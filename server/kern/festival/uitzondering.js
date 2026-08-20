@@ -24,6 +24,11 @@
    terwijl de boeking nog een voornemen is, een rider met open punten, een
    soundcheck die begint.
 
+   WAT ER VAN DE BEMENSING BIJKOMT staat in ./voorspelling.js: een plek waar
+   minder mensen staan dan de norm vraagt, en een uitstroom die niet meer voor
+   sluitingstijd past. Beide gerekend op getallen die een mens heeft gezet, en
+   dus met dezelfde vanzelfsprekendheid op deze hoop als de rest.
+
    WAT ER VAN BUITEN BIJKOMT staat in ./signalen.js: onbezette beveiligingsposten
    en een door de vervoerder gemelde storing, gelezen bij BEVESTIGDE partners en
    alleen voor wat die partner zelf heeft vrijgegeven. Die twee lijsten worden
@@ -39,7 +44,8 @@
 const ERNST = { kritiek: 3, hoog: 2, aandacht: 1 };
 
 module.exports = (ctx) => {
-  const { editieVind, dagVind, bezetting, instroom, signalen, podiumSignalen } = ctx;
+  const { editieVind, dagVind, bezetting, instroom, signalen, podiumSignalen,
+    vooruitSignalen } = ctx;
 
   /* De horizon: hoe ver vooruit een uitzondering nog een uitzondering is. Een
      uur is de standaard omdat dat ongeveer de tijd is die een ingreep op een
@@ -112,6 +118,9 @@ module.exports = (ctx) => {
        naar hetzelfde scherm, en een tweede lijst laat ze kiezen. */
     const vloer = podiumSignalen(fid, eid, { dag: dag.id, tijd: v.tijd, vooruit: horizon });
     if (!vloer.error) for (const s of vloer.signalen) uit.push(s);
+
+    const vooruit = vooruitSignalen(fid, eid, { dag: dag.id, tijd: v.tijd, vooruit: horizon });
+    if (!vooruit.error) for (const s of vooruit.signalen) uit.push(s);
 
     /* Het dringendste eerst: eerst de ernst, dan de tijd die er nog is. */
     uit.sort((a, b2) => (ERNST[b2.ernst] - ERNST[a.ernst]) || (a.over - b2.over));

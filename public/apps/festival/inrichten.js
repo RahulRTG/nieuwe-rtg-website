@@ -172,7 +172,7 @@
     doe('/api/festival/plek', { naam: $('#plekNaam').value.trim(), soort: $('#plekSoort').value,
       ouder: $('#plekOuder').value || null, capaciteit: $('#plekCap').value,
       veiligeCapaciteit: $('#plekVeilig').value, besloten: $('#plekBesloten').checked,
-      changeover: $('#plekOmbouw').value },
+      changeover: $('#plekOmbouw').value, doorstroom: $('#plekDoor').value },
       function () { $('#plekNaam').value = ''; herlaadTerrein().then(na); });
   });
 

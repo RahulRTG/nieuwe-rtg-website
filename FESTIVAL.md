@@ -487,8 +487,68 @@ hebben.
    veiligheidscoördinator die naar twee schermen kijken, is precies wat deze
    wereld niet is. Er wordt hier niets afgelast en niets omgeboekt: deze laag
    stelt vast, ingrijpen doet de mens (par. 4).
-7. **Voorspelling.** Horeca-, personeels- en vervoersvraag uit programma en flow.
-8. **Geheugen.** Verwacht tegen werkelijk, per editie, als advies voor de volgende.
+7. **Voorspelling.** ✅ Wat er ergens hoort te staan, tegen wat er staat — en
+   hoe lang het leeglopen duurt. `kern/festival/{norm,voorspelling}.js`
+
+   **Het getal is van de organisator en niet van ons.** Dit is de fase waar
+   LAT-regel 3 het snelst sneuvelt: een kengetal als „reken op één medewerker
+   per 250 bezoekers” ziet eruit als kennis, is een gok, en wordt nooit meer
+   weggehaald zodra het er staat. Er staat hier dus geen enkele standaardnorm en
+   geen startlijst. Een norm is een uitspraak van een mens die dit festival kent
+   — `vast` (wat er hoe dan ook moet staan) plus `per100` (wat er per honderd
+   aanwezigen bij komt) — en de software doet niets anders dan die uitspraak over
+   een heel terrein en een hele avond uitrekenen.
+
+   **De aanwezigen komen van de dichtstbijzijnde tellende plek.** Een bar telt
+   zelf niemand, dus „per 250 in de zone” rekent op de zone waarin die bar ligt,
+   en de uitkomst zegt erbij op welke plek dat getal gemeten is. Zo is „vier man”
+   geen mededeling maar iets wat na te rekenen valt.
+
+   **Een dienst bemenst de plek waarop hij staat, en niets anders.** Streng, en
+   met opzet: de andere kant op zou een rooster met tien man op „het terrein”
+   elke bar, elk toilet en elke poort tegelijk bemand laten lijken.
+
+   **Het leeglopen is de vervoersvraag in zijn eerlijkste vorm:** aanwezigen
+   gedeeld door de doorstroom van de uitgangen, afgezet tegen de tijd tot de
+   curfew. De doorstroom staat op de plek en wordt door de organisator gezet;
+   staat hij er niet, dan wordt er niets uitgerekend en zegt het scherm dat.
+   Nooduitgangen tellen niet mee — die zijn er voor een ontruiming, niet voor
+   het naar huis gaan, en ze meerekenen maakt het getal mooier en de avond
+   gevaarlijker.
+
+   **Wat er níét is: een bezoekersprognose en een verbruiksmodel.** Hoeveel
+   mensen er komen en hoeveel bier er doorgaat, valt zonder editiegeschiedenis
+   niet te weten. Wie er een norm voor zet, krijgt hem uitgerekend; wie dat niet
+   doet, krijgt geen getal. Dat is dezelfde stilte als bij voorraad en weer in
+   `signalen.js`, en om dezelfde reden.
+8. **Geheugen.** ✅ Een afdruk per afgesloten dag, en die editie naast de vorige.
+   `kern/festival/geheugen.js`
+
+   **Een afgesloten dag is een afdruk en geen berekening**, en dat is het enige
+   punt in deze wereld waar met opzet een tweede waarheid ontstaat. Overal
+   anders geldt LAT-regel 4. Hier niet: scans worden opgeruimd, een terrein
+   wordt volgend jaar anders ingedeeld, een norm verandert. Een geheugen dat elk
+   jaar opnieuw uitrekent wat er vorig jaar gebeurde, is geen geheugen maar een
+   schatting die meebeweegt met vandaag. Er wordt dus vastgelegd op het moment
+   van afsluiten, met de naam van wie afsloot erbij, en daarna niet herrekend.
+   Een tweede keer afsluiten kan, maar staat er dan ook bij.
+
+   **Er staan aantallen in en geen mensen** (par. 5.1). Geen pascodes, geen
+   codenamen, geen tijdstip waarop iemand ergens was. „Even bewaren wie er
+   waren” is één regel code, en dat is precies de regel die hier niet mag staan.
+
+   **De piek wordt gevonden door de dag na te lopen**, op elk moment waarop er
+   werkelijk iets veranderde. Zijn dat er te veel, dan per kwartier — en welke
+   van de twee het was, staat *in* de afdruk. Een piek die tussen twee
+   peilmomenten in viel, kan gemist zijn, en dat hoort niemand later te moeten
+   raden.
+
+   **Advies is een waarneming en geen voorspelling.** „Vorig jaar kwam 78% van
+   de geldige passen binnen” is iets anders dan „dit jaar komt 78%”. Er staat
+   dus nergens een verwachting voor de volgende editie; er staat wat er was, en
+   hoeveel edities dat waren. Een lijn door één punt is geen lijn — de
+   vergelijking zegt dat met zoveel woorden, en zonder eerdere *afgesloten*
+   editie vergelijkt hij niets.
 
 ---
 
@@ -504,6 +564,8 @@ hebben.
 - **Geen weersvoorspeller.** De weerlaag rekent gevolgen door van een voorspelling
   die ergens anders vandaan komt, en zegt erbij van wie.
 - **Niet in één release.** Acht fasen, en elke fase moet los overeind staan.
+  Alle acht staan er nu; wat er niet in zit staat hierboven per fase, en dat is
+  geen achterstand maar een grens.
 
 ---
 

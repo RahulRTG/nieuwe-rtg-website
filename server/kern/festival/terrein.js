@@ -90,6 +90,13 @@ module.exports = (ctx) => {
        opnieuw en loopt hij bij de eerste wijziging uit de pas. */
     const changeover = d.changeover == null || d.changeover === ''
       ? 0 : Math.max(0, Math.min(240, parseInt(d.changeover, 10) || 0));
+    /* DE DOORSTROOM hoort net zo goed bij de plek: hoeveel mensen er per uur
+       door deze uitgang of halte kunnen. Het is het enige getal waarmee "hoe
+       lang duurt het leeglopen" te rekenen valt, en het is een getal van de
+       ORGANISATOR -- wij meten het niet en verzinnen het niet. Staat het er
+       niet, dan rekent ./voorspelling.js hier niets uit en zegt dat ook. */
+    const doorstroom = d.doorstroom == null || d.doorstroom === ''
+      ? 0 : Math.max(0, Math.min(1000000, parseInt(d.doorstroom, 10) || 0));
     const cap = Math.max(0, Math.min(1000000, parseInt(d.capaciteit, 10) || 0));
     let veilig = d.veiligeCapaciteit == null || d.veiligeCapaciteit === ''
       ? cap : Math.max(0, parseInt(d.veiligeCapaciteit, 10) || 0);
@@ -124,11 +131,13 @@ module.exports = (ctx) => {
          Dit moet VOOR het opslaan gebeuren, want daarna is de boom al stuk. */
       if (ouder && (ouder === p.id || plekIn(e, ouder, p.id)))
         return { status: 400, error: 'Een plek kan niet in zichzelf liggen.' };
-      Object.assign(p, { naam, soort, ouder, besloten, changeover, capaciteit: cap, veiligeCapaciteit: veilig });
+      Object.assign(p, { naam, soort, ouder, besloten, changeover, doorstroom,
+        capaciteit: cap, veiligeCapaciteit: veilig });
       save();
       return { ok: true, plek: p };
     }
-    const p = { id: id(), naam, soort, ouder, besloten, changeover, capaciteit: cap, veiligeCapaciteit: veilig };
+    const p = { id: id(), naam, soort, ouder, besloten, changeover, doorstroom,
+      capaciteit: cap, veiligeCapaciteit: veilig };
     if (Object.keys(e.plekken).length >= 2000) return { status: 400, error: 'Tot tweeduizend plekken per editie.' };
     e.plekken[p.id] = p;
     save();

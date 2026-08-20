@@ -51,6 +51,10 @@
   23. Het schema veranderen is managerwerk; een riderpunt afvinken doet de vloer.
   24. Het podiumbeeld neemt dag en klok van de server.
   25. De afrekening is een overzicht, en blijft bij de manager.
+  26. De norm zetten is managerwerk; de vraag lezen doet de vloer.
+  27. De voorspelling neemt dag en klok van de server.
+  28. Afsluiten draagt de naam uit de sessie en gebeurt niet twee keer stil.
+  29. Het geheugen blijft bij de manager en vergelijkt niet met niets.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -498,6 +502,68 @@ test('25. de afrekening is een overzicht en blijft bij de manager', async () => 
   assert.match(a.let_op, /niets geind en niets overgemaakt/);
 });
 
+test('26. de norm zetten is managerwerk, de vraag lezen doet de vloer', async () => {
+  const barId = (await post('/api/festival/plek', { festival: fid, editie: eid,
+    naam: 'Bar Lima', soort: 'bar', ouder: terreinId }, manager)).plek.id;
+
+  assert.equal((await api('/api/festival/norm', { festival: fid, editie: eid, plek: barId,
+    vast: 4, van: '00:00', tot: '23:59' }, deur)).status, 403);
+
+  /* De norm hangt aan VANDAAG en niet aan elke dag. Dat is wat toets 27
+     bruikbaar maakt: op de dag van morgen hoort er dan geen gat te staan, en
+     een route die de dag uit het lichaam zou overnemen, valt daardoor door de
+     mand. Met een norm voor alle dagen bewees die toets niets. */
+  const r = await post('/api/festival/norm', { festival: fid, editie: eid, plek: barId,
+    dag: vandaagId, vast: 4, van: '00:00', tot: '23:59' }, manager);
+  assert.equal(r.ok, true);
+  assert.equal(r.norm.wat, 'mensen');
+
+  /* Lezen mag de vloer: wie ziet dat hij met twee van de vier staat, is de
+     eerste die het kan melden. */
+  const lijst = await post('/api/festival/normen', { festival: fid, editie: eid }, deur);
+  assert.equal(lijst.ok, true);
+  assert.ok(lijst.normen.some(n => n.plekNaam === 'Bar Lima'));
+});
+
+test('27. de voorspelling neemt de dag en de klok van de server', async () => {
+  /* Het lichaam wijst naar morgen en naar vier uur 's nachts; de route hoort
+     dat te negeren en de lopende dag te nemen. Zelfde regel als bij de scan
+     (toets 5) en het podiumbeeld (toets 24), en hier omdat een gat van een uur
+     geleden een ander gat is dan het gat van nu. */
+  const b = await post('/api/festival/vooruit', { festival: fid, editie: eid,
+    dag: morgenId, tijd: '04:00' }, deur);
+  assert.equal(b.ok, true);
+  assert.equal(b.dag, vandaagId);
+  assert.ok(b.gaten.some(g => g.plekNaam === 'Bar Lima'),
+    'er staat een norm van vier voor VANDAAG en niemand ingeroosterd; op de dag '
+    + 'uit het lichaam zou hier niets staan');
+  assert.equal(b.leegloop.bekend, false, 'geen doorstroom gezet, dus geen getal');
+});
+
+test('28. afsluiten draagt de naam uit de sessie, en gebeurt niet twee keer stil', async () => {
+  assert.equal((await api('/api/festival/dag/sluiten', { festival: fid, editie: eid,
+    dag: vandaagId }, deur)).status, 403, 'een dag afsluiten is geen deurwerk');
+
+  const r = await post('/api/festival/dag/sluiten', { festival: fid, editie: eid,
+    dag: vandaagId, door: 'Nienke Vroomen' }, manager);
+  const roster = await post('/api/supplier/roster', { code: 'ESVEDRA' });
+  const managerNaam = roster.staff.find(x => x.role === 'manager').name;
+  assert.equal(r.afdruk.door, managerNaam, 'niet de naam die is ingetypt');
+  assert.ok(r.afdruk.passenGeldig >= 1);
+
+  const nog = await api('/api/festival/dag/sluiten', { festival: fid, editie: eid,
+    dag: vandaagId }, manager);
+  assert.equal(nog.status, 409);
+});
+
+test('29. het geheugen blijft bij de manager en vergelijkt niet met niets', async () => {
+  assert.equal((await api('/api/festival/geheugen', { festival: fid, editie: eid }, deur)).status, 403);
+  const g = await post('/api/festival/geheugen', { festival: fid, editie: eid }, manager);
+  assert.equal(g.ok, true);
+  assert.equal(g.bekend, false, 'er is nog geen eerdere editie');
+  assert.equal(g.nu.dagen.length, 1);
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -599,4 +665,23 @@ test('25. de afrekening is een overzicht en blijft bij de manager', async () => 
       LICHAAM laten komen in plaats van uit de serverklok.
       -> toets 24 zakte: het beeld toonde het programma van morgen terwijl het
          eigen podium draaide. Zelfde fout als mutatie 3 en 6, andere deur.
+
+  19. In routes/festival/vooruit.js dag en tijd van /api/festival/vooruit uit
+      het LICHAAM laten komen.
+      -> toets 27 zakte. Dezelfde fout als mutatie 3, 6 en 18; de vijfde deur.
+      LET OP -- deze mutatie sloeg de EERSTE keer af, en dat lag aan de toets.
+         De norm die erin stond gold voor ELKE dag, dus op de dag uit het
+         lichaam stond er net zo goed een gat en bewees de toets niets. De norm
+         hangt nu aan vandaag; dan is er op de dag van morgen geen gat, en zakt
+         de mutatie. Dit is de derde keer in dit bestand dat een mutatie een gat
+         in de TOETS aanwijst in plaats van in de code (zie ook 2 en 7).
+
+  20. In routes/festival/vooruit.js `door` bij /api/festival/dag/sluiten uit de
+      body laten komen.
+      -> toets 28 zakte: de afdruk van een festivaldag droeg de naam van iemand
+         die niet bestaat, en dat is de naam waar je een jaar later op teruggaat.
+
+  21. In routes/festival/vooruit.js managerOnly weghalen bij /api/festival/norm,
+      /api/festival/dag/sluiten en /api/festival/geheugen.
+      -> toetsen 26, 28 en 29 zakten.
    ========================================================================== */

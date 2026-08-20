@@ -23,11 +23,22 @@
 module.exports = (ctx) => {
   const { editieVind, dagVind, plekVind, plekPad, momentOffset, PLEK_SOORTEN } = ctx;
 
-  /* De toestand per (pas, telplek): de laatste scan van die dag wint. */
-  function laatsteStandPer(e, dagId) {
+  /* De toestand per (pas, telplek): de laatste scan van die dag wint.
+
+     `tot` is optioneel en snijdt de dag af op een moment (minuten na opening).
+     Zonder dat getal is de uitkomst de stand NU, en dat is wat de cockpit
+     vraagt. Mét dat getal is het de stand op dat moment, en dat is wat
+     ./geheugen.js nodig heeft om achteraf de piek te vinden. Dat is bewust
+     dezelfde functie: een tweede telling die "vroeger" berekent, gaat op de
+     eerste de beste wijziging uit de pas lopen met deze (LAT-regel 4). */
+  function laatsteStandPer(e, dagId, tot, dag) {
     const stand = new Map();
     for (const s of e.scans || []) {
       if (s.dag !== dagId || !s.telplek) continue;
+      if (tot != null) {
+        const o = momentOffset(dag, s.datum, s.tijd);
+        if (o === null || o > tot) continue;
+      }
       stand.set(s.pas + '|' + s.telplek, s.richting);
     }
     return stand;
@@ -35,9 +46,9 @@ module.exports = (ctx) => {
 
   /* Waar staat elke pas nu: zijn diepste plek. Geeft een Map plekId -> aantal
      met ALLEEN de diepste plek per pas; het optellen naar boven gebeurt daarna. */
-  function diepste(e, dagId) {
+  function diepste(e, dagId, tot, dag) {
     const binnen = new Map();                       // pas -> { plek, diepte }
-    for (const [sleutel, richting] of laatsteStandPer(e, dagId)) {
+    for (const [sleutel, richting] of laatsteStandPer(e, dagId, tot, dag)) {
       if (richting !== 'in') continue;
       const [pas, tel] = sleutel.split('|');
       const pad = plekPad(e, tel);
@@ -52,12 +63,13 @@ module.exports = (ctx) => {
 
   /* De bezetting van elke tellende plek, met de telling van alles wat erin ligt
      erbij opgeteld. */
-  function bezetting(fid, eid, dagId) {
+  function bezetting(fid, eid, dagId, tot) {
     const e = editieVind(fid, eid);
     if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
-    if (!dagVind(e, dagId)) return { status: 404, error: 'Deze dag staat niet in de editie.' };
+    const dag = dagVind(e, dagId);
+    if (!dag) return { status: 404, error: 'Deze dag staat niet in de editie.' };
 
-    const per = diepste(e, dagId);
+    const per = diepste(e, dagId, tot == null ? null : tot, dag);
     const totaal = new Map();
     for (const [plekId, n] of per) {
       const pad = plekPad(e, plekId);
@@ -79,7 +91,7 @@ module.exports = (ctx) => {
         deel: veilig ? Math.round((n / veilig) * 1000) / 10 : null });
     }
     uit.sort((a, b) => (b.deel || 0) - (a.deel || 0));
-    return { ok: true, dag: dagId, plekken: uit };
+    return { ok: true, dag: dagId, tot: tot == null ? null : tot, plekken: uit };
   }
 
   /* INSTROOM: hoeveel mensen kwamen er de laatste `venster` minuten binnen op

@@ -17,12 +17,16 @@
      ./rider.js         klaarzetten wat er moet staan, en wat er open staat
      ./podium.js        de vloer   wat er nu speelt, en wat er niet klopt
      ./dienst.js        de ploeg   wie waar staat; geen tweede klok, geen score
+     ./norm.js          de maat    wat er hoort te staan -- een getal van een mens
+     ./voorspelling.js  vooruit    het gat voordat het er is, en het leeglopen
      ./groep.js         samen      een groep gasten; RTG verstuurt hier niets
      ./partner.js       banden     een band die beide kanten sluiten
      ./signalen.js      van buiten wat andere domeinen al bijhouden
      ./uitzondering.js  vooruit    wat er over dertig minuten misgaat
      ./gereed.js        keuren     controls met bewijs; alleen afgetekend telt
      ./gereedheid.js    de uitslag het ene getal waar een terrein op opengaat
+     ./geheugen.js      terug      wat er werkelijk gebeurde, vastgelegd bij het
+                                   afsluiten en daarna niet meer herrekend
 
    DE VOLGORDE VAN OPBOUW IS NIET VRIJ, en het is dezelfde reden als bij
    kern/concern/index.js: elk deel leest wat het vorige heeft neergezet. ./model
@@ -69,6 +73,11 @@ module.exports = (ctx) => {
   Object.assign(k, require('./rider')(k));
   Object.assign(k, require('./podium')(k));
   Object.assign(k, require('./dienst')(k));
+  /* ./norm.js zet de maat, ./voorspelling.js legt hem naast het rooster en de
+     telling -- dus in die volgorde, en allebei voor ./uitzondering.js die de
+     gaten mee op de hoop gooit. */
+  Object.assign(k, require('./norm')(k));
+  Object.assign(k, require('./voorspelling')(k));
   Object.assign(k, require('./groep')(k));
   Object.assign(k, require('./partner')(k));
   Object.assign(k, require('./signalen')(k));
@@ -77,6 +86,9 @@ module.exports = (ctx) => {
      ./gereed.js, dus die volgorde is gedrag en geen smaak. */
   Object.assign(k, require('./gereed')(k));
   Object.assign(k, require('./gereedheid')(k));
+  /* ./geheugen.js als allerlaatste: het leest de telling, de bemensing en de
+     gereedheid, dus alles hierboven moet er al staan. */
+  Object.assign(k, require('./geheugen')(k));
 
   /* ---------- de samenvatting ----------
 

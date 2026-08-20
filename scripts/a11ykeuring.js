@@ -148,7 +148,14 @@ function zichtbaar(el) {
    WAT ER NOG STEEDS WORDT OVERGESLAGEN, en dat blijft eerlijk: een `url()` als
    achtergrond (een foto -- daar valt niets van te rekenen zonder de pixels), en
    een keten die tot de wortel doorzichtig blijft. Die twee geven null, precies
-   zoals vroeger. Alleen zijn het er nu een handvol in plaats van drieduizend. */
+   zoals vroeger. Alleen zijn het er nu een handvol in plaats van drieduizend.
+
+   NAGEREKEND OP 20 AUGUSTUS 2026, want "een handvol" was een schatting en die
+   hoort hier niet te staan. Over alle schermen in drie thema's, 5977
+   tekstelementen: de `url()`-grond is 663 keer de reden (11,1%) en de keten die
+   tot de wortel doorzichtig blijft NUL keer -- die reden stond dus jarenlang op
+   papier zonder ooit te zijn voorgekomen. De echte blinde vlek zat aan de
+   andere kant, bij de VOORGROND, en staat nu bij keurInPagina() uitgeschreven. */
 
 function mengOver(voor, achter) {
   const a = voor[3] == null ? 1 : voor[3];
@@ -277,6 +284,25 @@ function gronden(el) {
   }
   return uit.length ? uit : null;
 }
+/* DE LETTER OVER DE GROND. Een aparte functie en geen paar regels in de lus,
+   om precies een reden: hier zit sinds 20 augustus de menging van een
+   halfdoorzichtige VOORGROND in, en een som die de poort laat zakken of slagen
+   hoort in Node na te rekenen te zijn (test/a11ykeuring.test.js). In de lus
+   kan dat niet -- daar zit een browser omheen.
+
+   Per grondkandidaat wordt de letter EERST over die grond gemengd en pas daarna
+   gewogen. Dat is niet hetzelfde als een keer mengen en dan vergelijken: over
+   een verloop levert dezelfde letter per toon een andere kleur op, en de
+   ongunstigste van die combinaties telt. */
+function opGrond(fg, kandidaten) {
+  let beste = null;
+  for (const k of kandidaten) {
+    const inkt = mengOver(fg, k);            // EEN keer mengen, en hier
+    const r = ratio(inkt, k);
+    if (!beste || r < beste.verhouding) beste = { verhouding: r, grond: k, inkt: inkt };
+  }
+  return beste;
+}
 /* De oude naam blijft bestaan voor wie een enkele kleur wil: de ongunstigste
    kandidaat kan hij niet kiezen zonder de voorgrond te kennen, dus hij geeft de
    eerste. Binnen de keuring wordt gronden() gebruikt, niet dit. */
@@ -388,19 +414,43 @@ function keurInPagina() {
     if (!eigenTekst || !zichtbaar(el)) return;
     const s = getComputedStyle(el);
     if (parseFloat(s.opacity) < 1) return;                 // half-transparante intro-tekst: overslaan
-    const fg = kleur(s.color); if (!fg || fg[3] < 1) return;
+    /* EEN HALFDOORZICHTIGE LETTER IS OOK EEN LETTER, en dat is de reparatie van
+       20 augustus 2026. Hieronder stond \`fg[3] < 1\` en dan return: elke tekst met
+       een alfa in zijn kleur ging ongewogen langs de poort. Gemeten over alle
+       schermen in drie thema's: 1968 van de 5977 tekstelementen, 32,9%. Dat is
+       geen randgeval maar de grootste blinde vlek die er was -- groter dan de
+       \`url()\`-gronden (11,1%) en groter dan de reden die hier op papier stond
+       ("een keten die tot de wortel doorzichtig blijft", in werkelijkheid NUL).
+       En het is precies de groep waar de zachte tonen van dit huis in wonen:
+       \`--rtg-muted\` en \`--rtg-soft\` staan als \`rgba(...)\` in de themalaag, dus
+       de poort keek langs de tekst waar hij het hardst nodig was.
+
+       Rekenen kan gewoon: de browser doet er hetzelfde mee als met een
+       doorzichtige achtergrondlaag, en die som staat al in mengOver(). Per
+       grondkandidaat wordt de letter EERST over die grond gemengd en pas daarna
+       gewogen -- niet eenmaal over de eerste kandidaat, want over een verloop
+       verschilt de gemengde letter per toon.
+
+       Wat hier nog wel stopt: alfa NUL. Dat is geen bleke letter maar een
+       onzichtbare, en die wordt in dit huis (en overal) gebruikt om tekst door
+       een achtergrond te laten tekenen (\`background-clip:text\`). Daar valt geen
+       verhouding van te maken die iets betekent, dus zwijgt de poort erover --
+       dezelfde afspraak als bij een foto als grond. */
+    const fg = kleur(s.color); if (!fg || !(fg[3] == null || fg[3] > 0)) return;
     /* De ONGUNSTIGSTE grond telt. Tekst over een verloop staat op elke toon
        ervan, dus hij hoort overal leesbaar te zijn en niet gemiddeld. */
     const kandidaten = gronden(el); if (!kandidaten || !kandidaten.length) return;
-    let bg = kandidaten[0];
-    for (const k of kandidaten) if (ratio(fg, k) < ratio(fg, bg)) bg = k;
+    const uit = opGrond(fg, kandidaten);
+    const laagst = uit.verhouding, bg = uit.grond, voor = uit.inkt;
     const drempel = grootTekst(parseFloat(s.fontSize), s.fontWeight) ? 3 : 4.5;
-    if (ratio(fg, bg) < drempel - 0.05) {
-      tel(contrast, 'contrast', 'Te laag kleurcontrast (' + Math.round(ratio(fg, bg) * 100) / 100 + ':1)');
+    if (laagst < drempel - 0.05) {
+      tel(contrast, 'contrast', 'Te laag kleurcontrast (' + Math.round(laagst * 100) / 100 + ':1)');
       // hoogstens drie voorbeelden: genoeg om het te vinden, niet genoeg om
       // het log onleesbaar te maken
       if (contrast.contrast.waar.length < 3)
-        contrast.contrast.waar.push(adres(el) + ' -- ' + s.color + ' op rgb(' + bg.slice(0, 3).join(', ') + ')');
+        contrast.contrast.waar.push(adres(el) + ' -- ' + s.color +
+          ((fg[3] == null || fg[3] >= 1) ? '' : ' = rgb(' + voor.join(', ') + ')') +
+          ' op rgb(' + bg.slice(0, 3).join(', ') + ')');
     }
   });
 
@@ -408,7 +458,7 @@ function keurInPagina() {
 }
 
 const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar,
-  mengOver, laagStukken, verloopStops, uitersten, pseudoLagen, gronden, achtergrond, adres, keurInPagina]
+  mengOver, laagStukken, verloopStops, uitersten, pseudoLagen, gronden, opGrond, achtergrond, adres, keurInPagina]
   .concat([]) // dektHelemaal is een pijlfunctie en gaat als tekst mee, hieronder
   .map(f => f.toString()).join('\n\n') +
   '\nconst dektHelemaal = ' + dektHelemaal.toString() + ';\n' +
@@ -431,4 +481,4 @@ function velt(structureel, contrast) {
 }
 
 module.exports = { BRON, kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, velt,
-  mengOver, laagStukken, verloopStops, uitersten, dektHelemaal };
+  mengOver, laagStukken, verloopStops, uitersten, dektHelemaal, opGrond };

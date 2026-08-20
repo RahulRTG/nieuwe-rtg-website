@@ -147,3 +147,35 @@ test('van een verloop tellen alleen de uitersten', () => {
   assert.deepEqual(uit[0], [173, 91, 59, 1]);
   assert.deepEqual(uit[1], [58, 17, 29, 1]);
 });
+
+/* ---------- de letter zelf ----------
+   Deze toets bestaat omdat de keuring tot 20 augustus 2026 elke tekst met een
+   ALFA in zijn kleur ongewogen liet passeren: `if (fg[3] < 1) return`. Gemeten
+   over alle schermen in drie thema's: 1968 van de 5977 tekstelementen, 32,9% --
+   de grootste blinde vlek die deze poort had, en precies de groep waar de
+   zachte tonen van dit huis in wonen (--rtg-muted en --rtg-soft staan als
+   rgba() in de themalaag). */
+
+test('een halfdoorzichtige letter wordt over zijn grond gemengd, niet overgeslagen', () => {
+  /* DE MUTATIE: laat opGrond de fg ongemengd wegen (ratio(fg, k) in plaats van
+     ratio(mengOver(fg, k), k)). Wit-met-alfa-0,4 op zwart meet dan 21:1 terwijl
+     er in werkelijkheid donkergrijs op zwart staat. */
+  const uit = k.opGrond([255, 255, 255, 0.4], [[12, 12, 11]]);
+  assert.deepEqual(uit.inkt, [109, 109, 109], 'wit op 40% over bijna-zwart is middengrijs');
+  assert.ok(uit.verhouding < 4.5, 'en dat haalt de norm niet: ' + uit.verhouding);
+  // dekkend blijft precies wat het was
+  assert.equal(Math.round(k.opGrond([255, 255, 255, 1], [[12, 12, 11]]).verhouding * 100) / 100,
+    Math.round(k.ratio([255, 255, 255], [12, 12, 11]) * 100) / 100);
+});
+
+test('over een verloop telt de ongunstigste combinatie, per kandidaat gemengd', () => {
+  /* Een letter met alfa is op elke toon van het verloop een ANDERE kleur, dus
+     eerst mengen en dan vergelijken -- niet andersom.
+     DE MUTATIE: meng EEN keer, over kandidaten[0], en vergelijk die ene inkt
+     met alle gronden. Hieronder staat de donkere grond voorop, dus die menging
+     levert middengrijs -- en dan meet de witte grond 3,68 in plaats van 1,03 en
+     verdwijnt de bevinding. Vandaar dat de donkere hier eerst staat. */
+  const uit = k.opGrond([255, 255, 255, 0.5], [[12, 12, 11], [255, 255, 255]]);
+  assert.deepEqual(uit.grond, [255, 255, 255], 'op wit is een halve witte letter het slechtst af');
+  assert.ok(uit.verhouding < 1.1, 'wit op wit blijft wit: ' + uit.verhouding);
+});

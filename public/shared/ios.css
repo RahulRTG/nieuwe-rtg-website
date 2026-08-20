@@ -100,6 +100,12 @@
   --rtg-muted:rgba(244,241,236,0.86); --muted:rgba(244,241,236,0.86);
   --rtg-soft:rgba(244,241,236,0.74); --soft:rgba(244,241,236,0.74);
   --rtg-line:var(--ios-lijn); --line:var(--ios-lijn);
+  /* EN DE VLAKKEN, want een knop in de balk pakt --card2 en die staat op de
+     pagina. Zonder deze twee is dat op een LICHT thema een doorzichtig wit
+     kaartje op een donkere balk -- middengrijs, met de ivoren balkinkt erop.
+     Gemeten op websitestudio en sitemaker: de knop Reset, 2,6:1. */
+  --rtg-card:#111110; --card:#111110;
+  --rtg-card2:#151312; --card2:#151312;
 }
 
 /* Links en rechts krijgen precies wat ze nodig hebben, de titel krijgt de rest

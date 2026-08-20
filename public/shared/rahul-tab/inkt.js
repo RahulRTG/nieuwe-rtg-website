@@ -100,15 +100,29 @@
   }
   var woord = licht ? '#3A3733' : '#F2EEE8';
   if (grond && verhouding(rgbVan(woord), grond) < 4.5) woord = licht ? '#14110E' : '#FFFFFF';
-  /* DE ZACHTERE ONDERREGEL IS VERVALLEN, en dat is een besluit met een reden.
+  /* DE ZACHTERE ONDERREGEL IS VERVALLEN, EN IK HEB HEM OP 20 AUGUSTUS 2026
+     GEPROBEERD TERUG TE ZETTEN. Dat werkte niet, en waarom niet hoort hier te
+     staan, anders probeert de volgende het opnieuw.
+
      Hij stond op #5A5651 of #8A8680 en zakte op elke MIDDENTOON: 4,07:1 op de
-     goudgetinte tab, 2,37 op een lichte pagina. Die toon veilig houden vraagt een
-     grondmeting die klopt, en grondVan() hierboven meet iets anders dan de
-     keuring -- die mengt doorzichtige lagen, deze niet. Ik heb geprobeerd hem
-     gelijk te trekken en dat keerde de inktkeuze op sommige schermen om.
-     Een verschil dat je niet kunt narekenen, mag geen leesbaarheid dragen. Dus
-     draagt de onderregel dezelfde inkt als het woord: iets minder zacht, en
-     altijd te lezen. */
+     goudgetinte tab, 2,37 op een lichte pagina. Mijn gedachte was: sinds
+     grondVan() hierboven NULL geeft als hij het niet weet, kan ik hem gewoon
+     narekenen -- zacht als de grond bekend is en de toon er 4,5 haalt, anders de
+     volle inkt. Dat leek waterdicht en het was het niet: de a11y-poort ging van
+     12 naar 88 bevindingen, 84 daarvan op precies dit ene element, rgb(138,134,128)
+     op rgb(79,78,76).
+
+     De oorzaak staat al in de kop van dit bestand en ik had hem moeten geloven:
+     grondVan() zoekt de eerste voorouder met een DEKKENDE achtergrondkleur, en de
+     keuring mengt doorzichtige lagen en verlopen. Op een tab die op een half
+     doorzichtige balk hangt, vindt grondVan() dus een donkere voorouder verderop
+     terwijl er in werkelijkheid middengrijs onder de letters ligt. De toon haalt
+     mijn controle en zakt in het echt.
+
+     Twee metingen die niet dezelfde vraag beantwoorden, mogen samen geen besluit
+     dragen. De onderregel draagt daarom dezelfde inkt als het woord: iets minder
+     zacht, en altijd te lezen. Wie hem terug wil, moet EERST grondVan() en
+     gronden() dezelfde vraag laten beantwoorden -- niet de uitkomst ervan gokken. */
   var zacht = woord;
   tab.style.setProperty('color', woord, 'important');
   var sub = tab.querySelector('small');

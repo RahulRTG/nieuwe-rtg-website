@@ -86,12 +86,25 @@
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
   /* DE ACCENTTOON MOET OOK OP EEN LICHT VLAK LEZEN. #5EE7F7 is een heldere
-     cyaan: prachtig op pianolak (10,5:1) en onleesbaar op parelmoer (1,4).
-     Op een lichte grond wordt het dezelfde kleur in de schaduw. */
-  /* Champagne is het enige LICHTE thema van het huis (rtg-themas.css), dus dat
-     is hier de schakelaar. Zou er ooit een tweede lichte grond bij komen, dan
-     hoort deze regel mee te groeien -- de a11y-poort zegt het dan meteen. */
-  :root[data-rtg-thema="champagne"] .moveHero{--ov-accent:#155A63;}
+     cyaan: prachtig op pianolak (13,3:1) en onleesbaar op parelmoer (1,4). En de
+     tint is niet van dit blad: de server stuurt hem mee met het lidmaatschap
+     (private goud, lifestyle amber) en laadMoveWereld() zet hem INLINE. Een
+     inline stijl wint van elke regel hier, dus een vaste vervanging op champagne
+     haalde niets uit -- dat was mijn eerste poging en de poort zag hem gewoon
+     staan.
+
+     Wat hier staat vervangt de kleur dus niet maar VERDIEPT hem: dezelfde tint,
+     in de schaduw, zodat het onderscheid tussen de passen blijft. 40% van de
+     tint, nagerekend op de drie accenten die de server stuurt en op de twee
+     gronden waar ze staan: 5,8 tot 7,4 -- alle drie ruim boven de 4,5.
+
+     Champagne is het enige LICHTE thema van het huis (rtg-themas.css), dus dat
+     is hier de schakelaar. Komt er ooit een tweede lichte grond bij, dan hoort
+     deze regel mee te groeien -- de a11y-poort zegt het dan meteen. */
+  :root[data-rtg-thema="champagne"] .moveHero .eyebrow,
+  :root[data-rtg-thema="champagne"] .moveHero .moveStop,
+  :root[data-rtg-thema="champagne"] .moveHero .moveOrb b{
+    color:color-mix(in srgb,var(--accent) 40%,#000);}
   .moveHero{--accent:var(--ov-accent,#5EE7F7);position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:26px;
     border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--card)),var(--card) 70%);box-shadow:0 24px 70px rgba(0,0,0,.25)}
   .moveHero.private{--accent:#D8C8A0;background:linear-gradient(145deg,#24231e,#0c1015 72%)}.moveHero.lifestyle{--accent:#E8C98B;background:linear-gradient(145deg,#34251f,#17110f 72%)}

@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, browserOpties, geenBrowser, laadPlaywright } = require('./helper');
 
 const pw = laadPlaywright();
 /* Dezelfde browserkeuze als test/office-suite.e2e.js: een meegeleverde Chromium

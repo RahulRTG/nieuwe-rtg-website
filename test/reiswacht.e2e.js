@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser, laadPlaywright } = require('./helper');
 
 const pw = laadPlaywright();
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };

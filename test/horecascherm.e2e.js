@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, geenBrowser, browserOpties } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, geenBrowser, browserOpties, volgVerzoeken, wachtOpRust, wachtOpTekst } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-horecascherm-'));

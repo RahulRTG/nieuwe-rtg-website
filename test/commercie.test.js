@@ -183,10 +183,17 @@ test('11. de partnerpoort staat open voor Business Lite, en hangt niet aan een p
   assert.equal(caps.mag('rtg', 'can_be_partner'), false, 'een consumentenpas is geen bedrijf');
   assert.equal(caps.mag('gratis', 'can_be_partner'), false);
 
-  const bron = require('fs').readFileSync(require.resolve('../server/routes/member/partnerkanaal.js'), 'utf8');
+  /* Het partnerkanaal is bij de 10 kB-knip in twee onderwerpen gesplitst: het
+     BOEKEN via een partnerlink en de AANVRAAG van een bedrijf. De poort hoort
+     bij de aanvraag. Allebei gelezen, zodat een volgende verhuizing deze toets
+     laat zakken in plaats van hem stil te laten slagen op een bestand dat de
+     poort niet meer draagt. */
+  const bestanden = ['../server/routes/member/partnerkanaal.js', '../server/routes/member/partneraanvraag.js'];
+  const bron = bestanden.map((b) => require('fs').readFileSync(require.resolve(b), 'utf8')).join('\n');
   assert.doesNotMatch(bron, /tier\s*!==\s*'business'/,
     'de poort hoort een capability te vragen en geen pas-id: anders sluit elke nieuwe trede zichzelf buiten');
-  assert.match(bron, /can_be_partner/);
+  assert.match(bron, /can_be_partner/,
+    'de capability-poort staat in een van de twee helften van het partnerkanaal');
 });
 
 test('12. de gratis trede mag niets zakelijks, en dat is geen vergetelheid', () => {

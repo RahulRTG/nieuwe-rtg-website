@@ -29,9 +29,24 @@
 <link href="/shared/seizoen-pas.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/command.css" rel="stylesheet">
+<link href="/shared/adaptief.css" rel="stylesheet">
+<link href="/shared/grammatica.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
+<script src="/shared/adaptief.js" defer></script>
+<script src="/shared/adaptief/grammatica.js" defer></script>
+<script src="/shared/adaptief/register.js" defer></script>
+<script src="/shared/adaptief/lagen.js" defer></script>
+<script src="/shared/adaptief/vasthoud.js" defer></script>
+<script src="/shared/adaptief/rail.js" defer></script>
+<script src="/shared/adaptief/gewicht.js" defer></script>
+<script src="/shared/adaptief/waarom.js" defer></script>
+<script src="/shared/adaptief/balkknop.js" defer></script>
+<script src="/shared/adaptief/balk.js" defer></script>
+<script src="/shared/adaptief/diepte.js" defer></script>
+<script src="/shared/adaptief/orb.js" defer></script>
+<script src="/shared/adaptief/brug.js" defer></script>
 <style>
   :root{
     --bg:var(--rtg-bg);
@@ -1647,6 +1662,10 @@
   /* De widget-laag (kaartjes verbergen, terughalen en verslepen op een tweede
      beginscherm) is weg met dat tweede scherm zelf. De kaartjes staan nu in
      de app waar ze horen; daar hoeft niets meer gekozen of gesleept. */
+  .privknop{flex:1;background:none;border:1px solid var(--line);border-radius:0;
+    padding:0.6rem;font-size:0.68rem;color:var(--soft);}
+  .privrij{display:flex;gap:0.5rem;}
+  .privknop.wis{border-color:rgba(194,58,94,0.4);}
 </style>
 <script src="/shared/command/catalog.js" defer></script>
 <script src="/shared/command/console.js" defer></script>
@@ -1654,6 +1673,9 @@
 <script src="/shared/command/bank.js" defer></script>
 <script src="/shared/command/praat.js" defer></script>
 <script src="/shared/command/inlogpoort.js" defer></script>
+<script src="/shared/command/bladhaak.js" defer></script>
+<script src="/shared/command/romp.js" defer></script>
+<script src="/shared/command/geheugen.js" defer></script>
 <script src="/shared/command/werktafel.js" defer></script>
 <script src="/shared/command.js" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
@@ -1769,10 +1791,11 @@
       <div class="notif-list" id="notifList"></div>
       <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
         <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
-        <div style="display:flex;gap:0.5rem;">
-          <button id="privExport" style="flex:1;background:none;border:1px solid var(--line);border-radius:0;padding:0.6rem;font-size:0.68rem;color:var(--soft);" data-i18n="app.priv.export">Download mijn gegevens</button>
-          <button id="privDelete" style="flex:1;background:none;border:1px solid rgba(194,58,94,0.4);border-radius:0;padding:0.6rem;font-size:0.68rem;color:var(--burgundy);" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
+        <div class="privrij">
+          <button id="privExport" class="privknop" data-i18n="app.priv.export">Download mijn gegevens</button>
+          <button id="privDelete" class="privknop wis" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
         </div>
+        <div class="privrij"><button id="privKoppel" class="privknop" data-i18n="app.priv.koppel">Mijn koppelingen</button></div>
         <div style="font-size:0.6rem;color:var(--soft);line-height:1.5;" data-i18n="app.priv.note">Je AVG-rechten: inzage en vergetelheid, zonder formulieren. Verwijderen wist je cv, chats, likes en locatie en logt je overal uit.</div>
       </div>
     </div>
@@ -2303,6 +2326,9 @@
 <script src="/shared/adresvoorstel.js"></script>
 <script src="/shared/poortgesprek.js"></script>
 <script src="/apps/geo.js"></script>
+<script src="/shared/plek.js" defer></script>
+<script src="/shared/plaats.js" defer></script>
+<script src="/shared/plaatsdienst.js" defer></script>
 <script src="/apps/translate.js"></script>
 <script src="/apps/foundation/gezin-rt.js"></script>
 <script src="/shared/thema.js"></script>
@@ -2328,6 +2354,8 @@
 <script src="/shared/scanner.js"></script>
 <script src="/shared/scanknop.js"></script>
 <script src="/shared/rtgcode.js"></script>
+<script src="/shared/linkkaart.js"></script>
+<script src="/shared/linkkoppelingen.js"></script>
 <!-- de levende, ondertekende code (o.a. de contactcode die na een minuut vervalt) -->
 <script src="/shared/dyncode.js"></script>
 <script src="/shared/speler.js"></script>

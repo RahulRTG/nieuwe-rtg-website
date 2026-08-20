@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-08-18T13:35:45.279Z",
-    "commit": "852fe97",
+    "op": "2026-08-20T23:13:46.829Z",
+    "commit": "a732b304",
     "boomVuil": true,
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Gemeten uitslag van npm run sabotage: per systeemwet of het uitzetten van zijn handhaver ECHT iets rood maakte. Niet met de hand bijwerken -- npm run wetten vergelijkt de vingerafdruk van het recept en meldt het als de meting verlopen is.",
   "grens": "Per wet is EEN sabotagezet geprobeerd. \"Raak\" betekent: deze handhaver staat aan en merkt DEZE zet. Het is geen bewijs dat de wet langs geen enkele andere weg te omzeilen is. Wetten met \"mensenwerk\" zijn helemaal niet machinaal beproefd.",
@@ -214,10 +214,10 @@
     },
     "wereld-geen-twee-beginschermen": {
       "stand": "raak",
-      "afdruk": "16bcdc163c0c7d11",
-      "reden": "de merken liggen op een cirkel, en niet op een hoop",
-      "wachter": "e2e:test/wereld.e2e.js",
-      "duurMs": 209283
+      "afdruk": "132d10527e2099dd",
+      "reden": "\u001b[33m2026-08-20T23:11:24.582Z WARN \u001b[0m [config] RTG_ENC_KEY niet gezet: versleuteling-at-rest is uit (prima voor lokaal, niet voor productie).",
+      "wachter": "e2e:test/appmenu.e2e.js",
+      "duurMs": 142541
     },
     "techniek-geen-productie-zonder-grootboek": {
       "stand": "raak",

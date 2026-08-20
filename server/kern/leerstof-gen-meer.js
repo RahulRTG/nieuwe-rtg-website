@@ -59,45 +59,6 @@ const GEN2 = {
     return { v: 'Rond ' + n + ' af op ' + (stap === 10 ? 'tientallen' : stap === 100 ? 'honderdtallen' : 'duizendtallen'), a: String(uit), feit: { soort: 'afronden', n, stap } };
   },
 
-  // hoeveel tijd zit ertussen: klokkijken dat ergens over gaat
-  tijdsduur() {
-    const u1 = 7 + r(10), m1 = 5 * r(12);
-    const duur = 5 * (1 + r(23));
-    let u2 = u1, m2 = m1 + duur;
-    while (m2 >= 60) { m2 -= 60; u2++; }
-    const uren = Math.floor(duur / 60), min = duur % 60;
-    const a = uren ? (min ? uren + ' uur en ' + min + ' minuten' : uren + ' uur') : min + ' minuten';
-    return { v: 'Hoe lang duurt het van ' + tijd(u1, m1) + ' tot ' + tijd(u2, m2) + '?', a };
-  },
-
-  // de kalender: dagen, weken en maanden
-  kalender() {
-    const DAGEN = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
-    const MAANDEN = [['januari', 31], ['februari', 28], ['maart', 31], ['april', 30], ['mei', 31], ['juni', 30],
-      ['juli', 31], ['augustus', 31], ['september', 30], ['oktober', 31], ['november', 30], ['december', 31]];
-    const soort = r(3);
-    if (soort === 0) {
-      const ix = r(7), stap = 1 + r(6);
-      return { v: 'Het is ' + DAGEN[ix] + '. Welke dag is het over ' + stap + ' dag' + (stap === 1 ? '' : 'en') + '?',
-        a: DAGEN[(ix + stap) % 7], opties: schud(DAGEN.slice()) };
-    }
-    if (soort === 1) {
-      const [naam, dagen] = kies(MAANDEN);
-      return { v: 'Hoeveel dagen heeft ' + naam + ' (geen schrikkeljaar)?', a: String(dagen), opties: schud(['28', '30', '31']) };
-    }
-    const weken = 2 + r(6);
-    return { v: 'Hoeveel dagen zijn ' + weken + ' weken?', a: String(weken * 7) };
-  },
-
-  // schaal: van kaart naar werkelijkheid en terug
-  schaal() {
-    const s = kies([100, 200, 500, 1000]);
-    const cm = 2 + r(8);
-    const meter = (cm * s) / 100;
-    return { v: 'Op een kaart met schaal 1 : ' + s + ' is een weg ' + cm + ' cm lang. Hoeveel meter is dat in het echt?',
-      a: String(meter % 1 === 0 ? meter : Math.round(meter * 10) / 10).replace('.', ',') };
-  },
-
   // negatieve getallen, meestal in graden: het getal onder de nul
   negatief(g) {
     const max = g.max || 15;
@@ -145,27 +106,23 @@ const GEN2 = {
       return { v: 'Er werden boeken geleend: ' + tekst + '. Op welke dag waren het er de meeste?',
         a: meeste.dag, opties: schud(DAGEN.slice()) };
     }
-    if (soort === 1) return { v: 'Er werden boeken geleend: ' + tekst + '. Hoeveel in de hele week samen?',
-      a: String(rij.reduce((n, x) => n + x.n, 0)) };
+    /* Ook deze twee takken gaven geen opties terug terwijl `tabel` in MEERKEUZE
+       staat. De afleiders zijn de fouten die een kind bij een tabel echt maakt:
+       een dag overslaan of dubbel tellen, en optellen waar aftrekken moet. */
+    if (soort === 1) {
+      const totaal = rij.reduce((n, x) => n + x.n, 0);
+      const opties = [totaal, totaal - rij[0].n, totaal - rij[rij.length - 1].n,
+        totaal + Math.max.apply(null, rij.map(x => x.n))]
+        .filter(x => x > 0).map(String).filter((x, i, l) => l.indexOf(x) === i);
+      return { v: 'Er werden boeken geleend: ' + tekst + '. Hoeveel in de hele week samen?',
+        a: String(totaal), opties: schud(opties) };
+    }
     const twee = schud(rij).slice(0, 2);
+    const verschil = Math.abs(twee[0].n - twee[1].n);
+    const opties = [verschil, twee[0].n + twee[1].n, Math.max(twee[0].n, twee[1].n)]
+      .filter(x => x >= 0).map(String).filter((x, i, l) => l.indexOf(x) === i);
     return { v: 'Er werden boeken geleend: ' + tekst + '. Hoeveel schelen ' + twee[0].dag + ' en ' + twee[1].dag + '?',
-      a: String(Math.abs(twee[0].n - twee[1].n)) };
-  },
-
-  // meten: lengte, gewicht en inhoud omrekenen binnen een soort
-  meten(g) {
-    const TABEL = {
-      lengte: [['kilometer', 'meter', 1000], ['meter', 'centimeter', 100], ['centimeter', 'millimeter', 10], ['meter', 'decimeter', 10]],
-      gewicht: [['kilogram', 'gram', 1000], ['ton', 'kilogram', 1000], ['gram', 'milligram', 1000]],
-      inhoud: [['liter', 'deciliter', 10], ['liter', 'milliliter', 1000], ['deciliter', 'centiliter', 10]]
-    };
-    /* g.eenheid en niet g.soort: `soort` is al de naam van de generator zelf,
-       en een parameter die zo heet, overschrijft in de aanroep de generator. */
-    const [groot, klein, factor] = kies(TABEL[g.eenheid] || TABEL.lengte);
-    const n = 1 + r(9);
-    return r(2) === 0
-      ? { v: n + ' ' + groot + ' = hoeveel ' + klein + '?', a: String(n * factor) }
-      : { v: (n * factor) + ' ' + klein + ' = hoeveel ' + groot + '?', a: String(n) };
+      a: String(verschil), opties: schud(opties) };
   },
 
   // breuken vergelijken: welke is groter, en waarom is dat niet het grootste getal
@@ -179,6 +136,11 @@ const GEN2 = {
 };
 
 // welke van deze soorten meerkeuze zijn (zelfde afspraak als in leerstof-gen.js)
-const MEERKEUZE2 = ['breukvergelijk', 'kalender', 'schatten', 'tabel'];
+/* Meten en tijd staan in ./leerstof-gen-meten.js; hun meerkeuzesoorten reizen
+   mee zodat er maar een lijst is die de beller ziet. */
+const { GENM, MEERKEUZE_METEN } = require('./leerstof-gen-meten');
+Object.assign(GEN2, GENM);
+
+const MEERKEUZE2 = ['breukvergelijk', 'schatten', 'tabel'].concat(MEERKEUZE_METEN);
 
 module.exports = { GEN2, MEERKEUZE2 };

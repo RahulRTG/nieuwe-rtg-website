@@ -25,11 +25,15 @@
    3. EEN SOORT IS EEN REGEL. Niet een regel per melding maar een regel per
       soort, met het aantal erbij. Twaalf niet-becijferde toetsen zijn een taak
       en geen twaalf taken. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { datum } = require('../lib/klok');
 const MAX_PER_BAK = 6;
 
 module.exports = (sctx) => {
   const { router, S, eigenVeld, klasVan, presentieLijst, rapporten } = sctx;
-  const dag = () => new Date().toISOString().slice(0, 10);
+  const dag = () => datum().toISOString().slice(0, 10);
 
   /* Elke bron levert hoogstens EEN regel: wat, hoeveel, waarom, en waar het
      hoort. De volgorde binnen een bak is de volgorde hieronder; er wordt niet

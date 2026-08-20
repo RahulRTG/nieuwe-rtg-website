@@ -24,6 +24,10 @@
       precies het punt van Institutional Memory. Met besluit, eigenaar en datum.
    4. GEEN SAMENVATTING OVER MENSEN. Wat er in de notitie staat, heeft een mens
       zelf getypt. Er wordt hier niets over een docent of een kind samengevat. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { datum: klokDatum } = require('../lib/klok');
 const MAX_LESSEN = 2000;
 const TOON = 5;
 
@@ -40,7 +44,7 @@ function verslagVan(k, d, id, at, scho) {
       .map(([stand, n]) => [String(stand).slice(0, 20), Math.max(0, Number(n) || 0)]))
     : {};
   return { id, klasCode: k.code, klas: k.naam, fase: k.fase || null,
-    datum: scho(d.datum, 10) || new Date().toISOString().slice(0, 10),
+    datum: scho(d.datum, 10) || klokDatum().toISOString().slice(0, 10),
     door: scho(d.door, 60), at,
     doelen: (Array.isArray(d.doelen) ? d.doelen : []).map(x => String(x || '').trim()).filter(Boolean).slice(0, 20),
     /* Alleen de TELLING van de presentie. Wie er was staat in de presentielijst
@@ -52,7 +56,7 @@ function verslagVan(k, d, id, at, scho) {
 
 module.exports = (sctx) => {
   const { router, save, rid, nu, schoon, S, eigenVeld, klasVan, presentieLijst } = sctx;
-  const dag = () => new Date().toISOString().slice(0, 10);
+  const dag = () => klokDatum().toISOString().slice(0, 10);
   const L = (sch) => { if (!Array.isArray(sch.lessen)) sch.lessen = []; return sch.lessen; };
 
   const schoolVanKlas = (k) => (k.schoolCode ? eigenVeld(S(), k.schoolCode) : null);

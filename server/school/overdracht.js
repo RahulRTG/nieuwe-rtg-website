@@ -20,6 +20,10 @@
    van de vier standaarden hebben wij de specificatie niet kunnen lezen, dus
    die kaarten reizen met het etiket onbevestigd mee. Zie
    kern/koppelvlak-kaarten.js. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { nu: klokNu } = require('../lib/klok');
 const { pakket, KAART } = require('../kern/overdracht');
 const { naarBuiten, naarBinnen, STANDAARDEN } = require('../kern/koppelvlak');
 
@@ -114,7 +118,7 @@ module.exports = (sctx) => {
 
     const code = 'OD-' + rid(6).toUpperCase();
     kluis(g.sch)[code] = { code, naarSchool: naar.code, van: g.sch.naam, door, at: nu(),
-      tot: new Date(Date.now() + GELDIG_DAGEN * 86400000).toISOString(),
+      tot: new Date(klokNu() + GELDIG_DAGEN * 86400000).toISOString(),
       doel: p.doel, velden: p.velden, weggelaten: p.weggelaten, toestemmingDoor: p.toestemmingDoor };
     if (log) log(g.sch, g.p, 'overdracht-klaargezet', l.id, 'naar ' + naar.code + ' (' + p.doel + ')');
     save();

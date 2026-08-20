@@ -8,6 +8,10 @@
    - HUISWERK dat aan een leerdoel uit de leerlijn hangt: het kind oefent
      rechtstreeks vanuit de klas (met feedback, want oefenen mag verklikken)
      en bij vier van de vijf goed vinkt het huiswerk zichzelf af. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { nu: klokNu } = require('../lib/klok');
 const { DOELEN } = require('../kern/leerstof');
 const { opgave } = require('../kern/leerstof-gen');
 /* De Misconception Graph: een fout antwoord bij huiswerk wordt geduid en voor
@@ -72,7 +76,7 @@ module.exports = (sctx) => {
        vaste leraar via de achterdeur: hij begint als "even invallen bij ziekte"
        en staat er over een half jaar nog. Veertien dagen als de aanvrager
        niets zegt, negentig als maximum. */
-    k.waarnemer = { id: p.id, naam: p.naam, at: nu(), tot: totWanneer(req.body.dagen, Date.now()) };
+    k.waarnemer = { id: p.id, naam: p.naam, at: nu(), tot: totWanneer(req.body.dagen, klokNu()) };
     save();
     res.json({ ok: true, waarnemer: k.waarnemer,
       uitleg: 'De waarneming loopt tot ' + k.waarnemer.tot.slice(0, 10) + ' en stopt dan vanzelf. Eerder stoppen kan altijd.' });

@@ -12,6 +12,10 @@
 
    De waarnemer telt alleen zolang zijn waarneming loopt (./waarneming.js): een
    overname zonder einde is een tweede vaste leraar via de achterdeur. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { datum } = require('../lib/klok');
 const { eigenVeld } = require('../kern/util');
 const { loopt: waarnemingLoopt } = require('./waarneming');
 
@@ -49,7 +53,7 @@ function maakPoorten({ K, S, gezinVan, profielVan }) {
         const p = Object.values(sch.personeel || {}).find(x => x.token === tok);
         // de eigen leraar, een teamlid (max 3 vast) of de actieve waarnemer
         // de waarnemer telt alleen zolang zijn waarneming loopt (./school/waarneming.js)
-        const waarnemer = waarnemingLoopt(k.waarnemer, new Date().toISOString()) ? k.waarnemer : null;
+        const waarnemer = waarnemingLoopt(k.waarnemer, datum().toISOString()) ? k.waarnemer : null;
         if (p && p.status === 'actief' && (p.id === k.leraarId
           || (k.leraren || []).some(x => x.id === p.id)
           || (waarnemer && waarnemer.id === p.id))) mag = true;

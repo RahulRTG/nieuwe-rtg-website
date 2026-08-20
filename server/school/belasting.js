@@ -23,11 +23,15 @@
    EN ER GAAT NIETS NAAR HET KIND. Een drukke dag is een signaal aan wie het
    werk zet. Een melding aan een leerling dat het te druk is, verplaatst de last
    naar degene die er niets over te zeggen heeft. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { datum } = require('../lib/klok');
 const { week } = require('../kern/belasting');
 
 module.exports = (sctx) => {
   const { router, K, S, eigenVeld, klasVan, personeelVan, rapporten } = sctx;
-  const dag = () => new Date().toISOString().slice(0, 10);
+  const dag = () => datum().toISOString().slice(0, 10);
 
   /* Het werk van EEN klas, als telbare stukken. Titels blijven hier al buiten;
      wat er niet in gaat, kan er ook niet uit komen. */

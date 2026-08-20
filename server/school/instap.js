@@ -24,6 +24,10 @@
    Ook hier wordt niets bewaard. Er is geen voortgangsbalk en geen "3 van de 5
    voltooid": dat zou een prestatiemeter op een mens zijn, en dat is precies wat
    grens 8 verbiedt. De lijst wordt telkens uitgerekend uit de stand van zaken. */
+/* De tijd komt uit de tijdmachine en niet van het besturingssysteem: anders
+   is dit bestand niet te beproeven op schrikkeldag, zomertijd of een verlopen
+   termijn. Zie server/lib/klok.js. */
+const { datum } = require('../lib/klok');
 const { DOELEN } = require('../kern/leerstof');
 
 const MAX_DOELEN = 6;
@@ -59,7 +63,7 @@ function stappenVan(stand) {
 
 module.exports = (sctx) => {
   const { router, S, eigenVeld, K, klasVan, personeelVan, presentieLijst } = sctx;
-  const dag = () => new Date().toISOString().slice(0, 10);
+  const dag = () => datum().toISOString().slice(0, 10);
   const lessenVan = (sch) => (Array.isArray(sch && sch.lessen) ? sch.lessen : []);
 
   /* ---------- de vervanger: alles wat hij nodig heeft, en niets meer ---------- */

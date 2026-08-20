@@ -398,7 +398,7 @@ worden -- door de school, door ons, door een toezichthouder.
 | Zorg overleeft een echte overstap niet | met een gevuld zorgdossier getoetst | **ja** (`test/overdracht.test.js`) |
 | Een leerdoel-id verandert nooit | registertoets op de bestaande ids | **ja** (`test/leerfabric.test.js`) |
 | Een opgave verklapt nooit haar eigen antwoord | generatortoets over alle leerdoelen | **ja** -- ving bij het schrijven twee echte gevallen |
-| Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
+| Presentie van een les staat binnen 30 seconden | handelingen geteld + server gebenchmarkt (`test/presentiemeting.test.js`) | **deels**: het scherm is uitzonderingsgestuurd (iedereen staat op aanwezig), dus een klas van 30 met 2 afwezigen kost **3 handelingen** in plaats van 31, en de server schrijft die klas in **enkele milliseconden** weg -- ruim binnen zijn deel van de 30 seconden. Wat de mens kost is **ongemeten**: er is nooit een leraar mee geklokt |
 | Geen zorgtoegang zonder doel en reden | invariant + toets | **ja** (`test/schoolenterprise.test.js`) |
 | Een rapport bereikt het gezin alleen na menselijke vaststelling | invariant + toets | **ja** (`test/schoolbeeld.test.js`) |
 | AI stelt nooit zelfstandig een schooladvies vast | policytoets + mutatie | **ja** sinds 20 augustus 2026: de grens staat op een plek (`kern/schooladvies.js`) en elke paduitspraak hangt eraan, met mutatie beproefd |

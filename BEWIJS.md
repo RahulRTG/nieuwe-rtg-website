@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1036 bestanden en 6899 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1037 bestanden en 6903 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1036 |
-| losse beweringen (`test(...)`) | 6899 |
+| toetsbestanden | 1037 |
+| losse beweringen (`test(...)`) | 6903 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 109 |
+| niets van beide | 110 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-910 bestanden, 6679 beweringen.
+911 bestanden, 6683 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -596,6 +596,7 @@ toets omvalt.
 | `poortwacht.test.js` | 3 | gezakt op `===->!==#0` | De poortwacht-bevindingen, vastgelegd zodat ze niet terugkruipen. scripts/poortwacht.js klopt anoniem aan bij alle 2496 geregistreerde API-routes. |
 | `portemonnee.test.js` | 5 | gezakt op `liegpoort /api/` | DE PORTEMONNEE EN DE POST -- geld tussen mensen, en wat erover geschreven wordt. WAAROM DIT ER IS RTG Pay raakt het meest gevoelige dat een app kan doen: het saldo van een mens verplaatsen. |
 | `postdatum.test.js` | 13 | gezakt op `liegpoort /api/` | Postdatums: de datums die in uw eigen post staan, als VOORSTEL. Wat hier bewezen wordt, en waarom juist dit: de lezer drie vormen herkend, en de twijfelgevallen NIET geraden -- "03/04/2026" wordt overgeslagen met de... |
+| `presentiemeting.test.js` | 4 | -- | De presentiebelofte: een les staat binnen dertig seconden. Wat hier hard wordt gemaakt: - het scherm is UITZONDERINGSGESTUURD: iedereen staat op aanwezig en de leraar wijzigt alleen wie er niet is. |
 | `productie-installatie.test.js` | 4 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-motor.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie.test.js` | 19 | gezakt op `===->!==#0` | Tests voor de productie-hardening: config-validatie, duurzame opslag, betaal-naad (idempotentie + webhook-verificatie) en de logger. NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js, omdat die... |

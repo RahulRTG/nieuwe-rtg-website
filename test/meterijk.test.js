@@ -157,6 +157,43 @@ function journaalMetGat(weglaten) {
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
 const IJKINGEN = {
+  bewijsCellenBewezen: {
+    /* De 100%-tand op het bewijs zelf. De teller krijgt een nep-register
+       gevoerd (zelfde snit als telSkips): eerst een matrix met zeven bewezen
+       cellen, dan een zonder telling, dan een die geen JSON is. De laatste
+       twee horen te GOOIEN en niet nul te geven -- een register dat wegvalt is
+       een gezakte meting, en nul zou hier de allerslechtste stand belonen. */
+    proef: () => {
+      const schuld = JSON.stringify({ telling: { meetwerk: 0, instrument: 0, grens: 9 } });
+      const lees = (matrixTekst) => (naam) =>
+        naam === 'BEWIJSMATRIX.json' ? matrixTekst : schuld;
+      const uit = norm.telBewijslaag(lees(JSON.stringify({ telling: { bewezen: 7 } })));
+      assert.equal(uit.bewijsCellenBewezen, 7, 'zeven bewezen cellen worden er zeven geteld');
+      assert.throws(() => norm.telBewijslaag(lees(JSON.stringify({ telling: {} }))),
+        /bewijsCellenBewezen niet gemeten/, 'een matrix zonder telling is een gezakte meting, geen nul');
+      assert.throws(() => norm.telBewijslaag(lees('{ kapot')),
+        /BEWIJSMATRIX\.json is niet leesbaar/, 'een onleesbare matrix is een gezakte meting, geen nul');
+      return uit.bewijsCellenBewezen;
+    }
+  },
+  bewijsAchterstand: {
+    /* De andere kant van dezelfde tand: meetwerk en instrument tellen mee,
+       de soort `grens` niet -- die sluit nooit en is geen achterstand. Telde
+       hij wel mee, dan zou de ratel eeuwig 586 punten eisen die per definitie
+       niet te leveren zijn, en dan draait iemand hem stilletjes los. */
+    proef: () => {
+      const matrix = JSON.stringify({ telling: { bewezen: 1 } });
+      const lees = (schuldTekst) => (naam) =>
+        naam === 'BEWIJSMATRIX.json' ? matrix : schuldTekst;
+      const uit = norm.telBewijslaag(lees(JSON.stringify({ telling: { meetwerk: 3, instrument: 4, grens: 500 } })));
+      assert.equal(uit.bewijsAchterstand, 7, 'meetwerk en instrument tellen; de grens van 500 niet');
+      assert.throws(() => norm.telBewijslaag(lees(JSON.stringify({ telling: { meetwerk: 3 } }))),
+        /bewijsAchterstand niet gemeten/, 'een schuldregister zonder instrument-telling is een gezakte meting');
+      assert.throws(() => norm.telBewijslaag(lees('nee')),
+        /BEWIJSSCHULD\.json is niet leesbaar/, 'een onleesbaar schuldregister is een gezakte meting, geen nul');
+      return uit.bewijsAchterstand;
+    }
+  },
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",

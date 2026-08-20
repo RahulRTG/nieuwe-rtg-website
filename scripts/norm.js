@@ -50,6 +50,11 @@ const METERS = [
   { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },
   { sleutel: 'endpointsZonderTest', richting: 'omlaag', wat: 'endpoints die in geen enkele test voorkomen' },
   { sleutel: 'dekkingPct', richting: 'omhoog', wat: 'percentage endpoints dat in een test voorkomt' },
+  /* De 100%-richting: bewijs mag alleen groeien en schuld mag alleen krimpen.
+     Niet als ambitie maar als tand -- een gezakte cel of een gegroeide post
+     gaat vanaf nu langs een mens met een reden in NORM.json. */
+  { sleutel: 'bewijsCellenBewezen', richting: 'omhoog', wat: 'cellen (route x schakel) in de bewijsmatrix met bewijs' },
+  { sleutel: 'bewijsAchterstand', richting: 'omlaag', wat: 'openstaande bewijsschuld (meetwerk + instrument; de grens telt niet mee)' },
   { sleutel: 'keuringStuk', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "stuk"' },
   { sleutel: 'keuringScheef', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "scheef"' },
   /* keuringBeter WAS EEN GEBLENDE TELLER, en daarmee de enige meter in deze
@@ -381,6 +386,38 @@ function telOngeijkt(ijkBron, extraSleutels) {
    zijn eigen voorbeeldregel mee). Nagemeten over de hele testmap: alle
    honderdeen browsergevallen staan in *.e2e.js en alle zeventien dienstgevallen
    in *.test.js. De grens loopt daar dus precies. */
+/* DE 100%-RICHTING, MECHANISCH. Twee tanden op de bewijslaag zelf: het aantal
+   bewezen cellen in de matrix mag alleen stijgen (richting omhoog), en de
+   openstaande bewijsschuld mag alleen dalen (richting omlaag). De soort
+   `grens` telt niet mee in de achterstand: dat is de rand van de methode, en
+   wie die als achterstand telt jaagt op een getal dat niet bestaat (zie de kop
+   van scripts/bewijsschuld.js).
+
+   Losse functie met de lezer als invoer, zodat de ijking hem nep-registers kan
+   voeren en hem echt ziet uitslaan -- zelfde snit als telSkips en
+   telInlineStijl, en om dezelfde reden (LAT.md regel 10). Kapotte of
+   ontbrekende invoer is een gezakte meting, geen nul (regel 3). */
+function telBewijslaag(lees) {
+  let matrix, schuld;
+  try { matrix = JSON.parse(lees('BEWIJSMATRIX.json')); } catch (e) {
+    throw new Error('BEWIJSMATRIX.json is niet leesbaar (' + e.message + '); draai npm run ' +
+      'bewijsmatrix:vast -- een meter zonder invoer is geen meter');
+  }
+  try { schuld = JSON.parse(lees('BEWIJSSCHULD.json')); } catch (e) {
+    throw new Error('BEWIJSSCHULD.json is niet leesbaar (' + e.message + '); draai node ' +
+      'scripts/bewijsschuld.js --vastleggen -- een meter zonder invoer is geen meter');
+  }
+  const bewezen = matrix.telling && matrix.telling.bewezen;
+  if (typeof bewezen !== 'number') {
+    throw new Error('BEWIJSMATRIX.json draagt geen telling.bewezen; dan is bewijsCellenBewezen niet gemeten');
+  }
+  const t = schuld.telling || {};
+  if (typeof t.meetwerk !== 'number' || typeof t.instrument !== 'number') {
+    throw new Error('BEWIJSSCHULD.json draagt geen telling.meetwerk/instrument; dan is bewijsAchterstand niet gemeten');
+  }
+  return { bewijsCellenBewezen: bewezen, bewijsAchterstand: t.meetwerk + t.instrument };
+}
+
 function telSkips(bestanden, lees) {
   const uit = { dienst: 0, browser: 0 };
   for (const f of bestanden) {
@@ -591,7 +628,12 @@ function meet(bronnen) {
       '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
   }
 
+  /* De bewijslaag zelf aan de ratel; het hele verhaal staat bij telBewijslaag. */
+  const { bewijsCellenBewezen, bewijsAchterstand } = telBewijslaag(
+    (naam) => fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
+
   return {
+    bewijsCellenBewezen, bewijsAchterstand,
     metersOngeijkt,
     routesNietSchakelbaar,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
@@ -834,4 +876,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };
+module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips, telBewijslaag };

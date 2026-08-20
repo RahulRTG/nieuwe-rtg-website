@@ -122,6 +122,19 @@ const POSTEN = [
       'de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd ' +
       'per ronde, dus dit sluit met werk en niet met een doorbraak.' },
 
+  /* NIEUW SINDS DE BAND KLAAR IS. Blind is een uitslag en geen gat in de meting:
+     er is over deze route gelogen en geen enkele toets zag het. Maar voor de
+     100%-richting is het wel degelijk schuld -- niet van de meting maar van de
+     toetsen. Elke blinde route is een toets die nog niet bestaat. */
+  { id: 'output-blind', soort: 'meetwerk',
+    wat: 'routes waarover gelogen is zonder dat een toets het merkte',
+    uit: (r) => (r.output && r.output.gemeten || {}).blind,
+    waarom: 'de liegpoort heeft het antwoord van precies deze route vervalst en de toetsen die ' +
+      'hem raken bleven groen. Er kijkt dus niets naar deze inhoud; wat hier terugkomt kan ' +
+      'stilletjes leeg of fout zijn zonder dat iets zakt.',
+    sluit: 'per route een toets die het ANTWOORD leest en er iets van vindt. Geen statusregel ' +
+      '(die was er al en bleef groen) maar een inhoudseis. Daarna meet de band hem vanzelf om.' },
+
   { id: 'audit-wisselend', soort: 'meetwerk',
     wat: 'routes die soms wel en soms geen spoor nalaten',
     uit: (r) => (r.audit && r.audit.gemeten || {}).wisselend,

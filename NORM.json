@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-08-18",
+  "vastgelegd": "2026-08-20",
   "meters": {
     "endpointsZonderTest": 1192,
     "dekkingPct": 71,
@@ -28,7 +28,9 @@
     "toetsenNietGemeten": 151,
     "toetsenOngevoeligPct": 2.5,
     "wettenOnbewezen": 5,
-    "devPakketten": 1
+    "devPakketten": 1,
+    "bewijsCellenBewezen": 20563,
+    "bewijsAchterstand": 1435
   },
   "notities": [
     {

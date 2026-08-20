@@ -67,6 +67,34 @@ test('1. de tijdenrekening: de som klopt met de blokken', () => {
   assert.equal(som.langstePauze, 30);
 });
 
+test('1b. een overgang binnen dezelfde milliseconde laat het open blok niet uit de tijdlijn vallen', () => {
+  /* Dit is de som achter een sporadische zakker: dienstSoort sluit het oude
+     blok op t en opent het nieuwe op t, en dienstBeeld meet soms nog binnen
+     diezelfde milliseconde. tel() liet een blok met tot === van (nul minuten)
+     toen helemaal weg, dus het beeld toonde GEEN open blok terwijl de dienst
+     er een had -- en toets 5 hieronder zag dat alleen als de timing net zo
+     viel (in CI onder belasting, zie PR #58). Hier staat hij deterministisch:
+     geen server, geen klok, dezelfde milliseconde met opzet. */
+  const eerder = new Date(Date.UTC(2026, 7, 6, 8)).toISOString();
+  const t = new Date(Date.UTC(2026, 7, 6, 12)).toISOString();
+  const som = T.tel([
+    { soort: 'rijden', van: eerder, tot: t },     // het oude blok sluit op t
+    { soort: 'pauze', van: t, tot: null }         // het nieuwe opent op t
+  ], new Date(t).getTime());                      // en "nu" is nog steeds t
+  assert.equal(som.blokken.length, 2, 'beide blokken staan in het beeld, ook het blok van nul minuten');
+  const open = som.blokken.filter(b => b.open);
+  assert.equal(open.length, 1, 'het zojuist geopende blok blijft zichtbaar als het open blok');
+  assert.equal(open[0].soort, 'pauze');
+  assert.equal(som.arbeidMin, 240, 'en de optelsom verandert er niet van');
+
+  // omgekeerde of onleesbare blokken blijven WEL buiten beeld: dat is rommel, geen tijdlijn
+  const rommel = T.tel([
+    { soort: 'rijden', van: t, tot: eerder },
+    { soort: 'rijden', van: 'gisteren', tot: t }
+  ], new Date(t).getTime());
+  assert.equal(rommel.blokken.length, 0, 'een blok dat achteruit loopt of niet te lezen is telt nergens in');
+});
+
 test('2. de signalen noemen hun rekensom, en een nette dienst geeft er geen', () => {
   const u = (h, m = 0) => new Date(Date.UTC(2026, 7, 6, h, m)).toISOString();
   /* Een nette dienst: 7,25 uur arbeid waarvan 7,25 uur rijden, met 45 minuten

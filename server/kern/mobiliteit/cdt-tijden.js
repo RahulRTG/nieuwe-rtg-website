@@ -47,7 +47,15 @@ function tel(blokken, totMs) {
   for (const b of blokken || []) {
     const van = new Date(b.van).getTime();
     const tot = b.tot ? new Date(b.tot).getTime() : (totMs || Date.now());
-    if (!Number.isFinite(van) || !Number.isFinite(tot) || tot <= van) continue;
+    /* Alleen ONLEESBARE of OMGEKEERDE blokken vallen weg; een blok van nul
+       milliseconden is gewoon een blok. Hier stond `tot <= van`, en dat liet
+       een blok dat in DEZELFDE milliseconde begon als het meetmoment uit de
+       tijdlijn vallen -- precies wat een overgang doet: het oude blok sluit op
+       t, het nieuwe opent op t, en wie het beeld nog binnen die milliseconde
+       opvraagt zag dan GEEN open blok terwijl de dienst er wel een had. De
+       optelsom veranderde er niet van (nul minuten is nul), maar het beeld
+       loog over de tijdlijn, en de CDT-toetsen zakten daar sporadisch op. */
+    if (!Number.isFinite(van) || !Number.isFinite(tot) || tot < van) continue;
     const min = Math.round((tot - van) / 60000);
     const s = SOORTEN[b.soort] || SOORTEN.ander;
     if (s.telt.includes('arbeid')) uit.arbeidMin += min;

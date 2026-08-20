@@ -1,19 +1,19 @@
 {
  "stempel": {
-  "op": "2026-08-20T08:10:41.849Z",
-  "commit": "3f381f5",
-  "boomVuil": true,
+  "op": "2026-08-20T09:03:01.793Z",
+  "commit": "ee9db81",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Het ware antwoordprofiel per blinde route (status, sleutels, dragende velden), vastgelegd van een eerlijke run op een wegwerpserver. test/inhoudswacht.test.js dwingt deze profielen af; de liegpoort vervangt een antwoord door 200 {ok:true}, dus elk profiel met meer dan dat ziet de leugen. De kaart stapelt: een nieuwe run vervangt alleen wat hij zelf aanriep.",
  "grens": "Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.",
  "gemeten": {
-  "blindeRoutes": 146,
-  "inKaart": 103,
-  "waarneembaar": 98,
-  "onwaarneembaar": 5,
-  "versDezeRun": 103,
-  "zonderRol": 43,
+  "doelRoutes": 47,
+  "inKaart": 145,
+  "waarneembaar": 138,
+  "onwaarneembaar": 7,
+  "versDezeRun": 47,
+  "zonderRol": 0,
   "dood": 0
  },
  "perRoute": {
@@ -242,7 +242,7 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T08:10:40.999Z",
+   "op": "2026-08-20T09:03:01.642Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/fluister/focus": {
@@ -251,7 +251,7 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T08:10:40.999Z",
+   "op": "2026-08-20T09:03:01.642Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/fluister/onthoud": {
@@ -565,7 +565,7 @@
    "rol": "office",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T08:10:40.999Z",
+   "op": "2026-08-20T09:03:01.642Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/office/hardware/serie": {
@@ -949,7 +949,7 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T08:10:40.999Z",
+   "op": "2026-08-20T09:03:01.642Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/staff/flits/meld": {
@@ -1458,7 +1458,7 @@
    "rol": "member",
    "status": 200,
    "onwaarneembaar": true,
-   "op": "2026-08-20T08:10:40.999Z",
+   "op": "2026-08-20T09:03:01.642Z",
    "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
   },
   "POST /api/verify/selfie": {
@@ -1473,6 +1473,551 @@
     "error"
    ],
    "op": "2026-08-20T08:10:40.999Z"
+  },
+  "GET /api/foundation/gezin/:code/klussen": {
+   "methode": "GET",
+   "pad": "/api/foundation/gezin/:code/klussen",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /api/foundation/health": {
+   "methode": "GET",
+   "pad": "/api/foundation/health",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "ai",
+    "ok",
+    "verwerking"
+   ],
+   "dragend": [
+    "ai",
+    "ok",
+    "verwerking"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /api/push/key": {
+   "methode": "GET",
+   "pad": "/api/push/key",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "key"
+   ],
+   "dragend": [
+    "key"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /api/sso/start": {
+   "methode": "GET",
+   "pad": "/api/sso/start",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /api/sso/terug": {
+   "methode": "GET",
+   "pad": "/api/sso/terug",
+   "rol": "publiek",
+   "status": 400,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /api/stad/algoritmes": {
+   "methode": "GET",
+   "pad": "/api/stad/algoritmes",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "bijwerken",
+    "geenProfilering",
+    "menselijkToezicht",
+    "niveaus",
+    "regels",
+    "status",
+    "wat"
+   ],
+   "dragend": [
+    "bijwerken",
+    "geenProfilering",
+    "menselijkToezicht",
+    "niveaus",
+    "regels",
+    "status",
+    "wat"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /apps": {
+   "methode": "GET",
+   "pad": "/apps",
+   "rol": "publiek",
+   "status": 200,
+   "onwaarneembaar": true,
+   "op": "2026-08-20T09:03:01.642Z",
+   "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
+  },
+  "GET /apps/bureau.html": {
+   "methode": "GET",
+   "pad": "/apps/bureau.html",
+   "rol": "publiek",
+   "status": 200,
+   "onwaarneembaar": true,
+   "op": "2026-08-20T09:03:01.642Z",
+   "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
+  },
+  "GET /scriptbundel.js": {
+   "methode": "GET",
+   "pad": "/scriptbundel.js",
+   "rol": "publiek",
+   "status": 400,
+   "sleutels": [],
+   "dragend": [],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /stijlbundel.css": {
+   "methode": "GET",
+   "pad": "/stijlbundel.css",
+   "rol": "publiek",
+   "status": 400,
+   "sleutels": [],
+   "dragend": [],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "GET /werken/:code": {
+   "methode": "GET",
+   "pad": "/werken/:code",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [],
+   "dragend": [],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/cluster/:actie": {
+   "methode": "POST",
+   "pad": "/api/cluster/:actie",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/foundation/school/huiswerk/maak": {
+   "methode": "POST",
+   "pad": "/api/foundation/school/huiswerk/maak",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/foundation/school/webhook/lijst": {
+   "methode": "POST",
+   "pad": "/api/foundation/school/webhook/lijst",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/partner": {
+   "methode": "POST",
+   "pad": "/api/partner",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/partnertrips": {
+   "methode": "POST",
+   "pad": "/api/partnertrips",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "trips"
+   ],
+   "dragend": [
+    "trips"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/baby/instellen": {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/instellen",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/kantoorpakket/bewaar": {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/bewaar",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/kantoorpakket/vul": {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/vul",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/social/dm/send": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/dm/send",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/social/snap/send": {
+   "methode": "POST",
+   "pad": "/api/rtf/social/snap/send",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/spel/arcade-score": {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/arcade-score",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/spel/opgeven": {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/opgeven",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/rtf/spel/sneek-bord": {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/sneek-bord",
+   "rol": "publiek",
+   "status": 403,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/sso/waarheen": {
+   "methode": "POST",
+   "pad": "/api/sso/waarheen",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "sso"
+   ],
+   "dragend": [
+    "sso"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/translate": {
+   "methode": "POST",
+   "pad": "/api/translate",
+   "rol": "publiek",
+   "status": 200,
+   "sleutels": [
+    "from",
+    "text",
+    "translated"
+   ],
+   "dragend": [
+    "from",
+    "translated"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/architect/bouwstaat": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/architect/bouwstaat",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/architect/kritiek": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/architect/kritiek",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/architect/project": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/architect/project",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/architect/verwijder": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/architect/verwijder",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/atelier/collectie": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/atelier/collectie",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/atelier/techpack": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/atelier/techpack",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/atelier/verwijder": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/atelier/verwijder",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/hardware/kritiek": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/hardware/kritiek",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/hardware/serie": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/hardware/serie",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/hardware/stuklijst": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/hardware/stuklijst",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/redactie/ai/schrijf": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/redactie/ai/schrijf",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/redactie/artikel/verwijder": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/redactie/artikel/verwijder",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/redactie/nieuwstips": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/redactie/nieuwstips",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/studio/collectie": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/studio/collectie",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/studio/kritiek": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/studio/kritiek",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
+  },
+  "POST /api/werkplek/bureau/studio/specsheet": {
+   "methode": "POST",
+   "pad": "/api/werkplek/bureau/studio/specsheet",
+   "rol": "publiek",
+   "status": 404,
+   "sleutels": [
+    "error"
+   ],
+   "dragend": [
+    "error"
+   ],
+   "op": "2026-08-20T09:03:01.642Z"
   }
  }
 }

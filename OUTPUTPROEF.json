@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T08:56:46.991Z",
-  "commit": "6ea8268",
+  "op": "2026-08-20T09:04:19.058Z",
+  "commit": "ee9db81",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,9 +9,9 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 4119,
+  "bewezen": 4131,
   "onbeslist": 0,
-  "blind": 47,
+  "blind": 35,
   "ongemeten": 29
  },
  "routes": 4195,
@@ -853,12 +853,12 @@
    "reden": "er is over DEZE route gelogen en architect.test.js zakte daarop"
   },
   "GET /api/foundation/health": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfwelzijn2.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en rtfwelzijn2.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/foundation/gezin/maak": {
    "staat": "bewezen",
@@ -11907,12 +11907,12 @@
    "reden": "er is over DEZE route gelogen en baby.test.js zakte daarop"
   },
   "POST /api/rtf/baby/instellen": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "rtfalbum.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en rtfalbum.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/rtf/baby/entry-maak": {
    "staat": "bewezen",
@@ -13507,12 +13507,12 @@
    "reden": "er is over DEZE route gelogen en bibliotheek.test.js zakte daarop"
   },
   "POST /api/foundation/school/huiswerk/maak": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "bijles.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en bijles.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/foundation/school/bijles/vraag": {
    "staat": "bewezen",
@@ -16798,12 +16798,12 @@
    "reden": "er is over DEZE route gelogen en rtfgeld.test.js zakte daarop"
   },
   "GET /api/foundation/gezin/:code/klussen": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "gezin-weghalen.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en gezin-weghalen.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "GET /api/ice": {
    "staat": "bewezen",
@@ -19782,12 +19782,12 @@
    "reden": "er is over DEZE route gelogen en theater.test.js zakte daarop"
   },
   "POST /api/cluster/:actie": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "kleine-grendels.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en kleine-grendels.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "GET /api/supplier/stream": {
    "staat": "bewezen",
@@ -23704,12 +23704,12 @@
    "reden": "er is over DEZE route gelogen en portemonnee.test.js zakte daarop"
   },
   "GET /api/push/key": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "publieke-rand.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en publieke-rand.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "GET /api/zegel/sleutel": {
    "staat": "bewezen",
@@ -23776,20 +23776,20 @@
    "reden": "er is over DEZE route gelogen en publieke-rand.test.js zakte daarop"
   },
   "POST /api/partner": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "publieke-rand.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en publieke-rand.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/partnertrips": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "publieke-rand.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en publieke-rand.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/auth/verify-email": {
    "staat": "ongemeten",
@@ -27703,12 +27703,12 @@
    "reden": "er is over DEZE route gelogen en schoolenterprise.test.js zakte daarop"
   },
   "POST /api/foundation/school/webhook/lijst": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "schoolenterprise.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en schoolenterprise.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/foundation/school/opleiding/zet": {
    "staat": "bewezen",
@@ -29343,12 +29343,12 @@
    "reden": "er is over DEZE route gelogen en stadsbesluit.test.js zakte daarop"
   },
   "GET /api/stad/algoritmes": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "stadsbesluit.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en stadsbesluit.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/office/weefsel/onderhoud": {
    "staat": "bewezen",
@@ -30567,12 +30567,12 @@
    "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "GET /api/sso/terug": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "techniek-sso-scim.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/sso/wissel": {
    "staat": "bewezen",
@@ -30583,12 +30583,12 @@
    "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js zakte daarop"
   },
   "GET /api/sso/start": {
-   "staat": "blind",
+   "staat": "bewezen",
    "bron": "outputproef (gericht)",
    "toetsen": [
-    "techniek-sso-scim.test.js"
+    "inhoudswacht.test.js"
    ],
-   "reden": "er is over DEZE route gelogen en techniek-sso-scim.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
+   "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/supplier/gebouw/zaal/weg": {
    "staat": "bewezen",
@@ -34050,9 +34050,9 @@
    "op": "2026-08-18T21:52:43.697Z"
   },
   "GET /api/foundation/health": {
-   "toets": "rtfwelzijn2.test.js",
-   "merkt": false,
-   "op": "2026-08-18T14:07:35.870Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:27.623Z"
   },
   "POST /api/foundation/gezin/maak": {
    "toets": "rtfwelzijn2.test.js",
@@ -38069,9 +38069,9 @@
    "op": "2026-08-19T07:43:53.925Z"
   },
   "POST /api/rtf/baby/instellen": {
-   "toets": "rtfalbum.test.js",
-   "merkt": false,
-   "op": "2026-08-18T20:19:53.402Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:18.884Z"
   },
   "POST /api/rtf/baby/entry-maak": {
    "toets": "rtfalbum.test.js",
@@ -38701,9 +38701,9 @@
    "op": "2026-08-18T23:00:53.783Z"
   },
   "POST /api/foundation/school/huiswerk/maak": {
-   "toets": "bijles.test.js",
-   "merkt": false,
-   "op": "2026-08-19T08:18:03.937Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:06.183Z"
   },
   "POST /api/foundation/school/bijles/vraag": {
    "toets": "bijles.test.js",
@@ -42942,9 +42942,9 @@
    "op": "2026-08-19T07:46:10.755Z"
   },
   "GET /api/push/key": {
-   "toets": "publieke-rand.test.js",
-   "merkt": false,
-   "op": "2026-08-19T11:35:38.014Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:27.593Z"
   },
   "GET /api/zegel/sleutel": {
    "toets": "zegelroute.test.js",
@@ -42987,14 +42987,14 @@
    "op": "2026-08-19T11:36:00.241Z"
   },
   "POST /api/partner": {
-   "toets": "publieke-rand.test.js",
-   "merkt": false,
-   "op": "2026-08-19T11:36:01.701Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:18.523Z"
   },
   "POST /api/partnertrips": {
-   "toets": "publieke-rand.test.js",
-   "merkt": false,
-   "op": "2026-08-19T11:36:02.966Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:18.959Z"
   },
   "POST /api/supplier/pr/nieuwsbrief": {
    "toets": "prplus.test.js",
@@ -46432,9 +46432,9 @@
    "op": "2026-08-19T13:22:23.854Z"
   },
   "POST /api/foundation/school/webhook/lijst": {
-   "toets": "schoolenterprise.test.js",
-   "merkt": false,
-   "op": "2026-08-19T13:22:25.023Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:06.086Z"
   },
   "POST /api/foundation/school/opleiding/zet": {
    "toets": "schoolenterprise.test.js",
@@ -48507,9 +48507,9 @@
    "op": "2026-08-19T14:57:35.249Z"
   },
   "GET /api/stad/algoritmes": {
-   "toets": "stadsbesluit.test.js",
-   "merkt": false,
-   "op": "2026-08-19T14:57:39.270Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:40.800Z"
   },
   "POST /api/member/leren/lijsten": {
    "toets": "leren-leden.test.js",
@@ -50102,14 +50102,14 @@
    "op": "2026-08-19T17:08:08.627Z"
   },
   "GET /api/sso/terug": {
-   "toets": "techniek-sso-scim.test.js",
-   "merkt": false,
-   "op": "2026-08-19T17:08:08.635Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:40.708Z"
   },
   "GET /api/sso/start": {
-   "toets": "techniek-sso-scim.test.js",
-   "merkt": false,
-   "op": "2026-08-19T17:08:10.192Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:40.586Z"
   },
   "POST /api/rtf/social/respond": {
    "toets": "rtf-veilig.test.js",
@@ -54997,9 +54997,9 @@
    "op": "2026-08-20T08:09:50.574Z"
   },
   "POST /api/cluster/:actie": {
-   "toets": "kleine-grendels.test.js",
-   "merkt": false,
-   "op": "2026-08-20T08:09:50.588Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:04:05.803Z"
   },
   "GET /api/foundation/gezin/:code/berichten": {
    "toets": "foundation-rest.test.js",
@@ -55032,9 +55032,9 @@
    "op": "2026-08-20T08:10:04.972Z"
   },
   "GET /api/foundation/gezin/:code/klussen": {
-   "toets": "gezin-weghalen.test.js",
-   "merkt": false,
-   "op": "2026-08-20T08:10:18.279Z"
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:27.721Z"
   },
   "DELETE /api/techniek/sso/:org": {
    "toets": "techniek-sso-scim.test.js",
@@ -55110,6 +55110,21 @@
    "toets": "foundation.test.js",
    "merkt": true,
    "op": "2026-08-20T08:11:25.611Z"
+  },
+  "GET /scriptbundel.js": {
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:53.026Z"
+  },
+  "GET /werken/:code": {
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:53.374Z"
+  },
+  "GET /stijlbundel.css": {
+   "toets": "inhoudswacht.test.js",
+   "merkt": true,
+   "op": "2026-08-20T09:03:53.630Z"
   }
  },
  "basislijn": {

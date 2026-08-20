@@ -69,6 +69,26 @@ regels die machinaal te handhaven zijn. Paragraaf 4 is de eerlijke lijst open
 gaten — waaronder drie plekken waar de code iets anders doet dan de
 partnervoorwaarden beloven.
 
+**`CONTROLPLANE.md` is het Economic Control Plane** — de laag die vóór iedere
+economische handeling bepaalt of zij mag, en achteraf kan bewijzen waarom. Lees
+die met COMMERCIE.md ernaast: dat beschrijft wat iets kost, dit wie iets mag.
+Vier regels dragen het geheel, en alle vier komen ze uit een fout die hier echt
+is gemaakt: **geen belofte zonder afdwingbare capability, geen capability zonder
+caller, geen bevoegdheid zonder oorsprong, geen economische actie zonder bewijs.**
+
+De drie die je het snelst nodig hebt: een bevoegdheid is **geen ja of nee** maar
+vier dimensies (wat, waar, hoeveel, wanneer) en **delegatie kan alleen
+versmallen** — structureel, niet als vuistregel. Een besluit kent **acht
+uitkomsten** en "nee" is er maar één van; `ONBEKEND` is met opzet géén synoniem
+van `WEIGEREN`, want een storing hoort niet te klinken als een overtreding. En
+een nieuwe handhavingsregel **loopt eerst mee** zonder te blokkeren: je kunt niet
+afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
+
+`scripts/capabilities.js` is de meting die dit document eerlijk houdt — hij telt
+per capability of er ergens een caller is, en hij vond er vijf die er geen
+hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
+lijst van wat er nog openstaat.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

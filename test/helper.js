@@ -919,6 +919,7 @@ async function installeerNepMicrofoon(context) {
 }
 
 
+const KEUR_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
 async function keurLidGoed(base, token, codenaam, geboortedatum) {
   const post = (pad, body, tok) => fetch(base + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),

@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, keurLidGoed } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sudoku-e2e-'));
@@ -30,6 +30,12 @@ async function nieuwLid(base) {
     body: JSON.stringify({ name: 'Puzzelaar', email: 'su' + u + '@x.nl', phone: '06' + u.slice(0, 8),
       password: 'geheim12345', geboortedatum: '1982-02-02', tier: 'rtg' }) }).then(r => r.json());
   assert.ok(reg.token, 'het lid is aangemeld: ' + JSON.stringify(reg).slice(0, 160));
+  /* EN LANGS DE KEURING, want de progressielaag stopt bij 18+ EN A3 (zie
+     kern/volwassen.js en de grens in kern/spellen/grens.js). Zonder deze stap
+     speelt het lid gewoon, maar wordt er niets bewaard -- en dan zakt deze
+     toets op de punten in plaats van op het spel. */
+  const codenaam = (reg.state && reg.state.user && reg.state.user.codename) || reg.codename;
+  if (codenaam) await keurLidGoed(base, reg.token, codenaam, '1982-02-02');
   return reg.token;
 }
 

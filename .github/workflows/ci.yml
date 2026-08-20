@@ -37,7 +37,11 @@ jobs:
   test:
     name: Tests, checks en build
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # 1h08 op 18 aug, gecanceld op 90 min op 20 aug: de suite groeide met deze
+    # samenvoeging van ~897 naar 1058 toetsbestanden plus 153 schermtoetsen.
+    # Ruimte voor die groei en een trage runner, en niet zo hoog dat een echte
+    # vastloper er een uur onder wegzakt.
+    timeout-minutes: 150
     services:
       postgres:
         image: postgres:16-alpine

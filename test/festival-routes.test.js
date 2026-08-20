@@ -41,6 +41,9 @@
   15. Reserveren verbruikt de plek voordat er betaald is, en de prijs komt uit
       de reservering en niet uit het lichaam.
   16. Een mislukte betaling geeft de plek meteen terug.
+  17. De ledenkant: een groep maken en meedoen met een code.
+  18. Een niet-lid leest de stand niet.
+  19. De codenaam komt uit de sessie; het lichaam mag hem niet zetten.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -58,7 +61,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-fest-'));
 const VANDAAG = new Date().toISOString().slice(0, 10);
 const MORGEN = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
-let manager, deur, andere, zonderTickets;
+let manager, deur, andere, zonderTickets, lidA, lidB;
 let fid, eid, vandaagId, morgenId, terreinId, ingangId, pasCode;
 
 async function api(pad, body, token) {
@@ -84,6 +87,13 @@ test.before(async () => {
   deur = await inloggen('ESVEDRA', 'staff');
   andere = await inloggen('MACE', 'manager');          // een andere zaak MET tickets
   zonderTickets = await inloggen('SAKURA', 'manager');  // appartementen: geen tickets
+
+  /* Twee echte leden voor de groepskant: die is van GASTEN en niet van de zaak. */
+  const u = Date.now().toString().slice(-7);
+  lidA = (await post('/api/auth/register', { name: 'Groep A', email: 'ga' + u + '@x.nl', phone: '061' + u,
+    password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).token;
+  lidB = (await post('/api/auth/register', { name: 'Groep B', email: 'gb' + u + '@x.nl', phone: '062' + u,
+    password: 'geheim12345', geboortedatum: '1991-01-01', tier: 'rtg', pasApp: 'rtg' })).token;
 
   fid = (await post('/api/festival/nieuw', { naam: 'Testival' }, manager)).festival.id;
   eid = (await post('/api/festival/editie', { festival: fid, jaar: 2027 }, manager)).editie.id;
@@ -333,6 +343,46 @@ test('16. een mislukte betaling geeft de plek meteen terug', async () => {
   assert.equal(na.ruimte, 1, 'een verkeerd getypte code houdt de zaal niet een kwartier bezet');
 });
 
+test('17. de ledenkant: een groep maken en meedoen met een code', async () => {
+  const g = await post('/api/festival/groep', { festival: fid, editie: eid, naam: 'Naar Testival' }, lidA);
+  assert.equal(g.ok, true);
+  assert.equal(g.groep.leden.length, 1);
+
+  /* Lid B doet zelf mee, met de code die A hem heeft gegeven. RTG heeft niets
+     verstuurd: er is geen uitnodiging, geen melding, geen mail. */
+  const mee = await post('/api/festival/groep/mee', { festival: fid, editie: eid, code: g.groep.code }, lidB);
+  assert.equal(mee.ok, true);
+  assert.equal(mee.groep.leden.length, 2);
+
+  const stand = await post('/api/festival/groep/stand', { festival: fid, editie: eid, id: g.groep.id }, lidB);
+  assert.equal(stand.zonderPas, 2, 'een getal, en verder niets');
+  assert.deepEqual(Object.keys(stand).sort(), ['code', 'id', 'leden', 'maker', 'naam', 'ok', 'zonderPas']);
+});
+
+test('18. een niet-lid leest de stand niet', async () => {
+  const g = await post('/api/festival/groep', { festival: fid, editie: eid, naam: 'Besloten' }, lidA);
+  const buiten = await api('/api/festival/groep/stand', { festival: fid, editie: eid, id: g.groep.id }, lidB);
+  assert.equal(buiten.status, 404, 'wie er in een groep zit is niets voor buitenstaanders');
+});
+
+test('19. de codenaam komt uit de sessie; het lichaam mag hem niet zetten', async () => {
+  const g = await post('/api/festival/groep', { festival: fid, editie: eid, naam: 'Van A' }, lidA);
+  const stand = await post('/api/festival/groep/stand', { festival: fid, editie: eid, id: g.groep.id }, lidA);
+  const codenaamVanA = stand.maker;
+
+  /* Lid B doet alsof hij A is. Wordt de codenaam uit het lichaam genomen, dan
+     leest hij de groep van een ander -- en stapt hij er straks ook uit. */
+  const alsof = await api('/api/festival/groep/stand',
+    { festival: fid, editie: eid, id: g.groep.id, codenaam: codenaamVanA }, lidB);
+  assert.equal(alsof.status, 404);
+
+  const eruit = await api('/api/festival/groep/weg',
+    { festival: fid, editie: eid, id: g.groep.id, codenaam: codenaamVanA }, lidB);
+  assert.equal(eruit.status, 404);
+  const na = await post('/api/festival/groep/stand', { festival: fid, editie: eid, id: g.groep.id }, lidA);
+  assert.equal(na.leden.length, 1, 'A staat er nog gewoon in');
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -402,4 +452,10 @@ test('16. een mislukte betaling geeft de plek meteen terug', async () => {
   12. In routes/festival/verkoop.js het bedrag uit de body halen in plaats van
       uit de reservering.
       -> toets 15 zakte: de koper bepaalde zelf wat hij betaalde.
+
+  13. In routes/festival/groep.js de codenaam uit de body laten komen in plaats
+      van uit liveCodename(req.session).
+      -> toets 19 zakte: lid B las de groep van lid A en kon hem eruit zetten.
+         Dit is dezelfde fout als de klok en de zaakcode, en hier weegt hij het
+         zwaarst: een groep wordt dan een lijst waar iedereen aan kan zitten.
    ========================================================================== */

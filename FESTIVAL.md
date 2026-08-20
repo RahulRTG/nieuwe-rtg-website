@@ -391,9 +391,9 @@ hebben.
    het staat in de uitslag.
 4. **Crew.** Zero-search: dienst openen, route, briefing, één knop. Bovenop het
    bestaande rooster, niet ernaast.
-5. **Commerce.** ✅ *behalve groepen* — producten met een voorraad, bundels die
-   de voorraad van hun onderdelen verbruiken, en verkopen in twee stappen.
-   `kern/festival/{product,bundel,verkoop}.js`
+5. **Commerce.** ✅ Producten met een voorraad, bundels die de voorraad van hun
+   onderdelen verbruiken, verkopen in twee stappen, en groepen.
+   `kern/festival/{product,bundel,verkoop,groep}.js`
 
    **De twee stappen zijn geen omslachtigheid maar een grendel.** Betalen duurt,
    en tussen "is er nog plek" en "hier is uw pas" past een tweede koper. Dus:
@@ -407,13 +407,27 @@ hebben.
    als beide nog plek hebben. Een **ruit** (twee onderdelen die hetzelfde
    product bevatten) is geen lus en telt één keer.
 
-   **Groepen ontbreken nog, en dat is bewust het lastigste deel.** Een groep
-   raakt per definitie een tweede persoon, en dan geldt de regel uit LIFE.md
-   onverkort: samenstellen en klaarzetten mag, bevestigen doet de mens. "Nog
-   drie vrienden missen een ticket" is een feit binnen een groep die iemand zelf
-   heeft gemaakt — maar het mag nooit een bericht worden dat RTG namens hem
-   verstuurt, en het mag geen kunstmatige urgentie dragen (CLAUDE.md). Dat
-   verdient zijn eigen ronde.
+   **De groep is het deel waar vooral telt wat er NIET in zit.** Een groep raakt
+   per definitie een tweede persoon, en dan geldt LIFE.md par. 4 onverkort:
+   samenstellen en klaarzetten mag, bevestigen doet de mens. Daaruit volgt een
+   ongebruikelijke vorm:
+
+   - **Er wordt niets verstuurd.** Geen uitnodiging, geen push, geen "Kobalt
+     heeft je toegevoegd". De maker krijgt een code en geeft die zelf door.
+   - **Niemand wordt toegevoegd.** Er bestaat geen functie waarmee je een ander
+     in een groep zet; meedoen is een eigen handeling met een code die je van
+     een mens kreeg.
+   - **Het gat is een getal.** `zonderPas` zegt hoeveel leden nog geen pas
+     hebben, en verder niets — geen "nodig ze uit", geen aftelklok. In een groep
+     komt de druk van vrienden, en dat werkt beter dan welke banner ook; juist
+     daarom niet (CLAUDE.md verbiedt kunstmatige urgentie).
+   - **Er is geen hoofd van de groep.** Elk lid mag de code vernieuwen en elk
+     lid mag weg. Een maker met meer rechten maakt van een vriendengroep een
+     trechter met een eigenaar.
+   - **De organisator leest niets mee.** Groepsgroottes voor de camping zijn een
+     echte behoefte, maar het is ook het sociale netwerk van de bezoekers; dat
+     vraagt dezelfde tweezijdige toestemming als een partnerband en verdient een
+     eigen besluit.
 6. **Artiest en podium.** Boeking, rider, changeover, settlement — met het
    draaiboek dat er al is.
 7. **Voorspelling.** Horeca-, personeels- en vervoersvraag uit programma en flow.

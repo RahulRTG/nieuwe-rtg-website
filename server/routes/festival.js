@@ -150,4 +150,5 @@ module.exports = (kern) => {
   require('./festival/poort')(kern, { mijn, editieVan, geenFestival, stuur });
   require('./festival/gereed')(kern, { mijn, editieVan, geenFestival, stuur });
   require('./festival/partner')(kern, { mijn, editieVan, geenFestival, stuur });
+  require('./festival/verkoop')(kern, { mijn, editieVan, geenFestival, stuur });
 };

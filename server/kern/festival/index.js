@@ -6,10 +6,13 @@
      ./model.js         de TIJD    festival, editie, dag -- en het rekenen over
                                    middernacht heen, op een plek
      ./terrein.js       de PLAATS  de boom van plekken, met een cyclusgrendel
-     ./rechten.js       schrijven  producten en passen; een pas draagt rechten
+     ./rechten.js       schrijven  wat een recht is, en hoe een pas ontstaat
+     ./product.js       aanbod     wat er te koop is: prijs, voorraad, bundels
      ./poort.js         lezen      mag deze pas hier, nu -- en waarom niet
      ./toegang.js       handelen   de scan, dubbelgebruik, de offline bundel
      ./bezetting.js     tellen     hoeveel mensen waar, en hoe snel erbij
+     ./bundel.js        rekenen    de keten van een product en de ruimte erin
+     ./verkoop.js       verkopen   reserveren, loslaten en rondmaken
      ./partner.js       banden     een band die beide kanten sluiten
      ./signalen.js      van buiten wat andere domeinen al bijhouden
      ./uitzondering.js  vooruit    wat er over dertig minuten misgaat
@@ -47,11 +50,16 @@ module.exports = (ctx) => {
   Object.assign(k, require('./model')(k));
   Object.assign(k, require('./terrein')(k));
   Object.assign(k, require('./rechten')(k));
+  Object.assign(k, require('./product')(k));   // gebruikt keurRecht uit ./rechten.js
   Object.assign(k, require('./poort')(k));
   Object.assign(k, require('./toegang')(k));
   Object.assign(k, require('./bezetting')(k));
   /* ./partner.js voor ./signalen.js (die leest partnersVan), en beide voor
      ./uitzondering.js (die de signalen mee op de hoop gooit). */
+  /* ./bundel.js rekent, ./verkoop.js handelt en gebruikt dat rekenwerk; beide
+     na ./rechten.js, want de verkoop geeft passen uit. */
+  Object.assign(k, require('./bundel')(k));
+  Object.assign(k, require('./verkoop')(k));
   Object.assign(k, require('./partner')(k));
   Object.assign(k, require('./signalen')(k));
   Object.assign(k, require('./uitzondering')(k));

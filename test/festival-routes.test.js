@@ -38,6 +38,9 @@
   12. De partnerkant loopt niet via eigendom: de genoemde zaak bevestigt.
   13. De zaakcode komt uit de sessie; het lichaam mag hem niet zetten.
   14. De postbus toont alleen banden waarin deze zaak zelf genoemd is.
+  15. Reserveren verbruikt de plek voordat er betaald is, en de prijs komt uit
+      de reservering en niet uit het lichaam.
+  16. Een mislukte betaling geeft de plek meteen terug.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -290,6 +293,46 @@ test('14. de postbus toont alleen banden waarin deze zaak zelf genoemd is', asyn
   assert.deepEqual(leeg.banden, [], 'en een zaak die nergens genoemd is, ziet niets');
 });
 
+test('15. reserveren verbruikt de plek voordat er betaald is', async () => {
+  const prod = await post('/api/festival/product', { festival: fid, editie: eid, naam: 'Vroege vogel',
+    prijs: 65, voorraad: 1, rechten: [{ soort: 'festival.entree', dagen: [vandaagId] }] }, manager);
+  assert.equal(prod.ok, true);
+
+  const a = await post('/api/festival/verkoop', { festival: fid, editie: eid, product: prod.product.id, koper: 'Kobalt' }, deur);
+  assert.equal(a.ok, true);
+  assert.equal(a.verkoop.stand, 'gereserveerd');
+
+  const ruimte = await post('/api/festival/ruimte', { festival: fid, editie: eid, product: prod.product.id }, deur);
+  assert.equal(ruimte.ruimte, 0, 'de plek is weg, en er is nog niets betaald');
+
+  const tweede = await api('/api/festival/verkoop', { festival: fid, editie: eid, product: prod.product.id, koper: 'Amber' }, deur);
+  assert.equal(tweede.status, 409, 'de tweede koper komt er niet meer bij');
+
+  /* Afrekenen: het bedrag komt uit de RESERVERING. Een prijs die de koper
+     meestuurt is geen prijs. */
+  const rond = await post('/api/festival/verkoop/rond',
+    { festival: fid, editie: eid, id: a.verkoop.id, methode: 'contant', prijs: 1 }, deur);
+  assert.equal(rond.ok, true);
+  assert.equal(rond.verkoop.betaald.centen, 6500);
+  assert.equal(rond.pas.drager, 'Kobalt');
+});
+
+test('16. een mislukte betaling geeft de plek meteen terug', async () => {
+  const prod = await post('/api/festival/product', { festival: fid, editie: eid, naam: 'Laatste plek',
+    prijs: 40, voorraad: 1, rechten: [{ soort: 'festival.entree', dagen: [vandaagId] }] }, manager);
+  const a = await post('/api/festival/verkoop', { festival: fid, editie: eid, product: prod.product.id, koper: 'Ivo' }, deur);
+  assert.equal((await post('/api/festival/ruimte', { festival: fid, editie: eid, product: prod.product.id }, deur)).ruimte, 0);
+
+  const stuk = await api('/api/festival/verkoop/rond',
+    { festival: fid, editie: eid, id: a.verkoop.id, methode: 'rtgpay', payCode: 'BESTAATNIET' }, deur);
+  assert.equal(stuk.status, 404);
+  const body = await stuk.json();
+  assert.equal(body.losgelaten, true);
+
+  const na = await post('/api/festival/ruimte', { festival: fid, editie: eid, product: prod.product.id }, deur);
+  assert.equal(na.ruimte, 1, 'een verkeerd getypte code houdt de zaal niet een kwartier bezet');
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -350,4 +393,13 @@ test('14. de postbus toont alleen banden waarin deze zaak zelf genoemd is', asyn
       plaats van alleen die waarin de zaak genoemd is.
       -> toets 14 zakte: een willekeurige zaak zag de partnerbanden van
          iedereen.
+
+  11. In routes/festival/verkoop.js de plek NIET loslaten als de betaling
+      mislukt.
+      -> toets 16 zakte: een verkeerd getypte betaalcode hield de laatste plek
+         een kwartier bezet.
+
+  12. In routes/festival/verkoop.js het bedrag uit de body halen in plaats van
+      uit de reservering.
+      -> toets 15 zakte: de koper bepaalde zelf wat hij betaalde.
    ========================================================================== */

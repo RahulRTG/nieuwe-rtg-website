@@ -5,9 +5,8 @@
 
    Een kaartje heeft vandaag een TYPE (routes/supplier/tickets.js). Elk nieuw
    product is dan code: een weekendticket is een nieuw type, met camping weer
-   een, met shuttle weer een. Dat is dezelfde N-kwadraat-val die dit huis al
-   drie keer heeft betaald -- bij de B2B-paren, bij de PDA en bij de
-   bijeenkomst-koppelingen.
+   een, met shuttle weer een -- dezelfde N-kwadraat-val die dit huis al drie
+   keer heeft betaald.
 
    Hier draagt een pas RECHTEN. Een recht is vier dingen en niet meer:
 
@@ -19,10 +18,9 @@
    Een PRODUCT is een verzameling rechten met een prijs eromheen. Dus data en
    geen code: een nieuw pakket verzinnen is een regel in een tabel, geen release.
 
-   En de crewkant komt er gratis bij. Een technicus draagt dezelfde vorm pas met
-   andere rechten; er is dus EEN poort, EEN scanner en EEN weigeringszin voor
-   bezoekers, crew, artiesten en leveranciers. Wie hier een tweede model voor
-   personeel bijzet, gooit precies dat weg. */
+   En de crewkant komt er gratis bij: een technicus draagt dezelfde vorm pas met
+   andere rechten, dus er is EEN poort en EEN weigeringszin voor bezoekers,
+   crew, artiesten en leveranciers. */
 'use strict';
 
 /* Een rechtsoort is punt-gescheiden en klein-geschreven. Bewust GEEN gesloten
@@ -88,32 +86,6 @@ module.exports = (ctx) => {
     return { recht: { soort, dagen, plek, van, tot, eis } };
   }
 
-  /* ---------- producten ---------- */
-  function productZet(fid, eid, data) {
-    const e = editieVind(fid, eid);
-    if (!e) return { status: 404, error: 'Deze editie bestaat niet.' };
-    const d = data || {};
-    const naam = schoon(d.naam, 80);
-    if (!naam) return { status: 400, error: 'Geef het product een naam.' };
-    const prijs = Number(d.prijs);
-    if (!(prijs >= 0) || prijs > 100000) return { status: 400, error: 'Geef een geldige prijs op.' };
-    const ruw = Array.isArray(d.rechten) ? d.rechten : [];
-    if (!ruw.length) return { status: 400, error: 'Een product zonder rechten geeft nergens toegang toe.' };
-    if (ruw.length > 50) return { status: 400, error: 'Tot vijftig rechten per product.' };
-    const rechten = [];
-    for (const r of ruw) {
-      const k = keurRecht(e, r);
-      if (k.error) return { status: 400, error: k.error };
-      rechten.push(k.recht);
-    }
-    const p = d.id && e.producten[String(d.id)] ? e.producten[String(d.id)]
-      : { id: 'prod' + crypto.randomBytes(4).toString('hex') };
-    Object.assign(p, { naam, prijs, rechten });
-    e.producten[p.id] = p;
-    save();
-    return { ok: true, product: p };
-  }
-
   /* ---------- een pas uitgeven ----------
      Uit een product, of met losse rechten (crew, artiest, leverancier). De
      rechten worden GEKOPIEERD op de pas en niet als verwijzing bewaard: wie
@@ -165,7 +137,7 @@ module.exports = (ctx) => {
     return { ok: true, pas: p };
   }
 
-  return { productZet, pasUitgeven, pasIntrekken, pasOpCode, keurRecht, PAS_SOORTEN };
+  return { pasUitgeven, pasIntrekken, pasOpCode, keurRecht, PAS_SOORTEN };
 };
 
 module.exports.PAS_SOORTEN = PAS_SOORTEN;

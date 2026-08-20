@@ -391,8 +391,29 @@ hebben.
    het staat in de uitslag.
 4. **Crew.** Zero-search: dienst openen, route, briefing, één knop. Bovenop het
    bestaande rooster, niet ernaast.
-5. **Commerce.** Producten als verzamelingen rechten, bundels met voorraadgrenzen,
-   groepen.
+5. **Commerce.** ✅ *behalve groepen* — producten met een voorraad, bundels die
+   de voorraad van hun onderdelen verbruiken, en verkopen in twee stappen.
+   `kern/festival/{product,bundel,verkoop}.js`
+
+   **De twee stappen zijn geen omslachtigheid maar een grendel.** Betalen duurt,
+   en tussen "is er nog plek" en "hier is uw pas" past een tweede koper. Dus:
+   reserveren verbruikt de plek meteen en synchroon, betalen gebeurt daarna, en
+   pas dan komt de pas. Mislukt de betaling, dan gaat de plek meteen terug.
+   Een reservering die niet op tijd wordt rondgemaakt, vervalt — en dat wordt
+   *gerekend*, niet opgeruimd: een opruimtaak betekent dat de voorraad pas klopt
+   zodra die taak liep.
+
+   Een bundel verbruikt alles wat erin zit, dus "festival + glamping" kan alleen
+   als beide nog plek hebben. Een **ruit** (twee onderdelen die hetzelfde
+   product bevatten) is geen lus en telt één keer.
+
+   **Groepen ontbreken nog, en dat is bewust het lastigste deel.** Een groep
+   raakt per definitie een tweede persoon, en dan geldt de regel uit LIFE.md
+   onverkort: samenstellen en klaarzetten mag, bevestigen doet de mens. "Nog
+   drie vrienden missen een ticket" is een feit binnen een groep die iemand zelf
+   heeft gemaakt — maar het mag nooit een bericht worden dat RTG namens hem
+   verstuurt, en het mag geen kunstmatige urgentie dragen (CLAUDE.md). Dat
+   verdient zijn eigen ronde.
 6. **Artiest en podium.** Boeking, rider, changeover, settlement — met het
    draaiboek dat er al is.
 7. **Voorspelling.** Horeca-, personeels- en vervoersvraag uit programma en flow.

@@ -43,6 +43,9 @@
     });
   }
 
+  /* Alleen de knop koppelen; LADEN gebeurt pas na het inloggen, vanuit
+     enterApp() in deel 01 -- net als de andere panelen. Riep dit bestand het
+     zelf aan, dan vuurde de backoffice bij elke paginalading een verzoek af
+     zonder token: een 401 in de console die echte fouten onder ruis bedelft. */
   koppelTafelMaak();
-  laadTafels();
 })();

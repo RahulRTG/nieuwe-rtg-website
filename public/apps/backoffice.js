@@ -57,6 +57,7 @@
     loadVerify();
     loadVakbewijzen();
     loadConcierge();
+    laadTafels();
     loadIncidenten();
     loadSalonNaleving();
     loadOntmoetingen();
@@ -620,7 +621,7 @@
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
-    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadVakbewijzen(); loadConcierge(); loadIncidenten(); loadSalonNaleving(); loadOntmoetingen(); loadTrust(); });
+    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadVakbewijzen(); loadConcierge(); laadTafels(); loadIncidenten(); loadSalonNaleving(); loadOntmoetingen(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
     // Salon-ontmoetingen: SOS-alarm en het live camerabeeld (WebRTC-signaal)
     source.addEventListener('ontmoeting-sos', () => { loadOntmoetingen(); const p=$('#prices'); if(p) p.classList.add('flash'); });
@@ -713,6 +714,9 @@
     });
   }
 
+  /* Alleen de knop koppelen; LADEN gebeurt pas na het inloggen, vanuit
+     enterApp() in deel 01 -- net als de andere panelen. Riep dit bestand het
+     zelf aan, dan vuurde de backoffice bij elke paginalading een verzoek af
+     zonder token: een 401 in de console die echte fouten onder ruis bedelft. */
   koppelTafelMaak();
-  laadTafels();
 })();

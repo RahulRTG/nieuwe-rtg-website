@@ -105,6 +105,10 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, scheuren: kern.commercieRechten.scheuren(codes), zaken: codes.length };
   }));
 
+  /* Hoe het met elk ONDERDEEL gaat, en de knoppen om er een dicht te zetten.
+     Een eigen bestand: zie ./gezondheid.js. */
+  require('./capgezondheid')(ctx);
+
   app.post('/api/office/handhaving', officeAuth, (req, res) => veilig(res, () => {
     if (!kern || !kern.handhavingSchaduw) return { status: 503, error: 'De schaduwlaag is niet gemount.' };
     const regels = kern.handhavingSchaduw.lijst().map(r => ({ ...r, tegenfeit: tegenfeit.vanSchaduw(r) }));

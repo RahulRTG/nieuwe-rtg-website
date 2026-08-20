@@ -66,6 +66,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Intent (voornemen) | `commercie/voornemen.js` + `/plan`, `/keuring`, `/uitvoeren` | **af** — de keuring gaat over het totaal (§5.6) |
 | Effectieve rechten | `commercie/rechten.js` | **af** — nominaal naast effectief (§5.7) |
 | Terugval-voorstel | `commercie/voorstel.js` + `/weging.js` | **af** — voorstellen, nooit verplaatsen (§5.8) |
+| Capability health | `commercie/capgezondheid.js` | **af** — meet; blokkeert nog niet automatisch (§5.9) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -510,6 +511,45 @@ voorstellen.
 
 Zeven mutaties, alle zeven gevangen.
 
+### 5.9 Capability health (was §6.9, nu gebouwd)
+
+Een gewone healthcheck kent één antwoord: het huis doet het, of het doet het
+niet. Valt de uitbetaalrail om, dan staat er rood — en dan is de vraag "kan de
+kassa nog draaien?" niet te beantwoorden, terwijl het antwoord gewoon ja is. Een
+restaurant op vrijdagavond wordt niet geholpen door een lampje dat over iets
+anders gaat.
+
+Dus een stand **per capability**: GROEN, AMBER, ROOD, QUARANTAINE — en
+ONGEMETEN, want *groen is niet "geen nieuws"*. Een capability waar niemand iets
+mee deed is niet gezond maar onbewezen, en een bord dat na een stille nacht
+overal groen staat, zegt niets. Dezelfde regel als bij de schaduwstand (§5.3) en
+het terugval-voorstel (§5.8) — inmiddels drie keer dezelfde discipline op drie
+plekken.
+
+**Quarantaine raakt één capability en nooit het huis.** Structureel: `mag()`
+neemt een capability en antwoordt alleen daarover; er is geen functie die "alles"
+dicht kan zetten, en een toets houdt dat vast. `payout` in quarantaine terwijl
+kassa, orders en refunds doorlopen is precies het verschil tussen een storing en
+een uitval.
+
+**Automatisch erin, nooit automatisch eruit.** Een onderdeel dat een kwartier
+onafgebroken rood staat gaat vanzelf dicht — doorgaan met een rail die alles
+weigert kost bij elke poging geld en vertrouwen. Eruit komen doet een mens, met
+een naam. Een systeem dat zichzelf dicht doet én zichzelf weer open doet,
+verbergt precies de storing die je had willen zien. Automatische quarantaines
+zijn apart telbaar.
+
+**En hij meet, hij blokkeert niet.** De uitbetaalrail meldt sinds nu elke
+inzending (gelukt of niet), maar niets in de geldstroom raadpleegt `mag()` nog.
+Automatisch de geldrail dichtzetten is precies het soort regel dat eerst hoort
+mee te lopen — §5.3 bestaat daarvoor. Eerst meten, dan afdwingen; dat de meting
+er is en de blokkade niet, staat hier zodat het niet als "af" leest.
+
+Zeven mutaties, alle zeven gevangen. En één fout die géén mutatie was: de module
+heette eerst `gezondheid.js`, en dat botste met het Gezondheidsmaatje van de
+RTFoundation — ik overschreef daarmee een bestaand toetsbestand. Vandaar
+`capgezondheid`: in dit huis gaat "gezondheid" over mensen.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -532,9 +572,9 @@ vastligt en niemand halverwege iets anders bouwt.
    oorspronkelijke formulering: "op basis van hun historie" is het niet geworden,
    want die historie bestaat niet. Het voorstel leunt op wat er nú te tellen
    valt, en zegt met naam waar het niet naar heeft gekeken.
-9. **Capability health** (GROEN/AMBER/ROOD/QUARANTAINE) en **capability-level
-   failover**: `payout` in quarantaine terwijl kassa, orders en refunds
-   doorlopen. Veel beter dan "healthcheck rood → platform stuk".
+9. ~~**Capability health**~~ **Gebouwd** — zie §5.9. De *failover* zelf (een
+   gequarantainede capability die de geldstroom werkelijk tegenhoudt) staat er
+   nog niet: die regel hoort eerst mee te lopen.
 10. **Safety kernel** — één piepkleine kern waar waardeverplaatsing,
     identiteitswijziging, rechtenwijziging, data-export en AI-uitvoering
     doorheen moeten.

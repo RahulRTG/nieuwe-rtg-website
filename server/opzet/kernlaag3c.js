@@ -19,7 +19,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { db, save, notify } = hulp;
+  const { db, save, notify, capGezondheid } = hulp;
 
 /* DE COMMERCIELE RONDE (kern/commercie/ronde.js): het werk dat wel gebouwd was
    en nooit werd gedaan. Vier lagen legden verplichtingen vast -- mislukte
@@ -127,6 +127,10 @@ Object.assign(kern, (() => {
     zaakAbonnement, schaduw, tegoed, contracten: kern.contracten || null });
 
   return { commercieBewijstoken: token, voornemens, commercieRechten: rechten,
+    /* De gezondheid per capability wordt in server.js gebouwd -- hij moet ouder
+       zijn dan de betaalrail die erop meldt -- en hier alleen aan de kern
+       gehangen, zodat het kantoor erbij kan. */
+    capGezondheid,
     commercieRonde: ronde, commercieVerrekening: verrekening,
     commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen, zaakAbonnement,
     handhavingSchaduw: schaduw };

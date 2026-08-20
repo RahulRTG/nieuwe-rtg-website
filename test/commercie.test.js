@@ -184,3 +184,34 @@ test('12. de gratis trede mag niets zakelijks, en dat is geen vergetelheid', () 
   assert.deepEqual(caps.capsVan('rtg'), ['can_use_ai'],
     'en de consumentenpas draagt alleen de AI-assistent');
 });
+
+/* DE ENTREE IS INGETROKKEN. De partnervoorwaarden noemden 10.000 euro entree
+   plus 500 per jaar, naast een Business Lite van 150 per maand. Twee
+   toegangsprijzen naast elkaar is onuitlegbaar, en 10.000 euro sluit precies de
+   kleine zaak buiten voor wie die trede bedoeld is (PRIJZEN.md 4.6). */
+test('13. er is geen entree meer, en het document zegt dat ook', () => {
+  const claims = require('../server/kern/commercie/claims');
+  const c = claims.claims().find(x => x.id === 'claim.partner.entry_fee');
+  assert.equal(c.waarde, 'GEEN');
+  assert.equal(c.dekking, claims.DEKKING.AFGEDWONGEN);
+
+  const doc = require('fs').readFileSync(
+    __dirname + '/../public/apps/juridisch/partnervoorwaarden.html', 'utf8');
+  assert.doesNotMatch(doc, /10\.000 entree|10\.000<\/b> entree/,
+    'de partnervoorwaarden noemen nog een entree');
+  assert.doesNotMatch(doc, /vaste contributie per jaar/,
+    'en nog een jaarlijkse contributie');
+  assert.doesNotMatch(doc, /zonder maximum/,
+    'de open kostenclausule ("doorbelasting zonder maximum") hoort weg te zijn');
+  assert.match(doc, /geen entree/, 'er hoort te staan dat er geen entree is');
+});
+
+/* De claims-poort hoort ook echt te draaien in de toetsen, en niet alleen als
+   endpoint te bestaan. Dit is prioriteit 10: geen financiele claim zonder
+   bewijs. */
+test('14. de release-poort komt schoon door', () => {
+  const claims = require('../server/kern/commercie/claims');
+  const p = claims.poort();
+  assert.equal(p.ok, true, p.problemen.join('; '));
+  assert.ok(p.aantal >= 12, 'er staan claims in');
+});

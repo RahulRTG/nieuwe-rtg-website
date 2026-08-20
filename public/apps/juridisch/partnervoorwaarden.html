@@ -50,7 +50,7 @@
     <p class="updated">Laatst bijgewerkt: 22 juli 2026 · Deze voorwaarden gelden tussen RTG (merknaam Rahul Travel Group, KvK 82273510) en elk aangesloten partnerbedrijf: horeca, hotels en appartementen, vervoerders, autoverhuur en -verkoop, boten en jachten, activiteiten, vastgoed, mode en retail, groothandels, beveiligingsteams en zelfstandige professionals. Akkoord met deze voorwaarden (inclusief de verwerkersafspraken in artikel 5) is een voorwaarde om partner te worden.</p>
 
     <div class="card">
-      <p><b>In het kort.</b> U betaalt RTG <b>0% commissie</b>: RTG neemt geen aandeel in uw omzet. Rekent u af via RTG Pay, dan betaalt u daarvoor een vast tarief per transactie (artikel 1) &mdash; een prijs voor een dienst, geen percentage van wat u verdient. In ruil vragen we drie dingen: lever de kwaliteit die RTG-leden verwachten, behandel gastgegevens volgens de afspraken hieronder, en houd uw verplichte bedrijfsaccount op De Salon levend.</p>
+      <p><b>In het kort.</b> U betaalt RTG <b>0% commissie</b>: RTG neemt geen aandeel in uw omzet. Rekent u af via RTG Pay, dan betaalt u daarvoor een vast tarief per transactie (artikel 1) &mdash; een prijs voor een dienst, geen percentage van wat u verdient. In ruil vragen we drie dingen: lever de kwaliteit die RTG-leden verwachten, behandel gastgegevens volgens de afspraken hieronder, en houd uw verplichte bedrijfsaccount op De Salon levend. Een partnerplek hoort bij een zakelijk abonnement (artikel 1); er is geen entree.</p>
     </div>
 
     <h2>1. Het partnerschap en 0% commissie</h2>
@@ -59,7 +59,7 @@
       <li><b>Wel: de betaaldienst.</b> Rekent u af via RTG Pay, dan treedt RTG op als betaaldienstverlener en brengt daarvoor <b><span data-tarief="vast">&euro; 0,10</span> plus <span data-tarief="pct">1</span>% per transactie</b> in rekening, per betaling direct verrekend op uw partnerrekening en als aparte regel zichtbaar. Dat is een prijs voor een verleende dienst en nadrukkelijk geen aandeel in uw omzet: het bedrag hangt af van het aantal betalingen dat wij afhandelen, niet van wat u verdient. U bent niet verplicht via RTG Pay af te rekenen; doet u dat niet, dan brengt RTG u hiervoor niets in rekening. Een wijziging van dit tarief kondigen wij vooraf aan.</li>
       <li><b>Ledenprijsgarantie:</b> de prijs die u RTG-leden rekent is <b>nooit hoger dan uw eigen publieke prijs</b> (uw eigen website, uw prijslijst ter plaatse) voor dezelfde dienst op hetzelfde moment; de bedoeling is lager, omdat u bij RTG geen commissie afdraagt en die marge aan leden kunt doorgeven. Meldt een lid een lagere eigen publieke prijs, dan past u de prijs aan en zet u het verschil voor dat lid recht. Deze garantie gaat uitsluitend over uw eigen prijzen: RTG stelt <b>geen</b> eisen aan uw prijzen of aanwezigheid op andere verkoopkanalen.</li>
       <li>De partner-apps (kassa, werkplekken, personeel, backoffice, boekhouding) zijn kosteloos onderdeel van het partnerschap.</li>
-      <li><b>Founding-partners</b> (zelf aangemeld of onze uitnodiging geaccepteerd voor de sluitingsdatum van de founding-actie) betalen <b>geen entree en geen contributie</b>. Wie de uitnodiging eerst afsloeg of later toetreedt, betaalt eenmalig <b>&euro; 10.000 entree</b> en <b>&euro; 500 vaste contributie per jaar</b>, plus een jaarlijkse doorbelasting van de werkelijke onderhoudskosten van het platform (servers, energie, voorschotten en dergelijke), gespecificeerd op de factuur en zonder maximum. De sluitingsdatum wordt vooraf aangekondigd; de datum van aanmelding of uitnodiging is bepalend.</li>
+      <li><b>Wat het partnerschap kost.</b> Een partnerplek hoort bij een zakelijk RTG-abonnement: <b>RTG Business Lite</b> (<span data-pasprijs="business-lite">&euro; 150</span> per maand) of de <b>RTG Business Pass</b>. Dat is het enige vaste bedrag: er is <b>geen entree</b>, geen aparte contributie en geen doorbelasting van onderhoudskosten. Naast het abonnement betaalt u alleen wat u werkelijk verbruikt &mdash; de betaaldienst uit artikel 1 en, boven het inbegrepen tegoed, extra AI-capaciteit. <b>Founding-partners</b> (zelf aangemeld of onze uitnodiging geaccepteerd voor de sluitingsdatum van de founding-actie) betalen dat abonnement niet zolang de founding-afspraak loopt. De sluitingsdatum wordt vooraf aangekondigd; de datum van aanmelding of uitnodiging is bepalend.</li>
       <li>De leverancierscode en PIN's zijn bedrijfsgebonden. U beheert zelf wie toegang heeft en wie manager is.</li>
       <li>RTG-leden zijn en blijven leden van RTG. RTG bemiddelt: elke bestelling, rit of boeking komt als losse overeenkomst tot stand <b>tussen het lid en uw onderneming</b>.</li>
     </ul>
@@ -164,6 +164,19 @@ fetch('/api/betaaldiensttarief').then(r => (r.ok ? r.json() : null)).then(d => {
     if (Number.isFinite(t.vastCenten)) el.textContent = eur(t.vastCenten);
   for (const el of document.querySelectorAll('[data-tarief="pct"]'))
     if (Number.isFinite(t.pct)) el.textContent = String(t.pct);
+}).catch(() => {});
+/* De prijs van het zakelijke abonnement komt uit dezelfde bron als de
+   voorwaardenpagina voor leden: een bedrag in een juridisch document dat los kan
+   lopen van wat de code rekent, is hoe "0% commissie" hier naast een
+   commissieknop kon blijven staan (PRIJZEN.md 4.1). */
+fetch('/api/pasprijzen').then(r => (r.ok ? r.json() : null)).then(d => {
+  if (!d || !d.passen) return;
+  const eur = c => '\u20AC ' + (c / 100).toLocaleString('nl-NL',
+    { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
+  for (const el of document.querySelectorAll('[data-pasprijs]')) {
+    const p = d.passen[el.dataset.pasprijs];
+    if (p && Number.isFinite(p.maandCenten)) el.textContent = eur(p.maandCenten);
+  }
 }).catch(() => {});
 </script>
 </body>

@@ -164,13 +164,19 @@ function claims() {
   uit.push({
     id: 'claim.partner.entry_fee',
     onderwerp: 'Partner-entree',
-    waarde: 'TE_HERZIEN',
-    tekst: 'de entree van 10.000 euro uit de partnervoorwaarden staat naast een Business Lite van ' +
-      bedrag(ladder.bodemCentenVan('business-lite')) + ' per maand en moet worden ingetrokken of herzien',
-    bron: 'alleen partnervoorwaarden.html',
-    dekking: DEKKING.BELOFTE,
-    toets: null,
-    kanttekening: 'Twee toegangsprijzen naast elkaar is onuitlegbaar; zie PRIJZEN.md 4.6.'
+    waarde: 'GEEN',
+    tekst: 'een partnerplek hoort bij een zakelijk abonnement (' +
+      caps.tredenMet('can_be_partner').map(t => (ladder.trede(t) || {}).naam || t).join(' of ') +
+      '); er is geen entree, geen aparte contributie en geen doorbelasting van onderhoudskosten',
+    bron: 'kern/commercie/capaciteiten.js + kern/pasladder.js',
+    /* Stond hier als BELOFTE met waarde TE_HERZIEN: de partnervoorwaarden
+       noemden een entree van 10.000 euro plus 500 per jaar, naast een Business
+       Lite van 150 per maand. Twee toegangsprijzen naast elkaar is onuitlegbaar,
+       en 10.000 euro sluit precies de kleine zaak buiten voor wie die trede
+       bedoeld is. De entree is ingetrokken; wat overblijft is het abonnement, en
+       dat komt uit de ladder. */
+    dekking: DEKKING.AFGEDWONGEN,
+    toets: 'test/commercie.test.js'
   });
   uit.push({
     id: 'claim.member.price_guarantee',

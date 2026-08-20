@@ -4,7 +4,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-function maak(rijen) {
+function maak(rijen, contracten) {
   const accounts = { ledenRegisterRijen: () => rijen };
   const onboarding = { store: () => ({ profielen: {
     'user-1': { velden: { woonplaats: 'Ibiza' } },
@@ -12,7 +12,9 @@ function maak(rijen) {
     'user-3': { velden: { woonplaats: 'Ibiza' } }
   } }) };
   const geldPasprijzen = () => ({ passen: { rtg: { maandCenten: 6500 }, lifestyle: { maandCenten: 2000000 } } });
-  return require('../server/kern/ledenregister')({ accounts, onboarding, geldPasprijzen, ledenAantal: () => rijen.length }).ledenregister;
+  const db = { data: { contracten: contracten || [] } };
+  return require('../server/kern/ledenregister')({ accounts, onboarding, geldPasprijzen,
+    ledenAantal: () => rijen.length, db }).ledenregister;
 }
 
 const RIJEN = [
@@ -54,8 +56,11 @@ test('omzet per pas en de 30%-split (20% lokaal, 10% RTF)', () => {
      `|| 0`-fout die deze module eerder al eens maakte. */
   for (const pas of ['lifestyle', 'business']) {
     assert.equal(omzet[pas].opMaat, true, pas + ' is contractueel');
-    assert.equal(omzet[pas].maandOmzet, null, pas + ': geen bedrag, en nadrukkelijk niet nul');
-    assert.equal(omzet[pas].prijsPP, null, pas + ': ook geen prijs per lid');
+    assert.equal(omzet[pas].maandOmzet, null,
+      pas + ': zonder contract geen bedrag, en nadrukkelijk niet nul');
+    assert.equal(omzet[pas].prijsPP, null, pas + ': er is geen prijs per lid');
+    assert.ok(omzet[pas].zonderContract >= 1,
+      pas + ': een lid zonder contract hoort zichtbaar te blijven, niet stil uit het totaal te vallen');
   }
   // het totaal loopt dus alleen over de treden met een lijstprijs
   assert.equal(r.split.totaalOmzet, 130);
@@ -114,4 +119,32 @@ test('de aanwas per bedrijf noemt bedrijven, nooit personen', () => {
   assert.equal(anemoon.email, undefined, 'en geen e-mailadres');
   const zonder = r.lijst.find(m => m.codenaam === 'Dennenhout');
   assert.equal(zonder.via, null, 'wie zichzelf aanmeldde heeft geen aanbrenger');
+});
+
+/* DE ANDERE KANT. De toets hierboven bewaakt dat een lid ZONDER contract niet
+   stil uit het totaal valt. Deze bewaakt dat een lid MET contract er wel in
+   komt -- en met het afgesproken bedrag, niet met een lijstprijs.
+
+   Zonder deze toets zou een omzetstaat die contractuele treden altijd op null
+   zet, groen blijven: dat was namelijk precies de vorige stand. */
+test('een contractuele trede telt mee met wat er is afgesproken', () => {
+  const contracten = [
+    { pas: 'lifestyle', status: 'ACTIEF', afgesprokenCenten: 2750000 },   // 27.500
+    { pas: 'business', status: 'ACTIEF', afgesprokenCenten: 750000 },     // 7.500
+    { pas: 'business', status: 'GEEINDIGD', afgesprokenCenten: 900000 },  // telt niet mee
+    { pas: 'business', status: 'CONCEPT', afgesprokenCenten: 999999 }     // ook niet
+  ];
+  const lr = maak(RIJEN, contracten);
+  const r = lr.register();
+  const omzet = Object.fromEntries(r.omzet.map(o => [o.pas, o]));
+
+  assert.equal(omzet.lifestyle.maandOmzet, 27500,
+    'de som van wat er is afgesproken, en niet de lijstprijs van 20.000');
+  assert.equal(omzet.business.maandOmzet, 7500,
+    'een geeindigd of nog niet getekend contract telt niet mee');
+  assert.equal(omzet.business.uitContracten, 1);
+
+  // en het totaal loopt nu over alle treden met een bekend bedrag
+  assert.equal(r.split.totaalOmzet, 130 + 27500 + 7500);
+  assert.equal(r.split.foundation30, Math.round((130 + 27500 + 7500) * 0.30 * 100) / 100);
 });

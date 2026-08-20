@@ -149,9 +149,16 @@ test('8. de poort laat geen claim door die zich sterker voordoet dan hij is', ()
    stilzwijgend als afgedwongen worden opgevoerd. */
 test('9. de bekende gaten staan als gat te boek, met een kanttekening', () => {
   const lijst = claims.claims();
+  /* De entree stond hier als BELOFTE met waarde TE_HERZIEN. Hij is inmiddels
+     INGETROKKEN: de partnervoorwaarden noemen geen entree meer en een
+     partnerplek hoort bij een zakelijk abonnement. Deze toets is meeveranderd
+     met het besluit -- maar hij bewaakt nu wel iets scherpers, namelijk dat de
+     claim ook echt uit de kern komt en niet uit het document. */
   const entree = lijst.find(c => c.id === 'claim.partner.entry_fee');
-  assert.equal(entree.dekking, claims.DEKKING.BELOFTE, 'de entree bestaat alleen op papier');
-  assert.match(entree.kanttekening, /onuitlegbaar|4\.6/);
+  assert.equal(entree.dekking, claims.DEKKING.AFGEDWONGEN, 'de entree is ingetrokken');
+  assert.equal(entree.waarde, 'GEEN');
+  assert.doesNotMatch(entree.bron, /partnervoorwaarden/,
+    'de waarde hoort uit de kern te komen en niet uit het juridische document');
 
   const garantie = lijst.find(c => c.id === 'claim.member.price_guarantee');
   assert.equal(garantie.dekking, claims.DEKKING.GEBOUWD, 'het plafond is er, de rechtzetting niet');

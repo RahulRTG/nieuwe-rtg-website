@@ -113,7 +113,8 @@ lijstprijs én van de bodem.
 | Partnervergoeding over omzet | **0% — en dat is geen instelling** | niemand | `kern/commercie/vergoeding.js` |
 | RTG-ledenvoordeel per genre | 0–50%, RTG legt bij | het lid krijgt, RTG betaalt | `kern/commercie/subsidie.js` |
 | Bijdrage partnerkanaal (gast) | max 5% over de **service**, nooit over de netto reissom | de partner | `kern/onderneming/regie.js` |
-| Partner-entree (niet-founding) | € 10.000 eenmalig + € 500 p/j + doorbelasting onderhoud | de partner | alleen in de partnervoorwaarden |
+| Partner-entree | **geen** — een partnerplek hoort bij een zakelijk abonnement | — | `kern/commercie/capaciteiten.js` |
+| AI boven het inbegrepen tegoed | een bundel, na een keuze vooraf | het lid of de zaak | `kern/commercie/tegoed.js` |
 
 De partnervergoeding staat er als nul omdat dat een eigenschap van het product
 is: er is geen knop meer die hem kan verzetten (COMMERCIE.md §3). De
@@ -231,13 +232,15 @@ Dat laatste bijt nu al: `test/pasprijs.test.js` toets 6 bewaakt dat een
 prijswijziging in de boardroom **overal** doorkomt — ook op de factuur van een
 lid dat een jaarcontract heeft. Voor de RTG Pass is dat een consumentenkwestie.
 
-### 4.6 De entree van € 10.000 bestaat alleen op papier — **en moet nu herzien**
+### 4.6 ~~De entree van € 10.000 bestaat alleen op papier~~ — INGETROKKEN
 
-*Sinds het besluit dat de partnerpoort Business Lite wordt (COMMERCIE.md §3b) is
-dit geen ontbrekende bouwsteen meer maar een tegenstrijdigheid: twee
-toegangsprijzen naast elkaar (€ 150 p/m én € 10.000 eenmalig) is onuitlegbaar,
-en € 10.000 sluit precies de kleine zaak buiten voor wie de € 150-trede bedoeld
-is. Intrekken of herzien, niet bouwen.*
+*De entree, de jaarlijkse contributie en de doorbelasting "zonder maximum" zijn
+uit de partnervoorwaarden gehaald. Wat overblijft is het abonnement: een
+partnerplek hoort bij RTG Business Lite of de Business Pass, en dat bedrag komt
+live uit de ladder in plaats van als los getal in het document te staan.
+Founding-partners betalen dat abonnement niet zolang hun afspraak loopt.
+`test/commercie.test.js` 13 bewaakt dat het document geen entree meer noemt. Wat
+er was:*
 
 Founding-partners betalen niets; wie later toetreedt betaalt € 10.000 eenmalig,
 € 500 per jaar en een doorbelasting van de werkelijke onderhoudskosten "zonder
@@ -246,11 +249,14 @@ code — nul treffers buiten het voorwaardendocument. LAUNCH.md noemt dit zelf a
 openstaand punt, inclusief de waarschuwing dat een open kostenclausule b2b wel
 mag maar gespecificeerd moet zijn om afdwingbaar te blijven.
 
-### 4.7 De omzetstaat telt de contractprijzen niet mee — **deels**
+### 4.7 ~~De omzetstaat telt de contractprijzen niet mee~~ — GESLOTEN
 
-*Het contractbedrag heeft nu een huis (`kern/commercie/contract.js`) en het
-betaalschema rekent ermee. Wat nog niet kan: de omzetstaat leest de accountlaag
-en niet de contracten, dus optellen zou daar een schatting worden. Blijft open.*
+*De omzetstaat leest nu de contracten: voor een contractuele trede is de omzet de
+**som van wat er werkelijk is afgesproken**, geen lijstprijs maal een aantal en
+geen schatting. Een geëindigd of nog niet getekend contract telt niet mee. Leden
+op zo'n trede zónder lopend contract staan apart als `zonderContract` — stil uit
+het totaal vallen is precies hoe een omzetstaat compleet lijkt terwijl hij het
+niet is. `test/ledenregister.test.js` toetst beide kanten. Wat er was:*
 
 Sinds deze ladder zijn Business én Lifestyle contractueel, dus `ledenregister.js`
 laat ze uit `totaalOmzet` en toont ze als `opMaat` met hun aantal. Dat is het
@@ -314,7 +320,35 @@ publieke prijs, zowel bij het opslaan van de menukaart als bij het bestellen
 *"meld het via de app: de partner past de prijs aan en het verschil wordt voor u
 rechtgezet."* Er is geen meldknop en geen terugbetaalstroom.
 
-### 4.12 De hoogte van € 65 en € 20.000 is nergens teruggerekend
+### 4.12 De hoogte van de bedragen, teruggerekend — GEDEELTELIJK
+
+*Hieronder staat wat er nu wél is terug te rekenen. Wat blijft ontbreken is de
+loonkant van Lifestyle: een menselijke concierge is een salaris, en dat staat
+nergens tegenover de € 20.000. Dat is geen som die code kan maken.*
+
+**Wat een lid moet dekken.** De vaste lasten uit `docs/rapport-testen-en-kosten.md`:
+~€ 10–15 per maand voor een pilot, € 120–200 voor een serieuze start, € 1.500–5.000
+op mega-schaal. Bij € 65 per maand ex btw houdt RTG na de 30% sociale afdracht
+€ 45,50 over. Dat betekent: **drie tot vijf RTG Passen dekken de pilot-infra, en
+drie tot vijf dekken ook de serieuze start** — die stap kost € 120–200 en drie
+leden brengen € 136,50 op. De variabele kant is de AI, en die is nu begrensd per
+trede (`kern/commercie/tegoed.js`) in plaats van open.
+
+**Waarom € 150 voor Business Lite.** Een kassasysteem kost in de praktijk € 35–150
+per maand en de gangbare stapel is drie of vier abonnementen (MARKT.md, met
+bronnen). € 150 zit aan de bovenkant van één zo'n abonnement en onder de stapel
+die het vervangt. De vergelijking die telt is niet het kassasysteem maar de
+commissie: bij € 15.000 bezorgomzet betaalt een zaak ruim € 2.100 per maand aan
+een bezorgplatform.
+
+**Waarom de sprong naar € 5.000 verdedigbaar is.** Business Lite is
+software-as-a-service; Business is een enterprise-relatie met governance, SLA en
+een vaste contactpersoon (`kern/commercie/capaciteiten.js` maakt dat verschil
+hard). Zonder de tussentrede was de sprong van € 65 naar € 5.000 niet uit te
+leggen, en een prijs die je niet kunt uitleggen is een prijs waarover
+onderhandeld wordt.
+
+**Wat er niet is teruggerekend:**
 
 De kostenkant staat er wel (`docs/rapport-testen-en-kosten.md`: ~€ 10–15 p/m
 pilot, € 120–200 serieuze start, AI variabel). Wat er niet staat: hoeveel leden

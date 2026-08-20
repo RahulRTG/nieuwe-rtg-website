@@ -7,10 +7,11 @@
    Bij elke pas hoort een maandbijdrage: de gratis app is 0, de RTG Pass (en
    straks Business Lite) staat in de geld-regie, en de Business Pass en de
    Lifestyle Pass zijn CONTRACTUEEL -- die dragen geen bedrag in de prijslijst,
-   dus ze tellen hier niet mee in de omzet. Dat is geen omissie maar het enige
-   eerlijke antwoord: RTG kent hun bedrag pas als het contract er is (zie
-   PRIJZEN.md, het gat "de contractprijs heeft geen huis"). Van elke bijdrage
-   gaat 30% naar de
+   dus hun omzet komt uit de CONTRACTEN (kern/commercie/contract.js): de som van
+   wat er werkelijk is afgesproken, en geen lijstprijs maal een aantal. Leden op
+   zo'n trede zonder lopend contract staan apart als `zonderContract`, want stil
+   uit het totaal vallen is precies hoe een omzetstaat compleet lijkt terwijl hij
+   het niet is. Van elke bijdrage gaat 30% naar de
    RTFoundation: 20% blijft LOKAAL (de omgeving van het lid) en 10% gaat naar de
    RTFoundation zelf. Dit is een RAPPORTAGE, berekend uit ledental x prijs; er
    wordt nooit geclaimd dat een echte betaling is verwerkt.
@@ -29,7 +30,18 @@ const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
 const { maandCentenVoor, contractueel } = require('./pasprijs');
 
-module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
+module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => {
+  /* De contracten, voor de omzet van de contractuele treden. Laat-gebonden en
+     defensief: dit is een RAPPORTAGE, en een omzetstaat die omvalt omdat de
+     contractentabel er nog niet is, is erger dan een omzetstaat zonder die
+     kolom. */
+  function contractenVan(pas) {
+    try {
+      const rijen = (db && db.data && db.data.contracten) || [];
+      return rijen.filter(c => c.pas === pas && Number.isFinite(c.afgesprokenCenten) &&
+        !['GEEINDIGD', 'CONCEPT', 'AANGEBODEN'].includes(c.status));
+    } catch (e) { return []; }
+  }
   const eur = c => Math.round(c) / 100;
 
   // de pas van een lid: een gast/gratis lid heeft tier 'guest'; wij tonen 'gratis'.
@@ -110,12 +122,34 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
          Lifestyle NUL euro tonen in plaats van "geen bedrag" -- precies de
          `|| 0`-val die drie regels hoger beschreven staat. */
       const opMaat = contractueel(pas);
+
+      /* CONTRACTUELE TREDEN TELLEN NU WEL MEE, maar uit de CONTRACTEN en niet
+         uit een lijstprijs maal een aantal. Dat is geen schatting: het is de
+         som van wat er werkelijk is afgesproken.
+
+         Wat er apart bij staat is `zonderContract`: leden met deze pas voor wie
+         geen lopend contract te vinden is. Die zijn er niet horen te zijn -- het
+         besluit weigert een akkoord zonder bedrag -- maar een rij uit de tijd
+         voor de ladder heeft er geen. Zo'n lid stil uit het totaal laten vallen
+         is precies hoe een omzetstaat compleet lijkt terwijl hij het niet is. */
+      if (opMaat) {
+        const ctr = contractenVan(pas);
+        const som = ctr.reduce((n, c) => n + c.afgesprokenCenten, 0);
+        return { pas, pasNaam: PAS_NAAM[pas], aantal, opMaat: true,
+          prijsPP: null,
+          maandOmzet: ctr.length ? eur(som) : null,
+          uitContracten: ctr.length,
+          zonderContract: Math.max(0, aantal - ctr.length) };
+      }
       const centenPP = maandCentenVoor(prijslijst, pas) || 0;
-      const maandCentenTot = opMaat ? null : centenPP * aantal;
-      return { pas, pasNaam: PAS_NAAM[pas], aantal, opMaat,
-        prijsPP: opMaat ? null : eur(centenPP), maandOmzet: opMaat ? null : eur(maandCentenTot) };
+      const maandCentenTot = centenPP * aantal;
+      return { pas, pasNaam: PAS_NAAM[pas], aantal, opMaat: false,
+        prijsPP: eur(centenPP), maandOmzet: eur(maandCentenTot) };
     });
     // totaal alleen over de passen met een bekende prijs (Business is op maat)
+    /* Het totaal loopt nu over ALLE treden met een bekend bedrag -- ook de
+       contractuele, want die dragen sinds de Contract Engine hun eigen som. Wie
+       geen contract heeft, telt niet mee en staat als `zonderContract`. */
     const totaalCenten = omzet.reduce((s, o) => s + (o.maandOmzet != null ? Math.round(o.maandOmzet * 100) : 0), 0);
     const split = {
       totaalOmzet: eur(totaalCenten),
@@ -134,7 +168,11 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
          aanmeldingen. Optellen zou hier dus een schatting worden, en een
          omzetstaat met een geschat getal erin is erger dan een die eerlijk zegt
          dat het er niet in zit. Zie PRIJZEN.md. */
-      businessOpMaat: PAS_VOLGORDE.filter(p => contractueel(p)).reduce((n, p) => n + (passen[p] || 0), 0)
+      /* Het aantal leden op een contractuele trede WAARVOOR GEEN CONTRACT staat.
+         Dat is het getal dat er echt toe doet: zij zitten niet in het totaal.
+         Was dit ooit het aantal contractuele leden -- toen telde geen van hen
+         mee -- nu telt alleen wie geen contract heeft nog buiten de boot. */
+      businessOpMaat: omzet.filter(o => o.opMaat).reduce((n, o) => n + (o.zonderContract || 0), 0)
     };
 
     return { ok: true,

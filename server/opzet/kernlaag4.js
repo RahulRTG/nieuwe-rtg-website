@@ -129,7 +129,7 @@ Object.assign(kern, require('../kern/geldregie').maakGeldregie({ db, save }));
    codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas
    en de 30%-foundationsplit (20% lokaal, 10% RTF). Na de geldregie gemount, want
    het leunt op de pasprijzen daaruit. */
-Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal }));
+Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal, db }));
 /* De ledenbalie hangt in ./kernlaag7.js, met een eigen kern (kern/ledenbalie*.js)
    en een eigen zetel. Hier stond een TWEEDE bedrading uit een andere tak die
    een maakLedenbalie() verwachtte die deze kern niet heeft -- de server startte

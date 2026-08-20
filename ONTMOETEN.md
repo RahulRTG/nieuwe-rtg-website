@@ -48,11 +48,12 @@ niet hetzelfde probleem voor een ander segment.
 
 Dit document schrijft niet op een leeg vel. Wat hieronder staat, draait.
 
-**Vonk** (`server/kern/vonk/index.js` + `vonk/match.js`, routes op `/api/vonk/*`,
-scherm `public/apps/vonk.html`): profiel en wensen op codenaam, een eindige
-dagselectie van maximaal zes wederzijds passende profielen, wederzijdse like =
-match, en dan automatisch een tafel bij de partner het dichtst bij het
-geografische midden van beide woonplaatsen (`tafelInHetMidden`). EUR 10 p.p.
+**Vonk** (`server/kern/vonk/`: `index.js` het profiel, `selectie.js` wie wie
+ziet, `assen.js` + `wensen.js` de voorkeurstaal, `match.js` de match; routes op
+`/api/vonk/*`, scherm `public/apps/vonk.html`): profiel en wensen op codenaam,
+een eindige dagselectie van maximaal zes wederzijds passende profielen,
+wederzijdse like = match, en dan automatisch een tafel bij de partner het dichtst
+bij het geografische midden van beide woonplaatsen (`tafelInHetMidden`). EUR 10 p.p.
 vooraf via RTG Pay — EUR 5 voor RTG, EUR 5 als aanbetaling bij de zaak; de
 reservering komt pas rond als beiden betaald hebben. Alleen de stad is
 zichtbaar, chat pas na een match, blokkeren en melden met backoffice-opvolging.
@@ -610,12 +611,30 @@ eerst iets waard is voor een lid.
 **Fase 0 — gedaan.** De ontmoetpoort gedeeld, en Rendez-vous erachter gezet
 (`kern/ontmoetpoort.js`, `test/rendezvous.test.js`).
 
-**Fase 1 — de voorkeurstaal in Vonk.** Verplicht / sterke voorkeur / leuk
-meegenomen, met privéwensen gescheiden van profielgegevens, en harde eisen die
-vóór de selectie filteren. Dit is de grootste kwaliteitssprong per regel code, en
-het raakt niets anders.
+**Fase 1 — gedaan: de voorkeurstaal in Vonk** (`kern/vonk/assen.js` +
+`kern/vonk/wensen.js`, met de selectie in `kern/vonk/selectie.js`). Zeven assen,
+drie gewichten, en `kenmerken` (wie u bent, per as zelf zichtbaar te maken)
+gescheiden van `wensen` (wat u van een ander vraagt, voor niemand zichtbaar).
 
-**Fase 2 — de Presence Graph in Rendez-vous.** Zelf opgegeven aanwezigheid met
+Twee beslissingen die daar zijn genomen en die het gedrag bepalen:
+
+- **Verplicht filtert op een uitgesproken tegenstelling, niet op een leeg veld.**
+  Wie stellig kinderen wil en wie stellig niet, ziet elkaar niet; wie er niets
+  over zei, blijft staan met een open punt bij de reden. Anders was de harde eis
+  een verborgen strafregel voor nieuwe leden geworden — en dat botst met par. 3.7.
+- **De uitleg lekt geen waarden.** Staat een as op "pas na een match", dan zegt
+  de reden wel *dát* het overeenkomt maar niet *wat* het antwoord is. Zonder die
+  regel was de zichtbaarheidskeuze een knop die niets doet.
+
+En bij het bouwen kwam er een oude fout boven die niets met de voorkeurstaal te
+maken had: `lib/geo.haversine` neemt twee punten en Vonk riep hem aan met vier
+losse getallen. Hij gaf dus altijd `null` — waardoor de afstandsgrens nooit
+filterde, de volgorde afstand negeerde, en **de tafel "rond het geografische
+midden" gewoon de eerste zaak uit de lijst pakte**, omdat `null < Infinity` waar
+is. Het midden werd berekend en meteen weggegooid. Hersteld, met de afstand tot
+het midden in het antwoord zodat de belofte narekenbaar is.
+
+**Fase 2 — nu aan de beurt: de Presence Graph in Rendez-vous.** Zelf opgegeven aanwezigheid met
 vensters, en overlap als signaal. Daarna pas de introductie in drie fasen.
 
 **Fase 3 — beschikbaarheid zonder agenda**, in allebei: Blind Availability in

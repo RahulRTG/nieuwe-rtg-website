@@ -6,7 +6,7 @@
    eigen matches, en blokkeren/melden. Krijgt de gedeelde ctx van kern/vonk/index.js. */
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, d, mag, likeVan, codenaamVan, keyVanCodenaam, haversine,
-    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN } = ctx;
+    reserveerTafel, pay, notify, sseToCustomer, sseToOffice, PRIJS_CENTEN, RTG_CENTEN, kenmerkenVan } = ctx;
 
   /* ---- like / voorbij; wederzijds = match + automatisch een tafel in het midden ---- */
   async function like(key, codenaam, aan) {
@@ -33,20 +33,33 @@ module.exports = (ctx) => {
     }
     return { status: 200, ok: true, match: true, id: m.id, tafel: m.tafel };
   }
-  // de partner met tafels het dichtst bij het geografische midden van de twee steden
+  /* De partner met tafels het dichtst bij het geografische MIDDEN van de twee
+     woonplaatsen -- het handtekeningstuk van Vonk.
+
+     DIT DEED LANG IETS ANDERS DAN HET ZEI. haversine wil twee punten en kreeg
+     vier losse getallen, dus hij gaf null; en `null < Infinity` is waar, zodat
+     de eerste zaak uit de lijst won en de rest nooit werd gewogen. Het midden
+     werd berekend en vervolgens weggegooid. Een zaak zonder bruikbare afstand
+     doet nu niet mee in plaats van te winnen (LAT.md regel 3: een meter zakt
+     als zijn invoer ontbreekt). */
   function tafelInHetMidden(pa, pb) {
-    if (!pa || !pb || !isFinite(pa.lat) || !isFinite(pb.lat)) return null;
+    if (!pa || !pb || !isFinite(pa.lat) || !isFinite(pa.lng) || !isFinite(pb.lat) || !isFinite(pb.lng)) return null;
     const mid = { lat: (pa.lat + pb.lat) / 2, lng: (pa.lng + pb.lng) / 2 };
     let beste = null, besteAf = Infinity;
     for (const s of Object.values(db.data.suppliers || {})) {
-      if (!(s.tables || []).length || !s.loc || !isFinite(s.loc.lat)) continue;
+      if (!(s.tables || []).length || !s.loc || !isFinite(s.loc.lat) || !isFinite(s.loc.lng)) continue;
       if (s.settings && s.settings.reservationsOpen === false) continue;
-      const af = haversine(mid.lat, mid.lng, s.loc.lat, s.loc.lng);
+      const af = haversine(mid, { lat: s.loc.lat, lng: s.loc.lng });
+      if (af == null) continue;
       if (af < besteAf) { besteAf = af; beste = s; }
     }
     if (!beste) return null;
     const dag = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
     return { supplierCode: beste.code, supplierName: beste.name, plek: (beste.loc && beste.loc.label) || beste.city || '',
+      /* De afstand van de zaak tot het midden gaat mee. Dat is nuttig voor het
+         lid, en het maakt de belofte "rond het midden" narekenbaar in plaats van
+         een zin waar niets aan te meten valt (LAT.md regel 9). */
+      middenAfstandKm: Math.round(besteAf / 100) / 10,
       datum: dag, tijd: '19:30', prijsPP: PRIJS_CENTEN / 100, rtgDeel: RTG_CENTEN / 100 };
   }
 
@@ -103,7 +116,9 @@ module.exports = (ctx) => {
     const rijen = d().matches.filter(m => m.a === key || m.b === key).slice(0, 50).map(m => ({
       id: m.id, met: codenaamVan(m.a === key ? m.b : m.a), at: m.at, status: m.status,
       tafel: m.tafel, ikBetaalde: !!m.betaald[key], anderBetaalde: !!m.betaald[m.a === key ? m.b : m.a],
-      berichten: m.berichten.slice(-30)
+      berichten: m.berichten.slice(-30),
+      // hier gaan de assen open die het lid op 'pas na een match' had gezet
+      kenmerken: kenmerkenVan(m.a === key ? m.b : m.a)
     }));
     return { status: 200, matches: rijen };
   }

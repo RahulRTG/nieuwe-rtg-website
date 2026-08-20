@@ -31,7 +31,7 @@
 
 const crypto = require('crypto');
 const inzagelog = require('../inzagelog');          // het bestaande spoor, geen tweede
-const { maandCentenVoor } = require('./pasprijs');  // een antwoord op "wat kost een pas"
+const { maandCentenVoor, contractueel } = require('./pasprijs');  // een antwoord op "wat kost een pas"
 
 /* Een reden moet iets zeggen. De grens ligt laag maar niet op nul, want een
    verplicht veld dat je met een punt kunt vullen is geen verplicht veld. Op
@@ -138,7 +138,8 @@ module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom
     const passen = (() => { try { const p = geldPasprijzen && geldPasprijzen(); return (p && p.passen) || null; } catch (e) { return null; } })();
     const centen = maandCentenVoor(passen, pas);
     return { pas, pasNaam: (passen && passen[pas] && passen[pas].naam) || pas,
-      opMaat: pas === 'business',                       // Business heeft geen bedrag: op maat
+      // contractueel (Business, Lifestyle) heeft geen bedrag in de prijslijst
+      opMaat: contractueel(pas),
       maandbijdrage: centen == null ? null : Math.round(centen) / 100,
       status: pas === 'gratis' ? 'gratis app' : 'lopend',
       voorstellen: zaken.voorstellenVan(u.id) };

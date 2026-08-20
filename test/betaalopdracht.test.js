@@ -299,3 +299,105 @@ test('twee rails kunnen niet dezelfde soort claimen', () => {
   assert.throws(() => op.registreerTeruggang('sepa-uit', async () => ({ ok: true })), /staat al een teruggang/);
   assert.throws(() => op.registreerTeruggang('iets', 'geen functie'), /is een functie/);
 });
+
+/* ============================================================================
+   ECONOMISCHE IDEMPOTENTIE -- zeventien herhalingen, EEN handeling.
+
+   DE FOUT DIE HIER ZAT, en zij is de duurste soort. Elke opdracht droeg al een
+   idempotentiesleutel -- 'rtf:<lid>:<factuur>', 'pay-uit:<zaak>:<boeking>',
+   'bank-sepa:<iban>:<boeking>' -- die keurig aan de rail werd meegegeven. Alleen
+   keek RTG er zelf nooit naar. Een zoekopdracht gaf zes plekken die hem
+   SCHRIJVEN en geen enkele die hem LEEST.
+
+   Twee aanroepen met dezelfde sleutel leverden dus twee opdrachten van samen het
+   dubbele bedrag, en of dat geld ook echt twee keer wegging hing af van de goede
+   wil van een externe partij. Precies het soort veld dat eruitziet als een
+   grendel en er geen is.
+   ========================================================================== */
+
+test('dezelfde economische handeling levert EEN opdracht, hoe vaak je hem ook aanbiedt', async () => {
+  const { op } = maak();
+  const eerste = op.maak({ ...basis, idemSleutel: 'rtf:LID7:FACT-1' });
+  const tweede = op.maak({ ...basis, idemSleutel: 'rtf:LID7:FACT-1' });
+  const derde = op.maak({ ...basis, centen: 999999, idemSleutel: 'rtf:LID7:FACT-1' });
+
+  assert.equal(tweede.id, eerste.id, 'een herhaling hoort dezelfde handeling te raken');
+  assert.equal(derde.id, eerste.id, 'ook als er een ander bedrag bij staat');
+  assert.equal(tweede.hergebruikt, true,
+    'stil dezelfde opdracht teruggeven zou een tweede stil gedrag zijn op de plek waar we er een weghalen');
+  assert.equal(derde.centen, basis.centen, 'en het bedrag van de EERSTE handeling blijft staan');
+
+  const alles = op.lijst({ limit: 50 });
+  assert.equal(alles.aantal, 1, 'een opdracht in de rij, niet drie');
+  assert.equal(alles.opdrachten[0].centen, basis.centen);
+});
+
+test('een andere sleutel is een andere handeling, en die mag er gewoon bij', () => {
+  const { op } = maak();
+  const a = op.maak({ ...basis, idemSleutel: 'pay-uit:KIKUNOI:B1' });
+  const b = op.maak({ ...basis, ledgerRef: 'L2', idemSleutel: 'pay-uit:KIKUNOI:B2' });
+  assert.notEqual(a.id, b.id);
+  assert.equal(b.hergebruikt, undefined);
+  assert.equal(op.lijst({ limit: 50 }).aantal, 2);
+});
+
+test('zonder eigen sleutel hangt de idempotentie aan de boeking, en die is er een per uitbetaling', () => {
+  const { op } = maak();
+  const a = op.maak(basis);                                   // valt terug op 'opdracht:' + ledgerRef
+  const b = op.maak(basis);
+  assert.equal(b.id, a.id, 'twee keer dezelfde boeking uitbetalen is een uitbetaling');
+
+  const c = op.maak({ ...basis, ledgerRef: 'L-ANDERS' });
+  assert.notEqual(c.id, a.id, 'een andere boeking is wel een andere handeling');
+});
+
+test('een hergebruikte opdracht die al is afgerond, wordt niet opnieuw ingediend', async () => {
+  const { op, rail } = maak();
+  const eerste = op.maak({ ...basis, idemSleutel: 'vast' });
+  await op.dienIn(eerste);
+  await op.bevestig({ settlementRef: 'RAIL-1', gelukt: true });
+  assert.equal(op.vind(eerste.id).status, 'AFGEWIKKELD');
+
+  const pogingenVoor = rail.pogingen.length;
+  const weer = op.maak({ ...basis, idemSleutel: 'vast' });
+  const na = await op.dienIn(weer);
+  assert.equal(weer.id, eerste.id);
+  assert.equal(na.status, 'AFGEWIKKELD');
+  assert.equal(rail.pogingen.length, pogingenVoor,
+    'een afgeronde betaling nog eens de rail op sturen is precies wat idempotentie moet voorkomen');
+});
+
+/* Een lege sleutel vindt niets. Let op wat deze toets WEL en NIET zegt: hij
+   bewijst het gedrag, niet dat er een grendel nodig is. De afslag op een lege
+   sleutel in vindOpIdem is een snelkoppeling -- via maak() draagt elke opdracht
+   een sleutel, dus er staat er nooit een lege in de rij, en een mutatie die de
+   afslag weghaalt laat dan ook niets zakken. Dat is hier opgeschreven in plaats
+   van weggewerkt met een toets die iets anders meet. */
+test('een lege idempotentiesleutel vindt niets, ook niet met een volle rij', () => {
+  const { op } = maak();
+  op.maak({ ...basis, idemSleutel: 'echt' });
+  op.maak({ ...basis, ledgerRef: 'L2', idemSleutel: 'ook-echt' });
+
+  assert.equal(op.vindOpIdem(''), null);
+  assert.equal(op.vindOpIdem(null), null);
+  assert.equal(op.vindOpIdem(undefined), null);
+  assert.equal(op.vindOpIdem('echt').idemSleutel, 'echt', 'een echte sleutel vindt wel');
+});
+
+test('de herhaling wordt geklaagd, want stil ontdubbelen verbergt een fout in de aanroeper', () => {
+  const klachten = [];
+  const db = { data: {} };
+  const op = require('../server/kern/betaalopdracht')({
+    d: () => db.data, save: () => {}, crypto, nu: () => 1000,
+    maxPogingen: 3, backoffMs: [100],
+    log: { warn: (bericht, gegevens) => klachten.push({ bericht, gegevens }) },
+    railInzenden: async () => ({ id: 'R1', status: 'ingepland' })
+  });
+  op.maak({ ...basis, idemSleutel: 'x' });
+  op.maak({ ...basis, idemSleutel: 'x' });
+
+  assert.equal(klachten.length, 1);
+  assert.match(klachten[0].bericht, /twee keer aangeboden/);
+  assert.equal(klachten[0].gegevens.idemSleutel, 'x');
+  assert.ok(klachten[0].gegevens.bestaand, 'met de opdracht erbij die er al stond');
+});

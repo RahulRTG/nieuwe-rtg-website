@@ -1,15 +1,24 @@
 /* Member-submodule: De Rechterhand -- de premium suite van de Lifestyle Pass.
    Gated op de Lifestyle Pass (Business erft mee als hoger niveau). Alleen routes;
    de logica woont in kern/lifestyle.js. Gemount vanuit routes/member.js. */
+const caps = require('../../kern/commercie/capaciteiten');
+
 module.exports = (kern) => {
   const { app, auth,
     lifestyleOverzicht, lifestyleAI,
     conciergeVraag, conciergeIntrek, conciergeVerzoeken, lifestyleVoorkeuren, lifestyleVoorkeurenZet,
     bezitZet, bezitWeg, bezittingen, gzAfspraak, gzAfspraakWeg, gzDossier, gzDossierWeg, gezondheid } = kern;
 
-  // De Rechterhand hoort bij de Lifestyle Pass; de Business Pass (hoger niveau) erft mee.
+  /* De Rechterhand hoort bij de Lifestyle Pass; de Business Pass (hoger niveau)
+     erft mee. Hier stond die regel als lijstje pas-id's, en dat is precies wat
+     COMMERCIE.md par. 6 verbiedt: bij een zesde trede moet iemand eraan denken
+     dit lijstje bij te werken, en die iemand bestaat niet.
+
+     `can_use_lifestyle_service` staat op dezelfde twee treden -- het gedrag is
+     ongewijzigd -- maar de vraag wordt nu op EEN plek beantwoord
+     (kern/commercie/capaciteiten.js). */
   function eis(req, res) {
-    if (['lifestyle', 'business'].includes(req.session.tier)) return true;
+    if (caps.mag(req.session.tier, 'can_use_lifestyle_service')) return true;
     res.status(403).json({ error: 'De Rechterhand is onderdeel van de Lifestyle Pass.' });
     return false;
   }

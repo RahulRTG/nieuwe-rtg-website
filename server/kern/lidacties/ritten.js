@@ -2,6 +2,8 @@
    en tarief, leeftijdsgrens voor jets/helikopters, plannen vooruit, het
    zorgprofiel voor de chauffeur) en betaalRitVoor. Krijgt de gedeelde
    context een keer bij het opstarten vanuit kern/lidacties.js. */
+const subsidie = require('../commercie/subsidie');
+
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
@@ -102,7 +104,7 @@ function betaalRitVoor(session, body) {
   if (kortingR) r.puntenKorting = kortingR;
   // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij)
   const voordeelR = ledenvoordeelVoor(findSupplier(r.supplierCode), r.quote - kortingR);
-  if (voordeelR) r.regieKorting = voordeelR;
+  if (voordeelR) { r.regieKorting = voordeelR; r.voordeelOpbouw = subsidie.opbouwVan(r.quote - kortingR, voordeelR); }
   r.paid = true;
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';

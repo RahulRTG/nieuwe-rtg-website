@@ -104,8 +104,16 @@ async function bouwGezelschap(base, opties) {
       { pas, naam: l.naam, contact: l.email }, l.token);
     assert.equal(aanvraag.status, 200, 'aanvraag lukt: ' + JSON.stringify(aanvraag.body));
     assert.equal(aanvraag.body.aanmelding.gekoppeld, true, 'de aanvraag hangt aan het account');
-    const besluit = await post('/api/aanmelding/beslis',
-      { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'proefpubliek' }, persoonlijkKantoor);
+    /* Het contractbedrag hoort bij het besluit sinds de ladder: een contractuele
+       pas (Business, Lifestyle) heeft geen lijstprijs, dus accepteren zonder
+       afgesproken maandbedrag wordt geweigerd. De bodem komt uit de ladder en
+       staat hier niet als getal -- anders zou een verhoging van de bodem dit
+       proefpubliek laten zakken op een reden die niets met zijn onderwerp te
+       maken heeft. */
+    const trede = require('../server/kern/pasladder').trede(pas);
+    const lijf = { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'proefpubliek' };
+    if (trede && trede.contractueel) lijf.contractEuro = trede.bodemCenten / 100;
+    const besluit = await post('/api/aanmelding/beslis', lijf, persoonlijkKantoor);
     assert.equal(besluit.status, 200, 'het menselijke besluit lukt: ' + JSON.stringify(besluit.body));
     l.pas = pas;
     return l;

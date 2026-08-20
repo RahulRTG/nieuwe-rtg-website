@@ -29,7 +29,7 @@
 
 const P = require('./plan');
 
-function maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken }) {
+function maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken, veiligheidskern }) {
 
   /* UITVOEREN. Stap voor stap, en elke stap levert het bewijs in. `doe` komt van
      de aanroeper -- deze laag boekt niets, zij bewaakt. */
@@ -66,14 +66,29 @@ function maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken }) {
       }
       if (v.stand === P.STAND.GEKEURD) zet(v, P.STAND.BEZIG);
 
-      let uit = null;
-      try {
-        uit = await doe({ voornemen: v.id, stap: s.nr, wat: s.wat, doel: s.doel, centen: s.centen,
+      /* DE VEILIGHEIDSKERN. Een stap die geld verplaatst gaat er doorheen; hij
+         draagt het besluit van het voornemen mee en laat een spoor. Een stap van
+         nul cent verplaatst geen waarde en hoeft er dus niet langs -- de kern
+         klein houden betekent ook: hem niet aanroepen waar hij niets toevoegt.
+
+         Zonder kern doet deze laag wat ze altijd deed. Dat is geen stilzwijgend
+         minder: de keuring, de vingerafdruk en het bewijstoken hierboven staan
+         er onverminderd. */
+      const viaKern = veiligheidskern && s.centen > 0;
+      const stapDoen = () => doe({ voornemen: v.id, stap: s.nr, wat: s.wat, doel: s.doel, centen: s.centen,
           gegevens: s.gegevens,
           /* DE ECONOMISCHE SLEUTEL VAN DEZE STAP. Dit is wat een herhaling
              onschadelijk maakt tot in de betaalrij: dezelfde sleutel, dezelfde
              handeling. */
           idemSleutel: (v.sleutel || v.id) + ':' + s.nr });
+
+      let uit = null;
+      try {
+        uit = viaKern
+          ? (await veiligheidskern.doe({ soort: 'WAARDE', wat: s.wat, wie: v.actor || 'onbekend',
+              waarom: 'voornemen ' + v.id + ', stap ' + s.nr, waardeCenten: s.centen,
+              besluit: v.besluit, bewijs: true }, stapDoen)).uitkomst
+          : await stapDoen();
       } catch (e) {
         s.uitkomst = { fout: String((e && e.message) || e).slice(0, 200) };
         save();

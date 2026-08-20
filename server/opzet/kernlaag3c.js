@@ -111,8 +111,24 @@ Object.assign(kern, (() => {
   const token = bewijs.maakBewijstoken({
     sleutel: (hulp.accounts && hulp.accounts.sleutelVoor) ? hulp.accounts.sleutelVoor('bewijstoken') : null,
     gezien: bewijs.geheugenGezien() });
+  /* DE VEILIGHEIDSKERN. Vijf soorten onomkeerbare handelingen, een deur, en hij
+     is piepklein -- dat is een eigenschap en geen toeval; een toets meet zijn
+     omvang. Zie kern/commercie/veiligheidskern.js.
+
+     Zijn journaal is APPEND-ONLY en staat los van het bestaande auditjournaal:
+     dat gaat over wat een medewerker deed, dit over wat er onomkeerbaar is
+     gebeurd en welk besluit eronder lag. */
+  const veiligheidskern = require('../kern/commercie/veiligheidskern').maakVeiligheidskern({
+    journaal: (rij) => {
+      if (!Array.isArray(db.data.kernjournaal)) db.data.kernjournaal = [];
+      db.data.kernjournaal.push(rij);
+      if (db.data.kernjournaal.length > 20000) db.data.kernjournaal.splice(0, db.data.kernjournaal.length - 20000);
+      save();
+    }
+  });
+
   const voornemens = require('../kern/commercie/voornemen').maakVoornemens({
-    db, save, verbruikToken: token.verbruik,
+    db, save, verbruikToken: token.verbruik, veiligheidskern,
     /* `beslis` komt LAAT: de bevoegdhedenbron hangt aan het huis en niet aan
        deze mount. Zolang er geen is, zegt keur() dat met zoveel woorden in
        plaats van stilzwijgend ja. */
@@ -126,7 +142,7 @@ Object.assign(kern, (() => {
   const rechten = require('../kern/commercie/rechten').maakRechten({
     zaakAbonnement, schaduw, tegoed, contracten: kern.contracten || null });
 
-  return { commercieBewijstoken: token, voornemens, commercieRechten: rechten,
+  return { commercieBewijstoken: token, voornemens, commercieRechten: rechten, veiligheidskern,
     /* De gezondheid per capability wordt in server.js gebouwd -- hij moet ouder
        zijn dan de betaalrail die erop meldt -- en hier alleen aan de kern
        gehangen, zodat het kantoor erbij kan. */

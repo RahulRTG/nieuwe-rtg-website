@@ -10,7 +10,7 @@
    AFSPRAKEN gebeurt, dit over of iets WERKT. Gemount vanuit ./commercie.js, met
    dezelfde context. */
 module.exports = (ctx) => {
-  const { app, officeAuth, boardroomAuth, veilig, afdelingen, kern } = ctx;
+  const { app, officeAuth, boardroomAuth, veilig, afdelingen, kern, db } = ctx;
 
   /* `ongemeten` staat er met opzet bij: een bord dat na een stille nacht overal
      groen staat, is een bord dat niets zegt. */
@@ -39,5 +39,20 @@ module.exports = (ctx) => {
     const r = kern.capGezondheid.geefVrij(b.cap, wie);
     if (r.ok) afdelingen.audit(wie, 'Onderdeel ' + b.cap + ' vrijgegeven');
     return r;
+  }));
+
+  /* HET JOURNAAL VAN DE VEILIGHEIDSKERN. Wat er onomkeerbaar is gebeurd, met het
+     besluit dat eronder lag -- en `soortenGezien` erbij, want het getal dat
+     ertoe doet is: hoeveel van de vijf soorten gaan er vandaag werkelijk door de
+     kern? Vandaag is dat er een (waarde, via de voornemens). Dat opschrijven is
+     eerlijker dan een kern die er staat en waar niets langs komt. */
+  app.post('/api/office/kernjournaal', officeAuth, (req, res) => veilig(res, () => {
+    const rijen = (db && db.data && db.data.kernjournaal) || [];
+    const soorten = {};
+    for (const r of rijen) soorten[r.soort] = (soorten[r.soort] || 0) + 1;
+    const laatste = rijen.slice(-100).reverse();
+    return { status: 200, ok: true, aantal: rijen.length, soortenGezien: soorten,
+      vanDeVijf: Object.keys(soorten).length, mislukt: rijen.filter(r => !r.gelukt).length,
+      laatste };
   }));
 };

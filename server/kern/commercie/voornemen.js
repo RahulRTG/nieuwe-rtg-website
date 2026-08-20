@@ -53,7 +53,7 @@ const { maakUitvoering } = require('./voornemen/uitvoeren');
    Zie ./voornemen/keuring.js. */
 const { maakKeuring } = require('./voornemen/keuring');
 
-function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken }) {
+function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken, veiligheidskern }) {
   const tijd = nu || klok.nu;
 
   function alles() {
@@ -116,7 +116,7 @@ function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken }) {
 
   const { keur, tekenAf } = maakKeuring({ vind, zet, publiek, save, tijd, beslis });
 
-  const uitvoering = maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken });
+  const uitvoering = maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken, veiligheidskern });
   const voerUit = uitvoering.voerUit;
   const halverwege = () => uitvoering.halverwege(alles);
 

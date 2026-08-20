@@ -30,14 +30,14 @@ const plan = require('../server/kern/commercie/voornemen/plan');
 
 const nu = () => 1_700_000_000_000;
 
-function opstelling({ maxCenten = 500000, beleid, zonderToken } = {}) {
+function opstelling({ maxCenten = 500000, beleid, zonderToken, kern } = {}) {
   const db = { data: {} };
   const token = maakBewijstoken({ sleutel: 'een-geheim-voor-de-toets', nu, gezien: geheugenGezien(nu) });
   const bevoegd = bev.maakBevoegdheid({ capability: 'reis.boek', grenzen: { maxCenten }, door: 'agent', nu });
   const motor = maakBesluit({ zoekBevoegdheid: () => bevoegd, nu, beleid,
     munt: zonderToken ? null : token.munt });
   const V = maakVoornemens({ db, save: () => {}, nu, beslis: motor.beslis,
-    verbruikToken: zonderToken ? null : token.verbruik });
+    verbruikToken: zonderToken ? null : token.verbruik, veiligheidskern: kern });
   return { V, db, token };
 }
 
@@ -276,4 +276,69 @@ test('11. wat halverwege blijft steken is telbaar en niet weggestopt', async () 
   assert.equal(h.length, 1);
   assert.equal(h[0].van, 3);
   assert.equal(h[0].gedaan, 1);
+});
+
+/* ============================================================================
+   DE VEILIGHEIDSKERN ONDER DE UITVOERING.
+
+   kern/commercie/veiligheidskern.js is los getoetst, maar dat de UITVOERING hem
+   werkelijk aanroept was nergens bewezen -- en dat is dezelfde blinde vlek als
+   bij de schaduwlaag: een laag die je alleen los toetst, is een laag waarvan je
+   hoopt dat hij is aangesloten.
+   ========================================================================== */
+const { maakVeiligheidskern } = require('../server/kern/commercie/veiligheidskern');
+
+test('12. een stap die geld verplaatst gaat door de veiligheidskern, met het besluit erbij', async () => {
+  const log = [];
+  const kern = maakVeiligheidskern({ journaal: (r) => log.push(r), nu });
+  const { V } = opstelling({ kern });
+
+  const v = V.stelOp({ actor: 'ai-agent', handeling: 'reis.boek', stappen: hotels(2, 4000) });
+  V.keur(v.voornemen.id, {});
+  const u = uitvoerder();
+  assert.equal((await V.voerUit(v.voornemen.id, { doe: u.doe })).voornemen.stand, STAND.UITGEVOERD);
+
+  assert.equal(log.length, 2, 'twee stappen, twee regels');
+  assert.equal(log[0].soort, 'WAARDE');
+  assert.equal(log[0].wie, 'ai-agent');
+  assert.match(log[0].waarom, /voornemen .*, stap 1/);
+  assert.equal(log[0].waardeCenten, 4000);
+  assert.ok(log[0].besluit.uitkomst, 'met het besluit dat eronder lag');
+  assert.equal(log[0].gelukt, true);
+  assert.equal(u.gedaan.length, 2, 'en de stappen zijn echt gedaan');
+});
+
+test('13. een stap van nul cent verplaatst geen waarde en hoeft niet langs de kern', async () => {
+  const log = [];
+  const kern = maakVeiligheidskern({ journaal: (r) => log.push(r), nu });
+  const { V } = opstelling({ kern });
+
+  const v = V.stelOp({ actor: 'a', handeling: 'reis.boek',
+    stappen: [{ wat: 'bevestigingsmail', centen: 0 }, { wat: 'hotel', centen: 4000 }] });
+  V.keur(v.voornemen.id, {});
+  const u = uitvoerder();
+  await V.voerUit(v.voornemen.id, { doe: u.doe });
+
+  assert.equal(u.gedaan.length, 2, 'beide stappen gebeuren');
+  assert.equal(log.length, 1, 'maar alleen de betalende staat in het kernjournaal');
+  assert.equal(log[0].wat, 'hotel');
+});
+
+test('14. een stap die vastloopt laat een spoor in de kern en staakt het voornemen', async () => {
+  const log = [];
+  const kern = maakVeiligheidskern({ journaal: (r) => log.push(r), nu });
+  const { V } = opstelling({ kern });
+
+  const v = V.stelOp({ actor: 'a', handeling: 'reis.boek', stappen: hotels(3, 4000) });
+  V.keur(v.voornemen.id, {});
+  let n = 0;
+  const r = await V.voerUit(v.voornemen.id, { doe: async () => {
+    n += 1; if (n === 2) throw new Error('het hotel is volgeboekt'); return { ok: true };
+  } });
+
+  assert.equal(r.voornemen.stand, STAND.GESTAAKT);
+  assert.equal(log.length, 2);
+  assert.equal(log[1].gelukt, false);
+  assert.match(log[1].fout, /volgeboekt/,
+    'een handeling die halverwege afbreekt is de interessantste rij in het journaal');
 });

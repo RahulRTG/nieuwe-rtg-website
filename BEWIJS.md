@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1052 bestanden en 7100 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1053 bestanden en 7111 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1052 |
-| losse beweringen (`test(...)`) | 7100 |
+| toetsbestanden | 1053 |
+| losse beweringen (`test(...)`) | 7111 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 866 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 27 |
+| alleen in de kop *genoemd*, nog niet gemeten | 28 |
 | niets van beide | 111 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-924 bestanden, 6875 beweringen.
+925 bestanden, 6886 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -866,6 +866,7 @@ toets omvalt.
 | `veiligheid-kring-rust.test.js` | 6 | gezakt op `liegpoort /api/` | DE KRING, HET CODEWOORD EN DE RUST -- 6 endpoints van RTG Veilig. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: kring/aanpassen, kring/mail, alarm/afsluiten, codewoord/schakel, codewoord/wis... |
 | `veiligheid-moment.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `veiligheid.test.js` | 1 | gezakt op `liegpoort /api/` | RTG Veilig: de vier apps op een ruggengraat. De belangrijkste toets staat in toets 4 en 5, en die is de reden dat dit zo gebouwd is: de dodemansknop moet aflopen ZONDER dat de telefoon nog iets doet. |
+| `veiligheidskern.test.js` | 8 | genoemd | DE VEILIGHEIDSKERN -- vijf soorten onomkeerbare handelingen, een deur. WAAROM DIT HET LAATSTE STUK IS. |
 | `verblijf.test.js` | 12 | gezakt op `liegpoort /api/` | De verblijf-laag (toren hotel): boeken met datums, het receptiebord en de check-in/check-out-keten. De logies gaan bij check-in automatisch als kamerlast op de rekening; de kassa-check-out int alles in een keer en... |
 | `vergeten-gezelschap.test.js` | 2 | gezakt op `liegpoort /api/` | VERGETEN, maar dan voor iedereen. test/vergeten.test.js veegt door de hele database en is streng, maar hij doet dat voor EEN lid: een RTG-lid van middelbare leeftijd zonder gezin. |
 | `vergeten.test.js` | 6 | gezakt op `liegpoort /api/` | VERGETEN -- blijft er na "verwijder mijn gegevens" echt niets achter? Het recht op vergetelheid (AVG art. |
@@ -885,7 +886,7 @@ toets omvalt.
 | `vloot.test.js` | 2 | gezakt op `===->!==#0` | Integratietests voor de foutisolatie: elke app draait als eigen proces in de vloot (server/vloot.js) achter de poortwachter. Een bug in een route raakt alleen die ene aanvraag; een crash van een groep raakt alleen... |
 | `voeding.test.js` | 8 | gezakt op `liegpoort /api/` | De voedingslaag (kern/voeding.js). Wat hier wordt vastgezet is vooral wat er NIET gebeurt, want dat is de hele keuze: 1. |
 | `vonk.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Vonk: dating op codenaam met de Salon-veiligheidslat. 18+ met een geverifieerd paspoort, een eindige dagselectie die wederzijds bij de wensen past, wederzijdse like = match + chatlijn + automatisch een tafel rond... |
-| `voornemen.test.js` | 12 | genoemd | HET VOORNEMEN -- van "boek vijf hotels in Parijs onder 180 euro" naar een gecontroleerd plan, met de blokkade VOOR de uitvoering. DE FOUT DIE DIT VOORKOMT. |
+| `voornemen.test.js` | 15 | genoemd | HET VOORNEMEN -- van "boek vijf hotels in Parijs onder 180 euro" naar een gecontroleerd plan, met de blokkade VOOR de uitvoering. DE FOUT DIE DIT VOORKOMT. |
 | `voorspel.test.js` | 12 | gezakt op `liegpoort /api/` | De voorspeller: RTG leert het ritme van leden en zaken uit het Pay-grootboek en voorspelt eerlijk (bij te weinig data: zeggen dat het nog niet kan). Draai los: node --experimental-sqlite --test test/voorspel.test.js |
 | `voorstel.test.js` | 9 | -- | HET VOORSTEL -- welke trede past bij deze zaak, en wie verplaatst haar? HET GAT DAT DIT DICHT. |
 | `vracht.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Vracht: internationale zendingen over lucht, water en land voor expediteurs (demo TerraMar Cargo). Bewaakt de etappeketen met de juiste documenten, de douane-stap bij een grensoverschrijding, het publieke volgen... |

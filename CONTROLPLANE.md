@@ -67,6 +67,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Effectieve rechten | `commercie/rechten.js` | **af** — nominaal naast effectief (§5.7) |
 | Terugval-voorstel | `commercie/voorstel.js` + `/weging.js` | **af** — voorstellen, nooit verplaatsen (§5.8) |
 | Capability health | `commercie/capgezondheid.js` | **af** — meet; blokkeert nog niet automatisch (§5.9) |
+| Veiligheidskern | `commercie/veiligheidskern.js` | **af** — 1 van de 5 soorten gaat er vandaag doorheen (§5.10) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -550,6 +551,43 @@ heette eerst `gezondheid.js`, en dat botste met het Gezondheidsmaatje van de
 RTFoundation — ik overschreef daarmee een bestaand toetsbestand. Vandaar
 `capgezondheid`: in dit huis gaat "gezondheid" over mensen.
 
+### 5.10 De veiligheidskern (was §6.10, nu gebouwd)
+
+Alles hiervóór beantwoordt een deelvraag: mag deze actor dit (§4), draagt hij daar
+bewijs van (§5.2), past het hele plan (§5.6), gebeurt het maar één keer (§5.5).
+Wat ontbrak is de plek waar die antwoorden **verplicht** worden gesteld. Zolang
+een domein rechtstreeks geld kan verplaatsen, is elk van die lagen een
+aanbeveling.
+
+**Vijf soorten, en niet meer:** WAARDE, IDENTITEIT, RECHTEN, EXPORT, AI. Waarom
+juist deze: het zijn de handelingen die je niet terug kunt nemen door een scherm
+te verversen. Al het andere is werk; dit is onomkeerbaar werk.
+
+**De kern is piepklein, en dat is een eigenschap.** Een veiligheidskern van
+vijfhonderd regels is geen kern maar een tweede applicatie, en niemand leest hem
+nog in één keer. `test/veiligheidskern.test.js` telt de regels code en zakt boven
+de zestig. Wie er iets bij wil zetten, hoort eerst te vragen of het niet
+*erbuiten* kan.
+
+Drie regels: **geen handeling zonder besluit** dat doorlaat (voor waarde,
+identiteit en rechten — export en AI gaan er wél doorheen maar hebben hun poort
+elders, en twee plekken die dezelfde grens trekken is er één te veel), **geen
+handeling zonder wie en waarom**, en **alles laat een spoor, juist wat mislukt**.
+De kern eet geen fouten op: dat is precies hoe een mislukte betaling ooit een
+geslaagd antwoord werd.
+
+**Wat er vandaag werkelijk doorheen gaat: één van de vijf.** De uitvoering van
+een voornemen (§5.6) stuurt elke stap die geld verplaatst door de kern, met het
+besluit eronder en een regel in het journaal. De andere vier soorten niet.
+`/api/office/kernjournaal` zet dat getal vooraan — `vanDeVijf` — want een kern
+die er staat en waar niets langs komt, is precies de stille belofte die dit
+document van begin tot eind bestrijdt.
+
+Tien mutaties, alle tien gevangen. Eén ervan pas na een correctie die het
+vermelden waard is: de toets liep met `for (const soort of EIST_BESLUIT)` over
+de tabel die hij moest controleren, en toetste dus zichzelf. De drie soorten
+staan er nu voluit in.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -575,9 +613,9 @@ vastligt en niemand halverwege iets anders bouwt.
 9. ~~**Capability health**~~ **Gebouwd** — zie §5.9. De *failover* zelf (een
    gequarantainede capability die de geldstroom werkelijk tegenhoudt) staat er
    nog niet: die regel hoort eerst mee te lopen.
-10. **Safety kernel** — één piepkleine kern waar waardeverplaatsing,
-    identiteitswijziging, rechtenwijziging, data-export en AI-uitvoering
-    doorheen moeten.
+10. ~~**Safety kernel**~~ **Gebouwd** — zie §5.10. De kern staat er en is klein;
+    "doorheen moeten" geldt vandaag voor één van de vijf soorten. Dat getal
+    staat in het kantoor, zodat het zichtbaar is en niet aangenomen.
 
 ## 7. Wat we bewust nog niet doen
 
@@ -598,8 +636,11 @@ vastligt en niemand halverwege iets anders bouwt.
 
 Zolang die vier niet allemaal machinaal gemeten worden, is dit een ambitie. Drie
 zijn dat nu — belofte (`claims.poort`), oorsprong (`bevoegdheid.herkomst`) en
-caller (`scripts/capabilities.js`) — en één deels: bewijs. Dat verschil eerlijk
-houden is de hele reden dat dit document een tabel bevat en geen manifest.
+caller (`scripts/capabilities.js`) — en één deels: bewijs. Sinds §5.10 is dat
+laatste voor één van de vijf soorten onomkeerbare handelingen wél hard: een
+waardestap uit een voornemen komt er zonder besluit niet doorheen. Dat verschil
+eerlijk houden is de hele reden dat dit document een tabel bevat en geen
+manifest.
 
 En één eerlijkheid hoort erbij: van de vijf gaten die de caller-meting vond, is
 er vandaag maar één die werkelijk iemand tegenhoudt. De andere vier zijn

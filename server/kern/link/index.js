@@ -30,19 +30,15 @@ const rem = require('./rem');
 const intenties = require('./intenties');
 
 module.exports = (opties) => {
-const { db, save, dyncodeGeef, handleVanPin, pinNormaliseer, pinKijk, liveKijk,
-        persoonRate, zaakVan, nu } = opties;
+const { db, save, crypto, dyncodeGeef, handleVanPin, pinNormaliseer, pinKijk, liveKijk,
+        persoonRate, rate, codenaamVan, zaakVan, nu } = opties;
 const { duidt, TYPES } = require('./register')({ dyncodeGeef });
 const { bonSchrijf, bonnenVan, BON_MAX } = require('./bonnen')({ db, save, nu });
-
-/* Het ene antwoord voor alles wat niets oplevert. Vier redenen die met opzet
-   niet uit elkaar te houden zijn (LINK.md par. 3.1, en kern/sociaal/pin-deur.js
-   op zijn eigen schaal): de code hoort bij niemand, bij een beschermd profiel,
-   bij iemand die jou blokkeerde, of bij iemand die zijn pin uit heeft staan.
-   Wie hier ooit een preciezere tekst per geval neerzet, bouwt de zoekmachine
-   waarmee je kunt vaststellen dat een kind bestaat. */
-const NIETS = { status: 404, error: 'Deze code kennen we niet (meer).' };
-const niets = () => { rem.misserGeteld(); return { ...NIETS }; };
+/* De capabilitylaag: codes die een HANDELING dragen in plaats van een ding aan
+   te wijzen. Het register van handelingen is leeg tot een domein er een aanmeldt
+   (kern/pay/vraagcode.js is de eerste) -- deze laag kent er zelf geen. */
+const handelingen = require('./handelingen')();
+const cap = require('./cap')({ crypto, dyncodeGeef, codenaamVan, bonSchrijf, handelingen, rate, nu });
 
 /* Wie mag er een MENS oplossen: alleen een sessie die zelf een mens is. Een zaak
    of een medewerker scant tafels, entrees en betaalcodes; een pin van een lid
@@ -50,6 +46,9 @@ const niets = () => { rem.misserGeteld(); return { ...NIETS }; };
    Zonder zo'n band is er ook geen pinKijk mogelijk -- die rekent met blokkades
    en verbindingen tussen twee MENSEN. */
 const isMens = s => s === 'lid' || s === 'gezin';
+
+/* De takken per type, elk met de deur die er al is (zie ./oplossen.js). */
+const { onderwerpVan } = require('./oplossen')({ handleVanPin, pinKijk, liveKijk, zaakVan, cap, isMens });
 
 async function los(scanner, tekst) {
   const wie = scanner && scanner.soort ? String(scanner.soort) : null;
@@ -121,48 +120,11 @@ function eigenRem(g, wie, mij) {
   return null;
 }
 
-/* Het oplossen zelf, per type -- en elke tak leent de bestaande deur in plaats van
-   er een te bouwen. */
-async function onderwerpVan(g, wie, mij) {
-  if (g.type === 'persoon') {
-    if (!isMens(wie)) return { status: 403, error: 'Deze code hoort bij een mens; alleen een lid kan daar iets mee.' };
-    // zelfde geval en zelfde antwoord als in eigenRem hierboven: een demo-pas
-    // heeft geen handle, en zonder handle is er geen band om te tonen
-    if (!mij) return { status: 403, error: 'Hier heb je een eigen ledenaccount voor nodig.' };
-    if (g.vorm === 'levend') {
-      /* De levende code draagt zijn eigen bewijs, dus geeft pin-live met opzet
-         GEEN sleutel terug: het scherm hoeft niet te weten hoe iemand in de
-         database heet. Zijn eigen rem per lid staat daar al omheen. */
-      const r = liveKijk(mij, g.sleutel);
-      if (r.error) return { status: r.status, error: r.error };
-      return { onderwerp: { codename: r.codename, tier: r.tier, status: r.st }, band: r.st };
-    }
-    const kaart = pinKijk(mij, handleVanPin(g.sleutel));
-    if (!kaart) return niets();
-    return { onderwerp: { key: kaart.key, codename: kaart.codename, tier: kaart.tier, status: kaart.st },
-      band: kaart.st };
-  }
-  if (g.type === 'plaats' || g.type === 'zaak') {
-    const z = typeof zaakVan === 'function' ? zaakVan(g.sleutel) : null;
-    if (!z) return niets();
-    /* De naam komt uit ONS register en niet uit de code (LINK.md par. 3.3): wie
-       een sticker overplakt met een eigen QR, ziet hier niet zijn eigen naam
-       verschijnen maar die van de zaak waar de code echt bij hoort. */
-    const onderwerp = { code: z.code || g.sleutel, naam: z.name || z.naam || null };
-    if (g.type === 'plaats') onderwerp.plek = g.tafel || '';
-    return { onderwerp, band: null };
-  }
-  if (g.type === 'betaalcode') {
-    /* Niet opzoeken, met opzet. Of deze code geldig is en van wie hij is, weet de
-       kassadeur (/api/supplier/pay/in) -- die int hem ook. Een tweede plek die
-       hetzelfde nakijkt, is een orakel waarmee je codes kunt aftasten zonder ooit
-       te innen. */
-    return { onderwerp: { code: g.sleutel }, band: null };
-  }
-  return niets();
-}
-
 return { linkLos: los, linkBon: bonSchrijf, linkBonnen: bonnenVan,
   linkTypes: TYPES, linkIntenties: intenties.CATALOGUS,
+  /* Aanmelden doet het domein zelf, bij het opstarten (opzet/aanbouw2.js). */
+  linkHandeling: handelingen.registreer, linkHandelingen: handelingen.alle,
+  linkCapMaak: cap.capMaak, linkCapKijk: cap.capKijk,
+  linkCapAanvaard: cap.capAanvaard, linkCapTrek: cap.capTrek, linkCapOpen: cap.capOpen,
   linkRemReset: rem.remReset, LINK_MIS_PER_MINUUT: rem.MIS_PER_MINUUT, LINK_BON_MAX: BON_MAX };
 };

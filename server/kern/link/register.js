@@ -32,7 +32,11 @@ const TYPES = {
   persoon:    { wat: 'een mens' },
   plaats:     { wat: 'een plek bij een zaak' },
   zaak:       { wat: 'een zaak' },
-  betaalcode: { wat: 'een betaalcode van een lid' }
+  betaalcode: { wat: 'een betaalcode van een lid' },
+  /* De capability wijst geen DING aan maar draagt een handeling. Hij hoort in
+     hetzelfde register omdat de scanner er niet aan kan zien wat hij vasthoudt
+     -- en dat is precies de bedoeling: een code, een deur, een weg. */
+  capability: { wat: 'een verzoek om iets te doen' }
 };
 
 /* Van codesoort naar type. De sleutels links zijn de soorten uit
@@ -45,6 +49,7 @@ const VAN_SOORT = {
   tafel: 'plaats',
   entree: 'zaak',
   kas: 'betaalcode',
+  cap: 'capability',         // een gebonden handeling (kern/link/cap.js)
   pas: null, zegel: null, deur: null   // bestaan, maar hebben hier nog geen onderwerp
 };
 
@@ -88,7 +93,12 @@ function geduid(soort, code, hoe, token, tafel) {
   const type = VAN_SOORT[soort];
   if (type === undefined) return { type: null, reden: 'vreemd', mis: true };
   if (type === null) return { type: null, reden: 'nog-geen-laag', soort };
-  const uit = { type, soort, vorm: hoe, sleutel: soort === 'contact' ? token : code };
+  /* Twee soorten dragen het hele TOKEN als sleutel en niet de verwijzing erin:
+     de levende contactcode en de capability. Alleen de laag die hem uitgaf kan
+     hem omzetten, en die controleert de handtekening zelf nog een keer -- een
+     "vertrouw me, dit is al nagekeken" tussen twee lagen is hoe een controle
+     ooit stilletjes verdwijnt. */
+  const uit = { type, soort, vorm: hoe, sleutel: (soort === 'contact' || soort === 'cap') ? token : code };
   if (tafel !== undefined) uit.tafel = tafel;
   return uit;
 }

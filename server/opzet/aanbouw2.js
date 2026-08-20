@@ -83,8 +83,11 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      de laag schikt bestaande stappen, en de rem die ze delen woont sinds deze
      ronde in kern/link/rem.js. */
   Object.assign(kern, require('../kern/link')({
-    db: kern.db, save: kern.save,
+    db: kern.db, save: kern.save, crypto,
     dyncodeGeef: () => kern.dyncode,
+    codenaamVan: (sleutel) => kern.codenaamVan(sleutel),
+    // dezelfde teller als de rest van deze laag gebruikt, per lid per onderwerp
+    rate: (wie, wat, max, perMs) => kern.sociaalRate(wie, wat, max, perMs),
     handleVanPin: (pin) => kern.handleVanPin(pin),
     pinNormaliseer: (ruw) => kern.pinNormaliseer(ruw),
     pinKijk: (mij, doel) => kern.pinKijk(mij, doel),
@@ -93,6 +96,20 @@ module.exports = function bouwKernAanTwee(kern, grens) {
        uur per lid, hoe je ze ook verdeelt over de twee loketten. */
     persoonRate: (mij) => kern.sociaalRate(mij, 'pinzoek', 30, 60 * 60 * 1000),
     zaakVan: (code) => kern.findSupplier(code)
+  }));
+  /* De eerste capability, en hij komt uit het domein dat hem bezit: RTG Pay.
+     "Betaal mij 18,50 voor diner" als code van twee minuten. De linklaag laat
+     hem zien en laat een mens bevestigen; het boeken zelf blijft in kern/pay --
+     daar is maar EEN plek waar geld beweegt, en die blijft het.
+
+     Hier en niet in kernlaag3 (waar RTG Pay wordt gebouwd), omdat de linklaag
+     pas hierboven bestaat. Aanmelden gooit bij een definitie die niet deugt, en
+     dat hoort: een half register is een register dat je pas wantrouwt nadat er
+     iets misging. */
+  kern.linkHandeling(require('../kern/pay/vraagcode')({
+    pay: kern.pay,
+    payGate: kern.onboarding && kern.onboarding.payGate,
+    schoon: kern.schoon
   }));
   require('../routes/link')(grens('link'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.

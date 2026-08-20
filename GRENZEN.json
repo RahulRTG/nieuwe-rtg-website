@@ -544,6 +544,9 @@
     ],
     "link": [
       "linkBonnen",
+      "linkCapAanvaard",
+      "linkCapMaak",
+      "linkCapTrek",
       "linkLos",
       "resolveSession",
       "sessionFor"

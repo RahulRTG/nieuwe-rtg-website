@@ -73,6 +73,22 @@ const CATALOGUS = [
     wegen: { 'lid:vast': '/api/supplier/menu/get', 'lid:levend': '/api/supplier/menu/get' }
   },
   {
+    /* De capability draagt zijn handeling al in zich; wat hij precies inhoudt
+       staat op de kaart die het bedoelingsscherm toont, niet in deze regel. Zo
+       blijft deze lijst zeggen wat je KUNT VRAGEN en de kaart wat er dan gebeurt.
+
+       Alleen voor een lid, omdat er vandaag alleen capabilities tussen leden
+       bestaan (kern/pay/vraagcode.js). Komt er een die een zaak mag aanvaarden,
+       dan hoort die rol hier EN in de deur te staan -- een regel tonen die de
+       deur weigert, is een belofte zonder weg. */
+    id: 'capability.aanvaarden',
+    type: 'capability',
+    tekst: 'Bekijken en bevestigen',
+    uitleg: 'Je ziet eerst wat er gebeurt.',
+    methode: 'POST',
+    wegen: { 'lid:levend': '/api/link/cap/aanvaard' }
+  },
+  {
     /* De kassakant: een lid toont zijn betaalcode, de ZAAK int hem. Andersom kan
        niet, en dat is geen omissie maar LINK.md par. 3.3 -- een code die iemand
        ophoudt of ophangt, mag geen geld naar zich toe halen. */

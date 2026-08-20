@@ -151,6 +151,12 @@ het meest voorkomende QR-misbruik dat er is.
 |---|---|
 | persoon (PIN), zaak, plaats, object, apparaat | betalen, ontvangen, delen, overdragen, machtigen, koppelen, toegang geven |
 
+**En de regel die daaruit volgt: een capability is de handdruk, niet de
+toegang.** Wie een handeling bedenkt die BLIJVENDE toegang uitdeelt, bouwt een
+sleutel die in een oude foto van een QR blijft zitten. Wat er na de handdruk
+overblijft — een boeking, een band, een gedeelde reis — hoort in de laag te
+staan waar die dingen wonen, met hun eigen intrekknop. De code sterft.
+
 De toets: *kan iemand met een foto van deze code over een jaar nog iets in gang
 zetten?* Zo ja, dan hoort hij niet vast te zijn. `pin-live.js` is hier de
 bestaande vorm van: de code draagt de pin niet, leeft 60 seconden, is eenmalig,
@@ -221,10 +227,30 @@ paden verhuizen er per stuk naartoe.
    Bearer-sessie waar deze deur op staat) en de intenties voor `pas`, `zegel` en
    `deur` — die codesoorten worden herkend en zeggen eerlijk dat deze laag er nog
    niets mee doet.
-2. **Capabilities.** Uitgeven en inwisselen: handeling, bron, reikwijdte,
-   vervaltijd, eenmalig, publiek. Bovenop `dyncode.js` -- dezelfde ondertekening,
-   want een tweede plek waar een HMAC wordt gezet is een tweede plek waar hij
-   fout kan staan.
+2. **Capabilities.** ✅ *gebouwd op 20 augustus 2026.* `kern/link/cap.js` (de
+   machinerie) en `kern/link/handelingen.js` (het register). Een capability
+   draagt een gebonden opdracht: handeling, bron, vervaltijd, eenmalig. De deur
+   is `POST /api/link/cap/maak`, `/aanvaard` en `/trek`; kijken gaat via het
+   bestaande `/api/link/los`, dat een capability als eigen type herkent.
+
+   Drie dingen die de vorm bepalen. **De code draagt de inhoud niet** — hij
+   draagt een verse verwijzing, net als de levende contactcode, zodat een foto
+   van de QR niet leest hoeveel er gevraagd wordt. **Het domein schrijft zijn
+   eigen handeling** (beschrijving én uitvoering), want de linklaag weet niet
+   wat geld is. **De code gaat pas op als de handeling gelukt is**, anders is
+   een betaling met te weinig saldo een vraag die niemand meer kan beantwoorden.
+
+   De eerste handeling is `geld.ontvangen` in `kern/pay/vraagcode.js`: "betaal
+   mij 18,50 voor diner", twee minuten geldig, eenmalig, en langs dezelfde
+   KYC-poort als `/api/pay/stuur` — een tweede deur naar hetzelfde geld zonder
+   die poort zou een omweg om die poort heen zijn.
+
+   **Wat hierna hoort te verhuizen: de kascode.** `pay.kasCode` + `kasInt` is in
+   alles al een capability (een lid geeft een code af, de kassa verzilvert hem
+   tot een maximum) behalve in naam, met een eigen levensduur en een eigen deur.
+   Dat is de volgende migratie, en het is meteen de eerste capability die een
+   ZAAK mag aanvaarden — waarvoor zowel de rol in het register als de regel in
+   `intenties.js` open moet, en niet één van de twee.
 3. **Het bedoelingsscherm.** Eén component, in de huisstijl: wie, wat, waarom,
    hoe lang, welke gegevens, en één bevestigknop.
 4. **RTG Scan.** Eén scherm in de leden-app dat op de resolver leunt, met de

@@ -213,12 +213,13 @@ const GOVERNANCE_WEL = capsTabel.tredenMet('can_use_enterprise_governance')[0];
 const GOVERNANCE_NIET = capsTabel.tredenMet('can_be_partner')
   .find((t) => !capsTabel.mag(t, 'can_use_enterprise_governance'));
 
-function zaakOpTrede(trede) {
+function zaakOpTrede(trede, schaduw) {
   const sessies = { g: { role: 'supplier', code: 'AAA', manager: true, lid: 7 } };
   const kern = {
     persoonseis: { isGedeeldeInlog: () => false, persoonVanActor: () => ({ lid: 7, sleutel: 'k' }),
       magWerkenHier: () => ({ ok: true }) },
-    zaakAbonnement: trede === undefined ? undefined : { van: () => ({ pas: trede, herkomst: 'vastgelegd' }) }
+    zaakAbonnement: trede === undefined ? undefined : { van: () => ({ pas: trede, herkomst: 'vastgelegd' }) },
+    handhavingSchaduw: schaduw || undefined
   };
   const o = opstelling({ kern, sessies });
   o.db.data.suppliers.push({ code: 'AAA', type: VRIJ });
@@ -268,4 +269,54 @@ test('een pad dat nergens onder valt, wordt door de poort niet aangeraakt', () =
   const lite = zaakOpTrede(GOVERNANCE_NIET);
   assert.equal(verzoek(lite, '/api/supplier/state').door, true);
   assert.equal(verzoek(lite, undefined).door, true, 'geen pad is geen weigering');
+});
+
+/* ============================================================================
+   DE SCHADUWSTAND AAN DE DEUR ZELF.
+
+   kern/commercie/schaduw.js is met zes mutaties nagelopen en geen daarvan liet
+   deze poort zakken -- dus dat de deur de schaduwlaag werkelijk raadpleegt, was
+   nergens bewezen. Een laag die je alleen los toetst, is een laag waarvan je
+   hoopt dat hij is aangesloten.
+   ========================================================================== */
+const { maakSchaduw } = require('../server/kern/commercie/schaduw');
+
+function schaduwlaag(modus) {
+  const db = { data: {} };
+  const S = maakSchaduw({ db, save: () => {}, nu: () => 1000 });
+  const id = 'abonnementspoort.can_use_enterprise_governance';
+  S.meld(id, 'SCHADUW');
+  if (modus === 'AFDWINGEN') {
+    S.stelVrij(id, 'in deze toets gaat het om de deur en niet om de rijpheid', 'toets');
+    S.zetModus(id, 'AFDWINGEN', 'toets');
+  }
+  return { S, id };
+}
+
+test('een regel in de SCHADUW laat het verzoek door en telt wat hij zou doen', () => {
+  const { S, id } = schaduwlaag('SCHADUW');
+  const lite = zaakOpTrede(GOVERNANCE_NIET, S);
+
+  const r = verzoek(lite, '/api/supplier/command/beleid/zet');
+  assert.equal(r.door, true, 'een schaduwregel houdt niemand tegen -- ook niet aan de echte deur');
+
+  const st = S.stand(id);
+  assert.equal(st.waarnemingen, 1, 'maar de deur meldt hem wel');
+  assert.equal(st.zouTegenhouden, 1);
+  assert.equal(st.voorbeelden[0].wie, 'AAA');
+  assert.equal(st.voorbeelden[0].wat, '/api/supplier/command/beleid/zet');
+});
+
+test('dezelfde regel op AFDWINGEN houdt hetzelfde verzoek wel tegen', () => {
+  const { S } = schaduwlaag('AFDWINGEN');
+  const lite = zaakOpTrede(GOVERNANCE_NIET, S);
+  const r = verzoek(lite, '/api/supplier/command/beleid/zet');
+  assert.equal(r.door, false);
+  assert.equal(r.uit.status, 402);
+});
+
+test('zonder schaduwlaag doet de poort wat hij altijd deed, niet stilzwijgend minder', () => {
+  const lite = zaakOpTrede(GOVERNANCE_NIET);       // geen schaduwlaag gemount
+  assert.equal(verzoek(lite, '/api/supplier/command/beleid/zet').door, false,
+    'een ontbrekende schaduwlaag mag geen handhaving uitzetten');
 });

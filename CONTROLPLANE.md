@@ -60,6 +60,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Bevoegdheid + grenzen | `commercie/bevoegdheid.js` | **af** — vier dimensies, delegatie versmalt |
 | Policy + decision | `commercie/besluit.js` | **af** — acht uitkomsten |
 | Bewijstoken | `commercie/bewijstoken.js` + `/zegel.js` | **af** als laag; nog geen route levert er een in (§5.2) |
+| Schaduwstand | `commercie/schaduw.js` | **af** — aan de leverancierspoort, met één regel die vandaag meeloopt (§5.3) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -246,6 +247,50 @@ inlevering hoort bij §6.4 hieronder. Dat staat hier zodat het niet als "af"
 leest: een token die niemand inlevert, is precies de stille belofte die dit
 document elders bestrijdt.
 
+### 5.3 De schaduwstand (was §6.3, nu gebouwd)
+
+§5.1 hing een abonnementscontrole aan de leverancierspoort. Zorgvuldig gebouwd,
+tien mutaties nagelopen — en niemand kon zeggen wat hij de volgende ochtend om
+negen uur zou dóen: hoeveel verzoeken hij raakt, van wie, op welke paden. Dat is
+het moment waarop een handhavingsregel een storing wordt in plaats van een grens.
+
+Een regel staat daarom in één van drie standen: **UIT** (niet eens gewogen),
+**SCHADUW** (oordeelt, telt, laat iedereen door) of **AFDWINGEN**. De enige zin
+die deze laag echt maakt is de volgende:
+
+> **Je kunt niet afdwingen wat nooit in de schaduw heeft gelopen.**
+
+Zonder die eis is een schaduwstand een vinkje dat niemand aanzet. Met die eis is
+hij de enige weg naar afdwingen: minstens 200 waarnemingen én minstens 7 dagen,
+en beide moeten gehaald zijn — duizend waarnemingen op één dag zeggen niets over
+de maandafsluiting, en een week met drie verzoeken zegt niets over drukte.
+
+**De uitzondering wordt gerekend, niet beweerd.** Een regel die aantoonbaar niets
+afpakt, hoeft niet te wachten — maar "aantoonbaar" is hier een som: heeft élke
+trede waarop een zaak kan staan de capability, dan kan de regel niemand iets
+ontnemen. Verandert het productprofiel, dan vervalt de vrijstelling vanzelf en
+valt de regel terug in de schaduw. Vrijstellingen zijn telbaar (`vrijgesteld()`),
+want een uitzondering die je niet kunt tellen is over een jaar de regel.
+
+**En dat betrapte meteen mijn eigen werk van een uur eerder.** Van de vier regels
+die de abonnementspoort voortbrengt zijn er drie vrijgesteld — kassa, Werk OS en
+personeel zitten op béide zakelijke treden. De vierde niet: *governance pakt
+Business Lite wel degelijk iets af*, en die regel is in §5.1 meteen aangezet.
+Dat had niet gemoeten. Hij loopt nu mee, en hij bijt pas als er bewijs is.
+
+Twee dingen die de meting eerlijk houden: een regel die in de héle
+schaduwperiode niemand zou hebben tegengehouden, is niet "veilig om aan te
+zetten" maar een regel waarvan we niet weten of hij werkt — dat staat als
+waarschuwing in de rijpheid, zonder te blokkeren. En een regel die al maanden in
+de schaduw staat, is een besluit dat niemand neemt; `blijftInSchaduw()` telt ze.
+
+Negen mutaties, alle negen gevangen. Drie ervan gingen niet over de laag maar
+over de *aansluiting*: zes mutaties op `schaduw.js` lieten de poortdeur groen,
+dus dat de deur de schaduwlaag werkelijk raadpleegt was nergens bewezen. Een
+laag die je alleen los toetst, is een laag waarvan je hóópt dat hij is
+aangesloten. Er staan nu drie gedragstoetsen op de deur zelf, waaronder de
+belangrijkste: een ontbrekende schaduwlaag mag geen handhaving uitzetten.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -254,8 +299,7 @@ vastligt en niemand halverwege iets anders bouwt.
 1. ~~**Enforcement in de Promise Gate.**~~ **Gebouwd** — zie §5.1.
 2. ~~**Capability tokens**~~ **Gebouwd** — zie §5.2. De laag staat er; de eerste
    route die er een inlevert nog niet.
-3. **Shadow enforcement** — een nieuwe regel eerst een week meelopen zonder te
-   blokkeren: *wat zou er gebeurd zijn?* Pas daarna afdwingen.
+3. ~~**Shadow enforcement**~~ **Gebouwd** — zie §5.3.
 4. **Counterfactual testing** — een beleidswijziging tegen de geschiedenis
    draaien: `refund.max 250 → 150` geeft *73 transacties anders, € 11.294
    betroffen, 51 extra goedkeuringen*.

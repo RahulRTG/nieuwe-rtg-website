@@ -93,6 +93,40 @@ function capabilityVoor(pad, kaart) {
   return null;
 }
 
+/* WELKE REGELS PAKKEN IEMAND IETS AF, EN WELKE NIET?
+
+   Dit wordt GEREKEND en niet beweerd. Een capability die op ELKE trede zit waar
+   een zaak op kan staan, kan per definitie niemand iets afnemen -- daar is een
+   schaduwperiode zinloos. Een capability die dat niet doet, hoort eerst mee te
+   lopen voordat hij bijt (./schaduw.js), en dat geldt uitdrukkelijk ook voor de
+   regel die hier op 20 augustus 2026 meteen is aangezet: governance pakt Business
+   Lite wel degelijk iets af, en dat had eerst een week moeten meelopen.
+
+   De vrijstelling is dus geen vinkje maar een SOM. Verandert het productprofiel
+   zo dat een trede het onderdeel verliest, dan vervalt de vrijstelling vanzelf
+   en valt de regel terug in de schaduw. */
+function vrijstellingVoor(cap) {
+  const zakelijk = Object.keys(caps.PROFIEL).filter(t => caps.mag(t, 'can_be_partner'));
+  const missen = zakelijk.filter(t => !caps.mag(t, cap));
+  if (missen.length) return null;
+  return 'elke zakelijke trede (' + zakelijk.join(', ') + ') bevat dit onderdeel, ' +
+    'dus deze regel kan geen enkele zaak iets afnemen';
+}
+
+/* De regels die deze tabel voortbrengt, met per stuk of hij vrijgesteld is. Een
+   id per CAPABILITY en niet per pad: het is een productgrens, en vijf paden die
+   dezelfde grens bewaken zijn een regel. */
+function regels() {
+  const gezien = new Set();
+  const uit = [];
+  for (const [, cap] of KAART) {
+    if (gezien.has(cap)) continue;
+    gezien.add(cap);
+    uit.push({ id: 'abonnementspoort.' + cap, cap, vrijstelling: vrijstellingVoor(cap) });
+  }
+  return uit;
+}
+
 /* Het antwoord voor een verzoek. `trede` komt van de aanroeper omdat deze laag
    de leverancierstabel niet hoort te kennen; is hij er niet, dan de terugval.
    Zie de kop voor waarom dat hier open is en bij de persoonseis dicht. */
@@ -115,10 +149,18 @@ function beoordeel(pad, trede) {
    erbij, want die kan er nog niet zijn (late binding, zie
    server/opzet/leverancierpoort.js). Ontbreekt hij, dan de terugval -- zie de
    kop voor waarom dat hier open is en bij de persoonseis ernaast dicht. */
-function voorZaak(zaakAbonnement, code, pad) {
+function voorZaak(zaakAbonnement, code, pad, schaduw) {
   let trede = null;
   try { if (zaakAbonnement) trede = zaakAbonnement.van(code).pas; } catch (e) { trede = null; }
-  return beoordeel(pad, trede);
+  const r = beoordeel(pad, trede);
+
+  /* DE SCHADUWSTAND. Zonder schaduwlaag doet deze poort wat hij altijd deed --
+     niet stilzwijgend minder. Mét: een regel die nog meeloopt, telt wel en houdt
+     niemand tegen. Zie ./schaduw.js voor waarom dat de enige weg naar afdwingen
+     hoort te zijn. */
+  if (!schaduw || r.ok || !r.cap) return r;
+  const w = schaduw.weeg('abonnementspoort.' + r.cap, r.error, { wie: code, wat: pad });
+  return w.door ? { ok: true, cap: r.cap, pas: r.pas, schaduw: true } : r;
 }
 
-module.exports = { KAART, capabilityVoor, beoordeel, voorZaak };
+module.exports = { KAART, capabilityVoor, beoordeel, voorZaak, regels, vrijstellingVoor };

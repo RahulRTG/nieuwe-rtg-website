@@ -74,7 +74,31 @@ Object.assign(kern, (() => {
      telbaar moet blijven. */
   const zaakAbonnement = require('../kern/commercie/zaakabonnement').maakZaakabonnement({ db, save });
 
+  /* DE SCHADUWSTAND VAN DE HANDHAVINGSREGELS. Een nieuwe regel loopt eerst mee
+     zonder te blokkeren, en pas als er bewijs is mag hij bijten. Zie
+     kern/commercie/schaduw.js -- met name waarom "je kunt niet afdwingen wat
+     nooit heeft meegelopen" de enige zin is die deze laag echt maakt.
+
+     De regels van de abonnementspoort melden zich hier aan, en de tabel REKENT
+     zelf uit welke er niemand iets afnemen: een capability die op elke zakelijke
+     trede zit, kan geen enkele zaak iets ontnemen en hoeft niet te wachten. Wat
+     dat niet haalt -- vandaag alleen governance, dat Business Lite wel degelijk
+     iets afpakt -- begint in de schaduw. Ook de regel die op 20 augustus 2026
+     meteen is aangezet; dat had niet gemoeten. */
+  const routepoort = require('../kern/commercie/routepoort');
+  const schaduw = require('../kern/commercie/schaduw').maakSchaduw({ db, save });
+  for (const r of routepoort.regels()) {
+    if (r.vrijstelling) {
+      schaduw.meld(r.id, 'AFDWINGEN');
+      schaduw.stelVrij(r.id, r.vrijstelling, 'productprofiel');
+      schaduw.zetModus(r.id, 'AFDWINGEN', 'productprofiel');
+    } else {
+      schaduw.meld(r.id, 'SCHADUW');
+    }
+  }
+
   return { commercieRonde: ronde, commercieVerrekening: verrekening,
-    commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen, zaakAbonnement };
+    commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen, zaakAbonnement,
+    handhavingSchaduw: schaduw };
 })());
 };

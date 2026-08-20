@@ -111,7 +111,7 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
        doorheen moet, dus een kassaroute die er morgen naast wordt gebouwd valt
        er vanzelf onder. Waarom deze poort TERUGVALT waar de persoonseis
        DICHTVALT, staat in kern/commercie/routepoort.js. */
-    const abo = routepoort.voorZaak(kern.zaakAbonnement, req.supplier.code, req.path);
+    const abo = routepoort.voorZaak(kern.zaakAbonnement, req.supplier.code, req.path, kern.handhavingSchaduw);
     if (!abo.ok) return res.status(402).json({ error: abo.error, capability: abo.cap, nodig: abo.nodig || null });
     next();
   }

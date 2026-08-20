@@ -129,3 +129,35 @@ test('het spoor draagt geen wachtwoord', async () => {
   const alles = JSON.stringify(bord()) + JSON.stringify(zaakBord());
   assert.ok(!/geheim123|fout-wachtwoord/.test(alles), 'nooit een wachtwoord in het log');
 });
+
+test('en ook geen E-MAILADRES: het bord draagt het account-id', async () => {
+  /* DIT IS EEN ECHTE FOUT GEWEEST, en hij zat in de reparatie hierboven. De
+     eerste versie schreef het login-adres in het veiligheidsbord, en dat is een
+     persoonsgegeven in de GEDEELDE database. test/vergeten.test.js viel er
+     terecht over: na "verwijder mijn account" stond het adres er nog.
+
+     De regel van dit huis staat in server/kern/vergeten.js bij het
+     inzagejournaal: een auditlog mag blijven staan zolang hij geen naam en geen
+     e-mailadres bevat -- alleen een id dat na de verwijdering nergens meer op
+     slaat. Zo kan niemand zijn sporen uitvegen door een account te wissen, en
+     staat er toch geen persoonsgegeven in de bak. Deze toets houdt beide kanten
+     vast: het adres staat er niet, en er staat wel iets waarmee het kantoor de
+     persoon kan opzoeken zolang die bestaat. */
+  const rijen = bord();
+  assert.ok(rijen.length >= 3, 'er staan pogingen op het bord');
+  assert.ok(!JSON.stringify(rijen).includes(MAIL),
+    'het login-adres hoort niet in de gedeelde database te staan; gevonden in: ' +
+    JSON.stringify(rijen.filter(r => JSON.stringify(r).includes(MAIL))));
+
+  const bekend = rijen.filter(r => r.wie != null);
+  assert.ok(bekend.length >= 2, 'een poging op een BEKEND account draagt wel een verwijzing');
+  for (const r of bekend) {
+    assert.match(String(r.wie), /^\d+$/, 'de verwijzing is het account-id en niets anders: ' + r.wie);
+  }
+  /* En de onbekende poging draagt niemand -- daar is geen account om naar te
+     wijzen, en het afgetaste adres is van iemand die hier misschien niet eens
+     lid is. Wat overblijft is het IP, en daar is credential stuffing aan te zien. */
+  const onbekend = rijen.filter(r => r.wie == null);
+  assert.ok(onbekend.length >= 1, 'de poging op een onbekend adres staat er wel, zonder naam');
+  assert.ok(onbekend.every(r => r.ip), 'maar altijd met het IP erbij');
+});

@@ -21,6 +21,15 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const nu = () => new Date().toISOString();
   const bak = () => { if (!db.data.checklijsten || typeof db.data.checklijsten !== 'object') db.data.checklijsten = {}; return db.data.checklijsten; };
   const vanZaak = code => { const b = bak(); if (!Array.isArray(b[code])) b[code] = []; return b[code]; };
+  /* Lezen zonder scheppen: vind() en mijn() draaien op elke kijk- en
+     weiger-weg, en die horen geen lege collectie achter te laten. De
+     staatproef ving dat op /checklijst/deel: een 404 op een verse server
+     liet `checklijsten` ontstaan -- geweigerd en toch veranderd (de gezakte
+     ROLLBACK-cel). Zelfde snit als Hlees in kern/horeca.js. */
+  const vanZaakLees = code => {
+    const b = db.data.checklijsten;
+    return (b && typeof b === 'object' && Array.isArray(b[code])) ? b[code] : [];
+  };
 
   const namen = ruw => [...new Set((Array.isArray(ruw) ? ruw : []).map(n => schoon(n, 40)).filter(Boolean))].slice(0, 40);
 
@@ -66,19 +75,19 @@ module.exports = ({ db, save, crypto, schoon }) => {
     });
   }
 
-  const vind = (zaak, id) => vanZaak(zaak).find(l => l.id === String(id || ''));
+  const vind = (zaak, id) => vanZaakLees(zaak).find(l => l.id === String(id || ''));
 
   /* De lijsten die IK zie: alles wat met mij is gedeeld, plus wat met het
      hele team is gedeeld. Andermans besloten lijsten blijven weg. */
   function mijn(zaak, wie, f) {
     f = f || {};
     const ik = schoon(wie, 40);
-    let rijen = vanZaak(zaak).filter(l => magMee(l, ik));
+    let rijen = vanZaakLees(zaak).filter(l => magMee(l, ik));
     if (f.event) rijen = rijen.filter(l => (l.event || '') === f.event);
     if (f.open) rijen = rijen.filter(l => l.items.some(i => !i.klaar));
     return { ok: true, ik,
       lijsten: rijen.slice(0, 60).map(metStand),
-      events: [...new Set(vanZaak(zaak).map(l => l.event).filter(Boolean))],
+      events: [...new Set(vanZaakLees(zaak).map(l => l.event).filter(Boolean))],
       uitleg: 'Iedereen met wie de lijst is gedeeld vinkt zelf af; bij elk vinkje staat wie het deed.' };
   }
 
@@ -123,7 +132,9 @@ module.exports = ({ db, save, crypto, schoon }) => {
   }
 
   function weg(zaak, id, door) {
-    const rijen = vanZaak(zaak);
+    // Lezen tot de splice: op een 404/403 hoort er niets te ontstaan. De echte
+    // array komt terug zodra hij bestaat, dus de splice raakt dezelfde rijen.
+    const rijen = vanZaakLees(zaak);
     const i = rijen.findIndex(l => l.id === String(id || ''));
     if (i < 0) return { status: 404, error: 'Deze checklijst bestaat niet.' };
     if (rijen[i].door !== schoon(door, 40)) return { status: 403, error: 'Alleen wie de lijst maakte kan hem weghalen.' };

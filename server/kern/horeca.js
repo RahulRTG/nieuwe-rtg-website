@@ -49,6 +49,20 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return h;
   }
 
+  /* Lezen zonder scheppen. H() maakt de doos van een zaak aan zodra iemand
+     ernaar vraagt -- ook als die vraag daarna wordt GEWEIGERD. De staatproef
+     ving dat op de fooienpot: een 400 liet een verse horeca-doos achter, en
+     een geweigerde aanroep die de toestand verandert is precies wat de
+     ROLLBACK-cel meet (PROOF.md par. 9: degraderen naar de veiligste
+     toestand, en een weigering laat niets achter). Wie alleen wil KIJKEN
+     krijgt hier de echte doos als hij bestaat, en anders een losse lege vorm
+     die nergens aan vast zit. */
+  function Hlees(code) {
+    const c = String(code || '');
+    return (db.data.horeca && db.data.horeca[c]) ? H(c)
+      : { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
+  }
+
   // de som van een regel en van een hele rekening, altijd op dezelfde manier
   const regelSom = (r) => centen(r.centen * r.aantal);
   function kortingCenten(rek) {
@@ -129,6 +143,6 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { ok: true, geboekt: echt, restVraag: wil - echt, saldo: b.saldo, bon: b.code };
   }
 
-  return { KANALEN, REGELSTANDEN, H, nu, id, centen, uitEuro, regelSom, kortingCenten, waarde,
+  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen, uitEuro, regelSom, kortingCenten, waarde,
     totaal, openstaand, controleerSom, happyKorting, bonMaak, bonBoek };
 };

@@ -22,28 +22,37 @@
    het weer en de dag, en dat weet de manager beter dan een dashboard. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
-  const { H, nu, id, centen, uitEuro, totaal } = horeca;
+  const { H, Hlees, nu, id, centen, uitEuro, totaal } = horeca;
 
   const P = (code) => { const h = H(code); if (!h.personeel) h.personeel = { potten: {}, loon: {} }; return h.personeel; };
+  /* De leesbroer van P: geen doos scheppen om in een lege doos te kijken.
+     Zelfde reden als Hlees in kern/horeca.js -- een weigering of een kale
+     lijstvraag hoort niets achter te laten. */
+  const Plees = (code) => Hlees(code).personeel || { potten: {}, loon: {} };
   const vandaag = () => nu().slice(0, 10);
 
   /* ---------- de fooienpot ---------- */
   app.post('/api/supplier/horeca/fooienpot', supplierAuth, (req, res) => {
-    const p = P(req.supplier.code);
+    /* EERST WEIGEREN, DAN PAS SCHEPPEN. Dit stond andersom: P() en H()
+       maakten de doos van de zaak aan voor er ook maar een veld was bekeken,
+       en een 400 liet die doos gewoon staan. De staatproef ving dat als
+       gezakte ROLLBACK-cel (geweigerd en de toestand veranderde toch). Tot
+       aan de laatste controle wordt hier alleen GELEZEN (Hlees); de eerste
+       schrijvende aanraking staat na de laatste weigering. */
     const datum = schoon(req.body.datum, 10) || vandaag();
-    const h = H(req.supplier.code);
+    const deelnemers = (Array.isArray(req.body.deelnemers) ? req.body.deelnemers : []).slice(0, 100)
+      .map(d => ({ naam: schoon(d && d.naam, 60), uren: Math.max(0, Math.min(24, Number(d && d.uren) || 0)),
+        weging: Math.max(0.1, Math.min(5, Number(d && d.weging) || 1)) }))
+      .filter(d => d.naam && d.uren);
+    if (!deelnemers.length) return res.status(400).json({ error: 'Wie heeft er gewerkt? Geef per persoon de gewerkte uren.' });
+
+    const h = Hlees(req.supplier.code);
     // de pot van die dag: alle fooi op rekeningen die die dag zijn gesloten
     const uitRekeningen = Object.values(h.rekeningen)
       .filter(r => (r.geslotenAt || '').slice(0, 10) === datum)
       .reduce((t, r) => t + centen(r.fooiCenten || 0), 0);
     const extra = req.body.extraCenten != null ? centen(req.body.extraCenten) : uitEuro(req.body.extra);
     const pot = uitRekeningen + extra;
-
-    const deelnemers = (Array.isArray(req.body.deelnemers) ? req.body.deelnemers : []).slice(0, 100)
-      .map(d => ({ naam: schoon(d && d.naam, 60), uren: Math.max(0, Math.min(24, Number(d && d.uren) || 0)),
-        weging: Math.max(0.1, Math.min(5, Number(d && d.weging) || 1)) }))
-      .filter(d => d.naam && d.uren);
-    if (!deelnemers.length) return res.status(400).json({ error: 'Wie heeft er gewerkt? Geef per persoon de gewerkte uren.' });
     if (!pot) return res.status(409).json({ error: 'Er is die dag geen fooi binnengekomen.' });
 
     /* Verdelen op uren maal weging. De restcenten gaan naar wie de meeste uren
@@ -62,6 +71,7 @@ module.exports = (kern) => {
     const uitgekeerd = verdeling.reduce((t, v) => t + v.centen, 0);
     if (uitgekeerd !== pot) return res.status(500).json({ error: 'De verdeling telt niet op tot de pot; er is niets vastgelegd.' });
 
+    const p = P(req.supplier.code);
     p.potten[datum] = { datum, potCenten: pot, uitRekeningen, extra, verdeling, at: nu(), door: req.actor.name };
     save();
     logActivity(req.supplier.code, req.actor, 'verdeelde de fooienpot van ' + datum + ' (' + (pot / 100).toFixed(2) + ')');
@@ -70,16 +80,19 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/horeca/fooienpot/lijst', supplierAuth, (req, res) => {
-    const p = P(req.supplier.code);
-    const rijen = Object.values(p.potten).sort((a, b) => String(b.datum).localeCompare(String(a.datum))).slice(0, 90);
+    const rijen = Object.values(Plees(req.supplier.code).potten)
+      .sort((a, b) => String(b.datum).localeCompare(String(a.datum))).slice(0, 90);
     res.json({ ok: true, potten: rijen, totaal: rijen.reduce((t, x) => t + x.potCenten, 0) });
   });
 
   /* ---------- loonkosten tegenover omzet ---------- */
   app.post('/api/supplier/horeca/loonkosten', supplierAuth, (req, res) => {
-    const p = P(req.supplier.code);
+    /* Scheppen alleen als er echt diensten worden neergezet; de 404 hieronder
+       hoort geen lege personeelsdoos achter te laten (zelfde les als de
+       fooienpot hierboven). */
     const datum = schoon(req.body.datum, 10) || vandaag();
     if (Array.isArray(req.body.diensten)) {
+      const p = P(req.supplier.code);
       p.loon[datum] = { datum, diensten: req.body.diensten.slice(0, 200).map(d => ({
         naam: schoon(d && d.naam, 60) || 'medewerker',
         uren: Math.max(0, Math.min(24, Number(d && d.uren) || 0)),
@@ -87,10 +100,10 @@ module.exports = (kern) => {
         afdeling: schoon(d && d.afdeling, 30) || 'zaal' })), at: nu() };
       save();
     }
-    const dag = p.loon[datum];
+    const dag = Plees(req.supplier.code).loon[datum];
     if (!dag) return res.status(404).json({ error: 'Voor ' + datum + ' staan er geen diensten. Zet ze eerst neer (diensten: [{naam, uren, uurloon}]).' });
 
-    const h = H(req.supplier.code);
+    const h = Hlees(req.supplier.code);
     const rekeningen = Object.values(h.rekeningen).filter(r => (r.geslotenAt || '').slice(0, 10) === datum && r.status === 'betaald');
     const omzet = rekeningen.reduce((t, r) => t + totaal(r).netto, 0);   // zonder fooi: die is niet van de zaak
     const fooi = rekeningen.reduce((t, r) => t + centen(r.fooiCenten || 0), 0);
@@ -114,19 +127,29 @@ module.exports = (kern) => {
      moet weten om iemand goed te helpen -- allergie, voorkeurstafel, wat hij
      meestal drinkt -- en wat er is afgesproken. */
   app.post('/api/supplier/horeca/gast', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
-    if (!h.gasten) h.gasten = {};
+    /* Alle weigeringen VOOR de eerste schrijvende aanraking. De punten-400
+       stond halverwege: de gast was dan al aangemaakt en allergie/voorkeur al
+       overschreven -- geweigerd en toch veranderd, precies de gezakte
+       ROLLBACK-cel van de staatproef. */
     const naam = schoon(req.body.naam, 60);
     if (!naam) return res.status(400).json({ error: 'Om wie gaat het?' });
     const sleutel = naam.toLowerCase();
+    const punten = req.body.punten != null ? Math.round(Number(req.body.punten) || 0) : null;
+    if (punten !== null) {
+      const bestaand = (Hlees(req.supplier.code).gasten || {})[sleutel];
+      if ((bestaand ? bestaand.punten : 0) + punten < 0) {
+        return res.status(400).json({ error: 'Een gast kan niet minder dan nul punten hebben.' });
+      }
+    }
+
+    const h = H(req.supplier.code);
+    if (!h.gasten) h.gasten = {};
     const g = h.gasten[sleutel] || (h.gasten[sleutel] = { naam, punten: 0, bezoeken: 0, at: nu() });
     if (req.body.allergie !== undefined) g.allergie = schoon(req.body.allergie, 120) || null;
     if (req.body.voorkeur !== undefined) g.voorkeur = schoon(req.body.voorkeur, 160) || null;
     if (req.body.notitie) g.notities = (g.notities || []).concat([{ tekst: schoon(req.body.notitie, 200), at: nu(), door: req.actor.name }]).slice(-20);
     if (req.body.bezoek === true) { g.bezoeken += 1; g.laatsteBezoek = vandaag(); }
-    if (req.body.punten != null) {
-      const punten = Math.round(Number(req.body.punten) || 0);
-      if (g.punten + punten < 0) return res.status(400).json({ error: 'Een gast kan niet minder dan nul punten hebben.' });
+    if (punten !== null) {
       g.punten += punten;
       g.puntenLog = (g.puntenLog || []).concat([{ punten, reden: schoon(req.body.reden, 80) || null, at: nu() }]).slice(-50);
     }

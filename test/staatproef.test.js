@@ -78,6 +78,64 @@ test('maar blijft hij ook bij de herhaling bewegen, dan is het wel een bevinding
   assert.match(o.reden, /ook bij de herhaling/);
 });
 
+/* ---------- de stille controle: doorlopende omgevingsschrijvers ---------- */
+
+test('DE STILLE CONTROLE: wat ook zonder aanroep beweegt, zakt de route niet', () => {
+  /* Dit is letterlijk wat zes rtfos-routes overkwam: securityLog en sessions
+     bewogen bij de aanroep, bij de herhaling, EN in een venster zonder enige
+     aanroep. Dan is het een omgevingsschrijver onder de meetklok, geen gevolg
+     van de opdracht -- en de uitslag hoort bewezen te zijn, met de ruis bij
+     naam in de reden. */
+  const o = weegStaat({ a: nee(401), b: nee(401),
+    d01: d('securityLog', 'sessions'), d12: d('securityLog', 'sessions'),
+    dStil: d('securityLog', 'sessions') });
+  assert.equal(o.rollback, 'bewezen');
+  assert.match(o.reden, /stille venster/);
+});
+
+test('maar de stille controle wast alleen weg wat hij zelf ZAG bewegen', () => {
+  /* De wringer: naast de ruis bewoog er ook iets dat in het stille venster
+     stil bleef. Dan blijft het een bevinding, en de reden noemt precies de
+     rest -- niet de ruis, die zou het zicht op de echte collectie vertroebelen. */
+  const o = weegStaat({ a: nee(401), b: nee(401),
+    d01: d('securityLog', 'saldi'), d12: d('securityLog', 'saldi'),
+    dStil: d('securityLog') });
+  assert.equal(o.rollback, 'GEZAKT');
+  assert.match(o.reden, /saldi/);
+  assert.match(o.reden, /omgevingsruis securityLog weggelaten/);
+  assert.ok(!/saldi.*securityLog|securityLog, saldi/.test(o.reden.split('herhaling:')[1].split('(')[0]),
+    'de restlijst noemt de ruis niet meer');
+});
+
+test('en een LEEG stil venster wast niets weg: dan was het geen ruis', () => {
+  /* Zonder deze kant zou de stille controle een vrijbrief zijn: elke meting
+     met een dStil erbij zou schoner lijken. Beweegt er in het stille venster
+     NIETS, dan blijft de volle bevinding staan. */
+  const o = weegStaat({ a: nee(401), b: nee(401),
+    d01: d('saldi'), d12: d('saldi'), dStil: niets });
+  assert.equal(o.rollback, 'GEZAKT');
+  assert.match(o.reden, /saldi/);
+});
+
+test('de stille controle geldt ook voor de idempotentie-herhaling', () => {
+  const ruisIdem = weegStaat({ a: ok, b: ok, d01: d('agenda', 'sessions'),
+    d12: d('sessions'), dStil: d('sessions') });
+  assert.equal(ruisIdem.idempotentie, 'bewezen',
+    'een herhaling die alleen omgevingsruis raakte is geen tweede uitvoering');
+  const echtIdem = weegStaat({ a: ok, b: ok, d01: d('agenda', 'sessions'),
+    d12: d('agenda', 'sessions'), dStil: d('sessions') });
+  assert.equal(echtIdem.idempotentie, 'GEZAKT');
+  assert.match(echtIdem.idemReden, /agenda/);
+});
+
+test('zonder stille meting verandert er niets aan het oude oordeel', () => {
+  /* dStil is een verfijning, geen gedragsbreuk: oude aanroepers (en oude
+     registers) houden exact dezelfde uitslag. */
+  const o = weegStaat({ a: nee(401), b: nee(401),
+    d01: d('securityLog', 'sessions'), d12: d('securityLog', 'sessions') });
+  assert.equal(o.rollback, 'GEZAKT');
+});
+
 /* ---------- de ruis ---------- */
 
 test('OMGEVINGSRUIS gaat eruit voordat er wordt geoordeeld', () => {
@@ -97,19 +155,24 @@ test('en zonder die filter meldt een weigering een bevinding over het journaal',
 
 /* ---------- de ronde ---------- */
 
-test('drie vingerafdrukken rond twee oproepen, en de ruis wordt toegepast', async () => {
+test('drie afdrukken rond twee oproepen, plus een STILLE als beide vensters bewogen', async () => {
+  /* Bewoog het bij de aanroep EN bij de herhaling, dan volgt de stille
+     controle: een vierde afdruk zonder enige aanroep ertussen. Hier blijft
+     het stille venster leeg, dus de bevinding blijft volledig staan -- de
+     controle is een zeef, geen vrijbrief (zie de weegStaat-toetsen boven). */
   const afdrukken = [];
   let beurt = 0;
   const uit = await draaiStaatproef({
     post: async () => ({ status: 200 }),
     vingerafdruk: async () => ({ nr: ++beurt }),
-    verschilVan: async (voor, na) => { afdrukken.push([voor.nr, na.nr]); return d('doorgeefjournaal', 'agenda'); },
+    verschilVan: async (voor, na) => { afdrukken.push([voor.nr, na.nr]);
+      return na.nr >= 4 ? niets : d('doorgeefjournaal', 'agenda'); },
     ruis: new Set(['doorgeefjournaal']),
     routes: [{ methode: 'POST', pad: '/api/x', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({})
   });
-  assert.equal(beurt, 3, 'drie vingerafdrukken bij de eerste route');
-  assert.deepEqual(afdrukken, [[1, 2], [2, 3]]);
+  assert.equal(beurt, 4, 'drie meetafdrukken en een stille controle');
+  assert.deepEqual(afdrukken, [[1, 2], [2, 3], [3, 4]]);
   const rij = uit.perRoute['POST /api/x'];
   assert.deepEqual(rij.collecties, ['agenda'], 'het journaal hoort er niet meer bij te staan');
   assert.equal(rij.idempotentie, 'GEZAKT');
@@ -124,7 +187,9 @@ test('de laatste afdruk van een route is de eerste van de volgende', async () =>
   const uit = await draaiStaatproef({
     post: async () => ({ status: 200 }),
     vingerafdruk: async () => ({ nr: ++beurt }),
-    verschilVan: async () => d('agenda'),
+    /* Alleen het eerste venster beweegt; dan is er geen stille controle nodig
+       en telt deze toets zuiver het hergebruik tussen routes. */
+    verschilVan: async (voor) => (voor.nr % 2 === 1 ? d('agenda') : niets),
     routes: [1, 2, 3].map(i => ({ methode: 'POST', pad: '/api/r' + i, rol: 'member' })),
     tokenVoor: () => 't', lijfVoor: () => ({})
   });

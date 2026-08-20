@@ -104,13 +104,42 @@ function telIn(bron) {
      meter juist bewaakt -- anders zou hij mensen aanzetten een werkende poll te
      slopen. */
   const regels = s.split('\n');
+  /* WANNEER IS EEN SLEEP EEN POLL? Als hij in een LUS staat.
+
+     Dat is de hele regel, en hij verving twee halve. Eerst stond hier "achter
+     een voorwaarde" en "de eerste regel in een lus" -- twee vormen van hetzelfde
+     idee, allebei per ongeluk smal. Ze misten `for (...) await even(50);` op een
+     regel, en ze misten de tik ONDERAAN een pollus (`for (;;) { kijk(); if
+     (klaar) return; await sleep(25); }`), wat precies de vorm is die je krijgt
+     als je het netjes doet. De meter telde die dan als schuld, en dat is de
+     omgekeerde fout: hij zet mensen aan een werkende poll te slopen.
+
+     Een sleep in een lus is een RETRY-CADANS: hij eindigt als de toestand er
+     is, niet als de klok afloopt. Een sleep daarbuiten is een gok. Vandaar een
+     eenvoudige haakjesteller die bijhoudt of een omhullend blok door for/while/
+     do is geopend; strings gaan er eerst uit, anders telt een accolade in een
+     tekst mee. */
+  const zonderTekst = regels.map(r => r
+    .replace(/\\./g, '')
+    .replace(/'[^']*'/g, "''").replace(/"[^"]*"/g, '""').replace(/`[^`]*`/g, '``'));
+  const inLus = [];
+  {
+    const stapel = [];
+    for (let i = 0; i < zonderTekst.length; i++) {
+      const r = zonderTekst[i];
+      inLus[i] = stapel.some(Boolean);
+      for (let k = 0; k < r.length; k++) {
+        if (r[k] === '{') stapel.push(/\b(for|while|do)\b[^{]*$/.test(r.slice(0, k)));
+        else if (r[k] === '}') stapel.pop();
+      }
+      // een lus die OP DEZE REGEL opengaat, telt ook voor deze regel zelf
+      if (!inLus[i]) inLus[i] = stapel.some(Boolean) || /^\s*(for|while)\s*\(/.test(r);
+    }
+  }
+  function isWacht(i) { return !inLus[i]; }
   for (let i = 0; i < regels.length; i++) {
     if (!/await\s+new Promise\([^)]*setTimeout/.test(regels[i])) continue;
-    if (/^\s*(if|while|for)\s*\(/.test(regels[i])) continue;          // achter een voorwaarde
-    let j = i - 1;
-    while (j >= 0 && !regels[j].trim()) j--;                           // de eerste regel IN een lus
-    if (j >= 0 && /^\s*(for|while)\s*\(.*\{\s*$/.test(regels[j])) continue;
-    n++;
+    if (isWacht(i)) n++;
   }
   /* De pijl mag zijn parameter met of zonder haakjes hebben: `(ms) =>` en
      `ms =>` zijn dezelfde wacht. Dat scheelde niet weinig -- de eerste versie
@@ -118,7 +147,11 @@ function telIn(bron) {
      Promise(...)` dus als nul. De eigen toets van deze meter viel er meteen
      over, en dat is precies waarvoor hij daar staat. */
   for (const m of s.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>\s*new Promise\([^;]*setTimeout/g)) {
-    n += (s.match(new RegExp('await\\s+' + m[1] + '\\s*\\(', 'g')) || []).length;
+    const aanroep = new RegExp('await\\s+' + m[1] + '\\s*\\(', 'g');
+    for (let i = 0; i < regels.length; i++) {
+      const raak = (regels[i].match(aanroep) || []).length;
+      if (raak && isWacht(i)) n += raak;
+    }
   }
   return n;
 }

@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
 
 const SLEUTEL = 'a'.repeat(64);
 const u = Date.now().toString().slice(-8);
@@ -80,9 +80,16 @@ test.before(async () => {
     { image: 'data:image/png;base64,' + png.toString('base64') }, { token });
   assert.equal(up.status, 200, 'het identiteitsbewijs moet opgeslagen zijn');
 
-  await new Promise(r => setTimeout(r, 2500)); // de opslaglus zijn werk laten doen
-  stop(srv.child);
-  await new Promise(r => setTimeout(r, 800)); // en netjes laten afsluiten
+  /* NETJES stoppen in plaats van 2500 + 800 ms gokken.
+
+     Hier stond "de opslaglus zijn werk laten doen" (2500 ms) en "netjes laten
+     afsluiten" (800 ms). Allebei gokken, en allebei overbodig: stopNet() stuurt
+     SIGTERM, en daarop FLUUST de server zijn snapshot voordat hij afsluit (zie
+     server/db/snapshot.js). Wachten op `exit` is dus precies wachten tot alles
+     op schijf staat -- het teken waar elke bewering hieronder op rust. stop()
+     zou hier juist verkeerd zijn: dat is SIGKILL, een stroomstoring, en dan
+     spoelt de write-behind niet. */
+  await stopNet(srv.child);
   bestanden = alleBestanden(TMP);
 });
 
@@ -169,7 +176,10 @@ test('6. een bestaand, nog PLAT dossier blijft leesbaar en migreert bij het opsl
     // nu iets nieuws sturen: dat schrijft het dossier, en dus versleutelt het
     const nieuw = await api(srv.base, '/api/chat/send', { text: 'nog een bericht', message: 'nog een bericht' }, { token: li.body.token });
     assert.equal(nieuw.status, 200);
-  } finally { stop(srv.child); await new Promise(r => setTimeout(r, 500)); }
+  /* stopNet en niet stop: de regels hierna lezen rtg.db van schijf, en dat mag
+     pas als de server zijn laatste schrijfactie heeft afgemaakt. SIGKILL met
+     500 ms ernaast gokte dat; SIGTERM met wachten op `exit` weet het. */
+  } finally { await stopNet(srv.child); }
 
   const db2 = new DatabaseSync(path.join(TMP, 'rtg.db'));
   const na = db2.prepare('SELECT member_state FROM users WHERE id = ?').get(rij.id);

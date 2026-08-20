@@ -158,10 +158,31 @@ test('de teller telt een echte wacht en negeert er een in commentaar', () => {
     'een eigen hulpje met een naam blijft een klokwacht, en elke aanroep telt');
   assert.strictEqual(telIn('const w = ms => ' + NP + '(r => ' + ST + '(r, ms));\nawait w(1500);'), 1,
     'ook zonder haakjes om de parameter -- die vorm telde de meter eerst als nul');
-  assert.strictEqual(telIn('if (!klaar) await ' + SLEEP + ';'), 0,
-    'een sleep achter een voorwaarde is een poll en geen klokwacht');
+  /* EEN SLEEP IN EEN LUS IS EEN POLL, en een sleep daarbuiten is een gok. Die
+     ene regel verving twee halve ("achter een voorwaarde", "de eerste regel in
+     een lus"), die allebei per ongeluk smal waren: ze misten de tik ONDERAAN
+     een pollus -- precies de vorm die je krijgt als je het netjes doet. En ze
+     golden alleen voor de kale sleep, waardoor een poll met een eigen naampje
+     wel meetelde. Beide fouten wijzen dezelfde kant op: de meter zette mensen
+     aan een werkende poll te slopen. */
+  const LUS = 'for (;;) {\n  if (klaar()) return;\n';
+  assert.strictEqual(telIn(LUS + '  await ' + SLEEP + ';\n}'), 0,
+    'de tik ONDERAAN een pollus is de cadans van die poll');
   assert.strictEqual(telIn('for (let i = 0; i < 20; i++) {\n  await ' + SLEEP + ';\n}'), 0,
-    'en de eerste regel in een lus ook');
+    'en bovenaan net zo goed');
+  assert.strictEqual(telIn('while (!klaar) {\n  kijk();\n  await ' + SLEEP + ';\n}'), 0,
+    'een while-lus telt ook als lus');
+  assert.strictEqual(telIn('if (!klaar) await ' + SLEEP + ';'), 1,
+    'maar een sleep achter een voorwaarde ZONDER lus eromheen blijft een gok');
+
+  // en dat geldt voor beide spellingen
+  const HULP = 'const even = ms => ' + NP + '(r => ' + ST + '(r, ms));\n';
+  assert.strictEqual(telIn(HULP + 'for (let i = 0; i < 60 && !klaar; i++) await even(50);'), 0,
+    'een poll met een eigen naampje is geen klokwacht');
+  assert.strictEqual(telIn(HULP + 'while (!klaar) {\n  await even(50);\n}'), 0,
+    'ook in een while-lus niet');
+  assert.strictEqual(telIn(HULP + 'await even(200);'), 1,
+    'maar de kale aanroep telt gewoon mee');
   assert.strictEqual(telIn('page.route(u, () => ' + NP + '(r => ' + ST + '(() => r(echt()), 1200)));'), 0,
     'een trage server NABOOTSEN in de pagina is een fixture, geen wacht van de toets');
   /* En de NAAM zonder aanroep is geen wacht. Zonder deze regel overleefde de

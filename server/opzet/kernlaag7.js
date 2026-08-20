@@ -19,7 +19,7 @@
 const { idVanKey } = require('../lib/lidsleutel');
 
 module.exports = (kern, hulp) => {
-  const { accounts, archief, bewerkCollectie, crypto, db, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, bewerkCollectie, crypto, db, etaMinutes, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -54,7 +54,7 @@ Object.assign(kern, require('../kern/werkbijlogin').maakWerkBijLogin({
    woonplaatsen (EUR 10 p.p. vooraf: EUR 5 RTG, EUR 5 aanbetaling zaak). */
 Object.assign(kern, require('../kern/vonk').maakVonk({
   db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
-  haversine, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
+  haversine, etaMinutes, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
 }));
 /* De voorspeller (kern/voorspel.js): leert het ritme van elk lid en elke
    zaak uit het RTG Pay-grootboek (de ene bron waar elke app in boekt) en
@@ -171,18 +171,9 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
 
-/* RTG One en Magnaat Wereld zijn overkoepelende werkruimtes. Ze worden hier
-   opgebouwd voordat kernlaag7b de routers ophangt, zodat de domeingrens nooit
-   een half gemonteerde motor kan doorgeven. */
-Object.assign(kern, require('../kern/rtgone')({ db, save, crypto }));
-const partnerstudio = require('../kern/magnaat-partnerstudio')({ db, save, crypto, findSupplier });
-Object.assign(kern, partnerstudio);
-Object.assign(kern, require('../kern/magnaatwereld')({
-  db, save, bewerkCollectie, crypto, functies: require('../functies'), sseToCustomer,
-  partnerstudio: partnerstudio.magnaatPartnerstudio, codenaamVan: kern.codenaamVan
-}));
+/* De overkoepelende werkruimtes (RTG One, Magnaat Wereld) en de Media OS
+   staan in ./kernlaag7-ruimtes.js -- zie de kop daar. Nog steeds VOOR de
+   routers van kernlaag7b, want de kern wordt hier nog gevuld. */
+require('./kernlaag7-ruimtes')(kern, hulp);
 
-// De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en
-// die moeten er dus al zijn. Uitleg: ./mediaos.js.
-require('./mediaos')(kern, hulp);
 };

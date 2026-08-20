@@ -57,6 +57,7 @@
     loadVerify();
     loadVakbewijzen();
     loadConcierge();
+    laadTafels();
     loadIncidenten();
     loadSalonNaleving();
     loadOntmoetingen();

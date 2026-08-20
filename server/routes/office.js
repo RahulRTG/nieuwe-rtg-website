@@ -22,6 +22,7 @@ module.exports = (kern) => {
   require('./office/werk')(octx);
   require('./office/bewaarverzoek')(octx);
   require('./office/concierge')(octx);
+  require('./office/rendezvous')(octx);
   /* De ledenbalie: de derde poort van het kantoor. Zie ./office/balie.js. */
   /* De ledenbalie hangt in server/routes/ledenbalie.js, met een eigen zetel en
      een eigen kern (kern/ledenbalie*.js). Hier stond een TWEEDE balie uit een

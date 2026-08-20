@@ -126,5 +126,8 @@
   },
   "devDependencies": {
     "playwright": "^1.62.1"
+  },
+  "dependencies": {
+    "zz-ijk-tijdelijk": "^1.0.0"
   }
 }

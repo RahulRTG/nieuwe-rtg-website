@@ -60,6 +60,12 @@ function maakDom() {
       setAttribute(n, v) { e.attrs[n] = String(v); },
       removeAttribute(n) { delete e.attrs[n]; },
       getAttribute(n) { return n in e.attrs ? e.attrs[n] : null; },
+      /* dataset hoort bij een element, en dit blad gebruikt het sinds de
+         gebarenlaag: canvas.js zet er data-gb-aan op zodat een tijdlijn zijn
+         acties maar EEN keer aanmeldt. Zonder dit veld viel deze nep-DOM daar
+         met een TypeError over -- de toets zakte op een gat in de nabootsing en
+         niet op het blad. */
+      dataset: {},
       classList: {
         toggle(k, aan) {
           const heeft = (' ' + e.className + ' ').indexOf(' ' + k + ' ') >= 0;
@@ -83,7 +89,11 @@ function maakDom() {
     body: kaal('body'),
     createElement: kaal,
     createTextNode: (t) => ({ textContent: String(t), kinderen: [] }),
-    querySelector: (s) => register[s] || null
+    querySelector: (s) => register[s] || null,
+    /* canvas.js wacht op het sein 'rtg-gebaar' als de gebarenlaag er nog niet
+       is (en die is er hier nooit). Zonder deze haak is dat een TypeError. */
+    addEventListener() {},
+    removeEventListener() {}
   };
   const w = {};
   // allebei zijn IIFE's op (window, document); hier krijgen ze de onze. De

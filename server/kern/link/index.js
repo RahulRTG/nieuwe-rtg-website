@@ -140,6 +140,6 @@ return { linkLos: los, linkBon: bonSchrijf, linkBonnen: bonnenVan,
   linkHandeling: handelingen.registreer, linkHandelingen: handelingen.alle,
   linkCapMaak: cap.capMaak, linkCapKijk: cap.capKijk,
   linkCapAanvaard: cap.capAanvaard, linkCapTrek: cap.capTrek, linkCapOpen: cap.capOpen,
-  linkKoppelingen: koppelingen,
+  linkKoppelingen: koppelingen, linkWieId: cap.idVan,
   linkRemReset: rem.remReset, LINK_MIS_PER_MINUUT: rem.MIS_PER_MINUUT, LINK_BON_MAX: BON_MAX };
 };

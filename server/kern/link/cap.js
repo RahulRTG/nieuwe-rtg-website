@@ -151,5 +151,10 @@ const { capKijk, capAanvaard } = require('./cap-in')({ losOp, kaartVan, idVan, v
    over de hele kluis en niet over een code. Hij mag lezen en weghalen, meer niet. */
 const { capOpenVan, capTrek } = require('./cap-beheer')({ open, losOp, kaartVan, idVan, opruimen, klok, WEG });
 
-return { capMaak, capKijk, capAanvaard, capTrek, capOpenVan, capOpen: open, capHandelingen: handelingen.alle };
+/* `idVan` gaat mee naar buiten omdat de DEUR dezelfde vraag heeft: onder welke
+   naam staan de bonnen van wie er aanklopt. Die stond daar los uitgerekend, en
+   twee plekken die een identiteit uitrekenen zijn twee namen zodra er een rol
+   bijkomt -- dan schrijft de een `supplier:LUCHT` waar de ander leest. */
+return { capMaak, capKijk, capAanvaard, capTrek, capOpenVan, capOpen: open,
+  capHandelingen: handelingen.alle, idVan };
 };

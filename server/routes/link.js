@@ -21,7 +21,7 @@
    zelf en niet op de vorm van de kop. */
 module.exports = (kern) => {
   const { app, express, auth, geenGast, liveCodename, supplierAuth, resolveSession, sessionFor,
-          linkLos, linkKoppelingen, linkCapMaak, linkCapAanvaard, linkCapTrek } = kern;
+          linkLos, linkKoppelingen, linkWieId, linkCapMaak, linkCapAanvaard, linkCapTrek } = kern;
   const wieScant = require('../kern/link/wie')({ sessionFor, resolveSession });
 
   /* Wat een mens intypt of scant. 4 kB is ruim: een RTG-code is hooguit
@@ -44,7 +44,11 @@ module.exports = (kern) => {
   app.post('/api/link/koppelingen', express.json({ limit: '1kb' }), (req, res) => {
     const wie = wieScant(req);
     if (!wie) return res.status(401).json({ error: 'Niet ingelogd.' });
-    const mij = wie.key || (wie.code ? wie.soort + ':' + wie.code : null);
+    /* Onder welke naam staan iemands bonnen? Dat rekent de laag uit (linkWieId),
+       niet deze deur: twee plekken die een identiteit samenstellen zijn twee
+       namen zodra er een rol bijkomt -- en dan schrijft de een waar de ander
+       leest. */
+    const mij = linkWieId(wie);
     if (!mij) return res.json({ open: [], bonnen: [], partijen: [], nietBewaard: 0 });
     res.json(linkKoppelingen(mij, wie));
   });

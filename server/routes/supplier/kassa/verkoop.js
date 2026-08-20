@@ -52,7 +52,11 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     if (code.slice(0, 5) === 'RTG1.' && typeof kern.linkCapAanvaard === 'function') {
       const r = await kern.linkCapAanvaard({ soort: 'supplier', code: req.supplier.code }, code, null,
         { centen, oms: req.supplier.name });
-      p = r.error ? r : (r.uitkomst || {});
+      /* GEEN STIL `|| {}` HIER. Zonder uitkomst zou `betaler` leeg blijven en
+         legde de kassa een bon aan die als betaald geldt zonder dat er iemand
+         bij hoort -- en dat valt pas op in de boekhouding. Een laag die ja zegt
+         zonder uitkomst is stuk, en dat hoort te klinken (LAT.md regel 5). */
+      p = r.error ? r : (r.uitkomst || { status: 500, error: 'De betaling gaf geen uitkomst terug.' });
     } else {
       p = await pay.kasInt({
         supplierCode: req.supplier.code, code: req.body.payCode,

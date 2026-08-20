@@ -121,14 +121,42 @@ if (require.main !== module) { module.exports = {}; return; }
   /* DE OOGSTGANG: een keer langs alle routes met de EIGEN rol, alleen om de
      pool te vullen. De kruisronde daarna roept met verkeerde rollen en die
      slagen (hopelijk) nooit -- zonder deze gang blijft de pool leeg en is
-     het verrijkte lijf een leeg gebaar. */
+     het verrijkte lijf een leeg gebaar.
+
+     EN HIJ LOGDE ZICHZELF UIT. Alle routes langsgaan betekent ook /api/logout
+     aanroepen, en daarna liep de rest van deze gang zonder sessie: van de 609e
+     route af kreeg elke member-route een 401, oogstte de pool niets meer, en
+     was de VINGERAFDRUK dood. De ijking eronder zag daardoor geen enkele
+     legitieme wijziging meer en zette de hele proef stil met "DE METER IS
+     BLIND" -- terecht, maar de oorzaak lag hier en niet in de meter. Gevonden
+     door na elke member-route te kijken of /api/pay/overzicht nog antwoordde.
+
+     De reparatie is geen lijst met uitzonderingen (die veroudert stil, LAT.md
+     regel 4) maar herstel op de waarneming: een 401 op je EIGEN rol betekent
+     dat je sessie weg is, en dan halen we een verse. Zo mag deze gang de deur
+     achter zich dichttrekken; hij loopt gewoon terug naar binnen. */
+  const versToken = {
+    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
+    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
+    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
+  };
   const eigenTokens = { member, supplier, office };
+  let hernieuwd = 0;
   for (const r of routes) {
     const tk = eigenTokens[r.rol];
-    if (tk) await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
+    if (!tk) continue;
+    const u = await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
+    if (u.status === 401 && versToken[r.rol]) {
+      const vers = await versToken[r.rol]();
+      if (vers) { eigenTokens[r.rol] = vers; hernieuwd++; }
+    }
   }
+  if (hernieuwd) console.log('  sessie hernieuwd tijdens de oogstgang : ' + hernieuwd +
+    '  (deze gang raakt ook de uitlogroutes aan)');
 
-  const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ member, supplier, office }), maxPogingen: MAX,
+  /* tokensVoor leest uit eigenTokens en niet uit de drie constanten van de
+     inlog: na de oogstgang kunnen die vervangen zijn. */
+  const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ ...eigenTokens }), maxPogingen: MAX,
     lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf });
 
   if (uit.bevindingen.meterStuk) {
@@ -158,7 +186,16 @@ if (require.main !== module) { module.exports = {}; return; }
        routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
        bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
     nietBeproefbaar: verdeling.zonderRol.length,
-    redenenNietBeproefbaar: verdeling.redenen,
+    /* MET DE NAMEN ERBIJ, en niet alleen de aantallen. Een reden met een getal
+       ("objectpoort: 106") is niet na te trekken en niet af te trekken: toen de
+       IDOR-proef 56 van deze routes bewezen-gescheiden verklaarde, viel er geen
+       enkele manier te bedenken om te zeggen WELKE, want dit register kende hun
+       namen niet. Nu wel, en BEWIJSSCHULD.json kan de post objectpoort daardoor
+       laten krimpen met precies wat een ander instrument heeft beslist. */
+    redenenNietBeproefbaar: verdeling.redenen.map(x => Object.assign({}, x, {
+      routes: verdeling.zonderRol.filter(z => z.reden === x.reden)
+        .map(z => z.methode + ' ' + z.pad).sort()
+    })),
     routesGevonden: kandidaten.length,
     gemeten: { routesMetRol: routes.length, beproefd: perRoute.length, pogingen: uit.pogingen,
       aclOpen: open.length, privacyLek: lek.length,

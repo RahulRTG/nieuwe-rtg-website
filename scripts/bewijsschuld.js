@@ -100,19 +100,34 @@ const POSTEN = [
      deze routes nog steeds niet kan wegen; de vraag is alleen verhuisd naar
      een instrument dat hem wel stelt. */
   { id: 'objectpoort', soort: 'meetwerk',
-    wat: 'routes die eigenaarschap toetsen van een object uit het lichaam',
-    uit: (r) => reden(r.rolproef, 'objectpoort'),
+    wat: 'routes die eigenaarschap toetsen van een object uit het lichaam, en die nog geen enkel ' +
+      'instrument heeft beslist',
+    /* De aftrek: de rolproef kan deze routes niet beproeven, maar de IDOR-proef
+       heeft er inmiddels een deel van bewezen-gescheiden verklaard. Dat aftrekken
+       kan pas sinds de rolproef de NAMEN wegschrijft en niet alleen het aantal;
+       zonder namen viel er niets te vergelijken en bleef de post op zijn oude
+       getal staan terwijl het werk allang was gedaan. Zijn de namen er niet
+       (een ouder register), dan valt hij terug op het kale aantal -- liever te
+       hoog dan stilletjes te laag. */
+    uit: (r) => {
+      const namen = redenRoutes(r.rolproef, 'objectpoort');
+      if (!namen) return reden(r.rolproef, 'objectpoort');
+      const beslist = idorGescheiden(r.idor);
+      return [...namen].filter(x => !beslist.has(x)).length;
+    },
     waarom: 'huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de ' +
       'identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is ' +
       'de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een ' +
       'bedrijfscode in het lijf.',
-    sluit: 'GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json), in twee gangen. Member-laag: ' +
-      '117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, ' +
-      'wat de klasse uitsluit). Werkplek-laag, geijkt op de eigenaar zodat een weigering iets bewijst: ' +
-      '20 routes bewezen-gescheiden, 0 doorbraken, 62 onbereikbaar omdat ook de rechtmatige eigenaar ' +
-      'er met alleen een bedrijfscode niet in kwam. Die 62 zijn de rest: ze vragen een lijf met meer ' +
-      'dan de code (een bestaand document, een klus), en dat is hetzelfde ketenwerk als object-vooraf ' +
-      'hieronder -- geen ontbrekend instrument meer, maar werk per domein.' },
+    sluit: 'GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json). Member-laag: 117 routes ' +
+      'bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de ' +
+      'klasse uitsluit). Werkplek-poort, geijkt op de eigenaar zodat een weigering iets bewijst: 56 ' +
+      'routes bewezen-gescheiden, 0 doorbraken, 26 onbereikbaar. Die 56 waren er eerst 20: de ijking ' +
+      'ging over op twee gangen met de objectpool, zodat de eigenaar met een lijf vol ECHTE id\'s uit ' +
+      'zijn eigen huis naar binnen gaat en lid B daarna met precies hetzelfde lijf. De 26 die ' +
+      'overblijven vragen een keten die deze proef niet kan lopen (een goedgekeurd document, een ' +
+      'toegewezen klus) en zijn hetzelfde werk als object-vooraf hieronder: geen ontbrekend ' +
+      'instrument, maar werk per domein.' },
 
   /* De deuren van het huis: elke lie-run spaart ze (RTG_LIEG_NIET), want een
      toets die niet meer kan inloggen zakt overal tegelijk en dan meet je de
@@ -289,11 +304,36 @@ function reden(register, voorvoegsel) {
     .reduce((a, x) => a + x.aantal, 0);
 }
 
+/* Dezelfde groepen, maar bij NAAM. De rolproef schrijft sinds kort niet alleen
+   het aantal maar ook de routes per reden weg, en dat maakt een aftrek mogelijk
+   die eerst niet te doen was: welke van deze routes heeft een ANDER instrument
+   inmiddels beslist? Geeft null als de namen er nog niet zijn (een register van
+   voor die verandering), zodat de post terugvalt op het kale aantal in plaats
+   van stilletjes nul te melden. */
+function redenRoutes(register, voorvoegsel) {
+  if (!register || !Array.isArray(register.redenenNietBeproefbaar)) return null;
+  const groepen = register.redenenNietBeproefbaar.filter(x => String(x.reden).startsWith(voorvoegsel));
+  if (!groepen.length || groepen.some(g => !Array.isArray(g.routes))) return null;
+  return new Set(groepen.flatMap(g => g.routes));
+}
+
+/* Wat de IDOR-proef bewezen-gescheiden heeft verklaard, uit beide gangen: de
+   member-laag en de werkplek-poort. Alleen 'gescheiden' telt -- 'onbereikbaar'
+   is geen uitspraak en 'doorbraak' is het tegendeel van een. */
+function idorGescheiden(register) {
+  if (!register) return new Set();
+  const uit = new Set();
+  for (const bak of [register.perRoute, register.werkplekPerRoute]) {
+    for (const [route, v] of Object.entries(bak || {})) if (v && v.staat === 'gescheiden') uit.add(route);
+  }
+  return uit;
+}
+
 function meet() {
   const r = {
     poortwacht: lees('POORTWACHT.json'), rolproef: lees('ROLPROEF.json'),
     staatproef: lees('STAATPROEF.json'), output: lees('OUTPUTPROEF.json'),
-    audit: lees('AUDITPROEF.json'), waarom: lees('WAAROM.json')
+    audit: lees('AUDITPROEF.json'), waarom: lees('WAAROM.json'), idor: lees('IDOR.json')
   };
   const posten = POSTEN.map(p => {
     let aantal = null;

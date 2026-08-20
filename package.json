@@ -90,6 +90,8 @@
     "zekerheid": "node scripts/zekerheid.js",
     "bewijsmatrix": "node --experimental-sqlite scripts/bewijsmatrix.js",
     "bewijsmatrix:vast": "node --experimental-sqlite scripts/bewijsmatrix.js --vastleggen",
+    "vertrouwen": "node --experimental-sqlite scripts/vertrouwen.js",
+    "vertrouwen:vast": "node --experimental-sqlite scripts/vertrouwen.js --vastleggen",
     "klok": "node scripts/klok.js",
     "klok:vast": "node scripts/klok.js --vastleggen",
     "controls": "node scripts/controls.js",

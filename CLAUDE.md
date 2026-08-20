@@ -70,6 +70,16 @@ bij zet.
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
 
+**`PROOF.md` is het diepte-document van de vertrouwenslaag** (werknaam RTG
+ProofOS): vertrouwen als levende uitkomst in plaats van instelling. De
+hoofdregel staat in paragraaf 0 en is mechanisch: **altijd voor de 100%, nooit
+minder** -- bewijs mag alleen groeien en schuld alleen krimpen (normtanden
+`bewijsCellenBewezen` en `bewijsAchterstand`), en elke afwijking heeft een naam,
+een reden en een sluitweg in BEWIJSSCHULD.json. Lees vooral paragraaf 9, de
+grenzen: bewijs is nooit een verhaal, degraderen is nooit stil, en niemand zet
+een vervalstaat met de hand op bewezen. `scripts/vertrouwen.js` meet de
+vervalstaten per route.
+
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

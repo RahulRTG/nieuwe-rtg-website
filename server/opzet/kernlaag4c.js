@@ -50,6 +50,13 @@ Object.assign(kern, require('../kern/fiscaal/preflight').maakPreflight({ db, btw
    idempotentie en een keten die een wijziging achteraf verraadt. KLAARGEZET EN
    NIET AANGEZET -- het kanaal is inert en het zekerheidsregister houdt het
    verzenden tegen; zie de kop van gateway/index.js. */
+/* Vooruitkijken (kern/fiscaal/scenario.js): een doorrekening op aannames die
+   STRUCTUREEL niets kan muteren -- hij krijgt geen db en geen save. */
+Object.assign(kern, require('../kern/fiscaal/scenario').maakScenario({ LANDEN,
+  dekking: kern.payrollOS && kern.payrollOS.dekking, jaargangen: kern.regelwacht.jaargangen }));
+/* En de verbintenis (kern/fiscaal/verbintenis.js): aansluiten zonder het hele
+   factuurregister te laten lezen. */
+Object.assign(kern, require('../kern/fiscaal/verbintenis').maakVerbintenis({ crypto }));
 Object.assign(kern, require('../kern/fiscaal/gateway/mandaat').maakMandaat({ db, save }));
 Object.assign(kern, require('../kern/fiscaal/gateway').maakGateway({ db, save, crypto,
   mandaat: kern.mandaat, kanalen: { sbr: require('../kern/fiscaal/gateway/sbr').kanaal } }));

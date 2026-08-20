@@ -261,6 +261,11 @@
     "facturatie": [
       "facturatie"
     ],
+    "fiscaal-vooruit": [
+      "btwAangifte",
+      "scenario",
+      "verbintenis"
+    ],
     "flits": [
       "flitsMeld",
       "flitsRond",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1035 bestanden en 6856 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1037 bestanden en 6869 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1035 |
-| losse beweringen (`test(...)`) | 6856 |
+| toetsbestanden | 1037 |
+| losse beweringen (`test(...)`) | 6869 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 108 |
+| niets van beide | 110 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-907 bestanden, 6634 beweringen.
+909 bestanden, 6647 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -226,7 +226,9 @@ toets omvalt.
 | `fiscaal-herkomst.test.js` | 7 | -- | DE BEWIJSKETEN: waar komt dit bedrag vandaan, en klopt het nog. Vijf beweringen: 1. |
 | `fiscaal-jaargangen.test.js` | 5 | -- | DE FISCALE JAARGANGEN: welke regels golden er op die dag. Vijf beweringen, en ze gaan alle vijf over hetzelfde verschil: tussen "wat geldt er nu" (dat kon dit huis al) en "wat gold er toen" (dat kon het niet, want de... |
 | `fiscaal-preflight.test.js` | 6 | -- | DE PRE-FLIGHT: GO, REVIEW of BLOCK vóór de klik. Zes beweringen, en de belangrijkste is de laatste. |
+| `fiscaal-scenario.test.js` | 7 | -- | DE SCENARIO-ENGINE: wat gebeurt er als ik dit doe -- zonder dat er iets gebeurt. Zes beweringen, en de eerste is de enige die er echt toe doet. |
 | `fiscaal-terugrekenen.test.js` | 5 | -- | DE REKENPLEKKEN OP DE REGELS VAN TOEN. De jaargangen (test/fiscaal-jaargangen.test.js) maakten terugrekenen MOGELIJK. |
+| `fiscaal-verbintenis.test.js` | 6 | -- | DE VERBINTENIS: aansluiten zonder alles te laten zien. Zes beweringen. |
 | `fiscaal-zekerheid.test.js` | 5 | -- | DE VIER ZEKERHEIDSKLASSEN. Elke fiscale uitkomst droeg dezelfde zin: "voorlichting, geen bindend fiscaal advies". |
 | `fiscaal-zzpwacht.test.js` | 5 | -- | DE ZZP-REGIMES PER INGANGSDATUM. De landentabel stond al per jaargang vast; de zzp-tabel niet, en daardoor rekende de zzp-tool elk jaar met de tarieven van nu. |
 | `flits.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Flits: de rijhulp van het netwerk. Meldingen op codenaam met houdbaarheid; een tweede melding dichtbij telt als bevestiging; drie keer "weg" haalt een melding eraf; landregels zetten flitsermeldingen uit waar ze... |

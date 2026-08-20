@@ -1283,6 +1283,60 @@ De pre-flight staat als knop bij het indienen — "Wat gebeurt er als ik indien?
 — en alleen op een aangifte waarvan de periode voorbij is en die nog niet is
 ingediend. Daarbuiten valt er niets te keuren en zou de kaart ruis zijn.
 
+### De scenario-engine (`kern/fiscaal/scenario.js`)
+
+"Wat als ik twaalf mensen aanneem in Duitsland?" De harde eis is dat er níéts
+verandert, en dat is hier **structureel** opgelost en niet met discipline: de
+module krijgt geen `db`, geen `save` en geen enkele functie die schrijft. Hij
+kán niet muteren — en dat is de enige vorm van die belofte die over vijf jaar
+nog waar is. De toets legt de volledige staat voor en na naast elkaar.
+
+Hij rekent ook niet zelf: elk getal komt uit de landentabel of uit de
+payroll-dekking. Daardoor stelt hij een vraag die een rekenmachine niet stelt —
+*kunnen wij daar überhaupt loon draaien?* Een kostenplaatje voor een land zonder
+goedgekeurde loontabel is een plaatje van iets dat niet kan, en dat staat
+erbij zonder dat het bedrag verandert.
+
+Elke **aanname** staat in het antwoord, en wat we niet weten staat er als eigen
+lijst — een aanname die je niet ziet is een aanname die je gelooft. Een
+doorrekening is `advies`, nooit vastgesteld.
+
+**Wat deze module niet doet: een gekozen scenario doorvoeren.** Dat is geen
+vergetelheid. "Klaarzetten mag, doorvoeren is een mensbesluit" loopt door dit
+hele huis, en een knop die een doorrekening in werkelijkheid omzet zou in één
+klap twaalf arbeidsovereenkomsten aanmaken.
+
+### De verbintenis (`kern/fiscaal/verbintenis.js`)
+
+Aangever en toezichthouder tellen hetzelfde register met dezelfde routine. Dat
+is de kracht van dit huis — een verschil betekent iets — maar het heeft een prijs
+die niemand had opgeschreven: om te kunnen tellen moet de inspecteur het **hele**
+factuurregister lezen. Voor een controle op een bedrag is dat de complete
+commerciële administratie van een onderneming.
+
+Een merkleboom over de getelde feiten lost dat op. De inspecteur krijgt een
+**wortel** en een totaal — geen factuurnummer, geen datum, geen bedrag per regel.
+Twijfelt hij over één factuur, dan krijgt hij die ene regel plus het pad naar de
+wortel en rekent zelf na dat hij in de getelde verzameling zat, zonder de rest te
+zien.
+
+> **Wat dit wél en niet is.** Een verbintenis met selectieve openbaarmaking, geen
+> zero-knowledge bewijs. De inspecteur kan **niet** nagaan dat er een factuur is
+> weggelaten — daarvoor zou hij de verzameling moeten kennen. Wat hij wel kan:
+> vaststellen dat de aangever zich op een moment aan een verzameling heeft
+> vastgelegd en daar achteraf niets aan kan veranderen zonder dat de wortel
+> verandert. Dat is minder dan het klinkt, en daarom staat het erbij.
+
+Twee valkuilen die de toets afdekt: dezelfde feiten in een andere volgorde geven
+dezelfde wortel (anders krijgen twee partijen met dezelfde administratie
+verschillende wortels), en een oneven knoop wordt **doorgeschoven en niet
+verdubbeld** — bij verdubbeling geeft `[a,b,c]` dezelfde wortel als `[a,b,c,c]`
+en kun je een regel toevoegen zonder dat iets verandert.
+
+Het spoor van wie waarnaar keek en waarom staat al in `server/inzagelog.js`, met
+een eigen keten en anker. Dat is niet opnieuw gebouwd — een tweede journaal is
+een tweede waarheid.
+
 ### Het bronnenregister (`kern/fiscaal/bronnen/`)
 
 De Regelwacht kon al *één* bron ophalen: één url uit `FISCAAL_BRON_URL`, met een

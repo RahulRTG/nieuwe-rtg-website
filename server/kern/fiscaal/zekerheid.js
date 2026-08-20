@@ -91,6 +91,8 @@ const REGISTER = {
     mits: 'De personeelskosten erin zijn een berekening op de klokuren en het ingestelde uurloon, geen loonrun.' },
   'boekhouding.advies': { klasse: 'advies',
     waarom: 'Genre-adviezen en AI-antwoorden zijn algemene voorlichting op eigen cijfers, geen beoordeling van uw situatie.' },
+  'scenario.doorrekening': { klasse: 'advies',
+    waarom: 'Een doorrekening op aannames die de vrager doet. Er is niets vastgelegd, niets gewijzigd, en de aannames staan in het antwoord.' },
   'zzp.berekening': { klasse: 'advies',
     waarom: 'Een indicatie op een verwachte jaarwinst, met tabellen per peiljaar. Aftrekposten, afschrijving en persoonlijke omstandigheden zitten er niet in.' },
   'reservering.btw': { klasse: 'bepaald',

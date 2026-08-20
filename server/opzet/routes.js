@@ -75,6 +75,7 @@ module.exports = function hangRoutesOp(kern) {
      in het kantoor, en de zaak wil weten of haar ploeg erdoor komt. */
   require('../routes/vakbewijs')(grens('vakbewijs'));
   require('../routes/gateway')(grens('gateway'));
+  require('../routes/fiscaal-vooruit')(grens('fiscaal-vooruit'));
   require('../routes/fout')(grens('fout'));
   require('../routes/onboarding')(grens('onboarding'));
   /* De adresopzoeker hoort bij het invullen van een adres (de intake en het

@@ -38,6 +38,7 @@ bouwen. Dat mag hier niet (LAT.md regel 4).
 | **Bewijspoort** | `beleid.js` + `server/lib/vervalstaat.js` | Proof-aware routing: een capability met vervalstaat GESCHORST valt uit `toegestanePaden`. De AI krijgt hem niet aangeboden. |
 | Schorspoort | `server/middleware/schorspoort.js` | Het runtime-vangnet eronder: een schrijvende aanroep op een geschorste route krijgt 503 met reden. Lezen blijft open. |
 | Vervalstaten | `scripts/vertrouwen.js`, `VERTROUWEN.json` | Per route bewezen / verschaald / verzwakt / geschorst / ongemeten, met de reden en met wat de staat zou veranderen. |
+| **Actiebewijs** | `server/kern/stuur/bon.js` | Elke door een mens bevestigde AI-handeling levert een bon: wat, waarom het mocht, de gemeten bewijsstand eronder, de uitkomst, en wat er NIET is gemeten. |
 | Idempotentie | `server/middleware/idempotentie.js` | Een sleutel, een uitvoering, hetzelfde antwoord. De bodem onder een transactie die halverwege hapert. |
 | Capability-graaf | het routedossier in Kantoor | 4195 routes over elf bewijsschakels, met bron en reden per cel. |
 
@@ -230,9 +231,16 @@ met een reden erbij, en met een proef die aantoont dat de grens ook echt sluit.
 1. **Proof-aware routing** -- GEDAAN (bewijspoort + gedeelde vervalstaat-lezer).
 2. **Het plan als object.** De compiler geeft een expliciete executiegraaf terug
    in plaats van een reeks losse aanroepen. Zonder dit is de rest niet te wegen.
-3. **Het actiebewijs.** Eerst voor de bestaande voorstel-bevestig-keten: wat is
-   er gebeurd, waarom mocht het, wat is gewijzigd. Dit is de kleinste stap met
-   het grootste zichtbare verschil.
+3. **Het actiebewijs** -- GEBOUWD (`server/kern/stuur/bon.js`), aangehaakt aan
+   de bestaande voorstel-bevestig-keten. Op de bon: de handeling, dat een MENS
+   bevestigde (met een kort kenmerk van het voorstel, nooit het token), de
+   bevoegdheid, de gemeten vervalstaat uit VERTROUWEN.json, en de uitkomst.
+   Twee dingen staan er als `nietGemeten` OP in plaats van eraf: welke gegevens
+   precies veranderden (dat meet de vingerafdruk over de hele opslag, een
+   proefinstrument en geen kosten per klik) en of de handeling terug te draaien
+   is (alleen een route met een bekende tegenhanger mag dat beloven). Een bon
+   die zwijgt over wat hij niet weet, leest als volledigheid. Geen
+   persoonsgegevens: codenamen blijven de eenheid, ook op papier.
 4. **Risicoklassen per capability** (bedrag, omkeerbaarheid, wie het raakt),
    zodat frictie kan meebewegen in plaats van overal gelijk te staan.
 5. **Reserveren als eigen stap**, en daarmee de terugweg bij een half mislukte

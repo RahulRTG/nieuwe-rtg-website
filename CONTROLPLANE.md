@@ -61,6 +61,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Policy + decision | `commercie/besluit.js` | **af** — acht uitkomsten |
 | Bewijstoken | `commercie/bewijstoken.js` + `/zegel.js` | **af** als laag; nog geen route levert er een in (§5.2) |
 | Schaduwstand | `commercie/schaduw.js` | **af** — aan de leverancierspoort, met één regel die vandaag meeloopt (§5.3) |
+| Tegenfeit | `commercie/tegenfeit.js` | **af** — met de boardroom als beslisser (§5.4) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -243,8 +244,8 @@ gedrag bevestigt zonder de eigenschap te meten:
 producent (`besluit.js` geeft hem mee bij `TOESTAAN`, en alleen daar — ook
 `BEPERKT` krijgt er geen, want daar is de gevráágde handeling juist niet
 goedgekeurd) en er is een verbruiker in de laag zelf, maar de eerste echte
-inlevering hoort bij §6.4 hieronder. Dat staat hier zodat het niet als "af"
-leest: een token die niemand inlevert, is precies de stille belofte die dit
+inlevering hoort bij §6.6, de intent-laag. Dat staat hier zodat het niet als
+"af" leest: een token die niemand inlevert, is precies de stille belofte die dit
 document elders bestrijdt.
 
 ### 5.3 De schaduwstand (was §6.3, nu gebouwd)
@@ -291,6 +292,44 @@ laag die je alleen los toetst, is een laag waarvan je hóópt dat hij is
 aangesloten. Er staan nu drie gedragstoetsen op de deur zelf, waaronder de
 belangrijkste: een ontbrekende schaduwlaag mag geen handhaving uitzetten.
 
+### 5.4 Het tegenfeit (was §6.4, nu gebouwd)
+
+§5.3 laat een regel meelopen en telt wat hij zou hebben tegengehouden. Na een
+week staat er een getal, en dan komt de vraag die er werkelijk toe doet: **kan
+die regel aan?** En breder: wat gebeurt er als `maxCenten` van 250 naar 150 gaat
+— hoeveel handelingen lopen anders, om hoeveel geld, hoeveel extra
+goedkeuringen? Zonder antwoord is een beleidswijziging een gok met een
+percentage erop.
+
+Drie dingen houden dit eerlijk, en ze zijn alle drie belangrijker dan de
+rekensom:
+
+1. **Het draait de échte beslisfunctie.** Twee motoren uit `besluit.js`,
+   dezelfde verzoeken erdoorheen. Een tegenfeit dat op een *model* van je
+   systeem rekent, meet je model — en modellen en systemen lopen uiteen op
+   precies de gevallen waar het om gaat.
+2. **Het zegt hoeveel geschiedenis het zag.** Onder de honderd verzoeken komt er
+   geen getal maar een mededeling. "3 van de 12" leest als een percentage
+   terwijl het ruis is; dat precies ogende getal uit een lege week is hier de
+   duurste verleiding.
+3. **Het schrijft niets.** Deze module heeft geen `db` en geen `save`, en een
+   toets houdt dat vast — dan kán het niet.
+
+**En het verzint geen rangorde.** De eerste versie telde "strenger" als
+doorgaan → niet-doorgaan, en noemde `TOESTAAN → BEPERKT` dus geen van beide,
+terwijl er precies dan minder geld beweegt. De verleiding is dan om de acht
+uitkomsten op één lijn van los naar streng te zetten — maar die lijn bestaat
+niet: is BEPERKT (u krijgt minder) strenger of soepeler dan GOEDKEURING (u
+krijgt alles, met een handtekening)? Dat hangt af van wie het vraagt. Er staan
+daarom vier assen die elk wél eenduidig zijn — geweigerd, wacht, krijgt minder,
+voorwaarde erbij — en een overgang kan er meer dan één tegelijk raken. `ONBEKEND`
+telt apart: een storing is geen overtreding.
+
+**De beslisser is een mens.** `/api/office/handhaving` toont per regel de
+schaduwstand mét het tegenfeit; `/api/office/handhaving/zet` zet hem om, met een
+regel in het auditjournaal. Daarmee heeft de keten van §5.3 en §5.4 een
+aanroeper aan beide kanten: de poort meldt, de boardroom beslist.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -300,9 +339,7 @@ vastligt en niemand halverwege iets anders bouwt.
 2. ~~**Capability tokens**~~ **Gebouwd** — zie §5.2. De laag staat er; de eerste
    route die er een inlevert nog niet.
 3. ~~**Shadow enforcement**~~ **Gebouwd** — zie §5.3.
-4. **Counterfactual testing** — een beleidswijziging tegen de geschiedenis
-   draaien: `refund.max 250 → 150` geeft *73 transacties anders, € 11.294
-   betroffen, 51 extra goedkeuringen*.
+4. ~~**Counterfactual testing**~~ **Gebouwd** — zie §5.4.
 5. **Economic idempotency** — één wereldwijde `economic_intent` die door order,
    betaling, grootboek, leverancier, settlement en refund loopt. Zeventien
    retries, één economische handeling. Dit voorkomt de duurste klasse bugs.

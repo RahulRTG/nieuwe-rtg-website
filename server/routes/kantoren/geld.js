@@ -7,7 +7,7 @@ const allocatie = require('../../kern/commercie/allocatie');
 const claims = require('../../kern/commercie/claims');
 
 module.exports = (ctx) => {
-  const { app, officeAuth, boardroomAuth, veilig, stuur, afdelingen, kern, db,
+  const { app, officeAuth, boardroomAuth, veilig, stuur, afdelingen, kern,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = ctx;
 
   /* De geld-regie: RTG bepaalt de pasprijzen, de partnervergoeding (per genre
@@ -60,40 +60,8 @@ module.exports = (ctx) => {
   app.post('/api/office/claims/poort', officeAuth, (req, res) => veilig(res, () =>
     ({ status: 200, ...claims.poort() })));
 
-  /* DE COMMERCIELE RONDE. Draait vanzelf (kern/opzet/kernlaag3.js), maar is ook
-     met de hand te trekken -- dat is het verschil tussen "hij hoort te draaien"
-     en "ik zie hem draaien". De uitslag zegt per stap wat er gebeurde EN wat er
-     nog openstaat; dat laatste getal bestond niet toen deze verplichtingen nog
-     door niemand werden opgepakt. */
-  app.post('/api/office/commercie/ronde', officeAuth, async (req, res) => {
-    try {
-      if (!kern || !kern.commercieRonde) return res.status(503).json({ error: 'De ronde is niet gemount.' });
-      res.json({ ok: true, uitslag: await kern.commercieRonde.draai() });
-    } catch (e) { console.error('[commercie-ronde]', e); res.status(500).json({ error: 'De ronde liep vast.' }); }
-  });
-  /* HET ABONNEMENT VAN DE ZAKEN. Het getal dat ertoe doet staat vooraan: hoeveel
-     zaken draaien op de gedocumenteerde terugval omdat ze van voor de ladder
-     zijn? Een terugval die je niet kunt tellen, is een gat dat er over een jaar
-     nog is en dat niemand meer ziet. */
-  app.post('/api/office/commercie/zaakabonnementen', officeAuth, (req, res) => veilig(res, () => {
-    if (!kern || !kern.zaakAbonnement) return { status: 503, error: 'Niet gemount.' };
-    const codes = (db && db.data && db.data.suppliers || []).map(s => s.code);
-    return { status: 200, ok: true,
-      vastgelegd: kern.zaakAbonnement.lijst(),
-      opTerugval: kern.zaakAbonnement.zonderAbonnement(codes) };
-  }));
-  app.post('/api/office/commercie/zaakabonnement/zet', boardroomAuth, (req, res) => veilig(res, () => {
-    if (!kern || !kern.zaakAbonnement) return { status: 503, error: 'Niet gemount.' };
-    const b = req.body || {};
-    const r = kern.zaakAbonnement.zet(b.code, b.pas, b.naam || 'boardroom');
-    if (r.ok) afdelingen.audit(b.naam || 'boardroom', 'Zaakabonnement ' + r.code + ' gezet op ' + r.pas);
-    return r;
-  }));
+  require('./geld/commercie')(ctx);
 
-  app.post('/api/office/commercie/openstaand', officeAuth, (req, res) => veilig(res, () =>
-    (kern && kern.commercieVerrekening
-      ? { status: 200, ok: true, ...kern.commercieVerrekening.openstaand() }
-      : { status: 503, error: 'De verrekening is niet gemount.' })));
   app.post('/api/office/geld', boardroomAuth, (req, res) => veilig(res, () => geldOverzicht()));
   app.post('/api/office/geld/pasprijs', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldPasprijsZet(req.body || {});

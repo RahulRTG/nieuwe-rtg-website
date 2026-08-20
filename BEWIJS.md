@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1048 bestanden en 7046 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1049 bestanden en 7055 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1048 |
-| losse beweringen (`test(...)`) | 7046 |
+| toetsbestanden | 1049 |
+| losse beweringen (`test(...)`) | 7055 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 47 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 866 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 25 |
+| alleen in de kop *genoemd*, nog niet gemeten | 26 |
 | niets van beide | 109 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-920 bestanden, 6821 beweringen.
+921 bestanden, 6830 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -819,6 +819,7 @@ toets omvalt.
 | `techniek-functies.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietest: functieschakelaars met bevestiging. Een schakelactie maakt een AANVRAAG; er verandert pas iets nadat de eigenaar (Rahul) accepteert. |
 | `techniek-sso-scim.test.js` | 7 | gezakt op `liegpoort /api/` | DE BEDIENINGSLAAG VAN HET PLATFORM -- techniek, SSO, SCIM en de meting. Negenentwintig endpoints die de waargenomen dekkingsmeting als nooit aangeroepen aanwees, en ze horen bij elkaar: dit is de keten waarmee een... |
 | `techniek.test.js` | 11 | gezakt op `!==->===#0` | Tests voor de techniek-motor (server/techniek.js): de gezondheidschecks en de zekeringen. Zuiver, met een nagemaakte ctx; geen server of database nodig. |
+| `tegenfeit.test.js` | 9 | genoemd | HET TEGENFEIT -- wat zou er gebeurd zijn onder de nieuwe regel? WAAROM DIT ER IS. |
 | `tegoed.test.js` | 13 | -- | AI-TEGOED: regel 5 en 6, en nu voor het eerst afgedwongen. Ze stonden in PRIJZEN.md als NIET afgedwongen, en dat was eerlijk -- de laag bestond niet: 5. |
 | `terrein-en-panden.test.js` | 5 | gezakt op `liegpoort /api/` | TERREIN, PANDEN EN DIEREN -- 6 endpoints uit de supplier-groep. gebouw/zaal/weg, golf/tee/weg, pand/foto, charter/fotos, boerderij/dier en boerderij/water stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `theater-thuis.test.js` | 4 | gezakt op `liegpoort /api/` | Het Thuisarchief van RTG Theater: de maker bewaart de video op het eigen apparaat; RTG bewaart alleen titel en affiche. Kijken loopt rechtstreeks (WebRTC-datakanaal) van maker naar kijker; de server is puur... |

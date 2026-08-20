@@ -40,6 +40,12 @@
    Dezelfde scheiding als bij ./fee.js en ./contract.js. */
 'use strict';
 
+/* Tijd komt uit de tijdmachine en niet van het besturingssysteem: alleen zo is
+   "wat gebeurt er op 29 februari" een vraag die je kunt stellen (server/lib/klok.js).
+   De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
+   is de klok en niet Date.now(). */
+const klok = require('../../lib/klok');
+
 /* De regels, met een versie. Een nieuwe verdeling komt erbij als NIEUWE versie;
    een bestaande wordt nooit gewijzigd. Dat is de hele reden dat er een tabel
    staat en geen constante: een constante die je aanpast, herschrijft het
@@ -129,7 +135,7 @@ function verdeel(bedragCenten, versie) {
 }
 
 function maakAllocatie({ db, save, nu }) {
-  const tijd = nu || (() => Date.now());
+  const tijd = nu || klok.nu;
   function rij() {
     if (!db.data) db.data = {};
     if (!Array.isArray(db.data.socialeAfdrachten)) db.data.socialeAfdrachten = [];

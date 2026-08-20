@@ -48,6 +48,12 @@
    Dezelfde scheiding als bij ./fee.js. */
 'use strict';
 
+/* Tijd komt uit de tijdmachine en niet van het besturingssysteem: alleen zo is
+   "wat gebeurt er op 29 februari" een vraag die je kunt stellen (server/lib/klok.js).
+   De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
+   is de klok en niet Date.now(). */
+const klok = require('../../lib/klok');
+
 const STATUS = {
   CONCEPT: 'CONCEPT', AANGEBODEN: 'AANGEBODEN', GEACCEPTEERD: 'GEACCEPTEERD',
   ACTIEF: 'ACTIEF', VERLENGBAAR: 'VERLENGBAAR', VERLENGD: 'VERLENGD',
@@ -98,7 +104,7 @@ const perMaand = f => (f === 'jaar' ? 12 : f === 'kwartaal' ? 3 : 1);
 function maakContract({ id, pas, aanmeldingId, naam, startAt, afgesprokenCenten,
   minimumMaanden = 12, frequentie = 'maand', verlenging = VERLENGING.OPZEGBAAR,
   opzegMaanden = 1, btwProfiel = 'nl-21', serviceNiveau = null, door = null, nu }) {
-  const at = nu ? nu() : Date.now();
+  const at = nu ? nu() : klok.nu();
   const start = startAt || new Date(at).toISOString();
   return {
     id, pas, aanmeldingId: aanmeldingId || null, naam: naam || null,
@@ -123,7 +129,7 @@ function maakContract({ id, pas, aanmeldingId, naam, startAt, afgesprokenCenten,
 }
 
 function maakContracten({ db, save, nu }) {
-  const tijd = nu || (() => Date.now());
+  const tijd = nu || klok.nu;
   function rij() {
     if (!db.data) db.data = {};
     if (!Array.isArray(db.data.contracten)) db.data.contracten = [];

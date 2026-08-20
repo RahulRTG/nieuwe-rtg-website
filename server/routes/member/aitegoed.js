@@ -10,7 +10,7 @@
    verbruik vast te leggen dat niemand heeft toegestaan. */
 module.exports = (kern) => {
   const { app, db, save, auth, officeAuth, schoon } = kern;
-  const tegoed = require('../../kern/commercie/tegoed').maakTegoed({ db, save, nu: () => Date.now() });
+  const tegoed = require('../../kern/commercie/tegoed').maakTegoed({ db, save });
   const bundelprijs = require('../../kern/commercie/bundelprijs');
   /* De inkoopkosten komen LAAT uit de geld-regie: die is bij het mounten van
      deze routes misschien nog niet gebonden, en een prijs die op nul valt omdat

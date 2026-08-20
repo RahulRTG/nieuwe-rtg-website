@@ -48,6 +48,12 @@
    Lopen die twee uiteen, dan is dat precies wat `openstaand()` hoort te melden. */
 'use strict';
 
+/* Tijd komt uit de tijdmachine en niet van het besturingssysteem: alleen zo is
+   "wat gebeurt er op 29 februari" een vraag die je kunt stellen (server/lib/klok.js).
+   De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
+   is de klok en niet Date.now(). */
+const klok = require('../../lib/klok');
+
 const STATUS = {
   GEINCASSEERD: 'GEINCASSEERD',
   OPENSTAAND: 'OPENSTAAND',
@@ -83,7 +89,7 @@ function magOvergaan(van, naar) {
 }
 
 function maakFees({ db, save, nu }) {
-  const tijd = nu || (() => Date.now());
+  const tijd = nu || klok.nu;
   function rij() {
     if (!db.data) db.data = {};
     if (!Array.isArray(db.data.betaaldienstFees)) db.data.betaaldienstFees = [];

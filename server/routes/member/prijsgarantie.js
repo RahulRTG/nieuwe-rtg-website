@@ -22,7 +22,7 @@ module.exports = (kern) => {
     catch (e) { console.error('[prijsgarantie]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   const meldingen = require('../../kern/commercie/prijsmelding')
-    .maakPrijsmeldingen({ db, save, nu: () => Date.now() });
+    .maakPrijsmeldingen({ db, save });
 
   const lidVan = req => (req.session && req.session.key) || (req.member && req.member.codename) || null;
 

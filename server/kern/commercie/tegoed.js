@@ -45,6 +45,12 @@
    geeft; wat hij kost, komt er later bij en staat als open punt in COMMERCIE.md. */
 'use strict';
 
+/* Tijd komt uit de tijdmachine en niet van het besturingssysteem: alleen zo is
+   "wat gebeurt er op 29 februari" een vraag die je kunt stellen (server/lib/klok.js).
+   De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
+   is de klok en niet Date.now(). */
+const klok = require('../../lib/klok');
+
 const caps = require('./capaciteiten');
 
 /* Het inbegrepen tegoed per trede, in credits per maand. Nul betekent: deze
@@ -80,7 +86,7 @@ function inbegrepenVoor(pas) {
 }
 
 function maakTegoed({ db, save, nu }) {
-  const tijd = nu || (() => Date.now());
+  const tijd = nu || klok.nu;
   function alles() {
     if (!db.data) db.data = {};
     if (!db.data.aiTegoed || typeof db.data.aiTegoed !== 'object') db.data.aiTegoed = {};

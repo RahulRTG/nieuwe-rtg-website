@@ -143,12 +143,12 @@ Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, k
 Object.assign(kern, (() => {
   const { maakVerrekening } = require('../kern/commercie/verrekening');
   const { maakRonde } = require('../kern/commercie/ronde');
-  const prijsmeldingen = require('../kern/commercie/prijsmelding').maakPrijsmeldingen({ db, save, nu: () => Date.now() });
-  const allocatie = require('../kern/commercie/allocatie').maakAllocatie({ db, save, nu: () => Date.now() });
-  const tegoed = require('../kern/commercie/tegoed').maakTegoed({ db, save, nu: () => Date.now() });
+  const prijsmeldingen = require('../kern/commercie/prijsmelding').maakPrijsmeldingen({ db, save });
+  const allocatie = require('../kern/commercie/allocatie').maakAllocatie({ db, save });
+  const tegoed = require('../kern/commercie/tegoed').maakTegoed({ db, save });
   const verrekening = maakVerrekening({ db, save,
     boekAsync: (b) => kern.pay.boekAsync(b), prijsmeldingen, allocatie,
-    rekLid: kern.pay.rekLid, rekPartner: kern.pay.rekPartner, nu: () => Date.now() });
+    rekLid: kern.pay.rekLid, rekPartner: kern.pay.rekPartner });
   const ronde = maakRonde({
     fees: kern.pay.fees, contracten: kern.aanmeldingen && kern.aanmeldingen.contracten,
     tegoed, verrekening, allocatie,
@@ -156,7 +156,7 @@ Object.assign(kern, (() => {
     /* Meldingen gaan door het bestaande kanaal; faalt dat, dan mag de ronde niet
        omvallen -- een melding is geen geld. */
     melden: (m) => { try { if (typeof notify === 'function') notify(m.houder || 'kantoor', { icon: 'geld', title: 'RTG', body: m.tekst }); } catch (e) {} },
-    env: process.env, nu: () => Date.now() });
+    env: process.env });
   /* De tik. Zelfde patroon als de opdrachtenronde van de bank: een vaste
      interval die alleen KIJKT, en die zichzelf niet in de weg zit als een ronde
      langer duurt (elke ronde is idempotent). `unref` zodat een test-server niet

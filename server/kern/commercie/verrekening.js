@@ -39,6 +39,12 @@
    loopt, zou anders twee keer betalen. */
 'use strict';
 
+/* Tijd komt uit de tijdmachine en niet van het besturingssysteem: alleen zo is
+   "wat gebeurt er op 29 februari" een vraag die je kunt stellen (server/lib/klok.js).
+   De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
+   is de klok en niet Date.now(). */
+const klok = require('../../lib/klok');
+
 const REK = {
   ledenvoordeel: 'rtg:ledenvoordeel',
   prijsgarantie: 'rtg:prijsgarantie',
@@ -48,7 +54,7 @@ const REK = {
 const subsidie = require('./subsidie');
 
 function maakVerrekening({ db, save, boekAsync, prijsmeldingen, allocatie, rekLid, rekPartner, nu }) {
-  const tijd = nu || (() => Date.now());
+  const tijd = nu || klok.nu;
   const boek = typeof boekAsync === 'function' ? boekAsync : null;
 
   function orders() { return (db.data && db.data.orders) || []; }

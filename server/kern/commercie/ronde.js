@@ -30,6 +30,12 @@
    handeling van een mens of van een vooraf gezette keuze. */
 'use strict';
 
+/* Tijd komt uit de tijdmachine en niet van het besturingssysteem: alleen zo is
+   "wat gebeurt er op 29 februari" een vraag die je kunt stellen (server/lib/klok.js).
+   De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
+   is de klok en niet Date.now(). */
+const klok = require('../../lib/klok');
+
 const contractlaag = require('./contract');
 
 /* Hoeveel dagen voor het einde van de verbintenis een contract VERLENGBAAR
@@ -40,7 +46,7 @@ const contractlaag = require('./contract');
 const VERLENGVENSTER_DAGEN = 45;
 
 function maakRonde({ fees, contracten, tegoed, verrekening, allocatie, boekAsync, melden, env, nu }) {
-  const tijd = nu || (() => Date.now());
+  const tijd = nu || klok.nu;
   const omgeving = env || process.env;
 
   /* 1. De betaaldienstvergoedingen die niet geboekt raakten. */

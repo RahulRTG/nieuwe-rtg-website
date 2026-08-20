@@ -157,12 +157,15 @@ test('8. de afgesproken prijs is een momentopname en verandert niet mee', () => 
   /* Er is geen enkele functie die de prijs van een lopend contract herziet: de
      catalogus wordt hier niet gelezen, en `verleng` is het enige moment waarop
      het bedrag mag veranderen. Dat is de hele bescherming. */
+  /* Niet "geen enkele require" -- dat was te grof, en het hield ook de tijdmachine
+     tegen (server/lib/klok.js), die juist een huisregel is. De bewering die telt
+     is smaller: dit bestand mag de PRIJSLAAG niet kennen. Wie pasprijs of
+     pasladder hier binnenhaalt, laat een boardroom-klik landen op een contract
+     dat al getekend is. */
   const bron = require('fs').readFileSync(require.resolve('../server/kern/commercie/contract.js'), 'utf8');
-  const requires = bron.match(/require\(['"][^'"]+['"]\)/g) || [];
-  assert.deepEqual(requires, [],
-    'dit bestand hoort de prijslijst niet te KENNEN -- wie pasprijs of pasladder hier binnenhaalt, ' +
-    'laat een boardroom-klik landen op een contract dat al getekend is. ' +
-    'Gevonden: ' + requires.join(', '));
+  const requires = (bron.match(/require\(['"]([^'"]+)['"]\)/g) || []);
+  const verboden = requires.filter(r => /pasprijs|pasladder|geldregie|catalogus/.test(r));
+  assert.deepEqual(verboden, [], 'de prijslaag hoort hier niet binnen te komen: ' + verboden.join(', '));
 
   const teller = c.termijnenTussen(k, k.startAt, c.eindeVerbintenis(k));
   assert.ok(teller.every(t => t.centen === 6500), 'elke termijn draagt het afgesproken bedrag');

@@ -151,6 +151,38 @@ function weegStaat({ a, b, d01, d12, dStil }) {
   return uit;
 }
 
+/* DE STAPELING: rondes vullen elkaar aan in plaats van elkaar te overschrijven.
+   Een volle ronde duurt uren en een container haalt dat niet; zonder stapeling
+   mat --max=N telkens dezelfde eerste N routes en gooide de rest van het
+   register weg -- en dan zakt de normtand bewijsCellenBewezen op een KLEINERE
+   meting, niet op slechtere code. Vers wint van oud, elke rij draagt zijn
+   op-stempel (oude rijen zonder stempel erven die van het oude register), en
+   de telling gaat over de samenvoeging. Puur en los toetsbaar, zelfde reden
+   als weegStaat. */
+function stapelRijen(oudeRijen, oudOp, versPerRoute, nuOp) {
+  const samen = new Map();
+  for (const rij of oudeRijen || []) {
+    samen.set(rij.methode + ' ' + rij.pad, { ...rij, op: rij.op || oudOp || null });
+  }
+  let versGemeten = 0;
+  for (const [sleutel, rij] of Object.entries(versPerRoute || {})) {
+    samen.set(sleutel, { ...rij, op: nuOp });
+    versGemeten++;
+  }
+  const rijen = [...samen.values()];
+  const telling = { state: 0, sideEffect: 0, rollback: 0, rollbackGezakt: 0, idemBewezen: 0, idemGezakt: 0, ongemeten: 0 };
+  for (const r of rijen) {
+    if (r.state === 'bewezen') telling.state++;
+    if (r.sideEffect === 'bewezen') telling.sideEffect++;
+    if (r.rollback === 'bewezen') telling.rollback++;
+    if (r.rollback === 'GEZAKT') telling.rollbackGezakt++;
+    if (r.idempotentie === 'bewezen') telling.idemBewezen++;
+    if (r.idempotentie === 'GEZAKT') telling.idemGezakt++;
+    if (r.state === 'ongemeten' && r.rollback === 'ongemeten') telling.ongemeten++;
+  }
+  return { rijen, telling, versGemeten };
+}
+
 /* Het verschil ONTDAAN van de ruis. Een aparte functie, zodat de regel op een
    plek staat en de toets hem los kan stellen. */
 function zonderRuis(d, ruis) {
@@ -178,19 +210,39 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
     const sleutel = 'staatproef-' + r.pad.replace(/\W+/g, '');
     const lijf = { ...lijfVoor(r), idem: sleutel, idempotentieSleutel: sleutel };
 
-    const doe = async () => {
+    /* DE HERNIEUWING SCHRIJFT ZELF, EN DAT VERGIFTIGDE HET VENSTER. Een 401
+       liet doe() opnieuw inloggen -- en een login schrijft securityLog en
+       sessions, BINNEN het venster f0..f1 dat aan deze route wordt
+       toegerekend. Voor een route die ook met een vers token 401 blijft geven
+       (verkeerde deelrol) vuurde dat bij de aanroep EN de herhaling: zes
+       rtfos-routes stonden zo op 'geweigerd en toch veranderd' zonder dat er
+       iets van hen bewoog. Daarom: hernieuwen mag alleen bij de EERSTE
+       aanroep, en vuurt hij, dan gaat het venster weg en begint de meting
+       opnieuw met een verse afdruk NA de login -- zonder tweede hernieuwing,
+       zodat er hoogstens een login per routemeting bestaat en die nooit in
+       een gemeten venster valt. De herhaling hernieuwt nooit: die hoort
+       hetzelfde token te dragen als de eerste aanroep. */
+    let hernieuwdNu = false;
+    const doe = async (magHernieuwen) => {
       let st = await post(r.pad, lijf, tokenVoor(r.rol));
       oproepen++;
-      if (st.status === 401 && hernieuw) {
-        if (await hernieuw(r.rol)) { hernieuwd++; st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++; }
+      if (magHernieuwen && st.status === 401 && hernieuw) {
+        if (await hernieuw(r.rol)) {
+          hernieuwd++; hernieuwdNu = true;
+          st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++;
+        }
       }
       return st;
     };
 
-    const f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
-    const a = await doe();
+    let f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
+    let a = await doe(true);
+    if (hernieuwdNu && f0) {
+      f0 = await vingerafdruk(); afdrukken++;
+      a = await doe(false);
+    }
     const f1 = await vingerafdruk(); afdrukken++;
-    const b = await doe();
+    const b = await doe(false);
     const f2 = await vingerafdruk(); afdrukken++;
     vorige = f2;
     /* Zonder vingerafdrukken valt er niets te oordelen -- dan is de MEETOPSTELLING
@@ -259,4 +311,4 @@ const CONTROL = {
     'eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.'
 };
 
-module.exports = { draaiStaatproef, weegStaat, zonderRuis, CONTROL };
+module.exports = { draaiStaatproef, weegStaat, zonderRuis, stapelRijen, CONTROL };

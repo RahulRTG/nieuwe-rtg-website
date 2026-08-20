@@ -197,6 +197,61 @@ test('de laatste afdruk van een route is de eerste van de volgende', async () =>
   assert.equal(uit.afdrukken, 7);
 });
 
+test('een hernieuwde login vervuilt het meetvenster niet', async () => {
+  /* Het mechanisme achter zes valse rtfos-bevindingen: een 401 liet doe()
+     opnieuw inloggen, en die login schreef securityLog en sessions BINNEN het
+     venster van de route. Nu: vuurt de hernieuwing, dan gaat het venster weg
+     en start de meting opnieuw met een verse afdruk NA de login. De toets
+     bootst het na: de login beweegt de toestand (verschil over het weggegooide
+     venster), de route zelf beweegt niets -- en de uitslag hoort dan schoon
+     'geweigerd en er bleef niets staan' te zijn, met precies EEN hernieuwing
+     en EEN extra afdruk. */
+  let beurt = 0, logins = 0, oproep = 0;
+  const uit = await draaiStaatproef({
+    post: async () => { oproep++; return { status: 401 }; },
+    hernieuw: async () => { logins++; return true; },
+    vingerafdruk: async () => ({ nr: ++beurt }),
+    /* Alleen het venster dat de login omvat (tussen afdruk 1 en 2) beweegt;
+       daarna is alles stil. */
+    verschilVan: async (voor) => (voor.nr === 1 ? d('securityLog', 'sessions') : niets),
+    routes: [{ methode: 'POST', pad: '/api/rtfos/iets', rol: 'office' }],
+    tokenVoor: () => 't', lijfVoor: () => ({})
+  });
+  const rij = uit.perRoute['POST /api/rtfos/iets'];
+  assert.equal(logins, 1, 'hoogstens een login per routemeting');
+  assert.equal(oproep, 4, 'aanroep, hernieuwde aanroep, herhaalde meting, herhaling');
+  assert.equal(beurt, 4, 'de weggegooide afdruk kost er precies een extra');
+  assert.equal(rij.rollback, 'bewezen',
+    'de login-schrijfacties horen niet aan de route toegerekend: ' + rij.reden);
+});
+
+test('rondes STAPELEN: vers wint, oud blijft, en de telling gaat over de samenvoeging', () => {
+  /* Zonder stapeling overschreef een begrensde ronde het hele register en
+     zakte de normtand op een KLEINERE meting in plaats van slechtere code. */
+  const { stapelRijen } = require('../scripts/lib/staatproef');
+  const oud = [
+    { methode: 'POST', pad: '/api/a', state: 'bewezen', sideEffect: 'bewezen', rollback: 'ongemeten', idempotentie: 'bewezen', op: '2026-08-01T00:00:00Z' },
+    { methode: 'POST', pad: '/api/b', state: 'ongemeten', sideEffect: 'ongemeten', rollback: 'GEZAKT', idempotentie: 'ongemeten' }
+  ];
+  const vers = { 'POST /api/b': { methode: 'POST', pad: '/api/b', state: 'ongemeten', sideEffect: 'ongemeten', rollback: 'bewezen', idempotentie: 'ongemeten' },
+    'POST /api/c': { methode: 'POST', pad: '/api/c', state: 'bewezen', sideEffect: 'bewezen', rollback: 'ongemeten', idempotentie: 'GEZAKT' } };
+  const uit = stapelRijen(oud, '2026-08-10T00:00:00Z', vers, '2026-08-20T00:00:00Z');
+
+  assert.equal(uit.rijen.length, 3, 'twee oude en een nieuwe, met een hermeting ertussen');
+  assert.equal(uit.versGemeten, 2);
+  const per = Object.fromEntries(uit.rijen.map(r => [r.methode + ' ' + r.pad, r]));
+  assert.equal(per['POST /api/a'].op, '2026-08-01T00:00:00Z', 'een eigen op-stempel blijft staan');
+  assert.equal(per['POST /api/b'].op, '2026-08-20T00:00:00Z', 'vers wint en draagt het verse stempel');
+  assert.equal(per['POST /api/b'].rollback, 'bewezen', 'de hermeting vervangt het oude oordeel');
+  assert.deepEqual(uit.telling, { state: 2, sideEffect: 2, rollback: 1, rollbackGezakt: 0,
+    idemBewezen: 1, idemGezakt: 1, ongemeten: 0 }, 'de telling gaat over de samenvoeging');
+  /* En een oude rij ZONDER eigen stempel erft die van het oude register --
+     nooit het verse, want dan lijkt oud bewijs jonger dan het is. */
+  const zonder = stapelRijen([{ methode: 'GET', pad: '/api/x', state: 'ongemeten', rollback: 'ongemeten' }],
+    '2026-07-01T00:00:00Z', {}, '2026-08-20T00:00:00Z');
+  assert.equal(zonder.rijen[0].op, '2026-07-01T00:00:00Z');
+});
+
 test('bewoog er bij GEEN ENKELE route iets, dan meldt de ronde zichzelf blind', async () => {
   /* Zonder deze controle levert een niet-aangesloten vingerafdruk een keurige
      lijst met nullen op -- de gevaarlijkste uitkomst die dit ding kan geven. */

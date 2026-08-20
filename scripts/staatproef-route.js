@@ -26,7 +26,7 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
-const { draaiStaatproef } = require('./lib/staatproef');
+const { draaiStaatproef, stapelRijen } = require('./lib/staatproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
@@ -134,9 +134,34 @@ if (require.main !== module) { module.exports = {}; return; }
      klopt hij zonder sleutel aan en meet hij niets.
      Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
   const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
-  const routes = verdeling.metRol;
+  /* DE RONDE STAPELT, NET ALS DE OUTPUT-BAND. Een volle ronde duurt uren en
+     een container haalt dat niet; met --max=N mat hij vroeger telkens DEZELFDE
+     eerste N routes en gooide de rest van het register weg. Nu: wat er al
+     staat blijft staan (met zijn eigen op-stempel), de rij begint bij routes
+     ZONDER rij en daarna bij de oudste meting, en de uitslag hieronder is de
+     samenvoeging. Zo bereikt een reeks begrensde rondes de hele populatie,
+     over herstarts heen -- en de normtand bewijsCellenBewezen kan niet meer
+     zakken doordat een kleine ronde een groot register overschrijft. */
+  let oudeRijen = [], oudOp = '1970-01-01T00:00:00Z';
+  try {
+    const oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8'));
+    oudOp = (oud.stempel && oud.stempel.op) || oudOp;
+    oudeRijen = oud.perRoute || [];
+  } catch (e) {}
+  const eerder = new Map(oudeRijen.map(rij => [rij.methode + ' ' + rij.pad, { ...rij, op: rij.op || oudOp }]));
+  /* De rij: eerst wat geen rij heeft, dan wat GESCHORST staat (een gezakte
+     cel sluit alleen door hermeting, PROOF.md par. 2), dan de oudste meting. */
+  const zakte = (r) => r && (r.rollback === 'GEZAKT' || r.idempotentie === 'GEZAKT') ? 0 : 1;
+  const routes = verdeling.metRol.slice().sort((x, y) => {
+    const a = eerder.get(x.methode + ' ' + x.pad), b = eerder.get(y.methode + ' ' + y.pad);
+    if (!a && !b) return 0;
+    if (!a) return -1;
+    if (!b) return 1;
+    return (zakte(a) - zakte(b)) || String(a.op).localeCompare(String(b.op));
+  });
   console.log('  routes gevonden                      : ' + kandidaten.length);
   console.log('  routes met een herkenbare rol        : ' + routes.length);
+  console.log('  waarvan al een rij in het register   : ' + routes.filter(r => eerder.has(r.methode + ' ' + r.pad)).length);
   meldZonderRol(verdeling);
 
   const ruwRoutes = routes;
@@ -183,17 +208,22 @@ if (require.main !== module) { module.exports = {}; return; }
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }
 
-  const t = uit.telling;
-  const rijen = Object.values(uit.perRoute);
+  /* De samenvoeging: vers wint, en wat niet is hermeten houdt zijn oude rij en
+     zijn eigen op-stempel. De telling gaat over de SAMENVOEGING; die van
+     draaiStaatproef gaat alleen over deze ronde. Regel en toets wonen in
+     scripts/lib/staatproef.js (stapelRijen). */
+  const { rijen, telling: t, versGemeten } =
+    stapelRijen(oudeRijen, oudOp, uit.perRoute, new Date().toISOString());
   const beoordeeld = rijen.filter(r => r.state === 'bewezen' || r.rollback !== 'ongemeten').length;
+  console.log('  vers gemeten deze ronde              : ' + versGemeten);
   console.log('  oproepen                             : ' + uit.oproepen);
   console.log('  BEOORDEELD                           : ' + beoordeeld + ' / ' + routes.length);
   /* GEEN STILLE AFKAPPING. Draait de ronde met een begrenzing, dan hoort er te
      staan wat er NIET is beproefd -- anders leest 'geen bevindingen' als een
      uitspraak over alle routes terwijl hij er een deel heeft gezien. */
   if (MAX && rijen.length < routes.length) {
-    console.log('  NIET BEPROEFD (begrenzing ' + MAX + ')      : ' + (routes.length - rijen.length) +
-      '   <- geen bevinding is hier geen uitspraak');
+    console.log('  NOG GEEN RIJ (begrenzing ' + MAX + ')       : ' + (routes.length - rijen.length) +
+      '   <- geen bevinding is hier geen uitspraak; de volgende ronde begint daar');
   }
   console.log('      STATE bewezen                    : ' + t.state);
   console.log('      SIDE_EFFECT bewezen              : ' + t.sideEffect);
@@ -211,14 +241,16 @@ if (require.main !== module) { module.exports = {}; return; }
     stempel: stempel(),
     uitleg: 'Per route drie vingerafdrukken rond twee gelijke oproepen. De eerste oproep IJKT: ' +
       'bewoog de toestand niet, dan is er over deze route niets te zeggen en staat alles op ongemeten. ' +
-      'Een route die hier NIET in staat is niet beproefd. Zie scripts/lib/staatproef.js voor de grens.',
+      'Een route die hier NIET in staat is niet beproefd. De rijen STAPELEN over rondes heen: elke rij ' +
+      'draagt zijn eigen op-stempel, een nieuwe ronde hermeet eerst wat geen rij heeft en dan de oudste. ' +
+      'Zie scripts/lib/staatproef.js voor de grens.',
     /* WAT ER NIET IS BEPROEFD, met de reden erbij. Zonder dit veld leest
        routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
        bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
     nietBeproefbaar: verdeling.zonderRol.length,
     redenenNietBeproefbaar: verdeling.redenen,
     routesGevonden: kandidaten.length,
-    gemeten: { routesMetRol: routes.length, beoordeeld, oproepen: uit.oproepen,
+    gemeten: { routesMetRol: routes.length, beoordeeld, versGemeten, oproepen: uit.oproepen,
       state: t.state, sideEffect: t.sideEffect, rollback: t.rollback, rollbackGezakt: t.rollbackGezakt,
       idemBewezen: t.idemBewezen, idemGezakt: t.idemGezakt, ongemeten: t.ongemeten,
       tokensHernieuwd: uit.hernieuwd, blindeRondes: uit.meterStuk ? 1 : 0,

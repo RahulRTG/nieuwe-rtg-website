@@ -291,6 +291,16 @@ const BEVEILIGING = [
    te groeien met de app en zelden te krimpen. Een nieuwe route die per ongeluk
    publiek is, valt hier meteen op. */
 const PUBLIEK = new Map([
+  /* De commerciele kern (#98): drie beweringen die ook in de voorwaarden staan.
+     Een voorwaardenpagina hoort ze HIER op te halen in plaats van ze zelf op te
+     schrijven -- dat uiteenlopen was de oorzaak van "0% commissie" naast een
+     knop op 12%. Zetten zit achter de boardroom-poort; dit is alleen lezen. */
+  ['GET /api/betaaldiensttarief', 'het tarief staat in de partnervoorwaarden en mag niet los lopen van wat de code rekent'],
+  ['POST /api/betaaldiensttarief', 'idem; de POST geeft dezelfde lijst terug als de GET'],
+  ['GET /api/sociaalbeleid', 'de verdeelregels van de bijdrage zijn een belofte aan leden, dus leesbaar zonder inlog'],
+  ['POST /api/sociaalbeleid', 'idem; de POST geeft dezelfde lijst terug als de GET'],
+  ['GET /api/claims', 'wat RTG publiek beweert, met per bewering de waarde, de bron en hoe hard hij is'],
+  ['POST /api/claims', 'idem; de POST geeft dezelfde lijst terug als de GET'],
   // de voordeur zelf: zonder deze routes kan niemand ooit inloggen
   ['POST /api/auth/register', 'aanmelden kan per definitie niet ingelogd'],
   ['POST /api/auth/login', 'inloggen'],

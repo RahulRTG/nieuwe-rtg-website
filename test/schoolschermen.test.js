@@ -131,6 +131,19 @@ test('elk school-endpoint heeft een scherm, of staat in het register van opensta
     'Wel op de server, geen scherm, niet in OPEN: ' + zonderScherm.filter(e => !OPEN.includes(e)).join(', ') + '\n' +
     'In OPEN maar inmiddels wel een scherm (haal ze uit de lijst): ' + OPEN.filter(e => !zonderScherm.includes(e)).join(', '));
   assert.ok(server.size >= 165, 'de school heeft minder endpoints dan verwacht: ' + server.size);
+
+  /* HET GETAL IN SCHOOL.md IS EEN BEWERING, DUS HET WORDT GEMETEN. Er stond
+     "168 van 168" terwijl er 201 waren: het aantal liep tien bouwrondes achter
+     zonder dat iets rood werd. Een getal dat een mens moet bijwerken, loopt
+     achter -- dus staat het hier vast aan de meting en niet aan iemands
+     geheugen. */
+  const school = fs.readFileSync(path.join(__dirname, '..', 'SCHOOL.md'), 'utf8');
+  const rij = school.split('\n').find(r => r.includes('Elk endpoint heeft een scherm'));
+  assert.ok(rij, 'de belofte "elk endpoint heeft een scherm" staat niet meer in SCHOOL.md');
+  const paar = rij.match(/(\d+) van (\d+)/);
+  assert.ok(paar, 'de rij in SCHOOL.md noemt geen aantal, dus de belofte is niet na te rekenen: ' + rij.trim());
+  assert.equal(Number(paar[1]), server.size, 'SCHOOL.md loopt achter: er zijn ' + server.size + ' school-endpoints');
+  assert.equal(Number(paar[2]), server.size, 'SCHOOL.md loopt achter: er zijn ' + server.size + ' school-endpoints');
 });
 
 test('de vier schermen van deze ronde bestaan en spreken de juiste endpoints aan', () => {

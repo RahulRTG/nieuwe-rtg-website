@@ -402,9 +402,9 @@ worden -- door de school, door ons, door een toezichthouder.
 | Geen zorgtoegang zonder doel en reden | invariant + toets | **ja** (`test/schoolenterprise.test.js`) |
 | Een rapport bereikt het gezin alleen na menselijke vaststelling | invariant + toets | **ja** (`test/schoolbeeld.test.js`) |
 | AI stelt nooit zelfstandig een schooladvies vast | policytoets + mutatie | **ja** in de kern, nog niet in elke laag |
-| Geen hulpvraag raakt zoek | SLA + opvolgbewijs | hulplijn bestaat, opvolgbewaking niet (§12) |
+| Geen hulpvraag raakt zoek | SLA + opvolgbewijs | **ja** sinds 19 augustus 2026 (`test/opvolging.test.js`), met mutatie beproefd |
 | 114 talen | vertaaldekking + steekproef op kwaliteit | vertaallaag bestaat, dekking niet gemeten |
-| Elk endpoint heeft een scherm | registertoets | **ja**, 168 van 168 |
+| Elk endpoint heeft een scherm | registertoets | **ja**, 201 van 201 (gemeten 20 augustus 2026) |
 
 Wie een belofte toevoegt zonder meting, voegt geen belofte toe maar een risico.
 
@@ -412,9 +412,9 @@ Wie een belofte toevoegt zonder meting, voegt geen belofte toe maar een risico.
 
 ## 8. De taallaag -- leren ondanks een taalbarrière, zonder het Nederlands weg te nemen
 
-> **Gebouwd op 19 augustus 2026.** Het vakbeleid met de harde regel, en de
-> poort naar het gezin met de terugvertaling en het bonnetje. De Language
-> Independence Test staat er nog niet -- zie het eind van deze paragraaf.
+> **Gebouwd op 19 augustus 2026.** Het vakbeleid met de harde regel, de poort
+> naar het gezin met de terugvertaling en het bonnetje, en de Language
+> Independence Test -- zie het eind van deze paragraaf.
 
 Niet overal een vertaalknop. Elke inhoudseenheid draagt een canonieke vorm plus
 representaties per taal, en de school stelt de regel in:
@@ -953,7 +953,10 @@ Er is één juiste eerste stap, en het is niet de spannendste.
     dragen, de overdracht per doel met een restlijst, en de werkende overstap
     tussen twee RTG-scholen (zie §13). Wat er nog niet is: een verbinding met
     een van die externe diensten zelf. Dat is geen vertaalvraag maar een kwestie
-    van sleutels, contracten en een partij aan de andere kant.
+    van sleutels, contracten en een partij aan de andere kant -- en van de
+    veldnamen, want van drie van de vier standaarden was de specificatie op 19
+    augustus 2026 niet te lezen. Die kaarten staan als **onbevestigd** in
+    `kern/koppelvlak-kaarten.js`, met per veld waarom.
 
 Elke stap krijgt zijn meting uit §7 mee, en elke grens uit §11 wordt door een
 toets bewaakt die iemand heeft zien zakken (LAT-regel 2).

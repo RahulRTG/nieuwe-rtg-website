@@ -17,6 +17,7 @@
 
     1. Meedoen is een eigen handeling: je hebt de code en je gebruikt hem.
     2. Er bestaat geen manier om iemand anders toe te voegen.
+   2b. Een code opzoeken voegt niemand toe, en gokt niet bij twijfel.
     3. Een code hoort bij EEN editie.
     4. Een code is in te trekken, en de oude werkt daarna niet meer.
     5. Er is geen hoofd van de groep: elk lid mag de code vernieuwen.
@@ -72,8 +73,35 @@ test('2. er bestaat geen manier om iemand anders toe te voegen', () => {
      hoort er een gesprek te volgen -- niet een stille uitbreiding. */
   const namen = Object.keys(w.k).filter(n => /^groep/.test(n)).sort();
   assert.deepEqual(namen,
-    ['groepCodeVernieuw', 'groepDeelnemen', 'groepMaak', 'groepStand', 'groepVerlaat', 'groepenVan'],
+    ['groepCodeVernieuw', 'groepDeelnemen', 'groepEditieVanCode', 'groepMaak', 'groepStand',
+      'groepVerlaat', 'groepenVan'],
     'geen groepNodig, groepVoegToe of groepUitnodig: RTG legt geen contact namens iemand');
+});
+
+test('2b. het opzoeken van een code voegt niemand toe, en gokt niet bij twijfel', () => {
+  /* `groepEditieVanCode` is de enige naam die ooit aan de lijst hierboven is
+     toegevoegd, en de reden staat in de kop van kern/festival/groep.js: een lid
+     dat nog niets heeft, ziet ook nog geen festival en kon de code die hij van
+     een vriend kreeg nergens invullen.
+
+     Hij zet NIEMAND ergens in -- hij vertaalt een code naar een editie, en het
+     meedoen zelf loopt daarna onveranderd langs groepDeelnemen, met de codenaam
+     uit de sessie. Deze toets legt allebei die eigenschappen vast. */
+  const w = wereld();
+  const g = w.maak('Naar Testival', 'Kobalt').groep;
+  const gevonden = w.k.groepEditieVanCode(g.code);
+  assert.equal(gevonden.eid, w.eid);
+  assert.equal(w.k.groepStand(w.fid, w.eid, g.id, 'Kobalt').leden.length, 1,
+    'opzoeken alleen voegt niemand toe');
+
+  assert.equal(w.k.groepEditieVanCode('ZZZZZZZZZZ'), null);
+
+  /* Dezelfde code in twee edities: dan is er geen goed antwoord, en wordt er
+     niet gegokt. Gokken zou iemand in de groep van een vreemde zetten. */
+  const tweede = w.k.editieNieuw(w.fid, { jaar: 2028 }).editie.id;
+  const ander = w.k.groepMaak(w.fid, tweede, { naam: 'Volgend jaar', maker: 'Ivo' }).groep;
+  ander.code = g.code;
+  assert.equal(w.k.groepEditieVanCode(g.code).meerdere, true);
 });
 
 test('3. een code hoort bij EEN editie', () => {

@@ -329,7 +329,7 @@ uitkomt is een **aanbod**, en het draagt zichtbaar waaruit het volgt.
 | **beleid** | de drempels en de handelingsruimte: veilige capaciteit per plek, wanneer iets een uitzondering wordt, welke handelingen vanzelf mogen | door een mens met een naam getekend vóór de poorten open; de gesloten lijst van vier staat er nooit in |
 | **cockpit** | Festival Command: uitzonderingsgestuurd, met voorspelling en aanlooptijd | rust is een uitkomst, geen leegte; wat goed gaat komt niet in beeld |
 | **Rahul** | de gegronde stem, in drie standen: gast, crew, directie | rekent met echte cijfers, noemt zijn bron, en zegt "dat weet ik niet" als de meting ontbreekt |
-| **actielog** | de tijdlijn van de editie: elke scan, elke inzet, elke beslissing, elk bewijs | groeit aan, wordt nooit herschreven — en is daarmee de reconstructie achteraf |
+| **actielog** | de tijdlijn van de editie: de scans (per poort per kwartier geteld), elke inzet, elke beslissing, elk bewijs | groeit aan, wordt nooit herschreven — en is daarmee de reconstructie achteraf. Hier stond eerst *elke* scan; dat botst met par. 5.1, en par. 5 wint |
 
 ---
 
@@ -342,7 +342,11 @@ uitkomt is een **aanbod**, en het draagt zichtbaar waaruit het volgt.
 3. de **uitzonderingenmotor** — van toestand naar een gerangschikte lijst met
    aanlooptijd;
 4. de **gereedheid** met controls en bewijs;
-5. de **editie-tijdlijn** als één stroom.
+5. de **editie-tijdlijn** als één stroom. ✅ `kern/festival/tijdlijn.js` —
+   samenvoegen en sorteren, meer niet: elke regel draagt zijn bron, want deze
+   laag is precies zo onherschrijfbaar als de bron eronder. Scans en passen
+   staan er geteld in en niet een voor een (par. 5.1); groepen staan er niet in,
+   want die zijn tussen gasten.
 
 **Niet nieuw, en dus expliciet verboden om na te bouwen:** rooster, loonrun,
 meldkamer, vergunning, keuken, kassa, polsband, inkoopketen, pendeldienst,

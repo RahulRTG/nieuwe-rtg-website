@@ -175,8 +175,14 @@ module.exports = (ctx) => {
   const publiekeEditie = (e) => ({ id: e.id, naam: e.naam, jaar: e.jaar, dagen: e.dagen || [],
     plekken: Object.keys(e.plekken || {}).length, passen: Object.keys(e.passen || {}).length });
 
-  return { festivalNieuw, festivalVind, editieNieuw, editieVind, dagZet, dagVind, dagOpMoment,
-    offset, momentOffset, duurVan, publiekFestival: publiek, HHMM };
+  /* ALLE festivals, en dat is er precies EEN nodig voor: ./gast.js moet weten
+     waar een lid een pas of een groep heeft, en een lid kent geen festival-id.
+     Er komt hier geen filter bij; wie op eigenaar wil zoeken, doet dat waar de
+     eigenaar iets betekent (routes/festival.js, mijn()). */
+  const festivalAlle = () => Object.values(bak());
+
+  return { festivalNieuw, festivalVind, festivalAlle, editieNieuw, editieVind, dagZet, dagVind,
+    dagOpMoment, offset, momentOffset, duurVan, publiekFestival: publiek, HHMM };
 };
 
 module.exports.offset = offset;

@@ -1,4 +1,10 @@
-/* Routes "festival" (deelmodule): DE NORM, DE VOORSPELLING EN HET GEHEUGEN.
+/* Routes "festival" (deelmodule): DE NORM, DE VOORSPELLING, HET GEHEUGEN EN DE
+   TIJDLIJN.
+
+   VIER ONDERWERPEN IN EEN BESTAND, EN DAT IS EEN KEUZE. Ze horen bij elkaar
+   omdat ze alle vier over TIJD gaan: wat er straks hoort te staan, wat er
+   straks misgaat, wat er gisteren gebeurde en waar dat uit blijkt. Wie hier een
+   vijfde bij zet dat daar niet over gaat, splitst het bestand.
 
    DE NORM IS MANAGERWERK. Wat er ergens hoort te staan, is een uitspraak over
    het festival en niet over een dienst; wie hem mag zetten, mag ook het rooster
@@ -96,5 +102,18 @@ module.exports = (kern, deur) => {
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);
     stuur(res, festival.vergelijk(f.id, editieVan(req)));
+  });
+
+  /* DE TIJDLIJN LEEST DE VLOER OOK. Anders dan het geheugen staat hij niet
+     achter managerOnly: er staat geen gastgegeven in (scans en passen zijn
+     geteld, groepen ontbreken) en het is midden in de nacht juist de crew die
+     moet kunnen nakijken wanneer iets is klaargezet of afgetekend. Wat er wel
+     in staat -- wie wat besliste -- zien diezelfde mensen ook op Gereed. */
+  app.post('/api/festival/tijdlijn', supplierAuth, (req, res) => {
+    const f = mijn(req);
+    if (!f) return stuur(res, geenFestival);
+    const b = req.body || {};
+    stuur(res, festival.tijdlijn(f.id, editieVan(req), {
+      dag: b.dag || null, soorten: Array.isArray(b.soorten) ? b.soorten : null }));
   });
 };

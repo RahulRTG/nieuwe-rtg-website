@@ -42,12 +42,29 @@ module.exports = (kern) => {
     }));
   });
 
+  /* MEEDOEN KAN OOK MET ALLEEN EEN CODE, en dat is geen gemak maar een gat dat
+     dichtmoest: een lid dat nog niets heeft, ziet ook nog geen festival, en kon
+     de code die hij van een vriend kreeg dus nergens kwijt. De editie wordt dan
+     uit de code zelf afgeleid (kern/festival/groep.js, groepEditieVanCode).
+
+     EEN VERKEERDE CODE GEEFT DEZELFDE WEIGERING ALS ALTIJD. Er komt geen route
+     bij die vertelt of een code bestaat; het opzoeken gebeurt binnen deze ene
+     handeling, en het antwoord op een onbekende code is 404 -- net als voorheen. */
   app.post('/api/festival/groep/mee', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    const w = waar(req);
+    const code = (req.body || {}).code;
+    let w = waar(req);
+    if (!w) {
+      const gevonden = festival.groepEditieVanCode(code);
+      if (gevonden && gevonden.meerdere) {
+        return stuur(res, { status: 409,
+          error: 'Deze code bestaat bij meer dan een festival. Kies eerst het festival.' });
+      }
+      w = gevonden;
+    }
     if (!w) return stuur(res, nietGevonden);
     stuur(res, festival.groepDeelnemen(w.fid, w.eid, {
-      code: (req.body || {}).code, codenaam: liveCodename(req.session)
+      code, codenaam: liveCodename(req.session)
     }));
   });
 

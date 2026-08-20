@@ -9,6 +9,11 @@
    ziet wat hij doet. Een norm die je invult op een ander blad dan waar de
    uitkomst staat, wordt een keer ingevuld en daarna nooit meer bijgesteld.
 
+   DE TIJDLIJN STAAT ONDERAAN, bij het geheugen en niet op een eigen blad. Ze
+   kijken allebei terug: het geheugen zegt wat een dag heeft opgeleverd, de
+   tijdlijn waar dat uit blijkt. Een eigen knop in de bank zou een tiende maken,
+   en dan wordt op een telefoon elk raakvlak in die balk weer een stukje kleiner.
+
    HET AFSLUITEN VAN DE DAG STAAT ERONDER, en dat is met opzet het laatste dat
    je op dit blad tegenkomt: het is het einde van de avond. Wat er dan wordt
    vastgelegd, verandert daarna niet meer mee (kern/festival/geheugen.js). */
@@ -168,6 +173,31 @@
       });
   }
 
+  function tekenLijn() {
+    var lijst = $('#vuLijn');
+    lijst.textContent = '';
+    if (!F.staat.fid) return Promise.resolve();
+    var soort = $('#vuLijnSoort').value;
+    return F.api('/api/festival/tijdlijn', { festival: F.staat.fid, editie: F.staat.eid,
+      dag: $('#vuLijnDag').value || null, soorten: soort ? [soort] : null })
+      .then(function (r) {
+        var b = r.body || {};
+        if (!b.ok) { $('#vuLijnStil').textContent = b.error || ''; return; }
+        b.gebeurtenissen.forEach(function (g) {
+          regel(lijst, null, g.zin + (g.door ? ' \u00b7 ' + g.door : ''),
+            String(g.op).slice(5, 16).replace('T', ' '));
+        });
+        /* GEEN STILLE AFKAPPING: wat er niet staat, staat er wel bij. */
+        $('#vuLijnStil').textContent = b.aantal
+          ? b.aantal + ' gebeurtenissen'
+            + (b.meer ? ', waarvan ' + b.meer + ' niet getoond -- kies een dag of een soort om te knijpen.' : '.')
+          : 'Er is op deze editie nog niets vastgelegd.';
+      });
+  }
+
+  $('#vuLijnDag').addEventListener('change', tekenLijn);
+  $('#vuLijnSoort').addEventListener('change', tekenLijn);
+
   F.opBlad('vooruit', function () {
     var plekken = F.staat.plekken.map(function (p) { return { value: p.id, tekst: p.naam }; });
     var dagen = (F.staat.dagen || []).map(function (d) { return { value: d.id, tekst: d.datum }; });
@@ -175,8 +205,10 @@
       F.inr.vulKeuze($('#vuPlek'), plekken);
       F.inr.vulKeuze($('#vuDag'), dagen, 'elke dag');
       F.inr.vulKeuze($('#vuSluitDag'), dagen, 'kies een dag');
+      F.inr.vulKeuze($('#vuLijnDag'), dagen, 'de hele editie');
     }
     herlaad();
     geheugen();
+    tekenLijn();
   });
 })();

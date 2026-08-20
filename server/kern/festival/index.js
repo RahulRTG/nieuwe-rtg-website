@@ -20,6 +20,8 @@
      ./norm.js          de maat    wat er hoort te staan -- een getal van een mens
      ./voorspelling.js  vooruit    het gat voordat het er is, en het leeglopen
      ./groep.js         samen      een groep gasten; RTG verstuurt hier niets
+     ./gast.js          de gast    zijn eigen pas, zijn groep, het programma --
+                                   en verder niets van deze wereld
      ./partner.js       banden     een band die beide kanten sluiten
      ./signalen.js      van buiten wat andere domeinen al bijhouden
      ./uitzondering.js  vooruit    wat er over dertig minuten misgaat
@@ -27,6 +29,8 @@
      ./gereedheid.js    de uitslag het ene getal waar een terrein op opengaat
      ./geheugen.js      terug      wat er werkelijk gebeurde, vastgelegd bij het
                                    afsluiten en daarna niet meer herrekend
+     ./tijdlijn.js      de actielog een stroom uit alle stempels die er al staan;
+                                   bezit niets, leest alles
 
    DE VOLGORDE VAN OPBOUW IS NIET VRIJ, en het is dezelfde reden als bij
    kern/concern/index.js: elk deel leest wat het vorige heeft neergezet. ./model
@@ -79,6 +83,9 @@ module.exports = (ctx) => {
   Object.assign(k, require('./norm')(k));
   Object.assign(k, require('./voorspelling')(k));
   Object.assign(k, require('./groep')(k));
+  /* ./gast.js na ./groep.js: hij leest groepenVan om te weten waar een lid iets
+     heeft. */
+  Object.assign(k, require('./gast')(k));
   Object.assign(k, require('./partner')(k));
   Object.assign(k, require('./signalen')(k));
   Object.assign(k, require('./uitzondering')(k));
@@ -89,6 +96,9 @@ module.exports = (ctx) => {
   /* ./geheugen.js als allerlaatste: het leest de telling, de bemensing en de
      gereedheid, dus alles hierboven moet er al staan. */
   Object.assign(k, require('./geheugen')(k));
+  /* ./tijdlijn.js helemaal onderaan: hij leest de stempels van alle lagen
+     hierboven en zet er niet een van zichzelf naast. */
+  Object.assign(k, require('./tijdlijn')(k));
 
   /* ---------- de samenvatting ----------
 

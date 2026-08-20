@@ -124,8 +124,10 @@ module.exports = (kern) => {
   });
 
   /* Een pas uitgeven is een handeling met geld- en toegangsgevolgen, dus
-     managerOnly. De VERKOOP zelf (betalen, bundels, groepen) is fase 5 en staat
-     er bewust nog niet: een halve betaalweg is erger dan geen. */
+     managerOnly. Dit is de HANDMATIGE weg -- crew, artiest, leverancier. De
+     verkoop met betaling en bundels staat in ./festival/verkoop.js en geeft
+     zijn passen langs dezelfde pasUitgeven() uit, zodat er een plek is waar een
+     pas ontstaat en niet twee. */
   app.post('/api/festival/pas', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
     const f = mijn(req);
@@ -155,6 +157,9 @@ module.exports = (kern) => {
   require('./festival/artiest')(kern, { mijn, editieVan, geenFestival, stuur });
   require('./festival/vooruit')(kern, { mijn, editieVan, geenFestival, stuur });
   /* De ledenkant staat los: een groep is tussen gasten en kent geen eigenaar
-     van het festival, dus hij krijgt de deur-hulpjes hierboven niet mee. */
+     van het festival, dus hij krijgt de deur-hulpjes hierboven niet mee. Dat
+     geldt net zo voor ./festival/gast.js: een gast bezit geen festival, hij
+     heeft er alleen een pas in. */
   require('./festival/groep')(kern);
+  require('./festival/gast')(kern);
 };

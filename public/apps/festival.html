@@ -80,6 +80,11 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 .fp-label{flex:0 0 auto;color:var(--rtg-soft);font-size:.85rem;}
 .fp-vink{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--rtg-soft);
   min-height:44px;}
+/* HET VAKJE ZELF MOET OOK RAAK TE KRIJGEN ZIJN. Een label van 44px hoog met een
+   vinkje van 13x13 erin haalt de eis van TOEGANKELIJK.md niet -- daar gaat het
+   om het RAAKVLAK en niet om de regel eromheen. Dit viel pas op toen Inrichten
+   op een telefoon bereikbaar werd; daarvoor kwam de scan er nooit langs. */
+.fp-vink input{width:24px;height:24px;flex:0 0 auto;}
 .fp-vak{margin-top:26px;}
 .fp-h2{font:500 1.05rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.02em;
   margin:26px 0 0;color:var(--rtg-txt);}
@@ -232,6 +237,26 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
           </div>
           <p class="fp-stil" id="vuTerug"></p>
           <div class="fp-lijst" id="vuGeheugen"></div>
+
+          <h2 class="fp-h2">Wat er gebeurd is</h2>
+          <p class="fp-stil">De tijdlijn van deze editie. Scans en passen staan geteld
+            per kwartier -- een bezoeker is een telling en geen spoor. Elke regel zegt
+            waar hij vandaan komt.</p>
+          <div class="fp-form">
+            <select class="veld" id="vuLijnDag" aria-label="Welke dag"></select>
+            <select class="veld" id="vuLijnSoort" aria-label="Welke soort gebeurtenis">
+              <option value="">alles</option>
+              <option value="scan">scans</option>
+              <option value="pas">passen</option>
+              <option value="boeking">programma</option>
+              <option value="rider">rider</option>
+              <option value="bewijs">bewijs</option>
+              <option value="partner">partners</option>
+              <option value="afsluiting">afsluitingen</option>
+            </select>
+          </div>
+          <div class="fp-lijst" id="vuLijn"></div>
+          <p class="fp-stil" id="vuLijnStil"></p>
         </div>
       </div>
 

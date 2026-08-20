@@ -41,7 +41,7 @@ const LEESBAAR = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const MAX_LEDEN = 50;
 
 module.exports = (ctx) => {
-  const { save, crypto, schoon, editieVind } = ctx;
+  const { save, crypto, schoon, editieVind, festivalAlle } = ctx;
 
   const bak = (e) => {
     if (!e.groepen || typeof e.groepen !== 'object') e.groepen = {};
@@ -160,6 +160,40 @@ module.exports = (ctx) => {
   const groepenVan = (e, codenaam) => Object.values((e && e.groepen) || {})
     .filter(g => !g.beeindigd && isLid(g, codenaam));
 
+  /* WELKE EDITIE HOORT BIJ DEZE CODE.
+
+     Dit bestaat om een gat dat pas in de browser zichtbaar werd: een lid dat nog
+     NIETS heeft -- geen pas, geen groep -- ziet ook geen festival, en kon dus de
+     code die hij van een vriend kreeg nergens invullen. Terwijl dat juist het
+     eerste is wat er gebeurt: iemand regelt de kaarten, de rest doet mee.
+
+     ER KOMT GEEN ZOEK-ENDPOINT OP. Deze functie wordt alleen binnen het
+     MEEDOEN gebruikt (routes/festival/groep.js): een verkeerde code geeft
+     precies dezelfde weigering als altijd, dus er ontstaat geen orakel dat
+     vertelt welke codes bestaan. Een code is tien tekens uit een leesbaar
+     alfabet -- ruim 6 x 10^13 mogelijkheden -- dus over alle edities zoeken
+     maakt raden niet merkbaar makkelijker; een eigen zoekroute wel.
+
+     BIJ TWIJFEL WEIGERT HIJ. Bestaat dezelfde code in twee edities, dan is er
+     geen goed antwoord en wordt er niet gegokt: dan hoort het lid erbij te
+     zeggen om welk festival het gaat. */
+  function groepEditieVanCode(code) {
+    const c = schoon(code, 12);
+    if (!c) return null;
+    const treffers = [];
+    for (const f of festivalAlle()) {
+      for (const e of Object.values(f.edities || {})) {
+        if (Object.values(e.groepen || {}).some(g => !g.beeindigd && g.code === c)) {
+          treffers.push({ fid: f.id, eid: e.id });
+        }
+      }
+    }
+    if (!treffers.length) return null;
+    if (treffers.length > 1) return { meerdere: true };
+    return treffers[0];
+  }
+
   return { groepMaak, groepDeelnemen, groepVerlaat, groepCodeVernieuw, groepStand,
+    groepEditieVanCode,
     groepenVan, GROEP_MAX: MAX_LEDEN };
 };

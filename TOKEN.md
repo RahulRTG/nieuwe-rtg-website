@@ -228,28 +228,32 @@ kop van het bestand zodat niemand hem "overbodig" noemt.
 | 2b | De zaakkant op een scherm (`apps/zaakpay.html`): saldo, innen, uitbetalen én tegoed | gebouwd |
 | 3 | De bestaande punten kloppend: centen, een plafond, een vermogen, en toetsen. Plus de cadeaukaart die niet betaald werd | gebouwd |
 | 3b | Het punten-tegoed door het pay-grootboek laten lopen. **Geblokkeerd**: dat kan pas als bestellingen, rekeningen en ritten zélf via RTG Pay betaald worden, en dat doen ze niet (par. 7) | — |
-| 4 | Het besluit over de bank-uitgang (par. 7) en, als dat valt, de vergunningsroute | — |
+| 4 | Het besluit over de bank-uitgang (par. 7) | genomen: brug is eenrichtingsverkeer |
 | 5 | E-money, eigen of via distributie. Begint niet met code maar met een vergunning | — |
 
 Geen fase begint voordat de vorige zijn toetsen heeft (LAT.md).
 
 ## 7. De besluiten die openstaan
 
-Vijf dingen kan software niet voor Rahul beslissen. Ze staan hier zodat ze niet
-als weglating in de code zitten.
+Van de vijf dingen die software niet voor Rahul kon beslissen, zijn er drie
+genomen (1, 2 en 3). Ze blijven staan met hun uitkomst, want een besluit
+waarvan de reden verdwijnt, wordt over een jaar opnieuw gevoerd. Wat nog open
+staat is 4 en 5.
 
-1. **De bank-uitgang raakt de grond onder `WALLET_SALDO`.** Het besluit zegt dat
-   walletsaldo *niet wordt uitbetaald aan het lid*. Dat klopt vandaag. Maar
-   zodra RTG Bank voor leden live gaat, bestaat de keten wallet → walletbrug →
-   eigen rekening → SEPA naar buiten. Dan is walletsaldo wél uitbetaalbaar en
-   vervalt een van de drie voorwaarden. Dit is precies het geval dat het besluit
-   zelf benoemt ("dan hoort dit vermogen van soort te wisselen"). Te beslissen
-   vóór de bank opengaat, niet erna.
-2. **Mag een partner e-money voor ons uitgeven?** `GELD_UITGEVEN` staat op
-   `partnerRail: null`. Als distributie namens een vergunninghoudende EMI een
-   route is die we openhouden, hoort dat in `kern/bevoegdheid/lijst.js` te
-   staan — dat bestand is een besluit, geen implementatiedetail, dus het is niet
-   stilzwijgend aangepast.
+1. ~~De bank-uitgang~~ — **besloten op 20 augustus 2026: de walletbrug wordt
+   eenrichtingsverkeer.** Geld mag van een eigen bankrekening naar de wallet,
+   niet andersom (`kern/bank/walletbrug.js`). Daarmee is de tweede voorwaarde
+   onder het besluit geen belofte meer maar een grendel, en kan de leden-bank
+   live zonder dat `WALLET_SALDO` van soort wisselt. Wat het kost, en dat hoort
+   erbij: een lid kan zijn walletsaldo niet naar zijn eigen rekening halen. Dat
+   is geen functie die verdwijnt maar een belofte die waar wordt gemaakt — het
+   besluit zei dit al, alleen deed de code het niet. Wie de brug weer opent,
+   opent daarmee de vergunningsvraag.
+2. ~~Mag een partner e-money voor ons uitgeven?~~ — **besloten op 20 augustus
+   2026: `partnerRail: null` blijft staan.** Geen distributie-route in de lijst
+   zolang er geen gesprek met een EMI loopt. De lijst hoort te zeggen wat waar
+   is, niet wat zou kunnen; komt die route er ooit, dan is één regel in
+   `kern/bevoegdheid/lijst.js` genoeg.
 3. ~~De gouden tekst op `apps/pay.html`~~ — **gedaan.** Alle gouden TEKST op
    `pay.html` staat nu op `--rtg-leesgoud`, plus de focusring op beide
    pay-schermen. Gemeten op de champagne-kaart (`#F9F6F2`, wit 42% over

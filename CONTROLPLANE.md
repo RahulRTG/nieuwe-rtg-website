@@ -59,6 +59,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Capability | `commercie/capaciteiten.js` | **af** (per trede) |
 | Bevoegdheid + grenzen | `commercie/bevoegdheid.js` | **af** — vier dimensies, delegatie versmalt |
 | Policy + decision | `commercie/besluit.js` | **af** — acht uitkomsten |
+| Bewijstoken | `commercie/bewijstoken.js` + `/zegel.js` | **af** als laag; nog geen route levert er een in (§5.2) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -199,16 +200,60 @@ geen aanroepgraaf. Een `beoordeel(...)` in een functie die zelf nergens wordt
 aangeroepen telt mee. Dat is bij een mutatie aangetoond en niet weggeredeneerd;
 wat die laatste schakel vasthoudt is een gedragstoets op de deur zelf.
 
+### 5.2 Het bewijstoken (was §6.2, nu gebouwd)
+
+Een besluit dat alleen in `besluit.js` bestaat, moet door elke volgende stap
+opnieuw worden gevraagd — en elke stap moet daarvoor bij de rechtenbron kunnen.
+Een **bewijstoken** draagt dat besluit mee: één handeling, één doel, één bedrag,
+een paar minuten. Naast de snelheid zit daar de zwaardere winst: een sessie is
+vandaag een sleutel tot álles wat de houder mag, en een bewijstoken is het
+omgekeerde. Gestolen is dan niet gelijk aan onbeperkt.
+
+Vier dingen zijn hard, en elk ervan is met een mutatie nagetrokken:
+
+1. **Een token kan nooit verruimen.** Hij wordt gemunt úit een bevoegdheid en
+   erft haar grenzen; extra grenzen versmallen alleen — met dezelfde `versmal()`
+   als delegatie, zodat er één plek is waar "smaller" wordt uitgelegd.
+2. **Hij vervalt altijd, en snel.** Maximaal vijftien minuten, en langer wordt
+   *geweigerd* in plaats van stil afgekapt. Kort is hier geen voorzichtigheid
+   maar de hele constructie: tussen munten en gebruiken kan een bevoegdheid
+   worden ingetrokken, en die intrekking bereikt een token pas als hij verloopt.
+   Dat is de prijs van niet-opzoeken, en hij hoort opgeschreven te staan.
+3. **Bij waarde is hij eenmalig.** Anders is afluisteren genoeg om dezelfde
+   betaling twee keer te doen. Dit raakt aan §6.5 (economische idempotentie) en
+   vervangt die niet: een nonce beschermt één token, geen keten.
+4. **De sleutel is niet de sessiesleutel** maar er met HKDF uit afgeleid onder
+   een eigen label. Wie een handtekening onder een bewijstoken zou kunnen
+   krijgen, maakt daarmee geen sessietoken — en andersom. Domeinscheiding kost
+   hier één regel en is later niet meer in te bouwen.
+
+**Twee mutaties overleefden de eerste ronde**, en dat is het vermelden waard
+omdat ze allebei hetzelfde soort blinde vlek waren — een toets die het juiste
+gedrag bevestigt zonder de eigenschap te meten:
+
+- Een handtekeningvergelijking op alleen de eerste vier tekens bleef groen: elke
+  toets veranderde een veld *willekeurig*, en dan verschilt het begin ook. Een
+  forceerder probeert juist niet willekeurig maar bouwt teken voor teken op. Er
+  staat nu een token waarvan het begin van de handtekening klopt en de rest niet.
+- De gemunte waarde als bovengrens was nergens getoetst: een token voor één euro
+  liet duizend euro door zolang de bevoegdheidsgrens dat toestond.
+
+**Wat er nog niet is:** een route die een bewijstoken inlevert. Er is een
+producent (`besluit.js` geeft hem mee bij `TOESTAAN`, en alleen daar — ook
+`BEPERKT` krijgt er geen, want daar is de gevráágde handeling juist niet
+goedgekeurd) en er is een verbruiker in de laag zelf, maar de eerste echte
+inlevering hoort bij §6.4 hieronder. Dat staat hier zodat het niet als "af"
+leest: een token die niemand inlevert, is precies de stille belofte die dit
+document elders bestrijdt.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
 vastligt en niemand halverwege iets anders bouwt.
 
 1. ~~**Enforcement in de Promise Gate.**~~ **Gebouwd** — zie §5.1.
-2. **Capability tokens** — kortlevende, ondertekende autorisatie
-   (*proof-carrying authorization*): actor, capability, resource, limiet,
-   vervaltijd, beleidsversie, nonce, handtekening. Minder databasecalls per
-   verzoek, en een gestolen sessie is niet meer gelijk aan onbeperkte rechten.
+2. ~~**Capability tokens**~~ **Gebouwd** — zie §5.2. De laag staat er; de eerste
+   route die er een inlevert nog niet.
 3. **Shadow enforcement** — een nieuwe regel eerst een week meelopen zonder te
    blokkeren: *wat zou er gebeurd zijn?* Pas daarna afdwingen.
 4. **Counterfactual testing** — een beleidswijziging tegen de geschiedenis
@@ -234,9 +279,10 @@ vastligt en niemand halverwege iets anders bouwt.
 
 ## 7. Wat we bewust nog niet doen
 
-- **Cryptografische tokens** vóór de enforcement-meting. Een ondertekend token
-  dat een recht draagt dat nergens wordt gevraagd, is een handtekening onder een
-  lege belofte. Eerst §6.1, dan §6.2.
+- ~~**Cryptografische tokens** vóór de enforcement-meting.~~ Die volgorde is
+  aangehouden: eerst de caller-meting (§5.1), toen het token (§5.2). Een
+  ondertekend token dat een recht draagt dat nergens wordt gevraagd, zou een
+  handtekening onder een lege belofte zijn geweest.
 - **De digital twin en economic sagas.** Prachtige ideeën, maar ze leunen op een
   intent-laag die er niet is. Ze staan op de lijst en niet in de code.
 - **Outcome-aware prijsstelling.** Vraagt gemeten waarde per capability; die

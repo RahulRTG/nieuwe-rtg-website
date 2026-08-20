@@ -78,7 +78,7 @@ const BELEID = {
 
 /* De kern. `zoekBevoegdheid` komt van de aanroeper: deze module weet niet waar
    bevoegdheden wonen, en dat hoort ze ook niet te weten. */
-function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu }) {
+function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
   const tijd = nu || klok.nu;
   const B = { ...BELEID, ...(beleid || {}) };
 
@@ -144,7 +144,23 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu }) {
       return { ...basis, uitkomst: UITKOMST.EXTRA_BEWIJS, bewijs,
         reden: 'Vanaf ' + bev.euro(B.extraBewijsBovenCenten) + ' vraagt RTG een verse bevestiging.' };
 
-    return { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: 'Binnen de bevoegdheid en het beleid.' };
+    /* HET BEWIJS OM MEE TE DRAGEN. Een ja dat alleen hier bestaat, moet door
+       elke volgende stap opnieuw worden gevraagd -- en elke stap moet daarvoor
+       bij de rechtenbron kunnen. Met een bewijstoken (./bewijstoken.js) draagt
+       de aanroeper het besluit mee: een handeling, een doel, een bedrag, een
+       paar minuten.
+
+       `munt` komt van de aanroeper en is optioneel. Zonder is dit gewoon het
+       besluit zoals het altijd al was -- niet een besluit dat stilzwijgend
+       zwakker is. */
+    const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: 'Binnen de bevoegdheid en het beleid.' };
+    if (munt) {
+      const t = munt(b, { actor: basis.actor, doel: basis.doel, waardeCenten: bedrag,
+        beleid: B.versie, eenmalig: raaktWaarde });
+      if (t && t.ok) uit.bewijstoken = t.token;
+      else if (t && t.error) uit.tokenFout = t.error;   // zichtbaar, niet stil
+    }
+    return uit;
   }
 
   /* Een bezwaar dat NIET met een lager bedrag op te lossen is. Een vertrouwd

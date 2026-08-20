@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T09:47:56.242Z",
-  "commit": "6c6e966",
+  "op": "2026-08-20T12:04:53.497Z",
+  "commit": "dd8234b",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -10,15 +10,15 @@
  "gemeten": {
   "kandidaten": 4104,
   "routes": 3255,
-  "bereikt": 826,
+  "bereikt": 880,
   "onbekend": 0,
-  "uitBoodschap": 1644,
-  "uitStatus": 1611,
+  "uitBoodschap": 1575,
+  "uitStatus": 1680,
   "pool": {
-   "domeinen": 44,
-   "velden": 539,
+   "domeinen": 142,
+   "velden": 943,
    "herprobeerd": 1014,
-   "herwonnen": 393
+   "herwonnen": 466
   }
  },
  "zonderRol": [
@@ -84,7 +84,7 @@
    "id": "bereikt",
    "wat": "de handler heeft gedraaid",
    "nodig": "niets -- deze route is te bewijzen; als de schakel toch ongemeten is, ligt het aan de meter en niet aan de voorwaarde",
-   "aantal": 826,
+   "aantal": 880,
    "voorbeelden": [
     "POST /api/aanmelding/betalingen -- status 200",
     "POST /api/aanmelding/lijst -- status 200",
@@ -110,7 +110,7 @@
    "id": "object-ontbreekt",
    "wat": "de route wil een bestaand object bedienen en dat is er niet",
    "nodig": "eerst aanmaken, dan bedienen -- een keten van twee stappen zoals scripts/lib/ketens die kent",
-   "aantal": 711,
+   "aantal": 635,
    "voorbeelden": [
     "POST /api/aandacht -- de route zegt: Zaak niet gevonden.",
     "POST /api/aanmelding/beslis -- de route zegt: Deze aanmelding bestaat niet.",
@@ -123,7 +123,7 @@
    "id": "veld-ontbreekt",
    "wat": "de validatie weigert het lijf voordat er iets gebeurt",
    "nodig": "de velden die DEZE route vraagt; plausibelLijf() is een grabbelton en geen contract",
-   "aantal": 165,
+   "aantal": 184,
    "voorbeelden": [
     "POST /api/ai -- status 400, en de boodschap (\"Geen vraag ontvangen.\") valt in geen bekende vorm",
     "POST /api/bedrijf/herkomst/open -- status 400, en de boodschap (\"Een herkomst hangt aan: ticket, taak.\") valt in geen bekende vorm",
@@ -136,7 +136,7 @@
    "id": "rol-te-laag",
    "wat": "de rol mag hier niet komen",
    "nodig": "de juiste rol, of de erkenning dat deze route voor de beproefde rollen niet bereikbaar is",
-   "aantal": 521,
+   "aantal": 522,
    "voorbeelden": [
     "POST /api/account/koppel -- status 403, en de boodschap (\"Maak eerst een (gratis) RTG-account; dat ene account is daarna uw sleutel tot alles.\") valt in geen bekende vorm",
     "POST /api/account/ontkoppel -- status 403, en de boodschap (\"Maak eerst een (gratis) RTG-account; dat ene account is daarna uw sleutel tot alles.\") valt in geen bekende vorm",
@@ -162,7 +162,7 @@
    "id": "conflict",
    "wat": "de toestand staat de handeling nu niet toe",
    "nodig": "een beginstand waarin de handeling wel mag; vaak is dat de vorige stap van dezelfde keten",
-   "aantal": 147,
+   "aantal": 148,
    "voorbeelden": [
     "POST /api/command/stad/start -- status 409, en de boodschap (\"Zet eerst het landpakket van dat land aan. Een stad in een land dat niet is ingericht, is \") valt in geen bekende vorm",
     "POST /api/live/door -- status 409, en de boodschap (\"U bent niet onderweg.\") valt in geen bekende vorm",
@@ -175,7 +175,7 @@
    "id": "dienst-uit",
    "wat": "een onderdeel staat uit of is er niet",
    "nodig": "de dienst aanzetten in de proefopstelling, of vastleggen dat hij daar bewust ontbreekt",
-   "aantal": 92,
+   "aantal": 93,
    "voorbeelden": [
     "POST /api/bank/advies -- de route zegt: De RTG Bank is nog niet live voor leden.",
     "POST /api/bank/afschrift -- de route zegt: De RTG Bank is nog niet live voor leden.",
@@ -1400,13 +1400,13 @@
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-k05i1l"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-01kixg"
   },
   "POST /api/command/beleid/zet": {
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-i7n1ik"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-w2ohtu"
   },
   "POST /api/command/canary": {
    "rol": "office",
@@ -1430,7 +1430,7 @@
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende functie: proef-gh9ppr"
+   "omdat": "de route zegt: Onbekende functie: proef-cp94ng"
   },
   "POST /api/command/canary/terug": {
    "rol": "office",
@@ -1635,7 +1635,7 @@
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat runbook bestaat niet: proef-npm107"
+   "omdat": "de route zegt: Dat runbook bestaat niet: proef-kgef5s"
   },
   "POST /api/command/runbooks": {
    "rol": "office",
@@ -1711,15 +1711,17 @@
   },
   "POST /api/command/zaak/besluit": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die zaak bestaat niet."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Een besluit vraagt een keuze.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/command/zaak/neem": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die zaak bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/command/zaak/open": {
    "rol": "office",
@@ -3378,9 +3380,10 @@
   },
   "POST /api/lab2/app/onderhoud": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit apparaat bestaat niet."
+   "status": 400,
+   "soort": "dienst-uit",
+   "omdat": "de route zegt: Wat is er aan onderhoud gedaan of nodig?",
+   "metPool": true
   },
   "POST /api/lab2/app/reserveer": {
    "rol": "office",
@@ -3402,9 +3405,10 @@
   },
   "POST /api/lab2/app/uitgifte": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit apparaat bestaat niet."
+   "status": 403,
+   "soort": "rol-te-laag",
+   "omdat": "de route zegt: PROEF is niet bevoegd op Regensensor RS-4.",
+   "metPool": true
   },
   "POST /api/lab2/bewijs/conclusie": {
    "rol": "office",
@@ -3524,10 +3528,9 @@
   },
   "POST /api/lab2/lab/budget": {
    "rol": "office",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Dit lab bestaat niet."
   },
   "POST /api/lab2/lab/maak": {
    "rol": "office",
@@ -3537,24 +3540,21 @@
   },
   "POST /api/lab2/lab/partner": {
    "rol": "office",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Dit lab bestaat niet."
   },
   "POST /api/lab2/lab/tekenaar": {
    "rol": "office",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldige rol.\") valt in geen bekende vorm",
-   "metPool": true
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Dit lab bestaat niet."
   },
   "POST /api/lab2/lab/zet": {
    "rol": "office",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Dit lab bestaat niet."
   },
   "POST /api/lab2/labs": {
    "rol": "office",
@@ -7688,21 +7688,24 @@
   },
   "POST /api/office/architect/bouwstaat": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/architect/concept": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/architect/kritiek": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/architect/maak": {
    "rol": "office",
@@ -7731,9 +7734,10 @@
   },
   "POST /api/office/architect/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/asset/fees": {
    "rol": "office",
@@ -7815,9 +7819,10 @@
   },
   "POST /api/office/atelierweb/etalage": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Sjabloon niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/atelierweb/foto": {
    "rol": "office",
@@ -7839,9 +7844,10 @@
   },
   "POST /api/office/atelierweb/haal": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Sjabloon niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/atelierweb/lijst": {
    "rol": "office",
@@ -8122,9 +8128,10 @@
   },
   "POST /api/office/dienst/uit": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze aanmelding staat niet (meer) open.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/doos/netwerk-zet": {
    "rol": "office",
@@ -8164,15 +8171,17 @@
   },
   "POST /api/office/hardware/concept": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/hardware/kritiek": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/hardware/maak": {
    "rol": "office",
@@ -8195,9 +8204,10 @@
   },
   "POST /api/office/hardware/stuklijst": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/hardware/verwijder": {
    "rol": "office",
@@ -8207,21 +8217,24 @@
   },
   "POST /api/office/hardware/winkel": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Geef een geldige eenmalige prijs (euro, ex btw).\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/hardware/winkel-uit": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/hardware/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Concept niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/ideeen": {
    "rol": "office",
@@ -8237,21 +8250,24 @@
   },
   "POST /api/office/ideeen/reactie": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Idee niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/ideeen/spinoff": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Idee niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/ideeen/uitwerken": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Idee niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/ideeen/verwijder": {
    "rol": "office",
@@ -8261,9 +8277,10 @@
   },
   "POST /api/office/ideeen/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Idee niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/incident/beslis": {
    "rol": "office",
@@ -8342,27 +8359,31 @@
   },
   "POST /api/office/kantoorpakket/aanwezig": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "de route zegt: Dit venster heeft geen geldige sessiesleutel.",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/ai": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Deze opdracht kent RTG Office niet.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/beheer": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/bewaar": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/deel": {
    "rol": "office",
@@ -8372,9 +8393,10 @@
   },
   "POST /api/office/kantoorpakket/fase": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Kies concept, beoordeling, goedgekeurd of archief.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/maak": {
    "rol": "office",
@@ -8390,27 +8412,31 @@
   },
   "POST /api/office/kantoorpakket/open": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/opmerking": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/samen": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/ster": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/terug": {
    "rol": "office",
@@ -8420,27 +8446,31 @@
   },
   "POST /api/office/kantoorpakket/uitslag": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Formulier niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Dit document is geen formulier.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/versies": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/vul": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Formulier niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Dit document is geen formulier.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/kantoorpakket/weg": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/koppel": {
    "rol": "office",
@@ -8510,9 +8540,10 @@
   },
   "POST /api/office/merk/haal": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Merk niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/merk/lijst": {
    "rol": "office",
@@ -8534,10 +8565,9 @@
   },
   "POST /api/office/merk/uitrol": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Merk niet gevonden.",
-   "metPool": true
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Zet eerst een hoofdontwerp voor dit merk.\") valt in geen bekende vorm"
   },
   "POST /api/office/merk/vestiging": {
    "rol": "office",
@@ -8559,10 +8589,9 @@
   },
   "POST /api/office/mob/overeenkomst": {
    "rol": "office",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Overeenkomst niet gevonden."
   },
   "POST /api/office/mob/proef": {
    "rol": "office",
@@ -8572,9 +8601,10 @@
   },
   "POST /api/office/mob/storing": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende vervoersmodule."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/muziek": {
    "rol": "office",
@@ -8825,9 +8855,10 @@
   },
   "POST /api/office/payroll/personeel": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Zaak niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/payroll/regels": {
    "rol": "office",
@@ -8999,9 +9030,10 @@
   },
   "POST /api/office/redactie/artikel/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Artikel niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/redactie/drukproef": {
    "rol": "office",
@@ -9516,9 +9548,10 @@
   },
   "POST /api/office/weefsel/keten": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend object."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/weefsel/klimaat": {
    "rol": "office",
@@ -9558,9 +9591,10 @@
   },
   "POST /api/office/weefsel/object": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend object."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/weefsel/object/maak": {
    "rol": "office",
@@ -9762,9 +9796,10 @@
   },
   "POST /api/office/weefsel/uitval": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend object."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/weefsel/vertrouwenszones": {
    "rol": "office",
@@ -9810,9 +9845,10 @@
   },
   "POST /api/office/weefsel/werk/klaar": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende werkorder."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/weefsel/werk/maak": {
    "rol": "office",
@@ -9822,9 +9858,10 @@
   },
   "POST /api/office/weefsel/werk/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende werkorder."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Deze werkorder is al afgerond.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/weefsel/wijken": {
    "rol": "office",
@@ -9864,15 +9901,17 @@
   },
   "POST /api/office/werkplaats/introk": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Opdracht niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/werkplaats/kritiek": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Opdracht niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Werk het idee eerst uit.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/werkplaats/maak": {
    "rol": "office",
@@ -9882,15 +9921,17 @@
   },
   "POST /api/office/werkplaats/publiceer": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Opdracht niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Werk de opdracht eerst uit voordat je hem publiceert.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/werkplaats/uitwerken": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Opdracht niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/werkplaats/verwijder": {
    "rol": "office",
@@ -9900,9 +9941,10 @@
   },
   "POST /api/office/werkplaats/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Opdracht niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/zelfzorg": {
    "rol": "office",
@@ -14424,13 +14466,13 @@
    "rol": "supplier",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-5v671y"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-3htm0i"
   },
   "POST /api/supplier/command/beleid/zet": {
    "rol": "supplier",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-bdt7q0"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-8k6cjf"
   },
   "POST /api/supplier/command/graaf": {
    "rol": "supplier",
@@ -14476,10 +14518,9 @@
   },
   "POST /api/supplier/command/operator/uitvoeren": {
    "rol": "supplier",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Dat plan bestaat niet (meer)."
   },
   "POST /api/supplier/command/puls": {
    "rol": "supplier",
@@ -14497,7 +14538,7 @@
    "rol": "supplier",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat runbook bestaat niet: proef-vt4fdy"
+   "omdat": "de route zegt: Dat runbook bestaat niet: proef-ka2o82"
   },
   "POST /api/supplier/command/runbooks": {
    "rol": "supplier",
@@ -14771,10 +14812,9 @@
   },
   "POST /api/supplier/dorp/post": {
    "rol": "supplier",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 400,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Onbekende afdeling."
   },
   "POST /api/supplier/dorp/stuurdoor": {
    "rol": "supplier",
@@ -14784,10 +14824,9 @@
   },
   "POST /api/supplier/dorp/tools": {
    "rol": "supplier",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 400,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Onbekende afdeling."
   },
   "POST /api/supplier/dorp/verder": {
    "rol": "supplier",
@@ -14857,9 +14896,10 @@
   },
   "POST /api/supplier/facturen/betaald": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze factuur bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/facturen/maak": {
    "rol": "supplier",
@@ -14875,9 +14915,10 @@
   },
   "POST /api/supplier/facturen/pdf": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Factuur niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/finance": {
    "rol": "supplier",
@@ -15139,9 +15180,10 @@
   },
   "POST /api/supplier/giftcard/redeem": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze cadeaukaart kennen we hier niet.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/giftcard/sell": {
    "rol": "supplier",
@@ -15406,10 +15448,9 @@
   },
   "POST /api/supplier/horeca/club/tafel": {
    "rol": "supplier",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Welke tafel?\") valt in geen bekende vorm"
   },
   "POST /api/supplier/horeca/club/tafel/stand": {
    "rol": "supplier",
@@ -15828,9 +15869,10 @@
   },
   "POST /api/supplier/horeca/simulatie/voorstellen": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Simulatiebrug niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/horeca/spatial": {
    "rol": "supplier",
@@ -16092,27 +16134,31 @@
   },
   "POST /api/supplier/kantoorpakket/aanwezig": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "de route zegt: Dit venster heeft geen geldige sessiesleutel.",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/ai": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Deze opdracht kent RTG Office niet.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/beheer": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/bewaar": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/deel": {
    "rol": "supplier",
@@ -16122,9 +16168,10 @@
   },
   "POST /api/supplier/kantoorpakket/fase": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Kies concept, beoordeling, goedgekeurd of archief.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/maak": {
    "rol": "supplier",
@@ -16140,27 +16187,31 @@
   },
   "POST /api/supplier/kantoorpakket/open": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/opmerking": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/samen": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/ster": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/terug": {
    "rol": "supplier",
@@ -16170,27 +16221,31 @@
   },
   "POST /api/supplier/kantoorpakket/uitslag": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Formulier niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Dit document is geen formulier.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/versies": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/vul": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Formulier niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Dit document is geen formulier.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/kantoorpakket/weg": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/kassa/artikel": {
    "rol": "supplier",
@@ -16933,9 +16988,9 @@
   },
   "POST /api/supplier/net/verzoek": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dat is uw eigen bedrijf.\") valt in geen bekende vorm",
+   "status": 409,
+   "soort": "conflict",
+   "omdat": "status 409, en de boodschap (\"U bent al verbonden.\") valt in geen bekende vorm",
    "metPool": true
   },
   "POST /api/supplier/notifications/read": {
@@ -17294,9 +17349,10 @@
   },
   "POST /api/supplier/poort/rondleiding": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende rondleiding."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/pos/checkout": {
    "rol": "supplier",
@@ -17661,9 +17717,10 @@
   },
   "POST /api/supplier/rtmail/antwoord": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/assist": {
    "rol": "supplier",
@@ -17697,9 +17754,10 @@
   },
   "POST /api/supplier/rtmail/bijlagen": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat bericht bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/btw-herinner": {
    "rol": "supplier",
@@ -17745,15 +17803,17 @@
   },
   "POST /api/supplier/rtmail/draad": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/etiket": {
    "rol": "supplier",
    "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Geef een etiket op.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/export": {
    "rol": "supplier",
@@ -17775,15 +17835,17 @@
   },
   "POST /api/supplier/rtmail/hulp": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/imap/intrekken": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die sleutel bestaat niet op dit postvak."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/imap/sleutel": {
    "rol": "supplier",
@@ -17805,10 +17867,9 @@
   },
   "POST /api/supplier/rtmail/inkoop": {
    "rol": "supplier",
-   "status": 200,
-   "soort": "bereikt",
-   "omdat": "status 200",
-   "metPool": true
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Geef een groothandel-code op.\") valt in geen bekende vorm"
   },
   "POST /api/supplier/rtmail/instellingen": {
    "rol": "supplier",
@@ -17824,9 +17885,10 @@
   },
   "POST /api/supplier/rtmail/lees": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit bericht staat niet in dit postvak.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/ongelezen": {
    "rol": "supplier",
@@ -17873,14 +17935,16 @@
   "POST /api/supplier/rtmail/sluimer": {
    "rol": "supplier",
    "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Dat is geen tijdstip.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/ster": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/stuur": {
    "rol": "supplier",
@@ -18064,9 +18128,10 @@
   },
   "POST /api/supplier/site/cijfers": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/site/domein": {
    "rol": "supplier",
@@ -18082,9 +18147,10 @@
   },
   "POST /api/supplier/site/haal": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/site/herstel": {
    "rol": "supplier",
@@ -18094,9 +18160,10 @@
   },
   "POST /api/supplier/site/live": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Zet de site eerst online; dan kun je wijzigingen publiceren.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/site/mijn": {
    "rol": "supplier",
@@ -18106,27 +18173,31 @@
   },
   "POST /api/supplier/site/offline": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/site/plan": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Zet de site eerst online; daarna kunt u een publicatiemoment kiezen.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/site/publiceer": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/site/spoor": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/site/team": {
    "rol": "supplier",
@@ -18142,9 +18213,10 @@
   },
   "POST /api/supplier/site/versies": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Website niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/staff/add": {
    "rol": "supplier",
@@ -18816,9 +18888,10 @@
   },
   "POST /api/supplier/zaak/functie": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Deze functie hoort niet bij dit type zaak.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/zegel/check": {
    "rol": "supplier",

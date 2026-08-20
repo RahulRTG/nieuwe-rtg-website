@@ -48,6 +48,29 @@ function domeinVan(pad) {
   return String(pad || '').split('/')[2] || '';
 }
 
+/* TWEE SLEUTELS, FIJN EN GROF, en dat is de reparatie van een gemeten fout.
+   Met alleen het tweede segment delen alle 251 /api/supplier/*-routes een bak:
+   een horeca-id belandt dan in een rtmail-route en levert daar dezelfde 404 op
+   als een verzonnen id. De FIJNE sleutel is het pad zonder zijn laatste
+   segment -- dat laatste is de handeling, de rest is de naamruimte waarin het
+   object leeft:
+
+     /api/supplier/horeca/fooienpot  ->  supplier/horeca   (fijn), supplier (grof)
+     /api/pay/oplaad                 ->  pay               (fijn en grof gelijk)
+     /api/bank/pas/betaal            ->  bank/pas          (fijn), bank (grof)
+
+   Geleerd wordt er onder ALLEBEI, verrijkt wordt er fijn-eerst met de grove
+   als terugval. Zo blijft de brede treffer bestaan waar hij hielp, en krijgt
+   de smalle voorrang waar hij scherper is. Geen lijst met domeinnamen die
+   binnen een maand achterloopt (LAT.md regel 4). */
+function sleutelsVan(pad) {
+  const delen = String(pad || '').split('/').filter(Boolean);   // ['api','supplier','horeca','fooienpot']
+  if (delen[0] !== 'api' || delen.length < 2) return [];
+  const grof = delen[1];
+  const fijn = delen.length > 2 ? delen.slice(1, -1).join('/') : grof;
+  return fijn === grof ? [grof] : [fijn, grof];
+}
+
 /* Enkelvoud-gok voor een lijstveldnaam: klussen -> klus, orders -> order,
    dossiers -> dossier. Bewust simpel (strip -en/-s); een gok die mist kost
    niets, want het veld belandt er dan gewoon niet bij. */
@@ -81,18 +104,20 @@ function maakPool() {
      elementen een tweede naam: { klussen: [{ id: K1 }] } leert zowel `id`
      als `klusId` en `klus`. */
   function leer(data, pad) {
-    const domein = domeinVan(pad);
-    if (!domein) return;
+    const sleutels = sleutelsVan(pad);
+    if (!sleutels.length) return;
     (function loop(v, diepte, lijstNaam) {
       if (!v || typeof v !== 'object' || diepte > 4) return;
       if (Array.isArray(v)) { for (const el of v.slice(0, 3)) loop(el, diepte + 1, lijstNaam); return; }
       for (const [k, w] of Object.entries(v)) {
         if (IDVELD.test(k) && bruikbaar(w)) {
-          zet(domein, k.toLowerCase(), w);
-          if (lijstNaam) {
-            const enk = enkelvoud(lijstNaam).toLowerCase();
-            zet(domein, enk, w);
-            zet(domein, enk + 'id', w);
+          for (const sleutel of sleutels) {
+            zet(sleutel, k.toLowerCase(), w);
+            if (lijstNaam) {
+              const enk = enkelvoud(lijstNaam).toLowerCase();
+              zet(sleutel, enk, w);
+              zet(sleutel, enk + 'id', w);
+            }
           }
         }
         if (Array.isArray(w)) loop(w, diepte + 1, k);
@@ -105,7 +130,12 @@ function maakPool() {
      domein een echte waarde. Bestaande verzonnen kernvelden (id, code)
      worden overschreven -- die waren juist het probleem. */
   function verrijk(basisLijf, pad) {
-    const d = per.get(domeinVan(pad));
+    /* Fijn eerst, grof als terugval: een scherpe treffer boven een brede. */
+    let d = null;
+    for (const sleutel of sleutelsVan(pad)) {
+      const kandidaat = per.get(sleutel);
+      if (kandidaat && kandidaat.size) { d = kandidaat; break; }
+    }
     if (!d || !d.size) return { lijf: basisLijf, velden: [] };
     const lijf = { ...basisLijf };
     const velden = [];
@@ -125,4 +155,4 @@ function maakPool() {
   return { leer, verrijk, grootte };
 }
 
-module.exports = { maakPool, domeinVan, enkelvoud, IDVELD };
+module.exports = { maakPool, domeinVan, sleutelsVan, enkelvoud, IDVELD };

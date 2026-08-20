@@ -28,6 +28,26 @@ test('oogsten: id-achtige velden, diep en uit lijsten, onder hun lijstnaam', () 
   assert.ok(velden.length >= 4);
 });
 
+test('FIJN VOOR GROF: een horeca-id belandt niet in een rtmail-route', () => {
+  /* De gemeten fout: met alleen het tweede segment deelden 251
+     /api/supplier/*-routes een bak. De fijne sleutel (het pad zonder zijn
+     laatste segment) houdt de naamruimtes uit elkaar; de grove blijft als
+     terugval bestaan waar er niets fijners is. */
+  const pool = maakPool();
+  pool.leer({ potten: [{ id: 'POT-1' }] }, '/api/supplier/horeca/fooienpot/lijst');
+
+  const eigen = pool.verrijk({}, '/api/supplier/horeca/loonkosten');
+  assert.equal(eigen.lijf.id, 'POT-1', 'binnen dezelfde naamruimte verrijkt hij gewoon');
+
+  /* rtmail heeft niets eigens, dus valt hij terug op de grove supplier-bak --
+     dat is bewust: een brede treffer is beter dan geen, en een misser kost
+     alleen een 404. Maar zodra rtmail zelf iets heeft geleerd, wint dat. */
+  pool.leer({ berichten: [{ id: 'MAIL-9' }] }, '/api/supplier/rtmail/inbox');
+  const mail = pool.verrijk({}, '/api/supplier/rtmail/lees');
+  assert.equal(mail.lijf.id, 'MAIL-9', 'de eigen naamruimte wint van de grove bak');
+  assert.ok(!mail.velden.includes('pot'), 'het horeca-lijstveld lekt niet naar rtmail');
+});
+
 test('de domeingrens: andermans id verrijkt nooit', () => {
   const pool = maakPool();
   pool.leer({ id: 'K-1' }, '/api/werkplek/klussen');

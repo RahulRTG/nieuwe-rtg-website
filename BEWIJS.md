@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1034 bestanden en 6886 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1035 bestanden en 6892 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1034 |
-| losse beweringen (`test(...)`) | 6886 |
+| toetsbestanden | 1035 |
+| losse beweringen (`test(...)`) | 6892 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 846 |
 | **overleefd**: geen mutatie kreeg hem rood | 21 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 107 |
+| niets van beide | 108 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-908 bestanden, 6666 beweringen.
+909 bestanden, 6672 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -704,6 +704,7 @@ toets omvalt.
 | `schild.test.js` | 4 | gezakt op `liegpoort /api/` | Het schild: de applicatie-WAF, de DDoS-banlijst en de kortlevende TURN-inloggegevens. Extern verkeer wordt gesimuleerd met een X-Forwarded-For-header (trust proxy staat aan); localhost zelf is uitgezonderd zodat... |
 | `school.test.js` | 13 | gezakt op `liegpoort /api/` | Integratietests voor RTF School (het schoolkanaal, "slimmer dan Magister"): klas maken en koppelen, rooster, huiswerk (afvinken), cijfers (afgeschermd per gezin), mededelingen, ziekmelden in één tik en de gezinsbrede... |
 | `schoolaanwezig.test.js` | 7 | gezakt op `liegpoort /api/` | De enterprise-laag van RTG School, deel 2: aanwezigheid, verlof, en de veiligheidskant (passen, bezoekers, incidenten, ontruiming, calamiteit). De beloftes die hier hard worden gemaakt: - dezelfde les twee keer... |
+| `schooladvies.test.js` | 6 | -- | De adviesgrens: wat dit systeem over het pad van een kind mag zeggen. De beloftes die hier hard worden gemaakt: - er is geen manier om uit deze module een BESLUIT te halen: geen parameter zet besluitDoorMens uit; -... |
 | `schoolbeeld.test.js` | 7 | gezakt op `liegpoort /api/` | De enterprise-laag van RTG School, deel 4: het directiebeeld, de rapporten, de koppelingen en het ouderportaal. De beloftes die hier hard worden gemaakt: - een verzuimwaarschuwing NOEMT ZIJN EIGEN REKENSOM (hoeveel... |
 | `schoolbel.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, bellen binnen de app: het klas-belkanaal (SSE) en de belsignalen. Ouders bellen de leraar of een boom-tak-gezin; kinderen bewust niet (geen privekanaal leraar-kind). |
 | `schooldirectie.test.js` | 1 | gezakt op `liegpoort /api/` | Golf 3: de directie-cockpit van de schoolpartner op kantoren-niveau, met de onderwijsregels leidend. Getoetst: signalen op organisatieniveau (wachtend personeel, klas zonder rooster), de schoolbrede mededeling die in... |

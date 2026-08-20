@@ -401,7 +401,9 @@ worden -- door de school, door ons, door een toezichthouder.
 | Presentie van een les staat binnen 30 seconden | benchmark op het presentiescherm | scherm bestaat sinds vandaag, meting nog niet |
 | Geen zorgtoegang zonder doel en reden | invariant + toets | **ja** (`test/schoolenterprise.test.js`) |
 | Een rapport bereikt het gezin alleen na menselijke vaststelling | invariant + toets | **ja** (`test/schoolbeeld.test.js`) |
-| AI stelt nooit zelfstandig een schooladvies vast | policytoets + mutatie | **ja** in de kern, nog niet in elke laag |
+| AI stelt nooit zelfstandig een schooladvies vast | policytoets + mutatie | **ja** sinds 20 augustus 2026: de grens staat op een plek (`kern/schooladvies.js`) en elke paduitspraak hangt eraan, met mutatie beproefd |
+| Er staat bij wie beslist, met naam | elke adviessoort noemt een aanspreekbare partij | **ja**, en nooit RTG of de AI (`test/schooladvies.test.js`) |
+| Een AI-tekst die iets vaststelt wordt gemeld | keuring op besluitende zinsdelen | **ja** -- de tekst wordt gemeld, niet stil bijgeschaafd |
 | Geen hulpvraag raakt zoek | SLA + opvolgbewijs | **ja** sinds 19 augustus 2026 (`test/opvolging.test.js`), met mutatie beproefd |
 | 114 talen | vertaaldekking + steekproef op kwaliteit | vertaallaag bestaat, dekking niet gemeten |
 | Elk endpoint heeft een scherm | registertoets | **ja**, 201 van 201 (gemeten 20 augustus 2026) |

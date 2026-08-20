@@ -182,6 +182,39 @@ test('de oude weg blijft precies zo werken: er is maar EEN plek die een kassacod
   assert.equal(inn.centen, 800);
 });
 
+test('de echte kassa (POS) neemt beide dragers, en int ze langs dezelfde weg', async () => {
+  /* DIT IS DE WEG DIE EEN KASSA ECHT LOOPT. /api/supplier/pos/sale maakt de bon
+     en int de betaalcode; daar zit de knop "Afrekenen, RTG Pay" aan vast. Sinds
+     de verhuizing mag `payCode` ook een ondertekende RTG-code zijn -- dan gaat
+     hij langs de capabilitylaag, die de kassa eerst de kaart liet zien. Het
+     innen is bij allebei kern/pay/kassa.js. */
+  const bon = { method: 'rtgpay', total: 12.50, items: [{ name: 'Lounge', qty: 1, price: 12.50 }] };
+
+  // 1. de nieuwe drager: het token uit de QR
+  const cap = await maakCap(lid.token, 5000);
+  const voor = await saldo(lid.token);
+  const met = await json(await api('/api/supplier/pos/sale',
+    { ...bon, payCode: cap.token, idem: 'pos-cap-' + Date.now() }, zaak));
+  assert.ok(met.sale, 'er is een bon: ' + JSON.stringify(met).slice(0, 120));
+  assert.equal(met.sale.method, 'rtgpay');
+  assert.equal(met.sale.betaler, lid.codenaam, 'de bon weet wie er betaalde');
+  assert.equal(await saldo(lid.token), voor - 1250, 'en het geld is echt bewogen');
+
+  // 2. de oude drager: de code van zes tekens, voorgelezen aan de kassa
+  const k = await json(await api('/api/pay/kascode', { maxCenten: 5000 }, lid.token));
+  const zonder = await json(await api('/api/supplier/pos/sale',
+    { ...bon, payCode: k.code, idem: 'pos-oud-' + Date.now() }, zaak));
+  assert.ok(zonder.sale, 'de getypte code doet het onveranderd');
+  assert.equal(zonder.sale.betaler, lid.codenaam);
+  assert.equal(await saldo(lid.token), voor - 2500, 'twee keer 12,50 van hetzelfde saldo af');
+
+  // en een token dat al op is, levert geen bon op
+  const nog = await api('/api/supplier/pos/sale',
+    { ...bon, payCode: cap.token, idem: 'pos-cap2-' + Date.now() }, zaak);
+  assert.equal(nog.status, 404);
+  assert.equal(await saldo(lid.token), voor - 2500, 'en er is niets extra afgeschreven');
+});
+
 test('beide kanten houden hun bon, ook de zaak', async () => {
   const cap = await maakCap(lid.token, 4000);
   await api('/api/supplier/link/cap/aanvaard', { capcode: cap.token, centen: 1500 }, zaak);

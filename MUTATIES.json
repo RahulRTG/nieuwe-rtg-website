@@ -2573,6 +2573,15 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "linkkaart.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "public/shared/linkkaart.js"
+      ],
+      "geprobeerd": 3,
+      "posities": 8
+    },
     "linkkassa.test.js": {
       "soort": "server",
       "staat": "gezakt",

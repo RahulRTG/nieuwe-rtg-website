@@ -83,8 +83,13 @@ const CATALOGUS = [
        deur weigert, is een belofte zonder weg. */
     id: 'capability.aanvaarden',
     type: 'capability',
-    tekst: 'Bekijken en bevestigen',
-    uitleg: 'Je ziet eerst wat er gebeurt.',
+    /* "Bevestigen" en niets erbij, sinds het bedoelingsscherm er is. Er stond
+       "Bekijken en bevestigen -- je ziet eerst wat er gebeurt", en dat was de
+       juiste tekst zolang die belofte nergens werd waargemaakt. Nu staat er een
+       kaart boven de knop met wie, wat, waarom en hoe lang; een knop die dan nog
+       aankondigt dat je iets te zien krijgt, praat over een scherm waar je al
+       naar kijkt. */
+    tekst: 'Bevestigen',
     methode: 'POST',
     /* `magVereist` betekent: laat deze regel alleen zien als de laag zegt dat
        deze scanner deze handeling MAG aanvaarden. Zonder die vlag zou een kassa

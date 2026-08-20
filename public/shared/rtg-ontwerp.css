@@ -207,3 +207,69 @@
   .rtg-nieuw{animation:none;}
   .rtg-rail::before{transition:none;}
 }
+
+/* ------------------------------------------------------- het bedoelingsscherm -- */
+/* RTG Link, stap 3 (LINK.md par. 2 en 4): wat een mens te zien krijgt VOORDAT hij
+   bevestigt. Wie, wat, waarom, welke gegevens, hoe lang -- en dan pas een knop.
+
+   Waarom dit een huiscomponent is en geen stijl in een app: hij verschijnt bij de
+   kassa, in de leden-app en straks overal waar er gescand wordt. Drie kopieën van
+   dit scherm zijn drie verschillende beloftes over hetzelfde moment, en dan is de
+   ene ergens strenger dan de andere zonder dat iemand dat besloot.
+
+   Hij leunt volledig op de tokens die hierboven al staan: geen eigen kleuren
+   (LAT.md regel 4), geen eigen letter. Het bedrag is de enige ceremoniële rol op
+   dit scherm -- "een belangrijk bedrag" uit de gesloten lijst van ONTWERP.md par.
+   1 -- en draagt daarom .rtg-kpi. De rest is werk en dus Inter. */
+.rtg-bedoeling{
+  position:fixed;inset:0;z-index:99998;
+  display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(12,12,11,0.72);
+  padding:0;
+}
+.rtg-bedoeling > .blad{
+  width:min(30rem,100%);max-height:88vh;overflow:auto;
+  background:var(--rtg-bg);color:var(--rtg-txt);
+  border-top:1px solid var(--rtg-line);
+  border-radius:var(--rtg-rond) var(--rtg-rond) 0 0;
+  padding:var(--rtg-ruim);
+  padding-bottom:calc(var(--rtg-ruim) + env(safe-area-inset-bottom,0));
+}
+@media (min-width:600px){
+  .rtg-bedoeling{align-items:center;}
+  .rtg-bedoeling > .blad{border-radius:var(--rtg-rond);border:1px solid var(--rtg-line);}
+}
+/* De kop: van WIE komt dit. Geen serif -- een codenaam is werk, geen ceremonie. */
+.rtg-bedoeling .van{
+  font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--rtg-soft);margin-bottom:0.2rem;
+}
+.rtg-bedoeling .wat{font-size:1.05rem;font-weight:600;line-height:1.3;}
+.rtg-bedoeling .waarom{color:var(--rtg-muted);font-size:var(--rtg-tekst);margin-top:0.2rem;}
+/* De regels met een getal: label links, waarde rechts, cijfers uitgelijnd. */
+.rtg-bedoeling .regels{margin-top:var(--rtg-ruim-klein);border-top:1px solid var(--rtg-line);}
+.rtg-bedoeling .regels > div{
+  display:flex;justify-content:space-between;gap:1rem;align-items:baseline;
+  min-height:var(--rtg-regel);padding:0.4rem 0;border-bottom:1px solid var(--rtg-line);
+}
+.rtg-bedoeling .regels .l{color:var(--rtg-soft);font-size:0.8rem;}
+.rtg-bedoeling .regels .w{font-variant-numeric:var(--rtg-cijfers);}
+/* Wat de ander van je te weten komt. Klein, maar altijd zichtbaar: dit is het
+   deel dat een gewone QR nooit vertelt. */
+/* Het valutateken naast een ceremonieel bedrag: werk, niet ceremonie. Zie de
+   toelichting bij `ceremonieel()` in shared/linkkaart.js -- Bodoni's euro leest
+   op deze plek als een C, en dit is het scherm waarop iemand moet zien hoeveel
+   er van hem afgaat. */
+.rtg-bedoeling .rtg-kpi .teken{font-size:0.55em;font-weight:500;vertical-align:0.28em;color:var(--rtg-soft);}
+.rtg-bedoeling .gegevens{margin-top:var(--rtg-ruim-klein);font-size:0.78rem;color:var(--rtg-muted);}
+.rtg-bedoeling .gegevens b{color:var(--rtg-txt);font-weight:600;}
+.rtg-bedoeling .knoppen{display:flex;flex-direction:column;gap:0.5rem;margin-top:var(--rtg-ruim);}
+.rtg-bedoeling button{
+  min-height:48px;border-radius:var(--rtg-rond-klein);
+  font-family:inherit;font-size:0.92rem;font-weight:600;cursor:pointer;
+  border:1px solid var(--rtg-line);background:transparent;color:var(--rtg-txt);
+  padding:0.6rem 1rem;
+}
+.rtg-bedoeling button.doen{background:var(--rtg-acc);border-color:var(--rtg-acc);color:#fff;}
+.rtg-bedoeling button:focus-visible{outline:2px solid var(--rtg-goud);outline-offset:2px;}
+.rtg-bedoeling .fout{color:var(--rtg-sig-incident);font-size:0.85rem;margin-top:var(--rtg-ruim-klein);}

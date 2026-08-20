@@ -270,8 +270,31 @@ paden verhuizen er per stuk naartoe.
    **geen kassascherm** dat deze weg gebruikt: het loket staat open en is
    getoetst, maar in `public/apps/` bestaat vandaag geen enkele knop die
    `/api/supplier/pay/in` of de nieuwe deur aanroept. Die kant komt met stap 4.
-3. **Het bedoelingsscherm.** Eén component, in de huisstijl: wie, wat, waarom,
-   hoe lang, welke gegevens, en één bevestigknop.
+3. **Het bedoelingsscherm.** ✅ *gebouwd op 20 augustus 2026.*
+   `public/shared/linkkaart.js` met zijn vormtaal in `shared/rtg-ontwerp.css`
+   (`.rtg-bedoeling`), dus onder de poorten van ONTWERP.md. Eén component voor
+   alle scanners: wie, wat, waarom, welke gegevens, hoe lang — en dan pas een
+   knop.
+
+   Vier keuzes die hem bruikbaar houden. **De app haalt op, het scherm toont**:
+   hij doet zelf geen enkel verzoek, want elke app heeft zijn eigen weg naar de
+   server. **Hij voert niets uit**: de intentie draagt zijn eigen weg, de app
+   roept die aan. **`opbouw()` is puur**, zodat een toets in Node kan nakijken
+   dat de vijf vragen echt beantwoord worden en dat er nooit een knop verschijnt
+   zonder weg. En **wat de app erbij weet, staat op dezelfde kaart** — bij de
+   kassa is dat wat déze bon kost, naast wat de code maximaal toestaat.
+
+   Twee dingen die het bouwen opleverde. De knoptekst was
+   "Bekijken en bevestigen · je ziet eerst wat er gebeurt": de juiste tekst
+   zolang die belofte nergens werd waargemaakt, en overbodig zodra er een kaart
+   boven staat. Nu: "Bevestigen". En het bedrag is ceremonieel (ONTWERP.md par.
+   1) maar het **valutateken niet** — Bodoni's euro leest op deze plek als een C,
+   op precies het scherm waar iemand moet zien hoeveel er van hem afgaat.
+
+   **De kassa gebruikt hem** (`leverancier-64.js`): scan je een RTG-code bij het
+   afrekenen, dan komt eerst de kaart en pas daarna de bon. `/api/supplier/pos/sale`
+   neemt sindsdien beide dragers — de getypte code van zes tekens én het token —
+   en int ze allebei langs `kern/pay/kassa.js`.
 4. **RTG Scan.** Eén scherm in de leden-app dat op de resolver leunt, met de
    actiekaart. De domeinscanners worden er cliënt van.
 5. **Twee echte intenties.** Eén die niets kost (contact of kaartje delen) en

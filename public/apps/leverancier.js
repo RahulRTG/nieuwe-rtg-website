@@ -6552,7 +6552,15 @@
           titel: T('pos.scanbetaal','Scan de betaalcode'),
           hint: T('pos.scanbetaalhint','Scan de QR op het scherm van de gast.'),
           handTekst: T('pos.oftyp','Of typ de betaalcode'),
-          onCode: (c) => { klaar = true; resolve(((c.tekst||'').trim().toUpperCase()) || null); },
+          /* HOOFDLETTERS ALLEEN WAAR DAT MAG. Een getypte kassacode leest
+             prettiger in kapitalen, maar een ondertekende RTG-code is
+             hoofdlettergevoelig -- de regel staat in shared/rtgcode.js, want
+             elke scanner heeft hem. */
+          onCode: (c) => {
+            klaar = true;
+            var t = (c.tekst||'').trim();
+            resolve((window.RTGCode && !RTGCode.hoofdlettersMogen(t) ? t : t.toUpperCase()) || null);
+          },
           onSluit: () => { if (!klaar) resolve(null); }
         });
       });
@@ -6812,6 +6820,24 @@
     }
     if (method === 'rtgpay'){
       body.payCode = await vraagPayCode(); if (!body.payCode) return;
+      /* EEN RTG-CODE KRIJGT EERST HET BEDOELINGSSCHERM (LINK.md par. 2). De
+         kassa ziet wie er betaalt en tot welk bedrag die code mag, naast wat
+         deze bon werkelijk kost -- en bevestigt dan pas. Een getypte code van
+         zes tekens gaat rechtstreeks door: daar valt niets te tonen wat de
+         kassa niet al weet, en de gast staat ervoor.
+
+         Gaat er iets mis bij het ophalen (geen netwerk, verlopen code), dan
+         stopt het hier: liever geen bon dan een bon waarvan niemand zag wat
+         hij deed. */
+      if (String(body.payCode).slice(0,5) === 'RTG1.' && window.RTGLinkKaart){
+        let kaart = null;
+        try { kaart = await API.call('/link/los', { tekst: body.payCode }); }
+        catch(e){ toast(e.message); return; }
+        const keuze = await RTGLinkKaart.toon(kaart, { extra: [
+          { naam: T('pos.dezebon','Deze bon'), waarde: eur(body.total), nadruk: true }
+        ] });
+        if (!keuze) return;
+      }
       body.idem = RTGIdem('pos');
     }
     try {

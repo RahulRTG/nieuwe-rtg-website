@@ -34,11 +34,32 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   // in het grootboek. Lukt dat niet, dan is er ook geen bon.
   let betaler = null, betaaldienstKosten = 0;
   if (method === 'rtgpay') {
-    const p = await pay.kasInt({
-      supplierCode: req.supplier.code, code: req.body.payCode,
-      centen: Math.round(total * 100), oms: req.supplier.name,
-      idem: req.body.idem
-    });
+    /* TWEE DRAGERS, EEN INNING. De gast toont zijn betaalcode uit de app: dat is
+       ofwel de code van zes tekens (voorgelezen of getypt), ofwel de ondertekende
+       RTG-code die sinds RTG Link in de QR staat (LINK.md; kern/pay/kassacode.js).
+
+       Het INNEN is bij allebei kern/pay/kassa.js -- bij de capability loopt het
+       alleen langs de laag die eerst de kaart liet zien en de kassa liet
+       bevestigen. Wat hier verschilt is dus de weg naar binnen, niet wat er met
+       het geld gebeurt; er is en blijft een plek waar een kassacode wordt
+       verzilverd (LAT.md regel 4).
+
+       De idempotentiesleutel komt bij de capability van de laag zelf en is aan
+       die ene code gebonden -- vandaar dat req.body.idem daar niet meegaat. */
+    const centen = Math.round(total * 100);
+    const code = String(req.body.payCode || '');
+    let p;
+    if (code.slice(0, 5) === 'RTG1.' && typeof kern.linkCapAanvaard === 'function') {
+      const r = await kern.linkCapAanvaard({ soort: 'supplier', code: req.supplier.code }, code, null,
+        { centen, oms: req.supplier.name });
+      p = r.error ? r : (r.uitkomst || {});
+    } else {
+      p = await pay.kasInt({
+        supplierCode: req.supplier.code, code: req.body.payCode,
+        centen, oms: req.supplier.name,
+        idem: req.body.idem
+      });
+    }
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;
     // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak

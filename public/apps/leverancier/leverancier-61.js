@@ -100,7 +100,15 @@
           titel: T('pos.scanbetaal','Scan de betaalcode'),
           hint: T('pos.scanbetaalhint','Scan de QR op het scherm van de gast.'),
           handTekst: T('pos.oftyp','Of typ de betaalcode'),
-          onCode: (c) => { klaar = true; resolve(((c.tekst||'').trim().toUpperCase()) || null); },
+          /* HOOFDLETTERS ALLEEN WAAR DAT MAG. Een getypte kassacode leest
+             prettiger in kapitalen, maar een ondertekende RTG-code is
+             hoofdlettergevoelig -- de regel staat in shared/rtgcode.js, want
+             elke scanner heeft hem. */
+          onCode: (c) => {
+            klaar = true;
+            var t = (c.tekst||'').trim();
+            resolve((window.RTGCode && !RTGCode.hoofdlettersMogen(t) ? t : t.toUpperCase()) || null);
+          },
           onSluit: () => { if (!klaar) resolve(null); }
         });
       });

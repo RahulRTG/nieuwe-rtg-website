@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T07:01:13.782Z",
-  "commit": "75cab54",
+  "op": "2026-08-20T07:23:20.621Z",
+  "commit": "8f28f47",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -27,8 +27,8 @@
    "dagen": 1.8
   },
   "STAATPROEF.json": {
-   "op": "2026-08-18T07:32:18.967Z",
-   "dagen": 2
+   "op": "2026-08-20T07:11:59.889Z",
+   "dagen": 0
   },
   "OUTPUTPROEF.json": {
    "op": "2026-08-20T00:47:47.633Z",
@@ -43,8 +43,8 @@
  "telling": {
   "bewezen": 0,
   "verschaald": 0,
-  "verzwakt": 4001,
-  "geschorst": 138,
+  "verzwakt": 4009,
+  "geschorst": 130,
   "ongemeten": 46
  },
  "perRoute": {
@@ -135,7 +135,7 @@
   },
   "POST /api/agenda/ai": {
    "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/agenda/antwoord": {
@@ -13244,9 +13244,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/blauwdrukken": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/boom": {
    "staat": "verzwakt",
@@ -13284,9 +13284,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/campagnes": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/casus/code": {
    "staat": "verzwakt",
@@ -13374,9 +13374,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/inkoop": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/inkoop/inschrijven": {
    "staat": "verzwakt",
@@ -13429,14 +13429,14 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/koppel/nog-niet": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/koppelbord": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/meldcode/open": {
    "staat": "verzwakt",
@@ -13459,9 +13459,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/melding/maak": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/rtfos/melding/sluit": {
    "staat": "verzwakt",
@@ -16424,9 +16424,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/fooienpot": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/supplier/horeca/fooienpot/lijst": {
    "staat": "verzwakt",
@@ -20799,9 +20799,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkvloer/checklijst/deel": {
-   "staat": "geschorst",
-   "reden": "het bewijs zegt zelf dat het niet klopt: gezakt op ROLLBACK",
-   "heropent": "repareer de oorzaak en laat de proef op ROLLBACK opnieuw slagen; een staat gaat alleen omhoog door hermeting"
+   "staat": "verzwakt",
+   "reden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/werkvloer/checklijst/item": {
    "staat": "verzwakt",

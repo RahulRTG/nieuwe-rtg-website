@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T06:55:22.786Z",
-    "commit": "75cab54",
+    "op": "2026-08-20T07:22:11.131Z",
+    "commit": "8f28f47",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,11 +12,11 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20566,
+    "bewezen": 20570,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 25059,
-    "gezakt": 138
+    "ongemeten": 25063,
+    "gezakt": 130
   },
   "perSchakel": {
     "AUTH": {
@@ -48,17 +48,17 @@
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 252,
+      "bewezen": 250,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3865,
+      "ongemeten": 3867,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 252,
+      "bewezen": 250,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3865,
+      "ongemeten": 3867,
       "gezakt": 0
     },
     "AUDIT": {
@@ -69,10 +69,10 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 139,
+      "bewezen": 138,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3850,
+      "ongemeten": 3851,
       "gezakt": 128
     },
     "FAILURE": {
@@ -83,11 +83,11 @@
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2449,
+      "bewezen": 2458,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 1658,
-      "gezakt": 10
+      "ongemeten": 1657,
+      "gezakt": 2
     },
     "PRIVACY": {
       "bewezen": 3379,
@@ -97,5 +97,5 @@
       "gezakt": 0
     }
   },
-  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN. Deze stand is met de hand vastgelegd over de ratel heen: STATE/SIDE_EFFECT/IDEMPOTENCY verloren vier cellen die eerder door een DEFECT bewezen werden (de geweigerde fooienpot en checklijst-deel bewogen de toestand, en die beweging was de meting); na de reparatie weigeren ze schoon en is er bij een weigering niets meer te meten. Bewezen steeg tegelijk van 20566 naar 20570 en ROLLBACK draagt geen gezakte staatproefcellen meer."
 }

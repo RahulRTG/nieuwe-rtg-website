@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T00:57:58.415Z",
-  "commit": "bd4ff35",
+  "op": "2026-08-20T07:22:28.975Z",
+  "commit": "8f28f47",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,7 +9,7 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 11,
-  "meetwerk": 304,
+  "meetwerk": 296,
   "instrument": 1131,
   "grens": 586
  },
@@ -74,7 +74,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 8,
+   "aantal": 0,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },

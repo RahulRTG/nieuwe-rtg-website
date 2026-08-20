@@ -35,7 +35,7 @@
       if (!t.length) return;
       uit += kaart('Aankomende toetsen · ' + esc(x.kind.naam),
         t.map(function (toets) {
-          return '<div style="margin:.3rem 0;"><b>' + esc(toets.naam) + '</b> <span class="mini">' + esc(String(toets.soort).toUpperCase()) +
+          return '<div class="h-my30"><b>' + esc(toets.naam) + '</b> <span class="mini">' + esc(String(toets.soort).toUpperCase()) +
             (toets.vak ? ' · ' + esc(toets.vak) : '') + (toets.bezig ? ' · al begonnen' : '') + '</span>' +
             '<div class="mini">Leerdoelen: ' + (toets.doelen || []).map(esc).join(', ') + '. Oefen ze rustig met Rahul Bijles hieronder.</div></div>';
         }).join(''));
@@ -104,7 +104,7 @@
              laag te blijven dat je hem per ongeluk haalt. Het zijn wensen en
              geen opdrachten aan de school; dat staat er ook. */
           if (uitEl) uitEl.innerHTML = esc('Verstuurd. ' + (r.wieZietDit || '')) +
-            '<div style="margin-top:.4rem;">Wil je er nog iets bij zeggen? Hoeft niet.' +
+            '<div class="h-mt40">Wil je er nog iets bij zeggen? Hoeft niet.' +
             '<div style="display:flex;gap:.3rem;margin-top:.3rem;flex-wrap:wrap;">' +
             '<select class="veld" data-wens-wanneer="' + esc(kc) + '" aria-label="Wanneer">' +
             '<option value="maakt-niet-uit">wanneer het uitkomt</option>' +

@@ -25,7 +25,7 @@ window.SPart.toetskeuring = function () {
       '<input class="veld" id="kvDoelen" maxlength="300" placeholder="Leerdoelen, gescheiden door komma s" aria-label="Leerdoelen">' +
       '<input class="veld" id="kvPer" type="number" min="1" max="20" value="3" aria-label="Vragen per leerdoel" style="max-width:6rem;">' +
       '<button class="knop" id="kvKeur" type="button">Wat meet dit</button></div>' +
-      '<div id="kvUit" class="stil" style="margin-top:.5rem;"></div>';
+      '<div id="kvUit" class="stil h-mt50"></div>';
     q('kvKeur').addEventListener('click', function () {
       var doelen = q('kvDoelen').value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
       if (!doelen.length) return meld('Kies de leerdoelen die u wilt meten.');
@@ -40,11 +40,11 @@ window.SPart.toetskeuring = function () {
                 ' &middot; ' + p.vragen + ' vragen &middot; ' + esc(p.vorm) + '</span><br><span class="stil">' + esc(p.meet) + '</span></span></div>';
             }).join('') +
             (d.opmerkingen.length
-              ? '<div style="margin-top:.4rem;"><b>Wat er aan te merken valt:</b><br>' + d.opmerkingen.map(function (x) {
+              ? '<div class="h-mt40"><b>Wat er aan te merken valt:</b><br>' + d.opmerkingen.map(function (x) {
                   return '&bull; ' + esc(x.wat) + ' <span class="stil">' + esc(x.wat_nu) + '</span>';
                 }).join('<br>') + '</div>'
               : '') +
-            '<div class="stil" style="margin-top:.4rem;">' + esc(d.uitleg) + '</div>';
+            '<div class="stil h-mt40">' + esc(d.uitleg) + '</div>';
         });
     });
   }
@@ -58,7 +58,7 @@ window.SPart.toetskeuring = function () {
       vak.innerHTML = '<div class="rij"><select class="veld" id="spKies" aria-label="Welke toets">' +
         t.map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.naam) + '</option>'; }).join('') +
         '</select><button class="knop" id="spToon" type="button">Hoe deed de toets het</button></div>' +
-        '<div id="spUit" class="stil" style="margin-top:.5rem;"></div>';
+        '<div id="spUit" class="stil h-mt50"></div>';
       q('spToon').addEventListener('click', function () {
         kl('/school/toets/spiegel', { toetsId: q('spKies').value }).then(function (r2) {
           var d = r2.body;
@@ -66,7 +66,7 @@ window.SPart.toetskeuring = function () {
           if (!d.genoeg) { q('spUit').textContent = d.uitleg; return; }
           q('spUit').innerHTML = '<div class="stil">' + d.gemaakt + ' keer gemaakt</div>' +
             d.perDoel.map(function (p) {
-              return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(p.naam) + '</b> ' +
+              return '<div class="item h-boven"><span><b>' + esc(p.naam) + '</b> ' +
                 '<span class="stil">' + Math.round(p.goedDeel * 100) + '% goed' +
                 (p.onderscheid === null ? '' : ' &middot; onderscheid ' + p.onderscheid) + '</span>' +
                 p.let_op.map(function (l) { return '<br><span class="stil">' + esc(l.wat) + ' ' + esc(l.wat_nu) + '</span>'; }).join('') +

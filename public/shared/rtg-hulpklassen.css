@@ -80,3 +80,51 @@
    stappen) is een ONTWERPbesluit dat de opmaak verandert; dat hoort een mens te
    nemen, niet een omzetting. Het goede nieuws is dat het daarna hier gebeurt, in
    dit ene bestand, en niet meer op twaalfhonderd plekken. */
+
+/* Uit de samenvoegronde van 20 augustus 2026: vormen die de veertien takken
+   meebrachten als los style-attribuut. Alleen wat vaker dan eens voorkomt. */
+.h-mb40 { margin-bottom: .4rem !important; }
+.h-mb60 { margin-bottom: .6rem !important; }
+.h-mb80 { margin-bottom: .8rem !important; }
+.h-my50 { margin: .5rem 0 !important; }
+.h-boven { align-items: flex-start !important; }
+.h-kolom8 { flex: 0 1 8rem !important; }
+.h-kolom9 { flex: 0 1 9rem !important; }
+.h-kolom10 { flex: 0 1 10rem !important; }
+
+/* Tweede ronde uit de samenvoeging van 20 augustus 2026. */
+.h-mb150 { margin-bottom: 1.5rem !important; }
+.h-my30 { margin: .3rem 0 !important; }
+.h-my40 { margin: .4rem 0 !important; }
+.h-onder60 { margin: 0 0 .6rem !important; }
+.h-weg { display: none !important; }
+.h-midden { text-align: center !important; }
+.h-zacht { opacity: .85 !important; }
+.h-kolom7 { flex: 0 1 7rem !important; }
+.h-kolom11 { flex: 0 1 11rem !important; }
+.h-kolom12 { flex: 0 1 12rem !important; }
+.h-rek9 { flex: 1 !important; min-width: 9rem !important; }
+.h-rek10 { flex: 1 !important; min-width: 10rem !important; }
+.h-rek14 { flex: 1 !important; min-width: 14rem !important; }
+
+/* De ondergrens van WCAG 2.5.8: een raakvlak haalt 24x24, ook als zijn
+   inhoud kleiner is. Zie TOEGANKELIJK.md en scripts/raakvlakkeuring.js. */
+.h-raak24 { display: inline-flex !important; align-items: center !important;
+  min-width: 24px !important; min-height: 24px !important; }
+
+/* Derde ronde uit de samenvoeging van 20 augustus 2026. */
+.h-chip { padding: .3rem .6rem !important; font-size: .76rem !important; }
+.h-breed7 { max-width: 7rem !important; }
+.h-meta { color: var(--soft) !important; font-size: .72rem !important; }
+.h-leesgoud { color: var(--rtg-leesgoud, var(--goud)) !important; }
+.h-links { text-align: left !important; }
+.h-zachter { opacity: .75 !important; }
+.h-onder50 { margin: 0 0 .5rem !important; }
+.h-my35 { margin: .35rem 0 !important; }
+.h-centreer { justify-content: center !important; }
+.h-rij { display: flex !important; gap: .4rem !important; }
+.h-rij-mid { display: flex !important; gap: .4rem !important; align-items: center !important; min-height: 24px !important; }
+.h-stapel { display: flex !important; flex-direction: column !important; gap: .35rem !important; }
+.h-rek5 { flex: 1 !important; min-width: 5rem !important; }
+.h-rek8 { flex: 1 !important; min-width: 8rem !important; }
+.h-rek9-2 { flex: 2 !important; min-width: 9rem !important; }

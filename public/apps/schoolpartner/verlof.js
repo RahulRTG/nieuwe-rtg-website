@@ -20,7 +20,7 @@ window.SPart.verlof = function () {
   sk('/school/verlof/lijst').then(function (r) {
     if (r.body.error) { $('#verlofLijst').innerHTML = '<p class="stil">' + esc(r.body.error) + '</p>'; return; }
     $('#verlofLijst').innerHTML = (r.body.aanvragen || []).slice(0, 20).map(function (v) {
-      return '<div class="item" style="align-items:flex-start;"><span style="flex:1;min-width:13rem;">' +
+      return '<div class="item h-boven"><span style="flex:1;min-width:13rem;">' +
         '<b>' + esc(v.naam || v.sleutel) + '</b> <span class="stil">· ' + esc(v.van) +
         (v.tot && v.tot !== v.van ? ' tot ' + esc(v.tot) : '') + ' · ' + esc(v.soort) + '</span><br>' +
         '<span class="stil">' + esc(v.reden) + (v.besluitReden ? '<br>besluit: ' + esc(v.besluitReden) : '') + '</span></span>' +

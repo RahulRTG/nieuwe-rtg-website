@@ -38,7 +38,7 @@ window.SPart.bewijs = function () {
         '<input class="veld" id="bwNotitie" maxlength="120" placeholder="Wat zag u?" aria-label="Wat zag u">' +
         '<button class="knop p" id="bwZet" type="button">Leg vast</button>' +
         '<button class="knop" id="bwToon" type="button">Toon beheersing</button></div>' +
-        '<div id="bewijsUit" class="stil" style="margin-top:.5rem;"></div>' +
+        '<div id="bewijsUit" class="stil h-mt50"></div>' +
         '<p class="stil">Een becijferde toets gaat vanzelf; dit is wat u ziet. De leerling krijgt het te zien bij "waarom denkt RTG dat ik dit kan?".</p>';
     if (!lln.length) return;
 

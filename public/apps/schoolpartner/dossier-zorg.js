@@ -19,11 +19,11 @@ window.RTGSchoolDossierZorg = (function () {
     if (!vak) return;
     var afgeschermd = /afgeschermd/i.test(String(dossier.zorgToegang || ''));
     if (afgeschermd) {
-      vak.innerHTML = '<div class="kop" style="margin-top:.9rem;">Zorgdeel</div>' +
+      vak.innerHTML = '<div class="kop h-mt90">Zorgdeel</div>' +
         '<p class="stil">' + esc(dossier.zorgToegang) + '</p>';
       return;
     }
-    vak.innerHTML = '<div class="kop" style="margin-top:.9rem;">Zorgdeel</div>' +
+    vak.innerHTML = '<div class="kop h-mt90">Zorgdeel</div>' +
       '<div class="rij"><input class="veld" id="zoReden" maxlength="120" placeholder="Waarom opent u dit zorgdeel?" ' +
       'aria-label="Reden om het zorgdeel te openen">' +
       '<button class="knop" id="zoOpen" type="button">Open het zorgdeel</button></div>' +
@@ -58,29 +58,29 @@ window.RTGSchoolDossierZorg = (function () {
     document.getElementById('zoInhoud').innerHTML =
       '<p class="stil">Geopend; de reden staat in het journaal.</p>' +
       (z.gedeeld ? '<p class="stil">U ziet dit dossier omdat het expliciet met u is gedeeld: het plan en de sessies, niet de notities.</p>' : '') +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="rij h-mt50">' +
       '<textarea class="veld" id="zoBehoefte" rows="2" maxlength="200" placeholder="Ondersteuningsbehoefte" aria-label="Ondersteuningsbehoefte">' +
       esc(z.behoefte || '') + '</textarea>' +
       '<textarea class="veld" id="zoPlan" rows="2" maxlength="600" placeholder="Plan" aria-label="Ondersteuningsplan">' +
       esc(z.plan || '') + '</textarea>' +
       '<button class="knop p" id="zoBewaar" type="button">Bewaar plan</button></div>' +
-      '<div class="kop" style="margin-top:.8rem;">Leerdoelen</div>' + doelen +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="kop h-mt80">Leerdoelen</div>' + doelen +
+      '<div class="rij h-mt50">' +
       '<input class="veld" id="zoDoel" maxlength="200" placeholder="Nieuw leerdoel" aria-label="Nieuw leerdoel">' +
-      '<input class="veld" id="zoDoelVak" maxlength="40" placeholder="Vak" aria-label="Vak" style="flex:0 1 8rem;">' +
-      '<input class="veld" id="zoDoelTot" type="date" aria-label="Tot wanneer" style="flex:0 1 10rem;">' +
+      '<input class="veld h-kolom8" id="zoDoelVak" maxlength="40" placeholder="Vak" aria-label="Vak">' +
+      '<input class="veld h-kolom10" id="zoDoelTot" type="date" aria-label="Tot wanneer">' +
       '<button class="knop" id="zoDoelErbij" type="button">Doel erbij</button></div>' +
-      '<div class="kop" style="margin-top:.8rem;">Begeleiding</div>' + sessies +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="kop h-mt80">Begeleiding</div>' + sessies +
+      '<div class="rij h-mt50">' +
       '<input class="veld" id="zoWat" maxlength="200" placeholder="Wat is er gedaan?" aria-label="Wat is er in de sessie gedaan">' +
-      '<input class="veld" id="zoMin" type="number" min="5" max="240" step="5" value="30" aria-label="Minuten" style="flex:0 1 7rem;">' +
+      '<input class="veld h-kolom7" id="zoMin" type="number" min="5" max="240" step="5" value="30" aria-label="Minuten">' +
       '<input class="veld" id="zoVervolg" maxlength="200" placeholder="Vervolg (mag leeg)" aria-label="Vervolg">' +
       '<button class="knop" id="zoSessie" type="button">Noteer sessie</button></div>' +
-      '<div class="kop" style="margin-top:.8rem;">Notities</div>' + notities +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="kop h-mt80">Notities</div>' + notities +
+      '<div class="rij h-mt50">' +
       '<input class="veld" id="zoNotitie" maxlength="600" placeholder="Notitie" aria-label="Notitie">' +
       '<button class="knop" id="zoNotitieErbij" type="button">Noteer</button></div>' +
-      '<div class="kop" style="margin-top:.8rem;">Delen met een externe begeleider</div>' +
+      '<div class="kop h-mt80">Delen met een externe begeleider</div>' +
       '<p class="stil">Zonder deze stap ziet een externe niets, ook niet met de rol. Terugdraaien kan altijd.' +
       ((z.gedeeldMet || []).length ? ' Nu gedeeld met: ' + esc((z.gedeeldMet || []).join(', ')) + '.' : '') + '</p>' +
       '<div class="rij"><input class="veld" id="zoWie" maxlength="24" placeholder="Personeels-id" aria-label="Personeels-id van de begeleider">' +

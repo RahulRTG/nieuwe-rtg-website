@@ -1,6 +1,6 @@
 /* de export van de school: alles plat en leesbaar, met het zorgdeel als aparte keuze */
         '<input type="checkbox" id="enExportZorg"> met het zorgdeel</label></div>' +
-        '<div id="enExportUit" class="stil" style="margin-top:.4rem;"></div>',
+        '<div id="enExportUit" class="stil h-mt40"></div>',
         'Alles wat de school van zichzelf heeft, plat en leesbaar. Vraagt u het zorgdeel erbij, dan staat dat als zodanig in het journaal.');
 
       h += kaart('Laatste inzage', (journaal.rijen || []).map(function (j) {

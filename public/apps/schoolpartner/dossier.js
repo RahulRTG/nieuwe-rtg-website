@@ -39,8 +39,8 @@ window.RTGSchoolDossier = (function () {
         '<div class="kaart"><div class="kop">Leerlingen</div>' +
         '<div class="rij"><input class="veld" id="doZoek" type="search" placeholder="Zoek op naam" ' +
         'maxlength="60" aria-label="Zoek een leerling op naam"></div>' +
-        '<div id="doLijst" style="margin-top:.5rem;"></div>' +
-        '<p class="stil" style="margin-top:.5rem;">Filtert in dit scherm, over de lijst die u al mag zien.</p></div>' +
+        '<div id="doLijst" class="h-mt50"></div>' +
+        '<p class="stil h-mt50">Filtert in dit scherm, over de lijst die u al mag zien.</p></div>' +
         '<div class="kaart enterprise-breed" id="doDetail" hidden></div>';
       lijstTekenen('');
       signalen();
@@ -60,7 +60,7 @@ window.RTGSchoolDossier = (function () {
       if (r.body.error) { vak.innerHTML = '<div class="kop">Signalen</div><p class="stil">' + esc(r.body.error) + '</p>'; return; }
       vak.innerHTML = '<div class="kop">Signalen (' + (r.body.aantal || 0) + ')</div>' +
         ((r.body.leerlingen || []).slice(0, 25).map(function (l) {
-          return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(l.naam) + '</b> <span class="stil">· ' +
+          return '<div class="item h-boven"><span><b>' + esc(l.naam) + '</b> <span class="stil">· ' +
             esc(l.klas) + '</span><br><span class="stil">' +
             l.factoren.map(function (f) { return esc(f.wat) + ': ' + esc(f.uitleg); }).join('<br>') + '</span></span>' +
             '<button class="knop" data-signaal="' + esc(l.sleutel) + '">Dossier</button></div>';
@@ -119,7 +119,7 @@ window.RTGSchoolDossier = (function () {
         ((d.overstappen || []).length ? '<div class="item"><span>Overstappen</span><span class="stil">' +
           d.overstappen.map(function (o) { return esc(String(o.at || '').slice(0, 10) + ' ' + (o.naar || o.van || '')); }).join(' · ') +
           '</span></div>' : '') +
-        '<div class="kop" style="margin-top:.9rem;">Contact en verzorgers</div>' +
+        '<div class="kop h-mt90">Contact en verzorgers</div>' +
         '<div class="rij">' +
           veld('doAdres', 'Adres', c.adres, 120) + veld('doPostcode', 'Postcode', c.postcode, 12) +
           veld('doPlaats', 'Plaats', c.plaats, 60) + veld('doTel', 'Telefoon', c.telefoon, 24) +
@@ -127,7 +127,7 @@ window.RTGSchoolDossier = (function () {
         '</div>' +
         [0, 1, 2].map(function (i) {
           var x = v[i] || {};
-          return '<div class="rij" style="margin-top:.4rem;">' +
+          return '<div class="rij h-mt40">' +
             veld('doVn' + i, 'Naam verzorger ' + (i + 1), x.naam, 60) +
             veld('doVr' + i, 'Relatie', x.relatie, 30) +
             veld('doVt' + i, 'Telefoon', x.telefoon, 24) +
@@ -135,15 +135,15 @@ window.RTGSchoolDossier = (function () {
             '<label class="stil" style="display:flex;gap:.3rem;align-items:center;min-height:24px;">' +
             '<input type="checkbox" id="doVnood' + i + '"' + (x.noodnummer ? ' checked' : '') + '> noodnummer</label></div>';
         }).join('') +
-        '<div class="rij" style="margin-top:.5rem;"><button class="knop p" id="doContact" type="button">Bewaar contactgegevens</button></div>' +
+        '<div class="rij h-mt50"><button class="knop p" id="doContact" type="button">Bewaar contactgegevens</button></div>' +
         '<p class="stil">Zonder telefoonnummer belt niemand bij een ongeluk. Een kind kan twee huizen hebben; daarom drie regels.</p>' +
-        '<div class="kop" style="margin-top:.9rem;">Documenten</div>' +
+        '<div class="kop h-mt90">Documenten</div>' +
         ((d.documenten || []).map(function (x) {
           return '<div class="item"><span>' + esc(x.titel) + ' <span class="stil">· ' + esc(x.soort) + '</span></span>' +
             '<span class="stil">' + esc(String(x.at).slice(0, 10)) + ' · ' + esc(x.door) + '</span></div>';
         }).join('') || '<p class="stil">Nog geen documenten geregistreerd.</p>') +
-        '<div class="rij" style="margin-top:.5rem;">' +
-          '<select class="veld" id="doSoort" aria-label="Soort document" style="flex:0 1 10rem;">' +
+        '<div class="rij h-mt50">' +
+          '<select class="veld h-kolom10" id="doSoort" aria-label="Soort document">' +
           ['diploma', 'certificaat', 'verklaring', 'rapport', 'overig'].map(function (s) {
             return '<option value="' + s + '">' + s + '</option>'; }).join('') + '</select>' +
           veld('doTitel', 'Titel', '', 100) + veld('doNummer', 'Nummer (mag leeg)', '', 40) +
@@ -151,13 +151,13 @@ window.RTGSchoolDossier = (function () {
           '<button class="knop" id="doDoc" type="button">Registreer</button>' +
         '</div>' +
         '<p class="stil">RTG School legt vast wat er is afgegeven; het diploma zelf komt van de officiele instelling.</p>' +
-        '<div class="kop" style="margin-top:.9rem;">Verzuim en voortgang</div>' +
+        '<div class="kop h-mt90">Verzuim en voortgang</div>' +
         '<div class="rij"><button class="knop" id="doVerzuim" type="button">Toon verzuimbeeld</button>' +
         (l.klasCode ? '<button class="knop" id="doVoortgang" type="button">Toon studievoortgang</button>' : '') +
-        '</div><div id="doBeeld" class="stil" style="margin-top:.5rem;"></div>' +
-        '<div class="kop" style="margin-top:.9rem;">Overstap en uitschrijving</div>' +
+        '</div><div id="doBeeld" class="stil h-mt50"></div>' +
+        '<div class="kop h-mt90">Overstap en uitschrijving</div>' +
         '<div class="rij">' +
-        '<input class="veld" id="doNaarKlas" maxlength="8" placeholder="Naar klascode" aria-label="Naar welke klas" style="flex:0 1 10rem;">' +
+        '<input class="veld h-kolom10" id="doNaarKlas" maxlength="8" placeholder="Naar klascode" aria-label="Naar welke klas">' +
         '<input class="veld" id="doOverReden" maxlength="160" placeholder="Reden van de overstap" aria-label="Reden van de overstap">' +
         '<button class="knop" id="doOverstap" type="button">Zet over</button>' +
         '<button class="knop" id="doUit" type="button">Schrijf uit</button></div>' +

@@ -39,8 +39,8 @@ window.RTGSchoolDossier = (function () {
         '<div class="kaart"><div class="kop">Leerlingen</div>' +
         '<div class="rij"><input class="veld" id="doZoek" type="search" placeholder="Zoek op naam" ' +
         'maxlength="60" aria-label="Zoek een leerling op naam"></div>' +
-        '<div id="doLijst" style="margin-top:.5rem;"></div>' +
-        '<p class="stil" style="margin-top:.5rem;">Filtert in dit scherm, over de lijst die u al mag zien.</p></div>' +
+        '<div id="doLijst" class="h-mt50"></div>' +
+        '<p class="stil h-mt50">Filtert in dit scherm, over de lijst die u al mag zien.</p></div>' +
         '<div class="kaart enterprise-breed" id="doDetail" hidden></div>';
       lijstTekenen('');
       signalen();
@@ -60,7 +60,7 @@ window.RTGSchoolDossier = (function () {
       if (r.body.error) { vak.innerHTML = '<div class="kop">Signalen</div><p class="stil">' + esc(r.body.error) + '</p>'; return; }
       vak.innerHTML = '<div class="kop">Signalen (' + (r.body.aantal || 0) + ')</div>' +
         ((r.body.leerlingen || []).slice(0, 25).map(function (l) {
-          return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(l.naam) + '</b> <span class="stil">· ' +
+          return '<div class="item h-boven"><span><b>' + esc(l.naam) + '</b> <span class="stil">· ' +
             esc(l.klas) + '</span><br><span class="stil">' +
             l.factoren.map(function (f) { return esc(f.wat) + ': ' + esc(f.uitleg); }).join('<br>') + '</span></span>' +
             '<button class="knop" data-signaal="' + esc(l.sleutel) + '">Dossier</button></div>';

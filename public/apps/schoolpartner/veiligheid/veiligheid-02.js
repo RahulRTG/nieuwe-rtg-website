@@ -1,7 +1,7 @@
 /* de incidentenkaart: wat er is gemeld, met de laatste vijfentwintig bovenaan */
   function incidentKaart(d) {
     var rijen = (d.incidenten || []).slice(0, 25).map(function (i) {
-      return '<div class="item" style="align-items:flex-start;"><span style="flex:1;min-width:14rem;">' +
+      return '<div class="item h-boven"><span class="h-rek14">' +
         '<b>' + esc(i.ernst) + '</b> <span class="stil">' + esc(String(i.at).slice(0, 10)) + ' · ' + esc(i.door) +
         (i.plek ? ' · ' + esc(i.plek) : '') + '</span><br>' + esc(i.wat) +
         (i.afhandeling ? '<br><span class="stil">afgehandeld: ' + esc(i.afhandeling) + '</span>' : '') + '</span>' +
@@ -12,11 +12,11 @@
 
     return '<div class="kaart enterprise-breed"><div class="kop">Incidenten</div>' + rijen +
       (d.verborgenUitleg ? '<p class="stil">' + esc(d.verborgenUitleg) + ' (' + d.verborgen + ' verborgen)</p>' : '') +
-      '<div class="rij" style="margin-top:.6rem;">' +
+      '<div class="rij h-mt60">' +
       '<input class="veld" id="vgIncWat" maxlength="600" placeholder="Wat is er gebeurd?" aria-label="Wat is er gebeurd">' +
-      '<select class="veld" id="vgIncErnst" aria-label="Ernst" style="flex:0 1 9rem;">' +
+      '<select class="veld h-kolom9" id="vgIncErnst" aria-label="Ernst">' +
       '<option value="licht">licht</option><option value="ernstig">ernstig</option><option value="zeer ernstig">zeer ernstig</option></select>' +
-      '<input class="veld" id="vgIncPlek" maxlength="60" placeholder="Plek" aria-label="Plek" style="flex:0 1 9rem;">' +
+      '<input class="veld h-kolom9" id="vgIncPlek" maxlength="60" placeholder="Plek" aria-label="Plek">' +
       '<button class="knop p" id="vgInc" type="button">Meld het incident</button></div>' +
       '<label class="stil" style="display:flex;gap:.4rem;align-items:center;min-height:24px;margin-top:.4rem;">' +
       '<input type="checkbox" id="vgIncVert"> Vertrouwelijk: alleen de vertrouwenspersoon en de directie lezen dit mee.</label>' +

@@ -38,13 +38,13 @@
       blokken += '<div class="sec">Vandaag · ' + esc(x.klas.naam) + '</div><div class="kaart blok">' +
         (plan.stukken.length
           ? plan.stukken.map(function (s) {
-              return '<div class="mini" style="margin:.4rem 0;"><b>' + esc(s.naam) + '</b> ' +
-                '<span style="opacity:.75;">' + esc(WAT[s.soort] || s.soort) + ' · ' + esc(s.vak) + '</span>' +
-                (s.deadline ? ' <span style="opacity:.75;">voor ' + esc(s.deadline) + '</span>' : '') +
-                '<br><span style="opacity:.85;">' + esc(s.waarom) + '</span></div>';
+              return '<div class="mini h-my40"><b>' + esc(s.naam) + '</b> ' +
+                '<span class="h-zachter">' + esc(WAT[s.soort] || s.soort) + ' · ' + esc(s.vak) + '</span>' +
+                (s.deadline ? ' <span class="h-zachter">voor ' + esc(s.deadline) + '</span>' : '') +
+                '<br><span class="h-zacht">' + esc(s.waarom) + '</span></div>';
             }).join('')
           : '<div class="mini">' + esc(plan.let || '') + '</div>') +
-        '<div class="mini" style="opacity:.85;">' + esc(plan.uitleg) + '</div></div>';
+        '<div class="mini h-zacht">' + esc(plan.uitleg) + '</div></div>';
     }
     wortel.innerHTML = blokken;
   }

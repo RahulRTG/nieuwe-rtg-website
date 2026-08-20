@@ -39,7 +39,7 @@ window.SPart.overdracht = function () {
           (v.klasse === 'nooit' ? ' aan' : '') + '">' + esc(v.klasse) + '</span>' +
           '<br><span class="stil">' + esc(v.waarom) + '</span></span></div>';
       }).join('') +
-        '<div class="kop" style="margin-top:.6rem;">Wat een standaard niet kan dragen</div>' +
+        '<div class="kop h-mt60">Wat een standaard niet kan dragen</div>' +
         r.body.standaarden.map(function (st) {
           return '<div class="item"><span><b>' + esc(st.naam) + '</b> <span class="tag' +
             (st.gelezen ? '' : ' aan') + '">' + (st.gelezen ? 'nagekeken' : 'onbevestigd') + '</span>' +
@@ -69,7 +69,7 @@ window.SPart.overdracht = function () {
   P.overdrachtLijst = lijst;
   function lijst(rijen, kop) {
     if (!rijen || !rijen.length) return '';
-    return '<div class="kop" style="margin-top:.5rem;">' + esc(kop) + '</div>' + rijen.map(function (x) {
+    return '<div class="kop h-mt50">' + esc(kop) + '</div>' + rijen.map(function (x) {
       return '<div class="item"><span><b>' + esc(x.veld) + '</b>' +
         (x.klasse ? ' <span class="tag">' + esc(x.klasse) + '</span>' : '') +
         '<br><span class="stil">' + esc(x.waarom) + '</span></span></div>';
@@ -89,7 +89,7 @@ window.SPart.overdracht = function () {
       '<option value="eduapi">Edu-API</option><option value="entree">Entree</option></select>' +
       '<input class="veld" id="ovDoor" maxlength="60" placeholder="Toestemming van (naam)" aria-label="Toestemming van">' +
       '<button class="knop" id="ovToon" type="button">Toon het pakket</button></div>' +
-      '<div id="ovUit" class="stil" style="margin-top:.5rem;"></div>';
+      '<div id="ovUit" class="stil h-mt50"></div>';
     q('ovToon').addEventListener('click', function () {
       var id = q('ovId').value.trim();
       if (!id) return meld('Geef het leerling-id uit de administratie.');
@@ -104,7 +104,7 @@ window.SPart.overdracht = function () {
             '<div><b>Gaat mee:</b> ' + esc(Object.keys(d.velden).join(', ') || 'niets') + '</div>' +
             (d.toestemmingDoor ? '<div class="stil">Toestemming genoteerd van ' + esc(d.toestemmingDoor) + '</div>' : '') +
             lijst(d.weggelaten, 'Gaat niet mee, en waarom') +
-            (d.vorm ? '<div class="kop" style="margin-top:.5rem;">Als ' + esc(d.vorm.naam) + '</div>' +
+            (d.vorm ? '<div class="kop h-mt50">Als ' + esc(d.vorm.naam) + '</div>' +
               '<div class="stil">' + esc(Object.keys(d.vorm.velden).join(', ') || 'niets') + '</div>' +
               lijst(d.vorm.weggelaten, 'Past niet in deze standaard') +
               '<p class="stil"><b>' + esc(d.vorm.naam) + ' kan niet dragen:</b> ' + d.vorm.kanNiet.map(esc).join('; ') + '</p>' +
@@ -123,7 +123,7 @@ window.SPart.overdracht = function () {
       '<option value="eduapi">Edu-API</option><option value="entree">Entree</option></select>' +
       '<button class="knop" id="inLees" type="button">Wat nemen we hiervan over</button></div>' +
       '<textarea class="veld" id="inVelden" rows="3" maxlength="2000" placeholder=\'{"naam":"...","geboortedatum":"..."}\' aria-label="Velden van buiten"></textarea>' +
-      '<div id="inUit" class="stil" style="margin-top:.5rem;"></div>';
+      '<div id="inUit" class="stil h-mt50"></div>';
     q('inLees').addEventListener('click', function () {
       var velden;
       try { velden = JSON.parse(q('inVelden').value || '{}'); }

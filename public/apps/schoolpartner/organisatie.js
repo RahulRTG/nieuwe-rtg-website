@@ -46,10 +46,10 @@ window.RTGSchoolOrganisatie = (function () {
             (v.plaats ? ' · ' + esc(v.plaats) : '') + '</span></span><span class="stil">' +
             v.leerlingen + ' leerlingen · ' + v.klassen + ' klassen</span></div>';
         }).join('') || '<p class="stil">Nog geen vestigingen; de school is er zelf een.</p>') +
-        '<div class="rij" style="margin-top:.5rem;">' +
+        '<div class="rij h-mt50">' +
         '<input class="veld" id="orVNaam" maxlength="80" placeholder="Naam" aria-label="Naam van de vestiging">' +
         '<input class="veld" id="orVPlaats" maxlength="60" placeholder="Plaats" aria-label="Plaats">' +
-        '<input class="veld" id="orVTel" maxlength="24" placeholder="Telefoon" aria-label="Telefoon" style="flex:0 1 10rem;">' +
+        '<input class="veld h-kolom10" id="orVTel" maxlength="24" placeholder="Telefoon" aria-label="Telefoon">' +
         '<button class="knop p" id="orVestiging" type="button">Zet vestiging</button></div></div>' +
 
         '<div class="kaart"><div class="kop">Opleidingen en capaciteit</div>' +
@@ -59,10 +59,10 @@ window.RTGSchoolOrganisatie = (function () {
             '<span class="' + (o.vol ? 'tag' : 'stil') + '">' + o.bezet + (o.plaatsen ? ' van ' + o.plaatsen : '') +
             (o.wachtlijst ? ' · ' + o.wachtlijst + ' op de wachtlijst' : '') + (o.vol ? ' · vol' : '') + '</span></div>';
         }).join('') || '<p class="stil">Nog geen opleidingen.</p>') +
-        '<div class="rij" style="margin-top:.5rem;">' +
+        '<div class="rij h-mt50">' +
         '<input class="veld" id="orONaam" maxlength="80" placeholder="Naam" aria-label="Naam van de opleiding">' +
-        '<input class="veld" id="orONiveau" maxlength="40" placeholder="Niveau" aria-label="Niveau" style="flex:0 1 9rem;">' +
-        '<input class="veld" id="orOPlaatsen" type="number" min="0" placeholder="Plaatsen" aria-label="Aantal plaatsen" style="flex:0 1 8rem;">' +
+        '<input class="veld h-kolom9" id="orONiveau" maxlength="40" placeholder="Niveau" aria-label="Niveau">' +
+        '<input class="veld h-kolom8" id="orOPlaatsen" type="number" min="0" placeholder="Plaatsen" aria-label="Aantal plaatsen">' +
         '<button class="knop p" id="orOpleiding" type="button">Zet opleiding</button></div>' +
         '<p class="stil">De capaciteit rekent uit of het vol is; wie er geplaatst wordt beslist de administratie.</p></div>' +
 
@@ -76,10 +76,10 @@ window.RTGSchoolOrganisatie = (function () {
         (klassen.map(function (k) {
           return '<div class="item"><span>' + esc(k.naam) + ' <span class="stil">· ' + esc(k.code) + ' · ' +
             (k.leerlingen || 0) + ' leerlingen</span></span>' +
-            '<select class="veld" data-pad="' + esc(k.code) + '" aria-label="Waar gaat ' + esc(k.naam) + ' heen" style="flex:0 1 12rem;">' +
+            '<select class="veld h-kolom12" data-pad="' + esc(k.code) + '" aria-label="Waar gaat ' + esc(k.naam) + ' heen">' +
             '<option value="">(verlaat de school)</option>' + klasOpties + '</select></div>';
         }).join('') || '<p class="stil">Nog geen klassen.</p>') +
-        '<div class="rij" style="margin-top:.6rem;"><button class="knop" id="orVoorstel" type="button">Maak het voorstel</button></div>' +
+        '<div class="rij h-mt60"><button class="knop" id="orVoorstel" type="button">Maak het voorstel</button></div>' +
         '<div id="orVoorstelUit"></div></div>';
       knoppen();
     });
@@ -113,16 +113,16 @@ window.RTGSchoolOrganisatie = (function () {
         if (r.body.error) return meld(r.body.error);
         VOORSTEL = r.body.voorstelId;
         var weg = (r.body.regels || []).filter(function (x) { return !x.naar; }).length;
-        q('orVoorstelUit').innerHTML = '<p class="stil" style="margin-top:.6rem;">' + esc(r.body.uitleg) + '</p>' +
-          '<div class="kpis" style="margin:.5rem 0;">' +
+        q('orVoorstelUit').innerHTML = '<p class="stil h-mt60">' + esc(r.body.uitleg) + '</p>' +
+          '<div class="kpis h-my50">' +
           [['Leerlingen in het voorstel', r.body.aantal], ['Zonder vervolgklas', weg]]
             .map(function (x) { return '<div class="kpi"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>' +
           (r.body.regels || []).slice(0, 40).map(function (x) {
             return '<div class="item"><span>' + esc(x.naam) + ' <span class="stil">· ' + esc(x.van) + '</span></span>' +
               '<span class="' + (x.naar ? 'stil' : 'tag') + '">' + esc(x.wat) + '</span></div>';
           }).join('') +
-          '<div class="rij" style="margin-top:.6rem;">' +
-          '<input class="veld" id="orBevestig" maxlength="10" placeholder="Typ OVERGANG" aria-label="Bevestig met het woord OVERGANG" style="flex:0 1 12rem;">' +
+          '<div class="rij h-mt60">' +
+          '<input class="veld h-kolom12" id="orBevestig" maxlength="10" placeholder="Typ OVERGANG" aria-label="Bevestig met het woord OVERGANG">' +
           '<button class="knop p" id="orVoerUit" type="button">Voer de overgang uit</button></div>';
         q('orVoerUit').addEventListener('click', function () {
           A('/school/schooljaar/voer-uit', sleutels({ voorstelId: VOORSTEL, bevestig: q('orBevestig').value.trim() }))

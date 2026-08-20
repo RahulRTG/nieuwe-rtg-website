@@ -59,12 +59,12 @@
         : ouder ? '<span class="mini">' + (t.bezig ? 'Bezig' : 'Nog niet gemaakt') + '. ' + esc(x.kind.naam) + ' maakt de toets zelf, op het eigen profiel.</span>'
         : '<button class="knop mini" data-toets="' + esc(t.id) + '" data-klas="' + esc(x.klas.code) + '">' +
           (t.bezig ? 'Ga verder' : 'Maak de toets') + '</button>';
-      return '<div class="mini" style="margin:.35rem 0;"><b>' + esc(t.naam) + '</b> · ' + esc(t.soort) +
+      return '<div class="mini h-my35"><b>' + esc(t.naam) + '</b> · ' + esc(t.soort) +
         ' · ' + t.vragen + ' vragen<br>' + stand + '</div>';
     }).join('');
     if (!lijst) return '';
     return kaart('Toetsen · ' + esc(x.kind.naam) + ' (' + esc(x.klas.naam) + ')',
-      lijst + '<div class="mini" style="margin-top:.4rem;">Elke leerling krijgt eigen opgaven. Je krijgt geen goed of fout per vraag: een toets kijk je na het inleveren na.</div>' +
+      lijst + '<div class="mini h-mt40">Elke leerling krijgt eigen opgaven. Je krijgt geen goed of fout per vraag: een toets kijk je na het inleveren na.</div>' +
       '<div id="toetsLoop-' + esc(x.klas.code) + '"></div>');
   }
 
@@ -76,11 +76,11 @@
         return esc(v.vak) + ' <b>' + (v.gemiddelde == null ? '-' : v.gemiddelde) + '</b>';
       }).join(' · ') || 'nog geen cijfers';
       var a = x.aanwezigheid || {};
-      return '<div class="mini" style="margin:.4rem 0;"><b>' + esc(x.naam) + '</b> · ' + esc(x.periode) +
+      return '<div class="mini h-my40"><b>' + esc(x.naam) + '</b> · ' + esc(x.periode) +
         ' · ' + esc(x.klas) + ' (' + esc(x.school) + ')<br>' + vakken +
         '<br>' + (a.lessen || 0) + ' lessen · ' + (a.gemist || 0) + ' gemist · ' + (a.telaat || 0) + ' keer te laat' +
-        (x.tekst ? '<br><span style="opacity:.85;">' + esc(x.tekst) + '</span>' : '') + '</div>';
-    }).join('') + '<div class="mini" style="margin-top:.4rem;">Hier staan alleen vastgestelde rapporten: een mens van school heeft ze gelezen voordat ze hier kwamen.</div>');
+        (x.tekst ? '<br><span class="h-zacht">' + esc(x.tekst) + '</span>' : '') + '</div>';
+    }).join('') + '<div class="mini h-mt40">Hier staan alleen vastgestelde rapporten: een mens van school heeft ze gelezen voordat ze hier kwamen.</div>');
   }
 
   function bind() {
@@ -106,15 +106,15 @@
   function vraag(r) {
     var vak = loopVak();
     if (!vak) return;
-    vak.innerHTML = '<div class="kaart blok" style="margin-top:.5rem;">' +
+    vak.innerHTML = '<div class="kaart blok h-mt50">' +
       '<div class="mini"><b>' + esc(r.naam || 'Toets') + '</b> · vraag ' + r.nr + ' van ' + r.totaal + '</div>' +
       '<div style="margin:.5rem 0;font-size:1.02rem;line-height:1.6;">' + esc(r.vraag) + '</div>' +
       ((r.opties || []).length
-        ? '<div style="display:flex;flex-direction:column;gap:.35rem;">' + r.opties.map(function (o) {
-            return '<button class="knop mini" data-optie="' + esc(o) + '" style="text-align:left;">' + esc(o) + '</button>';
+        ? '<div class="h-stapel">' + r.opties.map(function (o) {
+            return '<button class="knop mini h-links" data-optie="' + esc(o) + '">' + esc(o) + '</button>';
           }).join('') + '</div>'
-        : '<div style="display:flex;gap:.4rem;"><input class="veld" id="toetsIn" placeholder="Jouw antwoord" ' +
-          'autocomplete="off" aria-label="Jouw antwoord" style="flex:1;">' +
+        : '<div class="h-rij"><input class="veld h-flex1" id="toetsIn" placeholder="Jouw antwoord" ' +
+          'autocomplete="off" aria-label="Jouw antwoord">' +
           '<button class="knop mini" id="toetsStuur">Antwoord</button></div>') +
       '</div>';
     vak.querySelectorAll('[data-optie]').forEach(function (b) {

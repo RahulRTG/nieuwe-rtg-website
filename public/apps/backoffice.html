@@ -154,7 +154,7 @@
     <span style="display:flex;align-items:center;gap:0.8rem;">
       <a href="/apps/klankwerk-kantoor.html" title="Aanvragen om onder de RTG-naam uit te geven" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:0;padding:0.28rem 0.7rem;">RTG-naam</a>
       <a href="/apps/techniek.html" title="Technische status (beveiligd)" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:0;padding:0.28rem 0.7rem;">Techniek</a>
-      <span class="live" id="liveInd" style="display:none;"><span class="dot"></span>Live</span>
+      <span class="live h-weg" id="liveInd"><span class="dot"></span>Live</span>
     </span>
   </div>
 </header>
@@ -173,16 +173,16 @@
   <div class="wrap" id="hoofd">
     <div class="stat" id="stat"></div>
     <div class="zoekbar"><input id="zoekInp" placeholder="Zoek op gast, partner, referentie of plaats…" data-i18n-ph="bo.zoekph" autocomplete="off" data-zoek></div>
-    <div class="panel" style="margin-bottom:1.5rem;">
+    <div class="panel h-mb150">
       <h2 class="ph"><span><span data-i18n="panel.actie">Actiecentrum</span></span><button class="hbtn" id="briefBtn"><span data-i18n="bo.brief">Dagbriefing</span></button></h2>
       <div class="brief" id="briefBox"></div>
       <div class="rows" id="alertList"></div>
     </div>
-    <div class="panel" style="margin-bottom:1.5rem;">
+    <div class="panel h-mb150">
       <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span> <span id="liveTot" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--soft);"></span></h2>
       <div class="rows" id="liveList"></div>
     </div>
-    <div class="cols" style="margin-bottom:1.5rem;">
+    <div class="cols h-mb150">
       <div class="panel">
         <h2 data-i18n="panel.perf">Partnerprestaties</h2>
         <div class="rows" id="perfList"></div>
@@ -230,14 +230,14 @@
     <div class="cols h-mt150">
       <div class="panel">
         <h2 data-i18n="panel.tafels">Rendez-vous &mdash; The Table</h2>
-        <p class="sub" data-i18n="panel.tafels.sub" style="margin:0 0 0.6rem;">Stel een tafel samen: zes of acht leden die iets aan elkaar hebben. Zij zien hun eigen uitnodiging &mdash; nooit wie er nog meer komt.</p>
+        <p class="sub h-onder60" data-i18n="panel.tafels.sub">Stel een tafel samen: zes of acht leden die iets aan elkaar hebben. Zij zien hun eigen uitnodiging &mdash; nooit wie er nog meer komt.</p>
         <div class="rows" id="rvTafels"></div>
         <div style="padding:0.7rem;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:0.5rem;">
-          <input id="tfNaam" placeholder="Naam, bijv. Diner 04" style="flex:1;min-width:9rem;">
+          <input id="tfNaam" placeholder="Naam, bijv. Diner 04" class="h-rek9">
           <input id="tfStad" placeholder="Stad" style="width:8rem;">
           <input id="tfDatum" type="date" aria-label="Datum" style="width:9.5rem;">
           <input id="tfTijd" type="time" aria-label="Tijd" style="width:7rem;">
-          <input id="tfThema" placeholder="Thema, bijv. architectuur &middot; hospitality" style="flex:1;min-width:9rem;">
+          <input id="tfThema" placeholder="Thema, bijv. architectuur &middot; hospitality" class="h-rek9">
           <input id="tfPlaatsen" type="number" min="2" max="12" value="8" aria-label="Aantal plaatsen" style="width:5rem;">
           <input id="tfGasten" placeholder="Codenamen, met komma's" style="flex:1;min-width:12rem;">
           <button class="hbtn" id="tfMaak" data-i18n="bo.tfmaak">Tafel samenstellen</button>
@@ -247,18 +247,18 @@
     <div class="cols h-mt150">
       <div class="panel">
         <h2 data-i18n="panel.incidenten">Paspoort-incidenten</h2>
-        <p class="sub" data-i18n="panel.incidenten.sub" style="margin:0 0 0.6rem;">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
+        <p class="sub h-onder60" data-i18n="panel.incidenten.sub">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
         <div class="rows" id="incidenten"></div>
       </div>
       <div class="panel">
         <h2 data-i18n="panel.salon">Salon-naleving</h2>
-        <p class="sub" data-i18n="panel.salon.sub" style="margin:0 0 0.6rem;">De Salon is verplicht. Partners zonder compleet profiel zijn niet zichtbaar voor leden.</p>
+        <p class="sub h-onder60" data-i18n="panel.salon.sub">De Salon is verplicht. Partners zonder compleet profiel zijn niet zichtbaar voor leden.</p>
         <div class="rows" id="salonNaleving"></div>
       </div>
     </div>
     <div class="panel h-mt150">
       <h2><span data-i18n="panel.ontmoet">Salon-ontmoetingen (veiligheid)</span></h2>
-      <p class="sub" data-i18n="panel.ontmoet.sub" style="margin:0 0 0.6rem;">Lopende afspraken met live-locatie. Bij een SOS kijkt u mee via de camera en belt u 112.</p>
+      <p class="sub h-onder60" data-i18n="panel.ontmoet.sub">Lopende afspraken met live-locatie. Bij een SOS kijkt u mee via de camera en belt u 112.</p>
       <div class="rows" id="ontmoetOffice"></div>
     </div>
     <div class="panel h-mt150">

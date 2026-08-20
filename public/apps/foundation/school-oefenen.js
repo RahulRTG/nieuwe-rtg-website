@@ -32,7 +32,7 @@
       if (!oefenbaar.length) return;
       blokken += '<div class="sec">Oefenen · ' + esc(x.klas.naam) + '</div><div class="kaart blok">' +
         oefenbaar.slice(0, 6).map(function (h) {
-          return '<div class="mini" style="margin:.35rem 0;"><b>' + esc(h.titel) + '</b>' +
+          return '<div class="mini h-my35"><b>' + esc(h.titel) + '</b>' +
             (h.deadline ? ' · voor ' + esc(h.deadline) : '') +
             ' <button class="knop mini" data-oefen="' + esc(h.id) + '" data-klas="' + esc(x.klas.code) + '">Oefen</button></div>';
         }).join('') +
@@ -55,18 +55,18 @@
   function vraag(r) {
     var v = vak();
     if (!v) return;
-    v.innerHTML = '<div class="kaart blok" style="margin-top:.5rem;">' +
-      (r.les ? '<div class="mini" style="opacity:.85;">' + esc(r.les) + '</div>' : '') +
+    v.innerHTML = '<div class="kaart blok h-mt50">' +
+      (r.les ? '<div class="mini h-zacht">' + esc(r.les) + '</div>' : '') +
       '<div class="mini">Vraag ' + r.nr + ' van ' + r.totaal + '</div>' +
       '<div style="margin:.5rem 0;font-size:1.02rem;line-height:1.6;">' + esc(r.vraag) + '</div>' +
       ((r.opties || []).length
-        ? '<div style="display:flex;flex-direction:column;gap:.35rem;">' + r.opties.map(function (o) {
-            return '<button class="knop mini" data-optie="' + esc(o) + '" style="text-align:left;">' + esc(o) + '</button>';
+        ? '<div class="h-stapel">' + r.opties.map(function (o) {
+            return '<button class="knop mini h-links" data-optie="' + esc(o) + '">' + esc(o) + '</button>';
           }).join('') + '</div>'
-        : '<div style="display:flex;gap:.4rem;"><input class="veld" id="oefenIn" placeholder="Jouw antwoord" ' +
-          'autocomplete="off" aria-label="Jouw antwoord" style="flex:1;">' +
+        : '<div class="h-rij"><input class="veld h-flex1" id="oefenIn" placeholder="Jouw antwoord" ' +
+          'autocomplete="off" aria-label="Jouw antwoord">' +
           '<button class="knop mini" id="oefenStuur">Antwoord</button></div>') +
-      '<div class="mini" id="oefenUit" style="margin-top:.4rem;"></div></div>';
+      '<div class="mini h-mt40" id="oefenUit"></div></div>';
     v.querySelectorAll('[data-optie]').forEach(function (b) {
       b.addEventListener('click', function () { antwoord(b.dataset.optie); });
     });
@@ -89,7 +89,7 @@
        is, dan staat dat erbij, met dezelfde stof anders uitgelegd eronder.
        Kwam hij er niet uit, dan staat er niets extra's -- liever niets dan een
        gok, want een verzonnen duiding stuurt een kind de verkeerde kant op. */
-    var extra = (r.denkfout ? '<div style="margin-top:.35rem;"><b>' + esc(r.denkfout.naam) + '.</b> ' + esc(r.denkfout.uitleg) + '</div>' : '') +
+    var extra = (r.denkfout ? '<div class="h-mt35"><b>' + esc(r.denkfout.naam) + '.</b> ' + esc(r.denkfout.uitleg) + '</div>' : '') +
       (r.anders ? '<div style="margin-top:.3rem;opacity:.9;"><i>Anders uitgelegd (' + esc(r.anders.soort) + '):</i> ' + esc(r.anders.tekst) + '</div>' : '');
     if (!r.klaar) {
       vraag(r);

@@ -58,10 +58,10 @@ window.RTGSchoolOmroep = (function () {
     }).join('') || '<p class="stil">Nog geen nieuwsbrief verstuurd.</p>';
 
     return '<div class="kaart enterprise-breed"><div class="kop">Nieuwsbrief</div>' + rijen +
-      '<div class="rij" style="margin-top:.6rem;">' +
+      '<div class="rij h-mt60">' +
       '<input class="veld" id="omTitel" maxlength="100" placeholder="Titel" aria-label="Titel van de nieuwsbrief">' +
-      '<select class="veld" id="omKlas" aria-label="Voor welke klas" style="flex:0 1 11rem;">' + klasOpties + '</select></div>' +
-      '<div class="rij" style="margin-top:.4rem;">' +
+      '<select class="veld h-kolom11" id="omKlas" aria-label="Voor welke klas">' + klasOpties + '</select></div>' +
+      '<div class="rij h-mt40">' +
       '<textarea class="veld" id="omTekst" rows="3" maxlength="4000" placeholder="De tekst" aria-label="Tekst van de nieuwsbrief"></textarea>' +
       '<button class="knop p" id="omStuur" type="button">Verstuur</button></div>' +
       '<p class="stil">De brief wordt een keer per thuistaal vertaald die in de doelgroep voorkomt; het Nederlands blijft er altijd naast staan.</p></div>';
@@ -74,8 +74,8 @@ window.RTGSchoolOmroep = (function () {
     }).join('') || '<p class="stil">Niets te herinneren; alles staat bij.</p>';
 
     return '<div class="kaart"><div class="kop">Herinneringen (' + (d.aantal || 0) + ')</div>' + rijen +
-      '<div class="rij" style="margin-top:.6rem;">' +
-      '<select class="veld" id="omSoort" aria-label="Welke soort herinneringen" style="flex:0 1 11rem;">' +
+      '<div class="rij h-mt60">' +
+      '<select class="veld h-kolom11" id="omSoort" aria-label="Welke soort herinneringen">' +
       '<option value="">Alle soorten</option><option value="huiswerk">Huiswerk</option><option value="toets">Toets</option>' +
       '<option value="factuur">Factuur</option><option value="verlof">Verlof</option></select>' +
       '<button class="knop" id="omHerinner" type="button">Verstuur de herinneringen</button></div>' +
@@ -84,7 +84,7 @@ window.RTGSchoolOmroep = (function () {
 
   function toestemmingKaart(d, klasOpties) {
     var rijen = (d.toestemmingen || []).slice(0, 12).map(function (t) {
-      return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(t.titel) + '</b> <span class="stil">' +
+      return '<div class="item h-boven"><span><b>' + esc(t.titel) + '</b> <span class="stil">' +
         (t.klasCode ? '· ' + esc(t.klasCode) + ' ' : '') + (t.tot ? '· tot ' + esc(t.tot) : '') + '</span><br>' +
         '<span class="stil">' + t.toestemming.length + ' gaven toestemming' +
         (t.geweigerd ? ' · ' + t.geweigerd + ' weigerden' : '') +
@@ -93,10 +93,10 @@ window.RTGSchoolOmroep = (function () {
     }).join('') || '<p class="stil">Nog geen toestemmingsvragen.</p>';
 
     return '<div class="kaart"><div class="kop">Toestemming vragen</div>' + rijen +
-      '<div class="rij" style="margin-top:.6rem;">' +
+      '<div class="rij h-mt60">' +
       '<input class="veld" id="omTTitel" maxlength="100" placeholder="Waarvoor (bijv. foto op de site)" aria-label="Titel van de vraag">' +
-      '<select class="veld" id="omTKlas" aria-label="Voor welke klas" style="flex:0 1 11rem;">' + klasOpties + '</select></div>' +
-      '<div class="rij" style="margin-top:.4rem;">' +
+      '<select class="veld h-kolom11" id="omTKlas" aria-label="Voor welke klas">' + klasOpties + '</select></div>' +
+      '<div class="rij h-mt40">' +
       '<input class="veld" id="omTUitleg" maxlength="800" placeholder="Leg uit waar de toestemming precies voor is" aria-label="Uitleg">' +
       '<button class="knop p" id="omToestemming" type="button">Vraag het</button></div>' +
       '<p class="stil">' + esc(d.uitleg || '') + '</p></div>';
@@ -112,11 +112,11 @@ window.RTGSchoolOmroep = (function () {
     }).join('') || '<p class="stil">Nog geen berichten in deze vakgroep.</p>';
 
     return '<div class="kaart"><div class="kop">Vakgroep · ' + esc(d.vak) + '</div>' +
-      '<div class="rij"><select class="veld" id="omVakKies" aria-label="Welke vakgroep" style="flex:0 1 11rem;">' +
+      '<div class="rij"><select class="veld h-kolom11" id="omVakKies" aria-label="Welke vakgroep">' +
       vakken + '</select><input class="veld" id="omVakNieuw" maxlength="40" placeholder="Of een nieuwe vakgroep" aria-label="Nieuwe vakgroep">' +
       '<button class="knop" id="omVakOpen" type="button">Open</button></div>' +
-      '<div style="margin-top:.5rem;">' + berichten + '</div>' +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="h-mt50">' + berichten + '</div>' +
+      '<div class="rij h-mt50">' +
       '<input class="veld" id="omVakTekst" maxlength="1000" placeholder="Bericht aan de vakgroep" aria-label="Bericht aan de vakgroep">' +
       '<button class="knop" id="omVakStuur" type="button">Plaats</button></div></div>';
   }

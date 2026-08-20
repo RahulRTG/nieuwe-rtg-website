@@ -27,7 +27,7 @@ window.SPart.taal = function () {
     kl('/school/taalbeleid').then(function (r) {
       if (r.body.error) { vak.innerHTML = '<p class="stil">' + esc(r.body.error) + '</p>'; return; }
       vak.innerHTML = r.body.vakken.map(function (v) {
-        return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(v.vak) + '</b> ' +
+        return '<div class="item h-boven"><span><b>' + esc(v.vak) + '</b> ' +
           '<span class="stil">' + esc(v.steun) + (v.maximum !== 'volledig' ? ' (hoogstens ' + esc(v.maximum) + ')' : '') + '</span>' +
           '<br><span class="stil">' + esc(v.reden) + '</span></span></div>';
       }).join('') + '<p class="stil">' + esc(r.body.uitleg) + '</p>';
@@ -42,7 +42,7 @@ window.SPart.taal = function () {
       '<input class="veld" id="btTaal" maxlength="8" placeholder="Taal van het gezin (bijv. en)" aria-label="Taal van het gezin">' +
       '<button class="knop" id="btKijk" type="button">Controleer</button></div>' +
       '<textarea class="veld" id="btTekst" rows="3" maxlength="1200" placeholder="Uw bericht in het Nederlands" aria-label="Uw bericht"></textarea>' +
-      '<div id="btUit" class="stil" style="margin-top:.5rem;"></div>';
+      '<div id="btUit" class="stil h-mt50"></div>';
 
     q('btKijk').addEventListener('click', function () {
       var tekst = q('btTekst').value.trim(), taal = q('btTaal').value.trim().toLowerCase();
@@ -54,15 +54,15 @@ window.SPart.taal = function () {
           '<div><b>Vertaling:</b> ' + esc(r.body.vertaling) + '</div>' +
           '<div><b>Terugvertaald:</b> ' + esc(r.body.terug) + '</div>' +
           (r.body.verschillen.length
-            ? '<div style="margin-top:.4rem;"><b>Verschoven:</b><br>' + r.body.verschillen.map(function (v) {
+            ? '<div class="h-mt40"><b>Verschoven:</b><br>' + r.body.verschillen.map(function (v) {
                 return '&bull; ' + esc(v.wat) + ' <span class="stil">(' + esc(v.soort) + ', ' + esc(v.ernst) + ')</span>';
               }).join('<br>') + '</div>'
             : '') +
-          '<div style="margin-top:.4rem;">' + esc(r.body.uitleg) + '</div>' +
-          '<div class="stil" style="margin-top:.4rem;"><b>Bon:</b> model ' + esc(r.body.bon.model) +
+          '<div class="h-mt40">' + esc(r.body.uitleg) + '</div>' +
+          '<div class="stil h-mt40"><b>Bon:</b> model ' + esc(r.body.bon.model) +
           ' &middot; wel gebruikt: ' + r.body.bon.gebruikt.map(esc).join(', ') +
           ' &middot; niet gebruikt: ' + r.body.bon.nietGebruikt.map(esc).join(', ') + '</div>' +
-          '<div class="rij" style="margin-top:.5rem;">' +
+          '<div class="rij h-mt50">' +
           '<input class="veld" id="btDoor" maxlength="60" placeholder="Uw naam" aria-label="Uw naam">' +
           (r.body.moetGezien ? '<label class="stil"><input type="checkbox" id="btGezien"> Ik heb de verschoven betekenis gezien</label>' : '') +
           '<button class="knop p" id="btStuur" type="button">Versturen</button></div>';

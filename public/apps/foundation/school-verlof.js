@@ -35,7 +35,7 @@
     try { portaal = await gezinApi('/school/portaal'); } catch (e) { portaal = null; }
 
     var lijst = ((aanvragen && aanvragen.aanvragen) || []).slice(0, 10).map(function (v) {
-      return '<div class="mini" style="margin:.3rem 0;"><b>' + esc(v.naam || '') + '</b> · ' + esc(v.van) +
+      return '<div class="mini h-my30"><b>' + esc(v.naam || '') + '</b> · ' + esc(v.van) +
         (v.tot && v.tot !== v.van ? ' t/m ' + esc(v.tot) : '') + ' · ' + esc(v.status) +
         (v.besluitReden ? '<br>reden van de school: ' + esc(v.besluitReden) : '') + '</div>';
     }).join('') || '<div class="mini">Nog geen verlofaanvragen.</div>';
@@ -48,25 +48,25 @@
     var uit = kaart('Verlof aanvragen', lijst +
       (ouder ? '<div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;">' +
         '<select class="veld" id="vlKind" aria-label="Voor welk kind">' + kies + '</select>' +
-        '<input class="veld" id="vlVan" type="date" aria-label="Van" style="flex:0 1 9rem;">' +
-        '<input class="veld" id="vlTot" type="date" aria-label="Tot en met" style="flex:0 1 9rem;">' +
-        '<input class="veld" id="vlReden" maxlength="300" placeholder="Reden" aria-label="Reden van het verlof" style="flex:1;">' +
+        '<input class="veld h-kolom9" id="vlVan" type="date" aria-label="Van">' +
+        '<input class="veld h-kolom9" id="vlTot" type="date" aria-label="Tot en met">' +
+        '<input class="veld h-flex1" id="vlReden" maxlength="300" placeholder="Reden" aria-label="Reden van het verlof">' +
         '<button class="knop mini" data-doe="verlof">Vraag aan</button></div>' +
-        '<div class="mini" style="margin-top:.4rem;">Een mens van de school beslist; u krijgt het besluit met de reden erbij.</div>'
-        : '<div class="mini" style="margin-top:.4rem;">Verlof vraagt een ouder of verzorger aan.</div>'));
+        '<div class="mini h-mt40">Een mens van de school beslist; u krijgt het besluit met de reden erbij.</div>'
+        : '<div class="mini h-mt40">Verlof vraagt een ouder of verzorger aan.</div>'));
 
     var vrij = (portaal && portaal.vrijeMomenten) || [];
     var geboekt = ((portaal && portaal.afspraken) || []).map(function (a) {
-      return '<div class="mini" style="margin:.3rem 0;">Geboekt: ' + esc(a.datum) + ' om ' + esc(a.tijd) +
+      return '<div class="mini h-my30">Geboekt: ' + esc(a.datum) + ' om ' + esc(a.tijd) +
         ' met ' + esc(a.leraar) + (a.plek ? ' · ' + esc(a.plek) : '') + ' (' + esc(a.kind) + ')</div>';
     }).join('');
     if (ouder && (vrij.length || geboekt)) {
       uit += kaart('Oudergesprek', geboekt +
         (vrij.length ? vrij.slice(0, 12).map(function (m) {
-          return '<div class="mini" style="margin:.3rem 0;">' + esc(m.datum) + ' om ' + esc(m.tijd) + ' · ' +
+          return '<div class="mini h-my30">' + esc(m.datum) + ' om ' + esc(m.tijd) + ' · ' +
             m.minuten + ' min · ' + esc(m.leraar) + (m.plek ? ' · ' + esc(m.plek) : '') +
             ' <button class="knop mini" data-doe="boek" data-moment="' + esc(m.id) + '">Boek</button></div>';
-        }).join('') + '<div class="mini" style="margin-top:.4rem;">Wie het eerst komt; er is geen voorrang te koop.</div>'
+        }).join('') + '<div class="mini h-mt40">Wie het eerst komt; er is geen voorrang te koop.</div>'
           : '<div class="mini">Er staan nu geen vrije momenten klaar.</div>'));
     }
 

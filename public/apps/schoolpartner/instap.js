@@ -27,7 +27,7 @@ window.SPart.instap = function () {
       var d = r.body;
       if (d.error) { vak.innerHTML = '<p class="stil">' + esc(d.error) + '</p>'; return; }
       vak.innerHTML = d.stappen.map(function (s, i) {
-        return '<div class="item" style="align-items:flex-start;"><span><b>' + (i + 1) + '. ' + esc(s.wat) + '</b>' +
+        return '<div class="item h-boven"><span><b>' + (i + 1) + '. ' + esc(s.wat) + '</b>' +
           '<br><span class="stil">' + esc(s.waarom) + '</span></span></div>';
       }).join('') + '<p class="stil">' + esc(d.uitleg) + '</p>';
     });
@@ -45,18 +45,18 @@ window.SPart.instap = function () {
         ' &middot; ' + (d.vandaag.presentieGezet ? 'presentie staat' : 'presentie nog niet gezet') + '</div>' +
         (d.namen.length ? '<div class="stil">' + d.namen.map(esc).join(', ') + '</div>' : '') +
         (d.materiaal.length
-          ? '<div class="kop" style="margin-top:.6rem;">Het materiaal van vandaag</div>' +
+          ? '<div class="kop h-mt60">Het materiaal van vandaag</div>' +
             d.materiaal.map(function (m) {
-              return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(m.naam) + '</b> <span class="stil">' + esc(m.vak) + '</span>' +
+              return '<div class="item h-boven"><span><b>' + esc(m.naam) + '</b> <span class="stil">' + esc(m.vak) + '</span>' +
                 '<br>' + esc(m.les) +
                 m.uitleg.map(function (u) { return '<br><span class="stil"><i>' + esc(u.soort) + ':</i> ' + esc(u.tekst) + '</span>'; }).join('') +
                 '</span></div>';
             }).join('')
           : '<p class="stil">Voor vandaag staat er geen leerdoel klaar in deze klas.</p>') +
         (d.eerder.length
-          ? '<div class="kop" style="margin-top:.6rem;">Wat eerdere lessen opschreven</div>' +
+          ? '<div class="kop h-mt60">Wat eerdere lessen opschreven</div>' +
             d.eerder.map(function (x) {
-              return '<div class="item" style="align-items:flex-start;"><span>' +
+              return '<div class="item h-boven"><span>' +
                 (x.werkte ? '<b>Werkte:</b> ' + esc(x.werkte) + '<br>' : '') +
                 (x.liepVast ? '<b>Liep vast:</b> ' + esc(x.liepVast) + '<br>' : '') +
                 '<span class="stil">' + esc(x.klas) + ' &middot; ' + esc(x.datum) + ' &middot; ' + esc(x.door) + '</span></span></div>';

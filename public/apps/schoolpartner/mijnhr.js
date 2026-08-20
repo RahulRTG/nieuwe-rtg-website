@@ -28,7 +28,7 @@ window.SPart.mijnhr = function () {
         (v.besluitReden ? '</span><span class="stil">' + esc(v.besluitReden) : '') + '</span></div>';
     }).join('') || '<p class="stil">Niets genoteerd.</p>';
     var gesprekken = (d.gesprekken || []).slice(0, 5).map(function (x) {
-      return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(x.soort) + '</b> <span class="stil">' +
+      return '<div class="item h-boven"><span><b>' + esc(x.soort) + '</b> <span class="stil">' +
         esc(x.op) + ' · ' + esc(x.door) + '</span><br>' + esc(x.besproken) +
         ((x.afspraken || []).length ? '<br><span class="stil">afspraken: ' + esc(x.afspraken.join(' · ')) + '</span>' : '') +
         (x.reactie ? '<br><span class="stil">jouw reactie: ' + esc(x.reactie.tekst) + '</span>' : '') + '</span>' +
@@ -42,25 +42,25 @@ window.SPart.mijnhr = function () {
         return '<div class="item"><span>' + esc(b.wat) + '</span><span class="stil">' +
           (b.geldigTot ? 'geldig tot ' + esc(b.geldigTot) : 'geen einddatum') + '</span></div>';
       }).join('')) +
-      '<div class="kop" style="margin-top:.8rem;">Ziek en verlof</div>' + verlof +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="kop h-mt80">Ziek en verlof</div>' + verlof +
+      '<div class="rij h-mt50">' +
       (ziek ? '<button class="knop p" id="mhBeter" type="button">Ik ben weer beter</button>'
             : '<button class="knop" id="mhZiek" type="button">Ziek melden</button>') +
-      '<input class="veld" id="mhVan" type="date" aria-label="Verlof van" style="flex:0 1 10rem;">' +
-      '<input class="veld" id="mhTot" type="date" aria-label="Verlof tot" style="flex:0 1 10rem;">' +
+      '<input class="veld h-kolom10" id="mhVan" type="date" aria-label="Verlof van">' +
+      '<input class="veld h-kolom10" id="mhTot" type="date" aria-label="Verlof tot">' +
       '<input class="veld" id="mhToe" maxlength="200" placeholder="Toelichting bij het verlof" aria-label="Toelichting">' +
       '<button class="knop" id="mhVerlof" type="button">Vraag verlof aan</button></div>' +
       '<p class="stil">Een ziekmelding vraagt geen reden en legt geen medische gegevens vast. Over verlof beslist een mens.</p>' +
-      '<div class="kop" style="margin-top:.8rem;">Mijn uren</div>' +
+      '<div class="kop h-mt80">Mijn uren</div>' +
       '<div id="mhUren" class="stil">Laden...</div>' +
-      '<div class="rij" style="margin-top:.5rem;">' +
-      '<input class="veld" id="mhDatum" type="date" aria-label="Datum" style="flex:0 1 10rem;">' +
-      '<input class="veld" id="mhAantal" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Aantal uren" style="flex:0 1 7rem;">' +
+      '<div class="rij h-mt50">' +
+      '<input class="veld h-kolom10" id="mhDatum" type="date" aria-label="Datum">' +
+      '<input class="veld h-kolom7" id="mhAantal" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Aantal uren">' +
       '<input class="veld" id="mhWat" maxlength="80" placeholder="Waaraan" aria-label="Waaraan">' +
       '<button class="knop" id="mhBoek" type="button">Boek</button></div>' +
-      '<div class="kop" style="margin-top:.8rem;">Gesprekken</div>' + gesprekken +
-      '<div class="kop" style="margin-top:.8rem;">Wat ik mag</div><div id="mhRechten" class="stil">Laden...</div>' +
-      '<div class="kop" style="margin-top:.8rem;">Peiling</div><div id="mhPeiling" class="stil">Laden...</div>';
+      '<div class="kop h-mt80">Gesprekken</div>' + gesprekken +
+      '<div class="kop h-mt80">Wat ik mag</div><div id="mhRechten" class="stil">Laden...</div>' +
+      '<div class="kop h-mt80">Peiling</div><div id="mhPeiling" class="stil">Laden...</div>';
     uren();
     rechten();
     peiling();
@@ -88,11 +88,11 @@ window.SPart.mijnhr = function () {
       if (!vak) return;
       if (r.body.error) { vak.textContent = r.body.error; return; }
       vak.innerHTML = (r.body.peilingen || []).map(function (p) {
-        return '<div style="margin:.4rem 0;"><b>' + esc(p.titel) + '</b>' +
+        return '<div class="h-my40"><b>' + esc(p.titel) + '</b>' +
           (p.alGeantwoord ? ' <span class="tag aan">beantwoord</span>'
             : p.stellingen.map(function (st, i) {
                 return '<div class="rij" style="margin:.25rem 0;"><span style="flex:1;min-width:12rem;">' + esc(st) + '</span>' +
-                  '<select class="veld" data-peil="' + esc(p.id) + '" data-nr="' + i + '" aria-label="' + esc(st) + '" style="flex:0 1 7rem;">' +
+                  '<select class="veld h-kolom7" data-peil="' + esc(p.id) + '" data-nr="' + i + '" aria-label="' + esc(st) + '">' +
                   [1, 2, 3, 4, 5].map(function (n) { return '<option value="' + n + '">' + n + '</option>'; }).join('') +
                   '</select></div>';
               }).join('') + '<button class="knop" data-peilstuur="' + esc(p.id) + '" type="button">Verstuur anoniem</button>') +

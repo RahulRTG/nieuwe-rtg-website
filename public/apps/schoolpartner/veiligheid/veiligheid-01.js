@@ -64,12 +64,12 @@ window.RTGSchoolVeiligheid = (function () {
     }).join('') || '<p class="stil">Nog geen passen uitgegeven.</p>';
 
     return '<div class="kaart"><div class="kop">Toegangspassen</div>' +
-      '<div class="kpis" style="margin-bottom:.6rem;">' +
+      '<div class="kpis h-mb60">' +
       [['Passen', d.aantal || 0], ['Nu binnen', d.binnen || 0], ['Passages vandaag', d.passagesVandaag || 0]]
         .map(function (x) { return '<div class="kpi"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>' +
       rijen +
-      '<div class="rij" style="margin-top:.6rem;">' +
-      '<select class="veld" id="vgSoort" aria-label="Soort pas" style="flex:0 1 9rem;">' +
+      '<div class="rij h-mt60">' +
+      '<select class="veld h-kolom9" id="vgSoort" aria-label="Soort pas">' +
       '<option value="leerling">Leerling</option><option value="personeel">Personeel</option><option value="bezoeker">Bezoeker</option></select>' +
       '<select class="veld" id="vgLeerling" aria-label="Voor welke leerling">' + opties(MENSEN.leerlingen, 'id', 'naam') + '</select>' +
       '<select class="veld" id="vgPersoneel" aria-label="Voor welk personeelslid" hidden>' + opties(MENSEN.personeel, 'id', 'naam') + '</select>' +
@@ -87,7 +87,7 @@ window.RTGSchoolVeiligheid = (function () {
     }).join('') || '<p class="stil">Geen bezoekers geregistreerd.</p>';
 
     return '<div class="kaart"><div class="kop">Bezoekers (' + (d.binnen || 0) + ' binnen)</div>' + rijen +
-      '<div class="rij" style="margin-top:.6rem;">' +
+      '<div class="rij h-mt60">' +
       '<input class="veld" id="vgBezNaam" maxlength="60" placeholder="Naam" aria-label="Naam van de bezoeker">' +
       '<input class="veld" id="vgBezOrg" maxlength="60" placeholder="Organisatie" aria-label="Organisatie">' +
       '<input class="veld" id="vgBezVoor" maxlength="60" placeholder="Op bezoek bij" aria-label="Op bezoek bij">' +

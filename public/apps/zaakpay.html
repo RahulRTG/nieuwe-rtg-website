@@ -79,11 +79,11 @@
   <section class="kaart">
     <div class="sec">Innen aan de kassa</div>
     <div class="rij">
-      <input class="veld" id="iCode" placeholder="Betaalcode van het lid" autocomplete="off" maxlength="12" style="flex:2;min-width:9rem;" aria-label="Betaalcode van het lid">
-      <input class="veld" id="iBedrag" placeholder="Euro" inputmode="decimal" style="flex:1;min-width:5rem;" aria-label="Bedrag in euro">
+      <input class="veld h-rek9-2" id="iCode" placeholder="Betaalcode van het lid" autocomplete="off" maxlength="12" aria-label="Betaalcode van het lid">
+      <input class="veld h-rek5" id="iBedrag" placeholder="Euro" inputmode="decimal" aria-label="Bedrag in euro">
     </div>
     <div class="rij h-mt55">
-      <input class="veld" id="iOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" style="flex:1;min-width:9rem;" aria-label="Omschrijving, mag leeg">
+      <input class="veld h-rek9" id="iOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" aria-label="Omschrijving, mag leeg">
       <button class="knop" id="iInn">Inn</button>
     </div>
     <p class="hint h-mt60">Het lid toont zijn code in RTG Pay. Innen mag iedereen die is ingelogd: dat is het werk.</p>
@@ -92,17 +92,17 @@
   <section class="kaart">
     <div class="sec">Tegoed klaarzetten</div>
     <div class="rij">
-      <input class="veld" id="tBedrag" placeholder="Euro" inputmode="decimal" style="flex:1;min-width:5rem;" aria-label="Bedrag in euro">
-      <input class="veld" id="tAan" placeholder="Voor wie? Codenaam (mag leeg)" maxlength="40" style="flex:2;min-width:9rem;" aria-label="Codenaam van de ontvanger, mag leeg">
+      <input class="veld h-rek5" id="tBedrag" placeholder="Euro" inputmode="decimal" aria-label="Bedrag in euro">
+      <input class="veld h-rek9-2" id="tAan" placeholder="Voor wie? Codenaam (mag leeg)" maxlength="40" aria-label="Codenaam van de ontvanger, mag leeg">
     </div>
     <div class="rij h-mt55">
-      <input class="veld" id="tOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" style="flex:1;min-width:9rem;" aria-label="Waarvoor is het tegoed">
+      <input class="veld h-rek9" id="tOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" aria-label="Waarvoor is het tegoed">
       <button class="knop hoofd" id="tZet">Zet klaar</button>
     </div>
     <p class="hint h-mt60">Het geld gaat meteen uit de kas en staat vast tot iemand het ophaalt. Een zaak laadt niet bij: is het saldo te laag, dan kan het niet. Laat je de codenaam leeg, dan kan iedereen met de code het ophalen. Na een jaar haal je het zelf terug.</p>
     <div id="tNieuw" hidden>
       <div class="boncode" id="tCode" aria-live="polite"></div>
-      <div class="rij" style="justify-content:center;"><button class="knop stil" id="tKopieer">Kopieer de code</button></div>
+      <div class="rij h-centreer"><button class="knop stil" id="tKopieer">Kopieer de code</button></div>
     </div>
   </section>
 

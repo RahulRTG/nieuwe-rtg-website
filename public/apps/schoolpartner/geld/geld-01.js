@@ -60,14 +60,14 @@ window.RTGSchoolGeld = (function () {
     }).join('') || '<p class="stil">Niets openstaand.</p>';
 
     return '<div class="kaart enterprise-breed"><div class="kop">Openstaand (' + euro(deb.openTotaal) + ')</div>' + rijen +
-      '<div class="rij" style="margin-top:.6rem;">' +
+      '<div class="rij h-mt60">' +
       '<select class="veld" id="glLeerling" aria-label="Voor welke leerling">' + kies + '</select>' +
-      '<select class="veld" id="glSoort" aria-label="Soort factuur" style="flex:0 1 10rem;">' +
+      '<select class="veld h-kolom10" id="glSoort" aria-label="Soort factuur">' +
       ['schoolgeld', 'ouderbijdrage', 'excursie', 'materiaal', 'kantine', 'overig'].map(function (x) {
         return '<option value="' + x + '">' + x + '</option>'; }).join('') + '</select>' +
       '<input class="veld" id="glOms" maxlength="120" placeholder="Waarvoor" aria-label="Omschrijving">' +
-      '<input class="veld" id="glBedrag" type="number" min="0" step="0.5" placeholder="Bedrag" aria-label="Bedrag in euro" style="flex:0 1 8rem;">' +
-      '<input class="veld" id="glVervalt" type="date" aria-label="Vervaldatum" style="flex:0 1 10rem;">' +
+      '<input class="veld h-kolom8" id="glBedrag" type="number" min="0" step="0.5" placeholder="Bedrag" aria-label="Bedrag in euro">' +
+      '<input class="veld h-kolom10" id="glVervalt" type="date" aria-label="Vervaldatum">' +
       '<button class="knop p" id="glFactuur" type="button">Maak factuur</button></div>' +
       '<p class="stil">' + esc(deb.uitleg || '') + '</p></div>';
   }
@@ -81,11 +81,11 @@ window.RTGSchoolGeld = (function () {
     }).join('') || '<p class="stil">Geen machtigingen vastgelegd.</p>';
 
     return '<div class="kaart"><div class="kop">Machtigingen (' + (mac.actief || 0) + ' actief)</div>' + rijen +
-      '<div class="rij" style="margin-top:.6rem;">' +
+      '<div class="rij h-mt60">' +
       '<select class="veld" id="glMLeerling" aria-label="Voor welke leerling">' + kies + '</select>' +
       '<input class="veld" id="glMHouder" maxlength="80" placeholder="Naam op de rekening" aria-label="Naam op de rekening">' +
-      '<input class="veld" id="glMIban" maxlength="4" placeholder="Laatste 4" aria-label="Laatste vier tekens van het rekeningnummer" style="flex:0 1 7rem;">' +
-      '<input class="veld" id="glMMax" type="number" min="0" step="0.5" placeholder="Max per keer" aria-label="Maximum per incasso" style="flex:0 1 9rem;">' +
+      '<input class="veld h-kolom7" id="glMIban" maxlength="4" placeholder="Laatste 4" aria-label="Laatste vier tekens van het rekeningnummer">' +
+      '<input class="veld h-kolom9" id="glMMax" type="number" min="0" step="0.5" placeholder="Max per keer" aria-label="Maximum per incasso">' +
       '<button class="knop p" id="glMachtiging" type="button">Leg vast</button></div>' +
       '<p class="stil">Er wordt hier niets geïnd en niets afgeschreven: dit is het register van wat er is getekend. Een ouder kan zijn machtiging zelf en per direct stoppen.</p></div>';
   }
@@ -102,18 +102,18 @@ window.RTGSchoolGeld = (function () {
     }).join('') || '<p class="stil">Geen subsidies vastgelegd.</p>';
 
     return '<div class="kaart"><div class="kop">Budgetten</div>' + rijen +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="rij h-mt50">' +
       '<input class="veld" id="glBNaam" maxlength="60" placeholder="Naam (afdeling of doel)" aria-label="Naam van het budget">' +
-      '<input class="veld" id="glBBedrag" type="number" min="0" step="1" placeholder="Budget" aria-label="Budget in euro" style="flex:0 1 8rem;">' +
-      '<input class="veld" id="glBBesteed" type="number" min="0" step="1" placeholder="Besteding boeken" aria-label="Besteding in euro" style="flex:0 1 9rem;">' +
+      '<input class="veld h-kolom8" id="glBBedrag" type="number" min="0" step="1" placeholder="Budget" aria-label="Budget in euro">' +
+      '<input class="veld h-kolom9" id="glBBesteed" type="number" min="0" step="1" placeholder="Besteding boeken" aria-label="Besteding in euro">' +
       '<input class="veld" id="glBWat" maxlength="120" placeholder="Waaraan" aria-label="Waaraan besteed">' +
       '<button class="knop" id="glBudget" type="button">Zet budget</button></div>' +
-      '<div class="kop" style="margin-top:.8rem;">Subsidies</div>' + subs +
-      '<div class="rij" style="margin-top:.5rem;">' +
+      '<div class="kop h-mt80">Subsidies</div>' + subs +
+      '<div class="rij h-mt50">' +
       '<input class="veld" id="glSNaam" maxlength="80" placeholder="Naam" aria-label="Naam van de subsidie">' +
       '<input class="veld" id="glSVer" maxlength="80" placeholder="Verstrekker" aria-label="Verstrekker">' +
-      '<input class="veld" id="glSBedrag" type="number" min="0" step="1" placeholder="Toegekend" aria-label="Toegekend bedrag" style="flex:0 1 8rem;">' +
-      '<input class="veld" id="glSOnt" type="number" min="0" step="1" placeholder="Ontvangen" aria-label="Ontvangen bedrag" style="flex:0 1 8rem;">' +
+      '<input class="veld h-kolom8" id="glSBedrag" type="number" min="0" step="1" placeholder="Toegekend" aria-label="Toegekend bedrag">' +
+      '<input class="veld h-kolom8" id="glSOnt" type="number" min="0" step="1" placeholder="Ontvangen" aria-label="Ontvangen bedrag">' +
       '<button class="knop" id="glSubsidie" type="button">Noteer</button></div></div>';
   }
 

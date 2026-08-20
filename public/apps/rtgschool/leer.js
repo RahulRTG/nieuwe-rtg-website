@@ -90,11 +90,11 @@
       el.innerHTML = (d.vakken || []).map(function (v) {
         return '<div class="vakkop">' + esc(v.vak) + '</div>' + v.doelen.map(function (doel) {
           return '<div class="doel"><span>' + (doel.behaald ? '<span class="pil ok">behaald</span> ' : '') + esc(doel.naam) +
-            (doel.ref ? ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(doel.ref) + ')</span>' : '') + '</span>' +
+            (doel.ref ? ' <span class="h-meta">(' + esc(doel.ref) + ')</span>' : '') + '</span>' +
             '<span class="rij">' +
-            (doel.behaald ? '<button class="knop stil" data-waarom="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Waarom?</button>' : '') +
-            '<button class="knop stil" data-les="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Les</button>' +
-            '<button class="knop" data-oefen="' + esc(doel.id) + '" style="padding:.3rem .6rem;font-size:.76rem;">Oefenen</button></span></div>' +
+            (doel.behaald ? '<button class="knop stil h-chip" data-waarom="' + esc(doel.id) + '">Waarom?</button>' : '') +
+            '<button class="knop stil h-chip" data-les="' + esc(doel.id) + '">Les</button>' +
+            '<button class="knop h-chip" data-oefen="' + esc(doel.id) + '">Oefenen</button></span></div>' +
             '<div class="leeg" id="waarom-' + esc(doel.id).replace(/[^A-Za-z0-9-]/g, '_') + '" hidden></div>';
         }).join('');
       }).join('') || '<div class="leeg">Voor deze keuze staat er nog geen leerlijn klaar.</div>';
@@ -122,7 +122,7 @@
     try {
       var d = await api('/api/onderwijs/bewijs', { doel: doelId });
       vak.innerHTML = '<b>Beheersing: ' + esc(d.beheersing.woord) + '</b> &mdash; ' + esc(d.beheersing.uitleg) +
-        '<div style="margin-top:.35rem;">' + (d.bewijs || []).map(function (b) {
+        '<div class="h-mt35">' + (d.bewijs || []).map(function (b) {
           return '&bull; ' + esc(BEWIJSNAAM[b.soort] || b.soort) +
             (b.detail ? ': ' + esc(b.detail) : '') +
             (b.door ? ' <span style="opacity:.8;">(' + esc(b.door) + ')</span>' : '') +
@@ -156,8 +156,8 @@
       }).join('');
       document.getElementById('lesInhoud').innerHTML = '<b>' + esc(d.doel.naam) + '</b> (' + esc(d.doel.vak) + ')' +
         '<p id="lesTekst" style="margin-top:.4rem;line-height:1.7;">' + esc(d.doel.les) + '</p>' +
-        (uitleg ? '<div class="rij" style="margin-top:.5rem;"><span class="sec" style="margin:0;">Leg anders uit</span>' + uitleg + '</div>' : '') +
-        (onder ? '<div class="sec" style="margin-top:.8rem;">Wat hier onder ligt</div>' + onder +
+        (uitleg ? '<div class="rij h-mt50"><span class="sec" style="margin:0;">Leg anders uit</span>' + uitleg + '</div>' : '') +
+        (onder ? '<div class="sec h-mt80">Wat hier onder ligt</div>' + onder +
           ((d.ontbreekt || []).length
             ? '<p class="leeg">Hiervan staat nog open: ' + esc(d.ontbreekt.map(function (x) { return x.naam; }).join(', ')) +
               '. Dat eerst doen scheelt hier veel gepuzzel.</p>'
@@ -217,9 +217,9 @@
         ? d.stukken.map(function (x) {
             var knop = x.soort === 'herhalen' ? 'herhaal' : 'oefen';
             return '<div class="doel"><span>' + esc(x.naam) +
-              ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(x.vak) + ')</span><br>' +
+              ' <span class="h-meta">(' + esc(x.vak) + ')</span><br>' +
               '<span style="color:var(--soft);font-size:.76rem;">' + esc(x.waarom) + '</span></span>' +
-              '<span class="rij"><button class="knop" data-' + knop + '="' + esc(x.doel) + '" style="padding:.3rem .6rem;font-size:.76rem;">Doen</button></span></div>';
+              '<span class="rij"><button class="knop h-chip" data-' + knop + '="' + esc(x.doel) + '">Doen</button></span></div>';
           }).join('')
         : '<div class="leeg">' + esc(d.let || '') + '</div>') +
         '<p class="leeg" style="margin:.5rem 0 0;">' + esc(d.uitleg) + '</p>';
@@ -247,8 +247,8 @@
       var d = await api('/api/leerstof/herhalen');
       el.innerHTML = d.open.length
         ? d.open.slice(0, 12).map(function (o) {
-            return '<div class="doel"><span>' + esc(o.naam) + ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(o.vak) + ')</span></span>' +
-              '<span class="rij"><button class="knop" data-herhaal="' + esc(o.doel) + '" style="padding:.3rem .6rem;font-size:.76rem;">' + d.vragen + ' vragen</button></span></div>';
+            return '<div class="doel"><span>' + esc(o.naam) + ' <span class="h-meta">(' + esc(o.vak) + ')</span></span>' +
+              '<span class="rij"><button class="knop h-chip" data-herhaal="' + esc(o.doel) + '">' + d.vragen + ' vragen</button></span></div>';
           }).join('')
         : '<div class="leeg">Er staat vandaag niets klaar om terug te halen.' +
           (d.later.length ? ' Het eerstvolgende komt op ' + esc(String(d.later[0].volgende).slice(0, 10)) + '.' : '') + '</div>';
@@ -292,7 +292,7 @@
          gedacht is, staat dat hier -- met daaronder dezelfde stof op een
          andere manier uitgelegd. Komt de server er niet uit, dan staat er
          niets extra's: een verzonnen duiding stuurt je de verkeerde kant op. */
-      if (d.denkfout) regel += '<div style="margin-top:.4rem;"><b>' + esc(d.denkfout.naam) + '.</b> ' + esc(d.denkfout.uitleg) + '</div>';
+      if (d.denkfout) regel += '<div class="h-mt40"><b>' + esc(d.denkfout.naam) + '.</b> ' + esc(d.denkfout.uitleg) + '</div>';
       if (d.anders) regel += '<div style="margin-top:.35rem;opacity:.9;"><i>Anders uitgelegd (' + esc(d.anders.soort) + '):</i> ' + esc(d.anders.tekst) + '</div>';
       if (d.klaar) {
         document.getElementById('oefenOpties').innerHTML = '';

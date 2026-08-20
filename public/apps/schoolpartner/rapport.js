@@ -43,12 +43,12 @@ window.SPart.rapport = function () {
             return esc(v.vak) + ' ' + (v.gemiddelde == null ? '-' : v.gemiddelde);
           }).join(' · ') || 'nog geen cijfers';
           var a = l.aanwezigheid || {};
-          return '<div class="item" style="align-items:flex-start;"><span style="flex:1;min-width:14rem;">' +
+          return '<div class="item h-boven"><span class="h-rek14">' +
             '<b>' + esc(l.naam) + '</b> <span class="stil">gemiddeld ' + (l.gemiddelde == null ? '-' : l.gemiddelde) + '</span><br>' +
             '<span class="stil">' + vakken + '<br>' + (a.lessen || 0) + ' lessen · ' + (a.gemist || 0) +
             ' gemist · ' + (a.telaat || 0) + ' keer te laat</span>' +
             (l.tekstBron ? '<br><span class="tag">' + esc(l.tekstBron) + '</span>' : '') +
-            '</span><span class="rij" style="flex:1;min-width:14rem;">' +
+            '</span><span class="rij h-rek14">' +
             '<textarea class="veld" rows="3" data-tekst="' + esc(l.sleutel) + '" maxlength="1200" ' +
             'aria-label="Rapporttekst voor ' + esc(l.naam) + '"' + (vast ? ' readonly' : '') + '>' +
             esc(l.tekst || '') + '</textarea>' +
@@ -56,8 +56,8 @@ window.SPart.rapport = function () {
               '<button class="knop p" data-bewaar="' + esc(l.sleutel) + '">Bewaar</button>') +
             '</span></div>';
         }).join('') +
-        (vast ? '' : '<div class="rij" style="margin-top:.8rem;">' +
-          '<label class="stil" style="display:flex;gap:.4rem;align-items:center;min-height:24px;">' +
+        (vast ? '' : '<div class="rij h-mt80">' +
+          '<label class="stil h-rij-mid">' +
           '<input type="checkbox" id="rapGelezen"> Ik heb alle teksten gelezen.</label>' +
           '<button class="knop p" id="rapVast" type="button">Stel vast en deel met de gezinnen</button></div>');
       knoppen(rap.id);

@@ -27,7 +27,7 @@ window.SPart.denkfout = function () {
       vak.innerHTML = !p.length
         ? '<p class="stil">Er staat op dit moment geen denkpatroon open in deze klas. Dit vult zich vanzelf terwijl er geoefend wordt.</p>'
         : p.map(function (x) {
-            return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(x.naam) + '</b>' +
+            return '<div class="item h-boven"><span><b>' + esc(x.naam) + '</b>' +
               ' <span class="stil">bij ' + esc(x.doelNaam) + '</span><br><span class="stil">' + esc(x.uitleg) + '</span></span>' +
               '<span class="rij"><span class="stil">' + x.aantal + 'x</span>' +
               '<button class="knop mini" data-doel="' + esc(x.doel) + '" data-df="' + esc(x.id) + '" type="button">Besproken</button></span></div>';

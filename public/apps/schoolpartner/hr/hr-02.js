@@ -13,7 +13,7 @@
             : '<span class="tag">' + esc(v.status) + '</span>') + '</div>';
       }).join('') || '<p class="stil">Geen verlof of ziekte genoteerd.</p>';
       var gesprekken = (d.gesprekken || []).slice(0, 6).map(function (x) {
-        return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(x.soort) + '</b> <span class="stil">' +
+        return '<div class="item h-boven"><span><b>' + esc(x.soort) + '</b> <span class="stil">' +
           esc(x.op) + ' · ' + esc(x.door) + '</span><br>' + esc(x.besproken) +
           ((x.afspraken || []).length ? '<br><span class="stil">afspraken: ' + esc(x.afspraken.join(' · ')) + '</span>' : '') +
           (x.reactie ? '<br><span class="stil">reactie van de medewerker: ' + esc(x.reactie.tekst) + '</span>' : '') +
@@ -21,17 +21,17 @@
       }).join('') || '<p class="stil">Nog geen gesprekken vastgelegd.</p>';
 
       document.getElementById('hrDossier').innerHTML =
-        '<div class="kop" style="margin-top:.8rem;">' + esc(d.naam) + '</div>' +
+        '<div class="kop h-mt80">' + esc(d.naam) + '</div>' +
         '<div class="item"><span>Contract</span><span class="stil">' +
         (c ? esc(c.soort) + ' · ' + c.uren + ' uur' + (c.functie ? ' · ' + esc(c.functie) : '') +
              (c.van ? ' · vanaf ' + esc(c.van) : '') : 'nog niet vastgelegd') + '</span></div>' +
-        '<div class="rij" style="margin-top:.4rem;">' +
+        '<div class="rij h-mt40">' +
         '<input class="veld" id="hrCSoort" maxlength="40" placeholder="Soort (onbepaalde tijd)" aria-label="Soort contract">' +
         '<input class="veld" id="hrCUren" type="number" min="0" max="60" placeholder="Uren" aria-label="Uren per week" style="flex:0 1 6rem;">' +
         '<input class="veld" id="hrCFunctie" maxlength="60" placeholder="Functie" aria-label="Functie">' +
-        '<input class="veld" id="hrCVan" type="date" aria-label="Vanaf" style="flex:0 1 10rem;">' +
+        '<input class="veld h-kolom10" id="hrCVan" type="date" aria-label="Vanaf">' +
         '<button class="knop" id="hrCZet" type="button">Leg contract vast</button></div>' +
-        '<div class="kop" style="margin-top:.8rem;">Bevoegdheden en trainingen</div>' +
+        '<div class="kop h-mt80">Bevoegdheden en trainingen</div>' +
         ((d.bevoegdheden || []).concat(d.trainingen || []).length
           ? (d.bevoegdheden || []).map(function (b) {
               return '<div class="item"><span>' + esc(b.wat) + (b.vak ? ' <span class="stil">· ' + esc(b.vak) + '</span>' : '') +
@@ -42,15 +42,15 @@
                 '<span class="' + (t.afgerond ? 'tag aan' : 'stil') + '">' + (t.afgerond ? 'afgerond' : esc(t.op || 'gepland')) + '</span></div>';
             }).join('')
           : '<p class="stil">Nog niets vastgelegd.</p>') +
-        '<div class="rij" style="margin-top:.4rem;">' +
+        '<div class="rij h-mt40">' +
         '<input class="veld" id="hrBev" maxlength="80" placeholder="Bevoegdheid" aria-label="Bevoegdheid">' +
-        '<input class="veld" id="hrBevVak" maxlength="40" placeholder="Vak" aria-label="Vak" style="flex:0 1 8rem;">' +
-        '<input class="veld" id="hrBevTot" type="date" aria-label="Geldig tot" style="flex:0 1 10rem;">' +
+        '<input class="veld h-kolom8" id="hrBevVak" maxlength="40" placeholder="Vak" aria-label="Vak">' +
+        '<input class="veld h-kolom10" id="hrBevTot" type="date" aria-label="Geldig tot">' +
         '<button class="knop" id="hrBevZet" type="button">Erbij</button></div>' +
-        '<div class="kop" style="margin-top:.8rem;">Verlof en ziekte</div>' + verlof +
-        '<div class="kop" style="margin-top:.8rem;">Gesprekken</div>' + gesprekken +
-        '<div class="rij" style="margin-top:.4rem;">' +
-        '<input class="veld" id="hrGSoort" maxlength="30" placeholder="Soort gesprek" aria-label="Soort gesprek" style="flex:0 1 12rem;">' +
+        '<div class="kop h-mt80">Verlof en ziekte</div>' + verlof +
+        '<div class="kop h-mt80">Gesprekken</div>' + gesprekken +
+        '<div class="rij h-mt40">' +
+        '<input class="veld h-kolom12" id="hrGSoort" maxlength="30" placeholder="Soort gesprek" aria-label="Soort gesprek">' +
         '<input class="veld" id="hrGTekst" maxlength="1000" placeholder="Wat is er besproken?" aria-label="Wat is er besproken">' +
         '<button class="knop" id="hrGZet" type="button">Leg vast</button></div>' +
         '<p class="stil">Geen cijfer en geen schaal: wat hier staat zijn afspraken. De medewerker kan er zijn eigen reactie bij zetten.</p>';

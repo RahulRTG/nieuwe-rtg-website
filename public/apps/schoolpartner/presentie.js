@@ -41,22 +41,22 @@ window.SPart.presentie = function () {
     var lln = klas.leerlingen || [];
     $('#presLijst').innerHTML = !lln.length
       ? '<p class="stil">Nog geen leerlingen in deze klas.</p>'
-      : '<div class="rij" style="margin-bottom:.6rem;">' +
-          '<input class="veld" id="presDatum" type="date" value="' + vandaag + '" aria-label="Datum van de les" style="flex:0 1 11rem;">' +
-          '<select class="veld" id="presUur" aria-label="Lesuur" style="flex:0 1 7rem;">' + uren() + '</select>' +
+      : '<div class="rij h-mb60">' +
+          '<input class="veld h-kolom11" id="presDatum" type="date" value="' + vandaag + '" aria-label="Datum van de les">' +
+          '<select class="veld h-kolom7" id="presUur" aria-label="Lesuur">' + uren() + '</select>' +
           '<input class="veld" id="presVak" placeholder="Vak (mag leeg)" maxlength="40" aria-label="Vak">' +
         '</div>' +
         lln.map(function (l) {
           var sl = esc(l.sleutel), naam = esc(l.naam);
           return '<div class="item"><span>' + naam + '</span><span class="rij">' +
-            '<select class="veld" data-leerling="' + sl + '" aria-label="Stand voor ' + naam + '" style="flex:0 1 9rem;">' +
+            '<select class="veld h-kolom9" data-leerling="' + sl + '" aria-label="Stand voor ' + naam + '">' +
             STANDEN.map(function (s) { return '<option value="' + s[0] + '">' + s[1] + '</option>'; }).join('') +
             '</select>' +
-            '<input class="veld" type="number" min="0" max="240" step="5" data-minuten="' + sl + '" hidden ' +
-            'placeholder="min. te laat" aria-label="Minuten te laat voor ' + naam + '" style="flex:0 1 8rem;">' +
+            '<input class="veld h-kolom8" type="number" min="0" max="240" step="5" data-minuten="' + sl + '" hidden ' +
+            'placeholder="min. te laat" aria-label="Minuten te laat voor ' + naam + '">' +
             '</span></div>';
         }).join('') +
-        '<div class="rij" style="margin-top:.7rem;">' +
+        '<div class="rij h-mt70">' +
           '<button class="knop p" id="presZet" type="button">Zet de presentie</button>' +
           '<button class="knop" id="presAlle" type="button">Iedereen aanwezig</button>' +
         '</div>';
@@ -77,7 +77,7 @@ window.SPart.presentie = function () {
         '</span><span class="stil">gezet door ' + esc(l.door) + '</span></div>';
     }).join('');
     $('#presBeeld').innerHTML = (rijen || '<p class="stil">Nog geen presentie geregistreerd voor deze klas.</p>') +
-      (laatste ? '<div class="kop" style="margin-top:.9rem;">Laatst gezet</div>' + laatste : '');
+      (laatste ? '<div class="kop h-mt90">Laatst gezet</div>' + laatste : '');
   }
 
   function knoppen() {

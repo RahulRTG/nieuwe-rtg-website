@@ -2,10 +2,10 @@
   function kantineKaart(kies) {
     return '<div class="kaart"><div class="kop">Kantinesaldo</div>' +
       '<div class="rij"><select class="veld" id="glKLeerling" aria-label="Voor welke leerling">' + kies + '</select>' +
-      '<input class="veld" id="glKBij" type="number" min="0" step="0.5" placeholder="Opwaarderen" aria-label="Opwaarderen met" style="flex:0 1 9rem;">' +
-      '<input class="veld" id="glKAf" type="number" min="0" step="0.5" placeholder="Besteed" aria-label="Besteed bedrag" style="flex:0 1 8rem;">' +
+      '<input class="veld h-kolom9" id="glKBij" type="number" min="0" step="0.5" placeholder="Opwaarderen" aria-label="Opwaarderen met">' +
+      '<input class="veld h-kolom8" id="glKAf" type="number" min="0" step="0.5" placeholder="Besteed" aria-label="Besteed bedrag">' +
       '<button class="knop" id="glKantine" type="button">Boek</button></div>' +
-      '<div id="glKUit" class="stil" style="margin-top:.4rem;"></div>' +
+      '<div id="glKUit" class="stil h-mt40"></div>' +
       '<p class="stil">Een leeg saldo weigert nooit eten; het verschil wordt een factuur voor de ouders.</p></div>';
   }
 
@@ -17,7 +17,7 @@
     }).join('') || '<p class="stil">Nog niets gefactureerd.</p>';
 
     return '<div class="kaart enterprise-breed"><div class="kop">Rapportage</div>' +
-      '<div class="kpis" style="margin-bottom:.6rem;">' +
+      '<div class="kpis h-mb60">' +
       [['Gefactureerd', euro(t.gefactureerd)], ['Betaald', euro(t.betaald)],
        ['Terugbetaald', euro(t.terugbetaald)], ['Open', euro(t.open)]]
         .map(function (x) { return '<div class="kpi"><b style="font-size:1.05rem;">' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>' +

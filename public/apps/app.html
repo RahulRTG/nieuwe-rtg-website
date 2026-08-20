@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="39d4c0f0">
+<meta name="rtg-bouw" content="065aa2af">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1736,7 +1736,7 @@
         <button class="os-klaar" id="osKlaar" hidden>Klaar</button>
         <button class="bell os-verborgen-knop" id="bell" aria-label="Meldingen" tabindex="-1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-          <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
+          <span class="bell-badge h-weg" id="bellBadge">0</span>
         </button>
         <!-- De ENIGE knop die in de statusbalk blijft staan. Toen de balk werd
              leeggemaakt (scannen, Zegel, backoffice en de bel verhuisden naar
@@ -1862,12 +1862,12 @@
              Dezelfde beweging als de identiteit hierboven, maar over een beroep;
              hij verschijnt alleen als je werk erom vraagt. -->
         <div id="vakbewijsBanner"></div>
-        <input type="file" id="verifyFile" accept="image/*" style="display:none;">
-        <input type="file" id="selfieFile" accept="image/*" capture="user" style="display:none;">
+        <input type="file" id="verifyFile" accept="image/*" class="h-weg">
+        <input type="file" id="selfieFile" accept="image/*" capture="user" class="h-weg">
         <div id="paspoortInbox"></div>
         <div class="card" id="homeTrip"></div>
         <div class="card" id="tripList"></div>
-        <p class="sub" style="margin-top:1rem;" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Eén berichtje aan je AI is genoeg.</p>
+        <p class="sub h-mt100" data-i18n="app.v.trip.note">Wijzigen of toevoegen? Eén berichtje aan je AI is genoeg.</p>
         <div id="showroom"></div>
       </div>
 
@@ -1898,8 +1898,8 @@
         <h2 data-i18n="app.v.salon">De Salon.</h2>
         <p class="sub" data-i18n="app.v.salon.sub">Posts verschijnen 7 dagen na verblijf, voor je veiligheid.</p>
         <div class="sc-bar" id="socialBar"></div>
-        <div id="ontmoetPaneel" style="display:none;"></div>
-        <div id="zakLauncher" style="display:none;"></div>
+        <div id="ontmoetPaneel" class="h-weg"></div>
+        <div id="zakLauncher" class="h-weg"></div>
         <!-- Wat vroeger als losse widgets op een tweede beginscherm stond,
              staat nu in de app waar het thuishoort. -->
         <div class="card" id="homeSalon"></div>
@@ -1974,7 +1974,7 @@
       <button data-tab="salon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3"/><circle cx="16.5" cy="10.5" r="2.4"/><path d="M3.5 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5"/><path d="M14.5 18.5c.5-2.2 1.6-3.4 3.4-3.4 1.4 0 2.6.8 3.1 2.4"/></svg><span data-i18n="app.tab.salon">Salon</span></button>
       <button data-tab="terplaatse"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-i18n="app.tab.tp">Ter plaatse</span></button>
       <button data-tab="zorg" id="tabZorg"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-6.5-4.4-9-9C1.5 8 3 4.5 6.5 4.5c2 0 3.2 1.2 4 2.4C11.3 5.7 12.5 4.5 14.5 4.5 18 4.5 19.5 8 18 11c-.6 1.1-1.5 2.2-2.5 3.2"/><path d="M14 15h5M16.5 12.5v5"/></svg><span data-i18n="app.tab.care">Zorg</span></button>
-      <button data-tab="assets" id="tabAssets" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M9.5 20v-4.5h5V20"/><path d="M12 8.5v.01"/></svg><span data-i18n="app.tab.assets">Assets</span></button>
+      <button data-tab="assets" id="tabAssets" class="h-weg"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20V9l7-5 7 5v11"/><path d="M9.5 20v-4.5h5V20"/><path d="M12 8.5v.01"/></svg><span data-i18n="app.tab.assets">Assets</span></button>
       <button data-tab="gezin" id="tabGezin" style="display:none;position:relative;"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-6-4.2-6-9a4 4 0 0 1 7.4-2A4 4 0 0 1 18 11c0 4.8-6 9-6 9z"/></svg><span>Gezin</span><span id="tabGezinDot" style="display:none;position:absolute;top:4px;right:18px;width:8px;height:8px;border-radius:50%;background:var(--burgundy,#C23A5E);"></span></button>
     </div>
 
@@ -2123,7 +2123,7 @@
       <button class="ms-close" id="cvClose" aria-label="Sluiten">✕</button>
     </div>
     <div class="ms-body" id="cvBody">
-      <div class="field" style="margin-top:0.6rem;"><label data-i18n="cv.name">Je naam</label><input id="cvName"></div>
+      <div class="field h-mt60"><label data-i18n="cv.name">Je naam</label><input id="cvName"></div>
       <div class="field"><label data-i18n="cv.contact">Telefoon of e-mail</label><input id="cvContact"></div>
       <div class="field"><label data-i18n="cv.headline">Gewenste functie</label><input id="cvHeadline" placeholder="Bijv. Bediening of Receptie" data-i18n-ph="cv.headline.ph"></div>
       <div class="field"><label data-i18n="cv.exp">Werkervaring (een regel per baan)</label><textarea id="cvExp" style="min-height:90px;" placeholder="Bediening bij De Zwaan (2022-2025)&#10;Runner bij Hotel Astoria (2020-2022)" data-i18n-ph="cv.exp.ph"></textarea></div>
@@ -2199,21 +2199,21 @@
     <div class="ms-body" style="padding:1rem 1.1rem;display:flex;flex-direction:column;gap:0.7rem;">
       <div style="display:flex;gap:0.6rem;">
         <label class="soft-sm-grow"><span data-i18n="ride.pax">Personen</span>
-          <select id="ridePax" class="ms-note" style="margin-top:0.3rem;"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
+          <select id="ridePax" class="ms-note h-mt30"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select>
         </label>
         <label class="soft-sm-grow"><span data-i18n="ride.bag">Koffers</span>
-          <select id="rideBag" class="ms-note" style="margin-top:0.3rem;"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
+          <select id="rideBag" class="ms-note h-mt30"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option></select>
         </label>
       </div>
       <div style="display:flex;gap:0.6rem;">
         <label class="soft-sm-grow"><span data-i18n="ride.plan">Wanneer</span>
-          <select id="ridePlan" class="ms-note" style="margin-top:0.3rem;"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
+          <select id="ridePlan" class="ms-note h-mt30"><option value="nu" data-i18n="ride.nu">Nu</option><option value="later" data-i18n="ride.later">Op een tijd</option></select>
         </label>
         <label class="soft-sm-grow"><span data-i18n="ride.datum">Datum</span>
-          <input id="rideDatum" type="date" class="ms-note" style="margin-top:0.3rem;">
+          <input id="rideDatum" type="date" class="ms-note h-mt30">
         </label>
         <label class="soft-sm-grow"><span data-i18n="ride.tijd">Tijd</span>
-          <input id="rideTijd" type="time" class="ms-note" style="margin-top:0.3rem;">
+          <input id="rideTijd" type="time" class="ms-note h-mt30">
         </label>
       </div>
       <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">

@@ -842,7 +842,7 @@ function vraagOfferte(code){
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
       '<label class="opties" for="ofTekst">Omschrijf de klus</label>'+
       '<textarea class="veld" id="ofTekst" rows="4" maxlength="300" placeholder="Bijv. schutting van 8 meter vervangen, hout mag je zelf voorstellen" style="margin-bottom:.5rem;resize:vertical;"></textarea>'+
-      '<label class="opties" for="ofWens">Gewenste datum (optioneel)</label><input class="veld" id="ofWens" type="date" style="margin-bottom:.6rem;">'+
+      '<label class="opties" for="ofWens">Gewenste datum (optioneel)</label><input class="veld h-mb60" id="ofWens" type="date">'+
       '<button class="knop" id="ofGa" style="width:100%;">Vraag offerte aan</button>'+
       '<p class="opties h-mt50">Je vraagt aan op je codenaam; het antwoord met prijs verschijnt hier op het Dienstenplein onder Mijn offertes.</p>'+
     '</div></div>';
@@ -863,9 +863,9 @@ function boekDienst(code, dienstId){
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="dbTerug">← Terug</button>'+
     '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">'+esc(z.naam)+'</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(d.naam)+'</h1></div></div>'+
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
-      '<label class="opties" for="dbDatum">Datum</label><input class="veld" id="dbDatum" type="date" style="margin-bottom:.5rem;">'+
-      '<label class="opties" for="dbTijd">Tijd</label><select class="veld" id="dbTijd" style="margin-bottom:.5rem;"><option value="">Kies eerst een datum</option></select>'+
-      '<label class="opties" for="dbHerhaal">Herhalen</label><select class="veld" id="dbHerhaal" style="margin-bottom:.5rem;">'+
+      '<label class="opties" for="dbDatum">Datum</label><input class="veld h-mb50" id="dbDatum" type="date">'+
+      '<label class="opties" for="dbTijd">Tijd</label><select class="veld h-mb50" id="dbTijd"><option value="">Kies eerst een datum</option></select>'+
+      '<label class="opties" for="dbHerhaal">Herhalen</label><select class="veld h-mb50" id="dbHerhaal">'+
         '<option value="">Eenmalig</option><option value="1">Elke week</option><option value="2">Elke 2 weken</option><option value="4">Elke 4 weken</option></select>'+
       '<textarea class="veld" id="dbNote" rows="2" maxlength="140" placeholder="Opmerking voor de zaak (optioneel)" style="margin-bottom:.6rem;resize:vertical;"></textarea>'+
       '<button class="knop" id="dbGa" style="width:100%;">Vraag aan · '+(d.prijs?euro(d.prijs):'op aanvraag')+'</button>'+
@@ -959,9 +959,9 @@ function koopFarm(code, productId, naam){
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="kfTerug">← Terug</button>'+
     '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">Van het land</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
-      '<label class="opties">Naam voor de levering</label><input class="veld" id="kfNaam" maxlength="60" style="margin-bottom:.5rem;">'+
-      '<label class="opties">E-mail</label><input class="veld" id="kfMail" type="email" maxlength="80" style="margin-bottom:.5rem;">'+
-      '<label class="opties">Aantal</label><input class="veld" id="kfAantal" type="number" min="1" max="100" value="1" style="margin-bottom:.6rem;">'+
+      '<label class="opties">Naam voor de levering</label><input class="veld h-mb50" id="kfNaam" maxlength="60">'+
+      '<label class="opties">E-mail</label><input class="veld h-mb50" id="kfMail" type="email" maxlength="80">'+
+      '<label class="opties">Aantal</label><input class="veld h-mb60" id="kfAantal" type="number" min="1" max="100" value="1">'+
       '<button class="knop" id="kfBevestig" style="width:100%;">Bestelling plaatsen</button>'+
       '<p class="opties h-mt50">Vers van het erf; we nemen contact op voor de levering. Prijs in euro.</p>'+
     '</div></div>';
@@ -994,9 +994,9 @@ function koopEigen(slug, naam){
   wrap.innerHTML = '<div class="blad-kop"><button class="terug" id="koopTerug">← Terug</button>'+
     '<div><div class="ey" style="font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));">Bestellen</div><h1 style="font-family:\'Bodoni Moda\',serif;font-size:1.3rem;">'+esc(naam)+'</h1></div></div>'+
     '<div class="art" style="grid-template-columns:1fr;max-width:460px;"><div class="kaart">'+
-      '<label class="opties">Naam voor de levering</label><input class="veld" id="koopNaam" maxlength="60" style="margin-bottom:.5rem;">'+
-      '<label class="opties">E-mail</label><input class="veld" id="koopMail" type="email" maxlength="80" style="margin-bottom:.5rem;">'+
-      '<label class="opties">Aantal</label><input class="veld" id="koopAantal" type="number" min="1" max="50" value="1" style="margin-bottom:.5rem;">'+
+      '<label class="opties">Naam voor de levering</label><input class="veld h-mb50" id="koopNaam" maxlength="60">'+
+      '<label class="opties">E-mail</label><input class="veld h-mb50" id="koopMail" type="email" maxlength="80">'+
+      '<label class="opties">Aantal</label><input class="veld h-mb50" id="koopAantal" type="number" min="1" max="50" value="1">'+
       '<textarea class="veld" id="koopNote" rows="2" maxlength="500" placeholder="Opmerking (optioneel)" style="margin-bottom:.6rem;resize:vertical;"></textarea>'+
       '<button class="knop" id="koopBevestig" style="width:100%;">Bestelling plaatsen</button>'+
       '<p class="opties h-mt50">We nemen contact op voor de levering. Facturatie in euro, ex btw.</p>'+

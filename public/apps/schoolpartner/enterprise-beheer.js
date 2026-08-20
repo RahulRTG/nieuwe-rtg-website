@@ -29,7 +29,7 @@
       var h = '<div class="deel">Rollen en rechten</div>';
 
       h += kaart('Wie mag wat', (rollen.personeel || []).map(function (p) {
-        return '<div class="item" style="align-items:flex-start;"><span>' + esc(p.naam) +
+        return '<div class="item h-boven"><span>' + esc(p.naam) +
           ' <span class="stil">· ' + esc(p.status) + '</span></span>' +
           '<span class="doelkies" data-rolrij="' + esc(p.id) + '">' + rolIds.map(function (id) {
             return '<label><input type="checkbox" value="' + esc(id) + '"' +
@@ -79,7 +79,7 @@
       h += kaart('Anonieme peiling',
         '<div class="rij"><input class="veld" id="enPTitel" maxlength="100" placeholder="Titel van de peiling" aria-label="Titel van de peiling">' +
         '<input class="veld" id="enPStelling" maxlength="160" placeholder="Stelling (antwoord 1 t/m 5)" aria-label="Stelling">' +
-        '<select class="veld" id="enPDoel" aria-label="Doelgroep" style="flex:0 1 9rem;">' +
+        '<select class="veld h-kolom9" id="enPDoel" aria-label="Doelgroep">' +
         '<option value="ouders">Ouders</option><option value="leerlingen">Leerlingen</option><option value="personeel">Personeel</option></select>' +
         '<button class="knop p" id="enPMaak" type="button">Zet uit</button></div>' +
         (peilingen.peilingen || []).map(function (p) {
@@ -96,10 +96,10 @@
          journaal, en dat staat er ook bij. */
       h += kaart('Export',
         '<div class="rij"><button class="knop" id="enExport" type="button">Exporteer de school</button>' +
-        '<label class="stil" style="display:flex;gap:.4rem;align-items:center;min-height:24px;">' +
+        '<label class="stil h-rij-mid">' +
 /* de export van de school: alles plat en leesbaar, met het zorgdeel als aparte keuze */
         '<input type="checkbox" id="enExportZorg"> met het zorgdeel</label></div>' +
-        '<div id="enExportUit" class="stil" style="margin-top:.4rem;"></div>',
+        '<div id="enExportUit" class="stil h-mt40"></div>',
         'Alles wat de school van zichzelf heeft, plat en leesbaar. Vraagt u het zorgdeel erbij, dan staat dat als zodanig in het journaal.');
 
       h += kaart('Laatste inzage', (journaal.rijen || []).map(function (j) {

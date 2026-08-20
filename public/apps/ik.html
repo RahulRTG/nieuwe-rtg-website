@@ -255,7 +255,7 @@
       'van de hand waarmee u uw telefoon vasthoudt \u2014 op elk scherm, ook voordat u inlogt.</p>' +
       OPTIES.map(o => '<button class="keus" data-hand="' + o[0] + '" aria-pressed="' + (nu === o[0]) + '">' +
         '<b>' + Veilig.esc(o[1]) + '</b><span>' + Veilig.esc(o[2]) + '</span></button>').join('') +
-      '<p class="stil" style="margin-top:.6rem;">Dit staat op dit toestel. Op een ander toestel zet u het opnieuw.</p>';
+      '<p class="stil h-mt60">Dit staat op dit toestel. Op een ander toestel zet u het opnieuw.</p>';
     host.querySelectorAll('[data-hand]').forEach(b => b.addEventListener('click', () => {
       RTGHand.zet(b.dataset.hand);
       tekenHand();

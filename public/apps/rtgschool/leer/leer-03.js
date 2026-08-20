@@ -31,9 +31,9 @@
         ? d.stukken.map(function (x) {
             var knop = x.soort === 'herhalen' ? 'herhaal' : 'oefen';
             return '<div class="doel"><span>' + esc(x.naam) +
-              ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(x.vak) + ')</span><br>' +
+              ' <span class="h-meta">(' + esc(x.vak) + ')</span><br>' +
               '<span style="color:var(--soft);font-size:.76rem;">' + esc(x.waarom) + '</span></span>' +
-              '<span class="rij"><button class="knop" data-' + knop + '="' + esc(x.doel) + '" style="padding:.3rem .6rem;font-size:.76rem;">Doen</button></span></div>';
+              '<span class="rij"><button class="knop h-chip" data-' + knop + '="' + esc(x.doel) + '">Doen</button></span></div>';
           }).join('')
         : '<div class="leeg">' + esc(d.let || '') + '</div>') +
         '<p class="leeg" style="margin:.5rem 0 0;">' + esc(d.uitleg) + '</p>';
@@ -61,8 +61,8 @@
       var d = await api('/api/leerstof/herhalen');
       el.innerHTML = d.open.length
         ? d.open.slice(0, 12).map(function (o) {
-            return '<div class="doel"><span>' + esc(o.naam) + ' <span style="color:var(--soft);font-size:.72rem;">(' + esc(o.vak) + ')</span></span>' +
-              '<span class="rij"><button class="knop" data-herhaal="' + esc(o.doel) + '" style="padding:.3rem .6rem;font-size:.76rem;">' + d.vragen + ' vragen</button></span></div>';
+            return '<div class="doel"><span>' + esc(o.naam) + ' <span class="h-meta">(' + esc(o.vak) + ')</span></span>' +
+              '<span class="rij"><button class="knop h-chip" data-herhaal="' + esc(o.doel) + '">' + d.vragen + ' vragen</button></span></div>';
           }).join('')
         : '<div class="leeg">Er staat vandaag niets klaar om terug te halen.' +
           (d.later.length ? ' Het eerstvolgende komt op ' + esc(String(d.later[0].volgende).slice(0, 10)) + '.' : '') + '</div>';
@@ -106,7 +106,7 @@
          gedacht is, staat dat hier -- met daaronder dezelfde stof op een
          andere manier uitgelegd. Komt de server er niet uit, dan staat er
          niets extra's: een verzonnen duiding stuurt je de verkeerde kant op. */
-      if (d.denkfout) regel += '<div style="margin-top:.4rem;"><b>' + esc(d.denkfout.naam) + '.</b> ' + esc(d.denkfout.uitleg) + '</div>';
+      if (d.denkfout) regel += '<div class="h-mt40"><b>' + esc(d.denkfout.naam) + '.</b> ' + esc(d.denkfout.uitleg) + '</div>';
       if (d.anders) regel += '<div style="margin-top:.35rem;opacity:.9;"><i>Anders uitgelegd (' + esc(d.anders.soort) + '):</i> ' + esc(d.anders.tekst) + '</div>';
       if (d.klaar) {
         document.getElementById('oefenOpties').innerHTML = '';

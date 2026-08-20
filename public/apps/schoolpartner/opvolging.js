@@ -27,7 +27,7 @@ window.SPart.opvolging = function () {
       vak.innerHTML = (!m.length
         ? '<p class="stil">Er staat niets open. De knop staat altijd op het scherm van elk kind.</p>'
         : m.map(function (x) {
-            return '<div class="item" style="align-items:flex-start;"><span>' +
+            return '<div class="item h-boven"><span>' +
               '<b>' + esc(x.naam) + '</b> ' +
               (x.acuut ? '<span class="tag aan">acuut</span> ' : '') +
               (x.vertrouwelijk ? '<span class="tag">vertrouwelijk</span> ' : '') +

@@ -182,7 +182,7 @@
             <button class="knop" id="teamErbij" type="button">Vast op de klas (max 3)</button>
             <button class="knop" id="overnameStop" type="button">Overname stoppen</button>
           </div>
-          <div class="rij" style="margin-top:.4rem;">
+          <div class="rij h-mt40">
             <input class="veld" id="overneemCode" placeholder="Klascode van een collega" aria-label="Klascode om waar te nemen">
             <button class="knop" id="overneem" type="button">Neem waar</button>
           </div>
@@ -192,12 +192,12 @@
       <div class="kaart">
         <div class="kop">Toets uit de leerlijn</div>
         <p class="stil">Vink leerdoelen aan, kies de vorm, klaar. Elke leerling krijgt verse opgaven; de motor kijkt na en het cijfervoorstel blijft een advies.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <select class="veld" id="tSoort" aria-label="Toetsvorm" style="flex:0 1 12rem;">
             <option value="so">SO</option><option value="proefwerk">Proefwerk</option>
             <option value="examen">Examen</option><option value="mo">MO (mondeling)</option>
           </select>
-          <select class="veld" id="tGroep" aria-label="Groep" style="flex:0 1 9rem;"></select>
+          <select class="veld h-kolom9" id="tGroep" aria-label="Groep"></select>
           <input class="veld" id="tNaam" placeholder="Naam (mag leeg)" aria-label="Naam van de toets">
         </div>
         <div class="doelkies" id="tDoelen" role="group" aria-label="Leerdoelen"></div>
@@ -254,9 +254,9 @@
         <div class="kop">Wat gaat er mee bij een overstap</div>
         <p class="stil">Geen dossier maar een pakket per doel. Wat op "nooit" staat gaat ook met toestemming niet mee, en elke standaard zegt wat hij niet kan dragen. Er wordt hier niets verstuurd.</p>
         <div id="overdrachtKaart"></div>
-        <div id="overdrachtPakket" style="margin-top:.6rem;"></div>
-        <div id="overdrachtInlezen" style="margin-top:.6rem;"></div>
-        <div id="overdrachtOverstap" style="margin-top:.6rem;"></div>
+        <div id="overdrachtPakket" class="h-mt60"></div>
+        <div id="overdrachtInlezen" class="h-mt60"></div>
+        <div id="overdrachtOverstap" class="h-mt60"></div>
       </div>
       <div class="kaart">
         <div class="kop">De week van deze klas</div>
@@ -298,7 +298,7 @@
       <div class="kaart">
         <div class="kop">Excursies</div>
         <p class="stil">Locaties bestaan alleen tijdens een actieve excursie (met toestemming van de ouders) en worden bij de stop gewist. Elke blik op de kaart wordt gelogd en is zichtbaar voor de gezinnen.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <input class="veld" id="exTitel" placeholder="Naam (bijv. Artis)" aria-label="Naam van de excursie">
           <input class="veld" id="exBest" placeholder="Bestemming" aria-label="Bestemming">
           <button class="knop p" id="exMaak" type="button">Zet de excursie klaar</button>
@@ -310,9 +310,9 @@
       <div class="kaart">
         <div class="kop">Ouderbijdrage</div>
         <p class="stil">De ouderbijdrage is vrijwillig; een kind wordt nooit uitgesloten als er niet betaald is.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <input class="veld" id="bijTitel" placeholder="Waarvoor (bijv. Museumbezoek)" aria-label="Naam van de bijdrage">
-          <input class="veld" id="bijBedrag" type="number" min="0" step="0.5" placeholder="Bedrag" aria-label="Bedrag in euro" style="flex:0 1 8rem;">
+          <input class="veld h-kolom8" id="bijBedrag" type="number" min="0" step="0.5" placeholder="Bedrag" aria-label="Bedrag in euro">
           <button class="knop p" id="bijMaak" type="button">Vraag de bijdrage</button>
         </div>
         <div id="bijLijst"></div>
@@ -320,7 +320,7 @@
       <div class="kaart">
         <div class="kop">Telefoonboom</div>
         <p class="stil">De leraar belt twee gezinnen, elk gezin belt er weer twee. Iedereen ziet alleen de eigen takken.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <button class="knop" id="boomMaak" type="button">Boom (opnieuw) maken</button>
           <input class="veld" id="boomBericht" placeholder="Bericht voor het alarm" aria-label="Alarmbericht">
           <button class="knop p" id="boomStart" type="button">Start het alarm</button>
@@ -347,9 +347,9 @@
       <div class="kaart">
         <div class="kop">Momenten voor het oudergesprek</div>
         <p class="stil">Zet een avond in een keer klaar; de tijden lopen vanzelf door. Ouders kiezen zelf een moment: wie het eerst komt.</p>
-        <div class="rij" style="margin:.5rem 0;">
-          <input class="veld" id="afspraakDatum" type="date" aria-label="Datum" style="flex:0 1 10rem;">
-          <input class="veld" id="afspraakTijd" type="time" aria-label="Begintijd" style="flex:0 1 8rem;">
+        <div class="rij h-my50">
+          <input class="veld h-kolom10" id="afspraakDatum" type="date" aria-label="Datum">
+          <input class="veld h-kolom8" id="afspraakTijd" type="time" aria-label="Begintijd">
           <input class="veld" id="afspraakMinuten" type="number" min="5" max="60" step="5" value="10" aria-label="Minuten per gesprek" style="flex:0 1 7rem;">
           <input class="veld" id="afspraakAantal" type="number" min="1" max="20" value="8" aria-label="Aantal momenten" style="flex:0 1 7rem;">
           <input class="veld" id="afspraakPlek" maxlength="60" placeholder="Lokaal" aria-label="Plek">
@@ -367,7 +367,7 @@
       <div class="kaart">
         <div class="kop">Rapport klaarzetten</div>
         <p class="stil">De cijfers en de aanwezigheid staan er meteen in. Het blijft een concept tot u het vaststelt; zolang ziet geen enkel gezin het.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <input class="veld" id="rapPeriode" maxlength="30" placeholder="Periode (bijv. Periode 2)" aria-label="Periode van het rapport">
           <button class="knop p" id="rapMaak" type="button">Zet het rapport klaar</button>
         </div>

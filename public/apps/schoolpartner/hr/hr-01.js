@@ -52,7 +52,7 @@ window.RTGSchoolHR = (function () {
 
       wortel.innerHTML = '<div class="deel">Personeelszaken</div>' +
         '<div class="kaart"><div class="kop">Bezetting vandaag</div>' +
-        '<div class="kpis" style="margin-bottom:.6rem;">' +
+        '<div class="kpis h-mb60">' +
         [['Personeel actief', hr.personeel || 0], ['Vandaag uit', hr.vandaagUit || 0],
          ['Zonder contract', (hr.zonderContract || []).length]]
           .map(function (x) { return '<div class="kpi"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>' +
@@ -64,7 +64,7 @@ window.RTGSchoolHR = (function () {
         '<div class="kaart"><div class="kop">Vervanging</div>' +
         '<div class="rij"><select class="veld" id="hrKlas" aria-label="Voor welke klas">' + opties(KLASSEN, 'code', 'naam') + '</select>' +
         '<button class="knop" id="hrVrij" type="button">Wie is er vrij?</button></div>' +
-        '<div id="hrVrijUit" style="margin-top:.5rem;"></div>' +
+        '<div id="hrVrijUit" class="h-mt50"></div>' +
         '<p class="stil">Toewijzen zet de bestaande waarnemer op de klas; het lerarenteam en de online les weten het meteen.</p></div>' +
         '<div class="kaart enterprise-breed"><div class="kop">Personeelsdossier</div>' +
         '<div class="rij"><select class="veld" id="hrWie" aria-label="Welk personeelslid">' + opties(MENSEN, 'id', 'naam') + '</select>' +

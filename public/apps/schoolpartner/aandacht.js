@@ -32,14 +32,14 @@ window.SPart.aandacht = function () {
         : BAKKEN.map(function (b) {
             var rijen = r.body[b[0]] || [];
             if (!rijen.length) return '';
-            return '<div class="kop" style="margin-top:.6rem;">' + esc(b[1]) + '</div>' +
+            return '<div class="kop h-mt60">' + esc(b[1]) + '</div>' +
               rijen.map(function (x) {
-                return '<div class="item" style="align-items:flex-start;"><span><b>' + esc(x.wat) + '</b>' +
+                return '<div class="item h-boven"><span><b>' + esc(x.wat) + '</b>' +
                   (x.aantal > 1 ? ' <span class="stil">' + x.aantal + 'x</span>' : '') +
                   '<br><span class="stil">' + esc(x.waarom) + '</span></span></div>';
               }).join('');
           }).join('')) +
-        '<p class="stil" style="margin-top:.5rem;">' + esc(r.body.uitleg) + '</p>';
+        '<p class="stil h-mt50">' + esc(r.body.uitleg) + '</p>';
     });
   }
 
@@ -57,7 +57,7 @@ window.SPart.aandacht = function () {
         '<div class="stil">Aan de orde vandaag: ' + (d.doelen.length ? d.doelen.map(esc).join(', ') : 'niets gevonden') + '</div>' +
         (d.patronen.length ? '<div class="stil">' + d.patronen.length + ' denkpatroon (patronen) langsgekomen</div>' : '') +
         (d.alAfgerond ? '<p class="stil">Deze les is vandaag al afgerond.</p>' : '') +
-        '<div class="rij" style="margin-top:.5rem;">' +
+        '<div class="rij h-mt50">' +
         '<input class="veld" id="lesDoor" maxlength="60" placeholder="Uw naam" aria-label="Uw naam">' +
         '<input class="veld" id="lesWerkte" maxlength="300" placeholder="Wat werkte?" aria-label="Wat werkte">' +
         '<input class="veld" id="lesVast" maxlength="300" placeholder="Waar liep het vast?" aria-label="Waar liep het vast">' +
@@ -88,10 +88,10 @@ window.SPart.aandacht = function () {
     kl('/school/les/geheugen', { doel: doel }).then(function (r) {
       var d = r.body;
       if (d.error) return;
-      vak.innerHTML = '<div class="kop" style="margin-top:.6rem;">Wat we van deze stof weten</div>' +
+      vak.innerHTML = '<div class="kop h-mt60">Wat we van deze stof weten</div>' +
         (d.eerder.length
           ? d.eerder.map(function (x) {
-              return '<div class="item" style="align-items:flex-start;"><span>' +
+              return '<div class="item h-boven"><span>' +
                 (x.werkte ? '<b>Werkte:</b> ' + esc(x.werkte) + '<br>' : '') +
                 (x.liepVast ? '<b>Liep vast:</b> ' + esc(x.liepVast) + '<br>' : '') +
                 '<span class="stil">' + esc(x.klas) + ' &middot; ' + esc(x.datum) + ' &middot; ' + esc(x.door) + '</span></span></div>';

@@ -34,7 +34,7 @@ window.SPart.taalcheck = function () {
       '</select>' +
       '<input class="veld" id="tcDoel" maxlength="60" placeholder="Leerdoel-id" aria-label="Leerdoel">' +
       '<button class="knop" id="tcStart" type="button">Vergelijk</button></div>' +
-      '<div id="tcUit" class="stil" style="margin-top:.5rem;"></div>';
+      '<div id="tcUit" class="stil h-mt50"></div>';
     q('tcStart').addEventListener('click', start);
   });
 
@@ -71,8 +71,8 @@ window.SPart.taalcheck = function () {
         '<div><b>' + esc(d.uitkomst.zin) + '</b></div>' +
         '<div class="stil">Nederlands ' + d.goedNl + ' van ' + d.totaalPerRonde +
         ' &middot; eigen taal ' + d.goedThuis + ' van ' + d.totaalPerRonde + '</div>' +
-        '<div style="margin-top:.35rem;">' + esc(d.uitkomst.watNu) + '</div>' +
-        '<div class="stil" style="margin-top:.35rem;">' + esc(d.uitleg) + '</div>';
+        '<div class="h-mt35">' + esc(d.uitkomst.watNu) + '</div>' +
+        '<div class="stil h-mt35">' + esc(d.uitleg) + '</div>';
     });
   }
 };

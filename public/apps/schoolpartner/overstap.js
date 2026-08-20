@@ -29,12 +29,12 @@ window.SPart.overstap = function () {
     '<input class="veld" id="odNaar" maxlength="12" placeholder="Schoolcode van de ontvanger" aria-label="Ontvangende school">' +
     '<input class="veld" id="odDoor" maxlength="60" placeholder="Uw naam" aria-label="Uw naam">' +
     '<button class="knop p" id="odZet" type="button">Zet klaar</button></div>' +
-    '<div class="rij" style="margin-top:.4rem;">' +
+    '<div class="rij h-mt40">' +
     '<input class="veld" id="odCode" maxlength="16" placeholder="Code (OD-...)" aria-label="Code">' +
     '<input class="veld" id="odVan" maxlength="12" placeholder="Schoolcode van de verzender" aria-label="Verzendende school">' +
     '<button class="knop" id="odHaal" type="button">Haal op</button></div>' +
-    '<div id="odUit" class="stil" style="margin-top:.5rem;"></div>' +
-    '<div id="odKlaar" class="stil" style="margin-top:.5rem;"></div>';
+    '<div id="odUit" class="stil h-mt50"></div>' +
+    '<div id="odKlaar" class="stil h-mt50"></div>';
 
   q('odZet').addEventListener('click', function () {
     var id = q('odId').value.trim(), naar = q('odNaar').value.trim(), door = q('odDoor').value.trim();

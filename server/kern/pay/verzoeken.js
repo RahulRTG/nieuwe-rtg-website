@@ -4,8 +4,8 @@
    wallet zelf bij (autolaad in de kern) en betaalt door. Krijgt de gedeelde ctx van
    kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan,
-    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, KASCODE_MS } = ctx;
+  const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan, walletRuimte,
+    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
 
   /* ---------- geld sturen en Klompjes ---------- */
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
@@ -138,7 +138,12 @@ module.exports = (ctx) => {
       tegen: (r.naar === rek ? r.van : r.naar).replace(/^lid:/, '').replace(/^partner:/, 'zaak ').replace(/^extern:oplaad$/, 'opgeladen').replace(/^extern:uitbetaald$/, 'bank')
     }));
     const v = verzoekenVoor(codenaam);
-    return { ok: true, codenaam, saldo: saldoVan(rek), geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
+    /* Het plafond gaat mee naar het scherm, want een grens die je pas raakt is
+       een grens die je niet kende: de wallet kan tonen hoeveel er nog bij kan
+       voordat het opladen weigert. Uitzonderingsgestuurd blijft het aan het
+       scherm (ONTWERP.md) -- hier staan de twee getallen, niet het oordeel. */
+    return { ok: true, codenaam, saldo: saldoVan(rek), plafond: walletMax(), ruimte: walletRuimte(codenaam),
+      geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
   }
 
   return { stuur, huisIn, huisUit, verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek, tikCode, tikBetaal, tikFeed, overzicht };

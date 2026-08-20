@@ -172,6 +172,16 @@ if (rvTimer.unref) rvTimer.unref();
 kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
   ? kern.bank.bankDekWallet({ codenaam, centen })
   : { status: 403, error: 'De leden-bank is niet live.' });
+/* DE TWEE PLAFONDS KOMEN HIER AAN HUN BRON. Ze zijn de grond onder het besluit
+   in kern/bevoegdheid/lijst.js (WALLET_SALDO: gesloten circuit, harde
+   plafonds), en stonden tot nu toe als constante in de twee lagen die ze
+   handhaven -- alleen te verzetten door een programmeur. De boardroom zet ze nu
+   (kern/bankregie/instellingen.js) en die twee lagen lezen ze hier vandaan.
+   Late binding om dezelfde reden als de regel hierboven: pay en de puntenlaag
+   bestaan al voordat de bankregie is gebouwd, en tot dat moment geldt hun eigen
+   standaard. */
+kern.pay.koppelPlafond(() => bankregie.bankPlafonds().walletCenten);
+kern.puntenKoppelPlafond(() => bankregie.bankPlafonds().puntenCenten);
 /* De geldnaden (cutover-reconcile en de late binding van het fonds aan de bank)
    staan in ./kern-geldnaden.js: dit deel liep over de 10 kB-grens. Ze horen
    achteraan, want ze kunnen pas als alles hierboven er is. bankregie gaat mee

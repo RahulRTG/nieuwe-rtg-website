@@ -33,7 +33,7 @@ module.exports = (ctx) => {
     if (w.soort === 'bestelling' && sess && acties && acties.plaatsOrder) {
       const r = acties.plaatsOrder(sess, { supplierCode: w.supplierCode, items: w.items });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
-      const b = acties.betaalOrder(sess, { ref: r.order.ref });
+      const b = await acties.betaalOrder(sess, { ref: r.order.ref });
       if (b.error) return { tekst: 'De bestelling staat klaar (' + r.order.ref + '), maar het afrekenen lukte niet: ' + b.error + ' Rond hem af in de Bestellen-tab.', gedaan: true };
       return { tekst: 'Besteld en betaald bij ' + r.order.supplierName + ': ' + w.oms + ', samen ' + eur(b.order.total * 100) + '. Uw ophaalcode is ' + r.order.pickup + '; de zaak gaat er direct mee aan de slag.', gedaan: true };
     }
@@ -68,7 +68,7 @@ module.exports = (ctx) => {
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       let slot = '';
       if (r.ride.status === 'wacht-op-betaling') {
-        const b = acties.betaalRit(sess, { ref: r.ride.ref });
+        const b = await acties.betaalRit(sess, { ref: r.ride.ref });
         if (b.error) return { tekst: 'De rit staat klaar (' + r.ride.ref + '), maar het afrekenen lukte niet: ' + b.error, gedaan: true };
         slot = ' De offerte van ' + eur(r.ride.quote * 100) + ' is betaald;';
       } else slot = ' Offerte: ' + eur(r.ride.quote * 100) + ' (' + r.ride.betaalMoment + ');';

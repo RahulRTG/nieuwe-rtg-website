@@ -69,6 +69,17 @@ afgeleid uit RTG Travel, en er komt geen cijfer op een mens — ook niet intern 
 sorteersleutel. De poort (18+ met geverifieerd paspoort) staat op één plek,
 `server/kern/ontmoetpoort.js`, en wordt door beide apps gedeeld; de pas-eis is
 iets anders en blijft op de route. Par. 4 van `LIFE.md` staat er onverkort boven.
+**`TOKEN.md` gaat over de geldvorm zelf** — wat een eigen betaaltoken hier mag
+zijn. De kern in één zin: RTG heeft er al een, hij heet RTG Pay, en de vraag is
+niet of we er een bouwen maar of we hem uit het gesloten circuit halen. Dat is
+namelijk de grens tussen een besluit (`WALLET_SALDO` in
+`kern/bevoegdheid/lijst.js`: gesloten circuit, harde plafonds, niet uitbetaald
+aan het lid) en een vergunning (`GELD_UITGEVEN`, en daar staat geen partnerrail
+naast). Lees vóór je aan tegoed, punten of munten werkt vooral paragraaf 5 en 7:
+wat er bewust niet komt (een eigen chain, crypto eruit, een koers, tegoed dat
+verjaart ten gunste van RTG) en de drie besluiten die openstaan — waarvan de
+eerste, de bank-uitgang, vóór de leden-bank opengaat genomen moet worden en
+niet erna.
 
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht

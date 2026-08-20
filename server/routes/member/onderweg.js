@@ -77,8 +77,8 @@ module.exports = (kern) => {
     res.json(r);
   });
 
-  app.post('/api/ride/pay', auth, (req, res) => {
-    const r = betaalRitVoor(req.session, req.body);
+  app.post('/api/ride/pay', auth, async (req, res) => {
+    const r = await betaalRitVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

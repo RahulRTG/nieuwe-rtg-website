@@ -2,7 +2,7 @@
    RTG-punten en de meldingsvoorkeuren. Verbatim afgesplitst uit leden.js. */
 module.exports = (ctx) => {
   const { db, save, notify, sseToCustomer, zijnVrienden, orderMetRef, boekingenVanKlant,
-    id, nu, vandaag, rond, MELDING_SCOPES } = ctx;
+    id, nu, vandaag, rond, MELDING_SCOPES, payVan, codenaamVan } = ctx;
 
   /* ---- 6. de reisagenda ----
      Alles met een datum van dit lid, samengevoegd en per dag gegroepeerd:
@@ -103,44 +103,12 @@ module.exports = (ctx) => {
   }
 
   /* ---- 9. RTG-punten ----
-     Sparen: 1 punt per betaalde 10 euro. Verzilveren: 100 punten = 10 euro
-     tegoed. Het tegoed wordt bij de volgende betaling automatisch verrekend;
-     RTG legt het verschil bij, de zaak ontvangt altijd het volle bedrag. */
-  function puntenRek(key) { return db.data.punten[key] = db.data.punten[key] || { saldo: 0, tegoed: 0, historie: [] }; }
-  function puntenVan(key) {
-    const p = puntenRek(key);
-    return { saldo: p.saldo, tegoed: p.tegoed, historie: p.historie.slice(0, 20) };
-  }
-  function verdienPunten(key, euro, reden) {
-    const n = Math.floor((Number(euro) || 0) / 10);
-    if (n <= 0) return 0;
-    const p = puntenRek(key);
-    p.saldo += n;
-    p.historie.unshift({ punten: n, reden: String(reden || 'betaling').slice(0, 60), at: nu() });
-    p.historie = p.historie.slice(0, 60);
-    return n; // save() gebeurt in de betaal-handler
-  }
-  function verzilverPunten(key, aantal) {
-    const n = parseInt(aantal, 10);
-    if (!(n >= 100) || n % 100 !== 0) return { status: 400, error: 'Verzilveren kan per 100 punten (= € 10 tegoed).' };
-    const p = puntenRek(key);
-    if (p.saldo < n) return { status: 409, error: 'U heeft ' + p.saldo + ' punten; dat is niet genoeg.' };
-    const euro = (n / 100) * 10;
-    p.saldo -= n;
-    p.tegoed = rond(p.tegoed + euro);
-    p.historie.unshift({ punten: -n, reden: 'verzilverd naar € ' + euro + ' tegoed', at: nu() });
-    save();
-    return { ok: true, saldo: p.saldo, tegoed: p.tegoed };
-  }
-  // bij het betalen: verreken tegoed (RTG legt bij; de zaak ziet het volle bedrag)
-  function pasTegoedToe(key, totaal) {
-    const p = db.data.punten[key];
-    if (!p || !(p.tegoed > 0)) return 0;
-    const korting = rond(Math.min(p.tegoed, totaal));
-    p.tegoed = rond(p.tegoed - korting);
-    p.historie.unshift({ punten: 0, reden: '€ ' + korting + ' tegoed verrekend', at: nu() });
-    return korting; // save() gebeurt in de betaal-handler
-  }
+     Verhuisd naar ./punten.js. Niet om de maat: zodra verzilverde punten een
+     bedrag in euro's zijn dat het lid van RTG tegoed heeft, is dat een
+     geldstuk met eigen regels (een plafond, centen, een vermogen in de
+     bevoegdhedenlijst) en geen bijzaak van de spaarpot. De kop daar legt uit
+     wat er is veranderd en waarom. */
+  const punten = require('./punten')({ db, save, nu, payVan, codenaamVan });
 
   /* ---- 10. meldingsvoorkeuren ----
      Per scope aan of uit; afwezig betekent aan. De handhaving zit in notify()
@@ -160,6 +128,6 @@ module.exports = (ctx) => {
     return voorkeurVan(target);
   }
 
-  return { agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
-    puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, voorkeurVan, zetVoorkeur };
+  return Object.assign({ agendaVoor, maakSplits, mijnSplitsen, betaalSplits,
+    voorkeurVan, zetVoorkeur }, punten);
 };

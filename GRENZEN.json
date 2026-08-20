@@ -943,6 +943,7 @@
       "paspoortMijn",
       "paspoortStatus",
       "paspoortTrekIn",
+      "pay",
       "pestgrens",
       "pickupCode",
       "plaatsOrderVoor",
@@ -2252,6 +2253,7 @@
       "zijnVrienden"
     ],
     "zorgwallet": [
+      "onboarding",
       "status",
       "wallet",
       "zorgpolis"

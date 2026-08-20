@@ -8,6 +8,7 @@ module.exports = (ctx) => {
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
     orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor, factuurVoorLid } = ctx;
+  const { rekenAf } = require('./afrekenen')(ctx);
 function vraagRitVoor(session, body) {
   if (session.tier === 'guest') return { status: 403, error: 'Alleen voor leden.' };
   const s = findSupplier(body.supplierCode);
@@ -80,7 +81,7 @@ function vraagRitVoor(session, body) {
   return { ok: true, ride };
 }
 
-function betaalRitVoor(session, body) {
+async function betaalRitVoor(session, body) {
   const r = db.data.rides.find(x => x.ref === body.ref && (x.customerKey || x.customerTier) === session.key);
   if (!r) return { status: 404, error: 'Rit niet gevonden.' };
   if (r.paid) return { status: 409, error: 'Al betaald.' };
@@ -103,6 +104,13 @@ function betaalRitVoor(session, body) {
   // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij)
   const voordeelR = ledenvoordeelVoor(findSupplier(r.supplierCode), r.quote - kortingR);
   if (voordeelR) r.regieKorting = voordeelR;
+  /* Het geld, en pas daarna `paid`; zie ./afrekenen.js. */
+  const geld = await rekenAf({ session, supplierCode: r.supplierCode, supplierNaam: r.supplierName,
+    bedrag: r.quote, fooi: fooiR, korting: kortingR, voordeel: voordeelR,
+    soort: 'rit', ref: r.ref, idem: 'rit:' + r.ref });
+  if (geld.error) return geld;   // rekenAf gaf het tegoed al terug
+  r.payBetaaldCenten = geld.betaaldCenten;
+  r.payBijgelegdCenten = geld.bijgelegdCenten;
   r.paid = true;
   r.paidAt = new Date().toISOString();
   if (r.status === 'wacht-op-betaling') r.status = 'aangevraagd';
@@ -117,7 +125,7 @@ function betaalRitVoor(session, body) {
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   pushLive(session.key);
-  return { ok: true, ride: r };
+  return { ok: true, ride: r, bijgeladen: geld.bijgeladen || 0 };
 }
   return { vraagRitVoor, betaalRitVoor };
 };

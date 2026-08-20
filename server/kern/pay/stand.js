@@ -1,6 +1,6 @@
 /* WAAR DIT GELD NAAR LUISTERT: de stand van de betaallaag en de grenzen eromheen.
 
-   Drie schakelaars uit de omgeving en zes bedragen. Ze staan hier bij elkaar
+   Drie schakelaars uit de omgeving en zeven bedragen. Ze staan hier bij elkaar
    omdat ze allemaal EEN KEER bij het opstarten worden bepaald en daarna niet
    meer veranderen -- anders dan alles in ./index.js, dat per boeking werkt.
 
@@ -35,11 +35,27 @@ module.exports = () => {
 
   const MIN_CENTEN = 1;              // vanaf 1 cent (een rondje delen mag klein zijn)
   const MAX_CENTEN = 500000;         // tot 5000 euro per boeking
+  /* HET PLAFOND PER WALLET, en waarom het een BEDRAG is en geen voornemen.
+
+     kern/bevoegdheid/lijst.js staat RTG het aanhouden van walletsaldo toe op
+     grond van een BESLUIT en niet van een vergunning, en dat besluit noemt drie
+     voorwaarden: alleen binnen RTG te besteden, niet uitbetaald aan het lid, en
+     "een maximum per wallet en per boeking". Van die drie bestond alleen de
+     laatste helft: MAX_CENTEN hierboven begrenst de BOEKING, en het maximum per
+     WALLET stond nergens in de code. De grond onder het besluit was dus voor een
+     derde onbebouwd -- en dat is precies het soort verschil dat pas opvalt als
+     iemand ernaar vraagt die het mag vragen.
+
+     Hij ligt boven MAX_CENTEN, en dat is geen smaak maar een voorwaarde: elders
+     wordt op twee plekken gerekend dat een tekort altijd bij te laden is (het
+     autolaad-pad in ./opladen.js). Zakt dit getal onder MAX_CENTEN, dan bestaat
+     er een boeking die het lid niet meer kan dekken en faalt "EEN knop". */
+  const WALLET_MAX = 1000000;        // en tot 10.000 euro dat een lid tegelijk aanhoudt
   const OPLAAD_MIN = 100;            // opladen vanaf 1 euro
   const AUTOLAAD_STAP = 1000;        // zelf bijladen in stappen van 10 euro
   const KASCODE_MS = 5 * 60 * 1000;  // een kassacode leeft vijf minuten
   const KASCODE_MAX = 50000;         // standaardplafond kassacode: 500 euro
 
   return { betalingenUit, uitFout, schaduw, motorklant, geldModus,
-    MIN_CENTEN, MAX_CENTEN, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX };
+    MIN_CENTEN, MAX_CENTEN, WALLET_MAX, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX };
 };

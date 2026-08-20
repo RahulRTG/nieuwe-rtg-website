@@ -24,16 +24,18 @@
    Connect / Adyen for Platforms): zij houden het geld, dit grootboek blijft
    de waarheid over wie wat heeft. De naad (server/betaal.js) is er al. Dit is
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
-   de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
+   de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa,
+   het tegoed dat een lid voor een ander koopt in ./tegoed, en het afrekenen
+   met een zaak in ./zaakbetaling. */
 
 module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
   const nu = () => Date.now();
   const d = () => db.data;
-  /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
+  /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zeven
      bedragen -- staat in ./stand.js. Een keer bepaald bij het opstarten, en
      daarna onveranderlijk; alles hieronder werkt per boeking. */
   const { betalingenUit, uitFout, schaduw, motorklant, geldModus,
-    MIN_CENTEN, MAX_CENTEN, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
+    MIN_CENTEN, MAX_CENTEN, WALLET_MAX, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
 
   function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
   function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
@@ -70,6 +72,12 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
     save();
   }
+  /* Het plafond per wallet -- de tweede helft van de voorwaarde waarop
+     kern/bevoegdheid/lijst.js het walletsaldo toestaat -- staat in ./plafond.js,
+     inclusief waar het bedrag vandaan komt en waarom hij vóór de motor valt. */
+  const { plafondFout, walletRuimte, koppelPlafond, walletMax } =
+    require('./plafond')({ saldoVan, rekLid, standaard: WALLET_MAX });
+
   // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
   // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
   // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
@@ -83,6 +91,8 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
     if (!van.startsWith('extern:') && saldoVan(van) < c) return { status: 402, error: 'Onvoldoende saldo.' };
+    const vol = plafondFout(naar, c);
+    if (vol) return vol;
     const rij = { id: id('PB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 120), ref: ref || null, at: nu() };
     pasToe(rij);
     schaduw.spiegel(rij); // schaduw-modus: naar de Rust-motor (no-op als uit)
@@ -97,6 +107,9 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   async function boekAsync({ van, naar, centen, soort, oms, ref }) {
     if (betalingenUit) return uitFout();
     if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref });
+    // Het walletplafond valt VOOR de motor; zie de reden bij plafondFout.
+    const vol = plafondFout(naar, Math.round(Number(centen)));
+    if (vol) return vol;
     const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
     // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
@@ -110,7 +123,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      raakt de boekingsregels zelf niet aan. */
   const { laadOp, oplaadAfronden, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
     betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
-    motorklant, geldModus, keyVanCodenaam,
+    motorklant, geldModus, keyVanCodenaam, plafondFout,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
   });
 
@@ -125,10 +138,11 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   const ctx = {
     db, save, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
-    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
+    rekLid, rekPartner, saldoVan, walletRuimte, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0),
     opdrachten: betaalOpdrachten,
-    MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
+    MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX,
+    walletMax
   };
   /* rekLid hoort bij het koppelvlak: de vorm 'lid:' + codenaam is een regel
      van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
@@ -136,20 +150,13 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      op dag een al drie keer bijna fout gegaan. */
   /* KASCODE_MS staat erbij omdat de capability eromheen (./kassacode.js) exact
      dezelfde termijn moet aanhouden; een tweede getal is een tweede waarheid. */
-  /* De stand van de motor-zekering, voor het techniekbord. Een doorgeslagen
-     zekering hoort ZICHTBAAR te zijn en niet alleen merkbaar (LAT.md regel 5):
-     anders zie je alleen dat boekingen falen en niet dat wij zelf gestopt zijn
-     met het proberen. Zie server/kern/motorzekering.js. */
-  const motorZekering = () => motorklant.stand();
-  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor, motorZekering };
-  // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
-  // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
-  // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk
-  // wordt alleen hier berekend (statusbord-poll), niet in het warme geld-pad.
-  // `aan` is false als RTG_MOTOR_SHADOW niet is gezet.
-  const { vingerafdruk } = require('./vingerafdruk');
-  api.schaduw = { aan: schaduw.aan, stand: () => schaduw.stand(sluitcontrole().som, vingerafdruk(saldi())) };
+  /* De motorzekering en de schaduwstand: ./statusbord.js (alleen voor het bord). */
+  const { motorZekering, schaduwMetAfdruk } = require('./statusbord')({ motorklant, schaduw, sluitcontrole, saldi });
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, WALLET_MAX, walletMax, koppelPlafond, walletRuimte, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor, motorZekering };
+  api.schaduw = schaduwMetAfdruk;   // de drift-detector; zie ./statusbord.js
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
+  Object.assign(api, require('./tegoed')(ctx));
+  Object.assign(api, require('./zaakbetaling')(ctx));
   return { pay: api };
 };

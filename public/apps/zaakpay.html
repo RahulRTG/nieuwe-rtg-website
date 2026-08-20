@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<script src="/shared/id.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Pay · de zaak</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;
+  /* LEZEN IS IETS ANDERS DAN ACCENTEREN. --gold is de accenttoon en prima voor
+     een rand; als TEKST haalt hij op de champagne-kaart (#F9F6F2) 2,94:1 --
+     onder de 4,5 die kleine tekst vraagt, en zelfs onder de 3,0 voor grote; de
+     leesbare toon haalt daar 4,51. rtg-themas.css houdt daarvoor
+     --rtg-leesgoud bij: per thema de goudtoon die daar wel leest. */
+  --leesgoud:var(--rtg-leesgoud,#A98F1C);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;line-height:1.5;}
+  h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.15rem;}
+  header{padding:.8rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+  header .ey{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  .pil{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem;color:var(--muted);}
+  main{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:.8rem;padding:.8rem;max-width:1100px;width:100%;margin:0 auto;align-content:start;}
+  @media (max-width:760px){ main{grid-template-columns:1fr;} }
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
+  .breed{grid-column:1/-1;}
+  .sec{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.5rem;}
+  /* De ENE dominante KPI van dit scherm mag ceremonieel zijn (ONTWERP.md par. 1:
+     "een belangrijk bedrag"). Verder staat er geen serif op deze pagina. */
+  .kpi{font-family:'Bodoni Moda',serif;font-size:2.6rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.1;}
+  .kpi small{font-size:1rem;color:var(--soft);}
+  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:11px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
+  .knop:hover{background:#7F1634;color:#fff;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.hoofd{background:#7F1634;color:#fff;}
+  .knop.hoofd:hover{background:#96203F;}
+  .knop[disabled]{opacity:.4;cursor:default;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  .veld:focus{border-color:var(--burgundy);outline:none;}
+  .rij{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;}
+  .regel{display:flex;gap:.6rem;align-items:center;border-bottom:1px solid var(--line);padding:.45rem 0;font-size:.86rem;flex-wrap:wrap;}
+  .regel:last-child{border-bottom:0;}
+  .regel .wie{flex:1;min-width:9rem;}
+  .regel .wie small{display:block;color:var(--soft);font-size:.74rem;}
+  .plus{color:var(--green);font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;}
+  .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;}
+  .leeg{color:var(--muted);font-size:.84rem;padding:.4rem 0;}
+  .hint{font-size:.74rem;color:var(--soft);line-height:1.5;}
+  /* Zelfde afweging als op apps/pay.html: een tegoedcode van vierentwintig
+     tekens is werk en geen ceremonie, dus Inter, tabulair, en hij mag afbreken. */
+  .boncode{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.08em;font-size:1.05rem;color:var(--leesgoud);text-align:center;padding:.5rem 0 .2rem;word-break:break-all;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
+  :focus-visible{outline:2px solid var(--leesgoud);outline-offset:2px;}
+</style>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header>
+  <div><div class="ey">RTG · werkplek</div><h1>RTG Pay</h1></div>
+  <span class="pil" id="zaakNaam">...</span>
+</header>
+
+<main id="main">
+
+  <section class="kaart">
+    <div class="sec">Saldo van de zaak</div>
+    <div class="kpi" id="saldo">0,00<small> eur</small></div>
+    <p class="hint" id="kosten"></p>
+    <div class="rij h-mt60">
+      <button class="knop hoofd" id="uitbetaal">Uitbetalen naar de bank</button>
+    </div>
+    <p class="hint h-mt60">Uitbetalen stuurt het hele saldo naar de rekening van de zaak. Dat is een handeling van de manager; een medewerker krijgt hier een weigering te zien en dat is geen storing.</p>
+  </section>
+
+  <section class="kaart">
+    <div class="sec">Innen aan de kassa</div>
+    <div class="rij">
+      <input class="veld" id="iCode" placeholder="Betaalcode van het lid" autocomplete="off" maxlength="12" style="flex:2;min-width:9rem;" aria-label="Betaalcode van het lid">
+      <input class="veld" id="iBedrag" placeholder="Euro" inputmode="decimal" style="flex:1;min-width:5rem;" aria-label="Bedrag in euro">
+    </div>
+    <div class="rij h-mt55">
+      <input class="veld" id="iOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" style="flex:1;min-width:9rem;" aria-label="Omschrijving, mag leeg">
+      <button class="knop" id="iInn">Inn</button>
+    </div>
+    <p class="hint h-mt60">Het lid toont zijn code in RTG Pay. Innen mag iedereen die is ingelogd: dat is het werk.</p>
+  </section>
+
+  <section class="kaart">
+    <div class="sec">Tegoed klaarzetten</div>
+    <div class="rij">
+      <input class="veld" id="tBedrag" placeholder="Euro" inputmode="decimal" style="flex:1;min-width:5rem;" aria-label="Bedrag in euro">
+      <input class="veld" id="tAan" placeholder="Voor wie? Codenaam (mag leeg)" maxlength="40" style="flex:2;min-width:9rem;" aria-label="Codenaam van de ontvanger, mag leeg">
+    </div>
+    <div class="rij h-mt55">
+      <input class="veld" id="tOms" placeholder="Waarvoor? (mag leeg)" maxlength="80" style="flex:1;min-width:9rem;" aria-label="Waarvoor is het tegoed">
+      <button class="knop hoofd" id="tZet">Zet klaar</button>
+    </div>
+    <p class="hint h-mt60">Het geld gaat meteen uit de kas en staat vast tot iemand het ophaalt. Een zaak laadt niet bij: is het saldo te laag, dan kan het niet. Laat je de codenaam leeg, dan kan iedereen met de code het ophalen. Na een jaar haal je het zelf terug.</p>
+    <div id="tNieuw" hidden>
+      <div class="boncode" id="tCode" aria-live="polite"></div>
+      <div class="rij" style="justify-content:center;"><button class="knop stil" id="tKopieer">Kopieer de code</button></div>
+    </div>
+  </section>
+
+  <section class="kaart" id="tKlaarKaart" hidden>
+    <div class="sec">Klaargezet en nog niet opgehaald</div>
+    <div id="tKlaar"></div>
+  </section>
+
+  <section class="kaart breed">
+    <div class="sec">Bewegingen</div>
+    <div id="boekingen"><div class="leeg">Nog geen bewegingen.</div></div>
+  </section>
+
+</main>
+<div class="melding" id="melding" role="status"></div>
+
+<script src="/shared/uitvoer.js"></script>
+<script src="/shared/deur.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const euro = c => (c/100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const idem = () => RTGIdem('zaakpay');
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
+
+/* De deur op het scherm zelf in plaats van wegsturen: wie hier uitgelogd komt,
+   verliest met een location.replace() waar hij heen wilde. Zelfde vorm als op
+   de kassa. */
+function uitgelogd(){
+  var naar = '/apps/personeel.html?terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  setTimeout(function () {
+    var el = document.getElementById('main') || document.body;
+    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
+  }, 0);
+}
+if (!TOKEN) uitgelogd();
+
+const api = (pad, body) => fetch('/api/supplier/' + pad, { method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {}) })
+  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3600); }
+
+let STAND = null;
+/* Meenemen (shared/uitvoer.js): de bewegingen met de velden los, zodat de
+   boekhouder ze kan uitvoeren zonder ze over te tikken. Bedragen in euro; de
+   kern rekent in centen. */
+if (window.RTGUitvoer) RTGUitvoer.bron(() => {
+  if (!STAND || !(STAND.boekingen || []).length) return null;
+  return {
+    naam: 'bewegingen',
+    kolommen: ['datum', 'omschrijving', 'soort', 'richting', 'bedrag in euro'],
+    rijen: STAND.boekingen.map(r => [
+      new Date(r.at).toISOString().slice(0, 10), r.oms || '', r.soort || '',
+      String(r.naar || '').startsWith('partner:') ? 'in' : 'uit', (r.centen / 100).toFixed(2)
+    ])
+  };
+});
+
+/* De RICHTING komt uit de rekeningnaam en niet uit een meegestuurde code.
+   /api/supplier/pay/overzicht geeft alleen boekingen die DEZE partnerrekening
+   raken, dus precies een van de twee kanten is een partner: staat hij rechts,
+   dan komt er geld binnen. Zo hoeft het scherm zijn eigen code niet te kennen
+   om een plus van een min te onderscheiden. */
+const binnen = r => String(r.naar || '').startsWith('partner:');
+
+async function ververs(){
+  const d = await api('pay/overzicht');
+  STAND = d;
+  $('#saldo').innerHTML = esc(euro(d.saldo)) + '<small> eur</small>';
+  $('#kosten').textContent = d.kostenVandaag
+    ? 'Vandaag is er ' + euro(d.kostenVandaag) + ' eur aan betaaldienstkosten direct verrekend.'
+    : '';
+  const rijen = d.boekingen || [];
+  $('#boekingen').innerHTML = rijen.length ? rijen.map(r =>
+    '<div class="regel"><div class="wie"><b>'+esc(r.oms || r.soort)+'</b>'+
+      '<small>'+esc(r.soort)+' · '+esc(new Date(r.at).toLocaleString('nl-NL', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }))+'</small></div>'+
+    '<span class="'+(binnen(r)?'plus':'min')+'">'+(binnen(r)?'+':'-')+' '+esc(euro(r.centen))+'</span></div>').join('')
+    : '<div class="leeg">Nog geen bewegingen.</div>';
+}
+
+/* Het tegoed dat deze zaak heeft klaargezet. Alleen wat nog OPEN staat: een
+   opgehaalde bon is geschiedenis en die staat al bij de bewegingen. */
+async function verversTegoed(){
+  let d;
+  try { d = await api('pay/tegoed'); } catch (e) { return; }
+  const open = (d.klaargezet || []).filter(t => t.status === 'open');
+  $('#tKlaarKaart').hidden = !open.length;
+  if (!open.length) return;
+  $('#tKlaar').innerHTML = open.map(t =>
+    '<div class="regel"><div class="wie"><b>'+esc(euro(t.centen))+' eur</b>'+
+      '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+' · '+esc(t.code || '')+'</small></div>'+
+    (t.verlopen
+      ? '<button class="knop stil" data-terug="'+esc(t.id)+'">Neem terug</button>'
+      : '<span style="color:var(--leesgoud);font-size:.8rem;">wacht op ophalen</span>')+
+    '</div>').join('');
+  $('#tKlaar').querySelectorAll('[data-terug]').forEach(b => b.addEventListener('click', async () => {
+    b.disabled = true;
+    try {
+      const r = await api('pay/tegoed/terug', { id: b.dataset.terug, idem: idem() });
+      meld(euro(r.centen) + ' eur is terug in de kas.');
+      ververs(); verversTegoed();
+    } catch (e) { meld(e.message); b.disabled = false; }
+  }));
+}
+
+/* ---------- innen ---------- */
+$('#iInn').addEventListener('click', async () => {
+  const centen = Math.round(Number(String($('#iBedrag').value).replace(',', '.')) * 100);
+  const code = $('#iCode').value.trim();
+  if (!code) { meld('Vul de betaalcode van het lid in.'); return; }
+  if (!(centen > 0)) { meld('Vul het bedrag in.'); return; }
+  try {
+    const r = await api('pay/in', { code, centen, oms: $('#iOms').value.trim(), idem: idem() });
+    meld(euro(r.centen) + ' eur geind van ' + r.van + '.');
+    $('#iCode').value = ''; $('#iBedrag').value = ''; $('#iOms').value = '';
+    ververs();
+  } catch (e) { meld(e.message); }
+});
+
+/* ---------- uitbetalen ---------- */
+$('#uitbetaal').addEventListener('click', async () => {
+  const knop = $('#uitbetaal');
+  knop.disabled = true;
+  try {
+    const r = await api('pay/uitbetaal', { idem: idem() });
+    meld(euro(r.uitbetaald) + ' eur is onderweg naar de bank.');
+    ververs();
+  } catch (e) {
+    /* Een weigering van de server is hier het ANTWOORD en geen storing: een
+       medewerker zonder managerrechten hoort te lezen waarom, in plaats van een
+       knop te zien die niets doet. */
+    meld(e.message);
+  }
+  knop.disabled = false;
+});
+
+/* ---------- tegoed klaarzetten ---------- */
+$('#tZet').addEventListener('click', async () => {
+  const centen = Math.round(Number(String($('#tBedrag').value).replace(',', '.')) * 100);
+  if (!(centen > 0)) { meld('Vul een bedrag in.'); return; }
+  try {
+    const r = await api('pay/tegoed/zet', {
+      centen, aan: $('#tAan').value.trim(), oms: $('#tOms').value.trim(), idem: idem()
+    });
+    $('#tNieuw').hidden = false;
+    $('#tCode').textContent = r.tegoed.code;
+    meld('Tegoed staat klaar.');
+    $('#tBedrag').value = ''; $('#tAan').value = ''; $('#tOms').value = '';
+    ververs(); verversTegoed();
+  } catch (e) { meld(e.message); }
+});
+$('#tKopieer').addEventListener('click', async () => {
+  /* Het klembord kan geweigerd worden (geen https, geen toestemming). De code
+     staat dan nog gewoon leesbaar op het scherm, dus dit is een melding en geen
+     fout die de knop stukmaakt. */
+  try { await navigator.clipboard.writeText($('#tCode').textContent); meld('Code gekopieerd.'); }
+  catch (e) { meld('Kopiëren lukte niet; de code staat hierboven.'); }
+});
+
+async function start(){
+  try {
+    const s = await api('state');
+    $('#zaakNaam').textContent = (s.state && s.state.supplier && s.state.supplier.name) || 'Zaak';
+  } catch (e) { /* de naam is versiering; het geld eronder telt */ }
+  await ververs();
+  await verversTegoed();
+}
+if (TOKEN) start().catch(() => uitgelogd());
+</script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

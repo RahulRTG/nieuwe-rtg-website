@@ -1,6 +1,29 @@
-/* RTG Bank, deel "walletbrug": geld tussen de RTG Pay-wallet (lid:<codenaam>)
-   en een eigen betaalrekening, plus de dekking die Pay vraagt als de wallet
+/* RTG Bank, deel "walletbrug": geld van een eigen betaalrekening naar de RTG
+   Pay-wallet (lid:<codenaam>), plus de dekking die Pay vraagt als de wallet
    tekortkomt.
+
+   DE BRUG IS EENRICHTINGSVERKEER, EN DAT IS EEN BESLUIT (20 augustus 2026).
+   Geld mag van de bank NAAR de wallet, niet andersom. De reden staat in
+   kern/bevoegdheid/lijst.js: RTG mag walletsaldo aanhouden op grond van een
+   BESLUIT en niet van een vergunning, en dat besluit rust op drie voorwaarden
+   waarvan de tweede is dat het saldo NIET WORDT UITBETAALD AAN HET LID.
+
+   Die voorwaarde was een belofte zolang de leden-bank uit stond. Zodra die live
+   gaat, bestaat de keten wallet -> walletbrug -> eigen rekening -> SEPA naar
+   buiten, en dan is walletsaldo wel degelijk uitbetaalbaar -- precies het geval
+   dat het besluit zelf benoemt als "dan hoort dit vermogen van soort te
+   wisselen". In plaats van het besluit te laten sneuvelen is de deur dicht
+   gedaan: walletNaarBank weigert, met de reden erbij.
+
+   Wat dit KOST, want dat hoort erbij: een lid kan zijn walletsaldo niet naar
+   zijn eigen rekening halen. Dat is geen functie die verdwijnt maar een belofte
+   die waar wordt gemaakt -- het besluit zei dit al, alleen deed de code het
+   niet. Wie hem weer opent, opent daarmee de vergunningsvraag.
+
+   De oude implementatie is WEGGEHAALD en niet uitgecommentarieerd blijven
+   staan: git heeft hem, en dode code die alleen als naslag dient veroudert
+   stil mee met de code eromheen. Wat hij deed staat hierboven beschreven;
+   hoe hij het deed staat in de historie van dit bestand.
 
    Waarom apart van ./overboeken: dit is het enige pad in de bank dat TWEE
    grootboeken tegelijk raakt. Elk blijft apart sluiten -- de wallet-kant boekt
@@ -12,20 +35,13 @@
 module.exports = (ctx) => {
   const { boekAsync, rekMeta, saldoVan, pay, seintje } = ctx;
 
+  /* De dichte kant. Hij blijft BESTAAN in plaats van te verdwijnen, en de route
+     erboven blijft hangen: een oude app hoort te lezen waarom het niet meer kan,
+     niet een 404 te krijgen die op een storing lijkt. */
   async function walletNaarBank({ iban, codenaam, centen }) {
-    const c = String(codenaam || '').trim();
-    const m = rekMeta(iban);
-    if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
-    const bedrag = Math.round(Number(centen));
-    if (!Number.isFinite(bedrag) || bedrag < 1 || bedrag > pay.MAX_CENTEN) return { status: 400, error: 'Kies een bedrag tot ' + (pay.MAX_CENTEN / 100) + ' euro per keer.' };
-    // De wallet-kant loopt via het pay-grootboek (in motor-modus dus geguard langs
-    // de motor); de bank-kant is het eigen bank-grootboek. Elk sluit apart.
-    const uit = await pay.boekAsync({ van: 'lid:' + c, naar: 'extern:bank', centen: bedrag, soort: 'naar-bank', oms: 'Naar RTG Bank' });
-    if (uit.error) return uit;
-    const in_ = await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'van-wallet', oms: 'Van RTG Pay' });
-    if (in_.error) { await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
-    seintje(c);
-    return { ok: true, saldoCenten: saldoVan(iban) };
+    return { status: 409, code: 'wallet-eenrichting',
+      error: 'Saldo in RTG Pay besteedt u binnen RTG; het gaat niet naar een bankrekening. ' +
+        'Andersom kan wel: geld van uw rekening naar uw wallet.' };
   }
   async function bankNaarWallet({ iban, codenaam, centen }) {
     const c = String(codenaam || '').trim();

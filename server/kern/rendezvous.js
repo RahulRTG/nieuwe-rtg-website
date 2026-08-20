@@ -14,7 +14,7 @@
    losser was dan de brede. De pas-eis (Lifestyle of Business) blijft op de route
    waar hij hoort; de leeftijd en de identiteit horen hier, want de kern is wat
    elke ingang passeert. */
-module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan, tableZet }) => {
+module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin }) => {
   const nu = () => new Date().toISOString();
   const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
   const mag = key => ontmoetPoort(key, 'Rendez-vous');
@@ -74,70 +74,6 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
   }
 
   // wie mag ik zien: andere leden met een actief profiel, niet ikzelf, niet weggeveegd
-  function rvKandidaten(key) {
-    const poort = mag(key);
-    if (!poort.ok) return { status: 403, error: poort.reden };
-    const r = R();
-    const mij = r.profielen[key] || { locaties: [] };
-    const mijnLikes = r.likes[key] || {};
-    const mijnPasses = r.passes[key] || {};
-    const uit = [];
-    for (const [k, p] of Object.entries(r.profielen)) {
-      if (k === key || !p.aan) continue;
-      if (mijnPasses[k]) continue;
-      const zijLikenMij = !!(r.likes[k] && r.likes[k][key]);
-      const ikLikeHen = !!mijnLikes[k];
-      uit.push({ id: k, codenaam: codenaam(k), over: p.over || '', zoekt: p.zoekt || '',
-        wensen: p.wensen || [], locaties: p.locaties || [], gedeeldeLocaties: gedeeld(mij.locaties, p.locaties),
-        /* Waar en wanneer u tegelijk bent. Noemt nooit wie er woont -- zie de
-           derde grens in de kop van ./rendezvous-aanwezig.js. */
-        samen: AW.overlapTussen(mij, p),
-        likteMij: zijLikenMij && !ikLikeHen,
-        status: ikLikeHen && zijLikenMij ? 'match' : ikLikeHen ? 'geliked' : 'nieuw' });
-    }
-    /* Eerst wie u al leuk vindt, dan wie u BINNENKORT TEGENKOMT, en pas daarna
-       de gedeelde steden. Die middelste is de hele reden van de Presence Graph:
-       een gedeelde stad zonder tijd is een toevalligheid, samen ergens zijn is
-       een aanleiding. Geen aansporing erbij, alleen een volgorde -- LIFE.md
-       par. 4.1: de app port niet aan tot een volgende stap. */
-    uit.sort((a, b) => (b.likteMij - a.likteMij) || (b.samen.length - a.samen.length)
-      || (b.gedeeldeLocaties.length - a.gedeeldeLocaties.length));
-    return { status: 200, kandidaten: uit.slice(0, 60), profielAan: !!mij.aan };
-  }
-
-  function rvLike(key, targetKey) {
-    const poort = mag(key);
-    if (!poort.ok) return { status: 403, error: poort.reden };
-    const r = R();
-    if (!targetKey || targetKey === key) return { status: 400, error: 'Onbekend lid.' };
-    if (!r.profielen[key] || !r.profielen[key].aan) return { status: 400, error: 'Zet eerst uw eigen profiel aan.' };
-    const doel = r.profielen[targetKey];
-    if (!doel || !doel.aan) return { status: 404, error: 'Dit lid is niet (meer) beschikbaar.' };
-    if (!r.likes[key]) r.likes[key] = {};
-    if (r.passes[key]) delete r.passes[key][targetKey];
-    r.likes[key][targetKey] = nu();
-    const match = !!(r.likes[targetKey] && r.likes[targetKey][key]);
-    save();
-    if (match && notify) {
-      const g = gedeeld(r.profielen[key].locaties, doel.locaties);
-      const waar = g.length ? ' Denk aan een date in ' + g[0] + '.' : '';
-      try { notify(key, { title: 'Rendez-vous', body: 'U heeft een match met ' + codenaam(targetKey) + '.' + waar, scope: 'lifestyle' }); } catch (e) {}
-      try { notify(targetKey, { title: 'Rendez-vous', body: 'U heeft een match met ' + codenaam(key) + '.' + waar, scope: 'lifestyle' }); } catch (e) {}
-    }
-    return { status: 200, ok: true, match };
-  }
-  function rvPas(key, targetKey) {
-    const poort = mag(key);
-    if (!poort.ok) return { status: 403, error: poort.reden };
-    const r = R();
-    if (!targetKey) return { status: 400, error: 'Onbekend lid.' };
-    if (!r.passes[key]) r.passes[key] = {};
-    r.passes[key][targetKey] = nu();
-    if (r.likes[key]) delete r.likes[key][targetKey];
-    save();
-    return { status: 200, ok: true };
-  }
-
   function matchesVan(key) {
     const r = R();
     const mijn = r.likes[key] || {};
@@ -175,10 +111,17 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
     return { status: 200, ok: true, aanwezig: [], thuis: '' };
   }
 
+  // Together: twee eenzijdige verklaringen, "samen" is de projectie erover
+  const samen = require('./rendezvous-samen')({ R, mag, codenaam, nu, save });
+  const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu,
+    partnerVan: samen.rvPartnerVan });
+  // The Table, Moment en Encounter (een tweezijdige ja, twee momenten)
+  const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin });
   const { rvDate } = require('./rendezvous-date')({ R, AW, B, mag, codenaam, schoon, matchesVan, anthropic });
   // Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt
   const arrange = require('./rendezvous-arrange')({ R, AW, B, mag, codenaam, schoon, nu, save,
     matchesVan, tableZet, notify });
-  return { rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate, rvAanwezigWis,
-    rvArrange: arrange.rvArrange, rvAkkoord: arrange.rvAkkoord };
+  return { rvProfielGet, rvProfiel, ...ontdek, ...kring, rvMatches, rvDate, rvAanwezigWis,
+    rvArrange: arrange.rvArrange, rvAkkoord: arrange.rvAkkoord,
+    rvSamen: samen.rvSamen, rvSamenZet: samen.rvSamenZet };
 };

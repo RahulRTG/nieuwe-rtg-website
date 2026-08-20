@@ -746,7 +746,46 @@ keurt niet iets anders goed dan waar je ja op zei. En een voorstel vervalt zodra
 de grond eronder wegvalt: wist iemand zijn aanwezigheid, dan gaat het niet door
 over een weekend dat niet meer bestaat.
 
-**Fase 5 — de kring.** The Table, Moment en Encounter op de contactpin; en
-Together op de objectlaag.
+**Fase 5 — gedaan: de kring** (`kern/rendezvous-kring.js` en `-samen.js`).
+
+**Moment en Encounter zijn één mechanisme.** Allebei is het: ieder krijgt
+afzonderlijk de vraag of hij aan de ander voorgesteld wil worden, en alleen bij
+twee keer ja gaat er iets open. Het verschil is uitsluitend wánneer de vraag
+komt — vóór de ontmoeting (u bent allebei op hetzelfde evenement) of erna (u
+heeft elkaar gesproken). Daarom staat er één `introBied` / `introAntwoord` en
+geen twee bijna gelijke ketens; een derde moment is een derde `soort` en verder
+niets.
+
+**Wie als eerste ja zegt, blijft onzichtbaar.** Anders is het geen vraag meer
+maar een verzoek dat je moeilijk kunt afslaan. En een nee wordt nóóit gemeld —
+de ander leest niets. Precies dat maakt afwijzen licht.
+
+**Encounter leent de contactpin en verder niets.** Er wordt geen contact
+toegevoegd en geen sociale relatie aangemaakt: romantische interesse geeft geen
+toegang tot iemands bredere identiteit. En een pin van één kant is niet genoeg —
+anders kon iemand een voorgelezen pin later thuis invoeren en had de ander een
+vraag over iemand die hij niet koos.
+
+*Eerlijk over "de volgende ochtend":* dat is presentatie, geen mechanisme. Er
+wordt hier niets ingepland en er is geen wekker; de vraag staat klaar en ieder
+beantwoordt hem wanneer hij de app opent.
+
+**The Table** — een genodigde ziet de tafel (stad, dag, thema, hoeveel plaatsen)
+en **nooit** de gastenlijst. Achter de schermen mag RTG twee mogelijke
+introducties dezelfde uitnodiging sturen; dat is de hele kunst, en het werkt
+alleen zolang niemand het merkt. Een tafel wordt door RTG samengesteld — de kern
+kan dat, maar er is nog geen backofficescherm waar het gebeurt. Dat is, net als
+`geschikt` bij de zaken, een gat en geen ontwerp.
+
+**Together** — twee eenzijdige verklaringen, en "samen" bestaat alleen als
+projectie daarover: allebei wijzen naar elkaar. Er is geen collectie "relatie".
+Daaruit volgt vanzelf wat je zou willen: niemand kan een ander in een relatie
+zetten, en niemand kan een ander erin houden. Wie zijn helft intrekt, trekt
+alleen zijn eigen helft in — de projectie valt weg zodra er één verdwijnt, dus
+er hoeft geen "verbreken" te bestaan dat aan de kant van de ander iets aanpast.
+Zolang het staat, stoppen de introducties aan beide kanten; de kring blijft.
+
+Geen bericht als iemand zijn helft intrekt, geen datum die wordt bijgehouden,
+geen "u bent drie maanden samen" (par. 4.1 en 4.4).
 
 Elke fase eindigt met wat `LAT.md` vraagt: een toets die je hebt zien zakken.

@@ -403,3 +403,135 @@ test('arrange it: valt de grond onder het voorstel weg, dan vervalt het', async 
   assert.equal(nu2.status, 409, 'een voorstel over een weekend dat niet meer bestaat, gaat niet door');
   assert.match((await json(nu2)).error, /klopt niet meer/);
 });
+
+/* ---- DE KRING (kern/rendezvous-kring.js + -samen.js, ONTMOETEN.md fase 5) ----
+   The Table, de tweezijdige ja (Moment en Encounter), en Together. */
+
+test('the table: de gastenlijst verlaat de kern niet', async () => {
+  const kern = require('../server/kern/rendezvous.js');
+  const db = { data: { rendezvous: {} } };
+  const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({ geboren: '1985-05-05' }) };
+  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => 'Naam-' + k,
+    anthropic: null, notify() {}, accounts, leeftijdVan: () => 40, tableZet() {}, handleVanPin: () => null });
+
+  const t = api.rvTafelMaak({ naam: 'Diner 04', stad: 'Amsterdam', datum: '2026-09-10', tijd: '20:00',
+    thema: 'architectuur', plaatsen: 8, genodigden: ['user-1', 'user-2', 'user-3'] });
+  assert.equal(t.status, 200);
+  assert.equal(t.tafel.genodigden, undefined, 'zelfs het maak-antwoord draagt de lijst niet');
+
+  const mijn = api.rvTafels('user-1');
+  assert.equal(mijn.tafels.length, 1);
+  const rij = mijn.tafels[0];
+  assert.equal(rij.naam, 'Diner 04');
+  assert.equal(rij.plaatsen, 8, 'u ziet hoe groot het gezelschap is');
+  assert.ok(!('genodigden' in rij), 'maar niet wie er komen');
+  assert.ok(!/user-2|user-3|Naam-user-2/.test(JSON.stringify(mijn)), 'geen enkele medegast lekt door');
+
+  assert.equal(api.rvTafelAntwoord('user-1', rij.id, true).mijnStatus, 'ja');
+  // en een ander lid ziet die tafel niet
+  assert.equal(api.rvTafels('user-9').tafels.length, 0, 'wie niet is uitgenodigd, ziet niets');
+});
+
+test('de tweezijdige ja: wie als eerste ja zegt blijft onzichtbaar, en nee is stil', async () => {
+  const kern = require('../server/kern/rendezvous.js');
+  const db = { data: { rendezvous: {} } };
+  const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({ geboren: '1985-05-05' }) };
+  const gemeld = [];
+  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => 'Naam-' + k,
+    anthropic: null, notify: (k, m) => gemeld.push([k, m.body]), accounts, leeftijdVan: () => 40,
+    tableZet() {}, handleVanPin: () => null });
+
+  api.rvIntroBied('moment', 'user-1', 'user-2', 'allebei op Basel');
+  const sl = api.rvIntroducties('user-1').introducties[0].id;
+  assert.equal(api.rvIntroducties('user-1').introducties[0].aanleiding, 'allebei op Basel');
+
+  // A zegt ja; B mag daar niets van merken
+  assert.equal(api.rvIntroAntwoord('user-1', sl, true).geopend, false);
+  const bijB = api.rvIntroducties('user-2').introducties[0];
+  assert.equal(bijB.ikAntwoordde, null, 'B heeft zelf nog niets gezegd');
+  assert.equal(bijB.geopend, false);
+  assert.ok(!('anderJa' in bijB) && !('ja' in bijB), 'en ziet nergens dat A al ja zei');
+
+  // B zegt ook ja: nu pas open
+  const open = api.rvIntroAntwoord('user-2', sl, true);
+  assert.equal(open.geopend, true);
+  assert.equal(open.codenaam, 'Naam-user-1');
+
+  // en een nee blijft stil
+  api.rvIntroBied('encounter', 'user-3', 'user-4', 'u heeft elkaar ontmoet');
+  const sl2 = api.rvIntroducties('user-3').introducties[0].id;
+  gemeld.length = 0;
+  assert.equal(api.rvIntroAntwoord('user-3', sl2, false).geopend, false);
+  assert.deepEqual(gemeld, [], 'een afwijzing stuurt niemand een bericht');
+  assert.equal(api.rvIntroducties('user-4').introducties[0].ikAntwoordde, null,
+    'en de ander ziet niet dat er nee is gezegd');
+});
+
+test('encounter: een pin alleen is niet genoeg; het moet van twee kanten komen', async () => {
+  const kern = require('../server/kern/rendezvous.js');
+  const db = { data: { rendezvous: {} } };
+  const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({ geboren: '1985-05-05' }) };
+  const pins = { 'AAA-111': 'user-2', 'BBB-222': 'user-1' };
+  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => 'Naam-' + k,
+    anthropic: null, notify() {}, accounts, leeftijdVan: () => 40, tableZet() {},
+    handleVanPin: p => pins[p] || null });
+
+  assert.equal(api.rvEncounter('user-1', 'ONZIN').status, 404, 'een pin die niemand aanwijst doet niets');
+  const een = api.rvEncounter('user-1', 'AAA-111');
+  assert.equal(een.wacht, true, 'een kant is nog geen ontmoeting');
+  assert.equal(api.rvIntroducties('user-2').introducties.length, 0,
+    'en de ander krijgt dus nog geen vraag over iemand die hij niet koos');
+
+  const twee = api.rvEncounter('user-2', 'BBB-222');
+  assert.equal(twee.wacht, false, 'van twee kanten: nu is het een ontmoeting');
+  assert.equal(api.rvIntroducties('user-2').introducties[0].soort, 'encounter');
+});
+
+test('together: samen is een projectie over twee eigen verklaringen', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'samen-A' }, a);
+  await rv('profiel/zet', { aan: true, over: 'samen-B' }, b);
+  const kand = await json(await rv('kandidaten', {}, a));
+  const zB = kand.kandidaten.find(k => k.over === 'samen-B');
+  assert.ok(zB, 'B is eerst gewoon een kandidaat');
+
+  // A verklaart eenzijdig: nog niet samen
+  const een = await json(await rv('samen/zet', { met: zB.id }, a));
+  assert.equal(een.samen, false, 'een verklaring maakt nog geen relatie');
+  assert.equal((await json(await rv('samen', {}, b))).samen, false, 'en B is nergens in gezet');
+
+  // B verklaart terug: nu is het samen
+  const kandB = await json(await rv('kandidaten', {}, b));
+  const zA = kandB.kandidaten.find(k => k.over === 'samen-A');
+  const twee = await json(await rv('samen/zet', { met: zA.id }, b));
+  assert.equal(twee.samen, true, 'twee verklaringen naar elkaar: samen');
+
+  // de introducties stoppen, aan beide kanten
+  assert.deepEqual((await json(await rv('kandidaten', {}, a))).kandidaten, [], 'A krijgt niemand meer');
+  assert.equal((await json(await rv('kandidaten', {}, a))).samen, true);
+  const bijAnderen = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'derde' }, bijAnderen);
+  const derde = await json(await rv('kandidaten', {}, bijAnderen));
+  assert.ok(!derde.kandidaten.some(k => k.over === 'samen-A' || k.over === 'samen-B'),
+    'en ze staan ook bij een derde niet meer in de lijst');
+});
+
+test('together: je trekt alleen je eigen helft in, en de ander wordt niet gewist', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'los-A' }, a);
+  await rv('profiel/zet', { aan: true, over: 'los-B' }, b);
+  const idB = (await json(await rv('kandidaten', {}, a))).kandidaten.find(k => k.over === 'los-B').id;
+  await rv('samen/zet', { met: idB }, a);
+  const idA = (await json(await rv('kandidaten', {}, b))).kandidaten.find(k => k.over === 'los-A').id;
+  await rv('samen/zet', { met: idA }, b);
+  assert.equal((await json(await rv('samen', {}, a))).samen, true);
+
+  // A trekt in: samen valt weg voor allebei, maar B's eigen verklaring staat er nog
+  await rv('samen/zet', { ja: false }, a);
+  assert.equal((await json(await rv('samen', {}, a))).samen, false);
+  const bijB = await json(await rv('samen', {}, b));
+  assert.equal(bijB.samen, false, 'de projectie valt weg zodra een helft verdwijnt');
+  assert.ok(bijB.ikVerklaarde, 'maar B\'s eigen helft is niet door A gewist');
+});

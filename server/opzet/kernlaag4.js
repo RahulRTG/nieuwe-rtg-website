@@ -49,7 +49,10 @@ kern.huis = require('../kern/huis')({
 Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan,
   /* tableZet komt uit kern/rechterhand (kernlaag3) en staat er dus al: bij twee
      akkoorden krijgt elk lid de gelegenheid in zijn EIGEN dossier. */
-  tableZet: kern.tableZet }));
+  tableZet: kern.tableZet,
+  /* De contactpin uit kern/sociaal: Encounter LEENT hem als adres en maakt geen
+     eigen koppelcode. Zie de kop van kern/rendezvous-kring.js. */
+  handleVanPin: (pin) => kern.handleVanPin(pin) }));
 // De wauw-laag: stemming, verjaardagsglans en De Terugblik over alle socials
 Object.assign(kern, require('../kern/wauw')({ db, save, accounts, socialConnecties: kern.socialConnecties }));
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)

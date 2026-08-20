@@ -87,7 +87,7 @@ let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
 const api=(pad,body)=>fetch('/api/member/rendezvous/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
 let TAB='profiel';
-const TABS=[['profiel','Profiel'],['ontdek','Ontdek'],['matches','Matches']];
+const TABS=[['profiel','Profiel'],['ontdek','Ontdek'],['matches','Matches'],['kring','De kring']];
 function tekenTabs(){ $('#tabs').innerHTML=TABS.map(([k,n])=>'<button class="tab'+(TAB===k?' aan':'')+'" data-t="'+k+'">'+n+'</button>').join(''); document.querySelectorAll('[data-t]').forEach(b=> b.onclick=()=>{ TAB=b.dataset.t; laad(); }); }
 /* Meenemen (shared/uitvoer.js): u neemt mee wat er op het tabblad staat -- uw
    matches of de kandidaten die u nu ziet -- met de velden los, niet de kaart
@@ -116,6 +116,7 @@ async function laad(){
   try{
     if(TAB==='profiel') return await profiel();
     if(TAB==='ontdek') return await ontdek();
+    if(TAB==='kring') return await kring();
     return await matches();
   }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Rendez-vous niet laden.</div>'; }
 }
@@ -216,6 +217,63 @@ async function ontdek(){
   document.querySelectorAll('[data-ga]').forEach(b=> b.onclick=()=>{ TAB='matches'; laad(); });
 }
 
+/* De kring: uitnodigingen, de vragen die openstaan, de pin voor een ontmoeting,
+   en Together. Wat hier NIET staat is net zo belangrijk als wat er wel staat:
+   geen gastenlijst bij een tafel, en geen enkel spoor van wie er al ja zei. */
+async function kring(){
+  const [t,i,sm]=await Promise.all([api('tafels'),api('introducties'),api('samen')]);
+  UIT={ naam:'kring', kolommen:['soort','wat','wanneer','status'],
+    rijen:(t.tafels||[]).map(x=>['tafel',x.naam,(x.datum||'')+' '+(x.tijd||''),x.mijnStatus])
+      .concat((i.introducties||[]).map(x=>['introductie',x.codenaam,String(x.at||'').slice(0,10),x.geopend?'open':'in behandeling'])) };
+  let h='';
+
+  h+='<div class="kaart"><h2>Samen</h2>'
+    +(sm.samen?'<div>U bent samen met '+esc(sm.met)+'. Er komen geen introducties meer; uw uitnodigingen en de concierge blijven gewoon.</div>'
+      +'<div class="h-mt40"><button class="stilknop" id="losser">Dit klopt niet meer</button></div>'
+      :'<div class="note">Bent u samen met iemand die u hier heeft ontmoet? Dan zegt u dat allebei, en stoppen de introducties. U vindt de knop bij de match.</div>')
+    +'</div>';
+
+  h+='<div class="kaart"><h2>Uitnodigingen</h2>'+((t.tafels||[]).length
+    ? t.tafels.map(x=>'<div class="kand"><div class="nm">'+esc(x.naam)+'</div>'
+        +'<div class="note">'+esc([x.stad,x.datum,x.tijd].filter(Boolean).join(' \u00b7 '))+'</div>'
+        +(x.thema?'<div class="note">'+esc(x.thema)+'</div>':'')
+        +'<div class="note">'+x.plaatsen+' leden aan tafel. Wie er komen, hoort u aan tafel.</div>'
+        +(x.mijnStatus==='open'?'<div class="acts"><button class="knop stil" data-tafel="'+esc(x.id)+'" data-ja="0">Nee</button>'
+          +'<button class="knop hart" data-tafel="'+esc(x.id)+'" data-ja="1">Ik kom</button></div>'
+          :'<div class="note">U heeft '+(x.mijnStatus==='ja'?'toegezegd':'afgezegd')+'.</div>')
+        +'</div>').join('')
+    : '<div class="note">Geen uitnodigingen op dit moment.</div>')+'</div>';
+
+  h+='<div class="kaart"><h2>Voorgesteld worden</h2>'+((i.introducties||[]).length
+    ? i.introducties.map(x=>'<div class="kand"><div class="nm">'+esc(x.codenaam)+'</div>'
+        +'<div class="note">'+esc(x.aanleiding||'')+'</div>'
+        +(x.geopend?'<div class="samen">De introductie is open.</div>'
+          : x.ikAntwoordde===null
+            ? '<div class="acts"><button class="knop stil" data-intro="'+esc(x.id)+'" data-ja="0">Liever niet</button>'
+              +'<button class="knop hart" data-intro="'+esc(x.id)+'" data-ja="1">Graag</button></div>'
+            : '<div class="note">'+(x.ikAntwoordde?'U heeft ja gezegd. U hoort het als het wederzijds is.':'U heeft dit afgeslagen.')+'</div>')
+        +'</div>').join('')
+    : '<div class="note">Geen vragen die openstaan.</div>')+'</div>';
+
+  h+='<div class="kaart"><h2>Iemand ontmoet?</h2>'
+    +'<div class="note">Wissel geen nummers uit. Voer de pin in die u van elkaar kreeg &mdash; van beide kanten. Daarna krijgt u ieder afzonderlijk de vraag of u aan de ander voorgesteld wilt worden.</div>'
+    +'<span class="lbl">Pin</span><input class="veld" id="pin" placeholder="ABC-123">'
+    +'<div class="h-mt40"><button class="knop" id="pinOk">Ik heb deze persoon ontmoet</button></div></div>';
+
+  $('#main').innerHTML=h;
+  document.querySelectorAll('[data-tafel]').forEach(b=> b.onclick=async()=>{
+    try{ await api('tafel/antwoord',{id:b.dataset.tafel,ja:b.dataset.ja==='1'}); laad(); }catch(e){ meld(e.message); } });
+  document.querySelectorAll('[data-intro]').forEach(b=> b.onclick=async()=>{
+    try{ const r=await api('introductie/antwoord',{id:b.dataset.intro,ja:b.dataset.ja==='1'});
+      meld(r.geopend?'De introductie is open.':'Genoteerd.'); laad(); }catch(e){ meld(e.message); } });
+  $('#pinOk').onclick=async()=>{
+    try{ const r=await api('encounter',{pin:$('#pin').value});
+      meld(r.wacht?'Genoteerd. Zodra de ander uw pin ook invoert, krijgt u allebei de vraag.':'Genoteerd. U krijgt allebei de vraag.');
+      $('#pin').value=''; laad(); }catch(e){ meld(e.message); } };
+  const los=$('#losser'); if(los) los.onclick=async()=>{
+    try{ await api('samen/zet',{ja:false}); meld('Bijgewerkt.'); laad(); }catch(e){ meld(e.message); } };
+}
+
 async function matches(){
   const d=await api('matches');
   UIT={ naam:'matches', kolommen:['codenaam','gedeelde locaties','tegelijk ergens','voorstel','sinds'],
@@ -227,7 +285,8 @@ async function matches(){
     +samenRegel(m.samen)
     +(m.wanneer&&m.wanneer.samen?'<div class="samen">'+esc(m.wanneer.tekst)+'</div>':'')
     +(m.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">Gedeelde locaties: '+m.gedeeldeLocaties.map(esc).join(', ')+'</div>':((m.samen||[]).length?'':'<div class="note">Nog geen gedeelde locatie. Vul locaties aan bij Profiel.</div>'))
-    +'<div class="h-mt70"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button> <button class="stilknop" data-arrange="'+m.id+'">Arrange it</button></div>'
+    +'<div class="h-mt70"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button> <button class="stilknop" data-arrange="'+m.id+'">Arrange it</button>'
+    +' <button class="stilknop" data-samen="'+m.id+'">Wij zijn samen</button></div>'
     +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div>'
     +'<div id="arr-'+m.id+'"></div></div>').join('');
   $('#main').innerHTML=h;
@@ -259,6 +318,12 @@ async function matches(){
       catch(e){ meld(e.message); } });
   }
   document.querySelectorAll('[data-arrange]').forEach(b=> b.onclick=()=> toonArrange(b.dataset.arrange));
+  /* U zet alleen uw EIGEN helft. Pas als de ander hetzelfde doet, bestaat
+     "samen" -- zie de kop van kern/rendezvous-samen.js. */
+  document.querySelectorAll('[data-samen]').forEach(b=> b.onclick=async()=>{
+    try{ const r=await api('samen/zet',{met:b.dataset.samen});
+      meld(r.samen?'U bent allebei samen. De introducties stoppen.':'Genoteerd. Zodra de ander hetzelfde zegt, stoppen de introducties.');
+    }catch(e){ meld(e.message); } });
   document.querySelectorAll('[data-date]').forEach(b=> b.onclick=async()=>{ const box=$('#date-'+b.dataset.date); box.style.display='block'; box.textContent='Rahul denkt na…'; try{ const r=await api('date',{id:b.dataset.date}); box.textContent=r.antwoord; }catch(e){ box.textContent=e.message; } });
 }
 laad();

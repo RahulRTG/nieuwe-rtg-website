@@ -92,9 +92,18 @@ test('de proef overleeft zijn eigen ronde: een 401 van een DODE sessie telt niet
   /* En het gevolg dat ertoe doet: met een levende sessie oogst de pool ruim, en
      dat is wat de meting scherp maakt. Blijft dit getal laag, dan meet de proef
      vooral zijn eigen onbereikbaarheid. */
-  assert.ok((reg.gemeten.poolVelden || 0) >= 300,
+  assert.ok((reg.gemeten.poolVelden || 0) >= 400,
     'een pool die halverwege stopt met vullen laat de proef vooral onbereikbaar meten; velden: ' +
     reg.gemeten.poolVelden);
+
+  /* EN EEN LAAG DIEPER. Dezelfde gang komt langs /api/privacy/delete, en dat
+     wist het account zelf -- een verse sessie helpt daar niet, want er is geen
+     lid meer om in te loggen. Gemeten op route 1147 van de 1480: alles daarna
+     oogstte niets. De proef vervangt zijn proefpersoon nu, en dat hoort te
+     gebeuren; blijft dit nul, kijk dan of privacy/delete nog in de rij zit. */
+  assert.ok((reg.gemeten || {}).subjectVervangen >= 1,
+    'de proef wist zijn eigen proefpersoon en hoort hem te vervangen; gemeten: ' +
+    JSON.stringify((reg.gemeten || {}).subjectVervangen));
 });
 
 test('een weigering die een persoonsveld lekt is gescheiden EN een lek', () => {

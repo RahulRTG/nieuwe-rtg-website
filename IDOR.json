@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T13:06:33.477Z",
-  "commit": "e509ef4",
+  "op": "2026-08-20T13:29:42.525Z",
+  "commit": "6266540",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,14 +9,14 @@
  "grens": "een doorbraak is een VRAAG en geen vonnis: het object kan publiek zijn. En de proef ziet alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.",
  "gemeten": {
   "routes": 1480,
-  "gescheiden": 477,
+  "gescheiden": 546,
   "doorbraak": 0,
-  "nagekeken": 24,
-  "publiek": 261,
-  "onbereikbaar": 718,
+  "nagekeken": 35,
+  "publiek": 338,
+  "onbereikbaar": 561,
   "lek": 0,
-  "poolDomeinen": 69,
-  "poolVelden": 428,
+  "poolDomeinen": 97,
+  "poolVelden": 541,
   "werkplek": {
    "routes": 82,
    "gescheiden": 56,
@@ -28,7 +28,8 @@
     "velden": 57
    }
   },
-  "sessieHernieuwd": 1
+  "sessieHernieuwd": 3,
+  "subjectVervangen": 2
  },
  "doorbraken": [],
  "perRoute": {
@@ -31461,16 +31462,46 @@
    "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/privacy/delete": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id",
+    "invoice",
+    "invoiceid",
+    "item",
+    "itemid",
+    "categorie",
+    "categorieid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: DE PROEF ZELF. wisLid(req.session) wist het account van de AANROEPER; het id uit het lijf wordt niet gelezen. Dit is de route die lid A op plek 1147 van de rij liet verdwijnen -- geen doorbraak maar het recht om vergeten te worden, dat precies doet wat het belooft"
   },
   "POST /api/privacy/export": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "invoice",
+    "invoiceid",
+    "item",
+    "itemid",
+    "categorie",
+    "categorieid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/privacy/inzage": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "invoice",
+    "invoiceid",
+    "item",
+    "itemid",
+    "categorie",
+    "categorieid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/punten": {
    "staat": "onbereikbaar",
@@ -31485,48 +31516,122 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/rahul/kijk": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "plek",
+    "plekid",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/rahul/plekken": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "plek",
+    "plekid",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/rahul/stemming": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "plek",
+    "plekid",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/reis/landen": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "land",
+    "landid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/reis/wereld": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "land",
+    "landid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/reis/wijzer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "code",
+    "land",
+    "landid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: reisadvies per land; een landcode is publieke informatie en geen object van iemand"
   },
   "POST /api/reisbureau": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "reiz",
+    "reizid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/reisbureau/advies": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "reiz",
+    "reizid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/reisbureau/annuleer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "reiz",
+    "reizid"
+   ]
   },
   "POST /api/reisbureau/boek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "reiz",
+    "reizid"
+   ]
   },
   "POST /api/reisbureau/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "reiz",
+    "reizid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/rekening": {
    "staat": "onbereikbaar",
@@ -31549,88 +31654,222 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/residentie/bel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/betreed": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/emote": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/gids": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/huis": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/meubel/weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/meubel/zet": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/paar/antwoord": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/paar/los": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/paar/vraag": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/pols": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/spel/antwoord": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/spel/daag": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/spel/stop": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/spel/zet": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/stap": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/suite": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/suite/zet": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/vraag": {
+   "status": 409,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/residentie/weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/residentie/zeg": {
+   "status": 409,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 409: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "zal",
+    "zalid"
+   ]
   },
   "POST /api/retail/catalogus": {
    "staat": "onbereikbaar",
@@ -31773,212 +32012,628 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/salon/ai/bijschrift": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/ai/reacties": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/ai/waarover": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/archiveer": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/bewaar": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: een bladwijzer op een zichtbare post, in B's eigen lijst (salonProfiel.bewaar(req.session.key, ...))"
   },
   "POST /api/salon/bio": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/deal/claim": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/feed": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/inzicht": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/lid": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/meld": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: melden hoort op andermans post te werken -- drie VERSCHILLENDE melders verbergen hem voor iedereen, waarna het kantoor beslist"
   },
   "POST /api/salon/onderwerpen": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/plaats": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/poll/stem": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/profiel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/promo": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/reactie-weg": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/reacties": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: de reacties onder een post die B mag zien; wie de post mag zien, mag de reacties zien"
   },
   "POST /api/salon/reacties-van": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/reageer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: reageren op een zichtbare post; de reactie staat op B's naam uit de sessie"
   },
   "POST /api/salon/verberg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: verbergt de post in B's EIGEN tijdlijn (s.verborgen[mij]); de post zelf blijft voor iedereen staan"
   },
   "POST /api/salon/volg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/volg-lid": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/salon/volgend": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/salon/weg": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "post",
+    "postid"
+   ]
   },
   "POST /api/samen/chat": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/samen/maak": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/samen/mee": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "code"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf"
   },
   "POST /api/samen/muziek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/samen/staat": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "code"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven"
   },
   "POST /api/samen/weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/samen/zet": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code"
+   ]
   },
   "POST /api/site/ai": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/site/bewaar": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/site/cijfers": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/domein": {
+   "status": 503,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 503: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/foto": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/foto-weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/site/fotos": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/site/haal": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/herstel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/live": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/site/offline": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/persoonlijk": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/site/plan": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/publiceer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/sjablonen": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/site/sjabloon": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/spoor": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/versies": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ]
   },
   "POST /api/site/verwijder": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "lijst",
+    "lijstid",
+    "blok",
+    "blokid",
+    "pagina",
+    "paginaid",
+    "slug"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/sleutelwoorden/status": {
    "staat": "onbereikbaar",
@@ -32033,16 +32688,35 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/spar/lijst": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "spar",
+    "sparid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/spar/parkeer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "spar",
+    "sparid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/spar/status": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "spar",
+    "sparid"
+   ]
   },
   "POST /api/splits": {
    "staat": "onbereikbaar",
@@ -32057,100 +32731,223 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/stad/bewoner": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "domein",
+    "domeinid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/stad/melding": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "domein",
+    "domeinid"
+   ]
   },
   "POST /api/stad/raadpleging/reageer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "domein",
+    "domeinid"
+   ]
   },
   "POST /api/stad/raadplegingen": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "domein",
+    "domeinid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/state": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "post",
+    "postid",
+    "invoice",
+    "invoiceid",
+    "item",
+    "itemid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/supplier/menu/get": {
    "staat": "onbereikbaar",
    "reden": "geen id van A in dit domein"
   },
   "POST /api/suppliers": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "supplier",
+    "supplierid",
+    "id",
+    "room",
+    "roomid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/theater/abonneer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/huisstijl": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/kanaal/aanmeld": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: theaterKanaalMaak(req.session.key, ...) meldt een NIEUW kanaal aan voor B zelf"
   },
   "POST /api/theater/kijkplicht/gedaan": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/kijkplicht/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/theater/kijkplicht/stand": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/kijkplicht/zet": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/meld": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/reactie": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/reacties": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/theater/signaal": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/thuis/aanwezig": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/theater/verwijder": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/video/maak": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/zaak": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/theater/zaak/aanmeld": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id"
+   ]
   },
   "POST /api/theater/zaal": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/thuis/annuleer": {
    "staat": "onbereikbaar",
@@ -32245,36 +33042,87 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/tickets/aanbod": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "partner",
+    "partnerid",
+    "id",
+    "activiteit",
+    "activiteitid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/tickets/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "partner",
+    "partnerid",
+    "id",
+    "activiteit",
+    "activiteitid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/tijdlijn": {
    "staat": "onbereikbaar",
    "reden": "geen id van A in dit domein"
   },
   "POST /api/toestellen": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "sleutel"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/toestellen/intrek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "sleutel"
+   ]
   },
   "POST /api/toestellen/koppel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "sleutel"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/toestemming": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "toestemming",
+    "toestemmingid",
+    "lag",
+    "lagid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/toestemming/intrek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "toestemming",
+    "toestemmingid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/training": {
    "staat": "onbereikbaar",
@@ -32301,12 +33149,30 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/uitgaan": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "zak",
+    "zakid",
+    "id",
+    "event",
+    "eventid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/uitgaan/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "zak",
+    "zakid",
+    "id",
+    "event",
+    "eventid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/vak/offerte/akkoord": {
    "staat": "onbereikbaar",
@@ -32365,116 +33231,294 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/veiligheid": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/alarm": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/alarm/afsluiten": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/codewoord": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/codewoord/check": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/codewoord/proef": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/codewoord/schakel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/codewoord/wis": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/codewoord/zet": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/kring": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/kring/aanpassen": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/kring/mail": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/kring/toevoegen": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/kring/verwijderen": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/moment": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/moment/maak": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/moment/pauze": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/moment/status": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/moment/stop": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/plek": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/rust": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/rust/aan": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "nagekeken",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "doorbraak-kandidaat, met de hand nagekeken en GEEN lek: zet de rustmodus van B (rustAan(req.session.key, ...)); het id uit het lijf is verrijking die de route niet leest"
   },
   "POST /api/veiligheid/rust/uit": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/wacht": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/veiligheid/wacht/checkin": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/wacht/start": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/wacht/stop": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/veiligheid/wacht/verleng": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "stand",
+    "standid"
+   ]
   },
   "POST /api/verblijf": {
    "staat": "onbereikbaar",
@@ -32493,8 +33537,17 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/verhuur/aanbod": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "partner",
+    "partnerid",
+    "id",
+    "auto",
+    "autoid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/verify/selfie": {
    "staat": "onbereikbaar",
@@ -32509,28 +33562,86 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/verkoop/inruil": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "auto",
+    "autoid",
+    "suppliercode",
+    "aanbevol",
+    "aanbevolid"
+   ]
   },
   "POST /api/verkoop/koop": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "auto",
+    "autoid",
+    "suppliercode",
+    "aanbevol",
+    "aanbevolid"
+   ]
   },
   "POST /api/verkoop/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "auto",
+    "autoid",
+    "suppliercode",
+    "aanbevol",
+    "aanbevolid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/verkoop/proefrit": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "auto",
+    "autoid",
+    "suppliercode",
+    "aanbevol",
+    "aanbevolid"
+   ]
   },
   "POST /api/verkoop/showroom": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "auto",
+    "autoid",
+    "suppliercode",
+    "aanbevol",
+    "aanbevolid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/verkoop/teken": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "auto",
+    "autoid",
+    "suppliercode",
+    "aanbevol",
+    "aanbevolid"
+   ]
   },
   "POST /api/vertaal": {
    "staat": "onbereikbaar",
@@ -32541,32 +33652,89 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/verzorging": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "aanbieder",
+    "aanbiederid",
+    "id",
+    "behandeling",
+    "behandelingid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/verzorging/annuleer": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code",
+    "aanbieder",
+    "aanbiederid",
+    "id",
+    "behandeling",
+    "behandelingid"
+   ]
   },
   "POST /api/verzorging/boek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "code",
+    "aanbieder",
+    "aanbiederid",
+    "id",
+    "behandeling",
+    "behandelingid"
+   ]
   },
   "POST /api/verzorging/mijn": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "code",
+    "aanbieder",
+    "aanbiederid",
+    "id",
+    "behandeling",
+    "behandelingid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/voeding": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "moment",
+    "momentid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/voeding/weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "moment",
+    "momentid"
+   ]
   },
   "POST /api/voeding/zet": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "moment",
+    "momentid"
+   ]
   },
   "POST /api/vonk/bericht": {
    "staat": "onbereikbaar",
@@ -32609,24 +33777,51 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/wallet": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/wallet/munt/koop": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "code"
+   ]
   },
   "POST /api/wallet/munt/wissel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "code"
+   ]
   },
   "POST /api/wallet/voeg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "code"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/wallet/weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "code"
+   ]
   },
   "POST /api/wbw/groep": {
    "staat": "onbereikbaar",
@@ -32653,80 +33848,257 @@
    "reden": "geen id van A in dit domein"
   },
   "POST /api/webauthn/lijst": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "residentkey"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/webauthn/registreer": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "residentkey"
+   ]
   },
   "POST /api/webauthn/registreer/opties": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "residentkey"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/webauthn/weg": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 404,
+   "staat": "gescheiden",
+   "reden": "B kreeg 404: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "residentkey"
+   ]
   },
   "POST /api/wereld/bedrijf": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/bereik": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/bezoekers": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/feed": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/wereld/gesprek": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/introductie": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/lijst": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/lijst/zet": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/modus": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/profiel": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/wereld/profiel/van": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/profiel/zicht": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/rahul": {
+   "status": 400,
    "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "reden": "B kreeg 400: de eigenaarschapsvraag was niet aan de beurt",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/wereld/state": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 200,
+   "staat": "publiek",
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ],
+   "reden": "ook met een VERZONNEN id een 200: de route is publiek/rol-open, A's id maakt geen verschil -- geen objectreferentie om te schenden"
   },
   "POST /api/wereld/zoek": {
-   "staat": "onbereikbaar",
-   "reden": "geen id van A in dit domein"
+   "status": 403,
+   "staat": "gescheiden",
+   "reden": "B kreeg 403: het object is niet van B",
+   "lek": false,
+   "velden": [
+    "id",
+    "item",
+    "itemid",
+    "modi",
+    "modiid",
+    "lag",
+    "lagid"
+   ]
   },
   "POST /api/werving/verbind": {
    "staat": "onbereikbaar",

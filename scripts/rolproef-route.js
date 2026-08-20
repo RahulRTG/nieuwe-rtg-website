@@ -38,6 +38,7 @@ const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
 const { maakPool } = require('./lib/objectpool');
+const { maakSessiewacht } = require('./lib/sessiewacht');
 const { draaiRolproef, plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
@@ -141,17 +142,16 @@ if (require.main !== module) { module.exports = {}; return; }
     supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
   };
   const eigenTokens = { member, supplier, office };
-  let hernieuwd = 0;
+  const wacht = maakSessiewacht({ post, rollen: Object.fromEntries(Object.keys(versToken).map(rol => [rol, {
+    vers: async () => { try { return await versToken[rol](); } catch (e) { return null; } },
+    zet: (t) => { eigenTokens[rol] = t; }
+  }])) });
   for (const r of routes) {
     const tk = eigenTokens[r.rol];
     if (!tk) continue;
-    const u = await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
-    if (u.status === 401 && versToken[r.rol]) {
-      const vers = await versToken[r.rol]();
-      if (vers) { eigenTokens[r.rol] = vers; hernieuwd++; }
-    }
+    await wacht.roep(r.pad, plausibelLijf(r.pad), r.rol, Array.isArray(tk) ? tk[0] : tk);
   }
-  if (hernieuwd) console.log('  sessie hernieuwd tijdens de oogstgang : ' + hernieuwd +
+  if (wacht.hernieuwd()) console.log('  sessie hernieuwd tijdens de oogstgang : ' + wacht.hernieuwd() +
     '  (deze gang raakt ook de uitlogroutes aan)');
 
   /* tokensVoor leest uit eigenTokens en niet uit de drie constanten van de

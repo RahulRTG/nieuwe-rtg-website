@@ -35,6 +35,7 @@ const { alleRoutes, verdeelOpRol } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const wm = require('./lib/waarom');
 const { maakPool } = require('./lib/objectpool');
+const { maakSessiewacht } = require('./lib/sessiewacht');
 const { stempel } = require('./lib/stempel');
 
 const REGISTER = path.join(WORTEL, 'WAAROM.json');
@@ -76,6 +77,15 @@ if (require.main !== module) { module.exports = {}; return; }
   };
   const tokens = {};
   for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
+  /* DE SESSIEWACHT. Deze ronde loopt langs ALLE schrijfroutes, en /api/logout
+     hoort daarbij: vanaf dat punt deelde hij routes in op een antwoord dat
+     alleen maar "u bent niet ingelogd" was. Zie scripts/lib/sessiewacht.js voor
+     de regel en waarom hij op drie instrumenten tegelijk zat. */
+  const wacht = maakSessiewacht({ post, rollen: Object.fromEntries(Object.keys(inlog).map(rol => [rol, {
+    vers: async () => { try { return await inlog[rol](); } catch (e) { return null; } },
+    zet: (t) => { tokens[rol] = t; }
+  }])) });
+  const roep = (pad, lijf, rol) => wacht.roep(pad, lijf, rol, tokens[rol]);
   const mist = Object.keys(inlog).filter(r => !tokens[r]);
   if (mist.length) { console.error('geen token voor: ' + mist.join(', ')); server.klaar(); process.exitCode = 2; return; }
 
@@ -88,7 +98,7 @@ if (require.main !== module) { module.exports = {}; return; }
   const pool = maakPool();
   const indelingen = [];
   for (const r of routes) {
-    const u = await post(r.pad, plausibelLijf(r.pad), tokens[r.rol]);
+    const u = await roep(r.pad, plausibelLijf(r.pad), r.rol);
     if (u.status >= 200 && u.status < 300) pool.leer(u.data, r.pad);
     const d = wm.deel(u.status, wm.boodschapVan(u.data, u.tekst));
     indelingen.push({ route: r.methode + ' ' + r.pad, rol: r.rol, status: u.status,
@@ -111,7 +121,7 @@ if (require.main !== module) { module.exports = {}; return; }
     const { lijf, velden } = pool.verrijk(plausibelLijf(pad), pad);
     if (!velden.length) continue;
     herprobeerd++;
-    const u2 = await post(pad, lijf, tokens[i.rol]);
+    const u2 = await roep(pad, lijf, i.rol);
     if (u2.status >= 200 && u2.status < 300) pool.leer(u2.data, pad);
     const d2 = wm.deel(u2.status, wm.boodschapVan(u2.data, u2.tekst));
     if (d2.soort !== i.soort) {
@@ -140,7 +150,7 @@ if (require.main !== module) { module.exports = {}; return; }
          woord had, de boodschap van de route of alleen zijn statuscode. */
       uitBoodschap: indelingen.filter(i => i.door === 'boodschap').length,
       uitStatus: indelingen.filter(i => i.door === 'status').length,
-      pool: { ...poolStand, herprobeerd, herwonnen } },
+      pool: { ...poolStand, herprobeerd, herwonnen }, sessieHernieuwd: wacht.hernieuwd() },
     zonderRol,
     soorten: geteld,
     perRoute: Object.fromEntries(indelingen.map(i => [i.route, { rol: i.rol, status: i.status, soort: i.soort, omdat: i.omdat,
@@ -158,6 +168,8 @@ if (require.main !== module) { module.exports = {}; return; }
   for (const z of zonderRol) console.log('  ' + String(z.aantal).padStart(5) + '  (geen ronde)      ' + z.reden);
   console.log('\n  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden geoogst; ' +
     herprobeerd + ' object-routes herprobeerd, ' + herwonnen + ' herwonnen');
+  console.log('  sessie hernieuwd na een dode 401: ' + wacht.hernieuwd() +
+    '  (deze ronde loopt ook langs de uitlogroutes)');
   const uitB = indelingen.filter(i => i.door === 'boodschap').length;
   console.log('\n  ' + uitB + ' van de ' + indelingen.length + ' ingedeeld op wat de route ZEGT, ' +
     (indelingen.length - uitB) + ' alleen op zijn statuscode.');

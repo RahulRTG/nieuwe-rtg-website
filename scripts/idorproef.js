@@ -34,6 +34,7 @@ const { start } = require('./lib/wegwerpserver');
 const { alleRoutes, verdeelOpRol } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const { maakPool } = require('./lib/objectpool');
+const { maakSessiewacht } = require('./lib/sessiewacht');
 const { oordeelIdor } = require('./lib/idor');
 const { stempel } = require('./lib/stempel');
 
@@ -94,7 +95,22 @@ const NAGEKEKEN = {
   'POST /api/member/pulse/versies': 'de versiegeschiedenis staat met opzet open voor iedereen die het bericht mag zien -- dat is de voorwaarde waaronder bewerken eerlijk blijft',
   'POST /api/overheid/kvk/inschrijven': 'het kvknummer uit het lijf wordt genegeerd; het nieuwe nummer volgt uit B\'s eigen sleutel, en een tweede inschrijving op dezelfde sleutel geeft 409',
   'POST /api/podium/kanaal/aanmeld': 'kanaalMaak(req.session.key, ...) meldt een kanaal aan VOOR B; de makerkey uit het lijf wordt nergens gelezen',
-  'POST /api/podium/meld': 'een kanaal melden hoort op andermans kanaal te werken; de melder is codenaamVan(req.session.key)'
+  'POST /api/podium/meld': 'een kanaal melden hoort op andermans kanaal te werken; de melder is codenaamVan(req.session.key)',
+
+  /* DE TWEEDE OOGST, van de ronde die zijn proefpersoon niet meer wist. Elf
+     nieuwe kandidaten, en ze vallen in dezelfde vier patronen als hierboven --
+     met een vijfde erbij die alleen deze proef treft: */
+  'POST /api/privacy/delete': 'DE PROEF ZELF. wisLid(req.session) wist het account van de AANROEPER; het id uit het lijf wordt niet gelezen. Dit is de route die lid A op plek 1147 van de rij liet verdwijnen -- geen doorbraak maar het recht om vergeten te worden, dat precies doet wat het belooft',
+  'POST /api/reis/wijzer': 'reisadvies per land; een landcode is publieke informatie en geen object van iemand',
+  'POST /api/salon/bewaar': 'een bladwijzer op een zichtbare post, in B\'s eigen lijst (salonProfiel.bewaar(req.session.key, ...))',
+  'POST /api/salon/meld': 'melden hoort op andermans post te werken -- drie VERSCHILLENDE melders verbergen hem voor iedereen, waarna het kantoor beslist',
+  'POST /api/salon/reacties': 'de reacties onder een post die B mag zien; wie de post mag zien, mag de reacties zien',
+  'POST /api/salon/reageer': 'reageren op een zichtbare post; de reactie staat op B\'s naam uit de sessie',
+  'POST /api/salon/verberg': 'verbergt de post in B\'s EIGEN tijdlijn (s.verborgen[mij]); de post zelf blijft voor iedereen staan',
+  'POST /api/samen/mee': 'een samen-code werkt als een uitnodigingslink: wie hem heeft mag meedoen, en hij komt binnen onder zijn eigen codenaam. De kamer is vol bij twaalf',
+  'POST /api/samen/staat': 'de stand van een kamer waarvan je de code hebt; zelfde code-is-de-sleutel als hierboven',
+  'POST /api/theater/kanaal/aanmeld': 'theaterKanaalMaak(req.session.key, ...) meldt een NIEUW kanaal aan voor B zelf',
+  'POST /api/veiligheid/rust/aan': 'zet de rustmodus van B (rustAan(req.session.key, ...)); het id uit het lijf is verrijking die de route niet leest'
 };
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
@@ -121,8 +137,9 @@ if (require.main !== module) { module.exports = {}; return; }
      dan bestaat er eigenaarschap om te schenden. Beiden meerderjarig zodat de
      jeugdpoort niets afsluit dat de proef aanziet voor een IDOR-weigering. */
   const geheugen = {};
+  let teller = 0;
   const maakLid = async (n) => {
-    const email = 'idor' + n + '-' + Date.now() + '@voorbeeld.test';
+    const email = 'idor' + n + '-' + Date.now() + '-' + (++teller) + '@voorbeeld.test';
     const wachtwoord = 'geheim' + n + '123';
     const r = await post('/api/auth/register', {
       name: 'IDOR Lid ' + n, email, phone: '06123456' + (10 + n), password: wachtwoord,
@@ -158,22 +175,38 @@ if (require.main !== module) { module.exports = {}; return; }
      hij dood, dan halen we een verse en doen de route over; pas daarna telt het
      antwoord. */
   const levend = async (tok) => (await post('/api/auth/me', {}, tok)).status === 200;
+  /* EN DE PROEF WIST ZIJN EIGEN PROEFPERSOON. Een gang die elke schrijfroute
+     aanraakt, komt niet alleen langs /api/logout maar ook langs
+     /api/privacy/delete -- het recht om vergeten te worden. Gemeten op route
+     1147 van de 1480: vanaf daar bestond lid A niet meer, kon hij ook niet
+     opnieuw inloggen, en oogstte de rest van de gang niets. Een sessie
+     terughalen hielp daar niet; het account zelf was weg.
+
+     Dezelfde gedachte een laag dieper: een dode sessie krijgt een verse sessie,
+     een gewist account krijgt een vers account. Geen uitzonderingslijst met
+     routes die je moet overslaan (die veroudert stil, LAT.md regel 4) maar
+     herstel op de waarneming. De vervanger is een ANDER lid, en dat maakt de
+     IDOR-vraag niet zwakker: B blijft een vreemde voor de objecten van A. Wat
+     wel verandert is de pool -- id's van voor de wissing wijzen naar objecten
+     die met het account zijn meegegaan, en die geven een eerlijke 404 en dus
+     'onbereikbaar', niet een valse 'gescheiden'. */
+  let vervangen = 0;
   const versLid = async (n) => {
     const r = await post('/api/auth/login', { login: geheugen[n].email, password: geheugen[n].wachtwoord });
-    return r.data && r.data.token;
+    if (r.data && r.data.token) return r.data.token;
+    if (vervangen >= 6) return null;              // begrensd: een route die elk lid wist, moet opvallen
+    vervangen++;
+    return maakLid(n);
   };
-  let hernieuwd = 0;
-  /* Roept de route aan met het token van lid `n`, en zorgt dat een 401 iets
-     BETEKENT. `zet` hangt het verse token terug op de juiste plek. */
-  const roep = async (pad, lijf, n, tok, zet) => {
-    let u = await post(pad, lijf, tok);
-    if (u.status !== 401) return u;
-    if (await levend(tok)) return u;              // de sessie leeft: dit is een echte weigering
-    const vers = await versLid(n);
-    if (!vers) return u;
-    hernieuwd++; zet(vers);
-    return post(pad, lijf, vers);
-  };
+  /* De regel zelf staat in scripts/lib/sessiewacht.js, want hij zat op DRIE
+     instrumenten tegelijk en drie kopieen lopen uiteen (LAT.md regel 4). Hier
+     met een probe: /api/auth/me is goedkoper dan elke 401 met een verse inlog
+     natrekken, en een lid heeft zo'n route. */
+  const wacht = maakSessiewacht({ post, rollen: {
+    1: { vers: () => versLid(1), leeft: levend, zet: (t) => { A = t; } },
+    2: { vers: () => versLid(2), leeft: levend, zet: (t) => { B = t; } }
+  } });
+  const roep = (pad, lijf, n, tok) => wacht.roep(pad, lijf, n, tok);
 
   /* Alleen member-schrijfroutes: IDOR gaat over het bedienen van een object,
      niet over lezen of over een publieke deur. */
@@ -191,7 +224,7 @@ if (require.main !== module) { module.exports = {}; return; }
      bedienen; de pool onthoudt ze per domein. */
   const pool = maakPool();
   for (const r of routes) {
-    const u = await roep(r.pad, plausibelLijf(r.pad), 1, A, (t) => { A = t; });
+    const u = await roep(r.pad, plausibelLijf(r.pad), 1, A);
     if (u.status >= 200 && u.status < 300 && u.data && typeof u.data === 'object') pool.leer(u.data, r.pad);
   }
   const poolStand = pool.grootte();
@@ -200,11 +233,23 @@ if (require.main !== module) { module.exports = {}; return; }
      halverwege gestopt met vullen en zegt alles wat hierna komt minder dan het
      lijkt. Dan geen halve uitslag maar stoppen, in dezelfde vorm als "DE METER
      IS BLIND" van de rolproef. */
+  /* DE PROEF CONTROLEERT ZICHZELF, want dit is precies de fout die hij een ronde
+     lang niet zag. Wat de sessiewacht garandeert is dat een dode sessie NOOIT
+     langer dan een route meegaat: de eerstvolgende 401 herstelt hem. Wat zij
+     niet kan opvangen is de route die de sessie beeindigt met een 200 en daarna
+     de LAATSTE van de rij blijkt -- dan komt er geen 401 meer om op te reageren.
+     Onschadelijk (die gang was toch klaar), maar de volgende gang moet niet met
+     een dood token beginnen. Dus hier herstellen, en alleen stoppen als ook dat
+     niet lukt. */
   if (!(await levend(A))) {
-    console.error('\n  DE SESSIE VAN A IS DOOD na de oogstgang, en het herstel greep niet. De objectpool ' +
-      'is dan halverwege blijven steken en elke 401 hierna zou als "gescheiden" tellen zonder dat ' +
-      'iemand iets heeft geweigerd.\n');
-    klaar(); process.exit(2);
+    const vers = await versLid(1);
+    if (!vers) {
+      console.error('\n  DE SESSIE VAN A IS DOOD na de oogstgang en er komt geen verse voor terug. ' +
+        'Dan is niet vast te stellen hoeveel van deze gang met een geldige sessie is gelopen, en ' +
+        'elke 401 hierna zou als "gescheiden" tellen zonder dat iemand iets heeft geweigerd.\n');
+      klaar(); process.exit(2);
+    }
+    A = vers;
   }
 
   /* GANG 2: B probeert dezelfde routes met A's id's. En de IJKING die dit
@@ -222,7 +267,7 @@ if (require.main !== module) { module.exports = {}; return; }
     const sleutel = r.methode + ' ' + r.pad;
     const { lijf, velden } = pool.verrijk(plausibelLijf(r.pad), r.pad);
     if (!velden.length) { telling.onbereikbaar++; perRoute[sleutel] = { staat: 'onbereikbaar', reden: 'geen id van A in dit domein' }; continue; }
-    const u = await roep(r.pad, lijf, 2, B, (t) => { B = t; });
+    const u = await roep(r.pad, lijf, 2, B);
     const o = oordeelIdor(u.status, u.tekst);
     if (o.staat === 'doorbraak') {
       const nep = { ...lijf };
@@ -252,9 +297,14 @@ if (require.main !== module) { module.exports = {}; return; }
     if (o.lek) telling.lek++;
   }
   if (!(await levend(B))) {
-    console.error('\n  DE SESSIE VAN B IS DOOD na de aanvalsgang: de 401\'s die als bewezen scheiding ' +
-      'zijn geteld, kunnen ook gewoon "geen sessie" zijn geweest. Deze uitslag deugt niet.\n');
-    klaar(); process.exit(2);
+    const vers = await versLid(2);
+    if (!vers) {
+      console.error('\n  DE SESSIE VAN B IS DOOD na de aanvalsgang en er komt geen verse voor terug: de ' +
+        '401\'s die als bewezen scheiding zijn geteld, kunnen ook gewoon "geen sessie" zijn geweest. ' +
+        'Deze uitslag deugt niet.\n');
+      klaar(); process.exit(2);
+    }
+    B = vers;
   }
 
   /* ---- GANG 3: DE WERKPLEK-POORT (de 78 objectpoort-routes) ----
@@ -345,7 +395,7 @@ if (require.main !== module) { module.exports = {}; return; }
       continue;
     }
     if (gang.verrijkt) herwonnen++;
-    const aanval = await roep(r.pad, gang.lijf, 2, B, (t) => { B = t; });
+    const aanval = await roep(r.pad, gang.lijf, 2, B);
     const o = oordeelIdor(aanval.status, aanval.tekst);
     /* EEN 2xx OP EEN GEFILTERDE LIJST IS GEEN DOORBRAAK, en dit huis heeft er
        een: /api/werkplek/mijn antwoordt elk ingelogd lid met 200 en geeft
@@ -393,7 +443,7 @@ if (require.main !== module) { module.exports = {}; return; }
       'alleen wat A terugkreeg -- objecten die alleen via een eigen keten ontstaan, blijven buiten beeld.',
     gemeten: { routes: routes.length, ...telling, poolDomeinen: poolStand.domeinen, poolVelden: poolStand.velden,
       werkplek: { routes: werkplekRoutes.length, ...werkplekTelling,
-        herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: hernieuwd },
+        herwonnen, pool: wpPool.grootte() }, sessieHernieuwd: wacht.hernieuwd(), subjectVervangen: vervangen },
     doorbraken: doorbraken.map(([route, v]) => ({ route, status: v.status, velden: v.velden })),
     perRoute,
     werkplekPerRoute
@@ -413,8 +463,10 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('    onbereikbaar (geen open deur)      : ' + werkplekTelling.onbereikbaar);
   console.log('    herwonnen met een verrijkt lijf    : ' + herwonnen +
     '  (pool: ' + wpPool.grootte().domeinen + ' naamruimtes, ' + wpPool.grootte().velden + ' velden)');
-  console.log('    sessie hernieuwd na een dode 401    : ' + hernieuwd +
-    '  (deze proef loopt ook langs /api/logout)\n');
+  console.log('    sessie hernieuwd na een dode 401    : ' + wacht.hernieuwd() +
+    '  (deze proef loopt ook langs /api/logout)');
+  console.log('    proefpersoon vervangen             : ' + vervangen +
+    '  (deze proef loopt ook langs /api/privacy/delete)\n');
   for (const [route, v] of doorbraken.slice(0, 20)) console.log('   ? ' + route + ' -> ' + v.status + ' (via ' + (v.velden || []).join(',') + ')');
 
   if (VASTLEGGEN) {

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T13:10:58.223Z",
-  "commit": "d45472f",
+  "op": "2026-08-20T13:20:24.520Z",
+  "commit": "6266540",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -10,7 +10,7 @@
  "telling": {
   "posten": 14,
   "meetwerk": 56,
-  "instrument": 635,
+  "instrument": 932,
   "grens": 619
  },
  "posten": [
@@ -106,7 +106,7 @@
    "id": "object-vooraf",
    "soort": "instrument",
    "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
-   "aantal": 635,
+   "aantal": 932,
    "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
    "sluit": "de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
   },
@@ -133,6 +133,12 @@
    "van": 4688,
    "naar": 5416,
    "reden": "scripts/waarom.js gaf 1025 routes een naam die daarvoor anoniem in de 3112 ongemeten van de staatproef zaten; en auth-onbeslist telde 294 routes die al onder capability-in-handler en objectpoort stonden, dus die daalde van 300 naar 3"
+  },
+  {
+   "op": "2026-08-20",
+   "van": 691,
+   "naar": 988,
+   "reden": "De waarom-ronde liep tot nu toe halverwege zonder sessie: scripts/waarom.js loopt langs alle schrijfroutes en dus ook langs /api/logout, en vanaf dat punt kreeg elke member-route een 401. Die routes werden ingedeeld als geen-sessie -- een uitspraak over de proef en niet over de route. Met de sessiewacht erin (scripts/lib/sessiewacht.js) zakt geen-sessie van 687 naar 19, en de 668 die vrijkomen verdelen zich over de echte redenen: 297 naar object-ontbreekt, 191 naar bereikt, 117 naar veld-ontbreekt, 47 naar rol-te-laag, 10 naar niet-van-jou en 6 naar conflict. Geen enkele route ging de andere kant op (eraf: 0). De achterstand groeit dus van 691 naar 988 omdat er 297 routes ZICHTBAAR werden die er al waren, niet omdat er iets kapot is: bereikt ging tegelijk van 880 naar 1071 en de objectpool oogstte 1073 velden in plaats van 943."
   }
  ]
 }

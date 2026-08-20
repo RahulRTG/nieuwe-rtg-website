@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T12:45:20.749Z",
-    "commit": "3c21bf3",
+    "op": "2026-08-20T13:18:14.401Z",
+    "commit": "6266540",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -5070,6 +5070,14 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "sessiewacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/sessiewacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "skipwacht.test.js": {
       "soort": "puur",

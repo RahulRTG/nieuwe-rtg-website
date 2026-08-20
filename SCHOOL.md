@@ -838,24 +838,34 @@ blijft staan met wie hem afsloot erbij.
   en waren het niet. Op **19 augustus 2026** is dat nagezocht en gecorrigeerd,
   met dit resultaat:
 
+  Op **20 augustus 2026** is er beter gezocht, en dat leverde twee van de drie
+  alsnog op: Edu-V en OSO publiceren hun specificatie **ook op GitHub**, en dat
+  is hier wel te bereiken. De stand nu:
+
   | Standaard | Nagekeken? | Wat er is gecorrigeerd |
   |---|---|---|
-  | **Entree Federatie** | **ja**, tegen REFEDS eduPerson 202208 v4.4.0 | `eduPersonOrgUnit` bestaat niet (wel `eduPersonOrgUnitDN`, en dat is een organisatieonderdeel en geen klas); `eduPersonAffiliation` is geen opleiding maar een soort persoon (faculty, student, staff, alum, member, affiliate, employee, library-walk-in); eduPerson kent helemaal geen geboortedatum. Alle drie zijn nu een bevestigde `null` met de reden erbij. |
-  | **Edu-V** | nee, specificatie onbereikbaar | De hele leerlingkaart (`volledigeNaam`, `geboortedatum`, `opleidingCode`, `groepCode`) was verzonnen en is verwijderd. De openbare API-lijst die wel te zien was (Catalogue, Course, Association, Results, Usage, Employees, Delivery) gaat over leermiddelen en toegang, niet over een leerlingdossier. |
-  | **Edu-API** | nee, specificatie onbereikbaar | `person.displayName` verwijderd (een bron noemt `legalName.familyName`, dus de naam is daar vermoedelijk samengesteld); de rest staat er als **onbevestigde werknaam**. |
-  | **OSO** | nee, XSD onbereikbaar | De Nederlandse namen staan er als **onbevestigde werknaam**; wat er inhoudelijk in het dossier zit is wel publiek beschreven, de elementnamen niet. |
+  | **Entree Federatie** | **ja**, tegen REFEDS eduPerson 202208 v4.4.0 | `eduPersonOrgUnit` bestaat niet (wel `eduPersonOrgUnitDN`, en dat is een organisatieonderdeel en geen klas); `eduPersonAffiliation` is geen opleiding maar een soort persoon (faculty, student, staff, alum, member, affiliate, employee, library-walk-in); eduPerson kent helemaal geen geboortedatum. Alle drie een bevestigde `null` met de reden erbij. |
+  | **Edu-V** | **ja**, tegen `students-api.yaml` en `association-api.yaml` | De verzonnen kaart is weg. `dateOfBirth` is bevestigd (alleen binnen de scope `student.demographics`). De naam splitst over `givenName`/`familyNamePrefix`/`familyName`. Klas en opleiding staan **niet op de leerling**: dat zijn een `Group` (`groupType: class`, de stamgroep) en een `Enrollment` (naar `studyOfferingId` + `studyYear`) in de Association API. |
+  | **OSO** | **ja**, tegen `common/OSO_gegevensset.xsd` | `groepscode` en `schoolloopbaanlijst` zijn de echte elementen; mijn werknamen `groep` en `overstaphistorie` bestaan niet. `geboortedatum` bleek toevallig goed. De naam splitst over `voornaam` (meervoud), `voorletters-1`, `voorvoegsel`, `achternaam` en `roepnaam`. Een enkelvoudig opleidingveld kent de gegevensset niet. |
+  | **Edu-API** | **nee**, en er is ook geen spiegel | 1EdTech publiceert achter zijn eigen standards-site; op GitHub en npm is niets. Blijft **onbevestigde werknaam**. |
 
-  Drie van de vier specificaties waren vanaf deze machine niet te openen
-  (edustandaard.nl, developers.wiki.kennisnet.nl, edu-v.atlassian.net,
-  1edtech.org, imsglobal.org). Dat is dus **niet** opgelost, en het staat nu in
-  de code in plaats van in iemands hoofd: elk veld draagt `bevestigd` of
-  `onbevestigd`, elke standaard draagt een **bron**, en geen antwoord van
-  `naarBuiten`/`naarBinnen` reist zonder die vlag. Een ongelezen specificatie is
-  nooit bevestigd -- ook niet als er toevallig geen veld meereist.
+  **Waar ik mee fout zat.** Op 19 augustus schreef ik hier dat Edu-V
+  waarschijnlijk helemaal geen leerlingadministratie kent -- afgeleid uit een
+  lijst API-namen uit zoekresultaten. Die lijst was onvolledig: er is een
+  `students-api.yaml` met een compleet `Student`-object. Een gevolgtrekking uit
+  een lijst die je niet zelf hebt gezien, is ook een gok.
 
-  De eerlijke versie van de zin luidt dus: **de vertaling ligt klaar en is los
-  getoetst; aansluiten begint met het nakijken van de veldnamen, en dat kan pas
-  als de specificaties te lezen zijn.**
+  De regel eronder staat er nog steeds, en die is wat blijft: elk veld draagt
+  `bevestigd` of `onbevestigd`, elke standaard draagt een **bron**, en geen
+  antwoord van `naarBuiten`/`naarBinnen` reist zonder die vlag. Een ongelezen
+  specificatie is nooit bevestigd -- ook niet als er toevallig geen veld
+  meereist. En een veldnaam mag zijn eigen reden niet tegenspreken: dat ving bij
+  het overzetten een echte fout.
+
+  De eerlijke versie van de zin luidt dus: **de vertaling ligt klaar, is los
+  getoetst, en drie van de vier kaarten zijn tegen de specificatie zelf
+  gehouden. Wat aansluiten nog vraagt, zijn sleutels, een contract en een partij
+  aan de andere kant.**
 - **Transition Continuity.** Bij een overstap gaat niet "dossier.zip" mee, maar
   per doel: nodig voor inschrijving / nodig voor onderwijscontinuïteit / alleen
   met specifieke toestemming / niet overdraagbaar. **Gebouwd op 19 augustus
@@ -955,10 +965,10 @@ Er is één juiste eerste stap, en het is niet de spannendste.
     dragen, de overdracht per doel met een restlijst, en de werkende overstap
     tussen twee RTG-scholen (zie §13). Wat er nog niet is: een verbinding met
     een van die externe diensten zelf. Dat is geen vertaalvraag maar een kwestie
-    van sleutels, contracten en een partij aan de andere kant -- en van de
-    veldnamen, want van drie van de vier standaarden was de specificatie op 19
-    augustus 2026 niet te lezen. Die kaarten staan als **onbevestigd** in
-    `kern/koppelvlak-kaarten.js`, met per veld waarom.
+    van sleutels, contracten en een partij aan de andere kant. De veldnamen zijn
+    op 20 augustus 2026 wel nagekeken: Entree, Edu-V en OSO tegen hun eigen
+    specificatie, Edu-API blijft **onbevestigd** omdat 1EdTech niet openbaar
+    publiceert. Alles staat met de bron erbij in `kern/koppelvlak-kaarten.js`.
 
 Elke stap krijgt zijn meting uit §7 mee, en elke grens uit §11 wordt door een
 toets bewaakt die iemand heeft zien zakken (LAT-regel 2).

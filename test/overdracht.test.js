@@ -134,6 +134,24 @@ test('elke veldnaam draagt een staat en elke standaard een bron', () => {
   }
 });
 
+test('een veldnaam spreekt zijn eigen reden niet tegen', () => {
+  /* DE FOUT DIE HIER IS GEMAAKT. Bij het overzetten naar de echte
+     OSO-elementen bleef `veld: 'naam'` staan terwijl de reden ernaast zei dat
+     OSO de naam over vijf elementen splitst. Dan stuurt de adapter een veld
+     dat de standaard niet heeft, met de uitleg erbij dat het niet kan. */
+  const splitst = /splitst|staat niet op de leerling|geen enkelvoudig|kent geen/i;
+  for (const [id, st] of Object.entries(STANDAARDEN)) {
+    for (const [veld, r] of Object.entries(st.heen)) {
+      if (r.veld && splitst.test(r.waarom)) {
+        assert.fail(id + '.' + veld + ' draagt de veldnaam ' + r.veld
+          + ' terwijl de reden zegt dat de standaard dat gegeven niet als een veld heeft: ' + r.waarom);
+      }
+      /* En andersom: een null zonder reden is een gat zonder uitleg. */
+      if (r.veld === null) assert.ok(r.waarom.length > 30, id + '.' + veld + ' is leeg zonder te zeggen waarom');
+    }
+  }
+});
+
 test('een onbevestigde veldnaam reist nooit zonder waarschuwing', () => {
   /* Entree is de enige kaart waarvan de specificatie is gelezen. Gaat er niets
      onbevestigds mee, dan is het antwoord bevestigd en zwijgt het. */
@@ -152,16 +170,17 @@ test('een onbevestigde veldnaam reist nooit zonder waarschuwing', () => {
 
   /* En een standaard waarvan de specificatie NOOIT is gelezen, is nooit
      bevestigd -- ook niet als er toevallig geen veld meereist. Anders zou een
-     lege vertaling uit een ongelezen kaart er betrouwbaar uitzien. */
-  const leeg = naarBuiten({ zorg: 'x' }, 'eduv');
+     lege vertaling uit een ongelezen kaart er betrouwbaar uitzien. Edu-API is
+     sinds 20 augustus 2026 de enige die daar nog onder valt. */
+  const leeg = naarBuiten({ zorg: 'x' }, 'eduapi');
   assert.deepEqual(leeg.velden, {});
   assert.equal(leeg.bevestigd, false, 'een ongelezen kaart is nooit bevestigd');
   assert.match(leeg.waarschuwing, /nooit gelezen/i);
 
   /* Dezelfde regel de andere kant op: inlezen mag net zo min doen alsof. */
-  const binnen = naarBinnen({ naam: 'Iris' }, 'oso');
+  const binnen = naarBinnen({ 'program.code': 'x' }, 'eduapi');
   assert.equal(binnen.bevestigd, false);
-  assert.deepEqual(binnen.onbevestigd.map(x => x.extern), ['naam']);
+  assert.deepEqual(binnen.onbevestigd.map(x => x.extern), ['program.code']);
   assert.ok(binnen.bron.length > 20);
 });
 
@@ -181,16 +200,28 @@ test('de namen die fout waren, staan er niet meer', () => {
   for (const [veld, r] of Object.entries(STANDAARDEN.entree.heen)) {
     if (r.veld) assert.notEqual(r.veld, 'eduPersonAffiliation', veld + ' gebruikt een soort persoon als gegeven');
   }
-  /* En Edu-V draagt geen verzonnen leerlingkaart meer. */
+  /* Edu-V draagt geen verzonnen leerlingkaart meer. Sinds 20 augustus 2026 is
+     de OpenAPI zelf gelezen: dateOfBirth staat er als bevestigd veld, en de
+     andere drie zijn een bevestigde null omdat Edu-V ze ergens anders zet. */
+  assert.equal(STANDAARDEN.eduv.heen.geboren.veld, 'dateOfBirth');
   for (const [veld, r] of Object.entries(STANDAARDEN.eduv.heen)) {
-    assert.equal(r.veld, null, 'Edu-V.' + veld + ' draagt weer een niet-nagekeken veldnaam');
+    assert.equal(r.staat, 'bevestigd', 'Edu-V.' + veld + ' staat niet meer op nagekeken');
+    if (veld !== 'geboren') assert.equal(r.veld, null, 'Edu-V.' + veld + ' draagt weer een verzonnen veldnaam');
   }
+  /* En de OSO-werknamen zijn vervangen door de elementen uit de XSD. */
+  assert.equal(STANDAARDEN.oso.heen.klasCode.veld, 'groepscode', 'de werknaam groep is terug');
+  assert.equal(STANDAARDEN.oso.heen.overstappen.veld, 'schoolloopbaanlijst', 'de werknaam overstaphistorie is terug');
+  assert.equal(STANDAARDEN.oso.heen.geboren.veld, 'geboortedatum');
 });
 
 test('een veld van buiten dat wij niet kennen wordt geweigerd en gemeld', () => {
-  const r = naarBinnen({ naam: 'Iris', geboortedatum: '2016-03-02',
+  /* De velden hieronder zijn de ECHTE OSO-elementen (uit de XSD), niet de
+     werknamen die hier tot 20 augustus 2026 stonden. `naam` staat er met opzet
+     NIET meer bij: OSO splitst een naam over vijf elementen, dus wij nemen hem
+     niet als een geheel over. */
+  const r = naarBinnen({ groepscode: '3A', geboortedatum: '2016-03-02',
     risicoprofiel: 'hoog', leerlingVolgnummer: 42 }, 'oso');
-  assert.equal(r.velden.naam, 'Iris');
+  assert.equal(r.velden.klasCode, '3A');
   assert.equal(r.velden.geboren, '2016-03-02');
   assert.equal(r.velden.risicoprofiel, undefined, 'ons model groeit mee met wat een leverancier stuurt');
   assert.deepEqual(r.geweigerd.map(x => x.veld).sort(), ['leerlingVolgnummer', 'risicoprofiel']);
@@ -209,23 +240,35 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
      zonder bron laat een school denken dat er vier koppelingen klaarliggen. */
   assert.ok(kaart.body.standaarden.every(s => typeof s.bron === 'string' && s.bron.length > 20),
     'de kaart noemt de standaarden zonder te zeggen waar hun veldnamen vandaan komen');
-  assert.deepEqual(kaart.body.standaarden.filter(s => s.gelezen).map(s => s.id), ['entree'],
-    'alleen de Entree-kaart is tegen een specificatie gehouden');
+  /* Drie van de vier specificaties zijn gelezen. Edu-API blijft over: die
+     publiceert niet openbaar en er is geen spiegel. */
+  assert.deepEqual(kaart.body.standaarden.filter(s => !s.gelezen).map(s => s.id), ['eduapi'],
+    'de lijst nagekeken standaarden klopt niet meer');
   assert.match(kaart.body.uitleg, /geen dossier mee/i);
 
   const l = (await bh('/school/leerling/aanmeld', { naam: 'Iris', geboren: '2016-03-02' })).body;
   const p = await bh('/school/overdracht/pakket', { leerlingId: l.leerling.id, doel: 'continuiteit', standaard: 'oso' });
   assert.equal(p.status, 200);
   assert.ok(p.body.velden.naam);
-  assert.ok(p.body.vorm.velden.naam, 'de vorm van OSO gebruikt zijn eigen veldnamen');
+  assert.equal(p.body.vorm.velden.geboortedatum, '2016-03-02', 'de vorm van OSO gebruikt zijn eigen veldnamen');
+  /* En de naam gaat NIET mee als geheel: OSO splitst hem over vijf elementen,
+     dus hij staat in de restlijst met die reden erbij. */
+  assert.equal(p.body.vorm.velden.naam, undefined);
+  assert.match(p.body.vorm.weggelaten.find(x => x.veld === 'naam').waarom, /voorvoegsel|achternaam|splitst|vijf velden/i);
   assert.ok(p.body.vorm.kanNiet.length);
-  assert.equal(p.body.vorm.bevestigd, false, 'de OSO-veldnamen zijn nooit nagekeken');
-  assert.match(p.body.vorm.waarschuwing, /nooit gelezen/i);
+  /* OSO is sinds 20 augustus 2026 wel nagekeken, dus deze vertaling is
+     bevestigd -- de eerste die dat is. */
+  assert.equal(p.body.vorm.bevestigd, true, 'de OSO-kaart is uit de XSD gelezen en hoort bevestigd te zijn');
+  assert.equal(p.body.vorm.waarschuwing, null);
+  assert.match(p.body.vorm.bron, /OSO_gegevensset\.xsd/, 'de bron noemt het schema niet');
   assert.match(p.body.uitleg, /niets verstuurd/i, 'het antwoord hoort te zeggen dat er niets de deur uit ging');
 
-  const in1 = await bh('/school/overdracht/inlezen', { standaard: 'oso', velden: { naam: 'Iris', onzin: 1 } });
+  /* `naam` wordt hier nu ook geweigerd, en dat is winst: OSO kent geen element
+     naam. Wie het toch stuurt, stuurt iets wat de standaard niet heeft. */
+  const in1 = await bh('/school/overdracht/inlezen', { standaard: 'oso', velden: { groepscode: '3A', naam: 'Iris', onzin: 1 } });
   assert.equal(in1.status, 200);
-  assert.deepEqual(in1.body.geweigerd.map(x => x.veld), ['onzin']);
+  assert.equal(in1.body.velden.klasCode, '3A');
+  assert.deepEqual(in1.body.geweigerd.map(x => x.veld).sort(), ['naam', 'onzin']);
   assert.match(in1.body.uitleg, /plaatsen doet de administratie/i);
   assert.equal((await bh('/school/overdracht/inlezen', { standaard: 'zomaarwat', velden: {} })).status, 400);
 });

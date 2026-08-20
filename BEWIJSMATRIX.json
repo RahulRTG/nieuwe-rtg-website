@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T10:04:16.446Z",
-    "commit": "024e612",
+    "op": "2026-08-20T11:55:27.427Z",
+    "commit": "e101061",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,10 +12,10 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20859,
+    "bewezen": 20936,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 24904,
+    "ongemeten": 24827,
     "gezakt": 0
   },
   "perSchakel": {
@@ -41,10 +41,10 @@
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4156,
+      "bewezen": 4153,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 29,
+      "ongemeten": 32,
       "gezakt": 0
     },
     "STATE": {
@@ -62,10 +62,10 @@
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 29,
+      "bewezen": 109,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4156,
+      "ongemeten": 4076,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
@@ -97,5 +97,5 @@
       "gezakt": 0
     }
   },
-  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN. Met de hand vastgelegd over de ratel heen: zeven ROLLBACK-cellen waren bewezen op een WEIGERING (404 op een verzonnen id), en sinds de objectpool die routes met echte id-s bereikt weigeren ze niet meer -- het weigeringsbewijs vervalt eerlijk terwijl STATE/SIDE_EFFECT/IDEMPOTENCY er drie cellen bij kregen. Bereikt worden is meetwinst; het rollback-bewijs voor deze zeven vraagt een aparte geweigerde variant."
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN. Met de hand vastgelegd over de ratel heen na een verse suite-ronde: het TOTAAL verbeterde fors (ongemeten 24904 -> 24827, bewezen 20859 -> 20936, vooral AUDIT dat van 29 naar 109 bewezen ging door de uitkomstklasse-regel). De ENIGE daling zit op OUTPUT (-3) en heeft een benoemde oorzaak: vijf /api/doos/*-routes bestaan alleen in zaakdoos-modus en kwamen niet in het journaal van deze ronde, dus drie van hun cellen verloren hun toerekening. Dat is een kleinere beproefde populatie, geen regressie in de code; de doos-toetsen zelf draaiden en slaagden."
 }

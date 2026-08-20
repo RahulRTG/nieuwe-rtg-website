@@ -113,6 +113,10 @@ module.exports = (kern) => {
      knop niet (PRIJZEN.md 4.11). Drie kanten in een bestand: het lid meldt, de
      zaak erkent of betwist, het kantoor komt erbij als het vastloopt. */
   require('./member/prijsgarantie')(kern);
+  /* Het AI-tegoed: de stand zien en het beleid bij het plafond zetten. Een laag
+     die "nooit ongemerkt variabele kosten" afdwingt maar die niemand kan
+     raadplegen, maakt die belofte niet waar. */
+  require('./member/aitegoed')(kern);
   // Ter plaatse: gastsleutel, aandacht vragen, gastchat, event-RSVP.
   require('./member/terplaatse')(kern);
   // Onderweg: de live reis en ritten aanvragen/betalen.

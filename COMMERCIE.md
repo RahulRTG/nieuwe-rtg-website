@@ -188,7 +188,7 @@ in zit, staat erbij.
 | 3 | Betaaldienst met ledger en recovery | af — `commercie/fee.js`, inclusief herkansingsronde |
 | 4 | Contract Engine + price snapshots | af — `commercie/contract.js` |
 | 5 | Business Lite via capabilities | af — `commercie/capaciteiten.js`; de trede is uitgerold |
-| 6 | AI Entitlement + bundels + cap | af — `commercie/tegoed.js`; bundelprijzen nog niet (zie hieronder) |
+| 6 | AI Entitlement + bundels + cap | af — `commercie/tegoed.js` + `/api/member/ai/*`; bundelprijzen nog niet (zie hieronder) |
 | 7 | Tax Engine | af — `commercie/btw.js` |
 | 8 | Social allocation settlement | af — `commercie/allocatie.js`; uitbetaling wacht op `RTF_IBAN` |
 | 9 | Claims uit de kern | af — `commercie/claims.js` + `/api/claims` |
@@ -285,7 +285,20 @@ Wat er voor Business Lite bewezen moet zijn vóór `beschikbaar: true`: identity
 entitlement, onboarding, billing, permissions, governance-behandeling,
 feature access, cancellation, renewal, invoices, upgrade path.
 
-## 7. AI als verbruiksproduct
+## 7. AI als verbruiksproduct — gebouwd
+
+*`kern/commercie/tegoed.js`. De vier standen heten hier STOP, VRAAG_MIJ,
+AUTO_AANVULLEN en CONTRACT; de bundels AI Extra S/M/L en AI Enterprise. Bereikbaar
+via `/api/member/ai/tegoed`, `/api/member/ai/beleid` en `/api/member/ai/bundel`.
+Er is met opzet **geen** endpoint dat verbruik boekt: dat gebeurt waar de AI wordt
+aangeroepen, na `mag()`. Een los boek-endpoint zou een pad geven om verbruik vast
+te leggen dat niemand heeft toegestaan.*
+
+*Wat nog ontbreekt: de verkoopprijs van een bundel. Die wordt gerekend uit de
+inkoopkant en niet gekozen, en die laag bestaat niet — een bedrag verzinnen zou
+precies de fout van PRIJZEN.md §4.12 zijn.*
+
+### Het ontwerp
 
 Een eigen engine, geen pasfunctie:
 

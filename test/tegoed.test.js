@@ -188,3 +188,17 @@ test('12. een bundel is capaciteit met een naam, en noemt geen model', () => {
     'AI Enterprise is een contractafspraak en wordt niet los gekocht');
   assert.equal(t.koopBundel('Zaak', 'business-lite', 'bestaat-niet').status, 404);
 });
+
+/* De routes. Een laag die "nooit ongemerkt variabele kosten" afdwingt maar die
+   niemand kan raadplegen, maakt die belofte niet waar: een klant hoort te kunnen
+   zien hoe ver hij is en te kunnen kiezen wat er bij het plafond gebeurt.
+   Zonder deze routes was het tegoed een grendel zonder deur. */
+test('13. er is geen endpoint dat verbruik boekt', () => {
+  const bron = require('fs').readFileSync(
+    require.resolve('../server/routes/member/aitegoed.js'), 'utf8');
+  const paden = (bron.match(/app\.(post|get)\('([^']+)'/g) || []);
+  assert.ok(paden.length >= 3, 'de stand, het beleid en een bundel zijn bereikbaar');
+  assert.doesNotMatch(bron, /tegoed\.verbruik/,
+    'verbruik wordt geboekt waar de AI wordt aangeroepen, na mag() -- een los ' +
+    'boek-endpoint geeft een pad om verbruik vast te leggen dat niemand heeft toegestaan');
+});

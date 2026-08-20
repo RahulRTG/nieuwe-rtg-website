@@ -5,6 +5,11 @@ prijs die ergens los stond; het maakt er één ladder van en zegt per bedrag
 waaróm het dat bedrag is. `GELD.md` gaat over geld als besturingssysteem voor
 het lid, dit document over wat RTG vraagt en waarvoor.*
 
+**`COMMERCIE.md` is de architectuur onder dit document** — de Commercial Core:
+zeven lagen, drie prijsmechanismen, en het onderscheid dat alles bij elkaar
+houdt (catalogusprijs ≠ contractprijs ≠ factuurbedrag). Lees die als je aan de
+structuur werkt; dit document als je een bedrag zoekt.
+
 ## 0. De kern, in een zin
 
 > Prijs = toegang + verbruik + verantwoordelijkheid.
@@ -29,7 +34,7 @@ waardoor is opgelopen.
 
 | Trede | Prijs | Voor wie | Daarbovenop |
 |---|---|---|---|
-| Gratis app | € 0 | de maatschappelijke laag; de minimale ingang tot het RTG OS | niets |
+| RTG Community | € 0 | de maatschappelijke laag; de minimale ingang tot het RTG OS | niets |
 | RTG Pass | € 65 p/m | de consument | AI boven de bundel |
 | RTG Business Lite | € 150 p/m | zzp en klein MKB | AI + betaaldienst |
 | RTG Business Pass | vanaf € 5.000 p/m | grotere organisaties | contractueel |
@@ -102,19 +107,28 @@ lijstprijs én van de bodem.
 | Post | Tarief | Van wie | Waar |
 |---|---|---|---|
 | Betaaldienst (RTG Pay, kassa) | € 0,10 + 1% per transactie | de zaak, direct verrekend | `kern/geldregie.js`, `kern/pay/kassa.js` |
-| Partnervergoeding per genre/zaak | standaard 12%, max 30% | de zaak | `kern/geldregie.js` |
-| RTG-ledenvoordeel per genre | 0–50%, RTG legt bij | het lid krijgt, RTG betaalt | `kern/geldregie.js` |
+| Partnervergoeding over omzet | **0% — en dat is geen instelling** | niemand | `kern/commercie/vergoeding.js` |
+| RTG-ledenvoordeel per genre | 0–50%, RTG legt bij | het lid krijgt, RTG betaalt | `kern/commercie/subsidie.js` |
 | Bijdrage partnerkanaal (gast) | max 5% over de **service**, nooit over de netto reissom | de partner | `kern/onderneming/regie.js` |
 | Partner-entree (niet-founding) | € 10.000 eenmalig + € 500 p/j + doorbelasting onderhoud | de partner | alleen in de partnervoorwaarden |
 
-De eerste twee botsen met wat de partnervoorwaarden beloven. Zie §4.
+De partnervergoeding staat er als nul omdat dat een eigenschap van het product
+is: er is geen knop meer die hem kan verzetten (COMMERCIE.md §3). De
+betaaldienst is de enige post in deze tabel die geld van een partner naar RTG
+beweegt, en die heet nadrukkelijk geen commissie — zie §4.3, dat nog open staat.
 
 ## 4. De open gaten
 
 Gevonden bij de doorlichting van 20 augustus 2026. Op volgorde van hoe hard ze
 bijten, niet van hoe makkelijk ze zijn.
 
-### 4.1 "0% commissie" staat in de voorwaarden, en er is een commissieknop
+### 4.1 ~~"0% commissie" staat in de voorwaarden, en er is een commissieknop~~ — GESLOTEN
+
+*Opgelost op 20 augustus 2026: de generieke commissie is verdwenen, de
+partnervergoeding over omzet is nul als eigenschap van het product
+(`kern/commercie/vergoeding.js`), en wat RTG wél in rekening kan brengen valt
+onder vier benoemde soorten waarvan er geen enkele over omzet gaat. Zie
+COMMERCIE.md §3. Wat er was:*
 
 `partnervoorwaarden.html` art. 1: *"RTG rekent geen commissie, geen
 transactiekosten en geen licentiekosten over uw omzet via de app of de kassa."*
@@ -129,12 +143,17 @@ Twee schermen zeggen intussen hard **0%**: `routes/supplier/financien.js:38`
 (`'RTG-commissie', euroTekst(0)`) en `routes/supplier/backoffice.js:91` ("RTG
 rekent 0% commissie: deze omzet is volledig van u").
 
-**Wat er eerst nodig is:** een besluit. Ofwel de knop verdwijnt en 0% is echt,
-ofwel de voorwaarden gaan zeggen wat het systeem doet. Met de nieuwe ladder is
-het eerste het meest coherent: Business Lite verkoopt zich juist op *geen*
-omzetcommissie.
+**Het besluit:** de knop is verdwenen en 0% is echt. Met de ladder is dat ook
+het enige coherente: Business Lite verkoopt zich juist op *geen* omzetcommissie.
+`test/commercie.test.js` 1–3 dwingt het af, en de twee schermen die hard "€ 0,00"
+printten hebben nu gelijk.
 
-### 4.2 En op één plek wordt die commissie wél afgetrokken
+### 4.2 ~~En op één plek wordt die commissie wél afgetrokken~~ — GESLOTEN
+
+*Opgelost: `commissiePct()` in Thuis leest nu `vergoeding.PARTNER_COMMISSIE` en
+geeft nul; de eigen terugval van 10% en de "eerste huis"-berekening zijn weg.
+`test/commercie.test.js` 4 en `test/thuiszakelijk.test.js` bewaken het. Wat er
+was:*
 
 `kern/thuis/zakelijk.js:125`: `commissie = excl × pct`, en `nettoUitbetaling =
 excl − commissie`, met de tekst *"de zaak betaalt de gewone partnercommissie van
@@ -160,7 +179,16 @@ dan worden de kosten stilzwijgend nul in plaats van dat de transactie het meldt.
 **Wat er eerst nodig is:** het tarief in de partnervoorwaarden, met RTG als
 genoemde betaaldienstverlener, en een foutpad dat niet stil is.
 
-### 4.4 Het ledenvoordeel wordt getoond maar door niemand betaald
+### 4.4 ~~Het ledenvoordeel wordt getoond maar door niemand betaald~~ — GROTENDEELS GESLOTEN
+
+*Opgelost op de rekenkant: alle vier de bedragen worden vastgelegd met de
+invariant `lid + RTG === bruto === zaak` (`kern/commercie/subsidie.js`), en
+`betaalRekeningVoor` rapporteert niet langer `subtotaal + fooi` als betaald
+bedrag terwijl er twee kortingen af waren. `test/commercie.test.js` 5–9, vijf
+mutaties, vijf raak. **Wat nog open staat:** de verplichting staat op
+`te_verrekenen` — het daadwerkelijk overmaken wacht op de betaal-naad, net als
+de 30%-afdracht op `te_storten` staat zolang `RTF_IBAN` leeg is (§4.9). Wat er
+was:*
 
 De belofte is *"RTG legt bij, dus de zaak houdt het volle bedrag"*
 (`kern/geldregie.js`). In de code wordt `regieKorting` alleen **geschreven en

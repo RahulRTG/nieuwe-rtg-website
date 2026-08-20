@@ -8,10 +8,10 @@
      "vanaf". De bedragen zijn ex btw en 30% gaat naar de RTFoundation; het
      publieke endpoint voedt o.a. de voorwaardenpagina, dus wat de boardroom zet
      is meteen overal het geldende bedrag.
-   - COMMISSIES: de interne partnervergoeding (s.rate). Leden reizen op
-     nettoprijzen (voorwaarden), dus dit raakt het lid nooit; het is de
-     afspraak tussen RTG en de zaak. Standaard per genre, met per zaak een
-     eigen afspraak die voorgaat.
+   - PARTNERVERGOEDING: nul, en dat is een eigenschap van het product en geen
+     instelling (kern/commercie/vergoeding.js). Wat RTG wel in rekening brengt
+     zijn benoemde diensten -- betaaldienst, bemiddeling, tickets, inrichting --
+     en die heten nergens meer "commissie".
    - KORTINGEN: het RTG-ledenvoordeel per genre. RTG legt bij (zelfde patroon
      als het punten-tegoed): het lid betaalt minder, de zaak houdt het volle
      bedrag; zo blijft de nettoprijzen-belofte intact.
@@ -19,8 +19,8 @@
    maakGeldregie(state) volgt het vaste kern-patroon. */
 
 const ladder = require('./pasladder');
+const vergoeding = require('./commercie/vergoeding');
 
-const PCT_COMMISSIE_MAX = 30;   // partnervergoeding, in procenten
 const PCT_KORTING_MAX = 50;     // ledenvoordeel, in procenten
 const PAS_MAX_CENTEN = 10000000; // 100.000 euro per maand als bovengrens
 
@@ -87,36 +87,22 @@ function maakGeldregie({ db, save }) {
     return { status: 200, ok: true, pas, maandCenten: centen };
   }
 
-  /* ---- commissies: standaard per genre, per zaak een eigen afspraak ---- */
+  /* ---- partnervergoeding: NUL, en dat is geen instelling ----
+     De generieke commissieknop is weg (20 augustus 2026). Hij stond op 12
+     procent standaard, tot 30 procent per genre of per zaak, terwijl de
+     partnervoorwaarden 0% beloofden en twee schermen hard "EUR 0,00" printten.
+     Vier antwoorden op een vraag. De reden en de vier vergoedingssoorten die er
+     WEL zijn, staan in kern/commercie/vergoeding.js.
+
+     commissieVoor blijft bestaan omdat de aanroepers hem kennen; hij geeft nu
+     altijd nul. Zo hoeft geen enkele beller te weten dat dit is veranderd, en
+     kan er ook geen beller achterblijven die nog een oud tarief leest. */
   function commissieVoor(s) {
     if (!s) return null;
-    const g = d();
-    if (Number.isFinite(g.commissies.perZaak[s.code])) return g.commissies.perZaak[s.code];
-    if (Number.isFinite(g.commissies.standaard[s.type])) return g.commissies.standaard[s.type];
-    return Number.isFinite(s.rate) ? s.rate : 0.12;
+    return vergoeding.commissieVoor(s);
   }
-  function commissieZet(data) {
-    const pct = Number(data.pct);
-    if (!Number.isFinite(pct) || pct < 0 || pct > PCT_COMMISSIE_MAX)
-      return { status: 400, error: 'Geef een percentage tussen 0 en ' + PCT_COMMISSIE_MAX + '.' };
-    const rate = Math.round(pct * 100) / 10000;
-    const g = d();
-    if (data.code) {
-      const s = db.data.suppliers.find(x => x.code === String(data.code).toUpperCase());
-      if (!s) return { status: 404, error: 'Deze zaak bestaat niet.' };
-      g.commissies.perZaak[s.code] = rate;
-      s.rate = rate;
-      save();
-      return { status: 200, ok: true, code: s.code, rate };
-    }
-    const genre = String(data.genre || '');
-    if (!db.data.supplierTypes[genre]) return { status: 404, error: 'Dit genre bestaat niet.' };
-    g.commissies.standaard[genre] = rate;
-    // de standaard geldt meteen voor elke zaak van het genre zonder eigen afspraak
-    for (const s of db.data.suppliers)
-      if (s.type === genre && !Number.isFinite(g.commissies.perZaak[s.code])) s.rate = rate;
-    save();
-    return { status: 200, ok: true, genre, rate };
+  function commissieZet() {
+    return { status: 400, error: vergoeding.waaromGeenCommissie() };
   }
 
   /* ---- kortingen: het RTG-ledenvoordeel per genre (RTG legt bij) ---- */
@@ -172,7 +158,11 @@ function maakGeldregie({ db, save }) {
       pasprijzen: pasprijzen().passen,
       kortingen: g.kortingen,
       betaaldienst: betaaldienst(),
-      commissies: { standaard: g.commissies.standaard, perZaak: g.commissies.perZaak },
+      /* Geen commissietabel meer: er valt niets te zetten. Wat er wel is, zijn
+         de benoemde vergoedingssoorten -- de boardroom hoort te kunnen lezen
+         wat RTG een partner in rekening brengt en waarvoor. */
+      partnervergoeding: { overOmzet: vergoeding.PARTNER_COMMISSIE, uitleg: vergoeding.waaromGeenCommissie() },
+      vergoedingssoorten: vergoeding.soorten(),
       genres: Object.entries(db.data.supplierTypes).map(([id, t]) => ({ id, label: t.label, icon: t.icon })),
       zaken: db.data.suppliers.map(s => ({ code: s.code, naam: s.name, genre: s.type, rate: commissieVoor(s) })) };
   }

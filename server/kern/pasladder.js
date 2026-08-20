@@ -62,7 +62,13 @@
    contractueel  -- de hoogte spreek je per klant af; de bodem is de "vanaf"
    beschikbaar   -- bestaat de pas al als product? */
 const LADDER = [
-  { id: 'gratis', naam: 'Gratis app',
+  /* RTG COMMUNITY, en niet "RTG Foundation". De stichting die de 30% ontvangt
+     heet RTFoundation; een gratis PRODUCT met bijna dezelfde naam zou in code,
+     administratie, communicatie en juridische stukken door elkaar gaan lopen, en
+     dat draai je nooit meer terug. Twee semantisch verschillende objecten horen
+     twee namen te hebben. Het interne id blijft `gratis` -- dat is beschrijvend
+     en het staat in opgeslagen ledenrijen. */
+  { id: 'gratis', naam: 'RTG Community',
     bodemCenten: 0, standaardCenten: 0,
     vast: true, contractueel: false, beschikbaar: true,
     voor: 'de maatschappelijke laag: de minimale ingang tot het RTG OS' },

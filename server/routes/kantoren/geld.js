@@ -18,11 +18,12 @@ module.exports = (ctx) => {
     if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Pasprijs ' + r.pas + ' gezet op € ' + (r.maandCenten / 100).toFixed(2) + ' per maand (ex btw)');
     return r;
   }));
-  app.post('/api/office/geld/commissie', boardroomAuth, (req, res) => veilig(res, () => {
-    const r = geldCommissieZet(req.body || {});
-    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Partnervergoeding ' + (r.code || r.genre) + ' gezet op ' + (r.rate * 100).toFixed(1) + '%');
-    return r;
-  }));
+  /* De commissie-knop is weg (20 augustus 2026): de partnervergoeding over omzet
+     is nul en dat is een eigenschap van het product, geen instelling. Het
+     endpoint blijft bestaan en weigert met uitleg -- een verdwenen endpoint
+     geeft 404 en dat leest als een storing, terwijl dit een besluit is. Er valt
+     dus ook niets meer te auditen: een geweigerde zet verandert niets. */
+  app.post('/api/office/geld/commissie', boardroomAuth, (req, res) => veilig(res, () => geldCommissieZet(req.body || {})));
   // de betaaldienst: het tarief dat per kassabetaling DIRECT met de zaak wordt verrekend
   app.post('/api/office/geld/betaaldienst', boardroomAuth, (req, res) => veilig(res, () =>
     (req.body && (req.body.vastCenten != null || req.body.pct != null))

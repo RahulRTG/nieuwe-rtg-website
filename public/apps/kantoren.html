@@ -483,16 +483,9 @@
         <button class="knop stil" id="gPasZet" type="button">Zet de pasprijs</button>
         <span class="stil" id="gPasNu" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
-      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
-        <span style="flex:1;min-width:11rem;">
-          <label for="gComGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Partnervergoeding (interne afspraak RTG en zaak; raakt het lid nooit)</label>
-          <select id="gComGenre"></select>
-        </span>
-        <span><label for="gComZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Of een zaak (code)</label>
-          <input id="gComZaak" maxlength="12" placeholder="bijv. TRANSIT" style="width:8rem;text-transform:uppercase;"></span>
-        <span><label for="gComPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">%</label>
-          <input id="gComPct" type="number" min="0" max="30" step="0.1" style="width:5.5rem;"></span>
-        <button class="knop stil" id="gComZet" type="button">Zet de vergoeding</button>
+      <div class="rij" style="margin-top:.8rem;">
+        <div style="font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Partnervergoeding over omzet</div>
+        <div id="gVergoeding" class="stil" style="font-size:.82rem;"></div>
       </div>
       <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
         <span style="flex:1;min-width:11rem;">
@@ -3559,22 +3552,27 @@ async function laadGeld(){
   try {
     const d = await api('geld');
     const genres = d.genres.map(g => '<option value="'+esc(g.id)+'">'+esc(g.label||g.id)+'</option>').join('');
-    if (!$('#gComGenre').options.length) { $('#gComGenre').innerHTML = genres; $('#gKorGenre').innerHTML = genres; }
+    if (!$('#gKorGenre').options.length) { $('#gKorGenre').innerHTML = genres; }
+    /* De prijsregel per trede komt uit de ladder en wordt niet hier opgebouwd:
+       een contractuele trede draagt `vanafCenten` en GEEN maandbedrag, en wie
+       dat verschil hier zou platslaan, zet een bodem neer als prijs. */
     const p = d.pasprijzen;
-    $('#gPasNu').textContent = 'Nu: RTG ' + eurC(p.rtg.maandCenten) + ' · Lifestyle ' + eurC(p.lifestyle.maandCenten) + ' · gratis app € 0 · Business op maat · 30% naar RTFoundation';
+    $('#gPasNu').textContent = 'Nu: ' + Object.values(p).map(r =>
+      r.naam + ' ' + (Number.isFinite(r.maandCenten) ? eurC(r.maandCenten)
+        : Number.isFinite(r.vanafCenten) ? 'vanaf ' + eurC(r.vanafCenten) : 'op maat')
+      + (r.beschikbaar === false ? ' (nog niet beschikbaar)' : '')).join(' · ')
+      + ' · 30% naar RTFoundation';
     const kort = Object.entries(d.kortingen).map(([g, pct]) => esc(g) + ' ' + pct + '%').join(', ');
-    const com = Object.entries(d.commissies.standaard).map(([g, r]) => esc(g) + ' ' + (r*100).toFixed(1) + '%').join(', ');
-    const per = Object.entries(d.commissies.perZaak).map(([c, r]) => esc(c) + ' ' + (r*100).toFixed(1) + '%').join(', ');
-    $('#gStand').innerHTML = 'Ledenvoordeel: ' + (kort || 'geen') + '<br>Vergoeding per genre: ' + (com || 'standaard van de zaak') + (per ? '<br>Eigen afspraken: ' + per : '');
+    $('#gStand').innerHTML = 'Ledenvoordeel: ' + (kort || 'geen');
+    // de partnervergoeding is nul en er valt niets te zetten; wel te lezen wat er WEL in rekening komt
+    const v = d.partnervergoeding || {};
+    $('#gVergoeding').innerHTML = '<b>' + ((v.overOmzet || 0) * 100).toFixed(0) + '%</b> over de omzet van een partner. ' +
+      esc(v.uitleg || '') + '<br><span style="color:var(--soft);">' +
+      (d.vergoedingssoorten || []).map(x => '<b>' + esc(x.label) + '</b> — ' + esc(x.grondslag)).join('<br>') + '</span>';
   } catch (e) { $('#gStand').textContent = e.message; }
 }
 $('#gPasZet').addEventListener('click', async () => {
   try { await api('geld/pasprijs', { pas: $('#gPasKeuze').value, euro: Number($('#gPasEuro').value) }); meld('Pasprijs gezet; de voorwaarden tonen meteen het nieuwe bedrag.'); laadGeld(); }
-  catch (e) { meld(e.message); }
-});
-$('#gComZet').addEventListener('click', async () => {
-  const zaak = $('#gComZaak').value.trim().toUpperCase();
-  try { await api('geld/commissie', zaak ? { code: zaak, pct: Number($('#gComPct').value) } : { genre: $('#gComGenre').value, pct: Number($('#gComPct').value) }); meld('Vergoeding gezet.'); laadGeld(); }
   catch (e) { meld(e.message); }
 });
 $('#gKorZet').addEventListener('click', async () => {

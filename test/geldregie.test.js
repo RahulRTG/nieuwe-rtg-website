@@ -73,22 +73,37 @@ test('1. pasprijzen: de ladder publiek zichtbaar, met bodems die houden', async 
   await api('/api/office/geld/pasprijs', { pas: 'rtg', euro: 65 }, office);
 });
 
-test('2. partnervergoeding: standaard per genre, een eigen afspraak per zaak gaat voor', async () => {
+/* WAT HIER STOND was een toets op een knop die niet had moeten bestaan: een
+   partnervergoeding per genre, met een eigen afspraak per zaak die voorging, tot
+   30 procent. Ondertussen beloofden de partnervoorwaarden 0% commissie en
+   printten twee schermen hard "RTG-commissie EUR 0,00".
+
+   De toets was dus groen op gedrag dat in strijd was met het contract -- en dat
+   is de reden dat hij hier vervangen is in plaats van aangepast. De invarianten
+   zelf staan in test/commercie.test.js; dit is de weg erheen via de API. */
+test('2. partnervergoeding: nul, en er valt niets te zetten', async () => {
   const o = await api('/api/office/geld', {}, office);
   assert.equal(o.status, 200);
   const zaak = o.body.zaken.find(z => z.code === 'KIKUNOI');
   genre = zaak.genre;
+  assert.equal(zaak.rate, 0, 'elke zaak staat op nul, wat er ook in haar rij is opgeslagen');
+  assert.equal(o.body.partnervergoeding.overOmzet, 0);
+
+  // en de knop is weg: zetten wordt geweigerd, met de reden en met wat het wel kan zijn
   const g = await api('/api/office/geld/commissie', { genre, pct: 10 }, office);
-  assert.equal(g.status, 200);
-  const na = await api('/api/office/geld', {}, office);
-  assert.equal(na.body.zaken.find(z => z.code === 'KIKUNOI').rate, 0.1, 'de zaak volgt de genre-standaard');
-  // eigen afspraak per zaak wint van de standaard
+  assert.equal(g.status, 400, 'een commissie zetten hoort niet te kunnen');
+  assert.match(g.body.error, /geen commissie/);
   const per = await api('/api/office/geld/commissie', { code: 'KIKUNOI', pct: 12.5 }, office);
-  assert.equal(per.status, 200);
-  const na2 = await api('/api/office/geld', {}, office);
-  assert.equal(na2.body.zaken.find(z => z.code === 'KIKUNOI').rate, 0.125);
-  // grenzen: meer dan 30% is geen vergoeding meer
-  assert.equal((await api('/api/office/geld/commissie', { genre, pct: 40 }, office)).status, 400);
+  assert.equal(per.status, 400, 'ook niet per zaak');
+
+  // en na twee geweigerde pogingen staat alles nog steeds op nul
+  const na = await api('/api/office/geld', {}, office);
+  assert.equal(na.body.zaken.find(z => z.code === 'KIKUNOI').rate, 0);
+
+  // wat RTG wel in rekening kan brengen, staat er benoemd bij
+  assert.ok(na.body.vergoedingssoorten.length >= 4, 'de benoemde diensten staan op het bord');
+  assert.ok(na.body.vergoedingssoorten.every(v => v.overOmzet === false),
+    'en geen ervan neemt een aandeel in de omzet van de partner');
 });
 
 test('3. ledenvoordeel per genre: RTG legt bij; het lid ziet het, de zaak houdt het volle bedrag', async () => {

@@ -54,17 +54,40 @@ function opzet(opties) {
   return { db, auditspoor };
 }
 
-async function roep(poort, methode, pad, lijf, koppen) {
+/* DE EVENT-LOOP LATEN LEEGLOPEN, in plaats van 25 ms marge nemen.
+
+   Het spoor wordt op `res.finish` geschreven. Die server draait IN DIT PROCES,
+   dus als ons fetch-antwoord binnen is, staat die schrijfactie hooguit nog als
+   afgeronde I/O-taak in de wachtrij -- niet in de verre toekomst. Er stond
+   daarom `setTimeout(25)`: een marge die er meestal te veel is en op een drukke
+   machine te weinig, en dan zakt de toets op iets dat niet stuk is.
+
+   setImmediate draait in de check-fase, dus NA de I/O-fase waar `finish`
+   vandaan komt. Een paar van die tikken laten de wachtrij leeglopen zonder de
+   klok te raadplegen; op een trage machine duren ze vanzelf langer. We tikken
+   door tot de teller een aantal rondes stilstaat, met een ruime kap -- een tik
+   kost geen wachttijd, alleen een rondje event-loop. */
+async function tik() { return new Promise(k => setImmediate(k)); }
+async function spoorTotRust(spoor, rondes, kap) {
+  let vorige = -1, stil = 0;
+  for (let i = 0; i < (kap || 200); i++) {
+    await tik();
+    const nu = spoor.journaal.aantal();
+    stil = (nu === vorige) ? stil + 1 : 0;
+    vorige = nu;
+    if (stil >= (rondes || 5)) return nu;
+  }
+  return vorige;
+}
+
+async function roep(spoor, poort, methode, pad, lijf, koppen) {
   const r = await fetch('http://127.0.0.1:' + poort + pad, {
     method: methode,
     headers: Object.assign({ 'content-type': 'application/json' }, koppen || {}),
     body: methode === 'GET' ? undefined : JSON.stringify(lijf || {})
   });
   await r.text();
-  /* Het spoor wordt op res.finish geschreven; dat is bij de server al gebeurd
-     voordat wij hier klaar zijn, maar een tel marge maakt de toets stabiel
-     zonder iets te verbergen -- zonder spoor blijft hij ook na deze marge leeg. */
-  await new Promise(k => setTimeout(k, 25));
+  await spoorTotRust(spoor);
   return r.status;
 }
 
@@ -75,7 +98,7 @@ test('een geslaagde schrijfhandeling laat precies een regel na, met wie en wat',
     res.status(200).json({ ok: true });
   });
   try {
-    await roep(poort, 'POST', '/api/concern/nieuw', { naam: 'Iets' });
+    await roep(auditspoor, poort, 'POST', '/api/concern/nieuw', { naam: 'Iets' });
     const regels = auditspoor.journaal.recent(10);
     assert.strictEqual(regels.length, 1);
     assert.strictEqual(regels[0].actie, 'POST /api/concern/nieuw');
@@ -92,7 +115,7 @@ test('het verzoeklijf komt er NIET in -- een auditlog met alle lijven is zelf he
     res.status(200).json({ ok: true });
   });
   try {
-    await roep(poort, 'POST', '/api/lid/gegevens', { iban: 'NL91ABNA0417164300', naam: 'Echte Naam' });
+    await roep(auditspoor, poort, 'POST', '/api/lid/gegevens', { iban: 'NL91ABNA0417164300', naam: 'Echte Naam' });
     const alles = JSON.stringify(auditspoor.journaal.recent(10));
     assert.ok(!alles.includes('NL91ABNA0417164300'), 'geen IBAN in het spoor');
     assert.ok(!alles.includes('Echte Naam'), 'geen naam in het spoor');
@@ -106,7 +129,7 @@ test('de actor komt uit de sessie en nooit uit het lijf', async () => {
     res.status(200).json({ ok: true });
   });
   try {
-    await roep(poort, 'POST', '/api/iets', { actor: 'de directeur', wie: 'iemand anders' });
+    await roep(auditspoor, poort, 'POST', '/api/iets', { actor: 'de directeur', wie: 'iemand anders' });
     const r = auditspoor.journaal.recent(1)[0];
     assert.strictEqual(r.actor, 'user-7', 'wie het lijf schrijft, schrijft anders de naam van een ander onder zijn handeling');
   } finally { srv.close(); }
@@ -116,7 +139,7 @@ test('een geweigerde handeling laat niets na', async () => {
   const { auditspoor } = opzet();
   const { srv, poort } = await maakServer(auditspoor, (req, res) => res.status(403).json({ error: 'nee' }));
   try {
-    await roep(poort, 'POST', '/api/verboden', {});
+    await roep(auditspoor, poort, 'POST', '/api/verboden', {});
     assert.strictEqual(auditspoor.journaal.aantal(), 0, 'een gescande deurklink hoort niet tussen de echte handelingen');
   } finally { srv.close(); }
 });
@@ -125,7 +148,7 @@ test('lezen laat niets na', async () => {
   const { auditspoor } = opzet();
   const { srv, poort } = await maakServer(auditspoor, (req, res) => res.status(200).json({ ok: true }));
   try {
-    await roep(poort, 'GET', '/api/overzicht');
+    await roep(auditspoor, poort, 'GET', '/api/overzicht');
     assert.strictEqual(auditspoor.journaal.aantal(), 0);
   } finally { srv.close(); }
 });
@@ -134,11 +157,11 @@ test('het interne verkeer blijft eruit', async () => {
   const { auditspoor } = opzet();
   const { srv, poort } = await maakServer(auditspoor, (req, res) => res.status(200).json({ ok: true }));
   try {
-    await roep(poort, 'POST', '/api/cluster/hartslag', {});
-    await roep(poort, 'POST', '/api/command/apispoor', {});
+    await roep(auditspoor, poort, 'POST', '/api/cluster/hartslag', {});
+    await roep(auditspoor, poort, 'POST', '/api/command/apispoor', {});
     assert.strictEqual(auditspoor.journaal.aantal(), 0,
       'de hartslag elke seconde en het lezen van het spoor zelf zouden het venster vullen met wat niemand terugzoekt');
-    await roep(poort, 'POST', '/api/echt/werk', {});
+    await roep(auditspoor, poort, 'POST', '/api/echt/werk', {});
     assert.strictEqual(auditspoor.journaal.aantal(), 1, 'en de rest komt er wel in');
   } finally { srv.close(); }
 });
@@ -151,7 +174,7 @@ test('de zaak-actor draagt zijn code en de medewerker die aan het werk was', asy
     res.status(200).json({ ok: true });
   });
   try {
-    await roep(poort, 'POST', '/api/supplier/kassa/afrekenen', {});
+    await roep(auditspoor, poort, 'POST', '/api/supplier/kassa/afrekenen', {});
     assert.strictEqual(auditspoor.journaal.recent(1)[0].actor, 'zaak-HOSHI/p12');
   } finally { srv.close(); }
 });
@@ -160,7 +183,7 @@ test('een kantoorsessie zonder eigen account heet ook zo', async () => {
   const { auditspoor } = opzet({ sessionFor: () => ({ role: 'office' }) });
   const { srv, poort } = await maakServer(auditspoor, (req, res) => res.status(200).json({ ok: true }));
   try {
-    await roep(poort, 'POST', '/api/office/iets', {}, { authorization: 'Bearer kantoortoken' });
+    await roep(auditspoor, poort, 'POST', '/api/office/iets', {}, { authorization: 'Bearer kantoortoken' });
     assert.strictEqual(auditspoor.journaal.recent(1)[0].actor, 'kantoor-gedeelde-code',
       'een gedeelde code heeft geen persoon; dat hoort in het spoor te staan en niet weggepoetst');
   } finally { srv.close(); }
@@ -175,7 +198,7 @@ test('een gewijzigde regel breekt de keten, en de controle wijst hem aan', async
     res.status(200).json({ ok: true });
   });
   try {
-    for (const pad of ['/api/een', '/api/twee', '/api/drie']) await roep(poort, 'POST', pad, {});
+    for (const pad of ['/api/een', '/api/twee', '/api/drie']) await roep(auditspoor, poort, 'POST', pad, {});
     assert.strictEqual(auditspoor.journaal.controleer().heel, true, 'ongeschonden hoort heel te zijn');
 
     // iemand met schrijftoegang zet er een andere actor in
@@ -195,7 +218,7 @@ test('een weggeknipte regel breekt de keten ook', async () => {
     res.status(200).json({ ok: true });
   });
   try {
-    for (const pad of ['/api/een', '/api/twee', '/api/drie']) await roep(poort, 'POST', pad, {});
+    for (const pad of ['/api/een', '/api/twee', '/api/drie']) await roep(auditspoor, poort, 'POST', pad, {});
     db.data.apiSpoor.commandJournaal.splice(1, 1);           // de middelste eruit
     assert.strictEqual(auditspoor.journaal.controleer().heel, false);
     /* WAT DIT NIET ZIET, en dat hoort erbij: wie de NIEUWSTE regels weggooit,
@@ -218,9 +241,9 @@ test('een gewist lid verdwijnt uit het spoor, en de wissing staat er zelf in', a
     res.status(200).json({ ok: true });
   });
   try {
-    await roep(poort, 'POST', '/api/een', {}, { 'x-wie': 'user-9' });
-    await roep(poort, 'POST', '/api/twee', {}, { 'x-wie': 'user-9' });
-    await roep(poort, 'POST', '/api/drie', {}, { 'x-wie': 'user-8' });
+    await roep(auditspoor, poort, 'POST', '/api/een', {}, { 'x-wie': 'user-9' });
+    await roep(auditspoor, poort, 'POST', '/api/twee', {}, { 'x-wie': 'user-9' });
+    await roep(auditspoor, poort, 'POST', '/api/drie', {}, { 'x-wie': 'user-8' });
     const kopVoor = auditspoor.journaal.recent(1)[0].zegel;
 
     const uit = auditspoor.journaal.wisActor('user-9', 'recht op vergetelheid (AVG art. 17)');
@@ -245,7 +268,7 @@ test('wissen van een actor die er niet in staat, laat de keten met rust', async 
     res.status(200).json({ ok: true });
   });
   try {
-    await roep(poort, 'POST', '/api/een', {});
+    await roep(auditspoor, poort, 'POST', '/api/een', {});
     const voor = auditspoor.journaal.recent(1)[0].zegel;
     const uit = auditspoor.journaal.wisActor('user-999');
     assert.strictEqual(uit.geraakt, 0);
@@ -259,7 +282,7 @@ test('het spoor houdt een verzoek nooit op, ook niet als het schrijven faalt', a
   auditspoor.journaal.noteer = () => { throw new Error('opslag stuk'); };
   const { srv, poort } = await maakServer(auditspoor, (req, res) => res.status(200).json({ ok: true }));
   try {
-    const status = await roep(poort, 'POST', '/api/iets', {});
+    const status = await roep(auditspoor, poort, 'POST', '/api/iets', {});
     assert.strictEqual(status, 200, 'een geslaagde handeling mag niet alsnog stukgaan op zijn eigen boekhouding');
   } finally { srv.close(); }
 });

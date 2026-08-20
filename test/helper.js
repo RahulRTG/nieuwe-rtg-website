@@ -269,13 +269,28 @@ function stop(watDanOok) {
    hangende afsluiting de suite niet laat staan. */
 function stopNet(child, ms) {
   return new Promise(resolve => {
-    if (!child || child.exitCode != null) return resolve();
+    if (!child || wegAl(child)) return resolve();
     let klaar = false;
     const af = () => { if (!klaar) { klaar = true; resolve(); } };
     child.on('exit', af);
     try { child.kill('SIGTERM'); } catch (e) { return af(); }
     setTimeout(() => { try { child.kill('SIGKILL'); } catch (e) {} af(); }, ms || 15000).unref();
   });
+}
+
+/* IS DIT KIND AL WEG? `exitCode` alleen is niet genoeg.
+
+   Een proces dat door een SIGNAAL stierf houdt `exitCode === null` en zet
+   `signalCode` (bijvoorbeeld 'SIGKILL'). Wie alleen naar exitCode kijkt, denkt
+   dus dat zo'n kind nog leeft, hangt zijn `exit`-luisteraar op aan een proces
+   dat al weg is, en wacht op een gebeurtenis die nooit meer komt. Node meldt dat
+   als "Promise resolution is still pending but the event loop has already
+   resolved" -- en de hele toets wordt geannuleerd in plaats van rood.
+
+   Dat is hier ook echt gebeurd, bij test/herstelproef.test.js: die stopt zijn
+   servers met een signaal en daarna nog een keer via de opruimer. */
+function wegAl(child) {
+  return child.exitCode != null || child.signalCode != null || child.killed && !child.connected && child.pid == null;
 }
 
 /* EEN HARDE stop, en WACHTEN tot hij weg is.
@@ -293,7 +308,7 @@ function stopNet(child, ms) {
    afgesloten sqlite. 300 ms was daarvoor een gok; `exit` is het teken. */
 function stopHard(child, ms) {
   return new Promise(resolve => {
-    if (!child || child.exitCode != null) return resolve();
+    if (!child || wegAl(child)) return resolve();
     let klaar = false;
     const af = () => { if (!klaar) { klaar = true; resolve(); } };
     child.on('exit', af);

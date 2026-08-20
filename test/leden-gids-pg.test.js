@@ -56,7 +56,10 @@ test('Postgres-ledengids: een nieuw lid landt in de gids en telt mee in de kanto
       if (!(st && st.state && st.state.user)) await wacht(200);
     }
     assert.ok(st && st.state && st.state.user, 'het lid is ingelogd');
-    await wacht(400); // de gids-telling ververst kort na de upsert
+    /* GEEN 400 ms MEER. De opmerking hier was "de gids-telling ververst kort na
+       de upsert" -- en dat is precies wat de lus hieronder al opvangt: die
+       vraagt de telling twintig keer opnieuw tot hij gestegen is. De vier
+       tienden ervoor maakten de toets alleen trager, niet zekerder. */
 
     let na = voor;
     for (let i = 0; i < 20 && na < voor + 1; i++) {

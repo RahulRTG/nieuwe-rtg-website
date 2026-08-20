@@ -1134,6 +1134,575 @@ uiteenlopen. Twee gevolgen die het waard zijn om te noemen:
   `eten`, dus een kledingwinkel rekende het verlaagde tarief over een jas. Dat
   cijfer verandert daardoor, en dat is de bedoeling.
 
+### Welke regels golden er op die dag (`kern/fiscaal/jaargangen.js`)
+
+De Regelwacht hield zijn overlay bij als een platte kaart van laatste waarden
+(`Object.assign(eerder, wijz)`). Dat beantwoordde "wat geldt er nu" en maakte
+"wat gold er toen" **onbeantwoordbaar**: de oude waarde werd overschreven, niet
+bewaard. Wat het NL-eten-tarief op 15 maart 2026 was, stond daarna nergens meer.
+Een administratie krijgt jaren later precies die tweede vraag — bij een controle,
+een bezwaar of een due diligence.
+
+De oplossing is geleend en niet verzonnen. Payroll doet dit al met jaargangen
+(`kern/payroll/regelpakket.js`): een tarief is daar nooit een constante maar een
+**versie** met een geldigheidsperiode en een herkomst, en de loonrun stempelt de
+versie die hij gebruikte op zichzelf. Twee regelmotoren in één huis is precies
+wat LAT-regel 4 verbiedt, dus de fiscale kant krijgt hetzelfde model.
+
+Het verschil met payroll: dat krijgt hele pakketten binnen (een JSON per land per
+jaar), de Regelwacht krijgt losse velden ("NL, eten, 11%") en zijn basis staat in
+code. Een momentopname per wijziging zou voor ~200 landen absurd zijn. Dus:
+
+    de basis (peiljaar, uit landen.js) + de wijzigingen tot een datum
+    = de tabel zoals hij op die datum was
+
+**Het scharnier is de basis.** De projectie schrijft in de gedeelde
+`LANDEN`-tabel — dat moet, anders zou elke lezer in huis moeten veranderen — dus
+na een projectie is `LANDEN` de huidige stand en niet meer het peiljaar. Er staat
+daarom een diepe kopie van de tabel zoals `landen.js` hem oplevert, gemaakt
+vóórdat er iets overheen ging. Het opbouwen zelf is puur en staat apart
+(`jaargangen-tijdlijn.js`).
+
+Wat dat oplevert:
+
+- **een tariefwijziging van juli verplaatst het tarief van juni niet** — de toets
+  waar het om begonnen is, en die vóór deze laag niet te schrijven was;
+- **een wijziging met een ingangsdatum in de toekomst ligt klaar en doet niets**,
+  dezelfde eigenschap als een payroll-jaargang die in november binnenkomt voor
+  1 januari. Voorheen onmogelijk: de overlay kende geen ingangsdatum, dus alles
+  wat binnenkwam gold meteen;
+- **de geschiedenis zegt wat er veranderde en wat het verving**, per land en per
+  (genest) veld;
+- **de projectie stapelt niet** maar bouwt terug op vanaf de basis, zodat een
+  wijziging die wegvalt ook echt uit het beeld verdwijnt.
+
+De oude platte overlay wordt eenmalig omgezet. Eerlijk over wat niet te redden
+is: wanneer elk veld veranderde is nooit vastgelegd, dus alles landt op de laatst
+bekende updatedatum met de herkomst `overlay-migratie` en die reden erbij. Een
+verzonnen ingangsdatum is erger dan een grove.
+
+Een wijziging draagt een `stand` (`ongecontroleerd` / `goedgekeurd`): wat het
+kantoor doorvoert heeft een mens gezien, wat een automatische bron levert niet.
+Beide worden geprojecteerd — net als voorheen. Aan die projectie een goedkeuring
+hangen zou bij de eerste de beste storing stilletjes de tarieven van het hele
+huis bevriezen; dat is een eigen besluit met een eigen zichtbare schakelaar. De
+stand wordt hier alleen vastgelegd, zodat dat besluit later te nemen is zonder
+archeologie.
+
+De tariefkeuze zelf (categorie, anders standaard) staat op één plek —
+`tarief.js` `uitTabel`, gedeeld door de lopende tabel en de teruggerekende. Een
+herbouwd bedrag dat net anders terugvalt dan het oorspronkelijke is geen herbouw.
+
+`test/fiscaal-jaargangen.test.js` dekt de vijf beweringen; elk is met een mutatie
+zien zakken.
+
+#### En de rekenplekken die het moeten doen
+
+De jaargangen maken terugrekenen *mogelijk*; drie rekenplekken deden het niet en
+herschreven daarmee stilletjes een afgesloten dag of maand zodra de Regelwacht
+iets bijwerkte. Ze vragen het nu aan één plek (`kern/fiscaal/regelbron.js`), die
+zonder jaargangen netjes terugvalt op de lopende tabel — en dat ook zegt.
+
+**De maandboekhouding (`financeVoor`)** pot nu per categorie **én per tarief**,
+met het percentage van de dag van de transactie zelf. Verandert een tarief
+halverwege de maand, dan staan er twee regels in plaats van één: de omzet van
+voor en na de ingangsdatum hoort niet op een hoop, want dan draagt één van beide
+helften het verkeerde percentage af. Zo telt de btw-aangifte ook
+(`btwtelling.js` pot per tarief). Verandert er niets, dan is er per categorie
+precies één pot en ziet niemand verschil. De werkgeverslasten, het vakantiegeld
+en het minimumloon komen van een **peildag**: de laatste dag van de maand, maar
+nooit later dan vandaag — anders telt op de tiende al een wijziging mee die pas
+op de dertigste ingaat.
+
+**Het Z-rapport (`rapporten.js`)** gebruikt het tarief van díé dag. Daar zat nog
+een tweede probleem: dit bestand had een **eigen kopie** van de categorie-logica
+— de derde — met precies de bug die `tarief.js` kwam opheffen. Een zaak zonder
+kaart, kamers of ritten werd `eten`, dus een kledingwinkel kreeg het lage tarief
+over een jas terwijl zijn factuur en zijn maandboekhouding het standaardtarief
+zeiden. Eén zaak, één dag, twee cijfers.
+
+> **Dit verandert een cijfer.** Het Z-rapport van een zaak zonder kaart, kamers
+> of ritten gaat van het verlaagde naar het standaardtarief. Dat cijfer hoort te
+> veranderen — het stond fout, en het is dezelfde correctie die de factuur en de
+> boekhouding al hadden ondergaan.
+
+**De zzp-tool** is bewust *niet* half temporeel gemaakt. De schijven,
+aftrekposten en heffingskortingen staan als vaste data op het peiljaar en de
+Regelwacht raakt ze niet aan, dus er valt niets terug te rekenen. Een jaartal
+laten aannemen zou een antwoord geven dat eruitziet als "de regels van 2023" en
+het niet is. Hij accepteert nu een `jaar` en zegt bij een jaar buiten het
+peiljaar uitdrukkelijk dat dit niet de regels van dat jaar zijn — de som blijft
+gelijk, en juist daarom moet die zin er staan. **De ZZP-tabellen onder de
+jaargangen brengen is de volgende echte stap**, en die is hiermee niet gezet.
+
+Elke uitkomst draagt een `regelstand`: op welke dag is teruggerekend, uit welke
+bron (`jaargangen` of `lopend`), en welke wijzigingen golden er toen. Zonder die
+stempel is het herbouwen van een bedrag later een gok.
+
+`test/fiscaal-terugrekenen.test.js` dekt de vijf beweringen, elk met een mutatie
+zien zakken.
+
+### De bewijsketen (`kern/fiscaal/herkomst.js`)
+
+Een aangifte zegt "€ 4.812 te betalen". Dat getal is te vertrouwen zolang je het
+kunt openvouwen, en dat kon niet: de aangifte droeg de optelling maar niet de
+posten. Deze laag vouwt hem open langs de keten die er echt is — aangifte →
+periode → tarief → factuur → factuurregel → de regel die op de factuurdatum
+gold — en doet drie dingen.
+
+**Verklaren** geeft de opbouw van een periode, per tarief, met de factuurnummers
+eronder. **Herbouwen** rekent een ingediende aangifte opnieuw uit de primaire
+bronnen en vergelijkt cent voor cent; gelijk is groen. Anders dan de controle in
+`dienIn` weigert die niets — weigeren hoort bij het indienen, verantwoorden bij
+het terugkijken, en een controleur die alleen "geweigerd" ziet weet nog steeds
+niet hoeveel het scheelt.
+
+Het derde is het interessantst: **wat de keten zichzelf tegenspreekt.** Een
+factuurregel draagt het tarief dat de facturatiemotor erop zette; de jaargangen
+weten welke tarieven er in dat land op die dag *bestonden*. Staat er een
+percentage op een regel dat op die dag helemaal niet voorkwam, dan klopt er iets
+niet — een regel die vóór een tariefwijziging is geboekt en ná de ingangsdatum is
+gedateerd, of een met de hand ingetypt tarief.
+
+> Let op wat die controle wél en niet zegt. Hij zegt **niet** "deze regel had het
+> lage tarief moeten hebben": welke categorie een regel had staat niet op de
+> regel, en dat verzinnen zou een bewering zijn die wij niet kunnen waarmaken.
+> Hij zegt alleen: dit percentage bestond die dag niet in dit land. Dat is smal,
+> en juist daarom is het waar.
+
+**Eén telling, niet twee.** De centensom per regel komt uit `btwtelling.js` —
+dezelfde die de aangifte en de inspecteur gebruiken. De verklaring telt de posten
+los op en legt die som ernaast: wijken ze af, dan is dat geen detail maar een
+bevinding (`sluitAan: false` met het verschil erbij). Zo bewijst de verklaring
+zichzelf tegen het getal dat ze verklaart.
+
+De omgekeerde weg — **wat raakt deze regelwijziging** — telt de facturen die ná
+de ingangsdatum nog een percentage dragen dat door die wijziging is vervangen,
+per zaak. Wat er geteld wordt is smal en nagaanbaar, en de nuance reist mee: een
+levering van vóór de wijziging mág het oude tarief dragen, dus dit is de lijst om
+na te lopen en geen lijst met fouten.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/supplier/btw/verklaar` `{periode}` | De opbouw van een periode per tarief, met de facturen eronder; manager, eigen zaak uit het token |
+| `POST /api/supplier/btw/herbouw` `{id}` | Een eigen aangifte herbouwen uit de bronnen en cent voor cent vergelijken |
+| `POST /api/office/bank/regels/geschiedenis` `{land, veld?}` | Wat er veranderde, wanneer, en wat het verving |
+| `POST /api/office/bank/regels/geraakt` `{land, jaargang}` | Wat die wijziging raakt: facturen, regels en zaken |
+
+De impact-vraag hangt bij het **kantoor** en niet bij de inspecteur: wie de knop
+indrukt hoort te zien wat eronder beweegt.
+
+`test/fiscaal-herkomst.test.js` dekt zeven beweringen — vijf op de motor, elk met
+een mutatie zien zakken, en twee door de API heen op de poorten, want een
+verklaring legt de complete omzet mét factuurnummers open en is daarmee zo
+mogelijk gevoeliger dan de aangifte zelf.
+
+#### "Waarom dit bedrag?" in het Kantoor
+
+De bewijsketen staat als kaart onder de btw-aangifte
+(`public/apps/leverancier/leverancier-12a2.js`): vouw open geeft de opbouw per
+tarief met de factuurnummers eronder, en op een ingediende aangifte staat
+"Herbouw dit bedrag" — op de cent gelijk of niet, zonder tussenweg.
+
+Het scherm rekent **niets** uit, ook niet "even" de som als controle: dan staat
+er een derde teller in huis. Ook het oordeel of de opbouw aansluit komt van de
+server.
+
+**Uitzonderingsgestuurd** (ONTWERP.md): klopt alles, dan staat er een rustige
+opbouw en verder niets. Alleen een opbouw die niet aansluit en een tarief dat die
+dag niet bestond krijgen kleur. Een scherm dat bij "alles in orde" al een groen
+vinkje toont, leert de lezer over kleur heen te kijken — en dan valt de ene keer
+dat het misgaat ook niet meer op. `test/btw-waarom-scherm.e2e.js` toetst dus
+beide kanten: dat de eigen factuur eronder verschijnt, én dat er géén bevinding
+staat als er niets aan de hand is.
+
+#### "Wat veranderde?" bij de Regelwacht
+
+De landenlijst in de bankkamer zei *dát* een land was bijgewerkt; nu zegt hij
+wat er is gebeurd, wanneer het inging en **wat het verving** — dat laatste is
+waar de jaargangen voor zijn. Bij een tariefwijziging staat er een knop "Wat
+raakt dit?" naast: hoeveel facturen dragen ná de ingangsdatum nog het vervangen
+percentage, bij hoeveel zaken.
+
+Die knop staat er alleen bij een tariefwijziging; bij een minimumloon-wijziging
+valt er geen factuur van behandeling te veranderen, en de schermtoets eist dat er
+dan ook geen knop is. En het scherm neemt de zin van de server letterlijk over:
+bij een lijst om na te lopen staat er dat het niet fout hoeft te zijn, bij nul
+geraakte facturen staat er dat er niets is. Het schrijft daar niets stelligers
+overheen.
+
+#### En dezelfde keten voor het loon (`kern/payroll/herkomst.js`)
+
+De loonkant is de tweede grote geldstroom, en had al iets: `dossier.js`
+beantwoordt per medewerker per run de vier vragen — waarom is dit bedrag
+berekend, welke regelversie, is het betaald, is het aangegeven. Dat is de
+onderste helft van de keten. Wat ontbrak is de weg **van de aangifte omlaag**:
+het collectieve bedrag openvouwen naar de nominatieve regels, en van daaruit
+naar dat dossier. Deze laag bouwt die brug en **verwijst** voor het detail —
+het hier nog eens verzamelen zou een tweede dossier zijn.
+
+Herbouwen gebruikt `nominatief()` uit `aangifte.js`, dezelfde routine waarmee de
+aangifte is opgemaakt (daarvoor staat die nu op modulescope). Een herbouw die
+anders optelt vindt altijd een verschil, en dan zegt een verschil niets meer.
+
+De twee controles die bij het opmaken al draaiden, draaien hier **opnieuw** — en
+dat is de hele bedoeling: bij het opmaken bewijzen ze dat de aangifte goed
+begon, hier dat hij dat nog steeds is. De optelling van het nominatieve deel
+moet het collectieve deel zijn, en de aangegeven loonheffing moet zijn wat er op
+de stroken staat. Ze zijn onafhankelijk: draai je aan één rubriek, dan slaat de
+eerste uit en blijft het te betalen bedrag kloppen.
+
+Plus een derde die alleen achteraf te stellen is: **op welk regelpakket rustte de
+run**. Een pakket dat later van zijn aanmerking valt of dat zelf meldt dat zijn
+cijfers niet tegen het Handboek zijn gelegd, maakt de aangifte niet fout — het
+maakt hem twijfelachtig, en dat hoort naast het bedrag te staan in plaats van te
+verdwijnen.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/office/payroll/verklaar` `{id}` | Het collectieve bedrag open naar de nominatieve regels, met de verwijzing naar het dossier |
+| `POST /api/office/payroll/herbouw` `{id}` | De aangifte herbouwen uit de run en rubriek voor rubriek vergelijken |
+
+Beide staan als knop bij de loonaangifte in `apps/payroll.html`
+("Waarom dit bedrag?" en "Herbouw uit de run"). Uitzonderingsgestuurd: sluit
+alles aan, dan staat er één regel dat het aansluit; alleen bevindingen krijgen
+een pil. Het detail per medewerker staat in het dossier eronder en wordt hier
+niet overgetikt — twee ingangen op dezelfde keten, geen twee ketens.
+
+Bij het **kantoor** en niet bij de zaak: dit legt de loonheffing per werknemer
+open, en de werkgever leest zijn aangifte al mee via zijn eigen route. Een
+tweede, ruimere ingang op dezelfde gegevens is geen extra dienst maar een tweede
+sleutel op dezelfde deur.
+
+### De zzp-regimes per ingangsdatum (`kern/fiscaal/zzpwacht.js`)
+
+De landentabel stond al per jaargang vast; de zzp-tabel niet, dus de zzp-tool
+rekende elk jaar met de tarieven van nu. Diezelfde jaargangen-store draagt nu ook
+deze tabel — eigen bak, eigen basis, eigen geneste velden — met een eigen
+validatie, want wat een bron mag leveren verschilt per tabel: een btw-tarief
+tussen 0 en 30 zegt niets over een heffingskorting.
+
+Twee dingen die hier stuk waren of bijna stuk gingen:
+
+- **De diepe kopie liep door JSON.** De hoogste belastingschijf staat als
+  `[Infinity, 0.495]` in de tabel, en `JSON.stringify` maakt daar `null` van.
+  De schijvenlus rekent dan `Math.min(belastbaar, null)` = 0 en kent de
+  toptariefschijf geen inkomen meer toe: een berekening die er goed uitziet en
+  te laag is. De kopie gaat nu via `structuredClone`.
+- **`regimeOp` geeft altijd iets terug** — is er niets vastgelegd, dan de basis.
+  Dat doorgeven als "de regels van 2023" is precies de schijnzekerheid die deze
+  ronde moest wegnemen. Er gaat nu pas een regime mee als de tijdlijn iets over
+  die datum te zeggen heeft; anders zegt de tool zelf dat er met de tabel van nu
+  is gerekend.
+
+De schijventabel wordt als geheel vervangen en nooit samengevoegd: schijf 1 van
+2026 met schijf 3 van 2024 eronder telt gewoon door en ziet er volstrekt normaal
+uit.
+
+### De afsluiting van een periode (`kern/fiscaal/aansluiting.js`)
+
+Dit huis had controles genoeg — de aangifte weigert op een register dat zichzelf
+tegenspreekt, het toezicht legt facturatie naast wat er is aangegeven, de
+bewijsketen herbouwt een bedrag. Wat er niet was, is het antwoord op de vraag die
+een controller aan het eind van een kwartaal stelt: **is dit af, en waar zit de
+rest?**
+
+De dekking wordt in **centen** gemeten en niet in aantal controles. Drie
+controles waarvan er één faalt is 67%, of die ene nu over twee euro of over twee
+ton gaat.
+
+| | Betekenis |
+|---|---|
+| `bewezen` | centen onder een controle die is uitgevoerd en klopt |
+| `uitzondering` | centen waar een controle is uitgevoerd en níét klopt |
+| `ontbrekend` | centen waar geen controle overheen ligt |
+
+Die derde is de gevaarlijkste, want ontbrekende dekking ziet er in elk dashboard
+uit als nul. Een periode zonder aangifte staat dus niet op 100% maar op 0%
+bewezen.
+
+**Het telt per geldstroom en niet per controle.** Meerdere controles lopen over
+hetzelfde geld; die elk hun centen laten optellen was de eerste opzet hier en gaf
+200% dekking op een kwartaal met één factuur erin — de toets ving dat. Per pot
+bepaalt de zwaarste uitslag wat ermee gebeurt: wijkt er één af, dan is dat
+verschil uitzondering; is er één niet uitgevoerd, dan is de rest ontbrekend en
+niet bewezen.
+
+> Bewezen betekent dat twee onafhankelijke wegen op hetzelfde bedrag uitkomen —
+> niet dat het bedrag juist is. Een factuur met een verkeerd tarief die netjes in
+> de aangifte staat telt hier als bewezen; daar is de vreemd-tarief-controle
+> voor. Dit meet **dekking, geen correctheid**, en dat staat in het antwoord.
+
+`POST /api/supplier/btw/afsluiting` `{periode}`.
+
+### De pre-flight (`kern/fiscaal/preflight.js`)
+
+De controles staan op het juiste moment — een weigering die pas komt als het al
+is gebeurd, is geen weigering. Maar de gebruiker hoort het dus pas ná de klik:
+kenmerk invullen, indienen, en dán te horen krijgen dat de cijfers zijn
+veranderd. Niet fout, wel laat.
+
+`keur(handeling, context)` stelt dezelfde vragen vóór de klik en geeft **GO**,
+**REVIEW** of **BLOCK**, met alle redenen — niet alleen de zwaarste, want wie het
+eerste oplost hoort niet tegen het tweede aan te lopen.
+
+**De harde regel: deze laag controleert niets zelf.** Er staat geen enkele `if`
+over een fiscale regel in. Elke uitslag komt uit een routine die de handeling
+straks ook aanroept — de zekerheidsklassen, het ogenregister, de btw-telling. Een
+pre-flight met eigen controles is een tweede waarheid naast de echte, en die twee
+lopen uiteen op precies het moment dat het ertoe doet: dan zegt het scherm GO en
+weigert de server.
+
+Twee dingen die het bouwen ervan aan het licht bracht:
+
+- **`voorbehouden` betekent niet vanzelf, niet nooit.** De klasse heet
+  PROHIBITED_AUTOMATION en gaat over de software, niet over de mens. Een
+  inspecteur die een naheffing vaststelt doet precies wat de bedoeling is; wat
+  niet mag is een knop die het zonder hem doet. Zonder mens erop is het BLOCK,
+  met een mens REVIEW.
+- **`btw.indienen` en `btw.verzenden` deelden ten onrechte een klasse.**
+  Vastleggen dát er is ingediend is administratie die een manager doet;
+  verzenden is wat RTG nooit doet. Op één hoop maakte dat de pre-flight
+  onbruikbaar — hij blokkeerde de handeling die juist wel mag. Nu gesplitst.
+
+Een handeling zonder droogloop krijgt **nooit** GO: anders leest "wij hebben
+niets nagekeken" op het scherm hetzelfde als "alles is in orde".
+
+`POST /api/supplier/btw/preflight` `{id, kenmerk?}`.
+
+#### Beide op het scherm
+
+De afsluiting staat als kaart onder de btw-aangifte
+(`leverancier-12a3.js`, afgesplitst van de Waarom-kaart op de naad
+terugkijken/vooruitkijken). Een balk met drie stukken, en de bedragen erbij:
+99,96% leest als "af", terwijl de 0,04% ernaast juist het enige is dat werk
+vraagt. Alleen uitzondering en ontbrekend krijgen kleur; van de controles krijgt
+alleen wat níét sluit een accent. De schermtoets eist daarom ook wat er *niet*
+staat als alles klopt.
+
+De pre-flight staat als knop bij het indienen — "Wat gebeurt er als ik indien?"
+— en alleen op een aangifte waarvan de periode voorbij is en die nog niet is
+ingediend. Daarbuiten valt er niets te keuren en zou de kaart ruis zijn.
+
+### De scenario-engine (`kern/fiscaal/scenario.js`)
+
+"Wat als ik twaalf mensen aanneem in Duitsland?" De harde eis is dat er níéts
+verandert, en dat is hier **structureel** opgelost en niet met discipline: de
+module krijgt geen `db`, geen `save` en geen enkele functie die schrijft. Hij
+kán niet muteren — en dat is de enige vorm van die belofte die over vijf jaar
+nog waar is. De toets legt de volledige staat voor en na naast elkaar.
+
+Hij rekent ook niet zelf: elk getal komt uit de landentabel of uit de
+payroll-dekking. Daardoor stelt hij een vraag die een rekenmachine niet stelt —
+*kunnen wij daar überhaupt loon draaien?* Een kostenplaatje voor een land zonder
+goedgekeurde loontabel is een plaatje van iets dat niet kan, en dat staat
+erbij zonder dat het bedrag verandert.
+
+Elke **aanname** staat in het antwoord, en wat we niet weten staat er als eigen
+lijst — een aanname die je niet ziet is een aanname die je gelooft. Een
+doorrekening is `advies`, nooit vastgesteld.
+
+**Wat deze module niet doet: een gekozen scenario doorvoeren.** Dat is geen
+vergetelheid. "Klaarzetten mag, doorvoeren is een mensbesluit" loopt door dit
+hele huis, en een knop die een doorrekening in werkelijkheid omzet zou in één
+klap twaalf arbeidsovereenkomsten aanmaken.
+
+### De verbintenis (`kern/fiscaal/verbintenis.js`)
+
+Aangever en toezichthouder tellen hetzelfde register met dezelfde routine. Dat
+is de kracht van dit huis — een verschil betekent iets — maar het heeft een prijs
+die niemand had opgeschreven: om te kunnen tellen moet de inspecteur het **hele**
+factuurregister lezen. Voor een controle op een bedrag is dat de complete
+commerciële administratie van een onderneming.
+
+Een merkleboom over de getelde feiten lost dat op. De inspecteur krijgt een
+**wortel** en een totaal — geen factuurnummer, geen datum, geen bedrag per regel.
+Twijfelt hij over één factuur, dan krijgt hij die ene regel plus het pad naar de
+wortel en rekent zelf na dat hij in de getelde verzameling zat, zonder de rest te
+zien.
+
+> **Wat dit wél en niet is.** Een verbintenis met selectieve openbaarmaking, geen
+> zero-knowledge bewijs. De inspecteur kan **niet** nagaan dat er een factuur is
+> weggelaten — daarvoor zou hij de verzameling moeten kennen. Wat hij wel kan:
+> vaststellen dat de aangever zich op een moment aan een verzameling heeft
+> vastgelegd en daar achteraf niets aan kan veranderen zonder dat de wortel
+> verandert. Dat is minder dan het klinkt, en daarom staat het erbij.
+
+Twee valkuilen die de toets afdekt: dezelfde feiten in een andere volgorde geven
+dezelfde wortel (anders krijgen twee partijen met dezelfde administratie
+verschillende wortels), en een oneven knoop wordt **doorgeschoven en niet
+verdubbeld** — bij verdubbeling geeft `[a,b,c]` dezelfde wortel als `[a,b,c,c]`
+en kun je een regel toevoegen zonder dat iets verandert.
+
+Het spoor van wie waarnaar keek en waarom staat al in `server/inzagelog.js`, met
+een eigen keten en anker. Dat is niet opnieuw gebouwd — een tweede journaal is
+een tweede waarheid.
+
+### Het bronnenregister (`kern/fiscaal/bronnen/`)
+
+De Regelwacht kon al *één* bron ophalen: één url uit `FISCAAL_BRON_URL`, met een
+vorm die precies moest passen. Dat werkt zolang er precies één bron is en die
+toevallig onze taal spreekt.
+
+**Wat het opzoeken opleverde.** De officiële bron voor de EU-btw-tarieven is de
+[Taxes in Europe Database](https://ec.europa.eu/taxation_customs/tedb/) van de
+Europese Commissie, die een SOAP-dienst aanbiedt; daaromheen bestaan spiegels
+die dezelfde gegevens als JSON leveren. Elke bron draagt nu drie dingen die
+nergens stonden: **gezag** (officieel / afgeleid / indicatief), **dekking**
+(welke landen en velden) en **vorm** (met de adapter die hem vertaalt). Urls
+staan niet in de code maar in de omgeving — een url in de repository is een
+keuze die niemand heeft gemaakt en die bij elke uitrol meereist.
+
+#### De vondst die de vorm bepaalde
+
+Een tarievenbron zegt welke *tarieven* een land kent — `standard`, `reduced`,
+`super_reduced`. Hij zegt **niet** welke categorie welk tarief krijgt, en dat is
+precies wat RTG bewaart:
+
+```
+NL   eten 9   (verlaagd)      DE   eten 19  (standaard!)
+NL   logies 9 (verlaagd)      DE   logies 7 (verlaagd)
+```
+
+In Duitsland valt een restaurantmaaltijd onder het standaardtarief en een
+hotelovernachting onder het verlaagde; in Nederland allebei verlaagd. Dezelfde
+"reduced rate" landt dus in het ene land op eten en in het andere niet. Dat is
+een juridische toewijzing per land, en geen tarievenbron ter wereld levert hem
+mee.
+
+Daarom doet de adapter drie dingen, en het derde is het belangrijkst:
+
+- **automatisch** — het standaardtarief. `standard` is `tarieven.standaard`, in
+  elk land, zonder oordeel.
+- **signaleren** — verschuift een verlaagd tarief, dan wordt er níéts
+  toegewezen. Er komt een signaal: "eten staat bij ons op 9%, maar dat tarief
+  komt in deze bron niet meer voor; de verlaagde tarieven zijn nu 10%."
+- **nooit** — een categorie een tarief geven dat de bron niet over die categorie
+  heeft gezegd.
+
+Dat is dezelfde regel als bij de zekerheidsklassen: automatiseer wat objectief
+automatiseerbaar is, en maak nergens zekerheid waar die niet is. Een adapter die
+de verlaagde tarieven "slim" verdeelt, levert een tabel op die er goed uitziet en
+in de helft van de landen fout is.
+
+De dagelijkse controle loopt alle geconfigureerde bronnen af. Wat binnenkomt is
+`ongecontroleerd` tot een mens het aanmerkt — automatisch binnenhalen is iets
+anders dan ongezien in gebruik nemen — en het **gezag reist mee naar de
+jaargang**, want een tarief uit de instantie zelf en een tarief uit een spiegel
+zijn niet even hard. Bronnen en openstaande signalen staan in de bankkamer bij
+de Regelwacht; alleen de signalen krijgen kleur, want dat is het enige dat werk
+vraagt.
+
+De keuring van wat een bron mag leveren staat apart (`regelwacht-keuring.js`),
+op dezelfde naad als bij payroll tussen regelpakket en -keuring: die keuring is
+de enige muur tussen een slechte bron en de tabellen waarmee dit hele huis
+rekent.
+
+### De aangiftegateway (`kern/fiscaal/gateway/`) — klaargezet, niet aangezet
+
+RTG dient geen aangiften in. Dat is een productgrens en hij staat in het
+zekerheidsregister (`btw.verzenden` en `loon.verzenden` zijn `voorbehouden`).
+Deze laag verandert daar niets aan — hij bouwt de machinerie eromheen, zodat die
+grens ooit een **besluit** kan zijn in plaats van een verbouwing.
+
+| Onderdeel | Waarom het nu al moet staan |
+|---|---|
+| **Verzegeling** | Een zending draagt de sha256 van zijn eigen inhoud, canoniek geserialiseerd. Zonder dat is "wij hebben dit verstuurd" later een bewering |
+| **Idempotentie** | Dezelfde inhoud → dezelfde sleutel. Bij een instantie die traag antwoordt is dat het verschil tussen één aangifte en twee |
+| **Staatmachine** | Eén kant op, met `AANGEBODEN` en `BEVESTIGD` apart — een toestand die "verzonden" heet laat die twee samenvallen |
+| **Keten** | Elke overgang draagt de zegel van de vorige; een record dat achteraf is bijgewerkt verraadt zichzelf |
+| **Mandaat** | Zonder toestemming wordt er niet eens iets klaargezet — andermans cijfers klaarzetten is al een verwerking |
+| **Retry** | Begrensd, en alleen op dezelfde verzegelde inhoud |
+
+**Er is geen weg naar buiten, en dat is getoetst met een kanaal dat wél actief
+is en wél zou versturen.** `biedAan` kijkt eerst naar het zekerheidsregister en
+pas daarna naar het kanaal; vandaag zegt het eerste nee. Geen vlag, geen
+omgevingsvariabele, geen `force`. Wie dit ooit aanzet, verandert het register en
+vervangt `actief` in de adapter — twee bewuste handelingen met een naam eronder.
+
+Er is ook **geen route om iets aan te bieden**. Niet vergeten maar weggelaten:
+een knop die altijd afketst is een knop die niet had moeten staan.
+
+**De richting:** generieke kern, SBR/Digipoort als eerste adapter (`sbr.js`).
+Die beschrijft wat het kanaal *vraagt* — dat is nu al te controleren, zodat een
+zending die vandaag wordt klaargezet straks niet ineens onvolledig blijkt — en
+weigert te versturen. De XML-signature met PKIoverheid-certificaat is
+**niet** nagebouwd met een eigen sleutel: een zelfgemaakte handtekening die er
+officieel uitziet is erger dan geen. De inhoud is wel verzegeld; dat is intern
+bewijs en doet niet alsof het meer is.
+
+De zaak verleent het mandaat, het kantoor leest en rekent de keten na. De naam
+van de gever komt uit het token en nooit uit het verzoek — anders is "verleend
+door" een tekstveld.
+
+Eén ding dat het bouwen opleverde: zolang de gateway inert is, is de hele
+bevestigingstak (`BEVESTIGD` / `AFGEWEZEN`) langs de gewone weg **onbereikbaar**
+— een ontvangstbewijs voor iets dat nooit is weggegaan hoort niet te kunnen, en
+de staatmachine zegt dat zelf. Die overgangen liggen wel vast en zijn puur
+getoetst.
+
+### De ogenregel op één plek (`kern/ogen.js`)
+
+"Dezelfde ogen tellen niet dubbel" stond in **vier formuleringen** in huis en
+werd op vijf plekken gebruikt: de documentenuitgifte, de naheffingsaanslag, het
+bezwaar, het dwangbevel en de kwijtschelding. Drie schreven het met een trim, de
+vierde zonder.
+
+**Eerlijk over wat dat wel en niet betekende:** in `kern/uitgifte.js` was dat
+niet uit te buiten, want de naam gaat daar eerst door `schoon()` en die trimt al
+— aan beide kanten van de vergelijking. Er is dus geen gat gedicht. Wat het wél
+is: dezelfde waarheid op vier plekken, in formuleringen die nu al niet letterlijk
+gelijk zijn. LAT-regel 4 bestaat niet omdat het vandaag misgaat maar omdat het
+morgen misgaat — iemand haalt `schoon()` weg, of voegt een vijfde plek toe met
+weer een eigen variant.
+
+Wat er nu bij komt is het **register**: per handeling hoeveel ogen die vraagt
+(4 = twee mensen, 6 = drie), wat er nog omkeerbaar is, en een haak voor
+bedrag-drempels.
+
+> **Er staat één drempel, en die is door een mens gezet:** een naheffing boven
+> €25.000 vraagt een derde inspecteur. Hoog genoeg dat het dagelijkse werk niet
+> vastloopt, laag genoeg dat de zware gevallen een extra paar ogen krijgen.
+> Verschuift die grens, dan verschuift hij op die ene plek en nergens anders.
+> Voor alle andere handelingen staat de lijst leeg, en dan zegt `eist()` dat er
+> ook bij in plaats van een grens te suggereren die niemand heeft vastgesteld.
+
+Dit is **geen derde rechtenmodel**. Het beslist niet wie mag inloggen, wat een
+beheerder heeft uitgezet of wat RTG zelf mag — dat zijn de twee assen die er al
+zijn (`middleware/functieschakelaars.js` en `kern/bevoegdheid/`). Het is de
+telling van handtekeningen die die assen al veronderstelden en nergens
+opschreven. CONCERN.md's grens blijft dus staan.
+
+### De vier zekerheidsklassen (`kern/fiscaal/zekerheid.js`)
+
+Elke fiscale uitkomst droeg dezelfde zin — "voorlichting, geen bindend fiscaal
+advies" — en die stond zowel onder een btw-aangifte die tot op de cent uit het
+factuurregister is geteld als onder een zzp-schatting op een verwachte jaarwinst.
+Dat doet allebei tekort: het eerste wordt onnodig vaag, het tweede onterecht
+stevig, en wie overal hetzelfde voorbehoud leest, leest het na een week niet meer.
+
+| Klasse | Term | Betekenis |
+|---|---|---|
+| `bepaald` | DETERMINISTIC | Wet en gegevens leiden eenduidig tot deze uitkomst; mag als feit worden gepresenteerd |
+| `uitlegbaar` | INTERPRETIVE | Meerdere verdedigbare behandelingen; wij kiezen er één en zeggen welke en waarom |
+| `advies` | ADVISORY | Wij rekenen voor, een mens met vakkennis beoordeelt |
+| `voorbehouden` | PROHIBITED_AUTOMATION | Dit mag RTG niet zelfstandig doen |
+
+De regel eronder: **automatiseer wat objectief automatiseerbaar is, en maak
+nergens zekerheid waar die niet is.**
+
+Drie dingen die niet mogen sneuvelen. Een uitkomst die niemand heeft ingedeeld
+valt terug op de vóórzichtige klasse en zégt dat hij niet is ingedeeld — nooit
+stilzwijgend "bepaald". `voorbehouden` is een grens en geen nog-te-bouwen
+functie; indienen namens een ondernemer, een boete opleggen, een naheffing
+vaststellen en toegang tot een pas beloven staan er alle vier in. En `bepaald`
+betekent "over de uitkomst is geen discussie als de gegevens kloppen", niet
+"gegarandeerd juist" — daarvoor is de bewijsketen er.
+
+De klassen hangen aan de maandboekhouding, de aangifte, de verklaring en de
+zzp-som, en vervangen de vlakke zin ook in de system prompts van de
+AI-boekhouders. CLAUDE.md draagt de merkregel.
+
 ### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
 
 Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om

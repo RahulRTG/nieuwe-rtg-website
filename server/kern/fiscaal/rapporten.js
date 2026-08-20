@@ -1,21 +1,43 @@
 /* Fiscaal (deelmodule): het dagrapport (Z-rapport) en de shift-samenvatting
    van een zaak. Krijgt de gedeelde context een keer bij het opstarten vanuit
-   maakFiscaal in kern/fiscaal.js. */
+   maakFiscaal in kern/fiscaal.js.
+
+   TWEE DINGEN ZIJN HIER RECHTGEZET, en ze hangen samen.
+
+   1. DE CATEGORIE KWAM UIT EEN EIGEN KOPIE. Dit bestand had zijn eigen
+      `basisCat`: alles zonder kamers of ritten werd 'eten'. Dat is precies de
+      regel die ./tarief.js kwam opheffen -- een kledingwinkel rekende daardoor
+      het verlaagde tarief over een jas, en zijn Z-rapport zei iets anders dan
+      zijn maandboekhouding en zijn factuur over dezelfde verkoop. Dat is
+      LAT.md regel 4, en het was de DERDE kopie. Nu vraagt hij het aan dezelfde
+      routine als de rest.
+
+      GEVOLG: voor een zaak zonder kaart, kamers of ritten verandert het
+      Z-rapport van het lage naar het standaardtarief. Dat cijfer hoort te
+      veranderen -- het stond fout.
+
+   2. HET TARIEF KWAM UIT DE LOPENDE TABEL. Een Z-rapport is de afsluiting van
+      EEN DAG, en die dag ligt vaak in het verleden. Het tarief van vandaag
+      erop loslaten laat een afgesloten dag zichzelf herschrijven zodra de
+      Regelwacht iets bijwerkt. Nu vraagt hij de regels van DIE DAG
+      (./regelbron.js) en stempelt erbij waar ze vandaan kwamen. */
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
+const tarief = require('./tarief');
 module.exports = (ctx) => {
   const { db, centen, btwSplit, financeVoor } = ctx;
+  /* De regelbron komt uit maakFiscaal; zonder jaargangen valt hij netjes terug
+     op de lopende tabel en zegt dat ook in de stempel. */
+  const regelbron = ctx.regelbron || require('./regelbron')(null);
   const ordersVoor = typeof ctx.ordersVanZaak === 'function'
     ? ctx.ordersVanZaak
     : code => (db.data.orders || []).filter(o => o.supplierCode === code);
   function dagrapport(s, datum) {
     const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum || '')) ? String(datum) : new Date().toISOString().slice(0, 10);
     const opDag = iso => String(iso || '').slice(0, 10) === dag;
-    const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
-    const L = LANDEN[landCode];
-    const caps = db.capsVan(s);
-    const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
-    const menuStations = new Map((s.menu || []).map(m => [m.name, m.station]));
-    const catVan = naam => menuStations.get(naam) === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat;
+    const landCode = tarief.landVan(s);
+    // de categorie uit DEZELFDE routine als de boekhouding en de factuur
+    const basisCat = tarief.basisCat(s, db.capsVan(s));
+    const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     const potten = {};
     const betaalwijzen = {};
     let bonnen = 0, fooien = 0, omzet = 0;
@@ -39,11 +61,12 @@ module.exports = (ctx) => {
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
     }
-    const btw = Object.entries(potten).map(([cat, o2]) => {
-      const t = L.tarieven[cat] != null ? L.tarieven[cat] : L.tarieven.standaard;
-      return { cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, t) };
-    }).sort((a, b) => b.omzet - a.omzet);
-    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw };
+    // het tarief van DIE DAG, niet dat van vandaag
+    const btw = Object.entries(potten).map(([cat, o2]) =>
+      ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, regelbron.tariefOp(landCode, cat, dag)) }))
+      .sort((a, b) => b.omzet - a.omzet);
+    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw,
+      regelstand: regelbron.stempel(landCode, dag) };
   }
 
   /* De shift-samenvatting: het avondbriefing-moment in een kaart. De cijfers

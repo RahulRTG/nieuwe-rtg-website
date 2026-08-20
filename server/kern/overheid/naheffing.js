@@ -33,6 +33,8 @@
    Krijgt de gedeelde ctx van kern/overheid/index.js. */
 'use strict';
 
+const { zelfdeOgen } = require('../ogen');
+
 /* De verzuimboete (art. 67c AWR) heeft een wettelijk maximum. Dit is een
    demo-benadering met een peiljaar, net als de IB-schijven in ./index.js: werk
    hem bij als het bedrag verandert, en vertrouw hem niet als fiscaal advies. */
@@ -49,7 +51,12 @@ module.exports = (ctx) => {
     return db.data.rijkNaheffingen;
   }
   const vind = (id) => bak().find(n => n.id === String(id || '')) || null;
-  const gelijk = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+  /* Dezelfde ogen tellen niet dubbel -- de vergelijking staat in kern/ogen.js
+     en niet meer hier. Hij stond op vier plekken in huis en liep uiteen: de
+     ene trimde de naam, de andere niet, en dan tekent "A. Bakker " zijn eigen
+     besluit af. Reist via de ctx door naar ./naheffing-daarna.js en
+     ./naheffing-invordering.js, die hem daar al vandaan haalden. */
+  const gelijk = zelfdeOgen;
   const { publiek } = require('./naheffing-vorm')();
 
   /* Wat er over een periode bij een zaak valt na te heffen, uit de aansluiting

@@ -1842,8 +1842,17 @@ const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCa
 
 
 /* De fiscale rekenlaag komt uit kern/fiscaal.js en draagt db + de reken-helpers.
-   financeVoor: de maandboekhouding van de zaak; cannedBoekhouder: de AI-antwoorden. */
-const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, centen, btwSplit });
+   financeVoor: de maandboekhouding van de zaak; cannedBoekhouder: de AI-antwoorden.
+
+   DE JAARGANGEN GAAN LUI MEE. Deze laag wordt hier opgebouwd, maar de
+   Regelwacht -- en daarmee de fiscale jaargangen (kern/fiscaal/jaargangen.js) --
+   ontstaat pas in kernlaag4c, ruim honderd regels verderop. Een directe
+   verwijzing zou hier dus `undefined` opleveren en dan zou de boekhouding voor
+   altijd op de lopende tabel blijven rekenen. Vandaar een functie: hij wordt pas
+   uitgevoerd als er echt een rapport wordt gemaakt, en dan staat de laag er.
+   Hetzelfde idioom als de bevoegdheidslaag hierboven ("lui doorgegeven"). */
+const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, centen, btwSplit,
+  jaargangen: () => kern.regelwacht && kern.regelwacht.jaargangen });
 
 
 // AI-boekhouder voor het Business Pass-lid: wat is per land terug te vorderen

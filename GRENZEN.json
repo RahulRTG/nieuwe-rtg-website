@@ -99,7 +99,9 @@
     "bankhart": [
       "bank",
       "bankLedenAan",
-      "regelwacht"
+      "herkomst",
+      "regelwacht",
+      "zzpwacht"
     ],
     "bedrijf": [
       "agenda",
@@ -264,6 +266,11 @@
     "facturatie": [
       "facturatie"
     ],
+    "fiscaal-vooruit": [
+      "btwAangifte",
+      "scenario",
+      "verbintenis"
+    ],
     "flits": [
       "flitsMeld",
       "flitsRond",
@@ -307,6 +314,10 @@
       "tooManyTries",
       "verzoeklaag",
       "zaakVan"
+    ],
+    "gateway": [
+      "gateway",
+      "mandaat"
     ],
     "gebouw": [
       "gebouw",
@@ -1026,7 +1037,8 @@
       "zorgContact",
       "zorgVan",
       "zorgVoor",
-      "zorgZet"
+      "zorgZet",
+      "zzpwacht"
     ],
     "memo": [],
     "meting": [],
@@ -1612,6 +1624,7 @@
       "TABLE_STATUSES",
       "VAC_SOORTEN",
       "ZAAK_OPTIES",
+      "aansluiting",
       "addTicket",
       "agentBeslis",
       "agentKoppel",
@@ -1730,6 +1743,7 @@
       "happyKorting",
       "hasCred",
       "haversine",
+      "herkomst",
       "horeca",
       "horecaBord",
       "horecaFolioBoek",
@@ -1810,6 +1824,7 @@
       "poortKlaar",
       "posDay",
       "postdatum",
+      "preflight",
       "publicSupplier",
       "pushLive",
       "rampbeeld",

@@ -174,7 +174,11 @@ function maakBtwTelling({ db }) {
     return null;
   }
 
-  return { telFacturen, telPerZaak, tarievenPerTarief, controleerRegister };
+  /* regelBtwCenten gaat mee naar buiten omdat de bewijsketen (./herkomst.js)
+     dezelfde som per regel moet maken. Een verklaring die anders afrondt dan
+     de aangifte die hij verklaart, verklaart niets -- dan wijst hij een
+     verschil aan dat hijzelf heeft gemaakt. */
+  return { telFacturen, telPerZaak, tarievenPerTarief, controleerRegister, regelBtwCenten };
 }
 
 module.exports = { maakBtwTelling, periodeVak, vorigeBtwPeriode, RUBRIEK_NL };

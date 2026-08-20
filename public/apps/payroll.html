@@ -652,6 +652,7 @@ async function toonAangifte(a){
     '<div class="noot h-mt40">' + a.nominatief.length +
       ' werknemer(s) in het nominatieve deel; de optelling daarvan IS het bedrag hierboven.</div>' +
     aansluiting +
+    '<div id="osBewijs"></div><div id="osBewijsUit"></div>' +
     (a.stand === 'ingediend'
       ? '<div class="noot">Ingediend door ' + esc(a.ingediendDoor) + ' op ' + esc(String(a.ingediendOp).slice(0, 10)) +
         ', kenmerk ' + esc(a.kenmerk) + '.</div>'
@@ -664,6 +665,52 @@ async function toonAangifte(a){
     if (!kenmerk) return;
     try { const r = await api('aangifte/indienen', { id: a.id, kenmerk }); meld(r.let); toonAangifte(r.aangifte); }
     catch (e) { meld(e.message); }
+  });
+  bewijsKnoppen(a);
+}
+
+/* ---------- de bewijsketen van de aangifte (server: kern/payroll/herkomst.js)
+
+   Het dossier hieronder gaat van een RUN naar een medewerker; dit gaat van de
+   AANGIFTE omlaag naar de nominatieve regels. Twee ingangen op dezelfde keten,
+   en met opzet geen twee ketens: het detail per medewerker staat in het
+   dossier, en deze weergave VERWIJST ernaar in plaats van het over te tikken.
+
+   Uitzonderingsgestuurd: sluit alles aan, dan staat er een regel dat het
+   aansluit en verder niets. Alleen bevindingen krijgen een pil. */
+function bewijsKnoppen(a){
+  const doel = document.getElementById('osBewijs');
+  if (!doel) return;
+  doel.innerHTML = '<button class="knop" id="osVerklaar">Waarom dit bedrag?</button> ' +
+    '<button class="knop" id="osHerbouw">Herbouw uit de run</button>';
+
+  document.getElementById('osVerklaar').addEventListener('click', async () => {
+    let v; try { v = await api('verklaar', { id: a.id }); } catch (e) { return meld(e.message); }
+    document.getElementById('osBewijsUit').innerHTML =
+      '<div class="sec">Opbouw · ' + esc(v.periode) + '</div>' +
+      v.medewerkers.map(m => '<div class="regel"><b>' + esc(m.naam) + '</b>' +
+        '<span class="kpi">loonheffing ' + eurC(m.ingehoudenLoonheffing) +
+        ' · premies ' + eurC(m.premiesWerkgever) + ' · zvw ' + eurC(m.zvwWerkgever) + '</span></div>').join('') +
+      '<div class="regel"><b>Te betalen</b><span class="r"><b>' + eurC(v.teBetalenCenten) + '</b></span></div>' +
+      (v.regelpakket
+        ? '<div class="noot">Regelpakket ' + esc(v.regelpakket.versie || '?') + ' · ' + esc(v.regelpakket.stand || '?') +
+          (v.regelpakket.goedgekeurdDoor ? ' · aangemerkt door ' + esc(v.regelpakket.goedgekeurdDoor) : '') + '</div>'
+        : '') +
+      (v.sluitAan
+        ? '<div class="noot">De optelling van het nominatieve deel IS het collectieve bedrag, en de loonheffing is wat er op de stroken staat.</div>'
+        : v.bevindingen.map(b => '<div class="regel"><b>' + bevPil('hoog') + ' ' + esc(b.let) + '</b></div>').join('')) +
+      '<div class="noot">' + esc(v.let) + '</div>';
+  });
+
+  document.getElementById('osHerbouw').addEventListener('click', async () => {
+    let h; try { h = await api('herbouw', { id: a.id }); } catch (e) { return meld(e.message); }
+    document.getElementById('osBewijsUit').innerHTML =
+      '<div class="sec">Herbouwd uit de loonrun</div>' +
+      '<div class="regel"><b>' + (h.gelijk ? '<span class="pil">op de cent gelijk</span>' : bevPil('hoog')) +
+        ' ' + esc(h.uitslag) + '</b></div>' +
+      (h.gelijk ? '' : h.verschillen.map(x => '<div class="regel"><b>' + esc(x.rubriek) + '</b>' +
+        '<span class="kpi">aangegeven ' + eurC(x.ingediend) + ' · herbouwd ' + eurC(x.herbouwd) + '</span></div>').join('') +
+        '<div class="regel"><b>Verschil te betalen</b><span class="r">' + eurC(h.verschilCenten) + '</span></div>');
   });
 }
 

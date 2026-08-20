@@ -35,7 +35,14 @@ const fs = require('node:fs');
 /* De vindwijze staat in scripts/lib/scherm.js, want scripts/a11y.js heeft hem
    ook nodig en twee laders van dezelfde browser lopen uiteen (LAT.md regel 4).
    Daar staat ook wat er hier tweeendertig keer misging. */
-const { laadScherm } = require('../scripts/lib/scherm');
+/* EEN LADER VOOR ALLE SCHERMTOETSEN. laadScherm() was de ene helft van een
+   dubbeling en laadBrowser() de andere; ze kwamen uit twee takken die allebei
+   dezelfde 94-voudige kopie opruimden. Hier komen ze samen: laadBrowser doet
+   het werk (hij probeert te STARTEN, niet te laden), laadScherm is de naam
+   waaronder drieendertig toetsen hem al aanroepen. scripts/lib/scherm.js blijft
+   bestaan voor scripts/a11y.js, dat buiten test/ draait. */
+const { laadBrowser } = require('./browser');
+const laadScherm = (opties) => laadBrowser(opties);
 
 // Een vrije poort van het besturingssysteem: bind op 0, lees de toegewezen
 // poort, laat hem meteen weer los en geef hem door aan de kindserver.

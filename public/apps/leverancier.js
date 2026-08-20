@@ -1709,6 +1709,10 @@
       btwDetail(toon)+
       (eerder.length > 1 ? '<div class="tkc-who btw-eerder">'+T('fn.btweerder','Eerder')+': '+
         eerder.slice(1, 6).map(a => escT(a.periode)+' ('+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+')').join(' · ')+'</div>' : '')+
+      /* De bewijsketen onder de aangifte (deel 12a2). Bewust ONDER het detail
+         en niet ernaast: eerst wat er staat, dan waarom het er staat. */
+      btwWaaromKaart(toon)+
+      btwAfsluiting(toon)+
       btwNaheffingen()+
       '</div>';
   }
@@ -1769,6 +1773,7 @@
         btwData = null; await laadBtw();
       } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
     }));
+    btwWaaromBedrading(el); btwAfsluitingBedrading(el);   // deel 12a2; hijst over de bundel heen
     const bD = el.querySelector('#btwDien'); if (bD) bD.addEventListener('click', async () => {
       btwMsg = '';
       try {
@@ -1811,10 +1816,233 @@
             escT(a.ingediendDoor)+' · '+T('fn.btwkenmerk','kenmerk')+' '+escT(a.kenmerk)+'</div>'+
           '<button class="obtn" id="btwCorr" data-p="'+escT(a.periode)+'">'+T('fn.btwmaakcorr','Correctie opmaken')+'</button>'
         : a.periodeLoopt ? ''
-        : '<div class="btw-rij">'+
+        : btwPreflight(a)+
+          '<div class="btw-rij">'+
           '<input class="st-in btw-kenmerk" id="btwKenmerk" placeholder="'+T('fn.btwkenmerk.ph','Kenmerk van de Belastingdienst')+'">'+
           '<button class="obtn primary" id="btwDien" data-id="'+escT(a.id)+'">'+T('fn.btwdien','Indienen vastleggen')+'</button></div>')+
       '</div>';
+  }
+  /* ---- "Waarom?" -- de bewijsketen op het scherm (server: kern/fiscaal/herkomst.js) ----
+
+     De aangifte hierboven zegt een bedrag. Deze kaart vouwt dat bedrag open:
+     per tarief, met de facturen eronder, plus de twee dingen die de server
+     erbij vindt -- of de opbouw aansluit op de telling waar de aangifte op
+     staat, en of er een percentage op een factuurregel staat dat op die dag in
+     dit land niet bestond.
+
+     NET ALS DE KAART HIERBOVEN REKENT DIT SCHERM NIETS UIT. Ook niet "even" de
+     som van de tarieven als controle: dan staat er een derde teller in huis,
+     en die is het vroeg of laat oneens met de andere twee. Wat hier staat komt
+     van /supplier/btw/verklaar, inclusief het oordeel of het aansluit.
+
+     UITZONDERINGSGESTUURD (ONTWERP.md): als alles klopt, staat er een rustige
+     opbouw en verder niets. Alleen wat afwijkt krijgt kleur -- een opbouw die
+     niet aansluit en een tarief dat die dag niet bestond. Een scherm dat bij
+     "alles in orde" een groen vinkje toont, leert de lezer over kleur heen te
+     kijken, en dan valt de ene keer dat het misgaat ook niet meer op.
+
+     Een eigen deelbestand op deze plek in de stroom, vlak na btwDetail: de
+     delen worden rauw aaneengeplakt en delen dus een scope, dus btwKaart() en
+     btwBedrading() in deel 12a kunnen deze functies aanroepen ook al staan ze
+     hier lager -- functiedeclaraties hijsen over het hele bestand. */
+  let waaromData = null, waaromPer = null, waaromBusy = false, herbouwUit = null;
+
+  async function laadWaarom(periode){
+    if (waaromBusy) return;
+    waaromBusy = true; waaromPer = periode; herbouwUit = null;
+    try { waaromData = await API.call('/supplier/btw/verklaar', { periode }); }
+    catch(e){ waaromData = { error: e.message }; }
+    waaromBusy = false;
+    renderStation();
+  }
+
+  /* De klasse van de uitkomst (server: kern/fiscaal/zekerheid.js). Wordt
+     getoond zoals hij binnenkomt: "vastgesteld" onder een getelde opbouw is
+     iets anders dan "vraag een fiscalist" onder een schatting, en dat verschil
+     is precies de bedoeling van die laag. */
+  function waaromKlasse(z){
+    if (!z) return '';
+    return '<div class="tkc-who"><b>'+escT(z.kop || '')+'</b> · '+escT(z.waarom || '')+
+      (z.mits ? ' '+escT(z.mits) : '')+'</div>';
+  }
+
+  function waaromOpbouw(d){
+    const rijen = (d.tarieven || []).map(t =>
+      '<div class="st-row"><span>'+T('fn.wrm.tar','Omzet')+' '+t.tarief+'%'+
+        '<span class="sub">'+T('fn.grondslag','grondslag')+' '+eur(t.grondslagCenten/100)+' · '+
+        (t.facturen || []).length+' '+T('fn.wrm.fact','facturen')+'</span></span>'+
+        '<b class="btw-btw">'+eur(t.btwCenten/100)+'</b></div>'+
+      /* De facturen zelf, ingesprongen: dit is de onderste trede van de keten
+         die de gebruiker hier kan zien. Dieper (de regels van een factuur) zou
+         betekenen dat dit scherm het factuurregister gaat tonen, en daar is de
+         facturenkaart voor. */
+      '<div class="wrm-fact">'+(t.facturen || []).slice(0, 12).map(f =>
+        '<span>'+escT(f.nummer)+' <span class="sub">'+escT(f.datum)+' · '+eur(f.btwCenten/100)+'</span></span>').join('')+
+      ((t.facturen || []).length > 12 ? '<span class="sub">'+T('fn.wrm.meer','en meer')+'</span>' : '')+'</div>').join('');
+    return rijen || '<div class="tkc-who">'+T('fn.btwleeg','Geen facturen in deze periode.')+'</div>';
+  }
+
+  /* De twee bevindingen. Allebei alleen zichtbaar als ze er zijn. */
+  function waaromBevindingen(d){
+    let uit = '';
+    if (d.sluitAan === false)
+      uit += '<div class="tkc-who let"><b>'+T('fn.wrm.scheef','De opbouw sluit niet aan')+'</b> · '+
+        T('fn.wrm.scheef.s','Deze posten tellen niet op tot het bedrag waar de aangifte op staat. Verschil')+
+        ': '+eur((d.afwijkingCenten || 0)/100)+'</div>';
+    const vr = d.vreemdeTarieven || [];
+    if (vr.length)
+      uit += '<div class="tkc-who let"><b>'+T('fn.wrm.vreemd','Een percentage dat die dag niet bestond')+'</b>'+
+        vr.slice(0, 6).map(v => '<div class="sub">'+escT(v.nummer)+' ('+escT(v.datum)+'): '+v.tarief+'% · '+
+          T('fn.wrm.vreemd.s','toen golden hier')+' '+(v.bestond || []).join('%, ')+'%</div>').join('')+
+        (vr.length > 6 ? '<div class="sub">'+T('fn.wrm.meer','en meer')+'</div>' : '')+'</div>';
+    return uit;
+  }
+
+  function btwWaaromKaart(toon){
+    const per = (toon && toon.periode) || null;
+    const d = waaromData;
+    const zelfde = d && !d.error && d.periode === per;
+    return '<div class="btw-blok">'+
+      '<div class="btw-rij"><b>'+T('fn.wrm','Waarom dit bedrag?')+'</b>'+
+        (per ? '<button class="obtn" id="btwWrm" data-p="'+escT(per)+'">'+
+          (waaromBusy ? T('fn.wrm.bezig','Bezig…') : T('fn.wrm.knop','Vouw open'))+'</button>' : '')+
+        (toon && toon.stand === 'ingediend'
+          ? '<button class="obtn" id="btwHerb" data-id="'+escT(toon.id)+'">'+T('fn.wrm.herb','Herbouw dit bedrag')+'</button>' : '')+
+      '</div>'+
+      (d && d.error ? '<div class="tkc-who let">'+escT(d.error)+'</div>' : '')+
+      (zelfde
+        ? '<div class="st-row streep"><span><b>'+T('fn.btwversch','Verschuldigde btw')+'</b>'+
+            '<span class="sub">'+escT(d.van)+' t/m '+escT(d.tot)+' · '+d.facturen+' '+T('fn.wrm.fact','facturen')+'</span></span>'+
+            '<b>'+eur(d.verschuldigdCenten/100)+'</b></div>'+
+          waaromOpbouw(d)+waaromBevindingen(d)+waaromKlasse(d.zekerheid)
+        : '')+
+      /* De uitslag van een herbouw. Groen of rood zonder tussenweg: hij is op
+         de cent gelijk of hij is dat niet, en een "bijna" bestaat hier niet. */
+      (herbouwUit
+        ? '<div class="tkc-who '+(herbouwUit.gelijk ? '' : 'let')+'"><b>'+
+            (herbouwUit.gelijk ? T('fn.wrm.groen','Op de cent gelijk') : T('fn.wrm.rood','Niet gelijk'))+'</b> · '+
+            escT(herbouwUit.uitslag || '')+
+            (herbouwUit.gelijk ? '' : ' '+T('fn.wrm.nu','Nu geteld')+': '+eur(herbouwUit.herbouwd.saldoCenten/100)+
+              ' · '+T('fn.wrm.toen','ingediend')+': '+eur(herbouwUit.ingediend.saldoCenten/100))+'</div>'
+        : '')+
+      '</div>';
+  }
+
+  function btwWaaromBedrading(el){
+    const b = el.querySelector('#btwWrm');
+    if (b) b.addEventListener('click', () => laadWaarom(b.dataset.p));
+    const h = el.querySelector('#btwHerb');
+    if (h) h.addEventListener('click', async () => {
+      btwMsg = '';
+      try { herbouwUit = await API.call('/supplier/btw/herbouw', { id: h.dataset.id }); }
+      catch(e){ toast(e.message); herbouwUit = null; }
+      renderStation();
+    });
+  }
+  /* ---- de afsluiting van de periode en de pre-flight ----
+
+     Afgesplitst van leverancier-12a2.js, dat over de omvanglat ging, en de
+     snee valt op een echte grens: hiernaast staat WAAR EEN BEDRAG VANDAAN KOMT
+     (de bewijsketen), hier staat OF DE PERIODE AF IS en WAT ER GEBEURT ALS JE
+     indient. Terugkijken en vooruitkijken zijn twee vragen.
+
+     Zelfde plek in de stroom, dus zelfde scope: btwKaart() en btwDetail() in de
+     delen hierboven roepen deze functies aan, ook al staan ze lager -- de delen
+     worden rauw aaneengeplakt en functiedeclaraties hijsen. */
+  /* ---- de afsluiting van de periode (server: kern/fiscaal/aansluiting.js) ----
+
+     Drie getallen die samen het kwartaal zijn: bewezen, uitzondering,
+     ontbrekend. De derde is waarom deze kaart bestaat -- geld waar geen
+     controle overheen ligt, ziet er in elk ander overzicht uit als nul.
+
+     De balk is bewust GEEN percentagecijfer alleen: 99,96% leest als "af",
+     terwijl de 0,04% ernaast juist het enige is dat werk vraagt. Dus staan de
+     bedragen erbij, en is de uitzondering de enige die kleur krijgt. */
+  let sluitData = null, sluitBusy = false;
+
+  async function laadSluiting(periode){
+    if (sluitBusy) return;
+    sluitBusy = true;
+    try { sluitData = await API.call('/supplier/btw/afsluiting', { periode }); }
+    catch(e){ sluitData = { error: e.message }; }
+    sluitBusy = false;
+    renderStation();
+  }
+
+  function sluitBalk(d){
+    const t = d.dekking.totaalCenten || 1;
+    const b = (n) => Math.max(0, Math.round((n / t) * 1000) / 10);
+    return '<div class="afs-balk" role="img" aria-label="'+
+        T('fn.afs.bewezen','Bewezen')+' '+d.dekking.bewezenPct+'%, '+
+        T('fn.afs.uitz','Uitzondering')+' '+d.dekking.uitzonderingPct+'%, '+
+        T('fn.afs.ontbr','Ontbrekend')+' '+d.dekking.ontbrekendPct+'%">'+
+      '<span class="afs-b" style="width:'+b(d.dekking.bewezenCenten)+'%"></span>'+
+      '<span class="afs-u" style="width:'+b(d.dekking.uitzonderingCenten)+'%"></span>'+
+      '<span class="afs-o" style="width:'+b(d.dekking.ontbrekendCenten)+'%"></span>'+
+      '</div>';
+  }
+
+  function btwAfsluiting(toon){
+    const per = (toon && toon.periode) || null;
+    const d = sluitData;
+    const zelfde = d && !d.error && d.periode === per;
+    return '<div class="btw-blok">'+
+      '<div class="btw-rij"><b>'+T('fn.afs','Is deze periode af?')+'</b>'+
+        (per ? '<button class="obtn" id="btwAfs" data-p="'+escT(per)+'">'+
+          (sluitBusy ? T('fn.wrm.bezig','Bezig…') : T('fn.afs.knop','Nakijken'))+'</button>' : '')+
+      '</div>'+
+      (d && d.error ? '<div class="tkc-who let">'+escT(d.error)+'</div>' : '')+
+      (zelfde
+        ? sluitBalk(d)+
+          '<div class="st-row"><span>'+T('fn.afs.bewezen','Bewezen')+
+            '<span class="sub">'+d.dekking.bewezenPct+'%</span></span><b>'+eur(d.dekking.bewezenCenten/100)+'</b></div>'+
+          (d.dekking.uitzonderingCenten
+            ? '<div class="st-row"><span class="let">'+T('fn.afs.uitz','Uitzondering')+
+              '<span class="sub">'+d.dekking.uitzonderingPct+'%</span></span><b class="let">'+eur(d.dekking.uitzonderingCenten/100)+'</b></div>' : '')+
+          (d.dekking.ontbrekendCenten
+            ? '<div class="st-row"><span class="let">'+T('fn.afs.ontbr','Ontbrekend')+
+              '<span class="sub">'+T('fn.afs.ontbr.s','geen controle ligt hierover')+' · '+d.dekking.ontbrekendPct+'%</span></span>'+
+              '<b class="let">'+eur(d.dekking.ontbrekendCenten/100)+'</b></div>' : '')+
+          /* De controles zelf: alleen wat niet sluit krijgt kleur. Een rij
+             groene vinkjes leert de lezer over kleur heen te kijken. */
+          d.controles.map(c => '<div class="tkc-who'+(c.stand === 'sluit_aan' ? '' : ' let')+'">'+
+            escT(c.naam)+' · '+escT(c.stand.replace(/_/g, ' '))+
+            (c.let ? '<span class="sub">'+escT(c.let)+'</span>' : '')+'</div>').join('')+
+          '<div class="tkc-who">'+escT(d.let)+'</div>'
+        : '')+
+      '</div>';
+  }
+
+  /* ---- de pre-flight (server: kern/fiscaal/preflight.js) ----
+     Wat er gebeurt als je indient, VOOR de klik. Alleen zichtbaar op een
+     aangifte die nog niet is ingediend en waarvan de periode voorbij is --
+     daarbuiten is er niets te keuren en zou de kaart alleen ruis zijn. */
+  let vlucht = null;
+
+  function btwPreflight(a){
+    if (!a || a.stand === 'ingediend' || a.periodeLoopt) return '';
+    const kleur = vlucht && vlucht.uitslag === 'BLOCK' ? ' let'
+      : vlucht && vlucht.uitslag === 'REVIEW' ? ' let' : '';
+    return '<div class="btw-rij"><button class="obtn" id="btwPre" data-id="'+escT(a.id)+'">'+
+        T('fn.pre','Wat gebeurt er als ik indien?')+'</button></div>'+
+      (vlucht
+        ? '<div class="tkc-who'+kleur+'"><b>'+escT(vlucht.uitslag)+'</b>'+
+          (vlucht.redenen && vlucht.redenen.length
+            ? vlucht.redenen.map(r => '<span class="sub">'+escT(r)+'</span>').join('')
+            : '<span class="sub">'+escT(vlucht.let || '')+'</span>')+'</div>'
+        : '');
+  }
+
+  function btwAfsluitingBedrading(el){
+    const a = el.querySelector('#btwAfs');
+    if (a) a.addEventListener('click', () => laadSluiting(a.dataset.p));
+    const p = el.querySelector('#btwPre');
+    if (p) p.addEventListener('click', async () => {
+      try { vlucht = await API.call('/supplier/btw/preflight',
+        { id: p.dataset.id, kenmerk: (el.querySelector('#btwKenmerk') || {}).value || '' }); }
+      catch(e){ toast(e.message); vlucht = null; }
+      renderStation();
+    });
   }
   // het vakwerk-dashboard (dienstverlenende genres): vandaag-bord, aanvragen, KPI's en AI
   let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false, vakUren = null, vakPro = null;

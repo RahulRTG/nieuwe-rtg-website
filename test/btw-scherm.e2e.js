@@ -13,14 +13,19 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
+/* DE BROWSER KOMT UIT ./browser.js, en niet uit een eigen loader hier. Dat
+   bestand probeert te STARTEN in plaats van te laden: een Playwright zonder
+   bijbehorende Chromium laat de require lukken en pas de launch zakken, en dan
+   valt de toets om op iets dat niets over de code zegt. Er stond hier eerst een
+   eigen terugval op vaste paden -- dat was een 95e kopie van precies het
+   probleem waarvoor ./browser.js is geschreven. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) })).json();

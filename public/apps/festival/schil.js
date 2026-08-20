@@ -122,6 +122,17 @@
     toonBlad(knop.getAttribute('data-blad'));
   });
 
+  /* DE GASTENKANT IS GEEN BLAD MAAR EEN PAGINA, en daarom staat hij hier en niet
+     bij de bladen hierboven: hij heeft geen bank, geen tabs en geen gedeelde
+     staat -- een gast heeft een kaartje en een dag. Wie inricht hoort wel te
+     kunnen zien wat die gast dan ziet, anders is de gastenkant alleen te
+     bereiken met de link uit een pas en staat hij nergens in het huis aan te
+     tikken. */
+  var gastKnop = document.getElementById('fpGast');
+  if (gastKnop) gastKnop.addEventListener('click', function () {
+    location.href = '/apps/festival-gast.html';
+  });
+
   window.RTGFestival = { api: api, staat: staat, opBlad: opBlad, zetStand: zetStand,
     toonBlad: toonBlad, herlaad: start };
   start();

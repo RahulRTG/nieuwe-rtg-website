@@ -61,8 +61,18 @@ function noemt(p) {
      schermen uit terwijl de drie hoofdwerelden er gewoon stonden. Een graaf die de
      verkeerde randen volgt, meet niets. */
   try {
-    for (const m of fs.readFileSync(eigen, 'utf8').matchAll(/<script[^>]+src="(\/[^"]+\.js)"/g)) {
+    const paginabron = fs.readFileSync(eigen, 'utf8');
+    for (const m of paginabron.matchAll(/<script[^>]+src="(\/[^"]+\.js)"/g)) {
       bestanden.push(path.join(WORTEL, 'public', m[1].replace(/^\//, '')));
+    }
+    /* EN DE RELATIEF GELADEN SCRIPTS OOK. Derde keer dat deze graaf de
+       verkeerde randen volgde, en op dezelfde manier als hierboven: het
+       RTFoundation-huis laadt zijn sessielaag als <script src="sessie.js">, en
+       daar staat de hele navigatie van die wereld in (RTGWereld.bestemmingen).
+       Alleen absolute paden lezen betekende dat beheer.html "nergens aan te
+       tikken" heette terwijl hij gewoon in de wereldschil staat. */
+    for (const m of paginabron.matchAll(/<script[^>]+src="([a-z0-9][a-z0-9/-]*\.js)"/g)) {
+      bestanden.push(path.join(WORTEL, 'public', path.posix.dirname(p).replace(/^\//, ''), m[1]));
     }
   } catch (e) { /* pagina onleesbaar: dan levert hij ook geen randen */ }
   for (const kand of [path.join(WORTEL, 'public', 'apps', naam + '.js'),

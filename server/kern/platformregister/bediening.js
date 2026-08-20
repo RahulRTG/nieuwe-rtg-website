@@ -27,6 +27,8 @@ module.exports = [
     'een wettelijk recht is geen functie met een schakelaar'],
   ['/api/toestemming', 'Toestemming', 'Waar een lid ja of nee zegt tegen een verwerking.',
     'zie privacyrechten: de grondslag zelf is niet schakelbaar'],
+  ['/api/inzagekaart', 'De inzagekaart', 'Wie heeft er in uw dossier gekeken, wanneer en met welke reden.',
+    'zien wie in uw gegevens keek is hetzelfde AVG-recht als inzage zelf; een knop die dat dichtzet hoort niet te bestaan'],
   ['/api/metrics', 'Meetpoort', 'De cijfers voor de bewaking, achter een token of het interne net.',
     'de opstelling beslist hier (RTG_METRICS_TOKEN), niet een schakelaar op het bord'],
   ['/api/health', 'Gezondheidscontrole', 'Draait deze server, en is hij klaar voor verkeer.',
@@ -68,5 +70,9 @@ module.exports = [
   ['/werken', 'Wervingsingang', 'De publieke link waarmee een werkgever iemand binnenhaalt; stuurt door naar de inlog.',
     'staat hier als BEKENDE onvolkomenheid: hij hoort vermoedelijk bij de functie Wervingslink (werving), maar hem daar aanhangen verandert wat die schakelaar uitzet'],
   ['/', 'De ingang', 'Wie naar / gaat, komt via een interne herschrijving op de inlog uit.',
-    'de ingang van het huis is geen functie die je uit kunt zetten; zonder ingang is er niets om in te schakelen']
+    'de ingang van het huis is geen functie die je uit kunt zetten; zonder ingang is er niets om in te schakelen'],
+  ['/scriptblok.js', 'Afgesplitst scriptblok', 'Een kaal <script>-blok dat als eigen bestand wordt bezorgd.',
+    'de bezorging van de pagina zelf: zonder deze weg laadt het blok niet en is de pagina stuk, niet uitgeschakeld'],
+  ['/stijlblok.css', 'Afgesplitst stijlblok', 'Een kaal <style>-blok dat als eigen bestand wordt bezorgd.',
+    'zie het scriptblok: sinds style-src een nonce eist verhuist het blok naar een eigen adres, en dat is geen functie']
 ];

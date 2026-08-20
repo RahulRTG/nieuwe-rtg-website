@@ -119,6 +119,10 @@ const KAART = new Map([
   ['kansPoort', ['verfijner', null, 'recht kansenbord.plaatsen binnen auth+pro']],
   ['eigenaarAlleen', ['verfijner', null, 'alleen de eigenaar, binnen techAuth']],
   ['alleenBaas', ['verfijner', null, 'alleen de baas, binnen boardroomAuth of werkmail']],
+  ['eigenAccount', ['verfijner', null,
+    'een eigen RTG-account binnen auth; een anonieme demo-gast heeft er geen']],
+  ['nietBeschermd', ['verfijner', null,
+    'sluit een beschermd kind uit binnen gezinsPoort; de kern weigert al, dit is het antwoord dat het scherm nodig heeft']],
 
   // ---- lichaamssleutel: de sleutel staat in het verzoek, niet in de kop ----
   ['gastAuth', ['lichaamssleutel', null, 'herkent req.body.sleutel als tafelsessie']],

@@ -279,3 +279,34 @@
 .rtg-bedoeling button.doen{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;}
 .rtg-bedoeling button:focus-visible{outline:2px solid var(--rtg-goud);outline-offset:2px;}
 .rtg-bedoeling .fout{color:var(--rtg-sig-incident);font-size:0.85rem;margin-top:var(--rtg-ruim-klein);}
+
+/* ----------------------------------------------------- mijn koppelingen -- */
+/* RTG Link, stap 6 (LINK.md par. 4). Hij leent het blad van het
+   bedoelingsscherm hierboven -- zelfde moment, zelfde huis -- en zet er verder
+   niets nieuws neer: de lijsten zijn gewoon .rtg-register, de openstaande codes
+   dragen een .rtg-rail op "aandacht", en de tijden staan in .wanneer. Wat hier
+   staat is alleen wat een register nog niet had: een kopje, een lege stand, en
+   een knop die in een rij past. */
+.rtg-koppel > .blad{width:min(34rem,100%);}
+.rtg-koppel-kop{
+  font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--rtg-soft);margin:var(--rtg-ruim) 0 0.2rem;
+}
+/* EEN REGISTERRIJ MET EEN KNOP BREEKT OP EEN TELEFOON, en dat is geen detail:
+   met de knop erin duwde "Verzoek verstuurd · Rode Kraanvogel 01E3" zich over
+   vier regels met de tijd ergens in het midden. Gezien op 390px, niet bedacht.
+   De tekst krijgt daarom een eigen minimum en mag groeien; tijd en knop zakken
+   samen naar de volgende regel zodra er geen ruimte is. */
+.rtg-koppel .rtg-register .rij{flex-wrap:wrap;gap:0.45rem var(--rtg-ruim-klein);}
+.rtg-koppel .rtg-register .rij > span:first-child{flex:1 1 12rem;min-width:0;}
+.rtg-koppel-sub{color:var(--rtg-muted);}
+.rtg-koppel-reden{color:var(--rtg-soft);font-size:0.74rem;margin-top:0.15rem;line-height:1.4;}
+.rtg-koppel-leeg{color:var(--rtg-soft);font-size:var(--rtg-tekst);padding:0.6rem 0;}
+.rtg-koppel-knop{
+  min-height:36px;padding:0.3rem 0.8rem;
+  border:1px solid var(--rtg-line);border-radius:var(--rtg-rond-klein);
+  background:transparent;color:var(--rtg-txt);
+  font-family:inherit;font-size:0.78rem;cursor:pointer;white-space:nowrap;
+}
+.rtg-koppel-knop:focus-visible{outline:2px solid var(--rtg-goud);outline-offset:2px;}
+.rtg-koppel-knop[disabled]{opacity:.5;cursor:progress;}

@@ -303,8 +303,8 @@ test('een vraagcode van twee minuten: scannen, zien wat er gebeurt, en pas dan b
   assert.equal(await saldo(boris.token), voorB - 1850, 'en er is echt niet twee keer geboekt');
 
   // en beide kanten hebben hun bon
-  const bonB = (await json(await api('/api/link/bonnen', {}, boris.token))).bonnen;
-  const bonA = (await json(await api('/api/link/bonnen', {}, anna.token))).bonnen;
+  const bonB = (await json(await api('/api/link/koppelingen', {}, boris.token))).bonnen;
+  const bonA = (await json(await api('/api/link/koppelingen', {}, anna.token))).bonnen;
   assert.equal(bonB[0].intentie, 'geld.ontvangen');
   assert.equal(bonA[0].intentie, 'geld.ontvangen.gebruikt');
 });

@@ -4,7 +4,8 @@
 
    - /api/link/los     kijkt wat een gescande code is en wat je ermee KUNT.
                        Doet niets. Zet niets in gang. Verstuurt niets.
-   - /api/link/bonnen  wat je er eerder wel echt mee hebt gedaan.
+   - /api/link/koppelingen  wat er van je openstaat, wat er gebeurd is, en wat
+                       je er nu nog aan kunt doen.
    - /api/link/cap/*   de capability: een code die een HANDELING draagt --
                        maken, aanvaarden, intrekken.
 
@@ -20,7 +21,7 @@
    zelf en niet op de vorm van de kop. */
 module.exports = (kern) => {
   const { app, express, auth, geenGast, liveCodename, supplierAuth, resolveSession, sessionFor,
-          linkLos, linkBonnen, linkCapMaak, linkCapAanvaard, linkCapTrek } = kern;
+          linkLos, linkKoppelingen, linkCapMaak, linkCapAanvaard, linkCapTrek } = kern;
   const wieScant = require('../kern/link/wie')({ sessionFor, resolveSession });
 
   /* Wat een mens intypt of scant. 4 kB is ruim: een RTG-code is hooguit
@@ -33,15 +34,19 @@ module.exports = (kern) => {
     res.json({ type: r.type, wat: r.wat, vorm: r.vorm, onderwerp: r.onderwerp, intenties: r.intenties });
   });
 
-  /* De eigen bonnen. Alleen van jezelf: er gaat geen sleutel mee in het verzoek,
-     dus er is geen weg om in de lijst van een ander te kijken. Een zaak of een
-     medewerker heeft geen handle en dus geen bonnenlijst -- die krijgt een lege,
-     en dat is eerlijker dan een 403 op iets wat gewoon niet bestaat. */
-  app.post('/api/link/bonnen', express.json({ limit: '1kb' }), (req, res) => {
+  /* MIJN KOPPELINGEN (LINK.md par. 4, stap 6). Alleen van jezelf: er gaat geen
+     sleutel mee in het verzoek, dus er is geen weg om in de lijst van een ander
+     te kijken.
+
+     Een zaak heeft wel bonnen (de kassa aanvaardt capabilities) maar geen
+     ledensleutel; die komt binnen op zijn eigen naam. Zo is er een loket voor
+     een vraag die voor allebei hetzelfde is. */
+  app.post('/api/link/koppelingen', express.json({ limit: '1kb' }), (req, res) => {
     const wie = wieScant(req);
     if (!wie) return res.status(401).json({ error: 'Niet ingelogd.' });
-    if (!wie.key) return res.json({ bonnen: [], nietBewaard: 0 });
-    res.json(linkBonnen(wie.key));
+    const mij = wie.key || (wie.code ? wie.soort + ':' + wie.code : null);
+    if (!mij) return res.json({ open: [], bonnen: [], partijen: [], nietBewaard: 0 });
+    res.json(linkKoppelingen(mij, wie));
   });
 
   /* ---------- de capability (kern/link/cap.js) ----------
@@ -81,10 +86,13 @@ module.exports = (kern) => {
     res.json({ ok: true, kaart: r.kaart, uitkomst: r.uitkomst });
   });
 
-  // intrekken zolang er niets mee gebeurd is
+  /* Intrekken zolang er niets mee gebeurd is -- met de code die op je scherm
+     staat (capcode), of met het id waaronder hij in je koppelingen staat. Twee
+     ingangen, want je hebt hem niet altijd bij de hand; een besluit, want de
+     eigenaarscontrole staat in kern/link/cap-beheer.js. */
   app.post('/api/link/cap/trek', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    const r = linkCapTrek(alsLid(req), req.body && req.body.capcode);
+    const r = linkCapTrek(alsLid(req), req.body && req.body.capcode, req.body && req.body.id);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json({ ok: true });
   });

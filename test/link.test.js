@@ -403,17 +403,17 @@ test('scannen doet niets; pas de handeling erna schrijft een bon', async () => {
      (LAT.md regel 9). Zo is deze toets ook echt zakkend gezien. */
   const kijk = await json(await api('/api/link/los', { tekst: 'rtg:pin:' + pin }, dirk.token));
   assert.equal(kijk.onderwerp.codename, carla.codenaam, 'de scan vond Carla');
-  const naKijken = await json(await api('/api/link/bonnen', {}, dirk.token));
+  const naKijken = await json(await api('/api/link/koppelingen', {}, dirk.token));
   assert.deepEqual(naKijken.bonnen, [], 'kijken is geen daad, en dus geen bon');
   const stil = await json(await api('/api/member/connections', {}, carla.token));
   assert.equal((stil.requests || []).length, 0, 'en er ging ook echt niets de deur uit');
 
   // en nu de weg volgen die de intentie noemde
   await json(await api('/api/member/pin/connect', { pin }, dirk.token));
-  const naDoen = await json(await api('/api/link/bonnen', {}, dirk.token));
+  const naDoen = await json(await api('/api/link/koppelingen', {}, dirk.token));
   assert.equal(naDoen.bonnen.length, 1);
   assert.equal(naDoen.bonnen[0].intentie, 'contact.verbinden');
   assert.equal(naDoen.bonnen[0].vorm, 'vast');
-  assert.equal((await json(await api('/api/link/bonnen', {}, carla.token))).bonnen.length, 0,
+  assert.equal((await json(await api('/api/link/koppelingen', {}, carla.token))).bonnen.length, 0,
     'de ontvanger heeft niets gedaan en heeft dus geen bon');
 });

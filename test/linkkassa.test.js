@@ -218,7 +218,7 @@ test('de echte kassa (POS) neemt beide dragers, en int ze langs dezelfde weg', a
 test('beide kanten houden hun bon, ook de zaak', async () => {
   const cap = await maakCap(lid.token, 4000);
   await api('/api/supplier/link/cap/aanvaard', { capcode: cap.token, centen: 1500 }, zaak);
-  const vanLid = (await json(await api('/api/link/bonnen', {}, lid.token))).bonnen;
+  const vanLid = (await json(await api('/api/link/koppelingen', {}, lid.token))).bonnen;
   assert.equal(vanLid[0].intentie, 'geld.kassa.gebruikt', 'het lid ziet dat zijn code gebruikt is');
   assert.equal(vanLid[0].naar, 'supplier:LUCHT', 'en door wie');
 });

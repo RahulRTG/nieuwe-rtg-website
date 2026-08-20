@@ -2589,6 +2589,22 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "linkkoppelingen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "linkkoppelingenui.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "public/shared/linkkoppelingen.js"
+      ],
+      "geprobeerd": 1,
+      "posities": 8
+    },
     "linkscan.e2e.js": {
       "soort": "server",
       "staat": "gezakt",

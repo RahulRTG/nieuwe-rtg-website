@@ -31,7 +31,7 @@ const intenties = require('./intenties');
 
 module.exports = (opties) => {
 const { db, save, crypto, dyncodeGeef, handleVanPin, pinNormaliseer, pinKijk, liveKijk,
-        persoonRate, rate, codenaamVan, zaakVan, nu } = opties;
+        persoonRate, rate, codenaamVan, bandStand, zaakVan, nu } = opties;
 const { duidt, TYPES } = require('./register')({ dyncodeGeef });
 const { bonSchrijf, bonnenVan, BON_MAX } = require('./bonnen')({ db, save, nu });
 /* De capabilitylaag: codes die een HANDELING dragen in plaats van een ding aan
@@ -39,6 +39,20 @@ const { bonSchrijf, bonnenVan, BON_MAX } = require('./bonnen')({ db, save, nu })
    (kern/pay/vraagcode.js is de eerste) -- deze laag kent er zelf geen. */
 const handelingen = require('./handelingen')();
 const cap = require('./cap')({ crypto, dyncodeGeef, codenaamVan, bonSchrijf, handelingen, rate, nu });
+
+/* "Mijn koppelingen": wat er van mij openstaat, wat er gebeurd is, en wat ik er
+   nog aan kan doen. Hij leunt op de drie lagen hierboven en beslist zelf niets
+   over codes -- alleen over wat een mens er nog mee kan (./koppelingen.js). */
+const naamVan = (id) => {
+  const s = String(id || '');
+  if (s.startsWith('supplier:')) {
+    const z = typeof zaakVan === 'function' ? zaakVan(s.slice(9)) : null;
+    return (z && (z.name || z.naam)) || s.slice(9);
+  }
+  return typeof codenaamVan === 'function' ? codenaamVan(s) : s;
+};
+const { koppelingen } = require('./koppelingen')({
+  bonnenVan, capOpenVan: cap.capOpenVan, bandStand, naamVan });
 
 /* Wie mag er een MENS oplossen: alleen een sessie die zelf een mens is. Een zaak
    of een medewerker scant tafels, entrees en betaalcodes; een pin van een lid
@@ -126,5 +140,6 @@ return { linkLos: los, linkBon: bonSchrijf, linkBonnen: bonnenVan,
   linkHandeling: handelingen.registreer, linkHandelingen: handelingen.alle,
   linkCapMaak: cap.capMaak, linkCapKijk: cap.capKijk,
   linkCapAanvaard: cap.capAanvaard, linkCapTrek: cap.capTrek, linkCapOpen: cap.capOpen,
+  linkKoppelingen: koppelingen,
   linkRemReset: rem.remReset, LINK_MIS_PER_MINUUT: rem.MIS_PER_MINUUT, LINK_BON_MAX: BON_MAX };
 };

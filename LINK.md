@@ -325,8 +325,29 @@ paden verhuizen er per stuk naartoe.
 5. **Twee echte intenties.** ✅ *gehaald onderweg.* Verbinden (kost niets) en
    betalen (vraagt alles) lopen allebei over de laag, aan beide uiteinden
    getoetst — inclusief de poorten van RTG Pay, die ook via deze deur gelden.
-6. **Mijn koppelingen.** Bonnenlijst met intrekken per stuk, en per partij het
-   antwoord op "waarom had die toegang".
+6. **Mijn koppelingen.** ✅ *gebouwd op 20 augustus 2026.* `kern/link/koppelingen.js`
+   en `kern/link/cap-beheer.js`, met het scherm in `shared/linkkoppelingen.js` —
+   te openen in de leden-app naast inzage en vergetelheid, want dit gaat niet over
+   je adres maar over wat het huis van je bewaart.
+
+   Drie lijsten die drie verschillende vragen beantwoorden: **wat staat er nu
+   open** (codes van mij die nog leven, met een eigen id om ze weg te halen),
+   **wat is er gebeurd** (de bonnen), en **met wie** (per partij: hoe vaak,
+   wanneer, langs welke weg — het antwoord op "waarom had die toegang" is niet
+   een lijst rechten maar wat er werkelijk tussen jullie gebeurde).
+
+   **Wat er nog aan te doen is, rekent de server uit** en niet het scherm. Dat is
+   een besluit en geen opmaak: een scherm dat zelf gokt welke knop mag, toont
+   vroeg of laat een knop die weigert. En bij geld staat er geen knop maar een
+   reden — een betaling is geen deur die je dichtdoet.
+
+   **Twee dingen die deze stap boven water haalde.** Een openstaande capability
+   heeft nu naast zijn verwijzing (die verzilvert) een eigen **beheer-id** (dat
+   alleen intrekt): een beheerscherm hoort geen tweede manier te zijn om aan een
+   werkende code te komen. En een verstuurd vriendschapsverzoek had helemaal geen
+   weg terug — `/api/member/connect/intrek` bestaat sinds deze stap, want "wat kan
+   ik hier nog aan doen" was daar "niets", niet als besluit maar omdat er nooit
+   een deur voor was gebouwd.
 
 Elke stap krijgt een poort in `test/`, en `LAT.md` regel 2 geldt: een toets die
 je niet hebt zien zakken, is geen toets.

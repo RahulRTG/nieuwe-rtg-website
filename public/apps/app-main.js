@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '077f56e9';
+var RTG_BOUW = 'a228f73e';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -8809,6 +8809,22 @@ var RTG_BOUW = '077f56e9';
   if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
 
   /* ---------- AVG: inzage en vergetelheid ---------- */
+  /* MIJN KOPPELINGEN (RTG Link, LINK.md stap 6). Hij hoort in deze la en niet bij
+     de contactpin: dit gaat niet over je adres maar over wat er met je codes is
+     gebeurd -- naast inzage en vergetelheid, waar het thuishoort.
+
+     Het scherm haalt zelf niets op en voert zelf niets uit: het krijgt `haal` en
+     `doe` mee, want de weg naar de server is van de app (LAT.md regel 4). */
+  const privKoppel = document.getElementById('privKoppel');
+  if (privKoppel) privKoppel.addEventListener('click', () => {
+    if (!API.live){ toast(T('app.priv.needlogin','Log eerst in.')); return; }
+    if (!window.RTGKoppelingen){ toast(T('app.priv.koppelniet','Dit scherm is nog niet geladen.')); return; }
+    RTGKoppelingen.toon(() => API.call('/link/koppelingen', {}), {
+      doe: (weg, lijf) => API.call(String(weg).replace(/^\/api/, ''), lijf),
+      melden: (m) => toast(m)
+    });
+  });
+
   const privExport = document.getElementById('privExport');
   if (privExport) privExport.addEventListener('click', async () => {
     if (!API.live){ toast(T('app.priv.needlogin','Log eerst in.')); return; }

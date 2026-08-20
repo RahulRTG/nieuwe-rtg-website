@@ -28,6 +28,30 @@ function socialAntwoord(mij, ander, action) {
   db.data.connections = db.data.connections.filter(x => x !== c); save();
   return { status: 200, ok: true, st: 'geen' };
 }
+/* EEN VERZOEK DAT IK ZELF STUURDE, WEER INTREKKEN.
+
+   Dit ontbrak, en het viel pas op bij "mijn koppelingen" (LINK.md par. 4, stap
+   6): daar staat wat je met een code in gang hebt gezet, met per regel wat je er
+   nog aan kunt doen. Voor een verstuurd verzoek was het antwoord "niets" -- niet
+   omdat dat een besluit was, maar omdat er nooit een deur voor was gebouwd.
+
+   socialAntwoord doet het spiegelbeeld: die weigert een verzoek dat AAN JOU is
+   gericht (en eist daarom `c.requestedBy !== mij`). Deze doet dat van de andere
+   kant, met dezelfde controle omgedraaid. Een verzoek dat al geaccepteerd is,
+   raakt hij niet aan: dat is geen intrekken maar een vriendschap beeindigen, en
+   dat is een ander gesprek dat zijn eigen weg verdient.
+
+   De ontvanger krijgt geen seintje. Hij hoefde nog niets te doen, en een bericht
+   "iemand die je niet kende heeft zich bedacht" is ruis over iets wat nooit is
+   gebeurd. */
+function socialIntrek(mij, ander) {
+  const c = connectieTussen(mij, ander);
+  if (!c || c.status !== 'pending' || c.requestedBy !== mij)
+    return { status: 404, error: 'Er staat geen verzoek van jou open bij deze codenaam.' };
+  db.data.connections = db.data.connections.filter(x => x !== c); save();
+  return { status: 200, ok: true, st: 'geen' };
+}
+
 // mijn vrienden + openstaande verzoeken
 function socialConnecties(mij) {
   const conns = db.data.connections.filter(c => (c.a === mij || c.b === mij) && verbActief(c)).map(c => {
@@ -83,5 +107,5 @@ function socialGoedkeur(gezinCode, kidHandle, anderHandle, akkoord) {
   save();
   return { status: 200, ok: true, st: verbActief(c) ? 'verbonden' : 'wacht' };
 }
-return { socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur };
+return { socialAntwoord, socialIntrek, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur };
 };

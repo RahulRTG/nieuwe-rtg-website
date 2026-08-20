@@ -543,10 +543,10 @@
       "lifeVoor"
     ],
     "link": [
-      "linkBonnen",
       "linkCapAanvaard",
       "linkCapMaak",
       "linkCapTrek",
+      "linkKoppelingen",
       "linkLos",
       "resolveSession",
       "sessionFor"
@@ -1432,6 +1432,7 @@
       "socialDm",
       "socialDmSend",
       "socialGoedkeur",
+      "socialIntrek",
       "socialTeKeuren",
       "socialVerbind",
       "socialZoek",

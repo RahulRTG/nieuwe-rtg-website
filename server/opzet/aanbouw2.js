@@ -95,6 +95,10 @@ module.exports = function bouwKernAanTwee(kern, grens) {
     /* Dezelfde teller als de pindeur, met dezelfde sleutel: dertig pogingen per
        uur per lid, hoe je ze ook verdeelt over de twee loketten. */
     persoonRate: (mij) => kern.sociaalRate(mij, 'pinzoek', 30, 60 * 60 * 1000),
+    /* De stand van een band, voor "wat kan ik hier nog aan doen" in mijn
+       koppelingen. Uit de sociale kern gehaald en niet nagerekend: of een
+       verzoek nog openstaat is daar de waarheid. */
+    bandStand: (mij, ander) => kern.statusVan(mij, kern.connectieTussen(mij, ander)),
     zaakVan: (code) => kern.findSupplier(code)
   }));
   /* De eerste capability, en hij komt uit het domein dat hem bezit: RTG Pay.

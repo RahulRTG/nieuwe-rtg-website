@@ -21,11 +21,13 @@
    openstaande vraag die een nacht in de database blijft liggen, is precies het
    blijvende ding dat LINK.md par. 3.4 verbiedt.
 
-   TWEE BESTANDEN, TWEE ONDERWERPEN, dezelfde knip als bij de contactpin. Hier
-   woont het BEZIT: de kluis met openstaande codes, het uitgeven, het intrekken,
-   het opzoeken en de kaart. Het AANVAARDEN staat in ./cap-in.js -- daar staat
-   alles wat een aanvaller raakt, en daar wordt de handeling van het domein
-   uitgevoerd. */
+   DRIE BESTANDEN, DRIE ONDERWERPEN, dezelfde knip als bij de contactpin. Hier
+   woont het BEZIT: de kluis met openstaande codes, het uitgeven, het opzoeken en
+   de kaart. Het AANVAARDEN staat in ./cap-in.js -- daar staat alles wat een
+   aanvaller raakt, en daar wordt de handeling van het domein uitgevoerd. Het
+   BEHEER (wat staat er van mij open, en hoe haal ik het weg) staat in
+   ./cap-beheer.js: dat is de kant van de uitgever, met een eigen naam per code
+   en zonder token. */
 'use strict';
 
 const rem = require('./rem');
@@ -116,7 +118,14 @@ function capMaak(uitgever, invoer) {
   const opdracht = def.lees(invoer, uitgever);
   if (!opdracht || opdracht.error) return opdracht || { status: 400, error: 'Deze opdracht kan niet.' };
   const verwijzing = crypto.randomBytes(9).toString('base64url');
-  const cap = { handeling: def.id, uitgeverId: idVan(uitgever), uitgeverKey: uitgever.key || null,
+  /* TWEE NAMEN VOOR EEN CODE, EN DAT IS GEEN VERDUBBELING. De VERWIJZING zit in
+     het ondertekende token en verzilvert; het ID staat in de lijst "mijn
+     koppelingen" en beheert (intrekken). Zou het dezelfde string zijn, dan draagt
+     een beheerscherm -- en elk logboek en elke schermafdruk daarvan -- het deel
+     waarmee je hem kunt gebruiken. Nu kan een gelekt id hooguit iets DICHTdoen
+     van iemand die het al mocht, en dat is de goede kant om fout te gaan. */
+  const id = crypto.randomBytes(6).toString('base64url');
+  const cap = { handeling: def.id, id, uitgeverId: idVan(uitgever), uitgeverKey: uitgever.key || null,
     uitgeverSoort: uitgever.soort, opdracht, vervalt: klok() + def.ttlMs };
   open.set(verwijzing, cap);
   const c = d.maak({ soort: 'cap', code: verwijzing, ttlMs: def.ttlMs });
@@ -130,19 +139,6 @@ function capMaak(uitgever, invoer) {
 
 /* Kijken wat er in staat -- en niets doen. De code gaat hier bewust NIET op:
    een blik op de verkeerde code mag die van iemand anders niet verbranden. */
-/* Intrekken zolang er niets is gebeurd. Er komt geen bon van: intrekken sluit
-   een deur die nooit is doorgelopen, en een bon zonder daad is een bon die niets
-   zegt (LINK.md par. 3.6 gaat over het omgekeerde geval -- daar is er wel iets
-   gebeurd, en dan blijft het staan). */
-function capTrek(uitgever, token) {
-  const r = losOp(token);
-  if (r.fout) return { status: 404, error: WEG };
-  if (!idVan(uitgever) || idVan(uitgever) !== r.cap.uitgeverId)
-    return { status: 403, error: 'Deze code is niet van u.' };
-  open.delete(r.verwijzing);
-  return { status: 200, ok: true };
-}
-
 /* De deur krijgt het gereedschap mee dat hij nodig heeft en raakt de kluis
    verder niet aan: opzoeken, de kaart maken, weten wie iemand is. */
 /* `verbruik` en niet de Map zelf: de deur mag een code OPGEBRUIKEN, niet in de
@@ -151,6 +147,9 @@ function capTrek(uitgever, token) {
    eenmalige code deed niets meer, en test/linkcap.test.js zag het meteen. */
 const verbruik = (verwijzing) => open.delete(verwijzing);
 const { capKijk, capAanvaard } = require('./cap-in')({ losOp, kaartVan, idVan, verbruik, handelingen, bonSchrijf, WEG });
+/* Het beheer krijgt de kluis zelf, want "wat staat er van mij open" is een vraag
+   over de hele kluis en niet over een code. Hij mag lezen en weghalen, meer niet. */
+const { capOpenVan, capTrek } = require('./cap-beheer')({ open, losOp, kaartVan, idVan, opruimen, klok, WEG });
 
-return { capMaak, capKijk, capAanvaard, capTrek, capOpen: open, capHandelingen: handelingen.alle };
+return { capMaak, capKijk, capAanvaard, capTrek, capOpenVan, capOpen: open, capHandelingen: handelingen.alle };
 };

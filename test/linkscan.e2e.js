@@ -147,3 +147,39 @@ test('een pin van een ander wordt een kaart met een verbindknop', { skip: pw ? f
     assert.equal(verzoeken.requests[0].codename, a.codenaam);
   });
 });
+
+test('mijn koppelingen: wat openstaat is er weg te halen, wat gebeurd is blijft staan',
+  { skip: pw ? false : 'geen Playwright' }, async () => {
+  /* De knop uit LINK.md par. 3.6, in een echte browser: intrekken sluit een
+     deur, en de regel over wat er wel is gebeurd blijft er gewoon staan. */
+  await metApp(async ({ pg, base, a, b }) => {
+    // iets dat gebeurd is (een verzoek) en iets dat nog openstaat (een code)
+    const pin = (await api(base, '/api/member/pin', {}, b.token)).body;
+    await api(base, '/api/member/pin/connect', { pin: pin.toon }, a.token);
+    await api(base, '/api/link/cap/maak', { handeling: 'geld.ontvangen', centen: 2500, oms: 'borrel' }, a.token);
+
+    await pg.evaluate(() => document.getElementById('privKoppel').click());
+    await pg.waitForSelector('.rtg-koppel .rtg-register', { timeout: 8000 });
+    const voor = await pg.evaluate(() => document.querySelector('.rtg-koppel .blad').innerText);
+    assert.match(voor, /NU OPEN/);
+    assert.match(voor, /Verzoek verstuurd/);
+
+    // de openstaande code intrekken
+    await pg.click('.rtg-koppel button[data-trek]');
+    await pg.waitForTimeout(1200);
+    const na = await pg.evaluate(() => document.querySelector('.rtg-koppel .blad').innerText);
+    assert.match(na, /geen code van je open/i, 'de code is weg');
+    assert.match(na, /Verzoek verstuurd/, 'en wat er gebeurde staat er nog');
+    assert.equal((await api(base, '/api/link/koppelingen', {}, a.token)).body.open.length, 0,
+      'ook bij de server is hij weg');
+
+    // en het verzoek intrekken laat zijn eigen regel staan
+    await pg.click('.rtg-koppel button[data-bon]');
+    await pg.waitForTimeout(1200);
+    const slot = await pg.evaluate(() => document.querySelector('.rtg-koppel .blad').innerText);
+    assert.match(slot, /Verzoek verstuurd/, 'de bon blijft');
+    assert.match(slot, /staat niet meer open/i, 'met de reden waarom er niets meer kan');
+    assert.equal(((await api(base, '/api/member/connections', {}, b.token)).body.requests || []).length, 0,
+      'en de ander heeft geen verzoek meer');
+  });
+});

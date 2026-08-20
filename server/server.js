@@ -1640,14 +1640,36 @@ const {
    op. Hij wordt hier gebouwd omdat hij ouder moet zijn dan zijn drie gebruikers;
    elk van hen meldt daarna zijn eigen teruggang aan (registreerTeruggang), want
    terugboeken kan alleen in het grootboek waar het geld vandaan kwam. */
+/* DE GEZONDHEID VAN DE RAIL, per capability en niet per platform. Elke
+   inzending zegt of hij lukte; kern/commercie/capgezondheid.js telt en rekent de
+   stand. Zo is "de uitbetaalrail hapert" een eigen antwoord in plaats van een
+   rood lampje over het hele huis.
+
+   HIJ MEET EN HIJ BLOKKEERT NIET. Automatisch de geldrail dichtzetten is
+   precies het soort regel dat eerst een tijd hoort mee te lopen (zie
+   kern/commercie/schaduw.js); wat er nu staat is de meting, en de boardroom kan
+   met de hand in quarantaine zetten. Eerst meten, dan afdwingen. */
+const capGezondheid = require('./kern/commercie/capgezondheid').maakGezondheid({ db, save });
 const betaalOpdrachten = require('./kern/betaalopdracht')({
   d: () => db.data, save, crypto, nu: () => Date.now(), log,
   // aanbieden bij de rail: dezelfde sleutel bij elke poging, zodat een
   // herhaling bij de provider nooit een tweede betaling wordt
-  railInzenden: (o) => betaal.maakUitbetaling({
-    bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
-    referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
-  })
+  railInzenden: async (o) => {
+    try {
+      const uit = await betaal.maakUitbetaling({
+        bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
+        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
+      });
+      capGezondheid.meld('money.payout', true);
+      return uit;
+    } catch (e) {
+      /* De melding mag de fout niet opeten: hij gaat door naar de opdrachtenrij,
+         die hem herhaalt en desnoods terugboekt. Meten is meekijken, niet
+         ingrijpen. */
+      capGezondheid.meld('money.payout', false, (e && e.message) || String(e));
+      throw e;
+    }
+  }
 });
 
 /* De RTFoundation-afdracht (kern/fonds.js): van elke bevestigde maandbetaling
@@ -2133,7 +2155,7 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
@@ -2158,6 +2180,7 @@ const hulp = {
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
+require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt
 require('./opzet/kernlaag3w')(kern, hulp);   // de vier wereldlagen; VOOR 3b, want geldbeleid leest de geldwereld
 require('./opzet/kernlaag3b')(kern, hulp);
 require('./opzet/kernlaag4')(kern, hulp);

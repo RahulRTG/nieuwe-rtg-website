@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4429 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4471 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4429 |
-| servermodules (`server/**/*.js`) | 2470 |
-| routebestanden (`server/routes/**`) | 489 |
-| kernmodules (`server/kern/**`) | 1520 |
+| API-endpoints | 4471 |
+| servermodules (`server/**/*.js`) | 2526 |
+| routebestanden (`server/routes/**`) | 498 |
+| kernmodules (`server/kern/**`) | 1566 |
 | schermen (`public/**/*.html`) | 262 |
 | gedeelde browsermodules (`public/shared/*.js`) | 256 |
-| toetsbestanden (`test/*.test.js`) | 1059 |
-| schermtoetsen (`test/*.e2e.js`) | 153 |
+| toetsbestanden (`test/*.test.js`) | 1079 |
+| schermtoetsen (`test/*.e2e.js`) | 155 |
 
 ## 2. De weg van een verzoek
 
@@ -75,6 +75,7 @@ pinslot
 kernlaag1
 kernlaag2
 kernlaag3
+kernlaag3c
 kernlaag3w
 kernlaag3b
 kernlaag4
@@ -100,14 +101,14 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 203 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 205 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 53 |
-| `member` | 651 | 58 | 10 | 412 |
-| `supplier` | 568 | 105 | 6 | 300 |
-| `office` | 51 | 12 | 3 | 74 |
+| `member` | 664 | 62 | 10 | 414 |
+| `supplier` | 569 | 106 | 6 | 301 |
+| `office` | 51 | 13 | 3 | 75 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 75 | 10 | 31 | 66 |
 | `techniek` | 58 | 15 | 1 | 51 |
@@ -122,7 +123,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 2943 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2971 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -130,9 +131,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1475 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 203 |
-| daarvan door precies één domein | 1272 |
+| kern-namen die routes aanraken | 1484 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 205 |
+| daarvan door precies één domein | 1279 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -144,8 +145,8 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(176) auth(108) supplierAuth(59) officeAuth(37) db(36) liveCodename(29) status(27)
-accounts(23) schoon(22) managerOnly(17) codenaamVan(16) rtf(15) save(14) geenGast(12)
+app(176) auth(108) supplierAuth(59) officeAuth(38) db(36) liveCodename(29) status(27)
+accounts(24) schoon(22) managerOnly(17) codenaamVan(16) rtf(15) save(14) geenGast(12)
 tooManyTries(11) boardroomWie(11) crypto(11) anthropic(11) express(10) findSupplier(10)
 keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9) payrollOS(9) stuur(8)
 noteFailedTry(7) kern(7) sseToOffice(7) mail(6) sseToSupplier(6) pay(6) boardroomAuth(6)

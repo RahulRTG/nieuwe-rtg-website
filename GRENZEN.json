@@ -492,6 +492,10 @@
       "bevoegd",
       "boardroomAuth",
       "boardroomLijst",
+      "commercieRonde",
+      "commercieVerrekening",
+      "fonds",
+      "geldAiInkoopZet",
       "geldBetaaldienst",
       "geldBetaaldienstZet",
       "geldCommissieZet",
@@ -520,6 +524,7 @@
       "wacht",
       "weefsel",
       "werkplaats",
+      "zaakAbonnement",
       "zelfzorg"
     ],
     "klok": [
@@ -785,6 +790,7 @@
       "gegevensNodig",
       "gegevensStart",
       "gegevensZeg",
+      "geldAiInkoop",
       "gemeente",
       "genootschap",
       "genootschapAI",
@@ -1250,7 +1256,8 @@
       "totpOk",
       "trChat",
       "veiligGelijk",
-      "wieKijkt"
+      "wieKijkt",
+      "zaakAbonnement"
     ],
     "onboarding": [
       "eigenaar",

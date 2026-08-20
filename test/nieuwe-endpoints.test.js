@@ -1,6 +1,6 @@
 /* DE NIEUWE ENDPOINTS VAN DE SAMENVOEGRONDE, EEN KEER ECHT AANGEROEPEN.
 
-   WAT DIT IS. Bij het samenvoegen van 23 PR's kwamen 44 nieuwe endpoints
+   WAT DIT IS. Bij het samenvoegen van 24 PR's kwamen 76 nieuwe endpoints
    binnen waar geen enkel testbestand langs ging -- de deltapoort wees ze aan met
    "komt in geen enkel testbestand voor". Dat is de stilste soort risico: ze
    staan in de routetabel, ze halen elke keuring, en niemand heeft ze ooit
@@ -33,6 +33,10 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nieuw-'));
    lijst, dan is er nieuw werk zonder toets bijgekomen; krimpt hij, dan heeft
    iemand er een echte toets voor geschreven en mag hij hier weg. */
 const NIEUW = [
+  '/api/aanmelding/contracten',
+  '/api/aanmelding/opzeggen',
+  '/api/aanmelding/verleng',
+  '/api/betaaldiensttarief',
   '/api/festival/bezetting',
   '/api/festival/control/weg',
   '/api/festival/dienst/weg',
@@ -53,6 +57,10 @@ const NIEUW = [
   '/api/festival/uitzonderingen',
   '/api/festival/verkoop/los',
   '/api/leerstof/pad',
+  '/api/member/ai/beleid',
+  '/api/member/ai/bundel',
+  '/api/member/ai/bundels',
+  '/api/member/ai/tegoed',
   '/api/member/rendezvous/aanwezig/wis',
   '/api/member/rendezvous/akkoord',
   '/api/member/rendezvous/arrange',
@@ -63,25 +71,65 @@ const NIEUW = [
   '/api/member/rendezvous/samen/zet',
   '/api/member/rendezvous/tafel/antwoord',
   '/api/member/rendezvous/tafels',
+  '/api/office/ai/tegoed',
   '/api/office/bank/regels/geraakt',
   '/api/office/bank/regels/geschiedenis',
   '/api/office/bank/regels/zzp',
   '/api/office/bank/regels/zzp/update',
+  '/api/office/commercie/zaakabonnement/zet',
+  '/api/office/commercie/zaakabonnementen',
+  '/api/office/geld/ai-inkoop',
+  '/api/office/gezondheid',
+  '/api/office/gezondheid/quarantaine',
+  '/api/office/gezondheid/vrij',
+  '/api/office/handhaving',
+  '/api/office/handhaving/zet',
+  '/api/office/kernjournaal',
+  '/api/office/prijsgarantie',
+  '/api/office/prijsgarantie/afwijzen',
+  '/api/office/prijsgarantie/rechtzetten',
+  '/api/office/rechten',
+  '/api/office/sociaal',
+  '/api/office/terugval',
+  '/api/office/terugval/bevestig',
+  '/api/office/voornemen/staak',
+  '/api/office/voornemen/teken',
+  '/api/office/voornemens',
   '/api/rtf/leerling/bewijs',
   '/api/rtf/leerling/dag',
   '/api/rtf/leerling/herhaal',
   '/api/rtf/leerling/herhalen',
   '/api/rtf/leerling/pad',
+  '/api/sociaalbeleid',
+  '/api/supplier/abonnement',
   '/api/supplier/btw/afsluiting',
   '/api/supplier/btw/preflight',
   '/api/supplier/gateway/mandaat/intrek',
   '/api/supplier/horeca/gasten',
   '/api/supplier/pay/tegoed/terug',
+  '/api/supplier/prijsgarantie/betwist',
+  '/api/supplier/prijsgarantie/erken',
 ];
 
 /* Rommel die een handler nooit mag laten struikelen: leeg, een verkeerd type,
    en een te lang veld. Geen fuzzing -- drie vormen die in dit huis echt
    voorkomen als een client iets misbegrijpt. */
+/* MET REDEN PUBLIEK, en alleen-lezen. Ze staan hier bij naam omdat een lijst
+   zonder namen een filter is: dan groeit hij en ziet niemand het.
+
+     /api/betaaldiensttarief  het tarief staat in de partnervoorwaarden, en een
+                              bedrag in een juridisch document mag niet los
+                              kunnen lopen van wat de code rekent -- precies hoe
+                              "0% commissie" naast een commissieknop kon blijven
+                              bestaan. Zetten blijft achter de boardroom-poort.
+     /api/sociaalbeleid       dezelfde redenering: de verdeelregels van de
+                              bijdrage zijn een belofte aan leden, dus leesbaar
+                              zonder inlog. */
+const PUBLIEK_MET_REDEN = new Set([
+  '/api/betaaldiensttarief',
+  '/api/sociaalbeleid',
+]);
+
 const ROMMEL = [{}, { id: 12345, code: null }, { naam: 'x'.repeat(5000) }];
 
 test('elk nieuw endpoint bestaat, heeft een poort, en valt niet om op rommel', async () => {
@@ -110,7 +158,7 @@ test('elk nieuw endpoint bestaat, heeft een poort, en valt niet om op rommel', a
         /* En de poort: anoniem hoort er niet in te komen. 400 mag ook -- dan
            struikelt hij op het lijf voordat hij aan de deur toekomt, en dat is
            geen toegang. */
-        if (r.status >= 200 && r.status < 300) zonderPoort.push(pad);
+        if (r.status >= 200 && r.status < 300 && !PUBLIEK_MET_REDEN.has(pad)) zonderPoort.push(pad);
       }
     }
 

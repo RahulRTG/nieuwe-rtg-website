@@ -20,6 +20,7 @@
 'use strict';
 const klok = require('../../lib/klok');
 const { maandCentenUit } = require('../pasprijs');
+const btw = require('../commercie/btw');
 
 const PASNAAM = { rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
 
@@ -58,7 +59,11 @@ function maakFacturen({ i18n, deps }) {
                 (bijdrageCenten == null ? (lang === 'en' ? ' (bespoke)' : ' (prijs op maat)') : '') +
                 (maandNaam(inv.maand, lang) ? ' · ' + maandNaam(inv.maand, lang) : ''),
           // alleen invullen als er echt een prijs IS; anders het bedrag laten staan
-          ...(bijdrageCenten == null ? {} : { netto: 0, bijdrage: Math.round(bijdrageCenten * 1.21) / 100 })
+          /* Het btw-tarief kwam hier als `* 1.21` binnen. Nu uit het
+             btw-profiel (../commercie/btw.js); zonder profiel is dat NL 21%,
+             hetzelfde antwoord als vroeger maar niet langer het enige mogelijke. */
+          ...(bijdrageCenten == null ? {} : { netto: 0,
+            bijdrage: btw.overNetto(bijdrageCenten, md.btwProfiel).brutoCenten / 100 })
         };
       }
       return {
@@ -67,7 +72,7 @@ function maakFacturen({ i18n, deps }) {
         afboeklabel: lang === 'en'
           ? (contrib ? 'subscriptions and memberships' : 'travel and lodging expenses')
           : (contrib ? 'contributies en abonnementen' : 'reis- en verblijfkosten'),
-        btw: Math.round((inv.bijdrage - inv.bijdrage / 1.21) * 100) / 100
+        btw: btw.overBruto(Math.round((inv.bijdrage || 0) * 100), md.btwProfiel).btwCenten / 100
       };
     });
   }

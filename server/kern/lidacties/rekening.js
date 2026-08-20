@@ -9,6 +9,8 @@
 
    Verbatim afgesplitst van bestellen.js zodat beide modules in de 5-10 KB-band
    blijven; de gedeelde context komt een keer bij het opstarten binnen. */
+const subsidie = require('../commercie/subsidie');
+
 module.exports = (ctx) => {
   const { save, findSupplier, ordersVanKlant, fooiUit, pasTegoedToe, verdienPunten,
     ledenvoordeelVoor, keuken, notifySupplier, sseToSupplier, sseToOffice, factuurVoorLid } = ctx;
@@ -78,7 +80,7 @@ module.exports = (ctx) => {
       const k = pasTegoedToe(session.key, o.total);
       if (k) { o.puntenKorting = k; korting += k; }
       const v = ledenvoordeelVoor(s, o.total - k);
-      if (v) { o.regieKorting = v; voordeel += v; }
+      if (v) { o.regieKorting = v; o.voordeelOpbouw = subsidie.opbouwVan(o.total - k, v); voordeel += v; }
       o.paid = true;
       o.paidAt = nu;
       o.rekeningVoldaan = true; // afgerekend als deel van een gezamenlijke rekening
@@ -141,7 +143,22 @@ module.exports = (ctx) => {
     notifySupplier(s.code, { icon: 'rekening', title: 'Rekening voldaan', body: eerste.customerCodename + (eerste.table ? ' · ' + eerste.table : '') + ', ' + bonnen.length + ' bon(nen), ' + aantalItems + ' item(s), € ' + subtotaal + (fooi ? ' · fooi € ' + fooi : '') });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
-    return { ok: true, bijgeladen: geld.bijgeladen || 0, rekening: { supplierName: s.name, aantal: bonnen.length, subtotaal, fooi, puntenKorting: korting, regieKorting: voordeel, betaald: subtotaal + fooi, refs: bonnen.map(o => o.ref) } };
+    /* WAT HET LID BETAALT IS NIET HET SUBTOTAAL. Hier stond `betaald: subtotaal
+       + fooi`, terwijl er twee kortingen boven waren verrekend: het puntentegoed
+       van het lid en het RTG-ledenvoordeel. Het scherm toonde ze als aftrekposten
+       en het gerapporteerde bedrag negeerde ze allebei -- dus de rekening klopte
+       niet met zichzelf.
+
+       De zaak ontvangt WEL het volle subtotaal: dat is de belofte, en het
+       verschil legt RTG bij (kern/commercie/subsidie.js). Beide bedragen staan
+       er nu apart, want ze zijn allebei waar en ze zijn niet hetzelfde. */
+    const lidBetaalt = Math.round((subtotaal - korting - voordeel + fooi) * 100) / 100;
+    return { ok: true, bijgeladen: geld.bijgeladen || 0, rekening: { supplierName: s.name, aantal: bonnen.length, subtotaal, fooi,
+      puntenKorting: korting, regieKorting: voordeel,
+      betaald: lidBetaalt,
+      zaakOntvangt: subtotaal,
+      rtgLegtBij: voordeel,
+      refs: bonnen.map(o => o.ref) } };
   }
 
   return { rekeningVoor, betaalRekeningVoor };

@@ -10,6 +10,8 @@
 // opslaglaag: db.js is een singleton en de index hoort bij de collecties zelf.
 const { orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe } = require('../db');
 
+const subsidie = require('./commercie/subsidie');
+
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive,
@@ -83,7 +85,7 @@ function betaalBoekingVoor(session, body) {
   if (kortingB) b.puntenKorting = kortingB;
   // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij)
   const voordeelB = ledenvoordeelVoor(findSupplier(b.supplierCode), (b.price || 0) - kortingB);
-  if (voordeelB) b.regieKorting = voordeelB;
+  if (voordeelB) { b.regieKorting = voordeelB; b.voordeelOpbouw = subsidie.opbouwVan((b.price || 0) - kortingB, voordeelB); }
   b.paid = true;
   b.paidAt = new Date().toISOString();
   if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';

@@ -1914,6 +1914,19 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
 
     // ---- publieke informatie: staat ook gewoon op de site ----
     ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
+    /* DE DRIE COMMERCIELE FEITEN. Ze staan hier om dezelfde reden als
+       /api/pasprijzen erboven, en ze zijn de reparatie van het gat dat dit hele
+       traject begon: artikel 1 van de partnervoorwaarden beloofde "0% commissie"
+       terwijl de boardroom een commissieknop op 12 procent had. Dat kon bestaan
+       omdat HTML, code en documenten onafhankelijk over hetzelfde getal praatten.
+       De voorwaardenpagina's halen die getallen nu HIER op in plaats van ze zelf
+       op te schrijven -- en een voorwaardenpagina lees je zonder in te loggen,
+       dus een poort ervoor zou betekenen dat de pagina zijn eigen bedragen weer
+       gaat overtypen. Alledrie geven alleen wat er publiek beloofd wordt; er komt
+       geen ledendata langs. */
+    ['/api/claims', 'de publieke claims voeden de voorwaardenpagina\'s, die je zonder inlog leest'],
+    ['/api/betaaldiensttarief', 'het betaaldiensttarief staat in de partnervoorwaarden'],
+    ['/api/sociaalbeleid', 'de sociale afdracht is een publieke belofte (RTFoundation)'],
     ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
     ['/api/gids/app', 'de app-gids is openbaar'],
     ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],

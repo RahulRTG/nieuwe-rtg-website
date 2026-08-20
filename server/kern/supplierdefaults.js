@@ -82,7 +82,12 @@ function ensureSupplierDefaults(s) {
         : /snack|bites|friet|fries|nacho|bitterbal|kroket/.test(t) ? 'snack' : 'warm';
     }
   }
-  if (typeof s.rate !== 'number') s.rate = 0.12;
+  /* De partnervergoeding over omzet is nul (kern/commercie/vergoeding.js). Hier
+     stond 0.12 als terugval; dat was het vierde antwoord op dezelfde vraag,
+     naast de boardroomknop, de seed-tarieven en de 10% in Thuis. Het veld blijft
+     bestaan omdat opgeslagen zaken het dragen, maar niemand rekent er meer mee:
+     commissieVoor() geeft nul, wat hier ook staat. */
+  if (typeof s.rate !== 'number') s.rate = 0;
   // vervoerders: een vloot en een tarief, zodat elke rit direct een vaste
   // nettoprijs krijgt en het kantoor voertuigen aan chauffeurs kan koppelen
   const caps2 = db.capsVan(s);

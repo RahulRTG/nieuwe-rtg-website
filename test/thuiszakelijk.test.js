@@ -55,7 +55,10 @@ test('een zaak zet een huis live en maakt er commercieel aanbod van', async () =
   assert.equal(z.body.huis.btwPct, 10, 'Spanje: logies-btw 10% uit de landtabel');
   assert.match(z.body.huis.btwTekst, /Regelwacht/);
   assert.equal(z.body.huis.zakelijk.maandprijs, 6000);
-  assert.ok(z.body.huis.commissiePct > 0, 'de zaak betaalt de gewone partnercommissie');
+  assert.equal(z.body.huis.commissiePct, 0,
+    'RTG rekent geen commissie over de omzet van een partner (kern/commercie/vergoeding.js). ' +
+    'Dit was tot 20 augustus 2026 de enige plek op het platform waar dat wel gebeurde -- ' +
+    'met een eigen terugval van 10% en over het tarief van het eerste huis van de host.');
 
   // een tweede huis blijft gewoon particulier aanbod van dezelfde zaak
   const r2 = await api('/api/supplier/thuis/huis', { huis: {
@@ -115,7 +118,7 @@ test('op factuur boeken met een kostenplaats, en nooit de belofte dat er betaald
   assert.ok(b.body.reiswijzer, 'de Reiswijzer van Spanje reist gewoon mee');
 });
 
-test('het commerciele bord telt omzet, btw, commissie en wat er netto overblijft', async () => {
+test('het commerciele bord telt omzet, btw en wat er netto overblijft (zonder commissie)', async () => {
   // het verblijf afmaken zodat het meetelt
   const mijn = (await api('/api/thuis/mijn', {}, lid)).body.reizen;
   const ref = mijn.find(x => x.huisId === huisId).ref;
@@ -131,8 +134,10 @@ test('het commerciele bord telt omzet, btw, commissie en wat er netto overblijft
   assert.equal(bord.body.btwAfTeDragen, 96);
   assert.equal(bord.body.omzetInclBtw, 1056);
   assert.equal(bord.body.opFactuur, 1);
-  const verwacht = Math.round((960 - 960 * bord.body.commissiePct / 100) * 100) / 100;
-  assert.equal(bord.body.nettoUitbetaling, verwacht, 'netto = omzet exclusief btw min de commissie');
+  assert.equal(bord.body.commissiePct, 0, 'geen commissie over de omzet van de zaak');
+  assert.equal(bord.body.commissie, 0);
+  assert.equal(bord.body.nettoUitbetaling, 960,
+    'netto = de omzet exclusief btw, onverminderd: RTG houdt er niets van in');
   assert.match(bord.body.uitleg, /0% servicekosten/);
   assert.match(bord.body.uitleg, /nog niets overgemaakt/);
   assert.ok(!/^zaak:/.test(bord.body.zaak), 'de zaakvlag wordt nooit als naam getoond');

@@ -4,9 +4,14 @@
    in de kluis (privacy by design); de codenaam-gids is de enige plek waar leden
    herkenbaar zijn.
 
-   Bij elke pas hoort een maandbijdrage: de gratis app is 0, de RTG Pass en de
-   Lifestyle Pass staan in de geld-regie (standaard 65 en 20.000 ex btw), de
-   Business Pass is prijs op maat. Van elke bijdrage gaat 30% naar de
+   Bij elke pas hoort een maandbijdrage: de gratis app is 0, de RTG Pass (en
+   straks Business Lite) staat in de geld-regie, en de Business Pass en de
+   Lifestyle Pass zijn CONTRACTUEEL -- die dragen geen bedrag in de prijslijst,
+   dus hun omzet komt uit de CONTRACTEN (kern/commercie/contract.js): de som van
+   wat er werkelijk is afgesproken, en geen lijstprijs maal een aantal. Leden op
+   zo'n trede zonder lopend contract staan apart als `zonderContract`, want stil
+   uit het totaal vallen is precies hoe een omzetstaat compleet lijkt terwijl hij
+   het niet is. Van elke bijdrage gaat 30% naar de
    RTFoundation: 20% blijft LOKAAL (de omgeving van het lid) en 10% gaat naar de
    RTFoundation zelf. Dit is een RAPPORTAGE, berekend uit ledental x prijs; er
    wordt nooit geclaimd dat een echte betaling is verwerkt.
@@ -14,14 +19,24 @@
    Schaalvast: de rijen komen begrensd uit de accountlaag (een venster, geen
    miljoenen); bij een echt grootboek zou dit aggregatie-per-facet worden. */
 
-const PAS_VOLGORDE = ['gratis', 'rtg', 'lifestyle', 'business'];
-const PAS_NAAM = { gratis: 'Gratis app', rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
+/* De volgorde en de namen komen uit de ladder (kern/pasladder.js) en staan hier
+   niet nog eens: een trede erbij hoort in EEN lijst te landen, niet in twee.
+   Alleen beschikbare treden -- een pas die nog niet bestaat, heeft geen leden en
+   zou hier als lege regel met nul euro staan. */
+const ladder = require('./pasladder');
+const PAS_VOLGORDE = ladder.treden().filter(t => t.beschikbaar).map(t => t.id);
+const PAS_NAAM = Object.fromEntries(ladder.treden().map(t => [t.id, t.naam]));
 const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
-const { maandCentenVoor } = require('./pasprijs');
+const { maandCentenVoor, contractueel } = require('./pasprijs');
+/* De omzetkant staat apart: dit bestand telt WIE er lid is, dat rekent wat dat
+   opbrengt. Zie ./ledenregister/omzet.js. */
+const { maakOmzet } = require('./ledenregister/omzet');
 
-module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
+module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => {
   const eur = c => Math.round(c) / 100;
+  const { omzetstaat } = maakOmzet({ db, geldPasprijzen, PAS_VOLGORDE, PAS_NAAM,
+    contractueel, maandCentenVoor, eur });
 
   // de pas van een lid: een gast/gratis lid heeft tier 'guest'; wij tonen 'gratis'.
   const pasVan = tier => (tier === 'guest' ? 'gratis' : (PAS_VOLGORDE.includes(tier) ? tier : 'rtg'));
@@ -87,32 +102,7 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
       (!filter.geslacht || m.geslacht === filter.geslacht)
     ).filter(m => m.codenaam).slice(0, 500);
 
-    // de omzet per pas en de 30%-foundationsplit (20% lokaal, 10% RTF)
-    /* Uit ../pasprijs.js, net als het betaalschema en de ledenfacturen. Hier
-       stond `|| 0` als terugval, en dat is stiller dan het lijkt: op een verse
-       installatie (nog niets ingesteld in de boardroom) toonde de omzetstaat dan
-       NUL euro per lid, terwijl het betaalschema wel 65 euro in rekening bracht.
-       Twee kopieen, twee antwoorden op dezelfde vraag. */
-    const prijslijst = (() => { try { const p = geldPasprijzen && geldPasprijzen(); return (p && p.passen) || null; } catch (e) { return null; } })();
-    const maandCenten = { gratis: 0,
-      rtg: maandCentenVoor(prijslijst, 'rtg'), lifestyle: maandCentenVoor(prijslijst, 'lifestyle') };
-    const omzet = PAS_VOLGORDE.map(pas => {
-      const aantal = passen[pas] || 0;
-      const opMaat = pas === 'business';
-      const centenPP = maandCenten[pas] || 0;
-      const maandCentenTot = opMaat ? null : centenPP * aantal;
-      return { pas, pasNaam: PAS_NAAM[pas], aantal, opMaat,
-        prijsPP: opMaat ? null : eur(centenPP), maandOmzet: opMaat ? null : eur(maandCentenTot) };
-    });
-    // totaal alleen over de passen met een bekende prijs (Business is op maat)
-    const totaalCenten = omzet.reduce((s, o) => s + (o.maandOmzet != null ? Math.round(o.maandOmzet * 100) : 0), 0);
-    const split = {
-      totaalOmzet: eur(totaalCenten),
-      foundation30: eur(Math.round(totaalCenten * 0.30)),
-      lokaal20: eur(Math.round(totaalCenten * 0.20)),
-      rtf10: eur(Math.round(totaalCenten * 0.10)),
-      businessOpMaat: (passen.business || 0)
-    };
+    const { omzet, split } = omzetstaat(passen);
 
     return { ok: true,
       totaalGeteld: rijen.length,

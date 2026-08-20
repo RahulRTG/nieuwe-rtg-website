@@ -82,8 +82,36 @@ function makeCodename() {
 /* ondertekening van staatloze tokens (de token-vorm zelf staat in ./users). */
 function sign(body) { return crypto.createHmac('sha256', S.SECRET).update(body).digest('hex').slice(0, 32); }
 
+/* EEN SLEUTEL VOOR EEN ANDER DOEL, AFGELEID EN NIET DE SESSIESLEUTEL ZELF.
+
+   Er zijn buiten deze kluis dingen die ondertekend moeten worden -- het
+   bewijstoken van het controlevlak is de eerste (kern/commercie/bewijstoken/
+   zegel.js). Die mogen niet met S.SECRET tekenen, en niet omdat dat "netter"
+   is: wie op de een of andere manier een handtekening onder zo'n token kan
+   krijgen, zou daarmee anders een SESSIETOKEN kunnen maken. Domeinscheiding
+   kost hier een regel en is later niet meer in te bouwen.
+
+   Vandaar HKDF met het doel als label. De ruwe sleutel verlaat deze module
+   nooit; een aanroeper krijgt alleen een afgeleide, en van een afgeleide kom je
+   niet terug bij de bron. Een leeg doel geeft NIETS terug -- anders is
+   `sleutelVoor()` zonder argument stilzwijgend hetzelfde als een vaste sleutel
+   voor alles, en dan is de scheiding weg zonder dat iemand het merkt. */
+/* De afleiding staat LOS van de kluisstaat, en dat is geen stijlkeuze. Toen zij
+   nog rechtstreeks op S.SECRET stond, gaf `sleutelVoor` in elk toetsproces null
+   -- de kluis is daar niet geinitialiseerd -- en sloeg de toets zichzelf stil
+   over. Drie mutaties liepen er dwars doorheen. Een zuivere functie is te
+   toetsen; een die op modulestaat leunt, doet alsof. */
+function afleidSleutel(basis, doel) {
+  const d = String(doel || '').trim();
+  if (!d || !basis) return null;
+  const b = Buffer.isBuffer(basis) ? basis : Buffer.from(String(basis), 'utf8');
+  if (!b.length) return null;
+  return Buffer.from(crypto.hkdfSync('sha256', b, Buffer.alloc(0), Buffer.from('rtg-doel:' + d), 32));
+}
+function sleutelVoor(doel) { return afleidSleutel(S.SECRET, doel); }
+
 module.exports = {
   CODENAMES, enc, dec, encVeld, decVeld, emailHash, normalizePhone, phoneHash,
-  scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen, makeCodename, sign,
-  SCRYPT_N, SCRYPT_R, SCRYPT_P
+  scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen,
+  makeCodename, sign, SCRYPT_N, SCRYPT_R, SCRYPT_P, sleutelVoor, afleidSleutel
 };

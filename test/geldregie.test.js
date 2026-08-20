@@ -41,15 +41,21 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('1. pasprijzen: gratis blijft gratis, RTG en Lifestyle stelt de boardroom in, publiek zichtbaar', async () => {
+test('1. pasprijzen: de ladder publiek zichtbaar, met bodems die houden', async () => {
   const p = await api('/api/pasprijzen', {});
   assert.equal(p.status, 200);
   assert.equal(p.body.passen.gratis.maandCenten, 0, 'de gratis app kost niets');
   assert.equal(p.body.passen.gratis.vast, true, 'en dat staat vast');
   assert.equal(p.body.passen.rtg.maandCenten, 6500, 'RTG Pass 65 euro ex btw');
   assert.equal(p.body.passen.rtg.rtfCenten, 1950, '30% naar de RTFoundation');
-  assert.equal(p.body.passen.lifestyle.maandCenten, 2000000, 'Lifestyle Pass 20.000 euro');
-  assert.equal(p.body.passen.business.opMaat, true, 'Business is prijs op maat');
+  /* De twee bovenste treden zijn CONTRACTUEEL: een vanaf, geen prijs. Stond hier
+     een maandbedrag, dan zou de voorwaardenpagina een bedrag publiceren dat voor
+     geen enkele klant het afgesproken bedrag hoeft te zijn. */
+  assert.equal(p.body.passen.business.vanafCenten, 500000, 'Business vanaf 5.000 euro');
+  assert.equal(p.body.passen.business.maandCenten, undefined, 'en dus geen maandbedrag');
+  assert.equal(p.body.passen.lifestyle.vanafCenten, 2000000, 'Lifestyle vanaf 20.000 euro');
+  assert.equal(p.body.passen.lifestyle.maandCenten, undefined, 'en dus geen maandbedrag');
+
   // de boardroom zet een nieuwe RTG-prijs en het publieke endpoint volgt meteen
   const zet = await api('/api/office/geld/pasprijs', { pas: 'rtg', euro: 70 }, office);
   assert.equal(zet.status, 200);
@@ -66,28 +72,48 @@ test('1. pasprijzen: gratis blijft gratis, RTG en Lifestyle stelt de boardroom i
   const viaGet = await fetch(base + '/api/pasprijzen').then(async r => ({ status: r.status, body: await r.json() }));
   assert.equal(viaGet.status, 200, 'de publieke prijslijst antwoordt op GET');
   assert.deepEqual(viaGet.body, na.body, 'en geeft exact dezelfde prijzen als de POST');
+
   // de vaste afspraken zijn niet te verzetten
   assert.equal((await api('/api/office/geld/pasprijs', { pas: 'gratis', euro: 5 }, office)).status, 400);
-  assert.equal((await api('/api/office/geld/pasprijs', { pas: 'business', euro: 500 }, office)).status, 400);
+  assert.equal((await api('/api/office/geld/pasprijs', { pas: 'business', euro: 5000 }, office)).status, 400,
+    'ook een bedrag BOVEN de bodem gaat niet in de prijslijst: het hoort op het contract');
+  // en de bodem van de trede zelf houdt, ook via de API
+  assert.equal((await api('/api/office/geld/pasprijs', { pas: 'rtg', euro: 40 }, office)).status, 400,
+    'onder de bodem van 65 euro kan de RTG Pass niet');
   await api('/api/office/geld/pasprijs', { pas: 'rtg', euro: 65 }, office);
 });
 
-test('2. partnervergoeding: standaard per genre, een eigen afspraak per zaak gaat voor', async () => {
+/* WAT HIER STOND was een toets op een knop die niet had moeten bestaan: een
+   partnervergoeding per genre, met een eigen afspraak per zaak die voorging, tot
+   30 procent. Ondertussen beloofden de partnervoorwaarden 0% commissie en
+   printten twee schermen hard "RTG-commissie EUR 0,00".
+
+   De toets was dus groen op gedrag dat in strijd was met het contract -- en dat
+   is de reden dat hij hier vervangen is in plaats van aangepast. De invarianten
+   zelf staan in test/commercie.test.js; dit is de weg erheen via de API. */
+test('2. partnervergoeding: nul, en er valt niets te zetten', async () => {
   const o = await api('/api/office/geld', {}, office);
   assert.equal(o.status, 200);
   const zaak = o.body.zaken.find(z => z.code === 'KIKUNOI');
   genre = zaak.genre;
+  assert.equal(zaak.rate, 0, 'elke zaak staat op nul, wat er ook in haar rij is opgeslagen');
+  assert.equal(o.body.partnervergoeding.overOmzet, 0);
+
+  // en de knop is weg: zetten wordt geweigerd, met de reden en met wat het wel kan zijn
   const g = await api('/api/office/geld/commissie', { genre, pct: 10 }, office);
-  assert.equal(g.status, 200);
-  const na = await api('/api/office/geld', {}, office);
-  assert.equal(na.body.zaken.find(z => z.code === 'KIKUNOI').rate, 0.1, 'de zaak volgt de genre-standaard');
-  // eigen afspraak per zaak wint van de standaard
+  assert.equal(g.status, 400, 'een commissie zetten hoort niet te kunnen');
+  assert.match(g.body.error, /geen commissie/);
   const per = await api('/api/office/geld/commissie', { code: 'KIKUNOI', pct: 12.5 }, office);
-  assert.equal(per.status, 200);
-  const na2 = await api('/api/office/geld', {}, office);
-  assert.equal(na2.body.zaken.find(z => z.code === 'KIKUNOI').rate, 0.125);
-  // grenzen: meer dan 30% is geen vergoeding meer
-  assert.equal((await api('/api/office/geld/commissie', { genre, pct: 40 }, office)).status, 400);
+  assert.equal(per.status, 400, 'ook niet per zaak');
+
+  // en na twee geweigerde pogingen staat alles nog steeds op nul
+  const na = await api('/api/office/geld', {}, office);
+  assert.equal(na.body.zaken.find(z => z.code === 'KIKUNOI').rate, 0);
+
+  // wat RTG wel in rekening kan brengen, staat er benoemd bij
+  assert.ok(na.body.vergoedingssoorten.length >= 4, 'de benoemde diensten staan op het bord');
+  assert.ok(na.body.vergoedingssoorten.every(v => v.overOmzet === false),
+    'en geen ervan neemt een aandeel in de omzet van de partner');
 });
 
 test('3. ledenvoordeel per genre: RTG legt bij; het lid ziet het, de zaak houdt het volle bedrag', async () => {

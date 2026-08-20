@@ -71,7 +71,7 @@ Huis: `/apps/rtg.html` — 46 onderdelen.
 | Live | `link:podium` | `/apps/podium.html` |
 | Films en series | `link:theater` | `/apps/theater.html` |
 | Video | `link:clips` | `/apps/clips.html` |
-| Spelen | `link:spelen` | `/apps/spelen.html?pas=rtg` |
+| Spelen | `link:spelen` | `/apps/spelen.html?pas=` |
 | Nieuws | `link:nieuws` | `/apps/nieuws.html` |
 | Krant | `link:krant` | `/apps/krant.html` |
 | Sport | `link:sport` | `/apps/sport.html` |

@@ -2,6 +2,8 @@
    en tarief, leeftijdsgrens voor jets/helikopters, plannen vooruit, het
    zorgprofiel voor de chauffeur) en betaalRitVoor. Krijgt de gedeelde
    context een keer bij het opstarten vanuit kern/lidacties.js. */
+const subsidie = require('../commercie/subsidie');
+
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,

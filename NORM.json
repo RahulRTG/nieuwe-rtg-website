@@ -10,8 +10,8 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 129,
-    "keuringOmvang": 356,
-    "keuringDubbeling": 337,
+    "keuringOmvang": 361,
+    "keuringDubbeling": 355,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -21,11 +21,11 @@
     "keuringTeGroot": 37,
     "inlineStijlAttributen": 5999,
     "browserpoortToetsen": 207,
-    "kernBreedte": 1475,
-    "kernGedeeld": 203,
+    "kernBreedte": 1484,
+    "kernGedeeld": 205,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 250,
+    "toetsenNietGemeten": 273,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -45,6 +45,32 @@
     "bewijsAchterstand": 985
   },
   "notities": [
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 337,
+      "vervalt": "2026-11-02",
+      "meter": "keuringDubbeling 337 -> 355, keuringOmvang 356 -> 361 (PR #98 erbij, gemeten)",
+      "reden": "De commerciele kern (#98) brengt een eigen woordenschat mee -- capaciteiten, de pasladder, de vergoedingenrij, de subsidie-opbouw -- en die overlapt met wat er al stond. Achttien namen extra in meer dan twee kernmodules, en vijf bestanden extra in de band vlak onder de 10 kB. Deze ronde knipte er juist drie WEL: pay/kassa.js van 11,3 naar 7,0 kB (zeventig regels dode code die na een return stonden), partnerkanaal.js in twee onderwerpen, en de festivalschakelaars naar een eigen catalogusbestand. Aflossen is hernoemen of samenvoegen per naam, en dat deelt de ruime einddatum met de eerdere dubbeling."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "waarheen": "GRENZEN.json, waar de nieuwe namen per domein zijn begrensd (npm run grenslijst)",
+      "meter": "kernBreedte 1475 -> 1484, kernGedeeld 203 -> 205 (PR #98 erbij, gemeten)",
+      "reden": "Negen kern-eigenschappen erbij, twee daarvan gedeeld. Functieprijs en geen erosie: de capabilities en de pasladder zijn met opzet EEN plek waar drie kanten hem vragen -- de poort van het partnerkanaal vraagt nu can_be_partner in plaats van een pas-id te vergelijken, en dat is precies waarom die regel niet hoeft mee te veranderen als er een trede bij komt."
+    },
+    {
+      "datum": "2026-08-21",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 250,
+      "vervalt": "2026-10-01",
+      "meter": "toetsenNietGemeten 250 -> 273 (PR #98 erbij, gemeten)",
+      "reden": "Drieentwintig toetsbestanden extra waar de mutatiemotor nog niet langs is geweest, waaronder test/nieuwe-endpoints.test.js van deze ronde zelf. Die motor draait uren en is hier niet gedraaid; aflossen is een volle ronde npm run mutatie."
+    },
     {
       "datum": "2026-08-21",
       "soort": "schuld",

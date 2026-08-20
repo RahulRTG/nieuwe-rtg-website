@@ -1,112 +1,254 @@
-/* Contracten: elke zaak stelt een contract op (verhuur of personeel), gericht
-   aan een lid (op codenaam) of een personeelslid. Beide partijen tekenen
-   digitaal; pas als beide handtekeningen staan is het contract getekend, en
-   de tekst verandert daarna niet meer.
-   Draai: node --test test/contract.test.js */
+/* ============================================================================
+   HET CONTRACT: maand 13, en de prijs die vaststaat.
+
+   kern/aanmeldingen/betaalschema.js zette twaalf termijnen klaar en hield op.
+   Geen maand 13, geen verlenging, geen opzegging, geen opzegtermijn -- een
+   lidmaatschap liep administratief af zonder dat iemand het besloot.
+
+   De oplossing is niet "genereer meer termijnen", want dan verhuist het
+   probleem naar maand 25. De billing engine vraagt per datum of er een geldige
+   betalingsverplichting is, en maakt dan pas een termijn.
+
+   DE TWEE BEWERINGEN DIE ERTOE DOEN:
+
+     toets 5  maand 13 bestaat als het contract verlengd is, en NIET als het is
+              opgezegd
+     toets 8  een prijswijziging raakt een lopend contract niet -- de afgesproken
+              prijs is een momentopname en wordt nooit opnieuw uit de catalogus
+              gehaald (besluit 20 augustus 2026, COMMERCIE.md 3b)
+
+   Draai los: node --experimental-sqlite --test test/contract.test.js
+   ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { spawn } = require('node:child_process');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { startServer } = require('./helper');
+const { maakContracten, STATUS, magOvergaan, plusMaanden } = require('../server/kern/commercie/contract');
 
-let BASE;
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-con-'));
-let child, lidToken, lidCodenaam, managerToken, balieId, balieToken;
-
-async function api(pad, body, token) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = 'Bearer ' + token;
-  return fetch(BASE + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) });
+const START = '2026-01-15T10:00:00.000Z';
+function verse() {
+  const db = { data: {} };
+  return maakContracten({ db, save: () => {}, nu: () => Date.parse(START) });
 }
-const json = r => r.json();
+function actief(c, opties) {
+  const k = c.open({ pas: 'rtg', naam: 'Lid', startAt: START, afgesprokenCenten: 6500, ...(opties || {}) });
+  c.bied(k); c.accepteer(k); c.activeer(k);
+  return k;
+}
 
-test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
-  const reg = await json(await api('/api/auth/register', { name: 'Contract Lid', email: 'con@x.nl', phone: '0612345695',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
-  lidToken = reg.token;
-  // codenaam ophalen en het lid in de gids zetten (door iets te doen)
-  const conn = await json(await api('/api/member/connections', {}, lidToken));
-  lidCodenaam = conn.codename;
-  const roster = await json(await api('/api/supplier/roster', { code: 'ISLAREN' }));
-  const man = roster.staff.find(x => x.role === 'manager');
-  const balie = roster.staff.find(x => x.role !== 'manager');
-  balieId = balie.id;
-  managerToken = (await json(await api('/api/supplier/login', { code: 'ISLAREN', staffId: man.id, pin: '1234' }))).token;
-  balieToken = (await json(await api('/api/supplier/login', { code: 'ISLAREN', staffId: balie.id, pin: '5678' }))).token;
-});
-test.after(() => {
-  if (child) try { child.kill('SIGKILL'); } catch (e) {}
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+test('1. een contract loopt van CONCEPT naar ACTIEF, en niet in een keer', () => {
+  const c = verse();
+  const k = c.open({ pas: 'rtg', startAt: START, afgesprokenCenten: 6500 });
+  assert.equal(k.status, STATUS.CONCEPT);
+  assert.ok(c.activeer(k).error, 'een concept kan niet meteen actief worden');
+  c.bied(k);
+  assert.equal(k.status, STATUS.AANGEBODEN);
+  c.accepteer(k);
+  assert.equal(k.status, STATUS.GEACCEPTEERD);
+  assert.ok(c.activeer(k).ok);
+  assert.equal(k.status, STATUS.ACTIEF);
 });
 
-test('verhuurcontract aan een lid op codenaam; personeel mag geen contract opstellen', async () => {
-  assert.equal((await api('/api/supplier/contract/maak', { soort: 'verhuur', titel: 'X', tekst: 'x'.repeat(30), codenaam: lidCodenaam }, balieToken)).status, 403);
-  // onbekende codenaam
-  assert.equal((await api('/api/supplier/contract/maak', { soort: 'verhuur', titel: 'Huurcontract', tekst: 'De huurder is aansprakelijk conform de voorwaarden hieronder.', codenaam: 'Bestaat Niet 99' }, managerToken)).status, 404);
-  const c = await json(await api('/api/supplier/contract/maak', {
-    soort: 'verhuur', titel: 'Huurovereenkomst Fiat 500', codenaam: lidCodenaam,
-    tekst: 'De huurder verklaart de auto in goede staat te ontvangen en conform de RTG-voorwaarden te gebruiken.',
-    velden: [{ label: 'Auto', waarde: 'Fiat 500 Cabrio' }, { label: 'Borg', waarde: '300 euro' }]
-  }, managerToken));
-  assert.equal(c.contract.status, 'wacht');
-  assert.equal(c.contract.partij.codename, lidCodenaam);
-  assert.equal(c.contract.velden.length, 2);
-  global.__con = c.contract.ref;
+/* De grendel die voorkomt dat er ooit nog een lidmaatschap loopt waarvan
+   niemand weet wat het kost. */
+test('2. een contract zonder afgesproken bedrag wordt niet actief', () => {
+  const c = verse();
+  const k = c.open({ pas: 'business', startAt: START, afgesprokenCenten: null });
+  c.bied(k);
+  assert.ok(c.accepteer(k).error, 'accepteren zonder bedrag kan niet');
+  assert.ok(c.activeer(k).error, 'en actief worden al helemaal niet');
+  assert.equal(k.status, STATUS.AANGEBODEN, 'de stand is niet stiekem opgeschoven');
+
+  /* De grendel in activeer() apart, want langs de normale weg is hij
+     ONBEREIKBAAR: de statusmachine houdt AANGEBODEN -> ACTIEF al tegen, dus een
+     mutatie die de bedragcontrole weghaalt liet alles groen. Een grendel die
+     geen enkele toets kan laten zakken, bewaakt niets (LAT.md regel 10).
+
+     Hier wordt de enige stand nagebootst waarin hij WEL het verschil maakt: een
+     contract dat GEACCEPTEERD is en waarvan het bedrag daarna is kwijtgeraakt --
+     door een migratie, een handmatige ingreep of een latere fout. Dan hoort
+     actief worden te weigeren in plaats van een lidmaatschap te starten waarvan
+     niemand weet wat het kost. */
+  const stuk = c.open({ pas: 'business', startAt: START, afgesprokenCenten: 500000 });
+  c.bied(stuk); c.accepteer(stuk);
+  stuk.afgesprokenCenten = null;
+  const r = c.activeer(stuk);
+  assert.ok(r.error, 'zonder bedrag hoort actief worden te weigeren');
+  assert.match(r.error, /afgesproken bedrag/);
+  assert.equal(stuk.status, STATUS.GEACCEPTEERD, 'en de stand blijft staan');
 });
 
-test('het lid ziet het contract en tekent digitaal; tekst blijft daarna gelijk', async () => {
-  const mijn = await json(await api('/api/contracten/mijn', {}, lidToken));
-  const c = mijn.contracten.find(x => x.ref === global.__con);
-  assert.ok(c, 'het lid ziet het contract');
-  assert.equal(c.status, 'wacht');
-  const origineel = c.tekst;
-  // tekenen vereist naam + akkoord
-  assert.equal((await api('/api/contract/teken', { ref: global.__con, naam: '' }, lidToken)).status, 400);
-  const t = await json(await api('/api/contract/teken', { ref: global.__con, naam: 'C. Lid', akkoord: true }, lidToken));
-  assert.equal(t.status, 'wacht', 'de zaak moet nog tekenen');
-  // nog een keer tekenen kan niet
-  assert.equal((await api('/api/contract/teken', { ref: global.__con, naam: 'C. Lid', akkoord: true }, lidToken)).status, 409);
-  const na = (await json(await api('/api/contracten/mijn', {}, lidToken))).contracten.find(x => x.ref === global.__con);
-  assert.equal(na.tekst, origineel, 'de tekst is niet gewijzigd door het tekenen');
-  assert.equal(na.getekendDoorMij, true);
+test('3. een verbintenis van twaalf maanden geeft twaalf termijnen, niet dertien', () => {
+  const c = verse();
+  const k = actief(c);
+  const t = c.termijnenTussen(k, k.startAt, c.eindeVerbintenis(k));
+  assert.equal(t.length, 12,
+    'start + 12 maanden is het BEGIN van maand 13 en hoort er niet bij');
+  assert.equal(t[0].vervalt, START, 'de eerste termijn valt op de startdatum');
+  assert.equal(t[11].vervalt, plusMaanden(START, 11), 'en de laatste elf maanden later');
+  assert.equal(t[0].centen, 6500);
 });
 
-test('de zaak tekent de andere kant; dan is het contract volledig getekend', async () => {
-  const t = await json(await api('/api/supplier/contract/teken', { ref: global.__con, naam: 'Carmen Vidal', akkoord: true }, managerToken));
-  assert.equal(t.contract.status, 'getekend');
-  assert.ok(t.contract.tekenZaak && t.contract.tekenPartij);
-  // dubbel tekenen door de zaak kan niet
-  assert.equal((await api('/api/supplier/contract/teken', { ref: global.__con, naam: 'Carmen Vidal', akkoord: true }, managerToken)).status, 409);
+test('4. de billing engine antwoordt per datum, met de reden als het nee is', () => {
+  const c = verse();
+  const k = actief(c);
+  const ja = c.verplichtingOp(k, plusMaanden(START, 3));
+  assert.equal(ja.verschuldigd, true);
+  assert.equal(ja.centen, 6500);
+  assert.equal(ja.termijn, 4);
+
+  assert.equal(c.verplichtingOp(k, '2025-12-01T10:00:00.000Z').reden, 'voor de startdatum');
+  assert.equal(c.verplichtingOp(k, '2026-02-20T10:00:00.000Z').reden, 'geen termijndatum',
+    '"er is niets" en "we weten het niet" zijn niet hetzelfde');
+  const concept = c.open({ pas: 'rtg', startAt: START, afgesprokenCenten: 6500 });
+  assert.match(c.verplichtingOp(concept, START).reden, /CONCEPT/);
 });
 
-test('personeelscontract: getekend door het personeelslid in de PDA, niet door een ander', async () => {
-  const c = await json(await api('/api/supplier/contract/maak', {
-    soort: 'personeel', titel: 'Arbeidsovereenkomst bepaalde tijd', staffId: balieId,
-    tekst: 'Werknemer treedt in dienst als baliemedewerker voor het seizoen, conform de RTG-voorwaarden.',
-    velden: [{ label: 'Functie', waarde: 'Balie' }, { label: 'Uurloon', waarde: '14 euro' }]
-  }, managerToken));
-  const ref = c.contract.ref;
-  // het personeelslid ziet zijn eigen contract via de supplier-sessie (PDA)
-  const mijn = await json(await api('/api/supplier/contracten', {}, balieToken));
-  assert.ok(mijn.contracten.some(x => x.ref === ref), 'de medewerker ziet het eigen contract');
-  // de zaak tekent
-  await api('/api/supplier/contract/teken', { ref, naam: 'Carmen Vidal', akkoord: true }, managerToken);
-  // het personeelslid tekent zijn kant in de PDA
-  const t = await json(await api('/api/supplier/contract/teken', { ref, naam: 'Pau Riera', akkoord: true }, balieToken));
-  assert.equal(t.contract.status, 'getekend');
+/* DE BEWERING. Maand 13 bestaat als het contract verlengd is -- en niet als het
+   is opgezegd. Dat was voorheen niet uit te drukken. */
+test('5. maand 13 bestaat na verlengen, en niet na opzeggen', () => {
+  const c = verse();
+  const k = actief(c);
+  const maand13 = plusMaanden(START, 12);
+
+  assert.equal(c.verplichtingOp(k, maand13).verschuldigd, false,
+    'binnen de eerste verbintenis is maand 13 er nog niet');
+
+  c.verlengbaar(k);
+  c.verleng(k);
+  assert.equal(k.status, STATUS.ACTIEF, 'verlengen zet hem terug op actief');
+  assert.equal(k.periode, 2);
+  assert.equal(c.verplichtingOp(k, maand13).verschuldigd, true, 'en NU bestaat maand 13');
+  assert.equal(c.termijnenTussen(k, k.startAt, c.eindeVerbintenis(k)).length, 24,
+    'twee periodes van twaalf');
+
+  // en het andere pad: opzeggen laat maand 13 juist niet ontstaan
+  const c2 = verse();
+  const k2 = actief(c2);
+  c2.zegOp(k2, plusMaanden(START, 6));
+  assert.equal(k2.status, STATUS.OPZEGGEND);
+  assert.equal(c2.verplichtingOp(k2, maand13).reden, 'na de einddatum');
 });
 
-test('weigeren kan, zolang je nog niet getekend hebt', async () => {
-  const c = await json(await api('/api/supplier/contract/maak', {
-    soort: 'algemeen', titel: 'Aanvullende afspraak', codenaam: lidCodenaam,
-    tekst: 'Dit is een aanvullende afspraak tussen de partijen conform de voorwaarden.'
-  }, managerToken));
-  assert.equal((await api('/api/contract/weiger', { ref: c.contract.ref }, lidToken)).status, 200);
-  const na = (await json(await api('/api/contracten/mijn', {}, lidToken))).contracten.find(x => x.ref === c.contract.ref);
-  assert.equal(na.status, 'geweigerd');
-  // een geweigerd contract kun je niet alsnog tekenen
-  assert.equal((await api('/api/contract/teken', { ref: c.contract.ref, naam: 'C. Lid', akkoord: true }, lidToken)).status, 409);
+test('6. opzeggen kan de minimumtermijn niet inkorten', () => {
+  const c = verse();
+  const k = actief(c);
+  // opzeggen in maand 2, met een opzegtermijn van een maand
+  c.zegOp(k, plusMaanden(START, 1));
+  assert.equal(k.eindigtOp, plusMaanden(START, 12),
+    'de einddatum is het einde van de verbintenis, niet een maand na de opzegging');
+  assert.equal(c.termijnenTussen(k, k.startAt, c.eindeVerbintenis(k)).length, 12,
+    'alle twaalf termijnen blijven verschuldigd');
+});
+
+test('7. laat opzeggen laat de opzegtermijn gelden, niet de minimumtermijn', () => {
+  const c = verse();
+  const k = actief(c, { opzegMaanden: 2 });
+  c.zegOp(k, plusMaanden(START, 11));         // in maand 12 opzeggen
+  assert.equal(k.eindigtOp, plusMaanden(START, 13),
+    'twee maanden na de opzegging, want dat ligt na het einde van de verbintenis');
+});
+
+/* DE TWEEDE BEWERING. Besluit van 20 augustus 2026: een prijswijziging raakt
+   nooit een lopend contract. */
+test('8. de afgesproken prijs is een momentopname en verandert niet mee', () => {
+  const c = verse();
+  const k = actief(c);
+  assert.equal(k.prijsVastTot, plusMaanden(START, 12), 'vast tot het einde van de verbintenis');
+
+  /* Er is geen enkele functie die de prijs van een lopend contract herziet: de
+     catalogus wordt hier niet gelezen, en `verleng` is het enige moment waarop
+     het bedrag mag veranderen. Dat is de hele bescherming. */
+  /* Niet "geen enkele require" -- dat was te grof, en het hield ook de tijdmachine
+     tegen (server/lib/klok.js), die juist een huisregel is. De bewering die telt
+     is smaller: dit bestand mag de PRIJSLAAG niet kennen. Wie pasprijs of
+     pasladder hier binnenhaalt, laat een boardroom-klik landen op een contract
+     dat al getekend is. */
+  const bron = require('fs').readFileSync(require.resolve('../server/kern/commercie/contract.js'), 'utf8');
+  const requires = (bron.match(/require\(['"]([^'"]+)['"]\)/g) || []);
+  const verboden = requires.filter(r => /pasprijs|pasladder|geldregie|catalogus/.test(r));
+  assert.deepEqual(verboden, [], 'de prijslaag hoort hier niet binnen te komen: ' + verboden.join(', '));
+
+  const teller = c.termijnenTussen(k, k.startAt, c.eindeVerbintenis(k));
+  assert.ok(teller.every(t => t.centen === 6500), 'elke termijn draagt het afgesproken bedrag');
+
+  // en bij verlengen MAG hij veranderen -- dat is het enige moment
+  c.verlengbaar(k); c.verleng(k, 7500);
+  assert.equal(k.afgesprokenCenten, 7500);
+  assert.equal(k.prijsVastTot, plusMaanden(START, 24), 'en dan schuift de vaste periode mee');
+  const na = c.termijnenTussen(k, plusMaanden(START, 12), c.eindeVerbintenis(k));
+  assert.ok(na.every(t => t.centen === 7500), 'de nieuwe periode draagt het nieuwe bedrag');
+});
+
+test('9. de statusmachine weigert een sprong die niet mag', () => {
+  assert.equal(magOvergaan(STATUS.ACTIEF, STATUS.VERLENGBAAR), true);
+  assert.equal(magOvergaan(STATUS.GEEINDIGD, STATUS.ACTIEF), false, 'geeindigd is een eindstand');
+  assert.equal(magOvergaan(STATUS.CONCEPT, STATUS.ACTIEF), false, 'niet in een keer van concept naar actief');
+  assert.equal(magOvergaan(STATUS.OPZEGGEND, STATUS.ACTIEF), false, 'een opzegging draai je niet stil terug');
+
+  const c = verse();
+  const k = actief(c);
+  c.beeindig(k);
+  const weer = c.verleng(k);
+  assert.ok(weer.error, 'en de weigering komt als fout terug');
+  assert.equal(k.status, STATUS.GEEINDIGD);
+});
+
+test('10. een contract dat niet verlengt, verlengt ook echt niet', () => {
+  const c = verse();
+  const k = actief(c, { verlenging: 'geen' });
+  c.verlengbaar(k);
+  const r = c.verleng(k);
+  assert.ok(r.error);
+  assert.match(r.error, /eindigt op de afgesproken datum/);
+});
+
+/* Een maandbijdrage die op de 31e begint, hoort in februari niet op 3 maart te
+   vallen. Dit is de reden dat er met maanden wordt gerekend en niet met dagen. */
+test('11. maandrekenen klemt op de laatste dag van de maand', () => {
+  assert.equal(plusMaanden('2026-01-31T10:00:00.000Z', 1).slice(0, 10), '2026-02-28');
+  assert.equal(plusMaanden('2028-01-31T10:00:00.000Z', 1).slice(0, 10), '2028-02-29', 'schrikkeljaar');
+  assert.equal(plusMaanden('2026-01-31T10:00:00.000Z', 3).slice(0, 10), '2026-04-30');
+  assert.equal(plusMaanden('2026-01-15T10:00:00.000Z', 12).slice(0, 10), '2027-01-15');
+});
+
+test('12. verlooptBinnen vindt de contracten waar iets moet gebeuren', () => {
+  const c = verse();
+  const k = actief(c);
+  assert.equal(c.verlooptBinnen(30, START).length, 0, 'aan het begin nog niet');
+  /* 45 en niet 30: tussen 15 december en 15 januari zitten 31 dagen, dus een
+     venster van precies 30 valt er een dag naast. Dat is geen fout in de code
+     maar een randgeval in de toets -- en het is de reden dat een
+     herinneringsronde ruimer moet kijken dan de kalendermaand suggereert. */
+  const bijna = c.verlooptBinnen(45, plusMaanden(START, 11));
+  assert.equal(bijna.length, 1, 'een maand voor het einde van de verbintenis wel');
+  assert.equal(bijna[0].id, k.id);
+  assert.equal(c.verlooptBinnen(5, plusMaanden(START, 11)).length, 0,
+    'en een venster van vijf dagen vindt hem nog niet');
+});
+
+/* PRIVACY BY DESIGN, en dit is geen theorie: test/vergeten-gezelschap.test.js
+   vond dat de contractentabel de NAAM van een lid bewaarde, en dat die na een
+   verwijderverzoek bleef staan. Het recht op vergetelheid was daarmee gebroken
+   op een plek die niemand zou hebben nagekeken.
+
+   De regel van dit huis: operationele data draait op codenamen, de echte naam
+   staat in de identiteitskluis. Een tweede kopie ergens anders maakt die
+   scheiding waardeloos. Een contract heeft de naam ook niet nodig --
+   `aanmeldingId` wijst naar het dossier waar hij hoort, en die laag kent de
+   vergeetregels al. */
+test('13. een contract draagt geen persoonsnaam, ook niet als je hem meegeeft', () => {
+  const c = verse();
+  const k = c.open({ pas: 'lifestyle', aanmeldingId: 'a1', naam: 'Jan Jansen',
+    contact: 'jan@voorbeeld.test', startAt: START, afgesprokenCenten: 2000000 });
+
+  const rauw = JSON.stringify(k);
+  assert.doesNotMatch(rauw, /Jan Jansen/,
+    'een meegegeven naam hoort niet in de rij te belanden; er is geen veld waar hij in past');
+  assert.equal(k.naam, undefined);
+  assert.equal(k.aanmeldingId, 'a1', 'de verwijzing naar het dossier blijft wel');
+
+  // en ook niet via de publieke vorm, want dat is wat een scherm te zien krijgt
+  assert.doesNotMatch(JSON.stringify(c.publiek(k)), /Jan Jansen/);
+
+  // de hele tabel, want dat is wat een vergeet-sweep afloopt
+  assert.doesNotMatch(JSON.stringify(c.rij()), /Jan Jansen/);
 });

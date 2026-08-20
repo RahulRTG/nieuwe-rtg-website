@@ -53,6 +53,20 @@ module.exports = [
     vermogen: 'WALLET_SALDO' },
   { id: 'gld-prijzen', categorie: 'Geld', naam: 'Pasprijzen en balans', standaard: true, doelgroepen: ALLE,
     uitleg: 'De publieke prijslijst van de passen en het balansoverzicht van een lid.', paden: ['/api/pasprijzen', '/api/balans'] },
+  /* De commerciele kern naar buiten. Deze drie zijn PUBLIEK omdat ze in de
+     voorwaarden staan: een bedrag of een percentage in een juridisch document
+     dat los kan lopen van wat de code rekent, is precies hoe "0% commissie"
+     naast een commissieknop kon blijven bestaan. De pagina haalt ze hier op in
+     plaats van ze zelf op te schrijven. */
+  { id: 'gld-claims', categorie: 'Geld', naam: 'Commerciele claims en tarieven', standaard: true, doelgroepen: ALLE,
+    uitleg: 'Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is. Voedt de voorwaardenpagina\'s.',
+    paden: ['/api/claims', '/api/betaaldiensttarief', '/api/sociaalbeleid'] },
+  { id: 'gld-prijsgarantie', categorie: 'Geld', naam: 'Ledenprijsgarantie melden', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Een lid meldt dat het bij de zaak zelf goedkoper zag; de zaak erkent of betwist, en het verschil wordt rechtgezet.',
+    paden: ['/api/member/prijsgarantie'] },
+  { id: 'gld-aitegoed', categorie: 'Geld', naam: 'AI-tegoed en bundels', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De stand van het inbegrepen AI-tegoed, wat er bij het plafond gebeurt, en het bijkopen van een bundel.',
+    paden: ['/api/member/ai'] },
 
   // ---------- de rest, met naam ----------
   { id: 'ov-stad', categorie: 'Diensten (leden)', naam: 'Stad en zaakdoos', standaard: true, doelgroepen: LEDEN,

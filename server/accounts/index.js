@@ -134,6 +134,9 @@ module.exports = {
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   moetVernieuwen: kluis.moetVernieuwen,
+  /* Een afgeleide sleutel voor een ander doel; de ruwe sessiesleutel verlaat de
+     kluis nooit. Zie ./kluis.js voor waarom dat geen netheid maar scheiding is. */
+  sleutelVoor: kluis.sleutelVoor,
   ...users,
   ...staff
 };

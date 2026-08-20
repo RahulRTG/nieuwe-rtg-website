@@ -104,6 +104,52 @@ bewijst geen mens, een sticker is geen bron van gezag, en alles wat met een oude
 foto nog iets in gang kan zetten hoort tijdelijk te zijn. Er komt geen tweede
 scanner, geen tweede parser en geen tweede rem naast de huisbrede uit
 `server/kern/sociaal/pin-deur.js`.
+**`COMMERCIE.md` is de Commercial Core** — het commerciële subsysteem onder de
+prijslijst, in `server/kern/commercie/`: catalogus (`../pasladder.js`), pricing
+(`../pasprijs.js`), contract, verbruik (`tegoed.js`), vergoedingen, subsidie,
+fee, allocatie, btw en claims. Drie prijsmechanismen (free, fixed, contract) en
+het onderscheid dat alles bij elkaar houdt: **catalogusprijs ≠ contractprijs ≠
+factuurbedrag**. Vijf regels die er hard staan: de partnervergoeding over omzet
+is **nul** en dat is geen instelling; een **bodem is geen prijs** en mag nooit op
+een factuur belanden; het ledenvoordeel heeft **vier** bedragen met de invariant
+`lid + RTG === bruto === zaak`; een **prijswijziging raakt geen lopend contract**;
+en er ontstaan **nooit ongemerkt** variabele kosten (AI boven het tegoed vraagt
+altijd een keuze vooraf, en automatisch aanvullen vraagt een maandmaximum).
+`claims.poort()` is de release-gate: een bewering die zich AFGEDWONGEN noemt
+zonder toets, komt er niet door. Lees COMMERCIE.md als je aan de structuur werkt,
+PRIJZEN.md als je een bedrag zoekt.
+
+**`PRIJZEN.md` is de commerciële architectuur** — de ladder (gratis, RTG Pass
+65, Business Lite 150, Business vanaf 5.000, Lifestyle vanaf 20.000) en de
+prijsformule waar alles aan hangt: **prijs = toegang + verbruik +
+verantwoordelijkheid**. Lees die vóór je aan een prijs, een bundel of een
+factuurregel werkt. De harde regel daar: **een bodem is geen prijs** — een
+ondergrens weigert invoer en toont "vanaf", en mag nooit op een factuur belanden
+(dat is de € 9.075-fout uit `kern/pasprijs.js`, met een nieuw getal). De ladder
+staat op één plek, `kern/pasladder.js`; `test/pasladder.test.js` handhaaft de vier
+regels die machinaal te handhaven zijn. Paragraaf 4 is de eerlijke lijst open
+gaten — waaronder drie plekken waar de code iets anders doet dan de
+partnervoorwaarden beloven.
+
+**`CONTROLPLANE.md` is het Economic Control Plane** — de laag die vóór iedere
+economische handeling bepaalt of zij mag, en achteraf kan bewijzen waarom. Lees
+die met COMMERCIE.md ernaast: dat beschrijft wat iets kost, dit wie iets mag.
+Vier regels dragen het geheel, en alle vier komen ze uit een fout die hier echt
+is gemaakt: **geen belofte zonder afdwingbare capability, geen capability zonder
+caller, geen bevoegdheid zonder oorsprong, geen economische actie zonder bewijs.**
+
+De drie die je het snelst nodig hebt: een bevoegdheid is **geen ja of nee** maar
+vier dimensies (wat, waar, hoeveel, wanneer) en **delegatie kan alleen
+versmallen** — structureel, niet als vuistregel. Een besluit kent **acht
+uitkomsten** en "nee" is er maar één van; `ONBEKEND` is met opzet géén synoniem
+van `WEIGEREN`, want een storing hoort niet te klinken als een overtreding. En
+een nieuwe handhavingsregel **loopt eerst mee** zonder te blokkeren: je kunt niet
+afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
+
+`scripts/capabilities.js` is de meting die dit document eerlijk houdt — hij telt
+per capability of er ergens een caller is, en hij vond er vijf die er geen
+hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
+lijst van wat er nog openstaat.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

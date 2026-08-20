@@ -11,9 +11,12 @@
 
    1. Wie de prijs in de boardroom veranderde, zag het lid nog de OUDE prijs op
       zijn factuur -- terwijl het betaalschema wel met de nieuwe rekende.
-   2. De Business Pass is volgens de regie nadrukkelijk `opMaat: true` en heeft
+   2. De Business Pass is volgens de regie nadrukkelijk contractueel en heeft
       dus GEEN maandprijs. De factuur zette er 7500 x 1,21 = 9.075 euro op. Een
-      bedrag dat nergens is afgesproken.
+      bedrag dat nergens is afgesproken. (Sinds de ladder van 20 augustus 2026
+      geldt hetzelfde voor de Lifestyle Pass, en heeft elke trede bovendien een
+      BODEM -- die keurt invoer en is nadrukkelijk geen prijs; zie
+      test/pasladder.test.js toets 5.)
 
    En een derde die pas opviel bij het samenvoegen: het ledenregister viel terug
    op `|| 0`. Op een verse installatie (nog niets ingesteld) toonde de omzetstaat
@@ -29,7 +32,7 @@ const { maandCentenVoor, maandCentenUit, STANDAARD } = require('../server/kern/p
 
 test('1. zonder ingestelde prijs geldt de standaard, niet nul', () => {
   assert.equal(maandCentenVoor(null, 'rtg'), 6500, 'RTG valt terug op 65 euro');
-  assert.equal(maandCentenVoor({}, 'lifestyle'), 2000000, 'Lifestyle op 20.000 euro');
+  assert.equal(maandCentenVoor({}, 'business-lite'), 15000, 'Business Lite op 150 euro');
   assert.equal(maandCentenVoor(null, 'gratis'), 0, 'de gratis app is echt gratis');
   /* Dit is de bewering die het ledenregister miste: `|| 0` als terugval maakt
      van "nog niet ingesteld" stilzwijgend "gratis". */
@@ -37,12 +40,17 @@ test('1. zonder ingestelde prijs geldt de standaard, niet nul', () => {
 });
 
 test('2. een ingestelde prijs wint van de standaard', () => {
-  const lijst = { rtg: { maandCenten: 9900 }, lifestyle: { maandCenten: 1500000 } };
+  const lijst = { rtg: { maandCenten: 9900 }, 'business-lite': { maandCenten: 25000 } };
   assert.equal(maandCentenVoor(lijst, 'rtg'), 9900);
-  assert.equal(maandCentenVoor(lijst, 'lifestyle'), 1500000);
-  // en nul is een geldige keuze, geen "niet ingesteld"
+  assert.equal(maandCentenVoor(lijst, 'business-lite'), 25000);
+  /* Deze functie LEEST de prijslijst en keurt hem niet: de bodem wordt bewaakt
+     waar een bedrag binnenkomt (geldregie -> pasladder.keurCenten), niet hier.
+     Zou hij hier ook keuren, dan bestonden er twee plekken die "mag dit bedrag"
+     beantwoorden -- precies de kopie-fout waar dit bestand voor gemaakt is. Een
+     bedrag dat toch onder de bodem in de opslag staat, wordt getoond zoals het
+     er staat; het wordt niet stilzwijgend opgehoogd. */
   assert.equal(maandCentenVoor({ rtg: { maandCenten: 0 } }, 'rtg'), 0,
-    'wie de RTG Pass op nul zet, bedoelt nul');
+    'wat er staat, staat er -- deze laag verzint niets bij');
 });
 
 /* DE BEWERING DIE ERTOE DOET. Business is prijs op maat: er IS geen bedrag, en
@@ -71,9 +79,16 @@ test('5. de standaard hier is dezelfde als die van de geld-regie zelf', () => {
   const passen = geldPasprijzen().passen;
   assert.equal(passen.rtg.maandCenten, STANDAARD.rtg,
     'de regie en pasprijs.js vallen op hetzelfde bedrag terug (RTG)');
-  assert.equal(passen.lifestyle.maandCenten, STANDAARD.lifestyle,
-    'idem Lifestyle');
-  assert.equal(passen.business.opMaat, true, 'en de regie noemt Business zelf op maat');
+  assert.equal(passen['business-lite'].maandCenten, STANDAARD['business-lite'],
+    'idem Business Lite');
+  /* De contractuele treden horen aan BEIDE kanten geen bedrag te hebben. Stond
+     er hier een getal en daar null (of andersom), dan zou een verse installatie
+     iets anders tonen dan ze berekent. */
+  for (const pas of ['business', 'lifestyle']) {
+    assert.equal(STANDAARD[pas], null, pas + ' heeft geen standaardbedrag');
+    assert.equal(passen[pas].opMaat, true, 'en de regie noemt ' + pas + ' zelf contractueel');
+    assert.equal(passen[pas].maandCenten, undefined, pas + ' draagt geen maandbedrag in de prijslijst');
+  }
   // en de helper leest de regie ook echt
   assert.equal(maandCentenUit(geldPasprijzen, 'rtg'), STANDAARD.rtg);
 });

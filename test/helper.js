@@ -410,7 +410,22 @@ async function elevateTier(base, memberToken, pas, approverToken) {
   if (!id) throw new Error('elevateTier: aanvraag mislukt (' + JSON.stringify(aanvraag).slice(0, 120) + ')');
   let goedkeurder = approverToken;
   if (pas === 'lifestyle' || pas === 'business') goedkeurder = (await kantoorAlsPersoon(base)) || approverToken;
-  const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, goedkeurder);
+
+  /* EN HET AFGESPROKEN BEDRAG. Sinds de ladder (server/kern/pasladder.js) hebben
+     Business en Lifestyle geen lijstprijs meer: hun hoogte staat op het contract
+     van de klant, en accepteren zonder bedrag wordt geweigerd. Dezelfde reden
+     als bij de approver hierboven -- dit hulpje bootst na wat een mens in
+     productie doet, en die spreekt een bedrag af. We nemen de BODEM van de
+     trede, want dat is het enige bedrag dat we kunnen kennen zonder er een te
+     verzinnen; een toets die over de hoogte gaat, geeft zelf iets anders mee.
+
+     De bodem komt UIT de ladder en staat hier niet als getal: schreven we 20000
+     op, dan zou een verhoging van de bodem veertien toetsbestanden laten zakken
+     op een reden die niets met hun onderwerp te maken heeft. */
+  const trede = require('../server/kern/pasladder').trede(pas);
+  const lijf = { id, besluit: 'geaccepteerd' };
+  if (trede && trede.contractueel) lijf.contractEuro = trede.bodemCenten / 100;
+  const besluit = await post('/api/aanmelding/beslis', lijf, goedkeurder);
   if (!besluit.aanmelding || besluit.aanmelding.status !== 'geaccepteerd')
     throw new Error('elevateTier: beslis mislukt (' + JSON.stringify(besluit).slice(0, 120) + ')');
   return besluit;

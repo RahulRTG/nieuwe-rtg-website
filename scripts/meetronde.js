@@ -105,7 +105,7 @@ function draai(cmd, extraEnv) {
    wat op een lokale opstelling klopt maar geen bevinding is. Zie het blok bij
    PUBLIEK in scripts/poortwacht.js. */
 async function poortwachtRonde() {
-  const token = 'meetronde-' + Math.random().toString(36).slice(2, 10);
+  const token = 'meetronde-' + require('crypto').randomBytes(6).toString('hex');
   const srv = await wegwerp.start({ naam: 'poortwacht', env: {
     RTG_METRICS_TOKEN: token, OFFICE_CODE: 'RTG-MEETRONDE' } });
   try {

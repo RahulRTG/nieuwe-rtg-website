@@ -12,7 +12,7 @@
 
 module.exports = (ctx) => {
   const { save, rekLid, rekPartner, saldoVan, metIdem, boekAsync, zorgSaldo,
-    betaaldienstKosten, opdrachten, grootboek, MIN_CENTEN, MAX_CENTEN } = ctx;
+    betaaldienstKosten, opdrachten, grootboek, MIN_CENTEN, MAX_CENTEN, fees } = ctx;
 
   /* De teruggang van de partneruitbetaling: alleen deze kant weet dat het
      pay-grootboek het is en dat de tegenrekening extern:uitbetaald heet. Zie
@@ -66,6 +66,7 @@ module.exports = (ctx) => {
   }
 
   /* ---------- de partnerkant: saldo en uitbetalen ---------- */
+
   function partnerOverzicht(supplierCode) {
     const rek = rekPartner(supplierCode);
     const vandaag = new Date().toISOString().slice(0, 10);
@@ -74,6 +75,10 @@ module.exports = (ctx) => {
       // de direct verrekende betaaldienstkosten van vandaag, transparant erbij
       kostenVandaag: grootboek().filter(r => r.van === rek && r.soort === 'betaaldienstkosten' && new Date(r.at || 0).toISOString().slice(0, 10) === vandaag)
         .reduce((s, r) => s + r.centen, 0),
+      /* Wat er GEBOEKT is staat hierboven; wat er VERSCHULDIGD is en nog niet
+         geboekt staat hier. Twee metingen, want ze kunnen uiteenlopen -- en
+         precies dat uiteenlopen was vroeger onzichtbaar. Zie ../commercie/fee.js. */
+      kostenOpen: fees.openstaand(supplierCode),
       boekingen: grootboek().filter(r => r.van === rek || r.naar === rek).slice(0, 30)
     };
   }

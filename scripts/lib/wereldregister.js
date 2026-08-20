@@ -46,9 +46,42 @@ function blok(na, open, dicht) {
    (encodeURIComponent(pas)), en dan is elke regex een gok. Wat we willen weten
    is welke SLEUTELS er zijn en waar ze heen wijzen, niet met welke querystring. */
 function draai(code) {
-  return Function('"use strict";var pas="rtg";' +
-    'var encodeURIComponent=function(x){return x};return (' + code + ');')();
+  const { parse } = require('../ast/parser');
+  const boom = parse('var __x = ' + code + ';');
+  return waarde(boom.body[0].declarations[0].init);
 }
+
+/* De waarde van een knoop, voor zover hij vaststaat. LET OP de vorm van deze
+   parser: een Literal draagt `raw` (de brontekst) en `kind`, en niet `value`.
+   Een uitdrukking (encodeURIComponent(pas)) heeft geen vaste waarde; die gaf de
+   oude uitvoering als lege string terug en dat doet deze ook -- alleen zonder
+   een regel code te draaien. Een samenvoeging houdt zijn vaste deel, want dat
+   is het pad waar het hier om gaat. */
+function waarde(n) {
+  if (!n) return undefined;
+  if (n.type === 'Literal') {
+    if (n.kind === 'string') return JSON.parse(n.raw.replace(/^'([\s\S]*)'$/, (m, x) => '"' + x.replace(/"/g, '\\"') + '"'));
+    if (n.kind === 'getal') return Number(n.raw);
+    if (n.kind === 'bool') return n.raw === 'true';
+    return null;
+  }
+  if (n.type === 'TemplateLiteral') return (n.quasis || []).map((q) => q.cooked || '').join('');
+  if (n.type === 'ArrayExpression') return (n.elements || []).map(waarde);
+  if (n.type === 'ObjectExpression') {
+    const uit = {};
+    for (const e of n.properties || []) {
+      const sleutel = e.key && (e.key.name !== undefined ? e.key.name : waarde(e.key));
+      if (sleutel !== undefined) uit[sleutel] = waarde(e.value);
+    }
+    return uit;
+  }
+  if (n.type === 'BinaryExpression' && n.operator === '+') {
+    const l = waarde(n.left), r = waarde(n.right);
+    return String(l === undefined || l === null ? '' : l) + String(r === undefined || r === null ? '' : r);
+  }
+  return '';
+}
+
 
 const LINKS = draai(blok('const LINKS', '{', '}'));
 const OSAPPS = draai(blok('const OSAPPS', '{', '}'));

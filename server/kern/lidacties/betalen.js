@@ -10,6 +10,8 @@
    en pas daarna het bericht aan de zaak -- betaald is definitief.
 
    Krijgt dezelfde gedeelde context als ./bestellen.js. */
+const subsidie = require('../commercie/subsidie');
+
 module.exports = (ctx) => {
   const { save, findSupplier, fooiUit, pasTegoedToe, verdienPunten, ledenvoordeelVoor,
     keuken, notifySupplier, sseToSupplier, sseToOffice, orderMetRef, factuurVoorLid } = ctx;
@@ -36,10 +38,20 @@ async function betaalOrderVoor(session, body) {
   if (fooi) o.fooi = fooi;
   const korting = pasTegoedToe(session.key, o.total);
   if (korting) o.puntenKorting = korting;
-  // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij,
-  // dus de zaak houdt het volle bedrag en de nettoprijzen-belofte blijft staan)
+  /* Het RTG-ledenvoordeel per genre. De boardroom bepaalt het percentage; RTG
+     legt bij, dus de zaak houdt het volle bedrag en de nettoprijzen-belofte
+     blijft staan.
+
+     De VIER bedragen worden hier in een keer vastgelegd
+     (kern/commercie/subsidie.js). Hier stond alleen `o.regieKorting = voordeel`
+     -- het bedrag op het scherm, en verder niets: geen vastgelegde verplichting
+     van RTG aan de zaak, en geen enkele plek waar na te rekenen viel of lid +
+     RTG samen het brutobedrag opleveren. */
   const voordeel = ledenvoordeelVoor(findSupplier(o.supplierCode), o.total - korting);
-  if (voordeel) o.regieKorting = voordeel;
+  if (voordeel) {
+    o.regieKorting = voordeel;
+    o.voordeelOpbouw = subsidie.opbouwVan(o.total - korting, voordeel);
+  }
   /* HET GELD, EN PAS DAARNA `paid`. Deze functie zette alleen de vlag om; er
      kwam geen boeking aan te pas. De volgorde is nu: eerst betalen, dan pas
      zeggen dat er betaald is -- mislukt de betaling, dan blijft de bestelling

@@ -44,8 +44,23 @@ module.exports = (kern) => {
   // de wachtrij en het besluit: alleen RTG-personeel
   app.post('/api/aanmelding/lijst', officeAuth, (req, res) => veilig(res, () => aanmeldingen.lijst((req.body || {}).status)));
   app.post('/api/aanmelding/een', officeAuth, (req, res) => veilig(res, () => aanmeldingen.een(String((req.body || {}).id || ''))));
+  /* `contractEuro` gaat mee omdat een contractuele pas (Business, Lifestyle)
+     geen lijstprijs heeft: de kern weigert een akkoord zonder afgesproken
+     maandbedrag. Hier wordt niets gekeurd -- niet de bodem, niet of het veld
+     hoort -- want dan zou dezelfde regel op twee plekken staan. */
+  /* VERLENGEN EN OPZEGGEN: hier ontstaat maand 13, en hier houdt hij op. Tot
+     20 augustus 2026 bestond geen van beide -- een lidmaatschap liep
+     administratief af na twaalf termijnen zonder dat iemand het besloot. */
+  app.post('/api/aanmelding/verleng', officeAuth, (req, res) => veilig(res, () =>
+    aanmeldingen.verlengLidmaatschap(String((req.body || {}).id || ''), (req.body || {}).euro)));
+  app.post('/api/aanmelding/opzeggen', officeAuth, (req, res) => veilig(res, () =>
+    aanmeldingen.zegOpLidmaatschap(String((req.body || {}).id || ''))));
+  app.post('/api/aanmelding/contracten', officeAuth, (req, res) => veilig(res, () =>
+    ({ ok: true, contracten: aanmeldingen.contracten.lijst(req.body || {}) })));
+
   app.post('/api/aanmelding/beslis', officeAuth, (req, res) => veilig(res, () =>
-    aanmeldingen.beslis(String((req.body || {}).id || ''), String((req.body || {}).besluit || ''), wie(req), (req.body || {}).notitie)));
+    aanmeldingen.beslis(String((req.body || {}).id || ''), String((req.body || {}).besluit || ''), wie(req), (req.body || {}).notitie,
+      { contractEuro: (req.body || {}).contractEuro })));
   // het betaalschema: na een akkoord loopt de bijdrage 12 maanden automatisch,
   // met de 30%-foundationsplit. Alleen voor het personeel.
   app.post('/api/aanmelding/betalingen', officeAuth, (req, res) => veilig(res, () => aanmeldingen.betalingen(req.body || {})));

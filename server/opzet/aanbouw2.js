@@ -84,6 +84,55 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   // gedeelde sleutel. Na kern gemount omdat de meting-route kern.afdelingen leest.
   require('../routes/doos')(grens('doos'));
   require('../routes/code')(grens('code'));
+  /* RTG LINK (kern/link/, LINK.md): de adres- en capabilitylaag. Een gescande
+     code -> welk TYPE ding is dit -> wie of wat is het -> wat mag DEZE scanner
+     hier vragen. Staat NA routes/code.js omdat hij dezelfde ondertekening leest,
+     en hij haalt zijn oplossers op bij de deuren die er al zijn: de contactpin
+     (kern/sociaal/pin*.js) en de zakenlijst. Niets ervan wordt hier herbouwd --
+     de laag schikt bestaande stappen, en de rem die ze delen woont sinds deze
+     ronde in kern/link/rem.js. */
+  Object.assign(kern, require('../kern/link')({
+    db: kern.db, save: kern.save, crypto,
+    dyncodeGeef: () => kern.dyncode,
+    codenaamVan: (sleutel) => kern.codenaamVan(sleutel),
+    // dezelfde teller als de rest van deze laag gebruikt, per lid per onderwerp
+    rate: (wie, wat, max, perMs) => kern.sociaalRate(wie, wat, max, perMs),
+    handleVanPin: (pin) => kern.handleVanPin(pin),
+    pinNormaliseer: (ruw) => kern.pinNormaliseer(ruw),
+    pinKijk: (mij, doel) => kern.pinKijk(mij, doel),
+    liveKijk: (mij, token) => kern.liveKijk(mij, token),
+    /* Dezelfde teller als de pindeur, met dezelfde sleutel: dertig pogingen per
+       uur per lid, hoe je ze ook verdeelt over de twee loketten. */
+    persoonRate: (mij) => kern.sociaalRate(mij, 'pinzoek', 30, 60 * 60 * 1000),
+    /* De stand van een band, voor "wat kan ik hier nog aan doen" in mijn
+       koppelingen. Uit de sociale kern gehaald en niet nagerekend: of een
+       verzoek nog openstaat is daar de waarheid. */
+    bandStand: (mij, ander) => kern.statusVan(mij, kern.connectieTussen(mij, ander)),
+    zaakVan: (code) => kern.findSupplier(code)
+  }));
+  /* De eerste capability, en hij komt uit het domein dat hem bezit: RTG Pay.
+     "Betaal mij 18,50 voor diner" als code van twee minuten. De linklaag laat
+     hem zien en laat een mens bevestigen; het boeken zelf blijft in kern/pay --
+     daar is maar EEN plek waar geld beweegt, en die blijft het.
+
+     Hier en niet in kernlaag3 (waar RTG Pay wordt gebouwd), omdat de linklaag
+     pas hierboven bestaat. Aanmelden gooit bij een definitie die niet deugt, en
+     dat hoort: een half register is een register dat je pas wantrouwt nadat er
+     iets misging. */
+  kern.linkHandeling(require('../kern/pay/vraagcode')({
+    pay: kern.pay,
+    payGate: kern.onboarding && kern.onboarding.payGate,
+    schoon: kern.schoon
+  }));
+  /* En de tweede: de kassacode, die al bestond en nu een capability IS in plaats
+     van een leesbare code in een QR. De eerste die een ZAAK aanvaardt. */
+  kern.linkHandeling(require('../kern/pay/kassacode')({ pay: kern.pay, schoon: kern.schoon }));
+  /* En de inner die daarbij hoort: vier kassa-ingangen, een manier waarop een
+     betaalcode binnenkomt. Hij hangt HIER omdat hij de linklaag nodig heeft, en
+     hij leest die pas bij de aanroep -- vandaar dat hij `kern` als geheel
+     meekrijgt (zie de kop van kern/pay/kasinnen.js). */
+  kern.kasInnen = require('../kern/pay/kasinnen')(kern);
+  require('../routes/link')(grens('link'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
   require('../routes/veiligheid')(grens('veiligheid'));
   require('../routes/instant-reality')(grens('instant-reality'));

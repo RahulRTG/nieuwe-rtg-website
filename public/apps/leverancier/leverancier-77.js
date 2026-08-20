@@ -21,9 +21,16 @@
       if (!wvCart.length) return;
       const body = { method: b.dataset.wvbetaal, regels: wvCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
       if (body.method === 'rtgpay'){
-        const c = window.prompt(T('wv.paycode','Betaalcode van de klant (uit de app):'));
-        if (!c) return;
-        body.payCode = c.trim().toUpperCase();
+        /* Hier stond een EIGEN window.prompt met een onvoorwaardelijke
+           toUpperCase(). Dat is de vierde uitvoering van iets dat het huis al
+           heeft -- en hij droeg de fout die elders al was gerepareerd: een
+           ondertekende RTG-code is hoofdlettergevoelig, dus kapitalen sloopten
+           hem. Nu de gedeelde weg: tap to pay, scannen, of typen, met de kaart
+           erachter (LAT.md regel 4).
+
+           Zonder bedrag: het totaal komt van de serverprijzen en staat pas na
+           het boeken vast. */
+        body.payCode = await payCodeMetKaart(); if (!body.payCode) return;
       }
       if (wvKlant) body.klantKey = wvKlant.key;
       try {

@@ -450,6 +450,13 @@ const EIGEN_MODULE = new Map([
      van de helper (dus vielen ze in het servervak), maar geen van vieren leest
      iets van /api/ -- ze beproeven een module die ze zelf binnenhalen. */
   ['strenge-poort.test.js', ['test/helper.js']],
+  /* DE TWEE SCHERMEN VAN RTG LINK. Ze stonden in BEWIJS.md als "overleefd", en
+     dat was net als hierboven een uitspraak over de PROEF en niet over de toets:
+     allebei laden ze een BROWSERmodule uit public/shared/ met een require, en de
+     modulezoeker hieronder kijkt alleen naar server-paden. Er is dus nooit een
+     mutatie op geschoten. Nu wel. */
+  ['linkkaart.test.js', ['public/shared/linkkaart.js']],
+  ['linkkoppelingenui.test.js', ['public/shared/linkkoppelingen.js']],
   ['loghygiene.test.js', ['server/log.js']],
   ['genreregister.test.js', ['server/seed/genres.js']],
   ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],
@@ -688,6 +695,26 @@ const GEEN_BRONMUTATIE = new Map([
      leverancierssleutel weghalen laat toets 7 zakken. De passende operator is een
      hernoemer van stringliteralen, en die heeft deze motor niet. */
   ['voertuigscherm.e2e.js', 'overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak'],
+  /* DE TWEE SCHERMEN VAN RTG LINK, na drie en een mutaties in EIGEN_MODULE (zie
+     daar waarom ze eerst NUL mutaties kregen). Ze overleven, en dat is hier een
+     uitspraak over de OPERATOREN: het zijn opbouwmodules die tekst en markup
+     samenstellen, en geen enkele bronoperator raakt een letterlijke string of
+     een filter dat een lege lijst oplevert.
+
+     De foutklassen die ze WEL bewaken zijn met de hand nagetrokken, en alle
+     vier RAAK:
+       linkkaart        de knop-zonder-weg-rem weghalen (`i.weg &&` uit de
+                        filter) -> toets 3 zakt. `gegevens` stilletjes leeg
+                        teruggeven -> toets 1 en 5 zakken.
+       linkkoppelingen  `esc` de ruwe tekst laten teruggeven -> toets 7 zakt.
+                        Alleen het AANHALINGSTEKEN uit de ontsmetter halen ->
+                        toets 7 zakt sinds die toets ook de attribuut-sink
+                        (data-trek="...") beproeft; daarvoor bleef hij groen, en
+                        dat was een echt gat.
+     De passende operator zou een hernoemer van stringliteralen zijn, of een die
+     een filterconditie omkeert; die heeft deze motor niet. */
+  ['linkkaart.test.js', 'overleefde 3 mutaties in public/shared/linkkaart.js. Een opbouwmodule: geen rekenend gedrag dat een bronoperator raakt. Met de hand nagetrokken op de foutklassen die hij wel bewaakt (de knop-zonder-weg-rem, en "welke gegevens" stilzwijgend leeg): driemaal raak'],
+  ['linkkoppelingenui.test.js', 'overleefde 1 mutatie in public/shared/linkkoppelingen.js. Idem: opbouwmodule. Met de hand nagetrokken op het ontsmetten -- ruw teruggeven en alleen het aanhalingsteken weglaten laten hem allebei zakken; dat tweede pas sinds de toets ook de attribuut-sink beproeft'],
   ['boot-smoke.test.js', 'overleefde 45 mutaties in server/server.js, en terecht: deze toets is bewust ONDIEP -- de server komt op en de wortel geeft de ROS-poort, meer beweert hij niet. De juiste mutatie zit in de wortelroute of in de pagina, niet in de bron'],
   ['poortrace.test.js', 'overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet'],
   ['eu-naleving.test.js', 'overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen'],

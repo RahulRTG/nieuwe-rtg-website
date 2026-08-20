@@ -4,7 +4,7 @@
    routes/supplier/kassa.js. */
 module.exports = (kern) => {
   const { POS_METHODS, app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
-          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, pay, ordersVanZaak } = kern;
+          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, ordersVanZaak } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
@@ -36,10 +36,13 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   // in het grootboek. Lukt dat niet, dan is er ook geen bon.
   let betaler = null, betaaldienstKosten = 0;
   if (method === 'rtgpay') {
-    const p = await pay.kasInt({
-      supplierCode: req.supplier.code, code: req.body.payCode,
-      centen: Math.round(total * 100), oms: req.supplier.name,
-      idem: req.body.idem
+    /* TWEE DRAGERS, EEN INNING: de code van zes tekens (voorgelezen of getypt) of
+       de ondertekende RTG-code die sinds RTG Link in de QR staat. Welke het is,
+       hoeft deze kassa niet te weten -- kern/pay/kasinnen.js kent ze allebei en
+       int ze allebei langs kern/pay/kassa.js. */
+    const p = await kern.kasInnen({
+      supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+      code: req.body.payCode, centen: Math.round(total * 100), idem: req.body.idem
     });
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;

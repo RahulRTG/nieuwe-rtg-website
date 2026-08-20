@@ -6564,7 +6564,11 @@
         try {
           const body = Object.assign({ room: el.dataset.tafelrek }, extra);
           if (body.method === 'rtgpay'){
-            body.payCode = await vraagPayCode(); if (!body.payCode) return;
+            /* Met de kaart erbij (leverancier-61.js). Zonder bedrag: bij het
+             uitchecken telt de SERVER de open posten op, dus wat deze bon
+             kost weet dit scherm nog niet. Liever geen regel dan een
+             verzonnen regel. */
+          body.payCode = await payCodeMetKaart(); if (!body.payCode) return;
             body.idem = RTGIdem('trek');
           }
           const d = await API.call('/supplier/pos/checkout', body);
@@ -6758,9 +6762,30 @@
   function luchtPct(){ const st = state.settings || {}; return st.luchtzijde ? (Number.isFinite(Number(st.luchtToeslagPct)) ? Math.round(Number(st.luchtToeslagPct)) : 15) : 0; }
   function luchtPrijs(p){ const pct = luchtPct(); return pct ? Math.round(p * (1 + pct / 100) * 100) / 100 : p; }
   function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
+/* HOE EEN BETAALCODE VAN EEN GAST BINNENKOMT, en daarna de kassa-opbouw.
+
+   Dit is de tweede helft van ./leverancier-61.js. Dat bestand ging over de
+   10 kB-lat toen het bedoelingsscherm bij de betaalcode kwam, en de knip loopt
+   hier waar het onderwerp wisselt: daar de menukaart, hier de betaalcode en het
+   scherm dat hem gebruikt.
+
+   DE KNIP LOOPT OP DE PLEK ZELF EN VERPLAATST NIETS. De delen van een bundel
+   worden achter elkaar geplakt (scripts/bundel.js) en ze splitsen NIET op
+   functiegrenzen: dit bestand begint en eindigt gewoon midden in de app-functie.
+   Een blok uit het midden knippen en achteraan bijplakken zet het daarmee in een
+   ANDERE functie -- en dat is op het scherm een ReferenceError. Dat is hier een
+   keer gebeurd; check.js regel 24 ving het op.
+
+   Twee functies, en het verschil ertussen is de reden dat het er twee zijn:
+   `vraagPayCode` HAALT de code op (tap to pay, scannen, typen) en
+   `payCodeMetKaart` laat er eerst het bedoelingsscherm overheen gaan. De vier
+   kassa-ingangen roepen de tweede aan; de eerste is alleen voor de tweede. */
   /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
      hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip
-     niet of tikt er niemand, dan komt het typvenster vanzelf. */
+     niet of tikt er niemand, dan komt het typvenster vanzelf.
+
+     DIT HAALT ALLEEN DE CODE OP. Wat ermee gebeurt voordat het een bon wordt,
+     staat in payCodeMetKaart hieronder -- en dat is wat de kassa's aanroepen. */
   async function vraagPayCode(){
     if (window.TapPay && TapPay.kan()){
       const tap = window.confirm(T('pos.tapkeuze','Tap to pay: de gast tikt zijn toestel hiertegen. Liever de code scannen of typen? Kies dan Annuleren.'));
@@ -6780,13 +6805,49 @@
           titel: T('pos.scanbetaal','Scan de betaalcode'),
           hint: T('pos.scanbetaalhint','Scan de QR op het scherm van de gast.'),
           handTekst: T('pos.oftyp','Of typ de betaalcode'),
-          onCode: (c) => { klaar = true; resolve(((c.tekst||'').trim().toUpperCase()) || null); },
+          /* HOOFDLETTERS ALLEEN WAAR DAT MAG. Een getypte kassacode leest
+             prettiger in kapitalen, maar een ondertekende RTG-code is
+             hoofdlettergevoelig -- de regel staat in shared/rtgcode.js, want
+             elke scanner heeft hem. */
+          onCode: (c) => {
+            klaar = true;
+            var t = (c.tekst||'').trim();
+            resolve((window.RTGCode && !RTGCode.hoofdlettersMogen(t) ? t : t.toUpperCase()) || null);
+          },
           onSluit: () => { if (!klaar) resolve(null); }
         });
       });
     }
     const c = window.prompt(T('pos.paycode','Betaalcode van de gast (uit de app):'));
     return c ? c.trim().toUpperCase() : null;
+  }
+
+  /* DE ENE WEG WAARLANGS EEN BETAALCODE VAN EEN GAST BINNENKOMT. Het
+     bedoelingsscherm stond eerst alleen in de POS-verkoop; de andere drie
+     kassa-ingangen (uitchecken van een kamer of tafel, en de winkelvloer) namen
+     dezelfde code zonder kaart. Een belofte uit LINK.md die op een van de vier
+     plekken geldt, is geen belofte (LAT.md regel 4).
+
+     Een getypte code van zes tekens gaat rechtstreeks door: daar valt niets te
+     tonen wat de kassa niet al weet, en de gast staat ervoor. Gaat er iets mis
+     bij het ophalen (geen netwerk, verlopen code), dan stopt het hier: liever
+     geen bon dan een bon waarvan niemand zag wat hij deed.
+
+     `bedrag` is optioneel en in euro's: staat het vast voordat de gast betaalt,
+     dan komt het als "Deze bon" naast wat de code maximaal toestaat. Bij het
+     uitchecken en op de winkelvloer rekent de server het totaal pas uit, dus
+     daar blijft het leeg -- liever geen regel dan een verzonnen regel. */
+  async function payCodeMetKaart(bedrag){
+    const code = await vraagPayCode();
+    if (!code) return null;
+    if (String(code).slice(0,5) !== 'RTG1.' || !window.RTGLinkKaart) return code;
+    let kaart = null;
+    try { kaart = await API.call('/link/los', { tekst: code }); }
+    catch(e){ toast(e.message); return null; }
+    const extra = Number.isFinite(Number(bedrag)) && Number(bedrag) > 0
+      ? [{ naam: T('pos.dezebon','Deze bon'), waarde: eur(Number(bedrag)), nadruk: true }] : [];
+    const keuze = await RTGLinkKaart.toon(kaart, { extra });
+    return keuze ? code : null;
   }
 
   function renderKassa(){
@@ -6989,7 +7050,11 @@
       try {
         const body = { room: b.dataset.room, method: b.dataset.method };
         if (body.method === 'rtgpay'){
-          body.payCode = await vraagPayCode(); if (!body.payCode) return;
+          /* Met de kaart erbij (leverancier-61.js). Zonder bedrag: bij het
+             uitchecken telt de SERVER de open posten op, dus wat deze bon
+             kost weet dit scherm nog niet. Liever geen regel dan een
+             verzonnen regel. */
+          body.payCode = await payCodeMetKaart(); if (!body.payCode) return;
           body.idem = RTGIdem('co');
         }
         const d = await API.call('/supplier/pos/checkout', body);
@@ -7039,7 +7104,9 @@
       if (!(body.total>0)){ toast(T('pos.fillamount','Vul een bedrag in.')); return; }
     }
     if (method === 'rtgpay'){
-      body.payCode = await vraagPayCode(); if (!body.payCode) return;
+      /* De kaart zit in payCodeMetKaart (leverancier-61.js) en stond hier: alle
+         vier de kassa-ingangen delen hem nu, in plaats van deze ene. */
+      body.payCode = await payCodeMetKaart(body.total); if (!body.payCode) return;
       body.idem = RTGIdem('pos');
     }
     try {
@@ -8433,9 +8500,16 @@
       if (!wvCart.length) return;
       const body = { method: b.dataset.wvbetaal, regels: wvCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
       if (body.method === 'rtgpay'){
-        const c = window.prompt(T('wv.paycode','Betaalcode van de klant (uit de app):'));
-        if (!c) return;
-        body.payCode = c.trim().toUpperCase();
+        /* Hier stond een EIGEN window.prompt met een onvoorwaardelijke
+           toUpperCase(). Dat is de vierde uitvoering van iets dat het huis al
+           heeft -- en hij droeg de fout die elders al was gerepareerd: een
+           ondertekende RTG-code is hoofdlettergevoelig, dus kapitalen sloopten
+           hem. Nu de gedeelde weg: tap to pay, scannen, of typen, met de kaart
+           erachter (LAT.md regel 4).
+
+           Zonder bedrag: het totaal komt van de serverprijzen en staat pas na
+           het boeken vast. */
+        body.payCode = await payCodeMetKaart(); if (!body.payCode) return;
       }
       if (wvKlant) body.klantKey = wvKlant.key;
       try {

@@ -4,7 +4,11 @@
         try {
           const body = Object.assign({ room: el.dataset.tafelrek }, extra);
           if (body.method === 'rtgpay'){
-            body.payCode = await vraagPayCode(); if (!body.payCode) return;
+            /* Met de kaart erbij (leverancier-61.js). Zonder bedrag: bij het
+             uitchecken telt de SERVER de open posten op, dus wat deze bon
+             kost weet dit scherm nog niet. Liever geen regel dan een
+             verzonnen regel. */
+          body.payCode = await payCodeMetKaart(); if (!body.payCode) return;
             body.idem = RTGIdem('trek');
           }
           const d = await API.call('/supplier/pos/checkout', body);

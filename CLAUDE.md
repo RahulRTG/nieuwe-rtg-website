@@ -81,6 +81,19 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
+was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
+PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden
+uitgeeft. De kern in één zin: **een code zegt wie of wat, nooit wat er mag** —
+dat wordt bij het scannen berekend uit wie er scant, waar hij staat en wat hij
+al mocht. Lees vóór je een QR, een scanner of een koppelweg bouwt vooral
+paragraaf 3, de grenzen: de intentielijst toont wat DEZE scanner mag vragen en
+nooit wat de ander heeft (anders is het menu zelf een profieluitdraai), een scan
+bewijst geen mens, een sticker is geen bron van gezag, en alles wat met een oude
+foto nog iets in gang kan zetten hoort tijdelijk te zijn. Er komt geen tweede
+scanner, geen tweede parser en geen tweede rem naast de huisbrede uit
+`server/kern/sociaal/pin-deur.js`.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

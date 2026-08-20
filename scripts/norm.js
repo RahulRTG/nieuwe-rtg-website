@@ -173,6 +173,19 @@ const METERS = [
      ver de motor gekomen is, en dan betekent een stijging wat hij zegt. */
   { sleutel: 'toetsenOngevoeligPct', richting: 'omlaag', wat: 'aandeel van de GEMETEN toetsen dat een mutatie in eigen bron overleefde (%)' },
   { sleutel: 'toetsenNietGemeten', richting: 'omlaag', wat: 'toetsen waar de mutatiemotor nog niet langs is geweest' },
+  /* DE DERDE VOORRAAD, en hij stond als enige NIET op de ratel.
+     scripts/tandeloos.js telt beweringen die op een LEGE verzameling vanzelf
+     slagen: `assert.deepEqual(r.body.dingen, [])` bewijst niets als `dingen`
+     altijd leeg is. Dat was een CLI-only leeslijst -- je moest hem draaien om te
+     weten hoe hij ervoor stond, en dus wist niemand het. Zijn twee zusters
+     (endpointsZonderTest en toetsenNietGemeten) staan hier wel, en konden dus
+     niet stil groeien; deze wel.
+
+     Hij blijft een LEESLIJST en geen poort: soms is "er staat niets" precies wat
+     je toetst, en daar heeft dat script zijn eigen beoordeelde vrijstellingen
+     voor. De ratel zegt alleen dat het er niet MEER mogen worden zonder dat
+     iemand het opschrijft. */
+  { sleutel: 'beweringenZonderVulcontrole', richting: 'omlaag', wat: 'beweringen die op een lege verzameling vanzelf slagen (scripts/tandeloos.js)' },
   /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
      hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
      elkaar op, en de ene groep botste met een ANDERE meter in deze lijst.
@@ -566,6 +579,29 @@ function meet(bronnen) {
     return { ongevoeligPct: Math.round(1000 * overleefd / gemeten) / 10, nietGemeten, overleefd, gezakt };
   })();
 
+  /* De derde voorraad: beweringen die op een lege verzameling vanzelf slagen.
+     scripts/tandeloos.js doet de meting; hier komt alleen het getal binnen. Hij
+     leest de toetsmap zelf, dus hij zakt vanzelf als die er niet is -- en dat
+     hoort (LAT.md regel 3). */
+  const tandeloos = (() => {
+    const eigen = bronnen && bronnen.meetTandeloos;
+    /* ONTHOUDEN, MAAR ALLEEN DE ECHTE METING. Deze telling leest en scant elk
+       toetsbestand; test/meterijk.test.js roept norm.meet() tientallen keren aan
+       (een keer per ijking) en zonder dit betaalt elke ijking die scan opnieuw --
+       een suite die daardoor minuten langer duurt, is een suite die iemand gaat
+       overslaan. Een INGEBRACHTE lezer wordt nooit onthouden: die is er juist om
+       een ANDER getal te geven, en een cache zou de ijking dan naar nul brengen
+       en hem stilletjes tandeloos maken. */
+    if (eigen) return keur(eigen());
+    if (tandeloosOnthouden === null) tandeloosOnthouden = keur(require('./tandeloos').meet({ stil: true }));
+    return tandeloosOnthouden;
+    function keur(r) {
+      if (!r || !Number.isFinite(r.meldingen) || !r.bekeken)
+        throw new Error('scripts/tandeloos.js gaf geen telling terug; dan is beweringenZonderVulcontrole niet gemeten');
+      return r.meldingen;
+    }
+  })();
+
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
   const PUB = path.join(WORTEL, 'public');
   const bundelPaden = new Set(Object.keys(require('./bundel').bundels).map(k => path.join(PUB, k)));
@@ -690,6 +726,7 @@ function meet(bronnen) {
     kernOngebruikt: grenzen.kernOngebruikt,
     toetsenOngevoeligPct: mutaties.ongevoeligPct,
     toetsenNietGemeten: mutaties.nietGemeten,
+    beweringenZonderVulcontrole: tandeloos,
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen,
     ratelTanden, metingenZonderRatel
@@ -707,6 +744,9 @@ function meet(bronnen) {
    Dat is precies LAT.md regel 3 (een meter zakt als zijn invoer ontbreekt), in
    de ratel die daar zelf over gaat. Nu: ontbreken mag (dat is de eerste keer),
    maar onleesbaar is een fout en die overschrijft niets. */
+/* De onthouden telling van scripts/tandeloos.js; zie de reden bij het gebruik. */
+let tandeloosOnthouden = null;
+
 function leesNorm() {
   if (!fs.existsSync(NORMBESTAND)) return null;                 // eerste keer: mag
   const ruw = fs.readFileSync(NORMBESTAND, 'utf8');

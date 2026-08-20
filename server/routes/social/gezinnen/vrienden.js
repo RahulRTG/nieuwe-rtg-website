@@ -2,9 +2,9 @@
    (met ouderakkoord), dm, snaps en verhalen. Gemount vanuit
    routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, gezinsPoort, nietBeschermd } = sctx;
   const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
-          socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
+          socialDm, socialDmSend, socialGoedkeur, socialIntrek, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
           verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;
 /* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
    maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
@@ -64,6 +64,17 @@ app.post('/api/rtf/social/connections', (req, res) => {
   const kinderen = s.beheerder ? rtf.socialProfielen().filter(sp => sp.gezinCode === s.g.code && sp.beschermd).map(sp => ({ handle: sp.handle, codenaam: sp.codenaam, ...pinKaart(sp.handle) })) : [];
   res.json({ me: s.handle, codename: s.codenaam, kind: s.kind, beschermd: s.beschermd, beheerder: s.beheerder, connections: sc.connections, requests: sc.requests, teKeuren: s.beheerder ? socialTeKeuren(s.g.code) : [], kinderen });
 });
+/* Een verzoek dat IK stuurde weer intrekken -- de gezinskant van
+   /api/member/connect/intrek. Hij hoort erbij omdat "mijn koppelingen" (LINK.md
+   stap 6) per regel een weg terug aanbiedt, en die weg moet in de wereld liggen
+   waar de scanner zit: een gezinslid komt niet door de ledendeur. De kern is
+   dezelfde (socialIntrek); alleen de poort ervoor verschilt. */
+app.post('/api/rtf/social/connect/intrek', gezinsPoort, nietBeschermd, (req, res) => {
+  const r = socialIntrek(req.gezinslid.handle, String(req.body.key || ''));
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
+});
+
 app.post('/api/rtf/social/dm', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   const r = socialDm(s.handle, String(req.body.withKey || ''));

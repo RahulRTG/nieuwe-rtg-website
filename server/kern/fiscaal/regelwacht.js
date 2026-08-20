@@ -20,15 +20,11 @@
    teruggevonden. Dat is niet altijd zo geweest: dit bestand hield zijn overlay
    bij als platte kaart van laatste waarden, en overschreef daarmee de oude --
    zie de kop daar voor wat dat onbeantwoordbaar maakte. */
-module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu }) => {
+const { keur } = require('./regelwacht-keuring');
+
+module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu, bronnen }) => {
   const haal = fetchImpl || ((...a) => fetch(...a));
   const { jaargangen } = require('./jaargangen').maakJaargangen({ db, save, LANDEN, peiljaar, nu });
-  const GETALLEN = { lasten: [0, 0.6], vakantiegeld: [0, 0.25], uurloonMin: [1, 100], alcoholLeeftijd: [16, 25] };
-  const TEKSTEN = ['aangifte', 'extra'];
-  // de reisregels (kern/reis.js zet ze op LANDEN[cc].reis) zijn net zo
-  // automatisch bij te werken als de belastingen: streng gevalideerd
-  const REIS_ENUM = { visum: ['geen', 'vrij', 'toestemming', 'aankomst', 'evisum', 'visum'], rijden: ['links', 'rechts'] };
-  const REIS_TEKST = { alarm: [2, 8], fooi: [1, 200], letOp: [0, 400] };
 
   const staat = () => (db.data.fiscaalRegels = db.data.fiscaalRegels || { versie: null, bron: null, at: null, wijzigingen: {} });
 
@@ -44,37 +40,7 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu }) => {
     const gedaan = {};
     for (const [cc, velden] of Object.entries((update && update.landen) || update || {})) {
       if (!LANDEN[cc] || typeof velden !== 'object') continue;
-      const wijz = {};
-      for (const [veld, waarde] of Object.entries(velden)) {
-        if (GETALLEN[veld]) {
-          const n = Number(waarde);
-          const [min, max] = GETALLEN[veld];
-          if (Number.isFinite(n) && n >= min && n <= max && LANDEN[cc][veld] !== n) wijz[veld] = n;
-        } else if (veld === 'tarieven' && typeof waarde === 'object') {
-          for (const [t, w] of Object.entries(waarde)) {
-            const n = Number(w);
-            if (LANDEN[cc].tarieven && t in LANDEN[cc].tarieven && Number.isFinite(n) && n >= 0 && n <= 30 && LANDEN[cc].tarieven[t] !== n) {
-              (wijz.tarieven = wijz.tarieven || {})[t] = n;
-            }
-          }
-        } else if (TEKSTEN.includes(veld) && typeof waarde === 'string' && waarde.trim()) {
-          const s = waarde.replace(/[<>]/g, '').slice(0, 400);
-          if (LANDEN[cc][veld] !== s) wijz[veld] = s;
-        } else if (veld === 'reis' && typeof waarde === 'object' && LANDEN[cc].reis) {
-          const rs = LANDEN[cc].reis;
-          for (const [rv, rw] of Object.entries(waarde)) {
-            if (REIS_ENUM[rv] && REIS_ENUM[rv].includes(rw) && rs[rv] !== rw) (wijz.reis = wijz.reis || {})[rv] = rw;
-            else if (rv === 'dagen') { const n = Number(rw); if (Number.isFinite(n) && n >= 0 && n <= 365 && rs.dagen !== n) (wijz.reis = wijz.reis || {}).dagen = n; }
-            else if (rv === 'water') { const b = rw === true; if (typeof rw === 'boolean' && rs.water !== b) (wijz.reis = wijz.reis || {}).water = b; }
-            else if (REIS_TEKST[rv] && typeof rw === 'string') {
-              const [min, max] = REIS_TEKST[rv];
-              const s = rw.replace(/[<>]/g, '').trim().slice(0, max);
-              if (s.length >= min && rs[rv] !== s) (wijz.reis = wijz.reis || {})[rv] = s;
-            }
-          }
-          if (wijz.reis && !Object.keys(wijz.reis).length) delete wijz.reis;
-        }
-      }
+      const wijz = keur(LANDEN[cc], velden);
       if (Object.keys(wijz).length) {
         /* VASTLEGGEN VOOR PROJECTEREN. De jaargang moet weten wat hij verving,
            en dat kan alleen zolang de oude waarde nog op de tabel staat. */
@@ -134,11 +100,38 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu }) => {
   /* De dagelijkse controle: met een bron halen we de nieuwste tabellen op;
      zonder bron is de status "peiljaar als basis". Nooit een crash: een
      onbereikbare of rare bron laat de huidige regels gewoon staan. */
+  /* HET BRONNENREGISTER ERBIJ (./bronnen/). De oude weg -- EEN url in
+     FISCAAL_BRON_URL die precies onze vorm spreekt -- blijft werken; daarnaast
+     loopt de controle nu alle GEREGISTREERDE bronnen af, elk met zijn eigen
+     adapter en zijn eigen gezag. Wat zo'n bron wel ziet veranderen maar niet
+     zelf mag toewijzen, komt terug als SIGNAAL en niet als wijziging; zie de
+     kop van ./bronnen/tedb.js voor waarom dat onderscheid er moet zijn. */
+  async function checkBronnen(st) {
+    if (!bronnen) return [];
+    const uit = [];
+    for (const b of bronnen.status()) {
+      if (!b.geconfigureerd) continue;
+      const r = await bronnen.haal(b.sleutel);
+      if (!r.ok) { uit.push({ bron: b.sleutel, ok: false, uitslag: r.uitslag }); continue; }
+      const toe = pasToe({ landen: r.landen }, { soort: 'bron', naam: r.naam, url: r.url, gezag: r.gezag }, r.versie);
+      uit.push({ bron: b.sleutel, ok: true, gezag: r.gezag, bijgewerkt: toe.landen, signalen: r.signalen.length });
+    }
+    if (uit.length) st.bronnenUitslag = uit;
+    return uit;
+  }
+
   async function check() {
     const url = process.env.FISCAAL_BRON_URL || '';
     const st = staat();
     st.laatsteCheck = new Date().toISOString();
-    if (!url) { st.checkUitslag = 'geen externe bron gekoppeld; ingebouwd peiljaar ' + peiljaar + ' plus doorgevoerde updates'; save(); return { ok: true, bron: null }; }
+    const uitBronnen = await checkBronnen(st);
+    if (!url) {
+      st.checkUitslag = uitBronnen.length
+        ? uitBronnen.map(b => b.bron + ': ' + (b.ok ? b.bijgewerkt + ' land(en), ' + b.signalen + ' signaal/signalen' : b.uitslag)).join(' · ')
+        : 'geen externe bron gekoppeld; ingebouwd peiljaar ' + peiljaar + ' plus doorgevoerde updates';
+      save();
+      return { ok: true, bron: null, bronnen: uitBronnen };
+    }
     try {
       const r = await haal(url, { signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined });
       if (!r.ok) throw new Error('bron gaf ' + r.status);
@@ -147,7 +140,7 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu }) => {
         { geldigVanaf: data.geldigVanaf, bekendgemaaktOp: data.bekendgemaaktOp });
       st.checkUitslag = 'bron opgehaald; ' + uit.landen + ' land(en) bijgewerkt';
       save();
-      return { ok: true, bron: url, bijgewerkt: uit.landen };
+      return { ok: true, bron: url, bijgewerkt: uit.landen, bronnen: uitBronnen };
     } catch (e) {
       st.checkUitslag = 'bron niet bereikbaar (' + String(e.message).slice(0, 80) + '); huidige regels blijven gelden';
       save();
@@ -163,6 +156,7 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu }) => {
     return { peiljaar, versie: st.versie, bron: st.bron, laatsteUpdate: st.at,
       laatsteCheck: st.laatsteCheck || null, checkUitslag: st.checkUitslag || null,
       landenMetUpdates: metUpdates,
+      bronnen: bronnen ? bronnen.status() : [], signalen: bronnen ? bronnen.signalen() : [],
       wijzigingen: tl.wijzigingen, ongecontroleerd: tl.ongecontroleerd, wachtend: tl.wachtend,
       totaal: Object.keys(LANDEN).length,
       landen: Object.entries(LANDEN).map(([cc, l]) => ({ code: cc, naam: l.naam, regio: l.regio || '', uurloonMin: l.uurloonMin,

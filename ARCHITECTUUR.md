@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4006 |
-| servermodules (`server/**/*.js`) | 2195 |
+| servermodules (`server/**/*.js`) | 2198 |
 | routebestanden (`server/routes/**`) | 455 |
-| kernmodules (`server/kern/**`) | 1351 |
+| kernmodules (`server/kern/**`) | 1354 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 221 |
-| toetsbestanden (`test/*.test.js`) | 906 |
+| toetsbestanden (`test/*.test.js`) | 907 |
 | schermtoetsen (`test/*.e2e.js`) | 128 |
 
 ## 2. De weg van een verzoek

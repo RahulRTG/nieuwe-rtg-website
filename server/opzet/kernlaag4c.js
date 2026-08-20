@@ -17,7 +17,11 @@ module.exports = (kern, hulp) => {
 /* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
    automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
    LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
-Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
+/* Het bronnenregister (kern/fiscaal/bronnen/): waar de regels vandaan komen en
+   hoeveel gezag dat heeft. Gaat VOOR de Regelwacht, die hem meekrijgt en er bij
+   elke dagelijkse controle overheen loopt. */
+Object.assign(kern, require('../kern/fiscaal/bronnen').maakBronnen({ db, save, LANDEN }));
+Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR, bronnen: kern.bronnen }));
 kern.regelwacht.herstelOverlay();
 /* De zzp-wacht (kern/fiscaal/zzpwacht.js): de ondernemersregimes per
    ingangsdatum, zodat een berekening over een ander jaar met de regels van dat

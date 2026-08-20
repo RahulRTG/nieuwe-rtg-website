@@ -33,6 +33,11 @@
   main{padding:1.6rem 0 4rem;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.7rem;margin:.3rem 0 .2rem;}
   .deck{color:var(--muted);font-size:.95rem;max-width:46rem;}
+  .rw-bronnen{margin-top:.7rem;}
+  .rw-bron{padding:.3rem 0;font-size:.82rem;}
+  .rw-bron .stil{display:block;}
+  .rw-bronlet{font-size:.74rem;}
+  .rw-signalen{margin-top:.6rem;padding:.5rem .7rem;border:1px solid var(--gold);border-radius:8px;font-size:.82rem;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;}
   .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
   .veld:focus{border-color:var(--burgundy);}
@@ -2608,6 +2613,24 @@ function bankRenderRegels(s){
       '<button class="knop stil" id="rwZet" type="button">Voer door</button>' +
       '<button class="knop stil" id="rwGesch" type="button">Wat veranderde?</button>' +
       '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>' +
+    /* DE BRONNEN, met hun gezag. Een tarief uit de instantie zelf en een
+       tarief uit een spiegel zijn niet even hard, en dat hoort bij het getal te
+       staan in plaats van in een handleiding. */
+    '<div class="rw-bronnen">' + (s.bronnen || []).map(b =>
+      '<div class="rw-bron"><strong>' + esc(b.naam) + '</strong> <span class="stil">' + esc(b.gezag) + ' · ' +
+      (b.geconfigureerd ? 'geconfigureerd' : 'niet geconfigureerd (' + esc(b.env) + ')') +
+      (b.laatsteUitslag ? ' · ' + esc(b.laatsteUitslag) : '') + '</span>' +
+      (b.let ? '<span class="stil rw-bronlet">' + esc(b.let) + '</span>' : '') + '</div>').join('') +
+    /* DE SIGNALEN: wat een bron zag veranderen maar niet zelf mag toewijzen.
+       Dit is werk, geen melding -- welke categorie welk verlaagd tarief krijgt,
+       is een toewijzing die een mens maakt. Daarom krijgt dit kleur en de rest
+       hierboven niet. */
+    ((s.signalen || []).length
+      ? '<div class="rw-signalen"><strong>' + (s.signalen || []).length + ' toewijzing(en) om na te lopen</strong>' +
+        (s.signalen || []).slice(0, 12).map(g => '<div class="stil">' + esc(g.land) + ' · ' + esc(g.categorie) +
+          ' staat op ' + g.onsTarief + '%, de bron kent ' + (g.bronTarieven || []).join('%, ') + '%</div>').join('') +
+        '</div>'
+      : '') + '</div>' +
     '<div id="rwUit"></div>';
   $('#rwZoek').addEventListener('input', () => {
     const q = $('#rwZoek').value.trim().toLowerCase();

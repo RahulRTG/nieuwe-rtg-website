@@ -1283,6 +1283,66 @@ De pre-flight staat als knop bij het indienen — "Wat gebeurt er als ik indien?
 — en alleen op een aangifte waarvan de periode voorbij is en die nog niet is
 ingediend. Daarbuiten valt er niets te keuren en zou de kaart ruis zijn.
 
+### Het bronnenregister (`kern/fiscaal/bronnen/`)
+
+De Regelwacht kon al *één* bron ophalen: één url uit `FISCAAL_BRON_URL`, met een
+vorm die precies moest passen. Dat werkt zolang er precies één bron is en die
+toevallig onze taal spreekt.
+
+**Wat het opzoeken opleverde.** De officiële bron voor de EU-btw-tarieven is de
+[Taxes in Europe Database](https://ec.europa.eu/taxation_customs/tedb/) van de
+Europese Commissie, die een SOAP-dienst aanbiedt; daaromheen bestaan spiegels
+die dezelfde gegevens als JSON leveren. Elke bron draagt nu drie dingen die
+nergens stonden: **gezag** (officieel / afgeleid / indicatief), **dekking**
+(welke landen en velden) en **vorm** (met de adapter die hem vertaalt). Urls
+staan niet in de code maar in de omgeving — een url in de repository is een
+keuze die niemand heeft gemaakt en die bij elke uitrol meereist.
+
+#### De vondst die de vorm bepaalde
+
+Een tarievenbron zegt welke *tarieven* een land kent — `standard`, `reduced`,
+`super_reduced`. Hij zegt **niet** welke categorie welk tarief krijgt, en dat is
+precies wat RTG bewaart:
+
+```
+NL   eten 9   (verlaagd)      DE   eten 19  (standaard!)
+NL   logies 9 (verlaagd)      DE   logies 7 (verlaagd)
+```
+
+In Duitsland valt een restaurantmaaltijd onder het standaardtarief en een
+hotelovernachting onder het verlaagde; in Nederland allebei verlaagd. Dezelfde
+"reduced rate" landt dus in het ene land op eten en in het andere niet. Dat is
+een juridische toewijzing per land, en geen tarievenbron ter wereld levert hem
+mee.
+
+Daarom doet de adapter drie dingen, en het derde is het belangrijkst:
+
+- **automatisch** — het standaardtarief. `standard` is `tarieven.standaard`, in
+  elk land, zonder oordeel.
+- **signaleren** — verschuift een verlaagd tarief, dan wordt er níéts
+  toegewezen. Er komt een signaal: "eten staat bij ons op 9%, maar dat tarief
+  komt in deze bron niet meer voor; de verlaagde tarieven zijn nu 10%."
+- **nooit** — een categorie een tarief geven dat de bron niet over die categorie
+  heeft gezegd.
+
+Dat is dezelfde regel als bij de zekerheidsklassen: automatiseer wat objectief
+automatiseerbaar is, en maak nergens zekerheid waar die niet is. Een adapter die
+de verlaagde tarieven "slim" verdeelt, levert een tabel op die er goed uitziet en
+in de helft van de landen fout is.
+
+De dagelijkse controle loopt alle geconfigureerde bronnen af. Wat binnenkomt is
+`ongecontroleerd` tot een mens het aanmerkt — automatisch binnenhalen is iets
+anders dan ongezien in gebruik nemen — en het **gezag reist mee naar de
+jaargang**, want een tarief uit de instantie zelf en een tarief uit een spiegel
+zijn niet even hard. Bronnen en openstaande signalen staan in de bankkamer bij
+de Regelwacht; alleen de signalen krijgen kleur, want dat is het enige dat werk
+vraagt.
+
+De keuring van wat een bron mag leveren staat apart (`regelwacht-keuring.js`),
+op dezelfde naad als bij payroll tussen regelpakket en -keuring: die keuring is
+de enige muur tussen een slechte bron en de tabellen waarmee dit hele huis
+rekent.
+
 ### De aangiftegateway (`kern/fiscaal/gateway/`) — klaargezet, niet aangezet
 
 RTG dient geen aangiften in. Dat is een productgrens en hij staat in het

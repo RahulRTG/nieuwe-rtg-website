@@ -19,11 +19,9 @@
      de basis (peiljaar) + de wijzigingen tot een datum
      = de tabel zoals hij op die datum was
 
-   EEN STORE PER TABEL. Dit werkt voor de landentabel (btw, lasten, minimumloon)
-   en voor de zzp-tabel (schijven, aftrek, kortingen), en die twee hebben elk
-   een eigen bak in de database, een eigen basis en eigen GENESTE velden. Wat
-   ze delen is het mechaniek, en dat hoort dus een keer te bestaan en niet twee
-   keer -- zie ./regelwacht.js en ./zzpwacht.js voor de twee gebruikers.
+   EEN STORE PER TABEL: de landentabel en de zzp-tabel hebben elk een eigen bak,
+   een eigen basis en eigen GENESTE velden. Wat ze delen is het mechaniek, en dat
+   hoort een keer te bestaan -- zie ./regelwacht.js en ./zzpwacht.js.
 
    Het opbouwen zelf staat in ./jaargangen-tijdlijn.js (puur); hier staat hoe je
    een wijziging bewaart, terugvindt en op de gedeelde tabel zet.
@@ -145,8 +143,10 @@ function maakJaargangen({ db, save, LANDEN, tabel, peiljaar, nu, bak: bakNaam, g
       wijzigingen: diep(wijzigingen),
       vorige: lichtUit(regelsOp(l, vanaf), wijzigingen),
       rechtsgrond: rechtsgrond ? String(rechtsgrond).replace(/[<>]/g, '').slice(0, 300) : null,
+      /* `gezag` reist mee: een tarief uit de instantie zelf en een tarief uit
+         een spiegel zijn niet even hard (kern/fiscaal/bronnen/). */
       bron: { soort: (bron && bron.soort) || 'handmatig', naam: (bron && bron.naam) || null,
-        url: (bron && bron.url) || null, opgehaaldOp: tijd() },
+        url: (bron && bron.url) || null, gezag: (bron && bron.gezag) || null, opgehaaldOp: tijd() },
       /* Wie het KANTOOR doorvoert, heeft een mens gezien; wat een automatische
          bron levert niet. Beide gaan de projectie in (zie de kop), maar ze zijn
          daarna uit elkaar te houden. */
@@ -160,7 +160,7 @@ function maakJaargangen({ db, save, LANDEN, tabel, peiljaar, nu, bak: bakNaam, g
     return { ok: true, jaargang: j };
   }
 
-  /* Aanmerken door een mens: de tweede helft van "welke regel gold er". */
+  /* Aanmerken door een mens. */
   function merkAan(land, id, door) {
     const j = lijstVan(land).find(x => x.id === id);
     if (!j) return { status: 404, error: 'Deze wijziging kennen we niet.' };

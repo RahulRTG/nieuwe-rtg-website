@@ -17,12 +17,12 @@ op telefoonformaat (390x844).
 
 | poort | staat | wat hij tegenhoudt |
 |---|---|---|
-| contrast, beide staten | **0** van 259, en nu over 83% van de tekst | tekst die te bleek is om te lezen |
+| contrast, beide staten | **0** van 259, en nu over 84,6% van de tekst | tekst die te bleek is om te lezen |
 | structuur (alt, label, naam, taal, titel) | **0** van 259 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
 | raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
-| de drie andere thema's | **0** op bordeaux en royal; champagne 12, grens 14 | tekst die alleen in de stand die je zelf niet gebruikt onleesbaar is |
+| de drie andere thema's | **0** op alle drie | tekst die alleen in de stand die je zelf niet gebruikt onleesbaar is |
 
 **HET GOUD WAS GEEN MERKBESLUIT MAAR EEN TOKEN DAT NIET MEETHEMAAT.** Toen de
 vierde ronde (champagne, bordeaux, royal) erbij kwam, stonden daar 470
@@ -45,16 +45,78 @@ beeldmerk houden hun goud.
 Dezelfde vorm bleek te gelden voor drie andere tonen, en die hebben nu allemaal
 een leestoken per thema: het **groen** (de stand *vrij*, *gezond*), de **zachte
 onderregel** en het **rood** (*druk*, *verwijderen*). Alle vier zijn ze
-**dekkend**, en dat is geen detail: `--rtg-soft` en `--rtg-muted` dragen een alfa,
-en de keuring slaat een voorgrond met alfa over. Een zachte toon daarheen sturen
-zou de bevinding laten *verdwijnen* zonder hem op te lossen — het tegenovergestelde
-van wat deze poort moet doen.
+**dekkend**, en dat was toen om een reden die inmiddels vervallen is: de keuring
+sloeg een voorgrond met alfa over, dus een zachte toon daarheen sturen zou de
+bevinding laten *verdwijnen* zonder hem op te lossen. Dat gat is een dag later
+gedicht — zie *de alfa* hieronder — en dekkend zijn ze gebleven, nu om een betere
+reden: een alfa zegt iets over sluier en niets over leesbaarheid.
 
-Daarmee ging de ronde van **470 naar 12**: bordeaux en royal staan op nul en zijn
-daar hard. Champagne houdt er twaalf, op vier schermen, en die hebben geen
-gemeenschappelijke oorzaak meer — twee ontwerpgereedschappen die de kleuren van de
-gebruiker zelf tonen, en twee schermen die hun eigen donkere vlak schilderen
-terwijl het thema licht is.
+Daarmee ging de ronde van **470 naar 0** op alle drie de thema's, en die nul is
+hard.
+
+**EN DE GROOTSTE BLINDE VLEK WAS NIET DE GROND MAAR DE LETTER.** Hierboven stond
+dat de poort 83% van de tekst weegt en dat de rest een `url()` als achtergrond is
+of een keten die tot de wortel doorzichtig blijft. Die 83% was een schatting, en
+op 20 augustus 2026 is hij nageteld over alle schermen in drie thema's. **5977
+tekstelementen: 3346 gewogen (56%), 663 overgeslagen om een `url()` (11,1%), nul
+om een doorzichtige keten** — die reden stond dus op papier zonder ooit te zijn
+voorgekomen — **en 1968 (32,9%) om iets dat hier helemaal niet stond: hun
+KLEUR had een alfa.** (Dat was een losse telling; sindsdien telt de poort het
+zelf, zie onderaan deze alinea.) De keuring deed daar `if (fg[3] < 1) return`, en dat is
+precies de groep waar `--rtg-muted` en `--rtg-soft` in wonen. De poort keek langs
+de tekst waar hij het hardst nodig was.
+
+Rekenen kon gewoon — het is dezelfde som die de keuring al op doorzichtige
+ACHTERGRONDlagen doet. `opGrond()` mengt de letter nu over elke grondkandidaat en
+weegt daarna, per kandidaat, want over een verloop is dezelfde letter op elke toon
+een andere kleur. Wat nog steeds stopt: een letter met alfa **nul**. Dat is geen
+bleke letter maar een onzichtbare, gebruikt om tekst door een achtergrond te laten
+tekenen; daar valt geen verhouding van te maken die iets betekent.
+
+**En het getal komt sindsdien uit de meting zelf.** Dat een percentage over de
+dekking met de hand geteld in twee documenten stond, is precies waarom het kon
+verouderen zonder dat iemand het merkte. `scripts/a11y.js` telt het nu per ronde
+mee en sluit ermee af, zodat het niet meer kan wegzakken:
+
+> `[a11y] dekking: van 28494 zichtbare tekstelementen zijn er 24102 gewogen
+> (84,6%); 4392 overgeslagen om een onberekenbare grond (15,4%), 0 om een letter
+> met alfa nul (0,0%).`
+
+Die 15,4% is één ding: een `url()` als achtergrond, een foto. Daar valt zonder de
+pixels niets van te rekenen, en dat blijft zo.
+
+Wat er daarmee zichtbaar werd was groot: **2844 bevindingen op de drie
+thema-ronden en 49 in de twee gewone staten**, en 795 van de voorbeelden waren
+twee tokens. `--rtg-soft` en `--rtg-muted` waren zelf de grootste bron van
+onleesbare tekst in dit huis. De oorzaak is dat **alfa de verkeerde knop is**:
+"56% van de inkt" is geen besluit over leesbaarheid maar over sluier, en wat het
+oplevert hangt af van de grond. Op onyx haalde 0,56 vlot 5,6:1, op parelmoer 3,5
+en op fluweel 3,6 — dezelfde regel, drie uitkomsten, waarvan twee onleesbaar.
+
+Ze zijn nu dekkend en per thema uitgerekend, met een regel die na te lopen is: de
+zachte toon is **zo zacht als de norm toelaat** (de lichtste tint die op de ergste
+grond van dat materiaal nog 4,85:1 haalt), de gedempte toon staat **halverwege**
+tussen die vloer en de volle inkt. "De ergste grond" is opgesomd en niet gegokt:
+elke stop van het glansverloop, elk van de zestien dagkleuren daarover, en de twee
+kaartvlakken daar weer overheen. `test/thema.test.js` rekent dat na zonder
+browser.
+
+Wat dat kost, hoort er eerlijk bij te staan: **op fluweel is er nauwelijks
+ruimte.** De lichtste bordeaux-stop haalt met de volle ivoren inkt maar 6,40:1,
+dus liggen de drie treden daar op 6,4 / 5,6 / 4,9 in plaats van op 11,5 / 8,2 /
+4,9 zoals op parelmoer. Op velours draagt de hiërarchie dus meer op maat en
+gewicht dan op toon — dezelfde uitkomst als bij het goud, dat op fluweel ook al
+ivoor werd.
+
+De rest was negen schermen die hun eigen vlak schilderen en hun eigen inkt niet,
+of niet specifiek genoeg. Twee daarvan zijn het vermelden waard omdat ze een
+patroon zijn en geen incident: op `app.html` is het bureau rondom de schil altijd
+zwart terwijl de inkt de themakeuze volgt, dus las alles wat BUITEN de schil landt
+1,06:1 onder champagne; en de website die een LID bouwt is een eigen document,
+maar `body.rtg-stijl .sub` uit de RTG-laag won van `.b-hero .sub` uit de bloklaag
+en verfde de hulptekst in de sitemaker onleesbaar. Dat laatste raakt ook een
+bezoeker van een gepubliceerde site, die geen lid is en niets aan die kleuren kan
+doen.
 
 **EN DE POORT ZELF WIEBELDE, DOORDAT PAGINA'S BIJ HET OPENEN VAN KLEUR
 VERANDERDEN.** De eerste grenzen zette ik op één meting, en de ronde daarna zakte
@@ -66,7 +128,6 @@ naar de kleur die hij hoort te hebben, en de keuring meet op 600 ms precies daar
 De overgang wordt nu pas een frame ná de eerste toepassing gearmeerd. Gemeten over
 drie ronden daarna: de wiebel ging van zes naar één. Dat is niet alleen een
 stabielere poort maar ook een pagina die meteen de goede kleur heeft.
-| de drie andere thema's | **0** onzichtbare tekst; het accent-als-kleine-tekst staat op een bovengrens | een lid dat champagne kiest en zijn scherm leeg ziet |
 
 **DE NUL BIJ CONTRAST WAS NOOIT WAAR, EN DAT IS OP 19 AUGUSTUS 2026 GEBLEKEN.**
 De keuring gaf op zodra er ergens in de keten een verloop stond -- en de themalaag
@@ -74,16 +135,19 @@ geeft `body` er een. Gemeten over alle 258 schermen in twee thema's: **1884
 tekstelementen werden gewogen en 3042 werden overgeslagen**, alle 3042 om die ene
 reden. De poort mat dus 38% van de tekst en meldde daarover nul. Hij rekent
 verlopen en doorzichtige lagen nu uit (`gronden()` in `scripts/a11ykeuring.js`)
-en weegt 83%; de rest is een `url()` als achtergrond of een keten die tot de
-wortel doorzichtig blijft, en daar blijft hij eerlijk zwijgen.
+en woog daarmee 56% — niet de 83% die hier een dag lang stond. Dat getal was een
+schatting en die hoort hier niet; zie *de alfa* hieronder voor de telling en voor
+wat er daarna nog buiten valt.
 
 Wat daarmee zichtbaar werd waren eerst drie systeemfouten -- de juridische
 pagina's met zwart op zwart, de grote iOS-titel licht op licht, en gedeelde
 componenten die het thema niet volgden -- en daarna een staart van zestig losse
 gevallen. **Alle zestig zijn gerepareerd**, bij de bron en niet per scherm: negen
 plekken in gedeelde bladen en zes op een scherm. De nul staat er dus weer, en hij
-betekent nu iets anders dan de vorige: hij gaat over 83% van de tekst in plaats
-van 38%. Wat er nog buiten valt staat met naam in `A11Y-INGELOGD.json`.
+betekent nu iets anders dan de vorige: hij gaat over 56% van de tekst in plaats
+van 38%, en sinds de dag erna over 84,6% -- een getal dat de poort zelf meet en
+aan het eind van elke ronde noemt. Wat er nog buiten valt staat met naam in
+`A11Y-INGELOGD.json`.
 
 **EN DE POORT KEURDE MAAR EEN STAND, NAMELIJK ONYX.** Dat is waar de themalaag
 op terugvalt als een lid niets kiest, dus alle drie de ronden hierboven meten die

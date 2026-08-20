@@ -279,7 +279,7 @@ function ordenSite(site,ver){
 const SOORTTEKST={vraag:'Uw vraag',offerte:'Waar wilt u een offerte voor',sollicitatie:'Vertel kort over uzelf',
   reservering:'Voor hoeveel personen, en wanneer',klacht:'Wat ging er mis',feedback:'Wat wilt u ons meegeven'};
 function tekenBlok(blok,ver){
-  const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='blok'; const t=blok.type;
+  const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='wb-blok'; const t=blok.type;
   const tekst=(el,v)=>{el.textContent=v||'';return el;};
   if(t==='hero'){ s.classList.add('b-hero'); s.appendChild(tekst(document.createElement('h1'),T.kop)); const p=document.createElement('div');p.className='sub';tekst(p,T.sub);s.appendChild(p); if(T.knop){const a=document.createElement('span');a.className='b-knop';tekst(a,T.knop);s.appendChild(a);} }
   else if(t==='kop'){ s.classList.add('b-kop'); s.appendChild(tekst(document.createElement('h2'),T.tekst)); }

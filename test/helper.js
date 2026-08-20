@@ -457,7 +457,59 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+/* DOORVEGEN OVER EEN REGEL, EN WAAROM DIT HIER STAAT EN NIET VIER KEER.
+
+   Dit stond als vier identieke kopieen in de vier gebaar-schermtoetsen, en de
+   fout die erin zat, zat er dus ook vier keer in (LAT.md regel 4).
+
+   DE DOBBELSTEEN DIE ERIN ZAT, MET DE METING ERBIJ. test/gebaar-bestanden.e2e.js
+   zakte tegen een KOUD gestarte server ongeveer een op de vijf keer, altijd op
+   dezelfde plek: de regel droeg zijn klasse, beide globals stonden er, en er kwam
+   geen lade en geen data-gb -- het gebaar begon niet eens. Dat is op 20 augustus
+   2026 nagerekend en het is geen fout in de laag maar een RACE MET EEN TIMER DIE
+   ER HOORT TE ZIJN: shared/gebaar/gebaar-03b.js opent na 520 ms de actielade
+   (lang drukken), en zet daarbij het lopende gebaar op nul. Tussen mouse.down()
+   en de eerste mouse.move() zit een aparte CDP-ronde; op een pagina die nog
+   bezig is met opstarten kan die de 520 ms overschrijden. Dan heeft de toets in
+   de ogen van de laag een halve seconde stilgestaan, en dat IS vasthouden.
+
+   Bewezen door het met opzet te forceren: 600 ms wachten na down() geeft precies
+   dezelfde eindstand, plus een open dialog.gb-blad die de oude aantekening nooit
+   had gecontroleerd.
+
+   Wat hier nu staat maakt dat zichtbaar in plaats van dodelijk: na de eerste
+   beweging wordt gecontroleerd of het gebaar echt begonnen is. Zo niet, dan is
+   het deze race, en dan gaat de lade dicht en volgt EEN nieuwe poging. Gebeurt
+   het twee keer, dan zakt de toets met de reden erbij -- want twee keer is geen
+   traagheid meer. Geen langere wachttijden: die maken een dobbelsteen stiller,
+   niet eerlijker. */
+async function veegDoor(page, doos, opties) {
+  const o = opties || {};
+  const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
+  const x0 = doos.x + doos.width * 0.8;
+  const px = -(doos.width * 0.62 + 90);
+  for (let poging = 1; poging <= 2; poging++) {
+    await page.mouse.move(x0, y);
+    await page.mouse.down();
+    await page.mouse.move(x0 + px / 22, y);
+    const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
+    if (!begonnen) {
+      await page.mouse.up();
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(250);
+      if (poging === 2) {
+        throw new Error('het gebaar begon twee keer niet: de vasthoud-teller (520ms) won ' +
+          'van de eerste beweging. Een keer is een trage opstart, twee keer is een fout.');
+      }
+      continue;
+    }
+    for (let i = 2; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
+    await page.mouse.up();
+    return;
+  }
+}
+
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, veegDoor,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

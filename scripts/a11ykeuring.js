@@ -408,12 +408,20 @@ function keurInPagina() {
     }
   }
 
+  /* WAT DE POORT WEEGT, TELT DE POORT ZELF. Dit stond als los getal in
+     TOEGANKELIJK.md en in A11Y-INGELOGD.json ("83%"), met de hand geteld, en het
+     was mis: de echte dekking was 56% en de grootste blinde vlek stond er niet
+     eens bij. Een cijfer over de meting hoort uit de meting te komen, anders
+     veroudert het zonder dat iemand het merkt (LAT.md regel 4). */
+  const dekking = { gemeten: 0, url: 0, onzichtbaar: 0, alfanul: 0 };
+
   // contrast (fataal): alleen elementen met eigen zichtbare tekst en een oplosbare, solide achtergrond
   document.querySelectorAll('body *').forEach(el => {
     const eigenTekst = Array.prototype.some.call(el.childNodes, n => n.nodeType === 3 && n.textContent.trim());
-    if (!eigenTekst || !zichtbaar(el)) return;
+    if (!eigenTekst) return;
+    if (!zichtbaar(el)) { dekking.onzichtbaar++; return; }
     const s = getComputedStyle(el);
-    if (parseFloat(s.opacity) < 1) return;                 // half-transparante intro-tekst: overslaan
+    if (parseFloat(s.opacity) < 1) { dekking.onzichtbaar++; return; }   // half-transparante intro-tekst
     /* EEN HALFDOORZICHTIGE LETTER IS OOK EEN LETTER, en dat is de reparatie van
        20 augustus 2026. Hieronder stond \`fg[3] < 1\` en dan return: elke tekst met
        een alfa in zijn kleur ging ongewogen langs de poort. Gemeten over alle
@@ -436,10 +444,11 @@ function keurInPagina() {
        een achtergrond te laten tekenen (\`background-clip:text\`). Daar valt geen
        verhouding van te maken die iets betekent, dus zwijgt de poort erover --
        dezelfde afspraak als bij een foto als grond. */
-    const fg = kleur(s.color); if (!fg || !(fg[3] == null || fg[3] > 0)) return;
+    const fg = kleur(s.color); if (!fg || !(fg[3] == null || fg[3] > 0)) { dekking.alfanul++; return; }
     /* De ONGUNSTIGSTE grond telt. Tekst over een verloop staat op elke toon
        ervan, dus hij hoort overal leesbaar te zijn en niet gemiddeld. */
-    const kandidaten = gronden(el); if (!kandidaten || !kandidaten.length) return;
+    const kandidaten = gronden(el); if (!kandidaten || !kandidaten.length) { dekking.url++; return; }
+    dekking.gemeten++;
     const uit = opGrond(fg, kandidaten);
     const laagst = uit.verhouding, bg = uit.grond, voor = uit.inkt;
     const drempel = grootTekst(parseFloat(s.fontSize), s.fontWeight) ? 3 : 4.5;
@@ -454,7 +463,7 @@ function keurInPagina() {
     }
   });
 
-  return { overtredingen: Object.values(structureel), contrast: Object.values(contrast) };
+  return { overtredingen: Object.values(structureel), contrast: Object.values(contrast), dekking };
 }
 
 const BRON = [kleur, luminantie, ratio, grootTekst, naam, mistAlt, mistNaam, mistLabel, zichtbaar,

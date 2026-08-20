@@ -230,3 +230,36 @@
   background:var(--rtg-grond);
   color:var(--rtg-txt);
 }
+
+/* EN EEN VLAK BINNEN EEN SCHERM MAG HETZELFDE ZEGGEN.
+   data-rtg-eigenvlak hierboven geldt voor een heel SCHERM. Er is ook de kleinere
+   vorm: een scherm dat het thema gewoon volgt, met daarin EEN vlak dat altijd
+   donker is -- een inlogpoort, een onboarding-overlay, een speler die zijn eigen
+   zwart schildert. Die vlakken schilderden hun grond hard en lieten hun inkt uit
+   het thema komen, en onder champagne kwam daar de donkere inkt op de donkere
+   grond terecht: de gedeelde Meenemen-knop las 1,48:1 op de onboardingpoort van
+   app.html.
+
+   De waarden zijn dezelfde als in het blok hierboven, en dat is bewust GEEN
+   gedeelde selector: `:has()` en dit attribuut in een selectorlijst zetten
+   betekent dat een browser die `:has()` niet kent de HELE lijst weggooit, dus
+   ook dit vlak. Twee regels met dezelfde waarheid is hier het kleinste kwaad;
+   test/thema.test.js houdt ze gelijk. */
+[data-rtg-vlak="onyx"]{
+  --rtg-bg:var(--onyx-basis);
+  --rtg-grond:var(--onyx-glans);
+  --rtg-txt:var(--op-onyx);
+  --rtg-muted:#CDC9C0;
+  --rtg-soft:#989489;
+  --rtg-line:var(--onyx-rand);
+  --rtg-card:#151312;
+  --rtg-card2:#1B1817;
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--gold-tekst);
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesgroen:#4C9A75;
+  --rtg-leesrood:#DE6E92;
+  --rtg-dagsterkte:0.10;
+  color-scheme:dark;
+  color:var(--rtg-txt);
+}

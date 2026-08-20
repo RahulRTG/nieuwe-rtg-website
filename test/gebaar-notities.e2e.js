@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor } = require('./helper');
 
 function laadPlaywright() {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
@@ -40,15 +40,6 @@ async function wachtTot(lees, klopt, wat, grens = 8000) {
   assert.fail(wat + ' -- na ' + grens + 'ms stond er: ' + JSON.stringify(laatst));
 }
 
-async function veegDoor(page, doos) {
-  const y = doos.y + doos.height / 2;
-  const x0 = doos.x + doos.width * 0.8;
-  const px = -(doos.width * 0.62 + 90);
-  await page.mouse.move(x0, y);
-  await page.mouse.down();
-  for (let i = 1; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
-  await page.mouse.up();
-}
 
 test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op vasthouden',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {

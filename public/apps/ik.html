@@ -17,6 +17,12 @@
     border:1px solid var(--line);border-radius:12px;color:var(--txt);font:inherit;cursor:pointer;}
   .keus:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
   .keus[aria-pressed="true"]{border-color:var(--goldlicht);background:rgba(201,162,75,.09);}
+  /* DE GEKOZEN KAART LEGT EEN GOUDWAS OVER ZIJN GROND, dus wordt die grond
+     lichter dan waar de zachte toon van het thema op gerekend is: 9% goud over
+     het paneel maakt er rgb(56,51,42) van, en daar haalt --rtg-soft 4,14:1. Een
+     GEKOZEN regel mag ook gewoon sterker staan, dus hij gaat een trede omhoog:
+     7,59:1. Wie de was zwaarder maakt, controleert dit opnieuw. */
+  .keus[aria-pressed="true"] span{color:var(--rtg-muted,var(--muted));}
   .keus b{display:block;font-size:.96rem;margin-bottom:.15rem;}
   .keus span{display:block;color:var(--soft);font-size:.8rem;line-height:1.5;}
   .vinkjes{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0;}

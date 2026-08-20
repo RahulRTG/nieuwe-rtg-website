@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor } = require('./helper');
 
 function laadPlaywright() {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
@@ -60,15 +60,6 @@ async function doosVan(locator, wat) {
   assert.fail(wat + ' bleef onder de meting verschuiven; de feed hertekent te vaak om te meten');
 }
 
-async function veegDoor(page, doos) {
-  const y = doos.y + Math.min(40, doos.height / 2);
-  const x0 = doos.x + doos.width * 0.8;
-  const px = -(doos.width * 0.62 + 90);
-  await page.mouse.move(x0, y);
-  await page.mouse.down();
-  for (let i = 1; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
-  await page.mouse.up();
-}
 
 test('een veeg archiveert een post en draait terug; bewaren drukt de knop in en laat hem staan',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
@@ -121,7 +112,7 @@ test('een veeg archiveert een post en draait terug; bewaren drukt de knop in en 
     /* De feed is langer dan het venster, en boundingBox() rekent in het VENSTER:
        zonder dit landt de muis buiten beeld en gebeurt er niets. */
     const doos1 = await doosVan(rij, 'de eerste post');
-    await veegDoor(page, doos1);
+    await veegDoor(page, doos1, { vanBoven: 40 });
     await wachtTot(() => staatVan(tekst), (s) => s && s.archief,
       'doorvegen hoort de post bij de server te archiveren');
     assert.match(await page.locator('.gb-terug').textContent(), /^\s*Gearchiveerd/,

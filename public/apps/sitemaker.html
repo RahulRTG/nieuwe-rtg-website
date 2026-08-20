@@ -47,20 +47,20 @@
   .doek{border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);}
   .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
   /* bewerk-affordances */
-  .bewerk .blok{outline:1px dashed transparent;transition:outline-color .15s;}
-  .bewerk .blok:hover{outline-color:color-mix(in srgb,var(--gold) 55%,transparent);}
+  .bewerk .wb-blok{outline:1px dashed transparent;transition:outline-color .15s;}
+  .bewerk .wb-blok:hover{outline-color:color-mix(in srgb,var(--gold) 55%,transparent);}
   .bew{outline:none;border-radius:4px;cursor:text;}
   .bewerk .bew:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent);}
   .bewerk .b-beeld img,.bewerk .b-gal img{cursor:pointer;}
   .bwbalk{position:absolute;top:6px;right:6px;display:none;gap:.25rem;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--line);border-radius:10px;padding:.2rem;}
-  .bewerk .blok:hover>.bwbalk{display:flex;}
+  .bewerk .wb-blok:hover>.bwbalk{display:flex;}
   .bwbalk button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
   .bwbalk button:hover{border-color:var(--gold);}
   .bwbalk button.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .bwbalk button svg{display:block;}
   .bwbalk .weg:hover{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
-  .blok.sleep{opacity:.5;}
-  .bewerk .blok.dim{opacity:.4;}
+  .wb-blok.sleep{opacity:.5;}
+  .bewerk .wb-blok.dim{opacity:.4;}
   .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
   .vlabel.var{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
   #versienoot{color:var(--rtg-leesgroen,var(--green));}
@@ -345,7 +345,7 @@ function balk(blok,p){
   return b;
 }
 function renderBlok(blok,p){
-  const s=document.createElement('section'); s.className='blok'; s.dataset.p=p; const T=toon(blok);
+  const s=document.createElement('section'); s.className='wb-blok'; s.dataset.p=p; const T=toon(blok);
   if(BEWERK){ s.draggable=true;
     s.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',p);s.classList.add('sleep');});
     s.addEventListener('dragend',()=>s.classList.remove('sleep'));

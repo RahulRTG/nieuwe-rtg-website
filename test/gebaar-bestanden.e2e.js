@@ -12,27 +12,24 @@
    wordt nu gepold tot de server het zegt, met een grens eromheen; wat de laag
    belooft is dat het GEBEURT, niet dat het binnen een seconde gebeurt.
 
-   EN HIJ ZAKT SOMS, EN IK WEET NIET WAAROM. Op 19 augustus 2026 gemeten: tegen
-   een KOUD gestarte server (zoals hier) zakt hij ongeveer een op de vijf keer,
-   altijd op dezelfde plek -- de doorveeg gebeurt niet en het bestand staat er na
-   acht seconden nog. Tegen de warme ontwikkelserver: nul op tien. De handtekening
-   van zo'n ronde is: de regel draagt zijn klasse (`item gb-rij`), beide globals
-   staan er, en er komt GEEN lade en GEEN data-gb -- het gebaar begint dus niet
-   eens.
+   EN HIJ ZAKTE SOMS, EN OP 20 AUGUSTUS 2026 IS UITGEZOCHT WAAROM. Tegen een
+   KOUD gestarte server (zoals hier) zakte hij ongeveer een op de vijf keer,
+   altijd op dezelfde plek: de regel droeg zijn klasse, beide globals stonden er,
+   en er kwam geen lade en geen data-gb -- het gebaar begon niet eens.
 
-   Wat het niet is, met een meting erbij: het is niet de regel zelf (beide
-   bestanden hebben dezelfde opbouw en maat), niet het aantal pointermoves (23,
-   elke ronde), en niet het aanwijslicht (de reparatie van position:relative
-   veranderde niets aan de kans). Wat het wel kan zijn is een hertekening van de
-   lijst tussen het neerkomen en de eerste beweging: forceer die met de hand en
-   het gebaar sterft precies zo. Alleen doet bestanden/app.js dat uit zichzelf
-   niet -- laad() draait een keer -- dus dat is een gelijkende oorzaak en geen
-   bewezen.
+   Hier stond dat ik niet wist waarom, met drie dingen die het NIET was. De
+   oorzaak bleek een RACE MET EEN TIMER DIE ER HOORT TE ZIJN: gebaar-03b.js opent
+   na 520 ms de actielade (lang drukken) en zet het lopende gebaar daarbij op nul.
+   Tussen mouse.down() en de eerste mouse.move() zit een aparte CDP-ronde, en op
+   een pagina die nog aan het opstarten is haalt die de 520 ms. Dan heeft deze
+   toets in de ogen van de laag een halve seconde stilgestaan -- en dat IS
+   vasthouden. Bewezen door het te forceren: 600 ms wachten na down() geeft
+   precies dezelfde eindstand, plus de open dialog.gb-blad die ik toen niet had
+   gecontroleerd. De vierde gedachte hierboven (een hertekening van de lijst) was
+   dus een gelijkende oorzaak en niet de echte.
 
-   Dit staat hier en niet weggepoetst met een langere wachttijd, want een toets
-   die soms zakt is een dobbelsteen, en een dobbelsteen die je stiller maakt is
-   erger dan een die rammelt. Wie hem opnieuw ziet zakken: begin bij die
-   handtekening, en niet bij de wachttijden.
+   De reparatie staat in test/helper.js, bij veegDoor -- op EEN plek, want deze
+   functie stond hier vier keer.
 
    Draai: node --test test/gebaar-bestanden.e2e.js  (slaat over zonder Playwright) */
 const test = require('node:test');
@@ -40,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor } = require('./helper');
 
 function laadPlaywright() {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
@@ -64,15 +61,6 @@ async function wachtTot(lees, klopt, wat, grens = 8000) {
   assert.fail(wat + ' -- na ' + grens + 'ms stond er: ' + JSON.stringify(laatst));
 }
 
-async function veegDoor(page, doos) {
-  const y = doos.y + doos.height / 2;
-  const x0 = doos.x + doos.width * 0.8;
-  const px = -(doos.width * 0.62 + 90);
-  await page.mouse.move(x0, y);
-  await page.mouse.down();
-  for (let i = 1; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
-  await page.mouse.up();
-}
 
 test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {

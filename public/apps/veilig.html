@@ -28,6 +28,9 @@
     background:transparent;border:1px solid var(--line);border-radius:12px;color:var(--txt);font:inherit;cursor:pointer;}
   .stand:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
   .stand[aria-pressed="true"]{border-color:var(--goldlicht);background:rgba(201,162,75,.09);}
+  /* Dezelfde goudwas als op ik.html, en dezelfde reparatie: op die lichtere
+     grond haalt de zachte toon 4,14:1, een trede hoger 7,59. */
+  .stand[aria-pressed="true"] span{color:var(--rtg-muted,var(--muted));}
   .stand b{display:block;font-size:.98rem;margin-bottom:.2rem;}
   .stand span{display:block;color:var(--soft);font-size:.82rem;line-height:1.5;}
   .baan{border:1px solid var(--groen);border-radius:12px;padding:.8rem .9rem;margin:1rem 0;

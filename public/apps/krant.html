@@ -95,7 +95,7 @@ function versieNu(){ const w=Math.min(window.innerWidth,1080); return w<=640?'te
 function toonBlok(b,v){ if(v==='desktop')return b; const o=b.varianten&&b.varianten[v]; return o?Object.assign({},b,o):b; }
 function ordenSite(site,v){ const vs=site.volgorde&&site.volgorde[v]; if(v!=='desktop'&&vs&&vs.length){const m={};(site.blokken||[]).forEach(b=>m[b.id]=b);const u=[];vs.forEach(id=>{if(m[id]){u.push(m[id]);delete m[id];}});(site.blokken||[]).forEach(b=>{if(m[b.id])u.push(b);});return u;} return (site.blokken||[]).slice(); }
 function tk(el,v){el.textContent=v||'';return el;}
-function blokEl(b,v){ const T=toonBlok(b,v),s=document.createElement('section');s.className='blok';const t=b.type;
+function blokEl(b,v){ const T=toonBlok(b,v),s=document.createElement('section');s.className='wb-blok';const t=b.type;
   if(t==='hero'){s.classList.add('b-hero');s.appendChild(tk(document.createElement('h1'),T.kop));const p=document.createElement('div');p.className='sub';tk(p,T.sub);s.appendChild(p);if(T.knop){const a=document.createElement('span');a.className='b-knop';tk(a,T.knop);s.appendChild(a);}}
   else if(t==='kop'){s.classList.add('b-kop');s.appendChild(tk(document.createElement('h2'),T.tekst));}
   else if(t==='tekst'){s.classList.add('b-tekst');const d=document.createElement('div');tk(d,T.tekst);s.appendChild(d);}

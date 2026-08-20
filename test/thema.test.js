@@ -32,7 +32,12 @@ const BLOKKEN = {
   onyx: blok(':root[data-rtg-thema="onyx"]{'),
   bordeaux: blok(':root[data-rtg-thema="bordeaux"]{'),
   royal: blok(':root[data-rtg-thema="royal"]{'),
-  'altijd-onyx': blok(':root[data-rtg-thema]:has(> body[data-rtg-eigenvlak="onyx"]){')
+  'altijd-onyx': blok(':root[data-rtg-thema]:has(> body[data-rtg-eigenvlak="onyx"]){'),
+  /* Het kleinere broertje: EEN vlak binnen een scherm dat altijd donker is (een
+     inlogpoort, een onboarding-overlay). Het draagt dezelfde waarheid en staat
+     bewust in een eigen regel -- zie de toelichting in rtg-themas.css -- dus
+     hoort het hier mee bewaakt te worden. */
+  'vlak-onyx': blok('[data-rtg-vlak="onyx"]{')
 };
 
 /* Tokens die BEWUST niet per materiaal verschillen: maten, en kleuren die hun
@@ -115,6 +120,27 @@ const waardeVan = (b, t) => {
   assert.ok(m, 'token niet gevonden: ' + t);
   return m[1].trim();
 };
+
+test('het altijd-onyx SCHERM en het altijd-onyx VLAK zeggen precies hetzelfde', () => {
+  /* Ze staan in twee regels omdat een selectorlijst met :has() erin door een
+     browser die :has() niet kent in zijn GEHEEL wordt weggegooid -- dan zou het
+     vlak meevallen. Twee regels met dezelfde waarheid mag alleen als iets ze
+     gelijk houdt (LAT.md regel 4), en dat is deze toets.
+     DE MUTATIE: verzet een van de twee, bijvoorbeeld --rtg-card in het vlak. */
+  const lees = (b) => {
+    const uit = {};
+    for (const m of b.matchAll(/(--rtg-[\w-]+)\s*:\s*([^;]+);/g)) uit[m[1]] = m[2].trim();
+    return uit;
+  };
+  const scherm = lees(BLOKKEN['altijd-onyx']);
+  const vlak = lees(BLOKKEN['vlak-onyx']);
+  const anders = [];
+  for (const [t, v] of Object.entries(scherm)) {
+    if (!(t in vlak)) anders.push('het vlak mist ' + t);
+    else if (vlak[t] !== v) anders.push(t + ': scherm ' + v + ', vlak ' + vlak[t]);
+  }
+  assert.deepEqual(anders, [], 'de twee altijd-onyx-regels zijn uit elkaar gelopen');
+});
 
 test('geen enkel zacht thematoken draagt nog een alfa', () => {
   /* DE MUTATIE: zet er in een van de vijf blokken weer een rgba() neer. */

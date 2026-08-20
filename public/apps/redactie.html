@@ -80,20 +80,20 @@
   .doekwrap{display:flex;justify-content:center;}
   .doek{border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.4);transition:max-width .28s ease;}
   .doek.mobielkader{border-radius:26px;border:2px solid var(--line);}
-  .bewerk .blok{outline:1px dashed transparent;transition:outline-color .15s;}
-  .bewerk .blok:hover{outline-color:color-mix(in srgb,var(--gold) 55%,transparent);}
+  .bewerk .wb-blok{outline:1px dashed transparent;transition:outline-color .15s;}
+  .bewerk .wb-blok:hover{outline-color:color-mix(in srgb,var(--gold) 55%,transparent);}
   .bew{outline:none;border-radius:4px;cursor:text;}
   .bewerk .bew:hover{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 30%,transparent);}
   .bewerk .b-beeld img,.bewerk .b-gal img{cursor:pointer;}
   .bwbalk{position:absolute;top:6px;right:6px;display:none;gap:.25rem;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--line);border-radius:10px;padding:.2rem;}
-  .bewerk .blok:hover>.bwbalk{display:flex;}
+  .bewerk .wb-blok:hover>.bwbalk{display:flex;}
   .bwbalk button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer;font-size:.85rem;line-height:1;display:grid;place-items:center;}
   .bwbalk button:hover{border-color:var(--gold);}
   .bwbalk button.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .bwbalk button svg{display:block;}
   .bwbalk .weg:hover{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
-  .blok.sleep{opacity:.5;}
-  .bewerk .blok.dim{opacity:.4;}
+  .wb-blok.sleep{opacity:.5;}
+  .bewerk .wb-blok.dim{opacity:.4;}
   .vlabel{position:absolute;top:6px;left:6px;z-index:3;background:rgba(12,12,11,.86);border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.16rem .45rem;border-radius:8px;}
   .vlabel.var{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
   .leegdoek{padding:4rem 1.4rem;text-align:center;color:var(--dmut);}
@@ -293,7 +293,7 @@ function balk(b,p){ const bar=document.createElement('div');bar.className='bwbal
   const verb=(b.verberg||[]).includes(APPARAAT); bar.appendChild(mk(verb?OOG_UIT:OOG,verb?'aan':'',()=>toggleZicht(b),(verb?'Weer tonen op ':'Verbergen op ')+APPARAAT,true));
   if(heeftVariant(b))bar.appendChild(mk('↺','',()=>resetVersie(b),'Gelijk aan basis'));
   bar.appendChild(mk('×','weg',()=>verwijder(b),'Verwijderen')); return bar; }
-function blokEl(b,p){ const s=document.createElement('section');s.className='blok';const T=toon2(b);const t=b.type;
+function blokEl(b,p){ const s=document.createElement('section');s.className='wb-blok';const T=toon2(b);const t=b.type;
   if(BEWERK){s.draggable=true;s.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',p);s.classList.add('sleep');});s.addEventListener('dragend',()=>s.classList.remove('sleep'));s.addEventListener('dragover',e=>e.preventDefault());s.addEventListener('drop',e=>{e.preventDefault();const v=+e.dataTransfer.getData('text/plain');if(!isNaN(v))herorden(v,p);});}
   if(t==='hero'){s.classList.add('b-hero');const h=document.createElement('h1');h.appendChild(veld(T.kop,v=>zetVeld(b,'kop',v)));s.appendChild(h);const pp=document.createElement('div');pp.className='sub';pp.appendChild(veld(T.sub,v=>zetVeld(b,'sub',v),true));s.appendChild(pp);const a=document.createElement('span');a.className='b-knop';a.appendChild(veld(T.knop,v=>zetVeld(b,'knop',v)));s.appendChild(a);}
   else if(t==='kop'){s.classList.add('b-kop');const h=document.createElement('h2');h.appendChild(veld(T.tekst,v=>zetVeld(b,'tekst',v)));s.appendChild(h);}

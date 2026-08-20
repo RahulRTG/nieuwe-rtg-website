@@ -139,6 +139,11 @@ function startEchteServer() {
 
   let totaal = 0, contrastTotaal = 0;
   const perRonde = [];
+  /* De dekking van deze poort, opgeteld over alles wat hij bekijkt. Zie de kop
+     bij `dekking` in a11ykeuring.js: dit getal stond met de hand geteld in twee
+     documenten en was mis. */
+  const dekking = { gemeten: 0, url: 0, onzichtbaar: 0, alfanul: 0 };
+  const telDekking = (d) => { if (d) for (const k of Object.keys(dekking)) dekking[k] += d[k] || 0; };
 
   for (const ronde of [{ naam: 'uitgelogd', token: null }, { naam: 'ingelogd', token: lid.token }]) {
     const context = await browser.newContext({ serviceWorkers: 'block' });
@@ -160,6 +165,7 @@ function startEchteServer() {
         console.error(`[a11y] ${pad} (${ronde.naam}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
         struct += 1; continue;
       }
+      telDekking(res.dekking);
       if (res.overtredingen.length) {
         struct += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
         console.log(`\n[a11y] ${pad} (${ronde.naam}): ${res.overtredingen.length} soort(en) structurele overtreding`);
@@ -287,6 +293,7 @@ function startEchteServer() {
         console.error(`[a11y] ${pad} (${thema}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
         struct += 1; continue;
       }
+      telDekking(res.dekking);
       if (res.overtredingen.length) {
         struct += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
         console.log(`\n[a11y] ${pad} (${thema}): ${res.overtredingen.length} soort(en) structurele overtreding`);
@@ -311,6 +318,14 @@ function startEchteServer() {
   server.stop();
 
   for (const r of perRonde) console.log(`[a11y] ${r.naam.padEnd(10)} ${r.struct} structureel · ${r.contr} contrast`);
+  {
+    const wegbaar = dekking.gemeten + dekking.url + dekking.alfanul;
+    const pct = (n) => wegbaar ? (n / wegbaar * 100).toFixed(1) + '%' : '-';
+    console.log(`[a11y] dekking: van ${wegbaar} zichtbare tekstelementen zijn er ` +
+      `${dekking.gemeten} gewogen (${pct(dekking.gemeten)}); ` +
+      `${dekking.url} overgeslagen om een onberekenbare grond (${pct(dekking.url)}), ` +
+      `${dekking.alfanul} om een letter met alfa nul (${pct(dekking.alfanul)}).`);
+  }
   /* DE RATEL IS OP NUL AANGEKOMEN, EN DAT IS DE HELE BEDOELING GEWEEST.
 
      De ingelogde ronde bracht 25 contrastfouten mee die nooit eerder gemeten
@@ -340,17 +355,20 @@ function startEchteServer() {
      zonder browser laten zakken. */
   const raakOordeel = raakvlak.veltRaakvlak(raakTotaal, (grens.raakvlak || {}).onder24);
   if (raakOordeel.faalt) fouten.push(raakOordeel.melding.trim().replace(/^\[a11y\] MISLUKT: /, ''));
-  /* DE THEMA'S HEBBEN EEN BOVENGRENS EN GEEN NUL, en dat is geen zwakkere poort
-     maar een eerlijkere. De onzichtbare tekst is weg en staat hard op nul; wat
-     er onder de thema's overblijft is EEN soort: het goud en de andere accenten
-     als KLEINE tekst. Dat is een merkbesluit (MATERIAAL.md: goud is een
-     vulkleur en geen tekstkleur) en geen instelfout, en het raakt de vormtaal.
-     Die op dag een hard afkeuren zou betekenen: de poort staat rood tot iemand
-     dat besluit heeft genomen, en dan wordt hij uitgezet.
+  /* DE THEMA'S STAAN OP NUL, EN DAT WAS EEN WEG VAN TWEE DAGEN.
+     Hier stond dat ze een BOVENGRENS hadden en geen nul, met de reden erbij: wat
+     er na de onzichtbare tekst overbleef leek EEN soort -- het goud en de andere
+     accenten als kleine tekst -- en dat is een merkbesluit dat de vormtaal raakt.
+     Op dag een hard afkeuren zou de poort rood zetten tot iemand dat besluit
+     nam, en dan wordt zo'n poort uitgezet.
 
-     Dus staat er per thema een getal dat alleen OMLAAG mag. Komt er ergens een
-     bevinding bij -- ook een onzichtbare -- dan gaat het getal omhoog en zakt de
-     scan. Een thema zonder getal in het register is een fout en geen vrijstelling. */
+     Het bleek geen merkbesluit maar een token dat niet meethemaat, en daarna nog
+     een: --rtg-soft en --rtg-muted droegen een alfa, en een alfa zegt niets over
+     leesbaarheid. Alle drie de thema's staan nu op nul (20 augustus 2026).
+
+     De constructie blijft staan omdat hij de nul BEWAAKT en niet omdat er ruimte
+     in zit: het getal per thema mag alleen omlaag, en een thema zonder getal in
+     het register is een fout en geen vrijstelling. */
   for (const t of perThema) {
     const bg = (grens.themas || {})[t.thema];
     if (bg === undefined) {

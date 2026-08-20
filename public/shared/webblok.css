@@ -27,8 +27,16 @@
 .doek[data-thema="donker"]{ --dbg:#0C0C0B; --dtxt:#F4F1EC; --dmut:#B5B3AF; --dline:rgba(255,255,255,.12); --dcard:#151312; }
 .doek[data-thema="licht"]{ --dbg:#F5F1EA; --dtxt:#20160F; --dmut:#4E4640; --dline:rgba(32,22,15,.14); --dcard:#FBF8F2; }
 .doek{background:var(--dbg);color:var(--dtxt);font-family:'Inter',system-ui,sans-serif;}
-.blok{position:relative;}
-.doek .blok h1,.doek .blok h2,.doek .blok h3{font-family:'Bodoni Moda',serif;font-weight:500;color:var(--dtxt);line-height:1.1;}
+/* .wb-blok EN NIET .blok, EN DAT IS EEN NAAMBOTSING DIE ECHT PIJN DEED.
+   De UI-kit van RTG claimt `.blok` als sectiekaart (body.rtg-stijl .blok in
+   shared/rtg-ui.css), en die selector is specifieker dan alles wat dit blad
+   over een blok zei. Gevolg: de site van een LID werd binnen de Website-maker
+   en de RTG-browser getekend met de kaartachtergrond, de rand, de hoeken en de
+   padding van RTG -- op champagne zelfs een half doorzichtig WIT vlak, waar de
+   hulptekst van de hero 1,91:1 op haalde. De site van een lid is een vreemd
+   document in een RTG-pagina; het huis hoort er niet in te tekenen. */
+.wb-blok{position:relative;}
+.doek .wb-blok h1,.doek .wb-blok h2,.doek .wb-blok h3{font-family:'Bodoni Moda',serif;font-weight:500;color:var(--dtxt);line-height:1.1;}
 .b-hero{padding:clamp(2.4rem,7cqw,5rem) clamp(1.4rem,5cqw,3.4rem);text-align:center;background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 22%,var(--dbg)),var(--dbg));}
 .b-hero h1{font-size:clamp(1.9rem,5cqw,3.4rem);}
 .doek .b-hero .sub{color:var(--dmut);font-size:clamp(1rem,2cqw,1.2rem);margin:.9rem auto 0;max-width:44ch;line-height:1.6;}

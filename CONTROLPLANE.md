@@ -65,6 +65,7 @@ SUBJECT → CONTRACT → ENTITLEMENTS → CAPABILITIES → POLICIES → LIMITS
 | Economische idempotentie | `kern/betaalopdracht/rij.js` | **af** voor uitbetalingen; nog niet over de hele keten (§5.5) |
 | Intent (voornemen) | `commercie/voornemen.js` + `/plan`, `/keuring`, `/uitvoeren` | **af** — de keuring gaat over het totaal (§5.6) |
 | Effectieve rechten | `commercie/rechten.js` | **af** — nominaal naast effectief (§5.7) |
+| Terugval-voorstel | `commercie/voorstel.js` + `/weging.js` | **af** — voorstellen, nooit verplaatsen (§5.8) |
 | Limits | grenzen op de bevoegdheid | **af**; dagtellers komen van de aanroeper |
 | Enforcement | `commercie/routepoort.js` aan de leverancierspoort | **af** — acht van acht capabilities hebben een caller |
 | Evidence | `commercie/claims.js` + de bewijslaag | **deels** |
@@ -473,6 +474,42 @@ argument — de **scheuren** over alle zaken heen. Loopt een scheur over álle
 zaken, dan is het geen zaakprobleem maar een regel die nog niet afdwingt, en dat
 staat er apart bij.
 
+### 5.8 Het terugval-voorstel (was §6.8, nu gebouwd)
+
+`zaakabonnement.js` laat elke zaak van vóór de ladder terugvallen op `business`
+met `herkomst: 'voor-de-ladder'`. Dat was de juiste keuze — een migratie die
+rechten intrekt is een storing met een nette naam — maar het is een *terugval* en
+geen besluit, en zonder iets dat ze voorstelt staan die zaken er over een jaar
+nog.
+
+Drie regels, en de eerste is de enige die er echt toe doet:
+
+1. **Er wordt niets automatisch verplaatst.** Er is één plek waar een trede
+   verandert, en dat is `bevestig()` met een naam erbij. Een zaak die op
+   maandagochtend haar kassa kwijt is omdat een algoritme vond dat ze hem niet
+   gebruikte, is precies de storing die de terugval moest voorkomen.
+2. **Geen bewijs is geen voorstel.** De verleiding is om "niets gebruikt" te
+   lezen als "de goedkoopste trede volstaat".
+3. **Een voorstel zegt wat het afpakt** — met naam, want wie tekent hoort te
+   weten wat hij intrekt.
+
+**En daar kwam een vierde bij, die deze module bijna miste.** De laag daarboven
+kan lang niet elke capability zien: kassa-artikelen en personeelsrijen staan
+ergens te tellen, maar of een zaak ooit governance heeft gebruikt weet niemand.
+Een nul uit *"niet gemeten"* ziet er precies zo uit als een nul uit *"niet
+gebruikt"* — en op die eerste een onderdeel intrekken is geen voorstel maar een
+gok. Daarom is `gemeten` een aparte lijst en geen afgeleide van `gebruik`: wat er
+niet in staat en wat de zaak nú heeft, telt als nodig.
+
+Het gevolg is zichtbaar en niet stil: de adapter meet vandaag twee dingen
+(kassa-artikelen, personeelsrijen), dus er valt zelden een lágere trede voor te
+stellen. Wat er wél uit komt is "leg vast waar deze zaak al draait" — en dat is
+óók winst: een terugval wordt een besluit zonder dat iemand iets kwijtraakt.
+Groeit de meetlijst, dan worden de voorstellen vanzelf scherper. Eerst meten, dan
+voorstellen.
+
+Zeven mutaties, alle zeven gevangen.
+
 ## 6. Wat hierna komt, op volgorde
 
 Alles hieronder is **ontwerp en geen code**. Het staat hier zodat de volgorde
@@ -491,9 +528,10 @@ vastligt en niemand halverwege iets anders bouwt.
 7. ~~**Effective rights**~~ **Gebouwd** — zie §5.7. Rol, delegatie en risicostand
    staan er nog niet in: die wonen in CONCERN.md respectievelijk `bevoegdheid.js`,
    en een bord dat ze half toont is misleidender dan één dat ze weglaat.
-8. **Self-healing fallback** — de zaken op `voor-de-ladder` automatisch
-   voorstellen op basis van hun historie, en pas na menselijke bevestiging
-   verplaatsen.
+8. ~~**Self-healing fallback**~~ **Gebouwd** — zie §5.8, met één afwijking van de
+   oorspronkelijke formulering: "op basis van hun historie" is het niet geworden,
+   want die historie bestaat niet. Het voorstel leunt op wat er nú te tellen
+   valt, en zegt met naam waar het niet naar heeft gekeken.
 9. **Capability health** (GROEN/AMBER/ROOD/QUARANTAINE) en **capability-level
    failover**: `payout` in quarantaine terwijl kassa, orders en refunds
    doorlopen. Veel beter dan "healthcheck rood → platform stuk".

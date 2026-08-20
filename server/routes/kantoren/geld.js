@@ -61,6 +61,10 @@ module.exports = (ctx) => {
     ({ status: 200, ...claims.poort() })));
 
   require('./geld/commercie')(ctx);
+  /* De zaken die nog op de gedocumenteerde terugval draaien, met per zaak een
+     voorstel. Zie ./geld/terugval.js -- die is de enige plek die de zaakvorm
+     kent, en hij zegt met zoveel woorden waar hij NIET naar kijkt. */
+  require('./geld/terugval')(ctx);
 
   app.post('/api/office/geld', boardroomAuth, (req, res) => veilig(res, () => geldOverzicht()));
   app.post('/api/office/geld/pasprijs', boardroomAuth, (req, res) => veilig(res, () => {

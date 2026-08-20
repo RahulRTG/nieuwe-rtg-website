@@ -20,10 +20,12 @@
    bedrag draagt, is geen reparatie maar een derde cijfer erbij.
 
    WAT DEZE TOETS NIET DEKT, en dat hoort erbij te staan: bij een cadeaukaart
-   en bij een tafelticket op 'contant' telt de maandboekhouding zelf dubbel
-   (TAKEN.md 4.27 en 4.28). Die twee gevallen staan met opzet niet in toets 7 --
-   niet omdat ze niet bestaan, maar omdat ze een defect aan de ANDERE kant zijn
-   en hier dus niets over deze reparatie zouden zeggen.
+   telt de maandboekhouding zelf dubbel (TAKEN.md 4.27). Dat geval staat met
+   opzet niet in toets 7 -- niet omdat het niet bestaat, maar omdat het een
+   defect aan de ANDERE kant is en hier dus niets over deze reparatie zou zeggen.
+   Het tafelticket op 'contant' stond hier ook (TAKEN.md 4.28) en is sinds 19
+   augustus 2026 gerepareerd; het heeft nu een eigen toets (6b), en die legt
+   daarom een derde getal ernaast dat niet kan meebewegen: de som van de bonnen.
 
    Draai los: node --test test/lidfactuur.test.js */
 const test = require('node:test');
@@ -65,8 +67,50 @@ async function facturenOpRef(base, mgrTok, ref) {
   assert.equal(f.status, 200, 'de facturenlijst van de zaak');
   return (f.body.verkocht || []).filter(x => x.ref === ref);
 }
-// de facturatiemotor boekt in een losse belofte; de route antwoordt eerder
-const even = () => new Promise(r => setTimeout(r, 400));
+/* WACHTEN TOT DE FACTUUR ER IS, niet 400 ms aftellen.
+
+   De facturatiemotor boekt in een LOSSE belofte; de route antwoordt eerder.
+   Hier stond daarom `const even = () => new Promise(r => setTimeout(r, 400))`,
+   twaalf keer aangeroepen. Dat is een gok die twee kanten op fout gaat: op deze
+   machine bijna altijd te lang (twaalf keer 400 ms voor niets) en onder
+   belasting te kort -- en dan meldt deze toets "geen factuur" terwijl de motor
+   nog bezig was. Precies de uitslag die niets over zijn onderwerp zegt.
+
+   Het teken is de factuur zelf. wachtOpFacturen() vraagt de lijst op tot elke
+   genoemde ref er een heeft, met een ruim budget en een leesbare fout als het
+   niet lukt. Wat de toetsen daarna beweren -- PRECIES een, en voor dit bedrag --
+   blijft ongewijzigd: dit wacht alleen tot er iets te beweren valt. */
+async function wachtOpFacturen(base, mgrTok, refs, opties) {
+  const lijst = Array.isArray(refs) ? refs : [refs];
+  const ms = (opties && opties.ms) || 15000;
+  const eind = Date.now() + ms;
+  for (;;) {
+    const uit = {};
+    for (const ref of lijst) uit[ref] = await facturenOpRef(base, mgrTok, ref);
+    if (lijst.every(ref => uit[ref].length)) return uit;
+    if (Date.now() >= eind) {
+      throw new Error('wachtte ' + ms + 'ms tot de facturatiemotor had geboekt, en dat gebeurde niet voor: ' +
+        lijst.filter(ref => !uit[ref].length).join(', '));
+    }
+    await new Promise(r => setTimeout(r, 25));
+  }
+}
+
+/* En hetzelfde voor het FOUTENBORD. De motor meldt zijn mislukking ook in een
+   losse belofte, dus stond er twee keer `setTimeout(50)` voor de telling. 50 ms
+   is genoeg tot het niet genoeg is, en dan meldt de toets "niet geteld" terwijl
+   de melding onderweg was. Het teken is de teller zelf. */
+async function wachtOpFouten(log, hoeveel, ms) {
+  const eind = Date.now() + (ms || 10000);
+  for (;;) {
+    const stand = log.foutenSamenvatting();
+    if (stand.totaal >= hoeveel) return stand;
+    if (Date.now() >= eind) {
+      throw new Error('wachtte ' + (ms || 10000) + 'ms op ' + hoeveel + ' gemelde fout(en) en er staan er ' + stand.totaal);
+    }
+    await new Promise(r => setTimeout(r, 25));
+  }
+}
 
 /* -------------------------------------------------------------------------
    1. de vier wegen in de app: bestelling, rekening, boeking, rit
@@ -83,14 +127,19 @@ test('1. een betaalde bestelling in de app levert precies EEN factuur op, op de 
     assert.equal(o.status, 200);
     const ref = o.body.order.ref, totaal = o.body.order.total;
 
-    // NOG NIET betaald = nog geen factuur. Een factuur bij het plaatsen zou een
-    // bon factureren die het lid nog kan laten lopen.
-    await even();
+    /* NOG NIET betaald = nog geen factuur. Een factuur bij het plaatsen zou een
+       bon factureren die het lid nog kan laten lopen.
+
+       Hier stond een wacht van 400 ms voor, en die is weg zonder dat de
+       bewering zwakker wordt. Op een AFWEZIGHEID kun je niet wachten; wat deze
+       regel echt hard maakt staat vier regels lager. Zou de motor bij het
+       PLAATSEN al factureren, dan telt hij na de betaling twee -- en `fac.length
+       === 1` zakt. Deze regel is dus een snellere fout met een duidelijker
+       bericht, en niet de bewering die het draagt. */
     assert.deepEqual(await facturenOpRef(base, mgr, ref), [], 'een onbetaalde bon heeft geen factuur');
 
     assert.equal((await api(base, '/api/order/pay', { ref }, lid)).status, 200);
-    await even();
-    const fac = await facturenOpRef(base, mgr, ref);
+    const fac = (await wachtOpFacturen(base, mgr, ref))[ref];
     assert.equal(fac.length, 1, 'precies een factuur na betaling');
     assert.equal(fac[0].totaal, totaal, 'en voor het bedrag van de bon');
     assert.ok(fac[0].btwBedrag > 0, 'met btw erop, anders bereikt hij de aangifte niet');
@@ -118,10 +167,10 @@ test('2. de gezamenlijke rekening geeft een factuur PER BON, en de fooi staat er
 
     const bet = await api(base, '/api/rekening/betaal', { supplierCode: 'KIKUNOI', fooi: 5 }, lid);
     assert.equal(bet.status, 200);
-    await even();
+    const beide = await wachtOpFacturen(base, mgr, [r1.body.order.ref, r2.body.order.ref]);
 
-    const f1 = await facturenOpRef(base, mgr, r1.body.order.ref);
-    const f2 = await facturenOpRef(base, mgr, r2.body.order.ref);
+    const f1 = beide[r1.body.order.ref];
+    const f2 = beide[r2.body.order.ref];
     assert.equal(f1.length, 1, 'bon 1 heeft zijn eigen factuur');
     assert.equal(f2.length, 1, 'bon 2 ook');
     assert.equal(f1[0].totaal, r1.body.order.total);
@@ -148,8 +197,7 @@ test('3. een betaalde boeking en een betaalde rit leveren allebei een factuur op
     const b = await api(base, '/api/booking/request', { supplierCode: 'CASTELL', serviceId: 'b1' }, lid);
     assert.equal(b.status, 200, JSON.stringify(b.body).slice(0, 200));
     assert.equal((await api(base, '/api/booking/pay', { ref: b.body.boeking.ref }, lid)).status, 200);
-    await even();
-    const fb = await facturenOpRef(base, mgrB, b.body.boeking.ref);
+    const fb = (await wachtOpFacturen(base, mgrB, b.body.boeking.ref))[b.body.boeking.ref];
     assert.equal(fb.length, 1, 'de boeking heeft een factuur');
     assert.equal(fb[0].totaal, b.body.boeking.price);
     assert.equal(fb[0].soort, 'dienst', 'een boeking is een dienst en geen verkoop');
@@ -159,8 +207,7 @@ test('3. een betaalde boeking en een betaalde rit leveren allebei een factuur op
     const rit = await api(base, '/api/ride/request', { supplierCode: 'MKKX', toCode: 'KIKUNOI', passengers: 1 }, lid);
     assert.equal(rit.status, 200, JSON.stringify(rit.body).slice(0, 200));
     assert.equal((await api(base, '/api/ride/pay', { ref: rit.body.ride.ref }, lid)).status, 200);
-    await even();
-    const fr = await facturenOpRef(base, mgrR, rit.body.ride.ref);
+    const fr = (await wachtOpFacturen(base, mgrR, rit.body.ride.ref))[rit.body.ride.ref];
     assert.equal(fr.length, 1, 'de rit heeft een factuur');
     assert.equal(fr[0].totaal, rit.body.ride.quote);
   } finally {
@@ -187,9 +234,8 @@ test('4. de balie int een onbetaalde bon op de ophaalcode: een factuur, en de be
     const inn = await api(base, '/api/supplier/pos/redeem', { code: o.body.order.pickup }, mgr);
     assert.equal(inn.status, 200, JSON.stringify(inn.body).slice(0, 200));
     assert.equal(inn.body.order.wasPaid, false, 'de balie heeft hem echt geind');
-    await even();
 
-    const fac = await facturenOpRef(base, mgr, ref);
+    const fac = (await wachtOpFacturen(base, mgr, ref))[ref];
     assert.equal(fac.length, 1, 'de balie-inning levert een factuur op');
     assert.equal(fac[0].totaal, o.body.order.total);
 
@@ -218,14 +264,20 @@ test('5. een bon die al in de app is betaald, wordt aan de balie NIET nog eens g
     const o = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }] }, lid);
     const ref = o.body.order.ref;
     assert.equal((await api(base, '/api/order/pay', { ref }, lid)).status, 200);
-    await even();
-    assert.equal((await facturenOpRef(base, mgr, ref)).length, 1, 'na de app-betaling: een');
+    assert.equal((await wachtOpFacturen(base, mgr, ref))[ref].length, 1, 'na de app-betaling: een');
 
     // en dan komt hij zijn bestelling ophalen
     const inn = await api(base, '/api/supplier/pos/redeem', { code: o.body.order.pickup }, mgr);
     assert.equal(inn.status, 200);
     assert.equal(inn.body.order.wasPaid, true, 'de balie ziet dat er al betaald is');
-    await even();
+    /* HIER BLIJFT EEN WACHT STAAN, en dat is een besluit. Deze bewering gaat
+       over iets dat NIET gebeurt -- er komt geen tweede factuur -- en daar
+       bestaat geen teken voor om op te wachten. De motor boekt in een losse
+       belofte, dus meteen tellen zou alleen zeggen "op dit moment nog niet".
+       Overal in dit bestand waar wel een teken bestaat, staat nu
+       wachtOpFacturen(); deze en die in toets 1 zijn de twee die overblijven,
+       en die staan met naam in KLOKWACHT.json. */
+    await new Promise(r => setTimeout(r, 400));
     assert.equal((await facturenOpRef(base, mgr, ref)).length, 1,
       'nog steeds EEN: uitgeven is geen tweede transactie');
   } finally {
@@ -253,15 +305,142 @@ test('6. een tafelticket in een keer afrekenen factureert elke bon aan de tafel 
     const af = await api(base, '/api/supplier/tafelticket/afrekenen',
       { table: tafel, zegel: tk.body.ticket.zegel, at: tk.body.ticket.at, method: 'contant' }, mgr);
     assert.equal(af.status, 200, JSON.stringify(af.body).slice(0, 200));
-    await even();
+    const beide = await wachtOpFacturen(base, mgr, [r1.body.order.ref, r2.body.order.ref]);
 
-    const f1 = await facturenOpRef(base, mgr, r1.body.order.ref);
-    const f2 = await facturenOpRef(base, mgr, r2.body.order.ref);
+    const f1 = beide[r1.body.order.ref];
+    const f2 = beide[r2.body.order.ref];
     assert.equal(f1.length, 1, 'bon 1 aan tafel heeft een factuur');
     assert.equal(f2.length, 1, 'bon 2 aan tafel ook');
     assert.equal(f1[0].totaal + f2[0].totaal, af.body.subtotaal,
       'samen precies het tafelticket');
     assert.equal(f1[0].methode, 'contant', 'de betaalwijze van de kassa reist mee');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* WAT ER MIS WAS AAN DE ANDERE KANT: DE BOEKHOUDING TELDE HET TAFELTICKET TWEE
+   KEER. Toets 6 hierboven laat zien dat elke bon aan de tafel zijn eigen factuur
+   krijgt -- dat klopte. Maar `/api/supplier/tafelticket/afrekenen` legt daar ook
+   nog EEN gebundelde kassabon overheen met het volle bedrag, en `financeVoor`
+   sloeg alleen `rtg` en `kamer` over. Een tafel die contant of met RTG Pay
+   afrekende, stond dus dubbel in de maandboekhouding (TAKEN.md 4.28).
+
+   De aangifte had er geen last van (die telt facturen, en die staan per bon),
+   dus toets 7 kon dit niet vinden: hij vergelijkt aangifte met boekhouding, en
+   hier was ALLEEN de boekhouding fout. Deze toets legt daarom een derde getal
+   ernaast dat niet kan meebewegen: de som van de bonnen zelf.
+
+   De bundelbon draagt nu `omzetElders: true`. Mutatie: dat merk weghalen (of de
+   regel in financeVoor) laat deze toets zakken op precies het dubbele. */
+test('6b. een tafelticket op contant telt de maandboekhouding NIET dubbel', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    await api(base, '/api/supplier/settings', { code: 'KIKUNOI', opties: { betaalVooraf: false } }, mgr);
+    const tafel = '9';
+    const lid = await registreer(base);
+    const item = await eersteItem(base, lid, 'KIKUNOI');
+    const r1 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 2 }], table: tafel }, lid);
+    const r2 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 1 }], table: tafel }, lid);
+    assert.equal(r2.status, 200);
+
+    const tk = await api(base, '/api/supplier/tafelticket', { table: tafel }, mgr);
+    assert.equal(tk.status, 200, JSON.stringify(tk.body).slice(0, 200));
+    const af = await api(base, '/api/supplier/tafelticket/afrekenen',
+      { table: tafel, zegel: tk.body.ticket.zegel, at: tk.body.ticket.at, method: 'contant' }, mgr);
+    assert.equal(af.status, 200, JSON.stringify(af.body).slice(0, 200));
+    const beide = await wachtOpFacturen(base, mgr, [r1.body.order.ref, r2.body.order.ref]);
+
+    /* De boekhouding rekent in grondslag (btw eraf) en het ticket in bedragen
+       INCLUSIEF btw; ze naast elkaar leggen zou een tariefverschil meten in
+       plaats van een dubbeltelling. De facturen dragen wel hetzelfde bedrag als
+       het ticket, dus die zijn de eerlijke maat. */
+    const f1 = beide[r1.body.order.ref];
+    const f2 = beide[r2.body.order.ref];
+    const somVanDeBonnen = Math.round((f1[0].totaal + f2[0].totaal) * 100);
+    assert.equal(somVanDeBonnen, Math.round(af.body.subtotaal * 100), 'de bonnen samen zijn het ticket');
+
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(fin.status, 200);
+    const omzetBoekhouding = Math.round((fin.body.btw || []).reduce((s2, r) => s2 + r.omzet, 0) * 100);
+    assert.ok(omzetBoekhouding > 0, 'de boekhouding telt deze omzet uberhaupt');
+    assert.equal(omzetBoekhouding, somVanDeBonnen,
+      'de maandboekhouding telt het tafelticket EEN keer; stond hij op ' + (somVanDeBonnen * 2) +
+      ', dan telt de bundelbon er weer bovenop');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* EN DE CADEAUKAART, HET SPIEGELBEELD ERVAN (TAKEN.md 4.27).
+
+   Er was GEEN betaalwijze 'cadeaukaart' aan de kassa. De kassa moest dus een bon
+   aanslaan en daarnaast de kaart verzilveren, en dan telde `financeVoor` de
+   omzet twee keer: een keer als bon en een keer als inwisseling. Andersom miste
+   de btw-aangifte een LOSSE inwisseling helemaal, want een verzilvering is geen
+   bon en boekt dus geen factuur.
+
+   'cadeaukaart' is nu een betaalwijze: de bon draagt de omzet met zijn eigen
+   regels (dus het juiste tarief per artikel) en de verzilveringen die bij een
+   bon horen dragen `viaBon`, waarop de maandboekhouding ze overslaat. Deze
+   toets legt beide kanten vast, want een reparatie die de ene kant dichtzet en
+   de andere opentrekt, is geen reparatie. */
+test('6c. een bon die met een cadeaukaart wordt betaald telt EEN keer, en de aangifte ziet hem', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    const kaart = await api(base, '/api/supplier/giftcard/sell', { bedrag: 100 }, mgr);
+    assert.equal(kaart.status, 200, JSON.stringify(kaart.body).slice(0, 200));
+    const code = kaart.body.kaart.code;
+
+    /* De verkoop van de kaart is nog GEEN omzet: het saldo is een schuld aan de
+       klant. Dat stond er al en blijft zo -- als de verkoop hier zou meetellen,
+       meet de rest van deze toets niets. */
+    const voor = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((voor.body.btw || []).reduce((x, r) => x + r.omzet, 0) * 100), 0,
+      'een verkochte kaart is nog geen omzet');
+
+    // de gast eet voor 40 euro en betaalt met de kaart
+    const bon = await api(base, '/api/supplier/pos/sale', {
+      total: 40, method: 'cadeaukaart', giftcardCode: code,
+      items: [{ name: 'Kaiseki', qty: 1, price: 40 }]
+    }, mgr);
+    assert.equal(bon.status, 200, JSON.stringify(bon.body).slice(0, 200));
+    assert.equal(bon.body.sale.method, 'cadeaukaart', 'de bon draagt de betaalwijze');
+    assert.equal(bon.body.sale.kaartCode, code, 'en welke kaart het was');
+    /* De kassabon boekt zijn factuur op `sale.id` (verkoop.js: `ref: sale.id`),
+       dus dat is hier het teken dat de facturatiemotor klaar is. */
+    await wachtOpFacturen(base, mgr, bon.body.sale.id);
+
+    // het saldo is eraf, en precies een keer
+    const na = await api(base, '/api/supplier/giftcard/redeem', { code, bedrag: 0 }, mgr);
+    assert.equal(na.status, 400, 'nul blijft geen bedrag');
+    const rest = await api(base, '/api/supplier/giftcard/redeem', { code, bedrag: 60 }, mgr);
+    assert.equal(rest.status, 200, 'er staat nog zestig op: de kaart is EEN keer belast');
+    assert.equal(rest.body.saldo, 0);
+
+    /* Vijftig euro is door de kassa gegaan (40) en vijftig los verzilverd (60):
+       samen honderd, en dat is precies wat de boekhouding hoort te tellen. Zou
+       de bon dubbel tellen, dan stond hier 140. */
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    const omzet = Math.round((fin.body.btw || []).reduce((x, r) => x + r.omzet, 0) * 100);
+    assert.equal(omzet, 10000,
+      'de bon (40) plus de losse inwisseling (60); bij 14000 telt de kassabon dubbel');
+    assert.equal(Math.round(fin.body.giftcards.ingewisseld * 100), 10000,
+      'het kaartrapport blijft het VOLLE bedrag melden: dat is een andere vraag dan waar de omzet staat');
+
+    /* En de andere kant: de bon boekt een factuur, dus de btw-aangifte ziet die
+       omzet nu wel. Voor de losse inwisseling geldt dat nog steeds niet -- die
+       staat als open punt bij 4.27. */
+    const op = await api(base, '/api/supplier/btw/opmaken', { periode: fin.body.maand }, mgr);
+    assert.equal(op.status, 200, JSON.stringify(op.body).slice(0, 200));
+    const omzetAangifte = (op.body.aangifte.tarieven || []).reduce((x, t) => x + t.omzetCenten, 0);
+    assert.ok(omzetAangifte > 0, 'de aangifte ziet de bon die met een kaart is betaald');
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
@@ -302,7 +481,7 @@ test('7. de btw-aangifte komt uit op de omzet die de maandboekhouding telt', asy
     const balie = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 4 }], naarKassa: true }, lid);
     assert.equal((await api(base, '/api/supplier/pos/redeem', { code: balie.body.order.pickup }, mgr)).status, 200);
     refs.push(balie.body.order.ref);
-    await even();
+    await wachtOpFacturen(base, mgr, refs);
 
     /* Wat de maandboekhouding telt. Let op WELK getal: `omzet` is inclusief
        btw, `grondslag` is eraf. De aangifte rekent in grondslag (dat is wat er
@@ -364,8 +543,7 @@ test('8. een factuur die NIET lukt komt op het techniekbord, en trekt de betalin
   log.foutenReset();
   maakFactuurVoorLid({ boekMetCodenaam: async () => ({ error: 'Geen bedrag om te factureren.' }) })
     (Object.assign({ ref: 'REF-NEE' }, bon));
-  await new Promise(r => setTimeout(r, 50));
-  const naNee = log.foutenSamenvatting();
+  const naNee = await wachtOpFouten(log, 1);
   assert.equal(naNee.totaal, 1, 'een nette weigering wordt geteld');
   assert.match(naNee.recent[0].bericht, /Geen bedrag/, 'met de reden van de motor erin');
 
@@ -373,8 +551,7 @@ test('8. een factuur die NIET lukt komt op het techniekbord, en trekt de betalin
   log.foutenReset();
   maakFactuurVoorLid({ boekMetCodenaam: async () => { throw new Error('opslag onbereikbaar'); } })
     (Object.assign({ ref: 'REF-BOEM' }, bon));
-  await new Promise(r => setTimeout(r, 50));
-  const naBoem = log.foutenSamenvatting();
+  const naBoem = await wachtOpFouten(log, 1);
   assert.equal(naBoem.totaal, 1, 'een afgewezen belofte wordt ook geteld');
   assert.match(naBoem.recent[0].bericht, /opslag onbereikbaar/);
 

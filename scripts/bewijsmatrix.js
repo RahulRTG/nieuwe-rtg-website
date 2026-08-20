@@ -109,6 +109,7 @@ const HANDELINGPROEF = (argv.find(a => a.startsWith('--handelingproef=')) || '')
 const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inWortel('KETENS.json');
 const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
 const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
+const AUDIT = (argv.find(a => a.startsWith('--audit=')) || '').slice(8) || inWortel('AUDITPROEF.json');
 const STAAT = (argv.find(a => a.startsWith('--staat=')) || '').slice(8) || inWortel('STAATPROEF.json');
 const UITVOER = (argv.find(a => a.startsWith('--uitvoer=')) || '').slice(10) || inWortel('UITVOERPROEF.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
@@ -147,6 +148,17 @@ const SCHAKELS = [
     nodig: 'de voorziening is server/lib/handelingsspoor.js; wat deze kolom NIET zegt is dat het spoor ' +
       'volledig is -- hij kijkt of er een regel verscheen, niet of alles wat erin staat klopt. En het ' +
       'wegknippen van de NIEUWSTE regels valt hier niet op; daarvoor is het anker nodig' },
+  { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
+    bron: 'scripts/auditproef-route.js (roept de route aan en vraagt daarna aan het spoor of er een regel bij kwam)',
+    nvtBijLezen: true,
+    /* HIER STOND "een hashketen over het auditlog; die bestaat nog niet als
+       algemene voorziening", en dat klopte maar voor de helft. De hashketen
+       bestond wel (kern/command/journaal.js); wat ontbrak was BEREIK -- alleen
+       RTG Command schreef erin. server/opzet/auditspoor.js geeft nu elke
+       schrijfroute een regel in dezelfde vorm. */
+    nodig: 'het kopzegel buiten deze database vastleggen. De keten betrapt een gewijzigde of ' +
+      'weggeknipte regel, maar wie de NIEUWSTE regels weggooit houdt een kloppende keten over; ' +
+      'alleen een anker bij een derde ziet dat (server/lib/keten-anker.js, bewust niet in bedrijf).' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: 'scripts/staatproef-route.js (op de TOESTAND), met scripts/idemproef-route.js als terugval (op het ANTWOORD)',
     nvtBijLezen: true },
@@ -269,25 +281,49 @@ function perRouteKaart(bestand) {
 /* De ketenronde: welke ROUTES zitten in een keten die onder echte sabotage is
    beoordeeld. Alleen scenario's die de zevenstappenlat halen tellen -- een
    scenario dat niet zichtbaar of niet herhaalbaar was, is geen bewijs. */
+/* DE KETENUITSLAG PER ROUTE -- en drie vlaggen in plaats van een oordeel.
+
+   Hier stond "de STRENGSTE uitkomst telt" in het commentaar, en dat deed de code
+   niet: hij OVERSCHREEF bij elk volgend scenario. Voor GELD en NOTITIE betekende
+   dat het volgende. Twee sabotages halen de lat: `schrijf-verloren`, waar de
+   terugdraaiing werkelijk is aangetoond (PROVEN), en `sterf-na-commit`, waar er
+   niets terug te draaien VALT (de commit was al rond) en het veld dus NVT is. De
+   laatste won, en zo stonden /api/notities/bewaar en /api/pay/oplaad als GEZAKT
+   met "rollback niet bewezen" -- terwijl hij juist wel bewezen was, in het
+   scenario waar de vraag van toepassing was.
+
+   NVT IS NIET GEZAKT. Dat is dezelfde regel die deze matrix overal aanhoudt:
+   ongemeten en gezakt zijn twee dingen. Vandaar drie vlaggen die OPTELLEN over
+   de scenario's, zodat het oordeel pas aan het eind valt:
+
+     proven      ergens is de terugdraaiing echt aangetoond
+     beoordeeld  ergens kon er uberhaupt iets over gezegd worden (niet NVT)
+     stil        ergens ging er stil iets verloren -- en dat is besmettelijk,
+                 want een keten die onder een sabotage stil verlies gaf is niet
+                 bewezen omdat een andere sabotage netjes verliep. */
+function ketenKaartUit(scenarios) {
+  const kaart = new Map();
+  for (const sc of scenarios || []) {
+    if (!sc.verraad || !(sc.lat && sc.lat.voldoet)) continue;
+    for (const pad of (ROUTES_PER_KETEN[sc.keten] || [])) {
+      const oud = kaart.get(pad);
+      kaart.set(pad, {
+        failure: sc.clientAntwoord === 'FAIL' || !!(oud && oud.failure),
+        proven: sc.rollback === 'PROVEN' || !!(oud && oud.proven),
+        beoordeeld: sc.rollback !== 'NVT' || !!(oud && oud.beoordeeld),
+        stil: !!sc.stilVerlies || !!(oud && oud.stil)
+      });
+    }
+  }
+  return kaart;
+}
+
 function ketenUitslag() {
   if (!KETENS) return null;
   try {
     const j = JSON.parse(fs.readFileSync(KETENS, 'utf8'));
     if (!Array.isArray(j.scenarios)) return null;
-    const kaart = new Map();
-    for (const sc of j.scenarios) {
-      if (!sc.verraad || !(sc.lat && sc.lat.voldoet)) continue;
-      for (const pad of (ROUTES_PER_KETEN[sc.keten] || [])) {
-        const oud = kaart.get(pad);
-        /* Een keten kan meerdere verraden hebben; de STRENGSTE uitkomst telt.
-           Een route die onder een van de sabotages stil verlies gaf, is niet
-           bewezen omdat een andere sabotage netjes verliep. */
-        kaart.set(pad, { failure: sc.clientAntwoord === 'FAIL' || (oud && oud.failure),
-          rollbackBewezen: sc.rollback === 'PROVEN' && !sc.stilVerlies && !(oud && oud.stil),
-          stil: sc.stilVerlies || (oud && oud.stil) });
-      }
-    }
-    return kaart;
+    return ketenKaartUit(j.scenarios);
   } catch (e) { return null; }
 }
 
@@ -334,6 +370,7 @@ function bouw(invoer) {
   const keten = inv.keten !== undefined ? inv.keten : ketenUitslag();
   const invoerKaart = inv.invoer !== undefined ? inv.invoer : perRouteKaart(INVOER);
   const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
+  const auditKaart = inv.audit !== undefined ? inv.audit : perRouteKaart(AUDIT);
   const staat = inv.staat !== undefined ? inv.staat : perRouteKaart(STAAT);
   const uitvoerKaart = inv.uitvoer !== undefined ? inv.uitvoer : perRouteKaart(UITVOER);
   const handeling = inv.handeling !== undefined ? inv.handeling : handelingproefUitslag();
@@ -372,11 +409,20 @@ function bouw(invoer) {
 
       if (s.id === 'FAILURE' || s.id === 'ROLLBACK') {
         const k = keten && keten.get(sleutel);
-        if (k) {
-          const goed = s.id === 'FAILURE' ? !k.stil : k.rollbackBewezen;
-          cellen[s.id] = goed
+        if (k && s.id === 'FAILURE') {
+          cellen[s.id] = !k.stil
             ? { staat: 'bewezen', bron: 'ketenronde' }
-            : { staat: 'gezakt', bron: 'ketenronde', reden: k.stil ? 'stil verlies' : 'rollback niet bewezen' };
+            : { staat: 'gezakt', bron: 'ketenronde', reden: 'stil verlies' };
+          continue;
+        }
+        /* ROLLBACK IN DRIE STAPPEN, en de derde is de reparatie: kon er NERGENS
+           iets over gezegd worden, dan zwijgt de zware bron en mag de lichte
+           (de staatproef hieronder) spreken. Eerst gaf hij daar "gezakt" op, en
+           dat was ongemeten vermomd als een bevinding. */
+        if (k && k.stil) { cellen[s.id] = { staat: 'gezakt', bron: 'ketenronde', reden: 'stil verlies' }; continue; }
+        if (k && k.proven) { cellen[s.id] = { staat: 'bewezen', bron: 'ketenronde' }; continue; }
+        if (k && k.beoordeeld) {
+          cellen[s.id] = { staat: 'gezakt', bron: 'ketenronde', reden: 'rollback niet bewezen' };
           continue;
         }
         /* ROLLBACK HEEFT SINDS DE STAATPROEF EEN TWEEDE BRON, en de volgorde is
@@ -461,6 +507,18 @@ function bouw(invoer) {
            wegen. Geprobeerd-en-ongemeten hoort zichtbaar te blijven, anders is
            het niet te onderscheiden van een route waar niemand aanklopte. */
         else if (uv) cellen[s.id] = { staat: 'ongemeten', bron: 'uitvoerproef', reden: 'nooit een 2xx' };
+        else cellen[s.id] = { staat: 'ongemeten' };
+        continue;
+      }
+
+      if (s.id === 'AUDIT') {
+        /* GEZAKT IS HIER WEL EEN DEFECT-OORDEEL, anders dan bij IDEMPOTENCY. Een
+           schrijfhandeling die lukt zonder spoor is achteraf niet terug te
+           vinden, en dat is letterlijk wat deze kolom belooft. */
+        const a = auditKaart && auditKaart.get(sleutel);
+        if (a && a.audit === 'bewezen') cellen[s.id] = { staat: 'bewezen', bron: 'auditproef', reden: a.reden };
+        else if (a && a.audit === 'gezakt') cellen[s.id] = { staat: 'gezakt', bron: 'auditproef', reden: a.reden };
+        else if (a) cellen[s.id] = { staat: 'ongemeten', bron: 'auditproef', reden: a.reden };
         else cellen[s.id] = { staat: 'ongemeten' };
         continue;
       }
@@ -593,7 +651,7 @@ const CONTROL = {
     'Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.'
 };
 
-module.exports = { bouw, achteruit, SCHAKELS, LEESMETHODEN, CONTROL };
+module.exports = { bouw, achteruit, SCHAKELS, LEESMETHODEN, ketenKaartUit, CONTROL };
 
 /* Alleen doen als iemand dit bestand DRAAIT. Wordt het geladen (door een toets,
    of straks door de keuring), dan hoort er niets te gebeuren en al helemaal geen

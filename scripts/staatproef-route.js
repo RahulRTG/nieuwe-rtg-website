@@ -27,7 +27,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
-const { draaiStaatproef } = require('./lib/staatproef');
+const { draaiStaatproef, ruisUit } = require('./lib/staatproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 
@@ -165,19 +165,85 @@ async function wacht(basis, ms) {
      raakt elke poort die er is, zonder dat er ergens een lijst met namen komt. */
   const steek = ruwRoutes.filter((_, i) => i % 120 === 0).slice(0, 30);
   for (const r of steek) await ijk(() => post(r.pad, {}, 'dit-token-bestaat-niet'));
-  const ruis = new Set([...geteld].filter(([, n]) => n >= RONDES).map(([c]) => c));
+  const aanvraagRuis = ruisUit(geteld, RONDES);
   const eenmalig = [...geteld].filter(([, n]) => n < RONDES).map(([c]) => c);
+
+  /* DE DERDE IJKING: RUIS DIE VAN DE KLOK KOMT, niet van een verzoek.
+
+     WAAROM HIJ ER IS. De twee ijkingen hierboven meten wat een VERZOEK in
+     beweging zet. Ze zien per definitie niets van een tijdschakelaar, en die
+     staan hier wel: server/opzet/diensten2.js zet elke tien seconden een meting
+     in `db.data.wacht`. Landt zo'n tik tussen de eerste en de tweede oproep van
+     een route, dan meldt de proef "de herhaling bewoog de toestand opnieuw"
+     over een route die niets deed. Dat is precies wat er gebeurde: drie routes
+     stonden op GEZAKT in de IDEMPOTENCY-kolom (/api/office/ideeen,
+     /api/overheid/water/meld, /api/wereld/feed) met als enige bewogen collectie
+     `wacht`.
+
+     WAAROM DIT NIETS KAN WEGPOETSEN. Er wordt in deze rondes NIETS gevraagd op
+     de proefroutes -- alleen de vingerafdruk zelf, en die staat al in de
+     ruislijst hierboven. Wat hier beweegt, kan dus per definitie niet het werk
+     van een route zijn. En de drempel is dezelfde als hierboven: alleen wat in
+     ELKE stille ronde bewoog telt mee. Een eenmalige naloper van eerder werk
+     haalt die drempel niet.
+
+     WAT HIJ NIET VANGT, en dat hoort erbij: schakelaars die trager lopen dan het
+     venster. Gemeten in stilte bewegen ook `techniek`, `ledenSites`, `veilig`,
+     `commandAlarmen` en `commandJournaal`, maar niet in elke ronde -- die staan
+     hieronder onder "soms". Ze worden dus NIET genegeerd; wie ze in een uitslag
+     ziet, weet nu waar hij moet kijken. Het venster oprekken tot ze er allemaal
+     in vallen zou de proef minuten kosten en de drempel juist verzwakken. */
+  const STIL_RONDES = 3;
+  const STIL_MS = Number(process.env.RTG_STAATPROEF_STIL_MS || 11000);   // net over de tik van tien seconden
+  const stilGeteld = new Map();
+  for (let i = 0; i < STIL_RONDES; i++) {
+    const v0 = await vingerafdruk();
+    await new Promise(r => setTimeout(r, STIL_MS));
+    const v1 = await vingerafdruk();
+    for (const c of (await verschilVan(v0, v1)).collecties || []) stilGeteld.set(c, (stilGeteld.get(c) || 0) + 1);
+  }
+  const tijdruis = ruisUit(stilGeteld, STIL_RONDES);
+
+  /* EN EEN LANGE STILTE, voor de schakelaars die TRAGER lopen dan het venster
+     hierboven. kern/command/alarm.js weegt eens per zestig seconden; die tik
+     haalt drie rondes van elf seconden nooit alle drie, maar kan wel net tussen
+     de twee oproepen van een route vallen -- en dan las de proef "de herhaling
+     bewoog de toestand opnieuw" over een route die niets deed.
+
+     Deze ene ronde is NIET voor de globale ruislijst. Wat hij oplevert is
+     `stilOoit`: collecties die in stilte uberhaupt bewegen. Die worden alleen
+     overgeslagen als de route ze bij zijn EERSTE oproep ook niet aanraakte --
+     twee voorwaarden tegelijk, zie zonderTijdtik in ./lib/staatproef.js. Zo
+     hoeft de globale lijst niet te verruimen en blijft `commandJournaal` scherp.
+
+     Vijfenzestig seconden: elk venster van meer dan zestig seconden bevat ten
+     minste een tik van een minuutschakelaar. */
+  const STIL_LANG_MS = Number(process.env.RTG_STAATPROEF_STIL_LANG_MS || 65000);
+  const v0 = await vingerafdruk();
+  await new Promise(r => setTimeout(r, STIL_LANG_MS));
+  const v1 = await vingerafdruk();
+  const stilOoit = new Set((await verschilVan(v0, v1)).collecties || []);
+  for (const c of stilGeteld.keys()) stilOoit.add(c);
+  for (const c of aanvraagRuis) stilOoit.delete(c);   // die gaan er toch al globaal uit
+
+  const somsStil = [...stilGeteld].filter(([c, n]) => n < STIL_RONDES && !aanvraagRuis.has(c)).map(([c]) => c);
+  const ruis = new Set([...aanvraagRuis, ...tijdruis]);
 
   console.log('\n=== DE TOESTAND PER ROUTE ===\n');
   console.log('  routes met een herkenbare rol        : ' + routes.length);
   console.log('  collecties in de vingerafdruk        : ' + proef.aantalCollecties);
   console.log('  oproepen per route                   : 2, met 3 vingerafdrukken');
-  console.log('  omgevingsruis (elke ronde, genegeerd): ' + (ruis.size ? [...ruis].join(', ') : 'geen'));
+  console.log('  ruis bij een VERZOEK    (genegeerd)  : ' + (aanvraagRuis.size ? [...aanvraagRuis].join(', ') : 'geen'));
+  console.log('  ruis van de KLOK        (genegeerd)  : ' + (tijdruis.size ? [...tijdruis].join(', ') : 'geen') +
+    '   <- ' + STIL_RONDES + ' stille rondes van ' + STIL_MS + ' ms');
+  console.log('  in stilte OOIT bewogen  (voorwaardelijk): ' + (stilOoit.size ? [...stilOoit].join(', ') : 'geen') +
+    '\n' + ' '.repeat(41) + '<- alleen overgeslagen als de route ze bij de EERSTE oproep ook niet raakte');
+  console.log('  in stilte SOMS bewogen  (in de korte ronde): ' + (somsStil.length ? somsStil.join(', ') : 'geen'));
   console.log('  eenmalig bewogen (WEL beoordeeld)    : ' + (eenmalig.length ? eenmalig.join(', ') : 'geen') + '\n');
 
   const uit = await draaiStaatproef({ post, vingerafdruk, routes, tokenVoor: (r) => tokens[r],
     hernieuw: async (rol) => { try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {} return false; },
-    lijfVoor: (r) => plausibelLijf(r.pad), verschilVan, ruis, maxRoutes: MAX });
+    lijfVoor: (r) => plausibelLijf(r.pad), verschilVan, ruis, stilOoit, maxRoutes: MAX });
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }
 
@@ -213,8 +279,17 @@ async function wacht(basis, ms) {
       state: t.state, sideEffect: t.sideEffect, rollback: t.rollback, rollbackGezakt: t.rollbackGezakt,
       idemBewezen: t.idemBewezen, idemGezakt: t.idemGezakt, ongemeten: t.ongemeten,
       tokensHernieuwd: uit.hernieuwd, blindeRondes: uit.meterStuk ? 1 : 0,
-      collectiesInVingerafdruk: proef.aantalCollecties, ruisCollecties: ruis.size, begrenzing: MAX },
+      collectiesInVingerafdruk: proef.aantalCollecties, ruisCollecties: ruis.size,
+      tijdruisCollecties: tijdruis.size, stilleRondes: STIL_RONDES, stilteMs: STIL_MS, begrenzing: MAX },
+    /* Drie lijsten in plaats van een. Wie later leest waarom een collectie niet
+       meetelde, hoort te zien OF dat kwam doordat elk verzoek hem beweegt of
+       doordat de klok dat doet -- en welke tragere schakelaars wel gezien maar
+       NIET genegeerd zijn. */
     omgevingsruis: [...ruis],
+    ruisBijVerzoek: [...aanvraagRuis],
+    ruisVanDeKlok: [...tijdruis],
+    inStilteOoitBewogen: [...stilOoit],
+    inStilteSomsBewogen: somsStil,
     perRoute: rijen
   }, null, 1) + '\n');
   console.log('\n  weggeschreven in STAATPROEF.json');

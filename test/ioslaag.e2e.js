@@ -35,7 +35,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop } = require('./helper');
+const { startServer, stop, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -43,9 +43,13 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 /* Alle app-pagina's onder public/apps, als webpad. */
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
@@ -96,9 +100,10 @@ test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
       const ids = kopIds(pad);
       if (!ids.length) continue;
       const page = await ctx.newPage();
+      await volgVerzoeken(page);
       try {
         await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
-        await page.waitForTimeout(120);
+        await wachtOpRust(page);
         // wegnavigeerd (inlogdeur)? dan meten we een andere pagina
         if (new URL(page.url()).pathname !== pad) { await page.close(); continue; }
         // stond de kop er sowieso niet? dan valt er niets te verliezen
@@ -113,7 +118,7 @@ test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
           s.onload = klaar; s.onerror = klaar;
           document.head.appendChild(s);
         }));
-        await page.waitForTimeout(80);
+        await wachtOpRust(page);
 
         const na = await page.evaluate((x) => x.filter((i) => !document.getElementById(i)), ids);
         gemeten++;
@@ -144,7 +149,7 @@ test('een app-pagina draagt geen woordmerk meer in zijn chrome',
 
     for (const pad of steek) {
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(250);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         ios: document.body.hasAttribute('data-ios'),
         merk: document.querySelectorAll('.os-merk, .os-merk-logo, .osbar, .os-kick, img[alt="RTG"]').length,
@@ -179,6 +184,7 @@ test('een knoppengroep in de kop blijft een groep',
     const ctx = await browser.newContext({ viewport: { width: 1100, height: 900 } });
     await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) {} }, tok);
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
 
     /* WAAROM DEZE TOETS APART BESTAAT. De andere hierboven kijkt of elementen
        met een ID blijven bestaan, en dat was niet genoeg: de tabs van
@@ -191,7 +197,7 @@ test('een knoppengroep in de kop blijft een groep',
        Een groep verhuist daarom als geheel. Deze toets bewaakt dat via de
        kiezer die de pagina zelf gebruikt, niet via het bestaan van de knop. */
     await page.goto(base + '/apps/payroll.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await wachtOpRust(page);
     const r = await page.evaluate(() => ({
       losseKnoppen: document.querySelectorAll('[data-tab]').length,
       viaDeNav: document.querySelectorAll('nav [data-tab]').length

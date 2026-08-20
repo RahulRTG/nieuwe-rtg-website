@@ -12,9 +12,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 test('Zorg-tab: de salon komt op het scherm en een lid boekt er een knipbeurt',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
@@ -47,7 +51,7 @@ test('Zorg-tab: de salon komt op het scherm en een lid boekt er een knipbeurt',
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'zorg', t: Date.now() }));
     }, reg.token);
-    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
     /* HIER STOND EEN KLIK OP .cmd-klok. Die knop vouwde de werktafel op en gaf
        de schil terug; hij bestaat niet meer, want het scherm waar hij heen

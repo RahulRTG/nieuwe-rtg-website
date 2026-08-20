@@ -119,6 +119,54 @@ function weegStaat({ a, b, d01, d12 }) {
   return uit;
 }
 
+/* WELKE COLLECTIES TELLEN ALS RUIS -- de regel, los van hoe hij geteld is.
+
+   De ijkingen in scripts/staatproef-route.js tellen per collectie in hoeveel
+   rondes hij bewoog. Ruis is wat in ELKE ronde bewoog; wat maar soms bewoog is
+   geen ruis maar een losse gebeurtenis, en die hoort zichtbaar te blijven. Die
+   strengheid is het hele punt: een collectie die af en toe meebeweegt zou anders
+   een echt tweede effect kunnen wegpoetsen.
+
+   Hij staat hier en niet in het script omdat een regel die je niet los kunt
+   stellen, een regel is die niemand natelt. */
+function ruisUit(geteld, rondes) {
+  const uit = new Set();
+  for (const [collectie, n] of geteld) if (n >= rondes) uit.add(collectie);
+  return uit;
+}
+
+/* DE TWEEDE, SCHERPERE REGEL: EEN TIK VAN DE KLOK DIE MAAR SOMS VALT.
+
+   De globale ruislijst hierboven is streng met opzet -- alleen wat in ELKE ronde
+   beweegt telt mee -- en dat laat een gat open. Een schakelaar die eens per
+   MINUUT loopt (kern/command/alarm.js doet dat) haalt die drempel niet, maar kan
+   wel net tussen de twee oproepen van een route vallen. Dan leest de proef "de
+   herhaling bewoog de toestand opnieuw" over een route die niets deed. Dat
+   gebeurde: /api/supplier/magnaat/studio/importeer viel over `commandAlarmen`.
+
+   Het venster oprekken tot boven die minuut zou werken, maar dan sleept de
+   globale lijst `commandJournaal` mee -- het auditjournaal van de commandkant --
+   en dan ziet niemand het meer als een echte route dat dubbel schrijft. Te duur.
+
+   VANDAAR TWEE VOORWAARDEN TEGELIJK, en alleen samen zijn ze veilig:
+
+     (a) de collectie is OOIT in stilte zien bewegen. Er werd toen niets
+         gevraagd, dus wat daar beweegt kan per definitie geen routewerk zijn.
+     (b) de collectie bewoog NIET bij de EERSTE oproep van deze route. Een route
+         doet twee keer hetzelfde; raakte hij die collectie de eerste keer niet
+         aan, dan is de tweede keer niet van hem.
+
+   (a) alleen is te zwak (een naloper van eerder werk haalt hem ook), (b) alleen
+   ook (een route kan bij een herhaling een ANDER pad nemen en daar iets loggen).
+   Samen blijft er weinig ruimte over om iets echts weg te poetsen -- en dat wat
+   overblijft staat in de grens onderaan dit bestand. */
+function zonderTijdtik(d12, d01, stilOoit) {
+  if (!d12 || !stilOoit || !stilOoit.size) return d12;
+  const bewoogAl = new Set((d01 && d01.collecties) || []);
+  const gewijzigd = (d12.gewijzigd || []).filter(g => !(stilOoit.has(g.collectie) && !bewoogAl.has(g.collectie)));
+  return { ...d12, gewijzigd, aantal: gewijzigd.length, collecties: gewijzigd.map(g => g.collectie) };
+}
+
 /* Het verschil ONTDAAN van de ruis. Een aparte functie, zodat de regel op een
    plek staat en de toets hem los kan stellen. */
 function zonderRuis(d, ruis) {
@@ -128,7 +176,7 @@ function zonderRuis(d, ruis) {
   return { ...d, gewijzigd, aantal: gewijzigd.length, collecties: gewijzigd.map(g => g.collectie) };
 }
 
-async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor, hernieuw, verschilVan, ruis, maxRoutes }) {
+async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor, hernieuw, verschilVan, ruis, stilOoit, maxRoutes }) {
   const perRoute = {};
   const tel = { state: 0, sideEffect: 0, rollback: 0, rollbackGezakt: 0, idemBewezen: 0, idemGezakt: 0, ongemeten: 0 };
   let oproepen = 0, hernieuwd = 0, afdrukken = 0;
@@ -146,17 +194,34 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
     const sleutel = 'staatproef-' + r.pad.replace(/\W+/g, '');
     const lijf = { ...lijfVoor(r), idem: sleutel, idempotentieSleutel: sleutel };
 
-    const doe = async () => {
-      let st = await post(r.pad, lijf, tokenVoor(r.rol));
-      oproepen++;
-      if (st.status === 401 && hernieuw) {
-        if (await hernieuw(r.rol)) { hernieuwd++; st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++; }
-      }
-      return st;
-    };
+    const doe = async () => { const st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++; return st; };
 
-    const f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
-    const a = await doe();
+    let f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
+    let a = await doe();
+    /* OPNIEUW INLOGGEN GEBEURT BUITEN HET MEETVENSTER, en dat is geen nettigheid
+       maar een reparatie van zes valse bevindingen.
+
+       De hernieuwing stond hier binnen `doe()`, dus binnen f0..f1. Een route die
+       401 geeft OOK met een geldig token -- /api/rtfos/* wil een andere soort
+       sessie -- liet deze proef bij ELKE oproep opnieuw inloggen, en een inlog
+       schrijft zelf `securityLog` en `sessions` weg. Die twee stonden dus in
+       d01 EN in d12, en de uitslag las: "geweigerd (401) en de toestand
+       veranderde toch, ook bij de herhaling". Zes routes lang, over iets wat de
+       proef zelf deed. Nagemeten en op de kop af gereproduceerd: dezelfde route
+       met de hernieuwing ERBUITEN beweegt alleen de journalen.
+
+       Nu wordt er hooguit EEN keer hernieuwd, en daarna begint de meting
+       opnieuw met een verse f0 -- de inlog valt zo buiten het venster. De eerste
+       oproep die de 401 opleverde telt niet mee; hij deed per definitie geen
+       werk. Blijft het na de hernieuwing 401, dan is dat de route en niet het
+       token, en die wordt schoon gemeten. */
+    if (a.status === 401 && hernieuw) {
+      if (await hernieuw(r.rol)) {
+        hernieuwd++;
+        f0 = await vingerafdruk(); afdrukken++;
+        a = await doe();
+      }
+    }
     const f1 = await vingerafdruk(); afdrukken++;
     const b = await doe();
     const f2 = await vingerafdruk(); afdrukken++;
@@ -172,8 +237,12 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
       continue;
     }
 
-    const o = weegStaat({ a, b, d01: zonderRuis(await verschilVan(f0, f1), ruis),
-      d12: zonderRuis(await verschilVan(f1, f2), ruis) });
+    /* Eerst de globale ruis eruit (die geldt voor beide verschillen), dan pas de
+       tweede regel -- die vergelijkt d12 MET d01 en heeft ze dus allebei nodig
+       in dezelfde staat. Zie zonderTijdtik hierboven voor waarom er twee zijn. */
+    const d01 = zonderRuis(await verschilVan(f0, f1), ruis);
+    const d12 = zonderTijdtik(zonderRuis(await verschilVan(f1, f2), ruis), d01, stilOoit);
+    const o = weegStaat({ a, b, d01, d12 });
     perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
       statussen: [a.status, b.status], ...o };
 
@@ -214,4 +283,4 @@ const CONTROL = {
     'eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.'
 };
 
-module.exports = { draaiStaatproef, weegStaat, zonderRuis, CONTROL };
+module.exports = { draaiStaatproef, weegStaat, zonderRuis, zonderTijdtik, ruisUit, CONTROL };

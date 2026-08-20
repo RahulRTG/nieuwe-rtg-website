@@ -48,6 +48,8 @@ module.exports = [
   { id: 'command-zien', categorie: 'RTG-Backoffice', naam: 'RTG Command: zien', standaard: true, doelgroepen: ['intern'],
     uitleg: 'De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.',
     paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal',
+      // het API-spoor hoort bij het zien; dichtzetten verbergt het en stopt het niet
+      '/api/command/apispoor',
       '/api/command/kwaliteit', '/api/command/graaf', '/api/command/herkomst', '/api/command/alarm',
       '/api/command/slo', '/api/command/sonde',
       /* De meldingsingang van de sonde hoort bij het zien en niet bij het doen:

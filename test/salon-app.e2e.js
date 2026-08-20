@@ -48,7 +48,7 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, a);
-    await page.goto(base + '/apps/salon.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/salon.html', { waitUntil: 'domcontentloaded' });
 
     // 1. de feed komt op en houdt op bij de eerste bladzijde, met een knop
     await page.waitForSelector('[data-post]', { timeout: 15000 });

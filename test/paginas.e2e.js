@@ -52,7 +52,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtOpNetstilte } = require('./helper');
 
 const PUB = path.join(__dirname, '..', 'public');
 
@@ -132,11 +132,30 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
         missend.length = 0;
         let probe = null;
         try {
-          await page.goto(base + p, { waitUntil: 'load' });
-          // ruim laten uitlopen: de meeste schermen doen hun eerste api-aanroep
-          // pas na de load, en juist daar sneuvelt er iets. Bij 300ms miste hij
-          // apps/payroll.html, waarvan de fout uit een afgewezen aanroep komt.
-          await new Promise(r => setTimeout(r, 900));
+          /* `domcontentloaded` en niet `load`: `load` wacht tot ELK subverzoek
+             binnen is, en valt bij 258 pagina's onder belasting op een dag om op
+             zijn eigen tijdslimiet -- rood zonder dat er iets stuk is (TAKEN.md
+             4.39). De scan verliest er niets mee: de wacht hieronder blijft
+             juist doorlopen zolang er verzoeken binnenkomen, dus een plaatje of
+             een lettertype dat 404 geeft komt nog steeds langs `missend`. */
+          await page.goto(base + p, { waitUntil: 'domcontentloaded' });
+          /* LATEN UITPRATEN, niet 900 ms aftellen.
+
+             De meeste schermen doen hun eerste api-aanroep pas NA de load, en
+             juist daar sneuvelt er iets: bij 300 ms miste deze scan
+             apps/payroll.html, waarvan de fout uit een afgewezen aanroep komt.
+             Het antwoord daarop was 900 ms, en dat is dezelfde gok een maat
+             groter -- onder belasting nog steeds te kort, en 258 keer 900 ms is
+             bijna vier minuten die er meestal niet nodig zijn.
+
+             wachtOpNetstilte wacht op het GEDRAG: zolang het scherm verzoeken
+             blijft afvuren is het bezig, en zodra er 400 ms geen nieuw verzoek
+             meer begint is het uitgepraat. Zie test/helper.js voor waarom dit
+             niet Playwrights networkidle is (de SSE-lijn).
+
+             Gemeten op 19 augustus 2026: de hele scan duurt hierna 63 s. Alleen
+             al de vaste wachten die eruit gingen waren er samen meer dan 230. */
+          await wachtOpNetstilte(page);
           /* NA EEN META-REFRESH MEET JE DE BESTEMMING, NIET DEZE PAGINA.
 
              Drie paden zijn een briefje met `<meta http-equiv="refresh"

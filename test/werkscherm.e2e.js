@@ -24,7 +24,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, bankDeur } = require('./helper');
+const { startServer, letOpFouten, bankDeur, wachtTot, wachtOpTekst, wachtOpZichtbaar,
+  wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -61,7 +62,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.removeItem('rtg_werk_sessie'); });
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(700);
+    await wachtOpZichtbaar(page, '#inlog');
     const uit = await page.evaluate(() => ({ pad: location.pathname,
       kaart: !document.getElementById('inlog').hidden,
       inhoud: !document.getElementById('inhoud').hidden,
@@ -76,7 +77,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     await page.fill('#iWerkruimte', w.werkruimte);
     await page.fill('#iToken', 'raden-maar');
     await page.click('#inlogGa');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /token|werkruimte/i, { in: '#melding' });
     const naFout = await page.evaluate(() => ({ inhoud: !document.getElementById('inhoud').hidden,
       melding: document.getElementById('melding').textContent }));
     assert.equal(naFout.inhoud, false, 'met een verkeerd token blijft de deur dicht');
@@ -86,7 +87,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
     await page.fill('#iWerkruimte', w.werkruimte);
     await page.fill('#iToken', lid.lidToken);
     await page.click('#inlogGa');
-    await page.waitForTimeout(900);
+    await wachtOpTekst(page, /Uitrol Utrecht/);
     let tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Pia/, 'het startscherm noemt wie er kijkt');
     assert.match(tekst, /projectleider/, 'met zijn rol');
@@ -103,7 +104,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
 
     /* ---- de weigering van de server komt op het scherm ---- */
     await page.click('[data-wk="projecten"]');
-    await page.waitForTimeout(800);
+    await wachtOpTekst(page, /Vergunning aanvragen/);
     tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Vergunning aanvragen/, 'de taken staan in de modulelijst');
     assert.match(tekst, /wacht/, 'en een geblokkeerde taak is als zodanig gemerkt');
@@ -119,7 +120,7 @@ test('het Werk OS toont zonder sleutel een inlogkaart, en daarbinnen een startsc
 
     /* ---- uitloggen sluit de inhoud weer ---- */
     await page.click('#inlogUit');
-    await page.waitForTimeout(400);
+    await wachtOpZichtbaar(page, '#inhoud', { weg: true });
     const naUit = await page.evaluate(() => !document.getElementById('inhoud').hidden);
     assert.equal(naUit, false, 'na uitloggen is de inhoud weer dicht');
 
@@ -156,8 +157,7 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
       localStorage.setItem('rtg_member_token', t);
     }, inlog.token);
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1400);
-
+    await wachtOpZichtbaar(page, '#inhoud');
     const stand = await page.evaluate(() => ({ kaart: !document.getElementById('inlog').hidden,
       inhoud: !document.getElementById('inhoud').hidden,
       tekst: document.body.innerText.replace(/\s+/g, ' ') }));
@@ -207,7 +207,10 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        andere app wordt. De zichtbare namen gaan wel mee in de foutmelding,
        want daarmee zoek je hem terug op het scherm. */
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000);
+    /* De werktafel is er pas als de schil zijn wereldbank heeft opgebouwd; dat
+       is wat de lus hieronder nodig heeft. */
+    await wachtTot(page, () => !!document.querySelector('#rtgCommand, .cmd-bank, #osZoek'),
+      null, { wat: 'de werktafel van RTG Command' });
     /* EN NIET MEER DOOR DE MAPPEN OF DE WERELDSTAND.
 
        Deze lus opende eerst elke tegel en las het mappenscherm; dat scherm
@@ -250,7 +253,10 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
         .map(b => ({ sleutel: b.dataset.sleutel || '', naam: b.textContent.trim() })));
     assert.ok(tegels.length, 'Spotlight hoort de onderdelen van de werelden te indexeren');
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(900);
+    await wachtTot(page, () => {
+      const i = document.getElementById('inlog'), c = document.getElementById('inhoud');
+      return !!i && !!c && (!i.hidden || !c.hidden);
+    }, null, { wat: 'de werkplek die kiest tussen deur en inhoud' });
 
     // en de werkplek staat ook gewoon in de app-bibliotheek
     const inBieb = await page.evaluate(async () => {
@@ -285,6 +291,7 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
+    await volgVerzoeken(page);
 
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => {
@@ -293,15 +300,36 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
       localStorage.setItem('rtg_member_token', t);
     }, inlog.token);
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1400);
+    await wachtOpZichtbaar(page, '#inhoud');
     await page.click('[data-wk="projecten"]');
-    await page.waitForTimeout(800);
+    await wachtOpZichtbaar(page, '#a_h0_naam');
+    await wachtOpRust(page);
+
+    /* VULLEN, NAKIJKEN, DAN PAS KLIKKEN. Het handelingenpaneel tekent zichzelf
+       na elk antwoord opnieuw, en een hertekening wist wat er net is ingetypt.
+       Wie daartussen klikt, stuurt lege velden mee -- de server weigert dan om
+       een andere reden dan de toets denkt te meten. Zo viel deze toets een op de
+       drie rondes om nadat de vaste wachttijden eruit waren; die dekten het toe. */
+    const vulEnDoe = async (velden, knop) => {
+      for (let poging = 0; poging < 3; poging++) {
+        for (const [sel, waarde] of velden) {
+          const veld = page.locator(sel);
+          const tag = await veld.evaluate((e) => e.tagName);
+          if (tag === 'SELECT') await veld.selectOption(waarde);
+          else await veld.fill(waarde);
+        }
+        const blijftStaan = await page.evaluate((v) => v.every(([sel, waarde]) => {
+          const el = document.querySelector(sel);
+          return !!el && el.value === waarde;
+        }), velden);
+        if (blijftStaan) { await page.click(knop); return wachtOpRust(page); }
+      }
+      throw new Error('de velden voor ' + knop + ' bleven niet staan: het paneel hertekende steeds opnieuw');
+    };
 
     /* ---- een project maken vanaf het scherm ---- */
-    await page.fill('#a_h0_naam', 'Uitrol Den Haag');
-    await page.selectOption('#a_h0_werkvorm', 'stadsuitrol');
-    await page.click('[data-doe="0"]');
-    await page.waitForTimeout(900);
+    await vulEnDoe([['#a_h0_naam', 'Uitrol Den Haag'], ['#a_h0_werkvorm', 'stadsuitrol']], '[data-doe="0"]');
+    await wachtOpTekst(page, /Uitrol Den Haag/);
     let tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Uitrol Den Haag/, 'het project staat na de handeling in de lijst');
     assert.match(tekst, /nog geen taken/, 'en zonder taken staat er geen percentage');
@@ -309,11 +337,10 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
     /* ---- een besluit sluiten zonder stemmen: de weigering hoort VOLUIT op
        het scherm te komen, niet als een rood kruisje ---- */
     await page.selectOption('#mKeuze', 'besluit');
-    await page.waitForTimeout(700);
-    await page.fill('#a_h0_titel', 'Kantoor sluiten op vrijdag');
-    await page.fill('#a_h0_onderbouwing', 'Bijna niemand komt naar kantoor op vrijdag.');
-    await page.click('[data-doe="0"]');
-    await page.waitForTimeout(900);
+    await wachtOpZichtbaar(page, '#a_h0_titel');
+    await vulEnDoe([['#a_h0_titel', 'Kantoor sluiten op vrijdag'],
+      ['#a_h0_onderbouwing', 'Bijna niemand komt naar kantoor op vrijdag.']], '[data-doe="0"]');
+    await wachtOpTekst(page, /Kantoor sluiten op vrijdag/);
     tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Kantoor sluiten op vrijdag/, 'het voorstel staat in de lijst');
     assert.match(tekst, /advies/, 'en het staat op advies');
@@ -327,13 +354,11 @@ test('de handelingen staan op het scherm, en een weigering komt voluit in beeld'
     assert.ok(besluitId, 'het besluit is te vinden');
 
     // stemronde openen (handeling 2), daarna sluiten zonder stemmen (handeling 4)
-    await page.fill('#a_h2_besluitId', besluitId);
-    await page.click('[data-doe="2"]');
-    await page.waitForTimeout(700);
-    await page.fill('#a_h4_besluitId', besluitId);
-    await page.fill('#a_h4_evalueerOp', new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10));
-    await page.click('[data-doe="4"]');
-    await page.waitForTimeout(800);
+    await vulEnDoe([['#a_h2_besluitId', besluitId]], '[data-doe="2"]');
+    await wachtOpZichtbaar(page, '#a_h4_besluitId');
+    await vulEnDoe([['#a_h4_besluitId', besluitId],
+      ['#a_h4_evalueerOp', new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10)]], '[data-doe="4"]');
+    await wachtOpTekst(page, /niet gestemd|geen besluit/i, { in: '#melding' });
     const melding = await page.evaluate(() => document.getElementById('melding').textContent);
     assert.match(melding, /niet gestemd|geen besluit/i,
       'de weigering van de server komt voluit in beeld: ' + melding);

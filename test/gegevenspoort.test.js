@@ -11,7 +11,7 @@
    Draai los: node --test test/gegevenspoort.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 async function api(base, pad, body, token) {
@@ -252,9 +252,17 @@ test('wat je Rahul vertelt komt niet in zijn gespreksgeheugen terecht', async ()
     assert.match(klaar2.body.antwoord, /aangevraagd/i, 'de reservering is er (anders bewijst de rest niets)');
 
     // en dan: nergens in de datamap terug te vinden
-    await new Promise(r => setTimeout(r, 1500));   // de opslaglus zijn werk laten doen
-    stop(child);
-    await new Promise(r => setTimeout(r, 600));
+    /* NETJES stoppen in plaats van 1500 + 600 ms gokken.
+
+       Hier stond "de opslaglus zijn werk laten doen" (1500 ms) en daarna nog
+       600 ms om het kind weg te laten gaan. Allebei gokken, en allebei
+       overbodig: stopNet() stuurt SIGTERM, en daarop FLUST de server zijn
+       snapshot voordat hij afsluit (server/db/snapshot.js). Wachten op `exit`
+       is dus precies wachten tot alles op schijf staat -- het teken waar de
+       controle hieronder op rust. En het is de STRENGERE volgorde: onder de
+       oude gok kon de map gelezen worden terwijl er nog geschreven werd, en dan
+       zei "nergens terug te vinden" alleen dat het er nog niet stond. */
+    await stopNet(child);
     const alles = [];
     (function loop(d) {
       for (const e of fs.readdirSync(d, { withFileTypes: true })) {

@@ -14,9 +14,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
 test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
@@ -45,7 +49,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
     }, reg.token);
 
     /* 1. leeg is leeg, en zegt dat ook: geen lege lijst zonder uitleg. */
-    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('lijst');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);
@@ -57,7 +61,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
        zijn herkomst -- zonder dat het hier is ingetikt. */
     await api('doelen/maak', { titel: '10 kilometer hardlopen', reden: 'ik wil het kunnen',
       eenheid: 'km', nulmeting: 2, streef: 10, streefOp: overDagen(60) });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /10 kilometer/.test(document.getElementById('lijst').textContent),
       { timeout: 15000 });
 
@@ -82,7 +86,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
       body: JSON.stringify({ ok: true, vandaag: overDagen(0), maanden: [], aantal: 0, leeg: true,
         uitleg: 'x', storingen: ['De laag Zorg gaf een fout.'] })
     }));
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /De laag Zorg/.test(document.getElementById('storingen').textContent),
       { timeout: 10000 });
     assert.match(await page.textContent('#storingen'), /niet compleet/i,

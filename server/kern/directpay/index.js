@@ -72,6 +72,26 @@ function maakDirectpay(ctxIn) {
     }
     return sleutel ? (idemIndex.get(sleutel) || null) : null;
   }
+  /* DEZELFDE VOORZIENING VOOR BETAALVERZOEKEN, en die ontbrak. Een betaling
+     was al dubbeltik-vast; een VERZOEK om te betalen niet, dus twee keer op
+     "stuur" drukken zette er twee bij de klant -- gemeten met npm run idemproef
+     (TAKEN 3.8). Aparte index, want het zijn aparte lijsten; zelfde vorm, zodat
+     er niet twee manieren ontstaan om hetzelfde te doen. */
+  let verzoekIdemIndex = null;
+  function verzoekIdemZoek(sleutel) {
+    if (!verzoekIdemIndex) {
+      verzoekIdemIndex = new Map();
+      for (const v of ensure().betaalVerzoeken) if (v.idem) verzoekIdemIndex.set(v.idem, v);
+    }
+    return sleutel ? (verzoekIdemIndex.get(sleutel) || null) : null;
+  }
+  function verzoekIdemBewaar(v) {
+    if (!v.idem) return;
+    verzoekIdemZoek(null);
+    verzoekIdemIndex.set(v.idem, v);
+    if (verzoekIdemIndex.size > 250000) { verzoekIdemIndex = null; verzoekIdemZoek(null); }
+  }
+
   function idemBewaar(b) {
     if (!b.idem) return;
     idemZoek(null); // index bestaat zeker
@@ -120,7 +140,7 @@ function maakDirectpay(ctxIn) {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, crypto, betaal, ensure, centenVan, id, schoon, nu, nuMs, ledger, publiek,
-    idemZoek, idemBewaar, tempoOk, findSupplier, notify, notifySupplier, logActivity,
+    idemZoek, idemBewaar, verzoekIdemZoek, verzoekIdemBewaar, tempoOk, findSupplier, notify, notifySupplier, logActivity,
     sseToSupplier, sseToCustomer, sseToOffice, MIN_CENTEN, MAX_CENTEN,
     directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
     betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe };

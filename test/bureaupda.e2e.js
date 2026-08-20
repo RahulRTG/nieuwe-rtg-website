@@ -18,9 +18,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 /* Wat elk bureau van zichzelf hoort te tonen. Deze tabel staat met opzet NIET
    uit shared/bureaupda.js gelezen: dan zou de toets de code overschrijven met
@@ -59,7 +63,7 @@ test('de drie bureau-PDA\'s komen op, elk met hun eigen bureau, op één werking
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, login.token);
 
-      await page.goto(base + b.pad, { waitUntil: 'load' });
+      await page.goto(base + b.pad, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => {
         const e = document.querySelector('#pLijst');
         return e && !/Laden/.test(e.textContent);

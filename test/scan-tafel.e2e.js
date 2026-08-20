@@ -6,7 +6,7 @@
    Draai: node --test test/scan-tafel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -43,13 +43,30 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     // 3) browser: token in localStorage, app openen
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(([tok]) => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [reg.token]);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+    /* DE ONBOARDINGPOORT PAS WEGHALEN ALS DE APP ZIJN BESLUIT HEEFT GENOMEN.
+
+       checkOnboarding() (app-main-07.js) haalt /api/onboarding/status op en zet
+       daarna zelf `#onbGate.hidden` -- op true als de intake rond is, op FALSE
+       als hij dat niet is. Haalt deze toets de poort weg voordat dat antwoord
+       binnen is, dan zet de app hem een tel later gewoon weer terug, en dan
+       onderschept die poort elke klik in de scanstroom.
+
+       Zolang de navigatie op `load` wachtte was dat antwoord altijd al binnen.
+       Met `domcontentloaded` is het een race, en die is in de e2e-ronde van 20
+       augustus ook echt geknapt. Vandaar: het antwoord AANMELDEN vóór de goto
+       (daarna is het te laat, waitForResponse ziet alleen wat nog komt) en er
+       hieronder op wachten. */
+    const statusAntwoord = page.waitForResponse(
+      r => r.url().includes('/api/onboarding/status'), { timeout: 30000 }).catch(() => null);
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await statusAntwoord;
 
     // 4) de eigen QR-onderdelen zijn geladen en scannen is bereikbaar. Sinds
     //    het OS-beginscherm staat scannen in het bedieningspaneel en niet meer
@@ -86,9 +103,22 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
        De echte weg is de bovenrand omlaag halen (shared/randen.js). Dat is
        meteen de betere toets: hij meet de ingang die er nu is en niet de knop
        die er toevallig nog staat. */
+    /* EERST WACHTEN TOT DIE RAND ER IS. shared/randen.js hangt zijn luisteraars
+       pas 60 ms na DOMContentLoaded op, en alleen als er iets te openen valt;
+       `window.RTGRanden` is het teken dat hij klaar is.
+
+       Deze regel stond er niet, en dat viel niet op zolang de navigatie op
+       `load` wachtte -- die tijd dekte het toe. In de e2e-ronde van 20 augustus
+       zakte deze toets een keer op precies dat gat: de haal ging over een
+       pagina die nog niet luisterde, en daarna wachtte hij acht seconden op een
+       #osCcScan die verborgen bleef. Dat is dus geen bijwerking van de
+       omzetting maar een race die er al zat. Zelfde reparatie als in
+       test/vooruitscherm.e2e.js. */
+    await page.waitForFunction(() => !!window.RTGRanden, null, { timeout: 20000 });
     await page.mouse.move(196, 4);
     await page.mouse.down();
-    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    // een veeg is een reeks bewegingen, geen sprong: `steps` in plaats van pauzes
+    for (const y of [20, 50, 90, 130]) await page.mouse.move(196, y, { steps: 4 });
     await page.mouse.up();
     await page.waitForSelector('#osCcScan', { state: 'visible', timeout: 8000 });
     await page.click('#osCcScan');

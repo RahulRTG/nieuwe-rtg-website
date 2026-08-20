@@ -62,7 +62,11 @@ test.before(async () => {
   BASE = 'http://127.0.0.1:' + PORT;
   // 1) een verse kast maken, dan drie soorten tickets erin leggen
   await boot();
-  await new Promise(r => setTimeout(r, 500));
+  /* GEEN 500 ms MEER VOOR HET STOPPEN. stop() is `child.kill('SIGTERM')` met
+     `child.once('exit', ...)` erbij (zie boven), en op SIGTERM spoelt de server
+     zijn snapshot voordat hij afsluit (server/db/snapshot.js). Wachten tot het
+     proces weg is IS dus wachten tot alles op schijf staat; de halve seconde
+     ervoor voegde daar niets aan toe. */
   await stop();
   const DB = path.join(TMP, 'db.json');
   const data = JSON.parse(fs.readFileSync(DB, 'utf8'));

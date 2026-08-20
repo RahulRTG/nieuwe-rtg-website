@@ -37,7 +37,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop } = require('./helper');
+const { startServer, stop, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,9 +45,13 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
   for (const naam of fs.readdirSync(dir)) {
@@ -211,13 +215,30 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
 
     for (const pad of thuisPaden.concat(appPagina)) {
       const page = await ctx.newPage();
+      await volgVerzoeken(page);
       try {
         await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-        await page.waitForTimeout(1200);
-        const r = await page.evaluate(() => ({
+        await wachtOpRust(page);
+        /* EEN LATE OMLEIDING, en die hoort hier gewoon te mogen. Twee van de
+           vier ingangen van de homescreen sturen door zodra hun eigen script
+           klaar is, en dat kan NA de rust vallen -- dan sterft de meting op een
+           vernielde context. Dat is geen defect maar precies wat een ingang
+           doet. Kwam de pagina ergens anders uit, dan is dit pad niet meer wat
+           we meten: de bestemming staat zelf ook in deze lijst en wordt daar
+           geteld. Zonder deze vangst zakte de toets op "Execution context was
+           destroyed" en las dat als een breuk in de balk. */
+        const meet = () => page.evaluate(() => ({
           eigen: document.querySelectorAll('.os-aibalk').length,
           metgezel: document.querySelectorAll('.mgz-balk').length
         }));
+        let r;
+        try { r = await meet(); }
+        catch (e) {
+          if (!/Execution context was destroyed|Target closed|Target page/.test(String(e && e.message))) throw e;
+          await wachtOpRust(page);
+          if (new URL(page.url()).pathname !== pad) continue;
+          r = await meet();
+        }
         const totaal = r.eigen + r.metgezel;
         if (totaal > 1) {
           fouten.push(pad + ': ' + totaal + ' balken (eigen ' + r.eigen + ', metgezel ' + r.metgezel + ')');
@@ -243,9 +264,10 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
       let gemeten = 0;
       for (const pad of appPaden()) {
         const page = await ctx.newPage();
+        await volgVerzoeken(page);
         try {
           await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-          await page.waitForTimeout(200);
+          await wachtOpRust(page);
           let meedoen;
           try {
             meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit') &&
@@ -279,6 +301,7 @@ test('het menu opent en brengt je terug naar het beginscherm',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#osMenuBtn', { timeout: 10000 });
     await page.click('#osMenuBtn');
@@ -318,6 +341,7 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     /* Een vers geregistreerd lid staat nog in de intake, en die legt een blad
        over het hele scherm. hidden is het signaal waarop Command wacht;
@@ -397,7 +421,10 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
     }
     // en de tegel doet het echt: hij klikt de verborgen bel aan
     await page.click('#osCcBel');
-    await page.waitForTimeout(500);
+    await wachtTot(page, () => {
+      const p = document.getElementById('notifPanel');
+      return !!(p && p.classList.contains('open'));
+    }, null, { wat: 'het geopende meldingenpaneel' });
     assert.equal(await page.evaluate(() => {
       const p = document.getElementById('notifPanel');
       return !!(p && p.classList.contains('open'));
@@ -411,9 +438,15 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
     await wachtWerelden(page);
     await page.mouse.move(196, 4);
     await page.mouse.down();
-    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    /* Een veeg is een REEKS bewegingen, geen sprong -- daar had die 40 ms mee te
+       maken. Playwright doet dat zelf met `steps`, en dan is het geen wachttijd
+       meer maar een beweging met tussenstappen. */
+    for (const y of [20, 50, 90, 130]) await page.mouse.move(196, y, { steps: 4 });
     await page.mouse.up();
-    await page.waitForTimeout(600);
+    await wachtTot(page, () => {
+      const s = document.getElementById('osCcScrim');
+      return !!(s && s.classList.contains('open'));
+    }, null, { wat: 'het bedieningspaneel dat de bovenrand opent' });
     assert.equal(await page.evaluate(() => {
       const s = document.getElementById('osCcScrim');
       return !!(s && s.classList.contains('open'));
@@ -444,6 +477,7 @@ test('de bank zet de vier werelden bovenaan, en het springboard is weg',
      scherm er weer onder. */
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
@@ -517,6 +551,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
      icoon van Command in plaats van het eigen merkteken. */
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
@@ -550,6 +585,7 @@ test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
      (app-main-29c.js filtert erop) en staat niet meer in de bank. */
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);

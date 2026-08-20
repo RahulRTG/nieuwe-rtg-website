@@ -18,13 +18,13 @@
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 0,
-      "gezakt": 1
+      "gezakt": 0
     },
     "ACL": {
       "bewezen": 3079,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1109,
+      "ongemeten": 1117,
       "gezakt": 0
     },
     "INPUT": {
@@ -87,7 +87,7 @@
       "bewezen": 3079,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1109,
+      "ongemeten": 1117,
       "gezakt": 0
     }
   },

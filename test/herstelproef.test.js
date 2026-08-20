@@ -25,7 +25,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 // de strenge poort mag de stderr van onze eigen server meelezen
-const { bewaakKind } = require('./helper');
+const { bewaakKind, stopNet } = require('./helper');
 
 /* ELKE FETCH MET EEN DEADLINE -- EEN TWEEDE SLOT, EN NIET DE OORZAAK.
 
@@ -86,7 +86,13 @@ async function start(poort, extra) {
   kind.kill();
   throw new Error('server op poort ' + poort + ' kwam niet op');
 }
-async function stop(kind) { if (kind) { kind.kill(); await wacht(600); } }
+/* WACHTEN TOT HIJ WEG IS, in plaats van 600 ms gokken -- met HETZELFDE signaal
+   als eerst. Hier stond `kind.kill(); await wacht(600)`, en `kill()` zonder
+   argument is SIGTERM: een nette stop waarbij de server zijn snapshot nog
+   spoelt. stopNet() stuurt datzelfde signaal en wacht op `exit`. Dat is het
+   teken waar de rest op rust: zolang het proces leeft heeft het de datamap nog
+   vast, en dan leest de backup-controle een kast waar nog in geschreven wordt. */
+async function stop(kind) { await stopNet(kind); }
 function post(poort, pad, body, tok) {
   const h = { 'Content-Type': 'application/json' };
   if (tok) h.Authorization = 'Bearer ' + tok;

@@ -87,6 +87,14 @@ module.exports = (kern) => {
     // await: sinds de bytes (mediastore, kluis) meegaan is dit ook I/O, en de
     // bevestiging hoort pas te komen als het echt gebeurd is
     await wisLid(req.session);
+    /* HET SPOOR VAN DEZE HANDELING ZELF. Het API-spoor noteert een geslaagde
+       schrijfhandeling NA het antwoord (server/opzet/auditspoor.js), dus deze
+       aanroep zou de zojuist gewiste sleutel meteen weer terugzetten -- en de
+       bezem van test/vergeten.test.js vond hem daar ook. Wat er moet blijven is
+       DAT er is gewist en wanneer; wie het was hoort er niet meer bij te staan.
+       Vandaar dat de sessie hier zijn sleutel verliest voordat het antwoord de
+       deur uit gaat: het spoor schrijft dan "gewist". */
+    req.session = { key: 'gewist', tier: req.session.tier };
     res.json({ ok: true });
   });
 };

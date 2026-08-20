@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -73,7 +73,9 @@ async function toon(page, base, app) {
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.removeItem('rtf_sessie'); });
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1100);   // een omleiding zou hierbinnen gebeuren
+  /* Een omleiding gebeurt bij het laden; wachten tot het scherm STIL is (geen
+     lopend verzoek, geen hertekening) vangt hem, en wacht niet langer dan nodig. */
+  await wachtOpRust(page);
   return page.evaluate(() => ({
     pad: location.pathname,
     deur: !!document.querySelector('.rtgdeur'),
@@ -98,6 +100,7 @@ test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -147,6 +150,7 @@ test('de klas-PDA opent pas na een eigen Foundation-profiel en vraagt buiten nie
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -184,6 +188,7 @@ test('de speeltuin en de speelhal roepen geen kind terug: geen ranglijst, geen r
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -232,6 +237,7 @@ test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -282,6 +288,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
       } catch (e) {}
     });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     const stuk = [];
@@ -289,7 +296,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
     for (const [naam, titel] of FOUNDATION_DEUREN) {
       const pad = '/apps/foundation/' + naam + '.html';
       await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(350);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         titel: document.title,
@@ -309,7 +316,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
     for (const [naam, doel] of FOUNDATION_OPEN) {
       const pad = '/apps/foundation/' + naam + '.html';
       await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(250);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         tekst: document.body.innerText.replace(/\s+/g, ' ').trim(),

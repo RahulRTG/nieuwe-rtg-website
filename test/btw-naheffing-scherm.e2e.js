@@ -14,18 +14,21 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, stopNet, letOpFouten } = require('./helper');
+const { startServer, stop, stopNet, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 const api = (base, pad, body, token) => fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const wacht = (ms) => new Promise(r => setTimeout(r, ms));
 
 function vorigKwartaal() {
   const d = new Date();
@@ -62,19 +65,16 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
     assert.equal(rek.status, 200, 'de zakelijke rekening is open');
     const iban = rek.body.rekening.iban;
 
-    /* NET STOPPEN, EN NIET DOODSCHIETEN. Hier stond stop(), en dat is SIGKILL --
-       een stroomstoring. De helper zegt het zelf bij stopNet(): "de server
-       krijgt geen kans zijn write-behind te spoelen". Daarna las deze toets
-       db.json van schijf en verwachtte de factuur die hij net had gemaakt.
+    /* NETJES stoppen en WACHTEN TOT HIJ WEG IS, in plaats van twee klokwachten.
 
-       Op een rustige machine was die toevallig al gespoeld binnen de 1500 ms
-       ervoor; op een volle CI-runner niet, en dan is db.facturen undefined en
-       zakt de toets op "Cannot read properties of undefined (reading '0')".
-       Dat leest als een kapotte factuurketen terwijl er niets mis is.
+       Hier stond `wacht(1500); stop(); wacht(2500)`. Die 1500 gokte dat de
+       write-behind van de JSON-opslag klaar was, en die 2500 gokte dat het
+       kindproces intussen wel weg zou zijn -- op een trage machine allebei mis,
+       en dan leest de regel hieronder een db.json zonder de factuur erin.
 
-       stopNet() stuurt SIGTERM en WACHT tot het proces echt weg is -- een
-       deploy in plaats van een stroomstoring. Dat is ook wat deze toets bedoelt:
-       hij zet opzet klaar en herstart daarna, hij beproeft geen crash. */
+       stopNet() is SIGTERM en wacht op `exit`. Dat is precies het teken waar de
+       bewering op rust: de server FLUSHT zijn snapshot op SIGTERM (zie
+       server/db/snapshot.js) en is bij `exit` aantoonbaar van het bestand af. */
     await stopNet(srv.child);
     const pad = path.join(TMP, 'db.json');
     const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
@@ -108,7 +108,7 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
       localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, zaakTok);
-    await page.goto(srv.base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.goto(srv.base + '/apps/leverancier.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app.active', { timeout: 20000 });
     await page.waitForSelector('[data-ksec="fin"]', { state: 'visible', timeout: 15000 });
     await page.click('[data-ksec="fin"]');

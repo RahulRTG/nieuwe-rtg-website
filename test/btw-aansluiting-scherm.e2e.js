@@ -18,9 +18,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) })).json();
@@ -54,7 +58,7 @@ test('Belastingkantoor: de aansluiting toont hetzelfde getal als de zaak zelf zi
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_werk_rijk', t); }, rijk);
-    await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app:not([hidden])', { timeout: 20000 });
 
     await page.click('.tab[data-t="aansl"]');

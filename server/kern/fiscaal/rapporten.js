@@ -57,7 +57,7 @@ module.exports = (ctx) => {
       omzet += v.total || 0;
       const m = v.method || 'contant';
       betaalwijzen[m] = centen((betaalwijzen[m] || 0) + (v.total || 0));
-      if (m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening: de btw loopt via de hoofdboeking
+      if (v.omzetElders || m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening (of een bundelbon): de btw loopt via de hoofdboeking
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
     }

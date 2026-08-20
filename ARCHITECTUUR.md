@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4107 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4108 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4107 |
-| servermodules (`server/**/*.js`) | 2361 |
-| routebestanden (`server/routes/**`) | 468 |
-| kernmodules (`server/kern/**`) | 1445 |
+| API-endpoints | 4108 |
+| servermodules (`server/**/*.js`) | 2368 |
+| routebestanden (`server/routes/**`) | 470 |
+| kernmodules (`server/kern/**`) | 1446 |
 | schermen (`public/**/*.html`) | 256 |
 | gedeelde browsermodules (`public/shared/*.js`) | 254 |
-| toetsbestanden (`test/*.test.js`) | 1003 |
+| toetsbestanden (`test/*.test.js`) | 1009 |
 | schermtoetsen (`test/*.e2e.js`) | 145 |
 
 ## 2. De weg van een verzoek
@@ -105,7 +105,7 @@ zie §5 -- er zijn nog 200 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 53 |
 | `member` | 641 | 57 | 10 | 401 |
-| `supplier` | 568 | 103 | 10 | 298 |
+| `supplier` | 568 | 104 | 10 | 298 |
 | `office` | 48 | 9 | 6 | 70 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 71 | 9 | 39 | 60 |
@@ -118,7 +118,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2323 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2324 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -126,9 +126,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1444 |
+| kern-namen die routes aanraken | 1445 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 200 |
-| daarvan door precies één domein | 1244 |
+| daarvan door precies één domein | 1245 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

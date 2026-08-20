@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
 
 const api = (base, pad, body, token) => fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
@@ -65,9 +65,17 @@ test('de hele keten: opleggen, vier ogen, bezwaar en derde ogen -- over de echte
     }
 
     // ---- 2. de factuur naar een afgesloten kwartaal, buiten de server om ----
-    await wacht(1500);
-    stop(srv.child);
-    await wacht(2500);
+    /* NETJES stoppen en WACHTEN TOT HIJ WEG IS, in plaats van twee klokwachten.
+
+       Hier stond `wacht(1500); stop(); wacht(2500)`. Die 1500 gokte dat de
+       write-behind van de JSON-opslag klaar was en die 2500 dat het kindproces
+       intussen wel weg zou zijn -- op een trage machine allebei mis, en dan
+       leest de regel hieronder een db.json zonder de factuur erin.
+
+       stopNet() is SIGTERM en wacht op `exit`. Dat is precies het teken waar
+       de bewering op rust: de server FLUSHT zijn snapshot op SIGTERM (zie
+       server/db/snapshot.js) en is bij `exit` aantoonbaar van het bestand af. */
+    await stopNet(srv.child);
     const pad = path.join(TMP, 'db.json');
     const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
     assert.equal(db.facturen.length, 1, 'de factuur staat in de opslag');
@@ -225,9 +233,17 @@ test('betalen en terugbetalen: het geld beweegt echt, over de echte routes', asy
     const iban = rek.body.rekening.iban;
     assert.equal(rek.body.saldoCenten, 0, 'en staat op nul');
 
-    await wacht(1500);
-    stop(srv.child);
-    await wacht(2500);
+    /* NETJES stoppen en WACHTEN TOT HIJ WEG IS, in plaats van twee klokwachten.
+
+       Hier stond `wacht(1500); stop(); wacht(2500)`. Die 1500 gokte dat de
+       write-behind van de JSON-opslag klaar was en die 2500 dat het kindproces
+       intussen wel weg zou zijn -- op een trage machine allebei mis, en dan
+       leest de regel hieronder een db.json zonder de factuur erin.
+
+       stopNet() is SIGTERM en wacht op `exit`. Dat is precies het teken waar
+       de bewering op rust: de server FLUSHT zijn snapshot op SIGTERM (zie
+       server/db/snapshot.js) en is bij `exit` aantoonbaar van het bestand af. */
+    await stopNet(srv.child);
     const pad = path.join(TMP, 'db.json');
     const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
     db.facturen[0].datum = K.datum;

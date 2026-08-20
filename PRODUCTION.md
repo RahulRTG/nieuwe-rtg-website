@@ -354,6 +354,32 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
 - **Betaal-naad** — `server/betaal.js`: idempotente betalingen (geen
   dubbele afschrijving bij herhaling) en webhook-verificatie met handtekening.
   Zonder Stripe-key draait de demo-provider.
+- **Auditspoor** — `server/opzet/auditspoor.js` schrijft elke GESLAAGDE
+  schrijfhandeling weg in een hash-geketend journaal (wie, wat, wanneer, welke
+  status; nooit het verzoeklijf, want een auditlog met alle lijven is zelf het
+  datalek). Wie er een regel in wijzigt of uit knipt, breekt de keten, en
+  `POST /api/command/apispoor` (backoffice) laat die controle draaien. Gemeten
+  met `npm run auditproef`: **860 schrijfroutes laten aantoonbaar een spoor na,
+  0 niet**, keten heel. Wat het NIET dekt: wie de nieuwste regels weggooit houdt
+  een kloppende keten over -- daarvoor moet het kopzegel buiten deze database
+  worden vastgelegd (`server/lib/keten-anker.js`, bewust nog niet in bedrijf;
+  `TAKEN.md` 3.7).
+- **Dubbeltik** — `server/lib/dubbeltik.js` staat vóór alle routers: een
+  schrijfverzoek met een idem-sleutel (`idem` in het lijf of de kop
+  `Idempotency-Key`) wordt één keer uitgevoerd; de herhaling krijgt het bewaarde
+  antwoord met `herhaald: true`. Gemeten met `npm run idemproef`: van 15
+  beschermde en 100 onbeschermde routes naar **842 beschermd en 3 onbeschermd**
+  (die drie zijn geldroutes; die gaan bewust langs deze laag omdat ze hun eigen,
+  duurzame idempotentie hebben -- zie `TAKEN.md` 3.8).
+  Drie grenzen staan in de kop van dat bestand en horen erbij: hij doet niets
+  zonder sleutel (twee keer hetzelfde toevoegen zonder sleutel MAG twee items
+  zijn), hij leeft in het geheugen van één proces (voor geld blijft
+  `server/lib/idem.js` staan, mét duurzame commit), en een ander lijf onder
+  dezelfde sleutel wordt doorgelaten in plaats van geweigerd. De kast is
+  begrensd op aantal (5000) én op omvang (32 MB, gemeten aan de content-length
+  die de server toch al berekent): loopt hij vol, dan valt de oudste eraf, zodat
+  bescherming geleidelijk aan de achterkant verdwijnt in plaats van dat het
+  geheugen oploopt.
 - **Security** — https-redirect + HSTS, strikte CSP (met per-antwoord nonce voor
   scripts), `nosniff`/`DENY`/referrer/permissions-headers, token-hashing,
   sessieverloop, rate-limits, AVG-rechten (inzage + verwijderen).
@@ -371,6 +397,21 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
   piekcapaciteit per instance schaalt met de kernen van de machine;
   meer draden dan kernen levert niets op. Meer capaciteit = zwaardere
   machine of meer instances (vloot/trio).
+- **Herkomst van het image** — de release-workflow maakt na de push een
+  stuklijst (SBOM, CycloneDX 1.5) UIT het gepubliceerde image en bindt die met
+  een Ed25519-handtekening aan het image-digest, het releasebewijs en de commit
+  (`scripts/imageherkomst.js`). Waarom dat nodig was naast `release-bewijs.json`:
+  dat bewijs hasht de BRON van dit huis, maar een image is meer dan deze
+  repository -- uit `node:22-slim` komen ruim honderd deb-pakketten mee die wij
+  niet schrijven. Op "zit die kwetsbaarheid in wat jullie draaien?" gaf een
+  bronhash geen antwoord. Controleren op de machine:
+  `npm run imageherkomst:controle -- --draait=<digest van wat er draait>`; zonder
+  dat laatste toets je alleen de handtekening en niet wat er staat te draaien.
+  **Twee eerlijke grenzen.** (1) Dit is geen Sigstore: geen transparantielogboek,
+  geen keyless-OIDC, geen derde die meekijkt -- wie sigstore-verificatie eist
+  krijgt dat hier niet (`TAKEN.md` 3.5). (2) Zolang `deploy/release-sleutel.pub`
+  niet bestaat, worden stuklijst en herkomstdocument wel gemaakt maar is er
+  niets te verifieren; de workflow zegt dat dan hardop als waarschuwing.
 - **Graceful shutdown** — `SIGTERM`/`SIGINT` schrijven data weg en sluiten netjes.
 - **Failover** — drie-server-cluster met poortwachter (`server/trio.js`).
 - **Toegankelijkheid** — alle vlaggenschip-schermen axe-schoon (CI bewaakt dit).

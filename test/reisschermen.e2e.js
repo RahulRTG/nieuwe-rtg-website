@@ -32,7 +32,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -87,7 +87,7 @@ async function toon(page, base, app, token) {
     localStorage.removeItem('rtg_office_token');
   }, token || null);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1000);
+  await wachtOpRust(page);
   return page.evaluate(() => ({
     pad: location.pathname, tekst: document.body.innerText.replace(/\s+/g, ' ')
   }));
@@ -97,6 +97,7 @@ async function opstelling(base) {
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   const fouten = [];
   letOpFouten(page, fouten);
   return { browser, page, fouten };
@@ -195,9 +196,17 @@ test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste 
       const b = [...document.querySelectorAll('#zoneBalk button')].find(x => /18\+/.test(x.textContent));
       b.click();
     });
+    /* WACHTEN OP WAT DE BEWERING HIERONDER MEET, en niet op iets ernaast. Hier
+       stond alleen "poortReden heeft tekst", en dat is eerder waar dan dat het
+       POORTSCHERM ook echt vooraan staat: de app vult de reden en wisselt daarna
+       pas van paneel. In een volle ronde viel de meting daar precies tussen --
+       `vZaal` was nog zichtbaar en `vPoort` nog niet -- en dan leest de uitslag
+       als "de 18+-deur staat open" terwijl er niets mis is met de deur. Zelfde
+       fout als wachten op de klok, alleen met een ander teken ernaast. */
     await o.page.waitForFunction(() => {
       const p = document.getElementById('poortReden');
-      return p && p.textContent.trim().length > 0;
+      const poort = document.getElementById('vPoort');
+      return p && p.textContent.trim().length > 0 && poort && poort.offsetParent !== null;
     }, null, { timeout: 10000 });
 
     const reden = await o.page.evaluate(() => document.getElementById('poortReden').textContent);

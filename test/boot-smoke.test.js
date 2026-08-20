@@ -9,6 +9,7 @@
    bestaande functie aanriep) én een verkeerde root-route langs alle groene
    tests. Deze test dekt die hele klasse in één keer af. */
 const { test } = require('node:test');
+const { opstartGeduld } = require('./helper');
 const assert = require('node:assert');
 const cp = require('child_process');
 const http = require('http');
@@ -31,16 +32,30 @@ function haal(port, pad) {
 }
 
 /* De volledige server laadt duizenden routes. Op een bezette CI- of
-   ontwikkelmachine kan dat aantoonbaar langer dan 15 seconden duren, zonder
-   dat de boot defect is. Fatale fouten blijven direct afbreken. */
-async function wachtTotOp(port, uitInfo, tot = 30000) {
-  const eind = Date.now() + tot;
+   ontwikkelmachine kan dat aantoonbaar langer duren dan een vast getal
+   toestaat, zonder dat de boot defect is. Het geduld komt daarom uit
+   ./helper.js (`opstartGeduld`), dezelfde functie die startServer gebruikt --
+   hier stond een derde kopie van die regel, met een eigen getal (LAT.md regel
+   4). Fatale fouten blijven direct afbreken, en een GESTOPT kindproces ook: dan
+   valt er niets meer te wachten en is een volle budgettijd alleen maar
+   wachttijd bij een melding die de oorzaak niet noemt. */
+async function wachtTotOp(port, uitInfo, kind, tot) {
+  const geduld = opstartGeduld(30000);
+  const budget = tot || geduld.ms;
+  const gestart = Date.now();
+  const eind = gestart + budget;
   while (Date.now() < eind) {
     if (uitInfo.fataal) throw new Error('server crashte bij opstart:\n' + uitInfo.log.slice(-2000));
+    if (kind && kind.exitCode != null)
+      throw new Error('server stopte tijdens opstarten (exit ' + kind.exitCode + ') na ' +
+        (Date.now() - gestart) + 'ms\n' + uitInfo.log.slice(-2000));
     try { const r = await haal(port, '/'); if (r.status) return r; } catch (e) { /* nog niet op */ }
     await new Promise(r => setTimeout(r, 250));
   }
-  throw new Error('server werd niet bereikbaar binnen ' + tot + 'ms\n' + uitInfo.log.slice(-2000));
+  throw new Error('server werd niet bereikbaar binnen ' + budget + 'ms (' +
+    (kind && kind.exitCode == null ? 'het kindproces LEEFDE nog' : 'het kindproces was gestopt') +
+    ', belasting ' + geduld.druk.toFixed(2) + ' per kern, geduld x' + geduld.extra + ')\n' +
+    uitInfo.log.slice(-2000));
 }
 
 // boot een kindproces op een gokte poort; bij een poortbotsing (EADDRINUSE --
@@ -70,7 +85,7 @@ test('de server boot en serveert de ROS-poort op de root', async () => {
       const port = 34000 + Math.floor(Math.random() * 2000);
       ({ kind, uitInfo } = boot(port, dataDir));
       try {
-        r = await wachtTotOp(port, uitInfo);
+        r = await wachtTotOp(port, uitInfo, kind);
         break;
       } catch (e) {
         kind.kill('SIGKILL');

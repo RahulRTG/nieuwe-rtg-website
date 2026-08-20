@@ -95,7 +95,21 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: pw ? fal
       await page.evaluate(() => window.RTGChatScherm.zet('vol'));
       assert.equal(await stand(), 'vol');
       await page.evaluate(() => window.__handenvrijKamer.beurt('member', 'En nog iets.'));
-      await new Promise(r => setTimeout(r, 300));
+      /* GEEN 300 ms MEER, en dat is nagelopen en niet weggelaten.
+
+         Hier stond `setTimeout(300)` om "het paneel de kans te geven terug te
+         veren". Maar die weg is helemaal SYNCHROON: beurt() roept inBeeld()
+         aan, inBeeld() roept naStand() aan, en naStand() doet meteen
+         zet('min') -- alle drie in handenvrij-chat.js en handenvrij-scherm.js,
+         zonder timer ertussen. Zodra de evaluate hierboven terug is, is het
+         terugveren dus al GEBEURD of nooit gebeurd. 300 ms wachten voegde daar
+         niets aan toe behalve de suggestie dat er iets te wachten viel.
+
+         De bel in de DOM is het teken dat beurt() echt is gelopen; zonder die
+         controle zou deze toets ook slagen als de beurt stilletjes wegviel. */
+      const bel = await page.evaluate(() => Array.from(
+        document.querySelectorAll('.hv-beurt.ik .hv-bel')).some(b => /En nog iets/.test(b.textContent)));
+      assert.equal(bel, true, 'de beurt staat in het gesprek; anders zegt de meting hieronder niets');
       assert.equal(await stand(), 'vol', 'een met de hand gezette stand hoort te blijven staan');
     });
 

@@ -2126,7 +2126,9 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     ["server/lib/idem-poort.js|const auth = (typeof req.get === 'function' && req.get('authorization')) || '';",
       'hasht de kop tot een SCOPE en beslist er niets mee: de idem-poort verleent geen toegang, hij zorgt ' +
       'alleen dat twee afzenders nooit dezelfde opslagsleutel delen. De echte authenticatie staat achter de ' +
-      'poort, en alleen een 2xx gaat de kast in -- een verzonnen kop levert dus nooit een bewaard antwoord op.']
+      'poort, en alleen een 2xx gaat de kast in -- een verzonnen kop levert dus nooit een bewaard antwoord op.'],
+    ["server/lib/dubbeltik.js|const kop = req.get('authorization') || '';",
+      'de dubbeltik VERSLEUTELT de kop tot een hash en kijkt er nooit in. Hij beslist niets over toegang -- de hash bepaalt alleen in welke la het bewaarde antwoord komt, zodat twee bellers met dezelfde idem-sleutel nooit elkaars antwoord krijgen. Een verzonnen kop levert dus hooguit een eigen lege la op; of het verzoek mag, beslist de echte auth verderop in de keten.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
@@ -3725,6 +3727,123 @@ console.log('\n53) elk scherm is vanaf de bank te bereiken');
   }
 }
 
+
+/* ============================================================================
+   54) DE RELEASE-WORKFLOW PUBLICEERT NIETS ZONDER STUKLIJST EN HERKOMST
+
+   WAT HIER ACHTER ZIT. Het releasebewijs (scripts/release-bewijs.js) hasht elke
+   bron in dit huis, en dat bewijs zit ook in het image. Maar een image is meer
+   dan deze repository: uit node:22-slim komen ruim honderd deb-pakketten mee die
+   wij niet schrijven en niet kiezen. Op de vraag "zit die kwetsbaarheid in wat
+   jullie draaien?" gaf een bronhash geen antwoord, en die vraag komt bij elke
+   doorlichting langs. scripts/imageherkomst.js maakt daarom een stuklijst UIT het
+   gepubliceerde image en bindt die met een handtekening aan het image-digest.
+
+   WAAROM DAT HIER EEN POORT NODIG HEEFT. Die stappen staan in een
+   workflow-bestand, en workflow-bestanden zijn de makkelijkste plek om iets uit
+   te zetten: een stap uitcommentarieren is een regel, en de publicatie gaat
+   daarna gewoon door. Groen, sneller, en niemand die het ziet -- tot een
+   inkoper om de stuklijst vraagt. Deze regel maakt van dat weglaten een rood
+   vinkje.
+
+   DE VOLGORDE DOET ERTOE, en dat is geen vormkwestie. Een stuklijst die VOOR de
+   publicatie wordt gemaakt beschrijft een image dat misschien niet is wat er
+   uiteindelijk gepusht is. Daarom eist deze regel dat --sbom NA de push staat.
+
+   WAT HIJ NIET KAN. Of de handtekening ooit gezet is, weet dit bestand niet:
+   dat hangt aan een secret in GitHub. Wel kan hij eisen dat de publieke sleutel,
+   als hij er staat, een echte Ed25519-sleutel is -- een verminkte plak tekst in
+   deploy/release-sleutel.pub zou anders pas opvallen op het moment dat iemand
+   een release probeert te verifieren. */
+console.log('\n54) de release-workflow publiceert niets zonder stuklijst en herkomst');
+{
+  const wfPad = path.join(ROOT, '.github/workflows/release-image.yml');
+  if (!fs.existsSync(wfPad)) fout('.github/workflows/release-image.yml bestaat niet meer');
+  else if (!fs.existsSync(path.join(ROOT, 'scripts/imageherkomst.js'))) fout('scripts/imageherkomst.js is weg, terwijl de workflow hem aanroept');
+  else {
+    const wf = fs.readFileSync(wfPad, 'utf8');
+    const na = (naald) => wf.indexOf(naald);
+    const push = na('docker push');
+    const sbom = na('imageherkomst.js --sbom');
+    const binden = na('imageherkomst.js --binden');
+    const controle = na('imageherkomst.js --controle');
+    const klachten = [];
+    if (push < 0) klachten.push('de workflow pusht geen image meer -- dan klopt deze regel niet meer bij wat hij bewaakt');
+    if (sbom < 0) klachten.push('er wordt geen stuklijst meer gemaakt (imageherkomst.js --sbom ontbreekt)');
+    else if (push >= 0 && sbom < push) klachten.push('de stuklijst wordt VOOR de push gemaakt; dan beschrijft hij niet wat er gepubliceerd is');
+    if (binden < 0) klachten.push('het image-digest wordt nergens aan de stuklijst gebonden (imageherkomst.js --binden ontbreekt)');
+    else if (sbom >= 0 && binden < sbom) klachten.push('er wordt gebonden voordat de stuklijst bestaat');
+    if (controle < 0) klachten.push('de workflow controleert zijn eigen publicatie niet (imageherkomst.js --controle ontbreekt)');
+    if (!/upload-artifact/.test(wf) || !/sbom\.json/.test(wf)) klachten.push('de stuklijst wordt niet bewaard: zonder upload blijft er na de run niets van over');
+    /* Een sleutel die er WEL staat maar geen sleutel is, is erger dan geen
+       sleutel: hij ziet eruit als een vertrouwensanker. */
+    const pubPad = path.join(ROOT, 'deploy/release-sleutel.pub');
+    if (fs.existsSync(pubPad)) {
+      try {
+        const sleutel = require('crypto').createPublicKey(fs.readFileSync(pubPad, 'utf8'));
+        if (sleutel.asymmetricKeyType !== 'ed25519') klachten.push('deploy/release-sleutel.pub is geen Ed25519-sleutel maar ' + sleutel.asymmetricKeyType);
+      } catch (e) { klachten.push('deploy/release-sleutel.pub is geen leesbare publieke sleutel: ' + e.message); }
+    }
+    if (klachten.length) klachten.forEach(fout);
+    else ok('de workflow maakt de stuklijst na de push, bindt hem aan het digest, controleert en bewaart hem' +
+      (fs.existsSync(pubPad) ? ', en de vastgelegde publieke sleutel is een geldige Ed25519-sleutel' : ' (nog geen vastgelegde publieke sleutel: releases zijn ongetekend)'));
+  }
+}
+
+
+/* ============================================================================
+   55) DE DUBBELTIK STAAT NA ELKE ANDERE RES.JSON-WIKKEL
+
+   DEZE REGEL KOMT UIT EEN FOUT DIE DERTIEN GROENE TOETSEN NIET ZAGEN. De
+   dubbeltik (server/lib/dubbeltik.js) hing res.json om zich een antwoord te
+   herinneren. jsonGzip() doet dat OOK, en stuurt een antwoord boven de kilobyte
+   via res.send in plaats van via res.json. Stond de dubbeltik daarvoor, dan zag
+   hij grote antwoorden nooit -- en liet hij de herhaling het werk gewoon opnieuw
+   doen. Negentien routes in de idemproef, allemaal met een groot antwoord, en
+   nergens een foutmelding: kleine antwoorden gingen goed, en curl vraagt
+   standaard geen compressie.
+
+   Wie het laatst om res.json heen gaat, ziet het antwoord het eerst. De
+   dubbeltik hoort dus de BUITENSTE wikkel te zijn. test/dubbeltikgzip.test.js
+   bewijst dat die samenstelling werkt; deze regel bewaakt dat de PRODUCTIECODE
+   die volgorde ook echt aanhoudt -- een toets die zijn eigen volgorde opschrijft
+   zegt niets over wat er in server/ gebeurt. */
+console.log('\n55) de dubbeltik staat na elke andere res.json-wikkel');
+{
+  const wikkelaars = [];
+  loop(path.join(ROOT, 'server'), /\.js$/, (f) => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    /* Elke plek die res.json vervangt is een wikkel. De dubbeltik zelf hoort
+       er ook bij: die moet als laatste komen. */
+    if (/\bres\.json\s*=/.test(bron)) wikkelaars.push(rel);
+  });
+  const poortwachters = path.join(ROOT, 'server/opzet/poortwachters.js');
+  const bron = fs.existsSync(poortwachters) ? zonderCommentaar(fs.readFileSync(poortwachters, 'utf8')) : '';
+  const gzip = bron.indexOf('app.use(jsonGzip())');
+  const dub = bron.indexOf('app.use(dubbeltik.middleware())');
+  const klachten = [];
+  if (dub < 0) klachten.push('de dubbeltik wordt in poortwachters.js niet meer gemount; dan is geen enkele route tegen een herhaling beschermd');
+  else if (gzip < 0) klachten.push('jsonGzip() staat niet meer in poortwachters.js -- controleer of de dubbeltik nog de buitenste wikkel is');
+  else if (dub < gzip) klachten.push('de dubbeltik staat VOOR jsonGzip(); grote antwoorden gaan dan buiten hem om (zie test/dubbeltikgzip.test.js)');
+  /* En een NIEUWE wikkel is geen fout, maar wel iets waar iemand naar hoort te
+     kijken: hij kan de dubbeltik opnieuw onzichtbaar maken. De lijst staat hier
+     bij naam, dus hij groeit niet stil. */
+  const BEKEND = {
+    'server/middleware/compressie.js': 'jsonGzip -- staat VOOR de dubbeltik, precies daarom bestaat deze regel',
+    'server/opzet/lijfpoort.js': 'het zaakdoos-journaal; staat voor de dubbeltik en verandert het antwoord niet',
+    'server/opzet/liegpoort.js': 'meetgereedschap, draait alleen met RTG_LIEG en nooit in een echte rit',
+    'server/lib/dubbeltik.js': 'de dubbeltik zelf',
+    'server/lib/cache.js': 'antwoordcache; alleen op leesroutes (GET), en een cachetreffer doet per definitie geen werk',
+    'server/web/verrijk.js': 'de EIGEN webserver voor klantdomeinen, een andere server dan deze app -- geen express, geen dubbeltik',
+    'server/lib/idem-poort.js': "de idem-poort. NAGEKEKEN op 20 augustus 2026 bij het samenvoegen: hij wordt gemount in opzet/lijfpoort.js (stap 8 van de verzoekketen, server.js r.422) en de dubbeltik in opzet/poortwachters.js (server.js r.441). De idem-poort wikkelt dus EERDER en de dubbeltik staat er nog achter, precies wat deze regel eist. Hij bewaart alleen een 2xx-antwoord onder een sleutel en verandert het antwoord zelf niet.",
+  };
+  const nieuw = wikkelaars.filter(w => !BEKEND[w]);
+  if (nieuw.length) klachten.push('nieuwe res.json-wikkel(s) buiten de bekende lijst: ' + nieuw.join(', ') +
+    ' -- staat de dubbeltik daar nog achter? Zet hem op de lijst in check.js regel 51 zodra dat is nagekeken');
+  if (klachten.length) klachten.forEach(fout);
+  else ok(wikkelaars.length + ' plekken vervangen res.json, en de dubbeltik komt na jsonGzip()');
+}
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

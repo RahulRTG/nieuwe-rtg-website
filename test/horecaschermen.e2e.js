@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtTot, wachtOpTekst, wachtOpVerandering, klikEnWacht, tekstVan } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -70,7 +70,10 @@ async function open(page, base, token, pad) {
     localStorage.setItem('rtg_sup_token', t);
   }, token);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(700);
+  /* Wachten tot het scherm ECHT iets heeft neergezet. Een kale goto is klaar
+     zodra de HTML er is; deze schermen halen hun inhoud daarna pas op. */
+  await wachtTot(page, () => (document.body && document.body.innerText || '').replace(/\s+/g, ' ').trim().length > 80,
+    null, { wat: 'een scherm met inhoud' });
 }
 const lees = (page) => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
@@ -109,8 +112,9 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
 
     const uitgeef = await page.$('[data-uit]');
     assert.ok(uitgeef, 'een bord dat klaar is, krijgt een uitgeefknop');
+    const voorUit = await tekstVan(page, '#eRegie');
     await uitgeef.click();
-    await page.waitForTimeout(800);
+    await wachtOpVerandering(page, '#eRegie', voorUit);
     const naUit = await page.evaluate(() => document.getElementById('eRegie').innerText.replace(/\s+/g, ' '));
     assert.ok(!/Tarbot/.test(naUit), 'wat is uitgegeven, staat niet meer aan de pas: ' + naUit.slice(0, 160));
 
@@ -121,14 +125,14 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
     await page.fill('#bZoneKosten', '2.50');
     await page.fill('#bZoneMin', '15');
     await page.click('#bZoneZet');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /Centrum/);
     tekst = await lees(page);
     assert.match(tekst, /Centrum/, 'de zone staat in de lijst');
 
     await page.fill('#bCheckPost', '1011 AB');
     await page.fill('#bCheckBedrag', '9');
     await page.click('#bCheck');
-    await page.waitForTimeout(400);
+    await wachtOpTekst(page, /Ja: zone Centrum/, { in: '#bCheckUit' });
     let uit = await page.evaluate(() => document.getElementById('bCheckUit').textContent);
     assert.match(uit, /Ja: zone Centrum/, 'binnen de zone kan het: ' + uit);
     assert.match(uit, /minimum wordt niet gehaald.*6[.,]00/,
@@ -136,19 +140,18 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
 
     await page.fill('#bCheckPost', '9999 ZZ');
     await page.click('#bCheck');
-    await page.waitForTimeout(400);
+    await wachtOpTekst(page, /9999/, { in: '#bCheckUit' });
     uit = await page.evaluate(() => document.getElementById('bCheckUit').textContent);
     assert.match(uit, /9999/, 'een nee noemt de postcode die buiten het gebied valt: ' + uit);
 
     await page.fill('#bSlotTijd', '18:30');
     await page.fill('#bSlotCap', '30');
-    await page.click('#bSlotZet');
-    await page.waitForTimeout(400);
+    await klikEnWacht(page, '#bSlotZet', '/bezorg/slot');
     await page.fill('#bSlotMin', '20');
     await page.click('#bSlotNeem');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /Gereserveerd: 20/, { in: '#melding' });
     await page.click('#bSlotNeem');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /vol \(20 van 30 minuten bezet\)/, { in: '#melding' });
     const melding = await page.evaluate(() => document.getElementById('melding').textContent);
     assert.match(melding, /vol \(20 van 30 minuten bezet\)/,
       'een vol tijdslot noemt hoeveel er bezet is, niet alleen "vol": ' + melding);
@@ -161,10 +164,14 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
       await page.fill('#bStopLat', s[1]);
       await page.fill('#bStopLng', s[2]);
       await page.click('#bStopVoeg');
-      await page.waitForTimeout(200);
+      /* Stops erbij zetten gaat zonder server: het scherm leegt de velden en
+         hertekent de lijst. Daar is dus niets te wachten -- alleen te zien dat
+         het gebeurd is. */
+      await wachtTot(page, () => document.getElementById('bStopAdres').value === '',
+        null, { wat: 'het adresveld leeg na "Stop erbij"' });
     }
     await page.click('#bRoute');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /stops/, { in: '#bRouteUit' });
     const route = await page.evaluate(() => document.getElementById('bRouteUit').textContent);
     assert.match(route, /2 stops, [\d.,]+ km/, 'de volgorde noemt de afstand: ' + route);
     assert.match(route, /geen optimale route/i,
@@ -174,17 +181,17 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
     await page.fill('#rBewijsRef', 'RTG-B-TEST01');
     await page.check('#rLeeftijdNodig');
     await page.click('#rBewijs');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /leeftijdscontrole/i, { in: '#melding' });
     let mld = await page.evaluate(() => document.getElementById('melding').textContent);
     assert.match(mld, /leeftijdscontrole/i, 'zonder leeftijdscontrole kan er niet worden afgetekend: ' + mld);
     await page.check('#rLeeftijdOk');
     await page.click('#rBewijs');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /overhandigd/i, { in: '#melding' });
     mld = await page.evaluate(() => document.getElementById('melding').textContent);
     assert.match(mld, /overhandigd/i, 'en overhandigen vraagt aan wie: ' + mld);
     await page.fill('#rOntvanger', 'buurvrouw 12B');
     await page.click('#rBewijs');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /Afgetekend om/, { in: '#rBewijsUit' });
     const bewijs = await page.evaluate(() => document.getElementById('rBewijsUit').textContent);
     assert.match(bewijs, /Afgetekend om \d\d:\d\d/, 'daarna wordt er wel afgetekend: ' + bewijs);
     assert.match(bewijs, /geen foto van een mens of een deur/i, 'met wat er NIET wordt bewaard erbij');
@@ -216,10 +223,9 @@ test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, 
     await page.fill('#hGasten', '2');
     await page.fill('#hNachtprijs', '180');
     await page.fill('#hBelasting', '3');
-    await page.click('#hOpen');
-    await page.waitForTimeout(700);
+    await klikEnWacht(page, '#hOpen', '/horeca/');
     await page.click('#hNacht');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /kamer\(s\) geboekt/, { in: '#hNachtUit' });
     let nacht = await page.evaluate(() => document.getElementById('hNachtUit').textContent);
     assert.match(nacht, /1 kamer\(s\) geboekt/, 'de nachtrun boekt de kamer: ' + nacht);
     let tekst = await lees(page);
@@ -227,40 +233,41 @@ test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, 
     assert.match(tekst, /Toeristenbelasting/, 'en de toeristenbelasting apart, niet verstopt in de kamerprijs');
     assert.match(tekst, /186[.,]00/, 'samen 180 + 2 x 3 = 186,00');
 
+    const voorNacht = await tekstVan(page, '#hNachtUit');
     await page.click('#hNacht');
-    await page.waitForTimeout(700);
+    await wachtOpVerandering(page, '#hNachtUit', voorNacht);
     nacht = await page.evaluate(() => document.getElementById('hNachtUit').textContent);
     assert.match(nacht, /0 kamer\(s\) geboekt, 1 overgeslagen/,
       'twee keer draaien boekt geen twee nachten, en het scherm zegt dat: ' + nacht);
 
     /* ---- roomservice kruist naar de gastrekening ---- */
     await page.fill('#sKamer', '210');
-    await page.click('#sOpen');
-    await page.waitForTimeout(600);
+    await klikEnWacht(page, '#sOpen', '/horeca/');
     await page.fill('#sNaam', 'Clubsandwich');
     await page.fill('#sPrijs', '18.50');
     await page.fill('#sAllergie', 'noten');
     await page.click('#sRegel');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /Clubsandwich/);
     tekst = await lees(page);
     assert.match(tekst, /Clubsandwich/, 'de roomservicebestelling staat op het scherm');
     assert.match(tekst, /noten/, 'met de allergie erbij');
     await page.click('#sOpKamer');
-    await page.waitForTimeout(900);
+    /* NIET op /roomservice/ wachten: dat woord staat al als categorie op dit
+       scherm, dus die wacht was meteen klaar en de toets las de rekening voordat
+       de boeking er stond. Wachten op het BEDRAG is wachten op de uitkomst. */
+    await wachtOpTekst(page, /204[,.]50/);
     tekst = await lees(page);
     assert.match(tekst, /roomservice/i, 'de boeking staat als soort roomservice op de gastrekening');
     assert.match(tekst, /204[,.]50/, 'en het folio-totaal is 186,00 + 18,50 = 204,50');
 
     /* ---- op een kamer zonder gastrekening kan het niet ---- */
     await page.fill('#sKamer', '999');
-    await page.click('#sOpen');
-    await page.waitForTimeout(600);
+    await klikEnWacht(page, '#sOpen', '/horeca/');
     await page.fill('#sNaam', 'Fles water');
     await page.fill('#sPrijs', '4');
-    await page.click('#sRegel');
-    await page.waitForTimeout(600);
+    await klikEnWacht(page, '#sRegel', '/horeca/');
     await page.click('#sOpKamer');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /geen open gastrekening op kamer 999/i, { in: '#melding' });
     const mld = await page.evaluate(() => document.getElementById('melding').textContent);
     assert.match(mld, /geen open gastrekening op kamer 999/i,
       'een rekening verdwijnt niet in een kamer die leegstaat: ' + mld);
@@ -273,7 +280,7 @@ test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, 
     await page.fill('#vAantal1', '50');
     await page.fill('#vPrijs1', '45');
     await page.click('#vOfferte');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /Bruiloft Van Dijk/);
     tekst = await lees(page);
     assert.match(tekst, /Bruiloft Van Dijk/, 'het event staat in de lijst');
     assert.match(tekst, /2[.,]?250[,.]00/, 'de offerte telt op tot 50 x 45,00');
@@ -282,14 +289,17 @@ test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, 
 
     await page.fill('#vDoor', 'mevrouw Van Dijk');
     await page.click('#vAkkoord');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /bevestigd/);
     tekst = await lees(page);
     assert.match(tekst, /bevestigd/, 'na het akkoord staat het event op bevestigd');
 
     await page.fill('#vKostWat', 'Inkoop vis en vlees');
     await page.fill('#vKostBedrag', '900');
     await page.click('#vKosten');
-    await page.waitForTimeout(700);
+    /* Wachten op de MARGE en niet op een procentteken: in dit paneel staat al
+       "in plaats van 100%" zolang er geen kosten zijn, dus die wacht was meteen
+       klaar en las de nacalculatie van voor de kostenpost. */
+    await wachtOpTekst(page, /1[.,]?350/, { in: '#vNaUit' });
     const na = await page.evaluate(() => document.getElementById('vNaUit').innerText.replace(/\s+/g, ' '));
     assert.match(na, /1[.,]?350[,.]00/, 'de marge is 2250 - 900 = 1350,00: ' + na);
     assert.match(na, /60%/, 'en dat is 60% van de opbrengst: ' + na);
@@ -319,14 +329,15 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
     await page.fill('#cNummer', '4471');
     await page.fill('#cBedrag', '50');
     await page.click('#cBandOp');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /saldo/, { in: '#cBandUit' });
     let uit = await page.evaluate(() => document.getElementById('cBandUit').textContent);
     assert.match(uit, /50[,.]00 saldo/, 'de band staat op 50,00: ' + uit);
     assert.ok(!/4471.*naam|naam.*4471/i.test(uit), 'er staat geen naam bij het bandnummer');
 
     await page.fill('#cBedrag', '80');
+    const voorBand = await tekstVan(page, '#cBandUit');
     await page.click('#cBandBetaal');
-    await page.waitForTimeout(600);
+    await wachtOpVerandering(page, '#cBandUit', voorBand);
     uit = await page.evaluate(() => document.getElementById('cBandUit').textContent);
     assert.match(uit, /saldo (€ )?0[,.]00/, 'een band kan niet onder nul: ' + uit);
     assert.match(uit, /30[,.]00 te weinig saldo/, 'en het tekort wordt genoemd zodat de rest apart afgerekend wordt: ' + uit);
@@ -334,12 +345,12 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
     await page.fill('#dCapaciteit', '2');
     await page.fill('#dPersonen', '1');
     await page.click('#dIn');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /^1$/, { in: '#dBinnen' });
     let binnen = await page.evaluate(() => document.getElementById('dBinnen').textContent);
     assert.equal(binnen, '1', 'er staat er een binnen');
     await page.fill('#dPersonen', '2');
     await page.click('#dIn');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /capaciteit is bereikt/i, { in: '#melding' });
     let mld = await page.evaluate(() => document.getElementById('melding').textContent);
     assert.match(mld, /capaciteit is bereikt \(1 van 2 binnen\)/i,
       'de teller weigert met zijn getal erbij: ' + mld);
@@ -350,7 +361,7 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
     await page.fill('#dNamen', 'Ilse, Bram');
     await page.fill('#dPromoter', 'Nova');
     await page.click('#dGastZet');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /Nova 0 van 2 binnen/);
     tekst = await lees(page);
     assert.match(tekst, /Nova 0 van 2 binnen/,
       'per promoter staat aangemeld EN binnen; alleen dat eerste zegt niets');
@@ -360,18 +371,18 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
     await page.fill('#aPuntNaam', 'Koeling 1');
     await page.fill('#aMin', '0');
     await page.fill('#aMax', '7');
-    await page.click('#aPuntZet');
-    await page.waitForTimeout(700);
+    await klikEnWacht(page, '#aPuntZet', '/haccp/');
     await page.fill('#aPuntNaam', 'Vriezer');
     await page.fill('#aMin', '-25');
     await page.fill('#aMax', '-16');
-    await page.click('#aPuntZet');
-    await page.waitForTimeout(700);
+    await klikEnWacht(page, '#aPuntZet', '/haccp/');
+    await wachtTot(page, () => [...document.querySelectorAll('#aPunt option')].some(o => /Vriezer/.test(o.textContent)),
+      null, { wat: 'het tweede meetpunt in de keuzelijst' });
 
     await page.selectOption('#aPunt', { label: 'Koeling 1 (0 tot 7 C)' });
     await page.fill('#aWaarde', '9');
     await page.click('#aMeting');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /buiten de grens/i, { in: '#melding' });
     mld = await page.evaluate(() => document.getElementById('melding').textContent);
     assert.match(mld, /buiten de grens \(0 tot 7 C\)/i,
       'een afwijking wordt geweigerd met de grens erbij: ' + mld);
@@ -379,7 +390,7 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
 
     await page.fill('#aActie', 'teruggekoeld, monteur gebeld');
     await page.click('#aMeting');
-    await page.waitForTimeout(800);
+    await wachtOpTekst(page, /teruggekoeld, monteur gebeld/);
     tekst = await lees(page);
     assert.match(tekst, /afwijking/, 'met de actie erbij wordt hij wel vastgelegd, als afwijking');
     assert.match(tekst, /teruggekoeld, monteur gebeld/, 'met de genomen actie in het logboek');
@@ -390,7 +401,7 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
     await page.fill('#bNaam', 'Kalfsfond');
     await page.fill('#bTht', '2020-01-01');
     await page.click('#bBatchZet');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /dagen over de datum/);
     tekst = await lees(page);
     assert.match(tekst, /dagen over de datum/, 'een batch over de datum zegt hoeveel dagen');
     assert.match(tekst, /niet automatisch afgeboekt/i,
@@ -402,7 +413,7 @@ test('een polsband kan niet onder nul, de deur weigert met het getal erbij, en e
     await page.fill('#lUren1', '8');
     await page.fill('#lUurloon1', '16.50');
     await page.click('#pLoon');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /132[,.]00/, { in: '#lUit' });
     const loon = await page.evaluate(() => document.getElementById('lUit').innerText.replace(/\s+/g, ' '));
     assert.match(loon, /132[,.]00/, 'het loon is 8 x 16,50 = 132,00: ' + loon);
     assert.match(loon, /geen omzet, dus geen percentage/i,

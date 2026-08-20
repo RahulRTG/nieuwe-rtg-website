@@ -57,7 +57,11 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1), o.paidAt || o.at);
     }
     for (const v of db.data.posSales[s.code] || []) {
-      if (v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
+      /* `omzetElders` is het merk van een kassabon die alleen HET STUK is en
+         niet de omzet: het tafelticket bundelt bonnen die hierboven al per
+         bestelling zijn geteld. Zonder deze regel stond de maand van een zaak
+         die tafels contant laat afrekenen twee keer zo hoog (TAKEN.md 4.28). */
+      if (v.omzetElders || v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1), v.at);
       else tel(basisCat, v.total || 0, v.at);
     }
@@ -69,12 +73,29 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       if (b.supplierCode !== s.code || !b.paid || b.status === 'geweigerd' || !inMaand(b.paidAt || b.at)) continue;
       tel('dienst', b.price || 0, b.paidAt || b.at);
     }
-    // cadeaukaarten (meervoudig inwisselbaar): btw-moment is de inwisseling
+    /* Cadeaukaarten (meervoudig inwisselbaar): het btw-moment is de INWISSELING,
+       niet de verkoop -- de verkoop is een schuld aan de klant.
+
+       WAAROM ER TWEE GETALLEN ZIJN. Een verzilvering met `viaBon` hoort bij een
+       kassabon die met de kaart is betaald, en die bon staat hierboven al in de
+       potten -- met zijn eigen regels, dus met het juiste tarief per artikel.
+       Hem hier nog eens optellen was precies de dubbeltelling van TAKEN.md 4.27.
+       Een verzilvering ZONDER bon (de losse inwisseling aan de balie) heeft geen
+       ander omzetmoment, en die telt hier dus wel -- anders zou die omzet
+       nergens meer staan. `ingewisseld` in het rapport blijft het VOLLE bedrag:
+       dat is wat de ondernemer van zijn kaarten wil weten, en dat is een andere
+       vraag dan waar de omzet is geboekt. */
     const kaarten = (db.data.giftcards || []).filter(g => g.supplierCode === s.code);
     const gcVerkocht = kaarten.filter(g => inMaand(g.at)).reduce((x, g) => x + g.bedrag, 0);
     let gcIngewisseld = 0;
-    // de inwisseling is het btw-moment, dus die dag bepaalt ook het tarief
-    for (const g of kaarten) for (const w of g.verzilveringen || []) if (inMaand(w.at)) { gcIngewisseld += w.bedrag; tel(basisCat, w.bedrag, w.at); }
+    /* De inwisseling is het btw-moment, dus die dag bepaalt ook het tarief. En
+       een verzilvering die AL OP EEN BON staat is hierboven al geteld: die hier
+       nog eens meenemen verdubbelt de omzet van de maand. */
+    for (const g of kaarten) for (const w of g.verzilveringen || []) {
+      if (!inMaand(w.at)) continue;
+      gcIngewisseld += w.bedrag;
+      if (!w.viaBon) tel(basisCat, w.bedrag, w.at);
+    }
     const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
     const btw = Object.values(potten)
       .map(p => ({ cat: p.cat, label: FIN_CAT[p.cat] || p.cat, ...btwSplit(p.omzet, p.tarief) }))
@@ -126,19 +147,8 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
     };
   }
 
-  // AI-boekhouder van de zaak: kent het land, de regels en de eigen cijfers
-  function cannedBoekhouder(vraag, fin, L) {
-    const v = vraag.toLowerCase();
-    if (/btw|vat|tarief|belasting|afdra/.test(v))
-      return 'In ' + L.naam + ' gelden voor u deze tarieven: ' + fin.btw.map(r => r.label + ' ' + r.tarief + '%').join(', ') + '. Deze maand is de af te dragen btw € ' + fin.btwTotaal + ' over € ' + centen(fin.btw.reduce((x, r) => x + r.grondslag, 0)) + ' grondslag. ' + L.aangifte;
-    if (/personeel|loon|salaris|lasten|vakantiegeld|kost/.test(v))
-      return 'Deze maand: ' + fin.personeel.uren + ' geklokte uren tegen € ' + fin.personeel.uurloon + ' = € ' + fin.personeel.bruto + ' bruto. Daar komt ~' + fin.personeel.lastenPct + '% werkgeverslasten (€ ' + fin.personeel.lasten + ')' + (fin.personeel.vakantiegeld ? ' en ' + fin.personeel.vakantiegeldPct + '% vakantiegeldreserve (€ ' + fin.personeel.vakantiegeld + ')' : '') + ' bij: totaal € ' + fin.personeel.totaal + '. Indicatie minimumuurloon in ' + L.naam + ': € ' + fin.personeel.uurloonMin + '.';
-    if (/cadeau|bon|kaart|voucher|gift/.test(v))
-      return 'Uw cadeaukaarten zijn meervoudig inwisselbaar: de verkoop (deze maand € ' + fin.giftcards.verkocht + ') is nog geen omzet en kent geen btw. Pas bij inwisseling (deze maand € ' + fin.giftcards.ingewisseld + ') boekt u omzet met btw. Het openstaande saldo van € ' + fin.giftcards.open + ' staat als verplichting op de balans.';
-    if (/aangifte|deadline|wanneer|termijn/.test(v))
-      return L.aangifte + ' ' + L.extra;
-    return 'Uw maand in ' + L.naam + ': af te dragen btw € ' + fin.btwTotaal + ', personeelskosten € ' + fin.personeel.totaal + ' (' + fin.personeel.uren + ' uur), cadeaukaarten € ' + fin.giftcards.open + ' open. Vraag me naar btw, personeelskosten, cadeaukaarten of aangiftetermijnen. ' + zin('boekhouding.advies');
-  }
+  /* De AI-boekhouder staat in ./boekhouder.js -- zie de kop daar. */
+  const { cannedBoekhouder } = require('./boekhouder')({ centen });
 
   /* Het Z-rapport (dagafsluiting) en de shift-samenvatting draaien als
      submodule op de gedeelde context (een keer bij het opstarten opgebouwd). */

@@ -24,14 +24,18 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop } = require('./helper');
+const { startServer, stop, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 /* Dezelfde elf als in shared/command/catalog.js. Bewust hier uitgeschreven en
    niet uit die module gelezen: dit is een lijst van SCHERMEN die op een telefoon
@@ -62,16 +66,21 @@ test('elk scherm uit de catalogus past op een telefoon van 390px', { skip: pw ? 
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   const teBreed = [];
   const navigatieBuiten = [];
   let vooruitzicht = null;
   try {
     for (const url of SCHERMEN) {
-      await page.goto(srv.base + url, { waitUntil: 'load', timeout: 45000 });
+      /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+         plaatje, elk lettertype -- terwijl de regel eronder al op het echte
+         teken wacht. Onder belasting valt dat om op zijn eigen 45 seconden, en
+         dan is de uitslag rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+      await page.goto(srv.base + url, { waitUntil: 'domcontentloaded', timeout: 45000 });
       /* Wachten op de OPMAAK, niet op de klok: zolang er geen stijlblad binnen is
          meet je een ongestileerde pagina, en die past altijd. */
       await page.waitForFunction(() => document.styleSheets.length > 0, { timeout: 15000 });
-      await page.waitForTimeout(1200);
+      await wachtOpRust(page);
       const m = await page.evaluate(() => ({
         venster: document.documentElement.clientWidth,
         inhoud: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth),

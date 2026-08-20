@@ -62,7 +62,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
 
     /* Clips, want daar kwam de melding vandaan: een blad dat onderaan opent,
        met zijn sluitknop precies op de plek van de balk. */
-    await page.goto(base + '/apps/clips.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/clips.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!document.querySelector('.rtg-rahul-tab'), null, { timeout: 20000 });
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'in rust is de centrale Rahul-tab bereikbaar');
 

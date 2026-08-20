@@ -107,7 +107,16 @@ test('member_dir: na het landen blijft de exacte opzoeking werken via de btree-l
   const pool = maakNepPool(20);   // landt snel
   await gidsen.init(pool);
   gidsen.ledenGidsZet('k2', 'Zilver-Haas-07', 'business');
-  await new Promise(r => setTimeout(r, 60));   // laat de INSERT landen
+  /* WACHTEN TOT DE INSERT GELAND IS, en niet 60 ms gokken. De neppool laat hem
+     na 20 ms zichtbaar worden, dus 60 was ruim -- maar "ruim" is geen teken, en
+     op een drukke machine is ruim ineens krap. De landing zelf is af te lezen. */
+  {
+    const eind = Date.now() + 10000;
+    while (pool._geland.size < 1) {
+      if (Date.now() >= eind) throw new Error('de INSERT landde niet binnen 10 s in de neppool');
+      await new Promise(r => setTimeout(r, 5));
+    }
+  }
   assert.equal(pool._geland.size, 1, 'de rij is nu geland in de (neppe) Postgres');
   const hit = await gidsen.ledenGidsExact('zilver-haas-07');
   assert.equal(hit && hit.key, 'k2', 'het lid blijft vindbaar na landing');

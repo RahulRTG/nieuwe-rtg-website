@@ -178,8 +178,24 @@ test('een prikbordbericht komt in Communities, en alleen bij de leden', async ()
 
 test('de feed is chronologisch, nieuwste eerst -- geen algoritme', async () => {
   const l = await lid('Tijd Lid', 'tijd@x.nl', 'rtg');
-  await post('/api/salon/plaats', { tekst: 'eerst' }, l.token);
-  await new Promise(r => setTimeout(r, 1100));
+  const eerste = await json(await post('/api/salon/plaats', { tekst: 'eerst' }, l.token));
+  /* WACHTEN TOT DE KLOK VERDER IS DAN DE EERSTE POST, en niet 1100 ms gokken.
+
+     Deze toets gaat over de VOLGORDE van de feed. Daarvoor is maar een ding
+     nodig: de tweede post moet een later tijdstip dragen dan de eerste. Dat is
+     een toestand -- de klok staat voorbij die stempel -- en geen duur van
+     1,1 seconde. Meestal is hij na een enkele tik al waar. */
+  {
+    const stempel = String((eerste.post && (eerste.post.at || eerste.post.tijd)) || '');
+    /* Zonder stempel zou de wacht hieronder stilletjes overslaan en zou deze
+       toets weer op geluk draaien -- precies het gat dat we dichtdoen. */
+    assert.ok(stempel, 'de geplaatste post draagt een tijdstempel om op te wachten');
+    const eind = Date.now() + 20000;
+    while (new Date().toISOString() <= stempel) {
+      if (Date.now() >= eind) throw new Error('de klok kwam niet voorbij de stempel van de eerste post');
+      await new Promise(r => setTimeout(r, 5));
+    }
+  }
   await post('/api/salon/plaats', { tekst: 'daarna' }, l.token);
 
   const f = await json(await post('/api/wereld/feed', { modus: 'lifestyle' }, l.token));

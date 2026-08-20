@@ -40,7 +40,7 @@ test('Genootschap: oprichten, een bijeenkomst uitroepen en een peiling houden',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/genootschap.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/genootschap.html', { waitUntil: 'domcontentloaded' });
 
     // 1. leeg begin
     await page.waitForFunction(() => /Je zit nog nergens in/.test(document.querySelector('#main').textContent), null, { timeout: 15000 });

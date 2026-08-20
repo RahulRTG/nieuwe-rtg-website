@@ -1,0 +1,44 @@
+{
+ "uitleg": "Toetsen die op een vaste tijd wachten in plaats van op een toestand. MAG ALLEEN KRIMPEN -- zie test/klokwacht.test.js. Twee tellingen: SCHERM (*.e2e.js) hoort op nul te staan en staat daar; SERVER (*.test.js) wacht deels op een ECHTE klok in het product (een sessie die verloopt, een veegtimer, het schrijfvenster van de opslag) en mag alleen krimpen. Wat ervoor in de plaats komt staat in test/helper.js (wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, wachtOpNetstilte, klikEnWacht).",
+ "hoe": "node scripts/klokwacht.js",
+ "gemeten": {
+  "scherm": 0,
+  "schermBestanden": 0,
+  "server": 28,
+  "serverBestanden": 14,
+  "totaal": 28,
+  "bestanden": 14
+ },
+ "schuld": {
+  "alarmweg.test.js": 1,
+  "bugjacht.test.js": 3,
+  "dubbeltik.test.js": 2,
+  "duurzaamheid-kill.test.js": 1,
+  "eventloop.test.js": 7,
+  "foutmelder.test.js": 1,
+  "journaalschrijf.test.js": 2,
+  "lidfactuur.test.js": 1,
+  "pg-snapshot.test.js": 1,
+  "pg-wachten.test.js": 1,
+  "schoolkoppel.test.js": 1,
+  "sloophamer.pg.test.js": 5,
+  "speldag.test.js": 1,
+  "spelsudoku.test.js": 1
+ },
+ "verantwoord": {
+  "eventloop.test.js": "de toets BLOKKEERT de event-loop een aantal ms en wacht tot de meter dat ziet; de tijd is hier de meting zelf en niet een gok erover",
+  "journaalschrijf.test.js": "het journaal spoelt per venster van een seconde; de bewering gaat over dat venster",
+  "sloophamer.pg.test.js": "chaosproef: redis en postgres gaan met opzet neer en weer aan, met verkeer ertussen. De duur van de storing is wat er getoetst wordt",
+  "bugjacht.test.js": "de sleeps zitten in NEPDIENSTEN die trage I/O nabootsen (Postgres, de motor, Stripe); de toets wacht daar niet op de klok, hij bouwt er een fixture mee",
+  "dubbeltik.test.js": "de sleeps zitten in de HANDLER van een nepserver die traag werk nabootst; dat is een fixture, en de duur ervan is wat de dubbeltik moet overleven",
+  "duurzaamheid-kill.test.js": "de kill valt met opzet MIDDEN in een burst betalingen; er is geen toestand voor \"we zijn nu halverwege de schrijfstroom\", de duur is het onderwerp",
+  "alarmweg.test.js": "bewaakt een AFWEZIGHEID: van vijfentwintig meldingen mag er maar EEN de deur uit, en de wacht is de ruimte waarin een tweede zich zou verraden",
+  "pg-snapshot.test.js": "bewaakt een AFWEZIGHEID: binnen het venster komt er geen tweede snapshot bij, en de wacht is ruim voorbij de flush-cyclus van 150 ms waarin een losgeslagen luisteraar zich zou melden",
+  "pg-wachten.test.js": "bewaakt een AFWEZIGHEID (de server sluit zichzelf NIET af) over een venster dat aan het product hangt: PG_HERKANS_MS staat op 300, dus 1500 ms is een stuk of vijf herkansingen",
+  "foutmelder.test.js": "bewaakt een AFWEZIGHEID: drie keer dezelfde fout wordt EEN bericht, en de wacht is de ruimte waarin een tweede zich zou verraden",
+  "schoolkoppel.test.js": "bewaakt een AFWEZIGHEID: een webhook die niet op deze gebeurtenis is geabonneerd krijgt niets, en de wacht is de ruimte waarin een bezorging zich zou melden",
+  "lidfactuur.test.js": "bewaakt een AFWEZIGHEID: uitgeven aan de balie levert GEEN tweede factuur op, en de facturatiemotor boekt in een losse belofte -- meteen tellen zou alleen zeggen \"op dit moment nog een\"",
+  "speldag.test.js": "de wacht IS het onderwerp: een oplosser is er in milliseconden doorheen, dus zonder pauze zijn de klok van de server en de nul die de client meestuurt niet uit elkaar te houden",
+  "spelsudoku.test.js": "zelfde als speldag: de verstreken tijd op de server is precies wat de toets tegenover de meegestuurde nul zet; zonder pauze meten allebei de volle basis"
+ }
+}

@@ -1,10 +1,10 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 12,
-    "groen": 10,
+    "controls": 13,
+    "groen": 12,
     "nietInBedrijf": 1,
-    "nietGroen": 1
+    "nietGroen": 0
   },
   "controls": [
     {
@@ -230,9 +230,10 @@
       },
       "grens": "gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.",
       "laatstGroen": {
-        "staat": "niet gemeten",
-        "reden": "geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)",
-        "at": "2026-08-18T09:58:20.387Z",
+        "staat": "GROEN",
+        "beweringen": 18,
+        "overgeslagen": 0,
+        "at": "2026-08-19T03:27:37.293Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -291,7 +292,7 @@
           "blindeRondes": 0,
           "tokensHernieuwd": 12
         },
-        "pct": 85.5
+        "pct": 86
       },
       "grens": "meet twee foutklassen op routes met een herkenbare rol: omvallen op rommel (5xx of geen antwoord) en een antwoord dat interne details meegeeft. Hij zegt NIETS over of de validatie het juiste heeft geweigerd -- een route die alles slikt en 200 teruggeeft telt hier als dicht. Routes achter een tweede grendel (KYC, onboarding) staan als ongemeten met reden.",
       "laatstGroen": {
@@ -314,16 +315,16 @@
       ],
       "bewijsstuk": "IDEMPROEF.json -- per route de drie oproepen en wat eruit kwam",
       "dekking": {
-        "beproefd": 12,
-        "totaal": 106,
+        "beproefd": 855,
+        "totaal": 855,
         "eenheid": "routes waar een tweede effect zichtbaar zou zijn",
         "tellers": {
-          "onbeschermd": 94,
-          "ongemeten": 2830,
+          "onbeschermd": 0,
+          "ongemeten": 2236,
           "blindeRondes": 0,
-          "tokensHernieuwd": 24
+          "tokensHernieuwd": 22
         },
-        "pct": 11.3
+        "pct": 100
       },
       "grens": "kijkt van BUITEN naar het antwoord, niet naar de database. Een route die zijn tweede effect niet in het antwoord laat zien (een stille toevoeging aan een lijst die niet wordt teruggegeven) telt hier als ongemeten en niet als beschermd -- daarvoor is de per-route vingerafdruk nodig die er nog niet is. En \"onbeschermd\" is geen defect-oordeel: twee keer op bewaren drukken hoort twee notities op te leveren. Het is een TELLING van waar de belofte uit deze kolom niet geldt, zodat je weet welke routes hem wel nodig hebben.",
       "laatstGroen": {
@@ -333,6 +334,38 @@
         "at": "2026-08-18T09:58:21.095Z",
         "bestanden": [
           "test/idemproef.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/auditproef.js",
+      "control": "AUDITSPOOR",
+      "wat": "elke geslaagde schrijfhandeling laat een regel na die niemand ongemerkt kan wijzigen",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/auditspoor.test.js"
+      ],
+      "bewijsstuk": "AUDITPROEF.json -- per route of er een spoor achterbleef, plus de ketencontrole",
+      "dekking": {
+        "beproefd": 860,
+        "totaal": 860,
+        "eenheid": "schrijfroutes die werkelijk werk deden",
+        "tellers": {
+          "gezakt": 0,
+          "ongemeten": 2231,
+          "blindeRondes": 0,
+          "ketenHeel": null
+        },
+        "pct": 100
+      },
+      "grens": "kijkt van BUITEN: hij ziet dat er een regel bij komt en dat de keten heel is. Hij controleert niet of die regel het juiste verhaal vertelt (de goede actor bij de goede handeling), en hij zegt niets over iemand met schrijftoegang tot de database die de HELE keten opnieuw uitrekent -- daarvoor moet het kopzegel buiten de deur worden vastgelegd.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 13,
+        "overgeslagen": 0,
+        "at": "2026-08-19T03:27:38.655Z",
+        "bestanden": [
+          "test/auditspoor.test.js"
         ]
       }
     },

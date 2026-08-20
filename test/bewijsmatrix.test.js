@@ -11,7 +11,7 @@
    Draai los: node --test test/bewijsmatrix.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { bouw, achteruit, SCHAKELS } = require('../scripts/bewijsmatrix');
+const { bouw, achteruit, SCHAKELS, ketenKaartUit } = require('../scripts/bewijsmatrix');
 
 /* Een miniwereld van drie routes: een schrijfroute met een bewaker in de bron,
    dezelfde weg als leesroute, en een schrijfroute zonder enige bewaker. */
@@ -183,4 +183,60 @@ test('een leesroute houdt IDEMPOTENCY op nvt, ook met een register ernaast', () 
   const m = bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null, rol: null, keten: null,
     invoer: null, idem: new Map([['GET /api/proef/lees', { idempotentie: 'onbeschermd' }]]) });
   assert.equal(m.rijen.find(r => r.pad === '/api/proef/lees').cellen.IDEMPOTENCY.staat, 'nvt');
+});
+
+/* ============================================================================
+   NVT IS NIET GEZAKT -- de ketenronde telt op in plaats van te overschrijven.
+
+   Twee sabotages op dezelfde keten halen de lat: bij `schrijf-verloren` wordt de
+   terugdraaiing echt aangetoond (PROVEN), bij `sterf-na-commit` valt er niets
+   terug te draaien (de commit was al rond) en is het veld NVT. De kaart
+   overschreef, dus de LAATSTE won -- en zo stonden /api/notities/bewaar en
+   /api/pay/oplaad als GEZAKT met "rollback niet bewezen", terwijl hij bewezen
+   was in het scenario waar de vraag van toepassing was.
+   ========================================================================== */
+const scen = (keten, verraad, rollback, extra) => Object.assign(
+  { keten, verraad, rollback, lat: { voldoet: true }, stilVerlies: false, clientAntwoord: 'FAIL' }, extra || {});
+
+test('een aangetoonde terugdraaiing blijft staan als een LATER scenario NVT is', () => {
+  const k = ketenKaartUit([scen('NOTITIE', 'schrijf-verloren', 'PROVEN'),
+                           scen('NOTITIE', 'sterf-na-commit', 'NVT')]);
+  const r = k.get('POST /api/notities/bewaar');
+  assert.equal(r.proven, true, 'PROVEN uit het eerste scenario telt op');
+  assert.equal(r.beoordeeld, true);
+  assert.equal(r.stil, false);
+});
+
+test('stil verlies is wel besmettelijk: een nette sabotage maakt dat niet ongedaan', () => {
+  const k = ketenKaartUit([scen('GELD', 'schrijf-verloren', 'PROVEN'),
+                           scen('GELD', 'sterf-na-commit', 'NVT', { stilVerlies: true })]);
+  assert.equal(k.get('POST /api/pay/oplaad').stil, true);
+});
+
+test('alleen NVT is NIET beoordeeld -- en dat mag geen bevinding worden', () => {
+  const k = ketenKaartUit([scen('GELD', 'sterf-na-commit', 'NVT')]);
+  const r = k.get('POST /api/pay/oplaad');
+  assert.equal(r.proven, false);
+  assert.equal(r.beoordeeld, false, 'er valt niets te beoordelen, dus is er niets gemeten');
+});
+
+test('een scenario dat de zevenstappenlat niet haalt telt helemaal niet mee', () => {
+  const k = ketenKaartUit([scen('GELD', 'schrijf-verloren', 'PROVEN', { lat: { voldoet: false } })]);
+  assert.equal(k.size, 0, 'geen bewijs zonder lat');
+});
+
+test('en in de matrix wordt NVT ongemeten, geen gezakt', () => {
+  const TABEL = { routes: [{ methode: 'POST', pad: '/api/pay/oplaad' }], herkomst: 'proef' };
+  const BEW = new Map([['POST /api/pay/oplaad', { bewakers: ['auth'], waar: 'proef.js:1' }]]);
+  const alleenNvt = ketenKaartUit([scen('GELD', 'sterf-na-commit', 'NVT')]);
+  const m = bouw({ tabel: TABEL, bewakers: BEW, journaal: null, poort: null, rol: null,
+    keten: alleenNvt, invoer: null, idem: null, audit: null, staat: null, uitvoer: null });
+  const cel = m.rijen[0].cellen.ROLLBACK;
+  assert.notEqual(cel.staat, 'gezakt', 'niet te beoordelen is geen bevinding: ' + JSON.stringify(cel));
+
+  const metProof = ketenKaartUit([scen('GELD', 'schrijf-verloren', 'PROVEN'),
+                                  scen('GELD', 'sterf-na-commit', 'NVT')]);
+  const m2 = bouw({ tabel: TABEL, bewakers: BEW, journaal: null, poort: null, rol: null,
+    keten: metProof, invoer: null, idem: null, audit: null, staat: null, uitvoer: null });
+  assert.equal(m2.rijen[0].cellen.ROLLBACK.staat, 'bewezen', 'en met een PROVEN erbij is hij bewezen');
 });

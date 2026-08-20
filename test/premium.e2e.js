@@ -26,7 +26,7 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -222,6 +222,7 @@ test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen 
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
     const page = await context.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/home.html', { waitUntil: 'domcontentloaded' });
@@ -305,13 +306,20 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
     const page = await context.newPage();
+    await volgVerzoeken(page);
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
     /* deze app meldt zijn bron pas aan als er gegevens zijn; we melden er
        zelf een aan zodat plaats() gedwongen wordt te kiezen */
     await page.evaluate(() => RTGUitvoer.bron(function () { return { kolommen: ['a', 'b'], rijen: [['1', '2']] }; }));
-    await page.waitForTimeout(3000);
+    /* Wachten tot de knop er ECHT staat en getekend is -- dat is de bewering
+       eronder. Drie seconden was een gok die op een trage machine te kort en op
+       een snelle drie seconden te lang was. */
+    await wachtTot(page, () => {
+      const k = document.querySelector('.rtguitvoer-knop');
+      return !!k && k.offsetParent !== null && k.offsetHeight > 0;
+    }, null, { wat: 'de getekende uitvoerknop' });
     const zicht = await page.evaluate(() => {
       const k = document.querySelector('.rtguitvoer-knop');
       if (!k) return { knop: false };
@@ -344,7 +352,7 @@ test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
     await page.setViewportSize({ width: 390, height: 844 });
     const buiten = [];
     for (const pad of ['/apps/navigatie.html', '/apps/ov.html', '/apps/balans.html', '/apps/home.html']) {
-      await page.goto(base + pad, { waitUntil: 'load' });
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
       // een bron aanmelden zoals een ingelogde app dat doet; zonder bron is er
       // geen knop, en dan meet deze toets niets
@@ -377,6 +385,7 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
       } catch (e) {}
     });
     const page = await context.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     const stuk = [];
@@ -384,7 +393,7 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
     for (const [naam, titel, doel] of PREMIUM_ZELFSTANDIG) {
       const pad = '/apps/' + naam + '.html';
       await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(350);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         titel: document.title,
@@ -402,7 +411,9 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
        omleiding naar de juiste stand. */
     for (const [naam, doelpad, hash] of PREMIUM_ALIASSEN) {
       await page.goto(base + '/apps/' + naam + '.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(250);
+      /* Een alias STUURT DOOR; wachten op rust is hier wachten tot die sprong
+         gebeurd is, in plaats van hopen dat 250 ms genoeg was. */
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({ pad: location.pathname, hash: location.hash }));
       if (r.pad !== doelpad || r.hash !== hash) {
         stuk.push(naam + ': alias kwam uit op ' + r.pad + r.hash + ' in plaats van ' + doelpad + hash);
@@ -415,7 +426,9 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
     for (const [naam, doelpad] of PREMIUM_TOEGANG) {
       const bron = '/apps/' + naam + '.html';
       await page.goto(base + bron, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(450);
+      /* Deze drie sturen door naar hun inlogdeur; wachten op rust is wachten
+         tot die sprong klaar is. */
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         kantoor: new URLSearchParams(location.search).get('kantoor'),

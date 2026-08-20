@@ -102,8 +102,10 @@ test('een idem-sleutel overleeft een nette herstart: geen tweede boeking na een 
     /* DE NETTE HERSTART. SIGTERM, niet SIGKILL: dit toetst een deploy en geen
        stroomstoring. De server hoort zijn write-behind te spoelen, en de
        idempotentie-boeken horen daarbij vooraan te gaan. */
-    await stopNet(srv.child);
-    await new Promise(r => setTimeout(r, 500));
+          /* GEEN 500 ms NA stopNet(). Die wacht stamt uit de tijd dat hier stop()
+         stond -- SIGKILL, dat niets afwacht. stopNet() wacht zelf al op `exit`,
+         dus op deze regel is het proces aantoonbaar weg en zijn datamap vrij. */
+      await stopNet(srv.child);
     srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
 
     const herA = (await api(srv.base, '/api/auth/login', { login: A.email, password: A.ww })).body.token;

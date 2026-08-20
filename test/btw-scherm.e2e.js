@@ -26,6 +26,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) })).json();
@@ -56,7 +61,7 @@ test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
       localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, login.token);
-    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app.active', { timeout: 20000 });
 
     await page.waitForSelector('[data-ksec="fin"]', { state: 'visible', timeout: 15000 });

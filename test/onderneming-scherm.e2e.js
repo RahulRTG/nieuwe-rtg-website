@@ -17,11 +17,15 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadScherm, startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken } = require('./helper');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 const skip = pw ? false : 'geen browser beschikbaar in deze omgeving';
 
 async function post(base, pad, body, token) {
@@ -42,6 +46,7 @@ async function open(opts) {
 
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
   const page = await browser.newPage();
+  await volgVerzoeken(page);
   const fouten = [];
   letOpFouten(page, fouten);
   await page.addInitScript((tok) => {
@@ -162,7 +167,7 @@ test('de hele weg: rechtsvorm kiezen, de lijst zien, afvinken en de zaak aanvrag
 
     // het plan vastleggen en inschrijven, dan pas kan de zaak worden aangevraagd
     await t.page.click('#planKnop');
-    await t.page.waitForTimeout(1500);
+    await wachtOpRust(t.page);
     await post(t.base, '/api/onderneming/ingeschreven', { id: (await post(t.base, '/api/onderneming/mijn', {}, t.token)).ondernemingen[0].id, kvk: '12345678' }, t.token);
     await t.page.reload({ waitUntil: 'domcontentloaded' });
     await t.page.waitForSelector('#aanvKnop', { timeout: 15000 });
@@ -202,7 +207,7 @@ test('een afgeraden plan wordt niet stilzwijgend vastgelegd', { skip }, async ()
     // de bevestiging wegklikken: er mag dan niets worden vastgelegd
     t.page.on('dialog', d => d.dismiss());
     await t.page.click('#planKnop');
-    await t.page.waitForTimeout(1200);
+    await wachtOpRust(t.page);
 
     const ond = (await post(t.base, '/api/onderneming/mijn', {}, t.token)).ondernemingen[0];
     assert.equal(ond.fase, 'idee', 'weigeren betekent weigeren: de fase is niet verschoven');

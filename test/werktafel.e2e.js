@@ -25,14 +25,18 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 async function opzet() {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werktafel-'));
@@ -138,7 +142,10 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
   letOpFouten(page, fouten);
   try {
     await page.addInitScript(t => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, token);
-    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
+    /* Zelfde reden als hierboven. Deze had geen eigen wacht erna, dus die staat
+       er nu: het stijlblad is binnen -- de beweringen meten gestapelde lagen. */
+    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.waitForFunction(() => document.styleSheets.length > 0, null, { timeout: 20000 });
 
     // 1) de intake staat open en hoort BOVENOP te liggen, ook op 1440px
     await page.waitForFunction(() => {
@@ -150,7 +157,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        zou ook groen zijn met de grendel eruit (LAT.md regel 9). Dit is de weg
        die het gat had: een app openen terwijl de overeenkomst nog openstaat. */
     await page.evaluate(() => { try { window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'); } catch (e) {} });
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     const dicht = await page.evaluate(stand);
     // op het PAD toetsen: de app draagt een querystring (?pas=rtg) en die hoort er te mogen zijn
     assert.equal(new URL(page.url()).pathname, '/apps/app.html',
@@ -217,7 +224,11 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
     await page.evaluate(() => { document.getElementById('onbGate').hidden = false; });
-    await page.waitForTimeout(400);
+    /* De werktafel hoort te wijken zodra de poort weer open staat; dat is een
+       schermreactie op een DOM-wijziging en niet op een verzoek, dus wachten we
+       op precies die reactie. */
+    await wachtTot(page, () => !document.querySelector('#rtgCommand .cmd-pane'),
+      null, { wat: 'een werktafel die wijkt voor de openstaande intake' });
     const opnieuw = await page.evaluate(stand);
     assert.equal(opnieuw.werktafel, false, 'gaat de intake alsnog open, dan hoort de werktafel te wijken');
     assert.equal(opnieuw.poortBovenop, true, 'en ligt de overeenkomst weer bovenop');
@@ -231,12 +242,12 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        passeren. Dat is precies de smalle stand, en dus hoort hij hier gemeten
        te worden en niet alleen op een breed venster. */
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     const smal = await page.evaluate(stand);
     assert.equal(smal.poortOpen, true, 'voorwaarde: de intake staat nog open, anders toetst het hieronder niets');
     assert.equal(smal.werktafel, false, 'op een telefoon bestaat deze werktafel sowieso niet');
     await page.evaluate(() => { try { window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'); } catch (e) {} });
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     assert.equal(new URL(page.url()).pathname, '/apps/app.html',
       'ook op een telefoon mag een openstaande overeenkomst niet met een paginasprong te passeren zijn');
 
@@ -299,7 +310,13 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        de LADE en de RAIL horen hetzelfde aanbod te dragen, want anders krijgt
        een telefoon minder deuren dan een computer. */
     await page.click('.cmd-lade');
-    await page.waitForTimeout(450);
+    /* `inBeeld` is de echte vraag en niet display:none -- de bank SCHUIFT, dus
+       we wachten tot hij werkelijk in beeld staat, met dezelfde meting die de
+       bewering hieronder gebruikt. */
+    await wachtTot(page, () => {
+      const bank = document.querySelector('.cmd-bank');
+      return !!bank && bank.getBoundingClientRect().top < window.innerHeight - 40;
+    }, null, { wat: 'de bank die in beeld schuift' });
     const laOpen = await page.evaluate(stand);
     assert.equal(laOpen.lade.inBeeld, true, 'de greep hoort de lade te openen');
     assert.equal(laOpen.lade.werelden, 4, 'met alle deuren erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
@@ -308,14 +325,18 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     /* Escape sluit hem. Zonder dit is de greep de enige uitweg, en dat is het
        soort scherm waar je op een telefoon in vast komt te zitten. */
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(450);
+    await wachtTot(page, () => {
+      const bank = document.querySelector('.cmd-bank');
+      return !bank || bank.getBoundingClientRect().top >= window.innerHeight - 40;
+    }, null, { wat: 'de bank die weer onder de rand zakt' });
     const laDicht = await page.evaluate(stand);
     assert.equal(laDicht.lade.inBeeld, false, 'Escape hoort de lade te sluiten');
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'false', 'en de stand hoort mee te gaan');
 
     // een TWEEDE blad geeft de strip zijn werk terug
     await page.evaluate(() => window.RTGCommand.open('/apps/geld-command.html', 'Geld'));
-    await page.waitForTimeout(900);
+    await wachtTot(page, () => document.querySelectorAll('.cmd-pane').length === 2,
+      null, { wat: 'het tweede blad' });
     const twee = await page.evaluate(stand);
     assert.equal(twee.bladen, 2, 'twee bladen open');
     assert.deepEqual(twee.chips, ['Vandaag', 'Geld*'], 'en de balk toont ze allebei, met de actieve gemarkeerd');
@@ -365,8 +386,11 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
       }) } });
     });
     // géén token: dit is een bezoeker die nog niets is
-    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
+    /* Zelfde reden als hierboven: het teken waarop gewacht moet worden staat op
+       de volgende regel, niet in het laatste plaatje. */
+    await page.goto(srv.base + '/apps/app.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#agPasskey', { timeout: 20000 });
+    await page.waitForFunction(() => document.styleSheets.length > 0, null, { timeout: 20000 });
 
     const uit = await page.evaluate(() => {
       const r = document.getElementById('rtgCommand'), g = document.getElementById('gate');
@@ -405,7 +429,10 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
        is voor het inloggen een uitnodiging, geen menu. Zonder deze stap zou een
        gesloten werktafel met werkende knoppen erdoorheen glippen. */
     await page.click('.cmd-nav button');
-    await page.waitForTimeout(600);
+    /* Hij hoort GEEN blad te openen maar de cursor op de deur te zetten; dat is
+       de toestand om op te wachten -- en die komt, of de bewering zakt. */
+    await wachtTot(page, () => document.activeElement && document.activeElement.id === 'agPasskey',
+      null, { wat: 'de cursor op de passkeydeur' });
     const na = await page.evaluate(() => ({
       bladen: document.querySelectorAll('.cmd-pane').length,
       pad: location.pathname,
@@ -476,8 +503,21 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) });
     });
 
-    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    /* `waitUntil: 'load'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
+       -- terwijl de regel eronder al op het echte teken wacht. Dat is meer
+       wachten dan de beweringen nodig hebben, en onder belasting viel het om op
+       zijn 45 seconden: een rode uitslag zonder dat er iets stuk was. Dezelfde
+       vorm als wachten op de klok (TAKEN.md 6.5), met een ander teken ernaast.
+
+       Wat er WEL nodig is: de wereldkiezer staat er, het stijlblad is binnen en
+       de balk heeft een echte hoogte -- want er wordt opmaak gemeten (een hoogte
+       en een ::after). Precies dat, en niets meer. */
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+    await page.waitForFunction(() => {
+      const b = document.querySelector('.cmd-balk');
+      return document.styleSheets.length > 0 && b && b.getBoundingClientRect().height > 0;
+    }, null, { timeout: 20000 });
 
     assert.equal(optiesBody.login, undefined, 'de eerste optiesvraag bevat geen login');
     assert.equal(optiesBody.email, undefined, 'de eerste optiesvraag bevat geen e-mailadres');
@@ -537,8 +577,21 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       window.MutationObserver = class { observe() {} disconnect() {} takeRecords() { return []; } };
     }, token);
-    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    /* `waitUntil: 'load'` wacht op ELK subverzoek -- elk plaatje, elk lettertype
+       -- terwijl de regel eronder al op het echte teken wacht. Dat is meer
+       wachten dan de beweringen nodig hebben, en onder belasting viel het om op
+       zijn 45 seconden: een rode uitslag zonder dat er iets stuk was. Dezelfde
+       vorm als wachten op de klok (TAKEN.md 6.5), met een ander teken ernaast.
+
+       Wat er WEL nodig is: de wereldkiezer staat er, het stijlblad is binnen en
+       de balk heeft een echte hoogte -- want er wordt opmaak gemeten (een hoogte
+       en een ::after). Precies dat, en niets meer. */
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+    await page.waitForFunction(() => {
+      const b = document.querySelector('.cmd-balk');
+      return document.styleSheets.length > 0 && b && b.getBoundingClientRect().height > 0;
+    }, null, { timeout: 20000 });
 
     const geland = await page.evaluate(() => ({
       tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),

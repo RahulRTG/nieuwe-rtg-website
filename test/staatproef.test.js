@@ -15,7 +15,7 @@
    Draai los: node --test test/staatproef.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { weegStaat, zonderRuis, draaiStaatproef } = require('../scripts/lib/staatproef');
+const { weegStaat, zonderRuis, zonderTijdtik, ruisUit, draaiStaatproef } = require('../scripts/lib/staatproef');
 
 const ok = { status: 200 };
 const nee = (s) => ({ status: s || 400 });
@@ -93,6 +93,102 @@ test('en zonder die filter meldt een weigering een bevinding over het journaal',
   assert.equal(weegStaat({ a: nee(404), b: nee(404), d01: ruw, d12: ruw }).rollback, 'GEZAKT');
   const schoon = zonderRuis(ruw, new Set(['doorgeefjournaal', 'rtgai']));
   assert.equal(weegStaat({ a: nee(404), b: nee(404), d01: schoon, d12: schoon }).rollback, 'bewezen');
+});
+
+/* DE DREMPEL VAN DE RUIS. Hij staat op "in ELKE ronde bewogen", en dat is geen
+   detail: zou hij op "ooit bewogen" staan, dan poetst een collectie die een keer
+   toevallig meebewoog voortaan echte tweede effecten weg. De ijkingen in
+   scripts/staatproef-route.js leveren de telling; deze functie is de regel. */
+test('ruis is wat in ELKE ronde bewoog, niet wat er ooit een keer bij zat', () => {
+  const geteld = new Map([['doorgeefjournaal', 4], ['wacht', 4], ['agenda', 3], ['notities', 1]]);
+  const ruis = ruisUit(geteld, 4);
+  assert.deepEqual([...ruis].sort(), ['doorgeefjournaal', 'wacht'],
+    'agenda bewoog in drie van de vier rondes en blijft dus gewoon meetellen');
+});
+
+test('en een stille ronde vangt de schakelaar die op de klok loopt', () => {
+  /* Dit is de meting die drie routes van GEZAKT afhaalde. server/opzet/diensten2.js
+     zet elke tien seconden een meting in `db.data.wacht`; landt die tik tussen de
+     twee oproepen van een route, dan leek de herhaling iets te doen. In stilte --
+     zonder dat er iets gevraagd wordt -- beweegt hij in elke ronde, en dan pas
+     mag hij eruit. */
+  const stil = new Map([['wacht', 3], ['techniek', 1], ['ledenSites', 1]]);
+  const tijdruis = ruisUit(stil, 3);
+  assert.deepEqual([...tijdruis], ['wacht']);
+  const ruw = d('wacht');
+  assert.equal(weegStaat({ a: ok, b: ok, d01: d('wereld'), d12: ruw }).idempotentie, 'GEZAKT',
+    'zonder de stille ijking leest een tik van de klok als een tweede effect');
+  const schoon = zonderRuis(ruw, tijdruis);
+  assert.equal(weegStaat({ a: ok, b: ok, d01: d('wereld'), d12: schoon }).idempotentie, 'bewezen');
+  /* En de tragere schakelaars blijven staan: die zijn NIET genegeerd. */
+  assert.equal(zonderRuis(d('techniek'), tijdruis).aantal, 1);
+});
+
+/* DE TWEEDE RUISREGEL, en de twee voorwaarden die alleen SAMEN veilig zijn.
+
+   Een schakelaar die eens per minuut loopt haalt de globale drempel niet (die
+   eist "in elke ronde"), maar kan wel net tussen de twee oproepen van een route
+   vallen. Het venster oprekken zou `commandJournaal` meeslepen, en dat is juist
+   het auditjournaal van de commandkant. Daarom mag een collectie alleen weg als
+   hij OOIT in stilte bewoog EN de route hem bij de EERSTE oproep niet raakte. */
+test('een tik van de klok telt niet mee als de route die collectie zelf niet raakte', () => {
+  const stilOoit = new Set(['commandAlarmen']);
+  const d01 = d('magnaatStudio');                       // wat de route echt deed
+  const d12 = d('commandAlarmen');                      // wat er bij de herhaling bewoog
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12 }).idempotentie, 'GEZAKT',
+    'zonder deze regel leest een minuuttik als een tweede effect');
+  const schoon = zonderTijdtik(d12, d01, stilOoit);
+  assert.equal(schoon.aantal, 0);
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12: schoon }).idempotentie, 'bewezen');
+});
+
+test('maar raakte de route die collectie WEL bij de eerste oproep, dan blijft hij staan', () => {
+  /* De gevaarlijke kant: een route die zijn eigen journaal bij ELKE oproep
+     bijschrijft, is precies wat deze kolom hoort te betrappen. Voorwaarde (b)
+     houdt hem binnen. */
+  const stilOoit = new Set(['commandJournaal']);
+  const d01 = d('commandJournaal', 'besluiten');
+  const d12 = d('commandJournaal');
+  const schoon = zonderTijdtik(d12, d01, stilOoit);
+  assert.deepEqual(schoon.collecties, ['commandJournaal'], 'niet weggepoetst');
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12: schoon }).idempotentie, 'GEZAKT');
+});
+
+test('en een collectie die NOOIT in stilte bewoog blijft altijd staan', () => {
+  /* Voorwaarde (a). Zonder die eis zou elke collectie die de route de tweede
+     keer voor het eerst aanraakt verdwijnen -- en dat is nu juist een tweede
+     effect met een ander pad, geen ruis. */
+  const d01 = d('notities');
+  const d12 = d('betalingen');
+  const schoon = zonderTijdtik(d12, d01, new Set(['wacht']));
+  assert.deepEqual(schoon.collecties, ['betalingen']);
+  assert.equal(weegStaat({ a: ok, b: ok, d01, d12: schoon }).idempotentie, 'GEZAKT');
+});
+
+/* DE HERNIEUWING VALT BUITEN HET MEETVENSTER.
+
+   Een route die 401 geeft ook met een geldig token liet deze proef bij elke
+   oproep opnieuw inloggen -- binnen f0..f1. Een inlog schrijft zelf weg, dus
+   stond dat in het verschil en las de uitslag als "geweigerd en de toestand
+   veranderde toch". Zes routes lang, over iets wat de proef zelf deed. */
+test('na een hernieuwing begint de meting opnieuw, zodat de inlog er niet in valt', async () => {
+  const afdrukken = [];
+  let beurt = 0, ingelogd = 0;
+  const uit = await draaiStaatproef({
+    /* Deze route blijft 401 geven, ook na de hernieuwing -- precies het geval
+       waar het misging. */
+    post: async () => ({ status: 401 }),
+    vingerafdruk: async () => ({ nr: ++beurt }),
+    verschilVan: async (voor, na) => { afdrukken.push([voor.nr, na.nr]); return d(); },
+    hernieuw: async () => { ingelogd++; return true; },
+    routes: [{ method: 'POST', pad: '/api/x', rol: 'office' }],
+    tokenVoor: () => 't', lijfVoor: () => ({})
+  });
+  assert.equal(ingelogd, 1, 'er wordt hooguit EEN keer hernieuwd, niet bij elke oproep');
+  assert.equal(beurt, 4, 'vier vingerafdrukken: een verworpen start, en daarna het echte venster');
+  assert.deepEqual(afdrukken, [[2, 3], [3, 4]],
+    'het venster begint NA de inlog (2), niet ervoor (1) -- anders telt de inlog als routewerk');
+  assert.equal(uit.perRoute['POST /api/x'].rollback, 'bewezen');
 });
 
 /* ---------- de ronde ---------- */

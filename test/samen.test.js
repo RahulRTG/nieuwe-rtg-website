@@ -46,6 +46,15 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
   const events = [];
   const es = await fetch(base + '/api/stream?token=' + encodeURIComponent(B));
   const lezer = es.body.getReader();
+  /* WACHTEN TOT DE SERVER ONS KENT, en niet 300 ms gokken. /api/stream zet de
+     luisteraar in sseClients en stuurt daarna meteen een `hello` (server.js).
+     Zien wij dat, dan is de registratie een feit -- en dat is precies de
+     voorwaarde voor de zet hieronder. Zet A eerder, dan gaat het seintje naar
+     niemand en wacht deze toets vijf seconden op een event dat nooit komt.
+
+     De lezer meldt dat zelf: `open` gaat af zodra de eerste brok binnen is. */
+  let meldOpen;
+  const open = new Promise(k => { meldOpen = k; });
   const leesEven = (async () => {
     const dec = new TextDecoder(); let buf = '';
     const tot = Date.now() + 5000;
@@ -53,10 +62,12 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
       const { value, done } = await Promise.race([lezer.read(), new Promise(r => setTimeout(() => r({ done: true }), 1200))]);
       if (done || !value) break;
       buf += dec.decode(value);
+      if (buf.includes('hello')) meldOpen();
       if (buf.includes('event: samen')) { events.push(buf); break; }
     }
+    meldOpen();   // ook als de lijn dichtging: nooit blijven hangen
   })();
-  await new Promise(r => setTimeout(r, 300));
+  await open;
   const zet = await api(base, '/api/samen/zet', { code, pad: '/apps/mall.html', titel: 'De RTG Mall' }, A);
   assert.equal(zet.status, 200);
   assert.equal(zet.body.kamer.pad, '/apps/mall.html');

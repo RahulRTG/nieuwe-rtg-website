@@ -7,15 +7,19 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtTot, wachtOpRust, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-')); }
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 async function api(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -71,7 +75,7 @@ async function bootTest(opts) {
          klok is met het beginscherm meegegaan, zie WERELD.md -- dus is het
          rooster de enige vorm en zet deze toets niets meer voor. */
     }, keys);
-    await page.goto(base + opts.pad, { waitUntil: 'load' });
+    await page.goto(base + opts.pad, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
     await page.waitForSelector('#app', { state: 'visible', timeout: 5000 });
     if (opts.na) await opts.na(page);
@@ -200,9 +204,10 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
 
     // 1. het oude pad blijft werken en komt uit bij de wallet-stand van RTG Geld
-    await page.goto(base + '/apps/wallet.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /\/apps\/geld\.html/.test(location.pathname + location.hash),
       null, { timeout: 15000 });
     assert.match(await page.evaluate(() => location.pathname + location.hash), /\/apps\/geld\.html#wallet$/,
@@ -222,9 +227,10 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
           juist die kant kan stil terugkomen: een pas op de homescreen is een
           codenaam die je aan iedereen laat zien die over je schouder meekijkt. */
     const thuis = await ctx.newPage();
+    await volgVerzoeken(thuis);
     await thuis.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await thuis.waitForSelector('#osMappen .os-app, .os-wm', { timeout: 15000, state: 'attached' });
-    await thuis.waitForTimeout(1200);
+    await wachtOpRust(thuis);
     const opThuis = await thuis.evaluate(() => ({
       pas: document.querySelectorAll('.wa-pas, #waPas, #ledenpas').length,
       codenaam: document.querySelectorAll('.wa-pas .cn, #ledenpas .cn').length
@@ -253,7 +259,7 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'en'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
-    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
     /* De begroeting stond hier en is van het beginscherm af; de passregel
        eronder loopt langs dezelfde weg (T('app.membersince',...) uit het
@@ -307,7 +313,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, login.token);
-    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app.active', { timeout: 15000 });
     // het Werk-OS: alle functies staan als apps op het springboard; de zaak
     // opent (na de sector-doorverwijzing) op het startscherm met dock
@@ -357,7 +363,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     // onboarding-modal (die anders de app blokkeert) niet verschijnt.
     await page.route('**/api/onboarding/status', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
-    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 
     /* Naar het AI/concierge-scherm en een bericht met een XSS-payload sturen.
@@ -414,7 +420,13 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.fill('#askInput', payload);
     await page.click('#askBtn');
     await page.waitForSelector('#chat .bubble.user', { timeout: 10000 });
-    await page.waitForTimeout(400); // geef een (eventuele) onerror de tijd om te vuren
+    /* Hier werd gewacht om een EVENTUELE onerror de tijd te geven -- wachten op
+       iets wat er juist niet hoort te zijn. Dat kan niet met "verschijnt het?",
+       dus wachten we tot het scherm stil is: geen lopend verzoek en geen
+       hertekening meer. Is er dan geen fout gevuurd, dan komt hij ook niet.
+       Drie stille rondes, want een enkele ronde is bij een polling van 100 ms
+       korter dan de 400 ms die hier vroeger stond. */
+    await wachtOpRust(page, null, { rondes: 3 });
 
     // de payload staat als TEKST in de bubbel, niet als uitgevoerd element
     assert.equal(await page.evaluate(() => document.querySelectorAll('#chat img').length), 0, 'de payload is niet als <img> uitgevoerd');
@@ -452,7 +464,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 
     /* DE BELOFTE IS DEZELFDE, DE PLEK NIET.
@@ -485,7 +497,26 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     /* De lade van de bank glijdt in 280ms weg (command.css). Meten of de balk
        vrij ligt terwijl hij nog beweegt, meet de animatie en niet de stand. */
     await page.waitForFunction(() => !document.querySelector('#rtgCommand.bank-open'), null, { timeout: 5000 });
-    await page.waitForTimeout(350);
+    /* De lade glijdt in 280 ms weg; meten terwijl hij beweegt meet de animatie.
+       Wachten tot de balk STIL LIGT is de vraag zelf: twee metingen achter
+       elkaar op dezelfde plaats. */
+    /* DRIE GELIJKE LEZINGEN OP 100 MS, en niet twee op animatieframetempo.
+
+       Zo stond het eerst, en het viel af en toe om: Playwright kijkt standaard
+       per FRAME, en twee frames vlak na elkaar geven bij een overgang van 280 ms
+       makkelijk dezelfde AFGERONDE plaats -- de beweging is dan nog bezig en de
+       meting eronder valt er middenin. Drie gelijke lezingen op 100 ms vragen
+       200 ms stilstand, en zo lang staat deze balk tijdens zijn overgang nergens
+       stil. De teller gaat bij elke afwijkende lezing terug naar nul, dus het is
+       geen verkapte klok: duurt het langer, dan wacht hij langer. */
+    await wachtTot(page, () => {
+      const e = document.querySelector('#rtgCommand .cmd-balk');
+      if (!e) { window.__balkStil = 0; return false; }
+      const top = Math.round(e.getBoundingClientRect().top);
+      window.__balkStil = window.__balkVorige === top ? (window.__balkStil || 0) + 1 : 0;
+      window.__balkVorige = top;
+      return window.__balkStil >= 3;
+    }, null, { wat: 'een balk die stil ligt', polling: 100 });
     assert.equal(await page.evaluate(() => {
       const e = document.querySelector('#rtgCommand .cmd-balk'), r = e.getBoundingClientRect();
       const boven = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
@@ -517,7 +548,14 @@ test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwij
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
+    /* De banner wordt door shared/verbinding.js GEMAAKT, en dat script zet pas
+       op zijn laatste regel window.RTGNet. Ga je offline voordat het zover is,
+       dan mist het verzoek de luisteraar en wacht deze toets op een banner die
+       nooit komt. `load` regelde dat vroeger impliciet, door op elk plaatje en
+       elk lettertype te wachten; dit is dezelfde garantie zonder die omweg --
+       en zonder de brosheid die eraan vastzit (TAKEN.md 4.39). */
+    await page.waitForFunction(() => !!window.RTGNet, null, { timeout: 15000 });
     // offline -> de banner schuift in beeld met een melding
     await context.setOffline(true);
     await page.waitForFunction(() => {
@@ -584,6 +622,7 @@ test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
       try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
     });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     // zonder token: dan staat de poort er, en daar hangt de klok
     await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
 
@@ -633,10 +672,11 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
         try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
       });
       const page = await ctx.newPage();
+      await volgVerzoeken(page);
       // zonder token: dan staat de poort er, en die is wat we meten
       await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#gate .ag-mond', { timeout: 15000 });
-      await page.waitForTimeout(1200);
+      await wachtOpRust(page);
 
       const r = await page.evaluate(() => {
         const klok = document.querySelector('#gate .os-lock .rtg-ring');
@@ -718,7 +758,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
       localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'salon', t: Date.now() - 20000 }));
     }, [reg.token]);
     const pKort = await ctxKort.newPage();
-    await pKort.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await pKort.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await pKort.waitForSelector('.view.active', { timeout: 15000 });
     assert.equal(await actieveView(pKort), 'salon',
       'na een onderbreking van seconden staat u weer waar u was');
@@ -731,7 +771,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
       localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'salon', t: Date.now() - 5 * 60000 }));
     }, [reg.token]);
     const pVers = await ctxVers.newPage();
-    await pVers.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await pVers.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await pVers.waitForSelector('.view.active', { timeout: 15000 });
     assert.equal(await actieveView(pVers), 'home',
       'een verse start toont het beginscherm, niet de app waar u het laatst was');

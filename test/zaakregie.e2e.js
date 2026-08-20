@@ -17,9 +17,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -51,7 +55,12 @@ async function metScherm(opts) {
       for (const k in kv) localStorage.setItem(k, kv[k]);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, opts.sleutels(token));
-    await page.goto(base + opts.pad, { waitUntil: 'load' });
+    /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+       plaatje, elk lettertype -- terwijl beide aanroepers hieronder als eerste
+       op het echte teken wachten (de poort die dichtgaat, `#gate` verborgen).
+       Onder belasting valt `load` om op zijn eigen tijdslimiet, en dan is de
+       uitslag rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+    await page.goto(base + opts.pad, { waitUntil: 'domcontentloaded' });
     await opts.doe(page);
     assert.deepEqual(fouten, [], 'geen JS-fouten op ' + opts.pad);
   } finally {

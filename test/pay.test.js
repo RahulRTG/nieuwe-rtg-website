@@ -296,3 +296,78 @@ test('en de tik gaat langs dezelfde sleutel: twee keer aanraken kost een keer ge
   assert.equal((await api('pay/overzicht', {}, lidA.token)).body.saldo, voorA - 450, 'A betaalde EEN keer');
   assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, voorB + 450, 'B ontving EEN keer');
 });
+
+/* TWEE KEER OP DE KNOP IS IETS ANDERS DAN EEN HERHAALD VERZOEK.
+
+   `/api/pay/kascode` en `/api/pay/tikcode` MAKEN een code van vijf minuten. Wie
+   twee keer op de knop drukt, wil een verse code -- en krijgt die ook. Wat
+   daarbij niet mag gebeuren is dat er twee codes tegelijk open staan: allebei
+   zetten ze de vorige code van dit lid eerst dood, dus na twee oproepen leeft er
+   precies een en valt er niets op te tellen. Er beweegt hier ook geen cent; geld
+   gaat pas lopen bij `/api/supplier/pay/in` en `/api/pay/tik`, en die dragen een
+   idem-sleutel (de toetsen daarvoor staan hierboven).
+
+   Het andere geval -- HETZELFDE verzoek dat nog een keer binnenkomt, met dezelfde
+   idem-sleutel -- staat onderaan dit bestand. Daar hoort de code van de eerste
+   oproep juist te blijven leven. De twee toetsen zijn elkaars tegenhanger, en ze
+   staan er allebei omdat de proef anders niet kan zien welk gedrag bedoeld was. */
+test('twee keer een code vragen laat er een leven, niet twee (kascode en tikcode)', async () => {
+  // de kassacode: de tweede oproep verdringt de eerste
+  const eerste = await api('pay/kascode', { maxCenten: 5000 }, lidA.token);
+  const tweede = await api('pay/kascode', { maxCenten: 5000 }, lidA.token);
+  assert.equal(tweede.status, 200);
+  assert.notEqual(eerste.body.code, tweede.body.code,
+    'de herhaling geeft een verse code -- daarom noemt de proef deze route onbeschermd');
+  assert.equal((await api('supplier/pay/in', { code: eerste.body.code, centen: 100, idem: 'kas-oud-1' }, supToken)).status, 404,
+    'maar de eerste code is dood; er staan er nooit twee tegelijk open');
+  assert.equal((await api('supplier/pay/in', { code: tweede.body.code, centen: 100, idem: 'kas-nieuw-1' }, supToken)).status, 200,
+    'de laatste code is de enige die het doet');
+
+  // de tikcode: dezelfde vraag aan de kant van de ontvanger
+  const t1 = await api('pay/tikcode', {}, lidB.token);
+  const t2 = await api('pay/tikcode', {}, lidB.token);
+  assert.equal(t2.status, 200);
+  assert.notEqual(t1.body.code, t2.body.code, 'ook hier is de herhaling een verse code');
+  assert.equal((await api('pay/tik', { code: t1.body.code, centen: 100, idem: 'tik-oud-1' }, lidA.token)).status, 404,
+    'en ook hier vervalt de vorige zodra de nieuwe er is');
+  assert.equal((await api('pay/tik', { code: t2.body.code, centen: 100, idem: 'tik-nieuw-1' }, lidA.token)).status, 200,
+    'de laatste tik werkt wel');
+
+  // en na dit alles sluit het grootboek nog steeds op de cent
+  assert.equal((await (await fetch(base + '/api/pay/gezond')).json()).klopt, true, 'grootboek sluit');
+});
+
+/* EN DE ANDERE KANT VAN DEZELFDE VRAAG: EEN RETRY MAG GEEN NIEUWE CODE MAKEN.
+
+   De toets hierboven zegt dat twee LOSSE keren vragen er een laat leven. Dat is
+   het goede gedrag voor iemand die twee keer op de knop drukt. Maar een
+   herhaling van HETZELFDE verzoek -- een load balancer die één keer opnieuw
+   probeert -- is iets anders: die hoort de code terug te krijgen die de gast al
+   op zijn scherm heeft, in plaats van hem te verdringen. De staatproef betrapte
+   dat: dezelfde sleutel legde een tweede rij in `payCodes`.
+
+   /api/pay/* gaat met opzet om de dubbeltik heen (geld heeft een duurzame,
+   strengere laag), maar deze twee verplaatsen geen geld -- ze maken een token
+   van vijf minuten. Ze staan daarom bij naam op de uitzonderingslijst in
+   server/opzet/geldwegen.js. Mutatie: `GEEN_GELD` daar leegmaken laat deze
+   toets zakken op "de herhaling gaf een nieuwe code". */
+test('een retry met dezelfde sleutel geeft dezelfde code terug, en verdringt de vorige niet', async () => {
+  const sleutel = 'kascode-retry-' + Date.now().toString(36);
+  const a = await api('pay/kascode', { maxCenten: 5000, idem: sleutel }, lidA.token);
+  const b = await api('pay/kascode', { maxCenten: 5000, idem: sleutel }, lidA.token);
+  assert.equal(b.status, 200);
+  assert.equal(b.body.code, a.body.code, 'de herhaling geeft dezelfde code');
+  assert.equal(b.body.herhaald, true, 'en de server zegt zelf dat hij de herhaling herkende');
+  assert.equal((await api('supplier/pay/in', { code: a.body.code, centen: 100, idem: 'kas-retry-in' }, supToken)).status, 200,
+    'de code van de eerste oproep leeft nog: er is er geen verdrongen');
+
+  const tSleutel = 'tikcode-retry-' + Date.now().toString(36);
+  const t1 = await api('pay/tikcode', { idem: tSleutel }, lidB.token);
+  const t2 = await api('pay/tikcode', { idem: tSleutel }, lidB.token);
+  assert.equal(t2.body.code, t1.body.code, 'ook de tikcode overleeft een retry');
+  assert.equal(t2.body.herhaald, true);
+  assert.equal((await api('pay/tik', { code: t1.body.code, centen: 100, idem: 'tik-retry-1' }, lidA.token)).status, 200,
+    'en die code doet het nog');
+
+  assert.equal((await (await fetch(base + '/api/pay/gezond')).json()).klopt, true, 'grootboek sluit');
+});

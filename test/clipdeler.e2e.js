@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, wachtOpRust } = require('./helper');
 
 /* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
    STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
@@ -72,7 +72,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     /* 'load' en niet 'networkidle': deze pagina's houden een SSE-verbinding
        open, dus het netwerk wordt nooit stil. Daar liep deze toets eerst 30
        seconden op vast -- de wachtregel was fout, niet de app. */
-    await makerPagina.goto(base + '/apps/clips.html', { waitUntil: 'load' });
+    await makerPagina.goto(base + '/apps/clips.html', { waitUntil: 'domcontentloaded' });
     await makerPagina.waitForFunction(() => !!window.RTGClipDeler, null, { timeout: 15000 });
     const bewaard = await makerPagina.evaluate(async ({ id, tok }) => {
       const deler = window.RTGClipDeler.start({ token: tok });
@@ -96,15 +96,15 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     })(TMP);
     assert.ok(!bestanden.some(f => f.includes(clipId)), 'er ligt geen clipbestand bij RTG');
 
-    await makerPagina.reload({ waitUntil: 'load' });
-    await makerPagina.waitForTimeout(800);   // de pagina meldt zijn aanwezigheid
+    await makerPagina.reload({ waitUntil: 'domcontentloaded' });
+    await wachtOpRust(makerPagina);   // de pagina meldt zijn aanwezigheid
 
     /* ---- de kijker: /apps/media.html, stand FLOW, en spelen ---- */
     const kijkCtx = await metToken(kijker);
     const kijkPagina = await kijkCtx.newPage();
     // via het gedeelde hulpje, zodat bekende browserruis niet als fout telt
     const fouten = letOpFouten(kijkPagina, []);
-    await kijkPagina.goto(base + '/apps/media.html', { waitUntil: 'load' });
+    await kijkPagina.goto(base + '/apps/media.html', { waitUntil: 'domcontentloaded' });
     await kijkPagina.waitForSelector('.standen button');
     await kijkPagina.evaluate(() => {
       const knoppen = [...document.querySelectorAll('.standen button')];
@@ -140,7 +140,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     const tweedeCtx = await metToken(tweede);
     const clipsPagina = await tweedeCtx.newPage();
     const foutenClips = letOpFouten(clipsPagina, []);
-    await clipsPagina.goto(base + '/apps/clips.html', { waitUntil: 'load' });
+    await clipsPagina.goto(base + '/apps/clips.html', { waitUntil: 'domcontentloaded' });
     await clipsPagina.waitForSelector('.clip .laag .knop');
     await clipsPagina.click('.clip .laag .knop');
     await clipsPagina.waitForFunction(() => {

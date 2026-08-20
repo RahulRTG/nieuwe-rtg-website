@@ -160,6 +160,7 @@
       "sessionFor"
     ],
     "command": [
+      "apiSpoor",
       "command",
       "veilig",
       "wie"
@@ -643,6 +644,7 @@
       "aiSystemPrompt",
       "annuleerItem",
       "annuleerReservering",
+      "apiSpoor",
       "appbieb",
       "applyChatVertaald",
       "assetDocument",

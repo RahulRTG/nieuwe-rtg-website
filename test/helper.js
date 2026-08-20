@@ -113,37 +113,29 @@ function luisterOpFouten(child) {
   });
 }
 
-/* HOE DRUK STAAT DEZE MACHINE, als vermenigvuldiger voor geduld.
+/* HOEVEEL GEDULD BIJ EEN OPSTART -- op EEN plek, want hij stond er twee keer.
 
-   Dit stond als twee regels middenin startEens(), en daardoor had
-   test/domeinalleen.test.js -- dat zijn eigen server start en dus zijn eigen
-   wachtlus heeft -- een harde 25 seconden die nooit meeschaalde. Die toets zakte
-   daarop in een volle testronde en slaagde er los naast, wat precies het beeld
-   geeft waar de kop hierboven voor waarschuwt: "server werd niet gezond" terwijl
-   er niets stuk was.
+   De schaling hieronder woonde binnen startEens(). test/domeinalleen.test.js
+   start zijn servers zelf (hij zet RTG_DOMAINS en kan de helper dus niet
+   gebruiken) en had een eigen wacht met een VASTE 25000 ms -- precies het getal
+   dat hier al als te krap staat opgeschreven. Op 19 augustus 2026 zakte hij
+   daarop in een volle suite, met een levend kindproces en een belasting van 8,5
+   op vier kernen; los gedraaid op een rustige machine drie keer groen. Dat is
+   dezelfde fout die deze schaling ooit heeft opgelost, in een tweede kopie
+   (LAT.md regel 4: een regel op twee plekken loopt uit elkaar).
 
-   Eén plek dus, en geen derde kopie (LAT.md regel 4). */
-function drukte() {
+   De eerste versie deed Math.round(druk), en dat was te grof: bij een
+   genormaliseerde belasting van 0,7 tot 0,9 -- een machine die bijna vol staat
+   -- rondde dat af op 1 en bleef het geduld op 25 seconden. Zeventig toetsen
+   zakten daarop, allemaal met een LEVEND kindproces. Een server die opstart doet
+   echt werk (SQLite, seed, sleutels), dus "bijna vol" is al genoeg om hem over
+   de grens te duwen. Vandaar 1 + druk: elke bezette kern telt meteen mee in
+   plaats van pas bij een hele. */
+function opstartGeduld(basisMs) {
   const kernen = Math.max(1, os.cpus().length);
   const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
-  return { kernen, druk, extra: Math.min(5, Math.max(1, Math.ceil(1 + druk))) };
-}
-
-/* GEDULD DAT MEESCHAALT MET DE MACHINE.
-
-   Een vaste tijdslimiet in een toets meet twee dingen tegelijk: of de code
-   antwoordt, en of de machine vrij was. Op een lege laptop is dat hetzelfde;
-   op een volle CI-runner niet, en dan is rood geen bevinding maar drukte.
-
-   Geef een basis in milliseconden, krijg er de tijd voor terug die bij de
-   huidige belasting hoort. De belasting zelf komt uit drukte() hierboven -- een
-   tweede meting zou naast de eerste gaan lopen (LAT.md regel 4).
-
-   Nooit ONBEPERKT: een aanroep die nooit antwoordt hoort een toets te laten
-   zakken en niet te laten hangen. Het plafond is vijf keer de basis. */
-function geduld(basisMs) {
-  const { druk } = drukte();
-  return Math.round(basisMs * Math.min(5, Math.max(1, 1 + druk)));
+  const extra = Math.min(5, Math.max(1, Math.ceil(1 + druk)));
+  return { druk, kernen, extra, ms: (basisMs || 25000) * extra };
 }
 
 async function startEens(opts) {
@@ -163,22 +155,17 @@ async function startEens(opts) {
      naar een fout die er niet was.
 
      Twee dingen zijn daarom veranderd. Het geduld schaalt nu mee met de
-     belasting van de machine: op een rustige machine blijft het 25 seconden, op
-     een machine die al vol staat wordt het ruimer. En als het dan alsnog niet
+     belasting van de machine (zie opstartGeduld hierboven): de basis is 25
+     seconden en de factor loopt met de druk mee, tot vijf keer op een machine
+     die vol staat. Die factor is minimaal twee zodra er uberhaupt iets draait --
+     `Math.ceil(1 + druk)` -- en dat is met opzet: een boot doet echt werk. Hier
+     stond nog "op een rustige machine blijft het 25 seconden", en dat klopte
+     sinds die wijziging niet meer. En als het dan alsnog niet
      lukt, ZEGT de fout wat er aan de hand was -- leefde het kindproces nog, hoe
      lang is er gewacht, en hoe zwaar stond de machine. Een levend kind plus een
      hoge belasting is drukte; een gestopt kind is een echt defect. Dat verschil
      hoort in de melding te staan en niet in het hoofd van wie hem leest. */
-  const { druk, extra: _extra } = drukte();
-  const kernen = Math.max(1, os.cpus().length);
-  /* De eerste versie van deze schaling deed Math.round(druk), en dat was te
-     grof: bij een genormaliseerde belasting van 0,7 tot 0,9 -- een machine die
-     bijna vol staat -- rondde dat af op 1 en bleef het geduld op 25 seconden.
-     Zeventig toetsen zakten daarop, allemaal met een LEVEND kindproces. Een
-     server die opstart doet echt werk (SQLite, seed, sleutels), dus "bijna vol"
-     is al genoeg om hem over de grens te duwen. Vandaar 1 + druk: elke bezette
-     kern telt meteen mee in plaats van pas bij een hele. */
-  const extra = _extra;
+  const { druk, extra } = opstartGeduld();
   const pogingen = opts.pogingen || 250 * extra;
   const gestart = Date.now();
   const port = await vrijePoort();
@@ -318,12 +305,53 @@ function stop(watDanOok) {
    hangende afsluiting de suite niet laat staan. */
 function stopNet(child, ms) {
   return new Promise(resolve => {
-    if (!child || child.exitCode != null) return resolve();
+    if (!child || wegAl(child)) return resolve();
     let klaar = false;
     const af = () => { if (!klaar) { klaar = true; resolve(); } };
     child.on('exit', af);
     try { child.kill('SIGTERM'); } catch (e) { return af(); }
     setTimeout(() => { try { child.kill('SIGKILL'); } catch (e) {} af(); }, ms || 15000).unref();
+  });
+}
+
+/* IS DIT KIND AL WEG? `exitCode` alleen is niet genoeg.
+
+   Een proces dat door een SIGNAAL stierf houdt `exitCode === null` en zet
+   `signalCode` (bijvoorbeeld 'SIGKILL'). Wie alleen naar exitCode kijkt, denkt
+   dus dat zo'n kind nog leeft, hangt zijn `exit`-luisteraar op aan een proces
+   dat al weg is, en wacht op een gebeurtenis die nooit meer komt. Node meldt dat
+   als "Promise resolution is still pending but the event loop has already
+   resolved" -- en de hele toets wordt geannuleerd in plaats van rood.
+
+   Dat is hier ook echt gebeurd, bij test/herstelproef.test.js: die stopt zijn
+   servers met een signaal en daarna nog een keer via de opruimer. */
+function wegAl(child) {
+  return child.exitCode != null || child.signalCode != null || child.killed && !child.connected && child.pid == null;
+}
+
+/* EEN HARDE stop, en WACHTEN tot hij weg is.
+
+   Het spiegelbeeld van stopNet(). stopNet is een deploy: SIGTERM, en de server
+   spoelt zijn write-behind nog weg. stopHard is een STROOMSTORING: SIGKILL, dus
+   niets wordt afgemaakt -- en dat is precies wat een duurzaamheidsproef wil
+   toetsen. Het verschil met stop() is dat deze WACHT tot het proces echt weg is.
+
+   Waarom dat verschil ertoe doet: na stop() liep er in de toetsen steevast een
+   `setTimeout(300)` met de opmerking "laat de OS-poort echt vrijkomen". Die
+   reden klopte niet eens (startServer pakt elke keer een verse vrije poort),
+   maar er zat wel een echte eis onder: zolang het oude proces nog leeft heeft
+   het de datamap nog vast, en dan start de volgende server op een half
+   afgesloten sqlite. 300 ms was daarvoor een gok; `exit` is het teken. */
+function stopHard(child, ms) {
+  return new Promise(resolve => {
+    if (!child || wegAl(child)) return resolve();
+    let klaar = false;
+    const af = () => { if (!klaar) { klaar = true; resolve(); } };
+    child.on('exit', af);
+    try { child.kill('SIGKILL'); } catch (e) { return af(); }
+    // SIGKILL is niet te weigeren; deze kap is er alleen voor het geval het
+    // handvat niet meer bij het proces hoort (al opgeruimd, of overschreven).
+    setTimeout(af, ms || 10000).unref();
   });
 }
 
@@ -413,6 +441,265 @@ function letOpFouten(page, bak) {
    telt een crash niet als fout -- in scheiding.test.js gold een 500 daardoor
    zelfs als een geslaagde weigering. Spawn dan wel met stderr op 'pipe'. */
 function bewaakKind(kind) { if (kind && kind.stderr) luisterOpFouten(kind); return kind; }
+
+
+/* ============================================================================
+   WACHTEN OP EEN TOESTAND, NIET OP DE KLOK.
+
+   WAAR DIT VANDAAN KOMT. `page.waitForTimeout(2500)` met de opmerking "de
+   widgets halen hun bron op" is een gok, en een gok die twee kanten op fout
+   gaat: op een rustige machine te lang (de suite duurt onnodig minuten langer)
+   en onder belasting te kort (rood zonder dat er iets stuk is). Dat laatste is
+   het ergste, want een suite die af en toe rood geeft zonder dat iemand weet
+   waarop, wordt binnen een maand genegeerd. Er stonden er 162, verdeeld over
+   35 bestanden; twee ervan hebben hier echt een halve dag zoeken gekost
+   (TAKEN.md 6.5).
+
+   Wat hieronder staat wacht op wat er MOET GEBEUREN in plaats van op hoe lang
+   dat ongeveer duurt. Twee eisen die het bruikbaar maken:
+
+   1. HIJ VERTELT WAAROP HIJ WACHTTE. Een kale "Timeout 15000ms exceeded" laat
+      de volgende lezer opnieuw zoeken. Deze gooit met wat er verwacht werd EN
+      met de eerste tweehonderd tekens die er wel stonden.
+   2. HIJ IS BEGRENSD. Een wacht zonder bovengrens hangt de hele suite op; de
+      grens staat hoog genoeg voor een trage machine (RTG_E2E_WACHT om hem te
+      verzetten) en is geen verkapte klok: hij gaat af als er iets stuk is, niet
+      als het even duurt.
+   ========================================================================== */
+const WACHT_MS = Number(process.env.RTG_E2E_WACHT || 15000);
+
+async function korteStand(page) {
+  try {
+    const t = await page.evaluate(() => (document.body ? document.body.innerText : '').replace(/\s+/g, ' ').slice(0, 200));
+    return 'wat er wel stond: "' + t + '"';
+  } catch (e) { return 'de pagina was niet meer te lezen (' + (e && e.message) + ')'; }
+}
+
+/* Wacht tot een uitdrukking in de pagina waar is. `wat` is de zin die in de
+   foutmelding komt -- schrijf hem als wat je verwachtte, niet als code. */
+async function wachtTot(page, fn, arg, opties) {
+  const ms = (opties && opties.ms) || WACHT_MS;
+  const wat = (opties && opties.wat) || 'de verwachte toestand';
+  /* `polling` gaat door naar Playwright. Standaard kijkt die per ANIMATIEFRAME,
+     en dat is te fijn voor een vraag als "ligt dit stil": twee frames vlak na
+     elkaar kunnen dezelfde afgeronde plaats geven terwijl de overgang nog loopt.
+     Wie op stilstand wacht, geeft hier een tempo mee dat grover is dan de
+     beweging -- en telt meerdere gelijke lezingen. */
+  const polling = opties && opties.polling;
+  try {
+    await page.waitForFunction(fn, arg, polling ? { timeout: ms, polling } : { timeout: ms });
+  } catch (e) {
+    throw new Error('wachtte ' + ms + 'ms op ' + wat + ', en die kwam niet. ' + (await korteStand(page)) +
+      '\n  onderliggend: ' + String((e && e.message) || e).split('\n')[0]);
+  }
+}
+
+/* Wacht tot een patroon in de zichtbare tekst staat. Standaard in de hele
+   pagina; `in` beperkt het tot een selector. */
+async function wachtOpTekst(page, patroon, opties) {
+  const bron = patroon instanceof RegExp ? patroon.source : String(patroon).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const vlaggen = patroon instanceof RegExp ? patroon.flags.replace(/g/g, '') : 'i';
+  const sel = (opties && opties.in) || 'body';
+  await wachtTot(page, ([b, v, s]) => {
+    const el = document.querySelector(s);
+    if (!el) return false;
+    return new RegExp(b, v).test(String(el.innerText || el.textContent || '').replace(/\s+/g, ' '));
+  }, [bron, vlaggen, sel], { ms: opties && opties.ms, wat: 'tekst ' + patroon + ' in ' + sel });
+}
+
+/* Wacht tot de tekst van een element VERANDERT ten opzichte van wat er stond.
+
+   Dit is de wacht voor het geval waarin je niet kunt zeggen wat er komt: een
+   melding die ook leeg kan blijven, een lijst die korter wordt, een antwoord
+   waarvan de toets juist wil controleren dat het NIET iets zegt. Op de tekst
+   wachten die je verwacht kan daar niet -- dus wacht je op het moment dat het
+   scherm iets nieuws heeft gezegd. Neem de oude tekst op met tekstVan(). */
+async function wachtOpVerandering(page, selector, oud, opties) {
+  await wachtTot(page, ([s, o]) => {
+    const el = document.querySelector(s);
+    if (!el) return false;
+    return String(el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim() !== o;
+  }, [selector, String(oud || '').replace(/\s+/g, ' ').trim()],
+  { ms: opties && opties.ms, wat: 'een nieuwe tekst in ' + selector });
+}
+
+/* WACHTEN TOT HET SCHERM STIL IS -- de enige eerlijke vervanger van "even 800ms".
+
+   Waarom dit nodig is naast wachten op een antwoord: een scherm dat een antwoord
+   krijgt, tekent zichzelf daarna opnieuw, en soms haalt het onderweg nog iets.
+   Wie tussen die twee in typt, ziet zijn invoer verdwijnen -- en stuurt lege
+   velden mee. Dat is precies waar de Living Lab-toets op omviel toen de vaste
+   wachttijden eruit gingen: het scherm zei "Wat heeft u waargenomen?" over een
+   veld dat de toets aantoonbaar had gevuld.
+
+   Stil betekent hier twee dingen tegelijk: er loopt geen verzoek meer, EN de
+   tekst is tussen twee pollingrondes niet veranderd. Dat is geen verkapte klok:
+   duurt het langer, dan wacht hij langer; is het meteen klaar, dan gaat hij
+   meteen door. volgVerzoeken() moet vóór de eerste goto worden aangeroepen,
+   want hij hangt een teller om window.fetch. */
+async function volgVerzoeken(page) {
+  await page.addInitScript(() => {
+    window.__rtgBezig = 0;
+    /* De ADRESSEN erbij, en niet alleen de teller. Blijft een wacht hangen op
+       "er loopt nog een verzoek", dan is de teller alleen een getal en moet je
+       gaan raden welk verzoek; met de lijst staat het in de foutmelding. Dat is
+       dezelfde regel als bij de gezakte toets: noem hem bij naam. */
+    window.__rtgInVlucht = [];
+    const echt = window.fetch;
+    window.fetch = function (...args) {
+      const waar = String((args[0] && args[0].url) || args[0] || '');
+      window.__rtgBezig++;
+      window.__rtgInVlucht.push(waar);
+      return echt.apply(this, args).finally(() => {
+        window.__rtgBezig--;
+        const i = window.__rtgInVlucht.indexOf(waar);
+        if (i >= 0) window.__rtgInVlucht.splice(i, 1);
+      });
+    };
+  });
+}
+
+/* WAT HIELD HET SCHERM BEZIG -- de helft van een wachtmelding die er niet was.
+   "Het werd niet stil" zegt niet of er nog een verzoek liep, en welk. */
+async function watHieldHemBezig(page) {
+  try {
+    return await page.evaluate(() => 'op ' + location.pathname + ' liepen er ' + (window.__rtgBezig || 0) +
+      ' verzoeken' + (window.__rtgInVlucht && window.__rtgInVlucht.length
+        ? ' (' + window.__rtgInVlucht.slice(0, 4).join(', ') + ')' : '') + '.');
+  } catch (e) { return 'de stand was niet meer te lezen (' + (e && e.message) + ').'; }
+}
+
+/* `rondes` is het aantal opeenvolgende gelijke lezingen dat nodig is voordat
+   iets "stil" heet. Standaard een; hoger als het scherm een eigen wachttijd
+   heeft die je moet overleven -- shared/deelmenu.js bouwt bijvoorbeeld pas 120 ms
+   NA de laatste wijziging, en dan is een enkele gelijke ronde te vroeg. Dat is
+   geen verkapte klok: elke ronde die niet gelijk is, zet de teller terug, dus
+   hij wacht net zo lang als het scherm nodig heeft. */
+let rustMerkTeller = 0;
+async function wachtOpRust(page, selector, opties) {
+  const ms = (opties && opties.ms) || WACHT_MS;
+  const rondes = Math.max(1, (opties && opties.rondes) || 1);
+  /* EEN MERK PER WACHT, en het woont in het DOCUMENT. Hier stond een aparte
+     `page.evaluate` die de vorige lezing wiste voordat de wacht begon -- nodig,
+     want anders vergelijkt de eerste ronde met de tekst waarop de VORIGE wacht
+     eindigde en is hij meteen "stil". Maar die evaluate viel om als de pagina
+     precies dan navigeerde, en de vangst hieronder maakte daar een verzonnen
+     time-out van. Met een merk in het document doet de wacht het zelf: klopt het
+     merk niet -- eerste ronde, of een NIEUW document na een omleiding -- dan
+     begint de telling opnieuw. Een omleiding overleeft de wacht dus in plaats
+     van hem te laten liegen, en er is een evaluate minder om over te struikelen. */
+  const merk = 'rust-' + (++rustMerkTeller);
+  try {
+    await page.waitForFunction(([s, n, m]) => {
+      if (window.__rtgRustMerk !== m) {
+        window.__rtgRustMerk = m; window.__rtgVorigeTekst = '\u0000nog-niet-gelezen'; window.__rtgStil = 0;
+      }
+      if (window.__rtgBezig) { window.__rtgStil = 0; return false; }
+      const el = s ? document.querySelector(s) : document.body;
+      if (!el) { window.__rtgStil = 0; return false; }
+      const nu = String(el.innerText || '');
+      const zelfde = window.__rtgVorigeTekst === nu;
+      window.__rtgVorigeTekst = nu;
+      window.__rtgStil = zelfde ? (window.__rtgStil || 0) + 1 : 0;
+      return window.__rtgStil >= n;
+    }, [selector || null, rondes, merk], { timeout: ms, polling: 100 });
+  } catch (e) {
+    /* EN DE ECHTE FOUT GAAT MEE. Deze vangst zei altijd "het werd niet stil",
+       ook als de wacht was omgevallen op iets heel anders -- een vernielde
+       context bij een omleiding bijvoorbeeld. Dat is precies het soort melding
+       waar een halve dag in gaat zitten: hij leest als een diagnose en is er
+       geen. */
+    throw new Error('wachtte ' + ms + 'ms tot ' + (selector || 'het scherm') +
+      ' stil was (geen lopend verzoek, geen hertekening), en dat werd het niet. ' +
+      (await watHieldHemBezig(page)) + ' ' + (await korteStand(page)) +
+      '\n  onderliggend: ' + String((e && e.message) || e).split('\n')[0]);
+  }
+}
+
+/* WACHTEN TOT DE PAGINA UITGEPRAAT IS -- geen nieuw verzoek meer.
+
+   Dit is de tegenhanger van wachtOpRust voor het geval waarin je NIET weet
+   waarop je wacht: een scan die elk scherm opent en alleen wil weten of er
+   onderweg iets omvalt. Zo'n scan heeft geen enkel teken om op te wachten, want
+   elk scherm heeft een ander teken. Daar stond dan ook jarenlang een vaste
+   `setTimeout(900)`: lang genoeg voor de meeste, en op een trage machine
+   precies te kort voor de schermen waar het om gaat.
+
+   Het teken dat er wel is, is het GEDRAG van de pagina: zolang hij nog verzoeken
+   afvuurt is hij bezig, en zodra er `stilMs` lang geen NIEUW verzoek meer
+   begint, is hij uitgepraat. Dat is een toestand en geen duur -- op een trage
+   machine wacht hij vanzelf langer, en op een snelle is hij eerder klaar dan de
+   900 ms die er stond.
+
+   Waarom "geen nieuw verzoek BEGINT" en niet "geen verzoek meer OPEN"
+   (Playwrights networkidle): de apps houden een SSE-lijn open, en die telt bij
+   networkidle voor altijd mee als lopend verkeer. Dan wacht je bij elk scherm de
+   volle kap uit en is de scan tien keer trager zonder iets extra's te zien.
+
+   `maxMs` is een kap en geen wacht: een pagina die blijft pollen (een tikker die
+   elke seconde iets ophaalt) wordt anders nooit stil. Hij komt dan gewoon terug;
+   de scan doet zijn beweringen daarna. */
+function wachtOpNetstilte(page, opties) {
+  const stilMs = (opties && opties.stilMs) || 400;
+  const maxMs = (opties && opties.maxMs) || 6000;
+  return new Promise((klaar) => {
+    let af = false, stilte = null;
+    const eind = () => {
+      if (af) return;
+      af = true;
+      clearTimeout(stilte); clearTimeout(kap);
+      try { page.off('request', tik); } catch (e) { /* pagina al dicht */ }
+      klaar();
+    };
+    const tik = () => { clearTimeout(stilte); stilte = setTimeout(eind, stilMs); };
+    const kap = setTimeout(eind, maxMs);
+    page.on('request', tik);
+    tik();
+  });
+}
+
+/* Klik, en wacht op het ANTWOORD VAN DE SERVER in plaats van op een geschatte
+   duur. Voor de gevallen waarin niet vooraf te zeggen is wat er op het scherm
+   komt (een lijst die vult, een melding die ook leeg kan blijven): de handeling
+   is klaar zodra het verzoek dat hij afvuurt beantwoord is.
+
+   `urlDeel` is een stuk van het pad, bijvoorbeeld '/horeca/hotel/open'. Zonder
+   dat wacht hij op het eerstvolgende POST-antwoord van de eigen API -- ruim
+   genoeg voor een scherm dat er maar een afvuurt, en te ruim voor een scherm
+   dat er drie doet; noem in dat geval het pad. */
+async function klikEnWacht(page, selector, urlDeel, opties) {
+  const ms = (opties && opties.ms) || WACHT_MS;
+  const deel = urlDeel || '/api/';
+  try {
+    const [antwoord] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes(deel) && r.request().method() !== 'GET', { timeout: ms }),
+      page.click(selector)
+    ]);
+    return antwoord;
+  } catch (e) {
+    throw new Error('klikte op ' + selector + ' en wachtte ' + ms + 'ms op een antwoord van ' + deel +
+      ', dat niet kwam. ' + (await korteStand(page)));
+  }
+}
+
+async function tekstVan(page, selector) {
+  return page.evaluate((s) => {
+    const el = document.querySelector(s);
+    return el ? String(el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim() : '';
+  }, selector);
+}
+
+/* Wacht tot een element zichtbaar is (of juist verborgen). Werkt ook op
+   elementen die met `hidden` worden geschakeld, en dat is hier de gewone
+   manier: de apps zetten hele blokken aan en uit. */
+async function wachtOpZichtbaar(page, selector, opties) {
+  const weg = !!(opties && opties.weg);
+  await wachtTot(page, ([s, w]) => {
+    const el = document.querySelector(s);
+    const zichtbaar = !!el && !el.hidden && el.offsetParent !== null;
+    return w ? !zichtbaar : zichtbaar;
+  }, [selector, weg], { ms: opties && opties.ms, wat: selector + (weg ? ' verdwenen' : ' zichtbaar') });
+}
 
 
 /* EEN BEWERING OVER "VANDAAG" GELDT MAAR BINNEN EEN KALENDERDAG.
@@ -526,90 +813,8 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-/* EEN LID DOOR DE KEURING HALEN, langs de echte weg: bewijs insturen, RTG-kantoor
-   keurt goed, en de geboortedatum van het document wordt overgenomen.
-
-   Hij staat hier omdat de 18+-poort sinds deze ronde echt naar die keuring kijkt
-   (server/kern/volwassen.js). Daarvoor was "18 jaar oud" genoeg -- op een
-   geboortedatum die het lid zelf intypte -- en kon elke toets een volwassene
-   maken door een jaartal te kiezen. Nu moet dat via het kantoor, en dat is in
-   drie toetsbestanden nodig. Drie kopieen van deze stappen lopen uiteen zodra
-   de keuringsstroom verandert; deze ene niet.
-
-   De geboortedatum is optioneel: laat je hem weg, dan blijft de opgegeven staan
-   en blijft de bron eerlijk 'opgegeven'. Voor de 18+-poort is de keuring zelf
-   genoeg; voor een stemming niet (zie kern/overheid/bestuur.js). */
-const KEUR_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
-async function keurLidGoed(base, token, codenaam, geboortedatum) {
-  const post = (pad, body, tok) => fetch(base + pad, { method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
-    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-  const office = (await post('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
-  if (!office) throw new Error('kantoor-inlog mislukt; is RTG_DEMO aan?');
-  await post('/api/verify/upload', { image: KEUR_PNG }, token);
-  await post('/api/verify/selfie', { image: KEUR_PNG }, token);
-  const pend = await post('/api/office/verifications', {}, office);
-  const mij = (pend.body.pending || []).find(x => x.codename === codenaam);
-  if (!mij) throw new Error('lid ' + codenaam + ' staat niet in de keuringsrij');
-  const r = await post('/api/office/verify', Object.assign({ userId: mij.id, decision: 'approve',
-    faceMatch: true }, geboortedatum ? { geboortedatum } : {}), office);
-  if (r.status !== 200) throw new Error('keuring mislukt: ' + JSON.stringify(r.body).slice(0, 160));
-  return mij.id;
-}
-
-/* DOORVEGEN OVER EEN REGEL, EN WAAROM DIT HIER STAAT EN NIET VIER KEER.
-
-   Dit stond als vier identieke kopieen in de vier gebaar-schermtoetsen, en de
-   fout die erin zat, zat er dus ook vier keer in (LAT.md regel 4).
-
-   DE DOBBELSTEEN DIE ERIN ZAT, MET DE METING ERBIJ. test/gebaar-bestanden.e2e.js
-   zakte tegen een KOUD gestarte server ongeveer een op de vijf keer, altijd op
-   dezelfde plek: de regel droeg zijn klasse, beide globals stonden er, en er kwam
-   geen lade en geen data-gb -- het gebaar begon niet eens. Dat is op 20 augustus
-   2026 nagerekend en het is geen fout in de laag maar een RACE MET EEN TIMER DIE
-   ER HOORT TE ZIJN: shared/gebaar/gebaar-03b.js opent na 520 ms de actielade
-   (lang drukken), en zet daarbij het lopende gebaar op nul. Tussen mouse.down()
-   en de eerste mouse.move() zit een aparte CDP-ronde; op een pagina die nog
-   bezig is met opstarten kan die de 520 ms overschrijden. Dan heeft de toets in
-   de ogen van de laag een halve seconde stilgestaan, en dat IS vasthouden.
-
-   Bewezen door het met opzet te forceren: 600 ms wachten na down() geeft precies
-   dezelfde eindstand, plus een open dialog.gb-blad die de oude aantekening nooit
-   had gecontroleerd.
-
-   Wat hier nu staat maakt dat zichtbaar in plaats van dodelijk: na de eerste
-   beweging wordt gecontroleerd of het gebaar echt begonnen is. Zo niet, dan is
-   het deze race, en dan gaat de lade dicht en volgt EEN nieuwe poging. Gebeurt
-   het twee keer, dan zakt de toets met de reden erbij -- want twee keer is geen
-   traagheid meer. Geen langere wachttijden: die maken een dobbelsteen stiller,
-   niet eerlijker. */
-async function veegDoor(page, doos, opties) {
-  const o = opties || {};
-  const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
-  const x0 = doos.x + doos.width * 0.8;
-  const px = -(doos.width * 0.62 + 90);
-  for (let poging = 1; poging <= 2; poging++) {
-    await page.mouse.move(x0, y);
-    await page.mouse.down();
-    await page.mouse.move(x0 + px / 22, y);
-    const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
-    if (!begonnen) {
-      await page.mouse.up();
-      await page.keyboard.press('Escape');
-      await page.waitForTimeout(250);
-      if (poging === 2) {
-        throw new Error('het gebaar begon twee keer niet: de vasthoud-teller (520ms) won ' +
-          'van de eerste beweging. Een keer is een trage opstart, twee keer is een fout.');
-      }
-      continue;
-    }
-    for (let i = 2; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
-    await page.mouse.up();
-    return;
-  }
-}
-
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, geduld, drukte, keurLidGoed, laadScherm, veegDoor,
+module.exports = { vrijePoort, startServer, opstartGeduld, stop, stopNet, stopHard, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, wachtOpNetstilte, volgVerzoeken, klikEnWacht, tekstVan, WACHT_MS,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

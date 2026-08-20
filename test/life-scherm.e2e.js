@@ -15,9 +15,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Een browser die er ECHT is; zie laadScherm() in test/helper.js voor wat
-   hier tweeendertig keer misging. */
-const pw = laadScherm();
+/* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
+   kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
+   lader, en die zakte op 'Executable doesn't exist' zodra het pakket er wel
+   was en de bijbehorende Chromium niet -- een rode toets die niets over zijn
+   onderwerp zei. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
 async function openDeel(page, naam) {
@@ -56,7 +60,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/life.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/life.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('signalen');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);
@@ -149,7 +153,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
       body: JSON.stringify({ onderwerp: 'beweging', waarde: 45 })
     }).then(r => r.json());
     assert.equal(gemeten.bron, 'apparaat');
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('signalen');
       return e && /uw toestel mat/i.test(e.textContent);
@@ -192,7 +196,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     /* En de harde kant ervan: haal hem uit het profiel, en hij is ook van de
        kaart. Bij een kopie zou hij hier blijven staan. */
     await api('zorgprofiel/zet', { allergenen: [], dieet: '', medisch: '', delen: false });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await openDeel(page, 'Als u het zelf niet kunt vertellen');
     await page.waitForSelector('#nood .nkaart', { timeout: 10000 });
     const naProfiel = await page.textContent('#nood .nkaart');
@@ -214,7 +218,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
        zonder tijd, en elke regel wijst naar de app die hem bezit -- want hier
        valt niets af te vinken, en dat hoort zichtbaar te zijn. */
     await api('gewoonten/maak', { naam: 'Even buiten', waarom: 'hoofd leeg' });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await openDeel(page, 'Uw dag');
     await page.waitForFunction(() => /Metoprolol/.test(document.getElementById('dag').textContent),
       { timeout: 15000 });

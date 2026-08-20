@@ -29,6 +29,9 @@ module.exports = function poortwachters(deps) {
   const { remOpDeDeur, opslagPoort, hoofdzekering, inlogpauzePoort } = require('../middleware/remmen');
   const { schakelaars } = require('../middleware/functieschakelaars');
   const { jsonGzip, statischGzip } = require('../middleware/compressie');
+  const { maakDubbeltik } = require('../lib/dubbeltik');
+  const geldwegen = require('./geldwegen');
+  const { maakAuditspoor } = require('./auditspoor');
   const { bureaublad, cspNonce } = require('../middleware/voordeur');
   const { stijlbundel, PAD: stijlbundelPad } = require('../middleware/stijlbundel');
 const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbundel');
@@ -61,6 +64,44 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
     bevoegdVan: deps.bevoegdVan,
     wachter: functiewachter }));
   app.use(jsonGzip());
+
+  /* DE DUBBELTIK, en hij staat hier om een reden die ik eerst fout had.
+
+     Hij moet twee dingen tegelijk: NA express.json() staan (de sleutel mag in
+     het lijf zitten) en VOOR elke route (een herhaling die de route al heeft
+     bereikt, heeft het werk al gedaan). Mijn eerste versie stond daarom in
+     lijfpoort.js, meteen achter de body-parser. Dat leek te kloppen en deed het
+     in de toetsen ook -- maar in de meting bleven negentien routes onbeschermd,
+     en dat waren precies de routes met een GROOT antwoord.
+
+     De oorzaak staat een regel hierboven. jsonGzip() vervangt res.json OOK, en
+     hij doet dat NA de dubbeltik; bij een antwoord boven de kilobyte stuurt hij
+     het via res.send in plaats van via de res.json waar de dubbeltik aan hing.
+     De dubbeltik zag dat antwoord dus nooit, bewaarde niets, en liet de
+     herhaling gewoon opnieuw het werk doen. Zichtbaar was dat nergens: kleine
+     antwoorden werden keurig herhaald, en met curl (dat standaard geen
+     compressie vraagt) deed hij het altijd goed.
+
+     Wie het laatst om res.json heen gaat, ziet het antwoord het eerst. De
+     dubbeltik hoort dus de BUITENSTE wikkel te zijn, en dat is hier: na de
+     compressie en voor alle routers. test/dubbeltikgzip.test.js zet die twee in
+     deze volgorde en eist een herhaling op een antwoord van boven de kilobyte.
+     En mist hij er tocht een, dan zegt hij dat nu hardop (zie dubbeltik.js). */
+  /* WELKE WEGEN OM DE DUBBELTIK HEEN GAAN staat in ./geldwegen.js, met het
+     verhaal erbij: de geldwegen hebben een sterkere, duurzame laag
+     (server/lib/idem.js) en twee wegen onder /api/pay verplaatsen geen geld en
+     horen er juist wel langs. Dat is een beleidsregel en geen bedrading, en hij
+     hoort niet tussen het monteren van middleware te staan. */
+  const dubbeltik = maakDubbeltik({ log, overslaan: (req) => geldwegen.slaOver(req.path) });
+  app.use(dubbeltik.middleware());
+
+  /* HET API-SPOOR. Staat naast de dubbeltik en om dezelfde reden hier: hij moet
+     voor alle routers hangen, zodat er geen route is die er langs kan. Hij
+     noteert NA het antwoord (res.finish), dus hij weet dan wie de route heeft
+     ingelogd en hij houdt de bezoeker nergens mee op. Zie de kop van
+     ./auditspoor.js voor wat er wel en niet in een regel staat. */
+  const auditspoor = maakAuditspoor({ db, save, sessionFor: (t) => sessionFor(t) });
+  app.use(auditspoor.middleware());
 
   let scanNet = null;
   app.use((req, res, next) => (scanNet ? scanNet(req, res, next) : next()));
@@ -113,5 +154,5 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
     }
   }));
 
-  return { functies, functiewachter, rtf, CSP_NONCE, zetScanNet: (n) => { scanNet = n; } };
+  return { functies, functiewachter, rtf, CSP_NONCE, dubbeltik, auditspoor, zetScanNet: (n) => { scanNet = n; } };
 };

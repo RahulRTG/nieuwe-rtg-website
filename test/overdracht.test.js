@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer, stop } = require('./helper');
 const { pakket, KAART } = require('../server/kern/overdracht');
-const { naarBuiten, naarBinnen, STANDAARDEN } = require('../server/kern/koppelvlak');
+const { naarBuiten, naarBinnen, STANDAARDEN, staatVan } = require('../server/kern/koppelvlak');
 
 let srv, base, sch;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-overdracht-'));
@@ -170,17 +170,30 @@ test('een onbevestigde veldnaam reist nooit zonder waarschuwing', () => {
 
   /* En een standaard waarvan de specificatie NOOIT is gelezen, is nooit
      bevestigd -- ook niet als er toevallig geen veld meereist. Anders zou een
-     lege vertaling uit een ongelezen kaart er betrouwbaar uitzien. Edu-API is
-     sinds 20 augustus 2026 de enige die daar nog onder valt. */
-  const leeg = naarBuiten({ zorg: 'x' }, 'eduapi');
-  assert.deepEqual(leeg.velden, {});
-  assert.equal(leeg.bevestigd, false, 'een ongelezen kaart is nooit bevestigd');
-  assert.match(leeg.waarschuwing, /nooit gelezen/i);
+     lege vertaling uit een ongelezen kaart er betrouwbaar uitzien.
 
-  /* Dezelfde regel de andere kant op: inlezen mag net zo min doen alsof. */
-  const binnen = naarBinnen({ 'program.code': 'x' }, 'eduapi');
+     Sinds 20 augustus 2026 zijn alle vier de kaarten nagekeken, dus die regel
+     heeft geen voorbeeld meer in de echte data. Een regel zonder voorbeeld is
+     een regel die je niet hebt zien werken, dus hier krijgt hij er een: een
+     verzonnen kaart die niemand heeft gelezen. */
+  const ongelezen = staatVan({ naam: 'Verzonnen Standaard', gelezen: false,
+    bron: 'niet gelezen; deze kaart bestaat alleen in deze toets' }, []);
+  assert.equal(ongelezen.bevestigd, false, 'een ongelezen kaart is nooit bevestigd');
+  assert.match(ongelezen.waarschuwing, /nooit gelezen/i);
+  assert.deepEqual(ongelezen.onbevestigd, [], 'er reisde geen veld mee en toch is hij niet bevestigd');
+
+  /* En andersom: gelezen plus niets onbevestigds is wel bevestigd, anders zou
+     de vlag altijd op onwaar staan en niets meer zeggen. */
+  const nagekeken = staatVan({ naam: 'Nagekeken Standaard', gelezen: true, bron: 'x' }, []);
+  assert.equal(nagekeken.bevestigd, true);
+  assert.equal(nagekeken.waarschuwing, null);
+
+  /* Dezelfde regel de andere kant op: inlezen mag net zo min doen alsof. Entree
+     draagt nog een onbevestigde veldnaam (displayName), want welke attributen
+     Entree feitelijk stuurt staat op een wiki die hier niet te openen is. */
+  const binnen = naarBinnen({ displayName: 'Iris' }, 'entree');
   assert.equal(binnen.bevestigd, false);
-  assert.deepEqual(binnen.onbevestigd.map(x => x.extern), ['program.code']);
+  assert.deepEqual(binnen.onbevestigd.map(x => x.extern), ['displayName']);
   assert.ok(binnen.bron.length > 20);
 });
 
@@ -240,10 +253,13 @@ test('de kaart en het pakket staan achter de leerlingpoort', async () => {
      zonder bron laat een school denken dat er vier koppelingen klaarliggen. */
   assert.ok(kaart.body.standaarden.every(s => typeof s.bron === 'string' && s.bron.length > 20),
     'de kaart noemt de standaarden zonder te zeggen waar hun veldnamen vandaan komen');
-  /* Drie van de vier specificaties zijn gelezen. Edu-API blijft over: die
-     publiceert niet openbaar en er is geen spiegel. */
-  assert.deepEqual(kaart.body.standaarden.filter(s => !s.gelezen).map(s => s.id), ['eduapi'],
-    'de lijst nagekeken standaarden klopt niet meer');
+  /* Sinds 20 augustus 2026 is elk van de vier tegen zijn eigen specificatie
+     gehouden. Komt er een standaard bij, dan hoort die eerst nagekeken te
+     worden en niet op de kaart te belanden met een werknaam. */
+  assert.deepEqual(kaart.body.standaarden.filter(s => !s.gelezen).map(s => s.id), [],
+    'er staat weer een standaard op de kaart waarvan niemand de specificatie heeft gelezen');
+  assert.ok(kaart.body.standaarden.every(s => /gelezen op|nagekeken/i.test(s.bron)),
+    'een bron die niet zegt wanneer er is gelezen, is geen bron');
   assert.match(kaart.body.uitleg, /geen dossier mee/i);
 
   const l = (await bh('/school/leerling/aanmeld', { naam: 'Iris', geboren: '2016-03-02' })).body;

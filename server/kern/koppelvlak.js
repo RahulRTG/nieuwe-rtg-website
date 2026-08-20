@@ -105,4 +105,10 @@ function naarBinnen(extern, standaard) {
   staatVan(s, onbev));
 }
 
-module.exports = { naarBuiten, naarBinnen, STANDAARDEN };
+/* `staatVan` staat in de uitvoer omdat hij anders niet te beproeven is. Sinds
+   20 augustus 2026 zijn alle vier de kaarten nagekeken, dus de regel "een
+   ongelezen specificatie is nooit bevestigd" heeft geen voorbeeld meer in de
+   echte data -- en een regel zonder voorbeeld is een regel die je niet hebt
+   zien werken. Met een verzonnen kaart is hij wel te beproeven; zie
+   test/overdracht.test.js. */
+module.exports = { naarBuiten, naarBinnen, STANDAARDEN, staatVan };

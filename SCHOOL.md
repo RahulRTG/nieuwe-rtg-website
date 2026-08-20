@@ -838,22 +838,33 @@ blijft staan met wie hem afsloot erbij.
   en waren het niet. Op **19 augustus 2026** is dat nagezocht en gecorrigeerd,
   met dit resultaat:
 
-  Op **20 augustus 2026** is er beter gezocht, en dat leverde twee van de drie
-  alsnog op: Edu-V en OSO publiceren hun specificatie **ook op GitHub**, en dat
-  is hier wel te bereiken. De stand nu:
+  Op **20 augustus 2026** is er beter gezocht, en dat leverde ze **alle drie**
+  alsnog op. Edu-V en OSO publiceren hun specificatie **ook op GitHub**; Edu-API
+  niet, maar de officiele JSON-schema's reizen mee in een npm-pakket
+  (`@universis/eduapi`), en alle dertig dragen een 1EdTech-PURL als `$id`. De
+  stand nu -- **vier van de vier nagekeken**:
 
   | Standaard | Nagekeken? | Wat er is gecorrigeerd |
   |---|---|---|
   | **Entree Federatie** | **ja**, tegen REFEDS eduPerson 202208 v4.4.0 | `eduPersonOrgUnit` bestaat niet (wel `eduPersonOrgUnitDN`, en dat is een organisatieonderdeel en geen klas); `eduPersonAffiliation` is geen opleiding maar een soort persoon (faculty, student, staff, alum, member, affiliate, employee, library-walk-in); eduPerson kent helemaal geen geboortedatum. Alle drie een bevestigde `null` met de reden erbij. |
   | **Edu-V** | **ja**, tegen `students-api.yaml` en `association-api.yaml` | De verzonnen kaart is weg. `dateOfBirth` is bevestigd (alleen binnen de scope `student.demographics`). De naam splitst over `givenName`/`familyNamePrefix`/`familyName`. Klas en opleiding staan **niet op de leerling**: dat zijn een `Group` (`groupType: class`, de stamgroep) en een `Enrollment` (naar `studyOfferingId` + `studyYear`) in de Association API. |
   | **OSO** | **ja**, tegen `common/OSO_gegevensset.xsd` | `groepscode` en `schoolloopbaanlijst` zijn de echte elementen; mijn werknamen `groep` en `overstaphistorie` bestaan niet. `geboortedatum` bleek toevallig goed. De naam splitst over `voornaam` (meervoud), `voorletters-1`, `voorvoegsel`, `achternaam` en `roepnaam`. Een enkelvoudig opleidingveld kent de gegevensset niet. |
-  | **Edu-API** | **nee** | 1EdTech publiceert achter zijn eigen standards-site; op GitHub en npm is niets. Het aangeleverde 1EdTech-document bleek de marketing-onepager: geen veldnamen. Wel bruikbaar als signaal -- Edu-API spreekt van **Classes en Sections**, niet van Groups, dus `group.code` heeft waarschijnlijk al de verkeerde objectnaam. Blijft **onbevestigd**; er komt geen tweede gok voor in de plaats. |
+  | **Edu-API** | **ja**, tegen de officiele JSON-schema's v1.0 | **Alle vier de werknamen waren fout.** `person.dateOfBirth` had een voorvoegsel dat niet bestaat (het is `dateOfBirth` op `Person`); `program.code` wijst naar een object dat de leerling niet draagt (een opleiding is een `Education`/`EducationOffering` met een `primaryCode`, bereikt via een `Enrollment`); `group.code` noemt een objectsoort die Edu-API **helemaal niet kent**. Als enige van de vier heeft Edu-API wel een enkel naamveld: `formattedName` (de ontlede vorm heet `legalName`). |
 
   **Waar ik mee fout zat.** Op 19 augustus schreef ik hier dat Edu-V
   waarschijnlijk helemaal geen leerlingadministratie kent -- afgeleid uit een
   lijst API-namen uit zoekresultaten. Die lijst was onvolledig: er is een
   `students-api.yaml` met een compleet `Student`-object. Een gevolgtrekking uit
   een lijst die je niet zelf hebt gezien, is ook een gok.
+
+  **En Edu-API is het duidelijkste bewijs waarom een werknaam nooit mag blijven
+  staan.** Van de vier gokken bleek er niet een goed. Bovendien kwam er iets uit
+  wat geen enkele gok had opgeleverd: Edu-API is een model voor **hoger
+  onderwijs** -- cursussen, offerings, hoorcolleges en practica. Een
+  **stamgroep**, de klas waar een Nederlands kind het hele jaar in zit, komt er
+  niet in voor. Dat is geen tekortkoming van die standaard maar een verschil in
+  onderwerp, en het staat nu in de kaart in plaats van weggepoetst met een veld
+  dat er toevallig op lijkt.
 
   De regel eronder staat er nog steeds, en die is wat blijft: elk veld draagt
   `bevestigd` of `onbevestigd`, elke standaard draagt een **bron**, en geen
@@ -863,9 +874,15 @@ blijft staan met wie hem afsloot erbij.
   het overzetten een echte fout.
 
   De eerlijke versie van de zin luidt dus: **de vertaling ligt klaar, is los
-  getoetst, en drie van de vier kaarten zijn tegen de specificatie zelf
-  gehouden. Wat aansluiten nog vraagt, zijn sleutels, een contract en een partij
-  aan de andere kant.**
+  getoetst, en alle vier de kaarten zijn tegen de specificatie zelf gehouden.
+  Wat aansluiten nog vraagt, zijn sleutels, een contract en een partij aan de
+  andere kant.**
+
+  Wat blijft staan is de regel eronder, en die is belangrijker dan de vier
+  vinkjes: een ongelezen specificatie is nooit bevestigd. Nu alle vier gelezen
+  zijn, heeft die regel geen voorbeeld meer in de echte data -- dus beproeft
+  `test/overdracht.test.js` hem met een **verzonnen kaart**. Een regel zonder
+  voorbeeld is een regel die je niet hebt zien werken.
 - **Transition Continuity.** Bij een overstap gaat niet "dossier.zip" mee, maar
   per doel: nodig voor inschrijving / nodig voor onderwijscontinuïteit / alleen
   met specifieke toestemming / niet overdraagbaar. **Gebouwd op 19 augustus
@@ -966,9 +983,8 @@ Er is één juiste eerste stap, en het is niet de spannendste.
     tussen twee RTG-scholen (zie §13). Wat er nog niet is: een verbinding met
     een van die externe diensten zelf. Dat is geen vertaalvraag maar een kwestie
     van sleutels, contracten en een partij aan de andere kant. De veldnamen zijn
-    op 20 augustus 2026 wel nagekeken: Entree, Edu-V en OSO tegen hun eigen
-    specificatie, Edu-API blijft **onbevestigd** omdat 1EdTech niet openbaar
-    publiceert. Alles staat met de bron erbij in `kern/koppelvlak-kaarten.js`.
+    op 20 augustus 2026 alle vier nagekeken tegen hun eigen specificatie, met de
+    bron erbij in `kern/koppelvlak-kaarten.js`.
 
 Elke stap krijgt zijn meting uit §7 mee, en elke grens uit §11 wordt door een
 toets bewaakt die iemand heeft zien zakken (LAT-regel 2).

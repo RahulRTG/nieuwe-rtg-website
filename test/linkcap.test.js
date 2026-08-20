@@ -129,6 +129,22 @@ test('de code gaat pas op als de handeling gelukt is', async () => {
   assert.equal(cap.capKijk(B, r.token).status, 404, 'nu is hij op');
 });
 
+test('de handeling ziet alleen wat `neem` doorlaat, nooit de ruwe body', async () => {
+  /* Waarom dit een eigen toets is: een mutatie die `neem` oversloeg en de ruwe
+     body doorgaf, BEET NIET -- de kassacode draagt toevallig dezelfde veldnamen,
+     dus het gedrag bleef gelijk (LAT.md regel 2: afgeslagen is zelf een uitkomst).
+     Wat `neem` werkelijk doet is een sluis zijn: wat een aanvaarder meestuurt komt
+     niet ongezien bij de handeling terecht. Dat is precies wat hier gemeten wordt. */
+  const gezien = [];
+  const { cap } = maak({
+    neem: (ruw) => ({ hoeveel: Math.round(Number(ruw && ruw.hoeveel)) || 1 }),
+    doe: async (x) => { gezien.push(x.invoer); return { klaar: true }; }
+  });
+  const r = cap.capMaak(A, { handeling: 'proef.doen' });
+  await cap.capAanvaard(B, r.token, null, { hoeveel: '7', rommel: 'x', uitgeverKey: 'A' });
+  assert.deepEqual(gezien, [{ hoeveel: 7 }], 'alleen het gekeurde veld, en omgezet');
+});
+
 test('aanvaarden schrijft twee bonnen: de dader en de eigenaar van de code', async () => {
   const { cap, bonnen } = maak();
   const r = cap.capMaak(A, { handeling: 'proef.doen' });
@@ -149,6 +165,17 @@ test('je eigen code aanvaarden kan niet, en een ander mag hem niet intrekken', a
   assert.equal(cap.capTrek(B, r.token).status, 403, 'B trekt de code van A niet in');
   assert.equal(cap.capTrek(A, r.token).ok, true);
   assert.equal(cap.capKijk(B, r.token).status, 404, 'na het intrekken wijst hij niets meer aan');
+  /* En nog een keer intrekken, op een code die er niet meer is. Dat pad raakte
+     GEEN ENKELE toets, en juist daar greep capTrek na een herindeling naar een
+     naam die in het andere bestand stond -- gevonden door regel 50 van de
+     keuring en niet door deze suite. Vandaar deze twee regels. */
+  const weer = cap.capTrek(A, r.token);
+  assert.equal(weer.status, 404);
+  /* Vergeleken met de ANDERE deur, en niet met nog een intrekking: twee
+     uitkomsten van dezelfde functie zijn samen net zo fout als samen goed, en
+     dan meet de regel niets (dat zag ik een mutatie bewijzen). Kijken en
+     intrekken horen over een code die weg is hetzelfde te zeggen. */
+  assert.equal(weer.error, cap.capKijk(A, r.token).error, 'beide deuren, hetzelfde antwoord');
 });
 
 test('verlopen, ingetrokken, opgebruikt en vervalst geven allemaal hetzelfde niets', async () => {

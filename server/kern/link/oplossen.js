@@ -22,7 +22,7 @@ const niets = () => { rem.misserGeteld(); return { ...NIETS }; };
 
 /* Het oplossen zelf, per type -- en elke tak leent de bestaande deur in plaats van
    er een te bouwen. */
-async function onderwerpVan(g, wie, mij) {
+async function onderwerpVan(g, wie, mij, zaakcode) {
   if (g.type === 'persoon') {
     if (!isMens(wie)) return { status: 403, error: 'Deze code hoort bij een mens; alleen een lid kan daar iets mee.' };
     // zelfde geval en zelfde antwoord als in eigenRem hierboven: een demo-pas
@@ -52,15 +52,15 @@ async function onderwerpVan(g, wie, mij) {
     return { onderwerp, band: null };
   }
   if (g.type === 'capability') {
-    /* Alleen een mens, en dat is geen willekeur: elke handeling die vandaag
-       bestaat wordt tussen leden gedaan, en de intentielijst zegt dat ook. Komt
-       er een capability die een zaak mag aanvaarden, dan gaat deze regel open --
-       samen met die van ./intenties.js, en niet een van de twee. */
-    if (!isMens(wie)) return { status: 403, error: 'Deze code is niet voor u bedoeld.' };
-    const r = cap.capKijk({ soort: wie, key: mij }, g.sleutel);
+    /* KIJKEN mag iedereen met een sessie van ons -- een lid, en sinds de
+       kassacode ook een zaak. Wat de scanner ermee KAN, zegt `mag`: dat komt uit
+       de handeling zelf (wie hem mag aanvaarden) en uit zijn eigen rol, en het
+       bepaalt of er een knop verschijnt. Zo staat er nooit een regel die de deur
+       daarna weigert. */
+    const r = cap.capKijk({ soort: wie, key: mij, code: zaakcode }, g.sleutel);
     if (r.error) return { status: r.status, error: r.error };
     if (r.eigen) return { status: 400, error: 'Dat is je eigen code.' };
-    return { onderwerp: r.kaart, band: null };
+    return { onderwerp: r.kaart, band: null, mag: r.mag };
   }
   if (g.type === 'betaalcode') {
     /* Niet opzoeken, met opzet. Of deze code geldig is en van wie hij is, weet de

@@ -19,7 +19,7 @@
    geldige sessie is het 401 -- kern/link/wie.js doet die controle op het token
    zelf en niet op de vorm van de kop. */
 module.exports = (kern) => {
-  const { app, express, auth, geenGast, liveCodename, resolveSession, sessionFor,
+  const { app, express, auth, geenGast, liveCodename, supplierAuth, resolveSession, sessionFor,
           linkLos, linkBonnen, linkCapMaak, linkCapAanvaard, linkCapTrek } = kern;
   const wieScant = require('../kern/link/wie')({ sessionFor, resolveSession });
 
@@ -65,7 +65,10 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     const r = linkCapMaak(alsLid(req), req.body || {});
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
-    res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs, kaart: r.kaart });
+    /* `eigen` is wat alleen de MAKER terugkrijgt en nooit op de kaart van een
+       scanner staat -- bij de kassacode is dat de code van zes tekens, om voor te
+       lezen aan een kassa zonder camera. */
+    res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs, kaart: r.kaart, eigen: r.eigen || undefined });
   });
 
   /* Aanvaarden: kijken deed /api/link/los al, en dat is met opzet een ander
@@ -84,5 +87,25 @@ module.exports = (kern) => {
     const r = linkCapTrek(alsLid(req), req.body && req.body.capcode);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json({ ok: true });
+  });
+
+  /* ---------- de kassakant ----------
+
+     TWEE LOKETTEN VOOR EEN HANDELING, en dat is geen dubbeling maar het gevolg
+     van twee werelden met twee poorten. Een lid komt binnen met `auth`, een zaak
+     met `supplierAuth` -- die laatste eist rol 'supplier', kijkt de zaak na, en
+     draagt de persoonseis van het genre. Wie een kassa langs de ledendeur zou
+     laten, zet die poort uit. Wat er ACHTER de deur gebeurt is bij allebei
+     dezelfde `capAanvaard`; alleen de geloofsbrief verschilt.
+
+     Het bedrag komt hier binnen en niet in de code: de kassacode is een BEGRENSDE
+     opdracht (het lid gaf een maximum af), en wat het werkelijk wordt vult de
+     kassa in. Of dat past, bepaalt kern/pay/kassa.js -- dezelfde functie als bij
+     /api/supplier/pay/in, en de enige die een kassacode verzilvert. */
+  app.post('/api/supplier/link/cap/aanvaard', supplierAuth, async (req, res) => {
+    const zaak = { soort: 'supplier', code: req.supplier.code };
+    const r = await linkCapAanvaard(zaak, req.body && req.body.capcode, null, req.body || {});
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json({ ok: true, kaart: r.kaart, uitkomst: r.uitkomst });
   });
 };

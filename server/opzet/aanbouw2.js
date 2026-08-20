@@ -111,6 +111,9 @@ module.exports = function bouwKernAanTwee(kern, grens) {
     payGate: kern.onboarding && kern.onboarding.payGate,
     schoon: kern.schoon
   }));
+  /* En de tweede: de kassacode, die al bestond en nu een capability IS in plaats
+     van een leesbare code in een QR. De eerste die een ZAAK aanvaardt. */
+  kern.linkHandeling(require('../kern/pay/kassacode')({ pay: kern.pay, schoon: kern.schoon }));
   require('../routes/link')(grens('link'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
   require('../routes/veiligheid')(grens('veiligheid'));

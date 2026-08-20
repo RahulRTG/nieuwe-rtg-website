@@ -52,6 +52,13 @@ function registreer(def) {
   eis(typeof def.lees === 'function', def.id + ': `lees` maakt van de invoer een gebonden opdracht');
   eis(typeof def.beschrijf === 'function', def.id + ': `beschrijf` maakt het bedoelingsscherm');
   eis(typeof def.doe === 'function', def.id + ': `doe` voert hem uit');
+  /* De drie die MOGEN ontbreken, maar geen half werk mogen zijn: `neem` leest
+     wat de aanvaarder zelf invult (een bedrag binnen een maximum), `nog` zegt of
+     datgene waar de code aan hangt nog leeft, en `voorUitgever` is wat alleen de
+     maker terugkrijgt. Staat er iets anders dan een functie, dan is dat een
+     tikfout die anders pas bij het eerste gebruik opvalt. */
+  for (const naam of ['neem', 'nog', 'voorUitgever'])
+    eis(def[naam] === undefined || typeof def[naam] === 'function', def.id + ': `' + naam + '` moet een functie zijn (of ontbreken)');
   register.set(def.id, Object.freeze({ ...def }));
   return def.id;
 }

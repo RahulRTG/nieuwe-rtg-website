@@ -223,24 +223,61 @@ test('de intentielijst hangt aan de SCANNER en niet aan de gescande mens', () =>
   assert.deepEqual(a.map(i => i.id), ['contact.verbinden']);
 });
 
-test('elke intentie wijst naar een weg die echt bestaat', () => {
-  /* Een menuregel zonder route is een belofte in tekst zonder belofte in code
-     (LAT.md regel 6). We lezen de echte routetabel uit de bron. */
-  const paden = new Set();
+/* De routetabel uit de bron: pad -> de poortwachters die ervoor staan. */
+function routetabel() {
+  const paden = new Map();
   (function loop(map) {
     for (const naam of fs.readdirSync(map)) {
       const p = path.join(map, naam);
       if (fs.statSync(p).isDirectory()) { loop(p); continue; }
       if (!naam.endsWith('.js')) continue;
       const bron = fs.readFileSync(p, 'utf8');
-      for (const m of bron.matchAll(/app\.(?:get|post|put|delete|patch)\(\s*['"](\/api\/[^'"]*)['"]/g)) paden.add(m[1]);
+      for (const m of bron.matchAll(/app\.(?:get|post|put|delete|patch)\(\s*['"](\/api\/[^'"]*)['"]\s*,([^)]{0,120})/g))
+        paden.set(m[1], (paden.get(m[1]) || '') + ' ' + m[2]);
     }
   })(path.join(WORTEL, 'server'));
+  return paden;
+}
+
+test('elke intentie wijst naar een weg die echt bestaat', () => {
+  /* Een menuregel zonder route is een belofte in tekst zonder belofte in code
+     (LAT.md regel 6). We lezen de echte routetabel uit de bron. */
+  const paden = routetabel();
   // eerst de meter zelf: vindt de scan te weinig, dan bewijst de rest niets
   assert.ok(paden.size > 500, 'de routescan vindt maar ' + paden.size + ' paden; dan meet deze toets niets');
   for (const c of intenties.CATALOGUS)
     for (const weg of Object.values(c.wegen))
       assert.ok(paden.has(weg), 'intentie ' + c.id + ' wijst naar ' + weg + ', en die route bestaat niet');
+});
+
+test('en die weg staat achter de poort die bij DIE scanner hoort', () => {
+  /* DE TOETS HIERBOVEN WAS NIET GENOEG, en dat bleek bij de kassacode. 'kas.innen'
+     bood een personeelssessie /api/supplier/pay/in aan: die route BESTAAT, dus de
+     vorige toets liet hem door. Alleen staat er supplierAuth voor, en dat eist rol
+     'supplier' -- een personeelssessie komt er nooit langs. Een menuregel die naar
+     een deur wijst die voor jou op slot zit, is net zo goed een belofte zonder weg.
+
+     De regel is eenvoudig: een weg voor een lid staat achter `auth`, een weg voor
+     een zaak achter `supplierAuth`. Wie een rol toevoegt waarvoor dat niet opgaat,
+     moet hier langs. */
+  const POORT = { lid: 'auth', supplier: 'supplierAuth' };
+  const paden = routetabel();
+  let gekeken = 0;
+  for (const c of intenties.CATALOGUS) {
+    for (const [sleutel, weg] of Object.entries(c.wegen)) {
+      const rol = sleutel.split(':')[0];
+      const poort = POORT[rol];
+      assert.ok(poort, 'de rol "' + rol + '" heeft geen bekende poort; vul POORT aan of denk na');
+      const mw = paden.get(weg) || '';
+      /* supplierAuth bevat 'auth' als deeltekst, dus voor een lid kijken we naar
+         het hele woord -- anders keurt deze toets een zaakdeur goed voor een lid. */
+      const heeft = poort === 'auth' ? /\bauth\b/.test(mw) : mw.includes(poort);
+      assert.ok(heeft, 'intentie ' + c.id + ' geeft ' + rol + ' de weg ' + weg +
+        ', maar daar staat geen ' + poort + ' voor (wel: "' + mw.trim() + '")');
+      gekeken++;
+    }
+  }
+  assert.ok(gekeken >= 6, 'er zijn maar ' + gekeken + ' wegen gekeurd; dan meet deze toets te weinig');
 });
 
 test('een zaak scant geen mens, en een lid int geen betaalcode', async () => {

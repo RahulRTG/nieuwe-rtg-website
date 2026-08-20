@@ -21,9 +21,11 @@
    openstaande vraag die een nacht in de database blijft liggen, is precies het
    blijvende ding dat LINK.md par. 3.4 verbiedt.
 
-   WAT HIER NIET GEBEURT: de handeling zelf. `doe` komt uit het domein dat hem
-   bezit (zie ./handelingen.js). Deze laag controleert, laat een mens bevestigen,
-   voert de opdracht van het domein uit en schrijft de bon. */
+   TWEE BESTANDEN, TWEE ONDERWERPEN, dezelfde knip als bij de contactpin. Hier
+   woont het BEZIT: de kluis met openstaande codes, het uitgeven, het intrekken,
+   het opzoeken en de kaart. Het AANVAARDEN staat in ./cap-in.js -- daar staat
+   alles wat een aanvaller raakt, en daar wordt de handeling van het domein
+   uitgevoerd. */
 'use strict';
 
 const rem = require('./rem');
@@ -35,6 +37,19 @@ module.exports = (opties) => {
 const { crypto, dyncodeGeef, codenaamVan, bonSchrijf, handelingen, rate, nu } = opties;
 
 const open = new Map();               // verwijzing -> gebonden opdracht
+
+/* HET ENE ANTWOORD voor alles wat niets oplevert: vreemd, gemanipuleerd,
+   verlopen, opgebruikt, ingetrokken, of het ding eronder is weg. Hij staat hier
+   en gaat mee naar de deur; hij stond even alleen dáár, en toen greep capTrek
+   naar een naam die hij niet had -- niet gevonden door een toets (dat pad raakte
+   er geen), maar door regel 50 van de keuring. */
+const WEG = 'Deze code is verlopen, al gebruikt, of hoort bij niets.';
+
+/* WIE IEMAND IS, in een laag die niet alleen leden bedient. Een lid heeft een
+   sleutel; een zaak heeft een code en geen sleutel. Zonder deze ene functie zou
+   "is dit je eigen code?" en "onder wiens naam komt de bon?" per rol anders
+   worden uitgerekend, en dan klopt er op een dag een van de twee niet. */
+const idVan = (x) => (x && x.key) ? x.key : ((x && x.code) ? x.soort + ':' + x.code : null);
 const klok = typeof nu === 'function' ? nu : () => Date.now();
 const dyn = () => (typeof dyncodeGeef === 'function' ? dyncodeGeef() : null);
 
@@ -92,63 +107,29 @@ function capMaak(uitgever, invoer) {
      tegenhouden is een lid dat er duizend per minuut de wereld in pompt. */
   if (typeof rate === 'function' && !rate(uitgever.key, 'capmaak', 60, UUR))
     return { status: 429, error: 'Te veel codes achter elkaar. Probeer het later opnieuw.' };
-  const opdracht = def.lees(invoer, uitgever);
-  if (!opdracht || opdracht.error) return opdracht || { status: 400, error: 'Deze opdracht kan niet.' };
+  /* Ruimte maken VOOR het lezen, want lezen kan iets kosten. De kassacode maakt
+     in zijn `lees` een echte code aan bij RTG Pay; zouden we daarna pas op de
+     drukte stuiten, dan hebben we een code de wereld in geholpen waar geen enkel
+     token bij hoort -- en die verdringt bij dat lid de code die hij wel had. */
   opruimen();
   if (open.size > MAX_OPEN) return { status: 503, error: 'Even te druk. Probeer het zo opnieuw.' };
+  const opdracht = def.lees(invoer, uitgever);
+  if (!opdracht || opdracht.error) return opdracht || { status: 400, error: 'Deze opdracht kan niet.' };
   const verwijzing = crypto.randomBytes(9).toString('base64url');
-  const cap = { handeling: def.id, uitgeverKey: uitgever.key, uitgeverSoort: uitgever.soort,
-    opdracht, vervalt: klok() + def.ttlMs };
+  const cap = { handeling: def.id, uitgeverId: idVan(uitgever), uitgeverKey: uitgever.key || null,
+    uitgeverSoort: uitgever.soort, opdracht, vervalt: klok() + def.ttlMs };
   open.set(verwijzing, cap);
   const c = d.maak({ soort: 'cap', code: verwijzing, ttlMs: def.ttlMs });
-  return { status: 200, token: c.token, exp: c.exp, ttlMs: c.ttlMs, kaart: kaartVan(cap) };
+  /* Wat alleen de UITGEVER te zien krijgt, en de scanner nooit. De kassacode
+     heeft dat nodig: het lid moet zijn code ook kunnen voorlezen aan een kassa
+     zonder camera, maar diezelfde code op de kaart zetten zou hem aan iedereen
+     geven die scant. */
+  const eigen = typeof def.voorUitgever === 'function' ? def.voorUitgever(opdracht) : null;
+  return { status: 200, token: c.token, exp: c.exp, ttlMs: c.ttlMs, kaart: kaartVan(cap), eigen };
 }
 
 /* Kijken wat er in staat -- en niets doen. De code gaat hier bewust NIET op:
    een blik op de verkeerde code mag die van iemand anders niet verbranden. */
-const WEG = 'Deze code is verlopen, al gebruikt, of hoort bij niets.';
-function capKijk(kijker, token) {
-  const r = losOp(token);
-  if (r.fout === 'geen-codelaag') return { status: 503, error: 'De codelaag draait hier niet.' };
-  if (r.fout) { if (r.mis) rem.misserGeteld(); return { status: 404, error: WEG }; }
-  return { status: 200, kaart: kaartVan(r.cap), eigen: !!(kijker && kijker.key && kijker.key === r.cap.uitgeverKey) };
-}
-
-/* En dan pas uitvoeren. De volgorde is de weg van LINK.md par. 2: controleren,
-   laten bevestigen (dat gebeurde op het scherm, voordat dit loket werd geroepen),
-   uitvoeren, bon.
-
-   DE CODE GAAT PAS OP ALS HET GELUKT IS. Zou hij bij het begin opgaan, dan is een
-   vraag met te weinig saldo een vraag die je niet nog een keer kunt beantwoorden.
-   Tegen dubbel indrukken staat de idempotentiesleutel: het domein krijgt de
-   verwijzing mee en kan er zijn eigen "dit heb ik al gedaan" op zetten. */
-async function capAanvaard(aanvaarder, token, sessie) {
-  const r = losOp(token);
-  if (r.fout === 'geen-codelaag') return { status: 503, error: 'De codelaag draait hier niet.' };
-  if (r.fout) { if (r.mis) rem.misserGeteld(); return { status: 404, error: WEG }; }
-  const def = handelingen.haal(r.cap.handeling);
-  if (!def) return { status: 500, error: 'Deze handeling bestaat niet meer.' };
-  if (!def.aanvaarder.includes(aanvaarder.soort)) return { status: 403, error: 'Deze code is niet voor u bedoeld.' };
-  if (!aanvaarder.key) return { status: 403, error: 'Hier heb je een eigen ledenaccount voor nodig.' };
-  if (aanvaarder.key === r.cap.uitgeverKey) return { status: 400, error: 'Dat is je eigen code.' };
-
-  const kaart = kaartVan(r.cap);
-  const uit = await def.doe({ opdracht: r.cap.opdracht, uitgeverKey: r.cap.uitgeverKey,
-    aanvaarder, sessie, idem: 'cap:' + r.verwijzing });
-  if (!uit || uit.error) return uit || { status: 500, error: 'De handeling gaf geen antwoord.' };
-  if (def.eenmalig) open.delete(r.verwijzing);
-
-  /* Twee bonnen, en dat is hier geen dubbeling. De aanvaarder deed iets (hij
-     bevestigde); de uitgever zag zijn code gebruikt worden -- en dat tweede is
-     precies het signaal waarmee hij merkt dat er een code van hem rondgaat.
-     Dezelfde gedachte als de herkomst bij een verzoek via de contactpin. */
-  bonSchrijf({ wie: aanvaarder.key, type: 'capability', intentie: r.cap.handeling,
-    vorm: 'levend', naar: r.cap.uitgeverKey });
-  bonSchrijf({ wie: r.cap.uitgeverKey, type: 'capability', intentie: r.cap.handeling + '.gebruikt',
-    vorm: 'levend', naar: aanvaarder.key });
-  return { status: 200, ok: true, kaart, uitkomst: uit };
-}
-
 /* Intrekken zolang er niets is gebeurd. Er komt geen bon van: intrekken sluit
    een deur die nooit is doorgelopen, en een bon zonder daad is een bon die niets
    zegt (LINK.md par. 3.6 gaat over het omgekeerde geval -- daar is er wel iets
@@ -156,11 +137,20 @@ async function capAanvaard(aanvaarder, token, sessie) {
 function capTrek(uitgever, token) {
   const r = losOp(token);
   if (r.fout) return { status: 404, error: WEG };
-  if (!uitgever.key || uitgever.key !== r.cap.uitgeverKey)
+  if (!idVan(uitgever) || idVan(uitgever) !== r.cap.uitgeverId)
     return { status: 403, error: 'Deze code is niet van u.' };
   open.delete(r.verwijzing);
   return { status: 200, ok: true };
 }
+
+/* De deur krijgt het gereedschap mee dat hij nodig heeft en raakt de kluis
+   verder niet aan: opzoeken, de kaart maken, weten wie iemand is. */
+/* `verbruik` en niet de Map zelf: de deur mag een code OPGEBRUIKEN, niet in de
+   kluis rondlopen. Dat de deur de Map wel kreeg (en er per ongeluk buiten zijn
+   bereik naar greep) is precies wat er bij de knip misging -- het opgaan van een
+   eenmalige code deed niets meer, en test/linkcap.test.js zag het meteen. */
+const verbruik = (verwijzing) => open.delete(verwijzing);
+const { capKijk, capAanvaard } = require('./cap-in')({ losOp, kaartVan, idVan, verbruik, handelingen, bonSchrijf, WEG });
 
 return { capMaak, capKijk, capAanvaard, capTrek, capOpen: open, capHandelingen: handelingen.alle };
 };

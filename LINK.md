@@ -245,12 +245,31 @@ paden verhuizen er per stuk naartoe.
    KYC-poort als `/api/pay/stuur` — een tweede deur naar hetzelfde geld zonder
    die poort zou een omweg om die poort heen zijn.
 
-   **Wat hierna hoort te verhuizen: de kascode.** `pay.kasCode` + `kasInt` is in
-   alles al een capability (een lid geeft een code af, de kassa verzilvert hem
-   tot een maximum) behalve in naam, met een eigen levensduur en een eigen deur.
-   Dat is de volgende migratie, en het is meteen de eerste capability die een
-   ZAAK mag aanvaarden — waarvoor zowel de rol in het register als de regel in
-   `intenties.js` open moet, en niet één van de twee.
+   **De kascode is verhuisd** (`kern/pay/kassacode.js`, dezelfde dag). Hij was in
+   alles al een capability — gebonden, begrensd, eenmalig, kort houdbaar —
+   behalve in naam. Wat veranderde is de **drager**: in de QR stond de code zelf
+   (`A1B2C3`), dus wie het scherm fotografeerde kon hem overtypen aan een andere
+   RTG-kassa; nu staat er een ondertekende verwijzing in en ziet de kassa eerst
+   een kaart (wie betaalt, tot welk bedrag). Het innen blijft `kasInt`: er is
+   geen tweede plek waar een kassacode wordt verzilverd.
+
+   Dit is de eerste capability die een **zaak** aanvaardt, en dat raakte drie
+   dingen die het eens moeten zijn: de rol in het register, de weg in
+   `intenties.js`, en een eigen loket achter `supplierAuth`
+   (`/api/supplier/link/cap/aanvaard`) — een kassa heeft geen ledensessie. Twee
+   dingen die daarbij zijn bijgekomen: een capability kan nu **invoer van de
+   aanvaarder** aannemen (het bedrag, binnen het maximum dat het lid afgaf), en
+   een handeling kan zeggen of datgene waar de code aan hangt **nog leeft** —
+   RTG Pay houdt per lid één code actief, dus een verse verdringt de vorige, en
+   dat hoort de kassa te weten vóórdat hij een bedrag intikt.
+
+   Wat de verhuizing **niet** deed, en dat hoort er eerlijk bij: de code van zes
+   tekens staat nog gewoon op het scherm (voor een kassa zonder camera lees je
+   hem voor) en de contactloze afgifte draagt hem ook nog — dat is een handeling
+   van dichtbij, geen beeld dat je van een afstand fotografeert. En er is nog
+   **geen kassascherm** dat deze weg gebruikt: het loket staat open en is
+   getoetst, maar in `public/apps/` bestaat vandaag geen enkele knop die
+   `/api/supplier/pay/in` of de nieuwe deur aanroept. Die kant komt met stap 4.
 3. **Het bedoelingsscherm.** Eén component, in de huisstijl: wie, wat, waarom,
    hoe lang, welke gegevens, en één bevestigknop.
 4. **RTG Scan.** Eén scherm in de leden-app dat op de resolver leunt, met de

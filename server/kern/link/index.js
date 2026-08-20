@@ -99,11 +99,11 @@ async function los(scanner, tekst) {
   if (rem.deurDicht())
     return { status: 429, error: 'Het oplossen van codes ligt even stil. Probeer het zo opnieuw.' };
 
-  const uit = await onderwerpVan(g, wie, mij);
+  const uit = await onderwerpVan(g, wie, mij, scanner && scanner.code);
   if (uit.error) return uit;
   return { status: 200, type: g.type, wat: (TYPES[g.type] || {}).wat, vorm: g.vorm,
     onderwerp: uit.onderwerp,
-    intenties: intenties.voor({ type: g.type, scanner: wie, vorm: g.vorm, band: uit.band }) };
+    intenties: intenties.voor({ type: g.type, scanner: wie, vorm: g.vorm, band: uit.band, mag: uit.mag }) };
 }
 
 /* De rem die aan de VRAGER hangt, voor het ene geval waar er een is. Geeft een

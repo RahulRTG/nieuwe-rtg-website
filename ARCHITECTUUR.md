@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3995 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3996 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3995 |
-| servermodules (`server/**/*.js`) | 2209 |
+| API-endpoints | 3996 |
+| servermodules (`server/**/*.js`) | 2211 |
 | routebestanden (`server/routes/**`) | 457 |
-| kernmodules (`server/kern/**`) | 1349 |
+| kernmodules (`server/kern/**`) | 1351 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 223 |
-| toetsbestanden (`test/*.test.js`) | 907 |
+| toetsbestanden (`test/*.test.js`) | 908 |
 | schermtoetsen (`test/*.e2e.js`) | 126 |
 
 ## 2. De weg van een verzoek
@@ -117,7 +117,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2262 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2263 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -139,7 +139,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(171) auth(105) supplierAuth(55) officeAuth(36) db(35) status(27) liveCodename(26)
+app(171) auth(105) supplierAuth(56) officeAuth(36) db(35) status(27) liveCodename(26)
 accounts(23) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
 boardroomWie(11) geenGast(11) crypto(11) anthropic(11) tooManyTries(10) express(10)
 findSupplier(10) rtmail(10) gegevensStop(9) payrollOS(9) keyVanCodenaam(9)

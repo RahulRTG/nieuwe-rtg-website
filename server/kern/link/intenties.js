@@ -86,7 +86,20 @@ const CATALOGUS = [
     tekst: 'Bekijken en bevestigen',
     uitleg: 'Je ziet eerst wat er gebeurt.',
     methode: 'POST',
-    wegen: { 'lid:levend': '/api/link/cap/aanvaard' }
+    /* `magVereist` betekent: laat deze regel alleen zien als de laag zegt dat
+       deze scanner deze handeling MAG aanvaarden. Zonder die vlag zou een kassa
+       die de betaalcode van een lid scant "bevestigen" te zien krijgen en dan
+       een weigering -- een belofte zonder weg (LAT.md regel 6).
+
+       En nee, dit breekt par. 3.1 niet. Die regel gaat over eigenschappen van de
+       ANDER; `mag` komt uit de rol van de scanner zelf en uit de code die hij op
+       dat moment vasthoudt. Er zit niets van een derde in. */
+    magVereist: true,
+    wegen: { 'lid:levend': '/api/link/cap/aanvaard',
+             /* De kassa heeft geen ledensessie en komt langs zijn eigen poort
+                binnen; zie de kop van kern/pay/kassacode.js voor de drie plekken
+                die het over die rol eens moeten zijn. */
+             'supplier:levend': '/api/supplier/link/cap/aanvaard' }
   },
   {
     /* De kassakant: een lid toont zijn betaalcode, de ZAAK int hem. Andersom kan
@@ -97,8 +110,13 @@ const CATALOGUS = [
     tekst: 'Innen aan de kassa',
     uitleg: 'De code van dit lid verzilveren.',
     methode: 'POST',
-    wegen: { 'supplier:vast': '/api/supplier/pay/in', 'supplier:levend': '/api/supplier/pay/in',
-             'staff:vast': '/api/supplier/pay/in', 'staff:levend': '/api/supplier/pay/in' }
+    /* GEEN 'staff', EN DAT WAS EEN FOUT VAN DE VORIGE PLAK. Hij stond er wel, en
+       de toets die elke weg naast de routetabel legt liet hem door: de route
+       BESTAAT immers. Alleen komt een personeelssessie er niet langs -- dat
+       loket staat achter supplierAuth, en dat eist rol 'supplier'. Een menuregel
+       die naar een deur wijst die voor jou op slot zit, is net zo goed een
+       belofte zonder weg. De toets kijkt nu ook naar de poort. */
+    wegen: { 'supplier:vast': '/api/supplier/pay/in', 'supplier:levend': '/api/supplier/pay/in' }
   }
 ];
 
@@ -108,12 +126,13 @@ const CATALOGUS = [
    band mag null zijn (bij een type waar geen band bestaat, zoals een tafel). Een
    regel die een band EIST, valt dan weg -- niet omdat de ander iets niet heeft,
    maar omdat de vraag niet bestaat. */
-function voor({ type, scanner, vorm, band }) {
+function voor({ type, scanner, vorm, band, mag }) {
   const sleutel = String(scanner || '') + ':' + String(vorm || 'vast');
   const uit = [];
   for (const c of CATALOGUS) {
     if (c.type !== type) continue;
     if (c.band && !c.band.includes(band == null ? 'geen' : band)) continue;
+    if (c.magVereist && mag !== true) continue;
     const weg = c.wegen[sleutel];
     if (!weg) continue;                   // deze scanner heeft hier geen weg voor
     uit.push({ id: c.id, tekst: c.tekst, uitleg: c.uitleg, methode: c.methode, weg });

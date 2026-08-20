@@ -100,8 +100,13 @@ module.exports = (ctx) => {
       return { stand: 'oranje', zin: 'Deze pas stond hier niet binnen.', pas: oordeel.pas, plek: oordeel.plek, telplek: tel };
     }
 
+    /* DE STAND STAAT NIET IN DE ZIN. Het scherm toont "GROEN" al als het
+       grootste element dat er is; het woord hier nog eens herhalen levert
+       "GROEN / GROEN -- GAST -- Poort Noord" op, en erger: twee plekken die
+       dezelfde uitkomst beweren (LAT-regel 4). De zin draagt dus alleen wat de
+       stand NIET zegt -- wat voor pas het is en waar hij binnenkomt. */
     const zin = richting === 'in'
-      ? 'GROEN -- ' + oordeel.pas.soort.toUpperCase() + ' -- ' + oordeel.plek.naam
+      ? oordeel.pas.soort.toUpperCase() + ' \u00b7 ' + oordeel.plek.naam
       : 'Uitgescand.';
     return zetScan(e, oordeel, d, richting, 'groen', zin, tel);
   }

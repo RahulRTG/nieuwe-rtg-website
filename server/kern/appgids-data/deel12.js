@@ -3,6 +3,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/festival-poort.html': G('De poort van een festival: scannen, en de reden erbij als het nee is.',
+    ['Kies de poort waar u staat; het veld houdt zelf de focus, zodat een handscanner gewoon werkt',
+      'Lees de uitslag aan het WOORD en het teken; kleur is de derde laag en verdwijnt in de zon',
+      'Zonder verbinding heet een scan ONBEVESTIGD en gaat hij in de wachtrij, nooit groen'],
+    'Oranje is zelden fraude: iemand liep terug naar zijn auto, of een hek stond even offline. Er staat bij waar en hoe laat de eerste scan was, zodat u het kunt vragen in plaats van te weigeren.'),
   '/apps/arrival.html': G('Invisible Arrival: een tijdelijke gastpas waarmee een zaak uw komst kan voorbereiden zonder uw route of GPS te volgen.',
     ['Vertel Rahul het moment, gezelschap en alleen de wensen die voor dit bezoek nodig zijn',
       'Controleer het voorstel voordat u de aanvraag verstuurt',

@@ -250,6 +250,7 @@ function opKleur(hex) {
       /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
          envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
          component en niet bij het toeval van zijn inhoud. */
+      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
         'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
       '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:0;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +

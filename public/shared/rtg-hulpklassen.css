@@ -128,3 +128,9 @@
 .h-rek5 { flex: 1 !important; min-width: 5rem !important; }
 .h-rek8 { flex: 1 !important; min-width: 8rem !important; }
 .h-rek9-2 { flex: 2 !important; min-width: 9rem !important; }
+
+/* Een link op een donkere grond: wit, want bordeaux is een accent en geen
+   tekstkleur (CLAUDE.md). Op de schoolpartner-grond haalde bordeaux 2,84:1
+   en wit 14,67:1; de eis is 4,5. De onderstreping blijft, anders is het
+   geen link meer maar tekst met een pijl erachter. */
+.h-witlink { color: #fff !important; text-decoration: underline !important; }

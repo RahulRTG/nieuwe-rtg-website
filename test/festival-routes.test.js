@@ -44,6 +44,8 @@
   17. De ledenkant: een groep maken en meedoen met een code.
   18. Een niet-lid leest de stand niet.
   19. De codenaam komt uit de sessie; het lichaam mag hem niet zetten.
+  20. Het rooster maken is managerwerk; het lezen doet iedereen over zichzelf.
+  21. Wie de dienst van is komt uit de sessie: je leest die van een collega niet.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -383,6 +385,42 @@ test('19. de codenaam komt uit de sessie; het lichaam mag hem niet zetten', asyn
   assert.equal(na.leden.length, 1, 'A staat er nog gewoon in');
 });
 
+test('20. het rooster maken is managerwerk; het lezen doet iedereen', async () => {
+  const roster = await post('/api/supplier/roster', { code: 'ESVEDRA' });
+  const deurNaam = roster.staff.find(x => x.role !== 'manager').name;
+  const terrein = (await post('/api/festival/plek', { festival: fid, editie: eid,
+    naam: 'Bar Lima', soort: 'bar', ouder: terreinId }, manager)).plek;
+
+  assert.equal((await api('/api/festival/dienst', { festival: fid, editie: eid, dag: vandaagId,
+    plek: terrein.id, wie: deurNaam, van: '00:00', tot: '23:00' }, deur)).status, 403);
+
+  const gezet = await post('/api/festival/dienst', { festival: fid, editie: eid, dag: vandaagId,
+    plek: terrein.id, wie: deurNaam, van: '00:00', tot: '23:00', rol: 'Bar', briefing: 'Bekers bij B12' }, manager);
+  assert.equal(gezet.ok, true);
+
+  const rooster = await post('/api/festival/diensten', { festival: fid, editie: eid, dag: vandaagId }, deur);
+  assert.equal(rooster.diensten.length, 1, 'het hele rooster lezen mag wel');
+});
+
+test('21. wie de dienst van is komt uit de sessie', async () => {
+  /* Het personeelslid ziet zijn eigen dienst... */
+  const mijne = await post('/api/festival/dienst/mijn', { festival: fid, editie: eid }, deur);
+  assert.equal(mijne.ok, true);
+  assert.ok(mijne.nu, 'de dienst loopt nu');
+  assert.equal(mijne.nu.plek, 'Bar Lima');
+  assert.equal(mijne.nu.briefing, 'Bekers bij B12');
+
+  /* ...en de MANAGER, die niet is ingeroosterd, ziet niets -- ook niet als hij
+     de naam van het personeelslid meestuurt. Zou `wie` uit het lichaam komen,
+     dan leest iedereen de briefing en de collega's van een ander. */
+  const roster = await post('/api/supplier/roster', { code: 'ESVEDRA' });
+  const deurNaam = roster.staff.find(x => x.role !== 'manager').name;
+  const alsof = await post('/api/festival/dienst/mijn',
+    { festival: fid, editie: eid, wie: deurNaam }, manager);
+  assert.equal(alsof.ok, true);
+  assert.equal(alsof.nu, null, 'de manager staat niet ingeroosterd, wat hij ook meestuurt');
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -453,7 +491,12 @@ test('19. de codenaam komt uit de sessie; het lichaam mag hem niet zetten', asyn
       uit de reservering.
       -> toets 15 zakte: de koper bepaalde zelf wat hij betaalde.
 
-  13. In routes/festival/groep.js de codenaam uit de body laten komen in plaats
+  13. In routes/festival/dienst.js `wie` uit de body laten komen in plaats van
+      uit req.actor.
+      -> toets 21 zakte: de manager las de dienst van een personeelslid,
+         inclusief zijn briefing en met wie hij staat.
+
+  14. In routes/festival/groep.js de codenaam uit de body laten komen in plaats
       van uit liveCodename(req.session).
       -> toets 19 zakte: lid B las de groep van lid A en kon hem eruit zetten.
          Dit is dezelfde fout als de klok en de zaakcode, en hier weegt hij het

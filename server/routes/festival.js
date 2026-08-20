@@ -151,6 +151,7 @@ module.exports = (kern) => {
   require('./festival/gereed')(kern, { mijn, editieVan, geenFestival, stuur });
   require('./festival/partner')(kern, { mijn, editieVan, geenFestival, stuur });
   require('./festival/verkoop')(kern, { mijn, editieVan, geenFestival, stuur });
+  require('./festival/dienst')(kern, { mijn, editieVan, geenFestival, stuur });
   /* De ledenkant staat los: een groep is tussen gasten en kent geen eigenaar
      van het festival, dus hij krijgt de deur-hulpjes hierboven niet mee. */
   require('./festival/groep')(kern);

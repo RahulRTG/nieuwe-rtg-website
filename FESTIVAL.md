@@ -389,8 +389,24 @@ hebben.
    indient tekent niet af, en honderd procent van nul bestaat niet. Afzwakken
    van een kritieke control mag — RTG is hier geen juridische autoriteit — maar
    het staat in de uitslag.
-4. **Crew.** Zero-search: dienst openen, route, briefing, één knop. Bovenop het
-   bestaande rooster, niet ernaast.
+4. **Crew.** ✅ Zero-search: `kern/festival/dienst.js` beantwoordt één vraag —
+   *wat is er van mij, nu?* Waar, tot hoe laat, de weg erheen als keten van
+   plekken ("Terrein › Weide › Bar Lima"), wie er met je staat, je pauze en je
+   briefing. Het is het eerste blad van het scherm, want de meeste mensen die
+   het openen komen werken en willen weten waar ze heen moeten.
+
+   **Wat er níét bij komt is de helft van het ontwerp.** Geen tweede klok —
+   in- en uitklokken hoort in `kern/personeel.js` en twee klokken geven twee
+   urenstaten, waarvan er één niet klopt bij de loonrun. Geen tweede
+   beveiligingsrooster — dat staat in `kern/beveiliging/` en wordt gelézen via
+   een partnerband. En geen score op een mens: geen stiptheidscijfer, geen
+   ranglijst. Toets 8 legt de vórm van het antwoord vast, zodat zoiets er niet
+   stil bij kan komen.
+
+   Wat er wél wordt afgedwongen: niemand staat op twee plekken tegelijk, ook
+   niet over middernacht heen. Een rooster waarin dat kan is geen rooster maar
+   een verlanglijst — en op de dag zelf staat er dan een bar zonder mensen
+   terwijl het rooster groen is.
 5. **Commerce.** ✅ Producten met een voorraad, bundels die de voorraad van hun
    onderdelen verbruiken, verkopen in twee stappen, en groepen.
    `kern/festival/{product,bundel,verkoop,groep}.js`

@@ -106,7 +106,8 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 
   <aside class="rv-bank">
     <nav aria-label="RTG Festival">
-      <button class="actief" data-blad="poort"><span class="rv-icoon">⌾</span><span>Poort</span></button>
+      <button class="actief" data-blad="dienst"><span class="rv-icoon">◐</span><span>Dienst</span></button>
+      <button data-blad="poort"><span class="rv-icoon">⌾</span><span>Poort</span></button>
       <button data-blad="beeld"><span class="rv-icoon">◉</span><span>Beeld</span></button>
       <button data-blad="terrein"><span class="rv-icoon">◫</span><span>Terrein</span></button>
       <button data-blad="gereed"><span class="rv-icoon">⌸</span><span>Gereed</span></button>
@@ -125,7 +126,17 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 
     <section class="rv-panes" id="fpPanes">
 
-      <div class="rv-pane actief" id="bladPoort">
+      <div class="rv-pane actief" id="bladDienst">
+        <div class="fp-blad">
+          <div class="rv-ey" id="dienstEy">MIJN DIENST</div>
+          <h1 id="dienstKop">Even kijken...</h1>
+          <p class="fp-stil" id="dienstWeg"></p>
+          <div class="fp-lijst" id="dienstLijst"></div>
+          <p class="fp-stil" id="dienstStraks"></p>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladPoort" hidden>
         <div class="fp-poort">
           <div class="fp-kop">
             <select id="kiesPlek" aria-label="Bij welke poort staat u"></select>
@@ -266,6 +277,19 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
             </div>
             <div class="fp-lijst" id="prodLijst"></div>
 
+            <h2 class="fp-h2">Diensten</h2>
+            <div class="fp-form">
+              <select class="veld" id="dnDag" aria-label="Op welke dag"></select>
+              <select class="veld" id="dnPlek" aria-label="Op welke plek"></select>
+              <input class="veld" id="dnWie" maxlength="60" placeholder="Wie" aria-label="Wie draait de dienst">
+              <input class="veld" id="dnVan" maxlength="5" placeholder="Van uu:mm" aria-label="Begintijd">
+              <input class="veld" id="dnTot" maxlength="5" placeholder="Tot uu:mm" aria-label="Eindtijd">
+              <input class="veld" id="dnRol" maxlength="40" placeholder="Rol" aria-label="Rol">
+              <input class="veld" id="dnBrief" maxlength="200" placeholder="Briefing" aria-label="Briefing">
+              <button class="knop" type="button" id="dnZet">Dienst erbij</button>
+            </div>
+            <div class="fp-lijst" id="dnLijst"></div>
+
             <h2 class="fp-h2">Keuring</h2>
             <div class="fp-form">
               <button class="knop" type="button" id="ctlSeed">Zet de startlijst controls klaar</button>
@@ -289,6 +313,7 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 </div>
 
 <script src="/apps/festival/schil.js" defer></script>
+<script src="/apps/festival/dienst.js" defer></script>
 <script src="/apps/festival/poort.js" defer></script>
 <script src="/apps/festival/beeld.js" defer></script>
 <script src="/apps/festival/gereed.js" defer></script>

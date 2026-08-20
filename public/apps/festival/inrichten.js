@@ -75,6 +75,11 @@
     var ouders = F.staat.plekken.filter(function (p) { return !(p.rol && p.rol.poort); })
       .map(function (p) { return { value: p.id, tekst: p.naam }; });
     vulKeuze($('#plekOuder'), ouders, 'geen (dit is het terrein)');
+    /* De plekkeuze van de DIENSTEN hoort hier ook bij: hij liep eerst alleen
+       mee bij het openen van het blad, dus een plek die je er net bij zette
+       stond niet in de lijst waar je hem meteen voor nodig had. Elke lijst die
+       het terrein toont, wordt bijgewerkt waar het terrein verandert. */
+    vulKeuze($('#dnPlek'), F.staat.plekken.map(function (p) { return { value: p.id, tekst: p.naam }; }));
     F.staat.plekken.forEach(function (p) {
       regel(lijst, p.naam + ' · ' + p.soort + (p.besloten ? ' · besloten' : ''),
         p.capaciteit ? p.veiligeCapaciteit + ' veilig van ' + p.capaciteit : 'geen capaciteit');
@@ -94,6 +99,7 @@
   function tekenDagen(dagen) {
     var lijst = $('#dagLijst');
     lijst.textContent = '';
+    vulKeuze($('#dnDag'), (dagen || []).map(function (d) { return { value: d.id, tekst: d.datum }; }));
     (dagen || []).forEach(function (d) {
       regel(lijst, d.datum, d.open + ' tot ' + d.sluit + (d.curfew ? ' · curfew ' + d.curfew : ''));
     });
@@ -124,6 +130,20 @@
       });
   }
 
+  function herlaadDiensten() {
+    var dagId = $('#dnDag').value;
+    if (!dagId) { $('#dnLijst').textContent = ''; return Promise.resolve(); }
+    return F.api('/api/festival/diensten', { festival: F.staat.fid, editie: F.staat.eid, dag: dagId })
+      .then(function (r) {
+        var lijst = $('#dnLijst');
+        lijst.textContent = '';
+        ((r.body || {}).diensten || []).forEach(function (d) {
+          regel(lijst, d.wie + ' · ' + (d.plekNaam || '?') + (d.rol ? ' · ' + d.rol : ''),
+            d.van + '-' + d.tot);
+        });
+      });
+  }
+
   function vulAlles() {
     var er = !!F.staat.fid;
     $('#inrStart').hidden = er;
@@ -135,6 +155,8 @@
     vulKeuze($('#prtRol'), ROLLEN);
     tekenTerrein();
     tekenDagen(F.staat.dagen);
+    vulKeuze($('#dnDag'), (F.staat.dagen || []).map(function (d) { return { value: d.id, tekst: d.datum }; }));
+    herlaadDiensten();
     herlaadProducten();
     herlaadPartners();
   }
@@ -177,6 +199,14 @@
       rechten: recht ? [{ soort: recht }] : [] },
       function () { $('#prodNaam').value = ''; herlaadProducten(); });
   });
+
+  $('#dnZet').addEventListener('click', function () {
+    doe('/api/festival/dienst', { dag: $('#dnDag').value, plek: $('#dnPlek').value,
+      wie: $('#dnWie').value.trim(), van: $('#dnVan').value.trim(), tot: $('#dnTot').value.trim(),
+      rol: $('#dnRol').value.trim() || null, briefing: $('#dnBrief').value.trim() || null },
+      function () { $('#dnWie').value = ''; herlaadDiensten(); });
+  });
+  $('#dnDag').addEventListener('change', herlaadDiensten);
 
   $('#ctlSeed').addEventListener('click', function () {
     doe('/api/festival/controls/seed', {}, function (b) { meld(b.aantal + ' controls klaargezet.'); });

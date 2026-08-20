@@ -13,6 +13,7 @@
      ./bezetting.js     tellen     hoeveel mensen waar, en hoe snel erbij
      ./bundel.js        rekenen    de keten van een product en de ruimte erin
      ./verkoop.js       verkopen   reserveren, loslaten en rondmaken
+     ./dienst.js        de ploeg   wie waar staat; geen tweede klok, geen score
      ./groep.js         samen      een groep gasten; RTG verstuurt hier niets
      ./partner.js       banden     een band die beide kanten sluiten
      ./signalen.js      van buiten wat andere domeinen al bijhouden
@@ -61,6 +62,7 @@ module.exports = (ctx) => {
      na ./rechten.js, want de verkoop geeft passen uit. */
   Object.assign(k, require('./bundel')(k));
   Object.assign(k, require('./verkoop')(k));
+  Object.assign(k, require('./dienst')(k));
   Object.assign(k, require('./groep')(k));
   Object.assign(k, require('./partner')(k));
   Object.assign(k, require('./signalen')(k));

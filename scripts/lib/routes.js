@@ -69,10 +69,27 @@ function loopMap(map, filter, doe) {
 let _kaart = null;
 function routekaart() {
   if (_kaart) return _kaart;
-  const uit = execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
-    { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
+  let uit;
+  try {
+    uit = execFileSync(process.execPath,
+      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+      { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
+        stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
+  } catch (e) {
+    /* DE REDEN MEE NAAR BOVEN. Hier stond stderr op 'ignore', en toen dit
+       kindproces een keer omviel tijdens de volle suite las de toets alleen
+       "Command failed: node ... routekaart.js --json". Dat is geen bevinding
+       maar een raadsel: je weet niet of de app niet startte, of de poort bezet
+       was, of het geheugen op was. Een meter die zakt hoort te zeggen waarom
+       (LAT.md regel 3), en dat kost hier een pipe en vier regels. */
+    const fout = new Error('de routekaart kon niet worden opgehaald: ' + e.message +
+      (e.status != null ? ' (afsluitcode ' + e.status + ')' : '') +
+      (e.signal ? ' (signaal ' + e.signal + ')' : '') +
+      '\n--- stderr van het kindproces ---\n' +
+      (String(e.stderr || '').trim().slice(-4000) || '(leeg -- het kind heeft niets gezegd)'));
+    fout.oorzaak = e;
+    throw fout;
+  }
   _kaart = JSON.parse(uit);
   if (!Array.isArray(_kaart.routes) || _kaart.routes.length < 100) {
     /* Een halve kaart is erger dan geen kaart: dan meten vier proeven een

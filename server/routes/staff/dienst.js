@@ -1,7 +1,13 @@
 /* Staff (deelmodule): de dienstlaag: Fluister voor de vloer (eigen geheugen
-   per personeelslid), in- en uitklokken, het eigen overzicht, verlof en
-   ziekmelden en de vertrouwenspersoon. Krijgt de gedeelde context een keer
-   bij het opstarten vanuit routes/staff.js. */
+   per personeelslid), het eigen overzicht, verlof en ziekmelden en de
+   vertrouwenspersoon. Krijgt de gedeelde context een keer bij het opstarten
+   vanuit routes/staff.js.
+
+   IN- EN UITKLOKKEN STAAT IN ./dienst-klok.js. Die knip kwam toen dit bestand
+   over de leesgrens ging, en de naad lag er al: hier staat wat er gebeurt als je
+   er NIET bent (verlof, ziek, wat kan ik nog wel, de vertrouwenspersoon), daar
+   staat wat er gebeurt als je er WEL bent (de klok, de pauze, en sinds
+   PLAATS.md fase 2 de aanwezigheid bij het hek van de zaak). */
 module.exports = (actx) => {
   const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
     /* payrollOS: een ziekmelding heeft twee kanten. De bezetting van vandaag
@@ -9,55 +15,15 @@ module.exports = (actx) => {
        stond gebouwd en werd door niets aangeroepen: de loonrun wist niet dat
        iemand ziek was. Hij mag ontbreken (een kaal testproces mount de loonlaag
        niet), dus elke aanroep hieronder controleert dat. */
-    payrollOS } = actx;
+    payrollOS, plaats, codenaamVan } = actx;
   const fluister = actx.fluister;
   const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = fluister;
 /* Fluister voor de vloer staat in ./dienst-fluister.js: dat stuk praat met een
    modelaanbieder en de rest van deze laag niet, dus de vraag wat er naar buiten
    gaat hoort daar bij elkaar. */
 require('./dienst-fluister')({ app, accounts, supplierAuth, fluister, stuurLus });
-
-app.post('/api/staff/clock', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
-  const open = lijst.find(e => e.staffId === req.actor.staffId && !e.out);
-  let actie;
-  if (open) { open.out = new Date().toISOString(); actie = 'uit'; }
-  else { lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId: req.actor.staffId, name: req.actor.name, in: new Date().toISOString(), out: null }); actie = 'in'; }
-  db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'klokte ' + actie);
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
-  res.json({ ok: true, actie, klok: klokVan(req.supplier.code, req.actor.staffId) });
-});
-
-/* PAUZE. Zolang je ingeklokt staat houdt het werkbeleid van je werkgever
-   functies dicht (kern/lidboard/werkbeleid.js). In je pauze niet: dan is je
-   pas weer van jou. De armslag is 45 minuten per dienst, samen voor alle
-   pauzes -- de rookpauze en de grote pauze komen uit dezelfde pot.
-
-   Wat hier NIET gebeurt: meten wat je in die minuten doet. De teller loopt op
-   pauzeminuten, punt. Zou hij op je gebruik van De Salon lopen, dan hield dit
-   systeem precies bij hoeveel minuten je op sociale media zat, en dat is de
-   meting waar dat hele beleid tegen beschermt.
-
-   Pauze nemen mag altijd, ook als de 45 minuten op zijn: je pauzerecht is niet
-   van RTG. Wat er dan gebeurt is alleen dat het beleid weer geldt. */
-app.post('/api/staff/pauze', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const lijst = db.data.klok[req.supplier.code] = db.data.klok[req.supplier.code] || [];
-  const dienst = Array.isArray(lijst) ? lijst.find(e => e.staffId === req.actor.staffId && e.in && !e.out) : null;
-  if (!dienst) return res.status(409).json({ error: 'Je staat niet ingeklokt; een pauze hoort bij een dienst.' });
-  dienst.pauzes = dienst.pauzes || [];
-  const open = dienst.pauzes.find(p => p && p.in && !p.uit);
-  let actie;
-  if (open) { open.uit = new Date().toISOString(); actie = 'uit'; }
-  else { dienst.pauzes.push({ in: new Date().toISOString(), uit: null }); actie = 'in'; }
-  save();
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
-  const stand = werkbeleidPauzeStand(req.supplier.code, req.actor.staffId);
-  res.json({ ok: true, actie, pauze: stand, budgetMinuten: WERKBELEID_PAUZE_MINUTEN });
-});
+// de klok, de pauze en de aanwezigheid: zie de kop hierboven
+require('./dienst-klok')(actx);
 
 app.post('/api/staff/mine', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });

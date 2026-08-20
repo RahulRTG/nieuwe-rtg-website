@@ -76,6 +76,9 @@
 
 <script src="sessie.js"></script>
 <script src="/apps/geo.js"></script>
+<!-- plek.js hoort bij geo.js: zonder dit script kan Geo.vraag() de vraag niet
+     stellen en blijft de knop "Dichtstbij eerst" stil niets doen. -->
+<script src="/shared/plek.js" defer></script>
 <script src="/apps/translate.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
@@ -295,10 +298,20 @@ Sessie.ophalen().then(d=>{
   // afstand tonen: eerder gegeven toestemming meteen gebruiken, anders op de knop
   async function vraagGps(){
     const btn = $('#gpsBtn'); const oud = btn.textContent; btn.textContent = 'Locatie zoeken...'; btn.disabled = true;
-    const p = await Geo.positie();
+    /* Geo.vraag() en niet Geo.positie(): dit is een BEWUSTE tik op een knop, en
+       stond de locatieschakelaar uit, dan hoort daar een vraag te komen en geen
+       stilte. Geo.positie() zwijgt dan (terecht -- die wordt ook ongevraagd
+       gebruikt); hier zou dat een dode knop opleveren. */
+    const magVooraf = Geo.mag();
+    const p = await Geo.vraag('Om de afstand tot elke plek te tonen moet ik weten waar je bent. Je locatie blijft op je toestel.');
     btn.disabled = false;
-    if (p){ mijnPlek = p; btn.textContent = 'Dichtstbij eerst'; teken(); }
-    else { btn.textContent = oud; alert('We konden je locatie niet ophalen. Zet locatie aan in je browser om de afstand te zien.'); }
+    if (p){ mijnPlek = p; btn.textContent = 'Dichtstbij eerst'; teken(); return; }
+    /* Hier stond een alert("zet locatie aan in je browser"). Die is weg, want na
+       een "nu niet" WAS de vraag de melding en is een waarschuwing zeuren. Stond
+       de schakelaar al aan en komt er tóch niets, dan is dat een echte storing
+       en hoort het er wel te staan -- op de knop zelf, niet in een alarmvenster. */
+    btn.textContent = magVooraf ? 'Locatie niet beschikbaar' : oud;
+    setTimeout(() => { btn.textContent = oud; }, 3000);
   }
   $('#gpsBtn').addEventListener('click', vraagGps);
   if (Geo.heeft()){ Geo.positie().then(p=>{ if(p){ mijnPlek = p; $('#gpsBtn').textContent = 'Dichtstbij eerst'; teken(); } }); }

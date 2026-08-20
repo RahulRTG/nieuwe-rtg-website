@@ -128,6 +128,7 @@ module.exports = function bouwKernAan(kern, grens) {
   require('../routes/wbw')(grens('wbw'));
   require('../routes/ov')(grens('ov'));
   require('../routes/navigatie')(grens('navigatie'));
+  require('../routes/plaats')(grens('plaats'));
   require('../routes/clips')(grens('clips'));
   /* De Media OS leest de vier media-domeinen; hij hangt daarom NA clips,
      theater en podium, en heeft aan de kern verder niets eigens. */

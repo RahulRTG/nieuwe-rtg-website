@@ -15,9 +15,62 @@
 
 const { DAGEN, seintjeVoor, ketenUit, gewoontenUit, combinatiesUit } = require('./rekenen');
 
-function maakVoorspel({ db, findSupplier }) {
+function maakVoorspel({ db, findSupplier, plaats }) {
   const boek = () => Array.isArray(db.data.payBoekingen) ? db.data.payBoekingen : [];
   const naamVan = (code) => { const z = findSupplier(code); return z ? z.name : code; };
+
+  /* PLAATS ALS BRON (PLAATS.md fase 3).
+
+     De voorspeller leerde uitsluitend uit het grootboek: hij weet WANNEER en
+     WAT, nooit WAAR. Daardoor was "je bestelt meestal om 19:00" het maximum,
+     terwijl "je bestelt om 19:00 als je thuis bent, en je bent nu onderweg" het
+     verschil is tussen een aardige suggestie en iets wat klopt.
+
+     WAT PLAATS HIER NIET DOET, EN NIET KAN: leren. De plaatslaag houdt geen
+     spoor (PLAATS.md grens 1), dus er valt uit plaats geen patroon over tijd af
+     te leiden en dat is met opzet zo. Plaats spreekt alleen over NU: ben je op
+     dit moment in de buurt van de zaak waar deze gewoonte over gaat.
+
+     DRIE UITKOMSTEN, EN DE DERDE IS DE BELANGRIJKSTE. Bevestigd nabij,
+     bevestigd niet nabij, en NIET GEMETEN -- er keek niemand. Alleen een
+     uitdrukkelijke "niet nabij" mag een verwachting laten zakken. Zou "niet
+     gemeten" hetzelfde doen, dan wordt elk lid dat zijn locatie uit laat staan
+     stilletjes slechter bediend, en dat is een boete op een keuze die vrij hoort
+     te zijn.
+
+     EN HET DOEL IS 'nadering' EN NIET 'dienst'. Een waarneming die is gemaakt om
+     je aanwezigheid op je werk te bevestigen, mag geen aanbeveling voeden --
+     grens 2 van PLAATS.md, en het is precies waarvoor een hek zijn doel draagt.
+
+     WAT ER NIET GEBEURT is de zekerheid opblazen. Die staat voor een geleerde
+     frequentie; er nabijheid bij optellen zou het getal iets anders laten
+     betekenen dan het zegt. Nabijheid verandert alleen de VOLGORDE, en staat als
+     eigen veld naast de verwachting zodat je kunt zien dat het meespeelde. */
+  const NIET_GEMETEN = { bevestigd: false, gemeten: false };
+  function nabijheid(codenaam, code) {
+    if (!code || !plaats || typeof plaats.plaatsBijZaak !== 'function') return NIET_GEMETEN;
+    try {
+      const r = plaats.plaatsBijZaak(codenaam, code, 'nadering');
+      return { bevestigd: !!r.bevestigd, gemeten: !!r.gemeten };
+    } catch (e) { return NIET_GEMETEN; }
+  }
+  function metPlaats(codenaam, lijst) {
+    const uit = lijst.map(v => {
+      const nabij = nabijheid(codenaam, v.code);
+      if (!nabij.gemeten) return { ...v, nabij };
+      /* Rahul noemt zijn bron: als plaats heeft meegespeeld, staat dat in het
+         waarom en niet alleen in de rangschikking. Een verwachting die om een
+         onzichtbare reden zakt, is een verwachting die je niet kunt narekenen. */
+      return { ...v, nabij, waarom: v.waarom + (nabij.bevestigd
+        ? ' \u00b7 je bent nu in de buurt' : ' \u00b7 je bent nu ergens anders') };
+    });
+    /* De volgorde: bevestigd nabij eerst, dan wat niemand heeft gemeten, dan wat
+       aantoonbaar elders is. Niets valt weg -- klaarzetten is het werkwoord, en
+       iets verbergen omdat je er nu niet bent zou een lid zijn eigen gewoonte
+       kunnen afnemen. */
+    const rang = (v) => (v.nabij && v.nabij.gemeten) ? (v.nabij.bevestigd ? 0 : 2) : 1;
+    return uit.sort((a, b) => rang(a) - rang(b) || (b.zekerheid || 0) - (a.zekerheid || 0));
+  }
 
   function voorLid(codenaam, key, nu = new Date()) {
     const rek = 'lid:' + codenaam;
@@ -36,9 +89,10 @@ function maakVoorspel({ db, findSupplier }) {
         (g.tussenDagen < 1 ? 'dag' : Math.round(g.tussenDagen) + ' dagen'),
       vraag: 'Zet mijn gebruikelijke bezoek aan ' + naamVan(g.code) +
         ' klaar, rond ' + g.uur + ':00.'
-    }))).slice(0, 3);
+    })));
+    const gewogen = metPlaats(codenaam, verwachtingen).slice(0, 3);
     return {
-      ok: true, verwachtingen, geleerdUit: rijen.length,
+      ok: true, verwachtingen: gewogen, geleerdUit: rijen.length,
       uitleg: verwachtingen.length ? null :
         'Nog te weinig geschiedenis om eerlijk te voorspellen; RTG leert met elk bezoek.'
     };

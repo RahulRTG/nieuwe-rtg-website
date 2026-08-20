@@ -51,6 +51,13 @@ module.exports = [
     uitleg: 'Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.', paden: ['/api/meet'] },
   { id: 'dom-nav', categorie: 'Diensten (leden)', naam: 'Navigatie', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Routes en navigatie onderweg.', paden: ['/api/nav'] },
+  /* De plaatslaag (PLAATS.md). Hoort hier net zo goed als elk ander domein: de
+     boardroom moet hem per pas, per land of bij storing kunnen sluiten. Gaat
+     hij uit, dan valt het huis terug op wat er voor deze laag was -- hekken en
+     waarnemingen verdwijnen en elke uitspraak wordt "niet gemeten", en dat is
+     precies de stand die overal als veilig antwoord is ingebouwd. */
+  { id: 'dom-plaats', categorie: 'Diensten (leden)', naam: 'Plaats (aanwezigheid en nadering)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.', paden: ['/api/plaats'] },
 
   // ---------- cultuur, sport en gezelschap ----------
   { id: 'dom-genootschap', categorie: 'Cultuur en gezelschap', naam: 'Het Genootschap', standaard: true, doelgroepen: LEDEN,

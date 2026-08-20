@@ -311,4 +311,18 @@ const CONTROL = {
     'eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.'
 };
 
-module.exports = { draaiStaatproef, weegStaat, zonderRuis, stapelRijen, CONTROL };
+
+function ruisUit(geteld, rondes) {
+  const uit = new Set();
+  for (const [collectie, n] of geteld) if (n >= rondes) uit.add(collectie);
+  return uit;
+}
+
+function zonderTijdtik(d12, d01, stilOoit) {
+  if (!d12 || !stilOoit || !stilOoit.size) return d12;
+  const bewoogAl = new Set((d01 && d01.collecties) || []);
+  const gewijzigd = (d12.gewijzigd || []).filter(g => !(stilOoit.has(g.collectie) && !bewoogAl.has(g.collectie)));
+  return { ...d12, gewijzigd, aantal: gewijzigd.length, collecties: gewijzigd.map(g => g.collectie) };
+}
+
+module.exports = { draaiStaatproef, weegStaat, zonderRuis, zonderTijdtik, ruisUit, stapelRijen, CONTROL };

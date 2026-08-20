@@ -26,7 +26,7 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
-const { draaiStaatproef, stapelRijen, zonderRuis } = require('./lib/staatproef');
+const { draaiStaatproef, stapelRijen, zonderRuis, ruisUit, zonderTijdtik } = require('./lib/staatproef');
 const { maakPool } = require('./lib/objectpool');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
@@ -199,7 +199,7 @@ if (require.main !== module) { module.exports = {}; return; }
      raakt elke poort die er is, zonder dat er ergens een lijst met namen komt. */
   const steek = ruwRoutes.filter((_, i) => i % 120 === 0).slice(0, 30);
   for (const r of steek) await ijk(() => post(r.pad, {}, 'dit-token-bestaat-niet'));
-  const aanvraagRuis = zonderRuis(geteld, RONDES);
+  const aanvraagRuis = ruisUit(geteld, RONDES);
   const eenmalig = [...geteld].filter(([, n]) => n < RONDES).map(([c]) => c);
 
   /* DE DERDE IJKING: RUIS DIE VAN DE KLOK KOMT, niet van een verzoek.
@@ -236,7 +236,7 @@ if (require.main !== module) { module.exports = {}; return; }
     const v1 = await vingerafdruk();
     for (const c of (await verschilVan(v0, v1)).collecties || []) stilGeteld.set(c, (stilGeteld.get(c) || 0) + 1);
   }
-  const tijdruis = zonderRuis(stilGeteld, STIL_RONDES);
+  const tijdruis = ruisUit(stilGeteld, STIL_RONDES);
 
   /* EN EEN LANGE STILTE, voor de schakelaars die TRAGER lopen dan het venster
      hierboven. kern/command/alarm.js weegt eens per zestig seconden; die tik

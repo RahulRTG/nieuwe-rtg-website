@@ -707,7 +707,25 @@ const CONTROL = {
     'Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.'
 };
 
-module.exports = { bouw, achteruit, ketenUitslag, SCHAKELS, LEESMETHODEN, CONTROL };
+
+function ketenKaartUit(scenarios) {
+  const kaart = new Map();
+  for (const sc of scenarios || []) {
+    if (!sc.verraad || !(sc.lat && sc.lat.voldoet)) continue;
+    for (const pad of (ROUTES_PER_KETEN[sc.keten] || [])) {
+      const oud = kaart.get(pad);
+      kaart.set(pad, {
+        failure: sc.clientAntwoord === 'FAIL' || !!(oud && oud.failure),
+        proven: sc.rollback === 'PROVEN' || !!(oud && oud.proven),
+        beoordeeld: sc.rollback !== 'NVT' || !!(oud && oud.beoordeeld),
+        stil: !!sc.stilVerlies || !!(oud && oud.stil)
+      });
+    }
+  }
+  return kaart;
+}
+
+module.exports = { bouw, achteruit, ketenUitslag, ketenKaartUit, SCHAKELS, LEESMETHODEN, CONTROL };
 
 /* Alleen doen als iemand dit bestand DRAAIT. Wordt het geladen (door een toets,
    of straks door de keuring), dan hoort er niets te gebeuren en al helemaal geen

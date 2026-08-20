@@ -145,6 +145,17 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
        toerekening. */
     const direct = gemeten && gemeten[route];
     if (direct) {
+      /* Zelfde grens als in kiesKandidaten: over een pad dat de liegpoort niet
+         kan raken is nooit echt gelogen, dus een eerdere gerichte uitslag over
+         zo'n pad is geen uitslag. Niet stil wegfilteren maar benoemen. */
+      const padD = route.slice(route.indexOf(' ') + 1);
+      if (!padD.startsWith('/api/')) {
+        perRouteUit[route] = { staat: 'ongemeten', bron: 'outputproef (gericht)', toetsen: [direct.toets],
+          reden: 'de liegpoort raakt alleen /api/-paden; de leugen ging aan maar vuurde nooit, ' +
+            'dus de eerdere uitslag telt niet' };
+        telling.ongemeten++;
+        continue;
+      }
       perRouteUit[route] = direct.merkt
         ? { staat: 'bewezen', bron: 'outputproef (gericht)', toetsen: [direct.toets],
             reden: 'er is over DEZE route gelogen en ' + direct.toets + ' zakte daarop' }
@@ -274,7 +285,15 @@ function kiesKandidaten(al) {
   const kandidaten = [];
   for (const [route, toetsen] of k.perRoute) {
     if (gedaan[route] || infra.has(route)) continue;
-    if (isDeur(route.slice(route.indexOf(' ') + 1))) continue;
+    const pad = route.slice(route.indexOf(' ') + 1);
+    if (isDeur(pad)) continue;
+    /* BUITEN BEREIK VAN DE LIEGPOORT. De poort vervangt alleen antwoorden op
+       /api/-paden; over een pagina of bundel valt niet te liegen, dus daar is
+       geen kandidaat van te maken -- een meting die niet kan draaien is geen
+       uitslag (LAT.md regel 3 en 12). Padparameter-routes waren hier ook
+       buiten bereik tot de liegpoort ze op vorm leerde matchen (zie
+       maakPatroon in server/opzet/liegpoort.js); die doen nu gewoon mee. */
+    if (!pad.startsWith('/api/')) continue;
     const gevoelig = [...toetsen].filter(t => g.gevoelig.has(t));
     if (!gevoelig.length) continue;
     const smalste = gevoelig

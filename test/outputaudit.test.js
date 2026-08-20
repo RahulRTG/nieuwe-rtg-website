@@ -177,6 +177,46 @@ test('5. een verse gerichte ronde telt METEEN mee, niet pas de volgende batch', 
   const blind = oordeel(perRoute, perToets, gevoelig, new Set(),
     { 'POST /api/vers': { toets: 'breed.test.js', merkt: false, op: 'nu' } });
   assert.equal(blind.perRoute['POST /api/vers'].staat, 'blind');
+
+  /* BUITEN BEREIK VAN DE LIEGPOORT IS GEEN UITSLAG. De poort raakt alleen
+     /api/-paden; over een pagina of bundel is de leugen wel aangezet maar
+     nooit afgegaan, en toch stonden zulke routes op blind -- een meting die
+     niet heeft gedraaid is geen slechte uitslag, maar een goede al helemaal
+     niet (LAT.md regel 3 en 12). */
+  for (const merkt of [true, false]) {
+    const route = 'GET /apps/index.html';
+    const pr = new Map([[route, new Set(['breed.test.js'])]]);
+    const pt = new Map([['breed.test.js', new Set([route, 'POST /api/ander'])]]);
+    const uit = oordeel(pr, pt, gevoelig, new Set(),
+      { [route]: { toets: 'breed.test.js', merkt, op: 'nu' } });
+    assert.equal(uit.perRoute[route].staat, 'ongemeten',
+      route + ' met merkt=' + merkt + ' hoort ongemeten te zijn, niet ' + uit.perRoute[route].staat);
+    assert.match(uit.perRoute[route].reden, /liegpoort/);
+  }
+
+  /* En een PADPARAMETER-route doet sinds de vorm-matching gewoon mee: de
+     liegpoort vertaalt /:code naar een segment-joker, dus daarover LIEGEN kan
+     echt en het oordeel telt. De poort zelf wordt hieronder apart geijkt. */
+  const par = 'GET /api/gezin/:code/mij';
+  const prP = new Map([[par, new Set(['breed.test.js'])]]);
+  const ptP = new Map([['breed.test.js', new Set([par, 'POST /api/ander'])]]);
+  assert.equal(oordeel(prP, ptP, gevoelig, new Set(),
+    { [par]: { toets: 'breed.test.js', merkt: true, op: 'nu' } }).perRoute[par].staat, 'bewezen');
+});
+
+test('7b. de liegpoort matcht een padparameter op vorm, per segment', () => {
+  const { magLiegen } = require('../server/opzet/liegpoort');
+  assert.equal(magLiegen('/api/gezin/ABC123/mij', '/api/gezin/:code/mij', ''), true,
+    'een :segment staat voor precies een echt segment');
+  assert.equal(magLiegen('/api/gezin/ABC123/extra/mij', '/api/gezin/:code/mij', ''), false,
+    'twee segmenten passen niet in een joker');
+  assert.equal(magLiegen('/api/gezin/ABC123', '/api/gezin/:code/mij', ''), false,
+    'een korter pad matcht niet');
+  assert.equal(magLiegen('/api/scim/v2/Users/u-1', '/api/scim/v2/Users/:id', ''), true);
+  /* Het oude letterlijke gedrag blijft: een patroon zonder parameter is een
+     voorvoegsel, en niet-/api/-paden liegen nooit. */
+  assert.equal(magLiegen('/api/notities/mijn', '/api/notities', ''), true);
+  assert.equal(magLiegen('/apps/index.html', '/apps/:pagina', ''), false);
 });
 
 test('6. de basislijn vervangt de controlerun zonder het oordeel te verzwakken', () => {

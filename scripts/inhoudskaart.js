@@ -1,0 +1,160 @@
+#!/usr/bin/env node
+/* ============================================================================
+   DE INHOUDSKAART -- het ware antwoordprofiel van de blinde routes.
+
+   WAAROM DIT ER IS. Na de OUTPUT-band bleven er 145 routes BLIND: er is over
+   ze gelogen en geen enkele toets zag het. De sluitweg uit BEWIJSSCHULD.json
+   ("per route een toets die het antwoord leest") met de hand schrijven is
+   dagenwerk over vijftig domeinen -- en de meeste van die toetsen zouden
+   hetzelfde doen: kijken of het antwoord de vorm heeft die het hoort te
+   hebben. Dus doen we dat een keer goed: dit script legt per blinde route het
+   WARE antwoordprofiel vast (status, sleutels, en welke velden dragend zijn),
+   en test/inhoudswacht.test.js dwingt die profielen af. De liegpoort vervangt
+   een antwoord door `200 {ok:true}`; elk profiel met meer dan dat is dus een
+   toets die de leugen ziet -- en de band meet dat daarna per route na, met
+   controlerun en al. Geen truc: het profiel komt uit een eerlijke run, en een
+   route waarvan het ware antwoord ZELF kaal {ok:true} is, is eerlijk
+   onwaarneembaar en blijft blind met die reden in dit register.
+
+   WAT EEN PROFIEL IS, en waarom niet meer dan dit:
+
+     status     de statuscode van het ware antwoord op een plausibele aanroep
+     sleutels   de sleutels op het hoogste niveau, gesorteerd
+     dragend    de sleutels waarvan de waarde niet leeg was (een getal, een
+                niet-lege tekst, een niet-lege lijst of een gevuld object)
+
+   GEEN WAARDEN. Waarden verschillen per run (id's, tijden, teksten); sleutels
+   en gevuldheid zijn de vorm van het antwoord, en de vorm is wat de leugen
+   sloopt. Wie meer wil borgen dan de vorm schrijft alsnog een echte toets --
+   dit register is de vloer, niet het plafond.
+
+   DE KAART STAPELT: een nieuwe run vervangt alleen de routes die hij zelf
+   heeft aangeroepen; de rest houdt zijn profiel en zijn op-stempel.
+
+   Draai:  node --experimental-sqlite scripts/inhoudskaart.js
+   ========================================================================== */
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const { start } = require('./lib/wegwerpserver');
+const { alleRoutes, verdeelOpRol } = require('./lib/routes');
+const { plausibelLijf } = require('./lib/rolproef');
+const { stempel } = require('./lib/stempel');
+
+const WORTEL = path.join(__dirname, '..');
+const UITSLAG = path.join(WORTEL, 'INHOUDSKAART.json');
+const OUTPUT = path.join(WORTEL, 'OUTPUTPROEF.json');
+
+/* Het profiel van een antwoord: pure functie, los toetsbaar. */
+function profielVan(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return { sleutels: [], dragend: [], vorm: Array.isArray(data) ? 'lijst' : typeof data };
+  }
+  const sleutels = Object.keys(data).sort();
+  const dragend = sleutels.filter(k => {
+    const v = data[k];
+    if (v === null || v === undefined || v === '') return false;
+    if (typeof v === 'number' || typeof v === 'boolean') return true;
+    if (typeof v === 'string') return v.length > 0;
+    if (Array.isArray(v)) return v.length > 0;
+    if (typeof v === 'object') return Object.keys(v).length > 0;
+    return false;
+  });
+  return { sleutels, dragend, vorm: 'object' };
+}
+
+/* Onwaarneembaar: het ware antwoord onderscheidt zich niet van de leugen
+   (200 met hoogstens `ok`). Daarover valt met vormen niets te bewaken. */
+function onwaarneembaar(status, profiel) {
+  return status === 200 && profiel.sleutels.every(k => k === 'ok');
+}
+
+module.exports = { profielVan, onwaarneembaar };
+if (require.main !== module) return;
+
+(async () => {
+  let reg;
+  try { reg = JSON.parse(fs.readFileSync(OUTPUT, 'utf8')); }
+  catch (e) { console.error('geen OUTPUTPROEF.json; zonder blindenlijst valt er niets in kaart te brengen'); process.exit(2); }
+  const blind = new Set(Object.entries(reg.perRoute || {})
+    .filter(([, c]) => c.staat === 'blind').map(([k]) => k));
+  if (!blind.size) { console.log('geen blinde routes; de kaart heeft niets te doen'); return; }
+
+  const routes = alleRoutes().filter(r => blind.has(r.methode + ' ' + r.pad));
+  const verdeling = verdeelOpRol(routes, ['member', 'office', 'supplier']);
+  console.log('\n=== DE INHOUDSKAART ===\n');
+  console.log('  blinde routes                : ' + blind.size);
+  console.log('  met een rol waarvoor een token bestaat: ' + verdeling.metRol.length);
+
+  const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const { basis, klaar } = server;
+  const doe = async (methode, pad, lijf, tok) => {
+    try {
+      const r = await fetch(basis + pad, { method: methode,
+        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+        body: methode === 'GET' || methode === 'HEAD' ? undefined : JSON.stringify(lijf || {}) });
+      let data = null; try { data = await r.json(); } catch (e) {}
+      return { status: r.status, data };
+    } catch (e) { return { status: 0, data: null }; }
+  };
+  const inlog = {
+    member: async () => (await doe('POST', '/api/login', { tier: 'rtg' })).data.token,
+    office: async () => (await doe('POST', '/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
+    supplier: async () => (await doe('POST', '/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
+  };
+  const tokens = {};
+  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
+
+  /* Vaste volgorde: de wacht roept straks in dezelfde volgorde aan, zodat de
+     opgebouwde toestand (route A maakte iets dat route B ziet) gelijk loopt. */
+  const rij = verdeling.metRol.slice().sort((a, b) =>
+    (a.methode + ' ' + a.pad).localeCompare(b.methode + ' ' + b.pad));
+
+  const nuOp = new Date().toISOString();
+  const vers = {};
+  let waarneembaar = 0, kaal = 0, dood = 0;
+  for (const r of rij) {
+    const uit = await doe(r.methode, r.pad, plausibelLijf(r.pad), tokens[r.rol]);
+    const sleutel = r.methode + ' ' + r.pad;
+    if (!uit.status) { dood++; continue; }
+    const profiel = profielVan(uit.data);
+    if (onwaarneembaar(uit.status, profiel)) {
+      kaal++;
+      vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
+        onwaarneembaar: true, op: nuOp,
+        reden: 'het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); ' +
+          'hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan' };
+      continue;
+    }
+    waarneembaar++;
+    vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
+      sleutels: profiel.sleutels, dragend: profiel.dragend, op: nuOp };
+  }
+  klaar();
+
+  /* Stapelen: vers wint, de rest blijft. */
+  let oud = {};
+  try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) {}
+  const perRoute = { ...oud, ...vers };
+
+  fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
+    uitleg: 'Het ware antwoordprofiel per blinde route (status, sleutels, dragende velden), vastgelegd ' +
+      'van een eerlijke run op een wegwerpserver. test/inhoudswacht.test.js dwingt deze profielen af; ' +
+      'de liegpoort vervangt een antwoord door 200 {ok:true}, dus elk profiel met meer dan dat ziet de ' +
+      'leugen. De kaart stapelt: een nieuwe run vervangt alleen wat hij zelf aanriep.',
+    grens: 'Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de ' +
+      'vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en ' +
+      'blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.',
+    gemeten: { blindeRoutes: blind.size, inKaart: Object.keys(perRoute).length,
+      waarneembaar: Object.values(perRoute).filter(p => !p.onwaarneembaar).length,
+      onwaarneembaar: Object.values(perRoute).filter(p => p.onwaarneembaar).length,
+      versDezeRun: Object.keys(vers).length, zonderRol: verdeling.zonderRol.length, dood },
+    perRoute
+  }, null, 1) + '\n');
+  console.log('  waarneembaar profiel         : ' + waarneembaar);
+  console.log('  onwaarneembaar (kaal ok)     : ' + kaal);
+  console.log('  zonder token voor de rol     : ' + verdeling.zonderRol.length);
+  console.log('  niet bereikbaar              : ' + dood);
+  console.log('\n  weggeschreven in INHOUDSKAART.json\n');
+})().catch(e => { console.error('de inhoudskaart viel om: ' + (e && e.stack || e)); process.exit(2); });

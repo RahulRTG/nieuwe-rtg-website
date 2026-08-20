@@ -69,6 +69,16 @@ if (require.main !== module) { module.exports = {}; return; }
 
 const werkers = Math.max(1, Number((argv.find(a => a.startsWith('--werkers=')) || '').slice(10)) || 4);
 const max = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
+/* DE BLINDENRONDE (--blind). De gewone rij komt uit kiesKandidaten en eist een
+   toets die de mutatiemotor al gevoelig heeft bevonden; de inhoudswacht
+   (test/inhoudswacht.test.js) is daar te nieuw voor. Maar de gerichte meting
+   zelf heeft die eis niet: liegen over EEN route en kijken of de wacht zakt is
+   direct bewijs, motor of geen motor. In deze stand is de rij dus: elke route
+   die op blind staat EN een waarneembaar profiel in INHOUDSKAART.json heeft,
+   met de inhoudswacht als toets -- en de oude blinde uitslag telt niet als "al
+   gemeten", want die is precies wat we willen vervangen. */
+const blindStand = argv.includes('--blind');
+const WACHT = 'inhoudswacht.test.js';
 
 function leesRegister() {
   try { return JSON.parse(fs.readFileSync(REGISTER, 'utf8')); }
@@ -109,12 +119,22 @@ function eenRegel(args) {
 }
 
 (async () => {
-  const kandidaten = op.kiesKandidaten();
-  if (!kandidaten) { console.error('geen journaal of geen MUTATIES.json'); process.exitCode = 2; return; }
-  const rij = max ? kandidaten.slice(0, max) : kandidaten;
-
   const reg = leesRegister();
   const gericht = reg.gericht || {};
+  let kandidaten;
+  if (blindStand) {
+    let kaart;
+    try { kaart = JSON.parse(fs.readFileSync(path.join(WORTEL, 'INHOUDSKAART.json'), 'utf8')); }
+    catch (e) { console.error('geen INHOUDSKAART.json; draai eerst scripts/inhoudskaart.js'); process.exitCode = 2; return; }
+    kandidaten = Object.entries(gericht)
+      .filter(([, u]) => !u.merkt)
+      .filter(([route]) => { const p = (kaart.perRoute || {})[route]; return p && !p.onwaarneembaar; })
+      .map(([route]) => ({ route, toets: WACHT, breedte: 0 }));
+  } else {
+    kandidaten = op.kiesKandidaten();
+    if (!kandidaten) { console.error('geen journaal of geen MUTATIES.json'); process.exitCode = 2; return; }
+  }
+  const rij = max ? kandidaten.slice(0, max) : kandidaten;
   /* De basislijn uit het register terug in een Map, zodat een herstart de al
      gemeten toetsen niet opnieuw controleert. */
   const basislijn = new Map(Object.entries(reg.basislijn || {}));
@@ -179,7 +199,11 @@ function eenRegel(args) {
     while (volgende < rij.length) {
       const i = volgende++;
       const d = rij[i];
-      if (gericht[d.route]) { klaar++; continue; }   // al gemeten (herstart/overlap)
+      /* Al gemeten (herstart/overlap). In de blindenronde telt de oude blinde
+         uitslag niet: die vervangen we juist. Wat daar WEL telt: de route is
+         inmiddels merkt, of de wacht heeft hem deze ronde al gehad. */
+      const oude = gericht[d.route];
+      if (oude && (!blindStand || oude.merkt || oude.toets === WACHT)) { klaar++; continue; }
 
       /* WAT WEET DE BASISLIJN VAN DEZE TOETS?
            groen    -> geef 'groen' mee, de werker slaat de controle over

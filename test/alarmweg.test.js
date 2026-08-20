@@ -58,6 +58,24 @@ function ontvanger(antwoord) {
 }
 const even = ms => new Promise(r => setTimeout(r, ms));
 
+/* WACHTEN TOT DE TELLER BIJ IS, in plaats van 50 ms gokken.
+
+   De bezorging wordt in een losse belofte geteld: het bericht is al binnen bij
+   de ontvanger terwijl `m.stand()` nog nul zegt. Hier stond daarvoor
+   `await even(50)`. Dat is dezelfde vorm als de lussen hieronder, alleen zonder
+   uitweg: is de machine druk, dan meet de bewering een teller die nog moest
+   worden bijgewerkt en zakt hij op iets dat niet stuk is.
+
+   Dit hulpje kijkt gewoon opnieuw tot het getal er staat, met hetzelfde budget
+   dat de lussen hier al gebruiken (60 x 50 ms). */
+async function totStand(m, veld, waarde, rondes) {
+  for (let i = 0; i < (rondes || 60); i++) {
+    if (m.stand()[veld] >= waarde) return m.stand();
+    await even(50);
+  }
+  return m.stand();
+}
+
 test('1. zonder webhook bestaat de melder wel, en zegt hij dat hij uit staat', async () => {
   const m = maakFoutmelder({ url: '' });
   assert.equal(m.actief, false);
@@ -91,8 +109,7 @@ test('2. met een webhook komt een echte storing aan, met stack en context', asyn
     assert.equal(b.context.id, 'abc123');
     assert.ok(b.tijd, 'en een tijdstip');
 
-    await even(50);
-    const s = m.stand();
+    const s = await totStand(m, 'bezorgd', 1);
     assert.equal(s.bezorgd, 1, 'en de bezorging is geteld: ' + JSON.stringify(s));
     assert.equal(s.mislukt, 0);
   } finally { o.stop(); }
@@ -152,6 +169,12 @@ test('6. een fout-storm gaat er niet ongetemperd doorheen', async () => {
     // dezelfde fout op hetzelfde pad: dat is een vingerafdruk
     for (let i = 0; i < 25; i++) m.melden(new Error('dezelfde storing'), { p: '/api/order' });
     for (let i = 0; i < 40 && !o.binnen.length; i++) await even(50);
+    /* HIER BLIJFT EEN WACHT STAAN, en dat is een besluit. De bewering gaat over
+       iets dat NIET gebeurt: van vijfentwintig meldingen mag er maar EEN de
+       deur uit. Op een afwezigheid kun je niet wachten -- meteen tellen zou
+       alleen zeggen "op dit moment nog een". De 200 ms zijn de ruimte waarin
+       nummer twee zich zou moeten melden als de tempering stuk was. Zie
+       KLOKWACHT.json; dit is de enige die in dit bestand overblijft. */
     await even(200);
     assert.equal(o.binnen.length, 1, 'vijfentwintig keer dezelfde storing wordt een bericht');
 

@@ -88,23 +88,53 @@ test('groeicurve: metingen op datum gesorteerd, laatste gewicht/lengte apart', a
   assert.equal(kind.laatsteLengte.lengte, 121);
 });
 
+/* WAT ER OP SCHIJF STAAT, EN WACHTEN TOT DEZE SCHRIJFACTIE ER ECHT IN ZIT.
+
+   De twee toetsen hieronder beweren iets NEGATIEFS: de allergie en de
+   medicijnnaam staan niet leesbaar op schijf. Daar zit een val in. Lees je te
+   vroeg, dan staat er nog helemaal niets van deze schrijfactie -- en dan is
+   "het geheim staat er niet" waar om de verkeerde reden. Er stond hiervoor
+   `setTimeout(200)`, en die val bleef daarmee gewoon open: 200 ms is genoeg tot
+   het niet genoeg is.
+
+   Het anker is de schijf zelf. We nemen een afdruk VOOR de schrijfactie en
+   wachten tot de bytes veranderd zijn; dan is er aantoonbaar iets van deze
+   actie geland, en pas dan zegt "het geheim staat er niet in" iets. */
+function opSchijf() {
+  return ['db.json', 'store.db', 'store.db-wal']
+    .map(f => path.join(TMP, f)).filter(f => fs.existsSync(f))
+    .map(f => fs.readFileSync(f, 'utf8')).join('\n');
+}
+async function naSchrijven(voor, ms) {
+  const eind = Date.now() + (ms || 15000);
+  for (;;) {
+    const nu = opSchijf();
+    if (nu !== voor) return nu;
+    if (Date.now() >= eind) {
+      throw new Error('wachtte ' + (ms || 15000) + 'ms tot de schrijfactie op schijf stond, en de bestanden ' +
+        'veranderden niet; de bewering hieronder zou dan waar zijn omdat er NIETS staat');
+    }
+    await new Promise(r => setTimeout(r, 25));
+  }
+}
+
 test('de allergiekaart komt uit het zorgprofiel en ligt versleuteld op schijf', async () => {
   const G = await gezin();
+  const voor = opSchijf();
   // de ouder vult de allergie in het zorgprofiel (oppasinfo)
   await api('/gezin/oppasinfo', { code: G.code, token: G.token, allergie: 'GEHEIM-PINDA-ALLERGIE', eten: '', huisregels: '' });
   const d = await overzicht(G.code, G.token);
   assert.match(d.allergie, /PINDA/, 'de allergiekaart toont de zorgprofiel-info');
   // en die medische info ligt niet leesbaar op schijf
-  await new Promise(r => setTimeout(r, 200));
-  const ruw = ['db.json', 'store.db', 'store.db-wal'].map(f => path.join(TMP, f)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
+  const ruw = await naSchrijven(voor);
   assert.ok(!ruw.includes('GEHEIM-PINDA-ALLERGIE'), 'de allergie ligt versleuteld op schijf');
 });
 
 test('medicijn-namen liggen ook versleuteld op schijf', async () => {
   const G = await gezin();
+  const voor = opSchijf();
   await api('/gezin/gezondheid/medicijn', { code: G.code, token: G.token, voor: G.kindId, naam: 'GEHEIM-MEDICIJN-XYZ', dosis: '1 tablet' });
-  await new Promise(r => setTimeout(r, 200));
-  const ruw = ['db.json', 'store.db', 'store.db-wal'].map(f => path.join(TMP, f)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
+  const ruw = await naSchrijven(voor);
   assert.ok(!ruw.includes('GEHEIM-MEDICIJN-XYZ'), 'de medicijnnaam ligt versleuteld op schijf');
 });
 

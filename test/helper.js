@@ -278,6 +278,32 @@ function stopNet(child, ms) {
   });
 }
 
+/* EEN HARDE stop, en WACHTEN tot hij weg is.
+
+   Het spiegelbeeld van stopNet(). stopNet is een deploy: SIGTERM, en de server
+   spoelt zijn write-behind nog weg. stopHard is een STROOMSTORING: SIGKILL, dus
+   niets wordt afgemaakt -- en dat is precies wat een duurzaamheidsproef wil
+   toetsen. Het verschil met stop() is dat deze WACHT tot het proces echt weg is.
+
+   Waarom dat verschil ertoe doet: na stop() liep er in de toetsen steevast een
+   `setTimeout(300)` met de opmerking "laat de OS-poort echt vrijkomen". Die
+   reden klopte niet eens (startServer pakt elke keer een verse vrije poort),
+   maar er zat wel een echte eis onder: zolang het oude proces nog leeft heeft
+   het de datamap nog vast, en dan start de volgende server op een half
+   afgesloten sqlite. 300 ms was daarvoor een gok; `exit` is het teken. */
+function stopHard(child, ms) {
+  return new Promise(resolve => {
+    if (!child || child.exitCode != null) return resolve();
+    let klaar = false;
+    const af = () => { if (!klaar) { klaar = true; resolve(); } };
+    child.on('exit', af);
+    try { child.kill('SIGKILL'); } catch (e) { return af(); }
+    // SIGKILL is niet te weigeren; deze kap is er alleen voor het geval het
+    // handvat niet meer bij het proces hoort (al opgeruimd, of overschreven).
+    setTimeout(af, ms || 10000).unref();
+  });
+}
+
 function postJson(base) {
   return (pad, body, tok) => fetch(base + pad, {
     method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
@@ -736,7 +762,7 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-module.exports = { vrijePoort, startServer, opstartGeduld, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+module.exports = { vrijePoort, startServer, opstartGeduld, stop, stopNet, stopHard, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
   wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, wachtOpRust, wachtOpNetstilte, volgVerzoeken, klikEnWacht, tekstVan, WACHT_MS,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren

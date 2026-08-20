@@ -23,7 +23,7 @@
   var token = null;
   try { token = localStorage.getItem('rtg_sup_token'); } catch (e) {}
 
-  var staat = { fid: null, eid: null, dagId: null, dagDatum: null, naam: '', plekken: [] };
+  var staat = { fid: null, eid: null, dagId: null, dagDatum: null, naam: '', plekken: [], dagen: [] };
   var luisteraars = {};
 
   function api(pad, body) {
@@ -80,16 +80,21 @@
   }
 
   /* De zaakpoort. Zonder token of zonder festival heeft geen enkel blad iets te
-     tonen, dus dat wordt EEN keer gezegd en niet drie keer half. */
+     tonen, dus dat wordt EEN keer gezegd en niet drie keer half.
+
+     HIJ IS HERLAADBAAR, en dat is geen luxe. Het blad Inrichten maakt een
+     festival aan terwijl dit scherm al open staat; zonder een tweede ronde
+     blijft de tabbalk "Nog geen festival ingericht" zeggen boven een festival
+     dat er wel degelijk is. Elk blad dat de wereld verandert, roept dit aan. */
   function start() {
     var wie = document.getElementById('fpWie');
-    if (!token) { if (wie) wie.textContent = 'Log eerst in op de zaak'; return; }
+    if (!token) { if (wie) wie.textContent = 'Log eerst in op de zaak'; return Promise.resolve(); }
 
-    api('/api/festival/mijn', {}).then(function (r) {
+    return api('/api/festival/mijn', {}).then(function (r) {
       var f = ((r.body || {}).festivals || [])[0];
       var e = f && (f.edities || [])[0];
       if (!f || !e) { if (wie) wie.textContent = 'Nog geen festival ingericht'; return; }
-      staat.fid = f.id; staat.eid = e.id; staat.naam = f.naam;
+      staat.fid = f.id; staat.eid = e.id; staat.naam = f.naam; staat.dagen = e.dagen || [];
       if (wie) wie.textContent = f.naam + ' · ' + e.jaar;
       return Promise.all([
         api('/api/festival/terrein', { festival: staat.fid, editie: staat.eid }),
@@ -117,6 +122,7 @@
     toonBlad(knop.getAttribute('data-blad'));
   });
 
-  window.RTGFestival = { api: api, staat: staat, opBlad: opBlad, zetStand: zetStand, toonBlad: toonBlad };
+  window.RTGFestival = { api: api, staat: staat, opBlad: opBlad, zetStand: zetStand,
+    toonBlad: toonBlad, herlaad: start };
   start();
 })();

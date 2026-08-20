@@ -72,12 +72,27 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 .fp-cijfer{display:block;margin-top:6px;color:var(--rtg-soft);font-size:.9rem;
   letter-spacing:0;font-variant-numeric:var(--rtg-cijfers);}
 
+/* De werkvelden. Een rij die afbreekt in plaats van uit het scherm te lopen --
+   dezelfde les als bij de poort: een flexkind zonder min-width duwt alles scheef. */
+.fp-form{display:flex;flex-wrap:wrap;gap:var(--rtg-ruim-klein);align-items:center;margin:12px 0 4px;}
+.fp-form .veld{flex:1 1 10rem;min-width:0;}
+.fp-form .knop{flex:0 0 auto;min-height:44px;cursor:pointer;}
+.fp-label{flex:0 0 auto;color:var(--rtg-soft);font-size:.85rem;}
+.fp-vink{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--rtg-soft);
+  min-height:44px;}
+.fp-vak{margin-top:26px;}
+.fp-h2{font:500 1.05rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.02em;
+  margin:26px 0 0;color:var(--rtg-txt);}
+.fp-groot{font-size:clamp(1.6rem,7vw,2.6rem);letter-spacing:.2em;margin:8px 0;
+  font-variant-numeric:var(--rtg-cijfers);color:var(--rtg-goud);overflow-wrap:anywhere;}
+
 /* Beeld en terrein: registers, geen kaartendashboards (ONTWERP.md par. 7). */
 .fp-blad{padding:clamp(18px,3vw,34px);max-width:900px;}
 .fp-blad h1{font:500 clamp(26px,3.4vw,40px)/1.05 'Bodoni Moda',serif;margin:14px 0 6px;}
 .fp-lijst{margin-top:22px;display:flex;flex-direction:column;}
-.fp-regel{display:flex;gap:14px;align-items:baseline;padding:12px 0 12px 14px;
-  border-bottom:1px solid var(--rtg-line);border-left:2px solid transparent;}
+.fp-regel{display:flex;gap:14px;align-items:baseline;padding:12px 14px;
+  border-bottom:1px solid var(--rtg-line);border-left:2px solid transparent;
+  font:inherit;text-align:left;width:100%;background:transparent;color:inherit;}
 .fp-regel[data-sig="kritiek"] {border-left-color:var(--rtg-sig-incident);}
 .fp-regel[data-sig="hoog"]    {border-left-color:var(--rtg-sig-aandacht);}
 .fp-regel[data-sig="aandacht"]{border-left-color:var(--rtg-sig-actief);}
@@ -95,9 +110,10 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
       <button data-blad="beeld"><span class="rv-icoon">◉</span><span>Beeld</span></button>
       <button data-blad="terrein"><span class="rv-icoon">◫</span><span>Terrein</span></button>
       <button data-blad="gereed"><span class="rv-icoon">⌸</span><span>Gereed</span></button>
+      <button data-blad="kassa"><span class="rv-icoon">◈</span><span>Kassa</span></button>
     </nav>
     <div class="rv-bankvoet">
-      <button data-blad="terrein"><span class="rv-icoon">≡</span><span>Editie</span></button>
+      <button data-blad="inrichten"><span class="rv-icoon">≡</span><span>Inrichten</span></button>
     </div>
   </aside>
 
@@ -170,6 +186,104 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
         </div>
       </div>
 
+      <div class="rv-pane" id="bladKassa" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">KASSA</div>
+          <h1 id="kassaZin">Kies wat u verkoopt.</h1>
+          <p class="fp-stil">De plek wordt vastgezet voordat er betaald wordt. Lukt de
+            betaling niet, dan komt hij meteen weer vrij.</p>
+          <div class="fp-lijst" id="kassaAanbod"></div>
+
+          <form class="fp-form" id="kassaForm">
+            <label class="fp-label" for="kassaKoper">Op wiens codenaam</label>
+            <input class="veld" id="kassaKoper" maxlength="60" placeholder="Codenaam" autocomplete="off">
+            <button class="knop" type="submit" id="kassaZet">Zet vast</button>
+          </form>
+
+          <div id="kassaOpen" hidden>
+            <div class="fp-lijst"><div class="fp-regel"><span id="kassaOpenZin"></span></div></div>
+            <div class="fp-form">
+              <button class="knop" type="button" id="kassaContant">Contant afrekenen</button>
+              <input class="veld" id="kassaPayCode" maxlength="12" placeholder="Betaalcode" autocomplete="off">
+              <button class="knop" type="button" id="kassaPay">RTG Pay</button>
+              <button class="knop" type="button" id="kassaLos">Laat los</button>
+            </div>
+          </div>
+
+          <div id="kassaPas" hidden>
+            <div class="rv-ey">PASCODE</div>
+            <div id="kassaPasCode" class="fp-groot"></div>
+            <p class="fp-stil" id="kassaPasBij"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladInrichten" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">INRICHTEN</div>
+          <h1 id="inrKop">Een festival opzetten</h1>
+          <p class="fp-stil" id="inrStil">Alles hieronder is van deze zaak. Wat er staat, staat er echt.</p>
+
+          <section class="fp-vak" id="inrStart" hidden>
+            <h2 class="fp-h2">Beginnen</h2>
+            <div class="fp-form">
+              <input class="veld" id="inrNaam" maxlength="80" placeholder="Naam van het festival" aria-label="Naam van het festival">
+              <input class="veld" id="inrJaar" type="number" min="2000" max="2100" placeholder="Jaar" aria-label="Jaar">
+              <button class="knop" type="button" id="inrBegin">Begin</button>
+            </div>
+          </section>
+
+          <section class="fp-vak" id="inrRest" hidden>
+            <h2 class="fp-h2">Dagen</h2>
+            <div class="fp-form">
+              <input class="veld" id="dagDatum" maxlength="10" placeholder="jjjj-mm-dd" aria-label="Datum">
+              <input class="veld" id="dagOpen" maxlength="5" placeholder="Open uu:mm" aria-label="Openingstijd">
+              <input class="veld" id="dagSluit" maxlength="5" placeholder="Sluit uu:mm" aria-label="Sluitingstijd">
+              <input class="veld" id="dagCurfew" maxlength="5" placeholder="Curfew uu:mm" aria-label="Curfew">
+              <button class="knop" type="button" id="dagZet">Dag erbij</button>
+            </div>
+            <div class="fp-lijst" id="dagLijst"></div>
+
+            <h2 class="fp-h2">Plekken</h2>
+            <div class="fp-form">
+              <input class="veld" id="plekNaam" maxlength="60" placeholder="Naam" aria-label="Naam van de plek">
+              <select class="veld" id="plekSoort" aria-label="Soort plek"></select>
+              <select class="veld" id="plekOuder" aria-label="Ligt in"></select>
+              <input class="veld" id="plekCap" type="number" min="0" placeholder="Capaciteit" aria-label="Capaciteit">
+              <input class="veld" id="plekVeilig" type="number" min="0" placeholder="Veilig" aria-label="Veilige capaciteit">
+              <label class="fp-vink"><input type="checkbox" id="plekBesloten"> besloten</label>
+              <button class="knop" type="button" id="plekZet">Plek erbij</button>
+            </div>
+            <div class="fp-lijst" id="plekLijst"></div>
+
+            <h2 class="fp-h2">Producten</h2>
+            <div class="fp-form">
+              <input class="veld" id="prodNaam" maxlength="80" placeholder="Naam" aria-label="Naam van het product">
+              <input class="veld" id="prodPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs">
+              <input class="veld" id="prodVoorraad" type="number" min="0" placeholder="Voorraad (leeg = vrij)" aria-label="Voorraad">
+              <input class="veld" id="prodRecht" maxlength="60" placeholder="Recht, bijv. festival.entree" aria-label="Rechtsoort">
+              <button class="knop" type="button" id="prodZet">Product erbij</button>
+            </div>
+            <div class="fp-lijst" id="prodLijst"></div>
+
+            <h2 class="fp-h2">Keuring</h2>
+            <div class="fp-form">
+              <button class="knop" type="button" id="ctlSeed">Zet de startlijst controls klaar</button>
+            </div>
+            <p class="fp-stil">Een begin, geen wet. U past hem aan; wat kritiek is bepaalt u.</p>
+
+            <h2 class="fp-h2">Partners</h2>
+            <div class="fp-form">
+              <select class="veld" id="prtRol" aria-label="Rol van de partner"></select>
+              <input class="veld" id="prtZaak" maxlength="40" placeholder="Zaakcode" aria-label="Zaakcode">
+              <button class="knop" type="button" id="prtZet">Stel voor</button>
+            </div>
+            <p class="fp-stil">Een voorstel opent niets. De zaak bevestigt zelf, en bepaalt zelf wat zij deelt.</p>
+            <div class="fp-lijst" id="prtLijst"></div>
+          </section>
+        </div>
+      </div>
+
     </section>
   </main>
 </div>
@@ -178,6 +292,8 @@ body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
 <script src="/apps/festival/poort.js" defer></script>
 <script src="/apps/festival/beeld.js" defer></script>
 <script src="/apps/festival/gereed.js" defer></script>
+<script src="/apps/festival/kassa.js" defer></script>
+<script src="/apps/festival/inrichten.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>

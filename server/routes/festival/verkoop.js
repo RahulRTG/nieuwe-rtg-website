@@ -24,6 +24,27 @@ module.exports = (kern, deur) => {
 
   const nu = () => new Date().toISOString();
 
+  /* HET AANBOD MET DE RUIMTE ER METEEN BIJ. Een kassa die eerst de producten
+     ophaalt en daarna per product de ruimte, doet N+1 aanroepen op de drukste
+     minuut van de dag. Hier komt het in een keer -- en uit dezelfde berekening,
+     zodat er geen tweede telling ontstaat. */
+  app.post('/api/festival/producten', supplierAuth, (req, res) => {
+    const f = mijn(req);
+    if (!f) return stuur(res, geenFestival);
+    const eid = editieVan(req);
+    const e = festival.editieVind(f.id, eid);
+    if (!e) return stuur(res, { status: 404, error: 'Deze editie bestaat niet.' });
+    const moment = nu();
+    const uit = Object.values(e.producten || {}).map(p => {
+      const r = festival.ruimte(f.id, eid, p.id, moment);
+      return { id: p.id, naam: p.naam, prijs: p.prijs, voorraad: p.voorraad,
+        onderdelen: p.onderdelen || [], rechten: (p.rechten || []).length,
+        ruimte: r.error ? null : r.ruimte, krapste: r.error ? null : r.krapste,
+        fout: r.error || null };
+    });
+    res.json({ ok: true, producten: uit });
+  });
+
   app.post('/api/festival/ruimte', supplierAuth, (req, res) => {
     const f = mijn(req);
     if (!f) return stuur(res, geenFestival);

@@ -40,6 +40,15 @@ const { versheid, nuCommit, WORTEL } = require('./lib/stempel');
    een keer van 3377 beproefde routes terug naar 292 -- zonder dat het register
    er anders uitzag. De meetronde geeft de goede vlaggen mee. */
 const REGISTERS = [
+  /* DE SUITE ZELF STAAT BOVENAAN, en dat is de duurste les van dit huis over
+     veroudering. Zestien toetsen zakten aan de geldkant zonder dat iemand het
+     wist: de losse toetsen die erlangs gingen waren groen, de registers waren
+     vers en de keuring was schoon. Nergens was te zien dat de laatste VOLLE
+     ronde van dertig commits geleden was. Sinds scripts/test-runner.js een
+     stempel achterlaat, veroudert de suite hier net zo zichtbaar als elk
+     register -- en hij hoort vooraan, want een register dat verser is dan de
+     suite eronder meet een huis waarvan niemand weet of het nog werkt. */
+  ['SUITE.json', 'npm test', 'de laatste VOLLE testronde: wanneer, waartegen, en of hij groen was'],
   ['DEKKING.json', 'npm run dekking:vast', 'welke routes een toets echt heeft aangeroepen'],
   ['POORTWACHT.json', 'npm run meetronde -- --alleen=poortwacht', 'welke routes zonder token opengaan'],
   ['ROLPROEF.json', 'npm run meetronde -- --alleen=rolproef', 'of een verkeerde rol binnenkomt'],

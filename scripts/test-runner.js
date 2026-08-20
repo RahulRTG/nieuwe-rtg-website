@@ -75,4 +75,40 @@ for (const naam of geïsoleerd) {
   if (uit && !code) code = uit;
 }
 geefAfbouwSlotVrij();
+
+/* ---- HET STEMPEL VAN DE VOLLE RONDE ----
+
+   DE STILTE DIE DIT DICHT. Zestien toetsen zakten aan de geldkant en niemand
+   wist het, want na de verandering die ze brak is er geen volle suite meer
+   gedraaid. De losse toetsen die er wel langsgingen waren groen; de registers
+   waren vers; de keuring was schoon. Er was geen enkele plek waar te zien was
+   dat de LAATSTE VOLLE RONDE van dertig commits geleden was.
+
+   Dit huis heeft daar al gereedschap voor: scripts/versheid.js zegt van elk
+   register "gemeten op <commit>, sindsdien zijn N codebestanden gewijzigd".
+   Wat ontbrak was dat de suite zelf ook een register achterliet. Nu wel, en
+   daarmee valt zijn veroudering op dezelfde manier op als die van elk ander.
+
+   ALTIJD SCHRIJVEN, OOK BIJ ROOD. Een ronde die zakt is ook een feit, en juist
+   dat feit hoort niet te verdwijnen doordat iemand hem niet afmaakt.
+
+   ALLEEN BIJ EEN VOLLE RONDE. Wie `node scripts/test-runner.js pay.test.js`
+   draait heeft de suite niet gedraaid; dat stempel zou de meter laten liegen
+   op precies het punt waarvoor hij bestaat. */
+if (!selectie.length) {
+  try {
+    const { stempel } = require('./lib/stempel');
+    fs.writeFileSync(path.join(WORTEL, 'SUITE.json'), JSON.stringify({
+      stempel: stempel(),
+      uitleg: 'De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. ' +
+        'scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt ' +
+        'net zo hard opvalt als een register dat achterloopt.',
+      grens: 'zegt niets over WELKE toets zakte -- dat staat in de uitvoer van de ronde zelf. ' +
+        'Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.',
+      hoe: 'npm test',
+      gemeten: { bestanden: bestanden.length, afsluitcode: code, groen: code === 0 }
+    }, null, 1) + '\n');
+  } catch (e) { console.error('[tests] kon SUITE.json niet schrijven: ' + e.message); }
+}
+
 process.exitCode = code;

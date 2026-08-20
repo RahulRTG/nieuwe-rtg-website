@@ -20,18 +20,18 @@
   /* --burgundy volgt nu de levende dagkleur uit de machines (dagkleur.css),
      met de bordeaux-op-zwart als vaste terugval; --merk (wijn) en --gold
      blijven vast, precies zoals de merkregels voorschrijven. */
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--merk:#7F1634;--burgundy:var(--dag-kleur,#C23A5E);--gold:#A98F1C;--green:#4C9A75;/* LEZEN IS IETS ANDERS DAN ACCENTEREN. --gold hierboven is de vaste accenttoon en die is prima voor een rand of een randje licht, maar als TEKST haalt hij op het champagne-thema 2,76:1 op een lichte kaart -- onder de 4,5 die kleine tekst vraagt, en zelfs onder de 3,0 voor grote. rtg-themas.css houdt daarvoor --rtg-leesgoud bij: per thema de goudtoon die daar wel leest (op donker het hoogsel, op licht de logotoon zelf, op fluweel ivoor). Nieuwe tekst pakt die. De oudere gouden teksten op dit scherm staan nog op de vaste toon; dat is een aparte ronde over dit hele scherm en geen bijvangst hier. */--leesgoud:var(--rtg-leesgoud,#A98F1C);}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--merk:#7F1634;--burgundy:var(--dag-kleur,#C23A5E);--gold:#A98F1C;--green:#4C9A75;/* LEZEN IS IETS ANDERS DAN ACCENTEREN. --gold hierboven is de vaste accenttoon en die is prima voor een rand of een randje licht, maar als TEKST haalt hij op de champagne-kaart (#F9F6F2, wit 42% over parelmoer) 2,94:1 -- onder de 4,5 die kleine tekst vraagt, en zelfs onder de 3,0 voor grote. De leesbare toon haalt daar 4,51. rtg-themas.css houdt daarvoor --rtg-leesgoud bij: per thema de goudtoon die daar wel leest (op donker het hoogsel, op licht de logotoon zelf, op fluweel ivoor). ALLE gouden TEKST op dit scherm pakt die nu, plus de focusring (WCAG 1.4.11 vraagt daar 3:1 tegen wat ernaast ligt). Wat op --gold blijft staan is geen tekst: de randen van de kaarten, de achtergrond van de springlink (daar leest zwart op goud) en het vinkje. En let op WANNEER dit verschil zichtbaar is -- --rtg-leesgoud bestaat alleen als er een thema GEKOZEN is, dus zonder themakeuze verandert er niets en valt alles terug op de vaste toon hierboven. */--leesgoud:var(--rtg-leesgoud,#A98F1C);}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
-  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  :focus-visible{outline:2px solid var(--leesgoud);outline-offset:2px;}
   .wrap{max-width:560px;margin:0 auto;padding:0 1.1rem;}
   header{border-bottom:1px solid var(--line);padding:1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
   header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
   .brand{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
-  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--leesgoud);}
   main{padding:1.4rem 0 4rem;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.6rem;margin:.3rem 0 .2rem;}
   .deck{color:var(--muted);font-size:.92rem;}
@@ -59,7 +59,7 @@
   .saldo small{font-size:1.2rem;color:var(--soft);}
   .chiprij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0;}
   .chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:.45rem 1rem;font-size:.9rem;cursor:pointer;font-family:inherit;font-weight:600;}
-  .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--leesgoud);}
   .rij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
   .tikkie{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
   .tikkie:last-child{border-bottom:0;}
@@ -70,7 +70,7 @@
   .hist .plus{color:var(--green);font-variant-numeric:tabular-nums;font-weight:700;}
   .hist .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;}
   .hist span:first-child{color:var(--muted);}
-  .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--gold);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
+  .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--leesgoud);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
   /* De tegoedcode is 24 tekens en moet met de hand overgetikt kunnen worden.
      Dus met opzet GEEN .kascode hierboven: die is Bodoni op 2,6rem met 0,35em
      letterruimte -- gemaakt voor zes tekens die je van een afstand voorleest, en
@@ -111,7 +111,7 @@
   <!-- de wallet -->
   <section id="vPay" hidden>
     <div class="kaart" style="border-color:var(--gold);">
-      <div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Saldo van <span id="pNaam" style="color:var(--gold);"></span></div>
+      <div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Saldo van <span id="pNaam" style="color:var(--leesgoud);"></span></div>
       <div class="saldo" id="pSaldo">0,00<small> eur</small></div>
       <div class="chiprij" role="group" aria-label="Oplaadbedrag">
         <button class="chip" data-laad="2500">+ 25</button>
@@ -294,7 +294,7 @@ async function ververs(){
   // uitstaand van mij
   $('#pVanMij').innerHTML = d.vanMij.length ? d.vanMij.map(v =>
     '<div class="tikkie"><div class="wie"><b>'+esc(v.aan)+'</b><small>'+esc(v.oms)+' · '+esc(euro(v.centen))+' eur</small></div>'+
-    '<span style="color:'+(v.status==='betaald'?'var(--green)':v.status==='open'?'var(--gold)':'var(--soft)')+';font-size:.82rem;">'+esc(v.status)+'</span>'+
+    '<span style="color:'+(v.status==='betaald'?'var(--green)':v.status==='open'?'var(--leesgoud)':'var(--soft)')+';font-size:.82rem;">'+esc(v.status)+'</span>'+
     (v.status==='open' ? '<button class="knop stil" data-intrek="'+v.id+'" style="padding:.3rem .8rem;font-size:.75rem;">Trek in</button>' : '')+'</div>').join('')
     : '<div class="leeg">Geen uitstaande Klompjes.</div>';
   $('#pVanMij').querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
@@ -375,8 +375,8 @@ async function laadTiks(){
     el.innerHTML = r.tiks.map(t =>
       '<div style="display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.85rem;">'+
         '<span>'+(t.richting === 'uit'
-          ? 'Jij tikte <b style="color:var(--gold);">'+esc(t.met)+'</b>'
-          : '<b style="color:var(--gold);">'+esc(t.met)+'</b> tikte jou')+
+          ? 'Jij tikte <b style="color:var(--leesgoud);">'+esc(t.met)+'</b>'
+          : '<b style="color:var(--leesgoud);">'+esc(t.met)+'</b> tikte jou')+
           (t.oms && t.oms !== 'Tik' ? ' <span style="color:var(--muted);">· '+esc(t.oms)+'</span>' : '')+'</span>'+
         '<span style="white-space:nowrap;color:var(--muted);">'+(t.richting==='uit'?'-':'+')+' '+euro(t.centen)+' · '+wanneer(t.at)+'</span>'+
       '</div>').join('');

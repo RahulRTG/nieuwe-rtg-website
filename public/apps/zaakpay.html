@@ -13,8 +13,9 @@
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;
   /* LEZEN IS IETS ANDERS DAN ACCENTEREN. --gold is de accenttoon en prima voor
-     een rand; als TEKST haalt hij op het champagne-thema 2,76:1 op een lichte
-     kaart -- onder de 4,5 die kleine tekst vraagt. rtg-themas.css houdt daarvoor
+     een rand; als TEKST haalt hij op de champagne-kaart (#F9F6F2) 2,94:1 --
+     onder de 4,5 die kleine tekst vraagt, en zelfs onder de 3,0 voor grote; de
+     leesbare toon haalt daar 4,51. rtg-themas.css houdt daarvoor
      --rtg-leesgoud bij: per thema de goudtoon die daar wel leest. */
   --leesgoud:var(--rtg-leesgoud,#A98F1C);}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -53,7 +54,7 @@
      tekens is werk en geen ceremonie, dus Inter, tabulair, en hij mag afbreken. */
   .boncode{font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.08em;font-size:1.05rem;color:var(--leesgoud);text-align:center;padding:.5rem 0 .2rem;word-break:break-all;}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
-  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  :focus-visible{outline:2px solid var(--leesgoud);outline-offset:2px;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>

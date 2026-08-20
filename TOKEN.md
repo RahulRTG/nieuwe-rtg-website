@@ -227,7 +227,7 @@ kop van het bestand zodat niemand hem "overbodig" noemt.
 | 2 | Tegoed op het scherm van het lid (`apps/pay.html`) | gebouwd |
 | 2b | De zaakkant op een scherm (`apps/zaakpay.html`): saldo, innen, uitbetalen én tegoed | gebouwd |
 | 3 | De bestaande punten kloppend: centen, een plafond, een vermogen, en toetsen. Plus de cadeaukaart die niet betaald werd | gebouwd |
-| 3b | Het punten-tegoed door het pay-grootboek laten lopen, zodat er één saldo is in plaats van twee (par. 7) | — |
+| 3b | Het punten-tegoed door het pay-grootboek laten lopen. **Geblokkeerd**: dat kan pas als bestellingen, rekeningen en ritten zélf via RTG Pay betaald worden, en dat doen ze niet (par. 7) | — |
 | 4 | Het besluit over de bank-uitgang (par. 7) en, als dat valt, de vergunningsroute | — |
 | 5 | E-money, eigen of via distributie. Begint niet met code maar met een vergunning | — |
 
@@ -250,22 +250,32 @@ als weglating in de code zitten.
    route is die we openhouden, hoort dat in `kern/bevoegdheid/lijst.js` te
    staan — dat bestand is een besluit, geen implementatiedetail, dus het is niet
    stilzwijgend aangepast.
-3. **De gouden tekst op `apps/pay.html` leest niet in elk thema.** Dat scherm
-   zet zijn eigen `--gold:#A98F1C` en gebruikt die ook als tekstkleur. Op het
-   champagne-thema haalt die toon **2,76:1** op een lichte kaart — onder de 4,5
-   die kleine tekst vraagt en onder de 3,0 voor grote. `rtg-themas.css` houdt
-   daar `--rtg-leesgoud` voor bij; het nieuwe tegoed-deel gebruikt die, de
-   oudere gouden teksten op dat scherm (de kascode, de statuslabels, het
-   woordmerk) nog niet. Dat is een ronde over dat hele scherm, en die hoort
-   bewust genomen te worden in plaats van als bijvangst.
-4. **Het punten-tegoed is een TWEEDE saldo naast RTG Pay.** Twee bedragen die
-   allebei geld van hetzelfde lid voorstellen, is precies waar
-   `kern/geldwereld.js` voor waarschuwt: ze kunnen uit elkaar lopen en er is er
-   maar één die dubbel boekhoudt. Het hoort door het pay-grootboek te lopen —
-   verzilveren wordt dan een boeking naar de wallet en de korting verdwijnt. Dat
-   omleggen raakt vijf betaalpaden en verandert wat het lid ziet (een korting
-   wordt saldo), dus het is een productbesluit en geen opruiming. **Mijn
-   aanbeveling: doen**, maar als eigen ronde.
+3. ~~De gouden tekst op `apps/pay.html`~~ — **gedaan.** Alle gouden TEKST op
+   `pay.html` staat nu op `--rtg-leesgoud`, plus de focusring op beide
+   pay-schermen. Gemeten op de champagne-kaart (`#F9F6F2`, wit 42% over
+   parelmoer): de vaste toon haalt **2,94:1** en zakt daarmee zelfs voor grote
+   tekst; de leesbare toon haalt **4,51:1** en haalt de 4,5 voor kleine tekst. Wat op de vaste `--gold` blijft is geen tekst: kaartranden, de
+   achtergrond van de springlink en het vinkje. Zonder gekozen thema verandert
+   er niets, want `--rtg-leesgoud` bestaat alleen mét een thema.
+4. **Het punten-tegoed is een TWEEDE saldo naast RTG Pay — en de weg ernaartoe
+   is langer dan hier eerst stond.** Twee bedragen die allebei geld van hetzelfde
+   lid voorstellen, is precies waar `kern/geldwereld.js` voor waarschuwt.
+
+   Hier stond: *"het hoort door het pay-grootboek te lopen — mijn aanbeveling:
+   doen, maar als eigen ronde"*. Bij het uitwerken bleek de voorwaarde daaronder
+   te ontbreken. **De drie betaalpaden die het tegoed verrekenen, verplaatsen
+   zelf geen geld**: `betaalOrderVoor`, `betaalRekeningVoor` en `betaalRitVoor`
+   zetten `paid = true`, schrijven een factuur en sturen een bericht — er komt
+   geen `pay`, geen betaal-naad en geen boeking aan te pas. Zou verzilverd
+   tegoed in de wallet landen, dan kan het in precies die paden nergens meer
+   worden uitgegeven: de korting verdwijnt en er komt geen betaling voor terug.
+
+   De echte volgorde is dus omgekeerd. **Eerst moeten bestellingen, rekeningen
+   en ritten via RTG Pay betaald worden**; pas daarna is het tegoed een saldo in
+   plaats van een korting. Dat eerste is geen opruiming maar een verbouwing van
+   de hele handelslaag, met eigen keuzes (wat gebeurt er bij een zaak zonder
+   RTG Pay, wat met achteraf betalen, wat met terugbetalen). **Aanbeveling: niet
+   nu**, en niet als bijvangst van het geldwerk — het is een eigen project.
 5. **De bedragen van de twee plafonds.** € 10.000 per wallet en € 500 aan
    punten-tegoed zijn verdedigbare keuzes, geen wettelijke getallen. Wie het
    walletplafond verhoogt, verzwakt de grond onder het besluit; wie het verlaagt

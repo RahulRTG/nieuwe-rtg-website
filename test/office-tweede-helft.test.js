@@ -358,10 +358,20 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, en een pas is de 
     phone: '+31612340003', password: 'Wachtwoord123', geboortedatum: '1988-03-11' });
   assert.equal(gewoon.status, 200);
   assert.equal(gewoon.body.state.user.tier, 'rtg', 'zelf aanmelden levert een RTG Pass');
+  /* EEN CONSUMENTENPAS IS GEEN BEDRIJF. Hier stond dat een gewone RTG Pass een
+     partnerplek mocht aanvragen; dat was het antwoord van 18 augustus 2026 op
+     een poort die toen DE Business Pass eiste -- vanaf 5.000 euro, en daarmee
+     dicht voor het restaurant met acht man uit MARKT.md. Twee dagen later kwam
+     de trede die daar wel voor is: COMMERCIE.md 3b maakt RTG Business Lite
+     (150 euro) de partnerpoort. De poort vraagt sindsdien de capability
+     `can_be_partner` en geen pas-id, zodat een volgende trede zichzelf niet
+     opnieuw buitensluit. */
   const metRtg = await post('/api/partner/apply', { company: 'Gewone Pas BV', type: 'restaurant',
     city: 'Rotterdam', contactName: 'A. Vragende', email: 'gp' + t + '@rtg.test', akkoord: true }, gewoon.body.token);
-  assert.equal(metRtg.status, 200, 'een gewone RTG Pass mag een partnerplek aanvragen: '
+  assert.equal(metRtg.status, 403, 'een RTG Pass is persoonlijk en draagt geen partnerplek: '
     + JSON.stringify(metRtg.body).slice(0, 160));
+  assert.match(String(metRtg.body.error || ''), /zakelijke pas/,
+    'en de weigering noemt de pas die het wel doet -- anders is 403 een doodlopende weg');
 
   // en een menselijk besluit naar Business verandert daar niets aan
   await elevateTier(base, gewoon.body.token, 'business', kantoor);

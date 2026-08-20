@@ -94,7 +94,17 @@ const EIGEN = [
   '/api/betaal/',         // de betaalkern: direct betalen en een verzoek voldoen
   '/api/supplier/pay/',   // de zaak int en betaalt uit via de wallet
   '/api/supplier/pos/',   // kassa-checkout en losse verkoop
-  '/api/supplier/ticket/' // deurverkoop
+  '/api/supplier/ticket/', // deurverkoop
+
+  /* En deze drie vond de toets op zijn TWEEDE ronde, na de samenvoeging van
+     24 takken. Ze zijn stuk voor stuk nieuw geldwerk dat zijn `idem` uit het
+     lijf leest en aan de wallet doorgeeft; de centrale kas zou hun eigen
+     antwoord overstemmen met een bewaard eerste antwoord, en juist bij geld is
+     dat antwoord afhankelijk van de toestand NA de eerste aanroep. Het zijn
+     losse routes en geen mappen, dus ze staan hier voluit. */
+  '/api/festival/verkoop/rond',  // de festivalkassa rondt af via de wallet
+  '/api/giftcard/buy',           // een cadeaukaart kopen; de sleutel gaat mee naar de wallet
+  '/api/supplier/betaalverzoek'  // directpay geeft bij dezelfde sleutel het BESTAANDE verzoek terug
 ];
 const doetHetZelf = (pad) => EIGEN.some(p => pad.startsWith(p));
 

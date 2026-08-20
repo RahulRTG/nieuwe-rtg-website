@@ -38,7 +38,9 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
        aanvraag van voor deze wijziging), dan wordt er niets vastgelegd en valt de
        zaak op de gedocumenteerde terugval, telbaar in `zonderAbonnement()`. */
     try {
-      const trede = a.businessPass && a.businessPass.pas;
+      // uit het bewijs hierboven, in welke van de twee vormen het ook staat:
+      // `pas.tier` is de huidige, `businessPass.pas` de vorm van voor 20 augustus.
+      const trede = (bewijs && bewijs.tier) || (a.businessPass && a.businessPass.pas);
       if (trede && kern.zaakAbonnement) kern.zaakAbonnement.zet(code, trede, 'partner-goedkeuring');
     } catch (e) { /* een abonnement dat niet landt, mag de goedkeuring niet blokkeren */ }
     const pin = accounts.makePin();

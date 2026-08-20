@@ -94,12 +94,22 @@ module.exports = (kern) => {
       company, type, city, contactName, email, phone, note,
       // vastlegging van het akkoord (bewijs): wat en wanneer
       akkoord: { partnervoorwaarden: true, verwerkersafspraken: true, at: new Date().toISOString() },
-      // het Business Pass-bewijs: zonder dit keurt het kantoor niets goed
-      /* De TREDE erbij, niet alleen "er was een zakelijke pas". Zonder dat
-         gegeven weet niemand na goedkeuring waar de zaak op zit, en dan is het
-         capability-profiel een folder: het staat er en niets houdt zich eraan.
-         Zie kern/commercie/zaakabonnement.js. */
-      businessPass: { key: passSess.key, pas: passSess.tier, at: new Date().toISOString() },
+      /* HET LEDENBEWIJS. Zonder dit keurt het kantoor niets goed.
+
+         DIT VELD HEEFT DRIE VORMEN GEHAD EN DAT IS EEN KEER TE VAAK. Het heette
+         `businessPass: {key, at}` toen de poort DE Business Pass eiste; op
+         18 augustus werd dat `pas: {tier, key, at}`, omdat de eis toen niet meer
+         over die ene pas ging; en op 20 augustus kwam de trede erbij, maar in de
+         oude naam en met een andere binnennaam (`businessPass.pas`). Drie
+         schrijvers, twee lezers, en routes/office/partners.js las er nog maar
+         een van goed -- het abonnement van de zaak landde niet.
+
+         Het is nu EEN vorm: `pas`, met `tier` erin. De trede hoort erbij en niet
+         alleen "er was een zakelijke pas": zonder dat gegeven weet niemand na
+         goedkeuring waar de zaak op zit en is het capability-profiel een folder.
+         Zie kern/commercie/zaakabonnement.js. Oude aanvragen met `businessPass`
+         blijven leesbaar; het kantoor leest allebei. */
+      pas: { tier: passSess.tier, key: passSess.key, at: new Date().toISOString() },
       status: 'nieuw', at: new Date().toISOString()
     };
     db.data.partnerApplications.unshift(entry);

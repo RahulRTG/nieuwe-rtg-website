@@ -26,14 +26,16 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, elevateTier } = require('./helper');
 
 const CODE = 'RTG-INST-TEST';
 
 function post(base) {
-  return (pad, body, token) => fetch(base + pad, {
+  return (pad, body, token, idem) => fetch(base + pad, {
     method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' },
+      token ? { Authorization: 'Bearer ' + token } : {},
+      idem ? { 'Idempotency-Key': idem } : {}),
     body: JSON.stringify(body || {})
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
@@ -108,9 +110,18 @@ test('de boardroom sluit een echte instelling aan, en de beheerder kan naar binn
       { code: aan.body.code, staffId: manager.id, pin: aan.body.pin })).body;
     assert.ok(login.token, 'en die komt met zijn PIN naar binnen');
 
-    // 6. twee keer dezelfde instelling is een nette 409
-    assert.equal((await P('/api/office/instelling/aansluiten', GEMEENTE, eigenaar)).status, 409,
-      'dezelfde gemeente niet nog een keer');
+    /* 6. TWEE KEER DEZELFDE INSTELLING IS EEN NETTE 409 -- maar dan moet het wel
+       een tweede HANDELING zijn en geen dubbeltik. Aansluiten staat in
+       lib/idemsleutels-werelden.js als `zelfdeVerzoek`, dus een woordelijk
+       gelijk verzoek binnen het venster van seconden krijgt het eerste antwoord
+       opnieuw te horen -- 200, en de 409 hieronder kwam nooit aan de beurt.
+       Dat is precies wat die laag hoort te doen bij een dubbelklik.
+
+       Een bewuste tweede poging draagt daarom een eigen Idempotency-Key, net als
+       een echte client die weet dat hij iets nieuws vraagt. Dan loopt hij wel de
+       handler in en komt de dubbelcontrole van kern/instelling.js aan het woord. */
+    assert.equal((await P('/api/office/instelling/aansluiten', GEMEENTE, eigenaar,
+      'tweede-poging-gemeente')).status, 409, 'dezelfde gemeente niet nog een keer');
 
     /* 7. EN ALLEEN INTERNE GENRES. Kon je hier een restaurant neerzetten, dan
        was dit een tweede deur naar de catalogus die de partnerbeoordeling
@@ -148,7 +159,12 @@ test('via het partnerformulier komt niemand als gemeente of marechaussee binnen'
       assert.ok(r.body.error && r.body.error.length > 15, genre + ': met uitleg erbij (' + r.body.error + ')');
     }
 
-    // en een gewoon genre gaat gewoon door: dit is geen dichte deur voor iedereen
+    /* En een gewoon genre gaat gewoon door: dit is geen dichte deur voor
+       iedereen. De pas moet daarvoor wel zakelijk zijn -- sinds COMMERCIE.md 3b
+       (20 augustus 2026) is RTG Business Lite de partnerpoort. Dat is een ANDERE
+       deur dan de genrepoort die deze toets meet, en zonder deze regel zou een
+       403 van de paspoort hier lezen als "het genre is dicht". */
+    await elevateTier(srv.base, lid, 'business');
     const goed = await P('/api/partner/apply', aanvraag('restaurant', 'Gewoon Een Zaak'), lid);
     assert.equal(goed.status, 200, 'een open genre blijft open: ' + JSON.stringify(goed.body).slice(0, 160));
 

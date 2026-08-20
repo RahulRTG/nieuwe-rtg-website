@@ -1,8 +1,19 @@
-/* De toegangseis voor nieuwe partners: een partnerplek vraag je aan ALS LID.
-   Elke pas telt -- RTG, Lifestyle en Business -- want een bedrijf beginnen is
-   niet aan de elite voorbehouden; alleen wie helemaal geen pas heeft komt er
-   niet in. Het kantoor geeft ook alleen een code uit bij een aanvraag met
-   ledenbewijs.
+/* De toegangseis voor nieuwe partners: een partnerplek vraag je aan ALS LID,
+   met een ZAKELIJKE pas. Het kantoor geeft ook alleen een code uit bij een
+   aanvraag met ledenbewijs.
+
+   HIER STOND "ELKE PAS TELT", EN DAT IS OP 20 AUGUSTUS 2026 VERVANGEN. De
+   redenering eronder klopte wel: de poort eiste toen DE Business Pass, en die
+   is sinds de ladder vanaf 5.000 euro per maand -- dus sloot hij het restaurant
+   met acht man buiten, precies de klant die MARKT.md als ingang aanwijst. Het
+   antwoord daarop was eerst "dan telt elke pas", en dat was twee dagen later
+   niet meer nodig: COMMERCIE.md 3b maakt RTG Business Lite (150 euro) de
+   partnerpoort, en dat is de trede die er speciaal voor is. De poort vraagt
+   sindsdien de capability `can_be_partner` en geen pas-id, zodat een volgende
+   trede zichzelf niet opnieuw buitensluit.
+
+   Een consumentenpas is dus geen bedrijf. Wie helemaal geen pas heeft, komt er
+   nog steeds niet in -- die regel is niet veranderd.
    Draai: node --experimental-sqlite --test test/partnerpas.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -56,14 +67,15 @@ test('zonder pas geen aanvraag (en dus geen code)', async () => {
   assert.equal(gast.status, 403, 'een ingelogde gast zonder pas komt er niet in');
 });
 
-test('een gewone RTG Pass is genoeg: een bedrijf beginnen is niet aan de elite', async () => {
+test('een consumentenpas is geen bedrijf: de partnerpoort vraagt een zakelijke trede', async () => {
   const rtg = await api('/api/partner/apply', aanvraag({ company: 'Casa Marisol', passToken: rtgToken }));
-  assert.equal(rtg.status, 200, 'een RTG Pass mag een partnerplek aanvragen');
+  assert.equal(rtg.status, 403, 'een RTG Pass is een persoonlijke pas en geen zaak');
+  const uit = await json(rtg);
+  assert.match(String(uit.error || ''), /zakelijke pas/,
+    'en de weigering zegt WELKE pas het wel doet, anders is 403 een doodlopende weg');
   const st = await json(await api('/api/office/state', {}, officeToken));
   const a = (st.state.partnerApplications || []).find(x => x.company === 'Casa Marisol');
-  assert.ok(a && a.pas && a.pas.tier === 'rtg', 'het ledenbewijs zit op de aanvraag, met de pas erbij');
-  const besluit = await json(await api('/api/office/partner/decide', { id: a.id, action: 'goedkeuren' }, eigenaarToken));
-  assert.ok(besluit.code, 'het kantoor geeft ook op een RTG Pass een bedrijfscode uit');
+  assert.equal(a, undefined, 'een geweigerde aanvraag hoort ook niet stil op het kantoor te landen');
 });
 
 test('met Business Pass: aanvraag met ledenbewijs, en het kantoor geeft de code uit', async () => {

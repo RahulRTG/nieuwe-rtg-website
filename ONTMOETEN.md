@@ -663,8 +663,35 @@ niets meer.
 
 Daarna pas de introductie in drie fasen.
 
-**Fase 3 — beschikbaarheid zonder agenda**, in allebei: Blind Availability in
-Vonk, Private Availability in Rendez-vous. Eén mechanisme, twee gezichten.
+**Fase 3 — gedaan: beschikbaarheid zonder agenda** (`kern/beschikbaar.js`).
+Eén bestand, twee namen: Blind Availability in Vonk, Private Availability in
+Rendez-vous — net als de ontmoetpoort.
+
+**Een ritme, geen kalender.** Eenentwintig hokjes: zeven dagen maal ochtend,
+middag, avond. Geen datum, geen tijdstip, geen "volgende week". Wat u aankruist
+zegt hoe uw week er meestal uitziet, niet waar u op 24 augustus bent — dat
+laatste is aanwezigheid en woont in `rendezvous-aanwezig.js`.
+
+**Er komt precies één ding uit, en pas na een wederzijdse match:** het eerste
+dagdeel in de week dat u allebei aankruiste. *Donderdagavond komt u beiden uit.*
+Niet de lijst, niet het aantal, niet "u heeft er drie gemeen".
+
+Dat "één en niet allemaal" is de hele beveiliging. Zou de doorsnede compleet
+teruggegeven worden, dan hoefde iemand alleen alle eenentwintig hokjes aan te
+vinken om de volledige beschikbaarheid van de ander uit te lezen, en was de
+belofte onwaar voor iedereen die de moeite nam.
+
+**En wat het niet oplost, want dat hoort erbij.** Wie het echt op iemand gemunt
+heeft, kan zijn eigen hokjes eenentwintig keer omzetten en zo alsnog het hele
+ritme aflezen. Deze constructie is daar geen bewijs tegen; ze maakt het een
+volgehouden handeling in plaats van een vinkje. Twee dingen dempen de schade: het
+gaat om een ritme en niet om een agenda (u leert dat iemand meestal op
+donderdagavond kan, niet waar hij dan is), en het kan alleen na een wederzijdse
+match. Wie zich zo gedraagt hoort in de meldstroom thuis en niet in een slimmer
+algoritme.
+
+En er staat niets omheen: geen teller, geen "nog twee dagen", geen "plan nu".
+De zin noemt het dagdeel en houdt op (par. 4.1).
 
 **Fase 4 — de ontmoeting.** Meet Halfway met contextbewuste plekken in Vonk;
 Arrange It met De Rechterhand in Rendez-vous.

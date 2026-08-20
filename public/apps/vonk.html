@@ -61,6 +61,13 @@
   .waarom .op{color:var(--soft);}
   .merk{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0.18rem 0.55rem;font-size:0.72rem;color:var(--soft);margin:0.2rem 0.25rem 0 0;}
   .niet{font-size:0.72rem;color:var(--soft);margin-top:0.5rem;}
+  .rooster{width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:0.78rem;}
+  .rooster th{font-weight:400;color:var(--soft);font-size:0.72rem;text-align:left;padding:0.3rem 0.2rem;}
+  .rooster td{padding:0;}
+  .rooster label{display:flex;align-items:center;justify-content:center;margin:0;min-height:2.75rem;
+    border:1px solid var(--line);border-radius:8px;cursor:pointer;}
+  .rooster input{width:auto;min-width:0;padding:0;}
+  .wanneer{color:var(--gold);font-size:0.82rem;margin-top:0.4rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -103,6 +110,13 @@
     <div class="rij"><button class="knop vol" id="wBewaar">Bewaar wat er toe doet</button><span class="stil" id="wStatus"></span></div>
   </section>
 
+  <section aria-label="Wanneer u kunt">
+    <h2>Wanneer u kunt</h2>
+    <p class="stil">Kruis aan wanneer u meestal kunt. Dit is geen agenda: er staat geen datum en geen tijdstip in, en niemand ziet uw vinkjes. Heeft u een match, dan krijgt u allebei één dagdeel te zien dat u beiden aankruiste &mdash; verder niets.</p>
+    <div id="rooster"><p class="stil">Bewaar eerst uw profiel.</p></div>
+    <div class="rij"><button class="knop vol" id="bBewaar">Bewaar wanneer u kunt</button><span class="stil" id="bStatus"></span></div>
+  </section>
+
   <section aria-label="De dagselectie">
     <h2>Vandaag voor u</h2>
     <div id="selectie"><p class="stil">Nog geen selectie; bewaar eerst uw profiel.</p></div>
@@ -132,6 +146,24 @@
 
   let MATCHES = [];   // wat er binnenkomt van /api/vonk/mijn
   let TABEL = null;   // de assentabel zoals de server hem geeft (kern/vonk/wensen.js)
+  let ROOSTER = null; // de dagdelen (kern/beschikbaar.js) -- ook hier geen tweede lijst
+
+  /* Eenentwintig hokjes: zeven dagen maal drie dagdelen. Een tabel omdat het er
+     een IS -- dag in de rij, dagdeel in de kolom -- en dat leest een schermlezer
+     als zodanig voor. Elk vinkje draagt zijn hele naam ("donderdagavond"), zodat
+     hij ook los van zijn rij te begrijpen is. */
+  function tekenRooster(mijn){
+    if (!ROOSTER) return;
+    const aan = new Set(mijn || []);
+    const kop = '<tr><th></th>' + ROOSTER.delen.map(p => '<th scope="col">' + esc(p.label) + '</th>').join('') + '</tr>';
+    const rijen = ROOSTER.dagen.map(d =>
+      '<tr><th scope="row">' + esc(d.label) + '</th>' + ROOSTER.delen.map(p => {
+        const s = ROOSTER.slots.find(x => x.id === d.id + '-' + p.id);
+        return '<td><label><input type="checkbox" data-slot="' + esc(s.id) + '"' +
+          (aan.has(s.id) ? ' checked' : '') + ' aria-label="' + esc(s.label) + '"></label></td>';
+      }).join('') + '</tr>').join('');
+    $('#rooster').innerHTML = '<table class="rooster"><caption class="weg">Wanneer u meestal kunt</caption>' + kop + rijen + '</table>';
+  }
 
   /* De voorkeurstaal wordt UIT DE SERVERTABEL opgebouwd en staat hier niet
      nog een keer. Een as erbij is een regel in ASSEN en verder niets -- zou
@@ -201,7 +233,9 @@
         $('#pInt').value = (s.profiel.interesses || []).join(', ');
       }
       if (s.tabel) TABEL = s.tabel;
+      if (s.rooster) ROOSTER = s.rooster;
       tekenAssen(s.profiel);
+      tekenRooster(s.profiel && s.profiel.beschikbaar);
       $('#selectie').innerHTML = ((s.mensen || []).map(p =>
         '<div class="kaart"><div class="naam">' + esc(p.codenaam) + ', ' + p.leeftijd + '</div>' +
         '<div class="sub">' + esc(p.stad || 'stad onbekend') + (p.gemeen && p.gemeen.length ? ' · samen: ' + p.gemeen.map(esc).join(', ') : '') + '</div>' +
@@ -221,6 +255,7 @@
         (x.tafel ? '<div class="sub">Tafel: ' + esc(x.tafel.supplierName) + ' (' + esc(x.tafel.plek) + '), ' + esc(x.tafel.datum) + ' ' + esc(x.tafel.tijd) +
           ' · EUR ' + x.tafel.prijsPP + ' p.p. · status: ' + esc(x.status) + '</div>' : '<div class="sub">Spreek samen iets af in de chat.</div>') +
         (merken(x.kenmerken) ? '<div>' + merken(x.kenmerken) + '</div>' : '') +
+        (x.wanneer && x.wanneer.samen ? '<div class="wanneer">' + esc(x.wanneer.tekst) + '</div>' : '') +
         (x.tafel && !x.ikBetaalde ? '<div class="rij"><button class="knop vol" data-betaal="' + esc(x.id) + '">Bevestig met EUR ' + x.tafel.prijsPP + '</button></div>' : '') +
         '<div class="chat">' + (x.berichten || []).map(b => '<div><span class="wie">' + esc(b.van) + '</span> ' + esc(b.tekst) + '</div>').join('') + '</div>' +
         '<div class="rij"><input data-tekst="' + esc(x.id) + '" maxlength="300" placeholder="Bericht" aria-label="Bericht aan ' + esc(x.met) + '">' +
@@ -272,6 +307,12 @@
       await api('profiel', { kenmerken, wensen, zicht });
       $('#wStatus').textContent = 'Bewaard.'; laad();
     } catch (e) { meld(e.message); }
+  });
+  $('#bBewaar').addEventListener('click', async () => {
+    if (!ROOSTER) { meld('Bewaar eerst uw profiel.'); return; }
+    const beschikbaar = Array.from(document.querySelectorAll('[data-slot]')).filter(c => c.checked).map(c => c.dataset.slot);
+    try { await api('profiel', { beschikbaar }); $('#bStatus').textContent = 'Bewaard.'; laad(); }
+    catch (e) { meld(e.message); }
   });
   if (!tok) { meld('Log eerst in via de leden-app.'); return; }
   laad();

@@ -11,7 +11,7 @@
 const W = require('./wensen');
 
 module.exports = (ctx) => {
-  const { d, mag, likeVan, matchTussen, haversine, publiek, DAG_MAX } = ctx;
+  const { d, mag, likeVan, matchTussen, haversine, publiek, DAG_MAX, rooster } = ctx;
 
   /* AFSTAND IN KILOMETERS, of null als we het niet weten.
 
@@ -78,7 +78,7 @@ module.exports = (ctx) => {
     const leeg = mensen.length ? null
       : wegDoorEis ? 'Vandaag geen nieuwe Vonk. Niemand voldeed aan wat u het belangrijkst noemde.'
         : 'Vandaag geen nieuwe Vonk. Morgen kijken we weer.';
-    return { status: 200, profiel: publiek(key, ik, true), mensen, tabel: W.tabel(), leeg,
+    return { status: 200, profiel: publiek(key, ik, true), mensen, tabel: W.tabel(), rooster: rooster(), leeg,
       /* Wat er NIET meeweegt hoort bij de uitleg: dat is precies het vertrouwen
          dat een datingapp normaal niet geeft (ONTMOETEN.md par. 3.2). */
       nietGebruikt: ['politieke voorkeur', 'inkomen', 'populariteit'],

@@ -305,3 +305,66 @@ test('13. een onbekende afstand is geen nabije afstand', async () => {
   const zonder = api.vonkSelectie('user-3');
   assert.equal(zonder.mensen.length, 2, 'zonder plaats filtert afstand niemand weg');
 });
+
+/* ---- BLIND AVAILABILITY (kern/beschikbaar.js, ONTMOETEN.md fase 3) ----
+   Een ritme in dagdelen, geen agenda. Er komt EEN dagdeel uit en pas na een
+   wederzijdse match; de hokjes van de ander ziet niemand. */
+
+test('14. blind availability: de hokjes van de ander blijven onzichtbaar, ook in de selectie', async () => {
+  const hier = nieuwePlek();
+  const a = await lidMetProfiel({ beschikbaar: ['do-avond', 'za-middag'] }, hier);
+  const b = await lidMetProfiel({ beschikbaar: ['za-middag'] }, hier);
+  const kaart = zieIn(await selectieVan(b.token), a.codenaam);
+  assert.ok(kaart, 'de kandidaat staat er');
+  assert.ok(!('beschikbaar' in kaart), 'zijn dagdelen staan niet op de kaart');
+  assert.ok(!('wanneer' in kaart), 'en er is voor een match nog geen doorsnede');
+  // de eigenaar krijgt zijn eigen hokjes wel terug
+  const eigen = (await selectieVan(a.token)).profiel;
+  assert.deepEqual(eigen.beschikbaar, ['do-avond', 'za-middag'], 'u ziet uw eigen hokjes');
+});
+
+test('15. blind availability: na een match EEN dagdeel, ook als er meer overlappen', async () => {
+  const hier = nieuwePlek();
+  const a = await lidMetProfiel({ beschikbaar: ['di-avond', 'do-avond', 'za-middag'] }, hier);
+  const b = await lidMetProfiel({ beschikbaar: ['do-avond', 'za-middag', 'zo-avond'] }, hier);
+  await api('/api/vonk/like', { codenaam: b.codenaam }, a.token);
+  const l = await api('/api/vonk/like', { codenaam: a.codenaam }, b.token);
+  assert.equal(l.body.match, true, 'wederzijds');
+
+  const mijn = await api('/api/vonk/mijn', {}, a.token);
+  const rij = mijn.body.matches.find(m => m.met === b.codenaam);
+  assert.ok(rij, 'de match staat er');
+  assert.equal(rij.wanneer.samen.slot, 'do-avond', 'de eerste in de week, niet zaterdag');
+  assert.match(rij.wanneer.tekst, /^Donderdagavond komt u beiden uit\.$/,
+    'de zin noemt het dagdeel en houdt op -- geen aansporing erachteraan');
+  // en nergens de lijst of het aantal
+  const tekst = JSON.stringify(rij.wanneer);
+  assert.ok(!/za-middag/.test(tekst), 'het tweede gedeelde dagdeel staat er niet bij');
+  assert.ok(!/di-avond|zo-avond/.test(tekst), 'en de niet-gedeelde hokjes al helemaal niet');
+});
+
+test('16. blind availability: alle hokjes aanvinken levert nog steeds een dagdeel op', async () => {
+  const hier = nieuwePlek();
+  const alles = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo']
+    .flatMap(d => ['ochtend', 'middag', 'avond'].map(p => d + '-' + p));
+  const gulzig = await lidMetProfiel({ beschikbaar: alles }, hier);
+  const ander = await lidMetProfiel({ beschikbaar: ['wo-ochtend', 'vr-avond'] }, hier);
+  await api('/api/vonk/like', { codenaam: ander.codenaam }, gulzig.token);
+  await api('/api/vonk/like', { codenaam: gulzig.codenaam }, ander.token);
+
+  const mijn = await api('/api/vonk/mijn', {}, gulzig.token);
+  const rij = mijn.body.matches.find(m => m.met === ander.codenaam);
+  assert.equal(rij.wanneer.samen.slot, 'wo-ochtend', 'nog steeds precies een dagdeel');
+  assert.ok(!/vr-avond/.test(JSON.stringify(rij.wanneer)),
+    'wie alles aanvinkt leest de agenda van de ander niet uit');
+});
+
+test('17. blind availability: geen overlap en geen invoer zijn twee verschillende zinnen', async () => {
+  const B = require('../server/kern/beschikbaar');
+  assert.equal(B.zin(['ma-ochtend'], ['zo-avond']).tekst, 'U heeft op dit moment geen dagdeel samen.');
+  assert.equal(B.zin([], ['zo-avond']).tekst, 'U heeft nog geen dagdelen aangekruist.',
+    'uw eigen lege lijst is uw eigen zaak en zegt niets over de ander');
+  assert.equal(B.zin([], []).samen, null);
+  // en er is geen enkel pad waarlangs een lijst naar buiten komt
+  assert.deepEqual(Object.keys(B.zin(['do-avond'], ['do-avond'])).sort(), ['samen', 'tekst']);
+});

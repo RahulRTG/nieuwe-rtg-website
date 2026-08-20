@@ -36,6 +36,10 @@
   .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
 .samen{color:var(--gold);font-size:.85rem;margin-top:.4rem;}
+.rooster{width:100%;border-collapse:collapse;margin-top:.5rem;font-size:.78rem;}
+.rooster th{font-weight:400;color:var(--soft);font-size:.7rem;text-align:left;padding:.3rem .2rem;}
+.rooster td{padding:0;}
+.rooster label{display:flex;align-items:center;justify-content:center;margin:0;min-height:2.75rem;border:1px solid var(--line);border-radius:8px;cursor:pointer;}
 .per{display:flex;gap:.4rem;align-items:flex-end;flex-wrap:wrap;margin-top:.5rem;}
 .per>span{flex:1;min-width:6rem;}
 .per input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.85rem;padding:.5rem .6rem;min-height:2.75rem;}
@@ -125,6 +129,18 @@ function rijHtml(v){
     +'<span><span class="lbl">Tot</span><input data-tot type="date" value="'+esc(v.tot||'')+'" aria-label="Tot en met welke dag"></span>'
     +'<button class="weg" data-weg aria-label="Deze periode weghalen">Weg</button></div>';
 }
+/* Dezelfde eenentwintig hokjes als in Vonk, uit hetzelfde rooster van de server
+   (kern/beschikbaar.js). Een tabel, want dag maal dagdeel is er een. */
+function roosterHtml(R, mijn){
+  const aan=new Set(mijn||[]);
+  const kop='<tr><th></th>'+R.delen.map(p=>'<th scope="col">'+esc(p.label)+'</th>').join('')+'</tr>';
+  const rijen=R.dagen.map(d=>'<tr><th scope="row">'+esc(d.label)+'</th>'+R.delen.map(p=>{
+    const s=R.slots.find(x=>x.id===d.id+'-'+p.id);
+    return '<td><label><input type="checkbox" data-slot="'+esc(s.id)+'"'+(aan.has(s.id)?' checked':'')+' aria-label="'+esc(s.label)+'"></label></td>';
+  }).join('')+'</tr>').join('');
+  return '<table class="rooster">'+kop+rijen+'</table>';
+}
+
 function koppelRijen(){
   document.querySelectorAll('#periodes [data-weg]').forEach(b=> b.onclick=()=>{ b.closest('.per').remove(); });
 }
@@ -148,9 +164,18 @@ async function profiel(){
     +'<div class="note">Andere leden zien hier niets van, behalve wanneer u tegelijk ergens bent. Uw woonplaats wordt nooit los getoond.</div>'
     +'<div class="h-mt80"><button class="knop" id="bewaarWaar">Bewaren</button> <button class="stilknop" id="wis">Alles wissen</button></div></div>';
 
+  h+='<div class="kaart"><h2>Wanneer u kunt</h2>'
+    +'<div class="note">Kruis aan wanneer u meestal kunt. Geen agenda, geen datum, geen tijdstip &mdash; en niemand ziet uw vinkjes. Bij een wederzijdse match krijgt u allebei \u00e9\u00e9n dagdeel te zien dat u beiden aankruiste.</div>'
+    +roosterHtml(d.rooster, p.beschikbaar)
+    +'<div class="h-mt80"><button class="knop" id="bewaarWanneer">Bewaren</button></div></div>';
+
   h+='<div class="note">Bij een match stelt Rahul een jetset-date voor op een plek waar u beiden bent of voor openstaat. Rahul belooft niets; De Rechterhand regelt de date pas als u beiden akkoord bent.</div>';
   $('#main').innerHTML=h;
   $('#bewaar').onclick=async()=>{ try{ await api('profiel/zet',{aan:$('#aan').checked,over:$('#over').value,zoekt:$('#zoekt').value,wensen:$('#wensen').value,locaties:$('#locaties').value}); meld('Profiel bewaard.'); }catch(e){ meld(e.message); } };
+  $('#bewaarWanneer').onclick=async()=>{
+    const beschikbaar=Array.from(document.querySelectorAll('[data-slot]')).filter(c=>c.checked).map(c=>c.dataset.slot);
+    try{ await api('profiel/zet',{beschikbaar}); meld('Bewaard.'); }catch(e){ meld(e.message); }
+  };
   $('#plus').onclick=()=>{ $('#periodes').insertAdjacentHTML('beforeend', rijHtml({stad:'',van:'',tot:''})); koppelRijen(); };
   koppelRijen();
   $('#bewaarWaar').onclick=async()=>{
@@ -200,6 +225,7 @@ async function matches(){
   if(!d.matches.length){ $('#main').innerHTML='<div class="leeg">Nog geen matches. Like iemand bij Ontdek; is het wederzijds, dan verschijnt de match hier.</div>'; return; }
   let h=d.matches.map(m=>'<div class="kaart match"><div class="nm" style="font-family:Bodoni Moda,serif;font-size:1.15rem;">'+esc(m.codenaam)+'</div>'
     +samenRegel(m.samen)
+    +(m.wanneer&&m.wanneer.samen?'<div class="samen">'+esc(m.wanneer.tekst)+'</div>':'')
     +(m.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">Gedeelde locaties: '+m.gedeeldeLocaties.map(esc).join(', ')+'</div>':((m.samen||[]).length?'':'<div class="note">Nog geen gedeelde locatie. Vul locaties aan bij Profiel.</div>'))
     +'<div class="h-mt70"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button></div>'
     +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div></div>').join('');

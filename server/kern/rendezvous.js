@@ -22,6 +22,10 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
      bestand geeft er GEEN reisbron aan mee, en dat is de grens zelf en niet een
      controle erop -- zie de kop van ./rendezvous-aanwezig.js. */
   const AW = require('./rendezvous-aanwezig');
+  /* Private Availability: dezelfde code als Vonks Blind Availability
+     (./beschikbaar.js). Een ritme in dagdelen; alleen de doorsnede komt eruit,
+     en pas bij een wederzijdse match. */
+  const B = require('./beschikbaar');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const lijstUit = (v, max, elk) => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => schoon(x, elk || 40)).filter(Boolean).slice(0, max || 12);
 
@@ -45,9 +49,10 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
     const p = r.profielen[key] || { aan: false, over: '', zoekt: '', wensen: [], locaties: [] };
     /* Alles wat we van u weten staat hier, ook de aanwezigheid: ONTMOETEN.md
        par. 2.1 eist dat een lid het kan zien en kan wissen. */
-    return { status: 200, codenaam: codenaam(key),
+    return { status: 200, codenaam: codenaam(key), rooster: B.rooster(),
       profiel: { aan: !!p.aan, over: p.over || '', zoekt: p.zoekt || '', wensen: p.wensen || [],
-        locaties: p.locaties || [], thuis: p.thuis || '', aanwezig: AW.schoonAanwezig(p.aanwezig, schoon) } };
+        locaties: p.locaties || [], thuis: p.thuis || '', aanwezig: AW.schoonAanwezig(p.aanwezig, schoon),
+        beschikbaar: B.schoonBeschikbaar(p.beschikbaar) } };
   }
   function rvProfiel(key, b) {
     const poort = mag(key);
@@ -62,6 +67,7 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
     if (b.thuis !== undefined) p.thuis = schoon(b.thuis, 40);
     // de lijst wordt VERVANGEN, niet aangevuld; zie de kop van ./rendezvous-aanwezig.js
     if (b.aanwezig !== undefined) p.aanwezig = AW.schoonAanwezig(b.aanwezig, schoon);
+    if (b.beschikbaar !== undefined) p.beschikbaar = B.schoonBeschikbaar(b.beschikbaar);
     p.bij = nu();
     r.profielen[key] = p; save();
     return { status: 200, ok: true };
@@ -143,6 +149,8 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
         const samen = AW.overlapTussen(mij, r.profielen[t]);
         // waar u tegelijk bent gaat voor op waar u allebei weleens komt
         uit.push({ id: t, codenaam: codenaam(t), gedeeldeLocaties: g, samen,
+          // pas hier, na de wederzijdse like: een dagdeel of niets
+          wanneer: B.zin(mij.beschikbaar, r.profielen[t].beschikbaar),
           voorstel: (samen[0] && samen[0].stad) || g[0] || null, sinds: mijn[t] });
       }
     }
@@ -167,6 +175,6 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
     return { status: 200, ok: true, aanwezig: [], thuis: '' };
   }
 
-  const { rvDate } = require('./rendezvous-date')({ R, AW, mag, codenaam, schoon, matchesVan, anthropic });
+  const { rvDate } = require('./rendezvous-date')({ R, AW, B, mag, codenaam, schoon, matchesVan, anthropic });
   return { rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate, rvAanwezigWis };
 };

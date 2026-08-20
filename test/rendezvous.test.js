@@ -263,3 +263,53 @@ test('de presence graph komt nooit uit een reis, ook niet als die er is', async 
   assert.equal(kandidaten.length, 1, 'de ander is wel gewoon een kandidaat');
   assert.deepEqual(kandidaten[0].samen, [], 'maar zonder ingetikte aanwezigheid is er geen overlap');
 });
+
+/* ---- PRIVATE AVAILABILITY (kern/beschikbaar.js, ONTMOETEN.md fase 3) ----
+   Hetzelfde mechanisme als Vonks Blind Availability, ander gezicht. */
+
+test('private availability: pas bij wederzijdse interesse, en dan een dagdeel', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'A-beschikbaar', beschikbaar: ['wo-avond', 'do-avond'] }, a);
+  await rv('profiel/zet', { aan: true, over: 'B-beschikbaar', beschikbaar: ['do-avond', 'vr-avond'] }, b);
+
+  // voor de match: de kandidaatkaart draagt niets over dagdelen
+  const kand = await json(await rv('kandidaten', {}, a));
+  const zB = kand.kandidaten.find(k => k.over === 'B-beschikbaar');
+  assert.ok(zB, 'B is een kandidaat');
+  assert.ok(!('beschikbaar' in zB), 'zijn dagdelen staan er niet');
+  assert.ok(!('wanneer' in zB), 'en er is nog geen doorsnede');
+
+  // na de wederzijdse like wel, en dan precies een
+  await rv('like', { id: zB.id }, a);
+  const kandB = await json(await rv('kandidaten', {}, b));
+  await rv('like', { id: kandB.kandidaten.find(k => k.likteMij).id }, b);
+  const m = await json(await rv('matches', {}, a));
+  const rij = m.matches.find(x => x.codenaam === zB.codenaam);
+  assert.equal(rij.wanneer.samen.slot, 'do-avond', 'het gedeelde dagdeel');
+  assert.equal(rij.wanneer.tekst, 'Donderdagavond komt u beiden uit.');
+  assert.ok(!/wo-avond|vr-avond/.test(JSON.stringify(rij.wanneer)),
+    'de niet-gedeelde dagdelen van beide kanten blijven binnen');
+});
+
+test('private availability: een lid ziet zijn eigen dagdelen terug', async () => {
+  const a = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, beschikbaar: ['za-middag', 'onzin', 'ma-ochtend'] }, a);
+  const p = (await json(await rv('profiel', {}, a))).profiel;
+  assert.deepEqual(p.beschikbaar, ['ma-ochtend', 'za-middag'],
+    'in weekvolgorde, en onbekende hokjes vallen weg');
+});
+
+/* EEN MECHANISME, TWEE GEZICHTEN. Vonk en Rendez-vous noemen dit anders maar
+   draaien op hetzelfde bestand. Zou er ooit een tweede kopie komen, dan lopen de
+   twee uiteen zodra er een verandert -- LAT.md regel 4. */
+test('beschikbaarheid is een gedeeld mechanisme, geen twee kopieen', async () => {
+  const fs = require('fs');
+  const vonk = fs.readFileSync('server/kern/vonk/index.js', 'utf8');
+  const rdv = fs.readFileSync('server/kern/rendezvous.js', 'utf8');
+  assert.match(vonk, /require\('\.\.\/beschikbaar'\)/, 'Vonk gebruikt de gedeelde module');
+  assert.match(rdv, /require\('\.\/beschikbaar'\)/, 'Rendez-vous ook');
+  // en ze geven allebei exact dezelfde zin bij dezelfde invoer
+  const B = require('../server/kern/beschikbaar');
+  assert.equal(B.zin(['do-avond'], ['do-avond']).tekst, 'Donderdagavond komt u beiden uit.');
+});

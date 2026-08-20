@@ -25,6 +25,7 @@
 const { coord } = require('../util');
 const { maakOntmoetpoort, MIN_LEEFTIJD } = require('../ontmoetpoort');
 const W = require('./wensen');
+const B = require('../beschikbaar');
 
 const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
@@ -69,6 +70,10 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
        is het punt: kenmerken zijn wie u bent, wensen zijn wat u van een ander
        vraagt en zijn voor niemand zichtbaar, zicht bepaalt per as wie uw eigen
        antwoord ziet. */
+    /* Blind Availability (../beschikbaar.js): een ritme in dagdelen, geen agenda.
+       Gaat NOOIT mee in `publiek` -- alleen de doorsnede komt eruit, en pas na
+       een wederzijdse match. */
+    if (data.beschikbaar !== undefined) p.beschikbaar = B.schoonBeschikbaar(data.beschikbaar);
     p.kenmerken = W.zetKenmerken(p.kenmerken, data.kenmerken);
     p.wensen = W.zetWensen(p.wensen, data.wensen);
     p.zicht = W.zetZicht(p.zicht, data.zicht);
@@ -82,7 +87,8 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
   const publiek = (key, p, zelf, niveau) => ({ codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
     stad: p.stad, interesses: p.interesses, kenmerken: W.toonKenmerken(p, zelf ? 'match' : (niveau || 'kandidaten')),
     ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt, leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax,
-      maxKm: p.maxKm, actief: p.actief, wensen: p.wensen || {}, zicht: p.zicht || {} } : {}) });
+      maxKm: p.maxKm, actief: p.actief, wensen: p.wensen || {}, zicht: p.zicht || {},
+      beschikbaar: p.beschikbaar || [] } : {}) });
 
   /* ---- de dagselectie: eindig en wederzijds passend ----
      pastBij dekt de drie eisen die ALTIJD hard zijn en die daarom niet in de
@@ -103,7 +109,12 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     /* Pas na een wederzijdse like gaan de assen open die op 'match' staan. Dat
        is wat die zichtbaarheidskeuze BETEKENT; zonder deze regel was het een
        knop die niets doet (LAT.md regel 8). */
-    kenmerkenVan: (k) => W.toonKenmerken(d().profielen[k] || {}, 'match') };
+    kenmerkenVan: (k) => W.toonKenmerken(d().profielen[k] || {}, 'match'),
+    /* De enige uitweg voor beschikbaarheid, en hij loopt via ./match omdat daar
+       de wederzijdse match staat. Geeft een dagdeel of niets, nooit een lijst. */
+    wanneerMet: (mij, ander) => B.zin((d().profielen[mij] || {}).beschikbaar,
+      (d().profielen[ander] || {}).beschikbaar),
+    rooster: B.rooster };
   const api = { vonkProfielZet: profielZet };
   Object.assign(api, require('./selectie')(ctx));
   Object.assign(api, require('./match')(ctx));

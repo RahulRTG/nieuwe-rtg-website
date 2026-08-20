@@ -154,9 +154,20 @@ const caps = require('../server/kern/commercie/capaciteiten');
 test('10. rechten komen uit een productprofiel, niet uit een pas-id', () => {
   assert.equal(caps.mag('business-lite', 'can_use_pos'), true);
   assert.equal(caps.mag('rtg', 'can_use_pos'), false, 'een consumentenpas draait geen kassa');
+  /* Deze toets bewaakte eerst dat Business De Rechterhand NIET had. Dat was mijn
+     bewering en niet die van het product: routes/member/lifestyle.js laat de
+     Business Pass al sinds het begin meeerven als hoger niveau. Ze afdwingen zou
+     elke Business Pass-houder die suite hebben afgenomen -- een migratie die
+     rechten intrekt is een storing met een nette naam.
+
+     Wat WEL geldt: de bedrijfsvoering zit niet bij Lifestyle. Dat is de
+     asymmetrie die het product echt heeft. */
   assert.equal(caps.mag('lifestyle', 'can_use_lifestyle_service'), true);
-  assert.equal(caps.mag('business', 'can_use_lifestyle_service'), false,
-    'Lifestyle is geen zwaardere Business: de menselijke regie zit daar en niet hier');
+  assert.equal(caps.mag('business', 'can_use_lifestyle_service'), true,
+    'de Business Pass erft De Rechterhand, zoals routes/member/lifestyle.js dat altijd al deed');
+  assert.equal(caps.mag('lifestyle', 'can_manage_staff'), false,
+    'maar andersom niet: Lifestyle is een persoonlijke pas, geen zakelijke');
+  assert.equal(caps.mag('lifestyle', 'can_be_partner'), false);
 
   // niet mogen is de veilige uitkomst
   assert.equal(caps.mag('business', 'can_hack_everything'), false, 'een onbekende capability geeft niets');

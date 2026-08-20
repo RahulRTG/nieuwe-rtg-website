@@ -64,12 +64,23 @@ const PROFIEL = {
   'business-lite': ['can_use_workos', 'can_manage_staff', 'can_use_pos', 'can_use_ai', 'can_be_partner'],
 
   business: ['can_use_workos', 'can_manage_staff', 'can_use_pos', 'can_use_ai',
-    'can_use_enterprise_governance', 'can_use_dedicated_support', 'can_be_partner'],
+    'can_use_enterprise_governance', 'can_use_dedicated_support', 'can_be_partner',
+    'can_use_lifestyle_service'],
 
-  /* Lifestyle is geen zwaardere Business. De menselijke regie is er wel, de
-     bedrijfsvoering niet: het is een persoonlijke pas, geen zakelijke. Wie beide
-     wil, heeft beide nodig -- en dat is eerlijker dan een pas die stilzwijgend
-     alles kan. */
+  /* Lifestyle is geen zwaardere Business EN ANDERSOM WEL. Dat klinkt scheef en
+     het is het niet:
+
+     - de BEDRIJFSVOERING (kassa, personeel, Werk OS) zit bij de zakelijke treden
+       en niet bij Lifestyle: het is een persoonlijke pas;
+     - de MENSELIJKE REGIE (De Rechterhand, concierge) zit bij Lifestyle EN bij
+       Business, want de Business Pass erft die suite als hoger niveau. Zo werkt
+       het al sinds routes/member/lifestyle.js bestaat.
+
+     Hier stond eerst dat Business die regie NIET had, en dat was een bewering die
+     ik had opgeschreven zonder naar de bestaande code te kijken. Ze afdwingen zou
+     elke Business Pass-houder De Rechterhand hebben afgenomen -- een migratie die
+     rechten intrekt is een storing met een nette naam. Het profiel hoort het
+     product te BESCHRIJVEN, niet te herontwerpen. */
   lifestyle: ['can_use_ai', 'can_use_dedicated_support', 'can_use_lifestyle_service']
 };
 

@@ -21,9 +21,24 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
     // Een nieuw goedgekeurde partner start OFFLINE: eerst door de ondernemer-
     // poort (Salon-pagina vullen + de rondleidingen), dan pas online en
     // zichtbaar voor leden. online:false zet ensureSupplierDefaults niet terug.
-    const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0.12, menu: [], online: false };
+    /* `rate: 0.12` stond hier tot 20 augustus 2026: elke nieuwe partner werd
+       aangemaakt met een commissie van 12 procent. commissieVoor() geeft
+       inmiddels altijd nul (kern/commercie/vergoeding.js), dus er bewoog niets
+       -- maar een veld dat 0.12 zegt terwijl het huis 0% belooft, is precies de
+       tegenspraak die deze hele ronde heeft opgeruimd. Nul is wat het is. */
+    const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0, menu: [], online: false };
     ensureSupplierDefaults(s);
     db.data.suppliers.push(s);
+
+    /* HET ABONNEMENT VAN DE ZAAK. Zonder dit weet niemand na vandaag waar deze
+       zaak op zit, en kan het capability-profiel niets afdwingen. De trede komt
+       van de aanvraag zelf -- de pas waarmee is aangevraagd. Ontbreekt hij (een
+       aanvraag van voor deze wijziging), dan wordt er niets vastgelegd en valt de
+       zaak op de gedocumenteerde terugval, telbaar in `zonderAbonnement()`. */
+    try {
+      const trede = a.businessPass && a.businessPass.pas;
+      if (trede && kern.zaakAbonnement) kern.zaakAbonnement.zet(code, trede, 'partner-goedkeuring');
+    } catch (e) { /* een abonnement dat niet landt, mag de goedkeuring niet blokkeren */ }
     const pin = accounts.makePin();
     await accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
     a.status = 'goedgekeurd'; a.code = code;

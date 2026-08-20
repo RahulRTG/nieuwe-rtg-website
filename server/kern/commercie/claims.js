@@ -225,6 +225,22 @@ function claims() {
     toets: 'test/bundelprijs.test.js'
   });
 
+  /* WAT EEN ABONNEMENT BEVAT, en dat het ook echt wordt afgedwongen. Dit was tot
+     20 augustus 2026 een folder: het profiel stond er en zes van de acht
+     capabilities werden nergens gevraagd -- omdat een zaak helemaal geen
+     abonnement droeg. */
+  uit.push({
+    id: 'claim.subscription.capabilities',
+    onderwerp: 'Wat een abonnement bevat',
+    waarde: Object.keys(caps.CAPS).length + '_CAPABILITIES',
+    tekst: 'elke trede heeft een productprofiel dat zegt wat het abonnement bevat, en een zaak ' +
+      'draagt de trede waarop zij is toegelaten; de vraag "mag deze klant dit" wordt op een plek ' +
+      'beantwoord en niet per bestand opnieuw',
+    bron: 'kern/commercie/capaciteiten.js + kern/commercie/zaakabonnement.js',
+    dekking: DEKKING.AFGEDWONGEN,
+    toets: 'test/zaakabonnement.test.js + test/commercie.test.js'
+  });
+
   return uit;
 }
 

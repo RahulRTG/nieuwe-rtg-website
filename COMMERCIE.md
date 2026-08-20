@@ -310,6 +310,45 @@ Business      → WorkOS full, enterprise governance, integraties, SLA,
 
 Bij een zesde abonnement hoeven er dan geen 77 bestanden open.
 
+### Een zaak draagt een abonnement
+
+De capabilities konden aanvankelijk niets afdwingen, en de reden bleek niet
+luiheid maar een **ontbrekend gegeven**: een zaak droeg helemaal geen trede. De
+partnerpoort kijkt naar de pas van de *aanvrager* op het moment van aanvragen, en
+daarna wist niemand meer waar die zaak op zat. Zo is een productprofiel een
+folder — het staat er, en niets houdt zich eraan.
+
+`kern/commercie/zaakabonnement.js` legt die schakel. Bij goedkeuring van een
+partneraanvraag wordt de trede vastgelegd; daarna beantwoordt
+`mag(zaakCode, cap)` de vraag.
+
+**Wat doet een zaak van vóór de ladder?** Er zijn er honderden. Ze weigeren zou
+elke bestaande partner buitensluiten; ze stilzwijgend alles geven maakt de
+handhaving zinloos. Dus vallen ze terug op `business`, met
+`herkomst: 'voor-de-ladder'` erbij — dat is wat ze feitelijk hadden (ze zijn
+toegelaten onder "een partnerplek vraagt een Business Pass"), en het is de
+ruimste zakelijke trede, dus de terugval kan nooit iets afpakken. **Een migratie
+die rechten intrekt, is een storing met een nette naam.**
+
+En de terugval is **telbaar**: `zonderAbonnement()` en
+`/api/office/commercie/zaakabonnementen` laten zien wie erop draait. Een terugval
+die je niet kunt tellen, is een gat dat er over een jaar nog is en dat niemand
+meer ziet — dezelfde reden dat `toewijzing: 'terugval'` in de kantoorregels als
+dekkingsgat telt.
+
+### Een correctie die het opschrijven waard is
+
+In dit profiel stond eerst dat de Business Pass **De Rechterhand niet had** —
+"Lifestyle is geen zwaardere Business". Dat was een bewering die hier is
+opgeschreven zonder naar de bestaande code te kijken:
+`routes/member/lifestyle.js` laat de Business Pass al sinds het begin meeërven
+als hoger niveau. Ze afdwingen zou elke Business Pass-houder die suite hebben
+afgenomen.
+
+Het profiel hoort het product te **beschrijven**, niet te herontwerpen. De
+asymmetrie die er wél is: de bedrijfsvoering (kassa, personeel, Werk OS) zit bij
+de zakelijke treden en niet bij Lifestyle, want dat is een persoonlijke pas.
+
 Wat er voor Business Lite bewezen moet zijn vóór `beschikbaar: true`: identity,
 entitlement, onboarding, billing, permissions, governance-behandeling,
 feature access, cancellation, renewal, invoices, upgrade path.

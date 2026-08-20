@@ -131,7 +131,11 @@ module.exports = (kern) => {
       // vastlegging van het akkoord (bewijs): wat en wanneer
       akkoord: { partnervoorwaarden: true, verwerkersafspraken: true, at: new Date().toISOString() },
       // het Business Pass-bewijs: zonder dit keurt het kantoor niets goed
-      businessPass: { key: passSess.key, at: new Date().toISOString() },
+      /* De TREDE erbij, niet alleen "er was een zakelijke pas". Zonder dat
+         gegeven weet niemand na goedkeuring waar de zaak op zit, en dan is het
+         capability-profiel een folder: het staat er en niets houdt zich eraan.
+         Zie kern/commercie/zaakabonnement.js. */
+      businessPass: { key: passSess.key, pas: passSess.tier, at: new Date().toISOString() },
       status: 'nieuw', at: new Date().toISOString()
     };
     db.data.partnerApplications.unshift(entry);

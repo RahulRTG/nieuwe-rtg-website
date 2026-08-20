@@ -490,6 +490,7 @@
       "wacht",
       "weefsel",
       "werkplaats",
+      "zaakAbonnement",
       "zelfzorg"
     ],
     "klok": [
@@ -1186,7 +1187,8 @@
       "totpOk",
       "trChat",
       "veiligGelijk",
-      "wieKijkt"
+      "wieKijkt",
+      "zaakAbonnement"
     ],
     "onboarding": [
       "eigenaar",

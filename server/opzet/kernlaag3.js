@@ -176,8 +176,16 @@ Object.assign(kern, (() => {
   }, RONDE_MS);
   if (timer.unref) timer.unref();
 
+  /* Het abonnement van een ZAAK. Zonder dit gegeven kan het capability-profiel
+     niets afdwingen: een zaak droeg helemaal geen trede, en dan is
+     `mag(zaak, 'can_use_pos')` een vraag zonder onderwerp. Zie
+     kern/commercie/zaakabonnement.js, met name waarom een zaak zonder
+     vastgelegd abonnement op `business` terugvalt en waarom die terugval
+     telbaar moet blijven. */
+  const zaakAbonnement = require('../kern/commercie/zaakabonnement').maakZaakabonnement({ db, save });
+
   return { commercieRonde: ronde, commercieVerrekening: verrekening,
-    commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen };
+    commercieAllocatie: allocatie, commercieTegoed: tegoed, prijsmeldingen, zaakAbonnement };
 })());
 
 Object.assign(kern, require('../kern/keuken')({ db, save, crypto, schoon, notifySupplier }));

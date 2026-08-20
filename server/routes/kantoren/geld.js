@@ -7,7 +7,7 @@ const allocatie = require('../../kern/commercie/allocatie');
 const claims = require('../../kern/commercie/claims');
 
 module.exports = (ctx) => {
-  const { app, officeAuth, boardroomAuth, veilig, stuur, afdelingen, kern,
+  const { app, officeAuth, boardroomAuth, veilig, stuur, afdelingen, kern, db,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = ctx;
 
   /* De geld-regie: RTG bepaalt de pasprijzen, de partnervergoeding (per genre
@@ -71,6 +71,25 @@ module.exports = (ctx) => {
       res.json({ ok: true, uitslag: await kern.commercieRonde.draai() });
     } catch (e) { console.error('[commercie-ronde]', e); res.status(500).json({ error: 'De ronde liep vast.' }); }
   });
+  /* HET ABONNEMENT VAN DE ZAKEN. Het getal dat ertoe doet staat vooraan: hoeveel
+     zaken draaien op de gedocumenteerde terugval omdat ze van voor de ladder
+     zijn? Een terugval die je niet kunt tellen, is een gat dat er over een jaar
+     nog is en dat niemand meer ziet. */
+  app.post('/api/office/commercie/zaakabonnementen', officeAuth, (req, res) => veilig(res, () => {
+    if (!kern || !kern.zaakAbonnement) return { status: 503, error: 'Niet gemount.' };
+    const codes = (db && db.data && db.data.suppliers || []).map(s => s.code);
+    return { status: 200, ok: true,
+      vastgelegd: kern.zaakAbonnement.lijst(),
+      opTerugval: kern.zaakAbonnement.zonderAbonnement(codes) };
+  }));
+  app.post('/api/office/commercie/zaakabonnement/zet', boardroomAuth, (req, res) => veilig(res, () => {
+    if (!kern || !kern.zaakAbonnement) return { status: 503, error: 'Niet gemount.' };
+    const b = req.body || {};
+    const r = kern.zaakAbonnement.zet(b.code, b.pas, b.naam || 'boardroom');
+    if (r.ok) afdelingen.audit(b.naam || 'boardroom', 'Zaakabonnement ' + r.code + ' gezet op ' + r.pas);
+    return r;
+  }));
+
   app.post('/api/office/commercie/openstaand', officeAuth, (req, res) => veilig(res, () =>
     (kern && kern.commercieVerrekening
       ? { status: 200, ok: true, ...kern.commercieVerrekening.openstaand() }

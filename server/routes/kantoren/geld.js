@@ -91,6 +91,17 @@ module.exports = (ctx) => {
   app.post('/api/office/geld/betaaldienst', boardroomAuth, (req, res) => veilig(res, () =>
     (req.body && (req.body.vastCenten != null || req.body.pct != null))
       ? kern.geldBetaaldienstZet(req.body) : { status: 200, ok: true, ...kern.geldBetaaldienst() }));
+  /* De AI-inkoopkosten: de basis onder elke bundelprijs. Zonder deze instelling
+     is er geen bundelprijs, en dan is een bundel niet te koop -- credits
+     weggeven omdat een som ontbreekt is de duurste manier om een gat te
+     verbergen. */
+  app.post('/api/office/geld/ai-inkoop', boardroomAuth, (req, res) => veilig(res, () => {
+    const r = kern.geldAiInkoopZet(req.body || {});
+    if (r.ok) afdelingen.audit(req.body.naam || 'boardroom',
+      'AI-inkoopkosten gezet op ' + (r.inkoopCentenPer1000 / 100).toFixed(2) + ' euro per 1000 credits');
+    return r;
+  }));
+
   app.post('/api/office/geld/korting', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldKortingZet(req.body || {});
     if (r.ok) afdelingen.audit(req.body.naam || 'boardroom', 'Ledenvoordeel ' + r.genre + ' gezet op ' + r.pct + '%');

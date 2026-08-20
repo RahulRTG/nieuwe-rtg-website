@@ -151,6 +151,24 @@ function maakGeldregie({ db, save }) {
     return Math.min(c, t.vastCenten + Math.round(c * t.pct / 100));
   }
 
+  /* ---- de AI-inkoopkosten: de basis onder de bundelprijzen ----
+     Wat capaciteit RTG werkelijk kost, per 1000 credits. Alleen de boardroom
+     weet dat, want alleen daar is bekend wat er wordt betaald. Staat er niets,
+     dan is er GEEN bundelprijs -- en dat is een antwoord, geen fout
+     (kern/commercie/bundelprijs.js). */
+  function aiInkoop() {
+    const t = d().aiInkoop || {};
+    return { inkoopCentenPer1000: Number.isFinite(t.inkoopCentenPer1000) ? t.inkoopCentenPer1000 : null };
+  }
+  function aiInkoopZet(data) {
+    const c = Math.round(Number((data || {}).centenPer1000));
+    if (!Number.isFinite(c) || c < 0 || c > 100000)
+      return { status: 400, error: 'Geef de inkoopkosten in centen per 1000 credits (0 tot 100.000).' };
+    d().aiInkoop = { inkoopCentenPer1000: c };
+    save();
+    return { status: 200, ok: true, ...aiInkoop() };
+  }
+
   /* ---- het boardroom-overzicht: alles op een bord ---- */
   function overzicht() {
     const g = d();
@@ -158,6 +176,8 @@ function maakGeldregie({ db, save }) {
       pasprijzen: pasprijzen().passen,
       kortingen: g.kortingen,
       betaaldienst: betaaldienst(),
+      aiInkoop: aiInkoop(),
+      aiBundels: require('./commercie/bundelprijs').lijst(aiInkoop()),
       /* Geen commissietabel meer: er valt niets te zetten. Wat er wel is, zijn
          de benoemde vergoedingssoorten -- de boardroom hoort te kunnen lezen
          wat RTG een partner in rekening brengt en waarvoor. */
@@ -169,7 +189,8 @@ function maakGeldregie({ db, save }) {
 
   return { geldPasprijzen: pasprijzen, geldPasprijsZet: pasprijsZet, geldCommissieZet: commissieZet,
     geldKortingZet: kortingZet, geldOverzicht: overzicht, ledenvoordeelVoor, commissieVoor,
-    geldBetaaldienst: betaaldienst, geldBetaaldienstZet: betaaldienstZet, betaaldienstKosten };
+    geldBetaaldienst: betaaldienst, geldBetaaldienstZet: betaaldienstZet, betaaldienstKosten,
+    geldAiInkoop: aiInkoop, geldAiInkoopZet: aiInkoopZet };
 }
 
 module.exports = { maakGeldregie };

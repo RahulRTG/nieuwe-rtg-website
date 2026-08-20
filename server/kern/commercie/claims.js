@@ -209,6 +209,22 @@ function claims() {
     toets: 'test/ronde.test.js + test/commercie-ronde.e2e.js'
   });
 
+  /* De bundelprijs. Stond in COMMERCIE.md als "bewust niet gebouwd" omdat de
+     inkoopkant ontbrak -- en dat was eerlijk, maar geen eindstand: de klant
+     krijgt te horen dat hij een bundel kan kopen, en dan hoort er te staan wat
+     die kost. De som bestaat nu; of er een PRIJS uitkomt hangt aan een
+     boardroom-instelling, en zonder die instelling is de bundel niet te koop. */
+  uit.push({
+    id: 'claim.ai.bundle_price',
+    onderwerp: 'Prijs van een AI-bundel',
+    waarde: 'GEREKEND_NIET_GEKOZEN',
+    tekst: 'de verkoopprijs van een bundel volgt uit inkoopkosten, veiligheidsmarge en ' +
+      'platformmarge; zonder ingestelde inkoopkosten is er geen prijs en is de bundel niet te koop',
+    bron: 'kern/commercie/bundelprijs.js',
+    dekking: DEKKING.AFGEDWONGEN,
+    toets: 'test/bundelprijs.test.js'
+  });
+
   return uit;
 }
 

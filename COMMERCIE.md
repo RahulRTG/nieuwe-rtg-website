@@ -188,7 +188,7 @@ in zit, staat erbij.
 | 3 | Betaaldienst met ledger en recovery | af — `commercie/fee.js`, inclusief herkansingsronde |
 | 4 | Contract Engine + price snapshots | af — `commercie/contract.js` |
 | 5 | Business Lite via capabilities | af — `commercie/capaciteiten.js`; de trede is uitgerold |
-| 6 | AI Entitlement + bundels + cap | af — `commercie/tegoed.js` + `/api/member/ai/*`; bundelprijzen nog niet (zie hieronder) |
+| 6 | AI Entitlement + bundels + cap | af — `commercie/tegoed.js` + `commercie/bundelprijs.js` + `/api/member/ai/*` |
 | 7 | Tax Engine | af — `commercie/btw.js` |
 | 8 | Social allocation settlement | af — `commercie/allocatie.js`; uitbetaling wacht op `RTF_IBAN` |
 | 9 | Claims uit de kern | af — `commercie/claims.js` + `/api/claims` |
@@ -224,16 +224,17 @@ over; ze meldt dat een tegoed op raakt maar koopt niets bij.
 
 ### Wat er bewust NIET in zit
 
-- **De verkoopprijs van een AI-bundel.** Die wordt gerekend uit de inkoopkant
-  (`inkoopkosten → veiligheidsmarge → platformmarge → verkoopprijs`), en die
-  laag bestaat niet. Een bedrag verzinnen zou precies de fout van PRIJZEN.md
-  §4.12 zijn. De bundels dragen daarom capaciteit en een naam, geen prijs.
-- **De uitbetaalkant van de subsidie en de sociale afdracht.** Beide staan als
-  verplichting met een bedrag en een status; het overmaken loopt via de
-  betaal-naad en wacht op een rekening.
-- **De omzetstaat over contractprijzen** (PRIJZEN.md §4.7): die leest de
-  accountlaag en niet de contracten.
-- **De entree van € 10.000** (§4.6): te herzien, niet te bouwen.
+- **Een IBAN voor de RTFoundation.** Dat is geen code maar een bankrekening. De
+  verdeling, het spoor en de betaalbaarstelling staan; zolang `RTF_IBAN` leeg is
+  blijft een afdracht op GERESERVEERD, en de claim staat daarom op GEBOUWD.
+- **Het bedrag van de AI-inkoopkosten.** De *som* staat er
+  (`inkoopkosten → veiligheidsmarge → platformmarge → verkoopprijs`); wat de
+  boardroom moet invullen is wat capaciteit werkelijk kost. Zonder die
+  instelling is er geen bundelprijs en is een bundel **niet te koop** — credits
+  weggeven omdat een som ontbreekt, is de duurste manier om een gat te
+  verbergen.
+- **De loonkant van Lifestyle** (PRIJZEN.md §4.12): een menselijke concierge is
+  een salaris, en dat is geen som die code kan maken.
 
 ## 4b. Wat hierna komt
 
@@ -322,9 +323,15 @@ Er is met opzet **geen** endpoint dat verbruik boekt: dat gebeurt waar de AI wor
 aangeroepen, na `mag()`. Een los boek-endpoint zou een pad geven om verbruik vast
 te leggen dat niemand heeft toegestaan.*
 
-*Wat nog ontbreekt: de verkoopprijs van een bundel. Die wordt gerekend uit de
-inkoopkant en niet gekozen, en die laag bestaat niet — een bedrag verzinnen zou
-precies de fout van PRIJZEN.md §4.12 zijn.*
+*De verkoopprijs van een bundel wordt GEREKEND en niet gekozen
+(`kern/commercie/bundelprijs.js`): inkoopkosten → veiligheidsmarge (25%) →
+platformmarge (40%) → afronden omhoog. De inkoopkosten zijn een
+boardroom-instelling, want alleen daar is bekend wat capaciteit werkelijk kost;
+staat er niets, dan is er geen prijs en is de bundel niet te koop. De
+veiligheidsmarge is er om een reden die terugkomt: een klant koopt capaciteit en
+geen model, dus RTG mag het model onder een verkochte bundel vervangen — en
+draagt dan het verschil als het duurder wordt. De marge is precies die
+verzekering.*
 
 ### Het ontwerp
 

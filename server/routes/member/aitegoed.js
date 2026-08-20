@@ -11,6 +11,12 @@
 module.exports = (kern) => {
   const { app, db, save, auth, officeAuth, schoon } = kern;
   const tegoed = require('../../kern/commercie/tegoed').maakTegoed({ db, save, nu: () => Date.now() });
+  const bundelprijs = require('../../kern/commercie/bundelprijs');
+  /* De inkoopkosten komen LAAT uit de geld-regie: die is bij het mounten van
+     deze routes misschien nog niet gebonden, en een prijs die op nul valt omdat
+     de volgorde toevallig anders lag, is precies het soort fout dat deze hele
+     ronde moest opruimen. */
+  const inkoop = () => { try { return kern.geldAiInkoop ? kern.geldAiInkoop() : {}; } catch (e) { return {}; } };
   const veilig = (res, werk) => {
     try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); }
     catch (e) { console.error('[aitegoed]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
@@ -29,8 +35,16 @@ module.exports = (kern) => {
   app.post('/api/member/ai/beleid', auth, (req, res) => veilig(res, () =>
     tegoed.zetBeleid(wie(req), pasVan(req), req.body || {})));
 
-  app.post('/api/member/ai/bundel', auth, (req, res) => veilig(res, () =>
-    tegoed.koopBundel(wie(req), pasVan(req), schoon((req.body || {}).bundel, 20))));
+  /* De prijs komt uit de berekening en niet uit een veld in het verzoek: een
+     bundelprijs die de client meestuurt, is een bundelprijs die de client kiest. */
+  app.post('/api/member/ai/bundel', auth, (req, res) => veilig(res, () => {
+    const id = schoon((req.body || {}).bundel, 20);
+    return tegoed.koopBundel(wie(req), pasVan(req), id, bundelprijs.prijsVan(id, inkoop()));
+  }));
+
+  // de bundels met hun prijs, zodat een scherm kan tonen wat iets kost
+  app.post('/api/member/ai/bundels', auth, (req, res) => veilig(res, () =>
+    ({ status: 200, ok: true, bundels: bundelprijs.lijst(inkoop()) })));
 
   // het kantoor kan de stand van een houder opvragen (op codenaam)
   app.post('/api/office/ai/tegoed', officeAuth, (req, res) => veilig(res, () => {

@@ -138,7 +138,11 @@ function maakTegoed({ db, save, nu }) {
        ons -- dat is regel 6. */
     const bundelsUit = Object.values(BUNDELS).filter(b => b.credits).map(b => ({ ...b }));
     if (r.beleid === BELEID.AUTO_AANVULLEN && r.autoBundel && BUNDELS[r.autoBundel]) {
-      const kosten2 = 0;   // de prijs komt uit de inkoopkant, die nog niet bestaat
+      /* De prijs van de bundel telt mee in het maandmaximum. Stond hier nul
+         zolang de inkoopkant niet bestond -- en een maximum waar niets tegenaan
+         telt, is geen maximum. `prijsVan` komt via opties mee, want deze module
+         kent de boardroom-instelling niet. */
+      const kosten2 = Number.isFinite(((opties || {}).bundelPrijs || {}).centen) ? opties.bundelPrijs.centen : 0;
       const overMax = Number.isFinite(r.maandMaxCenten) &&
         (r.autoDezeMaandCenten + kosten2) > r.maandMaxCenten;
       if (overMax)
@@ -185,16 +189,26 @@ function maakTegoed({ db, save, nu }) {
     return r.inbegrepen + r.bijgekocht - r.verbruikt;
   }
 
-  // handmatig een bundel bijkopen
-  function koopBundel(houder, pas, bundelId) {
+  /* Handmatig een bundel bijkopen. `prijs` is de gerekende verkoopprijs
+     (kern/commercie/bundelprijs.js) en komt van de aanroeper, want alleen die
+     kent de boardroom-instelling.
+
+     ZONDER PRIJS GEEN VERKOOP. Staat de inkoopkant niet ingesteld, dan is er
+     geen prijs, en dan hoort er niets verkocht te worden -- credits weggeven
+     omdat een som ontbreekt, is de duurste manier om een gat te verbergen. */
+  function koopBundel(houder, pas, bundelId, prijs) {
     const b = BUNDELS[String(bundelId || '')];
     if (!b) return { status: 404, error: 'Deze bundel bestaat niet.' };
     if (!b.credits) return { status: 400, error: b.naam + ' is een contractafspraak en wordt niet los gekocht.' };
+    const centen = prijs && Number.isFinite(prijs.centen) ? prijs.centen : null;
+    if (centen === null)
+      return { status: 409, error: (prijs && prijs.reden) ||
+        'Voor deze bundel is nog geen prijs vastgesteld; hij is daarom niet te koop.' };
     const r = rijVan(houder, pas);
     r.bijgekocht += b.credits;
-    r.bundels.unshift({ bundel: b.id, credits: b.credits, automatisch: false, at: tijd() });
+    r.bundels.unshift({ bundel: b.id, credits: b.credits, centen, automatisch: false, at: tijd() });
     save();
-    return { status: 200, ok: true, bundel: b.naam, rest: restVan(r) };
+    return { status: 200, ok: true, bundel: b.naam, centen, rest: restVan(r) };
   }
 
   /* Het beleid zetten. AUTO_AANVULLEN VRAAGT EEN MAANDMAXIMUM -- automatisch

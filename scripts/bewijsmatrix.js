@@ -246,24 +246,35 @@ function perRouteKaart(bestand) {
 /* De ketenronde: welke ROUTES zitten in een keten die onder echte sabotage is
    beoordeeld. Alleen scenario's die de zevenstappenlat halen tellen -- een
    scenario dat niet zichtbaar of niet herhaalbaar was, is geen bewijs. */
-function ketenUitslag() {
-  if (!KETENS) return null;
+function ketenUitslag(bestand) {
+  const pad = bestand || KETENS;
+  if (!pad) return null;
   try {
-    const j = JSON.parse(fs.readFileSync(KETENS, 'utf8'));
+    const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
     if (!Array.isArray(j.scenarios)) return null;
     const kaart = new Map();
     for (const sc of j.scenarios) {
       if (!sc.verraad || !(sc.lat && sc.lat.voldoet)) continue;
-      for (const pad of (ROUTES_PER_KETEN[sc.keten] || [])) {
-        const oud = kaart.get(pad);
+      for (const routePad of (ROUTES_PER_KETEN[sc.keten] || [])) {
         /* Een keten kan meerdere verraden hebben; de STRENGSTE uitkomst telt.
-           Een route die onder een van de sabotages stil verlies gaf, is niet
-           bewezen omdat een andere sabotage netjes verliep. */
-        kaart.set(pad, { failure: sc.clientAntwoord === 'FAIL' || (oud && oud.failure),
-          rollbackBewezen: sc.rollback === 'PROVEN' && !sc.stilVerlies && !(oud && oud.stil),
-          stil: sc.stilVerlies || (oud && oud.stil) });
+           Maar streng gaat over GIF, niet over volgorde: een sabotage die stil
+           verlies of een geweigerde-maar-blijvende wijziging liet zien (NIET)
+           vergiftigt het oordeel, en een sabotage waar niets terug te draaien
+           VIEL (NVT, zoals sterf-na-commit) zegt niets en wist dus ook niets
+           uit. De oude vorm liet het LAATSTE scenario winnen, zodat een NVT na
+           een PROVEN de route op 'rollback niet bewezen' zette -- twee cellen
+           stonden daardoor gezakt op een volgorde-effect in plaats van op een
+           waarneming. */
+        const oud = kaart.get(routePad) || { failure: false, proven: false, niet: false, stil: false };
+        kaart.set(routePad, {
+          failure: sc.clientAntwoord === 'FAIL' || oud.failure,
+          proven: sc.rollback === 'PROVEN' || oud.proven,
+          niet: sc.rollback === 'NIET' || oud.niet,
+          stil: sc.stilVerlies || oud.stil
+        });
       }
     }
+    for (const k of kaart.values()) k.rollbackBewezen = k.proven && !k.niet && !k.stil;
     return kaart;
   } catch (e) { return null; }
 }
@@ -597,7 +608,7 @@ const CONTROL = {
     'Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.'
 };
 
-module.exports = { bouw, achteruit, SCHAKELS, LEESMETHODEN, CONTROL };
+module.exports = { bouw, achteruit, ketenUitslag, SCHAKELS, LEESMETHODEN, CONTROL };
 
 /* Alleen doen als iemand dit bestand DRAAIT. Wordt het geladen (door een toets,
    of straks door de keuring), dan hoort er niets te gebeuren en al helemaal geen

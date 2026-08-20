@@ -208,3 +208,38 @@ test('een leesroute houdt IDEMPOTENCY op nvt, ook met een register ernaast', () 
     invoer: null, idem: new Map([['GET /api/proef/lees', { idempotentie: 'onbeschermd' }]]) });
   assert.equal(m.rijen.find(r => r.pad === '/api/proef/lees').cellen.IDEMPOTENCY.staat, 'nvt');
 });
+
+test('de ketensamenvoeging kent gif en geen volgorde: NVT wist een PROVEN nooit uit', () => {
+  /* Twee cellen stonden op 'rollback niet bewezen' door een volgorde-effect:
+     het LAATSTE scenario won, dus een sterf-na-commit (rollback NVT -- er viel
+     niets terug te draaien) wiste het eerdere PROVEN uit. Streng hoort over
+     GIF te gaan (stil verlies, of NIET: geweigerd en toch blijvend), niet over
+     de toevallige volgorde in het register. */
+  const { ketenUitslag } = require('../scripts/bewijsmatrix');
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-keten-'));
+  const schrijf = (scenarios) => {
+    const p = path.join(map, 'k.json');
+    fs.writeFileSync(p, JSON.stringify({ scenarios }));
+    return p;
+  };
+  const sc = (rollback, extra) => ({ keten: 'GELD', verraad: 'x', rollback,
+    stilVerlies: false, clientAntwoord: 'FAIL', lat: { voldoet: true }, ...extra });
+  const pad = 'POST /api/pay/oplaad';
+  try {
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NVT')])).get(pad).rollbackBewezen, true,
+      'een NVT na een PROVEN wist niets uit');
+    assert.equal(ketenUitslag(schrijf([sc('NVT'), sc('PROVEN')])).get(pad).rollbackBewezen, true,
+      'en andersom ook niet: volgorde is geen oordeel');
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NIET')])).get(pad).rollbackBewezen, false,
+      'NIET (geweigerd en toch blijvend) is gif, in elke volgorde');
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NVT', { stilVerlies: true })])).get(pad).rollbackBewezen, false,
+      'stil verlies is gif, ook naast een PROVEN');
+    assert.equal(ketenUitslag(schrijf([sc('NVT'), sc('NVT')])).get(pad).rollbackBewezen, false,
+      'alleen NVT is geen bewijs: er is nooit een terugdraai waargenomen');
+  } finally {
+    try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
+  }
+});

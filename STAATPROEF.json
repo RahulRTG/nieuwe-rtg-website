@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T07:11:59.889Z",
-  "commit": "8f28f47",
+  "op": "2026-08-20T07:33:20.257Z",
+  "commit": "7f3ac37",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -70,15 +70,15 @@
   "routesMetRol": 3255,
   "beoordeeld": 2709,
   "versGemeten": 170,
-  "oproepen": 352,
+  "oproepen": 340,
   "state": 250,
   "sideEffect": 250,
   "rollback": 2459,
   "rollbackGezakt": 0,
-  "idemBewezen": 137,
-  "idemGezakt": 113,
+  "idemBewezen": 250,
+  "idemGezakt": 0,
   "ongemeten": 655,
-  "tokensHernieuwd": 6,
+  "tokensHernieuwd": 0,
   "blindeRondes": 0,
   "collectiesInVingerafdruk": 144,
   "ruisCollecties": 2,
@@ -420,13 +420,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "agendas"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: agendas",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -892,7 +892,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -908,7 +908,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -924,7 +924,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -940,7 +940,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -956,7 +956,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -972,7 +972,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -988,7 +988,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1004,7 +1004,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 503) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1020,7 +1020,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 503) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1036,7 +1036,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 503) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1052,7 +1052,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1068,7 +1068,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1084,7 +1084,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1100,7 +1100,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1116,7 +1116,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1132,7 +1132,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1148,7 +1148,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1164,7 +1164,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1180,7 +1180,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1196,7 +1196,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1212,7 +1212,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1228,7 +1228,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1244,7 +1244,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1260,7 +1260,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1276,7 +1276,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1292,7 +1292,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1308,7 +1308,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1324,7 +1324,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1340,7 +1340,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1356,7 +1356,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1372,7 +1372,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1388,7 +1388,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1404,7 +1404,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1420,7 +1420,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1436,7 +1436,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1452,7 +1452,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1468,7 +1468,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 403) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1484,7 +1484,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1502,7 +1502,7 @@
     "bestanden"
    ],
    "reden": "geweigerd (status 404); de eenmalige wijziging in bestanden was inrichting -- de herhaling liet alles met rust",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1518,7 +1518,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1534,7 +1534,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1550,7 +1550,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1566,7 +1566,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1582,7 +1582,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1598,7 +1598,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1614,7 +1614,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1630,7 +1630,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1646,7 +1646,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 400) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1662,7 +1662,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1678,7 +1678,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1694,7 +1694,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1710,7 +1710,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1726,7 +1726,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "de route bevestigde zonder dat er iets in de opslag bewoog; een tweede effect zou hier niet te zien zijn",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1742,7 +1742,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1758,7 +1758,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1774,7 +1774,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1790,7 +1790,7 @@
    "idempotentie": "ongemeten",
    "collecties": [],
    "reden": "geweigerd (status 404) en er bleef niets staan",
-   "op": "2026-08-18T07:32:18.967Z"
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -1950,14 +1950,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "bijles",
     "onderwijs"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: bijles",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -3244,7 +3244,7 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandAgents",
     "commandBeleid",
@@ -3252,8 +3252,8 @@
     "commandJournaalTotaal"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (4)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandJournaal, commandJournaalTotaal",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -3266,14 +3266,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandJournaal",
     "commandJournaalTotaal"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandJournaal, commandJournaalTotaal",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -3286,15 +3286,15 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandAgents",
     "commandJournaal",
     "commandJournaalTotaal"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (3)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandJournaal, commandJournaalTotaal",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -3323,15 +3323,15 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandAlarmen",
     "commandJournaal",
     "commandJournaalTotaal"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (3)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandAlarmen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -3859,13 +3859,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandPlannen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandPlannen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -4230,15 +4230,15 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandJournaal",
     "commandJournaalTotaal",
     "sondeMonsters"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (3)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandJournaal, commandJournaalTotaal, sondeMonsters",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -4299,13 +4299,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandAlarmen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandAlarmen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -4366,15 +4366,15 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "commandJournaal",
     "commandJournaalTotaal",
     "commandZaken"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (3)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: commandJournaal, commandJournaalTotaal, commandZaken",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -4683,13 +4683,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "concern"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: concern",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -5025,13 +5025,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "concern"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: concern",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -5078,13 +5078,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "concern"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: concern",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -5637,13 +5637,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "drmRapport"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: drmRapport",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -6300,13 +6300,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "gedachten"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: gedachten",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -6715,15 +6715,15 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "gemeenteMeldingen",
     "supplierNotifications",
     "weefsel"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (3)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: gemeenteMeldingen, supplierNotifications",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -7282,13 +7282,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "genootschap"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: genootschap",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -7413,13 +7413,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "gewoonten"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: gewoonten",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -8102,13 +8102,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "officeDocs"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: officeDocs",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -10157,13 +10157,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "live"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: live",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -10976,13 +10976,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "mallLijsten"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: mallLijsten",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -11409,13 +11409,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "mediaLijsten"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: mediaLijsten",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -11556,13 +11556,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "mediaKamers"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: mediaKamers",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -11783,13 +11783,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "meetKamers"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: meetKamers",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -13715,13 +13715,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "leren"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: leren",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -13798,13 +13798,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "leren"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: leren",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -14334,13 +14334,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "magnaatWereld"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: magnaatWereld",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -16281,14 +16281,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rtmailBewaar",
     "rtmailRecht"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rtmailRecht",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -16511,14 +16511,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rtmail",
     "rtmailRecht"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rtmailRecht",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -16600,13 +16600,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "mailSleutels"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: mailSleutels",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -17678,13 +17678,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "spellen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: spellen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -17729,13 +17729,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "spelTeams"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: spelTeams",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -18522,13 +18522,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "metier"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: metier",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -19167,13 +19167,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "muziek"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: muziek",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -19882,13 +19882,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "architect"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: architect",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -19917,13 +19917,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "architect"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: architect",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20051,13 +20051,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "atelier"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: atelier",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20102,13 +20102,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "atelier"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: atelier",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20169,13 +20169,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "atelierSites"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: atelierSites",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20556,14 +20556,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "bankregie",
     "kantoorAudit"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20592,13 +20592,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20643,13 +20643,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20662,13 +20662,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "bankregie"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: bankregie",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20697,14 +20697,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "bankregie",
     "kantoorAudit"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: bankregie, kantoorAudit",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -20813,13 +20813,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "fiscaalRegels"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: fiscaalRegels",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -21513,13 +21513,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "hardware"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: hardware",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -21548,13 +21548,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "hardware"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: hardware",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -21666,13 +21666,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "ideeen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ideeen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -21909,13 +21909,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorTaken"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorTaken",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -22090,13 +22090,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "officeDocs"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: officeDocs",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -22991,13 +22991,15 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
-    "onderzoeker"
+    "onderzoeker",
+    "techniek",
+    "wacht"
    ],
-   "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: onderzoeker",
-   "op": "2026-08-20T07:11:59.863Z"
+   "reden": "bevestigd, en gemeten welke collecties bewogen (3)",
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -23656,14 +23658,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "payrollRegelJournaal",
     "payrollRegels"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: payrollRegelJournaal",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -23970,13 +23972,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rechtsvormRegels"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rechtsvormRegels",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -24053,13 +24055,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "redactie"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: redactie",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -24800,13 +24802,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "studio"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: studio",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -24867,13 +24869,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "studio"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: studio",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26137,13 +26139,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26478,14 +26480,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit",
     "weefselWerk"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit, weefselWerk",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26661,13 +26663,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "werkplaats"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: werkplaats",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26763,14 +26765,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit",
     "zelfzorg"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit, zelfzorg",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26783,14 +26785,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit",
     "zelfzorg"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit, zelfzorg",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26803,14 +26805,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit",
     "zelfzorg"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit, zelfzorg",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26823,14 +26825,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "kantoorAudit",
     "zelfzorg"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: kantoorAudit, zelfzorg",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26910,13 +26912,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "onboarding"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: onboarding",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -26945,13 +26947,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "onboarding"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: onboarding",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -27332,13 +27334,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "ondernemingen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ondernemingen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -28023,13 +28025,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "ovRegie"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ovRegie",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -29121,14 +29123,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rijkBerichten",
     "rijkRijbewijzen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rijkBerichten, rijkRijbewijzen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -29509,13 +29511,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "waterMeldingen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: waterMeldingen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -29787,13 +29789,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "payCodes"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: payCodes",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -29894,13 +29896,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "payTikCodes"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: payTikCodes",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -30709,13 +30711,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "residentie"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: residentie",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -30728,13 +30730,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "residentie"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: residentie",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -30866,13 +30868,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "residentie"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: residentie",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -34113,13 +34115,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rtgid"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rtgid",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -34278,13 +34280,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rtgOne"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rtgOne",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -34523,13 +34525,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "salon"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: salon",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -34638,13 +34640,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "posts"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: posts",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -34867,13 +34869,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "samenKamers"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: samenKamers",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -34998,13 +35000,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "ledenSites"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ledenSites",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -36863,14 +36865,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "aanwezig",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: aanwezig, supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -37064,13 +37066,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "agendas"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: agendas",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -37585,14 +37587,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "betaalVerzoeken",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: betaalVerzoeken, supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -38119,13 +38121,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -39039,13 +39041,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "zaakCommand"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: zaakCommand",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -40090,7 +40092,7 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "facturen",
     "factuurTeller",
@@ -40099,8 +40101,8 @@
     "rtmailSchrijf"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (5)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: facturen, factuurTeller, rtmail",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -40563,14 +40565,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "gebouwPand",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: gebouwPand, supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -40729,13 +40731,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "gebouwPlus"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: gebouwPlus",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -40860,14 +40862,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "giftcards",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: giftcards, supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -41448,14 +41450,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "horeca",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: horeca, supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -41846,14 +41848,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "horeca",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -42574,14 +42576,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "horeca",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: horeca, supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -42706,13 +42708,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "magnaatBrug"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: magnaatBrug",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -42757,13 +42759,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "horeca"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: horeca",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -43541,13 +43543,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "officeDocs"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: officeDocs",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -44580,13 +44582,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "suppliers"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: suppliers",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -45001,14 +45003,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "supplierActivity",
     "suppliers"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity, suppliers",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -45779,13 +45781,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "onboarding"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: onboarding",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -46673,14 +46675,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "supplierActivity",
     "suppliers"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -47628,13 +47630,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "suppliers"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: suppliers",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -47732,14 +47734,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rtmailBewaar",
     "rtmailRecht"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rtmailRecht",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -47944,13 +47946,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "rtmailRecht"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: rtmailRecht",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -48030,13 +48032,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "mailSleutels"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: mailSleutels",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -48387,13 +48389,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -48598,13 +48600,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "creatorOproepen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: creatorOproepen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -48681,14 +48683,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "supplierActivity",
     "supplierNotifications"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity, supplierNotifications",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -48767,13 +48769,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "ledenSites"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ledenSites",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -49028,14 +49030,14 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "staffInvites",
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (2)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: staffInvites, supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -49288,13 +49290,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -50610,13 +50612,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "werkbeleid"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: werkbeleid",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -50847,13 +50849,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "supplierActivity"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: supplierActivity",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -52443,13 +52445,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "toestellen"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: toestellen",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",
@@ -53896,13 +53898,13 @@
    "state": "bewezen",
    "sideEffect": "bewezen",
    "rollback": "ongemeten",
-   "idempotentie": "GEZAKT",
+   "idempotentie": "bewezen",
    "collecties": [
     "wallet"
    ],
    "reden": "bevestigd, en gemeten welke collecties bewogen (1)",
-   "idemReden": "de herhaling met dezelfde sleutel bewoog de toestand opnieuw: wallet",
-   "op": "2026-08-20T07:11:59.863Z"
+   "idemReden": "de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog",
+   "op": "2026-08-20T07:33:20.211Z"
   },
   {
    "methode": "POST",

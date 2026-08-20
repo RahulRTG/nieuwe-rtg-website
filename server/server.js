@@ -1350,12 +1350,19 @@ const {
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet,
   favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen,
   betaalSplits, zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer,
-  puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, puntenKoppelPlafond, voorkeurVan, zetVoorkeur
+  puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, herstelTegoed, puntenKoppelPlafond, voorkeurVan, zetVoorkeur
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
   // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
-  tafeldekVan: () => kern.tafeldek
+  tafeldekVan: () => kern.tafeldek,
+  /* RTG Pay wordt pas in kernlaag3 gebouwd -- ver na deze regel -- en de
+     annuleerlaag heeft hem nodig om een betaalde annulering ECHT terug te
+     boeken. Laat gebonden, net als de gedekte tafel hierboven. */
+  payVan: () => kern.pay,
+  /* codenaamVan hoort erbij: het geld van een verzilverde punt gaat naar de
+     WALLET van dit lid, en die hangt aan de codenaam. */
+  codenaamVan
 });
 
 /* De retail-/mode-laag (kern/retail.js): collecties, artikelen met varianten,
@@ -1920,7 +1927,7 @@ const kern = {
   tafelplanning, reserveringTafel, reserveringKomst, walkIn,
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet, favorietenVan, isFavoriet,
   fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst,
-  meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, puntenKoppelPlafond,
+  meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, herstelTegoed, puntenKoppelPlafond,
   voorkeurVan, zetVoorkeur,
   // de retail-/mode-laag (kern/retail.js)
   RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,

@@ -102,8 +102,8 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json(r.allergieBotsing ? { error: r.error, allergieBotsing: r.allergieBotsing } : { error: r.error });
     res.json(r);
   });
-  app.post('/api/order/pay', auth, (req, res) => {
-    const r = betaalOrderVoor(req.session, req.body);
+  app.post('/api/order/pay', auth, async (req, res) => {
+    const r = await betaalOrderVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
@@ -114,8 +114,8 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });
-  app.post('/api/rekening/betaal', auth, (req, res) => {
-    const r = betaalRekeningVoor(req.session, req.body);
+  app.post('/api/rekening/betaal', auth, async (req, res) => {
+    const r = await betaalRekeningVoor(req.session, req.body);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

@@ -42,7 +42,7 @@
 */
 'use strict';
 
-module.exports = ({ db, save, nu }) => {
+module.exports = ({ db, save, nu, payVan, codenaamVan }) => {
   /* Het plafond op het VERZILVERDE tegoed. Bewust anders dan het walletplafond
      en niet dezelfde constante: dit is een andere pot met een ander verhaal.
      Bij 1 punt per 10 euro en 100 punten per 10 euro tegoed hoort hier 50.000
@@ -95,12 +95,47 @@ module.exports = ({ db, save, nu }) => {
     p.historie = p.historie.slice(0, 60);
     return n; // save() gebeurt in de betaal-handler
   }
-  function verzilverPunten(key, aantal) {
+  async function verzilverPunten(key, aantal) {
     const n = parseInt(aantal, 10);
     if (!(n >= 100) || n % 100 !== 0) return { status: 400, error: 'Verzilveren kan per 100 punten (= € 10 tegoed).' };
     const p = puntenRek(key);
     if (p.saldo < n) return { status: 409, error: 'U heeft ' + p.saldo + ' punten; dat is niet genoeg.' };
     const centen = (n / 100) * 1000;
+
+    /* VERZILVEREN LANDT IN DE WALLET, en daarmee houdt het tweede saldo op te
+       bestaan. Dit stond als apart bedrag naast RTG Pay: `tegoedCenten`, een
+       euro-aanspraak op RTG die alleen als KORTING kon worden ingelost, op de
+       drie betaalpaden die hem kenden. Twee bedragen die allebei geld van
+       hetzelfde lid voorstellen, is precies waar kern/geldwereld.js voor
+       waarschuwt -- en het lid moest maar weten welk potje waar gold.
+
+       Dat kon pas nu. Zolang bestellingen, rekeningen en ritten zelf geen geld
+       verplaatsten, was verzilverd tegoed in de wallet juist ONbesteedbaar: de
+       korting verdween en er kwam geen betaling voor terug. Sinds die drie
+       paden via RTG Pay lopen (kern/pay/zaakbetaling.js) is het andersom, en is
+       walletsaldo de enige vorm die overal werkt.
+
+       Het geld komt van de huisrekening: RTG geeft hier iets weg, dus er hoort
+       een boeking tegenover te staan en geen opgehoogd veld. En het WALLETPLAFOND
+       geldt: zit de wallet vol, dan weigert dit met de reden erbij -- de punten
+       blijven dan gewoon staan, want de aftrek gebeurt hieronder pas NA de
+       boeking. */
+    const pay = typeof payVan === 'function' ? payVan() : null;
+    const codenaam = typeof codenaamVan === 'function' ? codenaamVan(key) : null;
+    if (pay && pay.huisUit && codenaam) {
+      const b = await pay.huisUit({ aanCodenaam: codenaam, centen,
+        oms: 'RTG-punten verzilverd', idem: 'punten:' + key + ':' + p.saldo + ':' + n });
+      if (b.error) return b;
+      p.saldo -= n;
+      p.historie.unshift({ punten: -n, reden: '€ ' + (centen / 100) + ' naar je wallet', at: nu() });
+      save();
+      return { ok: true, saldo: p.saldo, naarWalletCenten: centen,
+        tegoedCenten: p.tegoedCenten, tegoed: p.tegoedCenten / 100 };
+    }
+    /* TERUGVAL: zonder pay of zonder codenaam (een gast) blijft het oude tegoed
+       bestaan. Dat is geen tweede weg die we openhouden maar een vangnet -- als
+       de wallet niet bereikbaar is, hoort verzilveren te weigeren of te landen
+       waar het altijd landde, en niet stil te verdampen. */
     /* Het plafond valt VOOR de punten worden afgeschreven: anders zijn de
        punten weg en is het tegoed er niet. */
     if (p.tegoedCenten + centen > tegoedMax()) {
@@ -113,21 +148,12 @@ module.exports = ({ db, save, nu }) => {
     save();
     return { ok: true, saldo: p.saldo, tegoedCenten: p.tegoedCenten, tegoed: p.tegoedCenten / 100 };
   }
-  // bij het betalen: verreken tegoed (RTG legt bij; de zaak ziet het volle bedrag)
-  function pasTegoedToe(key, totaal) {
-    if (!db.data.punten[key]) return 0;          // geen rekening: niets te verrekenen, en niets aan te maken
-    const p = puntenRek(key);
-    if (!(p.tegoedCenten > 0)) return 0;
-    /* De aanroepers rekenen in EURO'S (o.total en r.quote zijn euro-getallen),
-       dus dat blijft de vorm van het antwoord. Binnen deze functie is alles
-       centen, zodat het bewaarde saldo exact blijft. */
-    const kortingCenten = Math.min(p.tegoedCenten, Math.max(0, Math.round((Number(totaal) || 0) * 100)));
-    if (kortingCenten <= 0) return 0;
-    p.tegoedCenten -= kortingCenten;
-    p.historie.unshift({ punten: 0, reden: '€ ' + (kortingCenten / 100) + ' tegoed verrekend', at: nu() });
-    return kortingCenten / 100; // save() gebeurt in de betaal-handler
-  }
+  /* Het OUDE tegoed -- verrekenen bij een betaling en teruggeven als die
+     mislukt -- staat in ./punten-tegoed.js. Niet om de maat, maar omdat dat het
+     deel is dat op weg naar buiten is: sinds verzilveren in de wallet landt,
+     vult niets dat veld nog. Loopt de laatste rekening leeg, dan kan dat hele
+     bestand weg -- en dat is makkelijker te zien als het een bestand is. */
+  const tegoed = require('./punten-tegoed')({ db, save, nu, puntenRek });
 
-
-  return { puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, puntenKoppelPlafond };
+  return Object.assign({ puntenVan, verdienPunten, verzilverPunten, puntenKoppelPlafond }, tegoed);
 };

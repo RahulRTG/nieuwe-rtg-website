@@ -230,15 +230,14 @@ kop van het bestand zodat niemand hem "overbodig" noemt.
 | 3b | Het punten-tegoed door het pay-grootboek laten lopen. **Geblokkeerd**: dat kan pas als bestellingen, rekeningen en ritten zélf via RTG Pay betaald worden, en dat doen ze niet (par. 7) | — |
 | 4 | Het besluit over de bank-uitgang (par. 7) | genomen: brug is eenrichtingsverkeer |
 | 5 | E-money, eigen of via distributie. Begint niet met code maar met een vergunning | — |
+| 6 | De handelslaag betaalt via RTG Pay (bestelling, rekening, rit), annuleren boekt terug, en verzilveren landt in de wallet | gebouwd |
 
 Geen fase begint voordat de vorige zijn toetsen heeft (LAT.md).
 
 ## 7. De besluiten die openstaan
 
-Van de vijf dingen die software niet voor Rahul kon beslissen, zijn er vier
-genomen (1, 2, 3 en 5). Ze blijven staan met hun uitkomst, want een besluit
-waarvan de reden verdwijnt, wordt over een jaar opnieuw gevoerd. Wat nog open
-staat is 4 — en dat is geen besluit maar een verbouwing.
+Alle vijf zijn genomen. Ze blijven staan met hun uitkomst, want een besluit
+waarvan de reden verdwijnt, wordt over een jaar opnieuw gevoerd.
 
 1. ~~De bank-uitgang~~ — **besloten op 20 augustus 2026: de walletbrug wordt
    eenrichtingsverkeer.** Geld mag van een eigen bankrekening naar de wallet,
@@ -261,25 +260,47 @@ staat is 4 — en dat is geen besluit maar een verbouwing.
    tekst; de leesbare toon haalt **4,51:1** en haalt de 4,5 voor kleine tekst. Wat op de vaste `--gold` blijft is geen tekst: kaartranden, de
    achtergrond van de springlink en het vinkje. Zonder gekozen thema verandert
    er niets, want `--rtg-leesgoud` bestaat alleen mét een thema.
-4. **Het punten-tegoed is een TWEEDE saldo naast RTG Pay — en de weg ernaartoe
-   is langer dan hier eerst stond.** Twee bedragen die allebei geld van hetzelfde
-   lid voorstellen, is precies waar `kern/geldwereld.js` voor waarschuwt.
+4. ~~Het punten-tegoed is een tweede saldo naast RTG Pay~~ — **gedaan, en de
+   weg ernaartoe was inderdaad de verbouwing.** Hier stond dat de voorwaarde
+   ontbrak: **de drie betaalpaden die het tegoed verrekenen, verplaatsten zelf
+   geen geld.** `betaalOrderVoor`, `betaalRekeningVoor` en `betaalRitVoor`
+   zetten `paid = true`, schreven een factuur en stuurden een bericht — er kwam
+   geen `pay`, geen betaal-naad en geen boeking aan te pas. Er stond "betaald"
+   op het scherm en er was nooit iets geboekt. Dat is nu omgedraaid, in deze
+   volgorde:
 
-   Hier stond: *"het hoort door het pay-grootboek te lopen — mijn aanbeveling:
-   doen, maar als eigen ronde"*. Bij het uitwerken bleek de voorwaarde daaronder
-   te ontbreken. **De drie betaalpaden die het tegoed verrekenen, verplaatsen
-   zelf geen geld**: `betaalOrderVoor`, `betaalRekeningVoor` en `betaalRitVoor`
-   zetten `paid = true`, schrijven een factuur en sturen een bericht — er komt
-   geen `pay`, geen betaal-naad en geen boeking aan te pas. Zou verzilverd
-   tegoed in de wallet landen, dan kan het in precies die paden nergens meer
-   worden uitgegeven: de korting verdwijnt en er komt geen betaling voor terug.
+   **Eerst betalen, dan pas de vlag.** De drie paden lopen via
+   `kern/pay/zaakbetaling.js`. Dat is een DRIEHOEK en geen overboeking: het lid
+   betaalt zijn deel aan de zaak, en wat RTG weggeeft (ledenvoordeel, oud
+   punten-tegoed) legt RTG er vanuit de huisrekening bovenop — want de belofte
+   van dit huis is dat de zaak áltijd het volle bedrag ontvangt. De twee
+   boekingen zijn alles-of-niets; lukt de tweede niet, dan gaat de eerste met de
+   hand terug, net als in `kern/bank/walletbrug.js`. Mislukt de betaling, dan
+   blijft de bestelling onbetaald en komt het verrekende tegoed terug — ook bij
+   een HERHALING met dezelfde idem-sleutel, want dat antwoord is `ok` en wie
+   alleen op `.error` kijkt, laat het lid daar stil tegoed verliezen.
 
-   De echte volgorde is dus omgekeerd. **Eerst moeten bestellingen, rekeningen
-   en ritten via RTG Pay betaald worden**; pas daarna is het tegoed een saldo in
-   plaats van een korting. Dat eerste is geen opruiming maar een verbouwing van
-   de hele handelslaag, met eigen keuzes (wat gebeurt er bij een zaak zonder
-   RTG Pay, wat met achteraf betalen, wat met terugbetalen). **Aanbeveling: niet
-   nu**, en niet als bijvangst van het geldwerk — het is een eigen project.
+   **En annuleren boekt echt terug.** Dat pad meldde "€ x retour" zonder ooit
+   iets over te maken. Dat kon zolang er ook niets was betaald; nu zou dezelfde
+   regel betekenen dat de zaak het geld houdt. Het gaat terug waar het vandaan
+   kwam — het deel van het lid naar de wallet, het deel van RTG naar de
+   huisrekening — en alleen voor wat een `payBetaaldCenten`-marker draagt, zodat
+   oudere transacties en nog niet omgezette paden zich precies gedragen zoals ze
+   deden.
+
+   **Daarna pas kon het tweede saldo weg.** Verzilveren landt nu in de WALLET
+   (`extern:treasury` → `lid:…`) in plaats van in `tegoedCenten`. Dat kon niet
+   eerder: zolang de drie paden geen geld verplaatsten, was verzilverd tegoed in
+   de wallet juist ONbesteedbaar. `pasTegoedToe` blijft staan om saldi van vóór
+   deze ronde leeg te laten lopen — bestaande leden hun tegoed afpakken is geen
+   opruiming — en niets vult dat veld nog. Loopt de laatste rekening leeg, dan
+   kan die functie weg en is de laatste plek verdwenen waar twee saldi naast
+   elkaar bestonden.
+
+   **Wat het kost, en dat hoort erbij:** een betaling boven de boekingsgrens van
+   RTG Pay (€ 5.000) weigert nu, met die reden. Dat is een bekende grens en geen
+   bug; een rekening daarboven bestaat en heeft nog geen weg.
+
 5. ~~De bedragen van de twee plafonds~~ — **gedaan: ze zijn van de boardroom.**
    Ze stonden als constante in de code (`kern/pay/stand.js` en
    `kern/ervaring/leden/punten.js`) en waren daarmee alleen te verzetten door
@@ -295,7 +316,10 @@ staat is 4 — en dat is geen besluit maar een verbouwing.
    het te openen. Wat de bedragen zijn blijft een keuze:
 
    € 10.000 per wallet en € 500 aan punten-tegoed blijven de standaard, en het
-   blijven verdedigbare keuzes en geen wettelijke getallen. Wie het
+   blijven verdedigbare keuzes en geen wettelijke getallen. **Let op wat punt 4
+   met de tweede deed:** nu verzilveren in de wallet landt, vult niets het
+   punten-tegoed nog, dus dat plafond bewaakt alleen de saldi van vóór die
+   verandering. Het walletplafond doet sindsdien het werk dat beide deden. Wie het
    walletplafond verhoogt, verzwakt de grond onder het besluit. Het
    puntenplafond hoort bij een besteding van € 50.000 en is dus ruim; lager
    zetten raakt echte leden eerder dan je denkt. Het verschil met hiervoor is

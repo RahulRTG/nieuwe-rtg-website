@@ -2,7 +2,7 @@
    RTG-punten en de meldingsvoorkeuren. Verbatim afgesplitst uit leden.js. */
 module.exports = (ctx) => {
   const { db, save, notify, sseToCustomer, zijnVrienden, orderMetRef, boekingenVanKlant,
-    id, nu, vandaag, rond, MELDING_SCOPES } = ctx;
+    id, nu, vandaag, rond, MELDING_SCOPES, payVan, codenaamVan } = ctx;
 
   /* ---- 6. de reisagenda ----
      Alles met een datum van dit lid, samengevoegd en per dag gegroepeerd:
@@ -108,7 +108,7 @@ module.exports = (ctx) => {
      geldstuk met eigen regels (een plafond, centen, een vermogen in de
      bevoegdhedenlijst) en geen bijzaak van de spaarpot. De kop daar legt uit
      wat er is veranderd en waarom. */
-  const punten = require('./punten')({ db, save, nu });
+  const punten = require('./punten')({ db, save, nu, payVan, codenaamVan });
 
   /* ---- 10. meldingsvoorkeuren ----
      Per scope aan of uit; afwezig betekent aan. De handhaving zit in notify()

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1036 bestanden en 6890 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1037 bestanden en 6896 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1036 |
-| losse beweringen (`test(...)`) | 6890 |
+| toetsbestanden | 1037 |
+| losse beweringen (`test(...)`) | 6896 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 866 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 27 |
+| alleen in de kop *genoemd*, nog niet gemeten | 28 |
 | niets van beide | 95 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-908 bestanden, 6666 beweringen.
+909 bestanden, 6672 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -928,6 +928,7 @@ toets omvalt.
 | `zaak-loket-en-dossier.test.js` | 4 | gezakt op `liegpoort /api/` | HET LOKET EN HET DOSSIER -- 5 endpoints uit de supplier-groep. overheid/bekendmakingen, gemeente/bekendmakingen, overheid/kvk/mijn, advies/dossier/status en apply/chat/send stonden als nooit aangeroepen in de... |
 | `zaak-vloot-en-facturen.test.js` | 5 | gezakt op `liegpoort /api/` | VLOOT, FACTUREN EN OPROEPEN -- 5 endpoints uit de supplier-groep. fleet, auto, facturen/maak, samenwerking/oproep/sluit en guest/connect stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `zaak.test.js` | 3 | gezakt op `liegpoort /api/` | De eigen mini-boardroom per zaak: elke leverancier zet zijn eigen functies aan/uit en ziet een HR- en marketing-momentopname. Een uitgezette functie werkt echt (bijv. |
+| `zaakbetaling.test.js` | 6 | genoemd | DE DRIE BETAALPADEN VERPLAATSEN ECHT GELD. Een bestelling, een lopende rekening en een rit zetten `paid = true`, schreven een factuur en stuurden een bericht -- en verplaatsten geen cent. |
 | `zaakcommand-routes.test.js` | 8 | gezakt op `liegpoort /api/` | DE ROUTES VAN ZAAK COMMAND -- de commandolaag van EEN zaak, over HTTP. test/zaakcommand.test.js toetst de motor met nagemaakte gegevens: daar staat dat de zaak niets van de buurman ziet en niets van RTG. |
 | `zaakcommand.test.js` | 8 | gezakt op `===->!==#0` | Zaak Command (kern/zaakcommand/): dezelfde commandologica als RTG Command, maar van EEN zaak en uitsluitend over die zaak. Deze toets bewijst vier dingen: de zaak ziet niets van een andere zaak en niets van RTG; een... |
 | `zaakdoos.test.js` | 10 | gezakt op `liegpoort /api/` | De Zaakdoos end-to-end: een cloudserver en een doos-kastje ernaast. 1. |

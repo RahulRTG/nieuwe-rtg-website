@@ -89,7 +89,11 @@ test('een bug in een route geeft die ene aanvraag 500; het proces leeft door', a
 test('crasht de kantoor-groep, dan valt ALLEEN kantoor uit; de rest draait door', async () => {
   // laat het kantoor-proces echt sterven (rechtstreeks op zijn eigen poort)
   await post('/api/test/crash', {}, BASIS + 1).catch(() => {});
-  await new Promise(r => setTimeout(r, 400));
+  /* GEEN 400 ms MEER. Wat hier moest gebeuren -- het kantoorproces valt om en de
+     gateway merkt dat -- wordt hieronder al afgewacht met wachtTot(), die tot
+     twintig seconden lang opnieuw vraagt. De 400 ms ervoor maakten de toets
+     alleen trager; op een drukke machine waren ze bovendien te kort en dan zou
+     de eerste meting een nog levend proces zien. */
 
   // kantoor is nu (even) onbereikbaar via de gateway: 502, geen hangende aanvraag
   const kantoorPlat = await wachtTot(async () =>

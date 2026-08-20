@@ -12,7 +12,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, vrijePoort, stop } = require('./helper');
+const { startServer, vrijePoort, stop, stopHard } = require('./helper');
 
 /* ELKE FETCH MET EEN DEADLINE -- EEN TWEEDE SLOT, EN NIET DE OORZAAK.
 
@@ -253,8 +253,11 @@ test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', asy
   // pinger tikt elke 10s, dus op een snelle runner kan het dagrapport (verderop)
   // anders pings=0 zien omdat de eerste tik nog niet gelopen had.
   await wachtOp('/api/doos/rapport', doos.base, d => d.pings >= 1);
-  cloudChild.kill('SIGKILL');
-  await new Promise(r => setTimeout(r, 300));
+  /* SIGKILL EN WACHTEN TOT HIJ WEG IS. De cloud gaat met opzet hard neer -- dat
+     is het onderwerp -- maar of hij al weg is, is een toestand en geen duur. Met
+     300 ms ernaast kon de doos hem nog even zien leven en dus nog niet
+     terugvallen op lokaal. */
+  await stopHard(cloudChild);
   // het eerstvolgende verzoek merkt het en valt door naar lokaal: inloggen
   // lukt gewoon, op de kloon-data van de doos zelf
   let login;

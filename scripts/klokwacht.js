@@ -231,7 +231,17 @@ const VERANTWOORD = {
   'pg-snapshot.test.js': 'bewaakt een AFWEZIGHEID: binnen het venster komt er geen tweede snapshot bij, ' +
     'en de wacht is ruim voorbij de flush-cyclus van 150 ms waarin een losgeslagen luisteraar zich zou melden',
   'pg-wachten.test.js': 'bewaakt een AFWEZIGHEID (de server sluit zichzelf NIET af) over een venster dat aan ' +
-    'het product hangt: PG_HERKANS_MS staat op 300, dus 1500 ms is een stuk of vijf herkansingen'
+    'het product hangt: PG_HERKANS_MS staat op 300, dus 1500 ms is een stuk of vijf herkansingen',
+  'foutmelder.test.js': 'bewaakt een AFWEZIGHEID: drie keer dezelfde fout wordt EEN bericht, en de wacht is de ' +
+    'ruimte waarin een tweede zich zou verraden',
+  'schoolkoppel.test.js': 'bewaakt een AFWEZIGHEID: een webhook die niet op deze gebeurtenis is geabonneerd ' +
+    'krijgt niets, en de wacht is de ruimte waarin een bezorging zich zou melden',
+  'lidfactuur.test.js': 'bewaakt een AFWEZIGHEID: uitgeven aan de balie levert GEEN tweede factuur op, en de ' +
+    'facturatiemotor boekt in een losse belofte -- meteen tellen zou alleen zeggen "op dit moment nog een"',
+  'speldag.test.js': 'de wacht IS het onderwerp: een oplosser is er in milliseconden doorheen, dus zonder pauze ' +
+    'zijn de klok van de server en de nul die de client meestuurt niet uit elkaar te houden',
+  'spelsudoku.test.js': 'zelfde als speldag: de verstreken tijd op de server is precies wat de toets tegenover ' +
+    'de meegestuurde nul zet; zonder pauze meten allebei de volle basis'
 };
 
 function leesVastgelegd() {

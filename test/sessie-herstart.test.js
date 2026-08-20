@@ -4,7 +4,7 @@
    maakSessies-fabriek (server/kern/sessies.js). Draai: npm test */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -62,8 +62,11 @@ test('een ingelogd lid blijft na een serverherstart ingelogd (zelfde data-dir)',
     const voor = await api(s.base, '/api/state', {}, reg.token);
     assert.ok(voor.state && voor.state.user, 'voor de herstart is het lid ingelogd');
     const codenaam = voor.state.user.codename;
-    stop(s.child);
-    await new Promise(r => setTimeout(r, 700));
+    /* stopNet en niet stop() met 700 ms ernaast. Deze toets gaat over een NETTE
+       herstart ("hetzelfde token moet het na een deploy nog doen"), dus SIGTERM
+       hoort erbij -- en dan spoelt de server zijn sessies nog weg. `exit` is het
+       teken dat hij van de datamap af is; 700 ms was een gok daarover. */
+    await stopNet(s.child);
 
     // 2) herstarten met dezelfde data-dir; hetzelfde token moet nog werken
     s = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });

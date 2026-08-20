@@ -35,6 +35,9 @@
       de functiescheiding een formaliteit.
   10. De peildatum van de gereedheid komt van de server.
   11. Indienen mag het personeel; zaaien en aftekenen alleen de manager.
+  12. De partnerkant loopt niet via eigendom: de genoemde zaak bevestigt.
+  13. De zaakcode komt uit de sessie; het lichaam mag hem niet zetten.
+  14. De postbus toont alleen banden waarin deze zaak zelf genoemd is.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -245,6 +248,48 @@ test('11. indienen mag het personeel; zaaien en aftekenen alleen de manager', as
     control: c.id }, deur)).status, 403, 'maar aftekenen is managerwerk');
 });
 
+test('12. de partnerkant loopt niet via eigendom: de genoemde zaak bevestigt', async () => {
+  /* MACE bezit dit festival niet en kan het niet lezen (toets 3). Maar als het
+     festival MACE als partner voorstelt, moet MACE juist WEL kunnen antwoorden
+     -- anders sluit een band nooit. Eigendom is hier de verkeerde vraag. */
+  const voorstel = await post('/api/festival/partner', { festival: fid, editie: eid, rol: 'horeca', zaak: 'MACE' }, manager);
+  assert.equal(voorstel.ok, true);
+  assert.equal(voorstel.partner.stand, 'voorgesteld');
+
+  const doorEigenaar = await api('/api/festival/partner/bevestig',
+    { festival: fid, editie: eid, id: voorstel.partner.id }, manager);
+  assert.equal(doorEigenaar.status, 404, 'de eigenaar kan zijn eigen voorstel niet bevestigen');
+
+  const doorMace = await post('/api/festival/partner/bevestig',
+    { festival: fid, editie: eid, id: voorstel.partner.id, deelt: ['x1'] }, andere);
+  assert.equal(doorMace.ok, true);
+  assert.equal(doorMace.partner.stand, 'bevestigd');
+  assert.deepEqual(doorMace.partner.deelt, ['x1']);
+});
+
+test('13. de zaakcode komt uit de sessie; het lichaam mag hem niet zetten', async () => {
+  const voorstel = await post('/api/festival/partner', { festival: fid, editie: eid, rol: 'techniek', zaak: 'MACE' }, manager);
+
+  /* Het personeelslid van ESVEDRA doet alsof hij MACE is. Wordt zaakCode uit
+     het lichaam genomen, dan bevestigt hij de band van een ander bedrijf -- en
+     dan is de hele tweezijdigheid een formulier. */
+  const alsof = await api('/api/festival/partner/bevestig',
+    { festival: fid, editie: eid, id: voorstel.partner.id, zaakCode: 'MACE' }, deur);
+  assert.equal(alsof.status, 404);
+
+  const echt = await post('/api/festival/partner/bevestig', { festival: fid, editie: eid, id: voorstel.partner.id }, andere);
+  assert.equal(echt.ok, true);
+});
+
+test('14. de postbus toont alleen banden waarin deze zaak zelf genoemd is', async () => {
+  const inbox = await post('/api/festival/partner/inbox', {}, andere);
+  assert.ok(inbox.banden.length >= 1, 'MACE ziet de banden waarin hij genoemd is');
+  assert.ok(inbox.banden.every(b => b.festivalNaam), 'met genoeg context om te kunnen antwoorden');
+
+  const leeg = await post('/api/festival/partner/inbox', {}, zonderTickets);
+  assert.deepEqual(leeg.banden, [], 'en een zaak die nergens genoemd is, ziet niets');
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -295,4 +340,14 @@ test('11. indienen mag het personeel; zaaien en aftekenen alleen de manager', as
 
    8. In routes/festival/gereed.js de peildatum uit de body laten komen.
       -> toets 10 zakte: een stuk dat in 2020 verliep telde weer mee.
+
+   9. In routes/festival/partner.js `zaakCode` uit de body laten komen in plaats
+      van uit req.supplier.
+      -> toets 13 zakte: een personeelslid van het festival bevestigde de band
+         van een ANDER bedrijf, en opende daarmee wat dat bedrijf deelt.
+
+  10. In routes/festival/partner.js de postbus over alle banden laten lopen in
+      plaats van alleen die waarin de zaak genoemd is.
+      -> toets 14 zakte: een willekeurige zaak zag de partnerbanden van
+         iedereen.
    ========================================================================== */

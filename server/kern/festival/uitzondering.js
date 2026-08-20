@@ -20,17 +20,22 @@
    rustige plek. Dat is LAT-regel 3 op deze laag: een meter zonder invoer hoort
    niets te beweren.
 
-   WAT DEZE LAAG (NOG) NIET WEET, EN DUS NIET VERZINT. Voorraad, weer, vervoer,
-   personeelsbezetting en storingen zijn echte uitzonderingsbronnen en ze staan
-   in FESTIVAL.md par. 8 als fase 7. Ze komen erbij als deze laag de domeinen
-   leest die ze al bijhouden -- niet door ze hier na te bouwen, en zeker niet
-   door er alvast een plausibel getal voor te tonen. */
+   WAT ER VAN BUITEN BIJKOMT staat in ./signalen.js: onbezette beveiligingsposten
+   en een door de vervoerder gemelde storing, gelezen bij BEVESTIGDE partners en
+   alleen voor wat die partner zelf heeft vrijgegeven. Die twee lijsten worden
+   hier SAMENGEVOEGD en niet naast elkaar getoond -- twee lijsten laten de
+   leiding kiezen welke ze eerst leest, en dat is precies de keuze die een
+   cockpit hoort weg te nemen.
+
+   VOORRAAD EN WEER STAAN ER NOG NIET, en waarom niet staat in ./signalen.js:
+   er is geen laag om te lezen. Een plausibel getal tonen zou erger zijn dan
+   niets tonen. */
 'use strict';
 
 const ERNST = { kritiek: 3, hoog: 2, aandacht: 1 };
 
 module.exports = (ctx) => {
-  const { editieVind, dagVind, bezetting, instroom } = ctx;
+  const { editieVind, dagVind, bezetting, instroom, signalen } = ctx;
 
   /* De horizon: hoe ver vooruit een uitzondering nog een uitzondering is. Een
      uur is de standaard omdat dat ongeveer de tijd is die een ingreep op een
@@ -94,14 +99,21 @@ module.exports = (ctx) => {
       }
     }
 
+    /* Wat de domeinen van de partners melden, op dezelfde hoop. */
+    const buiten = signalen(fid, eid, { datum: v.datum, tijd: v.tijd });
+    if (!buiten.error) for (const s of buiten.signalen) uit.push(s);
+
     /* Het dringendste eerst: eerst de ernst, dan de tijd die er nog is. */
     uit.sort((a, b2) => (ERNST[b2.ernst] - ERNST[a.ernst]) || (a.over - b2.over));
 
     return { ok: true, dag: dag.id, tijd: String(v.tijd || ''), horizon,
       uitzonderingen: uit, gemeten, ongemeten,
+      partners: buiten.partners || 0, zonderDeling: buiten.zonderDeling || 0,
       /* Rust is pas rust als er ook echt gemeten is EN er geen blinde vlekken
-         zijn. Anders is het stilte, en die zin hoort een cockpit niet te zeggen. */
-      rust: uit.length === 0 && gemeten > 0 && ongemeten.length === 0 };
+         zijn. Een bevestigde partner die niets deelt, is zo'n blinde vlek: hij
+         levert stilte op, en stilte is geen rust. */
+      rust: uit.length === 0 && gemeten > 0 && ongemeten.length === 0
+        && !(buiten.zonderDeling || 0) };
   }
 
   return { uitzonderingen };

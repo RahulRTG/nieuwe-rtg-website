@@ -360,11 +360,29 @@ hebben.
 1. **Terrein en pas.** ✅ De boom van plekken, de rechten, de scan met
    dubbelgebruik-slot en de leesbare weigering. *Hiermee kan een festival zijn
    poorten draaien.* `kern/festival/{model,terrein,soorten,rechten,poort,toegang}.js`
-2. **Command en uitzonderingen.** ✅ *voor wat er gemeten wordt* — bezetting,
-   drempels, vooruitblik, de gerangschikte lijst, en de ongemeten plekken als
-   eigen bevinding. `kern/festival/{bezetting,uitzondering}.js`. Wat er nog
-   ontbreekt is de KOPPELING: voorraad, rooster, vervoer en storingen zijn echte
-   uitzonderingsbronnen en worden nog niet gelezen (zie fase 7).
+2. **Command en uitzonderingen.** ✅ Bezetting, drempels, vooruitblik, de
+   gerangschikte lijst, en de blinde vlekken als eigen bevinding.
+   `kern/festival/{bezetting,uitzondering,partner,signalen}.js`.
+
+   De koppeling naar andere domeinen loopt via een **partnerband die twee
+   kanten kent** (`partner.js`): het festival stelt voor, de zaak bevestigt, en
+   die zaak noemt zelf welke posten of lijnen zij vrijgeeft. Een voorstel opent
+   niets, en een bevestigde band zonder vrijgegeven stukken deelt niets. Beide
+   kanten kunnen opzeggen.
+
+   Waarom niet eenvoudiger: een beveiligingspost draagt een `klant` als **vrije
+   tekst**, dus matchen op naam zou "Testival" en "Testival 2027" tot twee
+   klanten maken — en wie zijn post zo noemt, leest mee. En een festival dat
+   zelf mag opschrijven wie zijn beveiliger is, opent daarmee andermans rooster
+   met een regel in zijn eigen data.
+
+   Wat er doorkomt is een **getal**: hoeveel plekken onbezet zijn, en dat er een
+   storing loopt. Geen namen van bewakers, geen diensten, geen omzet.
+
+   **Voorraad en weer staan er nog niet, en dat blijft zo tot er een laag is om
+   te lezen.** Er is geen horeca-voorraadmodule; `kern/retail.js` telt mode en
+   geen fust. Een schatting op omzet zou een getal opleveren dat nergens vandaan
+   komt (LAT-regel 3).
 3. **Gereedheid.** ✅ Controls met bewijs, NIET GEREED die niet weg te praten
    is. `kern/festival/{gereed,gereedheid}.js`. Vier wegen naar vals groen staan
    dicht: een stuk dat niemand zag telt nul, een verlopen stuk telt nul, wie

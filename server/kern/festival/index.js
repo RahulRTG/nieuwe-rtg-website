@@ -10,6 +10,8 @@
      ./poort.js         lezen      mag deze pas hier, nu -- en waarom niet
      ./toegang.js       handelen   de scan, dubbelgebruik, de offline bundel
      ./bezetting.js     tellen     hoeveel mensen waar, en hoe snel erbij
+     ./partner.js       banden     een band die beide kanten sluiten
+     ./signalen.js      van buiten wat andere domeinen al bijhouden
      ./uitzondering.js  vooruit    wat er over dertig minuten misgaat
      ./gereed.js        keuren     controls met bewijs; alleen afgetekend telt
      ./gereedheid.js    de uitslag het ene getal waar een terrein op opengaat
@@ -38,7 +40,9 @@ module.exports = (ctx) => {
 
   /* Een gedeelde context die per deel wordt aangevuld, zodat elk volgend deel
      leest wat het vorige neerzette zonder een tweede kopie van een leesfunctie. */
-  const k = { db, save, crypto, schoon };
+  /* `kern` gaat als functie mee zodat ./signalen.js hem LAAT leest: die hangt
+     aan domeinen die in dezelfde ronde worden samengesteld. Zie de kop daar. */
+  const k = { db, save, crypto, schoon, kern: ctx.kern };
 
   Object.assign(k, require('./model')(k));
   Object.assign(k, require('./terrein')(k));
@@ -46,6 +50,10 @@ module.exports = (ctx) => {
   Object.assign(k, require('./poort')(k));
   Object.assign(k, require('./toegang')(k));
   Object.assign(k, require('./bezetting')(k));
+  /* ./partner.js voor ./signalen.js (die leest partnersVan), en beide voor
+     ./uitzondering.js (die de signalen mee op de hoop gooit). */
+  Object.assign(k, require('./partner')(k));
+  Object.assign(k, require('./signalen')(k));
   Object.assign(k, require('./uitzondering')(k));
   /* De gereedheid als laatste twee: ./gereedheid.js leest standVanControl uit
      ./gereed.js, dus die volgorde is gedrag en geen smaak. */

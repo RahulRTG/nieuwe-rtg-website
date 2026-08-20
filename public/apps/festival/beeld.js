@@ -65,6 +65,13 @@
           lijst.appendChild(regel(x.ernst, x.zin, x.over ? 'over ' + x.over + ' min' : 'nu'));
         });
         var stukjes = [b.gemeten + (b.gemeten === 1 ? ' plek gemeten' : ' plekken gemeten')];
+        /* EEN ZWIJGENDE PARTNER IS EEN BLINDE VLEK. Een band die bevestigd is
+           maar niets vrijgeeft levert stilte op, en stilte is geen rust -- dus
+           staat het er, naast de plekken die niet gemeten worden. */
+        if (b.partners) {
+          stukjes.push(b.partners + (b.partners === 1 ? ' partner meldt mee' : ' partners melden mee')
+            + (b.zonderDeling ? ', waarvan ' + b.zonderDeling + ' niets deelt' : ''));
+        }
         if ((b.ongemeten || []).length) {
           var n = (b.ongemeten || []).length;
           stukjes.push(n + (n === 1 ? ' plek met een drempel wordt niet gemeten: '

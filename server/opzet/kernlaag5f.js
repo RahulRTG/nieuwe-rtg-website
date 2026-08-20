@@ -19,5 +19,9 @@
 
 module.exports = (kern, hulp) => {
   const { crypto, db, save, schoon } = hulp;
-  kern.festival = require('../kern/festival')({ db, save, crypto, schoon });
+  /* De kern gaat als FUNCTIE mee en niet als waarde: kern/festival/signalen.js
+     leest bevRooster en storingLijst, en die staan er op dit moment wel maar
+     een volgende laag kan er nog bij zetten. Een functie leest laat; een waarde
+     bevriest wat er nu is (zelfde reden als de Proxy in ./domeingrens.js). */
+  kern.festival = require('../kern/festival')({ db, save, crypto, schoon, kern: () => kern });
 };

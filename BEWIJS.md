@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1031 bestanden en 6870 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1032 bestanden en 6877 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1031 |
-| losse beweringen (`test(...)`) | 6870 |
+| toetsbestanden | 1032 |
+| losse beweringen (`test(...)`) | 6877 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 866 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 22 |
+| alleen in de kop *genoemd*, nog niet gemeten | 23 |
 | niets van beide | 95 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-905 bestanden, 6650 beweringen.
+906 bestanden, 6657 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -570,6 +570,7 @@ toets omvalt.
 | `payroll-uren-controles.test.js` | 12 | gezakt op `===->!==#0` | Payroll OS: de uren uit de klok en de automatische controles. HIER SLUIT DE KETEN: dienst plannen, inklokken, toeslagen berekenen, afwijkingen zien, en dan pas de loonrun. |
 | `payroll-valuta.test.js` | 7 | gezakt op `===->!==#0` | Payroll OS: VALUTA -- want "centen" is niet overal honderdsten. WAT HIER OP HET SPEL STAAT, en het is geen opsmuk. |
 | `payroll.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Payroll: het loonkantoor draait de personeelsbetalingen op de data die het platform al heeft (klok, rollen, fiscale landtabellen), en de matchtafel linkt medewerkers en bedrijven -- maar alleen wie zichzelf "open... |
+| `paytegoed.test.js` | 7 | genoemd | Het walletplafond en het tegoed dat een lid voor een ander koopt. Twee dingen worden hier vastgehouden, en ze horen bij elkaar omdat ze allebei uit dezelfde regel komen: kern/bevoegdheid/lijst.js staat RTG het... |
 | `pda-aanmelden.test.js` | 5 | gezakt op `liegpoort /api/` | 1x aanmelden voor de personeels-app: log één keer in met het eigen RTG-account en land meteen op de juiste bedrijfspagina. Wie bij meer bedrijven op het rooster staat, wisselt met één tik van werkplek, zonder opnieuw... |
 | `pda-netwerk.test.js` | 3 | gezakt op `liegpoort /api/` | Personeelsnetwerk + service-uitmuntendheid. 1) PDA's van verschillende zaken praten met elkaar, maar alleen na wederzijdse toestemming (manager vraagt, andere manager keurt goed); daarna mag al het personeel in die... |
 | `pdamodules.test.js` | 3 | gezakt op `liegpoort /api/` | DE PDA-MODULES: EEN LIJN TUSSEN SERVER EN PDA, EN GEEN TWEEDE WAARHEID. WAT ER MISGING De personeels-PDA bepaalde ZELF welke eigen tabs aangingen, met regels als `(state.supplier.caps \|\| []).includes('marina')`... |

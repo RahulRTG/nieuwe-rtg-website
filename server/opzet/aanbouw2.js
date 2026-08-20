@@ -20,7 +20,12 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   require('../routes/rtgid')(grens('rtgid'));
   /* RTG Wallet (kern/wallet.js) en de zorgtak van de verzekeraar
      (kern/zorgpolis.js): de zorgpas op codenaam ligt direct in de wallet. */
-  Object.assign(kern, require('../kern/wallet').maakWallet({ db, save, crypto, schoon }));
+  /* pay en codenaamVan komen erbij omdat de feestmunt sindsdien ECHT betaald
+     wordt (kern/wallet.js). Allebei bestaan ze hier al lang: pay wordt in
+     kernlaag3 gebouwd, de sociale kern nog eerder, en deze aanbouw hangt aan
+     kernlaag7b -- er is dus niets laat te binden. */
+  Object.assign(kern, require('../kern/wallet').maakWallet({ db, save, crypto, schoon,
+    pay: kern.pay, codenaamVan: kern.codenaamVan }));
   Object.assign(kern, require('../kern/zorgpolis').maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam,
     walletVoeg: kern.walletVoeg, walletWegBron: kern.walletWegBron }));
   require('../routes/zorgwallet')(grens('zorgwallet'));

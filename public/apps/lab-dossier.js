@@ -30,18 +30,18 @@
       'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}' +
       '.wrap{max-width:820px;margin:0 auto;}' +
       '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2rem;}' +
-      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}' +
+      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}' +
       '.cover h1{font-size:2.2rem;margin:.5rem 0 .3rem;}.cover .sub{color:var(--muted);font-size:.9rem;}' +
       '.keten{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:1.2rem 0;}' +
       '.stap{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.25rem .7rem;color:var(--soft);}' +
-      '.stap.was{color:var(--gold);border-color:var(--gold);}' +
+      '.stap.was{color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);}' +
       '.stap.nu{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}' +
       '.pijl{color:var(--soft);font-size:.8rem;}' +
       'section{border-top:1px solid var(--line);padding:1.4rem 0;page-break-inside:avoid;}' +
       'section h2{font-size:1.15rem;margin-bottom:.6rem;}' +
       '.toets{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;}' +
       '.toets .st{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;}' +
-      '.toets.ok .st{color:var(--groen);}.toets.wacht .st{color:var(--gold);}' +
+      '.toets.ok .st{color:var(--groen);}.toets.wacht .st{color:var(--rtg-leesgoud,var(--gold));}' +
       '.toets p{font-size:.88rem;color:var(--muted);margin-top:.3rem;}' +
       '.log{font-size:.88rem;padding:.3rem 0;border-bottom:1px solid var(--line);display:flex;gap:.9rem;}' +
       '.log:last-child{border-bottom:none;}.log .d{color:var(--soft);white-space:nowrap;font-size:.78rem;padding-top:.15rem;}' +

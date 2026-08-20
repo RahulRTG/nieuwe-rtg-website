@@ -37,14 +37,14 @@
     'border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:1.4rem 1.4rem 1.2rem;' +
     'font-family:Inter,system-ui,sans-serif;color:#F4F1EC;box-shadow:0 24px 60px rgba(0,0,0,.6);}' +
     '.poort-kaart h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:600;font-size:1.4rem;margin:0 0 .2rem;}' +
-    '.poort-kaart .p-sub{color:#A79F92;font-size:.86rem;line-height:1.5;margin:0 0 1.1rem;}' +
+    '.poort-kaart .p-sub{color:var(--rtg-leeszacht,#A79F92);font-size:.86rem;line-height:1.5;margin:0 0 1.1rem;}' +
     '.p-stap{display:flex;gap:.7rem;align-items:flex-start;padding:.55rem 0;border-top:1px solid rgba(255,255,255,.08);}' +
     '.p-vink{flex:0 0 auto;width:1.4rem;height:1.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;' +
     'font-size:.8rem;border:1px solid rgba(255,255,255,.25);color:#8A8680;margin-top:.1rem;}' +
     '.p-stap.klaar .p-vink{background:var(--burgundy,#7F1634);border-color:var(--burgundy,#7F1634);color:#fff;}' +
     '.p-stap .p-tk{flex:1;min-width:0;}' +
     '.p-stap .p-tk b{display:block;font-weight:600;font-size:.92rem;}' +
-    '.p-stap .p-tk span{display:block;color:#A79F92;font-size:.82rem;line-height:1.45;margin-top:.1rem;}' +
+    '.p-stap .p-tk span{display:block;color:var(--rtg-leeszacht,#A79F92);font-size:.82rem;line-height:1.45;margin-top:.1rem;}' +
     '.p-stap .p-doe{flex:0 0 auto;align-self:center;border:1px solid var(--burgundy-on-dark,#C23A5E);background:transparent;' +
     'color:var(--burgundy-on-dark,#C23A5E);font:inherit;font-size:.78rem;font-weight:600;border-radius:999px;padding:.3rem .7rem;cursor:pointer;}' +
     '.p-stap .p-doe:hover{background:rgba(194,58,94,.12);}' +

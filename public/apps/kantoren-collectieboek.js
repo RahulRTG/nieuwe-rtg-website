@@ -44,7 +44,7 @@
       'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}' +
       '.wrap{max-width:820px;margin:0 auto;}' +
       '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2.4rem;}' +
-      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}' +
+      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}' +
       '.cover h1{font-size:2.4rem;margin:.5rem 0 .3rem;}.cover .sub{color:var(--muted);font-size:.9rem;}' +
       'article{border-top:1px solid var(--line);padding:2rem 0;page-break-inside:avoid;}article:first-of-type{border-top:none;}' +
       'article header{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;}' +
@@ -58,7 +58,7 @@
       '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}' +
       '.verhaal{font-style:italic;margin-top:.8rem;font-size:.96rem;}' +
       '.kritiek{margin-top:1rem;border-left:2px solid var(--gold);padding-left:.8rem;font-size:.9rem;color:var(--muted);}' +
-      '.kritiek b{color:var(--gold);font-weight:600;}' +
+      '.kritiek b{color:var(--rtg-leesgoud,var(--gold));font-weight:600;}' +
       '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}' +
       '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}' +
       '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}' +

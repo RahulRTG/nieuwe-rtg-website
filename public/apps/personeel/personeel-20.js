@@ -58,7 +58,7 @@
       const uit = document.getElementById('pdCheckUit');
       try {
         const r = await API.call('/supplier/ticket/checkin', { code: $('#pdCode').value });
-        uit.innerHTML = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>'+
+        uit.innerHTML = '<b style="color:var(--rtg-leesgroen,var(--green));">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>'+
           (r.ticket.zorg?'<div style="margin-top:0.3rem;color:#E2B93B;">\u26A0 '+esc(pkZorg(r.ticket.zorg))+'</div>':'');
         $('#pdCode').value = '';
         laadEntree();

@@ -19,7 +19,7 @@
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
   .codepaneel{display:flex;align-items:center;gap:.8rem;justify-content:space-between;flex-wrap:wrap;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.9rem 1.1rem;}
-  .codepaneel .code{font-size:1.5rem;font-weight:700;letter-spacing:.28em;color:var(--goud);}
+  .codepaneel .code{font-size:1.5rem;font-weight:700;letter-spacing:.28em;color:var(--rtg-leesgoud,var(--goud));}
   .plist{display:flex;flex-direction:column;gap:.6rem;}
   .prow{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .8rem;}
   .prow .av{width:2.4rem;height:2.4rem;border-radius:.7rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
@@ -89,7 +89,7 @@
 
   <div class="kaart blok">
     <h2>Gegevens en privacy</h2>
-    <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--goud)">privacy en veiligheid</a>-pagina.</div>
+    <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--rtg-leesgoud,var(--goud))">privacy en veiligheid</a>-pagina.</div>
     <button class="knop rood" id="wisAlles">Alle gegevens van ons gezin verwijderen</button>
     <div class="h" id="wisUitleg" style="margin:.6rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
   </div>
@@ -152,7 +152,7 @@ $('#dRol').addEventListener('change', ()=>{ $('#rolhint').hidden = $('#dRol').va
 async function laad(){
   const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
   if (d.error || !d.profiel){ location.href='index.html'; return; }
-  if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" style="color:var(--accent-tekst)">Terug naar de app</a>.</p>'; return; }
+  if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" style="color:var(--rtg-leesgoud,var(--goud))">Terug naar de app</a>.</p>'; return; }
   Sessie.balk($('#balk'), { terug:'index.html', terugTekst:'← Terug' });
   $('#uCode').textContent = s.code;
   $('#zin').textContent = 'Beheer het gezin "' + d.gezin.naam + '". Voeg profielen toe en houd iedereen op de hoogte.';
@@ -188,7 +188,7 @@ async function laad(){
   if (d.wisVerzoek && !d.wisVerzoek.vanMij){
     $('#wisAlles').textContent = 'Toestemming geven om alles te verwijderen';
     $('#wisAlles').dataset.mode = 'bevestig';
-    $('#wisUitleg').innerHTML = '<b style="color:var(--rood)">'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens verwijderen.</b> Geef jij toestemming, of <a href="#" id="wisWeiger" style="color:var(--goud)">wijs het verzoek af</a>.';
+    $('#wisUitleg').innerHTML = '<b style="color:var(--rood)">'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens verwijderen.</b> Geef jij toestemming, of <a href="#" id="wisWeiger" style="color:var(--rtg-leesgoud,var(--goud))">wijs het verzoek af</a>.';
     $('#wisWeiger').onclick = async (e)=>{ e.preventDefault(); try{ await api('/gezin/wissen/intrekken', { code:s.code, token:s.token }); laad(); }catch(err){ alert(err.message); } };
   } else if (d.wisVerzoek && d.wisVerzoek.vanMij){
     $('#wisAlles').textContent = 'Verzoek intrekken';

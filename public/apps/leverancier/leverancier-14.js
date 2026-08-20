@@ -19,7 +19,7 @@
            [T('bz.acties','Open acties'), b.stats.openActies]]
           .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;">'+
             '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
-            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--gold);margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
+            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--rtg-leesgoud,var(--gold));margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
           '<div class="tkc-who h-mt50">'+T('bz.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div>'+
           '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;">'+
           '<button class="obtn" id="boBrief">'+T('bz.brief','Dagbriefing')+'</button>'+

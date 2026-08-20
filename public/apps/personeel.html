@@ -104,7 +104,7 @@
   #app.active{display:flex;}
   .topbar{padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.4rem 0.9rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);}
   .topbar .who b{display:block;font-size:0.94rem;font-weight:600;}
-  .topbar .who span{font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);}
+  .topbar .who span{font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .switch{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.7rem;color:var(--muted);}
   .content{flex:1;overflow-y:auto;padding:1.3rem 1.4rem calc(env(safe-area-inset-bottom,0px) + 6rem);}
   .view{display:none;}
@@ -116,7 +116,7 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);}
   .k{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
 
-  .shift-big{margin-top:0.5rem;font-family:'Bodoni Moda',serif;font-size:1.5rem;color:var(--gold);}
+  .shift-big{margin-top:0.5rem;font-family:'Bodoni Moda',serif;font-size:1.5rem;color:var(--rtg-leesgoud,var(--gold));}
   .task{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
   .task:last-child{border-bottom:none;}
   .task .ic{font-size:1.1rem;flex-shrink:0;}
@@ -129,7 +129,7 @@
   .abtn:active{transform:scale(0.96);}
   .abtn.ghost{background:none;border:1px solid var(--line);color:var(--txt);}
   .pill{display:inline-block;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:0.25rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
-  .pill.g{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .pill.g{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
   .pill.a{color:var(--amber);border-color:rgba(201,154,46,0.4);}
   .pill.b{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
 
@@ -142,7 +142,7 @@
   .kamer{border-left:4px solid var(--line);}
   .kamer.vuil{border-left-color:#E5484D;}
   .kamer.bezig{border-left-color:var(--amber);}
-  .kamer.schoon{border-left-color:var(--green);}
+  .kamer.schoon{border-left-color:var(--rtg-leesgroen,var(--green));}
   .kamer.defect{border-left-color:#E5484D;background:rgba(229,72,77,0.06);}
   .kamer.bezet{border-left-color:var(--line);opacity:0.75;}
   .hkchip{display:inline-flex;align-items:center;gap:0.3rem;border:1px solid var(--line);border-radius:999px;padding:0.2rem 0.6rem;font-size:0.64rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
@@ -157,24 +157,24 @@
   .mbrow .q button{width:2rem;height:2rem;border-radius:50%;background:var(--card2);border:1px solid var(--line);font-size:1rem;}
 
   .rooster-day{margin-top:0.9rem;}
-  .rooster-day .dh{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;}
+  .rooster-day .dh{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:0.35rem;}
   .rrow{display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;border-radius:10px;font-size:0.84rem;}
   .rrow.me{background:rgba(169,143,28,0.1);border:1px solid rgba(169,143,28,0.3);}
   .rrow span{color:var(--muted);font-size:0.76rem;}
-  .rrow.me span{color:var(--gold);}
+  .rrow.me span{color:var(--rtg-leesgoud,var(--gold));}
 
   .chat{display:flex;flex-direction:column;gap:0.55rem;margin-top:0.6rem;}
   .msg{max-width:82%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.85rem;line-height:1.45;}
   .msg.me{align-self:flex-end;background:var(--burgundy-deep);border-top-right-radius:5px;color:#fff;}
   .msg.other{align-self:flex-start;background:var(--card2);border:1px solid var(--line);border-top-left-radius:5px;}
-  .msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:0.15rem;}
+  .msg .who{display:block;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:0.15rem;}
   .msg.me .who{color:rgba(255,255,255,0.65);}
   .compose{display:flex;gap:0.5rem;margin-top:0.9rem;}
   .compose input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.75rem 1rem;font-size:0.88rem;color:var(--txt);outline:none;}
   .compose button{background:var(--knop);color:var(--knop-txt);border:none;border-radius:999px;padding:0 1.2rem;font-size:0.82rem;font-weight:600;}
   .act{display:flex;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);font-size:0.8rem;}
   .act:last-child{border-bottom:none;}
-  .act b{color:var(--gold);font-weight:600;white-space:nowrap;}
+  .act b{color:var(--rtg-leesgoud,var(--gold));font-weight:600;white-space:nowrap;}
   .act span{color:var(--muted);flex:1;}
   .act time{color:var(--soft);font-size:0.64rem;white-space:nowrap;}
 
@@ -204,7 +204,7 @@
   .vlin{background:rgba(255,255,255,0.06);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.85rem;color-scheme:dark;outline:none;}
   #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
-  .glist.compact{margin-top:.8rem;}.pd-demo-hint{margin-top:.7rem;font-size:.72rem;color:var(--soft);}.pd-card-copy{font-size:.8rem;line-height:1.5;margin-top:.35rem;color:var(--soft);}.abtn.pd-block{display:block;text-align:center;margin-top:.65rem;text-decoration:none;}.pd-empty{color:var(--soft);font-size:.8rem;}.pd-chatrij{padding:.25rem 0;border-bottom:1px solid var(--line);}.pd-chatnaam{color:var(--gold);}
+  .glist.compact{margin-top:.8rem;}.pd-demo-hint{margin-top:.7rem;font-size:.72rem;color:var(--soft);}.pd-card-copy{font-size:.8rem;line-height:1.5;margin-top:.35rem;color:var(--soft);}.abtn.pd-block{display:block;text-align:center;margin-top:.65rem;text-decoration:none;}.pd-empty{color:var(--soft);font-size:.8rem;}.pd-chatrij{padding:.25rem 0;border-bottom:1px solid var(--line);}.pd-chatnaam{color:var(--rtg-leesgoud,var(--gold));}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>

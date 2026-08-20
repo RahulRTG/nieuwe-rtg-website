@@ -48,7 +48,14 @@
   .dagrij .klok{font-family:'Bodoni Moda',Georgia,serif;font-size:1.2rem;min-width:3.4rem;}
   .dagrij .wat{flex:1 1 auto;font-size:.9rem;}
   .dagrij .wat .uit{display:block;color:var(--soft);font-size:.78rem;line-height:1.5;margin-top:.1rem;}
-  .dagrij .bron{font-size:.74rem;white-space:nowrap;}
+  /* DE BRON IS EEN LINK, en die had geen kleur -- dus zette de BROWSER er een:
+     rgb(158,158,255) op onyx (leesbaar, dus niemand zag het) en #0000EE zodra
+     color-scheme licht wordt. Dezelfde les als bij de app-links op media.html:
+     een kleur die je niet zelf zet, zet de browser. De huisinkt met een gouden
+     onderstreping -- goud is hier een accent en geen tekstkleur. */
+  .dagrij .bron{font-size:.74rem;white-space:nowrap;color:var(--txt);
+    text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:0.18em;
+    text-decoration-color:var(--rtg-leesgoud,var(--gold));}
   .dagrij.af .klok,.dagrij.af .wat b{color:var(--soft);}
   .losse{margin-top:1rem;}
 </style>

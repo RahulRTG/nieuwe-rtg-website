@@ -21,9 +21,16 @@
     var st = d.createElement('style');
     st.id = 'waStijl';
     st.textContent =
+      /* DE PAS SCHILDERT ZIJN EIGEN GROND, DUS OOK ZIJN EIGEN INKT. Deze kaart is
+         altijd donker -- het is de pas zelf en geen paneel dat meethemaat. De tekst
+         erop kwam uit --rtg-txt en --rtg-soft, en die volgen WEL het thema: op
+         champagne stond de pasnaam in rgb(26,23,19) op rgb(36,16,22), 1,1:1. De
+         tokens staan nu op de kaart zelf, zodat alles wat erin komt klopt. */
       '#paneel .wa-pas{background:linear-gradient(150deg,#241016,#150C0F 55%,#0C0C0B);' +
         'border:1px solid rgba(201,162,75,.34);border-radius:12px;padding:1.3rem 1.35rem 1.2rem;' +
-        'position:relative;overflow:hidden;margin:.6rem 0 1rem;}' +
+        'position:relative;overflow:hidden;margin:.6rem 0 1rem;' +
+        'color:var(--op-onyx,#F4F0E9);--rtg-txt:var(--op-onyx,#F4F0E9);' +
+        '--rtg-muted:rgba(244,240,233,0.78);--rtg-soft:rgba(244,240,233,0.66);}' +
       '#paneel .wa-pas .label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rtg-soft);}' +
       '#paneel .wa-pas .cn{font-family:"Bodoni Moda",serif;font-weight:400;line-height:1.1;' +
         'font-size:clamp(1.7rem,7vw,2.35rem);margin:.45rem 0 .9rem;cursor:pointer;}' +
@@ -47,7 +54,7 @@
       '#paneel .wa-invoer{display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0 1rem;}' +
       '#paneel .wa-invoer>*{flex:1;min-width:7rem;}' +
       '#paneel .wa-invoer .knop{flex:0 0 auto;}' +
-      '#paneel .knop.wa-weg{color:var(--rtg-rood,#C23A5E);border-color:rgba(194,58,94,.4);}' +
+      '#paneel .knop.wa-weg{color:var(--rtg-leesrood,var(--rtg-rood,#C23A5E));border-color:rgba(194,58,94,.4);}' +
       '#waScrim{position:fixed;inset:0;z-index:80;background:#F4F1EC;color:#0C0C0B;display:none;' +
         'flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;}' +
       '#waScrim.aan{display:flex;}' +

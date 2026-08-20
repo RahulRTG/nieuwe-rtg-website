@@ -30,14 +30,14 @@
   header{border-bottom:1px solid var(--line);padding:1.1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
   header .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brand{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
-  .brand small{display:block;font-family:'Inter',sans-serif;font-size:0.56rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:0.56rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .live{display:inline-flex;align-items:center;gap:0.45rem;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
   .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(76,154,117,0.2);}
 
   /* login */
   #gate{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem;}
   .gate-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:2.25rem;}
-  .gate-card .k{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+  .gate-card .k{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .gate-card h1{font-size:1.7rem;margin-top:0.75rem;}
   .gate-card p{margin-top:0.6rem;font-size:0.85rem;color:var(--muted);}
   .gate-card input{width:100%;margin-top:1.5rem;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0.85rem 1rem;color:var(--txt);font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;outline:none;}
@@ -51,7 +51,7 @@
   .stat .b{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem;}
   .stat .l{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
   .stat .v{font-family:'Bodoni Moda',serif;font-size:1.8rem;margin-top:0.3rem;}
-  .stat .v.a{color:var(--burgundy);} .stat .v.g{color:var(--gold);}
+  .stat .v.a{color:var(--burgundy);} .stat .v.g{color:var(--rtg-leesgoud,var(--gold));}
   @media (max-width:720px){.stat{grid-template-columns:repeat(2,1fr);}}
 
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
@@ -65,11 +65,11 @@
   .row .nm{font-weight:600;font-size:0.88rem;}
   .row .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
   .row .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;white-space:nowrap;}
-  .row .amt.g{color:var(--gold);}
+  .row .amt.g{color:var(--rtg-leesgoud,var(--gold));}
   .pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.22rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
   .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.bereiding{color:var(--amber);}
-  .pill.klaar,.pill.geserveerd{color:var(--green);}
+  .pill.klaar,.pill.geserveerd{color:var(--rtg-leesgroen,var(--green));}
   .livedot{width:9px;height:9px;border-radius:50%;background:var(--burgundy);display:inline-block;vertical-align:middle;animation:livepulse 1.4s infinite;}
   @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 7px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
   .empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
@@ -90,7 +90,7 @@
   .uitleg{font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.7rem;line-height:1.5;}
   .vbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:600;cursor:pointer;}
   .vbtn.doc{color:var(--muted);}
-  .vbtn.ok{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .vbtn.ok{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
   .vbtn.no{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .vbtn:hover{background:rgba(255,255,255,0.05);}
   /* invoer in een paneel: hetzelfde ritme als de rijen erboven, veel lucht */
@@ -150,7 +150,7 @@
 
 <header>
   <div class="wrap">
-    <div class="brand"><span class="merkvlak">Rahul Travel Group</span><small>Backoffice · <a href="/apps/command.html" style="color:var(--gold);text-decoration:none;">RTG Command →</a> · <a href="/apps/kantoren.html" style="color:var(--gold);text-decoration:none;">De kantoren →</a></small></div>
+    <div class="brand"><span class="merkvlak">Rahul Travel Group</span><small>Backoffice · <a href="/apps/command.html" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">RTG Command →</a> · <a href="/apps/kantoren.html" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">De kantoren →</a></small></div>
     <span style="display:flex;align-items:center;gap:0.8rem;">
       <a href="/apps/klankwerk-kantoor.html" title="Aanvragen om onder de RTG-naam uit te geven" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.7rem;">RTG-naam</a>
       <a href="/apps/techniek.html" title="Technische status (beveiligd)" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.7rem;">Techniek</a>

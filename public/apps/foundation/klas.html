@@ -30,7 +30,7 @@
   .groot{font-family:'Bodoni Moda',serif;font-size:1.8rem;text-align:center;padding:1.4rem 0;}
   .goed{color:#9CCB9C;} .fout{color:#E39AA2;}
   .score{position:sticky;top:0;background:var(--bg);padding:.6rem 0;display:flex;justify-content:space-between;font-size:.9rem;color:var(--zacht);}
-  .score b{color:var(--accent-tekst, var(--goud));font-size:1.05rem;}
+  .score b{color:var(--rtg-leesgoud,var(--goud));font-size:1.05rem;}
   .stap{display:none;} .stap.aan{display:block;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -93,7 +93,7 @@ function teken(){
   }
   if (LES.fase === 'klaar'){
     inhoud.innerHTML = '<div class="groot">✓</div><h1 style="font-size:1.25rem;text-align:center;">De les is klaar!</h1>'+
-      '<p class="stil" style="text-align:center;margin-top:.4rem;">Je had <b style="color:var(--accent-tekst, var(--goud));">'+LES.score+'</b> vragen goed. Kijk vooral welke stap je nu beter begrijpt.</p>'+
+      '<p class="stil" style="text-align:center;margin-top:.4rem;">Je had <b style="color:var(--rtg-leesgoud,var(--goud));">'+LES.score+'</b> vragen goed. Kijk vooral welke stap je nu beter begrijpt.</p>'+
       '<p class="stil" style="text-align:center;margin-top:.7rem;">Er is bewust geen podium: leren is geen wedstrijd.</p>';
     opties.innerHTML = ''; return;
   }

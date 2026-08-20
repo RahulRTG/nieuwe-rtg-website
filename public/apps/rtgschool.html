@@ -17,8 +17,8 @@
   [hidden]{display:none !important;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.25rem;}
   header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
   main{padding:1rem;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
@@ -32,7 +32,7 @@
   .knop[disabled]{opacity:.5;cursor:default;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;line-height:1.55;}
   .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
-  .pil.ok{color:var(--green);border-color:var(--green);}
+  .pil.ok{color:var(--rtg-leesgroen,var(--green));border-color:var(--rtg-leesgroen,var(--green));}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.6rem;}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.7rem .85rem;}
   .kpi b{display:block;font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.5rem;line-height:1.1;}
@@ -41,7 +41,7 @@
   .doel{display:flex;gap:.5rem;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:.4rem 0;font-size:.86rem;}
   .doel:last-child{border-bottom:none;}
   .doel button{white-space:nowrap;}
-  .vakkop{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin:.7rem 0 .2rem;}
+  .vakkop{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:.7rem 0 .2rem;}
   /* de delen van de pagina: een rustige, zakelijke kop boven elke groep
      kaarten, zelfde vorm als .vakkop maar met lucht eromheen -- vier vaste
      delen (paspoort, leren, toetsing, bijles), geen nieuw visueel apparaat */

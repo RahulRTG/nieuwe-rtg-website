@@ -112,6 +112,14 @@
     r.setProperty('--inlog-onder', p.onder);
     r.setProperty('--inlog-basis', p.basis);
     r.setProperty('--inlog-accent', p.accent);
+    /* WIE ZIJN EIGEN GROND SCHILDERT, SCHILDERT OOK ZIJN EIGEN INKT. Dit vlak is
+       altijd bijna zwart (lichtheid 0,042), wat het lid ook voor thema koos, en
+       zonder deze regel kwam onder champagne -- het enige lichte thema -- de
+       donkere thema-inkt erop. Alleen `color` zetten is niet genoeg: gedeelde
+       onderdelen lezen --rtg-muted rechtstreeks. Het attribuut zet de hele
+       donkere set, en die staat op EEN plek (shared/rtg-themas.css). */
+    var vlakken = d.querySelectorAll('[data-inlogkleur]');
+    for (var i = 0; i < vlakken.length; i++) vlakken[i].setAttribute('data-rtg-vlak', 'onyx');
     if (!d.getElementById(STIJL_ID)) {
       var st = d.createElement('style');
       st.id = STIJL_ID;

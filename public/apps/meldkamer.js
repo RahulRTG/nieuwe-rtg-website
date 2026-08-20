@@ -66,7 +66,7 @@
       const vrij = (d.eenheden || []).filter(e => e.status === 'vrij');
       const kanWijzen = m.status !== 'afgerond';
       return '<div class="melding"><span class="prio p' + m.prio + '">P' + m.prio + '</span><b>' + esc(m.tekst) + '</b>' +
-        (m.plek ? ' · ' + esc(m.plek) : '') + ' · ' + esc(m.status) + (m.viaBijstand ? ' · <span style="color:var(--gold);">bijstandsverzoek</span>' : '') +
+        (m.plek ? ' · ' + esc(m.plek) : '') + ' · ' + esc(m.status) + (m.viaBijstand ? ' · <span style="color:var(--rtg-leesgoud,var(--gold));">bijstandsverzoek</span>' : '') +
         '<div class="rij">' +
         (kanWijzen && vrij.length ? '<select data-wijs-e="' + m.id + '">' + vrij.map(e => '<option value="' + e.id + '">' + esc(e.naam) + ' (' + e.soort + ')</option>').join('') + '</select>' +
           '<button class="knop klein" data-wijs="' + m.id + '" type="button">Stuur</button>' : '') +
@@ -369,7 +369,7 @@
     const t = b.totalen;
     $('#rampKpis').innerHTML =
       '<div class="rkpi"><b style="color:var(--groen);">' + t.eenhedenVrij + '</b><span>eenheden vrij</span></div>' +
-      '<div class="rkpi"><b style="color:var(--gold);">' + t.eenhedenIngezet + '</b><span>ingezet</span></div>' +
+      '<div class="rkpi"><b style="color:var(--rtg-leesgoud,var(--gold));">' + t.eenhedenIngezet + '</b><span>ingezet</span></div>' +
       '<div class="rkpi"><b style="color:var(--groen);">' + t.beddenVrij + '</b><span>bedden vrij</span></div>' +
       '<div class="rkpi"><b>' + t.sehWachtend + '</b><span>SEH wacht</span></div>' +
       '<div class="rkpi"><b style="color:var(--rood);">' + t.meldingenOpen + '</b><span>open meldingen</span></div>';

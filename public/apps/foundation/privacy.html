@@ -13,7 +13,7 @@
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
-  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--accent-tekst);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--rtg-leesgoud,var(--goud));}
   .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
   .wrap{max-width:42rem;margin:0 auto;padding:1.4rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.8rem;margin:.4rem 0 .3rem;}
@@ -23,10 +23,14 @@
   .blok p{line-height:1.6;margin-bottom:.6rem;}
   .blok ul{margin:.2rem 0 .6rem 1.1rem;line-height:1.6;}
   .blok li{margin-bottom:.3rem;}
-  .blok b{color:var(--accent-tekst);}
-  .nood{background:#12211a;border:1px solid var(--groen);border-radius:12px;padding:1rem 1.1rem;line-height:1.6;margin-top:.4rem;}
+  /* Lopende tekst, dus de tekstkleur en niet het accent: --goud2 is voor de
+     drie leeftijdsgroepen bordeaux (#C23A5E) en haalt op deze grond 2,84:1.
+     CLAUDE.md zegt het met zoveel woorden -- bordeaux-op-donker is genoeg
+     voor grote tekst en te weinig voor lopende tekst en kleine labels. */
+  .blok b{color:var(--txt);}
+  .nood{background:#12211a;color:#EAF3EC;border:1px solid var(--groen);border-radius:12px;padding:1rem 1.1rem;line-height:1.6;margin-top:.4rem;}
   .nood b{color:#8fd69b;}
-  .nood .nr{font-family:var(--serif);color:var(--txt);font-size:1.1rem;}
+  .nood .nr{font-family:var(--serif);color:inherit;font-size:1.1rem;}
   /* de deelmarkeringen: korte namen voor het deelmenu; zonder JavaScript
      blijven ze als rustige tussenkopjes boven hun blok staan */
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
@@ -34,7 +38,7 @@
   /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
      2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
   .foot > a{display:inline-block;padding:.25rem 0;min-height:24px;}
-  .foot a{color:var(--accent-tekst);text-decoration:none;}
+  .foot a{color:var(--rtg-leesgoud,var(--goud));text-decoration:none;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">

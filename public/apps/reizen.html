@@ -393,6 +393,14 @@
     });
   })();
 
+  /* ELKE REGEL DRAAGT ZIJN ACTIES (shared/gebaar.js): veeg naar links om te
+     openen of te delen, naar rechts voor het kenmerk of de hele regel. De
+     bouwer staat in de laag, want Kantoor en Sociaal tekenen dezelfde
+     .reis-regel en die vraag hoort op EEN plek te staan (LAT.md regel 4). */
+  function gebaren() { window.RTGGebaar.wereldregister($('#komend')); }
+  if (window.RTGGebaar) gebaren();
+  else document.addEventListener('rtg-gebaar', gebaren, { once: true });
+
   async function laad() {
     /* De stand staat er vanaf de eerste seconde, en zegt dan wat hij is:
        onbekend. Een leeg gat waar het oordeel hoort te staan leest als 'niets

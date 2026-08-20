@@ -7,7 +7,12 @@
 #rail{padding:1.2rem .95rem;background:
   linear-gradient(180deg,rgba(127,22,52,.08),transparent 12rem),var(--rail);}
 body.rtg-stijl>main{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;}
-#rail>.sec:first-child{letter-spacing:.2em;color:rgba(201,162,75,.62);}
+/* GOUD ALS KLEINE TEKST HOORT HET LEESGOUD TE ZIJN. Hier stond het huisgoud op
+   62%, en dat komt op het lichtste paneel van dit scherm op 3,28:1 uit -- op een
+   sectiekop van 10px in kapitalen. Dezelfde les als in rtg-themas.css: goud is
+   een vulkleur, en waar het TEKST wordt, wint --rtg-leesgoud. Dekkend, want een
+   alfa is geen besluit over leesbaarheid maar over sluier. */
+#rail>.sec:first-child{letter-spacing:.2em;color:var(--rtg-leesgoud,#C0A544);}
 .nieuwe{background:transparent;border-color:transparent;border-bottom-color:var(--line);border-radius:0;
   padding:.68rem .35rem;margin:0;transition:background .18s,border-color .18s,transform .18s;}
 .nieuwe:hover{background:rgba(255,255,255,.025);border-bottom-color:rgba(194,58,94,.55);transform:translateX(2px);}
@@ -19,7 +24,10 @@ body.rtg-stijl>main{width:100%!important;max-width:none!important;margin:0!impor
     linear-gradient(130deg,rgba(255,255,255,.025),transparent 60%);position:relative;overflow:hidden;}
 .office-overzicht:after{content:"";position:absolute;left:0;right:0;top:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.62;}
-.office-overzicht-kop>span,.office-ey{display:block;color:rgba(201,162,75,.72);font-size:.61rem;
+/* Zelfde regel als bij #rail>.sec hierboven: goud dat TEKST wordt, is
+   --rtg-leesgoud en draagt geen alfa. Op 72% haalde dit bovenschrift 4,14:1 op
+   de bordeauxgetinte kop van dit paneel. */
+.office-overzicht-kop>span,.office-ey{display:block;color:var(--rtg-leesgoud,#C0A544);font-size:.61rem;
   letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem;}
 .office-overzicht h1{font-family:'Bodoni Moda',serif;font-size:clamp(1.8rem,3vw,2.8rem);font-weight:500;
   line-height:1.02;letter-spacing:-.025em;margin:0 0 .6rem;}

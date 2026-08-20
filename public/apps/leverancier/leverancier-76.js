@@ -87,7 +87,7 @@
   function wvKlantKaart(k){
     const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
     return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;margin-top:0.5rem;">'+
-      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--rtg-leesgoud,var(--gold));">'+eur(k.besteedTotaal)+'</span></div>'+
       '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('wv.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
       (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
       ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
@@ -100,7 +100,7 @@
     const cartTot = wvCart.reduce((n, r) => n + r.price * r.aantal, 0);
     let html = '';
     html += '<div class="card"><div class="tt-h" style="display:flex;justify-content:space-between;align-items:center;">'+T('wv.kassa','Mobiele kassa')+
-      (wvKlant?'<span style="color:var(--gold);font-size:0.7rem;">'+esc(wvKlant.codenaam||wvKlant.key)+'</span>':'')+'</div>'+
+      (wvKlant?'<span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.7rem;">'+esc(wvKlant.codenaam||wvKlant.key)+'</span>':'')+'</div>'+
       (wvCart.length ? '<div class="h-mt50">'+wvCart.map((r,i) =>
         '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.naam)+' · '+esc(r.kleur)+' · '+esc(r.maat)+'</span><span class="pr">'+eur(r.price)+' × '+r.aantal+'</span></div>'+
         '<button class="obtn" data-wvdel="'+i+'" class="h-mt30">✕ '+T('wv.weg','Weg')+'</button></div>').join('')+

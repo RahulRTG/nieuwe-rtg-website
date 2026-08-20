@@ -18,9 +18,9 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   a{color:inherit;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);
     padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;text-decoration:none;}
   main{padding:1.1rem;max-width:900px;margin:0 auto;}
@@ -46,17 +46,17 @@
   .leeg{color:var(--muted);font-size:.9rem;padding:1.6rem 0;text-align:center;}
   .vakjes{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;}
   .vak{border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem;font-size:.74rem;color:var(--soft);}
-  .vak.heeft{border-color:var(--green);color:var(--green);}
+  .vak.heeft{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
   .regel{border-top:1px solid var(--line);padding:.6rem 0;display:flex;gap:.6rem;align-items:flex-start;flex-wrap:wrap;}
   .regel .op{margin-left:auto;display:flex;gap:.4rem;}
   .vervallen{opacity:.6;}
   .vervallen .waarom{color:var(--burgundy);font-size:.76rem;}
   .prijsop{color:var(--burgundy);font-size:.76rem;}
-  .prijsaf{color:var(--green);font-size:.76rem;}
+  .prijsaf{color:var(--rtg-leesgroen,var(--green));font-size:.76rem;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);
     padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
-  .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
   /* Vervangen style="..."-attributen. Ze staan hier als klasse omdat de CSP
      style-src-attr pas dicht kan als public/ er geen meer heeft; NORM.json telt
      ze en dat getal mag alleen omlaag. Zelfde maten als de attributen hadden. */
@@ -70,7 +70,7 @@
   .ruim{margin-top:.5rem;}
   .ruimer{margin-top:.6rem;}
   .ruimst{margin-top:1rem;}
-  .goed{color:var(--green);}
+  .goed{color:var(--rtg-leesgroen,var(--green));}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">

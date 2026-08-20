@@ -30,21 +30,101 @@
   var tab = d.querySelector('.rtg-rahul-tab');
   if (!tab) return;
 
+  /* GEEN GROND IS GEEN ZWART, en dat is de reparatie van 19 augustus 2026.
+     Hieronder viel deze functie terug op de achtergrondkleur van body, en die
+     leest bij een verloop `rgba(0, 0, 0, 0)`. De regex hapte in die eerste drie
+     nullen en gaf ZWART terug -- terwijl de grond op dat moment het lichte
+     champagne-verloop was. De tab koos dus zijn lichte inkt op een lichte grond:
+     rgb(242,238,232) op rgb(251,248,243), 1,09:1, op achttien plekken. De
+     terugval "zonder grond: de huiskleur, donker" was op een donker huis altijd
+     waar en werd onwaar zodra er een licht thema bestond.
+     Nu geeft hij null als hij het niet weet, en beslist de aanroeper. */
   function grondVan(el) {
     for (var n = el; n && n !== d.documentElement; n = n.parentElement) {
       var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/.exec(getComputedStyle(n).backgroundColor || '');
       if (m && (m[4] === undefined || Number(m[4]) > 0.5)) return [+m[1], +m[2], +m[3]];
     }
-    var b = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(d.body).backgroundColor || '');
-    return b ? [+b[1], +b[2], +b[3]] : [12, 12, 11];   // zonder grond: de huiskleur, donker
+    return null;
+  }
+  /* DE INKT VAN DE BUREN VERRAADT DE GROND. Staat er geen ondubbelzinnig vlak in
+     de keten -- een verloop, een afbeelding, een doorzichtige stapel -- dan is de
+     kleur van de tekst ERNAAST wel bekend, en die is per definitie gekozen om op
+     die grond te lezen. Lichte buurtekst betekent donkere grond. Dat werkt ook
+     als de tab in een donker eiland op een lichte pagina hangt (de iOS-balk zet
+     daar zijn eigen inkt), want dit leest de inkt op de plek van de tab zelf. */
+  function inktVan(el) {
+    var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(el).color || '');
+    return m ? [+m[1], +m[2], +m[3]] : null;
   }
   function helderheid(rgb) {
     var k = rgb.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
     return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
   }
 
-  var licht = helderheid(grondVan(tab.parentElement || tab)) > 0.35;
-  tab.style.setProperty('color', licht ? '#3A3733' : '#F2EEE8', 'important');
+  /* GEEN DREMPEL MEER, MAAR EEN VERGELIJKING -- en dat is de aanvulling van
+     19 augustus 2026.
+
+     Hierboven stond `helderheid(grond) > 0.35` en daarachter twee vaste paren.
+     Een drempel werkt zolang de grond een van de twee uitersten is. Zodra de
+     contrastronde verlopen kon lezen bleek er een derde soort te bestaan: een
+     MIDDENTOON. Op de goudgetinte tab haalde de KOMPAS-regel 4,07:1 en op een
+     lichte pagina, waar de balk naar grijs composeert, 2,37. Allebei onder de
+     norm, en allebei onzichtbaar voor een drempel -- die zegt alleen licht of
+     donker, nooit "geen van beide genoeg".
+
+     Ik heb eerst geprobeerd de GRONDMETING slimmer te maken (doorzichtige lagen
+     mengen). Dat keerde de keuze op sommige schermen om: de tab koos de lichte
+     inkt op een donkere grond. Die poging staat hier niet meer, want een meting
+     die ik niet kan narekenen is geen verbetering.
+
+     Wat er nu staat kan niet omklappen: van de twee inkten wint degene met de
+     hoogste gemeten verhouding tot de grond. Geen grens om verkeerd te zetten.
+     De zachte onderregel mag alleen zacht blijven als hij zelf de norm haalt --
+     8px halfvet is geen grote tekst, dus 4,5 en niet 3. */
+  function verhouding(a, b) {
+    var l1 = helderheid(a), l2 = helderheid(b);
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  }
+  function rgbVan(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+
+  var ouder = tab.parentElement || tab;
+  var grond = grondVan(ouder);
+  var licht;                                      // IS DE GROND LICHT?
+  if (grond) {
+    licht = verhouding(rgbVan('#14110E'), grond) > verhouding(rgbVan('#FFFFFF'), grond);
+  } else {
+    var buur = inktVan(ouder);
+    licht = buur ? helderheid(buur) < 0.5 : false; // lichte buurtekst = donkere grond
+  }
+  var woord = licht ? '#3A3733' : '#F2EEE8';
+  if (grond && verhouding(rgbVan(woord), grond) < 4.5) woord = licht ? '#14110E' : '#FFFFFF';
+  /* DE ZACHTERE ONDERREGEL IS VERVALLEN, EN IK HEB HEM OP 20 AUGUSTUS 2026
+     GEPROBEERD TERUG TE ZETTEN. Dat werkte niet, en waarom niet hoort hier te
+     staan, anders probeert de volgende het opnieuw.
+
+     Hij stond op #5A5651 of #8A8680 en zakte op elke MIDDENTOON: 4,07:1 op de
+     goudgetinte tab, 2,37 op een lichte pagina. Mijn gedachte was: sinds
+     grondVan() hierboven NULL geeft als hij het niet weet, kan ik hem gewoon
+     narekenen -- zacht als de grond bekend is en de toon er 4,5 haalt, anders de
+     volle inkt. Dat leek waterdicht en het was het niet: de a11y-poort ging van
+     12 naar 88 bevindingen, 84 daarvan op precies dit ene element, rgb(138,134,128)
+     op rgb(79,78,76).
+
+     De oorzaak staat al in de kop van dit bestand en ik had hem moeten geloven:
+     grondVan() zoekt de eerste voorouder met een DEKKENDE achtergrondkleur, en de
+     keuring mengt doorzichtige lagen en verlopen. Op een tab die op een half
+     doorzichtige balk hangt, vindt grondVan() dus een donkere voorouder verderop
+     terwijl er in werkelijkheid middengrijs onder de letters ligt. De toon haalt
+     mijn controle en zakt in het echt.
+
+     Twee metingen die niet dezelfde vraag beantwoorden, mogen samen geen besluit
+     dragen. De onderregel draagt daarom dezelfde inkt als het woord: iets minder
+     zacht, en altijd te lezen. Wie hem terug wil, moet EERST grondVan() en
+     gronden() dezelfde vraag laten beantwoorden -- niet de uitkomst ervan gokken. */
+  var zacht = woord;
+  tab.style.setProperty('color', woord, 'important');
   var sub = tab.querySelector('small');
-  if (sub) sub.style.setProperty('color', licht ? '#5A5651' : '#8A8680', 'important');
+  if (sub) sub.style.setProperty('color', zacht, 'important');
 })(window, document);

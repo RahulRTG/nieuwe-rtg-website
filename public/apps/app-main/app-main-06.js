@@ -120,7 +120,7 @@
     el.style.display='';
     const conns = social.connections || [], reqs = social.requests || [];
     const totUnread = conns.reduce((n,c)=> n + (c.unread||0), 0);
-    let html = '<div class="label">Contacten'+(totUnread?' · <span style="color:var(--gold)">'+totUnread+' nieuw</span>':'')+'</div>';
+    let html = '<div class="label">Contacten'+(totUnread?' · <span style="color:var(--rtg-leesgoud,var(--gold))">'+totUnread+' nieuw</span>':'')+'</div>';
     reqs.forEach(r => {
       html += '<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);">'+
         '<span class="sc-av" style="width:2rem;height:2rem;">'+initCN(r.codename)+'</span>'+

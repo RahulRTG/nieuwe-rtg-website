@@ -106,8 +106,24 @@
 .rtg-intro{margin:0 0 1.4rem;}
 .rtg-intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
 .rtg-intro p{color:var(--rtg-soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
-/* de weg terug staat linksboven, in het accent, en is een gewone link */
-.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc-tekst);text-decoration:none;font-size:.85rem;
+/* DE WEG TERUG STAAT LINKSBOVEN, EN NIET MEER IN HET ACCENT.
+
+   --rtg-acc is de DAGKLEUR (zie boven), en die verandert met het seizoen en het
+   uur. Als tekst nagerekend over alle zestien ankertinten, op de grond van elk
+   van de vier thema's: op onyx zakken er 3 onder 4,5:1, op bordeaux 4, op royal
+   3 -- en op champagne, waar de grond parel is, 15 van de 16. GEEN ENKELE tint
+   haalt het op alle vier. De contrastpoort zag dit niet omdat een verloop als
+   grond bewust wordt overgeslagen (scripts/a11ykeuring.js).
+
+   Dit geldt voor alle vier de plekken waar het accent hieronder TEKST was: deze
+   weg terug, dezelfde in de stijl-schil, het merk-plaatje en de hover van een
+   knoprij. Ze dragen nu --rtg-txt, de inkt die het thema zelf al meebrengt:
+   17,23 op onyx, 13,57 op bordeaux, 14,65 op royal, 15,72 op champagne.
+
+   Het accent blijft waar het GEEN tekst is: als vlak, als rand, als schakelaar.
+   Daar is de inkt al per tint uitgerekend (shared/dagkleur.css) en klopt het.
+   test/balkkleur.test.js zakt zodra de dagkleur hier weer tekst wordt. */
+.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-txt);text-decoration:none;font-size:.85rem;
   /* Een terugweg is een knop en geen zin, dus 24x24 (WCAG 2.5.8) -- de breedte
      telt mee, want vaak is het alleen een pijl. Bewust min-* en geen padding:
      deze selector is specifieker dan de .terug van een pagina zelf, en met een
@@ -140,7 +156,11 @@
 /* een rij die je kunt aantikken blijft een knop, geen div met een klikhandler */
 button.rtg-rij{width:100%;background:none;border-left:none;border-right:none;border-bottom:none;
   color:inherit;font:inherit;text-align:left;cursor:pointer;}
-button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc-tekst);}
+/* De hover was ALLEEN een kleurverschil, en dan nog in de dagkleur -- dubbel
+   mis: ONTWERP.md par. 5 zegt dat een toestand nooit op kleur alleen leunt, en
+   die kleur was ook nog eens niet altijd leesbaar. Een streep werkt in elk
+   thema, elk seizoen en voor wie kleur niet ziet. */
+button.rtg-rij:hover .rtg-naam{text-decoration:underline;text-underline-offset:.18em;}
 
 /* ------------------------------------------------------------- knoppen ----*/
 .rtg-knop{
@@ -165,6 +185,28 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc-tekst);}
 }
 .rtg-veld:focus{outline:none;border-color:color-mix(in srgb,var(--rtg-acc) 60%,var(--rtg-line));}
 .rtg-veld:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:1px;}
+
+/* HET VINKJE STOND IN SYSTEEMBLAUW, en dat is geen kleur van dit huis.
+   Een aanvinkvakje, een keuzerondje, een schuif en een voortgangsbalk krijgen
+   zonder `accent-color` de kleur van het BESTURINGSSYSTEEM -- op de meeste
+   toestellen #0075FF. Op een notitiebord in onyx staat dat als een postzegel op
+   een fluwelen envelop; gezien op apps/notities.html naast een gebarenlade.
+   CLAUDE.md zegt: geen nieuwe kleuren. Een kleur die je niet zelf zet, zet de
+   browser -- dezelfde les als bij de standaard-linkkleur (apps/media.html).
+
+   HET WORDT --rtg-goud EN NIET --rtg-acc, en dat is met kijken beslist. De
+   dagkleur was de eerste keuze -- die draagt hier immers de focusring -- maar de
+   dagkleur is er zestien, en vandaag was hij toevallig hsl(202 61% 57%): een
+   lucht-blauw dat op het scherm niet van systeemblauw te onderscheiden was. Een
+   kleur die soms hetzelfde is als de kleur die je wegneemt, neemt niets weg.
+   --rtg-goud is bovendien precies wat hier nodig is: de opmerking bij dat token
+   zegt met zoveel woorden dat het een VULKLEUR is en geen tekstkleur, en een
+   aangevinkt vakje is een vlak. Het vinkje zelf tekent de browser, met
+   gegarandeerd contrast op de accentkleur. */
+body.rtg-stijl input[type="checkbox"],
+body.rtg-stijl input[type="radio"],
+body.rtg-stijl input[type="range"],
+body.rtg-stijl progress{accent-color:var(--rtg-goud);}
 .rtg-veld::placeholder{color:var(--rtg-soft);}
 .rtg-label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;margin-bottom:.3rem;}
@@ -187,7 +229,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc-tekst);}
    "altijd aan". Klein en in het accent, zodat het opvalt zonder te schreeuwen. */
 .rtg-merk{
   display:inline-block;margin-left:.5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-  font-weight:700;color:var(--rtg-acc-tekst);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
+  font-weight:700;color:var(--rtg-txt);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
   border-radius:999px;padding:.08rem .45rem;vertical-align:middle;
 }
 .rtg-merk.stil{color:var(--rtg-soft);border-color:var(--rtg-line);}
@@ -204,7 +246,7 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc-tekst);}
 .rtg-melder.zien{min-height:auto;padding:.65rem .9rem;margin-bottom:1rem;opacity:1;}
 .rtg-melder.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
 .rtg-melder.let{background:color-mix(in srgb,var(--rtg-acc) 14%,transparent);border-color:var(--rtg-acc);}
-.rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+.rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-leesrood,var(--rtg-rood));}
 
 /* --------------------------------------------------------- rest & rust -----*/
 .rtg-leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
@@ -255,7 +297,7 @@ body.rtg-stijl h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;letter
 body.rtg-stijl .kop h1{font-size:1.7rem;}
 body.rtg-stijl .ey{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;display:block;margin-bottom:.15rem;}
-body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc-tekst);
+body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-txt);
   text-decoration:none;font-size:.85rem;min-height:24px;min-width:24px;}
 
 /* de sectiekaart: alles wat een blok inhoud omvat, krijgt dezelfde kaart */
@@ -454,7 +496,7 @@ body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud)
 body.rtg-stijl .knop.prim{background:var(--rtg-acc);border-color:var(--rtg-acc);color:var(--rtg-acc-inkt);font-weight:700;}
 body.rtg-stijl .knop.prim:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.vol:hover{filter:brightness(1.07);}
-body.rtg-stijl .knop.weg{color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
+body.rtg-stijl .knop.weg{color:var(--rtg-leesrood,var(--rtg-rood));border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
 /* .klein is de derde maat uit de woordenschat van het huis, naast .vol en .weg:
    een knopje dat in een regel of een chip meeloopt. Zonder deze regel kreeg zo'n
    knopje de volle maat en liep de regel eromheen het scherm af. */
@@ -474,7 +516,7 @@ body.rtg-stijl .leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text
 body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
   border:1px solid var(--rtg-line);background:var(--rtg-card2);padding:.65rem .9rem;margin-bottom:1rem;}
 body.rtg-stijl .melding.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
-body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-leesrood,var(--rtg-rood));}
 
 /* ---- de overstap-laag, deel 2: de rest van de gedeelde woordenschat ----
    Na de eerste ronde bleek welke namen er nog meer overal terugkomen: statistiek-
@@ -529,7 +571,7 @@ body.rtg-stijl .status,body.rtg-stijl .merk,body.rtg-stijl .badge{
 body.rtg-stijl .status.ok,body.rtg-stijl .status.goed,body.rtg-stijl .badge.ok{
   color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
 body.rtg-stijl .status.rood,body.rtg-stijl .status.fout,body.rtg-stijl .badge.rood{
-  color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 45%,transparent);}
+  color:var(--rtg-leesrood,var(--rtg-rood));border-color:color-mix(in srgb,var(--rtg-rood) 45%,transparent);}
 
 /* de sectietitel binnen een kaart, en de inlogkaart van een werkplek */
 body.rtg-stijl .titel,body.rtg-stijl .sectiekop,body.rtg-stijl .st-sec{

@@ -75,7 +75,7 @@
     const rekeningen = plan.tafels.filter(t => t.rekening);
     const rekBlok = rekeningen.length
       ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'">'+
-          '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--gold);">'+eur(t.rekening.totaal)+'</b></span>'+
+          '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(t.rekening.totaal)+'</b></span>'+
           '<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+
             '<button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button>'+
             '<button class="obtn js-reksplit">'+T('res.splits','Splits')+'</button>'+

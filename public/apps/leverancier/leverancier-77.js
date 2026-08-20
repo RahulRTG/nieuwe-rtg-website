@@ -98,7 +98,7 @@
           '<div class="ds">'+T('zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min</div>'+
           (a.zorg ? '<div class="ds" style="color:#E2B93B;">'+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
           (a.intake ? '<div class="ds" style="color:#E2B93B;">'+esc(a.intake)+'</div>' : '')+
-          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--green,#4C9A75);">'+T('zb.klaar','Afgerond')+'</div>'
+          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--rtg-leesgroen,var(--green,#4C9A75));">'+T('zb.klaar','Afgerond')+'</div>'
             : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" class="h-mt35">'+T('zb.afronden','Afronden')+'</button>')+
           '</div>').join('')
         : '<div class="empty">'+T('zb.leeg','Geen afspraken op deze dag.')+'</div>')+

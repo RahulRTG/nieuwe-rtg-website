@@ -7,7 +7,7 @@
         '<button class="bigbtn" id="kPrSend" class="h-mt20">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.pricenote','RTG-leden betalen uw nettoprijs; u ontvangt altijd het volledige bedrag, RTG rekent 0% commissie.')+'</div></div>';
       html += '<div class="tkc"><h3>'+T('sup.pricehist','Eerder doorgegeven')+'</h3>'+
-        (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b style="color:var(--gold);">'+eur(p.price)+'</b></div>').join('')
+        (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(p.price)+'</b></div>').join('')
         : '<div class="tkc-who">'+T('sup.noprices','Nog geen prijzen doorgegeven.')+'</div>')+'</div>';
     }
     if (kantoorSec === 'marketing'){
@@ -36,7 +36,7 @@
           '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;">'+
           [[T('mk.volgers','Volgers'), mk.volgers], [T('mk.posts','Berichten'), mk.posts], ['Likes', mk.likes], [T('mk.reacties','Reacties'), mk.reacties]]
           .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;text-align:center;">'+
-            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.25rem;color:var(--gold);">'+x[1]+'</div>'+
+            '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.25rem;color:var(--rtg-leesgoud,var(--gold));">'+x[1]+'</div>'+
             '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.1rem;">'+x[0]+'</div></div>').join('')+'</div>'+
           '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. aan zee sinds 1998, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+
           '<button class="obtn primary" id="mkBioSave" style="align-self:flex-start;">'+T('mk.biosave','Bio opslaan')+'</button></div></div>';
@@ -57,7 +57,7 @@
           '<button class="bigbtn" id="mkPollGo">'+T('mk.pollgo','Plaats de poll')+'</button></div>'+
           (mk.polls.length ? mk.polls.map(pl =>
             '<div class="h-mt40"><div class="tkc-who" style="color:var(--txt);">'+pl.vraag+'</div>'+
-            pl.opties.map(o => '<div class="st-row" style="padding:0.3rem 0;"><span class="sub">'+o.tekst+'</span><b style="color:var(--gold);">'+o.stemmen+'</b></div>').join('')+'</div>').join('') : '')+'</div>';
+            pl.opties.map(o => '<div class="st-row" style="padding:0.3rem 0;"><span class="sub">'+o.tekst+'</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+o.stemmen+'</b></div>').join('')+'</div>').join('') : '')+'</div>';
       }
       // pr-plus (los script leverancier-pr.js): planner, nieuwsbrief, bereik
       html += '<div id="prPlusWortel" style="display:contents;"></div>';

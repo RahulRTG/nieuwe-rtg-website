@@ -103,7 +103,7 @@
         ? '<button class="abtn" data-hm="'+t.id+'" data-hmst="bezig">Start</button>'
         : '<span style="display:flex;gap:.35rem;"><button class="abtn ghost" data-hm="'+t.id+'" data-hmst="hulp">Hulp</button><button class="abtn" data-hm="'+t.id+'" data-hmst="klaar">Klaar</button></span>';
       return '<div class="task"><span class="ic">'+RTGGlyf.tekst(t.icon)+'</span><div class="t"><b>'+esc(MTX(t.b))+'</b><span>'+esc(MTX(t.s))+'</span></div>'+act+'</div>';
-    }).join('') : '<div style="font-size:0.84rem;color:var(--green);padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
+    }).join('') : '<div style="font-size:0.84rem;color:var(--rtg-leesgroen,var(--green));padding:0.4rem 0;">✓ '+T('pd.alldone','Alles is bij.')+'</div>')+'</div>';
     const tw = $('#takenWrap');
     // melden hoort bij iedereen: een klus doorgeven en gevonden voorwerpen registreren
     const kamers = (state && state.rooms || []).map(r => r.name);

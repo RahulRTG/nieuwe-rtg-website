@@ -68,7 +68,7 @@
 
   function kaartCertificaten(){
     const c = data.certificaten || [];
-    const verloopKleur = v => v.verlopen ? 'color:var(--warn,#C0392B);' : 'color:var(--gold);';
+    const verloopKleur = v => v.verlopen ? 'color:var(--warn,#C0392B);' : 'color:var(--rtg-leesgoud,var(--gold));';
     const verlopend = data.verlopend || [];
     let h = '<div class="tkc"><h3>' + T('hr2.cert', 'Certificaten & bevoegdheden') + '</h3>' +
       '<div class="tkc-who">' + T('hr2.cert.s', 'EHBO, BHV, allergenen: wie mag wat, en wanneer het verloopt.') + '</div>' +

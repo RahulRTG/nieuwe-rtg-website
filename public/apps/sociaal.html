@@ -88,7 +88,7 @@
   #lijn .verder{margin:.7rem 0 0;font-size:.74rem;color:var(--rtg-soft);}
 </style>
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro">
+<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-eigenvlak="onyx">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 
 <aside class="sociaal-bank" aria-label="RTG hoofdnavigatie">
@@ -485,6 +485,14 @@
     const dlg = $('#objpaneel');
     if (dlg.close) dlg.close(); else dlg.removeAttribute('open');
   });
+
+  /* ELKE REGEL DRAAGT ZIJN ACTIES (shared/gebaar.js): veeg naar links om te
+     openen of te delen, naar rechts voor het kenmerk of de hele regel. De
+     bouwer staat in de laag, want Kantoor en Reizen tekenen dezelfde .reis-regel
+     en die vraag hoort op EEN plek te staan (LAT.md regel 4). */
+  function gebaren() { window.RTGGebaar.wereldregister($('#kring')); }
+  if (window.RTGGebaar) gebaren();
+  else document.addEventListener('rtg-gebaar', gebaren, { once: true });
 
   // klikken op een kenmerk kopieert het (ONTWERP.md: de referentie is wat een
   // professional zoekt, dus hij staat er en is met een klik mee te nemen)

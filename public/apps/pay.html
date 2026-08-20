@@ -31,7 +31,7 @@
   header{border-bottom:1px solid var(--line);padding:1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
   header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
   .brand{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
-  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   main{padding:1.4rem 0 4rem;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.6rem;margin:.3rem 0 .2rem;}
   .deck{color:var(--muted);font-size:.92rem;}
@@ -59,7 +59,7 @@
   .saldo small{font-size:1.2rem;color:var(--soft);}
   .chiprij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0;}
   .chip{border:1px solid var(--line);background:var(--card2);color:var(--txt);border-radius:999px;padding:.45rem 1rem;font-size:.9rem;cursor:pointer;font-family:inherit;font-weight:600;}
-  .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+  .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .rij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
   .tikkie{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
   .tikkie:last-child{border-bottom:0;}
@@ -67,10 +67,10 @@
   .tikkie .wie small{display:block;color:var(--soft);font-size:.75rem;}
   .hist{display:flex;justify-content:space-between;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.88rem;}
   .hist:last-child{border-bottom:0;}
-  .hist .plus{color:var(--green);font-variant-numeric:tabular-nums;font-weight:700;}
+  .hist .plus{color:var(--rtg-leesgroen,var(--green));font-variant-numeric:tabular-nums;font-weight:700;}
   .hist .min{color:var(--burgundy);font-variant-numeric:tabular-nums;font-weight:700;}
   .hist span:first-child{color:var(--muted);}
-  .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--gold);text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
+  .kascode{font-family:'Bodoni Moda',serif;font-size:2.6rem;letter-spacing:.35em;text-align:center;color:var(--rtg-leesgoud,var(--gold));text-shadow:0 0 24px rgba(169,143,28,.8);padding:.6rem 0 .2rem;}
   .tik-qr{display:block;width:min(220px,62vw);height:auto;margin:.5rem auto .1rem;background:#fff;padding:.55rem;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.35);}
   .leeg{color:var(--soft);font-size:.85rem;}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
@@ -104,7 +104,7 @@
   <!-- de wallet -->
   <section id="vPay" hidden>
     <div class="kaart" style="border-color:var(--gold);">
-      <div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Saldo van <span id="pNaam" style="color:var(--gold);"></span></div>
+      <div style="font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Saldo van <span id="pNaam" style="color:var(--rtg-leesgoud,var(--gold));"></span></div>
       <div class="saldo" id="pSaldo">0,00<small> eur</small></div>
       <div class="chiprij" role="group" aria-label="Oplaadbedrag">
         <button class="chip" data-laad="2500">+ 25</button>
@@ -337,8 +337,8 @@ async function laadTiks(){
     el.innerHTML = r.tiks.map(t =>
       '<div style="display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.85rem;">'+
         '<span>'+(t.richting === 'uit'
-          ? 'Jij tikte <b style="color:var(--gold);">'+esc(t.met)+'</b>'
-          : '<b style="color:var(--gold);">'+esc(t.met)+'</b> tikte jou')+
+          ? 'Jij tikte <b style="color:var(--rtg-leesgoud,var(--gold));">'+esc(t.met)+'</b>'
+          : '<b style="color:var(--rtg-leesgoud,var(--gold));">'+esc(t.met)+'</b> tikte jou')+
           (t.oms && t.oms !== 'Tik' ? ' <span style="color:var(--muted);">· '+esc(t.oms)+'</span>' : '')+'</span>'+
         '<span style="white-space:nowrap;color:var(--muted);">'+(t.richting==='uit'?'-':'+')+' '+euro(t.centen)+' · '+wanneer(t.at)+'</span>'+
       '</div>').join('');

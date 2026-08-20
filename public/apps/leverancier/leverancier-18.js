@@ -19,7 +19,7 @@
           '<option value="menu"'+(e.catering.mode==='menu'?' selected':'')+'>'+T('ek.menu','Vast menu')+'</option>'+
           '<option value="alacarte"'+(e.catering.mode==='alacarte'?' selected':'')+'>\u00c0 la carte</option></select>'+
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+(state.menu||[]).filter(m=>m.station!=='bar').map(m=>
-          '<button class="mn-station'+(e.catering.itemIds.includes(m.id)?'" style="border-color:var(--gold);color:var(--gold);':'"')+'" data-kdish="'+m.id+'" data-ev="'+e.id+'">'+m.name+'</button>').join('')+'</div>'+
+          '<button class="mn-station'+(e.catering.itemIds.includes(m.id)?'" style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));':'"')+'" data-kdish="'+m.id+'" data-ev="'+e.id+'">'+m.name+'</button>').join('')+'</div>'+
         '<button class="obtn" data-kcat="'+e.id+'">'+T('ek.save','Bewaar de eventkeuken')+'</button></div>'+
         '<div class="st-form h-mt50">'+
         ((e.allergies||[]).map(a=>'<div class="st-row"><span>\u26a0 '+a.allergen+' ('+a.count+'\u00d7)'+

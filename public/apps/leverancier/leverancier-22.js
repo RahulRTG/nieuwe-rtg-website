@@ -12,7 +12,7 @@
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
-        finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--gold);">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
+        finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
         finData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -20,7 +20,7 @@
     const gR = el.querySelector('#gcRedeem'); if (gR) gR.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/redeem', { code: el.querySelector('#gcCode').value, bedrag: Number(el.querySelector('#gcInBedrag').value) });
-        finMsg = ''+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--gold);">€ '+d.saldo+'</b>';
+        finMsg = ''+T('fn.gcgeind','Ingewisseld. Restsaldo op de kaart:')+' <b style="color:var(--rtg-leesgoud,var(--gold));">€ '+d.saldo+'</b>';
         finData = null;
         renderStation();
       } catch(e){ toast(e.message); }
@@ -49,6 +49,6 @@
       try {
         const d = await API.call('/supplier/accountant/adviezen', {});
         box.innerHTML = (d.intro ? '<div style="font-size:0.82rem;margin:0.6rem 0;line-height:1.6;">' + esc(d.intro) + '</div>' : '') +
-          (d.adviezen || []).map(a => '<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;"><b style="color:var(--gold);font-size:0.8rem;">' + esc(a.titel) + '</b><div style="font-size:0.8rem;color:var(--soft);margin-top:0.2rem;line-height:1.5;">' + esc(a.tekst) + '</div></div>').join('');
+          (d.adviezen || []).map(a => '<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;"><b style="color:var(--rtg-leesgoud,var(--gold));font-size:0.8rem;">' + esc(a.titel) + '</b><div style="font-size:0.8rem;color:var(--soft);margin-top:0.2rem;line-height:1.5;">' + esc(a.tekst) + '</div></div>').join('');
       } catch(e){ box.innerHTML = '<div class="tkc-who">' + esc(e.message) + '</div>'; }
     });

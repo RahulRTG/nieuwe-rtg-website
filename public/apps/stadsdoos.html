@@ -17,8 +17,8 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:2rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);}
-  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.25rem;margin-top:.1rem;}
   main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
@@ -28,7 +28,7 @@
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
-  .prio{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+  .prio{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.6rem 0;}
   .dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;flex:0 0 auto;}

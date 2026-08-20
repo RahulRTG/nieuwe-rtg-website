@@ -1,8 +1,15 @@
 /* Gedeelde stijl voor de vier veiligheidsapps. Zelfde huisstijl als de rest
    van het leden-OS: zwart, dunne lijnen, veel lucht. Rustig, want dit zijn
    schermen die je soms onder spanning gebruikt. */
-:root{--bg:#0C0C0B;--card:#151312;--line:rgba(255,255,255,0.12);--txt:#F4F1EC;
-  --soft:rgba(244,241,236,0.62);--gold:#857007;--goldlicht:#C9A24B;
+/* De tokens LEUNEN OP HET THEMA en zetten alleen de terugval. Ze stonden hier
+   hard (--txt:#F4F1EC en verder), terwijl de themalaag de GROND van deze
+   schermen wel verzette. Onder champagne -- het enige lichte thema -- gaf dat
+   ivoren tekst op een parelmoeren vlak: 1,04:1 op twaalf plekken over vijf
+   schermen. Grond en inkt horen bij elkaar: wie de een aan het thema geeft,
+   geeft de ander ook. Zonder thema is de terugval precies wat er stond. */
+:root{--bg:var(--rtg-bg,#0C0C0B);--card:var(--rtg-card,#151312);
+  --line:var(--rtg-line,rgba(255,255,255,0.12));--txt:var(--rtg-txt,#F4F1EC);
+  --soft:var(--rtg-soft,rgba(244,241,236,0.62));--gold:#857007;--goldlicht:var(--rtg-leesgoud,#C9A24B);
   --bordeaux:#C23A5E;--groen:#69B891;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}

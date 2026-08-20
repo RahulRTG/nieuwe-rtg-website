@@ -13,8 +13,8 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
   .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   /* Rendez-vous houdt zijn eigen tabbladen (Profiel / Ontdek / Matches): een
@@ -42,7 +42,7 @@
   .schakel{display:flex;align-items:center;gap:.6rem;font-size:.92rem;}
   .schakel input{width:1.2rem;height:1.2rem;accent-color:var(--gold);}
   .chip{display:inline-block;font-size:.72rem;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin:.15rem .2rem 0 0;}
-  .chip.deel{border-color:var(--gold);color:var(--gold);}
+  .chip.deel{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .kand{border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin-bottom:.7rem;background:var(--card2);}
   .kand .nm{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
   .kand .over{font-size:.88rem;color:var(--muted);margin-top:.3rem;line-height:1.5;}
@@ -122,7 +122,7 @@ async function ontdek(){
   if(!d.kandidaten.length){ h+='<div class="leeg">Nog geen andere leden om te ontdekken. Kom straks terug.</div>'; $('#main').innerHTML=h; return; }
   h+=d.kandidaten.map(k=>{
     const isMatch=k.status==='match', geliked=k.status==='geliked';
-    return '<div class="kand'+(isMatch?' match':'')+'"><div class="nm">'+esc(k.codenaam)+(isMatch?'<span class="badge">match</span>':geliked?'<span class="badge" style="background:var(--card);color:var(--gold);border:1px solid var(--gold);">geliked</span>':k.likteMij?'<span class="badge">vindt u al leuk</span>':'')+'</div>'
+    return '<div class="kand'+(isMatch?' match':'')+'"><div class="nm">'+esc(k.codenaam)+(isMatch?'<span class="badge">match</span>':geliked?'<span class="badge" style="background:var(--card);color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);">geliked</span>':k.likteMij?'<span class="badge">vindt u al leuk</span>':'')+'</div>'
       +(k.over?'<div class="over">'+esc(k.over)+'</div>':'')
       +(k.zoekt?'<div class="note">Zoekt: '+esc(k.zoekt)+'</div>':'')
       +'<div class="h-mt40">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'

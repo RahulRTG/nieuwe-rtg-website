@@ -311,6 +311,19 @@
       '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');
   }
 
+  /* ELKE REGEL DRAAGT ZIJN ACTIES (shared/gebaar.js). Veeg naar links: openen
+     of delen. Veeg naar rechts: het kenmerk of de hele regel overnemen. Veeg
+     door en de eerste van die kant gebeurt meteen.
+
+     De bouwer staat in de LAAG en niet hier: Sociaal en Reizen tekenen exact
+     dezelfde .reis-regel, en drie kopieen van dezelfde vraag lopen binnen een
+     maand uiteen (LAT.md regel 4). Gedelegeerd, dus dit hoeft maar een keer en
+     niet bij elke hertekening. De laag laadt zonder haast mee via
+     shared/basis.js; tot hij er is verandert er niets aan het scherm. */
+  function gebaren() { window.RTGGebaar.wereldregister($('#werkdag')); }
+  if (window.RTGGebaar) gebaren();
+  else document.addEventListener('rtg-gebaar', gebaren, { once: true });
+
   // klikken op een kenmerk kopieert het (ONTWERP.md: de referentie is wat een
   // professional zoekt, dus hij staat er en is met een klik mee te nemen)
   document.addEventListener('click', (e) => {

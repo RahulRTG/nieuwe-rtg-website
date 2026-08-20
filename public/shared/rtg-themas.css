@@ -20,12 +20,22 @@
   --rtg-bg:var(--pearl-basis);
   --rtg-grond:var(--pearl-glans);
   --rtg-txt:var(--op-pearl);
-  --rtg-muted:rgba(26,23,19,0.72);
-  --rtg-soft:rgba(26,23,19,0.56);
+  --rtg-muted:#34322F;                 /* 8,24:1 op de ergste champagne-grond */
+  --rtg-soft:#555452;                  /* 4,88:1 -- zo zacht als de norm toelaat */
   --rtg-line:var(--pearl-rand);
   --rtg-card:rgba(255,255,255,0.42);
+  --rtg-card2:rgba(255,255,255,0.70);
   --rtg-goud:var(--gold-tekst);
-  --rtg-leesgoud:var(--gold-basis);  /* op licht mag de logotoon zelf lezen */
+  /* DE LOGOTOON HAALT HET NIET, en dat is nagerekend en niet aangenomen. Hier
+     stond --gold-basis (#857007) met de opmerking "op licht mag de logotoon zelf
+     lezen". Gemeten op parelmoer: 4,28:1, en op een lichte kaart 3,94 -- allebei
+     onder de 4,5 die WCAG voor kleine tekst vraagt. Net eronder is eronder.
+     --gold-diep is het bestaande huistoken voor goud in de schaduw en haalt 7,12
+     op parelmoer en 6,55 op een lichte kaart. Zelfde goud, in de schaduw. */
+  --rtg-leesgoud:var(--gold-diep);
+  --rtg-leesgroen:#2E6B4E;
+  --rtg-leeszacht:var(--rtg-soft);   /* zie de toelichting onder de vier blokken */
+  --rtg-leesrood:#A3234C;
   --rtg-dagsterkte:0.16;
 }
 /* ---- Onyx: pianolak, de vertrouwde stand ---- */
@@ -33,12 +43,16 @@
   --rtg-bg:var(--onyx-basis);
   --rtg-grond:var(--onyx-glans);
   --rtg-txt:var(--op-onyx);
-  --rtg-muted:rgba(244,240,233,0.72);
-  --rtg-soft:rgba(244,240,233,0.56);
+  --rtg-muted:#CDC9C0;                 /* 8,92:1 */
+  --rtg-soft:#989489;                  /* 4,87:1 */
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
+  --rtg-card2:#1B1817;
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--gold-tekst);  /* op donker het hoogsel: 8,11:1 */
+  --rtg-leesgroen:#4C9A75;
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesrood:#DE6E92;
   --rtg-dagsterkte:0.10;
 }
 /* ---- Bordeaux: fluweel, het merk zelf ---- */
@@ -46,13 +60,17 @@
   --rtg-bg:var(--bordeaux-diep);
   --rtg-grond:var(--bordeaux-glans);
   --rtg-txt:var(--op-bordeaux);
-  --rtg-muted:rgba(244,240,233,0.74);
-  --rtg-soft:rgba(244,240,233,0.58);
+  --rtg-muted:#EDE0DC;                 /* 5,64:1 -- fluweel laat niet meer toe */
+  --rtg-soft:#E6CECC;                  /* 4,87:1 */
   --rtg-line:var(--bordeaux-rand);
   --rtg-card:rgba(0,0,0,0.22);
+  --rtg-card2:rgba(0,0,0,0.34);
   --rtg-goud:var(--gold-tekst);
   /* op fluweel haalt zelfs het hoogsel maar 4,21:1, dus lees je hier ivoor */
   --rtg-leesgoud:var(--op-bordeaux);
+  --rtg-leesgroen:#7FD1A8;
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesrood:#F8CAD8;
   --rtg-dagsterkte:0.06;
 }
 /* ---- Royal: fluweel in koningsblauw ---- */
@@ -60,14 +78,77 @@
   --rtg-bg:var(--royal-diep);
   --rtg-grond:var(--royal-glans);
   --rtg-txt:var(--op-royal);
-  --rtg-muted:rgba(240,242,247,0.74);
-  --rtg-soft:rgba(240,242,247,0.58);
+  --rtg-muted:#DADFE8;                 /* 6,11:1 */
+  --rtg-soft:#C0C8D7;                  /* 4,85:1 */
   --rtg-line:var(--royal-rand);
   --rtg-card:rgba(0,0,0,0.20);
+  --rtg-card2:rgba(0,0,0,0.32);
   --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--op-royal);
+  --rtg-leesgroen:#7FD1A8;
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesrood:#F8CAD8;
   --rtg-dagsterkte:0.07;
 }
+
+/* NIET ALLEEN HET GOUD MOET KUNNEN LEZEN. Naast --rtg-leesgoud staan hier nu
+   --rtg-leesgroen en --rtg-leeszacht, en ze zijn er om precies dezelfde reden:
+   een vaste toon die op onyx prima leest, zakt op parelmoer en op fluweel. Voor
+   het groen (de stand "vrij", "gezond", een vrije dag) en voor de zachte
+   onderregel gold dat allebei. Gemeten op de gronden waar ze echt staan:
+
+     groen   #4C9A75  onyx 5,77 · licht 2,75 · bordeaux 2,96 · royal 3,22
+             per thema: #4C9A75 / #2E6B4E / #7FD1A8 / #7FD1A8  -> 5,8 / 5,1 / 5,5 / 6,0
+     zacht   #A79F92  onyx 7,47 · licht 1,80 · bordeaux 2,82 · royal 3,29
+             per thema: was #A79F92 / #5E574D / #D6D0C6 / #D6D0C6
+             en heet sinds 20 augustus gewoon --rtg-soft; zie de alinea hieronder
+     rood    #DE6E92  onyx 6,29 · licht 2,38 · bordeaux 2,37 · royal 2,77
+             per thema: #DE6E92 / #A3234C / #F8CAD8 / #F8CAD8  -> 6,3 / 5,5 / 5,1 / 5,9
+             (op fluweel kan een alarmkleur geen ROOD zijn -- rood op rood leest
+             niet, hoe je hem ook draait. Daar wordt het een heel licht roze, en
+             de betekenis blijft aan de vorm en de plek hangen: ONTWERP.md par. 5
+             zegt niet voor niets dat status nooit op kleur alleen staat.)
+
+   EN OP 20 AUGUSTUS 2026 BLEEK DAT --rtg-soft EN --rtg-muted ZELF HET ERGST
+   WAREN. Hierboven stond dat ze een alfa dragen (0,56 en 0,72) en dat de keuring
+   een voorgrond met alfa overslaat -- dus dat een zachte toon daarheen sturen de
+   bevinding zou laten VERDWIJNEN zonder hem op te lossen. Dat klopte, en het was
+   maar de helft. Zodra de keuring die alfa WEL kon rekenen (opGrond() in
+   scripts/a11ykeuring.js), stonden er 2844 bevindingen op de drie thema-ronden,
+   en 795 van de voorbeelden waren precies deze twee tokens.
+
+   DE OORZAAK IS DAT ALFA DE VERKEERDE KNOP IS. "56% van de inkt" is geen besluit
+   over leesbaarheid maar over sluier: wat het OPLEVERT hangt af van de grond, en
+   die verschilt per thema, per kaart, per stand van de dagkleur. Op onyx haalde
+   0,56 vlot 5,6:1; op parelmoer 3,5 en op fluweel 3,6 -- dezelfde regel, drie
+   uitkomsten, waarvan twee onleesbaar.
+
+   Ze zijn nu DEKKEND en per thema uitgerekend, met een regel die je kunt
+   nalopen: de zachte toon is ZO ZACHT ALS DE NORM TOELAAT (de lichtste tint die
+   op de ergste grond van dat thema nog 4,85:1 haalt), en de gedempte toon staat
+   HALVERWEGE tussen die vloer en de volle inkt. "De ergste grond" is daarbij
+   niet gegokt maar opgesomd: elke stop van het glansverloop, elk van de zestien
+   dagkleuren over die stops, en de twee kaartvlakken daar weer overheen.
+
+   Wat dat kost, staat er eerlijk bij: op FLUWEEL is er nauwelijks ruimte. De
+   lichtste stop van bordeaux (#9E1C40) haalt met de volle ivoren inkt maar
+   6,40:1, dus liggen de drie treden daar op 6,4 / 5,6 / 4,9 in plaats van op
+   11,5 / 8,2 / 4,9 zoals op parelmoer. Op velours draagt de hierarchie dus meer
+   op maat en gewicht dan op toon -- en dat is dezelfde uitkomst als bij
+   --rtg-leesgoud, dat op fluweel ook al ivoor werd.
+
+   EN --rtg-leeszacht IS GEEN APART TOKEN MEER. Dat bestond alleen omdat
+   --rtg-soft onleesbaar was; nu is het hetzelfde antwoord op dezelfde vraag, en
+   twee plekken met dezelfde waarheid is precies wat LAT.md regel 4 verbiedt. Het
+   wijst nu naar --rtg-soft, zodat de bestaande aanroepen blijven werken. */
+
+/* --rtg-card2 STOND HIER NIET, EN DAT WAS EEN GAT.
+   Elk thema zette --rtg-card, geen enkel thema zette --rtg-card2, dus die
+   bleef op de basiswaarde uit rtg-ui.css staan: #1B1817, bijna zwart. Op
+   vijftien schermen is dat het vlak van de meldingsstrook (.melding), en de
+   tekst erop komt uit --rtg-txt -- die WEL meethemaat. Onder champagne gaf dat
+   rgb(26,23,19) op rgb(27,24,23): 1,01:1. Niet slecht leesbaar maar onzichtbaar.
+   Wie hier een token bijzet, zet hem in alle vier de blokken. */
 
 /* --rtg-goud IS EEN VULKLEUR EN GEEN TEKSTKLEUR.
    In de UI-kit vult dit token de primaire knop, met #1C1608 als inkt erop. Ik
@@ -84,12 +165,101 @@
    De grond zelf, plus de levende kleur die eroverheen ademt. Twee lagen: de
    dagkleur bovenop, met de sterkte die het thema toestaat, en daaronder het
    materiaal. Zo verandert de tint continu zonder dat het materiaal verdwijnt. */
-:root[data-rtg-thema] body{
+/* EEN SCHERM MAG ZIJN EIGEN VLAK HOUDEN, en dat is geen uitzondering maar een
+   reparatie van iets dat stuk was. De drie juridische pagina's verklaren zichzelf
+   licht (`body{background:var(--white);color:var(--black)}`) omdat een juridisch
+   stuk een DOCUMENT is en geen appvlak. De regel hieronder is specifieker en nam
+   alleen de GROND over -- de inkt van die pagina's bleef zwart. Gevolg: bijna
+   zwarte tekst op een bijna zwarte grond, 1,08:1, op de partnervoorwaarden, de
+   voorwaarden en de privacyverklaring. Samen 156 van de bevindingen die de
+   contrastronde vond zodra hij verlopen kon lezen (zie TOEGANKELIJK.md).
+
+   Wie `data-rtg-eigenvlak` op zijn body zet, zegt: ik schilder mijn eigen grond
+   EN mijn eigen inkt. Allebei, of geen van beide -- half meedoen is precies wat
+   dit stukmaakte. */
+:root[data-rtg-thema] body[data-rtg-eigenvlak]{ background-attachment:initial; }
+:root[data-rtg-thema] body:not([data-rtg-eigenvlak]){
   background:
     linear-gradient(180deg,
       color-mix(in srgb, var(--dag-kleur,#C23A5E) calc(var(--rtg-dagsterkte,.1) * 100%), transparent) 0%,
       transparent 62%),
     var(--rtg-grond);
   background-attachment:fixed;
+  color:var(--rtg-txt);
+}
+
+/* EN EEN SCHERM MAG ZEGGEN DAT HET ALTIJD DONKER IS.
+   `data-rtg-eigenvlak="onyx"` is de tweede helft van diezelfde afspraak. Er is
+   een soort scherm dat geen thema verdraagt: een zoeker (camera), een kaart
+   (navigatie), een speler (media, muziek), een cockpit (living-os) en de
+   veiligheidspanelen. Die schilderen hun vlakken hard donker -- #0C0C0B, #141012,
+   rgba(21,19,18,.86) -- en halen hun inkt uit --rtg-txt, die WEL meethemaat.
+   Onder champagne, het enige lichte thema, gaf dat 62 keer bijna-zwart op
+   bijna-zwart. Een kaart wit maken is geen reparatie maar een ander scherm; en
+   elk vlak apart een inkt geven repareert alleen de vlakken die er vandaag zijn.
+
+   Dus verklaart zo'n scherm zichzelf onyx, en dan draait zijn HELE eiland terug
+   naar de donkere set: grond, inkt, kaarten, lijnen en het leesgoud. Wat er
+   daarna in dat scherm komt, klopt vanzelf. De thema-keuze van het lid blijft
+   overal elders staan; dit scherm doet er alleen niet aan mee. */
+/* De tokens staan op :ROOT en niet op de body, en dat is met een meting
+   geleerd. Een pagina schrijft `:root{--txt:var(--rtg-txt)}` -- die verwijzing
+   wordt opgelost OP :root, dus een --rtg-txt die pas op de body staat komt er
+   nooit in. Op navigatie.html bleef daardoor elke knop de champagne-inkt houden
+   terwijl de grond al onyx was: acht keer donker op donker, terwijl het scherm
+   zich net onyx had verklaard. Met :has() staat de waarde waar de pagina hem
+   leest. Het huis gebruikt :has() al (zie shared/ios.css). */
+:root[data-rtg-thema]:has(> body[data-rtg-eigenvlak="onyx"]){
+  --rtg-bg:var(--onyx-basis);
+  --rtg-grond:var(--onyx-glans);
+  --rtg-txt:var(--op-onyx);
+  --rtg-muted:#CDC9C0;                 /* 8,92:1 */
+  --rtg-soft:#989489;                  /* 4,87:1 */
+  --rtg-line:var(--onyx-rand);
+  --rtg-card:#151312;
+  --rtg-card2:#1B1817;
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--gold-tekst);
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesgroen:#4C9A75;
+  --rtg-leesrood:#DE6E92;
+  --rtg-dagsterkte:0.10;
+  color-scheme:dark;
+}
+:root[data-rtg-thema] body[data-rtg-eigenvlak="onyx"]{
+  background:var(--rtg-grond);
+  color:var(--rtg-txt);
+}
+
+/* EN EEN VLAK BINNEN EEN SCHERM MAG HETZELFDE ZEGGEN.
+   data-rtg-eigenvlak hierboven geldt voor een heel SCHERM. Er is ook de kleinere
+   vorm: een scherm dat het thema gewoon volgt, met daarin EEN vlak dat altijd
+   donker is -- een inlogpoort, een onboarding-overlay, een speler die zijn eigen
+   zwart schildert. Die vlakken schilderden hun grond hard en lieten hun inkt uit
+   het thema komen, en onder champagne kwam daar de donkere inkt op de donkere
+   grond terecht: de gedeelde Meenemen-knop las 1,48:1 op de onboardingpoort van
+   app.html.
+
+   De waarden zijn dezelfde als in het blok hierboven, en dat is bewust GEEN
+   gedeelde selector: `:has()` en dit attribuut in een selectorlijst zetten
+   betekent dat een browser die `:has()` niet kent de HELE lijst weggooit, dus
+   ook dit vlak. Twee regels met dezelfde waarheid is hier het kleinste kwaad;
+   test/thema.test.js houdt ze gelijk. */
+[data-rtg-vlak="onyx"]{
+  --rtg-bg:var(--onyx-basis);
+  --rtg-grond:var(--onyx-glans);
+  --rtg-txt:var(--op-onyx);
+  --rtg-muted:#CDC9C0;
+  --rtg-soft:#989489;
+  --rtg-line:var(--onyx-rand);
+  --rtg-card:#151312;
+  --rtg-card2:#1B1817;
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--gold-tekst);
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesgroen:#4C9A75;
+  --rtg-leesrood:#DE6E92;
+  --rtg-dagsterkte:0.10;
+  color-scheme:dark;
   color:var(--rtg-txt);
 }

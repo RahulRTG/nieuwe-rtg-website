@@ -83,7 +83,10 @@
   .gsp time{font-size:.66rem;color:var(--rtg-muted);font-variant-numeric:tabular-nums;}
   .telbol{min-width:1.15rem;height:1.15rem;padding:0 .3rem;border-radius:999px;background:var(--rtg-rood,#7F1634);
     color:#fff;font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
-  .merkje{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-goud);}
+  /* --rtg-goud is de VULkleur (zie rtg-themas.css: "een vulkleur en geen
+     tekstkleur"), en dit is tekst. --rtg-leesgoud is de toon die op deze
+     grond leest -- per thema een andere. */
+  .merkje{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--rtg-goud));}
   .leeg{padding:2.5rem 1.2rem;text-align:center;color:var(--rtg-muted);font-size:.85rem;line-height:1.6;}
 
   /* ---------------- rechts: het gesprek ---------------- */

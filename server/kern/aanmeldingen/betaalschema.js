@@ -7,8 +7,9 @@
    een echte betaling is verwerkt -- een betaalprovider zou het schema uitvoeren.
    Draait op de gedeelde context die kern/aanmeldingen.js opbouwt. */
 module.exports = (ctx) => {
-  const { B, geldPasprijzen, rid, nu, eur, PASSEN } = ctx;
+  const { B, geldPasprijzen, rid, nu, eur, PASSEN, db, save } = ctx;
   const { maandCentenUit } = require('../pasprijs');
+  const contracten = require('../commercie/contract').maakContracten({ db, save, nu });
 
   /* De maandbijdrage van DEZE aanmelding in centen.
 
@@ -33,21 +34,95 @@ module.exports = (ctx) => {
   // een maand erbij op een ISO-datum (voor het 12-maands-schema)
   function plusMaanden(iso, n) { const d = new Date(iso); d.setMonth(d.getMonth() + n); return d.toISOString(); }
 
+  /* HET SCHEMA KOMT UIT HET CONTRACT, niet uit "maak er twaalf".
+
+     Hier stond een lus van 1 tot en met 12. Dat leverde precies twaalf
+     termijnen op en daarna niets: geen maand 13, geen verlenging, geen
+     opzegging. Nu wordt er een CONTRACT geopend (../commercie/contract.js) en
+     vraagt het schema welke termijnen daaruit voortvloeien tot het einde van de
+     minimumtermijn. Bij een verse aanmelding zijn dat er nog steeds twaalf --
+     maar nu omdat de verbintenis twaalf maanden duurt, en niet omdat het getal
+     twaalf in een lus staat. Wordt het contract verlengd, dan komen de volgende
+     termijnen er vanzelf bij; wordt het opgezegd, dan houdt het op.
+
+     De prijs is een MOMENTOPNAME op het contract. Een latere wijziging in de
+     boardroom raakt dit lidmaatschap niet meer -- besluit van 20 augustus 2026
+     (COMMERCIE.md 3b). */
   function startBetalingen(a) {
     const centen = maandCentenVan(a);
-    const termijnen = [];
-    for (let m = 1; m <= 12; m++) {
-      const bedrag = centen; // null bij Business (op maat)
-      termijnen.push({ id: rid(), aanmeldingId: a.id, pas: a.pas, naam: a.naam, maand: m,
-        opMaat: centen == null,
-        centen: bedrag, foundationCenten: bedrag == null ? null : Math.round(bedrag * 0.30),
-        lokaalCenten: bedrag == null ? null : Math.round(bedrag * 0.20),
-        rtfCenten: bedrag == null ? null : Math.round(bedrag * 0.10),
-        vervalt: plusMaanden(a.besluit.at, m - 1), status: 'gepland', at: nu() });
-    }
+    const c = contracten.open({
+      pas: a.pas, aanmeldingId: a.id, naam: a.naam,
+      startAt: a.besluit.at,
+      afgesprokenCenten: centen,
+      minimumMaanden: 12, frequentie: 'maand',
+      door: (a.besluit || {}).door || null
+    });
+    contracten.bied(c);
+    contracten.accepteer(c, centen);
+    const actief = contracten.activeer(c);
+
+    /* Geen bedrag? Dan blijft het contract op GEACCEPTEERD staan en komen er
+       geen termijnen. Dat kan alleen bij een pas zonder lijstprijs waarvoor
+       niets is afgesproken -- en dat weigert het besluit al. Blijft het toch
+       gebeuren, dan is een leeg schema het eerlijke antwoord, geen rij met
+       twaalf lege bedragen. */
+    const termijnen = actief.error ? [] : vertaal(a, c);
     const b = B();
-    b.unshift({ aanmeldingId: a.id, pas: a.pas, naam: a.naam, gestart: nu(), termijnen });
+    b.unshift({ aanmeldingId: a.id, contractId: c.id, pas: a.pas, naam: a.naam,
+      gestart: nu(), termijnen });
     if (b.length > 5000) b.pop();
+    return c;
+  }
+
+  /* De termijnen van dit contract tot het einde van de huidige verbintenis, in
+     de vorm die de rest van het huis kent (met de 30%-split erbij). */
+  function vertaal(a, c) {
+    return contracten.termijnenTussen(c, c.startAt, contracten.eindeVerbintenis(c))
+      .map(t => ({ id: rid(), aanmeldingId: a.id, contractId: c.id, pas: a.pas, naam: a.naam,
+        maand: t.termijn, periode: t.periode, opMaat: false,
+        centen: t.centen,
+        foundationCenten: Math.round(t.centen * 0.30),
+        lokaalCenten: Math.round(t.centen * 0.20),
+        rtfCenten: Math.round(t.centen * 0.10),
+        vervalt: t.vervalt, status: 'gepland', at: nu() }));
+  }
+
+  /* VERLENGEN: hier ontstaat maand 13. De volgende periode wordt uitgerekend uit
+     het contract en achter de bestaande termijnen geplakt -- de oude blijven
+     staan, want die zijn gebeurd. */
+  function verlengLidmaatschap(aanmeldingId, nieuwEuro) {
+    const rijtje = B().find(r => r.aanmeldingId === String(aanmeldingId || ''));
+    if (!rijtje || !rijtje.contractId) return { status: 404, error: 'Voor dit lidmaatschap loopt geen contract.' };
+    const c = contracten.vind(rijtje.contractId);
+    if (!c) return { status: 404, error: 'Dit contract bestaat niet meer.' };
+    const voor = contracten.eindeVerbintenis(c);
+    const r = contracten.verleng(c, Number.isFinite(Number(nieuwEuro)) ? Math.round(Number(nieuwEuro) * 100) : undefined);
+    if (r.error) return { status: 400, error: r.error };
+    const extra = contracten.termijnenTussen(c, voor, contracten.eindeVerbintenis(c))
+      .map(t => ({ id: rid(), aanmeldingId: rijtje.aanmeldingId, contractId: c.id, pas: rijtje.pas,
+        naam: rijtje.naam, maand: t.termijn, periode: t.periode, opMaat: false, centen: t.centen,
+        foundationCenten: Math.round(t.centen * 0.30), lokaalCenten: Math.round(t.centen * 0.20),
+        rtfCenten: Math.round(t.centen * 0.10), vervalt: t.vervalt, status: 'gepland', at: nu() }));
+    rijtje.termijnen = rijtje.termijnen.concat(extra);
+    save();
+    return { ok: true, contract: contracten.publiek(c), erbij: extra.length };
+  }
+
+  /* OPZEGGEN: de termijnen na de einddatum vervallen. Ze worden verwijderd en
+     niet op 'vervallen' gezet -- een geplande termijn die nooit komt, is geen
+     termijn met een andere status maar een termijn die er niet is. */
+  function zegOpLidmaatschap(aanmeldingId) {
+    const rijtje = B().find(r => r.aanmeldingId === String(aanmeldingId || ''));
+    if (!rijtje || !rijtje.contractId) return { status: 404, error: 'Voor dit lidmaatschap loopt geen contract.' };
+    const c = contracten.vind(rijtje.contractId);
+    if (!c) return { status: 404, error: 'Dit contract bestaat niet meer.' };
+    const r = contracten.zegOp(c);
+    if (r.error) return { status: 400, error: r.error };
+    const voor = rijtje.termijnen.length;
+    rijtje.termijnen = rijtje.termijnen.filter(t => new Date(t.vervalt) < new Date(c.eindigtOp));
+    save();
+    return { ok: true, contract: contracten.publiek(c), eindigtOp: c.eindigtOp,
+      vervallen: voor - rijtje.termijnen.length };
   }
 
   function betalingBeeld(rij) {
@@ -73,5 +148,5 @@ module.exports = (ctx) => {
       lidmaatschappen: rijen.slice(0, 200).map(betalingBeeld) };
   }
 
-  return { startBetalingen, betalingen };
+  return { startBetalingen, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten };
 };

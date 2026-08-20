@@ -47,11 +47,16 @@
    nergens wordt afgedwongen is een belofte en geen regel (LAT.md). PRIJZEN.md
    zegt per regel wat er eerst nodig is.
 
-   BESCHIKBAAR IS IETS ANDERS DAN BESLOTEN. Business Lite staat hieronder met
-   `beschikbaar: false`: de prijs is besloten, de pas zelf bestaat nog niet (die
-   raakt de toegangsregels, de stem per pas en de functieschakelaars -- 77
-   bestanden noemen een pas-id). Zo staat het besluit vast zonder dat er een
-   prijslijst verschijnt voor iets wat je niet kunt kopen. */
+   BESCHIKBAAR IS IETS ANDERS DAN BESLOTEN. `beschikbaar` zegt of een trede te
+   koop is. Business Lite stond hier een tijd op `false`: de prijs was besloten,
+   de pas bestond nog niet. Sinds de capability-laag
+   (kern/commercie/capaciteiten.js) staat hij op `true` -- en de reden dat dat
+   kon, is dat rechten nu uit een productprofiel komen in plaats van uit
+   `if (pas === ...)` in zevenenzeventig bestanden.
+
+   Een trede op `true` zetten is dus geen vlag omzetten maar een belofte: er is
+   een aanmeldingsdefinitie (naam, stem, welkom) en een capability-profiel.
+   `test/pasladder.test.js` toets 9 laat een half-uitgerolde trede zakken. */
 'use strict';
 
 /* De treden, in de volgorde waarin ze aan een mens getoond worden: van gratis
@@ -80,7 +85,7 @@ const LADDER = [
 
   { id: 'business-lite', naam: 'RTG Business Lite',
     bodemCenten: 15000, standaardCenten: 15000,
-    vast: false, contractueel: false, beschikbaar: false,
+    vast: false, contractueel: false, beschikbaar: true,
     voor: 'zzp en klein MKB: software-as-a-service, geen omzetcommissie' },
 
   { id: 'business', naam: 'RTG Business Pass',

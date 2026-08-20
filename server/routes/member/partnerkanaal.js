@@ -2,6 +2,9 @@
    via een partnerlink, bedrijven vragen een partnerplek aan (alleen met een
    actieve Business Pass) en bestellen RTG-hardware in de winkel (Zaakdoos en
    toebehoren, prijzen in euro ex btw). Gemount vanuit routes/member.js. */
+const caps = require('../../kern/commercie/capaciteiten');
+const ladder = require('../../kern/pasladder');
+
 module.exports = (kern) => {
   const { app, db, save, crypto, findPartner, findStaffPartner, publicTrip, schoon,
     resolveSession, mail, sseToOffice, ondernemingBijdrageOver } = kern;
@@ -89,8 +92,22 @@ module.exports = (kern) => {
        toelichting boven /api/logout in routes/auth.js. */
     const passToken = String(b.passToken || (req.headers.authorization || '').replace(/^Bearer\s+/i, '') || '');
     const passSess = passToken ? resolveSession(passToken) : null;
-    if (!passSess || passSess.tier !== 'business')
-      return res.status(403).json({ error: 'Zonder Business Pass geen bedrijfscode: een partnerplek vraagt u aan met een actieve Business Pass. Log op dit apparaat in op de Business Pass-app en probeer het opnieuw.' });
+    /* DE POORT VRAAGT EEN CAPABILITY, GEEN PAS-ID. Hier stond een rechtstreekse
+       vergelijking van de sessie-tier met het pas-id van de Business Pass.
+       Sinds de ladder is de Business Pass vanaf
+       5.000 euro per maand, en daarmee sloot die regel precies de klant buiten
+       voor wie het partnerkanaal bedoeld is: het restaurant met acht man uit
+       MARKT.md. De ladder had dat gat zelf gemaakt.
+
+       `can_be_partner` hoort bij Business Lite en Business
+       (kern/commercie/capaciteiten.js). Komt er ooit een trede bij, dan hoeft
+       deze regel niet mee te veranderen -- en dat is het hele punt van
+       capabilities: de vraag "mag deze klant dit" wordt op EEN plek beantwoord
+       en niet in zevenenzeventig bestanden opnieuw. */
+    if (!passSess || !caps.mag(passSess.tier, 'can_be_partner'))
+      return res.status(403).json({ error: 'Een partnerplek vraagt u aan met een zakelijke pas (' +
+        caps.tredenMet('can_be_partner').map(t => (ladder.trede(t) || {}).naam || t).join(' of ') +
+        '). Log op dit apparaat in op die app en probeer het opnieuw.' });
     // schoon(): strip < en > uit vrije tekst. De bedrijfsnaam en plaats komen later
     // in andermans schermen (De Salon, backoffice), dus nooit als opmaak laten landen.
     const company = schoon(b.company, 80);

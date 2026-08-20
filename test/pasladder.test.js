@@ -127,23 +127,37 @@ test('8. de geld-regie serveert exact de ladder, met vanaf en niet met prijs', (
   }
 });
 
-/* Business Lite is BESLOTEN maar bestaat nog niet als pas: de toegangsregels,
-   de stem per pas en de functieschakelaars kennen hem niet. Zolang dat zo is,
-   hoort hij niet als koopbaar product op een prijslijst te verschijnen. Deze
-   toets valt om zodra iemand hem beschikbaar zet zonder de rest te bouwen -- en
-   dat is precies de bedoeling. */
-test('9. Business Lite staat in de ladder maar is nog niet beschikbaar', () => {
-  const lite = ladder.trede('business-lite');
-  assert.ok(lite, 'de trede bestaat: de prijs is besloten');
-  assert.equal(lite.bodemCenten, 15000);
-  assert.equal(lite.beschikbaar, false,
-    'zet je dit op true, bouw dan eerst de pas zelf (aanmeldingen, stem, functieschakelaars) -- zie PRIJZEN.md');
+/* EEN BESCHIKBARE TREDE IS EEN BELOFTE. Business Lite stond hier een tijd op
+   `beschikbaar: false`: de prijs was besloten, de pas bestond niet. Wat die vlag
+   op `true` mocht zetten, is de capability-laag -- rechten komen nu uit een
+   productprofiel in plaats van uit `if (pas === ...)` in zevenenzeventig
+   bestanden.
 
-  /* De omzetstaat van het ledenregister leidt zijn kolommen af uit BESCHIKBAAR,
-     dus een niet-uitgerolde trede levert daar geen lege regel met nul euro op. */
-  const kolommen = ladder.treden().filter(t => t.beschikbaar).map(t => t.id);
-  assert.equal(kolommen.includes('business-lite'), false,
-    'de omzetstaat toont geen trede zonder leden');
-  assert.deepEqual(kolommen, ['gratis', 'rtg', 'business', 'lifestyle'],
-    'en de volgorde volgt de ladder, van licht naar zwaar');
+   Deze toets zegt wat "beschikbaar" MOET betekenen: er is een naam, een stem en
+   een welkomsttekst in de aanmeldingsstroom, en er is een capability-profiel.
+   Zet iemand een trede op true zonder die twee, dan zakt hij hier -- en dat is
+   precies de half-uitgerolde pas die je niet wilt ontdekken via een lid dat
+   nergens in kan. */
+test('9. elke beschikbare trede is ook echt uitgerold', () => {
+  const caps = require('../server/kern/commercie/capaciteiten');
+  const bron = require('fs').readFileSync(require.resolve('../server/kern/aanmeldingen.js'), 'utf8');
+
+  for (const t of ladder.treden().filter(x => x.beschikbaar)) {
+    if (t.id === 'gratis') continue;   // de gratis app kent geen aanmeldingsstroom
+    assert.ok(bron.includes("'" + t.id + "'") || bron.includes(t.id + ':'),
+      t.id + ' is beschikbaar maar komt niet voor in de aanmeldingsstroom (naam, stem, welkom)');
+    assert.ok(caps.capsVan(t.id).length > 0,
+      t.id + ' is beschikbaar maar heeft geen capability-profiel: dan mag een klant niets');
+  }
+
+  // en Business Lite in het bijzonder, want daar hangt de partnerpoort aan
+  const lite = ladder.trede('business-lite');
+  assert.equal(lite.bodemCenten, 15000);
+  assert.equal(lite.beschikbaar, true);
+  assert.equal(caps.mag('business-lite', 'can_be_partner'), true,
+    'de partnerpoort hangt hieraan: zonder deze capability kan een zzp-er geen partner worden');
+
+  // geen enkel profiel verwijst naar een capability die niet bestaat
+  for (const o of caps.overzicht())
+    assert.deepEqual(o.onbekend, [], o.pas + ' verwijst naar een onbekende capability: ' + o.onbekend.join(', '));
 });

@@ -27,6 +27,14 @@ const PASSEN = {
     welkom: 'Dank voor uw interesse in de Lifestyle Pass. Ik bereid alles voor u voor; de toelating zelf beslist een mens.',
     open: false // alleen na menselijke goedkeuring of op uitnodiging
   },
+  'business-lite': {
+    naam: 'RTG Business Lite', stem: 'u',
+    /* Zakelijk en scherp, net als Business -- maar dit is de zzp'er en het
+       kleine MKB, dus zonder de toon van een enterprise-relatie. Geen
+       accountmanager, wel meteen werkende software. */
+    welkom: 'Dank voor uw aanvraag voor Business Lite. Ik loop de aanmelding met u door en zet uw zaak klaar; de toelating beslist een mens.',
+    open: true // zakelijk instapniveau: aan te vragen, mens beslist alsnog
+  },
   business: {
     naam: 'RTG Business Pass', stem: 'u',
     // "efficiente strategische partner": zakelijk, scherp, u-vorm
@@ -65,7 +73,7 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   /* Het betaalschema (de 12 maandtermijnen met de 30%-foundation-split en het
      kantooroverzicht) draait als submodule op dezelfde context; zie
      aanmeldingen/betaalschema.js. */
-  const { startBetalingen, betalingen } = require('./aanmeldingen/betaalschema')({ B, geldPasprijzen, rid, nu, eur, PASSEN });
+  const { startBetalingen, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten } = require('./aanmeldingen/betaalschema')({ B, geldPasprijzen, rid, nu, eur, PASSEN, db, save });
   /* De ondernemersintake en de automatische bedrijfsprovisioning na de
      eerste voldane termijn; zie aanmeldingen/bedrijf.js. */
   const bedrijfMod = require('./aanmeldingen/bedrijf')({ db, save, kap, nu, accounts });
@@ -167,6 +175,6 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   // De zaak klaarzetten: ./aanmeldingen/klaarzetten.js (stond op de NOG-lijst).
   const klaarzetten = require('./aanmeldingen/klaarzetten')({ A, bedrijfMod });
 
-  return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen,
+  return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten,
     termijnVoldaan, magAutomatischToekennen, PASSEN }, klaarzetten) };
 };

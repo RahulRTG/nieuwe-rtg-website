@@ -154,3 +154,44 @@ test('een contractuele pas kan niet worden geaccepteerd zonder afgesproken bedra
       pas + ': het afgesproken bedrag wint van de bodem EN van de lijstprijs');
   }
 });
+
+/* MAAND 13. Dit kon voorheen niet bestaan: startBetalingen zette twaalf
+   termijnen klaar en daarna hield het op. Nu komt het schema uit een contract,
+   en groeit het alleen als iemand verlengt. */
+test('maand 13 ontstaat door te verlengen, en verdwijnt door op te zeggen', () => {
+  const a = maak();
+  const lid = a.aanvraag({ pas: 'rtg', naam: 'Jaarlid' }).aanmelding;
+  a.beslis(lid.id, 'geaccepteerd', 'Beoordelaar');
+  const rij = () => a.betalingen({ aanmeldingId: lid.id }).lidmaatschappen[0];
+  assert.equal(rij().termijnen.length, 12, 'de eerste verbintenis is twaalf maanden');
+
+  const v = a.verlengLidmaatschap(lid.id);
+  assert.equal(v.ok, true, JSON.stringify(v));
+  assert.equal(v.erbij, 12, 'verlengen levert een tweede periode van twaalf op');
+  assert.equal(rij().termijnen.length, 24);
+  assert.equal(rij().termijnen[12].maand, 13, 'en daar is maand 13');
+
+  // opzeggen laat de termijnen na de einddatum vervallen
+  const o = a.zegOpLidmaatschap(lid.id);
+  assert.equal(o.ok, true, JSON.stringify(o));
+  assert.ok(o.eindigtOp, 'met een uitgerekende einddatum');
+  assert.ok(rij().termijnen.length < 24, 'de termijnen daarna zijn er niet meer');
+  assert.ok(rij().termijnen.every(t => new Date(t.vervalt) < new Date(o.eindigtOp)),
+    'een geplande termijn die nooit komt, is geen termijn met een andere status maar een termijn die er niet is');
+});
+
+/* DE PRIJS-LOCK. Besluit van 20 augustus 2026: een prijswijziging in de
+   boardroom raakt nooit een lopend contract. */
+test('een prijswijziging raakt een lopend lidmaatschap niet', () => {
+  const a = maak({ pasprijzen: { rtg: 6500 } });
+  const lid = a.aanvraag({ pas: 'rtg', naam: 'Voor de verhoging' }).aanmelding;
+  a.beslis(lid.id, 'geaccepteerd', 'Beoordelaar');
+  const eerst = a.betalingen({ aanmeldingId: lid.id }).lidmaatschappen[0].termijnen[0].bedrag;
+  assert.equal(eerst, 65);
+
+  // de boardroom verhoogt naar 99 euro
+  a.zetPasprijs && a.zetPasprijs('rtg', 9900);
+  const na = a.betalingen({ aanmeldingId: lid.id }).lidmaatschappen[0].termijnen;
+  assert.ok(na.every(t => t.bedrag === 65),
+    'wat dit lid tekende, betaalt dit lid -- de termijnen dragen de momentopname van het contract');
+});

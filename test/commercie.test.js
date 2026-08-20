@@ -140,3 +140,47 @@ test('9. centen in, centen uit: geen halve cent verdwijnt in een afronding', () 
     }
   }
 });
+
+/* --------------------------------------------------------------- capabilities */
+
+/* Zevenenzeventig bestanden noemen een pas-id. Zou Business Lite zijn uitgerold
+   zoals de vorige passen, dan kwam er in al die bestanden een `if (pas ===
+   'business-lite')` bij -- en bij de zesde trede opnieuw. Dan wordt "mag deze
+   klant dit" op zeventig plaatsen los beantwoord, en die antwoorden lopen
+   uiteen zodra iemand er een vergeet. Precies hoe thuis/zakelijk.js aan een
+   eigen commissie van 10% kwam terwijl de rest 12 gebruikte. */
+const caps = require('../server/kern/commercie/capaciteiten');
+
+test('10. rechten komen uit een productprofiel, niet uit een pas-id', () => {
+  assert.equal(caps.mag('business-lite', 'can_use_pos'), true);
+  assert.equal(caps.mag('rtg', 'can_use_pos'), false, 'een consumentenpas draait geen kassa');
+  assert.equal(caps.mag('lifestyle', 'can_use_lifestyle_service'), true);
+  assert.equal(caps.mag('business', 'can_use_lifestyle_service'), false,
+    'Lifestyle is geen zwaardere Business: de menselijke regie zit daar en niet hier');
+
+  // niet mogen is de veilige uitkomst
+  assert.equal(caps.mag('business', 'can_hack_everything'), false, 'een onbekende capability geeft niets');
+  assert.equal(caps.mag('bestaat-niet', 'can_use_ai'), false, 'een onbekende pas ook niet');
+  assert.equal(caps.mag(null, 'can_use_ai'), false);
+});
+
+/* DE POORT DIE DE LADDER ZELF DICHTGOOIDE. partnerkanaal.js eiste
+   `tier !== 'business'` -- en Business is sinds de ladder vanaf 5.000 euro. */
+test('11. de partnerpoort staat open voor Business Lite, en hangt niet aan een pas-id', () => {
+  assert.deepEqual(caps.tredenMet('can_be_partner'), ['business-lite', 'business'],
+    'het restaurant met acht man moet erin kunnen, en de enterprise ook');
+  assert.equal(caps.mag('rtg', 'can_be_partner'), false, 'een consumentenpas is geen bedrijf');
+  assert.equal(caps.mag('gratis', 'can_be_partner'), false);
+
+  const bron = require('fs').readFileSync(require.resolve('../server/routes/member/partnerkanaal.js'), 'utf8');
+  assert.doesNotMatch(bron, /tier\s*!==\s*'business'/,
+    'de poort hoort een capability te vragen en geen pas-id: anders sluit elke nieuwe trede zichzelf buiten');
+  assert.match(bron, /can_be_partner/);
+});
+
+test('12. de gratis trede mag niets zakelijks, en dat is geen vergetelheid', () => {
+  assert.deepEqual(caps.capsVan('gratis'), [],
+    'RTG Community is de maatschappelijke ingang; er hangt geen zakelijke capability aan');
+  assert.deepEqual(caps.capsVan('rtg'), ['can_use_ai'],
+    'en de consumentenpas draagt alleen de AI-assistent');
+});

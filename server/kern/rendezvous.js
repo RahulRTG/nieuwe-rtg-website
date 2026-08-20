@@ -14,7 +14,7 @@
    losser was dan de brede. De pas-eis (Lifestyle of Business) blijft op de route
    waar hij hoort; de leeftijd en de identiteit horen hier, want de kern is wat
    elke ingang passeert. */
-module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin }) => {
+module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, leeftijdVan, tableZet, handleVanPin }) => {
   const nu = () => new Date().toISOString();
   const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
   const mag = key => ontmoetPoort(key, 'Rendez-vous');
@@ -35,7 +35,17 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts,
     for (const v of ['profielen', 'likes', 'passes']) if (!r[v] || typeof r[v] !== 'object') r[v] = {};
     return r;
   }
-  const codenaam = key => (liveCodename ? liveCodename(key) : '') || 'Een lid';
+  /* DE CODENAAM VAN EEN SLEUTEL. Hier stond `liveCodename(key)`, en dat is de
+     verkeerde functie: liveCodename verwacht een SESSIE (hij leest
+     `session.account`), en elke andere aanroeper in dit huis geeft er ook een
+     sessie aan. Met een sleutelstring erin gaf hij altijd null -- en viel alles
+     terug op de tekst hieronder. Gevolg: iedereen in Rendez-vous heette "Een
+     lid". Een app die volledig op codenamen draait, had er dus maar een.
+
+     codenaamVan leest de gids op sleutel, en is bovendien de tegenhanger van
+     keyVanCodenaam -- zonder dat kon het kantoor een tafel niet op codenaam
+     samenstellen. */
+  const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
   // overlap van twee locatielijsten, hoofdletterongevoelig, met de oorspronkelijke schrijfwijze
   function gedeeld(a, b) {
     const bl = (b || []).map(x => x.toLowerCase());

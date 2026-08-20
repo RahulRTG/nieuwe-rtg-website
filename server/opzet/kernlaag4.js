@@ -46,7 +46,10 @@ kern.huis = require('../kern/huis')({
 /* Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass (match -> jetset-date).
    accounts + leeftijdVan zijn er voor de ontmoetpoort (18+ en KYC, kern/ontmoetpoort.js),
    die Rendez-vous deelt met Vonk. De pas-eis blijft op routes/member/rendezvous.js. */
-Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan,
+Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic, notify, accounts, leeftijdVan,
+  /* codenaamVan en niet liveCodename: zie de kop van kern/rendezvous.js. Laat
+     gebonden, want de sociale laag wordt later samengesteld. */
+  codenaamVan: (k) => kern.codenaamVan(k),
   /* tableZet komt uit kern/rechterhand (kernlaag3) en staat er dus al: bij twee
      akkoorden krijgt elk lid de gelegenheid in zijn EIGEN dossier. */
   tableZet: kern.tableZet,

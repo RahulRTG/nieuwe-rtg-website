@@ -720,11 +720,14 @@ over kinderen zei kost u een gesprek, een zaak die niets over een drempel zei
 kost u de avond — en dat overkomt precies de mensen die het al moeilijker hebben.
 Bij mensen is twijfel een open punt, bij drempels een nee.
 
-*Eerlijk over vandaag:* vrijwel geen enkele zaak heeft dat veld ingevuld, want er
-is nog geen leveranciersscherm waar een ondernemer het opgeeft. Dat is een gat en
-geen ontwerp. Zolang het zo is levert een harde eis weinig op — en dat is de
-goede kant om fout te gaan. Het antwoord telt daarom hoevéél zaken op de eis
-afvielen, zodat het gat zichtbaar is in plaats van als lege lijst te verschijnen.
+*Sinds fase 6 kan een zaak dat zelf opgeven* — in de zaak-app onder Beheer,
+"Wat uw zaak kan". Het is een uitspraak van de ondernemer en geen keuring door
+RTG, net als de allergenen bij een gerecht. Wat er niet staat, geldt nergens als
+toegezegd. Het antwoord telt daarom nog steeds hoevéél zaken op de eis afvielen,
+zodat een korte lijst zichzelf verklaart in plaats van als storing te lezen.
+
+De woordenlijst zelf woont in `kern/geschikt.js` en niet in Vonk: hij gaat over
+een horecazaak, en Vonk is er maar één afnemer van.
 
 Het budget wordt gerékend (mediaan van de menuprijzen die er al staan), niet aan
 een zaak gevraagd, en het staat nooit op een profiel.
@@ -773,9 +776,11 @@ beantwoordt hem wanneer hij de app opent.
 **The Table** — een genodigde ziet de tafel (stad, dag, thema, hoeveel plaatsen)
 en **nooit** de gastenlijst. Achter de schermen mag RTG twee mogelijke
 introducties dezelfde uitnodiging sturen; dat is de hele kunst, en het werkt
-alleen zolang niemand het merkt. Een tafel wordt door RTG samengesteld — de kern
-kan dat, maar er is nog geen backofficescherm waar het gebeurt. Dat is, net als
-`geschikt` bij de zaken, een gat en geen ontwerp.
+alleen zolang niemand het merkt. Een tafel wordt door RTG samengesteld, sinds
+fase 6 in de backoffice (paneel *Rendez-vous — The Table*), op codenaam. De
+kantoorkant staat met opzet in een eigen bestand (`rendezvous-tafels.js`): daar
+geldt precies de omgekeerde regel — het kantoor móét de lijst zien. Twee
+tegengestelde regels in één bestand gaan vroeg of laat door elkaar lopen.
 
 **Together** — twee eenzijdige verklaringen, en "samen" bestaat alleen als
 projectie daarover: allebei wijzen naar elkaar. Er is geen collectie "relatie".
@@ -787,5 +792,24 @@ Zolang het staat, stoppen de introducties aan beide kanten; de kring blijft.
 
 Geen bericht als iemand zijn helft intrekt, geen datum die wordt bijgehouden,
 geen "u bent drie maanden samen" (par. 4.1 en 4.4).
+
+**Fase 6 — gedaan: de twee gaten dicht.** Een zaak geeft nu zelf op wat hij kan
+(`kern/geschikt.js` + de zaak-app), en het kantoor stelt een tafel samen
+(`kern/rendezvous-tafels.js` + de backoffice). Allebei stonden ze hierboven als
+gat opgeschreven; ze staan er niet meer.
+
+En daar kwam een fout boven die geen van beide was. `kern/rendezvous.js` haalde
+de codenaam van een lid op met `liveCodename(key)` — maar `liveCodename`
+verwacht een **sessie** (hij leest `session.account`), en elke andere aanroeper
+in dit huis geeft er ook een sessie aan. Met een sleutelstring gaf hij altijd
+`null`, en viel alles terug op de tekst `'Een lid'`. **Iedereen in Rendez-vous
+heette dus hetzelfde** — in een app die volledig op codenamen draait.
+
+Het viel niet op omdat geen enkele toets twee leden op naam uit elkaar hield: ze
+zochten op locatie of op de tekst van een profiel, en `'Een lid' === 'Een lid'`
+gaf keurig groen. Het kwam pas boven doordat het kantoor een tafel op codenaam
+moest samenstellen en `keyVanCodenaam` niets terugvond. Nu leest Rendez-vous
+`codenaamVan(key)` uit de gids — de tegenhanger van `keyVanCodenaam`, en dus ook
+de reden dat het kantoor een lid kán terugvinden.
 
 Elke fase eindigt met wat `LAT.md` vraagt: een toets die je hebt zien zakken.

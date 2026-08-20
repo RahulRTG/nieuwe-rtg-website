@@ -483,3 +483,44 @@ test('23. meet halfway: het budget begrenst, en staat nergens op een profiel', a
   const eigen = (await selectieVan(rijk.token)).profiel;
   assert.equal(eigen.datewens.budget, 'hoog', 'de eigenaar ziet ze wel');
 });
+
+/* ---- WAT EEN ZAAK KAN (kern/geschikt.js) ----
+   De woordenlijst hoort bij de zaak en niet bij Vonk; Vonk is een afnemer.
+   Een zaak verklaart het zelf, en wat niet verklaard is telt nergens mee. */
+
+test('24. de woordenlijst van wat een zaak kan, woont bij de zaak', async () => {
+  const G = require('../server/kern/geschikt');
+  const H = require('../server/kern/vonk/halfweg');
+  // Vonk gebruikt exact dezelfde lijst; twee kopieen zouden uiteenlopen
+  assert.deepEqual(H.tafelkaart().eisen.map(e => e.id), G.lijst().map(e => e.id));
+  const fs = require('fs');
+  assert.match(fs.readFileSync('server/kern/vonk/halfweg.js', 'utf8'), /require\('\.\.\/geschikt'\)/,
+    'halfweg leest de lijst, hij bezit hem niet');
+
+  assert.deepEqual(G.schoonGeschikt(['halal', 'onzin', 'halal', 'rolstoel']), ['rolstoel', 'halal'],
+    'onbekende woorden vallen weg, dubbele ook, en de volgorde volgt de lijst');
+  assert.equal(G.voldoet({}, ['rolstoel']), false, 'niets verklaard is niet voldoen');
+  assert.equal(G.voldoet({ geschikt: ['rolstoel'] }, ['rolstoel', 'halal']), false, 'deels is niet voldoen');
+  assert.equal(G.voldoet({ geschikt: ['rolstoel', 'halal'] }, ['rolstoel']), true);
+  assert.equal(G.voldoet({ geschikt: ['rolstoel'] }, []), true, 'zonder eis voldoet iedereen');
+});
+
+test('25. een zaak verklaart zelf wat hij kan, en dat bereikt de datefinder', async () => {
+  // de zaak-app zet het via /api/supplier/settings; hier langs dezelfde weg
+  const zaken = (await api('/api/office/state', {}, office)).body;
+  assert.ok(zaken, 'de backoffice antwoordt');
+  const H = require('../server/kern/vonk/halfweg');
+  const { haversine, etaMinutes } = require('../server/lib/geo');
+  const afstandM = (p, l) => haversine({ lat: p.lat, lng: p.lng }, { lat: l.lat, lng: l.lng });
+  const G = require('../server/kern/geschikt');
+
+  // een zaak zonder verklaring en dezelfde zaak met verklaring
+  const zonder = { code: 'z', name: 'Zonder', type: 'restaurant', loc: { lat: 52, lng: 4.5 }, tables: [1], menu: [{ price: 12 }] };
+  const met = { ...zonder, code: 'm', name: 'Met', geschikt: G.schoonGeschikt(['rolstoel', 'onzin']) };
+  const a = { lat: 51.9, lng: 4.5, datewens: { eisen: ['rolstoel'] } };
+  const b = { lat: 52.1, lng: 4.5, datewens: {} };
+  const r = H.drieOpties({ a, b, suppliers: { zonder, met }, mid: { lat: 52, lng: 4.5 }, afstandM,
+    reisMin: m => etaMinutes(m, 'driving') });
+  assert.deepEqual(r.opties.map(o => o.supplierCode), ['m'], 'alleen wie het verklaarde komt door');
+  assert.equal(r.waarom.eis, 1, 'en het gat wordt geteld');
+});

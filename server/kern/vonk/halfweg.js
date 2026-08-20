@@ -47,14 +47,10 @@
    plaats van te gokken. Het budget van een lid staat NOOIT op zijn profiel; het
    leeft alleen hier (ONTMOETEN.md par. 3.6). */
 
-const EISEN = [
-  { id: 'rolstoel', label: 'rolstoeltoegankelijk' },
-  { id: 'prikkelarm', label: 'prikkelarm' },
-  { id: 'halal', label: 'halal' },
-  { id: 'kosher', label: 'kosher' },
-  { id: 'vegan', label: 'vegan' },
-  { id: 'zonderAlcohol', label: 'zonder alcohol' }
-];
+/* De eisen zelf wonen bij de ZAAK en niet hier: kern/geschikt.js. Vonk is een
+   afnemer van die woordenlijst, niet de eigenaar ervan -- zie de kop daar. */
+const G = require('../geschikt');
+const EISEN = G.EISEN;
 
 /* De soorten uitje, en welke zaaktypen ze bedienen. De typen komen uit de
    bestaande leverancierslaag; hier wordt niets nieuws verzonnen. */
@@ -69,7 +65,7 @@ const BUDGETTEN = ['laag', 'midden', 'hoog', 'egaal'];
 const KLASSE_MAX = { laag: 15, midden: 35, hoog: Infinity };
 const RANG = { laag: 1, midden: 2, hoog: 3 };
 
-const eisIds = new Set(EISEN.map(e => e.id));
+const eisIds = G.IDS;
 
 /* Wat een lid van de PLEK vraagt. Staat los van `kenmerken` in ./wensen.js, en
    dat is met opzet: "ik drink geen alcohol" is iets anders dan "de plek moet
@@ -119,8 +115,7 @@ function drieOpties({ a, b, suppliers, mid, afstandM, reisMin }) {
     if (!s.loc || !isFinite(s.loc.lat) || !isFinite(s.loc.lng)) { waarom.zonderPlek++; continue; }
 
     // de eisen: alleen wat de zaak ZELF heeft verklaard telt (zie de kop)
-    const kan = Array.isArray(s.geschikt) ? s.geschikt : [];
-    if (eisen.length && !eisen.every(e => kan.includes(e))) { waarom.eis++; continue; }
+    if (eisen.length && !G.voldoet(s, eisen)) { waarom.eis++; continue; }
 
     const klasse = klasseVan(s);
     if (plafond && klasse && RANG[klasse] > plafond) { waarom.budget++; continue; }
@@ -174,7 +169,7 @@ function maakOptie(k, soort) {
 
 // de lijstjes zoals een scherm ze nodig heeft
 const tafelkaart = () => ({
-  eisen: EISEN.map(e => ({ ...e })), soorten: SOORTEN.map(s => ({ id: s.id, label: s.label })),
+  eisen: G.lijst(), soorten: SOORTEN.map(s => ({ id: s.id, label: s.label })),
   budgetten: BUDGETTEN.slice()
 });
 

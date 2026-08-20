@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4002 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4005 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4002 |
-| servermodules (`server/**/*.js`) | 2211 |
-| routebestanden (`server/routes/**`) | 456 |
-| kernmodules (`server/kern/**`) | 1352 |
+| API-endpoints | 4005 |
+| servermodules (`server/**/*.js`) | 2214 |
+| routebestanden (`server/routes/**`) | 457 |
+| kernmodules (`server/kern/**`) | 1354 |
 | schermen (`public/**/*.html`) | 259 |
 | gedeelde browsermodules (`public/shared/*.js`) | 223 |
 | toetsbestanden (`test/*.test.js`) | 905 |
@@ -105,7 +105,7 @@ zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 651 | 57 | 10 | 408 |
 | `supplier` | 562 | 102 | 10 | 295 |
-| `office` | 40 | 7 | 5 | 64 |
+| `office` | 43 | 8 | 5 | 68 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 71 | 9 | 39 | 60 |
 | `techniek` | 57 | 14 | 1 | 51 |
@@ -125,9 +125,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1425 |
+| kern-namen die routes aanraken | 1428 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 191 |
-| daarvan door precies één domein | 1234 |
+| daarvan door precies één domein | 1237 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -142,7 +142,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 app(170) auth(104) supplierAuth(55) officeAuth(36) db(35) status(27) liveCodename(25)
 accounts(23) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
 boardroomWie(11) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) findSupplier(10)
-rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) logActivity(8)
+keyVanCodenaam(10) rtmail(10) express(9) gegevensStop(9) payrollOS(9) logActivity(8)
 noteFailedTry(7) kern(7) stuur(7) sseToOffice(7) mail(6) boardroomAuth(6) talen(6)
 loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 ```

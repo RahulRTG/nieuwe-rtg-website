@@ -249,7 +249,7 @@ test('de presence graph komt nooit uit een reis, ook niet als die er is', async 
   } };
   const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({
     geboren: '1990-05-05', trip: { dest: 'Parijs', from: '2026-08-21', to: '2026-08-24' } }) };
-  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => k,
+  const api = kern({ db, save() {}, crypto: require('crypto'), codenaamVan: k => k,
     anthropic: null, notify() {}, accounts, leeftijdVan: () => 36 });
 
   api.rvProfiel('user-1', { aan: true, over: 'reist naar Parijs' });
@@ -411,7 +411,7 @@ test('the table: de gastenlijst verlaat de kern niet', async () => {
   const kern = require('../server/kern/rendezvous.js');
   const db = { data: { rendezvous: {} } };
   const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({ geboren: '1985-05-05' }) };
-  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => 'Naam-' + k,
+  const api = kern({ db, save() {}, crypto: require('crypto'), codenaamVan: k => 'Naam-' + k,
     anthropic: null, notify() {}, accounts, leeftijdVan: () => 40, tableZet() {}, handleVanPin: () => null });
 
   const t = api.rvTafelMaak({ naam: 'Diner 04', stad: 'Amsterdam', datum: '2026-09-10', tijd: '20:00',
@@ -437,7 +437,7 @@ test('de tweezijdige ja: wie als eerste ja zegt blijft onzichtbaar, en nee is st
   const db = { data: { rendezvous: {} } };
   const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({ geboren: '1985-05-05' }) };
   const gemeld = [];
-  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => 'Naam-' + k,
+  const api = kern({ db, save() {}, crypto: require('crypto'), codenaamVan: k => 'Naam-' + k,
     anthropic: null, notify: (k, m) => gemeld.push([k, m.body]), accounts, leeftijdVan: () => 40,
     tableZet() {}, handleVanPin: () => null });
 
@@ -472,7 +472,7 @@ test('encounter: een pin alleen is niet genoeg; het moet van twee kanten komen',
   const db = { data: { rendezvous: {} } };
   const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({ geboren: '1985-05-05' }) };
   const pins = { 'AAA-111': 'user-2', 'BBB-222': 'user-1' };
-  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => 'Naam-' + k,
+  const api = kern({ db, save() {}, crypto: require('crypto'), codenaamVan: k => 'Naam-' + k,
     anthropic: null, notify() {}, accounts, leeftijdVan: () => 40, tableZet() {},
     handleVanPin: p => pins[p] || null });
 
@@ -534,4 +534,92 @@ test('together: je trekt alleen je eigen helft in, en de ander wordt niet gewist
   const bijB = await json(await rv('samen', {}, b));
   assert.equal(bijB.samen, false, 'de projectie valt weg zodra een helft verdwijnt');
   assert.ok(bijB.ikVerklaarde, 'maar B\'s eigen helft is niet door A gewist');
+});
+
+/* ---- HET KANTOOR STELT EEN TAFEL SAMEN (kern/rendezvous-tafels.js) ----
+   De twee kanten staan tegenover elkaar: het kantoor MOET de gastenlijst zien,
+   een lid mag hem nooit zien. Daarom staan ze in twee bestanden. */
+
+/* Elk lid heeft een EIGEN codenaam. Dit stond hier niet, en daardoor bleef
+   maanden onopgemerkt dat liveCodename een sessie verwacht en een sleutel kreeg:
+   hij gaf altijd null, en iedereen in Rendez-vous heette "Een lid". Een app die
+   volledig op codenamen draait had er dus maar een. */
+test('elk lid heeft zijn eigen codenaam, en die is op naam terug te vinden', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'naam-A' }, a);
+  await rv('profiel/zet', { aan: true, over: 'naam-B' }, b);
+  const na = (await json(await rv('profiel', {}, a))).codenaam;
+  const nb = (await json(await rv('profiel', {}, b))).codenaam;
+  assert.ok(na && nb, 'allebei een codenaam');
+  assert.notEqual(na, nb, 'en niet dezelfde');
+  assert.notEqual(na, 'Een lid', 'en niet de terugvaltekst');
+
+  // de kandidatenlijst draagt dezelfde naam, en het kantoor vindt hem terug
+  const kand = await json(await rv('kandidaten', {}, a));
+  const zB = kand.kandidaten.find(k => k.over === 'naam-B');
+  assert.equal(zB.codenaam, nb, 'de kandidaat draagt zijn eigen codenaam');
+  const office = await officeTok();
+  const g = await json(await raw('/office/rendezvous/tafel/maak',
+    { naam: 'Rondrit', plaatsen: 2, genodigden: [nb] }, office));
+  assert.ok(g.ok, 'het kantoor vindt het lid terug op die codenaam');
+});
+
+test('the table: het kantoor stelt samen op codenaam, en ziet wel de lijst', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'tafelgast-A' }, a);
+  await rv('profiel/zet', { aan: true, over: 'tafelgast-B' }, b);
+  const naamA = (await json(await rv('profiel', {}, a))).codenaam;
+  const naamB = (await json(await rv('profiel', {}, b))).codenaam;
+  const office = await officeTok();
+
+  const gemaakt = await json(await raw('/office/rendezvous/tafel/maak',
+    { naam: 'Diner 04', stad: 'Amsterdam', datum: dag(9), tijd: '20:00',
+      thema: 'architectuur', plaatsen: 8, genodigden: [naamA, naamB] }, office));
+  assert.ok(gemaakt.ok, 'de tafel is samengesteld');
+  assert.equal(gemaakt.tafel.aantal, 2);
+  assert.equal(gemaakt.tafel.genodigden, undefined, 'ook het maak-antwoord draagt de lijst niet');
+
+  // het kantoor ziet de lijst wel, op codenaam
+  const kantoor = await json(await raw('/office/rendezvous/tafels', {}, office));
+  const t = kantoor.tafels.find(x => x.naam === 'Diner 04');
+  assert.equal(t.genodigden.length, 2);
+  assert.ok(t.genodigden.some(g => g.codenaam === naamA), 'op codenaam, niet op echte naam');
+
+  // het lid ziet zijn uitnodiging en niet de medegasten
+  const mijn = await json(await rv('tafels', {}, a));
+  const rij = mijn.tafels.find(x => x.naam === 'Diner 04');
+  assert.ok(rij, 'de uitnodiging staat bij het lid');
+  assert.equal(rij.plaatsen, 8);
+  assert.ok(!JSON.stringify(mijn).includes(naamB), 'de medegast lekt niet naar het lid');
+
+  assert.equal((await json(await rv('tafel/antwoord', { id: rij.id, ja: true }, a))).mijnStatus, 'ja');
+  const na = await json(await raw('/office/rendezvous/tafels', {}, office));
+  assert.equal(na.tafels.find(x => x.naam === 'Diner 04').toegezegd, 1, 'het kantoor ziet de toezegging');
+});
+
+test('the table: een onbekende codenaam wordt gemeld, niet stil overgeslagen', async () => {
+  const a = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'bestaat' }, a);
+  const naamA = (await json(await rv('profiel', {}, a))).codenaam;
+  const office = await officeTok();
+  const r = await raw('/office/rendezvous/tafel/maak',
+    { naam: 'Diner 05', plaatsen: 4, genodigden: [naamA, 'Bestaat Niet'] }, office);
+  assert.equal(r.status, 400, 'een tafel van vier die er stiekem drie telt, komt er niet');
+  assert.match((await json(r)).error, /Bestaat Niet/);
+});
+
+test('the table: iemand erbij kan, maar niet voorbij het aantal plaatsen', async () => {
+  const office = await officeTok();
+  const leden = [];
+  for (let i = 0; i < 3; i++) {
+    const t = await lidMet('lifestyle');
+    await rv('profiel/zet', { aan: true, over: 'plek-' + i }, t);
+    leden.push((await json(await rv('profiel', {}, t))).codenaam);
+  }
+  const g = await json(await raw('/office/rendezvous/tafel/maak',
+    { naam: 'Diner 06', plaatsen: 2, genodigden: [leden[0], leden[1]] }, office));
+  const vol = await raw('/office/rendezvous/tafel/nodig', { id: g.tafel.id, codenaam: leden[2] }, office);
+  assert.equal(vol.status, 409, 'de tafel zit vol');
 });

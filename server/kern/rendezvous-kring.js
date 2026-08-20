@@ -67,25 +67,11 @@ module.exports = (ctx) => {
   const SOORTEN = ['moment', 'encounter'];
 
   function T() { const r = R(); if (!r.tafels || typeof r.tafels !== 'object') r.tafels = {}; return r.tafels; }
+  // de kantoorkant (samenstellen en overzicht) woont in ./rendezvous-tafels.js
+  const kantoor = require('./rendezvous-tafels')({ T, id, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')), schoon, nu, save, notify, codenaam });
   function I() { const r = R(); if (!r.introducties || typeof r.introducties !== 'object') r.introducties = {}; return r.introducties; }
 
   /* ---- The Table ---- */
-
-  // door RTG, niet door een lid. `genodigden` zijn sessiesleutels.
-  function tafelMaak(b) {
-    const naam = schoon(b.naam, 80);
-    if (!naam) return { status: 400, error: 'Geef de tafel een naam.' };
-    const plaatsen = Math.max(2, Math.min(12, parseInt(b.plaatsen, 10) || 8));
-    const t = { id: id(), naam, stad: schoon(b.stad, 40), datum: isDatum(b.datum) ? b.datum : '',
-      tijd: /^\d{2}:\d{2}$/.test(b.tijd || '') ? b.tijd : '', thema: schoon(b.thema, 120),
-      plaatsen, genodigden: {}, at: nu() };
-    for (const k of (Array.isArray(b.genodigden) ? b.genodigden : []).slice(0, plaatsen)) t.genodigden[k] = { status: 'open', at: nu() };
-    T()[t.id] = t; save();
-    for (const k of Object.keys(t.genodigden)) {
-      try { notify(k, { title: 'Rendez-vous', body: 'Een uitnodiging: ' + naam + (t.stad ? ', ' + t.stad : '') + '.', scope: 'lifestyle' }); } catch (e) {}
-    }
-    return { status: 200, ok: true, tafel: { ...t, genodigden: undefined, aantal: Object.keys(t.genodigden).length } };
-  }
 
   /* Wat een genodigde ziet. Nadrukkelijk zonder gastenlijst: `plaatsen` zegt hoe
      groot het gezelschap is en verder niets. Wie er nog meer komt, hoort u aan
@@ -188,7 +174,7 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, wacht: false, codenaam: codenaam(doel) };
   }
 
-  return { rvTafelMaak: tafelMaak, rvTafels: tafels, rvTafelAntwoord: tafelAntwoord,
+  return { ...kantoor, rvTafels: tafels, rvTafelAntwoord: tafelAntwoord,
     rvIntroducties: introducties, rvIntroAntwoord: introAntwoord, rvEncounter: encounter,
     rvIntroBied: introBied };
 };

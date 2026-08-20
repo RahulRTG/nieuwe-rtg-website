@@ -93,4 +93,4 @@
   });
 
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
-})();
+

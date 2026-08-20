@@ -31,7 +31,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const { CATALOGUS } = require('../server/lib/verraad');
 const { beoordeel, isStilVerlies, voldoetAanLat, financieelOordeel } = require('./lib/ketenproef');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
@@ -43,27 +43,17 @@ const UITSLAG = path.join(WORTEL, 'KETENS.json');
 const SEED = (process.argv.slice(2).find(a => a.startsWith('--seed=')) || '--seed=819226199').slice(7);
 const VERRADEN = CATALOGUS.filter(v => v.waar && v.waar.includes('db/index.js')).map(v => v.naam);
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer(); s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
+/* De gedeelde wegwerpserver (scripts/lib/wegwerpserver.js) met magSterven:
+   deze ronde saboteert de start bewust en wil WETEN dat de server stierf.
+   Een hangende start telt hier ook als dood -- dat was altijd al de
+   betekenis van deze uitslag. De datamap is van de aanroeper en wordt
+   dus niet door de lib opgeruimd. */
 async function start(datamap, extra) {
-  const poort = await vrijePoort();
-  const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
-      STUN_UIT: '1', RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra } });
-  const eind = Date.now() + 45000;
-  while (Date.now() < eind) {
-    if (kind.exitCode !== null) return { kind, basis, dood: true };
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return { kind, basis, dood: false }; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return { kind, basis, dood: true };
+  try {
+    const s = await wegwerp({ naam: 'keten', datamap, magSterven: true, wachtMs: 45000,
+      env: { RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra } });
+    return { kind: s.kind, basis: s.basis, dood: s.dood };
+  } catch (e) { return { kind: null, basis: '', dood: true }; }
 }
 const stop = (s) => { try { s.kind.kill('SIGKILL'); } catch (e) {} };
 const post = async (basis, pad, lijf, tok) => {

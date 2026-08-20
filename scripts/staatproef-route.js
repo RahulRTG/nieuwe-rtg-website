@@ -27,6 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
 const { draaiStaatproef, stapelRijen } = require('./lib/staatproef');
+const { maakPool } = require('./lib/objectpool');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
@@ -63,6 +64,11 @@ if (require.main !== module) { module.exports = {}; return; }
   const server = await start({ naam: 'staatproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
 
+  /* De objectpool oogst in de post-wikkel: elk geslaagd antwoord op DEZE
+     server draagt echte id's, en lijfVoor verrijkt er de volgende lijven mee
+     (scripts/lib/objectpool.js). Zo bereikt de proef ook de routes die een
+     bestaand object willen -- de grootste ongemeten groep. */
+  const pool = maakPool();
   const post = async (pad, lijf, tok) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
@@ -70,6 +76,7 @@ if (require.main !== module) { module.exports = {}; return; }
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
+      if (r.status >= 200 && r.status < 300 && data && typeof data === 'object') pool.leer(data, pad);
       return { status: r.status, data };
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
@@ -204,7 +211,7 @@ if (require.main !== module) { module.exports = {}; return; }
 
   const uit = await draaiStaatproef({ post, vingerafdruk, routes, tokenVoor: (r) => tokens[r],
     hernieuw: async (rol) => { try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {} return false; },
-    lijfVoor: (r) => plausibelLijf(r.pad), verschilVan, ruis, maxRoutes: MAX });
+    lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf, verschilVan, ruis, maxRoutes: MAX });
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }
 

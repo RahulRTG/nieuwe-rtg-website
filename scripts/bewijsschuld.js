@@ -70,7 +70,12 @@ const POSTEN = [
       const totaal = Object.values(om).reduce((a, b) => a + b, 0);
       const elders = (om['capability in de handler'] || 0) +
         (om['objectpoort: eerst een bestaand object'] || 0) +
-        (om['geen autorisatielaag, alleen een rem'] || 0);
+        (om['geen autorisatielaag, alleen een rem'] || 0) +
+        /* Benoemd sinds de laatste drie zijn nagelopen: twee routes waar de
+           schakelkast (functie uit) voor de poort antwoordt, en de meetpoort
+           waar de opstelling beslist. Besluiten van het huis, geen open slot. */
+        (om['functie staat uit: de schakelkast antwoordt voor de poort'] || 0) +
+        (om['omgeving beslist (meetpoort)'] || 0);
       return totaal - elders;
     },
     waarom: 'de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een ' +

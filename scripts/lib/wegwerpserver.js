@@ -55,7 +55,12 @@ async function wachtTotOp(basis, msMax) {
 async function start(opties) {
   const o = opties || {};
   const poort = await vrijePoort();
-  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-' + (o.naam || 'wegwerp') + '-'));
+  /* Een eigen datamap tenzij de aanroeper er een meegeeft: de ketenronde
+     herstart bewust op DEZELFDE map (knoeien met het zegel en kijken of de
+     herstart het merkt), en dan hoort de map ook niet door klaar() te worden
+     opgeruimd -- wie hem aanlevert, ruimt hem op. */
+  const eigenMap = !o.datamap;
+  const datamap = o.datamap || fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-' + (o.naam || 'wegwerp') + '-'));
   const basis = 'http://127.0.0.1:' + poort;
 
   const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
@@ -68,13 +73,28 @@ async function start(opties) {
 
   const klaar = () => {
     try { kind.kill('SIGKILL'); } catch (e) {}
-    try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {}
+    if (eigenMap) { try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} }
   };
   process.on('exit', klaar);
 
+  /* Sommige instrumenten saboteren de START bewust (ketenronde en
+     verraadronde geven een kapot zegel of een verraden seed mee) en willen
+     WETEN dat de server stierf in plaats van een uitzondering. Met
+     `magSterven: true` komt dat terug als { dood: true }; zonder blijft een
+     server die niet opkomt een fout, want dan is de meetopstelling stuk. */
+  if (o.magSterven) {
+    const eind = Date.now() + (o.wachtMs || 45000);
+    while (Date.now() < eind) {
+      if (kind.exitCode !== null) return { basis, poort, datamap, kind, klaar, dood: true };
+      try { const r = await fetch(basis + '/api/health'); if (r.ok) return { basis, poort, datamap, kind, klaar, dood: false }; } catch (e) {}
+      await new Promise(r => setTimeout(r, 200));
+    }
+    klaar();
+    throw new Error('de wegwerpserver kwam niet op en stierf ook niet binnen de wachttijd');
+  }
   const op = await wachtTotOp(basis, o.wachtMs || 90000);
   if (!op) { klaar(); throw new Error('de wegwerpserver kwam niet op binnen de wachttijd'); }
-  return { basis, poort, datamap, kind, klaar };
+  return { basis, poort, datamap, kind, klaar, dood: false };
 }
 
 module.exports = { start, vrijePoort, wachtTotOp, WORTEL };

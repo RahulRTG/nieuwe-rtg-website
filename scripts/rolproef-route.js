@@ -37,7 +37,8 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
-const { draaiRolproef } = require('./lib/rolproef');
+const { maakPool } = require('./lib/objectpool');
+const { draaiRolproef, plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, verdeelOpRol, meldZonderRol } = require('./lib/routes');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
@@ -75,6 +76,10 @@ if (require.main !== module) { module.exports = {}; return; }
   const server = await start({ naam: 'rolproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
 
+  /* De objectpool: oogsten in de wikkel, verrijken via lijfVoor. Een verkeerde
+     rol met een ECHT object-id bereikt de eigenaarschapsvraag zelf -- precies
+     de laag waar de kale lijven op 404 strandden. */
+  const pool = maakPool();
   const post = async (pad, lijf, tok) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
@@ -82,6 +87,7 @@ if (require.main !== module) { module.exports = {}; return; }
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
+      if (r.status >= 200 && r.status < 300 && data && typeof data === 'object') pool.leer(data, pad);
       return { status: r.status, data };
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
@@ -112,7 +118,18 @@ if (require.main !== module) { module.exports = {}; return; }
   meldZonderRol(verdeling);
   console.log('  begrenzing (pogingen in totaal)      : ' + MAX);
 
-  const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ member, supplier, office }), maxPogingen: MAX });
+  /* DE OOGSTGANG: een keer langs alle routes met de EIGEN rol, alleen om de
+     pool te vullen. De kruisronde daarna roept met verkeerde rollen en die
+     slagen (hopelijk) nooit -- zonder deze gang blijft de pool leeg en is
+     het verrijkte lijf een leeg gebaar. */
+  const eigenTokens = { member, supplier, office };
+  for (const r of routes) {
+    const tk = eigenTokens[r.rol];
+    if (tk) await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
+  }
+
+  const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ member, supplier, office }), maxPogingen: MAX,
+    lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf });
 
   if (uit.bevindingen.meterStuk) {
     console.error('\n  DE METER IS BLIND: ' + uit.bevindingen.meterStuk);

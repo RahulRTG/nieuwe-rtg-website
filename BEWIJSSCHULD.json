@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T09:33:54.008Z",
-  "commit": "12b71c7",
+  "op": "2026-08-20T09:52:59.273Z",
+  "commit": "6c6e966",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,8 +9,8 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 12,
-  "meetwerk": 113,
-  "instrument": 1131,
+  "meetwerk": 107,
+  "instrument": 817,
   "grens": 604
  },
  "posten": [
@@ -18,7 +18,7 @@
    "id": "auth-onbeslist",
    "soort": "meetwerk",
    "wat": "stille routes die onder geen enkele andere post op deze lijst vallen",
-   "aantal": 3,
+   "aantal": 0,
    "waarom": "de klop gaat zonder token. Een 400 of 404 betekent dat de validatie of een opzoeking eerder aan de beurt was dan de autorisatie, en zegt niets over een slot. Na een tweede klop met een plausibel lijf bleven deze routes hetzelfde antwoord geven.",
    "sluit": "per route nakijken wat er precies wordt gevraagd. Dit is geen instrumentvraag meer maar handwerk op een handvol routes, en dat is precies wat een schuldpost hoort te zijn als het gereedschap er is."
   },
@@ -90,7 +90,7 @@
    "id": "object-vooraf",
    "soort": "instrument",
    "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
-   "aantal": 1025,
+   "aantal": 711,
    "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
    "sluit": "per domein een keten van twee stappen, zoals scripts/lib/ketens die al kent: maak het object met de rol die het mag, bedien het daarna. Dat is per domein werk en geen generieke truc -- een id raden uit een ander domein levert dezelfde 404 op."
   },
@@ -106,7 +106,7 @@
    "id": "wegwerpserver-kopieen",
    "soort": "meetwerk",
    "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
-   "aantal": 7,
+   "aantal": 4,
    "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
    "sluit": "ze een voor een omzetten. Bewust niet in een keer: deze tien vullen de registers waar dit huis op leunt, en ze tegelijk verbouwen is precies de verandering die je niet in een keer moet doen."
   }

@@ -274,11 +274,20 @@ async function ronde() {
           ? bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: (r.bewakers && r.bewakers[m]) || [] })
           : null;
         if (bewaking) {
-          const k = bewaking.rol ? 'een rol, maar de invoer strandt eerder'
+          /* Een 503 op een route MET een rol is de schakelkast die antwoordt
+             voor de poort: de functie staat uit (bijv. dom-eigendomein, een
+             boardroom-schakelaar die standaard dicht is). Dat is een besluit
+             van het huis en geen open vraag over het slot -- en het hoort hier
+             met naam, anders leest het als achterstand. Zelfde voor de
+             meetpoort: daar beslist de opstelling, niet de bezoeker. */
+          const k = bewaking.rol
+            ? (a.status === 503 ? 'functie staat uit: de schakelkast antwoordt voor de poort'
+              : 'een rol, maar de invoer strandt eerder')
             : /geen bewakerslaag/.test(bewaking.reden) ? 'capability in de handler'
               : /objectpoort/.test(bewaking.reden) ? 'objectpoort: eerst een bestaand object'
                 : /geenBewaker/.test(bewaking.reden) ? 'geen autorisatielaag, alleen een rem'
-                  : 'anders';
+                  : /omgeving/.test(bewaking.reden) ? 'omgeving beslist (meetpoort)'
+                    : 'anders';
           uit.stilOmdat[k] = (uit.stilOmdat[k] || 0) + 1;
         }
         if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status,

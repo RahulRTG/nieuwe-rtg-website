@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-18T10:33:05.011Z",
-  "commit": "507c957",
+  "op": "2026-08-20T09:47:56.242Z",
+  "commit": "6c6e966",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -10,10 +10,16 @@
  "gemeten": {
   "kandidaten": 4104,
   "routes": 3255,
-  "bereikt": 790,
+  "bereikt": 826,
   "onbekend": 0,
-  "uitBoodschap": 1581,
-  "uitStatus": 1674
+  "uitBoodschap": 1644,
+  "uitStatus": 1611,
+  "pool": {
+   "domeinen": 44,
+   "velden": 539,
+   "herprobeerd": 1014,
+   "herwonnen": 393
+  }
  },
  "zonderRol": [
   {
@@ -78,7 +84,7 @@
    "id": "bereikt",
    "wat": "de handler heeft gedraaid",
    "nodig": "niets -- deze route is te bewijzen; als de schakel toch ongemeten is, ligt het aan de meter en niet aan de voorwaarde",
-   "aantal": 790,
+   "aantal": 826,
    "voorbeelden": [
     "POST /api/aanmelding/betalingen -- status 200",
     "POST /api/aanmelding/lijst -- status 200",
@@ -104,7 +110,7 @@
    "id": "object-ontbreekt",
    "wat": "de route wil een bestaand object bedienen en dat is er niet",
    "nodig": "eerst aanmaken, dan bedienen -- een keten van twee stappen zoals scripts/lib/ketens die kent",
-   "aantal": 1025,
+   "aantal": 711,
    "voorbeelden": [
     "POST /api/aandacht -- de route zegt: Zaak niet gevonden.",
     "POST /api/aanmelding/beslis -- de route zegt: Deze aanmelding bestaat niet.",
@@ -117,20 +123,20 @@
    "id": "veld-ontbreekt",
    "wat": "de validatie weigert het lijf voordat er iets gebeurt",
    "nodig": "de velden die DEZE route vraagt; plausibelLijf() is een grabbelton en geen contract",
-   "aantal": 237,
+   "aantal": 165,
    "voorbeelden": [
-    "POST /api/agenda/bereik -- status 400, en de boodschap (\"Kies een geldig datumvenster.\") valt in geen bekende vorm",
     "POST /api/ai -- status 400, en de boodschap (\"Geen vraag ontvangen.\") valt in geen bekende vorm",
-    "POST /api/avond/voorkeuren/zaak -- status 400, en de boodschap (\"Voor welke zaak?\") valt in geen bekende vorm",
-    "POST /api/avond/voorstel -- status 400, en de boodschap (\"Hoe laat wil je beginnen?\") valt in geen bekende vorm",
-    "POST /api/bedrijf/herkomst/open -- status 400, en de boodschap (\"Een herkomst hangt aan: ticket, taak.\") valt in geen bekende vorm"
+    "POST /api/bedrijf/herkomst/open -- status 400, en de boodschap (\"Een herkomst hangt aan: ticket, taak.\") valt in geen bekende vorm",
+    "POST /api/bedrijf/post/omzetten -- status 400, en de boodschap (\"Kies wat het wordt: taak, ticket, kans.\") valt in geen bekende vorm",
+    "POST /api/bieb/ai -- status 400, en de boodschap (\"Vertel eerst wat u zoekt of wilt leren.\") valt in geen bekende vorm",
+    "POST /api/clips/maak -- status 400, en de boodschap (\"Een clip duurt 1 tot 60 seconden.\") valt in geen bekende vorm"
    ]
   },
   {
    "id": "rol-te-laag",
    "wat": "de rol mag hier niet komen",
    "nodig": "de juiste rol, of de erkenning dat deze route voor de beproefde rollen niet bereikbaar is",
-   "aantal": 520,
+   "aantal": 521,
    "voorbeelden": [
     "POST /api/account/koppel -- status 403, en de boodschap (\"Maak eerst een (gratis) RTG-account; dat ene account is daarna uw sleutel tot alles.\") valt in geen bekende vorm",
     "POST /api/account/ontkoppel -- status 403, en de boodschap (\"Maak eerst een (gratis) RTG-account; dat ene account is daarna uw sleutel tot alles.\") valt in geen bekende vorm",
@@ -143,20 +149,20 @@
    "id": "geen-sessie",
    "wat": "er is geen geldige sessie voor deze rol",
    "nodig": "een token voor de rol die deze route bewaakt; vier eigenrollen hebben er nog geen",
-   "aantal": 339,
+   "aantal": 687,
    "voorbeelden": [
-    "POST /api/privacy/export -- de route zegt: Niet ingelogd.",
-    "POST /api/privacy/inzage -- de route zegt: Niet ingelogd.",
-    "POST /api/punten -- de route zegt: Niet ingelogd.",
-    "POST /api/punten/verzilver -- de route zegt: Niet ingelogd.",
-    "POST /api/push/subscribe -- de route zegt: Niet ingelogd."
+    "POST /api/agenda/antwoord -- de route zegt: Niet ingelogd.",
+    "POST /api/agenda/bereik -- de route zegt: Niet ingelogd.",
+    "POST /api/agenda/bewaar -- de route zegt: Niet ingelogd.",
+    "POST /api/agenda/uitnodig -- de route zegt: Niet ingelogd.",
+    "POST /api/agenda/wijzig -- de route zegt: Niet ingelogd."
    ]
   },
   {
    "id": "conflict",
    "wat": "de toestand staat de handeling nu niet toe",
    "nodig": "een beginstand waarin de handeling wel mag; vaak is dat de vorige stap van dezelfde keten",
-   "aantal": 146,
+   "aantal": 147,
    "voorbeelden": [
     "POST /api/command/stad/start -- status 409, en de boodschap (\"Zet eerst het landpakket van dat land aan. Een stad in een land dat niet is ingericht, is \") valt in geen bekende vorm",
     "POST /api/live/door -- status 409, en de boodschap (\"U bent niet onderweg.\") valt in geen bekende vorm",
@@ -273,21 +279,24 @@
   },
   "POST /api/agenda/antwoord": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Uitnodiging niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/agenda/bereik": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldig datumvenster.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/agenda/bewaar": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Afspraak niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/agenda/ics": {
    "rol": "member",
@@ -315,9 +324,10 @@
   },
   "POST /api/agenda/uitnodig": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Afspraak niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/agenda/verwijder": {
    "rol": "member",
@@ -327,9 +337,10 @@
   },
   "POST /api/agenda/wijzig": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Afspraak niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/ai": {
    "rol": "member",
@@ -417,21 +428,24 @@
   },
   "POST /api/avond": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze avond kennen we niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/avond/aanvragen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze avond kennen we niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/avond/koppel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze avond kennen we niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/avond/mijn": {
    "rol": "member",
@@ -459,15 +473,17 @@
   },
   "POST /api/avond/voorkeuren/zaak": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Voor welke zaak?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/avond/voorstel": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Hoe laat wil je beginnen?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/balans": {
    "rol": "member",
@@ -723,9 +739,10 @@
   },
   "POST /api/bestanden/herstel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dat bestand staat niet in de prullenbak.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/bestanden/leeg": {
    "rol": "member",
@@ -735,9 +752,10 @@
   },
   "POST /api/bestanden/map": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die map bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/bestanden/mijn": {
    "rol": "member",
@@ -759,15 +777,17 @@
   },
   "POST /api/bestanden/pdf/redigeer": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef op welke tekst eruit moet.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/bestanden/pdf/samenvoegen": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies minstens twee PDF-bestanden om samen te voegen.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/bestanden/pdf/splitsen": {
    "rol": "member",
@@ -777,15 +797,17 @@
   },
   "POST /api/bestanden/updeel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Die upload loopt niet (meer); begin opnieuw.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/bestanden/upklaar": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Die upload loopt niet (meer); begin opnieuw.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/bestanden/upload": {
    "rol": "member",
@@ -891,15 +913,17 @@
   },
   "POST /api/boeken/boek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dat boek staat niet in de huisbibliotheek.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/boeken/lees": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Welk boek lees je?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/boeken/voortgang": {
    "rol": "member",
@@ -963,33 +987,38 @@
   },
   "POST /api/care/annuleer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Boeking niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/betaal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Boeking niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/boek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Zorgaanbieder niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/intake/deel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Zorgaanbieder niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/intake/stop": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze deling is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/mijn": {
    "rol": "member",
@@ -999,15 +1028,17 @@
   },
   "POST /api/care/pakket/betaal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Pakketboeking niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/pakket/boek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit pakket bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/pakket/mijn": {
    "rol": "member",
@@ -1023,9 +1054,10 @@
   },
   "POST /api/care/vastleggen/deel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Zorgaanbieder niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/vastleggen/mijn": {
    "rol": "member",
@@ -1035,9 +1067,10 @@
   },
   "POST /api/care/vastleggen/stop": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze toestemming is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/wachtlijst": {
    "rol": "member",
@@ -1047,15 +1080,17 @@
   },
   "POST /api/care/wachtlijst/af": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"U staat daar niet (meer) op de lijst.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/care/wachtlijst/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Zorgaanbieder niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/charter/aanbod": {
    "rol": "member",
@@ -1065,21 +1100,24 @@
   },
   "POST /api/charter/boek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Geen charterpartner gevonden.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/charter/foto": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Charter niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/charter/locatie": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Charter niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/charter/mijn": {
    "rol": "member",
@@ -1089,9 +1127,10 @@
   },
   "POST /api/charter/sos": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Charter niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/chat/history": {
    "rol": "member",
@@ -1185,21 +1224,24 @@
   },
   "POST /api/comm/begin": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Met wie?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/concept": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/gesprek": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/inbox": {
    "rol": "member",
@@ -1209,51 +1251,59 @@
   },
   "POST /api/comm/lees": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/por": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/reactie": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/stuur": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/typt": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/vlag": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende vlag."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/wijzig": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/wis": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit gesprek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/comm/zoek": {
    "rol": "member",
@@ -1293,9 +1343,10 @@
   },
   "POST /api/command/alarm/stil": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dat alarm staat er niet.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/command/apipoort": {
    "rol": "office",
@@ -1349,13 +1400,13 @@
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-lzgu4b"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-k05i1l"
   },
   "POST /api/command/beleid/zet": {
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-5ck2cw"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-i7n1ik"
   },
   "POST /api/command/canary": {
    "rol": "office",
@@ -1379,7 +1430,7 @@
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende functie: proef-1twi1q"
+   "omdat": "de route zegt: Onbekende functie: proef-gh9ppr"
   },
   "POST /api/command/canary/terug": {
    "rol": "office",
@@ -1497,9 +1548,10 @@
   },
   "POST /api/command/operator/uitvoeren": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat plan bestaat niet (meer)."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/command/overname": {
    "rol": "office",
@@ -1583,7 +1635,7 @@
    "rol": "office",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat runbook bestaat niet: proef-m8ogw7"
+   "omdat": "de route zegt: Dat runbook bestaat niet: proef-npm107"
   },
   "POST /api/command/runbooks": {
    "rol": "office",
@@ -1923,9 +1975,10 @@
   },
   "POST /api/concern/opname/herstel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze momentopname bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/concern/opname/maak": {
    "rol": "member",
@@ -1995,15 +2048,17 @@
   },
   "POST /api/concern/uitnodiging/accepteer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitnodiging kennen we niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/concern/uitnodiging/intrek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitnodiging bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/concern/uitnodigingen": {
    "rol": "member",
@@ -2259,9 +2314,10 @@
   },
   "POST /api/foodcourt/tijden": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Restaurant niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/galerij/album": {
    "rol": "member",
@@ -2451,15 +2507,17 @@
   },
   "POST /api/gemeente/afspraak": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een balieproduct.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemeente/afspraak/annuleer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Afspraak niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemeente/afspraken": {
    "rol": "supplier",
@@ -2493,9 +2551,10 @@
   },
   "POST /api/gemeente/belasting/betaal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Aanslag niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemeente/belasting/mijn": {
    "rol": "member",
@@ -2511,15 +2570,17 @@
   },
   "POST /api/gemeente/burgerzaken/slots": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een balieproduct.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemeente/grofvuil": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Omschrijf wat er opgehaald moet worden.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemeente/meld": {
    "rol": "member",
@@ -2559,9 +2620,10 @@
   },
   "POST /api/gemeente/vergunning": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldige vergunningsoort.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemeente/vergunning/beslis": {
    "rol": "supplier",
@@ -2583,9 +2645,10 @@
   },
   "POST /api/gemeente/verhuizing": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "de route zegt: Vul je nieuwe adres in."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemoed": {
    "rol": "member",
@@ -2595,27 +2658,31 @@
   },
   "POST /api/gemoed/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Voor die dag staat er niets.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/gemoed/zet": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies hoe u erbij zit.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/afgelast": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/agenda": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/ai/aankondiging": {
    "rol": "member",
@@ -2637,39 +2704,45 @@
   },
   "POST /api/genootschap/antwoord": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/bijgepraat": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/binnen": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/eruit": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/gezien": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/gezondheid": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/mijn": {
    "rol": "member",
@@ -2685,51 +2758,59 @@
   },
   "POST /api/genootschap/mijn-uitvoer": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/nodig-uit": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/pas-aan": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/prik": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/prik-weg": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/prikbord": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/reactie-weg": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/reageer": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/richt-op": {
    "rol": "member",
@@ -2739,33 +2820,38 @@
   },
   "POST /api/genootschap/roep-bijeen": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/rol": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/stem": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/uitvoer": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/vertrek": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit genootschap bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/genootschap/zoek": {
    "rol": "member",
@@ -2817,15 +2903,17 @@
   },
   "POST /api/groothandel/annuleer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bestelling niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/groothandel/bestel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Groothandel niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/groothandel/markt": {
    "rol": "member",
@@ -2853,15 +2941,17 @@
   },
   "POST /api/home/merk/ontkoppel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit merk is niet verbonden.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/home/merk/verbind": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit merk is (nog) niet aangesloten op de Home Kit.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/home/merken": {
    "rol": "member",
@@ -2871,27 +2961,31 @@
   },
   "POST /api/home/scene/ai": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Vertel eerst wat voor moment het moet worden (bijv. filmavond).\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/home/scene/bewaar": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Een scene heeft minstens een apparaatstand nodig.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/home/scene/start": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze scene bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/home/scene/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze scene bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/home/zet": {
    "rol": "member",
@@ -2979,9 +3073,10 @@
   },
   "POST /api/instant-reality/event": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende gebeurtenis."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/instant-reality/partner": {
    "rol": "member",
@@ -2997,39 +3092,45 @@
   },
   "POST /api/kantoorpakket/aanwezig": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/ai": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/beheer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/bewaar": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/deel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/fase": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/maak": {
    "rol": "member",
@@ -3045,57 +3146,66 @@
   },
   "POST /api/kantoorpakket/open": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/opmerking": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/samen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/ster": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/terug": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/uitslag": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Formulier niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/versies": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/vul": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Formulier niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/kantoorpakket/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Document niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/klets": {
    "rol": "member",
@@ -3255,9 +3365,10 @@
   },
   "POST /api/lab2/app/lijst": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/app/maak": {
    "rol": "office",
@@ -3393,9 +3504,10 @@
   },
   "POST /api/lab2/impact": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/kader": {
    "rol": "office",
@@ -3405,15 +3517,17 @@
   },
   "POST /api/lab2/lab/audit": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/lab/budget": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/lab/maak": {
    "rol": "office",
@@ -3423,21 +3537,24 @@
   },
   "POST /api/lab2/lab/partner": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/lab/tekenaar": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Kies een geldige rol.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/lab2/lab/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/labs": {
    "rol": "office",
@@ -3465,15 +3582,17 @@
   },
   "POST /api/lab2/opbrengst": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/overzicht": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/plan/advies": {
    "rol": "office",
@@ -3549,9 +3668,10 @@
   },
   "POST /api/lab2/themas": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/uit/maak": {
    "rol": "office",
@@ -3567,9 +3687,10 @@
   },
   "POST /api/lab2/uit/pijplijn": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/uit/status": {
    "rol": "office",
@@ -3585,9 +3706,10 @@
   },
   "POST /api/lab2/werk/agenda": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit lab bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/lab2/werk/besluit": {
    "rol": "office",
@@ -3621,9 +3743,10 @@
   },
   "POST /api/labfonds/beslis": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit voorstel bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/labfonds/boardroom": {
    "rol": "office",
@@ -3633,9 +3756,10 @@
   },
   "POST /api/labfonds/doneer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze locatie bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/labfonds/locatie/maak": {
    "rol": "member",
@@ -3651,21 +3775,24 @@
   },
   "POST /api/labfonds/scheidsrechter": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit voorstel bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/labfonds/stem": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit voorstel bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/labfonds/voorstel/maak": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze locatie bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/leerstof/antwoord": {
    "rol": "member",
@@ -3705,21 +3832,24 @@
   },
   "POST /api/leven/band/bevestig": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit verzoek bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/leven/band/verbreek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze band bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/leven/band/vraag": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Die codenaam kennen wij niet. Vraag hem nog eens na.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/leven/beeindigd": {
    "rol": "member",
@@ -3747,15 +3877,17 @@
   },
   "POST /api/leven/deel/in": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze deling bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/leven/deel/zet": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dat kunt u niet delen. Wel: lijn, talenten, interesses, bijdrage, diplomas, talen, afsprak\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/leven/kring": {
    "rol": "member",
@@ -3963,21 +4095,24 @@
   },
   "POST /api/mall/aanvraag": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Schrijf kort wat u zoekt.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/aanvraag/kies": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Aanvraag niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/aanvraag/sluit": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Aanvraag niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/aanvragen/mijn": {
    "rol": "member",
@@ -3999,9 +4134,10 @@
   },
   "POST /api/mall/apps/installeer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze app bestaat niet in de bibliotheek."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/apps/mijn": {
    "rol": "member",
@@ -4011,15 +4147,17 @@
   },
   "POST /api/mall/apps/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze app staat niet op je startscherm.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/bestel": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldig product.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/bestellingen": {
    "rol": "member",
@@ -4029,9 +4167,10 @@
   },
   "POST /api/mall/bewaar": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit aanbod bestaat niet (meer) in de Mall."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/bewaard": {
    "rol": "member",
@@ -4041,9 +4180,10 @@
   },
   "POST /api/mall/collectie": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze collectie bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/collecties": {
    "rol": "member",
@@ -4053,9 +4193,10 @@
   },
   "POST /api/mall/concierge": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Stel uw vraag in een korte zin.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/eigen": {
    "rol": "member",
@@ -4071,21 +4212,24 @@
   },
   "POST /api/mall/land": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Boerderij niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/land-bestel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Boerderij niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/lijst": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Lijst niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/lijst/nieuw": {
    "rol": "member",
@@ -4095,27 +4239,31 @@
   },
   "POST /api/mall/lijst/regel-weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Lijst niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/lijst/voegtoe": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Lijst niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/lijst/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Lijst niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/lijst/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Lijst niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/lijsten": {
    "rol": "member",
@@ -4143,15 +4291,17 @@
   },
   "POST /api/mall/reis/installeer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze reisgids bestaat niet in de bibliotheek."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/reis/lees": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze reisgids bestaat niet in de bibliotheek."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/reis/mijn": {
    "rol": "member",
@@ -4161,9 +4311,10 @@
   },
   "POST /api/mall/reis/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze gids staat niet bij uw reisgidsen.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/rtf": {
    "rol": "member",
@@ -4179,9 +4330,10 @@
   },
   "POST /api/mall/rtf/installeer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze app bestaat niet in de bibliotheek."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/rtf/mijn": {
    "rol": "member",
@@ -4191,9 +4343,10 @@
   },
   "POST /api/mall/rtf/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze app staat niet bij jouw apps.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mall/wijzigingen": {
    "rol": "member",
@@ -4215,9 +4368,10 @@
   },
   "POST /api/mediaos/bewaar": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dit is geen geldig stuk-id.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/bieb": {
    "rol": "member",
@@ -4233,15 +4387,17 @@
   },
   "POST /api/mediaos/lijst": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/lijst/deel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/lijst/maak": {
    "rol": "member",
@@ -4251,15 +4407,17 @@
   },
   "POST /api/mediaos/lijst/stuk": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/lijst/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/lijsten": {
    "rol": "member",
@@ -4269,21 +4427,24 @@
   },
   "POST /api/mediaos/maker": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze maker bestaat niet (of heeft een andere codenaam)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/meldingen": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Zeg erbij om welke maker het gaat.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/samen/in": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze luisterkamer bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/samen/mijn": {
    "rol": "member",
@@ -4293,9 +4454,10 @@
   },
   "POST /api/mediaos/samen/nodig": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze luisterkamer bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/samen/start": {
    "rol": "member",
@@ -4311,9 +4473,10 @@
   },
   "POST /api/mediaos/samen/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze luisterkamer bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/smaak": {
    "rol": "member",
@@ -4323,21 +4486,24 @@
   },
   "POST /api/mediaos/stuk": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dit is geen geldig stuk-id.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/stuur": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies: meer, minder, nooit, verras of reset.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/volg": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Zeg erbij wie u wilt volgen.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mediaos/wereld": {
    "rol": "member",
@@ -4377,9 +4543,10 @@
   },
   "POST /api/meet/kom": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die kamercode bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/meet/maak": {
    "rol": "member",
@@ -4395,9 +4562,10 @@
   },
   "POST /api/meet/sein": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die kamer bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/meet/verlaat": {
    "rol": "member",
@@ -4407,9 +4575,10 @@
   },
   "POST /api/meet/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die kamer bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/meldingen/voorkeur": {
    "rol": "member",
@@ -4425,21 +4594,24 @@
   },
   "POST /api/member/apply": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Partner niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/apply/chat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Chat niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/apply/chat/send": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Chat niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/apply/chats": {
    "rol": "member",
@@ -4479,9 +4651,10 @@
   },
   "POST /api/member/berichten/vlag": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende vlag."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/berichten/zoek": {
    "rol": "member",
@@ -4491,9 +4664,10 @@
   },
   "POST /api/member/block": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "de route zegt: Ongeldig."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/boardroom": {
    "rol": "member",
@@ -4515,15 +4689,17 @@
   },
   "POST /api/member/boardroom/zet": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende functie."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/boardroom/zetveel": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef een set functies mee.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/bord": {
    "rol": "member",
@@ -4947,15 +5123,17 @@
   },
   "POST /api/member/connect": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze codenaam kennen we niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/connect/respond": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Geen openstaand verzoek van deze codenaam.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/connections": {
    "rol": "member",
@@ -4977,15 +5155,17 @@
   },
   "POST /api/member/doe": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef een geldig API-pad (begint met /api/, zonder query).\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/doe/bevestig": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit voorstel bestaat niet meer of is verlopen."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/doe/kaart": {
    "rol": "member",
@@ -5037,9 +5217,10 @@
   },
   "POST /api/member/leren/herhaal-antwoord": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/herhaal-stand": {
    "rol": "member",
@@ -5049,27 +5230,31 @@
   },
   "POST /api/member/leren/lijst-ai": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Zeg waarover de lijst moet gaan.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/lijst-haal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/lijst-maak": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Een lijst heeft minstens twee vraag-antwoordparen nodig.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/lijst-weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/lijsten": {
    "rol": "member",
@@ -5079,27 +5264,31 @@
   },
   "POST /api/member/leren/notitie": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit project bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/overhoor-klaar": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze lijst is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/project-ai": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit project bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/project-antwoord": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitnodiging is er niet meer."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/project-maak": {
    "rol": "member",
@@ -5109,21 +5298,24 @@
   },
   "POST /api/member/leren/project-staat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit project bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/project-uitnodig": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit project bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/project-weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Alleen wie het project startte kan het opruimen.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/projecten": {
    "rol": "member",
@@ -5139,9 +5331,10 @@
   },
   "POST /api/member/leren/schrijf-feedback": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Schrijf eerst een stukje; dan lees ik mee.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/schrijf-opdracht": {
    "rol": "member",
@@ -5157,27 +5350,31 @@
   },
   "POST /api/member/leren/sessie-antwoord": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitnodiging is er niet meer."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/sessie-staat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze leersessie bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/sessie-start": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Kies eerst een van je eigen lijsten.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/sessie-zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze leersessie bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/sessies": {
    "rol": "member",
@@ -5187,15 +5384,17 @@
   },
   "POST /api/member/leren/taak-maak": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit project bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/leren/taak-zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit project bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/lifestyle/ai": {
    "rol": "member",
@@ -5301,33 +5500,38 @@
   },
   "POST /api/member/magnaat/controle/taak/maak": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit codecontrolepunt bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/controle/taak/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze controletaak bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/controle/zelftest": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit codecontrolepunt bestaat niet meer in de actuele scan."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/controle/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit codecontrolepunt bestaat niet meer in de actuele scan."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/economie/analyse": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een economische hypothese.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/economie/beslis": {
    "rol": "member",
@@ -5337,21 +5541,24 @@
   },
   "POST /api/member/magnaat/economie/schok": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een bestaand economisch scenario.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/economie/volgende-dag": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Een unieke commandosleutel is nodig om dubbel verwerken te voorkomen.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/kantoor/kies": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze RTG-werkruimte staat niet in de actuele codescan.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/overzicht": {
    "rol": "member",
@@ -5361,87 +5568,101 @@
   },
   "POST /api/member/magnaat/partner/stap": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze training bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/partner/start": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit officiële partnerbedrijf staat niet in de Magnaat-wereld.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/taak/actie": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit dossier bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/taak/antwoord": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze opdracht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/taak/handeling": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze opdracht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/taak/start": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze RTG-functie staat niet in de spelbrug.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/teamkamer/actie": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze teamkamer bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/teamkamer/bedien": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze teamkamer bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/teamkamer/deelnemen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze toegangscode is niet geldig of de teamkamer is al gestart.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/teamkamer/maak": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Kies een gepubliceerd officieel partnerbedrijf.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/teamkamer/mijn": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze teamkamer bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/teamkamer/rol": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze teamkamer bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/teamkamer/start": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze teamkamer bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/magnaat/werkproces/start": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit volledige werkproces bestaat nog niet.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/naam/lijst": {
    "rol": "member",
@@ -5469,21 +5690,24 @@
   },
   "POST /api/member/nieuws/ai": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit artikel is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/nieuws/artikel": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit artikel is er niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/bewaar": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/bewaard": {
    "rol": "member",
@@ -5493,9 +5717,10 @@
   },
   "POST /api/member/pulse/bewerk": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/feed": {
    "rol": "member",
@@ -5505,15 +5730,17 @@
   },
   "POST /api/member/pulse/like": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/meld": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/post": {
    "rol": "member",
@@ -5529,21 +5756,24 @@
   },
   "POST /api/member/pulse/reactie": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/versies": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/volg": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Die codenaam kun je niet volgen.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/pulse/weg": {
    "rol": "member",
@@ -6009,9 +6239,10 @@
   },
   "POST /api/member/report": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Wie wil je melden?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/adres": {
    "rol": "member",
@@ -6021,9 +6252,10 @@
   },
   "POST /api/member/rtmail/afwezig": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dat is geen tijdstip.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/alias": {
    "rol": "member",
@@ -6033,9 +6265,10 @@
   },
   "POST /api/member/rtmail/antwoord": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/assist": {
    "rol": "member",
@@ -6057,45 +6290,52 @@
   },
   "POST /api/member/rtmail/bewaring": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Een juridische bewaring zetten of opheffen kan niet zonder reden.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/bijlage": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die bijlage bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/bijlagen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/classificeer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Factuur niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/concept/bewaar": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit concept bestaat niet in dit postvak."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/concept/verstuur": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit concept bestaat niet in dit postvak."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/concept/weg": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit concept bestaat niet in dit postvak."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/concepten": {
    "rol": "member",
@@ -6105,9 +6345,10 @@
   },
   "POST /api/member/rtmail/delegatie/weg": {
    "rol": "member",
-   "status": 403,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die delegatie bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/delegeer": {
    "rol": "member",
@@ -6123,15 +6364,17 @@
   },
   "POST /api/member/rtmail/draad": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/etiket": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/export": {
    "rol": "member",
@@ -6153,15 +6396,17 @@
   },
   "POST /api/member/rtmail/hulp": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/imap/intrekken": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die sleutel bestaat niet op dit postvak."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/imap/sleutel": {
    "rol": "member",
@@ -6195,15 +6440,17 @@
   },
   "POST /api/member/rtmail/lees": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit bericht staat niet in dit postvak.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/opruimen": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Hiervoor is een reden nodig; die wordt vastgelegd in het journaal.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/rechten": {
    "rol": "member",
@@ -6213,21 +6460,24 @@
   },
   "POST /api/member/rtmail/regel/maak": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Waarop moet deze regel letten? Kies uit: van, onderwerp, tekst, soort.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/regel/weg": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze regel bestaat niet in dit postvak."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/regel/zet": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze regel bestaat niet in dit postvak."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/regels": {
    "rol": "member",
@@ -6237,51 +6487,59 @@
   },
   "POST /api/member/rtmail/sluimer": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/ster": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/af": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/bevestiging": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/dossier": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/hef": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/koppel": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/lid": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Wie wil je erbij?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/maak": {
    "rol": "member",
@@ -6297,51 +6555,59 @@
   },
   "POST /api/member/rtmail/team/notitie": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/overzicht": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/pak": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/postvak": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/prioriteit": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/status": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/stuur": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/team/verlaat": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/vak": {
    "rol": "member",
@@ -6357,21 +6623,24 @@
   },
   "POST /api/member/rtmail/verplaats": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bericht bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/workflow": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/rtmail/zoek": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Waar zoekt u naar?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/snap/opdracht": {
    "rol": "member",
@@ -6387,9 +6656,10 @@
   },
   "POST /api/member/snap/view": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze snap is er niet meer."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/snaps": {
    "rol": "member",
@@ -6399,45 +6669,52 @@
   },
   "POST /api/member/spel/antwoord": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitnodiging is er niet meer."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/arcade-bord": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend arcadespel."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/arcade-score": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend arcadespel."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/dag": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dit spel heeft geen dagopgave.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/dag-klaar": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dit spel heeft geen dagopgave.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/dag-start": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Dit spel heeft geen dagopgave.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/kijk": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/klasgenoten": {
    "rol": "member",
@@ -6453,21 +6730,24 @@
   },
   "POST /api/member/spel/nabespreking": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Van deze partij is geen verloop (meer).\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/naspelen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Van deze partij is geen verloop (meer).\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/nieuw": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend spel."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/online": {
    "rol": "member",
@@ -6477,21 +6757,24 @@
   },
   "POST /api/member/spel/opgeven": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/praat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/praat-stuur": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/prestaties": {
    "rol": "member",
@@ -6501,33 +6784,38 @@
   },
   "POST /api/member/spel/projectie-open": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/projectie-sluit": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/rahul": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/random": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend spel."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/replay": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Van deze partij is geen verloop (meer).\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/sneek-bord": {
    "rol": "member",
@@ -6543,9 +6831,10 @@
   },
   "POST /api/member/spel/staat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/stand": {
    "rol": "member",
@@ -6567,9 +6856,10 @@
   },
   "POST /api/member/spel/team-antwoord": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Er ligt geen uitnodiging voor je klaar.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/team-mijn": {
    "rol": "member",
@@ -6585,21 +6875,24 @@
   },
   "POST /api/member/spel/team-nodig": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/team-verlaat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit team bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/toernooi-antwoord": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitnodiging is er niet meer."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/toernooi-mijn": {
    "rol": "member",
@@ -6609,21 +6902,24 @@
   },
   "POST /api/member/spel/toernooi-nieuw": {
    "rol": "member",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend spel."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/toernooi-staat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit toernooi bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/toewijzen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/uitslagen": {
    "rol": "member",
@@ -6639,9 +6935,10 @@
   },
   "POST /api/member/spel/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit potje bestaat niet (meer)."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/spel/zichtbaar": {
    "rol": "member",
@@ -6675,9 +6972,10 @@
   },
   "POST /api/member/sport/sponsor": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Pakket niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/sport/sponsors": {
    "rol": "member",
@@ -6693,9 +6991,10 @@
   },
   "POST /api/member/sport/ticket/koop": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Wedstrijd niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/sport/tickets": {
    "rol": "member",
@@ -6711,15 +7010,17 @@
   },
   "POST /api/member/story/post": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een foto (max ~900 kB).\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/story/view": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit verhaal is er niet meer."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/taal": {
    "rol": "member",
@@ -6729,9 +7030,10 @@
   },
   "POST /api/member/taal/zet": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een actieve taal; de Boardroom bepaalt welke wereldtalen aanstaan.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/unblock": {
    "rol": "member",
@@ -6747,9 +7049,10 @@
   },
   "POST /api/member/vluchten/boek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Vlucht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/vluchten/bord": {
    "rol": "member",
@@ -6759,15 +7062,17 @@
   },
   "POST /api/member/vluchten/charter": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een privejet of een helikopter.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/vluchten/incheck": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Boeking niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/member/vluchten/mijn": {
    "rol": "member",
@@ -6969,15 +7274,17 @@
   },
   "POST /api/mob/abo/aanbod": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende OV-vervoerder."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/abo/koop": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende OV-vervoerder."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/abo/mijn": {
    "rol": "member",
@@ -6987,33 +7294,38 @@
   },
   "POST /api/mob/annuleer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Opdracht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/beleid": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef de code van uw werkgever op.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/favoriet": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef een vertrekpunt en een bestemming op.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/kaart/aanbod": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende OV-vervoerder."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/kaart/koop": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een product: enkel, retour, dagkaart, zitplaats\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/kaart/mijn": {
    "rol": "member",
@@ -7029,15 +7341,17 @@
   },
   "POST /api/mob/pendel": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef de code van uw werkgever op.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/pendel/reserveer": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef de code van uw werkgever op.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/plekken": {
    "rol": "member",
@@ -7047,15 +7361,17 @@
   },
   "POST /api/mob/reis/annuleer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Reis niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/reis/boek": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Vertrekpunt: Geef een vertrekpunt en een bestemming op.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/reis/mijn": {
    "rol": "member",
@@ -7065,21 +7381,24 @@
   },
   "POST /api/mob/reis/plan": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Vertrekpunt: Geef een vertrekpunt en een bestemming op.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/volg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Opdracht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mob/vraag": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Vertrekpunt: Geef een vertrekpunt en een bestemming op.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/mode/bezorg/aanvraag": {
    "rol": "member",
@@ -7107,9 +7426,10 @@
   },
   "POST /api/muziek/bewaar": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/maak": {
    "rol": "member",
@@ -7125,9 +7445,10 @@
   },
   "POST /api/muziek/open": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/rahul": {
    "rol": "member",
@@ -7137,51 +7458,59 @@
   },
   "POST /api/muziek/samen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/samen/eruit": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/samen/nodig": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Wie wilt u erbij?\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/samen/rol": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/samen/verlaat": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/uitgave": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitgave bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/uitgave/in": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitgave bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/uitgave/mooi": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitgave bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/uitgave/reacties": {
    "rol": "member",
@@ -7191,15 +7520,17 @@
   },
   "POST /api/muziek/uitgave/reageer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitgave bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/uitgave/rtg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze uitgave bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/uitgave/van": {
    "rol": "member",
@@ -7209,15 +7540,17 @@
   },
   "POST /api/muziek/uitgeven": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/weg": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit stuk bestaat niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/muziek/zaal": {
    "rol": "member",
@@ -7330,14 +7663,16 @@
   "POST /api/office/afdelingshotel/boek": {
    "rol": "office",
    "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende afdeling."
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Kies een geldige periode (van voor tot).\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/afdelingshotel/zet": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze afdeling heeft nog geen hotel.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/aidata": {
    "rol": "office",
@@ -7377,9 +7712,10 @@
   },
   "POST /api/office/architect/portfolio": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Geen project met concepten gevonden.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/architect/project": {
    "rol": "office",
@@ -7779,9 +8115,10 @@
   },
   "POST /api/office/dienst/in": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/dienst/uit": {
    "rol": "office",
@@ -7845,9 +8182,10 @@
   },
   "POST /api/office/hardware/productblad": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Geen serie met concepten gevonden.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/hardware/serie": {
    "rol": "office",
@@ -7941,21 +8279,24 @@
   },
   "POST /api/office/inzage": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 403,
+   "soort": "rol-te-laag",
+   "omdat": "status 403, en de boodschap (\"Deze kamer heeft geen inzage in de identiteitskluis. Alleen kamers die klanten bij naam mo\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/kachat": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kachat/stuur": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/kamer": {
    "rol": "office",
@@ -8193,9 +8534,10 @@
   },
   "POST /api/office/merk/uitrol": {
    "rol": "office",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Zet eerst een hoofdontwerp voor dit merk.\") valt in geen bekende vorm"
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "de route zegt: Merk niet gevonden.",
+   "metPool": true
   },
   "POST /api/office/merk/vestiging": {
    "rol": "office",
@@ -8217,9 +8559,10 @@
   },
   "POST /api/office/mob/overeenkomst": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Overeenkomst niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/mob/proef": {
    "rol": "office",
@@ -8253,9 +8596,10 @@
   },
   "POST /api/office/onboarding": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/office/ondernemersregie": {
    "rol": "office",
@@ -8841,9 +9185,10 @@
   },
   "POST /api/office/stad/regime": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend domein."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Kies een regime: vrij, gedoseerd, streng.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/office/stad/scenario": {
    "rol": "office",
@@ -9867,21 +10212,24 @@
   },
   "POST /api/onderwijs/doel": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef een geldig leerdoel-id.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/onderwijs/inschrijf": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Die fase staat niet op de ladder.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/onderwijs/jaar-over": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Schrijf eerst in op een fase.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/onderwijs/ladder": {
    "rol": "member",
@@ -9975,9 +10323,10 @@
   },
   "POST /api/ov/hier": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "de route zegt: Geen geldige plek."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/ov/kaart": {
    "rol": "member",
@@ -10041,9 +10390,10 @@
   },
   "POST /api/overheid/aangifte": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "de route zegt: Vul je bruto jaarinkomen in."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/aangifte/advies": {
    "rol": "member",
@@ -10053,9 +10403,10 @@
   },
   "POST /api/overheid/aanslag/betaal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Aanslag niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/aanslagen/mijn": {
    "rol": "member",
@@ -10197,9 +10548,10 @@
   },
   "POST /api/overheid/bericht/gelezen": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bericht niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/berichten": {
    "rol": "member",
@@ -10209,15 +10561,17 @@
   },
   "POST /api/overheid/beroep": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Bezwaar niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/bezwaar": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "de route zegt: Vul in waartegen je bezwaar maakt en waarom."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/bezwaar/beslis": {
    "rol": "supplier",
@@ -10419,9 +10773,10 @@
   },
   "POST /api/overheid/rdw/check": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "de route zegt: Vul een geldig kenteken in."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/regie": {
    "rol": "supplier",
@@ -10443,15 +10798,17 @@
   },
   "POST /api/overheid/stem": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldige optie.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/subsidie": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldige subsidieregeling.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/subsidie/beslis": {
    "rol": "supplier",
@@ -10479,9 +10836,10 @@
   },
   "POST /api/overheid/toeslag": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldige toeslag.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/toeslag/beslis": {
    "rol": "supplier",
@@ -10527,9 +10885,10 @@
   },
   "POST /api/overheid/uitkering": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een geldige regeling.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/uitkering/beslis": {
    "rol": "supplier",
@@ -10563,15 +10922,17 @@
   },
   "POST /api/overheid/voertuig/meld": {
    "rol": "member",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "de route zegt: Vul een geldig kenteken in."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/voertuig/schors": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Voertuig niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/voertuigen": {
    "rol": "member",
@@ -10605,9 +10966,10 @@
   },
   "POST /api/overheid/waterschap/betaal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Aanslag niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/overheid/waterschap/mijn": {
    "rol": "member",
@@ -10623,15 +10985,17 @@
   },
   "POST /api/pakket/advies": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekend bedrijfstype."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pakket/koop": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit pakket is niet (meer) beschikbaar.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pakket/typen": {
    "rol": "member",
@@ -10677,9 +11041,10 @@
   },
   "POST /api/pay": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Factuur niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pay/kascode": {
    "rol": "member",
@@ -10701,21 +11066,24 @@
   },
   "POST /api/pay/saldo": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Factuur niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pay/stuur": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die codenaam kennen we niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pay/tik": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Deze tik is niet (meer) geldig; laat je vriend opnieuw op ontvangen zetten.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pay/tikcode": {
    "rol": "member",
@@ -10731,15 +11099,17 @@
   },
   "POST /api/pay/verzoek": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Codenaam PROEF kennen we niet."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pay/verzoek/betaal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Dit verzoek staat niet voor jou open.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/pay/verzoek/intrek": {
    "rol": "member",
@@ -10773,9 +11143,10 @@
   },
   "POST /api/podium/abonneer": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Kanaal niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/blokkeer": {
    "rol": "member",
@@ -10785,9 +11156,10 @@
   },
   "POST /api/podium/cadeau": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Kanaal niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/chat": {
    "rol": "member",
@@ -10797,9 +11169,10 @@
   },
   "POST /api/podium/kaartje": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Kanaal niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/kanaal/aanmeld": {
    "rol": "member",
@@ -10809,9 +11182,10 @@
   },
   "POST /api/podium/kanaal/zet": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"U heeft nog geen kanaal.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/kanalen": {
    "rol": "member",
@@ -10821,27 +11195,31 @@
   },
   "POST /api/podium/kijk": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Kanaal niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/koop": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Kanaal niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/live": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"U heeft nog geen kanaal.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/meld": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Kanaal niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/mijn": {
    "rol": "member",
@@ -10857,15 +11235,17 @@
   },
   "POST /api/podium/signaal": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Kanaal niet gevonden."
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/waar": {
    "rol": "member",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"U heeft nog geen kanaal.\") valt in geen bekende vorm"
+   "status": 401,
+   "soort": "geen-sessie",
+   "omdat": "de route zegt: Niet ingelogd.",
+   "metPool": true
   },
   "POST /api/podium/weg": {
    "rol": "member",
@@ -11361,21 +11741,24 @@
   },
   "POST /api/rtfkantoor/kamer": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/rtfkantoor/kamer/advies": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/rtfkantoor/kamer/taak": {
    "rol": "office",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze kamer bestaat niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/rtfkantoor/kamer/taak-zet": {
    "rol": "office",
@@ -13365,9 +13748,10 @@
   },
   "POST /api/supplier/agenda/wijzig": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Afspraak niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/agent": {
    "rol": "supplier",
@@ -13551,9 +13935,10 @@
   },
   "POST /api/supplier/betaalverzoek/intrek": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Betaalverzoek niet gevonden."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/beveiliging/aanvraag": {
    "rol": "supplier",
@@ -14039,13 +14424,13 @@
    "rol": "supplier",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-5o7psr"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-5v671y"
   },
   "POST /api/supplier/command/beleid/zet": {
    "rol": "supplier",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Die regel bestaat niet: proef-413ago"
+   "omdat": "de route zegt: Die regel bestaat niet: proef-bdt7q0"
   },
   "POST /api/supplier/command/graaf": {
    "rol": "supplier",
@@ -14091,9 +14476,10 @@
   },
   "POST /api/supplier/command/operator/uitvoeren": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat plan bestaat niet (meer)."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/command/puls": {
    "rol": "supplier",
@@ -14111,7 +14497,7 @@
    "rol": "supplier",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dat runbook bestaat niet: proef-73rq2g"
+   "omdat": "de route zegt: Dat runbook bestaat niet: proef-vt4fdy"
   },
   "POST /api/supplier/command/runbooks": {
    "rol": "supplier",
@@ -14385,9 +14771,10 @@
   },
   "POST /api/supplier/dorp/post": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende afdeling."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/dorp/stuurdoor": {
    "rol": "supplier",
@@ -14397,9 +14784,10 @@
   },
   "POST /api/supplier/dorp/tools": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Onbekende afdeling."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/dorp/verder": {
    "rol": "supplier",
@@ -14979,21 +15367,24 @@
   },
   "POST /api/supplier/horeca/club/band": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Welk bandnummer? (het nummer dat op de band staat, geen naam)\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/horeca/club/band/betaal": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze band kennen we niet."
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/horeca/club/band/terug": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Deze band kennen we niet."
+   "status": 409,
+   "soort": "conflict",
+   "omdat": "status 409, en de boodschap (\"Er staat niets meer op deze band.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/horeca/club/deur": {
    "rol": "supplier",
@@ -15015,9 +15406,10 @@
   },
   "POST /api/supplier/horeca/club/tafel": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Welke tafel?\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/horeca/club/tafel/stand": {
    "rol": "supplier",
@@ -15171,9 +15563,10 @@
   },
   "POST /api/supplier/horeca/gast/qr": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Voor welke tafel?\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/horeca/gast/uitverkocht": {
    "rol": "supplier",
@@ -15311,7 +15704,7 @@
    "rol": "supplier",
    "status": 404,
    "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Voor 2026-08-18 staan er geen diensten. Zet ze eerst neer (diensten: [{naam, uren, uurloon\") valt in geen bekende vorm"
+   "omdat": "status 404, en de boodschap (\"Voor 2026-08-20 staan er geen diensten. Zet ze eerst neer (diensten: [{naam, uren, uurloon\") valt in geen bekende vorm"
   },
   "POST /api/supplier/horeca/missions": {
    "rol": "supplier",
@@ -15999,9 +16392,10 @@
   },
   "POST /api/supplier/lost/add": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Omschrijf het voorwerp.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/lost/done": {
    "rol": "supplier",
@@ -16539,9 +16933,10 @@
   },
   "POST /api/supplier/net/verzoek": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "de route zegt: Dit bedrijf kennen we niet."
+   "status": 400,
+   "soort": "veld-ontbreekt",
+   "omdat": "status 400, en de boodschap (\"Dat is uw eigen bedrijf.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/notifications/read": {
    "rol": "supplier",
@@ -17241,9 +17636,10 @@
   },
   "POST /api/supplier/rooster/beslis": {
    "rol": "supplier",
-   "status": 404,
-   "soort": "object-ontbreekt",
-   "omdat": "status 404, en de boodschap (\"Er ligt geen roostervoorstel.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rooster/voorstel": {
    "rol": "supplier",
@@ -17409,9 +17805,10 @@
   },
   "POST /api/supplier/rtmail/inkoop": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Geef een groothandel-code op.\") valt in geen bekende vorm"
+   "status": 200,
+   "soort": "bereikt",
+   "omdat": "status 200",
+   "metPool": true
   },
   "POST /api/supplier/rtmail/instellingen": {
    "rol": "supplier",
@@ -17841,15 +18238,17 @@
   },
   "POST /api/supplier/tafelticket": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een tafel om de bonnen samen te voegen.\") valt in geen bekende vorm"
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "status 404, en de boodschap (\"Geen openstaande bonnen aan t1.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/tafelticket/afrekenen": {
    "rol": "supplier",
-   "status": 400,
-   "soort": "veld-ontbreekt",
-   "omdat": "status 400, en de boodschap (\"Kies een tafel.\") valt in geen bekende vorm"
+   "status": 404,
+   "soort": "object-ontbreekt",
+   "omdat": "status 404, en de boodschap (\"Geen openstaande bonnen aan t1.\") valt in geen bekende vorm",
+   "metPool": true
   },
   "POST /api/supplier/team/buzz": {
    "rol": "supplier",

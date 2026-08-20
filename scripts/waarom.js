@@ -34,6 +34,7 @@ const { start, WORTEL } = require('./lib/wegwerpserver');
 const { alleRoutes, verdeelOpRol } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const wm = require('./lib/waarom');
+const { maakPool } = require('./lib/objectpool');
 const { stempel } = require('./lib/stempel');
 
 const REGISTER = path.join(WORTEL, 'WAAROM.json');
@@ -82,13 +83,43 @@ if (require.main !== module) { module.exports = {}; return; }
   let routes = verdeling.metRol;
   if (MAX) routes = routes.slice(0, MAX);
 
+  /* DE EERSTE GANG oogst en passant: elk geslaagd antwoord draagt echte id's,
+     en de objectpool onthoudt ze per domein (scripts/lib/objectpool.js). */
+  const pool = maakPool();
   const indelingen = [];
   for (const r of routes) {
     const u = await post(r.pad, plausibelLijf(r.pad), tokens[r.rol]);
+    if (u.status >= 200 && u.status < 300) pool.leer(u.data, r.pad);
     const d = wm.deel(u.status, wm.boodschapVan(u.data, u.tekst));
     indelingen.push({ route: r.methode + ' ' + r.pad, rol: r.rol, status: u.status,
       soort: d.soort, door: d.door, omdat: d.omdat });
   }
+
+  /* DE TWEEDE GANG: de routes die een bestaand object wilden, nu met een lijf
+     dat echte id's uit hun eigen domein draagt. Oogsten is geen raden -- de
+     waarden komen uit antwoorden die deze ronde zelf zag, op deze server.
+     Alleen een indeling die daadwerkelijk verandert wordt overgenomen, met
+     metPool erbij zodat het register laat zien welk deel van het antwoord op
+     de pool leunt. */
+  let herwonnen = 0, herprobeerd = 0;
+  for (const i of indelingen) {
+    /* Ook veld-ontbreekt: "welk bedrijf?" is vaak een id-VELDNAAM die de pool
+       inmiddels uit dat domein kent. Niet-van-jou en conflict bewust niet --
+       daar is het object er wel en zegt een tweede id niets nieuws. */
+    if (i.soort !== 'object-ontbreekt' && i.soort !== 'veld-ontbreekt') continue;
+    const pad = i.route.slice(i.route.indexOf(' ') + 1);
+    const { lijf, velden } = pool.verrijk(plausibelLijf(pad), pad);
+    if (!velden.length) continue;
+    herprobeerd++;
+    const u2 = await post(pad, lijf, tokens[i.rol]);
+    if (u2.status >= 200 && u2.status < 300) pool.leer(u2.data, pad);
+    const d2 = wm.deel(u2.status, wm.boodschapVan(u2.data, u2.tekst));
+    if (d2.soort !== i.soort) {
+      Object.assign(i, { status: u2.status, soort: d2.soort, door: d2.door, omdat: d2.omdat, metPool: true });
+      herwonnen++;
+    }
+  }
+  const poolStand = pool.grootte();
   server.klaar();
 
   const geteld = wm.telling(indelingen);
@@ -108,10 +139,12 @@ if (require.main !== module) { module.exports = {}; return; }
       /* HOE HARD IS DEZE INDELING. Zie scripts/lib/waarom.js: wie het laatste
          woord had, de boodschap van de route of alleen zijn statuscode. */
       uitBoodschap: indelingen.filter(i => i.door === 'boodschap').length,
-      uitStatus: indelingen.filter(i => i.door === 'status').length },
+      uitStatus: indelingen.filter(i => i.door === 'status').length,
+      pool: { ...poolStand, herprobeerd, herwonnen } },
     zonderRol,
     soorten: geteld,
-    perRoute: Object.fromEntries(indelingen.map(i => [i.route, { rol: i.rol, status: i.status, soort: i.soort, omdat: i.omdat }]))
+    perRoute: Object.fromEntries(indelingen.map(i => [i.route, { rol: i.rol, status: i.status, soort: i.soort, omdat: i.omdat,
+      ...(i.metPool ? { metPool: true } : {}) }]))
   };
 
   if (jsonUit) { console.log(JSON.stringify(uit, null, 1)); process.exitCode = 0; return; }
@@ -123,6 +156,8 @@ if (require.main !== module) { module.exports = {}; return; }
     if (s.aantal) console.log('           nodig: ' + s.nodig);
   }
   for (const z of zonderRol) console.log('  ' + String(z.aantal).padStart(5) + '  (geen ronde)      ' + z.reden);
+  console.log('\n  objectpool: ' + poolStand.domeinen + ' domeinen, ' + poolStand.velden + ' velden geoogst; ' +
+    herprobeerd + ' object-routes herprobeerd, ' + herwonnen + ' herwonnen');
   const uitB = indelingen.filter(i => i.door === 'boodschap').length;
   console.log('\n  ' + uitB + ' van de ' + indelingen.length + ' ingedeeld op wat de route ZEGT, ' +
     (indelingen.length - uitB) + ' alleen op zijn statuscode.');

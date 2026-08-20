@@ -31,7 +31,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'DUURZAAMHEIDSKOSTEN.json');
@@ -54,31 +54,14 @@ const ROUTES = [
     lijf: (i) => ({ delen: i % 2 === 0, allergieen: ['proef' + i] }) }
 ];
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer(); s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
 
+/* De gedeelde wegwerpserver (scripts/lib/wegwerpserver.js): eigen poort,
+   eigen datamap, en klaar() ruimt allebei op. */
 async function start(extra) {
-  const poort = await vrijePoort();
-  const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kosten-'));
-  const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
-      STUN_UIT: '1', RTG_DEMO: '1', ...extra }
-  });
-  const eind = Date.now() + 60000;
-  while (Date.now() < eind) {
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return { kind, basis, datamap }; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  throw new Error('de server kwam niet op');
+  const s = await wegwerp({ naam: 'kosten', wachtMs: 60000, env: { RTG_DEMO: '1', ...extra } });
+  return { kind: s.kind, basis: s.basis, datamap: s.datamap, klaar: s.klaar };
 }
-const stop = (s) => { try { s.kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(s.datamap, { recursive: true, force: true }); } catch (e) {} };
+const stop = (s) => s.klaar();
 
 const post = async (basis, pad, lijf, tok) => {
   const t0 = process.hrtime.bigint();

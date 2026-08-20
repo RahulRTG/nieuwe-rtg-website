@@ -79,5 +79,5 @@ module.exports = (ctx) => {
 
   const partner = require('./partner')(ctx);
 
-  return Object.assign({ kasCode, kasInt }, partner);
+  return Object.assign({ kasCode, kasStand, kasInt }, partner);
 };

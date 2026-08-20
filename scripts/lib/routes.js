@@ -153,6 +153,27 @@ function plekVan(methode, pad) {
   return null;
 }
 
+/* De routes in EEN bronbestand, voor de deltapoort: die vergelijkt de tekst van
+   voor en na een wijziging en heeft dus geen boom nodig maar een string. */
+function routesInBron(tekst, bestandNaam) {
+  const uit = [];
+  let m;
+  ROUTE_RE.lastIndex = 0;
+  while ((m = ROUTE_RE.exec(tekst))) {
+    const pad = m[4];
+    if (!pad.startsWith('/')) continue;
+    uit.push({
+      methode: m[2].toUpperCase(),
+      pad,
+      viaRouter: m[1] === 'router',
+      bestand: bestandNaam || '?',
+      regel: tekst.slice(0, m.index).split('\n').length,
+      rauw: (m[5] || '').trim().slice(0, 160)
+    });
+  }
+  return uit;
+}
+
 function alleRoutes() {
   const kaart = routekaart();
   const uit = [];
@@ -289,5 +310,5 @@ const SCHAKELPADEN = [
 ];
 const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p));
 
-module.exports = { alleRoutes, WORTEL, loopMap, SCHAKELPADEN, isSchakel,
+module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, SCHAKELPADEN, isSchakel,
   rolVan, redenZonderRol, verdeelOpRol, meldZonderRol, bewakerskaart };

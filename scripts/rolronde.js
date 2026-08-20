@@ -152,6 +152,24 @@ function beoordeel(uitslag, normMeters) {
 }
 
 /* ------------------------------------------------------------------ de ronde */
+/* LOKETTEN DIE MET OPZET VOOR MEER DAN EEN ROL OPENGAAN.
+
+   De regel van deze ronde is streng en hoort dat te zijn: een leden-endpoint
+   geeft 401 aan een leverancier en aan het kantoor. Maar niet elk endpoint dat
+   een lid binnenlaat is een LEDEN-endpoint; een enkele is een loket dat voor
+   meer dan een rol dezelfde vraag beantwoordt, elk op zijn eigen naam.
+
+   Ze staan hier bij naam, met de reden en de toets die het gedrag vasthoudt.
+   Een filter zonder namen zou hetzelfde effect hebben en niemand zou het zien
+   groeien -- zelfde afspraak als GEDEELD_BEDOELD in scripts/gluurronde.js. */
+const ROLGEDEELD = new Map([
+  ['POST /api/link/koppelingen', {
+    reden: 'het loket "wat staat er van mij open". Een zaak heeft daar bonnen (de kassa aanvaardt '
+      + 'capabilities) maar geen ledensleutel, en komt binnen op zijn EIGEN naam: linkWieId(wie) rekent uit '
+      + 'onder welke naam iemands bonnen staan, dus niemand ziet die van een ander.',
+    toets: 'test/linkkoppelingen.test.js -- "je ziet alleen je eigen koppelingen, en een zaak de zijne"' }],
+]);
+
 async function main() {
   let srv = null, basis = BASIS_EXTERN;
   if (!basis) {
@@ -186,6 +204,7 @@ async function main() {
 
   const ledenEndpoints = [], publiekOfVroeg = [], andereRol = [], stil = [];
   const gaten = [];
+  const gedeeld = [];
   let hersteld = 0;
   const lidLeeft = async () => (await vraag('POST', '/api/state', lid)).status !== 401;
 
@@ -212,6 +231,11 @@ async function main() {
          antwoord de functie noemt, zodat een echte 503-crash blijft opvallen --
          zelfde afspraak als in test/auth-rol.test.js. */
       const bewustDicht = a.status === 503 && a.data && a.data.functie;
+      /* Een loket dat met opzet voor meer dan een rol opengaat telt hier niet
+         als gat -- maar wel als REGEL, want het staat bij naam in ROLGEDEELD
+         hierboven met zijn reden en zijn toets. */
+      const bewustGedeeld = ROLGEDEELD.has(r.methode + ' ' + pad);
+      if (bewustGedeeld) { gedeeld.push(r.methode + ' ' + pad + ' [' + rol + ']'); continue; }
       if (!bewustDicht && (a.status < 400 || a.status >= 500))
         gaten.push({ route: r.methode + ' ' + pad, rol, status: a.status, bestand: r.bestand + ':' + r.regel });
     }
@@ -222,6 +246,10 @@ async function main() {
     K.grijs + '(anoniem eruit, lid erdoor)' + K.reset);
   console.log('  ' + K.grijs + publiekOfVroeg.length + ' routes gaven een anonieme beller geen 401 (publiek, of ze valideren voor de deur)' + K.reset);
   console.log('  ' + K.grijs + andereRol.length + ' routes lieten ook een lid niet binnen (leverancier, kantoor, foundation)' + K.reset);
+  if (gedeeld.length) {
+    console.log('  ' + K.grijs + gedeeld.length + ' antwoord(en) van een loket dat MET OPZET voor meer dan een rol opengaat:' + K.reset);
+    for (const [route, uitleg] of ROLGEDEELD) console.log('    ' + K.grijs + route + ' -- ' + uitleg.reden.slice(0, 90) + K.reset);
+  }
   if (stil.length) console.log('  ' + K.geel + stil.length + ' routes gaven geen antwoord' + K.reset);
 
   try {
@@ -233,6 +261,7 @@ async function main() {
       meters: { [METER]: gaten.length, [METER_N]: ledenEndpoints.length },
       routesOnderzocht: routes.length, sessieHersteld: hersteld,
       publiekOfVroegGevalideerd: publiekOfVroeg.length, andereRol: andereRol.length, zonderAntwoord: stil,
+      bewustGedeeld: [...ROLGEDEELD].map(([route, u]) => ({ route, reden: u.reden, toets: u.toets })),
       gaten
     }, null, 2) + '\n');
   } catch (e) { console.error('  kon ROLRONDE.json niet schrijven: ' + e.message); }

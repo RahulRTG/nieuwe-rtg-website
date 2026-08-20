@@ -134,7 +134,9 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
      hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
      op dag een al drie keer bijna fout gegaan. */
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
+  /* KASCODE_MS staat erbij omdat de capability eromheen (./kassacode.js) exact
+     dezelfde termijn moet aanhouden; een tweede getal is een tweede waarheid. */
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
   api.schaduw = schaduwStand;
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));

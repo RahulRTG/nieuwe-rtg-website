@@ -60,9 +60,21 @@ function wapenStrengePoort() {
   poortGewapend = true;
   process.on('exit', () => {
     if (!serverUitzonderingen.length) return;
-    process.stderr.write('\n[31mSTRENGE POORT: ' + serverUitzonderingen.length +
+    /* WELK TOETSBESTAND, en dat stond er niet. In een volle, parallelle run
+       schrijven tientallen kindprocessen door elkaar heen; deze melding kwam dan
+       tussen de regels van vier andere bestanden terecht en de TAP-uitslag zei
+       alleen "not ok test/x.test.js -- exitCode 1", terwijl al zijn subtoetsen
+       ok waren. Dat kost een half uur zoeken in een logbestand van 55.000
+       regels, en dat is een keer gebeurd: twee bestanden leken flaky onder
+       belasting en waren in werkelijkheid slachtoffer van EEN ontbrekende naam
+       in GRENZEN.json. Een meter die niet zegt waar hij aansloeg, laat je de
+       verkeerde oorzaak verzinnen (LAT.md regel 1). */
+    const wie = require('path').basename(process.argv[1] || 'onbekend');
+    process.stderr.write('\n[31mSTRENGE POORT (' + wie + '): ' + serverUitzonderingen.length +
       ' server-uitzondering(en) tijdens de tests (uncaught/unhandled). De run faalt.[0m\n');
     for (const r of serverUitzonderingen.slice(0, 10)) process.stderr.write('  - ' + r + '\n');
+    if (serverUitzonderingen.length > 10)
+      process.stderr.write('  ... en nog ' + (serverUitzonderingen.length - 10) + ' die hier niet passen\n');
     if (!process.exitCode) process.exitCode = 1;
   });
 }

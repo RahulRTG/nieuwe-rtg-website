@@ -11,25 +11,12 @@
 module.exports = (kern) => {
   const { app, express, resolveSession, sessionFor, dyncode } = kern;
 
-  // Een geldige app-sessie: een lid (account/demo-pas) of een zaak-/personeels-
-  // /kantoorsessie. We hebben de rol hier niet nodig, alleen: is dit onze app.
-  function appSessie(req) {
-    const header = req.get('authorization') || '';
-    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-    if (!token) return null;
-    // Eerst de in-memory sessie (demo-pas, zaak, personeel, kantoor): heeft die
-    // een bekende rol (supplier/staff/office), dan telt die rol; anders is het
-    // een lid (een demo-pas met een tier).
-    const s = sessionFor(token);
-    if (s) {
-      if (s.role && MAG[s.role]) return { soort: s.role, code: s.code || null };
-      return { soort: 'lid', tier: s.tier || null };
-    }
-    // Geen in-memory sessie: een echt account-token -> een lid.
-    const lid = resolveSession(token);
-    if (lid) return { soort: 'lid', tier: lid.tier, key: lid.key };
-    return null;
-  }
+  /* Een geldige app-sessie: een lid (account/demo-pas) of een zaak-/personeels-
+     /kantoorsessie. Stond hier als eigen functie tot er een tweede deur kwam die
+     dezelfde vraag stelt (/api/link/los); nu doet kern/link/wie.js het voor
+     allebei. Twee eigen uitrekeningen van "wie klopt er aan" zijn twee
+     antwoorden, en dan is de vraag welke klopt (LAT.md regel 4). */
+  const appSessie = require('../kern/link/wie')({ sessionFor, resolveSession });
 
   // welke codesoorten een actor mag uitgeven (de code zelf is geen geheim; de
   // echte controle zit bij het afrekenen/inchecken)

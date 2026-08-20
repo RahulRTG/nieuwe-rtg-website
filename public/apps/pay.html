@@ -389,28 +389,43 @@ $('#xBetaal').addEventListener('click', () => {
   if (c) tikBetaalMet(c, centen);
 });
 
-/* de kassacode */
+/* de kassacode -- sinds 20 augustus 2026 als capability (LINK.md, RTG Link)
+
+   WAT ER VERANDERDE, EN WAT NIET. De code zelf en het innen zijn ongewijzigd:
+   RTG Pay maakt hem, de kassa int hem, met hetzelfde maximum en dezelfde vijf
+   minuten. Wat veranderde is wat er IN DE QR staat.
+
+   Vroeger stond daar de code zelf ('A1B2C3'), en dus kon iedereen die het scherm
+   fotografeerde hem overtypen aan een andere RTG-kassa. Nu staat er een
+   ondertekende verwijzing in: de kassa haalt hem langs /api/link/los, ziet eerst
+   WIE er betaalt en TOT HOEVEEL, en pas daarna verschijnt er een knop.
+
+   De code van zes tekens blijft gewoon op het scherm staan -- voor een kassa
+   zonder camera lees je hem voor -- en de contactloze afgifte blijft hem ook
+   gebruiken: dat is een bewuste handeling van dichtbij, geen beeld dat je van een
+   afstand kunt fotograferen. */
 let kasTimer = null;
 $('#kMaak').addEventListener('click', async () => {
   const max = Math.round(Number(String($('#kMax').value).replace(',', '.')) * 100);
   try {
-    const r = await api('pay/kascode', { maxCenten: max > 0 ? max : undefined });
+    const r = await api('link/cap/maak', { handeling: 'geld.kassa', maxCenten: max > 0 ? max : undefined });
+    const eigen = r.eigen || {};        // de code + het maximum, alleen voor mij
     $('#kasUit').hidden = true;
     $('#kasAan').hidden = false;
-    $('#kCode').textContent = r.code;
+    $('#kCode').textContent = eigen.code || '';
     const kqi = $('#kQr');
-    try { if (window.RTGQRteken && kqi) { kqi.src = RTGQRteken.dataURL(r.code, { schaal: 5, quiet: 3 }); kqi.hidden = false; } else if (kqi) kqi.hidden = true; }
+    try { if (window.RTGQRteken && kqi) { kqi.src = RTGQRteken.dataURL(r.token, { schaal: 5, quiet: 3 }); kqi.hidden = false; } else if (kqi) kqi.hidden = true; }
     catch (e) { if (kqi) kqi.hidden = true; }
-    $('#kMaxToon').textContent = euro(r.maxCenten) + ' eur';
-    $('#kTot').textContent = new Date(r.geldigTot).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    $('#kMaxToon').textContent = euro(eigen.maxCenten) + ' eur';
+    $('#kTot').textContent = new Date(r.exp).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
     // tap to pay: het toestel staat klaar om de code contactloos af te geven
     // zolang hij geldig is; het scherm tonen blijft altijd werken
-    if (window.TapPay && TapPay.kan()){
+    if (window.TapPay && TapPay.kan() && eigen.code){
       $('#kTap').hidden = false;
-      TapPay.schrijf(r.code, Math.max(1000, r.geldigTot - Date.now())).catch(() => {});
+      TapPay.schrijf(eigen.code, Math.max(1000, r.exp - Date.now())).catch(() => {});
     }
     clearTimeout(kasTimer);
-    kasTimer = setTimeout(() => { $('#kasUit').hidden = false; $('#kasAan').hidden = true; }, Math.max(1000, r.geldigTot - Date.now()));
+    kasTimer = setTimeout(() => { $('#kasUit').hidden = false; $('#kasAan').hidden = true; }, Math.max(1000, r.exp - Date.now()));
   } catch (e) { meld(e.message); }
 });
 

@@ -32,6 +32,18 @@ module.exports = [
     uitleg: 'De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.', paden: ['/api/pin', '/api/sleutelwoorden'] },
   { id: 'tg-zegel', categorie: 'Toegang en identiteit', naam: 'Zegel, codes en rechtenbeheer', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.', paden: ['/api/zegel', '/api/code', '/api/drm'] },
+  /* RTG Link staat NAAST de codelaag hierboven en niet erin, want het zijn twee
+     dingen: daar wordt een code gemaakt en ondertekend, hier wordt hij geduid --
+     wat is dit, en wat mag DEZE scanner er nu mee (LINK.md). Uit zetten haalt het
+     scannen weg zonder de codes zelf onbruikbaar te maken: een tafelcode blijft
+     een tafelcode, alleen het bedoelingsscherm en de capabilities gaan uit.
+
+     Alleen /api/link, en dat is met opzet. De gezinsdeur (/api/rtf/link) en de
+     kassadeur (/api/supplier/link) horen bij het oppervlak van die werelden: wie
+     de RTFoundation of de partnerkant uitzet, hoort ook hun scanweg mee uit te
+     zetten -- en niet andersom. */
+  { id: 'tg-link', categorie: 'Toegang en identiteit', naam: 'RTG Link (scannen en capabilities)', standaard: true, doelgroepen: ALLE,
+    uitleg: 'De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.', paden: ['/api/link'] },
   /* De adresopzoeker hoort bij DE PLEK WAAR EEN ADRES GEVRAAGD MAG WORDEN, en dat
      is deze poort: de intake vraagt er sinds de momenten geen meer. Hij hoort
      dus niet onder Onboarding -- wie daar de schakelaar omzet, zou anders ook de

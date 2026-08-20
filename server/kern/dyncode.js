@@ -37,7 +37,14 @@ module.exports = ({ crypto, dataDir }) => {
    deur. Wat hier gedeeld is, is de ONDERTEKENING -- en dat is precies wat je
    wilt delen: een tweede plek waar een HMAC wordt gezet, is een tweede plek
    waar hij fout kan staan. */
-const SOORTEN = ['kas', 'tafel', 'entree', 'zegel', 'deur', 'pas', 'contact'];
+/* 'cap' hoort hier om dezelfde reden als 'contact', en staat om dezelfde reden
+   NIET in de uitgiftelijst van routes/code.js: een capability wijst geen ding
+   aan maar draagt een HANDELING, en wie er een mag maken hangt af van welke
+   handeling het is. Dat besluit valt in kern/link/handelingen.js. Zou 'cap' hier
+   wel vrij uitgeefbaar zijn, dan kon elk lid via /api/code/dyn een code maken
+   die de capabilitydeur later serieus neemt -- het register overgeslagen, de
+   grenzen eromheen mee. test/linkcap.test.js bewaakt dat. */
+const SOORTEN = ['kas', 'tafel', 'entree', 'zegel', 'deur', 'pas', 'contact', 'cap'];
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => Buffer.from(String(s), 'base64url');
 

@@ -28,6 +28,21 @@ module.exports = (ctx) => {
     save();
     return { ok: true, code, maxCenten: max, geldigTot: nu() + KASCODE_MS };
   }
+  /* Leeft deze code nog? Kijken zonder te consumeren, voor de capability die er
+     sinds 20 augustus 2026 omheen zit (../link/cap.js): RTG Pay houdt per lid
+     maar EEN code actief, dus wie een verse maakt, maakt zijn vorige waardeloos
+     terwijl het token ervan nog prima ondertekend is. Zonder deze vraag ziet een
+     kassa een keurige kaart, tikt het bedrag in, en hoort dan pas dat er niets is.
+
+     GEEN ROUTE, EN DAT IS EEN VOORWAARDE. Een loket dat zegt of een code van zes
+     tekens bestaat, is een orakel waarmee je ze kunt aftasten. Deze functie is
+     alleen te bereiken met een geldig ondertekend capability-token, en dat token
+     is aan EEN code gebonden. */
+  function kasStand(code) {
+    const k = kascodes().find(x => x.code === String(code || '').toUpperCase().trim());
+    if (!k || k.gebruikt || k.geldigTot < nu()) return null;
+    return { maxCenten: k.maxCenten, geldigTot: k.geldigTot };
+  }
   async function kasInt({ supplierCode, code, centen, oms, idem }) {
     const k = kascodes().find(x => x.code === String(code || '').toUpperCase().trim());
     if (!k || k.gebruikt || k.geldigTot < nu()) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
@@ -133,5 +148,5 @@ module.exports = (ctx) => {
     });
   }
 
-  return { kasCode, kasInt, partnerOverzicht, partnerUitbetaal };
+  return { kasCode, kasStand, kasInt, partnerOverzicht, partnerUitbetaal };
 };

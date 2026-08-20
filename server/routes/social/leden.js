@@ -3,7 +3,7 @@
    ./snaps.js. Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord,
+  const { app, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord, socialIntrek,
           socialConnecties, liveCodename, connectieTussen, verbActief, codenaamVan,
           sseToCustomer, isGeblokkeerd } = kern;
 
@@ -31,6 +31,18 @@ app.post('/api/member/connect', auth, async (req, res) => {
 app.post('/api/member/connect/respond', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const r = socialAntwoord(req.session.key, String(req.body.key || ''), req.body.action);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  res.json({ ok: true, status: r.st });
+});
+
+/* Een verzoek dat IK stuurde weer intrekken. Het spiegelbeeld van /respond
+   hierboven: die weigert wat aan jou gericht is, deze haalt weg wat jij zelf in
+   gang zette. Kwam er met "mijn koppelingen" (LINK.md stap 6): daar staat per
+   regel wat je er nog aan kunt doen, en voor een verstuurd verzoek was het
+   antwoord "niets" -- niet als besluit, maar omdat er geen deur voor bestond. */
+app.post('/api/member/connect/intrek', auth, (req, res) => {
+  if (geenGast(req, res)) return;
+  const r = socialIntrek(req.session.key, String(req.body.key || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });

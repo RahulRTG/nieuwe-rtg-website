@@ -43,6 +43,20 @@ const REGELS = [
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],
   [/\/techniek|\/wacht|\/incident|\/storing/, 'techniek', 'Techniek & De Wacht'],
+  /* RTG Link (LINK.md): de adres- en capabilitylaag. Hij hoort bij Intern & IT,
+     bij de familie waar hij thuishoort -- codes, scanners, sleutels, identiteit
+     (zie de platformregel verderop met /code, /scanner en /rtgid).
+
+     Hij staat HIER en niet in dat blok, want zijn deuren wonen in drie werelden:
+     /api/link (leden), /api/rtf/link (gezin) en /api/supplier/link (de kassa).
+     Verderop zouden `rtf` en `supplier` hem eerder afvangen en lag dezelfde laag
+     bij drie kantoren. Een laag heeft een eigenaar; waar zijn deuren staan doet
+     daar niet aan af.
+
+     Zonder deze regel viel elk Link-punt terug op de restpost, en dat is met
+     opzet rood: onbekend werk hoort niet stilletjes bij Onderzoek te belanden.
+     De volle toetssuite wees dat aan (test/kantoren.test.js, acht gaten). */
+  [/(?:^|\/)link\//, 'intern', 'Intern & IT'],
 
   /* Geld, handel en groei. */
   [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen/, 'financien', 'Financiën'],

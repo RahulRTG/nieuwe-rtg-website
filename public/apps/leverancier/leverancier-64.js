@@ -15,7 +15,9 @@
       if (!(body.total>0)){ toast(T('pos.fillamount','Vul een bedrag in.')); return; }
     }
     if (method === 'rtgpay'){
-      body.payCode = await vraagPayCode(); if (!body.payCode) return;
+      /* De kaart zit in payCodeMetKaart (leverancier-61.js) en stond hier: alle
+         vier de kassa-ingangen delen hem nu, in plaats van deze ene. */
+      body.payCode = await payCodeMetKaart(body.total); if (!body.payCode) return;
       body.idem = RTGIdem('pos');
     }
     try {

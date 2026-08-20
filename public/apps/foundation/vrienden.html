@@ -28,7 +28,6 @@
   .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--goud);}
   .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
   #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
-  #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
   /* een eigen display wint van de [hidden]-regel van de browser */
   #pinUitNoot{margin-top:.55rem;font-size:.75rem;line-height:1.45;color:var(--zacht);}
   .pinlabel{color:var(--zacht);font-size:.8rem;}
@@ -36,7 +35,7 @@
   .pinst.ok{color:var(--groen,#7ecb8f);}
   #pinLiveDoek{margin-top:.6rem;}
   .pincode.uit{opacity:.45;text-decoration:line-through;}
-  #pinQrBeeld[hidden],#pinCam[hidden],#mijnpin[hidden],#pinLiveDoek[hidden],#pinUitNoot[hidden]{display:none;}
+  #pinQrBeeld[hidden],#mijnpin[hidden],#pinLiveDoek[hidden],#pinUitNoot[hidden]{display:none;}
   .stories{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .8rem;}
   .story{flex:0 0 auto;text-align:center;width:4.2rem;cursor:pointer;}
   .story .ring{width:3.4rem;height:3.4rem;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--paneel2);border:2px solid var(--goud);}
@@ -123,6 +122,7 @@
       <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
       <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
       <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
+      <button class="knop grijs mini" id="pinKoppelKnop">Mijn koppelingen</button>
     </div>
     <img id="pinQrBeeld" alt="QR-code met jouw pin" hidden>
     <div id="pinLiveDoek" hidden></div>
@@ -147,7 +147,6 @@
       <button class="knop" id="pinZoekBtn">Zoek</button>
       <button class="knop grijs" id="pinScanBtn">Scan</button>
     </div>
-    <video id="pinCam" playsinline muted hidden></video>
     <div class="lijst" id="pinRes"></div>
   </div>
   <!-- beschermd profiel (15 of jonger): zoeken staat dicht, de ouder voegt toe -->
@@ -255,6 +254,11 @@
 <script src="/shared/qrteken.js" defer></script>
 <script src="/shared/qrscan.js" defer></script>
 <script src="/shared/scanner.js" defer></script>
+<script src="/shared/scanknop.js" defer></script>
+<!-- RTG Link: het bedoelingsscherm en mijn koppelingen (LINK.md). Dezelfde twee
+     schermen als in de leden-app; de gezinskant heeft zijn eigen deur ervoor. -->
+<script src="/shared/linkkaart.js" defer></script>
+<script src="/shared/linkkoppelingen.js" defer></script>
 <script src="/shared/rtgcode.js" defer></script>
 <script src="/shared/dyncode.js" defer></script>
 <script>
@@ -465,7 +469,25 @@ async function kindContacten(kindHandle, cn){
    en een RTG-lid voegen elkaar er dus gewoon mee toe. Zoeken en versturen staan
    met opzet uit elkaar: eerst zien WIE het is, dan pas een knop. Een gescande
    code die meteen een verzoek verstuurt, is een verzoek dat niemand deed. */
-let mijnPin = null, pinScanner = null;
+/* RTG Link loopt langs een eigen deur (/api/rtf/link), met dezelfde
+   gezinssessie in het lijf als /api/rtf/social. Twee loketten, een laag. */
+/* Het pad komt hier VOLUIT binnen en wordt niet uit een voorvoegsel geplakt: de
+   huismeters lezen de klantkant als tekst (scripts/onbetreden.js noteert of een
+   route "door geen enkele client aangeroepen" wordt). Een samengesteld pad is
+   voor zo'n meter een route die niemand roept, en dat is dan een fout label op
+   een deur die het prima doet -- LAT.md regel 3.
+
+   Wat het voorvoegsel wél gratis gaf, staat er daarom expliciet onder. Dit lijf
+   draagt de gezinscode en het profieltoken; een pad dat buiten /api/rtf/ wijst,
+   zou die geloofsbrief aan een vreemde deur aanbieden. Leesbaarheid mag geen
+   sleutel weggeven, dus hier weigert hij liever. */
+function lnk(pad, body){
+  if (String(pad).slice(0, 9) !== '/api/rtf/') return Promise.reject(new Error('Er ging iets mis.'));
+  return fetch(pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
+    .then(r => r.json().catch(()=>({})).then(d => { if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }));
+}
+
+let mijnPin = null;
 let pinLive = null;
 /* De trefferregel voor allebei de pin-wegen. Stond twee keer -- de vaste pin en
    de levende code bouwden dezelfde rij met dezelfde statussen -- en dat is hoe
@@ -559,30 +581,71 @@ function pinQrTeken(){
   catch(e){ alert('De QR-code kan hier niet getekend worden.'); return false; }
   return true;
 }
-/* Scannen gebeurt op het toestel zelf: elk frame wordt lokaal ontleed
-   (/shared/scanner.js), er gaat geen beeld de deur uit. */
-function pinScanWissel(){
-  if (pinScanner){ pinScanUit(); return; }
-  if (!window.RTGScanner){ alert('Scannen kan hier niet. Typ de pin over.'); return; }
-  $('#pinCam').hidden = false;
-  pinScanner = new RTGScanner.Scanner({ video: $('#pinCam'), onCode: c=>{
-    const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort:'tekst' };
-    // twee soorten: de vaste pin staat leesbaar in de code, de levende is een
-    // ondertekend token dat alleen de server kan duiden. Zelfde gebaar.
-    if (g.soort === 'rtg1'){ pinScanUit(); pinLiveKijken(g.token); return; }
-    if (g.soort !== 'pin') return;
-    pinScanUit();
-    $('#pinIn').value = g.pin;
-    pinOpzoeken(g.pin);
-  } });
-  pinScanner.start().catch(()=>{ alert('Geen toegang tot de camera.'); pinScanUit(); });
-  $('#pinScanBtn').textContent = 'Stop';
+/* Scannen gaat langs de HUISOVERLAY (/shared/scanknop.js) en niet langs een
+   eigen camerablad. Hier stond dat eigen blad: een <video> in de pagina, een
+   RTGScanner eromheen en "Geen toegang tot de camera." als het misging. Dat was
+   een tweede uitvoering van iets dat het huis al heeft -- en de gedeelde versie
+   kan meer dan deze kon.
+
+   Wat dit scherm daarmee wint, is precies wat het miste: de overlay draagt
+   altijd een handinvoer ("Of typ/plak de code"), dus een levende code of een
+   vraagcode die je geplakt kreeg, kan hier nu ook zonder camera naar binnen. Het
+   pinveld eronder blijft een pinveld -- typen blijft wat het was (LINK.md par.
+   4), en de laag bereik je via de scanweg, net als aan de ledenkant.
+
+   En de overlay legt uit waarom de camera niet start (RTGMedia): op een gewoon
+   http-adres geeft de browser hem niet vrij, en dat is op een telefoon de meest
+   voorkomende reden. "Geen toegang tot de camera" liet een mens zelf zoeken. */
+function pinScanOpen(){
+  if (!window.RTGScanknop){ alert('Scannen kan hier niet. Typ de pin over.'); return; }
+  RTGScanknop.open({ titel: 'Code scannen', onCode: c => { scanRoute(c.tekst); } });
 }
-function pinScanUit(){
-  if (pinScanner){ try{ pinScanner.stop(); }catch(e){} pinScanner = null; }
-  $('#pinCam').hidden = true;
-  $('#pinScanBtn').textContent = 'Scan';
+
+/* RTG SCAN, GEZINSKANT (LINK.md par. 2). Hier stond een kleine keten van
+   als-dans: is het een vaste pin, dan opzoeken; is het een levende code, dan een
+   ander scherm; anders niets. Nu vraagt de app EEN keer wat het is en wat je
+   ermee kunt, en toont het bedoelingsscherm -- wie, wat, welke gegevens, hoe
+   lang -- voordat er iets gebeurt.
+
+   Typen blijft wat het was: wie een pin overtypt, doet een opzoeking en ziet de
+   treffer in de lijst eronder. Dat is dezelfde twee-staps-weg, alleen zonder
+   camera. */
+const LINK_ACTIES = {
+  'contact.verbinden': async (kaart, tekst, intentie) => {
+    const g = window.RTGCode ? RTGCode.lees(tekst) : { soort:'tekst' };
+    const lijf = kaart.vorm === 'levend' ? { livecode: tekst } : { pin: g.pin || tekst };
+    const r = await soc(String(intentie.weg).replace('/api/rtf/social',''), lijf);
+    alert(r.status === 'wacht-op-ouder'
+      ? 'Verzoek verstuurd. Een ouder moet het nog goedkeuren.'
+      : 'Verzoek verstuurd naar ' + (kaart.onderwerp.codename || ''));
+    laden();
+  },
+  'contact.gesprek': async (kaart) => {
+    alert('Jullie zijn al verbonden. Open het gesprek in je vriendenlijst.');
+  }
+};
+async function scanRoute(tekst){
+  if (!window.RTGLinkKaart){ alert('Dit scherm is nog niet geladen.'); return; }
+  let kaart;
+  try { kaart = await lnk('/api/rtf/link/los', { tekst }); }
+  catch(e){ alert(e.message); return; }
+  const keuze = await RTGLinkKaart.toon(kaart, {});
+  if (!keuze) return;
+  const doen = LINK_ACTIES[keuze.id];
+  if (!doen){ alert('Dit kan hier nog niet.'); return; }
+  try { await doen(kaart, tekst, keuze); } catch(e){ alert(e.message); }
 }
+
+/* Mijn koppelingen (LINK.md stap 6): wat er van je openstaat, wat je met een
+   code in gang zette, en wat je daar nog aan kunt doen. */
+const _pinKoppel = $('#pinKoppelKnop');
+if (_pinKoppel) _pinKoppel.addEventListener('click', () => {
+  if (!window.RTGKoppelingen){ alert('Dit scherm is nog niet geladen.'); return; }
+  RTGKoppelingen.toon(() => lnk('/api/rtf/link/koppelingen', {}), {
+    doe: (weg, lijf) => soc(String(weg).replace('/api/rtf/social', ''), lijf),
+    melden: (m) => alert(m)
+  });
+});
 // stap 1: wie is dit?
 async function pinOpzoeken(ruw){
   const pin = String(ruw||'').trim(); if (!pin) return;
@@ -620,7 +683,7 @@ $('#zoekBtn').addEventListener('click', zoek);
 $('#zoek').addEventListener('keydown', e=>{ if(e.key==='Enter') zoek(); });
 $('#pinZoekBtn').addEventListener('click', ()=> pinOpzoeken($('#pinIn').value));
 $('#pinIn').addEventListener('keydown', e=>{ if(e.key==='Enter') pinOpzoeken($('#pinIn').value); });
-$('#pinScanBtn').addEventListener('click', pinScanWissel);
+$('#pinScanBtn').addEventListener('click', pinScanOpen);
 $('#pinKopie').addEventListener('click', pinKopieer);
 $('#pinQrKnop').addEventListener('click', pinQrWissel);
 $('#pinNieuwKnop').addEventListener('click', pinNieuw);

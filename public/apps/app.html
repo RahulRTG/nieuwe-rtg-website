@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="4416650d">
+<meta name="rtg-bouw" content="a228f73e">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1759,6 +1759,11 @@
       <div class="notif-list" id="notifList"></div>
       <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
         <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
+        <!-- Mijn koppelingen (RTG Link, LINK.md stap 6): wat er van je openstaat,
+             wat je met een code in gang zette, en wat je daar nog aan kunt doen.
+             Hier en niet bij de pin: dit gaat niet over je adres maar over wat
+             het huis van je bewaart -- dezelfde la als inzage en vergetelheid. -->
+        <button id="privKoppel" style="background:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.priv.koppel">Mijn koppelingen</button>
         <div style="display:flex;gap:0.5rem;">
           <button id="privExport" style="flex:1;background:none;border:1px solid var(--line);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--soft);" data-i18n="app.priv.export">Download mijn gegevens</button>
           <button id="privDelete" style="flex:1;background:none;border:1px solid rgba(194,58,94,0.4);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--burgundy);" data-i18n="app.priv.delete">Verwijder mijn gegevens</button>
@@ -2318,6 +2323,8 @@
 <script src="/shared/scanner.js"></script>
 <script src="/shared/scanknop.js"></script>
 <script src="/shared/rtgcode.js"></script>
+<script src="/shared/linkkaart.js"></script>
+<script src="/shared/linkkoppelingen.js"></script>
 <!-- de levende, ondertekende code (o.a. de contactcode die na een minuut vervalt) -->
 <script src="/shared/dyncode.js"></script>
 <script src="/shared/speler.js"></script>

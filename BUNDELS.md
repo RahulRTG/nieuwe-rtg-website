@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 398 delen, 0 zonder onderwerp.**
+**51 bundels, 401 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 84 delen, 8886 regels in de delen
+`public/apps/app-main/` -- 86 delen, 8962 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -97,6 +97,8 @@ omlaag.
 | `app-main-54.js` | de Toestelkluis: eigen kopieen op het eigen toestel |
 | `app-main-55.js` | het thema van de vaste pas |
 | `app-main-56.js` | het zegel: aftellen en sluiten |
+| `app-main-56b.js` | RTG Scan: de scanknop van de leden-app |
+| `app-main-56c.js` | De Salon: de etalage van een partner en de tijdlijn |
 | `app-main-57.js` | de zakelijke lade voor Business en Lifestyle |
 | `app-main-58.js` | de knoppen onder een Salon-bericht |
 | `app-main-59.js` | de afspraken en hun status |
@@ -186,7 +188,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 105 delen, 9022 regels in de delen
+`public/apps/leverancier/` -- 106 delen, 9096 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -271,6 +273,7 @@ omlaag.
 | `leverancier-59.js` | een bestelkaart opbouwen |
 | `leverancier-60.js` | een tafel afrekenen |
 | `leverancier-61.js` | een gerecht aan de menukaart toevoegen |
+| `leverancier-61b.js` | HOE EEN BETAALCODE VAN EEN GAST BINNENKOMT, en daarna de kassa-opbouw |
 | `leverancier-62.js` | de shift-samenvatting: het avondbriefingmoment |
 | `leverancier-63.js` | afrekenen, of op de kamer laten schrijven |
 | `leverancier-64.js` | de bon van de kassa naar een bestelling |

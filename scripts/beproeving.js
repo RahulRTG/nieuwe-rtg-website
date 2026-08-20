@@ -63,7 +63,8 @@
                   STRENG (=1: de lat 10x scherper -- dekking 30, lek-vloer 4,
                   latentie-SLO 200 ms, meer werkers, extra lek-ronde).
    ============================================================================ */
-const { spawn, execFileSync } = require('child_process');
+const { execFileSync } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const fs = require('fs'), os = require('os'), path = require('path');
 const http = require('http');
 /* De goede verhalen (scripts/verhalen.js). De gauntlet bewijst dat er niets
@@ -263,31 +264,24 @@ async function poortVrij() {
     throw new Error('poort ' + PORT + ' is al bezet (waarschijnlijk een achtergebleven server van een eerdere run). Ruim die eerst op, bijv.: pkill -f "gc-hook.js"');
   }
 }
-function boot() {
-  return new Promise((resolve, reject) => {
-    const logfd = fs.openSync(SRVLOG, 'a');
-    /* RTG_DEMO: sinds 316de548 (2026-08-07) is de demo-inlog uitdrukkelijk
-       opt-in, en zonder de vlag worden ook de demozaken opgeruimd. De
-       toetshelper (test/helper.js) kreeg de vlag toen wel; dit harnas heeft
-       zijn eigen boot en bleef achter. Gevolg: tokens() haalde nul sessies op,
-       de schakelkast bleef dicht, en elke fase draaide tegen de standaardstand
-       terwijl het rapport anders suggereerde. De personas en demozaken zijn de
-       meetinstrumenten van deze beproeving; zonder hen meet ze niets. */
-    const env = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
-      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
-      NODE_OPTIONS: '--max-old-space-size=8192' };
-    if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
-    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'],
-      { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
-    child.on('exit', c => { if (c) reject(new Error('server stopte, code ' + c)); });
-    (async () => {
-      // wachten op READINESS, niet op liveness: pas als de duurzame opslag echt
-      // geladen is (Postgres: gedeelde data + RAM-venster) mag de test erin --
-      // anders toets je de verouderde lokale snapshot in plaats van de waarheid
-      for (let i = 0; i < 300; i++) { const r = await verzoek('GET', '/api/ready', null, null, 3000); if (r.status === 200) return resolve(); await new Promise(r => setTimeout(r, 250)); }
-      reject(new Error('server niet gereed (opslag laadt niet)'));
-    })();
+async function boot() {
+  const logfd = fs.openSync(SRVLOG, 'a');
+  /* RTG_DEMO: sinds 316de548 (2026-08-07) is de demo-inlog uitdrukkelijk
+     opt-in, en zonder de vlag worden ook de demozaken opgeruimd. De personas en
+     demozaken zijn de meetinstrumenten van deze beproeving; zonder hen meet ze
+     niets. RTG_STORE=postgres in de megamodus. De gedeelde wegwerpserver draait
+     met --expose-gc + gc-hook (heap lezen), wacht op READINESS (pas als de
+     duurzame opslag echt geladen is, niet op liveness), en schrijft naar de
+     log-fd waar nieuweFouten() uit leest. De datamap (TMP) is van dit script. */
+  const env = { NODE_ENV: 'test', ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI',
+    RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT, NODE_OPTIONS: '--max-old-space-size=8192' };
+  if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
+  const bundel = await wegwerp({
+    naam: 'beproeving', poort: PORT, datamap: TMP, gereed: 'ready', logFd: logfd,
+    nodeArgs: ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js')], env, wachtMs: 90000
   });
+  child = bundel.kind;
+  child.on('exit', c => { if (c) console.error('[beproeving] server stopte, code ' + c); });
 }
 function stop() { return new Promise(r => { if (!child) return r(); child.removeAllListeners('exit'); child.on('exit', () => r()); child.kill('SIGKILL'); child = null; }); }
 // Nette (geplande) stop: SIGTERM laat de server zijn write-behind flushen

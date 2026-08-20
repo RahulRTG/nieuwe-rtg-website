@@ -234,10 +234,11 @@ const POSTEN = [
     waarom: 'scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande ' +
       'instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server ' +
       'start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.',
-    sluit: 'ze een voor een omzetten; keten-, verraadronde en duurzaamheidskosten zijn om (met ' +
-      'magSterven en eigen-datamap in de lib). De vier die resten (beproeving, hersteltijd, ' +
-      'ladder, tot-crash) willen eigen vlaggen (--expose-gc, gc-hook) of een hergebruikte ' +
-      'datamap over een herstart heen; dat vraagt een lib-uitbreiding per geval, een voor een.' }
+    sluit: 'GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de ' +
+      'opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), ' +
+      'een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook ' +
+      'voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). ' +
+      'Een tiende kopie kan er niet meer bij zonder dat de teller het ziet.' }
 ];
 
 function reden(register, voorvoegsel) {

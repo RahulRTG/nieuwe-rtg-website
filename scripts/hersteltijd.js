@@ -33,6 +33,7 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 
 const AANTAL = Math.max(1000, Number(process.argv[2]) || 50000);
 const WORTEL = path.join(__dirname, '..');
@@ -117,19 +118,17 @@ async function main() {
 
   /* De server start in een eigen proces, met de sleutels uit de "secrets
      manager" -- precies zoals het draaiboek het voorschrijft. */
+  /* De gedeelde wegwerpserver op de HERSTELDE datamap (doel): de lib wacht tot
+     /api/health antwoordt, en dat wachten IS de meting -- we klokken eromheen.
+     De map is van dit script (het herstelde doel), dus de lib ruimt hem niet
+     op; srv.kill() blijft werken want de lib geeft het kindproces terug. */
   t = process.hrtime.bigint();
-  const poort = 4700 + Math.floor(Math.random() * 200);
-  const srv = require('child_process').spawn(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'server/server.js')],
-    { env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: doel, SMTP_URL: '' }, stdio: 'ignore' });
-
-  let op = false;
-  for (let i = 0; i < 240 && !op; i++) {
-    await new Promise(r => setTimeout(r, 500));
-    try { const r = await fetch('http://127.0.0.1:' + poort + '/api/health'); op = r.ok; } catch (e) {}
-  }
+  let bundel;
+  try { bundel = await wegwerp({ naam: 'herstel', datamap: doel, wachtMs: 120000 }); }
+  catch (e) { console.error('\n  De server kwam niet op. Herstel MISLUKT.'); process.exit(1); }
   const startSec = seconden(process.hrtime.bigint() - t);
-  if (!op) { srv.kill(); console.error('\n  De server kwam niet op. Herstel MISLUKT.'); process.exit(1); }
+  const poort = bundel.poort;
+  const srv = bundel.kind;
   console.log('  server op        : ' + fmt(startSec));
 
   /* De echte proef: kan een bestaand lid inloggen, en is zijn naam terug? Dat
@@ -164,4 +163,11 @@ async function main() {
   console.log('\n  \x1b[32mHerstel compleet en geklokt.\x1b[0m');
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+/* ALLEEN DOEN ALS IEMAND DIT BESTAND DRAAIT. Zonder deze wacht start een volle
+   herstelproef (50.000 leden seeden) zodra iets dit bestand require't -- een
+   laadcontrole deed dat. Zelfde wacht als de andere instrumenten. */
+if (require.main === module) {
+  main().catch(e => { console.error(e); process.exit(1); });
+} else {
+  module.exports = {};
+}

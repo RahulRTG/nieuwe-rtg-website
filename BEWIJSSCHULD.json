@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T10:04:16.594Z",
-  "commit": "024e612",
+  "op": "2026-08-20T10:44:57.315Z",
+  "commit": "31a983f",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,7 +9,7 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 12,
-  "meetwerk": 102,
+  "meetwerk": 98,
   "instrument": 817,
   "grens": 604
  },
@@ -35,8 +35,8 @@
    "soort": "instrument",
    "wat": "routes die eigenaarschap toetsen van een object uit het lichaam",
    "aantal": 106,
-   "waarom": "huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is de identiteit nooit aan de beurt geweest.",
-   "sluit": "een IDOR-proef: twee leden met DEZELFDE rol, en de een probeert het object van de ander. Dat is precies de foutklasse die de rolproef expliciet buiten zijn grens legt."
+   "waarom": "huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een bedrijfscode in het lijf.",
+   "sluit": "de IDOR-proef (scripts/idorproef.js, IDOR.json) bestaat nu en beantwoordt de vraag voor de MEMBER-laag: twee echte leden, A oogst objecten, B probeert ze te bedienen. Uitkomst: 117 routes bewezen-gescheiden, 0 lekken (de member-routes halen de eigenaar uit req.session en niet uit het lijf, wat de klasse uitsluit). De WERKPLEK-variant -- twee werkruimtes met een bedrijfscode -- hergebruikt dat fundament maar vraagt de werkplek-auth (beheer-/lid-token per werkruimte); dat is de resterende stap voor deze 78."
   },
   {
    "id": "output-deuren",
@@ -106,9 +106,9 @@
    "id": "wegwerpserver-kopieen",
    "soort": "meetwerk",
    "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
-   "aantal": 4,
+   "aantal": 0,
    "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
-   "sluit": "ze een voor een omzetten; keten-, verraadronde en duurzaamheidskosten zijn om (met magSterven en eigen-datamap in de lib). De vier die resten (beproeving, hersteltijd, ladder, tot-crash) willen eigen vlaggen (--expose-gc, gc-hook) of een hergebruikte datamap over een herstart heen; dat vraagt een lib-uitbreiding per geval, een voor een."
+   "sluit": "GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
   }
  ],
  "groei": [

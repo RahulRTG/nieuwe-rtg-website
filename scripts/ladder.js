@@ -32,7 +32,7 @@
    Env: LADDER_SEED (deterministische rommel), LADDER_PORT.
    ============================================================================ */
 'use strict';
-const { spawn } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const http = require('http');
 const fs = require('fs');
 const os = require('os');
@@ -105,13 +105,14 @@ function werkbank(vraag, rollen, kiezer) {
 }
 
 /* ---------- server starten (tenzij --basis) ---------- */
-function bootEigen() {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ladder-'));
-  const child = spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'], {
-    cwd: WORTEL, env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '', ANTHROPIC_API_KEY: '' },
-    stdio: ['ignore', 'ignore', 'ignore']
-  });
-  return { child, base: 'http://127.0.0.1:' + PORT, TMP };
+/* De gedeelde wegwerpserver op de VASTE ladder-poort, wachtend op READINESS
+   (pas als de opslag echt geladen is mag de ladder erin). De lib wacht al tot
+   /api/ready antwoordt; de wachtGezond hieronder is daarna een snelle
+   bevestiging. Async omdat de lib op de server wacht. */
+async function bootEigen() {
+  const bundel = await wegwerp({ naam: 'ladder', poort: PORT, gereed: 'ready',
+    env: { NODE_ENV: 'test', ANTHROPIC_API_KEY: '' } });
+  return { child: bundel.kind, base: bundel.basis, TMP: bundel.datamap };
 }
 async function wachtGezond(vraag, pogingen) {
   for (let i = 0; i < (pogingen || 200); i++) {
@@ -165,7 +166,7 @@ async function main() {
   console.log('\n' + K.vet + 'DE LADDER' + K.reset + K.grijs + '  van een onhandige kleuter tot de slimste aanvaller' + K.reset);
 
   if (!BASIS_EXTERN) {
-    srv = bootEigen(); base = srv.base;
+    srv = await bootEigen(); base = srv.base;
     const gezond = await wachtGezond(maakVraag('127.0.0.1', PORT));
     if (!gezond) { console.log('\n  ' + K.rood + 'de server werd niet gezond op ' + base + K.reset + '\n'); try { srv.child.kill('SIGKILL'); } catch (e) {} return 1; }
   }

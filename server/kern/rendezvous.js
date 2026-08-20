@@ -6,9 +6,18 @@
    uit Lifestyle- en Business-leden -- exclusief en op codenaam (privacy by design:
    echte namen blijven in de kluis). Rahul BELOOFT nooit een reservering; hij stelt
    voor en De Rechterhand regelt het pas als het rond is. Gedeelde context vanuit
-   server.js. */
-module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
+   server.js.
+
+   DE POORT. Rendez-vous eist hetzelfde als Vonk: een echt account, een door RTG
+   geverifieerd paspoort en 18 of ouder (kern/ontmoetpoort.js). Dat stond hier
+   lang NIET -- er was alleen een pas-eis op de route, waardoor de exclusieve app
+   losser was dan de brede. De pas-eis (Lifestyle of Business) blijft op de route
+   waar hij hoort; de leeftijd en de identiteit horen hier, want de kern is wat
+   elke ingang passeert. */
+module.exports = ({ db, save, crypto, liveCodename, anthropic, notify, accounts, leeftijdVan }) => {
   const nu = () => new Date().toISOString();
+  const { ontmoetPoort } = require('./ontmoetpoort').maakOntmoetpoort({ accounts, leeftijdVan });
+  const mag = key => ontmoetPoort(key, 'Rendez-vous');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const lijstUit = (v, max, elk) => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => schoon(x, elk || 40)).filter(Boolean).slice(0, max || 12);
 
@@ -26,11 +35,15 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
   }
 
   function rvProfielGet(key) {
+    const poort = mag(key);
+    if (!poort.ok) return { status: 403, error: poort.reden };
     const r = R();
     const p = r.profielen[key] || { aan: false, over: '', zoekt: '', wensen: [], locaties: [] };
     return { status: 200, profiel: { aan: !!p.aan, over: p.over || '', zoekt: p.zoekt || '', wensen: p.wensen || [], locaties: p.locaties || [] }, codenaam: codenaam(key) };
   }
   function rvProfiel(key, b) {
+    const poort = mag(key);
+    if (!poort.ok) return { status: 403, error: poort.reden };
     const r = R();
     const p = r.profielen[key] || { at: nu() };
     if (b.aan !== undefined) p.aan = b.aan === true;
@@ -45,6 +58,8 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
 
   // wie mag ik zien: andere leden met een actief profiel, niet ikzelf, niet weggeveegd
   function rvKandidaten(key) {
+    const poort = mag(key);
+    if (!poort.ok) return { status: 403, error: poort.reden };
     const r = R();
     const mij = r.profielen[key] || { locaties: [] };
     const mijnLikes = r.likes[key] || {};
@@ -66,6 +81,8 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
   }
 
   function rvLike(key, targetKey) {
+    const poort = mag(key);
+    if (!poort.ok) return { status: 403, error: poort.reden };
     const r = R();
     if (!targetKey || targetKey === key) return { status: 400, error: 'Onbekend lid.' };
     if (!r.profielen[key] || !r.profielen[key].aan) return { status: 400, error: 'Zet eerst uw eigen profiel aan.' };
@@ -85,6 +102,8 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     return { status: 200, ok: true, match };
   }
   function rvPas(key, targetKey) {
+    const poort = mag(key);
+    if (!poort.ok) return { status: 403, error: poort.reden };
     const r = R();
     if (!targetKey) return { status: 400, error: 'Onbekend lid.' };
     if (!r.passes[key]) r.passes[key] = {};
@@ -108,10 +127,16 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     uit.sort((a, b) => String(b.sinds).localeCompare(String(a.sinds)));
     return uit;
   }
-  function rvMatches(key) { return { status: 200, matches: matchesVan(key) }; }
+  function rvMatches(key) {
+    const poort = mag(key);
+    if (!poort.ok) return { status: 403, error: poort.reden };
+    return { status: 200, matches: matchesVan(key) };
+  }
 
   // Rahul stelt een jetset-date voor bij een match, op een gedeelde/openstaande locatie
   async function rvDate(key, targetKey, vraag) {
+    const poort = mag(key);
+    if (!poort.ok) return { status: 403, error: poort.reden };
     const r = R();
     const m = matchesVan(key).find(x => x.id === targetKey);
     if (!m) return { status: 400, error: 'Dit is (nog) geen wederzijdse match.' };

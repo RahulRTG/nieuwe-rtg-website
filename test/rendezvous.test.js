@@ -1,7 +1,8 @@
 /* Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle
    Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en
    Rahul stelt een jetset-date voor op een gedeelde locatie. Gated op de Lifestyle
-   Pass; op codenaam. Draai los:
+   Pass EN op de ontmoetpoort (18+ met geverifieerd paspoort, kern/ontmoetpoort.js).
+   Op codenaam. Draai los:
    node --experimental-sqlite --test test/rendezvous.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -31,13 +32,32 @@ test.after(() => {
 
 let teller = 0;
 const officeTok = async () => (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
-async function lidMet(tier) {
+const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+
+/* Het paspoort door de balie halen. Zonder dit komt een lid de ontmoetpoort niet
+   door, ook niet met een Lifestyle Pass: de leeftijd wordt uit member_state.geboren
+   gerekend en die staat er pas als het kantoor een document heeft gezien. */
+async function verifieer(token) {
+  const st = await json(await raw('/state', {}, token));
+  const codename = st.state.user.codename;
+  await raw('/verify/upload', { image: PNG }, token);
+  await raw('/verify/selfie', { image: PNG }, token);
+  const office = await officeTok();
+  const pend = await json(await raw('/office/verifications', {}, office));
+  const mij = (pend.pending || []).find(x => x.codename === codename);
+  if (!mij) throw new Error('verifieer: lid niet in de wachtrij');
+  await raw('/office/verify', { userId: mij.id, decision: 'approve', faceMatch: true, geslacht: 'v' }, office);
+}
+
+async function lidMet(tier, opties) {
+  const { kyc = true, geboortedatum = '1985-05-05' } = opties || {};
   const t = Date.now() + '' + (teller++);
   // zelf-registreren geeft altijd RTG; Lifestyle/Business komt na een menselijk
   // akkoord, dus registreren als RTG en optillen langs de office-flow.
   const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
-  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'r' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1985-05-05', tier: regTier }));
+  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'r' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum, tier: regTier }));
   if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, r.token, tier, await officeTok());
+  if (kyc) await verifieer(r.token);
   return r.token;
 }
 
@@ -112,4 +132,27 @@ test('Rendez-vous is gated op de Lifestyle Pass (RTG niet, Business wel)', async
   assert.equal((await rv('profiel', {}, rtg)).status, 403);
   const biz = await lidMet('business');
   assert.equal((await rv('profiel', {}, biz)).status, 200);
+});
+
+/* DE ONTMOETPOORT. Rendez-vous had lang alleen de pas-eis, waardoor de besloten
+   app iedereen met een Lifestyle Pass toeliet -- ook zonder geverifieerd paspoort
+   en ook onder de 18 -- terwijl het brede Vonk dat wel eiste. De eis woont nu in
+   kern/ontmoetpoort.js en geldt voor allebei. */
+test('de ontmoetpoort: zonder geverifieerd paspoort geen Rendez-vous, ook niet met een Lifestyle Pass', async () => {
+  const los = await lidMet('lifestyle', { kyc: false });
+  const dicht = await rv('profiel', {}, los);
+  assert.equal(dicht.status, 403, 'zonder KYC blijft de deur dicht');
+  assert.match((await json(dicht)).error, /paspoort/i, 'en de reden noemt het paspoort');
+  // ook de schrijvende ingangen zijn dicht, niet alleen het lezen
+  assert.equal((await rv('profiel/zet', { aan: true, locaties: 'Ibiza' }, los)).status, 403);
+  assert.equal((await rv('kandidaten', {}, los)).status, 403);
+  assert.equal((await rv('matches', {}, los)).status, 403);
+});
+
+test('de ontmoetpoort: een minderjarige met een Lifestyle Pass komt er niet in', async () => {
+  const jaar = new Date().getUTCFullYear();
+  const kind = await lidMet('lifestyle', { geboortedatum: (jaar - 16) + '-05-05' });
+  const dicht = await rv('profiel', {}, kind);
+  assert.equal(dicht.status, 403, '16 jaar is geen 18');
+  assert.match((await json(dicht)).error, /18 jaar/, 'en de reden noemt de leeftijdsgrens');
 });

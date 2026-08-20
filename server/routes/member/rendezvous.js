@@ -1,6 +1,12 @@
 /* Member-submodule: Rendez-vous -- de besloten AI-datingapp van de Lifestyle Pass.
    Gated op de Lifestyle Pass (Business erft mee). De logica woont in
-   kern/rendezvous.js. Gemount vanuit routes/member.js. */
+   kern/rendezvous.js. Gemount vanuit routes/member.js.
+
+   HIER STAAT ALLEEN DE PAS-EIS. Welke pas toegang geeft is een productkeuze en
+   verschilt per app; de ontmoetpoort (18+ met geverifieerd paspoort) is dat niet
+   en staat daarom in de kern, gedeeld met Vonk -- zie kern/ontmoetpoort.js. Wie
+   hier ooit ook de leeftijd zou controleren, bouwt de tweede kopie van een grens
+   en dat is precies hoe deze app hem eerder helemaal misliep. */
 module.exports = (kern) => {
   const { app, auth, rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate } = kern;
 

@@ -13,8 +13,8 @@
    poort, het profiel/de wensen en de dagselectie wonen hier; de like/match,
    het betalen, de chat en het blokkeren/melden in ./match. */
 const { coord } = require('../util');
+const { maakOntmoetpoort, MIN_LEEFTIJD } = require('../ontmoetpoort');
 
-const MIN_LEEFTIJD = 18;
 const DAG_MAX = 6;            // de eindige dagselectie
 const PRIJS_CENTEN = 1000;    // EUR 10 p.p.
 const RTG_CENTEN = 500;       // waarvan EUR 5 voor RTG; de rest is aanbetaling bij de zaak
@@ -29,21 +29,12 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
     return db.data.vonk;
   }
 
-  /* ---- de poort: 18+ met actief geverifieerd paspoort (zelfde lat als Podium) ---- */
-  function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
-  }
-  function mag(key) {
-    const u = accountVanKey(key);
-    if (!u) return { ok: false, reden: 'Alleen voor RTG-leden met een eigen account.' };
-    if (u.verified !== 'verified') return { ok: false, reden: 'Activeer eerst uw RTG-geverifieerde paspoort (KYC); zo weet iedereen op Vonk dat de ander echt is.' };
-    let md = {}; try { md = accounts.getMemberState(u.id) || {}; } catch (e) {}
-    const lft = md.geboren ? leeftijdVan(md.geboren) : null;
-    if (lft == null || lft < MIN_LEEFTIJD) return { ok: false, reden: 'Vonk is vanaf ' + MIN_LEEFTIJD + ' jaar.' };
-    return { ok: true, leeftijd: lft };
-  }
+  /* ---- de poort: 18+ met actief geverifieerd paspoort (zelfde lat als Podium)
+     Woont in kern/ontmoetpoort.js, samen met Rendez-vous. Stond hier ooit
+     uitgeschreven, en juist daardoor had Rendez-vous hem niet -- zie de kop
+     daar. De pas-eis blijft op de route: Vonk is er voor elke pas. ---- */
+  const { ontmoetPoort } = maakOntmoetpoort({ accounts, leeftijdVan });
+  const mag = key => ontmoetPoort(key, 'Vonk');
 
   /* ---- profiel en wensen (alles op codenaam; alleen de stad is zichtbaar) ---- */
   function profielZet(key, data) {

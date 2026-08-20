@@ -80,30 +80,6 @@ const EDUV = {
     'een geboortedatum zonder de scope student.demographics']
 };
 
-/* Edu-API (1EdTech). Hier stond person.displayName, person.dateOfBirth,
-   program.code en group.code. Een zoekresultaat noemt legalName.familyName,
-   wat erop wijst dat de naam een samengesteld object is en niet displayName.
-   Nagekeken is er niets: standards.1edtech.org en imsglobal.org waren niet te
-   openen. */
-const EDUAPI = {
-  naam: 'Edu-API',
-  bron: 'Geen. standards.1edtech.org, 1edtech.org en imsglobal.org zijn hier niet te openen, en op 20 augustus 2026 is ook gezocht naar een publieke spiegel (GitHub, npm): die is er niet. 1EdTech publiceert achter zijn eigen standards-site.',
-  gelezen: false,
-  heen: {
-    naam: { veld: null, staat: 'onbevestigd',
-      waarom: 'Hier stond person.displayName. Een zoekresultaat noemt legalName.familyName, dus de naam is daar vermoedelijk een samengesteld object; wij weten niet welke vorm en zetten er geen tweede gok voor in de plaats.' },
-    geboren: { veld: 'person.dateOfBirth', staat: 'onbevestigd',
-      waarom: 'Nooit nagekeken. Een werknaam, geen specificatie.' },
-    opleiding: { veld: 'program.code', staat: 'onbevestigd',
-      waarom: 'Nooit nagekeken. Een werknaam, geen specificatie.' },
-    klasCode: { veld: 'group.code', staat: 'onbevestigd',
-      waarom: 'Nooit nagekeken. Een werknaam, geen specificatie.' }
-  },
-  kanNiet: ['zorg- en ondersteuningsgegevens; die vallen buiten wat een administratiekoppeling hoort te dragen',
-    'onze leerdoelenstructuur met voorkennis en bewijs',
-    'zekerheid over de veldnamen hierboven: die zijn niet nagekeken']
-};
-
 /* OSO, nagekeken in het schema zelf (github.com/edustandaard/oso-gegevensset,
    common/OSO_gegevensset.xsd, opgehaald 20 augustus 2026). Twee van mijn
    werknamen bleken toevallig goed en twee fout -- en dat is precies waarom een
@@ -130,6 +106,10 @@ const OSO = {
     'de reden waarom een gegeven wel of niet is meegestuurd',
     'een opleiding als enkelvoudig gegeven; de gegevensset kent dat veld niet']
 };
+
+/* Edu-API staat apart: die kaart is als enige niet nagekeken, en dat komt
+   doordat 1EdTech niet openbaar publiceert. Zie ./koppelvlak-kaart-eduapi.js. */
+const { EDUAPI } = require('./koppelvlak-kaart-eduapi');
 
 const STANDAARDEN = { eduv: EDUV, entree: ENTREE, eduapi: EDUAPI, oso: OSO };
 

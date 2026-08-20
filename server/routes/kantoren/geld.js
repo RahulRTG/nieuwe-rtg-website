@@ -12,6 +12,20 @@ module.exports = (ctx) => {
      wat hier gezet wordt is meteen overal het geldende bedrag. */
   app.post('/api/pasprijzen', (req, res) => stuur(res, geldPasprijzen()));
   app.get('/api/pasprijzen', (req, res) => stuur(res, geldPasprijzen()));
+
+  /* Het betaaldiensttarief is PUBLIEK, om dezelfde reden als de pasprijzen: het
+     staat in de partnervoorwaarden, en een bedrag dat in een juridisch document
+     staat mag niet los kunnen lopen van het bedrag dat de code rekent. Dat was
+     precies hoe "0% commissie" naast een commissieknop kon blijven bestaan.
+     Alleen lezen; zetten blijft achter de boardroom-poort. */
+  const tarief = () => {
+    const t = kern.geldBetaaldienst ? kern.geldBetaaldienst() : { vastCenten: 10, pct: 1 };
+    return { status: 200, betaaldienst: { ...t,
+      grondslag: 'per transactie, direct verrekend op de partnerrekening',
+      overOmzet: false } };
+  };
+  app.get('/api/betaaldiensttarief', (req, res) => stuur(res, tarief()));
+  app.post('/api/betaaldiensttarief', (req, res) => stuur(res, tarief()));
   app.post('/api/office/geld', boardroomAuth, (req, res) => veilig(res, () => geldOverzicht()));
   app.post('/api/office/geld/pasprijs', boardroomAuth, (req, res) => veilig(res, () => {
     const r = geldPasprijsZet(req.body || {});

@@ -4,8 +4,13 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
-    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, opdrachten,
+    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, opdrachten, db,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
+
+  /* De vergoedingenrij van de betaaldienst: wat is verschuldigd, en is het
+     geboekt? Twee verschillende vragen, en tot 20 augustus 2026 was er maar een
+     antwoord. Zie ../commercie/fee.js. */
+  const fees = require('../commercie/fee').maakFees({ db, save, nu });
 
   /* De teruggang van de partneruitbetaling: alleen deze kant weet dat het
      pay-grootboek het is en dat de tegenrekening extern:uitbetaald heet. Zie
@@ -54,17 +59,32 @@ module.exports = (ctx) => {
       /* De kosten van de betaaldienst gaan DIRECT naar de ondernemer: per
          transactie meteen verrekend op de partnerrekening, als eigen regel in
          het grootboek naast de ontvangst -- geen verzamelfactuur achteraf.
-         Het tarief komt uit de geld-regie; het lid merkt er niets van. */
+         Het tarief komt uit de geld-regie; het lid merkt er niets van.
+
+         HIER STOND `if (kb.error) kosten = 0;`. Mislukte de boeking, dan werden
+         de kosten nul: niet uitgesteld, niet gemeld, niet in een rij. De
+         vordering van RTG op de zaak verdween en niemand kon achteraf zien dat
+         hij ooit bestond -- het grootboek sloot immers netjes, er was niets
+         geboekt. Zie de kop van ../commercie/fee.js.
+
+         Nu wordt de vergoeding VOOR de boekpoging vastgelegd. Lukt de boeking,
+         dan is hij GEBOEKT; mislukt hij, dan staat hij op HERKANSING en blijft
+         hij verschuldigd. Het bedrag in de teruggave is wat de zaak verschuldigd
+         is -- dat verandert niet door een mislukte boeking -- met de stand
+         ernaast, zodat de kassa het verschil kan zien. */
       let kosten = 0;
       try { kosten = Math.max(0, Math.round(betaaldienstKosten(c) || 0)); } catch (e) { kosten = 0; }
+      let kostenStatus = null;
       if (kosten > 0) {
+        const f = fees.incasseer({ supplierCode, centen: kosten, transactieCenten: c, ref: k.code });
         const kb = await boekAsync({ van: rekPartner(supplierCode), naar: 'rtg:betaaldienst', centen: kosten,
           soort: 'betaaldienstkosten', oms: 'Betaaldienstkosten, direct verrekend', ref: k.code });
-        if (kb.error) kosten = 0;
+        if (kb.error) fees.mislukt(f, kb); else fees.geboekt(f, (kb.boeking || {}).id || null);
+        kostenStatus = f ? f.status : null;
       }
       save();
       seintje(k.codenaam);
-      return { ok: true, centen: c, van: k.codenaam, kosten };
+      return { ok: true, centen: c, van: k.codenaam, kosten, kostenStatus };
     });
   }
 
@@ -77,6 +97,10 @@ module.exports = (ctx) => {
       // de direct verrekende betaaldienstkosten van vandaag, transparant erbij
       kostenVandaag: grootboek().filter(r => r.van === rek && r.soort === 'betaaldienstkosten' && new Date(r.at || 0).toISOString().slice(0, 10) === vandaag)
         .reduce((s, r) => s + r.centen, 0),
+      /* Wat er GEBOEKT is staat hierboven; wat er VERSCHULDIGD is en nog niet
+         geboekt staat hier. Twee metingen, want ze kunnen uiteenlopen -- en
+         precies dat uiteenlopen was vroeger onzichtbaar. */
+      kostenOpen: fees.openstaand(supplierCode),
       boekingen: grootboek().filter(r => r.van === rek || r.naar === rek).slice(0, 30)
     };
   }
@@ -133,5 +157,5 @@ module.exports = (ctx) => {
     });
   }
 
-  return { kasCode, kasInt, partnerOverzicht, partnerUitbetaal };
+  return { kasCode, kasInt, partnerOverzicht, partnerUitbetaal, fees };
 };

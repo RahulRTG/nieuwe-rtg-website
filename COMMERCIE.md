@@ -86,6 +86,8 @@ voor een bestaand contract nooit opnieuw de actuele lijstprijs opgehaald.
 | Contractprijs bij het besluit | `kern/aanmeldingen/besluit.js`; accepteren weigert zonder bedrag |
 | Partnervergoeding = 0 | `kern/commercie/vergoeding.js`, `test/commercie.test.js` (1–4) |
 | Ledenvoordeel met vier bedragen | `kern/commercie/subsidie.js`, `test/commercie.test.js` (5–9) |
+| Betaaldienstvergoeding met statussen | `kern/commercie/fee.js`, `test/betaaldienstfee.test.js` (9) |
+| Tarief publiek en live in de voorwaarden | `/api/betaaldiensttarief` |
 
 ### De partnervergoeding is nul, en dat is geen knop
 
@@ -120,16 +122,75 @@ de transactie, en `subsidie.keur()` rekent ze na op de **opgeslagen** rij — ni
 op een verse berekening. De oude toets controleerde `order.total` en
 `regieKorting`: precies de twee velden die ook kloppen als er niets gebeurt.
 
+## 3b. Vier besluiten van 20 augustus 2026
+
+Genomen nadat de ladder een gat opende dat er daarvoor niet was.
+
+### De partnerpoort wordt Business Lite
+
+`routes/member/partnerkanaal.js` eist voor een bedrijfscode een **Business
+Pass** — en die is sinds de ladder vanaf € 5.000 per maand. Daarmee sloot de
+poort precies de klant buiten die MARKT.md als ingang aanwijst: het restaurant
+met acht man. De ladder had dat gat zelf gemaakt.
+
+**Besluit:** een zaak wordt partner met **RTG Business Lite** (€ 150 p/m).
+Business blijft voor grotere organisaties. Twee gevolgen die erbij horen:
+
+- Business Lite moet gebouwd zijn vóór de poort verandert (§6). Tot dan blijft
+  de eis staan zoals hij is; de poort verzetten naar een pas die niet bestaat,
+  zou hem helemaal sluiten.
+- De **€ 10.000 entree en € 500 contributie** uit de partnervoorwaarden moeten
+  worden ingetrokken of herzien. Twee toegangsprijzen naast elkaar (€ 150 p/m
+  én € 10.000 eenmalig) is onuitlegbaar, en een eenmalig bedrag van € 10.000
+  sluit dezelfde kleine zaak weer buiten. Dit is PRIJZEN.md §4.6, dat daarmee
+  van "niet gebouwd" naar "te herzien" gaat.
+
+### Een prijswijziging raakt nooit een lopend contract
+
+`price_lock_until` = einde van de minimumtermijn. Wat een lid tekende, betaalt
+het lid. Consumentenrechtelijk het veiligst voor de RTG Pass (twaalf maanden) en
+commercieel het duidelijkst.
+
+Dit is nu nog **niet** afgedwongen: `test/pasprijs.test.js` toets 6 bewaakt zelfs
+het tegenovergestelde — dat een boardroom-wijziging overal doorkomt, ook op de
+factuur van een lid met een jaarcontract. Die toets bewaakt iets echts (de drie
+uiteengelopen kopieën van de pasprijs) en mag pas veranderen als de Contract
+Engine er is; dan wordt het "een wijziging komt door naar elk contract dat er nog
+niet aan vastzit". Prijs: één prijswijziging leeft langer naast de oude, want
+lopende contracten volgen pas bij verlenging.
+
+### Het betaaldiensttarief blijft, en komt in de voorwaarden
+
+€ 0,10 + 1% per transactie blijft. De partnervoorwaarden noemen **RTG nu
+expliciet als betaaldienstverlener**, met het tarief, met de grondslag ("per
+transactie, niet over uw omzet") en met de vaststelling dat afrekenen via RTG
+Pay niet verplicht is. Artikel 1 is daarvoor herschreven: het beloofde "geen
+transactiekosten" terwijl elke kassabetaling naar `rtg:betaaldienst` boekte.
+
+Het bedrag staat **niet hard** in het document maar komt live uit
+`/api/betaaldiensttarief` — de eerste stap van §9. Een bedrag in een juridisch
+document dat los kan lopen van wat de code rekent, is precies hoe "0% commissie"
+naast een commissieknop kon blijven bestaan.
+
+### RTG Community
+
+Zie §11.
+
 ## 4. Wat hierna komt, op volgorde
 
-De eigenaar heeft de volgorde bepaald. 1 en 2 zijn af.
+De eigenaar heeft de volgorde bepaald. 1, 2 en 3 zijn af.
 
 1. ~~Commissieconflict definitief verwijderen~~ — **af**
 2. ~~Ledenkorting financieel echt maken~~ — **af** (rekenkundig; de uitbetaalkant
    staat op `te_verrekenen` tot de betaal-naad hem oppakt)
-3. **Betaaldienst met ledger en recovery.** `if (kb.error) kosten = 0` moet weg;
-   een mislukte interne boeking mag nooit geld laten verdwijnen. De staten:
-   `PAYMENT_CAPTURED → FEE_PENDING → FEE_POSTED → FEE_RETRY → FEE_RECONCILED`.
+3. ~~Betaaldienst met ledger en recovery~~ — **af**. `if (kb.error) kosten = 0`
+   is weg; de vergoeding wordt vastgelegd vóór de boekpoging en blijft bij een
+   mislukking verschuldigd (`kern/commercie/fee.js`,
+   `test/betaaldienstfee.test.js`). De staten heten in dit huis GEINCASSEERD →
+   OPENSTAAND → GEBOEKT / HERKANSING → AFGESTEMD, met de Engelse namen erbij.
+   Nog **niet** gebouwd: de automatische herkansingsronde. Een HERKANSING blijft
+   nu staan tot iemand kijkt — zichtbaar in `kostenOpen` op het
+   partneroverzicht, maar niemand pakt hem op.
 4. **Contract Engine met price snapshots.** Zie §5.
 5. **Business Lite via capabilities**, niet via pas-id-checks. Zie §6.
 6. **AI Entitlement**: bundels, auto-top-up, spend cap. Zie §7.

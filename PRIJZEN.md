@@ -164,7 +164,17 @@ terwijl overal elders 12% de standaard is — precies het kopieprobleem waarvoor
 `kern/pasprijs.js` is gemaakt. En het neemt het tarief van het **eerste huis** en
 past dat toe op alle omzet.
 
-### 4.3 De betaaldienstkosten gaan naar RTG, en de voorwaarden noemen ze niet
+### 4.3 ~~De betaaldienstkosten gaan naar RTG, en de voorwaarden noemen ze niet~~ — GESLOTEN
+
+*Opgelost op 20 augustus 2026. Het tarief blijft (€ 0,10 + 1%), maar de
+partnervoorwaarden noemen RTG nu expliciet als betaaldienstverlener, met de
+grondslag erbij en met de vaststelling dat afrekenen via RTG Pay niet verplicht
+is; artikel 1 beloofde "geen transactiekosten" en is herschreven. Het bedrag
+staat niet hard in het document maar komt uit `/api/betaaldiensttarief`. En het
+stille foutpad is weg: `kern/commercie/fee.js` legt de vergoeding vast vóór de
+boekpoging, zodat een mislukte boeking een openstaande post achterlaat in plaats
+van een nul. `test/betaaldienstfee.test.js`, vijf mutaties vijf raak — waarvan
+M1 letterlijk de oude bug is. Wat er was:*
 
 `kern/pay/kassa.js:59-63` boekt per kassabetaling € 0,10 + 1% van de
 partnerrekening naar **`rtg:betaaldienst`**. Dat is inkomsten van RTG uit een
@@ -176,8 +186,9 @@ kassabon (`leverancier.js:6821`).
 Daarnaast een echt defect: `if (kb.error) kosten = 0;` — mislukt de kostenboeking,
 dan worden de kosten stilzwijgend nul in plaats van dat de transactie het meldt.
 
-**Wat er eerst nodig is:** het tarief in de partnervoorwaarden, met RTG als
-genoemde betaaldienstverlener, en een foutpad dat niet stil is.
+**Wat er nog niet is:** een automatische herkansingsronde. Een mislukte boeking
+staat nu zichtbaar op HERKANSING in `kostenOpen`, maar er is niemand die hem
+oppakt — dat blijft mensenwerk tot die ronde er is.
 
 ### 4.4 ~~Het ledenvoordeel wordt getoond maar door niemand betaald~~ — GROTENDEELS GESLOTEN
 
@@ -211,7 +222,13 @@ Dat laatste bijt nu al: `test/pasprijs.test.js` toets 6 bewaakt dat een
 prijswijziging in de boardroom **overal** doorkomt — ook op de factuur van een
 lid dat een jaarcontract heeft. Voor de RTG Pass is dat een consumentenkwestie.
 
-### 4.6 De entree van € 10.000 bestaat alleen op papier
+### 4.6 De entree van € 10.000 bestaat alleen op papier — **en moet nu herzien**
+
+*Sinds het besluit dat de partnerpoort Business Lite wordt (COMMERCIE.md §3b) is
+dit geen ontbrekende bouwsteen meer maar een tegenstrijdigheid: twee
+toegangsprijzen naast elkaar (€ 150 p/m én € 10.000 eenmalig) is onuitlegbaar,
+en € 10.000 sluit precies de kleine zaak buiten voor wie de € 150-trede bedoeld
+is. Intrekken of herzien, niet bouwen.*
 
 Founding-partners betalen niets; wie later toetreedt betaalt € 10.000 eenmalig,
 € 500 per jaar en een doorbelasting van de werkelijke onderhoudskosten "zonder

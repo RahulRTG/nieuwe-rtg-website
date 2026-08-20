@@ -898,6 +898,132 @@
       "pad": "server/server.js",
       "reden": "binnengekomen met de samenvoegronde van 2026-08-18 (PR #83), uit een tak die ouder is dan de deltapoort; de monoliet groeit met elke tak mee; het afbouwplan staat in TAKEN.md en elke nieuwe kamer hoort in kern/ of routes/ te landen, niet hier",
       "vervalt": "2026-09-15"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/app-main/app-main-56c.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 28 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/backoffice/backoffice-05.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/foundation/leerpaspoort.html",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 3 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/foundation/school-oefenen.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 2 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/foundation/school-toets.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/foundation/school-verlof.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/leverancier/leverancier-12a3.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 3 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/leverancier/leverancier-84.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 5 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/routedekking.html",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/rtgschool/leer/leer-02.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 5 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/rtgschool/leer/leer-03.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 3 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/dossier/dossier-02.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/geld/geld-02.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/hr/hr-02.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/mijnhr.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 2 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/taalcheck.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/toetskeuring.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/veiligheid/veiligheid-02.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/schoolpartner/verlof.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/zaakpay.html",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/shared/linkkaart.js",
+      "vervalt": "2026-10-01",
+      "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
     }
   ]
 }

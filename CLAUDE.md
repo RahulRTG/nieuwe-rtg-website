@@ -31,6 +31,19 @@ bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
 de grenzen: een relatie is geen trechter, en er komt geen score op het leven
 tussen mensen.
 
+**`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
+Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
+zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de
+match het product, bij Rendez-vous de ontmoeting. De toetsvraag bij elke nieuwe
+functie is dus: maakt dit het vínden beter of het ontmóéten? Lees vóór je aan
+daten, matchen of introduceren werkt vooral paragraaf 4, de grenzen: de software
+port nooit aan tot een volgende stap (de knop mag, de aansporing niet), een
+introductie leunt nooit op een derde, aanwezigheid is zelf opgegeven en nooit
+afgeleid uit RTG Travel, en er komt geen cijfer op een mens — ook niet intern als
+sorteersleutel. De poort (18+ met geverifieerd paspoort) staat op één plek,
+`server/kern/ontmoetpoort.js`, en wordt door beide apps gedeeld; de pas-eis is
+iets anders en blijft op de route. Par. 4 van `LIFE.md` staat er onverkort boven.
+
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht
 concern, en daarna mensen er moeiteloos in laten werken. Lees vóór je aan

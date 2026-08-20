@@ -220,6 +220,23 @@
     </div>
     <div class="cols h-mt150">
       <div class="panel">
+        <h2 data-i18n="panel.tafels">Rendez-vous &mdash; The Table</h2>
+        <p class="sub" data-i18n="panel.tafels.sub" style="margin:0 0 0.6rem;">Stel een tafel samen: zes of acht leden die iets aan elkaar hebben. Zij zien hun eigen uitnodiging &mdash; nooit wie er nog meer komt.</p>
+        <div class="rows" id="rvTafels"></div>
+        <div style="padding:0.7rem;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <input id="tfNaam" placeholder="Naam, bijv. Diner 04" style="flex:1;min-width:9rem;">
+          <input id="tfStad" placeholder="Stad" style="width:8rem;">
+          <input id="tfDatum" type="date" aria-label="Datum" style="width:9.5rem;">
+          <input id="tfTijd" type="time" aria-label="Tijd" style="width:7rem;">
+          <input id="tfThema" placeholder="Thema, bijv. architectuur &middot; hospitality" style="flex:1;min-width:9rem;">
+          <input id="tfPlaatsen" type="number" min="2" max="12" value="8" aria-label="Aantal plaatsen" style="width:5rem;">
+          <input id="tfGasten" placeholder="Codenamen, met komma's" style="flex:1;min-width:12rem;">
+          <button class="hbtn" id="tfMaak" data-i18n="bo.tfmaak">Tafel samenstellen</button>
+        </div>
+      </div>
+    </div>
+    <div class="cols h-mt150">
+      <div class="panel">
         <h2 data-i18n="panel.incidenten">Paspoort-incidenten</h2>
         <p class="sub" data-i18n="panel.incidenten.sub" style="margin:0 0 0.6rem;">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
         <div class="rows" id="incidenten"></div>

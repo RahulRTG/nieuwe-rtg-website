@@ -1115,6 +1115,43 @@ dat het misgaat ook niet meer op. `test/btw-waarom-scherm.e2e.js` toetst dus
 beide kanten: dat de eigen factuur eronder verschijnt, én dat er géén bevinding
 staat als er niets aan de hand is.
 
+#### En dezelfde keten voor het loon (`kern/payroll/herkomst.js`)
+
+De loonkant is de tweede grote geldstroom, en had al iets: `dossier.js`
+beantwoordt per medewerker per run de vier vragen — waarom is dit bedrag
+berekend, welke regelversie, is het betaald, is het aangegeven. Dat is de
+onderste helft van de keten. Wat ontbrak is de weg **van de aangifte omlaag**:
+het collectieve bedrag openvouwen naar de nominatieve regels, en van daaruit
+naar dat dossier. Deze laag bouwt die brug en **verwijst** voor het detail —
+het hier nog eens verzamelen zou een tweede dossier zijn.
+
+Herbouwen gebruikt `nominatief()` uit `aangifte.js`, dezelfde routine waarmee de
+aangifte is opgemaakt (daarvoor staat die nu op modulescope). Een herbouw die
+anders optelt vindt altijd een verschil, en dan zegt een verschil niets meer.
+
+De twee controles die bij het opmaken al draaiden, draaien hier **opnieuw** — en
+dat is de hele bedoeling: bij het opmaken bewijzen ze dat de aangifte goed
+begon, hier dat hij dat nog steeds is. De optelling van het nominatieve deel
+moet het collectieve deel zijn, en de aangegeven loonheffing moet zijn wat er op
+de stroken staat. Ze zijn onafhankelijk: draai je aan één rubriek, dan slaat de
+eerste uit en blijft het te betalen bedrag kloppen.
+
+Plus een derde die alleen achteraf te stellen is: **op welk regelpakket rustte de
+run**. Een pakket dat later van zijn aanmerking valt of dat zelf meldt dat zijn
+cijfers niet tegen het Handboek zijn gelegd, maakt de aangifte niet fout — het
+maakt hem twijfelachtig, en dat hoort naast het bedrag te staan in plaats van te
+verdwijnen.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/office/payroll/verklaar` `{id}` | Het collectieve bedrag open naar de nominatieve regels, met de verwijzing naar het dossier |
+| `POST /api/office/payroll/herbouw` `{id}` | De aangifte herbouwen uit de run en rubriek voor rubriek vergelijken |
+
+Bij het **kantoor** en niet bij de zaak: dit legt de loonheffing per werknemer
+open, en de werkgever leest zijn aangifte al mee via zijn eigen route. Een
+tweede, ruimere ingang op dezelfde gegevens is geen extra dienst maar een tweede
+sleutel op dezelfde deur.
+
 ### De zzp-regimes per ingangsdatum (`kern/fiscaal/zzpwacht.js`)
 
 De landentabel stond al per jaargang vast; de zzp-tabel niet, dus de zzp-tool

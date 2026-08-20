@@ -38,6 +38,7 @@ const { maakContracten } = require('./contracten');
 const { maakRun } = require('./run');
 const { maakJournaal } = require('./journaal');
 const { maakAangifte } = require('./aangifte');
+const { maakPayrollHerkomst } = require('./herkomst');
 const { maakVerzuim } = require('./verzuim');
 const { maakIdentiteit } = require('./identiteit');
 const { maakBijwerken, urlBron } = require('./bijwerken');
@@ -59,6 +60,10 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
   /* Het dossier verzamelt alleen; het rekent niets opnieuw uit en vult geen
      gaten. Daarom krijgt het de andere lagen mee in plaats van de database. */
   const dossier = maakDossier({ run, journaal, aangifte, regelpakket: regels, contracten });
+  /* De bewijsketen van de aangifte: van het collectieve bedrag omlaag naar de
+     nominatieve regels, en van daaruit naar het dossier hierboven. Hij bouwt
+     dat detail niet na -- hij wijst ernaar. */
+  const { payrollHerkomst } = maakPayrollHerkomst({ aangifte, run, regelpakket: regels, dossier });
   const verzuim = maakVerzuim({ db, save, nu });
   const identiteit = maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity });
   /* De dekking eerst: de bijwerklaag leest er zijn bronnen uit, per land. Zo is
@@ -91,7 +96,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
 
   return {
     payrollOS: {
-      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, samenstellen, controles, dekking, dossier,
+      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, samenstellen, controles, dekking, dossier, herkomst: payrollHerkomst,
       bijwerken, urlBron, laadMeegeleverd
     }
   };

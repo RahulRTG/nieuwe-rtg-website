@@ -10,7 +10,7 @@
           '<span>'+a.company+' · '+a.func+'</span>'+
           '<span style="display:flex;align-items:center;gap:0.4rem;flex-shrink:0;">'+
           (a.chatId ? '<button class="chatb" style="width:auto;padding:0.2rem 0.55rem;font-size:0.7rem;" data-apchat="'+a.chatId+'" data-apco="'+encodeURIComponent(a.company)+'">'+T('cv.chat','Chat')+'</button>' : '')+
-          '<span style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:'+kleur+';border:1px solid '+kleur+';border-radius:999px;padding:0.15rem 0.55rem;">'+label+'</span></span></div>';
+          '<span style="font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:'+kleur+';border:1px solid '+kleur+';border-radius:0;padding:0.15rem 0.55rem;">'+label+'</span></span></div>';
       }).join('')+'</div>' : '')+
       '<button class="vbtn h-mt80" id="cvOpen">'+(myCvReady?T('cv.card.edit','Bewerk mijn cv'):T('cv.card.make','Maak mijn cv'))+'</button>';
     $('#cvOpen').addEventListener('click', openCvSheet);
@@ -80,7 +80,7 @@
       vacLanden.map(l => '<option value="'+l.code+'"'+(l.code===vacLand?' selected':'')+'>'+(VLAG[l.code]||'')+' '+esc(l.naam)+'</option>').join('');
     let h = '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">'+
       '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('vac.k','Werk en vacatures')+'</div>'+
-      '<select id="vacLand" style="background:var(--card2);color:var(--txt,#fff);border:1px solid var(--line);border-radius:999px;padding:0.3rem 0.6rem;font-size:0.72rem;">'+landOpts+'</select></div>';
+      '<select id="vacLand" style="background:var(--card2);color:var(--txt,#fff);border:1px solid var(--line);border-radius:0;padding:0.3rem 0.6rem;font-size:0.72rem;">'+landOpts+'</select></div>';
     if (!rij.length){
       h += '<div style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);">'+T('vac.leeg','Nu geen open vacatures die bij u passen. Kijk gerust later nog eens.')+'</div>'+
         '<button class="rahul-leeg-knop h-mt50" data-rahul-leeg="Zoek werk dat bij mijn profiel past en help me solliciteren">'+T('vac.leegdoe','Laat Rahul werk zoeken dat past')+'</button>';
@@ -88,12 +88,12 @@
       h += '<div style="margin-top:0.7rem;display:flex;flex-direction:column;gap:0.6rem;">'+ rij.slice(0,20).map(({v,km})=>{
         const al = isApplied(v);
         const meta = [ VACSOORT[v.soort]||v.soort, (VLAG[v.land]||'')+' '+(v.landNaam||''), v.plaats||v.stad, km!=null?(''+Geo.tekst(km)):'' ].filter(x=>x&&x.trim()).join(' · ');
-        return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;">'+
+        return '<div style="border:1px solid var(--line);border-radius:0;padding:0.7rem 0.85rem;">'+
           '<div style="display:flex;align-items:flex-start;gap:0.5rem;justify-content:space-between;">'+
           '<div style="min-width:0;"><b style="font-size:0.9rem;">'+esc(v.func)+'</b>'+
           '<div style="font-size:0.74rem;color:var(--rtg-leesgoud,var(--gold));font-weight:600;">'+esc(v.bedrijf)+'</div>'+
           '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.15rem;">'+esc(meta)+'</div></div>'+
-          (al ? '<span style="flex-shrink:0;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:#4CAF7D;border:1px solid #4CAF7D;border-radius:999px;padding:0.15rem 0.5rem;">'+T('vac.verstuurd','verstuurd')+'</span>'
+          (al ? '<span style="flex-shrink:0;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:#4CAF7D;border:1px solid #4CAF7D;border-radius:0;padding:0.15rem 0.5rem;">'+T('vac.verstuurd','verstuurd')+'</span>'
                : '<button class="vbtn" style="flex-shrink:0;width:auto;padding:0.4rem 0.8rem;font-size:0.74rem;" data-vac="'+v.id+'" data-sup="'+v.supplierCode+'">'+T('vac.sol','Solliciteer')+'</button>')+
           '</div>'+
           (v.omschrijving?'<div style="font-size:0.74rem;color:var(--muted);margin-top:0.4rem;line-height:1.4;">'+esc(v.omschrijving)+'</div>':'')+

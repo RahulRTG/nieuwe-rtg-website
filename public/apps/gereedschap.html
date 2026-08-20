@@ -25,7 +25,7 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:760px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
@@ -33,7 +33,7 @@
   .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
   .paneel{display:none;}
@@ -52,12 +52,12 @@
   body.rtg-stijl header nav .knop.aan{color:var(--txt);border-bottom-color:var(--gold);}
 
   /* de rekenmachine */
-  #rkScherm{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  #rkScherm{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:500 1.6rem 'Inter',sans-serif;text-align:right;padding:.9rem .9rem;
     font-variant-numeric:tabular-nums;}
   #rkUitkomst{text-align:right;color:var(--rtg-leesgoud,var(--gold));font-size:1rem;min-height:1.5rem;margin:.3rem .2rem .6rem;}
   #rkToetsen{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;}
-  #rkToetsen button{background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--txt);
+  #rkToetsen button{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:600 1.05rem 'Inter',sans-serif;padding:.85rem 0;cursor:pointer;}
   #rkToetsen button:hover{border-color:var(--gold);}
   #rkToetsen .op{color:var(--rtg-leesgoud,var(--gold));}
@@ -66,12 +66,12 @@
    breedte van zijn inhoud, en dan duwt een lange regel het hele scherm open
    (op 390px liep dit tot 605px, buiten beeld). */
 .zaak{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem;margin-top:.8rem;}
-  .zaak .vak{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .zaak .vak{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;}
   .zaak .vak b{display:block;font-size:.72rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;}
   .zaak .uitkomst{font-size:.82rem;color:var(--muted);margin-top:.4rem;line-height:1.5;}
 
   /* wekkers, timers, klokken */
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;
     margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
   .kaart .tijd{font:600 1.3rem 'Inter',sans-serif;font-variant-numeric:tabular-nums;}
   .kaart .wat{flex:1;color:var(--muted);font-size:.8rem;}
@@ -86,7 +86,7 @@
   .alarm.open{display:flex;}
   .alarm h2{font-size:2rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}

@@ -107,17 +107,49 @@ function startEchteServer() {
   const server = await startEchteServer();
   const basis = server.basis;
 
-  let browser;
+  /* DE BROWSER WORDT GEZOCHT EN NIET OP EEN PLEK VERWACHT.
+
+     Playwright zoekt de build die bij ZIJN versie hoort ("chromium_headless_
+     shell-1234"). Staat er een andere op de machine -- een omgeving die
+     browsers voorinstalleert, een distro-chromium, een andere pin -- dan
+     faalde de start en sloeg deze scan zichzelf over. Dat is de duurste
+     uitkomst die er is: er ligt een prima browser op schijf en de poort meldt
+     "overgeslagen" met exitcode 0, dus alles ziet er groen uit terwijl er 258
+     schermen ongekeurd blijven.
+
+     Dus: eerst de gepinde build, en anders de eerste die er echt staat. Welke
+     het werd staat in de uitvoer, want een keuring die niet zegt waarmee hij
+     gemeten heeft, is een keuring die je niet kunt narekenen. */
+  const kandidaten = [
+    process.env.RTG_CHROMIUM,
+    process.env.PLAYWRIGHT_BROWSERS_PATH && path.join(process.env.PLAYWRIGHT_BROWSERS_PATH, 'chromium'),
+    '/opt/pw-browsers/chromium',
+    '/usr/bin/chromium', '/usr/bin/chromium-browser', '/usr/bin/google-chrome'
+  ].filter(p => { try { return p && fs.existsSync(p); } catch (e) { return false; } });
+
+  let browser, waarmee = 'de gepinde Playwright-build';
   try {
     /* RTG_CHROMIUM wijst een browser aan die niet op de plek staat die het
        pakket verwacht (een ontwikkelbak met een eigen chromium). Leeg is
-       undefined en dus precies het gedrag van hiervoor. */
+       undefined en dus precies het gedrag van hiervoor. Lukt ook dat niet,
+       dan lopen we de kandidaat-paden af voor we het opgeven. */
     browser = await pw.chromium.launch({ args: ['--no-sandbox'], executablePath: process.env.RTG_CHROMIUM || undefined });
-  } catch (e) {
-    console.log('[a11y] Kon Chromium niet starten; scan overgeslagen:', e.message);
-    server.stop();
-    process.exit(STRICT ? 1 : 0);
+  } catch (eerste) {
+    for (const pad of kandidaten) {
+      try {
+        browser = await pw.chromium.launch({ executablePath: pad, args: ['--no-sandbox'] });
+        waarmee = pad;
+        break;
+      } catch (e2) { /* volgende kandidaat */ }
+    }
+    if (!browser) {
+      console.log('[a11y] Kon Chromium niet starten; scan overgeslagen:', eerste.message);
+      if (kandidaten.length) console.log('[a11y] geprobeerd:', kandidaten.join(', '));
+      server.stop();
+      process.exit(STRICT ? 1 : 0);
+    }
   }
+  console.log('[a11y] browser:', waarmee);
 
   /* Een echt proeflid, zodat de tweede ronde een ECHTE sessie heeft en niet een
      verzonnen token dat de server toch weigert. */

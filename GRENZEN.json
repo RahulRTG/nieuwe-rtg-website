@@ -50,7 +50,9 @@
       "automatisering",
       "checkCred",
       "eersteBijdrageFactuur",
+      "email",
       "forgetSession",
+      "geboren",
       "hasCred",
       "herstelStart",
       "isBaas",
@@ -59,13 +61,17 @@
       "loginFails",
       "mail",
       "memberTemplate",
+      "name",
       "noteFailedTry",
       "pasAppOk",
       "pasAppVan",
+      "password",
       "rememberSession",
       "sessions",
       "startHerstel",
       "stateFor",
+      "telefoon",
+      "tier",
       "webauthnLijst",
       "webauthnLoginMaak",
       "webauthnLoginOpties",
@@ -241,10 +247,6 @@
       "consentVan",
       "status"
     ],
-    "inzagekaart": [
-      "inzagekaartVan",
-      "status"
-    ],
     "dagcoach": [
       "dagVoor"
     ],
@@ -266,6 +268,14 @@
     ],
     "facturatie": [
       "facturatie"
+    ],
+    "festival": [
+      "editieVan",
+      "festival",
+      "geenFestival",
+      "mijn",
+      "pay",
+      "stuur"
     ],
     "fiscaal-vooruit": [
       "btwAangifte",
@@ -385,6 +395,10 @@
     "instant-reality": [
       "instantGet",
       "instantMutate"
+    ],
+    "inzagekaart": [
+      "inzagekaartVan",
+      "status"
     ],
     "journaal": [
       "boardroomAuth",
@@ -989,21 +1003,21 @@
       "rtfbieb",
       "rvAanwezigWis",
       "rvAkkoord",
+      "rvArrange",
+      "rvDate",
       "rvEncounter",
       "rvIntroAntwoord",
       "rvIntroducties",
-      "rvSamen",
-      "rvSamenZet",
-      "rvTafelAntwoord",
-      "rvTafels",
-      "rvArrange",
-      "rvDate",
       "rvKandidaten",
       "rvLike",
       "rvMatches",
       "rvPas",
       "rvProfiel",
       "rvProfielGet",
+      "rvSamen",
+      "rvSamenZet",
+      "rvTafelAntwoord",
+      "rvTafels",
       "salon",
       "salonAI",
       "salonInzicht",
@@ -1201,8 +1215,8 @@
       "ensureSupplierDefaults",
       "findSupplier",
       "forgetSession",
-      "instelling",
       "handelingsspoor",
+      "instelling",
       "keyVanCodenaam",
       "logInlog",
       "loginFails",
@@ -1650,6 +1664,7 @@
       "GROOTHANDEL_CATEGORIEEN",
       "H",
       "HK_STATUSES",
+      "Hlees",
       "KANALEN",
       "LANDEN",
       "PASPOORT_NIVEAUS",

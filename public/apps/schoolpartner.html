@@ -27,34 +27,34 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:760px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0 0 .5rem;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
   /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
      2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
   .stil > a{display:inline-block;padding:.25rem 0;min-height:24px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}
-  .knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.5rem .85rem;cursor:pointer;}
   .knop.p{background:var(--burgundy);border-color:transparent;color:#fff;}
   .knop:hover{border-color:var(--gold);}
   .knop:focus-visible,.veld:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.55rem;margin-bottom:.8rem;}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;}
   .kpi b{display:block;font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:500;}
   .kpi span{font-size:.68rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
   .item{display:flex;gap:.6rem;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:.55rem 0;flex-wrap:wrap;}
   .item:first-of-type{border-top:0;}
-  .tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
+  .tag{font-size:.66rem;border:1px solid var(--line);border-radius:0;padding:.12rem .5rem;color:var(--muted);}
   .tag.aan{color:var(--goed);border-color:var(--goed);}
   .doelkies{display:flex;flex-wrap:wrap;gap:.35rem;margin:.5rem 0;}
-  .doelkies label{border:1px solid var(--line);border-radius:999px;padding:.28rem .6rem;font-size:.74rem;cursor:pointer;display:inline-flex;gap:.3rem;align-items:center;}
+  .doelkies label{border:1px solid var(--line);border-radius:0;padding:.28rem .6rem;font-size:.74rem;cursor:pointer;display:inline-flex;gap:.3rem;align-items:center;}
   .doelkies input{accent-color:var(--burgundy);}
   .doelkies label:has(:checked){border-color:var(--burgundy);color:#fff;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;}
   .melding.zie{opacity:1;}
   /* markeringen voor het deelmenu: ze bundelen de kaarten van de werkbank tot

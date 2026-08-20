@@ -58,7 +58,7 @@
     scrollbar-width:none;}
   .werelden::-webkit-scrollbar{display:none;}
   .werelden button{flex:0 0 auto;background:none;border:1px solid var(--rtg-line);
-    border-radius:999px;padding:0.42rem 0.95rem;color:var(--rtg-muted);
+    border-radius:0;padding:0.42rem 0.95rem;color:var(--rtg-muted);
     font:inherit;font-size:0.76rem;font-weight:600;cursor:pointer;
     white-space:nowrap;transition:background .18s,color .18s,border-color .18s;}
   /* De gekozen wereld: bijna-zwart OP het accent haalde 3,78:1, en dat is de
@@ -74,7 +74,7 @@
   /* de feed */
   main{padding:1.1rem 1.1rem 5.5rem;max-width:640px;margin:0 auto;}
   .kaart{background:var(--rtg-card);border:1px solid var(--rtg-line);
-    border-radius:var(--rtg-rond);padding:1rem 1.05rem;margin-bottom:0.8rem;}
+    border-radius:0;padding:1rem 1.05rem;margin-bottom:0.8rem;}
   .kaart .r1{display:flex;align-items:baseline;gap:0.55rem;margin-bottom:0.5rem;}
   .kaart .auteur{font-weight:600;font-size:0.86rem;}
   .kaart .bron{font-size:0.66rem;color:var(--rtg-soft);text-transform:uppercase;
@@ -83,11 +83,11 @@
     font-variant-numeric:tabular-nums;}
   .kaart p{margin:0 0 0.7rem;font-size:0.9rem;line-height:1.55;
     color:var(--rtg-txt);white-space:pre-wrap;overflow-wrap:anywhere;}
-  .kaart img{width:100%;border-radius:var(--rtg-rond-klein);display:block;
+  .kaart img{width:100%;border-radius:0;display:block;
     margin-bottom:0.7rem;}
   .kaart .acties{display:flex;gap:0.5rem;align-items:center;}
   .kaart .acties button{background:none;border:1px solid var(--rtg-line);
-    border-radius:999px;padding:0.3rem 0.75rem;color:var(--rtg-muted);
+    border-radius:0;padding:0.3rem 0.75rem;color:var(--rtg-muted);
     font:inherit;font-size:0.72rem;cursor:pointer;}
   .kaart .acties button:hover{color:var(--rtg-txt);border-color:var(--rtg-acc);}
   .kaart .tel{font-size:0.72rem;color:var(--rtg-soft);margin-left:auto;
@@ -96,16 +96,16 @@
   .leeg{color:var(--rtg-soft);font-size:0.85rem;line-height:1.6;
     text-align:center;padding:3rem 1rem;}
   .meer{display:block;width:100%;background:none;border:1px solid var(--rtg-line);
-    border-radius:999px;padding:0.6rem;color:var(--rtg-muted);font:inherit;
+    border-radius:0;padding:0.6rem;color:var(--rtg-muted);font:inherit;
     font-size:0.78rem;cursor:pointer;margin-top:0.4rem;}
   .fout{background:rgba(222,110,146,0.10);border:1px solid var(--rtg-rood);
-    border-radius:var(--rtg-rond-klein);padding:0.75rem 0.9rem;
+    border-radius:0;padding:0.75rem 0.9rem;
     font-size:0.8rem;color:var(--rtg-txt);margin-bottom:0.8rem;}
 
   /* het profiel: per laag een kaart, per veld een regel met een keuzelijst.
      De keuzelijst is de hele interactie -- invullen gebeurt in de bronapp. */
   .laag{background:var(--rtg-card);border:1px solid var(--rtg-line);
-    border-radius:var(--rtg-rond);padding:1rem 1.05rem;margin-bottom:0.8rem;}
+    border-radius:0;padding:1rem 1.05rem;margin-bottom:0.8rem;}
   .laag h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;
     font-size:1.1rem;margin:0 0 0.15rem;}
   .laag .bron{font-size:0.7rem;color:var(--rtg-soft);margin:0 0 0.9rem;}
@@ -118,16 +118,16 @@
   .veld .wa.leeg{color:var(--rtg-soft);font-style:italic;}
   .veld select{background:var(--rtg-card2);color:var(--rtg-txt);font:inherit;
     font-size:0.74rem;border:1px solid var(--rtg-line);
-    border-radius:999px;padding:0.28rem 0.6rem;cursor:pointer;}
+    border-radius:0;padding:0.28rem 0.6rem;cursor:pointer;}
 
   /* zoeken: een veld en een lijst treffers. De regel "gedeelde connecties"
      staat op de kaart, want dat is wat een introductie mogelijk maakt. */
   #zoekform{display:flex;gap:0.5rem;margin-bottom:1rem;}
   #zoekform input{flex:1;background:var(--rtg-card2);color:var(--rtg-txt);
     font:inherit;font-size:0.85rem;border:1px solid var(--rtg-line);
-    border-radius:999px;padding:0.5rem 0.95rem;}
+    border-radius:0;padding:0.5rem 0.95rem;}
   #zoekform button{background:var(--rtg-acc);color:#0C0C0B;font:inherit;
-    font-size:0.8rem;font-weight:600;border:0;border-radius:999px;
+    font-size:0.8rem;font-weight:600;border:0;border-radius:0;
     padding:0.5rem 1.1rem;cursor:pointer;}
   .via{font-size:0.72rem;color:var(--rtg-acc);margin-top:0.35rem;}
 

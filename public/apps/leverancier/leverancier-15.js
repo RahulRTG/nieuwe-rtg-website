@@ -76,7 +76,7 @@
           '<div id="accVragen" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.5rem 0;"></div>'+
           '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" class="h-flex1">'+
           '<button class="obtn primary" id="accGo">'+T('fn.vraag','Vraag')+'</button></div>'+
-          '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
+          '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
           '<button class="obtn h-mt60" id="accAdvies">'+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+
           '<div id="accAdv"></div></div>';
       }

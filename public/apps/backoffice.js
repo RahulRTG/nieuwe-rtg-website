@@ -340,14 +340,14 @@
       const status = dt.status === 'noodgeval' ? ''+T('bo.ontnood','NOODGEVAL') : dt.status === 'actief' ? ''+T('bo.ontactief','loopt') : ''+T('bo.onttekenen','wacht op tekenen');
       let sosBlok = '';
       if (nood) sosBlok = dt.sos.map(s =>
-        '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:8px;padding:0.5rem 0.7rem;">'+
+        '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:0;padding:0.5rem 0.7rem;">'+
         '<b style="color:#ff8a8a;">'+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
         '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
         '<button class="vbtn ok" data-live="'+dt.id+'" data-naam="'+escHtml(s.door)+'">'+T('bo.ontlive','Live meekijken')+'</button>'+
         '<a class="vbtn" href="tel:112" style="text-decoration:none;background:#c62828;color:#fff;">'+T('bo.ont112','Bel 112')+'</a>'+
         '<button class="vbtn" data-sosaf="'+dt.id+'" data-sosid="'+s.id+'">'+T('bo.ontsosaf','SOS afgehandeld')+'</button>'+
         '</div></div>').join('');
-      return '<div class="vrow" style="'+(nood?'border:1px solid #c62828;border-radius:12px;':'')+'"><div class="vi" style="width:100%;">'+
+      return '<div class="vrow" style="'+(nood?'border:1px solid #c62828;border-radius:0;':'')+'"><div class="vi" style="width:100%;">'+
         '<div class="nm">'+RTGGlyf.tekst(dt.icon)+' '+escHtml(dt.activiteitLabel)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+namen+'</span></div>'+
         '<div class="sub">'+status+' · '+pos+'</div>'+ sosBlok +'</div></div>';
     }).join('');
@@ -534,7 +534,7 @@
       const pc = x.status==='nieuw'?'nieuw':x.status==='aangenomen'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.ap.new','nieuw'):x.status==='aangenomen'?T('bo.ap.hired','aangenomen'):T('bo.ap.rejected','afgewezen');
       return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.name)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.func)+'</span>'+
-        (x.viaRTG?' <span style="font-size:0.58rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:999px;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</span>':'')+'</div>'+
+        (x.viaRTG?' <span style="font-size:0.58rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:0;padding:0.1rem 0.45rem;vertical-align:middle;">RTG</span>':'')+'</div>'+
         '<div class="sub">'+escHtml(x.company)+' · '+timeAgo(x.at)+'</div></div>'+
         '<span class="pill '+pc+'">'+st+'</span></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';

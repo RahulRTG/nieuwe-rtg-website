@@ -27,7 +27,7 @@
          champagne stond de pasnaam in rgb(26,23,19) op rgb(36,16,22), 1,1:1. De
          tokens staan nu op de kaart zelf, zodat alles wat erin komt klopt. */
       '#paneel .wa-pas{background:linear-gradient(150deg,#241016,#150C0F 55%,#0C0C0B);' +
-        'border:1px solid rgba(201,162,75,.34);border-radius:12px;padding:1.3rem 1.35rem 1.2rem;' +
+        'border:1px solid rgba(201,162,75,.34);border-radius:0;padding:1.3rem 1.35rem 1.2rem;' +
         'position:relative;overflow:hidden;margin:.6rem 0 1rem;' +
         'color:var(--op-onyx,#F4F0E9);--rtg-txt:var(--op-onyx,#F4F0E9);' +
         '--rtg-muted:rgba(244,240,233,0.78);--rtg-soft:rgba(244,240,233,0.66);}' +
@@ -38,7 +38,7 @@
       '#paneel .wa-pas .mrow{font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-soft);}' +
       '#paneel .wa-pas .mrow+.mrow{margin-top:.55rem;}' +
       '#paneel .wa-pas .mrow b{display:block;font-size:.78rem;color:var(--rtg-txt);font-weight:500;margin-top:.2rem;letter-spacing:.08em;}' +
-      '#paneel .wa-pas .qr{background:#fff;padding:4px;border-radius:6px;line-height:0;flex-shrink:0;}' +
+      '#paneel .wa-pas .qr{background:#fff;padding:4px;border-radius:0;line-height:0;flex-shrink:0;}' +
       '#paneel .wa-pas .qr canvas{width:62px;height:62px;display:block;}' +
       /* padding en min-height: 14px hoog was onder de 24 van WCAG 2.5.8 */
       '#paneel .wa-pas .waarom{margin-top:1rem;background:none;border:0;padding:5px 0;min-height:24px;cursor:pointer;' +

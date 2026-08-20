@@ -88,9 +88,9 @@
 /* Alleen de BUITENhoeken: aan de snede sluit de lade recht op de plank aan,
    want daar raken ze elkaar. */
 .gb-lade[data-kant="rechts"]{right:0;border-left:1px solid var(--gold-rand,rgba(192,165,68,.52));
-  border-radius:0 var(--gb-rond-lade,0px) var(--gb-rond-lade,0px) 0;}
+  border-radius:0;}
 .gb-lade[data-kant="links"]{left:var(--gb-inzet,0px);border-right:1px solid var(--gold-rand,rgba(192,165,68,.52));
-  border-radius:var(--gb-rond-lade,0px) 0 0 var(--gb-rond-lade,0px);}
+  border-radius:0;}
 
 /* De knoppen zijn aan de SNEDE geplakt en niet aan de buitenrand: ze rijden met
    de plank mee naar binnen in plaats van op hun plek te wachten. */
@@ -161,7 +161,7 @@
 .gb-greep{
   position:absolute;top:50%;inset-inline-end:.15rem;transform:translateY(-50%);
   width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-  background:transparent;border:0;border-radius:999px;cursor:pointer;padding:0;
+  background:transparent;border:0;border-radius:0;cursor:pointer;padding:0;
   color:var(--rtg-soft,#8A8680);z-index:2;
 }
 .gb-greep:hover,.gb-greep:focus-visible{color:var(--gold-tekst,#C0A544);}
@@ -175,7 +175,7 @@
    <dialog> in de bovenlaag en geen zwevend paneeltje: dat werkt ook binnen een
    voorouder met een transform, en levert Esc en focusopsluiting gratis. */
 .gb-blad{
-  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:var(--rtg-rond,14px);
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:0;
   background:var(--onyx-glans,#0C0C0B);color:var(--op-onyx,#F4F0E9);
   padding:0;width:min(23rem,92vw);
   font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
@@ -219,7 +219,7 @@
    bevestigen doet de mens. */
 .gb-borg{position:relative;}
 .gb-borg::before{
-  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  content:"";position:absolute;inset:0;border-radius:0;pointer-events:none;
   background:linear-gradient(90deg,var(--gold-rand,rgba(192,165,68,.52)) 0 var(--gb-borg,0%),transparent var(--gb-borg,0%));
   opacity:.55;
 }
@@ -239,7 +239,7 @@
      garantie van morgen. Vandaar :where(). */
   :where(.rtg-knop,.knop,.gb-rij){position:relative;}
   :where(.rtg-knop,.knop,.gb-rij)::after{
-    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    content:"";position:absolute;inset:0;border-radius:0;pointer-events:none;
     opacity:0;transition:opacity var(--rtg-tijd-paneel,180ms) ease;
     background:radial-gradient(20rem 20rem at var(--gb-lx,50%) var(--gb-ly,50%),
       rgba(192,165,68,.10) 0%,rgba(192,165,68,0) 62%);
@@ -271,7 +271,7 @@ html.rtg-stil .gb-rij.gb-weg{transition:none;}
   position:fixed;left:50%;bottom:4.5rem;transform:translateX(-50%);z-index:9998;
   display:flex;align-items:center;gap:.9rem;max-width:92vw;
   background:var(--onyx-glans,#0C0C0B);border:1px solid var(--gold-rand,rgba(192,165,68,.52));
-  border-radius:999px;padding:.5rem .6rem .5rem 1.05rem;
+  border-radius:0;padding:.5rem .6rem .5rem 1.05rem;
   font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);font-size:.82rem;
   color:var(--op-onyx,#F4F0E9);
 }
@@ -281,7 +281,7 @@ html.rtg-stil .gb-rij.gb-weg{transition:none;}
 .gb-terug > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .gb-terug button{flex:none;
   background:transparent;border:1px solid var(--rtg-line,rgba(255,255,255,.18));
-  border-radius:999px;padding:.3rem .75rem;min-height:24px;cursor:pointer;
+  border-radius:0;padding:.3rem .75rem;min-height:24px;cursor:pointer;
   font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
   color:var(--gold-tekst,#C0A544);
 }

@@ -25,7 +25,7 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;text-decoration:none;display:inline-block;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
@@ -33,7 +33,7 @@
   .knop:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
 
   /* De agenda houdt zijn eigen weergave-schakelaar (maand / week / lijst), maar
@@ -59,7 +59,7 @@
 
   /* de maand: een echt raster; buiten de maand gedimd, vandaag met goud */
   .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
-    border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+    border:1px solid var(--line);border-radius:0;overflow:hidden;}
   .mkop{background:var(--card2);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
     color:var(--soft);padding:.35rem .4rem;text-align:center;}
   .mdag{background:var(--card);min-height:6rem;padding:.28rem .32rem;cursor:pointer;text-align:left;
@@ -67,10 +67,10 @@
   .mdag:hover{background:var(--card2);}
   .mdag.buiten{opacity:.45;}
   .dnr{display:inline-block;font-size:.68rem;color:var(--muted);min-width:1.35rem;text-align:center;
-    border-radius:999px;padding:.05rem 0;margin-bottom:.15rem;}
+    border-radius:0;padding:.05rem 0;margin-bottom:.15rem;}
   .mdag.vandaag .dnr{background:var(--gold);color:#0C0C0B;font-weight:700;}
   .chip{display:block;font-size:.63rem;line-height:1.35;border-left:2px solid var(--burgundy);
-    padding:.08rem .32rem;margin:.14rem 0;background:var(--card2);border-radius:4px;
+    padding:.08rem .32rem;margin:.14rem 0;background:var(--card2);border-radius:0;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt);}
   .chip.eco{border-left-color:var(--gold);}
   .chip.uit{border-left-style:dashed;color:var(--muted);}
@@ -80,14 +80,14 @@
 
   /* de week: zeven kolommen met de afspraken op volgorde */
   .wgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
-    border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+    border:1px solid var(--line);border-radius:0;overflow:hidden;}
   .wdag{background:var(--card);min-height:11rem;padding:.3rem .35rem;}
   .wdag .chip{font-size:.7rem;padding:.2rem .4rem;cursor:pointer;}
 
   /* de lijst: gegroepeerd per dag, met de uitnodigingen erin */
   .ldag{margin-bottom:1rem;}
   .ldag h3{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.35rem;}
-  .litem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;
+  .litem{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;
     margin-bottom:.45rem;display:flex;gap:.7rem;align-items:center;cursor:pointer;}
   .litem .tijd{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.78rem;min-width:5.4rem;}
   .litem .wat{flex:1;min-width:0;}
@@ -100,20 +100,20 @@
   .scrim{position:fixed;inset:0;z-index:20;background:rgba(10,10,9,.86);display:none;
     align-items:flex-start;justify-content:center;padding:1rem;overflow:auto;}
   .scrim.open{display:flex;}
-  .paneel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem;
+  .paneel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;
     width:min(560px,100%);margin:auto 0;}
   .paneel h3{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin-bottom:.6rem;}
   .paneel label{display:block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
     color:var(--soft);margin:.6rem 0 .2rem;}
   .paneel input,.paneel select,.paneel textarea{width:100%;background:var(--card2);border:1px solid var(--line);
-    border-radius:9px;color:var(--txt);font:inherit;font-size:.88rem;padding:.5rem .65rem;}
+    border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.5rem .65rem;}
   .paneel .twee{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
   .deeln{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding:.35rem 0;
     display:flex;justify-content:space-between;gap:.6rem;}
   .deeln .st{color:var(--soft);font-size:.7rem;}
   .deeln .st.ja{color:var(--rtg-leesgoud,var(--gold));}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (max-width:760px){

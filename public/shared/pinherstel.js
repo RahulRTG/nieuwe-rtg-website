@@ -33,7 +33,7 @@ function opvangen(API, T){
      daarom zelf af als "buiten het venster". Wat modaal is, zegt dat. */
   doos.setAttribute('aria-modal','true');
   doos.setAttribute('aria-label', T('pinh.kop','Nieuwe algemene pin'));
-  doos.style.cssText = 'width:min(22rem,100%);background:var(--paneel,#151312);border:1px solid var(--line);border-radius:14px;padding:1.2rem;color:var(--txt,#F7F5F1);font-family:Inter,system-ui,sans-serif;';
+  doos.style.cssText = 'width:min(22rem,100%);background:var(--paneel,#151312);border:1px solid var(--line);border-radius:0;padding:1.2rem;color:var(--txt,#F7F5F1);font-family:Inter,system-ui,sans-serif;';
   var kop = document.createElement('div');
   kop.textContent = T('pinh.kop','Nieuwe algemene pin');
   kop.style.cssText = 'font-family:"Bodoni Moda",Georgia,serif;font-size:1.15rem;margin-bottom:.5rem;';
@@ -43,12 +43,12 @@ function opvangen(API, T){
   var inp = document.createElement('input');
   inp.type='password'; inp.inputMode='numeric'; inp.maxLength=8; inp.autocomplete='off';
   inp.setAttribute('aria-label', T('pinh.veld','Nieuwe pin'));
-  inp.style.cssText = 'width:100%;margin:0 0 .5rem;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;font-size:1rem;letter-spacing:.4em;text-align:center;color:var(--txt);';
+  inp.style.cssText = 'width:100%;margin:0 0 .5rem;background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;font-size:1rem;letter-spacing:.4em;text-align:center;color:var(--txt);';
   var fout = document.createElement('div');
   fout.style.cssText = 'min-height:1.2rem;font-size:.8rem;color:var(--burgundy-on-dark,#C23A5E);margin-bottom:.6rem;';
   var ga = document.createElement('button');
   ga.type='button'; ga.textContent = T('pinh.zet','Pin instellen');
-  ga.style.cssText = 'width:100%;border:none;border-radius:999px;padding:.65rem;font:inherit;font-size:.86rem;font-weight:600;background:var(--gold,#857007);color:#0C0C0B;cursor:pointer;';
+  ga.style.cssText = 'width:100%;border:none;border-radius:0;padding:.65rem;font:inherit;font-size:.86rem;font-weight:600;background:var(--gold,#857007);color:#0C0C0B;cursor:pointer;';
   ga.addEventListener('click', async function(){
     var pin = inp.value.trim();
     if (!/^\d{4,8}$/.test(pin)) { fout.textContent = T('pin.vorm','4 tot 8 cijfers.'); return; }

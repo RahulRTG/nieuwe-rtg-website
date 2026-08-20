@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Festival</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/reizen-veilig.css" rel="stylesheet">
+<style>
+/* DE SCHIL IS NIET VAN DIT SCHERM. Bank, werkvlak en tabbalk komen uit
+   shared/reizen-veilig.css -- dezelfde schil als RTG Geld en RTG Leven. Op een
+   breed scherm staat de bank links (154px), onder de 760px klapt hij naar een
+   onderbalk van 68px. Dat is EEN element in twee standen, en daarom hoort er
+   hier niets van overgeschreven te worden.
+
+   Wat hieronder staat is alleen het instrument in het werkvlak. */
+.fp-poort{display:flex;flex-direction:column;height:100%;padding:var(--rtg-ruim);gap:var(--rtg-ruim);}
+.fp-poort *,.fp-poort *::before,.fp-poort *::after{box-sizing:border-box;}
+.fp-kop{display:flex;gap:var(--rtg-ruim-klein);align-items:center;flex-wrap:wrap;}
+.fp-kop select{min-height:44px;max-width:100%;padding:0 .6rem;font:inherit;}
+
+/* HET UITSLAGVLAK. Kleur is de DERDE laag: er staat altijd een woord en een
+   teken (ONTWERP.md par. 5), zodat het leesbaar blijft voor wie kleur niet ziet
+   en op een zwart-witte print. */
+#uitslag{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;border:1px solid var(--rtg-line);padding:var(--rtg-ruim);
+  min-height:32dvh;width:100%;min-width:0;}
+#uitslagWoord{font-size:clamp(1.9rem,9vw,4rem);line-height:1;letter-spacing:.04em;font-weight:600;
+  max-width:100%;overflow-wrap:anywhere;}
+#uitslagZin{margin-top:1rem;font-size:clamp(1rem,3.2vw,1.3rem);max-width:32ch;color:var(--rtg-txt);}
+#uitslagBij{margin-top:.6rem;font-size:.85rem;color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);}
+#uitslag[data-sig="gezond"]  {border-color:var(--rtg-sig-gezond);}
+#uitslag[data-sig="aandacht"]{border-color:var(--rtg-sig-aandacht);}
+#uitslag[data-sig="incident"]{border-color:var(--rtg-sig-incident);}
+#uitslag[data-sig="gezond"]   #uitslagWoord{color:var(--rtg-sig-gezond);}
+#uitslag[data-sig="aandacht"] #uitslagWoord{color:var(--rtg-sig-aandacht);}
+#uitslag[data-sig="incident"] #uitslagWoord{color:var(--rtg-sig-incident);}
+#uitslagWoord::after{content:attr(data-teken);margin-left:.4em;font-size:.8em;}
+
+.fp-invoer{display:flex;gap:var(--rtg-ruim-klein);width:100%;min-width:0;}
+/* min-width:0 op het veld: een flexkind mag standaard niet kleiner worden dan
+   zijn inhoud, en dan duwt een grote letter het hele scherm scheef. */
+#code{flex:1 1 auto;min-width:0;min-height:64px;padding:0 1rem;
+  font-size:clamp(1.1rem,4.5vw,1.7rem);letter-spacing:.16em;text-transform:uppercase;
+  font-variant-numeric:var(--rtg-cijfers);}
+/* De VORM van veld en knop komt uit de gedeelde stijl en wordt niet
+   overschreven; alleen de MAAT wordt gezet, want aan een hek moet een duim
+   raak zijn. Een eigen vorm zou dit het enige afwijkende scherm van 291 maken. */
+body.rtg-stijl .fp-poort .knop{flex:0 0 auto;min-height:64px;min-width:44px;
+  padding:0 1.4rem;white-space:nowrap;cursor:pointer;}
+.fp-voet{display:flex;gap:var(--rtg-ruim);align-items:center;flex-wrap:wrap;width:100%;
+  border-top:1px solid var(--rtg-line);padding-top:var(--rtg-ruim-klein);font-size:.85rem;}
+.teller{font-variant-numeric:var(--rtg-cijfers);color:var(--rtg-soft);}
+/* De standzin deelt de tabbalk met de tabs en met Rahul. Hij krijgt daarom een
+   eigen maat en kapt netjes af in plaats van de balk uit elkaar te duwen; de
+   volle zin staat op het blad Beeld. */
+#fpStand{align-self:center;max-width:min(46ch,42vw);padding:0 12px;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media(max-width:760px){#fpStand{display:none;}}
+.teller b{color:var(--rtg-txt);font-weight:600;}
+
+/* De stand van de gereedheid: een woord en een teken, nooit kleur alleen. */
+.fp-stand{display:inline-flex;align-items:baseline;gap:.5em;margin:6px 0 0;
+  font-size:clamp(1rem,2.4vw,1.25rem);letter-spacing:.06em;font-weight:600;}
+.fp-stand::after{content:attr(data-teken);font-size:.9em;}
+.fp-stand[data-sig="gezond"]  {color:var(--rtg-sig-gezond);}
+.fp-stand[data-sig="incident"]{color:var(--rtg-sig-incident);}
+.fp-cijfer{display:block;margin-top:6px;color:var(--rtg-soft);font-size:.9rem;
+  letter-spacing:0;font-variant-numeric:var(--rtg-cijfers);}
+
+/* De werkvelden. Een rij die afbreekt in plaats van uit het scherm te lopen --
+   dezelfde les als bij de poort: een flexkind zonder min-width duwt alles scheef. */
+.fp-form{display:flex;flex-wrap:wrap;gap:var(--rtg-ruim-klein);align-items:center;margin:12px 0 4px;}
+.fp-form .veld{flex:1 1 10rem;min-width:0;}
+.fp-form .knop{flex:0 0 auto;min-height:44px;cursor:pointer;}
+.fp-label{flex:0 0 auto;color:var(--rtg-soft);font-size:.85rem;}
+.fp-vink{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--rtg-soft);
+  min-height:44px;}
+/* HET VAKJE ZELF MOET OOK RAAK TE KRIJGEN ZIJN. Een label van 44px hoog met een
+   vinkje van 13x13 erin haalt de eis van TOEGANKELIJK.md niet -- daar gaat het
+   om het RAAKVLAK en niet om de regel eromheen. Dit viel pas op toen Inrichten
+   op een telefoon bereikbaar werd; daarvoor kwam de scan er nooit langs. */
+.fp-vink input{width:24px;height:24px;flex:0 0 auto;}
+.fp-vak{margin-top:26px;}
+.fp-h2{font:500 1.05rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.02em;
+  margin:26px 0 0;color:var(--rtg-txt);}
+.fp-groot{font-size:clamp(1.6rem,7vw,2.6rem);letter-spacing:.2em;margin:8px 0;
+  font-variant-numeric:var(--rtg-cijfers);color:var(--rtg-goud);overflow-wrap:anywhere;}
+
+/* Beeld en terrein: registers, geen kaartendashboards (ONTWERP.md par. 7). */
+.fp-blad{padding:clamp(18px,3vw,34px);max-width:900px;}
+.fp-blad h1{font:500 clamp(26px,3.4vw,40px)/1.05 'Bodoni Moda',serif;margin:14px 0 6px;}
+.fp-lijst{margin-top:22px;display:flex;flex-direction:column;}
+.fp-regel{display:flex;gap:14px;align-items:baseline;padding:12px 14px;
+  border-bottom:1px solid var(--rtg-line);border-left:2px solid transparent;
+  font:inherit;text-align:left;width:100%;background:transparent;color:inherit;}
+.fp-regel[data-sig="kritiek"] {border-left-color:var(--rtg-sig-incident);}
+.fp-regel[data-sig="hoog"]    {border-left-color:var(--rtg-sig-aandacht);}
+.fp-regel[data-sig="aandacht"]{border-left-color:var(--rtg-sig-actief);}
+.fp-regel .rek{margin-left:auto;font-variant-numeric:var(--rtg-cijfers);color:var(--rtg-soft);
+  white-space:nowrap;}
+.fp-stil{color:var(--rtg-soft);font-size:.85rem;margin-top:10px;}
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-modus="command">
+<div class="rv-app">
+
+  <aside class="rv-bank">
+    <nav aria-label="RTG Festival">
+      <button class="actief" data-blad="dienst"><span class="rv-icoon">◐</span><span>Dienst</span></button>
+      <button data-blad="poort"><span class="rv-icoon">⌾</span><span>Poort</span></button>
+      <button data-blad="beeld"><span class="rv-icoon">◉</span><span>Beeld</span></button>
+      <button data-blad="terrein"><span class="rv-icoon">◫</span><span>Terrein</span></button>
+      <button data-blad="podium"><span class="rv-icoon">◍</span><span>Podium</span></button>
+      <button data-blad="vooruit"><span class="rv-icoon">◇</span><span>Vooruit</span></button>
+      <button data-blad="gereed"><span class="rv-icoon">⌸</span><span>Gereed</span></button>
+      <button data-blad="kassa"><span class="rv-icoon">◈</span><span>Kassa</span></button>
+    </nav>
+    <div class="rv-bankvoet">
+      <button data-blad="inrichten"><span class="rv-icoon">≡</span><span>Inrichten</span></button>
+    </div>
+  </aside>
+
+  <main class="rv-werk" id="main">
+    <header class="rv-tabs">
+      <div id="fpTabs"><span class="rv-tab actief" id="fpWie"></span></div>
+      <span class="teller" id="fpStand"></span>
+    </header>
+
+    <section class="rv-panes" id="fpPanes">
+
+      <div class="rv-pane actief" id="bladDienst">
+        <div class="fp-blad">
+          <div class="rv-ey" id="dienstEy">MIJN DIENST</div>
+          <h1 id="dienstKop">Even kijken...</h1>
+          <p class="fp-stil" id="dienstWeg"></p>
+          <div class="fp-lijst" id="dienstLijst"></div>
+          <p class="fp-stil" id="dienstStraks"></p>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladPoort" hidden>
+        <div class="fp-poort">
+          <div class="fp-kop">
+            <select id="kiesPlek" aria-label="Bij welke poort staat u"></select>
+            <select id="kiesRichting" aria-label="Naar binnen of naar buiten">
+              <option value="in">Naar binnen</option>
+              <option value="uit">Naar buiten</option>
+            </select>
+          </div>
+
+          <div id="uitslag" role="status" aria-live="assertive" data-sig="stil">
+            <div id="uitslagWoord" data-teken="">GEREED</div>
+            <div id="uitslagZin">Scan een pas of typ de code.</div>
+            <div id="uitslagBij"></div>
+          </div>
+
+          <form class="fp-invoer" id="scanForm">
+            <input id="code" name="code" autocomplete="off" autocapitalize="characters"
+              spellcheck="false" maxlength="16" aria-label="Pascode" placeholder="PASCODE">
+            <button class="knop" type="submit">Scan</button>
+          </form>
+
+          <div class="fp-voet">
+            <span class="teller" id="binnen"></span>
+            <span class="teller" id="wachtrij"></span>
+            <button class="knop" id="synchroniseer" type="button" hidden>Wachtrij versturen</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladBeeld" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">FESTIVAL COMMAND</div>
+          <h1 id="beeldZin">Nog niets gemeten.</h1>
+          <p class="fp-stil">Wat goed gaat komt hier niet in beeld. Wat er staat, vraagt aandacht.</p>
+          <div class="fp-lijst" id="beeldLijst"></div>
+          <p class="fp-stil" id="beeldOngemeten"></p>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladTerrein" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">TERREIN</div>
+          <h1>De plekken en hun grenzen</h1>
+          <p class="fp-stil">De veilige capaciteit staat naast de vergunde. Het verschil tussen die twee is de tijd die u heeft.</p>
+          <div class="fp-lijst" id="terreinLijst"></div>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladPodium" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">PODIUM</div>
+          <h1 id="podiumKop">Nog niets op.</h1>
+          <p class="fp-stil">Wie er nu op is, wie erna komt, en hoeveel tijd daar
+            werkelijk tussen zit. De ombouwtijd van het podium is er al af.</p>
+          <div class="fp-lijst" id="podiumLijst"></div>
+          <h2 class="fp-h2">Open riderpunten</h2>
+          <div class="fp-lijst" id="podiumRider"></div>
+          <p class="fp-stil" id="podiumStil"></p>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladVooruit" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">VOORUIT</div>
+          <h1 id="vuKop">Nog geen norm.</h1>
+          <p class="fp-stil">Elk getal hier komt uit een meting of uit een norm die u
+            zelf heeft gezet. Waar er een ontbreekt, staat er geen getal maar een zin.</p>
+          <div class="fp-lijst" id="vuVraag"></div>
+          <p class="fp-stil" id="vuLeeg"></p>
+
+          <h2 class="fp-h2">Normen</h2>
+          <div class="fp-form">
+            <select class="veld" id="vuPlek" aria-label="Op welke plek"></select>
+            <input class="veld" id="vuWat" maxlength="40" placeholder="Wat (leeg = mensen)" aria-label="Wat er moet staan">
+            <input class="veld" id="vuVast" type="number" min="0" placeholder="Vast" aria-label="Vast aantal">
+            <input class="veld" id="vuPer100" type="number" min="0" placeholder="Per 100 aanwezigen" aria-label="Per honderd aanwezigen">
+            <input class="veld" id="vuVan" maxlength="5" placeholder="Van uu:mm" aria-label="Vanaf">
+            <input class="veld" id="vuTot" maxlength="5" placeholder="Tot uu:mm" aria-label="Tot">
+            <select class="veld" id="vuDag" aria-label="Op welke dag"></select>
+            <button class="knop" type="button" id="vuNormZet">Norm erbij</button>
+          </div>
+          <div class="fp-lijst" id="vuNormen"></div>
+          <p class="fp-stil" id="vuStil"></p>
+
+          <h2 class="fp-h2">De dag afsluiten</h2>
+          <p class="fp-stil">Wat er dan wordt vastgelegd, verandert daarna niet meer mee.
+            Er staan aantallen in en geen mensen.</p>
+          <div class="fp-form">
+            <select class="veld" id="vuSluitDag" aria-label="Welke dag sluit u af"></select>
+            <button class="knop" type="button" id="vuSluit">Sluit de dag af</button>
+          </div>
+          <p class="fp-stil" id="vuTerug"></p>
+          <div class="fp-lijst" id="vuGeheugen"></div>
+
+          <h2 class="fp-h2">Wat er gebeurd is</h2>
+          <p class="fp-stil">De tijdlijn van deze editie. Scans en passen staan geteld
+            per kwartier -- een bezoeker is een telling en geen spoor. Elke regel zegt
+            waar hij vandaan komt.</p>
+          <div class="fp-form">
+            <select class="veld" id="vuLijnDag" aria-label="Welke dag"></select>
+            <select class="veld" id="vuLijnSoort" aria-label="Welke soort gebeurtenis">
+              <option value="">alles</option>
+              <option value="scan">scans</option>
+              <option value="pas">passen</option>
+              <option value="boeking">programma</option>
+              <option value="rider">rider</option>
+              <option value="bewijs">bewijs</option>
+              <option value="partner">partners</option>
+              <option value="afsluiting">afsluitingen</option>
+            </select>
+          </div>
+          <div class="fp-lijst" id="vuLijn"></div>
+          <p class="fp-stil" id="vuLijnStil"></p>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladGereed" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">GEREEDHEID</div>
+          <h1 id="gereedZin">Nog niet gekeurd.</h1>
+          <p class="fp-stil">Elk procent komt uit een control met bewijs. Een stuk dat niemand
+            zag telt nul, en een ontbrekende kritieke control zet alles op niet gereed,
+            ongeacht wat de rest doet.</p>
+          <div class="fp-lijst" id="gereedLijst"></div>
+          <p class="fp-stil" id="gereedGroepen"></p>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladKassa" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">KASSA</div>
+          <h1 id="kassaZin">Kies wat u verkoopt.</h1>
+          <p class="fp-stil">De plek wordt vastgezet voordat er betaald wordt. Lukt de
+            betaling niet, dan komt hij meteen weer vrij.</p>
+          <div class="fp-lijst" id="kassaAanbod"></div>
+
+          <form class="fp-form" id="kassaForm">
+            <label class="fp-label" for="kassaKoper">Op wiens codenaam</label>
+            <input class="veld" id="kassaKoper" maxlength="60" placeholder="Codenaam" autocomplete="off">
+            <button class="knop" type="submit" id="kassaZet">Zet vast</button>
+          </form>
+
+          <div id="kassaOpen" hidden>
+            <div class="fp-lijst"><div class="fp-regel"><span id="kassaOpenZin"></span></div></div>
+            <div class="fp-form">
+              <button class="knop" type="button" id="kassaContant">Contant afrekenen</button>
+              <input class="veld" id="kassaPayCode" maxlength="12" placeholder="Betaalcode" autocomplete="off">
+              <button class="knop" type="button" id="kassaPay">RTG Pay</button>
+              <button class="knop" type="button" id="kassaLos">Laat los</button>
+            </div>
+          </div>
+
+          <div id="kassaPas" hidden>
+            <div class="rv-ey">PASCODE</div>
+            <div id="kassaPasCode" class="fp-groot"></div>
+            <p class="fp-stil" id="kassaPasBij"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rv-pane" id="bladInrichten" hidden>
+        <div class="fp-blad">
+          <div class="rv-ey">INRICHTEN</div>
+          <h1 id="inrKop">Een festival opzetten</h1>
+          <p class="fp-stil" id="inrStil">Alles hieronder is van deze zaak. Wat er staat, staat er echt.</p>
+
+          <section class="fp-vak" id="inrStart" hidden>
+            <h2 class="fp-h2">Beginnen</h2>
+            <div class="fp-form">
+              <input class="veld" id="inrNaam" maxlength="80" placeholder="Naam van het festival" aria-label="Naam van het festival">
+              <input class="veld" id="inrJaar" type="number" min="2000" max="2100" placeholder="Jaar" aria-label="Jaar">
+              <button class="knop" type="button" id="inrBegin">Begin</button>
+            </div>
+          </section>
+
+          <section class="fp-vak" id="inrRest" hidden>
+            <h2 class="fp-h2">Dagen</h2>
+            <div class="fp-form">
+              <input class="veld" id="dagDatum" maxlength="10" placeholder="jjjj-mm-dd" aria-label="Datum">
+              <input class="veld" id="dagOpen" maxlength="5" placeholder="Open uu:mm" aria-label="Openingstijd">
+              <input class="veld" id="dagSluit" maxlength="5" placeholder="Sluit uu:mm" aria-label="Sluitingstijd">
+              <input class="veld" id="dagCurfew" maxlength="5" placeholder="Curfew uu:mm" aria-label="Curfew">
+              <button class="knop" type="button" id="dagZet">Dag erbij</button>
+            </div>
+            <div class="fp-lijst" id="dagLijst"></div>
+
+            <h2 class="fp-h2">Plekken</h2>
+            <div class="fp-form">
+              <input class="veld" id="plekNaam" maxlength="60" placeholder="Naam" aria-label="Naam van de plek">
+              <select class="veld" id="plekSoort" aria-label="Soort plek"></select>
+              <select class="veld" id="plekOuder" aria-label="Ligt in"></select>
+              <input class="veld" id="plekCap" type="number" min="0" placeholder="Capaciteit" aria-label="Capaciteit">
+              <input class="veld" id="plekVeilig" type="number" min="0" placeholder="Veilig" aria-label="Veilige capaciteit">
+              <input class="veld" id="plekOmbouw" type="number" min="0" max="240" placeholder="Ombouw min (podium)" aria-label="Ombouwtijd in minuten">
+              <input class="veld" id="plekDoor" type="number" min="0" placeholder="Doorstroom p/u (uitgang)" aria-label="Doorstroom per uur">
+              <label class="fp-vink"><input type="checkbox" id="plekBesloten"> besloten</label>
+              <button class="knop" type="button" id="plekZet">Plek erbij</button>
+            </div>
+            <div class="fp-lijst" id="plekLijst"></div>
+
+            <h2 class="fp-h2">Producten</h2>
+            <div class="fp-form">
+              <input class="veld" id="prodNaam" maxlength="80" placeholder="Naam" aria-label="Naam van het product">
+              <input class="veld" id="prodPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs">
+              <input class="veld" id="prodVoorraad" type="number" min="0" placeholder="Voorraad (leeg = vrij)" aria-label="Voorraad">
+              <input class="veld" id="prodRecht" maxlength="60" placeholder="Recht, bijv. festival.entree" aria-label="Rechtsoort">
+              <button class="knop" type="button" id="prodZet">Product erbij</button>
+            </div>
+            <div class="fp-lijst" id="prodLijst"></div>
+
+            <h2 class="fp-h2">Diensten</h2>
+            <div class="fp-form">
+              <select class="veld" id="dnDag" aria-label="Op welke dag"></select>
+              <select class="veld" id="dnPlek" aria-label="Op welke plek"></select>
+              <input class="veld" id="dnWie" maxlength="60" placeholder="Wie" aria-label="Wie draait de dienst">
+              <input class="veld" id="dnVan" maxlength="5" placeholder="Van uu:mm" aria-label="Begintijd">
+              <input class="veld" id="dnTot" maxlength="5" placeholder="Tot uu:mm" aria-label="Eindtijd">
+              <input class="veld" id="dnRol" maxlength="40" placeholder="Rol" aria-label="Rol">
+              <input class="veld" id="dnBrief" maxlength="200" placeholder="Briefing" aria-label="Briefing">
+              <button class="knop" type="button" id="dnZet">Dienst erbij</button>
+            </div>
+            <div class="fp-lijst" id="dnLijst"></div>
+
+            <h2 class="fp-h2">Programma</h2>
+            <div class="fp-form">
+              <select class="veld" id="bkDag" aria-label="Op welke dag"></select>
+              <select class="veld" id="bkPodium" aria-label="Op welk podium"></select>
+              <input class="veld" id="bkArtiest" maxlength="80" placeholder="Artiest" aria-label="Artiest">
+              <input class="veld" id="bkVan" maxlength="5" placeholder="Van uu:mm" aria-label="Begintijd">
+              <input class="veld" id="bkTot" maxlength="5" placeholder="Tot uu:mm" aria-label="Eindtijd">
+              <input class="veld" id="bkSound" maxlength="5" placeholder="Soundcheck uu:mm" aria-label="Soundcheck">
+              <input class="veld" id="bkGage" type="number" min="0" step="0.01" placeholder="Gage" aria-label="Gage">
+              <button class="knop" type="button" id="bkZet">Zet in het schema</button>
+            </div>
+            <div class="fp-form">
+              <label class="fp-label" for="bkHoe">Waaruit blijkt de bevestiging</label>
+              <input class="veld" id="bkHoe" maxlength="120" placeholder="Getekend contract, mail van 3 juni" autocomplete="off">
+            </div>
+            <p class="fp-stil">Een nieuwe boeking is een voornemen. Tik een voornemen aan om
+              hem te bevestigen; zonder bron gebeurt er niets, want "bevestigd" zonder
+              bron is geen afspraak maar een herinnering.</p>
+            <div class="fp-lijst" id="bkLijst"></div>
+
+            <div class="fp-form">
+              <select class="veld" id="bkRiderBoeking" aria-label="Bij welke boeking"></select>
+              <input class="veld" id="bkRiderWat" maxlength="120" placeholder="Wat moet er staan" aria-label="Riderpunt">
+              <button class="knop" type="button" id="bkRiderZet">Riderpunt erbij</button>
+            </div>
+
+            <h2 class="fp-h2">Keuring</h2>
+            <div class="fp-form">
+              <button class="knop" type="button" id="ctlSeed">Zet de startlijst controls klaar</button>
+            </div>
+            <p class="fp-stil">Een begin, geen wet. U past hem aan; wat kritiek is bepaalt u.</p>
+
+            <h2 class="fp-h2">Partners</h2>
+            <div class="fp-form">
+              <select class="veld" id="prtRol" aria-label="Rol van de partner"></select>
+              <input class="veld" id="prtZaak" maxlength="40" placeholder="Zaakcode" aria-label="Zaakcode">
+              <button class="knop" type="button" id="prtZet">Stel voor</button>
+            </div>
+            <p class="fp-stil">Een voorstel opent niets. De zaak bevestigt zelf, en bepaalt zelf wat zij deelt.</p>
+            <div class="fp-lijst" id="prtLijst"></div>
+          </section>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<script src="/apps/festival/schil.js" defer></script>
+<script src="/apps/festival/dienst.js" defer></script>
+<script src="/apps/festival/poort.js" defer></script>
+<script src="/apps/festival/beeld.js" defer></script>
+<script src="/apps/festival/podium.js" defer></script>
+<script src="/apps/festival/gereed.js" defer></script>
+<script src="/apps/festival/kassa.js" defer></script>
+<script src="/apps/festival/inrichten.js" defer></script>
+<script src="/apps/festival/vooruit.js" defer></script>
+<script src="/apps/festival/programma.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

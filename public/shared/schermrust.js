@@ -35,7 +35,7 @@
     kaart.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;' +
       'background:rgba(12,12,11,0.82);backdrop-filter:blur(6px);padding:1.2rem;';
     const doos = document.createElement('div');
-    doos.style.cssText = 'max-width:22rem;background:#151312;border:1px solid rgba(255,255,255,0.14);border-radius:16px;' +
+    doos.style.cssText = 'max-width:22rem;background:#151312;border:1px solid rgba(255,255,255,0.14);border-radius:0;' +
       'padding:1.4rem 1.3rem;color:#F4F1EC;font-family:Inter,system-ui,sans-serif;text-align:center;';
     const kop = document.createElement('div');
     kop.textContent = 'Even niks.';
@@ -46,7 +46,7 @@
     tekst.style.cssText = 'margin:0.7rem 0 1rem;font-size:0.86rem;line-height:1.6;color:rgba(244,241,236,0.72);';
     const weg = document.createElement('button');
     weg.textContent = 'Ik leg hem weg';
-    weg.style.cssText = 'display:block;width:100%;background:#C9A24B;border:none;border-radius:10px;padding:0.65rem;' +
+    weg.style.cssText = 'display:block;width:100%;background:#C9A24B;border:none;border-radius:0;padding:0.65rem;' +
       'color:#0C0C0B;font:inherit;font-weight:600;cursor:pointer;';
     const door = document.createElement('button');
     door.textContent = 'Nog even door';
@@ -62,7 +62,7 @@
         groet.textContent = tekstNa;
         groet.setAttribute('role', 'status');
         groet.style.cssText = 'position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);z-index:99999;' +
-          'background:#151312;border:1px solid rgba(255,255,255,0.14);border-radius:999px;padding:0.5rem 1rem;' +
+          'background:#151312;border:1px solid rgba(255,255,255,0.14);border-radius:0;padding:0.5rem 1rem;' +
           'color:#F4F1EC;font-family:Inter,system-ui,sans-serif;font-size:0.8rem;';
         document.body.appendChild(groet);
         setTimeout(() => groet.remove(), 3500);

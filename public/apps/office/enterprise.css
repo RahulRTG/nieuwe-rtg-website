@@ -41,13 +41,13 @@ body.rtg-stijl>main{width:100%!important;max-width:none!important;margin:0!impor
 .office-signalen span{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--zacht);white-space:nowrap;}
 
 .zoekrij{position:sticky;top:-1.1rem;z-index:6;padding:.65rem 0;background:linear-gradient(var(--bg) 82%,transparent);}
-.zoekrij input,.zoekrij select{border-radius:3px;min-height:2.25rem;}
+.zoekrij input,.zoekrij select{border-radius:0;min-height:2.25rem;}
 .tabelkop,.doc{grid-template-columns:1.55rem minmax(12rem,1fr) 7.4rem 7rem 8rem 5.5rem;}
 .doc{min-height:4.15rem;transition:background .15s,border-color .15s;}
 .doc:hover{background:linear-gradient(90deg,rgba(127,22,52,.09),rgba(255,255,255,.018));border-bottom-color:rgba(255,255,255,.14);}
 .doc .naam small{margin-top:.2rem;display:block;}
 .office-status{display:inline-flex;align-items:center;gap:.38rem;width:max-content;max-width:100%;
-  border:1px solid var(--line);padding:.22rem .48rem;border-radius:999px;color:var(--soft);font-size:.63rem;
+  border:1px solid var(--line);padding:.22rem .48rem;border-radius:0;color:var(--soft);font-size:.63rem;
   letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
 .office-status:before{content:"";width:.34rem;height:.34rem;border-radius:50%;background:var(--zacht);}
 .office-status[data-fase="beoordeling"]{border-color:rgba(201,162,75,.38);color:#D8BF80;}
@@ -72,7 +72,7 @@ body.rtg-stijl>main{width:100%!important;max-width:none!important;margin:0!impor
 
 .balk{min-height:3.15rem;padding:.5rem .8rem;flex-wrap:nowrap;}
 .balk input.titel{font-size:1.08rem;}
-.office-fase{border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--soft);
+.office-fase{border:1px solid var(--line);border-radius:0;background:transparent;color:var(--soft);
   padding:.38rem .65rem;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
 .office-fase[data-fase="beoordeling"]{color:#D8BF80;border-color:rgba(201,162,75,.42);}
 .office-fase[data-fase="goedgekeurd"]{color:#9ED2B8;border-color:rgba(105,184,145,.42);}
@@ -82,7 +82,7 @@ body.rtg-stijl>main{width:100%!important;max-width:none!important;margin:0!impor
 .office-meer>summary::-webkit-details-marker,.office-opmaak>summary::-webkit-details-marker{display:none;}
 .office-meermenu{position:absolute;right:0;top:calc(100% + .45rem);z-index:45;width:10.5rem;padding:.42rem;
   display:grid;gap:.18rem;background:rgba(20,18,18,.98);border:1px solid var(--line2);box-shadow:0 16px 40px rgba(0,0,0,.48);}
-.office-meermenu .knop{width:100%;text-align:left;background:transparent;border-color:transparent;border-radius:3px;padding:.5rem .6rem;}
+.office-meermenu .knop{width:100%;text-align:left;background:transparent;border-color:transparent;border-radius:0;padding:.5rem .6rem;}
 .office-meermenu .knop:hover{background:var(--veld);border-color:var(--line);}
 .office-opmaakmenu{position:absolute;right:0;top:calc(100% + .45rem);z-index:44;width:min(36rem,calc(100vw - 2rem));
   padding:.65rem;background:rgba(20,18,18,.98);border:1px solid var(--line2);box-shadow:0 16px 40px rgba(0,0,0,.48);}

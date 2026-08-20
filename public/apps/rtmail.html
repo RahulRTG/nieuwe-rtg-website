@@ -21,11 +21,11 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
-  header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:999px;padding:.15rem .6rem;}
+  header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:0;padding:.15rem .6rem;}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
-  .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
+  .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
   .rij:hover{border-color:var(--gold);}
-  .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;font-size:1.1rem;}
+  .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:0;flex-shrink:0;font-size:1.1rem;}
   .rij .b{flex:1;min-width:0;}
   .rij .nm{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.45rem;}
   .rij.ongelezen .nm::before{content:'';width:.5rem;height:.5rem;border-radius:50%;background:var(--burgundy);flex:0 0 auto;}
@@ -37,11 +37,11 @@
   .rij .lt .ongev{color:#E78AA0;font-weight:600;}
   .rij .tijd{font-size:.7rem;color:var(--soft);white-space:nowrap;}
   .terug{background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;margin-bottom:.8rem;padding:.2rem 0;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.15rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.15rem;}
   .kaart h2{font-size:1.15rem;margin-bottom:.3rem;}
   .kaart .meta{font-size:.72rem;color:var(--soft);margin-bottom:.9rem;}
   .kaart .body{font-size:.92rem;line-height:1.65;white-space:pre-wrap;color:var(--muted);word-break:break-word;}
-  .band{display:flex;align-items:center;gap:.5rem;font-size:.72rem;border-radius:10px;padding:.45rem .6rem;margin-bottom:.8rem;border:1px solid var(--line);}
+  .band{display:flex;align-items:center;gap:.5rem;font-size:.72rem;border-radius:0;padding:.45rem .6rem;margin-bottom:.8rem;border:1px solid var(--line);}
   .band svg{width:1rem;height:1rem;flex:0 0 auto;}
   .band.ok{color:#8FD6A6;background:rgba(70,150,95,.1);border-color:rgba(120,200,150,.28);}
   .band.sys{color:var(--rtg-leesgoud,var(--gold));background:rgba(169,143,28,.1);border-color:rgba(169,143,28,.3);}
@@ -51,18 +51,18 @@
   .lk.no .lkb{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#E78AA0;text-decoration:none;margin-left:.25rem;}
   a.lk.ok{color:var(--rtg-leesgoud,var(--gold));text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
   .bijlaag-noot{font-size:.72rem;color:var(--soft);margin-top:.9rem;border-top:1px solid var(--line);padding-top:.7rem;line-height:1.5;}
-  .ai{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.85rem .9rem;margin-bottom:.9rem;}
+  .ai{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.85rem .9rem;margin-bottom:.9rem;}
   .ai h3{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.4rem;}
   .ai .tx{font-size:.86rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;}
-  .ai-knop{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;border-radius:10px;padding:.55rem;cursor:pointer;margin-bottom:.9rem;}
+  .ai-knop{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;border-radius:0;padding:.55rem;cursor:pointer;margin-bottom:.9rem;}
   .ai-knop:hover{border-color:var(--gold);}
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.66);display:grid;place-items:center;z-index:20;padding:1.2rem;}
-  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;max-width:420px;width:100%;}
+  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;max-width:420px;width:100%;}
   .modal h2{font-size:1.1rem;margin-bottom:.5rem;}
   .modal p{font-size:.85rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;word-break:break-word;}
-  .modal .url{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--rtg-leesgoud,var(--gold));background:var(--card2);border-radius:8px;padding:.5rem .6rem;margin:.6rem 0;word-break:break-all;}
+  .modal .url{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--rtg-leesgoud,var(--gold));background:var(--card2);border-radius:0;padding:.5rem .6rem;margin:.6rem 0;word-break:break-all;}
   .modal .rij2{display:flex;gap:.5rem;margin-top:.8rem;}
-  .modal button{flex:1;border-radius:10px;font:inherit;font-size:.85rem;font-weight:600;padding:.6rem;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);}
+  .modal button{flex:1;border-radius:0;font:inherit;font-size:.85rem;font-weight:600;padding:.6rem;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);}
   .modal button.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
   .inlog{text-align:center;padding:3rem 1rem;}
@@ -71,21 +71,21 @@
      bij het bericht zelf - niet als score, maar zodat niemand dubbel werkt. */
   .kop{font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
   .adr{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.76rem;color:var(--rtg-leesgoud,var(--gold));word-break:break-all;}
-  .vld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.86rem;padding:.55rem .65rem;margin-bottom:.5rem;}
+  .vld{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.86rem;padding:.55rem .65rem;margin-bottom:.5rem;}
   .vld:focus{outline:2px solid var(--gold);outline-offset:1px;}
-  .knp{border:1px solid var(--line);background:var(--card2);color:var(--txt);font:inherit;font-size:.78rem;font-weight:600;border-radius:9px;padding:.42rem .7rem;cursor:pointer;}
+  .knp{border:1px solid var(--line);background:var(--card2);color:var(--txt);font:inherit;font-size:.78rem;font-weight:600;border-radius:0;padding:.42rem .7rem;cursor:pointer;}
   .knp:hover{border-color:var(--gold);}
   .knp.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .knp[aria-pressed="true"]{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knprij{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem;}
-  .tag{display:inline-block;font-size:.66rem;letter-spacing:.04em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;margin-right:.35rem;}
+  .tag{display:inline-block;font-size:.66rem;letter-spacing:.04em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.1rem .5rem;margin-right:.35rem;}
   .tag.af{color:#8FD6A6;}
   .fout{font-size:.78rem;color:#E78AA0;margin-top:.5rem;}
   /* De mappenbalk: vier bestemmingen, en de sluimerteller ernaast. Geen
      gekleurde vlakken -- het ritme van dit huis is zwart, wit en een accent. */
   .mapbalk{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;margin:0 0 .6rem;}
   .mapknp{border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:.76rem;font-weight:600;
-    border-radius:999px;padding:.34rem .7rem;cursor:pointer;letter-spacing:.02em;}
+    border-radius:0;padding:.34rem .7rem;cursor:pointer;letter-spacing:.02em;}
   .mapknp:hover{border-color:var(--gold);color:var(--txt);}
   .mapknp.aan{color:var(--txt);border-color:var(--gold);}
   .mtel{margin-left:.4rem;color:var(--rtg-leesgoud,var(--gold));font-variant-numeric:tabular-nums;}

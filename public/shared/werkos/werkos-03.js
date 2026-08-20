@@ -85,7 +85,7 @@
     .wos-flits{outline:1px solid color-mix(in srgb, var(--gold,#A98F1C) 70%, transparent) !important;outline-offset:3px;transition:outline-color 0.6s;}
     .wos-bord-knop{
       display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer;
-      border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:11px;
+      border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:0;
       background:linear-gradient(155deg,#211E1B,#161311);color:var(--txt,#F4F1EC);
       padding:0.45rem 0.8rem;font-size:0.72rem;font-family:inherit;letter-spacing:0.08em;text-transform:uppercase;
       transition:border-color 0.13s;

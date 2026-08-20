@@ -27,53 +27,53 @@
   a{color:inherit;}
   /* masthead-balk */
   .top{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 82%,transparent));backdrop-filter:blur(8px);border-bottom:1px solid var(--lijnfijn);padding:.6rem 1.1rem;display:flex;align-items:center;gap:.7rem;max-width:48rem;margin:0 auto;}
-  .terug{background:transparent;border:1px solid var(--lijnfijn);color:var(--txt);border-radius:999px;padding:.35rem .75rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .terug{background:transparent;border:1px solid var(--lijnfijn);color:var(--txt);border-radius:0;padding:.35rem .75rem;font:inherit;font-size:.8rem;cursor:pointer;}
   .top .mh{font-family:'Bodoni Moda',serif;font-weight:600;letter-spacing:.02em;}
   .top .mh b{color:var(--accent-tekst);}
   /* cover */
   .cover{text-align:center;padding:2rem 0 1rem;}
-  .cover .logo-img{display:block;width:min(100%,30rem);margin:0 auto 1.3rem;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);}
+  .cover .logo-img{display:block;width:min(100%,30rem);margin:0 auto 1.3rem;border-radius:0;box-shadow:0 14px 40px rgba(0,0,0,.45);}
   .flags{display:flex;justify-content:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem;}
-  .flag{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:.25rem .6rem;border-radius:999px;border:1px solid var(--lijnfijn);color:var(--zacht);}
+  .flag{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:.25rem .6rem;border-radius:0;border:1px solid var(--lijnfijn);color:var(--zacht);}
   .cover h1{font-size:clamp(2rem,7vw,3rem);font-weight:600;line-height:1.05;margin:.3rem 0 .5rem;text-wrap:balance;}
   .cover h1 em{font-style:normal;color:var(--goud-h);}
   .cover .sub{color:var(--zacht);font-size:1rem;max-width:30rem;margin:0 auto;}
   /* cover-lijnen zoals op een echt blad */
   .coverlijnen{display:grid;gap:.5rem;margin:1.5rem auto 0;max-width:32rem;text-align:left;}
-  .cl{display:flex;align-items:center;gap:.7rem;border:1px solid var(--lijnfijn);border-radius:14px;padding:.7rem .9rem;background:var(--paneel);}
+  .cl{display:flex;align-items:center;gap:.7rem;border:1px solid var(--lijnfijn);border-radius:0;padding:.7rem .9rem;background:var(--paneel);}
   .cl .n{flex:0 0 1.7rem;height:1.7rem;border-radius:50%;border:1px solid var(--goud-h);color:var(--accent-tekst);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;}
   .cl .t{font-size:.95rem;}
   .cl.b .n{border-color:var(--blauw);color:var(--blauw-tekst);}
   .cl.g .n{border-color:var(--groen-h);color:var(--groen-h);}
   /* artikel */
   .art{margin:2.6rem 0;}
-  .eyebrow{display:inline-block;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--accent-tekst);border:1px solid var(--lijnfijn);border-radius:999px;padding:.2rem .6rem;}
+  .eyebrow{display:inline-block;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--accent-tekst);border:1px solid var(--lijnfijn);border-radius:0;padding:.2rem .6rem;}
   .eyebrow.b{color:var(--blauw-tekst);} .eyebrow.g{color:var(--groen-h);}
   .art h2{font-size:clamp(1.4rem,5vw,2rem);font-weight:600;margin:.6rem 0 .7rem;text-wrap:balance;}
   .art p{color:#e9e4d9;font-size:1.04rem;margin:.65rem 0;}
   .art p b{color:var(--txt);}
   /* de verdeling: dun en vrolijk */
-  .split{border:1px solid var(--lijnfijn);border-radius:16px;padding:1.2rem;margin:1.2rem 0;background:var(--paneel);}
+  .split{border:1px solid var(--lijnfijn);border-radius:0;padding:1.2rem;margin:1.2rem 0;background:var(--paneel);}
   .split h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;margin-bottom:.15rem;}
   .split .h{color:var(--zacht);font-size:.88rem;margin-bottom:1rem;}
-  .balk{display:flex;height:2.4rem;border-radius:999px;overflow:hidden;border:1px solid var(--lijnfijn);}
+  .balk{display:flex;height:2.4rem;border-radius:0;overflow:hidden;border:1px solid var(--lijnfijn);}
   .balk span{display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:800;color:#0c0c0b;}
   .balk .lid{flex:70;background:#2a2620;color:var(--zacht);}
   .balk .lok{flex:20;background:var(--goud-h);}
   .balk .rtf{flex:10;background:var(--blauw);color:#fff;}
   .legenda{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.8rem;font-size:.82rem;color:var(--zacht);}
-  .legenda i{display:inline-block;width:.75rem;height:.75rem;border-radius:4px;vertical-align:-.05em;margin-right:.35rem;}
+  .legenda i{display:inline-block;width:.75rem;height:.75rem;border-radius:0;vertical-align:-.05em;margin-right:.35rem;}
   /* kaarten: fijne randen, vrolijke chips */
   .kaartjes{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem;margin:1.2rem 0;}
-  .kj{border:1px solid var(--lijnfijn);border-radius:16px;padding:1.1rem;background:var(--paneel);}
-  .kj .chip{display:inline-block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;padding:.15rem .55rem;border-radius:999px;margin-bottom:.55rem;}
+  .kj{border:1px solid var(--lijnfijn);border-radius:0;padding:1.1rem;background:var(--paneel);}
+  .kj .chip{display:inline-block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;padding:.15rem .55rem;border-radius:0;margin-bottom:.55rem;}
   .kj:nth-child(1) .chip{color:var(--blauw-tekst);border:1px solid var(--blauw);}
   .kj:nth-child(2) .chip{color:var(--accent-tekst);border:1px solid var(--goud-h);}
   .kj:nth-child(3) .chip{color:var(--groen-h);border:1px solid var(--groen-h);}
   .kj h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;margin-bottom:.3rem;}
   .kj p{color:var(--zacht);font-size:.9rem;line-height:1.55;}
   /* wist-je-dat */
-  .wist{border:1px solid var(--lijnfijn);border-left:2px solid var(--groen-h);border-radius:14px;padding:1rem 1.1rem;margin:2rem 0;background:var(--paneel2);}
+  .wist{border:1px solid var(--lijnfijn);border-left:2px solid var(--groen-h);border-radius:0;padding:1rem 1.1rem;margin:2rem 0;background:var(--paneel2);}
   .wist b{color:var(--groen-h);letter-spacing:.05em;}
   .wist p{color:#e9e4d9;font-size:.98rem;margin-top:.3rem;}
   /* citaat, groot en speels */
@@ -83,7 +83,7 @@
   .quote .bron{color:var(--zacht);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.7rem;}
   /* ingangen */
   .ingangen{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.7rem;margin-top:1rem;}
-  .ingang{border:1px solid var(--lijnfijn);border-radius:14px;padding:.9rem;text-decoration:none;color:var(--txt);background:var(--paneel2);transition:border-color .2s,transform .2s;}
+  .ingang{border:1px solid var(--lijnfijn);border-radius:0;padding:.9rem;text-decoration:none;color:var(--txt);background:var(--paneel2);transition:border-color .2s,transform .2s;}
   .ingang:hover{border-color:var(--goud-h);transform:translateY(-2px);}
   .ingang b{font-family:'Bodoni Moda',serif;font-weight:600;}
   .ingang span{display:block;color:var(--zacht);font-size:.82rem;margin-top:.15rem;line-height:1.45;}

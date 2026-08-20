@@ -57,7 +57,7 @@
       '<div class="row-gap"><select class="st-in" id="ovGerecht" class="h-flex2">'+
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
       '<input class="st-in" id="ovAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
-      '<button class="tkc-start" id="ovBij" style="flex:1;border-radius:10px;">'+T('over.is','Is over')+'</button></div>'+
+      '<button class="tkc-start" id="ovBij" style="flex:1;border-radius:0;">'+T('over.is','Is over')+'</button></div>'+
       (l.length ? l.map(x => '<div class="st-row"><span><b style="color:var(--rtg-leesgoud,var(--gold));">'+x.qty+'×</b> '+MTX(x.name)+'<span class="sub">'+timeAgo(x.at)+' · '+(x.door||'')+'</span></span>'+
         '<span class="acts"><button class="obtn primary" data-overgebruikt="'+x.id+'">'+T('over.gebruikt','Gebruikt')+'</button><button class="obtn warn" data-overweg="'+x.id+'">✕</button></span></div>').join('')
       : '<div class="tkc-who">'+T('over.leeg','Er ligt nu niets over.')+'</div>')+'</div>';

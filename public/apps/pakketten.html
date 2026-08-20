@@ -21,31 +21,31 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:920px;margin:0 auto;}
   .intro{color:var(--muted);font-size:.92rem;line-height:1.6;max-width:60ch;}
   .geheim{margin-top:.6rem;font-size:.76rem;color:var(--soft);border-left:2px solid var(--gold);padding:.3rem 0 .3rem .7rem;}
   .kop{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.6rem 0 .6rem;}
   .typen{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.7rem;}
-  .type{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;cursor:pointer;text-align:left;transition:border-color .2s,transform .2s;font:inherit;color:var(--txt);}
+  .type{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;cursor:pointer;text-align:left;transition:border-color .2s,transform .2s;font:inherit;color:var(--txt);}
   .type:hover,.type:focus-visible{border-color:var(--gold);transform:translateY(-2px);}
   .type.aan{border-color:var(--gold);background:linear-gradient(180deg,rgba(169,143,28,.14),var(--card));}
   .type b{display:block;font-size:1.02rem;font-family:'Bodoni Moda',serif;font-weight:500;}
   .type span{display:block;font-size:.78rem;color:var(--soft);margin-top:.2rem;line-height:1.45;}
   #pakket{margin-top:1.4rem;display:none;}
   #pakket.aan{display:block;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-top:.9rem;}
   .kaart h3{font-size:1.1rem;margin-bottom:.5rem;}
   .rij{display:flex;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--line);align-items:baseline;}
   .rij:last-child{border-bottom:0;}
   .rij b{flex-shrink:0;min-width:9.5rem;font-weight:600;font-size:.9rem;}
   .rij span{color:var(--muted);font-size:.85rem;line-height:1.5;}
   .apps{display:flex;flex-wrap:wrap;gap:.4rem;}
-  .app{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--muted);}
+  .app{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.35rem .8rem;font-size:.8rem;color:var(--muted);}
   /* de technieken met een QR-code erbij */
   .tech{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
-  .tk{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:.8rem;display:flex;gap:.7rem;align-items:flex-start;}
-  .tk img{width:58px;height:58px;flex-shrink:0;border-radius:8px;background:#fff;padding:3px;image-rendering:pixelated;}
+  .tk{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.8rem;display:flex;gap:.7rem;align-items:flex-start;}
+  .tk img{width:58px;height:58px;flex-shrink:0;border-radius:0;background:#fff;padding:3px;image-rendering:pixelated;}
   .tk b{display:block;font-size:.88rem;}
   .tk span{display:block;font-size:.76rem;color:var(--soft);margin-top:.2rem;line-height:1.45;}
   /* de 3D-plattegrond: een isometrisch raster met kamers */
@@ -53,15 +53,15 @@
   .vloer{position:relative;width:min(420px,86vw);height:min(300px,62vw);margin:0 auto;
     transform:rotateX(56deg) rotateZ(-42deg);transform-style:preserve-3d;
     background:repeating-linear-gradient(0deg,transparent,transparent calc(25% - 1px),rgba(255,255,255,.06) 25%),repeating-linear-gradient(90deg,transparent,transparent calc(25% - 1px),rgba(255,255,255,.06) 25%);
-    border:1px solid rgba(255,255,255,.10);border-radius:6px;}
-  .kamer{position:absolute;border-radius:5px;color:#0C0C0B;font-weight:700;font-size:.6rem;
+    border:1px solid rgba(255,255,255,.10);border-radius:0;}
+  .kamer{position:absolute;border-radius:0;color:#0C0C0B;font-weight:700;font-size:.6rem;
     display:flex;align-items:center;justify-content:center;text-align:center;padding:.2rem;
     box-shadow:0 10px 0 -2px rgba(0,0,0,.45);transform:translateZ(14px);letter-spacing:.02em;}
   .huur{background:linear-gradient(180deg,rgba(169,143,28,.12),var(--card));border-color:rgba(169,143,28,.4);}
   .maatrij{display:flex;gap:.5rem;margin-top:.6rem;}
-  .maatrij input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;color:var(--txt);font:inherit;font-size:.86rem;}
-  .maatrij button{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
-  .opmaat{margin-top:.7rem;background:#0C0C0B;border:1px solid rgba(169,143,28,.4);border-radius:12px;padding:.7rem .8rem;font-size:.86rem;color:var(--txt);line-height:1.55;white-space:pre-wrap;}
+  .maatrij input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;color:var(--txt);font:inherit;font-size:.86rem;}
+  .maatrij button{background:var(--gold);color:#000;border:none;border-radius:0;padding:.6rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
+  .opmaat{margin-top:.7rem;background:#0C0C0B;border:1px solid rgba(169,143,28,.4);border-radius:0;padding:.7rem .8rem;font-size:.86rem;color:var(--txt);line-height:1.55;white-space:pre-wrap;}
   .opmaat[hidden]{display:none;}
   .leeg{color:var(--muted);font-size:.9rem;padding:2rem 0;text-align:center;}
 </style>

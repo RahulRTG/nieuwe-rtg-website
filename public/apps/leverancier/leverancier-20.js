@@ -30,7 +30,7 @@
            [T('vk.gembon','Gem. bon'), eur(k.gemBon)],
            [T('vk.open','Open aanvragen'), k.openAanvragen],
            [T('vk.bezet','Bezet vandaag'), k.bezetUurVandaag+' u']]
-          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;">'+
+          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.8rem;">'+
             '<div style="font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+x[0]+'</div>'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.2rem;color:var(--rtg-leesgoud,var(--gold));margin-top:0.15rem;">'+x[1]+'</div></div>').join('')+'</div>'+
           '<div class="tkc-who h-mt50">'+T('vk.nulcom','RTG rekent 0% commissie: deze omzet is volledig van u.')+'</div></div>';
@@ -63,7 +63,7 @@
         html += '<div class="tkc h-volbreed"><h3>'+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
           '<div class="st-form"><input class="st-in" id="vakQ" placeholder="'+T('vk.aiplace','Bijv. waar moet ik me vandaag op richten?')+'">'+
           '<button class="bigbtn" id="vakAi"'+(vakAiBusy?' disabled':'')+'>'+(vakAiBusy?T('vk.aidenkt','De assistent denkt na...'):T('vk.aivraag','Vraag advies'))+'</button></div>'+
-          (vakAiMsg ? '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;">'+vakAiMsg+'</div>' : '')+'</div>';
+          (vakAiMsg ? '<div style="border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;">'+vakAiMsg+'</div>' : '')+'</div>';
       }
     }
     if (kantoorSec === 'diensten'){

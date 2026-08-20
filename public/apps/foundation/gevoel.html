@@ -18,7 +18,7 @@
   .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
   .koppen{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
   @media(min-width:34rem){ .koppen{grid-template-columns:repeat(3,1fr);} }
-  .kop{background:var(--paneel2);border:2px solid var(--lijn);border-radius:18px;padding:.9rem .6rem .7rem;
+  .kop{background:var(--paneel2);border:2px solid var(--lijn);border-radius:0;padding:.9rem .6rem .7rem;
     cursor:pointer;color:var(--rtg-leesgoud,var(--goud));display:flex;flex-direction:column;align-items:center;gap:.4rem;}
   .kop:hover{border-color:var(--goud);}
   .kop.gekozen{border-color:var(--goud2);}
@@ -61,7 +61,7 @@
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Mijn dagboekje</h2>
     <p style="color:var(--zacht);font-size:.85rem;line-height:1.5;margin-bottom:.6rem;">Alleen jij ziet dit. Niet papa, niet mama, niemand.</p>
     <div id="dagboekStrook" style="display:flex;gap:.35rem;flex-wrap:wrap;"></div>
-    <div id="hulpRegel" hidden style="margin-top:.8rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;">
+    <div id="hulpRegel" hidden style="margin-top:.8rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;">
       Je had een paar zware dagen achter elkaar. Dat hoef je niet alleen te dragen:
       <a href="steun.html" style="color:var(--goud2);">praat met iemand</a> of kijk in de
       <a href="hulpwijzer.html" style="color:var(--goud2);">hulpwijzer</a>.</div>

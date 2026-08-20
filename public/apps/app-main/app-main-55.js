@@ -2,7 +2,7 @@
     if (vastePas === 'rtg' || vastePas === 'lifestyle'){
       const pasNaam = vastePas === 'rtg' ? T('bo2.thema.bordeaux','Bordeaux (RTG)') : T('bo2.thema.parel','Parelmoer (Lifestyle)');
       const nu = pasThemaHuidig();
-      const knop = (val, tekst) => '<button class="js-thema" data-thema="' + val + '" style="margin-top:0.5rem;margin-right:0.4rem;border-radius:999px;padding:0.4rem 0.85rem;font-family:inherit;font-size:0.7rem;cursor:pointer;border:1px solid ' + (nu===val?'var(--gold)':'var(--line)') + ';background:' + (nu===val?'var(--gold)':'none') + ';color:' + (nu===val?'#000':'var(--txt)') + ';">' + tekst + '</button>';
+      const knop = (val, tekst) => '<button class="js-thema" data-thema="' + val + '" style="margin-top:0.5rem;margin-right:0.4rem;border-radius:0;padding:0.4rem 0.85rem;font-family:inherit;font-size:0.7rem;cursor:pointer;border:1px solid ' + (nu===val?'var(--gold)':'var(--line)') + ';background:' + (nu===val?'var(--gold)':'none') + ';color:' + (nu===val?'#000':'var(--txt)') + ';">' + tekst + '</button>';
       html += kaart('' + T('bo2.weergave','Weergave'),
         '<div class="fineprint">' + T('bo2.weergave.s','Kies het kleurthema van deze app.') + '</div>' +
         knop(THEMA_STANDAARD[vastePas], pasNaam) + knop('standaard', T('bo2.thema.klassiek','Klassiek (donker)')));
@@ -57,19 +57,19 @@
     const st = document.createElement('style'); st.id = 'rtg-zegel-stijl';
     st.textContent = [
       '.zg-ov{position:fixed;inset:0;z-index:99998;background:rgba(12,12,11,.72);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;}',
-      '.zg-card{background:var(--bg,#0C0C0B);color:var(--txt,#fff);width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:1.3rem 1.3rem calc(1.3rem + env(safe-area-inset-bottom,0));max-height:92vh;overflow-y:auto;}',
+      '.zg-card{background:var(--bg,#0C0C0B);color:var(--txt,#fff);width:100%;max-width:520px;border-radius:0;padding:1.3rem 1.3rem calc(1.3rem + env(safe-area-inset-bottom,0));max-height:92vh;overflow-y:auto;}',
       '.zg-card h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;font-size:1.25rem;margin:.1rem 0 .2rem;}',
       '.zg-sub{color:var(--soft,#8A8680);font-size:.82rem;margin-bottom:1rem;}',
       '.zg-opt{display:flex;align-items:center;gap:.7rem;padding:.7rem .2rem;border-bottom:1px solid var(--line,#26251f);cursor:pointer;font-size:.95rem;}',
       '.zg-opt input{width:20px;height:20px;accent-color:#7F1634;}',
-      '.zg-btn{width:100%;margin-top:1rem;background:#7F1634;color:#fff;border:none;border-radius:12px;padding:.85rem;font-weight:600;font-family:inherit;font-size:.95rem;cursor:pointer;}',
+      '.zg-btn{width:100%;margin-top:1rem;background:#7F1634;color:#fff;border:none;border-radius:0;padding:.85rem;font-weight:600;font-family:inherit;font-size:.95rem;cursor:pointer;}',
       '.zg-btn.sec{background:none;border:1px solid var(--line,#3a3a38);color:var(--soft,#8A8680);}',
       '.zg-qrwrap{text-align:center;}',
-      '.zg-qr{background:#fff;display:inline-block;padding:14px;border-radius:14px;margin:.4rem 0;}',
+      '.zg-qr{background:#fff;display:inline-block;padding:14px;border-radius:0;margin:.4rem 0;}',
       '.zg-qr canvas{display:block;width:min(64vw,260px);height:auto;image-rendering:pixelated;}',
-      '.zg-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(133,112,7,.16);color:#C9A227;border:1px solid rgba(133,112,7,.4);border-radius:999px;padding:.3rem .8rem;font-size:.78rem;font-weight:600;margin:.2rem 0;}',
+      '.zg-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(133,112,7,.16);color:#C9A227;border:1px solid rgba(133,112,7,.4);border-radius:0;padding:.3rem .8rem;font-size:.78rem;font-weight:600;margin:.2rem 0;}',
       '.zg-claims{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin:.6rem 0;}',
-      '.zg-claim{background:rgba(194,58,94,.14);color:#C23A5E;border-radius:999px;padding:.25rem .7rem;font-size:.8rem;font-weight:600;}',
+      '.zg-claim{background:rgba(194,58,94,.14);color:#C23A5E;border-radius:0;padding:.25rem .7rem;font-size:.8rem;font-weight:600;}',
       '.zg-tel{font-size:.8rem;color:var(--soft,#8A8680);}'
     ].join('');
     document.head.appendChild(st);

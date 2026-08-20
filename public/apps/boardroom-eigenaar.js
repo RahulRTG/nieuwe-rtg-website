@@ -35,7 +35,7 @@
       "font-family:Inter,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--gold,#857007);}" +
     '.ez-kop::before,.ez-kop::after{content:"";flex:0 0 2.2rem;height:1px;background:color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
     ".ez-naam{font-family:'Bodoni Moda',serif;font-size:1.25rem;text-align:center;margin:.35rem 0 1.1rem;}" +
-    '.ez details{border:1px solid var(--line,#DEDBD5);border-radius:14px;margin:.6rem 0;background:var(--card,rgba(255,255,255,.03));}' +
+    '.ez details{border:1px solid var(--line,#DEDBD5);border-radius:0;margin:.6rem 0;background:var(--card,rgba(255,255,255,.03));}' +
     ".ez summary{cursor:pointer;padding:.85rem 1rem;font-family:'Bodoni Moda',serif;font-size:1.02rem;list-style:none;}" +
     '.ez summary::-webkit-details-marker{display:none;}' +
     '.ez summary::after{content:"▾";float:right;color:var(--gold,#857007);opacity:.7;}' +
@@ -45,18 +45,18 @@
     '.ez-stip{flex:0 0 8px;width:8px;height:8px;border-radius:50%;}' +
     '.ez-fn small{display:block;color:var(--muted,#8A8680);font-size:.72rem;line-height:1.45;}' +
     '.ez-fn>div{flex:1;min-width:0;font-size:.86rem;}' +
-    '.ez-knop{background:none;border:1px solid var(--line,#DEDBD5);border-radius:999px;color:inherit;' +
+    '.ez-knop{background:none;border:1px solid var(--line,#DEDBD5);border-radius:0;color:inherit;' +
       'font:inherit;font-size:.72rem;padding:.3rem .8rem;cursor:pointer;white-space:nowrap;}' +
     '.ez-knop.aan{border-color:color-mix(in srgb, var(--gold,#857007) 65%, transparent);color:var(--gold,#857007);}' +
     '.ez-cat{margin:.7rem 0 .2rem;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold,#857007);}' +
     '.ez-taal{display:inline-block;margin:.2rem .3rem .2rem 0;}' +
-    '.ez-ai textarea{width:100%;box-sizing:border-box;background:none;border:1px solid var(--line,#DEDBD5);border-radius:10px;' +
+    '.ez-ai textarea{width:100%;box-sizing:border-box;background:none;border:1px solid var(--line,#DEDBD5);border-radius:0;' +
       'color:inherit;font:inherit;font-size:.86rem;padding:.6rem;min-height:3.2rem;resize:vertical;}' +
     '.ez-ai .ez-antwoord{margin:.7rem 0;font-size:.84rem;line-height:1.55;color:var(--muted,#8A8680);white-space:pre-wrap;}' +
     '.ez-log{font-size:.76rem;color:var(--muted,#8A8680);line-height:1.6;}' +
     '.ez-betaal{border-top:1px solid color-mix(in srgb,var(--line,#DEDBD5) 45%,transparent);padding:.65rem 0;}' +
     '.ez-betaal:first-child{border-top:none;}.ez-betaal-kop{display:flex;align-items:center;justify-content:space-between;gap:.5rem;}' +
-    '.ez-betaal-acties{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.45rem}.ez-betaal select{background:none;color:inherit;border:1px solid var(--line,#DEDBD5);border-radius:999px;padding:.28rem .55rem;font-size:.72rem;}' +
+    '.ez-betaal-acties{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.45rem}.ez-betaal select{background:none;color:inherit;border:1px solid var(--line,#DEDBD5);border-radius:0;padding:.28rem .55rem;font-size:.72rem;}' +
     '.ez-melding{margin:.5rem 0;font-size:.8rem;color:var(--gold,#857007);min-height:1.1rem;}';
   document.head.appendChild(stijl);
 

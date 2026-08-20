@@ -19,19 +19,19 @@
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
   .statusknoppen{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
-  .statusknoppen button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.5rem .9rem;font-size:.9rem;}
+  .statusknoppen button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.5rem .9rem;font-size:.9rem;}
   .statusknoppen button:hover{border-color:var(--goud);}
   .knoprij{display:flex;gap:.6rem;flex-wrap:wrap;}
-  .deelstatus{font-size:.9rem;line-height:1.5;margin-top:.9rem;padding:.7rem .9rem;border-radius:10px;background:var(--paneel2);border:1px solid var(--lijn);}
+  .deelstatus{font-size:.9rem;line-height:1.5;margin-top:.9rem;padding:.7rem .9rem;border-radius:0;background:var(--paneel2);border:1px solid var(--lijn);}
   .deelstatus.aan{border-color:var(--groen);}
   .fam{display:flex;flex-direction:column;gap:.6rem;}
-  .lid{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;}
+  .lid{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.7rem .9rem;}
   .lid .av{width:2.4rem;height:2.4rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
   .lid .nm{font-weight:600;}
   .lid .st{font-size:.82rem;color:var(--zacht);}
   .lid .kaartlink{margin-left:auto;color:var(--rtg-leesgoud,var(--goud));text-decoration:none;font-size:.85rem;white-space:nowrap;}
   .leeg{color:var(--zacht);font-size:.9rem;}
-  .sos{width:100%;background:var(--rood);color:#fff;font-weight:700;border-radius:12px;padding:.9rem;font-size:1rem;}
+  .sos{width:100%;background:var(--rood);color:#fff;font-weight:700;border-radius:0;padding:.9rem;font-size:1rem;}
   .privaat{font-size:.8rem;color:var(--zacht);margin-top:.7rem;line-height:1.5;}
   .ok{color:var(--groen);font-size:.88rem;min-height:1.1rem;margin-top:.4rem;}
   .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
@@ -76,7 +76,7 @@
     <h2>Geen bereik? Noodbericht via satelliet</h2>
     <div class="h">Nieuwere telefoons kunnen zonder bereik een sms via een satelliet sturen (buiten, met vrij zicht op de lucht). De app zet een zo kort mogelijk noodbericht voor je klaar, met de tijd en je locatie erin; je telefoon biedt de satellietweg zelf aan zodra er geen bereik is. Bij direct gevaar en gewoon bereik: bel altijd eerst 112.</div>
     <button class="knop" id="nsMaak" style="width:100%;">Maak mijn noodbericht</button>
-    <div id="nsTekst" style="margin-top:.6rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;font-size:.95rem;line-height:1.5;word-break:break-word;" hidden></div>
+    <div id="nsTekst" style="margin-top:.6rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;font-size:.95rem;line-height:1.5;word-break:break-word;" hidden></div>
     <div id="nsKnoppen" style="display:flex;gap:.5rem;margin-top:.5rem;" hidden>
       <a class="knop" id="nsSms" style="flex:1;text-align:center;text-decoration:none;">Open in Berichten</a>
       <button class="knop grijs h-flex1" id="nsKopie">Kopieer</button>

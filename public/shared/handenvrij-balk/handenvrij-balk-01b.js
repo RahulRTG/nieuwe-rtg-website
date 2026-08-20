@@ -26,7 +26,7 @@
      stapeling waar ONTWERP.md par. 1 over gaat; wat een invoerveld is, blijkt
      uit de cursor en de plaatshouder, niet uit een tweede rand. */
   var css = '.hv-balk{position:fixed;left:12px;right:12px;z-index:38;display:flex;gap:.45rem;align-items:center;' +
-    'bottom:calc(12px + env(safe-area-inset-bottom,0px));padding:.4rem .4rem .4rem .55rem;border-radius:22px;' +
+    'bottom:calc(12px + env(safe-area-inset-bottom,0px));padding:.4rem .4rem .4rem .55rem;border-radius:0;' +
     'font-family:var(--rtg-interface,Inter,system-ui,sans-serif);' +
     'border:1px solid color-mix(in srgb,var(--gold-tekst,#C0A544) 24%,rgba(255,255,255,.1));' +
     'background:linear-gradient(145deg,rgba(28,25,24,.84),rgba(5,5,5,.78));' +
@@ -46,7 +46,7 @@
        uitweg, en twee keer dezelfde uitzondering is beter dan twee vormen. */
     '.hv-balk input{flex:1;min-width:0;height:38px!important;padding:0 .85rem!important;' +
     'background:rgba(5,5,5,.42)!important;border:1px solid var(--rtg-line,rgba(255,255,255,.09))!important;' +
-    'border-radius:13px!important;color:var(--rtg-txt,#F4F0E9)!important;' +
+    'border-radius:0;color:var(--rtg-txt,#F4F0E9)!important;' +
     'font:400 .84rem var(--rtg-interface,Inter,system-ui,sans-serif)!important;' +
     'box-shadow:0 2px 7px rgba(0,0,0,.3) inset!important;}' +
     '.hv-balk input::placeholder{color:var(--rtg-soft,rgba(244,240,233,.56));}' +
@@ -54,7 +54,7 @@
     /* De knoppen moeten op een telefoon van 390px naast het veld passen; met
        drie woorden erin liep de rij het beeld uit. Vandaar een pijl voor sturen
        (zoals in de metgezel) en korte woorden voor de twee schakelaars. */
-    '.hv-k{background:transparent;border:1px solid var(--rtg-line,rgba(255,255,255,.09));border-radius:999px;' +
+    '.hv-k{background:transparent;border:1px solid var(--rtg-line,rgba(255,255,255,.09));border-radius:0;' +
     'color:var(--rtg-muted,rgba(244,240,233,.72));font:500 .72rem/1 inherit;' +
     'padding:.5rem .7rem;cursor:pointer;white-space:nowrap;flex:0 0 auto;' +
     'transition:color 140ms,border-color 140ms,background 140ms;}' +

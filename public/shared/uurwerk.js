@@ -70,7 +70,7 @@
       '*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb, var(--gold,#C9A24B) 40%, transparent) transparent;}' +
       '::-webkit-scrollbar{width:6px;height:6px;}' +
       '::-webkit-scrollbar-track{background:transparent;}' +
-      '::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--gold,#C9A24B) 38%, transparent);border-radius:999px;}' +
+      '::-webkit-scrollbar-thumb{background:color-mix(in srgb, var(--gold,#C9A24B) 38%, transparent);border-radius:0;}' +
       // de minuutbaan: zestig fijne strepen met een gouden accent op de vijf,
       // zoals de streepband van de RTG-klok; voor sectiekoppen en scheidingen
       '.rtg-minuutbaan{position:relative;padding-bottom:0.55rem;}' +

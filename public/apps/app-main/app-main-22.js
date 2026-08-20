@@ -2,14 +2,14 @@
     $('#boekBody').innerHTML =
       (s.vak ? '<div style="font-size:0.72rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;">' + s.vak + ' · ' + s.city + '</div>' : '') +
       s.services.map(x =>
-        '<div class="rowitem js-svc" data-svc="' + x.id + '" style="cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;margin-bottom:0.55rem;">' +
+        '<div class="rowitem js-svc" data-svc="' + x.id + '" style="cursor:pointer;border:1px solid var(--line);border-radius:0;padding:0.75rem 0.9rem;margin-bottom:0.55rem;">' +
         '<div class="t"><b>' + (x.soort === 'product' ? '' : '') + x.name + '</b><span>' + (x.desc || '') + (x.duurMin ? ' · ' + x.duurMin + ' min' : '') + '</span></div>' +
         '<span class="amount">' + eur(x.price) + '</span></div>').join('') +
       '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;">' +
-      '<input id="boekDatum" type="date" value="' + morgen + '" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;">' +
-      '<input id="boekTijd" type="time" value="14:00" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;"></div>' +
+      '<input id="boekDatum" type="date" value="' + morgen + '" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;">' +
+      '<input id="boekTijd" type="time" value="14:00" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem;color:var(--txt);font-family:inherit;color-scheme:dark;"></div>' +
       '<div class="h-mt50" id="boekSlots"></div>' +
-      '<input id="boekNote" placeholder="' + T('boek.noteph','Bijv. maat, locatie of blessure') + '" style="width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.82rem;">' +
+      '<input id="boekNote" placeholder="' + T('boek.noteph','Bijv. maat, locatie of blessure') + '" style="width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.82rem;">' +
       '<div style="font-size:0.66rem;color:var(--soft);margin:0.5rem 0 0;">' + T('boek.los','U boekt rechtstreeks bij deze professional: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de professional.') + '</div>' +
       '<button id="boekGo" class="btn-pay" style="width:100%;margin-top:0.7rem;justify-content:center;">' + FID + T('boek.go','Boek en betaal') + '</button>';
     $('#boek-sheet').classList.add('open');
@@ -28,7 +28,7 @@
       }
       box.innerHTML = '<div style="font-size:0.66rem;color:var(--soft);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.35rem;">' + T('boek.vrijetijden','Vrije tijden') + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">' + d.tijden.map(t =>
-          '<button class="js-slot" data-t="' + t + '" style="background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.35rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;cursor:pointer;">' + t + '</button>').join('') + '</div>';
+          '<button class="js-slot" data-t="' + t + '" style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.35rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;cursor:pointer;">' + t + '</button>').join('') + '</div>';
       box.querySelectorAll('.js-slot').forEach(b => b.addEventListener('click', () => {
         $('#boekTijd').value = b.dataset.t;
         box.querySelectorAll('.js-slot').forEach(x => { x.style.borderColor = 'var(--line)'; x.style.color = 'var(--txt)'; });

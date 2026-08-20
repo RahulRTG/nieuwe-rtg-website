@@ -3,8 +3,8 @@
       const slot = wv.dagen[d[0]] || {};
       return '<div class="st-row" data-wvdag="'+d[0]+'" style="gap:0.5rem;">'+
         '<span style="min-width:2.2rem;text-transform:uppercase;font-size:0.68rem;">'+d[1]+'</span>'+
-        '<input type="time" class="wv-van" value="'+(slot.van||'')+'" aria-label="'+T('wv.vanaf','Vanaf')+' '+d[1]+'" '+(slot.dicht?'disabled':'')+' style="background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;">'+
-        '<input type="time" class="wv-tot" value="'+(slot.tot||'')+'" aria-label="'+T('wv.tot','Tot')+' '+d[1]+'" '+(slot.dicht?'disabled':'')+' style="background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;">'+
+        '<input type="time" class="wv-van" value="'+(slot.van||'')+'" aria-label="'+T('wv.vanaf','Vanaf')+' '+d[1]+'" '+(slot.dicht?'disabled':'')+' style="background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;">'+
+        '<input type="time" class="wv-tot" value="'+(slot.tot||'')+'" aria-label="'+T('wv.tot','Tot')+' '+d[1]+'" '+(slot.dicht?'disabled':'')+' style="background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;">'+
         '<button class="obtn'+(slot.dicht?' warn':'')+'" data-wvdicht="'+d[0]+'">'+(slot.dicht?T('wv.dicht','Dicht'):T('wv.open','Open'))+'</button></div>';
     }).join('');
     // de werkplek-zone: een punt met straal; buiten de zone geen werksessie,
@@ -12,7 +12,7 @@
     // als op de desktop). De positie van het toestel wordt alleen op het
     // inlogmoment vergeleken en nooit opgeslagen.
     const plek = wv.plek || null;
-    const veldStijl = 'background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;';
+    const veldStijl = 'background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;';
     const plekBlok = '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
       '<b style="font-size:0.78rem;">'+T('wv.plekh','Werkplek-zone')+'</b>'+
       '<div class="tkc-who">'+T('wv.pleks','Alleen op de werkplek inloggen: het toestel deelt bij het inloggen eenmalig zijn positie, de server vergelijkt die met deze zone en bewaart er niets van. Thuiswerk-toestemming per persoon heft de zone op.')+'</div>'+

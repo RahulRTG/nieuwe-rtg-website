@@ -52,7 +52,7 @@
        precies over de onderste rij apps. Geen zwevende knoppen meer: hij hoort
        bij de balk waar ook het merk en het account staan. */
     .rtg-thema-knop{display:inline-flex;align-items:center;gap:0.45rem;
-      background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:999px;
+      background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:0;
       padding:0.42rem 0.85rem;font-family:'Inter',-apple-system,sans-serif;font-size:0.72rem;font-weight:600;
       letter-spacing:0.04em;cursor:pointer;transition:background .18s;white-space:nowrap;}
     .rtg-thema-knop:hover{background:#7F1634;border-color:#7F1634;}

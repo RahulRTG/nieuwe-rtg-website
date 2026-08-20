@@ -30,11 +30,11 @@
   header h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;line-height:1.1;}
   header .ey{font-size:.56rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .stand{display:inline-flex;align-items:center;gap:.45rem;font-size:.72rem;letter-spacing:.06em;
-    text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.25rem .7rem;}
+    text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:0;padding:.25rem .7rem;}
   .stand i{width:8px;height:8px;border-radius:50%;background:var(--groen);display:block;}
   .stand.let i{background:var(--amber);} .stand.storing i{background:var(--acc);} .stand.leeg i{background:var(--soft);}
   .zoekbalk{flex:1 1 16rem;min-width:12rem;display:flex;gap:.4rem;}
-  .zoekbalk input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  .zoekbalk input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;font-size:.86rem;padding:.5rem .75rem;}
   .zoekbalk input:focus{outline:2px solid var(--acc);outline-offset:1px;}
 
@@ -45,7 +45,7 @@
     margin:1.3rem .4rem .45rem;}
   nav#rail .csec:first-child{margin-top:0;}
   nav#rail button{display:flex;align-items:baseline;gap:.5rem;width:100%;text-align:left;background:none;
-    border:1px solid transparent;border-radius:10px;padding:.45rem .55rem;font-size:.87rem;color:var(--muted);}
+    border:1px solid transparent;border-radius:0;padding:.45rem .55rem;font-size:.87rem;color:var(--muted);}
   nav#rail button:hover{color:var(--txt);border-color:var(--line);}
   nav#rail button[aria-current="page"]{color:var(--txt);border-color:var(--line);background:var(--card);}
   nav#rail button .tel{margin-left:auto;font-size:.7rem;color:var(--soft);font-variant-numeric:tabular-nums;}
@@ -77,7 +77,7 @@
   .kaart h3{font-size:1.02rem;margin-bottom:.3rem;font-family:'Bodoni Moda',Georgia,serif;}
   .kaart p{font-size:.85rem;color:var(--muted);line-height:1.6;}
   .rooster{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.85rem;margin-bottom:1.2rem;}
-  .tegel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;}
+  .tegel{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;}
   .tegel .l{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
   .tegel .v{font-family:'Bodoni Moda',Georgia,serif;font-size:1.75rem;margin-top:.3rem;font-variant-numeric:tabular-nums;}
   .tegel .v.acc{color:var(--acc);} .tegel .v.gold{color:var(--rtg-leesgoud,var(--gold));} .tegel .v.groen{color:var(--groen);}
@@ -89,7 +89,7 @@
   .lijn{border-top:1px solid var(--line);padding:.6rem 0;font-size:.85rem;}
   .lijn:last-child{border-bottom:0;}
   .cniveau{display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-    border:1px solid var(--line);border-radius:999px;padding:.1rem .5rem;color:var(--muted);}
+    border:1px solid var(--line);border-radius:0;padding:.1rem .5rem;color:var(--muted);}
   .cniveau.auto{border-color:var(--groen);color:var(--groen);}
   .cniveau.assist{border-color:var(--amber);color:var(--amber);}
   .cniveau.hand{border-color:var(--acc);color:var(--acc);}
@@ -105,10 +105,10 @@
      genoeg voor elk formulier in deze app. */
   .veld.kort{width:5.5rem;} .veld.smal{width:9rem;} .veld.mid{width:13rem;} .veld.breed{width:18rem;}
   .mt{margin-top:.7rem;}
-  .staaf{height:.4rem;background:var(--card2);border-radius:999px;overflow:hidden;margin-top:.45rem;}
+  .staaf{height:.4rem;background:var(--card2);border-radius:0;overflow:hidden;margin-top:.45rem;}
   .staaf i{display:block;height:100%;background:var(--gold);}
   .cmelding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;
+    border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;
     transition:opacity .3s;z-index:60;pointer-events:none;max-width:min(90vw,34rem);text-align:center;}
   table.ctab{width:100%;border-collapse:collapse;font-size:.84rem;}
   table.ctab th{text-align:left;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
@@ -116,7 +116,7 @@
   table.ctab td{padding:.45rem .5rem;border-bottom:1px solid var(--line);vertical-align:top;}
   .schuif{overflow-x:auto;}
   .werkplek{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.7rem;}
-  .werkplek a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  .werkplek a{display:block;background:var(--card);border:1px solid var(--line);border-radius:0;
     padding:.8rem .9rem;text-decoration:none;}
   .werkplek a:hover{border-color:var(--acc);}
   .werkplek a b{display:block;font-size:.9rem;font-weight:600;}

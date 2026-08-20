@@ -78,7 +78,7 @@
 .cmd-balk[data-trek]{position:relative}
 .cmd-balk[data-trek="een"]::before,.cmd-balk[data-trek="twee"]::before{
   content:"";position:absolute;left:50%;transform:translateX(-50%);top:-9px;
-  width:36px;height:3px;border-radius:3px;background:var(--rtg-soft,#8A8680);
+  width:36px;height:3px;border-radius:0;background:var(--rtg-soft,#8A8680);
 }
 .cmd-balk[data-trek="twee"]::before{width:72px;background:var(--gold-tekst,#C0A544)}
 

@@ -588,7 +588,7 @@
       'width:150px;min-width:24px;height:24px;min-height:24px;' +
       'background:none;border:0;padding:0;cursor:pointer;display:flex;' +
       'align-items:center;justify-content:center;touch-action:none;}' +
-      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:2.5px;' +
+      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:0;' +
       'background:rgba(244,241,236,.55);}';
     (document.head || document.documentElement).appendChild(st);
   }

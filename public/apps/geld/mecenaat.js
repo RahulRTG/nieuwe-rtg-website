@@ -32,7 +32,7 @@
       '#paneel .mc-half>*{flex:1;min-width:0;}' +
       '#paneel .mc-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +
       '#paneel .mc-vraag input{flex:1;width:auto;}' +
-      '#paneel .mc-uit{border:1px solid var(--rtg-line);border-radius:12px;padding:.6rem .8rem;' +
+      '#paneel .mc-uit{border:1px solid var(--rtg-line);border-radius:0;padding:.6rem .8rem;' +
         'margin-top:.6rem;font-size:.85rem;line-height:1.55;white-space:pre-wrap;}';
     d.head.appendChild(s);
   };

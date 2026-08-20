@@ -43,7 +43,7 @@
   border-top-left-radius:20px;border-top-right-radius:20px;border-bottom:0;
   padding-bottom:env(safe-area-inset-bottom,0px);transform:translateY(101%);}
 .rtg-laag-lade.open .lg-vak{transform:translateY(0);}
-.lg-greep{flex:0 0 auto;width:44px;height:4px;margin:.7rem auto .2rem;border-radius:4px;
+.lg-greep{flex:0 0 auto;width:44px;height:4px;margin:.7rem auto .2rem;border-radius:0;
   background:var(--rtg-line,#26241f);}
 
 /* ---- het paneel: op telefoon het scherm, op tablet van rechts ---- */

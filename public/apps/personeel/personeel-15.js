@@ -75,8 +75,8 @@
         '<b>'+esc(o.customerCodename)+' · '+T('pd.bz.bonnr','bon')+' '+o.ref+'</b>'+
         o.items.map(i=>'<label style="display:block;font-size:0.82rem;cursor:pointer;"><input type="checkbox" class="ipItem" value="'+esc(i.id)+'" style="accent-color:var(--gold);margin-right:0.35rem;">'+i.qty+'x '+esc(i.name)+'</label>').join('')+
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
-        '<input class="ipTas" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'" style="flex:1;min-width:6rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
-        '<input class="ipBon" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'" style="flex:1;min-width:7rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
+        '<input class="ipTas" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'" style="flex:1;min-width:6rem;background:transparent;border:1px solid var(--line);border-radius:0;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
+        '<input class="ipBon" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'" style="flex:1;min-width:7rem;background:transparent;border:1px solid var(--line);border-radius:0;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
         '<button class="abtn ipKlaar">'+T('pd.bz.ingepakt','Alles zit erin')+'</button></div></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geeninpak','Niets om in te pakken; nieuwe bestellingen verschijnen hier.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.mijn','Mijn rit')+' ('+mijn.length+')</div>'+

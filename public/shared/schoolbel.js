@@ -30,11 +30,11 @@
     el.id = 'sbel';
     el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Schoolgesprek');
     el.style.cssText = 'display:none;position:fixed;inset:auto 1rem 1rem 1rem;z-index:80;background:#151312;color:#F4F1EC;' +
-      'border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:1rem;box-shadow:0 12px 40px rgba(0,0,0,.5);font-family:Inter,system-ui,sans-serif;';
+      'border:1px solid rgba(255,255,255,.14);border-radius:0;padding:1rem;box-shadow:0 12px 40px rgba(0,0,0,.5);font-family:Inter,system-ui,sans-serif;';
     el.innerHTML = '<div id="sbelWie" style="font-weight:600;margin-bottom:.6rem;"></div>' +
       '<div style="display:flex;gap:.5rem;">' +
-      '<button id="sbelNeem" type="button" style="display:none;flex:1;padding:.55rem;border:0;border-radius:10px;background:#69B891;color:#0C0C0B;font:inherit;font-weight:600;cursor:pointer;">Opnemen</button>' +
-      '<button id="sbelWeg" type="button" style="flex:1;padding:.55rem;border:0;border-radius:10px;background:#7F1634;color:#fff;font:inherit;font-weight:600;cursor:pointer;">Ophangen</button></div>' +
+      '<button id="sbelNeem" type="button" style="display:none;flex:1;padding:.55rem;border:0;border-radius:0;background:#69B891;color:#0C0C0B;font:inherit;font-weight:600;cursor:pointer;">Opnemen</button>' +
+      '<button id="sbelWeg" type="button" style="flex:1;padding:.55rem;border:0;border-radius:0;background:#7F1634;color:#fff;font:inherit;font-weight:600;cursor:pointer;">Ophangen</button></div>' +
       '<audio id="sbelAudio" autoplay></audio>';
     document.body.appendChild(el);
     el.querySelector('#sbelWeg').addEventListener('click', function () { sein('hangup'); stop(); });

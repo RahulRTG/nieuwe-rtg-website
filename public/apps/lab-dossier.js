@@ -33,13 +33,13 @@
       '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}' +
       '.cover h1{font-size:2.2rem;margin:.5rem 0 .3rem;}.cover .sub{color:var(--muted);font-size:.9rem;}' +
       '.keten{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:1.2rem 0;}' +
-      '.stap{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.25rem .7rem;color:var(--soft);}' +
+      '.stap{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.25rem .7rem;color:var(--soft);}' +
       '.stap.was{color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);}' +
       '.stap.nu{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600;}' +
       '.pijl{color:var(--soft);font-size:.8rem;}' +
       'section{border-top:1px solid var(--line);padding:1.4rem 0;page-break-inside:avoid;}' +
       'section h2{font-size:1.15rem;margin-bottom:.6rem;}' +
-      '.toets{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;}' +
+      '.toets{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;}' +
       '.toets .st{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;}' +
       '.toets.ok .st{color:var(--groen);}.toets.wacht .st{color:var(--rtg-leesgoud,var(--gold));}' +
       '.toets p{font-size:.88rem;color:var(--muted);margin-top:.3rem;}' +
@@ -49,7 +49,7 @@
       '.bev b{display:block;}.bev span{font-size:.86rem;color:var(--muted);}' +
       '.leeg{color:var(--soft);font-size:.86rem;}' +
       '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}' +
-      '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
+      '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
       '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.toets p,.bev span,.log{color:#444;}.log .d,.leeg{color:#999;}.stap.nu{-webkit-print-color-adjust:exact;print-color-adjust:exact;}section,.cover,.toets,.log,.bev{border-color:#ddd;}}' +
       '</style></head><body>' +
       '<div class="balk"><span>Onderzoeksdossier &middot; ' + esc(p.titel) + '</span><button id="pbtn" type="button">Print / PDF</button></div>' +

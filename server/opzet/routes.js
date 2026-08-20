@@ -76,6 +76,11 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/vakbewijs')(grens('vakbewijs'));
   require('../routes/gateway')(grens('gateway'));
   require('../routes/fiscaal-vooruit')(grens('fiscaal-vooruit'));
+  /* RTG Festival (FESTIVAL.md): naast de domeinen om dezelfde reden als concern
+     -- het terrein en de passen zijn van de ZAAK, de mens bij het hek is
+     personeel, en de gast draagt de pas. Het valt in elk van die drie half
+     thuis. */
+  require('../routes/festival')(grens('festival'));
   require('../routes/fout')(grens('fout'));
   require('../routes/onboarding')(grens('onboarding'));
   /* De adresopzoeker hoort bij het invullen van een adres (de intake en het

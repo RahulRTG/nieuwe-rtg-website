@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1199 bestanden en 8124 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1211 bestanden en 8283 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1199 |
-| losse beweringen (`test(...)`) | 8124 |
+| toetsbestanden | 1211 |
+| losse beweringen (`test(...)`) | 8283 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 943 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 41 |
-| alleen in de kop *genoemd*, nog niet gemeten | 42 |
+| alleen in de kop *genoemd*, nog niet gemeten | 54 |
 | niets van beide | 163 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1046 bestanden, 7849 beweringen.
+1058 bestanden, 8008 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -249,6 +249,18 @@ toets omvalt.
 | `factuur.test.js` | 5 | gezakt op `liegpoort /api/` | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |
 | `factuursaldo.test.js` | 6 | gezakt op `liegpoort /api/` | De maandfactuur betalen uit het eigen RTG Pay-saldo (/api/pay/saldo, kern/factuursaldo.js): de derde betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn (autolaad inbegrepen, idempotent) en de... |
 | `fases.test.js` | 4 | gezakt op `liegpoort /api/` | Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd; lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten. |
+| `festival-dienst.test.js` | 11 | genoemd | DE DIENST: ZERO-SEARCH, EN WAT ER NIET BIJ KOMT. WAAROM DIT BESTAAT Een medewerker die zijn dienst opent, hoort niet te hoeven zoeken naar iets wat het systeem al weet: welke dienst is van mij, waar is dat, wie staat... |
+| `festival-gast.test.js` | 9 | genoemd | DE GASTENKANT: ZIJN EIGEN DINGEN, EN VERDER NIETS. WAAROM DIT BESTAAT Deze wereld had bijna een jaar lang alleen een organisatiekant. |
+| `festival-geheugen.test.js` | 11 | genoemd | HET GEHEUGEN: EEN AFDRUK, GEEN HERBEREKENING. WAAROM DIT BESTAAT Overal in dit huis geldt LAT-regel 4: niet twee plekken die hetzelfde weten. |
+| `festival-gereed.test.js` | 10 | genoemd | FESTIVAL READINESS: EEN GETAL DAT NIET GROEN TE PRATEN IS. WAAROM DIT BESTAAT Een Festival Readiness Score van 98,7% is een mooi getal en juist daarom gevaarlijk (FESTIVAL.md par. |
+| `festival-groep.test.js` | 12 | genoemd | DE GROEP: WAT ER NIET IN ZIT IS DE TOETS. WAAROM DIT BESTAAT Een festival beleef je met mensen, en dat is precies waarom een groep het gevaarlijkste stuk van deze wereld is. |
+| `festival-partner.test.js` | 9 | genoemd | DE PARTNERBAND EN DE SIGNALEN VAN BUITEN. WAAROM DIT BESTAAT De cockpit hoort te weten dat er twee beveiligingsposten onbezet zijn. |
+| `festival-podium.test.js` | 11 | genoemd | ARTIEST EN PODIUM: EEN VOORNEMEN IS GEEN PROGRAMMA. WAAROM DIT BESTAAT CLAUDE.md verbiedt met zoveel woorden te doen alsof een boeking verwerkt is. |
+| `festival-routes.test.js` | 29 | genoemd | RTG FESTIVAL OVER ECHTE HTTP: de eigendomsgrens en de klok. WAAROM DIT NAAST test/festival.test.js BESTAAT Dat bestand is PUUR: het toetst de kern zonder server, en daar zitten de regels over rechten, tijd en telling in. |
+| `festival-tijdlijn.test.js` | 10 | genoemd | DE EDITIE-TIJDLIJN: SAMENVOEGEN EN SORTEREN, MEER NIET. WAAROM DIT BESTAAT Par. |
+| `festival-verkoop.test.js` | 14 | genoemd | FESTIVAL COMMERCE: VOORRAAD, BUNDELS, EN DE TWEE STAPPEN. WAAROM DIT BESTAAT Betalen duurt. |
+| `festival-vooruit.test.js` | 13 | genoemd | NORM EN VOORSPELLING: HET GETAL IS VAN EEN MENS. WAAROM DIT BESTAAT LAT-regel 3 zegt dat een meter zonder invoer niets hoort te beweren, en een voorspellingslaag is precies de plek waar die regel sneuvelt. |
+| `festival.test.js` | 20 | genoemd | RTG FESTIVAL: HET TERREIN, DE PAS EN DE VOORUITBLIK. WAAROM DIT BESTAAT Een festival was in dit huis een `activiteit` van een zaak, en dat model kon vier dingen niet (FESTIVAL.md par. |
 | `fiscaal-aansluiting.test.js` | 5 | -- | DE AFSLUITING VAN EEN PERIODE: hoeveel van dit geld is bewezen. De controles bestonden al maar stonden elk in hun eigen module. |
 | `fiscaal-bronnen.test.js` | 6 | -- | HET BRONNENREGISTER: waar komen de regels vandaan, en wat mag een bron zelf. Zes beweringen, en de tweede is waar het om draait. |
 | `fiscaal-gateway.test.js` | 10 | -- | DE AANGIFTEGATEWAY: klaargezet, niet aangezet. Zeven beweringen, en de eerste is de enige die er echt toe doet. |

@@ -22,7 +22,7 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem;}
@@ -37,11 +37,11 @@
   .rw-bron{padding:.3rem 0;font-size:.82rem;}
   .rw-bron .stil{display:block;}
   .rw-bronlet{font-size:.74rem;}
-  .rw-signalen{margin-top:.6rem;padding:.5rem .7rem;border:1px solid var(--gold);border-radius:8px;font-size:.82rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;}
-  .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
+  .rw-signalen{margin-top:.6rem;padding:.5rem .7rem;border:1px solid var(--gold);border-radius:0;font-size:.82rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;}
+  .veld{width:100%;border:1px solid var(--line);border-radius:0;padding:.8rem 1rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
   .veld:focus{border-color:var(--burgundy);}
-  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:999px;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:0;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
   .knop:hover{background:var(--burgundy);color:#fff;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
@@ -53,7 +53,7 @@
   /* de gezondheidsband: alles-gecontroleerd op één oogopslag, boven de kamers.
      Rustig -- een haarlijn met stille pillen; klikken opent de Techniek-kamer. */
   .gezondband{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:1.2rem;
-    padding:.7rem 1rem;border:1px solid var(--line);border-radius:12px;
+    padding:.7rem 1rem;border:1px solid var(--line);border-radius:0;
     background:linear-gradient(155deg,#1B1815 0%,var(--card) 60%);cursor:pointer;
     transition:border-color .13s, transform .13s;}
   .gezondband:hover{border-color:color-mix(in srgb, var(--gold) 45%, transparent);transform:translateY(-1px);}
@@ -65,7 +65,7 @@
   .gezondband .gb-meer{margin-left:auto;font-size:.72rem;color:var(--rtg-leesgoud,var(--gold));font-weight:650;white-space:nowrap;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1.4rem;}
   .kamer{
-    padding:1.1rem 1.2rem;cursor:pointer;border-radius:14px;
+    padding:1.1rem 1.2rem;cursor:pointer;border-radius:0;
     background:linear-gradient(155deg,#1B1815 0%,var(--card) 60%);
     box-shadow:0 10px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
     transition:border-color .13s cubic-bezier(.22,.7,.3,1), transform .13s cubic-bezier(.22,.7,.3,1), box-shadow .13s;
@@ -77,7 +77,7 @@
   }
   .kamer:active{transform:scale(.985);}
   .kamer .ic{
-    width:46px;height:46px;border-radius:12px;font-size:1.35rem;
+    width:46px;height:46px;border-radius:0;font-size:1.35rem;
     display:flex;align-items:center;justify-content:center;
     background:linear-gradient(155deg,#23201C,#161311);
     border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);
@@ -115,7 +115,7 @@
   #vKamer:has(#tabWereld:not([hidden])) [data-tab="wereld"]{color:var(--txt);border-bottom-color:var(--gold);}
   .betaal-kop{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
   .betaal-providers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:.8rem;}
-  .betaal-provider{border:1px solid var(--line);border-radius:12px;padding:.8rem;background:rgba(255,255,255,.025);}
+  .betaal-provider{border:1px solid var(--line);border-radius:0;padding:.8rem;background:rgba(255,255,255,.025);}
   .betaal-provider h5{margin:0 0 .25rem;font-size:.94rem;display:flex;justify-content:space-between;gap:.5rem;}
   .betaal-stip{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#B0483B;margin-right:.35rem;}
   .betaal-stip.ok{background:#4C7A4C;}.betaal-stip.wacht{background:#C9A24B;}
@@ -141,19 +141,19 @@
   .fx:last-child{border-bottom:0;}
   .fx .nm{flex:1;min-width:12rem;font-size:.88rem;}
   .fx .nm small{display:block;color:var(--soft);font-size:.72rem;}
-  .wip{position:relative;width:2.6rem;height:1.4rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);cursor:pointer;flex-shrink:0;transition:background .15s;}
+  .wip{position:relative;width:2.6rem;height:1.4rem;border-radius:0;background:var(--card2);border:1px solid var(--line);cursor:pointer;flex-shrink:0;transition:background .15s;}
   .wip::after{content:'';position:absolute;top:2px;left:2px;width:1rem;height:1rem;border-radius:50%;background:var(--soft);transition:left .15s, background .15s;}
   .wip[aria-checked="true"]{background:rgba(76,154,117,.35);border-color:var(--rtg-leesgroen,var(--green));}
   .wip[aria-checked="true"]::after{left:calc(100% - 1rem - 2px);background:var(--green);}
   .dgchips{display:flex;gap:.35rem;flex-wrap:wrap;}
-  .dg{font-size:.68rem;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;background:var(--card2);color:var(--muted);cursor:pointer;}
+  .dg{font-size:.68rem;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;background:var(--card2);color:var(--muted);cursor:pointer;}
   .dg.uit{border-color:var(--burgundy);color:var(--burgundy);}
   .voorstel{display:flex;gap:.7rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.88rem;}
   .voorstel:last-child{border-bottom:0;}
   .voorstel .kamerlabel{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));white-space:nowrap;padding-top:.15rem;}
-  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:0;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;}
   /* de wereld: bolletjes */
-  .wkaart{width:100%;border-radius:12px;background:#0a0f14;border:1px solid var(--line);display:block;}
+  .wkaart{width:100%;border-radius:0;background:#0a0f14;border:1px solid var(--line);display:block;}
   .bol{display:inline-block;width:.72rem;height:.72rem;border-radius:50%;flex-shrink:0;}
   .bol.groen{background:var(--green);box-shadow:0 0 7px var(--green);}
   .bol.oranje{background:var(--amber);box-shadow:0 0 7px var(--amber);}
@@ -167,9 +167,9 @@
 .kantoor-nav{display:flex;align-items:center;gap:.9rem;}.kantoor-nav a{font-size:.8rem;color:var(--muted);}.kantoor-nav a.eerst{color:var(--rtg-leesgoud,var(--gold));}
 .ik-kop{margin-top:1rem;}.ik-overzicht{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;}.ik-groei{flex:1;min-width:15rem;}.ik-inline{display:inline;}.ik-noodstop{border-color:var(--burgundy);}.ik-proefuit{margin-top:.55rem;}
 .ik-tegel{padding:1rem;}.ik-tegel.aan{border-color:#1e7d4f;}.ik-tegelkop{display:flex;gap:.5rem;justify-content:space-between;align-items:center;}.ik-tegelkop h3{margin:0;}.ik-status.aan{color:#1e7d4f;}.ik-status.uit{color:var(--rtg-leesgoud,var(--gold));}.ik-status.niet-ingericht{color:var(--burgundy);}
-.ik-doel{min-height:2.5rem;color:var(--soft);font-size:.82rem;line-height:1.5;}.ik-omgeving{font-size:.72rem;color:var(--soft);padding:.45rem .55rem;border:1px solid var(--line);border-radius:8px;}.ik-laatste{margin-top:.55rem;font-size:.74rem;}.ik-storing{margin-top:.45rem;color:var(--burgundy);font-size:.74rem;}.ik-label{display:block;margin-top:.55rem;font-size:.7rem;color:var(--soft);}
+.ik-doel{min-height:2.5rem;color:var(--soft);font-size:.82rem;line-height:1.5;}.ik-omgeving{font-size:.72rem;color:var(--soft);padding:.45rem .55rem;border:1px solid var(--line);border-radius:0;}.ik-laatste{margin-top:.55rem;font-size:.74rem;}.ik-storing{margin-top:.45rem;color:var(--burgundy);font-size:.74rem;}.ik-label{display:block;margin-top:.55rem;font-size:.7rem;color:var(--soft);}
 .ik-invoer{display:flex;gap:.35rem;}.ik-invoer input{flex:1;min-width:7rem;}.ik-acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.65rem;}.ik-ketenlijst{display:grid;gap:.5rem;}.ik-rij{display:flex;align-items:center;gap:.65rem;padding:.55rem 0;border-bottom:1px solid var(--line);}.ik-rijtekst{flex:1;}.ik-besluitrij{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--line);}.ik-logrij{padding:.45rem 0;border-bottom:1px solid var(--line);}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}
   /* De bankkamer: reconciliatie, vergunning en de bevoegdheidsmatrix.
      Deze regels staan hier en niet in losse stijlattributen. Twee redenen, en de
      tweede is de echte: die attributen houden style-src-attr in de CSP open
@@ -291,7 +291,7 @@
     <div class="kaart" id="kKantine" hidden>
       <h4 style="margin:0 0 .4rem;">De kaart van vandaag</h4>
       <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Een gerecht per regel; opslaan vervangt de kaart van vandaag en iedereen ziet hem meteen.</p>
-      <textarea id="kKantineMenu" rows="4" maxlength="1000" placeholder="Bijv. dagsoep, nasi van gisteren maar beter, vega wrap" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="kKantineMenu" rows="4" maxlength="1000" placeholder="Bijv. dagsoep, nasi van gisteren maar beter, vega wrap" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div class="taakrij h-mt50">
         <input class="veld" id="kKantineNaam" style="max-width:10rem;" placeholder="Wie zet de kaart?" maxlength="30">
         <button class="knop stil" id="kKantineZet" type="button">Zet de kaart</button>
@@ -310,7 +310,7 @@
         kan lid worden en de reis overnemen. Er wordt hierbij <b>niets over de klant bewaard</b> -- geen naam,
         geen e-mailadres, geen telefoonnummer, en geen bestanden. U stuurt de link zelf.</p>
       <textarea id="kKlaarTekst" rows="3" maxlength="20000" placeholder="Plak hier een bevestiging, voucher of boardingpass-strook"
-        style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+        style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div class="taakrij" style="margin-top:.5rem;">
         <button class="knop stil" id="kKlaarLees" type="button">Lees voor</button>
         <span class="stil" id="kKlaarGelezen" style="font-size:.78rem;color:var(--soft);"></span>
@@ -594,9 +594,9 @@
     <div class="kaart" id="bRahul">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">De vaste kern van Rahuls karakter en levensverhaal ligt vast in de code en wordt door tests bewaakt. Hier vult de boardroom hem aan of stuurt hem bij; de aanvulling komt live mee in elke assistent (leden, zaken, personeel, boardroom). Leeg laten = alleen de vaste kern.</p>
       <label for="rKarakter" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het karakter (max 2000 tekens)</label>
-      <textarea id="rKarakter" rows="3" maxlength="2000" placeholder="Bijv. extra eigenschappen, voorkeuren of omgangsregels" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="rKarakter" rows="3" maxlength="2000" placeholder="Bijv. extra eigenschappen, voorkeuren of omgangsregels" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <label for="rVerhaal" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het verhaal (max 2000 tekens)</label>
-      <textarea id="rVerhaal" rows="4" maxlength="2000" placeholder="Bijv. nieuwe hoofdstukken of details van het levensverhaal" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="rVerhaal" rows="4" maxlength="2000" placeholder="Bijv. nieuwe hoofdstukken of details van het levensverhaal" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div style="display:flex;gap:.6rem;align-items:center;margin-top:.7rem;flex-wrap:wrap;">
         <button class="knop stil" id="rBewaar" type="button">Bewaar de aanvulling</button>
         <span class="stil" id="rStand" style="font-size:.78rem;color:var(--soft);"></span>
@@ -698,7 +698,7 @@
           <select class="veld" id="atelier3dKies" style="max-width:16rem;font-size:.78rem;padding:.3rem .5rem;" aria-label="Kies een ontwerp voor het podium"></select>
         </div>
       </div>
-      <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
+      <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:0;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
       <p style="font-size:.72rem;color:var(--muted);margin:.4rem 0 0;" id="atelier3dUitleg"></p>
     </div>
     <h3 class="sec">Nieuw ontwerp briefen</h3>
@@ -708,7 +708,7 @@
         <input class="veld" id="aNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Bordeaux Top-Handle No.2" maxlength="100">
         <input class="veld" id="aHuis" style="max-width:11rem;" placeholder="Huis / maison (optioneel)" maxlength="80">
       </div>
-      <textarea id="aBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gelegenheid, materiaal of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="aBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gelegenheid, materiaal of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="aMaak">Ontwerp aanmaken</button>
     </div>
     <h3 class="sec">Het atelier <span id="aFilters" style="margin-left:.4rem;"></span></h3>
@@ -738,7 +738,7 @@
         <input class="veld" id="wpDoel" style="flex:1;min-width:11rem;" placeholder="Welk onderdeel? bijv. RTG Pay" maxlength="120" hidden>
       </div>
       <input class="veld" id="wpNaam" style="width:100%;margin-top:.5rem;" placeholder="Naam van de opdracht" maxlength="120">
-      <textarea id="wpBrief" rows="2" maxlength="900" placeholder="De brief: wat moet het worden of beter kunnen?" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="wpBrief" rows="2" maxlength="900" placeholder="De brief: wat moet het worden of beter kunnen?" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="wpMaak">Opdracht aanmaken + laten uitwerken</button>
     </div>
     <h3 class="sec">De werkbank <span id="wpFilters" style="margin-left:.4rem;"></span></h3>
@@ -761,7 +761,7 @@
         <input class="veld" id="sNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Meridiaan GT" maxlength="100">
         <input class="veld" id="sHuis" style="max-width:11rem;" placeholder="Huis / programma (optioneel)" maxlength="80">
       </div>
-      <textarea id="sBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gebruik, aandrijving of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="sBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gebruik, aandrijving of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="sMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Programma's <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een lookbook</span></h3>
@@ -793,7 +793,7 @@
         <input class="veld" id="hNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. RTG PDA One" maxlength="100">
         <input class="veld" id="hHuis" style="max-width:11rem;" placeholder="Huis / serie (optioneel)" maxlength="80">
       </div>
-      <textarea id="hBrief" rows="2" maxlength="600" placeholder="De brief: gebruik, formaat, aansluitingen of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="hBrief" rows="2" maxlength="600" placeholder="De brief: gebruik, formaat, aansluitingen of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="hMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Series <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een productblad</span></h3>
@@ -825,7 +825,7 @@
         <input class="veld" id="gNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Villa Meridiaan" maxlength="100">
         <input class="veld" id="gHuis" style="max-width:11rem;" placeholder="Huis / project (optioneel)" maxlength="80">
       </div>
-      <textarea id="gBrief" rows="2" maxlength="600" placeholder="De brief: ligging, sfeer, gebruik of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="gBrief" rows="2" maxlength="600" placeholder="De brief: ligging, sfeer, gebruik of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="gMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Projecten <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een portfolio</span></h3>
@@ -851,7 +851,7 @@
     <h3 class="sec">Nieuw idee</h3>
     <div class="kaart">
       <input class="veld" id="iTitel" style="width:100%;" placeholder="Titel, bijv. Reislijn Meridiaan" maxlength="100">
-      <textarea id="iBrief" rows="2" maxlength="800" placeholder="Waar gaat het over? De gedachte, de sfeer, het gebruik." style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="iBrief" rows="2" maxlength="800" placeholder="Waar gaat het over? De gedachte, de sfeer, het gebruik." style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div id="iBureaus" class="rij" style="margin-top:.5rem;gap:.5rem;"></div>
       <button class="knop h-mt50" id="iMaak">Idee toevoegen</button>
     </div>
@@ -1578,9 +1578,9 @@ async function openAtelier(){
   if (!sel.options.length) sel.innerHTML = d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   renderAtelier();
 }
-function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+g+';border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;">'+esc(s)+'</span>'; }
+function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+g+';border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;">'+esc(s)+'</span>'; }
 function swatches(kleuren){ return '<div style="display:flex;gap:.3rem;margin:.4rem 0;">'+(kleuren||[]).map(k =>
-  '<span title="'+esc(k.naam)+'" style="width:1.5rem;height:1.5rem;border-radius:6px;border:1px solid var(--line);background:'+esc(k.hex)+';"></span>').join('')+
+  '<span title="'+esc(k.naam)+'" style="width:1.5rem;height:1.5rem;border-radius:0;border:1px solid var(--line);background:'+esc(k.hex)+';"></span>').join('')+
   '<span style="align-self:center;font-size:.7rem;color:var(--muted);margin-left:.3rem;">'+(kleuren||[]).map(k => esc(k.naam)).join(' · ')+'</span></div>'; }
 function renderAtelier(){
   const d = ATELIER; if (!d) return;
@@ -1625,7 +1625,7 @@ function renderAtelier(){
   bindAtelier();
 }
 function techpackHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Tech pack</div>'+
     (p.onderdelen||[]).map(o => '<div style="font-size:.8rem;"><b>'+esc(o.naam)+'</b> · '+esc(o.materiaal)+' <span style="color:var(--muted);">('+esc(o.spec)+')</span></div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.constructie)+' · '+esc(p.maten)+'</div>'+
@@ -1805,7 +1805,7 @@ function renderStudio(){
   bindStudio();
 }
 function specsheetHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Specsheet</div>'+
     (p.modules||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.prestaties)+' · '+esc(p.afmetingen)+'</div>'+
@@ -1895,16 +1895,16 @@ async function exportLookbook(naam){
     'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
     '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
     '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
-    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:0;border:1px solid var(--line);display:block;}'+
     '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
     '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
     '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
-    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-top:1.1rem;}'+
     '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
     '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
     '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
     '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
-    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
     '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
     '</style></head><body>'+
     '<div class="balk"><span>Lookbook &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
@@ -1988,7 +1988,7 @@ function renderHardware(){
   bindHardware();
 }
 function stuklijstHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Stuklijst</div>'+
     (p.onderdelen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.verbruik)+' · '+esc(p.afmetingen)+'</div>'+
@@ -2087,16 +2087,16 @@ async function exportProductblad(naam){
     'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
     '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
     '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
-    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:0;border:1px solid var(--line);display:block;}'+
     '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
     '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
     '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
-    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-top:1.1rem;}'+
     '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
     '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
     '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
     '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
-    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
     '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
     '</style></head><body>'+
     '<div class="balk"><span>Productblad &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
@@ -2170,7 +2170,7 @@ function renderArchitect(){
   bindArchitect();
 }
 function bouwstaatHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Bouwstaat</div>'+
     (p.delen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.oppervlak)+' · '+esc(p.kavel)+'</div>'+
@@ -2260,16 +2260,16 @@ async function exportPortfolio(naam){
     'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
     '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
     '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
-    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:0;border:1px solid var(--line);display:block;}'+
     '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
     '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
     '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
-    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-top:1.1rem;}'+
     '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
     '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
     '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
     '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
-    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
     '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
     /* Let op: hier hoort GEEN desktopframe-koppeling te staan. Dit is een
        string die een LOSSE, af te drukken pagina opbouwt (portfolio-export),
@@ -2323,7 +2323,7 @@ function renderIdeeen(){
         '<span style="font-size:.72rem;color:var(--muted);">'+o.bureaus.map(b => b.icon+' '+esc(b.label.replace('RTG ',''))).join(' · ')+(o.door?' · '+esc(o.door):'')+'</span></div>'+
         statusPil(o.status)+'</div>'+
       (o.brief?'<p style="font-size:.82rem;color:var(--muted);line-height:1.6;margin:.4rem 0 0;">'+esc(o.brief)+'</p>':'')+
-      (o.uitwerking ? '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+      (o.uitwerking ? '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
         '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Brief per bureau</div>'+
         Object.keys(o.uitwerking).map(k => { const b = bureauOpts.find(x => x.id === k) || { icon:'•', label:k }; return '<div style="font-size:.8rem;line-height:1.55;margin-bottom:.2rem;"><b>'+ico(b.icon)+' '+esc(b.label.replace('RTG ',''))+':</b> '+esc(o.uitwerking[k])+'</div>'; }).join('')+'</div>' : '')+
       (o.spinoffs && o.spinoffs.length ? '<div style="font-size:.76rem;color:var(--rtg-leesgoud,var(--gold));margin-top:.45rem;">Als concept: '+o.spinoffs.map(s => esc(s.bureauLabel.replace('RTG ',''))).join(', ')+'</div>' : '')+
@@ -2392,7 +2392,7 @@ function chatWidget(el, kamerId){
       box.innerHTML = d.berichten.length ? d.berichten.map(m =>
         '<div style="padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.88rem;"><b style="color:var(--rtg-leesgoud,var(--gold));">'+esc(m.naam)+'</b> '+
         '<span style="color:var(--soft);font-size:.7rem;">'+new Date(m.at).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span><br>'+
-        (m.foto ? '<img src="'+m.foto+'" alt="Snap van '+esc(m.naam)+'" style="max-width:12rem;border-radius:10px;margin:.2rem 0;">' : '')+esc(m.tekst||'')+'</div>').join('')
+        (m.foto ? '<img src="'+m.foto+'" alt="Snap van '+esc(m.naam)+'" style="max-width:12rem;border-radius:0;margin:.2rem 0;">' : '')+esc(m.tekst||'')+'</div>').join('')
         : '<div class="leeg">Nog stil hier; zeg eens hallo.</div>';
       box.scrollTop = box.scrollHeight;
     } catch (e) {}
@@ -2613,11 +2613,11 @@ async function bankSchakel(pad, body){
 function bankRenderKnop(r){
   const seg = r.modi.map(m => '<button class="knop' + (m === r.modus ? '' : ' stil') + '" data-modus="' + m + '" style="padding:.45rem 1rem;">' + esc(BK_MODUS[m]) + '</button>').join(' ');
   const nood = r.nood && r.nood.actief
-    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:8px;color:var(--burgundy-on-dark,#C23A5E);"><strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
+    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:0;color:var(--burgundy-on-dark,#C23A5E);"><strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
     : '';
   const a = r.autorisatie;
   const aut = a
-    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
+    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
     : '';
   $('#bankKnop').innerHTML =
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.6rem;">' +
@@ -3382,7 +3382,7 @@ function stadRenderScenario(){
     '</div>' +
     '<div style="display:flex;gap:.5rem;flex-wrap:wrap;">' + seg + '</div>' +
     (actief ? '<p style="margin:.6rem 0 0;color:var(--soft);font-size:.85rem;">' + esc(actief.uitleg) + '</p>' : '') +
-    (b.alerts.length ? '<div style="margin-top:.6rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;font-size:.85rem;">' + b.alerts.map(a => '⚠ ' + esc(a.tekst)).join('<br>') + '</div>' : '');
+    (b.alerts.length ? '<div style="margin-top:.6rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;font-size:.85rem;">' + b.alerts.map(a => '⚠ ' + esc(a.tekst)).join('<br>') + '</div>' : '');
   $('#stadWie').addEventListener('input', e => { stadWie = e.target.value; });
   $('#stadScenario').querySelectorAll('[data-scenario]').forEach(k => k.addEventListener('click', async () => {
     try { const r = await api('stad/scenario', { scenario: k.dataset.scenario, naam: stadWie });
@@ -3423,7 +3423,7 @@ function stadRenderNodeAan(){
     try {
       const r = await api('stad/node/aanmeld', { doosNaam: $('#stadDoosNaam').value, zone: $('#stadZoneSel').value,
         sensoren: $('#stadSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: stadWie });
-      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
       $('#stadDoosNaam').value = ''; $('#stadSens').value = '';
       stadVervers();
     } catch (e) { meld(e.message); }
@@ -3952,7 +3952,7 @@ async function laadLedenregister(){
   const eur = c => '€ ' + (Math.round(Number(c)*100)/100).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   const kop = t => '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .35rem;">'+t+'</div>';
   const tegels = arr => '<div style="display:flex;flex-wrap:wrap;gap:.5rem;">'+arr.map(x =>
-    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:10px;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--rtg-leesgoud,var(--gold));">'+x.aantal+'</span></span>').join('')+'</div>';
+    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--rtg-leesgoud,var(--gold));">'+x.aantal+'</span></span>').join('')+'</div>';
   // de omzet + 30%-split
   const omzetRijen = (d.omzet||[]).map(o =>
     '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw')+'</span></span>'+
@@ -3964,7 +3964,7 @@ async function laadLedenregister(){
     kop('Per land (top)') + tegels((d.perLand||[]).slice(0,12)) +
     kop('Per stad (top)') + tegels((d.perStad||[]).slice(0,12)) +
     kop('Omzet per pas') + omzetRijen +
-    '<div style="margin-top:.6rem;background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;line-height:1.7;font-size:.86rem;">'+
+    '<div style="margin-top:.6rem;background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.7rem .9rem;line-height:1.7;font-size:.86rem;">'+
       'Maandomzet (bekende prijzen): <b>'+eur(s.totaalOmzet)+'</b><br>'+
       '30% naar de RTFoundation: <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(s.foundation30)+'</b><br>'+
       '&nbsp;&nbsp;20% lokaal: <b>'+eur(s.lokaal20)+'</b> · 10% RTFoundation: <b>'+eur(s.rtf10)+'</b>'+

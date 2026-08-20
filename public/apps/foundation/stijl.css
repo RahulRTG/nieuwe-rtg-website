@@ -22,19 +22,19 @@ html,body{height:100%;}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
 button{font-family:inherit;cursor:pointer;border:none;}
 input,textarea,select{font-family:inherit;}
-.knop{background:var(--goud);color:#1a1710;border-radius:12px;padding:0.7rem 1.1rem;font-size:0.95rem;font-weight:700;transition:filter .15s;}
+.knop{background:var(--goud);color:#1a1710;border-radius:0;padding:0.7rem 1.1rem;font-size:0.95rem;font-weight:700;transition:filter .15s;}
 .knop:hover{filter:brightness(1.07);}
 .knop.groen{background:var(--groen);color:#fff;}
 .knop.grijs{background:#26221d;color:var(--txt);}
 .knop.rood{background:var(--rood);color:#fff;}
-.knop.klein{padding:0.45rem 0.7rem;font-size:0.82rem;border-radius:10px;}
-.veld{width:100%;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;
+.knop.klein{padding:0.45rem 0.7rem;font-size:0.82rem;border-radius:0;}
+.veld{width:100%;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;
   padding:0.8rem 1rem;font-size:1rem;color:var(--txt);outline:none;}
 .veld:focus{border-color:var(--goud);}
-.kaart{background:var(--paneel);border:1px solid var(--lijn);border-radius:var(--radius);}
+.kaart{background:var(--paneel);border:1px solid var(--lijn);border-radius:0;}
 .zacht{color:var(--zacht);}
 .serif{font-family:var(--serif);}
-.badge{display:inline-block;background:#241f16;color:var(--rtg-leesgoud,var(--goud));border-radius:999px;padding:0.15rem 0.6rem;font-size:0.72rem;font-weight:600;}
+.badge{display:inline-block;background:#241f16;color:var(--rtg-leesgoud,var(--goud));border-radius:0;padding:0.15rem 0.6rem;font-size:0.72rem;font-weight:600;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#3a352d;}
 .dot.aan{background:var(--groen);box-shadow:0 0 8px rgba(95,165,106,.7);}
 .kick{font-size:0.7rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));font-weight:700;}
@@ -47,7 +47,7 @@ input,textarea,select{font-family:inherit;}
 @media(max-width:560px){.campus-ingang{grid-template-columns:1fr}.campus-ingang b{grid-column:1;grid-row:auto;margin-top:.35rem}}
 /* gedeelde AI-chat (coach-pagina's) */
 .chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}
-.chat .b{padding:.6rem .8rem;border-radius:12px;max-width:88%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
+.chat .b{padding:.6rem .8rem;border-radius:0;max-width:88%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
 .chat .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
 .chat .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
 .rijveld{display:flex;gap:.5rem;}

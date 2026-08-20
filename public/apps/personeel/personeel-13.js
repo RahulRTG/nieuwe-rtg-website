@@ -6,7 +6,7 @@
       '<div style="margin-top:0.35rem;font-size:0.74rem;color:var(--soft);">'+T('pd.fl.d','Uw eigen assistent. Hij onthoudt wat u hem vertelt ("onthoud dat...") en leert van wat u gebruikt; vraag "wat weet je over mij" en wis wanneer u wilt.')+'</div>'+
       '<div id="pkFlSein"></div>'+
       '<div id="pkFlUit" style="margin-top:0.45rem;font-size:0.8rem;line-height:1.5;">'+(pkFlLaatst||'')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
       '<button class="abtn ghost" id="pkFlMic" aria-label="'+T('pd.fl.mic','Spreek uw vraag in')+'"></button>'+
       '<button class="abtn" id="pkFlStuur">'+T('pd.fl.stuur','Stuur')+'</button></div></div>'+
       trainingKaart()+
@@ -56,7 +56,7 @@
     $('#hulpWrap').insertAdjacentHTML('beforeend',
       '<div class="card"><div class="k">'+T('pd.taal.h','Mijn taal')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.74rem;color:var(--soft);">'+T('pd.taal.s','Kies uw moedertaal. Uw hele scherm, uw bonnen en uw taken verschijnen dan in die taal, hier en op elke andere werk-app waar u inlogt.')+'</div>'+
-      '<select id="mtKies" style="width:100%;margin-top:0.5rem;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);font:inherit;font-size:0.85rem;"></select></div>');
+      '<select id="mtKies" style="width:100%;margin-top:0.5rem;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;color:var(--txt);font:inherit;font-size:0.85rem;"></select></div>');
     if (window.MoederTaal) MoederTaal.talen().then(ts => {
       const sel = document.getElementById('mtKies'); if (!sel || !ts.length) return;
       const nu = MoederTaal.actueel();
@@ -72,7 +72,7 @@
     API.call('/staff/fluister/profiel').then(prof => {
       const el = document.getElementById('pkFlSein');
       if (!el || !(prof.seintjes || []).length) return;
-      el.innerHTML = '<div style="margin-top:0.45rem;border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.65rem;">'+
+      el.innerHTML = '<div style="margin-top:0.45rem;border:1px solid var(--line);border-radius:0;padding:0.5rem 0.65rem;">'+
         '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('pd.fl.sein','Mijn assistent ziet')+'</div>'+
         prof.seintjes.map(x => '<div style="margin-top:0.28rem;font-size:0.76rem;line-height:1.45;">'+esc(x.icoon)+' '+esc(x.tekst)+'</div>').join('')+'</div>';
     }).catch(() => {});

@@ -23,14 +23,14 @@
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:960px;margin:0 auto;}
   .etage{margin-top:1.8rem;}
   .etage-kop{display:flex;align-items:baseline;gap:.6rem;border-bottom:1px solid var(--line);padding-bottom:.5rem;margin-bottom:1rem;}
   .etage-kop h2{font-size:1.15rem;}
   .etage-kop .n{font-size:.72rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;}
   .boutieks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.9rem;}
-  .boutiek{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
+  .boutiek{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;cursor:pointer;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.35rem;text-align:left;}
   .boutiek:hover{border-color:var(--gold);transform:translateY(-2px);}
   .boutiek h3{font-size:1.05rem;}
   a.boutiek{text-decoration:none;color:inherit;}
@@ -45,7 +45,7 @@
   /* gids: alle leveranciers per genre, met een diepe link naar boeken/reserveren */
   .gids{margin-top:2.4rem;}
   .genres{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;}
-  .genre{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .95rem;display:flex;gap:.7rem;align-items:flex-start;text-decoration:none;color:var(--txt);transition:border-color .2s,transform .2s;}
+  .genre{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .95rem;display:flex;gap:.7rem;align-items:flex-start;text-decoration:none;color:var(--txt);transition:border-color .2s,transform .2s;}
   .genre:hover{border-color:var(--gold);transform:translateY(-2px);}
   .genre .gi{font-size:1.3rem;line-height:1;color:var(--rtg-leesgoud,var(--gold));}
   .genre .gi .rtg-glyf{width:1.35rem;height:1.35rem;display:block;}
@@ -58,7 +58,7 @@
   .blad.open{display:block;}
   .blad-kop{position:sticky;top:0;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   .art{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.9rem;padding:1.1rem;max-width:960px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;}
   .kaart .cat{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .kaart h3{font-size:1rem;}
   .kaart .mat{font-size:.78rem;color:var(--soft);}
@@ -66,23 +66,23 @@
   .kaart .prijs{font-size:.95rem;margin-top:.2rem;}
   .kaart .opties{font-size:.74rem;color:var(--soft);}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.4rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .knop.aan{background:var(--gold);color:#000;border-color:var(--gold);}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   /* ---- de vindlaag: zoeken en de plek waar je staat ---- */
   .vind{margin:.4rem 0 0;}
   .vind .zoekrij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
-  .vind input.zoek{flex:1;min-width:12rem;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  .vind input.zoek{flex:1;min-width:12rem;background:var(--card);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;font-size:1rem;padding:.75rem .9rem;}
   .vind input.zoek:focus{outline:none;border-color:var(--gold);}
   .plekrij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.6rem;font-size:.8rem;color:var(--soft);}
-  .plekrij select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.4rem .6rem;}
+  .plekrij select{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.4rem .6rem;}
   .verdiepingen{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.55rem;margin-top:1rem;}
-  .vd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;text-align:left;
+  .vd{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;text-align:left;
     color:var(--txt);font:inherit;cursor:pointer;transition:border-color .2s,transform .2s;}
   .vd:hover{border-color:var(--gold);transform:translateY(-2px);}
   .vd.aan{border-color:var(--gold);}
@@ -90,10 +90,10 @@
   .vd span{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
   /* een gevonden aanbod: één kaartvorm voor product, reis, dienst, huur en marktplaats */
   .treffers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.8rem;}
-  .tref{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;}
+  .tref{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;}
   .tref .band{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;}
   .tref .soort{color:var(--rtg-leesgoud,var(--gold));}
-  .tref .wie{border:1px solid var(--line);border-radius:999px;padding:.1rem .45rem;color:var(--soft);}
+  .tref .wie{border:1px solid var(--line);border-radius:0;padding:.1rem .45rem;color:var(--soft);}
   /* De partnermerker: de RAND blijft bordeaux, want dat is waar het accent voor
      is. De TEKST erin was ook bordeaux (#C23A5E) en haalde op deze grond 3,58:1
      bij 9,9px. Wit maakt het label leesbaar en de rand doet het merkwerk. */
@@ -105,7 +105,7 @@
   .tref .vrij{font-size:.74rem;color:var(--rtg-leesgroen,var(--green,#4C9A75));}
   .tref .dicht{font-size:.74rem;color:var(--soft);}
   .tref .ga{margin-top:.5rem;align-self:flex-start;text-decoration:none;}
-  .stukmelding{border:1px solid var(--burgundy);border-radius:12px;padding:.7rem .9rem;margin-top:.9rem;font-size:.82rem;color:var(--muted);}
+  .stukmelding{border:1px solid var(--burgundy);border-radius:0;padding:.7rem .9rem;margin-top:.9rem;font-size:.82rem;color:var(--muted);}
   /* Vervangen style="..."-attributen: de CSP kan style-src-attr pas dicht als
      public/ er geen meer heeft, en NORM.json telt ze. Zelfde maten als de
      attributen hadden. */
@@ -1044,16 +1044,16 @@ $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('o
   <form class="rahulrij" id="rahulForm"><input id="rahulIn" placeholder="Bijv. boek Ibiza voor 2 personen" autocomplete="off" maxlength="300" aria-label="Vraag of opdracht"><button class="rahulgo" type="submit" aria-label="Versturen">→</button></form>
 </section>
 <style>
-.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:999px;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
-.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card,#151312);border:1px solid var(--gold);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.rahulfab{position:fixed;right:1rem;bottom:1rem;z-index:35;background:var(--gold);color:#000;border:none;border-radius:0;padding:.7rem 1.1rem;font-family:'Inter',system-ui,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+.rahulsheet{position:fixed;right:1rem;bottom:1rem;z-index:36;width:min(360px,92vw);background:var(--card,#151312);border:1px solid var(--gold);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);}
 .rahulsheet[hidden]{display:none;}
 .rahulkop{display:flex;align-items:center;justify-content:space-between;}
 .rahulkop b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1rem;}
 .rahulkop .terug{padding:.2rem .55rem;}
 .rahuluit{font-size:.86rem;color:var(--muted,#bbb);line-height:1.55;max-height:40vh;overflow-y:auto;white-space:pre-wrap;}
 .rahulrij{display:flex;gap:.4rem;}
-.rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:10px;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
-.rahulgo{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
+.rahulrij input{flex:1;background:var(--bg,#0C0C0B);border:1px solid var(--line,#333);border-radius:0;color:var(--txt,#eee);font:inherit;font-size:.86rem;padding:.5rem .7rem;}
+.rahulgo{background:var(--gold);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font-weight:700;cursor:pointer;}
 </style>
 <script>(function(){
   var tok=null; try{tok=localStorage.getItem('rtg_member_token');}catch(e){}

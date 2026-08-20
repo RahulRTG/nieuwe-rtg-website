@@ -35,7 +35,7 @@
           '<div class="tkc-who">'+T('mk.salon.s','Vast onderdeel van uw RTG-partnerschap: leden volgen uw zaak en krijgen een melding bij elk bericht.')+'</div>'+
           '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;">'+
           [[T('mk.volgers','Volgers'), mk.volgers], [T('mk.posts','Berichten'), mk.posts], ['Likes', mk.likes], [T('mk.reacties','Reacties'), mk.reacties]]
-          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;text-align:center;">'+
+          .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;text-align:center;">'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.25rem;color:var(--rtg-leesgoud,var(--gold));">'+x[1]+'</div>'+
             '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.1rem;">'+x[0]+'</div></div>').join('')+'</div>'+
           '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. aan zee sinds 1998, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+

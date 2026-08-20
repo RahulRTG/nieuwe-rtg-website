@@ -25,7 +25,7 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:640px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop:focus-visible,.boek:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
@@ -33,20 +33,20 @@
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
   #plank,#eigen{display:grid;gap:.55rem;}
-  .boek{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;
+  .boek{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.8rem .9rem;
     color:var(--txt);font:inherit;text-align:left;cursor:pointer;display:grid;gap:.25rem;}
   .boek:hover{border-color:var(--gold);}
   .boek b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;}
-  .vgang{display:block;height:.3rem;border-radius:999px;background:var(--card2);overflow:hidden;margin-top:.2rem;}
+  .vgang{display:block;height:.3rem;border-radius:0;background:var(--card2);overflow:hidden;margin-top:.2rem;}
   .vgang span{display:block;height:100%;background:var(--gold);}
   /* de lezer: rustig papiergevoel binnen de donkere huisstijl */
   #leesBlok .leeskop{display:flex;gap:.5rem;align-items:baseline;flex-wrap:wrap;margin-bottom:.6rem;}
   #leesTitel{font-size:1.25rem;}
   #tekst{font-family:'Bodoni Moda',serif;font-size:1rem;line-height:1.85;white-space:pre-wrap;
-    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;
+    background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.2rem;
     height:calc(100vh - 16rem);overflow-y:auto;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}

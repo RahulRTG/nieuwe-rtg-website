@@ -3713,6 +3713,7 @@ console.log('\n53) elk scherm is vanaf de bank te bereiken');
     ['/apps/vitaal.html', 'omleiding: Vitaal is een stand van RTG Veilig geworden'],
     ['/apps/metier.html', 'omleiding: Metier is een stand van RTG Geld geworden'],
     ['/apps/gast.html', 'landingspagina: je komt hier door een QR-code op een tafel of kamer te scannen, niet via een link'],
+    ["/apps/festival-gast.html", "landingspagina: uw eigen kant van het festival. U komt hier met de pas die u al heeft (de code staat groot in beeld aan de poort) of via de link van uw groep -- niet via de bank. Het ORGANISATIEscherm /apps/festival.html hangt wel gewoon, bij de zaakschermen in de leverancier-app."],
     ["/apps/reisuitnodiging.html", "landingspagina: je komt hier via de link die het reisbureau of een reisgenoot je stuurt. Hem aan de bank hangen zou hem juist verkeerd maken -- de pagina bestaat om een reis over te nemen die IEMAND ANDERS voor je klaarzette (REIZEN.md, kern/reisuitnodiging.js), en zonder die link valt er niets te openen"]
   ]);
   try {
@@ -4019,6 +4020,41 @@ console.log('\n57) een browser start op EEN plek: test/helper.js');
     ok(bekeken + ' browsertoetsen halen hun browser bij test/helper.js');
   }
 }
+
+console.log('\n58) geen ronde hoeken: elke border-radius is 0, behalve een echte cirkel');
+{
+  const RE = /border-radius\s*:\s*([^;}"'\n\\`]+)/g;
+  const mag = (v) => {
+    const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
+    return k === '0' || k === '0!important' || k === '50%' || k === '50%!important';
+  };
+  const kapot = [];
+  let gekeken = 0, cirkels = 0;
+  loop(path.join(ROOT, 'public'), /\.(css|html|js)$/, f => {
+    const rel = path.relative(ROOT, f);
+    if (rel.endsWith('.min.js')) return;
+    let bron; try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return; }
+    if (!bron.includes('border-radius')) return;
+    gekeken++;
+    let m;
+    RE.lastIndex = 0;
+    while ((m = RE.exec(bron))) {
+      const v = m[1].trim();
+      if (mag(v)) { if (v.toLowerCase().startsWith('50%')) cirkels++; continue; }
+      kapot.push(rel + ' regel ' + bron.slice(0, m.index).split('\n').length + ': ' + v.slice(0, 40));
+    }
+  });
+  if (kapot.length) {
+    for (const k of kapot.slice(0, 12)) {
+      fout('ronde hoek: ' + k + ' -- zet hem op 0 (CLAUDE.md ontwerpprincipe 3);' +
+        ' een echte cirkel mag, en die schrijf je als border-radius:50%');
+    }
+    if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' plekken');
+  } else {
+    ok(gekeken + ' bestanden met een radius: allemaal 0, plus ' + cirkels + ' echte cirkels');
+  }
+}
+
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

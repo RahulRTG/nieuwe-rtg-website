@@ -201,7 +201,7 @@
     const open = (pdPol.aanvragen||[]).filter(a => a.status === 'aangevraagd');
     html += '<div class="card"><div class="k">'+T('pd.pol.advies','Adviesvragen')+' ('+open.length+')</div>'+
       (open.length ? open.map(a => '<div class="task"><div class="t"><b>'+esc(a.klant)+' · '+esc(a.product)+'</b><span>'+esc(a.situatie)+'</span></div></div>'+
-        '<div style="display:flex;gap:0.4rem;margin:0.3rem 0 0.6rem;"><input data-ppat="'+a.id+'" placeholder="'+T('pd.pol.schrijf','Het advies (van u, niet van het systeem)')+'" maxlength="240" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--txt);font:inherit;font-size:0.78rem;padding:0.4rem 0.6rem;">'+
+        '<div style="display:flex;gap:0.4rem;margin:0.3rem 0 0.6rem;"><input data-ppat="'+a.id+'" placeholder="'+T('pd.pol.schrijf','Het advies (van u, niet van het systeem)')+'" maxlength="240" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.78rem;padding:0.4rem 0.6rem;">'+
         '<button class="abtn" data-ppak="'+a.id+'">'+T('pd.pol.klaar','Advies klaar')+'</button></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.pol.geenadvies','Geen open adviesvragen.')+'</div>')+'</div>';
     // declaraties: goedkeuren met een tik, afwijzen alleen met een reden
@@ -209,12 +209,12 @@
     html += '<div class="card"><div class="k">'+T('pd.pol.decl','Declaraties')+' ('+decl.length+')</div>'+
       (decl.length ? decl.map(x => '<div class="task"><div class="t"><b>'+esc(x.codenaam)+' · '+esc(x.omschrijving)+'</b><span>'+eur(x.bedrag)+'</span></div>'+
         '<button class="abtn" data-ppdg="'+x.id+'">'+T('pd.pol.goed','Keur goed')+'</button></div>'+
-        '<div style="display:flex;gap:0.4rem;margin:0.3rem 0 0.6rem;"><input data-ppdr="'+x.id+'" placeholder="'+T('pd.pol.reden','Reden bij afwijzen')+'" maxlength="160" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--txt);font:inherit;font-size:0.78rem;padding:0.4rem 0.6rem;">'+
+        '<div style="display:flex;gap:0.4rem;margin:0.3rem 0 0.6rem;"><input data-ppdr="'+x.id+'" placeholder="'+T('pd.pol.reden','Reden bij afwijzen')+'" maxlength="160" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.78rem;padding:0.4rem 0.6rem;">'+
         '<button class="abtn" data-ppda="'+x.id+'" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.pol.af','Wijs af')+'</button></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.pol.geendecl','Geen open declaraties.')+'</div>')+'</div>';
     // de pas-controle
     html += '<div class="card"><div class="k">'+T('pd.pol.pas','Pas-controle')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="ppPas" placeholder="ZP-XXXX" maxlength="12" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:8px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.45rem 0.6rem;text-transform:uppercase;">'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="ppPas" placeholder="ZP-XXXX" maxlength="12" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.45rem 0.6rem;text-transform:uppercase;">'+
       '<button class="abtn" id="ppGo">'+T('pd.pol.check','Controleer')+'</button></div>'+
       '<div id="ppUit" style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);"></div></div>';
     wrap.innerHTML = html;
@@ -1131,7 +1131,7 @@
       if (w.type === 'actie') return '<button class="abtn" data-pkdactie="'+esc(w.tekst)+'" style="width:100%;margin-top:0.45rem;">'+esc(w.knop)+'</button>';
       // de leeftijdscheck aan de deur: ja/nee op codenaam, zonder gegevens
       if (w.type === 'leeftijd') return kop(w.titel)+
-        '<div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><input id="pkLftIn" placeholder="'+T('pd.lft.ph','Codenaam van de gast')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
+        '<div style="display:flex;gap:0.35rem;margin-top:0.35rem;"><input id="pkLftIn" placeholder="'+T('pd.lft.ph','Codenaam van de gast')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.5rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
         '<button class="abtn" data-pklft="18">18+?</button><button class="abtn ghost" data-pklft="21">21+?</button></div>'+
         '<div id="pkLftUit" style="margin-top:0.3rem;font-size:0.78rem;color:var(--soft);">'+esc(w.hint||'')+'</div>';
       if (w.type === 'meter') return kop(w.titel)+'<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.35rem;">'+
@@ -1446,7 +1446,7 @@
       '<div style="margin-top:0.35rem;font-size:0.74rem;color:var(--soft);">'+T('pd.fl.d','Uw eigen assistent. Hij onthoudt wat u hem vertelt ("onthoud dat...") en leert van wat u gebruikt; vraag "wat weet je over mij" en wis wanneer u wilt.')+'</div>'+
       '<div id="pkFlSein"></div>'+
       '<div id="pkFlUit" style="margin-top:0.45rem;font-size:0.8rem;line-height:1.5;">'+(pkFlLaatst||'')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="pkFlIn" placeholder="'+T('pd.fl.ph','Vraag iets, of: onthoud dat...')+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;color:var(--txt);outline:none;font-family:inherit;font-size:0.85rem;">'+
       '<button class="abtn ghost" id="pkFlMic" aria-label="'+T('pd.fl.mic','Spreek uw vraag in')+'"></button>'+
       '<button class="abtn" id="pkFlStuur">'+T('pd.fl.stuur','Stuur')+'</button></div></div>'+
       trainingKaart()+
@@ -1496,7 +1496,7 @@
     $('#hulpWrap').insertAdjacentHTML('beforeend',
       '<div class="card"><div class="k">'+T('pd.taal.h','Mijn taal')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.74rem;color:var(--soft);">'+T('pd.taal.s','Kies uw moedertaal. Uw hele scherm, uw bonnen en uw taken verschijnen dan in die taal, hier en op elke andere werk-app waar u inlogt.')+'</div>'+
-      '<select id="mtKies" style="width:100%;margin-top:0.5rem;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.7rem;color:var(--txt);font:inherit;font-size:0.85rem;"></select></div>');
+      '<select id="mtKies" style="width:100%;margin-top:0.5rem;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;color:var(--txt);font:inherit;font-size:0.85rem;"></select></div>');
     if (window.MoederTaal) MoederTaal.talen().then(ts => {
       const sel = document.getElementById('mtKies'); if (!sel || !ts.length) return;
       const nu = MoederTaal.actueel();
@@ -1512,7 +1512,7 @@
     API.call('/staff/fluister/profiel').then(prof => {
       const el = document.getElementById('pkFlSein');
       if (!el || !(prof.seintjes || []).length) return;
-      el.innerHTML = '<div style="margin-top:0.45rem;border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.65rem;">'+
+      el.innerHTML = '<div style="margin-top:0.45rem;border:1px solid var(--line);border-radius:0;padding:0.5rem 0.65rem;">'+
         '<div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('pd.fl.sein','Mijn assistent ziet')+'</div>'+
         prof.seintjes.map(x => '<div style="margin-top:0.28rem;font-size:0.76rem;line-height:1.45;">'+esc(x.icoon)+' '+esc(x.tekst)+'</div>').join('')+'</div>';
     }).catch(() => {});
@@ -1740,8 +1740,8 @@
         '<b>'+esc(o.customerCodename)+' · '+T('pd.bz.bonnr','bon')+' '+o.ref+'</b>'+
         o.items.map(i=>'<label style="display:block;font-size:0.82rem;cursor:pointer;"><input type="checkbox" class="ipItem" value="'+esc(i.id)+'" style="accent-color:var(--gold);margin-right:0.35rem;">'+i.qty+'x '+esc(i.name)+'</label>').join('')+
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
-        '<input class="ipTas" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'" style="flex:1;min-width:6rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
-        '<input class="ipBon" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'" style="flex:1;min-width:7rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
+        '<input class="ipTas" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'" style="flex:1;min-width:6rem;background:transparent;border:1px solid var(--line);border-radius:0;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
+        '<input class="ipBon" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'" style="flex:1;min-width:7rem;background:transparent;border:1px solid var(--line);border-radius:0;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
         '<button class="abtn ipKlaar">'+T('pd.bz.ingepakt','Alles zit erin')+'</button></div></div>').join('')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geeninpak','Niets om in te pakken; nieuwe bestellingen verschijnen hier.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.mijn','Mijn rit')+' ('+mijn.length+')</div>'+
@@ -1894,7 +1894,7 @@
   function tekenvlakOpen(id, titel){
     wvPdaTekent = id; wvPdaPaden = [];
     $('#wvVak').innerHTML = '<div class="h-mt60"><b>' + esc(titel) + '</b>' +
-      '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
+      '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:0;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
       '<div class="row">' +
       '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
       '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
@@ -2169,8 +2169,8 @@
         return '<div class="card" style="border-left:4px solid '+(a>=12?'#E5484D':a>=6?'#C99A2E':'#2E7D5B')+';">'+
           '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
           '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--rtg-leesgoud,var(--gold));">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
-          (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+esc(o.allergyNote)+'</div>':'')+
-          (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+T('pd.zorgp','Zorgprofiel gast')+': '+esc(pkZorg(o.zorg))+'</div>':'')+
+          (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:0;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+esc(o.allergyNote)+'</div>':'')+
+          (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:0;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+T('pd.zorgp','Zorgprofiel gast')+': '+esc(pkZorg(o.zorg))+'</div>':'')+
           pkGast(o)+
           (adv?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+adv+'</div>':'')+
           '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost h-flex1" data-pkgo="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>':'')+
@@ -2232,7 +2232,7 @@
       if (open) return;
       const div = document.createElement('div');
       div.className = 'pk-kennis';
-      div.style.cssText = 'white-space:pre-line;font-size:0.78rem;color:var(--soft);background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.75rem;margin:0.25rem 0 0.4rem;line-height:1.55;';
+      div.style.cssText = 'white-space:pre-line;font-size:0.78rem;color:var(--soft);background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.75rem;margin:0.25rem 0 0.4rem;line-height:1.55;';
       div.textContent = T('ds.laden','De AI-chef schrijft...');
       d.insertAdjacentElement('afterend', div);
       try { const k = await API.call('/supplier/menu/kennis', { itemId: d.dataset.pkdish, soort: 'bereiding' }); div.textContent = k.tekst; } catch(e){ div.textContent = e.message; }
@@ -2252,7 +2252,7 @@
     try { pdRetail = (await API.call('/supplier/retail', {})).retail; } catch(e){ pdRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }
     renderWinkel();
   }
-  function winkelInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;font-size:0.95rem;color:var(--txt);outline:none;font-family:inherit;">'; }
+  function winkelInput(id, ph){ return '<input id="'+id+'" placeholder="'+ph+'" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.85rem;font-size:0.95rem;color:var(--txt);outline:none;font-family:inherit;">'; }
   function renderWinkel(){
     const tabBtn = document.getElementById('tabWinkel');
     if (tabBtn) tabBtn.style.display = heeftRetail() ? '' : 'none';
@@ -2437,16 +2437,16 @@
     wrap.innerHTML =
       '<div class="card"><div class="k">'+T('pd.e.check','Entree-check')+'</div>'+
       '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+
-      '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
+      '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
       '<button class="abtn" id="pdCheck">'+T('pd.e.binnen','Binnen')+'</button></div>'+
       '<div id="pdCheckUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);"></div></div>'+
       // de kassa aan de deur: kaartje verkopen, contant of met RTG Pay, VIP kan
       (slots.length ? '<div class="card"><div class="k">'+T('pd.e.verkoop','Deurverkoop')+'</div>'+
       '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
-      '<select id="pdVkSlot" style="flex:2;min-width:150px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;">'+
+      '<select id="pdVkSlot" style="flex:2;min-width:150px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;">'+
         slots.map((x,i) => '<option value="'+i+'">'+x.tijd+' \u00B7 '+esc(x.naam)+' ('+(x.capaciteit-x.verkocht)+' '+T('pd.e.vrij','vrij')+')</option>').join('')+'</select>'+
-      '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
-      '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
+      '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
+      '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:0;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
       '<button class="abtn h-flex1" data-pdvk="contant">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
       '<button class="abtn h-flex1" data-pdvk="rtgpay">RTG Pay</button></div>'+
@@ -2532,7 +2532,7 @@
         '<button class="abtn ghost" data-cvfoto="'+c.ref+'" data-fase="na">'+T('pd.va.na','Na-foto')+' ('+c.fotosNa+')</button> '+
         '<button class="abtn" data-cvst="'+c.ref+'" data-st="afgerond">'+T('pd.va.terug','Teruggeven')+'</button>';
       return '<div class="card">'+
-        (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy,#C23A5E);border-radius:10px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.82rem;"><b>SOS:</b> '+esc(c.sos[0].bericht)+
+        (c.sos && c.sos.length ? '<div style="background:rgba(194,58,94,0.16);border:1px solid var(--burgundy,#C23A5E);border-radius:0;padding:0.5rem 0.7rem;margin-bottom:0.5rem;font-size:0.82rem;"><b>SOS:</b> '+esc(c.sos[0].bericht)+
           (Number.isFinite(c.sos[0].lat)?' · <a style="color:var(--gold,#C99A2E);" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('pd.va.kaart','kaart')+'</a>':'')+
           ' <button class="abtn" data-cvsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;">'+T('pd.va.sosok','Afgehandeld')+'</button></div>':'')+
         '<div class="k">'+esc(c.boot)+' · '+esc(c.type)+'</div>'+
@@ -2694,7 +2694,7 @@
           const in2 = !!(state.klok && (state.klok.binnen||[]).includes(m.name));
           return '<div class="task"><span class="ic">'+(m.role==='manager'?'':'')+'</span><div class="t"><b>'+esc(m.name)+'</b><span>'+(m.role==='manager'?'Manager':T('pd.staff','Medewerker'))+(in2?' ·  '+T('pd.ingeklokt','ingeklokt'):'')+'</span></div>'+
             (in2?'<button class="abtn" data-belm="'+m.id+'" data-naam="'+esc(m.name)+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5c-1 0-1.8.8-1.8 1.8 0 7.2 5.8 13 13 13 1 0 1.8-.8 1.8-1.8v-2.2c0-.8-.6-1.5-1.4-1.7l-2-.4c-.7-.2-1.4.1-1.8.7l-.4.8c-2-1-3.6-2.6-4.6-4.6l.8-.4c.6-.4.9-1.1.7-1.8l-.4-2C9.3 4.1 8.6 3.5 7.8 3.5z"/></svg></button>':'')+
-            '<button class="abtn ghost" data-dmm="'+m.id+'" data-naam="'+esc(m.name)+'" style="position:relative;"><i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-6px;right:-6px;background:#C23A5E;color:#fff;border-radius:999px;font-style:normal;font-size:0.6rem;min-width:1.1rem;height:1.1rem;line-height:1.1rem;text-align:center;"></i></button>'+
+            '<button class="abtn ghost" data-dmm="'+m.id+'" data-naam="'+esc(m.name)+'" style="position:relative;"><i data-dmbadge="'+m.id+'" style="display:none;position:absolute;top:-6px;right:-6px;background:#C23A5E;color:#fff;border-radius:0;font-style:normal;font-size:0.6rem;min-width:1.1rem;height:1.1rem;line-height:1.1rem;text-align:center;"></i></button>'+
             '<button class="abtn ghost" data-buzz="'+m.id+'">'+T('pd.buzz','Tril')+'</button></div>';
         }).join('')+'</div>' : '')+
       '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+

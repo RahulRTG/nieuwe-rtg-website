@@ -25,7 +25,7 @@
   textarea.veld{width:100%;min-height:5.5rem;line-height:1.5;}
   .fotoknop{display:flex;gap:.5rem;align-items:center;margin-top:.5rem;flex-wrap:wrap;}
   .fotoknop input[type=file]{display:none;}
-  .preview{max-width:9rem;border-radius:12px;display:block;}
+  .preview{max-width:9rem;border-radius:0;display:block;}
   .preview[hidden],.mini[hidden]{display:none;}
   /* het album: maandgroepen met een bladzijde-gevoel */
   .dag{margin-bottom:1.2rem;}
@@ -36,33 +36,33 @@
   .hart{background:none;border:0;cursor:pointer;color:var(--zacht);font-size:.95rem;padding:0 .2rem;}
   .hart.aan{color:var(--accent-tekst);}
   .filterrij{display:flex;gap:.4rem;margin:0 0 .8rem;}
-  .filterrij button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;cursor:pointer;}
+  .filterrij button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.35rem .9rem;font-size:.82rem;cursor:pointer;}
   .filterrij button.aan{border-color:var(--goud);color:var(--accent-tekst);}
-  .jarig{display:flex;align-items:center;gap:.6rem;background:var(--paneel2);border:1px solid var(--goud);border-radius:12px;padding:.6rem .9rem;margin-bottom:.5rem;font-size:.9rem;}
+  .jarig{display:flex;align-items:center;gap:.6rem;background:var(--paneel2);border:1px solid var(--goud);border-radius:0;padding:.6rem .9rem;margin-bottom:.5rem;font-size:.9rem;}
   .jarig a{margin-left:auto;color:var(--accent-tekst);font-size:.82rem;text-decoration:none;white-space:nowrap;}
   /* de kijker: een foto groot, met pijlen en het hartje */
   .kijker{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;z-index:60;flex-direction:column;align-items:center;justify-content:center;padding:1rem;}
   .kijker.open{display:flex;}
-  .kijker img{max-width:100%;max-height:70vh;border-radius:12px;}
+  .kijker img{max-width:100%;max-height:70vh;border-radius:0;}
   .kijker .onder{color:var(--txt);text-align:center;margin-top:.8rem;max-width:34rem;}
   .kijker .onder small{display:block;color:var(--zacht);margin-top:.25rem;}
   .kijker .knopjes{display:flex;gap:1rem;align-items:center;margin-top:.7rem;}
-  .kijker button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.5rem .9rem;cursor:pointer;font-size:1rem;}
-  .moment img{width:100%;border-radius:12px;display:block;margin-bottom:.6rem;}
+  .kijker button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.5rem .9rem;cursor:pointer;font-size:1rem;}
+  .moment img{width:100%;border-radius:0;display:block;margin-bottom:.6rem;}
   .moment .tk{line-height:1.55;white-space:pre-wrap;}
   .moment .wie{display:flex;align-items:center;gap:.4rem;color:var(--zacht);font-size:.78rem;margin-top:.5rem;}
   .moment .wie .weg{margin-left:auto;}
   /* gezinsnamen en momenten */
   .chips{display:flex;gap:.4rem;flex-wrap:wrap;margin:.3rem 0 .5rem;}
-  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;display:inline-flex;gap:.4rem;align-items:center;}
+  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.35rem .8rem;font-size:.85rem;display:inline-flex;gap:.4rem;align-items:center;}
   .chip button{background:none;border:0;color:var(--zacht);cursor:pointer;padding:0;font-size:.85rem;}
-  .idee{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.7rem .9rem;margin-bottom:.5rem;}
+  .idee{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;margin-bottom:.5rem;}
   .idee b{font-family:var(--serif);font-weight:500;}
   .idee div{color:var(--zacht);font-size:.9rem;line-height:1.5;margin-top:.15rem;}
   /* voor jou als ouder */
-  .adem{background:var(--paneel2);border-left:3px solid var(--groen,#5FA56A);border-radius:8px;padding:.8rem 1rem;line-height:1.55;font-size:.95rem;}
+  .adem{background:var(--paneel2);border-left:3px solid var(--groen,#5FA56A);border-radius:0;padding:.8rem 1rem;line-height:1.55;font-size:.95rem;}
   .links{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem;}
-  .links a{background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.4rem .9rem;font-size:.85rem;color:var(--txt);text-decoration:none;}
+  .links a{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.4rem .9rem;font-size:.85rem;color:var(--txt);text-decoration:none;}
   .links a:hover{border-color:var(--goud);}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">

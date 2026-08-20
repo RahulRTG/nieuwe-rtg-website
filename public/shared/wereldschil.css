@@ -80,10 +80,10 @@ body[data-ws]{ padding-bottom:calc(var(--ws-ruimte,0px) + var(--ws-eigen,0px)); 
 .ws-doel[aria-current]{ color:var(--ws-aan); }
 .ws-doel[aria-current]::before{
   content:""; position:absolute; top:0; left:22%; right:22%; height:2px;
-  background:currentColor; border-radius:0 0 2px 2px;
+  background:currentColor; border-radius:0;
 }
 .ws-doel{ position:relative; }
-.ws-doel:focus-visible{ outline:2px solid var(--ws-aan); outline-offset:-3px; border-radius:10px; }
+.ws-doel:focus-visible{ outline:2px solid var(--ws-aan); outline-offset:-3px; border-radius:0; }
 
 /* de wisselknop en de spleetknop horen niet op een telefoon */
 .ws-hand, .ws-splits{ display:none; }
@@ -103,10 +103,10 @@ body[data-ws]{ padding-bottom:calc(var(--ws-ruimte,0px) + var(--ws-eigen,0px)); 
   }
   .ws-doel{ flex:0 0 auto; padding:.62rem .2rem; gap:.3rem; }
   .ws-doel[aria-current]::before{
-    top:8%; bottom:8%; left:0; right:auto; width:2px; height:auto; border-radius:0 2px 2px 0;
+    top:8%; bottom:8%; left:0; right:auto; width:2px; height:auto; border-radius:0;
   }
   :root[data-hand="rechts"] .ws-doel[aria-current]::before{
-    left:auto; right:0; border-radius:2px 0 0 2px;
+    left:auto; right:0; border-radius:0;
   }
 
   /* de pagina schuift op, aan de kant waar de rail staat */
@@ -122,7 +122,7 @@ body[data-ws]{ padding-bottom:calc(var(--ws-ruimte,0px) + var(--ws-eigen,0px)); 
   }
   .ws-hand .rtg-glyf, .ws-splits .rtg-glyf{ width:19px; height:19px; }
   .ws-hand:hover, .ws-splits:hover{ color:#F7F5F1; }
-  .ws-hand:focus-visible, .ws-splits:focus-visible{ outline:2px solid var(--ws-aan); outline-offset:-3px; border-radius:10px; }
+  .ws-hand:focus-visible, .ws-splits:focus-visible{ outline:2px solid var(--ws-aan); outline-offset:-3px; border-radius:0; }
   .ws-splits[aria-pressed="true"]{ color:var(--ws-aan); }
 }
 
@@ -179,7 +179,7 @@ body[data-ws]{ padding-bottom:calc(var(--ws-ruimte,0px) + var(--ws-eigen,0px)); 
     font-weight:600; color:#F7F5F1; letter-spacing:.02em; text-transform:none; font-size:.85rem; }
   .ws-paneel-dicht{
     background:none; border:0; cursor:pointer; color:var(--ws-inkt);
-    width:32px; height:32px; display:grid; place-items:center; border-radius:8px; font-size:1.1rem;
+    width:32px; height:32px; display:grid; place-items:center; border-radius:0; font-size:1.1rem;
   }
   .ws-paneel-dicht:hover{ color:#F7F5F1; background:rgba(244,241,236,.07); }
   .ws-paneel iframe{ width:100%; height:calc(100% - 44px); border:0; display:block; background:var(--bg,#0C0C0B); }

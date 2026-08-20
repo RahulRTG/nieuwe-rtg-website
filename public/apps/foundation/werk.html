@@ -15,7 +15,7 @@
   .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
-  .balkje{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1.1rem;}
+  .balkje{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.7rem .9rem;margin-bottom:1.1rem;}
   .balkje label{font-size:.85rem;color:var(--zacht);}
   .balkje .veld{max-width:6rem;padding:.45rem .6rem;}
   .cvstatus{font-size:.85rem;line-height:1.45;}
@@ -28,22 +28,22 @@
   .vac h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin:0;}
   .vac .bedrijf{color:var(--rtg-leesgoud,var(--goud));font-size:.9rem;font-weight:600;}
   .vac .meta{color:var(--zacht);font-size:.82rem;margin-top:.25rem;display:flex;gap:.5rem;flex-wrap:wrap;}
-  .vac .meta span{background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.1rem .55rem;}
+  .vac .meta span{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.1rem .55rem;}
   .vac .oms{color:var(--zacht);font-size:.9rem;line-height:1.45;margin:.6rem 0 .8rem;}
   .vac .acties{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .vac .verstuurd{color:var(--groen,#7ecb8f);font-size:.88rem;font-weight:600;}
   .leeg{color:var(--zacht);text-align:center;padding:2rem 1rem;line-height:1.5;}
   .mijn{display:flex;flex-direction:column;gap:.5rem;}
-  .msoll{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;}
+  .msoll{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;}
   .msoll .mt{flex:1;min-width:0;}
   .msoll .mt b{display:block;font-size:.92rem;}
   .msoll .mt span{font-size:.78rem;color:var(--zacht);}
-  .pil{font-size:.72rem;font-weight:700;border-radius:999px;padding:.2rem .6rem;white-space:nowrap;}
+  .pil{font-size:.72rem;font-weight:700;border-radius:0;padding:.2rem .6rem;white-space:nowrap;}
   .pil.nieuw{background:#2a2a1a;color:#d8c86a;border:1px solid #6a5f2a;}
   .pil.aangenomen{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
   .pil.afgewezen{background:#2a1512;color:#e88;border:1px solid #6a2f2a;}
   .pil.onbekend{background:var(--paneel);color:var(--zacht);border:1px solid var(--lijn);}
-  .jong{background:#181712;border:1px solid var(--lijn);border-radius:12px;padding:1.1rem;color:var(--zacht);line-height:1.5;}
+  .jong{background:#181712;border:1px solid var(--lijn);border-radius:0;padding:1.1rem;color:var(--zacht);line-height:1.5;}
   .jong b{color:var(--txt);}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -195,17 +195,17 @@ let chatId = null, chatTimer = null;
 function chatMsgHtml(m){
   const mij = m.van === 'sollicitant';
   const inner = mij ? esc(m.tekst) : '<span class="xlate">'+esc(m.tekst)+'</span>';
-  return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:82%;padding:.45rem .75rem;border-radius:12px;'+(mij?'background:var(--goud);color:#1a1710;':'background:var(--paneel2);border:1px solid var(--lijn);')+'white-space:pre-wrap;">'+inner+'</div>';
+  return '<div style="align-self:'+(mij?'flex-end':'flex-start')+';max-width:82%;padding:.45rem .75rem;border-radius:0;'+(mij?'background:var(--goud);color:#1a1710;':'background:var(--paneel2);border:1px solid var(--lijn);')+'white-space:pre-wrap;">'+inner+'</div>';
 }
 function vertaalChat(root){ if(!root||!window.Vertaal) return; root.querySelectorAll('.xlate:not([data-vt])').forEach(el=>{ el.setAttribute('data-vt','1'); Vertaal.vul(el, el.textContent, 'nl'); }); }
 function ensureChatEl(){
   let ov = document.getElementById('rtfchat'); if (ov) return ov;
   ov = document.createElement('div'); ov.id='rtfchat';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;';
-  ov.innerHTML='<div style="background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:16px 16px 0 0;width:min(100%,40rem);height:78vh;display:flex;flex-direction:column;">'+
+  ov.innerHTML='<div style="background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:0;width:min(100%,40rem);height:78vh;display:flex;flex-direction:column;">'+
     '<div style="display:flex;align-items:center;gap:.6rem;padding:.9rem 1rem;border-bottom:1px solid var(--lijn);"><b class="h-flex1" id="rcWie"></b><button id="rcX" style="background:none;border:none;color:var(--zacht);font-size:1.3rem;">✕</button></div>'+
     '<div id="rcMsgs" style="flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>'+
-    '<div style="display:flex;gap:.5rem;padding:.8rem 1rem;border-top:1px solid var(--lijn);"><input id="rcIn" placeholder="Bericht (bijv. Kan ik donderdag om 15u langskomen?)" style="flex:1;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .85rem;color:var(--txt);"><button class="knop" id="rcSend" style="width:auto;">Stuur</button></div>'+
+    '<div style="display:flex;gap:.5rem;padding:.8rem 1rem;border-top:1px solid var(--lijn);"><input id="rcIn" placeholder="Bericht (bijv. Kan ik donderdag om 15u langskomen?)" style="flex:1;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.6rem .85rem;color:var(--txt);"><button class="knop" id="rcSend" style="width:auto;">Stuur</button></div>'+
     '</div>';
   document.body.appendChild(ov);
   ov.querySelector('#rcX').addEventListener('click', sluitChat);

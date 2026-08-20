@@ -19,7 +19,7 @@
   #doek{position:fixed;inset:0;display:block;touch-action:none;cursor:pointer;}
   .bovenrij{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:.7rem;
     padding:.8rem 1rem calc(.8rem + env(safe-area-inset-top) * 0);}
-  .terugknop{background:rgba(28,36,64,.85);border:2px solid var(--s-geel);color:#FFF;border-radius:999px;
+  .terugknop{background:rgba(28,36,64,.85);border:2px solid var(--s-geel);color:#FFF;border-radius:0;
     padding:.55rem 1.1rem;font:inherit;font-size:1rem;font-weight:700;cursor:pointer;}
   .opdracht{flex:1;text-align:center;color:#FFF;font-size:1.25rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5);min-height:1.6rem;}
   .menu{position:fixed;inset:0;z-index:10;background:linear-gradient(180deg,#26305A,#1C2440);
@@ -37,7 +37,7 @@
      leesbaar maar onzichtbaar, en pas te zien toen de keuring een voorgrond met
      alfa kon rekenen. */
   body.rtg-stijl .menu .sub{color:#C9D2F0;margin-bottom:.8rem;text-align:center;}
-  .spelkaartje{width:min(26rem,92vw);border:0;border-radius:26px;padding:1.2rem 1.4rem;cursor:pointer;
+  .spelkaartje{width:min(26rem,92vw);border:0;border-radius:0;padding:1.2rem 1.4rem;cursor:pointer;
     display:flex;align-items:center;gap:1rem;font:inherit;text-align:left;color:#1C2440;}
   .spelkaartje b{font-size:1.35rem;display:block;}
   .spelkaartje span{font-size:.95rem;opacity:.85;}
@@ -48,11 +48,11 @@
   .k4{background:var(--s-koraal);color:#3A0F08;}
   .k5{background:var(--s-gras);color:#12300C;}
   .k6{background:var(--s-blauw);color:#0C2440;}
-  body.rtg-stijl .menu .naarhuis{background:transparent;border:2px solid #C9D2F0;color:#C9D2F0;border-radius:999px;
+  body.rtg-stijl .menu .naarhuis{background:transparent;border:2px solid #C9D2F0;color:#C9D2F0;border-radius:0;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.6rem;}
   .kwastrij{position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));left:0;right:0;z-index:6;
     display:none;justify-content:center;}
-  .kwastrij button{background:rgba(28,36,64,.85);border:2px solid var(--s-geel);color:#FFF;border-radius:999px;
+  .kwastrij button{background:rgba(28,36,64,.85);border:2px solid var(--s-geel);color:#FFF;border-radius:0;
     padding:.6rem 1.4rem;font:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">

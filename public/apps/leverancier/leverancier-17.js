@@ -4,7 +4,7 @@
       const items = (state.menu||[]).filter(m=>(m.station==='bar')===(stn==='bar'));
       const KANTEN = { warm:'Warme kant', koud:'Koude kant', snack:'Snacks', dessert:'Desserts' };
       // de kaart-bewerker: de chef past alles per gerecht aan, ook het vuurplan
-      const bewerker = x => '<div class="st-form" data-kedit-form="'+x.id+'" style="border:1px solid var(--line);border-radius:12px;padding:0.7rem;margin:0.3rem 0 0.5rem;">'+
+      const bewerker = x => '<div class="st-form" data-kedit-form="'+x.id+'" style="border:1px solid var(--line);border-radius:0;padding:0.7rem;margin:0.3rem 0 0.5rem;">'+
         '<input class="st-in" data-kf="name" value="'+escT(x.name)+'" placeholder="'+T('menu.name','Naam')+'">'+
         '<div class="row-gap"><input class="st-in" data-kf="cat" value="'+escT(x.cat||'')+'" placeholder="'+T('menu.cat','Categorie')+'" class="h-flex2"><input class="st-in" data-kf="price" type="number" inputmode="decimal" value="'+x.price+'" placeholder="\u20ac" class="h-flex1"></div>'+
         '<input class="st-in" data-kf="desc" value="'+escT(x.desc||'')+'" placeholder="'+T('kt.m.desc','Omschrijving (voor gast en keuken)')+'">'+
@@ -34,7 +34,7 @@
             '<div class="tkc-who">'+T('ag2.deck','De AI stelt de inkoop voor op de verkoop, de mise en place en de verwachte drukte. De gemachtigde keurt goed, past aan of wijst af; pas dan wordt er echt besteld bij de vaste leverancier.')+'</div>'+
             // meerdere groothandels: elke gekoppelde staat als chip met een weg-knop
             ((A.partners||[]).length ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.4rem;">'+
-              A.partners.map(p=>'<span style="display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--gold);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.74rem;">\ud83d\udce6 '+p.naam+
+              A.partners.map(p=>'<span style="display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--gold);border-radius:0;padding:0.3rem 0.7rem;font-size:0.74rem;">\ud83d\udce6 '+p.naam+
                 '<button data-agweg="'+p.code+'" style="background:none;border:none;color:var(--soft);cursor:pointer;font-size:0.8rem;" title="'+T('ag2.weg','loskoppelen')+'">\u2715</button></span>').join('')+'</div>' : '')+
             '<div class="row-gap"><select class="st-in" id="agGh" class="h-flex2"><option value="">'+T('ag2.kies2','Groothandel erbij...')+'</option>'+
               (agentMarkt||[]).filter(g=>!(A.partners||[]).find(p=>p.code===g.code)).map(g=>'<option value="'+g.code+'">'+g.name+'</option>').join('')+'</select>'+
@@ -44,7 +44,7 @@
             ((A.partners||[]).length>1?'<div class="tkc-who h-mt30">'+T('ag2.multi','De AI vergelijkt de gekoppelde groothandels per bestelling en kiest de beste dekking en prijs.')+'</div>':'')+
             (A.voorstellen||[]).slice(0,3).map(v=>{
               const wacht = v.status === 'wacht-op-goedkeuring';
-              return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem;margin-top:0.5rem;">'+
+              return '<div style="border:1px solid var(--line);border-radius:0;padding:0.7rem;margin-top:0.5rem;">'+
                 '<div class="tkc-top"><span style="font-weight:600;">'+(v.groothandelNaam||'')+' \u00b7 \u20ac '+v.totaal+'</span><span class="tkc-age">'+(wacht?'\u23f3 '+T('ag2.wacht','wacht op de gemachtigde'):v.status+(v.ref?' \u00b7 '+v.ref:''))+'</span></div>'+
                 '<div class="tkc-who">'+v.uitleg+'</div>'+
                 (v.regels||[]).slice(0,10).map(r=>'<div class="st-row"><span>'+r.naam+'<span class="sub">'+(r.reden||'')+' \u00b7 \u20ac '+r.prijs+' / '+(r.eenheid||'st')+'</span></span>'+

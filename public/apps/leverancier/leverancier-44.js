@@ -1,11 +1,11 @@
 /* de statusknoppen van een vrachtzending */
-    if (z.status==='onderweg') acties += '<button data-vret="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.etklaar','Etappe klaar')+'</button>';
-    if (z.status==='douane') acties += '<button data-vrdouane="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.douane','Douane heeft ingeklaard')+'</button>';
-    if (z.status==='aangekomen') acties += '<button data-vraf="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.afleveren','Afleveren')+'</button>';
-    if (z.status!=='afgeleverd') acties += '<button data-vrmeld="'+z.id+'" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('vr.melding','Melding')+'</button>';
-    return '<div style="border:1px solid '+(z.status==='afgeleverd'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
+    if (z.status==='onderweg') acties += '<button data-vret="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.etklaar','Etappe klaar')+'</button>';
+    if (z.status==='douane') acties += '<button data-vrdouane="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.douane','Douane heeft ingeklaard')+'</button>';
+    if (z.status==='aangekomen') acties += '<button data-vraf="'+z.id+'" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.4rem;font-weight:600;font-family:inherit;font-size:0.75rem;">'+T('vr.afleveren','Afleveren')+'</button>';
+    if (z.status!=='afgeleverd') acties += '<button data-vrmeld="'+z.id+'" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.75rem;">'+T('vr.melding','Melding')+'</button>';
+    return '<div style="border:1px solid '+(z.status==='afgeleverd'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.7rem 0.85rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(z.ref)+' · '+esc(z.klant)+'</b>'+
-      '<span style="border:1px solid var(--line);border-radius:999px;padding:0.1rem 0.55rem;font-size:0.7rem;">'+esc(T('vr.st.'+z.status, VR_STATUS[z.status]||z.status))+'</span></div>'+
+      '<span style="border:1px solid var(--line);border-radius:0;padding:0.1rem 0.55rem;font-size:0.7rem;">'+esc(T('vr.st.'+z.status, VR_STATUS[z.status]||z.status))+'</span></div>'+
       '<div class="sub">'+esc(z.inhoud)+' · '+z.gewichtKg.toLocaleString('nl-NL')+' kg · '+z.colli+' colli · '+esc(z.incoterm)+'</div>'+
       '<div class="sub">'+esc(z.van.plaats)+' ('+esc(z.van.land)+') → '+esc(z.naar.plaats)+' ('+esc(z.naar.land)+') · ETA '+esc(z.eta)+'</div>'+
       vrTijdlijn(z)+
@@ -22,12 +22,12 @@
     const k = d.kpi;
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.onderweg, T('vr.k.onderweg','onderweg')],[k.douane, T('vr.k.douane','bij douane')],[k.afgeleverd, T('vr.k.af','afgeleverd')],[k.kilosOnderweg.toLocaleString('nl-NL')+' kg', T('vr.k.kg','onderweg in kilo’s')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
     h += '<div class="sub h-mt50">'+T('vr.permod','Actieve etappes per modaliteit')+': '+Object.keys(VR_MOD).map(m=>T('vr.mod.'+m, VR_MOD[m].label)+' '+(k.perModaliteit[m]||0)).join(' · ')+'</div>';
 
     // nieuwe zending: klant, lading, herkomst/bestemming en de etappe-bouwer
     h += '<div class="st-sec h-mt100">'+T('vr.nieuw','Nieuwe zending')+'</div>'+
-      '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
+      '<div style="border:1px solid var(--line);border-radius:0;padding:0.8rem;">'+
       '<div class="row-gap"><input id="vrKlant" class="st-in" placeholder="'+T('vr.klant','Klant')+'" maxlength="60" class="h-flex2"><input id="vrInhoud" class="st-in" placeholder="'+T('vr.inhoud','Wat gaat er mee (lading)')+'" maxlength="120" style="flex:3;"></div>'+
       '<div class="row-gap h-mt40"><input id="vrGewicht" class="st-in" type="number" min="1" placeholder="'+T('vr.gewicht','Gewicht (kg)')+'" class="h-flex1"><input id="vrColli" class="st-in" type="number" min="1" placeholder="'+T('vr.colli','Colli')+'" class="h-flex1">'+
       '<select id="vrIncoterm" class="st-in h-flex1">'+(d.incoterms||[]).map(t=>'<option'+(t==='DAP'?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
@@ -35,8 +35,8 @@
       '<div class="sub h-mt55">'+T('vr.route','De route, etappe voor etappe; het juiste vervoersdocument (AWB, B/L, CMR, CIM, CMNI) regelt de app per etappe:')+'</div>'+
       '<div id="vrEtappes">'+vrEtappeRijen()+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
-      '<button id="vrEtPlus" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.4rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.78rem;">+ '+T('vr.etplus','Etappe')+'</button>'+
-      '<button id="vrBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('vr.boek','Zending boeken')+'</button></div></div>';
+      '<button id="vrEtPlus" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.78rem;">+ '+T('vr.etplus','Etappe')+'</button>'+
+      '<button id="vrBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('vr.boek','Zending boeken')+'</button></div></div>';
 
     // de zendingen zelf: lopend eerst, afgeleverd inklapbaar
     const lopend = d.zendingen.filter(z=>z.status!=='afgeleverd'), af = d.zendingen.filter(z=>z.status==='afgeleverd');

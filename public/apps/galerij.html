@@ -25,7 +25,7 @@
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1100px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
@@ -51,13 +51,13 @@
   /* het raster: vierkant, veel lucht eromheen niet nodig -- het beeld is de lucht */
   .raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr));gap:.4rem;}
   .thumb{position:relative;aspect-ratio:1;background:var(--card2);border:1px solid var(--line);
-    border-radius:10px;overflow:hidden;cursor:pointer;}
+    border-radius:0;overflow:hidden;cursor:pointer;}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
   .thumb .ster{position:absolute;top:.35rem;right:.4rem;color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;
     text-shadow:0 1px 4px rgba(0,0,0,.7);}
   .thumb .wacht{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     color:var(--soft);font-size:.62rem;letter-spacing:.1em;}
-  .albumkaart{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;
+  .albumkaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.8rem .9rem;
     margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;cursor:pointer;}
   .albumkaart:hover{border-color:var(--gold);}
   .albumkaart b{flex:1;font-size:.9rem;}
@@ -67,13 +67,13 @@
   .scrim{position:fixed;inset:0;z-index:20;background:rgba(8,8,7,.94);display:none;
     flex-direction:column;align-items:center;justify-content:center;padding:1rem;}
   .scrim.open{display:flex;}
-  #kkBeeld{max-width:100%;max-height:70vh;border-radius:10px;background:var(--card2);}
+  #kkBeeld{max-width:100%;max-height:70vh;border-radius:0;background:var(--card2);}
   #kkMeta{color:var(--muted);font-size:.78rem;margin-top:.6rem;text-align:center;}
   #kkBalk{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:.8rem;align-items:center;}
-  #kkBalk select{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  #kkBalk select{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;padding:.4rem .55rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}

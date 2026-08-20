@@ -40,15 +40,15 @@
     'display:flex;align-items:center;justify-content:center;padding:1.2rem;}' +
     '.rp-waas[hidden]{display:none;}' +
     '.rp-kaart{width:min(30rem,100%);background:#151312;border:1px solid rgba(255,255,255,.12);' +
-    'border-radius:18px;padding:1.4rem;font-family:Inter,system-ui,sans-serif;color:#F4F1EC;' +
+    'border-radius:0;padding:1.4rem;font-family:Inter,system-ui,sans-serif;color:#F4F1EC;' +
     'box-shadow:0 24px 60px rgba(0,0,0,.6);}' +
     '.rp-kaart h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:600;font-size:1.3rem;margin:0 0 .8rem;}' +
     '.rp-vraag{font-size:.95rem;line-height:1.55;margin:0 0 1rem;}' +
-    '.rp-kaart input{width:100%;background:#0C0C0B;border:1px solid rgba(255,255,255,.18);border-radius:12px;' +
+    '.rp-kaart input{width:100%;background:#0C0C0B;border:1px solid rgba(255,255,255,.18);border-radius:0;' +
     'color:#F4F1EC;font:inherit;font-size:.95rem;padding:.7rem .8rem;}' +
     '.rp-kaart input:focus{outline:none;border-color:var(--burgundy-on-dark,#C23A5E);}' +
     '.rp-rij{display:flex;gap:.6rem;margin-top:1rem;}' +
-    '.rp-rij button{border:none;cursor:pointer;font:inherit;font-weight:600;font-size:.9rem;border-radius:12px;padding:.7rem 1rem;}' +
+    '.rp-rij button{border:none;cursor:pointer;font:inherit;font-weight:600;font-size:.9rem;border-radius:0;padding:.7rem 1rem;}' +
     '.rp-door{flex:1;background:var(--burgundy,#7F1634);color:#fff;}' +
     '.rp-door:hover{background:var(--burgundy-bright,#9E1C40);}' +
     '.rp-door:disabled{background:#2a2724;color:#6b6862;cursor:not-allowed;}' +

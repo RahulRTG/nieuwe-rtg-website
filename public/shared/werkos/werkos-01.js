@@ -33,14 +33,14 @@
   .wos-app:hover{transform:translateY(-3px);}
   .wos-app:active{transform:scale(0.97);}
   .wos-tegel{
-    width:76px;height:76px;border-radius:18px;position:relative;
+    width:76px;height:76px;border-radius:0;position:relative;
     display:flex;align-items:center;justify-content:center;
     background:linear-gradient(155deg,#23201C 0%,#171412 62%,#131110 100%);
     border:1px solid var(--line,rgba(255,255,255,0.09));
     box-shadow:0 10px 26px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.07);
     transition:border-color 0.13s, box-shadow 0.13s;
   }
-  @media (min-width:700px){.wos-tegel{width:88px;height:88px;border-radius:20px;}}
+  @media (min-width:700px){.wos-tegel{width:88px;height:88px;border-radius:0;}}
   .wos-app:hover .wos-tegel{
     border-color:color-mix(in srgb, var(--gold,#A98F1C) 65%, transparent);
     box-shadow:0 16px 34px rgba(0,0,0,0.5), 0 0 0 1px rgba(169,143,28,0.12), inset 0 1px 0 rgba(255,255,255,0.1);
@@ -64,7 +64,7 @@
   .wos-dock{
     position:fixed;left:50%;transform:translateX(-50%);
     bottom:calc(env(safe-area-inset-bottom,0px) + 0.85rem);
-    z-index:60;display:none;gap:0.5rem;padding:0.5rem 0.6rem;border-radius:16px;
+    z-index:60;display:none;gap:0.5rem;padding:0.5rem 0.6rem;border-radius:0;
     background:color-mix(in srgb, var(--card,#151312) 62%, transparent);
     backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);
     border:1px solid var(--line,rgba(255,255,255,0.09));
@@ -72,7 +72,7 @@
   }
   body.wos.wos-aan .wos-dock{display:flex;}
   .wos-dock button{
-    width:48px;height:48px;border-radius:12px;border:1px solid transparent;
+    width:48px;height:48px;border-radius:0;border:1px solid transparent;
     background:linear-gradient(155deg,#211E1B,#161311);position:relative;
     display:flex;align-items:center;justify-content:center;cursor:pointer;
     transition:border-color 0.13s, transform 0.13s;
@@ -82,7 +82,7 @@
   .wos-dock button.actief{border-color:color-mix(in srgb, var(--gold,#A98F1C) 55%, transparent);}
   .wos-dock button.actief::after{
     content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-7px;
-    width:14px;height:2px;border-radius:1px;background:var(--gold,#A98F1C);
+    width:14px;height:2px;border-radius:0;background:var(--gold,#A98F1C);
   }
 
   /* klok en batterij in de bestaande topbar */
@@ -91,13 +91,13 @@
   .wos-bat{display:inline-flex;align-items:center;gap:5px;}
   .wos-bat i{
     width:21px;height:11px;border:1px solid color-mix(in srgb, var(--txt,#F4F1EC) 55%, transparent);
-    border-radius:3px;padding:1.5px;display:block;position:relative;
+    border-radius:0;padding:1.5px;display:block;position:relative;
   }
   .wos-bat i::after{
     content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:4px;
-    border-radius:0 2px 2px 0;background:color-mix(in srgb, var(--txt,#F4F1EC) 55%, transparent);
+    border-radius:0;background:color-mix(in srgb, var(--txt,#F4F1EC) 55%, transparent);
   }
-  .wos-bat b{display:block;height:100%;border-radius:1.5px;background:var(--txt,#F4F1EC);min-width:2px;}
+  .wos-bat b{display:block;height:100%;border-radius:0;background:var(--txt,#F4F1EC);min-width:2px;}
   .wos-bat.laag b{background:var(--burgundy,#C23A5E);}
   .wos-bat em{font-style:normal;font-size:0.66rem;color:var(--soft,rgba(244,241,236,0.62));font-variant-numeric:tabular-nums;}
 
@@ -111,7 +111,7 @@
   .wos-zoek.open{display:flex;}
   .wos-zoek-paneel{margin-top:14vh;width:min(480px,90%);}
   .wos-zoek-paneel input{
-    width:100%;padding:0.9rem 1.1rem;border-radius:13px;
+    width:100%;padding:0.9rem 1.1rem;border-radius:0;
     border:1px solid var(--line,rgba(255,255,255,0.09));
     background:color-mix(in srgb, var(--card,#151312) 84%, transparent);
     color:var(--txt,#F4F1EC);font-size:0.98rem;outline:none;font-family:inherit;
@@ -120,14 +120,14 @@
   .wos-zoek-lijst{margin-top:0.6rem;display:flex;flex-direction:column;gap:0.3rem;}
   .wos-zoek-lijst button{
     display:flex;align-items:center;gap:0.75rem;text-align:left;cursor:pointer;
-    padding:0.6rem 0.8rem;border-radius:11px;border:1px solid var(--line,rgba(255,255,255,0.09));
+    padding:0.6rem 0.8rem;border-radius:0;border:1px solid var(--line,rgba(255,255,255,0.09));
     background:color-mix(in srgb, var(--card,#151312) 74%, transparent);
     color:var(--txt,#F4F1EC);font-size:0.86rem;font-family:inherit;
     transition:border-color 0.12s;
   }
   .wos-zoek-lijst button:hover{border-color:color-mix(in srgb, var(--gold,#A98F1C) 55%, transparent);}
   .wos-zoek-lijst .zi{
-    width:32px;height:32px;border-radius:9px;flex-shrink:0;
+    width:32px;height:32px;border-radius:0;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;
     background:linear-gradient(155deg,#211E1B,#161311);
     border:1px solid var(--line,rgba(255,255,255,0.09));
@@ -151,7 +151,7 @@
     z-index:61;width:130px;height:20px;background:none;border:none;padding:0;cursor:pointer;
     display:flex;align-items:center;justify-content:center;touch-action:none;
   }
-  .wos-pill::after{content:"";width:110px;height:5px;border-radius:3px;background:color-mix(in srgb, var(--txt,#F4F1EC) 55%, transparent);}
+  .wos-pill::after{content:"";width:110px;height:5px;border-radius:0;background:color-mix(in srgb, var(--txt,#F4F1EC) 55%, transparent);}
   .wos-pill:focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}
   body.wos-thuis .wos-pill{display:none;}
   body:not(.wos-aan) .wos-pill{display:none;}

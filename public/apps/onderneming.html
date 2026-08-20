@@ -27,17 +27,17 @@
   header h1{font-size:1.05rem;}
   .sp{flex:1 1 auto;}
   main{max-width:56rem;margin:0 auto;padding:1.3rem 1rem;display:flex;flex-direction:column;gap:1.4rem;}
-  .vak{background:var(--card);border:1px solid var(--line);border-radius:var(--rtg-rond,14px);padding:1.1rem 1.15rem;}
+  .vak{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.15rem;}
   .vak > h2{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));
     font-family:'Inter',sans-serif;font-weight:700;margin-bottom:.8rem;}
   .groet{font-size:1.35rem;line-height:1.3;margin-bottom:.35rem;}
   .subtxt{color:var(--soft);font-size:.85rem;line-height:1.5;}
   .ladder{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.9rem;}
-  .stap{font-size:.68rem;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--soft);}
+  .stap{font-size:.68rem;padding:.25rem .55rem;border-radius:0;border:1px solid var(--line);color:var(--soft);}
   .stap.bereikt{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .stap.nu{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:700;}
   .cijfers{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.7rem;}
-  .cijfer{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .cijfer{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;}
   .cijfer .lbl{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
   .cijfer .wrd{font-size:1.4rem;margin-top:.25rem;}
   .cijfer .eh{font-size:.7rem;color:var(--soft);}
@@ -49,16 +49,16 @@
   .actie .kop{font-weight:650;font-size:.95rem;}
   .actie .waarom{color:var(--soft);font-size:.82rem;margin-top:.2rem;line-height:1.5;}
   .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;
-    font-weight:600;border-radius:10px;padding:.5rem .85rem;cursor:pointer;}
+    font-weight:600;border-radius:0;padding:.5rem .85rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   label.veld{display:flex;flex-direction:column;gap:.25rem;font-size:.68rem;letter-spacing:.08em;
     text-transform:uppercase;color:var(--soft);}
   label.veld input,label.veld select,label.veld textarea{background:var(--card2);border:1px solid var(--line);
-    color:var(--txt);font:inherit;font-size:.88rem;border-radius:10px;padding:.5rem .6rem;text-transform:none;letter-spacing:0;}
+    color:var(--txt);font:inherit;font-size:.88rem;border-radius:0;padding:.5rem .6rem;text-transform:none;letter-spacing:0;}
   .raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.7rem;}
-  .bevinding{border-left:3px solid var(--line);padding:.55rem .8rem;margin-top:.6rem;background:var(--card2);border-radius:0 10px 10px 0;}
+  .bevinding{border-left:3px solid var(--line);padding:.55rem .8rem;margin-top:.6rem;background:var(--card2);border-radius:0;}
   .bevinding.blokkerend{border-left-color:var(--burgundy);}
   .bevinding.zwaar{border-left-color:var(--gold);}
   .bevinding .bk{font-weight:650;font-size:.9rem;}
@@ -76,7 +76,7 @@
   table.mnd th:first-child,table.mnd td:first-child{text-align:left;}
   table.mnd th{color:var(--soft);font-weight:600;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 5.5rem);
-    background:var(--card2);border:1px solid var(--gold);color:var(--txt);padding:.6rem 1rem;border-radius:12px;
+    background:var(--card2);border:1px solid var(--gold);color:var(--txt);padding:.6rem 1rem;border-radius:0;
     font-size:.85rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40;max-width:90vw;}
   .stil{color:var(--soft);font-size:.85rem;line-height:1.55;}
   /* Ruimte-klassen in plaats van losse stijl-attributen. Elk stijl-attribuut
@@ -743,7 +743,7 @@ function vakCapaciteit(){
     const p=d.bezetting===null?0:Math.min(100,d.bezetting);
     const kl=d.bezetting!==null&&d.bezetting>=85?'var(--burgundy)':(d.bezetting>=60?'var(--gold)':'var(--line)');
     return '<span title="'+esc(d.datum)+': '+(d.bezetting===null?'-':d.bezetting+'%')+'" style="display:inline-block;width:.7rem;height:'+
-      Math.max(3,Math.round(p*0.28))+'px;background:'+kl+';margin-right:2px;vertical-align:bottom;border-radius:2px;"></span>';
+      Math.max(3,Math.round(p*0.28))+'px;background:'+kl+';margin-right:2px;vertical-align:bottom;border-radius:0;"></span>';
   }).join('');
   return '<div class="vak"><h2>Capaciteit</h2>'+
     '<div class="score"><span class="n groot">'+c.bezetting+'%</span>'+

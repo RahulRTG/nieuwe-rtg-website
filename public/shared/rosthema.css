@@ -23,7 +23,7 @@
 .ros-thema{position:fixed;left:max(14px,env(safe-area-inset-left,0px));z-index:9990;
   bottom:calc(14px + env(safe-area-inset-bottom,0px));
   display:inline-flex;align-items:center;gap:.5rem;
-  padding:.4rem .55rem;border-radius:999px;
+  padding:.4rem .55rem;border-radius:0;
   background:color-mix(in srgb, var(--card,#151312) 82%, transparent);
   border:1px solid var(--line,rgba(255,255,255,.14));
   box-shadow:0 10px 30px rgba(0,0,0,.4);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}

@@ -13,7 +13,7 @@
    Wat hij hier NOOIT doet: iemand uitnodigen, iemand eruit zetten, of een
    bijeenkomst plaatsen. Dat zijn handelingen tussen mensen; de AI schrijft
    hoogstens de woorden. */
-const { tekst } = require('../../ai');
+const { tekst } = require('../../ai-kort');
 const { samenvat: lokaalSamenvatten } = require('../../lib/lokale-taal');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Je helpt bij een besloten ' +

@@ -162,6 +162,7 @@ module.exports = (kern) => {
   require('./techniek/functie')(tctx);
   require('./techniek/boardroom')(tctx);
   require('./techniek/betalingen')(tctx);
+  require('./techniek/aikosten')(tctx);  // de stand van de modelkraan (server/ai-meter.js)
   require('./techniek/beheer')(tctx);
   require('./techniek/wacht')(tctx);
   require('./techniek/papieren')(tctx);

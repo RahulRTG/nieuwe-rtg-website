@@ -163,6 +163,51 @@ function codemasker(bron) {
       while (j < bron.length && bron[j] !== c) { if (bron[j] === '\\') j++; j++; }
       uit(i, j + 1); i = j + 1; continue;
     }
+    /* EN EEN REGEXLITERAL, want die kan een aanhalingsteken bevatten.
+
+       Zonder dit las de masker de apostrof in `/url\\(\\s*(['"]?)...\\)/i` als het
+       begin van een tekenreeks, en gold alles tot het VOLGENDE aanhalingsteken
+       als tekst. In server/middleware/stijlafsplitsing.js sloeg dat 1796 tekens
+       echte code over -- de hele magVerhuizen(), met zijn return true en return
+       false. De motor meldde dan "geen bruikbare mutatie", en dat leest als
+       "hier valt niets te meten" terwijl het "ik kon de code niet zien" was.
+       Over server/ gemeten: 5 modules, 13 mutatieplekken onzichtbaar, waaronder
+       functies/toegang.js.
+
+       WANNEER IS EEN / EEN REGEX EN WANNEER EEN DEELSTREEP. Daar bestaat geen
+       waterdichte regel zonder een echte ontleder, maar wel een die het in
+       gewone code altijd goed heeft: een regex kan alleen staan waar een
+       WAARDE wordt verwacht. Dus kijken we naar het laatste betekenisvolle
+       teken ervoor. Is dat een operator, een haakje-open, een komma of het eind
+       van een sleutelwoord als return, dan begint hier een waarde en dus een
+       regex. Is het een naam, een cijfer of een haakje-dicht, dan stond er iets
+       waar je door KUNT delen. Bij twijfel doen we niets -- dan blijft het
+       gedrag zoals het was. */
+    if (c === '/') {
+      let k = i - 1;
+      while (k >= 0 && /\s/.test(bron[k])) k--;
+      const vorige = k >= 0 ? bron[k] : '';
+      const woord = /[A-Za-z_$]/.test(vorige) ? (bron.slice(0, k + 1).match(/[A-Za-z_$][A-Za-z0-9_$]*$/) || [''])[0] : '';
+      const WAARDEWOORD = /^(return|typeof|instanceof|case|in|of|new|delete|void|do|else|yield|await)$/;
+      const waardePlek = vorige === '' || '(,=:[!&|?{};+-*%~^<>'.includes(vorige) || WAARDEWOORD.test(woord);
+      if (waardePlek) {
+        let j = i + 1, inKlasse = false, gesloten = false;
+        while (j < bron.length) {
+          const t = bron[j];
+          if (t === '\\') { j += 2; continue; }
+          if (t === '\n') break;                 // een regex loopt nooit over een regeleinde
+          if (inKlasse) { if (t === ']') inKlasse = false; j++; continue; }
+          if (t === '[') { inKlasse = true; j++; continue; }
+          if (t === '/') { gesloten = true; break; }
+          j++;
+        }
+        if (gesloten) {
+          let e = j + 1;
+          while (e < bron.length && /[gimsuyd]/.test(bron[e])) e++;
+          uit(i, e); i = e; continue;
+        }
+      }
+    }
     i++;
   }
   return masker;
@@ -733,6 +778,28 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
+
+  /* HET AFBOUWSLOT, EN WAAROM HET HIER ONTBRAK.
+
+     Dit is het meest bronmuterende script in huis: het verandert echte
+     bestanden in server/ en zet ze in een finally terug. Precies waar
+     scripts/afbouw-slot.js voor bedoeld is ("een tijdelijk ijkbestand mag nooit
+     een geldige scan vervuilen") -- maar het slot werd alleen gepakt door
+     test-runner.js, release-gate.js en staging-repetitie.js. Draaide iemand
+     `npm run mutatie` naast `npm test`, dan las de suite gemuteerde bron en
+     zakten er toetsen op code die niemand had geschreven.
+
+     Twee dingen die dit voorkomt, en de tweede is de ergste:
+       1. een andere lezer ziet halverwege een gemuteerd bestand;
+       2. ruimEerderOp() hieronder zet de LEVENDE mutaties van een tweede
+          mutatieronde terug -- die denkt dan dat hij zijn eigen bron muteert
+          terwijl er al iets anders in staat, en de uitslag is onzin.
+
+     Daarom vóór ruimEerderOp(), en binnen require.main: test/mutatiewacht.test.js
+     IMPORTEERT deze module, en een slot dat bij het laden dichtklapt zou die
+     toets het slot laten grijpen zonder ooit iets te muteren. */
+  const geefAfbouwSlotVrij = require('./afbouw-slot').pak('mutatiemotor');
+  void geefAfbouwSlotVrij; // pak() hangt zichzelf al aan exit/SIGINT/SIGTERM
 
   /* EERST OPRUIMEN WAT EEN VORIGE RONDE HEEFT LATEN STAAN, en het HARDOP zeggen.
      Een stille opruiming laat niemand weten dat er iets was blijven liggen, en dan

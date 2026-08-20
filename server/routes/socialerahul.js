@@ -29,7 +29,7 @@
 module.exports = (kern) => {
   const { app, auth, geenGast, anthropic, schoon } = kern;
   /* Zelfde weg als routes/geldrahul.js: laat gelezen, uit ../ai. */
-  const { tekst } = require('../ai');
+  const { tekst } = require('../ai-kort');
 
   /* De bronregels: waarop rust dit antwoord. Ze gaan mee met ELK antwoord, ook
      het vaste demo-antwoord zonder sleutel -- juist daar, want een vast antwoord

@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 126,
-    "keuringOmvang": 159,
+    "keuringOmvang": 161,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -26,13 +26,18 @@
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 155,
-    "toetsenOngevoeligPct": 1.1,
+    "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-19",
+      "meter": "keuringOmvang 159 -> 161; toetsenOngevoeligPct 1.1 -> 1.2 (gemeten NA het samengaan met main)",
+      "reden": "De snelheids- en kostenronde, opnieuw gemeten tegen de basislijn die main na PR 84 heeft neergezet -- niet overgenomen van voor die samenvoeging. Mijn eigen notitie van eerder vandaag stond op de oude basislijn en is daarmee vervallen; dit is de enige die telt.\n\nkeuringOmvang +2, en het zijn precies twee bestanden:\n- server/ai-meter.js op 9.423. Dat is 23 bytes de band in en 817 van de harde grens. Knippen om drieentwintig bytes is een knip om een getal; de naad die er wel was (de rem per aanroeper) is deze ronde al geknipt naar server/ai-rem.js.\n- server/middleware/blokafsplitsing.js op 9.876. Dit bestand IS een ontdubbeling: stijl- en scriptafsplitsing droegen dezelfde machine twee keer (codering, padcontrole, vingerafdruk, cache, brotli/gzip, 400/404). Netto staan er minder bytes dan ervoor. Zijn naad (pagina-kant tegenover uitleverkant) deelt de constanten en de deurcontrole; die uit elkaar trekken zou een machine over drie bestanden verspreiden om een teller te sparen.\n\nWAT IK WEL HEB TERUGGEBRACHT en dus niet ophoog: twee bestanden die door deze ronde de band in groeiden zijn eruit geknipt op een echte naad. middleware/voordeur.js stond op 10.129 bytes (111 onder de harde grens) door de vier nieuwe herschrijflagen; die vijf herschrijvingen staan nu in middleware/herschrijfketen.js, want de VOLGORDE van die keten is dragend en hoort als keten leesbaar te zijn. server/ai.js stond op 9.916; jaNee() en tekst() wonen nu in server/ai-kort.js.\n\ntoetsenOngevoeligPct 1.1 -> 1.2 door precies EEN overlever erbij. Van mijn tien nieuwe toetsbestanden zijn er negen bewezen gevoelig; test/modelkeuze.test.js overleeft, en dat stond in zijn eigen kop al voordat de motor er langs ging: hij bewaakt geen besturingsstroom maar BESTANDSINHOUD -- welke modelnaam in welk bestand staat. Ook de twee nieuwe operatoren van main (getal+1, regex-alternatief-weg) raken geen tekenreeks, dus hij kan nog steeds niet zakken op wat er geprobeerd wordt. Opnieuw nagegaan na de samenvoeging: negentien mutaties, alle negentien overleefd. Met de hand zijn er vier mutaties op gedaan die alle vier raak waren (bijles naar Haiku, gesprek naar Sonnet, agenda stil terug naar Opus, Haiku uit de prijstabel). Grens van het gereedschap, geen slappe toets.\n\nEEN VALKUIL DIE HIER BIJNA EEN VERKEERD GETAL OPLEVERDE, want die hoort opgeschreven. Git voegde MUTATIES.json bij deze samenvoeging TEKSTUEEL samen, en dat gaf een register met 22 overlevers: mijn oudere verdicten wonnen van de nieuwere van main voor elf toetsen die main juist had gerepareerd (bundeldelen, concern, genreregister, genretoegang, loghygiene, merge3.property, stillepost, strenge-poort, txgeld, txindex, txkap). Daar bovenop wint scripts/mutatie.js zijn eigen voortgangsbestand (server/data/mutatie-voortgang.json, buiten de repo) van de vastgelegde uitslag -- \"de tweede wint bij een botsing: die is later\" -- en het mijne droeg diezelfde oude stand, dus een herhaling van de meting zette ze opnieuw terug. Opgelost door het voortgangsbestand weg te gooien, MUTATIES.json van main te nemen en alleen mijn tien toetsen daar bovenop te meten. Uitkomst: 11 overlevers (de 10 van main plus modelkeuze), en geen enkel verdict van main teruggedraaid.\n\nEERLIJKHEIDSHALVE: geen --vastleggen gedraaid. endpointsZonderTest (1191 tegen 1192) en testbestanden (915 tegen 905) staan beter dan hun norm; die winst is deels van main en deels van deze tak, en hem op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
+    },
     {
       "datum": "2026-08-18",
       "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",

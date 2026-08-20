@@ -57,7 +57,7 @@ function maakKijken({ anthropic }) {
     const tekst = String(vraag || '').trim().slice(0, 200) || 'Wat is dit?';
     try {
       const r = await anthropic.messages.create({
-        model: 'claude-opus-4-8', max_tokens: 400, system: OPDRACHT,
+        model: 'claude-sonnet-5', max_tokens: 400, system: OPDRACHT,
         messages: [{ role: 'user', content: [
           { type: 'image', source: { type: 'base64', media_type: beeld.soort, data: beeld.data } },
           { type: 'text', text: tekst }

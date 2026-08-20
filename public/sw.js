@@ -2,7 +2,7 @@
    is en offline opent. API-verkeer gaat altijd naar het netwerk.
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
-const CACHE = 'rtg-app-1967587a';
+const CACHE = 'rtg-app-97a5e1b9';
 const SHELL = ['/apps/app.html', '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -20,14 +20,48 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/')) return;
-  // Iconen en manifests veranderen zelden: die mogen uit de cache komen.
-  const staticAsset = /^\/(icons|manifests)\//.test(url.pathname) || url.pathname === '/icon.svg';
+  /* Draagt het adres de VINGERAFDRUK van het bestand (?v=...), dan mag het uit
+     de cache zonder navragen.
+
+     Dit is precies de uitzondering op de regel hieronder, en hij mag omdat de
+     angst die die regel bewaakt hier niet meer kan uitkomen. Die angst is:
+     nieuwe html naast een oud script, en dat is een zwart scherm. Met een
+     vingerafdruk in het adres verwijst nieuwe html naar een NIEUW adres -- het
+     oude wordt simpelweg niet meer opgevraagd, dus het kan niet meer naast
+     nieuwe html terechtkomen. Zie server/middleware/versieadres.js.
+
+     Wat het scheelt: een herhaalbezoek deed 67 verzoeken (62 daarvan een 304)
+     en duurde 900 ms terwijl er maar 43 KB over de lijn ging. Al die tijd zat
+     in het navragen zelf. */
+  const gestempeld = url.searchParams.has('v');
+  // Iconen en manifests veranderen zelden: die mogen ook uit de cache komen.
+  const staticAsset = gestempeld || /^\/(icons|manifests)\//.test(url.pathname) || url.pathname === '/icon.svg';
   e.respondWith(
     staticAsset
       ? caches.match(e.request).then(hit => hit ||
           fetch(e.request).then(res => {
             const copy = res.clone();
-            caches.open(CACHE).then(c => c.put(e.request, copy));
+            caches.open(CACHE).then(async c => {
+              await c.put(e.request, copy);
+              /* EN DE VORIGE VERSIE ERUIT.
+
+                 Een gestempeld adres verandert bij elke wijziging van het
+                 bestand, dus zonder dit blijft elke oude versie naast de nieuwe
+                 staan. De CACHE-naam ruimt dat niet op: die is een hash van de
+                 SCHIL (zie scripts/build.js), dus een uitrol die alleen
+                 /shared/klok.js aanraakt laat de naam ongemoeid en de oude
+                 klok.js blijft liggen. Over veel uitrollen groeit dat door.
+
+                 Hier hoogstens een per bestand: bij een treffer op hetzelfde
+                 pad met een ANDER stempel gaat de oude weg. Dit kost alleen
+                 werk als er echt iets nieuws gecachet wordt, niet bij een
+                 gewone treffer. */
+              if (!gestempeld) return;
+              for (const oud of await c.keys()) {
+                const u = new URL(oud.url);
+                if (u.pathname === url.pathname && u.search !== url.search) c.delete(oud);
+              }
+            });
             return res;
           }))
       /* "Network-first" is hier niet vanzelf waar. fetch(e.request) mag gewoon

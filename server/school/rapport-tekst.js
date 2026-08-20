@@ -7,7 +7,8 @@
    rapport vast te stellen, en dat vraagt een mens die bevestigt dat hij de
    teksten heeft gelezen. Zonder AI-sleutel komt er geen verzonnen tekst maar
    een feitelijke opzet uit de cijfers zelf. */
-const { maakAI, tekst: aiTekst } = require('../ai');
+const { maakAI } = require('../ai');
+const { tekst: aiTekst } = require('../ai-kort');
 
 module.exports = (sctx) => {
   const { router, save, nu, schoon, K, S, eigenVeld, poort, log, gezinSessie,

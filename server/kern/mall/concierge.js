@@ -132,7 +132,7 @@ module.exports = (ctx) => {
 
     let filters = null, genegeerd = [], gebruikteAI = false;
     if (anthropic) {
-      const { tekst } = require('../../ai');
+      const { tekst } = require('../../ai-kort');
       const rauw = await tekst(anthropic, SYSTEEM, tekstIn, { max: 300 });
       const gelezen = leesJson(rauw);
       if (gelezen) {

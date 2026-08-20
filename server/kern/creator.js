@@ -148,7 +148,7 @@ function maakCreator({ db, save, crypto, anthropic, schoon }) {
       try {
         const { RAHUL_LEAD } = require('./rahul');
         const sys = RAHUL_LEAD + 'je werkt als ervaren content-strateeg en scriptschrijver voor een content creator op RTG. Niche: ' + (c.niche || 'algemeen') + '. Antwoord kort en concreet in het Nederlands. Als om een script wordt gevraagd, lever een kant-en-klaar script met hook, opbouw en call-to-action.';
-        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 700, system: sys, messages: [{ role: 'user', content: opdracht }] });
+        const r = await anthropic.messages.create({ model: 'claude-sonnet-5', max_tokens: 700, system: sys, messages: [{ role: 'user', content: opdracht }] });
         const tekst = (r && r.content && r.content[0] && r.content[0].text || '').trim();
         if (tekst) return { antwoord: tekst };
       } catch (e) { /* val terug op sjablonen */ }

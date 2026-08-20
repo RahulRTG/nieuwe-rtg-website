@@ -12,7 +12,7 @@ module.exports = (fctx) => {
   const { app, accounts, supplierAuth, stuurLus } = fctx;
   const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = fctx.fluister;
   const metKompas = (antwoord) => {
-    const stand = require('../../ai').beschikbaarheid(fctx.anthropic);
+    const stand = require('../../ai-stand').beschikbaarheid(fctx.anthropic);
     return Object.assign(antwoord, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,
       verwerking: stand.verwerking, kompas: stand.kompas });
   };

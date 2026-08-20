@@ -15,6 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const { heeftVinger } = require('./versieadres');
 
 const GZIP_TYPE = {
   '.js': 'application/javascript; charset=utf-8',
@@ -140,7 +141,13 @@ function statischGzip(publicDir) {
        niet genoeg gebleken in de praktijk. */
     const etag = 'W/"' + st.size.toString(16) + '-' + Math.round(st.mtimeMs).toString(16) + (minMtimeMs ? '-m' + Math.round(minMtimeMs).toString(16) : '') + '-' + (br ? 'b' : 'g') + '"';
     res.setHeader('ETag', etag);
-    res.setHeader('Cache-Control', 'no-cache');
+    /* ...TENZIJ het adres de vingerafdruk van het bestand draagt. Dan is
+       navragen zinloos: hetzelfde adres is per definitie dezelfde inhoud, en
+       verandert het bestand dan verwijst de nieuwe html naar een NIEUW adres.
+       Precies het bezwaar hierboven -- oud script naast nieuwe html -- kan dan
+       niet meer uitkomen. Zie ./versieadres.js; dat scheelt bij een
+       herhaalbezoek zevenenzestig keer navragen. */
+    res.setHeader('Cache-Control', heeftVinger(req) ? 'public, max-age=31536000, immutable' : 'no-cache');
     if (req.headers['if-none-match'] === etag) { res.statusCode = 304; return res.end(); }
     res.setHeader('Content-Type', type);
     res.setHeader('Content-Encoding', br ? 'br' : 'gzip');

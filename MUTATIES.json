@@ -107,12 +107,28 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "ai-budget.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-budget.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "ai-cache.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/anthropic.js",
       "operator": "===->!==",
       "gezakt": 1
+    },
+    "ai-meter.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-meter.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "ai-oproepen.test.js": {
       "soort": "puur",
@@ -136,6 +152,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "ai-rem.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/ai-rem.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "ai-uitwijk.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -148,6 +172,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "aikosten-route.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "aipoort.test.js": {
@@ -635,6 +666,14 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "blokafsplitsing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/blokafsplitsing.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 12
     },
     "boardroom-poort.test.js": {
       "soort": "server",
@@ -2620,6 +2659,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "lokale-ai-poort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/local-ai.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "lokale-taal.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3125,6 +3172,15 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "modelkeuze.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/ai-meter.js"
+      ],
+      "geprobeerd": 19,
+      "posities": 8
     },
     "moedertaal.test.js": {
       "soort": "server",
@@ -4956,6 +5012,14 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "scriptafsplitsing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/scriptafsplitsing.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "scriptbundel.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -5473,6 +5537,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "stijlafsplitsing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/stijlafsplitsing.js",
+      "operator": "true->false#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "stijlbundel.test.js": {
       "soort": "puur",
@@ -5997,6 +6069,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/verraadtelling.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "versieadres.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/versieadres.js",
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1

@@ -22,7 +22,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
     (kern.gemeente && kern.gemeente.magBehandelen && kern.gemeente.magBehandelen(s)));
   const wereld = isAmbt ? 'supplier' : (req.actor && req.actor.staffId != null ? 'staff' : 'supplier');
   const A = (reply, did, extra) => {
-    const stand = require('../../../ai').beschikbaarheid(kern.anthropic);
+    const stand = require('../../../ai-stand').beschikbaarheid(kern.anthropic);
     const antwoord = Object.assign({ reply, did: !!did,
       aiBeschikbaar: stand.beschikbaar,
       modus: stand.beschikbaar ? stand.modus : 'workflow',

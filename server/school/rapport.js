@@ -14,7 +14,8 @@
    zonder AI-sleutel komt er geen verzonnen tekst maar een feitelijke opzet uit
    de cijfers zelf. Zo staat er nooit iets in het rapport van een kind wat
    niemand heeft nagekeken. */
-const { maakAI, tekst: aiTekst } = require('../ai');
+const { maakAI } = require('../ai');
+const { tekst: aiTekst } = require('../ai-kort');
 
 module.exports = (sctx) => {
   const { router, save, rid, nu, schoon, K, eigenVeld, poort, log, gezinSessie, gemiddelde } = sctx;

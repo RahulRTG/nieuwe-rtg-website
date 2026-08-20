@@ -11,7 +11,7 @@
 
    Wat hier bewust NIET zit: een motor die de feed rangschikt op wat jou
    vasthoudt. Dat is precies het patroon dat de huisregels verbieden. */
-const { tekst } = require('../../ai');
+const { tekst } = require('../../ai-kort');
 const { reactiesSamenvatting } = require('../../lib/lokale-taal');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Schrijf rustig, ' +

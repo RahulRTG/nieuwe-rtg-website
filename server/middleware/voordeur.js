@@ -18,9 +18,10 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
-const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
-const { herschrijfHtml: scriptbundelHtml } = require('./scriptbundel');
 const { CSP, magnaatHtml, STIJLSTEMPEL } = require('./csp');
+/* De vijf herschrijvingen en hun volgorde staan apart; die volgorde is dragend
+   en hoort als keten leesbaar te zijn. Zie ./herschrijfketen.js. */
+const { herschrijfPagina } = require('./herschrijfketen');
 
 /* Een verzoek intern doorverwijzen naar een ander pad.
 
@@ -89,16 +90,7 @@ function cspNonce(publicDir, aan) {
       if (paginaHaak) { try { paginaHaak(rel, req); } catch (e) {} }
       const nonce = crypto.randomBytes(16).toString('base64');
       const magnaat = req.query && String(req.query.magnaat || '') === '1' && rel.startsWith('/apps/');
-      html = magnaatHtml(html, magnaat);
-      /* Een rij opeenvolgende stijlbladen wordt EEN verwijzing. Dit gaat voor de
-         stempels uit: wat hier verdwijnt hoeft geen nonce meer. Zie
-         ./stijlbundel.js voor wat er wel en niet in mag. */
-      html = stijlbundelHtml(html);
-      /* En hetzelfde voor een rij UITGESTELDE scripts. Dat mocht lang niet,
-         omdat een fout in het ene script het volgende zou meeslepen; in de
-         bundel krijgt elk bestand daarom zijn eigen try/catch, waarmee dat
-         verschil weg is. Zie ./scriptbundel.js. */
-      html = scriptbundelHtml(html);
+      html = herschrijfPagina(html, rel, publicDir, magnaat);
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       // dezelfde behandeling voor de stijlblokken: sinds style-src een nonce
       // draagt, komt een ongestempeld blok er niet meer doorheen
@@ -113,11 +105,34 @@ function cspNonce(publicDir, aan) {
         : stempel + html;
       res.set('Content-Security-Policy', CSP(nonce, magnaat));
       res.type('html');
-      // ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag mobiel)
+      /* Ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag
+         mobiel).
+
+         WAAROM DIT DE ASYNCHRONE gzip IS EN NIET gzipSync. Dit is de enige
+         compressie in huis die PER VERZOEK gebeurt: een pagina draagt een eigen
+         nonce, dus het antwoord is elke keer anders en er valt niets te cachen
+         (statische bestanden gaan een keer door de compressor en daarna uit de
+         cache, zie ./compressie.js -- daar is sync juist prima).
+
+         gzipSync legt de event loop stil voor de duur van de compressie. Deze
+         server is er maar EEN: het failover-trio houdt er twee op standby en
+         db.writable laat maar een proces schrijven, dus die ene event loop is
+         het hele huis. De asynchrone gzip doet hetzelfde werk op de
+         libuv-threadpool en dus op de andere kernen.
+
+         Gemeten, 200 verzoeken van 93 KB op vier kernen:
+           gzipSync   475 ms   2,37 ms per verzoek, event loop geblokkeerd
+           gzip       271 ms   1,36 ms per verzoek, op de threadpool
+         Dat is 1,75x, zonder ook maar iets aan de opslag te veranderen. */
       if (html.length > 2048 && /\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) {
-        res.setHeader('Content-Encoding', 'gzip');
-        res.setHeader('Vary', 'Accept-Encoding');
-        return res.send(zlib.gzipSync(Buffer.from(html), { level: 6 }));
+        return zlib.gzip(Buffer.from(html), { level: 6 }, (gzFout, gz) => {
+          // gaat het comprimeren mis, dan gaat de pagina onverpakt de deur uit:
+          // trager, maar nooit een leeg scherm
+          if (gzFout || !gz) return res.send(html);
+          res.setHeader('Content-Encoding', 'gzip');
+          res.setHeader('Vary', 'Accept-Encoding');
+          res.send(gz);
+        });
       }
       res.send(html);
     });

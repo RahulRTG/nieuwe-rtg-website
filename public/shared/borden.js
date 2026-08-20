@@ -115,6 +115,7 @@
       bind(b);
     }
 
+/* de knoppen op een bord binden */
     function bind(b){
       el.querySelectorAll('[data-open]').forEach(x => x.addEventListener('click', () => { open = x.dataset.open; render(); }));
       const nieuw = el.querySelector('[data-nieuw]');

@@ -1,3 +1,4 @@
+/* doorverwijzen naar een andere dienst */
     if (z.verwijsDoelen && z.verwijsDoelen.length) {
       $('#kVerwijs').hidden = false;
       $('#vNaar').innerHTML = z.verwijsDoelen.map(v => '<option value="' + v.code + '">' + esc(v.naam) + ' (' + esc(v.soort) + ')</option>').join('');

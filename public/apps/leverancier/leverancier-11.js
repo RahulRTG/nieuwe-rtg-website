@@ -1,3 +1,4 @@
+/* de keukenhulp: live advies van het model of de regelcoach */
     el.innerHTML = html;
     bindStation(el);
   }

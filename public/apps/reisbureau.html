@@ -65,7 +65,7 @@
 <main id="main">
   <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Reizen die wij voor je samenstellen, tegen de nettoprijs zonder opslag. Je vraagt een reis aan; een RTG-reisadviseur bevestigt de datum en regelt de rest.</p>
   <div style="display:flex;gap:.5rem;margin:1rem 0 .3rem;max-width:560px;">
-    <input class="veld" id="adviesIn" style="flex:1;" maxlength="200" placeholder="Waar heb je zin in? Bijv. zon, strand, rust" aria-label="Waar heb je zin in">
+    <input class="veld h-flex1" id="adviesIn" maxlength="200" placeholder="Waar heb je zin in? Bijv. zon, strand, rust" aria-label="Waar heb je zin in">
     <button class="knop" id="adviesGo" type="button" style="width:auto;margin:0;padding:.55rem 1rem;">Adviseer</button>
   </div>
   <div id="adviesUit" style="font-size:.86rem;color:var(--muted);margin-bottom:.4rem;"></div>
@@ -89,7 +89,7 @@
       <div><div class="lbl">Voorkeursdatum</div><input class="veld" id="rDatum" type="date"></div>
       <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
     </div>
-    <div style="margin-top:.8rem;"><div class="lbl">Wensen (optioneel)</div><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
+    <div class="h-mt80"><div class="lbl">Wensen (optioneel)</div><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
     <div id="rTotaal" style="margin-top:.8rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums;"></div>
     <button class="knop" id="rBoek">Reis aanvragen</button>
   </div>
@@ -116,7 +116,7 @@ const api = (pad, body, herkans) => fetch(pad, {
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het reisbureau is er voor leden. Open de app en log in met je RTG-account.</p>'+
-    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+    '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
 let ALLE = [], AANTAL = 2, HUIDIG = null;

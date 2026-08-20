@@ -580,6 +580,23 @@ function meet(bronnen) {
   })(PUB);
   const inlineStijlAttributen = telInlineStijl(p => fs.readFileSync(p, 'utf8'), stijlBestanden);
 
+  /* De kruisproef op de commentaar-verwijderaar, uit dezelfde bron als de toets
+     die hem bewaakt (regel 4: geen tweede implementatie). Faalt hij, dan zakt de
+     meter in plaats van stil nul te geven -- juist bij een meter die over
+     blindheid gaat is een stille nul de ergste uitkomst. */
+  let bronBlindeBestanden;
+  try { bronBlindeBestanden = require('./lib/bronblind').meetBlind({ wortel: WORTEL }).ongedekt; }
+  catch (e) { throw new Error('de kruisproef op de commentaar-verwijderaar kon niet draaien (' + e.message + '); een meter zonder invoer is geen meter'); }
+
+  /* De delen zonder onderwerpregel, uit dezelfde bron als BUNDELS.md zelf
+     (regel 4: geen tweede implementatie). */
+  let delenZonderOnderwerp;
+  try {
+    const { delenVan } = require('./deelindex');
+    delenZonderOnderwerp = Object.values(require('./bundel').bundels)
+      .reduce((som, map) => som + delenVan(map).filter(d => !d.onderwerp).length, 0);
+  } catch (e) { throw new Error('de bundeldelen konden niet worden gelezen (' + e.message + '); een meter zonder invoer is geen meter'); }
+
   /* De grenzen uit dezelfde bron als het losse script (regel 4: geen tweede
      implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
   let grenzen;

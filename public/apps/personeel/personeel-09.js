@@ -1,3 +1,4 @@
+/* de gereedschappen op een bord tekenen */
     const regel = (icoon, links, rechts, rood) => '<div style="display:flex;justify-content:space-between;gap:0.5rem;font-size:0.8rem;margin-top:0.3rem;"><span>'+(icoon?icoon+' ':'')+links+'</span>'+(rechts?'<b style="color:'+(rood?'#FF8589':'var(--gold)')+';white-space:nowrap;">'+rechts+'</b>':'')+'</div>';
     return t.tools.map(w => {
       if (w.type === 'cijfers') return kop(w.titel)+regel('', w.items.map(i => esc(i.label)+' <b>'+esc(String(i.waarde))+'</b>').join(' · '), '');

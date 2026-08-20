@@ -1,3 +1,4 @@
+/* de demomelding: een demo is een toestand, geen terugval na een storing */
   const explicieteDemo = magnaatProef || zoekParams.get('demo') === '1';
 
   /* Een demo is een toestand, geen terugval na een storing. De melding stond

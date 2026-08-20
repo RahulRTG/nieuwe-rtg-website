@@ -378,7 +378,38 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
+    /* EERST BEWIJZEN DAT HET PANEEL VAN DEZE KLIK OPEN IS, en pas dan typen.
+
+       Wachten op '#osZoekScrim.open' is niet genoeg, en dat is de kern. Die
+       klasse staat op een BLIJVEND element: is het paneel eerder in deze suite
+       al eens open geweest, dan kan de wachtregel de OUDE .open zien en
+       doorlopen voordat de klik van hierboven is afgehandeld. Daarna wist
+       openZoek() alsnog het veld -- die functie doet letterlijk
+       `zoekInput.value = ''; zoek(); zoekInput.focus();` (app-main.js) -- en dan
+       is wat page.fill() net had ingetypt weg, blijft de lijst leeg, en komt de
+       rij nooit meer, want er vuurt geen input-event meer.
+
+       De focus is het EINDE van openZoek(), dus een gefocust en leeg veld is het
+       bewijs dat die functie voor DEZE klik helemaal klaar is. Dat is wat hier
+       wordt afgewacht.
+
+       EERLIJK ERBIJ: dit is niet lokaal nagespeeld. Wat wel vaststaat komt uit
+       de CI-uitslag van 20 augustus, en die werd leesbaar doordat hier al een
+       waitForFunction stond: de toets zakte niet meer op een TypeError maar op
+       "Timeout 10000ms exceeded" -- de rij bleef dus TIEN SECONDEN weg. Daarmee
+       viel de vorige verklaring (de lijst is nog niet getekend) definitief af:
+       zoek() is een gewone synchrone input-listener. Een leeggemaakt veld is de
+       enige gevonden route waarlangs die rij lang wegblijft. Blijft hij ook
+       hierna zakken, dan is deze verklaring ook fout en moet de volgende stap
+       zijn: bij een storing de staat van het paneel afdrukken (waarde van het
+       veld, aantal knoppen, welke scrims open staan). */
+    await page.waitForFunction(() => {
+      const i = document.querySelector('#osZoekInput');
+      return !!i && document.activeElement === i && i.value === '';
+    }, null, { timeout: 10000 });
     await page.fill('#osZoekInput', 'iets vragen');
+    await page.waitForFunction(() => [...document.querySelectorAll('#osZoekLijst button')]
+      .some((x) => /Laat Rahul dit doen/i.test(x.textContent)), null, { timeout: 10000 });
     await page.evaluate(() => {
       const b = [...document.querySelectorAll('#osZoekLijst button')]
         .find((x) => /Laat Rahul dit doen/i.test(x.textContent));

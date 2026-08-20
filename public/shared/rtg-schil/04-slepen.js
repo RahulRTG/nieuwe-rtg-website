@@ -1,4 +1,4 @@
-  /* --------------------------------------------------------- verplaatsen -- */
+/* verplaatsen: een surface aan zijn gouden greep verslepen */
   function sleep(s, ev) {
     var m = meet();
     var start = s.el.getBoundingClientRect();

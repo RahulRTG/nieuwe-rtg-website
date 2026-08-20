@@ -1,3 +1,4 @@
+/* een verblijf tonen: foto's en kamers */
     if (s.photos && s.photos.length)
       head += '<div class="ms-photos">' + s.photos.map(p => '<img src="' + p + '" alt="">').join('') + '</div>';
     if (s.rooms && s.rooms.length){
@@ -15,7 +16,7 @@
         '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote2','Tegen nettoprijs; het huis bevestigt uw verblijf en de rekening loopt op de kamer.') + '</div>' +
         // keyless: tijdens een ingecheckt verblijf is de telefoon de sleutel
         '<div style="display:flex;gap:0.5rem;padding-bottom:0.8rem;">' +
-        '<button class="vbtn" id="vbDeurKamer" style="flex:1;">' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
+        '<button class="vbtn h-flex1" id="vbDeurKamer">' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
         '<button class="vbtn" id="vbDeurEntree" style="flex:1;background:var(--card);color:var(--txt);border:1px solid var(--line);">' + T('vb.deurentree','Open de entree') + '</button></div>';
     }
     const funcs = APPLY_FUNCS[s.type] || [];

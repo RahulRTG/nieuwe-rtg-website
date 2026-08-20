@@ -1,3 +1,4 @@
+/* de algemene pin: zetten of vragen */
     API.call('/pin/status', {}).then(st => {
       const zetten = !st.gezet;
       belTitel.textContent = zetten ? T('pin.zet', 'Kies uw algemene pin') : T('pin.vraag', 'Algemene pin');

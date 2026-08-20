@@ -1,3 +1,4 @@
+/* een auto kopen of inruilen, met een bod */
     el.querySelectorAll('.js-vkkoop').forEach(b => b.addEventListener('click', async () => {
       const bod = prompt(T('vk.bodvraag','Uw bod in € (leeg = vraagprijs):'), b.dataset.prijs);
       if (bod === null) return;
@@ -23,7 +24,7 @@
       h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">' +
         '<b>' + escT(g.naam) + '</b><span class="sub"> · ' + escT(g.city||'') + '</span>' +
         g.producten.slice(0,50).map(p => '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-top:1px solid var(--line);">' +
-          '<div style="flex:1;"><span style="font-size:0.85rem;">' + escT(p.naam) + '</span><span class="sub"> · € ' + p.prijs + '/' + escT(p.eenheid) + '</span></div>' +
+          '<div class="h-flex1"><span style="font-size:0.85rem;">' + escT(p.naam) + '</span><span class="sub"> · € ' + p.prijs + '/' + escT(p.eenheid) + '</span></div>' +
           '<input class="js-boq" data-code="' + g.code + '" data-pid="' + p.id + '" type="number" min="0" placeholder="0" aria-label="' + T('bo.aantal','Aantal') + '" style="width:3.6rem;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0.35rem;color:var(--txt);font-family:inherit;"></div>').join('') +
         '<button class="js-bobestel" data-code="' + g.code + '" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:10px;padding:0.55rem;font-weight:600;font-family:inherit;cursor:pointer;">' + T('bo.bestel','Bezorgen') + '</button></div>';
     }
@@ -70,7 +71,7 @@
     if (bzZaak) return renderBzZaak();
     if (!bzPartners.length){
       el.innerHTML = '<div class="card"><div style="font-size:0.85rem;color:var(--muted);">'+T('bz.geen','Nog geen partners met een bezorgdienst op uw bestemming. Zodra een zaak de dienst opent, staat hij hier.')+'</div>'+
-        '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek waar ik hier iets kan bestellen en laten bezorgen, en regel het" style="margin-top:0.6rem;">'+T('bz.geendoe','Laat Rahul iets bestellen')+'</button></div>';
+        '<button class="rahul-leeg-knop h-mt60" data-rahul-leeg="Zoek waar ik hier iets kan bestellen en laten bezorgen, en regel het">'+T('bz.geendoe','Laat Rahul iets bestellen')+'</button></div>';
       return;
     }
     el.innerHTML = bzPartners.map(p =>

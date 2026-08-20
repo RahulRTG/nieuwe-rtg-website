@@ -90,7 +90,7 @@
       '<input id="lbAiIn" placeholder="Bijv. wat staat er dit kwartaal op de planning?" ' +
         'aria-label="Uw vraag aan de vlootbeheerder" autocomplete="off">' +
       '<button class="knop hoofd" type="submit">Vraag</button></form>' +
-      '<div id="lbAiUit" class="stil" style="margin-top:.6rem;" aria-live="polite"></div></div>';
+      '<div id="lbAiUit" class="stil h-mt60" aria-live="polite"></div></div>';
     $('#lbVak').innerHTML = h;
   }
 

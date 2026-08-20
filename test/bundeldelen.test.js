@@ -92,3 +92,34 @@ test('elke bundel in de lijst heeft delen, en elke delenmap een bundel', () => {
     assert.ok(bundel(uit).length > 0, uit + ' is niet leeg');
   }
 });
+
+/* DE BOUW SCHRIJFT ALLEEN WAT VERANDERD IS, EN DAAR LEUNT CI OP.
+
+   schrijfBundels() vergelijkt eerst en schrijft pas daarna. Dat lijkt een
+   snelheidsdetail maar het is de reden dat `npm run build` gevolgd door
+   `git diff --exit-code` iets betekent: zou de bouw altijd schrijven, dan
+   veranderde alleen de mtime en niet de inhoud -- en dan zegt een schone diff
+   nog steeds niets over de vraag of de delen en de bundel gelijk liepen.
+
+   De mutatiemotor liet deze toets als "overleefd" staan, en dit is wat er
+   ontbrak: de wacht vóór het schrijven werd nergens afgedwongen. */
+test('een tweede bouw schrijft niets: de wacht vóór het schrijven doet zijn werk', () => {
+  const { schrijfBundels } = require('../scripts/bundel');
+  /* De boom staat gelijk (de toets hierboven eist dat al), dus de EERSTE aanroep
+     hoort al niets te schrijven. Twee keer, zodat een verschil tussen "de eerste
+     ruimt op" en "hij schrijft altijd" ook zichtbaar is. */
+  assert.deepEqual(schrijfBundels(), [], 'met gelijke delen en bundels wordt er niets herschreven');
+  assert.deepEqual(schrijfBundels(), [], 'en een tweede keer al helemaal niet');
+});
+
+test('DE TEGENPROEF: wijkt een bundel af, dan schrijft hij hem WEL', () => {
+  const { schrijfBundels } = require('../scripts/bundel');
+  const naam = Object.keys(bundels)[0];
+  const pad = path.join(PUB, naam);
+  const echt = fs.readFileSync(pad);
+  try {
+    fs.writeFileSync(pad, Buffer.concat([echt, Buffer.from('\n/* scheef */\n')]));
+    assert.deepEqual(schrijfBundels(), [naam], 'de afwijkende bundel wordt herschreven, en alleen die');
+    assert.ok(fs.readFileSync(pad).equals(echt), 'en hij staat weer gelijk aan zijn delen');
+  } finally { fs.writeFileSync(pad, echt); }
+});

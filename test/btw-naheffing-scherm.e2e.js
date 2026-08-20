@@ -14,7 +14,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, stopNet, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -67,9 +67,20 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
     assert.equal(rek.status, 200, 'de zakelijke rekening is open');
     const iban = rek.body.rekening.iban;
 
-    await wacht(1500);
-    stop(srv.child);
-    await wacht(2500);
+    /* NET STOPPEN, EN NIET DOODSCHIETEN. Hier stond stop(), en dat is SIGKILL --
+       een stroomstoring. De helper zegt het zelf bij stopNet(): "de server
+       krijgt geen kans zijn write-behind te spoelen". Daarna las deze toets
+       db.json van schijf en verwachtte de factuur die hij net had gemaakt.
+
+       Op een rustige machine was die toevallig al gespoeld binnen de 1500 ms
+       ervoor; op een volle CI-runner niet, en dan is db.facturen undefined en
+       zakt de toets op "Cannot read properties of undefined (reading '0')".
+       Dat leest als een kapotte factuurketen terwijl er niets mis is.
+
+       stopNet() stuurt SIGTERM en WACHT tot het proces echt weg is -- een
+       deploy in plaats van een stroomstoring. Dat is ook wat deze toets bedoelt:
+       hij zet opzet klaar en herstart daarna, hij beproeft geen crash. */
+    await stopNet(srv.child);
     const pad = path.join(TMP, 'db.json');
     const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
     db.facturen[0].datum = K.datum;

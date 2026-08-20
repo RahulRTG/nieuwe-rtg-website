@@ -93,7 +93,7 @@
             '<input class="veld" id="mFunctie" placeholder="Functie" maxlength="60" aria-label="Functie">' +
             '<button class="knop" type="button" id="mErbij">Erbij</button>' +
           '</div>' +
-          '<p class="leeg" style="margin-top:.6rem;">De bezetting draait op codenamen; de echte naam blijft in de kluis.</p>' +
+          '<p class="leeg h-mt60">De bezetting draait op codenamen; de echte naam blijft in de kluis.</p>' +
         '</div>' +
         '<div class="vak"><h3>Taken van dit huis</h3><div id="taken"></div>' +
           '<div class="rij">' +

@@ -1,3 +1,4 @@
+/* de aandelen in een deal, en wie akkoord is */
             const mij = d.aandelen.find(a => a.code === mijnCode) || {};
             return '<div class="st-row"><span><b>'+esc(d.naam)+'</b> · '+eur(d.prijsCenten)+
               '<span class="sub">'+d.aandelen.map(a => esc(a.naam)+' '+eur(a.centen)+(a.akkoord?' ✓':' …')).join(' + ')+

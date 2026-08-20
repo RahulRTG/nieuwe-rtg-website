@@ -1,7 +1,8 @@
+/* de zakelijke lade voor Business en Lifestyle */
     if (user && (user.tier === 'business' || user.tier === 'lifestyle')){
       zakL.style.display = 'block';
       zakL.innerHTML = '<button id="zakOpenBtn" style="display:flex;align-items:center;gap:0.7rem;width:100%;text-align:left;background:none;border:1px solid var(--gold);border-radius:14px;padding:0.75rem 1rem;margin-bottom:0.8rem;color:var(--txt);font-family:inherit;cursor:pointer;">' +
-        '<span style="font-size:1.2rem;"></span><span style="flex:1;"><b style="font-size:0.85rem;">' + T('zak.h','RTG Zakelijk') + '</b>' +
+        '<span style="font-size:1.2rem;"></span><span class="h-flex1"><b style="font-size:0.85rem;">' + T('zak.h','RTG Zakelijk') + '</b>' +
         '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('zak.launch','Uw professionele netwerk: profiel, gids, feed en aanbevelingen.') + '</span></span>' +
         '<span style="color:var(--gold);">›</span></button>';
       $('#zakOpenBtn').addEventListener('click', zakOpen);
@@ -50,7 +51,7 @@
           p.poll.opties.map((o, i) => {
             const pct = p.poll.totaal ? Math.round(o.stemmen / p.poll.totaal * 100) : 0;
             return p.poll.gestemd
-              ? '<div style="margin-top:0.45rem;"><div style="display:flex;justify-content:space-between;font-size:0.76rem;"><span>' + (o.mijn ? '✓ ' : '') + o.tekst + '</span><span style="color:var(--soft);">' + pct + '%</span></div>' +
+              ? '<div class="h-mt45"><div style="display:flex;justify-content:space-between;font-size:0.76rem;"><span>' + (o.mijn ? '✓ ' : '') + o.tekst + '</span><span style="color:var(--soft);">' + pct + '%</span></div>' +
                 '<div style="height:4px;border-radius:99px;background:rgba(255,255,255,0.08);margin-top:0.25rem;overflow:hidden;"><i style="display:block;height:100%;width:' + pct + '%;background:' + (o.mijn ? 'var(--gold)' : 'var(--soft)') + ';border-radius:99px;"></i></div></div>'
               : '<button class="js-stem" data-optie="' + i + '" style="display:block;width:100%;margin-top:0.45rem;background:none;border:1px solid var(--line);border-radius:10px;padding:0.5rem 0.7rem;color:var(--txt);font-size:0.78rem;font-family:inherit;text-align:left;cursor:pointer;">' + o.tekst + '</button>';
           }).join('') + '</div>'

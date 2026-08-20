@@ -1,3 +1,4 @@
+/* van taal wisselen: alles opnieuw ophalen */
     const tab = active ? active.tab : 'home';
     // inhoud opnieuw ophalen in de nieuwe taal (facturen, reis, menu's)
     if (API.live){ try { applyState((await API.call('/state')).state); } catch (e) {} }

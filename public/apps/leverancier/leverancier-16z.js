@@ -1,3 +1,4 @@
+/* hr-plus: inwerken, groeigesprekken, certificaten en dienstjaren */
     if (kantoorSec === 'hr'){
       // hr-plus (los script leverancier-hr.js): inwerktrajecten,
       // groeigesprekken, certificaten & bevoegdheden en dienstjaren;

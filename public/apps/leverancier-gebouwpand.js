@@ -23,17 +23,17 @@
 
     function teken(p) {
       var vandaag = new Date().toISOString().slice(0, 10);
-      var h = '<div class="st-sec" style="margin-top:1.2rem;">' + T('gp.kop', 'Het hele pand') + '</div>';
+      var h = '<div class="st-sec h-mt120">' + T('gp.kop', 'Het hele pand') + '</div>';
       if ((p.signalen || []).length) {
         h += '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.6rem 0.8rem;">' +
           p.signalen.map(function (s) { return '<div class="sub" style="padding:0.15rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') + '</div>';
       }
 
-      h += '<div class="st-sec" style="margin-top:0.9rem;">' + T('gp.inst', 'Installaties en keuringen') + '</div>' +
-        '<div class="row-gap"><select id="gpISoort" ' + IN + ' style="flex:1;">' +
+      h += '<div class="st-sec h-mt90">' + T('gp.inst', 'Installaties en keuringen') + '</div>' +
+        '<div class="row-gap"><select class="h-flex1" id="gpISoort" ' + IN + '>' +
         (p.soorten || []).map(function (s) { return '<option value="' + s + '">' + (NAAM_INST[s] || s) + '</option>'; }).join('') + '</select>' +
         '<input id="gpINaam" ' + IN + ' placeholder="' + T('gp.i.naam', 'Naam (bijv. Lift A)') + '" maxlength="60" style="flex:2;">' +
-        '<input id="gpIDatum" ' + IN + ' type="date" style="flex:1;">' +
+        '<input class="h-flex1" id="gpIDatum" ' + IN + ' type="date">' +
         '<button id="gpINieuw" style="' + GOUD + 'flex:1;">' + T('gp.i.leg', 'Leg vast') + '</button></div>';
       h += (p.installaties || []).map(function (i) {
         var te = i.keuringTot < vandaag;
@@ -43,7 +43,7 @@
           '<button data-gpkeur="' + i.id + '" style="' + STIL + '">' + T('gp.i.herkeur', 'Herkeurd') + '</button></div>';
       }).join('') || '<p class="sub">' + T('gp.i.geen', 'Nog geen installaties vastgelegd.') + '</p>';
 
-      h += '<div class="st-sec" style="margin-top:1rem;">' + T('gp.post', 'Mailroom') + '</div>' +
+      h += '<div class="st-sec h-mt100">' + T('gp.post', 'Mailroom') + '</div>' +
         '<div class="row-gap"><input id="gpPVoor" ' + IN + ' placeholder="' + T('gp.p.voor', 'Voor welke huurder') + '" maxlength="60" style="flex:2;">' +
         '<input id="gpPWat" ' + IN + ' placeholder="' + T('gp.p.wat', 'Wat (pakket, aangetekend...)') + '" maxlength="80" style="flex:2;">' +
         '<button id="gpPNieuw" style="' + GOUD + 'flex:1;">' + T('gp.p.aan', 'Neem aan') + '</button></div>';
@@ -53,8 +53,8 @@
           '<button data-gppost="' + x.id + '" style="' + STIL + '">' + T('gp.p.klaar', 'Opgehaald') + '</button></div>';
       }).join('') || '<p class="sub">' + T('gp.p.geen', 'De mailroom is leeg.') + '</p>';
 
-      h += '<div class="st-sec" style="margin-top:1rem;">' + T('gp.park', 'Parkeren') + '</div>' +
-        '<div class="row-gap"><input id="gpKPlek" ' + IN + ' placeholder="P1-04" maxlength="12" style="flex:1;">' +
+      h += '<div class="st-sec h-mt100">' + T('gp.park', 'Parkeren') + '</div>' +
+        '<div class="row-gap"><input class="h-flex1" id="gpKPlek" ' + IN + ' placeholder="P1-04" maxlength="12">' +
         '<input id="gpKWie" ' + IN + ' placeholder="' + T('gp.k.wie', 'Huurder (leeg = vrij)') + '" maxlength="60" style="flex:2;">' +
         '<button id="gpKZet" style="' + GOUD + 'flex:1;">' + T('gp.k.zet', 'Wijs toe') + '</button></div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">' +
@@ -62,9 +62,9 @@
           return '<span title="' + esc(x.huurder || T('gp.k.vrij', 'vrij')) + '" style="border:1px solid ' + (x.huurder ? 'var(--burgundy,#7F1634)' : 'var(--line)') + ';border-radius:8px;padding:0.25rem 0.55rem;font-size:0.72rem;color:' + (x.huurder ? 'inherit' : 'var(--soft)') + ';">' + esc(x.plek) + '</span>';
         }).join('') + '</div>';
 
-      h += '<div class="st-sec" style="margin-top:1rem;">' + T('gp.bhv', 'BHV en ontruiming') + '</div>' +
-        '<div class="row-gap"><input id="gpBDag" ' + IN + ' type="date" style="flex:1;">' +
-        '<input id="gpBOp" ' + IN + ' type="number" min="0" max="100" placeholder="' + T('gp.b.op', 'Opkomst %') + '" style="flex:1;">' +
+      h += '<div class="st-sec h-mt100">' + T('gp.bhv', 'BHV en ontruiming') + '</div>' +
+        '<div class="row-gap"><input class="h-flex1" id="gpBDag" ' + IN + ' type="date">' +
+        '<input class="h-flex1" id="gpBOp" ' + IN + ' type="number" min="0" max="100" placeholder="' + T('gp.b.op', 'Opkomst %') + '">' +
         '<input id="gpBPunt" ' + IN + ' placeholder="' + T('gp.b.punt', 'Verbeterpunten') + '" maxlength="300" style="flex:3;">' +
         '<button id="gpBLeg" style="' + GOUD + 'flex:1;">' + T('gp.b.leg', 'Leg vast') + '</button></div>';
       h += (p.bhv || []).slice(0, 5).map(function (o) {

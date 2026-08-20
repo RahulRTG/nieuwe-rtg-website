@@ -191,7 +191,7 @@ function toonOpgaven(){
   if(!opgaven.length){ box.innerHTML='<div class="mini">Nog geen opgaven. De begeleider zet ze hier klaar.</div>'; return; }
   box.innerHTML = opgaven.slice().reverse().map(o=>
     '<div class="kaart item" data-o="'+esc(o.id)+'"><h4>Opgave</h4><div>'+esc(o.tekst)+'</div>'+
-    (o.klaar?'<div class="klaar">✓ Ingeleverd</div>':'<button class="knop klein groen" data-open="'+esc(o.id)+'" style="margin-top:.5rem;">Maken & inleveren</button>')+
+    (o.klaar?'<div class="klaar">✓ Ingeleverd</div>':'<button class="knop klein groen h-mt50" data-open="'+esc(o.id)+'">Maken & inleveren</button>')+
     '<div class="opgave-open" id="op-'+esc(o.id)+'" style="display:none;"><textarea class="veld" placeholder="Typ hier je antwoord…"></textarea><button class="knop klein" data-lever="'+esc(o.id)+'">Inleveren</button></div></div>'
   ).join('');
   box.querySelectorAll('[data-open]').forEach(b=> b.addEventListener('click', ()=>{ $('#op-'+b.dataset.open).style.display='block'; b.style.display='none'; }));

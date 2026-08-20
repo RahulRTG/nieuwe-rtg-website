@@ -1,3 +1,4 @@
+/* de AI-draad van de zaak */
     renderAIThread();
     try {
       const d = await API.call('/supplier/ai', { q });

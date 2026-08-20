@@ -79,7 +79,7 @@
         '<label class="stil lbl" for="mailIn">Of een e-mailadres, voor iemand buiten RTG</label>' +
         '<div class="rij"><input id="mailIn" type="email" maxlength="120" placeholder="naam@voorbeeld.nl">' +
         '<button class="knop" id="mailAdd">Toevoegen</button></div>' +
-        '<p class="stil" style="margin-top:.5rem;">Een klein kringetje werkt beter dan een groot: ' +
+        '<p class="stil h-mt50">Een klein kringetje werkt beter dan een groot: ' +
         'als iedereen denkt dat een ander wel gaat kijken, gaat er niemand.</p>';
 
       function na(p) { p.then(function () { V.kringKaart(host, opnieuw); if (opnieuw) opnieuw(); }).catch(function (e) { V.melding(e.message); }); }

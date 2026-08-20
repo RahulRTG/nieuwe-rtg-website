@@ -1,3 +1,4 @@
+/* de knoppen onder een Salon-bericht */
     document.querySelectorAll('.post').forEach(el => {
       const post = posts.find(p => p.id === Number(el.dataset.post));
       el.querySelector('.js-like').addEventListener('click', ev => {
@@ -136,7 +137,7 @@
     const uit = !s.aan;
     h += '<div style="display:flex;align-items:flex-start;gap:0.7rem;">' +
       '<span style="font-size:1.3rem;"></span>' +
-      '<div style="flex:1;"><b style="font-size:0.9rem;">' + T('ont.titel','Ontmoetingen') + '</b>' +
+      '<div class="h-flex1"><b style="font-size:0.9rem;">' + T('ont.titel','Ontmoetingen') + '</b>' +
       '<span style="display:block;font-size:0.68rem;color:var(--muted);">' + T('ont.sub','Connecties die vlakbij zijn kunnen samen afspreken. Alleen jij bepaalt of dit aanstaat.') + '</span></div>' +
       (s.mag
         ? '<button id="ontToggle" role="switch" aria-checked="' + (s.aan ? 'true' : 'false') + '" style="flex-shrink:0;width:52px;height:30px;border-radius:999px;border:1px solid var(--gold);background:' + (s.aan ? 'var(--gold)' : 'none') + ';position:relative;cursor:pointer;" aria-label="' + T('ont.toggle','Ontmoetingen aan of uit') + '"><span style="position:absolute;top:3px;left:' + (s.aan ? '25px' : '3px') + ';width:22px;height:22px;border-radius:50%;background:' + (s.aan ? '#000' : 'var(--gold)') + ';transition:left .15s;"></span></button>'

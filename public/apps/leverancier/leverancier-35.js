@@ -1,3 +1,4 @@
+/* de AI-factuurtool */
     if (canEdit){
       html += '<div class="card"><div class="tt-h">'+T('fact.ai','AI-factuurtool')+'</div>'+
         '<p class="sub h-mt30">'+T('fact.ai.sub','Vraag iets, of maak een factuur in gewone taal: "maak een factuur voor [codenaam], 3 uur advies a 90 euro".')+'</p>'+

@@ -82,7 +82,7 @@ module.exports = ({ db, save, crypto, schoon, anthropic }) => {
       try {
         const lijst = w.apparaten.filter(a => a.soort !== 'slot')
           .map(a => a.id + ' (' + a.naam + ', ' + a.kamer + ', velden: ' + Object.keys(a.stand).join('/') + ')').join('\n');
-        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 700,
+        const r = await anthropic.messages.create({ model: 'claude-haiku-4-5', max_tokens: 700,
           system: 'Je bent de scenemaker van een smart home. Antwoord UITSLUITEND met geldige JSON: {"naam":"korte naam","uitleg":"een zin","standen":{"apparaat-id":{...}}}. ' +
             'Gebruik alleen de opgegeven apparaat-ids en velden (aan:boolean, open:boolean, dim:1-100, volume:0-100, temp:5-30). Sloten bestaan voor jou niet.',
           messages: [{ role: 'user', content: 'De wens: ' + q + '\n\nDe apparaten:\n' + lijst }] });

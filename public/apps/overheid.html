@@ -89,8 +89,8 @@
     <div class="kaart">
       <h3>Aangifte inkomstenbelasting</h3>
       <div class="rij">
-        <div style="flex:1;"><div class="lbl">Bruto jaarinkomen (€)</div><input class="veld" id="ibInkomen" inputmode="numeric" placeholder="Bijv. 48000"></div>
-        <div style="flex:1;"><div class="lbl">Aftrekposten (€)</div><input class="veld" id="ibAftrek" inputmode="numeric" placeholder="0"></div>
+        <div class="h-flex1"><div class="lbl">Bruto jaarinkomen (€)</div><input class="veld" id="ibInkomen" inputmode="numeric" placeholder="Bijv. 48000"></div>
+        <div class="h-flex1"><div class="lbl">Aftrekposten (€)</div><input class="veld" id="ibAftrek" inputmode="numeric" placeholder="0"></div>
       </div>
       <div class="lbl">Al ingehouden loonheffing (€, optioneel)</div>
       <input class="veld" id="ibIngehouden" inputmode="numeric" placeholder="Leeg = schatting">
@@ -99,21 +99,21 @@
         <textarea class="veld" id="ibAi" maxlength="300" placeholder="Bijv. ik verdien 48.000 bruto en had 3.200 aan hypotheekrente"></textarea>
         <button class="knop stil" id="ibAiGo" style="margin-top:.5rem;width:auto;">Rahul vult de velden in</button>
       </div>
-      <div id="ibUit" style="margin-top:.8rem;"></div>
-      <div class="rij" style="margin-top:.8rem;">
+      <div class="h-mt80" id="ibUit"></div>
+      <div class="rij h-mt80">
         <button class="knop stil" id="ibBereken" style="width:auto;">Bereken</button>
         <button class="knop" id="ibGo" style="width:auto;">Aangifte indienen</button>
       </div>
     </div>
     <h3 style="margin:1.1rem 0 .5rem;">Mijn aanslagen</h3>
     <div id="ibMijn"><div class="leeg">Nog geen aanslagen.</div></div>
-    <div class="kaart" style="margin-top:1rem;">
+    <div class="kaart h-mt100">
       <h3>Toeslag aanvragen</h3>
       <div class="lbl">Welke toeslag?</div>
       <div class="chips" id="tsSoorten"></div>
       <div class="lbl">Jaarinkomen (€)</div>
       <input class="veld" id="tsInkomen" inputmode="numeric" placeholder="Bijv. 22000">
-      <button class="knop" id="tsGo" style="margin-top:.8rem;">Toeslag aanvragen</button>
+      <button class="knop h-mt80" id="tsGo">Toeslag aanvragen</button>
     </div>
     <div id="tsMijn"></div>
   </section>
@@ -121,24 +121,24 @@
   <section class="paneel" id="p-rdw">
     <div class="kaart">
       <h3>Rijbewijs</h3>
-      <div id="rbInfo" class="meta" style="margin-top:.3rem;">Laden…</div>
+      <div id="rbInfo" class="meta h-mt30">Laden…</div>
       <button class="knop stil" id="rbVerleng" style="margin-top:.7rem;width:auto;">Rijbewijs verlengen</button>
     </div>
     <div class="kaart">
       <h3>Voertuig registreren (RDW)</h3>
       <div class="rij">
-        <div style="flex:1;"><div class="lbl">Kenteken</div><input class="veld" id="vtKenteken" maxlength="12" placeholder="Bijv. 12-ABC-3"></div>
-        <div style="flex:1;"><div class="lbl">Merk</div><input class="veld" id="vtMerk" maxlength="40" placeholder="Bijv. Land Rover"></div>
+        <div class="h-flex1"><div class="lbl">Kenteken</div><input class="veld" id="vtKenteken" maxlength="12" placeholder="Bijv. 12-ABC-3"></div>
+        <div class="h-flex1"><div class="lbl">Merk</div><input class="veld" id="vtMerk" maxlength="40" placeholder="Bijv. Land Rover"></div>
       </div>
-      <button class="knop" id="vtGo" style="margin-top:.8rem;">Op mijn naam zetten</button>
+      <button class="knop h-mt80" id="vtGo">Op mijn naam zetten</button>
     </div>
     <h3 style="margin:1.1rem 0 .5rem;">Mijn voertuigen</h3>
     <div id="vtMijn"><div class="leeg">Nog geen voertuigen.</div></div>
-    <div class="kaart" style="margin-top:1rem;">
+    <div class="kaart h-mt100">
       <h3>Kenteken controleren</h3>
       <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:.3rem;">Check bij de RDW of een kenteken bekend is en of de APK geldig is · handig vóór je een auto huurt of instapt.</p>
-      <div class="rij" style="margin-top:.5rem;"><input class="veld" id="chkKenteken" maxlength="12" placeholder="Kenteken" style="flex:1;min-width:8rem;"><button class="knop stil" id="chkGo" style="width:auto;">Controleer</button></div>
-      <div id="chkUit" style="margin-top:.6rem;"></div>
+      <div class="rij h-mt50"><input class="veld" id="chkKenteken" maxlength="12" placeholder="Kenteken" style="flex:1;min-width:8rem;"><button class="knop stil" id="chkGo" style="width:auto;">Controleer</button></div>
+      <div class="h-mt60" id="chkUit"></div>
     </div>
   </section>
 
@@ -152,7 +152,7 @@
       <div class="chips" id="kvVormen"></div>
       <div class="lbl">SBI-code (optioneel)</div>
       <input class="veld" id="kvSbi" maxlength="8" placeholder="Bijv. 5610">
-      <button class="knop" id="kvGo" style="margin-top:.8rem;">Inschrijven</button>
+      <button class="knop h-mt80" id="kvGo">Inschrijven</button>
     </div>
     <h3 style="margin:1.1rem 0 .5rem;">Mijn inschrijvingen</h3>
     <div id="kvMijn"><div class="leeg">Nog geen inschrijving.</div></div>
@@ -165,7 +165,7 @@
       <div class="chips" id="szSoorten"></div>
       <div class="lbl">Toelichting (optioneel)</div>
       <textarea class="veld" id="szToe" maxlength="400" placeholder="Vertel kort je situatie"></textarea>
-      <button class="knop" id="szGo" style="margin-top:.8rem;">Aanvraag indienen</button>
+      <button class="knop h-mt80" id="szGo">Aanvraag indienen</button>
     </div>
     <div id="szMijn"></div>
     <div class="kaart">
@@ -189,7 +189,7 @@
       <textarea class="veld" id="sbProject" maxlength="300" placeholder="Wat wil je doen?"></textarea>
       <div class="lbl">Gevraagd bedrag (€)</div>
       <input class="veld" id="sbBedrag" inputmode="numeric" placeholder="Bijv. 3000">
-      <button class="knop" id="sbGo" style="margin-top:.8rem;">Subsidie aanvragen</button>
+      <button class="knop h-mt80" id="sbGo">Subsidie aanvragen</button>
     </div>
     <div id="sbMijn"></div>
   </section>
@@ -207,7 +207,7 @@
       <textarea class="veld" id="wmTekst" maxlength="500" placeholder="Bijv. ondergelopen tunnel na de bui"></textarea>
       <div class="lbl">Locatie (optioneel)</div>
       <input class="veld" id="wmLoc" maxlength="120" placeholder="Straat of plek">
-      <button class="knop" id="wmGo" style="margin-top:.8rem;">Melding versturen</button>
+      <button class="knop h-mt80" id="wmGo">Melding versturen</button>
     </div>
     <div id="wmMijn"></div>
   </section>
@@ -239,11 +239,11 @@ if (!TOKEN) {
   // Phishing-bestendig: de code leeft twee minuten en werkt maar een keer.
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Inloggen met RTG iD</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Geen wachtwoord, geen sms. MijnOverheid vraagt alleen uw codenaam en een bewijs 18-plus; meer krijgt het loket niet.</p>'+
-    '<p style="margin-top:1rem;"><button id="idStart" style="background:var(--goud,#C9A24B);color:#0C0C0B;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:600;cursor:pointer;">Toon koppelcode</button></p>'+
+    '<p class="h-mt100"><button id="idStart" style="background:var(--goud,#C9A24B);color:#0C0C0B;border:none;border-radius:10px;padding:.6rem 1rem;font:inherit;font-weight:600;cursor:pointer;">Toon koppelcode</button></p>'+
     '<div id="idFlow" style="display:none;margin-top:1rem;">'+
       '<div style="font-family:\'Bodoni Moda\',serif;font-size:2rem;letter-spacing:.15em;" id="idCode"></div>'+
       '<p style="color:var(--muted);margin-top:.5rem;line-height:1.6;">Open <b>RTG iD</b> in de leden-app en voer deze code in; u ziet daar dat <b>MijnOverheid</b> de aanvrager is. De code leeft twee minuten.</p>'+
-      '<p id="idStand" style="margin-top:.6rem;">Wacht op bevestiging…</p></div>'+
+      '<p class="h-mt60" id="idStand">Wacht op bevestiging…</p></div>'+
     '<div id="idKlaar" style="display:none;margin-top:1rem;"></div>'+
     '<p style="margin-top:1rem;color:var(--muted);">Of <a href="/apps/app.html">log in via de leden-app</a>.</p></div>';
   const idApi = (pad, body) => fetch('/api/rtgid/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -266,7 +266,7 @@ if (!TOKEN) {
         $('#idKlaar').style.display = '';
         $('#idKlaar').innerHTML = '<p><b>Ingelogd met RTG iD</b>'+(wie.namens?' (via gemachtigde '+esc(wie.namens)+')':'')+'</p>'+
           '<p style="color:var(--muted);margin-top:.4rem;line-height:1.6;">Gedeeld met dit loket: codenaam <b>'+esc(a.codenaam||'')+'</b> en bewijs 18-plus: <b>'+(a['18plus']===true?'ja':a['18plus']===false?'nee':'onbekend')+'</b>. Uw geboortedatum en naam zijn niet gedeeld; dit staat in uw inzagelog.</p>'+
-          '<p style="margin-top:.8rem;"><a href="/apps/app.html">Open het loket via de leden-app →</a></p>';
+          '<p class="h-mt80"><a href="/apps/app.html">Open het loket via de leden-app →</a></p>';
       } else {
         $('#idStand').textContent = st.stand === 'geweigerd' ? 'U heeft de inlog geweigerd; er is niets gedeeld.'
           : 'De code is verlopen; vraag een nieuwe.';
@@ -535,7 +535,7 @@ async function laadWaterMeldingen(){
   $('#wmMijn').innerHTML = l.length ? '<h3 style="margin:1.1rem 0 .5rem;">Mijn meldingen</h3>'+l.map(m =>
     '<div class="item"><h4>'+esc(m.soortLabel)+'</h4><div class="meta">'+esc(m.tekst)+(m.locatie?' · '+esc(m.locatie):'')+'</div>'+
     '<span class="status '+(m.status==='opgelost'?'op':m.status==='afgewezen'?'af':'')+'">'+esc(m.status)+'</span>'+
-    ((m.updates&&m.updates.length)?'<div class="meta" style="margin-top:.3rem;">Laatste: '+esc(m.updates[0].tekst)+'</div>':'')+'</div>').join('') : '';
+    ((m.updates&&m.updates.length)?'<div class="meta h-mt30">Laatste: '+esc(m.updates[0].tekst)+'</div>':'')+'</div>').join('') : '';
 }
 
 // Stemmen + bekendmakingen
@@ -550,7 +550,7 @@ async function laadStem(){
   const recht = v.stemrecht || { ok: true };
   const magStemmen = v.open && !v.alGestemd && recht.ok;
   $('#stemKaart').innerHTML = '<h3>'+esc(v.titel)+'</h3><p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin:.3rem 0 .7rem;">'+esc(v.toelichting||'')+'</p>'+
-    v.opties.map(o => '<div class="stemopt"><div style="flex:1;"><b>'+esc(o.label)+'</b><div class="balk" style="width:'+o.pct+'%;"></div></div>'+
+    v.opties.map(o => '<div class="stemopt"><div class="h-flex1"><b>'+esc(o.label)+'</b><div class="balk" style="width:'+o.pct+'%;"></div></div>'+
       '<div style="text-align:right;min-width:3rem;"><div style="font-variant-numeric:tabular-nums;">'+o.pct+'%</div>'+
       (magStemmen?'<button class="knop" data-stem="'+esc(o.id)+'" style="padding:.25rem .7rem;font-size:.78rem;margin-top:.2rem;">Stem</button>':'')+'</div></div>').join('')+
     ((v.open && !v.alGestemd && !recht.ok)

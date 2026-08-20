@@ -1,3 +1,4 @@
+/* een verkoopaanvraag aanvaarden of een tegenbod doen */
     el.querySelectorAll('[data-vkact]').forEach(b => b.addEventListener('click', async () => {
       const actie = b.dataset.act; const body = { ref:b.dataset.vkact, actie };
       if (actie==='aanvaard'){ const p = prompt(T('vk.tegenbod','Verkoopprijs bevestigen of tegenbod (€):'), b.dataset.prijs||''); if(p===null) return; body.prijs = p; if (b.dataset.inruil==='1'){ const t = prompt(T('vk.taxatie','Inruil taxeren op (€):'),'0'); if(t!==null) body.taxatie = t; } }

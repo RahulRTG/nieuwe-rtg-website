@@ -1,3 +1,4 @@
+/* de lopende rekening bij een partner opvragen */
     API.call('/rekening', { supplierCode: code }).then(d => {
       const r = d.rekening;
       if (!r || !r.aantal) return toast(T('app.rek.leeg','Er staat geen lopende rekening open.'));

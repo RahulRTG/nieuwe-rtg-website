@@ -1,3 +1,4 @@
+/* de secties van een taxi- of jetzaak */
     if (type === 'taxi' || type === 'jet') secs.push(
       ['ritten','\uD83D\uDDFA',T('kt.ritten','Ritten')],
       ['historie','\uD83D\uDCD2',T('kt.historie','Historie')],

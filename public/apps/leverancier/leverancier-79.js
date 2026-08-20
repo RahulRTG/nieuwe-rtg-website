@@ -1,3 +1,4 @@
+/* de aanwezigheidsteller op nul zetten */
     document.getElementById('awLeeg').addEventListener('click', async () => {
       if (!confirm(T('aw.leegvraag','De teller op nul zetten?'))) return;
       try { const d = await API.call('/supplier/aanwezig/leeg', {}); awToon(d.aanwezig); } catch(e){ toast(e.message); }
@@ -77,7 +78,7 @@
         ? '<select class="tt-in" id="ttTafel" aria-label="' + T('tt.tafel','Tafel') + '"><option value="">' + T('tt.kies','Kies een tafel…') + '</option>' +
             tafels.map(t => '<option value="' + t.name + '">' + t.name + '</option>').join('') + '</select>'
         : '<input class="tt-in" id="ttTafel" placeholder="' + T('tt.tafelnr','Tafelnummer of -naam') + '">') +
-      '<div id="ttBody" style="margin-top:.8rem;"></div></div>';
+      '<div class="h-mt80" id="ttBody"></div></div>';
     document.body.appendChild(ov);
     ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     document.getElementById('ttSluit').addEventListener('click', () => ov.remove());

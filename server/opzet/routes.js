@@ -95,76 +95,10 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/meting')(grens('meting'));
   require('../routes/algpin')(grens('algpin'));
   require('../routes/werkbeleid')(grens('werkbeleid'));
-  require('../routes/sleutelwoorden')(grens('sleutelwoorden'));
-  require('../routes/agenda')(grens('agenda'));
-  require('../routes/notities')(grens('notities'));
-  require('../routes/bestanden')(grens('bestanden'));
-  require('../routes/meet')(grens('meet'));
-  require('../routes/galerij')(grens('galerij'));
-  require('../routes/klok')(grens('klok'));
-  require('../routes/vertaal')(grens('vertaal'));
-  require('../routes/memo')(grens('memo'));
-  require('../routes/boeken')(grens('boeken'));
-  require('../routes/onderwijs')(grens('onderwijs'));
-  require('../routes/leerstof')(grens('leerstof'));
-  require('../routes/bijles')(grens('bijles'));
-  require('../routes/facturatie')(grens('facturatie'));
-  require('../routes/rtmail')(grens('rtmail'));
-  require('../routes/rtmail-vak')(grens('rtmail-vak'));
-  require('../routes/rtmail-schrijf')(grens('rtmail-schrijf'));
-  require('../routes/rtmail-bestuur')(grens('rtmail-bestuur'));
-  require('../routes/rtmail-team')(grens('rtmail-team'));
-  require('../routes/rtgone')(grens('rtgone'));
-  require('../routes/werkmail')(grens('werkmail'));
-  require('../routes/mailpost')(grens('mailpost'));
-  require('../routes/payroll')(grens('payroll'));
-  require('../routes/huis')(grens('huis'));
-  require('../routes/muziek')(grens('muziek'));
-  require('../routes/muziek-samen')(grens('muziek-samen'));
-  require('../routes/atelierweb')(grens('atelierweb'));
-  require('../routes/webmaker')(grens('webmaker'));
-  require('../routes/webbrowser')(grens('webbrowser'));
-  require('../routes/zaakweb')(grens('zaakweb'));
-  require('../routes/webmeting')(grens('webmeting'));
-  require('../routes/webmerk')(grens('webmerk'));
-  require('../routes/journalistiek')(grens('journalistiek'));
-  require('../routes/markt')(grens('markt'));
-  require('../routes/borden')(grens('borden'));
-  require('../routes/spellen')(grens('spellen'));
-  require('../routes/magnaatwereld')(grens('magnaatwereld'));
-  require('../routes/leren')(grens('leren'));
-  /* Payroll OS: de routes van de nieuwe loonlaag (kern/payroll/), naast de
-     oude payroll-routes en met dezelfde poorten. */
-  require('../routes/payroll-os')(grens('payroll-os'));
-  /* De RTF-bieb-routes (de kern staat al bij de Mall-bibliotheken). */
-  require('../routes/rtfbieb')(grens('rtfbieb'));
-  /* Dezelfde leermotor als RTG School, achter de drie leerlingpassen. */
-  require('../routes/rtfleerling')(grens('rtfleerling'));
-  /* De Geloof & Wijsheid-Bibliotheek-routes (kern staat al hierboven). */
-  require('../routes/geloofbieb')(grens('geloofbieb'));
-  /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
-  require('../routes/rtfkantoor')(grens('rtfkantoor'));
-  /* Het RTF Living Lab: het onderzoeksplatform per stad. Eigen domein en niet
-     bij rtfkantoor ingehangen, want de bewonerskant heeft publieke deuren met
-     een eigen rem -- dat is een andere poort dan de kantoorinlog daar. */
-  require('../routes/livinglab')(grens('livinglab'));
-  /* De twee werkplekken RTG en RTF (kern staat al hierboven). */
-  require('../routes/werkplek')(grens('werkplek'));
-  /* Het RTG Werk OS: de werkplek van een hele organisatie (server/bedrijf/).
-     Staat naast werkplek.js en niet erin: dat is het beeld van RTG en RTF zelf,
-     dit is een werkruimte die ook aan een andere organisatie te geven is. */
-  require('../routes/bedrijf')(grens('bedrijf'));
-  require('../routes/labfonds')(grens('labfonds'));
-  require('../routes/aanmeldingen')(grens('aanmeldingen'));
-  require('../routes/ledenregister')(grens('ledenregister'));
-  /* Het doorgeefjournaal: een leesbare regel per verzoek en per uitgaand
-     bericht. Naast het ledenregister, want het staat achter dezelfde poort en
-     om dezelfde reden -- meekijken met het verkeer hoort een naam te hebben. */
-  require('../routes/journaal')(grens('journaal'));
-  /* De ledenbalie: de afdeling die een lid mag helpen met zijn abo, zijn
-     wachtwoord of een klacht. Achter een eigen zetel, niet achter de gedeelde
-     kantoorcode -- iemands account aanraken hoort een naam te hebben. */
-  require('../routes/ledenbalie')(grens('ledenbalie'));
+  /* De routers die aan meer dan een domein hangen -- van sleutelwoorden tot
+     de ledenbalie -- staan in ./routes-dwars.js. Alleen `grens` gaat mee: dat
+     is precies waarom dat blok als geheel kon verhuizen. */
+  require('./routes-dwars')(grens);
   /* De wervingslink /werken/<code>: een werkgever nodigt iemand uit die nog
      geen RTG-account heeft, langs dezelfde uitnodiging als de kassacode van
      routes/supplier/werving. */

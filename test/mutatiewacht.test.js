@@ -209,3 +209,104 @@ test('zetTerug ruimt alles op en laat niets in de lijst staan', () => {
     fs.rmSync(map, { recursive: true, force: true });
   }
 });
+
+/* ============================================================================
+   EN: WACHT HIJ OP EEN ANDERE BRONMUTERENDE RONDE?
+
+   De opruimwacht hierboven gaat over een CRASH. Dit gaat over
+   GELIJKTIJDIGHEID, en dat is een andere storing met dezelfde oorzaak: deze
+   motor verandert echte bestanden in server/.
+
+   scripts/afbouw-slot.js bestaat daarvoor ("een tijdelijk ijkbestand mag nooit
+   een geldige scan vervuilen"), maar werd alleen gepakt door test-runner.js,
+   release-gate.js en staging-repetitie.js. Draaide iemand `npm run mutatie`
+   naast `npm test`, dan las de suite gemuteerde bron en zakten er toetsen op
+   code die niemand had geschreven -- en erger: ruimEerderOp() in de motor zet
+   de LEVENDE mutaties van een tweede ronde terug, waarna beide uitslagen onzin
+   zijn.
+   ========================================================================== */
+test('de motor weigert zolang een andere bronmuterende ronde het slot heeft', async () => {
+  const WORTEL = path.join(__dirname, '..');
+  const SLOT = path.join(WORTEL, '.release', 'afbouw-slot');
+  /* Draait deze toets ONDER de volledige suite, dan houdt test-runner.js het
+     slot al vast -- dat is precies de stand die we willen beproeven, en we
+     blijven er dan vanaf. Draait hij los, dan zetten we zelf een slot op naam
+     van dit proces (dat leeft, dus de motor mag het niet als verweesd opruimen)
+     en halen het daarna weg. */
+  const alGehouden = fs.existsSync(SLOT);
+  if (!alGehouden) {
+    fs.mkdirSync(SLOT, { recursive: true, mode: 0o700 });
+    fs.writeFileSync(path.join(SLOT, 'eigenaar.json'),
+      JSON.stringify({ pid: process.pid, taak: 'toets-gelijktijdigheid', gestart: new Date().toISOString() }));
+  }
+  try {
+    const uit = await new Promise((klaar) => {
+      const kind = spawn(process.execPath, [MOTOR, 'mutatiewacht.test.js'], { cwd: WORTEL });
+      let tekst = '';
+      kind.stdout.on('data', d => tekst += d);
+      kind.stderr.on('data', d => tekst += d);
+      kind.on('close', (code) => klaar({ code, tekst }));
+    });
+    assert.notEqual(uit.code, 0, 'de motor hoort te weigeren zolang het slot bezet is');
+    assert.match(uit.tekst, /Afbouw is al actief/,
+      'en te zeggen WIE het slot heeft, anders staat iemand te zoeken naar een proces dat hij niet ziet');
+  } finally {
+    if (!alGehouden) fs.rmSync(SLOT, { recursive: true, force: true });
+  }
+});
+
+/* ============================================================================
+   EN: ZIET DE CODEMASKER EEN REGEXLITERAL?
+
+   De motor muteert alleen wat ECHT code is; commentaar en tekenreeksen worden
+   gemaskerd, want een verandering in een uitlegregel bewijst niets. Maar een
+   REGEXLITERAL kan een aanhalingsteken bevatten, en dan las de masker de rest
+   van het bestand als tekst.
+
+   Wat dat kostte: in server/middleware/stijlafsplitsing.js sloeg hij vanaf
+   `/url\(\s*(['"]?)...` 1796 tekens over -- de hele magVerhuizen(), met zijn
+   return true en return false. De motor meldde "geen bruikbare mutatie", en dat
+   leest als "hier valt niets te meten" terwijl het "ik kon de code niet zien"
+   was. Over server/ gemeten raakte dat 5 modules en 13 mutatieplekken,
+   waaronder functies/toegang.js.
+
+   Andersom moet het ook kloppen: een `<=` binnen een `(?<=` lookbehind is
+   regexsyntaxis en geen code. Die muteren geeft een syntaxfout, en dus een
+   VALS "bewezen gevoelig".
+   ========================================================================== */
+test('de codemasker ziet een regexliteral, en verwart hem niet met tekst', () => {
+  const { codemasker } = require('../scripts/mutatie.js');
+  const codeNa = (bron, naald) => codemasker(bron)[bron.indexOf(naald)];
+
+  // een aanhalingsteken IN een regex mag de code erna niet opeten
+  const bron = 'const R = /url\\(([\'"]?)x\\1\\)/i;\nfunction f() { return true; }\n';
+  assert.equal(codeNa(bron, 'return true'), true, 'de code na de regex hoort code te blijven');
+  assert.equal(codeNa(bron, 'url'), false, 'en het regexlichaam zelf hoort gemaskerd te zijn');
+
+  // een lookbehind is regexsyntaxis, geen vergelijking
+  const lookbehind = 'const d = t.split(/(?<=[.!?])\\s+/);\nif (a <= b) { return false; }\n';
+  assert.equal(codeNa(lookbehind, '<='), false, 'de <= binnen (?<= is regex en geen operator');
+  assert.equal(codeNa(lookbehind, 'return false'), true, 'de echte code erna blijft zichtbaar');
+
+  /* Een SCHUINE STREEP BINNEN EEN TEKENKLASSE sluit de regex niet. Dit staat
+     echt in de bron: server/middleware/scriptafsplitsing.js gebruikt
+     /^\/(?!\/)[A-Za-z0-9_\-/.]+\.html$/ -- met een / in de klasse. Zonder
+     klasse-herkenning eindigt de regex daar te vroeg en telt de rest van de
+     regel als code die er niet is. */
+  const inKlasse = 'const P = /^\\/(?!\\/)[A-Za-z0-9_\\-/.]+\\.html$/;\nfunction h() { return true; }\n';
+  assert.equal(codeNa(inKlasse, 'A-Za-z'), false, 'de tekenklasse hoort binnen de regex te vallen');
+  /* En dit is de assertie die het verschil MAAKT. Zonder klasse-herkenning
+     eindigt de regex bij de / in de klasse, en geldt alles daarna -- inclusief
+     `.html$/` -- als code. Alleen hieraan is te zien of de klasse echt werd
+     overgeslagen; de twee beweringen eromheen kloppen in beide gevallen. */
+  assert.equal(codeNa(inKlasse, 'html'), false, 'ook de staart van de regex hoort binnen de regex te vallen');
+  assert.equal(codeNa(inKlasse, 'return true'), true, 'en de code erna blijft zichtbaar');
+
+  // een DEELSTREEP is geen regex: daar mag niets gemaskerd worden
+  const deling = 'const helft = totaal / 2;\nfunction g() { return true; }\n';
+  assert.equal(codeNa(deling, 'return true'), true, 'een deling opent geen regex');
+
+  // commentaar en tekenreeksen blijven gewoon gemaskerd
+  assert.equal(codeNa('/* return true */\nvar x = 1;', 'return true'), false);
+  assert.equal(codeNa('var s = "return true";\nvar x = 1;', 'return true'), false);
+});

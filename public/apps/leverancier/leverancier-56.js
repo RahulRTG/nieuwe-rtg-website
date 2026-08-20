@@ -1,3 +1,4 @@
+/* een cel op het zaakbord, en de samenvatting van schakelaars */
   function zbCel(n, label, waarschuw){
     return '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v'+(waarschuw?' a':'')+'">'+n+'</div><div class="l">'+label+'</div></div>';
   }

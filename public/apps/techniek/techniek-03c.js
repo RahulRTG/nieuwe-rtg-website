@@ -1,3 +1,4 @@
+/* de automatische noodrem aan- of uitzetten */
     if (noodremAan && !confirm('De automatische noodrem uitzetten? Bij een brute-force-aanval springen de zekeringen dan NIET meer vanzelf.')) return;
     api('/api/techniek/beveiliging/auto', { method:'POST', body:{ aan: !noodremAan } })
       .then(function(d){ toast(d.autoReactie ? 'Noodrem aan: zekeringen springen vanzelf bij een aanval.' : 'Noodrem uit.'); laad(); })

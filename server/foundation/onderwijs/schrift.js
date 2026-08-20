@@ -91,8 +91,8 @@ module.exports = (octx) => {
     if (!clean.length) return res.json({ text: 'Stel je vraag maar, dan denk ik met je mee.' });
     if (!anthropic) return res.json({ text: DEMO[Math.floor(Math.random() * DEMO.length)], demo: true });
     try {
-      const bb = ctx.kiesBuddy(req.body.buddy);
-      const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 400, system: 'Je heet ' + bb.naam + ' en bent ' + bb.wie + '. ' + SYSTEM + ctx.leeftijdInstr(req.body.groep), messages: clean });
+      const bb = octx.kiesBuddy(req.body.buddy);
+      const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 400, system: 'Je heet ' + bb.naam + ' en bent ' + bb.wie + '. ' + SYSTEM + octx.leeftijdInstr(req.body.groep), messages: clean });
       res.json({ text: (r.content || []).map(b => b.text || '').join('').trim() || DEMO[0] });
     } catch (e) { res.json({ text: DEMO[Math.floor(Math.random() * DEMO.length)], demo: true }); }
   });

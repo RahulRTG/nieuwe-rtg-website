@@ -140,14 +140,14 @@
         </select>
         <label class="stil" for="tKlaar"><input type="checkbox" id="tKlaar"> klaar</label>
       </div>
-      <p class="stil" style="margin-top:.5rem;">Zolang een stuk niet klaar is, kunt u het niet onder een clip
+      <p class="stil h-mt50">Zolang een stuk niet klaar is, kunt u het niet onder een clip
         zetten. Klaar is uw eigen oordeel, niet het onze.</p>
     </div>
 
     <div class="kop deel">Het raster</div>
     <div class="kaart">
       <div id="rack"></div>
-      <div class="rij" style="margin-top:.7rem;">
+      <div class="rij h-mt70">
         <label class="stil" for="nieuwInstrument">Instrument</label>
         <select class="veld" id="nieuwInstrument"></select>
         <button class="knop" id="kanaalBij" type="button">Kanaal erbij</button>
@@ -163,8 +163,8 @@
       <p class="stil">Een lus van vier maten is een figuur; een lied heeft delen. Wat u hier benoemt
         verandert niets aan de klank &ndash; het maakt zichtbaar wat de vorm is, en dat is precies wat een
         lus tot een lied maakt.</p>
-      <div id="secties" style="margin-top:.6rem;"></div>
-      <div class="rij" style="margin-top:.6rem;">
+      <div class="h-mt60" id="secties"></div>
+      <div class="rij h-mt60">
         <label class="stil" for="sNaam">Deel</label>
         <select class="veld" id="sNaam">
           <option>Intro</option><option>Couplet</option><option selected>Refrein</option>
@@ -182,31 +182,31 @@
     <div class="kaart">
       <p class="stil">Wat hij maakt is een voorstel: het landt pas in uw raster als u dat zegt, en het is
         daarna gewoon te bewerken. RTG claimt niets van wat u maakt.</p>
-      <div class="rij" style="margin-top:.6rem;">
+      <div class="rij h-mt60">
         <label class="stil" for="rVraag" style="position:absolute;left:-999px;">Wat wilt u horen?</label>
         <input class="veld" id="rVraag" style="flex:1;min-width:10rem;" maxlength="300"
           placeholder="Bijv. een rustige lounge rond 90 bpm">
         <button class="knop" id="rVraagKnop" type="button">Een figuur om mee te beginnen</button>
       </div>
-      <div class="rij" style="margin-top:.6rem;">
+      <div class="rij h-mt60">
         <label class="stil" for="rTekst" style="position:absolute;left:-999px;">Uw zin om te zingen</label>
         <input class="veld" id="rTekst" style="flex:1;min-width:10rem;" maxlength="600"
           placeholder="Uw eigen zin, bijv. de zon komt op boven de haven">
         <button class="knop vol" id="rLiedKnop" type="button">Maak er een heel lied van</button>
       </div>
-      <p class="stil" style="margin-top:.5rem;">Bij een heel lied komt er een vorm uit (intro, couplet,
+      <p class="stil h-mt50">Bij een heel lied komt er een vorm uit (intro, couplet,
         refrein) met een zanglijn erop. Uw zin wordt lettergreep voor lettergreep onder de noten gelegd;
         Rahul schrijft uw woorden niet. Typt u niets, dan zingt de stem open klinkers, zodat u hoort waar
         uw tekst nog moet komen. De stem wordt opgewekt &ndash; het is geen opname van een zanger.</p>
-      <div id="rUit" style="margin-top:.7rem;"></div>
+      <div class="h-mt70" id="rUit"></div>
     </div>
 
     <div class="kop deel">Samen produceren</div>
     <div class="kaart">
       <p class="stil">Muziek maken is zelden een eenmanszaak. Wie u erbij haalt, bewerkt het stuk volledig
         mee en staat straks in de aftiteling. Het stuk is gedeeld, de credits niet.</p>
-      <div id="makers" style="margin-top:.6rem;"></div>
-      <div class="rij" id="nodigRij" style="margin-top:.6rem;">
+      <div class="h-mt60" id="makers"></div>
+      <div class="rij h-mt60" id="nodigRij">
         <label class="stil" for="mCode">Codenaam</label>
         <input class="veld" id="mCode" style="flex:1;min-width:9rem;" maxlength="40"
           placeholder="Bijv. Zilveren Lynx 2679">
@@ -214,7 +214,7 @@
         <select class="veld" id="mRol"></select>
         <button class="knop" id="mNodig" type="button">Erbij vragen</button>
       </div>
-      <p class="stil" style="margin-top:.5rem;">U werkt niet tegelijk in hetzelfde raster: wie als laatste
+      <p class="stil h-mt50">U werkt niet tegelijk in hetzelfde raster: wie als laatste
         bewaart, wint. Daarom staat hierboven wie er als laatste iets deed. Liever een eerlijke
         waarschuwing dan een valse belofte.</p>
     </div>
@@ -222,7 +222,7 @@
     <div class="kop deel">Uitgeven</div>
     <div class="kaart">
       <div id="uitgaveVlak"></div>
-      <p class="stil" style="margin-top:.5rem;">Onder uw codenaam geeft u zelf uit, meteen: het is uw werk.
+      <p class="stil h-mt50">Onder uw codenaam geeft u zelf uit, meteen: het is uw werk.
         De RTG-naam eronder is een aanvraag, geen knop &ndash; RTG die zijn naam ergens onder zet, staat
         ergens voor in, en dat besluit een mens bij het kantoor. Wordt het nee, dan blijft uw uitgave
         gewoon staan onder uw codenaam.</p>
@@ -236,7 +236,7 @@
         <button class="knop rood" id="stukWeg" type="button">Dit stuk weghalen</button>
         <button class="knop" id="terugLijst" type="button">Naar mijn stukken</button>
       </div>
-      <p class="stil" style="margin-top:.5rem;">Het geluidsbestand wordt op uw eigen toestel uitgerekend, met
+      <p class="stil h-mt50">Het geluidsbestand wordt op uw eigen toestel uitgerekend, met
         dezelfde motor die het afspeelt &mdash; het klinkt dus precies zoals u het hoorde. Alles wat u hier
         maakt is van u: elke klank wordt opgewekt, er zit geen licentie van iemand anders in.</p>
       <div class="fout" id="fout" hidden></div>

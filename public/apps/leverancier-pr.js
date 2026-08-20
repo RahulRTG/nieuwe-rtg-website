@@ -30,7 +30,7 @@
         '<button class="obtn warn" data-prweg="' + c.id + '">✕</button></div>').join('') +
       (geplaatst.length ? geplaatst.map(c => '<div class="st-row"><span style="opacity:0.65;">✓ ' + esc(c.soort === 'deal' ? c.titel : c.tekst).slice(0, 70) +
         '<span class="sub">' + T('pr2.live', 'live sinds') + ' ' + wanneer(c.geplaatstOp) + '</span></span></div>').join('') : '');
-    h += '<div class="st-form" style="margin-top:0.5rem;">' +
+    h += '<div class="st-form h-mt50">' +
       '<select class="st-in" id="prSoort"><option value="post">' + T('pr2.post', 'Salon-post') + '</option><option value="deal">' + T('pr2.deal', 'Aanbieding (alleen leden)') + '</option></select>' +
       '<input class="st-in" id="prTitel" placeholder="' + T('pr2.titel', 'Titel (bij een aanbieding)') + '">' +
       '<textarea class="st-in" id="prTekst" placeholder="' + T('pr2.tekst', 'De tekst van de post of aanbieding') + '" style="min-height:56px;resize:vertical;"></textarea>' +
@@ -46,10 +46,10 @@
       ' · ' + (nb.volgers || 0) + ' ' + T('mk.volgers', 'Volgers').toLowerCase() + '</div>';
     if (nb.laatste) h += '<div class="st-row"><span>' + esc(nb.laatste.onderwerp) + '<span class="sub">' + wanneer(nb.laatste.at) + ' · ' + nb.laatste.verstuurd + ' ' + T('pr2.bezorgd', 'bezorgd') + '</span></span></div>';
     h += nb.magWeer
-      ? '<div class="st-form" style="margin-top:0.5rem;"><input class="st-in" id="prNbOnd" placeholder="' + T('pr2.onderwerp', 'Onderwerp') + '">' +
+      ? '<div class="st-form h-mt50"><input class="st-in" id="prNbOnd" placeholder="' + T('pr2.onderwerp', 'Onderwerp') + '">' +
         '<textarea class="st-in" id="prNbTekst" placeholder="' + T('pr2.brieftekst', 'De brief zelf') + '" style="min-height:70px;resize:vertical;"></textarea>' +
         '<button class="obtn primary" id="prNbGo" style="align-self:flex-start;">' + T('pr2.verstuur', 'Verstuur aan alle volgers') + '</button></div>'
-      : '<div class="tkc-who" style="margin-top:0.4rem;">' + T('pr2.wacht', 'De volgende brief kan 7 dagen na de vorige.') + '</div>';
+      : '<div class="tkc-who h-mt40">' + T('pr2.wacht', 'De volgende brief kan 7 dagen na de vorige.') + '</div>';
     return h + '</div>';
   }
 
@@ -63,7 +63,7 @@
         (p.claims != null ? '<br>' + p.claims + ' ' + T('mk.claims', 'geclaimd') : '') +
         (p.stemmen != null ? '<br>' + p.stemmen + ' ' + T('pr2.stemmen', 'stemmen') : '') + '</span></div>').join('')
         : '<div class="tkc-who">' + T('pr2.geen', 'Nog geen berichten geplaatst.') + '</div>') +
-      '<button class="obtn ghost" id="prDossier" style="margin-top:0.5rem;">' + T('pr2.dossier', 'Persdossier') + ' (print)</button></div>';
+      '<button class="obtn ghost h-mt50" id="prDossier">' + T('pr2.dossier', 'Persdossier') + ' (print)</button></div>';
   }
 
   function teken(){

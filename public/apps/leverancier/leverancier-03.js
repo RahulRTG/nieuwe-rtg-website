@@ -1,3 +1,4 @@
+/* de sectorwissel en de tabbladen per sector */
     location.replace(location.pathname + '?sector=' + doel);
     return true;
   }

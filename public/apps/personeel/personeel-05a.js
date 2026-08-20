@@ -1,3 +1,4 @@
+/* de dienstkeuze en de sectorstap */
     $('#kaTerug').addEventListener('click', stepSector);
     const toonDienst = () => {
       $('#kaMeld').hidden = !!kaDienst;

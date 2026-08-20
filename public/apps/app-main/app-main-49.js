@@ -1,3 +1,4 @@
+/* het boekland van een zakelijk lid */
     if (user.tier !== 'business'){ wrap.innerHTML = ''; return; }
     let land = 'NL';
     try { land = localStorage.getItem('rtg_boekland') || 'NL'; } catch(e){}
@@ -69,7 +70,7 @@
           rij(T('zzp.teBetalen','Te betalen (indicatie)'), eur(d.belasting), true) +
           rij(T('zzp.netto','Netto over'), eur(d.netto), true) +
           '<div style="margin-top:0.55rem;padding-top:0.55rem;border-top:1px solid var(--line);color:var(--gold);">' + T('zzp.reserveer','Zet ~') + d.reserveerPct + '% ' + T('zzp.opzij','opzij: ongeveer') + ' ' + eur(d.perMaand) + ' ' + T('zzp.pm','per maand') + '.</div>' +
-          '<div style="margin-top:0.5rem;">' + d.regels.map(r => '• ' + r).join('<br>') + '</div>' +
+          '<div class="h-mt50">' + d.regels.map(r => '• ' + r).join('<br>') + '</div>' +
           '<div style="margin-top:0.5rem;font-size:0.64rem;color:var(--soft);">' + T('zzp.disc','Indicatie op jaarbasis; dit is voorlichting, geen bindend fiscaal advies.') + '</div>';
       } catch(e){ box.textContent = e.message; }
     });

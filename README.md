@@ -159,6 +159,14 @@ beeld kunnen elk een apart lokaal model krijgen via `LOCAL_AI_MODEL_KORT`,
 `LOCAL_AI_MODEL_TOOLS` en `LOCAL_AI_MODEL_VISION`. Zonder vision-model wordt
 beeld nooit stil verwijderd of aan een tekstmodel voorgelegd.
 
+Die proef spreekt ELK ingesteld model apart aan, en dat is niet vanzelfsprekend
+geweest: hij stuurde een vraag met `max_tokens: 32`, en `modelVoor()` kiest bij
+<= 200 het KORTE model. Stond `LOCAL_AI_MODEL` verkeerd -- een typefout, een
+model dat de server niet geladen heeft -- dan slaagde de check gewoon, terwijl
+elk normaal verzoek daarna stilletjes naar de betaalde uitwijk viel. Nagemeten
+met een kapot tekstmodel: de oude proef gaf exit 0 en sprak alleen het korte
+model aan; de huidige geeft exit 1 en noemt `tekst=... FOUT`.
+
 Zonder model start RTG in **handmatige werkmodus**. Alle schermen, navigatie,
 controles en regelgestuurde opdrachten blijven werken; alleen vrije
 modelverrijking valt weg. Met `RTG_AI_UIT=1` is ook in productie aantoonbaar
@@ -835,6 +843,199 @@ De meter `wettenOnbewezen` in `NORM.json` telt wat er niet bewezen is en mag
 alleen omlaag; `test/meterijk.test.js` ijkt hem (keuringsregel 35), en
 `test/wetten.test.js` ijkt de motor zelf -- onder andere dat een wachter die al
 rood was nooit als bewijs meetelt.
+
+## Snelheid en kosten: vier lagen, allemaal nagemeten
+
+Vier lagen die de pagina lichter maken en de rekening drukken. Ze staan alle
+vier standaard AAN en zijn los uit te zetten; de cijfers komen uit een echte
+browser over HTTP/2 op 80 ms latentie en 12 Mbit, mediaan van vijf ronden.
+
+| laag | wat | uit met |
+|---|---|---|
+| `middleware/stijlafsplitsing.js` | groot inline `<style>`-blok wordt een eigen blad | `RTG_STIJLAFSPLITSING=0` |
+| `middleware/scriptafsplitsing.js` | groot inline `<script>`-blok wordt een eigen bestand | `RTG_SCRIPTAFSPLITSING=0` |
+| `middleware/versieadres.js` | elke `.js`/`.css`-verwijzing krijgt `?v=`, en mag dan `immutable` | `RTG_VINGERAFDRUK=0` |
+| `middleware/voordeur.js` | paginacompressie asynchroon (libuv-threadpool i.p.v. de event loop) | -- |
+
+De eerste twee zijn EEN machine met twee instellingen: het gereedschap
+(codering, padcontrole, vingerafdruk, cache, compressie, koppen) staat in
+`middleware/blokafsplitsing.js`, de afweging per soort blok bij de twee lagen
+zelf -- waarom een stijlblok mag verhuizen zonder dat de cascade schuift, en
+een scriptblok zonder dat de uitvoervolgorde schuift.
+
+Waarom dit ertoe doet: over alle 258 schermen was 74% van de 4,7 MB HTML inline
+CSS en JS. Dat is de ene bron die NOOIT gecachet kan worden -- een pagina draagt
+een eigen nonce, dus elk antwoord is anders. Op `/apps/app.html`:
+
+    rauwe HTML      185.444 -> 51.883 bytes
+    over de lijn     52.636 -> 13.910 bytes gzip (74% minder)
+    CPU per verzoek     7,9 ->    1,05 ms
+    plafond             127 ->     948 pagina's/seconde per proces
+
+En met de versie in het adres hoeft een terugkerende bezoeker niet meer na te
+vragen of zijn scripts nog goed zijn: 908 -> 637 ms en 67 -> 29 verzoeken bij
+de server.
+
+Elke laag laat de pagina exact hetzelfde: de uitgeleverde CSS en JS zijn
+byte-voor-byte de inline blokken, en over 1294 elementen x 25 berekende
+eigenschappen is er geen verschil. Alle 259 schermen zijn met en zonder de
+lagen langsgelopen; geen enkel scherm gedraagt zich anders.
+
+## De modelkraan: een meter en twee kranen (`server/ai-meter.js`, `server/ai-rem.js`)
+
+EERST DE STAND VAN ZAKEN, want die is minder alarmerend dan het klinkt:
+`npm run live:init` schrijft `RTG_AI_UIT=1`, dus productie start ZONDER model,
+in de regelgestuurde werkmodus. En zodra er wel AI is, is de keten lokaal-eerst
+(`server/ai.js`): de eigen modelserver (`LOCAL_AI_URL`) staat vooraan, externe
+aanbieders zijn uitwijk voor wat lokaal niet kan of uitvalt. De
+configuratiekeuring (`server/config/productie-ai.js`) weigert zelfs een
+achtergebleven providersleutel naast `RTG_AI_UIT=1`: uit moet aantoonbaar uit
+zijn.
+
+Wat er dus geregeld moest worden, geldt voor het moment dat er externe sleutels
+staan. Dan sturen honderd aanroepplekken werk naar een extern model, en
+`usage.output_tokens` kwam wel binnen maar werd weggegooid: de eerste keer dat
+je de kosten zag, was op de factuur. De rem aan de deur (300 verzoeken per
+minuut per IP) ziet bovendien geen verschil tussen een endpoint van een tiende
+cent en een Opus-aanroep van $0,0136 -- een uur volloopen is ongeveer $244.
+
+EN DE EIGEN AI TELT OOK MEE, in een eigen emmer. Die kost geen geld maar
+CAPACITEIT: eigen ijzer, eigen wachttijd. Er hangt dus geen bedrag aan, wel een
+telling. Daaruit volgt het getal dat je echt wilt zien: **het aandeel dat naar
+buiten ging**. De keten is lokaal-eerst, dus dat hoort laag te zijn. Loopt het
+op, dan is dat geen kostenpost maar een signaal -- de eigen modelserver haakt
+af, en de rekening merkt het eerder dan een mens.
+
+`server/ai.js` is het enige punt waar elke aanroep langskomt, dus daar wordt
+geteld en daar staan de kranen:
+
+| schakelaar | wat | standaard |
+|---|---|---|
+| `RTG_AI_DAGPLAFOND` | dagplafond in dollar voor het hele huis; daarboven gaan externe modellen dicht | 50 (`npm run live:init` schrijft hem) |
+| `RTG_AI_BEURTEN_PER_MINUUT` | modelaanroepen per aanroeper per minuut; 0 zet de rem uit | 60 |
+| `RTG_AI_PRIJZEN` | prijstabel overschrijven (JSON), zodat een prijswijziging geen codewijziging is | ingebouwde tabel |
+
+De stand is af te lezen op `GET /api/techniek/ai/kosten` (techniek-inlog en
+alleen de eigenaar): aanroepen, tokens, kosten en de uitsplitsing per model,
+plus de interne emmer (`lokaal`) en `aandeelExtern`. Een totaalbedrag zegt dat
+het duur is, de uitsplitsing zegt waardoor, en het aandeel zegt of de eigen
+modelserver zijn werk nog doet.
+
+Beide kranen raken alleen EXTERNE aanbieders: een eigen modelserver
+(`LOCAL_AI_URL`) draait door, en anders valt de keten terug op geen-model -- de
+handmatige werkmodus die dit huis al draagt. De rem telt MODELAANROEPEN en geen
+routes, via dezelfde `AsyncLocalStorage` die `db/index.js` al gebruikt, zodat
+een nieuwe route er automatisch onder valt. Meter en rem staan apart
+(`ai-meter.js` en `ai-rem.js`) omdat ze verschillende dingen doen: de meter
+meet en grijpt in als het geld op is, de rem stopt iemand die er in een minuut
+doorheen gaat. De prijzen zijn een tabel met een
+peildatum en verouderen; ze bewaken een orde van grootte, ze zijn geen
+boekhouding.
+
+## Het AI-budget per persoon (`server/ai-budget.js`)
+
+De twee grenzen hierboven missen allebei iets. Het huisplafond telt het HELE
+huis: dat vangt een lek, maar pas als iedereen er last van heeft -- de kraan
+gaat voor de honderdste bezoeker dicht doordat de eerste hem heeft
+leeggetrokken. De rem telt per MINUUT: die vangt een uitschieter, maar een
+script dat netjes 59 per minuut doet loopt een dag lang door.
+
+Wat ertussen zat is een grens die bij de **persoon** hoort.
+
+| pas | venster | budget |
+|---|---|---|
+| gratis (en wie niet is ingelogd) | per dag | € 0,50 |
+| RTG Pass | per maand | € 15 |
+| Lifestyle Pass en Business Pass | per maand | € 5.000 |
+
+**Kijk naar het venster, niet naar het bedrag.** € 0,50 per dag is over een
+maand ook € 15 -- precies de RTG Pass. Het verschil is dus niet hoeveel je
+krijgt maar hoe vrij je erin bent: een RTG-lid mag zijn maand op één dag
+opmaken, een gratis gebruiker nooit meer dan een halve euro op een dag. Wie wil
+dat een betalend lid ook méér krijgt, verandert één getal in `BUDGETTEN`
+(`server/ai-budget-beleid.js`, of `RTG_AI_BUDGETTEN` als JSON in de omgeving).
+
+**Een IP is geen persoon.** De rem hiernaast sleutelt op IP, en voor een grens
+per minuut is dat prima. Voor een dag- of maandbudget is het op twee manieren
+fout tegelijk: een kantoor deelt één IP met honderd collega's, die dan samen
+één budget zouden krijgen, en een lid dat van wifi naar 4G loopt zou opeens
+iemand anders zijn met een vol budget. De sleutel is daarom de sessiesleutel
+van het lid (`user-<id>`) -- pseudoniem, zoals de rest van de operationele
+data; de echte naam blijft in de identiteitskluis. Wie niet is ingelogd valt
+terug op het IP en krijgt het gratis-budget, want anders is uitloggen de manier
+om er onderuit te komen.
+
+**De Foundation sluit nooit.** Alles onder `/api/foundation`, `/api/rtf`,
+`/api/bijles`, `/api/onderwijs` en `/api/member/leren` telt wel mee maar wordt
+nooit afgesloten. Dat volgt uit een regel die er al stond (`test/modelkeuze.test.js`):
+wat een kind te horen krijgt is geen kostenpost. Een bijlesdocent die halverwege
+een som stopt omdat het tegoed op is, is precies dat wel. Alleen het huisplafond
+kan die aanroepen nog stoppen. De lijst staat op één plek, met een reden per
+regel, en is bewust géén vlag die elke aanroeper zelf moet zetten -- zo'n vlag
+ben je een keer vergeten, en dan valt een kind stil.
+
+**Wat het niet is: geen aftelteller en geen verkooptrechter.** Er komt nergens
+"nog twaalf vragen vandaag" in beeld; dat is kunstmatige schaarste, en dat is
+precies wat CLAUDE.md verbiedt. Het budget is onzichtbaar tot het op is. En het
+bericht dat je dan krijgt noemt met opzet géén andere pas: zodra een grens per
+pas verschilt is "upgrade voor meer AI" de vanzelfsprekende volgende zin, en
+dan is de rem een verkoopargument geworden (LIFE.md: een relatie is geen
+trechter). Het bericht wijst naar wat er wél kan -- de handmatige werkmodus.
+
+**De munt.** De aanbieders factureren in dollar, deze budgetten staan in euro.
+Daar zit dus een koers tussen, met een peildatum, overschrijfbaar met
+`RTG_AI_KOERS` -- en die veroudert net zo hard als de prijstabel. Hij bewaakt
+een orde van grootte; het is geen boekhouding. **De ingebouwde koers (1 EUR =
+1,08 USD, peildatum 19 augustus 2026) is een aanname die iemand hoort na te
+kijken: dit huis heeft geen koersbron en verzint er ook geen.**
+
+De stand staat op hetzelfde luik als de meter (`GET /api/techniek/ai/kosten`):
+de bedragen per pas, hoeveel mensen er verbruik hebben, hoeveel er aan hun
+grens zitten, en wat de vrijgestelde oppervlakken kostten. Bewust een AANTAL en
+geen lijst -- wie er aan zijn grens zit is een gegeven over een lid, en dat
+hoort niet in een kostenoverzicht te staan omdat het toevallig te tellen is.
+
+## De eigen modelserver heeft een poort (`server/local-ai-poort.js`)
+
+Een externe aanbieder schaalt mee; een eigen modelserver niet. Die doet er twee,
+misschien vier tegelijk, en daarboven wordt hij niet langzamer maar STUK: alles
+kruipt, alles loopt in de timeout, en de uitwijkketen stuurt vervolgens ALLES
+naar de betaalde aanbieder. Dat is de dure faalstand, en hij is stil -- de
+rekening ziet hem eerder dan een mens, en ondertussen verlaat de inhoud wel het
+huis.
+
+Twee kleppen daartegen, allebei in `local-ai-poort.js` en niet in de HTTP-laag
+eronder (die bedient ook de betaalprovider en weet niets van een GPU).
+`local-ai.js` ernaast gaat over modelkeuze en de netwerkgrens; de poort gaat
+over capaciteit:
+
+| schakelaar | wat | standaard |
+|---|---|---|
+| `LOCAL_AI_GELIJKTIJDIG` | hoeveel verzoeken tegelijk naar de eigen server | 2 |
+| `LOCAL_AI_WACHT_MS` | hoe lang een verzoek in de wachtrij mag staan voordat de keten uitwijkt | 20000 |
+| `LOCAL_AI_STORINGSGRENS` | storingen op rij voordat de onderbreker aanslaat | 3 |
+| `LOCAL_AI_HERSTEL_MS` | hoe lang lokaal dan wordt overgeslagen, voordat er weer een verzoek langs mag | 30000 |
+
+Nul is bij deze twee tijden een geldig antwoord en geen leegte:
+`LOCAL_AI_WACHT_MS=0` betekent "niet in de rij, meteen uitwijken" en
+`LOCAL_AI_HERSTEL_MS=0` betekent "geen herstelvenster".
+
+Waarom de wachtrij een grens heeft: een lid drie minuten naar een leeg scherm
+laten kijken is erger dan de vraag naar buiten sturen. Waar die grens ligt is
+een keuze en geen natuurwet, dus hij staat in de env.
+
+Waarom de onderbreker bestaat: blijft de server *hangen* (niet weigeren, maar
+hangen), dan betaalt elk verzoek eerst de volle timeout voordat de uitwijk
+begint. Na een paar storingen slaat `kan()` over op false en slaat de keten hem
+meteen over. Na het herstelvenster mag er weer een verzoek langs; lukt dat, dan
+gaat de klep dicht en staat de teller weer op nul.
+
+Af te lezen op `GET /api/techniek/ai/kosten` als `lokaleServer`: bezig,
+wachtend, storingen, onderbroken. `aandeelExtern` zegt DAT de eigen server
+afhaakt; dit zegt waarom.
+
+`test/lokale-ai-poort.test.js` toetst dit tegen een echte nagemaakte
+modelserver -- gelijktijdigheid, de wachtgrens, de onderbreker en het herstel.
 
 ## Datamap instelbaar (RTG_DATA_DIR)
 

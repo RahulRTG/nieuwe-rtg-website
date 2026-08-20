@@ -1,9 +1,9 @@
 /* WANNEER TELT EEN ROUTE ALS "KOMT IN EEN TEST VOOR".
 
    Deze regels stonden in scripts/keuring.js, binnen in dekking(), als een
-   functie die verder niemand kon aanroepen. Toen scripts/deltapoort.js
-   dezelfde vraag moest stellen over de routes die NIEUW zijn in een wijziging,
-   waren er twee wegen: de regels overtypen, of ze hierheen halen.
+   functie die verder niemand kon aanroepen. Toen scripts/deltapoort.js en later
+   scripts/nieuweroutes.js dezelfde vraag moesten stellen over de routes die
+   NIEUW zijn in een wijziging, waren er twee wegen: de regels overtypen, of ze hierheen halen.
 
    Overtypen is regel 4 van de lat (nooit twee plekken die een waarheid
    vasthouden), en juist bij deze regels loopt dat gegarandeerd mis: ze zijn
@@ -27,4 +27,18 @@ function maakZoeker(testTekst) {
   return maakDekkingsIndex(testTekst);
 }
 
-module.exports = { maakZoeker };
+/* Dezelfde vraag, maar zonder eerst een zoeker te maken -- de vorm die
+   scripts/nieuweroutes.js gebruikt in een filter-lus. Het register wordt per
+   tekst EEN keer gebouwd en vastgehouden; zonder die cache zou elke route de
+   hele toetstekst opnieuw indexeren, en dat is precies de traagheid waar
+   dekkingsindex.js voor bestaat. */
+const losseTeksten = new Map();
+function gedektIn(route, testTekst) {
+  const sleutel = typeof testTekst === 'string' ? testTekst : null;
+  if (sleutel === null) return maakZoeker(String(testTekst))(route);
+  let zoek = losseTeksten.get(sleutel);
+  if (!zoek) { zoek = maakZoeker(sleutel); losseTeksten.set(sleutel, zoek); }
+  return zoek(route);
+}
+
+module.exports = { maakZoeker, gedektIn };

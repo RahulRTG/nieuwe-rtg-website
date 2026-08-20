@@ -83,7 +83,7 @@
   <div class="kaart blok" id="kInstel" hidden>
     <div style="font-family:var(--serif);font-size:1.1rem;margin-bottom:.5rem;">Voor wie is dit boekje?</div>
     <input class="veld" id="iNaam" placeholder="De naam van jullie kindje" maxlength="30">
-    <input class="veld" id="iGeboren" type="date" style="margin-top:.4rem;" aria-label="Geboortedatum (mag leeg)">
+    <input class="veld h-mt40" id="iGeboren" type="date" aria-label="Geboortedatum (mag leeg)">
     <button class="knop" id="iDoe" style="width:100%;margin-top:.5rem;">Begin het boekje</button>
     <div class="fout" id="iFout"></div>
   </div>
@@ -96,7 +96,7 @@
       <button class="mini" id="bWijzig" title="Naam of geboortedatum aanpassen">✎</button>
     </div>
 
-    <div class="kaart blok" style="margin-top:.8rem;">
+    <div class="kaart blok h-mt80">
       <div style="color:var(--zacht);font-size:.82rem;margin-bottom:.4rem;" id="cVandaag"></div>
       <textarea class="veld" id="cTekst" placeholder="Wat deed jullie kindje vandaag?"></textarea>
       <div class="fotoknop">
@@ -127,7 +127,7 @@
       <div style="color:var(--zacht);font-size:.88rem;line-height:1.45;margin-bottom:.4rem;">Wie horen er allemaal bij jullie? Broertjes, zusjes, opa, oma; de hond mag ook. De buddy bedenkt er momenten bij waar iedereen in meedoet.</div>
       <div class="chips" id="gChips"></div>
       <div style="display:flex;gap:.5rem;">
-        <input class="veld" id="gNaam" style="flex:1;" placeholder="Naam erbij (bijv. opa Ties)" maxlength="30">
+        <input class="veld h-flex1" id="gNaam" placeholder="Naam erbij (bijv. opa Ties)" maxlength="30">
         <button class="knop klein" id="gDoe">+</button>
       </div>
       <button class="knop" id="mDoe" style="width:100%;margin-top:.6rem;">Bedenk momenten voor ons gezin</button>
@@ -297,7 +297,7 @@ document.addEventListener('keydown', ev => {
 });
 function toonMomenten(m){
   $('#mLijst').innerHTML = (m && m.items && m.items.length) ?
-    '<div style="margin-top:.7rem;">' + m.items.map(x => '<div class="idee"><b>' + esc(x.titel) + '</b><div>' + esc(x.hoe) + '</div></div>').join('') +
+    '<div class="h-mt70">' + m.items.map(x => '<div class="idee"><b>' + esc(x.titel) + '</b><div>' + esc(x.hoe) + '</div></div>').join('') +
     (m.demo ? '<div class="leeg" style="padding:0;">De buddy koos uit een vast setje (demo).</div>' : '') + '</div>' : '';
 }
 async function laad(){

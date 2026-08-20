@@ -1,3 +1,4 @@
+/* een foto uploaden bij de zaak */
     const f = $('#phFile'); if (f) f.addEventListener('change', () => {
       const file = f.files && f.files[0]; if (!file) return;
       if (file.size > 1024*1024){ toast(T('sup.phtoobig','Foto te groot (max 1 MB).')); return; }

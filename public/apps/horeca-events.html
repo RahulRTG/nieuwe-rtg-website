@@ -19,7 +19,7 @@
 <header>
   <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
   <span><span class="ey">RTG Horeca</span><h1>Offerte, verbruik en nacalculatie</h1></span>
-  <span style="flex:1;"></span>
+  <span class="h-flex1"></span>
 </header>
 <main id="main">
   <div class="kaart">
@@ -36,26 +36,26 @@
       <input class="veld" id="vContact" maxlength="80" placeholder="Contactpersoon" aria-label="Contactpersoon">
       <input class="veld" id="vRuimte" maxlength="60" placeholder="Ruimte" aria-label="Ruimte" style="flex:0 1 9rem;">
     </div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij h-mt60">
       <input class="veld" id="vPost1" maxlength="100" placeholder="Post 1" aria-label="Post 1">
       <input class="veld" id="vAantal1" type="number" min="1" value="50" aria-label="Aantal post 1" style="flex:0 1 6rem;">
       <input class="veld" id="vPrijs1" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 1" style="flex:0 1 7rem;">
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij h-mt40">
       <input class="veld" id="vPost2" maxlength="100" placeholder="Post 2" aria-label="Post 2">
       <input class="veld" id="vAantal2" type="number" min="1" value="1" aria-label="Aantal post 2" style="flex:0 1 6rem;">
       <input class="veld" id="vPrijs2" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 2" style="flex:0 1 7rem;">
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij h-mt40">
       <input class="veld" id="vPost3" maxlength="100" placeholder="Post 3" aria-label="Post 3">
       <input class="veld" id="vAantal3" type="number" min="1" value="1" aria-label="Aantal post 3" style="flex:0 1 6rem;">
       <input class="veld" id="vPrijs3" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs post 3" style="flex:0 1 7rem;">
     </div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij h-mt60">
       <button class="knop p" id="vOfferte" type="button">Nieuwe offerte</button>
       <button class="knop" id="vPosten" type="button">Posten wijzigen</button>
     </div>
-    <p class="stil" style="margin-top:.4rem;">Posten wijzigen na een akkoord maakt een nieuwe versie die opnieuw bevestigd moet worden. Anders staat er aan het eind een bedrag op de factuur dat niemand heeft gezien.</p>
+    <p class="stil h-mt40">Posten wijzigen na een akkoord maakt een nieuwe versie die opnieuw bevestigd moet worden. Anders staat er aan het eind een bedrag op de factuur dat niemand heeft gezien.</p>
   </div>
 
   <div class="kaart">
@@ -70,7 +70,7 @@
       <input class="veld" id="vAanbedrag" type="number" min="0" step="0.01" placeholder="Aanbetaling" aria-label="Aanbetaling" style="flex:0 1 8rem;">
       <button class="knop" id="vAanbetaling" type="button">Boeken</button>
     </div>
-    <p class="stil" style="margin-top:.4rem;">Een offerte is pas een opdracht na een akkoord met een naam erbij. Een keuken die kookt voor 350 gasten omdat iemand aan de telefoon ja zei, is precies hoe het misgaat.</p>
+    <p class="stil h-mt40">Een offerte is pas een opdracht na een akkoord met een naam erbij. Een keuken die kookt voor 350 gasten omdat iemand aan de telefoon ja zei, is precies hoe het misgaat.</p>
   </div>
 
   <div class="kaart">
@@ -87,8 +87,8 @@
       <button class="knop p" id="vKosten" type="button">Kosten erbij</button>
       <button class="knop" id="vNa" type="button">Nacalculatie</button>
     </div>
-    <div id="vNaUit" style="margin-top:.6rem;"></div>
-    <p class="stil" style="margin-top:.4rem;">Zonder ingevoerde kosten blijft de marge leeg in plaats van 100%. Een nacalculatie zonder kosten is geen nacalculatie.</p>
+    <div class="h-mt60" id="vNaUit"></div>
+    <p class="stil h-mt40">Zonder ingevoerde kosten blijft de marge leeg in plaats van 100%. Een nacalculatie zonder kosten is geen nacalculatie.</p>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>

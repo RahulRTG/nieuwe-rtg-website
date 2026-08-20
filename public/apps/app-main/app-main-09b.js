@@ -1,4 +1,4 @@
-  /* ---- dm ---- */
+/* de directe berichten openen */
   async function openDm(key, naam){
     dmWith = key; dmNaam = naam;
     $('#dmNaam').textContent = naam;

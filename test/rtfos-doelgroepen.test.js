@@ -119,7 +119,25 @@ test('de drie schermen zijn installeerbaar, en het deelnemersicoon verraadt niet
     const html = await (await fetch(BASE + scherm)).text();
     assert.ok(html.includes('rel="manifest" href="' + manifestPad + '"'),
       scherm + ' verwijst niet naar ' + manifestPad);
-    assert.match(html, /serviceWorker\.register\('sw\.js'\)/,
+    /* De code die de pagina DRAAIT, niet alleen de tekst die erin staat.
+
+       Een groot inline <script> wordt bij het serveren een eigen bestand
+       (server/middleware/scriptafsplitsing.js), zodat het niet bij elk bezoek
+       opnieuw over de lijn hoeft. De registratie staat dan nog steeds in de
+       pagina, alleen een verwijzing verderop. Zoeken in alleen de html vond
+       hem niet meer -- terwijl een echte browser de service worker gewoon
+       registreert (nagemeten: zelfde sw.js, met en zonder afsplitsing).
+
+       Daarom volgt deze toets de verwijzing. Dat is niet zwakker dan eerst,
+       maar strenger: nu wordt ook bewezen dat het afgesplitste bestand echt
+       op te halen is. */
+    let draait = html;
+    for (const m of html.matchAll(/src="(\/scriptblok\.js\?[^"]+)"/g)) {
+      const r = await fetch(BASE + m[1].replace(/&amp;/g, '&'));
+      assert.equal(r.status, 200, scherm + ' verwijst naar ' + m[1] + ', maar dat is niet op te halen');
+      draait += '\n' + await r.text();
+    }
+    assert.match(draait, /serviceWorker\.register\('sw\.js'\)/,
       scherm + ' registreert geen service worker, dus hij is niet installeerbaar');
 
     const res = await fetch(BASE + manifestPad);

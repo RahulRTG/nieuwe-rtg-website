@@ -1,3 +1,4 @@
+/* de events van de zaak */
     if (kantoorSec === 'events'){
       const evs = state.events || [];
       html += '<div class="tkc"><h3>'+T('kt.newevent','Nieuw event')+'</h3><div class="st-form">'+
@@ -28,7 +29,7 @@
         '<div class="row-gap"><input class="st-in" id="kaN'+e.id+'" placeholder="'+T('ek.allergen','Allergeen, bijv. noten')+'" class="h-flex2"><input class="st-in" id="kaC'+e.id+'" type="number" placeholder="1\u00d7" class="h-flex1"></div>'+
         '<button class="obtn" data-kaladd="'+e.id+'">'+T('ek.addal','Allergeen registreren')+'</button>'+
         '<button class="obtn primary" data-kmep="'+e.id+'">\u2728 '+T('ek.mep','Organiseer de mise en place')+'</button></div>'+
-        '<h3 style="margin-top:0.6rem;">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
+        '<h3 class="h-mt60">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
         (rs.length ? rs.map(it=>'<div class="st-row"><span>'+(it.daysBefore?'<span style="font-size:0.6rem;letter-spacing:0.06em;color:var(--soft);margin-right:0.4rem;">D-'+it.daysBefore+'</span>':'')+'<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
           '<button class="obtn warn" data-krdel="'+e.id+'" data-item="'+it.id+'">\u2715</button></div>').join('')
           : '<div class="tkc-who">'+T('rs.none','Nog geen draaiboek. Voer regels in, plak een bestaand draaiboek, of laat de AI er een opstellen.')+'</div>')+
@@ -37,13 +38,13 @@
         '<select class="st-in" id="krS'+e.id+'" style="flex:1.4;">'+stOpts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></div>'+
         '<input class="st-in" id="krX'+e.id+'" placeholder="'+T('rs.what','Wat moet er gebeuren?')+'">'+
         '<button class="obtn" data-kradd="'+e.id+'">'+T('rs.add','Regel toevoegen')+'</button></div>'+
-        '<div class="st-form" style="margin-top:0.7rem;">'+
+        '<div class="st-form h-mt70">'+
         '<textarea class="st-in" id="krP'+e.id+'" placeholder="'+T('rs.paste','Plak hier een bestaand draaiboek (per regel een tijd en taak), of kies een bestand...')+'" style="min-height:64px;resize:vertical;"></textarea>'+
         '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;">'+
         '<label class="obtn" style="cursor:pointer;">\uD83D\uDCC4 '+T('rs.upload','Upload bestand')+'<input type="file" accept=".txt,.csv,.md,text/plain" data-krfile="'+e.id+'" style="display:none;"></label>'+
         '<button class="obtn" data-krimp="'+e.id+'">'+T('rs.import','Verwerk met AI')+'</button>'+
         '<button class="obtn primary" data-krai="'+e.id+'">\u2728 '+T('rs.suggest','Laat de AI een draaiboek opstellen')+'</button></div></div>'+
-        '<div class="tkc-act" style="margin-top:0.7rem;"><button class="'+(e.published?'tkc-start':'tkc-ready')+'" data-kevpub="'+e.id+'">'+(e.published?T('kt.ev.offline','Haal offline'):T('kt.ev.publish','Publiceer voor leden'))+'</button>'+
+        '<div class="tkc-act h-mt70"><button class="'+(e.published?'tkc-start':'tkc-ready')+'" data-kevpub="'+e.id+'">'+(e.published?T('kt.ev.offline','Haal offline'):T('kt.ev.publish','Publiceer voor leden'))+'</button>'+
         '<button class="tkc-start" data-kevdel="'+e.id+'" style="flex:0 0 auto;">\u2715</button></div></div>';
       }).join('');
     }

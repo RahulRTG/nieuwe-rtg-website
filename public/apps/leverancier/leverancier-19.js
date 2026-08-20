@@ -1,3 +1,4 @@
+/* de minibar-catalogus */
     if (kantoorSec === 'minibar'){
       const cat = (state.minibar && state.minibar.catalog) || [];
       html += '<div class="tkc h-volbreed"><h3>'+T('kt.mbcat','Minibar-catalogus')+' ('+cat.length+')</h3>'+

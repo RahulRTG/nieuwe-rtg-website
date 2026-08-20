@@ -180,7 +180,7 @@ async function wmLaad(){
       '<span class="lt">'+esc(a.label)+' · '+esc(ROLNAAM[a.rol]||a.rol)+(a.actief?'':' · <span class="ongev">afgepakt</span>')+'</span></span>'+
       (a.rol==='eigenaar'||a.rol==='rahul'?'':'<span class="nieuwbtn" data-slot="'+esc(a.adres)+'" data-aan="'+(a.actief?'0':'1')+'">'+(a.actief?'Afpakken':'Teruggeven')+'</span>')+
       '</button>').join('')+
-    '<div class="kaart" style="margin-top:.8rem;"><h2 style="font-size:1rem;">Nieuw adres (werkgever)</h2>'+
+    '<div class="kaart h-mt80"><h2 style="font-size:1rem;">Nieuw adres (werkgever)</h2>'+
     '<label class="lab">Naam voor de apenstaart</label><input class="veld" id="wmLokaal" placeholder="bijv. balie of jamal">'+
     '<label class="lab">Voor wie</label><input class="veld" id="wmLabel" placeholder="bijv. De balie">'+
     '<div class="fout" id="wmFout" hidden></div>'+

@@ -1,3 +1,4 @@
+/* het live-paneel: van modus wisselen */
     $('#livePanel').querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
       liveMode = b.dataset.mode;
       $('#livePanel').querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === liveMode));
@@ -28,7 +29,7 @@
     el.innerHTML = d.assets.map(a => {
       const p = posVan(a.id);
       const vol = a.beschikbaar === 0;
-      return '<div class="live-start" style="margin-top:0.8rem;">' +
+      return '<div class="live-start h-mt80">' +
         '<div class="lh">' +RTGGlyf.tekst(a.icon)+ ' ' + esc(a.naam) + '</div>' +
         '<div class="ld">' + esc(a.beschrijving) + '<br>' + esc(a.waar) + ' · ' + T('as.waarde','objectwaarde') + ' ' + eur(a.waarde) + '</div>' +
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;font-size:0.72rem;color:var(--soft);">' +
@@ -52,7 +53,7 @@
           ? '<div style="margin-top:0.7rem;font-size:0.74rem;color:var(--soft);">' + T('as.volh','De pool is vol.') + ' ' + (a.wachtenden ? a.wachtenden + ' ' + T('as.wachten','op de wachtlijst.') : '') + '</div>' +
             (a.opWachtlijst
               ? '<div style="margin-top:0.4rem;font-size:0.74rem;color:var(--gold-bright,#C99A2E);">✓ ' + T('as.opwl','U staat op de wachtlijst; bij de eerstvolgende uitstapper bent u aan de beurt.') + '</div>'
-              : '<button class="live-go js-aswacht" data-id="' + a.id + '" style="margin-top:0.5rem;">' + T('as.wachtknop','Zet mij op de wachtlijst') + '</button>')
+              : '<button class="live-go js-aswacht h-mt50" data-id="' + a.id + '">' + T('as.wachtknop','Zet mij op de wachtlijst') + '</button>')
           : '<div style="margin-top:0.7rem;font-size:0.72rem;color:var(--soft);line-height:1.6;">' +
             '<b style="color:var(--txt);">Access</b> · ' + eur(a.prijsAccess) + ' · ' + T('as.access.s','dienstenvoucher: alleen het gebruik (25% van de ticketwaarde). Teller reset elk jaar, na tien jaar is het klaar.') + '<br>' +
             '<b style="color:var(--txt);">Asset</b> · ' + eur(a.prijsAsset) + ' · ' + T('as.asset.s','deelnemingsbewijs in') + ' ' + esc(a.entiteit) + ': ' + T('as.asset.s2','zelfde gebruik, plus uw aandeel in de restwaarde. Uitstappen via de wachtlijst, anders koopt RTG terug binnen 30 dagen.') + '<br>' +
@@ -62,7 +63,7 @@
             '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="access" style="flex:1;margin-top:0;">Access</button>' +
             '<button class="live-go js-askoop" data-id="' + a.id + '" data-smaak="asset" data-ent="' + esc(a.entiteit) + '" data-fee="' + a.serviceFee + '" style="flex:1;margin-top:0;background:var(--gold-bright,#C99A2E);">Asset</button>' +
           '</div>')+
-        '<button class="mo-code js-asdoc" data-id="' + a.id + '" style="margin-top:0.5rem;">' + T('as.doc','Essentiele informatie') + '</button>' +
+        '<button class="mo-code js-asdoc h-mt50" data-id="' + a.id + '">' + T('as.doc','Essentiele informatie') + '</button>' +
         '<div data-asdocuit="' + a.id + '" style="display:none;margin-top:0.5rem;font-size:0.7rem;color:var(--soft);line-height:1.6;border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.75rem;"></div>' +
       '</div>';
     }).join('');

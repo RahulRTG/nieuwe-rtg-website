@@ -117,8 +117,15 @@ test('4b. ieder appscherm krijgt in Magnaat vóór zijn eigen code de dichte tra
   const uit = await draai(cspNonce(PUBLIC, true), req, nepRes());
   const html = String(uit.res.body);
   const csp = uit.res.kop['content-security-policy'] || '';
-  assert.equal((html.match(/src="\/apps\/magnaat-sandbox\.js"/g) || []).length, 1);
-  const externeScripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m => m[1]);
+  /* Het pad zonder querystring, want elke verwijzing draagt sinds
+     server/middleware/versieadres.js de versie van het bestand mee (?v=...).
+     Dat verandert niets aan WELK script er staat of in welke VOLGORDE -- en dat
+     is precies wat deze toets bewaakt -- dus vergelijken we op het pad. */
+  const padVan = (u) => String(u).split('?')[0];
+  const sandboxTags = [...html.matchAll(/src="([^"]*magnaat-sandbox\.js[^"]*)"/g)];
+  assert.equal(sandboxTags.length, 1, 'de blokkade staat er precies een keer');
+  assert.equal(padVan(sandboxTags[0][1]), '/apps/magnaat-sandbox.js');
+  const externeScripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m => padVan(m[1]));
   assert.equal(externeScripts[0], '/apps/magnaat-sandbox.js',
     'de blokkade draait vóór het eerste externe paginascript');
   assert.match(csp, /connect-src 'none'/);

@@ -1,3 +1,4 @@
+/* de backoffice: de basis (helpers, taal, elementen) */
 (function(){
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);

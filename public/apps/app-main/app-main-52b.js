@@ -1,9 +1,10 @@
+/* de reactieteller onder een bericht */
                     (k.reactiesTotaal ? '<div style="font-size:0.62rem;color:var(--soft);margin-top:0.3rem;">' + k.reactiesTotaal + ' ' + T('zak.k.reacties','reactie(s)') + '</div>' : '')
                   : ''))) +
             '</div>';
           const alle = (d.kansen || []).concat(d.partnerVacatures || []);
           $('#kansLijst').innerHTML = alle.length ? alle.map(kaart).join('')
-            : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.k.leeg','Nog geen kansen. Plaats de eerste: een opdracht, samenwerking of investeringsvraag.') + '<br><button class="rahul-leeg-knop" data-rahul-leeg="Stel een kans op (een opdracht, samenwerking of investeringsvraag) en plaats hem voor me" style="margin-top:0.6rem;">' + T('zak.k.leegdoe','Laat Rahul een kans opstellen') + '</button></div>';
+            : '<div class="zak-kaart" style="color:var(--soft);font-size:0.78rem;">' + T('zak.k.leeg','Nog geen kansen. Plaats de eerste: een opdracht, samenwerking of investeringsvraag.') + '<br><button class="rahul-leeg-knop h-mt60" data-rahul-leeg="Stel een kans op (een opdracht, samenwerking of investeringsvraag) en plaats hem voor me">' + T('zak.k.leegdoe','Laat Rahul een kans opstellen') + '</button></div>';
           $('#kansLijst').querySelectorAll('.js-kre').forEach(b => b.addEventListener('click', async () => {
             const inp = $('#kansLijst').querySelector('.js-kretxt[data-id="' + b.dataset.id + '"]');
             try { await API.call('/zakelijk/kans/reageer', { id: b.dataset.id, tekst: inp.value }); toast(T('zak.k.gereageerd','Reactie geplaatst; de plaatser ziet hem direct.')); laad(); }
@@ -51,7 +52,7 @@
         const veld = (label, id, val, ph) => '<div class="field"><label>' + label + '</label><input id="' + id + '" value="' + escT(val || '') + '"' + (ph ? ' placeholder="' + ph + '"' : '') + '></div>';
         body.innerHTML =
           '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.6rem;line-height:1.5;">' + T('zak.uitleg','Uw profiel is pas zichtbaar in de gids als u het bewaart. U kiest zelf welke naam u zakelijk gebruikt.') + '</div>' +
-          (d.cvSuggestie ? '<button id="zakUitCv" class="zak-chip klik" style="margin-top:0.5rem;">' + T('zak.uitcv','Vul aan vanuit mijn RTG-cv') + '</button>' : '') +
+          (d.cvSuggestie ? '<button id="zakUitCv" class="zak-chip klik h-mt50">' + T('zak.uitcv','Vul aan vanuit mijn RTG-cv') + '</button>' : '') +
           veld(T('zak.naam','Professionele naam'), 'zakNaam', p.naam, T('zak.naamph','Standaard: uw codenaam')) +
           veld(T('zak.kop','Kop'), 'zakKop', p.kop, T('zak.kopph','Bijv. Oprichter, Fotograaf, Jurist')) +
           veld(T('zak.sector','Sector'), 'zakSector', p.sector) +

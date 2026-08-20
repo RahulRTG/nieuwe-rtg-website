@@ -35,7 +35,7 @@
       d.groepen.length + ' soort(en)' + (d.domeinen && d.domeinen.length ? ' over ' + d.domeinen.length + ' domein(en)' : '') + '.</p>';
     if (!d.groepen.length) {
       u += '<div class="kaart"><h3>Niets gevonden</h3><p>Er is gekeken in ' + d.bereik.length + ' objectsoorten:</p>' +
-        '<div class="meta" style="margin-top:.5rem;">' +
+        '<div class="meta h-mt50">' +
         d.bereik.map(function (b) { return esc(b.meervoud) + ' (' + esc(b.velden.join(', ')) + ')'; }).join('<br>') +
         '</div></div>';
       return u;
@@ -51,7 +51,7 @@
           (r.sub ? ' <span class="meta">' + esc(r.sub) + '</span>' : '') +
           '<div class="meta">' + esc(r.type) + ' ' + esc(r.id) + ' · gevonden op ' + esc(r.veld) + '</div></div>';
       }
-      if (g.totaal > g.rijen.length) u += '<p class="meta" style="margin-top:.5rem;">' +
+      if (g.totaal > g.rijen.length) u += '<p class="meta h-mt50">' +
         (g.totaal - g.rijen.length) + ' verder niet getoond.</p>';
       u += '</div>';
     }
@@ -84,7 +84,7 @@
     }
     var d = o.data;
     var u = '<button class="knop" id="terugZoek">← terug naar de zoekuitslag</button>' +
-      '<h2 class="ckop" style="margin-top:.9rem;">' + esc(d.object.titel) + '</h2>' +
+      '<h2 class="ckop h-mt90">' + esc(d.object.titel) + '</h2>' +
       '<p class="lead">' + esc(d.object.label) + ' ' + esc(d.object.id) +
       (d.object.sub ? ' · ' + esc(d.object.sub) : '') + ' · domein ' + esc(d.object.domein) + '</p>';
 
@@ -96,7 +96,7 @@
         ' <span class="meta">risico ' + a.score + (a.vierOgen ? ' · vier ogen' : '') + '</span>' +
         '<div class="meta">' + esc(a.wat) + '</div>' +
         '<div class="meta">' + esc(a.waaromNiet || a.waarom) + '</div>' +
-        (a.soort === 'runbook' && a.past ? '<div class="crij" style="margin-top:.45rem;">' +
+        (a.soort === 'runbook' && a.past ? '<div class="crij h-mt45">' +
           '<button class="knop" data-rb="' + esc(a.id) + '" data-droog="1">Droog draaien</button>' +
           '<button class="knop' + (a.niveau === 'auto' ? ' vol' : '') + '" data-rb="' + esc(a.id) + '">Uitvoeren</button></div>' : '') +
         '</div>';
@@ -122,7 +122,7 @@
         gr.rijen.map(function (x) { return '<button class="knop" data-t="' + esc(x.type) + '" data-i="' + esc(x.id) + '" style="border:none;padding:0;font-size:.8rem;">' + esc(x.titel) + '</button> (via ' + esc(x.via) + ')'; }).join(' · ') +
         '</div></div>';
     }
-    if (d.afhankelijkhedenOnvolledig) u += '<p class="meta" style="margin-top:.5rem;">Let op: minstens één collectie is groter dan de scangrens. Deze lijst is daarmee niet volledig.</p>';
+    if (d.afhankelijkhedenOnvolledig) u += '<p class="meta h-mt50">Let op: minstens één collectie is groter dan de scangrens. Deze lijst is daarmee niet volledig.</p>';
     u += '</div>';
 
     u += '<div class="kaart"><h3>De feiten</h3><div class="schuif"><table class="ctab"><tbody>';

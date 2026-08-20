@@ -145,6 +145,7 @@
       $('#rApotheek').innerHTML = z.apotheken.map(a => '<option value="' + a.code + '">' + esc(a.naam) + '</option>').join('');
       $('#eigenRecepten').innerHTML = (z.eigenRecepten || []).slice(0, 5).map(r => esc(r.middel) + ' (' + esc(r.status) + ')').join('<br>');
     }
+/* doorverwijzen naar een andere dienst */
     if (z.verwijsDoelen && z.verwijsDoelen.length) {
       $('#kVerwijs').hidden = false;
       $('#vNaar').innerHTML = z.verwijsDoelen.map(v => '<option value="' + v.code + '">' + esc(v.naam) + ' (' + esc(v.soort) + ')</option>').join('');
@@ -305,6 +306,7 @@
     laadKetenGesprek();
   }
   async function laadKetenGesprek() {
+/* het ketengesprek */
     if (!ktGekozen) { $('#ktChat').innerHTML = ''; return; }
     try {
       const g = await api('keten/gesprek', { kanaal: ktGekozen });
@@ -372,12 +374,12 @@
       '<div class="rkpi"><b>' + t.sehWachtend + '</b><span>SEH wacht</span></div>' +
       '<div class="rkpi"><b style="color:var(--rood);">' + t.meldingenOpen + '</b><span>open meldingen</span></div>';
     let h = '';
-    if (b.korpsen.length) h += '<div style="margin-top:0.5rem;"><b style="font-size:0.8rem;">Korpsen</b>' + b.korpsen.map(k =>
+    if (b.korpsen.length) h += '<div class="h-mt50"><b style="font-size:0.8rem;">Korpsen</b>' + b.korpsen.map(k =>
       '<div class="melding" style="padding:0.4rem 0;">' + esc(k.naam) + ' · ' + k.vrij + ' vrij / ' + k.inzet + ' ingezet' +
       (k.perSoort.length ? ' <span class="stil">(' + k.perSoort.map(p => p.vrij + ' ' + p.soort).join(', ') + ')</span>' : '') + '</div>').join('') + '</div>';
-    if (b.ziekenhuizen.length) h += '<div style="margin-top:0.5rem;"><b style="font-size:0.8rem;">Ziekenhuizen</b>' + b.ziekenhuizen.map(z =>
+    if (b.ziekenhuizen.length) h += '<div class="h-mt50"><b style="font-size:0.8rem;">Ziekenhuizen</b>' + b.ziekenhuizen.map(z =>
       '<div class="melding" style="padding:0.4rem 0;">' + esc(z.naam) + ' · ' + z.beddenVrij + '/' + z.beddenTotaal + ' bedden vrij · SEH: ' + z.sehWachtend + ' wacht</div>').join('') + '</div>';
-    if (b.defensie.length) h += '<div style="margin-top:0.5rem;"><b style="font-size:0.8rem;">Defensie</b>' + b.defensie.map(d =>
+    if (b.defensie.length) h += '<div class="h-mt50"><b style="font-size:0.8rem;">Defensie</b>' + b.defensie.map(d =>
       '<div class="melding" style="padding:0.4rem 0;">' + esc(d.naam) + ' · ' + d.gevechtsgereed + ' gevechtsgereed, ' + d.beperkt + ' beperkt · ' + d.gewonden + ' gewonden</div>').join('') + '</div>';
     $('#rampDetail').innerHTML = h;
     document.querySelectorAll('[data-nvl]').forEach(x => x.addEventListener('click', async () => {

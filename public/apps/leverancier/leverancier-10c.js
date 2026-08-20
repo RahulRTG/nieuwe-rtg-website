@@ -1,3 +1,4 @@
+/* de straks-taken en de mise-en-place van vandaag */
           });
           const straksRows = Object.entries(straks).sort((a,b)=>a[1].min-b[1].min).slice(0,6);
           const dmsK = (state.dailyMeps||{})[new Date().toISOString().slice(0,10)];

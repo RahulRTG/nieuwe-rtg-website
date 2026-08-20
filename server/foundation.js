@@ -83,7 +83,7 @@ const { setMarkt } = require('./foundation/markt')(ctx);
    een load balancer heeft er niets aan. De cijfers staan op het RTF-kantoor,
    achter een inlog; hier blijft alleen het leven-teken over. */
 router.get('/health', (req, res) => {
-  const s = require('./ai').beschikbaarheid(anthropic);
+  const s = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({ ok: true, ai: s.modus, verwerking: s.verwerking });
 });
 

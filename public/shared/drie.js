@@ -193,6 +193,7 @@
     var raster = opties.raster || [0.79, 0.63, 0.29];
     var licht = normaliseer(opties.licht || [0.5, 1.0, 0.35]);
 
+/* de buffers van een mesh naar de GPU */
     function bufferVan(mesh) {
       var b = { pos: gl.createBuffer(), nor: gl.createBuffer(), kol: gl.createBuffer(), idx: gl.createBuffer(), n: mesh.indices.length };
       gl.bindBuffer(gl.ARRAY_BUFFER, b.pos); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.posities), gl.STATIC_DRAW);

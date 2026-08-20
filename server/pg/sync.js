@@ -3,8 +3,16 @@
    dezelfde 3-weg-merge (merge3) als de SQLite-opslag, zodat twee instances
    elkaar niet overschrijven. De leeskant (wijzigingen van andere instances
    ophalen) staat in ./inlezen.js. Afgesplitst uit pg/index.js; de pool, de
-   kluis-helpers en de gedeelde staat-maps komen via de context binnen. */
-const KANAAL = 'rtg_kv';
+   kluis-helpers en de gedeelde staat-maps komen via de context binnen.
+
+   WAT HIER STAAT IS BELEID, GEEN MECHANISME. Welke collectie meegaat, hoe lang
+   een grote mag wachten, welke sleutels een snelle rijstrook krijgen en in
+   welke volgorde ze gaan -- dat staat hieronder. HOE een schrijf veilig is
+   tegen een tweede schrijver (het slot, de merge, het versienummer, de NOTIFY,
+   en de twee lanen) staat in ./schrijflanen.js. Die snede stond al opgeschreven
+   in TAKEN.md 4.23 en in de uitzonderingslijst van scripts/check.js; ze is
+   gemaakt toen dit bestand met 11935 byte over de 10 kB-grens stond. */
+'use strict';
 
 /* DE SNELLE RIJSTROOK: collecties die nooit achter tientallen megabytes mogen
    wachten. Dit zijn de idempotentie-boeken van RTG Pay en RTG Bank.
@@ -45,8 +53,10 @@ function herstelbaar(k) {
 }
 
 module.exports = (ctx) => {
-  const { pool, merge3, uitStore, naarStore, vlag,
-    toegepast, laatsteJson, laatsteGrootte, laatsteLengte, laatsteCheck } = ctx;
+  /* Alleen wat het BELEID nodig heeft. De pool, de kluis-helpers en de
+     merge gaan als hele ctx door naar ./schrijflanen.js -- ze hier ook
+     uitpakken zou een tweede lijst maken die uit de pas kan lopen. */
+  const { vlag, laatsteJson, laatsteGrootte, laatsteLengte, laatsteCheck } = ctx;
 
   /* Schrijf de gewijzigde collecties weg. Per collectie in een transactie met een
      row-lock: schreef een ander proces ondertussen een nieuwere versie, dan
@@ -82,9 +92,9 @@ module.exports = (ctx) => {
   const GROOT_BYTES = 512 * 1024, GROOT_MS = 2000;
   const GROOT_FLUSH_MS = Number(process.env.PG_GROOT_FLUSH_MS || 5000);
   const laatsteSchrijf = new Map(); // collectie -> tijdstip van de laatste echte schrijf
+  const { schrijfLanen } = require('./schrijflanen')(ctx, laatsteSchrijf);
   const lengteVan = v => Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0);
   async function flush(dataNu, force, alleen) {
-    let geschreven = 0;
     const gewijzigd = [];
     const nu = Date.now();
     if (!alleen) vlag.uitgesteld = false;
@@ -130,82 +140,10 @@ module.exports = (ctx) => {
       }
       return a[1].length - b[1].length;
     });
-    /* Een collectie schrijven, binnen een al geopende transactie. De advisory
-       lock is cruciaal: bij de ALLEREERSTE schrijf bestaat de rij nog niet, en
-       dan zou "SELECT ... FOR UPDATE" niets vergrendelen -- twee gelijktijdige
-       schrijvers zouden dan allebei "geen rij" zien, de merge overslaan en
-       elkaars insert overschrijven (verloren update). De lock serialiseert
-       schrijvers naar dezelfde collectie, rij of niet. De caches (laatsteJson,
-       toegepast) werkt de AANROEPER pas na de COMMIT bij: een rollback mag
-       geen bijgewerkte cache achterlaten. */
-    async function schrijfEen(client, k, jOns) {
-      await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
-      const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [k]);
-      /* De lijst `gewijzigd` is vóór het wachten op het slot gemaakt. Een
-         directe collectietransactie in DIT proces kan intussen al gecommit en
-         de lokale werkkopie vervangen hebben. Schrijf dan de verse werkkopie,
-         nooit de oude JSON die vóór het slot werd berekend. */
-      const liveJson = JSON.stringify(dataNu[k]);
-      let j = liveJson === jOns ? jOns : liveJson;
-      if (huidig.rows.length && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {
-        const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
-        const samen = merge3(base, dataNu[k], JSON.parse(uitStore(huidig.rows[0].val)));
-        dataNu[k] = samen;
-        j = JSON.stringify(samen);
-      }
-      const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
-      const ver = Number(nv.rows[0].v);
-      await client.query(
-        `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
-         ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, bijgewerkt = now()`,
-        [k, naarStore(j), ver]
-      );
-      await client.query(`SELECT pg_notify($1, $2)`, [KANAAL, k]);
-      return { j, ver };
-    }
-    const naCommit = (k, r) => { laatsteJson.set(k, r.j); laatsteSchrijf.set(k, Date.now()); toegepast.set(k, r.ver); geschreven++; };
-    /* DE RIJSTROOK IS EEN GEHEEL. paySaldi en payIdem elk in een eigen
-       transactie committen liet een venster staan: een kill -9 tussen die twee
-       commits gaf een schijf waarop het geld staat en de idem-sleutel niet, en
-       de crashproef boekte er prompt dubbel door (+137 centen, herhaalbaar).
-       Daarom gaan de rijstrook-sleutels in EEN transactie: alles of niets.
-       De slotvolgorde is de sleutelNAAM, niet de grootte -- groottes verschillen
-       per instance, en twee instances die dezelfde locks in verschillende
-       volgorde nemen zetten elkaar klem. De trage laan hieronder houdt zijn
-       transactie per collectie: grote blobs in een groepstransactie zouden de
-       locks seconden vasthouden. */
-    if (alleen && gewijzigd.length) {
-      gewijzigd.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
-      const client = await pool.connect();
-      const geslaagd = [];
-      try {
-        await client.query('BEGIN');
-        for (const [k, jOns] of gewijzigd) geslaagd.push([k, await schrijfEen(client, k, jOns)]);
-        await client.query('COMMIT');
-      } catch (e) {
-        try { await client.query('ROLLBACK'); } catch (x) {}
-        throw e;
-      } finally {
-        client.release();
-      }
-      for (const [k, r] of geslaagd) naCommit(k, r);
-      return geschreven;
-    }
-    for (const [k, jOns] of gewijzigd) {
-      const client = await pool.connect();
-      try {
-        await client.query('BEGIN');
-        const r = await schrijfEen(client, k, jOns);
-        await client.query('COMMIT');
-        naCommit(k, r);
-      } catch (e) {
-        try { await client.query('ROLLBACK'); } catch (x) {}
-        throw e;
-      } finally {
-        client.release();
-      }
-    }
-    return geschreven;
+    /* HOE er geschreven wordt -- slot, merge, versie, NOTIFY, en de twee
+       lanen waarin dat gebeurt -- staat in ./schrijflanen.js. Hier blijft
+       het BELEID: wat er meegaat en in welke volgorde. */
+    return schrijfLanen(dataNu, gewijzigd, alleen);
   }
 
   return { flush, VOORRANG };

@@ -1,3 +1,4 @@
+/* aanmelden als medewerker bij een zaak */
     msg.textContent = T('enr.busy','Bezig met aanmelden...');
     try {
       const r = await API.call('/supplier/staff/join', { bedrijf, kassacode, login: login2, password, pin });

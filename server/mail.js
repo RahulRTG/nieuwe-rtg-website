@@ -25,12 +25,8 @@
    Zo is de hele mailstroom af voor livegang: alleen nog een SMTP-account
    koppelen via twee omgevingsvariabelen.
    ========================================================================== */
-const fs = require('fs');
-const path = require('path');
-const rtgKlok = require('./lib/klok');
 const smsSandbox = require('./sms-sandbox');
 
-const OUTBOX = path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'outbox');
 const SMTP_URL = process.env.SMTP_URL || '';
 const SMTP_SANDBOX_GEVRAAGD = process.env.SMTP_SANDBOX === '1';
 const SMTP_SANDBOX = SMTP_SANDBOX_GEVRAAGD && process.env.NODE_ENV !== 'production';
@@ -53,74 +49,28 @@ if (SMTP_URL) {
   }
 }
 const CONFIGURED = !!transporter;
-/* De lokale sandboxes krijgen bovenop hun startconfiguratie een runtime-
-   zekering. De Integratiekamer kan ze UIT zetten zonder procesherstart; AAN kan
-   alleen wanneer de veilige lokale provider bij de start echt is ingericht. */
-let smtpSandboxAan = CONFIGURED && SMTP_SANDBOX;
-let smsSandboxAan = smsSandbox.enabled;
 
-/* De outbox is niet alleen de ontwikkelstand: hij vangt ook mail op als een
-   ECHTE verzending mislukt (zie send() hieronder). Dan liggen er dus op de
-   productiemachine bestanden met het e-mailadres van een lid en een werkende
-   bevestigings- of herstel-link erin. Daarom gaat de outbox door dezelfde kluis
-   als de rest: staat RTG_ENC_KEY, dan versleuteld (.eml.enc), anders leesbaar
-   (.txt) zodat lokaal ontwikkelen niet omslachtig wordt. Terugkijken kan met
-   `npm run outbox`. */
-function toOutbox(to, subject, text) {
-  fs.mkdirSync(OUTBOX, { recursive: true, mode: 0o700 });
-  try { fs.chmodSync(OUTBOX, 0o700); } catch (e) {}
-  /* De naam draagt de tijd EN een willekeurig staartje. Zonder dat staartje
-     schrijven twee berichten in dezelfde milliseconde over elkaar heen -- en dat
-     is geen zeldzaam geval: een herstelaanvraag stuurt de LINK en de CODE vlak
-     na elkaar, precies de twee dingen die je allebei nodig hebt. Een van de twee
-     verdween dan, terwijl het logboek beide als bewaard meldde. Zelfde soort
-     fout als de rest: een storing die je niet kunt zien. */
-  const stamp = rtgKlok.datum().toISOString().replace(/[:.]/g, '-');
-  const staart = require('crypto').randomBytes(4).toString('hex');
-  const bericht = `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
-  const kluis = require('./kluis');
-  const naam = stamp + '-' + staart + (kluis.AAN ? '.eml.enc' : '.txt');
-  fs.writeFileSync(path.join(OUTBOX, naam), kluis.versleutel(bericht), { mode: 0o600 });
-  // het adres zelf hoort niet in het logboek als de inhoud wel beschermd is
-  console.log(`[mail] (outbox) ${kluis.AAN ? 'versleuteld opgeslagen' : 'naar ' + to}: ${subject}`);
-}
+/* Het vangnet -- de outbox waar alles op terugvalt -- staat in
+   ./mail-outbox.js, samen met het pad waar hij woont. Drie modules schrijven
+   erin (dit bestand, de eigen bezorging en de SMS-kant), dus hij is geen
+   detail van een van die drie. */
+const { toOutbox } = require('./mail-outbox')({ FROM });
 
-/* Het bericht zoals het over de lijn gaat. Bij directe bezorging bouwen wij
-   het zelf op -- er is geen provider meer die koppen aanvult -- en dus hoort
-   alles erin te staan wat een ontvanger verwacht: een datum, een uniek
-   Message-ID, en de tekst als UTF-8. */
-function bouwBericht(to, subject, text) {
-  const crypto = require('crypto');
-  /* De opmaak-hulpjes komen uit server/smtp.js en worden hier NIET nagemaakt:
-     een onderwerp met een accent hoort in beide standen op dezelfde manier
-     gecodeerd te worden, en twee kopieen van die regel lopen ooit uiteen. */
-  const { _kopWaarde: kopWaarde, _rfcDatum: rfcDatum } = require('./smtp');
-  const id = '<' + crypto.randomBytes(12).toString('hex') + '@' + (MAIL_DOMEIN || 'localhost') + '>';
-  const koppen = {
-    From: FROM, To: to, Subject: kopWaarde(subject), Date: rfcDatum(rtgKlok.datum()),
-    'Message-ID': id, 'MIME-Version': '1.0',
-    'Content-Type': 'text/plain; charset=utf-8', 'Content-Transfer-Encoding': 'base64'
-  };
-  /* Base64 en niet 8bit: wij onderhandelen bij directe bezorging geen 8BITMIME,
-     en een ontvanger die dat niet aanbiedt mag hoge bytes weggooien -- dan komt
-     de mail aan met kapotte accenten. Het lost meteen het punt-aan-het-begin-
-     van-een-regel-probleem op. */
-  const lijf = Buffer.from(String(text == null ? '' : text) + '\n', 'utf8')
-    .toString('base64').replace(/(.{76})/g, '$1\r\n');
-  let dkim = null;
-  if (DKIM_SLEUTEL && MAIL_DOMEIN) {
-    try {
-      const uit = require('./dkim').onderteken({ koppen, lijf, domein: MAIL_DOMEIN,
-        selector: DKIM_SELECTOR, priveSleutel: DKIM_SLEUTEL });
-      if (uit.ok) dkim = uit.kop;
-      else console.warn('[mail] niet ondertekend:', uit.waarom);
-    } catch (e) { console.warn('[mail] DKIM mislukt:', e.message); }
-  }
-  const kop = (dkim ? dkim + '\r\n' : '') +
-    Object.keys(koppen).map(k => k + ': ' + koppen[k]).join('\r\n');
-  return { rauw: kop + '\r\n\r\n' + lijf, ondertekend: !!dkim, messageId: id };
-}
+/* De SMS-kant en de sandbox-zekering staan in ./mail-lokaal.js. Daar woont ook
+   de STAND van de twee sandboxen: die werd hier op vier plekken gelezen en op
+   twee geschreven zonder dat iets aanwees wie erover ging. */
+/* `kanalen` en niet `lokaal`: een paar regels hierboven heet een blokvariabele
+   in de SMTP-controle al zo ("de host is loopback"), en twee dingen met dezelfde
+   naam in een bestand leest niemand twee keer goed. */
+const kanalen = require('./mail-lokaal')({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox });
+const { sendSms, zetSandbox, sandboxStand } = kanalen;
 
+/* Het OPSTELLEN van een bericht -- de RFC-koppen, de codering en de
+   DKIM-handtekening -- staat in ./mail-opstellen.js. Zelfde soort knip als
+   ./mail-bezorgen.js hieronder: daar staat HOE het over de lijn gaat, hier
+   staat WAT er over de lijn gaat, en in dit bestand blijft WAARHEEN en wat
+   er gebeurt als dat niet lukt. */
+const { bouwBericht } = require('./mail-opstellen')({ FROM, MAIL_DOMEIN, DKIM_SLEUTEL, DKIM_SELECTOR });
 /* Zelf bezorgen staat in ./mail-bezorgen.js. Afgesplitst omdat dit bestand over
    de 10 KB ging, en de knip loopt langs een echte grens: hierboven staat WAT er
    verstuurd wordt en waar het blijft als dat niet lukt, daar staat HOE het over
@@ -152,7 +102,7 @@ function send(to, subject, text) {
   };
   const isMail = /@/.test(String(to));
   if (!isMail) return sendSms(String(to).replace(/^sms:/i, ''), subject, text);
-  if (transporter && (!SMTP_SANDBOX || smtpSandboxAan)) {
+  if (transporter && (!SMTP_SANDBOX || kanalen.smtpAan())) {
     transporter.sendMail({ from: FROM, to, subject, text })
       .then(() => { console.log(`[mail] verzonden naar ${to}: ${subject}`); journaal(true, 'smtp'); })
       .catch(e => { console.warn('[mail] verzenden mislukt, naar outbox:', e.message); journaal(false, 'smtp', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
@@ -162,35 +112,9 @@ function send(to, subject, text) {
   try { toOutbox(to, subject, text); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); }
 }
 
-/* Providerachtige SMS-aflevering, volledig lokaal. In sandboxstand valideert
-   de contractsimulator eerst het verzoek; pas bij acceptatie komt het bericht
-   in de (waar mogelijk versleutelde) outbox. Zonder sandbox blijft de outbox
-   het zichtbare lokale vangnet. */
-function sendSms(to, subject, text) {
-  const journaal = (gelukt, hoe, reden) => {
-    try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: 'sms:' + to, mislukt: !gelukt, reden }); } catch (e) {}
-  };
-  try {
-    if (smsSandbox.enabled && !smsSandboxAan) {
-      const e = new Error('De SMS-sandbox is door de Integratiekamer uitgezet.');
-      e.code = 'SMS_SANDBOX_UIT';
-      throw e;
-    }
-    const r = smsSandbox.enabled
-      ? smsSandbox.send(to, text)
-      : { ok: true, status: 'outbox', provider: 'outbox', sandbox: false, bezorgd: false };
-    toOutbox('sms:' + to, subject, text);
-    journaal(true, smsSandbox.enabled ? 'sms-sandbox' : 'outbox');
-    return r;
-  } catch (e) {
-    journaal(false, smsSandbox.enabled ? 'sms-sandbox' : 'outbox', e.message);
-    throw e;
-  }
-}
-
 async function bezorgNu(to, subject, text) {
   if (!to || !/@/.test(String(to))) return { ok: false, soort: 'permanent', waarom: 'dat is geen e-mailadres' };
-  if (transporter && (!SMTP_SANDBOX || smtpSandboxAan)) {
+  if (transporter && (!SMTP_SANDBOX || kanalen.smtpAan())) {
     try {
       await transporter.sendMail({ from: FROM, to, subject, text });
       return { ok: true, soort: 'bezorgd', via: 'smarthost' };
@@ -208,28 +132,6 @@ async function bezorgNu(to, subject, text) {
   }
   try { toOutbox(to, subject, text); return { ok: true, soort: 'bezorgd', via: 'outbox' }; }
   catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'de outbox is niet te schrijven' }; }
-}
-
-function zetSandbox(kanaal, aan) {
-  if (process.env.NODE_ENV === 'production') return { ok: false, code: 'SANDBOX_PRODUCTIE', error: 'Een lokale sandbox kan niet in productie worden geschakeld.' };
-  if (kanaal === 'smtp') {
-    if (aan && !(CONFIGURED && SMTP_SANDBOX)) return { ok: false, code: 'SMTP_SANDBOX_NIET_INGERICHT', error: 'Richt eerst SMTP_SANDBOX met een lokale SMTP_URL in.' };
-    smtpSandboxAan = !!aan;
-    return { ok: true, aan: smtpSandboxAan };
-  }
-  if (kanaal === 'sms') {
-    if (aan && !smsSandbox.enabled) return { ok: false, code: 'SMS_SANDBOX_NIET_INGERICHT', error: 'Zet SMS_SANDBOX=1 bij de lokale start.' };
-    smsSandboxAan = !!aan;
-    return { ok: true, aan: smsSandboxAan };
-  }
-  return { ok: false, code: 'KANAAL_ONBEKEND', error: 'Onbekend postkanaal.' };
-}
-
-function sandboxStand() {
-  return {
-    smtp: { geconfigureerd: CONFIGURED && SMTP_SANDBOX, aan: smtpSandboxAan, live: (CONFIGURED && !SMTP_SANDBOX) || DIRECT },
-    sms: { geconfigureerd: smsSandbox.enabled, aan: smsSandboxAan, live: false }
-  };
 }
 
 /* Er is nog bewust geen extern SMS-kanaal aangesloten. Dit expliciete veld

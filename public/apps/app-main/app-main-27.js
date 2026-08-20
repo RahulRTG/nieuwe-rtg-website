@@ -1,3 +1,4 @@
+/* een map hernoemen op het springboard */
     setTimeout(() => { hernoemIn.focus(); hernoemIn.select(); }, 60);
   }
   if (hernoemOk) hernoemOk.addEventListener('click', () => { if (hernoemDoel) zetMapNaam(hernoemDoel, hernoemIn.value); sluitScrims(); });

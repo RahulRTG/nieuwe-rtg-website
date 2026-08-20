@@ -88,7 +88,7 @@
       <button class="knop" id="modeSchouw" type="button" aria-pressed="true">Schouw</button>
       <button class="knop" id="modeVloer" type="button" aria-pressed="false">Werkvloer</button>
     </div>
-    <div class="scherm" style="margin-top:0.7rem;">
+    <div class="scherm h-mt70">
       <video id="cam" autoplay playsinline muted></video>
       <canvas id="rooster" class="rooster"></canvas>
       <span class="status" id="oogStatus" role="status">Camera starten…</span>
@@ -103,10 +103,10 @@
         <button class="knop" id="knopNulmeting" type="button">Nulmeting vastleggen</button>
         <button class="knop vol" id="knopSchouw" type="button">Schouw en log</button>
       </div>
-      <p class="stil" style="margin-top:0.5rem;">Richt de camera op het voertuig. De visielaag vergelijkt elke zone met de
+      <p class="stil h-mt50">Richt de camera op het voertuig. De visielaag vergelijkt elke zone met de
         nulmeting van dit voertuig en logt het oordeel als gecodeerde journaalregel: loopt de zaak via een Zaakdoos, dan
         neemt het doos-journaal hem vanzelf op.</p>
-      <div class="kaart"><h2 style="margin-top:0;">Laatste schouwen</h2><div class="log" id="logSchouw"><p class="stil">Nog geen schouwen.</p></div></div>
+      <div class="kaart"><h2 class="h-mt0">Laatste schouwen</h2><div class="log" id="logSchouw"><p class="stil">Nog geen schouwen.</p></div></div>
     </div>
 
     <!-- de werkvloer: aanleren en knoploos loggen -->
@@ -117,9 +117,9 @@
         <input id="leerNaam" maxlength="40" placeholder="Naam (bijv. Kist gereedschap 2)">
         <button class="knop" id="knopLeer" type="button">Toon het en leer aan</button>
       </div>
-      <p class="stil" style="margin-top:0.5rem;">Houd een item even rustig in beeld. Herkent het oog een aangeleerd item,
+      <p class="stil h-mt50">Houd een item even rustig in beeld. Herkent het oog een aangeleerd item,
         dan logt het vanzelf wie het meeneemt of terugbrengt: zonder knop. U staat als drager op de regel via uw PDA-inlog.</p>
-      <div class="kaart"><h2 style="margin-top:0;">Uitgifteregister</h2><div class="log" id="logVloer"><p class="stil">Nog geen bewegingen.</p></div></div>
+      <div class="kaart"><h2 class="h-mt0">Uitgifteregister</h2><div class="log" id="logVloer"><p class="stil">Nog geen bewegingen.</p></div></div>
     </div>
   </section>
 </main>

@@ -142,12 +142,12 @@
   <input class="veld" id="snTitel" maxlength="160" placeholder="Kop">
   <label class="lab">Rubriek</label><select id="snRubriek"></select>
   <label class="lab">Tekst</label><textarea id="snTekst" rows="5" maxlength="20000" placeholder="Wat is er gebeurd?"></textarea>
-  <div class="rij" style="margin-top:.7rem;">
+  <div class="rij h-mt70">
     <button class="knop" id="snAssist">Rahul: kop &amp; chapo</button>
     <span class="sp"></span>
     <button class="knop groen" id="snPubliceer">Publiceer nu</button>
   </div>
-  <div id="snAI" class="hint" style="margin-top:.6rem;"></div>
+  <div id="snAI" class="hint h-mt60"></div>
 </div></div>
 <!-- blok-kiezer -->
 <div class="sheet" id="blokSheet"><div class="box"><h2>Nieuw blok</h2><div class="hint" style="margin:.2rem 0 .8rem;">Kies een blok voor je homepage.</div><div class="blokkies" id="blokkies"></div></div></div>
@@ -192,7 +192,7 @@ function toon(t){ HUIDIG=t; LIJST=null; document.querySelectorAll('#tabs button'
 function vandaag(){
   const T=STAAT.tellers||{};
   $('#hoofd').innerHTML='<div class="kpis"><div class="kpi"><b>'+(T.live||0)+'</b><span>live</span></div><div class="kpi"><b>'+(T.concept||0)+'</b><span>concept</span></div><div class="kpi"><b>'+(T.gelezen||0)+'</b><span>gelezen</span></div></div>'+
-    '<div class="kaart"><div class="rij"><h3 style="flex:1;">Vandaag op de redactie</h3><button class="knop prim" id="v_snel">Snel nieuws</button></div><div id="recent" style="margin-top:.5rem;"></div></div>';
+    '<div class="kaart"><div class="rij"><h3 class="h-flex1">Vandaag op de redactie</h3><button class="knop prim" id="v_snel">Snel nieuws</button></div><div class="h-mt50" id="recent"></div></div>';
   $('#v_snel').addEventListener('click',openSnel);
   const r=$('#recent'); const lijst=STAAT.recent||[]; LIJST=lijst;
   if(!lijst.length){ r.innerHTML='<div class="hint">Nog geen artikelen. Klik op "Snel nieuws" om te beginnen.</div>'; return; }
@@ -211,7 +211,7 @@ function artRij(a){
   el.appendChild(acties); return el;
 }
 async function artikelenTab(){
-  $('#hoofd').innerHTML='<div class="kaart"><div class="rij"><h3 style="flex:1;">Artikelen</h3><button class="knop prim" id="nieuwArt">Nieuw artikel</button></div>'+
+  $('#hoofd').innerHTML='<div class="kaart"><div class="rij"><h3 class="h-flex1">Artikelen</h3><button class="knop prim" id="nieuwArt">Nieuw artikel</button></div>'+
     '<div class="rij" id="filters" style="margin:.6rem 0;"></div><div id="artlijst"></div></div>';
   $('#nieuwArt').addEventListener('click',()=>editArtikel(null));
   const f=$('#filters'); ['alle','concept','live'].forEach(s=>{const c=document.createElement('button');c.className='chip'+(s==='alle'?' aan':'');c.textContent=s==='alle'?'Alle':(s==='live'?'Live':'Concept');c.dataset.s=s;c.addEventListener('click',()=>laadArtikelen(s));f.appendChild(c);});
@@ -232,11 +232,11 @@ async function editArtikel(id){
   $('#hoofd').innerHTML='<div class="kaart"><div class="rij"><button class="mini" id="a_terug">← terug</button><span class="sp"></span>'+
     '<button class="knop" id="a_assist">Rahul: kop &amp; chapo</button><button class="knop" id="a_bewaar">Bewaren</button><button class="knop groen" id="a_pub">Publiceren</button></div>'+
     '<label class="lab">Kop</label><input class="veld" id="a_titel" maxlength="160" value="'+esc(a.titel)+'">'+
-    '<div class="rij"><div style="flex:1;"><label class="lab">Rubriek</label><select id="a_rubriek">'+rubOpts+'</select></div>'+
-    '<div style="flex:1;"><label class="lab">Beeld</label><button class="knop" id="a_beeld" style="width:100%;">'+(a.beeld?'Beeld gekozen':'Kies beeld')+'</button></div></div>'+
+    '<div class="rij"><div class="h-flex1"><label class="lab">Rubriek</label><select id="a_rubriek">'+rubOpts+'</select></div>'+
+    '<div class="h-flex1"><label class="lab">Beeld</label><button class="knop" id="a_beeld" style="width:100%;">'+(a.beeld?'Beeld gekozen':'Kies beeld')+'</button></div></div>'+
     '<label class="lab">Chapo (samenvatting)</label><textarea id="a_chapo" rows="2" maxlength="300">'+esc(a.chapo)+'</textarea>'+
     '<label class="lab">Tekst</label><textarea id="a_inhoud" rows="12" maxlength="20000">'+esc(a.inhoud)+'</textarea>'+
-    '<div id="a_ai" class="hint" style="margin-top:.6rem;"></div></div>';
+    '<div id="a_ai" class="hint h-mt60"></div></div>';
   let beeld=a.beeld||'', artId=a.id||null;
   const verzamel=()=>({id:artId,titel:$('#a_titel').value,rubriek:$('#a_rubriek').value,chapo:$('#a_chapo').value,inhoud:$('#a_inhoud').value,beeld});
   $('#a_terug').addEventListener('click',()=>toon('artikelen'));
@@ -249,7 +249,7 @@ function cijfersTab(){
   const T=STAAT.tellers||{}; const top=(STAAT.recent||[]).filter(a=>a.status==='live').sort((a,b)=>(b.gelezen||0)-(a.gelezen||0)).slice(0,8);
   LIJST=top;
   $('#hoofd').innerHTML='<div class="kpis"><div class="kpi"><b>'+(T.live||0)+'</b><span>live artikelen</span></div><div class="kpi"><b>'+(T.gelezen||0)+'</b><span>keer gelezen</span></div><div class="kpi"><b>'+(STAAT.rubrieken||[]).length+'</b><span>rubrieken</span></div></div>'+
-    '<div class="kaart"><h3>Best gelezen</h3><div id="top" style="margin-top:.5rem;"></div></div>';
+    '<div class="kaart"><h3>Best gelezen</h3><div class="h-mt50" id="top"></div></div>';
   const t=$('#top'); if(!top.length){ t.innerHTML='<div class="hint">Nog geen gelezen artikelen.</div>'; return; }
   t.innerHTML=''; top.forEach(a=>{const el=document.createElement('div');el.className='art';el.innerHTML='<div class="t"><b>'+esc(a.titel)+'</b><small>'+esc(a.rubriek)+'</small></div><b>'+(a.gelezen||0)+'</b>';t.appendChild(el);});
 }
@@ -323,11 +323,11 @@ function huisstijlTab(){
   DESIGN=STAAT.site&&STAAT.site.blokken?JSON.parse(JSON.stringify(STAAT.site)):{blokken:[],volgorde:null}; DESIGN.volgorde=DESIGN.volgorde||null;
   const H=STAAT.huisstijl;
   $('#hoofd').innerHTML='<div class="kaart"><h3>Huisstijl</h3>'+
-    '<div class="rij" style="margin-top:.6rem;"><div style="flex:1;min-width:12rem;"><label class="lab">Naam van de krant</label><input class="veld" id="h_naam" maxlength="60" value="'+esc(H.naam)+'"></div>'+
+    '<div class="rij h-mt60"><div style="flex:1;min-width:12rem;"><label class="lab">Naam van de krant</label><input class="veld" id="h_naam" maxlength="60" value="'+esc(H.naam)+'"></div>'+
     '<div style="flex:1;min-width:12rem;"><label class="lab">Pay-off</label><input class="veld" id="h_payoff" maxlength="100" value="'+esc(H.payoff||'')+'"></div></div>'+
     '<label class="lab">Accentkleur</label><div class="swatches" id="h_swatches"></div>'+
-    '<div class="rij" style="margin-top:.7rem;"><button class="knop" id="h_thema">Thema: '+(H.thema==='licht'?'Licht':'Donker')+'</button><button class="knop" id="h_bewaar">Huisstijl bewaren</button></div></div>'+
-    '<div class="kaart"><div class="bouwbalk"><h3 style="flex:1;">Homepage</h3>'+
+    '<div class="rij h-mt70"><button class="knop" id="h_thema">Thema: '+(H.thema==='licht'?'Licht':'Donker')+'</button><button class="knop" id="h_bewaar">Huisstijl bewaren</button></div></div>'+
+    '<div class="kaart"><div class="bouwbalk"><h3 class="h-flex1">Homepage</h3>'+
     '<div class="apparaten" id="apparaten"><button data-a="telefoon">Telefoon</button><button data-a="tablet">Tablet</button><button data-a="desktop" class="aan">Desktop</button></div>'+
     '<button class="knop" id="b_blok">+ Blok</button><button class="knop" id="b_voorbeeld">Voorbeeld</button><button class="knop groen" id="b_bewaar">Site bewaren</button></div>'+
     '<div class="doekwrap"><div class="doek" id="doek" data-thema="donker"></div></div></div>';
@@ -344,7 +344,7 @@ function bouwBlokkies(){const g=$('#blokkies');g.innerHTML='';BLOKTYPES.forEach(
 function bouwBeeldgrid(){const g=$('#beeldgrid');g.innerHTML='';BEELDEN.forEach(src=>{const b=document.createElement('button');b.type='button';const im=document.createElement('img');im.src=src;im.alt='';b.appendChild(im);b.addEventListener('click',()=>{if(beeldDoel&&beeldDoel.zet)beeldDoel.zet(src);$('#beeldSheet').classList.remove('open');});g.appendChild(b);});}
 
 /* ---------- bediening ---------- */
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De redactie hoort bij je nieuwsbedrijf. Log in op de leverancier-app; kom dan hierheen terug.</p><p style="margin-top:1rem;"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; document.querySelector('nav.tabs').style.display='none'; $('#snelKnop').style.display='none'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De redactie hoort bij je nieuwsbedrijf. Log in op de leverancier-app; kom dan hierheen terug.</p><p class="h-mt100"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; document.querySelector('nav.tabs').style.display='none'; $('#snelKnop').style.display='none'; }
 else {
   document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>toon(b.dataset.t)));
   document.querySelectorAll('.sheet').forEach(sh=>sh.addEventListener('click',e=>{if(e.target===sh)sh.classList.remove('open');}));

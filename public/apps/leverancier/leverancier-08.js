@@ -1,3 +1,4 @@
+/* de bonnenstatistiek van de kassa */
     const oudste = ages.length ? Math.max.apply(null, ages) : 0;
     return '<div class="st-stats">'+
       '<div class="st-stat"><b>'+list.length+'</b><span>'+T('kds.open','Open bonnen')+'</span></div>'+

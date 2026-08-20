@@ -54,7 +54,7 @@
       if (r.status !== 200) return meld(r.body.error || 'Log eerst in op de leden-app.');
       kamers = r.body.kamers || [];
       $('#kamers').innerHTML = (r.body.kamers || []).map(function (k) {
-        return '<div class="kaart"><span style="flex:1;"><b>' + esc(k.titel) + '</b>' +
+        return '<div class="kaart"><span class="h-flex1"><b>' + esc(k.titel) + '</b>' +
           ' <span class="code">' + esc(k.code) + '</span></span>' +
           '<button class="knop vol" data-kom="' + esc(k.code) + '" type="button">Binnen</button>' +
           (k.vanMij ? '<button class="knop" data-weg="' + esc(k.id) + '" type="button">Opruimen</button>' : '') +

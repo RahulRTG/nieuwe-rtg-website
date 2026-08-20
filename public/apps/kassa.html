@@ -56,7 +56,7 @@
     <div class="band" id="leeftijdBand" hidden>18+: controleer de leeftijd met het Zegel voor u alcohol aanslaat.</div>
     <div class="sec" id="artKop">Artikelen</div>
     <div class="grid" id="artGrid"><div class="leeg">Laden...</div></div>
-    <div class="sec" style="margin-top:.8rem;">Eigen artikel (werkgever)</div>
+    <div class="sec h-mt80">Eigen artikel (werkgever)</div>
     <div class="rij">
       <input class="veld" id="nNaam" placeholder="Naam" style="flex:2;min-width:7rem;">
       <input class="veld" id="nPrijs" placeholder="Prijs" inputmode="decimal" style="flex:1;min-width:4.5rem;">
@@ -68,69 +68,69 @@
     <div class="sec">De bon</div>
     <div id="bon"><div class="leeg">Nog leeg; tik links een artikel aan.</div></div>
     <div class="tot"><span>Totaal</span><span id="totaal">€ 0,00</span></div>
-    <div class="rij" id="badgeRij" hidden><input class="veld" id="badgeNaam" placeholder="Naam van de collega (interne verrekening)" style="flex:1;"></div>
-    <div class="rij" id="tafelRij" hidden><select class="veld" id="tafelKies" style="flex:1;"></select></div>
-    <div class="rij" style="margin-top:.55rem;">
+    <div class="rij" id="badgeRij" hidden><input class="veld h-flex1" id="badgeNaam" placeholder="Naam van de collega (interne verrekening)"></div>
+    <div class="rij" id="tafelRij" hidden><select class="veld h-flex1" id="tafelKies"></select></div>
+    <div class="rij h-mt55">
       <button class="knop" id="payContant">Contant</button>
       <button class="knop" id="payRtg">RTG Pay-code</button>
       <button class="knop stil" id="payTafel" hidden>Op de tafel</button>
       <button class="knop stil" id="bonLeeg">Wis</button>
     </div>
-    <div class="sec" style="margin-top:.7rem;">Premium, gewoon inbegrepen</div>
+    <div class="sec h-mt70">Premium, gewoon inbegrepen</div>
     <div class="rij">
       <button class="knop stil" id="pKorting">Korting</button>
       <button class="knop stil" id="pParkeer">Parkeer bon</button>
       <button class="knop stil" id="pWacht">Wachtbonnen</button>
       <button class="knop stil" id="pRetour">Retour</button>
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij h-mt40">
       <button class="knop stil" data-derf="verspil">Verspil</button>
       <button class="knop stil" data-derf="breuk">Breuk</button>
       <button class="knop stil" data-derf="eigen">Eigen gebruik</button>
       <button class="knop stil" id="pRepro">Repro</button>
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij h-mt40">
       <button class="knop stil" id="pRapport">Dagrapport</button>
       <button class="knop stil" id="pKas">Kasopmaak</button>
     </div>
-    <div class="hint" style="margin-top:.45rem;">De functies waar andere kassa's een abonnement voor vragen, zitten er hier gewoon in. Verspil, breuk en eigen gebruik boeken ook de voorraad af.</div>
-    <div class="hint" id="uitkomst" style="margin-top:.55rem;"></div>
+    <div class="hint h-mt45">De functies waar andere kassa's een abonnement voor vragen, zitten er hier gewoon in. Verspil, breuk en eigen gebruik boeken ook de voorraad af.</div>
+    <div class="hint h-mt55" id="uitkomst"></div>
   </section>
 </main>
 <dialog id="dlgKg">
   <div class="sec">Gewicht</div>
   <p class="hint" id="kgUitleg" style="margin-bottom:.5rem;"></p>
-  <div class="rij"><input class="veld" id="kgVeld" inputmode="decimal" placeholder="bv. 0,750" style="flex:1;"><span class="hint">kg</span></div>
-  <div class="rij" style="margin-top:.6rem;"><button class="knop" id="kgOk">Op de bon</button><button class="knop stil" id="kgWeg">Annuleer</button></div>
+  <div class="rij"><input class="veld h-flex1" id="kgVeld" inputmode="decimal" placeholder="bv. 0,750"><span class="hint">kg</span></div>
+  <div class="rij h-mt60"><button class="knop" id="kgOk">Op de bon</button><button class="knop stil" id="kgWeg">Annuleer</button></div>
 </dialog>
 <dialog id="dlgModus">
   <div class="sec">Kies de kassamodus</div>
   <div id="modusLijst" style="display:flex;flex-direction:column;gap:.4rem;"></div>
-  <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="modusDicht">Sluit</button></div>
+  <div class="rij h-mt60"><button class="knop stil" id="modusDicht">Sluit</button></div>
 </dialog>
 <dialog id="dlgVraag">
   <div class="sec" id="vraagKop"></div>
   <p class="hint" id="vraagUitleg" style="margin-bottom:.5rem;"></p>
-  <div class="rij"><input class="veld" id="vraagVeld" style="flex:1;" autocomplete="off"></div>
-  <div class="rij" style="margin-top:.6rem;"><button class="knop" id="vraagOk">Akkoord</button><button class="knop stil" id="vraagWeg">Annuleer</button></div>
+  <div class="rij"><input class="veld h-flex1" id="vraagVeld" autocomplete="off"></div>
+  <div class="rij h-mt60"><button class="knop" id="vraagOk">Akkoord</button><button class="knop stil" id="vraagWeg">Annuleer</button></div>
 </dialog>
 <dialog id="dlgInfo">
   <div class="sec" id="infoKop"></div>
   <div id="infoIn" style="font-size:.86rem;line-height:1.6;"></div>
-  <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="infoDicht">Sluit</button></div>
+  <div class="rij h-mt60"><button class="knop stil" id="infoDicht">Sluit</button></div>
 </dialog>
 <dialog id="dlgScherm">
   <div class="sec">Welke kassa is dit toestel?</div>
   <p class="hint" style="margin-bottom:.5rem;">Gebruikt de zaak meerdere kassaschermen, dan krijgt elk scherm een eigen naam; elke bon draagt die naam en elk scherm kan een eigen modus hebben.</p>
   <div id="schermLijst" style="display:flex;flex-direction:column;gap:.35rem;margin-bottom:.6rem;"></div>
-  <div class="rij"><input class="veld" id="schermNieuw" placeholder='Nieuwe kassa, bv. "Kassa bar"' style="flex:1;"><button class="knop" id="schermMaak">Zet neer</button></div>
-  <div class="rij" style="margin-top:.6rem;"><button class="knop stil" id="schermDicht">Sluit</button></div>
+  <div class="rij"><input class="veld h-flex1" id="schermNieuw" placeholder='Nieuwe kassa, bv. "Kassa bar"'><button class="knop" id="schermMaak">Zet neer</button></div>
+  <div class="rij h-mt60"><button class="knop stil" id="schermDicht">Sluit</button></div>
 </dialog>
 <dialog id="dlgPay">
   <div class="sec">RTG Pay</div>
   <p class="hint" style="margin-bottom:.5rem;">De gast toont de betaalcode (QR of cijfers) uit de app.</p>
-  <div class="rij"><input class="veld" id="payCode" placeholder="Betaalcode" style="flex:1;" autocomplete="off"></div>
-  <div class="rij" style="margin-top:.6rem;"><button class="knop" id="payOk">Innen</button><button class="knop stil" id="payWeg">Annuleer</button></div>
+  <div class="rij"><input class="veld h-flex1" id="payCode" placeholder="Betaalcode" autocomplete="off"></div>
+  <div class="rij h-mt60"><button class="knop" id="payOk">Innen</button><button class="knop stil" id="payWeg">Annuleer</button></div>
 </dialog>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
@@ -351,9 +351,9 @@ $('#pRapport').addEventListener('click', async () => {
     info('Dagrapport · ' + d.dag,
       '<div class="regel"><span>Omzet (' + d.bonnen + ' bonnen)</span><span class="min"><b>' + eur(d.omzet) + '</b></span></div>' +
       Object.entries(d.perMethode).map(([m, v]) => '<div class="regel"><span>· ' + esc(m) + '</span><span class="min">' + eur(v) + '</span></div>').join('') +
-      '<div class="sec" style="margin-top:.5rem;">Per kassa</div>' +
+      '<div class="sec h-mt50">Per kassa</div>' +
       Object.entries(d.perKassa).map(([k2, v]) => '<div class="regel"><span>' + esc(k2) + '</span><span class="min">' + eur(v) + '</span></div>').join('') +
-      '<div class="sec" style="margin-top:.5rem;">Bijzonderheden</div>' +
+      '<div class="sec h-mt50">Bijzonderheden</div>' +
       '<div class="regel"><span>Retouren (' + d.retouren + ')</span><span class="min">-' + eur(d.retourBedrag) + '</span></div>' +
       '<div class="regel"><span>Kortingen</span><span class="min">-' + eur(d.kortingen) + '</span></div>' +
       '<div class="regel"><span>Derving (' + d.derving.regels + ')</span><span class="min">' + eur(d.derving.waarde) + '</span></div>' +

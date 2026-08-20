@@ -43,8 +43,16 @@ function stuurBestand(req, res, fp, st, next) {
      kreeg "max-age=14400". Met no-cache cachet Cloudflare het antwoord niet en
      blijft het een 304 van een paar bytes. Gehashte build-output houdt zijn
      eeuwige cache: die naam verandert immers zodra de inhoud verandert. */
+  /* Naast de gehashte build-output telt ook een adres dat de VERSIE van het
+     bestand draagt (?v=...) als onveranderlijk, en om dezelfde reden: de naam
+     -- hier de querystring -- verandert zodra de inhoud verandert. De
+     gecomprimeerde route hiernaast doet dit al (middleware/compressie.js);
+     zonder deze regel kreeg een client die geen compressie vraagt als enige
+     nog "no-cache", en dan staat er twee keer iets anders voor hetzelfde
+     bestand. Zie middleware/versieadres.js. */
+  const gestempeld = !!(req && req.query && req.query.v);
   if (!res.getHeader('Cache-Control')) {
-    res.setHeader('Cache-Control', onveranderlijk(fp) ? 'public, max-age=31536000, immutable'
+    res.setHeader('Cache-Control', (onveranderlijk(fp) || gestempeld) ? 'public, max-age=31536000, immutable'
       : (/\.(?:js|css|json|webmanifest|svg)$/i.test(fp) ? 'no-cache' : 'public, max-age=0'));
   }
 

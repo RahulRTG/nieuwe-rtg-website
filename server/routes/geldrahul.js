@@ -20,7 +20,7 @@ module.exports = (kern) => {
      helper in server/ai.js, zodat modelkeuze en aanbieder-uitwijk daar blijven
      wonen en dit bestand er geen tweede versie van begint. */
   const { euroTekst } = require('../kern/geldgraaf/hulp');
-  const { tekst } = require('../ai');
+  const { tekst } = require('../ai-kort');
 
   /* Leden schrijven bedragen in euro's ("kan ik nog 250 uitgeven?"); intern is
      alles centen. De vertaling gebeurt hier een keer, aan de rand. Getallen

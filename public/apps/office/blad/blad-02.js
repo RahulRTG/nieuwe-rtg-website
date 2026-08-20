@@ -1,3 +1,4 @@
+/* de actieve cel: invoer, selectie en het blad */
       invoer.value = data.cellen[ref] || '';
       Array.prototype.forEach.call(tabel.querySelectorAll('td.actief'), function (t) { t.classList.remove('actief'); });
       var td = tabel.querySelector('td[data-ref="' + ref + '"]');

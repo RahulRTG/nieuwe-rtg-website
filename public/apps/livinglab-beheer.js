@@ -36,7 +36,7 @@
           }).join('')
         : '<div class="gebrek">Nog niemand. Zolang dit register leeg is, kan in dit lab niets ondertekend worden ' +
           'en komt geen enkel onderzoek voorbij de deelnemersstap. Dit is dus de eerste stap.</div>') +
-      '<div class="rij" style="margin-top:.4rem;">' +
+      '<div class="rij h-mt40">' +
         '<input class="veld" data-tknaam placeholder="Naam" maxlength="80">' +
         '<select class="veld" data-tkrol aria-label="Rol" style="max-width:12rem;">' +
           KADER.rollen.filter(function (r) { return ROLLEN_TEKENEN.indexOf(r.rol) >= 0; })
@@ -47,7 +47,7 @@
       '<div class="leeg">Bij risicoklasse hoog tekenen er twee, waarvan minstens één onafhankelijk. ' +
         'Alleen een toezichthouder kan een onderzoek stilleggen.</div>' +
 
-      '<div class="sec" style="margin-top:1rem;">Budget en partners</div>' +
+      '<div class="sec h-mt100">Budget en partners</div>' +
       '<div class="rij">' +
         '<input class="veld" data-btoeg type="number" min="0" placeholder="toegekend" value="' + ((lab.budget || {}).toegekend || 0) + '">' +
         '<input class="veld" data-bbest type="number" min="0" placeholder="besteed" value="' + ((lab.budget || {}).besteed || 0) + '">' +
@@ -56,18 +56,18 @@
       ((lab.partners || []).length
         ? lab.partners.map(function (p) { return '<div class="log">' + esc(p.naam) + ' &middot; ' + esc(p.soort) + '</div>'; }).join('')
         : '<div class="leeg">Nog geen partners.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<input class="veld" data-pnaam placeholder="Partner" maxlength="80">' +
         '<input class="veld" data-psoort placeholder="soort" maxlength="40" style="max-width:9rem;">' +
         '<button class="knop stil" data-pbij type="button">Voeg toe</button></div>' +
 
-      '<div class="sec" style="margin-top:1rem;">Bewaartermijn</div>' +
+      '<div class="sec h-mt100">Bewaartermijn</div>' +
       '<div class="rij"><input class="veld" data-bewaar type="number" min="0" value="' + (lab.bewaarMaanden || 0) + '" style="max-width:8rem;">' +
         '<button class="knop stil" data-bewaarzet type="button">Zet bewaartermijn (maanden)</button></div>' +
       '<div class="leeg">De RTF-ondergrens is ' + (KADER.bewaar.min) + ' maanden; daar kan een lab lokaal niet onder. ' +
         'Na die termijn verliezen studies hun ruwe data maar houden ze hun conclusies.</div>' +
 
-      '<div class="sec" style="margin-top:1rem;">Auditspoor</div>' +
+      '<div class="sec h-mt100">Auditspoor</div>' +
       '<button class="knop stil" data-audit type="button">Toon de laatste honderd handelingen</button>' +
       '<div data-auditlijst></div>';
 

@@ -1,3 +1,4 @@
+/* het cv van een sollicitant die via RTG kwam */
     const apCv = x => {
       if (!x.viaRTG || !x.cv) return '';
       const c = x.cv, parts = [];

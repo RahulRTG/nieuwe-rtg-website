@@ -204,14 +204,14 @@
       u += '<div class="tegel"><div class="l">' + esc(d.domein) + '</div>' +
         '<div class="v ' + (KLEUR[d.stand] || '') + '" style="font-size:1.15rem;">' + esc(d.stand) + '</div>' +
         '<div class="u">' + esc(d.redenen.join(' · ')) + '</div>' +
-        '<div class="meta" style="margin-top:.5rem;">' + d.objecten + ' objecten in ' +
+        '<div class="meta h-mt50">' + d.objecten + ' objecten in ' +
         esc(d.soorten.map(function (s) { return s.meervoud; }).join(', ')) + '</div>' +
-        (d.runbooks.length ? '<div class="meta" style="margin-top:.35rem;">' +
+        (d.runbooks.length ? '<div class="meta h-mt35">' +
           d.runbooks.map(function (r) { return esc(r.naam) + ' (' + r.kandidaten + ', ' + esc(r.niveau) + ')'; }).join('<br>') + '</div>' : '') +
         '</div>';
     }
     u += '</div>';
-    u += '<p class="meta" style="margin-top:1.2rem;">Dekking: ' + p.dekking.soorten + ' objectsoorten over ' +
+    u += '<p class="meta h-mt120">Dekking: ' + p.dekking.soorten + ' objectsoorten over ' +
       p.dekking.domeinen + ' domeinen. Wat niet in het objectregister staat, telt hier niet mee -- het staat dan niet op groen, het staat er niet.</p>';
     el.innerHTML = u;
   };
@@ -316,7 +316,7 @@
       d.groepen.length + ' soort(en)' + (d.domeinen && d.domeinen.length ? ' over ' + d.domeinen.length + ' domein(en)' : '') + '.</p>';
     if (!d.groepen.length) {
       u += '<div class="kaart"><h3>Niets gevonden</h3><p>Er is gekeken in ' + d.bereik.length + ' objectsoorten:</p>' +
-        '<div class="meta" style="margin-top:.5rem;">' +
+        '<div class="meta h-mt50">' +
         d.bereik.map(function (b) { return esc(b.meervoud) + ' (' + esc(b.velden.join(', ')) + ')'; }).join('<br>') +
         '</div></div>';
       return u;
@@ -332,7 +332,7 @@
           (r.sub ? ' <span class="meta">' + esc(r.sub) + '</span>' : '') +
           '<div class="meta">' + esc(r.type) + ' ' + esc(r.id) + ' · gevonden op ' + esc(r.veld) + '</div></div>';
       }
-      if (g.totaal > g.rijen.length) u += '<p class="meta" style="margin-top:.5rem;">' +
+      if (g.totaal > g.rijen.length) u += '<p class="meta h-mt50">' +
         (g.totaal - g.rijen.length) + ' verder niet getoond.</p>';
       u += '</div>';
     }
@@ -365,7 +365,7 @@
     }
     var d = o.data;
     var u = '<button class="knop" id="terugZoek">← terug naar de zoekuitslag</button>' +
-      '<h2 class="ckop" style="margin-top:.9rem;">' + esc(d.object.titel) + '</h2>' +
+      '<h2 class="ckop h-mt90">' + esc(d.object.titel) + '</h2>' +
       '<p class="lead">' + esc(d.object.label) + ' ' + esc(d.object.id) +
       (d.object.sub ? ' · ' + esc(d.object.sub) : '') + ' · domein ' + esc(d.object.domein) + '</p>';
 
@@ -377,7 +377,7 @@
         ' <span class="meta">risico ' + a.score + (a.vierOgen ? ' · vier ogen' : '') + '</span>' +
         '<div class="meta">' + esc(a.wat) + '</div>' +
         '<div class="meta">' + esc(a.waaromNiet || a.waarom) + '</div>' +
-        (a.soort === 'runbook' && a.past ? '<div class="crij" style="margin-top:.45rem;">' +
+        (a.soort === 'runbook' && a.past ? '<div class="crij h-mt45">' +
           '<button class="knop" data-rb="' + esc(a.id) + '" data-droog="1">Droog draaien</button>' +
           '<button class="knop' + (a.niveau === 'auto' ? ' vol' : '') + '" data-rb="' + esc(a.id) + '">Uitvoeren</button></div>' : '') +
         '</div>';
@@ -403,7 +403,7 @@
         gr.rijen.map(function (x) { return '<button class="knop" data-t="' + esc(x.type) + '" data-i="' + esc(x.id) + '" style="border:none;padding:0;font-size:.8rem;">' + esc(x.titel) + '</button> (via ' + esc(x.via) + ')'; }).join(' · ') +
         '</div></div>';
     }
-    if (d.afhankelijkhedenOnvolledig) u += '<p class="meta" style="margin-top:.5rem;">Let op: minstens één collectie is groter dan de scangrens. Deze lijst is daarmee niet volledig.</p>';
+    if (d.afhankelijkhedenOnvolledig) u += '<p class="meta h-mt50">Let op: minstens één collectie is groter dan de scangrens. Deze lijst is daarmee niet volledig.</p>';
     u += '</div>';
 
     u += '<div class="kaart"><h3>De feiten</h3><div class="schuif"><table class="ctab"><tbody>';
@@ -463,7 +463,7 @@
       'De AI verwoordt hooguit; hij kiest niet wat er gebeurt.</p>' +
       '<div class="kaart">' +
       '<textarea class="veld" id="opq" placeholder="Bijvoorbeeld: waarom loopt mobiliteit in Haarlem achter?"></textarea>' +
-      '<div class="crij" style="margin-top:.6rem;"><button class="knop vol" id="opGa">Vraag het</button>' +
+      '<div class="crij h-mt60"><button class="knop vol" id="opGa">Vraag het</button>' +
       VOORBEELDEN.map(function (v) { return '<button class="knop" data-vb="' + esc(v) + '">' + esc(v) + '</button>'; }).join('') +
       '</div></div><div id="opuit"></div>';
     el.innerHTML = u;
@@ -486,7 +486,7 @@
   function toonPlan(p) {
     var u = '<div class="kaart"><h3>Het antwoord</h3><p style="color:var(--txt);font-size:.95rem;line-height:1.7;">' +
       esc(p.tekst) + '</p>' +
-      '<div class="crij" style="margin-top:.9rem;">' +
+      '<div class="crij h-mt90">' +
       (p.veilig && !p.uitgevoerd ? '<button class="knop vol" id="opDoe">Doe de veilige ' + p.veilig + ' en geef mij de uitzonderingen</button>' : '') +
       (p.uitgevoerd ? '<span class="meta">Dit plan is uitgevoerd.</span>' : '') +
       '</div></div>';
@@ -495,19 +495,19 @@
       var d = p.delen[i];
       u += '<div class="kaart"><h3>' + esc(d.naam) + ' <span class="meta">· ' + d.totaal + ' geval(len) in ' + esc(d.domein) + '</span></h3>';
       if (d.oorzaakVeld) {
-        u += '<p>Gemeten oorzaak: het veld <b>' + esc(d.oorzaakVeld) + '</b>.</p><div class="meta" style="margin-top:.35rem;">' +
+        u += '<p>Gemeten oorzaak: het veld <b>' + esc(d.oorzaakVeld) + '</b>.</p><div class="meta h-mt35">' +
           d.oorzaken.map(function (o) { return o.aantal + '× ' + esc(o.waarde); }).join(' · ') + '</div>';
       } else {
         u += '<p class="meta">Geen enkel veld verklaart deze gevallen samen; ze hebben geen gedeelde oorzaak.</p>';
       }
-      u += '<div class="crij" style="margin-top:.7rem;">' +
+      u += '<div class="crij h-mt70">' +
         '<span class="meta">veilig ' + d.veilig + '</span><span class="meta">· met hulp ' + d.hulp + '</span>' +
         '<span class="meta">· mens ' + d.mens + '</span>' +
         (d.overgeslagen ? '<span class="meta">· ' + d.overgeslagen + ' boven de rondegrens</span>' : '') +
         '</div>' +
-        '<div class="meta" style="margin-top:.4rem;">Stapeloordeel: risico ' + d.stapeloordeel.score + ' -- ' + esc(d.stapeloordeel.waarom) + '</div>';
+        '<div class="meta h-mt40">Stapeloordeel: risico ' + d.stapeloordeel.score + ' -- ' + esc(d.stapeloordeel.waarom) + '</div>';
       if (d.uitzonderingen.length) {
-        u += '<div style="margin-top:.7rem;"><b style="font-size:.85rem;">Uitzonderingen</b>';
+        u += '<div class="h-mt70"><b style="font-size:.85rem;">Uitzonderingen</b>';
         for (var j = 0; j < d.uitzonderingen.length; j++) {
           var x = d.uitzonderingen[j];
           u += '<div class="lijn"><button class="knop" data-t="' + esc(d.type) + '" data-i="' + esc(x.id) + '" style="border:none;padding:0;">' +
@@ -574,7 +574,7 @@
         (k.objectType ? '<p class="meta">Object: <button class="knop" data-t="' + esc(k.objectType) + '" data-i="' + esc(k.objectId) + '" style="border:none;padding:0;font-size:.78rem;">' + esc(k.objectType) + ' ' + esc(k.objectId) + '</button></p>' : '') +
         (k.bewijs ? '<p class="meta">Bewijs: ' + esc(JSON.stringify(k.bewijs).slice(0, 220)) + '</p>' : '') +
         (k.besluit ? '<p class="meta">Besluit: ' + esc(k.besluit.keuze) + ' -- ' + esc(k.besluit.reden) + ' (' + esc(k.besluit.door) + ')</p>'
-          : '<div class="crij" style="margin-top:.6rem;">' +
+          : '<div class="crij h-mt60">' +
             (k.eigenaar ? '' : '<button class="knop" data-neem="' + esc(k.id) + '">Ik pak hem op</button>') +
             '<input class="veld" data-keuze="' + esc(k.id) + '" placeholder="besluit (bv. hersteld, afgewezen)" style="min-width:12rem;">' +
             '<input class="veld" data-reden="' + esc(k.id) + '" placeholder="waarom" style="min-width:14rem;flex:1;">' +
@@ -642,7 +642,7 @@
       var rb = runbooks[i];
       u += '<div class="kaart"><h3>' + esc(rb.naam) + ' ' + C.niveau(rb.oordeel.niveau) + '</h3>' +
         '<p>' + esc(rb.wat) + '</p>' +
-        '<p class="meta" style="margin-top:.45rem;">Zet <b>' + esc(rb.veld) + '</b> op <b>' + esc(rb.naar) + '</b> · ' +
+        '<p class="meta h-mt45">Zet <b>' + esc(rb.veld) + '</b> op <b>' + esc(rb.naar) + '</b> · ' +
         (rb.terugDraaibaar ? 'terug te draaien' : 'NIET terug te draaien') +
         (rb.klantImpact ? ' · de klant merkt dit' : ' · geen klantimpact') + '</p>' +
         '<p class="meta">Risico ' + rb.oordeel.score + ' -- ' + esc(rb.oordeel.waarom) + '</p>' +
@@ -652,7 +652,7 @@
         (rb.kandidaten ? '<button class="knop" data-droog="' + esc(rb.id) + '">Droog draaien</button>' +
           '<button class="knop' + (rb.oordeel.niveau === 'auto' ? ' vol' : '') + '" data-voer="' + esc(rb.id) + '">Uitvoeren</button>' : '') +
         '</div>' +
-        (rb.oordeel.niveau === 'hand' && rb.kandidaten ? '<p class="meta" style="margin-top:.5rem;">Dit runbook staat op handmatig: uitvoeren vraagt uw expliciete akkoord en komt als zodanig in het journaal.</p>' : '') +
+        (rb.oordeel.niveau === 'hand' && rb.kandidaten ? '<p class="meta h-mt50">Dit runbook staat op handmatig: uitvoeren vraagt uw expliciete akkoord en komt als zodanig in het journaal.</p>' : '') +
         '<div class="meta" id="droog-' + esc(rb.id) + '"></div></div>';
     }
 
@@ -664,12 +664,12 @@
         '<p class="meta">' + (r.droog ? 'droogloop' : 'uitgevoerd') + ' door ' + esc(r.door) + ' · ' +
         r.geraakt + ' van ' + r.totaalKandidaten + ' · ' + C.niveau(r.niveau) + ' · risico ' + C.getal(r.score) +
         (r.reden ? ' · ' + esc(r.reden) : '') + '</p>' +
-        (r.voorbeelden && r.voorbeelden.length ? '<div class="meta" style="margin-top:.4rem;">' +
+        (r.voorbeelden && r.voorbeelden.length ? '<div class="meta h-mt40">' +
           r.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') +
           (r.geraakt > r.voorbeelden.length ? '<br>… en nog ' + (r.geraakt - r.voorbeelden.length) : '') + '</div>' : '') +
         (r.droog ? '' : r.teruggedraaid
-          ? '<p class="meta" style="margin-top:.5rem;">Teruggedraaid door ' + esc(r.terugDoor) + '.</p>'
-          : '<div class="crij" style="margin-top:.6rem;"><button class="knop weg" data-terug="' + esc(r.id) + '">Terugzetten naar de vorige toestand</button></div>') +
+          ? '<p class="meta h-mt50">Teruggedraaid door ' + esc(r.terugDoor) + '.</p>'
+          : '<div class="crij h-mt60"><button class="knop weg" data-terug="' + esc(r.id) + '">Terugzetten naar de vorige toestand</button></div>') +
         '</div>';
     }
     return u;
@@ -749,7 +749,7 @@
           '<div class="meta">' + esc(String(v.van)) + ' → ' + esc(String(v.naar)) + ' · voorgesteld door ' + esc(v.door) +
           ' op ' + esc(C.tijd(v.at)) + '</div>' +
           '<div class="meta">Reden: ' + esc(v.reden) + '</div>' +
-          '<div class="crij" style="margin-top:.45rem;">' +
+          '<div class="crij h-mt45">' +
           '<input class="veld" data-kr="' + esc(v.id) + '" placeholder="uw oordeel, kort" style="flex:1;min-width:12rem;">' +
           '<button class="knop vol" data-keur="' + esc(v.id) + '" data-ja="1">Goedkeuren</button>' +
           '<button class="knop weg" data-keur="' + esc(v.id) + '">Afwijzen</button></div></div>';
@@ -850,7 +850,7 @@
     var u = '<div class="kaart"><h3>' + esc(d.vraag) + '</h3>' +
       '<p>' + (d.knelpunten.length ? 'Knelpunt bij: <b>' + esc(d.knelpunten.join(', ')) + '</b>.' : 'Geen enkel domein komt boven 85% bezetting.') +
       ' Er komen ' + d.extraUitzonderingen + ' extra uitzonderingen bij; dat is ongeveer ' + d.extraMensuren + ' mensuur.</p>' +
-      '<p class="meta" style="margin-top:.5rem;">Model: ' + esc(d.model) + '</p></div>';
+      '<p class="meta h-mt50">Model: ' + esc(d.model) + '</p></div>';
     u += '<div class="kaart"><div class="schuif"><table class="ctab"><thead><tr><th>Domein</th><th>Volume nu</th><th>Straks</th>' +
       '<th>Bezetting</th><th>Wachtindex</th><th>Uitzonderingen</th></tr></thead><tbody>';
     for (var i = 0; i < d.regels.length; i++) {
@@ -913,7 +913,7 @@
         '<p class="meta">' + a.actiesDitUur + ' van ' + a.actiesMax + ' handelingen dit uur · ' +
         C.euro(a.centenVandaag) + ' van ' + C.euro(a.centenMax) + ' vandaag · foutkans ' + a.foutkans + '%</p>' +
         '<div class="staaf"><i style="width:' + Math.min(100, Math.round(a.actiesDitUur / a.actiesMax * 100)) + '%"></i></div>' +
-        '<div class="crij" style="margin-top:.7rem;">' +
+        '<div class="crij h-mt70">' +
         (a.gestopt ? '<button class="knop" data-hervat="' + esc(a.naam) + '">Hervatten</button>'
           : '<button class="knop weg" data-stop="' + esc(a.naam) + '">Stoppen</button>') +
         '</div></div>';
@@ -925,7 +925,7 @@
       var so = rechten.soorten[s];
       u += '<div class="lijn"><b>' + esc(so.id) + '</b> <span class="meta">· hooguit ' + so.maxMinuten + ' minuten · nu ' + so.nuActief + ' actief</span>' +
         '<div class="meta">' + esc(so.wat) + '</div>' +
-        '<div class="crij" style="margin-top:.45rem;">' +
+        '<div class="crij h-mt45">' +
         '<input class="veld" data-aan="' + esc(so.id) + '" placeholder="aan wie" style="width:11rem;">' +
         '<input class="veld" data-rrd="' + esc(so.id) + '" placeholder="reden" style="flex:1;min-width:11rem;">' +
         '<button class="knop" data-geef="' + esc(so.id) + '">Tijdelijk geven</button>' +
@@ -940,9 +940,9 @@
       u += '<div class="lijn"><b>' + esc(x.recht) + '</b>' + (x.nood ? ' <span class="cniveau hand">nooddeur</span>' : '') +
         '<div class="meta">' + esc(x.aan) + ' · gegeven door ' + esc(x.door) + ' · tot ' + esc(C.tijd(x.tot)) + '</div>' +
         '<div class="meta">' + esc(x.reden) + '</div>' +
-        '<div class="crij" style="margin-top:.4rem;"><button class="knop weg" data-introk="' + esc(x.id) + '">Nu intrekken</button></div></div>';
+        '<div class="crij h-mt40"><button class="knop weg" data-introk="' + esc(x.id) + '">Nu intrekken</button></div></div>';
     }
-    u += '<p class="meta" style="margin-top:.5rem;">' + rechten.verlopen + ' recht(en) zijn verlopen of ingetrokken; die staan in het journaal.</p></div>';
+    u += '<p class="meta h-mt50">' + rechten.verlopen + ' recht(en) zijn verlopen of ingetrokken; die staan in het journaal.</p></div>';
     return u;
   }
 
@@ -1022,7 +1022,7 @@
         '<td>' + w.perNiveau.auto + '</td><td>' + w.handUren + '</td><td>' + w.automatiseringsgraad + '%</td></tr>';
     }
     if (!b.werkstromen.length) u += '<tr><td colspan="7" class="meta">Er is in deze periode nog niets genoteerd.</td></tr>';
-    u += '</tbody></table></div><p class="meta" style="margin-top:.7rem;">' + esc(b.onzeker) + '</p></div>';
+    u += '</tbody></table></div><p class="meta h-mt70">' + esc(b.onzeker) + '</p></div>';
 
     if (b.kandidaten.length) {
       u += '<div class="kaart"><h3>Kandidaten voor de volgende ronde</h3>';
@@ -1061,7 +1061,7 @@
       (d.keten.heel
         ? 'Heel: ' + d.keten.regels + ' regels in het venster sluiten op elkaar aan. In totaal zijn er ' + d.aantal + ' regels genoteerd.'
         : 'BREUK bij regel ' + esc(d.keten.bij) + ': ' + esc(d.keten.waarom)) +
-      '</p><p class="meta" style="margin-top:.4rem;">Dit bewijst dat de regels in het venster onderling kloppen. ' +
+      '</p><p class="meta h-mt40">Dit bewijst dat de regels in het venster onderling kloppen. ' +
       'Het bewijst niet dat er niets vóór het venster is verdwenen -- daarvoor telt het totaal onafhankelijk mee.</p></div>';
     u += '<div class="kaart"><div class="schuif"><table class="ctab"><thead><tr><th>Wanneer</th><th>Wie</th><th>Wat</th>' +
       '<th>Niveau</th><th>Object</th><th>Voor → na</th><th>Reden</th></tr></thead><tbody>';
@@ -1123,7 +1123,7 @@
           (b.voorbeelden && b.voorbeelden.length ? '<div class="meta">' + esc(b.voorbeelden.join(' · ')) + '</div>' : '') +
           '</div>';
       }
-      u += '<p class="meta" style="margin-top:.6rem;">' + esc(d.gemeten.drempel) + '.' +
+      u += '<p class="meta h-mt60">' + esc(d.gemeten.drempel) + '.' +
         (d.gemeten.onvolledig ? ' Let op: minstens één collectie is groter dan de scangrens, dus dit beeld is niet volledig.' : '') +
         '</p></div>';
 
@@ -1169,7 +1169,7 @@
         d.knopen.map(function (k) {
           return '<tr><td>' + esc(k.label) + '</td><td class="meta">' + esc(k.domein) + '</td><td>' + k.aantal + '</td></tr>';
         }).join('') + '</tbody></table></div>' +
-        (d.losse.length ? '<p class="meta" style="margin-top:.6rem;">Los in de graaf (niets verwijst ernaar en ze verwijzen nergens heen): ' +
+        (d.losse.length ? '<p class="meta h-mt60">Los in de graaf (niets verwijst ernaar en ze verwijzen nergens heen): ' +
           esc(d.losse.join(', ')) + '. Dat is een uitslag, geen fout -- maar het is wel waar een koppeling zou kunnen ontbreken.</p>' : '') +
         '</div>';
 
@@ -1185,7 +1185,7 @@
           id: document.querySelector('#grI').value, diepte: Number(document.querySelector('#grD').value || 2) })
           .then(function (w) {
             document.querySelector('#grPad').innerHTML =
-              '<p class="meta" style="margin-top:.7rem;">Vanaf <b>' + esc(w.start.titel) + '</b>: ' +
+              '<p class="meta h-mt70">Vanaf <b>' + esc(w.start.titel) + '</b>: ' +
               w.knopen + ' knopen tot diepte ' + w.diepte + (w.grens ? ' -- ' + esc(w.grens) : '') + '</p>' +
               w.lagen.map(function (l) {
                 return '<div class="lijn"><b>stap ' + l.stap + '</b> <span class="meta">' + l.aantal + '</span>' +

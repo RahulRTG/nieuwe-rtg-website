@@ -78,6 +78,8 @@
     "icons": "node scripts/icons.js",
     "norm": "node scripts/norm.js",
     "norm:vast": "node scripts/norm.js --vastleggen",
+    "norm:basis": "node scripts/normbasis.js",
+    "nieuweroutes": "node scripts/nieuweroutes.js",
     "dekking": "node scripts/dekking.js",
     "dekking:vast": "node scripts/dekking.js --vastleggen",
     "samenhang": "node scripts/samenhang.js",

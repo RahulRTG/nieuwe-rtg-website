@@ -112,7 +112,7 @@
       '<span class="stil">' + wanneer + ' · ' + Math.max(1, Math.round(it.bytes / 1024)) + ' kB' +
       (TX[it.id] ? ' · met transcript' : '') + '</span></div>' +
       '<audio controls preload="none" data-audio="' + esc(it.id) + '"></audio>' +
-      '<div class="rij" style="margin-top:.45rem;">' +
+      '<div class="rij h-mt45">' +
       '<button class="knop" data-vat="' + esc(it.id) + '" type="button">Samenvatting</button>' +
       '<button class="knop" data-naam="' + esc(it.id) + '" type="button">Hernoem</button>' +
       '<button class="knop" data-weg="' + esc(it.id) + '" type="button">Weg</button></div>' +

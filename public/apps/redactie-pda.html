@@ -79,7 +79,7 @@ function render(s){
     '<label class="lab">Tekst</label><textarea id="tekst" rows="6" maxlength="20000" placeholder="Korte verslaggeving…"></textarea>'+
     '<button class="knop prim" id="pub">Publiceer nu</button>'+
     '<button class="knop stil" id="concept">Bewaar als concept</button></div>'+
-    '<div class="kaart"><h2 style="font-size:1rem;">Recent</h2><div id="recent" style="margin-top:.4rem;"></div></div>';
+    '<div class="kaart"><h2 style="font-size:1rem;">Recent</h2><div class="h-mt40" id="recent"></div></div>';
   $('#pub').addEventListener('click',()=>verstuur(true));
   $('#concept').addEventListener('click',()=>verstuur(false));
   const r=$('#recent'); const lijst=(s.recent||[]).slice(0,10);
@@ -98,7 +98,7 @@ async function verstuur(publiceren){
   try{ if(publiceren) await api('snel',body); else await api('artikel/bewaar',body); meld(publiceren?'Gepubliceerd.':'Concept bewaard.'); laad(); }
   catch(e){ meld(e.message); }
 }
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p class="hint" style="margin-top:.6rem;">De verslaggevers-PDA hoort bij je nieuwsbedrijf.</p><p style="margin-top:1rem;"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p class="hint h-mt60">De verslaggevers-PDA hoort bij je nieuwsbedrijf.</p><p class="h-mt100"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; }
 else laad();
 </script>
 <script src="/shared/basis.js" defer></script>

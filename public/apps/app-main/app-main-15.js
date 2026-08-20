@@ -1,3 +1,4 @@
+/* de knoppen onder een zorgpakket: betalen en openen */
     el.querySelectorAll('[data-carepakpay]').forEach(x => x.addEventListener('click', async () => {
       try { await API.call('/care/pakket/betaal', { ref: x.dataset.carepakpay }); toast(T('care.paktoast','Pakket betaald. Fijn verblijf.')); laadCare(); }
       catch(e){ toast(e.message); }

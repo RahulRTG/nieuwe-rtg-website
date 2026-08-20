@@ -1,4 +1,4 @@
-  /* ------------------------------------------------------------- surfaces -- */
+/* surfaces: een venster openen, sluiten en naar voren halen */
   function open(id, opties) {
     opties = opties || {};
     var bestaand = vind(id);

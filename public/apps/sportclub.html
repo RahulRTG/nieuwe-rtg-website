@@ -167,7 +167,7 @@ async function kiesScherm(){
   }));
 }
 function kopStuk(titel){ return '<button class="terug" id="terug">← het clubkantoor</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>'; }
-function aiBlok(hint){ return '<div class="ai"><div class="rij" style="margin-top:0;"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-clubmanager adviseert; beslissen doet de club zelf.</div></div>'; }
+function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-clubmanager adviseert; beslissen doet de club zelf.</div></div>'; }
 function koppelBasis(){
   $('#terug').addEventListener('click', kiesScherm);
   $('#aiK').addEventListener('click', async () => {

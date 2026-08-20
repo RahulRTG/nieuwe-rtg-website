@@ -1,3 +1,4 @@
+/* de wijzerplaat tekenen */
       svg.appendChild(n);
       return n;
     };

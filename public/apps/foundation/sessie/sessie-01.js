@@ -1,3 +1,4 @@
+/* de sessie van de hulppas: lezen, actief en bewaren */
   var Sessie = {
     huidig: lees,
     actief: function () { var s = lees(); return !!(s && s.code && s.token); },

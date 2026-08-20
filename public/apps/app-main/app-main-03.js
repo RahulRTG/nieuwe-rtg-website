@@ -1,3 +1,4 @@
+/* de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen */
     const s = pasStem();
     return s === 'business' ? business : s === 'lifestyle' ? lifestyle : rtg;
   }

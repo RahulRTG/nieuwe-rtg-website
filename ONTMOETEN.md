@@ -58,10 +58,12 @@ vooraf via RTG Pay — EUR 5 voor RTG, EUR 5 als aanbetaling bij de zaak; de
 reservering komt pas rond als beiden betaald hebben. Alleen de stad is
 zichtbaar, chat pas na een match, blokkeren en melden met backoffice-opvolging.
 
-**Rendez-vous** (`server/kern/rendezvous.js`, routes op
+**Rendez-vous** (`server/kern/rendezvous.js` met `-aanwezig.js` voor de
+Presence Graph en `-date.js` voor Rahul de koppelaar; routes op
 `/api/member/rendezvous/*`, scherm `public/apps/rendezvous.html`): een discreet
 profiel met wensen en de locaties waar een lid openstaat voor een ontmoeting,
-kandidaten gesorteerd op gedeelde locaties, wederzijdse like = match, en dan
+en waar het wanneer is; kandidaten gesorteerd op wie u binnenkort tegenkomt en
+pas daarna op gedeelde locaties, wederzijdse like = match, en dan
 stelt Rahul een date voor. Rahul belooft daar nooit een reservering — hij
 schetst, en De Rechterhand legt vast zodra beiden akkoord zijn.
 
@@ -634,8 +636,32 @@ midden" gewoon de eerste zaak uit de lijst pakte**, omdat `null < Infinity` waar
 is. Het midden werd berekend en meteen weggegooid. Hersteld, met de afstand tot
 het midden in het antwoord zodat de belofte narekenbaar is.
 
-**Fase 2 — nu aan de beurt: de Presence Graph in Rendez-vous.** Zelf opgegeven aanwezigheid met
-vensters, en overlap als signaal. Daarna pas de introductie in drie fasen.
+**Fase 2 — gedaan: de Presence Graph in Rendez-vous**
+(`kern/rendezvous-aanwezig.js`). Een thuisstad plus zelf opgegeven vensters
+(stad, van, tot), en de overlap ertussen als eigen signaal — dat sorteert nu
+vóór de gedeelde steden, en Rahul krijgt de dagen mee zodat zijn schets over een
+echt weekend gaat in plaats van over "een keer".
+
+Drie dingen zitten in de constructie en niet in een controle erop:
+
+- **Het bestand krijgt geen reisbron binnen.** Het zijn zuivere functies over wat
+  een lid intikte; een koppeling met RTG Travel zou er expliciet in geduwd moeten
+  worden, en dat is precies de drempel die hij hoort te hebben (par. 4.3).
+- **Er is geen veld waar een tijdstip in past.** `datum()` accepteert alleen
+  JJJJ-MM-DD, het scherm gebruikt `type="date"`, en vensters die voorbij zijn
+  vallen er bij het opslaan meteen af.
+- **Het overlapbericht zegt nooit wie er woont.** Een thuisstad telt mee bij het
+  rekenen, maar het antwoord luidt altijd "u bent er allebei". Zonder die regel
+  kon iemand twaalf vensters in twaalf steden neerleggen en aflezen waar de
+  anderen wonen; voor de ontmoeting maakt het niets uit wie er woont, voor de
+  privacy alles.
+
+Wat géén signaal is: twee mensen die in dezelfde stad *wonen*. Dat is geen timing
+maar dezelfde stad, en dat kon de app al. Er hoort minstens één gedateerd venster
+bij, anders zou elke stadgenoot elke dag bovenaan staan en betekent het woord
+niets meer.
+
+Daarna pas de introductie in drie fasen.
 
 **Fase 3 — beschikbaarheid zonder agenda**, in allebei: Blind Availability in
 Vonk, Private Availability in Rendez-vous. Eén mechanisme, twee gezichten.

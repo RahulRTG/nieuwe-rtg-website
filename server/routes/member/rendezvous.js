@@ -8,7 +8,7 @@
    hier ooit ook de leeftijd zou controleren, bouwt de tweede kopie van een grens
    en dat is precies hoe deze app hem eerder helemaal misliep. */
 module.exports = (kern) => {
-  const { app, auth, rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate } = kern;
+  const { app, auth, rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate, rvAanwezigWis } = kern;
 
   function eis(req, res) {
     if (['lifestyle', 'business'].includes(req.session.tier)) return true;
@@ -33,6 +33,7 @@ module.exports = (kern) => {
   app.post('/api/member/rendezvous/like', auth, doe((k, b) => rvLike(k, String(b.id || ''))));
   app.post('/api/member/rendezvous/pas', auth, doe((k, b) => rvPas(k, String(b.id || ''))));
   app.post('/api/member/rendezvous/matches', auth, doe((k) => rvMatches(k)));
+  app.post('/api/member/rendezvous/aanwezig/wis', auth, doe((k) => rvAanwezigWis(k)));
 
   // de AI-date is async (Rahul de koppelaar), dus een eigen handler
   app.post('/api/member/rendezvous/date', auth, async (req, res) => {

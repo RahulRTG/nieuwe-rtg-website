@@ -156,3 +156,110 @@ test('de ontmoetpoort: een minderjarige met een Lifestyle Pass komt er niet in',
   assert.equal(dicht.status, 403, '16 jaar is geen 18');
   assert.match((await json(dicht)).error, /18 jaar/, 'en de reden noemt de leeftijdsgrens');
 });
+
+/* ---- DE PRESENCE GRAPH (kern/rendezvous-aanwezig.js, ONTMOETEN.md fase 2) ----
+   Locatie was een verzameling ("we komen allebei weleens in Parijs") en wordt een
+   agenda ("we zijn er allebei van 22 tot 24 augustus"). */
+
+// een datum n dagen vooruit, als JJJJ-MM-DD; toetsen mogen niet op de kalender leunen
+const dag = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+
+test('de presence graph: tegelijk in dezelfde stad is een eigen signaal', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'A', thuis: 'Amsterdam',
+    aanwezig: [{ stad: 'Parijs', van: dag(1), tot: dag(4) }] }, a);
+  await rv('profiel/zet', { aan: true, over: 'B-overlap', thuis: 'Londen',
+    aanwezig: [{ stad: 'Parijs', van: dag(2), tot: dag(6) }] }, b);
+
+  const kand = await json(await rv('kandidaten', {}, a));
+  const zB = kand.kandidaten.find(k => k.over === 'B-overlap');
+  assert.ok(zB, 'B staat erbij');
+  assert.deepEqual(zB.samen, [{ stad: 'Parijs', van: dag(2), tot: dag(4) }],
+    'de overlap is de doorsnede van de twee vensters, niet het hele venster');
+  // en het overlapbericht zegt nooit wie er woont
+  assert.ok(!JSON.stringify(zB.samen).includes('thuis'), 'geen woonplaats in het signaal');
+});
+
+test('de presence graph: wie er woont telt mee, maar wordt niet verklapt', async () => {
+  const reiziger = await lidMet('lifestyle');
+  const bewoner = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'reiziger', thuis: 'Oslo',
+    aanwezig: [{ stad: 'Wenen', van: dag(3), tot: dag(5) }] }, reiziger);
+  await rv('profiel/zet', { aan: true, over: 'woont-in-wenen', thuis: 'Wenen' }, bewoner);
+
+  const kand = await json(await rv('kandidaten', {}, reiziger));
+  const z = kand.kandidaten.find(k => k.over === 'woont-in-wenen');
+  assert.deepEqual(z.samen, [{ stad: 'Wenen', van: dag(3), tot: dag(5) }],
+    'zijn woonplaats maakt uw venster tot een overlap');
+  const tekst = JSON.stringify(z);
+  assert.ok(!/"thuis"/.test(tekst), 'maar zijn thuisstad staat nergens in het antwoord');
+});
+
+test('de presence graph: twee stadgenoten zonder venster zijn geen signaal', async () => {
+  const x = await lidMet('lifestyle');
+  const y = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'x-thuis', thuis: 'Rotterdam' }, x);
+  await rv('profiel/zet', { aan: true, over: 'y-thuis', thuis: 'Rotterdam' }, y);
+  const kand = await json(await rv('kandidaten', {}, x));
+  const z = kand.kandidaten.find(k => k.over === 'y-thuis');
+  assert.deepEqual(z.samen, [], 'dezelfde woonplaats is geen tijdsignaal; dat kon de app al');
+});
+
+test('de presence graph is grofmazig: een tijdstip komt er niet in, en voorbij vervalt', async () => {
+  const a = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, aanwezig: [
+    { stad: 'Parijs', van: dag(1) + 'T19:30', tot: dag(4) },   // een tijdstip
+    { stad: 'Rome', van: dag(-30), tot: dag(-20) },            // al voorbij
+    { stad: 'Gstaad', van: dag(9), tot: dag(6) }               // omgedraaid
+  ] }, a);
+  const p = (await json(await rv('profiel', {}, a))).profiel;
+  const steden = p.aanwezig.map(v => v.stad);
+  assert.ok(!steden.includes('Parijs'), 'een venster met een tijdstip wordt niet aangenomen');
+  assert.ok(!steden.includes('Rome'), 'een venster dat voorbij is, blijft niet staan');
+  const g = p.aanwezig.find(v => v.stad === 'Gstaad');
+  assert.ok(g && g.van === dag(6) && g.tot === dag(9), 'omgedraaide datums worden rechtgezet, niet geweigerd');
+});
+
+test('de presence graph: een lid ziet zijn aanwezigheid en kan hem in een keer wissen', async () => {
+  const a = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'wisser', thuis: 'Madrid',
+    aanwezig: [{ stad: 'Lissabon', van: dag(2), tot: dag(5) }] }, a);
+  let p = (await json(await rv('profiel', {}, a))).profiel;
+  assert.equal(p.thuis, 'Madrid', 'het lid ziet wat er van hem bekend is');
+  assert.equal(p.aanwezig.length, 1);
+
+  assert.equal((await rv('aanwezig/wis', {}, a)).status, 200);
+  p = (await json(await rv('profiel', {}, a))).profiel;
+  assert.deepEqual(p.aanwezig, [], 'de aanwezigheid is weg');
+  assert.equal(p.thuis, '', 'en de thuisstad ook');
+  assert.equal(p.over, 'wisser', 'maar de rest van het profiel blijft staan');
+});
+
+/* DE GRENS UIT ONTMOETEN.md PAR. 4.3: aanwezigheid is zelf opgegeven en wordt
+   nooit uit RTG Travel gevuld. Dit is een NIET-functie, en die toets je door de
+   reis er wel te laten zijn: een lid met een lopende reis in de database houdt
+   een lege aanwezigheid tot het zelf iets intikt. */
+test('de presence graph komt nooit uit een reis, ook niet als die er is', async () => {
+  const kern = require('../server/kern/rendezvous.js');
+  const db = { data: {
+    // een reis staat pontificaal in dezelfde database die de module krijgt
+    trip: { dest: 'Parijs', from: '2026-08-21', to: '2026-08-24', items: [] },
+    rendezvous: {}
+  } };
+  const accounts = { getUserById: () => ({ id: 1, verified: 'verified' }), getMemberState: () => ({
+    geboren: '1990-05-05', trip: { dest: 'Parijs', from: '2026-08-21', to: '2026-08-24' } }) };
+  const api = kern({ db, save() {}, crypto: require('crypto'), liveCodename: k => k,
+    anthropic: null, notify() {}, accounts, leeftijdVan: () => 36 });
+
+  api.rvProfiel('user-1', { aan: true, over: 'reist naar Parijs' });
+  const p = api.rvProfielGet('user-1').profiel;
+  assert.deepEqual(p.aanwezig, [], 'de reis vult de aanwezigheid niet');
+  assert.equal(p.thuis, '', 'en levert ook geen thuisstad');
+
+  // twee leden die allebei "op reis naar Parijs" zijn, zien elkaar niet als overlap
+  api.rvProfiel('user-2', { aan: true, over: 'ook naar Parijs' });
+  const kandidaten = api.rvKandidaten('user-1').kandidaten;
+  assert.equal(kandidaten.length, 1, 'de ander is wel gewoon een kandidaat');
+  assert.deepEqual(kandidaten[0].samen, [], 'maar zonder ingetikte aanwezigheid is er geen overlap');
+});

@@ -25,12 +25,12 @@
     "kernGedeeld": 188,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 156,
-    "toetsenOngevoeligPct": 2.5,
+    "toetsenNietGemeten": 150,
+    "toetsenOngevoeligPct": 2.4,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "bewijsCellenBewezen": 20827,
-    "bewijsAchterstand": 1298
+    "bewijsCellenBewezen": 20826,
+    "bewijsAchterstand": 1281
   },
   "notities": [
     {
@@ -475,6 +475,11 @@
       "datum": "2026-08-20",
       "meter": "toetsenNietGemeten 154 -> 156",
       "reden": "test/inhoudswacht.test.js en test/schorspoort.test.js zijn nieuw en nog niet door de mutatiemotor gezien. De mutatieband start direct na deze vastlegging en meet alle openstaande toetsen; deze tand hoort daarna fors omlaag (er staan er 156)."
+    },
+    {
+      "datum": "2026-08-20",
+      "meter": "bewijsCellenBewezen 20827 -> 20826",
+      "reden": "Een OUTPUT-cel op een deur stond op bewezen via toerekening, maar elke lie-run spaart de deuren (RTG_LIEG_NIET): dat bewijs kon nooit echt geleverd zijn. Vals bewijs inleveren is geen verslechtering; de deur draagt nu de grens-post output-deuren."
     }
   ],
   "prestatie": {

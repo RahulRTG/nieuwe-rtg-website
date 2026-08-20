@@ -98,6 +98,21 @@ const POSTEN = [
     sluit: 'een IDOR-proef: twee leden met DEZELFDE rol, en de een probeert het object van de ' +
       'ander. Dat is precies de foutklasse die de rolproef expliciet buiten zijn grens legt.' },
 
+  /* De deuren van het huis: elke lie-run spaart ze (RTG_LIEG_NIET), want een
+     toets die niet meer kan inloggen zakt overal tegelijk en dan meet je de
+     voorbereiding en niet de inhoud. De OUTPUT-cel van een deur is daarom per
+     constructie niet met de liegpoort te meten. */
+  { id: 'output-deuren', soort: 'grens',
+    wat: 'deuren (login, register, webauthn) waarvan het antwoord niet met de liegpoort te meten is',
+    uit: (r) => {
+      const per = (r.output && r.output.perRoute) || {};
+      return Object.values(per).filter(c => c.staat === 'ongemeten' && /deur/.test(c.reden || '')).length || undefined;
+    },
+    waarom: 'RTG_LIEG_NIET spaart de deuren in elke lie-run; over een deur is dus per constructie ' +
+      'nooit gelogen, en een oordeel van een instrument dat er niet kan komen is geen oordeel.',
+    sluit: 'niets in deze proef; een inhoudseis op een deur hoort in een gewone toets op het echte ' +
+      'antwoord (token-vorm, foutmelding), niet in een leugenmeting die de deur zou breken.' },
+
   { id: 'lichaamssleutel', soort: 'grens',
     wat: 'routes waarvan de sleutel een VELD IN HET VERZOEK is, geen token in de kop',
     uit: (r) => reden(r.rolproef, 'lichaamssleutel'),

@@ -126,10 +126,13 @@ function eenRegel(args) {
     let kaart;
     try { kaart = JSON.parse(fs.readFileSync(path.join(WORTEL, 'INHOUDSKAART.json'), 'utf8')); }
     catch (e) { console.error('geen INHOUDSKAART.json; draai eerst scripts/inhoudskaart.js'); process.exitCode = 2; return; }
-    kandidaten = Object.entries(gericht)
-      .filter(([, u]) => !u.merkt)
-      .filter(([route]) => { const p = (kaart.perRoute || {})[route]; return p && !p.onwaarneembaar; })
-      .map(([route]) => ({ route, toets: WACHT, breedte: 0 }));
+    /* De rij komt uit de KAART: elke waarneembare route die nog geen merkt
+       draagt. Dat dekt de blinde routes (oude uitslag vervangen) EN de
+       onbesliste (nooit een gericht-rij gehad) in een beweging. */
+    kandidaten = Object.keys(kaart.perRoute || {})
+      .filter(route => !kaart.perRoute[route].onwaarneembaar)
+      .filter(route => !gericht[route] || !gericht[route].merkt)
+      .map(route => ({ route, toets: WACHT, breedte: 0 }));
   } else {
     kandidaten = op.kiesKandidaten();
     if (!kandidaten) { console.error('geen journaal of geen MUTATIES.json'); process.exitCode = 2; return; }

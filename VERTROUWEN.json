@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T08:36:55.168Z",
-  "commit": "6511c97",
+  "op": "2026-08-20T08:59:00.462Z",
+  "commit": "6ea8268",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -24,14 +24,14 @@
   },
   "IDEMPROEF.json": {
    "op": "2026-08-20T07:39:12.644Z",
-   "dagen": 0
+   "dagen": 0.1
   },
   "STAATPROEF.json": {
    "op": "2026-08-20T07:33:20.257Z",
-   "dagen": 0
+   "dagen": 0.1
   },
   "OUTPUTPROEF.json": {
-   "op": "2026-08-20T08:25:44.786Z",
+   "op": "2026-08-20T08:56:46.991Z",
    "dagen": 0
   },
   "AUDITPROEF.json": {
@@ -43,9 +43,9 @@
  "telling": {
   "bewezen": 0,
   "verschaald": 0,
-  "verzwakt": 4160,
+  "verzwakt": 4159,
   "geschorst": 0,
-  "ongemeten": 25
+  "ongemeten": 26
  },
  "perRoute": {
   "POST /api/aandacht": {
@@ -284,9 +284,9 @@
    "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
   },
   "POST /api/auth/register": {
-   "staat": "verzwakt",
-   "reden": "het bewijs draagt minder dan het lijkt: 10 schakel(s) nooit gemeten (AUTH, ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
-   "heropent": "meet de ontbrekende schakel(s); de sluitweg per soort staat in BEWIJSSCHULD.json"
+   "staat": "ongemeten",
+   "reden": "geen enkele schakel draagt bewijs; er is niets om te vertrouwen",
+   "heropent": "meet: elke schakel heeft een instrument (zie scripts/bewijsmatrix.js SCHAKELS)"
   },
   "POST /api/auth/resend": {
    "staat": "verzwakt",

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T08:25:44.786Z",
-  "commit": "f620e2d",
+  "op": "2026-08-20T08:56:46.991Z",
+  "commit": "6ea8268",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -9,10 +9,10 @@
  "uitleg": "Per route: kijkt een toets naar de INHOUD van het antwoord. Gemeten door de liegpoort (RTG_LIEG) per toetsbestand te koppelen aan de routes die dat bestand raakt. Alleen een toets die GEEN andere route raakt levert bewijs over DEZE route.",
  "grens": "zegt niets over routes die geen enkele toets raakt, en niets over de vraag of de inhoud KLOPT -- alleen of iemand ernaar kijkt.",
  "gemeten": {
-  "bewezen": 4120,
-  "onbeslist": 15,
-  "blind": 49,
-  "ongemeten": 11
+  "bewezen": 4119,
+  "onbeslist": 0,
+  "blind": 47,
+  "ongemeten": 29
  },
  "routes": 4195,
  "perRoute": {
@@ -59,7 +59,7 @@
    "reden": "er is over DEZE route gelogen en aanmeldgesprek.test.js zakte daarop"
   },
   "POST /api/office/login": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "aanmeldbesluit.test.js",
     "api-contract.test.js",
@@ -68,31 +68,31 @@
     "assets.test.js",
     "atelier.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 2); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/auth/register": {
-   "staat": "bewezen",
-   "bron": "outputproef",
+   "staat": "ongemeten",
    "toetsen": [
+    "aanmeldgesprek.test.js",
+    "activiteiten.test.js",
+    "administratie.test.js",
     "adresopzoek.test.js",
-    "mall-bestellingen.test.js",
-    "mall-concierge.test.js",
-    "mall-kaart.test.js",
-    "sessie-herstart.test.js"
+    "agenda-pro.test.js",
+    "agenda.test.js"
    ],
-   "reden": "deze toets(en) zakken als het antwoord leeg wordt, en raken geen andere route"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/auth/login": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "aanmeldbesluit.test.js",
     "ai-regie.test.js",
     "aidata.test.js",
+    "onbekend",
     "bank.test.js",
-    "bankdeuren.test.js",
-    "bedrijfeigenaar.test.js"
+    "bankdeuren.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 3); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/sleutelwoorden/zet": {
    "staat": "bewezen",
@@ -135,7 +135,7 @@
    "reden": "deze toets(en) zakken als het antwoord leeg wordt, en raken geen andere route"
   },
   "POST /api/supplier/login": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "aanwezig.test.js",
     "activiteiten.test.js",
@@ -144,7 +144,7 @@
     "agent.test.js",
     "algpin.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 2); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/supplier/aanwezig": {
    "staat": "bewezen",
@@ -499,7 +499,7 @@
    "reden": "er is over DEZE route gelogen en ai-regie.test.js zakte daarop"
   },
   "POST /api/login": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "aidata.test.js",
     "api-contract.test.js",
@@ -508,7 +508,7 @@
     "bank-beheer.test.js",
     "bank.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 2); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/office/kachat/stuur": {
    "staat": "bewezen",
@@ -1261,19 +1261,19 @@
    "reden": "er is over DEZE route gelogen en pinvergeten.test.js zakte daarop"
   },
   "POST /api/auth/resend": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "auth-rol.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/auth/password": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "auth-rol.test.js",
     "herstel2fa.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 8); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/logout": {
    "staat": "bewezen",
@@ -1284,14 +1284,15 @@
    "reden": "er is over DEZE route gelogen en uitloggen.test.js zakte daarop"
   },
   "POST /api/auth/me": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "auth-rol.test.js",
     "boardroom-poort.test.js",
     "ledenladder.test.js",
-    "levenbandroutes.test.js"
+    "levenbandroutes.test.js",
+    "sessiegrens.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 13); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/verify/upload": {
    "staat": "bewezen",
@@ -1318,32 +1319,40 @@
    "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/webauthn/registreer/opties": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
-    "auth-rol.test.js"
+    "auth-rol.test.js",
+    "webauthn-ceremonie.test.js",
+    "webauthn.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/webauthn/registreer": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
-    "auth-rol.test.js"
+    "auth-rol.test.js",
+    "webauthn-ceremonie.test.js",
+    "webauthn.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/webauthn/lijst": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
-    "auth-rol.test.js"
+    "auth-rol.test.js",
+    "webauthn-ceremonie.test.js",
+    "webauthn.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/webauthn/weg": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
-    "auth-rol.test.js"
+    "auth-rol.test.js",
+    "webauthn-ceremonie.test.js",
+    "webauthn.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 1376); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/avond/voorkeuren": {
    "staat": "bewezen",
@@ -16089,14 +16098,16 @@
    "reden": "er is over DEZE route gelogen en directpay.test.js zakte daarop"
   },
   "POST /api/auth/forgot": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "doorgeefjournaal.test.js",
+    "onbekend",
+    "herstel-sandbox.test.js",
     "herstel2fa.test.js",
-    "kleine-grendels.test.js",
-    "publieke-rand.test.js"
+    "herstelgat.test.js",
+    "herstelzondertelefoon.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 5); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/office/journaal": {
    "staat": "bewezen",
@@ -18298,11 +18309,13 @@
    "reden": "er is over DEZE route gelogen en inhoudswacht.test.js zakte daarop"
   },
   "POST /api/auth/reset": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
-    "herstel2fa.test.js"
+    "herstel2fa.test.js",
+    "herstelzondertelefoon.test.js",
+    "sessiegrens.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 8); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/supplier/home/merk": {
    "staat": "bewezen",
@@ -23412,11 +23425,11 @@
    "reden": "er is over DEZE route gelogen en payroll.test.js zakte daarop"
   },
   "POST /api/supplier/mijn/login": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "pda-aanmelden.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 6); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/staff/mine": {
    "staat": "bewezen",
@@ -23779,11 +23792,11 @@
    "reden": "er is over DEZE route gelogen en publieke-rand.test.js bleef groen; geen enkele toets kijkt naar deze inhoud"
   },
   "POST /api/auth/verify-email": {
-   "staat": "onbeslist",
+   "staat": "ongemeten",
    "toetsen": [
     "publieke-rand.test.js"
    ],
-   "reden": "inhoudgevoelige toetsen raken deze route, maar elk daarvan raakt er meer (de smalste: 19); de gevoeligheid is niet aan deze route toe te schrijven"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/supplier/pr/nieuwsbrief": {
    "staat": "bewezen",
@@ -31544,20 +31557,20 @@
    "reden": "er is over DEZE route gelogen en wachtlijst.test.js zakte daarop"
   },
   "POST /api/webauthn/opties": {
-   "staat": "blind",
+   "staat": "ongemeten",
    "toetsen": [
     "webauthn-ceremonie.test.js",
     "webauthn.test.js"
    ],
-   "reden": "alleen toetsen die groen bleven terwijl alles loog; die kijken niet naar de inhoud"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/webauthn/login": {
-   "staat": "blind",
+   "staat": "ongemeten",
    "toetsen": [
     "webauthn-ceremonie.test.js",
     "webauthn.test.js"
    ],
-   "reden": "alleen toetsen die groen bleven terwijl alles loog; die kijken niet naar de inhoud"
+   "reden": "dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); dit instrument kan hier per constructie niet meten"
   },
   "POST /api/supplier/site/genereer": {
    "staat": "bewezen",

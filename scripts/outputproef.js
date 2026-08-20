@@ -124,7 +124,23 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
   const infra = infrastructuur(perToets);
   const perRouteUit = {};
   const telling = { bewezen: 0, onbeslist: 0, blind: 0, ongemeten: 0 };
+  const deurLijst = require('./mutatie').DEUREN.split(',');
+  const isDeurPad = (p) => deurLijst.some(d => p === d || p.startsWith(d));
   for (const [route, toetsen] of perRoute) {
+    /* DE DEUREN EERST, en voor ELKE tak. Elke lie-run -- de brede van de
+       mutatiemotor en de gerichte van de band -- spaart de deuren
+       (RTG_LIEG_NIET), want een toets die niet meer kan inloggen zakt overal
+       tegelijk. Over een deur is dus per constructie nooit gelogen: een
+       blind- of onbeslist-oordeel erover is een uitspraak van een instrument
+       dat er niet kan komen. Dat heet hier ongemeten, met de reden erbij;
+       de post output-deuren in BEWIJSSCHULD.json draagt hem als grens. */
+    if (isDeurPad(route.slice(route.indexOf(' ') + 1))) {
+      perRouteUit[route] = { staat: 'ongemeten', toetsen: [...toetsen].slice(0, 6),
+        reden: 'dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); ' +
+          'dit instrument kan hier per constructie niet meten' };
+      telling.ongemeten++;
+      continue;
+    }
     const gevoelige = [...toetsen].filter(t => gevoelig.has(t));
     if (!gevoelige.length) {
       const blinde = [...toetsen].filter(t => blind.has(t));
@@ -156,6 +172,8 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
         telling.ongemeten++;
         continue;
       }
+      /* De deuren komen hier nooit: die zijn bovenaan de lus al op ongemeten
+         gezet, voor elke tak tegelijk. */
       perRouteUit[route] = direct.merkt
         ? { staat: 'bewezen', bron: 'outputproef (gericht)', toetsen: [direct.toets],
             reden: 'er is over DEZE route gelogen en ' + direct.toets + ' zakte daarop' }

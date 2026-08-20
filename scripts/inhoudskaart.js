@@ -37,7 +37,7 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
-const { alleRoutes, verdeelOpRol } = require('./lib/routes');
+const { alleRoutes, rolVan } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const { stempel } = require('./lib/stempel');
 
@@ -76,15 +76,38 @@ if (require.main !== module) return;
   let reg;
   try { reg = JSON.parse(fs.readFileSync(OUTPUT, 'utf8')); }
   catch (e) { console.error('geen OUTPUTPROEF.json; zonder blindenlijst valt er niets in kaart te brengen'); process.exit(2); }
-  const blind = new Set(Object.entries(reg.perRoute || {})
-    .filter(([, c]) => c.staat === 'blind').map(([k]) => k));
-  if (!blind.size) { console.log('geen blinde routes; de kaart heeft niets te doen'); return; }
+  /* Blind EN onbeslist: allebei zijn het routes zonder toerekenbare
+     inhoudstoets, en voor allebei is een vormcontract de sluitweg. DEUREN
+     doen niet mee: die worden in elke lie-run gespaard (RTG_LIEG_NIET), dus
+     een contract erop kan nooit tot een gerichte meting leiden. */
+  const { DEUREN } = require('./mutatie');
+  const isDeur = (pad) => DEUREN.split(',').some(d => pad === d || pad.startsWith(d));
+  const doel = new Set(Object.entries(reg.perRoute || {})
+    .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist')
+    .filter(([k]) => !isDeur(k.split(' ')[1]))
+    .map(([k]) => k));
+  if (!doel.size) { console.log('geen blinde of onbesliste routes; de kaart heeft niets te doen'); return; }
 
-  const routes = alleRoutes().filter(r => blind.has(r.methode + ' ' + r.pad));
-  const verdeling = verdeelOpRol(routes, ['member', 'office', 'supplier']);
+  /* De rolverdeling, met de PUBLIEKE routes erbij: rolVan() geeft daar niets
+     terug en verdeelOpRol zou ze wegleggen, maar een route zonder poort is
+     juist de makkelijkste om in kaart te brengen -- gewoon aankloppen zonder
+     token. Eigenrollen (boardroom, scim, webauthn, werkplekbaas) blijven
+     erbuiten met hun reden: dit instrument heeft er geen sleutel voor. */
+  const KENT = new Set(['member', 'office', 'supplier']);
+  const routes = [];
+  let zonderSleutel = 0;
+  for (const r of alleRoutes()) {
+    const s = r.methode + ' ' + r.pad;
+    if (!doel.has(s)) continue;
+    const rol = rolVan(r.bewakers);
+    if (!rol) routes.push({ methode: r.methode, pad: r.pad, rol: 'publiek' });
+    else if (KENT.has(rol)) routes.push({ methode: r.methode, pad: r.pad, rol });
+    else zonderSleutel++;
+  }
+  const verdeling = { metRol: routes, zonderRol: { length: zonderSleutel } };
   console.log('\n=== DE INHOUDSKAART ===\n');
-  console.log('  blinde routes                : ' + blind.size);
-  console.log('  met een rol waarvoor een token bestaat: ' + verdeling.metRol.length);
+  console.log('  blinde + onbesliste routes (geen deur): ' + doel.size);
+  console.log('  bereikbaar (publiek of bekende rol)   : ' + verdeling.metRol.length);
 
   const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
@@ -146,7 +169,7 @@ if (require.main !== module) return;
     grens: 'Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de ' +
       'vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en ' +
       'blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.',
-    gemeten: { blindeRoutes: blind.size, inKaart: Object.keys(perRoute).length,
+    gemeten: { doelRoutes: doel.size, inKaart: Object.keys(perRoute).length,
       waarneembaar: Object.values(perRoute).filter(p => !p.onwaarneembaar).length,
       onwaarneembaar: Object.values(perRoute).filter(p => p.onwaarneembaar).length,
       versDezeRun: Object.keys(vers).length, zonderRol: verdeling.zonderRol.length, dood },

@@ -194,6 +194,20 @@ test('5. een verse gerichte ronde telt METEEN mee, niet pas de volgende batch', 
     assert.match(uit.perRoute[route].reden, /liegpoort/);
   }
 
+  /* En de DEUREN: elke lie-run spaart ze (RTG_LIEG_NIET), dus ook daar is
+     nooit echt gelogen en telt een oude uitspraak niet -- dezelfde valse
+     meting als de padparameters, alleen via de spaarlijst. */
+  for (const merkt of [true, false]) {
+    const deur = 'POST /api/auth/forgot';
+    const prD = new Map([[deur, new Set(['breed.test.js'])]]);
+    const ptD = new Map([['breed.test.js', new Set([deur, 'POST /api/ander'])]]);
+    const uitD = oordeel(prD, ptD, gevoelig, new Set(),
+      { [deur]: { toets: 'breed.test.js', merkt, op: 'nu' } });
+    assert.equal(uitD.perRoute[deur].staat, 'ongemeten',
+      deur + ' met merkt=' + merkt + ' hoort ongemeten te zijn, niet ' + uitD.perRoute[deur].staat);
+    assert.match(uitD.perRoute[deur].reden, /deur/);
+  }
+
   /* En een PADPARAMETER-route doet sinds de vorm-matching gewoon mee: de
      liegpoort vertaalt /:code naar een segment-joker, dus daarover LIEGEN kan
      echt en het oordeel telt. De poort zelf wordt hieronder apart geijkt. */

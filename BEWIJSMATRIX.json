@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-20T08:35:21.952Z",
-    "commit": "6511c97",
+    "op": "2026-08-20T08:57:34.128Z",
+    "commit": "6ea8268",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -12,10 +12,10 @@
   "schakels": 11,
   "cellen": 46035,
   "telling": {
-    "bewezen": 20827,
+    "bewezen": 20826,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 24936,
+    "ongemeten": 24937,
     "gezakt": 0
   },
   "perSchakel": {
@@ -41,10 +41,10 @@
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4120,
+      "bewezen": 4119,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 65,
+      "ongemeten": 66,
       "gezakt": 0
     },
     "STATE": {
@@ -97,5 +97,5 @@
       "gezakt": 0
     }
   },
-  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN. Deze stand is met de hand vastgelegd over de ratel heen: een OUTPUT-cel op een deur stond op bewezen via toerekening, maar elke lie-run spaart de deuren (RTG_LIEG_NIET) dus dat bewijs kon nooit echt zijn geleverd; de deur staat nu eerlijk op ongemeten met de grens-post output-deuren in BEWIJSSCHULD.json."
 }

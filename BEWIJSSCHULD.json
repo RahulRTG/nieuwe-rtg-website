@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T12:46:28.867Z",
-  "commit": "3c21bf3",
+  "op": "2026-08-20T13:10:58.223Z",
+  "commit": "d45472f",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,7 +9,7 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 14,
-  "meetwerk": 110,
+  "meetwerk": 56,
   "instrument": 635,
   "grens": 619
  },
@@ -33,10 +33,10 @@
   {
    "id": "objectpoort",
    "soort": "meetwerk",
-   "wat": "routes die eigenaarschap toetsen van een object uit het lichaam",
-   "aantal": 106,
+   "wat": "routes die eigenaarschap toetsen van een object uit het lichaam, en die nog geen enkel instrument heeft beslist",
+   "aantal": 52,
    "waarom": "huisAuth en huisPoort doen werkplek.kent(req.body.bedrijf) VOORDAT ze naar de identiteit kijken. Met een leeg of verzonnen bedrijf is 404 het enige antwoord en is de identiteit nooit aan de beurt geweest. Dit zijn 78 /api/werkplek/*-routes met een bedrijfscode in het lijf.",
-   "sluit": "GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json), in twee gangen. Member-laag: 117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de klasse uitsluit). Werkplek-laag, geijkt op de eigenaar zodat een weigering iets bewijst: 20 routes bewezen-gescheiden, 0 doorbraken, 62 onbereikbaar omdat ook de rechtmatige eigenaar er met alleen een bedrijfscode niet in kwam. Die 62 zijn de rest: ze vragen een lijf met meer dan de code (een bestaand document, een klus), en dat is hetzelfde ketenwerk als object-vooraf hieronder -- geen ontbrekend instrument meer, maar werk per domein."
+   "sluit": "GEMETEN met de IDOR-proef (scripts/idorproef.js, IDOR.json). Member-laag: 117 routes bewezen-gescheiden, 0 lekken (de eigenaar komt uit req.session, nooit uit het lijf, wat de klasse uitsluit). Werkplek-poort, geijkt op de eigenaar zodat een weigering iets bewijst: 56 routes bewezen-gescheiden, 0 doorbraken, 26 onbereikbaar. Die 56 waren er eerst 20: de ijking ging over op twee gangen met de objectpool, zodat de eigenaar met een lijf vol ECHTE id's uit zijn eigen huis naar binnen gaat en lid B daarna met precies hetzelfde lijf. De 26 die overblijven vragen een keten die deze proef niet kan lopen (een goedgekeurd document, een toegewezen klus) en zijn hetzelfde werk als object-vooraf hieronder: geen ontbrekend instrument, maar werk per domein."
   },
   {
    "id": "output-deuren",

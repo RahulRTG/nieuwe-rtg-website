@@ -23,7 +23,8 @@ const FUNCTIES = [].concat(
   require('./cat-domeinen2'),
   require('./cat-geld'),
   require('./cat-domeinen3'),
-  require('./cat-domeinen4'));
+  require('./cat-domeinen4'),
+  require('./cat-festival'));
 
 const OP_ID = Object.fromEntries(FUNCTIES.map(f => [f.id, f]));
 /* FAIL-FAST OP EEN ONBEKENDE CATEGORIE. Het bord groepeert per categorie en

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T09:06:13.509Z",
-  "commit": "62c91d1",
+  "op": "2026-08-20T10:00:17.718Z",
+  "commit": "7d3f2b2",
   "boomVuil": true,
   "node": "v22.22.2",
   "journaal": ".routejournaal"
@@ -11,8 +11,8 @@
  "gemeten": {
   "bewezen": 4156,
   "onbeslist": 0,
-  "blind": 10,
-  "ongemeten": 29
+  "blind": 5,
+  "ongemeten": 34
  },
  "routes": 4195,
  "perRoute": {
@@ -11924,11 +11924,12 @@
   },
   "GET /media/:naam": {
    "staat": "ongemeten",
-   "bron": "outputproef (gericht)",
    "toetsen": [
-    "media.test.js"
+    "baby.test.js",
+    "media.test.js",
+    "onbekend"
    ],
-   "reden": "de liegpoort raakt alleen /api/-paden; de leugen ging aan maar vuurde nooit, dus de eerdere uitslag telt niet"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "POST /api/rtf/baby/boek": {
    "staat": "bewezen",
@@ -18071,11 +18072,13 @@
   },
   "GET /": {
    "staat": "ongemeten",
-   "bron": "outputproef (gericht)",
    "toetsen": [
-    "slo-routes.test.js"
+    "onbekend",
+    "paginaroutes.test.js",
+    "slo-routes.test.js",
+    "webplatform.test.js"
    ],
-   "reden": "de liegpoort raakt alleen /api/-paden; de leugen ging aan maar vuurde nooit, dus de eerdere uitslag telt niet"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "POST /api/staff": {
    "staat": "ongemeten",
@@ -20839,11 +20842,12 @@
   },
   "GET /apps/index.html": {
    "staat": "ongemeten",
-   "bron": "outputproef (gericht)",
    "toetsen": [
+    "loghygiene.test.js",
+    "paginaroutes.test.js",
     "schild.test.js"
    ],
-   "reden": "de liegpoort raakt alleen /api/-paden; de leugen ging aan maar vuurde nooit, dus de eerdere uitslag telt niet"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "POST /api/lucht/charters": {
    "staat": "bewezen",
@@ -23150,39 +23154,39 @@
    "reden": "er is over DEZE route gelogen en staff-inzet-mob.test.js zakte daarop"
   },
   "GET /apps": {
-   "staat": "blind",
+   "staat": "ongemeten",
    "toetsen": [
     "paginaroutes.test.js"
    ],
-   "reden": "alleen toetsen die groen bleven terwijl alles loog; die kijken niet naar de inhoud"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "GET /apps/bureau.html": {
-   "staat": "blind",
+   "staat": "ongemeten",
    "toetsen": [
     "paginaroutes.test.js"
    ],
-   "reden": "alleen toetsen die groen bleven terwijl alles loog; die kijken niet naar de inhoud"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "GET /stijlbundel.css": {
-   "staat": "blind",
+   "staat": "ongemeten",
    "toetsen": [
     "paginaroutes.test.js"
    ],
-   "reden": "alleen toetsen die groen bleven terwijl alles loog; die kijken niet naar de inhoud"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "GET /scriptbundel.js": {
-   "staat": "blind",
+   "staat": "ongemeten",
    "toetsen": [
     "paginaroutes.test.js"
    ],
-   "reden": "alleen toetsen die groen bleven terwijl alles loog; die kijken niet naar de inhoud"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "GET /werken/:code": {
-   "staat": "blind",
+   "staat": "ongemeten",
    "toetsen": [
     "paginaroutes.test.js"
    ],
-   "reden": "alleen toetsen die groen bleven terwijl alles loog; die kijken niet naar de inhoud"
+   "reden": "de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument per constructie niet meten"
   },
   "GET /api/techniek/papieren": {
    "staat": "bewezen",

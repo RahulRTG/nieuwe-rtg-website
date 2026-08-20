@@ -9,9 +9,9 @@
  "grens": "Een profiel borgt de VORM van het antwoord, niet de waarheid van de waarden -- dit is de vloer, geen plafond. Routes met onwaarneembaar:true zijn eerlijk niet te bewaken op vorm en blijven blind. En de kaart kent alleen rollen waarvoor dit instrument een token heeft.",
  "gemeten": {
   "doelRoutes": 47,
-  "inKaart": 145,
-  "waarneembaar": 138,
-  "onwaarneembaar": 7,
+  "inKaart": 140,
+  "waarneembaar": 135,
+  "onwaarneembaar": 5,
   "versDezeRun": 47,
   "zonderRol": 0,
   "dood": 0
@@ -1566,51 +1566,6 @@
     "status",
     "wat"
    ],
-   "op": "2026-08-20T09:03:01.642Z"
-  },
-  "GET /apps": {
-   "methode": "GET",
-   "pad": "/apps",
-   "rol": "publiek",
-   "status": 200,
-   "onwaarneembaar": true,
-   "op": "2026-08-20T09:03:01.642Z",
-   "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
-  },
-  "GET /apps/bureau.html": {
-   "methode": "GET",
-   "pad": "/apps/bureau.html",
-   "rol": "publiek",
-   "status": 200,
-   "onwaarneembaar": true,
-   "op": "2026-08-20T09:03:01.642Z",
-   "reden": "het ware antwoord is zelf niet van de leugen te onderscheiden (200 met hoogstens ok); hier valt met vormen niets te bewaken -- een echte inhoudstoets moet dieper kijken dan dit register kan"
-  },
-  "GET /scriptbundel.js": {
-   "methode": "GET",
-   "pad": "/scriptbundel.js",
-   "rol": "publiek",
-   "status": 400,
-   "sleutels": [],
-   "dragend": [],
-   "op": "2026-08-20T09:03:01.642Z"
-  },
-  "GET /stijlbundel.css": {
-   "methode": "GET",
-   "pad": "/stijlbundel.css",
-   "rol": "publiek",
-   "status": 400,
-   "sleutels": [],
-   "dragend": [],
-   "op": "2026-08-20T09:03:01.642Z"
-  },
-  "GET /werken/:code": {
-   "methode": "GET",
-   "pad": "/werken/:code",
-   "rol": "publiek",
-   "status": 404,
-   "sleutels": [],
-   "dragend": [],
    "op": "2026-08-20T09:03:01.642Z"
   },
   "POST /api/cluster/:actie": {

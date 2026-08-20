@@ -134,10 +134,23 @@ function oordeel(perRoute, perToets, gevoelig, blind, gemeten) {
        blind- of onbeslist-oordeel erover is een uitspraak van een instrument
        dat er niet kan komen. Dat heet hier ongemeten, met de reden erbij;
        de post output-deuren in BEWIJSSCHULD.json draagt hem als grens. */
-    if (isDeurPad(route.slice(route.indexOf(' ') + 1))) {
+    const padR = route.slice(route.indexOf(' ') + 1);
+    if (isDeurPad(padR)) {
       perRouteUit[route] = { staat: 'ongemeten', toetsen: [...toetsen].slice(0, 6),
         reden: 'dit is een deur en elke lie-run spaart de deuren (RTG_LIEG_NIET=DEUREN); ' +
           'dit instrument kan hier per constructie niet meten' };
+      telling.ongemeten++;
+      continue;
+    }
+    /* En de niet-/api/-paden (pagina's, bundels) horen hier OOK bovenaan: de
+       liegpoort raakt alleen /api/, dus elk oordeel over ze -- ook via de
+       toerekening of de blinde-toetsenlijst -- komt van een leugen die nooit
+       heeft gevuurd. Eerst stond deze wacht alleen in de gerichte tak, en
+       bleven GET /apps en de bundels als "blind" staan. */
+    if (!padR.startsWith('/api/')) {
+      perRouteUit[route] = { staat: 'ongemeten', toetsen: [...toetsen].slice(0, 6),
+        reden: 'de liegpoort raakt alleen /api/-paden; over deze route kan dit instrument ' +
+          'per constructie niet meten' };
       telling.ongemeten++;
       continue;
     }

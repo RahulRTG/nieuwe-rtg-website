@@ -85,6 +85,7 @@ if (require.main !== module) return;
   const doel = new Set(Object.entries(reg.perRoute || {})
     .filter(([, c]) => c.staat === 'blind' || c.staat === 'onbeslist')
     .filter(([k]) => !isDeur(k.split(' ')[1]))
+    .filter(([k]) => k.split(' ')[1].startsWith('/api/'))
     .map(([k]) => k));
   if (!doel.size) { console.log('geen blinde of onbesliste routes; de kaart heeft niets te doen'); return; }
 
@@ -141,6 +142,17 @@ if (require.main !== module) return;
     const sleutel = r.methode + ' ' + r.pad;
     if (!uit.status) { dood++; continue; }
     const profiel = profielVan(uit.data);
+    /* Geen JSON (een bundel, een CSV-export): daar valt met sleutels niets te
+       bewaken, en een leeg profiel in de kaart zou een wacht zijn die niets
+       wacht. Eerlijk onwaarneembaar, met de vorm als reden. */
+    if (profiel.vorm !== 'object' || !profiel.sleutels.length) {
+      kaal++;
+      vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
+        onwaarneembaar: true, op: nuOp,
+        reden: 'het antwoord is geen JSON-object (vorm: ' + profiel.vorm + '); een vormcontract ' +
+          'op sleutels kan hier niets bewaken' };
+      continue;
+    }
     if (onwaarneembaar(uit.status, profiel)) {
       kaal++;
       vers[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, status: uit.status,
@@ -158,7 +170,15 @@ if (require.main !== module) return;
   /* Stapelen: vers wint, de rest blijft. */
   let oud = {};
   try { oud = JSON.parse(fs.readFileSync(UITSLAG, 'utf8')).perRoute || {}; } catch (e) {}
-  const perRoute = { ...oud, ...vers };
+  /* Snoeien bij het stapelen: geen niet-/api/-paden (buiten bereik van de
+     liegpoort) en geen waarneembaar profiel zonder sleutels -- dat zou een
+     wacht zijn die niets wacht. */
+  const perRoute = {};
+  for (const [k, v] of Object.entries({ ...oud, ...vers })) {
+    if (!k.split(' ')[1].startsWith('/api/')) continue;
+    if (!v.onwaarneembaar && (!v.sleutels || !v.sleutels.length)) continue;
+    perRoute[k] = v;
+  }
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),

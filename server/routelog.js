@@ -99,9 +99,18 @@ function noteerToets(methode, patroon) {
    `AUDIT METHODE /pad spoor|geen`, ontdubbeld op de hele regel. Een route die de
    ene keer wel en de andere keer geen spoor nalaat levert dus beide regels op,
    en dat is juist: dan hangt het ergens van af. */
-function noteerAudit(methode, patroon, sporen) {
+function noteerAudit(methode, patroon, sporen, status) {
   if (!bestand || !patroon) return;
-  noteer('AUDIT', (methode || 'GET') + ' ' + patroon + ' ' +
+  /* De uitkomstklasse erbij (2xx/4xx/5xx): zonder wist niemand of een 'geen'
+     bij een weigering hoorde -- en precies die dubbelzinnigheid hield 92
+     routes op 'wisselend' (de post audit-wisselend). Een route die bij elke
+     GESLAAGDE aanroep journaalt en bij een weigering niet, is niet
+     wispelturig; dat onderscheid kan alleen de meting maken. De oude vorm
+     zonder klasse blijft leesbaar voor de proef (scripts/auditproef.js). */
+  const klasse = Number.isFinite(status)
+    ? (status < 300 ? '2xx' : status >= 500 ? '5xx' : '4xx') + ' '
+    : '';
+  noteer('AUDIT', (methode || 'GET') + ' ' + patroon + ' ' + klasse +
     (sporen && sporen.length ? sporen.join(',') : 'geen'));
 }
 

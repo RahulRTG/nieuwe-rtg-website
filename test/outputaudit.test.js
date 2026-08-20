@@ -145,6 +145,30 @@ test('3. AUDIT: de sporenlijst is benoemd, en groei is de enige maat', () => {
   assert.equal(uit.perRoute['POST /api/soms'].staat, 'wisselend',
     'soms wel en soms geen spoor is geen eigenschap van de route, dus geen bewijs');
   assert.match(uit.perRoute['POST /api/soms'].reden, /hangt dus ergens van af/);
+
+  /* DE UITKOMSTKLASSE VERFIJNT HET OORDEEL. 92 routes stonden op wisselend
+     omdat de oude regel niet kon zeggen waar het 'geen' bij hoorde. Sinds de
+     meting de klasse meeschrijft ('2xx|spoor', '4xx|geen') geldt: journaalt
+     elke GESLAAGDE aanroep, dan is dat een eigenschap -- een weigering die
+     niet journaalt is een keuze. Wisselt het ook BINNEN de geslaagde
+     aanroepen, dan blijft het een bevinding. En zodra een route
+     klasse-waarnemingen heeft, tellen alleen die: de oude vorm kan deze
+     vraag niet beantwoorden. */
+  const verfijnd = oordeelUit(new Map([
+    ['POST /api/keurig', new Set(['2xx|securityLog', '4xx|geen'])],
+    ['POST /api/echt-wispelturig', new Set(['2xx|securityLog', '2xx|geen', '4xx|geen'])],
+    ['POST /api/alleen-weigering', new Set(['4xx|securityLog', '4xx|geen'])],
+    ['POST /api/oud-en-nieuw', new Set(['geen', '2xx|securityLog'])]
+  ]));
+  assert.equal(verfijnd.perRoute['POST /api/keurig'].staat, 'bewezen',
+    'elke geslaagde aanroep journaalt; de weigering zonder spoor is een keuze');
+  assert.match(verfijnd.perRoute['POST /api/keurig'].reden, /GESLAAGDE/);
+  assert.equal(verfijnd.perRoute['POST /api/echt-wispelturig'].staat, 'wisselend');
+  assert.match(verfijnd.perRoute['POST /api/echt-wispelturig'].reden, /binnen de geslaagde/);
+  assert.equal(verfijnd.perRoute['POST /api/alleen-weigering'].staat, 'wisselend',
+    'alleen weigeringen gezien: over geslaagd werk valt niets te zeggen');
+  assert.equal(verfijnd.perRoute['POST /api/oud-en-nieuw'].staat, 'bewezen',
+    'de klasse-vorm wint van een oude waarneming zonder klasse');
   assert.equal(uit.perRoute['GET /api/nooit'].staat, 'geen spoor');
   assert.deepEqual(uit.telling, { bewezen: 1, wisselend: 1, 'geen spoor': 1 });
 });

@@ -32,7 +32,7 @@ module.exports = function auditmeting({ app, db }) {
     res.on('finish', () => {
       const patroon = req.routePatroon || null;
       if (!patroon) return;
-      try { routelog.noteerAudit(req.method, patroon, sporen.gegroeid(voor, sporen.standVan(db.data))); }
+      try { routelog.noteerAudit(req.method, patroon, sporen.gegroeid(voor, sporen.standVan(db.data)), res.statusCode); }
       catch (e) { /* een meting mag nooit een verzoek raken */ }
     });
     next();

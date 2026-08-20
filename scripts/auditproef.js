@@ -62,24 +62,48 @@ function oordeelUit(perRoute) {
   const uitslag = {};
   const telling = { bewezen: 0, wisselend: 0, 'geen spoor': 0 };
   for (const [route, waarnemingen] of perRoute) {
-    const w = [...waarnemingen];
-    const metSpoor = w.filter(x => x !== 'geen');
-    const zonder = w.filter(x => x === 'geen');
+    const alle = [...waarnemingen];
+    /* DE KLASSE-VORM WINT. Sinds de meting de uitkomstklasse meeschrijft
+       ('2xx|securityLog', '4xx|geen') valt te onderscheiden waar een 'geen'
+       bij hoorde -- en precies dat onderscheid hield 92 routes op wisselend.
+       Zodra een route klasse-waarnemingen heeft tellen alleen die; de oude
+       vorm kan de vraag niet beantwoorden die hier wordt gesteld. */
+    const metKlasse = alle.filter(x => /^\dxx\|/.test(x));
+    const obs = (metKlasse.length ? metKlasse : alle).map(x => {
+      const i = x.indexOf('|');
+      return i < 0 || !/^\dxx\|/.test(x) ? { klasse: null, sporen: x } : { klasse: x.slice(0, i), sporen: x.slice(i + 1) };
+    });
+    const namen = (lijst) => [...new Set(lijst.filter(o => o.sporen !== 'geen')
+      .map(o => o.sporen).join(',').split(',').filter(Boolean))].join(', ');
+    const metSpoor = obs.filter(o => o.sporen !== 'geen');
+    const zonder = obs.filter(o => o.sporen === 'geen');
+    const geslaagd = obs.filter(o => o.klasse === '2xx');
+
     let staat, reden;
     if (metSpoor.length && !zonder.length) {
       staat = 'bewezen';
-      reden = 'liet bij elke waarneming een spoor na in: ' +
-        [...new Set(metSpoor.join(',').split(','))].join(', ');
+      reden = 'liet bij elke waarneming een spoor na in: ' + namen(obs);
+    } else if (geslaagd.length && geslaagd.every(o => o.sporen !== 'geen')) {
+      /* Het verfijnde geval: elke GESLAAGDE aanroep journaalt, het "soms geen"
+         zat bij weigeringen. Dan is "geslaagd werk laat een spoor na" wel
+         degelijk een eigenschap van de route -- een weigering die niet
+         journaalt is een keuze, geen wispelturigheid. */
+      staat = 'bewezen';
+      reden = 'liet bij elke GESLAAGDE aanroep een spoor na in: ' + namen(geslaagd) +
+        '; een geweigerde aanroep journaalt hier niet, en dat is een keuze en geen wispelturigheid';
     } else if (metSpoor.length && zonder.length) {
       staat = 'wisselend';
-      reden = 'soms wel een spoor (' + [...new Set(metSpoor.join(',').split(','))].join(', ') +
-        '), soms geen. Het hangt dus ergens van af, en dan is "laat een spoor na" ' +
+      const binnenGeslaagd = geslaagd.some(o => o.sporen !== 'geen') && geslaagd.some(o => o.sporen === 'geen');
+      reden = 'soms wel een spoor (' + namen(obs) + '), soms geen' +
+        (binnenGeslaagd ? ', ook binnen de geslaagde aanroepen' :
+          (metKlasse.length && !geslaagd.length ? '; alleen weigeringen zijn waargenomen, dus over geslaagd werk zegt dit niets' : '')) +
+        '. Het hangt dus ergens van af, en dan is "laat een spoor na" ' +
         'geen eigenschap van deze route.';
     } else {
       staat = 'geen spoor';
       reden = 'bij elke waarneming groeide geen enkel journaal';
     }
-    uitslag[route] = { staat, reden, waarnemingen: w.length };
+    uitslag[route] = { staat, reden, waarnemingen: alle.length };
     telling[staat]++;
   }
   return { telling, perRoute: uitslag };
@@ -101,7 +125,12 @@ function meet() {
     const v = r.slice(6).split(' ').filter(Boolean);
     if (v.length < 3) continue;
     const sleutel = v[0] + ' ' + v[1];
-    const waarneming = v.slice(2).join(' ');
+    /* De nieuwe vorm draagt een uitkomstklasse ('AUDIT POST /pad 2xx sporen');
+       die komt als '2xx|sporen' in de waarneming zodat oordeelUit hem kan
+       onderscheiden van de oude vorm zonder klasse. */
+    const waarneming = /^\dxx$/.test(v[2]) && v.length >= 4
+      ? v[2] + '|' + v.slice(3).join(' ')
+      : v.slice(2).join(' ');
     if (!perRoute.has(sleutel)) perRoute.set(sleutel, new Set());
     perRoute.get(sleutel).add(waarneming);
   }

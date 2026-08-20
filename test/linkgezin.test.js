@@ -33,7 +33,12 @@ function post(pad, body, token) {
 }
 const fond = (pad, body) => post('/api/foundation' + pad, body);
 const soc = (pad, body) => post('/api/rtf/social' + pad, body);
-const lnk = (pad, body) => post('/api/rtf/link' + pad, body);
+/* GEEN prefix-helper voor de linkdeur, anders dan hierboven bij `fond` en `soc`.
+   Die twee wegen bestonden al; deze twee zijn nieuw, en een route die nergens
+   voluit in een toets staat is voor scripts/nieuweroutes.js een ONGETOETSTE
+   route -- ook als hij hier wel degelijk wordt aangeroepen. Dat is LAT.md
+   regel 3 in het klein: een meter zakt zodra zijn invoer ontbreekt. Het pad
+   staat daarom voluit, elke keer. */
 
 async function gezin(naam) {
   const g = await json(await fond('/gezin/maak', { gezinsnaam: naam, naam: 'Ouder ' + naam, pin: '1234' }));
@@ -61,7 +66,7 @@ test('een gezinslid scant een pin en krijgt ZIJN eigen weg, niet die van een lid
   const lid = await nieuwLid('Gezin Lid');
   const pin = (await json(await post('/api/member/pin', {}, lid.token))).toon;
 
-  const r = await json(await lnk('/los', { code: g.code, token: g.token, tekst: 'rtg:pin:' + pin }));
+  const r = await json(await post('/api/rtf/link/los', { code: g.code, token: g.token, tekst: 'rtg:pin:' + pin }));
   assert.equal(r.type, 'persoon');
   assert.equal(r.onderwerp.codename, lid.codenaam, 'de codenaam, nooit de echte naam');
   assert.ok(!JSON.stringify(r).includes('Gezin Lid'), 'de echte naam blijft in de kluis');
@@ -77,10 +82,10 @@ test('een gezinslid scant een pin en krijgt ZIJN eigen weg, niet die van een lid
 
 test('zonder geldige gezinssessie gaat deze deur niet open', async () => {
   const g = await gezin('Linkslot');
-  assert.equal((await lnk('/los', { tekst: 'rtg:pin:00000000' })).status, 403, 'zonder code en token');
-  assert.equal((await lnk('/los', { code: g.code, token: 'rommel', tekst: 'rtg:pin:00000000' })).status, 403,
+  assert.equal((await post('/api/rtf/link/los', { tekst: 'rtg:pin:00000000' })).status, 403, 'zonder code en token');
+  assert.equal((await post('/api/rtf/link/los', { code: g.code, token: 'rommel', tekst: 'rtg:pin:00000000' })).status, 403,
     'en met een verzonnen token');
-  assert.equal((await lnk('/koppelingen', { code: g.code, token: 'rommel' })).status, 403);
+  assert.equal((await post('/api/rtf/link/koppelingen', { code: g.code, token: 'rommel' })).status, 403);
 });
 
 test('een kind van 15 of jonger komt hier niet langs, met dezelfde woorden als bij de pin', async () => {
@@ -93,11 +98,11 @@ test('een kind van 15 of jonger komt hier niet langs, met dezelfde woorden als b
   const pin = (await json(await post('/api/member/pin', {}, lid.token))).toon;
 
   const dichtPin = await soc('/pin', { code: g.code, token: kind.token });
-  const dichtScan = await lnk('/los', { code: g.code, token: kind.token, tekst: 'rtg:pin:' + pin });
+  const dichtScan = await post('/api/rtf/link/los', { code: g.code, token: kind.token, tekst: 'rtg:pin:' + pin });
   assert.equal(dichtScan.status, 403);
   assert.equal((await json(dichtScan)).error, (await json(dichtPin)).error,
     'scannen en de pin zeggen letterlijk hetzelfde');
-  assert.match((await json(await lnk('/koppelingen', { code: g.code, token: kind.token }))).error || '',
+  assert.match((await json(await post('/api/rtf/link/koppelingen', { code: g.code, token: kind.token }))).error || '',
     /ouder of verzorger/i);
 });
 
@@ -127,7 +132,7 @@ test('een gezinslid ziet een vraagcode wel, maar krijgt er geen knop bij', async
   const cap = await json(await post('/api/link/cap/maak',
     { handeling: 'geld.ontvangen', centen: 1500, oms: 'lunch' }, lid.token));
 
-  const r = await json(await lnk('/los', { code: g.code, token: g.token, tekst: cap.token }));
+  const r = await json(await post('/api/rtf/link/los', { code: g.code, token: g.token, tekst: cap.token }));
   assert.equal(r.type, 'capability');
   assert.equal(r.onderwerp.wat, 'Betalen', 'hij ziet wat er gevraagd wordt');
   assert.deepEqual(r.intenties, [], 'en krijgt er geen knop bij');
@@ -139,7 +144,7 @@ test('mijn koppelingen werkt ook aan de gezinskant, en staat daar altijd op nul 
   const pin = (await json(await post('/api/member/pin', {}, lid.token))).toon;
   await soc('/pin/connect', { code: g.code, token: g.token, pin });
 
-  const k = await json(await lnk('/koppelingen', { code: g.code, token: g.token }));
+  const k = await json(await post('/api/rtf/link/koppelingen', { code: g.code, token: g.token }));
   assert.deepEqual(k.open, [], 'een gezinslid geeft geen codes uit, dus er staat niets open');
   assert.equal(k.bonnen.length, 1);
   assert.equal(k.bonnen[0].intentie, 'contact.verbinden');
@@ -157,7 +162,7 @@ test('mijn koppelingen werkt ook aan de gezinskant, en staat daar altijd op nul 
   assert.equal(((await json(await post('/api/member/connections', {}, lid.token))).requests || []).length, 0,
     'het verzoek is echt weg bij het lid');
 
-  const na = await json(await lnk('/koppelingen', { code: g.code, token: g.token }));
+  const na = await json(await post('/api/rtf/link/koppelingen', { code: g.code, token: g.token }));
   assert.equal(na.bonnen.length, 1, 'en de bon staat er nog -- intrekken wist geen geschiedenis');
   assert.equal(na.bonnen[0].terug, undefined);
 });
@@ -173,7 +178,7 @@ test('een lid krijgt de ledendeur, een gezinslid de zijne -- voor dezelfde hande
   await soc('/pin/connect', { code: g.code, token: g.token, pin: pinB });
 
   const vanLid = await json(await post('/api/link/koppelingen', {}, a.token));
-  const vanGezin = await json(await lnk('/koppelingen', { code: g.code, token: g.token }));
+  const vanGezin = await json(await post('/api/rtf/link/koppelingen', { code: g.code, token: g.token }));
   assert.equal(vanLid.bonnen[0].terug.weg, '/api/member/connect/intrek');
   assert.equal(vanGezin.bonnen[0].terug.weg, '/api/rtf/social/connect/intrek');
   assert.notEqual(vanLid.bonnen[0].terug.weg, vanGezin.bonnen[0].terug.weg,

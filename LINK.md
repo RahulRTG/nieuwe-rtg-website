@@ -319,6 +319,14 @@ paden verhuizen er per stuk naartoe.
    dezelfde laag (dezelfde rem, hetzelfde `pinKijk`). Een tweede weg naar
    hetzelfde antwoord is dat niet; een tweede *uitvoering* zou het wel zijn.
 
+   Eén ding blijft daar wél openstaan, en het is dezelfde soort kopie die aan de
+   gezinskant is opgeruimd (zie verderop): het camerablad van dat scherm is een
+   eigen `RTGScanner` en niet de huisoverlay `shared/scanknop.js`. Het is er geen
+   doodlopende weg — de scanknop van de app zelf draagt de handinvoer wél, dus
+   wie een code geplakt krijgt, kan altijd nog daarheen. Maar het is één
+   leesinstrument te veel, en het verandert de vorm van dat scherm om het weg te
+   halen. Dat is een besluit van de eigenaar, geen opruimklus onderweg.
+
    **De gezinskant kwam er op 20 augustus 2026 bij** (`routes/social/gezinnen/link.js`).
    Een eigen deur, want een gezinslid heeft een andere geloofsbrief: een
    gezinscode met een profieltoken in het lijf, niet de Bearer-sessie waar
@@ -341,10 +349,40 @@ paden verhuizen er per stuk naartoe.
    deed), en de gezinspoort stond in twee bestanden op het punt een derde kopie te
    worden — hij staat nu één keer in `routes/social/gezinnen.js`.
 
-   **Wat NIET is nagelopen:** het foundation-scherm zelf in een browser. De
-   server, de poorten en de intentie-dekking zijn getoetst; dat `vrienden.html`
-   het bedoelingsscherm ook echt toont, is hier niet met een browser bevestigd —
-   de proefopstelling kreeg de gezinssessie in deze omgeving niet aan de praat.
+   **Het gezinsscherm is alsnog in een browser nagelopen** (`test/linkgezin.e2e.js`,
+   20 augustus 2026). Hier stond dat dat niet gelukt was; de proefopstelling
+   struikelde niet over de gezinssessie maar over twee dingen die niemand had
+   opgeschreven. Het scherm wordt door `shared/deelmenu.js` in tabbladen geknipt,
+   dus "Toevoegen" staat er pas na een druk — de toets drukt nu, want een toets
+   die de tabbalk overslaat meet een scherm dat niemand zo ziet. En de
+   leerlingdeur (`/api/rtf/toegang`) staat voor een beheerder gewoon open; die
+   draait in deze toets dus echt mee en wordt niet afgeplakt.
+
+   **Wat het naar boven haalde is geen toetsprobleem maar een gat in het scherm:
+   RTG Link was daar alleen met een CAMERA te bereiken.** De Scan-knop had een
+   eigen camerablad — een `<video>` in de pagina met een `RTGScanner` eromheen —
+   en dus geen handinvoer. Wie een levende code of een vraagcode geplakt kreeg,
+   kon die er nergens in kwijt: het pinveld eronder snapt alleen een pin.
+
+   De oorzaak was niet dat er een invoerveld ontbrak, maar dat dit scherm een
+   TWEEDE UITVOERING had van iets dat het huis al heeft. `shared/scanknop.js`
+   bestaat precies hiervoor — "zonder camera valt hij terug op met de hand
+   typen/plakken, zodat een scan nooit een doodlopende weg is" — en de leden-app
+   gebruikt hem al. De gezinskant gebruikt hem nu ook, en het eigen camerablad is
+   weg. Er kwam dus geen veld bij; er ging een kopie af (LAT.md regel 1 en 4).
+
+   Twee dingen komen daar gratis bij. De handinvoer, waarmee een geplakte code
+   hier eindelijk naar binnen kan. En de uitleg waarom de camera niet start: de
+   overlay leest de mediapoort, en op een gewoon http-adres geeft de browser de
+   camera niet vrij — op een telefoon de meest voorkomende reden. Hier stond
+   "Geen toegang tot de camera.", en dat laat een mens zelf zoeken.
+
+   Het pinveld blijft een pinveld: typen blijft wat het was.
+
+   Twee dingen zijn daarmee in een echte browser bevestigd: de kaart toont de
+   codenaam en niet de echte naam, en kijken kost nog niets — er staat pas een
+   verzoek na de druk. En de grens uit deze stap is er ook te zien: een vraagcode
+   toont wel de kaart en géén knop, want een gezinsprofiel heeft geen portemonnee.
 
    De weg is getoetst in een echte browser (`test/linkscan.e2e.js`): scannen met
    de handinvoer van de scanoverlay, de kaart lezen, bevestigen, en dan pas is er

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-20T13:20:24.520Z",
-  "commit": "6266540",
+  "op": "2026-08-20T15:47:59.691Z",
+  "commit": "fcba02e",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,7 +9,7 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 14,
-  "meetwerk": 56,
+  "meetwerk": 53,
   "instrument": 932,
   "grens": 619
  },
@@ -82,7 +82,7 @@
    "id": "audit-wisselend",
    "soort": "meetwerk",
    "wat": "routes die soms wel en soms geen spoor nalaten, en waarvan nog niemand weet waarom",
-   "aantal": 3,
+   "aantal": 0,
    "waarom": "het hangt ergens van af -- geslaagd of geweigerd, welke rol, welke invoer. Dan is \"laat een spoor na\" geen eigenschap van de route.",
    "sluit": "uitzoeken WAARVAN het afhangt. Per route na te lopen met het journaal erbij; echte achterstand, geen ontbrekend gereedschap. De veertien van de vorige ronde zijn zo nagelopen: drie bleken een echt defect (auth/login, supplier/login, office/verify) en zijn gerepareerd, elf hadden een reden en staan nu onder audit-verklaard."
   },

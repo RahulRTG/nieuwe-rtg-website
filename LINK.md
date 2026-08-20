@@ -295,11 +295,36 @@ paden verhuizen er per stuk naartoe.
    afrekenen, dan komt eerst de kaart en pas daarna de bon. `/api/supplier/pos/sale`
    neemt sindsdien beide dragers — de getypte code van zes tekens én het token —
    en int ze allebei langs `kern/pay/kassa.js`.
-4. **RTG Scan.** Eén scherm in de leden-app dat op de resolver leunt, met de
-   actiekaart. De domeinscanners worden er cliënt van.
-5. **Twee echte intenties.** Eén die niets kost (contact of kaartje delen) en
-   één die alles vraagt (betalen, met de step-up uit 3.2), zodat de laag meteen
-   aan beide uiteinden is beproefd.
+4. **RTG Scan.** ✅ *gebouwd op 20 augustus 2026.* De scanknop van de leden-app
+   (`app-main-56.js`) ging langs een keten van als-dans: tafel → menu, kascode →
+   een tekstje, entree → een ander tekstje, anders de ruwe tekst. Elke nieuwe
+   soort code kwam er als tak bij, en elke app had zijn eigen keten. Nu wordt de
+   vraag "wat is dit en wat kan ik ermee" één keer gesteld, aan de laag die het
+   weet — daarna de kaart, daarna een mens, daarna pas de handeling.
+
+   Wat een lid vandaag met één knop kan: iemand toevoegen (vaste pin én levende
+   code), een tafel openen om te bestellen, en een vraagcode betalen. Die laatste
+   is nieuw en volgt gratis uit de laag: `geld.ontvangen` bestond al, en RTG Scan
+   is de eerste plek waar een lid hem kan aanvaarden.
+
+   De app houdt een tabel `intentie → wat er dan gebeurt`, want een intentie is
+   soms een aanroep en soms een la die opengaat. Die tabel en de catalogus van de
+   server gaan over dezelfde lijst; `test/link.test.js` zakt zodra er een intentie
+   bijkomt die het scherm niet kent — anders staat er een knop die "dit kan hier
+   nog niet" zegt.
+
+   **Wat hier bewust NIET is meegegaan:** de scanner op het vriendenscherm
+   (`app-main-09a.js`). Die is gespecialiseerd — hij toont je eigen pin, je QR,
+   je live code en de treffer in één blok — en leunt onderhuids al op dezelfde
+   laag (dezelfde rem, hetzelfde `pinKijk`). Een tweede weg naar hetzelfde
+   antwoord is dat niet; een tweede *uitvoering* zou het wel zijn.
+
+   De weg is getoetst in een echte browser (`test/linkscan.e2e.js`): scannen met
+   de handinvoer van de scanoverlay, de kaart lezen, bevestigen, en dan pas is er
+   geld bewogen of een verzoek verstuurd.
+5. **Twee echte intenties.** ✅ *gehaald onderweg.* Verbinden (kost niets) en
+   betalen (vraagt alles) lopen allebei over de laag, aan beide uiteinden
+   getoetst — inclusief de poorten van RTG Pay, die ook via deze deur gelden.
 6. **Mijn koppelingen.** Bonnenlijst met intrekken per stuk, en per partij het
    antwoord op "waarom had die toegang".
 

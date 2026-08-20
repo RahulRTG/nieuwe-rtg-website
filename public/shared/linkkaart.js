@@ -106,7 +106,11 @@
       h += '<button type="button" class="doen" data-i="' + i + '">' + esc(k.tekst) +
         (k.uitleg ? ' <span style="font-weight:400;opacity:.8;">· ' + esc(k.uitleg) + '</span>' : '') + '</button>';
     });
-    h += '<button type="button" data-af="1">Annuleren</button>';
+    /* "Annuleren" veronderstelt dat er iets te annuleren VALT. Bij een code
+       waar deze scanner niets mee kan -- een entree-code in de leden-app, de
+       betaalcode van een ander -- is de kaart puur informatie, en dan is
+       "Sluiten" wat de knop werkelijk doet. */
+    h += '<button type="button" data-af="1">' + (inhoud.knoppen.length ? 'Annuleren' : 'Sluiten') + '</button>';
     h += '</div><div class="fout" hidden></div></div>';
     return h;
   }

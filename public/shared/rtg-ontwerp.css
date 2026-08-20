@@ -270,6 +270,12 @@
   border:1px solid var(--rtg-line);background:transparent;color:var(--rtg-txt);
   padding:0.6rem 1rem;
 }
-.rtg-bedoeling button.doen{background:var(--rtg-acc);border-color:var(--rtg-acc);color:#fff;}
+/* GOUD EN NIET BORDEAUX, en dat is een correctie op de eerste versie. Die stond
+   op --rtg-acc, en dat is de OMGEVINGSkleur: de leverancier-app zet hem op
+   bordeaux, de leden-app op goud, dus dezelfde bevestigknop zag er per app
+   anders uit. ONTWERP.md par. 4 wijst goud aan als "autoriteit, primair" -- en
+   een bevestiging is precies dat. Zelfde paring als .knop.vol in rtg-ui.css,
+   inclusief de donkere inkt (7,5:1 op goud). */
+.rtg-bedoeling button.doen{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;}
 .rtg-bedoeling button:focus-visible{outline:2px solid var(--rtg-goud);outline-offset:2px;}
 .rtg-bedoeling .fout{color:var(--rtg-sig-incident);font-size:0.85rem;margin-top:var(--rtg-ruim-klein);}

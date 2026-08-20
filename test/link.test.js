@@ -280,6 +280,23 @@ test('en die weg staat achter de poort die bij DIE scanner hoort', () => {
   assert.ok(gekeken >= 6, 'er zijn maar ' + gekeken + ' wegen gekeurd; dan meet deze toets te weinig');
 });
 
+test('elke intentie die een LID kan krijgen, heeft ook een handeling in de app', () => {
+  /* DE ANDERE HELFT VAN "EEN KNOP ZONDER WEG BESTAAT NIET". De toets hierboven
+     kijkt of de route bestaat en of de poort klopt; deze kijkt of het SCHERM er
+     iets mee doet. RTG Scan (app-main-56b.js) heeft een tabel intentie -> wat er
+     dan gebeurt, en die tabel en de catalogus van de server gaan over dezelfde
+     lijst. Komt er een intentie bij zonder handeling, dan toont de app een kaart
+     met een knop die "dit kan hier nog niet" zegt -- precies de belofte zonder
+     weg die deze laag niet hoort te maken. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'public/apps/app-main/app-main-56b.js'), 'utf8');
+  const blok = bron.slice(bron.indexOf('const LINK_ACTIES'), bron.indexOf('async function scanRoute'));
+  assert.ok(blok.length > 200, 'de actietabel van RTG Scan is niet gevonden');
+  const voorLid = intenties.CATALOGUS.filter(c => Object.keys(c.wegen).some(k => k.startsWith('lid:')));
+  assert.ok(voorLid.length >= 3, 'er horen meerdere leden-intenties te zijn, anders meet dit niets');
+  for (const c of voorLid)
+    assert.ok(blok.includes("'" + c.id + "'"), 'RTG Scan kent geen handeling voor ' + c.id);
+});
+
 test('een zaak scant geen mens, en een lid int geen betaalcode', async () => {
   const { sociaal, link } = maak();
   const pin = sociaal.pinVan('A');

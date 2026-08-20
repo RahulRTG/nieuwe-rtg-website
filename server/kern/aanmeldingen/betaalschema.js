@@ -50,8 +50,11 @@ module.exports = (ctx) => {
      (COMMERCIE.md 3b). */
   function startBetalingen(a) {
     const centen = maandCentenVan(a);
+    /* Geen `naam` mee: een contract draagt geen persoonsnaam (zie de kop van
+       ../commercie/contract.js). Het aanmeldingId wijst naar het dossier waar hij
+       hoort, en die laag kent de vergeetregels. */
     const c = contracten.open({
-      pas: a.pas, aanmeldingId: a.id, naam: a.naam,
+      pas: a.pas, aanmeldingId: a.id,
       startAt: a.besluit.at,
       afgesprokenCenten: centen,
       minimumMaanden: 12, frequentie: 'maand',

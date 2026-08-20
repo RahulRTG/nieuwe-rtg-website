@@ -101,13 +101,24 @@ const perMaand = f => (f === 'jaar' ? 12 : f === 'kwartaal' ? 3 : 1);
 /* Het contract zelf. `afgesprokenCenten` mag null zijn zolang er nog niets is
    getekend (CONCEPT), maar niet meer zodra het ACTIEF wordt -- dat wordt
    hieronder afgedwongen. */
-function maakContract({ id, pas, aanmeldingId, naam, startAt, afgesprokenCenten,
+/* GEEN NAAM IN EEN CONTRACT. Hier stond `naam`, overgenomen uit de aanmelding, en
+   dat brak het recht op vergetelheid: verwijderde een lid zijn gegevens, dan
+   bleef zijn naam in de contractentabel staan (test/vergeten-gezelschap.test.js
+   vond het). Operationele data van dit huis draait op codenamen -- de echte naam
+   staat in de identiteitskluis, en een tweede kopie ergens anders maakt die
+   scheiding waardeloos.
+
+   Een contract heeft die naam ook niet nodig: `aanmeldingId` wijst naar het
+   dossier waar hij hoort, en die laag kent de vergeetregels al. Wie een naam op
+   een scherm wil, haalt hem daar op -- en krijgt hem dus niet meer als het lid
+   is vergeten. Dat is precies de bedoeling. */
+function maakContract({ id, pas, aanmeldingId, startAt, afgesprokenCenten,
   minimumMaanden = 12, frequentie = 'maand', verlenging = VERLENGING.OPZEGBAAR,
   opzegMaanden = 1, btwProfiel = 'nl-21', serviceNiveau = null, door = null, nu }) {
   const at = nu ? nu() : klok.nu();
   const start = startAt || new Date(at).toISOString();
   return {
-    id, pas, aanmeldingId: aanmeldingId || null, naam: naam || null,
+    id, pas, aanmeldingId: aanmeldingId || null,
     status: STATUS.CONCEPT,
     startAt: start,
     minimumMaanden: Math.max(1, Math.round(minimumMaanden)),
@@ -291,7 +302,7 @@ function maakContracten({ db, save, nu }) {
 
   function publiek(c) {
     if (!c) return null;
-    return { id: c.id, pas: c.pas, naam: c.naam, status: c.status, periode: c.periode,
+    return { id: c.id, pas: c.pas, aanmeldingId: c.aanmeldingId, status: c.status, periode: c.periode,
       startAt: c.startAt, minimumMaanden: c.minimumMaanden, frequentie: c.frequentie,
       verlenging: c.verlenging, opzegMaanden: c.opzegMaanden,
       maandCenten: c.afgesprokenCenten, prijsVastTot: c.prijsVastTot,

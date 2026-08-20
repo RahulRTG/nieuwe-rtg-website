@@ -224,3 +224,31 @@ test('12. verlooptBinnen vindt de contracten waar iets moet gebeuren', () => {
   assert.equal(c.verlooptBinnen(5, plusMaanden(START, 11)).length, 0,
     'en een venster van vijf dagen vindt hem nog niet');
 });
+
+/* PRIVACY BY DESIGN, en dit is geen theorie: test/vergeten-gezelschap.test.js
+   vond dat de contractentabel de NAAM van een lid bewaarde, en dat die na een
+   verwijderverzoek bleef staan. Het recht op vergetelheid was daarmee gebroken
+   op een plek die niemand zou hebben nagekeken.
+
+   De regel van dit huis: operationele data draait op codenamen, de echte naam
+   staat in de identiteitskluis. Een tweede kopie ergens anders maakt die
+   scheiding waardeloos. Een contract heeft de naam ook niet nodig --
+   `aanmeldingId` wijst naar het dossier waar hij hoort, en die laag kent de
+   vergeetregels al. */
+test('13. een contract draagt geen persoonsnaam, ook niet als je hem meegeeft', () => {
+  const c = verse();
+  const k = c.open({ pas: 'lifestyle', aanmeldingId: 'a1', naam: 'Jan Jansen',
+    contact: 'jan@voorbeeld.test', startAt: START, afgesprokenCenten: 2000000 });
+
+  const rauw = JSON.stringify(k);
+  assert.doesNotMatch(rauw, /Jan Jansen/,
+    'een meegegeven naam hoort niet in de rij te belanden; er is geen veld waar hij in past');
+  assert.equal(k.naam, undefined);
+  assert.equal(k.aanmeldingId, 'a1', 'de verwijzing naar het dossier blijft wel');
+
+  // en ook niet via de publieke vorm, want dat is wat een scherm te zien krijgt
+  assert.doesNotMatch(JSON.stringify(c.publiek(k)), /Jan Jansen/);
+
+  // de hele tabel, want dat is wat een vergeet-sweep afloopt
+  assert.doesNotMatch(JSON.stringify(c.rij()), /Jan Jansen/);
+});

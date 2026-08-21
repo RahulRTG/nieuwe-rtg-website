@@ -117,11 +117,23 @@ function cspNonce(publicDir, aan) {
          corrigeert het attribuut hieronder als de cookie achterliep -- en dat
          moet gebeurd zijn voordat er iets getekend wordt. Zo hoeven er geen 257
          losse scripttags voor. */
-      const stempel = '<script nonce="' + nonce + '">' + STIJLSTEMPEL + '</script>'
-        + '<script src="/shared/hand.js" nonce="' + nonce + '"></script>';
+      const stijl = '<script nonce="' + nonce + '">' + STIJLSTEMPEL + '</script>';
+      const handTag = '<script src="/shared/hand.js" nonce="' + nonce + '"></script>';
+      /* IN MAGNAAT GAAT DE HAND ACHTER DE BLOKKADE. herschrijfPagina hierboven
+         heeft de sandbox-tag al direct na <head> gezet, en die hoort het EERSTE
+         externe script te blijven (test/middleware.test.js 4b): een blokkade
+         achter een ander extern script is een blokkade die te laat komt. De
+         stempelaar mag er wel voor -- die is inline en maakt zelf geen blok.
+         Twee takken raakten deze volgorde tegelijk: de een verhuisde de
+         magnaat-herschrijving naar de keten, de ander hing hand.js aan de
+         stempel; samen stond de hand ineens voor de blokkade. */
       html = /<head[^>]*>/i.test(html)
-        ? html.replace(/<head[^>]*>/i, (m) => m + stempel)
-        : stempel + html;
+        ? html.replace(/<head[^>]*>/i, (m) => m + stijl)
+        : stijl + html;
+      const sandboxTag = /(<script[^>]*\/apps\/magnaat-sandbox\.js[^>]*><\/script>)/i;
+      html = magnaat && sandboxTag.test(html)
+        ? html.replace(sandboxTag, (m) => m + handTag)
+        : html.replace(stijl, stijl + handTag);
       /* LINKS- OF RECHTSHANDIG, voordat er iets getekend is.
 
          De duimboog van een linkshandige is het spiegelbeeld van die van een

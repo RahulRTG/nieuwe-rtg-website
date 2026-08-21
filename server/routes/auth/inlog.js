@@ -87,6 +87,15 @@ app.post('/api/auth/login', async (req, res) => {
        het IP, en dat is ook precies waar credential stuffing aan te zien is:
        veel mislukte accountpogingen van een plek. */
     logInlog('account', false, user ? user.id : null, req);
+    /* EN HIER WORDT DE DOELEMMER OOK ECHT GEVOELD. Deze twee regels waren bij de
+       samenvoeging weggevallen terwijl het vullen van de emmer hierboven bleef
+       staan -- een rem die telt maar niet remt. Het commentaar erboven belooft
+       "een gok per twee seconden per account", en zonder deze wacht was dat een
+       belofte zonder afdwinging: dertig gokken van dertig adressen liepen weer
+       op volle snelheid. test/inlogrem.test.js meet de tijd, niet de status,
+       en die zakte er terecht op. */
+    const doel = loginFails.get(doelBucket);
+    if (doel && doel.until > Date.now()) await new Promise(r => setTimeout(r, 2000));
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
   loginFails.delete(bucket); loginFails.delete(bronBucket); loginFails.delete(doelBucket);

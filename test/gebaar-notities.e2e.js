@@ -90,7 +90,19 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
       'Terugdraaien hoort de notitie terug op het bord te zetten');
 
     // 3. de andere kant pint vast, en dat is ook echt omkeerbaar
+    /* EERST HET BORD LATEN UITHERTEKENEN, en dat is de oorzaak van twee losse
+       flakkeringen die hieronder zaten. `wachtTot` hierboven pollt de SERVER:
+       die is klaar zodra het terugdraaien is verwerkt, terwijl de pagina daarna
+       nog moet hertekenen. En `waitForSelector('#bord .nkaart.gb-rij')` is dan
+       meteen tevreden -- de OUDE kaarten voldoen er ook aan. Wie hier doorloopt,
+       pakt de maten van een kaart die een tel later wordt vervangen; het gebaar
+       begint dan op een knoop die uit het document wordt gehaald, en de lade die
+       de laag eraan hangt is nergens meer te vinden. Dat verklaarde zowel de
+       lege lade in deze stap als het weggooien in stap 4 dat niets deed: dat
+       leunt op dezelfde regel. Deze wacht kijkt naar het BORD zelf en gaat pas
+       door als daar niets meer verandert. */
     await page.waitForSelector('#bord .nkaart.gb-rij');
+    await wachtOpRust(page, '#bord');
     const weer = page.locator('#bord .nkaart').first();
     const titel2 = (await weer.locator('h3').textContent()).trim();
     const d2 = await weer.boundingBox();
@@ -110,6 +122,16 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
        valt er hier uit. Daarom wordt hier niet op een vaste rij beweerd maar op
        de regel: de eerste klopt, alles wat er staat past HEEL, en wat er niet in
        past staat in de actielade. */
+    /* WACHTEN TOT DE LADE ER ECHT IS, en niet tot de muis klaar is met bewegen.
+       Dit zakte af en toe met `undefined` op de eerste actie, en de oorzaak is
+       geen drempel maar een tik: de laag bouwt de lade tijdens het slepen op,
+       en `page.mouse.move` keert terug zodra de gebeurtenis is afgeleverd -- niet
+       zodra het scherm hem verwerkt heeft. De toets las de lade dus in dezelfde
+       tik waarin hij werd gevuld. Het viel op doordat er tijdelijk een
+       diagnoseregel tussen stond: die ene extra heen-en-weer naar de browser was
+       al genoeg om hem te laten slagen, en dat is het bewijs van een race en niet
+       van een te korte veeg. De muis blijft hier bewust ingedrukt. */
+    await page.waitForSelector('#bord .gb-lade .gb-doe > span', { state: 'attached', timeout: 10000 });
     const lade = await page.evaluate(() =>
       [...document.querySelectorAll('#bord .gb-lade .gb-doe > span')].map((s) => s.textContent));
     assert.equal(lade[0], 'Vastpinnen', 'naar rechts hoort vastpinnen vooraan te liggen');

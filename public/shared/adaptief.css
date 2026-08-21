@@ -174,7 +174,8 @@ body.rtg-command .cmd-werk{min-width:0;}
   stroke-linecap:round;stroke-linejoin:round;}
 /* De overloop. Wat niet past verdwijnt niet maar verhuist naar de lade -- dat is
    de hele afspraak van deze laag in één knop. */
-.cmd-meer{flex:0 0 auto;width:var(--rtg-raak);min-height:var(--rtg-raak);border:0;
+.cmd-meer{flex:0 0 auto;width:var(--rtg-raak);min-width:var(--rtg-raak);
+  min-height:var(--rtg-raak);border:0;
   border-left:1px solid var(--rtg-line);background:transparent;color:var(--rtg-muted,#8A8680);
   display:grid;place-items:center;cursor:pointer;font:600 .9rem var(--rtg-interface,'Inter',sans-serif);
   letter-spacing:.1em;padding:0;}

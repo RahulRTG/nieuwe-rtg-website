@@ -152,8 +152,20 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
       const dozen = await page.locator('#rtgCommand .cmd-actie, #rtgCommand .cmd-meer:visible')
         .evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }));
       assert.ok(dozen.length, 'er horen raakvlakken te staan');
+      /* EEN HALVE PIXEL SPELING, EN WAAROM DAT DE POORT NIET BOT MAAKT.
+         getBoundingClientRect geeft een KOMMAGETAL, en de opmaak van een andere
+         Chromium-bouw kan op 43,99 uitkomen waar deze machine 44,00 meet -- dat
+         gebeurde: lokaal haalden alle raakvlakken exact 44, in CI viel er een
+         net onder en de melding las "44x47 is te klein". De ondergrens van
+         TOEGANKELIJK.md is 24 en het ontwerp van ADAPTIEF.md mikt op 44; een
+         honderdste pixel is geen verschil dat een duim voelt.
+
+         De tanden blijven zitten: de mutatie hierboven (min-width op 24) zakt
+         er met twintig pixels doorheen, niet met een halve. */
+      const SPELING = 0.5;
       for (const [b, h] of dozen) {
-        assert.ok(b >= 44 && h >= 44, 'een raakvlak van ' + Math.round(b) + 'x' + Math.round(h) + ' is te klein');
+        assert.ok(b >= 44 - SPELING && h >= 44 - SPELING,
+          'een raakvlak van ' + Math.round(b * 100) / 100 + 'x' + Math.round(h * 100) / 100 + ' is te klein');
       }
     });
   });

@@ -10,6 +10,38 @@
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 
+  /* De websitebrief gaat pas naar de server NADAT de gebruiker in deze app is
+     ingelogd. Geen externe berichtendienst of openbaar aanvraag-endpoint:
+     dezelfde ingelogde /chat/send-lijn die de app zelf gebruikt. We wissen het
+     fragment pas na een geslaagde aanname, zodat een netwerkstoring de aanvraag
+     niet stil laat verdwijnen en een herlaad hem opnieuw kan proberen. */
+  let websiteAanvraagBezig = false;
+  async function verwerkWebsiteAanvraag(){
+    if (!websiteAanvraag || websiteAanvraagBezig || !user.account || !API.live) return;
+    websiteAanvraagBezig = true;
+    const regels = [
+      'Aanvraag via rtravelgroup.store', '',
+      'Wereld / behoefte: ' + websiteAanvraag.requirement,
+      'Naam: ' + websiteAanvraag.name,
+      'E-mail: ' + websiteAanvraag.email,
+      websiteAanvraag.phone ? 'Telefoon: ' + websiteAanvraag.phone : null,
+      '', 'Brief:', websiteAanvraag.message
+    ].filter(regel => regel !== null);
+    try {
+      const d = await API.call('/chat/send', { text: regels.join('\n') });
+      openTab('ai');
+      renderChatMsgs(d.messages, user.tier !== 'rtg');
+      websiteAanvraag = null;
+      history.replaceState(null, '', location.pathname + location.search);
+      toast(T('aanvraag.app.ok','Uw aanvraag staat in uw beveiligde RTG-lijn.'));
+    } catch(e){
+      openTab('ai');
+      const invoer = $('#askInput');
+      if (invoer) invoer.value = regels.join('\n');
+      toast(e.message || T('aanvraag.app.mis','De aanvraag staat klaar; verstuur hem zodra de verbinding terug is.'));
+    } finally { websiteAanvraagBezig = false; }
+  }
+
   function standaardChips(){
     const chips = lang()==='en'
       ? ['Yes, arrange it','What do you know about me?','What should I pack?','Plan my day','Arrange a restaurant']

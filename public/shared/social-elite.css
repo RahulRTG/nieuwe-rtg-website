@@ -1,0 +1,135 @@
+/* Gedeelde productschil voor RTG Social en De Salon.
+   Graphite draagt het systeem; ivoor draagt de inhoud. Messing is een signaal,
+   nooit decoratie. De onderliggende apps en hun serverwaarheid blijven intact. */
+body.rtg-social-elite{
+  --rtg-social-top:72px;
+  --rtg-social-rail:78px;
+  --rtg-bg:#ebe9e4;
+  --rtg-card:#f8f7f3;
+  --rtg-card2:#f1efe9;
+  --rtg-txt:#181817;
+  --rtg-muted:#5e5d58;
+  --rtg-soft:#858178;
+  --rtg-line:rgba(24,24,23,.12);
+  --rtg-product:#151614;
+  --rtg-product-2:#20211e;
+  --rtg-brass:#9a7f3f;
+  margin:0!important;padding-bottom:0!important;color:var(--rtg-txt);background:var(--rtg-bg);
+}
+body.rtg-social-elite::before{
+  content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;opacity:.42;
+  background:radial-gradient(900px 520px at 12% 0,rgba(255,255,255,.72),transparent 68%),linear-gradient(90deg,transparent 49.9%,rgba(24,24,23,.025) 50%,transparent 50.1%);
+}
+.rtg-social-commandbar{
+  position:fixed;z-index:52;top:0;right:0;left:0;height:var(--rtg-social-top);display:flex;align-items:stretch;
+  min-width:0;padding:0 clamp(1.2rem,2.5vw,2.5rem);border:0;border-bottom:1px solid rgba(255,255,255,.09);
+  background:rgba(20,21,19,.96);color:#f4f2ed;-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);
+}
+body:not(.rtg-salon-elite)>.rtg-social-commandbar{left:var(--rtg-social-rail);}
+.rtg-social-commandbar-brand{
+  display:flex;align-items:center;gap:1rem;min-width:0;color:#f4f2ed;text-decoration:none;
+  font:500 .8rem/1 var(--rtg-interface,Inter,system-ui,sans-serif);letter-spacing:.16em;text-transform:uppercase;
+}
+.rtg-social-commandbar-brand span{font-family:"Bodoni Moda",serif;font-size:1rem;letter-spacing:.11em;}
+.rtg-social-commandbar-brand small{padding-left:1rem;border-left:1px solid rgba(255,255,255,.16);color:rgba(244,242,237,.56);font:500 .57rem/1 var(--rtg-interface,Inter,system-ui,sans-serif);letter-spacing:.16em;}
+.rtg-social-commandbar-state{display:flex;align-items:center;gap:.65rem;margin-left:auto;padding-inline:1.3rem;color:rgba(244,242,237,.58);font:500 .58rem/1 var(--rtg-interface,Inter,system-ui,sans-serif);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;}
+.rtg-social-commandbar-state::before{content:"";width:6px;height:6px;border-radius:50%;background:#bca66c;}
+.rtg-social-commandbar .rtg-rahul-tab{order:3;align-self:stretch;min-width:168px!important;height:71px!important;border-right:0!important;border-left:1px solid rgba(255,255,255,.1)!important;padding:0 0 0 1.25rem!important;color:#f4f2ed!important;}
+.rtg-social-commandbar .rtg-rahul-tab small{color:rgba(244,242,237,.48)!important;}
+.rtg-salon-elite>.rtg-social-commandbar{padding-left:4.9rem;}
+.rtg-social-elite .amn-knop.amn-zweef{top:14px;left:16px;width:44px;height:44px;color:#f4f2ed!important;}
+body.rtg-social-elite:not(.rtg-salon-elite) .amn-knop.amn-zweef{left:17px;}
+body.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop{position:fixed!important;z-index:53;top:14px;left:17px;width:44px;height:44px;margin:0!important;color:#f4f2ed!important;}
+@media(max-width:760px){
+  body.rtg-social-elite{--rtg-social-top:60px;}
+  .rtg-social-commandbar{height:60px;padding-left:4.15rem;padding-right:.35rem;}
+  body:not(.rtg-salon-elite)>.rtg-social-commandbar{left:0;}
+  .rtg-social-commandbar-state{display:none;}
+  .rtg-social-commandbar .rtg-rahul-tab{min-width:102px!important;height:59px!important;padding-left:.7rem!important;}
+  .rtg-social-commandbar-brand{font-size:.67rem;letter-spacing:.1em;gap:.65rem;}
+  .rtg-social-commandbar-brand{min-width:44px;}
+  .rtg-social-commandbar-brand span{font-size:.88rem;}
+  .rtg-social-commandbar-brand small{font-size:.49rem;padding-left:.65rem;}
+  body.rtg-social-elite:not(.rtg-salon-elite) .amn-knop.amn-zweef,body.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop{top:8px;left:9px;}
+}
+@media(max-width:410px){.rtg-social-commandbar-brand small{display:none;}}
+@media(prefers-reduced-motion:reduce){.rtg-social-commandbar{-webkit-backdrop-filter:none;backdrop-filter:none;}}
+
+/* ==========================================================================
+   PRIVATE RESIDENCE · QUIET LUXURY
+
+   De bovenlaag gedraagt zich als de entree van een besloten huis: veel lucht,
+   één haarlijn en geen zware dashboardbalk. Status blijft zichtbaar, maar
+   vraagt niet om aandacht.
+   ========================================================================== */
+body.rtg-social-elite{
+  --rtg-social-top:66px;
+  --rtg-bg:#f1eee7;
+  --rtg-card:#f7f4ed;
+  --rtg-card2:#ebe6dc;
+  --rtg-txt:#171712;
+  --rtg-muted:#625f57;
+  --rtg-soft:#8d887e;
+  --rtg-line:rgba(23,23,18,.13);
+  --rtg-product:#f1eee7;
+  --rtg-product-2:#e8e3d9;
+  --rtg-brass:#887347;
+  background:#f1eee7;
+}
+body.rtg-social-elite::before{
+  opacity:.26;
+  background:
+    radial-gradient(900px 520px at 8% -8%,rgba(255,255,255,.95),transparent 72%),
+    linear-gradient(90deg,transparent 49.95%,rgba(23,23,18,.025) 50%,transparent 50.05%);
+}
+.rtg-social-commandbar{
+  height:var(--rtg-social-top);
+  padding:0 clamp(1.25rem,3.5vw,4.5rem);
+  border-bottom:1px solid rgba(23,23,18,.12);
+  background:rgba(244,241,234,.94);
+  color:#171712;
+  box-shadow:none;
+}
+body:not(.rtg-salon-elite)>.rtg-social-commandbar{left:0;}
+.rtg-social-commandbar-brand{
+  gap:1.15rem;color:#171712;
+  font-size:.65rem;font-weight:600;letter-spacing:.2em;
+}
+.rtg-social-commandbar-brand span{font-size:1.04rem;letter-spacing:.14em;}
+.rtg-social-commandbar-brand small{
+  border-left-color:rgba(23,23,18,.16);color:rgba(23,23,18,.47);
+  font-size:.53rem;letter-spacing:.18em;
+}
+.rtg-social-commandbar-state{padding-right:0;color:rgba(23,23,18,.48);font-size:.52rem;letter-spacing:.17em;}
+.rtg-social-commandbar-state::before{width:5px;height:5px;background:#691f32;box-shadow:none;}
+.rtg-social-commandbar .rtg-rahul-tab{
+  height:65px!important;margin-left:1.5rem!important;padding-left:1.5rem!important;
+  border-left-color:rgba(23,23,18,.13)!important;color:#171712!important;
+}
+.rtg-social-commandbar .rtg-rahul-tab small{color:rgba(23,23,18,.44)!important;}
+.rtg-salon-elite>.rtg-social-commandbar{padding-left:4.8rem;}
+.rtg-social-elite .amn-knop.amn-zweef,
+body.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop{color:#171712!important;}
+
+@media(max-width:760px){
+  body.rtg-social-elite{--rtg-social-top:58px;}
+  .rtg-social-commandbar{height:58px;padding:0 .55rem 0 3.9rem;background:rgba(244,241,234,.97);}
+  .rtg-social-commandbar-brand{gap:.65rem;font-size:.6rem;letter-spacing:.14em;}
+  .rtg-social-commandbar-brand span{font-size:.9rem;}
+  .rtg-social-commandbar-brand small{font-size:.46rem;letter-spacing:.12em;padding-left:.65rem;}
+  .rtg-social-commandbar .rtg-rahul-tab{height:57px!important;min-width:96px!important;margin-left:auto!important;padding-left:.65rem!important;color:#171712!important;}
+  body.rtg-social-elite:not(.rtg-salon-elite) .amn-knop.amn-zweef,
+  body.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop{top:7px;left:8px;color:#171712!important;}
+}
+
+/* LEESBAARHEID · luxe mag verfijnd zijn, nooit vaag of microscopisch. */
+body.rtg-social-elite{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+.rtg-social-commandbar-brand{font-size:.72rem;letter-spacing:.17em;}
+.rtg-social-commandbar-brand small{font-size:.64rem;letter-spacing:.14em;color:rgba(23,23,18,.62);}
+.rtg-social-commandbar-state{color:rgba(23,23,18,.66);font-size:.64rem;letter-spacing:.14em;}
+.rtg-social-commandbar .rtg-rahul-tab small{font-size:.65rem!important;color:rgba(23,23,18,.62)!important;}
+@media(max-width:760px){
+  .rtg-social-commandbar-brand{font-size:.68rem;letter-spacing:.12em;}
+  .rtg-social-commandbar-brand small{font-size:.63rem;letter-spacing:.1em;color:rgba(23,23,18,.66);}
+  .rtg-social-commandbar .rtg-rahul-tab small{font-size:.65rem!important;}
+}

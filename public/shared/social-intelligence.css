@@ -1,0 +1,220 @@
+/* ==========================================================================
+   RTG REALITY ENGINE
+   Een post-screen contextlaag: lokale signalen, zichtbare systeemgrenzen en
+   een levende kaart van de sociale wereld. IJsblauw betekent techniek;
+   messing blijft gereserveerd voor positie, vertrouwen en menselijk akkoord.
+   ========================================================================== */
+:root{
+  --rtg-ion:#99eaff;
+  --rtg-ion-soft:rgba(153,234,255,.16);
+  --rtg-intel-dark:#111310;
+  --rtg-intel-line:rgba(255,255,255,.12);
+  --rtg-intel-height:76px;
+}
+.rtg-intelligence [hidden]{display:none!important;}
+.rtg-intel-host{isolation:isolate;}
+.rtg-intel-host>.rtg-reality-graph{
+  --graph-x:var(--rtg-graph-x,0);
+  --graph-y:var(--rtg-graph-y,0);
+  position:absolute;z-index:2;right:clamp(1rem,4vw,4.5rem);top:50%;box-sizing:border-box;width:min(43vw,590px);
+  min-width:420px;padding:1rem 1.1rem .85rem;overflow:hidden;color:#edf2ec;
+  border:1px solid rgba(153,234,255,.2);border-right-color:rgba(203,179,112,.35);
+  background:linear-gradient(135deg,rgba(12,15,14,.9),rgba(19,22,20,.74));
+  box-shadow:0 28px 70px rgba(0,0,0,.28),inset 0 0 45px rgba(153,234,255,.025);
+  backdrop-filter:blur(18px);transform:translate3d(calc(var(--graph-x) * -8px),calc(-50% + var(--graph-y) * -6px),0);
+  transition:transform .18s ease-out;
+}
+.rtg-reality-graph::before,.rtg-reality-graph::after{content:"";position:absolute;width:18px;height:18px;pointer-events:none;}
+.rtg-reality-graph::before{top:-1px;left:-1px;border-top:1px solid var(--rtg-ion);border-left:1px solid var(--rtg-ion);}
+.rtg-reality-graph::after{right:-1px;bottom:-1px;border-right:1px solid #c8ad6b;border-bottom:1px solid #c8ad6b;}
+.rtg-graph-head,.rtg-graph-foot{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:1rem;font:600 .52rem/1 Inter,system-ui,sans-serif;letter-spacing:.17em;}
+.rtg-graph-head>span{color:rgba(239,244,238,.42);}
+.rtg-graph-head b{display:flex;align-items:center;gap:.55rem;color:var(--rtg-ion);font:inherit;}
+.rtg-graph-head i,.rtg-intel-state::before,.rtg-intel-deck footer i{width:5px;height:5px;background:var(--rtg-ion);box-shadow:0 0 12px var(--rtg-ion);}
+.rtg-reality-graph svg{display:block;width:100%;height:auto;margin:.25rem 0;overflow:visible;}
+.rtg-graph-orbit{fill:none;stroke:rgba(153,234,255,.12);stroke-width:1;stroke-dasharray:2 8;}
+.rtg-graph-signal{fill:none;stroke:var(--rtg-ion);stroke-width:1.2;stroke-linecap:round;stroke-dasharray:1 15;filter:drop-shadow(0 0 5px var(--rtg-ion));animation:rtg-signal 12s linear infinite;}
+.rtg-graph-link{fill:none;stroke:rgba(203,179,112,.22);stroke-width:1;}
+.rtg-graph-node>circle:first-child{fill:rgba(16,19,17,.92);stroke:rgba(239,244,238,.25);stroke-width:1;}
+.rtg-node-core{fill:rgba(239,244,238,.45);}
+.rtg-graph-node text{fill:rgba(239,244,238,.66);font:600 8px/1 Inter,system-ui,sans-serif;letter-spacing:1.1px;text-anchor:middle;}
+.rtg-graph-node .rtg-node-code{fill:rgba(239,244,238,.3);font-size:6px;letter-spacing:.65px;}
+.rtg-graph-node.is-active>circle:first-child{fill:rgba(153,234,255,.1);stroke:var(--rtg-ion);stroke-width:1.5;filter:url(#rtgIon);}
+.rtg-graph-node.is-active .rtg-node-core{fill:var(--rtg-ion);filter:url(#rtgIon);}
+.rtg-graph-node.is-active text{fill:#e8fbff;}
+.rtg-graph-node.is-active .rtg-node-code{fill:var(--rtg-ion);}
+.rtg-graph-foot{padding-top:.65rem;border-top:1px solid rgba(255,255,255,.08);justify-content:flex-start;gap:1.25rem;color:rgba(239,244,238,.28);font-size:.45rem;}
+.rtg-graph-foot span:last-child{margin-left:auto;color:rgba(203,179,112,.62);}
+
+/* De live registerbalk is geen navigatie en geen marketing. Hij vertelt wat
+   de interface nu werkelijk weet, en waar haar bevoegdheid stopt. */
+.rtg-intel-strip{position:relative;z-index:35;box-sizing:border-box;min-height:var(--rtg-intel-height);display:grid;grid-template-columns:minmax(190px,.8fr) minmax(520px,2.4fr) minmax(150px,.55fr);align-items:stretch;color:#eceee9;background:linear-gradient(90deg,#10120f,#181b18 62%,#111714);border-top:1px solid rgba(153,234,255,.19);border-bottom:1px solid rgba(255,255,255,.1);}
+.rtg-intel-strip::before{content:"";position:absolute;top:-1px;left:0;width:18%;height:1px;background:var(--rtg-ion);box-shadow:0 0 18px var(--rtg-ion);animation:rtg-scan 8s ease-in-out infinite;}
+.rtg-intel-identity{display:flex;flex-direction:column;justify-content:center;gap:.45rem;padding:1rem clamp(1rem,2.8vw,2.7rem);border-right:1px solid var(--rtg-intel-line);}
+.rtg-intel-identity span{color:var(--rtg-ion);font:600 .56rem/1 Inter,system-ui,sans-serif;letter-spacing:.2em;}
+.rtg-intel-identity b{color:rgba(236,238,233,.44);font:500 .47rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;}
+.rtg-intel-data{display:grid;grid-template-columns:.75fr .9fr .8fr 1.2fr 1.1fr;margin:0;min-width:0;}
+.rtg-intel-cell{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.45rem;padding:.8rem clamp(.65rem,1.4vw,1.4rem);border-right:1px solid var(--rtg-intel-line);}
+.rtg-intel-cell dt{color:rgba(236,238,233,.32);font:600 .45rem/1 Inter,system-ui,sans-serif;letter-spacing:.16em;}
+.rtg-intel-cell dd{overflow:hidden;margin:0;color:#eef0eb;font:600 .61rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.07em;white-space:nowrap;text-overflow:ellipsis;}
+.rtg-intel-state{display:flex;align-items:center;gap:.5rem;color:#d7f8f0!important;}
+.rtg-intel-state::before{content:"";flex:0 0 auto;}
+.rtg-intel-cell:last-child .rtg-intel-state{color:#e0c986!important;}
+.rtg-intel-cell:last-child .rtg-intel-state::before{background:#c7aa61;box-shadow:0 0 10px rgba(199,170,97,.5);}
+.rtg-intel-command{min-width:0;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:0 clamp(1rem,2vw,1.8rem);border:0;border-radius:0!important;color:#eafaff;background:rgba(153,234,255,.055);font:600 .54rem/1 Inter,system-ui,sans-serif;letter-spacing:.15em;cursor:pointer;}
+.rtg-intel-command:hover,.rtg-intel-command:focus-visible{background:rgba(153,234,255,.12);}
+.rtg-intel-command kbd{padding:.35rem .45rem;border:1px solid rgba(153,234,255,.22);color:var(--rtg-ion);background:transparent;font:500 .48rem/1 Inter,system-ui,sans-serif;letter-spacing:.04em;}
+
+/* Vandaag wordt door een begrensde redactionele kolom gedragen. De nieuwe
+   registerbalk breekt daar bewust doorheen en verbindt hem met het systeem. */
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-intel-strip{margin-inline:calc(clamp(1.5rem,5vw,6.5rem) * -1);padding-inline:clamp(1.5rem,5vw,6.5rem);}
+.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.rtg-reality-graph{right:0;width:min(44vw,570px);}
+.rtg-social-elite:not(.rtg-salon-elite) .merkkop>div:first-of-type,.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.sociaal-filter{position:relative;z-index:4;}
+@media(min-width:761px){
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop>.sociaal-filter{
+    position:absolute!important;top:2rem!important;right:calc(min(44vw,570px) + 2.5rem)!important;
+  }
+}
+
+/* Salon gebruikt een lichte beeldkop. Daarom krijgt de grafiek een harde,
+   zwarte technische plaat in het fotografische rechter register. */
+.rtg-salon-elite .salon-werkveld>header>.rtg-reality-graph{right:clamp(1rem,3vw,3.2rem);width:min(40vw,550px);}
+.rtg-salon-elite .rtg-intel-strip{width:100%;}
+
+/* De zelfstandige suite-apps krijgen een volwaardig contextpodium. Tekst en
+   grafiek bezetten ieder een eigen helft, in plaats van elkaar te bedekken. */
+.rtg-suitehero.rtg-intel-host{min-height:330px;align-items:center;}
+.rtg-suitehero.rtg-intel-host .rtg-suitehero-copy{display:block;}
+.rtg-suitehero.rtg-intel-host .rtg-suitehero-copy>p{max-width:40%;margin-top:1rem;}
+.private-hero>.rtg-reality-graph{top:2rem;right:1rem;width:min(40vw,560px);transform:translate3d(calc(var(--graph-x) * -8px),calc(var(--graph-y) * -6px),0);}
+
+/* Berichten bezit een schermvullende kern. De registerbalk wordt onderdeel van
+   de vaste schermgeometrie, zodat hij nooit boven een gesprek zweeft. */
+body.rtg-intel-messages .rtg-intel-strip{position:fixed;z-index:50;top:var(--suite-stack);right:0;left:0;height:var(--rtg-intel-height);}
+body.rtg-intel-messages .comm{inset:calc(var(--suite-stack) + var(--rtg-intel-height)) 0 0!important;}
+
+/* Commandodeck: een controlekamer voor intentie, grens en uiteindelijke keuze. */
+.rtg-intel-scrim{position:fixed;z-index:100000;inset:0;display:grid;place-items:center;padding:clamp(1rem,4vw,4rem);background:rgba(7,9,8,.78);backdrop-filter:blur(20px);}
+.rtg-intel-deck{position:relative;width:min(1040px,100%);max-height:calc(100dvh - 2rem);overflow:auto;color:#edf0ea;border:1px solid rgba(153,234,255,.22);background:linear-gradient(145deg,#111310,#181b18 70%,#111713);box-shadow:0 50px 120px rgba(0,0,0,.55);}
+.rtg-intel-deck::before,.rtg-intel-deck::after{content:"";position:absolute;z-index:2;width:34px;height:34px;pointer-events:none;}
+.rtg-intel-deck::before{top:-1px;left:-1px;border-top:1px solid var(--rtg-ion);border-left:1px solid var(--rtg-ion);}
+.rtg-intel-deck::after{right:-1px;bottom:-1px;border-right:1px solid #c8ad6b;border-bottom:1px solid #c8ad6b;}
+.rtg-intel-deck>header{position:relative!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;min-height:0!important;margin:0!important;padding:2.2rem 2.4rem 1.6rem!important;border:0!important;border-bottom:1px solid var(--rtg-intel-line)!important;color:#edf0ea!important;background:transparent!important;}
+.rtg-intel-deck>header span,.rtg-deck-context>span{display:block;color:var(--rtg-ion);font:600 .54rem/1 Inter,system-ui,sans-serif;letter-spacing:.2em;}
+.rtg-intel-deck h2{margin:.7rem 0 0;color:#f2f3ef;font:500 clamp(2rem,4vw,3.6rem)/.95 "Bodoni Moda",Georgia,serif;letter-spacing:-.03em;}
+.rtg-intel-close{min-width:72px;min-height:44px;border:1px solid rgba(255,255,255,.16);border-radius:0!important;color:rgba(237,240,234,.65);background:transparent;font:600 .5rem/1 Inter,system-ui,sans-serif;letter-spacing:.14em;cursor:pointer;}
+.rtg-deck-grid{display:grid;grid-template-columns:minmax(270px,.78fr) minmax(420px,1.35fr);}
+.rtg-deck-context{padding:2rem 2.4rem 2.4rem;border-right:1px solid var(--rtg-intel-line);}
+.rtg-deck-context strong{display:block;margin:1.5rem 0 .8rem;color:#e7d6a7;font:500 2.2rem/1 "Bodoni Moda",Georgia,serif;}
+.rtg-deck-context>p{max-width:38ch;color:rgba(237,240,234,.48);font:.76rem/1.65 Inter,system-ui,sans-serif;}
+.rtg-deck-context dl{margin:2rem 0 0;}
+.rtg-deck-context dl div{display:flex;justify-content:space-between;gap:1rem;padding:.78rem 0;border-top:1px solid rgba(255,255,255,.08);}
+.rtg-deck-context dt{color:rgba(237,240,234,.35);font:500 .58rem/1.25 Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;}
+.rtg-deck-context dd{margin:0;color:rgba(237,240,234,.76);font:600 .6rem/1.25 Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;}
+.rtg-deck-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
+.rtg-deck-actions>a,.rtg-deck-actions>button{min-width:0;min-height:260px;display:flex;flex-direction:column;align-items:flex-start;padding:2rem 1.5rem;border:0;border-right:1px solid var(--rtg-intel-line);border-radius:0!important;color:inherit;background:transparent;text-align:left;text-decoration:none;cursor:pointer;}
+.rtg-deck-actions>:last-child{border-right:0;}
+.rtg-deck-actions>a:hover,.rtg-deck-actions>button:hover,.rtg-deck-actions>a:focus-visible,.rtg-deck-actions>button:focus-visible{background:linear-gradient(180deg,rgba(153,234,255,.09),rgba(153,234,255,.015));}
+.rtg-deck-actions span{color:var(--rtg-ion);font:600 .48rem/1 Inter,system-ui,sans-serif;letter-spacing:.14em;}
+.rtg-deck-actions b{margin:auto 0 .65rem;color:#f0f1ed;font:500 1.45rem/1.05 "Bodoni Moda",Georgia,serif;}
+.rtg-deck-actions small{color:rgba(237,240,234,.4);font:.66rem/1.5 Inter,system-ui,sans-serif;}
+.rtg-intel-deck>footer{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 2.4rem;border-top:1px solid var(--rtg-intel-line);color:rgba(237,240,234,.32);font:600 .48rem/1 Inter,system-ui,sans-serif;letter-spacing:.15em;}
+.rtg-intel-deck>footer span{display:flex;align-items:center;gap:.65rem;color:rgba(153,234,255,.7);}
+.rtg-intel-open{overflow:hidden!important;}
+
+@keyframes rtg-signal{to{stroke-dashoffset:-180;}}
+@keyframes rtg-scan{0%,100%{transform:translateX(0);opacity:.45;}50%{transform:translateX(455%);opacity:1;}}
+
+@media(max-width:1100px){
+  .rtg-intel-host>.rtg-reality-graph{width:45vw;min-width:390px;opacity:.82;}
+  .rtg-intel-strip{grid-template-columns:180px minmax(470px,1fr) 142px;}
+  .rtg-intel-cell:nth-child(3){display:none;}
+  .rtg-intel-data{grid-template-columns:.8fr 1fr 1.5fr 1.2fr;}
+}
+@media(max-width:760px){
+  :root{--rtg-intel-height:62px;}
+  .rtg-intel-host>.rtg-reality-graph{top:auto;right:1rem;bottom:1rem;width:calc(100% - 2rem);min-width:0;padding:.7rem .8rem .6rem;transform:none;opacity:1;background:rgba(12,15,14,.88);}
+  .rtg-reality-graph svg{height:102px;margin:-.1rem 0;}
+  .rtg-graph-head{font-size:.44rem;}.rtg-graph-foot{display:none;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop>.rtg-reality-graph{right:1rem;width:calc(100% - 2rem);}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop{box-sizing:border-box!important;min-height:450px!important;padding-bottom:172px!important;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop>.sociaal-filter{position:absolute!important;top:1rem!important;right:1rem!important;left:auto!important;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop h1{max-width:8ch;font-size:2.55rem!important;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop .sociaal-inleiding{max-width:27ch;font-size:.72rem;}
+  .rtg-salon-elite .salon-werkveld>header>.rtg-reality-graph{right:1rem;bottom:1rem;width:calc(100% - 2rem);}
+  .rtg-salon-elite .salon-werkveld>header{min-height:390px!important;}
+  .rtg-intel-strip{min-height:var(--rtg-intel-height);grid-template-columns:135px minmax(0,1fr) 58px;}
+  .rtg-intel-identity{padding:.7rem .8rem;}.rtg-intel-identity span{font-size:.48rem;}.rtg-intel-identity b{font-size:.39rem;letter-spacing:.07em;}
+  .rtg-intel-data{grid-template-columns:.8fr 1fr;}
+  .rtg-intel-cell{padding:.65rem .75rem;}.rtg-intel-cell dt{font-size:.39rem;}.rtg-intel-cell dd{font-size:.54rem;}
+  .rtg-intel-cell:nth-child(2),.rtg-intel-cell:nth-child(3),.rtg-intel-cell:nth-child(4){display:none;}
+  .rtg-intel-command{justify-content:center;padding:0;overflow:hidden;border-left:1px solid var(--rtg-intel-line);font-size:0;}
+  .rtg-intel-command>span{display:none!important;}
+  .rtg-intel-command>kbd{display:block!important;padding:0;border:0;color:var(--rtg-ion);font-size:.52rem;letter-spacing:.02em;}
+  .rtg-social-elite:not(.rtg-salon-elite) .rtg-intel-strip{margin-inline:calc(clamp(1.5rem,5vw,6.5rem) * -1);padding-inline:clamp(1.5rem,5vw,6.5rem);}
+  body.rtg-intel-messages .rtg-intel-strip{top:var(--suite-top);}
+  body.rtg-intel-messages .comm{inset:calc(var(--suite-top) + var(--rtg-intel-height)) 0 var(--suite-nav)!important;}
+  .rtg-intel-scrim{padding:.7rem;place-items:end stretch;}
+  .rtg-intel-deck{width:100%;max-height:calc(100dvh - 1.4rem);}
+  .rtg-intel-deck>header{padding:1.4rem 1.2rem 1.1rem!important;}.rtg-intel-deck h2{font-size:2rem;}
+  .rtg-deck-grid{display:block;}.rtg-deck-context{padding:1.25rem;border-right:0;border-bottom:1px solid var(--rtg-intel-line);}
+  .rtg-deck-context>p,.rtg-deck-context dl{display:none;}.rtg-deck-context strong{margin:.8rem 0 0;font-size:1.45rem;}
+  .rtg-deck-actions{display:block;}.rtg-deck-actions>a,.rtg-deck-actions>button{min-height:86px;width:100%;display:grid;grid-template-columns:86px 1fr;grid-template-rows:auto auto;align-content:center;padding:1rem 1.25rem;border-right:0;border-bottom:1px solid var(--rtg-intel-line);}
+  .rtg-deck-actions span{grid-row:1/3;align-self:center;}.rtg-deck-actions b{margin:0;font-size:1.15rem;}.rtg-deck-actions small{margin-top:.3rem;}
+  .rtg-intel-deck>footer{padding:0 1.25rem;}
+  .rtg-suitehero.rtg-intel-host{box-sizing:border-box;min-height:430px;padding-bottom:170px;align-items:flex-start;}
+  .rtg-suitehero.rtg-intel-host .rtg-suitehero-copy>p{max-width:100%;margin-top:.8rem;}
+}
+@media(max-width:390px){
+  .rtg-intel-strip{grid-template-columns:124px minmax(0,1fr) 52px;}
+  .rtg-intel-identity{padding-left:.65rem;}.rtg-intel-cell{padding-inline:.6rem;}
+  .rtg-graph-node text{font-size:7px;}.rtg-graph-node .rtg-node-code{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  .rtg-graph-signal,.rtg-intel-strip::before{animation:none;}
+  .rtg-intel-host>.rtg-reality-graph{transition:none;}
+  .rtg-intel-scrim,.rtg-reality-graph{backdrop-filter:none;}
+}
+
+/* LEESBAARHEID · de technische contextlaag gebruikt geen microscopische HUD-tekst. */
+.rtg-graph-head,.rtg-graph-foot{font-size:.65rem;line-height:1.3;}
+.rtg-graph-node text{font-size:10px;letter-spacing:.8px;}
+.rtg-graph-node .rtg-node-code{font-size:10px;letter-spacing:.4px;}
+.rtg-intel-identity span{font-size:.67rem;line-height:1.25;}
+.rtg-intel-identity b{font-size:.65rem;line-height:1.35;}
+.rtg-intel-cell dt{font-size:.65rem;line-height:1.25;}
+.rtg-intel-cell dd{font-size:.7rem;line-height:1.35;}
+.rtg-intel-command{font-size:.65rem;}
+.rtg-intel-command kbd{font-size:.65rem;}
+.rtg-intel-deck>header span,.rtg-deck-context>span{font-size:.65rem;line-height:1.25;}
+.rtg-intel-close{font-size:.63rem;}
+.rtg-deck-context>p{font-size:.82rem;}
+.rtg-deck-context dt,.rtg-deck-context dd{font-size:.68rem;line-height:1.35;}
+.rtg-deck-actions span{font-size:.63rem;}
+.rtg-deck-actions small{font-size:.75rem;}
+.rtg-intel-deck>footer{font-size:.63rem;}
+
+@media(max-width:760px){
+  .rtg-graph-head{font-size:.63rem;}
+  .rtg-intel-identity span,.rtg-intel-identity b,
+  .rtg-intel-cell dt,.rtg-intel-cell dd{font-size:.63rem;}
+  .rtg-graph-node text{font-size:10px;}
+  .rtg-graph-node .rtg-node-code{font-size:10px;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop .sociaal-inleiding{max-width:27ch;font-size:.88rem;line-height:1.62;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop>.sociaal-filter{right:1.25rem;bottom:158px;z-index:6;}
+  .rtg-social-elite:not(.rtg-salon-elite) .rtg-intel-strip{
+    width:100%!important;margin-inline:0!important;padding-inline:0!important;
+    grid-template-columns:105px minmax(0,1fr) 100px;
+  }
+  .rtg-salon-elite .rtg-intel-strip{width:100%!important;grid-template-columns:105px minmax(0,1fr) 100px;}
+  .rtg-salon-elite .salon-werkveld>header{
+    box-sizing:border-box!important;min-height:520px!important;padding-bottom:160px!important;
+  }
+  .rtg-intel-command{padding:.35rem .5rem;font-size:.65rem;line-height:1.25;letter-spacing:.055em;text-align:center;}
+  .rtg-intel-command::before{display:none;}
+  .rtg-intel-command>span{display:block!important;}
+  .rtg-intel-command>kbd{display:none!important;}
+  .rtg-intel-command{padding:.3rem .22rem;font-size:.56rem;letter-spacing:.03em;}
+  .rtg-intel-cell:last-child dd{font-size:.56rem;letter-spacing:.02em;}
+  .private-hero.rtg-intel-host{box-sizing:border-box;min-height:650px!important;}
+}

@@ -251,7 +251,12 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
         window.RTGLagen.paneel({ titel: 'Twee' });
         window.RTGLagen.taak({ titel: 'Drie' });
       });
-      await wachtOpRust(page);
+      /* Drie lagen openen, en er hoort er ÉÉN over te blijven: de vorige worden
+         weggeanimeerd. wachtOpRust telt stilte en die is er al vóórdat die
+         animatie klaar is -- dan staan er nog drie. Wachten tot er nog één is,
+         is de toestand die deze toets bedoelt. */
+      await page.waitForFunction(() => document.querySelectorAll('.rtg-laag').length === 1,
+        null, { timeout: 15000 });
       assert.equal(await page.locator('.rtg-laag').count(), 1, 'er hoort er precies één te staan');
       assert.equal(await page.locator('.rtg-laag[data-soort="taak"]').count(), 1, 'en dat is de laatste');
     });

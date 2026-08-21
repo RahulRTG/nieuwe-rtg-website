@@ -43,6 +43,15 @@ async function veeg(page, doos, px, losLaten) {
   if (losLaten) await page.mouse.up();
 }
 
+/* WACHTEN OP DE LADE, NIET OP STILTE. wachtOpRust telt hoe lang de tekst niet
+   verandert -- en vlak na een veeg is het nog stil omdat de lade nog moet
+   opengaan. Dan meet de bewering erna een scherm dat nog niets heeft gedaan.
+   Deze twee wachten op de toestand die de toets daarna beweert. */
+const ladeOpen = (page) => page.waitForFunction(
+  () => !!document.querySelector('#werkdag .gb-lade'), null, { timeout: 15000 });
+const ladeDicht = (page) => page.waitForFunction(
+  () => !document.querySelector('#werkdag .gb-lade'), null, { timeout: 15000 });
+
 const laden = (page) => page.evaluate(() => {
   const l = document.querySelector('#werkdag .gb-lade');
   return l ? {
@@ -92,24 +101,24 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
 
     // 2. halve veeg naar links -> de rechterlade blijft open staan, niets gebeurt
     await veeg(page, doos, -140, true);
-    await wachtOpRust(page);
+    await ladeOpen(page);
     assert.deepEqual(await laden(page), { kant: 'rechts', gereed: false, acties: ['Openen', 'Delen'] },
       'een halve veeg naar links hoort de rechterlade te openen zonder iets uit te voeren');
 
     // 3. een tik op een actie sluit de lade en opent de regel NIET
     await page.locator('#werkdag .gb-lade .gb-doe').nth(1).click();
-    await wachtOpRust(page);
+    await ladeDicht(page);
     assert.match(page.url(), /kantoor\.html/,
       'een tik in de lade mag niet doorlekken naar de link waar de regel zelf op zit');
     assert.equal(await laden(page), null, 'na een tik hoort de lade opgeruimd te zijn');
 
     // 4. de andere kant draagt andere acties -- dat is de hele afspraak
     await veeg(page, doos, 140, true);
-    await wachtOpRust(page);
+    await ladeOpen(page);
     assert.deepEqual((await laden(page)).acties, ['Kenmerk', 'Overnemen'],
       'een veeg naar rechts hoort de ANDERE lade te openen');
     await page.keyboard.press('Escape');
-    await wachtOpRust(page);
+    await ladeDicht(page);
 
     // 5. doorvegen: eerst zichtbaar gereed, dan uitgevoerd, dan een melding
     const drempel = Math.max(168 + 52, doos.width * 0.55) + 70;
@@ -117,7 +126,9 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     assert.equal((await laden(page)).gereed, true,
       'voorbij de drempel hoort de lade te laten ZIEN dat loslaten iets doet');
     await page.mouse.up();
-    await wachtOpRust(page);
+    // doorvegen VOERT UIT: wachten tot de uitkomst er is, en de lade weg
+    await page.waitForFunction(() => window.__plak === 'doc86af40638634', null, { timeout: 15000 });
+    await ladeDicht(page);
     assert.equal(await page.evaluate(() => window.__plak), 'doc86af40638634',
       'doorvegen naar rechts hoort het kenmerk van die regel over te nemen');
     assert.match(await page.locator('.gb-terug').textContent(), /doc86af40638634/,
@@ -127,7 +138,8 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     // 6. zonder hand: pijltoets opent dezelfde acties met ECHTE knoppen
     await page.evaluate(() => document.querySelector('#werkdag .reis').focus());
     await page.keyboard.press('ArrowLeft');
-    await wachtOpRust(page);
+    await page.waitForFunction(() => { const d = document.querySelector('dialog.gb-blad'); return !!(d && d.open); },
+      null, { timeout: 15000 });
     const lade = await page.evaluate(() => {
       const dl = document.querySelector('dialog.gb-blad');
       return dl ? { open: dl.open, knoppen: [...dl.querySelectorAll('menu button')].map((b) => b.textContent.trim()) } : null;
@@ -135,7 +147,8 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     assert.deepEqual(lade, { open: true, knoppen: ['Openen', 'Delen'] },
       'pijl links hoort dezelfde acties te openen als de veeg naar links, maar dan als knoppen');
     await page.keyboard.press('Escape');
-    await wachtOpRust(page);
+    await page.waitForFunction(() => /gb-rij/.test(document.activeElement.className || ''),
+      null, { timeout: 15000 });
     assert.match(await page.evaluate(() => document.activeElement.className), /gb-rij/,
       'na de actielade hoort de focus terug te vallen op de regel waar hij vandaan kwam');
 

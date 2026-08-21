@@ -201,7 +201,12 @@ test('de levende code wordt getekend, en de schakelaar maakt de vaste pin onvind
 
     // 1. de levende code: een echt getekende QR, met de aftelring eronder
     await page.click('#scPinLive');
-    await page.waitForSelector('#scPinLiveDoek canvas', { timeout: 30000 });
+    /* Er horen er TWEE te komen: de code en de aftelring. waitForSelector is al
+       tevreden bij de eerste, en dan meet de bewering hieronder een halve
+       tekening. Zolang de toets sneller of trager werd, kon dat ook toevallig
+       goed gaan -- daarom wachten we nu op allebei. */
+    await page.waitForFunction(() => document.querySelectorAll('#scPinLiveDoek canvas').length >= 2,
+      null, { timeout: 30000 });
     const live = await page.evaluate(() => {
       const cs = document.querySelectorAll('#scPinLiveDoek canvas');
       return { aantal: cs.length, breed: cs[0] ? cs[0].width : 0 };

@@ -188,7 +188,11 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       await page.mouse.down();
       await wachtTot(page, () => !!document.querySelector('.vh-knop.af'), null, { ms: 15000 });
       await page.mouse.up();
-      await wachtOpRust(page);
+      /* Bevestigd, en dan gaat de lade dicht -- met een animatie. wachtOpRust
+         telt stilte en die is er al voordat hij weg is; dan telt de bewering
+         onderaan nog een lade. Wachten tot hij ECHT weg is. */
+      await page.waitForFunction(() => !!(window.__gedaan && window.__gedaan.bevestigd)
+        && document.querySelectorAll('.rtg-laag').length === 0, null, { timeout: 15000 });
       const gedaan = await page.evaluate(() => window.__gedaan);
       assert.ok(gedaan && gedaan.bevestigd === true, 'vasthouden hoort hem af te maken: ' + JSON.stringify(gedaan));
       assert.match(gedaan.reden, /Finance/, 'en de reden hoort mee te gaan');
@@ -325,7 +329,14 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       await zetProef(page, 'zwaar');
       const voor = await page.locator('#rtgCommand .cmd-balk').boundingBox();
       await page.evaluate(() => window.RTGDiepte.bezig());
-      await wachtOpRust(page);
+      /* De rail zakt IN; dat is de toestand waar deze toets over gaat, en niet
+         "het scherm is stil" -- dat is het al voordat de rail begint. */
+      await page.waitForFunction(() => {
+        const r = document.querySelector('#rtgCommand .cmd-rail');
+        if (!r) return true;
+        const b = r.getBoundingClientRect();
+        return b.height < 6 || getComputedStyle(r).visibility === 'hidden' || b.width === 0;
+      }, null, { timeout: 15000 });
       const na = await page.locator('#rtgCommand .cmd-balk').boundingBox();
       assert.equal(Math.round(voor.y), Math.round(na.y), 'het dock hoort te blijven staan');
       assert.ok(!(await page.locator('#rtgCommand .cmd-rail').isVisible()) ||

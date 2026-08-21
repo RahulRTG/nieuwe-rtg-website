@@ -109,7 +109,10 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     await page.mouse.down();
     for (let i = 1; i <= 16; i++) await page.mouse.move(d0.x + d0.width * 0.8 - i * 7, d0.y + d0.height / 2);
     await page.mouse.up();
-    await wachtOpRust(page);
+    /* Wachten tot de lade ER IS, niet tot het scherm stil is. wachtOpRust telt
+       stilte, en vlak na een veeg is het nog stil omdat de lade nog moet
+       opengaan -- dan meet de regel hieronder een lade die er niet staat. */
+    await page.waitForFunction(() => !!document.querySelector('#lijst .gb-lade'), null, { timeout: 15000 });
     const uit = await page.evaluate(() => {
       const l = document.querySelector('#lijst .gb-lade');
       if (!l) return ['er staat geen open lade om te meten'];
@@ -121,7 +124,8 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     });
     assert.deepEqual(uit, [], 'geen enkele knop mag over de rand van zijn lade steken');
     await page.keyboard.press('Escape');
-    await wachtOpRust(page);
+    // en tot hij WEG is; anders begint de volgende veeg op een lade die nog dichtgaat
+    await page.waitForFunction(() => !document.querySelector('#lijst .gb-lade'), null, { timeout: 15000 });
 
     // 1. doorvegen zet het bestand er ECHT in -- gemeten aan de server, niet aan het scherm
     const rij = page.locator('#lijst .item').first();

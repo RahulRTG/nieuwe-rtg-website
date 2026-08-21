@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1235 bestanden en 8529 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1238 bestanden en 8568 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1235 |
-| losse beweringen (`test(...)`) | 8529 |
+| toetsbestanden | 1238 |
+| losse beweringen (`test(...)`) | 8568 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 943 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 41 |
-| alleen in de kop *genoemd*, nog niet gemeten | 61 |
+| alleen in de kop *genoemd*, nog niet gemeten | 64 |
 | niets van beide | 180 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1080 bestanden, 8260 beweringen.
+1083 bestanden, 8299 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -137,6 +137,7 @@ toets omvalt.
 | `bewakers.test.js` | 10 | gezakt op `return-weg#0` | DE BEWAKERSKAART MOET UITPUTTEND BLIJVEN. scripts/lib/bewakers.js zegt van elke bewakerslaag in dit huis wat voor SOORT deur het is. |
 | `bewakersketen.test.js` | 2 | gezakt op `===->!==#0` | DE BEWAKERSKETEN: elke deur van een domein draagt het slot van dat domein. WAT DIT BEWAAKT, EN WAAROM HET PAS SINDS VANDAAG KAN Een route is in deze router een LAAG PER MIDDLEWARE (server/web/routing.js); de laatste... |
 | `bewijs.test.js` | 3 | -- | Proof of Learning: bewijs onder elke beheersing. De belofte die hier hard wordt gemaakt: "behaald" is geen bewering meer maar een conclusie uit bewijs, en een leerling kan altijd navragen waarop die conclusie berust. |
+| `bewijsboek.test.js` | 12 | genoemd | HET REGRESSIECORPUS VAN HET BEWIJSBOEK. Dit is de laag die mag zeggen "die toets hoeft niet opnieuw". |
 | `bewijsmatrix.test.js` | 19 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
 | `bewijsschuld.test.js` | 4 | gezakt op `===->!==#2` | DE BEWIJSSCHULD MAG ALLEEN KRIMPEN. WAAROM DIT BESTAAT. |
 | `bewijstoken.test.js` | 13 | genoemd | HET BEWIJSTOKEN -- een bevoegdheid die je kunt meedragen. WAT ER OP HET SPEL STAAT. |
@@ -779,6 +780,7 @@ toets omvalt.
 | `residentie4.test.js` | 3 | gezakt op `return-weg#0` | De vragenmotor van De Residence: ruim tienduizend verschillende vragen in zes genres, van superluchtig tot een traan tot zakelijk en door en door. Pure unit-test op de module zelf. |
 | `retail.test.js` | 11 | gezakt op `liegpoort /api/` | End-to-end tests voor het retail-/mode-genre (kern/retail.js): collecties en artikelen met varianten, voorraad, clienteling (maten/verlanglijst/historie/ notities), apart leggen, paskamerverzoeken,... |
 | `rijksles.test.js` | 4 | gezakt op `liegpoort /api/` | De Rijks-Bibliotheek (10.000 werk-apps per overheidsafdeling) en de Lesmaker (AI-lesstof + de interactieve klas-PDA). |
+| `risico.test.js` | 13 | genoemd | HET REGRESSIECORPUS VAN DE RISICOPROPAGATIE. WAAROM DIT BESTAND ZWAAR WEEGT. |
 | `rollenmatrix.test.js` | 9 | gezakt op `liegpoort /api/` | DE ROLLENMATRIX -- drieënveertig endpoints uit acht torens, een vraag. Deze endpoints wees de waargenomen dekkingsmeting als nooit aangeroepen aan. |
 | `rolproef.test.js` | 13 | gezakt op `===->!==#0` | DE ROL-SCHEIDING (scripts/lib/rolproef.js) -- de proef die vraagt of een INGELOGDE met de verkeerde rol binnenkomt, en of de weigering iets lekt. WAAROM DEZE TOETS ER IS. |
 | `ronde.test.js` | 11 | genoemd | DE COMMERCIELE RONDE: het werk dat wel gebouwd was en nooit werd gedaan. Vier dingen stonden klaar en werden door niemand aangeroepen. |
@@ -869,6 +871,7 @@ toets omvalt.
 | `scriptbundel.test.js` | 6 | overleefd | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
 | `securitylog-keten.test.js` | 7 | gezakt op `liegpoort /api/` | HET INLOG-AUDITLOG AAN DE HASHKETEN. Waarom juist dit log. |
 | `selfhost.test.js` | 5 | gezakt op `===->!==#0` | De self-hosted voordeur: geheimen mogen niet in Compose lekken, een private beta mag nooit publiek worden, en het installatiecommando mag bestaande sleutels niet stil vervangen. |
+| `semdiff.test.js` | 14 | genoemd | HET REGRESSIECORPUS VAN DE SEMANTISCHE DIFF. Deze laag levert de ONDERGRENS waarmee scripts/lib/risico.js verder rekent. |
 | `sentinel.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `server.test.js` | 9 | gezakt op `liegpoort /api/` | Integratietests: een echte server draaien in een geisoleerde datamap en de kernflows over HTTP uitoefenen. Dit bewaakt precies de plekken waar geld en wet aan hangen: de fiscale rekenmachine, de leeftijdslaag, De... |
 | `sessie-herstart.test.js` | 1 | gezakt op `liegpoort /api/` | Sessie-duurzaamheid: een ingelogd lid blijft na een serverherstart ingelogd, omdat de sessie (alleen de token-hash) in db.data.sessions staat en bij het opstarten terug in de Map wordt geladen. Dit dekt het... |

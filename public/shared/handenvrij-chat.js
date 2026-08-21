@@ -176,28 +176,13 @@
       .then(function (d) {
         var m = (d && d.messages) || [];
         if (!m.length) return;
-        /* HET OPGEHAALDE GESPREK KLAPT NIETS OPEN -- EN NIETS DICHT.
-           De eerste helft stond er al: je begint waar je was, niet met een
-           paneel dat vanzelf openspringt. Dat werd gedaan door de beurten
-           gewoon toe te voegen en het paneel daarna terug op `min` te zetten.
-
-           DE TWEEDE HELFT ONTBRAK, EN DAT KOSTTE EEN BETAALBEVESTIGING. Dit
-           antwoord komt over het net binnen, dus het landt op een willekeurig
-           moment na het laden van de pagina. Opent er in datzelfde venster iets
-           anders het paneel, dan sloeg deze regel het weer dicht -- met dat
-           andere erin. Het ergste geval is niet theoretisch: zegt de gebruiker
-           vlak na een herlaadactie iets over geld, dan hangt de
-           bevestigingskaart ("Zal ik dit doorzetten?") in een dichtgeklapt
-           paneel, met de focus al op "Ja, doorzetten", terwijl Rahul hardop
-           vraagt of hij het zal doorzetten. Een menselijke poort die je niet
-           kunt zien, is geen poort.
-
-           Nu wordt de stand tijdens het inladen niet meer aangeraakt: de
-           beurten komen er stil bij en er wordt achteraf niets meer
-           rechtgezet. Dat haalt de race weg in plaats van hem korter te maken.
-           De toets zakte hierop twee tot vier keer op de vier zodra er iets
-           anders naast draaide; dat is waarom het jarenlang als flakkering las
-           en niet als fout. */
+        /* DIT KLAPT NIETS OPEN -- EN NIETS DICHT. Je begint waar je was; dat
+           werd gedaan door het paneel achteraf op `min` te zetten. Die regel
+           sloot dus ook wat er intussen door iets ANDERS was geopend, want dit
+           antwoord komt over het net en landt op een willekeurig moment. Het
+           duurste geval: een betaalbevestiging in een dicht paneel, met de
+           focus al op "Ja, doorzetten". De stand wordt tijdens het inladen nu
+           niet meer aangeraakt -- dat haalt de race weg. */
         stilLaden = true;
         try { m.slice(-10).forEach(function (b) { beurt(b.from, b.text, b.at); }); }
         finally { stilLaden = false; }

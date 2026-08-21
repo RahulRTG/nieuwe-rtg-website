@@ -106,22 +106,12 @@
     kaart.appendChild(vak);
     /* HET PANEEL OPENEN LANGS DE ENIGE EIGENAAR ERVAN, en niet met de hand.
        Hier stond `kamer.vak.hidden = false`, en handenvrij-chat.js waarschuwt
-       daar letterlijk voor: "Hier zelf .hidden zetten zou de standen omzeilen."
-       Dat is precies wat er gebeurde. Staat handenvrij-scherm.js erbij, dan
-       bepaalt DIE de zichtbaarheid uit `stand`; een los gezette .hidden houdt
-       geen stand, want de eerstvolgende zet() rekent hem weer uit `min` terug.
-
-       WAT DAT KOSTTE. De bevestigingskaart van een BETALING kwam in een
-       dichtgeklapt paneel te hangen: aanwezig, met de focus al op "Ja,
-       doorzetten", terwijl Rahul hardop vraagt of hij het zal doorzetten. Een
-       menselijke poort die je niet kunt zien, is geen poort. De schermtoets
-       zakte hierop twee tot vier keer op de vier zodra er iets anders naast
-       draaide, en ging los meestal door -- daarom las het jarenlang als
-       flakkering en niet als fout.
-
-       En daarom `zet` en niet `naStand`: die laatste respecteert een paneel dat
-       de gebruiker heeft vastgezet, en dat is voor een gewone beurt juist. Voor
-       de bevestiging van een betaling niet -- die MOET in beeld komen. */
+       daar letterlijk voor: dat omzeilt de standen, en de eerstvolgende zet()
+       rekent de zichtbaarheid weer terug uit `min`. Zo kwam de bevestiging van
+       een BETALING in een dicht paneel te hangen -- aanwezig, met de focus al op
+       "Ja, doorzetten". En bewust zet() en niet naStand(): die laatste
+       respecteert een paneel dat de gebruiker heeft vastgezet, wat voor een
+       gewone beurt juist is en voor deze kaart niet. */
     if (root.RTGChatScherm) root.RTGChatScherm.zet('half');
     else kamer.vak.hidden = false;
     kamer.vak.appendChild(kaart);

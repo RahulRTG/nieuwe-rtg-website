@@ -3643,7 +3643,21 @@ console.log('\n51) geen enkel bestand plukt een naam uit een bereik dat het niet
      en een regel die honderd keer onterecht rood staat, leert niemand meer
      iets. Wat public/ WEL bewaakt staat in regel 19 (geen twee modules die
      dezelfde window-naam opeisen) en regel 42. */
-  for (const map of ['server', 'scripts']) {
+  /* EN test/ ERBIJ, sinds 21 augustus 2026. Die map stond hier niet, en dat
+     kostte een nacht: de samenvoeging van 24 takken liet `bankDeur` achter in
+     drie toetsbestanden die hem niet hadden (hij woonde in apps-ui.e2e.js),
+     plus `pw` en `fs` in twee andere. Node deelt geen bereik tussen
+     toetsbestanden, dus dat is een ReferenceError -- maar pas op de tak van de
+     toets die hem raakt, en dus pas in CI, na twee uur suite. Deze analyser had
+     ze alle drie gevonden; hij keek alleen de andere kant op. Nagetrokken op de
+     stand van vóór de reparatie: werkscherm, zegel-ui en pinherstel melden
+     bankDeur, vakbewijs-scherm meldt pw.
+
+     Wat daarvoor wel moest: de BROWSERKANT overslaan. Een schermtoets geeft een
+     functie mee aan de pagina (page.evaluate, waitForFunction), en die draait in
+     Chromium waar window.Geo gewoon bestaat. Zonder die uitzondering meldt deze
+     regel elke browsernaam als vrij. Zie BROWSERHAAK in lib/vrijenamen.js. */
+  for (const map of ['server', 'scripts', 'test']) {
     const m = path.join(ROOT, map);
     if (!fs.existsSync(m)) continue;
     loop(m, /\.js$/, (f) => {

@@ -65,6 +65,36 @@ const GLOBAAL = new Set([
 
 /* De namen die een knoop BINDT. Een patroon (destructuring, rest, standaard)
    kan er meer dan een bevatten, dus dit loopt erdoorheen. */
+/* AANROEPEN WAARVAN DE CALLBACK IN DE BROWSER DRAAIT.
+
+   Een schermtoets geeft een functie mee aan de PAGINA: page.evaluate(() =>
+   window.Geo.mag()) draait niet in Node maar in Chromium, waar window.Geo
+   bestaat en `Geo` dus een gewone globale is. Wie die functies meeneemt, meldt
+   elke browsernaam als vrij -- en een regel die honderd keer onterecht rood
+   staat, leert niemand meer iets (zie de kop van keuringsregel 51).
+
+   Alleen de FUNCTIE-argumenten worden overgeslagen, niet de hele aanroep: het
+   eerste argument van waitForFunction is de browserkant, het tweede is gewone
+   Node-code die wel degelijk zijn namen moet hebben. */
+const BROWSERHAAK = new Set(['evaluate', 'evaluateAll', 'evaluateHandle',
+  'waitForFunction', '$eval', '$$eval', 'addInitScript', 'exposeFunction']);
+
+function isBrowserKant(knoop, pad) {
+  for (let i = pad.length - 1; i >= 0; i--) {
+    const k = pad[i];
+    if (!k || (k.type !== 'FunctionExpression' && k.type !== 'ArrowFunctionExpression')) continue;
+    const ouder = pad[i - 1];
+    if (!ouder || ouder.type !== 'CallExpression') continue;
+    if (!(ouder.arguments || []).includes(k)) continue;
+    const c = ouder.callee;
+    const naam = c && (c.type === 'MemberExpression'
+      ? (c.property && (c.property.name || c.property.value))
+      : c.name);
+    if (BROWSERHAAK.has(String(naam || ''))) return true;
+  }
+  return false;
+}
+
 function bindingenUit(knoop, uit) {
   if (!knoop || typeof knoop !== 'object') return;
   switch (knoop.type) {
@@ -126,7 +156,8 @@ function vrijeNamen(bron) {
       case 'ImportNamespaceSpecifier':
         if (knoop.local) bindingenUit(knoop.local, gebonden); break;
       case 'Identifier':
-        if (!isGeenVerwijzing(knoop, ouder) && !gelezen.has(knoop.name)) {
+        if (!isGeenVerwijzing(knoop, ouder) && !gelezen.has(knoop.name)
+            && !isBrowserKant(knoop, pad)) {
           gelezen.set(knoop.name, knoop.lijn || 0);
         }
         break;
@@ -140,4 +171,4 @@ function vrijeNamen(bron) {
   return { fout: null, namen, regelVan: (n) => gelezen.get(n) || 0 };
 }
 
-module.exports = { vrijeNamen, GLOBAAL };
+module.exports = { vrijeNamen, GLOBAAL, BROWSERHAAK };

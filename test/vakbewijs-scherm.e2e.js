@@ -53,7 +53,9 @@ const KANDIDATEN = kandidaten();
 async function start() {
   let laatste = null;
   for (const k of KANDIDATEN) {
-    try { return await k.chromium.launch(browserOpties(pw)); } catch (e) { laatste = e; }
+    // browserOpties krijgt DE KANDIDAAT waarop we starten, niet een `pw` die
+    // hier niet bestaat -- dat gaf ReferenceError zodra er een browser was.
+    try { return await k.chromium.launch(browserOpties(k)); } catch (e) { laatste = e; }
   }
   throw laatste || new Error('geen browser');
 }

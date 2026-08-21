@@ -6,7 +6,7 @@
    browser. Draai: node --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zguI-')); }

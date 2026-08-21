@@ -7,7 +7,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -20,24 +20,7 @@ async function api(base, pad, body, token) {
   return (await fetch(base + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) })).json();
 }
 
-/* RTG Command is de landing op elke breedte, en sinds het springboard als
-   scherm verdween (WERELD.md) is er niets meer om naar op te vouwen. Deze helper
-   klikte de knop die dat deed; hij opent nu de deur in de VOET van de bank, en
-   dat is dezelfde weg die een lid heeft. `naam` is de tekst op die deur. */
-async function bankDeur(page, naam) {
-  await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 10000 });
-  const lade = page.locator('#rtgCommand .cmd-lade');
-  if (await lade.isVisible()) {
-    await lade.click();
-    await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
-  }
-  await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
-    .some((b) => b.textContent.trim() === n), naam, { timeout: 15000 });
-  await page.evaluate((n) => {
-    [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
-      .find((b) => b.textContent.trim() === n).click();
-  }, naam);
-}
+// bankDeur woont in ./helper.js: drie andere toetsbestanden gebruiken hem ook.
 
 // Gedeeld stramien: zet tokens/keys in localStorage, open de app, wacht tot het
 // inlogscherm weg is en de app-weergave zichtbaar is, en eis geen JS-fouten.

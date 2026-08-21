@@ -1041,7 +1041,35 @@ function drukte() {
   return { kernen, druk, extra: Math.min(5, Math.max(1, Math.ceil(1 + druk))) };
 }
 
-module.exports = { bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser,
+
+/* DE DEUR IN DE VOET VAN DE BANK.
+
+   RTG Command is de landing op elke breedte, en sinds het springboard als scherm
+   verdween (WERELD.md) is er niets meer om naar op te vouwen. Deze helper opent
+   de deur in de VOET van de bank -- dezelfde weg die een lid heeft. `naam` is de
+   tekst op die deur.
+
+   HIJ STOND IN apps-ui.e2e.js, en werkscherm, pinherstel en zegel-ui riepen hem
+   aan alsof hij van hen was. Node deelt geen scope tussen toetsbestanden, dus
+   dat is een ReferenceError -- en die valt pas op de tak van de toets die hem
+   raakt, en dus pas in CI. Vandaar hier, waar gedeeld gereedschap hoort. */
+async function bankDeur(page, naam, opties) {
+  const ms = (opties && opties.timeout) || 15000;
+  await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 10000 });
+  const lade = page.locator('#rtgCommand .cmd-lade');
+  if (await lade.isVisible()) {
+    await lade.click();
+    await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
+  }
+  await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
+    .some((b) => b.textContent.trim() === n), naam, { timeout: ms });
+  await page.evaluate((n) => {
+    [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
+      .find((b) => b.textContent.trim() === n).click();
+  }, naam);
+}
+
+module.exports = { bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser,
   installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

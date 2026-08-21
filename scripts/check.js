@@ -4072,5 +4072,44 @@ console.log('\n58) geen ronde hoeken: elke border-radius is 0, behalve een echte
 }
 
 
+/* ==========================================================================
+   59) ELKE MODULE DIE ROUTES REGISTREERT, WORDT OOK ECHT INGELADEN.
+
+   Bij de samenvoeging van 24 takken (21 augustus 2026) viel de mountregel van
+   server/routes/office/rendezvous.js weg. Het bestand stond er, de kern eronder
+   ook, en alle drie zijn adressen gaven 404 -- "Onbekend eindpunt". Vier toetsen
+   zakten daarop, na twee uur suite.
+
+   EN GEEN ENKELE METER ZAG HET AANKOMEN, want dat kan ook niet: een module die
+   niemand inlaadt staat in geen enkele teller, dus hij kan er ook nergens uit
+   verdwijnen. De dekking daalt niet, de routekaart wordt korter, en alles ziet
+   er kleiner maar gezond uit. Dat is de stilste vorm van kapot die dit huis
+   kent.
+
+   Deze regel stelt een kleine vraag -- is er een pad van een ingang naar dit
+   bestand? -- en beantwoordt hem in milliseconden. Zie scripts/lib/bedrading.js
+   voor hoe requires worden opgelost en waarom samengestelde requires RUIM
+   worden benaderd (liever een gemist geval dan een vals alarm, want een poort
+   die onterecht rood staat leert niemand meer iets).
+
+   MUTATIE (RAAK): haal de mountregel van office/rendezvous uit routes/office.js
+   -> deze regel meldt dat bestand bij naam.
+   ========================================================================== */
+console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen');
+{
+  const { meet } = require('./lib/bedrading');
+  const r = meet(['server']);
+  if (r.wezen.length) {
+    for (const w of r.wezen.slice(0, 12)) {
+      fout('registreert routes maar wordt nergens ingeladen: ' + w +
+        ' -- mount hem, of haal hem weg');
+    }
+    if (r.wezen.length > 12) fout('... en nog ' + (r.wezen.length - 12) + ' module(s)');
+  } else {
+    ok(r.gekeken + ' bestanden nagelopen, elke routemodule heeft een pad vanaf een ingang' +
+      (r.samengesteld ? ' (' + r.samengesteld + ' bestand(en) met een samengestelde require, ruim benaderd)' : ''));
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

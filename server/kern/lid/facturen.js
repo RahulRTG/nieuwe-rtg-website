@@ -88,10 +88,21 @@ function maakFacturen({ i18n, deps }) {
      die blijft, maar als een factuur VAN DIT LID: een eigen nummer, de maand
      waarin hij lid werd, en de prijs uit dezelfde bron als hierboven. De gratis
      gast-laag heeft geen pas en dus geen bijdrage: die krijgt niets. */
-  // de maandbijdrage inclusief btw, in euro's; null (op maat) wordt 0
-  function centenNaarBijdrage(tier) {
+  /* De maandbijdrage inclusief btw, in euro's; null (op maat) wordt 0.
+
+     HIER STOND NOG `* 1.21`, EN DAT WAS DE HELFT VAN EEN REPARATIE. Toen het
+     tarief uit ../commercie/btw.js ging komen, is facturenVoor() hierboven
+     omgezet en deze niet -- terwijl dit de plek is waar de factuur wordt
+     GEMAAKT. Twee rekensommen voor hetzelfde bedrag lopen uit elkaar zodra er
+     een tweede profiel bijkomt, en dan toont het scherm iets anders dan er in
+     de factuur staat: precies de fout die de kop van dit bestand beschrijft.
+
+     Zonder profiel geeft btw.js NL 21% -- hetzelfde antwoord als vroeger, maar
+     niet langer het enige mogelijke. Het profiel hoort bij het lid en niet bij
+     de trede, dus wie er een heeft geeft hem mee. */
+  function centenNaarBijdrage(tier, btwProfiel) {
     const centen = maandCentenUit(deps.geldPasprijzen, tier);
-    return centen == null ? 0 : Math.round(centen * 1.21) / 100;
+    return centen == null ? 0 : btw.overNetto(centen, btwProfiel).brutoCenten / 100;
   }
 
   function eersteBijdrageFactuur(tier, userId, opDatum) {

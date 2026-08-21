@@ -30,9 +30,11 @@ const { startServer, stop, elevateTier } = require('./helper');
 const CODE = 'RTG-CW-TEST';
 
 function post(base) {
-  return (pad, body, token) => fetch(base + pad, {
+  return (pad, body, token, idem) => fetch(base + pad, {
     method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+    headers: Object.assign({ 'Content-Type': 'application/json' },
+      token ? { Authorization: 'Bearer ' + token } : {},
+      idem ? { 'Idempotency-Key': idem } : {}),
     body: JSON.stringify(body || {})
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
@@ -102,8 +104,13 @@ test('een wens uit de onboarding komt op het kantoor, op codenaam, en een mens b
     assert.equal(naBesluit.wensen[0].besluit, 'opgepakt', 'maar hij is wel te zien, met het besluit erbij');
     assert.ok(naBesluit.wensen[0].door, 'en met wie het deed: ' + naBesluit.wensen[0].door);
 
-    // twee keer beslissen kan niet
-    const nogmaals = await P('/api/office/catalogus-wens/besluit', { id: w.id, besluit: 'opgepakt' }, kantoor);
+    /* TWEE KEER BESLISSEN KAN NIET -- maar dan moet het wel een tweede BESLUIT
+       zijn en geen dubbelklik. Deze route staat als `zelfdeVerzoek` verklaard
+       (lib/idemsleutels-werelden.js), dus een woordelijk gelijk verzoek binnen
+       seconden hoort het eerste antwoord terug te krijgen; dat is wat die laag
+       moet doen. Een bewust tweede besluit draagt een eigen Idempotency-Key. */
+    const nogmaals = await P('/api/office/catalogus-wens/besluit', { id: w.id, besluit: 'opgepakt' },
+      kantoor, 'tweede-besluit-wens');
     assert.equal(nogmaals.status, 409, 'een tweede besluit kaatst af');
   } finally { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 });

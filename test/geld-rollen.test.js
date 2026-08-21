@@ -144,7 +144,18 @@ test('2. B komt met zijn eigen geldige sessie nergens bij A binnen', async () =>
     [404, '/api/bank/afschrift', { iban: A.iban }],
     [404, '/api/bank/bevries', { iban: A.iban, aan: true }],
     [404, '/api/bank/naar-wallet', { iban: A.iban, centen: 100 }],
-    [404, '/api/bank/van-wallet', { iban: A.iban, centen: 100 }],
+    /* WALLET NAAR BANK IS VOOR IEDEREEN DICHT, en daarom staat hier 409 en geen
+       404. RTG Pay is een gesloten circuit (TOKEN.md: WALLET_SALDO is een
+       besluit, geen vergunning): saldo besteedt u binnen RTG en het gaat niet
+       naar een bankrekening -- van uzelf niet en van een ander al helemaal
+       niet. De route weigert dus vóór hij naar de eigenaar kijkt.
+
+       Dat verzwakt de eigendomsgrens niet, het maakt hem overbodig op deze ene
+       ingang, en de stand van A hieronder bewijst nog steeds dat er niets is
+       gebeurd. Gaat de bank-uitgang ooit open (TOKEN.md par. 7, besluit een),
+       dan hoort hier weer 404 te staan en zakt deze regel -- precies de
+       bedoeling. */
+    [409, '/api/bank/van-wallet', { iban: A.iban, centen: 100 }],
     [404, '/api/bank/storten', { iban: A.iban, centen: 5000, route: 'ideal' }],
     [404, '/api/bank/overboek', { vanIban: A.iban, naarIban: B.iban, centen: 5000, oms: 'kaping' }],
     [404, '/api/bank/sepa', { iban: A.iban, centen: 5000, naarIban: 'NL00RTGB0000000000', begunstigde: 'B', oms: 'x' }],

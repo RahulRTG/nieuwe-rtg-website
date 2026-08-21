@@ -15,7 +15,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -69,6 +69,15 @@ test('de muisvrije balk werkt in een echte pagina', { skip: geenBrowser(pw) }, a
       true, 'de balk hoort weg te staan tot je Rahul roept');
     await page.evaluate(() => window.RTGRahul.open());
     await page.waitForSelector('.hv-balk input', { state: 'visible', timeout: 15000 });
+    /* EN DAN NOG WACHTEN TOT DE BALK STIL STAAT. `state: 'visible'` is al waar
+       terwijl de balk nog openschuift, en de bevestigingskaart wordt daar
+       vervolgens IN gehangen. Playwright ziet die kaart dan wel staan maar niet
+       zichtbaar -- de meldingen luidden letterlijk "14 x locator resolved to
+       hidden" en "element is not stable" -- en op een drukke machine liep de
+       vijf seconden eerder af dan de beweging. Deze toets zakte zo vier van de
+       vier keer wanneer er iets anders naast draaide, en ging los gewoon door;
+       dat is precies het beeld van een race en niet van een fout in het scherm. */
+    await wachtOpRust(page, '.hv-balk');
 
     // 2. typen zonder de muis: een losse letter belandt in de balk
     await page.click('h1, body');
@@ -133,12 +142,28 @@ test('de muisvrije balk werkt in een echte pagina', { skip: geenBrowser(pw) }, a
     /* 7. het voelt als een gesprek: jouw zin staat er meteen als eigen bubbel,
        daarna komt Rahul met een bubbel aan zijn kant. Niet een regel die de
        vorige wist, maar beurten die blijven staan. */
+    /* Tellen wat er AL van Rahul staat. Het opgehaalde gesprek zet er eerdere
+       beurten in, en die zijn van een nieuw antwoord niet te onderscheiden --
+       dus wachten op "een beurt van Rahul" kan al waar zijn voordat dit verzoek
+       ook maar de deur uit is. */
+    const hijVoor = await page.evaluate(() =>
+      [...document.querySelectorAll('.hv-chat .hv-beurt.hij .hv-bel')]
+        .filter((b) => !b.querySelector('.hv-tikt')).length);
     await page.evaluate(() => { document.querySelector('.hv-balk input').value = 'hoe staat mijn saldo ervoor'; });
     await page.click('.hv-balk button[type="submit"]');
     await page.waitForSelector('.hv-chat .hv-beurt.ik .hv-bel', { state: 'visible', timeout: 5000 });
     const mijn = await page.evaluate(() => document.querySelector('.hv-chat .hv-beurt.ik .hv-bel').textContent);
     assert.match(mijn, /saldo/, 'jouw eigen zin hoort meteen in het gesprek te staan');
-    await page.waitForSelector('.hv-chat .hv-beurt.hij .hv-bel', { state: 'visible', timeout: 20000 });
+    /* WACHTEN OP EEN ECHT ANTWOORD, en niet op de drie puntjes. Die puntjes
+       dragen exact dezelfde klassen als een beurt van Rahul -- `hv-beurt hij`
+       met een `hv-bel` erin -- dus deze wacht was meteen tevreden zodra Rahul
+       BEGON te denken. Drie regels verderop staat dan de bewering dat de puntjes
+       weg horen te zijn, en die zakt zolang het antwoord nog onderweg is. Hij
+       ging alleen goed omdat het antwoord er meestal snel genoeg was.
+       Het onderscheid is de inhoud: een bel zonder puntjes IS het antwoord. */
+    await page.waitForFunction((voor) =>
+      [...document.querySelectorAll('.hv-chat .hv-beurt.hij .hv-bel')]
+        .filter((b) => !b.querySelector('.hv-tikt')).length > voor, hijVoor, { timeout: 20000 });
     const beurten = await page.evaluate(() => ({
       ik: document.querySelectorAll('.hv-chat .hv-beurt.ik').length,
       hij: document.querySelectorAll('.hv-chat .hv-beurt.hij').length,
@@ -195,7 +220,15 @@ test('de muisvrije balk werkt in een echte pagina', { skip: geenBrowser(pw) }, a
       await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ antwoord: 'geregeld' }) });
     });
     await page.evaluate(() => { window.__handenvrijKamer.doe('betaal de rekening', true); });
-    await page.waitForSelector('.hv-kaart', { state: 'visible', timeout: 5000 });
+    /* VIJF SECONDEN WAS EEN GOK, en op een belaste machine de verkeerde: elke
+       andere wacht in dit bestand staat op vijftien. Wat hier wordt beweerd is
+       DAT de bevestigingskaart in beeld komt, niet hoe snel. Ruimer wachten
+       verzwakt die bewering niet -- het haalt alleen de klok uit het oordeel.
+       De twee echte fouten die hieronder zaten zijn apart gerepareerd (de kaart
+       opende het paneel buiten de standenlaag om, en het ophalen van het oude
+       gesprek klapte het weer dicht); dit is wat er daarna nog aan speling over
+       is. */
+    await page.waitForSelector('.hv-kaart', { state: 'visible', timeout: 15000 });
     assert.equal(naarRahul2, 0, 'ook met de mond aan gaat er eerst niets uit');
     await page.click('.hv-kaart button.ja');
     /* WACHTEN OP HET ANTWOORD, niet op 800 ms.

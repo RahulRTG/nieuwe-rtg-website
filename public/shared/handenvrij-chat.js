@@ -106,7 +106,11 @@
      standen en de regel "hij praat -> omhoog, jij antwoordt -> omlaag". Is die
      laag er niet (of nog niet geladen), dan doen we het oude, simpele: gewoon
      zichtbaar maken. Hier zelf .hidden zetten zou de standen omzeilen. */
+  var stilLaden = false;
   function inBeeld(van) {
+    /* Tijdens het ophalen van het oude gesprek klapt er niets open of dicht --
+       zie laadGesprek() hieronder voor wat dat anders kostte. */
+    if (stilLaden) return;
     if (kamer.naStand) kamer.naStand(van);
     else vak.hidden = false;
   }
@@ -172,10 +176,31 @@
       .then(function (d) {
         var m = (d && d.messages) || [];
         if (!m.length) return;
-        m.slice(-10).forEach(function (b) { beurt(b.from, b.text, b.at); });
-        /* Het opgehaalde gesprek staat er, maar hoeft niet in beeld te
-           springen: je begint waar je was, niet met een openklappend paneel. */
-        if (root.RTGChatScherm) root.RTGChatScherm.zet('min'); else vak.hidden = true;
+        /* HET OPGEHAALDE GESPREK KLAPT NIETS OPEN -- EN NIETS DICHT.
+           De eerste helft stond er al: je begint waar je was, niet met een
+           paneel dat vanzelf openspringt. Dat werd gedaan door de beurten
+           gewoon toe te voegen en het paneel daarna terug op `min` te zetten.
+
+           DE TWEEDE HELFT ONTBRAK, EN DAT KOSTTE EEN BETAALBEVESTIGING. Dit
+           antwoord komt over het net binnen, dus het landt op een willekeurig
+           moment na het laden van de pagina. Opent er in datzelfde venster iets
+           anders het paneel, dan sloeg deze regel het weer dicht -- met dat
+           andere erin. Het ergste geval is niet theoretisch: zegt de gebruiker
+           vlak na een herlaadactie iets over geld, dan hangt de
+           bevestigingskaart ("Zal ik dit doorzetten?") in een dichtgeklapt
+           paneel, met de focus al op "Ja, doorzetten", terwijl Rahul hardop
+           vraagt of hij het zal doorzetten. Een menselijke poort die je niet
+           kunt zien, is geen poort.
+
+           Nu wordt de stand tijdens het inladen niet meer aangeraakt: de
+           beurten komen er stil bij en er wordt achteraf niets meer
+           rechtgezet. Dat haalt de race weg in plaats van hem korter te maken.
+           De toets zakte hierop twee tot vier keer op de vier zodra er iets
+           anders naast draaide; dat is waarom het jarenlang als flakkering las
+           en niet als fout. */
+        stilLaden = true;
+        try { m.slice(-10).forEach(function (b) { beurt(b.from, b.text, b.at); }); }
+        finally { stilLaden = false; }
       })
       .catch(function () {});
   }

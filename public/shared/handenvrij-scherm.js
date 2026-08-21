@@ -196,6 +196,28 @@
   document.addEventListener('fullscreenchange', kijkVolScherm);
   document.addEventListener('webkitfullscreenchange', kijkVolScherm);
 
-  zet('min', false);
+  /* BEGINNEN IN DE STAND DIE ER AL IS, en niet in de stand die wij prettig
+     vinden. Hier stond kaal `zet('min', false)`, en dat is bijna altijd goed:
+     een verse pagina hoort met een dicht paneel te beginnen.
+
+     BIJNA. Deze module is een eigen script en laadt dus op zijn eigen moment.
+     Alles wat vóór dat moment het paneel opent -- een beurt uit
+     handenvrij-chat.js, of de bevestigingskaart uit handenvrij-geld.js -- werd
+     door deze ene regel weer dichtgeslagen, met inhoud en al. Na een
+     herlaadactie is dat geen theoretisch venster maar een echt venster van
+     tientallen milliseconden, en precies daar zakte de schermtoets in: twee tot
+     vier keer op de vier zodra er iets anders naast draaide, en nooit wanneer er
+     een diagnoseregel tussen stond die het venster juist ruimer maakte. Dat
+     laatste is de reden dat het jarenlang als flakkering las.
+
+     Het ergste geval is de bevestiging van een BETALING: die kaart zet de focus
+     op "Ja, doorzetten" en Rahul vraagt hardop of hij het zal doorzetten,
+     terwijl het paneel dicht is. Een menselijke poort die je niet kunt zien, is
+     geen poort.
+
+     `chat.hidden` is bij het bouwen van de balk op true gezet, dus false
+     betekent hier: iemand heeft hem bewust opengedaan. Die neemt deze laag dan
+     over in plaats van hem te overrulen. */
+  zet(chat.hidden ? 'min' : bewaardeStand(), false);
   root.RTGChatScherm = { zet: function (s) { zet(s, true); }, stand: function () { return stand; }, greep: greep };
 })(typeof self !== 'undefined' ? self : this);

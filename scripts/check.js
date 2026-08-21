@@ -4158,5 +4158,44 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
   }
 }
 
+/* ==========================================================================
+   60) DE VERBODEN GRAAF: paden die er niet eens mogen ZIJN.
+
+   Dit huis beweert zulke dingen al -- de gluurronde (mag A bij de spullen van
+   B), de rolronde (welke rol komt waar binnen), het gesloten circuit van RTG
+   Pay -- maar dynamisch, achteraf, en alleen op de paden waar iemand een toets
+   voor maakte. Een verboden kant die STATISCH staat, geldt overal en altijd,
+   ook waar niemand aan gedacht heeft.
+
+   FAIL-CLOSED: elke regel in scripts/lib/verboden.js noemt wie het WEL mag, met
+   een reden. Al het andere is verboden. Een lijst van wie het NIET mag vergeet
+   zichzelf zodra er een map bijkomt.
+
+   MUTATIE (RAAK): roep accounts.realNameOf() aan in een bestand onder
+   server/routes/member/ -> deze regel meldt het, met de reden dat de ledenkant
+   op codenamen draait.
+
+   Zie PROOF-INCREMENTAL.md par. 4.
+   ========================================================================== */
+console.log('\n60) de verboden graaf: geen enkel pad dat er niet mag zijn');
+{
+  const { meet } = require('./lib/verboden');
+  const r = meet(['server', 'public']);
+  if (r.overtredingen.length) {
+    for (const o of r.overtredingen.slice(0, 12)) {
+      fout(o.werkwoord + ' geschonden (' + o.regel + '): ' + o.bestand + ':' + o.lijn +
+        ' raakt ' + o.wat + ' -- ' + o.reden);
+    }
+    if (r.overtredingen.length > 12) fout('... en nog ' + (r.overtredingen.length - 12) + ' plek(ken)');
+  } else {
+    const raakt = Object.values(r.gedekt).reduce((a, g) => a + g.geraakt, 0);
+    ok(r.regels + ' verboden kanten over ' + r.gekeken + ' bestanden; ' + raakt +
+      ' plek(ken) raken ze en dragen allemaal een reden');
+    for (const [id, g] of Object.entries(r.gedekt)) {
+      console.log('  \x1b[2m  ' + id.padEnd(18) + g.geraakt + ' plek(ken), allemaal toegestaan\x1b[0m');
+    }
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

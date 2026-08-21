@@ -27,6 +27,28 @@
    ========================================================================== */
 const fs = require('fs');
 const path = require('path');
+/* COMMENTAAR EN DEZE METING.
+
+   Een kop die uitlegt hoe `require(..)` werkt is geen require, en zonder iets
+   te doen meldde deze meter twee commentaarregels als onbekende kant.
+
+   Maar scripts/lib/bereik.js zijn `zonderCommentaar` is hier te grof: op
+   server/opzet/aanbouw2.js haalt hij 5,6 van de 9,6 kB weg en eet daarbij de
+   ECHTE mountregel van routes/doos op -- waarna twee gemounte routebestanden
+   als wees werden gemeld. Een poort die op zijn eigen stripper struikelt, is
+   erger dan geen poort.
+
+   (En let op de vorm van deze alinea zelf: een voorbeeld met een letterlijke
+   require erin laat keuringsregel 7 zakken, die elke relatieve require in de
+   BRONTEKST natrekt. Dezelfde valkuil, andere kant op.)
+
+   Daarom hier de lichtste vorm die werkt, en alleen waar hij nodig is:
+   - voor het VINDEN van kanten blijft de rauwe bron staan. Een require in
+     commentaar voegt dan een kant toe die er niet is, en dat maakt de graaf
+     RUIMER -- de veilige kant voor een weesmeting;
+   - voor het noteren van een ONBEKENDE kant wordt de regel zelf bekeken:
+     begint hij met //, * of /*, dan is het proza. */
+const COMMENTAARREGEL = /^\s*(?:\/\/|\*|\/\*)/;
 
 const WORTEL = path.join(__dirname, '..', '..');
 
@@ -72,6 +94,9 @@ const SAMENGESTELD_RE = /require\(\s*[^'")\s]/;           // require(iets dat ge
    getal staat in de uitslag. */
 const SAMEN_RE = /require\(\s*(['"])([^'"]+)\1\s*\+\s*([A-Za-z_$][\w$]*)\s*\)/g;
 const LIJST_RE = /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*\[([^\]]*)\]/g;
+/* require(path.join(iets, 'server/kern/...')) -- het tweede stuk is letterlijk
+   en wijst vanaf de wortel, dus dit is geen onbekende maar een omweg. */
+const JOIN_RE = /require\(\s*path\.join\(\s*[^,)]+,\s*(['"])([^'"]+)\1\s*\)\s*\)/g;
 
 function letterlijkeLijsten(bron) {
   const uit = new Map();
@@ -104,16 +129,24 @@ function meet(mappen) {
   for (const m of mappen || ['server']) bestanden(path.join(WORTEL, m), alle);
 
   const ingeladen = new Set();
-  let samengesteld = 0;
+  /* DRIE KLASSEN, EN ZE WORDEN GETELD (PROOF-INCREMENTAL.md par. 3.2).
+
+       opgeloste kanten  een letterlijke require die naar een bestaand bestand wijst
+       benaderde kanten  samengesteld, maar met een letterlijke lijst in hetzelfde
+                         bestand -- we nemen alle kandidaten mee en weten niet welke
+       onbekende kanten  samengesteld zonder enig houvast in dit bestand
+
+   Een graaf die zegt "nul onzekerheden" moet dat kunnen bewijzen; daarom staan
+   deze drie getallen in de uitslag en niet alleen het eindoordeel. */
+  const kanten = { opgelost: 0, benaderd: 0, onbekend: [] };
   for (const f of alle) {
     let bron;
     try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { continue; }
-    if (SAMENGESTELD_RE.test(bron)) samengesteld++;
     REQUIRE_RE.lastIndex = 0;
     let m;
     while ((m = REQUIRE_RE.exec(bron))) {
       const doel = los(f, m[2]);
-      if (doel) ingeladen.add(doel);
+      if (doel) { ingeladen.add(doel); kanten.opgelost++; }
     }
     /* En de samengestelde met een letterlijke lijst ernaast. RUIM benaderd, en
        met opzet: de lus loopt vaak over een AFGELEIDE variabele --
@@ -129,13 +162,43 @@ function meet(mappen) {
        een vals alarm op een module die wel degelijk draait, maakt deze poort
        waardeloos. Een gemist geval kost een 404 die de suite alsnog vindt. */
     const lijsten = letterlijkeLijsten(bron);
+    const rel = path.relative(WORTEL, f).replace(/\\/g, '/');
+    let benaderdHier = 0;
     SAMEN_RE.lastIndex = 0;
     while ((m = SAMEN_RE.exec(bron))) {
       const eigen = lijsten.get(m[3]);
       const kandidaten = eigen || [...lijsten.values()].flat();
+      if (!kandidaten.length) continue;
+      benaderdHier++;
       for (const w of kandidaten) {
         const doel = los(f, m[2] + w);
         if (doel) ingeladen.add(doel);
+      }
+    }
+    JOIN_RE.lastIndex = 0;
+    while ((m = JOIN_RE.exec(bron))) {
+      const doel = los(path.join(WORTEL, 'x.js'), './' + m[2]);
+      if (doel) { ingeladen.add(doel); kanten.opgelost++; benaderdHier++; }
+    }
+    kanten.benaderd += benaderdHier;
+
+    /* Wat samengesteld is en NIET met een lijst te benaderen viel, is onbekend.
+       Dat wordt bij naam genoteerd en niet alleen geteld: een getal zonder
+       namen is geen meting maar een gevoel. */
+    if (SAMENGESTELD_RE.test(bron) && !benaderdHier) {
+      /* Ook een VERVOLGREGEL binnen een blokcommentaar is proza, en die begint
+         niet met een teken dat hem verraadt -- in dit huis lopen koppen over
+         tien regels door. Vandaar dat de blokstaat wordt meegelopen. */
+      let inBlok = false;
+      for (const r of bron.split('\n')) {
+        const opent = r.includes('/*') && !r.includes('*/');
+        if (inBlok) { if (r.includes('*/')) inBlok = false; continue; }
+        if (opent) { inBlok = true; continue; }
+        if (COMMENTAARREGEL.test(r)) continue;
+        if (SAMENGESTELD_RE.test(r)) {
+          kanten.onbekend.push(rel + ': ' + r.trim().slice(0, 90));
+          break;
+        }
       }
     }
   }
@@ -155,7 +218,7 @@ function meet(mappen) {
     wezen.push(rel);
   }
 
-  return { gekeken: alle.length, samengesteld, wezen: wezen.sort() };
+  return { gekeken: alle.length, kanten, wezen: wezen.sort() };
 }
 
 module.exports = { meet, los };

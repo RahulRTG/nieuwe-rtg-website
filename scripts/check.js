@@ -4106,8 +4106,14 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
     }
     if (r.wezen.length > 12) fout('... en nog ' + (r.wezen.length - 12) + ' module(s)');
   } else {
-    ok(r.gekeken + ' bestanden nagelopen, elke routemodule heeft een pad vanaf een ingang' +
-      (r.samengesteld ? ' (' + r.samengesteld + ' bestand(en) met een samengestelde require, ruim benaderd)' : ''));
+    /* DE DRIE GETALLEN STAAN ERBIJ, en dat is de hele bedoeling: een graaf die
+       zegt "nul wezen" moet kunnen laten zien hoeveel hij zeker wist. Zie
+       PROOF-INCREMENTAL.md par. 3.2 -- known / potentially relevant /
+       unresolved als GEMETEN grootheden, niet als gevoel. */
+    ok(r.gekeken + ' bestanden, ' + r.kanten.opgelost + ' kanten opgelost, ' +
+      r.kanten.benaderd + ' benaderd, ' + r.kanten.onbekend.length + ' onbekend' +
+      ' -- geen enkele routemodule zonder pad vanaf een ingang');
+    for (const o of r.kanten.onbekend) console.log('  \x1b[2m  onbekend: ' + o + '\x1b[0m');
   }
 }
 

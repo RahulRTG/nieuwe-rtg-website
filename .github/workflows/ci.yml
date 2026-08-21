@@ -37,11 +37,16 @@ jobs:
   test:
     name: Tests, checks en build
     runs-on: ubuntu-latest
-    # 1h08 op 18 aug, gecanceld op 90 min op 20 aug: de suite groeide met deze
-    # samenvoeging van ~897 naar 1058 toetsbestanden plus 153 schermtoetsen.
-    # Ruimte voor die groei en een trage runner, en niet zo hoog dat een echte
-    # vastloper er een uur onder wegzakt.
-    timeout-minutes: 150
+    # 1h08 op 18 aug, gecanceld op 90 min op 20 aug, en op 21 aug liep hij op
+    # 150 min NOG. Gemeten in die afgebroken ronde: de unit-stap draaide toen al
+    # 117 minuten en was nog bezig -- geen vastloper, gewoon een suite die met
+    # deze samenvoeging van ~897 naar 1058 toetsbestanden ging. De concurrency
+    # staat al op 4 (het maximum voor een standaard runner; hoger laat servers
+    # elkaars healthcheck verdringen, zie scripts/test-runner.js), dus er valt
+    # geen tijd te winnen zonder de suite te splitsen. Ruimte voor de groei en
+    # voor een trage runner, en niet zo hoog dat een echte vastloper er een uur
+    # onder wegzakt.
+    timeout-minutes: 240
     services:
       postgres:
         image: postgres:16-alpine

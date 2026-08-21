@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -43,9 +43,15 @@ function meet(journalen) {
   for (const j of journalen) { args.push('--lees'); args.push(j); }
   const opties = { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
     timeout: 600000, maxBuffer: 64 * 1024 * 1024 };
-  let uit;
-  try { uit = execFileSync(process.execPath, args, opties); }
-  catch (e) { uit = String(e.stdout || ''); }
+  /* spawnSync EN NIET execFileSync, want deze meter zakt hier met opzet (zie de
+     opmerking bij vulling): dan GOOIT execFileSync, en in dat foutpad kapt Node
+     de uitvoer af op de pijpbuffer van 64 kB -- ongeacht de maxBuffer die we
+     hier meegeven. Met deze verzameling groeide het JSON daaroverheen en zakte
+     de toets op "Unterminated string in JSON at position 65536": een meetfout
+     die eruitziet als een kapotte meter. spawnSync gooit niet en houdt zich wel
+     aan maxBuffer. */
+  const r = spawnSync(process.execPath, args, opties);
+  const uit = String(r.stdout || '');
   assert.ok(uit.trim().startsWith('{'), 'de meter gaf geen JSON terug: ' + uit.slice(0, 200));
   return JSON.parse(uit);
 }
@@ -65,9 +71,14 @@ test('twee journalen tellen samen, en een endpoint uit het tweede is niet meer "
     const zonder = meet([alleen]);
     const met = meet([alleen, scherm]);
 
-    assert.ok(zonder.ongeraakt.includes('/api/fout/client'),
+    /* MET DE METHODE ERVOOR. `ongeraakt` draagt sinds de routekaart per
+       methode telt regels als "POST /api/fout/client"; op het kale pad zoeken
+       vindt dan nooit iets, en dan is deze bewering altijd waar aan de ene kant
+       en altijd onwaar aan de andere -- een toets die niets meet. */
+    const REGEL = 'POST /api/fout/client';
+    assert.ok(zonder.ongeraakt.includes(REGEL),
       'met alleen het toetsjournaal staat de foutmelder als nooit aangeraakt');
-    assert.ok(!met.ongeraakt.includes('/api/fout/client'),
+    assert.ok(!met.ongeraakt.includes(REGEL),
       'met het schermjournaal erbij niet meer -- de unie telt');
     assert.ok(met.geraakt > zonder.geraakt, 'en het cijfer gaat omhoog van een journaal erbij');
     assert.equal(met.routes, zonder.routes, 'de routekaart zelf verandert er niet van');

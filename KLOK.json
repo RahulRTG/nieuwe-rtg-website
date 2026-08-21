@@ -1,23 +1,32 @@
 {
-  "uitleg": "Directe tijdsaanroepen (new Date() / Date.now() zonder argument) in server/. MAG ALLEEN KRIMPEN -- zie test/klok.test.js. Wie de tijd aan het OS vraagt, doet niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd of een verlopen mandaat.",
-  "hoe": "node scripts/klok.js --top",
-  "gemeten": {
-    "totaal": 1281,
-    "bestanden": 657,
-    "modulesOpDeKlok": 56
+ "uitleg": "Directe tijdsaanroepen (new Date() / Date.now() zonder argument) in server/. MAG ALLEEN KRIMPEN -- zie test/klok.test.js. Wie de tijd aan het OS vraagt, doet niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd of een verlopen mandaat.",
+ "hoe": "node scripts/klok.js --top",
+ "gemeten": {
+  "totaal": 1303,
+  "bestanden": 689,
+  "modulesOpDeKlok": 105
+ },
+ "vrijgesteld": [
+  {
+   "bestand": "server/lib/klok.js",
+   "reden": "DIT IS de klok; hij moet ergens de echte tijd vragen"
   },
-  "vrijgesteld": [
-    {
-      "bestand": "server/lib/klok.js",
-      "reden": "DIT IS de klok; hij moet ergens de echte tijd vragen"
-    },
-    {
-      "bestand": "server/opzet/liegpoort.js",
-      "reden": "meetgereedschap, draait nooit in een echte rit"
-    },
-    {
-      "bestand": "server/routelog.js",
-      "reden": "meetgereedschap; een journaal met een verzette tijdstempel is onbruikbaar"
-    }
-  ]
+  {
+   "bestand": "server/opzet/liegpoort.js",
+   "reden": "meetgereedschap, draait nooit in een echte rit"
+  },
+  {
+   "bestand": "server/routelog.js",
+   "reden": "meetgereedschap; een journaal met een verzette tijdstempel is onbruikbaar"
+  }
+ ],
+ "groei": [
+  {
+   "op": "2026-08-21",
+   "van": 1281,
+   "naar": 1303,
+   "reden": "De samenvoeging van 24 takken. Tweeentwintig nieuwe directe tijdsaanroepen, verspreid over nieuwe modules -- geen enkele bestaande module ging terug naar het OS. Daar staat tegenover dat \"modules op de klok\" bijna verdubbelde (56 -> 105): het nieuwe werk vraagt zijn tijd overwegend WEL bij server/lib/klok.js. In verhouding is de schuld dus gedaald; deze teller telt aanroepen en groeit mee met het huis.",
+   "sluit": "De tweeentwintig staan verspreid en zijn per stuk te verhuizen naar nu()/datum(). Begin bij de modules die een DATUM tonen aan een mens (mandaten, verlof, leeftijd): daar is het verschil tussen de OS-klok en RTG_KLOK het scherpst te merken. node scripts/klok.js --top wijst de zwaarste bestanden aan."
+  }
+ ]
 }

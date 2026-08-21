@@ -226,6 +226,13 @@ const JOURNALEN = [
 
 function main() {
   let journalen = journalenUitArgv(), suite = null;
+  /* PER JOURNAAL: IS HIJ MEEGETELD, EN ZO NIET WAAROM. Zonder deze lijst zegt
+     het rapport alleen een cijfer, en dan is "0%" niet te onderscheiden van
+     "de suite draaide zonder RTG_ROUTELOG". Hij kwam met b3f0d83e en raakte bij
+     de samenvoeging van 24 takken zoek terwijl de toets die hem meet bleef
+     staan (test/dekking.test.js, "de uitslag zegt PER JOURNAAL of hij
+     meetelde"). */
+  const herkomst = [];
   const staand = path.join(WORTEL, '.routejournaal');
   if (journalen.length) {
     const weg = journalen.filter(p => !fs.existsSync(p));
@@ -233,11 +240,17 @@ function main() {
       console.error('Deze routejournalen bestaan niet: ' + weg.join(', ') + '. Draaide de suite met RTG_ROUTELOG gezet?');
       return 2;
     }
+    for (const j of journalen) herkomst.push({ pad: j, geteld: true, reden: 'meegegeven met --lees' });
   } else if (!process.argv.includes('--vers') && (() => { const v = jongerDanDeCode(staand); if (!v.ok && !jsonUit && fs.existsSync(staand)) console.log('Het staande journaal is niet bruikbaar: ' + v.reden + '.\n'); return v.ok; })()) {
     /* Het schermjournaal van `npm run e2e` telt mee als het er ligt. Zonder die
        ronde blijven de browser-only routes ongeraakt, en dat hoort de poort dan
        ook te zeggen in plaats van ze te verzwijgen. */
     journalen = [staand, path.join(WORTEL, '.schermjournaal')].filter(p => fs.existsSync(p));
+    for (const j of JOURNALEN) {
+      const vol = path.join(WORTEL, j.pad);
+      if (!fs.existsSync(vol)) { herkomst.push({ pad: j.pad, geteld: false, reden: 'bestaat niet -- draai ' + j.suite }); continue; }
+      herkomst.push({ pad: j.pad, geteld: journalen.includes(vol), reden: journalen.includes(vol) ? 'vers' : 'niet meegeteld' });
+    }
     if (!jsonUit) console.log('Het journaal van de laatste `npm test` is nog vers; die gebruiken we' +
       (journalen.length > 1 ? ', samen met het schermjournaal van `npm run e2e`' : '') +
       '.\n\x1b[2m(--vers dwingt een nieuwe suite af)\x1b[0m\n');
@@ -247,6 +260,7 @@ function main() {
     if (!jsonUit) console.log('De suite draait met het routejournaal aan; dit duurt zolang de suite duurt.\n');
     suite = draaiSuite(eigen);
     journalen = [eigen];
+    herkomst.push({ pad: eigen, geteld: true, reden: 'hier gedraaid' });
   }
 
   const routelog = require(path.join(WORTEL, 'server', 'routelog'));
@@ -278,7 +292,7 @@ function main() {
   if (jsonUit) {
     process.stdout.write(JSON.stringify({ routes: m.totaal, geraakt: m.geraakt, pct,
       nooitAangeraakt: m.nooitAangeraakt, onmeetbaar, gaten: m.gaten, ongeraakt, vreemd: m.vreemd,
-      suiteStatus: suite ? suite.status : null }) + '\n');
+      journalen: herkomst, suiteStatus: suite ? suite.status : null }) + '\n');
   } else {
     console.log('\n\x1b[1mWAARGENOMEN DEKKING\x1b[0m \x1b[2m(uit het routejournaal, niet uit de tekst van de tests)\x1b[0m\n');
     console.log('  routes op de routekaart    : ' + m.totaal + '  \x1b[2m(methode + patroon, alles inbegrepen)\x1b[0m');
@@ -347,4 +361,12 @@ function main() {
   return 0;
 }
 
-if (require.main === module) process.exit(main());
+/* process.exitCode EN NIET process.exit(). Dit script schrijft met --json een
+   antwoord dat met dit huis is meegegroeid tot ver over de 64 kB, en
+   process.exit() kapt een schrijf naar een PIJP af zodra die buffer vol is:
+   Node krijgt geen kans meer om te spoelen. Wie de uitvoer las kreeg dan
+   precies 65536 bytes en dus half JSON -- een meetfout die eruitziet als een
+   kapotte meter (test/dekking.test.js zakte erop met "Unterminated string in
+   JSON at position 65536"). Met exitCode loopt de proceslus leeg, spoelt stdout,
+   en eindigt Node vanzelf met dezelfde code. */
+if (require.main === module) process.exitCode = main();

@@ -48,11 +48,14 @@
 const ZWAARTE = ['algemeen', 'identity', 'money', 'security'];
 const zwaarder = (a, b) => (ZWAARTE.indexOf(a) >= ZWAARTE.indexOf(b) ? a : b);
 
-/* De klassen uit semdiff, van licht naar zwaar. Deze lijst staat hier ook zodat
-   de twee lagen elkaar kunnen vergelijken zonder elkaar in te laden. */
-const KLASSEN = ['cosmetic', 'implementation', 'contract', 'public API',
-  'schema', 'authorization', 'money', 'security'];
-const hogerst = (a, b) => (KLASSEN.indexOf(a) >= KLASSEN.indexOf(b) ? a : b);
+/* DE KLASSELADDER KOMT UIT semdiff.js EN STAAT HIER NIET NOG EENS.
+   Hij stond hier wel, "zodat de twee lagen elkaar kunnen vergelijken zonder
+   elkaar in te laden" -- en die kopie miste `besturing`. Gevolg: een wijziging
+   aan de bewijsmachinerie zelf, de zwaarste klasse die er is, werd hier
+   teruggezet naar `implementation`, omdat indexOf voor een onbekende naam -1
+   geeft en die dus van alles verliest. Twee bestanden die allebei gelijk leken
+   te hebben, en een fout die precies in de naad ertussen zat. */
+const { GEWICHT: KLASSEN, zwaarste: hogerst } = require('./semdiff');
 
 /* Welk gebied welke klasse afdwingt zodra een wijziging het kan bereiken. */
 const GEBIED_KLASSE = { security: 'security', money: 'money',

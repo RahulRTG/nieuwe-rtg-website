@@ -17,7 +17,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -124,7 +124,7 @@ async function metLid(stand, fn, ritmeOpzet, rustig) {
       const s = document.querySelector('.os-thuisscherm');
       return !!(s && s.getBoundingClientRect().width > 100 && s.getBoundingClientRect().height > 100);
     }, null, { timeout: 10000 });
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     await fn({ base, page });
   } finally {
     if (browser) await browser.close();
@@ -483,7 +483,7 @@ test('de momenten van vandaag staan op de wijzerplaat, en de klok wordt dat mome
 
     // en Escape brengt je terug naar de klok
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     assert.equal(await page.evaluate(() => RTGWereld.stand().moment), false,
       'Escape hoort je terug te brengen naar de klok');
   });
@@ -564,7 +564,14 @@ test('zonder patroon zegt Rahul niets over je ritme',
   zwak['map-media|' + uur] = { n: 1.8, t: Date.now() };   // en geen duidelijke koploper
 
   await metLid('aan', async ({ page }) => {
-    await page.waitForTimeout(3500);
+    /* Wachten tot hij BESLOTEN heeft, niet tot de klok verstreken is. Een
+       negatieve bewering ("hij zegt niets over je ritme") wordt niet waar door
+       lang genoeg te wachten; hij wordt toetsbaar zodra het besluit er staat.
+       data-soort IS dat besluit. */
+    await wachtTot(page, () => {
+      const el = document.getElementById('osWereldRahul');
+      return !!(el && el.getAttribute('data-soort'));
+    }, null, { ms: 15000 });
     const soort = await page.evaluate(() => document.getElementById('osWereldRahul').getAttribute('data-soort'));
     assert.notEqual(soort, 'ritme',
       'hij doet een uitspraak over je ritme terwijl er geen patroon is');
@@ -589,7 +596,7 @@ test('de levende grond tekent werkelijk iets', { skip: overslaan }, async () => 
      De eis is daarom de echte: de tekenmaat van het canvas hoort zijn maat op
      het scherm te zijn, maal de pixeldichtheid. */
   await metLid('aan', async ({ page }) => {
-    await page.waitForTimeout(900);
+    await wachtOpRust(page);
     const r = await page.evaluate(() => {
       const cv = document.querySelector('.os-wereld-grond');
       if (!cv) return { canvas: false };
@@ -629,7 +636,7 @@ test('de sterrenhemel van de poort staat op ware grootte op het beginscherm',
     await page.waitForFunction(
       () => !!document.querySelector('.os-thuisscherm > canvas.rtg-sterren'),
       null, { timeout: 15000 });
-    await page.waitForTimeout(600);
+    await wachtOpRust(page);
     const r = await page.evaluate(() => {
       const cv = document.querySelector('.os-thuisscherm > canvas.rtg-sterren');
       const dpr = Math.min(2, devicePixelRatio || 1);
@@ -827,7 +834,7 @@ test('Rahul zegt het EEN keer: in de ring, niet ook nog in de draad eronder',
       const dr = document.getElementById('osAiDraad');
       return dr && dr.children.length > 0;
     }, null, { timeout: 20000 });
-    await page.waitForTimeout(600);
+    await wachtOpRust(page);
     const r = await page.evaluate(() => ({
       draadTekst: document.getElementById('osAiDraad').lastElementChild.textContent,
       ringZichtbaar: getComputedStyle(document.getElementById('osWereldRahul')).display !== 'none',

@@ -15,7 +15,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, wachtOpNetstilte, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -61,7 +61,8 @@ async function metApp(fn) {
     }, a.token);
     const pg = await ctx.newPage();
     await pg.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await pg.waitForTimeout(1500);
+    await wachtOpNetstilte(pg);
+    await wachtOpRust(pg);
     await fn({ pg, base, a, b });
   } finally {
     if (browser) await browser.close();
@@ -109,7 +110,7 @@ test('een gescande vraagcode wordt eerst een kaart en pas na een druk een betali
 
     // en dan pas bevestigen
     await pg.click('.rtg-bedoeling button.doen');
-    await pg.waitForTimeout(1200);
+    await wachtOpNetstilte(pg);
     assert.equal((await api(base, '/api/pay/overzicht', {}, a.token)).body.saldo, voorA - 1850,
       'na de druk is er betaald');
     assert.equal(await pg.locator('.rtg-bedoeling').count(), 0, 'en de kaart is weg');
@@ -120,7 +121,7 @@ test('een QR die niet van ons is geeft geen kaart en geen fout, maar wat er ston
   { skip: geenBrowser(pw) }, async () => {
   await metApp(async ({ pg }) => {
     await scan(pg, 'https://bushalte.example/dienstregeling');
-    await pg.waitForTimeout(900);
+    await wachtOpRust(pg);
     assert.equal(await pg.locator('.rtg-bedoeling').count(), 0,
       'een vreemde QR hoort geen bedoelingsscherm te krijgen');
   });
@@ -135,7 +136,7 @@ test('een pin van een ander wordt een kaart met een verbindknop', { skip: geenBr
     assert.match(tekst, new RegExp(b.codenaam.split(' ')[0], 'i'));
     assert.match(tekst, /Nog niet verbonden/);
     await pg.click('.rtg-bedoeling button.doen');
-    await pg.waitForTimeout(1200);
+    await wachtOpNetstilte(pg);
     const verzoeken = (await api(base, '/api/member/connections', {}, b.token)).body;
     assert.equal((verzoeken.requests || []).length, 1, 'Boris heeft het verzoek');
     assert.equal(verzoeken.requests[0].codename, a.codenaam);
@@ -160,7 +161,7 @@ test('mijn koppelingen: wat openstaat is er weg te halen, wat gebeurd is blijft 
 
     // de openstaande code intrekken
     await pg.click('.rtg-koppel button[data-trek]');
-    await pg.waitForTimeout(1200);
+    await wachtOpNetstilte(pg);
     const na = await pg.evaluate(() => document.querySelector('.rtg-koppel .blad').innerText);
     assert.match(na, /geen code van je open/i, 'de code is weg');
     assert.match(na, /Verzoek verstuurd/, 'en wat er gebeurde staat er nog');
@@ -169,7 +170,7 @@ test('mijn koppelingen: wat openstaat is er weg te halen, wat gebeurd is blijft 
 
     // en het verzoek intrekken laat zijn eigen regel staan
     await pg.click('.rtg-koppel button[data-bon]');
-    await pg.waitForTimeout(1200);
+    await wachtOpNetstilte(pg);
     const slot = await pg.evaluate(() => document.querySelector('.rtg-koppel .blad').innerText);
     assert.match(slot, /Verzoek verstuurd/, 'de bon blijft');
     assert.match(slot, /staat niet meer open/i, 'met de reden waarom er niets meer kan');

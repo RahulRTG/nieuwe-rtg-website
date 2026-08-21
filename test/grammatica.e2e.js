@@ -16,7 +16,7 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
+const { browserOpties, geenBrowser, laadScherm, letOpFouten, startServer, stop, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -120,7 +120,7 @@ async function trek(page, hoogte) {
   await page.mouse.down();
   await page.mouse.move(b.x + b.width * 0.62, b.y - hoogte, { steps: 12 });
   await page.mouse.up();
-  await page.waitForTimeout(600);
+  await wachtOpRust(page);
 }
 
 test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) => {
@@ -171,18 +171,24 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
          mislukking te zijn -- de knop biedt de tweede weg aan. */
       await page.locator('.vh-knop').hover();
       await page.mouse.down();
-      await page.waitForTimeout(200);
+      await wachtOpRust(page);
       await page.mouse.up();
-      await page.waitForTimeout(200);
+      await wachtOpRust(page);
       assert.equal(await page.evaluate(() => window.__gedaan), null, 'een korte druk mag niet afgaan');
       assert.ok(await page.locator('.vh-knop.tweede').count() > 0,
         'een korte druk hoort de tweede weg aan te bieden');
 
+      /* HIER IS DE TIJD HET GEBAAR ZELF: vasthouden duurt nu eenmaal. Maar de
+         toets hoeft niet te gokken HOE lang -- shared/adaptief/vasthoud.js zet
+         de knop op `.af` zodra de druk vol is, en dat is het moment om los te
+         laten. Zo blijft het een echte lange druk en toch een wacht op een
+         toestand: gaat de drempel ooit omhoog, dan wacht deze toets gewoon
+         langer in plaats van te zakken. */
       await page.locator('.vh-knop').hover();
       await page.mouse.down();
-      await page.waitForTimeout(1300);
+      await wachtTot(page, () => !!document.querySelector('.vh-knop.af'), null, { ms: 15000 });
       await page.mouse.up();
-      await page.waitForTimeout(500);
+      await wachtOpRust(page);
       const gedaan = await page.evaluate(() => window.__gedaan);
       assert.ok(gedaan && gedaan.bevestigd === true, 'vasthouden hoort hem af te maken: ' + JSON.stringify(gedaan));
       assert.match(gedaan.reden, /Finance/, 'en de reden hoort mee te gaan');
@@ -201,11 +207,11 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
     await metLid(async (page) => {
       await zetProef(page, 'terug');
       await page.locator('#rtgCommand .cmd-actie[data-cap="proef.terug"]').click();
-      await page.waitForTimeout(400);
+      await wachtOpRust(page);
       assert.equal(await page.evaluate(() => window.__gedaan), 'weg', 'terug hoort meteen te gebeuren');
       await page.waitForSelector('#rtgCommand .rail-ongedaan', { timeout: 8000 });
       await page.locator('#rtgCommand .rail-ongedaan').click();
-      await page.waitForTimeout(400);
+      await wachtOpRust(page);
       assert.equal(await page.evaluate(() => window.__ongedaan), 1, 'de weg terug hoort te werken');
       assert.equal(await page.locator('#rtgCommand .rail-ongedaan').count(), 0,
         'en daarna hoort de melding weg te zijn');
@@ -248,7 +254,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       const doos = await page.locator('#rtgCommand .cmd-actie[data-cap="proef.licht"]').boundingBox();
       await page.mouse.move(doos.x + doos.width / 2, doos.y + doos.height / 2);
       await page.mouse.down();
-      await page.waitForTimeout(700);
+      await wachtOpRust(page);
       await page.mouse.up();
       await page.waitForSelector('.rtg-laag-lade.open', { timeout: 8000 });
       assert.equal((await page.locator('.lg-titel').textContent()).trim(), 'Vet');
@@ -270,7 +276,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       const orb = await page.locator('#rtgCommand .cmd-mondknop').boundingBox();
       await page.mouse.move(orb.x + orb.width / 2, orb.y + orb.height / 2);
       await page.mouse.down();
-      await page.waitForTimeout(700);
+      await wachtOpRust(page);
       await page.mouse.up();
       await page.waitForSelector('.rtg-laag-lade.open', { timeout: 8000 });
       const kopjes = await page.locator('.lg-kopje').allTextContents();
@@ -319,7 +325,7 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       await zetProef(page, 'zwaar');
       const voor = await page.locator('#rtgCommand .cmd-balk').boundingBox();
       await page.evaluate(() => window.RTGDiepte.bezig());
-      await page.waitForTimeout(400);
+      await wachtOpRust(page);
       const na = await page.locator('#rtgCommand .cmd-balk').boundingBox();
       assert.equal(Math.round(voor.y), Math.round(na.y), 'het dock hoort te blijven staan');
       assert.ok(!(await page.locator('#rtgCommand .cmd-rail').isVisible()) ||

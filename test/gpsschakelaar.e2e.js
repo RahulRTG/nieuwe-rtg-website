@@ -100,7 +100,7 @@ test('Locatie: de vier apps die een positie nodig hebben, vragen erom',
       await page.goto(base + app, { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => { localStorage.removeItem('rtg_os_gps'); localStorage.setItem('rtg_cookieinfo_v1', '1'); });
       await page.goto(base + app, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(600);
+      await wachtOpRust(page);
       const uit = await page.evaluate(() => ({
         plek: typeof window.RTGPlek,
         vraag: !!document.querySelector('.rtgplek')
@@ -186,13 +186,13 @@ test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
     assert.equal(await p1.evaluate(() => localStorage.getItem('rtg_os_gps')), null,
       'een vers profiel hoort geen schakelaar te hebben');
     await p1.click('#osCcGps');
-    await p1.waitForTimeout(400);
+    await wachtOpRust(p1);
     assert.equal(await p1.evaluate(() => localStorage.getItem('rtg_os_gps')), '1',
       'de tegel zette de schakelaar niet aan');
     assert.ok(await p1.evaluate(() => document.querySelector('#osCcGps').classList.contains('aan')),
       'de tegel toont niet dat hij aan staat');
     await p1.click('#osCcGps');                       // en weer uit
-    await p1.waitForTimeout(300);
+    await wachtOpRust(p1);
     assert.equal(await p1.evaluate(() => localStorage.getItem('rtg_os_gps')), '0',
       'de tegel kon niet meer uit');
 
@@ -201,7 +201,7 @@ test('Locatie: de schakelaar is te bedienen vanuit het bedieningspaneel',
        komt -- precies de stille storing die dit hele geval was. */
     const p2 = await open(false);
     await p2.click('#osCcGps');
-    await p2.waitForTimeout(400);
+    await wachtOpRust(p2);
     assert.equal(await p2.evaluate(() => localStorage.getItem('rtg_os_gps')), '0',
       'het toestel weigerde, maar de schakelaar bleef aan staan');
     assert.equal(await p2.evaluate(() => document.querySelector('#osCcGps').classList.contains('aan')), false,
@@ -282,7 +282,7 @@ test('Locatie: geo.js luistert naar dezelfde schakelaar',
        nooit, dus niet op de belofte wachten -- alleen op de aanraking. */
     await opnieuw('1');
     await page.evaluate(() => { localStorage.removeItem('rtg_geo'); Geo.positie(0); });
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     const aan = await page.evaluate(() => window.__gpsAanrakingen);
     assert.ok(aan >= 1, 'schakelaar op aan, maar geo.js raakte geolocation nooit aan');
 

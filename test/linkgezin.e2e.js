@@ -19,7 +19,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { browserOpties, geenBrowser, laadPlaywright, startServer, stop, wachtOpNetstilte, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -116,7 +116,7 @@ test('een gezinslid plakt een RTG-code en krijgt eerst de kaart, dan pas het ver
       'de kaart lezen stuurt nog niets');
 
     await pg.click('.rtg-bedoeling button.doen');
-    await pg.waitForTimeout(1200);
+    await wachtOpNetstilte(pg);
     assert.equal(((await api(base, '/api/member/connections', {}, lid.token)).body.requests || []).length, 1,
       'na de druk staat het verzoek er');
     assert.ok(gezegd.some(m => /verstuurd/i.test(m)), 'en het scherm zegt dat ook');
@@ -135,7 +135,7 @@ test('een gezinslid plakt een RTG-code en krijgt eerst de kaart, dan pas het ver
     const tel = (r) => { if (r.url().includes('/api/member/pin')) uitgegaan.push(r.url()); };
     pg.on('request', tel);
     await pg.evaluate(() => lnk('/api/member/pin', {}).catch(() => {}));
-    await pg.waitForTimeout(600);
+    await wachtOpRust(pg);
     pg.off('request', tel);
     assert.deepEqual(uitgegaan, [], 'de gezinssleutel gaat niet naar een deur van een andere wereld');
   });

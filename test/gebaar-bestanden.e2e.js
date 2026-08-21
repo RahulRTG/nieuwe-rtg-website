@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
@@ -109,7 +109,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     await page.mouse.down();
     for (let i = 1; i <= 16; i++) await page.mouse.move(d0.x + d0.width * 0.8 - i * 7, d0.y + d0.height / 2);
     await page.mouse.up();
-    await page.waitForTimeout(420);
+    await wachtOpRust(page);
     const uit = await page.evaluate(() => {
       const l = document.querySelector('#lijst .gb-lade');
       if (!l) return ['er staat geen open lade om te meten'];
@@ -121,7 +121,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     });
     assert.deepEqual(uit, [], 'geen enkele knop mag over de rand van zijn lade steken');
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
 
     // 1. doorvegen zet het bestand er ECHT in -- gemeten aan de server, niet aan het scherm
     const rij = page.locator('#lijst .item').first();

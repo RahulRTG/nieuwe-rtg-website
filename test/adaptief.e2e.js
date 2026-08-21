@@ -18,7 +18,7 @@
    overgeslagen. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { laadScherm, startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
+const { laadScherm, startServer, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -210,7 +210,7 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
 
         const voor = await fr.locator('#tekst').innerHTML();
         await page.locator('#rtgCommand .cmd-actie').first().click();
-        await page.waitForTimeout(400);
+        await wachtOpRust(page);
         const na = await fr.locator('#tekst').innerHTML();
         assert.notEqual(na, voor, 'een tik in de balk hoort het document te veranderen');
         assert.ok(/<b>|<strong>/i.test(na), 'er hoort vette tekst te staan');
@@ -251,7 +251,7 @@ test('de contextuele schilbalk', { skip: geenBrowser(pw), concurrency: false }, 
         window.RTGLagen.paneel({ titel: 'Twee' });
         window.RTGLagen.taak({ titel: 'Drie' });
       });
-      await page.waitForTimeout(400);
+      await wachtOpRust(page);
       assert.equal(await page.locator('.rtg-laag').count(), 1, 'er hoort er precies één te staan');
       assert.equal(await page.locator('.rtg-laag[data-soort="taak"]').count(), 1, 'en dat is de laatste');
     });

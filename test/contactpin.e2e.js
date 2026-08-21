@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadScherm, startServer, stop, browserOpties, geenBrowser } = require('./helper');
+const { laadScherm, startServer, stop, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 /* Een browser KIEZEN door hem te starten, niet door hem te laden: zie de
    kop van ./browser.js. Dit bestand droeg nog een eigen kopie van de oude
@@ -175,7 +175,7 @@ test('de scanknop opent de HUISOVERLAY, met de handinvoer als uitweg',
     // een code die niet van ons is: de overlay BLIJFT staan, zodat je opnieuw kunt
     await page.fill('.rtg-scan-hand input', 'https://voorbeeld.test/iets');
     await page.click('.rtg-scan-hand button[type=submit]');
-    await page.waitForTimeout(600);
+    await wachtOpRust(page);
     assert.ok(await page.$('.rtg-scan-ov'), 'een vreemde QR gooit het venster niet dicht');
 
     // en dan de echte pin

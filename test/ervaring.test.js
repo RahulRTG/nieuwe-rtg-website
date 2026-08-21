@@ -131,13 +131,26 @@ test('9. RTG-punten: sparen bij betalen, verzilveren naar tegoed, tegoed verreke
   assert.ok(p.body.saldo >= 104, 'punten gespaard: ' + p.body.saldo);
   const fout = await api(base, '/api/punten/verzilver', { punten: 50 }, lidB.token);
   assert.equal(fout.status, 400, 'verzilveren kan per 100');
+  /* VERZILVEREN LANDT IN DE WALLET, en daarmee houdt het tweede saldo op te
+     bestaan. Hier stond dat 100 punten "10 euro tegoed" opleverden en dat dat
+     tegoed bij de volgende bestelling als KORTING werd verrekend
+     (`puntenKorting`). Dat klopte zolang bestellingen, rekeningen en ritten zelf
+     geen geld verplaatsten; sinds die drie via RTG Pay lopen
+     (kern/pay/zaakbetaling.js) is walletsaldo de enige vorm die overal werkt, en
+     zijn twee bedragen die allebei geld van hetzelfde lid voorstellen precies
+     waar kern/geldwereld.js voor waarschuwt.
+
+     Het oude `tegoedCenten` bestaat nog als vangnet voor een gast zonder
+     codenaam of een onbereikbare wallet -- zie de terugval in
+     kern/ervaring/leden/punten.js -- maar voor een gewoon lid is het nul, en
+     dat hoort hier te staan. */
   const zilver = await api(base, '/api/punten/verzilver', { punten: 100 }, lidB.token);
-  assert.equal(zilver.body.tegoed, 10, '100 punten = 10 euro tegoed');
-  // volgende betaling: het tegoed wordt automatisch verrekend (RTG legt bij)
-  const o = await bestel(lidB.token, [{ id: 'ramen', qty: 1 }]);
-  assert.equal(o.puntenKorting, 10, 'tegoed verrekend bij het betalen');
+  assert.equal(zilver.status, 200, JSON.stringify(zilver.body).slice(0, 160));
+  assert.equal(zilver.body.naarWalletCenten, 1000, '100 punten = 10 euro in de wallet');
+  assert.equal(zilver.body.tegoed, 0, 'en niet in een tweede potje ernaast');
+  assert.equal(zilver.body.saldo, p.body.saldo - 100, 'de punten zijn afgeschreven');
   p = await api(base, '/api/punten', {}, lidB.token);
-  assert.equal(p.body.tegoed, 0, 'het tegoed is op');
+  assert.equal(p.body.tegoed, 0, 'er staat geen los tegoed meer');
 });
 
 test('7. splitsen: betaalverzoek naar een verbonden vriend, die zijn deel betaalt', async () => {

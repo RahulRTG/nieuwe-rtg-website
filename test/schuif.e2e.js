@@ -28,7 +28,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright } = require('./helper');
+const { startServer, stop, laadPlaywright, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -81,7 +81,7 @@ test('geen enkel Foundation-scherm schuift zijwaarts op een telefoon', { skip: !
       const page = await ctx.newPage();
       try {
         await page.goto(base + '/apps/foundation/' + naam + '.html', { waitUntil: 'networkidle', timeout: 25000 });
-        await page.waitForTimeout(500);
+        await wachtOpRust(page);
         const uitslag = await page.evaluate(() => {
           const cw = document.documentElement.clientWidth;
           const sw = document.documentElement.scrollWidth;

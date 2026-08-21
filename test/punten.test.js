@@ -95,15 +95,20 @@ test('het tegoed rekent in centen en stopt bij het plafond', async () => {
 
   // 6000 punten sparen: 600 euro aan tegoed, en het plafond ligt op 500
   data.punten.k = { saldo: 6000, tegoedCenten: 0, historie: [] };
+  /* verzilverPunten is async sinds verzilveren in de wallet landt: er staat een
+     echte boeking vanaf de huisrekening tegenover. Zonder await is `r` een
+     belofte en is `r.ok` undefined -- dan meet deze lus niets. Deze stub geeft
+     geen `payVan` mee, dus loopt hij bewust over de terugval (het oude tegoed
+     met zijn plafond), en dat is precies wat hieronder wordt gemeten. */
   for (let i = 0; i < 50; i++) {
-    const r = punten.verzilverPunten('k', 100);
+    const r = await punten.verzilverPunten('k', 100);
     assert.equal(r.ok, true, 'ronde ' + i + ' hoort te lukken: ' + JSON.stringify(r).slice(0, 120));
   }
   const stand = punten.puntenVan('k');
   assert.equal(stand.tegoedCenten, 50000, 'vijftig keer tien euro staat als 50000 CENTEN');
   assert.equal(stand.tegoed, 500, 'en het scherm ziet er nog steeds euro\'s');
 
-  const overheen = punten.verzilverPunten('k', 100);
+  const overheen = await punten.verzilverPunten('k', 100);
   assert.equal(overheen.status, 409, 'boven het plafond gaat verzilveren niet door');
   assert.equal(punten.puntenVan('k').saldo, 1000, 'en de punten blijven staan; ze zijn niet verdampt');
 

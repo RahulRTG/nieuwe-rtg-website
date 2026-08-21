@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-08-20T15:47:59.691Z",
-  "commit": "fcba02e",
+  "op": "2026-08-21T00:45:13.967Z",
+  "commit": "30dc6bb4",
   "boomVuil": true,
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 14,
-  "meetwerk": 53,
+  "meetwerk": 57,
   "instrument": 932,
-  "grens": 619
+  "grens": 608
  },
  "posten": [
   {
@@ -82,7 +82,7 @@
    "id": "audit-wisselend",
    "soort": "meetwerk",
    "wat": "routes die soms wel en soms geen spoor nalaten, en waarvan nog niemand weet waarom",
-   "aantal": 0,
+   "aantal": null,
    "waarom": "het hangt ergens van af -- geslaagd of geweigerd, welke rol, welke invoer. Dan is \"laat een spoor na\" geen eigenschap van de route.",
    "sluit": "uitzoeken WAARVAN het afhangt. Per route na te lopen met het journaal erbij; echte achterstand, geen ontbrekend gereedschap. De veertien van de vorige ronde zijn zo nagelopen: drie bleken een echt defect (auth/login, supplier/login, office/verify) en zijn gerepareerd, elf hadden een reden en staan nu onder audit-verklaard."
   },
@@ -90,7 +90,7 @@
    "id": "audit-verklaard",
    "soort": "grens",
    "wat": "routes die wisselen, en waarvan met de hand is opgeschreven waarvan het afhangt",
-   "aantal": 11,
+   "aantal": null,
    "waarom": "de kaart in scripts/auditproef.js zegt per route wat het verschil maakt. Er loopt een regel doorheen: een journaal schrijft GEBEURTENISSEN op en geen aanroepen. Een knop die niets omzette, een ronde die niets boekte, een wachtrij die leeg was -- dan is er niets gebeurd, en een regel die zegt van wel maakt het boek juist minder waard.",
    "sluit": "niets, en daarom is dit een GRENS en geen achterstand: voor deze routes is \"laat hij altijd een spoor na\" de verkeerde vraag, want het juiste antwoord is nee. De post is wel begrensd gehouden: verklaard telt NOOIT als bewijs (de bewijsmatrix zet er ongemeten neer, niet bewezen), de kaart raakt \"geen spoor\" niet aan, en een verklaring die nergens meer op slaat wordt gemeld. Deze post staat er dus om zichtbaar te blijven, niet om weggewerkt te worden."
   },
@@ -122,7 +122,7 @@
    "id": "wegwerpserver-kopieen",
    "soort": "meetwerk",
    "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
-   "aantal": 0,
+   "aantal": 4,
    "waarom": "scripts/lib/wegwerpserver.js bestaat sinds de meetronde, maar de bestaande instrumenten zijn er nog niet op omgezet. Verandert er iets aan hoe je hier een server start, dan verandert dat op tien plekken of -- waarschijnlijker -- op een.",
    "sluit": "GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
   }
@@ -139,6 +139,12 @@
    "van": 691,
    "naar": 988,
    "reden": "De waarom-ronde liep tot nu toe halverwege zonder sessie: scripts/waarom.js loopt langs alle schrijfroutes en dus ook langs /api/logout, en vanaf dat punt kreeg elke member-route een 401. Die routes werden ingedeeld als geen-sessie -- een uitspraak over de proef en niet over de route. Met de sessiewacht erin (scripts/lib/sessiewacht.js) zakt geen-sessie van 687 naar 19, en de 668 die vrijkomen verdelen zich over de echte redenen: 297 naar object-ontbreekt, 191 naar bereikt, 117 naar veld-ontbreekt, 47 naar rol-te-laag, 10 naar niet-van-jou en 6 naar conflict. Geen enkele route ging de andere kant op (eraf: 0). De achterstand groeit dus van 691 naar 988 omdat er 297 routes ZICHTBAAR werden die er al waren, niet omdat er iets kapot is: bereikt ging tegelijk van 880 naar 1071 en de objectpool oogstte 1073 velden in plaats van 943."
+  },
+  {
+   "op": "2026-08-21",
+   "van": 985,
+   "naar": 989,
+   "reden": "De samenvoeging van 24 takken. De groei zit volledig in object-vooraf: nieuwe routes die een BESTAAND object willen bedienen dat de proef zelf niet heeft aangemaakt. Geen enkele post wisselde van soort en geen bestaande meting ging verloren -- het huis werd groter en deze teller telt routes. Sluiten doe je met een aanmaakstap per nieuw domein in de proef."
   }
  ]
 }

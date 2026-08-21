@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 /* Waar de browser NIET op de plek staat die het pakket verwacht (een
@@ -92,24 +92,24 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
 
     // 2. halve veeg naar links -> de rechterlade blijft open staan, niets gebeurt
     await veeg(page, doos, -140, true);
-    await page.waitForTimeout(350);
+    await wachtOpRust(page);
     assert.deepEqual(await laden(page), { kant: 'rechts', gereed: false, acties: ['Openen', 'Delen'] },
       'een halve veeg naar links hoort de rechterlade te openen zonder iets uit te voeren');
 
     // 3. een tik op een actie sluit de lade en opent de regel NIET
     await page.locator('#werkdag .gb-lade .gb-doe').nth(1).click();
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     assert.match(page.url(), /kantoor\.html/,
       'een tik in de lade mag niet doorlekken naar de link waar de regel zelf op zit');
     assert.equal(await laden(page), null, 'na een tik hoort de lade opgeruimd te zijn');
 
     // 4. de andere kant draagt andere acties -- dat is de hele afspraak
     await veeg(page, doos, 140, true);
-    await page.waitForTimeout(350);
+    await wachtOpRust(page);
     assert.deepEqual((await laden(page)).acties, ['Kenmerk', 'Overnemen'],
       'een veeg naar rechts hoort de ANDERE lade te openen');
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
 
     // 5. doorvegen: eerst zichtbaar gereed, dan uitgevoerd, dan een melding
     const drempel = Math.max(168 + 52, doos.width * 0.55) + 70;
@@ -117,7 +117,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     assert.equal((await laden(page)).gereed, true,
       'voorbij de drempel hoort de lade te laten ZIEN dat loslaten iets doet');
     await page.mouse.up();
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     assert.equal(await page.evaluate(() => window.__plak), 'doc86af40638634',
       'doorvegen naar rechts hoort het kenmerk van die regel over te nemen');
     assert.match(await page.locator('.gb-terug').textContent(), /doc86af40638634/,
@@ -127,7 +127,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     // 6. zonder hand: pijltoets opent dezelfde acties met ECHTE knoppen
     await page.evaluate(() => document.querySelector('#werkdag .reis').focus());
     await page.keyboard.press('ArrowLeft');
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     const lade = await page.evaluate(() => {
       const dl = document.querySelector('dialog.gb-blad');
       return dl ? { open: dl.open, knoppen: [...dl.querySelectorAll('menu button')].map((b) => b.textContent.trim()) } : null;
@@ -135,7 +135,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     assert.deepEqual(lade, { open: true, knoppen: ['Openen', 'Delen'] },
       'pijl links hoort dezelfde acties te openen als de veeg naar links, maar dan als knoppen');
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(250);
+    await wachtOpRust(page);
     assert.match(await page.evaluate(() => document.activeElement.className), /gb-rij/,
       'na de actielade hoort de focus terug te vallen op de regel waar hij vandaan kwam');
 
@@ -187,11 +187,11 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
 
     // 1. doorvegen naar links voert af EN biedt de weg terug aan
     await veeg(page, doos, -(doos.width * 0.55 + 90), true);
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     assert.deepEqual(await page.evaluate(() => window.__log), ['afgerond'],
       'doorvegen hoort de eerste actie van die kant uit te voeren');
     await page.locator('.gb-terug button').click();
-    await page.waitForTimeout(250);
+    await wachtOpRust(page);
     assert.deepEqual(await page.evaluate(() => window.__log), ['afgerond', 'teruggedraaid'],
       'wat een actie teruggeeft, hoort de knop Terugdraaien te zijn');
 
@@ -201,24 +201,24 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
     assert.equal(await page.evaluate(() => document.querySelector('.gb-lade').hasAttribute('data-gereed')), false,
       'een lade met een borg-actie vooraan hoort NOOIT gereed te worden gemeld');
     await page.mouse.up();
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     assert.deepEqual(await page.evaluate(() => window.__log), [],
       'doorvegen mag een onomkeerbare actie niet uitvoeren -- daar is borg voor');
 
     // 3. hij gebeurt wel, maar pas na twee drukken op de echte knop
     await page.evaluate(() => document.querySelector('.proefrij').focus());
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     const knop = page.locator('.gb-blad menu button').first();
     assert.match(await knop.textContent(), /houd vast/,
       'een borg-actie hoort in de actielade te zeggen dat je hem vasthoudt');
     await knop.press('Enter');
-    await page.waitForTimeout(200);
+    await wachtOpRust(page);
     assert.deepEqual(await page.evaluate(() => window.__log), [],
       'de eerste druk zet hem op scherp en voert nog niets uit');
     assert.ok(await knop.getAttribute('data-scherp') !== null, 'op scherp hoort zichtbaar te zijn');
     await knop.press('Enter');
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     assert.deepEqual(await page.evaluate(() => window.__log), ['verwijderd'],
       'de tweede druk voert hem uit');
 
@@ -307,7 +307,7 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
        Na loslaten staat de lade op zijn eigen maat, en dat is de maat die een
        lid ziet. */
     await veeg(page, doos, -150, true);
-    await page.waitForTimeout(420);
+    await wachtOpRust(page);
 
     const meting = await page.evaluate(() => {
       const r = document.getElementById('proefregel');

@@ -44,7 +44,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -125,7 +125,7 @@ test('het platformregister zegt van elk ding wat het is, wat het doet, of het aa
          Verdwijnt hij, dan leest "ongemeten" als een oordeel over de app. */
       await page.selectOption('#staat', 'ongemeten');
       await page.click('#zoeken');
-      await page.waitForTimeout(800);
+      await wachtOpRust(page);
       const aantal = await page.$$eval('.ding', els => els.length);
       if (!aantal) return t.diagnostic('geen enkel ding staat op ongemeten; niets te controleren');
       await page.click('.ding');
@@ -149,7 +149,14 @@ test('het platformregister zegt van elk ding wat het is, wat het doet, of het aa
         const kaartTekst = await page.evaluate(async () => {
           const el = document.querySelector('.ding');
           if (el) el.click();
-          await new Promise(r => setTimeout(r, 300));
+          /* Wachten tot de kaart iets ZEGT, niet tot er 300 ms om zijn. Een
+             sleep binnen een evaluate telt net zo hard als een sleep erbuiten:
+             de toets wacht er wel degelijk op. Deze poll is begrensd, dus een
+             kaart die leeg blijft levert een lege tekst en geen hangende toets. */
+          const lijf = () => document.querySelector('#kLijf');
+          for (let i = 0; i < 60 && !(lijf() && lijf().innerText.trim()); i++) {
+            await new Promise(r => requestAnimationFrame(r));
+          }
           const t = document.querySelector('#kLijf').innerText;
           document.querySelector('#kaart').close();
           return t;
@@ -159,7 +166,7 @@ test('het platformregister zegt van elk ding wat het is, wat het doet, of het aa
         return t.diagnostic('WAAROM.json ontbreekt; alleen het zwijgen is gecontroleerd');
       }
       await page.click('#wis');
-      await page.waitForTimeout(800);
+      await wachtOpRust(page);
       let gezien = 0;
       const n = await page.$$eval('.ding', els => els.length);
       for (let i = 0; i < Math.min(n, 12) && !gezien; i++) {
@@ -185,12 +192,12 @@ test('het platformregister zegt van elk ding wat het is, wat het doet, of het aa
 
     await t.test('een filter verandert de telling, anders suggereert het dat je hebt gekeken', async () => {
       await page.click('#wis');
-      await page.waitForTimeout(800);
+      await wachtOpRust(page);
       const alles = await page.$eval('#filteruitleg', el => el.textContent);
       await page.selectOption('#staat', 'gezakt').catch(() => {});
       await page.fill('#zoek', 'bank');
       await page.click('#zoeken');
-      await page.waitForTimeout(800);
+      await wachtOpRust(page);
       const gefilterd = await page.$eval('#filteruitleg', el => el.textContent);
       assert.notStrictEqual(alles, gefilterd, 'het filter verandert niets: "' + alles + '"');
       assert.match(gefilterd, /van \d/, 'de uitleg zegt hoeveel van hoeveel: ' + gefilterd);
@@ -245,7 +252,7 @@ test('het routedossier opent een route en toont zijn assen',
     await t.test('zoeken op een pad levert alleen dat pad op', async () => {
       await page.fill('#zoek', '/api/health');
       await page.click('#zoeken');
-      await page.waitForTimeout(800);
+      await wachtOpRust(page);
       const uitleg = await page.$eval('#filteruitleg', el => el.textContent);
       assert.match(uitleg, /van [\d.]+/, 'de uitleg zegt hoeveel van hoeveel: ' + uitleg);
       const paden = await page.$$eval('#lijst > *', els => els.slice(0, 10).map(el => el.innerText));

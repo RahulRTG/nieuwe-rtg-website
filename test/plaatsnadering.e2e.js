@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
+const { browserOpties, geenBrowser, letOpFouten, startServer, stop, wachtOpNetstilte, wachtOpRust } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -114,7 +114,7 @@ test('plaats: het toestel meldt de aankomst zelf, en de pass blijft zonder GPS',
     assert.ok(await page.locator('[data-pulse="in-de-buurt"]').count(),
       'de handknop blijft bestaan; dit vervangt hem niet, het scheelt alleen het handwerk');
 
-    await page.waitForTimeout(500);
+    await wachtOpRust(page);
     assert.equal(verstuurd.filter(r => /\/pulse|\/waarneem/.test(r.url)).length, 0,
       'voor de tik is er niets gedeeld en niets waargenomen');
 
@@ -233,7 +233,11 @@ test('plaats: langs een ANDERE zaak lopen geeft geen aankomstpuls',
     assert.ok(stand.waarnemingen.some(w => w.hek === elders.id && w.wat === 'binnen'),
       'het toestel heeft de andere zaak wel degelijk als binnen gezien');
 
-    await new Promise(r => setTimeout(r, 1200));
+    /* Hier wordt een NEGATIEF bewezen: de zaak van de pass hoort niets te
+       hebben gehoord. Dat wordt niet waar door 1200 ms te wachten -- het wordt
+       toetsbaar zodra de pagina is uitgepraat, want dan is alles wat zij nog
+       ging melden ook gemeld. */
+    await wachtOpNetstilte(page);
     const pas = await api(base, '/api/arrival/pass', { pass: vraag.pass.accessToken });
     assert.equal(pas.pass.pulse, 'nog-niet-onderweg',
       'maar de zaak van de pass heeft niets gehoord: langslopen is geen aankomst');

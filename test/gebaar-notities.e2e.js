@@ -18,7 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
@@ -136,7 +136,7 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
     assert.match(await knop.textContent(), /houd vast/,
       'weggooien kan niet terug, dus hoort hij te zeggen dat je hem vasthoudt');
     await knop.press('Enter');
-    await page.waitForTimeout(300);
+    await wachtOpRust(page);
     assert.ok(await knop.getAttribute('data-scherp') !== null, 'de eerste druk zet hem op scherp');
     assert.ok(await staatVan(titel2), 'de eerste druk mag de notitie nog niet hebben weggegooid');
     assert.equal((await staatVan(titel2)).vast, false,

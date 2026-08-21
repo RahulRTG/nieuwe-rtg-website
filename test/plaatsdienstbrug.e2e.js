@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -109,7 +109,7 @@ test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets
     assert.match(tekst, /niet waar je bent geweest/,
       'en het zegt wat er NIET gebeurt, vóórdat iemand ja zegt');
 
-    await page.waitForTimeout(600);
+    await wachtOpRust(page);
     const voor = await api(base, '/api/plaats/stand', {}, reg.token);
     assert.equal(voor.vensters.length, 0, 'zonder tik ligt er geen toestemming');
     /* En de plaatslaag heeft niets waargenomen. Bewust NIET gemeten op
@@ -143,7 +143,7 @@ test('plaats: een lopende dienst wordt aangeboden, en pas na de tik gaat er iets
        concreetst. */
     await api(base, '/api/staff/clock', {}, werker);                   // uit, en zo laten
     await page.evaluate(() => window.RTGPlaatsDienst.ronde());
-    await page.waitForTimeout(800);
+    await wachtOpRust(page);
     const eind = await api(base, '/api/plaats/stand', {}, reg.token);
     assert.equal(eind.vensters.length, 0, 'het venster is dicht');
     assert.equal(eind.waarnemingen.length, 0, 'en er ligt geen waarneming meer');

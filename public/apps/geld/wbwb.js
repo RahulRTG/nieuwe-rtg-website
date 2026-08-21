@@ -174,7 +174,7 @@
               '<button class="knop hoofd" id="wbVerreken" type="button">Verreken mijn deel</button>' +
               '<button class="knop" id="wbVerzoek" type="button">Stuur betaalverzoeken</button>' +
             '</div>' +
-            '<p class="stil" style="margin-top:.5rem;">Geld beweegt alleen door uw eigen tik: u betaalt uw ' +
+            '<p class="stil h-mt50">Geld beweegt alleen door uw eigen tik: u betaalt uw ' +
               'eigen deel, of u stuurt de anderen een net betaalverzoek. Niemand kan bij andermans wallet.</p>' +
           '</div>' +
           '<h2>Nieuwe uitgave</h2>' +

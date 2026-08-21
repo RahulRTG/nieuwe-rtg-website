@@ -41,7 +41,7 @@
         '<td>' + w.perNiveau.auto + '</td><td>' + w.handUren + '</td><td>' + w.automatiseringsgraad + '%</td></tr>';
     }
     if (!b.werkstromen.length) u += '<tr><td colspan="7" class="meta">Er is in deze periode nog niets genoteerd.</td></tr>';
-    u += '</tbody></table></div><p class="meta" style="margin-top:.7rem;">' + esc(b.onzeker) + '</p></div>';
+    u += '</tbody></table></div><p class="meta h-mt70">' + esc(b.onzeker) + '</p></div>';
 
     if (b.kandidaten.length) {
       u += '<div class="kaart"><h3>Kandidaten voor de volgende ronde</h3>';
@@ -80,7 +80,7 @@
       (d.keten.heel
         ? 'Heel: ' + d.keten.regels + ' regels in het venster sluiten op elkaar aan. In totaal zijn er ' + d.aantal + ' regels genoteerd.'
         : 'BREUK bij regel ' + esc(d.keten.bij) + ': ' + esc(d.keten.waarom)) +
-      '</p><p class="meta" style="margin-top:.4rem;">Dit bewijst dat de regels in het venster onderling kloppen. ' +
+      '</p><p class="meta h-mt40">Dit bewijst dat de regels in het venster onderling kloppen. ' +
       'Het bewijst niet dat er niets vóór het venster is verdwenen -- daarvoor telt het totaal onafhankelijk mee.</p></div>';
     u += '<div class="kaart"><div class="schuif"><table class="ctab"><thead><tr><th>Wanneer</th><th>Wie</th><th>Wat</th>' +
       '<th>Niveau</th><th>Object</th><th>Voor → na</th><th>Reden</th></tr></thead><tbody>';

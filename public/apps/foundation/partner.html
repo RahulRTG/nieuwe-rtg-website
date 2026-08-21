@@ -72,12 +72,12 @@ async function laad(){
   const uitslagen = (d.uitslagen || []).map(u =>
     '<div class="item"><b>' + esc(u.titel) + '</b> · ' + esc(u.fase) + ' · ' + (u.voorWie === 'samen' ? 'RTG en RTF samen' : 'RTFoundation') +
     (u.bevindingen || []).map(bv => '<div class="kpi">· ' + esc(bv.titel || bv.tekst || '') + (bv.titel && bv.tekst ? ' -- ' + esc(bv.tekst) : '') + '</div>').join('') +
-    '<div style="margin-top:.3rem;"><button class="knop stil" data-voorstel="' + esc(u.id) + '">Voorstel doen</button></div></div>').join('')
+    '<div class="h-mt30"><button class="knop stil" data-voorstel="' + esc(u.id) + '">Voorstel doen</button></div></div>').join('')
     || '<div class="leeg">Er liggen nog geen uitslagen op de raadstafel.</div>';
   const besluiten = (d.besluiten || []).map(b => {
     const stemmen = b.stemmen.map(s => (s.voor ? '✓ ' : '✕ ') + esc(s.wie) + ' (' + s.kant + ')').join(' · ') || 'nog geen stemmen';
     const knoppen = b.status === 'open'
-      ? '<div class="rij" style="margin-top:.3rem;"><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="1">Voor</button><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="0">Tegen</button><button class="knop stil" data-sluit="' + esc(b.id) + '">Sluit besluit</button></div>'
+      ? '<div class="rij h-mt30"><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="1">Voor</button><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="0">Tegen</button><button class="knop stil" data-sluit="' + esc(b.id) + '">Sluit besluit</button></div>'
       : '';
     return '<div class="item"><b>' + esc(b.titel) + '</b> -- ' + esc(b.voorstel) +
       '<div class="kpi">door ' + esc(b.door) + ' · status: <b>' + esc(b.status) + '</b>' + (b.uitslag ? ' (' + esc(b.uitslag) + ')' : '') + '</div>' +
@@ -86,7 +86,7 @@ async function laad(){
   $('#raad').hidden = false;
   $('#raad').innerHTML =
     '<div class="kaart"><div class="sec">Aan tafel</div><b>' + esc(d.partner.naam) + '</b> · ' + esc(d.partner.soort) + ' · stadspartner van ' + esc(d.partner.stad) +
-    '<div class="noot" style="margin-top:.4rem;">Een besluit valt pas als beide kanten gestemd hebben: uw stem namens de stad en die van het RTG-personeel. Het besloten RTG-bedrijfswerk staat nooit op deze tafel.</div></div>' +
+    '<div class="noot h-mt40">Een besluit valt pas als beide kanten gestemd hebben: uw stem namens de stad en die van het RTG-personeel. Het besloten RTG-bedrijfswerk staat nooit op deze tafel.</div></div>' +
     '<div class="kaart"><div class="sec">Lab-uitslagen op de raadstafel</div>' + uitslagen + '</div>' +
     '<div class="kaart"><div class="sec">Besluiten</div>' + besluiten + '</div>' +
     // rtgdeel-vast: uitloggen hoort bij geen enkel deel en blijft altijd staan

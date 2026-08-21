@@ -19,6 +19,7 @@ const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\
    staan; voor deze keuringen is dat genoeg. Staat in scripts/lib/bron.js omdat
    scripts/keuring.js hem ook gebruikt. */
 const { zonderCommentaar } = require('./lib/bron');
+const { paginaDraagt } = require('./lib/hulpcss');
 
 function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
@@ -359,7 +360,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/apps/app-main/app-main-52.js', 'een HTML-opbouw in een string, in een keer'],
     ['public/apps/personeel/personeel-17.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/apps/backoffice/backoffice-03.js', 'een opbouwfunctie zonder binnengrens'],
-    ['public/shared/flagship/flagship-02.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
@@ -407,15 +407,14 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
-    /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
-       ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
-       (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
-       stuk, er zit een duidelijke naad tussen de diagnose (reden/NAMEN/vraag) en
-       de zichtbare melding. Opknippen is wel echte bedrading: 21 pagina's laden
-       nu een module en een blad, en keuringsregel 38 rekent dat na, dus er komt
-       een tweede script bij dat overal mee moet. Dat doe je een voor een met de
-       toetsen ernaast en niet in de staart van een ronde. */
-    'public/shared/media.js',
+    /* public/shared/media.js STOND HIER en is er weer af, en de reden waarom hij
+       bleef staan bleek geen reden. Er stond: opknippen kost 26 pagina's een
+       TWEEDE script, voor een module wiens hele werk is om te WERKEN als er iets
+       stuk is. Dat klopt voor een gewone snede -- maar niet voor een BUNDEL. Dit
+       huis serveert er al vijftig als een bestand en bewerkt ze als delen
+       (scripts/bundel.js), dus de deur is nu shared/media/media-01.js (de
+       diagnose en de teksten) en -02.js (de melding en de vraag), byte voor byte
+       samen het origineel. Geen pagina verandert. */
     /* server/kern/eenaccount.js en public/apps/app-main/app-main-25.js STONDEN
        HIER en zijn er weer af: de naden die erbij benoemd stonden, zijn geknipt.
        De sleutelbos en het MUNTEN van een sessie staan nu apart
@@ -428,73 +427,46 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        Zo hoort deze lijst te krimpen: niet door de grens te verzetten. */
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
-    'server/kern/journalistiek.js',
-    'server/kern/pay/index.js',
-    /* RTMAIL bevat de bestaande mailboxroutes plus de nieuwe Smart Action Dock.
-       De workflowroutes krijgen in een volgende onderhoudssnede een eigen
-       router; tot die veilige bedrading blijft dit een zichtbare waarschuwing. */
-    'server/routes/rtmail.js',
-    'server/kern/werkplaats.js',
-    'server/lokaal-tls.js',
-    'server/techniek.js',
-    'server/trio.js',
+    /* server/kern/pay/index.js STOND HIER en is er weer af. Twee onderwerpen
+       eruit: de stand van de laag (de drie schakelaars uit de omgeving en de
+       zes bedragen, ./stand.js) en alles wat eruit komt zonder dat er geld
+       beweegt (./kijken.js). pasToe, boek en boekAsync bleven met opzet staan:
+       WETTEN.json handhaaft de wet geld-conservatie in dit bestand en wijst met
+       zijn sabotagerecept EEN REGEL uit pasToe() aan, met bestandsnaam erbij. */
+    /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
+       De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
+       comm-deuren, auth, vergeten), de zes van de werkplaats-ronde
+       (journalistiek, rtmail, werkplaats, lokaal-tls, techniek, trio) en het
+       eerste deel van de app-gids: allemaal geknipt in een eerdere ronde,
+       allemaal onder de grens, en allemaal nog op de lijst.
 
-    /* DE COMMUNICATIEKERN EN WAT ERAAN VASTZIT. Deze zeven kwamen erbij toen de
-       zes losse berichtenvoorraden naar een kern verhuisden, en ze staan hier
-       met een reden per stuk -- niet als groep, want dan is het geen lijst maar
-       een uitzondering met zeven namen.
+       De maten die erbij stonden waren daardoor onwaar geworden -- er stond
+       "15,1 KB" bij een bestand van 9,1. En erger: zolang de regel er staat mag
+       datzelfde bestand ongemerkt weer over de grens groeien, want de
+       uitzondering geldt nog.
 
-       Er is al geknipt waar de naad echt zat: kern/comm/index.js ging van 25,7
-       naar 15,1 KB (./tonen.js en ./deelnemer.js), kern/comm/gast.js van 15,5
-       naar 9,4 (./gast-verhuizing.js en ./gast-lijsten.js), kern/ledenbalie.js
-       van 13,7 naar 9,2 (-dossier en -klachten). Wat hieronder staat is wat er
-       DAARNA nog over de grens ligt. */
+       Regel 13 rekent dat nu na: een NOG-regel waarvan het bestand al onder de
+       grens zit, is een harde fout. Zo kan deze lijst alleen nog krimpen door
+       werk, en niet groeien door vergeetachtigheid. */
 
-    // 15,1 KB, waarvan 3,6 KB architectuurkop -- die legt de hele kern uit en
-    // hoort bij de ingang. De volgende snede is bericht() + het sein eruit;
-    // dat is echte bedrading (elke module schrijft via bericht) en hoort een
-    // eigen ronde met de toetsen ernaast.
-    'server/kern/comm/index.js',
-    // 10,4 KB: het actormodel is EEN tabel (lid/zaak/mens/gezin/kantoor) met de
-    // wissels die eruit volgen (naam, sein, voornaam). Knippen zou de vorm van
-    // een sleutel scheiden van wat je ermee mag -- precies wat hier bij elkaar
-    // hoort, want dat is de poort. Kandidaat voor MAG, niet voor een snede.
-    'server/kern/comm/wie.js',
-    // 10,2 en 11,1 KB: de twee deuren naar de kern (lid en zaak). Ze delen hun
-    // vorm; de snede die er hoort is een gedeelde routelaag voor allebei, en
-    // dat is een verbouwing van twee bestanden tegelijk.
-    'server/routes/member/comm.js',
-    'server/routes/supplier/comm.js',
-    // 10,1 KB: de auth-routes groeiden met startHerstel(), dat de ledenbalie
-    // hergebruikt. De herstelstroom staat al apart (routes/auth/herstel.js);
-    // wat hier over is, is de bedrading eromheen.
-    'server/routes/auth.js',
-    // 10,3 KB: de vergetelheid raakt elke voorraad, en sinds de verhuizing ook
-    // de vier oude berichtenstapels. Elke regel is een andere plek in de
-    // database; ze uit elkaar halen maakt "wat wordt er gewist" moeilijker na
-    // te lopen, en dat is juist de vraag die dit bestand moet beantwoorden.
-    'server/kern/vergeten.js',
-    // 10,7 KB: de postbus. Ging over de grens toen de outbox een teller kreeg
-    // (twee mails in dezelfde milliseconde overschreven elkaar). De naad zit
-    // tussen het opstellen en het afleveren.
-    'server/mail.js',
-    /* 11,4 en 10,7 KB: allebei stonden ze tientallen bytes onder de grens en
-       gingen ze erover door een gemeten oorzaak uit de beproevingsladder. De
-       crashproef (kill -9 onder schrijflast) vond een dubbele boeking doordat
-       geld en idem-sleutel in twee losse commits landden -- de save-bundel
-       (bijeen) hoort naast de save() die hij bewaakt. En de 1M-ronde vond een
-       404 op een bestaand lid doordat een koude cache als feit werd gelezen --
-       de wachtende lezing hoort naast de lader die hij hergebruikt. De snedes
-       die er wel zijn (bijeen naar een eigen module; het zoek-deel van de
-       ledengids apart) zijn echte bedrading en staan in TAKEN.md. */
-    'server/db/index.js',
-    'server/db/ledengids.js',
-    /* 11,3 KB: dezelfde crashproef-ronde. De rijstrook-sleutels (geld + idem)
-       gingen elk in een eigen transactie en een kill -9 tussen die twee commits
-       boekte dubbel; nu schrijft de rijstrook als EEN transactie. De snede
-       bestaat (schrijfEen + de twee schrijflanen naar een eigen deel) en staat
-       in TAKEN.md 4.23. */
-    'server/pg/sync.js',
+    /* server/mail.js STOND HIER en is er weer af: de naad die er met naam bij
+       stond -- "tussen het opstellen en het afleveren" -- is geknipt, en er
+       bleken er drie te zitten. Het opstellen van het bericht (RFC-koppen,
+       codering, DKIM) staat in mail-opstellen.js, de SMS-kant met de
+       sandbox-zekering in mail-lokaal.js, en het vangnet met zijn pad in
+       mail-outbox.js. Wat overblijft is de keuze tussen de drie standen. */
+    /* server/db/index.js en server/db/ledengids.js STONDEN HIER en zijn er weer
+       af: de twee snedes die er met naam bij stonden, zijn gemaakt. Het
+       zoek-deel van de ledengids staat in db/ledengids-zoek.js, en db/index.js
+       is langs vier naden geknipt -- ./starten.js, ./bijeen.js (de save-bundel
+       naast de save() die hij bewaakt, precies zoals het hier stond),
+       ./duurzaam.js en ./afsluiten.js. Van 23911 naar 9260 byte. */
+    /* server/pg/sync.js STOND HIER en is er weer af: de snede die er met naam
+       bij stond -- "schrijfEen + de twee schrijflanen naar een eigen deel" --
+       is gemaakt. Het slot, de merge, het versienummer, de NOTIFY en de twee
+       lanen wonen nu in server/pg/schrijflanen.js; wat in sync.js overblijft is
+       het beleid (wat gaat mee, in welke volgorde). Zo hoort deze lijst te
+       krimpen: niet door de grens te verzetten. */
     // De geïmporteerde enterprise-motoren hebben benoemde sneden, maar hun
     // opslag- en migratiebedrading wordt pas na deze release afzonderlijk
     // geknipt met de integratietoetsen ernaast.
@@ -502,11 +474,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/kern/magnaat-controle.js',
     'server/kern/magnaat-economie.js',
     'server/kern/magnaatwereld.js'
-    ,
-    // De app-gids is een declaratieve kaart. De nieuwe enterprise-ingangen
-    // brachten dit deel net over de grens; bij de volgende gidsronde verhuizen
-    // ze als één groep naar deel1b.
-    'server/kern/appgids-data/deel1.js'
   ]);
   let teGroot = 0, uitz = 0, nog = [];
   for (const map of ['server', 'public']) {
@@ -525,7 +492,37 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
   if (nog.length) {
     console.log('  ! nog op te knippen (' + nog.length + '): ' + nog.join(', '));
   }
-  if (!teGroot) ok('geen onverwacht groot productbestand (' + uitz + ' benoemde uitzonderingen, ' + nog.length + ' op de lijst)');
+  /* EEN LIJST DIE NIETS MEER BEWAAKT, LEEST ALS DEKKING DIE ER NIET IS.
+     Dezelfde controle als bij regel 47, en om dezelfde reden. Twee vormen:
+
+     SPOKEN -- een regel die een bestand noemt dat niet meer bestaat. Die
+     beschermt niets en houdt de reden erbij levend alsof hij ergens over gaat.
+     Er stond er een: public/shared/flagship/flagship-02.js.
+
+     AFGERONDE REGELS in NOG -- NOG betekent "moet nog geknipt worden". Staat het
+     bestand inmiddels onder de grens, dan is dat werk KLAAR en hoort de regel
+     eruit. Doe je dat niet, dan mag datzelfde bestand ongemerkt weer over de
+     grens groeien: de uitzondering staat er nog. Precies het gat waar een lijst
+     die alleen maar aangroeit voor bedoeld is.
+
+     MAG is met opzet NIET zo streng. Dat is een BESLUIT ("dit bestand mag groot
+     zijn, en waarom"), geen taak. Een besluit dat vandaag niet bijt, hoort te
+     blijven staan met zijn redenering -- anders moet die opnieuw worden gevoerd
+     zodra het bestand weer groeit. Wel telt het spookbestand ook daar. */
+  const bestaat = (r) => fs.existsSync(path.join(ROOT, r));
+  const spoken = [...MAG.keys(), ...NOG].filter(r => !bestaat(r));
+  const afgerond = [...NOG].filter(r => bestaat(r) && fs.statSync(path.join(ROOT, r)).size <= MAX);
+  if (spoken.length) {
+    fout('de lijst noemt bestanden die niet meer bestaan: ' + spoken.join(', ') +
+      ' -- haal ze eruit, anders belooft de lijst dekking die er niet is');
+  }
+  if (afgerond.length) {
+    fout('deze staan in NOG maar zijn al onder de grens: ' + afgerond.join(', ') +
+      ' -- haal ze van de lijst, anders mogen ze ongemerkt weer overheen groeien');
+  }
+  if (!teGroot && !spoken.length && !afgerond.length) {
+    ok('geen onverwacht groot productbestand (' + uitz + ' benoemde uitzonderingen, ' + nog.length + ' op de lijst)');
+  }
 }
 
 
@@ -2229,6 +2226,7 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
     ['routes/techniek/beheer.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
     ['routes/techniek/functie.js', 'techniek/eigenaar-gereedschap, geen lid-gesprek'],
     ['translate.js', 'vertaalmachine, geen gesprek'],
+    ['translate/batch-model.js', 'JSON-lijstvertaler voor aantoonbare UI-brontekst, geen gesprek'],
   ]);
   const sites = scan(ROOT);
   const buiten = new Set(sites.filter(s => !s.draagtRegel).map(s => s.bestand));
@@ -2456,7 +2454,12 @@ console.log('\n37) elke pagina die een hulpklasse gebruikt, laadt ook rtg-hulpkl
         }
         if (!gebruikt) continue;
         met++;
-        if (!s.includes('rtg-hulpklassen.css')) {
+        /* Niet `s.includes(...)`: sinds het stijlblad via @import in rtg-ui.css
+           hangt, staat de naam op geen van de 231 pagina's die hem wel laden.
+           Die keten volgt ./lib/hulpcss.js, uit dezelfde bron als
+           scripts/hulpklassen-omzet.js -- twee kopieen zouden uiteenlopen en
+           dan ruilt de een iets in wat de ander afkeurt (regel 4). */
+        if (!paginaDraagt(s, p, PUB)) {
           mis++;
           fout(web(p) + ' gebruikt een hulpklasse maar laadt rtg-hulpklassen.css niet');
         }
@@ -2510,7 +2513,15 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
     const bronnen = [];
     loop(PUB, /\.(js|html)$/, f => {
       const p = web(f);
-      if (p.startsWith('/dist/') || p === '/shared/media.js') return;
+      /* De deur zelf telt niet als overtreder -- en dat is sinds hij een BUNDEL
+         is niet meer een pad maar twee. shared/media.js ging over de 10 kB en is
+         opgeknipt in shared/media/media-01.js (de diagnose en de teksten) en
+         -02.js (de melding en de vraag). Voor de browser is dat nog steeds EEN
+         bestand; voor deze regel waren het er ineens twee, en die tweede kwam
+         als overtreder binnen omdat de enige echte getUserMedia-aanroep van dit
+         huis daarin staat. Wat de deur is, is de MODULE -- niet het aantal
+         bestanden waarin hij bewaard wordt. */
+      if (p.startsWith('/dist/') || p === '/shared/media.js' || p.startsWith('/shared/media/')) return;
       bronnen.push(f);
     });
 
@@ -3052,12 +3063,13 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
 {
   const TOEGESTAAN = new Map([
-    ['server/db/index.js', 'hier WOONT de primitive, en bijeen() is de enige indirecte weg erheen'],
+    ['server/db/duurzaam.js', 'hier WOONT de primitive sinds db/index.js is opgeknipt'],
+    ['server/db/bijeen.js', 'de bundel met de duurzaam-vlag is de enige indirecte weg erheen'],
+    ['server/db/index.js', 'draagt de vlag van de aanroeper door naar de bundel; kiest zelf niets'],
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
-    ['test/duurzaamheidskosten.test.js', 'de toets op het oordeel van die meting'],
     ['server/lib/verraad.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
@@ -3066,12 +3078,40 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
-    ['server/kern/bestanden-delen.js', 'delen, versies en de prullenbak zijn dezelfde kluis; een lid ziet niet welke knop beschermd is'],
     ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
-     regel alleen zichzelf. */
+     regel alleen zichzelf.
+
+     EN HIJ KIJKT NAAR CODE, NIET NAAR PROZA. Hier stond de rauwe bron, dus een
+     bestand dat saveDuurzaam alleen NOEMT -- in een kop die uitlegt waarom het
+     hier juist niet gebeurt -- kwam als overtreder binnen en moest met een
+     reden op de lijst. Zo'n regel is erger dan geen: hij zet een naam op de
+     lijst van plekken die aan de duurzame commit komen terwijl daar geen enkele
+     aanroep staat, en dan leest de lijst als dekking die er niet is.
+
+     Betrapt bij het knippen van server/db/index.js: drie nieuwe deelbestanden
+     werden gemeld, en een ervan (afsluiten.js) raakt de commit nergens aan --
+     het woord stond in een zin over waar hij NIET hoort. Strings blijven wel
+     staan: server/lib/verraad.js noemt de plek in zijn catalogus als tekst, en
+     dat is een verwijzing die iets doet.
+
+     TWEE REGELS VIELEN DAARMEE VAN DE LIJST, en dat zegt iets over wat deze
+     regel wel en niet ziet. test/duurzaamheidskosten.test.js kwam er alleen op
+     door zijn eigen uitleg; die raakt de commit nergens aan.
+     server/kern/bestanden-delen.js WEL -- maar via een `vastleggen` die
+     server/kern/bestanden.js hem aanreikt, en die naam staat in 111 bestanden
+     van dit huis. Hem aan het bereik toevoegen zou de lijst met honderd namen
+     vullen en daarmee waardeloos maken.
+
+     WAT DEZE REGEL DUS NIET DEKT, en dat hoort hier te staan: een module die de
+     helper KRIJGT AANGEREIKT. Dat is te verdedigen en niet toevallig -- deze
+     regel bewaakt wie BESLUIT om duurzaam te schrijven, en dat besluit valt
+     waar lib/duurzaam wordt gemaakt (bestanden.js, dus op de lijst). Een module
+     die alleen gebruikt wat hij krijgt, kan dat besluit niet nemen. Maar wie
+     vanuit een toegestaan bestand de helper aan een nieuwe module doorgeeft,
+     komt hier ongezien langs. Dat is mensenwerk, geen poort. */
   const BEREIK = /saveDuurzaam|duurzaam\s*:\s*true|lib\/duurzaam/;
   const overtreders = [];
   let gezien = 0;
@@ -3086,7 +3126,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
       if (!naam.endsWith('.js')) continue;
       let bron; try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
       if (bron.includes('\u0000')) continue;
-      if (!BEREIK.test(bron)) continue;
+      if (!BEREIK.test(zonderCommentaar(bron))) continue;
       gezien++;
       const rel = path.relative(ROOT, p).replace(/\\/g, '/');
       if (!TOEGESTAAN.has(rel)) overtreders.push(rel);
@@ -3163,6 +3203,276 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
   } else {
     ok(REGISTERS.length + ' bewijsregisters en ' + BEWIJSSCRIPTS.length + ' bewijsinstrumenten: ' +
       'de go-live-keuring leest er geen, en ze vellen geen go-live-oordeel');
+  }
+}
+
+/* ============================================================================
+   49) ELK MEDIA-ELEMENT DRAAGT EEN BESLUIT OVER ONDERTITELING, MET EEN REDEN
+
+   WAAROM DIT GEEN "ELKE <video> EEN <track>"-POORT IS. Die poort is in vijf
+   minuten geschreven en zou hier meteen twintig keer onterecht afgaan. Van de
+   negenentwintig media-elementen in dit huis is de meerderheid geen INHOUD maar
+   een INSTRUMENT: de camera die een paspoort leest, de QR-scanner van de
+   RTG-code, het oog dat een werkvloer schouwt, het onzichtbare element dat een
+   affiche uit het eerste frame haalt, en je eigen beeld in de hoek van een
+   gesprek. Daar valt niets te ondertitelen -- er is geen geluid en er wordt niets
+   gezegd. Een poort die daar toch een <track> eist levert twintig loze alarmen
+   op, en na drie loze alarmen zet iemand de poort uit. Dat is exact het patroon
+   van de vals-alarmronde in scripts/lib/rolproef.js.
+
+   DUS EEN REGISTER, ZOALS PUBLIEK IN REGEL 28. Elk element staat hieronder bij
+   naam, met een soort en een reden. Komt er een element bij, dan zakt deze regel
+   tot iemand het besluit opschrijft. Dat is het doel: niet dat er overal
+   ondertitels zijn, maar dat over elk element iemand heeft nagedacht, en dat je
+   kunt nalezen wie en waarom.
+
+   HET REGISTER LIEGT DE GATEN NIET WEG. Acht van de negenentwintig staan als
+   OPEN, en dat is de eerlijke stand en geen slordigheid:
+
+     live gesprek (6)    Een <track> kan niet bestaan voor beeld dat nu ontstaat.
+                         Wat een dove deelnemer hier nodig heeft is live tekst
+                         (spraak-naar-tekst tijdens het gesprek), en die bestaat
+                         in dit huis niet. WCAG 1.2.2 gaat hier niet over; 1.2.4
+                         wel, en die is niet gehaald.
+     live uitzending (2) Zelfde verhaal, eenrichting: het Podium en het SOS-beeld
+                         naar het kantoor.
+     opgenomen (0)       Dit waren er drie. Het Theater en de filmspeler van de
+                         Media OS hadden geen veld voor ondertitels in het model;
+                         dat veld is er nu (kern/ondertitels.js, dezelfde bron als
+                         de clip-kant), met een route, een vel waar de maker ze
+                         intypt en een gedeelde band die ze toont. De derde, een
+                         spraakbericht in de teamchat, bleek dood hout: het veld
+                         `m.audio` wordt nergens geschreven. Weggehaald.
+
+   WAT HIJ MACHINAAL NAKIJKT, want een register met alleen woorden erin is een
+   document en geen poort:
+
+     stil    Een spiegel of werktuig MOET stil staan: `muted` in de tag, of
+             `muted = true` in de regels eronder. Zonder die eis schuift zo'n
+             element ongemerkt van "geen geluid" naar "geluid dat niemand
+             ondertitelt", en dan klopt de reden hier niet meer. Dit is de tand
+             met de meeste bijt: hij gaat af op een wijziging van EEN attribuut.
+     anker   Wie "dit is geregeld" zegt, noemt WAAR: een bestand en een naam die
+             daar moet staan. Haalt iemand de ondertitelband uit de clipdeler,
+             dan zakt deze regel -- ook al is aan het scherm zelf niets veranderd.
+     ratel   Het aantal open punten mag alleen omlaag. Wie een twaalfde open
+             element toevoegt, lost eerst een ander op of verhoogt OPEN_MAX met
+             opzet en met een reden.
+
+   DE SLEUTEL IS bestand#id. Elementen zonder id krijgen een rangnummer in dat
+   bestand (#1, #2), en elementen die in JS worden gemaakt een #js1, #js2. Zo'n
+   rangnummer schuift als iemand er een element boven zet, en dan meldt deze regel
+   een onbekend element plus een spookregel. Dat is geen ruis maar het gewenste
+   gedrag: er is iets bijgekomen en er is nog geen besluit over.
+
+   WAT HIJ NIET ZIET, en dat hoort erbij te staan: een element waarvan de
+   tagnaam uit een variabele komt (createElement(soort)). Die vorm komt hier
+   vandaag niet voor; komt hij er ooit, dan glipt hij langs deze regel. De drie
+   vormen die hij WEL ziet zijn de tag in markup of in een string, een
+   createElement met een letterlijke naam, en new Audio().
+
+   GEBUNDELDE BESTANDEN DOEN NIET MEE (public/apps/personeel.js en broers): de
+   bron staat in de losse delen ernaast, en anders staat elk element hier twee
+   keer -- dezelfde afspraak als regel 13 en 19. */
+console.log('\n49) elk media-element draagt een besluit over ondertiteling');
+{
+  /* De soorten. `open` betekent: hier hoort iets en het is er niet. `stil` en
+     `anker` zijn de twee dingen die machinaal na te kijken zijn. */
+  const SOORTEN = {
+    spiegel:     { open: false, stil: true },   // je eigen beeld, zichtbaar, zonder geluid
+    werktuig:    { open: false, stil: true },   // beeld als invoer of rekenmiddel
+    ondertiteld: { open: false, anker: true },  // opgenomen inhoud MET een weg naar tekst
+    gesprek:     { open: true },                // live, tweerichting
+    uitzending:  { open: true },                // live, eenrichting
+    onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
+  };
+  /* De ratel. Gemeten op 17 augustus 2026: eerst 11 open van 30, toen 9 nadat het
+     Theater een ondertitelspoor kreeg (kern/ondertitels.js, gedeeld met de
+     clip-kant), en nu 8 van 29 -- het spraakbericht in de teamchat bleek DOOD
+     HOUT. De speler stond in personeel-23.js achter `m.audio`, en niets in dit
+     huis schrijft dat veld ooit: /api/supplier/team/message neemt alleen `text`
+     aan, en geen enkele aanroeper stuurt iets anders. Het was dus geen
+     ondertitelgat maar een knop voor een functie die niet bestaat, en die is
+     weggehaald in plaats van beschreven. Mag alleen omlaag. */
+  const OPEN_MAX = 8;
+  /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
+     Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
+     shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
+     oude anker (toonOndertitels in clipdeler-01.js) viel weg en twee elementen
+     zakten. Dat is precies waar een anker voor is. */
+  const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
+  const REGISTER = new Map([
+    ['public/apps/app-main/app-main-09a.js#scPinCam', ['werktuig', 'de sociale balk leest een contactpin of een levende code van het scherm van een ander; shared/media.js vraagt bij een camera nooit geluid']],
+    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
+    ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
+    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij']],
+    ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
+    ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
+    ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
+    ['public/apps/clips.html#js2', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
+    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander']],
+    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
+    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander']],
+    ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
+    ['public/apps/foundation/vrienden.html#pinCam', ['werktuig', 'dezelfde pinlezer aan de gezinskant: beeld als invoer om een code te lezen, zonder geluid']],
+    ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
+    ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
+    ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
+    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted']],
+    ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
+    ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
+    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand']],
+    ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
+    ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
+    ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
+    ['public/apps/theater.html#vVoorbeeld', ['spiegel', 'de voorvertoning van je eigen upload, stil, voordat je hem publiceert']],
+    ['public/apps/theater.html#js1', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
+    ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],
+    ['public/shared/scanknop.js#js1', ['werktuig', 'de gedeelde scanknop: hetzelfde leesinstrument, in een eigen venster']],
+    ['public/shared/scanner.js#js1', ['werktuig', 'het reserve-element van de scanner zelf, als de aanroeper er geen meegeeft']],
+    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks']],
+    ['public/shared/teamcall/teamcall-01.js#1', ['spiegel', 'de teamcall van het personeel: je eigen tegel, stil, want je eigen stem terughoren is een echo']],
+    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij']]
+  ]);
+
+  const bundelPaden = new Set(Object.keys(BUNDELLIJST).map(k => 'public/' + k));
+  const gevonden = new Map();
+  loop(path.join(ROOT, 'public'), /\.(html|js)$/, (f) => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (bundelPaden.has(rel)) return;
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    let m, n = 0, jsN = 0;
+    const tag = /<(video|audio)(\s[^>]*)?>/gi;
+    while ((m = tag.exec(bron))) {
+      n++;
+      const id = (String(m[2] || '').match(/\bid=["']?([A-Za-z0-9_-]+)/) || [])[1];
+      gevonden.set(rel + '#' + (id || n), { stil: /\bmuted\b/.test(m[0]) });
+    }
+    /* In JS gemaakte elementen. `muted` staat daar niet in de tag maar in de
+       regels eronder, dus kijken we in een venster van 300 tekens erna. */
+    const inJs = /(?:createElement\(\s*["'](video|audio)["']\s*\)|new\s+Audio\s*\()/g;
+    while ((m = inJs.exec(bron))) {
+      jsN++;
+      const venster = bron.slice(m.index, m.index + 300);
+      gevonden.set(rel + '#js' + jsN, { stil: /\bmuted\b/.test(venster) });
+    }
+  });
+
+  const klachten = [];
+  for (const [sleutel, el] of gevonden) {
+    const post = REGISTER.get(sleutel);
+    if (!post) {
+      klachten.push(sleutel + ' is een media-element zonder besluit -- zet hem in REGISTER met een soort en een reden (check.js regel 49)');
+      continue;
+    }
+    const soort = SOORTEN[post[0]];
+    if (!soort) { klachten.push(sleutel + ' staat als soort "' + post[0] + '", en die soort bestaat niet'); continue; }
+    if (!post[1] || post[1].length < 25) klachten.push(sleutel + ' heeft geen reden die iets zegt');
+    if (soort.stil && !el.stil) {
+      klachten.push(sleutel + ' staat als ' + post[0] + ' (stil) maar is niet meer muted -- of er komt geluid uit, of de reden klopt niet meer');
+    }
+    if (soort.anker) {
+      const [bestand, naam] = post[2] || [];
+      if (!bestand || !naam) klachten.push(sleutel + ' staat als ondertiteld maar noemt niet waar dat geregeld is');
+      else if (!fs.existsSync(path.join(ROOT, bestand))) klachten.push(sleutel + ': het anker ' + bestand + ' bestaat niet meer');
+      else if (!fs.readFileSync(path.join(ROOT, bestand), 'utf8').includes(naam)) {
+        klachten.push(sleutel + ': ' + bestand + ' draagt "' + naam + '" niet meer -- de weg naar tekst is eruit gehaald');
+      }
+    }
+  }
+  /* Een register dat namen bevat die niet meer bestaan, groeit stil vol en leest
+     als dekking die er niet is -- dezelfde controle als bij regel 28 en 47. */
+  for (const sleutel of REGISTER.keys()) {
+    if (!gevonden.has(sleutel)) klachten.push('check.js regel 49: ' + sleutel + ' staat in het register maar bestaat niet (meer) als media-element');
+  }
+
+  const open = [...gevonden.keys()].filter(k => REGISTER.has(k) && (SOORTEN[REGISTER.get(k)[0]] || {}).open);
+  if (open.length > OPEN_MAX) {
+    klachten.push(open.length + ' open media-elementen terwijl OPEN_MAX op ' + OPEN_MAX + ' staat: ' + open.join(', '));
+  }
+
+  if (klachten.length) klachten.forEach(fout);
+  else {
+    const per = {};
+    for (const k of gevonden.keys()) { const s = REGISTER.get(k)[0]; per[s] = (per[s] || 0) + 1; }
+    const noem = (lijst) => lijst.filter(s => per[s]).map(s => per[s] + ' ' + s).join(', ');
+    ok(gevonden.size + ' media-elementen, elk met een besluit en een reden: ' +
+      (gevonden.size - open.length) + ' geregeld (' + noem(['spiegel', 'werktuig', 'ondertiteld']) + '), ' +
+      open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX);
+  }
+}
+
+/* ============================================================================
+   50) geen enkel bestand plukt een naam uit een bereik dat het niet heeft
+
+   WAAR DIT UIT KOMT. Een groot bestand opknippen ziet er onschuldig uit: de
+   regels verhuizen en de code is woord voor woord dezelfde. Maar een blok dat in
+   zijn oude bestand een naam uit het OMRINGENDE bereik plukte, vindt die na de
+   knip niet meer -- en JavaScript zegt dat pas als de regel echt draait.
+
+   Op 19 augustus 2026 ging dat op EEN dag vijf keer mis, en alle vijf stil:
+
+     werkplek-bureaus-b.js  `kies` en `BUREAUS` bleven achter. /api/werkplek/
+       bureaus gooide een ReferenceError, die de try/catch eromheen omzette in
+       een 500 met "Er ging iets mis". Voor elk huis kapot, twee dagen lang.
+     rtmail-lid.js          `klokNu` bleef achter; de tak die hem gebruikt werd
+       door geen enkele toets aangeraakt.
+     leverancierpoort.js    `grootSupplierSync`, plus een require-pad dat vanuit
+       een map dieper niet meer klopte.
+     x509-pakket.js         `genKeyPair`; maakCSR() zonder eigen sleutel liep
+       erop vast. Deze stond er al vanaf een eerdere ronde.
+     imap-server.js         `poort`, `host` en `tlsOpties` werden nergens uit de
+       opties gehaald, dus IMAP kon uberhaupt niet starten.
+     schrift.js             de context heet `octx`, maar de AI-buddy las `ctx`.
+
+   Wat geen van zes betrapte: `node --check` (het is geldige syntaxis),
+   scripts/routekaart.js (die START de server, hij doet geen verzoek) en de
+   keuring (die leest tekst). Vandaar deze regel.
+
+   HIJ IS MET OPZET VOORZICHTIG. scripts/lib/vrijenamen.js telt een naam als
+   gebonden zodra het bestand hem ERGENS bindt, hoe diep dan ook -- een echte
+   scope-analyse zou ook betrappen dat de binding in een ANDER bereik staat,
+   maar elke fout daarin is een vals alarm op een regel die verder klopt. In een
+   harde poort is een vals alarm duurder dan een gemist geval. De nul hieronder
+   is dus geen garantie; hij is de ondergrens. */
+console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet heeft');
+{
+  const { vrijeNamen } = require('./lib/vrijenamen');
+  let gekeken = 0, stuk = 0;
+  const kapot = [];
+  /* ALLEEN server/ EN scripts/, en public/ met opzet niet. Daar is een vrije
+     naam juist de NORMALE vorm: de browser deelt EEN bereik over alle
+     script-tags van een pagina heen, dus shared/uitvoer.js zet RTGUitvoer op
+     window en apps/agenda/app.js leest hem. Die bestanden hier meenemen zou
+     honderden meldingen geven op code die precies doet wat ze hoort te doen --
+     en een regel die honderd keer onterecht rood staat, leert niemand meer
+     iets. Wat public/ WEL bewaakt staat in regel 19 (geen twee modules die
+     dezelfde window-naam opeisen) en regel 42. */
+  for (const map of ['server', 'scripts']) {
+    const m = path.join(ROOT, map);
+    if (!fs.existsSync(m)) continue;
+    loop(m, /\.js$/, (f) => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      if (rel.includes('/data/')) return;
+      let bron; try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return; }
+      gekeken++;
+      const r = vrijeNamen(bron);
+      /* Een bestand dat de eigen parser niet leest, is geen bevinding van DEZE
+         regel -- regel 5 (de AST-scan) gaat daarover. Stil overslaan zou het
+         cijfer hieronder wel mooier maken, dus het wordt geteld en genoemd. */
+      if (r.fout) { stuk++; return; }
+      if (r.namen.length) kapot.push(rel + ' -> ' + r.namen.join(', '));
+    });
+  }
+  if (kapot.length) {
+    for (const k of kapot.slice(0, 12)) {
+      fout('gebruikt een naam die dit bestand nergens heeft: ' + k +
+        ' -- geef hem mee als parameter, of haal hem zelf op met require()');
+    }
+    if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' bestanden');
+  } else {
+    ok(gekeken + ' bestanden nagelopen, geen enkele vrije naam' +
+      (stuk ? ' (' + stuk + ' niet te lezen voor de eigen parser; zie regel 5)' : ''));
   }
 }
 

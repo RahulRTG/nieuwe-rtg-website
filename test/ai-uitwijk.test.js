@@ -127,8 +127,8 @@ test('4. lokale provider kiest per capability een lokaal model', async () => {
       { type: 'image', source: { type: 'base64', media_type: 'image/png', data: 'AA==' } }, { type: 'text', text: 'kijk' }
     ] }] });
     assert.deepEqual(server.laatste.verzoeken.map(v => v.body.model), ['rtg-kort', 'rtg-tools', 'rtg-vision']);
-    assert.deepEqual(server.laatste.verzoeken.map(v => v.body.reasoning_effort), ['none', 'low', 'none'],
-      'gewone tekst en beeld antwoorden direct; toolkeuze krijgt een klein redeneerbudget');
+    assert.deepEqual(server.laatste.verzoeken.map(v => v.body.reasoning_effort), ['none', 'none', 'none'],
+      'tekst, tools en beeld antwoorden direct zonder verborgen redeneertekst');
     assert.equal(c.lokaal, true);
     assert.equal(c.kan({ tools: [{}] }), true);
     assert.equal(c.kan({ messages: [{ role: 'user', content: [{ type: 'image' }] }] }), true);

@@ -6,6 +6,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
 const path = require('node:path');
+const fs = require('node:fs');
+const os = require('node:os');
 const { maakSmsSandbox } = require('../server/sms-sandbox');
 const iban = require('../server/iban');
 const config = require('../server/config');
@@ -46,6 +48,35 @@ test('SMTP-sandbox accepteert alleen een lokale catcher en noemt die niet live',
 test('SMTP-sandbox weigert een externe host zonder er verbinding mee te maken', () => {
   const code = `const m=require('./server/mail');if(m.sandboxConfigured||m.liveConfigured)process.exit(9);`;
   const r = kind(code, { SMTP_SANDBOX: '1', SMTP_URL: 'smtp://smtp.example.invalid:2525' });
+  assert.equal(r.status, 0, r.stderr || r.stdout);
+});
+
+test('de SMTP-zekering stopt de VERZENDKANT, niet alleen het bord', () => {
+  /* DE TOETS DIE ER NIET WAS. De toets hieronder kijkt of sandboxStand() na het
+     omzetten "uit" meldt. Dat is het BORD. Of send() en bezorgNu() zich er iets
+     van aantrekken werd nergens nagegaan -- en dat is wat de Integratiekamer
+     belooft: "uit zetten zonder procesherstart".
+
+     Betrapt bij het afsplitsen van ./server/mail-lokaal.js: de stand kreeg daar
+     een eigenaar, en de tegenproef -- smtpAan() de STARTwaarde laten teruggeven
+     in plaats van de levende vlag -- liet geen enkele toets zakken. Een schakelaar
+     die nergens op aangesloten zit ziet er precies zo uit als een die het doet.
+
+     Meetbaar zonder netwerk: met de sandbox AAN gaat bezorgNu langs de smarthost
+     op 127.0.0.1:2525, waar niets luistert -- dat geeft een tijdelijke fout. Met
+     de zekering UIT slaat hij de smarthost over en valt terug op de outbox. Het
+     verschil tussen die twee antwoorden IS de schakelaar. */
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mailzekering-'));
+  const code = `
+    const m=require('./server/mail');
+    (async () => {
+      const aan = await m.bezorgNu('iemand@example.test','proef','tekst');
+      if (aan.via === 'outbox') process.exit(9);
+      if (!m.zetSandbox('smtp', false).ok) process.exit(8);
+      const uit = await m.bezorgNu('iemand@example.test','proef','tekst');
+      if (!(uit.ok && uit.via === 'outbox')) process.exit(7);
+    })().catch(() => process.exit(6));`;
+  const r = kind(code, { SMTP_SANDBOX: '1', SMTP_URL: 'smtp://127.0.0.1:2525', RTG_DATA_DIR: dir });
   assert.equal(r.status, 0, r.stderr || r.stdout);
 });
 

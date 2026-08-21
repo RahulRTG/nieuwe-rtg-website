@@ -31,6 +31,9 @@
      blijven ze als rustige tussenkopjes boven hun blok staan */
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   .foot{margin-top:1.4rem;font-size:.85rem;}
+  /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
+     2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
+  .foot > a{display:inline-block;padding:.25rem 0;min-height:24px;}
   .foot a{color:var(--goud);text-decoration:none;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -91,9 +94,9 @@
     <h2>Meteen hulp nodig?</h2>
     <div class="nood">
       <p><b>Nood of gevaar:</b> bel <span class="nr">112</span>.</p>
-      <p style="margin-top:.5rem;"><b>Somber of geen uitweg meer:</b> bel gratis, dag en nacht, <span class="nr">113</span> (0800-0113).</p>
-      <p style="margin-top:.5rem;"><b>Kinderen en jongeren:</b> de Kindertelefoon, gratis en anoniem: <span class="nr">0800-0432</span>.</p>
-      <p style="margin-top:.5rem;"><b>Onveilig thuis:</b> Veilig Thuis, gratis: <span class="nr">0800-2000</span>.</p>
+      <p class="h-mt50"><b>Somber of geen uitweg meer:</b> bel gratis, dag en nacht, <span class="nr">113</span> (0800-0113).</p>
+      <p class="h-mt50"><b>Kinderen en jongeren:</b> de Kindertelefoon, gratis en anoniem: <span class="nr">0800-0432</span>.</p>
+      <p class="h-mt50"><b>Onveilig thuis:</b> Veilig Thuis, gratis: <span class="nr">0800-2000</span>.</p>
     </div>
   </div>
 

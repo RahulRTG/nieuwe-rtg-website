@@ -117,9 +117,34 @@ const OPERATOREN = [
   { naam: '<=-><', zoek: /<=/, zet: '<' },
   { naam: '&&->||', zoek: /&&/, zet: '||' },
   { naam: '+->-', zoek: /(\w) \+ (\w)/, zet: '$1 - $2' },
-  { naam: 'return-weg', zoek: /\breturn ([a-zA-Z_$][\w$.]*);/, zet: 'return undefined;' }
-];
+  { naam: 'return-weg', zoek: /\breturn ([a-zA-Z_$][\w$.]*);/, zet: 'return undefined;' },
+  /* EEN GETAL IS OOK GEDRAG. Plafonds, drempels, tijden en indexen staan hier
+     overal, en geen van de operatoren hierboven raakt er een: ze kijken naar
+     tekens, niet naar waarden. Daardoor kreeg een toets over een GRENS soms maar
+     een of twee schoten -- test/txkap.test.js gaat over de vraag wat er gebeurt
+     bij de 50.001e boeking, en dat is een getal.
 
+     Eentje erbij is de kleinste stap die de betekenis echt verandert: een
+     plafond van vijf wordt zes, een index van nul wordt een, een wachttijd van
+     tien seconden wordt elf. Wie daarop leunt, merkt het; wie niet, niet -- en
+     dat is precies wat een operator hoort te scheiden. Een getal in een
+     tekenreeks of in commentaar blijft buiten schot via het masker hieronder. */
+  { naam: 'getal+1', zoek: /\b(\d+)\b/, zet: (m, n) => String(Number(n) + 1) },
+  /* EEN REGEX IS OOK GEDRAG, en geen van de negen operatoren hierboven raakt er
+     een. Zie ./lib/regexmutatie.js voor wat hij doet en waarom -- en voor de
+     toets die hem vasthoudt. Waar hij mag toeslaan wordt niet gegokt: een
+     schuine streep is soms een deling en soms een regex, en een verkeerde gok
+     levert onzin-code op die de toets om de verkeerde reden laat zakken. De
+     lexer van de eigen AST-scanner wijst regex-tokens exact aan. */
+  {
+    naam: 'regex-alternatief-weg',
+    vind: (bron) => {
+      let tokens; try { tokens = require('./ast/lexer').lex(bron); } catch (e) { return []; }
+      return tokens.filter(t => t.type === 'regex').map(t => ({ start: t.start, eind: t.end }));
+    },
+    maak: (tekst) => require('./lib/regexmutatie').laatsteAlternatiefWeg(tekst)
+  }
+];
 /* Waar mag een operator toeslaan? Niet in commentaar en niet in een tekenreeks:
    daar verandert hij niets aan het gedrag, en dan meet de proef of de toets
    tekst leest. We bouwen een masker van de bron en muteren alleen op posities
@@ -155,12 +180,28 @@ function codemasker(bron) {
    de schuld geeft. Nu gaat de motor bij een overlever DIEPER: meer plekken per
    operator. Zie proefPuur. */
 function muteer(bron, op, index) {
+  /* Een operator met `vind` wijst zijn eigen plekken aan (zie
+     regex-alternatief-weg): daar is een tekstpatroon niet genoeg om te weten of
+     iets code is. De rest werkt op het masker hieronder. */
+  if (op.vind) {
+    const plekken = op.vind(bron);
+    let n = 0;
+    for (const p of plekken) {
+      const nieuw = op.maak(bron.slice(p.start, p.eind));
+      if (nieuw === null) continue;
+      if (n++ < (index || 0)) continue;
+      return bron.slice(0, p.start) + nieuw + bron.slice(p.eind);
+    }
+    return null;
+  }
   const masker = codemasker(bron);
   const re = new RegExp(op.zoek.source, 'g');
   let m, n = 0;
   while ((m = re.exec(bron))) {
     if (!masker[m.index]) continue;
     if (n++ < (index || 0)) continue;
+    /* `zet` mag ook een functie zijn (zie getal+1): dan rekent hij de nieuwe
+       tekst uit in plaats van hem te plakken. String.replace kent beide vormen. */
     const vervanging = m[0].replace(new RegExp(op.zoek.source), op.zet);
     return bron.slice(0, m.index) + vervanging + bron.slice(m.index + m[0].length);
   }
@@ -353,6 +394,26 @@ const EIGEN_MODULE = new Map([
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */
   ['domeinalleen.test.js', ['server/opzet/routes.js']],
+  /* VIER TOETSEN DIE DE LIEGPOORT OVERLEEFDEN OMDAT HIJ ZE NIET RAAKT, en dat
+     is precies waar de uitleg hierboven over gaat: het overleven zei niets over
+     de toets en alles over de verkeerde proef. Alle vier bevatten een require
+     van de helper (dus vielen ze in het servervak), maar geen van vieren leest
+     iets van /api/ -- ze beproeven een module die ze zelf binnenhalen. */
+  ['strenge-poort.test.js', ['test/helper.js']],
+  ['loghygiene.test.js', ['server/log.js']],
+  ['genreregister.test.js', ['server/seed/genres.js']],
+  ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],
+  /* VIER TOETSEN DIE OP server/db/index.js MIKTEN, en dat is 23,9 kB met de hele
+     opslaglaag erin. Elk van de vier beproeft een SMALLER stuk dat die module
+     alleen doorgeeft: het afkappen en de index van de transactiecollecties
+     (server/db/tx/index.js) en de drieweg-samenvoeging (server/db/merge.js).
+     Eenendertig schoten op de grote module raakten telkens code die deze toetsen
+     niet aanroepen -- dezelfde misser als hierboven, alleen subtieler omdat het
+     getal hoog is. */
+  ['txkap.test.js', ['server/db/tx/index.js']],
+  ['txindex.test.js', ['server/db/tx/index.js']],
+  ['txgeld.test.js', ['server/db/tx/index.js', 'server/db/tx/collecties.js']],
+  ['merge3.property.test.js', ['server/db/merge.js']],
   /* Elke app als eigen proces achter de poortwachter. */
   ['vloot.test.js', ['server/vloot.js']],
   /* Productiestand: demo dicht, geen dev-lekken, registreren werkt. */

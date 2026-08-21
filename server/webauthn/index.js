@@ -28,6 +28,11 @@ function controleerClientData(clientDataJSON, verwachtType, verwachteChallenge, 
   if (!gelijk(Buffer.from(String(c.challenge)), Buffer.from(String(verwachteChallenge))))
     throw new Error('challenge komt niet overeen');
   if (c.origin !== verwachteOrigin) throw new Error('origin komt niet overeen (' + c.origin + ')');
+  // Cross-origin WebAuthn krijgt steeds meer browsermogelijkheden (onder meer
+  // via embedded betaal-/identiteitsstromen). RTG gebruikt die bewust niet:
+  // een passkey-ceremonie hoort rechtstreeks bij onze eigen deur. Niet alleen
+  // op het huidige browsergedrag vertrouwen, maar die grens ook verifieren.
+  if (c.crossOrigin === true) throw new Error('cross-origin WebAuthn is niet toegestaan');
   return c;
 }
 
@@ -66,9 +71,13 @@ function generateAuthenticationOptions(opts) {
   };
 }
 
-function verifyRegistrationResponse({ response, expectedChallenge, expectedOrigin, expectedRPID }) {
+function verifyRegistrationResponse({ response, expectedChallenge, expectedOrigin, expectedRPID,
+  requireUserVerification = false }) {
   const resp = response && response.response;
   if (!resp || !resp.clientDataJSON || !resp.attestationObject) throw new Error('onvolledig registratie-antwoord');
+  if (!response || response.type !== 'public-key') throw new Error('credential-type klopt niet');
+  if (response.rawId && String(response.rawId) !== String(response.id || ''))
+    throw new Error('rawId komt niet overeen met credential-id');
   controleerClientData(resp.clientDataJSON, 'webauthn.create', expectedChallenge, expectedOrigin);
 
   const att = cborLees(vanB64u(resp.attestationObject), 0).waarde;
@@ -79,8 +88,13 @@ function verifyRegistrationResponse({ response, expectedChallenge, expectedOrigi
   if (!gelijk(authData.rpIdHash, sha256(Buffer.from(expectedRPID, 'utf8'))))
     throw new Error('rpIdHash komt niet overeen met de verwachte RP-ID');
   if (!authData.up) throw new Error('user-present-vlag ontbreekt');
+  if (requireUserVerification && !authData.uv)
+    throw new Error('lokale gebruikersverificatie ontbreekt');
+  if (authData.bs && !authData.be) throw new Error('ongeldige backup-vlaggen');
   if (!authData.at || !authData.credentialId || !authData.credentialPublicKey)
     throw new Error('geen credential in authenticatorData');
+  if (String(response.id || '') !== b64u(authData.credentialId))
+    throw new Error('credential-id komt niet overeen met attestatie');
 
   // fmt 'none': geen attestatie-handtekening. Andere formaten steunen we (nog) niet.
   if (fmt !== 'none') throw new Error('attestatieformaat ' + fmt + ' wordt niet ondersteund (verwacht: none)');
@@ -103,10 +117,15 @@ function verifyRegistrationResponse({ response, expectedChallenge, expectedOrigi
   };
 }
 
-function verifyAuthenticationResponse({ response, expectedChallenge, expectedOrigin, expectedRPID, credential }) {
+function verifyAuthenticationResponse({ response, expectedChallenge, expectedOrigin, expectedRPID, credential,
+  requireUserVerification = false }) {
   const resp = response && response.response;
   if (!resp || !resp.clientDataJSON || !resp.authenticatorData || !resp.signature)
     throw new Error('onvolledig login-antwoord');
+  if (!response || response.type !== 'public-key' || String(response.id || '') !== String(credential && credential.id || ''))
+    throw new Error('credential-id komt niet overeen');
+  if (response.rawId && String(response.rawId) !== String(response.id))
+    throw new Error('rawId komt niet overeen met credential-id');
   controleerClientData(resp.clientDataJSON, 'webauthn.get', expectedChallenge, expectedOrigin);
 
   const authDataBuf = vanB64u(resp.authenticatorData);
@@ -114,6 +133,9 @@ function verifyAuthenticationResponse({ response, expectedChallenge, expectedOri
   if (!gelijk(authData.rpIdHash, sha256(Buffer.from(expectedRPID, 'utf8'))))
     throw new Error('rpIdHash komt niet overeen met de verwachte RP-ID');
   if (!authData.up) throw new Error('user-present-vlag ontbreekt');
+  if (requireUserVerification && !authData.uv)
+    throw new Error('lokale gebruikersverificatie ontbreekt');
+  if (authData.bs && !authData.be) throw new Error('ongeldige backup-vlaggen');
 
   // ondertekend wordt: authenticatorData || sha256(clientDataJSON)
   const data = Buffer.concat([authDataBuf, sha256(vanB64u(resp.clientDataJSON))]);
@@ -124,7 +146,7 @@ function verifyAuthenticationResponse({ response, expectedChallenge, expectedOri
   // teller-regressie: een gekloonde sleutel valt op doordat de teller terugloopt
   const oud = credential.counter || 0;
   const nieuw = authData.signCount;
-  if ((oud > 0 || nieuw > 0) && nieuw <= oud && nieuw !== 0)
+  if ((oud > 0 || nieuw > 0) && nieuw <= oud)
     throw new Error('teller liep terug (mogelijk gekloonde sleutel)');
 
   return { verified: true, authenticationInfo: { newCounter: nieuw, credentialDeviceType: authData.be ? 'multiDevice' : 'singleDevice', credentialBackedUp: authData.bs } };

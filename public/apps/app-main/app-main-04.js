@@ -1,3 +1,4 @@
+/* inloggen en de staat binnenhalen: token, pas en het eerste scherm */
     API.token = t;
     try {
       applyState((await API.call('/state')).state);
@@ -57,6 +58,7 @@
         'padding:0.9rem 0.4rem 1.1rem;text-wrap:balance;animation:agZin 0.5s ease;}' +
       '@keyframes agZin{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}' +
       '.ag-rij{display:flex;align-items:center;border-bottom:1px solid var(--line);margin:0 0.6rem;transition:border-color 0.2s;}' +
+      '.ag-rij[hidden]{display:none;}' +
       '.ag-rij:focus-within{border-color:var(--burgundy);}' +
       '.ag-rij input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt);' +
         "font-family:'Inter',sans-serif;font-size:0.95rem;text-align:center;padding:0.75rem 0.4rem;}" +
@@ -65,13 +67,17 @@
         'padding:0.4rem 0.2rem;opacity:0;transition:opacity 0.2s;font-family:inherit;}' +
       '.ag-rij:focus-within button,.ag-rij.vol button{opacity:0.85;}' +
       '.ag-mond{display:block;margin:0.15rem auto 0.3rem;width:220px;height:100px;}' +
-      // Face ID / passkey: een ingetogen gouden regel onder het veld, alleen
-      // zichtbaar zodra Rahul weet met wie hij praat (een terugkerend lid)
-      '.ag-passkey{margin:0.95rem auto 0;background:none;border:none;color:var(--gold,#857007);' +
-        'font-family:inherit;font-size:0.78rem;letter-spacing:0.03em;cursor:pointer;opacity:0.9;' +
-        'display:flex;align-items:center;gap:0.4rem;}' +
+      // De passkey is de voordeur: groot genoeg als eerste handeling, maar nog
+      // steeds in de stille horlogetaal van het huis.
+      '.ag-passkey{margin:0.95rem auto 0;background:color-mix(in srgb,var(--gold,#857007) 10%,transparent);' +
+        'border:1px solid color-mix(in srgb,var(--gold,#857007) 48%,transparent);border-radius:999px;color:var(--gold,#857007);' +
+        'font-family:inherit;font-size:0.82rem;letter-spacing:0.03em;cursor:pointer;min-height:44px;padding:0.65rem 1.15rem;' +
+        'display:flex;align-items:center;justify-content:center;gap:0.48rem;min-width:min(18rem,82vw);}' +
       '.ag-passkey[hidden]{display:none;}' +
-      '.ag-passkey svg{width:15px;height:15px;stroke:currentColor;fill:none;}' +
+      '.ag-passkey svg{width:17px;height:17px;stroke:currentColor;fill:none;}' +
+      '.ag-anders{margin:0.65rem auto 0;padding:0.4rem 0.7rem;background:none;border:0;color:var(--soft);' +
+        'font:inherit;font-size:0.72rem;letter-spacing:0.025em;cursor:pointer;text-decoration:underline;text-underline-offset:0.22rem;}' +
+      '.ag-anders[hidden]{display:none;}' +
       /* De ballotage-regalia: pas zichtbaar zodra de vier vragen beginnen.
          Een stille kopregel met haarlijnen (de horlogetaal van het huis), en
          daaronder vier Romeinse cijfers als plaatsbepaling -- een uitnodiging,

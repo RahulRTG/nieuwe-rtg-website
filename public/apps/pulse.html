@@ -176,7 +176,7 @@ async function laad(){
         (pl.mappen.length?'<div class="trend">'+pl.mappen.map(m=>'<span>'+esc(m.naam)+' · '+m.aantal+'</span>').join('')+'</div>':'')+
         (pl.bewaard.length?pl.bewaard.map(x=>'<div class="post"><div class="kop"><span class="wie">'+esc(x.codenaam)+'</span><span class="tijd">'+esc(x.map)+'</span></div><div class="tekst">'+mooi(x.tekst)+'</div></div>').join('')
           :'<div class="leeg">Je plank is nog leeg.</div>')+
-        '<div style="margin-top:.8rem;"><button class="knop" id="plankTerug">Terug naar de feed</button></div>'+
+        '<div class="h-mt80"><button class="knop" id="plankTerug">Terug naar de feed</button></div>'+
         '<p style="color:var(--muted);font-size:.8rem;margin-top:.6rem;">Wat je bewaart is prive: de schrijver merkt er niets van.</p></div>';
       $('#plankTerug').onclick=()=>laad();
     }catch(e){ meld(e.message); } };

@@ -1,3 +1,4 @@
+/* de menukaart per station (keuken of bar) */
     if (kantoorSec === 'keuken' || kantoorSec === 'bar'){
       const stn = kantoorSec;
       const items = (state.menu||[]).filter(m=>(m.station==='bar')===(stn==='bar'));

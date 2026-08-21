@@ -1,8 +1,25 @@
 name: CI
 
 on:
+  # ALLEEN DE HOOFDLIJN, en dat is een reparatie en geen bezuiniging.
+  #
+  # Hier stond 'claude/**' bij. Een push naar zo'n branch draaide dan de hele
+  # keten EN de pull_request-trigger deed dat ook, op dezelfde commit, tegelijk.
+  # De concurrency-groep hieronder kon dat niet zien: bij een pull_request is
+  # de sleutel het PR-nummer en bij een push de ref, dus twee groepen die
+  # elkaar nooit annuleren.
+  #
+  # Wat dat kostte was niet alleen tijd. Twee volledige schermrondes (elk bijna
+  # een uur, elk met een eigen Chromium, Postgres en Redis) vochten om dezelfde
+  # runners, en de traagste van de twee liep tegen zijn timeout van 90 minuten
+  # aan -- drie keer op rij, telkens de PR-run, telkens op een commit waarvan
+  # de push-run in 45 minuten groen was. Een rood vinkje om drukte in plaats
+  # van om code, en elke keer een herstart met de hand.
+  #
+  # Een branch zonder PR krijgt hierdoor geen keuring meer. Dat is de prijs, en
+  # hij is klein: mergen kan alleen via een PR, en dan draait pull_request.
   push:
-    branches: [ main, master, 'claude/**' ]
+    branches: [ main, master ]
   pull_request:
 
 # Geen workflowstap krijgt stilzwijgend schrijfrechten op de repository.
@@ -69,8 +86,18 @@ jobs:
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/
       # functies): zakt de in-proces-dekking onder de vloer, dan faalt de stap.
-      # De vloeren staan bewust een paar punten onder de gemeten basislijn
-      # (63/80/51) zodat normale ruis niet flaket, maar echte terugval hard opvalt.
+      # De vloeren staan bewust een paar punten onder de gemeten basislijn zodat
+      # normale ruis niet flaket, maar echte terugval hard opvalt.
+      #
+      # GEMETEN OP 17 AUGUSTUS 2026, volledige suite (6520 toetsen):
+      #   regels 80,63  takken 80,60  functies 67,73   -> vloer 78 / 78 / 65
+      #
+      # Daarvoor stonden de vloeren op 58/74/47 terwijl deze opmerking 63/80/51
+      # als basislijn noemde: twee getallen die geen van beide meer klopten, en
+      # ruim 22 punten lucht op regels en functies. Een vloer die zo diep onder
+      # de stand ligt bewaakt niets -- er kon een vijfde van de dekking wegvallen
+      # zonder dat de stap rood werd. Bij de volgende meting hoort de vloer weer
+      # mee op te schuiven; dat is dezelfde ratel als NORM.json.
       # RTG_ROUTELOG laat elke kindserver opschrijven welk ROUTEPATROON hij heeft
       # afgehandeld. Dat kost niets extra's in deze stap en levert de volgende
       # stap een waargenomen dekkingscijfer in plaats van een tekstzoektocht
@@ -82,18 +109,18 @@ jobs:
       # log-API levert alleen de STAART. Het downloadadres van het volledige log
       # ligt achter een andere host, die niet altijd bereikbaar is. Wie dan een
       # rode stap ziet, weet alleen DAT er iets zakte. Vandaar de herhaling
-      # onderaan: bij een rode uitslag komen de "not ok"-regels en de telling
-      # nog een keer voorbij, na de tabel, waar ze wel te vinden zijn.
+      # onderaan, na de tabel, waar ze wel te vinden is.
+      # Die herhaling gaf eerst alleen de NAAM terug ("not ok 5861 - ..."), en
+      # niet de reden. Daarmee begon iedereen alsnog bij het lokaal naspelen van
+      # de hele suite; op 18 augustus 2026 kostte dat een ochtend. Sindsdien komt
+      # het hele TAP-blok mee: de bewering, de verwachte en de gevonden waarde en
+      # de stapel. Zie scripts/gezakte-toetsen.js.
       - name: Unit- en integratietests + dekkingsvloer (json-opslag)
         run: |
           set -o pipefail
           uitslag=0
           npm run test:gate 2>&1 | tee /tmp/gate.log || uitslag=$?
-          if [ "$uitslag" -ne 0 ]; then
-            echo "----- GEZAKTE TOETSEN (herhaald; hierboven staan ze onder de dekkingstabel) -----"
-            grep -E "not ok [0-9]" /tmp/gate.log | head -60 || true
-            grep -E "^# (tests|pass|fail|skipped) " /tmp/gate.log || true
-          fi
+          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/gate.log; fi
           exit "$uitslag"
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
@@ -117,6 +144,28 @@ jobs:
       # deze stap zakt kwaliteit weg zonder dat iemand een besluit neemt.
       - name: De norm (mag alleen strakker, nooit losser)
         run: npm run norm
+
+      # EN DE LAT ZELF. NORM.json staat IN de tak, dus een tak kan hem verzetten
+      # en dan meet de stap hierboven de code tegen een lat die in dezelfde
+      # commit is verlaagd. Deze stap legt hem naast die van main: strakker mag
+      # altijd, losser alleen met een reden in `notities` die de meter bij naam
+      # noemt. De fetch is er omdat de checkout ondiep is en origin/main hier
+      # anders niet bestaat -- en dan zakt normbasis.js liever dan dat hij
+      # stilzwijgend slaagt.
+      - name: De basislijn van de norm (verlagen mag, stilletjes niet)
+        run: |
+          git fetch --depth=1 origin main
+          node scripts/normbasis.js --tegen FETCH_HEAD
+
+      # DE INSTROOM, NAAST DE VOORRAAD. endpointsZonderTest is een TOTAAL: een
+      # tak die drie routes toevoegt en er vier laat toetsen komt er groen
+      # doorheen. TAKEN.md 4.3 noemde 622 ongedekte endpoints, vandaag zijn het
+      # er 1192, en de ratel heeft in die hele periode niet een keer geklaagd --
+      # hij bewaakte de voorraad en niemand bewaakte wat erbij kwam. Deze stap
+      # draait de routekaart hier en in een worktree van main, en eist een toets
+      # voor het verschil. De fetch van de stap hierboven maakt FETCH_HEAD.
+      - name: Nieuwe routes komen met een toets
+        run: node --experimental-sqlite scripts/nieuweroutes.js --tegen FETCH_HEAD
       # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
       # van de tests: te laag voor suites die een hulpje gebruiken, en op te
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
@@ -155,9 +204,25 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Blokkeer nieuwe high/critical kwetsbaarheden
-        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: high
+
+  # PR #58 wilde het runtime-image van node:22-slim naar node:26-slim tillen en
+  # kreeg zes groene vinkjes, terwijl geen enkele job de container aanraakte:
+  # release-image.yml bouwt pas bij een release, en de keuring hierboven draait
+  # op de Node van de runner. Deze job draait de echte server met de echte CMD
+  # in de Node uit de Dockerfile -- geen imagebouw, dus geen Rust-fase van
+  # minuten op elke PR. Wat hij niet dekt (Rust-fase, COPY, rechten) staat in
+  # de kop van het script.
+  container:
+    name: De container komt op
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: De Node uit de Dockerfile draait de CMD uit de Dockerfile
+        run: node scripts/containerproef.js
 
   a11y:
     name: Toegankelijkheid (eigen keuring)
@@ -174,7 +239,11 @@ jobs:
         run: |
           npm i --no-save playwright@^1.49.0
           npx playwright install --with-deps chromium
-      - name: Eigen a11y-scan van de vlaggenschip-schermen
+      # De naam stond hier tot 17 augustus 2026 als "de vlaggenschip-schermen",
+      # en dat was op een gegeven moment een leugen in de logregel: de scan gaat
+      # sinds de uitbreiding over ALLE schermen, uitgelogd en ingelogd -- en sinds
+      # de raakvlakronde over alle schermen nog een derde keer, op telefoonformaat.
+      - name: Eigen a11y-scan, uitgelogd + ingelogd + raakvlak op telefoonformaat
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'
@@ -188,8 +257,16 @@ jobs:
       # Chromium. Met concurrency 2 wisselde onder runnerbelasting alleen WELK
       # goed scherm zijn lokale 8/20s-grens miste (Boeken, daarna Mobiliteit).
       # Een volledige seriele ronde blijft ruim binnen deze jobs 90 minuten.
+      # Dezelfde herhaling als bij de unit-toetsen, en om dezelfde reden: deze
+      # stap draait ruim veertig minuten en zet per schermtoets een server en een
+      # Chromium op. Zakt er een, dan staat zijn blok duizenden regels hoger.
       - name: Scherm-tests (PDA in de browser)
-        run: npm run e2e
+        run: |
+          set -o pipefail
+          uitslag=0
+          npm run e2e 2>&1 | tee /tmp/e2e.log || uitslag=$?
+          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/e2e.log; fi
+          exit "$uitslag"
         env:
           RTG_E2E_STRICT: '1'
       # "Af" is geen bewering meer. De stap hierboven schrijft .schermjournaal

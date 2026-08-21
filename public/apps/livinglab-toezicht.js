@@ -40,14 +40,14 @@
             esc(e.stilgelegd.reden) + '</div>'
         : '<div class="leeg">Dit onderzoek loopt.</div>') +
       (toez
-        ? '<div class="rij" style="margin-top:.35rem;">' +
+        ? '<div class="rij h-mt35">' +
             '<select class="veld" data-tzdoor aria-label="Toezichthouder">' + toez + '</select>' +
             '<input class="veld" data-tzreden placeholder="Reden" maxlength="300">' +
             '<button class="knop stil" data-tzzet type="button">' +
               (e.stilgelegd ? 'Hervat het onderzoek' : 'Leg het onderzoek stil') + '</button></div>'
         : '<div class="leeg">Dit lab heeft nog geen ethisch toezichthouder; alleen die kan een onderzoek stilleggen.</div>') +
 
-      '<div class="sec" style="margin-top:.9rem;">Klachten' + (open ? ' (' + open + ')' : '') + '</div>' +
+      '<div class="sec h-mt90">Klachten' + (open ? ' (' + open + ')' : '') + '</div>' +
       (open
         ? '<div class="gebrek">Er staan ' + open + ' klacht(en) op dit onderzoek. Zolang er één open is, ' +
             'komt de studie niet aan deelnemers toe.</div>' +
@@ -55,7 +55,7 @@
           '<div data-klachten></div>'
         : '<div class="leeg">Geen klachten. Een deelnemer dient ze in zonder in te loggen, ' +
             'want een klacht kan juist gaan over hoe dit onderzoek met hem omging.</div>') +
-      (alle ? '<div class="rij" style="margin-top:.35rem;" data-kafhandel hidden>' +
+      (alle ? '<div class="rij h-mt35" data-kafhandel hidden>' +
         '<select class="veld" data-kdoor aria-label="Afgehandeld door">' + alle + '</select>' +
         '<input class="veld" data-kantwoord placeholder="Antwoord aan de klager" maxlength="1000">' +
         '<button class="knop stil" data-kzet type="button">Handel af</button></div>' : '') +

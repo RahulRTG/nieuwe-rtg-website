@@ -101,7 +101,7 @@
         : 'Nog geen bestanden hier. Sleep iets naar dit scherm of druk op Upload.') + '</p>' +
       (bak ? '' : '');
     if (bak && eigen.length) {
-      $('#lijst').innerHTML += '<div class="rij" style="margin-top:.5rem;">' +
+      $('#lijst').innerHTML += '<div class="rij h-mt50">' +
         '<button class="knop" id="leegAlles" type="button">Prullenbak leegmaken</button></div>';
       var la = $('#leegAlles');
       if (la) la.addEventListener('click', function () {

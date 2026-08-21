@@ -1,3 +1,4 @@
+/* portfolio en trajecten van een creator */
     const pfAdd = $('#crPfAdd'); if (pfAdd) pfAdd.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/platform', { platform: $('#crPfPlat').value, handle: $('#crPfHandle').value, volgers: Number($('#crPfVolg').value)||0 })); } catch(e){ toast(e.message); } });
     el.querySelectorAll('[data-trdel]').forEach(b => b.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/tarief', { weg: true, id: b.dataset.trdel })); } catch(e){ toast(e.message); } }));
     const trAdd = $('#crTrAdd'); if (trAdd) trAdd.addEventListener('click', async () => { try { crToe(await API.call('/supplier/creator/tarief', { soort: $('#crTrSoort').value, prijs: Number($('#crTrPrijs').value)||0 })); } catch(e){ toast(e.message); } });

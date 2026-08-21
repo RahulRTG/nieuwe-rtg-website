@@ -1,3 +1,4 @@
+/* een map hernoemen op het springboard */
     setTimeout(() => { hernoemIn.focus(); hernoemIn.select(); }, 60);
   }
   if (hernoemOk) hernoemOk.addEventListener('click', () => { if (hernoemDoel) zetMapNaam(hernoemDoel, hernoemIn.value); sluitScrims(); });
@@ -59,8 +60,22 @@
     const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
     zoekLijst.appendChild(d);
   }
-  function zoekRij(icoonNode, label, meta, doe) {
+  /* `sleutel` is optioneel en alleen gezet op rijen die een APP zijn.
+
+     Waarom hij er is: Spotlight is sinds het springboard verdween de enige
+     plek waar de onderdelen van een wereld nog te vinden zijn (zie openMap in
+     app-main-26b.js -- de `items` blijven bestaan zodat deze index ze kan
+     indexeren). Een rij droeg alleen zijn ZICHTBARE naam, en die namen
+     veranderen met beleid: "Werk OS" werd "Mijn werkplekken", "RTG Office"
+     werd "Documenten". Wie wil nagaan of een app nog vindbaar is, moest dus
+     op een etiket zoeken dat juist hoort te mogen schuiven.
+
+     De sleutel schuift niet: die verandert alleen als de app echt een andere
+     app wordt. Hij staat hier dus naast het etiket, net als op een tegel
+     (app-main-26b.js doet hetzelfde met dataset.sleutel). */
+  function zoekRij(icoonNode, label, meta, doe, sleutel) {
     const b = document.createElement('button');
+    if (sleutel) b.dataset.sleutel = sleutel;
     const zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(icoonNode);
     b.appendChild(zi);
     b.appendChild(document.createTextNode(label));
@@ -84,13 +99,13 @@
       const top = topGebruik(4);
       if (top.length) {
         zoekSectie('Voor u');
-        for (const s of top) zoekRij(tegelInhoud(s), itemNaam(s), null, () => { sluitScrims(); openItem(s); });
+        for (const s of top) zoekRij(tegelInhoud(s), itemNaam(s), null, () => { sluitScrims(); openItem(s); }, s);
         zoekSectie('Alle apps');
       }
     }
     for (const { item, uit } of alleItems()) {
       if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
-      zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); });
+      zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); }, item);
     }
     // acties (instellingen en schakelaars) doen mee zodra er getypt wordt
     if (q) {

@@ -340,7 +340,7 @@
       }
       var d = o.data;
       var u = '<button class="zc-knop" id="zcTerug">← terug</button>' +
-        '<div class="zc-kaart" style="margin-top:.7rem;"><h3>' + esc(d.object.titel) + '</h3>' +
+        '<div class="zc-kaart h-mt70"><h3>' + esc(d.object.titel) + '</h3>' +
         '<p class="zc-meta">' + esc(d.object.label) + ' ' + esc(d.object.id) + (d.object.sub ? ' · ' + esc(d.object.sub) : '') + '</p></div>';
 
       u += '<div class="zc-kaart"><h3>Wat er kan</h3>';
@@ -435,7 +435,7 @@
           x.onclick = function () {
             api('runbook/voer', { id: x.dataset.droog, droog: true }).then(function (rr) {
               vak.querySelector('#zcD-' + x.dataset.droog).innerHTML =
-                '<div style="margin-top:.5rem;">' + rr.run.geraakt + ' van ' + rr.run.totaalKandidaten + ' zouden wijzigen:<br>' +
+                '<div class="h-mt50">' + rr.run.geraakt + ' van ' + rr.run.totaalKandidaten + ' zouden wijzigen:<br>' +
                 rr.run.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') + '</div>';
             }).catch(function (e) { b.melden(e.message); });
           };

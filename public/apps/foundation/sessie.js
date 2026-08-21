@@ -74,6 +74,7 @@
         return d;
       }).catch(function () { toegangSlot('De toegangscontrole is nu niet bereikbaar. Uit veiligheid blijft deze ruimte dicht; probeer het zo opnieuw.', false); return null; });
   }
+/* de sessie van de hulppas: lezen, actief en bewaren */
   var Sessie = {
     huidig: lees,
     actief: function () { var s = lees(); return !!(s && s.code && s.token); },
@@ -178,6 +179,7 @@
       el.querySelector('#sbWissel').onclick = function () { Sessie.wisProfiel(); };
       el.querySelector('#sbUit').onclick = function (e) { e.preventDefault(); if (confirm('Het hele gezin uitloggen op dit toestel?')) { Sessie.uitloggen(); location.href = 'index.html'; } };
       el.querySelector('#sbBel').onclick = function () { menu.hidden = true; ber.hidden = !ber.hidden; if (!ber.hidden) laadBerichten(el); };
+/* de ongelezen-teller */
       telOngelezen(el);
     }
   };

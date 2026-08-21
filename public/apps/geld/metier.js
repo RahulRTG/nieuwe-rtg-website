@@ -82,7 +82,7 @@
       'er eerlijk bij als zelf opgegeven.</p>' +
       (alle.length ? alle.map(M.rolRij).join('') : '<p class="stil">Nog geen werk op je profiel.</p>') +
       '<label class="stil lbl" for="mtRwat">Rol toevoegen</label><input id="mtRwat" maxlength="80" placeholder="Wat deed je?">' +
-      '<input id="mtRwaar" maxlength="80" placeholder="Waar?" style="margin-top:.4rem;">' +
+      '<input class="h-mt40" id="mtRwaar" maxlength="80" placeholder="Waar?">' +
       '<div class="mt-half"><input id="mtRvan" inputmode="numeric" placeholder="van (jaar)" aria-label="Van welk jaar">' +
       '<input id="mtRtot" inputmode="numeric" placeholder="tot (jaar)" aria-label="Tot welk jaar"></div>' +
       '<div class="mt-knoppen"><button class="knop" id="mtBrol" type="button">Toevoegen</button></div></div>' +

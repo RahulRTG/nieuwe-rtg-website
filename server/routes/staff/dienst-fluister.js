@@ -11,6 +11,11 @@
 module.exports = (fctx) => {
   const { app, accounts, supplierAuth, stuurLus } = fctx;
   const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = fctx.fluister;
+  const metKompas = (antwoord) => {
+    const stand = require('../../ai').beschikbaarheid(fctx.anthropic);
+    return Object.assign(antwoord, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,
+      verwerking: stand.verwerking, kompas: stand.kompas });
+  };
 
 /* Fluister voor de vloer: dezelfde persoonlijke assistent, met een eigen
    geheugen per personeelslid (nooit gedeeld met de werkgever). */
@@ -59,10 +64,10 @@ app.post('/api/staff/fluister', supplierAuth, async (req, res) => {
       systeem: require('../../kern/rahul').RAHUL_LEAD +
         'Je helpt ' + werkNaam(req) + ' (personeel, PDA) bij ' + req.supplier.name + ' (' + req.supplier.type + ').'
     });
-    if (lus && lus.tekst) return res.json({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
-      goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring), goedkeuringWereld: 'staff' });
+    if (lus && lus.tekst) return res.json(metKompas({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+      goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring), goedkeuringWereld: 'staff' }));
   }
-  res.json(r);
+  res.json(metKompas(r));
 });
 app.post('/api/staff/fluister/profiel', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });

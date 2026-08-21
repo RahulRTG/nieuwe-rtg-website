@@ -1,3 +1,4 @@
+/* het gesprek in stappen */
   function gesprek(el, opt) {
     if (!el || !opt || !opt.stappen || !opt.stappen.length) return null;
     stijl();

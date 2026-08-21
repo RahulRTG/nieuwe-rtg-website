@@ -96,7 +96,7 @@
   <div id="bord" aria-live="polite"></div>
   <div id="gedeeldKop" class="kop" style="display:none;">Met mij gedeeld · samen bewerken</div>
   <div id="gedeeldBord"></div>
-  <p class="stil" style="margin-top:.8rem;">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
+  <p class="stil h-mt80">Een notitie met datum en tijd krijgt vanzelf een gekoppelde afspraak
     in RTG Agenda; daar komt ook het seintje vandaan. Delen op codenaam is samen werken: de ander kan afvinken
     en aanvullen.</p>
 </main>
@@ -107,8 +107,8 @@
     <div id="ntTekstWrap"><textarea id="ntTekst" rows="7" maxlength="4000" placeholder="Schrijf hier."></textarea></div>
     <div id="ntLijstWrap" style="display:none;">
       <div id="ntTaken"></div>
-      <div class="rij" style="margin-top:.5rem;">
-        <input class="gewoon" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe" style="flex:1;">
+      <div class="rij h-mt50">
+        <input class="gewoon h-flex1" id="ntNieuwTaak" maxlength="200" placeholder="Nieuw punt; Enter voegt toe">
       </div>
     </div>
     <div class="twee">
@@ -117,16 +117,16 @@
     </div>
     <div id="ntDeelWrap">
       <label for="ntCode">Delen op codenaam (samen bewerken)</label>
-      <div class="rij"><input class="gewoon" id="ntCode" maxlength="60" placeholder="Codenaam" style="flex:1;">
+      <div class="rij"><input class="gewoon h-flex1" id="ntCode" maxlength="60" placeholder="Codenaam">
         <button class="knop" id="ntDeel" type="button">Deel</button></div>
       <p class="stil" id="ntGedeeld"></p>
     </div>
-    <div class="rij" style="margin-top:.9rem;">
+    <div class="rij h-mt90">
       <button class="knop vol" id="ntBewaar" type="button">Bewaar</button>
       <button class="knop" id="ntVast" type="button">Vastpinnen</button>
       <button class="knop" id="ntArchief" type="button">Archiveer</button>
       <button class="knop" id="ntWeg" type="button">Verwijder</button>
-      <span style="flex:1;"></span>
+      <span class="h-flex1"></span>
       <button class="knop" id="ntDicht" type="button">Sluit</button>
     </div>
   </div>

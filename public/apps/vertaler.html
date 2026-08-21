@@ -83,14 +83,14 @@
     <select class="veld" id="taalVan" aria-label="Van taal"></select>
     <button class="knop" id="wissel" type="button" aria-label="Talen wisselen">&#8646;</button>
     <select class="veld" id="taalNaar" aria-label="Naar taal"></select>
-    <span style="flex:1;"></span>
+    <span class="h-flex1"></span>
     <button class="knop" id="spreek" type="button">Spreek</button>
   </div>
   <div class="kop">Uw tekst</div>
   <textarea id="invoer" rows="4" maxlength="2000" placeholder="Typ hier, of druk op Spreek."></textarea>
   <div class="kop">De vertaling</div>
   <div id="uitPaneel" aria-live="polite"><span class="leeg">De vertaling verschijnt hier terwijl u typt.</span></div>
-  <div class="rij" style="margin-top:.6rem;">
+  <div class="rij h-mt60">
     <button class="knop" id="zegOp" type="button">Lees voor</button>
     <button class="knop" id="kopieer" type="button">Kopieer</button>
     <button class="knop" id="bewaarZin" type="button">Bewaar deze zin</button>
@@ -98,13 +98,13 @@
 
   <div class="kop">Onderweg · veelgebruikte zinnen</div>
   <div class="rij" id="reisTabs"></div>
-  <div id="reisZinnen" style="margin-top:.5rem;"></div>
+  <div class="h-mt50" id="reisZinnen"></div>
 
   <div class="kop" id="bewaardKop" style="display:none;">Bewaarde zinnen (op dit toestel)</div>
   <div id="bewaard"></div>
   <div class="kop" id="histKop" style="display:none;">Onlangs vertaald (op dit toestel)</div>
   <div id="historie"></div>
-  <p class="stil" style="margin-top:.8rem;">Geschiedenis en bewaarde zinnen blijven op uw toestel; de server
+  <p class="stil h-mt80">Geschiedenis en bewaarde zinnen blijven op uw toestel; de server
     onthoudt uw gesprekken niet. Zonder AI-sleutel vertaalt het huiswoordenboek (Nederlands en Engels) en zegt
     de app het eerlijk als een taal nu niet lukt.</p>
 </main>

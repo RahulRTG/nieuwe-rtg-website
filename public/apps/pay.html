@@ -42,9 +42,16 @@
   .knop:hover{background:var(--merk);color:#fff;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600;}
   .knop.pay{background:#000;color:#fff;border:1px solid #333;width:100%;font-size:1rem;padding:.9rem;}
-  /* de grote actieknoppen dragen het merkrood van het logo */
-  .knop.merk{background:var(--merk);color:#fff;width:100%;font-size:1.05rem;padding:.95rem;box-shadow:0 4px 18px rgba(127,23,52,.45);}
-  .knop.merk:hover{background:#96203F;}
+  /* De grote actieknoppen dragen het merkrood van het logo.
+     HEETTE .knop.merk EN DAT WAS EEN NAAMSBOTSING. rtg-ui.css gebruikt .merk voor
+     een klein statuslabel (`body.rtg-stijl .status,.merk,.badge`), en die selector
+     is specifieker dan .knop.merk. Alle drie de knoppen op dit scherm kwamen
+     daardoor als badge uit de bus: 9,9px hoofdletters in een pilletje van 19 hoog,
+     in plaats van een schermbrede bordeaux knop. Gevonden bij het meten van
+     raakvlakken (WCAG 2.5.8) -- de maat was het symptoom, de naam de oorzaak.
+     .hoofd is de naam die de rest van dit huis voor een hoofdknop gebruikt. */
+  .knop.hoofd{background:var(--merk);color:#fff;width:100%;font-size:1.05rem;padding:.95rem;box-shadow:0 4px 18px rgba(127,23,52,.45);}
+  .knop.hoofd:hover{background:#96203F;}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
   h3.sec{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:1.5rem 0 .2rem;}
   /* saldo-held */
@@ -114,8 +121,8 @@
         <input class="veld" id="xBedrag" inputmode="decimal" placeholder="Euro" style="max-width:7rem;">
         <input class="veld" id="xOms" placeholder="Waarvoor? (mag leeg)" style="flex:1;min-width:8rem;" maxlength="80">
       </div>
-      <div class="rij" style="margin-top:.6rem;">
-        <button class="knop merk" id="xBetaal">Tik en betaal</button>
+      <div class="rij h-mt60">
+        <button class="knop hoofd" id="xBetaal">Tik en betaal</button>
         <button class="knop stil" id="xOntvang">Zet op ontvangen</button>
       </div>
       <div id="xOntvangAan" hidden>
@@ -135,12 +142,12 @@
         <input class="veld" id="tBedrag" inputmode="decimal" placeholder="Totaal in euro" style="max-width:9rem;">
         <input class="veld" id="tOms" placeholder="Waarvoor?" style="flex:1;min-width:10rem;" maxlength="80">
       </div>
-      <div style="margin-top:.6rem;">
+      <div class="h-mt60">
         <input class="veld" id="tAan" placeholder="Aan wie? Codenamen, met komma">
         <div class="chiprij" id="tVrienden" aria-label="Kies vrienden"></div>
       </div>
       <label class="schakel"><input type="checkbox" id="tSplits" checked> Splits het totaal, ik doe zelf mee</label>
-      <button class="knop merk" id="tStuur" style="margin-top:.7rem;">Vraag het Klompje</button>
+      <button class="knop hoofd h-mt70" id="tStuur">Vraag het Klompje</button>
     </div>
 
     <h3 class="sec">Geld sturen</h3>
@@ -236,7 +243,7 @@ async function ververs(){
   // voor jou: elk verzoek is EEN knop
   $('#pAanMij').innerHTML = d.aanMij.length ? d.aanMij.map(v =>
     '<div class="tikkie"><div class="wie"><b>'+esc(v.van)+'</b><small>'+esc(v.oms)+'</small></div>'+
-    '<button class="knop merk" data-betaal="'+v.id+'" style="width:auto;flex:1;min-width:9rem;">Betaal '+esc(euro(v.centen))+' eur</button></div>').join('')
+    '<button class="knop hoofd" data-betaal="'+v.id+'" style="width:auto;flex:1;min-width:9rem;">Betaal '+esc(euro(v.centen))+' eur</button></div>').join('')
     : '<div class="leeg">Geen openstaande Klompjes.</div>';
   $('#pAanMij').querySelectorAll('[data-betaal]').forEach(b => b.addEventListener('click', async () => {
     b.disabled = true;

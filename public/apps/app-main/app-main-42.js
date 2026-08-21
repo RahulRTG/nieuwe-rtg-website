@@ -1,3 +1,4 @@
+/* de verzoeken van partners om een niveau: u beslist */
     if (open.length) html += open.map(v => '<div class="vbanner" style="border-color:var(--gold,#c9a227);">' +
       '<b>'+esc(v.supplierName)+' '+T('pi.vraagt','vraagt uw')+' '+T('pi.n.'+v.niveau, v.niveau)+'</b>' +
       '<span>'+(v.reden?esc(v.reden)+' · ':'')+T('pi.uitleg','U beslist. Bij goedkeuren ziet de partner dit 10 minuten; daarna vervalt het vanzelf.')+'</span>' +
@@ -20,6 +21,7 @@
 
   function renderHome(){
     renderVerifyBanner();
+    laadVakbewijs();
     laadPaspoortInbox();
     // gratis gebruiker (zonder pas): beperkte, veilige startpagina
     if (user.tier === 'guest'){ renderHomeGuest(); return; }

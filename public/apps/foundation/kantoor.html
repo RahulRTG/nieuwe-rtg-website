@@ -67,8 +67,8 @@
       <div class="kpi" id="kMissie" style="margin:.3rem 0 .6rem;"></div>
       <div class="rij" id="kKpis"></div>
     </div>
-    <div class="kaart" style="margin-top:.7rem;"><div class="sec">Werklijsten</div><div id="kLijsten"></div></div>
-    <div class="kaart" style="margin-top:.7rem;">
+    <div class="kaart h-mt70"><div class="sec">Werklijsten</div><div id="kLijsten"></div></div>
+    <div class="kaart h-mt70">
       <div class="sec">Rahul denkt mee in deze kamer</div>
       <div class="rij" style="margin-bottom:.5rem;">
         <input class="veld" id="aVraag" placeholder="Stel een vraag, of laat leeg" maxlength="300" aria-label="Vraag aan Rahul">
@@ -76,7 +76,7 @@
       </div>
       <div id="kAdvies" class="leeg">Rahul kijkt naar de cijfers van deze kamer en zegt wat opvalt. Hij adviseert; u beslist.</div>
     </div>
-    <div class="kaart" style="margin-top:.7rem;">
+    <div class="kaart h-mt70">
       <div class="sec">Taken van deze kamer</div>
       <div class="rij" style="margin-bottom:.5rem;"><input class="veld" id="tTekst" placeholder="Nieuwe taak" maxlength="200"><button class="knop" id="tMaak">+</button></div>
       <div id="kTaken"></div>
@@ -155,7 +155,7 @@ async function open(id){
   $('#kNaam').innerHTML = glyf(d.icoon) + esc(d.naam);
   $('#kMissie').textContent = d.missie;
   $('#kKpis').innerHTML = d.kpis.map(k => '<div class="stat"><b>' + esc(k.waarde) + '</b><i>' + esc(k.label) + '</i></div>').join('');
-  $('#kLijsten').innerHTML = d.lijsten.map(l => '<div class="sec" style="margin-top:.5rem;">' + esc(l.titel) + '</div>' +
+  $('#kLijsten').innerHTML = d.lijsten.map(l => '<div class="sec h-mt50">' + esc(l.titel) + '</div>' +
     (l.items.length ? '<ul>' + l.items.map(i => '<li>· ' + esc(i) + '</li>').join('') + '</ul>' : '<div class="leeg">Nu even niets.</div>')).join('') || '<div class="leeg">Geen lijsten.</div>';
   toonTaken(d.taken);
 }
@@ -172,7 +172,7 @@ $('#aVraag2').addEventListener('click', async () => {
   try {
     const r = await api('kamer/advies', { id: KAMER, vraag: $('#aVraag').value.trim() });
     doel.innerHTML = '<div>' + esc(r.antwoord) + '</div>' +
-      (r.punten && r.punten.length ? '<ul style="margin-top:.5rem;">' + r.punten.map(p => '<li>· ' + esc(p) + '</li>').join('') + '</ul>' : '');
+      (r.punten && r.punten.length ? '<ul class="h-mt50">' + r.punten.map(p => '<li>· ' + esc(p) + '</li>').join('') + '</ul>' : '');
   } catch (e) { doel.textContent = e.message; }
 });
 /* ---------- De Stadsraad: per stad een invloedrijke partner; RTG-personeel
@@ -184,15 +184,15 @@ async function raadLaad(){
   const besluiten = (d.besluiten || []).map(b => {
     const stemmen = b.stemmen.map(s => (s.voor ? '✓ ' : '✕ ') + esc(s.wie) + ' (' + s.kant + ')').join(' · ') || 'nog geen stemmen';
     const knoppen = b.status === 'open'
-      ? '<div class="rij" style="margin-top:.3rem;"><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="1" style="font-size:.72rem;padding:.25rem .6rem;">Voor</button><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="0" style="font-size:.72rem;padding:.25rem .6rem;">Tegen</button><button class="knop stil" data-sluit="' + esc(b.id) + '" style="font-size:.72rem;padding:.25rem .6rem;">Sluit besluit</button></div>'
+      ? '<div class="rij h-mt30"><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="1" style="font-size:.72rem;padding:.25rem .6rem;">Voor</button><button class="knop stil" data-stem="' + esc(b.id) + '" data-voor="0" style="font-size:.72rem;padding:.25rem .6rem;">Tegen</button><button class="knop stil" data-sluit="' + esc(b.id) + '" style="font-size:.72rem;padding:.25rem .6rem;">Sluit besluit</button></div>'
       : '';
     return '<div style="border-bottom:1px solid var(--line);padding:.45rem 0;font-size:.84rem;"><b>' + esc(b.titel) + '</b> -- ' + esc(b.voorstel) + '<div class="kpi">door ' + esc(b.door) + ' · status: <b>' + esc(b.status) + '</b>' + (b.uitslag ? ' (' + esc(b.uitslag) + ')' : '') + '</div><div class="kpi">' + stemmen + '</div>' + knoppen + '</div>';
   }).join('') || '<div class="leeg">Nog geen besluiten.</div>';
   $('#raadIn').innerHTML =
-    '<div class="sec" style="margin-top:.4rem;">Stadspartners (een per stad)</div>' + partners +
+    '<div class="sec h-mt40">Stadspartners (een per stad)</div>' + partners +
     '<div class="rij" style="margin:.5rem 0 .2rem;"><input class="veld" id="pStad" placeholder="Stad"><input class="veld" id="pNaam" placeholder="Naam van de foundation of club"><select class="veld" id="pSoort" style="flex:0 0 8rem;"><option value="foundation">foundation</option><option value="club">club</option><option value="instelling">instelling</option></select><button class="knop" id="pMaak">Partner toevoegen</button></div>' +
-    '<div class="sec" style="margin-top:.6rem;">Lab-uitslagen op de raadstafel</div>' + uitslagen +
-    '<div class="sec" style="margin-top:.6rem;">Besluiten</div>' + besluiten;
+    '<div class="sec h-mt60">Lab-uitslagen op de raadstafel</div>' + uitslagen +
+    '<div class="sec h-mt60">Besluiten</div>' + besluiten;
   $('#pMaak').addEventListener('click', async () => {
     try { await api('stadsraad/partner-maak', { stad: $('#pStad').value.trim(), naam: $('#pNaam').value.trim(), soort: $('#pSoort').value }); raadLaad(); }
     catch (e) { alert(e.message); }

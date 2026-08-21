@@ -12,13 +12,10 @@ const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scan-')); }
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) {}
-  return null;
-}
+/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
+   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
+   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
+const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 async function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -72,11 +69,13 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     assert.equal(rt, 'RTG-tafel', 'de QR-codec round-tript in de browser');
 
     // 5) bedieningspaneel -> Scannen -> overlay -> met de hand de tafel-QR invoeren
-    // De nieuwe landing is de Command-werktafel; deze toets gebruikt de
-    // interne thuisingang voordat de bovenrandbediening beschikbaar is.
-    await page.waitForFunction(() => window.RTGCommand && document.getElementById('rtgCommand'), null, { timeout: 15000 });
-    await page.evaluate(() => window.RTGCommand.thuis());
     /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN GEBRUIKER DAT DOET.
+
+       Hier ging eerst een klik op de knop in de bank vooraf, die de werktafel
+       opvouwde naar het springboard. Dat springboard is als scherm weg
+       (WERELD.md) en die knop dus ook -- maar de bovenrand luistert gewoon op
+       document mee (shared/randen.js), dus die haal werkt boven de werktafel
+       precies zoals hij boven de schil werkte. Eén stap minder.
 
        Hier stond `page.click('#osCcBtn')`. Die knop stond toen nog in de
        statusbalk van het beginscherm; die balk is leeggemaakt (mappen, klok,

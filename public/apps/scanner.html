@@ -39,6 +39,8 @@
   #beeldWrap{display:none;margin:.7rem 0;border-radius:12px;overflow:hidden;border:1px solid var(--line);}
   #beeld{width:100%;display:block;}
   #docWrap{margin-top:.6rem;font-size:.82rem;color:var(--muted);}
+  /* 24x24, anders is het vakje zelf niet te raken (WCAG 2.5.8) */
+  #docmodus{width:24px;height:24px;vertical-align:-.4rem;margin-right:.2rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
   #strook{display:flex;gap:.5rem;flex-wrap:wrap;}
   .pag{position:relative;display:inline-block;}
@@ -85,12 +87,13 @@
     <button class="knop" id="bewaarFotos" type="button">Bewaar als losse foto's</button>
   </div>
 
-  <p class="stil" style="margin-top:.8rem;">Alles gebeurt op je toestel: de documentmodus en de PDF worden
+  <p class="stil h-mt80">Alles gebeurt op je toestel: de documentmodus en de PDF worden
     hier gemaakt, en het resultaat gaat als gewoon bestand naar je RTG Bestanden-kluis (map Scans) -- zelfde
     kwota, zelfde prullenbak. Er gaat geen beeld naar een andere server.</p>
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/kluismap.js"></script>
 <script src="/apps/scanner/pdfje.js"></script>
 <script src="/apps/scanner/app.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>

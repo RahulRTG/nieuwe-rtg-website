@@ -1,3 +1,4 @@
+/* het team van vandaag */
     $('#teamWrap').innerHTML =
       (staff.length ? '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.buzzh','Collega oproepen')+'<span style="display:flex;gap:0.4rem;"><button class="abtn" id="teamCall" style="font-size:0.66rem;">'+T('pd.teamcall','Teamcall')+'</button><button class="abtn ghost" id="buzzAll" style="font-size:0.66rem;">'+T('pd.buzzall','Iedereen')+'</button></span></div>'+
         staff.map(m=>{
@@ -9,7 +10,7 @@
         }).join('')+'</div>' : '')+
       '<div class="card"><div class="k">'+T('pd.chat','Teamchat')+'</div><div class="chat">'+
       (team.length ? team.map(m=>'<div class="msg '+(m.who===me.name?'me':'other')+'"><span class="who">'+esc(m.who)+'</span>'+
-        (m.audio?'<audio controls src="'+m.audio+'" style="width:190px;max-width:100%;height:34px;"></audio>':esc(m.text))+'</div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
+        esc(m.text)+'</div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.nochat','Nog geen berichten.')+'</div>')+
       '</div><div class="compose"><input id="tmMsg" placeholder="'+T('pd.msgph','Bericht aan het team')+'"><button id="tmSend">'+T('pd.send','Stuur')+'</button></div></div>'+
       '<div class="card"><div class="k">'+T('pd.activity','Wie deed wat')+'</div>'+
       (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>'+
@@ -21,7 +22,7 @@
         if (v.inkomend) return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';
         return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.wait','wacht op akkoord')+'</span></div></div>';
       }).join('') : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.none','Nog geen verbindingen.')+'</div>')+
-      (me.role==='manager' ? '<div class="compose" style="margin-top:0.5rem;"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
+      (me.role==='manager' ? '<div class="compose h-mt50"><input id="netCode" placeholder="'+T('pd.net.code','Bedrijfscode')+'" style="text-transform:uppercase;"><button id="netAdd">'+T('pd.net.connect','Verbind')+'</button></div>' : '')+
       '<div id="netChat"></div></div>';
     const send = async () => {
       const inp = $('#tmMsg'); const text = (inp.value||'').trim(); if (!text) return;
@@ -64,7 +65,7 @@
     const box = document.getElementById('netChat'); if (!box) return;
     if (!netOpen){ box.innerHTML = ''; return; }
     const naam = (netwerk.find(v => v.code === netOpen) || {}).naam || netOpen;
-    box.innerHTML = '<div class="k" style="margin-top:0.7rem;">'+esc(naam)+'</div><div class="chat">'+
+    box.innerHTML = '<div class="k h-mt70">'+esc(naam)+'</div><div class="chat">'+
       (netBerichten.length ? netBerichten.map(m => '<div class="msg '+(m.code===code?'me':'other')+'"><span class="who">'+esc(m.naam+' · '+m.door)+'</span>'+esc(m.tekst)+'</div>').join('')
         : '<div style="font-size:0.8rem;color:var(--soft);">'+T('pd.net.nomsg','Nog geen berichten.')+'</div>')+
       '</div><div class="compose"><input id="netMsg" placeholder="'+T('pd.net.msgph','Bericht')+'"><button id="netSend">'+T('pd.send','Stuur')+'</button></div>';

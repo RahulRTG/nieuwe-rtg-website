@@ -27,6 +27,8 @@
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .65rem;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;display:block;}
   .rij{display:flex;gap:.7rem;flex-wrap:wrap;align-items:flex-end;}
+  /* de aanvinkvakjes: 13x13 is te klein om te raken (WCAG 2.5.8) */
+  .rij input[type="checkbox"],label input[type="checkbox"]{width:24px;height:24px;flex:0 0 auto;}
   .knop{background:var(--gold);color:#000;border:none;border-radius:11px;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .sec{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 .5rem;}
@@ -84,11 +86,11 @@
   <div class="tabs"><button id="tabZoek" class="aan">Zoeken</button><button id="tabReizen">Mijn reizen</button><button id="tabHost">Host</button></div>
 
   <section id="secZoek">
-    <div class="rij" style="margin-top:1rem;">
+    <div class="rij h-mt100">
       <span><span class="lbl">Waarheen</span><input class="veld" id="zPlaats" placeholder="Plaats, land of titel" style="width:12rem;"></span>
-      <span><span class="lbl">Aankomst</span><input class="veld" id="zVan" type="date"></span>
-      <span><span class="lbl">Vertrek</span><input class="veld" id="zTot" type="date"></span>
-      <span><span class="lbl">Gasten</span><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
+      <span><label class="lbl" for="zVan">Aankomst</label><input class="veld" id="zVan" type="date"></span>
+      <span><label class="lbl" for="zTot">Vertrek</label><input class="veld" id="zTot" type="date"></span>
+      <span><label class="lbl" for="zGasten">Gasten</label><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
       <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="zInstant"> Instant boeken</label>
       <button class="knop" id="zGo">Zoek</button>
     </div>
@@ -117,7 +119,7 @@
         <span><span class="lbl">Prijs/nacht (€)</span><input class="veld" id="nPrijs" type="number" min="1" value="120" style="width:6.5rem;"></span>
         <span><span class="lbl">Max gasten</span><input class="veld" id="nGasten" type="number" min="1" max="20" value="4" style="width:5rem;"></span>
       </div>
-      <div class="rij" style="margin-top:.7rem;">
+      <div class="rij h-mt70">
         <span><span class="lbl">Schoonmaak (€)</span><input class="veld" id="nSchoon" type="number" min="0" value="0" style="width:6rem;"></span>
         <span><span class="lbl">Weekkorting %</span><input class="veld" id="nWeek" type="number" min="0" max="50" value="10" style="width:6rem;"></span>
         <span><span class="lbl">Annulering</span><select class="veld" id="nAnnul"><option value="flex">Flexibel</option><option value="gemiddeld">Gemiddeld</option><option value="streng">Streng</option></select></span>
@@ -221,7 +223,7 @@ async function openHuis(id){
     $('#bInhoud').innerHTML =
       '<div class="beeld v'+(HUIDIG.visual||0)+'" style="border-radius:14px;height:150px;"></div>'+
       '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:.8rem;">'+esc(HUIDIG.beschrijving||'')+'</p>'+
-      '<div style="margin-top:.4rem;">'+(HUIDIG.voorzieningen||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join('')+
+      '<div class="h-mt40">'+(HUIDIG.voorzieningen||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join('')+
         '<span class="chip">'+HUIDIG.slaapkamers+' slaapkamers</span><span class="chip">'+HUIDIG.bedden+' bedden</span><span class="chip">'+HUIDIG.badkamers+' badkamers</span>'+
         (HUIDIG.keyless?'<span class="chip" style="color:var(--gold);border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
       '<div class="kaart"><h3 style="font-size:1rem;">Prijs</h3>'+
@@ -288,7 +290,7 @@ async function laadReizen(){
       '<div class="boeking"><div class="st">'+esc(b.status)+'</div><b>'+esc(b.titel)+'</b> · '+esc(b.plaats)+'<br>'+
       '<span style="color:var(--soft);">'+esc(b.van)+' tot '+esc(b.tot)+' · '+b.gasten+' gasten · '+euro(b.prijsopbouw.totaal)+' · host '+esc(b.host)+'</span>'+
       (b.deurcode ? '<div style="margin:.4rem 0;">Deurcode: <span class="deur">'+esc(b.deurcode)+'</span></div>' : '')+
-      '<div class="rij" style="margin-top:.4rem;">'+
+      '<div class="rij h-mt40">'+
         (b.status==='bevestigd' ? '<button class="knop stil" data-doe="checkin" data-ref="'+esc(b.ref)+'">Check-in</button>' : '')+
         (b.status==='ingecheckt' ? '<button class="knop stil" data-doe="checkuit" data-ref="'+esc(b.ref)+'">Check-uit</button>' : '')+
         (['aangevraagd','bevestigd'].includes(b.status) ? '<button class="knop stil" data-doe="annuleer" data-ref="'+esc(b.ref)+'">Annuleer</button>' : '')+
@@ -334,7 +336,7 @@ async function laadBord(){
       '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(d.uitbetaling)+'</div>'+
       (d.aanvragen.length ? '<div class="sec">Aanvragen</div>'+d.aanvragen.map(a =>
         '<div class="boeking"><b>'+esc(a.titel)+'</b> · '+esc(a.van)+' tot '+esc(a.tot)+' · gast '+esc(a.gast)+(a.gastRating?' (★ '+a.gastRating+')':'')+
-        '<div class="rij" style="margin-top:.4rem;"><button class="knop" data-ok="'+esc(a.ref)+'">Accepteer</button><button class="knop stil" data-nee="'+esc(a.ref)+'">Wijs af</button></div></div>').join('') : '');
+        '<div class="rij h-mt40"><button class="knop" data-ok="'+esc(a.ref)+'">Accepteer</button><button class="knop stil" data-nee="'+esc(a.ref)+'">Wijs af</button></div></div>').join('') : '');
     $('#hBord').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', async () => { try { await api('beslis', { ref: b.dataset.ok, akkoord: true }); meld('Geaccepteerd.'); laadBord(); } catch(e){ meld(e.message); } }));
     $('#hBord').querySelectorAll('[data-nee]').forEach(b => b.addEventListener('click', async () => { try { await api('beslis', { ref: b.dataset.nee, akkoord: false }); meld('Afgewezen.'); laadBord(); } catch(e){ meld(e.message); } }));
   } catch(e){ $('#hBord').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
@@ -345,7 +347,7 @@ async function laadHuizen(){
     MIJNHUIZEN = d.huizen;
     $('#hHuizen').innerHTML = d.huizen.length ? d.huizen.map(h =>
       '<div class="boeking"><b>'+esc(h.titel)+'</b> · '+esc(h.plaats)+' · '+euro(h.prijs)+'/nacht'+(h.rating.sterren?' · ★ '+h.rating.sterren:'')+
-      '<div class="rij" style="margin-top:.4rem;">'+
+      '<div class="rij h-mt40">'+
       '<button class="knop stil" data-advies="'+esc(h.id)+'">AI-prijsadvies</button>'+
       '<button class="knop stil" data-blok="'+esc(h.id)+'">Blokkeer datums</button>'+
       '<button class="knop stil" data-cohost="'+esc(h.id)+'">Co-host</button></div>'+

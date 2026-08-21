@@ -1,3 +1,4 @@
+/* de onboarding: het paspoort scannen of een bestand kiezen */
     onbActies([
       { txt: T('onb.scan','Scan je paspoort'), prim: true, doe: function(){
           if (window.RTGPaspoortScan) RTGPaspoortScan.open({ onKlaar: function(d, mrz){ onbPaspoortUpload(d, mrz); } });
@@ -68,6 +69,7 @@
     const g = onbEl('onbGate'); if (g) g.hidden = true;
     onbStap = null; onbGeopend = false; onbSt = null; onbRij = [];
     onbActies([]); const l = onbEl('onbLees'); if (l){ l.hidden = true; }
+    naarWereldkeuze();
     toast(T('onb.welkom','Welkom aan boord! Fijne reis.'));
   }
   async function onbInvoer(tekst){

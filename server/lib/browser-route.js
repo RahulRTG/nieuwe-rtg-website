@@ -14,8 +14,15 @@
       af. Anders zou een fout in de toets zelf eruitzien als een fout in het
       scherm, en dat is het duurste soort verwarring.
 
-   De glob wordt eenmalig naar een regexp vertaald: '**/api/*' is wat een
-   schermtoets wil typen, een regexp is wat de vergelijking nodig heeft. */
+   De glob wordt eenmalig naar een regexp vertaald: een patroon met sterretjes
+   is wat een schermtoets wil typen, een regexp is wat de vergelijking nodig
+   heeft. Voorbeelden staan bij naarRegexp() hieronder, en met opzet niet hier:
+   een glob met een ster gevolgd door een schuine streep SLUIT dit commentaar,
+   en dan wordt de rest van de regel als code gelezen. Dat is precies wat er
+   gebeurde -- dit bestand wierp bij het laden "api is not defined", en omdat
+   elke schermtoets die require in een try/catch zet ("geen browser"), sloegen
+   ze allemaal stilletjes over in plaats van te melden dat de driver stuk was
+   (LAT-regel 5: niets slaat stil over). */
 'use strict';
 
 function globNaarRe(glob) {

@@ -65,8 +65,8 @@
         return (B.instrumenten()[c.instrument] || {}).naam || c.instrument;
       }).join(', ');
       $('#rUit').innerHTML = '<p class="stil">' + esc(voorstel.uitleg) + '</p>' +
-        '<p class="stil" style="margin-top:.3rem;">Kanalen: ' + esc(namen) + '</p>' +
-        '<div class="rij" style="margin-top:.6rem;">' +
+        '<p class="stil h-mt30">Kanalen: ' + esc(namen) + '</p>' +
+        '<div class="rij h-mt60">' +
         '<button class="knop" id="rBeluister" type="button">Eerst beluisteren</button>' +
         '<button class="knop vol" id="rZet" type="button">Zet het in mijn raster</button>' +
         '<button class="knop" id="rWeg" type="button">Laat maar</button></div>';

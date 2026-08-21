@@ -1,3 +1,4 @@
+/* het chatvenster met een partner */
     let ov = document.getElementById('apchat'); if (ov) return ov;
     ov = document.createElement('div'); ov.id='apchat';
     ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center;';

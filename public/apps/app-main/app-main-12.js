@@ -1,3 +1,4 @@
+/* de meldingenlijst en het ongelezen-merk */
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
           '<div class="notif-item' + (x.read ? '' : ' unread') + '">' +
@@ -104,6 +105,24 @@
        raakt. renderAll() leest dit terug en zet je waar je was. */
     try { localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab, t: Date.now() })); } catch(e){}
     $('#content').scrollTop = 0;
+    /* HET SCHERM WISSELDE, MAAR DE SCHIL HOORDE HET NIET.
+
+       sync() (app-main-28.js) zet os-open op #app, en daaraan hangt de hele
+       app-modus: de terugknop en de titel in de statusbalk in plaats van het
+       woordmerk, en de schermvaste pill. Hij hing aan een MutationObserver op
+       #app zelf -- en openTab raakt #app niet aan. Hij raakt de views en de
+       tabknoppen aan. Gevolg: je opende Ter plaatse en de balk bleef die van
+       het beginscherm, zonder weg terug.
+
+       Dat viel niet op zolang het springboard eronder lag: je kon altijd nog
+       op een tegel tikken. Nu de werktafel het beginscherm is, is deze balk de
+       enige uitweg uit zo'n scherm -- en dan is "hij hoort het niet" geen
+       schoonheidsfoutje meer. De waarnemer blijft staan voor de gate-wissel
+       (in- en uitloggen); dit is de wissel die hij niet kon zien.
+
+       Via window omdat sync() in een andere scope woont dan deze functie -- zie
+       de naad in app-main-28.js. */
+    if (window.RTGOSSync) RTGOSSync();
     // Alleen bij een echte klik de focus naar de nieuwe weergave verplaatsen, zodat
     // toetsenbord- en schermlezergebruikers meelopen (niet bij programmatische wissels).
     if (focusView){

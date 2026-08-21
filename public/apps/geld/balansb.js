@@ -22,11 +22,11 @@
       $('#blAdvies').innerHTML = (data.adviezen || []).map(function (a) {
         return '<div class="bl-advies"><span aria-hidden="true">' + esc(a.icoon) + '</span><span>' + esc(a.tekst) + '</span></div>';
       }).join('') +
-        '<button class="knop" id="blRust" type="button" style="margin-top:.8rem;">Vraag Rahul een rustmoment te plannen</button>';
+        '<button class="knop h-mt80" id="blRust" type="button">Vraag Rahul een rustmoment te plannen</button>';
       $('#blKook').innerHTML =
         '<p class="stil">Uit eten: ongeveer ' + esc(b.uitPerWeek) + ' keer per week' +
           (b.laat ? ' &middot; ' + esc(b.laat) + ' late nachten in twee weken' : '') + '.</p>' +
-        '<p class="stil" style="margin-top:.5rem;">' + esc(data.koken) + '</p>' +
+        '<p class="stil h-mt50">' + esc(data.koken) + '</p>' +
         '<div class="bl-knoppen">' +
           '<button class="knop" id="blKookVraag" type="button">Vraag Rahul een recept voor vanavond</button>' +
           '<button class="knop" id="blBeweeg" type="button">Vraag Rahul naar sport en wellness</button>' +
@@ -110,7 +110,7 @@
           '<label class="stil lbl" for="blReceptTekst">Recept</label>' +
           '<textarea id="blReceptTekst" rows="4" maxlength="4000" placeholder="Plak hier het recept uit de Rahul-chat"></textarea>' +
           '<div class="bl-knoppen"><button class="knop hoofd" id="blReceptBewaar" type="button">Bewaar op dit toestel</button></div>' +
-          '<div id="blReceptLijst" style="margin-top:.6rem;"></div>' +
+          '<div class="h-mt60" id="blReceptLijst"></div>' +
         '</div>' +
       '</div>',
     start: start,

@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { TALEN, bestaat, naamEn, maakTalen } = require('../server/talen');
+const { TALEN, STANDAARD, STANDAARD_VERSIE, bestaat, naamEn, maakTalen } = require('../server/talen');
 const vertaal = require('../server/translate');
 const { startServer, stop } = require('./helper');
 
@@ -31,16 +31,30 @@ test('register: dekt de wereld, kent endoniemen en Engelse namen', () => {
 test('register: basistalen altijd aan, schakelen werkt, taalVan valt veilig terug', () => {
   const db = { data: {} };
   const t = maakTalen({ db, save: () => {} });
-  assert.deepEqual(t.actieve().map(x => x.code).sort(), ['en', 'nl'], 'standaard alleen de basis');
+  assert.deepEqual(t.actieve().map(x => x.code), STANDAARD, 'standaard zijn alle 114 talen actief');
+  assert.equal(db.data.talen.standaardVersie, STANDAARD_VERSIE);
+  assert.equal(t.zet('fr', false).ok, true, 'Frans uit');
   assert.equal(t.zet('fr', true).ok, true, 'Frans aan');
   assert.ok(t.isActief('fr'));
   assert.equal(t.taalVan('fr'), 'fr', 'actieve taal mag');
+  assert.equal(t.zet('ja', false).ok, true, 'Japans uit');
   assert.equal(t.taalVan('ja'), 'nl', 'inactieve taal valt terug op nl');
   assert.equal(t.taalVan('geen-taal'), 'nl');
   assert.equal(t.zet('nl', false).status, 409, 'de basis kan niet uit');
   assert.equal(t.zet('fr', false).ok, true, 'Frans weer uit');
   assert.ok(!t.isActief('fr'));
   assert.equal(t.zet('xx', true).status, 404, 'onbekende taal bestaat niet');
+});
+
+test('register: de oude nl/en-stand migreert eenmalig naar alle 114 talen', () => {
+  let saves = 0;
+  const db = { data: { talen: { actief: ['nl', 'en'] } } };
+  const t = maakTalen({ db, save: () => { saves++; } });
+  assert.equal(t.actieve().length, TALEN.length);
+  assert.equal(db.data.talen.standaardVersie, STANDAARD_VERSIE);
+  assert.equal(saves, 1, 'de migratie wordt een keer bewaard');
+  t.actieve();
+  assert.equal(saves, 1, 'volgende lezingen herschrijven de database niet');
 });
 
 // ---- 2. de vertaallaag ----
@@ -51,6 +65,40 @@ test('translate: nl/en via woordenboek; vreemde taal zonder AI blijft heel', asy
   assert.equal(fr.translated, false, 'zonder AI-sleutel komt fr onvertaald terug');
   assert.equal(fr.text, 'Tot vanavond bij het diner.', 'nooit kapot');
   assert.equal(vertaal.localize('Zojuist betaald', 'fr'), 'Just paid', 'seed-inhoud: Engelse terugval voor elke niet-nl taal');
+});
+
+test('translate: een UI-scherm gaat als batch naar het model en wordt gecachet', async () => {
+  let aanroepen = 0;
+  vertaal.setAnthropic({ messages: { create: async (p) => {
+    aanroepen++;
+    const invoer = JSON.parse(p.messages[0].content);
+    return { content: [{ type: 'text', text: JSON.stringify(invoer.map(t => 'FR:' + t)) }] };
+  } } });
+  try {
+    const bron = ['Uniek schermlabel alfa', 'Unieke schermknop beta'];
+    const een = await vertaal.translateBatch(bron, 'fr', 'nl');
+    assert.deepEqual(een.map(x => x.text), bron.map(t => 'FR:' + t));
+    assert.equal(aanroepen, 1, 'een schermgroep kost een modelaanroep');
+    const twee = await vertaal.translateBatch(bron, 'fr', 'nl');
+    assert.deepEqual(twee.map(x => x.text), bron.map(t => 'FR:' + t));
+    assert.equal(aanroepen, 1, 'de tweede keer komt volledig uit de cache');
+  } finally { vertaal.setAnthropic(null); }
+});
+
+test('translate: de batch stuurt alleen toegestane UI-bronnen naar het model', async () => {
+  const gezien = [];
+  vertaal.setAnthropic({ messages: { create: async (p) => {
+    const invoer = JSON.parse(p.messages[0].content); gezien.push(...invoer);
+    return { content: [{ type: 'text', text: JSON.stringify(invoer.map(t => 'FR:' + t)) }] };
+  } } });
+  try {
+    const ui = 'Toegestane unieke UI-bron gamma';
+    const prive = 'Persoonlijke vrije tekst delta';
+    const uit = await vertaal.translateBatch([ui, prive], 'fr', 'nl', { ai: t => t === ui });
+    assert.deepEqual(gezien, [ui]);
+    assert.equal(uit[0].text, 'FR:' + ui);
+    assert.equal(uit[1].text, prive, 'niet-toegestane tekst blijft lokaal en heel');
+  } finally { vertaal.setAnthropic(null); }
 });
 
 // ---- 3. end-to-end: Boardroom-schakelaars + chatten in je eigen taal ----
@@ -75,11 +123,15 @@ test('Boardroom: alle wereldtalen met schakelaars; aanzetten maakt ze kiesbaar',
   const nl = alles.body.talen.find(t => t.code === 'nl');
   assert.ok(nl.aan && nl.basis, 'nl is basis en aan');
 
-  // publiek: standaard alleen de basis
+  // publiek: standaard de hele wereld
   const voor = await api(base, '/api/talen', {});
-  assert.deepEqual(voor.body.talen.map(t => t.code).sort(), ['en', 'nl']);
+  assert.equal(voor.body.talen.length, TALEN.length);
 
-  // eigenaar zet Frans en Japans aan
+  // eigenaar kan niet-basistalen uit- en weer aanzetten
+  assert.equal((await api(base, '/api/boardroom/taal', { code: 'fr', aan: false }, owner)).status, 200);
+  assert.equal((await api(base, '/api/boardroom/taal', { code: 'ja', aan: false }, owner)).status, 200);
+  const uit = await api(base, '/api/talen', {});
+  assert.ok(!uit.body.talen.some(t => t.code === 'fr' || t.code === 'ja'));
   assert.equal((await api(base, '/api/boardroom/taal', { code: 'fr', aan: true }, owner)).status, 200);
   assert.equal((await api(base, '/api/boardroom/taal', { code: 'ja', aan: true }, owner)).status, 200);
   const na = await api(base, '/api/talen', {});

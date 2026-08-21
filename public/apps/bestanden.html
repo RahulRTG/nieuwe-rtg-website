@@ -43,7 +43,8 @@
 
   /* het pad en de mappen */
   #pad{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:.6rem;}
-  #pad button{background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;padding:.15rem .2rem;}
+  /* min-height erbij: .15rem boven en onder bracht de knop net niet op 24 (WCAG 2.5.8) */
+  #pad button{background:none;border:none;color:var(--muted);font:inherit;cursor:pointer;padding:.15rem .2rem;min-height:24px;}
   #pad button:hover{color:var(--gold);}
   #pad .hier{color:var(--txt);font-weight:600;}
   .mapkaart{display:inline-flex;align-items:center;gap:.45rem;background:var(--card);border:1px solid var(--line);
@@ -125,20 +126,20 @@
   <div id="gedeeldLijst"></div>
   <div id="officeKop" class="kop" style="display:none;">Uit RTG Office · werken doet u daar</div>
   <div id="officeLijst"></div>
-  <p class="stil" style="margin-top:.8rem;">Alles in de kluis staat versleuteld opgeslagen. De prullenbak bewaart
+  <p class="stil h-mt80">Alles in de kluis staat versleuteld opgeslagen. De prullenbak bewaart
     30 dagen en telt mee voor het quotum; delen op codenaam laat de ander kijken en nieuwe versies plaatsen.</p>
 </main>
 
 <div class="scrim" id="bkScrim" role="dialog" aria-label="Bestand">
   <div class="paneel">
     <input class="titel" id="bkNaam" maxlength="120" aria-label="Bestandsnaam">
-    <p class="stil" id="bkMeta" style="margin-top:.4rem;"></p>
+    <p class="stil h-mt40" id="bkMeta"></p>
     <div id="bkKijk" style="display:none;"></div>
     <label for="bkMap">In map</label>
     <select class="veld" id="bkMap" style="width:100%;"></select>
     <div id="bkDeelWrap">
       <label for="bkCode">Delen op codenaam (kijken en nieuwe versies)</label>
-      <div class="rij"><input class="veld" id="bkCode" maxlength="60" placeholder="Codenaam" style="flex:1;">
+      <div class="rij"><input class="veld h-flex1" id="bkCode" maxlength="60" placeholder="Codenaam">
         <button class="knop" id="bkDeel" type="button">Deel</button></div>
       <p class="stil" id="bkGedeeld"></p>
     </div>
@@ -146,16 +147,16 @@
       <label>Versies</label>
       <div id="bkVersies"></div>
     </div>
-    <div class="rij" style="margin-top:.9rem;">
+    <div class="rij h-mt90">
       <button class="knop vol" id="bkBewaar" type="button">Bewaar</button>
       <button class="knop" id="bkHaal" type="button">Download</button>
       <button class="knop" id="bkNieuwVersie" type="button">Nieuwe versie</button>
       <button class="knop" id="bkSter" type="button">Ster</button>
       <button class="knop" id="bkWeg" type="button">Verwijder</button>
-      <span style="flex:1;"></span>
+      <span class="h-flex1"></span>
       <button class="knop" id="bkDicht" type="button">Sluit</button>
     </div>
-    <div class="rij" style="margin-top:.5rem;">
+    <div class="rij h-mt50">
       <button class="knop" id="bkHerstel" type="button" style="display:none;">Herstel</button>
       <input type="file" id="versiekiezer" hidden aria-label="Nieuwe versie kiezen">
     </div>

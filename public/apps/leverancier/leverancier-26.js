@@ -1,3 +1,4 @@
+/* de weekbeschikbaarheid per dag */
     const rows = DAG.map(d => {
       const slot = wv.dagen[d[0]] || {};
       return '<div class="st-row" data-wvdag="'+d[0]+'" style="gap:0.5rem;">'+

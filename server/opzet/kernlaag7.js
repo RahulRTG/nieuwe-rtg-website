@@ -44,7 +44,7 @@ module.exports = (kern, hulp) => {
    werkvenster van de werkgever bepaalt of hij open of dicht is. */
 Object.assign(kern, require('../kern/werkbijlogin').maakWerkBijLogin({
   accounts, crypto, findSupplier, magWerken: kern.magWerken, rememberSession,
-  logInlog: kern.logInlog, logActivity, supplierState
+  logInlog: kern.logInlog, logActivity, supplierState, persoonsPoort: kern.persoonsPoort
 }));
 /* RTG Vonk (kern/vonk.js): dating op codenaam met de Salon-veiligheidslat
    (18+ en KYC via de podium-poort), een eindige dagselectie, en bij een

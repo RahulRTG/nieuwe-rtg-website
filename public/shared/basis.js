@@ -25,6 +25,16 @@
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
 
+  /* ---- taal: elk echt appscherm krijgt dezelfde 114-talige laag ---------
+     Vijf grote shells namen i18n.js zelf al op; alle andere schermen hadden
+     daardoor geen taalkeuze en hielden hun hardcoded tekst. De basis ligt op
+     ieder blijvend appscherm en laadt de taalrail precies één keer. */
+  if (!window.RTGi18n && !document.querySelector('script[src^="/shared/i18n.js"]')) {
+    var taalScript = document.createElement('script');
+    taalScript.src = '/shared/i18n.js'; taalScript.async = false;
+    (document.head || document.documentElement).appendChild(taalScript);
+  }
+
   /* In een SPLIT-paneel (same-origin iframe uit shared/split.js) staat de app
      in een halve breedte naast een andere app. De vensterbeheerder en het
      desktopframe die deze class ook zetten bestaan niet meer -- het OS is iOS
@@ -170,6 +180,196 @@
   window.addEventListener('offline', function () { toost(rtf ? 'Even geen internet; de app werkt gewoon door waar dat kan.' : 'Geen verbinding; de app werkt door waar dat kan.'); });
   window.addEventListener('online', function () { toost('De verbinding is terug.'); });
 
+/* de toegankelijkheidshelpers van de gedeelde laag */
+  var MELDPLEKKEN = '#toast,.toast,#melding,.melding,[data-toast],.status';
+  /* ---- de toegankelijkheidshelpers van de gedeelde laag ----
+
+     Twee dingen die op ELK scherm moeten gelden en die geen enkele pagina zelf
+     hoeft te doen: een melding die wordt voorgelezen, en een venster waar je
+     niet ongemerkt uit tabt. Ze staan in een eigen deel omdat basis-02.js met
+     hen erbij op 14,6 KB kwam en de grens 10 is (check.js regel 13) -- en omdat
+     ze samen een onderwerp zijn: wat de schil doet voor wie het scherm niet
+     ziet of niet met een muis bedient.
+
+     Ze worden aangeroepen vanuit start() in basis-02.js. Dat mag: alle delen
+     van deze bundel zitten in EEN IIFE, dus een functie die hier staat is daar
+     gewoon bekend. */
+
+  /* MELDINGEN DIE NIEMAND HOORT.
+
+     Bijna elk scherm hier heeft een toast of een statusregel: "bewaard",
+     "netwerk weg", "dat mag niet". Ze verschijnen in beeld, en voor wie ze niet
+     ZIET gebeurt er niets. Een schermlezer leest alleen voor wat in een live
+     region staat, en dat is precies wat deze elementen niet waren -- gemeten
+     over 259 schermen: 46 stille meldplekken op 42 schermen (25x #melding, 11x
+     #toast, 9x .status).
+
+     Waarom hier en niet per pagina: het zijn 42 schermen met dezelfde vorm, en
+     42 losse reparaties lopen uiteen. `role="status"` is bovendien de zachte
+     variant (aria-live=polite): hij onderbreekt niets en wacht tot de lezer
+     uitgesproken is. Voor een echte fout is `alert` de juiste rol, maar die
+     kiest een pagina zelf -- wie al een rol heeft, houdt hem.
+
+     Een statische regel die nooit verandert wordt hier ook een status, en dat
+     is onschadelijk: een live region meldt alleen WIJZIGINGEN. */
+  function meldingenHoorbaar() {
+    var kandidaten = document.querySelectorAll(MELDPLEKKEN);
+    for (var i = 0; i < kandidaten.length; i++) {
+      var el = kandidaten[i];
+      if (el.getAttribute('role') || el.getAttribute('aria-live')) continue;   // eigen keuze wint
+      el.setAttribute('role', 'status');
+    }
+  }
+
+  /* EEN MODAAL WAAR JE UIT TABT, IS GEEN MODAAL.
+
+     `aria-modal="true"` vertelt een schermlezer: negeer de rest van de pagina.
+     Het doet NIETS aan de tabvolgorde. Staat de achtergrond dan nog open, dan
+     tabt iemand met een toetsenbord de melding uit en landt op knoppen die zijn
+     schermlezer niet meer voorleest -- hij hoort stilte en weet niet waar hij
+     is. Dat is erger dan geen modaal.
+
+     Gemeten over 259 schermen: twee eigen vensters, en het ene (de onboarding
+     van app.html) liet dertien focusbare elementen buiten zich staan terwijl het
+     aria-modal droeg.
+
+     `inert` is de enige manier om dat in een keer waar te maken: het haalt een
+     tak uit de tabvolgorde EN uit de toegankelijkheidsboom. Een browser zonder
+     inert-ondersteuning valt terug op de oude situatie en niet op iets ergers.
+
+     Dit doet BEWUST geen Escape-afhandeling: of een venster gesloten mag worden
+     hangt af van wat het vraagt (een onboardingpoort is niet hetzelfde als een
+     tip), en dat weet de pagina en niet deze laag. */
+  var inertGezet = [], modaalGepland = false, kwamVan = null;
+
+  /* WAAR DE FOCUS VANDAAN KWAM, bijgehouden terwijl het gebeurt.
+
+     Eerste poging onthield hem op het moment dat deze laag de focus in het
+     venster zette, en die kwam altijd te laat: een pagina die zijn venster
+     opent, zet de focus er zelf al in (shared/uitvoer.js doet `laag.hidden =
+     false; knop.focus()` in EEN tik). De waarnemer draait pas daarna, en ziet
+     dan alleen nog een focus die al binnen staat. Wie wil weten waar iemand
+     vandaan kwam, moet meekijken en niet achteraf vragen. */
+  var kwamVanBuiten = null;
+  function focusSpoor() {
+    document.addEventListener('focusin', function (e) {
+      var m = openModaal();
+      if (!m || !m.contains(e.target)) kwamVanBuiten = e.target;
+    }, true);
+  }
+
+  /* Welk venster staat er OPEN -- apart, want twee plekken hebben het nodig en
+     de tweede mag niet wachten (zie modaalLos hieronder).
+
+     DE LAATSTE WINT, EN DAT KOSTTE EEN TOETS. Eerst nam deze de EERSTE in de
+     boom, en op app.html staat dat vast: de onboardingpoort staat in de markup,
+     en een venster dat later opengaat wordt aan het eind van <body> gehangen.
+     Toen pin-herstel zijn eigen scherm opende, sloot deze laag dus alles buiten
+     de ONBOARDING af -- inclusief dat nieuwe scherm. Het stond bovenop, in
+     beeld, en was onaanklikbaar; de tik viel door naar het veld eronder.
+     test/pinherstel.e2e.js zakte erop.
+
+     Later in de boom is bovenop, dus telt de laatste. */
+  function openModaal() {
+    var kandidaten = document.querySelectorAll('[aria-modal="true"]');
+    for (var i = kandidaten.length - 1; i >= 0; i--) {
+      var k = kandidaten[i];
+      if (k.hidden || !k.getClientRects().length) continue;
+      var cs = window.getComputedStyle(k);
+      if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+      return k;
+    }
+    return null;
+  }
+
+  /* LOSLATEN MAG NOOIT EEN FRAME WACHTEN, en die regel komt uit een fout die ik
+     zelf heb gemaakt. Het afsluiten hangt in een requestAnimationFrame om een
+     regen van mutaties te bundelen, en het loslaten hing daar aan vast. Gevolg:
+     na het sluiten van een venster stond de rest van de pagina nog een frame
+     lang op inert. Een mens merkt dat zelden, maar wat er in dat frame gebeurt
+     is niet niets -- een pagina die na het sluiten de focus terugzet op de knop
+     waar de tik vandaan kwam, zet hem op een INERT element, en dan valt de focus
+     terug op body. Twee schermtoetsen in test/premium.e2e.js zakten er precies
+     op ("in een veld komt de letter gewoon in het veld", "de focus gaat terug
+     naar de knop waar de tik vandaan kwam").
+
+     Dus: sluiten mag wachten, loslaten niet.
+
+     EN DE FOCUS TERUG, WANT WIJ HEBBEN HEM WEGGEHAALD. Zelfs zonder dat frame
+     vertraging kan een pagina hem niet zelf terugzetten: zij sluit het venster
+     en zet de focus op de knop waar de tik vandaan kwam, allebei in dezelfde
+     tik -- en op dat moment staat die knop nog op inert, dus de focus valt op
+     body. De waarnemer draait pas daarna. Dat is geen fout van de pagina: hij
+     deed het goed voordat deze laag bestond.
+
+     Dus onthoudt deze laag waar de focus vandaan kwam en zet hem terug als hij
+     bij het loslaten NERGENS staat. Heeft de pagina hem intussen zelf ergens
+     neergezet, dan blijft die keuze staan -- de pagina weet beter waar hij
+     hoort dan wij. */
+  function modaalLos() {
+    if (!inertGezet.length || openModaal()) return false;
+    for (var i = 0; i < inertGezet.length; i++) inertGezet[i].inert = false;
+    inertGezet = [];
+    /* "Nergens" is meer dan body. In het echte geval (shared/uitvoer.js) doet de
+       pagina `laag.hidden = true; knop.focus();` in EEN tik: die focus valt weg
+       omdat de knop nog inert is, en de focus BLIJFT dan staan op de knop in het
+       zojuist verborgen venster -- een element zonder afmetingen, waar niemand
+       iets aan heeft. Pas een tel later laat de browser hem los naar body. Wie
+       alleen op body test, komt te laat. */
+    var actief = document.activeElement;
+    var nergens = !actief || actief === document.body ||
+      !actief.getClientRects || !actief.getClientRects().length;
+    var terug = kwamVan || kwamVanBuiten;
+    if (terug && nergens && document.contains(terug)) {
+      try { terug.focus({ preventScroll: true }); } catch (e) { try { terug.focus(); } catch (e2) {} }
+    }
+    kwamVan = null;
+    return true;
+  }
+
+  function modaalAfsluiten() {
+    var open = openModaal();
+    // eerst terugdraaien wat we eerder hebben afgesloten
+    for (var j = 0; j < inertGezet.length; j++) inertGezet[j].inert = false;
+    inertGezet = [];
+    if (!open || open.tagName === 'DIALOG') return;   // <dialog> doet dit zelf
+    /* OP ELK NIVEAU, en niet alleen bovenaan. Eerste versie zocht de bovenste
+       voorouder van het venster en sloot diens BUREN af -- gemeten op app.html:
+       van de dertien focusbare elementen buiten het venster kwamen er zo maar
+       twee achter inert te staan, want het venster hangt middenin dezelfde tak
+       als de rest van de app. Wie de wereld buiten een venster wil afsluiten,
+       loopt omhoog en sluit op iedere verdieping de buren af. */
+    for (var k = open; k && k !== document.body; k = k.parentElement) {
+      var ouder = k.parentElement; if (!ouder) break;
+      for (var n = ouder.firstElementChild; n; n = n.nextElementSibling) {
+        if (n === k || n.tagName === 'SCRIPT' || n.tagName === 'STYLE' || n.contains(open)) continue;
+        try { n.inert = true; inertGezet.push(n); } catch (e) { /* oude browser: laat staan */ }
+      }
+    }
+    /* En de focus hoort erin te staan. Zonder dit blijft de focus achter op de
+       knop die het venster opende -- in een inerte tak, dus nergens. */
+    if (!open.contains(document.activeElement)) {
+      // waar hij vandaan kwam, zodat modaalLos() hem straks kan teruggeven
+      if (document.activeElement && document.activeElement !== document.body) kwamVan = document.activeElement;
+      var eerste = open.querySelector('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])');
+      var doel = eerste || open;
+      if (!eerste && !open.hasAttribute('tabindex')) open.setAttribute('tabindex', '-1');
+      try { doel.focus({ preventScroll: true }); } catch (e) { try { doel.focus(); } catch (e2) {} }
+    }
+  }
+
+  /* Dezelfde behandeling voor een tak die er LATER bij komt: een scherm dat een
+     kaart met een statusregel erin aanmaakt, gaf anders niets terug. Wordt
+     aangeroepen vanuit de waarnemer in basis-02.js. */
+  function meldingenIn(n) {
+    if (!n || !n.querySelectorAll) return;
+    var kandidaten = n.matches && n.matches(MELDPLEKKEN) ? [n] : [];
+    kandidaten = kandidaten.concat([].slice.call(n.querySelectorAll(MELDPLEKKEN)));
+    for (var i = 0; i < kandidaten.length; i++) {
+      var m = kandidaten[i];
+      if (!m.getAttribute('role') && !m.getAttribute('aria-live')) m.setAttribute('role', 'status');
+    }
+  }
   /* ---- 5. het lopende werk: de gangreserve-laag van het huis ---- */
   var uw = document.createElement('script');
   uw.src = '/shared/uurwerk.js'; uw.async = true;
@@ -204,15 +404,101 @@
     var velden = (root.querySelectorAll ? root.querySelectorAll('input:not([maxlength]),textarea:not([maxlength])') : []);
     for (var i = 0; i < velden.length; i++) zetGrens(velden[i]);
   }
+  /* ---- SPRING NAAR DE INHOUD ----
+
+     Gemeten: 1 van de 258 schermen had een route naar de inhoud, en die ENE
+     werkte niet (zie hieronder). Wie met een toetsenbord of schermlezer werkt,
+     tabt dus op elk scherm eerst door de hele navigatie voordat de inhoud
+     begint -- bij elke paginawissel opnieuw. Gemeten wat dat kost tot in de
+     main: 15 tabs op wereld.html, 11 op salon.html, 4 op mall.html.
+
+     Dat is geen fout die een scan vindt: alles IS bereikbaar. Het is een fout
+     die pas opvalt als je het zelf een dag doet.
+
+     Hier en niet in 258 bestanden, want dit blad is het vangnet dat elke pagina
+     draagt. Let op: basis.js is GEGENEREERD uit deze map (scripts/bundel.js), dus
+     een wijziging hoort hier en niet in de bundel -- die wordt door de volgende
+     build overschreven. Dat is precies hoe deze functie een keer verloren ging.
+
+     Het doel krijgt tabindex=-1, anders verplaatst de browser de focus niet echt
+     naar een element dat zelf niet focusbaar is: de pagina springt dan wel, maar
+     de volgende Tab begint weer bovenaan. Dat is het verschil tussen een link
+     die lijkt te werken en een link die werkt. */
+  function springNaarInhoud() {
+    if (document.querySelector('.rtg-spring')) return;          // al gezet
+    /* WIJKEN VOOR EEN EIGEN SPRINGLINK, MAAR ALLEEN ALS DIE WERKT.
+       app.html en backoffice.html hebben hun eigen <a class="skip" href="#content">,
+       en die is daar gemeten als eerste focusbare element -- dus krijgen ze er
+       geen tweede bij. Dat een eerste Tab daar op een knop landt komt doordat die
+       inlogschermen zelf focus op een veld zetten; de link is dan al voorbij.
+       De test hieronder kijkt daarom naar de tabVOLGORDE en niet naar waar de
+       focus toevallig staat. Alleen wat de browser echt focust telt: rects
+       alleen is niet genoeg (visibility:hidden heeft rects), tabindex<0 valt
+       buiten de volgorde. */
+    var eigen = document.querySelector('a.skip, a.skiplink, a[href^="#"][class*="skip"]');
+    if (eigen) {
+      var eersteFocus = null;
+      var kand = document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      for (var i = 0; i < kand.length; i++) {
+        /* "Zal de browser hier naartoe tabben" is meer dan rects hebben: een
+           element op visibility:hidden heeft wel rects en krijgt geen focus, en
+           tabindex<0 valt buiten de volgorde. Twee eerdere versies keken alleen
+           naar rects en weken daardoor voor de kapotte a.skip op app.html. */
+        var e = kand[i];
+        if (!e.getClientRects().length) continue;
+        var cs = window.getComputedStyle(e);
+        if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+        if (e.disabled || e.tabIndex < 0) continue;
+        eersteFocus = e; break;
+      }
+      if (eersteFocus === eigen) return;                        // die van hen doet het werk al
+    }
+    var doel = document.querySelector('#main, main, [role="main"]') || document.querySelector('h1');
+    if (!doel) return;                                          // niets om naartoe te springen
+    if (!doel.id) doel.id = 'rtg-inhoud';
+    if (!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex', '-1');
+
+    var a = document.createElement('a');
+    a.className = 'rtg-spring';
+    a.href = '#' + doel.id;
+    a.textContent = 'Naar de inhoud';
+    a.addEventListener('click', function () {
+      try { doel.focus({ preventScroll: false }); } catch (e) { doel.focus(); }
+    });
+
+    var st = document.createElement('style');
+    st.textContent = '.rtg-spring{position:fixed;left:-9999px;top:0;z-index:99999;' +
+      'background:#0C0C0B;color:#fff;padding:.6rem 1rem;font:600 .82rem Inter,system-ui,sans-serif;' +
+      'border:1px solid #857007;text-decoration:none}' +
+      '.rtg-spring:focus{left:.5rem;top:.5rem}';
+    document.head.appendChild(st);
+    document.body.insertBefore(a, document.body.firstChild);
+  }
+
   function start() {
+    springNaarInhoud();
+    /* de twee helpers uit basis-01c.js: meldingen die worden voorgelezen, en een
+       venster dat de rest van de pagina afsluit zolang het open staat */
+    meldingenHoorbaar();
+    focusSpoor();
+    modaalAfsluiten();
     begrens(document);
     try {
       new MutationObserver(function (muts) {
         for (var i = 0; i < muts.length; i++) for (var j = 0; j < muts[i].addedNodes.length; j++) {
           var n = muts[i].addedNodes[j];
-          if (n && n.nodeType === 1) begrens(n);
+          if (n && n.nodeType === 1) { begrens(n); meldingenIn(n); }
         }
-      }).observe(document.body, { childList: true, subtree: true });
+        /* Een venster gaat open door `hidden` of een klasse, niet door een nieuw
+           element -- daarom ook op attributen letten, gebundeld in een frame.
+
+           LOSLATEN GAAT WEL METEEN. Zie modaalLos() in basis-01c.js: een frame
+           wachten met het opheffen van inert betekent dat een pagina die na het
+           sluiten de focus terugzet, hem op een inert element zet. */
+        modaalLos();
+        if (!modaalGepland) { modaalGepland = true; requestAnimationFrame(function () { modaalGepland = false; modaalAfsluiten(); }); }
+      }).observe(document.body, { childList: true, subtree: true,
+        attributes: true, attributeFilter: ['hidden', 'class', 'style', 'aria-modal'] });
     } catch (e) {}
 
     /* ---- 4. de app-gids als rustige leerlaag ----

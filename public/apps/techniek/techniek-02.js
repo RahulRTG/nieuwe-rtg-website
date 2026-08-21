@@ -1,3 +1,4 @@
+/* de virusscanner beproeven met een EICAR-bestand */
     api('/api/techniek/wacht/av-test', { method:'POST', body:{ inhoud:eicar, naam:'eicar.com', mime:'application/octet-stream' } })
       .then(function(d){ toast('Scanner: ' + d.resultaat.verdict + ' (' + (d.resultaat.redenen[0]||'') + ')'); laadWacht(); })
       .catch(function(e){ toast(e.message); });

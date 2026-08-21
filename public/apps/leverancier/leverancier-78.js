@@ -1,3 +1,4 @@
+/* de stijl van het zegelvenster */
     const st = document.createElement('style'); st.id = 'rtg-zc-stijl';
     st.textContent = [
       '.zc-ov{position:fixed;inset:0;z-index:100000;background:rgba(12,12,11,.78);display:flex;align-items:center;justify-content:center;padding:1.2rem;}',

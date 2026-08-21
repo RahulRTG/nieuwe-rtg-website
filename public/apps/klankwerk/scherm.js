@@ -50,7 +50,7 @@
 
   if (!TOKEN) {
     $('#lijstVlak').innerHTML = '<div class="kaart"><h2>Log eerst in</h2>' +
-      '<p class="stil" style="margin-top:.5rem;">Open de RTG-app en log in; daarna staan uw stukken hier.</p></div>';
+      '<p class="stil h-mt50">Open de RTG-app en log in; daarna staan uw stukken hier.</p></div>';
     return;
   }
 
@@ -74,7 +74,7 @@
       v.innerHTML = '<div class="kop">Mijn stukken</div>' +
         (rijen || '<p class="stil">Nog niets gemaakt. Begin met een nieuw stuk; er staat meteen een maat in ' +
           'die klinkt, zodat u hoort wat u doet.</p>') +
-        '<div class="rij" style="margin-top:.8rem;">' +
+        '<div class="rij h-mt80">' +
         '<button class="knop vol" id="nieuw" type="button">Nieuw stuk</button>' +
         '<button class="knop" id="nieuwLeeg" type="button">Leeg beginnen</button></div>';
       Array.prototype.forEach.call(v.querySelectorAll('[data-id]'), function (b) {

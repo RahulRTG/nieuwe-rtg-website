@@ -489,9 +489,25 @@ const { sessions, tokenHash, rememberSession, forgetSession, sessionFor,
   koppelBus: koppelSessiesBus, herbouwSessions, TOKEN_TTL_MS } =
   maakSessies({ db, save, crypto });
 
-/* Inlogpogingen afremmen: per bron en doel hooguit tien mislukkingen,
-   daarna vijf minuten wachten. Geldt voor wachtwoorden en toegangscodes. */
-const loginFails = new Map(); // bucket -> { n, until }
+/* Inlogpogingen afremmen: per emmer hooguit tien mislukkingen (of de grens die
+   de aanroeper meegeeft), daarna vijf minuten wachten. Geldt voor wachtwoorden
+   en toegangscodes.
+
+   WAT EEN EMMER IS, BEPAALT WAT DE REM KAN. Een emmer op IP+account remt tien
+   gokken van EEN bron op EEN account -- en niets anders. Veertig bronnen op
+   hetzelfde account zijn veertig verse emmers, dus een verspreide aanval loopt
+   er ongehinderd langs. Daarom hangt de inlog nu ook een emmer op de bron
+   alleen en een op het doel alleen (routes/auth/inlog.js), net zoals de
+   passkey-kant dat al deed. Gemeten voor de reparatie: 40 gokken op een account
+   vanaf 40 adressen leverden nul remmen op.
+
+   DE GRENS IS PER AANROEP INSTELBAAR omdat de emmers niet dezelfde schade
+   aanrichten als ze onterecht dichtgaan. Een emmer op IP+account raakt alleen
+   de aanvaller; een emmer op de bron alleen kan een heel kantoor achter een
+   NAT-adres treffen, en een emmer op het doel alleen kan een vreemde gebruiken
+   om iemands account dicht te houden. Die twee staan dus ruimer, en het slot
+   duurt bewust maar vijf minuten. */
+const loginFails = new Map(); // bucket -> { n, until, laatst }
 function tooManyTries(res, bucket) {
   const f = loginFails.get(bucket);
   if (f && f.until > Date.now()) {
@@ -500,10 +516,18 @@ function tooManyTries(res, bucket) {
   }
   return false;
 }
-function noteFailedTry(bucket) {
+function noteFailedTry(bucket, limiet) {
+  const grens = Number(limiet) > 0 ? Number(limiet) : 10;
   const f = loginFails.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
-  if (f.n >= 10) {
+  /* WANNEER DEZE TELLER MOCHT VERVALLEN WAS EEN GAT. De opruimlus gooide elke
+     vijf minuten alles weg wat niets tegenhield -- ook een emmer die nog aan
+     het tellen was. Daarmee was de regel in de praktijk "negen mislukkingen per
+     opruimronde", en wie zijn gokken doseerde kwam nooit aan de grens. Sinds
+     hier een tijdstempel bij staat, ruimt de lus alleen op wat ook echt stil
+     is (zie opzet/start.js). */
+  f.laatst = Date.now();
+  if (f.n >= grens) {
     f.until = Date.now() + 5 * 60000; f.n = 0;
     // de rate-limit sloeg aan: dit ziet eruit als brute force op een inlog
     if (beveilig) beveilig.meld('brute-force', 'kritiek',
@@ -538,6 +562,20 @@ function logInlog(kanaal, ok, wie, req) {
   if (lijst.length > 5000) lijst.length = 5000;
   save();
 }
+
+/* DE LEVERANCIERSPOORT staat in ./opzet/leverancierpoort.js: de twee
+   SSE-wegen, de melding aan een zaak, de code-index, de opzoeking, de poort
+   waar elke supplier-route doorheen moet, de persoonseis die daaraan hangt, en
+   het activiteitenjournaal. Acht functies die eerst midden in het
+   leverancier-blok hieronder stonden.
+
+   HIER EN NIET DAAR, want de dienstenlaag hieronder krijgt findSupplier,
+   sseToOffice en sseToSupplier als WAARDE mee. `bus` en `kern` gaan andersom en
+   bestaan hier nog niet; die komen daarom als getter binnen (zie de kop daar). */
+const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
+  findSupplier, supplierAuth, persoonsPoort, logActivity } =
+  require('./opzet/leverancierpoort')({ db, save, crypto, rtgKlok, sessionFor, DEMO,
+    grootSupplierSync, busGeef: () => bus, kernGeef: () => kern });
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
    die daarop leunen (archief, beveiliging, de Wacht, RTmail, naamlaag, antivirus)
@@ -864,7 +902,10 @@ function eisAccount(req, res) {
    alleen nodig op het moment dat er echt een bericht langskomt, en tegen die
    tijd staat hij er. Een vaste verwijzing zou hier voor altijd undefined zijn. */
 const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media,
-  commDm: () => kern && kern.commDm });
+  commDm: () => kern && kern.commDm,
+  // de ondertekenaar van de levende contactcode, om dezelfde reden opgehaald in
+  // plaats van vastgehouden: kern/dyncode.js wordt pas in kernlaag1 gezet
+  dyncodeGeef: () => kern && kern.dyncode });
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
 const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon });
@@ -1025,6 +1066,25 @@ app.post('/api/translate', require('./rem')({ windowMs: 60000, limit: 30 }), asy
 // sleutel is de handtekening van de actieve set, dus een taal aan/uit zetten
 // verandert de sleutel en de cache is meteen ongeldig (geen staleness).
 const talenCache = require('./lib/cache').antwoordCache({ ttl: 3600000, max: 8, sleutel: () => 'talen:' + talen.handtekening() });
+/* De losse GitHub Pages-voordeur (index.html in de repositoryroot) draait op
+   rahulrtg.github.io en gebruikt dezelfde taal-API. Alleen die vaste publieke
+   voordeuren krijgen CORS; andere oorsprongen kunnen de response niet lezen. */
+const UI_CORS_ORIGINS = new Set([
+  'https://rahulrtg.github.io',
+  'https://rahultravelgroup.com',
+  'https://www.rahultravelgroup.com'
+]);
+app.use(['/api/talen', '/api/vertaal/ui'], (req, res, next) => {
+  const origin = String(req.get('origin') || '');
+  if (UI_CORS_ORIGINS.has(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Vary', 'Origin');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  next();
+});
 // talen: de actieve set (voor autodetectie + vertaling) en de VOLLEDIGE wereld
 // (alle 114, met een aan/uit-vlag) zodat de taalkiezer alle landvlaggen toont.
 app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve(), alle: talen.alle() }));
@@ -1106,16 +1166,22 @@ app.post('/api/supplier/aanwezig/leeg', supplierAuth, (req, res) => {
 });
 /* Het UI-woordenboek van een pagina in een keer naar een ACTIEVE wereldtaal:
    zo draait de hele app (elke pagina, elk scherm) in elke taal die de
-   boardroom aanzet. Publiek maar begrensd (max 400 teksten van 300 tekens)
-   en zwaar gecachet in de vertaallaag; met een AI-sleutel vertaalt Claude
-   volledig, zonder sleutel valt hij terug op het woordenboek (nooit kapot). */
-app.post('/api/vertaal/ui', async (req, res) => {
+   boardroom aan laat staan. De route is publiek omdat ook de voordeur vóór
+   inloggen in de toesteltaal moet staan. Twee remmen begrenzen modelkosten:
+   per IP én installatiebreed. De vertaallaag groepeert de regels bovendien in
+   echte batches in plaats van één modelaanroep per knop te doen. */
+const uiVertaalPerIp = require('./rem')({ windowMs: 60000, limit: 30 });
+const uiVertaalGlobaal = require('./rem')({ windowMs: 60000, limit: 180, key: () => 'alle-ui' });
+const uiBronnen = require('./lib/ui-bronnen').maakUiBronnen(PUBLIC_DIR, [path.join(PUBLIC_DIR, '..', 'index.html')]);
+app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {
   try {
     const naar = talen.taalVan(req.body && req.body.naar);
+    let totaal = 0;
     const teksten = (Array.isArray(req.body && req.body.teksten) ? req.body.teksten : []).slice(0, 400)
-      .map(t => String(t == null ? '' : t).slice(0, 300));
-    const uit = [];
-    for (const t of teksten) uit.push((await i18n.translate(t, naar)).text);
+      .map(t => String(t == null ? '' : t).slice(0, 300))
+      .filter(t => { totaal += t.length; return totaal <= 24000; });
+    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen.toegestaan });
+    const uit = regels.map(r => r.text);
     res.json({ ok: true, naar, teksten: uit });
   } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }
 });
@@ -1147,67 +1213,6 @@ function findStaffPartner(staffCode) {
    Eén app voor alle leverancierstypes. Communiceert live (SSE) met de
    klanten-app, de website en de backoffice. Leveranciers gebruiken de app
    gratis; in ruil bieden ze RTG hun beste dynamische prijs. */
-
-// SSE-routering naar een specifieke leverancier of naar de backoffice
-function sseToSupplier(code, event, data) {
-  bus.publish('sse', { doel: 'sup', match: code, event, data });
-}
-function sseToOffice(event, data) {
-  bus.publish('sse', { doel: 'office', event, data });
-}
-
-function notifySupplier(code, note) {
-  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: rtgKlok.datum().toISOString(), ...note };
-  db.data.supplierNotifications[code] = (db.data.supplierNotifications[code] || []);
-  db.data.supplierNotifications[code].unshift(n);
-  db.data.supplierNotifications[code] = db.data.supplierNotifications[code].slice(0, 40);
-  save();
-  sseToSupplier(code, 'notify', n);
-  return n;
-}
-
-/* Leverancier opzoeken op code. Met miljoenen zaken in de kast is een lineaire
-   scan (Array.find) per verzoek te duur: elke kassahandeling, elke bestelling
-   en elke inlog zoekt een zaak op. Daarom een index (code -> zaak) die zichzelf
-   herbouwt zodra het aantal zaken verandert (nieuwe partner erbij). Zo is elke
-   opzoeking O(1), ook bij miljoenen restaurants. */
-let _supIndex = null, _supIndexLen = -1;
-function supplierIndex() {
-  if (!_supIndex || _supIndexLen !== db.data.suppliers.length) {
-    _supIndex = new Map();
-    for (const s of db.data.suppliers) _supIndex.set(s.code, s);
-    _supIndexLen = db.data.suppliers.length;
-  }
-  return _supIndex;
-}
-function findSupplier(code) {
-  const c = String(code || '').trim().toUpperCase();
-  // eerst de kleine, actieve kast in het geheugen (O(1)); anders het grootboek
-  // in Postgres (miljoenen bulk-zaken, op aanvraag ingeladen met cache).
-  return supplierIndex().get(c) || grootSupplierSync(c) || null;
-}
-function supplierAuth(req, res, next) {
-  const header = req.get('authorization') || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  const sess = token && sessionFor(token);
-  if (!sess || sess.role !== 'supplier') return res.status(401).json({ error: 'Niet ingelogd als leverancier.' });
-  req.supplier = findSupplier(sess.code);
-  if (!req.supplier) return res.status(401).json({ error: 'Leverancier niet gevonden.' });
-  if (req.supplier.partnerStatus === 'geschorst' || req.supplier.partnerStatus === 'beeindigd')
-    return res.status(401).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
-  // Wie is er aan het werk (voor toeschrijving van activiteiten).
-  req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null, lidKey: sess.lidKey || null };
-  next();
-}
-
-// Legt vast wie wat deed binnen het bedrijf; live zichtbaar in de team-tab.
-function logActivity(code, actor, text) {
-  const list = db.data.supplierActivity[code] = (db.data.supplierActivity[code] || []);
-  list.unshift({ who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() });
-  db.data.supplierActivity[code] = list.slice(0, 80);
-  save();
-  sseToSupplier(code, 'sync', { scope: 'team' });
-}
 
 // publieke weergave van een leverancier (voor de klant)
 
@@ -1903,7 +1908,7 @@ const kern = {
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
-  sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState,
+  sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)

@@ -47,8 +47,8 @@
     $('#spelKeuze').innerHTML = '<h2>De telefoon gaat</h2>' +
       '<div class="sub">' + esc(d.van) + ' nodigt u uit in de suite</div>' +
       '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
-      '<button class="knop2" id="belGa" type="button" style="flex:1;">Ga erheen</button>' +
-      '<button class="knop2 stil2" id="belNiet" type="button" style="flex:1;">Niet nu</button></div>';
+      '<button class="knop2 h-flex1" id="belGa" type="button">Ga erheen</button>' +
+      '<button class="knop2 stil2 h-flex1" id="belNiet" type="button">Niet nu</button></div>';
     $('#spelLaag').classList.add('open');
     $('#belGa').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); betreed(d.adres); });
     $('#belNiet').addEventListener('click', () => $('#spelLaag').classList.remove('open'));

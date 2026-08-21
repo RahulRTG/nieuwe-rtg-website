@@ -30,6 +30,9 @@
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+  /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
+     2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
+  .stil > a{display:inline-block;padding:.25rem 0;min-height:24px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
     font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}
@@ -117,7 +120,13 @@
           <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false" aria-label="Persoonlijke toegangssleutel">
           <button class="knop" id="inGa" type="button">Veilig openen</button>
         </div>
-        <p class="stil" style="margin-top:.8rem;"><a href="/apps/foundation/school.html" style="color:var(--burgundy);">Nieuwe school registreren →</a></p>
+        <div class="school-veiligheidsrij"><span><b>Tijdelijk</b>Sluit de tab en de sleutel verdwijnt.</span><span><b>Rolgestuurd</b>Alleen jouw bevoegdheden worden geladen.</span><span><b>Controleerbaar</b>Gevoelige inzage wordt gelogd.</span></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Nieuwe school of collega?</div>
+        <p class="stil">Een school wordt eerst door RTG gecontroleerd. Daarna laat de directie iedere collega persoonlijk toe.</p>
+        <div class="poort-stappen"><div class="poort-stap"><b><i>01</i>Aanmelden</b>De school vraagt toegang aan.</div><div class="poort-stap"><b><i>02</i>Controleren</b>RTG controleert de organisatie.</div><div class="poort-stap"><b><i>03</i>Toelaten</b>Directie geeft rollen aan medewerkers.</div></div>
+        <p class="stil h-mt80"><a href="/apps/foundation/school.html" style="color:var(--burgundy);">Start de gecontroleerde aanmeldstroom →</a></p>
       </div>
     </div>
   </div>
@@ -182,12 +191,12 @@
         <div class="rij">
           <button class="knop p" id="lesKnop" type="button">Online les starten</button>
           <span class="tag" id="lesTag" hidden></span>
-          <span style="flex:1;"></span>
+          <span class="h-flex1"></span>
           <button class="knop" id="teamKnop" type="button">Team en overname</button>
         </div>
-        <div id="teamBlok" hidden style="margin-top:.6rem;">
+        <div class="h-mt60" id="teamBlok" hidden>
           <div id="teamLijst" class="stil"></div>
-          <div class="rij" style="margin-top:.4rem;">
+          <div class="rij h-mt40">
             <input class="veld" id="teamId" placeholder="Personeels-id van de collega" aria-label="Personeels-id">
             <button class="knop" id="teamErbij" type="button">Vast op de klas (max 3)</button>
             <button class="knop" id="overnameStop" type="button">Overname stoppen</button>

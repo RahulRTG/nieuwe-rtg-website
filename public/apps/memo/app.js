@@ -31,18 +31,12 @@
   try { TX = JSON.parse(localStorage.getItem('rtg_memo_tx') || '{}'); } catch (e) {}
   function txBewaar() { try { localStorage.setItem('rtg_memo_tx', JSON.stringify(TX)); } catch (e) {} }
 
-  /* ---- de map Memo's in de kluis (een keer opzoeken of aanmaken) ---- */
+  /* De map Memo's: opzoeken gaat via shared/kluismap.js, en daar staat ook
+     waarom dat een belofte is en geen variabele. `mapId` blijft hier staan omdat
+     de lijst erop filtert; hij wordt gevuld zodra de belofte rond is. */
   var mapId = null;
   function zoekMap() {
-    return api('/api/bestanden/mijn').then(function (r) {
-      if (r.body.error) throw new Error(r.body.error);
-      var m = (r.body.mappen || []).find(function (x) { return x.naam === "Memo's"; });
-      if (m) { mapId = m.id; return r.body; }
-      return api('/api/bestanden/map', { naam: "Memo's" }).then(function (n) {
-        mapId = n.body.id;
-        return api('/api/bestanden/mijn').then(function (r2) { return r2.body; });
-      });
-    });
+    return RTGKluisMap.zoek(api, "Memo's").then(function (id) { mapId = id; return id; });
   }
 
   /* ---- opnemen ---- */
@@ -98,12 +92,14 @@
       var d = new Date();
       var naam = 'memo-' + d.toISOString().slice(0, 10) + '-' +
         String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + '.webm';
-      api('/api/bestanden/upload', { naam: naam, map: mapId, dataUrl: fr.result }).then(function (r) {
-        if (r.body.error) return meld(r.body.error);
-        if (transcript.trim()) { TX[r.body.id] = transcript.trim(); txBewaar(); }
-        meld('Memo bewaard in je kluis.');
-        laad();
-      });
+      zoekMap().then(function (map) {
+        return api('/api/bestanden/upload', { naam: naam, map: map, dataUrl: fr.result }).then(function (r) {
+          if (r.body.error) return meld(r.body.error);
+          if (transcript.trim()) { TX[r.body.id] = transcript.trim(); txBewaar(); }
+          meld('Memo bewaard in je kluis.');
+          laad();
+        });
+      }).catch(function (e) { meld(e.message); });
     };
     fr.readAsDataURL(blob);
   }
@@ -116,7 +112,7 @@
       '<span class="stil">' + wanneer + ' · ' + Math.max(1, Math.round(it.bytes / 1024)) + ' kB' +
       (TX[it.id] ? ' · met transcript' : '') + '</span></div>' +
       '<audio controls preload="none" data-audio="' + esc(it.id) + '"></audio>' +
-      '<div class="rij" style="margin-top:.45rem;">' +
+      '<div class="rij h-mt45">' +
       '<button class="knop" data-vat="' + esc(it.id) + '" type="button">Samenvatting</button>' +
       '<button class="knop" data-naam="' + esc(it.id) + '" type="button">Hernoem</button>' +
       '<button class="knop" data-weg="' + esc(it.id) + '" type="button">Weg</button></div>' +
@@ -137,8 +133,13 @@
           TX[it.id] ? 'ja' : 'nee'];
       }) };
   });
+  /* De lijst filtert op de map, dus ook zij wacht. Met `mapId === null` zou ze
+     juist de losse bestanden UIT de wortel tonen alsof het memo's waren. */
   function laad() {
-    api('/api/bestanden/mijn').then(function (r) {
+    return zoekMap().then(toonLijst).catch(function (e) { meld(e.message); });
+  }
+  function toonLijst() {
+    return api('/api/bestanden/mijn').then(function (r) {
       if (r.body.error) return meld(r.body.error);
       var memos = (r.body.items || []).filter(function (x) { return x.map === mapId && !x.weg; })
         .sort(function (a, b) { return b.op - a.op; });
@@ -190,5 +191,5 @@
   if (!token) { meld('Log eerst in op de leden-app.'); return; }
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { $('#luister').checked = false; $('#luister').disabled = true; $('#luisterWrap').classList.add('uit'); }
-  zoekMap().then(function () { laad(); }).catch(function (e) { meld(e.message); });
+  laad();   // zoekt de map zelf op en meldt zelf wat er misgaat
 })();

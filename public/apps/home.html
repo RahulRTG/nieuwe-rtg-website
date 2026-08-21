@@ -94,8 +94,8 @@ const api = (pad, body) => fetch(pad, { method:'POST', headers:{'Content-Type':'
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p class="stil" style="margin-top:.6rem;">De Home Kit hoort bij je RTG-account. Open de app en log in.</p>'+
-    '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
+    '<p class="stil h-mt60">De Home Kit hoort bij je RTG-account. Open de app en log in.</p>'+
+    '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
 let HUIS = null, VOORSTEL = null, MERKEN = [];
@@ -132,7 +132,7 @@ function tekenMerken(){
     '<div class="scene"'+(m.verbonden?' style="border-color:var(--gold);"':'')+'><b>'+RTGGlyf.tekst(m.icon)+' '+esc(m.naam)+
     (m.partner?' <small style="color:var(--gold);">partner</small>':'')+'</b>'+
     '<small>'+esc(m.soort)+' · '+m.aantal+' apparaten · '+esc(m.uitleg)+'</small>'+
-    '<div class="rij" style="margin-top:.3rem;">'+
+    '<div class="rij h-mt30">'+
     (m.verbonden ? '<button class="knop stil2 mlos" data-id="'+esc(m.id)+'">Ontkoppel</button>'
                  : '<button class="knop mvast" data-id="'+esc(m.id)+'">Verbind</button>')+'</div></div>').join('')
     : '<span class="stil">Nog geen merken aangesloten.</span>';
@@ -194,7 +194,7 @@ function tekenKamers(){
 function tekenScenes(){
   $('#scenes').innerHTML = HUIS.scenes.length ? HUIS.scenes.map(s =>
     '<div class="scene"><b>'+esc(s.naam)+'</b><small>'+esc(s.uitleg||'')+' ('+s.aantal+' apparaten)</small>'+
-    '<div class="rij" style="margin-top:.3rem;"><button class="knop scstart" data-id="'+esc(s.id)+'">Start</button>'+
+    '<div class="rij h-mt30"><button class="knop scstart" data-id="'+esc(s.id)+'">Start</button>'+
     '<button class="knop stil2 scweg" data-id="'+esc(s.id)+'">Weg</button></div></div>').join('')
     : '<span class="stil">Nog geen scènes. Laat Rahul er hieronder een voorstellen.</span>';
   $('#scenes').querySelectorAll('.scstart').forEach(b => b.addEventListener('click', async () => {
@@ -219,9 +219,9 @@ $('#maak').addEventListener('click', async () => {
     const alle = HUIS.kamers.flatMap(k => k.apparaten);
     $('#voorstel').hidden = false;
     $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(demo-voorstel; met AI-sleutel bouwt Rahul hem zelf)</small>':'')+
-      '<p class="stil" style="margin-top:.2rem;">'+esc(VOORSTEL.uitleg)+'</p>'+
+      '<p class="stil h-mt20">'+esc(VOORSTEL.uitleg)+'</p>'+
       '<ul>'+Object.entries(VOORSTEL.standen).map(([id,s]) => { const a = alle.find(x => x.id === id); return '<li>'+esc(a?a.naam:id)+': '+esc(JSON.stringify(s).replace(/[{}"]/g,'').replace(/,/g,', ').replace(/aan:true/,'aan').replace(/aan:false/,'uit'))+'</li>'; }).join('')+'</ul>'+
-      '<div class="rij" style="margin-top:.6rem;"><button class="knop" id="vBewaar">Bewaar als scène</button><span class="stil">Sloten doet u altijd zelf; die zitten er nooit in.</span></div>';
+      '<div class="rij h-mt60"><button class="knop" id="vBewaar">Bewaar als scène</button><span class="stil">Sloten doet u altijd zelf; die zitten er nooit in.</span></div>';
     $('#vBewaar').addEventListener('click', async () => {
       try { await api('/api/home/scene/bewaar', VOORSTEL); $('#voorstel').hidden = true; $('#wens').value = ''; meld('Scène bewaard.'); laad(); } catch(e){ meld(e.message); }
     });

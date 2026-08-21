@@ -50,7 +50,7 @@
       <input class="veld" id="cSport" placeholder="Sport" maxlength="40">
       <button class="knop" id="cMaak">+ Club</button>
     </div>
-    <div class="leeg" style="margin-top:.4rem;">De club krijgt een clubcode voor het eigen portaal (club.html); daarmee ziet de club alleen het eigen dossier.</div>
+    <div class="leeg h-mt40">De club krijgt een clubcode voor het eigen portaal (club.html); daarmee ziet de club alleen het eigen dossier.</div>
   </div>
   <div id="lijst"><div class="leeg">Laden...</div></div>
 </main>
@@ -114,7 +114,7 @@ function kaart(c){
     '<div class="rij" style="margin:.35rem 0;"><input class="veld" data-anaam placeholder="Nieuwe afspraak"><button class="knop stil" data-amaak>+</button></div>' +
     '<div class="sec">Samenwerkingslog (club + RTF schrijven samen)</div>' +
     ((c.log || []).slice(0, 6).map(m => '<div class="log ' + esc(m.wie) + '"><b>' + esc(m.naam) + '</b>: ' + esc(m.tekst) + '</div>').join('') || '<div class="leeg">Nog stil hier.</div>') +
-    '<div class="rij" style="margin-top:.35rem;"><input class="veld" data-bericht placeholder="Bericht aan de club"><button class="knop stil" data-stuur>Stuur</button></div>' +
+    '<div class="rij h-mt35"><input class="veld" data-bericht placeholder="Bericht aan de club"><button class="knop stil" data-stuur>Stuur</button></div>' +
     '</div>';
 }
 function bind(){

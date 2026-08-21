@@ -54,7 +54,15 @@
   .film .mb{position:absolute;right:0.5rem;top:0.5rem;font-size:0.62rem;background:rgba(12,12,11,0.75);
     border-radius:999px;padding:0.2rem 0.5rem;font-variant-numeric:tabular-nums;}
   /* de bioscoop */
-  .doek{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  /* het ondertitelvel: drie maten die anders als style="" in de markup zouden
+     staan -- en elk inline style-attribuut houdt style-src-attr in de CSP open
+     (NORM.json telt ze daarom). */
+  .ondvel{margin-top:0.8rem;}
+  .ondvel textarea{width:100%;font:inherit;font-size:0.85rem;}
+  .ondrij{margin-top:0.5rem;}
+  .doek{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    /* relative: de ondertitelband (shared/ondertitelband.js) hangt hierin */
+    position:relative;}
   .doek video{width:100%;display:block;max-height:70vh;}
   .kijkTitel{font-family:'Bodoni Moda',serif;font-size:1.4rem;margin-top:0.8rem;}
   .reacties{font-size:0.84rem;line-height:1.6;}
@@ -111,7 +119,7 @@
   <!-- de bioscoop -->
   <section id="vKijk" class="weg">
     <button class="knop" id="terugZaal" type="button">← Terug naar de zaal</button>
-    <div class="doek" style="margin-top:0.7rem;">
+    <div class="doek h-mt70">
       <video id="doekVideo" controls playsinline preload="metadata"></video>
     </div>
     <div class="kijkTitel" id="kijkTitel"></div>
@@ -119,6 +127,25 @@
     <div class="rij">
       <button class="knop" id="abbKnop" type="button">Abonneer op dit kanaal</button>
       <button class="knop rood" id="meldKnop" type="button">Melden bij RTG-kantoor</button>
+      <!-- Alleen zichtbaar op je EIGEN video: de ondertitels van dit stuk. Het
+           Theater had nog geen enkel beheerscherm per video (zelfs verwijderen
+           niet); dit is het eerste, en het is er een dat de kijker dient. -->
+      <button class="knop" id="ondKnop" type="button" hidden>Ondertitels</button>
+    </div>
+    <!-- HET ONDERTITELVEL. Vorm: een regel per ondertitel, "0:05 - 0:09 tekst".
+         Dat is bewust geen tijdlijn met slepen: de meeste makers hebben hun
+         tekst al ergens staan en willen hem plakken, en een tekstvak kan dat.
+         Wat een GELDIGE regel is, beslist de server (kern/ondertitels.js) --
+         hier staat alleen hoe tekst in cues verandert en terug. -->
+    <div class="kaart ondvel" id="ondVel" hidden>
+      <p class="stil">Een video zonder ondertiteling is een video die een deel van de mensen niet kan volgen.
+        Een regel per ondertitel: <code>0:05 - 0:09 wat er gezegd wordt</code>.</p>
+      <label for="ondTekst">Ondertitels</label>
+      <textarea id="ondTekst" rows="8"></textarea>
+      <div class="rij ondrij">
+        <button class="knop vol" id="ondBewaar" type="button">Bewaar de ondertitels</button>
+        <button class="knop" id="ondDicht" type="button">Sluiten</button>
+      </div>
     </div>
     <h2>Reacties</h2>
     <div class="kaart"><div class="reacties" id="reacties"><p class="stil">Nog geen reacties.</p></div>
@@ -131,6 +158,7 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/ondertitelband.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
@@ -420,7 +448,7 @@
       '<button class="knop" id="vOpname" type="button">● Opnemen (hoogste kwaliteit)</button>' +
       '<button class="knop" id="vKies" type="button">Bestand kiezen</button>' +
       '<input type="file" id="vBestand" accept="video/webm,video/mp4" style="position:absolute;left:-999px;" tabindex="-1" aria-label="Videobestand kiezen"></div>' +
-      '<p class="stil" id="vStatus" style="margin-top:0.5rem;">De camera neemt op tot 4K met hoge bitrate; het bestand gaat exact zo naar de kijker.</p>' +
+      '<p class="stil h-mt50" id="vStatus">De camera neemt op tot 4K met hoge bitrate; het bestand gaat exact zo naar de kijker.</p>' +
       '<div class="voortgang" id="vVoortgang"><i></i></div>' +
       '<video id="vVoorbeeld" style="width:100%;border-radius:10px;margin-top:0.6rem;display:none;" muted playsinline></video>';
     kaart.querySelector('#vKies').addEventListener('click', () => kaart.querySelector('#vBestand').click());
@@ -581,6 +609,7 @@
             if (b.soort === 'klaar') {
               const blob = new Blob(ontvangst.brokken, { type: 'video/webm' });
               $('#doekVideo').src = URL.createObjectURL(blob);
+              if (window.RTGOndertitelband) RTGOndertitelband.zet($('.doek'), $('#doekVideo'), (open && open.ondertitels) || []);
               $('#kijkSub').textContent = 'Rechtstreeks ontvangen van ' + (open ? open.codenaam : 'de maker') + ': niets bij RTG bewaard.';
             }
             return;
@@ -614,6 +643,12 @@
     open = v;
     $('#doekVideo').removeAttribute('src');
     $('#kijkTitel').textContent = v.titel;
+    /* De ondertitelknop hoort alleen bij je EIGEN video: het kanaal in deze zaal
+       dat van jou is, is zaal.mijn. Een kijker krijgt hem niet te zien, want die
+       schrijft de ondertitels van een ander niet. */
+    const eigen = !!(zaal && zaal.mijn && zaal.mijn.id === v.kanaalId);
+    $('#ondKnop').hidden = !eigen;
+    $('#ondVel').hidden = true;
     if (v.bewaring === 'thuis') {
       if (!v.online) { zeg('De maker is nu niet online; dit werk staat alleen op diens eigen apparaat.'); return; }
       toonReacties(); toon('vKijk');
@@ -621,6 +656,10 @@
       return;
     }
     $('#doekVideo').src = '/api/theater/kijk/' + v.id + '?token=' + encodeURIComponent(token);
+    /* De ondertitels reizen mee met de kaart uit de zaal (kern/theater/index.js
+       videoBeeld), dus ze staan er voordat het beeld begint. De band zelf is de
+       gedeelde laag die ook de clips en de Media OS gebruiken. */
+    if (window.RTGOndertitelband) RTGOndertitelband.zet($('.doek'), $('#doekVideo'), v.ondertitels || []);
     // contentbescherming: de DRM-route (EME) plus de zichtbare laag (blur, overlay, watermerk)
     try { if (window.RTGProtect) RTGProtect.guardVideo($('#doekVideo'), { contentId: 'theater:' + v.id, watermark: 'RTG Theater · ' + (v.codenaam || 'lid') }); } catch (e) {}
     $('#kijkSub').textContent = v.kanaal + ' · ' + v.codenaam + ' · ' + v.mb + ' MB origineel' + (v.omschrijving ? ' · ' + v.omschrijving : '');
@@ -639,7 +678,9 @@
       el.appendChild(d);
     }
   }
-  $('#terugZaal').addEventListener('click', () => { $('#doekVideo').pause(); $('#doekVideo').removeAttribute('src'); laadZaal(); });
+  $('#terugZaal').addEventListener('click', () => { $('#doekVideo').pause(); $('#doekVideo').removeAttribute('src');
+    if (window.RTGOndertitelband) RTGOndertitelband.weg($('.doek'));
+    laadZaal(); });
   $('#reactieForm').addEventListener('submit', async e => { e.preventDefault();
     const t = $('#reactieVeld').value.trim(); if (!t || !open) return;
     const r = await api('reactie', { id: open.id, tekst: t });
@@ -649,6 +690,55 @@
     const r = await api('abonneer', { kanaalId: open.kanaalId });
     zeg(r.body.error || 'Geabonneerd: nieuw werk van dit kanaal staat voortaan bovenaan.');
   });
+  /* ---------- de ondertitels van je eigen video ----------
+
+     TEKST NAAR CUES EN TERUG, en dat is het enige wat hier gebeurt: of een cue
+     GELDIG is (binnen de duur, niet te lang, gesorteerd) beslist de server in
+     kern/ondertitels.js, samen met de clip-kant. Een tweede oordeel hier zou
+     precies de dubbeling zijn die dit spoor moest vermijden.
+
+     Een regel die niet te lezen is, valt weg en de rest blijft staan -- dezelfde
+     afspraak als op de server, zodat een plakfout niet je hele vel kost. */
+  const tijdUit = (s) => {
+    const m = /^\s*(?:(\d+):)?(\d+(?:[.,]\d+)?)\s*$/.exec(String(s || ''));
+    if (!m) return null;
+    return (m[1] ? Number(m[1]) * 60 : 0) + Number(String(m[2]).replace(',', '.'));
+  };
+  const tijdIn = (sec) => Math.floor(sec / 60) + ':' + String(Math.round(sec % 60)).padStart(2, '0');
+  function velNaarCues(tekst) {
+    const uit = [];
+    for (const regel of String(tekst || '').split('\n')) {
+      if (!regel.trim()) continue;
+      const m = /^\s*([^-]+?)\s*-\s*([^\s]+)\s+(.+)$/.exec(regel);
+      if (!m) continue;
+      const van = tijdUit(m[1]), tot = tijdUit(m[2]);
+      if (van == null || tot == null) continue;
+      uit.push({ van, tot, tekst: m[3].trim() });
+    }
+    return uit;
+  }
+  const cuesNaarVel = (cues) => (cues || []).map(c => tijdIn(c.van) + ' - ' + tijdIn(c.tot) + ' ' + c.tekst).join('\n');
+
+  $('#ondKnop').addEventListener('click', () => {
+    if (!open) return;
+    const vel = $('#ondVel');
+    vel.hidden = !vel.hidden;
+    if (!vel.hidden) { $('#ondTekst').value = cuesNaarVel(open.ondertitels); $('#ondTekst').focus(); }
+  });
+  $('#ondDicht').addEventListener('click', () => { $('#ondVel').hidden = true; $('#ondKnop').focus(); });
+  $('#ondBewaar').addEventListener('click', async () => {
+    if (!open) return;
+    const regels = velNaarCues($('#ondTekst').value);
+    const r = await api('ondertitels', { id: open.id, regels });
+    if (r.body.error) return zeg(r.body.error);
+    open.ondertitels = r.body.ondertitels || [];
+    /* Meteen zichtbaar op het doek dat je voor je hebt: anders moet je de video
+       opnieuw openen om te zien wat je zojuist hebt getypt. */
+    if (window.RTGOndertitelband) RTGOndertitelband.zet($('.doek'), $('#doekVideo'), open.ondertitels);
+    $('#ondTekst').value = cuesNaarVel(open.ondertitels);
+    zeg(open.ondertitels.length + ' ondertitelregel(s) bewaard.');
+  });
+
   $('#meldKnop').addEventListener('click', async () => { if (!open) return;
     const reden = prompt('Wat wilt u melden aan RTG-kantoor?');
     if (reden == null) return;

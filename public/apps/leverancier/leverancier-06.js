@@ -1,3 +1,4 @@
+/* de personeelskiezer: wie ben jij */
     if (fallback) list = all;
     spH2().textContent = mgmt ? T('sp.r.mgmt','Management') : func;
     spDeck().textContent = fallback ? T('sp.nofunc','Nog niemand met deze functie; kies uw naam uit het team.') : T('sp.pickname','Kies uw naam en voer uw pincode in.');
@@ -31,7 +32,7 @@
       } catch(e){ toast(e.message); }
     });
   }
-  function backBtn(){ return '<button class="sp-biz-btn" id="spBack2" style="margin-top:0.9rem;">← '+T('sp.back','Terug')+'</button>'; }
+  function backBtn(){ return '<button class="sp-biz-btn h-mt90" id="spBack2">← '+T('sp.back','Terug')+'</button>'; }
   function bindBack(fn){ const b = $('#spBack2'); if (b) b.addEventListener('click', fn); }
 
   $('#spBack').addEventListener('click', () => $('#staffPick').classList.remove('open'));

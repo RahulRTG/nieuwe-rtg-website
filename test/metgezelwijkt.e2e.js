@@ -21,13 +21,10 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop, letOpFouten } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) {}
-  return null;
-}
+/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
+   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
+   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
+const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
 const rahulStaat = () => {
@@ -74,10 +71,41 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        en beide veilige voorbereidingsknoppen blijft bedienen. */
     await page.waitForSelector('.rtg-one [data-one-decision]', { state: 'attached', timeout: 10000 });
     await page.click('.rtg-rahul-tab');
+
+    /* HIER STOND EEN VASTGEPINDE DECORTEKST, en dat is precies waarom deze
+       twee regels omvielen. De knop schreef vroeger zelf "5 DOMEINEN
+       GESIMULEERD" en "4 voorbereid · 0 uitgevoerd" in het scherm zonder iets
+       te simuleren; deze toets pinde die bewering vast en hield haar daarmee in
+       leven. De Live Twin haalt de stand nu bij de server: eerst een
+       tussenstand, daarna de echte status met het aantal bevestigde bronnen.
+       Toevallig zijn dat er ook vijf -- maar nu gemeten in plaats van beweerd.
+
+       Dus toetsen we niet langer de tekst maar de RONDE: de Proof Rail komt
+       alleen in de "n CONTROLES"-vorm te staan als de server werkelijk een
+       pakket met bronnen heeft geleverd (de beginstand is "2 SERVERBRONNEN").
+       Deze toets zakt dus zodra die ronde stilvalt, en niet zodra iemand een
+       woord in de koptekst wijzigt. */
     await page.click('[data-build-plan]');
-    assert.equal(await page.textContent('[data-twin-state]'), '5 DOMEINEN GESIMULEERD');
+    await page.waitForFunction(
+      () => /^\d+ CONTROLES$/.test(((document.querySelector('[data-proof-count]') || {}).textContent || '').trim()),
+      null, { timeout: 20000 });
+    const bronnen = (await page.textContent('[data-proof-count]')).trim().match(/^(\d+) CONTROLES$/);
+    assert.ok(Number(bronnen[1]) >= 1, 'de server heeft minstens een bron bevestigd, dus de ronde is echt gelopen');
+    assert.match((await page.textContent('[data-flow-evidence]')).trim(), /^\d+ bevestigd$/,
+      'en de Evidence-stap telt diezelfde bevestigde bronnen');
+    assert.notEqual((await page.textContent('[data-twin-state]')).trim(), 'BRONNEN CONTROLEREN',
+      'de twin blijft niet in de tussenstand hangen');
+
+    /* De tweede knop. Zonder wachtend voorstel voert hij niets uit en zegt dat
+       ook -- dat is de grens die deze PR bewaakt. Dus: hij antwoordt zichtbaar,
+       en de uitvoeringsstand springt níet op uitgevoerd. */
+    const logVoor = await page.evaluate(() => document.querySelector('.rtg-command-log').children.length);
     await page.click('[data-one-decision]');
-    assert.equal(await page.textContent('[data-decision-state]'), 'CONTROLE GEOPEND');
+    await page.waitForFunction(n => document.querySelector('.rtg-command-log').children.length > n,
+      logVoor, { timeout: 10000 });
+    assert.equal((await page.textContent('[data-decision-state]')).trim(), 'GEEN UITVOERING',
+      'zonder wachtend voorstel blijft de uitvoeringsstand leeg');
+
     await page.click('.rtg-command-close');
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'na de workspace blijft de tab bereikbaar');
 

@@ -1,3 +1,4 @@
+/* de kengetallen van een beautysalon */
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.afsprakenVandaag, T('bs.k.af','afspraken vandaag')],[k.wachtenden, T('bs.k.wacht','in de wachtrij')],[k.inDeStoel, T('bs.k.stoel','in de stoel')],[eur(k.omzetVandaag), T('bs.k.omzet','omzet vandaag')]]
         .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
@@ -50,8 +51,8 @@
       '<input id="pcDieet" class="st-in" placeholder="'+T('pc.dieet','Dieet of bijzonderheden')+'" maxlength="120" class="h-flex2"><button id="pcIn" style="flex:1;'+vzGoud+'">'+T('pc.in','Check in')+'</button></div>';
     h += (d.gasten||[]).map(g=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(g.naam)+' ('+esc(g.dier)+') · hok '+g.hok+'</b><span class="sub">'+esc(g.baasje)+(g.tot?' · tot '+esc(g.tot):'')+'</span>'+vzKnop('data-pcuit', g.id, T('pc.uit','Check uit'))+'</div>'+
-      (g.dieet?'<div class="sub" style="margin-top:0.25rem;">'+esc(g.dieet)+'</div>':'')+
-      (g.notities&&g.notities.length?'<div class="sub" style="margin-top:0.25rem;">'+esc(g.notities[0].tekst)+'</div>':'')+
+      (g.dieet?'<div class="sub h-mt25">'+esc(g.dieet)+'</div>':'')+
+      (g.notities&&g.notities.length?'<div class="sub h-mt25">'+esc(g.notities[0].tekst)+'</div>':'')+
       '<div class="row-gap h-mt40"><input data-pcnt="'+g.id+'" class="st-in" placeholder="'+T('pc.notitie','Notitie voor het baasje')+'" maxlength="160" style="flex:3;">'+vzKnop('data-pcnb', g.id, T('pc.noteer','Noteer'), true)+'</div></div>').join('');
 
     // de uitlaatrondes

@@ -31,7 +31,7 @@
   if (!memTok && !supTok) return;
   if (!window.__rahulTabStandaard) {
     var rahulTabScript = document.createElement('script');
-    rahulTabScript.src = '/shared/rahul-tab.js?v=command5'; rahulTabScript.defer = true;
+    rahulTabScript.src = '/shared/rahul-tab.js?v=command7'; rahulTabScript.defer = true;
     document.head.appendChild(rahulTabScript);
   }
 
@@ -142,6 +142,7 @@
     '.mgz-seintje:hover{border-color:#C23A5E;}.mgz-seintje b{color:var(--gold,#857007);display:block;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.15rem;}' +
     /* de lege-toestand-knop: overal waar nog niets staat, kan Rahul het regelen */
     '.rahul-leeg-knop{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--gold,#857007);color:var(--gold,#857007);border-radius:999px;padding:.5rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;}' +
+/* de stijl en de bouwstenen van de metgezel */
     '.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var maakEl = function (html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstChild; };

@@ -65,9 +65,9 @@
     // dat vak uitgerekt, dan wordt deze schaduw een ellips die ver boven en
     // onder de wijzerplaat uitloopt -- en de wijzerplaat verraadt dat niet,
     // want de SVG houdt zijn eigen verhouding en blijft rond. Wie de klok
-    // ergens een maat geeft: houd breedte en hoogte gelijk (zie de twee
-    // gelijke bovengrenzen bij .os-klokvak in apps/app.html, en de toets
-    // "het vak van de klok op het beginscherm is vierkant").
+    // ergens een maat geeft: houd breedte en hoogte gelijk. (Het voorbeeld hier
+    // was .os-klokvak op het beginscherm van apps/app.html, met twee gelijke
+    // bovengrenzen; die klok is weg -- zie WERELD.md -- maar de val niet.)
     '.rtg-ring::before{content:"";position:absolute;inset:1.5%;border-radius:50%;pointer-events:none;' +
       'box-shadow:0.18rem 0.22rem 0.7rem rgba(0,0,0,0.34), 0.7rem 0.85rem 2.2rem rgba(0,0,0,0.22);}' +
     /* Vervolg van klok-01: het glas en de rest van de ringstijl. Geknipt omdat
@@ -210,6 +210,7 @@
     const maak = (naam, at) => {
       const n = document.createElementNS(NS, naam);
       for (const [k, v] of Object.entries(at)) n.setAttribute(k, v);
+/* de wijzerplaat tekenen */
       svg.appendChild(n);
       return n;
     };
@@ -416,6 +417,7 @@
       lume.setAttribute('stroke', '#E7E2CC'); lume.setAttribute('stroke-width', (w * 0.4).toFixed(2));
       lume.setAttribute('stroke-linecap', 'round');
       g.append(body, lume);
+/* de wijzers laten draaien */
       wijzers.appendChild(g);
       let vorige = null;
       return { draai: graden => {

@@ -38,17 +38,17 @@
               '<button class="knop stil" data-bnzet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Nagetrokken</button>') +
           '</div>';
       }).join('') : '<div class="leeg">Nog geen bronnen. Een bron die niemand heeft nagetrokken, draagt hier geen conclusie.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<input class="veld" data-brtitel placeholder="Bron: titel" maxlength="200">' +
         '<input class="veld" data-brherkomst placeholder="Herkomst" maxlength="200" style="max-width:11rem;">' +
         '<button class="knop stil" data-brzet type="button">Voeg bron toe</button></div>' +
 
-      '<div class="sec" style="margin-top:.9rem;">Datasets</div>' +
+      '<div class="sec h-mt90">Datasets</div>' +
       (ds.length ? ds.map(function (d) {
         return '<div class="log"><b>' + esc(d.naam) + '</b> &middot; ' + d.rijen + ' rijen' +
           (d.herkomst ? ' &middot; ' + esc(d.herkomst) : '') + '</div>';
       }).join('') : '<div class="leeg">Nog geen datasets.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
+      '<div class="rij h-mt35">' +
         '<input class="veld" data-dsnaam placeholder="Dataset: naam" maxlength="120">' +
         '<input class="veld" data-dsrijen type="number" min="0" placeholder="rijen" style="max-width:7rem;">' +
         '<button class="knop stil" data-dszet type="button">Voeg dataset toe</button></div></div>';
@@ -83,7 +83,7 @@
           ((c.bewijs || []).length
             ? '<br>' + c.bewijs.map(function (w) { return esc(w.soort) + (w.notitie ? ' (' + esc(w.notitie) + ')' : ''); }).join(', ')
             : '') +
-          '<div class="rij" style="margin-top:.3rem;">' +
+          '<div class="rij h-mt30">' +
             '<select class="veld" data-bsoort aria-label="Bewijs kiezen" style="font-size:.78rem;">' +
               '<option value="">-- kies een drager uit dit dossier --</option>' + opties() +
               '<option value="interview:">interview (beschrijf hieronder)</option>' +
@@ -92,7 +92,7 @@
             '</select>' +
             '<input class="veld" data-bvrij placeholder="omschrijving (bij de laatste drie)" style="font-size:.78rem;">' +
             '<button class="knop stil" data-bkoppel type="button" style="font-size:.72rem;padding:.2rem .55rem;">Hang eronder</button></div>' +
-          '<div class="rij" style="margin-top:.3rem;">' +
+          '<div class="rij h-mt30">' +
             '<select class="veld" data-ggraad aria-label="Bewijsgraad" style="font-size:.78rem;">' +
               KADER.bewijs.map(function (b) {
                 return '<option value="' + esc(b.graad) + '">' + esc(b.naam) + '</option>';

@@ -126,7 +126,7 @@
         (st.centen != null ? ' → ' + eur(st.centen) : '') + '</div>';
     }).join('');
     return '<details><summary>Hoe is dit uitgerekend?</summary>' + s +
-      '<div class="stap" style="margin-top:0.4rem;">Gerekend met regelpakket ' +
+      '<div class="stap h-mt40">Gerekend met regelpakket ' +
       esc(strook.regelpakket ? strook.regelpakket.versie : '?') + ' (' +
       esc(strook.regelpakket ? strook.regelpakket.land : '') + ').' +
       (strook.regelpakket && strook.regelpakket.stand !== 'goedgekeurd'
@@ -147,7 +147,7 @@
       return '<div class="kaart">' +
         '<div class="strookkop"><b>' + esc(s.periode) + '<br><span class="stil">' + esc(s.zaak) + '</span></b>' +
         '<span class="netto">' + eur(st.nettoCenten) + '</span></div>' +
-        (s.correctieVan ? '<p class="stil" style="margin-top:0.4rem;">Dit is een correctie op een eerdere periode. De oorspronkelijke strook blijft staan; deze zet het verschil recht.</p>' : '') +
+        (s.correctieVan ? '<p class="stil h-mt40">Dit is een correctie op een eerdere periode. De oorspronkelijke strook blijft staan; deze zet het verschil recht.</p>' : '') +
         /* WAAROP DEZE STROOK BERUST, en dat hoort HIER te staan en niet alleen
            in de backoffice. De administrateur kan het regelpakket erbij halen;
            de medewerker die naar zijn eigen bedrag kijkt, kan dat niet. Draait
@@ -158,7 +158,7 @@
           'Deze berekening staat op belastingtabellen die nog niet tegen de officiële bron zijn gelegd. ' +
           'De bedragen kunnen daardoor afwijken. Gebruik deze strook niet als bewijs van inkomen; vraag uw werkgever om een gecontroleerde versie.</p>' : '') +
         '<p class="uitleg">' + esc(s.uitleg) + '</p>' +
-        '<div style="margin-top:0.7rem;">' +
+        '<div class="h-mt70">' +
         bruto.map(regelRij).join('') +
         '<div class="rij dik"><span class="lbl">Bruto</span><span>' + eur(st.brutoCenten) + '</span></div>' +
         '<div class="rij"><span class="lbl">Loonheffing</span><span>− ' + eur(st.loonheffingCenten) + '</span></div>' +

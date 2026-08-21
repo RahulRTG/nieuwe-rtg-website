@@ -1,3 +1,4 @@
+/* de bouwstempel: HTML en script moeten van dezelfde bouw zijn */
 (function(){
 /* HTML EN SCRIPT MOETEN VAN DEZELFDE BOUW ZIJN.
 
@@ -12,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'beedc273';
+var RTG_BOUW = 'f71de07b';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');

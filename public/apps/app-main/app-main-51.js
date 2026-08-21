@@ -1,3 +1,4 @@
+/* een betaalpartner kiezen */
     ov.querySelectorAll('.js-dppick').forEach(b => b.addEventListener('click', () => {
       const s = lijst.find(x => x.code === b.dataset.code); ov.remove();
       betaalPartner(s.code, s.name, { bron });
@@ -69,7 +70,7 @@
         zakStatusKnop(p) + '</div>' +
       (p.bio ? '<div style="font-size:0.76rem;color:var(--muted);margin-top:0.45rem;line-height:1.5;">' + escT(p.bio) + '</div>' : '') +
       ((p.ervaring || []).length ? '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.4rem;">' + p.ervaring.map(escT).join('<br>') + '</div>' : '') +
-      (skills ? '<div style="margin-top:0.35rem;">' + skills +
+      (skills ? '<div class="h-mt35">' + skills +
         (p.status === 'verbonden' ? '<div style="font-size:0.6rem;color:var(--soft);margin-top:0.25rem;">' + T('zak.tikskill','Tik een vaardigheid aan om hem aan te bevelen.') + '</div>' : '') + '</div>' : '') +
       '</div>';
   }

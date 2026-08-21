@@ -28,7 +28,7 @@
       'De AI verwoordt hooguit; hij kiest niet wat er gebeurt.</p>' +
       '<div class="kaart">' +
       '<textarea class="veld" id="opq" placeholder="Bijvoorbeeld: waarom loopt mobiliteit in Haarlem achter?"></textarea>' +
-      '<div class="crij" style="margin-top:.6rem;"><button class="knop vol" id="opGa">Vraag het</button>' +
+      '<div class="crij h-mt60"><button class="knop vol" id="opGa">Vraag het</button>' +
       VOORBEELDEN.map(function (v) { return '<button class="knop" data-vb="' + esc(v) + '">' + esc(v) + '</button>'; }).join('') +
       '</div></div><div id="opuit"></div>';
     el.innerHTML = u;
@@ -51,7 +51,7 @@
   function toonPlan(p) {
     var u = '<div class="kaart"><h3>Het antwoord</h3><p style="color:var(--txt);font-size:.95rem;line-height:1.7;">' +
       esc(p.tekst) + '</p>' +
-      '<div class="crij" style="margin-top:.9rem;">' +
+      '<div class="crij h-mt90">' +
       (p.veilig && !p.uitgevoerd ? '<button class="knop vol" id="opDoe">Doe de veilige ' + p.veilig + ' en geef mij de uitzonderingen</button>' : '') +
       (p.uitgevoerd ? '<span class="meta">Dit plan is uitgevoerd.</span>' : '') +
       '</div></div>';
@@ -60,19 +60,19 @@
       var d = p.delen[i];
       u += '<div class="kaart"><h3>' + esc(d.naam) + ' <span class="meta">· ' + d.totaal + ' geval(len) in ' + esc(d.domein) + '</span></h3>';
       if (d.oorzaakVeld) {
-        u += '<p>Gemeten oorzaak: het veld <b>' + esc(d.oorzaakVeld) + '</b>.</p><div class="meta" style="margin-top:.35rem;">' +
+        u += '<p>Gemeten oorzaak: het veld <b>' + esc(d.oorzaakVeld) + '</b>.</p><div class="meta h-mt35">' +
           d.oorzaken.map(function (o) { return o.aantal + '× ' + esc(o.waarde); }).join(' · ') + '</div>';
       } else {
         u += '<p class="meta">Geen enkel veld verklaart deze gevallen samen; ze hebben geen gedeelde oorzaak.</p>';
       }
-      u += '<div class="crij" style="margin-top:.7rem;">' +
+      u += '<div class="crij h-mt70">' +
         '<span class="meta">veilig ' + d.veilig + '</span><span class="meta">· met hulp ' + d.hulp + '</span>' +
         '<span class="meta">· mens ' + d.mens + '</span>' +
         (d.overgeslagen ? '<span class="meta">· ' + d.overgeslagen + ' boven de rondegrens</span>' : '') +
         '</div>' +
-        '<div class="meta" style="margin-top:.4rem;">Stapeloordeel: risico ' + d.stapeloordeel.score + ' -- ' + esc(d.stapeloordeel.waarom) + '</div>';
+        '<div class="meta h-mt40">Stapeloordeel: risico ' + d.stapeloordeel.score + ' -- ' + esc(d.stapeloordeel.waarom) + '</div>';
       if (d.uitzonderingen.length) {
-        u += '<div style="margin-top:.7rem;"><b style="font-size:.85rem;">Uitzonderingen</b>';
+        u += '<div class="h-mt70"><b style="font-size:.85rem;">Uitzonderingen</b>';
         for (var j = 0; j < d.uitzonderingen.length; j++) {
           var x = d.uitzonderingen[j];
           u += '<div class="lijn"><button class="knop" data-t="' + esc(d.type) + '" data-i="' + esc(x.id) + '" style="border:none;padding:0;">' +
@@ -139,7 +139,7 @@
         (k.objectType ? '<p class="meta">Object: <button class="knop" data-t="' + esc(k.objectType) + '" data-i="' + esc(k.objectId) + '" style="border:none;padding:0;font-size:.78rem;">' + esc(k.objectType) + ' ' + esc(k.objectId) + '</button></p>' : '') +
         (k.bewijs ? '<p class="meta">Bewijs: ' + esc(JSON.stringify(k.bewijs).slice(0, 220)) + '</p>' : '') +
         (k.besluit ? '<p class="meta">Besluit: ' + esc(k.besluit.keuze) + ' -- ' + esc(k.besluit.reden) + ' (' + esc(k.besluit.door) + ')</p>'
-          : '<div class="crij" style="margin-top:.6rem;">' +
+          : '<div class="crij h-mt60">' +
             (k.eigenaar ? '' : '<button class="knop" data-neem="' + esc(k.id) + '">Ik pak hem op</button>') +
             '<input class="veld" data-keuze="' + esc(k.id) + '" placeholder="besluit (bv. hersteld, afgewezen)" style="min-width:12rem;">' +
             '<input class="veld" data-reden="' + esc(k.id) + '" placeholder="waarom" style="min-width:14rem;flex:1;">' +

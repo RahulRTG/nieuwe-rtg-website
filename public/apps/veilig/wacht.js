@@ -22,8 +22,8 @@
         '<div class="rij"><input id="eigen" type="number" min="1" max="1440" placeholder="of eigen aantal minuten" aria-label="Eigen aantal minuten"></div>' +
         '<label class="stil lbl" for="wat">Waar gaat u heen? (alleen uw kring ziet dit)</label>' +
         '<input id="wat" maxlength="80" placeholder="Bijv. lopend naar huis vanaf het station">' +
-        '<label class="mini" style="margin-top:.7rem;"><input type="checkbox" id="marge" checked> eerst mij nog 10 minuten waarschuwen</label>' +
-        '<button class="knop hoofd groot" id="start" style="margin-top:.8rem;">Start de wacht</button>';
+        '<label class="mini h-mt70"><input type="checkbox" id="marge" checked> eerst mij nog 10 minuten waarschuwen</label>' +
+        '<button class="knop hoofd groot h-mt80" id="start">Start de wacht</button>';
       var gekozen = 30;
       $('#wacht').querySelectorAll('[data-min]').forEach(function (b) {
         b.addEventListener('click', function () {
@@ -52,11 +52,11 @@
       '<div class="teller' + (x.status === 'genade' ? ' warm' : (alarm ? ' alarm' : '')) + '" id="klok" aria-live="off">--:--</div>' +
       '<p class="tellerbij" id="bij"></p>' +
       '<button class="knop hoofd groot" id="in">Ik ben thuis</button>' +
-      '<div class="rij" style="margin-top:.6rem;">' +
-        '<button class="knop" id="plus" style="flex:1;">15 minuten erbij</button>' +
-        '<button class="knop stop" id="stop" style="flex:1;">Stoppen</button>' +
+      '<div class="rij h-mt60">' +
+        '<button class="knop h-flex1" id="plus">15 minuten erbij</button>' +
+        '<button class="knop stop h-flex1" id="stop">Stoppen</button>' +
       '</div>' +
-      '<p class="stil" style="margin-top:.7rem;">' + Veilig.esc(x.label || '') + '</p>';
+      '<p class="stil h-mt70">' + Veilig.esc(x.label || '') + '</p>';
 
     var klok = $('#klok'), bij = $('#bij');
     var rest = x.restSec;
@@ -111,7 +111,7 @@
       '<div class="kaart">' +
         '<p class="stil">Stuur uw kring een proefalarm. Zij zien duidelijk dat het een test is. ' +
         'Doe dit een keer echt: een keten die u nooit heeft geprobeerd, is geen keten.</p>' +
-        '<button class="knop" id="proef" style="margin-top:.6rem;">Stuur een proefalarm</button>' +
+        '<button class="knop h-mt60" id="proef">Stuur een proefalarm</button>' +
       '</div>',
     start: function () {
       $('#proef').addEventListener('click', async function () {

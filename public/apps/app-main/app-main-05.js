@@ -56,12 +56,15 @@
       }
     }
     const pkKnop = doos.querySelector('#agPasskey');
+    const andersKnop = doos.querySelector('#agAnders');
+    const antwoordRij = inp.closest('.ag-rij');
+    let passkeyBezig = false, passkeyAbort = null;
     function toonPasskey(aan){
       if (!pkKnop) return;
       pkKnop.hidden = !aan;
       // het label pas hier vertalen: bij het bouwen van de poort is de i18n
       // soms nog niet geladen
-      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.knop','Face ID of passkey'); }
+      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.open','Open met Face ID of passkey'); }
     }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';
@@ -75,41 +78,56 @@
       toonPasskey(false);
     }
 
-    /* Face ID / passkey: dezelfde WebAuthn-dans als de aparte passkey-pagina,
-       maar binnen de poort. Rahul kent de gebruikersnaam al (loginU); het
-       toestel bewijst de identiteit, de server munt een echte sessie. */
-    async function passkeyInlog(){
-      if (!loginU || bezig) return;
+    /* RTG Deur: eerst bewijst het toestel wie er staat; pas daarna zoekt de
+       server het account bij de credential. Na "Andere manier" kan dezelfde
+       functie ook de oude, gerichte passkey van een genoemd account gebruiken. */
+    async function passkeyInlog(automatisch){
+      if (passkeyBezig) return;
       if (!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get)){
-        zeg('rahul', T('ag.pk.geen','Dit toestel kent nog geen Face ID of passkey. Typ je wachtwoord.')); return;
+        zeg('rahul', T('ag.pk.geen','Dit toestel kent geen passkey. Kies Andere manier.')); return;
       }
       const b2u = s => Uint8Array.from(atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
       const u2b = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-      bezig = true;
+      passkeyBezig = true;
+      passkeyAbort = window.AbortController ? new AbortController() : null;
       try {
         zeg('rahul', T('ag.pk.vraag','Je toestel vraagt nu om je Face ID, vingerafdruk of sleutel.'));
-        const o = await API.call('/webauthn/opties', { login: loginU });
+        const o = await API.call('/webauthn/opties', loginU ? { login: loginU } : {});
         const pub = o.opties; pub.challenge = b2u(pub.challenge);
         pub.allowCredentials = (pub.allowCredentials || []).map(c => Object.assign({}, c, { id: b2u(c.id) }));
-        const cred = await navigator.credentials.get({ publicKey: pub });
+        const vraag = { publicKey: pub };
+        if (passkeyAbort) vraag.signal = passkeyAbort.signal;
+        const cred = await navigator.credentials.get(vraag);
         const antwoord = { id: cred.id, rawId: u2b(cred.rawId), type: cred.type,
           clientExtensionResults: cred.getClientExtensionResults(),
           response: { authenticatorData: u2b(cred.response.authenticatorData), clientDataJSON: u2b(cred.response.clientDataJSON),
             signature: u2b(cred.response.signature), userHandle: cred.response.userHandle ? u2b(cred.response.userHandle) : null } };
-        const r = await API.call('/webauthn/login', { login: loginU, antwoord });
-        bezig = false;
+        const r = await API.call('/webauthn/login', { login: loginU || undefined, ceremonie: o.ceremonie, antwoord,
+          pasApp: vastePas || undefined, lang: document.documentElement.lang || 'nl' });
+        passkeyBezig = false; passkeyAbort = null;
         if (r && r.token){
           API.token = r.token; try { localStorage.setItem('rtg_member_token', r.token); } catch(e){}
           zeg('rahul', T('ag.welkom','Daar ben je weer. Welkom terug.'));
           if (typeof restoreSession === 'function') await restoreSession();
         }
       } catch(e){
-        bezig = false;
-        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')) return; // afgebroken door de gebruiker
-        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Typ anders je wachtwoord.'));
+        passkeyBezig = false; passkeyAbort = null;
+        if (e && (e.name === 'NotAllowedError' || e.name === 'AbortError')){
+          if (!automatisch && e.name !== 'AbortError') zeg('rahul', T('ag.pk.afgebroken','Niet geopend. Probeer opnieuw of kies Andere manier.'));
+          return;
+        }
+        zeg('rahul', (e && e.message ? e.message + ' ' : '') + T('ag.pk.mis','Dat lukte niet met de passkey. Kies Andere manier.'));
       }
     }
-    if (pkKnop) pkKnop.addEventListener('click', passkeyInlog);
+    function andereManier(stil){
+      if (passkeyAbort) passkeyAbort.abort();
+      antwoordRij.hidden = false;
+      toonPasskey(false);
+      if (andersKnop) andersKnop.hidden = true;
+      if (!stil){ start(); inp.focus(); }
+    }
+    if (pkKnop) pkKnop.addEventListener('click', () => passkeyInlog(false));
+    if (andersKnop) andersKnop.addEventListener('click', () => andereManier(false));
 
     /* ---------- wachtwoord-herstel, geheel in het gesprek ----------
        Rahul vraagt de zescijferige code (tweede kanaal, per SMS) en daarna het

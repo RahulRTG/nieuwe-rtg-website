@@ -1,3 +1,4 @@
+/* het alarmvenster */
     let el = document.getElementById('alarmOverlay');
     if (!el){
       el = document.createElement('div');

@@ -100,7 +100,7 @@
             'placeholder="waar ligt het / hoe is het te vinden" aria-label="Waar het ligt"></div>' +
           '<div class="nl-half"><input id="nlDN" maxlength="600" ' +
             'placeholder="notitie (optioneel)" aria-label="Notitie"></div>' +
-          '<button class="knop hoofd" type="submit" style="margin-top:.6rem;">+ document</button>' +
+          '<button class="knop hoofd h-mt60" type="submit">+ document</button>' +
         '</form>' +
       '</div>' +
       '<h2>Vertrouwenspersonen</h2>' +
@@ -115,7 +115,7 @@
             '<input id="nlCT" maxlength="40" placeholder="telefoon" aria-label="Telefoon">' +
             '<input id="nlCE" maxlength="120" placeholder="e-mail" aria-label="E-mail">' +
           '</div>' +
-          '<button class="knop" type="submit" style="margin-top:.6rem;">+ contact</button>' +
+          '<button class="knop h-mt60" type="submit">+ contact</button>' +
         '</form>' +
       '</div>' +
       '<h2>Wensen</h2>' +
@@ -126,7 +126,7 @@
             'placeholder="titel (optioneel)" aria-label="Titel"></div>' +
           '<div class="nl-half"><textarea id="nlWX" maxlength="800" ' +
             'placeholder="Wat wilt u vastleggen?" aria-label="Uw wens"></textarea></div>' +
-          '<button class="knop" type="submit" style="margin-top:.6rem;">+ wens</button>' +
+          '<button class="knop h-mt60" type="submit">+ wens</button>' +
         '</form>' +
       '</div>' +
       '<h2>Vraag de adviseur</h2>' +

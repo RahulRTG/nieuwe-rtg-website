@@ -80,6 +80,14 @@
   .vrow .vi{flex:1;min-width:0;}
   .vrow .vi .nm{font-weight:600;font-size:0.9rem;}
   .vrow .vi .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;overflow:hidden;text-overflow:ellipsis;}
+  /* De drie vormen die de vakbewijzenstapel nodig heeft. Ze stonden als
+     style="..." in het opbouwende script; dat houdt style-src-attr in de CSP
+     open en telt in de norm-meter inlineStijlAttributen. Hier zijn het klassen,
+     net als bij de rest van dit scherm. */
+  .vrow .vi .nm .bij{color:var(--soft);font-weight:400;font-size:0.72rem;}
+  .vkop{margin:0.8rem 0 0.3rem;color:var(--soft);}
+  .vgrens{color:var(--soft);margin-top:0.2rem;}
+  .uitleg{font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.7rem;line-height:1.5;}
   .vbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:600;cursor:pointer;}
   .vbtn.doc{color:var(--muted);}
   .vbtn.ok{color:var(--green);border-color:rgba(76,154,117,0.4);}
@@ -190,7 +198,7 @@
         </div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols h-mt150">
       <div class="panel">
         <h2 data-i18n="panel.aanmeldingen">Aanmeldingen per pas</h2>
         <p style="font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.7rem;line-height:1.5;" data-i18n="bo.aanmuitleg">De AI verzorgt de hele aanmelding automatisch (berichten, onboarding, rondleiding, RTF, veiligheid en privacy). Alleen dit blijft aan jou: accepteren of afwijzen. Lifestyle en Business krijgen nooit automatisch toegang.</p>
@@ -201,11 +209,16 @@
         <div class="rows" id="verify"></div>
       </div>
       <div class="panel">
+        <h2 data-i18n="panel.vakbewijs">Vakbewijzen</h2>
+        <p class="uitleg" data-i18n="bo.vakuitleg">De stukken die bij een beroep horen: een VOG voor de kinderopvang, een BIG-registratie voor wie voorschrijft, een legitimatiebewijs voor een bewaker. Jij legt vast dat je het stuk hebt gezien, met je naam erbij. RTG is geen inspectie en beoordeelt de inhoud niet.</p>
+        <div class="rows" id="vakbewijzen"></div>
+      </div>
+      <div class="panel">
         <h2 data-i18n="panel.concierge">Concierge-inbox</h2>
         <div class="rows" id="concierge"></div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols h-mt150">
       <div class="panel">
         <h2 data-i18n="panel.incidenten">Paspoort-incidenten</h2>
         <p class="sub" data-i18n="panel.incidenten.sub" style="margin:0 0 0.6rem;">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
@@ -217,12 +230,12 @@
         <div class="rows" id="salonNaleving"></div>
       </div>
     </div>
-    <div class="panel" style="margin-top:1.5rem;">
+    <div class="panel h-mt150">
       <h2><span data-i18n="panel.ontmoet">Salon-ontmoetingen (veiligheid)</span></h2>
       <p class="sub" data-i18n="panel.ontmoet.sub" style="margin:0 0 0.6rem;">Lopende afspraken met live-locatie. Bij een SOS kijkt u mee via de camera en belt u 112.</p>
       <div class="rows" id="ontmoetOffice"></div>
     </div>
-    <div class="panel" style="margin-top:1.5rem;">
+    <div class="panel h-mt150">
       <h2><span data-i18n="panel.trust">Vertrouwenslijn</span></h2>
       <div class="rows" id="trustList"></div>
     </div>
@@ -237,7 +250,7 @@
         <div id="ontLiveStatus" style="font-size:0.75rem;color:var(--soft);margin-top:0.5rem;">Verbinden met de camera van het lid…</div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols h-mt150">
       <div class="panel">
         <h2 data-i18n="panel.apps">Sollicitaties bij partners</h2>
         <div class="rows" id="appsList"></div>
@@ -249,7 +262,7 @@
         <div class="rows" id="paList"></div>
       </div>
     </div>
-    <div class="cols" style="margin-top:1.5rem;">
+    <div class="cols h-mt150">
       <div class="panel">
         <h2>FOUNDATION-registraties</h2>
         <p class="sub" style="margin:0 1.25rem .5rem;">Scholen, vrijwilligers en partnerstichtingen. Toegang ontstaat pas na alle Boardroom-controles.</p>

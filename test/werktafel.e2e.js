@@ -14,9 +14,9 @@
    2) HET BEGINSCHERM KOOS VOOR JE. bouw() opende zichzelf twee vaste apps
       (Reizen & Veilig en Geld). De werktafel IS inmiddels het beginscherm -- op
       elke breedte -- maar hij begint leeg: welke apps er opengaan is een keuze
-      van een mens. De hoofdnavigatie toont LIFE, WORK en FOUNDATION, met
-      INSTELLINGEN als vierde app in de bankvoet. Specialistische onderdelen
-      blijven achter die vier voordeuren.
+      van een mens. De klok blijft bestaan als ingang bovenaan de bank, want
+      daar hangen de werelden op hun bezel (WERELD.md); hem kiezen vouwt de
+      werktafel op.
 
    Wat deze toets NIET doet, is meten of de onboarding zelf klopt (daar zijn de
    aanmeldtoetsen voor). Hij meet alleen wie er bovenop mag liggen.
@@ -53,6 +53,16 @@ async function opzet() {
   return { srv, token: d.token, dataDir };
 }
 
+async function tekenOnboarding(base, token) {
+  const r = await fetch(base + '/api/onboarding/teken', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ naam: 'Werktafel Proef', akkoord: true })
+  });
+  const d = await r.json().catch(() => ({}));
+  assert.equal(r.status, 200, 'onboarding tekenen: ' + JSON.stringify(d).slice(0, 200));
+  assert.equal(d.klaar, true, 'de proefgebruiker hoort na tekenen binnen te mogen');
+}
+
 /* De stand van het scherm in EEN oogopslag. `bovenop` is de kern van geval 1:
    niet "staat de deur in de DOM" maar "wie raakt de muis in het midden van de
    deur" -- want de bug was juist dat de deur er wel stond en onbereikbaar was. */
@@ -67,6 +77,20 @@ const stand = () => {
     poortBovenop: !!(midden && g && g.contains(midden)),
     appActief: !!(document.getElementById('app') || {}).classList?.contains('active'),
     shellZichtbaar: !!(S && getComputedStyle(S).display !== 'none' && S.getBoundingClientRect().width > 0),
+    /* DE SCHIL BESTAAT NOG, EN DAT IS DE BEDOELING -- maar als LA en niet als
+       scherm (WERELD.md). De panelen wonen erin (bedieningspaneel, Zegel,
+       meldingen), dus "de schil is weg" is niet meer de vraag. De vraag is of
+       hij de werktafel afvangt: ligt er een onzichtbaar vel overheen, dan
+       reageert er niets meer en zie je daar niets van. Dat is hier al een keer
+       gebeurd -- shared/levendekleur.js schilderde de schil met !important --
+       en een meting op zichtbaarheid zag dat niet. Deze wel: wie raakt de muis
+       in het midden van de werkvloer? */
+    schilVangt: (() => {
+      const w = document.querySelector('.cmd-werk'); if (!w || !S) return null;
+      const b = w.getBoundingClientRect();
+      const t = document.elementFromPoint(Math.round(b.x + b.width / 2), Math.round(b.y + b.height / 2));
+      return !!(t && S.contains(t));
+    })(),
     klok: document.querySelectorAll('.os-app').length,
     commandActief: !!(window.RTGCommand && window.RTGCommand.actief()),
     // de lade: `inBeeld` is de echte vraag, want dicht staat hij onder de rand
@@ -81,9 +105,13 @@ const stand = () => {
     gateBestaat: !!document.getElementById('gate'),
     gateInShell: !!(S && S.contains(document.getElementById('gate'))),
     greep: !!document.querySelector('.cmd-lade'),
-    klokIngang: !!document.querySelector('.cmd-klok'),
-    hoofdnavigatie: [...document.querySelectorAll('.cmd-nav button span')].map(x => x.textContent.trim()),
-    instellingen: document.querySelector('.cmd-bankvoet button span')?.textContent.trim() || null,
+    /* De ingang naar het systeem. Dit was `.cmd-klok`, de knop die de werktafel
+       opvouwde naar het klokscherm; dat scherm bestaat niet meer (WERELD.md) en
+       die knop dus ook niet. Wat de belofte eronder was -- er is vanaf de
+       werktafel altijd een zichtbare weg naar uitloggen, de pin, je Zegel --
+       leeft door in de voet van de bank. */
+    paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
+      .some(b => /Bedieningspaneel/i.test(b.textContent)),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
     // hoeveel er onder het blad overblijft: dat hoort precies de schilbalk te
@@ -153,22 +181,9 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const thuis = await page.evaluate(stand);
     assert.equal(thuis.bladen, 0, 'de werktafel hoort leeg te beginnen, niet met apps die het huis koos');
-    assert.equal(thuis.shellZichtbaar, false, 'en hij is het beginscherm, dus de klok ligt eronder');
-    assert.equal(thuis.klokIngang, false, 'Beginscherm hoort geen extra ingang naast de vier apps te zijn');
-    assert.deepEqual(thuis.hoofdnavigatie, ['LIFE', 'WORK', 'FOUNDATION'],
-      'de hoofdnavigatie hoort exact de drie inhoudelijke apps te tonen');
-    assert.equal(thuis.instellingen, 'INSTELLINGEN', 'INSTELLINGEN hoort als vierde app in de bankvoet');
+    assert.equal(thuis.schilVangt, false, 'de schil ligt als een vel over de werktafel; dan reageert er niets meer');
+    assert.equal(thuis.paneelIngang, true, 'de voet van de bank hoort de weg naar het bedieningspaneel te dragen');
     assert.equal(thuis.commandActief, true, 'en een app opent hier als blad');
-
-    // INSTELLINGEN is een echte vierde app, geen lokaal pagina-paneel
-    await page.click('[data-cmd="settings"]');
-    await page.waitForSelector('.cmd-pane iframe[src="/apps/ik.html"]', { timeout: 10000 });
-    assert.deepEqual(await page.evaluate(() => ({
-      titel: document.querySelector('.cmd-balkblad')?.textContent,
-      bladen: document.querySelectorAll('.cmd-pane').length
-    })), { titel: 'INSTELLINGEN', bladen: 1 }, 'INSTELLINGEN hoort als eigen appblad te openen');
-    await page.evaluate(() => window.RTGCommand.sluitAlles());
-    await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
 
     // 3) een app openen vult de werkvloer; de lege staat maakt plaats
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
@@ -183,6 +198,23 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     const terug = await page.evaluate(stand);
     assert.equal(terug.werktafel, true, 'het laatste blad sluiten hoort niet de hele werktafel op te ruimen');
     assert.equal(terug.bladen, 0, 'maar hem leeg achter te laten');
+
+    /* 4b) EN ER IS GEEN WEG MEER TERUG NAAR EEN ANDER BEGINSCHERM.
+
+       Hier stond het spiegelbeeld van deze toets: klik .cmd-klok, de werktafel
+       vouwt zich op en de klok komt terug. Dat was toen juist -- de klok WAS
+       het beginscherm en de werktafel klapte ervoor. Nu is de werktafel het
+       beginscherm (WERELD.md), en een knop die hem opvouwt zou je op een leeg
+       scherm achterlaten zonder iets om naar terug te keren.
+
+       Wat ervoor in de plaats komt is de andere helft van dezelfde belofte, en
+       hij hoort net zo hard te zakken: er is GEEN knop meer die de werktafel
+       weghaalt, en de weg naar het systeem staat in de voet van de bank. */
+    assert.equal(await page.evaluate(() => !!document.querySelector('.cmd-klok')), false,
+      'de opvouwknop is terug; die laat je achter op een scherm dat er niet meer is');
+    assert.equal(terug.paneelIngang, true,
+      'en de weg naar het bedieningspaneel is uit de bank verdwenen -- dan is uitloggen onbereikbaar');
+
 
     /* 5) EN ANDERSOM. checkOnboarding is asynchroon: de deur kan opengaan NADAT
        de werktafel er al staat. Dan is wegnemen de enige juiste uitkomst -- een
@@ -216,13 +248,14 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     /* 7) DEZELFDE WERKTAFEL OP EEN TELEFOON, in zijn eigen vorm.
 
        De bank is hier geen rail maar een lade, en er staat een blad tegelijk in
-       beeld. Wat NIET verandert: een app wordt een blad in plaats van een
-       paginasprong en het laatste blad sluiten laat de werktafel leeg. */
+       beeld. Wat NIET verandert: het beginscherm blijft de klok, een app wordt
+       een blad in plaats van een paginasprong, en het laatste blad sluiten
+       brengt je thuis. */
     await page.evaluate(() => { document.getElementById('onbGate').hidden = true; });
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalThuis = await page.evaluate(stand);
     assert.equal(smalThuis.bladen, 0, 'ook op een telefoon begint de werktafel leeg');
-    assert.equal(smalThuis.shellZichtbaar, false, 'en is hij het beginscherm');
+    assert.equal(smalThuis.schilVangt, false, 'en de schil vangt hem ook op een telefoon niet af');
 
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
     await page.waitForSelector('#rtgCommand .cmd-pane', { timeout: 10000 });
@@ -233,8 +266,8 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(smalBlad.greep, true, 'met een greep voor de lade, want de bank is hier geen vaste rail');
     assert.equal(smalBlad.lade.inBeeld, false, 'die lade ligt dicht tot je hem haalt');
 
-    /* GEEN TABSTRIP BIJ EEN BLAD. Gemeten op 390x844: de werelden dragen een
-       eigen bovenbalk en soms een eigen onderbalk; met de
+    /* GEEN TABSTRIP BIJ EEN BLAD. Gemeten op 390x844: acht van de twaalf
+       werelden dragen een eigen bovenbalk en vijf een eigen onderbalk; met de
        strip erbovenop was 21% van het scherm navigatie, in drie lagen. De
        bovenste had niets te kiezen -- er is geen tweede tabblad. En de greep
        mag niet op het blad komen te liggen: hij hoort in de band die de schil
@@ -253,12 +286,13 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
-    // de lade halen: drie inhoudelijke apps; Instellingen staat in de bankvoet
+    // de lade halen: dezelfde vijftien deuren als in de rail op een computer
+    // (drie werelden boven, twaalf stukken software eronder)
     await page.click('.cmd-lade');
     await page.waitForTimeout(450);
     const laOpen = await page.evaluate(stand);
     assert.equal(laOpen.lade.inBeeld, true, 'de greep hoort de lade te openen');
-    assert.equal(laOpen.lade.werelden, 3, 'alleen LIFE, WORK en FOUNDATION horen in deze rij; er stonden er ' + laOpen.lade.werelden);
+    assert.equal(laOpen.lade.werelden, 15, 'met alle deuren erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'true', 'en dat hoort een schermlezer ook te horen');
 
     /* Escape sluit hem. Zonder dit is de greep de enige uitweg, en dat is het
@@ -281,7 +315,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalTerug = await page.evaluate(stand);
     assert.equal(smalTerug.bladen, 0, 'het laatste blad sluiten laat de werktafel ook hier leeg staan');
-    assert.equal(smalTerug.klokIngang, false, 'zonder Beginscherm als extra menu-item');
+    assert.equal(smalTerug.paneelIngang, true, 'met het bedieningspaneel als ingang in de lade');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
@@ -310,9 +344,19 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
   const fouten = [];
   letOpFouten(page, fouten);
   try {
+    // Een voorspelbare virtuele voordeur: de passkeyvraag blijft open totdat
+    // "Andere manier" hem afbreekt. Zo toetst dit schermgedrag, niet het
+    // passkeymagazijn van de machine waarop de toets toevallig draait.
+    await page.addInitScript(() => {
+      try { localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+      Object.defineProperty(window, 'PublicKeyCredential', { configurable: true, value: class {} });
+      Object.defineProperty(navigator, 'credentials', { configurable: true, value: { get: ({ signal }) => new Promise((resolve, reject) => {
+        if (signal) signal.addEventListener('abort', () => reject(new DOMException('afgebroken', 'AbortError')), { once: true });
+      }) } });
+    });
     // géén token: dit is een bezoeker die nog niets is
     await page.goto(srv.base + '/apps/app.html', { waitUntil: 'load', timeout: 45000 });
-    await page.waitForSelector('#agIn', { timeout: 20000 });
+    await page.waitForSelector('#agPasskey', { timeout: 20000 });
 
     const uit = await page.evaluate(() => {
       const r = document.getElementById('rtgCommand'), g = document.getElementById('gate');
@@ -321,18 +365,29 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
         stand: r && r.dataset.stand,
         gateInWerkvloer: !!(r && r.querySelector('#gate')),
         gateZichtbaar: !!(g && g.getBoundingClientRect().width > 0),
-        veld: !!document.getElementById('agIn'),
+        veldBestaat: !!document.getElementById('agIn'),
+        veldZichtbaar: !!document.getElementById('agIn')?.getBoundingClientRect().width,
+        passkeyZichtbaar: !!document.getElementById('agPasskey')?.getBoundingClientRect().width,
+        andereManier: !!document.getElementById('agAnders')?.getBoundingClientRect().width,
         werelden: document.querySelectorAll('.cmd-nav button').length,
-        klokIngang: !!document.querySelector('.cmd-klok'),
+        paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
+          .some(b => /Bedieningspaneel/i.test(b.textContent)),
         tabs: tabs ? getComputedStyle(tabs).display : null,
       };
     });
     assert.equal(uit.stand, 'gesloten', 'voor het inloggen hoort de werktafel in de gesloten stand te staan');
     assert.equal(uit.gateInWerkvloer, true, 'met het inloggesprek IN de werkvloer');
     assert.equal(uit.gateZichtbaar, true, 'en zichtbaar -- verplaatsen mag hem niet verstoppen');
-    assert.equal(uit.veld, true, 'het antwoordveld van Rahul hoort er te zijn');
-    assert.equal(uit.werelden, 3, 'de bankrij toont LIFE, WORK en FOUNDATION; er stonden er ' + uit.werelden);
-    assert.equal(uit.klokIngang, false, 'maar geen Beginscherm-knop: die vouwt de werktafel op en laat je zonder gesprek achter');
+    assert.equal(uit.veldBestaat, true, 'het terugvalveld van Rahul hoort klaar te staan');
+    assert.equal(uit.veldZichtbaar, false, 'maar vraagt niet eerst om informatie van de bezoeker');
+    assert.equal(uit.passkeyZichtbaar, true, 'de passkey hoort de zichtbare eerste deur te zijn');
+    assert.equal(uit.andereManier, true, 'met een veilige terugval voor bestaande accounts');
+    /* Twaalf stukken software plus de drie werelden die er sinds WERELD.md
+       bovenaan staan. Het getal is geen doel op zich -- wat het bewaakt is dat
+       de bank in de gesloten stand LAAT ZIEN wat er achter de deur zit, en dus
+       niet stilletjes leegloopt. */
+    assert.equal(uit.werelden, 15, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
+    assert.equal(uit.paneelIngang, false, 'voor het inloggen valt er niets te bedienen: geen systeemdeur in de bank');
     assert.equal(uit.tabs, 'none', 'en geen tabbalk zonder tabbladen: een bediening die niets doet leest als kapot');
 
     /* EEN WERELD AANRAKEN OPENT GEEN DEUR. Dit is de kern van de keuze: de bank
@@ -343,12 +398,141 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     const na = await page.evaluate(() => ({
       bladen: document.querySelectorAll('.cmd-pane').length,
       pad: location.pathname,
-      cursorInGesprek: document.activeElement && document.activeElement.id === 'agIn',
+      cursorOpDeur: document.activeElement && document.activeElement.id === 'agPasskey',
     }));
     assert.equal(na.bladen, 0, 'een wereld aanraken mag voor het inloggen geen blad openen');
     assert.equal(na.pad, '/apps/app.html', 'en geen paginasprong worden');
-    assert.equal(na.cursorInGesprek, true, 'hij hoort de cursor in het inloggesprek te zetten');
+    assert.equal(na.cursorOpDeur, true, 'hij hoort de cursor op de passkeydeur te zetten');
 
+    // De terugval verschijnt pas na de uitdrukkelijke keuze van de bezoeker.
+    await page.click('#agAnders');
+    await page.waitForSelector('#agIn', { state: 'visible', timeout: 10000 });
+    const anders = await page.evaluate(() => ({
+      veldZichtbaar: !!document.getElementById('agIn').getBoundingClientRect().width,
+      veldActief: document.activeElement && document.activeElement.id === 'agIn',
+      passkeyZichtbaar: !!document.getElementById('agPasskey').getBoundingClientRect().width,
+      andereZichtbaar: !!document.getElementById('agAnders').getBoundingClientRect().width,
+    }));
+    assert.equal(anders.veldZichtbaar, true, 'Andere manier opent het bestaande aanmeld- en herstelgesprek');
+    assert.equal(anders.veldActief, true, 'met de cursor meteen waar iemand zelf informatie kan geven');
+    assert.equal(anders.passkeyZichtbaar, false, 'de eerste deur wijkt dan voor de gekozen terugval');
+    assert.equal(anders.andereZichtbaar, false, 'de keuze staat niet dubbel op het scherm');
+
+    assert.deepEqual(fouten, [], 'geen JS-fouten');
+  } finally {
+    await ctx.close();
+    await browser.close();
+    await stop(srv.child);
+    try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* DE SNELLE DEUR VRAAGT GEEN IDENTITEIT VOORAF.
+
+   De cryptografische ceremonie zelf wordt met een echte P-256-sleutel getoetst
+   in webauthn-ceremonie.test.js. Hier gaat het om de browserbedrading: opties
+   zonder login ophalen, de eenmalige ceremonie terugsturen en daarna precies
+   op de lege wereldkiezer landen. */
+test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
+  { skip: pw ? false : 'geen Playwright' }, async () => {
+  const { srv, token, dataDir } = await opzet();
+  await tekenOnboarding(srv.base, token);
+  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const page = await ctx.newPage();
+  const fouten = [];
+  let optiesBody = null, loginBody = null;
+  letOpFouten(page, fouten);
+  try {
+    await page.addInitScript(() => {
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      Object.defineProperty(window, 'PublicKeyCredential', { configurable: true, value: class {} });
+      const bytes = () => new Uint8Array([1, 2, 3]).buffer;
+      Object.defineProperty(navigator, 'credentials', { configurable: true, value: { get: async () => ({
+        id: 'sleutel-uit-toestel', rawId: bytes(), type: 'public-key', getClientExtensionResults: () => ({}),
+        response: { authenticatorData: bytes(), clientDataJSON: bytes(), signature: bytes(), userHandle: null }
+      }) } });
+    });
+    await page.route('**/api/webauthn/opties', async route => {
+      optiesBody = route.request().postDataJSON();
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        ceremonie: '12345678901234567890123456789012',
+        opties: { challenge: 'AQID', rpId: '127.0.0.1', userVerification: 'required', allowCredentials: [] }
+      }) });
+    });
+    await page.route('**/api/webauthn/login', async route => {
+      loginBody = route.request().postDataJSON();
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) });
+    });
+
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+
+    assert.equal(optiesBody.login, undefined, 'de eerste optiesvraag bevat geen login');
+    assert.equal(optiesBody.email, undefined, 'de eerste optiesvraag bevat geen e-mailadres');
+    assert.equal(optiesBody.username, undefined, 'de eerste optiesvraag bevat geen gebruikersnaam');
+    assert.deepEqual(Object.keys(optiesBody).filter(k => k !== 'lang'), [],
+      'alleen de niet-identificerende taalkeuze mag naast de naamloze optiesvraag meereizen');
+    assert.equal(loginBody.login, undefined, 'ook na lokale verificatie wordt geen ingevulde login verzonnen');
+    assert.equal(loginBody.ceremonie, '12345678901234567890123456789012', 'de eenmalige serverceremonie gaat ongewijzigd terug');
+    assert.equal(loginBody.antwoord.id, 'sleutel-uit-toestel', 'het toestel wijst de passkey aan');
+    assert.equal(loginBody.pasApp, 'rtg', 'de pasgrens blijft ook op de snelle deur staan');
+    const geland = await page.evaluate(() => ({
+      tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),
+      bladen: document.querySelectorAll('.cmd-pane').length,
+      poortVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
+    }));
+    assert.equal(geland.poortVerborgen, true, 'de passkey sluit de inlogpoort na de echte sessie');
+    assert.equal(geland.bladen, 0, 'de snelle deur opent geen demo-activiteit');
+    assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
+    assert.deepEqual(fouten, [], 'geen JS-fouten');
+  } finally {
+    await ctx.close();
+    await browser.close();
+    await stop(srv.child);
+    try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* DE INLOGROUTE ZELF MOET LANDEN.
+
+   De algemene MutationObserver is hieronder expres inert. Zonder die ingreep
+   zou een indirecte class-mutatie dezelfde uitkomst tekenen en kon deze toets
+   groen blijven terwijl de inlogroute zelf niets deed. Dit is dus het scherm
+   uit de productbeslissing: een terugkerend lid, op telefoonformaat, nul
+   geopende bladen en alleen de uitnodiging om zelf een wereld te kiezen. */
+test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
+  { skip: pw ? false : 'geen Playwright' }, async () => {
+  const { srv, token, dataDir } = await opzet();
+  await tekenOnboarding(srv.base, token);
+  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const page = await ctx.newPage();
+  const fouten = [];
+  letOpFouten(page, fouten);
+  try {
+    await page.addInitScript(t => {
+      localStorage.setItem('rtg_member_token', t);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      window.MutationObserver = class { observe() {} disconnect() {} takeRecords() { return []; } };
+    }, token);
+    await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
+    await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
+
+    const geland = await page.evaluate(() => ({
+      tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),
+      bladen: document.querySelectorAll('.cmd-pane').length,
+      gateVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
+      appActief: document.getElementById('app').classList.contains('active'),
+      balk: Math.round(document.querySelector('.cmd-balk').getBoundingClientRect().height),
+      uitnodiging: getComputedStyle(document.querySelector('.cmd-balkbladen'), '::after').content,
+    }));
+    assert.equal(geland.appActief, true, 'voorwaarde: de sessie is werkelijk hersteld');
+    assert.equal(geland.gateVerborgen, true, 'de inlogpoort hoort na de sessie weg te zijn');
+    assert.equal(geland.bladen, 0, 'de inlog mag geen wereld of activiteit vooraf openen');
+    assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
+    assert.equal(geland.balk, 48, 'onderaan hoort alleen de wereldbalk te staan');
+    assert.match(geland.uitnodiging, /Kies een wereld/);
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
     await ctx.close();

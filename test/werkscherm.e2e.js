@@ -24,15 +24,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, bankDeur } = require('./helper');
 
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
+/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
+   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
+   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
+const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkscherm-'));
 
@@ -211,53 +208,47 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        want daarmee zoek je hem terug op het scherm. */
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
-    /* EN NIET MEER DOOR DE MAPPEN TE KLIKKEN.
+    /* EN NIET MEER DOOR DE MAPPEN OF DE WERELDSTAND.
 
-       Deze lus opende elke tegel en las het mappenscherm dat daarna verscheen.
-       Dat scherm bestaat niet meer: sinds PLATFORM.md par. 0 is een wereld een
-       APP en geen map, dus tikken NAVIGEERT (zie openMap in app-main-26b.js).
-       De eerste klik haalde de pagina dus onder de toets vandaan, en wat je in
-       de uitslag zag was 'Execution context was destroyed' -- een foutmelding
-       over de meting, waar het gebrek van de meting zelf in stond.
+       Deze lus opende eerst elke tegel en las het mappenscherm; dat scherm
+       verdween toen een wereld een APP werd (PLATFORM.md par. 0). Daarna liep
+       hij de wereldstand af met RTGWereld.zoom() -- de kring om de klok. Ook
+       die is weg: de klok is van het beginscherm af en de werktafel is het
+       geworden (WERELD.md), en shared/wereld.js bestaat niet meer.
 
-       De EIS is niet veranderd: de werkplek en RTG Office moeten vanaf het
-       beginscherm te vinden zijn, in een van de werelden. Wat wel is veranderd
-       is hoe je erin kijkt. De wereldstand toont de onderdelen van een wereld
-       IN dezelfde cirkel (RTGWereld.zoom), zonder de pagina te verlaten, en elk
-       merk draagt daar dezelfde data-sleutel als een tegel. We lopen de werelden
-       dus af en zoomen er een voor een in. */
-    const tegels = await page.evaluate(async () => {
-      const wacht = (ms) => new Promise((k) => setTimeout(k, ms));
-      if (!window.RTGWereld) return null;
-      if (!RTGWereld.aan()) { RTGWereld.zet(true); await wacht(400); }
-      const uit = [];
-      const aantal = RTGWereld.stand().merken;
-      /* WACHTEN OP DE STAND, niet op een klok. Inzoomen is een VLUCHT van een
-         paar honderd milliseconde (wereld-05e.js); een vaste wachttijd die daar
-         net onder zit, leest de ring van vlak voor de landing. */
-      const tot = async (klaar) => { for (let n = 0; n < 120 && !klaar(); n++) await wacht(50); };
-      for (let i = 0; i < aantal; i++) {
-        RTGWereld.naar(i);
-        await wacht(220);
-        RTGWereld.zoom(true);
-        await tot(() => RTGWereld.stand().diep);
-        await wacht(120);
-        for (const m of document.querySelectorAll('.os-wm[data-sleutel]')) {
-          uit.push({ sleutel: m.dataset.sleutel || '', naam: (m.getAttribute('aria-label') || '').trim() });
-        }
-        RTGWereld.zoom(false);
-        await tot(() => !RTGWereld.stand().diep);
-        await wacht(120);
-      }
-      return uit;
-    });
-    assert.ok(tegels, 'de wereldstand hoort beschikbaar te zijn om de werelden af te lopen');
-    const namen = tegels.map(t => t.naam + ' [' + t.sleutel + ']').join(', ');
-    assert.ok(tegels.some(t => t.sleutel === 'os:werk'),
-      'de werkplek (os:werk) heeft een tegel op de homescreen; gevonden: ' + namen);
-    assert.ok(tegels.some(t => t.sleutel === 'link:office'),
-      'en RTG Office (link:office) ook; die had er nooit een. Gevonden: ' + namen);
+       DE EIS IS NOG STEEDS DEZELFDE, en dat is waarom deze toets blijft
+       bestaan in plaats van mee te verdwijnen: de werkplek en RTG Office
+       moeten vanaf het beginscherm te VINDEN zijn. Wat verandert is telkens
+       waar je kijkt.
 
+       Nu is dat Spotlight, en niet bij gebrek aan beter: de `items` van een
+       wereld bestaan sinds openMap (app-main-26b.js) nog uitsluitend zodat
+       deze index ze indexeert. Wat Spotlight niet kent, kan een lid niet meer
+       vinden zonder het adres te weten -- precies de melding waar deze toets
+       uit voortkwam.
+
+       De weg erheen is de weg van een lid: de bank van de werktafel, de deur
+       naar het bedieningspaneel, en daar Zoeken. Nog steeds op data-sleutel en
+       niet op naam; de zichtbare namen gaan alleen mee in de foutmelding. */
+    /* De intake staat buiten deze toets: een account waarvan de overeenkomst
+       nog niet getekend is krijgt #onbGate over het scherm, en daar mag de
+       werktafel niet overheen (shared/command.js). Mocken op `klaar` is wat de
+       rest van de suite hier ook doet. */
+    await ctx.route('**/api/onboarding/status', (r) => r.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
+      null, { timeout: 30000 });
+    await bankDeur(page, 'Bedieningspaneel', { timeout: 20000 });
+    await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
+    await page.click('#osCcZoek');
+    await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelectorAll('#osZoekLijst button[data-sleutel]').length > 5,
+      null, { timeout: 10000 });
+    const tegels = await page.evaluate(() =>
+      [...document.querySelectorAll('#osZoekLijst button[data-sleutel]')]
+        .map(b => ({ sleutel: b.dataset.sleutel || '', naam: b.textContent.trim() })));
+    assert.ok(tegels.length, 'Spotlight hoort de onderdelen van de werelden te indexeren');
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(900);
 

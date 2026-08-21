@@ -76,7 +76,7 @@
     for (var k in eigen) if (!(k in w.I18N.en)) w.I18N.en[k] = eigen[k];
   })();
 
-  /* ------------------------------------------------------------- stijl */
+/* de stijl van het bedieningspaneel */
   /* De vormtaal van het bedieningspaneel (shared/bediening.js): een blad dat
      van onderen opkomt, donker, met een gouden accent. Bewust dezelfde vorm --
      het is hetzelfde soort ding, en twee soorten bladen naast elkaar is weer
@@ -351,7 +351,7 @@
     return uit;
   }
 
-  /* --------------------------------------------------------- het blad */
+/* het blad dat van onderen opkomt */
   var scrim = null, blad = null, knop = null, laatstFocus = null;
 
   /* De titel zegt WAAR JE BENT: de naam van deze app, uit de navigatiebalk of
@@ -488,7 +488,7 @@
   function opEsc(e) { if (e.key === 'Escape') { e.stopPropagation(); sluit(); } }
   function wissel() { (scrim && scrim.classList.contains('amn-open')) ? sluit() : open(); }
 
-  /* ---------------------------------------------------------- de knop */
+/* de knop: de hamburger staat links, en verder niets */
   /* DE RTG-HEADERSTANDAARD: de hamburger staat LINKS, en verder niets.
      Hij stond rechtsboven in een afgerond vierkant met een eigen achtergrond,
      een rand en een blur -- een knopvlak dus, en daarmee het zwaarste element

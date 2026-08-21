@@ -58,7 +58,7 @@
       <select class="veld" id="pWie" style="max-width:8rem;" aria-label="Voor wie"><option value="samen">samen</option><option value="rtg">RTG</option><option value="rtf">RTF</option></select>
       <input class="veld" id="pTitel" placeholder="Titel (bijv. Zonne-waterpomp voor een dorp)" maxlength="100">
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij h-mt40">
       <input class="veld" id="pDoel" placeholder="Doel: wat willen we leren of bouwen?" maxlength="400">
       <button class="knop" id="pMaak">+ Start</button>
     </div>
@@ -167,7 +167,7 @@ function render(){
         (v.status !== 'akkoord' ? '<input class="veld" data-door placeholder="Uw naam (mens tekent)" style="max-width:11rem;"><button class="knop stil" data-toets>Toets akkoord</button>' : '') +
         (nx ? '<button class="knop" data-fase="' + nx + '" style="margin-left:auto;">→ ' + nx + '</button>' : '') + '</div>' +
       (p.logboek || []).slice(0, 3).map(l => '<div class="log">' + esc(l.tekst) + '</div>').join('') +
-      '<div class="rij" style="margin-top:.4rem;"><input class="veld" data-log placeholder="Logboek-regel"><button class="knop stil" data-logmaak>Log</button>' +
+      '<div class="rij h-mt40"><input class="veld" data-log placeholder="Logboek-regel"><button class="knop stil" data-logmaak>Log</button>' +
       '<input class="veld" data-bev placeholder="Bevinding (titel)"><button class="knop stil" data-bevmaak>Bevinding</button>' +
       '<button class="knop stil" data-dossier>Dossier</button></div>' +
       '</div>';

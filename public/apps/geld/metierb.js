@@ -28,7 +28,7 @@
     var esc = w.Geld.esc, alle = (p.bewezen || []).concat(p.rollen || []);
     return '<div class="kaart"><h2>' + esc(p.codenaam) + '</h2>' +
       '<p class="stil">' + esc(p.kop || 'geen beroepskop') + (p.plaats ? ' · ' + esc(p.plaats) : '') + '</p>' +
-      (p.open ? '<div style="margin-top:.4rem;"><span class="badge mt-zg" style="margin-left:0;">Open voor werk</span></div>' : '') +
+      (p.open ? '<div class="h-mt40"><span class="badge mt-zg" style="margin-left:0;">Open voor werk</span></div>' : '') +
       (p.over ? '<p style="margin-top:.6rem;font-size:.88rem;line-height:1.55;">' + esc(p.over) + '</p>' : '') +
       '<div class="mt-knoppen"><button class="knop" id="mtBterug" type="button">Terug naar het register</button></div></div>' +
       '<div class="kaart"><h2>Werk</h2>' + (alle.length ? alle.map(M.rolRij).join('') : '<p class="stil">Niets opgegeven.</p>') + '</div>' +
@@ -38,7 +38,7 @@
         return '<button type="button" data-mtonder="' + esc(v) + '" aria-pressed="' + (o.ikDeed ? 'true' : 'false') + '">' +
           esc(v) + (o.aantal ? ' · ' + o.aantal : '') + '</button>';
       }).join('') + '</div>' : '<p class="stil">Niets opgegeven.</p>') +
-      '<p class="stil" style="margin-top:.5rem;">Onderschrijven kan alleen bij iemand met wie je verbonden bent, en alleen op een vaardigheid die er al staat.</p></div>' +
+      '<p class="stil h-mt50">Onderschrijven kan alleen bij iemand met wie je verbonden bent, en alleen op een vaardigheid die er al staat.</p></div>' +
       '<div class="kaart"><h2>Aanbevelingen</h2>' +
       ((p.aanbevelingen || []).length ? p.aanbevelingen.map(function (a) {
         return '<div class="rij"><div class="mt-tx"><b>' + esc(a.van) + '</b><div class="sub">' + esc(a.tekst) + '</div></div>' +
@@ -68,7 +68,7 @@
       '<label class="stil lbl" for="mtLland">Land</label>' +
       '<select id="mtLland"><option value="NL">Nederland</option><option value="BE">Belgie</option>' +
       '<option value="DE">Duitsland</option><option value="ES">Spanje</option></select>' +
-      '<p class="stil" style="margin-top:.6rem;">Onder de ' + esc(dd.drempel) + ' zaken tonen we niets: een gemiddelde over een handvol werkgevers is een omweg naar het loon van een herkenbare zaak.</p></div>' +
+      '<p class="stil h-mt60">Onder de ' + esc(dd.drempel) + ' zaken tonen we niets: een gemiddelde over een handvol werkgevers is een omweg naar het loon van een herkenbare zaak.</p></div>' +
       '<div class="kaart"><h2>Per vak</h2>' +
       ((dd.vakken || []).length ? dd.vakken.map(M.loonRij).join('')
         : '<p class="stil">Nog te weinig zaken per vak om cijfers te tonen zonder een werkgever aan te wijzen. De toets hieronder werkt wel: die legt je bod naast de wet.</p>') + '</div>' +
@@ -79,7 +79,7 @@
       '<input id="mtTuur" type="number" min="0" step="0.5" placeholder="16">' +
       '<div class="mt-knoppen"><button class="knop hoofd" id="mtBtoets" type="button">Vergelijk</button></div>' +
       '<div class="mt-uit" id="mtUtoets" hidden></div>' +
-      '<p class="stil" style="margin-top:.5rem;">Dit is informatie, geen onderhandelingstruc. Er gaat niets naar de werkgever en er wordt niets van bewaard.</p></div>';
+      '<p class="stil h-mt50">Dit is informatie, geen onderhandelingstruc. Er gaat niets naar de werkgever en er wordt niets van bewaard.</p></div>';
   };
 
   /* Rahul coacht: hij zegt wat er ontbreekt en schrijft concepten, maar vult
@@ -93,7 +93,7 @@
       '<label class="stil lbl" for="mtCvac">De vacature</label>' +
       '<textarea id="mtCvac" rows="4" maxlength="800" placeholder="Plak de vacaturetekst of beschrijf hem kort."></textarea>' +
       '<div class="mt-knoppen"><button class="knop hoofd" id="mtBbrief" type="button">Schrijf een concept</button></div>' +
-      '<p class="stil" style="margin-top:.5rem;">Het concept komt hier te staan. Jij verstuurt hem zelf, en jij ondertekent.</p>' +
+      '<p class="stil h-mt50">Het concept komt hier te staan. Jij verstuurt hem zelf, en jij ondertekent.</p>' +
       '<div class="mt-uit" id="mtUbrief" hidden></div></div>' +
       '<div class="kaart"><h2>Oefen het gesprek</h2>' +
       '<label class="stil lbl" for="mtCrol">Voor welke functie?</label><input id="mtCrol" maxlength="120" placeholder="Restaurantmanager">' +
@@ -102,7 +102,7 @@
       '<div id="mtOefenveld" hidden><label class="stil lbl" for="mtCantw">Je antwoord</label>' +
       '<textarea id="mtCantw" rows="3" maxlength="1200"></textarea>' +
       '<div class="mt-knoppen"><button class="knop" id="mtBantw" type="button">Antwoord geven</button></div></div>' +
-      '<p class="stil" style="margin-top:.5rem;">Er wordt niets van bewaard en niets van gedeeld. Dit is een oefenruimte.</p></div>';
+      '<p class="stil h-mt50">Er wordt niets van bewaard en niets van gedeeld. Dit is een oefenruimte.</p></div>';
   };
 
   /* Meenemen (shared/uitvoer.js): wat je meeneemt is het scherm waar je

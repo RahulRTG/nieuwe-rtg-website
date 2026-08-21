@@ -1,3 +1,4 @@
+/* het contactenblok op het beginscherm, met de lege staat */
     if (!conns.length && !reqs.length){
       html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
         '<div class="meta" style="margin:.2rem 0 .7rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
@@ -75,11 +76,23 @@
   function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
   function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }
 
+  // Na de onboarding kiest het lid zelf een wereld; de inlog opent niets voor.
+  function naarWereldkeuze(){
+    if (window.RTGCommand && typeof RTGCommand.land === 'function') RTGCommand.land();
+  }
+
   async function checkOnboarding(){
-    if (!API.live || !API.token || onbBezig) return;
-    let st; try { st = await API.call('/onboarding/status'); } catch(e){ return; }
-    if (!st || st.klaar){ const g0 = onbEl('onbGate'); if (g0) g0.hidden = true; return; }
+    // Een bewuste lokale demo heeft geen onboardingroute.
+    if (!API.live){ naarWereldkeuze(); return true; }
+    if (!API.token || onbBezig) return false;
+    let st; try { st = await API.call('/onboarding/status'); } catch(e){ return false; }
+    if (!st || st.klaar){
+      const g0 = onbEl('onbGate'); if (g0) g0.hidden = true;
+      naarWereldkeuze();
+      return true;
+    }
     onbStartGesprek(st);
+    return false;
   }
   function onbStartGesprek(st){
     const g = onbEl('onbGate'); if (!g) return;

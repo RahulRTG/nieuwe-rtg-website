@@ -8,13 +8,13 @@
     const kaart = document.createElement('div');
     kaart.className = 'zak-kaart';
     kaart.innerHTML = '<b style="font-size:0.8rem;">' + T('kluis.h','Op dit toestel') + '</b>' +
-      '<div class="fineprint" style="margin-top:0.25rem;">' + T('kluis.d','Uw eigen kopieen, opgeslagen in de beveiligde opslag van deze browser. Alleen u kunt erbij; er gaat niets over de lijn.') + '</div>' +
+      '<div class="fineprint h-mt25">' + T('kluis.d','Uw eigen kopieen, opgeslagen in de beveiligde opslag van deze browser. Alleen u kunt erbij; er gaat niets over de lijn.') + '</div>' +
       (items.length ? items.slice(0, 10).map(x =>
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.76rem;margin-top:0.4rem;">' +
           '<span>' + esc(x.naam) + '<span style="color:var(--muted);"> · ' + Math.max(1, Math.round(x.bytes/1024)) + ' kB</span></span>' +
           '<span style="white-space:nowrap;"><button class="js-klopen" data-k="' + esc(x.naam) + '" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.15rem 0.45rem;color:var(--txt);font-size:0.68rem;cursor:pointer;">' + T('kluis.open','Open') + '</button> ' +
           '<button class="js-klwis" data-k="' + esc(x.naam) + '" aria-label="' + T('kluis.wis','wis') + '" style="background:none;border:1px solid var(--line);border-radius:8px;padding:0.15rem 0.45rem;color:var(--soft);font-size:0.68rem;cursor:pointer;">✕</button></span></div>').join('')
-        : '<div class="fineprint" style="margin-top:0.4rem;">' + T('kluis.leeg','Nog leeg. Download een factuur of overzicht en uw kopie verschijnt hier vanzelf.') + '</div>');
+        : '<div class="fineprint h-mt40">' + T('kluis.leeg','Nog leeg. Download een factuur of overzicht en uw kopie verschijnt hier vanzelf.') + '</div>');
     host.appendChild(kaart);
     kaart.querySelectorAll('.js-klopen').forEach(b => b.addEventListener('click', async () => {
       const f = await Toestelkluis.haal(b.dataset.k); if (!f) return;

@@ -1,3 +1,4 @@
+/* het aanmeldformulier aanpassen in gewone taal */
     if (canEdit) h += '<div class="card" style="border-color:var(--gold);"><div class="tt-h">\u2728 '+T('onb.ai','Aanpassen met AI')+'</div>'+
       '<p class="sub">'+T('onb.ai.s','Beschrijf in gewone taal wat u wilt. Bijv. "voeg het veld BSN toe" of "zet in het contract dat annuleren tot 24 uur vooraf kan".')+'</p>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="onbAiIn" class="st-in h-flex1" placeholder="'+T('onb.ai.ph','Wat wilt u aanpassen?')+'"><button class="obtn primary" id="onbAiGo">'+T('onb.ai.go','Aanpassen')+'</button></div>'+

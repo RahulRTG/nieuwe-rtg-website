@@ -1,3 +1,4 @@
+/* de buffers van een mesh naar de GPU */
     function bufferVan(mesh) {
       var b = { pos: gl.createBuffer(), nor: gl.createBuffer(), kol: gl.createBuffer(), idx: gl.createBuffer(), n: mesh.indices.length };
       gl.bindBuffer(gl.ARRAY_BUFFER, b.pos); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.posities), gl.STATIC_DRAW);

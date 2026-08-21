@@ -70,7 +70,7 @@
         <input class="veld" id="lPin" type="password" inputmode="numeric" placeholder="PIN" maxlength="8" style="max-width:6rem;">
         <button class="knop" id="lIn" type="button">Meld aan</button>
       </div>
-      <p class="stil" id="lFout" aria-live="polite" style="margin-top:0.5rem;"></p>
+      <p class="stil h-mt50" id="lFout" aria-live="polite"></p>
       <p class="stil demo-hint" data-demo-only hidden>Demo: GARNIZOEN, commando-PIN 1234, logistiek-PIN 5678.</p>
     </div>
   </section>
@@ -78,11 +78,11 @@
   <section id="vBord" hidden>
     <div class="deel">Paraatheid</div>
     <div class="kaart">
-      <h2 style="margin-top:0;">Paraatheid</h2>
+      <h2 class="h-mt0">Paraatheid</h2>
       <div class="kpis" id="paraatheid"></div>
     </div>
     <div class="kaart">
-      <h2 style="margin-top:0;">Eenheden</h2>
+      <h2 class="h-mt0">Eenheden</h2>
       <div id="eenheden"></div>
       <div class="rij" id="rEenheid">
         <input class="veld" id="eNaam" placeholder="Naam eenheid" maxlength="60">
@@ -93,7 +93,7 @@
     </div>
     <div class="deel">Materieel</div>
     <div class="kaart">
-      <h2 style="margin-top:0;">Materieel & onderhoud</h2>
+      <h2 class="h-mt0">Materieel & onderhoud</h2>
       <div id="materieel"></div>
       <div class="rij" id="rMat">
         <input class="veld" id="mNaam" placeholder="Materieel" maxlength="60">
@@ -103,7 +103,7 @@
     </div>
     <div class="deel">Bevoorrading</div>
     <div class="kaart">
-      <h2 style="margin-top:0;">Bevoorrading</h2>
+      <h2 class="h-mt0">Bevoorrading</h2>
       <div id="bevoorrading"></div>
       <div class="rij">
         <select id="bSoort" aria-label="Soort"><option value="brandstof">Brandstof</option><option value="rantsoenen">Rantsoenen</option><option value="onderdelen">Onderdelen</option><option value="medisch">Medisch</option><option value="verbinding">Verbinding</option><option value="overig">Overig</option></select>
@@ -115,7 +115,7 @@
     </div>
     <div class="deel">Oefeningen</div>
     <div class="kaart">
-      <h2 style="margin-top:0;">Oefeningen</h2>
+      <h2 class="h-mt0">Oefeningen</h2>
       <div id="oefeningen"></div>
       <div class="rij" id="rOef">
         <input class="veld" id="oNaam" placeholder="Naam oefening" maxlength="80">
@@ -126,7 +126,7 @@
     </div>
     <div class="deel">Veldhospitaal</div>
     <div class="kaart">
-      <h2 style="margin-top:0;">Veldhospitaal (gewondenopvang met triage)</h2>
+      <h2 class="h-mt0">Veldhospitaal (gewondenopvang met triage)</h2>
       <div id="gewonden"></div>
       <div class="rij">
         <input class="veld" id="gAand" placeholder="Aanduiding (geen naam nodig)" maxlength="40" style="max-width:12rem;">
@@ -137,7 +137,7 @@
     </div>
     <div class="deel">Verplaatsingen</div>
     <div class="kaart">
-      <h2 style="margin-top:0;">Verplaatsingen (transport over land, water en lucht)</h2>
+      <h2 class="h-mt0">Verplaatsingen (transport over land, water en lucht)</h2>
       <div id="verplaatsingen"></div>
       <div class="rij">
         <input class="veld" id="vpVan" placeholder="Van" maxlength="60" style="max-width:8rem;">
@@ -150,7 +150,7 @@
     </div>
     <div class="deel">Staf-AI</div>
     <div class="kaart">
-      <h2 style="margin-top:0;">De staf-AI (logistiek en planning)</h2>
+      <h2 class="h-mt0">De staf-AI (logistiek en planning)</h2>
       <p class="stil" style="margin-bottom:0.5rem;">Vraag over paraatheid, materieel, onderhoud, bevoorrading en oefeningen. De AI is geen wapensysteem en weigert vragen over wapeninzet of doelbestrijding.</p>
       <div class="chat" id="aiChat"></div>
       <div class="rij">

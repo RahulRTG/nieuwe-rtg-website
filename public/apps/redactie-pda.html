@@ -36,7 +36,10 @@
   .badge.live{color:var(--green);border-color:var(--green);} .badge.concept{color:var(--gold);border-color:var(--gold);}
   .mini{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:.3rem .55rem;font:inherit;font-size:.75rem;cursor:pointer;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60;}
-  .inlog{margin:4rem auto;text-align:center;padding:0 1.2rem;} .inlog a{color:var(--gold);}
+  .inlog{margin:4rem auto;text-align:center;padding:0 1.2rem;}
+  /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
+     2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
+  .inlog a{color:var(--gold);display:inline-block;padding:.25rem 0;min-height:24px;}
   .hint{color:var(--soft);font-size:.8rem;line-height:1.5;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -76,7 +79,7 @@ function render(s){
     '<label class="lab">Tekst</label><textarea id="tekst" rows="6" maxlength="20000" placeholder="Korte verslaggeving…"></textarea>'+
     '<button class="knop prim" id="pub">Publiceer nu</button>'+
     '<button class="knop stil" id="concept">Bewaar als concept</button></div>'+
-    '<div class="kaart"><h2 style="font-size:1rem;">Recent</h2><div id="recent" style="margin-top:.4rem;"></div></div>';
+    '<div class="kaart"><h2 style="font-size:1rem;">Recent</h2><div class="h-mt40" id="recent"></div></div>';
   $('#pub').addEventListener('click',()=>verstuur(true));
   $('#concept').addEventListener('click',()=>verstuur(false));
   const r=$('#recent'); const lijst=(s.recent||[]).slice(0,10);
@@ -95,7 +98,7 @@ async function verstuur(publiceren){
   try{ if(publiceren) await api('snel',body); else await api('artikel/bewaar',body); meld(publiceren?'Gepubliceerd.':'Concept bewaard.'); laad(); }
   catch(e){ meld(e.message); }
 }
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p class="hint" style="margin-top:.6rem;">De verslaggevers-PDA hoort bij je nieuwsbedrijf.</p><p style="margin-top:1rem;"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de zaak-app</h2><p class="hint h-mt60">De verslaggevers-PDA hoort bij je nieuwsbedrijf.</p><p class="h-mt100"><a href="/apps/leverancier.html">Naar de zaak-app →</a></p></div>'; }
 else laad();
 </script>
 <script src="/shared/basis.js" defer></script>

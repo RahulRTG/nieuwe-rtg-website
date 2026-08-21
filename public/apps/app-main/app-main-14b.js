@@ -1,3 +1,4 @@
+/* de zorgpakketten: wat er loopt en wat er te kiezen valt */
   function renderCarePakketten(){
     const el = $('#carePakketten'); if (!el) return;
     if (!carePak.length && !carePakMijn.length){ el.innerHTML = ''; return; }
@@ -11,16 +12,16 @@
         '<div style="margin-top:0.3rem;font-size:0.92rem;"><b>'+esc(b.naam)+'</b></div>'+
         '<div class="soft-sm">'+b.nachten+' '+T('care.nachten','nachten')+' · '+esc(b.hotelNaam)+' · '+b.datum+' '+b.tijd+' · '+eur(b.prijs)+
           ' · '+(b.paid?'<span style="color:var(--green,#8bc3a8);">'+T('care.betaald','betaald')+'</span>':'<span style="color:var(--gold);">'+T('care.tebetalen','nog te betalen')+'</span>')+'</div>'+
-        (b.paid?'':'<button class="bz-groot" data-carepakpay="'+esc(b.ref)+'" style="margin-top:0.5rem;">'+T('care.betaal','Betaal')+' · '+eur(b.prijs)+'</button>')+
+        (b.paid?'':'<button class="bz-groot h-mt50" data-carepakpay="'+esc(b.ref)+'">'+T('care.betaal','Betaal')+' · '+eur(b.prijs)+'</button>')+
         '</div>';
     }
     // aanbod
     for (const p of carePak){
       const open = carePakOpen === p.id;
       html += '<div class="card"><div style="display:flex;justify-content:space-between;gap:0.5rem;">'+
-        '<div style="flex:1;"><b>'+esc(p.naam)+'</b>'+
-        '<div class="soft-sm" style="margin-top:0.15rem;">'+esc(p.beschrijving)+'</div>'+
-        '<div class="soft-sm" style="margin-top:0.25rem;">'+esc(p.hotelNaam)+' · '+p.nachten+' '+T('care.nachten','nachten')+' + '+esc(p.behandelingNaam)+' ('+p.duurMin+' min)</div></div>'+
+        '<div class="h-flex1"><b>'+esc(p.naam)+'</b>'+
+        '<div class="soft-sm h-mt15">'+esc(p.beschrijving)+'</div>'+
+        '<div class="soft-sm h-mt25">'+esc(p.hotelNaam)+' · '+p.nachten+' '+T('care.nachten','nachten')+' + '+esc(p.behandelingNaam)+' ('+p.duurMin+' min)</div></div>'+
         '<div style="text-align:right;white-space:nowrap;"><div style="color:var(--gold);font-size:0.95rem;">'+eur(p.prijs)+'</div>'+
         (p.bespaar>0?'<div class="soft-sm" style="color:var(--green,#8bc3a8);">'+T('care.bespaar','bespaar')+' '+eur(p.bespaar)+'</div>':'')+'</div></div>';
       if (open){
@@ -31,9 +32,9 @@
             '<button class="bz-btn'+(k.datum===d?' on':'')+'" data-carepakd="'+d+'">'+(d===dagen[0]?T('care.vandaag','vandaag'):d.slice(8)+'/'+d.slice(5,7))+'</button>').join('')+'</div>'+
           '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.45rem;">'+(p.tijden||[]).map(t2 =>
             '<button class="bz-btn'+(k.tijd===t2?' on':'')+'" data-carepakt="'+t2+'">'+t2+'</button>').join('')+'</div>'+
-          '<button class="bz-groot" id="carePakBoek" style="margin-top:0.7rem;"'+(k.tijd?'':' disabled')+'>'+T('care.pakboek','Boek dit pakket')+' · '+eur(p.prijs)+'</button></div>';
+          '<button class="bz-groot h-mt70" id="carePakBoek"'+(k.tijd?'':' disabled')+'>'+T('care.pakboek','Boek dit pakket')+' · '+eur(p.prijs)+'</button></div>';
       } else {
-        html += '<button class="bz-btn" data-carepakopen="'+esc(p.id)+'" style="margin-top:0.5rem;">'+T('care.pakkies2','Kies dag en tijd')+'</button>';
+        html += '<button class="bz-btn h-mt50" data-carepakopen="'+esc(p.id)+'">'+T('care.pakkies2','Kies dag en tijd')+'</button>';
       }
       html += '</div>';
     }

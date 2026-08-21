@@ -1,3 +1,4 @@
+/* de receptie van vandaag */
     el.innerHTML = '<div class="card"><div class="tt-h">'+T('rc.h','Receptie vandaag')+'</div>'+
       '<div class="pos-chips h-mt40">'+
         '<span>'+r.bezetting.bezet+' / '+r.bezetting.totaal+' '+T('rc.bezet','bezet')+'</span>'+

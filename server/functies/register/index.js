@@ -17,6 +17,7 @@ const FUNCTIES = [].concat(
   require('./cat-apps2'),
   require('./cat-life'),
   require('./cat-partners'),
+  require('./cat-partners2'),
   require('./cat-zaakregie'),
   require('./cat-domeinen'),
   require('./cat-domeinen2'),

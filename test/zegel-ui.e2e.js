@@ -6,17 +6,14 @@
    browser. Draai: node --experimental-sqlite --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, bankDeur } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zguI-')); }
-function laadBrowser() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) {}
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) {}
-  return null;
-}
+/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
+   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
+   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
+const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 async function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' }; if (token) h.Authorization = 'Bearer ' + token;
@@ -48,10 +45,17 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
     await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
       null, { timeout: 60000 });
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForFunction(() => window.RTGCommand && document.getElementById('rtgCommand'), null, { timeout: 10000 });
-    await page.evaluate(() => window.RTGCommand.thuis());
-    await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
-    await page.click('#osCcBtn');
+    /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN LID DAT DOET.
+
+       Hier stonden twee stappen: eerst de knop in de bank naar het springboard,
+       daarna de knop in de statusbalk daar. Dat springboard is als scherm weg
+       (WERELD.md) en het paneel hangt nu aan de voet van de bank -- dezelfde
+       deur die een lid ziet, één stap in plaats van twee.
+
+       Via openBank() en niet via .cmd-lade: deze pagina draait op de
+       standaardbreedte van Playwright, en daar is de bank een vaste rail
+       zonder greep. Zie test/helper.js. */
+    await bankDeur(page, 'Bedieningspaneel');
     await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
     await page.waitForSelector('#osCcZegel', { state: 'visible', timeout: 8000 });
     await page.click('#osCcZegel');

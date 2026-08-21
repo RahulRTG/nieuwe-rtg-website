@@ -1,3 +1,4 @@
+/* de wijzers laten draaien */
       wijzers.appendChild(g);
       let vorige = null;
       return { draai: graden => {

@@ -1,3 +1,4 @@
+/* de looplijst per station, op tijd gesorteerd */
     out.sort((a, b) => a.due.localeCompare(b.due) || (a.it.time.localeCompare(b.it.time)));
     return out;
   }

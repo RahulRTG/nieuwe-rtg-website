@@ -1,3 +1,4 @@
+/* de sectoriconen */
     zorgbalie:{ label:'Zorgbalie', svg:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>', cap:'care' },
     charter:  { label:'Charter',   svg:'<path d="M4 15l8-3 8 3-1.6 4H5.6z"/><path d="M12 12V4l6 4-6 1"/><path d="M3 20c1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0 1.2.8 2.4.8 3.6 0"/>', cap:'charter' },
     groothandel:{ label:'Groothandel', svg:'<rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M3 8l2-4h14l2 4"/><path d="M10 12h4"/>', cap:'groothandel' },

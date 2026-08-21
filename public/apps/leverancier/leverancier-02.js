@@ -1,3 +1,4 @@
+/* de sector van een zaak bepalen */
     if (!sup) return null;
     for (const k of Object.keys(SECTOR_DEF)){
       if (!SECTOR_DEF[k].legacy && SECTOR_DEF[k].codes.includes(sup.code)) return k;

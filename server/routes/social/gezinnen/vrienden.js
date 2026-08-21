@@ -5,7 +5,7 @@ module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
   const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
           socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
-          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding } = kern;
+          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;
 /* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
    maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
    contract (geen paspoort; dat is voor de reispas). */
@@ -38,11 +38,11 @@ app.post('/api/rtf/social/connect', async (req, res) => {
   res.json({ ok: true, status: r.st });
 });
 // Een ouder/beheerder voegt een contact toe voor een beschermd kind van zijn gezin
-// (op exacte codenaam). De andere kant moet daarna nog gewoon zelf accepteren.
+// (op contactpin of exacte codenaam). De andere kant moet daarna nog gewoon zelf accepteren.
 app.post('/api/rtf/social/oudervoeg', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder voegt contacten toe voor een kind.' });
-  const r = await ouderVerbind(s.g.code, String(req.body.kindHandle || ''), String(req.body.codenaam || ''));
+  const r = await ouderVerbind(s.g.code, String(req.body.kindHandle || ''), String(req.body.pin || req.body.codenaam || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });
@@ -56,7 +56,12 @@ app.post('/api/rtf/social/connections', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   const sc = socialConnecties(s.handle);
   // beheerder: ook de kinderen van het gezin, zodat de ouder kan meekijken
-  const kinderen = s.beheerder ? rtf.socialProfielen().filter(sp => sp.gezinCode === s.g.code && sp.beschermd).map(sp => ({ handle: sp.handle, codenaam: sp.codenaam })) : [];
+  /* De pin van het kind gaat mee voor de BEHEERDER, en alleen voor hem: zo
+     geeft een ouder hem door aan de ouder van een vriendje, precies zoals hij
+     nu de codenaam overtypt. Het kind zelf krijgt hem niet -- niet omdat hij
+     gevaarlijk is (een vreemde kan er niets mee, zie pinZoek), maar omdat het
+     kind er niets mee KAN: verbinden loopt daar hoe dan ook via de ouder. */
+  const kinderen = s.beheerder ? rtf.socialProfielen().filter(sp => sp.gezinCode === s.g.code && sp.beschermd).map(sp => ({ handle: sp.handle, codenaam: sp.codenaam, ...pinKaart(sp.handle) })) : [];
   res.json({ me: s.handle, codename: s.codenaam, kind: s.kind, beschermd: s.beschermd, beheerder: s.beheerder, connections: sc.connections, requests: sc.requests, teKeuren: s.beheerder ? socialTeKeuren(s.g.code) : [], kinderen });
 });
 app.post('/api/rtf/social/dm', (req, res) => {

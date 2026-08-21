@@ -5,11 +5,23 @@
    specialist of beauty medical. Krijgt de gedeelde ctx van kern/zorgketen/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, nu, schoon, bak, soortVan, sehRij, findSupplier,
-    VOORSCHRIJVERS, VERWIJZERS, AGENDAS, TRIAGE } = ctx;
+    VOORSCHRIJVERS, VERWIJZERS, AGENDAS, TRIAGE, persoonMag } = ctx;
 
-  /* ---------- recepten: voorschrijven en uitreiken ---------- */
-  function receptMaak(code, b) {
+  /* ---------- recepten: voorschrijven en uitreiken ----------
+
+     DE TWEEDE TOETS HIERONDER IS DE BELANGRIJKSTE VAN DIT BESTAND. Tot voor kort
+     stond hier alleen de eerste: is de ZAAK een huisarts, ziekenhuis of
+     specialist. Dat is een toets op het genre en niet op de mens, en het gevolg
+     was dat iedereen met de vier cijfers van een baliemedewerker een recept naar
+     een apotheek stuurde. Een praktijk heeft een balie, en die balie hoort te
+     kunnen werken -- ze hoort alleen niet voor te schrijven.
+
+     De eis zelf staat in kern/persoonseis.js; hier wordt hij alleen GESTELD.
+     Wie hem hier zou uitschrijven, zet de tweede plek neer die erover beslist. */
+  function receptMaak(code, b, actor) {
     if (!VOORSCHRIJVERS.includes(soortVan(code))) return { status: 403, error: 'Alleen de huisarts, het ziekenhuis of de specialist schrijft voor.' };
+    const p = persoonMag(code, 'voorschrijven', actor);
+    if (!p.ok) return { status: 403, error: p.error, persoonseis: p.missend || null };
     const apo = findSupplier(b.apotheek);
     if (!apo || apo.type !== 'apotheek') return { status: 404, error: 'Deze apotheek kennen we niet.' };
     const middel = schoon(b.middel, 120);
@@ -23,8 +35,10 @@ module.exports = (ctx) => {
     save();
     return { ok: true, recept: r };
   }
-  function receptZet(code, id, status) {
+  function receptZet(code, id, status, actor) {
     if (soortVan(code) !== 'apotheek') return { status: 403, error: 'Alleen de apotheek handelt recepten af.' };
+    const p = persoonMag(code, 'uitreiken', actor);
+    if (!p.ok) return { status: 403, error: p.error, persoonseis: p.missend || null };
     const r = bak().recepten.find(x => x.id === id && x.apotheek === code);
     if (!r) return { status: 404, error: 'Dit recept staat niet bij deze apotheek.' };
     if (!['klaar', 'uitgereikt', 'geweigerd'].includes(status)) return { status: 400, error: 'Kies klaar, uitgereikt of geweigerd.' };
@@ -57,8 +71,10 @@ module.exports = (ctx) => {
   }
 
   /* ---------- verwijzingen: van de spreekkamer naar de specialist ---------- */
-  function verwijsMaak(code, b) {
+  function verwijsMaak(code, b, actor) {
     if (!VERWIJZERS.includes(soortVan(code))) return { status: 403, error: 'Alleen de huisarts of het ziekenhuis verwijst door.' };
+    const p = persoonMag(code, 'verwijzen', actor);
+    if (!p.ok) return { status: 403, error: p.error, persoonseis: p.missend || null };
     const naar = findSupplier(b.naar);
     if (!naar || !AGENDAS.includes(naar.type)) return { status: 404, error: 'Verwijzen kan naar een medisch specialist of een beauty medical-kliniek.' };
     const reden = schoon(b.reden, 200);

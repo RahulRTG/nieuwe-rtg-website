@@ -1,12 +1,13 @@
+/* de ketenchat tussen zaken */
     if (mkKeten && (mkKeten.kanalen || []).length){
       html += '<div class="card"><div class="k">'+T('pd.mk.keten','Ketenchat')+'</div>'+
         '<div class="row" style="flex-wrap:wrap;margin-top:0.4rem;">'+mkKeten.kanalen.map(k =>
           '<button class="abtn '+(k.id===mkKanaal?'':'ghost')+'" data-mkkan="'+k.id+'"'+(k.id===mkKanaal?' aria-current="true"':'')+'>'+esc(k.naam)+'</button>').join('')+'</div>'+
-        '<div class="chat" style="margin-top:0.4rem;">'+((mkGesprek && mkGesprek.berichten) || []).slice(-15).map(m =>
+        '<div class="chat h-mt40">'+((mkGesprek && mkGesprek.berichten) || []).slice(-15).map(m =>
           '<div class="msg other"><span class="who">'+esc(m.van)+' · '+esc(m.korpsNaam || m.korps)+'</span>'+esc(m.tekst)+'</div>').join('')+'</div>'+
         (mkGesprek && mkGesprek.magSchrijven === false
           ? '<div style="font-size:0.75rem;color:var(--soft);margin-top:0.3rem;">'+T('pd.mk.meekijk','U kijkt mee als meldkamer; alleen de leden schrijven.')+'</div>'
-          : '<div class="compose" style="margin-top:0.4rem;"><input id="mkMsg" placeholder="'+T('pd.mk.msg','Bericht aan de keten')+'" maxlength="500"><button id="mkSend">'+T('pd.send','Stuur')+'</button></div>')+
+          : '<div class="compose h-mt40"><input id="mkMsg" placeholder="'+T('pd.mk.msg','Bericht aan de keten')+'" maxlength="500"><button id="mkSend">'+T('pd.send','Stuur')+'</button></div>')+
         '</div>';
     }
     wrap.innerHTML = html;

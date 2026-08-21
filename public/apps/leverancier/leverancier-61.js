@@ -1,5 +1,6 @@
+/* een gerecht aan de menukaart toevoegen */
     if (canEdit){
-      html += '<div class="card" style="margin-top:1.2rem;"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
+      html += '<div class="card h-mt120"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
         '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. gegrilde octopus')+'"></div>'+
         '<div class="row-gap"><div class="field h-flex2"><label>'+T('menu.cat','Categorie')+'</label><input id="mnCat" placeholder="'+T('menu.catph','Bijv. Voorgerechten')+'"></div>'+
         '<div class="field h-flex1"><label>'+T('menu.price','Prijs (€)')+'</label><input id="mnPrice" type="number" inputmode="decimal" placeholder="45"></div></div>'+

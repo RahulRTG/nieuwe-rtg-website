@@ -181,7 +181,7 @@ async function wmLaad(){
       '<span class="lt">'+esc(a.label)+' · '+esc(ROLNAAM[a.rol]||a.rol)+(a.actief?'':' · <span class="ongev">ingetrokken</span>')+(a.actief&&!a.toegang?' · adresbeheer, inhoud privé':'')+'</span></span>'+
       (!d.magBeheren||a.rol==='eigenaar'||a.rol==='rahul'?'':'<span class="nieuwbtn" data-slot="'+esc(a.adres)+'" data-aan="'+(a.actief?'0':'1')+'">'+(a.actief?'Intrekken':'Teruggeven')+'</span>')+
       '</button>').join('')+
-    (d.magBeheren?'<div class="kaart" style="margin-top:.8rem;"><h2 style="font-size:1rem;">Gedeeld functieadres</h2>'+
+    (d.magBeheren?'<div class="kaart h-mt80"><h2 style="font-size:1rem;">Gedeeld functieadres</h2>'+
     '<label class="lab">Naam voor de apenstaart</label><input class="veld" id="wmLokaal" placeholder="bijv. balie of jamal">'+
     '<label class="lab">Functie</label><input class="veld" id="wmLabel" placeholder="bijv. De balie">'+
     '<div class="fout" id="wmFout" hidden></div>'+

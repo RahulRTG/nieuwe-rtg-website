@@ -135,7 +135,9 @@ Object.assign(kern, require('../kern/eenaccount').maakEenAccount({
   logActivity, supplierState, officeState: kern.officeState, magWerken: kern.magWerken,
   pinInfo: kern.pinInfo, pinCheck: kern.pinCheck,
   // hetzelfde doel-slot als /api/supplier/login: een pin, een teller
-  pinSlot
+  pinSlot,
+  // en dezelfde persoonseis als /api/supplier/login: het ene account is geen achterdeur
+  persoonsPoort: kern.persoonsPoort
 }));
 /* Het kantoorgesprek (kern/kantoorgesprek.js): de backoffice binnenkomen door
    met Rahul te praten in plaats van een codeveld in te vullen. Zelfde slot als

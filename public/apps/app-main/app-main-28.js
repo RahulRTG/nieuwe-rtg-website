@@ -1,3 +1,4 @@
+/* het springboard verslepen, met vinger en met muis */
     grid.addEventListener('pointerdown', e => {
       const el = e.target.closest('.os-app'); if (!el) return;
       // waar de vinger begon: movementX/Y is bij touch in Safari altijd 0, dus
@@ -56,6 +57,12 @@
   }).observe(tabbar, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
   // de gate/app-wissel (inloggen, uitloggen) stuurt de schermvaste modus
   new MutationObserver(sync).observe(app, { attributes: true, attributeFilter: ['style', 'class'] });
+
+  /* sync() woont in deze scope en niet in die van openTab (app-main-12.js), dus
+     kan die hem niet aanroepen -- vandaar deze naad, dezelfde vorm als
+     window.RTGVraag in app-main-27.js. Waarom openTab hem nodig heeft staat
+     daar, bij de aanroep. */
+  window.RTGOSSync = sync;
 
   const naarHome = () => { const b = tabKnop('home'); if (b) b.click(); };
   const terug = $('#osTerug'), pill = $('#osPill');

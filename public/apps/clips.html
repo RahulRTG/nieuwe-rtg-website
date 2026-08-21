@@ -111,7 +111,7 @@
       <button class="knop" id="deelClip" type="button" disabled>Deel de clip</button>
       <button class="knop" id="studioDicht" type="button">Sluit</button>
     </div>
-    <p class="stil" id="studioStatus" style="margin-top:0.6rem;"></p>
+    <p class="stil h-mt60" id="studioStatus"></p>
   </div>
 </div>
 
@@ -142,14 +142,14 @@
 
     <h3 style="margin-top:1rem;font-size:0.8rem;">Ondertitels</h3>
     <p class="stil">Een clip zonder ondertitel is een clip die een deel van de mensen niet kan volgen.</p>
-    <div id="cueLijst" style="margin-top:0.5rem;"></div>
+    <div class="h-mt50" id="cueLijst"></div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
       <button class="knop" id="cueBij" type="button">Regel erbij</button>
       <button class="knop vol" id="cueBewaar" type="button">Bewaar de ondertitels</button>
     </div>
 
-    <p class="stil" id="knipStatus" style="margin-top:0.6rem;"></p>
-    <div style="margin-top:0.6rem;"><button class="knop" id="knipDicht" type="button">Sluit</button></div>
+    <p class="stil h-mt60" id="knipStatus"></p>
+    <div class="h-mt60"><button class="knop" id="knipDicht" type="button">Sluit</button></div>
   </div>
 </div>
 
@@ -163,12 +163,13 @@
       <input id="reactieVeld" maxlength="300" placeholder="Schrijf een reactie…">
       <button class="knop vol" type="submit">Plaats</button>
     </form>
-    <div style="margin-top:0.6rem;"><button class="knop" id="reactieDicht" type="button">Sluit</button></div>
+    <div class="h-mt60"><button class="knop" id="reactieDicht" type="button">Sluit</button></div>
   </div>
 </div>
 
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/ondertitelband.js"></script>
 <script src="/shared/clipdeler.js"></script>
 <script>
 (() => {

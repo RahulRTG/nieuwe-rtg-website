@@ -128,6 +128,7 @@
       '<span>Log in als lid om te kijken. Dit beeld is beveiligd en van een watermerk voorzien.</span>';
     wrap.appendChild(lock);
 
+/* het beveiligd-merk op het scherm */
     var badge = document.createElement('div');
     badge.className = 'rtgp-badge zicht';
     badge.textContent = 'Beveiligd';

@@ -47,10 +47,15 @@ const bundels = {
   'shared/glyf.js': 'shared/glyf',
   'shared/qr.js': 'shared/qr',
   'shared/klok.js': 'shared/klok',
-  // de levende wereld: de kring, het draaien, het inzoomen, het Command Wheel,
-  // de ring van Rahul en de levende grond -- zes delen in EEN IIFE
-  'shared/wereld.js': 'shared/wereld',
   'shared/metgezel.js': 'shared/metgezel',
+  /* DE MEDIAPOORT. Als bundel en niet als een tweede script, en dat is hier
+     het hele punt. shared/media.js stond op 10531 byte en moest onder de 10 kB
+     uit keuringsregel 13; de naad was allang benoemd (de diagnose tegenover de
+     zichtbare melding), maar knippen leek 26 pagina's een TWEEDE script te
+     kosten -- voor een module wiens hele werk is om te WERKEN als er iets stuk
+     is. Die ruil is nooit gemaakt, en hoefde ook niet: een bundel is voor de
+     browser precies EEN bestand. De delen zijn byte voor byte het origineel. */
+  'shared/media.js': 'shared/media',
   // het app-menu: stijl, tekens, de eigen functies van een app, de vaste
   // functies, het blad en de knop -- zes onderdelen achter elkaar in een IIFE
   'shared/appmenu.js': 'shared/appmenu',

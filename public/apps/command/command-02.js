@@ -39,14 +39,14 @@
       u += '<div class="tegel"><div class="l">' + esc(d.domein) + '</div>' +
         '<div class="v ' + (KLEUR[d.stand] || '') + '" style="font-size:1.15rem;">' + esc(d.stand) + '</div>' +
         '<div class="u">' + esc(d.redenen.join(' · ')) + '</div>' +
-        '<div class="meta" style="margin-top:.5rem;">' + d.objecten + ' objecten in ' +
+        '<div class="meta h-mt50">' + d.objecten + ' objecten in ' +
         esc(d.soorten.map(function (s) { return s.meervoud; }).join(', ')) + '</div>' +
-        (d.runbooks.length ? '<div class="meta" style="margin-top:.35rem;">' +
+        (d.runbooks.length ? '<div class="meta h-mt35">' +
           d.runbooks.map(function (r) { return esc(r.naam) + ' (' + r.kandidaten + ', ' + esc(r.niveau) + ')'; }).join('<br>') + '</div>' : '') +
         '</div>';
     }
     u += '</div>';
-    u += '<p class="meta" style="margin-top:1.2rem;">Dekking: ' + p.dekking.soorten + ' objectsoorten over ' +
+    u += '<p class="meta h-mt120">Dekking: ' + p.dekking.soorten + ' objectsoorten over ' +
       p.dekking.domeinen + ' domeinen. Wat niet in het objectregister staat, telt hier niet mee -- het staat dan niet op groen, het staat er niet.</p>';
     el.innerHTML = u;
   };

@@ -1,3 +1,4 @@
+/* de minibar tellen, per kamer */
     const items = Object.entries(mbQty).filter(([,q]) => q > 0).map(([id, qty]) => ({ id, qty }));
     try {
       const d = await API.call('/supplier/minibar/count', { room: mbRoom, items });

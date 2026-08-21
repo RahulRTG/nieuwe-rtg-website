@@ -27,7 +27,7 @@
    RTG_CHROMIUM=... node --experimental-sqlite --test test/pinherstel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, bankDeur } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -142,15 +142,23 @@ test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', 
     const token = await lidMetPin(base, '246810');
     const { page, fouten } = await ingelogd(browser, base, token, '/apps/app.html');
 
-    // De vier hoofdapps hebben losse apptegels vervangen. Pinbeheer blijft
-    // daarom als vaste, zichtbare ingang in het bedieningspaneel bereikbaar.
+    // De drie hoofdwerelden hebben losse apptegels vervangen. Pinbeheer blijft
+    // daarom als vaste, zichtbare ingang in het bedieningspaneel bereikbaar --
+    // te bereiken via "Toestel" in de bank van de werktafel.
     await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
       null, { timeout: 60000 });
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForFunction(() => window.RTGCommand && document.getElementById('rtgCommand'), null, { timeout: 10000 });
-    await page.evaluate(() => window.RTGCommand.thuis());
-    await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
-    await page.click('#osCcBtn');
+    /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN LID DAT DOET.
+
+       Hier stonden twee stappen: eerst de knop in de bank naar het springboard,
+       daarna de knop in de statusbalk daar. Dat springboard is als scherm weg
+       (WERELD.md) en het paneel hangt nu aan de voet van de bank -- dezelfde
+       deur die een lid ziet, één stap in plaats van twee.
+
+       Via openBank() en niet via .cmd-lade: deze pagina draait op de
+       standaardbreedte van Playwright, en daar is de bank een vaste rail
+       zonder greep. Zie test/helper.js. */
+    await bankDeur(page, 'Bedieningspaneel');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcPin');
 

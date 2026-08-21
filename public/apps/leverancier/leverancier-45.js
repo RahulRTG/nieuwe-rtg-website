@@ -1,3 +1,4 @@
+/* een melding in het vrachtlogboek */
     el.querySelectorAll('[data-vrmeld]').forEach(b => b.addEventListener('click', async () => {
       const t = prompt(T('vr.meldvraag','Korte melding voor het logboek (de klant ziet dit op de volgcode):')); if (!t) return;
       try { await API.call('/supplier/vracht/melding', { id:b.dataset.vrmeld, tekst:t }); renderVracht(); } catch(e){ toast(e.message); }

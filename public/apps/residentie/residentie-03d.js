@@ -59,8 +59,8 @@
       $('#spelKeuze').innerHTML = '<h2>Samen wandelen?</h2>' +
         '<div class="sub">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</div>' +
         '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
-        '<button class="knop2" id="paarJa" type="button" style="flex:1;">Graag</button>' +
-        '<button class="knop2 stil2" id="paarNee" type="button" style="flex:1;">Liever niet</button></div>';
+        '<button class="knop2 h-flex1" id="paarJa" type="button">Graag</button>' +
+        '<button class="knop2 stil2 h-flex1" id="paarNee" type="button">Liever niet</button></div>';
       $('#spelLaag').classList.add('open');
       $('#paarJa').addEventListener('click', async () => {
         $('#spelLaag').classList.remove('open');
@@ -79,8 +79,8 @@
         $('#spelKeuze').innerHTML = '<h2>U wandelt samen</h2>' +
           '<div class="sub">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</div>' +
           '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
-          '<button class="knop2" id="paarVriend" type="button" style="flex:1;">Word ook vrienden</button>' +
-          '<button class="knop2 stil2" id="paarKlaar" type="button" style="flex:1;">Verder</button></div>';
+          '<button class="knop2 h-flex1" id="paarVriend" type="button">Word ook vrienden</button>' +
+          '<button class="knop2 stil2 h-flex1" id="paarKlaar" type="button">Verder</button></div>';
         $('#spelLaag').classList.add('open');
         $('#paarVriend').addEventListener('click', () => { $('#spelLaag').classList.remove('open'); wordVrienden(S.paar); });
         $('#paarKlaar').addEventListener('click', () => $('#spelLaag').classList.remove('open'));

@@ -125,7 +125,7 @@
     var groepen = {};
     lijst.forEach(function (s) { (groepen[s.groep || 'Algemeen'] = groepen[s.groep || 'Algemeen'] || []).push(s); });
     $('#sjablonen').innerHTML = Object.keys(groepen).sort().map(function (g) {
-      return '<div class="sec" style="margin-top:.8rem;">' + esc(g) + '</div>' +
+      return '<div class="sec h-mt80">' + esc(g) + '</div>' +
         groepen[g].map(function (s) {
           return '<button class="sjab" type="button" data-sjab="' + esc(s.id) + '">' + esc(s.titel) + '</button>';
         }).join('');

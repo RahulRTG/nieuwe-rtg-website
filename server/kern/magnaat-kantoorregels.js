@@ -67,8 +67,14 @@ const REGELS = [
 
      Zonder deze regel viel elk Link-punt terug op de restpost, en dat is met
      opzet rood: onbekend werk hoort niet stilletjes bij Onderzoek te belanden.
-     De volle toetssuite wees dat aan (test/kantoren.test.js, acht gaten). */
-  [/(?:^|\/)link\//, 'intern', 'Intern & IT'],
+     De volle toetssuite wees dat aan (test/kantoren.test.js, acht gaten).
+
+     EN DE KALE DEUR TELT MEE. Het patroon eiste een schuine streep NA `link`,
+     dus /api/link/koppelingen matchte wel en /api/link zelf niet -- die bleef
+     als enige punt in het hele huis op de restpost staan. Nu mag er ook het
+     einde van het pad volgen; /api/linkkaart matcht nog steeds niet, want daar
+     komt een letter achteraan. */
+  [/(?:^|\/)link(?:\/|$)/, 'intern', 'Intern & IT'],
 
   /* Geld, handel en groei. */
   /* De commerciele kern hoort bij Financien, net als de pasprijzen: het gaat
@@ -90,6 +96,12 @@ const REGELS = [
   [/contract|juridisch|paspoort|machtig|privacy|avg|toestemming|inzagekaart|rechtsvorm|\/drm\b/, 'juridisch', 'Juridisch'],
   [/ingenieur|engineering/, 'ingenieurs', 'Ingenieurs'],
   [/\/bedrijf|\/onderneming|\/concern|\/genootschap|\/zakelijk|\/metier/, 'support', 'Support team'],
+  /* De GASTENKANT van het festival is een ledenoppervlak -- uw pas, het
+     programma van een dag, uw groep -- en hoort dus bij Klantenservice en niet
+     bij het Support team. Hij staat VOOR de regel hieronder, want die vangt elk
+     pad met "gast" af en gaat over de gastenkassa van een zaak. De
+     organisatiekant van het festival staat verderop bij Verkoop, naast horeca. */
+  [/\/festival\/gast|festival-gast/, 'klantenservice', 'Klantenservice'],
   [/supplier|partner|\/gast/, 'support', 'Support team'],
 
   /* Platform, onderzoek en creatie. */
@@ -108,6 +120,18 @@ const REGELS = [
   [/\/thuis|\/home|\/leven|\/life\b|\/ik\b|\/gemoed|\/gedachten|\/gewoonten|\/doelen|\/notities|\/memo|\/vitaal|\/voeding|\/medicatie|\/medicijnen|\/metingen|\/arrival|\/verblijf|\/booking|\/book\b|\/residentie|\/sociaal|\/samen|\/fluister|\/live\b|\/klets|\/chat\b|\/like\b|\/comment|\/tijdlijn|\/aandacht|\/attenties|\/favoriet|\/dag\b|\/locatie|\/adres|\/annuleer|\/gids\b|\/event\b|\/punten|\/vandaag|\/ice\b|\/rahul|\/ai\b|\/navigatie|\/reizen|\/vertaler/, 'klantenservice', 'Klantenservice'],
   [/\/cellier|\/cercle|\/concierge|\/zaal|\/entourage|\/garderobe|\/ghost|\/hangar|\/lifestyle|\/horloge|\/uitzicht|\/maison|\/mecenaat|\/pulse|\/rendezvous/, 'klantenservice', 'Klantenservice'],
   [/\/klankwerk|\/camera|\/oog\b|\/media\.html/, 'creatief', 'Creatief'],
+  /* HET FESTIVAL HEEFT TWEE KANTEN, en die horen niet in dezelfde kamer.
+
+     De GASTENKANT is een ledenoppervlak: uw pas, het programma van een dag, uw
+     groep. Dat is Klantenservice, net als de rest van wat een lid ziet. De
+     ORGANISATIEKANT -- poort, bezetting, kassa, dienst, podium -- is de
+     bedrijfsvoering van een zaak, en die staat hier al: /horeca ligt bij
+     Verkoop, en een festival is diezelfde gastvrijheid op schaal.
+
+     De gastenregel staat verderop, VOOR de brede /gast-regel van het Support
+     team: eerste match wint, en die regel gaat over de gastenkassa van een
+     zaak. Zonder allebei vielen 72 controlepunten terug op "Onderzoek & data". */
+  [/\/festival/, 'verkoop', 'Verkoop'],
   [/\/horeca|\/mijnmall|\/review|\/splits/, 'verkoop', 'Verkoop'],
   [/\/zaakweb|\/leverancier\.html/, 'support', 'Support team'],
   [/\/marechaussee|\/meldkamer/, 'paniekkamer', 'De Paniekkamer'],

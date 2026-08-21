@@ -164,8 +164,21 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    kleiner in plaats van vergeten (dezelfde afspraak als BEREIK.json).
 
    MUTATIE (RAAK): de grens op 0 zetten -> zakt met de volle 512 in de melding.
+
+   VERZET VAN 510 NAAR 546 OP 21 AUGUSTUS 2026, en met de oorzaak erbij zodat
+   het geen getal blijft dat niemand meer kan plaatsen. Het gat is niet nieuw en
+   niet breder geworden: het is dezelfde blinde vlek, evenredig meegegroeid met
+   het huis. De samenvoeging van 24 takken bracht 36 foundation-routes mee.
+
+   WAT DE SCANNER NIET ZIET, EN WAAROM. Hij eist dat het pad in de bron met
+   `/api/` begint. De foundation- en schoolrouters registreren RELATIEF
+   (`router.post('/gezin/maak')`) en worden gemount op /api/foundation; in de
+   bron staat dus nergens het volledige adres. Alle 546 gemiste routes zijn van
+   die vorm. Dat is te repareren -- de mount-prefix per router afleiden -- maar
+   het raakt de pariteit met de Rust-tweelingbroer hierboven, en dat is het
+   besluit dat hier expres niet wordt genomen.
    ========================================================================== */
-const GEMIST_MAX = 510;   // routes die de router heeft en de bronscanner niet
+const GEMIST_MAX = 546;   // routes die de router heeft en de bronscanner niet
 const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {

@@ -1,0 +1,309 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  RTG Mail inbound: SES stores raw mail briefly in encrypted S3 and invokes a
+  Lambda bridge that signs the exact bytes for the RTG application.
+
+Parameters:
+  CallbackUrl:
+    Type: String
+    Description: Exact public HTTPS endpoint, ending in /api/mail/ses
+    AllowedPattern: '^https://[^ ]+/api/mail/ses$'
+  InboundSecret:
+    Type: String
+    NoEcho: true
+    MinLength: 32
+    MaxLength: 512
+    Description: Must equal SES_INBOUND_SECRET in the RTG application
+  GroupDomain:
+    Type: String
+    Default: rahultravelgroup.com
+    AllowedPattern: '^[a-z0-9](?:[a-z0-9.-]{1,251})[a-z0-9]$'
+  EnableFoundation:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+    Description: Keep false until rahultravelfoundation.com is registered and controlled
+  FoundationDomain:
+    Type: String
+    Default: rahultravelfoundation.com
+    AllowedPattern: '^[a-z0-9](?:[a-z0-9.-]{1,251})[a-z0-9]$'
+  RuleSetName:
+    Type: String
+    Default: rtg-mail-inbound
+    AllowedPattern: '^[A-Za-z0-9][A-Za-z0-9_.-]{0,62}[A-Za-z0-9]$'
+  RuleName:
+    Type: String
+    Default: rtg-mail-to-app
+    AllowedPattern: '^[A-Za-z0-9][A-Za-z0-9_.-]{0,62}[A-Za-z0-9]$'
+
+Conditions:
+  UseFoundation: !Equals [!Ref EnableFoundation, 'true']
+
+Resources:
+  GroupIdentity:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref GroupDomain
+      DkimSigningAttributes:
+        NextSigningKeyLength: RSA_2048_BIT
+
+  FoundationIdentity:
+    Type: AWS::SES::EmailIdentity
+    Condition: UseFoundation
+    Properties:
+      EmailIdentity: !Ref FoundationDomain
+      DkimSigningAttributes:
+        NextSigningKeyLength: RSA_2048_BIT
+
+  MailBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: RemoveProcessedOrStrandedMail
+            Status: Enabled
+            ExpirationInDays: 2
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  MailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MailBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSesToStoreOnlyInboundObjects
+            Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub '${MailBucket.Arn}/incoming/*'
+            Condition:
+              StringEquals:
+                AWS:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                AWS:SourceArn: !Sub 'arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/*'
+
+  BridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ReadAndRemoveInboundMail
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ['s3:GetObject', 's3:DeleteObject']
+                Resource: !Sub '${MailBucket.Arn}/incoming/*'
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref BridgeSecret
+              - Effect: Allow
+                Action: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents']
+                Resource: !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:*'
+
+  BridgeSecret:
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Description: Shared HMAC secret for the SES to RTG Mail bridge
+      SecretString: !Ref InboundSecret
+
+  BridgeFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: nodejs24.x
+      Handler: index.handler
+      Role: !GetAtt BridgeRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      ReservedConcurrentExecutions: 10
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref MailBucket
+          OBJECT_PREFIX: incoming/
+          CALLBACK_URL: !Ref CallbackUrl
+          SECRET_ARN: !Ref BridgeSecret
+          GROUP_DOMAIN: !Ref GroupDomain
+          FOUNDATION_DOMAIN: !If [UseFoundation, !Ref FoundationDomain, '']
+      Code:
+        ZipFile: |
+          const crypto = require('node:crypto');
+          const { S3Client, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+          const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');
+          const s3 = new S3Client({});
+          const secrets = new SecretsManagerClient({});
+          let inboundSecret;
+          const norm = value => String(value || '').trim().toLowerCase();
+          const digest = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
+          const allowed = address => {
+            const at = address.lastIndexOf('@');
+            const domain = at > 0 ? address.slice(at + 1) : '';
+            const group = norm(process.env.GROUP_DOMAIN);
+            const foundation = norm(process.env.FOUNDATION_DOMAIN);
+            return domain.endsWith('.' + group) || (!!foundation && domain === foundation);
+          };
+          const bodyBytes = async stream => {
+            const chunks = [];
+            for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+            return Buffer.concat(chunks);
+          };
+          const secret = async () => {
+            if (inboundSecret) return inboundSecret;
+            const value = await secrets.send(new GetSecretValueCommand({ SecretId: process.env.SECRET_ARN }));
+            inboundSecret = String(value.SecretString || '');
+            if (inboundSecret.length < 32) throw new Error('Inbound secret is not configured safely');
+            return inboundSecret;
+          };
+          exports.handler = async event => {
+            const records = Array.isArray(event && event.Records) ? event.Records : [];
+            for (const record of records) {
+              const ses = record && record.ses;
+              const id = String(ses && ses.mail && ses.mail.messageId || '');
+              if (!/^[A-Za-z0-9._@+=:/-]{1,200}$/.test(id)) throw new Error('Missing SES message id');
+              const key = process.env.OBJECT_PREFIX + id;
+              const object = await s3.send(new GetObjectCommand({ Bucket: process.env.BUCKET_NAME, Key: key }));
+              const bytes = await bodyBytes(object.Body);
+              const timestamp = String(Math.floor(Date.now() / 1000));
+              const recipients = [...new Set((ses.receipt.recipients || []).map(norm).filter(allowed))];
+              if (!recipients.length) throw new Error('No allowed envelope recipient');
+              let retry = false;
+              for (const recipient of recipients) {
+                const verdict = value => {
+                  const status = String(value && value.status || '').toUpperCase();
+                  return ['PASS', 'FAIL', 'GRAY', 'PROCESSING_FAILED'].includes(status) ? status : '';
+                };
+                const checks = {
+                  spf: verdict(ses.receipt.spfVerdict),
+                  dkim: verdict(ses.receipt.dkimVerdict),
+                  dmarc: verdict(ses.receipt.dmarcVerdict),
+                  spam: verdict(ses.receipt.spamVerdict),
+                  virus: verdict(ses.receipt.virusVerdict)
+                };
+                const checkText = [checks.spf, checks.dkim, checks.dmarc, checks.spam, checks.virus].join('|');
+                const base = timestamp + '\n' + id + '\n' + recipient + '\n' + digest(bytes) + '\n' + checkText;
+                const signature = crypto.createHmac('sha256', await secret()).update(base).digest('hex');
+                const response = await fetch(process.env.CALLBACK_URL, {
+                  method: 'POST',
+                  headers: {
+                    'content-type': 'message/rfc822',
+                    'x-rtg-ses-timestamp': timestamp,
+                    'x-rtg-ses-message-id': id,
+                    'x-rtg-ses-recipient': recipient,
+                    'x-rtg-ses-signature': signature,
+                    'x-rtg-ses-mail-from': String(ses.mail.source || '').slice(0, 254),
+                    'x-rtg-ses-spf': checks.spf,
+                    'x-rtg-ses-dkim': checks.dkim,
+                    'x-rtg-ses-dmarc': checks.dmarc,
+                    'x-rtg-ses-spam': checks.spam,
+                    'x-rtg-ses-virus': checks.virus
+                  },
+                  body: bytes,
+                  signal: AbortSignal.timeout(20000)
+                });
+                if (response.status === 409 || response.status === 429 || response.status >= 500) retry = true;
+                console.log(JSON.stringify({ messageId: id, recipientHash: digest(Buffer.from(recipient)).slice(0, 16), status: response.status }));
+              }
+              if (retry) throw new Error('RTG application asked SES bridge to retry');
+              await s3.send(new DeleteObjectCommand({ Bucket: process.env.BUCKET_NAME, Key: key }));
+            }
+          };
+
+  AllowSesInvokeBridge:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref BridgeFunction
+      Principal: ses.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub 'arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/${RuleSetName}:receipt-rule/${RuleName}'
+
+  ReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties:
+      RuleSetName: !Ref RuleSetName
+
+  ReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    DependsOn: [MailBucketPolicy, AllowSesInvokeBridge]
+    Properties:
+      RuleSetName: !Ref ReceiptRuleSet
+      Rule:
+        Name: !Ref RuleName
+        Enabled: true
+        ScanEnabled: true
+        TlsPolicy: Optional
+        Recipients:
+          - !Sub '.${GroupDomain}'
+          - !If [UseFoundation, !Ref FoundationDomain, !Ref 'AWS::NoValue']
+        Actions:
+          - S3Action:
+              BucketName: !Ref MailBucket
+              ObjectKeyPrefix: incoming/
+          - LambdaAction:
+              FunctionArn: !GetAtt BridgeFunction.Arn
+              InvocationType: Event
+          - StopAction:
+              Scope: RuleSet
+
+Outputs:
+  BucketName:
+    Value: !Ref MailBucket
+  ReceiptRuleSetName:
+    Value: !Ref ReceiptRuleSet
+  SesMxTarget:
+    Description: Publish with MX priority 10 for every receiving domain/subdomain
+    Value: !Sub 'inbound-smtp.${AWS::Region}.amazonaws.com'
+  GroupDkimName1:
+    Value: !GetAtt GroupIdentity.DkimDNSTokenName1
+  GroupDkimValue1:
+    Value: !GetAtt GroupIdentity.DkimDNSTokenValue1
+  GroupDkimName2:
+    Value: !GetAtt GroupIdentity.DkimDNSTokenName2
+  GroupDkimValue2:
+    Value: !GetAtt GroupIdentity.DkimDNSTokenValue2
+  GroupDkimName3:
+    Value: !GetAtt GroupIdentity.DkimDNSTokenName3
+  GroupDkimValue3:
+    Value: !GetAtt GroupIdentity.DkimDNSTokenValue3
+  FoundationDkimName1:
+    Condition: UseFoundation
+    Value: !GetAtt FoundationIdentity.DkimDNSTokenName1
+  FoundationDkimValue1:
+    Condition: UseFoundation
+    Value: !GetAtt FoundationIdentity.DkimDNSTokenValue1
+  FoundationDkimName2:
+    Condition: UseFoundation
+    Value: !GetAtt FoundationIdentity.DkimDNSTokenName2
+  FoundationDkimValue2:
+    Condition: UseFoundation
+    Value: !GetAtt FoundationIdentity.DkimDNSTokenValue2
+  FoundationDkimName3:
+    Condition: UseFoundation
+    Value: !GetAtt FoundationIdentity.DkimDNSTokenName3
+  FoundationDkimValue3:
+    Condition: UseFoundation
+    Value: !GetAtt FoundationIdentity.DkimDNSTokenValue3

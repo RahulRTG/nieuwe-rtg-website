@@ -116,14 +116,12 @@ async function wachtRooster(page) {
     const app = document.getElementById('app');
     return !!(app && app.classList.contains('active') && window.RTGWereld &&
       document.querySelector('.view[data-view="home"].active') &&
-      document.querySelectorAll('#osMappen .os-app').length === 3);
+      document.querySelectorAll('#osMappen .os-app').length === 4);
   }, null, { timeout: 60000 });
   /* RTG Command is na de intake de landing. Deze toetsen meten de kloklaag
-     eronder, dus volgen dezelfde knop "Beginscherm" als een lid. Rechtstreeks
-     klikken via de DOM werkt ook wanneer de mobiele bank nog dicht is. */
+     eronder via de interne thuisingang; die staat niet in de hoofdnavigatie. */
   await page.evaluate(() => {
-    const k = document.querySelector('#rtgCommand .cmd-klok');
-    if (k) k.click();
+    if (window.RTGCommand) window.RTGCommand.thuis();
   });
   await page.evaluate(() => RTGWereld.zet(false));
   await page.waitForFunction(() => !RTGWereld.aan() &&
@@ -266,14 +264,12 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
       if (g) g.hidden = true;
     });
     /* RTG Command is de nieuwe landing. Deze toets meet bewust de stille
-       statusbalk van het beginscherm eronder, dus volgt dezelfde zichtbare
-       ingang als een lid. */
+       statusbalk van het beginscherm eronder via de interne thuisingang. */
     await page.waitForFunction(() => {
       const g = document.getElementById('onbGate');
       if (g) g.hidden = true;
-      const k = document.querySelector('#rtgCommand .cmd-klok');
-      if (!k) return false;
-      k.click();
+      if (!window.RTGCommand || !document.getElementById('rtgCommand')) return false;
+      window.RTGCommand.thuis();
       if (g) g.remove();
       return true;
     }, null, { timeout: 10000 });
@@ -363,7 +359,7 @@ test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenr
   });
 });
 
-test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klok staat erboven',
+test('het beginscherm draagt één gecentreerde rij van vier apps, en de klok staat erboven',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
@@ -406,12 +402,12 @@ test('het beginscherm draagt één gecentreerde rij van drie werelden, en de klo
         onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
       };
     });
-    assert.equal(r.mappen, 3, 'de voordeur hoort exact drie hoofdwerelden te dragen');
-    assert.equal(r.rijen, 1, 'de drie hoofdwerelden staan niet in één rij (rijen: ' + r.rijen + ')');
-    /* DE RIJ TELT ER DRIE EN HOORT GECENTREERD TE STAAN. Links en rechts even
-       veel marge maakt er één bewuste voordeur van, in plaats van drie tegels
+    assert.equal(r.mappen, 4, 'de voordeur hoort exact vier apps te dragen');
+    assert.equal(r.rijen, 1, 'de vier apps staan niet in één rij (rijen: ' + r.rijen + ')');
+    /* DE RIJ TELT ER VIER EN HOORT GECENTREERD TE STAAN. Links en rechts even
+       veel marge maakt er één bewuste voordeur van, in plaats van vier tegels
        die toevallig vanaf de linkerkant zijn neergelegd. De tegels houden
-       bovendien dezelfde compacte maat; drie uitgerekte tegels zouden de klok
+       bovendien dezelfde compacte maat; uitgerekte tegels zouden de klok
        en de rustige hiërarchie verdringen. */
     assert.ok(Math.abs(r.marge.links - r.marge.rechts) <= 2,
       'de laatste rij mappen staat niet gecentreerd (links ' + r.marge.links +
@@ -453,7 +449,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   /* PREMIUMRECHTEN VERANDEREN DE INHOUD, NIET DE KWALITEIT VAN DE VOORDEUR.
      Een RTG-pas ziet minder onderdelen dan Lifestyle of Business, maar krijgt
-     dezelfde drie volledige huizen. Daarom toetst dit pad bewust met de
+     dezelfde vier volledige apps. Daarom toetst dit pad bewust met de
      instappas: geen hoofdwereld mag daar terugvallen op een kaal monogram of
      verdwijnen. */
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mappen-'));
@@ -515,8 +511,10 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
         monogram: !!map.querySelector('.os-monogram')
       })));
 
-    assert.deepEqual(mappen.map((m) => m.sleutel), ['map-rtg', 'map-werk', 'map-rtf'],
-      'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
+    assert.deepEqual(mappen.map((m) => m.sleutel), ['map-rtg', 'map-werk', 'map-rtf', 'map-instellingen'],
+      'de voordeur hoort exact LIFE, WORK, FOUNDATION en INSTELLINGEN te dragen');
+    assert.deepEqual(mappen.map((m) => m.naam), ['LIFE', 'WORK', 'FOUNDATION', 'INSTELLINGEN'],
+      'de vier productnamen wijken af');
     const kaal = mappen.filter((m) => !m.glyf);
     assert.deepEqual(kaal.map((m) => m.naam + (m.monogram ? ' (monogram)' : ' (leeg)')), [],
       'deze wereldtegels dragen geen getekende glyf:\n' +
@@ -533,7 +531,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
   /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
      De voorganger van deze toets mat de tegels in een GEOPENDE map. Sinds het
-     beginscherm drie hoofdwerelden toont (PLATFORM.md par. 0) opent een tegel de
+     beginscherm vier hoofdapps toont (PLATFORM.md par. 0) opent een tegel de
      app zelf en is er geen tussenscherm meer. De fout waar die toets voor
      bestond is niet verdwenen -- hij is verhuisd: tegels die over elkaar
      liggen, buiten hun vak vallen of de helft van de breedte onbenut laten,
@@ -541,7 +539,7 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
      en geldt nu.
 
      Wat er bij komt en er niet in kon staan: dat een wereld ook echt zijn app
-     opent. Dat is het hele punt van de drie hoofdwerelden; een tegel die niets doet
+     opent. Dat is het hele punt van de vier hoofdapps; een tegel die niets doet
      zou door elke telling heen komen.
 
      De mutatie die hem hoort te laten zakken: haal `wereld` van een van de
@@ -597,8 +595,10 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
       };
     });
 
-    assert.deepEqual(beeld.sleutels, ['map-rtg', 'map-werk', 'map-rtf'],
-      'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te tekenen');
+    assert.deepEqual(beeld.sleutels, ['map-rtg', 'map-werk', 'map-rtf', 'map-instellingen'],
+      'de voordeur hoort exact LIFE, WORK, FOUNDATION en INSTELLINGEN te tekenen');
+    assert.deepEqual(beeld.namen, ['LIFE', 'WORK', 'FOUNDATION', 'INSTELLINGEN'],
+      'de vier productnamen wijken af');
     assert.equal(beeld.overlap, 0,
       'wereldtegels liggen over elkaar heen (' + beeld.overlap + ' paren): ' + beeld.namen.join(', '));
     assert.equal(beeld.buiten, 0, 'deze wereldtegels vallen buiten hun eigen vak');

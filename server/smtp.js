@@ -1,21 +1,6 @@
-/* Eigen, kleine SMTP-verzendclient, i.p.v. het pakket nodemailer.
-
-   Let op de nuance bij regel 1 (docs/de-lijn.md): we schrijven hier GEEN eigen
-   cryptografie. De versleuteling van de verbinding komt volledig uit node:tls
-   (implicit TLS of STARTTLS). Wij zetten alleen de bekende SMTP-protocolstappen
-   op elkaar -- EHLO, STARTTLS, AUTH, MAIL/RCPT/DATA -- plus een correcte MIME-
-   opmaak (headers, UTF-8, base64-body, dot-stuffing). Dat is protocol-assemblage,
-   geen crypto.
-
-   Scope, bewust smal en eerlijk: dit is een SUBMISSION-client naar een
-   geconfigureerde smarthost (SMTP_URL van een provider), geen volwaardige MTA.
-   Geen MX-resolutie, geen eigen wachtrij met herproberen -- dat doet de provider
-   erachter, en zonder SMTP_URL valt server/mail.js sowieso terug op de outbox.
-   Credentials gaan NOOIT over een onversleutelde verbinding (anders weigeren we).
-
-   Zelfde vorm als het pakket, zodat server/mail.js niets merkt:
-       const t = require('./smtp').createTransport(SMTP_URL);
-       await t.sendMail({ from, to, subject, text });   // belofte, net als nodemailer */
+/* Kleine SMTP-submissionclient voor een smarthost. TLS komt uit node:tls;
+   credentials gaan nooit over een onversleutelde verbinding. Zonder SMTP_URL
+   gebruikt mail.js de lokale outbox. */
 'use strict';
 const net = require('net');
 const tls = require('tls');
@@ -79,19 +64,32 @@ function kopWaarde(s) {
    Base64 voor de body vermijdt alle quoted-printable-randgevallen; regels op 76. */
 function bouwBericht(cfg, bericht) {
   const from = bericht.from || cfg.user || 'no-reply@localhost';
-  const koppen = [
-    'From: ' + from,
-    'To: ' + (Array.isArray(bericht.to) ? bericht.to.join(', ') : bericht.to),
-    'Subject: ' + kopWaarde(bericht.subject),
-    'Date: ' + rfcDatum(new Date()),
-    'Message-ID: <' + crypto.randomBytes(16).toString('hex') + '@' + cfg.naam + '>',
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=utf-8',
-    'Content-Transfer-Encoding: base64'
-  ];
+  const koppen = {
+    From:from,
+    To:Array.isArray(bericht.to) ? bericht.to.join(', ') : bericht.to,
+    Subject:kopWaarde(bericht.subject),
+    Date:rfcDatum(new Date()),
+    'Message-ID':'<' + crypto.randomBytes(16).toString('hex') + '@' + cfg.naam + '>',
+    'MIME-Version':'1.0',
+    'Content-Type':'text/plain; charset=utf-8',
+    'Content-Transfer-Encoding':'base64'
+  };
   const body = Buffer.from(String(bericht.text == null ? '' : bericht.text), 'utf8')
     .toString('base64').replace(/(.{76})/g, '$1' + CRLF);
-  let ruw = koppen.join(CRLF) + CRLF + CRLF + body;
+  /* Ook via een smarthost tekenen wij zelf als de beheerder een DKIM-sleutel
+     heeft ingericht. Sommige providers doen dit eveneens, maar veiligheid mag
+     niet stil afhangen van een aanname over de provider. Dubbele geldige DKIM-
+     handtekeningen zijn toegestaan; de ontvanger kan ze allebei narekenen. */
+  let dkim = '';
+  if (bericht.dkim && bericht.dkim.priveSleutel && bericht.dkim.domein) {
+    try {
+      const r = require('./dkim').onderteken({ koppen, lijf:body,
+        domein:bericht.dkim.domein, selector:bericht.dkim.selector || 'rtg',
+        priveSleutel:bericht.dkim.priveSleutel });
+      if (r.ok) dkim = r.kop + CRLF;
+    } catch (e) { /* providerbezorging blijft beschikbaar; mail.js meldt config */ }
+  }
+  let ruw = dkim + Object.keys(koppen).map(k => k + ': ' + koppen[k]).join(CRLF) + CRLF + CRLF + body;
   // dot-stuffing: een regel die met '.' begint krijgt er een '.' bij (RFC 5321 §4.5.2)
   ruw = ruw.replace(/\r\n\./g, CRLF + '..').replace(/^\./, '..');
   return ruw;
@@ -188,7 +186,9 @@ function verstuur(cfg, bericht) {
       await authenticeer(socket, lezer, caps);
     }
 
-    const van = adresVan(bericht.from || cfg.user);
+    // De zichtbare From mag een persoonlijk publiek alias zijn. De envelope-
+    // afzender blijft het geauthenticeerde hoofddomein voor SPF en bounces.
+    const van = adresVan(bericht.envelopeFrom || bericht.from || cfg.user);
     await commando(socket, lezer, 'MAIL FROM:<' + van + '>', [250], 'MAIL FROM');
     const rcpts = adressen(bericht.to);
     if (!rcpts.length) throw new Error('SMTP: geen geldige ontvanger');

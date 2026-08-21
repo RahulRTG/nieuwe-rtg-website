@@ -134,6 +134,8 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/payroll-os')(grens('payroll-os'));
   /* De RTF-bieb-routes (de kern staat al bij de Mall-bibliotheken). */
   require('../routes/rtfbieb')(grens('rtfbieb'));
+  /* De publieke FOUNDATION-registratie plus de Boardroom-controle. */
+  require('../routes/foundationregistratie')(grens('foundationregistratie'));
   /* Dezelfde leermotor als RTG School, achter de drie leerlingpassen. */
   require('../routes/rtfleerling')(grens('rtfleerling'));
   /* De Geloof & Wijsheid-Bibliotheek-routes (kern staat al hierboven). */

@@ -11,6 +11,9 @@ const ctx = require('./foundation/basis')();
 const { db, save, eigenVeld, crypto,
   encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
   router, F, nu, rid, schoon, LETTERS, DEMO, TIPS } = ctx;
+/* Foundation start vóór de hoofd-postlaag. Dit levende brugobject wordt na de
+   bouw van RTMAIL gevuld; de schoolroutes houden dezelfde verwijzing. */
+const schoolMailBrug = { dienst:null };
 // de onderwijslaag registreert zijn routes op dezelfde router
 require('./foundation/onderwijs')(ctx);
 
@@ -30,6 +33,7 @@ const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, dec
   hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
   socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
 require('./foundation/gezin')(gctx);
+require('./foundation/gezinstoegang')(gctx);
 
 /* ---------- de gezinssessie: wie ben je, en mag je bij de privezaken ---------- */
 function sessieVan(req, res) {
@@ -65,6 +69,10 @@ const { gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht,
 require('./foundation/berichten')(ctx);
 gctx.bezorgAanGasten = bezorgAanGasten; // late binding voor de gezinsberichten
 gctx.welkomRtf = () => {}; // late binding: het welkom-draaiboek (RTMAIL) komt via setAutomatisering
+/* Volwassen gezinsleden en gasten komen niet binnen op alleen de gedeelde
+   gezinscode. De beheerder maakt een persoonlijke, eenmalige uitnodiging en
+   de ontvanger accepteert die zelf. */
+const { accepteerGast } = require('./foundation/gezinsuitnodiging')(gctx);
 /* De server bindt hier het welkom-draaiboek in: elk nieuw RTF-profiel krijgt
    een welkom in zijn eigen RTMAIL-postvak (op codenaam). Los te laten (blijft
    de lege functie hierboven) als de automatisering niet meedraait. */
@@ -89,7 +97,10 @@ router.get('/health', (req, res) => {
 
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
-require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic });
+const schoolMail = require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+  encS, decS, teVaak, misluktePoging, goedePoging, ipVan, schoolMailBrug });
+const foundationMail = require('./foundation/leden-mail')({ router, G, save, sessieVan, isGast, schoolMailBrug });
+function setSchoolMail(dienst) { schoolMailBrug.dienst=dienst || null; }
 
 /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 
@@ -138,4 +149,7 @@ function leerlingPassen(sess) {
 
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };
+module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, setSchoolMail,
+  schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief,
+  foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief,
+  berichtVanGast, accepteerGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };

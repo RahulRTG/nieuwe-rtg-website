@@ -51,7 +51,7 @@
       <li>de <b>gezondheidsinfo</b> bij de oppasinfo (allergieën en medisch);</li>
       <li>de <b>berichten</b> die je binnen je gezin stuurt.</li>
     </ul>
-    <p>Pincodes bewaren we nooit als leesbare code, maar versleuteld met een eenrichtingsmethode (scrypt). Zo kan niemand ze teruglezen.</p>
+    <p>Pincodes bewaren we nooit als leesbare code, maar als een sterke eenrichtingshash (scrypt). Persoonlijke uitnodigingssleutels bewaren we eveneens alleen als hash. Zo kan niemand ze uit het opslagbestand teruglezen.</p>
   </div>
 
   <div class="deel">Locatie</div>
@@ -63,7 +63,14 @@
   <div class="deel">Wie ziet wat</div>
   <div class="kaart blok">
     <h2>Wie ziet wat</h2>
-    <p>Ieder gezinslid heeft een eigen profiel. Een <b>oppas, opa/oma of familielid</b> (gastprofiel) ziet alleen het broodnodige: waar de kinderen zijn, de belangrijke info en de berichten. De privézaken van het gezin (geld, mentale steun, dromen) blijven voor hen verborgen. De beheerder beschermt zijn profiel met een pincode.</p>
+    <p>Ieder gezinslid heeft een eigen profiel en eigen pincode. Een volwassene of gast wordt alleen toegevoegd met een persoonlijke sleutel die één keer werkt en na 48 uur verloopt. Een <b>oppas, opa/oma of familielid</b> (gastprofiel) ziet alleen het broodnodige: waar de kinderen zijn, de belangrijke info en de berichten. De privézaken van het gezin (geld, mentale steun, dromen) blijven voor hen verborgen.</p>
+  </div>
+
+  <div class="deel">Schoolpersoneel</div>
+  <div class="kaart blok">
+    <h2>Persoonlijke schooltoegang</h2>
+    <p>Alleen de gecontroleerde directie nodigt een medewerker uit. We bewaren naam, schoolmail, toegewezen rollen en het noodzakelijke toegangsjournaal. Het mailadres staat versleuteld; uitnodigings- en inloggeheimen staan alleen als hash en verdwijnen na gebruik.</p>
+    <p>Een uitnodiging werkt één keer en 48 uur, een latere inloglink één keer en 15 minuten. De toegang blijft alleen in de huidige tabsessie. De directie kan toegang onmiddellijk intrekken; iedere inhoudelijke schoolroute controleert daarna opnieuw de actuele rol en status.</p>
   </div>
 
   <div class="deel">Wissen</div>

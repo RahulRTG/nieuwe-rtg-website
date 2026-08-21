@@ -51,6 +51,8 @@
     $('#liveInd').style.display = 'inline-flex';
     startWerkOS();
     render();
+    loadHandelsRegels();
+    loadFoundationRegistraties();
     laadTimeline();
     loadAanmeldingen();
     loadVerify();
@@ -79,7 +81,7 @@
     }
   })();
 
-  async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
+  async function refresh(){ try { state = (await call('/office/state')).state; render(); loadHandelsRegels(); loadFoundationRegistraties(); } catch(e){} }
 
   async function loadVerify(){
     let pend = [];
@@ -168,6 +170,68 @@
     loadAanmeldingen();
   }
 
+  /* De officiele bronwacht: automatisch ophalen, maar nooit stil juridisch
+     versoepelen. Een echte bronwijziging wordt hier een beoordeelbare taak en
+     zet geraakte partnerbewijzen op hercontrole. */
+  async function loadHandelsRegels(){
+    const el = document.getElementById('handelsRegels'); if (!el) return;
+    let d; try { d = await call('/office/partner/regels'); }
+    catch(e){ el.innerHTML = '<div class="empty">Handelsregelwacht niet beschikbaar.</div>'; return; }
+    const open = (d.gebeurtenissen || []).filter(g => g.status === 'open');
+    const fouten = (d.bronnen || []).filter(b => String(b.uitslag || '').startsWith('fout'));
+    const bronnen = (d.bronnen || []).map(b =>
+      '<div class="sub"><a href="'+escHtml(b.url)+'" target="_blank" rel="noopener">'+escHtml(b.naam)+'</a> · '+
+      escHtml(b.uitslag || 'nog geen basis')+(b.laatsteCheck?' · '+timeAgo(b.laatsteCheck):'')+'</div>').join('');
+    const gebeurtenissen = open.map(g =>
+      '<div class="row"><div class="r1"><div><div class="nm">Regelwijziging · '+escHtml(g.naam)+'</div>'+
+      '<div class="sub">'+timeAgo(g.at)+' · '+g.aanvragen+' bedrijfs-, '+(g.foundationAanvragen||0)+' FOUNDATION- en '+g.leveranciers+' partnercontrole(s) heropend</div></div>'+
+      '<button class="vbtn ok" data-regelbevestig="'+g.id+'">Beoordeling vastleggen</button></div></div>').join('');
+    const getroffen = (d.getroffenLeveranciers || []).map(s =>
+      '<div class="row"><div><div class="nm">Hercontrole · '+escHtml(s.naam)+' <span style="color:var(--soft);font-weight:400">· '+escHtml(s.land)+'</span></div>'+
+      '<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem">'+s.eisen.map(e =>
+        '<button class="vbtn" data-regelcode="'+escHtml(s.code)+'" data-regeleis="'+escHtml(e.id)+'">'+escHtml(e.label)+'</button>').join('')+'</div></div></div>').join('');
+    el.innerHTML = '<div class="row"><div class="r1"><div><div class="nm">Automatische officiële regelwacht</div><div class="sub">'+
+      (d.automatisch?'Actief, iedere '+Math.round(d.intervalMs/3600000)+' uur':'Uitgeschakeld')+' · '+open.length+' open wijziging(en) · '+fouten.length+' bronfout(en)</div></div>'+
+      '<button class="vbtn" id="regelCheckNu">Nu controleren</button></div><details style="margin-top:.55rem"><summary class="sub">'+(d.bronnen||[]).length+' officiële bronnen</summary>'+bronnen+'</details></div>'+
+      gebeurtenissen+getroffen;
+    document.getElementById('regelCheckNu').addEventListener('click', async () => {
+      try { await call('/office/partner/regels/check', {}); await loadHandelsRegels(); }
+      catch(e){ alert(e.message); }
+    });
+    el.querySelectorAll('[data-regelbevestig]').forEach(b => b.addEventListener('click', async () => {
+      const toelichting = prompt('Wat is gewijzigd en wat betekent dit voor RTG en de betrokken bedrijven?');
+      if (!toelichting || toelichting.trim().length < 3) return;
+      try { await call('/office/partner/regels/bevestig', { id:b.dataset.regelbevestig, toelichting }); await loadHandelsRegels(); }
+      catch(e){ alert(e.message); }
+    }));
+    el.querySelectorAll('[data-regelcode]').forEach(b => b.addEventListener('click', async () => {
+      const referentie = prompt('Welke actuele officiële bron en uitkomst zijn gecontroleerd?');
+      if (!referentie || referentie.trim().length < 3) return;
+      const geldigTot = prompt('Geldig tot (JJJJ-MM-DD), of leeg als er geen einddatum is:') || '';
+      try { await call('/office/partner/regels/hercontrole', { code:b.dataset.regelcode,
+        onderdeel:b.dataset.regeleis, referentie, geldigTot }); await loadHandelsRegels(); }
+      catch(e){ alert(e.message); }
+    }));
+  }
+
+  /* FOUNDATION: kijken mag op kantoor; besluiten blijft Boardroomwerk. */
+  async function loadFoundationRegistraties(){
+    const el=document.getElementById('foundationRegistraties');if(!el)return;
+    let d;try{d=await call('/office/foundation/registraties');}catch(e){el.innerHTML='<div class="empty">Registraties niet beschikbaar.</div>';return;}
+    const lijst=d.registraties||[];
+    el.innerHTML=lijst.length?lijst.map(a=>{
+      const eisen=(a.toelating&&a.toelating.eisen)||[];
+      const klaar=e=>['geverifieerd','niet_van_toepassing'].includes(e.status)&&!(e.gecontroleerd&&e.gecontroleerd.geldigTot&&Date.parse(e.gecontroleerd.geldigTot)<Date.now());
+      const open=eisen.filter(e=>!klaar(e));
+      const controles=eisen.map(e=>'<div style="border-left:2px solid '+(klaar(e)?'var(--green)':e.status==='afgekeurd'?'#df6b7d':'var(--gold)')+';padding:.18rem 0 .18rem .5rem;margin-top:.25rem"><div class="sub"><b style="color:var(--text)">'+(klaar(e)?'✓ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+'</div>'+
+        (a.status==='nieuw'&&!klaar(e)?'<button class="vbtn ok" data-frcheck="'+a.id+'" data-freis="'+e.id+'">Controleren</button> '+(e.magNietVanToepassing?'<button class="vbtn" data-frnvt="'+a.id+'" data-freis="'+e.id+'">N.v.t.</button>':''):'')+'</div>').join('');
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400">· '+escHtml(a.typeLabel)+' · '+escHtml(a.plaats)+'</span></div><div class="sub">'+escHtml(a.contactNaam)+' · '+escHtml(a.email)+(a.brin?' · BRIN '+escHtml(a.brin):'')+(a.registratieNummer?' · registratie '+escHtml(a.registratieNummer):'')+' · '+timeAgo(a.at)+'</div>'+controles+'</div>'+
+        (a.status==='nieuw'?'<div style="display:flex;gap:.3rem;align-items:flex-start">'+(open.length?'<span class="pill nieuw">'+open.length+' open</span>':'<button class="vbtn ok" data-frok="'+a.id+'">Goedkeuren</button>')+'<button class="vbtn" data-frno="'+a.id+'">Afwijzen</button></div>':'<span class="pill '+(a.status==='goedgekeurd'?'klaar':'bereiding')+'">'+escHtml(a.status)+'</span>')+'</div></div>';
+    }).join(''):'<div class="empty">Geen registraties.</div>';
+    el.querySelectorAll('[data-frcheck],[data-frnvt]').forEach(b=>b.addEventListener('click',async()=>{const nvt=b.hasAttribute('data-frnvt');const ref=prompt(nvt?'Waarom is dit aantoonbaar niet van toepassing?':'Welke officiële bron en uitkomst zijn gecontroleerd?');if(!ref||ref.trim().length<3)return;try{await call('/office/foundation/registratie/controle',{id:b.dataset.frcheck||b.dataset.frnvt,onderdeel:b.dataset.freis,uitkomst:nvt?'niet_van_toepassing':'geverifieerd',referentie:ref});loadFoundationRegistraties();}catch(e){alert(e.message);}}));
+    el.querySelectorAll('[data-frok]').forEach(b=>b.addEventListener('click',async()=>{try{const r=await call('/office/foundation/registratie/besluit',{id:b.dataset.frok,action:'goedkeuren'});alert('Goedgekeurd'+(r.toegang?' · toegang is veilig per e-mail verstrekt.':'.'));loadFoundationRegistraties();}catch(e){alert(e.message);}}));
+    el.querySelectorAll('[data-frno]').forEach(b=>b.addEventListener('click',async()=>{const reden=prompt('Waarom wordt deze registratie afgewezen?');if(!reden||reden.trim().length<3)return;try{await call('/office/foundation/registratie/besluit',{id:b.dataset.frno,action:'afwijzen',reden});loadFoundationRegistraties();}catch(e){alert(e.message);}}));
+  }
   // ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ----
   async function loadIncidenten(){
     const el = document.getElementById('incidenten'); if (!el) return;
@@ -416,17 +480,53 @@
         '<span class="pill '+pc+'">'+st+'</span></div></div>';
     }).join('') : '<div class="empty">'+T('bo.noapps','Nog geen sollicitaties. Kandidaten solliciteren via de partner-apps, RTG-leden via de leden-app met hun cv.')+'</div>';
 
-    const pas = (state.partnerApplications || []).filter(x => past(x.company, x.type, x.city, x.contactName));
+    const pas = (state.partnerApplications || []).filter(x => past(x.company, x.type, x.city, x.contactName,
+      x.registratie && (x.registratie.nummer || x.registratie.kvkNummer), x.registratie && x.registratie.landNaam));
     $('#paList').innerHTML = pas.length ? pas.map(x => {
       const pc = x.status==='nieuw'?'nieuw':x.status==='goedgekeurd'?'klaar':'bereiding';
       const st = x.status==='nieuw'?T('bo.pa.new','nieuw'):x.status==='goedgekeurd'?T('bo.pa.ok','goedgekeurd'):T('bo.pa.no','afgewezen');
+      const toel = x.toelating || null;
+      const eisen = toel && Array.isArray(toel.eisen) ? toel.eisen : [];
+      const eisKlaar = e => ['geverifieerd','niet_van_toepassing'].includes(e.status) &&
+        !(e.gecontroleerd&&e.gecontroleerd.geldigTot&&Date.parse(e.gecontroleerd.geldigTot)<Date.now());
+      const open = eisen.filter(e => !eisKlaar(e));
+      const controleHtml = toel ? '<div style="display:grid;gap:.3rem;margin-top:.55rem;">'+eisen.map(e => {
+        const klaar = eisKlaar(e);
+        const verlopen = e.status==='geverifieerd'&&!klaar;
+        const referentie = e.gecontroleerd && e.gecontroleerd.referentie || e.referentie || '';
+        return '<div style="border-left:2px solid '+(klaar?'var(--green)':e.status==='afgekeurd'?'#df6b7d':'var(--gold)')+';padding-left:.55rem;">'+
+          '<div class="sub"><b style="color:var(--text)">'+(klaar?'✓ ':e.status==='afgekeurd'?'✕ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+
+          (verlopen?' · verlopen':'')+(referentie?' · '+escHtml(referentie):'')+'</div>'+
+          (x.status==='nieuw'&&!klaar?'<div style="display:flex;gap:.3rem;margin-top:.25rem;"><button class="vbtn ok" data-pactl="'+x.id+'" data-paeis="'+e.id+'">'+T('bo.pa.check','Controleren')+'</button>'+
+            (e.magNietVanToepassing?'<button class="vbtn" data-panvt="'+x.id+'" data-paeis="'+e.id+'">N.v.t.</button>':'')+'</div>':'')+'</div>';
+      }).join('')+'</div>' : '<div class="sub" style="color:#df6b7d;margin-top:.45rem;">Oude aanvraag zonder toelatingsdossier · opnieuw laten aanvragen</div>';
+      const reg = x.registratie || {};
+      const pre = reg.voorcontrole || {};
+      const regNummer = reg.nummer || reg.kvkNummer || '';
+      const regTitel = (reg.landNaam || (reg.kvkNummer ? 'Nederland' : '')) + (reg.regioOfStaat ? ' · ' + reg.regioOfStaat : '');
       return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(x.company)+' <span style="color:var(--soft);font-weight:400;">· '+escHtml(x.type)+' · '+escHtml(x.city)+'</span></div>'+
-        '<div class="sub">'+escHtml(x.contactName)+' · '+escHtml(x.email)+(x.phone?' · '+escHtml(x.phone):'')+' · '+timeAgo(x.at)+(x.note?'<br>"'+escHtml(x.note.slice(0,120))+'"':'')+(x.code?' · code '+escHtml(x.code):'')+'</div></div>'+
+        '<div class="sub">'+escHtml(x.contactName)+' · '+escHtml(x.email)+(x.phone?' · '+escHtml(x.phone):'')+' · '+timeAgo(x.at)+
+          (regNummer?'<br>'+escHtml(regTitel)+' · registratie '+escHtml(regNummer)+(reg.vestigingsnummer?' · vestiging '+escHtml(reg.vestigingsnummer):'')+' · voorcontrole '+escHtml(pre.status||'handmatig'):'')+
+          (reg.registerBron?'<br><a href="'+escHtml(reg.registerBron)+'" target="_blank" rel="noopener">Open officieel register</a>':'')+
+          (x.note?'<br>"'+escHtml(x.note.slice(0,120))+'"':'')+(x.code?' · code '+escHtml(x.code):'')+'</div>'+controleHtml+'</div>'+
         (x.status==='nieuw'
-          ? '<div style="display:flex;gap:0.4rem;flex-shrink:0;"><button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button><button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
+          ? '<div style="display:flex;gap:0.4rem;flex-shrink:0;align-items:flex-start;">'+(toel&&open.length===0?'<button class="vbtn ok" data-paok="'+x.id+'">'+T('bo.pa.approve','Goedkeuren')+'</button>':'<span class="pill nieuw">'+(toel?open.length+' open':'geblokkeerd')+'</span>')+'<button class="vbtn" data-pano="'+x.id+'">'+T('bo.pa.reject','Afwijzen')+'</button></div>'
           : '<span class="pill '+pc+'">'+st+'</span>')+
         '</div></div>';
     }).join('') : '<div class="empty">'+T('bo.nopa','Nog geen aanvragen. Bedrijven melden zich aan via de pagina "Partner worden" op de site.')+'</div>';
+    document.querySelectorAll('[data-pactl]').forEach(b => b.addEventListener('click', async () => {
+      const referentie = prompt('Welke officiële bron, registerverwijzing of controle-uitkomst is geraadpleegd?');
+      if (!referentie || referentie.trim().length < 3) return;
+      const geldigTot = prompt('Geldig tot (JJJJ-MM-DD), of laat leeg als dit niet van toepassing is:') || '';
+      try { await call('/office/partner/controle', { id:b.dataset.pactl, onderdeel:b.dataset.paeis, uitkomst:'geverifieerd', referentie, geldigTot }); await refresh(); }
+      catch(e){ alert(e.message); }
+    }));
+    document.querySelectorAll('[data-panvt]').forEach(b => b.addEventListener('click', async () => {
+      const reden = prompt('Waarom is dit controleonderdeel aantoonbaar niet van toepassing?');
+      if (!reden || reden.trim().length < 3) return;
+      try { await call('/office/partner/controle', { id:b.dataset.panvt, onderdeel:b.dataset.paeis, uitkomst:'niet_van_toepassing', referentie:reden }); await refresh(); }
+      catch(e){ alert(e.message); }
+    }));
     document.querySelectorAll('[data-paok]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await call('/office/partner/decide', { id: b.dataset.paok, action: 'goedkeuren' });
@@ -438,7 +538,9 @@
       } catch(e){ alert(e.message); }
     }));
     document.querySelectorAll('[data-pano]').forEach(b => b.addEventListener('click', async () => {
-      try { await call('/office/partner/decide', { id: b.dataset.pano, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
+      const reden = prompt('Waarom wordt deze aanvraag afgewezen? Dit komt in het beslisspoor en in de e-mail aan de aanvrager.');
+      if (!reden || reden.trim().length < 3) return;
+      try { await call('/office/partner/decide', { id: b.dataset.pano, action: 'afwijzen', reden }); await refresh(); } catch(e){ alert(e.message); }
     }));
 
     // schoolaanmeldingen: een school kan pas personeel toelaten en klassen maken
@@ -457,7 +559,6 @@
       try { await call('/office/school/decide', { code: b.dataset.scno, action: 'afwijzen' }); await refresh(); } catch(e){ alert(e.message); }
     }));
   }
-
   // De tijdlijn is schaalvast: de server bladert en zoekt door de volledige
   // historie; het scherm toont altijd 25 regels plus het eerlijke totaal.
   async function laadTimeline(){

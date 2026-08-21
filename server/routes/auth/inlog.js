@@ -77,6 +77,10 @@ app.post('/api/auth/login', async (req, res) => {
   if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
+  // Bestaande leden krijgen hun publieke adres bij de eerstvolgende veilige
+  // inlog; een paswijziging verhuist hier ook naar het juiste pasdomein.
+  try { require('../../kern/mail-publiek')({ accounts }).geefLid({
+    user, naam:accounts.realNameOf(user), tier:user.tier }); } catch (e) {}
   /* Een account voor alles: heeft dit lid een werkplek, dan komt die hier meteen
      mee. Geen tweede inlog en geen pincode -- je bent al wie je bent. Het
      werkvenster van de werkgever bepaalt of de plek open is; een dichte plek komt

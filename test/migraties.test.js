@@ -39,6 +39,7 @@ test('1. een verse database komt op de hoogste versie en heeft alle tabellen', (
     'sso_identiteiten', 'scim_sleutels', 'schema_versie'])
     assert.ok(t.includes(naam), 'tabel ontbreekt: ' + naam);
   assert.ok(kolommen(db, 'users').includes('actief'), 'migratie 4 heeft gedraaid');
+  assert.ok(kolommen(db, 'users').includes('public_mail_hash'), 'publieke mail heeft een HMAC-zoekkolom');
   db.close();
 });
 

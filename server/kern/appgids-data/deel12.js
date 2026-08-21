@@ -3,6 +3,10 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/foundation/mail.html': G('RTF Mail: het persoonlijke Foundation-postvak dat naar buiten alleen uw codenaam toont.',
+    ['Lees post die voor uw Foundation-profiel is bestemd', 'Schrijf intern naar een ander RTG- of Foundation-postvak',
+      'Gebruik het publieke codenaam-adres pas nadat het Foundation-domein veilig live staat'],
+    'Uw profiel bepaalt het afzenderadres; een adres kan nooit via het formulier worden overgenomen.'),
   '/apps/arrival.html': G('Invisible Arrival: een tijdelijke gastpas waarmee een zaak uw komst kan voorbereiden zonder uw route of GPS te volgen.',
     ['Vertel Rahul het moment, gezelschap en alleen de wensen die voor dit bezoek nodig zijn',
       'Controleer het voorstel voordat u de aanvraag verstuurt',

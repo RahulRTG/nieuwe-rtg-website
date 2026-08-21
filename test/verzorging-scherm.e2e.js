@@ -54,8 +54,8 @@ test('Zorg-tab: de salon komt op het scherm en een lid boekt er een knipbeurt',
     }, reg.token);
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
-    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 15000 });
-    await page.click('#rtgCommand .cmd-klok');
+    await page.waitForFunction(() => window.RTGCommand && document.getElementById('rtgCommand'), null, { timeout: 15000 });
+    await page.evaluate(() => window.RTGCommand.thuis());
     await page.waitForSelector('#app', { state: 'visible', timeout: 5000 });
     await page.waitForSelector('.view[data-view="zorg"].active', { timeout: 5000 });
 

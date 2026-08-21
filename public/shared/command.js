@@ -72,7 +72,8 @@
      De werktafel is het beginscherm geworden: inloggen brengt je daar, en het
      laatste blad sluiten laat hem leeg staan in plaats van hem af te breken.
      De klok blijft bestaan -- daar hangen de werelden op hun bezel (WERELD.md)
-     -- en staat bovenaan de bank. Hem kiezen vouwt de werktafel op.
+     -- maar staat niet als extra item naast de vier hoofdapps. De interne
+     thuisingang en de werkconsole kunnen de werktafel nog wel opvouwen.
 
      `opgevouwen` bestaat omdat probeer() anders zijn werk terugdraait: die
      bouwt zodra het mag, en zou de klok bij de eerstvolgende hertekening (een
@@ -133,7 +134,7 @@
      antwoord is precies mag(). Hij keek alleen naar de breedte: een tweede,
      mildere waarheid naast de grendel, waardoor de app-laag naar open() stuurde
      terwijl die zelf alsnog naar location.href terugviel. */
-  w.RTGCommand={open:open,bestemming:bestemming,
+  w.RTGCommand={open:open,bestemming:bestemming,thuis:thuis,
     herken:function(q){var a=appUit(q);return a?{naam:a[0],url:a[1]}:null},
     actief:mag,
     sluitAlles:function(){if(tafel)tafel.sluitAlles()}};

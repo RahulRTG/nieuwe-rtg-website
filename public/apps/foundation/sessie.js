@@ -21,7 +21,7 @@
   /* Bestandsnamen en catalogussleutels zijn bewust gelijk. Alleen deze
      leerling- en gezinsruimtes krijgen de centrale serverdeur; de openbare
      inlog, privacy-uitleg en professionele RTF-kantoren houden hun eigen deur. */
-  var BESCHERMDE_APPS = ('leren overhoren school schrift projecten toetsen studie presenteren klas schrijven tellen kleuren memorie verhaaltje liedjes babyboek magazine dromen bord speelhal agenda ochtend klusjes keuken verjaardagen reis vrienden markt opvoeden club gevoel rust pesten kompas steun hulpwijzer zakgeld geld cv werk budget rechten veilig gezondheid privacy mijnbanden mediawijs schoolbieb beroepen geloofbieb leerpaspoort').split(' ');
+  var BESCHERMDE_APPS = ('mail leren overhoren school schrift projecten toetsen studie presenteren klas schrijven tellen kleuren memorie verhaaltje liedjes babyboek magazine dromen bord speelhal agenda ochtend klusjes keuken verjaardagen reis vrienden markt opvoeden club gevoel rust pesten kompas steun hulpwijzer zakgeld geld cv werk budget rechten veilig gezondheid privacy mijnbanden mediawijs schoolbieb beroepen geloofbieb leerpaspoort').split(' ');
   function paginaSleutel() {
     var m = /\/([^/?#]+)\.html$/.exec(location.pathname);
     return m ? m[1].toLowerCase() : '';

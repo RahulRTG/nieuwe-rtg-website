@@ -84,5 +84,5 @@ module.exports = [
   { id: 'ov-mail-binnen', categorie: 'Werk (zaken en personeel)', naam: 'RTG Mail: post van buiten aannemen',
     standaard: true, doelgroepen: ['leverancier', 'personeel'],
     uitleg: 'De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert. Uit betekent: post van buiten komt niet meer binnen.',
-    paden: ['/api/mail/binnen'] }
+    paden: ['/api/mail/binnen', '/api/mail/ses'] }
 ];

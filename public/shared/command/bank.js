@@ -1,5 +1,5 @@
-/* DE BANK van RTG Command: de werelden, en de lade waarin ze op een telefoon
-   zitten.
+/* DE BANK van RTG Command: LIFE, WORK en FOUNDATION, plus INSTELLINGEN in de
+   vaste bankvoet. Op een telefoon wordt dezelfde indeling een lade.
 
    Vanaf 1000px is de bank een vaste rail links; daaronder een lade die van
    onderen opkomt, met een greep in de tabbalk. Dat verschil is opmaak
@@ -17,15 +17,9 @@
 
     function bouw(){
       var nav=root.querySelector('.cmd-nav');
-      /* De KLOK bovenaan: niet de landing, wel waar de werelden op hun bezel
-         hangen (WERELD.md). Hij vouwt de werktafel op in plaats van een blad te
-         openen. Voor het inloggen staat hij er NIET -- dan zou hij je bij een
-         klok zonder inloggesprek achterlaten, en de weg vooruit is er maar een. */
-      if(!dicht){
-        var k=d.createElement('button');k.className='cmd-klok';
-        k.innerHTML=svg('home')+'<span>Beginscherm</span>';
-        k.onclick=function(){sluit();o.thuis()};nav.appendChild(k);
-      }
+      /* Alleen de drie inhoudelijke producten staan in deze rij. De
+         specialistische onderdelen leven binnen hun product en Instellingen
+         staat afzonderlijk in de bankvoet als vierde product. */
       APPS.forEach(function(a){
         var b=d.createElement('button');b.innerHTML=svg(a[2])+'<span>'+a[0]+'</span>';
         if(!dicht)b.dataset.url=a[1];

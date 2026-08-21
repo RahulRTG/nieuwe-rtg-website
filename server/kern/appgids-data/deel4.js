@@ -3,6 +3,9 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/foundation/registreren.html': G('De veilige FOUNDATION-balie voor een gezin, school, vrijwilliger of partnerstichting.',
+    ['Kies hoe je wilt meedoen', 'Vul alleen de gevraagde registratiegegevens in', 'Volg daarna de officiële controles'],
+    'Mail nooit een kopie van je identiteitsbewijs of VOG; een medewerker legt alleen de controle-uitkomst vast.'),
   '/apps/foundation/geld.html': G('Het geldmaatje: leren omgaan met geld, op jouw niveau.',
     ['Doe de leerstukjes over geld', 'Oefen met sparen en kiezen', 'Vraag als iets niet klopt'],
     'Eerst sparen, dan kopen: wie dat jong leert, heeft er zijn leven lang plezier van.'),

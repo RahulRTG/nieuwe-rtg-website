@@ -2,7 +2,7 @@
 
    WAAROM DEZE TOETS BESTAAT. De wereldstand is de STANDAARD van het
    beginscherm -- het eerste wat een lid ziet. Alles eraan kan stil kapot: een
-   ring die zijn merken op een hoop legt is nog steeds een ring met drie
+   ring die zijn merken op een hoop legt is nog steeds een ring met vier
    knoppen, een achtergrond die nul pixels tekent is nog steeds een canvas, en
    een gouden ring van Rahul naast een open gesprek is nog steeds een gouden
    ring. Geen van die drie geeft een foutmelding. Ze zijn hier alle drie een
@@ -109,8 +109,8 @@ async function metLid(stand, fn, ritmeOpzet, rustig) {
       if (g) g.hidden = true;
     });
     /* RTG Command is na de intake de landing. De wereldtoetsen meten de ring
-       en kloklaag eronder; open die via dezelfde knop als een lid, zodat de
-       meting niet tegen een volledig correcte deklaag botst. */
+       en kloklaag eronder; open die via de interne thuisingang, buiten de vier
+       items van de hoofdnavigatie. */
     /* Wachten en klikken zijn bewust één browserstap. checkOnboarding kan de
        poort tussendoor opnieuw openen; een losse wait + click zag dan een knop
        die op de volgende event-lus alweer was afgebroken. */
@@ -120,9 +120,8 @@ async function metLid(stand, fn, ritmeOpzet, rustig) {
          zijn observer de toestand niet missen, ook niet onder CI-belasting. */
       const g = document.getElementById('onbGate');
       if (g) g.hidden = true;
-      const k = document.querySelector('#rtgCommand .cmd-klok');
-      if (!k) return false;
-      k.click();
+      if (!window.RTGCommand || !document.getElementById('rtgCommand')) return false;
+      window.RTGCommand.thuis();
       if (g) g.remove();
       return true;
     }, null, { timeout: 30000 });
@@ -162,7 +161,7 @@ test('zonder voorkeur opent het beginscherm in de wereldstand, met de tegels weg
     assert.equal(r.stand.aan, true, 'de wereldstand hoort de standaard te zijn');
     assert.equal(r.attr, 'aan', 'het beginscherm draagt data-os-wereld="aan"');
     assert.equal(r.mappenZichtbaar, false, 'in de wereldstand horen de maprijen weg te zijn');
-    assert.equal(r.tegelsInDom, 3, 'de drie wereldtegels horen in de DOM te BLIJVEN bestaan');
+    assert.equal(r.tegelsInDom, 4, 'de vier apptegels horen in de DOM te BLIJVEN bestaan');
     /* EEN KLOK. Twee klokken zou betekenen dat de wereldstand er zelf een is
        gaan tekenen, en dan lopen ze op een dag uit elkaar. */
     assert.equal(r.klokken, 1, 'er hoort precies EEN klok te zijn, geen tweede voor de wereldstand');
@@ -173,7 +172,7 @@ test('zonder voorkeur opent het beginscherm in de wereldstand, met de tegels weg
 test('de merken liggen op een cirkel, en niet op een hoop',
   { skip: overslaan }, async () => {
   /* DE MUTATIE: haal in wereld-02.js de regel weg die m.style.left/top zet
-     (of laat plaats() nooit aanroepen). De drie knoppen bestaan dan nog steeds,
+     (of laat plaats() nooit aanroepen). De vier knoppen bestaan dan nog steeds,
      hebben nog steeds hun aria-label en zijn nog steeds aanklikbaar -- ze
      liggen alleen allemaal linksboven op elkaar. Niets in de console zegt er
      iets over; dit is precies het soort stille breuk waar een e2e-toets voor
@@ -189,7 +188,7 @@ test('de merken liggen op een cirkel, en niet op een hoop',
       });
       return { merken, kring: Math.round(kring.width), knoppen: document.querySelectorAll('.os-wm').length };
     });
-    assert.equal(r.merken.length, 3, 'er horen exact drie hoofdwereldmerken te staan');
+    assert.equal(r.merken.length, 4, 'er horen exact vier hoofdappmerken te staan');
     const stralen = r.merken.map((m) => m.straal);
     const min = Math.min(...stralen), max = Math.max(...stralen);
     assert.ok(min > r.kring * 0.25,
@@ -238,7 +237,7 @@ test('draaien verplaatst de wereld op twaalf uur, en de naam eronder volgt',
         })()
       };
     });
-    assert.equal(viaMuis.stand.actief, 2, 'na naar(2) hoort de derde hoofdwereld actief te zijn');
+    assert.equal(viaMuis.stand.actief, 2, 'na naar(2) hoort FOUNDATION actief te zijn');
     assert.notEqual(viaMuis.stand.naam, eerste, 'er hoort een ANDERE wereld actief te zijn geworden');
     assert.equal(viaMuis.naamOpScherm, viaMuis.stand.naam, 'de naam onder de klok hoort de actieve wereld te zijn');
     assert.equal(viaMuis.actiefLabel, viaMuis.stand.naam, 'het gemarkeerde merk hoort dezelfde wereld te zijn');
@@ -255,9 +254,18 @@ test('draaien verplaatst de wereld op twaalf uur, en de naam eronder volgt',
         const nu = RTGWereld.stand().actief;
         if (nu === vorige) zelfde++; else { vorige = nu; zelfde = 0; }
       }
-      return RTGWereld.stand().actief;
+      const vierde = RTGWereld.stand().actief;
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      vorige = null; zelfde = 0;
+      for (let i = 0; i < 150 && zelfde < 4; i++) {
+        await new Promise((k) => setTimeout(k, 60));
+        const nu = RTGWereld.stand().actief;
+        if (nu === vorige) zelfde++; else { vorige = nu; zelfde = 0; }
+      }
+      return { vierde, rond: RTGWereld.stand().actief };
     });
-    assert.equal(naPijl, 0, 'pijl-rechts hoort na de derde wereld door te reizen naar de eerste (kreeg stand ' + naPijl + ')');
+    assert.equal(naPijl.vierde, 3, 'pijl-rechts hoort na FOUNDATION naar INSTELLINGEN te gaan');
+    assert.equal(naPijl.rond, 0, 'pijl-rechts hoort na INSTELLINGEN rond te reizen naar LIFE');
   });
 });
 
@@ -497,7 +505,7 @@ test('de momenten van vandaag staan op de wijzerplaat, en de klok wordt dat mome
 
 test('Rahul kent je ritme, en houdt het op het toestel',
   { skip: overslaan }, async () => {
-  /* "Normaal open je om deze tijd RTG Kantoor." De mooiste zin uit het ontwerp
+  /* "Normaal open je om deze tijd WORK." De mooiste zin uit het ontwerp
      en de gevaarlijkste, want er zit gedrag van een mens onder. Deze toets meet
      de grenzen en niet alleen of de zin verschijnt:
 
@@ -529,7 +537,7 @@ test('Rahul kent je ritme, en houdt het op het toestel',
       // en het staat echt alleen op dit toestel
       lokaal: !!localStorage.getItem('rtg_os_ritme_rtg')
     }));
-    assert.match(ring.tekst, /Normaal open je nu RTG Kantoor/,
+    assert.match(ring.tekst, /Normaal open je nu WORK/,
       'de ring hoort te zeggen wat je normaal op dit uur opent, kreeg: ' + ring.tekst);
     assert.equal(ring.lokaal, true, 'het ritme hoort op het toestel te staan');
     /* GEEN AANDACHTTREKKERIJ. Geen teller, geen badge, geen uitroepteken -- dat
@@ -550,7 +558,7 @@ test('Rahul kent je ritme, en houdt het op het toestel',
         toon: document.getElementById('osWereldRahul').getAttribute('data-toon') };
     });
     assert.equal(na.url, pad, 'het ritme hoort klaar te ZETTEN, niet te openen; je belandde op ' + na.url);
-    assert.equal(na.naam, 'RTG Kantoor', 'de bezel hoort naar die wereld te draaien, staat op ' + na.naam);
+    assert.equal(na.naam, 'WORK', 'de bezel hoort naar die app te draaien, staat op ' + na.naam);
     assert.equal(na.toon, 'nee', 'na de tik hoort de ring te wijken');
   }, opzet);
 });

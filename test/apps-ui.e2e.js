@@ -28,17 +28,12 @@ async function api(base, pad, body, token) {
   return (await fetch(base + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) })).json();
 }
 
-// RTG Command is de landing op elke breedte. Op een telefoon zit de bank in
-// een lade; via Beginscherm vouwt de gebruiker de werktafel op naar de klok en
-// de thuislaag. Schermtests die juist die thuislaag meten volgen dezelfde weg.
+// RTG Command is de landing op elke breedte. Schermtests die juist de klok- en
+// thuislaag meten gebruiken de interne thuisingang; die staat bewust niet als
+// extra item naast de vier hoofdapps in de hoofdnavigatie.
 async function naarLedenThuis(page) {
   await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 10000 });
-  const lade = page.locator('#rtgCommand .cmd-lade');
-  if (await lade.isVisible()) {
-    await lade.click();
-    await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
-  }
-  await page.click('#rtgCommand .cmd-klok');
+  await page.evaluate(() => window.RTGCommand.thuis());
   await page.waitForSelector('#app', { state: 'visible', timeout: 10000 });
 }
 
@@ -133,7 +128,7 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.ok(thuis.klok, 'de ronde RTG-klok staat in het midden');
       assert.ok(thuis.balk, 'de balk van Rahul staat onderaan');
 
-      /* DRIE HOOFDWERELDEN, EN NIETS ERNAAST (PLATFORM.md par. 0).
+      /* VIER HOOFDAPPS, EN NIETS ERNAAST (PLATFORM.md par. 0).
 
          HIER STOND DE VORIGE AFSPRAAK, en die is een eigenaarsbesluit later
          vervangen. De eis was: vier vaste tegels onder de klok (Bellen,
@@ -149,14 +144,16 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
          geldt, en die is scherper dan "de rij is leeg": elke tegel op het
          beginscherm hoort een WERELD te zijn. Zet iemand er een losse app naast
          (precies de uitzondering die de afspraak uitholt), dan zakt hij. */
-      assert.deepEqual(thuis.tegels.map((t) => t.sleutel), ['map-rtg', 'map-werk', 'map-rtf'],
-        'de voordeur hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
+      assert.deepEqual(thuis.tegels.map((t) => t.sleutel), ['map-rtg', 'map-werk', 'map-rtf', 'map-instellingen'],
+        'de voordeur hoort exact LIFE, WORK, FOUNDATION en INSTELLINGEN te dragen');
+      assert.deepEqual(thuis.tegels.map((t) => t.naam.replace(/^Map /, '')),
+        ['LIFE', 'WORK', 'FOUNDATION', 'INSTELLINGEN'], 'de vier productnamen wijken af');
       const geenWereld = thuis.tegels.filter(t => !/^map-/.test(t.sleutel));
       assert.deepEqual(geenWereld, [],
         'er staat iets op het beginscherm dat geen wereld is: ' +
         geenWereld.map(t => t.naam + ' (' + t.sleutel + ')').join(', '));
       assert.deepEqual(thuis.functies, [],
-        'de functierij hoort leeg te zijn -- de drie hoofdwerelden dragen alles: ' + thuis.functies.join(', '));
+        'de functierij hoort leeg te zijn -- de vier hoofdapps dragen alles: ' + thuis.functies.join(', '));
       assert.deepEqual(thuis.y.slice().sort((a, b) => a - b), thuis.y,
         'de volgorde is mappen, klok, functies, balk');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');

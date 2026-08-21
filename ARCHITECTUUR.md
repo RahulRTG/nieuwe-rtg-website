@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3965 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4005 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3965 |
-| servermodules (`server/**/*.js`) | 2153 |
-| routebestanden (`server/routes/**`) | 448 |
-| kernmodules (`server/kern/**`) | 1323 |
-| schermen (`public/**/*.html`) | 259 |
+| API-endpoints | 4005 |
+| servermodules (`server/**/*.js`) | 2178 |
+| routebestanden (`server/routes/**`) | 451 |
+| kernmodules (`server/kern/**`) | 1339 |
+| schermen (`public/**/*.html`) | 261 |
 | gedeelde browsermodules (`public/shared/*.js`) | 224 |
-| toetsbestanden (`test/*.test.js`) | 884 |
+| toetsbestanden (`test/*.test.js`) | 896 |
 | schermtoetsen (`test/*.e2e.js`) | 125 |
 
 ## 2. De weg van een verzoek
@@ -96,14 +96,14 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 188 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 189 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
-| `member` | 641 | 56 | 10 | 398 |
-| `supplier` | 562 | 102 | 10 | 294 |
-| `office` | 40 | 7 | 5 | 64 |
+| `member` | 644 | 57 | 12 | 398 |
+| `supplier` | 562 | 102 | 10 | 295 |
+| `office` | 45 | 8 | 9 | 61 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 57 | 14 | 1 | 51 |
@@ -115,7 +115,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2248 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2256 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -123,13 +123,13 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1395 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 188 |
-| daarvan door precies één domein | 1207 |
+| kern-namen die routes aanraken | 1394 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 189 |
+| daarvan door precies één domein | 1205 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
-Dat derde getal is de opening: 87% van wat er in de gedeelde zak zit, wordt door
+Dat derde getal is de opening: 86% van wat er in de gedeelde zak zit, wordt door
 precies één domein gebruikt. Dat hoort geen gedeelde kern te zijn maar bezit van dat
 domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen zakken.
 
@@ -137,11 +137,11 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(167) auth(102) supplierAuth(54) officeAuth(35) db(34) status(27) liveCodename(25)
-accounts(21) schoon(20) managerOnly(16) rtf(15) codenaamVan(15) save(14)
-boardroomWie(11) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) express(9)
+app(168) auth(102) supplierAuth(54) officeAuth(36) db(34) status(27) liveCodename(25)
+accounts(22) schoon(20) managerOnly(16) save(15) rtf(15) codenaamVan(15)
+boardroomWie(12) crypto(11) anthropic(11) tooManyTries(10) geenGast(10) express(10)
 findSupplier(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) rtmail(9) logActivity(8)
-noteFailedTry(7) kern(7) sseToOffice(7) mail(6) stuur(6) boardroomAuth(6) talen(6)
+sseToOffice(8) mail(7) noteFailedTry(7) kern(7) boardroomAuth(7) stuur(6) talen(6)
 loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 ```
 

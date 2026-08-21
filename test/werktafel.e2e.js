@@ -14,9 +14,9 @@
    2) HET BEGINSCHERM KOOS VOOR JE. bouw() opende zichzelf twee vaste apps
       (Reizen & Veilig en Geld). De werktafel IS inmiddels het beginscherm -- op
       elke breedte -- maar hij begint leeg: welke apps er opengaan is een keuze
-      van een mens. De klok blijft bestaan als ingang bovenaan de bank, want
-      daar hangen de werelden op hun bezel (WERELD.md); hem kiezen vouwt de
-      werktafel op.
+      van een mens. De hoofdnavigatie toont LIFE, WORK en FOUNDATION, met
+      INSTELLINGEN als vierde app in de bankvoet. Specialistische onderdelen
+      blijven achter die vier voordeuren.
 
    Wat deze toets NIET doet, is meten of de onboarding zelf klopt (daar zijn de
    aanmeldtoetsen voor). Hij meet alleen wie er bovenop mag liggen.
@@ -82,6 +82,8 @@ const stand = () => {
     gateInShell: !!(S && S.contains(document.getElementById('gate'))),
     greep: !!document.querySelector('.cmd-lade'),
     klokIngang: !!document.querySelector('.cmd-klok'),
+    hoofdnavigatie: [...document.querySelectorAll('.cmd-nav button span')].map(x => x.textContent.trim()),
+    instellingen: document.querySelector('.cmd-bankvoet button span')?.textContent.trim() || null,
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
     // hoeveel er onder het blad overblijft: dat hoort precies de schilbalk te
@@ -152,8 +154,21 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     const thuis = await page.evaluate(stand);
     assert.equal(thuis.bladen, 0, 'de werktafel hoort leeg te beginnen, niet met apps die het huis koos');
     assert.equal(thuis.shellZichtbaar, false, 'en hij is het beginscherm, dus de klok ligt eronder');
-    assert.equal(thuis.klokIngang, true, 'de klok hoort wel bovenaan de bank te staan als ingang');
+    assert.equal(thuis.klokIngang, false, 'Beginscherm hoort geen extra ingang naast de vier apps te zijn');
+    assert.deepEqual(thuis.hoofdnavigatie, ['LIFE', 'WORK', 'FOUNDATION'],
+      'de hoofdnavigatie hoort exact de drie inhoudelijke apps te tonen');
+    assert.equal(thuis.instellingen, 'INSTELLINGEN', 'INSTELLINGEN hoort als vierde app in de bankvoet');
     assert.equal(thuis.commandActief, true, 'en een app opent hier als blad');
+
+    // INSTELLINGEN is een echte vierde app, geen lokaal pagina-paneel
+    await page.click('[data-cmd="settings"]');
+    await page.waitForSelector('.cmd-pane iframe[src="/apps/ik.html"]', { timeout: 10000 });
+    assert.deepEqual(await page.evaluate(() => ({
+      titel: document.querySelector('.cmd-balkblad')?.textContent,
+      bladen: document.querySelectorAll('.cmd-pane').length
+    })), { titel: 'INSTELLINGEN', bladen: 1 }, 'INSTELLINGEN hoort als eigen appblad te openen');
+    await page.evaluate(() => window.RTGCommand.sluitAlles());
+    await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
 
     // 3) een app openen vult de werkvloer; de lege staat maakt plaats
     await page.evaluate(() => window.RTGCommand.open('/apps/vandaag.html', 'Vandaag'));
@@ -168,16 +183,6 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     const terug = await page.evaluate(stand);
     assert.equal(terug.werktafel, true, 'het laatste blad sluiten hoort niet de hele werktafel op te ruimen');
     assert.equal(terug.bladen, 0, 'maar hem leeg achter te laten');
-
-    /* 4b) de klok is bereikbaar gebleven: hem kiezen vouwt de werktafel op. Dat
-       is de enige weg terug naar de wereldring, dus als deze knop niets doet is
-       de klok onbereikbaar geworden -- precies wat we niet wilden. */
-    await page.click('.cmd-klok');
-    await page.waitForFunction(() => !document.getElementById('rtgCommand'), { timeout: 10000 });
-    const bijKlok = await page.evaluate(stand);
-    assert.equal(bijKlok.shellZichtbaar, true, 'Beginscherm hoort de klok terug te brengen');
-    assert.equal(bijKlok.klok, 3, 'met exact de drie hoofdwerelden eromheen');
-
 
     /* 5) EN ANDERSOM. checkOnboarding is asynchroon: de deur kan opengaan NADAT
        de werktafel er al staat. Dan is wegnemen de enige juiste uitkomst -- een
@@ -211,9 +216,8 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     /* 7) DEZELFDE WERKTAFEL OP EEN TELEFOON, in zijn eigen vorm.
 
        De bank is hier geen rail maar een lade, en er staat een blad tegelijk in
-       beeld. Wat NIET verandert: het beginscherm blijft de klok, een app wordt
-       een blad in plaats van een paginasprong, en het laatste blad sluiten
-       brengt je thuis. */
+       beeld. Wat NIET verandert: een app wordt een blad in plaats van een
+       paginasprong en het laatste blad sluiten laat de werktafel leeg. */
     await page.evaluate(() => { document.getElementById('onbGate').hidden = true; });
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalThuis = await page.evaluate(stand);
@@ -229,8 +233,8 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.equal(smalBlad.greep, true, 'met een greep voor de lade, want de bank is hier geen vaste rail');
     assert.equal(smalBlad.lade.inBeeld, false, 'die lade ligt dicht tot je hem haalt');
 
-    /* GEEN TABSTRIP BIJ EEN BLAD. Gemeten op 390x844: acht van de twaalf
-       werelden dragen een eigen bovenbalk en vijf een eigen onderbalk; met de
+    /* GEEN TABSTRIP BIJ EEN BLAD. Gemeten op 390x844: de werelden dragen een
+       eigen bovenbalk en soms een eigen onderbalk; met de
        strip erbovenop was 21% van het scherm navigatie, in drie lagen. De
        bovenste had niets te kiezen -- er is geen tweede tabblad. En de greep
        mag niet op het blad komen te liggen: hij hoort in de band die de schil
@@ -249,12 +253,12 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
-    // de lade halen: dezelfde twaalf werelden als in de rail op een computer
+    // de lade halen: drie inhoudelijke apps; Instellingen staat in de bankvoet
     await page.click('.cmd-lade');
     await page.waitForTimeout(450);
     const laOpen = await page.evaluate(stand);
     assert.equal(laOpen.lade.inBeeld, true, 'de greep hoort de lade te openen');
-    assert.equal(laOpen.lade.werelden, 12, 'met alle werelden erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
+    assert.equal(laOpen.lade.werelden, 3, 'alleen LIFE, WORK en FOUNDATION horen in deze rij; er stonden er ' + laOpen.lade.werelden);
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'true', 'en dat hoort een schermlezer ook te horen');
 
     /* Escape sluit hem. Zonder dit is de greep de enige uitweg, en dat is het
@@ -277,7 +281,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.waitForSelector('#rtgCommand .cmd-leeg', { timeout: 10000 });
     const smalTerug = await page.evaluate(stand);
     assert.equal(smalTerug.bladen, 0, 'het laatste blad sluiten laat de werktafel ook hier leeg staan');
-    assert.equal(smalTerug.klokIngang, true, 'met de klok als ingang in de lade');
+    assert.equal(smalTerug.klokIngang, false, 'zonder Beginscherm als extra menu-item');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
@@ -327,7 +331,7 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     assert.equal(uit.gateInWerkvloer, true, 'met het inloggesprek IN de werkvloer');
     assert.equal(uit.gateZichtbaar, true, 'en zichtbaar -- verplaatsen mag hem niet verstoppen');
     assert.equal(uit.veld, true, 'het antwoordveld van Rahul hoort er te zijn');
-    assert.equal(uit.werelden, 12, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
+    assert.equal(uit.werelden, 3, 'de bankrij toont LIFE, WORK en FOUNDATION; er stonden er ' + uit.werelden);
     assert.equal(uit.klokIngang, false, 'maar geen Beginscherm-knop: die vouwt de werktafel op en laat je zonder gesprek achter');
     assert.equal(uit.tabs, 'none', 'en geen tabbalk zonder tabbladen: een bediening die niets doet leest als kapot');
 

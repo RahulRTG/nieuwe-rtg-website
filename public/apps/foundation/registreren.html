@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Registreren bij FOUNDATION</title>
+<meta name="theme-color" content="#0c0c0b">
+<link rel="icon" href="/icons/foundation.svg">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="stylesheet" href="stijl.css">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box}.wrap{max-width:64rem;margin:auto;padding:1rem 1rem 4rem}.top{display:flex;gap:1rem;align-items:center;padding:.8rem 0 1.5rem}.terug{color:var(--zacht);text-decoration:none}.merk{margin-left:auto;font-size:.68rem;letter-spacing:.17em;color:var(--goud);font-weight:800}.hero{max-width:44rem;padding:1rem 0 1.6rem}.ey{font-size:.7rem;letter-spacing:.17em;text-transform:uppercase;color:var(--goud);font-weight:700}.hero h1{font:500 clamp(2rem,7vw,4.2rem)/1.02 var(--serif);margin:.45rem 0}.hero p,.uitleg{color:var(--zacht);line-height:1.6}.keuzes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}@media(max-width:640px){.keuzes{grid-template-columns:1fr}}.keuze{display:flex;flex-direction:column;text-align:left;min-height:10rem;padding:1rem;border:1px solid var(--lijn);border-radius:18px;background:var(--paneel);color:var(--txt);text-decoration:none;cursor:pointer}.keuze:hover,.keuze:focus-visible{border-color:var(--goud)}.keuze b{font:500 1.25rem var(--serif);margin:.7rem 0 .35rem}.keuze span{color:var(--zacht);font-size:.86rem;line-height:1.5}.keuze em{margin-top:auto;padding-top:.8rem;color:var(--goud);font-style:normal;font-size:.78rem;font-weight:700}.ico{font-size:1.4rem}.paneel{margin-top:1.2rem;padding:1rem;border:1px solid var(--lijn);border-radius:18px;background:var(--paneel)}.paneel h2{font:500 1.5rem var(--serif);margin:.2rem 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}@media(max-width:620px){.grid{grid-template-columns:1fr}}label{display:block;font-size:.78rem;color:var(--zacht)}input,select,textarea{width:100%;margin-top:.3rem;padding:.7rem .75rem;border:1px solid var(--lijn);border-radius:10px;background:var(--paneel2);color:var(--txt);font:inherit}textarea{min-height:6rem;resize:vertical}.vink{display:flex;gap:.55rem;align-items:flex-start;margin:.65rem 0;color:var(--txt);line-height:1.45}.vink input{width:1.1rem;height:1.1rem;margin:.12rem 0 0;flex:0 0 auto}.acties{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem}.knop{border:0;border-radius:10px;padding:.72rem 1rem;background:var(--txt);color:#111;font-weight:750;cursor:pointer}.knop.stil{background:transparent;color:var(--txt);border:1px solid var(--lijn)}.fout{color:#ee8ca2;min-height:1.2rem;margin-top:.5rem}.controles{display:grid;gap:.45rem;margin-top:.8rem}.controle{border-left:2px solid var(--goud);padding:.15rem 0 .15rem .65rem;font-size:.82rem;line-height:1.45}.controle small{display:block;color:var(--zacht)}.controle a{color:var(--goud)}.status{display:grid;gap:.6rem}.statusrij{padding:.75rem;border:1px solid var(--lijn);border-radius:12px}.pill{display:inline-block;padding:.17rem .5rem;border:1px solid var(--lijn);border-radius:999px;font-size:.68rem}.pill.goed{border-color:#315b40;color:#83cf9f}.pill.wacht{border-color:#665420;color:#dec068}.geheim{white-space:pre-wrap;padding:.7rem;border:1px solid #315b40;border-radius:10px;color:#9bd5ae;margin-top:.6rem}.hp{position:absolute;left:-10000px}.bronvoet{margin-top:1rem;font-size:.78rem;color:var(--zacht);line-height:1.55}
+</style>
+</head>
+<body class="rtg-stijl">
+<main class="wrap">
+  <div class="top"><a class="terug" href="index.html">← FOUNDATION</a><span class="merk">VEILIGE REGISTRATIE</span></div>
+  <section class="hero"><div class="ey">Eén voordeur, verschillende verantwoordelijkheden</div><h1>Hoe wilt u meedoen?</h1><p>Een gezin kan direct een eigen veilige ruimte maken. Scholen, vrijwilligers en partnerstichtingen doorlopen eerst de controles die bij hun verantwoordelijkheid horen.</p></section>
+  <section class="keuzes" aria-label="Kies een registratiesoort">
+    <button class="keuze" id="gezinKeuze"><i class="ico">⌂</i><b>Gezin</b><span>Start in één stap. Voeg kinderen veilig toe en nodig volwassenen daarna persoonlijk en eenmalig uit.</span><em>Direct en gratis starten →</em></button>
+    <button class="keuze" data-type="school"><i class="ico">▦</i><b>School</b><span>Voor directie of bevoegd gezag. BRIN, bevoegdheid en privacy-inrichting worden gecontroleerd vóór de schoolcode ontstaat.</span><em>School registreren →</em></button>
+    <button class="keuze" data-type="vrijwilliger"><i class="ico">◇</i><b>Vrijwilliger</b><span>Een korte intake zonder upload van ID of VOG. Bij werk met kinderen of kwetsbare mensen geldt een passende veiligheidscontrole.</span><em>Aanmelden als vrijwilliger →</em></button>
+    <button class="keuze" data-type="partnerstichting"><i class="ico">◎</i><b>Partnerstichting</b><span>Voor bestaande maatschappelijke organisaties. Register, bestuur, doel, geldstromen en afspraken worden aantoonbaar beoordeeld.</span><em>Samenwerking aanvragen →</em></button>
+  </section>
+
+  <section class="paneel" id="gezinPaneel" hidden>
+    <div class="ey">Gezin starten</div><h2>Uw veilige gezinsruimte</h2>
+    <p class="uitleg">U maakt eerst uw eigen beheerprofiel. Daarna voegt u kinderen toe of deelt u per volwassene één persoonlijke uitnodiging.</p>
+    <form id="gezinForm" novalidate>
+      <div class="grid">
+        <label>Naam van het gezin<input name="gezinsnaam" maxlength="40" placeholder="Bijvoorbeeld Gezin De Wit" required></label>
+        <label>Uw naam<input name="naam" maxlength="40" autocomplete="name" required></label>
+        <label>Uw eigen pincode<input name="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" required></label>
+        <label>Herhaal uw pincode<input name="pinNogmaals" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" required></label>
+      </div>
+      <label class="vink"><input name="bevoegdGezin" type="checkbox" required><span>Ik ben 18 jaar of ouder en mag deze gezinsruimte aanmaken. Ik voeg een kind alleen toe als ik daarvoor als ouder of verzorger bevoegd ben.</span></label>
+      <label class="vink"><input name="privacyAkkoord" type="checkbox" required><span>Ik begrijp dat een app-koppeling geen officieel bewijs van familieband of ouderlijk gezag is. Voor juridische handelingen kan een aparte controle nodig zijn.</span></label>
+      <div class="fout" id="gezinFout" role="alert"></div>
+      <div class="acties"><button class="knop" type="submit">Gezin veilig starten</button><button class="knop stil" type="button" id="gezinAnnuleer">Annuleren</button></div>
+    </form>
+  </section>
+
+  <section class="paneel" id="uitnodigingPaneel" hidden>
+    <div class="ey">Persoonlijke uitnodiging</div><h2 id="uitnodigingTitel">Meedoen met een gezin</h2>
+    <p class="uitleg" id="uitnodigingUitleg"></p>
+    <form id="uitnodigingForm" novalidate>
+      <div class="grid">
+        <label>Kies uw eigen pincode<input name="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" required></label>
+        <label>Herhaal uw pincode<input name="pinNogmaals" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" required></label>
+      </div>
+      <label class="vink"><input name="akkoord" type="checkbox" required><span>Ik accepteer deze rol en wil aan dit gezin gekoppeld worden.</span></label>
+      <label class="vink"><input name="privacyAkkoord" type="checkbox" required><span>Ik begrijp welke toegang deze rol geeft en dat ik de koppeling weer kan laten verwijderen.</span></label>
+      <div class="fout" id="uitnodigingFout" role="alert"></div>
+      <div class="acties"><button class="knop" type="submit">Uitnodiging accepteren</button></div>
+    </form>
+  </section>
+
+  <section class="paneel" id="formulierPaneel" hidden>
+    <div class="ey">Registratie</div><h2 id="formTitel"></h2><p class="uitleg" id="formUitleg"></p>
+    <form id="form" novalidate>
+      <input class="hp" name="websiteExtra" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <input type="hidden" name="type" id="type">
+      <div class="grid">
+        <label><span id="naamLabel">Naam</span><input name="naam" maxlength="120" autocomplete="organization" required></label>
+        <label>Plaats<input name="plaats" maxlength="80" autocomplete="address-level2" required></label>
+        <label>Contactpersoon<input name="contactNaam" maxlength="80" autocomplete="name" required></label>
+        <label>E-mailadres<input name="email" type="email" maxlength="160" autocomplete="email" required></label>
+        <label>Telefoon, optioneel<input name="telefoon" type="tel" maxlength="30" autocomplete="tel"></label>
+        <label>Land<select name="landCode"><option value="NL">Nederland</option><option value="BE">België</option><option value="DE">Duitsland</option><option value="GB">Verenigd Koninkrijk</option><option value="FR">Frankrijk</option><option value="OTHER">Ander land</option></select></label>
+        <label data-alleen="school">BRIN<input name="brin" maxlength="6" autocapitalize="characters" placeholder="bijv. 00AA"></label>
+        <label data-alleen="partnerstichting">Officieel registratienummer<input name="registratieNummer" maxlength="30" placeholder="In Nederland: KVK-nummer"></label>
+        <label data-alleen="partnerstichting">RSIN, indien van toepassing<input name="rsin" maxlength="9" inputmode="numeric"></label>
+        <label data-stad>FOUNDATION-stad<select name="stadId" id="stad"><option value="">Koppel op basis van plaats</option></select></label>
+      </div>
+      <label data-alleen="vrijwilliger">Talen, gescheiden met komma’s<input name="talen" maxlength="160"></label>
+      <label data-alleen="vrijwilliger">Vaardigheden, gescheiden met komma’s<input name="vaardigheden" maxlength="240"></label>
+      <label data-alleen="partnerstichting">Maatschappelijk doel<textarea name="doel" maxlength="500" placeholder="Wat doet de stichting en voor wie?"></textarea></label>
+      <label data-alleen="partnerstichting">Publieke website, optioneel<input name="website" type="url" maxlength="240" placeholder="https://"></label>
+      <label class="vink" data-alleen="vrijwilliger"><input name="minderjarig" type="checkbox"><span>De vrijwilliger is jonger dan 18 jaar.</span></label>
+      <label class="vink" data-alleen="vrijwilliger"><input name="ouderToestemming" type="checkbox"><span>Een ouder of wettelijk vertegenwoordiger stemt in als de vrijwilliger jonger dan 18 is.</span></label>
+      <label class="vink" data-kwetsbaar><input name="werktMetKwetsbaren" type="checkbox"><span>De beoogde inzet raakt kinderen of andere kwetsbare mensen.</span></label>
+      <label class="vink" data-alleen="partnerstichting"><input name="verwerktPersoonsgegevens" type="checkbox"><span>De samenwerking verwerkt persoonsgegevens van deelnemers of hulpvragers.</span></label>
+      <label class="vink" data-alleen="partnerstichting"><input name="anbi" type="checkbox"><span>De organisatie voert een ANBI-status.</span></label>
+      <div class="controles" id="controles"></div>
+      <label class="vink"><input name="bevoegd" type="checkbox" required><span>Ik ben bevoegd om deze registratie in te dienen of heb daarvoor aantoonbare toestemming.</span></label>
+      <label class="vink"><input name="waarheidsgetrouw" type="checkbox" required><span>De ingevulde gegevens zijn volledig en naar waarheid verstrekt.</span></label>
+      <label class="vink"><input name="privacyAkkoord" type="checkbox" required><span>Ik begrijp dat FOUNDATION de gegevens alleen gebruikt voor deze intake en toelatingscontrole. Ik mail geen kopie van een identiteitsbewijs of VOG.</span></label>
+      <div class="fout" id="fout" role="alert"></div>
+      <div class="acties"><button class="knop" type="submit">Registratie indienen</button><button class="knop stil" type="button" id="annuleer">Annuleren</button></div>
+    </form>
+  </section>
+
+  <section class="paneel" id="statusPaneel"><div class="ey">Mijn registraties</div><h2>Voortgang</h2><div class="status" id="status"><p class="uitleg">Nog geen registratie op dit toestel.</p></div></section>
+  <p class="bronvoet">FOUNDATION haalt regels niet uit vrije tekst. Officiële bronnen worden automatisch gevolgd; een wijziging opent een hercontrole en versoepelt nooit zelfstandig een veiligheidsgrens.</p>
+</main>
+<script src="registreren.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script><script src="/shared/ios.js" defer></script>
+</body>
+</html>

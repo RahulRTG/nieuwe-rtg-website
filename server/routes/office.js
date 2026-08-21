@@ -15,6 +15,7 @@ module.exports = (kern) => {
      query-toegangshelper, een keer gemount bij het opstarten. */
   const octx = { kern, officeQueryMag };
   require('./office/veiligheid')(octx);
+  require('./office/partneraanvragen')(octx);
   require('./office/partners')(octx);
   require('./office/toegang')(octx);
   require('./office/werk')(octx);

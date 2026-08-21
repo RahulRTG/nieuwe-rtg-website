@@ -168,6 +168,8 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
 
+kern.foundationregistratie = require('../kern/foundationregistratie-register')({ db, save, crypto, schoon });
+
 /* RTG One en Magnaat Wereld zijn overkoepelende werkruimtes. Ze worden hier
    opgebouwd voordat kernlaag7b de routers ophangt, zodat de domeingrens nooit
    een half gemonteerde motor kan doorgeven. */

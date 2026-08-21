@@ -160,38 +160,39 @@ function bindBalk(){
 }
 
 /* ---------- Werkmail: het zakelijke adresboek van de zaak ----------
-   Eigen domein <zaak>.rtg, standaardadressen voor de eigenaar en elke
-   manager, rahul@<domein> dat zelf terugschrijft, en de buitenpost om ook
-   buiten RTG te mailen. Alles van buiten valt in de onbetrouwde baan. */
+   Elk teamlid krijgt automatisch voornaam.achternaam@<zaak>.rtg. Het adres is
+   persoonlijk aan de personeelslogin gebonden; management beheert de uitgifte
+   maar leest niet ongemerkt de persoonlijke post van collega's. */
 async function apiW(pad, body){
   const r=await fetch('/api/supplier/werkmail/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})});
   const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;
 }
-const ROLNAAM={eigenaar:'eigenaar',management:'management',rahul:'AI van het huis',personeel:'personeel'};
+const ROLNAAM={eigenaar:'eigenaar',management:'management',rahul:'AI van het huis',personeel:'persoonlijk',gedeeld:'gedeeld adres'};
 async function wmLaad(){
   MAP='werkmail'; LIJST=[]; $('#tel').hidden=true;   // het adressenscherm is geen postvak
   let d; try{ d=await apiW('overzicht'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   $('#main').innerHTML = schakelBalk()+
     '<div class="kaart" style="margin-bottom:.8rem;"><h2>'+esc(d.domein)+'</h2>'+
-    '<div class="meta">Het eigen domein van de zaak. Extern mailen kan (via de '+(d.echteBuitenpost?'buitenpost':'outbox, er is nog geen SMTP-sleutel')+'); alles wat van buiten binnenkomt is onbetrouwbaar: links op slot, bijlagen bestaan niet.</div></div>'+
-    d.adressen.map((a,i)=>'<button class="rij'+(a.ongelezen?' ongelezen':'')+'" data-wa="'+esc(a.adres)+'"'+(a.actief?'':' style="opacity:.55"')+'>'+
+    '<div class="meta">'+esc(d.uitleg)+' Externe afzenders blijven onbetrouwbaar tot SPF, DKIM en DMARC slagen.</div></div>'+
+    d.adressen.map((a,i)=>'<button class="rij'+(a.ongelezen?' ongelezen':'')+'"'+(a.toegang?' data-wa="'+esc(a.adres)+'"':'')+((a.actief&&a.toegang)?'':' style="opacity:.55"')+'>'+
       '<span class="ic">'+esc(a.adres.slice(0,2).toUpperCase())+'</span>'+
-      '<span class="b"><span class="nm">'+esc(a.adres)+(a.ongelezen?' ('+a.ongelezen+')':'')+'</span>'+
-      '<span class="lt">'+esc(a.label)+' · '+esc(ROLNAAM[a.rol]||a.rol)+(a.actief?'':' · <span class="ongev">afgepakt</span>')+'</span></span>'+
-      (a.rol==='eigenaar'||a.rol==='rahul'?'':'<span class="nieuwbtn" data-slot="'+esc(a.adres)+'" data-aan="'+(a.actief?'0':'1')+'">'+(a.actief?'Afpakken':'Teruggeven')+'</span>')+
+      '<span class="b"><span class="nm">'+esc(a.publiekAdres||a.adres)+(a.ongelezen?' ('+a.ongelezen+')':'')+'</span>'+
+      (a.publiekAdres?'<span class="lt">Intern: '+esc(a.adres)+'</span>':'')+
+      '<span class="lt">'+esc(a.label)+' · '+esc(ROLNAAM[a.rol]||a.rol)+(a.actief?'':' · <span class="ongev">ingetrokken</span>')+(a.actief&&!a.toegang?' · adresbeheer, inhoud privé':'')+'</span></span>'+
+      (!d.magBeheren||a.rol==='eigenaar'||a.rol==='rahul'?'':'<span class="nieuwbtn" data-slot="'+esc(a.adres)+'" data-aan="'+(a.actief?'0':'1')+'">'+(a.actief?'Intrekken':'Teruggeven')+'</span>')+
       '</button>').join('')+
-    '<div class="kaart" style="margin-top:.8rem;"><h2 style="font-size:1rem;">Nieuw adres (werkgever)</h2>'+
+    (d.magBeheren?'<div class="kaart" style="margin-top:.8rem;"><h2 style="font-size:1rem;">Gedeeld functieadres</h2>'+
     '<label class="lab">Naam voor de apenstaart</label><input class="veld" id="wmLokaal" placeholder="bijv. balie of jamal">'+
-    '<label class="lab">Voor wie</label><input class="veld" id="wmLabel" placeholder="bijv. De balie">'+
+    '<label class="lab">Functie</label><input class="veld" id="wmLabel" placeholder="bijv. De balie">'+
     '<div class="fout" id="wmFout" hidden></div>'+
-    '<button class="knop" id="wmMaak">Adres aanmaken</button></div>';
+    '<button class="knop" id="wmMaak">Adres aanmaken</button></div>':'');
   bindBalk();
   $('#main').querySelectorAll('[data-wa]').forEach(b=>b.addEventListener('click',e=>{
     const slot=e.target.closest('[data-slot]');
     if(slot){ e.stopPropagation(); wmSlot(slot.dataset.slot, slot.dataset.aan==='1'); return; }
     wmInbox(b.dataset.wa);
   }));
-  $('#wmMaak').addEventListener('click', async()=>{
+  const maak=$('#wmMaak'); if(maak) maak.addEventListener('click', async()=>{
     const f=$('#wmFout'); f.hidden=true;
     try{ await apiW('maak',{lokaal:$('#wmLokaal').value.trim(), label:$('#wmLabel').value.trim()}); wmLaad(); }
     catch(e){ f.textContent=e.message; f.hidden=false; }

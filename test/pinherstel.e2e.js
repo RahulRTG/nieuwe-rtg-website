@@ -142,13 +142,13 @@ test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', 
     const token = await lidMetPin(base, '246810');
     const { page, fouten } = await ingelogd(browser, base, token, '/apps/app.html');
 
-    // De drie hoofdwerelden hebben losse apptegels vervangen. Pinbeheer blijft
+    // De vier hoofdapps hebben losse apptegels vervangen. Pinbeheer blijft
     // daarom als vaste, zichtbare ingang in het bedieningspaneel bereikbaar.
     await page.waitForFunction(() => document.getElementById('app')?.classList.contains('active'),
       null, { timeout: 60000 });
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 10000 });
-    await page.click('#rtgCommand .cmd-klok');
+    await page.waitForFunction(() => window.RTGCommand && document.getElementById('rtgCommand'), null, { timeout: 10000 });
+    await page.evaluate(() => window.RTGCommand.thuis());
     await page.waitForSelector('#shell', { state: 'visible', timeout: 10000 });
     await page.click('#osCcBtn');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });

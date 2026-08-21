@@ -72,10 +72,10 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     assert.equal(rt, 'RTG-tafel', 'de QR-codec round-tript in de browser');
 
     // 5) bedieningspaneel -> Scannen -> overlay -> met de hand de tafel-QR invoeren
-    // De nieuwe landing is de Command-werktafel; de zichtbare klok vouwt die
-    // naar het gewone beginscherm voordat de bovenrandbediening beschikbaar is.
-    await page.waitForSelector('#rtgCommand .cmd-klok', { state: 'visible', timeout: 15000 });
-    await page.click('#rtgCommand .cmd-klok');
+    // De nieuwe landing is de Command-werktafel; deze toets gebruikt de
+    // interne thuisingang voordat de bovenrandbediening beschikbaar is.
+    await page.waitForFunction(() => window.RTGCommand && document.getElementById('rtgCommand'), null, { timeout: 15000 });
+    await page.evaluate(() => window.RTGCommand.thuis());
     /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN GEBRUIKER DAT DOET.
 
        Hier stond `page.click('#osCcBtn')`. Die knop stond toen nog in de

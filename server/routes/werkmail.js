@@ -10,34 +10,44 @@ module.exports = (kern) => {
     return true;
   };
   const stuurUit = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  const eigenPostvak = (req, res) => {
+    if (werkmail.magGebruiken(req.supplier.code, req.body.adres || req.body.van, req.actor)) return true;
+    res.status(403).json({ error:'Dit postvak hoort niet bij uw persoonlijke inlog.' });
+    return false;
+  };
 
   app.post('/api/supplier/werkmail/overzicht', supplierAuth, (req, res) => {
-    stuurUit(res, werkmail.lijst(req.supplier));
+    stuurUit(res, werkmail.lijst(req.supplier, req.actor));
+  });
+  // Compatibele naam voor oudere kantoorproeven en externe clients.
+  app.post('/api/supplier/werkmail/adressen', supplierAuth, (req, res) => {
+    stuurUit(res, werkmail.lijst(req.supplier, req.actor));
   });
   app.post('/api/supplier/werkmail/maak', supplierAuth, (req, res) => {
     if (alleenBaas(req, res)) return;
-    stuurUit(res, werkmail.maak(req.supplier, req.body.lokaal, req.body.label));
+    stuurUit(res, werkmail.maak(req.supplier, req.body.lokaal, req.body.label, req.actor));
   });
   app.post('/api/supplier/werkmail/intrek', supplierAuth, (req, res) => {
     if (alleenBaas(req, res)) return;
     stuurUit(res, werkmail.intrek(req.supplier.code, req.body.adres, req.body.aan === true));
   });
-  // het postvak per zaak-adres (ook een ingetrokken adres blijft van de zaak leesbaar)
+  // Persoonlijke post is uitsluitend voor de gekoppelde personeelslogin.
   app.post('/api/supplier/werkmail/inbox', supplierAuth, (req, res) => {
-    if (!werkmail.isZaakAdres(req.supplier.code, req.body.adres)) return res.status(403).json({ error: 'Dit adres is niet van deze zaak.' });
+    if (!eigenPostvak(req, res)) return;
     res.json({ berichten: rtmail.postvak(req.body.adres) });
   });
   app.post('/api/supplier/werkmail/verzonden', supplierAuth, (req, res) => {
-    if (!werkmail.isZaakAdres(req.supplier.code, req.body.adres)) return res.status(403).json({ error: 'Dit adres is niet van deze zaak.' });
+    if (!eigenPostvak(req, res)) return;
     res.json({ berichten: rtmail.verzonden(req.body.adres) });
   });
   app.post('/api/supplier/werkmail/lees', supplierAuth, (req, res) => {
-    if (!werkmail.isZaakAdres(req.supplier.code, req.body.adres)) return res.status(403).json({ error: 'Dit adres is niet van deze zaak.' });
+    if (!eigenPostvak(req, res)) return;
     stuurUit(res, rtmail.lees(req.body.adres, String(req.body.id || '')));
   });
   // versturen: intern over RTMAIL, naar buiten via de buitenpost (SMTP/outbox)
   app.post('/api/supplier/werkmail/stuur', supplierAuth, (req, res) => {
-    stuurUit(res, werkmail.stuur(req.supplier.code, req.body.van, req.body.naar, req.body.onderwerp, req.body.tekst));
+    stuurUit(res, werkmail.stuur(req.supplier.code, req.body.van, req.body.naar,
+      req.body.onderwerp, req.body.tekst, req.actor));
   });
 
   /* De buitenpoort: zoals een mailserver post van het open internet aanneemt.

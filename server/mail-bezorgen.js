@@ -16,8 +16,8 @@ const dns = require('dns').promises;
    het adres niet bestaat en opnieuw proberen zinloos is; een tijdelijke zegt
    het tegenovergestelde. Dat verschil hoort in het logboek te staan, anders
    blijft iemand dagen bonzen op een adres dat er niet is. */
-function stuurDirect({ to, subject, text, FROM, bouwBericht, toOutbox }) {
-  const { rauw, ondertekend } = bouwBericht(to, subject, text);
+function stuurDirect({ to, subject, text, FROM, bouwBericht, toOutbox, opties }) {
+  const { rauw, ondertekend } = bouwBericht(to, subject, text, opties);
   const van = (/<([^>]+)>/.exec(FROM) || [null, FROM])[1];
   require('./smtp-direct').bezorg({ van, naar: to, bericht: rauw })
     .then(uit => {
@@ -27,9 +27,9 @@ function stuurDirect({ to, subject, text, FROM, bouwBericht, toOutbox }) {
       }
       console.warn('[mail] ' + uit.soort + ' niet bezorgd (' + (uit.waarom || uit.code) + '); naar de outbox' +
         (uit.soort === 'permanent' ? ' -- opnieuw proberen heeft geen zin' : ' -- later opnieuw proberen kan wel'));
-      try { toOutbox(to, subject, text); } catch (e) {}
+      try { toOutbox(to, subject, text, opties); } catch (e) {}
     })
-    .catch(e => { console.warn('[mail] eigen bezorging mislukt:', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
+    .catch(e => { console.warn('[mail] eigen bezorging mislukt:', e.message); try { toOutbox(to, subject, text, opties); } catch (e2) {} });
 }
 
 /* DEZELFDE VERZENDING, MAAR MET EEN ANTWOORD. `send()` hierboven is

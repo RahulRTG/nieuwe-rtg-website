@@ -1,4 +1,4 @@
-/* HET BEGINSCHERM DRAAGT DE DRIE WERELDEN EN VERDER GEEN LOSSE APPS.
+/* HET BEGINSCHERM DRAAGT DE VIER APPS EN VERDER GEEN LOSSE APPS.
 
    Dat is de afspraak van PLATFORM.md par. 0, en hij slijt precies op een
    manier: er komt "even" een app-tegel bij omdat iemand hem vaak nodig heeft,
@@ -22,18 +22,19 @@ const path = require('path');
 
 const lees = (...d) => fs.readFileSync(path.join(__dirname, '..', ...d), 'utf8');
 
-test('het beginscherm draagt geen losse app-tegels naast de drie werelden', () => {
+test('het beginscherm draagt geen losse app-tegels naast de vier apps', () => {
   const bundel = lees('public', 'apps', 'app-main.js');
   assert.match(bundel, /const FUNCTIES = \[\s*\]/,
-    'de functierij onder de klok is weer gevuld; het beginscherm hoort alleen de drie werelden te dragen');
+    'de functierij onder de klok is weer gevuld; het beginscherm hoort alleen de vier apps te dragen');
 });
 
-test('en het zijn er DRIE, elk met een eigen wereldpagina die bestaat', () => {
+test('en het zijn exact LIFE, WORK, FOUNDATION en INSTELLINGEN', () => {
   const bron = lees('public', 'apps', 'app-main', 'app-main-24a2.js');
-  const werelden = [...bron.matchAll(/wereld:\s*'([^']+)'/g)].map((m) => m[1]);
-  assert.equal(werelden.length, 3,
-    'er horen drie werelden te staan, gevonden: ' + werelden.join(', '));
-  for (const w of werelden) {
+  const apps = [...bron.matchAll(/naam:\s*'([^']+)'[^\n]*wereld:\s*'([^']+)'/g)]
+    .map((m) => ({ naam: m[1], wereld: m[2] }));
+  assert.deepEqual(apps.map((a) => a.naam), ['LIFE', 'WORK', 'FOUNDATION', 'INSTELLINGEN'],
+    'de voordeur hoort exact vier vaste productnamen te dragen');
+  for (const w of apps.map((a) => a.wereld)) {
     const p = path.join(__dirname, '..', 'public', w.replace(/^\//, ''));
     assert.ok(fs.existsSync(p), 'de wereldtegel wijst naar een pagina die niet bestaat: ' + w);
   }
@@ -73,45 +74,34 @@ test('wat uit de functierij verdween, heeft een ingang in zijn wereld', () => {
 test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', () => {
   const bron = lees('public', 'apps', 'app-main', 'app-main-24a2.js');
   const mappen = [...bron.matchAll(/wereld:\s*'([^']+)'[\s\S]*?items:\s*\[([^\]]*)\]/g)];
-  assert.ok(mappen.length >= 3, 'de mappen zijn niet te lezen; dan meet deze regel niets');
+  assert.equal(mappen.length, 4, 'de vier productindelingen zijn niet allemaal te lezen');
 
-  /* DE SCHULD DIE ER AL LAG, met naam en toenaam -- zelfde afspraak als de
-     BEKEND-lijst in scripts/check.js regel 45: hij mag ALLEEN KRIMPEN. Deze
-     vierendertig apps bestaan, draaien en staan in een wereld, maar die wereld
-     wijst er niet naartoe. Ze zijn dus alleen te bereiken door het adres met de
-     hand in te typen. Dat is niet in een keer op te lossen -- elke wereld
-     verdient een eigen ronde, en sommige van deze apps horen misschien op te
-     gaan IN hun wereld in plaats van ernaast te blijven staan.
-
-     Wat deze lijst wel doet: hem zichtbaar houden en verhinderen dat hij
-     groeit. Een nieuwe app zonder ingang zakt meteen. RTG Media is de eerste
-     wereld die af is (zie de rij specialisten in apps/media.html); de rest
-     hoort te volgen. */
-  const SCHULD = new Set([
-    '/apps/kantoor.html mist onderneming', '/apps/kantoor.html mist loonstrook',
-    '/apps/kantoor.html mist browser', '/apps/kantoor.html mist sitemaker'
-  ]);
-
-  const gemist = [], nogOpen = new Set();
+  /* GEEN UITZONDERINGSLIJST MEER. Een geregistreerde functie zonder ingang in
+     haar wereld is een verdwenen functie, ook als het HTML-bestand technisch
+     nog bestaat. De wereld mag naar het eigen pad of naar een bestaand oud pad
+     wijzen; oude bladwijzers blijven immers geldig als omleiding. */
+  const linksBron = lees('public', 'apps', 'app-main', 'app-main-23.js') +
+    lees('public', 'apps', 'app-main', 'app-main-24.js');
+  const gemist = [];
   for (const m of mappen) {
     const wereldPad = m[1];
     const pagina = path.join(__dirname, '..', 'public', wereldPad.replace(/^\//, ''));
     if (!fs.existsSync(pagina)) continue;
     const html = fs.readFileSync(pagina, 'utf8');
     for (const item of [...m[2].matchAll(/'link:([a-z0-9-]+)'/g)].map((x) => x[1])) {
-      const doel = path.join(__dirname, '..', 'public', 'apps', item + '.html');
-      if (!fs.existsSync(doel)) continue;              // geen eigen pagina: niets te linken
+      const eigenPad = '/apps/' + item + '.html';
+      const eigenBestand = path.join(__dirname, '..', 'public', eigenPad.replace(/^\//, ''));
+      const def = linksBron.match(new RegExp("\\n\\s*" + item + ":\\s*\\{[^}]*url:\\s*['\"]([^'\"]+)"));
+      const doelPad = def ? def[1] : eigenPad;
+      if (!fs.existsSync(eigenBestand) && !def) {
+        gemist.push(wereldPad + ' heeft geen bestaand doel voor ' + item);
+        continue;
+      }
       const regel = wereldPad + ' mist ' + item;
-      if (html.includes('/apps/' + item + '.html')) continue;   // bereikbaar, klaar
-      if (SCHULD.has(regel)) nogOpen.add(regel); else gemist.push(regel);
+      if (html.includes(eigenPad) || html.includes(doelPad)) continue;
+      gemist.push(regel);
     }
   }
   assert.deepEqual(gemist, [],
-    'NIEUW: deze apps staan in een wereld maar zijn daar niet te bereiken (en dus nergens):\n  ' + gemist.join('\n  '));
-  /* En wie er een oplost, haalt hem van de lijst. Anders slijt de lijst tot
-     een verzameling namen die niets meer zegt -- dezelfde afspraak als bij
-     regel 45 in scripts/check.js. */
-  const opgelost = [...SCHULD].filter((r) => !nogOpen.has(r));
-  assert.deepEqual(opgelost, [],
-    'deze staan nog als schuld genoteerd maar zijn inmiddels bereikbaar; haal ze uit SCHULD:\n  ' + opgelost.join('\n  '));
+    'deze functies staan in een wereld maar zijn daar niet te bereiken:\n  ' + gemist.join('\n  '));
 });

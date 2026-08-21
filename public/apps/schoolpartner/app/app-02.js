@@ -7,6 +7,7 @@
       var schoolNaam = typeof r.body.school === 'string' ? r.body.school : (r.body.school && r.body.school.naam) || S.code;
       context(schoolNaam, 'Leraar');
       $('#lWelkom').textContent = 'Welkom, ' + r.body.naam + '.';
+      if (window.RTGSchoolMail) RTGSchoolMail.bind(api, S, esc, meld, 'lMail');
       $('#lKlassen').innerHTML = (r.body.klassen || []).map(function (k) {
         return '<div class="item"><span>' + esc(k.naam) + ' <span class="stil">· code ' + esc(k.code) + '</span></span>' +
           '<button class="knop p" data-klas="' + esc(k.code) + '">Open</button></div>';
@@ -116,7 +117,9 @@
   window.SPart = window.SPart || {};
   window.SPart.kl = kl; window.SPart.esc = esc; window.SPart.meld = meld; window.SPart.werkbank = werkbank;
 
-  if (S && S.rol === 'directie') directie();
+  if (LINK_ACTIEF) toon('vPoort');
+  else if (S && S.rol === 'directie') directie();
   else if (S && S.rol === 'leraar') leraar();
+  else if (S && S.rol === 'personeel') personeel();
   else toon('vPoort');
 })();

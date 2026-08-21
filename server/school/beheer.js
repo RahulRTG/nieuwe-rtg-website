@@ -3,11 +3,38 @@
    server/school.js. */
 module.exports = (sctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto,
-    eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
+    teVaak, misluktePoging, goedePoging, ipVan, eigenVeld, K, S, schoolVan,
+    personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief } = sctx;
   const { FASEN, TRAPPEN } = require('../kern/onderwijs-ladder');
   // "mijn klas" = ik heb hem gemaakt OF ik sta vast op het lerarenteam
   const vanLeraar = (k, p) => k.leraarId === p.id || (k.leraren || []).some(x => x.id === p.id);
+  router.post('/school/school/activeren', (req, res) => {
+    const bucket = 'school-activeren:' + ipVan(req);
+    if (teVaak(res, bucket)) return;
+    const m = /^([A-Z0-9]{6})\.([a-f0-9]{48})$/i.exec(String(req.body.activatie || '').trim());
+    const sch = m ? eigenVeld(S(), m[1].toUpperCase()) : null;
+    const reg = sch && sch.registratie;
+    const hash = m ? crypto.createHash('sha256').update(m[2]).digest('hex') : '';
+    const verwacht = reg && String(reg.activatieHash || '');
+    const x = Buffer.from(hash), y = Buffer.from(verwacht);
+    const geldig = reg && reg.activatieStatus === 'open' && Date.parse(reg.activatieVerlooptAt) > Date.now()
+      && x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y);
+    if (!geldig) {
+      misluktePoging(bucket, 6, 15);
+      return res.status(403).json({ error:'Deze schoolactivatie is ongeldig, gebruikt of verlopen.' });
+    }
+    reg.activatieStatus = 'gebruikt'; reg.geactiveerdAt = nu(); delete reg.activatieHash; save();
+    goedePoging(bucket);
+    res.json({ ok:true, schoolCode:sch.code, beheerToken:sch.token,
+      school:{ naam:sch.naam, plaats:sch.plaats } });
+  });
   router.post('/school/school/maak', (req, res) => {
+    /* Deze oude snelle deur blijft alleen bestaan voor de geïsoleerde
+       testsuite die complete scholen als fixture nodig heeft. In productie
+       loopt iedere nieuwe school via /registratie/aanvragen; anders zou dit
+       pad alsnog vóór BRIN- en privacycontrole een beheersleutel uitgeven. */
+    if (process.env.NODE_ENV !== 'test') return res.status(410).json({
+      error:'Nieuwe scholen registreren via de veilige FOUNDATION-registratiebalie.' });
     const naam = schoon(req.body.naam, 80);
     const plaats = schoon(req.body.plaats, 60);
     if (!naam) return res.status(400).json({ error: 'Vul de naam van de school in.' });
@@ -17,10 +44,12 @@ module.exports = (sctx) => {
     res.json({ ok: true, schoolCode: code, beheerToken: S()[code].token, naam, status: 'wacht' });
   });
 
-  /* ---------- stap 2: PERSONEEL meldt zich aan bij de school ----------
-     Een leraar of ondersteuner meldt zich met de schoolcode en wacht daarna op
-     goedkeuring van de directie. Pas na goedkeuring kan een leraar klassen maken. */
+  /* Oude testfixture voor personeel. In productie geeft de directie rollen en
+     schoolmail vooraf op via personeelstoegang.js; een schoolcode alleen is
+     nooit meer voldoende om een aanmelding of sleutel te krijgen. */
   router.post('/school/personeel/aanmeld', (req, res) => {
+    if (process.env.NODE_ENV !== 'test') return res.status(410).json({
+      error:'Zelf aanmelden met alleen een schoolcode is gesloten. Vraag de directie om een persoonlijke uitnodiging op uw schoolmail.' });
     const sch = eigenVeld(S(), String(req.body.schoolCode || '').trim().toUpperCase());
     if (!sch) return res.status(404).json({ error: 'Deze schoolcode kennen we niet. Vraag hem na bij de school.' });
     const naam = schoon(req.body.naam, 60);
@@ -35,12 +64,14 @@ module.exports = (sctx) => {
 
   // personeelslid: waar sta ik? (wacht/actief) + mijn klassen als ik leraar ben
   router.post('/school/personeel/status', (req, res) => {
-    const pv = personeelVan(req, res); if (!pv) return;
+    const pv = personeelVan(req, res, { ookNietActief:true }); if (!pv) return;
     const { sch, p } = pv;
     const klassen = p.status === 'actief' && p.rol === 'leraar'
       ? Object.values(K()).filter(k => k.schoolCode === sch.code && vanLeraar(k, p)).map(klasSamenvatting)
       : [];
-    res.json({ ok: true, naam: p.naam, rol: p.rol, status: p.status,
+    const rtgMail = p.status === 'actief' && sctx.zorgPersoneelsMail
+      ? sctx.zorgPersoneelsMail(sch, p) : (p.rtgMail || null);
+    res.json({ ok: true, naam: p.naam, rol: p.rol, status: p.status, rtgMail,
       school: { naam: sch.naam, plaats: sch.plaats, code: sch.code, status: sch.status || 'actief' }, klassen,
       // de ladder voor het klas-maakformulier: per schoolsoort de fasen, zodat
       // het scherm nooit zelf een niveaulijst hoeft te verzinnen (een waarheid)
@@ -68,7 +99,9 @@ module.exports = (sctx) => {
     const sch = schoolVan(req, res); if (!sch) return;
     res.json({
       ok: true, schoolCode: sch.code, naam: sch.naam, plaats: sch.plaats, status: sch.status || 'actief',
-      personeel: Object.values(sch.personeel || {}).map(p => ({ id: p.id, naam: p.naam, rol: p.rol, status: p.status, at: p.at })),
+      personeel: Object.values(sch.personeel || {}).map(p => ({ id: p.id, naam: p.naam, rol: p.rol,
+        status: p.status, at: p.at, rtgMail:p.status === 'actief' && sctx.zorgPersoneelsMail
+          ? sctx.zorgPersoneelsMail(sch, p) : (p.rtgMail || null) })),
       klassen: Object.values(K()).filter(k => k.schoolCode === sch.code).map(klasSamenvatting)
     });
   });
@@ -81,8 +114,9 @@ module.exports = (sctx) => {
     if (req.body.akkoord === false) { delete sch.personeel[p.id]; save(); return res.json({ ok: true }); }
     if (!isActief(sch)) return res.status(403).json({ error: 'De school wacht nog op goedkeuring door RTG. Zodra RTG de school activeert, kun je personeel toelaten.' });
     p.status = 'actief';
+    if (sctx.zorgPersoneelsMail) sctx.zorgPersoneelsMail(sch, p);
     save();
-    res.json({ ok: true });
+    res.json({ ok: true, rtgMail:p.rtgMail || null });
   });
 
   /* ---------- stap 3: een GOEDGEKEURDE leraar maakt klassen ---------- */

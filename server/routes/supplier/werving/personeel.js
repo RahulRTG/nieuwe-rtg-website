@@ -6,7 +6,7 @@ module.exports = (wctx) => {
   // alleen wat deze wervingsmodule echt gebruikt (de rest van de gedeelde kern
   // hoort hier niet thuis; opgeruimd om dode destructuring te vermijden)
   const { DEMO, accounts, app, logActivity, loginFails, noteFailedTry,
-    notifySupplier, save, schoon, supplierAuth, tooManyTries } = kern;
+    notifySupplier, save, schoon, supplierAuth, tooManyTries, werkmail } = kern;
   /* De uitnodiging zelf -- maken, terugvinden, en er iemand mee verbinden --
      staat in ./uitnodiging.js. Hier staan de routes eromheen. */
   const uitnodiging = require('./uitnodiging')({ kern });
@@ -29,6 +29,10 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
   const st = accounts.getStaffById(Number(req.body.staffId));
   if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
     accounts.deactivateStaff(st.id);
+    /* Uit dienst is ook meteen uit de persoonlijke mailbox. Niet wachten tot
+       de volgende overzichtsaanvraag: een nog open personeelsessie mag na dit
+       besluit geen post meer lezen of versturen. */
+    if (werkmail && werkmail.trekPersoneelIn) werkmail.trekPersoneelIn(req.supplier.code, st.id);
     logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
   }
   res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });

@@ -26,16 +26,7 @@ module.exports = ({ save, kap, nu }) => {
 
   /* Wat er per genre gevraagd wordt. De tekst is wat de aanvrager LEEST, dus
      hij noemt het stuk bij de naam die hij zelf kent. */
-  const EISEN = {
-    ziekenhuis: 'toelating als instelling voor medisch-specialistische zorg',
-    huisarts: 'BIG-registratie van de praktijkhouder',
-    specialist: 'BIG-registratie met het specialisme erbij',
-    apotheek: 'inschrijving in het register van gevestigde apothekers',
-    beautymedical: 'bevoegdheid voor de behandelingen die u aanbiedt',
-    kinderopvang: 'inschrijving in het Landelijk Register Kinderopvang',
-    verzekeringen: 'AFM-vergunning of aansluiting bij een gevolmachtigde',
-    beveiliging: 'vergunning particuliere beveiligingsorganisatie'
-  };
+  const EISEN = require('../bedrijfscontrole').BEWIJS_EISEN;
 
   const eisVan = (genre) => EISEN[genre] || 'het stuk waaruit blijkt dat u dit beroep mag uitoefenen';
 

@@ -344,6 +344,60 @@ Dit is een half jaar bouwen, en de verkeerde volgorde kost het meest.
 10. **Persistente runners.** En pas nadat de 1303 directe tijdsaanroepen
     voldoende onder controle zijn.
 
+### 10.1 Wat er staat (22 augustus 2026)
+
+Negen van de tien zijn gebouwd. Per stap wat het is, waar het woont, en wat het
+bij de bouw heeft blootgelegd -- want dat laatste is de eigenlijke opbrengst.
+
+| # | stap | waar | stand |
+|---|------|------|-------|
+| 1 | Reality Index | `scripts/lib/werkelijkheid.js` | 5259 bestanden in ~950 ms, één wandeling |
+| 2 | Bedradingspoort | `scripts/lib/bedrading.js`, keuring 59 | 3730 kanten opgelost, 3 benaderd, 2 onbekend, 0 wezen |
+| 3 | Onzekerheidsmodel | in de index | drie klassen apart geteld, ratel in `BEDRADING.json` |
+| 4 | Verboden graaf | `scripts/lib/verboden.js`, keuring 60 | 2 regels, 31 plekken raken ze, allemaal met reden |
+| 5 | Risicopropagatie | `scripts/lib/risico.js` | transitief over de omkering, 8 mutaties beproefd |
+| 6 | Semantische diff | `scripts/lib/semdiff.js` | 10 klassen, soort vóór woorden |
+| 7 | Bewijsboek | `scripts/lib/bewijsboek.js` | 11 omgevingsdelen gemeten, 4 niet, 9 mutaties |
+| 8 | Planner | `scripts/plan.js` | de vier lagen achter elkaar, met redenen |
+| 9 | Werkrij | `scripts/draai.js` | twee banen, langste eerst, duur teruggeschreven |
+| 10 | Persistente runners | -- | **op slot**, zie hieronder |
+
+**Stap tien blijft dicht, en dat is een besluit en geen achterstand.** Par. 8.1
+en 11 zeggen het al: een runner die blijft staan, deelt zijn staat met de
+volgende toets. Alles wat vandaag de klok direct aanroept -- 1303 plekken in 689
+bestanden, waarvan 105 modules die hun eigen tijd bijhouden (`KLOK.json`) --
+gedraagt zich dan anders dan in een verse start, en dat verschil komt eruit als
+een toets die op de vierde ronde zakt zonder dat er iets is veranderd. Dat is
+precies het soort rood dat mensen afleert naar rood te kijken. Eerst die 1303,
+dan pas dit.
+
+**Wat het bouwen zelf heeft opgeleverd**, en dat weegt zwaarder dan de tabel:
+
+- **Vier meetfouten**, waarvan drie voortkwamen uit het feit dat er drie
+  scanners waren met elk hun eigen antwoord op de vraag wat commentaar is. Dat
+  is de reden dat stap 1 stap 1 hoort te zijn en het hier stap vijf werd.
+- **Een naadfout tussen risico.js en semdiff.js**: twee kopieën van dezelfde
+  klasseladder, waarvan er één `besturing` miste. Omdat `indexOf` voor een
+  onbekende naam -1 geeft, verloor de zwaarste klasse die er is van gewoon
+  binnenwerk. Sindsdien is er één ladder, en wint een onbekende naam.
+- **Twee stille fouten in de propagatie** die het corpus vond en een mens niet:
+  twijfel over een pad waar een bewezen kant naast ligt, en een ruit waar de
+  volgorde van de rij het antwoord bepaalde. Allebei maakten ze de uitkomst
+  alleen maar voorzichtiger -- de soort die je niet als fout herkent.
+- **Een classificator die 540 van de 2542 bestanden "beveiliging" noemde** omdat
+  hij codepatronen op proza losliet. Een etiket dat overal op zit, draagt geen
+  informatie.
+- **Eén regel die 797 van de 1237 toetsen blokkeert**: `test/helper.js:810`
+  laadt Playwright met een pad uit een variabele. Dat is geen gebrek van die
+  regel -- hij zoekt de browser op vier plekken, en dat is op sommige machines
+  de enige weg -- maar het is wel de duurste onbekende kant van het huis. Zolang
+  hij er staat, kan tweederde van de suite niets erven.
+
+En het scherpste: de planner zegt over de huidige samenvoegtak **NIETS TE ERVEN
+-- alles draait**. Dat is geen storing maar het juiste antwoord. Deze tak
+verandert 1113 bestanden in de bewijsmachinerie zelf en verwijdert er elf; over
+zo'n tak valt niets over te dragen. De winst begint bij de volgende tak.
+
 ## 11. De grenzen
 
 Vijf dingen die niet mogen sneuvelen, hoe verleidelijk snelheid ook is.

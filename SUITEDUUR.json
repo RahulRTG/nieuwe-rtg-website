@@ -1,0 +1,21 @@
+{
+ "versie": 1,
+ "ms": {
+  "test/ontwerp.test.js": 305,
+  "test/onderneming-ontwerper.test.js": 405,
+  "test/bewijsboek.test.js": 269,
+  "test/pasladder.test.js": 320,
+  "test/bedrading.test.js": 2117,
+  "test/risico.test.js": 2182,
+  "test/semdiff.test.js": 3938,
+  "test/perimeter-risico.test.js": 13294
+ },
+ "laatst": {
+  "toetsen": 1,
+  "wandklok": 269,
+  "banen": [
+   6,
+   2
+  ]
+ }
+}

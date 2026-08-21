@@ -88,6 +88,20 @@ const JOIN_RE = /require\(\s*path\.join\(\s*[^,)]+,\s*(['"])([^'"]+)\1\s*\)\s*\)
 const LIJST_RE = /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*\[([^\]]*)\]/g;
 const SAMENGESTELD_RE = /require\(\s*[^'")\s]/;
 
+/* LEZEN IS OOK EEN KANT. Een require is niet de enige manier waarop een bestand
+   van een ander afhangt: de keuringen lezen WERELDLIJST.md, de schermtoetsen
+   openen .html-pagina's, en de ratelregisters worden met readFileSync
+   binnengehaald. Zonder deze kanten zou een gewijzigde WERELDLIJST.md nergens
+   aankomen, en zou de planner de keuring die hem leest laten erven -- een
+   overgeslagen bewijs, en precies de stille soort.
+
+   RUIM EN NIET SCHERP. Elke letterlijke tekst die eruitziet als een bestandsnaam
+   met een gegevens-extensie telt mee, ook als hij in een melding staat. Dat
+   levert kanten op die er niet zijn, en dat maakt de graaf ruimer -- de veilige
+   kant. Wat het NIET oplevert is een samengesteld pad; dat blijft onbekend, met
+   alle gevolgen die par. 0 daaraan verbindt. */
+const LEES_RE = /['"`]([\w./-]+\.(?:md|json|html?|css|txt|ya?ml|svg))['"`]/g;
+
 function los(vanaf, spec) {
   if (!spec.startsWith('.')) return null;
   const basis = path.resolve(path.dirname(vanaf), spec);
@@ -184,6 +198,21 @@ function kantenUit(bron, code, absPad, rel) {
     });
   }
 
+  LEES_RE.lastIndex = 0;
+  while ((m = LEES_RE.exec(bron))) {
+    const naam = m[1];
+    if (naam.startsWith('node_modules')) continue;
+    for (const k of [path.resolve(path.dirname(absPad), naam), path.join(WORTEL, naam)]) {
+      let goed = false;
+      try { goed = fs.statSync(k).isFile(); } catch (e) { /* volgende */ }
+      if (!goed) continue;
+      const rel2 = path.relative(WORTEL, k).replace(/\\/g, '/');
+      if (rel2.startsWith('..')) break;
+      uit.opgelost.push(rel2);
+      break;
+    }
+  }
+
   if (!uit.benaderd.length) {
     for (const [lijn, r] of code) {
       if (beantwoord.has(lijn)) continue;          // deze regel is al opgelost
@@ -197,13 +226,28 @@ function kantenUit(bron, code, absPad, rel) {
 
 /* ------------------------------------------------------------------- index */
 
+/* WELKE BESTANDEN KOMEN IN DE INDEX. Niet alleen .js: een gewijzigd bestand dat
+   hier niet in staat, maakt elke impactvraag onbeantwoordbaar (zie risico.js,
+   `onvolledig`). Van 2555 gewijzigde bestanden in de samenvoegtak vielen er
+   zo 374 buiten beeld -- werkstromen, documenten, registers, schermen -- en dan
+   staat er terecht ONBETROUWBAAR onder elk oordeel, maar valt er ook niets meer
+   te winnen. Binaire bestanden blijven eruit; die worden niet gelezen als tekst
+   en veranderen zelden. */
+const TEKST_RE = /\.(?:js|mjs|cjs|json|md|html?|css|txt|ya?ml|svg|sh)$/i;
+/* Bestanden zonder extensie die er wel toe doen. Zonder deze lijst valt de
+   Node-versie -- die de houdbaarheid van elk bewijs bepaalt -- buiten de index,
+   en dan is elk oordeel over een tak die hem aanraakt onbetrouwbaar. */
+const NAAM_OK = new Set(['Dockerfile', '.nvmrc', '.dockerignore', 'Procfile']);
+const telt = (naam) => TEKST_RE.test(naam) || NAAM_OK.has(naam);
+const CODE_RE = /\.(?:js|mjs|cjs)$/i;
+
 function loop(map, uit) {
   let rij;
   try { rij = fs.readdirSync(map, { withFileTypes: true }); } catch (e) { return uit; }
   for (const n of rij) {
     const p = path.join(map, n.name);
     if (n.isDirectory()) { if (n.name !== 'node_modules' && n.name !== 'dist') loop(p, uit); }
-    else if (n.name.endsWith('.js')) uit.push(p);
+    else if (telt(n.name)) uit.push(p);
   }
   return uit;
 }
@@ -212,14 +256,25 @@ function loop(map, uit) {
    readFileSync per bestand. */
 function index(mappen) {
   const paden = [];
-  for (const m of mappen || ['server']) loop(path.join(WORTEL, m), paden);
+  for (const m of mappen || ['server']) {
+    /* '.' betekent: de losse bestanden IN de wortel, en niet de hele boom --
+       daar staan de ratelregisters en de merkdocumenten. */
+    if (m === '.') {
+      for (const n of fs.readdirSync(WORTEL, { withFileTypes: true })) {
+        if (!n.isDirectory() && telt(n.name)) paden.push(path.join(WORTEL, n.name));
+      }
+      continue;
+    }
+    loop(path.join(WORTEL, m), paden);
+  }
 
   const bestanden = new Map();
   for (const abs of paden) {
     let bron;
     try { bron = fs.readFileSync(abs, 'utf8'); } catch (e) { continue; }
     const rel = path.relative(WORTEL, abs).replace(/\\/g, '/');
-    const code = codeRegelsUit(bron);
+    const isCode = CODE_RE.test(rel);
+    const code = isCode ? codeRegelsUit(bron) : [];
     bestanden.set(rel, {
       pad: rel, abs,
       hash: crypto.createHash('sha256').update(bron).digest('hex').slice(0, 16),
@@ -228,7 +283,9 @@ function index(mappen) {
       gebied: gebiedVan(rel),
       code,
       bron,
-      kanten: kantenUit(bron, code, abs, rel)
+      soort: isCode ? 'code' : 'tekst',
+      kanten: isCode ? kantenUit(bron, code, abs, rel)
+        : { opgelost: [], benaderd: [], onbekend: [] }
     });
   }
 
@@ -253,4 +310,4 @@ function index(mappen) {
   return { bestanden, graaf, omgekeerd, gebiedVan, WORTEL };
 }
 
-module.exports = { index, gebiedVan, codeRegelsUit, kantenUit, los, vormVan, redenVan, GEBIEDEN };
+module.exports = { index, gebiedVan, TEKST_RE, CODE_RE, codeRegelsUit, kantenUit, los, vormVan, redenVan, GEBIEDEN };

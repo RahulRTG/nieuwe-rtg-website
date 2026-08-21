@@ -118,9 +118,12 @@ function raak(ix, gewijzigd, opties) {
      deze index niet bestrijkt. In beide gevallen is de verzameling hieronder
      niet compleet, en dat moet de aanroeper WETEN in plaats van raden. */
   const onvolledig = [];
+  const verwijderd = o.verwijderd || new Set();
   for (const g of gewijzigd) {
     if (!ix.bestanden.has(g)) {
-      onvolledig.push({ pad: g, waarom: 'staat niet in de index -- verwijderd, of buiten de gemeten mappen' });
+      onvolledig.push({ pad: g, waarom: verwijderd.has(g)
+        ? 'VERWIJDERD -- wie hem inlaadde is uit de huidige graaf niet meer af te lezen'
+        : 'staat niet in de index -- buiten de gemeten mappen, of een soort die niet wordt gelezen' });
       continue;
     }
     geraakt.set(g, { afstand: 0, via: 'zeker', reden: 'zelf gewijzigd' });
@@ -193,8 +196,14 @@ function klasseVan(uitkomst, ondergrens) {
   if (!uitkomst.volledig) {
     return { klasse: 'security', ondergrens: ondergrens || 'cosmetic', uitGraaf,
       gebied: uitkomst.gebied, betrouwbaar: false,
-      waarom: uitkomst.onvolledig.length + ' gewijzigd(e) pad(en) buiten de index: ' +
-        uitkomst.onvolledig.map((x) => x.pad).join(', ') };
+      /* KORT, MAAR MET NAAM. Hier stond de HELE lijst, en bij een tak van 2555
+         bestanden werd dat een reden van vier kilobyte die achter elke toets
+         opnieuw werd afgedrukt -- onleesbaar, en dus ongelezen. Drie namen en
+         een aantal is genoeg om te weten waar je moet kijken; de volle lijst
+         staat in `onvolledig`. */
+      waarom: uitkomst.onvolledig.length + ' gewijzigd(e) pad(en) buiten de index (' +
+        uitkomst.onvolledig.slice(0, 3).map((x) => x.pad).join(', ') +
+        (uitkomst.onvolledig.length > 3 ? ', ...' : '') + ')' };
   }
   /* EEN COSMETISCHE WIJZIGING BLIJFT COSMETISCH, ook in de beveiligingslaag --
      maar alleen als de vorm dat ZEKER weet, en dat weet hij per regel: een

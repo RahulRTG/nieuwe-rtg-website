@@ -8,11 +8,12 @@
   "test/bedrading.test.js": 2117,
   "test/risico.test.js": 2182,
   "test/semdiff.test.js": 3938,
-  "test/perimeter-risico.test.js": 13294
+  "test/perimeter-risico.test.js": 13294,
+  "test/gebaar-notities.e2e.js": 7780
  },
  "laatst": {
   "toetsen": 1,
-  "wandklok": 269,
+  "wandklok": 7780,
   "banen": [
    6,
    2

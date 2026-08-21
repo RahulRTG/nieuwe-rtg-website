@@ -27,12 +27,25 @@
    een eigen, smalle baan. Ze draaien wel tegelijk, want ze wachten op
    verschillende dingen.
 
-   WAT DIT NIET IS. Geen vervanger van `npm test`. Dit is dezelfde suite in een
-   andere volgorde, met dezelfde toetsen en dezelfde uitkomst. Zakt er iets, dan
-   zakt de hele draai -- er wordt niets weggelaten en niets verzacht.
+   WAT DIT NIET IS, EN DAT IS DUUR GELEERD. Dit is geen vervanger van
+   scripts/test-runner.js. Die loper weet dingen die deze rij niet wist: welke
+   toetsen ALLEEN mogen draaien (bronmuterend, of tegen een echte klok), en hoe
+   het routejournaal wordt opgezet. De eerste versie hier negeerde dat en draaide
+   alles zes tegelijk -- veertien zakkers, geen enkele daarvan een echte fout.
+   Precies de storing waar die solo-lijst tegen bedacht is, en precies de fout
+   waar dit hele bouwwerk over gaat: twee plekken die hetzelfde denken te weten.
+
+   Dus: de EENHEIDStoetsen gaan langs de bestaande loper, ongewijzigd. Wat deze
+   rij toevoegt is de SCHERMbaan, en daar zit de winst ook: 155 bestanden die
+   elk een server en een browser starten, met duren die een factor dertig
+   verschillen, draaiden tot nu toe strikt achter elkaar.
+
+   Zakt er iets, dan zakt de hele draai -- er wordt niets weggelaten en niets
+   verzacht.
 
    GEBRUIK
-     node scripts/draai.js               alle toetsen, op kosten verdeeld
+     node scripts/draai.js               schermtoetsen op kosten verdeeld
+     node scripts/draai.js --eenheid     ook de eenheidstoetsen (via test-runner.js)
      node scripts/draai.js --plan        alleen wat scripts/plan.js voorschrijft
      node scripts/draai.js --banen 6,2   eigen breedte (eenheid, scherm)
      node scripts/draai.js --alleen rem  alleen wat op dit patroon past
@@ -120,6 +133,16 @@ function baan(naam, rij, breedte, boek, gemeten, mislukt) {
   });
 }
 
+/* De eenheidstoetsen gaan langs de bestaande loper. Die kent de solo-lijst
+   (scripts/lib/geisoleerd.js) en zet het routejournaal op; dat wordt hier niet
+   nagebouwd. */
+function eenheidLangsDeLoper(bestanden) {
+  const r = require('child_process').spawnSync(process.execPath,
+    [path.join(__dirname, 'test-runner.js'), '--bestanden=' + bestanden.map((b) => path.basename(b)).join(',')],
+    { cwd: WORTEL, stdio: 'inherit' });
+  return r.status === 0;
+}
+
 (async function () {
   const boek = duren();
   const toetsen = tePakken();
@@ -127,19 +150,26 @@ function baan(naam, rij, breedte, boek, gemeten, mislukt) {
   const scherm = toetsen.filter((t) => /\.e2e\.js$/.test(t)).sort((a, b) => schat(boek, b) - schat(boek, a));
 
   const onbekend = toetsen.filter((t) => !boek.ms[t]).length;
-  console.log('\n' + toetsen.length + ' toets(en): ' + eenheid.length + ' eenheid op ' + BREED_EENHEID +
-    ' baan/banen, ' + scherm.length + ' scherm op ' + BREED_SCHERM + '.' +
+  console.log('\n' + toetsen.length + ' toets(en): ' + eenheid.length + ' eenheid (via de loper), ' +
+    scherm.length + ' scherm op ' + BREED_SCHERM + ' baan/banen.' +
     (onbekend ? '  \x1b[2m' + onbekend + ' zonder bekende duur; die gaan vooraan\x1b[0m' : ''));
   const geschat = [...eenheid, ...scherm].reduce((a, t) => a + schat(boek, t), 0);
   console.log('\x1b[2mseriële duur naar schatting ' + Math.round(geschat / 60000) + ' min\x1b[0m\n');
 
   const t0 = Date.now();
   const gemeten = {}, mislukt = [];
-  await Promise.all([
-    baan('eenheid', eenheid, BREED_EENHEID, boek, gemeten, mislukt),
-    baan('scherm', scherm, BREED_SCHERM, boek, gemeten, mislukt)
-  ]);
+  let eenheidGroen = true;
+  if (eenheid.length && heeft('--eenheid')) {
+    console.log('\x1b[2m' + eenheid.length + ' eenheidstoets(en) gaan langs scripts/test-runner.js' +
+      ' -- die kent de solo-lijst\x1b[0m');
+    eenheidGroen = eenheidLangsDeLoper(eenheid);
+  } else if (eenheid.length) {
+    console.log('\x1b[2m' + eenheid.length + ' eenheidstoets(en) overgeslagen; draai ze met --eenheid' +
+      ' of met npm test\x1b[0m');
+  }
+  await baan('scherm', scherm, BREED_SCHERM, boek, gemeten, mislukt);
   const duur = Date.now() - t0;
+  if (!eenheidGroen) mislukt.push({ toets: '(de eenheidstoetsen)', uit: 'scripts/test-runner.js gaf een fout terug' });
 
   /* DE GEMETEN DUUR TERUGSCHRIJVEN. Zonder dit blijft de verdeling voor altijd
      op de eerste gok staan, en dan is deze hele rij niet meer dan een dure

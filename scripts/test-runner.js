@@ -23,14 +23,12 @@ const argv = process.argv.slice(2);
 const reporter = (argv.find(a => a.startsWith('--reporter=')) || '').slice(11);
 const selectie = (argv.find(a => a.startsWith('--bestanden=')) || '').slice(12)
   .split(',').map(s => s.trim()).filter(Boolean);
-const GEISOLEERD = new Set([
-  'boot-smoke.test.js',
-  'grens-sweep.test.js',
-  'klok.test.js',
-  'zaakdoos.test.js',
-  'keuring.test.js',
-  'meterijk.test.js'
-]);
+/* DE SOLO-LIJST WOONT IN scripts/lib/geisoleerd.js. Hij stond hier, en dat was
+   bijna goed: hij hoort bij deze loper. Maar dit bestand IS een script -- wie het
+   met require() opent om alleen die lijst te lezen, start de hele suite. Dat is
+   niet theoretisch; het is hier gebeurd. Een lijst die twee lezers heeft, hoort
+   in een bestand dat niets doet als je het opent. */
+const { GEISOLEERD } = require('./lib/geisoleerd');
 const gevraagd = Number(process.env.RTG_TEST_CONCURRENCY);
 const concurrency = Number.isInteger(gevraagd) && gevraagd > 0
   ? Math.min(gevraagd, 32)

@@ -11,6 +11,7 @@
 'use strict';
 
 const fs = require('fs');
+const { maskerEmail } = require('./lib/geenlek');
 const https = require('https');
 const path = require('path');
 const readline = require('readline');
@@ -103,7 +104,10 @@ async function main() {
 
   const dialoog = vragen();
   try {
-    console.log('\nEerste RTG-eigenaar claimen voor ' + email + '.');
+    /* Gemaskeerd: genoeg om te bevestigen "ja, dat is mijn adres", te weinig
+       om een codenaam mee terug te voeren naar een mens. Zie
+       scripts/lib/geenlek.js. */
+    console.log('\nEerste RTG-eigenaar claimen voor ' + maskerEmail(email) + '.');
     const naam = process.env.RTG_OWNER_NAME || await dialoog.vraag('Volledige naam: ');
     const geboortedatum = process.env.RTG_OWNER_BIRTHDATE || await dialoog.vraag('Geboortedatum (JJJJ-MM-DD): ');
     const telefoon = process.env.RTG_OWNER_PHONE || await dialoog.vraag('Telefoon (optioneel): ');

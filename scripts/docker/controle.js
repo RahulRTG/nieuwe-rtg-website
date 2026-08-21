@@ -4,6 +4,7 @@
 'use strict';
 
 const fs = require('fs');
+const { zonderGeheim } = require('../lib/geenlek');
 const path = require('path');
 const crypto = require('crypto');
 const { leesEnv, leesGeheim } = require('./start');
@@ -105,8 +106,14 @@ if (publiek) {
 }
 
 console.log('\n=== RTG ' + (publiek ? 'publieke live-keuring' : 'self-host-keuring') + ' ===\n');
-for (const f of fouten) console.log(' ✗ ' + f);
-for (const w of waarschuwingen) console.log(' ⚠ ' + w);
+/* DOOR DE ZEEF. Wat deze keuring afdrukt zijn paden, hostnamen en
+   bestandsrechten uit de omgeving -- geen geheimen, en de melding is zonder die
+   waarden onbruikbaar ("een map ontbreekt" -- welke?). Die blijven dus staan.
+   Wat de zeef wel weghaalt is een verbindingsreeks met inloggegevens, een
+   e-mailadres en een sleutel, voor het geval een volgende melding er ooit een
+   meeneemt. Zie scripts/lib/geenlek.js. */
+for (const f of fouten) console.log(' ✗ ' + zonderGeheim(f));
+for (const w of waarschuwingen) console.log(' ⚠ ' + zonderGeheim(w));
 if (fouten.length) {
   console.log('\nNiet startklaar: ' + fouten.length + ' blokkerende fout(en).');
   process.exit(1);

@@ -120,7 +120,12 @@ async function trek(page, hoogte) {
   await page.mouse.down();
   await page.mouse.move(b.x + b.width * 0.62, b.y - hoogte, { steps: 12 });
   await page.mouse.up();
-  await wachtOpRust(page);
+  /* Omhoog trekken OPENT een laag -- een lade bij een kleine trek, de taakmodus
+     bij een grote. Wachten tot die laag er staat is de toestand waar elke
+     aanroeper daarna over beweert; wachtOpRust keert terug voordat er iets is
+     opengegaan, want tot dat moment verandert er niets. */
+  await page.waitForFunction(() => !!document.querySelector('.rtg-laag.open'),
+    null, { timeout: 15000 });
 }
 
 test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) => {
@@ -258,9 +263,14 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       const doos = await page.locator('#rtgCommand .cmd-actie[data-cap="proef.licht"]').boundingBox();
       await page.mouse.move(doos.x + doos.width / 2, doos.y + doos.height / 2);
       await page.mouse.down();
-      await wachtOpRust(page);
-      await page.mouse.up();
+      /* VASTHOUDEN TOT DE UITLEG KOMT, en niet tot het scherm stil is. De drempel
+         in shared/adaptief/balkknop.js staat op 480 ms; wachtOpRust keert al na
+         een fractie daarvan terug, want er verandert nog niets -- en dan is de
+         lange druk een tik geworden en gaat uitleg() nooit af. De lade die
+         verschijnt IS het bewijs dat de druk lang genoeg was; verzet iemand de
+         drempel, dan wacht deze toets langer in plaats van te zakken. */
       await page.waitForSelector('.rtg-laag-lade.open', { timeout: 8000 });
+      await page.mouse.up();
       assert.equal((await page.locator('.lg-titel').textContent()).trim(), 'Vet');
       assert.match(await page.locator('.wm-belofte').textContent(), /meteen/,
         'de uitleg hoort te zeggen wat de handeling weegt');
@@ -280,9 +290,9 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       const orb = await page.locator('#rtgCommand .cmd-mondknop').boundingBox();
       await page.mouse.move(orb.x + orb.width / 2, orb.y + orb.height / 2);
       await page.mouse.down();
-      await wachtOpRust(page);
-      await page.mouse.up();
+      // ook hier is de tijd het gebaar: vasthouden tot de orb zijn voorstel opent
       await page.waitForSelector('.rtg-laag-lade.open', { timeout: 8000 });
+      await page.mouse.up();
       const kopjes = await page.locator('.lg-kopje').allTextContents();
       assert.deepEqual(kopjes, ['Dit kan hier', 'Dit kan hier niet']);
       const rijen = (await page.locator('.rtg-laag .lg-rij').allTextContents()).join(' ');

@@ -2,7 +2,7 @@
   "name": "RTG Reizen, uw reiswereld",
   "short_name": "RTG Reizen",
   "id": "/apps/reizen",
-  "description": "Uw komende reis bij elkaar -- vlucht, verblijf, reis en charter -- ongeacht in welke app u hem boekte. Boeken zelf blijft in de app die het echte werk doet.",
+  "description": "Uw reizen, vluchten, verblijf en RTG Taxi in één snelle, beveiligde reis-app.",
   "lang": "nl",
   "start_url": "/apps/reizen.html",
   "scope": "/",

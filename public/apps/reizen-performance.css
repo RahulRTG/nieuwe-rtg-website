@@ -1,0 +1,120 @@
+:root{
+  --onyx:#080909;--graphite:#111313;--graphite-2:#171919;--ivory:#f1ede5;
+  --muted:#969995;--line:#2a2d2d;--line-soft:#1d2020;--wine:#8e0f36;
+  --wine-bright:#be164d;--gold:#cba65f;--green:#35bd72;--danger:#d3184e;
+  --sans:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --serif:"Bodoni Moda",Didot,serif;--header:88px;--nav:88px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--onyx);scroll-behavior:smooth}
+body{margin:0;min-width:320px;min-height:100dvh;background:var(--onyx);color:var(--ivory);font-family:var(--sans);font-feature-settings:"tnum" 1,"ss01" 1;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit}
+button,a,input,select{-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
+svg{display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+[hidden]{display:none!important}
+.skip{position:fixed;left:1rem;top:-5rem;z-index:1000;background:var(--ivory);color:var(--onyx);padding:.75rem 1rem;text-decoration:none;font-weight:700;transition:top .16s}
+.skip:focus{top:0}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.reisapp{min-height:100dvh;background:linear-gradient(180deg,#0b0c0c 0,var(--onyx) 24rem)}
+
+.prestatiekop{position:sticky;top:0;z-index:30;height:calc(var(--header) + env(safe-area-inset-top));padding:env(safe-area-inset-top) clamp(1.15rem,4vw,2.25rem) 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid var(--wine);background:rgba(8,9,9,.93);backdrop-filter:blur(20px)}
+.rtgmerk{justify-self:start;color:var(--gold);font:600 2rem/1 var(--serif);text-decoration:none;letter-spacing:-.035em}
+.prestatiekop>p{margin:0;font-size:.78rem;font-weight:650;letter-spacing:.25em}
+.veiligknop{justify-self:end;display:flex;align-items:center;gap:.48rem;min-height:44px;border:0;background:none;color:var(--ivory);padding:0;font-size:.61rem;font-weight:650;letter-spacing:.16em}
+.veiligknop svg{width:20px;height:20px}.veiligknop i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 14px rgba(53,189,114,.55)}
+
+main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom))}
+.appblad{min-height:calc(100dvh - var(--header) - var(--nav));animation:blad-in .28s ease both}
+.bladbinnen{width:min(100%,1180px);margin:0 auto;padding:clamp(2rem,5vw,4.5rem) clamp(1.2rem,4vw,3.2rem) 4rem}
+.micro{margin:0;color:#b5b7b3;font-size:.65rem;font-weight:650;letter-spacing:.22em;text-transform:uppercase}
+.sub,.sectiekop>p:last-child{color:var(--muted)}
+.tekstknop{border:0;border-bottom:1px solid var(--wine);background:none;color:var(--ivory);padding:.4rem 0;font-size:.62rem;font-weight:700;letter-spacing:.16em}
+
+.dagkop{margin-bottom:clamp(2rem,5vw,3.6rem)}
+.bestemmingkop{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-top:.65rem}
+.bestemmingkop h1{margin:0;font:800 clamp(4.1rem,18vw,8rem)/.88 var(--sans);letter-spacing:-.07em;text-transform:uppercase}
+.gereed{margin-bottom:.35rem;color:var(--ivory);font-size:.78rem;font-weight:650;letter-spacing:.22em;white-space:nowrap}.gereed::first-letter{color:var(--gold)}
+.dagkop .sub{margin:.85rem 0 0;font-size:1rem}
+.vandaagraster{display:grid;gap:2rem}
+.volgendblok{position:relative;overflow:hidden;border:1px solid #363939;background:linear-gradient(115deg,#141616 0,#0d0f0f 70%);padding:1.6rem 1.55rem 1.45rem}
+.volgendblok::after{content:"";position:absolute;right:-4rem;top:-2rem;width:9rem;height:130%;border-left:1px solid #272a2a;transform:skew(-17deg);background:repeating-linear-gradient(90deg,transparent 0,transparent 7px,#181a1a 8px,#181a1a 9px);pointer-events:none}
+.tijdregel{position:relative;z-index:1;display:flex;align-items:baseline;gap:1.1rem;margin:1.3rem 0 .75rem;flex-wrap:wrap}
+.tijdregel strong{font-size:clamp(3.9rem,17vw,7rem);line-height:.84;letter-spacing:-.055em}.tijdregel span{font-size:clamp(1.15rem,4vw,1.55rem);font-weight:500}
+.routekort{display:flex;align-items:center;gap:1rem;color:#d8d5cf;font-size:.78rem;font-weight:650;letter-spacing:.2em}.routekort b{color:var(--gold);font-size:1.25rem;font-weight:400}
+.vluchtregel{margin:1.45rem 0;border-top:1px solid #393c3c;padding-top:1.1rem;color:#d2d0ca;font-size:.72rem;font-weight:600;letter-spacing:.18em}
+.actieknop{position:relative;isolation:isolate;width:100%;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:1rem;border:0;color:white;background:linear-gradient(90deg,#74102f,#a61040);padding:0 1.5rem;font-weight:750;letter-spacing:.12em;text-align:left;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 50%,calc(100% - 24px) 100%,0 100%)}
+.actieknop::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.11),transparent);transform:translateX(-110%);z-index:-1;transition:transform .45s}
+.actieknop:hover::before{transform:translateX(110%)}.actieknop b{font-size:1.55rem;font-weight:300}
+.actieknop:disabled{cursor:wait;filter:saturate(.2);opacity:.68}
+
+.reiscontext{display:grid;gap:1.6rem}
+.prestatiepad{position:relative;display:grid;grid-template-columns:repeat(4,1fr);min-height:112px;padding:0 .25rem}
+.padlijn{position:absolute;left:7%;right:7%;top:61px;height:1px;background:#5a5d5d}
+.padlijn::after{content:"";display:block;width:36%;height:2px;background:var(--wine-bright);transform:translateY(-.5px)}
+.padpunt{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;color:#d6d4ce;font-size:.72rem;letter-spacing:.1em}
+.padpunt span{min-height:43px}.padpunt small{display:block;margin-top:.25rem;color:#c1c2bf;font-size:.58rem;letter-spacing:.17em}
+.padpunt i{position:relative;z-index:2;width:14px;height:14px;margin-top:.72rem;border:2px solid #777b79;border-radius:50%;background:var(--onyx)}
+.padpunt.actief i{border-color:#cbc8c0;background:var(--wine);box-shadow:0 0 0 4px var(--onyx)}
+.padpunt.nu{align-items:flex-start;text-align:left}.padpunt.einde{align-items:flex-end;text-align:right}
+.padpunt.nu i,.padpunt.einde i{width:36px;height:36px;margin-top:-.05rem;border-color:var(--gold);display:grid;place-items:center;color:var(--gold)}
+.padpunt.nu svg,.padpunt.einde svg{width:23px;height:23px}
+.statuslijst{border:1px solid #2f3232}
+.statuslijst button{width:100%;min-height:82px;display:grid;grid-template-columns:42px 1fr auto auto;align-items:center;gap:1rem;border:0;border-bottom:1px solid var(--line);background:#0d0f0f;color:var(--ivory);padding:.9rem 1rem;text-align:left}
+.statuslijst button:last-child{border-bottom:0}.statuslijst button:hover{background:#131515}
+.statusicoon{width:34px;height:34px;display:grid;place-items:center;border:1px solid;border-radius:50%;font-style:normal}.statusicoon.goed{color:var(--gold)}.statusicoon.wacht{color:#8e918e}.statusicoon.let{color:var(--danger)}
+.statuslijst span{display:flex;flex-direction:column;gap:.22rem}.statuslijst b{font-size:.9rem;font-weight:570}.statuslijst small{color:var(--muted);font-size:.7rem}.statuslijst strong{color:var(--wine-bright);font-size:.62rem;letter-spacing:.13em}.statuslijst em{color:var(--gold);font-size:1.35rem;font-style:normal}
+.rahulsnel{display:grid;grid-template-columns:1fr 52px;border:1px solid #323535;background:#101212;margin-top:2rem}
+.rahulsnel label{position:absolute;left:-9999px}.rahulsnel input{min-width:0;border:0;background:transparent;color:var(--ivory);outline:0;padding:0 1.2rem}.rahulsnel input::placeholder{color:#80847f}.rahulsnel button{height:58px;border:0;border-left:1px solid #323535;background:none;color:var(--gold);font-size:1.3rem}
+
+.sectiekop{margin-bottom:2.4rem}.sectiekop>div{display:flex;align-items:end;justify-content:space-between;gap:1.5rem}.sectiekop h1{max-width:820px;margin:.65rem 0 .5rem;font-size:clamp(2.2rem,7vw,4.8rem);line-height:.95;letter-spacing:-.05em;text-transform:uppercase}.sectiekop>p:last-child{max-width:640px;margin:.8rem 0 0;line-height:1.6}
+.canvasband{display:grid;border-block:1px solid var(--line);background:#0d0f0f;margin-bottom:2.5rem}
+.canvasband .cv-stand{padding:1.5rem 1.25rem 1rem}.canvasband .cv-app{color:var(--gold);font-family:var(--sans)}
+.canvasband .cv-woord{font-family:var(--sans);font-size:2rem;font-weight:720;text-transform:uppercase;letter-spacing:-.035em}.canvasband .cv-cijfers{border-color:var(--line)}
+.canvasband .cv-cijfers>span{color:var(--muted)}.canvasband .cv-rust{padding:0 1.25rem 1.5rem}.canvasband .cv-rust h2{font-family:var(--sans);font-size:1rem}.canvasband .cv-rust p{color:var(--muted)}
+.reisregister{border-top:1px solid var(--line)}.registerkop{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 0}.registerkop h2{margin:0;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase}.registerkop span{color:var(--muted);font-size:.7rem}
+.reisregel{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:1.1rem;color:inherit;text-decoration:none;border-top:1px solid var(--line-soft);padding:1.15rem .2rem}.reisregel:hover{background:#0e1010}.reisdatum{display:flex;flex-direction:column;color:var(--muted);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase}.reisdatum b{color:var(--ivory);font-size:1.55rem;line-height:1.1}.reiskern{display:flex;flex-direction:column;gap:.3rem}.reiskern b{font-size:1rem}.reiskern small{color:var(--muted)}.reisstatus{display:flex;align-items:center;gap:.45rem;color:var(--gold);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}.leegtekst{color:var(--muted);line-height:1.6}
+.reisdiensten{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:2.6rem}.reisdiensten a{display:grid;grid-template-columns:40px 1fr;align-items:center;gap:1rem;background:#0e1010;color:inherit;text-decoration:none;padding:1.15rem}.reisdiensten a:hover{background:#151717}.reisdiensten svg{width:26px;height:26px;color:var(--gold)}.reisdiensten span{display:flex;flex-direction:column;gap:.2rem}.reisdiensten b{font-size:.86rem}.reisdiensten small{color:var(--muted);font-size:.68rem}
+#vandaagVak{border-top:1px solid var(--line);margin-top:2rem;padding-top:1.2rem}#vandaagVak .cv-lijn{max-width:none;padding:1.25rem 0}#vandaagVak .cv-uur{color:var(--muted)}#vandaagVak .cv-wat{border-color:var(--line)}#vandaagVak .cv-toe{color:var(--muted)}
+
+.taxikop{margin-bottom:1.8rem}.taxiraster{display:grid;gap:1.4rem}.routevelden{position:relative;border:1px solid #353838;background:#111313;padding:0;margin:0}.routevelden legend{position:absolute;width:1px;height:1px;overflow:hidden}.routevelden label{position:relative;min-height:90px;display:grid;grid-template-columns:28px 1fr 48px;align-items:center;gap:.65rem;padding:0 1rem;border-bottom:1px solid var(--line)}.routevelden label:last-child{border:0}.routevelden label:first-of-type::after{content:"";position:absolute;left:1.84rem;top:57px;height:65px;width:1px;background:#8d918d}.routepunt{z-index:1;width:14px;height:14px;border:3px solid #c4c6c1;border-radius:50%;background:var(--wine)}.routepunt.aankomst{width:17px;height:22px;border:0;border-radius:55% 55% 55% 0;background:var(--gold);transform:rotate(-45deg)}
+.routevelden span{display:flex;flex-direction:column;gap:.18rem}.routevelden small{color:var(--muted);font-size:.6rem;letter-spacing:.16em}.routevelden input{width:100%;border:0;background:none;color:var(--ivory);outline:0;padding:.1rem 0;font-size:1rem}.routevelden input:focus{box-shadow:0 2px 0 var(--wine)}
+.locatieknop,.wisselknop{width:44px;height:44px;display:grid;place-items:center;border:0;border-left:1px solid var(--line);background:none;color:#d4d5d1}.locatieknop svg{width:21px;height:21px}.wisselknop{font-size:1.4rem}
+.suggesties{position:absolute;z-index:12;left:1.2rem;right:1.2rem;max-height:240px;overflow:auto;border:1px solid #3a3d3d;background:#121414;box-shadow:0 16px 35px #000}.suggesties button{width:100%;display:flex;justify-content:space-between;gap:1rem;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ivory);padding:.9rem;text-align:left}.suggesties button:hover{background:#1a1c1c}.suggesties small{color:var(--muted)}
+.ritkeuzes{display:grid;grid-template-columns:1fr 1.25fr;gap:.65rem;margin-top:.65rem}.momentkeuze{display:grid;grid-template-columns:1fr 1fr;border:1px solid #353838}.momentkeuze button,.reizigersknop{min-height:58px;border:0;background:#111313;color:#b8bab6;font-size:.72rem;font-weight:650;letter-spacing:.15em}.momentkeuze button+button{border-left:1px solid var(--line)}.momentkeuze button.actief{background:linear-gradient(90deg,#74102f,#931139);color:#fff}.reizigersknop{display:flex;align-items:center;justify-content:space-between;border:1px solid #353838;padding:0 1rem}.reizigersknop b{font-size:1.1rem}
+.laterinvoer{display:flex;flex-direction:column;gap:.45rem;margin-top:.65rem;color:var(--muted);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase}.laterinvoer input{min-height:54px;border:1px solid #353838;background:#111313;color:var(--ivory);padding:0 1rem;color-scheme:dark}
+.routekaart{position:relative;overflow:hidden;min-height:190px;border:1px solid #353838;background:#0b0d0d;margin-top:1rem}.kaartlijnen{position:absolute;inset:0;width:100%;height:100%}.straten{stroke:#303333;stroke-width:2}.ritlijn{stroke:var(--wine-bright);stroke-width:4}.startstip{fill:var(--wine);stroke:#d8d9d5;stroke-width:3}.eindstip{fill:var(--gold);stroke:#0b0d0d;stroke-width:3}.routekaart>div{position:absolute;left:1.2rem;right:1.2rem;bottom:1rem;display:flex;justify-content:space-between}.routekaart strong{font-size:1.65rem}.routekaart small{font-size:.65rem;letter-spacing:.15em}
+.voertuigen{border:1px solid #323535}.voertuig{width:100%;min-height:102px;display:grid;grid-template-columns:minmax(94px,160px) 1fr auto;align-items:center;gap:1rem;border:0;border-bottom:1px solid var(--line);background:#101212;color:var(--ivory);padding:1rem;text-align:left;position:relative}.voertuig:last-child{border-bottom:0}.voertuig:hover{background:#151717}.voertuig.actief{background:linear-gradient(90deg,#171919,#111313)}.voertuig.actief::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--wine-bright)}.voertuig svg{width:100%;height:auto;max-height:50px;stroke:#b5b7b4;fill:#181a1a}.voertuig span{display:flex;flex-direction:column;gap:.3rem}.voertuig b{font-size:.93rem;letter-spacing:.08em}.voertuig span small{color:var(--muted);font-size:.68rem}.voertuig>strong{display:flex;flex-direction:column;align-items:end;font-size:1.35rem}.voertuig>strong small{color:var(--muted);font-size:.48rem;letter-spacing:.12em}
+.vertrouwen{display:grid;grid-template-columns:1.2fr 1fr;border:1px solid #323535;margin-top:1rem}.vertrouwen span{min-height:64px;display:flex;align-items:center;gap:.6rem;padding:.8rem;color:#d4d4d0;font-size:.68rem}.vertrouwen span+span{border-left:1px solid var(--line)}.vertrouwen svg{width:23px;height:23px;color:var(--gold)}.boekknop{margin-top:1rem}.annuleren{margin:.7rem 0 0;color:var(--muted);text-align:center;font-size:.66rem}
+.lopendeRit{border-left:3px solid var(--green);background:#111413;margin-top:1rem;padding:1.1rem}.lopendeRit .micro{color:var(--green)}.lopendeRit h3{margin:.45rem 0;font-size:1.15rem}.lopendeRit p{margin:.35rem 0;color:var(--muted);font-size:.78rem}.lopendeRit a{display:inline-block;margin-top:.6rem;color:var(--gold);font-size:.7rem;text-decoration:none;border-bottom:1px solid}
+
+.rahulblad{max-width:840px}.chat{min-height:250px;border-block:1px solid var(--line);padding:1.5rem 0;display:flex;flex-direction:column;gap:.8rem}.chatregel{max-width:78%;margin:0;padding:.9rem 1rem;background:#141616;color:#d9d7d1;line-height:1.5}.chatregel.gebruiker{align-self:flex-end;border-right:2px solid var(--wine-bright);background:#191416}.chatregel.assistent{border-left:2px solid var(--gold)}.snelvragen{display:flex;gap:.55rem;flex-wrap:wrap;margin:1rem 0}.snelvragen button{min-height:42px;border:1px solid #363939;background:#101212;color:#cacac5;padding:.6rem .8rem;font-size:.7rem}.rahulformulier{display:grid;grid-template-columns:1fr auto;border:1px solid #363939}.rahulformulier label{position:absolute;left:-9999px}.rahulformulier input{min-width:0;min-height:64px;border:0;background:#0f1111;color:var(--ivory);padding:0 1rem;outline:0}.rahulformulier button{border:0;border-left:1px solid #363939;background:#74102f;color:white;padding:0 1.1rem;font-size:.67rem;font-weight:700;letter-spacing:.12em}
+
+.hoofdtabs{position:fixed;z-index:25;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #2f3232;background:rgba(9,10,10,.97);backdrop-filter:blur(22px)}
+.hoofdtabs button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.42rem;border:0;background:none;color:#929591;font-size:.66rem}.hoofdtabs button::after{content:"";position:absolute;bottom:0;width:0;height:3px;background:var(--wine-bright);transition:width .18s}.hoofdtabs button.actief{color:var(--ivory)}.hoofdtabs button.actief::after{width:52px}.hoofdtabs svg{width:25px;height:25px}.hoofdtabs button.actief svg{color:var(--wine-bright)}
+
+.keuzedialoog{width:min(92vw,480px);max-height:88dvh;overflow:auto;border:1px solid #3c3f3f;background:#111313;color:var(--ivory);padding:0;box-shadow:0 30px 90px #000}.keuzedialoog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(5px)}.keuzedialoog form,.bevestiginginhoud{padding:1.35rem}.dialoogkop{display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:1.4rem}.dialoogkop h2,.bevestiging h2{margin:.4rem 0 0;font-size:1.6rem}.dialoogkop>button{width:44px;height:44px;border:0;background:#1b1d1d;color:var(--ivory);font-size:1.4rem}.keuzedialoog label:not(.vink){display:grid;grid-template-columns:1fr 100px;align-items:center;border-top:1px solid var(--line);padding:.8rem 0}.keuzedialoog select{min-height:46px;border:1px solid #3b3e3e;background:#0d0f0f;color:var(--ivory);padding:0 .7rem}.vink{display:flex;gap:.7rem;align-items:center;border-top:1px solid var(--line);padding:1rem 0}.keuzedialoog .actieknop{margin-top:1rem}.bevestiginginhoud{text-align:center}.bevestigdicoon{width:64px;height:64px;display:grid;place-items:center;border:1px solid var(--green);border-radius:50%;color:var(--green);font-size:1.8rem;margin:0 auto 1.2rem}.bevestiging h2{font-size:1.8rem}.bevestiging p{color:var(--muted);line-height:1.55}.bevestiging #bevestigingFeiten{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin:1.3rem 0}.bevestiging #bevestigingFeiten span{display:flex;flex-direction:column;gap:.25rem;background:#0b0d0d;padding:1rem}.bevestiging #bevestigingFeiten small{color:var(--muted);font-size:.6rem;letter-spacing:.1em}.veiliglijst{list-style:none;margin:0;padding:0}.veiliglijst li{display:flex;gap:.8rem;padding:1rem 0;border-top:1px solid var(--line)}.veiliglijst b{color:var(--green)}
+.toast{position:fixed;z-index:80;left:50%;bottom:calc(var(--nav) + 1rem + env(safe-area-inset-bottom));transform:translate(-50%,20px);width:max-content;max-width:calc(100vw - 2rem);background:var(--ivory);color:var(--onyx);padding:.8rem 1rem;font-size:.75rem;font-weight:650;opacity:0;pointer-events:none;transition:.2s}.toast.zichtbaar{opacity:1;transform:translate(-50%,0)}
+
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+@keyframes blad-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(min-width:720px){
+  .canvasband{grid-template-columns:1fr 1.2fr;align-items:center}.canvasband .cv-rust{padding:1.5rem;border-left:1px solid var(--line)}
+  .reisdiensten{grid-template-columns:repeat(3,1fr)}
+}
+@media(min-width:940px){
+  :root{--header:96px;--nav:0px}
+  .reisapp{padding-left:104px}.prestatiekop{margin-left:-104px;padding-left:calc(104px + 2.5rem);grid-template-columns:1fr auto 1fr}
+  main{padding-bottom:0}.appblad{min-height:calc(100dvh - var(--header))}.bladbinnen{padding-bottom:5rem}
+  .hoofdtabs{left:0;right:auto;top:var(--header);bottom:0;width:104px;height:auto;padding:1.2rem .4rem;grid-template-columns:1fr;grid-template-rows:repeat(4,94px);border-top:0;border-right:1px solid #2f3232;background:#090a0a}
+  .hoofdtabs button::after{left:0;bottom:auto;width:3px;height:0}.hoofdtabs button.actief::after{width:3px;height:48px}.hoofdtabs button{font-size:.63rem}
+  .vandaagraster{grid-template-columns:1.08fr .92fr;align-items:start}.volgendblok{min-height:436px;display:flex;flex-direction:column}.volgendblok .actieknop{margin-top:auto}
+  .taxiraster{grid-template-columns:minmax(0,1fr) minmax(410px,.92fr);align-items:start;gap:1.6rem}.taxikop h1{font-size:4.7rem}
+  .toast{bottom:1.5rem}
+}
+@media(max-width:520px){
+  :root{--header:72px;--nav:78px}.prestatiekop{grid-template-columns:1fr auto 1fr}.prestatiekop>p{font-size:.65rem}.rtgmerk{font-size:1.65rem}.veiligknop span{display:none}.veiligknop{gap:.35rem}
+  .bladbinnen{padding-top:1.8rem;padding-inline:1rem}.bestemmingkop{align-items:flex-end}.bestemmingkop h1{font-size:clamp(3.8rem,20vw,5.4rem)}.gereed{font-size:.61rem;letter-spacing:.14em}.volgendblok{padding:1.3rem 1rem}.tijdregel{display:block}.tijdregel span{display:block;margin-top:.8rem}.statuslijst button{grid-template-columns:36px 1fr auto;padding:.8rem}.statuslijst strong{grid-column:2}.statuslijst em{grid-column:3;grid-row:1/3}.ritkeuzes{grid-template-columns:1fr}.routekaart{min-height:160px}.voertuig{grid-template-columns:82px 1fr auto;gap:.7rem;padding:.8rem}.voertuig svg{max-height:40px}.voertuig>strong{font-size:1.1rem}.vertrouwen{grid-template-columns:1fr}.vertrouwen span+span{border-left:0;border-top:1px solid var(--line)}.sectiekop h1{font-size:2.8rem}.rahulformulier{grid-template-columns:1fr}.rahulformulier button{min-height:52px;border-left:0;border-top:1px solid #363939}.chatregel{max-width:92%}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}.actieknop::before{display:none}}

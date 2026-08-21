@@ -1,0 +1,222 @@
+:root{
+  --bg:#080909;
+  --paneel:#0d0f0f;
+  --paneel-2:#111313;
+  --lijn:#343737;
+  --tekst:#f1ede5;
+  --zacht:#9a9c98;
+  --goud:#cba65f;
+  --wijn:#a80d3d;
+  --wijn-donker:#6f0a29;
+  --groen:#20d65a;
+  --rood:#dd164d;
+  color-scheme:dark;
+  font-synthesis:none;
+}
+
+*{box-sizing:border-box}
+html{background:#020303}
+body{margin:0;min-width:320px;min-height:100dvh;background:#020303;color:var(--tekst);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"ss01" 1}
+button,a{font:inherit}
+button{color:inherit}
+.skip{position:fixed;z-index:500;top:.5rem;left:50%;transform:translate(-50%,-160%);padding:.65rem 1rem;background:var(--tekst);color:#080909;text-decoration:none;transition:transform .15s}
+.skip:focus{transform:translate(-50%,0)}
+:focus-visible{outline:2px solid var(--goud);outline-offset:3px}
+[hidden]{display:none!important}
+
+.pda{position:relative;width:min(100%,760px);min-height:100dvh;margin:0 auto;overflow:hidden;background:radial-gradient(circle at 50% 18%,rgba(63,51,35,.09),transparent 31rem),linear-gradient(180deg,#0b0c0c,var(--bg) 54%);box-shadow:0 0 70px rgba(0,0,0,.7)}
+.pda::before{content:"";position:fixed;pointer-events:none;z-index:1;inset:0;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.14'/%3E%3C/svg%3E");mix-blend-mode:soft-light}
+
+.pda-kop{position:sticky;z-index:80;top:0;height:calc(82px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 1.45rem 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:2px solid var(--wijn);background:rgba(8,9,9,.95);backdrop-filter:blur(18px)}
+.rtg-merk{justify-self:start;color:var(--goud);font:600 2.05rem/1 "Bodoni Moda",Didot,serif;letter-spacing:-.04em;text-decoration:none}
+.pda-identiteit{justify-self:center;display:flex;align-items:center;gap:.6rem}
+.pda-identiteit strong{font-size:.76rem;line-height:1;letter-spacing:.24em}
+.pda-identiteit small{padding:.18rem .3rem;border:1px solid #4a4c49;color:var(--zacht);font-size:.47rem;letter-spacing:.12em}
+.veilig{justify-self:end;min-height:44px;display:flex;align-items:center;gap:.42rem;padding:0;border:0;background:none;cursor:pointer;color:var(--tekst);font-size:.59rem;font-weight:650;letter-spacing:.16em}
+.veilig svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.4}
+.veilig i,.verbinding i{width:7px;height:7px;border-radius:50%;background:var(--groen);box-shadow:0 0 14px rgba(32,214,90,.68)}
+
+main{position:relative;z-index:2;padding-bottom:calc(94px + env(safe-area-inset-bottom,0px))}
+.pda-blad{padding:2.25rem 1.65rem 2rem;animation:blad-in .22s ease-out}
+@keyframes blad-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.bovenregel,.bladkop p,.kaartlabel,.ritstatus,.systeemkaart>p{margin:0;color:#c8c8c4;font-size:.7rem;line-height:1.2;font-weight:570;letter-spacing:.19em}
+.beschikbaar-kop{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-top:.7rem}
+.beschikbaar-kop h1{max-width:88%;margin:0;font-size:clamp(2rem,7.8vw,3.65rem);line-height:.98;font-weight:790;letter-spacing:.015em;text-transform:uppercase}
+.verbinding{display:flex;align-items:center;gap:.45rem;padding-bottom:.28rem;color:var(--zacht);font-size:.5rem;letter-spacing:.14em;white-space:nowrap}
+
+.klokpodium{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:310px;padding:1.7rem 0 1.45rem;text-align:center}
+.klokpodium>p{margin:0 0 .6rem;font-size:.76rem;letter-spacing:.22em;color:#c8c8c4}
+.klokhouder{--rtg-klok-maat:clamp(13.5rem,40vw,18rem);display:grid;place-items:center;width:100%}
+
+.werkstapel{display:grid;gap:1rem}
+.ritkaart,.reservering,.lijstvak,.navigatiekaart,.systeemkaart{border:1px solid var(--lijn);background:linear-gradient(125deg,rgba(17,19,19,.98),rgba(10,11,11,.98));box-shadow:inset 0 1px rgba(255,255,255,.02)}
+.ritkaart{position:relative;padding:1.6rem 1.55rem 1.45rem;overflow:hidden}
+.ritkaart::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--wijn)}
+.ritkaart.nieuw::before{background:var(--wijn)}
+.ritkaart.actief::before{background:var(--goud)}
+.ritkaart.leeg::before{background:#353838}
+.nieuwe-kop{display:flex;align-items:center;gap:.65rem;color:var(--groen);font-size:.78rem;letter-spacing:.13em}
+.nieuwe-kop i{width:12px;height:12px;border-radius:50%;background:var(--groen);box-shadow:0 0 18px rgba(32,214,90,.4)}
+.afstand{margin:.85rem 0 .95rem;color:#d1d0cb;font-size:.83rem;letter-spacing:.14em}
+.ritroute{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:.85rem;margin:0 0 1rem;font-size:clamp(1.25rem,5vw,2rem);font-weight:760;line-height:1.06;letter-spacing:.02em;text-transform:uppercase}
+.ritroute span:last-child{text-align:right}
+.ritroute b{color:var(--goud);font-size:1.65rem;font-weight:350}
+.ritfeiten{display:flex;align-items:center;flex-wrap:wrap;gap:.65rem;margin:0;color:#e9e6de;font-size:clamp(.98rem,3.5vw,1.28rem);font-weight:650;letter-spacing:.05em}
+.ritfeiten i{width:3px;height:3px;border-radius:50%;background:#858784}
+.ritfeiten .prijs{color:var(--goud)}
+.voorleesactie{width:100%;min-height:52px;display:flex;align-items:center;gap:.75rem;margin-top:1.3rem;padding:.8rem .25rem;border:0;border-top:1px solid var(--lijn);border-bottom:1px solid var(--lijn);background:none;color:var(--goud);cursor:pointer;text-align:left;font-size:.72rem;letter-spacing:.14em}
+.voorleesactie svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.hoofdactie{width:100%;min-height:66px;display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1.15rem;padding:.8rem 1.4rem;border:1px solid #d21a51;background:linear-gradient(105deg,var(--wijn-donker),#ab103f 65%,#7a0d30);color:white;cursor:pointer;text-decoration:none;font-weight:760;letter-spacing:.06em;box-shadow:inset 0 1px rgba(255,255,255,.08);transition:filter .15s,transform .15s}
+.hoofdactie:hover:not(:disabled){filter:brightness(1.12)}
+.hoofdactie:active:not(:disabled){transform:translateY(1px)}
+.hoofdactie span{flex:1;text-align:center}
+.hoofdactie b{font-size:1.7rem;font-weight:340}
+.hoofdactie:disabled{cursor:not-allowed;opacity:.38;filter:grayscale(1)}
+.stille-actie,.demoactie{width:100%;min-height:48px;border:0;background:none;color:#bbbcb8;cursor:pointer;font-weight:590;letter-spacing:.11em}
+.stille-actie:disabled{opacity:.35;cursor:not-allowed}
+.actiefkop{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.actiefkop h2{margin:.65rem 0 .4rem;font-size:clamp(1.35rem,5vw,2rem);line-height:1;text-transform:uppercase}
+.statuschip{padding:.42rem .55rem;border:1px solid var(--goud);color:var(--goud);font-size:.56rem;letter-spacing:.12em;white-space:nowrap}
+.fasebalk{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:1.25rem 0}
+.fasebalk i{height:3px;background:#353838}
+.fasebalk i.gedaan{background:var(--goud)}
+.ritkaart.leeg h2,.laadkaart h2{margin:.7rem 0 .45rem;font-size:1.45rem;text-transform:uppercase}
+.ritkaart.leeg p:last-child{margin:.3rem 0 0;color:var(--zacht);font-size:.82rem;line-height:1.6}
+.laadlijn{height:2px;margin-top:1.2rem;overflow:hidden;background:#292b2b}
+.laadlijn i{display:block;width:32%;height:100%;background:var(--goud);animation:laden 1s ease-in-out infinite}
+@keyframes laden{from{transform:translateX(-110%)}to{transform:translateX(330%)}}
+.foutkaart{border-color:#5a1830}
+.foutkaart::before{background:var(--rood)}
+
+.reservering{display:flex;align-items:center;gap:1.2rem;margin-top:1rem;padding:1.15rem 1.4rem}
+.reservering svg{width:38px;height:38px;fill:none;stroke:#bbbcb8;stroke-width:1.4;stroke-linecap:round}
+.reservering div{display:flex;flex-direction:column;gap:.35rem;min-width:0}
+.reservering small{color:var(--zacht);font-size:.62rem;letter-spacing:.14em}
+.reservering strong{font-size:.9rem;letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.pda-nav{position:fixed;z-index:90;left:50%;bottom:0;width:min(100%,760px);height:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;grid-template-columns:repeat(4,1fr);padding:0 .4rem env(safe-area-inset-bottom,0px);border-top:1px solid #343737;background:rgba(8,9,9,.97);backdrop-filter:blur(20px)}
+.pda-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.42rem;border:0;background:none;color:#969895;cursor:pointer;font-size:.58rem;letter-spacing:.08em}
+.pda-nav button::after{content:"";position:absolute;bottom:0;width:0;height:3px;background:var(--wijn);transition:width .16s}
+.pda-nav button.actief{color:var(--tekst)}
+.pda-nav button.actief::after{width:56%}
+.pda-nav svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.pda-nav button.actief svg{color:var(--wijn)}
+
+.bladkop{padding:.45rem 0 1.65rem;border-bottom:1px solid var(--lijn)}
+.bladkop h1{margin:.65rem 0 .45rem;font-size:clamp(2.35rem,9vw,4.2rem);line-height:.95;text-transform:uppercase}
+.bladkop span{color:var(--zacht);font-size:.8rem;line-height:1.55}
+.cijferraster{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:1.2rem 0;background:var(--lijn);border:1px solid var(--lijn)}
+.cijferraster article{min-width:0;padding:1.2rem .9rem;background:var(--paneel)}
+.cijferraster small,.cijferraster span{display:block;color:var(--zacht);font-size:.56rem;letter-spacing:.1em}
+.cijferraster strong{display:block;margin:.48rem 0 .2rem;overflow:hidden;text-overflow:ellipsis;font-size:clamp(1.05rem,4.5vw,1.55rem);white-space:nowrap}
+.lijstvak{margin-top:1rem;padding:1.25rem}
+.lijstkop{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--lijn);padding-bottom:.8rem}
+.lijstkop h2{margin:0;font-size:1rem;text-transform:uppercase;letter-spacing:.08em}
+.lijstkop button{min-height:40px;border:0;background:none;color:var(--goud);cursor:pointer;font-size:.6rem;letter-spacing:.12em}
+.logregel{display:grid;grid-template-columns:auto 1fr auto;gap:.85rem;align-items:center;padding:1rem 0;border-bottom:1px solid #282a2a}
+.logregel:last-child{border-bottom:0}
+.logregel>i{width:8px;height:8px;border-radius:50%;background:#686b68}
+.logregel.klaar>i{background:var(--groen)}
+.logregel div{min-width:0}
+.logregel b,.logregel span{display:block}
+.logregel b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem;text-transform:uppercase}
+.logregel span,.logregel time{color:var(--zacht);font-size:.64rem}
+.leegregel{margin:0;padding:1.4rem 0;color:var(--zacht);font-size:.8rem}
+
+.navigatiekaart{min-height:310px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:1.25rem 0 0;padding:2rem;text-align:center}
+.kompas{width:92px;height:92px;display:grid;place-items:center;margin-bottom:1.25rem;border:1px solid #414443;border-radius:50%;color:var(--goud)}
+.kompas svg{width:54px;height:54px;fill:none;stroke:currentColor;stroke-width:1.1}
+.navigatiekaart p{margin:0;color:var(--goud);font-size:.62rem;letter-spacing:.17em}
+.navigatiekaart h2{margin:.65rem 0 .6rem;font-size:1.5rem;text-transform:uppercase}
+.navigatiekaart>span{max-width:28rem;color:var(--zacht);font-size:.78rem;line-height:1.6}
+.navroute{width:100%;text-align:left}
+.navroute>div{display:grid;grid-template-columns:16px 1fr;gap:1rem;align-items:start;padding:1rem 0;border-bottom:1px solid #2b2d2d}
+.navroute i{width:10px;height:10px;margin-top:.25rem;border:2px solid var(--goud);border-radius:50%}
+.navroute div:last-child i{border-radius:1px;background:var(--goud)}
+.navroute small,.navroute b{display:block}
+.navroute small{margin-bottom:.35rem;color:var(--zacht);font-size:.55rem;letter-spacing:.14em}
+.navroute b{font-size:1rem;text-transform:uppercase}
+.privacyregel{margin:1rem 0 0;color:var(--zacht);font-size:.68rem;line-height:1.55;text-align:center}
+
+.hulpopties{display:grid;margin:1.2rem 0;border:1px solid var(--lijn);background:var(--paneel)}
+.hulpopties button{min-height:78px;display:grid;grid-template-columns:30px 1fr auto;gap:1rem;align-items:center;padding:1rem 1.1rem;border:0;border-bottom:1px solid var(--lijn);background:none;text-align:left;cursor:pointer}
+.hulpopties button:last-child{border-bottom:0}
+.hulpopties svg{width:27px;height:27px;fill:none;stroke:var(--goud);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.hulpopties span b,.hulpopties span small{display:block}
+.hulpopties span b{font-size:.83rem;text-transform:uppercase;letter-spacing:.04em}
+.hulpopties span small{margin-top:.3rem;color:var(--zacht);font-size:.65rem;line-height:1.4}
+.hulpopties em{color:var(--zacht);font-size:1.4rem;font-style:normal}
+.hulpopties .noodoptie svg{stroke:var(--rood)}
+.systeemkaart{padding:1.2rem}
+.systeemkaart>p{margin-bottom:.8rem;color:var(--goud)}
+.systeemkaart>div{display:flex;justify-content:space-between;gap:1rem;padding:.75rem 0;border-top:1px solid #292b2b;font-size:.72rem}
+.systeemkaart span{color:var(--zacht)}
+.systeemkaart strong{font-weight:600;text-align:right}
+.demoactie{margin-top:1rem;border:1px solid var(--goud);color:var(--goud)}
+
+dialog{max-height:calc(100dvh - 1.2rem);color:var(--tekst)}
+dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
+.ritdialoog{width:min(calc(100% - 1.2rem),700px);padding:0;border:1px solid #4a4d4c;background:#0c0e0e;box-shadow:0 28px 100px rgba(0,0,0,.75)}
+.dialoog-binnen{padding:1.55rem}
+.dialoog-binnen header,.veiligdialoog header,.nooddialoog header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding-bottom:1rem;border-bottom:1px solid var(--lijn)}
+.dialoog-binnen header p,.veiligdialoog header p,.nooddialoog header p{margin:0 0 .4rem;color:var(--goud);font-size:.62rem;letter-spacing:.16em}
+.dialoog-binnen header h2{margin:0;font-size:1.65rem;text-transform:uppercase}
+.dialoog-binnen header button,.veiligdialoog header button,.nooddialoog header button{width:44px;height:44px;border:1px solid var(--lijn);background:none;color:var(--tekst);cursor:pointer;font-size:1.5rem}
+.dialoogroute{display:grid;grid-template-columns:1fr auto 1fr;gap:.7rem;align-items:center;padding:1.3rem 0;font-size:clamp(1.15rem,5vw,1.75rem);font-weight:760;line-height:1.05;text-transform:uppercase}
+.dialoogroute span:last-child{text-align:right}
+.dialoogroute b{color:var(--goud);font-weight:350}
+.dialoog-binnen dl{margin:0;border-top:1px solid var(--lijn)}
+.dialoog-binnen dl div{display:flex;justify-content:space-between;gap:1rem;padding:.7rem 0;border-bottom:1px solid #292b2b;font-size:.74rem}
+.dialoog-binnen dt{color:var(--zacht)}
+.dialoog-binnen dd{margin:0;text-align:right;font-weight:620}
+.veiligheidsnoot{display:flex;gap:.8rem;margin:1rem 0 0;padding:.9rem;border:1px solid #323535;background:#101212}
+.veiligheidsnoot svg{flex:0 0 auto;width:24px;height:24px;fill:none;stroke:var(--groen);stroke-width:1.5}
+.veiligheidsnoot p{margin:0}
+.veiligheidsnoot b,.veiligheidsnoot span{display:block}
+.veiligheidsnoot b{font-size:.7rem;text-transform:uppercase}
+.veiligheidsnoot span{margin-top:.25rem;color:var(--zacht);font-size:.63rem;line-height:1.45}
+.veiligdialoog,.nooddialoog{width:min(calc(100% - 1.2rem),600px);padding:1.5rem;border:1px solid var(--lijn);background:#0c0e0e}
+.veiligdialoog h2,.nooddialoog h2{margin:1.2rem 0;font-size:1.45rem;line-height:1.15;text-transform:uppercase}
+.veiligdialoog ul{display:grid;gap:.75rem;margin:0;padding:0;list-style:none}
+.veiligdialoog li{display:flex;gap:.7rem;color:var(--zacht);font-size:.78rem}
+.veiligdialoog li b{color:var(--groen)}
+.nooddialoog>div>p{color:var(--zacht);font-size:.72rem;line-height:1.5}
+
+.toast{position:fixed;z-index:200;left:50%;bottom:calc(102px + env(safe-area-inset-bottom,0px));width:max-content;max-width:calc(100vw - 2rem);padding:.85rem 1rem;transform:translate(-50%,20px);border:1px solid #555854;background:var(--tekst);color:#080909;box-shadow:0 18px 50px rgba(0,0,0,.5);font-size:.73rem;font-weight:650;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+.toast.zichtbaar{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:540px){
+  .pda-kop{height:calc(72px + env(safe-area-inset-top,0px));padding-inline:1rem}
+  .rtg-merk{font-size:1.75rem}
+  .pda-identiteit strong{font-size:.65rem;letter-spacing:.18em}
+  .pda-identiteit small{display:none}
+  .veilig span{display:none}
+  .pda-blad{padding:1.65rem 1rem 1.5rem}
+  .beschikbaar-kop{display:block}
+  .verbinding{margin-top:.7rem;padding:0}
+  .klokpodium{min-height:262px;padding:1.15rem 0 1.3rem}
+  .klokhouder{--rtg-klok-maat:min(13.7rem,63vw)}
+  .ritkaart{padding:1.3rem 1.15rem}
+  .ritroute{gap:.48rem}
+  .hoofdactie{min-height:58px}
+  .cijferraster article{padding:1rem .55rem}
+  .reservering{padding:1rem}
+}
+
+@media (max-width:370px){
+  .beschikbaar-kop h1{font-size:1.82rem}
+  .klokpodium{min-height:238px}
+  .klokhouder{--rtg-klok-maat:12.2rem}
+  .ritroute{font-size:1.05rem}
+  .ritfeiten{font-size:.85rem}
+  .cijferraster{grid-template-columns:1fr}
+  .pda-nav span{font-size:.52rem}
+}
+
+@media (min-width:900px){
+  .pda{border-left:1px solid #232525;border-right:1px solid #232525}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}

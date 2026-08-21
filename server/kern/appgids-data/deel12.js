@@ -3,6 +3,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/chauffeur.html': G('RTG Chauffeur: de persoonlijke PDA voor veilige ritmeldingen, navigatie en iedere uitvoeringsfase van een vervoersopdracht.',
+    ['Bekijk de route, duur, afstand en vaste ritprijs voordat u een aanvraag aanneemt',
+      'Gebruik de grote faseknop voor vertrek, aankomst, instappen, rijden en voltooien',
+      'Deel positie alleen tijdens een levende rit; na afronding stopt de app automatisch'],
+    'De officiële RTG-klok en de rustige bediening helpen onderweg, maar de server bewaakt de waarheid: een ongeldige statusstap of rit van een andere vervoerder wordt geweigerd.'),
   '/apps/arrival.html': G('Invisible Arrival: een tijdelijke gastpas waarmee een zaak uw komst kan voorbereiden zonder uw route of GPS te volgen.',
     ['Vertel Rahul het moment, gezelschap en alleen de wensen die voor dit bezoek nodig zijn',
       'Controleer het voorstel voordat u de aanvraag verstuurt',

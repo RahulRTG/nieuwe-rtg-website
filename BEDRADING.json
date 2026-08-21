@@ -1,0 +1,100 @@
+{
+ "uitleg": "De bedradingsgraaf en zijn eigen onzekerheid. ONBEKEND MAG ALLEEN KRIMPEN -- zie test/bedrading.test.js en keuringsregel 59. Voor identity, money en security is de eis nul: daar mag geen enkele kant onbepaald zijn, want daar mag een impactzone nooit stilzwijgend te klein uitvallen.",
+ "hoe": "node scripts/check.js (regel 59)",
+ "gemeten": {
+  "opgelost": 3687,
+  "benaderd": 3,
+  "onbekend": 2
+ },
+ "vertrouwen": {
+  "identity": {
+   "opgelost": 67,
+   "benaderd": 0,
+   "onbekend": 0,
+   "totaal": 67,
+   "pct": 100
+  },
+  "algemeen": {
+   "opgelost": 3468,
+   "benaderd": 3,
+   "onbekend": 2,
+   "totaal": 3473,
+   "pct": 99.86
+  },
+  "security": {
+   "opgelost": 34,
+   "benaderd": 0,
+   "onbekend": 0,
+   "totaal": 34,
+   "pct": 100
+  },
+  "money": {
+   "opgelost": 118,
+   "benaderd": 0,
+   "onbekend": 0,
+   "totaal": 118,
+   "pct": 100
+  }
+ },
+ "onbekend": [
+  {
+   "bestand": "server/kern/spellen/register.js",
+   "lijn": 98,
+   "vorm": "path.join met een variabele",
+   "code": "const mod = require(path.join(map, naam))(ctx);",
+   "reden": "de map komt uit een variabele; welke bestanden erin zitten is pas op runtime bekend"
+  },
+  {
+   "bestand": "server/routes/office/register.js",
+   "lijn": 74,
+   "vorm": "kale variabele",
+   "code": "try { const m = require(b); if (m && m.CONTROL) uit.push(m.CONTROL); }",
+   "reden": "het pad staat in een variabele die van buiten dit bestand komt"
+  }
+ ],
+ "benaderd": [
+  {
+   "bestand": "server/kern/fiscaal/wereld.js",
+   "lijn": 17,
+   "voorvoegsel": "./wereld/",
+   "kandidaten": [
+    "server/kern/fiscaal/wereld/afrika.js",
+    "server/kern/fiscaal/wereld/amerika.js",
+    "server/kern/fiscaal/wereld/azie.js",
+    "server/kern/fiscaal/wereld/europa.js",
+    "server/kern/fiscaal/wereld/oceanie.js"
+   ],
+   "grens": null
+  },
+  {
+   "bestand": "server/kern/reis.js",
+   "lijn": 15,
+   "voorvoegsel": "./reis/",
+   "kandidaten": [
+    "server/kern/reis/afrika.js",
+    "server/kern/reis/amerika.js",
+    "server/kern/reis/azie.js",
+    "server/kern/reis/europa.js",
+    "server/kern/reis/oceanie.js"
+   ],
+   "grens": null
+  },
+  {
+   "bestand": "server/opzet/routes.js",
+   "lijn": 62,
+   "voorvoegsel": "../routes/",
+   "kandidaten": [
+    "server/routes/auth.js",
+    "server/routes/member.js",
+    "server/routes/office.js",
+    "server/routes/social.js",
+    "server/routes/staff.js",
+    "server/routes/supplier.js",
+    "server/routes/techniek.js",
+    "server/routes/wereld.js",
+    "server/routes/zakelijk.js"
+   ],
+   "grens": null
+  }
+ ]
+}

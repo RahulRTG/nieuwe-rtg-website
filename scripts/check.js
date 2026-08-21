@@ -4111,9 +4111,50 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
        PROOF-INCREMENTAL.md par. 3.2 -- known / potentially relevant /
        unresolved als GEMETEN grootheden, niet als gevoel. */
     ok(r.gekeken + ' bestanden, ' + r.kanten.opgelost + ' kanten opgelost, ' +
-      r.kanten.benaderd + ' benaderd, ' + r.kanten.onbekend.length + ' onbekend' +
+      r.kanten.benaderd.length + ' benaderd, ' + r.kanten.onbekend.length + ' onbekend' +
       ' -- geen enkele routemodule zonder pad vanaf een ingang');
-    for (const o of r.kanten.onbekend) console.log('  \x1b[2m  onbekend: ' + o + '\x1b[0m');
+    for (const o of r.kanten.onbekend) {
+      console.log('  \x1b[2m  onbekend: ' + o.bestand + ':' + o.lijn + '  [' + o.vorm + ']\x1b[0m');
+    }
+    for (const [g, b] of Object.entries(r.vertrouwen).sort()) {
+      console.log('  \x1b[2m  ' + g.padEnd(9) + String(b.pct).padStart(6) + '% exact' +
+        (b.onbekend ? '  (' + b.onbekend + ' onbekend)' : '') + '\x1b[0m');
+    }
+  }
+
+  /* DE RATEL, EN DE HARDE NUL VOOR DRIE GEBIEDEN.
+
+     Onbekende kanten zijn geen gewone technische schuld. Het zijn de GRENZEN
+     van wat dit systeem op dit moment veilig kan bewijzen, en daar hangt straks
+     een beslissing aan: over een onbekende kant mag geen bewijs worden geerfd,
+     dus dan moet de impactzone conservatief worden opgerekt
+     (PROOF-INCREMENTAL.md par. 3.2 en 7.3). Een onbekende die er stilletjes
+     bijkomt, maakt die zone dus stilletjes groter of -- erger -- wordt vergeten.
+
+     Voor identity, money en security is de eis NUL en geen ratel. Daar mag een
+     impactzone nooit te klein uitvallen omdat de graaf een kant niet kon
+     bepalen; liever een gebied dat weigert te groeien dan een gebied waar we
+     het niet zeker weten. */
+  {
+    const REG = path.join(ROOT, 'BEDRADING.json');
+    let oud = null;
+    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); } catch (e) { oud = null; }
+    if (!oud) {
+      fout('BEDRADING.json ontbreekt of is onleesbaar -- draai node scripts/check.js met een verse meting');
+    } else {
+      if (r.kanten.onbekend.length > oud.gemeten.onbekend) {
+        fout('de bedradingsonzekerheid groeit: ' + oud.gemeten.onbekend + ' -> ' +
+          r.kanten.onbekend.length + '. Los de nieuwe op, of leg de groei met een reden vast in BEDRADING.json');
+        for (const o of r.kanten.onbekend) fout('  ' + o.bestand + ':' + o.lijn + '  ' + o.reden);
+      }
+      for (const g of ['identity', 'money', 'security']) {
+        const b = r.vertrouwen[g];
+        if (b && b.onbekend) {
+          fout(g + ' heeft ' + b.onbekend + ' onbekende kant(en); daar is de eis nul --' +
+            ' een impactzone mag hier nooit te klein uitvallen');
+        }
+      }
+    }
   }
 }
 

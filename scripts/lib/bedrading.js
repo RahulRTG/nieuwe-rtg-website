@@ -253,6 +253,42 @@ function analyseer(bron, vanaf, pad) {
   return uit;
 }
 
+/* VERTROUWEN PER GEBIED, EN WAAROM DAT MOET.
+
+   Eén obscure maplader in de spellenmap mag niet betekenen dat het HELE
+   platform permanent in "onzeker" hangt. Wat je wilt kunnen zeggen is dit:
+
+       algemeen : 99,95%
+       identity : 100%
+       money    : 100%
+       security : 100%
+
+   Dan is een gevoelige capability aantoonbaar volledig begrepen, ook als er
+   ergens in een hoek nog onzekerheid zit -- en kan een planner daar later op
+   sturen in plaats van op één plat cijfer.
+
+   DE GRENZEN ZIJN PADEN EN GEEN GEVOEL. Ze staan hier bij elkaar zodat je ze
+   kunt lezen en betwisten; een gebied dat hier ontbreekt valt onder `algemeen`
+   en krijgt dus de zachte eis. Wie een nieuw geldpad maakt en het hier vergeet,
+   verliest de harde eis -- daarom worden deze drie ook in de keuring genoemd. */
+const GEBIEDEN = [
+  ['identity', [/^server\/accounts\//, /^server\/accounts\.js$/, /^server\/kern\/paspoort/,
+    /^server\/kern\/rtgid/, /^server\/routes\/auth\//, /^server\/kern\/identiteit/,
+    /^server\/kern\/vakbewijs/, /^server\/kern\/persoonseis/]],
+  ['money', [/^server\/kern\/pay\//, /^server\/kern\/commercie\//, /^server\/kern\/geld/,
+    /^server\/routes\/bank/, /^server\/routes\/betaal/, /^server\/routes\/member\/betalen/,
+    /^server\/kern\/facturatie/, /^server\/kern\/tegoed/]],
+  ['security', [/^server\/middleware\//, /^server\/kern\/bevoegdheid\//, /^server\/rem\.js$/,
+    /^server\/kern\/beveiliging\//, /^server\/kern\/stuur\//, /^server\/schild/]]
+];
+
+function gebiedVan(rel) {
+  for (const [naam, patronen] of GEBIEDEN) {
+    for (const p of patronen) if (p.test(rel)) return naam;
+  }
+  return 'algemeen';
+}
+
 function meet(mappen) {
   const alle = [];
   for (const m of mappen || ['server']) bestanden(path.join(WORTEL, m), alle);
@@ -268,14 +304,21 @@ function meet(mappen) {
    Een graaf die zegt "nul onzekerheden" moet dat kunnen bewijzen; daarom staan
    deze drie getallen in de uitslag en niet alleen het eindoordeel. */
   const kanten = { opgelost: 0, benaderd: [], onbekend: [] };
+  const perGebied = {};
   for (const f of alle) {
     let bron;
     try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { continue; }
-    const r = analyseer(bron, f, path.relative(WORTEL, f));
+    const rel = path.relative(WORTEL, f).replace(/\\/g, '/');
+    const r = analyseer(bron, f, rel);
     for (const d of r.ingeladen) ingeladen.add(d);
     kanten.opgelost += r.opgelost;
     kanten.benaderd.push(...r.benaderd);
     kanten.onbekend.push(...r.onbekend);
+    const g = gebiedVan(rel);
+    const bak = perGebied[g] || (perGebied[g] = { opgelost: 0, benaderd: 0, onbekend: 0 });
+    bak.opgelost += r.opgelost;
+    bak.benaderd += r.benaderd.length;
+    bak.onbekend += r.onbekend.length;
   }
 
   /* De ingangen zelf worden door niemand ge-require'd en zijn dat ook niet:
@@ -293,7 +336,16 @@ function meet(mappen) {
     wezen.push(rel);
   }
 
-  return { gekeken: alle.length, kanten, wezen: wezen.sort() };
+  /* Het vertrouwen per gebied: welk deel van de kanten daar EXACT is opgelost.
+     Benaderd telt bewust niet als opgelost -- conservatief is niet hetzelfde als
+     zeker, en dit getal moet het verschil laten zien. */
+  const vertrouwen = {};
+  for (const [g, b] of Object.entries(perGebied)) {
+    const totaal = b.opgelost + b.benaderd + b.onbekend;
+    vertrouwen[g] = { ...b, totaal,
+      pct: totaal ? Math.round((b.opgelost / totaal) * 10000) / 100 : 100 };
+  }
+  return { gekeken: alle.length, kanten, vertrouwen, wezen: wezen.sort() };
 }
 
 module.exports = { meet, los, analyseer, vormVan, redenVan };

@@ -20,7 +20,12 @@ const { maakPoorten } = require('./school/poorten');
 
 module.exports = (ctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-    teVaak, misluktePoging, ipVan } = ctx;
+    teVaak, misluktePoging, ipVan,
+    /* onderwijs en leerstof zijn GETTERS (zie de opmerking bij setOnderwijs in
+       foundation.js): bij het opstarten bestaat die kern nog niet. Ze stonden
+       hier niet, en dus ook niet in sctx hieronder -- waardoor school/bewijs.js
+       altijd 503 gaf en een becijferde toets nooit in het leerpaspoort landde. */
+    onderwijs, leerstof, rtfHandle } = ctx;
 
   function K() {
     const f = F();
@@ -61,7 +66,8 @@ module.exports = (ctx) => {
      levert gemiddelde() aan de gezinslaag via die context. */
   const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
     teVaak, misluktePoging, ipVan,
-    eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief };
+    eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief,
+    onderwijs, leerstof, rtfHandle };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
   require('./school/directie')(sctx); // golf 3: de directie-cockpit op kantoren-niveau

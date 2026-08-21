@@ -101,8 +101,22 @@ function setOnderwijs(o, l) { onderwijsKern = o; if (l) leerstofKern = l; }
 
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
+/* DE DRIE DIE HIER ONTBRAKEN. school/toets.js en school/bewijs.js vragen om
+   `onderwijs` en `rtfHandle`, school/les.js om `leerstof` -- en geen van drieen
+   werd doorgegeven. Het gevolg was stil en compleet: /school/bewijs/leerling
+   antwoordde altijd 503 ("het leerpaspoort is nu niet bereikbaar"), en een
+   becijferde toets kwam nooit in het leerpaspoort terecht, want
+   bewijsNaarPaspoort() geeft 0 terug zodra de kern ontbreekt. Dat is precies
+   het geval dat die functie bedoelde op te vangen bij het OPSTARTEN, en het
+   duurde tot na de samenvoeging voordat iemand zag dat het altijd zo was.
+
+   `onderwijs` en `leerstof` gaan als GETTER mee en niet als waarde: bij het
+   opstarten zijn ze er nog niet (server.js roept setOnderwijs() later aan), en
+   een school die dan al draait hoort niet om te vallen maar het bewijs over te
+   slaan. Zie de opmerking bij setOnderwijs hierboven. */
 require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-  teVaak, misluktePoging, ipVan });
+  teVaak, misluktePoging, ipVan,
+  onderwijs: () => onderwijsKern, leerstof: () => leerstofKern, rtfHandle });
 
 /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 

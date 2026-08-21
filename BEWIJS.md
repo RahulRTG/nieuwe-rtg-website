@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1233 bestanden en 8512 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1234 bestanden en 8515 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1233 |
-| losse beweringen (`test(...)`) | 8512 |
+| toetsbestanden | 1234 |
+| losse beweringen (`test(...)`) | 8515 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 943 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 41 |
 | alleen in de kop *genoemd*, nog niet gemeten | 60 |
-| niets van beide | 179 |
+| niets van beide | 180 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1119,7 +1119,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-154 bestanden, 266 beweringen.
+155 bestanden, 269 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1204,6 +1204,7 @@ toets omvalt.
 | `metgezelwijkt.e2e.js` | 1 | -- | RAHUL BLIJFT BEREIKBAAR, MAAR LIGT NOOIT BOVEN EEN GEOPEND VENSTER. Het blok van de metgezel staat op z-index 9980 en zweeft daarmee boven vrijwel elk venster in dit huis (de bladen van Clips staan op 10, de... |
 | `metier.e2e.js` | 1 | -- | Scherm-test voor Métier. De unit-toetsen (test/metier.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet, en vooral dat het signatuurstuk zichtbaar werkt: je kaart bewaren, de bevestigde rol met... |
 | `mobiliteitscherm.e2e.js` | 5 | -- | Scherm-toets op het Mobility OS: leggen de twee schermen de weg werkelijk af? WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst dat de API klopt. |
+| `nieuwe-schermen.e2e.js` | 3 | -- | DRIE SCHERMEN DIE MET DE VERZAMELING MEEKWAMEN, EN DIE NOG NOOIT EEN BROWSER HADDEN GEZIEN. RTG Festival bracht twee schermen mee (het organisatiescherm en de gastenkant) en RTG Reizen een derde (de klaargezette reis). |
 | `notities.e2e.js` | 1 | -- | Scherm-test voor Notities & Taken: een lijst bouwen met Enter, bewaren, afvinken op de kaart zelf (zonder de editor te openen), delen op codenaam en de andere kant die meteen mee kan doen. |
 | `objectpaneel.e2e.js` | 1 | genoemd | Schermtoets voor het objectpaneel op RTG Sociaal (LIFE.md fase 2). Deze toets bewaakt EEN ding, en het is de reden dat de objectlaag bestaat: het scherm kent geen enkele cap bij naam. |
 | `office-blad.e2e.js` | 1 | -- | Scherm-test voor het rekenblad van RTG Office. test/rekenmotor.test.js bewijst dat de motor rekent; deze bewijst dat een mens er ook bij kan. |

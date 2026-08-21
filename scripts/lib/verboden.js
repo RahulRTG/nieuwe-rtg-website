@@ -21,10 +21,7 @@
 
    Zie PROOF-INCREMENTAL.md par. 4.
    ========================================================================== */
-const fs = require('fs');
-const path = require('path');
-
-const WORTEL = path.join(__dirname, '..', '..');
+const { index, codeRegelsUit } = require('./werkelijkheid');
 
 /* ---------------------------------------------------------------- de regels */
 
@@ -90,37 +87,12 @@ const REGELS = [
 
 /* ------------------------------------------------------------ de uitvoering */
 
-const COMMENTAARREGEL = /^\s*(?:\/\/|\*|\/\*)/;
-
-/* COMMENTAAR TELT NIET MEE, en die les is duur betaald: bij het bouwen van
-   scripts/lib/bedrading.js meldde de eerste versie twee koppen als bevinding,
-   en de tweede versie at met een te grove stripper een echte regel op. Vandaar
-   hier de lichtste vorm: per regel kijken, met de blokstaat meegelopen omdat
-   een kop in dit huis over tien regels doorloopt. */
-function codeRegels(bron) {
-  const uit = [];
-  let inBlok = false;
-  const regels = bron.split('\n');
-  for (let i = 0; i < regels.length; i++) {
-    const r = regels[i];
-    if (inBlok) { if (r.includes('*/')) inBlok = false; continue; }
-    if (r.includes('/*') && !r.includes('*/')) { inBlok = true; continue; }
-    if (COMMENTAARREGEL.test(r)) continue;
-    uit.push([i + 1, r]);
-  }
-  return uit;
-}
-
-function bestanden(map, uit) {
-  let rij;
-  try { rij = fs.readdirSync(map, { withFileTypes: true }); } catch (e) { return uit; }
-  for (const n of rij) {
-    const p = path.join(map, n.name);
-    if (n.isDirectory()) { if (n.name !== 'node_modules' && n.name !== 'dist') bestanden(p, uit); }
-    else if (n.name.endsWith('.js')) uit.push(p);
-  }
-  return uit;
-}
+/* COMMENTAAR TELT NIET MEE, en die les is duur betaald: bij het bouwen van de
+   bedradingsanalyser meldde de eerste versie twee koppen als bevinding, en de
+   tweede versie at met een te grove stripper een echte regel op. Het antwoord op
+   die vraag staat nu op EEN plek -- codeRegelsUit() in lib/werkelijkheid.js --
+   en niet meer in drie scanners met elk hun eigen versie ervan. Dat verschil was
+   zelf de bron van drie meetfouten. */
 
 function past(patronen, rel) {
   for (const [p, reden] of patronen) if (p.test(rel)) return reden;
@@ -131,39 +103,40 @@ function past(patronen, rel) {
    daar? Een overtreding draagt de regel, het bestand, het regelnummer en de
    reden waarom het daar niet hoort -- want een melding zonder reden wordt
    weggeklikt. */
-function meet(mappen) {
-  const alle = [];
-  for (const m of mappen || ['server', 'public']) bestanden(path.join(WORTEL, m), alle);
+function meet(mappen, klaarIndex) {
+  const waar = mappen || ['server', 'public'];
+  const ix = klaarIndex || index(waar);
+  const binnen = (rel) => waar.some((m) => rel === m || rel.startsWith(m + '/'));
 
   const overtredingen = [];
   const gedekt = {};
   for (const regel of REGELS) gedekt[regel.id] = { mag: 0, geraakt: 0 };
+  let gekeken = 0;
 
-  for (const f of alle) {
-    const rel = path.relative(WORTEL, f).replace(/\\/g, '/');
-    let bron;
-    try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { continue; }
+  for (const b of ix.bestanden.values()) {
+    if (!binnen(b.pad)) continue;
+    gekeken++;
 
     for (const regel of REGELS) {
-      if (!regel.zoek.test(bron)) continue;                 // raakt dit niet: klaar
-      const treffers = codeRegels(bron).filter(([, r]) => regel.zoek.test(r));
-      if (!treffers.length) continue;                        // stond alleen in commentaar
+      if (!regel.zoek.test(b.bron)) continue;                 // raakt dit niet: klaar
+      const treffers = b.code.filter(([, r]) => regel.zoek.test(r));
+      if (!treffers.length) continue;                          // stond alleen in commentaar
       gedekt[regel.id].geraakt++;
 
-      const toegestaan = past(regel.mag, rel);
+      const toegestaan = past(regel.mag, b.pad);
       if (toegestaan) { gedekt[regel.id].mag++; continue; }
 
-      const verboden = past(regel.nooit, rel) ||
+      const verboden = past(regel.nooit, b.pad) ||
         'staat niet op de toestemmingslijst van deze regel';
       overtredingen.push({
         regel: regel.id, werkwoord: regel.werkwoord, wat: regel.wat,
-        bestand: rel, lijn: treffers[0][0], code: treffers[0][1].trim().slice(0, 90),
+        bestand: b.pad, lijn: treffers[0][0], code: treffers[0][1].trim().slice(0, 90),
         reden: verboden
       });
     }
   }
 
-  return { gekeken: alle.length, regels: REGELS.length, gedekt, overtredingen };
+  return { gekeken, regels: REGELS.length, gedekt, overtredingen };
 }
 
-module.exports = { meet, REGELS, codeRegels };
+module.exports = { meet, REGELS, codeRegels: codeRegelsUit };

@@ -4095,10 +4095,19 @@ console.log('\n58) geen ronde hoeken: elke border-radius is 0, behalve een echte
    MUTATIE (RAAK): haal de mountregel van office/rendezvous uit routes/office.js
    -> deze regel meldt dat bestand bij naam.
    ========================================================================== */
+/* DE REALITY INDEX -- EEN wandeling, EEN leesronde, EEN antwoord op de
+   commentaarvraag. Regel 59 en 60 stellen verschillende vragen over dezelfde
+   feiten; ze horen die feiten niet elk apart op te halen. Zie
+   PROOF-INCREMENTAL.md stap 1: drie scanners met elk een eigen boomwandeling was
+   niet alleen traag, het was de bron van drie van de vier meetfouten die bij het
+   bouwen van deze twee poorten zijn gemaakt -- want elke kopie had zijn eigen
+   antwoord op de vraag wat commentaar is. */
+const WERKELIJKHEID = require('./lib/werkelijkheid').index(['server', 'public']);
+
 console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen');
 {
   const { meet } = require('./lib/bedrading');
-  const r = meet(['server']);
+  const r = meet(['server'], WERKELIJKHEID);
   if (r.wezen.length) {
     for (const w of r.wezen.slice(0, 12)) {
       fout('registreert routes maar wordt nergens ingeladen: ' + w +
@@ -4180,7 +4189,7 @@ console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen'
 console.log('\n60) de verboden graaf: geen enkel pad dat er niet mag zijn');
 {
   const { meet } = require('./lib/verboden');
-  const r = meet(['server', 'public']);
+  const r = meet(['server', 'public'], WERKELIJKHEID);
   if (r.overtredingen.length) {
     for (const o of r.overtredingen.slice(0, 12)) {
       fout(o.werkwoord + ' geschonden (' + o.regel + '): ' + o.bestand + ':' + o.lijn +

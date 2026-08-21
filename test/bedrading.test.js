@@ -3,8 +3,9 @@
 
    WAAROM DIT BESTAND ZWAARDER WEEGT DAN EEN GEWONE TOETS.
 
-   scripts/lib/bedrading.js beantwoordt de vraag "is er een pad van een ingang
-   naar dit bestand", en keuringsregel 59 laat de bouw daarop zakken. In de
+   scripts/lib/werkelijkheid.js beantwoordt de vraag "welke bestanden laadt dit
+   bestand in", en keuringsregel 59 laat de bouw zakken zodra daar een
+   routemodule buiten valt. In de
    richting die PROOF-INCREMENTAL.md beschrijft mag deze laag straks méér: hij
    gaat bepalen welke bewijzen NIET opnieuw hoeven. Een analyser die dat mag
    zeggen, hoort tot de zwaarst getoetste code van dit huis -- want elke fout
@@ -19,7 +20,7 @@
      - een SAMENGESTELDE require met een letterlijke lijst ernaast;
      - path.join met een letterlijk pad, dat geen onbekende is maar een omweg.
 
-   DE MUTATIE VOOR DIT BESTAND: haal in bedrading.js de blokcommentaar-staat
+   DE MUTATIE VOOR DIT BESTAND: haal in werkelijkheid.js de blokcommentaar-staat
    weg -> "een doorlopende kop telt niet mee" zakt.
    ========================================================================== */
 'use strict';
@@ -28,7 +29,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { analyseer, los, vormVan, meet } = require('../scripts/lib/bedrading');
+const { kantenUit, codeRegelsUit, los, vormVan } = require('../scripts/lib/werkelijkheid');
+const { meet } = require('../scripts/lib/bedrading');
 
 /* Een echte map met echte bestanden, want `los` raakt de schijf: een require
    telt pas als opgelost wanneer het doel BESTAAT. Dat is de hele reden dat
@@ -42,13 +44,18 @@ for (const f of ['kern/zorg.js', 'kern/wacht/index.js', 'routes/auth.js',
   fs.writeFileSync(path.join(TMP, f), '// leeg\n');
 }
 const HIER = path.join(TMP, 'ingang.js');
-const kijk = (bron) => analyseer(bron, HIER, 'ingang.js');
+const kijk = (bron) => {
+  const r = kantenUit(bron, codeRegelsUit(bron), HIER, 'ingang.js');
+  /* `opgelost` is in de index een LIJST van doelen en geen teller -- die lijst
+     is wat een impactvraag nodig heeft. Hier houden we beide bij de hand. */
+  return { ...r, aantal: r.opgelost.length, ingeladen: new Set(r.opgelost) };
+};
 
 test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 test('een letterlijke require telt als opgelost, en wijst naar het echte bestand', () => {
   const r = kijk("const z = require('./kern/zorg');\n");
-  assert.equal(r.opgelost, 1);
+  assert.equal(r.aantal, 1);
   assert.equal(r.onbekend.length, 0);
   assert.ok([...r.ingeladen].some((p) => p.endsWith('kern/zorg.js')));
 });
@@ -57,19 +64,19 @@ test('een map met index.js wordt opgelost, net als Node dat doet', () => {
   /* Dit was een echte misser: vier schoolmodules leken ongemount tot bleek dat
      hun ouder ze als map inlaadt. */
   const r = kijk("require('./kern/wacht');\n");
-  assert.equal(r.opgelost, 1);
+  assert.equal(r.aantal, 1);
   assert.ok([...r.ingeladen].some((p) => p.endsWith('wacht/index.js')));
 });
 
 test('een require naar iets dat niet bestaat, telt nergens mee', () => {
   const r = kijk("require('./kern/bestaatniet');\n");
-  assert.equal(r.opgelost, 0);
+  assert.equal(r.aantal, 0);
   assert.equal(r.ingeladen.size, 0);
 });
 
 test('een kernmodule is geen kant in deze graaf', () => {
   const r = kijk("const fs = require('fs');\nconst path = require('node:path');\n");
-  assert.equal(r.opgelost, 0);
+  assert.equal(r.aantal, 0);
   assert.equal(r.onbekend.length, 0);
 });
 

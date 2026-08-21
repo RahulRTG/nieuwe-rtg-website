@@ -18,7 +18,8 @@
   var MARGE = 64;   // hoe dicht bij de rand voordat er gedockt wordt
 
   var schil = {
-    vak: null, console: null, tabs: null, dok: null,
+    vak: null, console: null, tabs: null, dok: null, onderbalk: null,
+    apps: [], dockApps: [],
     surfaces: [],       // { id, naam, el, zoom }
     actief: null,
     huidigeContext: null,

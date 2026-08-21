@@ -18,8 +18,16 @@
     return (s.items || []).concat(s.gedeeld || []).find(function (x) { return x.id === id; }) || null;
   }
   function toon(id) {
-    open = vind(id);
-    if (!open) return;
+    /* EERST ZOEKEN, DAN PAS ZETTEN. Hier stond `open = vind(id); if (!open) return;`
+       -- en dat wist de staat van een paneel dat gewoon openstond zodra vind()
+       even niets vond (de lijst wordt herladen, en dan is stand().items een tel
+       lang leeg). Het scherm bleef open, `open` werd null, en de voorvertoning
+       die onderweg was zag `!open` en hield op: een tekstbestand opende zonder
+       ooit zijn inhoud te tonen. Een mislukte opzoeking hoort niets kapot te
+       maken; hij hoort niets te doen. */
+    var gevonden = vind(id);
+    if (!gevonden) return;
+    open = gevonden;
     $('#bkNaam').value = open.naam;
     $('#bkNaam').readOnly = !open.vanMij;
     $('#bkMeta').textContent = (open.mime || '') + ' · ' + B().maat(open.bytes) +

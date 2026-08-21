@@ -43,8 +43,13 @@ const OPEN = [
   { app: 'pulse', eist: /volgend|ontdek|mijn plank/i },
   { app: 'thuis', eist: /van lid aan lid|logeren bij leden/i },
   { app: 'stad', eist: /voor bewoners|hoe de stad/i },
-  { app: 'horloge', eist: /signatuur|skelet|horloge/i },
-  { app: 'uitzicht', eist: /skyline|het huis in de nacht/i },
+  /* horloge en uitzicht stonden hier tot 19 augustus 2026. Commit 261f1f83
+     ("Elf schermen waren nergens vandaan te bereiken; twee zijn weg") haalde die
+     twee pagina's weg maar liet deze lijst staan, en dan eist een toets een
+     scherm dat met opzet niet meer bestaat: 404, en de melding luidt "zegt niet
+     waar het voor is" terwijl er helemaal niets meer is. Het horloge leeft nog
+     wel, maar alleen op het inlogscherm (WERELD.md), en dat is geen ledenscherm
+     met een eigen pagina. */
   { app: 'browser', eist: /browser|rtg:\/\//i },
   { app: 'lesmaker', eist: /les|maker|opdracht/i },
   { app: 'pakketten', eist: /pakket|zending|bezorg/i }

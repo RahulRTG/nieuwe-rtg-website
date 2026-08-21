@@ -1782,13 +1782,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        Wat hem beschermt staat er wel: drie remmen (per adres+account, per
        adres, per doelwit), een vertraging bij een belaagd account, en een regel
        in het beveiligingsjournaal bij elke mislukte poging. */
-    /* /api/auth/login STOND HIER, met de reden "dit IS de deur: wie inlogt heeft
-       nog geen sessie". Die uitzondering is op 20 augustus 2026 vervallen omdat
-       de route sinds deze ronde zelf een 401 geeft bij verkeerde gegevens, en
-       deze regel dat als een poort in de handler telt. De bescherming is niet
-       minder geworden maar meer: drie remmen (adres, account, doelwit), een
-       vertraging bij een belaagd account, en een regel in het
-       beveiligingsjournaal bij elke mislukte poging. */
+    /* Hij is hier op 20 augustus 2026 nog even AF geweest, met als reden dat de
+       401 in de handler als poort telt. Dat is de heuristiek waarvoor het blok
+       hierboven juist waarschuwt, en het ging binnen een dag opnieuw mis: toen
+       de doelemmer zijn vertraging terugkreeg, schoof de 401 weer buiten het
+       venster van achthonderd tekens en meldde deze regel een gat waar niets
+       was veranderd aan wie er binnenkomt. De naam blijft dus staan. */
+    ['/api/auth/login', 'dit IS de deur: wie inlogt heeft nog geen sessie; drie remmen, een vertraging bij een belaagd account en het beveiligingsjournaal beschermen hem'],
     /* Dezelfde deur, andere sleutel. /api/webauthn/opties staat hierboven al op
        de lijst met "het bewijs volgt bij /login" -- dit is dat /login. Het
        bewijs zit in het verzoek: een handtekening over de uitdaging die de

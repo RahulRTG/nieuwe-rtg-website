@@ -21,7 +21,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, klikEnWacht } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, wachtOpTekst, klikEnWacht, wachtOpNetstilte } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -276,6 +276,24 @@ test('Living Lab: een mens loopt de hele cyclus af in de app zelf',
       return !!gekozen && /Toetsstad/.test(gekozen.textContent || '');
     }, null, { wat: 'de keuzelijst die op het nieuwe lab staat' });
     await deel('labbeheer');
+    /* EERST DE PAGINA LATEN UITPRATEN. Het labbeheer wordt hertekend door
+       herlaad(), en dat zijn vier verzoeken die parallel lopen; het laatste
+       antwoord landt tientallen tot honderden milliseconden later. Zo'n
+       hertekening zet `#beheer` opnieuw met innerHTML, en dan is het naamveld
+       dat hier net is ingevuld een NIEUW, leeg veld.
+
+       Het beeld klopte tot op het laatste moment: vlak voor de klik stond de
+       naam er nog, het veld was verbonden en er was maar één `#beheer`. De klik
+       stuurde toch `naam:""` en de server antwoordde 400 -- "Wie is dit? Een
+       handtekening draagt altijd een naam." De hertekening landde IN de klik:
+       Playwright kijkt eerst of het element zichtbaar en stil is, scrolt, en
+       klikt dan, en in dat venster was het veld al vervangen. Vandaar dat dit
+       op een drukke machine zakte en los meestal doorging.
+
+       Deze wacht haalt de oorzaak weg in plaats van er een marge omheen te
+       leggen: pas als er niets meer onderweg is, kan er ook niets meer
+       hertekenen. */
+    await wachtOpNetstilte(page);
     let tekenaars = 0;
     for (const [naam, rol, onaf] of [['Dr. Vermeer', 'professional', false], ['Prof. Aziz', 'reviewer', true], ['M. de Wit', 'toezichthouder', false]]) {
       await page.fill('#beheer [data-tknaam]', naam);

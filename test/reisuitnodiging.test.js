@@ -26,8 +26,10 @@ const { startServer, stop, keurLidGoed } = require('./helper');
 const dag = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
 let srv, base, kantoor, klant, genoot;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitnodiging-'));
-const post = (pad, body, token) => fetch(base + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+const post = (pad, body, token, idem) => fetch(base + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json',
+    ...(token ? { Authorization: 'Bearer ' + token } : {}),
+    ...(idem ? { 'Idempotency-Key': idem } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const nieuwLid = async (naam) => {
@@ -129,8 +131,14 @@ test('3. wie de link opent kan lid worden en de reis overnemen', async () => {
   assert.equal(reis.telling.onderdelen, 2);
   assert.deepEqual(reis.herkomsten, ['document'], 'de herkomst van het onderdeel blijft staan, niet die van het transport');
 
-  // en een link werkt maar een keer
-  assert.equal((await post('/api/reis/uitnodiging/eisop', { code: CODE }, klant)).status, 409);
+  /* EN EEN LINK WERKT MAAR EEN KEER -- maar dan moet het wel een tweede POGING
+     zijn en geen dubbeltik. Opeisen staat in lib/idemsleutels-werelden.js als
+     `zelfdeVerzoek`: twee woordelijk gelijke verzoeken binnen seconden zijn een
+     dubbelklik, en dan hoort de tweede het eerste antwoord terug te krijgen in
+     plaats van een fout. Precies wat die laag moet doen. Een bewuste tweede
+     poging draagt daarom een eigen Idempotency-Key, zoals een echte client. */
+  assert.equal((await post('/api/reis/uitnodiging/eisop', { code: CODE }, klant,
+    'tweede-poging-eisop')).status, 409);
   const dicht = await post('/api/reis/uitnodiging/open', { code: CODE }, null);
   assert.equal(dicht.body.uitnodiging.open, false);
   assert.match(dicht.body.uitnodiging.reden, /al gebruikt/i);

@@ -131,7 +131,21 @@ function sleutelVan(req) {
    zijn eigen, veel langere venster. */
 function verklaardeSleutel(req) {
   const v = sleutelVoor(req.method, req.path || req.url || '');
-  if (!v || v.nietIdempotent) return null;
+  /* `leest` HOORT HIER NET ZO HARD UIT ALS `nietIdempotent`, en dat stond er
+     niet. De verklaring van { leest: true } luidt met zoveel woorden "de poort
+     doet hier niets": een POST die niets verandert valt niets te dedupliceren.
+     Zonder deze regel kreeg zo'n route toch een verklaarde sleutel, en dus werd
+     hij binnen het venster HERHAALD -- met het antwoord van de vorige keer.
+
+     Dat is geen theoretisch lek. /api/reis/reizen en /api/reis/invoer/mijn
+     staan allebei als `leest` verklaard; een lid dat een reisonderdeel
+     bevestigde en meteen zijn reizen opvroeg, kreeg de LEGE lijst van ervoor
+     terug -- met `herhaald: true` erin, waar niemand naar keek. Vier toetsen in
+     test/invoer.test.js en drie in test/reisactiviteiten.test.js zakten hierop,
+     en in de app zou het lezen als "mijn boeking is niet aangekomen".
+
+     28 van de 85 verklaringen zeggen `leest`. Ze deden alle 28 hetzelfde. */
+  if (!v || v.nietIdempotent || v.leest) return null;
   const body = req.body && typeof req.body === 'object' ? req.body : {};
   if (v.velden) {
     const uit = {};

@@ -149,7 +149,15 @@ test('4. de zekerheden komen van de lezer, niet van de aanvrager', async () => {
   assert.equal(datumveld.waarde, '2030-01-01');
   assert.equal(datumveld.hoe, 'mens', 'wat een mens zet, heet "mens" en niet "bcbp"');
   assert.equal(datumveld.zekerheid, 1, 'de zekerheid zet de server, niet de aanvrager');
-  assert.equal(datumveld.gelezen, '2026-08-14', 'en wat de lezer ervan maakte blijft ernaast staan');
+  /* Hier stond '2026-08-14' met de hand ingetikt, en dat was een tijdbom. Het
+     jaar staat NIET in een boardingpass: de barcode geeft dagnummer 226 en de
+     lezer leidt het jaar af (toets 1 hierboven meet dat, mét een vaste
+     `vandaag`). Zodra 14 augustus voorbij is, leidt hij terecht het VOLGENDE
+     jaar af -- en dan zakt deze regel op iets wat goed gaat. Waar het hier om
+     gaat is dat de lezing bewaard blijft naast wat de mens erover zei, dus
+     vragen we de lezer wat hij ervan maakte in plaats van het te verzinnen. */
+  assert.equal(datumveld.gelezen, pasLees.body.voorstel.velden.van_datum.waarde,
+    'en wat de lezer ervan maakte blijft ernaast staan');
 
   // een onzin-waarde levert geen datum op, en dan gaat het onderdeel niet door
   const rommel = await post('/api/reis/invoer/lees', { tekst: PAS }, lid);

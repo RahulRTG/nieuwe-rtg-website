@@ -22,6 +22,18 @@ module.exports = (kern) => {
   require('./office/werk')(octx);
   require('./office/bewaarverzoek')(octx);
   require('./office/concierge')(octx);
+  /* THE TABLE: het kantoor stelt een tafel samen op codenaam. Curatie is
+     mensenwerk en dit is de enige plek waar een tafel ontstaat; zie
+     ./office/rendezvous.js en ONTMOETEN.md.
+
+     DEZE REGEL WAS BIJ DE SAMENVOEGING WEGGEVALLEN. Het bestand stond er nog,
+     de kern eronder ook, en alle drie zijn adressen gaven 404 -- "Onbekend
+     eindpunt". Vier toetsen in test/rendezvous.test.js zakten daarop, en geen
+     enkele meting zag het: een module die niemand inlaadt heeft geen dekking
+     om te verliezen. Gevonden door de routes die de BRON noemt te vergelijken
+     met de routes die de ROUTER registreert (test/magnaat-capabilities.test.js
+     doet dat al voor de andere kant van hetzelfde gat). */
+  require('./office/rendezvous')(octx);
   /* De routedekking: welke routes dit huis heeft en of ze beproefd zijn, voor
      het personeel na te kijken in plaats van alleen in een terminal. Zie
      ./office/dekking.js. */

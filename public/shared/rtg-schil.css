@@ -203,22 +203,13 @@ body[data-rtg-schil="standaard"] .console-werelden{
 body[data-rtg-schil="standaard"] .console-werelden .bloknaam{display:none;}
 body[data-rtg-schil="standaard"] .console-werelden .rijtje{display:flex;flex-direction:column;gap:3px;}
 body[data-rtg-schil="standaard"] .console-werelden .rijtje button{
-  position:relative;width:100%;min-height:48px;display:flex;align-items:center;text-align:left;
+  position:relative;width:100%;min-height:48px;display:flex;align-items:center;text-align:left;gap:.7rem;
   border:1px solid transparent;border-bottom-color:rgba(255,255,255,.045);border-radius:7px;
-  padding:.6rem .7rem .6rem 2.45rem;color:var(--rtg-muted);font-size:.78rem;white-space:nowrap;
+  padding:.6rem .72rem;color:var(--rtg-muted);font-size:.78rem;white-space:nowrap;
 }
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button::before{
-  content:'◇';position:absolute;left:.8rem;width:1rem;text-align:center;color:var(--rtg-soft);font-size:.92rem;
-}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:first-child::before{content:'⌂';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(2)::before{content:'▣';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(3)::before{content:'○';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(4)::before{content:'□';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(5)::before{content:'◫';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(6)::before{content:'◇';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(7)::before{content:'▤';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(8)::before{content:'◈';}
-body[data-rtg-schil="standaard"] .console-werelden .rijtje button:nth-child(9)::before{content:'✦';}
+body[data-rtg-schil="standaard"] .app-kort{display:none;flex:0 0 1.55rem;color:rgba(201,162,75,.68);
+  font-size:.58rem;font-weight:650;letter-spacing:.1em;font-variant-numeric:tabular-nums;}
+body[data-rtg-schil="standaard"] .app-label{overflow:hidden;text-overflow:ellipsis;}
 body[data-rtg-schil="standaard"] .console-werelden .rijtje button:hover,
 body[data-rtg-schil="standaard"] .console-werelden .rijtje button:focus-visible{
   border-color:rgba(127,22,52,.45);background:rgba(127,22,52,.12);color:var(--rtg-txt);
@@ -244,7 +235,8 @@ body[data-rtg-schil="standaard"] .console-ruimtes .bewaar{
 }
 body[data-rtg-schil="standaard"] .rtg-tabbar{
   position:absolute;box-sizing:border-box;display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;
-  background:#090908;border-bottom:1px solid var(--rtg-line);z-index:55;
+  background:rgba(10,10,9,.97);border-bottom:1px solid var(--rtg-line);z-index:55;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);scrollbar-width:none;
 }
 body[data-rtg-schil="standaard"] .rtg-tab{
   min-width:170px;max-width:220px;display:grid;grid-template-columns:minmax(0,1fr) 32px;
@@ -267,6 +259,59 @@ body[data-rtg-schil="standaard"] .rtg-surface{
 body[data-rtg-schil="standaard"] .rtg-surface:not([data-actief]){visibility:hidden;pointer-events:none;}
 body[data-rtg-schil="standaard"] .rtg-surface[data-actief]{border-color:var(--rtg-line);}
 body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle{display:none;}
+
+/* De derde vaste balk. Het is geen generiek app-dock met verzonnen logo's:
+   de namen komen rechtstreeks uit de huidige werkwereld en openen exact
+   dezelfde surfaces als de linkerbank. */
+body[data-rtg-schil="standaard"] .rtg-onderbalk{
+  position:absolute;box-sizing:border-box;z-index:55;display:flex;align-items:center;gap:.15rem;
+  padding:.45rem clamp(.45rem,1.2vw,1rem) calc(.45rem + env(safe-area-inset-bottom,0px));
+  background:rgba(10,10,9,.97);border-top:1px solid var(--rtg-line);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);overflow-x:auto;scrollbar-width:none;
+}
+body[data-rtg-schil="standaard"] .rtg-onderbalk button{
+  min-height:38px;padding:.4rem .72rem;border:1px solid transparent;border-radius:4px;background:transparent;
+  color:var(--rtg-soft);font:500 .68rem/1 var(--rtg-interface,Inter,sans-serif);letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;white-space:nowrap;
+}
+body[data-rtg-schil="standaard"] .rtg-onderbalk button:hover,
+body[data-rtg-schil="standaard"] .rtg-onderbalk button:focus-visible{
+  border-color:rgba(201,162,75,.28);color:var(--rtg-txt);background:rgba(255,255,255,.025);
+}
+body[data-rtg-schil="standaard"] .rtg-onderbalk button[aria-current="page"]{
+  color:var(--rtg-txt);border-color:rgba(127,22,52,.52);background:rgba(127,22,52,.15);
+  box-shadow:inset 0 -2px #7F1634;
+}
+body[data-rtg-schil="standaard"] .rtg-onder-thuis{border-right-color:var(--rtg-line)!important;
+  padding-right:1rem!important;margin-right:.25rem;}
+body[data-rtg-schil="standaard"] .rtg-onder-rek{flex:1;min-width:.25rem;}
+body[data-rtg-schil="standaard"] .rtg-onder-zoek{border-left-color:var(--rtg-line)!important;
+  padding-left:1rem!important;margin-left:.25rem;}
+body[data-rtg-schil="standaard"] .rtg-onder-code{display:none;}
+
+@media(max-width:1099px){
+  body[data-rtg-schil="standaard"] .console-werelden{padding:28px 7px 10px;}
+  body[data-rtg-schil="standaard"] .console-werelden .rijtje{gap:4px;}
+  body[data-rtg-schil="standaard"] .console-werelden .rijtje button{
+    min-height:48px;padding:.4rem .25rem;justify-content:center;border-bottom-color:transparent;
+  }
+  body[data-rtg-schil="standaard"] .app-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  body[data-rtg-schil="standaard"] .app-kort{display:block;flex:auto;text-align:center;font-size:.61rem;}
+  body[data-rtg-schil="standaard"] .console-ruimtes{display:none;}
+  body[data-rtg-schil="standaard"] .rtg-tab{min-width:150px;max-width:190px;}
+}
+@media(max-width:699px){
+  body[data-rtg-schil="standaard"] .console-werelden{padding:calc(env(safe-area-inset-top,0px) + 10px) 5px 8px;}
+  body[data-rtg-schil="standaard"] .console-werelden .rijtje button{min-height:45px;border-radius:3px;}
+  body[data-rtg-schil="standaard"] .rtg-tab{min-width:132px;max-width:168px;}
+  body[data-rtg-schil="standaard"] .rtg-tab-kies{padding-left:.7rem;font-size:.72rem;}
+  body[data-rtg-schil="standaard"] .rtg-onderbalk{gap:0;padding-left:.2rem;padding-right:.2rem;}
+  body[data-rtg-schil="standaard"] .rtg-onderbalk button{min-width:43px;padding:.35rem .3rem;font-size:.58rem;}
+  body[data-rtg-schil="standaard"] .rtg-onder-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  body[data-rtg-schil="standaard"] .rtg-onder-code{display:inline;font-size:.58rem;letter-spacing:.07em;}
+  body[data-rtg-schil="standaard"] .rtg-onder-thuis{padding-right:.35rem!important;margin-right:.08rem;}
+  body[data-rtg-schil="standaard"] .rtg-onder-zoek{padding-left:.35rem!important;margin-left:.08rem;}
+}
 
 /* ------------------------------------------- objecten tussen apps (stap 7) --
    Tijdens het slepen lichten de surfaces op die er IETS mee kunnen -- en alleen

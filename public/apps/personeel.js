@@ -3018,9 +3018,9 @@
     stepStart();
     await restoreSession();
   }
-  // het Werk-OS: springboard, dock, klok en Cmd+K, precies als op een telefoon.
+  // WerkOS: de echte dagstand eerst, daarna het werkregister, dock en Cmd+K.
   // RTG Eye (de camerabril: voertuigschouw + werkvloerregister) staat als
-  // eigen app op het springboard; de knop leeft in een onzichtbare houder.
+  // eigen werkvlak in het register; de knop leeft in een onzichtbare houder.
   const extraHouder = document.createElement('div');
   extraHouder.id = 'pdaExtra'; extraHouder.style.display = 'none';
   const oogKnop = document.createElement('button');

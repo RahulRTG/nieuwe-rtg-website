@@ -18,7 +18,8 @@
   var MARGE = 64;   // hoe dicht bij de rand voordat er gedockt wordt
 
   var schil = {
-    vak: null, console: null, tabs: null, dok: null,
+    vak: null, console: null, tabs: null, dok: null, onderbalk: null,
+    apps: [], dockApps: [],
     surfaces: [],       // { id, naam, el, zoom }
     actief: null,
     huidigeContext: null,
@@ -55,22 +56,23 @@
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
     if (standaard()) {
-      var bank = Math.min(166, Math.max(148, Math.round(m.b * .12)));
-      var tabhoog = 49;
+      /* De vaste Work OS-kamer heeft op ELK formaat dezelfde drie ankers:
+         links de software, boven het open werk en onder de korte route. Een
+         actieve app krijgt altijd het volledige vlak ertussen. Voorheen werd
+         dit vlak nog als een raster verdeeld terwijl CSS de overige apps
+         verborg; daardoor kon de zichtbare app letterlijk een half scherm
+         krijgen. */
+      var bank = m.b < 700 ? 56 : (m.b < 1100 ? 68 : 178);
+      var tabhoog = m.b < 700 ? 52 : 50;
+      var onderhoog = m.b < 700 ? 62 : 58;
       zet(schil.console, 0, 0, bank, m.h);
       if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
+      if (schil.onderbalk) zet(schil.onderbalk, bank, m.h - onderhoog, m.b - bank, onderhoog);
       if (!n) return;
       var werkbreed = m.b - bank;
-      var werkhoog = m.h - tabhoog;
-      var sk = n <= 3 ? n : 2;
-      var sr = Math.ceil(n / sk);
-      var sw = Math.floor(werkbreed / sk);
-      var sh = Math.floor(werkhoog / sr);
-      schil.surfaces.forEach(function (s, i) {
-        var c = i % sk, r = Math.floor(i / sk);
-        zet(s.el, bank + c * sw, tabhoog + r * sh,
-          c === sk - 1 ? werkbreed - c * sw : sw,
-          r === sr - 1 ? werkhoog - r * sh : sh);
+      var werkhoog = m.h - tabhoog - onderhoog;
+      schil.surfaces.forEach(function (s) {
+        zet(s.el, bank, tabhoog, werkbreed, werkhoog);
       });
       return;
     }
@@ -376,6 +378,43 @@
         var s = vind(tab.dataset.id); if (s) zoom(s, 'deep');
       });
       tab.querySelector('.rtg-tab-sluit').addEventListener('click', function () { sluit(tab.dataset.id); });
+    });
+    tekenOnderbalk();
+  }
+
+  /* De onderbalk is de korte, contextvaste route door de software. Hij kent
+     alleen app-id's en opent dezelfde surfaces als de linkerbank; er ontstaat
+     dus geen tweede administratie of afwijkende mobiele app. */
+  function tekenOnderbalk() {
+    if (!schil.onderbalk) return;
+    var ids = (schil.dockApps.length ? schil.dockApps : schil.apps.slice(0, 4).map(function (a) { return a.id; }));
+    var eerste = schil.apps[0];
+    var apps = ids.map(function (id) {
+      return schil.apps.find(function (a) { return a.id === id; });
+    }).filter(function (a) { return a && (!eerste || a.id !== eerste.id); });
+    function knop(a) {
+      var actief = schil.actief && schil.actief.id === a.id;
+      return '<button type="button" class="rtg-onder-app" data-dock-open="' + esc(a.id) + '"' +
+        (actief ? ' aria-current="page"' : '') + '>' +
+        '<span class="rtg-onder-code" aria-hidden="true">' + esc(a.kort || a.naam.slice(0, 2).toUpperCase()) + '</span>' +
+        '<span class="rtg-onder-label">' + esc(a.naam) + '</span></button>';
+    }
+    schil.onderbalk.innerHTML = (eerste
+      ? '<button type="button" class="rtg-onder-thuis" data-dock-open="' + esc(eerste.id) + '"' +
+        (schil.actief && schil.actief.id === eerste.id ? ' aria-current="page"' : '') +
+        '><span class="rtg-onder-code" aria-hidden="true">01</span><span class="rtg-onder-label">Home</span></button>'
+      : '') + apps.map(knop).join('') +
+      '<span class="rtg-onder-rek"></span><button type="button" class="rtg-onder-zoek" data-dock-zoek>' +
+      '<span class="rtg-onder-code" aria-hidden="true">⌘K</span><span class="rtg-onder-label">Zoeken</span></button>';
+    schil.onderbalk.querySelectorAll('[data-dock-open]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var a = schil.apps.find(function (x) { return x.id === b.dataset.dockOpen; });
+        if (a) open(a.id, { naam: a.naam, url: a.url, kort: a.naam });
+      });
+    });
+    var zoek = schil.onderbalk.querySelector('[data-dock-zoek]');
+    if (zoek) zoek.addEventListener('click', function () {
+      schil.vak.dispatchEvent(new CustomEvent('rtg-palet-open', { bubbles: true }));
     });
   }
   /* ------------------------------------------------------- werkruimtes --
@@ -687,11 +726,14 @@
     schil.console = opties.console || schil.vak.querySelector('.rtg-console');
     schil.tabs = el('nav', 'rtg-tabbar', schil.vak);
     schil.tabs.setAttribute('aria-label', 'Open software');
+    schil.onderbalk = el('nav', 'rtg-onderbalk', schil.vak);
+    schil.onderbalk.setAttribute('aria-label', 'Snelle software');
     schil.dok = el('div', 'rtg-dok', schil.vak);
     /* De apps die dit scherm kan openen. De shell KENT ze niet uit zichzelf --
        hij weet niets van domeinen -- maar het palet moet ergens uit kunnen
        putten, dus geeft de pagina zijn lijst mee. */
     schil.apps = (opties.apps || []).slice();
+    schil.dockApps = (opties.dock || []).slice();
     w.addEventListener('resize', schik);
     /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
        is een eigen pagina, maar altijd onze eigen. */

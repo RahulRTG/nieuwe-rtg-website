@@ -4,6 +4,10 @@
    toestemmingsmuur. Eén keer bevestigen is genoeg (localStorage). */
 (function () {
   var SLEUTEL = 'rtg_cookieinfo_v1';
+  /* Een Work OS-surface deelt dezelfde herkomst en dezelfde opslag met de
+     buitenschil. Eén melding buiten de surface is daarom volledig; iedere
+     iframe opnieuw laten melden gaf dubbele regels boven op de onderbalk. */
+  try { if (window.self !== window.top) return; } catch (e) { return; }
   try { if (localStorage.getItem(SLEUTEL)) return; } catch (e) { return; }
 
   var en = false;
@@ -35,6 +39,9 @@
     '#rtg-cookie a:hover,#rtg-cookie button:hover,' +
     '#rtg-cookie a:focus-visible,#rtg-cookie button:focus-visible{color:var(--gold-tekst,#C0A544);' +
       'border-bottom-color:var(--gold-tekst,#C0A544);}' +
+    /* Work OS heeft een vaste onderbalk; de melding staat erboven en laat alle
+       softwarebediening bereikbaar. */
+    'body[data-rtg-schil="standaard"] #rtg-cookie{bottom:calc(66px + env(safe-area-inset-bottom,0px));}' +
     /* op een licht thema draait alleen de inkt om; de vorm blijft dezelfde */
     ':root[data-rtg-thema="champagne"] #rtg-cookie span{color:rgba(26,23,19,0.58);}' +
     ':root[data-rtg-thema="champagne"] #rtg-cookie a,' +

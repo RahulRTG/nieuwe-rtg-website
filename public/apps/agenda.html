@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Agenda</title>
 <link rel="icon" href="/icon.svg">
@@ -126,8 +127,10 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/kantoor-tools.css?v=enterprise1" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-kantoor-tool="agenda">
+<script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Agenda</h1></span>
@@ -137,6 +140,10 @@
   </span>
 </header>
 <main>
+  <section class="kantoor-intro" aria-labelledby="agendaIntro">
+    <span class="ey">Kantoor · tijd &amp; besluit</span>
+    <div><h2 id="agendaIntro">Uw dag, zonder ruis.</h2><p>Afspraken, uitnodigingen en RTG-momenten in één beheerste tijdlijn.</p></div>
+  </section>
   <div class="rahulbalk">
     <input class="veld" id="rahulIn" maxlength="300" placeholder='Zeg het gewoon: "lunch met de notaris vrijdag om 12:30"'
       aria-label="Plan in gewone taal">

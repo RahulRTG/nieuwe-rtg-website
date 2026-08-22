@@ -85,6 +85,10 @@ test('2. een telefonische rit draagt een naam, en komt op naam van deze zaak', a
 
 test('3. het eigen dispatchbeeld toont alleen ritten van deze vervoerder', async () => {
   const mijn = await moet('/api/staff/mob/mijn', {}, chauffeur, 'het beeld van de chauffeur');
+  assert.equal(mijn.actor && mijn.actor.name, 'Yara El Idrissi',
+    'de PDA krijgt de persoon uit de ondertekende personeelssessie terug');
+  assert.ok(mijn.actor && mijn.actor.staffId,
+    'de PDA kan daardoor eigen lopende ritten onderscheiden van die van collega’s');
   const alles = JSON.stringify(mijn);
   assert.ok(alles.includes(RIT), 'de rit van deze zaak staat erin');
 

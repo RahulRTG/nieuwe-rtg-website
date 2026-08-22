@@ -2,85 +2,242 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RTG Reizen</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#080909">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifests/reizen.webmanifest">
 <link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/canvas.css" rel="stylesheet">
-<!-- het ontwerpsysteem, de materialen en de vier thema's komen mee via
-     shared/rtg-ui.css, dat ze insluit voor het hele platform. Hier stonden ze
-     ook nog eens los; dat laadde dezelfde drie bladen twee keer. -->
-<!-- De vormtaal van een wereldscherm staat in een eigen blad, want RTG Kantoor
-     gebruikt hem ook. Twee keer overtikken betekent twee superapps die uit
-     elkaar groeien (LAT.md regel 4). -->
-<link href="/shared/rtg-wereld.css" rel="stylesheet">
-<link href="/shared/ios.css" rel="stylesheet">
+<link href="/apps/reizen-performance.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro">
+<body>
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 
-<!-- RTG Reizen ORKESTREERT de reisdomeinen en vervangt ze niet (PLATFORM.md).
-     Verblijven, Reisbureau, Vluchten en Hangar houden hun eigen catalogus en
-     hun eigen boekingsstroom. Daarom staat er op dit scherm geen knop die boekt,
-     wijzigt of annuleert: elke regel is een link naar de app die het echte werk
-     doet. Zou dit scherm ook boeken, dan ontstaat een reis op twee plekken
-     (LAT.md regel 4). -->
-
-<!-- DE APPS VAN DEZE WERELD, en dat past bij wat dit scherm al is: het toont
-     wat er aankomt en verwijst voor het echte werk door naar de app die het
-     doet (zie de opmerking hierboven). Deze vier hadden alleen geen enkele
-     ingang -- niet hier, niet op het beginscherm, nergens. Ze zijn met de
-     graaf in test/bereikbaar.test.js gevonden. -->
-<nav class="wereldapps" aria-label="Apps in deze wereld">
-  <a href="/apps/boeken.html">Boeken</a>
-  <a href="/apps/luchthaven.html">Luchthaven</a>
-  <a href="/apps/uitgaan.html">Uitgaan</a>
-  <a href="/apps/zaal.html">Zaal</a>
-</nav>
-<main id="inhoud">
-  <!-- EEN vaste RTG-header: hamburger, appnaam, lucht, inhoud. Verder niets.
-       Hier stonden een "Home"-link, een RTG-rondje en de ondertitel "uw
-       reiswereld" -- vier keer tegelijk vertellen dat dit RTG is, waardoor het
-       merk juist zwakker werd. De hamburger van het app-menu (shared/appmenu.js)
-       is de enige navigatie; de weg terug loopt daardoorheen. -->
-  <header class="merkkop">
-    <h1 class="rtg-ceremonie">RTG Reizen</h1>
+<div class="reisapp">
+  <header class="prestatiekop">
+    <a class="rtgmerk" href="/apps/app.html" aria-label="Naar RTG Vandaag">RTG</a>
+    <p>REIZEN</p>
+    <button class="veiligknop" type="button" data-open-veilig aria-label="Bekijk beveiliging">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z"/></svg>
+      <i></i><span>BEVEILIGD</span>
+    </button>
   </header>
 
-  <!-- LAAG 0 EN LAAG 1 VAN HET COMMAND CANVAS (CANVAS.md): eerst de stand, dan
-       de rust, en pas daarna de functies. Hier stond een alarmbalk die
-       hetzelfde probeerde en het per scherm opnieuw uitvond.
+  <main id="inhoud">
+    <section class="appblad actief" data-blad="vandaag" aria-labelledby="titelVandaag">
+      <div class="bladbinnen vandaagblad">
+        <div class="dagkop">
+          <p class="micro" id="groet">GOEDEMIDDAG</p>
+          <div class="bestemmingkop">
+            <h1 id="titelVandaag">IBIZA</h1>
+            <span class="gereed" id="gereedTeller">4/4 GEREED</span>
+          </div>
+          <p class="sub" id="dagzin">Alles staat klaar.</p>
+        </div>
 
-       ZE STAAN LEEG, EN DAT IS DE BELANGRIJKSTE REGEL VAN DIT BLOK. Een woord
-       dat in de HTML staat, staat er ook als er niets is opgehaald -- en dat is
-       precies de leugen die de stand niet mag vertellen. -->
-  <div id="stand"></div>
-  <div id="rust"></div>
+        <div class="vandaagraster">
+          <section class="volgendblok" aria-labelledby="volgendTitel">
+            <div class="micro" id="volgendTitel">VOLGENDE</div>
+            <div class="tijdregel"><strong id="volgendTijd">18:20</strong><span id="volgendLabel">Chauffeur arriveert</span></div>
+            <div class="routekort"><span id="volgendVan">THUIS</span><b aria-hidden="true">→</b><span id="volgendNaar">SCHIPHOL</span></div>
+            <div class="vluchtregel"><span id="volgendExtra">VLUCHT 21:05</span></div>
+            <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
+          </section>
 
-  <!-- LAAG 3: DE COMMAND TIMELINE (CANVAS.md). Wat er vandaag OP DE KLOK staat.
-       Bij Reizen is dat smal en met reden: een vlucht vertrekt om 17:30, een
-       hotelovernachting niet. Wat een uur heeft komt hier, de rest blijft in het
-       register -- een verblijf bovenaan uw dag zetten op een verzonnen 00:00 is
-       precies wat een tijdlijn kapotmaakt.
+          <div class="reiscontext">
+            <section class="prestatiepad" aria-label="Reisverloop">
+              <div class="padlijn" aria-hidden="true"></div>
+              <div class="padpunt nu"><span>NU</span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i></div>
+              <div class="padpunt actief"><span>18:20<small>RIT</small></span><i></i></div>
+              <div class="padpunt"><span>21:05<small>VLUCHT</small></span><i></i></div>
+              <div class="padpunt einde"><span>00:10<small>IBIZA</small></span><i><svg viewBox="0 0 24 24"><path d="M12 21s6-5.3 6-11a6 6 0 1 0-12 0c0 5.7 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg></i></div>
+            </section>
 
-       Hij verdwijnt als er niets is: een leeg kader boven een rustige dag vraagt
-       aandacht zonder iets te zeggen. -->
-  <section id="vandaagVak" hidden>
-    <div class="regkop"><h2>Vandaag</h2><span class="tel" id="telVandaag"></span></div>
-    <div id="vandaag"></div>
-  </section>
+            <section class="statuslijst" aria-label="Reisstatus">
+              <button type="button" data-statusactie="vlucht"><i class="statusicoon goed">✓</i><span><b>Vlucht bevestigd</b><small>KL 1609 · stoel 4A</small></span><em>›</em></button>
+              <button type="button" data-statusactie="diner"><i class="statusicoon wacht">◷</i><span><b>Diner in afwachting</b><small>Partner bevestigt uiterlijk 17:00</small></span><em>›</em></button>
+              <button type="button" data-statusactie="betaling"><i class="statusicoon let">!</i><span><b>Betaling villa</b><small>Actie van u nodig</small></span><strong>NU BETALEN</strong><em>›</em></button>
+            </section>
+          </div>
+        </div>
 
-  <div class="regkop">
-    <h2>Wat eraan komt</h2>
-    <span class="tel" id="tel"></span>
+        <section id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
+          <h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2>
+          <div id="vandaag"></div>
+        </section>
+
+        <form class="rahulsnel" data-rahul-snel>
+          <label for="rahulSnel">Vraag Rahul over deze reis</label>
+          <input id="rahulSnel" name="vraag" autocomplete="off" placeholder="Vraag Rahul…">
+          <button type="submit" aria-label="Verstuur naar Rahul">↗</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="appblad" data-blad="reizen" aria-labelledby="titelReizen" hidden>
+      <div class="bladbinnen reizenblad">
+        <header class="sectiekop">
+          <p class="micro">UW REIZEN</p>
+          <div><h1 id="titelReizen">Onderweg, zonder ruis.</h1><button class="tekstknop" type="button" data-ververs-reizen>VERVERS</button></div>
+          <p>Vluchten, verblijf, vervoer en open acties in één controlebeeld.</p>
+        </header>
+
+        <div class="canvasband">
+          <div id="stand"></div>
+          <div id="rust"></div>
+        </div>
+
+        <section class="reisregister" aria-labelledby="komendTitel">
+          <div class="registerkop"><h2 id="komendTitel">Wat eraan komt</h2><span id="tel"></span></div>
+          <div id="komend" aria-live="polite"><p class="leegtekst">Uw reisgegevens worden veilig opgehaald…</p></div>
+        </section>
+
+        <nav class="reisdiensten" aria-label="Reisdiensten">
+          <a href="/apps/vluchten.html"><svg viewBox="0 0 24 24"><path d="m3 13 18-8-7 7-2 7-2-5-7-1Z"/></svg><span><b>Vluchten</b><small>Boeken en inchecken</small></span></a>
+          <a href="/apps/hotels.html"><svg viewBox="0 0 24 24"><path d="M3 20V5m0 11h18m0 4V9a3 3 0 0 0-3-3H9v10M7 10h.01"/></svg><span><b>Verblijven</b><small>Hotels en villa’s</small></span></a>
+          <a href="/apps/reisbureau.html"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM8 7V4h8v3M4 12h16"/></svg><span><b>Reisbureau</b><small>Persoonlijke planning</small></span></a>
+          <a href="/apps/ov.html"><svg viewBox="0 0 24 24"><path d="M6 18h12M7 18l-1 3m11-3 1 3M5 4h14v12H5zM8 7h8M8 12h.01M16 12h.01"/></svg><span><b>Mobiliteit</b><small>OV, pendel en combinaties</small></span></a>
+          <a href="/apps/navigatie.html"><svg viewBox="0 0 24 24"><path d="m14 4 6-2-2 6-6 6-6 6-2-2 6-6 4-8Z"/><path d="m10 12 2 2"/></svg><span><b>Navigatie</b><small>Route en live kaart</small></span></a>
+          <a href="/apps/reisboek.html"><svg viewBox="0 0 24 24"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2V3Z"/><path d="M9 7h6M9 11h6M7 17h12"/></svg><span><b>Reisboek</b><small>Documenten en draaiboek</small></span></a>
+          <a href="/apps/hangar.html"><svg viewBox="0 0 24 24"><path d="M3 18h18M5 18V9l7-5 7 5v9M9 18v-5h6v5"/></svg><span><b>Private mobility</b><small>Toestellen en vluchtlogboek</small></span></a>
+          <a href="/apps/boeken.html"><svg viewBox="0 0 24 24"><path d="M4 5a3 3 0 0 1 3-2h5v18H7a3 3 0 0 0-3 2V5Zm8-2h5a3 3 0 0 1 3 2v18a3 3 0 0 0-3-2h-5V3Z"/></svg><span><b>Boeken</b><small>Lezen voor onderweg</small></span></a>
+          <a href="/apps/chauffeur.html"><svg viewBox="0 0 24 24"><path d="M5 16 4 14l2-6h12l2 6-1 2M6 16h12v3H6zM8 19v2m8-2v2M7 12h.01M17 12h.01"/></svg><span><b>Chauffeur-PDA</b><small>Veilige werkplek voor rijders</small></span></a>
+        </nav>
+      </div>
+    </section>
+
+    <section class="appblad" data-blad="taxi" aria-labelledby="titelTaxi" hidden>
+      <div class="bladbinnen taxiblad">
+        <header class="sectiekop taxikop">
+          <p class="micro">TAXI</p>
+          <h1 id="titelTaxi">Waar wilt u heen?</h1>
+        </header>
+
+        <div class="taxiraster">
+          <div class="taxilinks">
+            <form id="taxiForm" novalidate>
+              <fieldset class="routevelden">
+                <legend>Uw route</legend>
+                <label>
+                  <i class="routepunt vertrek"></i><span><small>VAN</small><input id="vanVeld" name="van" value="Huidige locatie" autocomplete="street-address"></span>
+                  <button type="button" class="locatieknop" data-locatie aria-label="Gebruik mijn huidige locatie"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button>
+                </label>
+                <label>
+                  <i class="routepunt aankomst"></i><span><small>NAAR</small><input id="naarVeld" name="naar" value="Schiphol Airport" autocomplete="off" aria-controls="bestemmingSuggesties" aria-expanded="false"></span>
+                  <button type="button" class="wisselknop" data-wissel aria-label="Wissel vertrek en bestemming">⇅</button>
+                </label>
+              </fieldset>
+              <div class="suggesties" id="bestemmingSuggesties" role="listbox" hidden></div>
+
+              <div class="ritkeuzes">
+                <div class="momentkeuze" role="group" aria-label="Vertrekmoment">
+                  <button class="actief" type="button" data-moment="nu" aria-pressed="true">NU</button>
+                  <button type="button" data-moment="later" aria-pressed="false">LATER</button>
+                </div>
+                <button class="reizigersknop" type="button" data-open-reizigers><span id="reizigersSamenvatting">2 PERS. · 2 KOFFERS</span><b>⌄</b></button>
+              </div>
+              <label class="laterinvoer" hidden>Vertrekdatum en tijd<input id="vertrekLater" type="datetime-local" name="vertrek"></label>
+            </form>
+
+            <section class="routekaart" aria-label="Routevoorbeeld">
+              <svg class="kaartlijnen" viewBox="0 0 720 210" preserveAspectRatio="none" aria-hidden="true">
+                <g class="straten"><path d="M0 38 170 74 270 8 520 62 720 18M18 190 124 84 292 164 450 98 720 156M62 0 180 210M354 0 312 210M604 0 530 210M0 122 720 112"/><path d="M0 82 130 112 244 70 394 128 540 76 720 92"/></g>
+                <path class="ritlijn" d="M78 145c88-92 176 48 268-20 80-60 146-65 294-72"/>
+                <circle class="startstip" cx="78" cy="145" r="8"/><circle class="eindstip" cx="640" cy="53" r="8"/>
+              </svg>
+              <div><strong id="ritDuur">34 <small>MIN</small></strong><strong id="ritAfstand">42 <small>KM</small></strong></div>
+            </section>
+          </div>
+
+          <div class="taxirechts">
+            <section class="voertuigen" aria-labelledby="voertuigTitel">
+              <h2 id="voertuigTitel" class="sr-only">Kies uw voertuig</h2>
+              <button class="voertuig actief" type="button" data-voertuig="limousine" data-label="EXECUTIVE" data-prijs="68" aria-pressed="true">
+                <svg viewBox="0 0 160 48" aria-hidden="true"><path d="M9 32h8l8-14h75l20 5 22 9v6H9zM38 18l15-9h42l18 9M43 18h58"/><circle cx="38" cy="37" r="8"/><circle cx="119" cy="37" r="8"/></svg>
+                <span><b>EXECUTIVE</b><small>5 min · 4 personen</small></span><strong><small>INDICATIE</small>€68</strong>
+              </button>
+              <button class="voertuig" type="button" data-voertuig="taxi" data-label="COMFORT" data-prijs="42" aria-pressed="false">
+                <svg viewBox="0 0 160 48" aria-hidden="true"><path d="M9 32h8l8-14h75l20 5 22 9v6H9zM38 18l15-9h42l18 9M43 18h58"/><circle cx="38" cy="37" r="8"/><circle cx="119" cy="37" r="8"/></svg>
+                <span><b>COMFORT</b><small>7 min · 4 personen</small></span><strong><small>INDICATIE</small>€42</strong>
+              </button>
+              <button class="voertuig" type="button" data-voertuig="taxibus" data-label="VAN" data-prijs="84" aria-pressed="false">
+                <svg viewBox="0 0 160 48" aria-hidden="true"><path d="M10 10h102l30 18v10H10zM112 10v18h30M26 10v18h86"/><circle cx="38" cy="37" r="8"/><circle cx="119" cy="37" r="8"/></svg>
+                <span><b>VAN</b><small>9 min · 7 personen</small></span><strong><small>INDICATIE</small>€84</strong>
+              </button>
+            </section>
+
+            <div class="vertrouwen"><span><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z"/><path d="m9 12 2 2 4-5"/></svg>RTG-chauffeur gescreend</span><span>Prijs staat vast na aanvraag</span></div>
+            <button class="actieknop boekknop" type="submit" form="taxiForm" id="boekRit"><span>VRAAG EXECUTIVE AAN · ± €68</span><b aria-hidden="true">→</b></button>
+            <p class="annuleren">Kosteloos annuleren tot vertrek chauffeur</p>
+
+            <section class="lopendeRit" id="lopendeRit" hidden aria-live="polite"></section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="appblad" data-blad="rahul" aria-labelledby="titelRahul" hidden>
+      <div class="bladbinnen rahulblad">
+        <header class="sectiekop">
+          <p class="micro">PERSOONLIJKE REISASSISTENT</p>
+          <h1 id="titelRahul">Rahul reist met u mee.</h1>
+          <p>Vraag iets over uw reis of zet direct een handeling klaar.</p>
+        </header>
+        <div class="chat" id="rahulChat" aria-live="polite">
+          <p class="chatregel assistent">Waar kan ik bij helpen?</p>
+        </div>
+        <div class="snelvragen" aria-label="Snelle vragen">
+          <button type="button" data-vraag="Boek een taxi naar Schiphol">Taxi naar Schiphol</button>
+          <button type="button" data-vraag="Laat mijn volgende reis zien">Volgende reis</button>
+          <button type="button" data-vraag="Welke actie staat nog open?">Open acties</button>
+        </div>
+        <form class="rahulformulier" id="rahulForm">
+          <label for="rahulVraag">Uw vraag</label>
+          <input id="rahulVraag" autocomplete="off" placeholder="Vraag Rahul…" required>
+          <button type="submit">VERSTUUR <span aria-hidden="true">↗</span></button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <nav class="hoofdtabs" aria-label="RTG Reizen">
+    <button class="actief" type="button" data-tab="vandaag" aria-current="page">
+      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01"/></svg><span>Vandaag</span>
+    </button>
+    <button type="button" data-tab="reizen">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM8 7V4h8v3M4 12h16"/></svg><span>Reizen</span>
+    </button>
+    <button type="button" data-tab="taxi">
+      <svg viewBox="0 0 24 24"><path d="m5 16-1-2 2-6h12l2 6-1 2M6 16h12v3H6zM8 19v2m8-2v2M7 12h.01M17 12h.01"/></svg><span>Taxi</span>
+    </button>
+    <button type="button" data-tab="rahul">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Rahul</span>
+    </button>
+  </nav>
+</div>
+
+<dialog class="keuzedialoog" id="reizigersDialoog">
+  <form method="dialog">
+    <div class="dialoogkop"><div><span class="micro">RITVOORKEUREN</span><h2>Wie reist er mee?</h2></div><button value="cancel" aria-label="Sluiten">×</button></div>
+    <label>Personen<select id="personen"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
+    <label>Koffers<select id="koffers"><option>0</option><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+    <label class="vink"><input id="kinderzitje" type="checkbox"><span>Kinderzitje nodig</span></label>
+    <button class="actieknop" value="default"><span>OPSLAAN</span><b>→</b></button>
+  </form>
+</dialog>
+
+<dialog class="keuzedialoog bevestiging" id="ritBevestiging">
+  <div class="bevestiginginhoud">
+    <span class="bevestigdicoon">✓</span>
+    <p class="micro" id="bevestigingLabel">RIT AANGEVRAAGD</p>
+    <h2 id="bevestigingTitel">We zoeken uw chauffeur.</h2>
+    <p id="bevestigingTekst"></p>
+    <div id="bevestigingFeiten"></div>
+    <button class="actieknop" type="button" data-sluit-bevestiging><span>KLAAR</span><b>→</b></button>
   </div>
-  <div id="komend"><p class="stil">Laden...</p></div>
+</dialog>
 
   <!-- DE REISWACHT (REIZEN.md fase 3). Uitzonderingsgestuurd: alleen wat
        aandacht vraagt staat erin, en rust is een uitkomst -- die wordt dan ook
@@ -120,9 +277,18 @@
   <div class="poorten" id="poorten"></div>
 </main>
 
-<!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder
-     tekent de stand meteen bij het laden, en een uitgesteld blad is er dan nog
-     niet. Zie CANVAS.md; de vorm staat in shared/canvas.css. -->
+<dialog class="keuzedialoog" id="veiligDialoog">
+  <form method="dialog">
+    <div class="dialoogkop"><div><span class="micro">RTG BESCHERMING</span><h2>Uw reis blijft van u.</h2></div><button value="cancel" aria-label="Sluiten">×</button></div>
+    <ul class="veiliglijst"><li><b>✓</b><span>Versleutelde ledensessie</span></li><li><b>✓</b><span>Gescreende vervoerders</span></li><li><b>✓</b><span>Alleen noodzakelijke ritgegevens gedeeld</span></li></ul>
+    <button class="actieknop" value="default"><span>SLUITEN</span><b>→</b></button>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Het Command Canvas blijft de bron voor de gemeten wereldstand en de echte
+     tijdlijn. De performance-interface verandert de bediening, niet de waarheid. -->
 <script src="/shared/canvas.js"></script>
 <script src="/shared/canvas-taal.js"></script>
 <script>
@@ -671,15 +837,34 @@
   }
   laadMijnInvoer();
 })();
+
+/* Deze adapter staat bewust in het scherm: test/canvas.test.js bewaakt dat elke
+   wereld dezelfde gemeten stand en tijdlijn gebruikt. De rest van de interactie
+   staat in reizen-performance.js. */
+function tekenStand(d) {
+  var t = d.telling || {};
+  RTGCanvas.stand('#stand', { app: 'RTG Reizen', stand: d.stand, cijfers: [
+    [t.komend || 0, 'gepland'], [t.aandacht || 0, 'vraagt actie'], [t.wachtend || 0, 'wacht']
+  ] });
+  RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: RTGCanvas.zin(d.stand, { stil: d.stil }) });
+}
+function opDeKlok(x) { return x.van === new Date().toISOString().slice(0, 10) && !!x.tijd; }
+function tekenCanvasVandaag(lijst) {
+  var punten = (lijst || []).filter(opDeKlok).sort(function(a, b) { return String(a.tijd).localeCompare(String(b.tijd)); });
+  var vak = document.getElementById('vandaagVak');
+  vak.hidden = !punten.length;
+  RTGCanvas.lijn('#vandaag', punten.map(function(x) { return { uur: x.tijd, titel: (x.titel || 'Reis') + (x.bestemming ? ' naar ' + x.bestemming : ''), toe: x.status || x.app, href: x.link, sig: x.sig }; }));
+  return (lijst || []).filter(x => !opDeKlok(x));
+}
+tekenStand({});
 </script>
-<script src="/shared/deelmenu.js" defer></script>
+<script src="/apps/reizen-performance.js"></script>
+<script src="/apps/reizen-performance-reis.js"></script>
+<script src="/apps/reizen-performance-taxi.js"></script>
+<script src="/apps/reizen-performance-boeken.js"></script>
+<script src="/apps/reizen-performance-rahul.js"></script>
+<script src="/shared/poortgesprek.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 </body>
 </html>

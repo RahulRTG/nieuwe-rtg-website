@@ -53,7 +53,12 @@
   kop.appendChild(merk);
   kop.appendChild(identiteit);
   kop.appendChild(veilig);
-  body.insertBefore(kop, body.firstChild);
+  /* De gedeelde basis zet de springlink als eerste tabstop. Dit script draait
+     erna en mag de vaste merkbalk daar niet meer voor schuiven: dan moet een
+     toetsenbordgebruiker de hele schil door voordat de inhoud bereikbaar is. */
+  var spring = body.querySelector('a.rtg-spring, a.skip, a.skiplink, a[href^="#"][class*="skip"]');
+  if (spring && spring.parentNode === body) body.insertBefore(kop, spring.nextSibling);
+  else body.insertBefore(kop, body.firstChild);
 
   var items = [
     { id: 'vandaag', label: 'Vandaag', href: '/apps/reizen.html#vandaag', icoon: [['rect', { x: '4', y: '5', width: '16', height: '15', rx: '1' }], ['path', { d: 'M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01' }]] },

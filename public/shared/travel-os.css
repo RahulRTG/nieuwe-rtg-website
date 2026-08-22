@@ -6,10 +6,10 @@
   --tos-muted:#969995;
   --tos-line:#2a2d2d;
   --tos-wine:#8e0f36;
-  --tos-wine-bright:#be164d;
+  --tos-wine-bright:#e24a73;
   --tos-gold:#cba65f;
   --tos-green:#35bd72;
-  --tos-danger:#d3184e;
+  --tos-danger:#e24a73;
   --tos-top:88px;
   --tos-rail:104px;
   --tos-bottom:0px;
@@ -205,6 +205,7 @@ body.travel-os :where(.knop.stil,.terug,.meldknop){
   color:var(--tos-ivory) !important;
   border-radius:1px !important;
 }
+body.travel-os .ios-terug{min-height:44px}
 body.travel-os :where(.step button,.lagen button,.paneel .x,.weg){border-radius:1px !important}
 body.travel-os :where(.tabs,.chips){border-bottom:1px solid var(--tos-line) !important;background:transparent !important}
 body.travel-os :where(.tabs,.chips) > button{

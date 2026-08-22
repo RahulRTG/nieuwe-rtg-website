@@ -1,7 +1,7 @@
 :root{
   --onyx:#080909;--graphite:#111313;--graphite-2:#171919;--ivory:#f1ede5;
   --muted:#969995;--line:#2a2d2d;--line-soft:#1d2020;--wine:#8e0f36;
-  --wine-bright:#be164d;--gold:#cba65f;--green:#35bd72;--danger:#d3184e;
+  --wine-bright:#e24a73;--gold:#cba65f;--green:#35bd72;--danger:#e24a73;
   --sans:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --serif:"Bodoni Moda",Didot,serif;--header:88px;--nav:88px;
   color-scheme:dark;

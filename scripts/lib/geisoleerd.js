@@ -19,7 +19,17 @@ const GEISOLEERD = new Set([
   'klok.test.js',
   'zaakdoos.test.js',
   'keuring.test.js',
-  'meterijk.test.js'
+  'meterijk.test.js',
+  /* ERBIJ OP 22 AUGUSTUS 2026, en met een eerlijke slag om de arm. Deze toets
+     slaagt drie van de drie keer alleen en zakte in CI binnen een scherf van 272
+     bestanden op 'de zaak laat achteraf betalen' -- een betaalinstelling van een
+     leverancier die hij leest nadat een ander hem heeft gezet. WELKE toets dat
+     doet heb ik niet aangewezen; wat vaststaat is dat hij alleen wel en samen
+     niet werkt. Isoleren is hier het juiste gereedschap en geen doekje: de rest
+     van de suite wordt er niet trager van, en een toets die van zijn buren
+     afhangt meet niet wat hij beweert. Wie de echte botsing vindt, haalt hem
+     hier weg. */
+  'lidfactuur.test.js'
 ]);
 
 module.exports = { GEISOLEERD };

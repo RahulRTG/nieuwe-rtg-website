@@ -180,7 +180,13 @@ function startEchteServer() {
      (test/rtfagenda.e2e.js); de keuring niet. */
   const gezin = await fetch(basis + '/api/foundation/gezin/maak', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ gezinsnaam: 'Keurgezin', naam: 'Papa', pin: '1234' })
+    /* bevoegdGezin en privacyAkkoord zijn sinds 22 augustus 2026 verplicht: een
+       gezin aanmaken vraagt om een bevestiging dat je dat mag en de
+       privacy-uitleg begrijpt (server/foundation/gezin.js). Deze scan bootst een
+       echte gebruiker na, dus hij bevestigt ze net als die gebruiker -- en niet
+       door de poort te omzeilen met NODE_ENV=test. */
+    body: JSON.stringify({ gezinsnaam: 'Keurgezin', naam: 'Papa', pin: '1234',
+      bevoegdGezin: true, privacyAkkoord: true })
   }).then(r => r.json()).catch(() => ({}));
   if (!gezin || !gezin.token) {
     console.error('[a11y] MISLUKT: geen proefgezin, dus de RTF-schermen zouden achter hun deur blijven staan.');

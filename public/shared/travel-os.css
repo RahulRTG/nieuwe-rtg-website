@@ -53,8 +53,6 @@ body.travel-os{
 
 body.travel-os *{box-sizing:border-box}
 body.travel-os :focus-visible{outline:2px solid var(--tos-gold) !important;outline-offset:3px}
-body.travel-os .amn-knop{display:none !important}
-
 .tos-topbar{
   position:fixed;
   z-index:100;

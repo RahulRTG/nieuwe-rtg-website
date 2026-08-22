@@ -19,8 +19,8 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4514 |
-| servermodules (`server/**/*.js`) | 2555 |
-| routebestanden (`server/routes/**`) | 500 |
+| servermodules (`server/**/*.js`) | 2556 |
+| routebestanden (`server/routes/**`) | 501 |
 | kernmodules (`server/kern/**`) | 1584 |
 | schermen (`public/**/*.html`) | 266 |
 | gedeelde browsermodules (`public/shared/*.js`) | 266 |
@@ -106,7 +106,7 @@ zie §5 -- er zijn nog 206 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 53 |
-| `member` | 667 | 62 | 12 | 414 |
+| `member` | 667 | 63 | 12 | 414 |
 | `supplier` | 569 | 106 | 6 | 302 |
 | `office` | 59 | 15 | 3 | 75 |
 | `staff` | 26 | 8 | 1 | 42 |

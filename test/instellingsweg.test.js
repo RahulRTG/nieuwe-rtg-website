@@ -149,8 +149,21 @@ test('via het partnerformulier komt niemand als gemeente of marechaussee binnen'
   try {
     const P = post(srv.base);
     const lid = await versLid(P, 'Zita');
+    /* DE AANVRAAG DRAAGT NU EEN ECHTE REGISTRATIE. Sinds de samenvoeging van
+       22 augustus 2026 loopt /api/partner/apply langs de officiele controles:
+       een geldig handelsregisternummer, de verklaringen, en de verwerkersafspraken.
+       Deze toets meet de GENREpoort en niet die controles, dus vult hij ze
+       correct in -- anders zakt hij op "Een Nederlands KVK-nummer bestaat uit
+       precies 8 cijfers" en leest dat als "het genre is dicht". */
+    let kvkTeller = 10000000;
     const aanvraag = (type, company) => ({ company, type, city: 'Proefdorp',
-      contactName: 'Z. Aanvrager', email: 'z' + Date.now() + '@x.nl', akkoord: true });
+      contactName: 'Z. Aanvrager', email: 'z' + Date.now() + '@x.nl', akkoord: true,
+      landCode: 'NL', kvkNummer: String(++kvkTeller), vestigingsnummer: '0000' + String(kvkTeller),
+      bevoegd: true, waarheidsgetrouw: true, vergunningenGeldig: true, privacyAkkoord: true,
+      /* De officiele referenties die de aanvrager zelf aanlevert. Voor een
+         restaurant is dat de NVWA-registratie; welke eisen een genre kent staat
+         in kern/bedrijfscontrole.js en niet hier. */
+      bewijzen: { nvwa: 'NVWA-2026-PROEF' } });
 
     for (const genre of ['gemeente', 'luchthaven', 'ov', 'marechaussee', 'rijk']) {
       const r = await P('/api/partner/apply', aanvraag(genre, 'Zogenaamd ' + genre), lid);

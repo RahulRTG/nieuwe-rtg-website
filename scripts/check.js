@@ -1798,7 +1798,6 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/webauthn/login', 'de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
-    ['/api/foundation/registratie/catalogus', 'de openbare FOUNDATION-keuzelijst met officiële bronnen en actieve steden; bevat geen aanvragers'],
     ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
     ['/api/foundation/registratie/status', 'de willekeurige, gehashte statussleutel is de geloofsbrief en toont uitsluitend die ene aanvraag (met rem per ip)'],
     /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en
@@ -1939,7 +1938,6 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/krant/artikel', 'idem'],
     ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
     ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
-    ['/api/partner/types', 'de openbare keuzelijst met aanvraagbare bedrijfssoorten en bijbehorende officiële bronnen; bevat geen aanvraag- of bedrijfsdata'],
     ['/api/book', 'idem: boeken via het partnerkanaal is de hele opzet'],
     /* Een klaargezette reis wordt geopend door iemand die nog GEEN lid is --
        dat is de hele opzet van de reisuitnodiging. Het slot is de code zelf

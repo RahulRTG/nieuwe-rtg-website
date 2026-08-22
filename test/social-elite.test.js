@@ -121,23 +121,58 @@ test('Reality Engine is in elke Social-ruimte dezelfde werkende systeemlaag', ()
       /<script src="\/shared\/social-intelligence\.js" defer><\/script>/,
       app + ' laadt de gedeelde Intelligence-laag');
     assert.match(lees('public/apps/' + app + '.html'),
+      /<script src="\/shared\/social-intelligence-deck\.js" defer><\/script>/,
+      app + ' laadt het gedeelde commandodeck');
+    assert.match(lees('public/apps/' + app + '.html'),
       /<script src="\/shared\/social-intelligence-runtime\.js" defer><\/script>/,
       app + ' laadt de gedeelde Intelligence-runtime');
+    assert.match(lees('public/apps/' + app + '.html'),
+      /<script src="\/shared\/social-intelligence-data\.js" defer><\/script>/,
+      app + ' verbindt het commandodeck met de bestaande Social-routes');
   }
 
   const js = lees('public/shared/social-intelligence.js') +
-    lees('public/shared/social-intelligence-runtime.js');
+    lees('public/shared/social-intelligence-deck.js') +
+    lees('public/shared/social-intelligence-runtime.js') +
+    lees('public/shared/social-intelligence-data.js');
   assert.match(js, /REALITY GRAPH/);
   assert.match(js, /MENS BESLIST/);
   assert.match(js, /navigator\.onLine/);
   assert.match(js, /location\.protocol === 'https:'/,
     'de netwerkstatus claimt alleen TLS wanneer de pagina echt via HTTPS draait');
   assert.match(js, /event\.ctrlKey \|\| event\.metaKey/);
-  assert.match(js, /\.rtg-rahul-tab/);
+  for (const route of ['/api/sociaal/graaf', '/api/sociaal/beleid',
+    '/api/sociaal/beleid/zet', '/api/sociaal/rahul', '/api/sociaal/actielog']) {
+    assert.ok(js.includes(route), route + ' is in de Control Plane aangesloten');
+  }
+  assert.match(js, /role="tablist"/);
+  assert.match(js, /Waarop dit antwoord rust/);
+  assert.match(js, /Automatische verzending bestaat niet/);
   assert.doesNotMatch(js, /on(?:click|keydown|submit)\s*=/i,
     'de gedeelde laag gebruikt geen inline event handlers');
-  assert.doesNotThrow(() => new Function(lees('public/shared/social-intelligence.js')));
-  assert.doesNotThrow(() => new Function(lees('public/shared/social-intelligence-runtime.js')));
+  for (const bestand of ['social-intelligence.js', 'social-intelligence-deck.js',
+    'social-intelligence-runtime.js', 'social-intelligence-data.js']) {
+    const bron = lees('public/shared/' + bestand);
+    assert.doesNotThrow(() => new Function(bron));
+    assert.ok(Buffer.byteLength(bron) <= 10 * 1024, bestand + ' blijft onder 10 kB');
+  }
+});
+
+test('bestaande Social-functies hebben een bedienbare ingang in hun eigen ruimte', () => {
+  const verwachtingen = {
+    'genootschap.html': ['/genootschap/pas-aan', '/genootschap/nodig-uit', '/genootschap/rol',
+      '/genootschap/eruit', '/genootschap/reactie-weg'],
+    'pulse.html': ["api('profiel'", "api('volg'"],
+    'cercle.html': ["api('cercle/club'", "api('cercle/gast/terug'"],
+    'entourage.html': ["api('entourage/persoon'", "api('entourage/doc'", "api('entourage/doc/weg'"],
+    'attenties.html': ["api('attenties/relatie'", "api('attenties/gift'", "api('attenties/gift/weg'"]
+  };
+  for (const [bestand, routes] of Object.entries(verwachtingen)) {
+    const html = lees('public/apps/' + bestand);
+    for (const route of routes) assert.ok(html.includes(route), route + ' is aangesloten in ' + bestand);
+    const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+    for (const script of scripts) assert.doesNotThrow(() => new Function(script), bestand + ' blijft geldige browsersyntaxis');
+  }
 });
 
 test('Reality Engine blijft bruikbaar, leesbaar en rustig op mobiel', () => {

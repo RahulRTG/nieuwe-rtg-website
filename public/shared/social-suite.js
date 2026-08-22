@@ -16,7 +16,7 @@
   var privéPaden = ['/apps/sociaal-prive.html', '/apps/meet.html', '/apps/vonk.html',
     '/apps/rendezvous.html', '/apps/cercle.html', '/apps/entourage.html', '/apps/attenties.html'];
   var actief = pad === '/apps/comm.html' ? 'messages' :
-    pad === '/apps/salon.html' ? 'salon' :
+    (pad === '/apps/salon.html' || pad === '/apps/pulse.html') ? 'salon' :
     pad === '/apps/genootschap.html' ? 'circles' :
     privéPaden.indexOf(pad) !== -1 ? 'private' : 'today';
 

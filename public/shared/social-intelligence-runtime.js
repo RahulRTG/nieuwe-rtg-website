@@ -20,6 +20,7 @@
       scrim.hidden = false;
       document.body.classList.add('rtg-intel-open');
       closeButton.focus();
+      document.dispatchEvent(new CustomEvent('rtg:intel-open'));
     }
     function closeDeck() {
       scrim.hidden = true;
@@ -42,12 +43,6 @@
     opener.addEventListener('click', openDeck);
     closeButton.addEventListener('click', closeDeck);
     scrim.addEventListener('click', function (event) { if (event.target === scrim) closeDeck(); });
-    scrim.querySelector('[data-intel-action="rahul"]').addEventListener('click', function () {
-      closeDeck();
-      var rahul = document.querySelector('.rtg-rahul-tab');
-      if (rahul) rahul.click();
-      else location.href = '/apps/app.html';
-    });
     document.addEventListener('keydown', function (event) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();

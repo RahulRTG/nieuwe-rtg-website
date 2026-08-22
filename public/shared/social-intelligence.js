@@ -15,7 +15,7 @@
   var privatePaths = ['/apps/sociaal-prive.html', '/apps/meet.html', '/apps/vonk.html',
     '/apps/rendezvous.html', '/apps/cercle.html', '/apps/entourage.html', '/apps/attenties.html'];
   var active = pad === '/apps/comm.html' ? 'messages' :
-    pad === '/apps/salon.html' ? 'salon' :
+    (pad === '/apps/salon.html' || pad === '/apps/pulse.html') ? 'salon' :
     pad === '/apps/genootschap.html' ? 'circles' :
     privatePaths.indexOf(pad) !== -1 ? 'private' : 'today';
   var contextName = routes.filter(function (route) { return route.key === active; })[0].label;
@@ -126,23 +126,11 @@
     else document.body.insertBefore(strip, document.body.firstChild);
   }
 
-  function deck() {
-    var scrim = make('div', 'rtg-intel-scrim');
-    scrim.hidden = true;
-    scrim.innerHTML = '<aside class="rtg-intel-deck" id="rtgIntelDeck" role="dialog" aria-modal="true" aria-labelledby="rtgIntelTitle">' +
-      '<header><div><span>RTG CONTROL PLANE</span><h2 id="rtgIntelTitle">Van context naar besluit.</h2></div><button type="button" class="rtg-intel-close" aria-label="Sluit commandodeck">SLUIT</button></header>' +
-      '<div class="rtg-deck-grid"><section class="rtg-deck-context"><span>ACTIVE CONTEXT</span><strong>' + contextName + '</strong><p>De Reality Engine ordent wat hier zichtbaar is. Geen profielscore, geen verborgen rangorde.</p><dl><div><dt>Assistentie</dt><dd>Voorbereiden</dd></div><div><dt>Publicatie</dt><dd>Geblokkeerd</dd></div><div><dt>Laatste stap</dt><dd>Menselijk akkoord</dd></div></dl></section>' +
-      '<nav class="rtg-deck-actions" aria-label="Commandokeuzes"><button type="button" data-intel-action="rahul"><span>01 / ASSIST</span><b>Vraag Rahul</b><small>Open de lokale contextassistent</small></button><a href="/apps/sociaal.html"><span>02 / ORIENT</span><b>Open Vandaag</b><small>Keer terug naar uw briefing</small></a><a href="/apps/juridisch/privacy.html"><span>03 / VERIFY</span><b>Privacy protocol</b><small>Bekijk grenzen en waarborgen</small></a></nav></div>' +
-      '<footer><span><i></i>SYSTEM READY</span><b>CTRL / CMD + K</b></footer></aside>';
-    document.body.appendChild(scrim);
-    return scrim;
-  }
-
   window.RTGRealityEngine = {
+    contextName: contextName,
     addStylesheet: addStylesheet,
     mountGraph: mountGraph,
     mountTelemetry: mountTelemetry,
-    visibleSignals: visibleSignals,
-    deck: deck
+    visibleSignals: visibleSignals
   };
 })();

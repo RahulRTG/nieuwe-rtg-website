@@ -65,6 +65,14 @@
   .aibalk form{display:flex;gap:.5rem;max-width:660px;margin:0 auto;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/social-suite.css" rel="stylesheet">
+<link href="/shared/social-intelligence.css" rel="stylesheet">
+<script src="/shared/social-suite.js" defer></script>
+<script src="/shared/social-intelligence.js" defer></script>
+<script src="/shared/social-intelligence-deck.js" defer></script>
+<script src="/shared/social-intelligence-runtime.js" defer></script>
+<script src="/shared/social-intelligence-data.js" defer></script>
+<script id="rtgAppMenuJs" src="/shared/appmenu.js" defer></script>
 </head>
 <body class="rtg-stijl">
 <a href="#main" class="skip">Naar de inhoud</a>
@@ -140,7 +148,7 @@
       (g.mijnRol==='beheerder'?'<button class="knop stil" id="bgezond" type="button">Hoe staat het ervoor</button>'+
         '<button class="knop stil" id="balles" type="button">Neem alles mee</button>':'')+
       '<button class="knop stil" id="bvertrek" type="button">Vertrekken</button></div>'+
-      '<div class="uit" id="ugezond" hidden></div></div>';
+      '<div class="uit" id="ugezond" hidden></div></div><div class="kaart" id="kbeheer" hidden></div>';
 
     /* Wat heb je gemist? Met een bodem: staat er niets, dan zegt de app dat, in
        plaats van iets te verzinnen om je bezig te houden. */
@@ -183,15 +191,40 @@
               '<div class="staaf"><i style="width:'+pct+'%;"></i></div>';
           }).join('')+'<small class="h-mt30">'+x.peiling.totaal+' stemmen</small></div>' : '')+
           (x.reacties.length ? '<div class="h-mt40">'+x.reacties.map(function(r){
-            return '<small><b>'+esc(r.van)+':</b> '+esc(r.tekst)+'</small>'; }).join('')+'</div>' : '')+
+            return '<small><b>'+esc(r.van)+':</b> '+esc(r.tekst)+
+              (r.vanMij||g.mijnRol==='beheerder'?' <button class="mini" data-reactie-weg="'+x.id+'" data-reactie-id="'+r.id+'">verwijder reactie</button>':'')+
+              '</small>'; }).join('')+'</div>' : '')+
           '<div class="knoppen"><input data-reactie="'+x.id+'" placeholder="Reageren" aria-label="Reageren op dit bericht" style="max-width:60%;">'+
           '<button class="mini" data-reageer="'+x.id+'">plaatsen</button>'+
           (x.vanMij||g.mijnRol==='beheerder'?'<button class="mini" data-prikweg="'+x.id+'">weg</button>':'')+'</div></div></div>';
       }).join('') : '<div class="leeg">Het prikbord is nog leeg.</div>')+
-      (d.meer ? '<button class="knop stil" id="bmeer" type="button">Meer laden</button>' : (b.length?'<div class="leeg">Je bent bij.</div>':''))+
+      (d.meer ? '<button class="knop stil" id="bmeer" data-na="'+esc(d.volgende)+'" type="button">Meer laden</button>' : (b.length?'<div class="leeg">Je bent bij.</div>':''))+
       '</div>';
     toon(html);
     tekenBijgepraat(g.id);
+  }
+
+  /* De bestaande beheerroutes krijgen hier hun menselijke werkplek. De server
+     blijft beslissen wat mag; het scherm toont alleen de codenamen en grenzen
+     die `mijn` al teruggeeft. */
+  function tekenLeden(g){
+    var host = $('#kbeheer'); if (!host) return;
+    var beheer = g.mijnRol === 'beheerder';
+    var magNodigen = beheer || g.soort === 'openbaar';
+    var nauwer = ['openbaar','besloten','geheim'].filter(function(s){
+      return ['openbaar','besloten','geheim'].indexOf(s) >= ['openbaar','besloten','geheim'].indexOf(g.soort);
+    });
+    host.hidden = false;
+    host.innerHTML = '<h2>Leden en toegang</h2><p style="color:var(--soft);font-size:.78rem;line-height:1.5;">Codenamen beschermen de identiteit. Een uitnodiging wordt nooit automatisch lidmaatschap.</p>'+
+      (beheer?'<div class="uit"><label for="gnaam">Genootschap beheren</label><input id="gnaam" maxlength="70" value="'+esc(g.naam)+'">'+
+        '<label for="gsoort">Zichtbaarheid kan alleen strenger</label><select id="gsoort">'+nauwer.map(function(s){ return '<option value="'+s+'"'+(s===g.soort?' selected':'')+'>'+esc(SOORT[s])+'</option>'; }).join('')+'</select>'+
+        '<label for="gover">Waarover</label><textarea id="gover" rows="2" maxlength="600">'+esc(g.over)+'</textarea>'+
+        '<label for="gregels">Huisregels</label><textarea id="gregels" rows="2" maxlength="800">'+esc(g.regels)+'</textarea><div class="knoppen"><button class="knop" id="bgroepbewaar" type="button">Wijzigingen bewaren</button></div></div>':'')+
+      (magNodigen?'<div class="uit"><label for="guitnodig">Uitnodigen op codenaam</label><div style="display:flex;gap:.45rem;"><input id="guitnodig" maxlength="80" placeholder="codenaam"><button class="knop" id="bnodig" type="button">Uitnodigen</button></div></div>':'')+
+      '<div style="margin-top:.7rem;">'+(g.ledenlijst||[]).map(function(l){
+        return '<div class="rij"><div class="tx"><b>'+esc(l.codenaam)+(l.ikZelf?' (jij)':'')+'</b><small>'+esc(l.rol)+' · sinds '+esc(String(l.sinds||'').slice(0,10))+'</small></div>'+
+          (beheer&&!l.ikZelf?'<button class="mini" data-rol="'+esc(l.codenaam)+'" data-nieuwerol="'+(l.rol==='beheerder'?'lid':'beheerder')+'">'+(l.rol==='beheerder'?'maak lid':'maak beheerder')+'</button><button class="mini" data-eruit="'+esc(l.codenaam)+'">eruit</button>':'')+'</div>';
+      }).join('')+'</div>';
   }
 
   /* Bijgepraat: een korte lijst met een einde. Geen teller die oploopt en geen
@@ -306,7 +339,14 @@
     if (id === 'bleden') return api('/genootschap/mijn').then(function(d){
       var g = (d.groepen||[]).filter(function(x){ return String(x.id)===String(OPEN); })[0];
       if (!g) return melding('Kon de ledenlijst niet laden.');
-      melding('Leden: ' + (g.ledenlijst||[]).map(function(l){ return l.codenaam+' ('+l.rol+')'; }).join(', '));
+      tekenLeden(g);
+    });
+    if (id === 'bgroepbewaar') return api('/genootschap/pas-aan', { groep:OPEN, naam:$('#gnaam').value,
+      soort:$('#gsoort').value, over:$('#gover').value, regels:$('#gregels').value }).then(function(d){
+        melding(d.error||'Genootschap bijgewerkt.'); if(!d.error) openGroep(OPEN); });
+    if (id === 'bnodig') return api('/genootschap/nodig-uit', { groep:OPEN, wie:$('#guitnodig').value }).then(function(d){
+      melding(d.error||d.uitgenodigd+' is uitgenodigd en beslist zelf.');
+      if(!d.error) api('/genootschap/mijn').then(function(m){ var g=(m.groepen||[]).find(function(x){return String(x.id)===String(OPEN);}); if(g) tekenLeden(g); });
     });
     if (id === 'bgezien') return api('/genootschap/gezien', { groep:OPEN })
       .then(function(d){ if(d.error) return melding(d.error); tekenBijgepraat(OPEN); });
@@ -379,6 +419,18 @@
     var pw = ev.target.closest('[data-prikweg]');
     if (pw) return api('/genootschap/prik-weg', { groep:OPEN, id:pw.getAttribute('data-prikweg') })
       .then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+    var rw = ev.target.closest('[data-reactie-weg]');
+    if (rw) return api('/genootschap/reactie-weg', { groep:OPEN, id:rw.getAttribute('data-reactie-weg'),
+      reactieId:rw.getAttribute('data-reactie-id') }).then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+    var rz = ev.target.closest('[data-rol]');
+    if (rz) return api('/genootschap/rol', { groep:OPEN, wie:rz.getAttribute('data-rol'), rol:rz.getAttribute('data-nieuwerol') })
+      .then(function(d){ melding(d.error||'Rol aangepast.'); if(!d.error) openGroep(OPEN); });
+    var eu = ev.target.closest('[data-eruit]');
+    if (eu) {
+      if (!confirm(eu.getAttribute('data-eruit')+' uit dit genootschap zetten?')) return;
+      return api('/genootschap/eruit', { groep:OPEN, wie:eu.getAttribute('data-eruit') })
+        .then(function(d){ melding(d.error||'Lid verwijderd.'); if(!d.error) openGroep(OPEN); });
+    }
   });
 
   $('#aiform').addEventListener('submit', function(ev){

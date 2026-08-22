@@ -90,16 +90,61 @@
   .reactie .wie{font-weight:600;}
   .reactie .mini{background:none;border:none;color:var(--rtg-leesgoud,var(--gold));font-size:.7rem;cursor:pointer;padding:0 .3rem;}
 </style>
+<link href="/shared/social-elite.css" rel="stylesheet">
+<link href="/shared/salon-elite.css" rel="stylesheet">
+<link href="/shared/social-intelligence.css" rel="stylesheet">
+<script src="/shared/social-intelligence.js" defer></script>
+<script src="/shared/social-intelligence-deck.js" defer></script>
+<script src="/shared/social-intelligence-runtime.js" defer></script>
+<script src="/shared/social-intelligence-data.js" defer></script>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl rtg-social-elite rtg-salon-elite">
+<a class="skip" href="#main">Naar de inhoud</a>
+<div class="rtg-social-commandbar topbar cmd-tabs" aria-label="Sociale commandobalk">
+  <a class="rtg-social-commandbar-brand" href="/apps/sociaal.html"><span>RTG</span><small>LivingOS · De Salon</small></a>
+  <span class="rtg-social-commandbar-state">Alleen zichtbaar voor uw kring</span>
+</div>
+<nav class="salon-socialnav" aria-label="Sociale ruimtes">
+  <a href="/apps/sociaal.html"><span>Vandaag</span><small>briefing</small></a>
+  <a href="/apps/comm.html"><span>Berichten</span><small>gesprekken</small></a>
+  <a href="/apps/salon.html" aria-current="page"><span>Salon</span><small>momenten</small></a>
+  <a href="/apps/genootschap.html"><span>Kringen</span><small>genootschappen</small></a>
+  <a href="/apps/sociaal-prive.html"><span>Privé</span><small>besloten ruimtes</small></a>
+</nav>
+<div class="salon-werkveld">
 <header>
-  <div class="kop"><div><div class="ey">Uit De Salon</div><h1>De Salon</h1></div></div>
+  <div class="kop">
+    <div><div class="ey">Private member journal</div><h1>De Salon</h1><p class="salon-belofte">Momenten van mensen die u kent, in een omgeving die niets van u probeert te winnen.</p></div>
+    <a class="salon-terug" href="/apps/sociaal.html">Terug naar Social →</a>
+  </div>
   <div class="tabs" id="tabs" role="group" aria-label="Onderdelen"></div>
 </header>
-<main id="main"><div class="leeg">Laden…</div></main>
+<div class="salon-stage">
+  <main id="main"><div class="leeg">Laden…</div></main>
+  <aside class="salon-briefing" aria-label="Salon briefing">
+    <span class="salon-paneelkop">Private briefing</span>
+    <h2>Alleen wat van betekenis is.</h2>
+    <p>Rustig gerangschikt, zonder verslavende stroom, advertentiemodel of verborgen profielscore.</p>
+    <dl>
+      <div><dt>In beeld</dt><dd id="salonMomenten">Laden…</dd></div>
+      <div><dt>Bronnen</dt><dd id="salonMensen">Uw kring</dd></div>
+      <div><dt>Privacy</dt><dd>Codenamen</dd></div>
+    </dl>
+    <div class="salon-briefingacties">
+      <button type="button" data-salon-jump="plaats">Deel een moment <span aria-hidden="true">→</span></button>
+      <button type="button" data-salon-jump="ik">Open uw profiel <span aria-hidden="true">→</span></button>
+    </div>
+    <a class="salon-kringlink" href="/apps/genootschap.html">Beheer uw kringen</a>
+  </aside>
+</div>
+</div>
+<div class="salon-melding" id="salonMelding" role="status" aria-live="polite" aria-atomic="true" hidden>
+  <span id="salonMeldingTekst"></span>
+  <button type="button" id="salonMeldingSluit" aria-label="Melding sluiten">×</button>
+</div>
 <div class="aibalk" id="aibalk" hidden>
   <div class="uit" id="aiuit" hidden aria-live="polite"></div>
   <form id="aiform">
@@ -119,7 +164,9 @@
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
-let TAB='feed', ONDERWERP='', ZOEK='', NA=null, POSTS=[], NIEUW={media:[]}, ARCHIEF=false;
+const BEGIN_TAB=(/^#(feed|ontdek|plaats|bewaard|inzicht|ik)$/.exec(location.hash)||[])[1]||'feed';
+let TAB=BEGIN_TAB, ONDERWERP='', ZOEK='', NA=null, POSTS=[], NIEUW={media:[]}, ARCHIEF=false, TERUG_PROFIEL='';
+let MELD_TIMER=null;
 
 const TABS=[['feed','Feed'],['ontdek','Ontdekken'],['plaats','Plaatsen'],['bewaard','Bewaard'],['inzicht','Inzicht'],['ik','Mijn profiel']];
 const tijd=iso=>{ if(!iso) return ''; const d=new Date(iso), nu=new Date(); const dag=86400000;
@@ -134,19 +181,38 @@ async function api(pad,body){
   return d;
 }
 const toon=h=>{ $('#main').innerHTML=h; };
-function meld(t){ const u=$('#aiuit'); u.hidden=false; u.textContent=t; }
+function sluitMelding(){ clearTimeout(MELD_TIMER); $('#salonMelding').hidden=true; }
+function meld(t){
+  const tekst=String(t||'');
+  const u=$('#aiuit'); u.hidden=false; u.textContent=tekst;
+  const m=$('#salonMelding'); $('#salonMeldingTekst').textContent=tekst; m.hidden=false;
+  clearTimeout(MELD_TIMER);
+  if(tekst.length<180) MELD_TIMER=setTimeout(()=>{ m.hidden=true; },6000);
+}
+$('#salonMeldingSluit').onclick=sluitMelding;
+
+async function werk(knop,taak){
+  if(knop.disabled) return;
+  knop.disabled=true; knop.setAttribute('aria-busy','true'); knop.classList.add('wacht');
+  try{ await taak(); }catch(e){ meld(e.message); }
+  finally{ if(knop.isConnected){ knop.disabled=false; knop.removeAttribute('aria-busy'); knop.classList.remove('wacht'); } }
+}
 
 function tekenTabs(){
+  document.body.dataset.salonTab=TAB;
   $('#tabs').innerHTML=TABS.map(([id,l])=>'<button type="button" data-t="'+id+'" aria-pressed="'+(TAB===id?'true':'false')+'">'+esc(l)+'</button>').join('');
-  $('#tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; ONDERWERP=''; NA=null; ARCHIEF=false; teken(); });
+  $('#tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    TAB=b.dataset.t; ONDERWERP=''; ZOEK=''; NA=null; ARCHIEF=false; TERUG_PROFIEL=''; teken();
+  });
 }
 
 /* ---------- de post zelf ---------- */
 function postHtml(p){
   const media=(p.media||[]).filter(m=>m&&m.src);
-  return '<article class="post" data-post="'+p.id+'">'+
-    '<div class="top"><button class="naam" data-profiel="'+esc(p.author)+'">'+esc(p.author)+'</button>'+
-      (p.place?'<span class="plek">'+esc(p.place)+'</span>':'')+
+  const initialen=String(p.author||'Lid').split(/\s+/).filter(Boolean).slice(0,2).map(n=>n[0]).join('').toUpperCase();
+  return '<article class="post" data-post="'+p.id+'" data-media="'+(media.length?'ja':'nee')+'">'+
+    '<div class="top"><span class="salon-avatar" aria-hidden="true">'+esc(initialen)+'</span><span class="salon-auteur"><button class="naam" data-profiel="'+esc(p.author)+'">'+esc(p.author)+'</button>'+
+      (p.place?'<span class="plek">'+esc(p.place)+'</span>':'')+'</span>'+
       (p.partner?'<span class="merk">partner</span>':(p.featured?'<span class="merk">uitgelicht</span>':''))+'</div>'+
     (media.length?'<div class="kar"><div class="strip">'+media.map(m=>
         '<img src="'+esc(m.src)+'" alt="'+esc(m.alt||'Foto uit De Salon')+'" loading="lazy">').join('')+'</div>'+
@@ -167,27 +233,30 @@ function postHtml(p){
 }
 function knopen(){
   const m=$('#main');
-  m.querySelectorAll('[data-onderwerp]').forEach(b=>b.onclick=()=>{ TAB='feed'; ONDERWERP=b.dataset.onderwerp; NA=null; teken(); });
+  m.querySelectorAll('[data-onderwerp]').forEach(b=>b.onclick=()=>{ TAB='feed'; ONDERWERP=b.dataset.onderwerp; ZOEK=''; NA=null; teken(); });
   m.querySelectorAll('[data-profiel]').forEach(b=>b.onclick=()=>toonProfiel(b.dataset.profiel));
-  m.querySelectorAll('[data-like]').forEach(b=>b.onclick=async()=>{
-    try{ await api('/api/like',{postId:Number(b.dataset.like)}); herlaad(); }catch(e){ meld(e.message); } });
-  m.querySelectorAll('[data-bewaar]').forEach(b=>b.onclick=async()=>{
-    try{ await api('/api/salon/bewaar',{id:Number(b.dataset.bewaar),aan:b.getAttribute('aria-pressed')!=='true'}); herlaad(); }catch(e){ meld(e.message); } });
-  m.querySelectorAll('[data-verberg]').forEach(b=>b.onclick=async()=>{
-    try{ await api('/api/salon/verberg',{id:Number(b.dataset.verberg),aan:true}); herlaad(); }catch(e){ meld(e.message); } });
-  m.querySelectorAll('[data-meld]').forEach(b=>b.onclick=async()=>{
+  m.querySelectorAll('[data-like]').forEach(b=>b.onclick=()=>werk(b,async()=>{
+    await api('/api/like',{postId:Number(b.dataset.like),liked:b.getAttribute('aria-pressed')!=='true'}); herlaad(); }));
+  m.querySelectorAll('[data-bewaar]').forEach(b=>b.onclick=()=>werk(b,async()=>{
+    await api('/api/salon/bewaar',{id:Number(b.dataset.bewaar),aan:b.getAttribute('aria-pressed')!=='true'}); herlaad(); }));
+  m.querySelectorAll('[data-verberg]').forEach(b=>b.onclick=()=>werk(b,async()=>{
+    await api('/api/salon/verberg',{id:Number(b.dataset.verberg),aan:true}); meld('Verborgen. Alleen u ziet deze post niet meer.'); herlaad(); }));
+  m.querySelectorAll('[data-meld]').forEach(b=>b.onclick=()=>{
     const reden=prompt('Wat klopt er niet aan deze post?'); if(reden===null) return;
-    try{ const r=await api('/api/salon/meld',{id:Number(b.dataset.meld),reden}); meld(r.verborgen?'Gemeld. De post is verborgen tot het kantoor ernaar kijkt.':'Gemeld. Dank je.'); }catch(e){ meld(e.message); } });
-  m.querySelectorAll('[data-arch]').forEach(b=>b.onclick=async()=>{
+    werk(b,async()=>{ const r=await api('/api/salon/meld',{id:Number(b.dataset.meld),reden});
+      meld(r.verborgen?'Gemeld. De post is verborgen tot het kantoor ernaar kijkt.':'Gemeld. Dank je.'); herlaad(); });
+  });
+  m.querySelectorAll('[data-arch]').forEach(b=>b.onclick=()=>{
     const aan=b.dataset.aan==='1';
-    try{ await api('/api/salon/archiveer',{id:Number(b.dataset.arch),aan});
+    werk(b,async()=>{ await api('/api/salon/archiveer',{id:Number(b.dataset.arch),aan});
       meld(aan?'In je archief. Hij is uit de etalage, maar hij is nog van jou.':'Terug in je raster.');
-      herlaad();
-    }catch(e){ meld(e.message); } });
-  m.querySelectorAll('[data-weg]').forEach(b=>b.onclick=async()=>{
+      herlaad(); });
+  });
+  m.querySelectorAll('[data-weg]').forEach(b=>b.onclick=()=>{
     if(!confirm('Deze post verwijderen?')) return;
-    try{ await api('/api/salon/weg',{id:Number(b.dataset.weg)}); herlaad(); }catch(e){ meld(e.message); } });
-  m.querySelectorAll('[data-reacties]').forEach(b=>b.onclick=()=>toonReacties(Number(b.dataset.reacties)));
+    werk(b,async()=>{ await api('/api/salon/weg',{id:Number(b.dataset.weg)}); meld('De post is verwijderd.'); herlaad(); });
+  });
+  m.querySelectorAll('[data-reacties]').forEach(b=>b.onclick=()=>{ TERUG_PROFIEL=''; toonReacties(Number(b.dataset.reacties)); });
 }
 const herlaad=()=>{ NA=null; teken(); };
 
@@ -211,19 +280,27 @@ async function tekenFeed(){
   });
   const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Je archief</h2>'
     : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Wat je bewaarde</h2>'
+    : ZOEK ? '<div class="kaart salon-selectie">Resultaten voor <b>“'+esc(ZOEK)+'”</b> <button class="mini" id="wisZoek" type="button">wissen</button></div>'
     : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">wissen</button></div>' : '';
   toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Nog niets te zien. Plaats zelf iets, of volg iemand.')+'</div>')
     + (d.meer ? '<button class="meer" id="meer">Meer laden</button>'
               : (POSTS.length?'<div class="leeg" style="padding:1.2rem;">Je bent bij.</div>':'')));
+  const momentStand=$('#salonMomenten'), mensenStand=$('#salonMensen');
+  if(momentStand) momentStand.textContent=POSTS.length+' '+(POSTS.length===1?'moment':'momenten');
+  if(mensenStand) mensenStand.textContent=new Set(POSTS.map(p=>p.author).filter(Boolean)).size+' '+
+    (new Set(POSTS.map(p=>p.author).filter(Boolean)).size===1?'persoon':'mensen');
   knopen();
   if($('#meer')) $('#meer').onclick=()=>{ NA=d.volgende; tekenFeed(); };
+  if($('#wisZoek')) $('#wisZoek').onclick=()=>{ ZOEK=''; NA=null; teken(); };
   if($('#wisOnderwerp')) $('#wisOnderwerp').onclick=()=>{ ONDERWERP=''; NA=null; teken(); };
 }
 
 /* ---------- ontdekken: onderwerpen, niet een motor die voor jou kiest ---------- */
 async function tekenOntdek(){
   toon('<div class="kaart"><label for="zoekveld">Zoeken in De Salon</label><input id="zoekveld" type="search" value="'+esc(ZOEK)+'" placeholder="Zoek op woord, plaats of codenaam"><div class="knoppen"><button class="knop" id="zoekknop" type="button">Zoeken</button></div></div><div id="onderwerpen" class="kaart"><h2>Waar het over gaat</h2><p style="color:var(--soft);font-size:.85rem;">Laden…</p></div>');
-  $('#zoekknop').onclick=()=>{ ZOEK=$('#zoekveld').value.trim(); TAB='feed'; NA=null; teken(); };
+  const voerZoek=()=>{ ZOEK=$('#zoekveld').value.trim(); ONDERWERP=''; TAB='feed'; NA=null; teken(); };
+  $('#zoekknop').onclick=voerZoek;
+  $('#zoekveld').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); voerZoek(); } };
   try{
     const d=await api('/api/salon/ai/waarover',{});
     $('#onderwerpen').innerHTML='<h2>Waar het over gaat</h2>'+
@@ -260,22 +337,20 @@ function tekenPlaats(){
       '<figure><img src="'+m.beeld+'" alt=""><input data-alt="'+i+'" placeholder="alt-tekst" aria-label="Alt-tekst voor foto '+(i+1)+'"></figure>').join('');
     $('#mini').querySelectorAll('[data-alt]').forEach(inp=>inp.oninput=()=>{ NIEUW.media[Number(inp.dataset.alt)].alt=inp.value; });
   };
-  $('#bijschriftknop').onclick=async()=>{
+  $('#bijschriftknop').onclick=()=>{
     const w=$('#ptekst').value.trim()||prompt('Een paar steekwoorden?')||'';
     if(!w) return;
-    meld('Rahul schrijft…');
-    try{ const r=await api('/api/salon/ai/bijschrift',{steekwoorden:w,plaats:$('#pplaats').value});
-      $('#ptekst').value=r.bijschrift; meld('Voorstel staat in het veld. Lees het na en plaats het zelf.');
-    }catch(e){ meld(e.message); }
+    werk($('#bijschriftknop'),async()=>{ meld('Rahul schrijft…');
+      const r=await api('/api/salon/ai/bijschrift',{steekwoorden:w,plaats:$('#pplaats').value});
+      $('#ptekst').value=r.bijschrift; meld('Voorstel staat in het veld. Lees het na en plaats het zelf.'); });
   };
-  $('#plaatsknop').onclick=async()=>{
-    const knop=$('#plaatsknop'); knop.classList.add('wacht');
-    try{
+  $('#plaatsknop').onclick=()=>{
+    const knop=$('#plaatsknop');
+    werk(knop,async()=>{
       await api('/api/salon/plaats',{tekst:$('#ptekst').value,plaats:$('#pplaats').value,
         media:NIEUW.media,reactiesVan:$('#preacties').value});
       TAB='feed'; NA=null; teken(); meld('Geplaatst.');
-    }catch(e){ meld(e.message); }
-    finally{ knop.classList.remove('wacht'); }
+    });
   };
 }
 
@@ -306,7 +381,7 @@ async function tekenInzicht(){
           '<button class="mini" data-reacties="'+p.id+'">openen</button></div></div>').join('')
         : '<p style="color:var(--soft);font-size:.85rem;">Je hebt nog niets geplaatst.</p>')+'</div>');
   knopen();
-  $('#archknop').onclick=()=>{ TAB='feed'; ARCHIEF=true; NA=null; ONDERWERP=''; tekenTabs(); tekenFeed(); };
+  $('#archknop').onclick=()=>{ TAB='feed'; ARCHIEF=true; NA=null; ONDERWERP=''; ZOEK=''; tekenTabs(); tekenFeed(); };
 }
 
 /* ---------- profiel ---------- */
@@ -332,13 +407,16 @@ async function toonProfiel(wie){
                  :'<span class="geen">'+esc((p.text||'').slice(0,60))+'</span>')+'</button>').join('')
       : '<div class="leeg" style="grid-column:1/-1;">Nog niets geplaatst.</div>')+'</div>');
   $('#terugknop').onclick=()=>{ TAB='feed'; NA=null; teken(); };
-  if($('#volgknop')) $('#volgknop').onclick=async()=>{
-    try{ await api('/api/salon/volg-lid',{wie:d.codenaam,aan:!d.volgIk}); toonProfiel(wie); }catch(e){ meld(e.message); } };
-  if($('#bioknop')) $('#bioknop').onclick=async()=>{
+  if($('#volgknop')) $('#volgknop').onclick=()=>werk($('#volgknop'),async()=>{
+    await api('/api/salon/volg-lid',{wie:d.codenaam,aan:!d.volgIk}); toonProfiel(wie); });
+  if($('#bioknop')) $('#bioknop').onclick=()=>{
     const bio=prompt('Je bio (kort):',d.bio||''); if(bio===null) return;
     const plaats=prompt('Plaats (mag leeg):',d.plaats||'')||'';
-    try{ await api('/api/salon/bio',{bio,plaats}); toonProfiel(wie); }catch(e){ meld(e.message); } };
-  $('#main').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>toonReacties(Number(b.dataset.open),true));
+    werk($('#bioknop'),async()=>{ await api('/api/salon/bio',{bio,plaats}); toonProfiel(wie); });
+  };
+  $('#main').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{
+    TERUG_PROFIEL=wie||'ik'; toonReacties(Number(b.dataset.open),true);
+  });
 }
 
 /* ---------- reacties, met antwoorden ---------- */
@@ -363,15 +441,18 @@ async function toonReacties(id, alleen){
   toon(html);
   let opId=null;
   $('#main').querySelectorAll('[data-antwoord]').forEach(b=>b.onclick=()=>{ opId=Number(b.dataset.antwoord); $('#rtekst').focus(); meld('Je antwoordt op een reactie.'); });
-  $('#main').querySelectorAll('[data-rweg]').forEach(b=>b.onclick=async()=>{
-    try{ await api('/api/salon/reactie-weg',{id,reactieId:Number(b.dataset.rweg)}); toonReacties(id,alleen); }catch(e){ meld(e.message); } });
-  if($('#rknop')) $('#rknop').onclick=async()=>{
+  $('#main').querySelectorAll('[data-rweg]').forEach(b=>b.onclick=()=>werk(b,async()=>{
+    await api('/api/salon/reactie-weg',{id,reactieId:Number(b.dataset.rweg)}); toonReacties(id,alleen); }));
+  if($('#rknop')) $('#rknop').onclick=()=>{
     const t=$('#rtekst').value.trim(); if(!t) return;
-    try{ await api('/api/salon/reageer',{id,tekst:t,op:opId}); toonReacties(id,alleen); }catch(e){ meld(e.message); } };
-  if($('#rsamen')) $('#rsamen').onclick=async()=>{
-    meld('Rahul leest de reacties…');
-    try{ const r=await api('/api/salon/ai/reacties',{id}); meld(r.samenvatting); }catch(e){ meld(e.message); } };
-  $('#rterug').onclick=()=>{ TAB='feed'; NA=null; teken(); };
+    werk($('#rknop'),async()=>{ await api('/api/salon/reageer',{id,tekst:t,op:opId}); toonReacties(id,alleen); });
+  };
+  if($('#rsamen')) $('#rsamen').onclick=()=>werk($('#rsamen'),async()=>{
+    meld('Rahul leest de reacties…'); const r=await api('/api/salon/ai/reacties',{id}); meld(r.samenvatting); });
+  $('#rterug').onclick=()=>{
+    if(alleen&&TERUG_PROFIEL) return toonProfiel(TERUG_PROFIEL);
+    TAB='feed'; NA=null; teken();
+  };
 }
 
 /* ---------- de AI-balk ---------- */
@@ -418,6 +499,11 @@ if(!TOKEN){
 window.RTGSalon = { api: api, herlaad: herlaad,
   archief: () => ARCHIEF,
   post: (id) => POSTS.filter((p) => String(p.id) === String(id))[0] || null };
+
+document.querySelectorAll('[data-salon-jump]').forEach(b=>b.addEventListener('click',()=>{
+  TAB=b.dataset.salonJump; ONDERWERP=''; ZOEK=''; NA=null; ARCHIEF=false; TERUG_PROFIEL=''; teken();
+  document.querySelector('.salon-werkveld')?.scrollIntoView({behavior:'smooth',block:'start'});
+}));
 </script>
 <script src="/apps/salon/gebaren.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

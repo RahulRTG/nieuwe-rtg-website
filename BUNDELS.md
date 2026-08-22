@@ -649,7 +649,7 @@ omlaag.
 
 ## `shared/handenvrij-scherm.js`
 
-`public/shared/handenvrij-scherm/` -- 2 delen, 201 regels in de delen
+`public/shared/handenvrij-scherm/` -- 2 delen, 215 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -87,9 +87,21 @@
     font-variant-numeric:var(--rtg-cijfers);}
   #lijn .verder{margin:.7rem 0 0;font-size:.74rem;color:var(--rtg-soft);}
 </style>
+<link href="/shared/social-elite.css" rel="stylesheet">
+<link href="/shared/sociaal-elite.css" rel="stylesheet">
+<link href="/shared/social-intelligence.css" rel="stylesheet">
+<script src="/shared/social-intelligence.js" defer></script>
+<script src="/shared/social-intelligence-deck.js" defer></script>
+<script src="/shared/social-intelligence-runtime.js" defer></script>
+<script src="/shared/social-intelligence-data.js" defer></script>
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-eigenvlak="onyx">
+<body class="rtg-stijl rtg-social-elite" data-rtg-modus="pro" data-rtg-eigenvlak="onyx">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
+
+<div class="rtg-social-commandbar topbar cmd-tabs" aria-label="Sociale commandobalk">
+  <a class="rtg-social-commandbar-brand" href="/apps/app.html"><span>RTG</span><small>LivingOS · Sociaal</small></a>
+  <span class="rtg-social-commandbar-state">Besloten ledennetwerk</span>
+</div>
 
 <aside class="sociaal-bank" aria-label="RTG hoofdnavigatie">
   <nav>
@@ -127,61 +139,65 @@
 <main id="inhoud">
   <header class="merkkop">
     <div>
-      <span class="sociaal-boven">Sociaal · Rahul</span>
-      <h1 class="rtg-ceremonie">Uw sociale wereld.</h1>
-      <p class="sociaal-inleiding">Mensen, gesprekken, momenten en professioneel werk in één rustige tijdlijn.</p>
+      <span class="sociaal-boven">RTG Social</span>
+      <h1 class="rtg-ceremonie">Uw wereld, zorgvuldig dichtbij.</h1>
+      <p class="sociaal-inleiding">Eén besloten omgeving voor gesprekken, kringen en momenten. Geen openbaar profiel en geen algoritme dat voor u kiest.</p>
     </div>
-    <button class="sociaal-filter" type="button" id="sociaalFilter" aria-expanded="false">Alles <span aria-hidden="true">⌄</span></button>
+    <button class="sociaal-filter" type="button" id="sociaalFilter" aria-expanded="false"
+      aria-haspopup="menu" aria-controls="sociaalFilterMenu"><span id="sociaalFilterLabel">Alles</span> <span aria-hidden="true">⌄</span></button>
+    <div class="sociaal-filtermenu" id="sociaalFilterMenu" role="menu" aria-label="Filter het sociale overzicht" hidden>
+      <button type="button" role="menuitemradio" aria-checked="true" data-sociaal-filter="alles">Alles <small>het volledige overzicht</small></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-sociaal-filter="vandaag" tabindex="-1">Vandaag <small>alles met de datum van vandaag</small></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-sociaal-filter="wacht" tabindex="-1">Wacht op mij <small>zaken die een antwoord vragen</small></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-sociaal-filter="gesprekken" tabindex="-1">Gesprekken <small>openstaande berichten</small></button>
+      <button type="button" role="menuitemradio" aria-checked="false" data-sociaal-filter="bijeenkomsten" tabindex="-1">Bijeenkomsten <small>momenten uit uw kringen</small></button>
+    </div>
   </header>
 
   <nav class="sociaal-ruimtes" aria-label="Sociale ruimtes">
-    <a class="actief" href="#lijn">Tijdlijn <small>alles bij elkaar</small></a>
+    <a class="actief" href="#lijn">Vandaag <small>uw persoonlijke briefing</small></a>
     <a href="/apps/comm.html" data-ruimte="Berichten">Berichten <small id="sociaalBerichtStand">gesprekken en bellen</small></a>
-    <a href="/apps/salon.html" data-ruimte="De Salon">Momenten <small>foto, tekst en video</small></a>
+    <a href="/apps/salon.html" data-ruimte="De Salon">Salon <small>momenten van uw kring</small></a>
     <a href="/apps/genootschap.html" data-ruimte="Genootschap">Kringen <small>groepen en bijeenkomsten</small></a>
-    <a href="/apps/pulse.html" data-ruimte="Pulse">Actueel <small>kort en professioneel</small></a>
+    <a href="/apps/sociaal-prive.html" data-ruimte="Privé">Privé <small>besloten ruimtes</small></a>
   </nav>
 
-  <!-- LAAG 0 EN LAAG 1 VAN HET COMMAND CANVAS (CANVAS.md): eerst de stand, dan
-       de rust, en pas daarna de functies. Hier stond een alarmbalk die
-       hetzelfde probeerde en het per scherm opnieuw uitvond.
+  <div class="sociaal-stage">
+    <!-- LAAG 3: echte momenten van vandaag, als het visuele zwaartepunt. -->
+    <section id="vandaagVak" hidden>
+      <span class="sociaal-uitgelicht">Uitgelicht · vandaag</span>
+      <div class="regkop"><h2>Uw volgende moment</h2><span class="tel" id="telVandaag"></span></div>
+      <div id="vandaag"></div>
+    </section>
 
-       ZE STAAN LEEG, EN DAT IS DE BELANGRIJKSTE REGEL VAN DIT BLOK. Een woord
-       dat in de HTML staat, staat er ook als er niets is opgehaald -- en dat is
-       precies de leugen die de stand niet mag vertellen. -->
-  <div id="stand"></div>
-  <div id="rust"></div>
+    <!-- LAAG 0, 1 EN 5: oordeel, rust en pas daarna een menselijke keuze. -->
+    <aside class="sociaal-briefing" aria-label="Concierge briefing">
+      <span class="sociaal-paneelkop">Concierge briefing</span>
+      <div id="stand"></div>
+      <div id="rust"></div>
+      <div id="klaar"></div>
+    </aside>
 
-  <!-- LAAG 3: DE COMMAND TIMELINE (CANVAS.md). Wat er vandaag OP DE KLOK staat:
-       de bijeenkomsten met een tijdstip. Een gesprek dat op u wacht heeft geen
-       uur -- dat is geen moment maar een openstaande zaak, en die hoort in het
-       register. Hij verdwijnt als er vandaag niets is. -->
-  <section id="vandaagVak" hidden>
-    <div class="regkop"><h2>Vandaag</h2><span class="tel" id="telVandaag"></span></div>
-    <div id="vandaag"></div>
+    <aside class="sociaal-kringpaneel" aria-label="Uw kring">
+      <div class="regkop">
+        <h2>Uw kring</h2>
+        <span class="tel" id="tel"></span>
+      </div>
+      <div id="kring"><p class="stil">Laden...</p></div>
+      <a class="sociaal-kringactie" href="/apps/genootschap.html">Open uw kringen <span aria-hidden="true">→</span></a>
+    </aside>
+  </div>
+
+  <!-- DE MOMENTLIJN (LIFE.md fase 4). Geen stroom om te blijven scrollen. -->
+  <section class="sociaal-register">
+    <div class="regkop lijnkop"><h2>Tijdlijn</h2><span class="tel" id="lijntel"></span></div>
+    <div id="lijn"></div>
   </section>
 
-  <!-- LIFE COMMAND (LIFE.md fase 5). Rahul zet klaar, u bevestigt. Elke knop
-       hieronder is een KEUZE en geen bevestiging van iets dat al ingevuld was:
-       er is geen enkele weg waarlangs dit scherm iets uitvoert zonder dat u
-       kiest. Wat er gebeurt staat er vooraf bij, want er zit een ander mens
-       achter. -->
-  <div id="klaar"></div>
-
-  <div class="regkop">
-    <h2>Uw kring</h2>
-    <span class="tel" id="tel"></span>
-  </div>
-  <div id="kring"><p class="stil">Laden...</p></div>
-
-  <!-- DE MOMENTLIJN (LIFE.md fase 4). Geen stroom berichten maar wat er in uw
-       leven aankomt, in de tijdvakken waarin een mens denkt. Lege vakken bestaan
-       niet: een week zonder afspraken is geen gat om op te vullen. -->
-  <div class="regkop lijnkop"><h2>Tijdlijn</h2><span class="tel" id="lijntel"></span></div>
-  <div id="lijn"></div>
-
-  <div class="regkop"><h2>De sociale wereld</h2></div>
-  <div class="poorten" id="poorten"></div>
+  <section class="sociaal-poorten">
+    <div class="regkop"><h2>De sociale wereld</h2></div>
+    <div class="poorten" id="poorten"></div>
+  </section>
 </main>
 
 <!-- HET OBJECTPANEEL. Niet een app openen maar een ding uit uw leven: wat kan
@@ -248,6 +264,17 @@
   const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
   const MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
   const VANDAAG = new Date().toISOString().slice(0, 10);
+  const FILTERS = {
+    alles: { label: 'Alles', past: () => true },
+    vandaag: { label: 'Vandaag', past: x => String(x.wanneer || '').slice(0, 10) === VANDAAG },
+    wacht: { label: 'Wacht op mij', past: x => x.wacht === 'ik' || Number(x.open) > 0 },
+    gesprekken: { label: 'Gesprekken', past: x => x.soort === 'gesprek' || x.link === '/apps/comm.html' },
+    bijeenkomsten: { label: 'Bijeenkomsten', past: x => x.soort === 'bijeenkomst' }
+  };
+  let ACTIEF_FILTER = 'alles';
+  let WERELD_DATA = null;
+  let LIJN_DATA = null;
+  const filterRegels = regels => (regels || []).filter(FILTERS[ACTIEF_FILTER].past);
   function dagdeel(d) {
     if (!d) return null;
     const x = new Date(d + 'T00:00:00');
@@ -388,7 +415,8 @@
 
   function teken(d) {
     tekenStand(d);
-    const alles = d.regels || [];
+    const bron = d.regels || [];
+    const alles = filterRegels(bron);
     tekenVandaag(alles);
     // wat op de tijdlijn staat, staat niet nog eens in het register
     const r = alles.filter(x => !opDeKlok(x));
@@ -397,7 +425,9 @@
       ? r.map(werkRegel).join('')
       : (alles.length
         ? '<p class="stil">Verder wacht er niemand op u; wat er vandaag is, staat hierboven.</p>'
-        : '<p class="stil">Er wacht niemand op u. Wat er in Berichten, Genootschap of Pulse speelt, komt hier vanzelf te staan.</p>');
+        : (ACTIEF_FILTER !== 'alles' && bron.length
+          ? '<p class="stil">Binnen ‘' + esc(FILTERS[ACTIEF_FILTER].label) + '’ staat nu niets.</p>'
+          : '<p class="stil">Er wacht niemand op u. Wat er in Berichten, Genootschap of Pulse speelt, komt hier vanzelf te staan.</p>'));
 
     $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
       '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
@@ -522,22 +552,65 @@
     } catch (err) {}
   });
 
-  $('#sociaalFilter').addEventListener('click', (e) => {
-    const open = e.currentTarget.getAttribute('aria-expanded') === 'true';
-    e.currentTarget.setAttribute('aria-expanded', String(!open));
-    const ruimtes = document.querySelector('.sociaal-ruimtes');
-    ruimtes.classList.toggle('filter-open', !open);
-    if (!open) ruimtes.querySelector('a:not(.actief)')?.focus();
+  const filterKnop = $('#sociaalFilter');
+  const filterMenu = $('#sociaalFilterMenu');
+  const filterKeuzes = [...filterMenu.querySelectorAll('[data-sociaal-filter]')];
+
+  function sluitFilter(herstelFocus) {
+    filterMenu.hidden = true;
+    filterKnop.setAttribute('aria-expanded', 'false');
+    if (herstelFocus) filterKnop.focus();
+  }
+
+  function openFilter() {
+    filterMenu.hidden = false;
+    filterKnop.setAttribute('aria-expanded', 'true');
+    (filterKeuzes.find(b => b.dataset.sociaalFilter === ACTIEF_FILTER) || filterKeuzes[0]).focus();
+  }
+
+  function kiesFilter(id) {
+    if (!FILTERS[id]) return;
+    ACTIEF_FILTER = id;
+    $('#sociaalFilterLabel').textContent = FILTERS[id].label;
+    filterKeuzes.forEach(b => {
+      const gekozen = b.dataset.sociaalFilter === id;
+      b.setAttribute('aria-checked', String(gekozen));
+      b.tabIndex = gekozen ? 0 : -1;
+    });
+    if (WERELD_DATA) teken(WERELD_DATA);
+    if (LIJN_DATA) tekenLijn(LIJN_DATA);
+    sluitFilter(true);
+  }
+
+  filterKnop.addEventListener('click', () => {
+    if (filterMenu.hidden) openFilter(); else sluitFilter(false);
+  });
+  filterKeuzes.forEach(b => b.addEventListener('click', () => kiesFilter(b.dataset.sociaalFilter)));
+  filterMenu.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); sluitFilter(true); return; }
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+    e.preventDefault();
+    const nu = Math.max(0, filterKeuzes.indexOf(document.activeElement));
+    const volgende = e.key === 'Home' ? 0 : e.key === 'End' ? filterKeuzes.length - 1
+      : (nu + (e.key === 'ArrowDown' ? 1 : -1) + filterKeuzes.length) % filterKeuzes.length;
+    filterKeuzes[volgende].focus();
+  });
+  document.addEventListener('pointerdown', e => {
+    if (!filterMenu.hidden && !filterMenu.contains(e.target) && !filterKnop.contains(e.target)) sluitFilter(false);
   });
 
   /* De lijn tekenen. Het scherm bepaalt GEEN vakken en verzint geen labels: het
      toont de vakken die de server stuurt, in de volgorde waarin ze komen. Zou
      het zelf indelen, dan wisten twee plekken wanneer "volgende week" begint. */
   function tekenLijn(d) {
-    const v = d.vakken || [];
-    $('#lijntel').textContent = '';
+    const v = (d.vakken || []).map(vak => ({ ...vak, regels: filterRegels(vak.regels) }))
+      .filter(vak => vak.regels.length);
+    const aantal = v.reduce((som, vak) => som + vak.regels.length, 0);
+    $('#lijntel').textContent = aantal ? aantal + (aantal === 1 ? ' moment' : ' momenten') : '';
     if (!v.length) {
-      $('#lijn').innerHTML = '<p class="stil">Er staat niets gepland. Dat is geen gat: het is een rustige week.</p>';
+      $('#lijn').innerHTML = '<p class="stil">' + (ACTIEF_FILTER === 'alles'
+        ? 'Er staat niets gepland. Dat is geen gat: het is een rustige week.'
+        : 'Binnen ‘' + esc(FILTERS[ACTIEF_FILTER].label) + '’ staat niets op de tijdlijn.') + '</p>';
       return;
     }
     $('#lijn').innerHTML = v.map(vak =>
@@ -552,7 +625,7 @@
       /* Een telling en geen "meer laden": wie verder vooruit wil kijken, opent
          de app die het bijhoudt. Een knop die de lijst blijft verlengen is
          precies het patroon dat CLAUDE.md verbiedt. */
-      (d.later ? '<p class="verder">' + d.later + (d.later === 1 ? ' ding staat' : ' dingen staan') +
+      (ACTIEF_FILTER === 'alles' && d.later ? '<p class="verder">' + d.later + (d.later === 1 ? ' ding staat' : ' dingen staan') +
         ' verder vooruit, in de app waar ze thuishoren.</p>' : '');
   }
 
@@ -626,7 +699,7 @@
         body: '{}'
       });
       const d = await res.json().catch(() => ({}));
-      if (res.ok) tekenLijn(d);
+      if (res.ok) { LIJN_DATA = d; tekenLijn(d); }
     } catch (e) { /* de kring staat er al; een stille lijn is geen kapot scherm */ }
   }
 
@@ -676,6 +749,7 @@
       });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      WERELD_DATA = d;
       teken(d);
       laadKlaar();
       laadLijn();

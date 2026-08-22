@@ -91,6 +91,7 @@ module.exports = ({ kern, db, save, klok }) => {
     const v = invoer && typeof invoer === 'object' ? invoer : {};
     const stukken = [];
     if (v.soort !== undefined) stukken.push('voorstellen "' + v.soort + '" ' + (v.aan === false ? 'uit' : 'aan'));
+    if (v.knop !== undefined) stukken.push('schakelaar "' + v.knop + '" ' + (v.aan === false ? 'uit' : 'aan'));
     if (v.horizon !== undefined) stukken.push('horizon ' + Math.round(Number(v.horizon)) + ' dagen');
     return logMod.schrijf(key, {
       wie: 'lid', wat: 'beleid gewijzigd: ' + (stukken.join(', ') || 'geen wijziging'),

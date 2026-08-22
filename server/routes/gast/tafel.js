@@ -39,14 +39,21 @@ module.exports = (kern) => {
     const menu = (s && Array.isArray(s.menu)) ? s.menu : [];
     const h = kern.horeca.H(zaakcode);
     const uit = (h.instel && h.instel.uitverkocht) || {};
+    const capaciteitPauze = new Set(((h.etenCapaciteit || {}).gepauzeerdeItems || []).map(String));
     const twins = h.dishTwins || {};
     return menu.map(m => ({
       id: m.id, naam: m.name, uitleg: m.desc || null, cat: m.cat || 'Overig',
       foto: m.foto || m.photo || m.image || null,
       centen: Math.round(Number(m.price) * 100), allergenen: Array.isArray(m.allergens) ? m.allergens : [],
+      ingredienten: Array.isArray(m.ingredienten) ? m.ingredienten : [],
+      dieet: Array.isArray(m.dieet) ? m.dieet : [],
+      opties: Array.isArray(m.opties) ? m.opties : [],
       station: m.station || null,
+      prepMin: m.prepMin || null,
       alcohol: !!m.alcohol || /wijn|bier|cava|cocktail|gin|whisk|rum|vodka|borrel/i.test(String(m.name || '')),
-      uitverkocht: !!uit[m.id], sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
+      uitverkocht: !!uit[m.id] || capaciteitPauze.has(String(m.id)),
+      tijdelijkGepauzeerd: capaciteitPauze.has(String(m.id)),
+      sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
       twin: twins[m.id] && twins[m.id].publicatie ? { versie:twins[m.id].publicatie.versie,
         presentatie:twins[m.id].publicatie.presentatie||null, service:twins[m.id].publicatie.service||null,
         pairing:twins[m.id].publicatie.pairing||null } : null

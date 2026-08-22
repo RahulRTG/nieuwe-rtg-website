@@ -102,7 +102,8 @@ module.exports = (kern) => {
       items: b.items, allergie: schoon(b.allergie, 120) || null,
       idem: b.idem, apparaat: schoon(b.apparaat, 40) || null,
       kaartVan: (id) => { const m = kaart.find(x => x.id === id); return m
-        ? { id: m.id, name: m.naam, price: m.centen / 100, cat: m.cat, station: m.station, alcohol: m.alcohol } : null; }
+        ? { id: m.id, name: m.naam, price: m.centen / 100, cat: m.cat, station: m.station, alcohol: m.alcohol,
+          opties:m.opties, ingredienten:m.ingredienten, allergenen:m.allergenen, prepMin:m.prepMin } : null; }
     });
     if (uit.error) return stuur(res, uit);
     if (uit.herhaald) return res.json(uit);
@@ -136,6 +137,13 @@ module.exports = (kern) => {
     } else {
       buitenshuis.zetAfhaal(rek, { datum: b.datum, tijd: b.tijd, opmerking: b.opmerking });
     }
+    rek.fooiCenten = voorbeeld.fooiCenten || 0;
+    if (voorbeeld.kortingCenten) {
+      rek.kortingen = (rek.kortingen || []).filter(k => k.bron !== 'kortingscode');
+      rek.kortingen.push({ reden:'Kortingscode ' + voorbeeld.kortingscode, centen:voorbeeld.kortingCenten,
+        code:voorbeeld.kortingscode, bron:'kortingscode' });
+    }
+    rek.prijsversie = voorbeeld.prijsversie;
     /* Bij betaling op locatie mag de keuken meteen aan de slag. Bij online
        betalen blijft de bon achter de harde grendel tot de provider definitief
        heeft bevestigd -- processing of authorized is nadrukkelijk niet genoeg. */

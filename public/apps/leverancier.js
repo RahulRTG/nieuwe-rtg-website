@@ -6252,7 +6252,6 @@
       o.guestArrived ? E('div', { class: 'enroute here' }, '' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
         : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
       o.allergyNote ? E('div', { class: 'allergy' }, '' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
-      // het zorgprofiel van de gast reist automatisch mee (alleen met toestemming)
       o.zorg ? E('div', { class: 'allergy' }, '' + T('sup.zorgp', 'Zorgprofiel gast:') + ' ' + zorgTekst(o.zorg)) : null,
       o.tagSalon ? E('div', { class: 'salon' }, '✦ ' + T('sup.wantssalon', 'Gast wil dit taggen voor De Salon')) : null,
       E('div', { class: 'acts' },
@@ -6264,15 +6263,13 @@
   }
   function renderOrders(){
     renderReserveringen();
+    laadEtenWerkblad();
     const list = state.orders || [];
     const wrap = $('#orderList');
     if (!list.length){ Util.vervang(wrap, Util.el('div', { class: 'empty' }, T('sup.noorders', 'Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.'))); return; }
     Util.vervang(wrap, list.map(orderKaart));
   }
 
-  /* De tafelplanning: vandaag als gedekte avond (tafels, komst, walk-ins) en
-     de komende dagen als lijst. Elke rij draagt zijn eigen knoppen: bevestigen,
-     tafel toewijzen, gast is er, no-show, vertrokken. */
   const RES_PILL = { aangevraagd:'nieuw', bevestigd:'bereiding', aangekomen:'klaar' };
   function resStatusTekst(st){
     return st==='aangevraagd'?T('res.st.nieuw','nieuw'):st==='bevestigd'?T('res.bevestigd','bevestigd'):st==='aangekomen'?T('res.st.er','aan tafel'):st==='no-show'?'no-show':st==='afgerond'?T('res.st.weg','vertrokken'):st;
@@ -6289,10 +6286,8 @@
       '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
         (r.tafel?' ·  '+esc(r.tafel):'')+(r.notitie?' ·  '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
         (r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
-      (knoppen.length
-        ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
-        : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+
-    '</div>';
+      (knoppen.length ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
+        : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+'</div>';
   }
   async function renderReserveringen(){
     const wrap = $('#resWrap');
@@ -6302,33 +6297,12 @@
     try { plan = await API.call('/supplier/tafelplan', {}); } catch(e){ plan = { reserveringen: [], tafels: [], verwachtePersonen: 0, openAanvragen: 0, zonderTafel: 0 }; }
     if (!plan.reserveringen.length && !later.length && !plan.tafels.length){ wrap.innerHTML = ''; return; }
     const chips = plan.tafels.length
-      ? '<div class="pos-chips h-mt50">'+plan.tafels.map(t =>
-          t.status==='vrij'
-            ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
-            : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>'
-        ).join('')+'</div>'+
-        '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
-      : '';
-    // de open rekeningen: alles wat de kassa op de tafel zette, hier afrekenen
+      ? '<div class="pos-chips h-mt50">'+plan.tafels.map(t => t.status==='vrij'
+        ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
+        : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>').join('')+'</div>'+ '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>' : '';
     const rekeningen = plan.tafels.filter(t => t.rekening);
-    const rekBlok = rekeningen.length
-      ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'">'+
-          '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--gold);">'+eur(t.rekening.totaal)+'</b></span>'+
-          '<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+
-            '<button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button>'+
-            '<button class="obtn js-reksplit">'+T('res.splits','Splits')+'</button>'+
-            '<button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span>'+
-        '</div>').join('')
-      : '';
-    wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
-      '<div class="pos-chips h-mt40">'+
-        '<span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
-        (plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
-        (plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
-      '</div>'+chips+rekBlok+
-      (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline h-mt50">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
-      '</div>'+
-      (later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
+    const rekBlok = rekeningen.length ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'"><span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--gold);">'+eur(t.rekening.totaal)+'</b></span><span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;"><button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button><button class="obtn js-reksplit">'+T('res.splits','Splits')+'</button><button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span></div>').join('') : '';
+    wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div><div class="pos-chips h-mt40"><span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+(plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+(plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+'</div>'+chips+rekBlok+(plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline h-mt50">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+'</div>'+(later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij
 /* een tafel afrekenen */
     wrap.querySelectorAll('[data-tafelrek]').forEach(el => {
@@ -6450,7 +6424,6 @@
         '</div>'
       ).join('')
     ).join('') : '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>';
-/* een gerecht aan de menukaart toevoegen */
     if (canEdit){
       html += '<div class="card h-mt120"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
         '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. gegrilde octopus')+'"></div>'+
@@ -6458,6 +6431,8 @@
         '<div class="field h-flex1"><label>'+T('menu.price','Prijs (€)')+'</label><input id="mnPrice" type="number" inputmode="decimal" placeholder="45"></div></div>'+
         '<div class="field"><label>'+T('menu.desc','Omschrijving')+'</label><input id="mnDesc" placeholder="'+T('menu.descph','Kort en smakelijk')+'"></div>'+
         '<div class="field"><label>'+T('menu.alg','Allergenen (komma\'s)')+'</label><input id="mnAlg" placeholder="vis, soja"></div>'+
+        '<div class="row-gap"><div class="field h-flex2"><label>Ingrediënten</label><input id="mnIng" placeholder="tomaat"></div><div class="field h-flex1"><label>Bereiding (min)</label><input id="mnPrep" placeholder="12"></div></div>'+
+        '<div class="field"><label>Dieetlabels</label><input id="mnDieet" placeholder="vegetarisch"></div><div class="field"><label>Keuzes</label><input id="mnOpt" placeholder="Cuisson*: medium, doorbakken +1; Extra: kaas"></div>'+
         '<div class="field"><label>'+T('menu.station','Werkplek')+'</label><select id="mnStation" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
         '<option value="keuken"'+((S&&(S.type==='bar'||S.type==='club'))?'':' selected')+'>\uD83D\uDD25 '+T('menu.keuken','Keuken')+'</option>'+
         '<option value="bar"'+((S&&(S.type==='bar'||S.type==='club'))?' selected':'')+'>\uD83C\uDF78 Bar</option></select></div>'+
@@ -6476,7 +6451,8 @@
     const add = $('#mnAdd'); if (add) add.addEventListener('click', async () => {
       const name = $('#mnName').value.trim(), price = Number($('#mnPrice').value);
       if (!name || !(price>0)){ toast(T('menu.fill','Vul een naam en prijs in.')); return; }
-      const item = { id: RTGId('m'), cat: $('#mnCat').value.trim()||T('menu.other','Overig'), name, desc: $('#mnDesc').value.trim(), price, allergens: $('#mnAlg').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean), station: $('#mnStation') ? $('#mnStation').value : 'keuken' };
+      const opties = $('#mnOpt').value.split(';').map((g,gi)=>{ const p=g.split(':'), kop=(p[0]||'').trim(), verplicht=kop.endsWith('*'); const keuzes=(p.slice(1).join(':')||'').split(',').map((v,ki)=>{const m=v.trim().match(/^(.*?)(?:\s+\+(\d+(?:[.,]\d+)?))?$/);return {id:'k-'+gi+'-'+ki,naam:(m&&m[1]||'').trim(),prijsCenten:Math.round(Number((m&&m[2]||'0').replace(',','.'))*100)};}).filter(k=>k.naam);return {id:'g-'+gi,naam:kop.replace(/\*$/,'').trim(),verplicht,min:verplicht?1:0,max:verplicht?1:Math.max(1,keuzes.length),keuzes};}).filter(g=>g.naam&&g.keuzes.length);
+      const item = { id: RTGId('m'), cat: $('#mnCat').value.trim()||T('menu.other','Overig'), name, desc: $('#mnDesc').value.trim(), price, allergens: $('#mnAlg').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean), ingredienten:$('#mnIng').value.split(',').map(a=>a.trim()).filter(Boolean), dieet:$('#mnDieet').value.split(',').map(a=>a.trim().toLowerCase()).filter(Boolean), opties, prepMin:Number($('#mnPrep').value)||undefined, station: $('#mnStation') ? $('#mnStation').value : 'keuken' };
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); toast(T('menu.added','Staat op de kaart, gasten zien het direct.')); await refresh(); openTab('menu'); } catch(e){ toast(e.message); }
     });
   }
@@ -8964,6 +8940,64 @@
     $('#notifList').innerHTML = notifs.length ? notifs.map(n =>
       '<div class="notif-item'+(n.read?'':' unread')+'"><div class="ic">'+(window.RTGGlyf&&RTGGlyf.heeft(n.icon)?RTGGlyf.svgHTML(n.icon,{klasse:'gl-inline'}):(n.icon||'•'))+'</div><div class="tx"><b>'+n.title+'</b><span>'+n.body+'</span><time>'+timeAgo(n.at)+'</time></div></div>'
     ).join('') : '<div class="empty">'+T('sup.nonotif','Nog geen meldingen. Nieuwe bestellingen en betalingen ziet u hier live.')+'</div>';
+  }
+  /* RTG Eten: gedeelde toestand en de rolgerichte orderkaart. */
+  let etenWerk = null, etenBezig = false, etenRol = 'keuken', etenZoek = '', etenFilters = [], etenZoekTimer = null;
+  try { etenRol = localStorage.getItem('rtg_eten_rol') || etenRol; } catch(e){}
+
+  function etenLabel(s){ return ({ keuken:'Keuken', expeditie:'Expeditie', frontoffice:'Frontoffice', management:'Management',
+    geaccepteerd:'Accepteren', 'in-bereiding':'Start bereiding', klaar:'Markeer klaar', overgedragen:'Overdragen',
+    onderweg:'Onderweg', geleverd:'Geleverd' })[s] || s; }
+  function etenBedrag(c){ return '€ ' + ((Number(c)||0)/100).toFixed(2).replace('.', ','); }
+  function etenOpties(p){ return (p.opties || []).map(o => o.naam || o.id).filter(Boolean).join(' · '); }
+
+  function etenOrderHtml(o){
+    const vertraagd = o.eta && o.eta.minuten > 45;
+    const producten = (o.producten || []).map(p => '<div class="eten-product"><span><b>'+esc(p.aantal+' × '+p.naam)+'</b>'+
+      (etenOpties(p)?'<small>'+esc(etenOpties(p))+'</small>':'')+
+      (etenRol==='keuken' && p.station?'<small>Station '+esc(p.station)+(p.notitie?' · '+esc(p.notitie):'')+'</small>':'')+
+      '</span><span>'+etenBedrag(p.centen*p.aantal)+'</span></div>').join('');
+    const allergenen = [...new Set((o.producten || []).flatMap(p => p.allergenen || []))];
+    const roltekst = etenRol==='expeditie' ? 'Verpakking, code en overdracht tegelijk controleren.'
+      : etenRol==='frontoffice' ? (o.kanaal==='afhaal' ? 'Afhaalcode en gastvraag staan voorop.' : 'Klantvragen en uitzonderingen blijven zichtbaar.')
+        : etenRol==='management' ? 'Prijs, betaling, SLA en audit zijn één orderbeeld.' : 'Gerechten, modifiers, timing en station.';
+    return '<article class="eten-order'+(vertraagd?' vertraagd':'')+'"><div class="eten-orderkop"><div><h4>'+esc(o.klant && o.klant.codenaam || 'Gast')+'</h4><p>'+esc(o.rekeningId || o.ref || o.id)+' · '+esc(o.kanaal)+'</p></div><span class="eten-fase">'+esc(o.status.label)+'</span></div>'+producten+
+      (o.allergieControle || allergenen.length ? '<div class="eten-alert"><b>Allergiecontrole</b>'+(allergenen.length?' · '+esc(allergenen.join(', ')):' · persoonlijke controle vereist')+'</div>' : '')+
+      '<div class="eten-meta"><span>ETA '+(o.eta?esc(o.eta.minuten)+' min':'niet bekend')+'</span>'+(o.code?'<span>Code '+esc(o.code)+'</span>':'')+'<span>'+esc(o.statussen.betaling)+'</span></div><p class="eten-perfect"><b>Perfect Arrival</b> · '+esc(o.perfectArrival && o.perfectArrival.advies || roltekst)+'</p><div class="eten-actie"><strong>'+etenBedrag(o.prijs && o.prijs.totaal)+'</strong>'+(o.volgende?'<button class="obtn primary" data-eten-status="'+esc(o.volgende)+'" data-eten-rekening="'+esc(o.rekeningId)+'">'+esc(etenLabel(o.volgende))+'</button>':'<span class="soft-xs">'+esc(roltekst)+'</span>')+'</div></article>';
+  }
+  /* Opbouw en bediening van het werkblad; de kaart zelf staat in 84a. */
+  function renderEtenWerkblad(){
+    const el = $('#etenWerkblad'); if (!el) return;
+    if (!etenWerk){ el.innerHTML = '<section class="eten-werk"><div class="eten-kop"><div><h3>RTG Eten · operationeel werkblad</h3><p>Dezelfde order als bij de klant, toegespitst op je rol.</p></div><span class="eten-live">Live</span></div><div class="eten-leeg">Werkblad wordt geladen…</div></section>'; return; }
+    const d = etenWerk, cap = d.capaciteit || {}, sm = d.samenvatting || {};
+    const rollen = (d.rollen || []).map(r => '<button data-eten-rol="'+r+'" class="'+(r===etenRol?'aan':'')+'">'+etenLabel(r)+'</button>').join('');
+    const filters = [['nieuw','Nieuw'],['vertraagd','Vertraagd'],['klaar','Klaar'],['afhaal','Afhaal'],['bezorging','Bezorging'],['allergie','Allergie'],['probleem','Probleem']].map(f => '<button data-eten-filter="'+f[0]+'" class="'+(etenFilters.includes(f[0])?'aan':'')+'">'+f[1]+'</button>').join('');
+    const pauzes = (state.menu || []).slice(0,60).map(m => '<label><input type="checkbox" data-eten-pauze="'+esc(m.id)+'" '+((cap.gepauzeerdeItems||[]).includes(String(m.id))?'checked':'')+'>'+esc(m.name || m.naam)+'</label>').join('');
+    const codes = (d.kortingscodes || []).map(k => '<span>'+esc(k.code)+' · '+(k.procent?k.procent+'%':etenBedrag(k.centen))+' <button class="obtn warn" data-eten-codeweg="'+esc(k.code)+'">×</button></span>').join('');
+    const beheer = etenRol === 'management' ? '<div class="eten-cap"><label><input type="checkbox" id="etenOpen" '+(cap.open?'checked':'')+'> Bestellen open</label><label><input type="checkbox" id="etenAuto" '+(cap.auto?'checked':'')+'> Automatische sturing</label><label>Minimale extra minuten<input id="etenExtra" type="number" min="0" max="120" value="'+Number(cap.ingesteldeExtraMinuten||0)+'"></label><label>Druk vanaf<input id="etenLimiet" type="number" min="10" max="180" value="'+Number(cap.limietMinuten||35)+'"></label><label>Koks op de lijn<input id="etenKokken" type="number" min="1" max="60" value="'+Number(cap.kokken||1)+'"></label><label><input type="checkbox" id="etenAfhaal" '+(cap.afhalenPromoten?'checked':'')+'> Afhalen voorop</label><div class="eten-breed"><span class="soft-xs">Gerechten tijdelijk pauzeren</span><div class="eten-pauzes">'+(pauzes||'<span>Geen kaartitems</span>')+'</div></div><p class="eten-capadvies">'+esc(cap.advies||'')+' · wachttijd '+Number(cap.wachttijd||0)+' min</p><button class="obtn primary eten-breed" id="etenCapBewaar">Capaciteit publiceren</button><div class="eten-breed"><span class="soft-xs">Kortingscodes</span><div class="eten-zoeken"><input id="etenCode" maxlength="30" placeholder="Code"><input id="etenProcent" type="number" min="1" max="100" placeholder="%"><button class="obtn" id="etenCodeBewaar">Bewaar</button></div><div class="eten-samenvatting">'+codes+'</div></div></div>' : '<div class="eten-cap"><p class="eten-capadvies">Capaciteit: <b>'+esc(cap.stand||'rustig')+'</b> · '+esc(cap.advies||'')+'</p></div>';
+    el.innerHTML = '<section class="eten-werk"><div class="eten-kop"><div><h3>RTG Eten · operationeel werkblad</h3><p>Nieuw → geaccepteerd → in bereiding → klaar → overgedragen. Geld, bewijs en audit lopen eronder mee.</p></div><span class="eten-live">Live</span></div><div class="eten-rollen">'+rollen+'</div><div class="eten-zoeken"><input id="etenZoek" value="'+esc(etenZoek)+'" placeholder="Zoek bestelling, nummer, klant, gerecht, code of bezorger"><button class="obtn" id="etenZoekGo">Zoek</button></div><div class="eten-filters">'+filters+'</div><div class="eten-samenvatting"><span><b>'+Number(sm.zichtbaar||0)+'</b> zichtbaar</span><span><b>'+Number(sm.nieuw||0)+'</b> nieuw</span><span><b>'+Number(sm.keuken||0)+'</b> keuken</span><span><b>'+Number(sm.klaar||0)+'</b> klaar</span><span><b>'+Number(sm.problemen||0)+'</b> aandacht</span></div>'+beheer+'<div class="eten-orders">'+((d.orders||[]).map(etenOrderHtml).join('')||'<div class="eten-leeg">Geen orders binnen deze rol en filters.</div>')+'</div></section>';
+    bindEtenWerkblad(el);
+  }
+
+  function bindEtenWerkblad(el){
+    el.querySelectorAll('[data-eten-rol]').forEach(b => b.addEventListener('click', () => { etenRol=b.dataset.etenRol; try{localStorage.setItem('rtg_eten_rol',etenRol);}catch(e){} laadEtenWerkblad(true); }));
+    el.querySelectorAll('[data-eten-filter]').forEach(b => b.addEventListener('click', () => { const f=b.dataset.etenFilter; etenFilters=etenFilters.includes(f)?etenFilters.filter(x=>x!==f):etenFilters.concat(f); laadEtenWerkblad(true); }));
+    const zoek = () => { etenZoek=$('#etenZoek').value.trim(); laadEtenWerkblad(true); };
+    $('#etenZoekGo').addEventListener('click', zoek); $('#etenZoek').addEventListener('keydown', e => { if(e.key==='Enter') zoek(); });
+    $('#etenZoek').addEventListener('input', e => { clearTimeout(etenZoekTimer); const v=e.target.value; etenZoekTimer=setTimeout(()=>{etenZoek=v.trim(); laadEtenWerkblad(true);},350); });
+    el.querySelectorAll('[data-eten-status]').forEach(b => b.addEventListener('click', async () => { b.disabled=true; try{await API.call('/supplier/eten/status',{rekeningId:b.dataset.etenRekening,status:b.dataset.etenStatus}); await laadEtenWerkblad(true); toast('Order bijgewerkt.');}catch(e){toast(e.message);b.disabled=false;} }));
+    const capBtn=$('#etenCapBewaar'); if(capBtn) capBtn.addEventListener('click', async () => { try{await API.call('/supplier/eten/capaciteit',{wijzig:true,open:$('#etenOpen').checked,auto:$('#etenAuto').checked,extraMinuten:Number($('#etenExtra').value),limietMinuten:Number($('#etenLimiet').value),kokken:Number($('#etenKokken').value),afhalenPromoten:$('#etenAfhaal').checked,gepauzeerdeItems:[...el.querySelectorAll('[data-eten-pauze]:checked')].map(x=>x.dataset.etenPauze)});await laadEtenWerkblad(true);toast('Capaciteit staat live.');}catch(e){toast(e.message);} });
+    const codeBtn=$('#etenCodeBewaar'); if(codeBtn) codeBtn.addEventListener('click',async()=>{try{await API.call('/supplier/eten/instellingen',{actie:'bewaar-korting',code:$('#etenCode').value,procent:Number($('#etenProcent').value)});await laadEtenWerkblad(true);toast('Kortingscode bijgewerkt.');}catch(e){toast(e.message);} });
+    el.querySelectorAll('[data-eten-codeweg]').forEach(b=>b.addEventListener('click',async()=>{try{await API.call('/supplier/eten/instellingen',{actie:'verwijder-korting',code:b.dataset.etenCodeweg});await laadEtenWerkblad(true);}catch(e){toast(e.message);} }));
+  }
+
+  async function laadEtenWerkblad(force){
+    if (etenBezig || !state || !state.supplier || !((state.supplier.caps||[]).includes('menu'))) return;
+    if (!force && etenWerk && Date.now()-Number(etenWerk._geladenAt||0)<10000){ renderEtenWerkblad(); return; }
+    etenBezig=true; if(!etenWerk) renderEtenWerkblad();
+    try { const d=await API.call('/supplier/eten/werkblad',{rol:etenRol,zoek:etenZoek,filters:etenFilters}); etenRol=d.rol; d._geladenAt=Date.now(); etenWerk=d; renderEtenWerkblad(); }
+    catch(e){ const el=$('#etenWerkblad'); if(el) el.innerHTML='<section class="eten-werk"><div class="eten-leeg">'+esc(e.message)+'</div></section>'; }
+    finally { etenBezig=false; }
   }
   async function loadNotifs(){ try { const d = await API.call('/supplier/notifications', {}); } catch(e){} }
   $('#bell').addEventListener('click', () => { $('#notifPanel').classList.add('open'); $('#notifScrim').classList.add('open'); if (notifs.some(n=>!n.read)){ notifs.forEach(n=>n.read=true); API.call('/supplier/notifications/read').catch(()=>{}); renderBell(); } });

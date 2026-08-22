@@ -112,13 +112,13 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 8 delen, 1033 regels in de delen
+`public/apps/backoffice/` -- 8 delen, 930 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `backoffice-01.js` | de backoffice: de basis (helpers, taal, elementen) |
 | `backoffice-01b.js` | backoffice, vervolg van deel 01 |
-| `backoffice-01c.js` | backoffice, vervolg van deel 01b: DE VAKBEWIJZEN |
+| `backoffice-01c.js` | backoffice, vervolg van deel 01b: DE OFFICIELE BRONWACHT |
 | `backoffice-02.js` | paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt |
 | `backoffice-03.js` | Live meekijken bij een SOS: het lid stuurt een WebRTC-aanbod via de office- stream ('ontmoeting-signaal'); wij openen... |
 | `backoffice-03c.js` | DE REISBALIE EN DE INSTELLINGEN -- twee kantoorschermen voor twee deuren die er wel waren maar nergens op uitkwamen |

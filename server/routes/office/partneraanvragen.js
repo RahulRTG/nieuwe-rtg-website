@@ -57,55 +57,15 @@ module.exports = (octx) => {
     sseToOffice('sync', { scope: 'team', partnerAanvraag: a.id });
     res.json({ ok: true, toelating: { status: a.toelating.status, open: r.open } });
   });
+  /* /api/office/partner/decide STAAT HIER NIET MEER, en dat is een besluit.
 
-  app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
-    const a = (db.data.partnerApplications || []).find(x => x.id === req.body.id);
-    if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
-    if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
-    const action = String(req.body.action || '');
-    if (!['goedkeuren', 'afwijzen'].includes(action)) return res.status(400).json({ error: 'Kies goedkeuren of afwijzen.' });
-    const door = boardroomWie(req);
-    const at = klokDatum().toISOString();
+     Deze module bracht een eigen `decide` mee. De verzameling had die route al,
+     in ./partners.js, en daar zit het werk van deze week in: de eis dat er een
+     LEDENBEWIJS bij de aanvraag zit voordat er een bedrijfscode uitgaat, en het
+     vastleggen van het abonnement van de zaak. Beide ontbraken in de versie
+     hier. Twee registraties op hetzelfde adres betekent bovendien dat de eerste
+     stil wint en de tweede dode code is (keuringsregel 31) -- dus de zwakkere
+     poort had de sterkere kunnen verdringen, afhankelijk van de laadvolgorde.
+     De regels- en controleroutes hieronder zijn wel nieuw en blijven. */
 
-    if (action === 'goedkeuren') {
-      const poort = toelatingscontrole.magGoedkeuren(a, Date.parse(at));
-      if (!poort.ok) return res.status(409).json(poort);
-      const code = makeSupplierCode(a.company);
-      const registratie = a.registratie ? JSON.parse(JSON.stringify(a.registratie)) : null;
-      if (registratie) delete registratie.voorcontrole;
-      const s = { code, name: a.company, type: a.type, city: a.city, loc: null,
-        rate: 0.12, menu: [], online: false, registratie,
-        activiteiten: a.activiteiten ? JSON.parse(JSON.stringify(a.activiteiten)) : {},
-        toelating: { aanvraagId: a.id, gecontroleerdAt: at,
-          eisen: a.toelating.eisen.map(e => ({ id: e.id, label: e.label, bron: e.bron,
-            status: e.status, gecontroleerd: e.gecontroleerd })) } };
-      ensureSupplierDefaults(s);
-      db.data.suppliers.push(s);
-      const pin = accounts.makePin();
-      await accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
-      a.status = 'goedgekeurd'; a.code = code;
-      a.besluit = { action, door, at };
-      save();
-      logActivity(code, { name: 'Boardroom' }, 'liet de partner toe na afronding van het toelatingsdossier');
-      const url = appUrl(req);
-      mail.send(a.email, 'Welkom als gecontroleerde partner van Rahul Travel Group',
-        'Beste ' + a.contactName + ',\n\n' + a.company + ' is na de toelatingscontrole goedgekeurd als RTG-partner.\n\n' +
-        'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
-        'Open de partner-app op ' + url + '/apps/leverancier.html, kies uw bedrijf via de code en log in als management. ' +
-        'Uw zaak staat nog offline totdat de ondernemer-poort, Salon-pagina en werkintro zijn afgerond.\n\nRahul Travel Group');
-      sseToOffice('sync', { scope: 'team' });
-      return res.json({ ok: true, code, pin });
-    }
-
-    const reden = schoon(req.body.reden, 300);
-    if (reden.length < 3) return res.status(400).json({ error: 'Leg kort vast waarom de aanvraag wordt afgewezen.' });
-    a.status = 'afgewezen';
-    a.besluit = { action, door, at, reden };
-    save();
-    mail.send(a.email, 'Uw partneraanvraag bij Rahul Travel Group',
-      'Beste ' + a.contactName + ',\n\nNa beoordeling kunnen we ' + a.company + ' op dit moment geen partnerplek aanbieden. ' +
-      'Reden: ' + reden + '\n\nRahul Travel Group');
-    sseToOffice('sync', { scope: 'team' });
-    res.json({ ok: true });
-  });
 };

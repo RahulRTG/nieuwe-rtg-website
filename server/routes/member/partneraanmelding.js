@@ -30,7 +30,7 @@ function geldigeUrl(waarde) {
 }
 
 module.exports = (kern) => {
-  const { app, db, save, crypto, schoon, resolveSession, mail, sseToOffice } = kern;
+  const { app, db, resolveSession } = kern;
 
   /* DEZELFDE POORT ALS DE AANVRAAG, en om dezelfde reden. Hier stond
      `sess.tier === 'business'`: een harde tredecontrole in de code. Dat is de

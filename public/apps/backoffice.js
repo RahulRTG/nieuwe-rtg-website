@@ -180,6 +180,34 @@
     loadAanmeldingen();
   }
 
+  /* FOUNDATION: kijken mag op kantoor; besluiten blijft Boardroomwerk. */
+  async function loadFoundationRegistraties(){
+    const el=document.getElementById('foundationRegistraties');if(!el)return;
+    let d;try{d=await call('/office/foundation/registraties');}catch(e){el.innerHTML='<div class="empty">Registraties niet beschikbaar.</div>';return;}
+    const lijst=d.registraties||[];
+    el.innerHTML=lijst.length?lijst.map(a=>{
+      const eisen=(a.toelating&&a.toelating.eisen)||[];
+      const klaar=e=>['geverifieerd','niet_van_toepassing'].includes(e.status)&&!(e.gecontroleerd&&e.gecontroleerd.geldigTot&&Date.parse(e.gecontroleerd.geldigTot)<Date.now());
+      const open=eisen.filter(e=>!klaar(e));
+      const controles=eisen.map(e=>'<div style="border-left:2px solid '+(klaar(e)?'var(--green)':e.status==='afgekeurd'?'#df6b7d':'var(--gold)')+';padding:.18rem 0 .18rem .5rem;margin-top:.25rem"><div class="sub"><b style="color:var(--text)">'+(klaar(e)?'✓ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+'</div>'+
+        (a.status==='nieuw'&&!klaar(e)?'<button class="vbtn ok" data-frcheck="'+a.id+'" data-freis="'+e.id+'">Controleren</button> '+(e.magNietVanToepassing?'<button class="vbtn" data-frnvt="'+a.id+'" data-freis="'+e.id+'">N.v.t.</button>':''):'')+'</div>').join('');
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400">· '+escHtml(a.typeLabel)+' · '+escHtml(a.plaats)+'</span></div><div class="sub">'+escHtml(a.contactNaam)+' · '+escHtml(a.email)+(a.brin?' · BRIN '+escHtml(a.brin):'')+(a.registratieNummer?' · registratie '+escHtml(a.registratieNummer):'')+' · '+timeAgo(a.at)+'</div>'+controles+'</div>'+
+        (a.status==='nieuw'?'<div style="display:flex;gap:.3rem;align-items:flex-start">'+(open.length?'<span class="pill nieuw">'+open.length+' open</span>':'<button class="vbtn ok" data-frok="'+a.id+'">Goedkeuren</button>')+'<button class="vbtn" data-frno="'+a.id+'">Afwijzen</button></div>':'<span class="pill '+(a.status==='goedgekeurd'?'klaar':'bereiding')+'">'+escHtml(a.status)+'</span>')+'</div></div>';
+    }).join(''):'<div class="empty">Geen registraties.</div>';
+    el.querySelectorAll('[data-frcheck],[data-frnvt]').forEach(b=>b.addEventListener('click',async()=>{const nvt=b.hasAttribute('data-frnvt');const ref=prompt(nvt?'Waarom is dit aantoonbaar niet van toepassing?':'Welke officiële bron en uitkomst zijn gecontroleerd?');if(!ref||ref.trim().length<3)return;try{await call('/office/foundation/registratie/controle',{id:b.dataset.frcheck||b.dataset.frnvt,onderdeel:b.dataset.freis,uitkomst:nvt?'niet_van_toepassing':'geverifieerd',referentie:ref});loadFoundationRegistraties();}catch(e){alert(e.message);}}));
+    el.querySelectorAll('[data-frok]').forEach(b=>b.addEventListener('click',async()=>{try{const r=await call('/office/foundation/registratie/besluit',{id:b.dataset.frok,action:'goedkeuren'});alert('Goedgekeurd'+(r.toegang?' · toegang is veilig per e-mail verstrekt.':'.'));loadFoundationRegistraties();}catch(e){alert(e.message);}}));
+    el.querySelectorAll('[data-frno]').forEach(b=>b.addEventListener('click',async()=>{const reden=prompt('Waarom wordt deze registratie afgewezen?');if(!reden||reden.trim().length<3)return;try{await call('/office/foundation/registratie/besluit',{id:b.dataset.frno,action:'afwijzen',reden});loadFoundationRegistraties();}catch(e){alert(e.message);}}));
+  }
+  /* ---- backoffice, vervolg van deel 01b: DE OFFICIELE BRONWACHT ----
+
+     APART GEZET omdat 01b met de samenvoeging van 22 augustus 2026 over de
+     10 KB kwam, maar de naad ligt hier echt: dit is een eigen onderwerp. De
+     bronwacht haalt officiele registers automatisch op en laat het JURIDISCHE
+     oordeel bij een mens -- dezelfde grens die ONDERHOUD.md aan de wetwacht
+     stelt. De rest van 01b gaat over kantoorlijsten en Foundation-inzage.
+
+     Deel van dezelfde genaaide bundel (scripts/bundel.js): dit bestand is geen
+     module en draait binnen dezelfde IIFE als 01, 01b en 02. */
   /* De officiele bronwacht: automatisch ophalen, maar nooit stil juridisch
      versoepelen. Een echte bronwijziging wordt hier een beoordeelbare taak en
      zet geraakte partnerbewijzen op hercontrole. */
@@ -222,137 +250,6 @@
         onderdeel:b.dataset.regeleis, referentie, geldigTot }); await loadHandelsRegels(); }
       catch(e){ alert(e.message); }
     }));
-  }
-
-  /* FOUNDATION: kijken mag op kantoor; besluiten blijft Boardroomwerk. */
-  async function loadFoundationRegistraties(){
-    const el=document.getElementById('foundationRegistraties');if(!el)return;
-    let d;try{d=await call('/office/foundation/registraties');}catch(e){el.innerHTML='<div class="empty">Registraties niet beschikbaar.</div>';return;}
-    const lijst=d.registraties||[];
-    el.innerHTML=lijst.length?lijst.map(a=>{
-      const eisen=(a.toelating&&a.toelating.eisen)||[];
-      const klaar=e=>['geverifieerd','niet_van_toepassing'].includes(e.status)&&!(e.gecontroleerd&&e.gecontroleerd.geldigTot&&Date.parse(e.gecontroleerd.geldigTot)<Date.now());
-      const open=eisen.filter(e=>!klaar(e));
-      const controles=eisen.map(e=>'<div style="border-left:2px solid '+(klaar(e)?'var(--green)':e.status==='afgekeurd'?'#df6b7d':'var(--gold)')+';padding:.18rem 0 .18rem .5rem;margin-top:.25rem"><div class="sub"><b style="color:var(--text)">'+(klaar(e)?'✓ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+'</div>'+
-        (a.status==='nieuw'&&!klaar(e)?'<button class="vbtn ok" data-frcheck="'+a.id+'" data-freis="'+e.id+'">Controleren</button> '+(e.magNietVanToepassing?'<button class="vbtn" data-frnvt="'+a.id+'" data-freis="'+e.id+'">N.v.t.</button>':''):'')+'</div>').join('');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400">· '+escHtml(a.typeLabel)+' · '+escHtml(a.plaats)+'</span></div><div class="sub">'+escHtml(a.contactNaam)+' · '+escHtml(a.email)+(a.brin?' · BRIN '+escHtml(a.brin):'')+(a.registratieNummer?' · registratie '+escHtml(a.registratieNummer):'')+' · '+timeAgo(a.at)+'</div>'+controles+'</div>'+
-        (a.status==='nieuw'?'<div style="display:flex;gap:.3rem;align-items:flex-start">'+(open.length?'<span class="pill nieuw">'+open.length+' open</span>':'<button class="vbtn ok" data-frok="'+a.id+'">Goedkeuren</button>')+'<button class="vbtn" data-frno="'+a.id+'">Afwijzen</button></div>':'<span class="pill '+(a.status==='goedgekeurd'?'klaar':'bereiding')+'">'+escHtml(a.status)+'</span>')+'</div></div>';
-    }).join(''):'<div class="empty">Geen registraties.</div>';
-    el.querySelectorAll('[data-frcheck],[data-frnvt]').forEach(b=>b.addEventListener('click',async()=>{const nvt=b.hasAttribute('data-frnvt');const ref=prompt(nvt?'Waarom is dit aantoonbaar niet van toepassing?':'Welke officiële bron en uitkomst zijn gecontroleerd?');if(!ref||ref.trim().length<3)return;try{await call('/office/foundation/registratie/controle',{id:b.dataset.frcheck||b.dataset.frnvt,onderdeel:b.dataset.freis,uitkomst:nvt?'niet_van_toepassing':'geverifieerd',referentie:ref});loadFoundationRegistraties();}catch(e){alert(e.message);}}));
-    el.querySelectorAll('[data-frok]').forEach(b=>b.addEventListener('click',async()=>{try{const r=await call('/office/foundation/registratie/besluit',{id:b.dataset.frok,action:'goedkeuren'});alert('Goedgekeurd'+(r.toegang?' · toegang is veilig per e-mail verstrekt.':'.'));loadFoundationRegistraties();}catch(e){alert(e.message);}}));
-    el.querySelectorAll('[data-frno]').forEach(b=>b.addEventListener('click',async()=>{const reden=prompt('Waarom wordt deze registratie afgewezen?');if(!reden||reden.trim().length<3)return;try{await call('/office/foundation/registratie/besluit',{id:b.dataset.frno,action:'afwijzen',reden});loadFoundationRegistraties();}catch(e){alert(e.message);}}));
-  }
-  /* ---- backoffice, vervolg van deel 01b: DE VAKBEWIJZEN ----
-     Geknipt op een top-niveau grens binnen dezelfde IIFE, net als 01b; de delen
-     worden achter elkaar geplakt.
-
-     WAAROM DIT SCHERM ER MOEST KOMEN. De persoonseis (server/kern/persoonseis.js)
-     houdt personeel in een kinderopvang, een praktijk of een beveiligingsteam
-     tegen tot RTG hun stuk heeft gezien. Die aftekening kon alleen over een
-     API -- en een poort die dichtzit met een sleutel die niemand kan pakken, is
-     geen beveiliging maar een storing. Dit is de plek waar een mens het stuk
-     ziet en tekent.
-
-     TWEE DINGEN DIE HIER BEWUST ZO ZIJN.
-
-     1. GEEN ECHTE NAAM, ALLEEN DE CODENAAM. De naam ligt in de kluis en elke
-        blik daarin hoort door het inzagejournaal (zie pendingVerifications in
-        kern/kantoor/index.js). Voor deze stapel is dat niet nodig: wie aftekent
-        bekijkt een STUK, en de koppeling tussen dat stuk en de mens is de
-        identiteitsverificatie hiernaast, die al gedaan is.
-     2. DE AFTEKENING VRAAGT EEN NAAM, en die wordt hier GEVRAAGD en niet
-        geraden. De server weigert een lege naam met 400; een knop die stilletjes
-        "backoffice" invult zou van een aftekening een vinkje maken. */
-  // ---- de stapel: wat is ingediend en wacht op een mens ----
-  async function loadVakbewijzen(){
-    const el = document.getElementById('vakbewijzen'); if (!el) return;
-    let r = null;
-    try { r = await call('/office/vakbewijzen'); } catch(e){ return; }
-    if (r.soorten) VAK_SOORTEN = r.soorten;
-    const open = r.open || [], verlopend = r.verlopend || [];
-    const rij = v =>
-      '<div class="vrow" data-sleutel="'+escHtml(v.sleutel)+'" data-wat="'+escHtml(v.wat)+'">' +
-        '<div class="vi"><div class="nm">'+escHtml(vakLabel(v.wat)) +
-          ' <span class="bij">· '+escHtml(v.wie || '-')+'</span></div>' +
-          '<div class="sub" data-nr>' +
-            (v.tot ? T('bo.vak.tot','geldig tot')+' '+escHtml(v.tot) : T('bo.vak.geendatum','geen einddatum')) +
-            (v.toelichting ? ' · '+escHtml(v.toelichting) : '') + '</div></div>' +
-        /* Het NUMMER staat er niet bij. Het ligt in de identiteitskluis, en die
-           gaat alleen open met een reden die in het inzagejournaal landt en waar
-           de betrokkene bericht van krijgt. Een lijst die het nummer gewoon
-           toont, zou van elke blik een ongemerkte blik maken. */
-        '<button class="vbtn" data-nummer>'+T('bo.vak.nummer','Nummer inzien')+'</button>' +
-        '<button class="vbtn ok" data-teken>'+T('bo.vak.teken','Gezien en aftekenen')+'</button>' +
-      '</div>';
-    el.innerHTML = (open.length ? open.map(rij).join('')
-      : '<div class="empty">'+T('bo.vak.leeg','Geen openstaande vakbewijzen.')+'</div>') +
-      /* Wat er BINNENKORT afloopt hoort op hetzelfde bord: zonder die blik
-         merkt een zaak het verlopen pas op de ochtend dat er iemand niet meer
-         naar binnen kan. */
-      (verlopend.length ? '<div class="sub vkop">' +
-        T('bo.vak.verlopend','Loopt binnen 60 dagen af') + '</div>' + verlopend.map(v =>
-        '<div class="vrow"><div class="vi"><div class="nm">'+escHtml(vakLabel(v.wat)) +
-          ' <span class="bij">· '+escHtml(v.wie || '-')+'</span></div>' +
-          '<div class="sub">'+T('bo.vak.tot','geldig tot')+' '+escHtml(v.tot || '')+'</div></div>' +
-        '<button class="vbtn no" data-intrek data-sleutel="'+escHtml(v.sleutel)+'" data-wat="'+escHtml(v.wat)+'">' +
-          T('bo.vak.intrek','Intrekken')+'</button></div>').join('') : '');
-
-    el.querySelectorAll('[data-teken]').forEach(b => b.addEventListener('click', e => {
-      const row = e.target.closest('.vrow');
-      teken(row.dataset.sleutel, row.dataset.wat);
-    }));
-    el.querySelectorAll('[data-nummer]').forEach(b => b.addEventListener('click', e => {
-      const row = e.target.closest('.vrow');
-      nummerInzien(row);
-    }));
-    el.querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', e =>
-      intrek(e.target.dataset.sleutel, e.target.dataset.wat)));
-  }
-
-  /* De leesbare naam van een soort. De lijst komt van de server (het register in
-     kern/persoonseis-lijst.js); valt die weg, dan tonen we de id -- lelijker,
-     maar nooit een leeg vakje waar een mens op moet gokken. */
-  let VAK_SOORTEN = null;
-  const vakLabel = id => (VAK_SOORTEN && VAK_SOORTEN[id] && VAK_SOORTEN[id].naam) || id;
-
-  /* HET NUMMER OPVRAGEN. De reden wordt hier GEVRAAGD en niet verzonnen; de
-     server weigert een lege of nietszeggende reden met 400. Wat er terugkomt
-     zetten we in de rij zelf, met de grens eronder -- zodat wie het leest ook
-     ziet dat de betrokkene hier bericht van heeft gekregen. */
-  async function nummerInzien(row){
-    const reden = prompt(T('bo.vak.reden','Waarvoor heeft u dit nummer nodig? De betrokkene krijgt uw reden te zien.'));
-    if (reden === null) return;
-    let r;
-    try { r = await call('/office/vakbewijs/nummer', { sleutel: row.dataset.sleutel, wat: row.dataset.wat, reden: (reden||'').trim() }); }
-    catch(e){ alert(e.message); return; }
-    const sub = row.querySelector('[data-nr]');
-    if (sub) sub.innerHTML = '<b>'+escHtml(r.nummer || T('bo.vak.geennr','zonder nummer'))+'</b> · ' + sub.innerHTML +
-      '<div class="vgrens">'+escHtml(r.grens || '')+'</div>';
-    const knop = row.querySelector('[data-nummer]'); if (knop) knop.remove();
-  }
-
-  async function teken(sleutel, wat){
-    const door = prompt(T('bo.vak.wie','Wie tekent af dat dit stuk is gezien? (uw naam)'));
-    if (door === null) return;
-    if (!door.trim()) { alert(T('bo.vak.naamnodig','Een aftekening zonder naam is geen aftekening.')); return; }
-    try {
-      const r = await call('/office/vakbewijs/teken', { sleutel, wat, door: door.trim() });
-      /* De grens die de server meestuurt tonen we letterlijk. Wie aftekent moet
-         weten wat hij WEL en NIET vastlegt: dat het stuk er is, niet dat het
-         klopt. RTG is geen inspectie. */
-      if (r && r.grens) alert(r.grens);
-    } catch(e){ alert(e.message); return; }
-    loadVakbewijzen();
-  }
-
-  async function intrek(sleutel, wat){
-    const reden = prompt(T('bo.vak.waarom','Waarom trekt u dit stuk in? (bijvoorbeeld: doorgehaald in het register)'));
-    if (reden === null) return;
-    const door = prompt(T('bo.vak.wie','Wie tekent af dat dit stuk is gezien? (uw naam)'));
-    if (door === null || !door.trim()) return;
-    try { await call('/office/vakbewijs/intrek', { sleutel, wat, door: door.trim(), reden: reden.trim() }); }
-    catch(e){ alert(e.message); return; }
-    loadVakbewijzen();
   }
   // ---- paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt ----
   async function loadIncidenten(){

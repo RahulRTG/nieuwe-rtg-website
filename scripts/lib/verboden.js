@@ -44,7 +44,44 @@ const REGELS = [
       [/^server\/kern\//, 'de kern draagt de inzage-, paspoort- en kantoorlagen die er met een reden bij mogen'],
       [/^server\/opzet\//, 'de opzetlaag geeft de functie door; hij leest hem niet'],
       [/^server\/bedrijf\//, 'een zaak kent de naam van zijn eigen personeel'],
-      [/^server\/server\.js$/, 'de bedrading zelf']
+      [/^server\/server\.js$/, 'de bedrading zelf'],
+      /* ZELF-INZAGE, EN ALLEEN DAT. Deze route bouwt het publieke mailadres van
+         het INGELOGDE lid en zet daar zijn eigen naam bij --
+         `realNameOf(req.session.account)`, dus de sessie leest zichzelf.
+         CLAUDE.md zegt daarover: het kantoor opent een naam met een reden en een
+         regel in het inzagejournaal, zelf-inzage gaat vrij.
+
+         DE GRENS ZIT IN HET ARGUMENT en niet in het bestand: zodra hier een
+         ANDER account dan req.session.account wordt opgezocht, is dit geen
+         zelf-inzage meer en hoort deze uitzondering te vervallen. Dat is met een
+         patroon niet te zien, en daarom staat het hier opgeschreven.
+
+         Toegevoegd op 22 augustus 2026: PR #100 bracht deze aanroep mee, en deze
+         regel ving hem. Dat is de eerste keer dat de verboden graaf een NIEUWE
+         overtreding vond in plaats van bestaande te bevestigen. */
+      [/^server\/routes\/rtmail-lid\.js$/, 'zelf-inzage: het ingelogde lid leest zijn eigen naam bij zijn eigen mailadres'],
+      /* DEZELFDE DRIE AANROEPEN, EN EEN BEVINDING DIE GROTER IS DAN DEZE REGEL.
+
+         auth/account.js, auth/inlog.js en rtmail-lid.js doen alle drie hetzelfde:
+         `mail-publiek.geefLid({ user, naam: realNameOf(user) })`. Technisch is
+         het zelf-inzage -- `user` is telkens het eigen account -- en daarom
+         staan ze hier.
+
+         MAAR KIJK WAT ER MET DIE NAAM GEBEURT. `naamLokaal()` in
+         kern/mail-publiek.js maakt er het LOKALE DEEL van een publiek mailadres
+         van: "Jan Jansen" wordt jan.jansen@<pas>.<groepsdomein>. Elk lid krijgt
+         dat adres AUTOMATISCH bij aanmelden en inloggen, zonder het te kiezen.
+         Daarmee is de echte naam zichtbaar voor iedereen die post van dat adres
+         ontvangt -- terwijl CLAUDE.md zegt dat klantdata op codenamen draait en
+         echte namen in de gescheiden kluis blijven, en dat dat ontwerp niet
+         omzeild wordt.
+
+         Dat is geen overtreding van DEZE regel maar een productbesluit, en het
+         staat hier omdat het anders nergens staat. De nette vorm is dat een lid
+         zijn publieke adres KIEST (codenaam of eigen naam), en dat het niet
+         vanzelf uit de kluis wordt afgeleid. Gevonden op 22 augustus 2026 door
+         keuringsregel 60, bij het samenvoegen van PR #100. */
+      [/^server\/routes\/auth\/(?:account|inlog)\.js$/, 'zelf-inzage bij het uitgeven van het eigen publieke mailadres -- zie de bevinding hierboven']
     ],
     nooit: [
       [/^server\/routes\/member\//, 'de ledenkant draait op codenamen; hier hoort geen echte naam te komen'],

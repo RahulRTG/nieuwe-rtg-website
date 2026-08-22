@@ -28,8 +28,8 @@
     location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search));
   }
 
-  // Werk-OS-bord: Cmd+K (of de Panelen-knop in de kop) opent een springboard
-  // over het bord; een tik scrolt naar het paneel en licht het even op.
+  // WerkOS-bord: Cmd+K (of de Panelen-knop in de kop) opent het register
+  // over het bord; een keuze scrolt naar het paneel en licht het even op.
   let wosBord = null;
   function startWerkOS(){
     if (wosBord || !window.WerkOS) return;
@@ -39,9 +39,8 @@
       if (!el || apps.some(a => a.el === el)) return;
       const lab = h.querySelector('[data-i18n]');
       const ruw = ((lab ? lab.textContent : h.textContent) || '').trim().replace(/\s+/g, ' ');
-      const emoji = ((h.textContent || '').match(/\p{Extended_Pictographic}/u) || [])[0] || '▦';
       const naam = ruw.replace(/^[^\p{L}]+/u, '').replace(/[▾▸›\s]+$/g, '').split('·')[0].trim().slice(0, 26);
-      if (naam) apps.push({ naam, icoon: emoji, el });
+      if (naam) apps.push({ naam, glyf: 'paneel', el });
     });
     wosBord = WerkOS.bord({ titel: 'RTG Backoffice, alle panelen', apps, knopIn: document.querySelector('header .wrap > span') });
   }

@@ -9317,10 +9317,10 @@
   renderAIThread();
   buildPad();
   renderGate();
-  // het Werk-OS: springboard, dock, klok en Cmd+K over het bestaande tabmodel
+  // WerkOS: de echte stand eerst, daarna het werkregister, dock en Cmd+K.
   if (window.WerkOS) WerkOS.koppel({
     thuisTab: 'home', dock: ['orders', 'kassa', 'menu', 'ai', 'team'],
-    // het Meer-grid waaiert uit over het springboard: alle functies als apps
+    // Het Meer-grid vult het register aan met de overige bestaande functies.
     verberg: ['meer'], extra: { houder: '#meerWrap', knop: '.meer-btn' }
   });
   /* WAT UW ZAAK KAN (kern/geschikt.js). Een uitspraak van de ondernemer, geen

@@ -24,16 +24,6 @@
   a.terugmobiel{display:inline-block;margin-top:.5rem;font-size:.76rem;
     color:var(--rtg-soft);text-decoration:none;letter-spacing:.04em;}
   a.terugmobiel:hover,a.terugmobiel:focus-visible{color:var(--rtg-goud);}
-  .smal{position:fixed;inset:0;display:none;place-items:center;padding:2rem;text-align:center;}
-  .smal p{max-width:22rem;color:var(--rtg-soft);line-height:1.6;font-size:.9rem;}
-  .smal a{color:var(--rtg-goud);}
-  /* Onder 900px is dit niet de juiste omgeving: daar is RTG Mobile de app, en
-     een werkruimte met vijf surfaces op een telefoon is een belofte die het
-     scherm niet waar kan maken. Eerlijk zeggen is beter dan uitrekken. */
-  @media (max-width:899px){
-    .rtg-werkruimte{display:none;}
-    .smal{display:grid;}
-  }
 </style>
 </head>
 <!-- data-ios-uit: deze pagina IS de schil. Een hamburger met een app-menu zou
@@ -41,12 +31,6 @@
      een te veel. De weg terug staat daarom expliciet in de console zelf; zonder
      die link zou dit attribuut een uitweg zijn in plaats van een keuze. -->
 <body class="rtg-stijl" data-rtg-modus="pro" data-rtg-schil="standaard" data-ios-uit data-rtg-eigenvlak="onyx">
-
-<div class="smal">
-  <p><strong style="color:var(--rtg-txt);">RTG Workspace is voor een groot scherm.</strong><br>
-  Op een telefoon is RTG Mobile de app: dezelfde wereld, andere omgeving.
-  <br><br><a href="/apps/app.html">Naar RTG Mobile</a></p>
-</div>
 
 <main class="rtg-werkruimte" id="ruimte">
   <!-- De console: het anker van de werkruimte, geen menu met twintig apps maar
@@ -114,29 +98,29 @@
      eigen pagina blijft: de schil weet alleen naam en adres, niet wat erin
      gebeurt (PLATFORM.md -- de apps houden hun diepte, de bovenlaag verbindt). */
   const PERSOONLIJK = [
-    { id: 'reizen', naam: 'Reizen', url: '/apps/reizen.html' },
-    { id: 'veilig', naam: 'Veilig', url: '/apps/veilig.html' },
-    { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' },
-    { id: 'bestanden', naam: 'Bestanden', url: '/apps/bestanden.html' },
-    { id: 'notities', naam: 'Notities', url: '/apps/notities.html' },
-    { id: 'office', naam: 'Documenten', url: '/apps/office.html' },
-    { id: 'kantoor', naam: 'RTG Kantoor', url: '/apps/kantoor.html' },
-    { id: 'sociaal', naam: 'RTG Sociaal', url: '/apps/sociaal.html' }
+    { id: 'reizen', naam: 'Reizen', kort: 'RE', url: '/apps/reizen.html' },
+    { id: 'veilig', naam: 'Veilig', kort: 'VE', url: '/apps/veilig.html' },
+    { id: 'agenda', naam: 'Agenda', kort: 'AG', url: '/apps/agenda.html' },
+    { id: 'bestanden', naam: 'Bestanden', kort: 'BF', url: '/apps/bestanden.html' },
+    { id: 'notities', naam: 'Notities', kort: 'NT', url: '/apps/notities.html' },
+    { id: 'office', naam: 'Documenten', kort: 'DO', url: '/apps/office.html' },
+    { id: 'kantoor', naam: 'RTG Kantoor', kort: 'KA', url: '/apps/kantoor.html' },
+    { id: 'sociaal', naam: 'RTG Sociaal', kort: 'SO', url: '/apps/sociaal.html' }
   ];
 
   /* Dezelfde Spatial Shell heeft een eigen bedrijfsstand. Dit is geen tweede
      desktop en geen kopie van de kantoorfuncties: elke surface opent de echte
      bestaande app met haar eigen rechten. De schil bewaart alleen de indeling. */
   const KANTOOR = [
-    { id: 'vandaag', naam: 'Vandaag', url: '/apps/kantoor.html' },
-    { id: 'afdelingen', naam: 'Afdelingen', url: '/apps/kantoren.html' },
-    { id: 'personeel', naam: 'Personeel', url: '/apps/personeel.html?kantoor=1' },
-    { id: 'office', naam: 'RTG Office', url: '/apps/office.html?werk=kantoor' },
-    { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' },
-    { id: 'mail', naam: 'RTG Mail', url: '/apps/rtmail.html' },
-    { id: 'bestanden', naam: 'Bestanden', url: '/apps/bestanden.html' },
-    { id: 'backoffice', naam: 'Backoffice', url: '/apps/backoffice.html' },
-    { id: 'command', naam: 'RTG Command', url: '/apps/command.html' }
+    { id: 'vandaag', naam: 'Vandaag', kort: 'VD', url: '/apps/kantoor.html' },
+    { id: 'afdelingen', naam: 'Afdelingen', kort: 'AF', url: '/apps/kantoren.html' },
+    { id: 'personeel', naam: 'Personeel', kort: 'HR', url: '/apps/personeel.html?kantoor=1' },
+    { id: 'office', naam: 'RTG Office', kort: 'OF', url: '/apps/office.html?werk=kantoor' },
+    { id: 'agenda', naam: 'Agenda', kort: 'AG', url: '/apps/agenda.html' },
+    { id: 'mail', naam: 'RTG Mail', kort: 'ML', url: '/apps/rtmail.html' },
+    { id: 'bestanden', naam: 'Bestanden', kort: 'BF', url: '/apps/bestanden.html' },
+    { id: 'backoffice', naam: 'Backoffice', kort: 'BO', url: '/apps/backoffice.html' },
+    { id: 'command', naam: 'RTG Command', kort: 'CM', url: '/apps/command.html' }
   ];
   const kantoorModus = new URLSearchParams(location.search).get('gebied') === 'kantoor';
   const WERELDEN = kantoorModus ? KANTOOR : PERSOONLIJK;
@@ -150,10 +134,14 @@
     document.body.dataset.omgeving = 'kantoor';
   }
 
-  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN });
+  const SNEL = kantoorModus
+    ? ['vandaag', 'office', 'agenda', 'mail', 'bestanden']
+    : ['reizen', 'agenda', 'notities', 'office', 'bestanden'];
+  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN, dock: SNEL });
 
   $('#werelden').innerHTML = WERELDEN.map(w =>
-    '<button type="button" data-open="' + w.id + '" aria-label="' + w.naam + '">' + w.naam + '</button>').join('');
+    '<button type="button" data-open="' + w.id + '" aria-label="' + w.naam + '">' +
+    '<span class="app-kort" aria-hidden="true">' + w.kort + '</span><span class="app-label">' + w.naam + '</span></button>').join('');
   $('#werelden').querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
     const w = WERELDEN.find(x => x.id === b.dataset.open);
     if (w) RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam });
@@ -181,6 +169,7 @@
     $('#paletIn').value = ''; $('#paletIn').focus(); paletTeken();
   }
   function paletDicht() { $('#palet').hidden = true; }
+  $('#ruimte').addEventListener('rtg-palet-open', paletOpen);
   $('#paletIn').addEventListener('input', () => { paletKeuze = 0; paletTeken(); });
   $('#paletIn').addEventListener('keydown', (e) => {
     const t = RTGSchil.palet($('#paletIn').value);

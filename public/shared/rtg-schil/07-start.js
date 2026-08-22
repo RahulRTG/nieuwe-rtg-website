@@ -11,11 +11,14 @@
     schil.console = opties.console || schil.vak.querySelector('.rtg-console');
     schil.tabs = el('nav', 'rtg-tabbar', schil.vak);
     schil.tabs.setAttribute('aria-label', 'Open software');
+    schil.onderbalk = el('nav', 'rtg-onderbalk', schil.vak);
+    schil.onderbalk.setAttribute('aria-label', 'Snelle software');
     schil.dok = el('div', 'rtg-dok', schil.vak);
     /* De apps die dit scherm kan openen. De shell KENT ze niet uit zichzelf --
        hij weet niets van domeinen -- maar het palet moet ergens uit kunnen
        putten, dus geeft de pagina zijn lijst mee. */
     schil.apps = (opties.apps || []).slice();
+    schil.dockApps = (opties.dock || []).slice();
     w.addEventListener('resize', schik);
     /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
        is een eigen pagina, maar altijd onze eigen. */

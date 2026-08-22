@@ -32,7 +32,7 @@ body.rtg-stijl>main{width:100%!important;max-width:none!important;margin:0!impor
 .office-overzicht h1{font-family:'Bodoni Moda',serif;font-size:clamp(1.8rem,3vw,2.8rem);font-weight:500;
   line-height:1.02;letter-spacing:-.025em;margin:0 0 .6rem;}
 .office-overzicht p{color:var(--soft);font-size:.82rem;max-width:42rem;line-height:1.55;}
-.office-signalen{display:grid;grid-template-columns:repeat(3,minmax(5.5rem,1fr));border:1px solid var(--line);
+.office-signalen{display:grid;grid-template-columns:repeat(4,minmax(5.5rem,1fr));border:1px solid var(--line);
   background:rgba(8,8,7,.4);align-self:stretch;min-height:6rem;}
 .office-signalen article{display:flex;flex-direction:column;justify-content:flex-end;padding:.85rem .9rem;
   border-left:1px solid var(--line);}
@@ -108,11 +108,28 @@ html[data-rtg-oppervlak="1"] #aiBtn{display:none!important;}
 }
 @media(max-width:820px){
   .office-overzicht{margin-top:0;padding:1rem;min-height:0;}.office-overzicht h1{font-size:1.75rem;}
-  .office-signalen{grid-template-columns:repeat(3,1fr);}.office-signalen article{padding:.65rem;}
+  .office-signalen{grid-template-columns:repeat(2,1fr);}.office-signalen article{padding:.65rem;}
+  .office-signalen article:nth-child(3){border-left:0;border-top:1px solid var(--line);}
+  .office-signalen article:nth-child(4){border-top:1px solid var(--line);}
   .office-signalen b{font-size:1.25rem;}.office-signalen span{white-space:normal;}
   .balk{flex-wrap:wrap;}.balk input.titel{order:1;min-width:calc(100% - 8rem);}.office-fase{margin-left:auto;}
   .office-hoofdactie{order:2;}.office-opmaak,.office-meer{order:2;}.groep{order:3;}
   .tabelkop,.doc{grid-template-columns:1.4rem 1fr 6.5rem;}
   .tabelkop span:nth-child(3),.tabelkop span:nth-child(4),.tabelkop span:nth-child(5),
   .doc>.office-omvang,.doc>.office-status,.doc>.office-wie{display:none;}
+  #rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;max-height:none;padding:.7rem;
+    background:#11100f;}
+  #rail .sec{grid-column:1/-1;margin:.65rem 0 .25rem;}
+  #rail>.sec:first-child{margin-top:0;}
+  .nieuwe{min-width:0;padding:.65rem .45rem;align-items:flex-start;}
+  .nieuwe small{font-size:.63rem;line-height:1.35;}
+}
+@media(max-width:520px){
+  #rail{grid-template-columns:repeat(2,minmax(0,1fr));}
+  #vak{padding:.75rem .65rem 2rem;}
+  .office-overzicht{padding:.85rem;}.office-overzicht p{font-size:.75rem;}
+  .zoekrij{top:-.75rem;}.zoekrij input{width:100%;min-width:100%;}
+  .zoekrij select{flex:1;min-width:8rem;}
+  .balk{padding:.42rem .5rem;gap:.25rem;}.balk input.titel{font-size:.94rem;}
+  .office-fase{font-size:.56rem;padding:.32rem .42rem;}
 }

@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Bestanden</title>
 <link rel="icon" href="/icon.svg">
@@ -96,8 +97,10 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/adaptief.css" rel="stylesheet">
 <link href="/shared/grammatica.css" rel="stylesheet">
+<link href="/shared/kantoor-tools.css?v=enterprise1" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-kantoor-tool="bestanden">
+<script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Bestanden</h1></span>
@@ -113,6 +116,10 @@
      rij onder de kop. -->
 <div class="rtg-duimbalk"><button class="knop vol" id="kies" type="button" data-hoofdactie>Upload</button></div>
 <main>
+  <section class="kantoor-intro" aria-labelledby="bestandenIntro">
+    <span class="ey">Kantoor · beveiligde kluis</span>
+    <div><h2 id="bestandenIntro">Alles op zijn vaste plek.</h2><p>Bestanden, versies en gedeeld werk in een rustige, controleerbare omgeving.</p></div>
+  </section>
   <div class="rij" style="justify-content:space-between;">
     <span class="stil" id="quotumTekst">&nbsp;</span>
     <select class="veld" id="sorteer" aria-label="Sorteren">

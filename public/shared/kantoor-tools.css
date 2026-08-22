@@ -27,23 +27,23 @@ body[data-kantoor-tool]>main{width:min(100%,1280px);max-width:none;margin:0 auto
   line-height:1.03;letter-spacing:-.025em;margin:0 0 .42rem;color:var(--txt);}
 .kantoor-intro p{max-width:42rem;color:var(--soft);font-size:.8rem;line-height:1.6;}
 
-body[data-kantoor-tool] .knop{border-radius:3px;background:rgba(255,255,255,.025);font-weight:500;
+body[data-kantoor-tool] .knop{border-radius:0;background:rgba(255,255,255,.025);font-weight:500;
   letter-spacing:.015em;transition:background .16s,border-color .16s,color .16s;}
 body[data-kantoor-tool] .knop:hover{background:rgba(255,255,255,.045);border-color:rgba(201,162,75,.52);}
 body[data-kantoor-tool] .knop.vol{background:var(--gold);border-color:var(--gold);color:#151107;font-weight:650;}
-body[data-kantoor-tool] .veld{border-radius:3px;background:#171615;min-height:2.25rem;}
+body[data-kantoor-tool] .veld{border-radius:0;background:#171615;min-height:2.25rem;}
 body[data-kantoor-tool] .rahulbalk{padding:.62rem;border:1px solid var(--line);background:rgba(255,255,255,.014);}
 body[data-kantoor-tool] .stuur{min-height:3.2rem;border-bottom:1px solid var(--line);padding-bottom:.7rem;}
 body[data-kantoor-tool] .stuur h2{font-size:1.4rem;font-weight:500;}
 
 /* Agenda: het raster is de informatie, niet zevenentwintig losse kaartjes. */
 body[data-kantoor-tool="agenda"] .mgrid,
-body[data-kantoor-tool="agenda"] .wgrid{border-radius:2px;border-color:rgba(255,255,255,.11);background:rgba(255,255,255,.1);}
+body[data-kantoor-tool="agenda"] .wgrid{border-radius:0;border-color:rgba(255,255,255,.11);background:rgba(255,255,255,.1);}
 body[data-kantoor-tool="agenda"] .mkop{background:#171615;padding:.48rem .4rem;}
 body[data-kantoor-tool="agenda"] .mdag,
 body[data-kantoor-tool="agenda"] .wdag{background:#111110;}
 body[data-kantoor-tool="agenda"] .mdag:hover{background:#181716;}
-body[data-kantoor-tool="agenda"] .chip{border-radius:1px;background:rgba(255,255,255,.035);}
+body[data-kantoor-tool="agenda"] .chip{border-radius:0;background:rgba(255,255,255,.035);}
 body[data-kantoor-tool="agenda"] .litem{border-width:0 0 1px;border-radius:0;background:transparent;
   margin:0;padding:.78rem .3rem;}
 body[data-kantoor-tool="agenda"] .litem:hover{background:linear-gradient(90deg,rgba(127,22,52,.08),transparent);}
@@ -60,17 +60,17 @@ body[data-kantoor-tool="notities"] .nkaart.vast{box-shadow:inset 0 2px var(--gol
 /* Bestanden: een beheerbare tabelachtige lijst met vaste, dunne regels. */
 body[data-kantoor-tool="bestanden"] .meter{height:3px;border-radius:0;background:#191817;}
 body[data-kantoor-tool="bestanden"] #pad{padding:.72rem 0;border-bottom:1px solid var(--line);}
-body[data-kantoor-tool="bestanden"] .mapkaart{border-radius:2px;background:transparent;margin:.7rem .45rem .35rem 0;}
+body[data-kantoor-tool="bestanden"] .mapkaart{border-radius:0;background:transparent;margin:.7rem .45rem .35rem 0;}
 body[data-kantoor-tool="bestanden"] .item{margin:0;border-width:0 0 1px;border-radius:0;background:transparent;
   padding:.72rem .55rem;}
 body[data-kantoor-tool="bestanden"] .item:hover{background:linear-gradient(90deg,rgba(127,22,52,.08),transparent);}
-body[data-kantoor-tool="bestanden"] .item .ext{border-radius:2px;background:#171615;}
-body[data-kantoor-tool="bestanden"] .sleep{border-radius:2px;}
+body[data-kantoor-tool="bestanden"] .item .ext{border-radius:0;background:#171615;}
+body[data-kantoor-tool="bestanden"] .sleep{border-radius:0;}
 
-body[data-kantoor-tool] .paneel{border-radius:4px;background:#151413;box-shadow:0 28px 80px rgba(0,0,0,.5);}
+body[data-kantoor-tool] .paneel{border-radius:0;background:#151413;box-shadow:0 28px 80px rgba(0,0,0,.5);}
 body[data-kantoor-tool] .paneel input,
 body[data-kantoor-tool] .paneel select,
-body[data-kantoor-tool] .paneel textarea{border-radius:3px;}
+body[data-kantoor-tool] .paneel textarea{border-radius:0;}
 
 html[data-rtg-oppervlak="1"] body[data-kantoor-tool]>header{display:none;}
 html[data-rtg-oppervlak="1"] body[data-kantoor-tool]{padding-bottom:0;}

@@ -132,7 +132,7 @@ main{position:relative;z-index:2;padding-bottom:calc(94px + env(safe-area-inset-
 .navroute{width:100%;text-align:left}
 .navroute>div{display:grid;grid-template-columns:16px 1fr;gap:1rem;align-items:start;padding:1rem 0;border-bottom:1px solid #2b2d2d}
 .navroute i{width:10px;height:10px;margin-top:.25rem;border:2px solid var(--goud);border-radius:50%}
-.navroute div:last-child i{border-radius:1px;background:var(--goud)}
+.navroute div:last-child i{border-radius:0;background:var(--goud)}
 .navroute small,.navroute b{display:block}
 .navroute small{margin-bottom:.35rem;color:var(--zacht);font-size:.55rem;letter-spacing:.14em}
 .navroute b{font-size:1rem;text-transform:uppercase}

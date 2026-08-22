@@ -9,11 +9,11 @@
   background:linear-gradient(90deg,rgba(127,22,52,.16),transparent);}
 #diaVlak{padding:clamp(.75rem,2.2vw,2rem);background:
   radial-gradient(circle at 86% 0,rgba(127,22,52,.09),transparent 24rem);}
-.diakaart{width:min(100%,64rem);min-height:min(32rem,calc(100dvh - 13rem));margin:0 auto;border-radius:2px;
+.diakaart{width:min(100%,64rem);min-height:min(32rem,calc(100dvh - 13rem));margin:0 auto;border-radius:0;
   padding:clamp(1.2rem,3vw,2.4rem);background:linear-gradient(145deg,#171615,#121211);
   box-shadow:0 20px 55px rgba(0,0,0,.22);}
 .diakaart input.dt{font-size:clamp(1.5rem,3vw,2.25rem);line-height:1.15;padding-bottom:.75rem;}
-.diakaart textarea{border-radius:3px;background:#1a1918;}
+.diakaart textarea{border-radius:0;background:#1a1918;}
 @media(max-width:820px){
   #presWrap{grid-template-columns:1fr;border-left:0;border-right:0;}
   #diaRail{display:flex;gap:0;overflow-x:auto;overflow-y:hidden;max-height:6rem;padding:.35rem;border-right:0;

@@ -4,14 +4,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
-const { letOpFouten } = require('./helper');
+const { letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
 const pw = laadPlaywright();
 const script = path.join(__dirname, '..', 'public', 'shared', 'werkos.js');
 
@@ -49,8 +43,8 @@ async function tabSchil(page) {
 }
 
 test('WerkOS: boven-, linker- en onderbalk werken op desktop en mobiel',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
-  const browser = await pw.chromium.launch({ args:['--no-sandbox'] });
+  { skip: geenBrowser(pw) }, async () => {
+  const browser = await pw.chromium.launch(browserOpties(pw));
   try {
     for (const viewport of [{ width:1280, height:720 }, { width:320, height:700 }]) {
       const page = await browser.newPage({ viewport });
@@ -88,8 +82,8 @@ test('WerkOS: boven-, linker- en onderbalk werken op desktop en mobiel',
 });
 
 test('WerkOS: backofficepanelen bedienen dezelfde schil op mobiel',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
-  const browser = await pw.chromium.launch({ args:['--no-sandbox'] });
+  { skip: geenBrowser(pw) }, async () => {
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const page = await browser.newPage({ viewport:{ width:320, height:700 } });
   const fouten = []; letOpFouten(page, fouten);
   try {

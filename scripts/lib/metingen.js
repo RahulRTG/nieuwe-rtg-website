@@ -36,7 +36,13 @@
 const GEEN_METING = new Set([
   'package.json', 'package-lock.json',
   'NORM.json',              // de ratel zelf; die wordt door normverval.js bewaakt
-  'LANDEN.json'             // landpakketten: welke munt, welke voertaal -- gegevens
+  'LANDEN.json',            // landpakketten: welke munt, welke voertaal -- gegevens
+  /* SUITEDUUR.json draagt hoe lang elk toetsbestand duurde. Dat is een
+     PLANNINGSgetal en geen kwaliteitsgetal: een toets die langzamer wordt is
+     niet slechter, en een die sneller wordt niet beter. Het bestand voedt de
+     verdeling over de scherven (scripts/scherf.js); wordt het gewist, dan is de
+     verdeling een ronde lang onhandig en verder niets. */
+  'SUITEDUUR.json'
 ]);
 
 const REGISTER = {
@@ -58,6 +64,13 @@ const REGISTER = {
   'POORTWACHT.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'ROLPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'STAATPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
+
+  /* De bedradingsgraaf draagt zijn eigen grondwaarde en wordt door
+     keuringsregel 59 vastgehouden: het aantal ONBEKENDE kanten mag alleen
+     krimpen, en voor identity, money en security is de eis nul. Dat getal hoort
+     niet in NORM.json thuis -- het is geen kwaliteitscijfer over de code maar de
+     grens van wat deze graaf op dit moment veilig kan bewijzen. */
+  'BEDRADING.json': { eigenRatel: 'scripts/check.js' },
   'UITVOERPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'KLOK.json': { eigenRatel: 'scripts/klok.js' },
   /* De a11y-grens draagt zijn eigen nul: scripts/a11y.js LEEST de grens hieruit

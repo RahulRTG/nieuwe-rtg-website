@@ -23,7 +23,7 @@ body.rtg-suite-page{
   --rtg-card2:#e4e1d9;
   --rtg-txt:var(--suite-text);
   --rtg-muted:var(--suite-muted);
-  --rtg-soft:#89857c;
+  --rtg-soft:#625f57;
   --rtg-line:var(--suite-line);
   --rtg-goud:var(--suite-gold);
   --bg:var(--suite-paper);
@@ -31,7 +31,7 @@ body.rtg-suite-page{
   --card2:#e4e1d9;
   --txt:var(--suite-text);
   --muted:var(--suite-muted);
-  --soft:#89857c;
+  --soft:#625f57;
   --line:var(--suite-line);
   --gold:var(--suite-gold);
   --burgundy:var(--suite-wine);
@@ -65,13 +65,13 @@ body.rtg-suite-page::after{
   color:#dac891;background:#272821;font:500 .88rem/1 "Bodoni Moda",Georgia,serif;}
 .rtg-suitenav{position:fixed;z-index:79;top:var(--suite-top);right:0;left:0;height:var(--suite-nav);display:flex;
   justify-content:center;background:rgba(246,244,239,.96);border-bottom:1px solid var(--suite-line);backdrop-filter:blur(18px);}
-.rtg-suitenav-link{position:relative;display:flex;align-items:center;gap:.65rem;min-width:132px;padding:0 1.4rem;color:#77756e;
+.rtg-suitenav-link{position:relative;display:flex;align-items:center;gap:.65rem;min-width:132px;padding:0 1.4rem;color:#625f57;
   text-decoration:none;font:600 .65rem/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
 .rtg-suitenav-link::after{content:"";position:absolute;right:1.4rem;bottom:-1px;left:1.4rem;height:2px;background:transparent;}
 .rtg-suitenav-link:hover{color:var(--suite-text);}
 .rtg-suitenav-link[aria-current="page"]{color:var(--suite-text);}
 .rtg-suitenav-link[aria-current="page"]::after{background:var(--suite-gold);}
-.rtg-suitenav-note{color:#9b978d;font-size:.46rem;letter-spacing:.04em;text-transform:none;}
+.rtg-suitenav-note{color:#625f57;font-size:.46rem;letter-spacing:.04em;text-transform:none;}
 .rtg-suite-page :focus-visible{outline:2px solid var(--suite-gold)!important;outline-offset:3px!important;}
 
 .rtg-suitehero{position:relative;min-height:190px;display:flex;align-items:flex-end;overflow:hidden;padding:clamp(2.2rem,4.5vw,4.4rem) clamp(1.25rem,5vw,5.5rem) 1.8rem;color:#f3f0e8;border-bottom:1px solid rgba(255,255,255,.1);background:linear-gradient(90deg,rgba(18,19,17,.99) 0%,rgba(25,26,23,.95) 55%,rgba(67,42,45,.85) 100%);}
@@ -156,7 +156,7 @@ body.rtg-social-messages .lijst-kop h1{font:500 2rem/1 "Bodoni Moda",Georgia,ser
 body.rtg-social-messages .zoekrij input{border-radius:2px!important;background:rgba(255,255,255,.55)!important;}
 body.rtg-social-messages .nieuwknop{width:44px!important;height:44px!important;border-radius:2px!important;background:var(--suite-ink)!important;color:#fff!important;}
 body.rtg-social-messages .laden{padding:0 1.25rem!important;}
-body.rtg-social-messages .laden button{min-height:48px!important;color:#77756e!important;}
+body.rtg-social-messages .laden button{min-height:48px!important;color:#625f57!important;}
 body.rtg-social-messages .laden button[aria-current="true"]{color:var(--suite-text)!important;border-bottom-color:var(--suite-gold)!important;}
 body.rtg-social-messages .gesprek{border-radius:0!important;border-bottom:1px solid var(--suite-line)!important;}
 body.rtg-social-messages .draad{height:auto!important;background:var(--suite-paper-2)!important;}
@@ -192,7 +192,7 @@ body.rtg-suite-page.rtg-social-circles>header{display:flex!important;min-height:
 body.rtg-social-circles>header .ios-nav-rij{display:none!important;}
 body.rtg-social-circles>header .ios-nav-extra{width:min(1180px,100%);height:auto!important;margin:0 auto!important;}
 body.rtg-social-circles>header .tabs{width:100%;margin:0!important;border-bottom:0!important;}
-body.rtg-social-circles>header .tabs>button{min-height:58px!important;color:#77736c!important;}
+body.rtg-social-circles>header .tabs>button{min-height:58px!important;color:#625f57!important;}
 body.rtg-social-circles>header .tabs>button[aria-pressed="true"]{color:var(--suite-text)!important;border-bottom-color:var(--suite-gold)!important;}
 body.rtg-social-circles main#main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--suite-line);padding:1px!important;margin:2.4rem auto 7rem!important;}
 body.rtg-social-circles main#main>.kaart{height:100%;margin:0!important;padding:1.35rem 1.45rem!important;border:0!important;}

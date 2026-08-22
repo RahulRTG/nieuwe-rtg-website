@@ -211,7 +211,7 @@
 .rtg-social-elite .sociaal-ruimtes a{
   position:relative;min-height:59px;flex:0 0 auto;padding:0 clamp(1.25rem,2.3vw,2.5rem)!important;
   display:flex;align-items:center;border:0!important;background:transparent!important;
-  color:#777269;font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:#625f57;font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
 }
 .rtg-social-elite .sociaal-ruimtes a:first-child{padding-left:0!important;}
 .rtg-social-elite .sociaal-ruimtes a small{display:none;}
@@ -253,7 +253,7 @@
 .sociaal-briefing .sociaal-paneelkop{border-bottom-color:rgba(23,23,18,.14);color:#691f32;}
 .sociaal-briefing .cv-rust h2,.sociaal-briefing .cv-woord,.sociaal-briefing .cv-cijfers b{color:#171712;}
 .sociaal-briefing .cv-rust h2{font-size:2.15rem;line-height:1;}
-.sociaal-briefing .cv-rust p,.sociaal-briefing .cv-cijfers span,.sociaal-briefing .klaarkop{color:#777269;}
+.sociaal-briefing .cv-rust p,.sociaal-briefing .cv-cijfers span,.sociaal-briefing .klaarkop{color:#625f57;}
 .sociaal-briefing .cv-stand{border-top-color:rgba(23,23,18,.14);}
 .sociaal-briefing .vst{
   padding:1rem 0;border:0;border-top:1px solid rgba(23,23,18,.14);border-radius:0;
@@ -312,7 +312,7 @@
   }
   .rtg-social-elite .sociaal-ruimtes a{
     min-height:64px;flex:1 1 20%;justify-content:center;padding:.35rem .12rem!important;
-    color:#817c72;font-size:.5rem;letter-spacing:.08em;
+    color:#625f57;font-size:.5rem;letter-spacing:.08em;
   }
   .rtg-social-elite .sociaal-ruimtes a:first-child{padding-left:.12rem!important;}
   .rtg-social-elite .sociaal-ruimtes a.actief{color:#171712;}
@@ -403,13 +403,13 @@
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter{border-color:rgba(23,23,18,.2);background:transparent;color:#171712;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter:hover,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter:focus-visible,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter[aria-expanded="true"]{border-color:#691f32;background:transparent;color:#691f32;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes{margin-inline:0;padding-inline:0;border-bottom-color:rgba(23,23,18,.14);background:transparent;}
-.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief{color:#777269;background:transparent!important;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief{color:#625f57;background:transparent!important;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief{color:#171712;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief::after{background:#691f32;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing{background:#e9e4da;color:#171712;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .sociaal-paneelkop{border-bottom-color:rgba(23,23,18,.14);color:#691f32;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-rust h2,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-woord,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-cijfers b{color:#171712;}
-.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-rust p,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-cijfers span,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .klaarkop{color:#777269;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-rust p,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-cijfers span,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .klaarkop{color:#625f57;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-stand,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .vst{border-color:rgba(23,23,18,.14);color:#171712;}
 .rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .vst .keuzes button{border-color:rgba(23,23,18,.18)!important;color:#171712!important;}
 
@@ -425,7 +425,7 @@
   .rtg-social-elite:not(.rtg-salon-elite) .sociaal-inleiding{color:#625f57;font-size:.76rem;}
   .rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter{background:transparent;}
   .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes{margin:0;padding:0 0 env(safe-area-inset-bottom);background:rgba(244,241,234,.98);border-top-color:rgba(23,23,18,.13);}
-  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a{color:#817c72;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a{color:#625f57;}
   .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief{color:#171712;background:transparent!important;}
 }
 

@@ -286,13 +286,15 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
-    // de lade halen: dezelfde vijftien deuren als in de rail op een computer
-    // (drie werelden boven, twaalf stukken software eronder)
+    // de lade halen: drie inhoudswerelden, met Instellingen als vaste vierde
+    // mega-app in de voet van dezelfde bank
     await page.click('.cmd-lade');
     await page.waitForTimeout(450);
     const laOpen = await page.evaluate(stand);
     assert.equal(laOpen.lade.inBeeld, true, 'de greep hoort de lade te openen');
-    assert.equal(laOpen.lade.werelden, 15, 'met alle deuren erin, net als de rail; er stonden er ' + laOpen.lade.werelden);
+    assert.equal(laOpen.lade.werelden, 3, 'met alleen LIFE, WORK en FOUNDATION in de inhoudsrij; er stonden er ' + laOpen.lade.werelden);
+    assert.equal(await page.locator('#rtgCommand [data-cmd="settings"]').textContent(), 'INSTELLINGEN',
+      'Instellingen ontbreekt als vaste vierde mega-app');
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'true', 'en dat hoort een schermlezer ook te horen');
 
     /* Escape sluit hem. Zonder dit is de greep de enige uitweg, en dat is het
@@ -370,6 +372,7 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
         passkeyZichtbaar: !!document.getElementById('agPasskey')?.getBoundingClientRect().width,
         andereManier: !!document.getElementById('agAnders')?.getBoundingClientRect().width,
         werelden: document.querySelectorAll('.cmd-nav button').length,
+        instellingen: (document.querySelector('[data-cmd="settings"]') || {}).textContent || '',
         paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
           .some(b => /Bedieningspaneel/i.test(b.textContent)),
         tabs: tabs ? getComputedStyle(tabs).display : null,
@@ -382,11 +385,10 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
     assert.equal(uit.veldZichtbaar, false, 'maar vraagt niet eerst om informatie van de bezoeker');
     assert.equal(uit.passkeyZichtbaar, true, 'de passkey hoort de zichtbare eerste deur te zijn');
     assert.equal(uit.andereManier, true, 'met een veilige terugval voor bestaande accounts');
-    /* Twaalf stukken software plus de drie werelden die er sinds WERELD.md
-       bovenaan staan. Het getal is geen doel op zich -- wat het bewaakt is dat
-       de bank in de gesloten stand LAAT ZIEN wat er achter de deur zit, en dus
-       niet stilletjes leegloopt. */
-    assert.equal(uit.werelden, 15, 'de bank toont wat er achter de deur zit; er stonden er ' + uit.werelden);
+    /* De drie inhoudswerelden plus Instellingen als vaste vierde mega-app. Het
+       getal bewaakt dat de bank in de gesloten stand niet stilletjes leegloopt. */
+    assert.equal(uit.werelden, 3, 'de bank toont niet exact drie inhoudswerelden; er stonden er ' + uit.werelden);
+    assert.equal(uit.instellingen.trim(), 'INSTELLINGEN', 'de vaste vierde mega-app ontbreekt');
     assert.equal(uit.paneelIngang, false, 'voor het inloggen valt er niets te bedienen: geen systeemdeur in de bank');
     assert.equal(uit.tabs, 'none', 'en geen tabbalk zonder tabbladen: een bediening die niets doet leest als kapot');
 

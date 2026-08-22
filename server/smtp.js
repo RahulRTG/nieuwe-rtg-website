@@ -7,6 +7,7 @@ const tls = require('tls');
 const os = require('os');
 const crypto = require('crypto');
 const ssrf = require('./kern/ssrf');
+const { datum } = require('./lib/klok');
 
 const CRLF = '\r\n';
 
@@ -68,7 +69,7 @@ function bouwBericht(cfg, bericht) {
     From:from,
     To:Array.isArray(bericht.to) ? bericht.to.join(', ') : bericht.to,
     Subject:kopWaarde(bericht.subject),
-    Date:rfcDatum(new Date()),
+    Date:rfcDatum(datum()),
     'Message-ID':'<' + crypto.randomBytes(16).toString('hex') + '@' + cfg.naam + '>',
     'MIME-Version':'1.0',
     'Content-Type':'text/plain; charset=utf-8',

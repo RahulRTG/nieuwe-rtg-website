@@ -5,6 +5,8 @@
    inhoud: alleen welke bevoegde bron is bekeken, door wie en wanneer. */
 'use strict';
 
+const { nu: klokNu } = require('../lib/klok');
+
 const BRONNEN = Object.freeze({
   stichting:'https://www.kvk.nl/inschrijven/inschrijven-stichting/',
   ubo:'https://www.kvk.nl/ubo/moet-je-organisatie-ubo-opgave-doen/',
@@ -73,7 +75,8 @@ function klaar(e, nu) {
 }
 function herbereken(toelating, nu) {
   const eisen = toelating && Array.isArray(toelating.eisen) ? toelating.eisen : [];
-  const open = eisen.filter(e => e.verplicht && !klaar(e, nu || Date.now())).map(e => e.id);
+  const tijd = nu == null ? klokNu() : nu;
+  const open = eisen.filter(e => e.verplicht && !klaar(e, tijd)).map(e => e.id);
   if (toelating) toelating.status = open.length ? 'controle_nodig' : 'klaar_voor_besluit';
   return { status:toelating ? toelating.status : 'controle_nodig', open };
 }
@@ -95,7 +98,7 @@ function controleer(toelating, b, door, at) {
 }
 function magGoedkeuren(a, nu) {
   if (!a || !TYPES[a.type]) return { ok:false, error:'Onbekende FOUNDATION-registratie.' };
-  const stand = herbereken(a.toelating, nu || Date.now());
+  const stand = herbereken(a.toelating, nu == null ? klokNu() : nu);
   if (stand.open.length) return { ok:false, open:stand.open,
     error:'Goedkeuren is geblokkeerd: rond eerst alle controles af (' + stand.open.join(', ') + ').' };
   return { ok:true };

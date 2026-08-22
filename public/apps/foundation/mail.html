@@ -33,8 +33,9 @@
 <script src="sessie.js"></script>
 <script>
 'use strict';
+(function(){
 const $=s=>document.querySelector(s), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if(!window.Sessie||!Sessie.eisFamilie()) throw new Error('geen Foundation-sessie');
+if(!window.Sessie||!Sessie.eisFamilie()) return;
 const sess=Sessie.huidig(); Sessie.balk($('#balk'),{terug:'index.html'});
 const api=(pad,extra)=>Sessie.api('/mail/'+pad,Object.assign({code:sess.code,token:sess.token},extra||{}));
 const tijd=v=>{try{return new Date(v).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return ''}};
@@ -50,6 +51,7 @@ async function laad(){
 $('#nieuw').onclick=()=>$('#schrijf').showModal(); $('#annuleer').onclick=()=>$('#schrijf').close(); $('#leesDicht').onclick=()=>{$('#lezen').close();laad();};
 $('#verstuur').onclick=async()=>{try{$('#fout').textContent='';await api('stuur',{naar:$('#naar').value,onderwerp:$('#onderwerp').value,tekst:$('#tekst').value});$('#schrijf').close();$('#naar').value=$('#onderwerp').value=$('#tekst').value='';laad();}catch(e){$('#fout').textContent=e.message;}};
 laad();
+})();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

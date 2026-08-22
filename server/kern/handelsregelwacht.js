@@ -7,6 +7,7 @@
 
 const crypto = require('node:crypto');
 const BRONNEN = require('./handelsregelbronnen');
+const { datum } = require('../lib/klok');
 
 const MAX_BODY = 2 * 1024 * 1024;
 const kort = (v, n) => String(v || '').trim().slice(0, n);
@@ -14,7 +15,7 @@ const digest = v => crypto.createHash('sha256').update(v).digest('hex');
 
 module.exports = ({ db, save, fetchImpl, nu }) => {
   const haal = fetchImpl || ((...a) => fetch(...a));
-  const klok = nu || (() => new Date().toISOString());
+  const klok = nu || (() => datum().toISOString());
   const staat = () => (db.data.handelsRegelwacht = db.data.handelsRegelwacht ||
     { bronnen:{}, gebeurtenissen:[] });
 

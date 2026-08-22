@@ -39,7 +39,7 @@ module.exports = sctx => {
     const m=t.geheimPatroon.exec(String(req.body.inlog || '').trim());
     const sch=m ? eigenVeld(S(), m[1].toUpperCase()) : null, h=m ? t.hash(m[2]) : '';
     const p=sch ? Object.values(sch.personeel || {}).find(x => t.gelijk(x.inlogHash, h)) : null;
-    const geldig=p && p.status === 'actief' && p.inlogStatus === 'open' && Date.parse(p.inlogVerlooptAt) > Date.now();
+    const geldig=p && p.status === 'actief' && p.inlogStatus === 'open' && Date.parse(p.inlogVerlooptAt) > Date.parse(nu());
     if (!geldig) { misluktePoging(bucket, 6, 15); return res.status(403).json({ error:'Deze personeelsinlog is ongeldig, gebruikt of verlopen.' }); }
     p.inlogStatus='gebruikt'; p.laatstIngelogdAt=nu(); delete p.inlogHash; delete p.inlogVerlooptAt;
     log(sch, p, 'personeel-ingelogd', p.id, 'eenmalige schoolmail-link'); save(); goedePoging(bucket);

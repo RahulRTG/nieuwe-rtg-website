@@ -7,15 +7,16 @@ const register = require('../../seed/genres');
 const controle = require('../../kern/bedrijfscontrole');
 const kvk = require('../../kern/kvkvoorcontrole');
 const internationaal = require('../../kern/internationalehandel');
+const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 const VENSTER_MS = 60 * 60 * 1000;
 const MAX_PER_VENSTER = 4;
 const vensters = new Map();
 
 function teVeel(sleutel) {
-  const nu = Date.now();
+  const tijd = klokNu();
   const oud = vensters.get(sleutel);
-  const v = !oud || oud.tot <= nu ? { n: 0, tot: nu + VENSTER_MS } : oud;
+  const v = !oud || oud.tot <= tijd ? { n: 0, tot: tijd + VENSTER_MS } : oud;
   v.n += 1; vensters.set(sleutel, v);
   return v.n > MAX_PER_VENSTER;
 }
@@ -55,7 +56,7 @@ module.exports = (kern) => {
     if (!sess) return res.status(403).json({ error: 'Log in met uw Business Pass om uw aanvragen te zien.' });
     const aanvragen = (db.data.partnerApplications || []).filter(a => a.businessPass && a.businessPass.key === sess.key)
       .slice(0, 20).map(a => {
-        const stand = controle.herbereken(a.toelating, Date.now());
+        const stand = controle.herbereken(a.toelating, klokNu());
         return { id: a.id, company: a.company, city: a.city, status: a.status, code: a.code || null,
           toelating: { status: stand.status, open: stand.open.length,
             eisen: a.toelating && a.toelating.eisen ? a.toelating.eisen.map(e => ({ id: e.id, label: e.label, status: e.status })) : [] } };
@@ -112,7 +113,7 @@ module.exports = (kern) => {
     if (voorcontrole.status === 'gevonden' && (!voorcontrole.actief || !voorcontrole.naamMatch || !voorcontrole.vestigingMatch))
       return res.status(422).json({ error: 'De bedrijfsnaam of vestiging komt niet overeen met het actieve KVK-profiel. Controleer de gegevens of neem contact op met RTG.' });
 
-    const at = new Date().toISOString();
+    const at = klokDatum().toISOString();
     const entry = {
       id: crypto.randomBytes(8).toString('hex'), company, type, city, contactName, email, phone, website, note,
       registratie: { ...registratie, voorcontrole },

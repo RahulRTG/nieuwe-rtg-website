@@ -4,6 +4,8 @@
    ander geschikt KVK-product in de toelatingslijst staan. */
 'use strict';
 
+const { datum } = require('../lib/klok');
+
 function canon(waarde) {
   return String(waarde || '').toLowerCase()
     .replace(/\b(bv|nv|vof|cv|stichting|vereniging|eenmanszaak)\b/g, '')
@@ -61,7 +63,7 @@ async function voorcontrole({ apiKey, kvkNummer, vestigingsnummer, company, fetc
       naamMatch: !!doel && namen.some(n => canon(n) === doel),
       vestigingMatch: vestigingen.includes(String(vestigingsnummer)),
       namen, vestigingen, activiteiten: activiteitenUit(data),
-      gecontroleerdAt: new Date().toISOString()
+      gecontroleerdAt: datum().toISOString()
     };
   } catch (e) {
     return { status: 'handmatig', reden: e && e.name === 'AbortError' ? 'KVK API gaf niet op tijd antwoord.' : 'KVK API tijdelijk niet bereikbaar.' };

@@ -34,7 +34,7 @@ module.exports = ({ db, crypto, nu, rid }) => {
       if (Object.values(scholen()).some(s => s.registratie && s.registratie.brin === a.brin)) return { status:409, error:'Dit BRIN is al toegelaten.' };
       const code = schoolCode(), beheerToken = rid(16), geheim = rid(24);
       const activatieHash = crypto.createHash('sha256').update(geheim).digest('hex');
-      const activatieVerlooptAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+      const activatieVerlooptAt = new Date(Date.parse(nu()) + 48 * 60 * 60 * 1000).toISOString();
       scholen()[code] = { code, naam:a.naam, plaats:a.plaats, token:beheerToken, at:nu(), status:'actief', personeel:{},
         registratie:{ aanvraagId:a.id, brin:a.brin, landCode:a.landCode,
           activatieHash, activatieVerlooptAt, activatieStatus:'open' }, goedgekeurdAt:nu() };

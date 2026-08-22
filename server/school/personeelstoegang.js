@@ -26,12 +26,12 @@ module.exports = sctx => {
   const emailVan = waarde => String(waarde || '').trim().toLowerCase().slice(0, 254);
   const geldigeEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const geheimPatroon = /^([A-Z0-9]{6})\.([a-f0-9]{48})$/i;
-  const vervalt = uren => new Date(Date.now() + uren * 60 * 60 * 1000).toISOString();
+  const vervalt = uren => new Date(Date.parse(nu()) + uren * 60 * 60 * 1000).toISOString();
   const uitnodigingen = sch => {
     if (!Array.isArray(sch.personeelsUitnodigingen)) sch.personeelsUitnodigingen = [];
     return sch.personeelsUitnodigingen;
   };
-  const verlopen = item => !item || item.status !== 'open' || Date.parse(item.verlooptAt) <= Date.now();
+  const verlopen = item => !item || item.status !== 'open' || Date.parse(item.verlooptAt) <= Date.parse(nu());
   const basisUrl = req => {
     const vast = String(process.env.APP_URL || '').trim();
     if (vast) return vast.replace(/\/+$/, '');

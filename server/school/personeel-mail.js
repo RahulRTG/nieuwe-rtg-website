@@ -14,7 +14,7 @@
 const buitenpost = require('../mail');
 
 module.exports = sctx => {
-  const { router, save, personeelVan, S, schoolMailBrug } = sctx;
+  const { router, save, nu, personeelVan, S, schoolMailBrug } = sctx;
   const mailPubliek = require('../kern/mail-publiek')({});
   const slug = s => String(s == null ? '' : s).trim().toLowerCase().normalize('NFD')
     .replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 36) || 'school';
@@ -39,7 +39,7 @@ module.exports = sctx => {
       !!(dienst() && dienst().adresBestaat && dienst().adresBestaat(a));
     let lokaal=basis, n=2, adres=lokaal + '@' + domein;
     while (bestaat(adres)) { lokaal=basis.slice(0, 44) + '-' + n++; adres=lokaal + '@' + domein; }
-    p.rtgMail=adres; p.rtgMailAt=new Date().toISOString(); save(); return adres;
+    p.rtgMail=adres; p.rtgMailAt=nu(); save(); return adres;
   }
   function adresActief(adres) {
     const a=mailPubliek.intern(adres) || String(adres || '').trim().toLowerCase();

@@ -17,7 +17,7 @@ module.exports = (sctx) => {
     const hash = m ? crypto.createHash('sha256').update(m[2]).digest('hex') : '';
     const verwacht = reg && String(reg.activatieHash || '');
     const x = Buffer.from(hash), y = Buffer.from(verwacht);
-    const geldig = reg && reg.activatieStatus === 'open' && Date.parse(reg.activatieVerlooptAt) > Date.now()
+    const geldig = reg && reg.activatieStatus === 'open' && Date.parse(reg.activatieVerlooptAt) > Date.parse(nu())
       && x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y);
     if (!geldig) {
       misluktePoging(bucket, 6, 15);

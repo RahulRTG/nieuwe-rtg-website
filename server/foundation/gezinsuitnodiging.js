@@ -14,8 +14,8 @@ module.exports = (ctx) => {
     const x = Buffer.from(String(a || ''), 'hex'), y = Buffer.from(String(b || ''), 'hex');
     return x.length === y.length && x.length > 0 && crypto.timingSafeEqual(x, y);
   };
-  const verloop = () => new Date(Date.now() + DUUR).toISOString();
-  const verlopen = u => !u || u.status !== 'open' || Date.parse(u.verlooptAt) <= Date.now();
+  const verloop = () => new Date(Date.parse(nu()) + DUUR).toISOString();
+  const verlopen = u => !u || u.status !== 'open' || Date.parse(u.verlooptAt) <= Date.parse(nu());
   const rolNaam = rol => ({ ouder:'Ouder of verzorger', gezinslid:'Gezinslid', gast:'Oppas of familie met beperkte toegang' }[rol] || rol);
 
   function leesSleutel(waarde) {

@@ -5,6 +5,8 @@
    gecontroleerd. */
 'use strict';
 
+const { nu: klokNu } = require('../lib/klok');
+
 const BRONNEN = Object.freeze({
   kvk: 'https://developers.kvk.nl/nl/documentation/basisprofiel-api',
   vergunningen: 'https://business.gov.nl/business-location/establishing-or-relocating-a-business/permits-for-your-business/',
@@ -126,7 +128,8 @@ function eisKlaar(eis, nu) {
 
 function herbereken(toelating, nu) {
   if (!toelating || !Array.isArray(toelating.eisen)) return { status: 'controle_nodig', open: ['oude-aanvraag'] };
-  const open = toelating.eisen.filter(e => e.verplicht && !eisKlaar(e, nu || Date.now())).map(e => e.id);
+  const tijd = nu == null ? klokNu() : nu;
+  const open = toelating.eisen.filter(e => e.verplicht && !eisKlaar(e, tijd)).map(e => e.id);
   toelating.status = open.length ? 'controle_nodig' : 'klaar_voor_besluit';
   return { status: toelating.status, open };
 }
@@ -152,7 +155,7 @@ function controleer(toelating, data, door, at) {
 function magGoedkeuren(aanvraag, nu) {
   if (!aanvraag || !aanvraag.businessPass || !aanvraag.businessPass.key)
     return { ok: false, error: 'De aanvraag heeft geen Business Pass-bewijs.' };
-  const stand = herbereken(aanvraag.toelating, nu || Date.now());
+  const stand = herbereken(aanvraag.toelating, nu == null ? klokNu() : nu);
   if (stand.open.length) return { ok: false, open: stand.open,
     error: 'Goedkeuren is geblokkeerd: rond eerst alle officiële en interne controles af (' + stand.open.join(', ') + ').' };
   return { ok: true };

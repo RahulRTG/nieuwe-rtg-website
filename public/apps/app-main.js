@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'aa4e3be3';
+var RTG_BOUW = 'c6152796';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -5598,7 +5598,7 @@ var RTG_BOUW = 'aa4e3be3';
   function wereldBij() {
     if (!window.RTGCommand || !RTGCommand.werelden) return;
     RTGCommand.werelden(MAPPEN.filter(function (m) {
-      return m.wereld && m.items.some(itemZichtbaar);
+      return m.sleutel !== 'map-instellingen' && m.wereld && m.items.some(itemZichtbaar);
     }).map(function (m) {
       return {
         sleutel: m.sleutel,
@@ -7300,15 +7300,10 @@ var RTG_BOUW = 'aa4e3be3';
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){
-    const code = prompt('Vul de gezinscode in die je van het gezin kreeg:');
-    if (!code) return;
+    const uitnodiging = prompt('Plak de persoonlijke uitnodigingslink of code die je van het gezin kreeg:');
+    if (!uitnodiging) return;
     try {
-      const d = await API.call('/rtf/profielen', { code: code.trim().toUpperCase() });
-      const namen = d.profielen.map((p,i)=> (i+1)+'. '+p.naam + (p.gekoppeld?' (al gekoppeld)':'')).join('\n');
-      const keuze = prompt('Gezin "'+d.gezinNaam+'". Welk profiel ben jij?\n'+namen+'\n\nTyp het nummer:');
-      const idx = parseInt(keuze,10)-1;
-      if (isNaN(idx) || !d.profielen[idx]) return;
-      const r = await API.call('/rtf/koppel', { code: code.trim().toUpperCase(), profielId: d.profielen[idx].id });
+      const r = await API.call('/rtf/uitnodiging/accepteer', { uitnodiging: uitnodiging.trim() });
       toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu ook op je telefoon.');
       await refreshState(); renderFoundation(); openTab('gezin');
       ensurePush(true);

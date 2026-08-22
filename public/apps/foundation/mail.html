@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Mail</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<style>
+  .wrap{max-width:46rem;margin:0 auto;padding:1.1rem 1.1rem 3rem}.kop{display:flex;gap:.7rem;align-items:flex-start;justify-content:space-between}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.75rem}.intro,.stil{color:var(--zacht);line-height:1.55}.adres{font-family:ui-monospace,monospace;color:var(--goud2);word-break:break-all;margin:.5rem 0}
+  .kaart{padding:1rem;margin:.75rem 0}.rij{width:100%;display:grid;grid-template-columns:1fr auto;gap:.25rem .7rem;text-align:left;background:var(--paneel);color:var(--txt);border:1px solid var(--lijn);border-radius:13px;padding:.8rem;margin:.45rem 0}
+  .rij:hover{border-color:var(--goud)}.rij b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rij small{color:var(--zacht)}.rij .tijd{grid-row:1/3;grid-column:2;color:var(--zacht);font-size:.72rem}.ongelezen b:before{content:'•';color:var(--goud);margin-right:.35rem}
+  label{display:block;color:var(--zacht);font-size:.75rem;margin:.55rem 0 .2rem}.veld{margin:0}.knoprij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem}.fout{color:var(--rood);font-size:.82rem;min-height:1rem;margin-top:.4rem}
+  dialog{width:min(92vw,34rem);border:1px solid var(--lijn);border-radius:16px;background:var(--paneel);color:var(--txt);padding:1rem}dialog::backdrop{background:rgba(0,0,0,.72)}.body{white-space:pre-wrap;line-height:1.6;color:var(--zacht);margin-top:.8rem}
+</style>
+</head>
+<body class="rtg-stijl">
+<div id="balk"></div>
+<main class="wrap">
+  <div class="kop"><div><div class="kick">FOUNDATION</div><h1>RTF Mail</h1></div><button class="knop klein" id="nieuw">Nieuw</button></div>
+  <p class="intro">Je persoonlijke Foundation-postvak. Naar buiten ziet men uitsluitend je codenaam.</p>
+  <section class="kaart" id="adresKaart"><div class="stil">Adres laden…</div></section>
+  <section id="inbox"><div class="stil">Post laden…</div></section>
+</main>
+<dialog id="schrijf"><h2 class="serif">Nieuw bericht</h2><label for="naar">Aan</label><input class="veld" id="naar" type="email" maxlength="160"><label for="onderwerp">Onderwerp</label><input class="veld" id="onderwerp" maxlength="160"><label for="tekst">Bericht</label><textarea class="veld" id="tekst" rows="7" maxlength="8000"></textarea><div class="fout" id="fout"></div><div class="knoprij"><button class="knop" id="verstuur">Verstuur</button><button class="knop grijs" id="annuleer">Annuleer</button></div></dialog>
+<dialog id="lezen"><h2 class="serif" id="leesKop"></h2><div class="stil" id="leesMeta"></div><div class="body" id="leesBody"></div><div class="knoprij"><button class="knop grijs" id="leesDicht">Sluit</button></div></dialog>
+<script src="sessie.js"></script>
+<script>
+'use strict';
+(function(){
+const $=s=>document.querySelector(s), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+if(!window.Sessie||!Sessie.eisFamilie()) return;
+const sess=Sessie.huidig(); Sessie.balk($('#balk'),{terug:'index.html'});
+const api=(pad,extra)=>Sessie.api('/mail/'+pad,Object.assign({code:sess.code,token:sess.token},extra||{}));
+const tijd=v=>{try{return new Date(v).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return ''}};
+async function laad(){
+  try{
+    const [a,i]=await Promise.all([api('overzicht'),api('inbox')]);
+    $('#adresKaart').innerHTML='<div class="stil">Mijn adres</div><div class="adres">'+esc(a.publiekAdres||a.adres)+'</div>'+(a.publiekAdres?'<div class="stil">Intern beschermd als '+esc(a.adres)+'.</div>':'<div class="stil">'+esc(a.uitleg)+'</div>');
+    const berichten=i.berichten||[];
+    $('#inbox').innerHTML=berichten.length?berichten.map((m,n)=>'<button class="rij '+(m.gelezen?'':'ongelezen')+'" data-i="'+n+'"><b>'+esc(m.onderwerp)+'</b><small>'+esc(m.van)+'</small><span class="tijd">'+esc(tijd(m.at))+'</span></button>').join(''):'<div class="kaart stil">Je postvak is leeg.</div>';
+    $('#inbox').querySelectorAll('[data-i]').forEach(b=>b.onclick=async()=>{const m=berichten[+b.dataset.i];$('#leesKop').textContent=m.onderwerp;$('#leesMeta').textContent='Van '+m.van+' · '+tijd(m.at);$('#leesBody').textContent=m.tekst;$('#lezen').showModal();if(!m.gelezen){try{await api('lees',{id:m.id});}catch(e){}}});
+  }catch(e){$('#inbox').innerHTML='<div class="kaart fout">'+esc(e.message)+'</div>';}
+}
+$('#nieuw').onclick=()=>$('#schrijf').showModal(); $('#annuleer').onclick=()=>$('#schrijf').close(); $('#leesDicht').onclick=()=>{$('#lezen').close();laad();};
+$('#verstuur').onclick=async()=>{try{$('#fout').textContent='';await api('stuur',{naar:$('#naar').value,onderwerp:$('#onderwerp').value,tekst:$('#tekst').value});$('#schrijf').close();$('#naar').value=$('#onderwerp').value=$('#tekst').value='';laad();}catch(e){$('#fout').textContent=e.message;}};
+laad();
+})();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

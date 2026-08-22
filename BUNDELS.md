@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 92 delen, 9482 regels in de delen
+`public/apps/app-main/` -- 92 delen, 9477 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -112,7 +112,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 8 delen, 931 regels in de delen
+`public/apps/backoffice/` -- 8 delen, 1033 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -437,7 +437,7 @@ omlaag.
 
 ## `apps/schoolpartner/app.js`
 
-`public/apps/schoolpartner/app/` -- 3 delen, 281 regels in de delen
+`public/apps/schoolpartner/app/` -- 3 delen, 298 regels in de delen
 
 | deel | onderwerp |
 |---|---|

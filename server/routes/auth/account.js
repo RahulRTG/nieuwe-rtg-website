@@ -22,9 +22,6 @@ app.post('/api/auth/register', async (req, res) => {
   } catch (e) {
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
-  // De vervolgstappen (profiel bewaren, tokens uitgeven, staat opbouwen) raken
-  // de opslag. Faalt daar iets (bijv. de database onder zware druk), dan geven
-  // we een nette 503 terug in plaats van een onafgevangen 500.
   try {
     const mdNieuw = memberTemplate();
     /* Een nieuw account begint LEEG (kern/lid.js): geen reis en geen facturen
@@ -45,6 +42,8 @@ app.post('/api/auth/register', async (req, res) => {
     const pl = require('../../functies').plaatsNorm(req.body.plaats);
     if (pl) mdNieuw.plaats = pl;
     accounts.saveMemberState(user.id, mdNieuw);
+    try { require('../../kern/mail-publiek')({ accounts }).geefLid({
+      user, naam:accounts.realNameOf(user), tier:user.tier }); } catch (e) {}
     // welkom-draaiboek: een automatisch bericht in het eigen RTMAIL-postvak
     try { if (automatisering) automatisering.welkomLid({ codename: user.codename, wereld: 'RTG' }); } catch (e) {}
     // bevestigingsmail met een echte, werkende link

@@ -6,6 +6,7 @@ module.exports = (kern) => {
 
   app.post('/api/rtf/profielen', auth, (req, res) => {
     if (!eisAccount(req, res)) return;
+    if (process.env.NODE_ENV !== 'test') return res.status(410).json({ error: 'Koppelen met alleen een gezinscode is gesloten. Vraag het gezin om uw persoonlijke uitnodiging.' });
     const info = rtf.gastProfielen(req.body.code);
     if (!info) return res.status(404).json({ error: 'Dit gezin kennen we niet. Klopt de gezinscode?' });
     if (!info.profielen.length) return res.status(404).json({ error: 'Dit gezin heeft nog geen oppas- of familieprofiel om te koppelen. Vraag de ouder er een aan te maken.' });
@@ -14,10 +15,20 @@ module.exports = (kern) => {
 
   app.post('/api/rtf/koppel', auth, (req, res) => {
     if (!eisAccount(req, res)) return;
+    if (process.env.NODE_ENV !== 'test') return res.status(410).json({ error: 'Gebruik de persoonlijke, eenmalige uitnodiging van het gezin.' });
     const u = req.session.account;
     const r = rtf.linkGast({ code: req.body.code, profielId: req.body.profielId, userId: u.id, tier: u.tier, codenaam: u.codename });
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json({ ok: true, gezinNaam: r.gezinNaam, profielNaam: r.profielNaam, tierNaam: r.tierNaam });
+  });
+
+  app.post('/api/rtf/uitnodiging/accepteer', auth, (req, res) => {
+    if (!eisAccount(req, res)) return;
+    const u = req.session.account;
+    const r = rtf.accepteerGast({ uitnodiging:req.body.uitnodiging, userId:u.id,
+      tier:u.tier, codenaam:u.codename });
+    if (r.error) return res.status(r.status || 400).json({ error:r.error });
+    res.json(r);
   });
 
   app.post('/api/rtf/ontkoppel', auth, (req, res) => {

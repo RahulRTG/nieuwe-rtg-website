@@ -5,6 +5,7 @@
    Pure data + een opzoekfunctie; geen state, geen db. */
 
 const G = (wat, doe, tip) => ({ wat, doe, tip });
+const { wereldVanRoute } = require('./wereldroutes');
 
 /* De teksten zelf staan per deel in ./appgids-data/ (elk 5-10 KB);
    dit bestand voegt ze samen en houdt de opzoekfunctie.
@@ -35,9 +36,11 @@ function gidsVan(pad) {
   const p = String(pad || '').split('?')[0].split('#')[0].slice(0, 120);
   const entry = GIDS[p];
   const wereld = p.startsWith('/apps/foundation/') ? 'rtf' : 'rtg';
-  if (entry) return { pad: p, wereld, ...entry };
+  const megaApp = wereldVanRoute(p);
+  if (entry) return { pad: p, wereld, megaApp, ...entry };
   if (!/^\/apps\//.test(p)) return null;
-  return { pad: p, wereld, algemeen: true, ...(wereld === 'rtf' ? FALLBACK_RTF : FALLBACK_RTG) };
+  return { pad: p, wereld, megaApp, algemeen: true,
+    ...(wereld === 'rtf' ? FALLBACK_RTF : FALLBACK_RTG) };
 }
 
 module.exports = { gidsVan, GIDS, TOTAAL: Object.keys(GIDS).length };

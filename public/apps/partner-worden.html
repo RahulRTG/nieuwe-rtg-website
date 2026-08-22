@@ -32,13 +32,35 @@
           <div class="grid">
             <label>Bedrijfsnaam<input name="company" maxlength="80" autocomplete="organization" required></label>
             <label>Type bedrijf<select name="type" required><option value="">Types laden…</option></select></label>
+            <label>Vestigingsland<select name="landCode" required><option value="NL">Nederland</option></select></label>
+            <label><span id="registratieLabel">KVK-nummer</span><input name="registratieNummer" inputmode="numeric" pattern="[0-9]{8}" minlength="8" maxlength="8" autocomplete="off" required></label>
+            <label id="vestigingVeld">KVK-vestigingsnummer<input name="vestigingsnummer" inputmode="numeric" pattern="[0-9]{12}" minlength="12" maxlength="12" autocomplete="off" required></label>
+            <label id="regioVeld" hidden>Staat of territorium<input name="regioOfStaat" maxlength="80" autocomplete="address-level1"></label>
+            <label class="wide" id="registerBronVeld" hidden>Link naar het officiële ondernemingsregister<input name="registerBron" type="url" maxlength="240" placeholder="https://officieel-register.example" autocomplete="url"><small id="registerHint"></small></label>
             <label>Plaats<input name="city" maxlength="60" autocomplete="address-level2" required></label>
             <label>Contactpersoon<input name="contactName" maxlength="60" autocomplete="name" required></label>
             <label>E-mailadres<input name="email" type="email" maxlength="80" autocomplete="email" required></label>
             <label>Telefoon<input name="phone" maxlength="30" autocomplete="tel"></label>
+            <label class="wide">Officiële bedrijfswebsite (optioneel)<input name="website" type="url" maxlength="240" placeholder="https://uwbedrijf.nl" autocomplete="url"></label>
+            <div class="wide"><span style="display:block;color:var(--muted);font-size:.75rem;margin-bottom:.4rem">Extra activiteiten</span><div class="checks">
+              <label class="check"><input name="voedsel" type="checkbox"><span>Voedsel of dranken</span></label>
+              <label class="check"><input name="alcohol" type="checkbox"><span>Alcohol schenken</span></label>
+              <label class="check"><input name="pakketreis" type="checkbox"><span>Pakketreizen verkopen</span></label>
+            </div></div>
+            <div class="wide"><span style="display:block;color:var(--muted);font-size:.75rem;margin-bottom:.4rem">Wereldwijde handel</span><div class="checks">
+              <label class="check"><input name="internationaleHandel" type="checkbox"><span>Internationaal inkopen of verkopen</span></label>
+              <label class="check"><input name="goederen" type="checkbox"><span>Goederen over landsgrenzen</span></label>
+              <label class="check"><input name="euBtw" type="checkbox"><span>Zakelijke EU-handel (btw/VIES)</span></label>
+              <label class="check"><input name="douane" type="checkbox"><span>EU-invoer, uitvoer of doorvoer</span></label>
+              <label class="check"><input name="gecontroleerdeGoederen" type="checkbox"><span>Dual-use of gecontroleerde goederen</span></label>
+              <label class="check"><input name="vsBetrokken" type="checkbox"><span>VS-partij, dollarbetaling of VS-goederen</span></label>
+            </div></div>
+            <div class="bewijs wide" id="bewijsVelden" aria-live="polite"></div>
             <label class="wide">Vertel kort waarom uw bedrijf bij RTG past<textarea name="note" maxlength="500"></textarea></label>
-            <label class="bot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
-            <label class="check wide"><input name="akkoord" type="checkbox" required><span>Ik ben bevoegd deze aanvraag te doen en ga akkoord met de partnervoorwaarden en verwerkersafspraken. Ik begrijp dat RTG de aanvraag persoonlijk beoordeelt.</span></label>
+            <label class="bot" aria-hidden="true">Extra website<input name="websiteExtra" tabindex="-1" autocomplete="off"></label>
+            <label class="check wide"><input name="bevoegd" type="checkbox" required><span>Ik ben bevoegd dit bedrijf te vertegenwoordigen.</span></label>
+            <label class="check wide"><input name="waarheidsgetrouw" type="checkbox" required><span>De registratie-, vestigings-, handels- en vergunninggegevens zijn volledig, juist en geldig. Ik meld wijzigingen direct.</span></label>
+            <label class="check wide"><input name="akkoord" type="checkbox" required><span>Ik ga akkoord met de partnervoorwaarden en verwerkersafspraken en begrijp dat RTG de officiële bronnen en fraudesignalen controleert.</span></label>
           </div>
           <div class="actions" data-hoofdactie><button id="verstuur" type="submit">Aanvraag versturen</button><a class="button secondary" href="/apps/app.html">Open uw pas</a></div>
           <div class="msg" id="melding" role="status" aria-live="polite"></div>

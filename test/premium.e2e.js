@@ -444,3 +444,34 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
     child.kill();
   }
 });
+
+test('partner worden: land en handelsactiviteit sturen de juiste bewijsvelden',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    await page.goto(base + '/apps/partner-worden.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.querySelectorAll('[name="landCode"] option').length === 189,
+      null, { timeout: 12000 });
+    await page.selectOption('[name="landCode"]', 'BE');
+    await page.selectOption('[name="type"]', 'restaurant');
+    assert.equal(await page.textContent('#registratieLabel'), 'Officieel registratienummer');
+    assert.equal(await page.locator('#registerBronVeld').isVisible(), true);
+    assert.equal(await page.locator('[data-bewijs="sector_lokaal"]').count(), 1,
+      'België krijgt een lokale sectorvergunning en geen Nederlandse NVWA-eis');
+    assert.equal(await page.locator('[data-bewijs="nvwa"]').count(), 0);
+    await page.check('[name="goederen"]');
+    await page.check('[name="douane"]');
+    assert.equal(await page.isChecked('[name="internationaleHandel"]'), true);
+    assert.equal(await page.locator('[data-bewijs="goederencode"]').count(), 1);
+    assert.equal(await page.locator('[data-bewijs="eori"]').count(), 1);
+    assert.deepEqual(fouten, []);
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});

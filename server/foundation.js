@@ -11,6 +11,9 @@ const ctx = require('./foundation/basis')();
 const { db, save, eigenVeld, crypto,
   encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
   router, F, nu, rid, schoon, LETTERS, DEMO, TIPS } = ctx;
+/* Foundation start vóór de hoofd-postlaag. Dit levende brugobject wordt na de
+   bouw van RTMAIL gevuld; de schoolroutes houden dezelfde verwijzing. */
+const schoolMailBrug = { dienst:null };
 // de onderwijslaag registreert zijn routes op dezelfde router
 require('./foundation/onderwijs')(ctx);
 
@@ -30,6 +33,7 @@ const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, dec
   hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
   socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
 require('./foundation/gezin')(gctx);
+require('./foundation/gezinstoegang')(gctx);
 
 /* ---------- de gezinssessie: wie ben je, en mag je bij de privezaken ---------- */
 function sessieVan(req, res) {
@@ -65,6 +69,10 @@ const { gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht,
 require('./foundation/berichten')(ctx);
 gctx.bezorgAanGasten = bezorgAanGasten; // late binding voor de gezinsberichten
 gctx.welkomRtf = () => {}; // late binding: het welkom-draaiboek (RTMAIL) komt via setAutomatisering
+/* Volwassen gezinsleden en gasten komen niet binnen op alleen de gedeelde
+   gezinscode. De beheerder maakt een persoonlijke, eenmalige uitnodiging en
+   de ontvanger accepteert die zelf. */
+const { accepteerGast } = require('./foundation/gezinsuitnodiging')(gctx);
 /* De server bindt hier het welkom-draaiboek in: elk nieuw RTF-profiel krijgt
    een welkom in zijn eigen RTMAIL-postvak (op codenaam). Los te laten (blijft
    de lege functie hierboven) als de automatisering niet meedraait. */
@@ -101,12 +109,18 @@ function setOnderwijs(o, l) { onderwijsKern = o; if (l) leerstofKern = l; }
 
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
-/* De laatste drie stonden hier niet, en daardoor gaf /school/bewijs/leerling
-   altijd 503 en landde een becijferde toets nooit in het leerpaspoort. Als
-   GETTER, om de reden die bij setOnderwijs hierboven staat; zie school.js. */
-require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-  teVaak, misluktePoging, ipVan,
+/* DE PARAMETERS VAN BEIDE KANTEN. De laatste drie van de verzameling
+   (onderwijs, leerstof, rtfHandle) stonden er niet, en daardoor gaf
+   /school/bewijs/leerling altijd 503 en landde een becijferde toets nooit in het
+   leerpaspoort -- als GETTER, om de reden die bij setOnderwijs hierboven staat.
+   De tak voegt encS/decS, goedePoging en de schoolmailbrug toe. Een van de twee
+   kanten kiezen betekent hier: of het leerpaspoort weer stuk, of de schoolmail
+   niet aangesloten. */
+const schoolMail = require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+  encS, decS, teVaak, misluktePoging, goedePoging, ipVan, schoolMailBrug,
   onderwijs: () => onderwijsKern, leerstof: () => leerstofKern, rtfHandle });
+const foundationMail = require('./foundation/leden-mail')({ router, G, save, sessieVan, isGast, schoolMailBrug });
+function setSchoolMail(dienst) { schoolMailBrug.dienst=dienst || null; }
 
 /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 
@@ -155,4 +169,4 @@ function leerlingPassen(sess) {
 
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
-module.exports = { setOnderwijs, router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };
+module.exports = { setOnderwijs, router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };

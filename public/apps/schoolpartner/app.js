@@ -28,9 +28,9 @@
     if (naam) { $('#schoolContextNaam').textContent = naam; $('#schoolContextRol').textContent = rol || ''; }
   }
   function toon(v) {
-    ['vPoort', 'vDirectie', 'vLeraar'].forEach(function (id) { $('#' + id).hidden = id !== v; });
+    ['vPoort', 'vDirectie', 'vPersoneel', 'vLeraar'].forEach(function (id) { $('#' + id).hidden = id !== v; });
     $('#uitlog').hidden = v === 'vPoort';
-    document.body.dataset.schoolRol = v === 'vDirectie' ? 'directie' : v === 'vLeraar' ? 'leraar' : 'poort';
+    document.body.dataset.schoolRol = v === 'vDirectie' ? 'directie' : v === 'vLeraar' ? 'leraar' : v === 'vPersoneel' ? 'personeel' : 'poort';
     if (v === 'vPoort') context('', '');
   }
   function uitloggen(bericht) {
@@ -41,14 +41,21 @@
   $('#uitlog').addEventListener('click', function () { uitloggen(); });
   if (Store) Store.bewaak([SLOT], function () { uitloggen('Je veilige schoolsessie is verlopen. Log opnieuw in.'); });
 
-  /* ---- de poort: het token vertelt zelf of je directie of leraar bent ---- */
+  function openPersoneel(d) {
+    var rollen=(d.medewerker && d.medewerker.rollen) || (d.rol === 'leraar' ? ['leraar'] : []);
+    S={ code:d.schoolCode || (d.school && d.school.code), token:d.personeelToken, rol:rollen.indexOf('leraar') >= 0 ? 'leraar' : 'personeel' };
+    bewaar(); if (S.rol === 'leraar') leraar(); else personeel();
+  }
+  var LINK_ACTIEF=window.RTGSchoolToegang ? RTGSchoolToegang.bind(api, openPersoneel, esc, meld) : false;
+
+  /* ---- de overgangsdeur: directiesleutel of een bestaande personeelssleutel ---- */
   $('#inGa').addEventListener('click', function () {
     var code = $('#inCode').value.trim().toUpperCase(), token = $('#inToken').value.trim();
     if (!code || !token) return meld('Vul de schoolcode en je token in.');
     api('/school/school/overzicht', { schoolCode: code, beheerToken: token }).then(function (r) {
       if (r.status === 200) { S = { code: code, token: token, rol: 'directie' }; bewaar(); $('#inToken').value = ''; return directie(); }
-      return api('/school/leraar/overzicht', { schoolCode: code, personeelToken: token }).then(function (r2) {
-        if (r2.status === 200) { S = { code: code, token: token, rol: 'leraar' }; bewaar(); $('#inToken').value = ''; return leraar(); }
+      return api('/school/personeel/status', { schoolCode: code, personeelToken: token }).then(function (r2) {
+        if (r2.status === 200 && r2.body.status === 'actief') { $('#inToken').value = ''; return openPersoneel({ schoolCode:code, personeelToken:token, rol:r2.body.rol, school:r2.body.school }); }
         meld(r2.body.error || 'Onbekende school of verkeerd token.');
       });
     });
@@ -93,6 +100,7 @@
         });
       });
       if (window.RTGSchoolDirectie) RTGSchoolDirectie.bind(api, S, esc, meld);
+      if (window.RTGSchoolPersoneelsbeheer) RTGSchoolPersoneelsbeheer.bind(api, S, esc, meld);
       if (window.RTGSchoolEnterprise) RTGSchoolEnterprise.bind(api, S, esc, meld);
       if (window.RTGSchoolDossier) RTGSchoolDossier.bind(api, S, esc, meld);
       if (window.RTGSchoolVeiligheid) RTGSchoolVeiligheid.bind(api, S, esc, meld);
@@ -100,6 +108,15 @@
       if (window.RTGSchoolGeld) RTGSchoolGeld.bind(api, S, esc, meld);
       if (window.RTGSchoolOrganisatie) RTGSchoolOrganisatie.bind(api, S, esc, meld);
       if (window.RTGSchoolOmroep) RTGSchoolOmroep.bind(api, S, esc, meld);
+    });
+  }
+  function personeel() {
+    toon('vPersoneel');
+    api('/school/personeel/status', { schoolCode:S.code, personeelToken:S.token }).then(function (r) {
+      if (r.body.error || r.body.status !== 'actief') { uitloggen(r.body.error || 'Deze schooltoegang is niet actief.'); return; }
+      context(r.body.school.naam, 'Personeel');
+      if (window.RTGSchoolMail) RTGSchoolMail.bind(api, S, esc, meld, 'pMail');
+      if (window.RTGSchoolPersoneel) RTGSchoolPersoneel.bind(api, S, esc, meld);
     });
   }
   /* ---------- leraar ---------- */

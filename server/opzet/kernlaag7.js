@@ -171,6 +171,8 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
 
+kern.foundationregistratie = require('../kern/foundationregistratie-register')({ db, save, crypto, schoon });
+
 /* De overkoepelende werkruimtes (RTG One, Magnaat Wereld) en de Media OS
    staan in ./kernlaag7-ruimtes.js -- zie de kop daar. Nog steeds VOOR de
    routers van kernlaag7b, want de kern wordt hier nog gevuld. */

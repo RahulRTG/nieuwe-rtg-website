@@ -398,6 +398,7 @@ test('inlogscherm: de werktafel is de deur, en een wereld erin opent hem niet',
         passkeyZichtbaar: !!document.getElementById('agPasskey')?.getBoundingClientRect().width,
         andereManier: !!document.getElementById('agAnders')?.getBoundingClientRect().width,
         werelden: document.querySelectorAll('.cmd-nav button').length,
+        instellingen: (document.querySelector('[data-cmd="settings"]') || {}).textContent || '',
         paneelIngang: [...document.querySelectorAll('.cmd-bankvoet button')]
           .some(b => /^Instellingen$/i.test(b.textContent.trim())),
         tabs: tabs ? getComputedStyle(tabs).display : null,

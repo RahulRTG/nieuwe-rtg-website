@@ -139,15 +139,15 @@ async function bouwGezelschap(base, opties) {
   /* Alle lagen uit foundation/gezinshulp.js. mini, kind en tiener zijn
      BESCHERMD; jong en volw niet. Beide soorten zitten er bewust in, want de
      grens is alleen te toetsen als je hem van twee kanten benadert. */
-  for (const [groep, naam, rol] of [
-    ['mini', 'Mees (4)', 'kind'],
-    ['kind', 'Kaya (8)', 'kind'],
-    ['tiener', 'Tim (14)', 'kind'],
-    ['jong', 'Jonas (19)', 'gezinslid'],
-    ['volw', 'Vera (41)', 'ouder']
+  for (const [groep, naam, rol, pin] of [
+    ['mini', 'Mees (4)', 'kind', '1111'],
+    ['kind', 'Kaya (8)', 'kind', '2222'],
+    ['tiener', 'Tim (14)', 'kind', '3333'],
+    ['jong', 'Jonas (19)', 'gezinslid', '4444'],
+    ['volw', 'Vera (41)', 'ouder', '5555']
   ]) {
     const p = await rtf('/gezin/profiel/maak',
-      { code: gezin.code, token: gezin.token, naam, rol, groep, pin: '1111' });
+      { code: gezin.code, token: gezin.token, naam, rol, groep, pin });
     assert.equal(p.status, 200, 'profiel ' + groep + ' lukt: ' + JSON.stringify(p.body));
     gezin.leden[groep] = { ...p.body.profiel, groep, rol };
   }

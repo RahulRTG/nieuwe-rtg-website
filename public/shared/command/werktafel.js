@@ -2,9 +2,7 @@
    sleepbare scheiding en de lade. De grendel (wie er naar binnen mag) staat in
    shared/command.js.
 
-   Deze laag stelt GEEN toegangsvragen: hij krijgt ze mee als o.magBestaan() en
-   o.breed(), en de stand via zet(). Wie hier een tweede oordeel inbouwt, zet de
-   waarheid over toegang op twee plekken. */
+   Deze laag stelt GEEN toegangsvragen: die krijgt hij van de grendel mee. */
 (function(w,d){
   'use strict';
   w.RTGCommandWerktafel=function(o){

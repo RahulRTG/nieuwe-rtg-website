@@ -51,6 +51,8 @@
     $('#liveInd').style.display = 'inline-flex';
     startWerkOS();
     render();
+    loadHandelsRegels();
+    loadFoundationRegistraties();
     laadTimeline();
     loadAanmeldingen();
     loadVerify();
@@ -81,7 +83,7 @@
     }
   })();
 
-  async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
+  async function refresh(){ try { state = (await call('/office/state')).state; render(); loadHandelsRegels(); loadFoundationRegistraties(); } catch(e){} }
 
   async function loadVerify(){
     let pend = [];

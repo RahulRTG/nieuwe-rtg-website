@@ -22,7 +22,8 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
   const CODENAMES = require('../accounts/kluis').CODENAMES;
 
   // RTMAIL: het interne postsysteem (de rail voor de automatiseringen)
-  const rtmail = require('../kern/rtmail')({ db, save, crypto });
+  const rtmail = require('../kern/rtmail')({ db, save, crypto,
+    integriteitSleutel:require('../accounts/state').SECRET });
   /* Teams: een adres dat meerderen samen lezen (receptie@partner.rtg). Krijgt de
      codenaam-lijst en het zaakregister mee om te toetsen of een adres nog vrij
      is -- een team mag nooit het postvak van een persoon of zaak kapen. */

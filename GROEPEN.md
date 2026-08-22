@@ -10,16 +10,16 @@ staan loodrecht op elkaar: een wereld is een plek, een groep is een publiek.
 
 | groep | functies | wie dat is |
 |---|---:|---|
-| **RTG-leden** | 140 | Leden met de RTG Pass. |
-| **Lifestyle** | 143 | Leden met de Lifestyle Pass. |
-| **Business** | 157 | Leden met de Business Pass (zakelijk). |
-| **Gratis app** | 44 | De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen). |
-| **Leveranciers** | 54 | Partners en hun personeel in de partner-app. |
-| **Personeel** | 42 | Medewerkers in de personeels-app (PDA). |
+| **RTG-leden** | 145 | Leden met de RTG Pass. |
+| **Lifestyle** | 148 | Leden met de Lifestyle Pass. |
+| **Business** | 160 | Leden met de Business Pass (zakelijk). |
+| **Gratis app** | 45 | De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen). |
+| **Leveranciers** | 57 | Partners en hun personeel in de partner-app. |
+| **Personeel** | 44 | Medewerkers in de personeels-app (PDA). |
 | **Foundation** | 48 | Gezinnen, leerlingen en scholen in de RTF-app. |
-| **RTG intern** | 20 | De RTG-backoffice en integraties (intern). |
+| **RTG intern** | 18 | De RTG-backoffice en integraties (intern). |
 
-Totaal 191 functieschakelaars in 16 categorieën.
+Totaal 197 functieschakelaars in 17 categorieën.
 
 ## Het verschil tussen de passen
 
@@ -27,10 +27,10 @@ Dit is de vraag waar een prijskaartje aan hangt, dus hier staat hij kaal:
 
 | | functies | waarvan uniek |
 |---|---:|---:|
-| RTG Pass | 140 | . |
-| Lifestyle Pass | 143 | 0 |
-| Business Pass | 157 | 14 |
-| Gratis app | 44 | . |
+| RTG Pass | 145 | . |
+| Lifestyle Pass | 148 | 0 |
+| Business Pass | 160 | 12 |
+| Gratis app | 45 | . |
 
 **Wat er boven de RTG Pass uit komt, de hele lijst:**
 
@@ -62,10 +62,6 @@ Dit is de vraag waar een prijskaartje aan hangt, dus hier staat hij kaal:
   <br>Bulkbetalingen en de salarisrun vanaf een zakelijke rekening.
 - **Kantoorgesprek** -- Business
   <br>Het gesprek waarmee een zaak zijn kantoor inricht.
-- **Het Vooruitzicht (scenariolaag)** -- Business
-  <br>De controleerbare scenariolaag voor intenties, voorbereiding, providerbewijs en uitzonderingen; het scherm heet Het Vooruitzicht.
-- **Werkmail bezorgen** -- Business
-  <br>De bezorging van interne werkmail.
 - **RTG Mail: post van buiten aannemen** -- Business
   <br>De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert.
 
@@ -83,7 +79,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Gratis app -- 44 functies
+## Gratis app -- 45 functies
 
 *De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen).*
 
@@ -130,7 +126,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Reiswijzer en landeninfo** -- De wijzer met landen, regels en wat je moet weten voor je gaat.
 - **Foodcourt** -- Het foodcourt met de vrije tijdsloten van de zaken.
 - **Partneroverzicht** -- De lijst met aangesloten partners die een lid kan zien.
-- **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
 
 ### RTFoundation
 
@@ -154,6 +149,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Walletsaldo en betalen binnen RTG** -- Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.
 - **Betalen en betaalverzoeken** -- Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
+- **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
 
 ### Toegang en identiteit
 
@@ -162,17 +158,21 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
+- **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
 - **De gegevenspoort** -- Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.
 - **Aanmelden voor een pas** -- Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.
-- **Wervingslink van een werkgever** -- De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.
 
 ### Cultuur en gezelschap
 
 - **De krant** -- De openbare krant: de gids, een uitgave openen en een artikel lezen.
 
+### Festival
+
+- **Festival: uw pas, programma en groep** -- De kant van de bezoeker: de eigen pas en edities, het programma met wat er getekend is, en een groep waarvan u zelf de code deelt.
+
 ---
 
-## RTG-leden -- 140 functies
+## RTG-leden -- 145 functies
 
 *Leden met de RTG Pass.*
 
@@ -274,6 +274,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Agenda** -- De agenda: afspraken, uitnodigingen en planning.
 - **RTG Meet (vergaderkamers)** -- Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.
 - **Navigatie** -- Routes en navigatie onderweg.
+- **Plaats (aanwezigheid en nadering)** -- Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.
 - **Reizen boeken** -- Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.
 - **Verblijf en reserveringen** -- Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.
 - **Reiswijzer en landeninfo** -- De wijzer met landen, regels en wat je moet weten voor je gaat.
@@ -286,7 +287,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Zorgprofiel** -- Het zorgprofiel van een lid: allergieen en wat een zaak moet weten.
 - **Aandacht en voorspellen** -- De aandachtslaag en de vooruitblik op wat een lid waarschijnlijk nodig heeft.
 - **Sparren en parkeren** -- De sparlijst: iets parkeren om er later op terug te komen.
-- **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
 
 ### Cultuur en gezelschap
 
@@ -337,12 +337,16 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De AI-bankier** -- Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.
 - **Wallet** -- De wallet van een lid binnen RTG Pay.
 - **Walletsaldo en betalen binnen RTG** -- Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.
+- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.
 - **Betalen en betaalverzoeken** -- Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.
 - **Rekening en facturen** -- De openstaande rekening, het afrekenen daarvan en losse facturen.
 - **Rekening splitsen** -- Een rekening samen delen en ieders deel betalen.
 - **Cadeaukaarten** -- Cadeaukaarten kopen en de eigen kaarten bekijken.
-- **Punten en verzilveren** -- Gespaarde punten en het verzilveren daarvan.
+- **Punten en verzilveren** -- Gespaarde punten en het verzilveren daarvan naar tegoed.
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
+- **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
+- **Ledenprijsgarantie melden** -- Een lid meldt dat het bij de zaak zelf goedkoper zag; de zaak erkent of betwist, en het verschil wordt rechtgezet.
+- **AI-tegoed en bundels** -- De stand van het inbegrepen AI-tegoed, wat er bij het plafond gebeurt, en het bijkopen van een bundel.
 
 ### Toegang en identiteit
 
@@ -351,13 +355,17 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
+- **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
 - **De gegevenspoort** -- Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.
 - **Aanmelden voor een pas** -- Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.
-- **Wervingslink van een werkgever** -- De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.
+
+### Festival
+
+- **Festival: uw pas, programma en groep** -- De kant van de bezoeker: de eigen pas en edities, het programma met wat er getekend is, en een groep waarvan u zelf de code deelt.
 
 ---
 
-## Lifestyle -- 143 functies
+## Lifestyle -- 148 functies
 
 *Leden met de Lifestyle Pass.*
 
@@ -462,6 +470,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Agenda** -- De agenda: afspraken, uitnodigingen en planning.
 - **RTG Meet (vergaderkamers)** -- Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.
 - **Navigatie** -- Routes en navigatie onderweg.
+- **Plaats (aanwezigheid en nadering)** -- Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.
 - **Reizen boeken** -- Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.
 - **Verblijf en reserveringen** -- Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.
 - **Reiswijzer en landeninfo** -- De wijzer met landen, regels en wat je moet weten voor je gaat.
@@ -474,7 +483,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Zorgprofiel** -- Het zorgprofiel van een lid: allergieen en wat een zaak moet weten.
 - **Aandacht en voorspellen** -- De aandachtslaag en de vooruitblik op wat een lid waarschijnlijk nodig heeft.
 - **Sparren en parkeren** -- De sparlijst: iets parkeren om er later op terug te komen.
-- **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
 
 ### Cultuur en gezelschap
 
@@ -525,12 +533,16 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De AI-bankier** -- Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.
 - **Wallet** -- De wallet van een lid binnen RTG Pay.
 - **Walletsaldo en betalen binnen RTG** -- Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.
+- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.
 - **Betalen en betaalverzoeken** -- Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.
 - **Rekening en facturen** -- De openstaande rekening, het afrekenen daarvan en losse facturen.
 - **Rekening splitsen** -- Een rekening samen delen en ieders deel betalen.
 - **Cadeaukaarten** -- Cadeaukaarten kopen en de eigen kaarten bekijken.
-- **Punten en verzilveren** -- Gespaarde punten en het verzilveren daarvan.
+- **Punten en verzilveren** -- Gespaarde punten en het verzilveren daarvan naar tegoed.
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
+- **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
+- **Ledenprijsgarantie melden** -- Een lid meldt dat het bij de zaak zelf goedkoper zag; de zaak erkent of betwist, en het verschil wordt rechtgezet.
+- **AI-tegoed en bundels** -- De stand van het inbegrepen AI-tegoed, wat er bij het plafond gebeurt, en het bijkopen van een bundel.
 
 ### Toegang en identiteit
 
@@ -539,13 +551,17 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
+- **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
 - **De gegevenspoort** -- Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.
 - **Aanmelden voor een pas** -- Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.
-- **Wervingslink van een werkgever** -- De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.
+
+### Festival
+
+- **Festival: uw pas, programma en groep** -- De kant van de bezoeker: de eigen pas en edities, het programma met wat er getekend is, en een groep waarvan u zelf de code deelt.
 
 ---
 
-## Business -- 157 functies
+## Business -- 160 functies
 
 *Leden met de Business Pass (zakelijk).*
 
@@ -655,6 +671,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Agenda** -- De agenda: afspraken, uitnodigingen en planning.
 - **RTG Meet (vergaderkamers)** -- Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.
 - **Navigatie** -- Routes en navigatie onderweg.
+- **Plaats (aanwezigheid en nadering)** -- Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.
 - **Reizen boeken** -- Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.
 - **Verblijf en reserveringen** -- Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.
 - **Reiswijzer en landeninfo** -- De wijzer met landen, regels en wat je moet weten voor je gaat.
@@ -667,8 +684,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Zorgprofiel** -- Het zorgprofiel van een lid: allergieen en wat een zaak moet weten.
 - **Aandacht en voorspellen** -- De aandachtslaag en de vooruitblik op wat een lid waarschijnlijk nodig heeft.
 - **Sparren en parkeren** -- De sparlijst: iets parkeren om er later op terug te komen.
-- **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
-- **Het Vooruitzicht (scenariolaag)** -- De controleerbare scenariolaag voor intenties, voorbereiding, providerbewijs en uitzonderingen; het scherm heet Het Vooruitzicht.
 
 ### Cultuur en gezelschap
 
@@ -690,7 +705,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De zaakdoos** -- De doos op locatie: zaakserver, netwerk en updates.
 - **Facturen** -- De facturatie van en naar een zaak.
 - **Kantoorgesprek** -- Het gesprek waarmee een zaak zijn kantoor inricht.
-- **Werkmail bezorgen** -- De bezorging van interne werkmail.
 - **RTG Mail: post van buiten aannemen** -- De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert.
 
 ### RTFoundation
@@ -733,12 +747,16 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De AI-bankier** -- Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.
 - **Wallet** -- De wallet van een lid binnen RTG Pay.
 - **Walletsaldo en betalen binnen RTG** -- Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.
+- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.
 - **Betalen en betaalverzoeken** -- Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.
 - **Rekening en facturen** -- De openstaande rekening, het afrekenen daarvan en losse facturen.
 - **Rekening splitsen** -- Een rekening samen delen en ieders deel betalen.
 - **Cadeaukaarten** -- Cadeaukaarten kopen en de eigen kaarten bekijken.
-- **Punten en verzilveren** -- Gespaarde punten en het verzilveren daarvan.
+- **Punten en verzilveren** -- Gespaarde punten en het verzilveren daarvan naar tegoed.
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
+- **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
+- **Ledenprijsgarantie melden** -- Een lid meldt dat het bij de zaak zelf goedkoper zag; de zaak erkent of betwist, en het verschil wordt rechtgezet.
+- **AI-tegoed en bundels** -- De stand van het inbegrepen AI-tegoed, wat er bij het plafond gebeurt, en het bijkopen van een bundel.
 
 ### Toegang en identiteit
 
@@ -747,13 +765,17 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
+- **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
 - **De gegevenspoort** -- Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.
 - **Aanmelden voor een pas** -- Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.
-- **Wervingslink van een werkgever** -- De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.
+
+### Festival
+
+- **Festival: uw pas, programma en groep** -- De kant van de bezoeker: de eigen pas en edities, het programma met wat er getekend is, en een groep waarvan u zelf de code deelt.
 
 ---
 
-## Personeel -- 42 functies
+## Personeel -- 44 functies
 
 *Medewerkers in de personeels-app (PDA).*
 
@@ -809,9 +831,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
+- **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
 - **De gegevenspoort** -- Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.
 - **Aanmelden voor een pas** -- Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.
-- **Wervingslink van een werkgever** -- De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.
 
 ### Leden (RTG-app)
 
@@ -827,14 +849,16 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### Geld
 
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
+- **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
 
-### Diensten (leden)
+### Festival
 
-- **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
+- **Festival: terrein en poort** -- Het terrein draaien: de poort en de scans, plekken en ruimtes, de dag en het podiumbeeld, en de uitzonderingen die aandacht vragen.
+- **Festival: diensten, artiesten en verkoop** -- De organisatie eromheen: roosters en diensten, de rider en het bewijs van een artiest, boekingen, producten en de verkoop.
 
 ---
 
-## Leveranciers -- 54 functies
+## Leveranciers -- 57 functies
 
 *Partners en hun personeel in de partner-app.*
 
@@ -905,8 +929,10 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Geld
 
+- **Tegoed vanuit een zaak** -- Een zaak zet tegoed klaar voor personeel of klanten, en neemt verlopen tegoed terug.
 - **Partnersaldo uitbetalen** -- Het RTG Pay-saldo van een zaak naar zijn bankrekening sturen.
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
+- **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
 
 ### Toegang en identiteit
 
@@ -915,9 +941,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
+- **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
 - **De gegevenspoort** -- Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.
 - **Aanmelden voor een pas** -- Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.
-- **Wervingslink van een werkgever** -- De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.
 
 ### Leden (RTG-app)
 
@@ -930,9 +956,10 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Rahul (de assistent)** -- De assistent zelf: zijn stemming, zijn blik op een scherm en de bibliotheekhulp.
 - **App-gids en uitleg** -- De gids die per scherm uitlegt wat je er kunt doen.
 
-### Diensten (leden)
+### Festival
 
-- **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
+- **Festival: terrein en poort** -- Het terrein draaien: de poort en de scans, plekken en ruimtes, de dag en het podiumbeeld, en de uitzonderingen die aandacht vragen.
+- **Festival: diensten, artiesten en verkoop** -- De organisatie eromheen: roosters en diensten, de rider en het bewijs van een artiest, boekingen, producten en de verkoop.
 
 ---
 
@@ -970,7 +997,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### Diensten (leden)
 
 - **Agenda** -- De agenda: afspraken, uitnodigingen en planning.
-- **Invisible Arrival** -- De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.
 
 ### Cultuur en gezelschap
 
@@ -998,9 +1024,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
+- **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
 - **De gegevenspoort** -- Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.
 - **Aanmelden voor een pas** -- Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.
-- **Wervingslink van een werkgever** -- De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.
 
 ### Leden (RTG-app)
 
@@ -1017,10 +1043,11 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### Geld
 
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
+- **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
 
 ---
 
-## RTG intern -- 20 functies
+## RTG intern -- 18 functies
 
 *De RTG-backoffice en integraties (intern).*
 
@@ -1052,7 +1079,5 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De zaakdoos** -- De doos op locatie: zaakserver, netwerk en updates.
 - **Facturen** -- De facturatie van en naar een zaak.
 - **Kantoorgesprek** -- Het gesprek waarmee een zaak zijn kantoor inricht.
-- **RTG One** -- Het enterprise-commandocentrum met beloften, intenties, overdracht, frictie en gecontroleerde automatisering.
-- **Werkmail bezorgen** -- De bezorging van interne werkmail.
 - **RTG Mail: post van buiten aannemen** -- De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert.
 

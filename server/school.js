@@ -20,7 +20,7 @@ const { maakPoorten } = require('./school/poorten');
 
 module.exports = (ctx) => {
   const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-    teVaak, misluktePoging, ipVan,
+    encS, decS, teVaak, misluktePoging, goedePoging, ipVan, schoolMailBrug,
     /* onderwijs en leerstof zijn GETTERS (zie de opmerking bij setOnderwijs in
        foundation.js): bij het opstarten bestaat die kern nog niet. Ze stonden
        hier niet, en dus ook niet in sctx hieronder -- waardoor school/bewijs.js
@@ -64,9 +64,14 @@ module.exports = (ctx) => {
   /* De drie lagen (beheer, klas, gezin) draaien als submodules op een
      gedeelde context, een keer opgebouwd bij het opstarten; de klaslaag
      levert gemiddelde() aan de gezinslaag via die context. */
-  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-    teVaak, misluktePoging, ipVan,
+  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic, encS, decS,
+    teVaak, misluktePoging, goedePoging, ipVan,
+    schoolMailBrug,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief,
+    /* onderwijs en leerstof zijn GETTERS (zie setOnderwijs in foundation.js):
+       bij het opstarten bestaat die kern nog niet. Zonder deze drie gaf
+       /school/bewijs/leerling altijd 503 en landde een becijferde toets nooit
+       in het leerpaspoort. */
     onderwijs, leerstof, rtfHandle };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
@@ -93,6 +98,9 @@ module.exports = (ctx) => {
      smaak: dossier en organisatie halen leerlingLijst() uit de context die
      inschrijving.js daar neerzet. */
   Object.assign(sctx, require('./school/rollen')(sctx)); // rollen, rechten, inzagejournaal
+  Object.assign(sctx, require('./school/personeel-mail')(sctx)); // persoonlijke naam@school.rtg-post
+  Object.assign(sctx, require('./school/personeelstoegang')(sctx)); // directie nodigt persoonlijk uit
+  require('./school/personeel-inlog')(sctx); // eenmalige schoolmail-link + intrekken
   Object.assign(sctx, require('./school/webhook')(sctx)); // de bezorger; zet sctx.meld voor de lagen hieronder
   require('./school/inschrijving')(sctx); // aanmelding, wachtlijst, plaatsing, uitschrijving, overstap
   Object.assign(sctx, require('./school/dossier')(sctx)); // dossier, contact, documenten, zorg
@@ -130,4 +138,6 @@ module.exports = (ctx) => {
   require('./school/belasting')(sctx); // de donderdag van de leerling en de week van de docent
   require('./school/overdracht')(sctx); // Transition Continuity en de adapters: wat gaat mee, en in welke vorm
   require('./school/taalcheck')(sctx); // Language Independence Test: dezelfde vraag opnieuw gesteld in de thuistaal
+
+  return { schoolMailAdresActief:sctx.schoolMailAdresActief };
 };

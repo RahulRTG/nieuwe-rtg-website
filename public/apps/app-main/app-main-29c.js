@@ -28,7 +28,7 @@
   function wereldBij() {
     if (!window.RTGCommand || !RTGCommand.werelden) return;
     RTGCommand.werelden(MAPPEN.filter(function (m) {
-      return m.wereld && m.items.some(itemZichtbaar);
+      return m.sleutel !== 'map-instellingen' && m.wereld && m.items.some(itemZichtbaar);
     }).map(function (m) {
       return {
         sleutel: m.sleutel,

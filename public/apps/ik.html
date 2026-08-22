@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wie ben ik</title>
+<title>INSTELLINGEN</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -33,6 +33,11 @@
   .welkom{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin:1rem 0;
     font-size:.85rem;line-height:1.6;color:var(--soft);}
   .welkom strong{color:var(--txt);}
+  .instellingpoorten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin:1rem 0 1.4rem;}
+  .instellingpoorten a{display:block;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;
+    color:var(--txt);text-decoration:none;font-weight:700;}
+  .instellingpoorten small{display:block;color:var(--soft);font-weight:400;line-height:1.4;margin-top:.25rem;}
+  @media(max-width:680px){.instellingpoorten{grid-template-columns:1fr;}}
 </style>
 <!-- De premium-laag. Sneltoetsen hebben hier echt werk: het deelmenu geeft ze
      1-5. Meenemen is hier bewust NIET geladen: deze pagina meldt geen bron aan,
@@ -48,11 +53,16 @@
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>Wie ben ik</h1>
+  <h1>INSTELLINGEN</h1>
   <div class="rek"></div>
   <span class="stil">voor Rahul</span>
 </header>
 <main id="inhoud">
+  <nav class="instellingpoorten" aria-label="Onderdelen van Instellingen">
+    <a href="#persoonlijk">Persoonlijk<small>Profiel, aanspreekvorm en voorkeuren</small></a>
+    <a href="/apps/passkeys.html">Passkeys<small>Veilig inloggen en toegang beheren</small></a>
+    <a href="/apps/juridisch.html">Juridisch<small>Voorwaarden, toestemmingen en afspraken</small></a>
+  </nav>
   <div class="welkom">
     <strong>Alles hier is van u, en alles is optioneel.</strong> Vult u niets in, dan krijgt u
     precies dezelfde Rahul; alleen weet hij dan de dingen niet die u niet heeft verteld.
@@ -60,7 +70,7 @@
     paspoort. Wat u hier zet, blijft in huis en gaat nergens heen.
   </div>
 
-  <section aria-label="Waar staat u in het leven">
+  <section id="persoonlijk" aria-label="Waar staat u in het leven">
     <h2>Waar staat u in het leven</h2>
     <div class="kaart" id="fase"><p class="stil">Laden...</p></div>
   </section>

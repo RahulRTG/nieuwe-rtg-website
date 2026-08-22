@@ -76,7 +76,10 @@ module.exports = (kern) => {
   /* De partneraanvraag (/api/partner/apply) staat in ./partneraanvraag.js --
      zie de kop daar. Hier blijft het BOEKEN via een partnerlink. */
   require('./partneraanvraag')(kern);
-
+  /* En de aanmeldmodule erbij: die draagt sinds deze samenvoeging /api/partner/types
+     en /api/partner/applications/mijn. Zijn eigen /api/partner/apply is eruit --
+     zie de kop daar; twee modules op hetzelfde adres is er een te veel. */
+  require('./partneraanmelding')(kern);
 
   // De losse partner-winkel is opgeheven: kopen gaat voortaan uitsluitend via de
   // RTG Mall (kern/mall.js + /api/mall). De catalogus woont in

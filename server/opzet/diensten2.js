@@ -48,8 +48,6 @@ beveilig.zetIsoleer((bron, reden) => wacht.isoleer(bron, reden));
 const atelierweb = require('../kern/atelierweb')({ db, save, crypto, schoon });
 // de persoonlijke naamlaag: eigen etiketten op codenamen, alleen in het eigen account
 const naamlaag = require('../kern/naamlaag')({ db, save, schoon });
-// het welkom-draaiboek ook voor nieuwe RTF-profielen (foundation, eigen router)
-try { rtf.setAutomatisering(automatisering); } catch (e) {}
 {
   const t = setInterval(() => { try { wacht.meet(); } catch (e) {} }, 10000);
   if (t.unref) t.unref();
@@ -86,13 +84,21 @@ const automatisering = require('../kern/automatisering')({ rtmail, db });
 // Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
 // eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
 const { werkmail } = require('../kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });
+// Foundation bestond al vóór de postlaag; nu krijgt School de levende motor.
+try { rtf.setAutomatisering(automatisering); } catch (e) {}
+try { rtf.setSchoolMail({ rtmail,
+  domeinBezet:d => Object.values((db.data.werkmail && db.data.werkmail.domeinen) || {}).includes(d),
+  adresBestaat:a => !!((db.data.werkmail && db.data.werkmail.adressen) || []).find(x => x.adres === rtmail.normAdres(a))
+}); } catch (e) {}
 /* Post van buiten AANNEMEN, op een plek (kern/mailaanname.js). Twee deuren
    komen hier binnen -- de HTTP-buitenpoort (/api/mail/binnen) en de
    SMTP-ontvanger (server/smtp-in.js) -- en de keten erachter hoort er maar een
    keer te staan. Staat NA werkmail en de teams, want de ontvangertoets vraagt
    die twee of een adres hier een postvak is. */
 const { mailAanname } = require('../kern/mailaanname')({ rtmail, mailIn, mailBijlage, mailAuth,
-  werkmail, findSupplier, team: rtmailTeam });
+  werkmail, findSupplier, team: rtmailTeam, accounts,
+  schoolAdresActief:rtf.schoolMailAdresActief,
+  foundationAdresActief:rtf.foundationMailAdresActief });
 
 /* Universeel scan-net: elke schrijf-aanvraag wordt door De Ontsmetter gehaald.
    Zit er een BESMETTE beeld-/PDF-data-URL in de body (waar dan ook, hoe diep

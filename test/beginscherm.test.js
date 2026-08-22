@@ -82,7 +82,7 @@ test('wat uit de functierij verdween, heeft een ingang in zijn wereld', () => {
 test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', () => {
   const bron = lees('public', 'apps', 'app-main', 'app-main-24a2.js');
   const mappen = [...bron.matchAll(/wereld:\s*'([^']+)'[\s\S]*?items:\s*\[([^\]]*)\]/g)];
-  assert.ok(mappen.length >= 3, 'de mappen zijn niet te lezen; dan meet deze regel niets');
+  assert.equal(mappen.length, 4, 'de vier productindelingen zijn niet allemaal te lezen');
 
   /* DE SCHULD DIE ER AL LAG, met naam en toenaam -- zelfde afspraak als de
      BEKEND-lijst in scripts/check.js regel 45: hij mag ALLEEN KRIMPEN. Deze
@@ -132,16 +132,10 @@ test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', ()
          moet linken. Dat is geen ingang maar een cirkel. */
       if ('/apps/' + item + '.html' === wereldPad) continue;
       const regel = wereldPad + ' mist ' + item;
-      if (html.includes('/apps/' + item + '.html')) continue;   // bereikbaar, klaar
-      if (SCHULD.has(regel)) nogOpen.add(regel); else gemist.push(regel);
+      if (html.includes(eigenPad) || html.includes(doelPad)) continue;
+      gemist.push(regel);
     }
   }
   assert.deepEqual(gemist, [],
-    'NIEUW: deze apps staan in een wereld maar zijn daar niet te bereiken (en dus nergens):\n  ' + gemist.join('\n  '));
-  /* En wie er een oplost, haalt hem van de lijst. Anders slijt de lijst tot
-     een verzameling namen die niets meer zegt -- dezelfde afspraak als bij
-     regel 45 in scripts/check.js. */
-  const opgelost = [...SCHULD].filter((r) => !nogOpen.has(r));
-  assert.deepEqual(opgelost, [],
-    'deze staan nog als schuld genoteerd maar zijn inmiddels bereikbaar; haal ze uit SCHULD:\n  ' + opgelost.join('\n  '));
+    'deze functies staan in een wereld maar zijn daar niet te bereiken:\n  ' + gemist.join('\n  '));
 });

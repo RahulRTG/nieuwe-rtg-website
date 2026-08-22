@@ -115,7 +115,7 @@
       werelden=werelden.filter(function(x){return x&&x.naam&&x.url});
       nav.textContent='';
       if(werelden.length){
-        nav.appendChild(kopje('Werelden'));
+        nav.appendChild(kopje('Apps'));
         werelden.forEach(function(x){nav.appendChild(deur(x.naam,x.url,x.teken))});
       }
       vulVoet();

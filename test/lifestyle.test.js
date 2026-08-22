@@ -2,7 +2,7 @@
    Concierge-bureau (verzoeken + voorkeuren), het Bezittingenregister met
    attentiepunten, en Gezondheid & welzijn (afspraken + prive-dossier). Gated op
    de Lifestyle Pass; een gewoon RTG-lid komt er niet in.
-   Draai los: node --experimental-sqlite --test test/lifestyle.test.js */
+   Draai los: node --test test/lifestyle.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -128,7 +128,7 @@ module.exports = (ctx) => {
           : 'Ontvangen: ' + set.telling + ' facturen, samen EUR ' + set.besteed + '.';
         const { RAHUL_LEAD } = require('../rahul');
         const sys = RAHUL_LEAD + 'je bent de facturen-assistent op RTG. Antwoord kort en concreet in het Nederlands. Situatie: ' + kort;
-        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 300, system: sys, messages: [{ role: 'user', content: opdracht }] });
+        const r = await anthropic.messages.create({ model: 'claude-sonnet-5', max_tokens: 300, system: sys, messages: [{ role: 'user', content: opdracht }] });
         const t = (r && r.content && r.content[0] && r.content[0].text || '').trim();
         if (t) return { antwoord: t };
       } catch (e) { /* val terug */ }

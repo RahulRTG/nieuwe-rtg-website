@@ -2,7 +2,7 @@
    geo:-URI's die het huis gebruikt tot iets toonbaars. Getoetst op beide
    vormen (echte coördinaten en het adres-alleen 0,0?q=...), op de nette-maar-
    ongebruikte extra's (;crs=, hoogte) en op rommel-invoer.
-   Draai los: node --experimental-sqlite --test test/kaart.test.js */
+   Draai los: node --test test/kaart.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const Kaart = require('../public/shared/kaart');

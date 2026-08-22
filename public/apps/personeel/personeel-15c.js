@@ -73,10 +73,10 @@
   function tekenvlakOpen(id, titel){
     wvPdaTekent = id; wvPdaPaden = [];
     $('#wvVak').innerHTML = '<div class="h-mt60"><b>' + esc(titel) + '</b>' +
-      '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
+      '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:0;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
       '<div class="row">' +
       '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
-      '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--gold);">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
+      '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
       '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.5rem;line-height:1.45;">' +
       T('pd.wv.tekenuit','Uw naam komt automatisch bij de handtekening te staan; het bureau ziet hem meteen.') + '</div></div>';
     const cv = $('#wvCanvas'), ctx = cv.getContext('2d');

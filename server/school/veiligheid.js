@@ -101,5 +101,35 @@ module.exports = (sctx) => {
     res.json({ ok: true, bezoeker: { id: b.id, binnen: false } });
   });
 
+  /* ---------- de twee lijsten ----------
+     Zonder deze lijsten bestond er wel een pas maar geen manier om hem terug
+     te vinden: uitgeven gaf een id terug, en wie die id kwijtraakte kon de pas
+     nooit meer blokkeren. Dat is geen schermprobleem maar een ontbrekend
+     antwoord, dus staat het hier.
+
+     WAT ER NIET IN ZIT is het punt: per pas komt alleen de HUIDIGE stand mee
+     (binnen of buiten, sinds wanneer, bij welke ingang), precies wat de
+     ontruimingslijst ook al toont. Er is geen geschiedenis om te tonen en er
+     komt er ook geen; de dagteller telt passages zonder wie. */
+  router.post('/school/pas/lijst', (req, res) => {
+    const g = poort(req, res, 'veiligheid'); if (!g) return;
+    const soort = String(req.body.soort || '');
+    const rijen = Object.values(PAS(g.sch))
+      .filter(p => !soort || p.soort === soort)
+      .map(p => ({ id: p.id, soort: p.soort, houder: p.houder, status: p.status, vestiging: p.vestiging || null,
+        binnen: !!(p.stand && p.stand.binnen), sinds: (p.stand && p.stand.sinds) || null, ingang: (p.stand && p.stand.ingang) || null }))
+      .sort((a, b) => String(a.houder).localeCompare(String(b.houder)));
+    res.json({ ok: true, aantal: rijen.length, binnen: rijen.filter(p => p.binnen).length, passen: rijen.slice(0, 500),
+      passagesVandaag: (g.sch.pasTellers || {})[dag()] || 0,
+      uitleg: 'Alleen de huidige stand; er wordt geen looproute bewaard.' });
+  });
+
+  router.post('/school/bezoeker/lijst', (req, res) => {
+    const g = poort(req, res, 'bezoeker'); if (!g) return;
+    const alle = BEZ(g.sch);
+    const binnen = alle.filter(b => b.binnen);
+    res.json({ ok: true, binnen: binnen.length, bezoekers: binnen.concat(alle.filter(b => !b.binnen).slice(0, 25)).slice(0, 100) });
+  });
+
   return { passen: PAS, bezoekers: BEZ };
 };

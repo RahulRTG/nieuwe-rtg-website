@@ -17,7 +17,7 @@ const stappen = [
   ['Rust-migratieregister', process.execPath, ['scripts/rust-migraties.js', '--controle']],
   ['Bron- en securityregels', process.execPath, ['scripts/check.js']],
   ['Dependency-audit', 'npm', ['audit', '--audit-level=high']],
-  ['Backup en herstel', process.execPath, ['--experimental-sqlite', '--test', 'test/herstelproef.test.js', 'test/backupvolledig.test.js']],
+  ['Backup en herstel', process.execPath, ['--test', 'test/herstelproef.test.js', 'test/backupvolledig.test.js']],
   ['Releasebewijs maken', process.execPath, ['scripts/release-bewijs.js']],
   ['Releasebewijs terugverifiëren', process.execPath, ['scripts/release-bewijs.js', '--controle']]
 ];

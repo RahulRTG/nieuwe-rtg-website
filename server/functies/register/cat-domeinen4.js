@@ -12,7 +12,7 @@
    /api/book, /api/booking, /api/bookings, /api/hotels en /api/partnertrips.
    Dat zijn vijf paden en EEN dienst; wie ze los zou schakelen kan een halve
    dienst overhouden, en daar heeft niemand iets aan. */
-const { DOELGROEPEN, LEDEN, LEDEN_RTF } = require('./doelgroepen');
+const { DOELGROEPEN, LEDEN, LEDEN_RTF, WERKOS } = require('./doelgroepen');
 const ALLE = DOELGROEPEN.map(d => d.id).filter(d => d !== 'intern');
 const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
 
@@ -42,10 +42,31 @@ module.exports = [
     uitleg: 'Een rekening samen delen en ieders deel betalen.', paden: ['/api/splits', '/api/splitsen'] },
   { id: 'gld-cadeau', categorie: 'Geld', naam: 'Cadeaukaarten', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Cadeaukaarten kopen en de eigen kaarten bekijken.', paden: ['/api/giftcard', '/api/giftcards'] },
+  /* HET VERMOGEN HOORT ERBIJ, en het ontbrak. Punten zelf zijn geen geld, maar
+     VERZILVERDE punten zijn een bedrag in euro's dat het lid van RTG tegoed
+     heeft tegen een vaste koers -- dezelfde soort aanspraak als het
+     walletsaldo, en dus hetzelfde vastgelegde besluit (gesloten circuit, niet
+     uitbetaald aan het lid, met een plafond). Zonder deze regel hing een
+     geldhandeling aan geen enkele bevoegdheid. Zie kern/ervaring/leden/punten.js. */
   { id: 'gld-punten', categorie: 'Geld', naam: 'Punten en verzilveren', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Gespaarde punten en het verzilveren daarvan.', paden: ['/api/punten'] },
+    uitleg: 'Gespaarde punten en het verzilveren daarvan naar tegoed.', paden: ['/api/punten'],
+    vermogen: 'WALLET_SALDO' },
   { id: 'gld-prijzen', categorie: 'Geld', naam: 'Pasprijzen en balans', standaard: true, doelgroepen: ALLE,
     uitleg: 'De publieke prijslijst van de passen en het balansoverzicht van een lid.', paden: ['/api/pasprijzen', '/api/balans'] },
+  /* De commerciele kern naar buiten. Deze drie zijn PUBLIEK omdat ze in de
+     voorwaarden staan: een bedrag of een percentage in een juridisch document
+     dat los kan lopen van wat de code rekent, is precies hoe "0% commissie"
+     naast een commissieknop kon blijven bestaan. De pagina haalt ze hier op in
+     plaats van ze zelf op te schrijven. */
+  { id: 'gld-claims', categorie: 'Geld', naam: 'Commerciele claims en tarieven', standaard: true, doelgroepen: ALLE,
+    uitleg: 'Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is. Voedt de voorwaardenpagina\'s.',
+    paden: ['/api/claims', '/api/betaaldiensttarief', '/api/sociaalbeleid'] },
+  { id: 'gld-prijsgarantie', categorie: 'Geld', naam: 'Ledenprijsgarantie melden', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Een lid meldt dat het bij de zaak zelf goedkoper zag; de zaak erkent of betwist, en het verschil wordt rechtgezet.',
+    paden: ['/api/member/prijsgarantie'] },
+  { id: 'gld-aitegoed', categorie: 'Geld', naam: 'AI-tegoed en bundels', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De stand van het inbegrepen AI-tegoed, wat er bij het plafond gebeurt, en het bijkopen van een bundel.',
+    paden: ['/api/member/ai'] },
 
   // ---------- de rest, met naam ----------
   { id: 'ov-stad', categorie: 'Diensten (leden)', naam: 'Stad en zaakdoos', standaard: true, doelgroepen: LEDEN,
@@ -66,14 +87,20 @@ module.exports = [
     uitleg: 'De sparlijst: iets parkeren om er later op terug te komen.', paden: ['/api/spar'] },
   { id: 'ov-bijles', categorie: 'RTFoundation', naam: 'Bijles', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'Het bijlesgesprek met de begeleider.', paden: ['/api/bijles'] },
-  { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: ['leverancier', 'personeel'],
+  { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Het gesprek waarmee een zaak zijn kantoor inricht.', paden: ['/api/kantoor'] },
-  { id: 'ov-arrival', categorie: 'Diensten (leden)', naam: 'Invisible Arrival', standaard: true, doelgroepen: ALLE,
-    uitleg: 'De publieke aankomstpas, voorbereiding en live aankomststatus voor een gast en de ontvangende zaak.', paden: ['/api/arrival'] },
-  { id: 'ov-instant-reality', categorie: 'Diensten (leden)', naam: 'Instant Reality', standaard: true, doelgroepen: ['business'],
-    uitleg: 'De controleerbare Business-wereld voor intenties, voorbereiding, providerbewijs en uitzonderingen.', paden: ['/api/instant-reality'] },
-  { id: 'ov-rtgone', categorie: 'Werk (zaken en personeel)', naam: 'RTG One', standaard: true, doelgroepen: ['intern'],
-    uitleg: 'Het enterprise-commandocentrum met beloften, intenties, overdracht, frictie en gecontroleerde automatisering.', paden: ['/api/rtgone'] },
+  /* HIER STONDEN 'ov-arrival', 'ov-instant-reality' en 'ov-rtgone'. Alle drie
+     claimden een pad dat 'arrival', 'instantreality' en 'rtgone' (cat-apps) al
+     claimen, en die staan eerder in de catalogus. Bij een even lange prefix wint
+     de eerste, dus deze drie stonden wel op het bord en schakelden samen 21
+     routes niet -- veertien daarvan van RTG One. Iemand die 'Invisible Arrival'
+     uitzette, zag hem uitgaan en hij bleef gewoon draaien.
+
+     Weggehaald in plaats van hernoemd: het ID van de WERKENDE schakelaar moet
+     blijven staan, anders raakt de bewaarde stand in db.data.functies zijn
+     eigenaar kwijt. De categorieen hier ('Diensten (leden)', 'Werk') houden na
+     dit weghalen 22 en 10 functies over, dus er verdwijnt geen groep van het
+     bord. Zie de fail-fast in ./index.js. */
   { id: 'ov-werkmail', categorie: 'Werk (zaken en personeel)', naam: 'Werkmail bezorgen', standaard: true, doelgroepen: ['leverancier', 'personeel'],
     uitleg: 'De bezorging van interne werkmail.', paden: ['/api/werkmail'] },
   /* De buitenpoort van RTG Mail. Deze hoort NAAR ZIJN AARD in de kast: hij is
@@ -82,7 +109,7 @@ module.exports = [
      vanuit de boardroom dicht kunnen zonder dat er iemand bij de code hoeft.
      Dat is precies waar de schakelkast voor bestaat. */
   { id: 'ov-mail-binnen', categorie: 'Werk (zaken en personeel)', naam: 'RTG Mail: post van buiten aannemen',
-    standaard: true, doelgroepen: ['leverancier', 'personeel'],
+    standaard: true, doelgroepen: WERKOS,
     uitleg: 'De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert. Uit betekent: post van buiten komt niet meer binnen.',
-    paden: ['/api/mail/binnen'] }
+    paden: ['/api/mail/binnen', '/api/mail/ses'] }
 ];

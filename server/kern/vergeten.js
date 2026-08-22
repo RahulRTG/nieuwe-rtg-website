@@ -121,6 +121,15 @@ module.exports = function maakVergeten(kern) {
        is precies waarvoor een auditlog niet bedoeld is (AVG art. 17 lid 3
        laat bewaren toe waar dat voor een rechtsvordering of wettelijke plicht
        nodig is). Wat overblijft is de-geidentificeerd. */
+    /* EN HET API-SPOOR. Dat bewaart per geslaagde schrijfhandeling WIE er
+       handelde -- de sleutel, nooit een naam. Na een wissing hoort die sleutel
+       daar niet meer te staan: de bezem van test/vergeten.test.js gaat door de
+       hele database en rekent er terecht op af. De regels zelf blijven (wat er
+       gebeurde en wanneer), de actor wordt "gewist", de keten wordt opnieuw
+       gezegeld en er komt een regel bij die zegt dát er is herschreven, met de
+       oude kop erin. Zo verdwijnt de persoon zonder dat het spoor stilletjes
+       een ander verleden gaat vertellen. */
+    if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, 'recht op vergetelheid (AVG art. 17)');
     // alle sessies van dit lid uitloggen
     for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
     save();

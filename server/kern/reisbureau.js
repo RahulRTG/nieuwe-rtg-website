@@ -3,7 +3,9 @@
    maar tegen de nettoprijs zonder opslag), en vragen een reis aan. De aanvraag
    landt bij een RTG-reisadviseur, die de datum bevestigt en de losse onderdelen
    (verblijf, transfers, tafels) regelt. Nooit de belofte dat iets al geboekt is:
-   een aanvraag heet "aangevraagd" tot een mens hem bevestigt.
+   een aanvraag heet "aangevraagd" tot een mens hem bevestigt. Die mens zit in de
+   kamer Reisbureau van het RTG-kantoor en drukt op `besluit` (onderaan); zonder
+   die kamer was dit een belofte zonder iemand die hem kon waarmaken.
 
    Geen echte lucht-/hotelmerken als bevestigde partners. Prijzen in euro.
    Volgt het vaste kern-patroon maakReisbureau(state). */
@@ -23,12 +25,22 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, visumtaakVan }) {
+function maakReisbureau({ db, save, crypto, visumtaakVan, accounts }) {
   const nu = () => new Date().toISOString();
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
+  /* HET DOSSIER VAN HET LID (kern/lid/reisdossier.js). Een aanvraag hoort niet
+     alleen bij het reisbureau te liggen maar ook bij het lid te staan -- als
+     AANVRAAG, want dat is wat het is. Zonder accounts (losse module-test) blijft
+     het dossier weg en verandert er niets aan het reisbureau zelf. */
+  const dossier = accounts ? require('./lid/reisdossier').maakReisdossier({ accounts }).reisdossier : null;
 
   const reizen = () => reisAanbod(db);
+  /* Het lokale reisadvies woont apart (./reisbureau-advies.js): het is de enige
+     laag hier die niets met de aanvraag doet -- hij LEEST alleen de catalogus en
+     rangschikt hem. Het draait op dezelfde `reizen()`, zodat er geen tweede
+     projectie van de prijs ontstaat (LAT-regel 4). */
+  const { advies } = require('./reisbureau-advies')({ reizen });
 
   function overzicht() {
     const lijst = reizen();
@@ -64,11 +76,24 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     // is de bestemming visumplichtig, dan staat de aanvraag-taak meteen klaar
     const vt = visum();
     const taak = vt ? (await vt.bijBoeking(sess.key, { ref: entry.ref, bestemming: trip.dest, vertrek })).taak : null;
+    /* En de reis komt in het dossier van het lid te staan. Dit is de plek waar
+       een reisdossier ONTSTAAT: hiervoor kwam de enige reis die een lid ooit
+       had uit de demo-seed (zie kern/lid/reisdossier.js). */
+    if (dossier) dossier.zetAanvraag(sess.key, { ...entry, dates: trip.dates || null });
     return { ok: true, aanvraag: entry, visumtaak: taak };
   }
 
+  /* WAT HET LID VAN EEN BESLUIT ZIET: de stand, wanneer het genomen is en het
+     bericht van de adviseur -- niet WIE er in het kantoor op de knop drukte.
+     Die naam is een interne sleutel (`user-3`, of "backoffice (gedeelde code)")
+     en hoort in het kantoor te blijven; het lid heeft aan een mens met een
+     bericht genoeg. Het besluit zelf staat wel op de aanvraag, want het kantoor
+     leest dezelfde rij. */
   function mijn(key) {
-    return (db.data.reisAanvragen || []).filter(a => a.customerKey === key).slice(0, 50);
+    return (db.data.reisAanvragen || []).filter(a => a.customerKey === key).slice(0, 50)
+      .map(a => a.besluit
+        ? Object.assign({}, a, { besluit: { at: a.besluit.at, bericht: a.besluit.bericht } })
+        : a);
   }
 
   // een lid trekt zijn eigen aanvraag in zolang die nog openstaat
@@ -78,6 +103,8 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
     a.status = 'geannuleerd';
     save();
+    // uit het dossier van het lid: een reis die niet doorgaat hoort niet in zijn tijdlijn
+    if (dossier) dossier.weghalen(key, a.ref);
     // de visumtaak van deze reis gaat mee weg; een taak voor een reis die
     // niet doorgaat is ruis in de agenda
     const vt = visum();
@@ -85,50 +112,15 @@ function maakReisbureau({ db, save, crypto, visumtaakVan }) {
     return { ok: true, aanvraag: a };
   }
 
-  /* Lokaal reisadvies: het lid vertelt in vrije tekst wat het zoekt. Een
-     uitlegbare score wijst de best passende reis uit de bestaande catalogus
-     aan en toont de woorden waarop de overeenkomst berust. */
-  function regelRangschik(wens) {
-    const lijst = reizen();
-    if (!lijst.length) return null;
-    const w = String(wens || '').toLowerCase();
-    const woorden = [...new Set(w.split(/[^a-z0-9à-ÿ]+/).filter(x => x.length > 2))];
-    const stop = new Set(['een', 'het', 'die', 'dat', 'met', 'voor', 'naar', 'van', 'zoek', 'willen', 'graag', 'reis']);
-    const intenties = [
-      ['rust', ['rust', 'stilte', 'rustig', 'natuur', 'wandelen', 'bergen']],
-      ['zon', ['zon', 'strand', 'zee', 'warm', 'zwemmen', 'kust']],
-      ['cultuur', ['cultuur', 'kunst', 'museum', 'historie', 'stad', 'architectuur']],
-      ['culinair', ['culinair', 'eten', 'restaurant', 'wijn', 'keuken', 'proeven']],
-      ['avontuur', ['avontuur', 'actief', 'hiken', 'surfen', 'safari', 'duiken']]
-    ];
-    const uitgebreid = new Set(woorden.filter(x => !stop.has(x)));
-    for (const [, groep] of intenties) if (groep.some(x => uitgebreid.has(x))) for (const x of groep) uitgebreid.add(x);
-    let beste = lijst[0], score = -1, treffers = [];
-    for (const r of lijst) {
-      const hooi = ((r.bestemming || '') + ' ' + (r.titel || '') + ' ' + (r.omschrijving || '') + ' ' + (r.inbegrepen || []).join(' ')).toLowerCase();
-      const raak = [...uitgebreid].filter(woord => hooi.includes(woord));
-      const s = raak.length;
-      if (s > score) { score = s; beste = r; treffers = raak; }
-    }
-    return { reis: beste, score, treffers: treffers.slice(0, 4) };
-  }
-  async function advies(wens) {
-    const lijst = reizen();
-    if (!lijst.length) return { status: 404, error: 'Er staan nu geen reizen klaar.' };
-    const val = regelRangschik(wens);
-    const reden = val.treffers.length
-      ? 'Deze reis sluit aan op ' + val.treffers.join(', ') + '.'
-      : 'Er is geen sterke inhoudelijke match; dit is het eerste beschikbare voorstel om mee te vergelijken.';
-    return { ok: true, reis: val.reis, reden, bron: 'regel', ai: false,
-      onderbouwing: { score: val.score, treffers: val.treffers } };
-  }
-
   // het reisbureau-kantoor: de openstaande aanvragen (codenamen, nooit echte namen)
   function aanvragen() {
     return { ok: true, aanvragen: (db.data.reisAanvragen || []).slice(0, 200) };
   }
+  /* Het BESLUIT van de reisadviseur (bevestigen, afwijzen, en de kantooringang
+     besluit()) staat in ./reisbureau-besluit.js -- zie de kop daar voor de naad. */
+  const { bevestig, wijsAf, besluit } = require('./reisbureau-besluit')({ db, save, nu, dossier, visum });
 
-  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen } };
+  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen, bevestig, wijsAf, besluit } };
 }
 
 module.exports = { maakReisbureau, reisAanbod };

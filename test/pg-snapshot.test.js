@@ -22,7 +22,7 @@
    komen), niet bij elke melding.
 
    Draai:  DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtgtest \
-           node --experimental-sqlite --test test/pg-snapshot.test.js
+           node --test test/pg-snapshot.test.js
    ========================================================================== */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF (zie leden-gids-pg). */
 const test = require('node:test');
@@ -53,9 +53,27 @@ test('de lokale snapshot wordt binnen het venster hoogstens een keer geschreven'
      overspant. */
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, PG_SNAP_MS: '120000' } });
   try {
-    // laat het opstarten (inclusief de eerste flush + snapshot) uitrazen
-    await wacht(1500);
-    const voor = fs.existsSync(SNAP) ? fs.statSync(SNAP).mtimeMs : 0;
+    /* WACHTEN TOT DE SNAPSHOT VAN HET OPSTARTEN IS UITGERAASD, en niet 1500 ms
+       gokken. De eerste flush schrijft er een; zolang de mtime nog beweegt is
+       het opstarten bezig, en dan zou `voor` hieronder een moment vastleggen
+       waar nog een schrijfactie achteraan komt -- die telt dan mee als de
+       "tweede snapshot" die er juist niet mag zijn.
+
+       Stil is hier: het bestand bestaat en zijn mtime is drie keer op rij
+       hetzelfde. */
+    let voor = 0;
+    {
+      const eind = Date.now() + 20000;
+      let vorige = -1, stil = 0;
+      for (;;) {
+        const nu = fs.existsSync(SNAP) ? fs.statSync(SNAP).mtimeMs : 0;
+        stil = (nu > 0 && nu === vorige) ? stil + 1 : 0;
+        vorige = nu;
+        if (stil >= 3) { voor = nu; break; }
+        if (Date.now() >= eind) throw new Error('de warme cache kwam niet tot rust binnen 20 s (mtime ' + nu + ')');
+        await wacht(100);
+      }
+    }
 
     /* Aanhoudend schrijfverkeer: elke registratie zet meerdere collecties vuil,
        elke flush-ronde stuurt per collectie een NOTIFY, en elke NOTIFY schreef
@@ -68,6 +86,11 @@ test('de lokale snapshot wordt binnen het venster hoogstens een keer geschreven'
         geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
       await wacht(200);
     }
+    /* HIER BLIJFT EEN WACHT STAAN, en dat is een besluit. De bewering hieronder
+       gaat over iets dat NIET gebeurt: er is geen tweede snapshot bij gekomen.
+       Op een afwezigheid kun je niet wachten; deze seconde is de ruimte waarin
+       een losgeslagen luisteraar zich zou verraden -- ruim voorbij de
+       flush-cyclus van 150 ms. Zie KLOKWACHT.json. */
     await wacht(1000);
 
     /* DE BEWERING. Er is in dit venster hooguit EEN snapshot bij gekomen.

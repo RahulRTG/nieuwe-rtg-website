@@ -5,16 +5,28 @@
    kern/directpay/index.js. */
 module.exports = (ctx) => {
   const { db, save, ensure, centenVan, id, schoon, nu, ledger, publiek, betaalDirect,
+    verzoekIdemZoek, verzoekIdemBewaar,
     findSupplier, sseToSupplier, MIN_CENTEN, MAX_CENTEN,
     directBetalingMetRef, directBetalingenVanZaak,
     betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe } = ctx;
 
   /* De leverancier stuurt een betaalverzoek op codenaam (of open aan wie het
      bekijkt). Het lid rekent het met Face ID af. */
-  function verzoekMaak({ supplierCode, actorName, naarCodename, bedragCenten, omschrijving }) {
+  function verzoekMaak({ supplierCode, actorName, naarCodename, bedragCenten, omschrijving, idem }) {
     ensure();
     const s = findSupplier(supplierCode);
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
+    /* DUBBELTIK OP HET VERZOEK ZELF. Een betaling was al beschermd, een verzoek
+       OM te betalen niet: twee keer op "stuur" drukken zette er twee bij de
+       klant, met twee bedragen die allebei openstaan. De sleutel hangt aan de
+       ZAAK (niet aan de medewerker), want twee mensen achter dezelfde balie die
+       hetzelfde verzoek versturen, sturen hetzelfde verzoek. Gemeten met
+       npm run idemproef; stond als TAKEN 3.8 op de lijst. */
+    const idemSleutel = idem ? ('bv:' + s.code + ':' + String(idem).slice(0, 60)) : null;
+    if (idemSleutel) {
+      const al = verzoekIdemZoek(idemSleutel);
+      if (al) return { status: 200, ok: true, verzoek: verzoekPubliek(al), herhaald: true };
+    }
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog.' };
@@ -24,10 +36,12 @@ module.exports = (ctx) => {
       bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Betaalverzoek',
       status: 'open', door: schoon(actorName, 60) || 'Beheer', betaaldDoor: null, betaaldRef: null, at: nu()
     };
+    if (idemSleutel) v.idem = idemSleutel;
     /* Ging met unshift + slice(0, 100000): een kopie van de hele array bij elk
        verzoek, en de staart eraf zonder dat er iets bewaard werd. Nu via de
        transactie-index, net als de betalingen zelf. */
     betaalVerzoekenVoegToe(v);
+    verzoekIdemBewaar(v);
     save();
     try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
     return { status: 200, ok: true, verzoek: verzoekPubliek(v) };

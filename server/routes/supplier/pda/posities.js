@@ -101,7 +101,7 @@ app.post('/api/supplier/mijn/login', async (req, res) => {
   if (tooManyTries(res, bucket)) return;
   const lid = accounts.findByLogin(req.body.login);
   if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Log in met uw eigen RTG-account.' });
   }
   loginFails.delete(bucket);

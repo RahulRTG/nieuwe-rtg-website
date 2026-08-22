@@ -21,10 +21,12 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     res.json({ ok: true, bestuur: ondernemingBestuur(o) });
   });
 
-  app.post('/api/onderneming/bestuur/zet', auth, (req, res) => {
+  /* Async sinds een bestuurder naar een MENS wijst: de codenaam wordt in de
+     ledengids opgezocht, en die lezing kan buiten het geheugen liggen. */
+  app.post('/api/onderneming/bestuur/zet', auth, async (req, res) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
-    stuur(res, ondernemingBestuurderZet(o, req.body || {}));
+    stuur(res, await ondernemingBestuurderZet(o, req.body || {}));
   });
 
   /* Aftreden en niet wissen: wie er ooit bestuurder was, was dat -- en juist
@@ -42,10 +44,10 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     stuur(res, ondernemingBestuurderAf(o, (req.body || {}).bestuurder));
   });
 
-  app.post('/api/onderneming/aandeel/zet', auth, (req, res) => {
+  app.post('/api/onderneming/aandeel/zet', auth, async (req, res) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
-    stuur(res, ondernemingAandeelZet(o, req.body || {}));
+    stuur(res, await ondernemingAandeelZet(o, req.body || {}));
   });
 
   app.post('/api/onderneming/aandeel/weg', auth, (req, res) => {

@@ -18,22 +18,18 @@
    de codec het kan decoderen doet er niet toe, de vraag is of de bytes
    aankomen en of de speler ze in beeld zet.
 
-   Draai: npm run e2e   (of los: node --experimental-sqlite --test test/clipdeler.e2e.js) */
+   Draai: npm run e2e   (of los: node --test test/clipdeler.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('een clip reist van toestel naar toestel en speelt in de Media OS en in Clips',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-clipdeler-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -55,7 +51,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     assert.equal(gemaakt.status, 200);
     const clipId = gemaakt.body.id;
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const metToken = async (token) => {
       const ctx = await browser.newContext({ viewport: { width: 900, height: 800 }, serviceWorkers: 'block' });
       await ctx.addInitScript((tok) => {
@@ -72,7 +68,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     /* 'load' en niet 'networkidle': deze pagina's houden een SSE-verbinding
        open, dus het netwerk wordt nooit stil. Daar liep deze toets eerst 30
        seconden op vast -- de wachtregel was fout, niet de app. */
-    await makerPagina.goto(base + '/apps/clips.html', { waitUntil: 'load' });
+    await makerPagina.goto(base + '/apps/clips.html', { waitUntil: 'domcontentloaded' });
     await makerPagina.waitForFunction(() => !!window.RTGClipDeler, null, { timeout: 15000 });
     const bewaard = await makerPagina.evaluate(async ({ id, tok }) => {
       const deler = window.RTGClipDeler.start({ token: tok });
@@ -96,15 +92,15 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     })(TMP);
     assert.ok(!bestanden.some(f => f.includes(clipId)), 'er ligt geen clipbestand bij RTG');
 
-    await makerPagina.reload({ waitUntil: 'load' });
-    await makerPagina.waitForTimeout(800);   // de pagina meldt zijn aanwezigheid
+    await makerPagina.reload({ waitUntil: 'domcontentloaded' });
+    await wachtOpRust(makerPagina);   // de pagina meldt zijn aanwezigheid
 
     /* ---- de kijker: /apps/media.html, stand FLOW, en spelen ---- */
     const kijkCtx = await metToken(kijker);
     const kijkPagina = await kijkCtx.newPage();
     // via het gedeelde hulpje, zodat bekende browserruis niet als fout telt
     const fouten = letOpFouten(kijkPagina, []);
-    await kijkPagina.goto(base + '/apps/media.html', { waitUntil: 'load' });
+    await kijkPagina.goto(base + '/apps/media.html', { waitUntil: 'domcontentloaded' });
     await kijkPagina.waitForSelector('.standen button');
     await kijkPagina.evaluate(() => {
       const knoppen = [...document.querySelectorAll('.standen button')];
@@ -140,7 +136,7 @@ test('een clip reist van toestel naar toestel en speelt in de Media OS en in Cli
     const tweedeCtx = await metToken(tweede);
     const clipsPagina = await tweedeCtx.newPage();
     const foutenClips = letOpFouten(clipsPagina, []);
-    await clipsPagina.goto(base + '/apps/clips.html', { waitUntil: 'load' });
+    await clipsPagina.goto(base + '/apps/clips.html', { waitUntil: 'domcontentloaded' });
     await clipsPagina.waitForSelector('.clip .laag .knop');
     await clipsPagina.click('.clip .laag .knop');
     await clipsPagina.waitForFunction(() => {

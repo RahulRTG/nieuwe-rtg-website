@@ -2,7 +2,7 @@
    Basisschool: rekenen, taal, aardrijkskunde, geschiedenis, natuur, verkeer
    en Engels. VO: negen-plus vakken per niveau. En de dekkingswacht: ELK
    leerdoel in de bibliotheek moet een werkende opgave-generator hebben.
-   Draai los: node --experimental-sqlite --test test/leerstofbreed.test.js */
+   Draai los: node --test test/leerstofbreed.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { DOELEN, PER_FASE } = require('../server/kern/leerstof');

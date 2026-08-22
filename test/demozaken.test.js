@@ -45,6 +45,25 @@ const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 const { startServer, stop } = require('./helper');
 
+/* SQLITE OPENEN ZOALS DE SERVER DAT DOET, en dat was hier het gat.
+
+   De server zet op elke verbinding `PRAGMA busy_timeout=5000` (zie
+   server/db/sqlite.js, met de reden erbij: zonder die wachttijd werd parallelle
+   opstart incidenteel rood met "database is locked"). Deze toets opende zijn
+   eigen verbinding ZONDER die pragma, en schrijft op een moment dat een zojuist
+   gestopte server nog kan wegschrijven -- write-behind is niet klaar op het
+   moment dat het proces "gestopt" heet.
+
+   Gevolg: een op de drie volle rondes viel dit bestand om op een lock, en dan
+   niet op wat het beweert (overleeft een echte partner de opruiming) maar op
+   het moment waarop het toevallig schreef. Een toets die om zoiets rood geeft,
+   leert iedereen zijn uitslag wegkijken. */
+function opslag(pad, opties) {
+  const db = opties ? new DatabaseSync(pad, opties) : new DatabaseSync(pad);
+  db.exec('PRAGMA busy_timeout=5000');
+  return db;
+}
+
 /* Zaken uit verschillende zaai-delen, want juist de spreiding was het probleem.
    HOSHI komt uit de basis-seed, SAKURA uit deel1, CASTELL uit deel8, TALLER uit
    deel9 en SOMBRA uit deel10. De laatste drie overleefden de oude opruiming. */
@@ -69,7 +88,7 @@ async function zaakBekend(base, code) {
 }
 
 function actiefPersoneel(dataDir, code) {
-  const db = new DatabaseSync(path.join(dataDir, 'rtg.db'), { readOnly: true });
+  const db = opslag(path.join(dataDir, 'rtg.db'), { readOnly: true });
   try {
     return db.prepare('SELECT COUNT(*) AS n FROM supplier_staff WHERE supplier_code = ? AND active = 1')
       .get(String(code)).n;
@@ -137,7 +156,7 @@ test('een database van VOOR het merkteken wordt alsnog opgeruimd', async () => {
     finally { await stop(demo); }
 
     // alle merktekens eraf: nu is het een database van voor deze wijziging
-    const db = new DatabaseSync(path.join(TMP, 'store.db'));
+    const db = opslag(path.join(TMP, 'store.db'));
     const zaken = JSON.parse(db.prepare("SELECT val FROM kv WHERE key = 'suppliers'").get().val);
     let gestript = 0;
     for (const z of zaken) if (z.geseed) { delete z.geseed; gestript++; }
@@ -171,7 +190,7 @@ test('een echte partner overleeft de opruiming', async () => {
     /* Een echte partner erbij zetten zoals de aanmelding dat doet: zonder
        merkteken. De opslag is sqlite (kv-tabel) zodra er een datamap is. */
     dataBestand = path.join(TMP, 'store.db');
-    const db = new DatabaseSync(dataBestand);
+    const db = opslag(dataBestand);
     const rij = db.prepare("SELECT val FROM kv WHERE key = 'suppliers'").get();
     const zaken = JSON.parse(rij.val);
     zaken.push({ code: 'ECHTEPARTNER', name: 'Echte Partner BV', type: 'bouw',

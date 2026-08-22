@@ -10,18 +10,11 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
@@ -31,7 +24,7 @@ async function openDeel(page, naam) {
 }
 
 test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lifescherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -53,7 +46,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     const id = (await api('doelen', {})).doelen[0].id;
     await api('doelen/meet', { id, waarde: 4 });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -61,7 +54,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/life.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/life.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('signalen');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);
@@ -154,7 +147,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
       body: JSON.stringify({ onderwerp: 'beweging', waarde: 45 })
     }).then(r => r.json());
     assert.equal(gemeten.bron, 'apparaat');
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('signalen');
       return e && /uw toestel mat/i.test(e.textContent);
@@ -197,7 +190,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     /* En de harde kant ervan: haal hem uit het profiel, en hij is ook van de
        kaart. Bij een kopie zou hij hier blijven staan. */
     await api('zorgprofiel/zet', { allergenen: [], dieet: '', medisch: '', delen: false });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await openDeel(page, 'Als u het zelf niet kunt vertellen');
     await page.waitForSelector('#nood .nkaart', { timeout: 10000 });
     const naProfiel = await page.textContent('#nood .nkaart');
@@ -219,7 +212,7 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
        zonder tijd, en elke regel wijst naar de app die hem bezit -- want hier
        valt niets af te vinken, en dat hoort zichtbaar te zijn. */
     await api('gewoonten/maak', { naam: 'Even buiten', waarom: 'hoofd leeg' });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await openDeel(page, 'Uw dag');
     await page.waitForFunction(() => /Metoprolol/.test(document.getElementById('dag').textContent),
       { timeout: 15000 });

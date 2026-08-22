@@ -48,6 +48,28 @@ module.exports = ({ LANDEN }) => {
     melbourne: 'AU', auckland: 'NZ', malediven: 'MV', seychellen: 'SC', mauritius: 'MU'
   };
 
+  /* DE PLAATS in vrije tekst, en niet alleen het land. De Invoerbalie moet uit
+     een ingelezen document kunnen halen dat er "Dubai" staat en niet alleen dat
+     het AE is -- een reis heet naar zijn bestemming en niet naar zijn land.
+     Zelfde tabel als landVind hieronder, want een tweede plaatsenlijst is
+     binnen een maand een andere lijst (LAT-regel 4).
+
+     De langste treffer wint: staat er "Abu Dhabi", dan is dat de plaats en niet
+     toevallig iets korters dat er ook in zit. Niets gevonden is niets terug --
+     een bestemming raden is precies wat de Invoerbalie niet mag. */
+  function plaatsVind(invoer) {
+    const laag = String(invoer || '').toLowerCase();
+    if (!laag) return null;
+    let beste = null;
+    for (const [plaats, cc] of Object.entries(PLAATSEN)) {
+      if (!laag.includes(plaats)) continue;
+      if (!beste || plaats.length > beste.plaats.length) beste = { plaats, land: cc };
+    }
+    if (!beste) return null;
+    return { plaats: beste.plaats.replace(/(^|[\s-])([a-z])/g, (m, v, l) => v + l.toUpperCase()),
+      land: beste.land, bron: 'de plaatsenlijst van de Reiswijzer' };
+  }
+
   // een land vinden in vrije tekst: code, landnaam of bekende plaats
   function landVind(invoer) {
     const t = String(invoer || '').trim();
@@ -82,5 +104,5 @@ module.exports = ({ LANDEN }) => {
       .sort((a, b) => a.naam.localeCompare(b.naam));
   }
 
-  return { reiswijzer, reisLanden, landVind };
+  return { reiswijzer, reisLanden, landVind, plaatsVind };
 };

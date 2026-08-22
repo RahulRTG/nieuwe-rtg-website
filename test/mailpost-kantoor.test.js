@@ -21,7 +21,7 @@
    3. DE PDF-NOTITIES (/api/bestanden/pdf/*). Een opmerking op een document
       zetten en teruglezen.
 
-   Draai los: node --experimental-sqlite --test test/mailpost-kantoor.test.js
+   Draai los: node --test test/mailpost-kantoor.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

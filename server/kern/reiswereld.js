@@ -29,6 +29,7 @@ module.exports.maakReiswereld = ({ kern }) => {
      per wereld met reden; ze samenvoegen zou van vier werelden een grijze
      middelmaat maken (zie het waarom in wereldkern.js). */
   const { RANG, bron, betekenisVan, standVan } = require('./wereldkern');
+  const bronnen = require('./reiswereld-bronnen');
 
   /* Laag 0 van het Command Canvas: het woord waarmee deze wereld opent
      (CANVAS.md). Bij Reizen betekent 'aandacht' bijna altijd hetzelfde ding --
@@ -61,7 +62,15 @@ module.exports.maakReiswereld = ({ kern }) => {
     ingecheckt:  { sig: 'gezond', teken: '✓' },
     aangevraagd: { sig: 'actief', teken: '◷', wacht: 'reisadviseur' },
     afgewezen:   { sig: 'incident', teken: '!' },
-    vertraagd:   { sig: 'aandacht', teken: '!' }
+    vertraagd:   { sig: 'aandacht', teken: '!' },
+    /* De twee standen van de Invoerbalie. `ingelezen` krijgt met opzet GEEN
+       vinkje: een vinkje leest als "RTG bevestigt dit", en dat doet RTG hier
+       niet -- het document zegt het, en van wie dat document is staat in de
+       herkomst (REIZEN.md par. 4.3). En een lezing waarvan een veld onder de
+       drempel bleef, is niet "waarschijnlijk goed" maar na te kijken; die vraagt
+       dus aandacht in plaats van groen te staan (par. 4.4). */
+    ingelezen:     { sig: 'gezond', teken: '\u25c7' },
+    tecontroleren: { sig: 'aandacht', teken: '!', wacht: 'uw controle' }
   };
   /* Door de poort: betekenisVan weigert een status die een signaal noemt
      dat niet bestaat. Zonder die controle gaf een onbekend signaal stil NaN
@@ -73,6 +82,12 @@ module.exports.maakReiswereld = ({ kern }) => {
     const b = betekenis(st);
     return {
       soort, titel: o.titel || '', bestemming: o.bestemming || '',
+      /* WAAR HET VANDAAN KOMT (REIZEN.md par. 2.2). De bron weet dit en de
+         lagen erboven niet, dus wordt het hier meegegeven en nergens geraden:
+         een verblijf staat bij een partner, een reis en een vlucht zijn van
+         RTG zelf. Wat het WOORD mag zijn, bewaakt kern/reizen.js -- een regel
+         zonder geldige herkomst wordt daar niet geplaatst maar losgelegd. */
+      herkomst: o.herkomst || '',
       van: dag(o.van), tot: dag(o.tot) || null, status: o.status || '',
       /* HET UUR, en alleen waar het domein er een kent. Een vlucht vertrekt om
          17:30 en een charter ook; een verblijf en een reis van het reisbureau
@@ -81,7 +96,11 @@ module.exports.maakReiswereld = ({ kern }) => {
          en de rest hoort in het register. Hier een 00:00 verzinnen zou een
          hotelovernachting bovenaan uw dag zetten (CANVAS.md). */
       tijd: o.tijd || null,
-      sig: b.sig || '', teken: b.teken || '', wacht: b.wacht || '',
+      /* De wachttekst: het WOORDENBOEK zegt wat een status betekent, maar WIE
+         er wacht verschilt per bron -- op een reisbureau-aanvraag wacht een
+         reisadviseur, op een betaald ticket de zaak. De bron mag dat
+         preciseren; het signaal en het teken blijven van het woordenboek. */
+      sig: b.sig || '', teken: b.teken || '', wacht: o.wacht || b.wacht || '',
       /* Alleen meesturen wat het domein ECHT weet. Een verblijf kent geen
          reizigersaantal en een vlucht kent een stoel en geen gezelschap; daar
          een 1 neerzetten zou een getal verzinnen dat er nooit stond. Het scherm
@@ -99,35 +118,12 @@ module.exports.maakReiswereld = ({ kern }) => {
 
   function komend(key) {
     const uit = [], stil = [];
-
-    bron('verblijven', () => (kern.mijnVerblijven(key) || [])
-      .filter(v => v.status !== 'geannuleerd')
-      .map(v => regel('verblijf', {
-        titel: v.roomName, bestemming: v.plaats || '', van: v.aankomst, tot: v.vertrek,
-        status: v.status, kenmerk: v.id, app: 'Verblijven', link: '/apps/hotels.html'
-      })), uit, stil);
-
-    bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
-      .filter(a => a.status !== 'geannuleerd')
-      .map(a => regel('reis', {
-        titel: a.titel, bestemming: a.bestemming, van: a.vertrek, personen: a.personen,
-        status: a.status, kenmerk: a.ref, app: 'Reisbureau', link: '/apps/reisbureau.html'
-      })), uit, stil);
-
-    bron('vluchten', () => {
-      const d = kern.lucht.mijn(key) || {};
-      const b = (d.boekingen || []).filter(x => x.status !== 'geannuleerd').map(x => regel('vlucht', {
-        titel: (x.vlucht || {}).nummer, bestemming: (x.vlucht || {}).bestemming,
-        van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd,
-        status: x.status, kenmerk: x.code,
-        app: 'Vluchten', link: '/apps/vluchten.html'
-      }));
-      const c = (d.charters || []).filter(x => x.status !== 'geannuleerd').map(x => regel('charter', {
-        titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd,
-        status: x.status, kenmerk: x.code, app: 'Hangar', link: '/apps/hangar.html'
-      }));
-      return b.concat(c);
-    }, uit, stil);
+    /* De bronnen zelf staan in ./reiswereld-bronnen.js: welk domein welke rij
+       levert, is iets anders dan wat deze wereld met die rijen DOET (sorteren,
+       oordelen, tellen). Ze stonden hier samen tot de invoerbalie erbij kwam en
+       het bestand over de grens van tien kilobyte ging; het is geen slechte
+       plek om die twee uit elkaar te halen. */
+    bronnen({ kern, regel, bron }, key, uit, stil);
 
     /* Alleen wat nog komt, en wat vandaag speelt. Een verblijf loopt door tot
        de vertrekdatum, dus dat telt zolang `tot` niet gepasseerd is; een vlucht
@@ -163,7 +159,7 @@ module.exports.maakReiswereld = ({ kern }) => {
          Het scherm zegt dit hardop, want een lege reiswereld die eigenlijk een
          storing is, laat iemand een vlucht missen. */
       stil,
-      bronnen: ['verblijven', 'reisbureau', 'vluchten']
+      bronnen: ['verblijven', 'reisbureau', 'vluchten', 'activiteiten', 'ingevoerd']
     };
   }
 

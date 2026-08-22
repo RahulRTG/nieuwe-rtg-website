@@ -2,7 +2,7 @@
    interne aanroep met de eigen inlog van de gebruiker. Dezelfde rechten en
    dezelfde schakelkast als de app-knoppen; infrastructuur is verboden
    terrein en geld-acties vragen eerst een bevestiging. Draai los:
-   node --experimental-sqlite --test test/stuur.test.js */
+   node --test test/stuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

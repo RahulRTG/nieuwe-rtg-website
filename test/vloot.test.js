@@ -2,7 +2,7 @@
    vloot (server/vloot.js) achter de poortwachter. Een bug in een route raakt
    alleen die ene aanvraag; een crash van een groep raakt alleen dat domein en
    wordt automatisch hersteld, terwijl de andere apps gewoon doordraaien.
-   Draai los: node --experimental-sqlite --test test/vloot.test.js */
+   Draai los: node --test test/vloot.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -89,7 +89,11 @@ test('een bug in een route geeft die ene aanvraag 500; het proces leeft door', a
 test('crasht de kantoor-groep, dan valt ALLEEN kantoor uit; de rest draait door', async () => {
   // laat het kantoor-proces echt sterven (rechtstreeks op zijn eigen poort)
   await post('/api/test/crash', {}, BASIS + 1).catch(() => {});
-  await new Promise(r => setTimeout(r, 400));
+  /* GEEN 400 ms MEER. Wat hier moest gebeuren -- het kantoorproces valt om en de
+     gateway merkt dat -- wordt hieronder al afgewacht met wachtTot(), die tot
+     twintig seconden lang opnieuw vraagt. De 400 ms ervoor maakten de toets
+     alleen trager; op een drukke machine waren ze bovendien te kort en dan zou
+     de eerste meting een nog levend proces zien. */
 
   // kantoor is nu (even) onbereikbaar via de gateway: 502, geen hangende aanvraag
   const kantoorPlat = await wachtTot(async () =>

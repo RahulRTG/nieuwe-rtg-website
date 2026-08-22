@@ -4,10 +4,12 @@
    routes/supplier/kassa.js. */
 module.exports = (kern) => {
   const { POS_METHODS, app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
-          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, pay, ordersVanZaak } = kern;
+          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, ordersVanZaak } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
+  // dezelfde drie grenzen als de losse inwisseling aan de balie; zie ./kaart.js
+  const { verzilver: verzilverKaart } = require('./kaart');
 app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   let total = Number(req.body.total);
   if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
@@ -34,18 +36,35 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   // in het grootboek. Lukt dat niet, dan is er ook geen bon.
   let betaler = null, betaaldienstKosten = 0;
   if (method === 'rtgpay') {
-    const p = await pay.kasInt({
-      supplierCode: req.supplier.code, code: req.body.payCode,
-      centen: Math.round(total * 100), oms: req.supplier.name,
-      idem: req.body.idem
+    /* TWEE DRAGERS, EEN INNING: de code van zes tekens (voorgelezen of getypt) of
+       de ondertekende RTG-code die sinds RTG Link in de QR staat. Welke het is,
+       hoeft deze kassa niet te weten -- kern/pay/kasinnen.js kent ze allebei en
+       int ze allebei langs kern/pay/kassa.js. */
+    const p = await kern.kasInnen({
+      supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+      code: req.body.payCode, centen: Math.round(total * 100), idem: req.body.idem
     });
     if (p.error) return res.status(p.status || 400).json({ error: p.error });
     betaler = p.van;
     // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak
     betaaldienstKosten = p.kosten || 0;
   }
+  /* CADEAUKAART: eerst het saldo eraf, dan pas een bon -- dezelfde volgorde als
+     bij RTG Pay hierboven, en om dezelfde reden. Lukt de afboeking niet (kaart
+     van een andere zaak, te weinig saldo), dan is er ook geen verkoop, want een
+     bon zonder betaling is een gat in de kas. De bon draagt de omzet met zijn
+     eigen regels; de verzilvering wordt gemerkt met `viaBon` zodat de
+     maandboekhouding hem niet nog een keer telt (TAKEN.md 4.27). */
+  const bonId = crypto.randomBytes(4).toString('hex');
+  let kaartCode = null;
+  if (method === 'cadeaukaart') {
+    const k = verzilverKaart(db, req.supplier.code, req.body.giftcardCode || req.body.payCode,
+      total, req.actor.name, bonId);
+    if (k.error) return res.status(k.status).json({ error: k.error });
+    kaartCode = k.kaart.code;
+  }
   const sale = {
-    id: crypto.randomBytes(4).toString('hex'),
+    id: bonId,
     bon: pickupCode(),
     actor: req.actor.name,
     // welke kassa van de zaak dit was (de schermnaam, bv. "Kassa bar")
@@ -55,7 +74,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
       ? { bedrag: Math.round(Number(req.body.korting.bedrag) * 100) / 100, reden: String(req.body.korting.reden || '').slice(0, 80) } : null,
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
-    items, total, method, betaler, luchtzijde,
+    items, total, method, betaler, luchtzijde, kaartCode,
     betaaldienstKosten: betaaldienstKosten || null,
     at: new Date().toISOString()
   };

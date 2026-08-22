@@ -24,7 +24,18 @@ const path = require('path');
 
 // de transportlaag zelf is geen aanroep-plek: die stuurt de al-opgebouwde prompt
 // door naar de aanbieder(s), en hoort geen persona te kennen.
-const TRANSPORT = new Set(['ai.js', 'anthropic.js', 'openai.js', 'gemini.js', 'local-ai.js']);
+//
+// ai-kort.js hoort hier om dezelfde reden, en het is geen versoepeling: jaNee()
+// en tekst() stonden tot 19 augustus IN ai.js en vielen dus al onder deze regel.
+// Ze schrijven zelf geen systeemprompt -- `system` is een parameter, en wat
+// erin gaat komt van de aanroeper.
+//
+// WEL EEN GAT DAT HIER ZICHTBAAR WORDT, en dat ouder is dan die verhuizing:
+// deze scan vindt bestanden met messages.create. Een module die jaNee() of
+// tekst() gebruikt heeft dat niet, en valt dus buiten deze regel -- elf modules
+// op dit moment. Dat was voor de verhuizing precies zo. Wie deze regel echt
+// sluitend wil maken, moet ook de aanroepers van die twee meenemen.
+const TRANSPORT = new Set(['ai.js', 'ai-kort.js', 'anthropic.js', 'openai.js', 'gemini.js', 'local-ai.js']);
 
 // Twee geldige manieren om de toegangsregel te dragen:
 //  1) de gedeelde basis eronder (RAHUL_BASIS -> RAHUL_LEAD, of de per-pas aiSystemPrompt);

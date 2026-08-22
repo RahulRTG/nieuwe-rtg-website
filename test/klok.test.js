@@ -21,7 +21,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 const { lees, nu, datum, verschoven, EENHEDEN } = require('../server/lib/klok');
 
 const WORTEL = path.join(__dirname, '..');
@@ -161,8 +161,13 @@ test('een schrikkeldagkind wordt ook in een gewoon jaar jarig', () => {
 /* ---------- de schuldmeter ---------- */
 
 test('de klokschuld telt alleen tijdsvragen en geen omrekeningen', () => {
-  const uit = execFileSync(process.execPath, [path.join(WORTEL, 'scripts', 'klok.js')],
-    { encoding: 'utf8', cwd: WORTEL });
+  /* spawnSync, want deze meter sluit met 1 af zodra de schuld is gegroeid -- en
+     execFileSync GOOIT dan, waarna deze toets "Command failed" meldt in plaats
+     van te meten wat hij beweert te meten. De uitslag op stdout is er gewoon;
+     het is de exitcode die iets anders zegt, en die gaat over de ratel en niet
+     over deze twee vragen. */
+  const uit = String(spawnSync(process.execPath, [path.join(WORTEL, 'scripts', 'klok.js')],
+    { encoding: 'utf8', cwd: WORTEL, maxBuffer: 64 * 1024 * 1024 }).stdout || '');
   const totaal = Number((uit.match(/directe tijdsaanroepen : (\d+)/) || [])[1]);
   assert.ok(totaal > 0, 'de meter hoort iets te zien');
   /* De ruwe grep vindt er meer, want die telt `new Date(x)` mee. Zou dit getal
@@ -175,8 +180,13 @@ test('de klokschuld telt alleen tijdsvragen en geen omrekeningen', () => {
 });
 
 test('de klokschuld ziet de module die WEL op de klok zit', () => {
-  const uit = execFileSync(process.execPath, [path.join(WORTEL, 'scripts', 'klok.js')],
-    { encoding: 'utf8', cwd: WORTEL });
+  /* spawnSync, want deze meter sluit met 1 af zodra de schuld is gegroeid -- en
+     execFileSync GOOIT dan, waarna deze toets "Command failed" meldt in plaats
+     van te meten wat hij beweert te meten. De uitslag op stdout is er gewoon;
+     het is de exitcode die iets anders zegt, en die gaat over de ratel en niet
+     over deze twee vragen. */
+  const uit = String(spawnSync(process.execPath, [path.join(WORTEL, 'scripts', 'klok.js')],
+    { encoding: 'utf8', cwd: WORTEL, maxBuffer: 64 * 1024 * 1024 }).stdout || '');
   const op = Number((uit.match(/modules op de klok\s+: (\d+)/) || [])[1]);
   assert.ok(op >= 1, 'server/lib/leeftijd.js zit op de klok en hoort geteld te worden');
 });

@@ -26,7 +26,7 @@
       zelf, en het is met een mutatie gevonden -- niet met een gedachte.
    10. alle weefselroutes zitten achter de kantoordeur.
 
-   Draai los: node --experimental-sqlite --test test/stadsweefsel.test.js */
+   Draai los: node --test test/stadsweefsel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -2,7 +2,7 @@
    onmogelijk, foto's VOOR de uitgifte en NA het inleveren als harde eis
    (beide partijen leggen vast, niets kan worden gewist), een SOS-knop die
    zaak EN RTG-actiecentrum bereikt, en vrijwillig live locatie delen.
-   Draai: node --experimental-sqlite --test test/verhuur.test.js */
+   Draai: node --test test/verhuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

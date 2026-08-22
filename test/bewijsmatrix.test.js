@@ -11,7 +11,7 @@
    Draai los: node --test test/bewijsmatrix.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { bouw, achteruit, SCHAKELS } = require('../scripts/bewijsmatrix');
+const { bouw, achteruit, SCHAKELS, ketenKaartUit } = require('../scripts/bewijsmatrix');
 
 /* Een miniwereld van drie routes: een schrijfroute met een bewaker in de bron,
    dezelfde weg als leesroute, en een schrijfroute zonder enige bewaker. */
@@ -144,11 +144,35 @@ test('een route waar de poortwacht ZONDER TOKEN binnenkwam is gezakt, niet bewez
 test('een dichte en een bewust publieke route zijn wel bewezen', () => {
   assert.equal(metPoort('dicht').staat, 'bewezen');
   assert.equal(metPoort('publiek').staat, 'bewezen');
-  assert.equal(metPoort('stil').staat, 'bewezen');
 });
 
 test('onbereikbaar is ongemeten: daar kwam geen antwoord', () => {
   assert.equal(metPoort('onbereikbaar').staat, 'ongemeten');
+});
+
+test('STIL is ONBESLIST en dus geen bewijs van authenticatie', () => {
+  /* Deze bewering stond hier omgekeerd: `metPoort('stil').staat === 'bewezen'`.
+     De toets legde daarmee vast wat er fout was.
+
+     De poortwacht klopt aan met een LEEG lichaam en noemt alleen 401 en 403
+     dicht; al het andere dat geen 2xx is heet stil. Dat waren 294 cellen -- 272
+     met status 404, 20 met 400, 2 met 503 -- en die telden allemaal als
+     aangetoonde authenticatie. Een 404 op een leeg verzoek betekent dat de
+     handler iets opzocht dat er niet was, een 400 dat de validatie eerder aan de
+     beurt was dan de autorisatie. Geen van beide zegt of deze route een sleutel
+     eist.
+
+     Nagetrokken op veertien van die 294: opnieuw aankloppen met een onzin-token
+     in de Authorization-kop geeft EXACT dezelfde status. Er is van buitenaf dus
+     geen authenticatie aan te tonen; mogelijk is er een ander mechanisme (een
+     opzoeking op een ongeraden code is zelf een controle), maar dat is geen
+     AUTH-dekking.
+
+     De reden hoort erbij, anders is dit niet te onderscheiden van een route waar
+     nooit op geklopt is. */
+  const c = metPoort('stil');
+  assert.equal(c.staat, 'ongemeten', 'een onbeslist antwoord is geen dekking');
+  assert.match(c.reden, /onbeslist/, 'en zegt waarom het onbeslist is');
 });
 
 /* ---------- de twee nieuwe kolommen ---------- */
@@ -183,4 +207,39 @@ test('een leesroute houdt IDEMPOTENCY op nvt, ook met een register ernaast', () 
   const m = bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null, rol: null, keten: null,
     invoer: null, idem: new Map([['GET /api/proef/lees', { idempotentie: 'onbeschermd' }]]) });
   assert.equal(m.rijen.find(r => r.pad === '/api/proef/lees').cellen.IDEMPOTENCY.staat, 'nvt');
+});
+
+test('de ketensamenvoeging kent gif en geen volgorde: NVT wist een PROVEN nooit uit', () => {
+  /* Twee cellen stonden op 'rollback niet bewezen' door een volgorde-effect:
+     het LAATSTE scenario won, dus een sterf-na-commit (rollback NVT -- er viel
+     niets terug te draaien) wiste het eerdere PROVEN uit. Streng hoort over
+     GIF te gaan (stil verlies, of NIET: geweigerd en toch blijvend), niet over
+     de toevallige volgorde in het register. */
+  const { ketenUitslag } = require('../scripts/bewijsmatrix');
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-keten-'));
+  const schrijf = (scenarios) => {
+    const p = path.join(map, 'k.json');
+    fs.writeFileSync(p, JSON.stringify({ scenarios }));
+    return p;
+  };
+  const sc = (rollback, extra) => ({ keten: 'GELD', verraad: 'x', rollback,
+    stilVerlies: false, clientAntwoord: 'FAIL', lat: { voldoet: true }, ...extra });
+  const pad = 'POST /api/pay/oplaad';
+  try {
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NVT')])).get(pad).rollbackBewezen, true,
+      'een NVT na een PROVEN wist niets uit');
+    assert.equal(ketenUitslag(schrijf([sc('NVT'), sc('PROVEN')])).get(pad).rollbackBewezen, true,
+      'en andersom ook niet: volgorde is geen oordeel');
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NIET')])).get(pad).rollbackBewezen, false,
+      'NIET (geweigerd en toch blijvend) is gif, in elke volgorde');
+    assert.equal(ketenUitslag(schrijf([sc('PROVEN'), sc('NVT', { stilVerlies: true })])).get(pad).rollbackBewezen, false,
+      'stil verlies is gif, ook naast een PROVEN');
+    assert.equal(ketenUitslag(schrijf([sc('NVT'), sc('NVT')])).get(pad).rollbackBewezen, false,
+      'alleen NVT is geen bewijs: er is nooit een terugdraai waargenomen');
+  } finally {
+    try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
+  }
 });

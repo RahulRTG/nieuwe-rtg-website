@@ -18,16 +18,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 /* [stand-id, naam in de balk, tekst die alleen deze stand opbouwt, oud pad] */
 const STANDEN = [
@@ -37,7 +33,7 @@ const STANDEN = [
   ['rust', 'Thuisrust', 'Zet aan', '/apps/thuisrust.html']
 ];
 
-test('RTG Veilig: de vier standen staan echt', { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
+test('RTG Veilig: de vier standen staan echt', { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-veilig-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -52,7 +48,7 @@ test('RTG Veilig: de vier standen staan echt', { skip: pw ? false : 'geen browse
     }).then(r => r.json());
     assert.ok(reg.token, 'het lid moet een token krijgen');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 900 } });
     // ingelogd doen alsof, net als de app zelf
     await ctx.addInitScript((tok) => { try { localStorage.setItem('rtg_member_token', tok); } catch (e) {} }, reg.token);

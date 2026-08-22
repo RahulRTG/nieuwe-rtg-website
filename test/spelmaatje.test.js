@@ -1,7 +1,7 @@
 /* Integratietest: Rahul als spelmaatje. In elk potje kun je Rahul erbij roepen
    voor een hint, een regel of een peptalk. Zonder AI-sleutel (zoals in de test)
    geeft hij een vaste, uitlegbare tip -- en alleen wie in het potje zit mag hem
-   aanroepen. Draai los: node --experimental-sqlite --test test/spelmaatje.test.js */
+   aanroepen. Draai los: node --test test/spelmaatje.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

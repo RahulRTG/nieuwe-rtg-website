@@ -16,6 +16,25 @@ const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCA
 const SVG = 'data:image/svg+xml;base64,' + Buffer.from('<svg/>').toString('base64');
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-media-'));
 
+/* WACHTEN TOT HET WEG IS, en niet een paar tellen gokken.
+
+   media.verwijder() is met opzet fire-and-forget: hij zet `backend.del()` in
+   gang en geeft meteen terug (server/media.js), zodat een verwijdering nooit
+   een verzoek ophoudt. De toets moet dus wachten -- maar op het RESULTAAT, niet
+   op een getal. Hier stond `setTimeout(30)` en `setTimeout(60)`; dat is te lang
+   als het al weg is en te kort zodra de machine druk is, en bij dat laatste
+   meldt de toets "het bestand staat er nog" over iets dat gewoon onderweg was.
+
+   Weg is een toestand, dus die vragen we net zo lang tot het antwoord er is. */
+async function totdatWeg(kijk, wat, ms) {
+  const eind = Date.now() + (ms || 10000);
+  for (;;) {
+    if (kijk()) return;
+    if (Date.now() >= eind) throw new Error('wachtte ' + (ms || 10000) + 'ms tot ' + wat + ', en dat gebeurde niet');
+    await new Promise(r => setTimeout(r, 10));
+  }
+}
+
 test('module (schijf): bewaar schrijft een bestand en houdt db-vrij van base64', async () => {
   const media = maakMedia({ dir: tmp(), env: {} });
   assert.equal(media.backendNaam, 'disk');
@@ -25,7 +44,7 @@ test('module (schijf): bewaar schrijft een bestand en houdt db-vrij van base64',
   assert.equal(await media.leesDataUrl(naam), PNG, 'leesDataUrl geeft exact dezelfde foto terug');
   assert.ok((await media.bewaarPubliek(PNG)).startsWith('/media/'), 'bewaarPubliek geeft een /media-URL');
   media.verwijder(naam);
-  await new Promise(r => setTimeout(r, 30));
+  await totdatWeg(() => !fs.existsSync(media.pad(naam)), 'het bestand van schijf was').catch(() => {});
   assert.ok(!fs.existsSync(media.pad(naam)), 'na verwijder is het bestand weg');
 });
 
@@ -123,7 +142,7 @@ test('S3-backend: put/get/del tegen een lokale nep-S3 (ondertekend, versleuteld)
     assert.ok(!opgeslagen.toString('utf8').includes('iVBOR'), 'de opgeslagen bytes zijn niet de kale base64-string');
     // verwijderen bereikt de nep-S3
     media.verwijder(naam);
-    await new Promise(r => setTimeout(r, 60));
+    await totdatWeg(() => store.size === 0, 'het object weg was bij de nep-S3').catch(() => {});
     assert.equal(store.size, 0, 'na verwijder is het object weg bij de nep-S3');
   } finally {
     srv.close();

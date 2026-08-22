@@ -23,40 +23,40 @@
   a{color:inherit;text-decoration:none;}
   input{font-family:'Inter',sans-serif;}
   .wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem);}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
 
   header{border-bottom:1px solid var(--line);padding:1.1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
   header .wrap{display:flex;align-items:center;justify-content:space-between;}
   .brand{font-family:'Bodoni Moda',serif;font-size:1.1rem;}
-  .brand small{display:block;font-family:'Inter',sans-serif;font-size:0.56rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:0.56rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .live{display:inline-flex;align-items:center;gap:0.45rem;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
   .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(76,154,117,0.2);}
 
   /* login */
   #gate{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem;}
-  .gate-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:2.25rem;}
-  .gate-card .k{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+  .gate-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:0;padding:2.25rem;}
+  .gate-card .k{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .gate-card h1{font-size:1.7rem;margin-top:0.75rem;}
   .gate-card p{margin-top:0.6rem;font-size:0.85rem;color:var(--muted);}
-  .gate-card input{width:100%;margin-top:1.5rem;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0.85rem 1rem;color:var(--txt);font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;outline:none;}
-  .gate-card button{width:100%;margin-top:0.9rem;background:#fff;color:#000;border:none;border-radius:999px;padding:0.9rem;font-size:0.86rem;font-weight:600;}
+  .gate-card input{width:100%;margin-top:1.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.85rem 1rem;color:var(--txt);font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;outline:none;}
+  .gate-card button{width:100%;margin-top:0.9rem;background:#fff;color:#000;border:none;border-radius:0;padding:0.9rem;font-size:0.86rem;font-weight:600;}
   .gate-card .hint{margin-top:1rem;font-size:0.72rem;color:var(--soft);}
 
   #app{display:none;padding:2rem 0 4rem;}
   #app.on{display:block;}
   .stat{display:grid;grid-template-columns:repeat(6,1fr);gap:1rem;margin-bottom:1.5rem;}
   @media (max-width:1000px){.stat{grid-template-columns:repeat(3,1fr);}}
-  .stat .b{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.25rem;}
+  .stat .b{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.25rem;}
   .stat .l{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
   .stat .v{font-family:'Bodoni Moda',serif;font-size:1.8rem;margin-top:0.3rem;}
-  .stat .v.a{color:var(--burgundy);} .stat .v.g{color:var(--gold);}
+  .stat .v.a{color:var(--burgundy);} .stat .v.g{color:var(--rtg-leesgoud,var(--gold));}
   @media (max-width:720px){.stat{grid-template-columns:repeat(2,1fr);}}
 
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
   @media (max-width:860px){.cols{grid-template-columns:1fr;}}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:0;overflow:hidden;}
   .panel h2{font-size:1.15rem;padding:1.1rem 1.25rem;border-bottom:1px solid var(--line);}
   .panel .rows{max-height:440px;overflow-y:auto;}
   .row{padding:0.9rem 1.25rem;border-bottom:1px solid var(--line);}
@@ -65,11 +65,11 @@
   .row .nm{font-weight:600;font-size:0.88rem;}
   .row .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
   .row .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;white-space:nowrap;}
-  .row .amt.g{color:var(--gold);}
-  .pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.22rem 0.55rem;border-radius:999px;border:1px solid var(--line);}
+  .row .amt.g{color:var(--rtg-leesgoud,var(--gold));}
+  .pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.22rem 0.55rem;border-radius:0;border:1px solid var(--line);}
   .pill.nieuw{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .pill.bereiding{color:var(--amber);}
-  .pill.klaar,.pill.geserveerd{color:var(--green);}
+  .pill.klaar,.pill.geserveerd{color:var(--rtg-leesgroen,var(--green));}
   .livedot{width:9px;height:9px;border-radius:50%;background:var(--burgundy);display:inline-block;vertical-align:middle;animation:livepulse 1.4s infinite;}
   @keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}70%{box-shadow:0 0 0 7px rgba(194,58,94,0);}100%{box-shadow:0 0 0 0 rgba(194,58,94,0);}}
   .empty{padding:2.5rem 1.25rem;text-align:center;color:var(--soft);font-size:0.85rem;}
@@ -88,29 +88,38 @@
   .vkop{margin:0.8rem 0 0.3rem;color:var(--soft);}
   .vgrens{color:var(--soft);margin-top:0.2rem;}
   .uitleg{font-size:0.74rem;color:var(--soft);margin:-0.3rem 0 0.7rem;line-height:1.5;}
-  .vbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:600;cursor:pointer;}
+  .vbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:0;padding:0.4rem 0.85rem;font-size:0.72rem;font-weight:600;cursor:pointer;}
   .vbtn.doc{color:var(--muted);}
-  .vbtn.ok{color:var(--green);border-color:rgba(76,154,117,0.4);}
+  .vbtn.ok{color:var(--rtg-leesgroen,var(--green));border-color:rgba(76,154,117,0.4);}
   .vbtn.no{color:var(--burgundy);border-color:rgba(194,58,94,0.4);}
   .vbtn:hover{background:rgba(255,255,255,0.05);}
+  /* invoer in een paneel: hetzelfde ritme als de rijen erboven, veel lucht */
+  .invoerrij{display:grid;gap:0.5rem;padding:1rem 1.25rem 1.25rem;border-top:1px solid var(--line);}
+  .invoerrij input,.invoerrij select{background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;color:var(--txt);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;}
+  .invoerrij input:focus,.invoerrij select:focus{border-color:var(--gold);}
+  .invoerrij button{justify-self:start;margin-top:0.2rem;}
   .doc-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out;}
   .doc-scrim.open{display:flex;}
-  .doc-scrim img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+  .doc-scrim img{max-width:100%;max-height:100%;border-radius:0;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
   .conv-scrim{cursor:default;}
-  .conv-card{width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .conv-card{width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:0;overflow:hidden;}
   .conv-head{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--line);}
   .conv-head b{font-family:'Bodoni Moda',serif;font-size:1.05rem;}
   .conv-body{flex:1;overflow-y:auto;padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:0.55rem;}
-  .cmsg{max-width:80%;padding:0.6rem 0.85rem;border-radius:14px;font-size:0.85rem;line-height:1.4;}
+  .cmsg{max-width:80%;padding:0.6rem 0.85rem;border-radius:0;font-size:0.85rem;line-height:1.4;}
   .cmsg.in{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px;}
   .cmsg.out{align-self:flex-end;background:var(--burgundy);color:#fff;border-bottom-right-radius:4px;}
   .cmsg .wa{display:block;font-size:0.58rem;opacity:0.7;margin-bottom:0.2rem;}
   .conv-reply{display:flex;gap:0.5rem;padding:0.9rem 1.25rem;border-top:1px solid var(--line);}
-  .conv-reply input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0.7rem 1rem;color:var(--txt);font-family:inherit;font-size:0.88rem;outline:none;}
+  .conv-reply input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:0;padding:0.7rem 1rem;color:var(--txt);font-family:inherit;font-size:0.88rem;outline:none;}
 
   /* slimme laag: actiecentrum, briefing, zoeken, prestaties en weekomzet */
   .panel h2.ph{display:flex;justify-content:space-between;align-items:center;gap:0.8rem;}
-  .hbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:999px;padding:0.35rem 0.85rem;font-size:0.7rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
+  /* Drie vormen die als style="..." op tientallen plekken stonden. Als klasse
+     staan ze een keer, en houden ze style-src-attr in de CSP dicht. */
+  .panel > .sub{margin:0 1.25rem;}   /* alleen de uitleg onder een kop, niet de .sub in de rijen */
+  .uitgifte{display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:0;font-size:0.8rem;line-height:1.6;}
+  .hbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:0;padding:0.35rem 0.85rem;font-size:0.7rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
   .hbtn:hover{background:rgba(255,255,255,0.05);}
   .alert{display:flex;align-items:center;gap:0.9rem;padding:0.85rem 1.25rem;border-bottom:1px solid var(--line);font-size:0.85rem;}
   .alert:last-child{border-bottom:none;}
@@ -119,20 +128,20 @@
   .alert.amber .lv{background:var(--amber);box-shadow:0 0 0 4px rgba(201,154,46,0.15);}
   .alert.info .lv{background:var(--green);box-shadow:0 0 0 4px rgba(76,154,117,0.15);}
   .alert .tx{flex:1;min-width:0;}
-  .brief{margin:0.9rem 1.25rem 0;padding:0.9rem 1.1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.85rem;line-height:1.65;display:none;}
+  .brief{margin:0.9rem 1.25rem 0;padding:0.9rem 1.1rem;border:1px solid var(--gold);border-radius:0;font-size:0.85rem;line-height:1.65;display:none;}
   .brief.on{display:block;}
   .zoekbar{margin-bottom:1.5rem;}
-  .zoekbar input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0.8rem 1.25rem;color:var(--txt);font-size:0.9rem;outline:none;font-family:'Inter',sans-serif;}
+  .zoekbar input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.8rem 1.25rem;color:var(--txt);font-size:0.9rem;outline:none;font-family:'Inter',sans-serif;}
   .zoekbar input:focus{border-color:var(--gold);}
   .chart{display:flex;align-items:flex-end;gap:0.6rem;height:170px;padding:1.25rem;}
   .chart .cb{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;height:100%;justify-content:flex-end;}
-  .chart .cb i{display:block;width:100%;max-width:44px;background:linear-gradient(180deg,var(--gold),rgba(169,143,28,0.3));border-radius:6px 6px 2px 2px;min-height:2px;}
+  .chart .cb i{display:block;width:100%;max-width:44px;background:linear-gradient(180deg,var(--gold),rgba(169,143,28,0.3));border-radius:0;min-height:2px;}
   .chart .cb.vandaag i{background:linear-gradient(180deg,var(--burgundy),rgba(194,58,94,0.3));}
   .chart .cb b{font-size:0.64rem;font-weight:600;white-space:nowrap;}
   .chart .cb span{font-size:0.58rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.06em;}
-  .perfbar{height:4px;border-radius:99px;background:rgba(255,255,255,0.07);margin-top:0.5rem;overflow:hidden;}
-  .perfbar i{display:block;height:100%;background:var(--gold);border-radius:99px;}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+  .perfbar{height:4px;border-radius:0;background:rgba(255,255,255,0.07);margin-top:0.5rem;overflow:hidden;}
+  .perfbar i{display:block;height:100%;background:var(--gold);border-radius:0;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -141,11 +150,11 @@
 
 <header>
   <div class="wrap">
-    <div class="brand"><span class="merkvlak">Rahul Travel Group</span><small>Backoffice · <a href="/apps/command.html" style="color:var(--gold);text-decoration:none;">RTG Command →</a> · <a href="/apps/kantoren.html" style="color:var(--gold);text-decoration:none;">De kantoren →</a></small></div>
+    <div class="brand"><span class="merkvlak">Rahul Travel Group</span><small>Backoffice · <a href="/apps/command.html" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">RTG Command →</a> · <a href="/apps/kantoren.html" style="color:var(--rtg-leesgoud,var(--gold));text-decoration:none;">De kantoren →</a></small></div>
     <span style="display:flex;align-items:center;gap:0.8rem;">
-      <a href="/apps/klankwerk-kantoor.html" title="Aanvragen om onder de RTG-naam uit te geven" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.7rem;">RTG-naam</a>
-      <a href="/apps/techniek.html" title="Technische status (beveiligd)" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:0.28rem 0.7rem;">Techniek</a>
-      <span class="live" id="liveInd" style="display:none;"><span class="dot"></span>Live</span>
+      <a href="/apps/klankwerk-kantoor.html" title="Aanvragen om onder de RTG-naam uit te geven" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:0;padding:0.28rem 0.7rem;">RTG-naam</a>
+      <a href="/apps/techniek.html" title="Technische status (beveiligd)" style="font-size:0.75rem;color:var(--soft);text-decoration:none;border:1px solid var(--line);border-radius:0;padding:0.28rem 0.7rem;">Techniek</a>
+      <span class="live h-weg" id="liveInd"><span class="dot"></span>Live</span>
     </span>
   </div>
 </header>
@@ -164,16 +173,16 @@
   <div class="wrap" id="hoofd">
     <div class="stat" id="stat"></div>
     <div class="zoekbar"><input id="zoekInp" placeholder="Zoek op gast, partner, referentie of plaats…" data-i18n-ph="bo.zoekph" autocomplete="off" data-zoek></div>
-    <div class="panel" style="margin-bottom:1.5rem;">
+    <div class="panel h-mb150">
       <h2 class="ph"><span><span data-i18n="panel.actie">Actiecentrum</span></span><button class="hbtn" id="briefBtn"><span data-i18n="bo.brief">Dagbriefing</span></button></h2>
       <div class="brief" id="briefBox"></div>
       <div class="rows" id="alertList"></div>
     </div>
-    <div class="panel" style="margin-bottom:1.5rem;">
+    <div class="panel h-mb150">
       <h2><span class="livedot"></span> <span data-i18n="panel.live">Live onderweg</span> <span id="liveTot" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--soft);"></span></h2>
       <div class="rows" id="liveList"></div>
     </div>
-    <div class="cols" style="margin-bottom:1.5rem;">
+    <div class="cols h-mb150">
       <div class="panel">
         <h2 data-i18n="panel.perf">Partnerprestaties</h2>
         <div class="rows" id="perfList"></div>
@@ -220,19 +229,36 @@
     </div>
     <div class="cols h-mt150">
       <div class="panel">
+        <h2 data-i18n="panel.tafels">Rendez-vous &mdash; The Table</h2>
+        <p class="sub h-onder60" data-i18n="panel.tafels.sub">Stel een tafel samen: zes of acht leden die iets aan elkaar hebben. Zij zien hun eigen uitnodiging &mdash; nooit wie er nog meer komt.</p>
+        <div class="rows" id="rvTafels"></div>
+        <div style="padding:0.7rem;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <input id="tfNaam" placeholder="Naam, bijv. Diner 04" class="h-rek9">
+          <input id="tfStad" placeholder="Stad" style="width:8rem;">
+          <input id="tfDatum" type="date" aria-label="Datum" style="width:9.5rem;">
+          <input id="tfTijd" type="time" aria-label="Tijd" style="width:7rem;">
+          <input id="tfThema" placeholder="Thema, bijv. architectuur &middot; hospitality" class="h-rek9">
+          <input id="tfPlaatsen" type="number" min="2" max="12" value="8" aria-label="Aantal plaatsen" style="width:5rem;">
+          <input id="tfGasten" placeholder="Codenamen, met komma's" style="flex:1;min-width:12rem;">
+          <button class="hbtn" id="tfMaak" data-i18n="bo.tfmaak">Tafel samenstellen</button>
+        </div>
+      </div>
+    </div>
+    <div class="cols h-mt150">
+      <div class="panel">
         <h2 data-i18n="panel.incidenten">Paspoort-incidenten</h2>
-        <p class="sub" data-i18n="panel.incidenten.sub" style="margin:0 0 0.6rem;">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
+        <p class="sub h-onder60" data-i18n="panel.incidenten.sub">Een partner eist bij een incident een identiteit op. Beoordeel en geef pas dan vrij.</p>
         <div class="rows" id="incidenten"></div>
       </div>
       <div class="panel">
         <h2 data-i18n="panel.salon">Salon-naleving</h2>
-        <p class="sub" data-i18n="panel.salon.sub" style="margin:0 0 0.6rem;">De Salon is verplicht. Partners zonder compleet profiel zijn niet zichtbaar voor leden.</p>
+        <p class="sub h-onder60" data-i18n="panel.salon.sub">De Salon is verplicht. Partners zonder compleet profiel zijn niet zichtbaar voor leden.</p>
         <div class="rows" id="salonNaleving"></div>
       </div>
     </div>
     <div class="panel h-mt150">
       <h2><span data-i18n="panel.ontmoet">Salon-ontmoetingen (veiligheid)</span></h2>
-      <p class="sub" data-i18n="panel.ontmoet.sub" style="margin:0 0 0.6rem;">Lopende afspraken met live-locatie. Bij een SOS kijkt u mee via de camera en belt u 112.</p>
+      <p class="sub h-onder60" data-i18n="panel.ontmoet.sub">Lopende afspraken met live-locatie. Bij een SOS kijkt u mee via de camera en belt u 112.</p>
       <div class="rows" id="ontmoetOffice"></div>
     </div>
     <div class="panel h-mt150">
@@ -240,13 +266,13 @@
       <div class="rows" id="trustList"></div>
     </div>
     <div id="ontLiveScrim" class="scrim" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;align-items:center;justify-content:center;">
-      <div style="width:min(94vw,640px);background:#111;border:1px solid var(--gold);border-radius:16px;padding:1rem;">
+      <div style="width:min(94vw,640px);background:#111;border:1px solid var(--gold);border-radius:0;padding:1rem;">
         <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;">
           <b style="flex:1;font-size:0.95rem;"><span id="ontLiveNaam">SOS</span></b>
-          <a id="ontBel112" href="tel:112" style="background:#c62828;color:#fff;border-radius:999px;padding:0.4rem 0.9rem;font-weight:700;text-decoration:none;">Bel 112</a>
-          <button id="ontLiveClose" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.4rem 0.8rem;color:var(--soft);cursor:pointer;">Sluiten</button>
+          <a id="ontBel112" href="tel:112" style="background:#c62828;color:#fff;border-radius:0;padding:0.4rem 0.9rem;font-weight:700;text-decoration:none;">Bel 112</a>
+          <button id="ontLiveClose" style="background:none;border:1px solid var(--line);border-radius:0;padding:0.4rem 0.8rem;color:var(--soft);cursor:pointer;">Sluiten</button>
         </div>
-        <video id="ontLiveVid" autoplay playsinline style="width:100%;border-radius:12px;background:#000;"></video>
+        <video id="ontLiveVid" autoplay playsinline style="width:100%;border-radius:0;background:#000;"></video>
         <div id="ontLiveStatus" style="font-size:0.75rem;color:var(--soft);margin-top:0.5rem;">Verbinden met de camera van het lid…</div>
       </div>
     </div>
@@ -257,11 +283,17 @@
       </div>
       <div class="panel">
         <h2 data-i18n="panel.pa">Partner-aanvragen</h2>
-        <div id="paResult" style="display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:12px;font-size:0.8rem;line-height:1.6;"></div>
+        <div id="paResult" class="uitgifte"></div>
+        <div class="rows" id="handelsRegels"><div class="empty">Officiële handelsbronnen laden…</div></div>
         <div class="rows" id="paList"></div>
       </div>
     </div>
     <div class="cols h-mt150">
+      <div class="panel">
+        <h2>FOUNDATION-registraties</h2>
+        <p class="sub" style="margin:0 1.25rem .5rem;">Scholen, vrijwilligers en partnerstichtingen. Toegang ontstaat pas na alle Boardroom-controles.</p>
+        <div class="rows" id="foundationRegistraties"><div class="empty">Registraties laden…</div></div>
+      </div>
       <div class="panel">
         <h2>Partnerstatus &amp; toegang</h2>
         <div class="rows" id="partnerList"></div>

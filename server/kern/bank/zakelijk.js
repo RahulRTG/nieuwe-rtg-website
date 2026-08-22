@@ -9,6 +9,7 @@
    ctx van kern/bank/index.js. */
 const { LANDEN } = require('../fiscaal');
 
+const { magBij } = require('./eigendom');
 module.exports = (ctx) => {
   const { schoon, d, boekAsync, rekMeta, saldoVan, bodem, rekeningen, accounts } = ctx;
 
@@ -16,7 +17,7 @@ module.exports = (ctx) => {
 
   async function batch({ vanIban, posten, codenaam, oms, soort }) {
     const m = rekMeta(vanIban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De bronrekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De bronrekening bestaat niet.' };
     if (m.bevroren) return { status: 423, error: 'Deze rekening is bevroren.' };
     if (!Array.isArray(posten) || !posten.length) return { status: 400, error: 'Voeg minstens één begunstigde toe.' };
     if (posten.length > MAX_POSTEN) return { status: 400, error: 'Maximaal ' + MAX_POSTEN + ' begunstigden per opdracht.' };

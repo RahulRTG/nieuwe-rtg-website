@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wie ben ik</title>
+<title>INSTELLINGEN</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -14,19 +14,30 @@
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   .keus{display:block;width:100%;text-align:left;margin:.45rem 0;padding:.85rem 1rem;background:transparent;
-    border:1px solid var(--line);border-radius:12px;color:var(--txt);font:inherit;cursor:pointer;}
+    border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;cursor:pointer;}
   .keus:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
   .keus[aria-pressed="true"]{border-color:var(--goldlicht);background:rgba(201,162,75,.09);}
+  /* DE GEKOZEN KAART LEGT EEN GOUDWAS OVER ZIJN GROND, dus wordt die grond
+     lichter dan waar de zachte toon van het thema op gerekend is: 9% goud over
+     het paneel maakt er rgb(56,51,42) van, en daar haalt --rtg-soft 4,14:1. Een
+     GEKOZEN regel mag ook gewoon sterker staan, dus hij gaat een trede omhoog:
+     7,59:1. Wie de was zwaarder maakt, controleert dit opnieuw. */
+  .keus[aria-pressed="true"] span{color:var(--rtg-muted,var(--muted));}
   .keus b{display:block;font-size:.96rem;margin-bottom:.15rem;}
   .keus span{display:block;color:var(--soft);font-size:.8rem;line-height:1.5;}
   .vinkjes{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0;}
-  .vinkjes label{display:flex;align-items:center;gap:.35rem;border:1px solid var(--line);border-radius:999px;
+  .vinkjes label{display:flex;align-items:center;gap:.35rem;border:1px solid var(--line);border-radius:0;
     padding:.4rem .8rem;font-size:.82rem;cursor:pointer;}
   .vinkjes input{width:auto;}
   .stemming{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
-  .welkom{border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin:1rem 0;
+  .welkom{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin:1rem 0;
     font-size:.85rem;line-height:1.6;color:var(--soft);}
   .welkom strong{color:var(--txt);}
+  .instellingpoorten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin:1rem 0 1.4rem;}
+  .instellingpoorten a{display:block;border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;
+    color:var(--txt);text-decoration:none;font-weight:700;}
+  .instellingpoorten small{display:block;color:var(--soft);font-weight:400;line-height:1.4;margin-top:.25rem;}
+  @media(max-width:680px){.instellingpoorten{grid-template-columns:1fr;}}
 </style>
 <!-- De premium-laag. Sneltoetsen hebben hier echt werk: het deelmenu geeft ze
      1-5. Meenemen is hier bewust NIET geladen: deze pagina meldt geen bron aan,
@@ -42,11 +53,16 @@
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>Wie ben ik</h1>
+  <h1>INSTELLINGEN</h1>
   <div class="rek"></div>
   <span class="stil">voor Rahul</span>
 </header>
 <main id="inhoud">
+  <nav class="instellingpoorten" aria-label="Onderdelen van Instellingen">
+    <a href="#persoonlijk">Persoonlijk<small>Profiel, aanspreekvorm en voorkeuren</small></a>
+    <a href="/apps/passkeys.html">Passkeys<small>Veilig inloggen en toegang beheren</small></a>
+    <a href="/apps/juridisch.html">Juridisch<small>Voorwaarden, toestemmingen en afspraken</small></a>
+  </nav>
   <div class="welkom">
     <strong>Alles hier is van u, en alles is optioneel.</strong> Vult u niets in, dan krijgt u
     precies dezelfde Rahul; alleen weet hij dan de dingen niet die u niet heeft verteld.
@@ -54,7 +70,7 @@
     paspoort. Wat u hier zet, blijft in huis en gaat nergens heen.
   </div>
 
-  <section aria-label="Waar staat u in het leven">
+  <section id="persoonlijk" aria-label="Waar staat u in het leven">
     <h2>Waar staat u in het leven</h2>
     <div class="kaart" id="fase"><p class="stil">Laden...</p></div>
   </section>
@@ -80,6 +96,11 @@
   <section aria-label="Hoe het scherm zich gedraagt">
     <h2>Hoe het scherm zich gedraagt</h2>
     <div class="kaart" id="toegankelijk"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Welke hand u gebruikt">
+    <h2>Welke hand u gebruikt</h2>
+    <div class="kaart" id="hand"></div>
   </section>
 
   <section aria-label="Geloof of levensbeschouwing">
@@ -220,6 +241,38 @@
     } catch (e) { host.innerHTML = '<p class="stil">' + Veilig.esc(e.message) + '</p>'; }
   }
 
+  /* WELKE HAND, EN WAAROM DIE NIET BIJ DE REST STAAT.
+
+     Alles in "hoe het scherm zich gedraagt" komt van de server en hangt aan een
+     account. Dit niet, en dat is opzet: welke hand iemand gebruikt is een
+     lichaamskenmerk en geen accountvoorkeur. Het moet dus al kloppen op het
+     INLOGSCHERM -- waar er nog geen account is om iets aan te hangen -- en het
+     moet gelezen zijn voordat er iets getekend wordt, anders klapt het scherm
+     van een linkshandige bij elke start zichtbaar om.
+
+     Vandaar shared/hand.js: localStorage als waarheid, een cookie zodat de
+     server het attribuut al in de HTML kan zetten. Zie de kop van dat bestand. */
+  function tekenHand() {
+    const host = $('#hand');
+    if (!window.RTGHand) { host.innerHTML = '<p class="stil">Deze instelling is hier nu niet beschikbaar.</p>'; return; }
+    const nu = RTGHand.is();
+    const OPTIES = [
+      ['rechts', 'Rechtshandig', 'De bank links, Rahul rechts \u2014 onder uw rechterduim.'],
+      ['links', 'Linkshandig', 'Gespiegeld: Rahul links, de bank rechts. Ook lades, menu\u2019s en de knop die bevestigt komen aan uw kant te liggen.']
+    ];
+    host.innerHTML =
+      '<p class="stil">Uw duim komt niet overal. RTG legt de dingen die u het vaakst aanraakt aan de kant ' +
+      'van de hand waarmee u uw telefoon vasthoudt \u2014 op elk scherm, ook voordat u inlogt.</p>' +
+      OPTIES.map(o => '<button class="keus" data-hand="' + o[0] + '" aria-pressed="' + (nu === o[0]) + '">' +
+        '<b>' + Veilig.esc(o[1]) + '</b><span>' + Veilig.esc(o[2]) + '</span></button>').join('') +
+      '<p class="stil h-mt60">Dit staat op dit toestel. Op een ander toestel zet u het opnieuw.</p>';
+    host.querySelectorAll('[data-hand]').forEach(b => b.addEventListener('click', () => {
+      RTGHand.zet(b.dataset.hand);
+      tekenHand();
+      Veilig.melding(b.dataset.hand === 'links' ? 'Gespiegeld voor uw linkerhand.' : 'Terug naar rechtshandig.');
+    }));
+  }
+
   /* Hoe het scherm zich gedraagt. De schakelaars komen uit de server-lijst
      (kern/toegankelijk.js), zodat een optie erbij daar een regel is en hier
      niets. Zetten gaat via RTGToegankelijk: dat past hem meteen toe op DEZE
@@ -250,7 +303,7 @@
     }));
   }
 
-  function teken(d) { tekenFase(d); tekenOmgang(d); tekenToegankelijk(d); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
+  function teken(d) { tekenFase(d); tekenOmgang(d); tekenToegankelijk(d); tekenHand(); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
 
   async function laad() {
     try { teken(await Veilig.api('/api/ik')); vandaag(); }

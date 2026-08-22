@@ -3,7 +3,7 @@
    halen dat door decodeImage -- die de zoekpatronen vindt, de rastermaat bepaalt,
    de modules sampelt en via de codec decodeert. Zo is de hele scan-keten
    (beeld -> tekst) te toetsen zonder camera.
-   Draai los: node --experimental-sqlite --test test/qrscan.test.js */
+   Draai los: node --test test/qrscan.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const QR = require('../public/shared/qr');

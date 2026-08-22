@@ -65,6 +65,9 @@ const { spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const TEST = path.join(WORTEL, 'test');
+/* Wanneer gemeten en waartegen; zonder stempel is een register niet na te
+   lopen (scripts/lib/stempel.js). */
+const { stempel } = require('./lib/stempel');
 const UITSLAG = path.join(WORTEL, 'MUTATIES.json');
 /* DE VOORTGANG STAAT BUITEN DE REPO, en dat is geen detail.
 
@@ -117,6 +120,11 @@ const OPERATOREN = [
   { naam: '<=-><', zoek: /<=/, zet: '<' },
   { naam: '&&->||', zoek: /&&/, zet: '||' },
   { naam: '+->-', zoek: /(\w) \+ (\w)/, zet: '$1 - $2' },
+  /* De spiegel van +->-. Zonder hem was elke bewering over een AFTREK
+     onraakbaar: de resolutie-correctie in server/meting-lus.js (n/1e6 - 10)
+     kon niet omgedraaid worden, en test/eventloop.test.js heette 'overleefd'
+     terwijl zijn kernassertie die aftrek juist vastspijkert. */
+  { naam: '-->+', zoek: /(\w) - (\w)/, zet: '$1 + $2' },
   { naam: 'return-weg', zoek: /\breturn ([a-zA-Z_$][\w$.]*);/, zet: 'return undefined;' },
   /* EEN GETAL IS OOK GEDRAG. Plafonds, drempels, tijden en indexen staan hier
      overal, en geen van de operatoren hierboven raakt er een: ze kijken naar
@@ -162,6 +170,51 @@ function codemasker(bron) {
       let j = i + 1;
       while (j < bron.length && bron[j] !== c) { if (bron[j] === '\\') j++; j++; }
       uit(i, j + 1); i = j + 1; continue;
+    }
+    /* EN EEN REGEXLITERAL, want die kan een aanhalingsteken bevatten.
+
+       Zonder dit las de masker de apostrof in `/url\\(\\s*(['"]?)...\\)/i` als het
+       begin van een tekenreeks, en gold alles tot het VOLGENDE aanhalingsteken
+       als tekst. In server/middleware/stijlafsplitsing.js sloeg dat 1796 tekens
+       echte code over -- de hele magVerhuizen(), met zijn return true en return
+       false. De motor meldde dan "geen bruikbare mutatie", en dat leest als
+       "hier valt niets te meten" terwijl het "ik kon de code niet zien" was.
+       Over server/ gemeten: 5 modules, 13 mutatieplekken onzichtbaar, waaronder
+       functies/toegang.js.
+
+       WANNEER IS EEN / EEN REGEX EN WANNEER EEN DEELSTREEP. Daar bestaat geen
+       waterdichte regel zonder een echte ontleder, maar wel een die het in
+       gewone code altijd goed heeft: een regex kan alleen staan waar een
+       WAARDE wordt verwacht. Dus kijken we naar het laatste betekenisvolle
+       teken ervoor. Is dat een operator, een haakje-open, een komma of het eind
+       van een sleutelwoord als return, dan begint hier een waarde en dus een
+       regex. Is het een naam, een cijfer of een haakje-dicht, dan stond er iets
+       waar je door KUNT delen. Bij twijfel doen we niets -- dan blijft het
+       gedrag zoals het was. */
+    if (c === '/') {
+      let k = i - 1;
+      while (k >= 0 && /\s/.test(bron[k])) k--;
+      const vorige = k >= 0 ? bron[k] : '';
+      const woord = /[A-Za-z_$]/.test(vorige) ? (bron.slice(0, k + 1).match(/[A-Za-z_$][A-Za-z0-9_$]*$/) || [''])[0] : '';
+      const WAARDEWOORD = /^(return|typeof|instanceof|case|in|of|new|delete|void|do|else|yield|await)$/;
+      const waardePlek = vorige === '' || '(,=:[!&|?{};+-*%~^<>'.includes(vorige) || WAARDEWOORD.test(woord);
+      if (waardePlek) {
+        let j = i + 1, inKlasse = false, gesloten = false;
+        while (j < bron.length) {
+          const t = bron[j];
+          if (t === '\\') { j += 2; continue; }
+          if (t === '\n') break;                 // een regex loopt nooit over een regeleinde
+          if (inKlasse) { if (t === ']') inKlasse = false; j++; continue; }
+          if (t === '[') { inKlasse = true; j++; continue; }
+          if (t === '/') { gesloten = true; break; }
+          j++;
+        }
+        if (gesloten) {
+          let e = j + 1;
+          while (e < bron.length && /[gimsuyd]/.test(bron[e])) e++;
+          uit(i, e); i = e; continue;
+        }
+      }
     }
     i++;
   }
@@ -339,7 +392,7 @@ function draaiToets(bestand, env, wacht, forceer) {
      meer -- elke toets heette "geen toetsen gedraaid", ook een suite die
      aantoonbaar draaide en zakte. Een meter die op een standaardinstelling
      leunt, meet de standaardinstelling (LAT regel 10). */
-  const vlaggen = ['--experimental-sqlite', '--test', '--test-reporter=tap'];
+  const vlaggen = ['--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
   const r = spawnSync('node', vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
@@ -400,6 +453,13 @@ const EIGEN_MODULE = new Map([
      van de helper (dus vielen ze in het servervak), maar geen van vieren leest
      iets van /api/ -- ze beproeven een module die ze zelf binnenhalen. */
   ['strenge-poort.test.js', ['test/helper.js']],
+  /* DE TWEE SCHERMEN VAN RTG LINK. Ze stonden in BEWIJS.md als "overleefd", en
+     dat was net als hierboven een uitspraak over de PROEF en niet over de toets:
+     allebei laden ze een BROWSERmodule uit public/shared/ met een require, en de
+     modulezoeker hieronder kijkt alleen naar server-paden. Er is dus nooit een
+     mutatie op geschoten. Nu wel. */
+  ['linkkaart.test.js', ['public/shared/linkkaart.js']],
+  ['linkkoppelingenui.test.js', ['public/shared/linkkoppelingen.js']],
   ['loghygiene.test.js', ['server/log.js']],
   ['genreregister.test.js', ['server/seed/genres.js']],
   ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],
@@ -420,12 +480,127 @@ const EIGEN_MODULE = new Map([
   ['golive.test.js', ['server/routes/auth/account.js', 'server/server.js']],
   /* De voorcheck van de SQLite-opslag; de toets noemt de module in zijn kop. */
   ['opslag-voorcheck.test.js', ['server/db/sqlite.js']],
+  /* DE TRANSACTIE- EN SAMENVOEGTOETSEN, en waarom ze "overleefden".
+
+     Deze vier stonden als overlever in MUTATIES.json, en dat is het zwaarste
+     verwijt dat deze motor kan maken: de toets legt het gedrag niet vast. Hier
+     was dat niet waar. Ze laden alle vier `require('../server/db')` -- de
+     ORKESTRATOR -- terwijl hun onderwerp een laag dieper woont: het afkappen en
+     archiveren in db/tx/index.js, de index in db/tx/ledger.js, en de
+     driewegsamenvoeging in db/merge.js. De motor muteerde dus achtentwintig keer
+     een bestand waar deze toetsen niets over beweren, en noteerde vervolgens dat
+     ZIJ tekortschoten.
+
+     Dat is exact de fout die vier regels hierboven al eens is gemaakt en
+     opgeschreven ("dat is de toets de schuld geven van iets wat hij niet heeft
+     gedaan"). Een overlever is pas een bevinding als de mutatie het juiste
+     bestand raakte; anders is het een bevinding over de toewijzing.
+
+     Nagemeten na deze verhuizing: alle vier zakken op een echte bronmutatie in
+     hun eigen module. */
+  ['txkap.test.js', ['server/db/tx/index.js']],
+  ['txindex.test.js', ['server/db/tx/index.js']],
+  ['txgeld.test.js', ['server/db/tx/index.js', 'server/db/tx/collecties.js']],
+  ['merge3.property.test.js', ['server/db/merge.js']],
+  /* Zelfde soort misgreep: server/db/gidsen.js is een samenvoeglaag van
+     zevenendertig regels die twee registers tot een API smeedt. Wat deze toets
+     bewaakt -- de synchrone omgekeerde cache (ledenRev) die een net actief lid
+     meteen op codenaam vindbaar maakt, ook voordat de INSERT geland is -- woont
+     in ./ledengids.js. */
+  ['ledengids-race.test.js', ['server/db/ledengids.js']],
+  /* Zelfde vorm nog eens: server/kern/concern/index.js is de orkestrator van
+     negentien bestanden en 2522 regels. De drie beweringen van concern.test.js
+     wonen elders -- de bronplicht bij een juridisch gegeven in ./bron.js, de
+     tijdmachine (een feit wordt nooit overschreven) in ./tijd.js, en de
+     bestuurderswissel in ./verandering.js en ./entiteit.js. */
+  ['concern.test.js', ['server/kern/concern/bron.js', 'server/kern/concern/tijd.js',
+    'server/kern/concern/verandering.js', 'server/kern/concern/entiteit.js']],
+  /* En nog eens: server/kern/comm/index.js voegt negentien bestanden samen.
+     comm-deelnemer.test.js gaat over het correctievenster, over wie er aan een
+     bericht mag komen en over intrekken -- dat woont in ./deelnemer.js en
+     ./bericht.js. */
+  ['comm-deelnemer.test.js', ['server/kern/comm/deelnemer.js', 'server/kern/comm/bericht.js']],
+  /* DE GELDMOTOR. Deze twee toetsen laden server/kern/pay/motorklant.js, en dat
+     is sinds de samenvoeging een schil van dertig regels: twee paden, twee
+     namen, klaar. De motor vond daar terecht "geen bruikbare mutatie" -- niet
+     omdat de toetsen niets vastleggen, maar omdat het gedrag een laag dieper
+     woont. Dat is precies waar dit register voor is.
+
+     Nagemeten met de hand, en alle tien raak: bij motorzekering.test.js slaan de
+     verwisselde storingsdrempel (elke niet-2xx als storing), een zekering die
+     nooit opent, een half-open die de hele wachtrij doorlaat, een ontbrekend dak
+     op de antwoordgrootte en een ontbrekende gelijktijdigheidsgrens allemaal
+     aan; bij motorverbinding.test.js de verwisselde grootboekpaden, het niet
+     afronden van centen, een weigering die als geslaagd telt, en het weghalen
+     van de fail-closed op een ontbrekende URL. */
+  ['motorzekering.test.js', ['server/kern/motorzekering.js']],
+  ['motorverbinding.test.js', ['server/kern/motorverbinding.js', 'server/kern/motorzekering.js']],
+  /* DE ROLLENVRAAG, vier bestanden. Deze toetsen zijn servertoetsen -- ze zetten
+     twee echte partijen op en laten de een bij de ander proberen -- en de
+     liegpoort kan er dus niets over zeggen. De module waar hun bewering woont is
+     per bestand een andere:
+
+       geld-rollen-school.test.js  de schoolpoort (het token wordt tegen de
+                                   GEVONDEN school gehouden, niet andersom) en de
+                                   twee financiele lagen die alles door g.sch
+                                   opzoeken;
+       geld-rollen-zaken.test.js   de horeca-rekening, waar de zaak uit de sessie
+                                   komt (H(req.supplier.code)) en het rekening-id
+                                   uit de body;
+       geld-rollen-buiten-bank.test.js  de rechterhand, waar de scope req.session.key
+                                   is en het meegestuurde id BINNEN dat dossier
+                                   wordt gezocht.
+
+     Met de hand nagemeten, alle drie raak: `if (beheer)` in plaats van
+     `if (beheer && sch.token === beheer)` laat school B met de code van A binnen
+     (toets 2 zakt); de factuur- en leerlingopzoeking over ALLE scholen heen laat
+     B op de factuur van A boeken en die op 'voldaan' zetten (toets 3 zakt); en
+     rekVan over alle zaken heen laat zaak B bij de omzet van A (toets 2 zakt). */
+  ['geld-rollen-school.test.js', ['server/school/rollen.js', 'server/school/financien.js', 'server/school/financien-beheer.js']],
+  ['geld-rollen-zaken.test.js', ['server/routes/supplier/horeca/rekening.js', 'server/routes/supplier/horeca/betalen.js']],
+  ['geld-rollen-buiten-bank.test.js', ['server/routes/member/rechterhand.js']],
+  ['geld-rollen-werkruimte.test.js', ['server/bedrijf/index.js', 'server/bedrijf/it.js']],
+  /* De noodrem. De toets zet echte inlogpogingen op een echte server, dus de
+     liegpoort kan er niets over zeggen; het gedrag woont in de teller van
+     server/beveiliging.js en in de bron die server/server.js meegeeft.
+     Met de hand nagemeten, beide raak: `.map(m => m.sleutel)` terugzetten laat
+     toets 2 zakken (een aanvaller sluit het huis weer), en de drempel
+     onbereikbaar hoog zetten laat toets 3 zakken (dan is de noodrem weg). */
+  ['noodrem-bron.test.js', ['server/beveiliging.js', 'server/server.js']],
+  /* De zesde rollenvraag. De grendel is profielVan() -- een token wordt BINNEN
+     het gezin gezocht -- en de rem tegen het raden van een gezinscode staat in
+     foundation/basis.js. Met de hand nagemeten en raak: profielVan over alle
+     gezinnen heen laten zoeken laat toets 2 zakken. */
+  ['geld-rollen-gezin.test.js', ['server/foundation/gezinshulp.js', 'server/foundation/basis.js']],
+  /* De dekkingsmeter start als KINDPROCES (hij is een CLI, geen module), dus zijn
+     toets noemt hem nergens in een require en de motor meldde "geen module
+     gevonden". Dat is dezelfde grens als bij de schermtoetsen hieronder. */
+  ['dekking.test.js', ['scripts/dekking.js']],
   /* TLS aan of uit, in de hele server en in de poortwachter. Drie mutaties met
      de hand nagetrokken en alle drie raak: het schema in de opstartmelding
      (luister.js), het maken van de TLS-server (web/index.js) en de schakelaar van
      de poortwachter (trio.js). web/index.js staat vooraan omdat die de zwaarste
      bewering draagt -- praat hij echt https. */
   ['tls-boot.test.js', ['server/web/index.js', 'server/opzet/luister.js', 'server/trio.js']],
+  /* DE GEVEL-OVERLEVERS. Deze toetsen laden een index.js die alleen delen aan
+     elkaar knoopt of her-exporteert; de logica die ze vastleggen woont in de
+     delen ernaast, en die zag de motor dus nooit. Per toets staat hier de
+     module die hij echt op de proef stelt, in de volgorde van de zwaarste
+     bewering -- en elke regel is daarna door de motor BEVESTIGD (gezakt), naar
+     de afspraak hierboven: een geraden module geeft de toets de schuld van de
+     lijst. */
+  ['concern.test.js', ['server/kern/concern/tijd.js', 'server/kern/concern/graaf.js', 'server/kern/concern/scope.js', 'server/kern/concern/readiness.js', 'server/kern/concern/uitnodiging.js', 'server/kern/concern/index.js']],
+  ['comm-deelnemer.test.js', ['server/kern/comm/deelnemer.js', 'server/kern/comm/index.js']],
+  ['scriptbundel.test.js', ['server/middleware/scriptbundel-rij.js', 'server/middleware/scriptbundel.js']],
+  /* Vier servertoetsen die de liegpoort overleefden omdat hun bewering niet
+     over API-antwoorden gaat: het genre-register en de toegangsstand (een
+     waarheid in seed/kern), de loghygiene (wat er in het LOG staat) en de
+     strenge poort (de bewaker in test/helper.js zelf). Een eigen module wint
+     van de liegpoort -- zie de kop van isServerToets. */
+  ['genreregister.test.js', ['server/seed/genres.js']],
+  ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],
+  ['loghygiene.test.js', ['server/log.js', 'server/routelog.js']],
+  ['ledengids-race.test.js', ['server/db/ledengids.js', 'server/db/gidsen.js']],
   /* SCHERMTOETSEN, en dat is nieuw. De motor haalde altijd alleen *.test.js op,
      dus de 85 *.e2e.js-bestanden waren structureel onmeetbaar -- en dat maakte
      toetsenNietGemeten een meter die het SCHRIJVEN van een schermtoets bestrafte.
@@ -495,6 +670,20 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* Deze ratel staat op NUL, en dat is precies wat hem onmeetbaar maakt voor de
+     motor: meet() leest de echte testmap, telt daar nul wachten, en elke
+     gedragsmatige mutatie in scripts/klokwacht.js laat dat nul. Nul in, nul uit.
+     Twee mutaties geprobeerd, allebei overleefd -- en dat is hier geen uitspraak
+     over de toets.
+
+     De juiste mutatie zit in de TELLING zelf (het commentaar niet strippen, de
+     haak uit het patroon halen), en dat zijn wijzigingen aan een reguliere
+     expressie; die operator heeft deze motor niet. Daarom is de telling apart
+     gezet als telIn() en met de HAND op beide fouten nagetrokken: het
+     commentaar niet strippen laat alle vier de beweringen zakken, de haak
+     weghalen laat de vierde zakken. Zonder die twee zou "de schuld staat op nul"
+     een bewering zijn over een meter die niemand ooit heeft zien uitslaan. */
+  ['klokwacht.test.js', 'overleefde 2 mutaties in scripts/klokwacht.js, en dat kan niet anders: de ratel staat op nul, dus een gedragsmatige mutatie in de teller laat de uitkomst nul. De telling zelf is apart gezet (telIn) en met de hand op twee echte fouten nagetrokken -- commentaar niet strippen, en de haak uit het patroon -- die allebei raak zijn'],
   /* Ik heb dit bestand eerst in EIGEN_MODULE gezet met public/apps/voertuig.js en
      rit.js erbij -- de twee modules die deze toets echt leest. De motor probeerde
      er 17 en de toets overleefde ze allemaal, en dat is hier GEEN uitspraak over
@@ -509,10 +698,119 @@ const GEEN_BRONMUTATIE = new Map([
      leverancierssleutel weghalen laat toets 7 zakken. De passende operator is een
      hernoemer van stringliteralen, en die heeft deze motor niet. */
   ['voertuigscherm.e2e.js', 'overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak'],
+  /* DE TWEE SCHERMEN VAN RTG LINK, na drie en een mutaties in EIGEN_MODULE (zie
+     daar waarom ze eerst NUL mutaties kregen). Ze overleven, en dat is hier een
+     uitspraak over de OPERATOREN: het zijn opbouwmodules die tekst en markup
+     samenstellen, en geen enkele bronoperator raakt een letterlijke string of
+     een filter dat een lege lijst oplevert.
+
+     De foutklassen die ze WEL bewaken zijn met de hand nagetrokken, en alle
+     vier RAAK:
+       linkkaart        de knop-zonder-weg-rem weghalen (`i.weg &&` uit de
+                        filter) -> toets 3 zakt. `gegevens` stilletjes leeg
+                        teruggeven -> toets 1 en 5 zakken.
+       linkkoppelingen  `esc` de ruwe tekst laten teruggeven -> toets 7 zakt.
+                        Alleen het AANHALINGSTEKEN uit de ontsmetter halen ->
+                        toets 7 zakt sinds die toets ook de attribuut-sink
+                        (data-trek="...") beproeft; daarvoor bleef hij groen, en
+                        dat was een echt gat.
+     De passende operator zou een hernoemer van stringliteralen zijn, of een die
+     een filterconditie omkeert; die heeft deze motor niet. */
+  ['linkkaart.test.js', 'overleefde 3 mutaties in public/shared/linkkaart.js. Een opbouwmodule: geen rekenend gedrag dat een bronoperator raakt. Met de hand nagetrokken op de foutklassen die hij wel bewaakt (de knop-zonder-weg-rem, en "welke gegevens" stilzwijgend leeg): driemaal raak'],
+  ['linkkoppelingenui.test.js', 'overleefde 1 mutatie in public/shared/linkkoppelingen.js. Idem: opbouwmodule. Met de hand nagetrokken op het ontsmetten -- ruw teruggeven en alleen het aanhalingsteken weglaten laten hem allebei zakken; dat tweede pas sinds de toets ook de attribuut-sink beproeft'],
   ['boot-smoke.test.js', 'overleefde 45 mutaties in server/server.js, en terecht: deze toets is bewust ONDIEP -- de server komt op en de wortel geeft de ROS-poort, meer beweert hij niet. De juiste mutatie zit in de wortelroute of in de pagina, niet in de bron'],
   ['poortrace.test.js', 'overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet'],
   ['eu-naleving.test.js', 'overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen'],
-  ['randen.test.js', 'overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA\'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module']
+  ['randen.test.js', 'overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA\'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module'],
+  /* Twee keer dezelfde les als hierboven, en allebei met de hand nagetrokken.
+
+     rahul-hart: de motor muteerde server/kern/rahul.js, want daar staat de
+     EXPORT van RAHUL_BASIS. De tekst zelf woont in server/kern/rahul-hart.js.
+     Ik heb hem eerst in het verkeerde bestand gemuteerd en kreeg groen -- wat
+     precies laat zien hoe overtuigend een verkeerde toewijzing liegt. In het
+     JUISTE bestand is hij tweemaal raak: 'Frenna' uit de passies halen laat
+     toets 1 zakken, en scrypt -> md5 laat toets 2 zakken (het security-verhaal
+     dat met de code moet kloppen). Wat hij vastlegt is TEKST; geen enkele
+     bronoperator raakt een letterlijke string. */
+  ['rahul-hart.test.js', 'de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken'],
+  /* consent-dekking is een CENSUS over de broncode: hij zoekt modules met de
+     toestemmingsvorm en eist dat elk in het register staat of een reden heeft.
+     Een operator verandert wat code DOET, niet welke bestanden er zijn -- de
+     juiste mutatie is een module toevoegen of uit het register halen. En die
+     ijkt de toets al zelf: zijn derde bewering is "de scan kan een nieuwe laag
+     ook echt vinden", dus hij toont zijn eigen gevoeligheid. */
+  ['consent-dekking.test.js', 'een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden'],
+  /* Nagetrokken: een aanroep verzinnen die niet bestaat (accounts.bestaatNietXX)
+     laat toets 1 zakken, en verifyToken uit de users-export halen laat beide
+     toetsen zakken. Wat hij vergelijkt is een EXPORTLIJST tegen aanroepen in de
+     bron; geen enkele operator (true->false, een vergelijking omdraaien) raakt
+     dat. Let op de vorm: de eerste bewering groeit en krimpt mee met de code,
+     dus alleen de harde ondergrens in toets 2 vangt een verdwenen export. */
+  ['wiring-contract.test.js', 'vergelijkt de accounts-exportlijst met de aanroepen in de bron; geen bronoperator raakt een exportlijst. Met de hand tweemaal raak: een verzonnen aanroep laat toets 1 zakken, verifyToken uit de export halen laat beide toetsen zakken'],
+  /* bundeldelen ijkt zichzelf al, en beter dan deze motor kan: zijn tweede
+     bewering trekt een ECHT bundelbestand scheef op schijf en eist dat de
+     meting uitslaat, met een finally die het terugzet. Een bronoperator op
+     scripts/bundel.js raakt de vergelijking niet die hij maakt. */
+  ['bundeldelen.test.js', 'ijkt zichzelf: de tweede bewering trekt een echt bundelbestand op schijf scheef en eist dat de meting uitslaat. Een bronoperator op scripts/bundel.js raakt die vergelijking niet'],
+  /* rtfcampus leest APPS en CATEGORIEEN, die uit ./rtfappcatalogus-data.js
+     komen -- een bestand met louter literalen. De betekenisvolle mutatie is
+     "haal een categorie weg", en daar heeft deze motor geen operator voor
+     (net als bij voertuigscherm.e2e.js hierboven).
+
+     Die mutatie bracht hier wel een ECHT gat aan het licht, en dat is de reden
+     dat deze regel er staat in plaats van een schouderophalen. Toets 2 eiste
+     dat elke categorie een Campuswereld heeft, maar niet dat elke wereld een
+     BESTAANDE categorie aanwijst. Een categorie weghalen liet dus een wereld
+     naar het niets wijzen en bleef groen. De tegenkant staat er nu bij, en
+     precies dezelfde handmutatie zakt sindsdien. */
+  ['rtfcampus.test.js', 'leest een catalogus van literalen; de betekenisvolle mutatie is een categorie weghalen en daar heeft de motor geen operator voor. Met de hand raak sinds de tegenkant erbij staat: een categorie uit rtfappcatalogus-data.js halen laat toets 2 zakken (daarvoor bleef dat onopgemerkt -- dat was het gat)'],
+  /* DRIE SERVERTOETSEN DIE DE LIEGPOORT NIET KAN BEOORDELEN, en om een reden
+     die het opschrijven waard is: ze beweren allemaal iets over AFWEZIGHEID.
+
+     De liegpoort laat elk endpoint een geldig maar LEEG antwoord geven, en een
+     toets die groen blijft kijkt dus niet naar de inhoud. Dat werkt zolang de
+     bewering is "hier hoort iets te staan". Maar "hier hoort GEEN token, GEEN
+     stack, GEEN persoonsgegeven te staan" wordt door een leeg antwoord juist
+     BEVESTIGD. De mutatie duwt precies de goede kant op, en dan zegt overleven
+     niets over de toets.
+
+     Alle drie met de hand nagetrokken op hun eigen foutklasse, alle drie raak. */
+  ['loghygiene.test.js', 'beweert AFWEZIGHEID (geen querystring, geen stack, geen persoonsgegeven in het log) en een leeg antwoord bevestigt dat juist; bovendien roept hij de middleware rechtstreeks aan, buiten de poort om. Met de hand raak: req.path vervangen door req.originalUrl in server/log.js zet de querystring met token en e-mailadres in de log en laat toets 1 zakken. Hij heeft ook de positieve tegenhanger, dus hij kan niet leeg slagen: "het pad staat er wel in"'],
+  ['strenge-poort.test.js', 'toetst de POORT zelf (test/helper.js), niet een endpoint -- de liegpoort zit een laag lager dan zijn onderwerp. Met de hand raak: de FATAAL-regex onherkenbaar maken laat beide toetsen zakken, want dan telt een crash niet meer mee'],
+  ['genretoegang.test.js', 'beweert dat een gesloten genre wordt GEWEIGERD en nooit stil een ander genre wordt; een leeg antwoord is ook geen ander genre, dus de liegpoort bevestigt de bewering in plaats van hem te breken'],
+  /* eventloop ijkt zichzelf beter dan deze motor kan, en dat is precies wat
+     LAT.md regel 10 van een meter vraagt: hij BLOKKEERT echt 200 ms en eist dat
+     de meter dat ziet, met een ondergrens (>=150) en een bovengrens (<1000), en
+     met de eis dat de MEDIAAN juist niet meebeweegt -- anders zou een meter die
+     alles op de max plakt er ook doorheen komen. Nagetrokken: lusVertraging()
+     alles op nul laten melden laat drie van de vier toetsen zakken.
+     Dit is bovendien het instrument waarmee de prestatiewinst van deze hele
+     ronde is beoordeeld; dat het niet stilletjes nul kan melden is dus geen
+     detail maar de bodem onder dat bewijs. */
+  ['eventloop.test.js', 'ijkt zichzelf met een echte blokkade van 200 ms, met onder- en bovengrens en de eis dat de mediaan niet meebeweegt. Nagetrokken: lusVertraging() nul laten melden laat drie van de vier toetsen zakken'],
+  /* scriptbundel bouwt zijn foutisolatie op als STRING (try/catch per bestand,
+     met de bestandsnaam in de melding) en voert die in de toets echt uit. Een
+     bronoperator raakt een stringliteraal niet; de betekenisvolle mutatie is de
+     omwikkeling weghalen. Nagetrokken en raak: dan sleept een gooiend script
+     het volgende wel mee en zakt de kernbelofte. */
+  ['scriptbundel.test.js', 'de foutisolatie is een stringliteraal (try/catch per bestand) die de toets echt uitvoert; geen bronoperator raakt dat. Met de hand raak: de omwikkeling weghalen laat toets 1 zakken, en dat is de enige reden dat samenvoegen daar mag'],
+  /* wereldtaal toetst DATA: dertig kernwoorden in elke registertaal, compact
+     opgeslagen als |-gescheiden regels in wereld1..wereld8. De motor muteert
+     wereld.js -- de uitpakker -- waar niets te halen valt. De betekenisvolle
+     mutatie is een woord uit een taalregel halen, en daar bestaat geen operator
+     voor. Nagetrokken en raak: een regel van veertien woorden naar dertien
+     brengen laat toets 1 zakken op "het kernwoord ontbreekt". */
+  ['wereldtaal.test.js', 'toetst dertig kernwoorden per taal, opgeslagen als |-gescheiden regels in wereld1..8; de motor muteert de uitpakker en niet de data. Met de hand raak: een woord uit een taalregel halen laat toets 1 zakken'],
+  /* i18n-auto is een PAGINASCAN over public/: hij leest ieder blijvend appscherm
+     en eist dat het de gedeelde taalrail laadt. Zijn onderwerp is dus welke
+     bestanden wat bevatten, niet wat een module rekent -- dezelfde klasse als
+     consent-dekking hierboven. */
+  ['i18n-auto.test.js', 'een paginascan over public/: leest ieder blijvend appscherm en eist dat het de taalrail laadt. Zijn onderwerp is de inhoud van bestanden, niet rekenend gedrag van een module'],
+  /* genreregister is dezelfde soort census, nu over de genre-definities: niemand
+     definieert een genre buiten het register, elk genre heeft een bestaande
+     sector. Een liegpoort die antwoorden leegmaakt raakt een registervergelijking
+     niet. */
+  ['genreregister.test.js', 'een census over de genre-definities (staat elk genre in het register, heeft elke sector genres); een leeggemaakt antwoord raakt een registervergelijking niet']
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets
@@ -734,6 +1032,28 @@ if (require.main === module) {
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
 
+  /* HET AFBOUWSLOT, EN WAAROM HET HIER ONTBRAK.
+
+     Dit is het meest bronmuterende script in huis: het verandert echte
+     bestanden in server/ en zet ze in een finally terug. Precies waar
+     scripts/afbouw-slot.js voor bedoeld is ("een tijdelijk ijkbestand mag nooit
+     een geldige scan vervuilen") -- maar het slot werd alleen gepakt door
+     test-runner.js, release-gate.js en staging-repetitie.js. Draaide iemand
+     `npm run mutatie` naast `npm test`, dan las de suite gemuteerde bron en
+     zakten er toetsen op code die niemand had geschreven.
+
+     Twee dingen die dit voorkomt, en de tweede is de ergste:
+       1. een andere lezer ziet halverwege een gemuteerd bestand;
+       2. ruimEerderOp() hieronder zet de LEVENDE mutaties van een tweede
+          mutatieronde terug -- die denkt dan dat hij zijn eigen bron muteert
+          terwijl er al iets anders in staat, en de uitslag is onzin.
+
+     Daarom vóór ruimEerderOp(), en binnen require.main: test/mutatiewacht.test.js
+     IMPORTEERT deze module, en een slot dat bij het laden dichtklapt zou die
+     toets het slot laten grijpen zonder ooit iets te muteren. */
+  const geefAfbouwSlotVrij = require('./afbouw-slot').pak('mutatiemotor');
+  void geefAfbouwSlotVrij; // pak() hangt zichzelf al aan exit/SIGINT/SIGTERM
+
   /* EERST OPRUIMEN WAT EEN VORIGE RONDE HEEFT LATEN STAAN, en het HARDOP zeggen.
      Een stille opruiming laat niemand weten dat er iets was blijven liggen, en dan
      mist iedereen het patroon dat de motor wordt afgebroken op een manier die zijn
@@ -770,7 +1090,14 @@ if (require.main === module) {
     const op = {};
     for (const k of Object.keys(uitslag).sort()) op[k] = uitslag[k];
     fs.mkdirSync(path.dirname(doel), { recursive: true });
-    fs.writeFileSync(doel, JSON.stringify({ toetsen: op }, null, 2) + '\n');
+    fs.writeFileSync(doel, JSON.stringify({ stempel: stempel(),
+      uitleg: 'Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de ' +
+        'module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren ' +
+        'bleven open, dus hij zakte op de INHOUD en niet op de inlog.',
+      grens: 'een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de ' +
+        'verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de ' +
+        'operatoren zijn mechanisch en er zijn fouten die ze niet maken.',
+      toetsen: op }, null, 2) + '\n');
   };
   const bewaar = () => schrijf(VOORTGANG);      // na elk bestand: buiten de repo
   const vastleggen = () => schrijf(UITSLAG);    // na een fase: in de repo
@@ -814,9 +1141,15 @@ if (require.main === module) {
        nodig heeft; anders kost de eerste ronde al uren. */
     const overlevers = puur.filter(n => uitslag[n] && uitslag[n].staat === 'overleefd');
     if (overlevers.length) {
-      console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, acht plekken per operator ---');
+      /* ALLE plekken, niet acht. De acht was een tijdsbesparing, en hij
+         produceerde valse beschuldigingen: in server/db/ledengids.js woont de
+         geteste logica voorbij de achtste ===, dus de motor stopte met meten
+         precies voordat hij raak kon schieten -- en noteerde 'overleefd' alsof
+         de TOETS niets vastlegde. Een pure toets kost seconden; de eerlijke
+         meting is er dus gewoon te betalen. */
+      console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, elke plek per operator ---');
       for (const naam of overlevers) {
-        const r = proefPuur(naam, 8);
+        const r = proefPuur(naam, 1000);
         uitslag[naam] = r;
         bewaar();
         console.log('        ' + naam.padEnd(42) + r.staat +
@@ -874,7 +1207,13 @@ if (require.main === module) {
 }
 
 module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
-  SPOOR, ruimEerderOp, schrijfSpoor, metMutatie,
+  SPOOR, ruimEerderOp, schrijfSpoor, metMutatie, DEUREN,
+  /* draaiToets naar buiten, zodat scripts/outputproef.js hem kan gebruiken in
+     plaats van namaken. Hij weet dingen die je niet twee keer wilt leren: de
+     reporter moet op TAP staan (anders leest niemand de uitslag op Node 24), en
+     een time-out krijgt SIGKILL en geen SIGTERM (anders blijven er wezen achter
+     die poorten vasthouden en latere metingen vervuilen). */
+  draaiToets,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js
      meldt een bestand aan, muteert het, stuurt SIGTERM en kijkt of het terugstaat. */

@@ -3,8 +3,8 @@
      kost (alles hier is gratis) en wijst bij zware onderwerpen liefdevol
      naar een vertrouwde grote. ---- */
   /* Ook Rahul staat in de balk, niet zwevend in de hoek. Zie samen-01.js. */
-  var rCss = '.rsm-rahul{background:var(--goud,#857007);color:#000;border:none;border-radius:999px;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
-    '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
+  var rCss = '.rsm-rahul{background:var(--goud,#857007);color:#000;border:none;border-radius:0;padding:.34rem .8rem;font:600 .74rem Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;}' +
+    '.rsm-rsheet{position:fixed;right:1rem;bottom:3.6rem;z-index:37;width:min(340px,92vw);background:var(--paneel,#151312);border:1px solid var(--goud,#857007);border-radius:0;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;color:var(--txt,#eee);font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);}' +
     '.rsm-rsheet[hidden]{display:none;}.rsm-ruit{font-size:.84rem;color:var(--zacht,#bbb);line-height:1.55;max-height:38vh;overflow-y:auto;white-space:pre-wrap;}';
   var rSt = document.createElement('style'); rSt.textContent = rCss; document.head.appendChild(rSt);
   var rFab = maakEl('<button class="rsm-rahul" type="button" aria-label="Vraag Rahul">✶ Rahul</button>');

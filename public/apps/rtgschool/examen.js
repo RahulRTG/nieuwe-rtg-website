@@ -55,7 +55,10 @@
     uit.innerHTML = '<span class="leeg">Het advies kijkt mee...</span>';
     try {
       var d = await api('/api/onderwijs/advies');
+      /* Wie beslist, staat er met naam bij. "Een mens beslist" is geen adres;
+         een kind moet weten bij wie het terecht kan. */
       uit.innerHTML = '<p style="line-height:1.7;">' + esc(d.advies) + '</p>' +
+        (d.beslist ? '<p class="leeg">Hierover beslist ' + esc(d.beslist) + '.</p>' : '') +
         (d.doelenTotaal ? '<p class="leeg">' + d.doelenBehaald + ' van de ' + d.doelenTotaal + ' leerdoelen van je fase behaald.</p>' : '') +
         (d.eerlijk ? '<p class="eerlijk h-mt50">' + esc(d.eerlijk) + '</p>' : '');
     } catch (e) { uit.innerHTML = '<span class="leeg">' + esc(e.message) + '</span>'; }

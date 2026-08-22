@@ -54,7 +54,7 @@ module.exports = (actx) => {
     const doelBucket = 'webauthn:doel:' + vingerafdruk(login ? 'account:' + login.trim().toLowerCase() : 'sleutel:' + credential);
     if (tooManyTries(res, bronBucket) || tooManyTries(res, doelBucket)) return;
     const r = await webauthnLoginMaak(login, req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
-    if (r.error) { noteFailedTry(bronBucket); noteFailedTry(doelBucket); return stuur(res, r); }
+    if (r.error) { noteFailedTry(bronBucket, req.ip); noteFailedTry(doelBucket, req.ip); return stuur(res, r); }
     loginFails.delete(bronBucket); loginFails.delete(doelBucket);
     const user = r.user;
     if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });

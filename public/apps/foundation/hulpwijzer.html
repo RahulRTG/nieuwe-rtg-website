@@ -23,14 +23,14 @@
   .cat summary .pijl{margin-left:auto;color:var(--zacht);transition:transform .15s;}
   .cat[open] summary .pijl{transform:rotate(90deg);}
   .cat .body{margin-top:.8rem;display:flex;flex-direction:column;gap:.7rem;}
-  .hulp{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;padding:.7rem .9rem;}
-  .hulp b{color:var(--goud);}
+  .hulp{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.7rem .9rem;}
+  .hulp b{color:var(--rtg-leesgoud,var(--goud));}
   .hulp p{color:var(--zacht);font-size:.88rem;line-height:1.45;margin-top:.2rem;}
   .blok{padding:1.2rem;margin:1.3rem 0;}
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
   .chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}
-  .b{padding:.6rem .8rem;border-radius:12px;max-width:85%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
+  .b{padding:.6rem .8rem;border-radius:0;max-width:85%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
   .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
   .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
   .rijveld{display:flex;gap:.5rem;}
@@ -53,9 +53,9 @@
     <h2>Weet je niet waar te beginnen?</h2>
     <div class="h">Vertel kort wat je nodig hebt, dan wijst Meike je de juiste, gratis plek.</div>
     <div class="chat" id="chat"><div class="b ai">Hoi, ik ben Meike. Waar kan ik je bij helpen? Denk aan eten, kleding, hulp voor de kinderen, of hulp met geld en post.</div></div>
-    <div class="rijveld">
+    <div class="rijveld rtg-duimeind">
       <textarea class="veld" id="vraag" rows="1" placeholder="Ik heb hulp nodig met..." maxlength="1000"></textarea>
-      <button class="knop" id="stuur">Vraag</button>
+      <button class="knop" id="stuur" data-hoofdactie>Vraag</button>
     </div>
     <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
     <div class="nood"><b>Nood of gevaar? Bel 112.</b> Zit je heel diep of denk je aan zelfmoord? Bel gratis en dag en nacht 113 (of 0800-0113).</div>

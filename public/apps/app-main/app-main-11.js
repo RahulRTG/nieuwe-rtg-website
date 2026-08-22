@@ -79,7 +79,7 @@
         ? '<div style="margin-top:1rem;border-top:1px solid var(--line);padding-top:.8rem;">' +
           d.gesprekken.slice(0, 8).map(g =>
             '<button class="klets-eerder" data-klets="' + escT(g.id) + '" style="display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:.5rem 0;font:inherit;cursor:pointer;">' +
-            '<b style="font-size:.78rem;color:var(--gold);">' + escT(g.metCodenaam) + '</b>' +
+            '<b style="font-size:.78rem;color:var(--rtg-leesgoud,var(--gold));">' + escT(g.metCodenaam) + '</b>' +
             '<span style="display:block;font-size:.82rem;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escT(g.eerste) + '</span></button>'
           ).join('') + '</div>'
         : '');

@@ -138,3 +138,77 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
     assert.equal(graph.motor.pariteit, true);
   });
 });
+
+/* ============================================================================
+   DE ACHTERSTAND VAN DE BRONSCANNER OP DE ROUTER -- vastgezet, niet weggepoetst.
+
+   WAAROM DEZE TOETS ER IS. De Capability Graph leest zijn API-deuren met een
+   regex over server/**.js (magnaat-capabilities-bronnen.js, API_RE). Zo'n regex
+   ziet niet wat via `app.use('/api/foundation', router)` of een
+   voorvoegsel-hulpje hangt. Gemeten op 17 augustus 2026: de graph kende 3679
+   routes waar de router er 4191 heeft -- 510 /api/-routes gemist, waaronder alle 281 van de
+   RTFoundation, en 6 die hij WEL noemt en die niet bestaan (`POST /api/geld/`,
+   `POST /api/member/spel/` en de twee opzettelijke testbugs).
+
+   Dat is dezelfde fout die in scripts/lib/routes.js is gerepareerd door de
+   levende router te vragen (scripts/routekaart.js). Hier is die reparatie NIET
+   gedaan, en dat is een bewuste grens: deze scanner heeft een tweelingbroer in
+   Rust en scan() vergelijkt de twee op PARITEIT. De JS-kant op de router zetten
+   laat die pariteit permanent driften, en dan valt de Rust-migratie stil met een
+   waarschuwing. Welke kant daar wint is een besluit over die migratie en niet
+   iets om in een dekkingsronde te beslissen.
+
+   Dus zolang dat besluit niet is genomen: de achterstand mag niet GROEIEN. Wie
+   een route toevoegt die de bronscanner niet ziet, ziet deze toets zakken. Zo
+   staat het gat als getal in de suite in plaats van als stilte -- en wordt het
+   kleiner in plaats van vergeten (dezelfde afspraak als BEREIK.json).
+
+   MUTATIE (RAAK): de grens op 0 zetten -> zakt met de volle 512 in de melding.
+
+   VERZET VAN 510 NAAR 546 OP 21 AUGUSTUS 2026, en met de oorzaak erbij zodat
+   het geen getal blijft dat niemand meer kan plaatsen. Het gat is niet nieuw en
+   niet breder geworden: het is dezelfde blinde vlek, evenredig meegegroeid met
+   het huis. De samenvoeging van 24 takken bracht 36 foundation-routes mee.
+
+   WAT DE SCANNER NIET ZIET, EN WAAROM. Hij eist dat het pad in de bron met
+   `/api/` begint. De foundation- en schoolrouters registreren RELATIEF
+   (`router.post('/gezin/maak')`) en worden gemount op /api/foundation; in de
+   bron staat dus nergens het volledige adres. Alle 546 gemiste routes zijn van
+   die vorm. Dat is te repareren -- de mount-prefix per router afleiden -- maar
+   het raakt de pariteit met de Rust-tweelingbroer hierboven, en dat is het
+   besluit dat hier expres niet wordt genomen.
+   ========================================================================== */
+const GEMIST_MAX = 546;   // routes die de router heeft en de bronscanner niet
+const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
+
+test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {
+  const routedekking = require('../server/kern/routedekking');
+  const { execFileSync } = require('child_process');
+  const kaart = JSON.parse(execFileSync(process.execPath,
+    ['--experimental-sqlite', path.join(root, 'scripts', 'routekaart.js'), '--json'],
+    { cwd: root, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
+      stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } }));
+  const echt = new Set(routedekking.inventaris(kaart.routes).routes
+    .filter(r => r.pad.startsWith('/api/'))
+    .map(r => r.methode + ' ' + r.pad));
+  assert.ok(echt.size > 1000, 'de router geeft zijn routes (' + echt.size + ')');
+
+  const gescand = new Set(bronnen.scanEndpoints(root).map(e => e.sleutel));
+  assert.ok(gescand.size > 1000, 'de bronscanner geeft routes (' + gescand.size + ')');
+
+  const gemist = [...echt].filter(s => !gescand.has(s));
+  const spook = [...gescand].filter(s => !echt.has(s) && !s.includes('/api/test/'));
+
+  /* De bewering staat op de TELLING en niet op een lus over de lijst: een lus
+     over een lege verzameling controleert niets (LAT.md regel 9). De namen staan
+     alleen in de melding. */
+  assert.ok(gemist.length <= GEMIST_MAX,
+    gemist.length + ' routes ziet de bronscanner niet (vastgelegd: ' + GEMIST_MAX + '). ' +
+    'De eerste tien:\n  ' + gemist.slice(0, 10).join('\n  ') +
+    '\n\nOfwel de route staat op een vorm die de regex niet leest (een mount of een ' +
+    'voorvoegsel-hulpje), ofwel de bronscanner hoort op scripts/routekaart.js te ' +
+    'gaan zoals scripts/lib/routes.js dat al doet.');
+  assert.ok(spook.length <= SPOOK_MAX,
+    spook.length + ' routes noemt de bronscanner die de router niet heeft (vastgelegd: ' +
+    SPOOK_MAX + '): ' + spook.slice(0, 10).join(', '));
+});

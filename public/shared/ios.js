@@ -110,6 +110,12 @@
   function merkWegChrome(wortel) { weghalen(wortel, MERK_CHROME); }
   function merkWegPagina() { weghalen(d.body, MERK_PAGINA); }
 
+/* ======================= De iOS-laag, deel 1b: DE BALK =======================
+
+   Uit ./ios-01.js geknipt op de 10 kB-grens, en op de naad die daar al in
+   stond: deel 1 gaat over het MERK (wat er van RTG weg moet in een
+   iOS-schil), dit deel over de BALK (wat ervoor terugkomt). Ze veranderen
+   om verschillende redenen. Zie de kop van ios-01.js voor het geheel. */
   /* ------------------------------------------------------- 2. de balk */
   function isTerug(node) {
     if (!node) return false;
@@ -166,11 +172,42 @@
      overslaat, ziet een kop zonder bediening, gooit hem weg -- en gooit het
      zoekveld mee weg. De app zoekt daarna naar #zoekveld, vindt niets, en
      Berichten heeft geen zoekfunctie meer zonder dat er iets rood wordt. */
+  /* MAAR EEN KNOP IN ANDERMANS DICHTE PANEEL IS GEEN BALKACTIE, en dat is iets
+     anders dan de regel hierboven.
+
+     Het verschil zit in WIE er verborgen is. Berichten heeft een zoekveld dat
+     zelf `hidden` is tot je inlogt: dat veld is een balkactie die nog moet
+     verschijnen, en die moet meetellen. Maar de RTFoundation-balk heeft een
+     profielmenu -- een dropdown met `hidden` erop -- en daarin staan Gezin
+     beheren, Ander profiel en Gezin uitloggen. Die drie zijn geen balkacties;
+     ze horen bij de knop die dat menu opent, en die knop staat er al.
+
+     Zonder dit onderscheid tilde bouwBalk() ze uit hun eigen menu de balk in,
+     waar ze hun opmaak kwijtraakten (het menu styleert zijn eigen links) en
+     als drie blauwe onderstreepte links over de titel heen kwamen te staan. Op
+     een telefoon liepen ze gewoon van het scherm af. Dat is precies hoe het
+     eruitzag op de foto waarmee dit gemeld werd.
+
+     De regel is dus: het element zelf verborgen -> meetellen. Een VOOROUDER
+     onder de kop dicht -> overslaan, want dan zit het in een paneel dat zijn
+     eigen opener heeft. Een <dialog> die niet open is en een <details> die
+     dicht is zijn hetzelfde geval met een andere spelling. */
+  function inGeslotenPaneel(node, kop) {
+    for (var p = node.parentElement; p && p !== kop; p = p.parentElement) {
+      if (p.hasAttribute && p.hasAttribute('hidden')) return true;
+      if (p.getAttribute && p.getAttribute('aria-hidden') === 'true') return true;
+      if (p.tagName === 'DIALOG' && !p.open) return true;
+      if (p.tagName === 'DETAILS' && !p.hasAttribute('open')) return true;
+    }
+    return false;
+  }
+
   function bedienbaar(kop) {
     var kandidaten = kop.querySelectorAll('button, a[href], input, select, textarea, [role="button"], [role="tab"]');
     var uit = [];
     for (var i = 0; i < kandidaten.length; i++) {
       if (isTerug(kandidaten[i])) continue;
+      if (inGeslotenPaneel(kandidaten[i], kop)) continue;
       uit.push(kandidaten[i]);
     }
     return uit;
@@ -219,6 +256,100 @@
   function groepVan(node) {
     var p = node.parentElement;
     return (p && p.matches('.filters, .tabs, [role="group"], [role="tablist"], nav')) ? p : null;
+  }
+
+  /* DE BALK HEEFT EEN BOVENGRENS, en die stond nergens opgeschreven.
+
+     bouwBalk() hieronder verplaatst ELKE bedienbare knop naar .ios-nav-acties.
+     Dat gaat goed bij twee of drie acties en het gaat stuk bij zeven: op
+     foundation/vrienden.html stonden Samen, Rahul, de avatar, de naam, Gezin
+     beheren, Ander profiel en Gezin uitloggen naast elkaar, samen 666px in een
+     scherm van 390. De balk werd niet te vol -- de PAGINA werd te breed, en
+     alles schoof zijwaarts. De tweede rij bestond al (naarTweedeRij), maar die
+     kiest op SOORT (een zoekveld, een tabrij) en nooit op RUIMTE. Dat is het
+     gat: er was geen regel die zei hoeveel er in een balk past.
+
+     Hier is die regel, en hij MEET in plaats van te tellen. Een vaste
+     bovengrens ("hoogstens drie") is net zo fout: drie lange labels passen
+     niet en vier pictogrammen wel.
+
+     ios.css houdt daarnaast de kolom zelf krimpbaar. Die twee doen niet
+     hetzelfde: het blad garandeert dat de pagina niet meer verbreedt, deze
+     functie zorgt dat de acties daarbij leesbaar blijven in plaats van
+     samengeperst. Zonder het blad schuift de pagina; zonder deze functie
+     staan er zeven knoppen op de ruimte van drie.
+
+     Twee dingen blijven altijd staan. De menuknop van appmenu.js (.amn-knop),
+     want dat is de uitweg zelf -- die wegzetten is de deur achter je
+     dichttrekken. En de terugknop, die staat in kolom 1 en komt hier niet
+     langs.
+
+     Wat naar beneden gaat is niet weg: appmenu.js leest .ios-nav-extra al even
+     goed als .ios-nav-acties (zie uitKnoppen daar), dus een uitgeweken actie
+     staat nog steeds in het menu. En de weg terug is er ook: wordt het venster
+     breder, dan gaat alles eerst terug naar de balk en meet hij opnieuw. */
+  var UITGEWEKEN = 'data-ios-uitgeweken';
+
+  function overloopVak(kop) {
+    var extra = kop.querySelector('.ios-nav-extra');
+    if (!extra) {
+      extra = el('div', 'ios-nav-extra');
+      var eersteRij = kop.querySelector('.ios-nav-rij');
+      kop.insertBefore(extra, eersteRij ? eersteRij.nextSibling : kop.firstChild);
+    }
+    var vak = extra.querySelector('.ios-nav-overloop');
+    if (!vak) { vak = el('div', 'ios-nav-overloop'); extra.appendChild(vak); }
+    return vak;
+  }
+
+  function pasActiesIn(kop) {
+    var acties = kop.querySelector('.ios-nav-acties');
+    if (!acties) return;
+
+    /* Eerst alles terug. Anders zakt de balk bij elke resize verder leeg: hij
+       zou wel kunnen uitplaatsen en nooit meer terughalen. */
+    var terug = kop.querySelectorAll('[' + UITGEWEKEN + ']');
+    for (var i = terug.length - 1; i >= 0; i--) {
+      terug[i].removeAttribute(UITGEWEKEN);
+      acties.appendChild(terug[i]);
+    }
+
+    /* HET BUDGET. Meten op overloop alleen is niet genoeg, en dat bleek pas op
+       een echte telefoon. De balk van vrienden.html liep namelijk NIET over:
+       de kolommen kregen 82 + 11 + 264 op 390 en pasten precies. Maar die 11
+       is de titelkolom, tot een streep geknepen, en de acties namen 68% van de
+       balk. Technisch klopte alles; het zag eruit alsof er zes dingen over
+       elkaar heen stonden, en dat was de melding.
+
+       Een navigatiebalk is navigatie en geen werkbalk. Meer dan 45% aan acties
+       betekent dat er geen balk meer is maar een rij knoppen met een pijl
+       ervoor. Vandaar twee voorwaarden: hij wijkt uit als het NIET PAST, en
+       ook als het wel past maar te vol staat. */
+    var BUDGET = 0.45;
+    var rij = acties.parentElement;
+    function teVol() {
+      if (acties.scrollWidth > acties.clientWidth + 1) return true;
+      if (!rij || !rij.clientWidth) return false;
+      return acties.getBoundingClientRect().width > rij.clientWidth * BUDGET;
+    }
+
+    var vak = null, rem = 40;
+    while (teVol() && rem--) {
+      var kandidaat = null;
+      for (var j = acties.children.length - 1; j >= 0; j--) {
+        var k = acties.children[j];
+        if (k.className && String(k.className).indexOf('amn-knop') >= 0) continue;
+        kandidaat = k; break;
+      }
+      if (!kandidaat) break;
+      if (!vak) vak = overloopVak(kop);
+      kandidaat.setAttribute(UITGEWEKEN, '');
+      vak.insertBefore(kandidaat, vak.firstChild);
+    }
+
+    /* Een lege wikkel is het behang waar dit bestand elders vanaf wil. */
+    var oud = kop.querySelector('.ios-nav-overloop');
+    if (oud && !oud.children.length) oud.remove();
   }
 
   function bouwBalk(kop) {
@@ -457,7 +588,7 @@
       'width:150px;min-width:24px;height:24px;min-height:24px;' +
       'background:none;border:0;padding:0;cursor:pointer;display:flex;' +
       'align-items:center;justify-content:center;touch-action:none;}' +
-      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:2.5px;' +
+      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:0;' +
       'background:rgba(244,241,236,.55);}';
     (document.head || document.documentElement).appendChild(st);
   }
@@ -475,8 +606,17 @@
     if (document.getElementById('rtg-ios-acties-basis')) return;
     var st = document.createElement('style');
     st.id = 'rtg-ios-acties-basis';
+    /* 24 voor de werkbalk, 44 voor de aangewezen hoofdhandeling. Die tweede
+       regel moet HIER staan en niet alleen in shared/rtg-ui.css: dit blad wordt
+       bij het laden aan <head> geplakt, dus het komt na de bundel EN
+       `.ios-nav-acties > *` (0,1,1) is zwaarder dan `[data-hoofdactie]` (0,1,0).
+       Zonder deze regel won de balkgrens van de duimgrens en stond "Ga online"
+       op /apps/sitemaker.html op 26,6 hoog terwijl rtg-ui.css 44 voorschreef --
+       een uur zoeken, want in de CSSOM matchte geen enkele regel: dit blad
+       bestaat alleen op de pagina. */
     st.textContent = '.ios-nav-acties > *{min-width:24px;min-height:24px;box-sizing:border-box;' +
-      'display:inline-flex;align-items:center;justify-content:center;}';
+      'display:inline-flex;align-items:center;justify-content:center;}' +
+      '.ios-nav-acties > [data-hoofdactie]{min-width:44px;min-height:44px;}';
     (document.head || document.documentElement).appendChild(st);
   }
 
@@ -598,7 +738,15 @@
   merkWegPagina();
 
   var kop = d.querySelector('body > header');
-  if (kop && !isThuis) bouwBalk(kop);
+  if (kop && !isThuis) {
+    bouwBalk(kop);
+    /* Pas inmeten als de balk er echt staat -- en na deze tik, want de
+       menuknop van appmenu.js komt verderop in dit bestand pas binnen en
+       telt mee in de breedte. */
+    var meetIn = function () { try { pasActiesIn(kop); } catch (e) {} };
+    if (w.requestAnimationFrame) w.requestAnimationFrame(meetIn); else meetIn();
+    w.addEventListener('resize', meetIn);
+  }
 
   /* In een split-paneel (shared/split.js zet de app in een iframe naast een
      andere) hoort GEEN home-indicator: die van het scherm eromheen is de

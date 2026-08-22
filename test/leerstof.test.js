@@ -2,7 +2,7 @@
    met een les, de oefensessie is server-authoritatief (antwoorden staan
    nooit in de vraag), een behaald doel komt in het leerpaspoort, en er
    zijn bewust geen scores, reeksen of ranglijsten buiten de sessie.
-   Draai los: node --experimental-sqlite --test test/leerstof.test.js */
+   Draai los: node --test test/leerstof.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -90,7 +90,14 @@ test('3. fouten zijn gewoon oefening: geen behaald, wel een vriendelijk advies, 
   for (let i = 0; i < 5; i++) r = await api('/leerstof/antwoord', { antwoord: 'nee hoor' });
   assert.equal(r.body.klaar, true);
   assert.equal(r.body.behaald, false);
-  assert.match(r.body.advies, /oefening|opnieuw/i, 'de toon blijft vriendelijk');
+  /* Het advies wees vroeger altijd naar "lees de les nog eens". Sinds de
+     Learning Fabric wijst het liever naar de VOORKENNIS die nog openstaat --
+     dat is hetzelfde vriendelijke antwoord, maar dan een dat ergens heen wijst.
+     Wat niet mag veranderen: geen verwijt, geen score, geen wedstrijd. */
+  assert.match(r.body.advies, /oefening|opnieuw|open|uitleg/i, 'de toon blijft vriendelijk en wijst ergens heen');
+  assert.doesNotMatch(r.body.advies, /fout|slecht|jammer|helaas/i, 'een fout is geen verwijt');
+  assert.ok(Array.isArray(r.body.ontbreekt), 'het antwoord noemt wat er onder dit doel nog openstaat');
+  assert.ok(r.body.ontbreekt.every(x => x.behaald === false), 'alleen wat nog niet af is');
   const alles = JSON.stringify(r.body) + JSON.stringify((await api('/onderwijs/mijn')).body);
   assert.doesNotMatch(alles, /reeks|streak|ranglijst|score/i, 'leren is geen wedstrijd');
   assert.doesNotMatch(alles, /Rekenwonder/, 'en het draait op de codenaam');

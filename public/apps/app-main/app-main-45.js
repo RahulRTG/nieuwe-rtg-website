@@ -21,6 +21,23 @@
   /* ---------- reizen ---------- */
 
   function renderTrip(){
+    /* Nog geen reis: dan staat hier wat een reisoverzicht IS en hoe het ontstaat.
+       Een nieuw account begint leeg en erft de demo-reis niet meer. */
+    if (!trip){
+      $('#tripSub').textContent = T('app.trip.emptysub','Uw reisoverzicht is nog leeg.');
+      const uitleg = (k, kop, tekst) =>
+        '<div class="rowitem"><div class="t"><b>' + T('app.trip.' + k, kop) + '</b><span>' +
+          T('app.trip.' + k + 's', tekst) + '</span></div></div>';
+      $('#tripList').innerHTML =
+        uitleg('e1', 'Vlucht, verblijf en transfer',
+          'Alles wat RTG aanvraagt komt hier per dag onder elkaar te staan, met de status erbij.') +
+        uitleg('e2', 'Wat nog niet vaststaat',
+          'Een aanvraag blijft een aanvraag tot de partner ja zegt. RTG bevestigt niets namens hen.') +
+        uitleg('e3', 'Beginnen doe je bij het reisbureau',
+          'Vraag daar een reis aan; vanaf dat moment staat hij hier, en Rahul denkt mee over de rest.');
+      renderAgenda();
+      return;
+    }
     $('#tripSub').textContent = trip.dest + ' · ' + trip.dates + ' · ' + T('app.in','over') + ' ' + trip.days + ' ' + T('app.days','dagen');
     $('#tripList').innerHTML = trip.items.map(it =>
       '<div class="rowitem">' +
@@ -47,7 +64,7 @@
     const dagNaam = d => new Date(d + 'T12:00:00').toLocaleDateString(lang() === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
     wrap.innerHTML = '<div class="sec-label h-mt120">' + T('erv.agenda','Mijn programma') + '</div>' +
       dagen.map(d =>
-        '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
+        '<div style="font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0.7rem 0 0.35rem;">' + dagNaam(d.datum) + '</div>' +
         d.items.map(it =>
           '<div class="rowitem"><div class="t"><b>' + (AGENDA_ICO[it.soort] || '·') + ' ' + it.titel + '</b><span>' + (it.tijd || T('erv.heledag','hele dag')) + ' · ' + tStatus(it.status) + '</span></div></div>'
         ).join('')
@@ -75,7 +92,7 @@
       for (const inv of targets){
         inv.status = 'paid'; inv.date = 'Zojuist betaald';
         foundation += Math.round(inv.bijdrage * 0.3);
-        for (const t of trip.items) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
+        for (const t of (trip ? trip.items : [])) if (t.invoiceId === inv.id){ t.status = 'paid'; t.label = 'Bevestigd'; }
       }
     }
     return foundation;
@@ -130,12 +147,12 @@
     }
     const munten = (muntOpties && muntOpties.munten) || [];
     const naam = { btc:'Bitcoin', eth:'Ethereum', usdc:'USD Coin', usdt:'Tether' };
-    ov.innerHTML = '<div style="width:100%;max-width:460px;background:var(--bg);border-radius:20px 20px 0 0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
+    ov.innerHTML = '<div style="width:100%;max-width:460px;background:var(--bg);border-radius:0;border:1px solid var(--line);padding:1.1rem 1.2rem 1.4rem;">' +
       '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;"><b style="font-size:1rem;">◈ ' + escT(cfg.titel || T('munt.title','Betaal met munten')) + '</b>' +
         '<button id="muntX" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button></div>' +
       '<div style="font-size:0.78rem;color:var(--soft);margin-bottom:0.8rem;">' + T('munt.bedrag','Te betalen') + ': <b style="color:var(--txt);">' + eur(cfg.euro) + '</b>. ' + T('munt.omzet','RTG zet uw munten meteen om naar euro.') + '</div>' +
       '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.2rem;">' +
-        munten.map(m => '<button class="js-muntpick" data-munt="' + m.munt + '" style="flex:1;min-width:5rem;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:0.6rem;font-family:inherit;cursor:pointer;"><b style="text-transform:uppercase;">' + m.munt + '</b><br><span style="font-size:0.62rem;color:var(--soft);">' + (naam[m.munt] || m.munt) + '</span></button>').join('') +
+        munten.map(m => '<button class="js-muntpick" data-munt="' + m.munt + '" style="flex:1;min-width:5rem;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:0;padding:0.6rem;font-family:inherit;cursor:pointer;"><b style="text-transform:uppercase;">' + m.munt + '</b><br><span style="font-size:0.62rem;color:var(--soft);">' + (naam[m.munt] || m.munt) + '</span></button>').join('') +
       '</div>' +
       '<div id="muntDetail"></div></div>';
     ov.querySelector('#muntX').addEventListener('click', () => { muntStop(); ov.remove(); });

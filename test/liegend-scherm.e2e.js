@@ -48,14 +48,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const { vindKlachten, vergelijk } = require('../scripts/lib/schermleugen');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 const WORTEL = path.join(__dirname, '..');
 const SCHULD = path.join(WORTEL, 'SCHERMLEUGEN.json');
@@ -104,7 +100,7 @@ const zichtbareTekst = (page) => page.evaluate(() => {
 });
 
 test('geen scherm liegt als de backend leeg antwoordt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-liegscherm-'));
   const { child, base } = await startServer({ env: {
     SMTP_URL: '', RTG_DATA_DIR: TMP,
@@ -121,7 +117,7 @@ test('geen scherm liegt als de backend leeg antwoordt',
     }).then(r => r.json());
     assert.ok(reg && reg.token, 'de deur mag niet liegen, anders meet deze toets de inlog');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     for (const scherm of SCHERMEN) {
       const klachten = [];
@@ -177,4 +173,26 @@ test('geen scherm liegt als de backend leeg antwoordt',
   assert.deepEqual(opgelost, [],
     'dit staat als schuld opgeschreven maar gebeurt niet meer -- haal het uit ' +
     'SCHERMLEUGEN.json, anders beschermt de ratel een gat dat dicht is');
+
+  /* ---- HET STEMPEL: WANNEER IS DIT GEMETEN, EN TEGEN WELKE CODE ----
+
+     SCHERMLEUGEN.json was het laatste register zonder stempel, en dat is geen
+     detail: een verouderd register ziet er identiek uit aan een verse, en
+     getallen worden geloofd (scripts/versheid.js). Hier is het bovendien
+     lastiger dan elders, want dit register wordt niet door een script gevuld
+     maar door DEZE toets -- en een toets die bij elke run een gevolgde bestand
+     herschrijft, maakt van `npm test` een vieze werkboom.
+
+     Vandaar RTG_VASTLEGGEN. De e2e-ronde (npm run e2e) zet hem, want dat IS de
+     meetronde; wie dit bestand los draait om iets na te kijken, laat de boom
+     met rust. Zonder de vlag verandert er niets -- ook niet als de meting
+     precies hetzelfde uitvalt. */
+  if (process.env.RTG_VASTLEGGEN === '1') {
+    const { stempel } = require('../scripts/lib/stempel');
+    const bij = Object.assign({}, schuld, { stempel: stempel(),
+      gemeten: { schermen: SCHERMEN.length,
+        metKlacht: Object.keys(gevonden).length,
+        klachten: Object.values(gevonden).reduce((a, v) => a + v.length, 0) } });
+    fs.writeFileSync(SCHULD, JSON.stringify(bij, null, 2) + '\n');
+  }
 });

@@ -8,7 +8,7 @@
    op zijn spelersindex te kijken -- en een kijker heeft geen index, dus die
    zou hem juist wel zien. Nagemeten, niet aangenomen.
 
-   Draai los: node --experimental-sqlite --test test/spelkijken.test.js */
+   Draai los: node --test test/spelkijken.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

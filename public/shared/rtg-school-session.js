@@ -66,12 +66,12 @@
       var stijl = document.createElement('style'); stijl.id = 'rtf-school-stijl';
       stijl.textContent = 'html.rtf-school-dicht body>*:not(#rtf-school-slot){visibility:hidden!important}' +
         'html.rtf-school-dicht #rtf-school-slot{visibility:visible!important}' +
-        '#rtf-school-slot .rtf-school-kaart{width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:18px;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)}' +
+        '#rtf-school-slot .rtf-school-kaart{width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:0;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)}' +
         '#rtf-school-slot .rtf-school-merk{font:600 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#c9a24b}' +
         '#rtf-school-slot h1{font:500 1.75rem/1.15 Georgia,serif;margin:.55rem 0}' +
         '#rtf-school-slot p{color:#bdb8ad;line-height:1.55;margin:0 0 1rem}' +
         '#rtf-school-slot .rtf-school-acties{display:flex;gap:.5rem;flex-wrap:wrap}' +
-        '#rtf-school-slot a{display:inline-flex;padding:.65rem .85rem;border-radius:10px;text-decoration:none}' +
+        '#rtf-school-slot a{display:inline-flex;padding:.65rem .85rem;border-radius:0;text-decoration:none}' +
         '#rtf-school-slot [data-school-open]{background:#f6f1e7;color:#111;font-weight:700}' +
         '#rtf-school-slot [data-school-uitweg]{border:1px solid #4a463d;color:#f6f1e7}';
       (document.head || document.documentElement).appendChild(stijl);

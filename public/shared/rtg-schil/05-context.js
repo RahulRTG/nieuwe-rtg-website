@@ -82,4 +82,41 @@
       });
       tab.querySelector('.rtg-tab-sluit').addEventListener('click', function () { sluit(tab.dataset.id); });
     });
+    tekenOnderbalk();
+  }
+
+  /* De onderbalk is de korte, contextvaste route door de software. Hij kent
+     alleen app-id's en opent dezelfde surfaces als de linkerbank; er ontstaat
+     dus geen tweede administratie of afwijkende mobiele app. */
+  function tekenOnderbalk() {
+    if (!schil.onderbalk) return;
+    var ids = (schil.dockApps.length ? schil.dockApps : schil.apps.slice(0, 4).map(function (a) { return a.id; }));
+    var eerste = schil.apps[0];
+    var apps = ids.map(function (id) {
+      return schil.apps.find(function (a) { return a.id === id; });
+    }).filter(function (a) { return a && (!eerste || a.id !== eerste.id); });
+    function knop(a) {
+      var actief = schil.actief && schil.actief.id === a.id;
+      return '<button type="button" class="rtg-onder-app" data-dock-open="' + esc(a.id) + '"' +
+        (actief ? ' aria-current="page"' : '') + '>' +
+        '<span class="rtg-onder-code" aria-hidden="true">' + esc(a.kort || a.naam.slice(0, 2).toUpperCase()) + '</span>' +
+        '<span class="rtg-onder-label">' + esc(a.naam) + '</span></button>';
+    }
+    schil.onderbalk.innerHTML = (eerste
+      ? '<button type="button" class="rtg-onder-thuis" data-dock-open="' + esc(eerste.id) + '"' +
+        (schil.actief && schil.actief.id === eerste.id ? ' aria-current="page"' : '') +
+        '><span class="rtg-onder-code" aria-hidden="true">01</span><span class="rtg-onder-label">Home</span></button>'
+      : '') + apps.map(knop).join('') +
+      '<span class="rtg-onder-rek"></span><button type="button" class="rtg-onder-zoek" data-dock-zoek>' +
+      '<span class="rtg-onder-code" aria-hidden="true">⌘K</span><span class="rtg-onder-label">Zoeken</span></button>';
+    schil.onderbalk.querySelectorAll('[data-dock-open]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var a = schil.apps.find(function (x) { return x.id === b.dataset.dockOpen; });
+        if (a) open(a.id, { naam: a.naam, url: a.url, kort: a.naam });
+      });
+    });
+    var zoek = schil.onderbalk.querySelector('[data-dock-zoek]');
+    if (zoek) zoek.addEventListener('click', function () {
+      schil.vak.dispatchEvent(new CustomEvent('rtg-palet-open', { bubbles: true }));
+    });
   }

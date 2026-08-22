@@ -28,13 +28,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scherm-e2e-'));
 
 const raw = (base, pad, body, tok) => fetch(base + '/api' + pad, { method: 'POST',
@@ -66,7 +62,7 @@ async function bevriend(base, a, b) {
 const api = (base, token, actie, body) => json(base, '/member/spel/' + actie, body, token);
 
 test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de kaart',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -93,7 +89,7 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
 
     /* Het scherm. GEEN token, geen sessie, geen enkele opslag -- alleen de code.
        Dat is precies wat een televisie in een vakantiehuis heeft. */
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

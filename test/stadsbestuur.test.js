@@ -23,7 +23,7 @@
 
    Zonder de mutaties waren die vier gewoon als geslaagde toetsen blijven staan.
 
-   Draai los: node --experimental-sqlite --test test/stadsbestuur.test.js */
+   Draai los: node --test test/stadsbestuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -338,6 +338,18 @@ test('het algoritmeregister is openbaar, leest zijn niveaus uit de code en noemt
   }
   assert.match(open.geenProfilering, /oordeel over een persoon/);
   assert.equal(open.niveaus.length, 5, 'de vijf niveaus staan erbij');
+
+  /* HETZELFDE REGISTER VIA POST. routes/stad.js hangt beide werkwoorden op --
+     de app praat met POST, een openbaar register hoort ook met een gewone GET
+     te openen -- maar de POST was nooit aangeroepen: de dekkingsmeting telde per
+     PAD en de GET hierboven zette hem gratis op groen. Sinds ze per METHODE
+     telt, valt dat op. De bewering is de belofte en niet de statuscode: hetzelfde
+     register, langs welk werkwoord je ook binnenkomt. */
+  const viaPost = await fetch(base + '/api/stad/algoritmes',
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    .then(async r => ({ status: r.status, body: await r.json() }));
+  assert.equal(viaPost.status, 200, 'het register antwoordt ook op POST');
+  assert.deepEqual(viaPost.body, open, 'en geeft precies hetzelfde register');
 
   // en de niveaus komen uit de code: niveau 4 gaat nooit vanzelf
   /* De niveaus komen uit de code. Let op waar de assertie op staat: alleen

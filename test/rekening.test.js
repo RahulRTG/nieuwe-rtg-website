@@ -4,10 +4,10 @@
    fooi over het geheel. Getoetst: /api/rekening telt de open bonnen op, en
    /api/rekening/betaal zet ze allemaal op betaald met de fooi op de rekening.
    Aan-de-balie-bonnen tellen niet mee (die gaan langs de kassa).
-   Draai los: node --experimental-sqlite --test test/rekening.test.js */
+   Draai los: node --test test/rekening.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rek-')); }
@@ -18,10 +18,14 @@ async function api(base, pad, body, token) {
 }
 async function registreer(base) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  return (await api(base, '/api/auth/register', {
+  const r = (await api(base, '/api/auth/register', {
     name: 'Rekening Lid', email: u + '@x.nl', phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
-  })).body.token;
+  })).body;
+  // achteraf betalen geldt alleen voor een volwassene, en volwassen is pas
+  // volwassen als het paspoort dat zegt -- dus keuren we het lid hier goed.
+  await keurLidGoed(base, r.token, r.state.user.codename, '1990-01-01');
+  return r.token;
 }
 async function eersteItem(base, token, code) {
   const kaart = (await api(base, '/api/supplier/menu/get', { code }, token)).body;

@@ -10,6 +10,8 @@
 
    `naam(req)` komt uit ./bank.js mee via de context: wie er handelt komt uit de
    sessie, nooit uit req.body. Zie de toelichting daar. */
+const { KANTOOR } = require('../../kern/bank/eigendom');
+
 module.exports = (ctx) => {
   const { app, officeAuth, veilig, afdelingen, sseToOffice, kern, naam } = ctx;
   const bank = kern.bank;
@@ -27,7 +29,10 @@ module.exports = (ctx) => {
     return r;
   }));
   app.post('/api/office/bank/rekening/bevries', officeAuth, (req, res) => veilig(res, () => {
-    const r = bank.rekeningBevries(String(req.body.iban || ''), req.body.aan === true);
+    /* KANTOOR en geen lege plek. Deze aanroep leunde erop dat een ONTBREKENDE
+       codenaam de eigendomscontrole oversloeg; dat is nu geen vrijbrief meer
+       (zie server/kern/bank/eigendom.js). Het kantoor zegt voortaan wie het is. */
+    const r = bank.rekeningBevries(String(req.body.iban || ''), req.body.aan === true, KANTOOR);
     if (r.ok) { afdelingen.audit(naam(req), 'Rekening ' + r.iban + ' ' + (r.bevroren ? 'bevroren' : 'ontdooid')); sync(); }
     return r;
   }));
@@ -93,7 +98,8 @@ module.exports = (ctx) => {
     if (!bestand.posten.length) { veilig(res, () => ({ status: 400, error: 'Niemand met een netto bedrag om uit te betalen.' })); return; }
 
     const posten = bestand.posten.map(p => ({ naarIban: p.iban, centen: p.centen, oms: 'Salaris ' + run.periode }));
-    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten });
+    // zelfde reden als hierboven: het kantoor maakt zich kenbaar
+    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten, codenaam: KANTOOR });
     veilig(res, () => {
       if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + run.code + ' (' + run.periode + ') uit loonrun ' + run.id + ': ' +
         r.geboekt + ' netto loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }

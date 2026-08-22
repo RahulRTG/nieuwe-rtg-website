@@ -6,8 +6,26 @@
    ingeperkt. Elke ingang die iets van buiten aanneemt -- de maker, de
    AI-assistent, een sjabloon, een extra pagina -- loopt hier langs, en dat is
    precies de reden om het op EEN plek te houden. */
-module.exports = ({ scho, crypto }) => {
-  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata', 'formulier', 'faq', 'prijzen'];
+module.exports = ({ scho, crypto, types }) => {
+  const ALLE_TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata', 'formulier', 'faq', 'prijzen'];
+  /* EEN AANROEPER MAG DE LIJST VERSMALLEN, NOOIT VERBREDEN.
+
+     De kop hierboven zegt dat elke ingang die iets van buiten aanneemt hier
+     langsloopt, "en dat is precies de reden om het op EEN plek te houden".
+     server/kern/atelierweb.js deed dat niet: die had een eigen kopie van
+     schoonBlok en schoonVolgorde voor tien van deze veertien types -- teken
+     voor teken dezelfde grenzen, dezelfde volgorde, dezelfde verberg- en
+     variantenafhandeling. Twee kopieen van een schoonmaker is de gevaarlijkste
+     vorm van LAT.md regel 4: scherp je hier een grens aan, dan blijft de andere
+     ingang de oude, ruimere versie gebruiken, en niets klaagt.
+
+     Het Atelier kent alleen de eerste tien blokken (geen zaakdata, formulier,
+     faq of prijzen), dus geeft het die tien mee. De FILTER is er met opzet: hij
+     laat een aanroeper kiezen uit wat hier bestaat en nooit een type
+     TOEVOEGEN. Een naam die hier niet in staat heeft ook geen schoonmaakregel,
+     en zou dus als 'tekst' worden afgehandeld terwijl hij anders heet -- een
+     blok dat er doorheen glipt met een tak die niemand heeft geschreven. */
+  const TYPES = Array.isArray(types) && types.length ? ALLE_TYPES.filter(t => types.includes(t)) : ALLE_TYPES;
   // de bronnen die een live zaakdata-blok mag aanwijzen (opgelost in kern/webplatform.js)
   const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'salon', 'reviews', 'contact'];
   const RIJ_MAX = 12;   // hoeveel vragen of prijsregels een blok mag dragen

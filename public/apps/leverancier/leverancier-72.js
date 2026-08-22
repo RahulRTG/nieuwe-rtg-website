@@ -66,13 +66,14 @@
           : T('bh.luchtuit','Uit: de zaak staat niet op een luchthaven'), !!st.luchtzijde) +
       (st.luchtzijde ? '<div class="tt-add"><input id="bhLuchtPct" type="number" min="0" max="100" inputmode="numeric" value="'+(st.luchtToeslagPct==null?15:st.luchtToeslagPct)+'" style="width:6rem;"><button id="bhLuchtPctZet">'+T('bh.pctzet','Toeslag % opslaan')+'</button></div>' : '')+
       '<div class="note-soft">'+T('bh.note','Dicht = leden kunnen direct niet meer bestellen of reserveren; de kaart blijft zichtbaar. Alles wordt gelogd.')+'</div></div>'+
+      kaartGeschikt() +
       '<div class="card"><div class="tt-h">'+T('bh.more','Verder beheren')+'</div>'+
       '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);line-height:1.7;">'+T('bh.tips','Menukaart bewerken doet u onder Menu. Tafels onder Tafels. Kamers en prijzen onder Kamers. Personeel en pincodes onder Team.')+'</div></div>'+
       '<div class="card"><div class="tt-h">Magnaat Partnerstudio</div><div class="note-soft">Bouw een veilige digitale tweeling van uw echte bedrijf en train personeel zonder echt geld, klantdata of productieacties.</div><div class="tt-add"><a class="obtn primary" href="/apps/magnaat-partnerstudio.html">Open Partnerstudio</a></div></div>'+
       '<div class="card"><div class="tt-h">'+T('ug.h','Officiele documentatie overschrijven')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">'+T('ug.sub','Met een druk op de knop naar uw oude apparatuur of een harde schijf, altijd achter het vier- of zes-ogenprincipe: 4 ogen = twee collega\'s tekenen, 6 ogen = drie. De bundel komt een keer vrij; daarna start u een nieuwe uitgifte.')+'</div>'+
-      '<div class="tt-add h-wrap"><select id="ugBron" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"></select>'+
-      '<select id="ugOgen" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="4">4 ogen (2 pers.)</option><option value="6">6 ogen (3 pers.)</option></select>'+
+      '<div class="tt-add h-wrap"><select id="ugBron" style="background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"></select>'+
+      '<select id="ugOgen" style="background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"><option value="4">4 ogen (2 pers.)</option><option value="6">6 ogen (3 pers.)</option></select>'+
       '<input id="ugDoel" placeholder="'+T('ug.doel','Doel, bijv. harde schijf archief')+'" style="flex:1;min-width:110px;">'+
       '<button id="ugStart">'+T('ug.start','Start uitgifte')+'</button></div>'+
       '<div id="ugLijst"></div></div>';
@@ -80,6 +81,7 @@
     el.querySelectorAll('[data-set]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/settings', { [b.dataset.set]: b.dataset.val === 'true' }); toast(T('bh.saved','Opgeslagen, leden zien het direct.')); await refresh(); openTab('beheer'); } catch(e){ toast(e.message); }
     }));
+    koppelGeschikt(el, async () => { await refresh(); openTab('beheer'); });
     const lp = $('#bhLuchtPctZet'); if (lp) lp.addEventListener('click', async () => {
       try { await API.call('/supplier/settings', { luchtToeslagPct: Number($('#bhLuchtPct').value) }); toast(T('bh.saved','Opgeslagen, leden zien het direct.')); await refresh(); openTab('beheer'); } catch(e){ toast(e.message); }
     });

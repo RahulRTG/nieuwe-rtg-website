@@ -16,11 +16,11 @@
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
   header h1{font-size:1.25rem;margin-top:.1rem;}
   main{padding:1rem;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.95rem 1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.95rem 1rem;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.4rem;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .veld{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
+  .veld{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;font-size:.74rem;padding:.3rem .65rem;}
   .item{border-bottom:1px solid var(--line);padding:.5rem 0;font-size:.86rem;line-height:1.5;}
   .kpi{font-size:.74rem;color:var(--soft);}
@@ -36,7 +36,7 @@
   <div class="kaart" id="poort">
     <div class="sec">Toegang voor de stadspartner</div>
     <p class="noot" style="margin-bottom:.6rem;">Elke stad waar wij aanwezig zijn heeft een invloedrijke partner -- een foundation, club of instelling. Met uw raadcode zit u aan tafel in het gezamenlijke foundation-kantoor en beslist u samen met RTG-personeel over de lab-uitslagen van het onderzoek.</p>
-    <div class="rij"><input class="veld" id="code" placeholder="RAAD-XXXXXX" autocomplete="off"><button class="knop" id="open">Naar de raadstafel</button></div>
+    <div class="rij"><input class="veld" id="code" placeholder="RAAD-XXXXXX" autocomplete="off"><button class="knop hoofd" id="open" data-hoofdactie>Naar de raadstafel</button></div>
     <div class="fout" id="fout" hidden></div>
   </div>
   <div id="raad" hidden></div>
@@ -120,5 +120,6 @@ if (CODE) { $('#code').value = CODE; laad(); }
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
 </body>
 </html>

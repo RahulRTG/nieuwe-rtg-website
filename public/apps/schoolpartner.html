@@ -20,41 +20,41 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 92%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:760px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0 0 .5rem;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
   /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
      2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
   .stil > a{display:inline-block;padding:.25rem 0;min-height:24px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}
-  .knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.5rem .85rem;cursor:pointer;}
   .knop.p{background:var(--burgundy);border-color:transparent;color:#fff;}
   .knop:hover{border-color:var(--gold);}
   .knop:focus-visible,.veld:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.55rem;margin-bottom:.8rem;}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;}
   .kpi b{display:block;font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:500;}
   .kpi span{font-size:.68rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
   .item{display:flex;gap:.6rem;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:.55rem 0;flex-wrap:wrap;}
   .item:first-of-type{border-top:0;}
-  .tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
+  .tag{font-size:.66rem;border:1px solid var(--line);border-radius:0;padding:.12rem .5rem;color:var(--muted);}
   .tag.aan{color:var(--goed);border-color:var(--goed);}
   .doelkies{display:flex;flex-wrap:wrap;gap:.35rem;margin:.5rem 0;}
-  .doelkies label{border:1px solid var(--line);border-radius:999px;padding:.28rem .6rem;font-size:.74rem;cursor:pointer;display:inline-flex;gap:.3rem;align-items:center;}
+  .doelkies label{border:1px solid var(--line);border-radius:0;padding:.28rem .6rem;font-size:.74rem;cursor:pointer;display:inline-flex;gap:.3rem;align-items:center;}
   .doelkies input{accent-color:var(--burgundy);}
   .doelkies label:has(:checked){border-color:var(--burgundy);color:#fff;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;}
   .melding.zie{opacity:1;}
   /* markeringen voor het deelmenu: ze bundelen de kaarten van de werkbank tot
@@ -100,14 +100,25 @@
       </div>
       <div class="enterprise-belofte"><b>Veilig per rol</b>Je sessie is tijdelijk. Rechten worden bij ieder verzoek opnieuw door de server gecontroleerd en gevoelige inzage komt in het journaal.</div>
     </section>
+    <div class="kaart" id="linkBevestiging" hidden aria-live="polite"></div>
     <div class="poort-grid">
       <div class="kaart">
-        <div class="kop">Open jouw werkruimte</div>
-        <div class="school-rolkop"><span class="school-avatar">S</span><div><strong>Beveiligde schooltoegang</strong><span>De sleutel blijft alleen in deze tabsessie</span></div></div>
+        <div class="kop">Stuur mij een inloglink</div>
+        <div class="school-rolkop"><span class="school-avatar">S</span><div><strong>Persoonlijke schooltoegang</strong><span>Alleen naar het eerder gecontroleerde schoolmailadres</span></div></div>
+        <div class="rij">
+          <input class="veld" id="mailCode" placeholder="Schoolcode" autocapitalize="characters" autocomplete="organization" spellcheck="false" aria-label="Schoolcode">
+          <input class="veld" id="mailAdres" placeholder="Jouw schoolmail" type="email" autocomplete="email" spellcheck="false" aria-label="Schoolmailadres">
+          <button class="knop p" id="mailGa" type="button">Stuur eenmalige link</button>
+        </div>
+        <div class="school-veiligheidsrij"><span><b>15 minuten</b>De link verloopt snel en werkt één keer.</span><span><b>Tijdelijk</b>Sluit de tab en de sessie verdwijnt.</span><span><b>Privé</b>Een onbekend adres krijgt hetzelfde neutrale antwoord.</span></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Directie of bestaande toegangssleutel</div>
+        <p class="stil">De directie opent hiermee de school na de gecontroleerde activatie. Bestaande personeelssleutels blijven bruikbaar tijdens de overgang.</p>
         <div class="rij">
           <input class="veld" id="inCode" placeholder="Schoolcode" autocapitalize="characters" autocomplete="organization" spellcheck="false" aria-label="Schoolcode">
           <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false" aria-label="Persoonlijke toegangssleutel">
-          <button class="knop p" id="inGa" type="button">Veilig openen</button>
+          <button class="knop" id="inGa" type="button">Veilig openen</button>
         </div>
         <div class="school-veiligheidsrij"><span><b>Tijdelijk</b>Sluit de tab en de sleutel verdwijnt.</span><span><b>Rolgestuurd</b>Alleen jouw bevoegdheden worden geladen.</span><span><b>Controleerbaar</b>Gevoelige inzage wordt gelogd.</span></div>
       </div>
@@ -115,7 +126,7 @@
         <div class="kop">Nieuwe school of collega?</div>
         <p class="stil">Een school wordt eerst door RTG gecontroleerd. Daarna laat de directie iedere collega persoonlijk toe.</p>
         <div class="poort-stappen"><div class="poort-stap"><b><i>01</i>Aanmelden</b>De school vraagt toegang aan.</div><div class="poort-stap"><b><i>02</i>Controleren</b>RTG controleert de organisatie.</div><div class="poort-stap"><b><i>03</i>Toelaten</b>Directie geeft rollen aan medewerkers.</div></div>
-        <p class="stil h-mt80"><a href="/apps/foundation/school.html" style="color:var(--burgundy);">Start de gecontroleerde aanmeldstroom →</a></p>
+        <p class="stil h-mt80"><a class="h-witlink" href="/apps/foundation/school.html">Start de gecontroleerde aanmeldstroom →</a></p>
       </div>
     </div>
   </div>
@@ -129,6 +140,7 @@
       <div class="enterprise-belofte"><b>Beslissen met grenzen</b>Cijfervoorstellen blijven advies. Zorginzage vraagt een reden. De systeembeheerder komt niet in leerlingdossiers.</div>
     </section>
     <div class="kpis" id="dKpis" aria-live="polite"></div>
+    <div id="dUitnodigen"></div>
     <div class="enterprise-start">
       <div class="kaart">
         <div class="kop">Personeel en toelating</div>
@@ -141,7 +153,25 @@
     </div>
     <div id="dPlus"></div>
     <div id="dEnterprise"></div>
+    <div id="dDossier"></div>
+    <div id="dVeiligheid"></div>
+    <div id="dHR"></div>
+    <div id="dGeld"></div>
+    <div id="dOrganisatie"></div>
+    <div id="dOmroep"></div>
     <div id="dBeheer"></div>
+  </div>
+
+  <!-- werkruimte voor administratie, HR, zorg, gebouw en andere schoolrollen -->
+  <div id="vPersoneel" hidden>
+    <section class="enterprise-hero">
+      <div><span class="ey">Personeelswerkruimte</span><h2 id="pWelkom">Jouw werk, met jouw bevoegdheden.</h2><p>De directie bepaalt de rollen. De server controleert bij iedere handeling opnieuw wat daarbij hoort.</p>
+        <div class="enterprise-acties" id="pRollen"></div>
+      </div>
+      <div class="enterprise-belofte"><b>Minimale toegang</b>Geen algemene schooldeur: zorg, financiën, HR, administratie en veiligheid blijven afzonderlijk afgeschermd.</div>
+    </section>
+    <div id="pMail"></div>
+    <div id="pWerk"></div>
   </div>
 
   <!-- leraar-werkbank -->
@@ -152,6 +182,7 @@
       </div>
       <div class="enterprise-belofte"><b>Kindveilig ontworpen</b>Geen privékanaal tussen leraar en kind. Ouders lezen standaard mee; vertrouwelijke hulp volgt een aparte bevoegdheid.</div>
     </section>
+    <div id="lMail"></div>
     <!-- rtgdeel-vast: de klassenkiezer blijft in elk deel van het menu staan;
          zonder klas heeft de werkbank eronder geen betekenis -->
     <div class="kaart rtgdeel-vast" id="lKlassenKaart">
@@ -176,18 +207,22 @@
             <button class="knop" id="teamErbij" type="button">Vast op de klas (max 3)</button>
             <button class="knop" id="overnameStop" type="button">Overname stoppen</button>
           </div>
+          <div class="rij h-mt40">
+            <input class="veld" id="overneemCode" placeholder="Klascode van een collega" aria-label="Klascode om waar te nemen">
+            <button class="knop" id="overneem" type="button">Neem waar</button>
+          </div>
         </div>
       </div>
       <div class="deel">Toetsen</div>
       <div class="kaart">
         <div class="kop">Toets uit de leerlijn</div>
         <p class="stil">Vink leerdoelen aan, kies de vorm, klaar. Elke leerling krijgt verse opgaven; de motor kijkt na en het cijfervoorstel blijft een advies.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <select class="veld" id="tSoort" aria-label="Toetsvorm" style="flex:0 1 12rem;">
             <option value="so">SO</option><option value="proefwerk">Proefwerk</option>
             <option value="examen">Examen</option><option value="mo">MO (mondeling)</option>
           </select>
-          <select class="veld" id="tGroep" aria-label="Groep" style="flex:0 1 9rem;"></select>
+          <select class="veld h-kolom9" id="tGroep" aria-label="Groep"></select>
           <input class="veld" id="tNaam" placeholder="Naam (mag leeg)" aria-label="Naam van de toets">
         </div>
         <div class="doelkies" id="tDoelen" role="group" aria-label="Leerdoelen"></div>
@@ -200,17 +235,95 @@
         <div class="kop">Toetsen en uitslagen</div>
         <div id="tLijst"></div>
       </div>
+      <div class="kaart">
+        <div class="kop">Thuistaal per vak</div>
+        <p class="stil">Niet overal een vertaalknop. Bij een taalvak is de taal zelf wat u meet, dus staat "volledig" daar niet als keuze; bij rekenen en de zaakvakken mag de thuistaal er volledig naast.</p>
+        <div id="taalbeleidVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Ligt het aan de taal of aan de stof</div>
+        <p class="stil">Dezelfde drie vragen, eerst in het Nederlands en daarna opnieuw gesteld in de eigen taal. Gaat het dan wel goed, dan zit de taal in de weg. Dit is een aanwijzing voor een gesprek; er wordt niets vastgelegd.</p>
+        <div id="taalcheckVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Bericht aan een gezin</div>
+        <p class="stil">U ziet de vertaling en de terugvertaling, met wat er in betekenis is verschoven. Er gaat niets weg zonder uw naam, en elk bericht draagt een bon.</p>
+        <div id="berichtVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">De eerste dag</div>
+        <p class="stil">Hoogstens vijf dingen, afgeleid uit hoe het er nu voor staat. Wat af is valt weg; er wordt niet bijgehouden hoe ver u bent.</p>
+        <div id="startVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Deze klas waarnemen</div>
+        <p class="stil">De klas, wat er vandaag speelt, het materiaal met een tweede uitleg, en wat eerdere lessen erover schreven. Wat u bewust niet ziet, staat er zelf bij.</p>
+        <div id="vervangVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Waar het vandaag om vraagt</div>
+        <p class="stil">Een lijst in plaats van meldingen uit vijf hoeken: nu, voor het eind van de dag, en wat kan wachten. Er staat niets over een kind in en er wordt niet bijgehouden hoe snel u hem leeg heeft.</p>
+        <div id="aandachtVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">De les afronden</div>
+        <p class="stil">Het concept is al opgemaakt uit wat er vandaag gebeurde. U hoeft alleen te bevestigen -- en wat u noteert komt terug bij dezelfde leerstof.</p>
+        <div id="lesVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Denkpatronen in deze klas</div>
+        <p class="stil">Niet welke antwoorden fout waren, maar welk denken erachter zat -- geteld over de hele klas, zonder wie. Een patroon dat vaak langskomt vraagt om een korte klassikale uitleg.</p>
+        <div id="denkfoutVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Wat gaat er mee bij een overstap</div>
+        <p class="stil">Geen dossier maar een pakket per doel. Wat op "nooit" staat gaat ook met toestemming niet mee, en elke standaard zegt wat hij niet kan dragen. Er wordt hier niets verstuurd.</p>
+        <div id="overdrachtKaart"></div>
+        <div id="overdrachtPakket" class="h-mt60"></div>
+        <div id="overdrachtInlezen" class="h-mt60"></div>
+        <div id="overdrachtOverstap" class="h-mt60"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">De week van deze klas</div>
+        <p class="stil">Wat er op deze kinderen afkomt, ook uit andere klassen waar ze in zitten. Van elders telt alleen het aantal. Loopt een dag vol, dan scheelt verplaatsen meer dan doorwerken.</p>
+        <div id="belastingKlas"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Uw eigen week</div>
+        <p class="stil">Nakijkwerk, deadlines en toetsdagen bij elkaar, zodat u kunt schuiven. Er wordt niet bijgehouden hoe snel u het wegwerkt.</p>
+        <div id="belastingMij"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Wat meet deze toets</div>
+        <p class="stil">Kies leerdoelen en een aantal vragen; u ziet dekking, vraagvorm, overlap, tijd en taalbelasting. Er wordt niets aan uw toets veranderd -- dit is een keuring, u beslist.</p>
+        <div id="keurVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Hoe deed de toets het</div>
+        <p class="stil">Na afname krijgt de toets zelf een uitslag: per leerdoel hoe het ging en of het onderscheid maakte. Over de groep geteld, zonder leerlingen -- en onder de vijf gemaakte toetsen staat er niets.</p>
+        <div id="spiegelVorm"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Bewijs van beheersing</div>
+        <p class="stil">Een becijferde toets landt vanzelf in het leerpaspoort. Wat u ziet -- een leerling die het uitlegt of voordoet -- legt u hier vast; dat is bewijs dat geen oefensessie kan meten.</p>
+        <div id="bewijsVorm"></div>
+      </div>
       <div class="deel">Hulplijn</div>
       <div class="kaart">
         <div class="kop">De hulplijn</div>
         <p class="stil">De ene knop van het kind zelf. Acuut staat bovenaan; vertrouwelijke meldingen ziet alleen jij (de vertrouwenspersoon-route), gewone meldingen lezen de ouders mee. Pak op met een korte notitie; het kind ziet dat het gezien is.</p>
         <div id="hulpLijst"></div>
       </div>
+      <div class="kaart">
+        <div class="kop">Wat er met een hulpvraag gebeurt</div>
+        <p class="stil">De keten: toegewezen, gezien, afspraak, afgerond. Wat te lang blijft staan gaat vanzelf naar de directie -- die ziet dat er iets ligt, niet wat of van wie.</p>
+        <div id="opvolgVorm"></div>
+      </div>
       <div class="deel">Excursies</div>
       <div class="kaart">
         <div class="kop">Excursies</div>
         <p class="stil">Locaties bestaan alleen tijdens een actieve excursie (met toestemming van de ouders) en worden bij de stop gewist. Elke blik op de kaart wordt gelogd en is zichtbaar voor de gezinnen.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <input class="veld" id="exTitel" placeholder="Naam (bijv. Artis)" aria-label="Naam van de excursie">
           <input class="veld" id="exBest" placeholder="Bestemming" aria-label="Bestemming">
           <button class="knop p" id="exMaak" type="button">Zet de excursie klaar</button>
@@ -222,9 +335,9 @@
       <div class="kaart">
         <div class="kop">Ouderbijdrage</div>
         <p class="stil">De ouderbijdrage is vrijwillig; een kind wordt nooit uitgesloten als er niet betaald is.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <input class="veld" id="bijTitel" placeholder="Waarvoor (bijv. Museumbezoek)" aria-label="Naam van de bijdrage">
-          <input class="veld" id="bijBedrag" type="number" min="0" step="0.5" placeholder="Bedrag" aria-label="Bedrag in euro" style="flex:0 1 8rem;">
+          <input class="veld h-kolom8" id="bijBedrag" type="number" min="0" step="0.5" placeholder="Bedrag" aria-label="Bedrag in euro">
           <button class="knop p" id="bijMaak" type="button">Vraag de bijdrage</button>
         </div>
         <div id="bijLijst"></div>
@@ -232,12 +345,62 @@
       <div class="kaart">
         <div class="kop">Telefoonboom</div>
         <p class="stil">De leraar belt twee gezinnen, elk gezin belt er weer twee. Iedereen ziet alleen de eigen takken.</p>
-        <div class="rij" style="margin:.5rem 0;">
+        <div class="rij h-my50">
           <button class="knop" id="boomMaak" type="button">Boom (opnieuw) maken</button>
           <input class="veld" id="boomBericht" placeholder="Bericht voor het alarm" aria-label="Alarmbericht">
           <button class="knop p" id="boomStart" type="button">Start het alarm</button>
         </div>
         <div id="boomLijst"></div>
+      </div>
+      <div class="deel">Aanwezigheid</div>
+      <div class="kaart">
+        <div class="kop">Presentie van deze les</div>
+        <p class="stil">Een registratie is een waarneming, geen oordeel. Zet u dezelfde les nog eens, dan vervangt dat de vorige: verzuim uit een typefout is een van de vervelendste fouten die een school kan maken.</p>
+        <div id="presLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Verzuimbeeld van de klas</div>
+        <p class="stil">Op naam, nooit op &quot;meeste verzuim eerst&quot;.</p>
+        <div id="presBeeld"></div>
+      </div>
+      <div class="deel">Verlof en oudergesprek</div>
+      <div class="kaart">
+        <div class="kop">Verlofaanvragen</div>
+        <p class="stil">Een besluit gaat altijd met een reden naar het gezin. Een afwijzing zonder reden is bij leerplicht het begin van een conflict dat niemand wil.</p>
+        <div id="verlofLijst"></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Momenten voor het oudergesprek</div>
+        <p class="stil">Zet een avond in een keer klaar; de tijden lopen vanzelf door. Ouders kiezen zelf een moment: wie het eerst komt.</p>
+        <div class="rij h-my50">
+          <input class="veld h-kolom10" id="afspraakDatum" type="date" aria-label="Datum">
+          <input class="veld h-kolom8" id="afspraakTijd" type="time" aria-label="Begintijd">
+          <input class="veld" id="afspraakMinuten" type="number" min="5" max="60" step="5" value="10" aria-label="Minuten per gesprek" style="flex:0 1 7rem;">
+          <input class="veld" id="afspraakAantal" type="number" min="1" max="20" value="8" aria-label="Aantal momenten" style="flex:0 1 7rem;">
+          <input class="veld" id="afspraakPlek" maxlength="60" placeholder="Lokaal" aria-label="Plek">
+          <button class="knop p" id="afspraakZet" type="button">Zet klaar</button>
+        </div>
+        <div id="afspraakLijst"></div>
+      </div>
+      <div class="deel">Mijn zaken</div>
+      <div class="kaart">
+        <div class="kop">Mijn personeelsdossier</div>
+        <p class="stil">Dit is jouw eigen dossier: wat hier staat, staat er ook voor HR. Ziek melden vraagt geen reden, uren boek je zelf, en je reactie bij een gesprek blijft staan.</p>
+        <div id="mijnHR"></div>
+      </div>
+      <div class="deel">Rapporten</div>
+      <div class="kaart">
+        <div class="kop">Rapport klaarzetten</div>
+        <p class="stil">De cijfers en de aanwezigheid staan er meteen in. Het blijft een concept tot u het vaststelt; zolang ziet geen enkel gezin het.</p>
+        <div class="rij h-my50">
+          <input class="veld" id="rapPeriode" maxlength="30" placeholder="Periode (bijv. Periode 2)" aria-label="Periode van het rapport">
+          <button class="knop p" id="rapMaak" type="button">Zet het rapport klaar</button>
+        </div>
+        <div id="rapLijst"></div>
+      </div>
+      <div class="kaart" id="rapDetailKaart">
+        <div class="kop">Het rapport</div>
+        <div id="rapDetail"><p class="stil">Open hierboven een rapport om de teksten te schrijven en het vast te stellen.</p></div>
       </div>
       <div class="deel">Cijferboek</div>
       <div class="kaart">
@@ -253,12 +416,38 @@
 <script src="/shared/schoolbel.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
+<script src="/apps/schoolpartner/toegang.js"></script>
 <script src="/apps/schoolpartner/toetsen.js"></script>
+<script src="/apps/schoolpartner/presentie.js"></script>
+<script src="/apps/schoolpartner/rapport.js"></script>
+<script src="/apps/schoolpartner/mijnhr.js"></script>
+<script src="/apps/schoolpartner/verlof.js"></script>
+<script src="/apps/schoolpartner/bewijs.js"></script>
+<script src="/apps/schoolpartner/denkfout.js"></script>
+<script src="/apps/schoolpartner/aandacht.js"></script>
+<script src="/apps/schoolpartner/instap.js"></script>
+<script src="/apps/schoolpartner/taal.js"></script>
+<script src="/apps/schoolpartner/taalcheck.js"></script>
+<script src="/apps/schoolpartner/opvolging.js"></script>
+<script src="/apps/schoolpartner/toetskeuring.js"></script>
+<script src="/apps/schoolpartner/belasting.js"></script>
+<script src="/apps/schoolpartner/overdracht.js"></script>
+<script src="/apps/schoolpartner/overstap.js"></script>
 <script src="/apps/schoolpartner/hulplijn.js"></script>
 <script src="/apps/schoolpartner/excursie.js"></script>
 <script src="/apps/schoolpartner/directie.js"></script>
+<script src="/apps/schoolpartner/directie-personeel.js"></script>
 <script src="/apps/schoolpartner/enterprise.js"></script>
 <script src="/apps/schoolpartner/enterprise-beheer.js"></script>
+<script src="/apps/schoolpartner/dossier-zorg.js"></script>
+<script src="/apps/schoolpartner/dossier.js"></script>
+<script src="/apps/schoolpartner/veiligheid.js"></script>
+<script src="/apps/schoolpartner/hr.js"></script>
+<script src="/apps/schoolpartner/geld.js"></script>
+<script src="/apps/schoolpartner/organisatie.js"></script>
+<script src="/apps/schoolpartner/omroep.js"></script>
+<script src="/apps/schoolpartner/personeel.js"></script>
+<script src="/apps/schoolpartner/mail.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
 <script>try { if (self !== top) document.documentElement.classList.add('in-campus'); } catch (e) {}</script>
 <script src="/shared/deelmenu.js" defer></script>

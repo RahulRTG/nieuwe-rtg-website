@@ -14,7 +14,7 @@
    4. ONDER DE DREMPEL WORDT ER NIETS INGEHOUDEN. Dat is het punt van de hele
       constructie: bij lage omzet hoort de bijdrage beschermend te werken.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-regie.test.js */
+   Draai los: node --test test/onderneming-regie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

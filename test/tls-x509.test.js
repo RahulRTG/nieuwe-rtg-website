@@ -3,7 +3,7 @@
    TLS-handshake, en een CSR die correct over de juiste inhoud is ondertekend.
    Als onze DER-codering ook maar één byte fout had, faalde de handshake of de
    handtekening-verificatie. Volledig offline. Draai los:
-   node --experimental-sqlite --test test/tls-x509.test.js */
+   node --test test/tls-x509.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

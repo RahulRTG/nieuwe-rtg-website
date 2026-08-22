@@ -109,8 +109,8 @@ async function draaiInvoerproef({ post, routes, tokenVoor, rommelVoor, hernieuw,
 
   for (const r of routes) {
     if (maxPogingen && gedaan >= maxPogingen) break;
-    const sleutel = r.method + ' ' + r.pad;
-    const bij = perRoute[sleutel] = { methode: r.method, pad: r.pad, rol: r.rol,
+    const sleutel = r.methode + ' ' + r.pad;
+    const bij = perRoute[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol,
       pogingen: 0, invoer: 'dicht', statussen: [] };
 
     for (let i = 0; i < N; i++) {

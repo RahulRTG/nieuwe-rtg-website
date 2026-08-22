@@ -38,8 +38,24 @@ module.exports = (ctx) => {
     return { ok: true, verblijf: v };
   }
 
+  /* WAAR DIT VERBLIJF IS. Een verblijfsrecord draagt de zaak (`supplierCode`,
+     `supplierName`) maar niet de plaats -- die staat bij de zaak zelf. De
+     reiswereld las al `v.plaats`, en dat veld bestond niet: hotelovernachtingen
+     stonden daar dus zonder bestemming, en De Reis (kern/reizen.js) kon ze
+     daardoor bij geen enkele reis plaatsen.
+
+     Hier opgelost en niet in de laag erboven: welk huis waar staat, weet dit
+     domein. Zou de reiswereld de zaken zelf opzoeken, dan is er een tweede plek
+     die dat bepaalt (LAT-regel 4). En niet bij het boeken meegeschreven, want
+     dan zou het bestaande verblijven niet helpen en zou dezelfde waarheid op
+     twee plekken staan. Is de zaak verdwenen, dan blijft de plaats leeg -- en
+     dan zegt De Reis dat hij het onderdeel niet kan plaatsen, in plaats van te
+     raden. */
   function mijnVerblijven(key) {
-    return lijst().filter(v => v.customerKey === key).slice(0, 25);
+    return lijst().filter(v => v.customerKey === key).slice(0, 25).map(v => {
+      const s = findSupplier(v.supplierCode);
+      return s && s.city ? Object.assign({}, v, { plaats: s.city }) : v;
+    });
   }
 
   function annuleer(key, vid) {

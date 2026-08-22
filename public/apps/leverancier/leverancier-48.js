@@ -1,11 +1,11 @@
 /* de kengetallen van een beautysalon */
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.afsprakenVandaag, T('bs.k.af','afspraken vandaag')],[k.wachtenden, T('bs.k.wacht','in de wachtrij')],[k.inDeStoel, T('bs.k.stoel','in de stoel')],[eur(k.omzetVandaag), T('bs.k.omzet','omzet vandaag')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // de agenda: behandeling op de juiste stoel, zonder dubbele bezetting
     h += '<div class="st-sec h-mt100">'+T('bs.agenda','De agenda')+'</div>'+
-      '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;">'+
+      '<div style="border:1px solid var(--line);border-radius:0;padding:0.8rem;">'+
       '<div class="row-gap"><select id="bsBeh" class="st-in h-flex2">'+d.behandelingen.map(b=>'<option value="'+b.id+'">'+esc(b.naam)+' · '+b.duurMin+' min · '+eur(b.prijs)+'</option>').join('')+'</select>'+
       '<select id="bsStoel" class="st-in h-flex2">'+d.stoelen.map(s=>'<option value="'+s.id+'">'+esc(s.naam)+'</option>').join('')+'</select></div>'+
       '<div class="row-gap h-mt40"><input id="bsNaam" class="st-in" placeholder="'+T('bs.naam','Op naam van')+'" maxlength="60" class="h-flex2"><input id="bsDatum" class="st-in" type="date" class="h-flex1"><input id="bsTijd" class="st-in" type="time" class="h-flex1">'+
@@ -42,14 +42,14 @@
     const k = d.kpi;
     let h = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:0.5rem;">'+
       [[k.gasten, T('pc.k.gast','gasten in het pension')],[k.hokkenVrij, T('pc.k.vrij','hokken vrij')],[k.rondesVandaag, T('pc.k.ronde','rondes gepland')],[k.trimOpen, T('pc.k.trim','trimafspraken')]]
-        .map(x=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
+        .map(x=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.1rem;display:block;">'+x[0]+'</b><span class="sub">'+x[1]+'</span></div>').join('')+'</div>';
 
     // het pension: check-in met dieet, notities en check-uit
     h += '<div class="st-sec h-mt100">'+T('pc.pension','Het pension')+'</div>'+
       '<div class="row-gap"><select id="pcDier" class="st-in" style="flex:0 0 6rem;"><option value="hond">hond</option><option value="kat">kat</option><option value="anders">anders</option></select>'+
       '<input id="pcNaam" class="st-in" placeholder="'+T('pc.naam','Naam dier')+'" maxlength="40" class="h-flex1"><input id="pcBaas" class="st-in" placeholder="'+T('pc.baas','Baasje')+'" maxlength="60" class="h-flex1">'+
       '<input id="pcDieet" class="st-in" placeholder="'+T('pc.dieet','Dieet of bijzonderheden')+'" maxlength="120" class="h-flex2"><button id="pcIn" style="flex:1;'+vzGoud+'">'+T('pc.in','Check in')+'</button></div>';
-    h += (d.gasten||[]).map(g=>'<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
+    h += (d.gasten||[]).map(g=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(g.naam)+' ('+esc(g.dier)+') · hok '+g.hok+'</b><span class="sub">'+esc(g.baasje)+(g.tot?' · tot '+esc(g.tot):'')+'</span>'+vzKnop('data-pcuit', g.id, T('pc.uit','Check uit'))+'</div>'+
       (g.dieet?'<div class="sub h-mt25">'+esc(g.dieet)+'</div>':'')+
       (g.notities&&g.notities.length?'<div class="sub h-mt25">'+esc(g.notities[0].tekst)+'</div>':'')+

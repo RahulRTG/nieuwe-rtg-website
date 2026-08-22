@@ -2,7 +2,7 @@
    officiele documentatie naar oude apparatuur of een harde schijf, altijd
    achter het 4- of 6-ogenprincipe. Getest voor de drie huizen: de zaak
    (roster-namen), het rijk (ambtenaren) en het RTG-kantoor (naamplicht).
-   Draai los: node --experimental-sqlite --test test/uitgifte.test.js */
+   Draai los: node --test test/uitgifte.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

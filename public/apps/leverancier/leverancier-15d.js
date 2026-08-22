@@ -62,9 +62,9 @@
           const kb = wvData.keuken;
           html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>'+T('wv.keuken','Het keukenbord')+'</h3>'+
             '<div class="st-row"><span>'+T('wv.gasten','Gasten op de lijst')+'</span><b>'+kb.gasten+'</b></div>'+
-            '<div class="st-row"><span>'+T('wv.metall','Tafels met een allergeen')+'</span><b style="color:var(--gold);">'+kb.tafelsMetAllergeen+'</b></div>'+
+            '<div class="st-row"><span>'+T('wv.metall','Tafels met een allergeen')+'</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+kb.tafelsMetAllergeen+'</b></div>'+
             (kb.samen.length ? kb.samen.map(function(r){
-              return '<div class="st-row"><span>'+(r.soort==='allergeen'?'<b style="color:var(--gold);">'+escT(r.wat)+'</b>':escT(r.wat))+
+              return '<div class="st-row"><span>'+(r.soort==='allergeen'?'<b style="color:var(--rtg-leesgoud,var(--gold));">'+escT(r.wat)+'</b>':escT(r.wat))+
                 '<span class="sub">'+T('wv.optafels','op tafel')+' '+escT(r.tafels.join(', '))+'</span></span><b>'+r.aantal+'x</b></div>';
             }).join('') : '<div class="tkc-who">'+T('wv.geentafels','Nog geen tafels op de lijst.')+'</div>')+
             '<div class="tkc-who">'+escT(kb.regel)+'</div></div>';
@@ -89,7 +89,7 @@
             (c.lijsten.length ? c.lijsten.map(function(l){
               return '<div class="st-row"><span><b>'+escT(l.titel)+'</b>'+(l.event?' · '+escT(l.event):'')+
                 '<span class="sub">'+l.af+'/'+l.totaal+' ('+l.pct+'%) · '+T('wv.meedoen','meedoen')+': '+escT(l.meedoen.join(', '))+'</span></span>'+
-                '<span>'+(l.klaar?'<b style="color:var(--gold);">'+T('wv.af','af')+'</b> ':'')+
+                '<span>'+(l.klaar?'<b style="color:var(--rtg-leesgoud,var(--gold));">'+T('wv.af','af')+'</b> ':'')+
                 '<button class="obtn" data-wvdeel="'+escT(l.id)+'">'+T('wv.deel','Delen met')+'</button></span></div>'+
                 l.items.map(function(i){
                   return '<div class="st-row" style="padding-left:1rem;"><span>'+(i.klaar?'✓ ':'○ ')+escT(i.tekst)+

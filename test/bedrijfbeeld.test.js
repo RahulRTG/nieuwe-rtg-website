@@ -10,7 +10,7 @@
      beheer-token telt die dochter niet mee, en dat wordt gezegd.
    - EEN KOPPELING MET EEN RTG-ACCOUNT GEEFT TELLINGEN, GEEN INHOUD -- en
      niemand koppelt het account van een ander.
-   Draai los: node --experimental-sqlite --test test/bedrijfbeeld.test.js */
+   Draai los: node --test test/bedrijfbeeld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

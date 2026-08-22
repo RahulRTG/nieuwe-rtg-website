@@ -1,7 +1,7 @@
 /* Integratietests voor het babyboekje (RTF Mini): het dagboek met foto's via de
    mediastore, de rechten (gast erbuiten, weghalen alleen door schrijver of
    beheerder), de gezinsnamen en de AI-gezinsmomenten met demo-terugval, en de
-   baby-steuncoach. Draai los: node --experimental-sqlite --test test/baby.test.js */
+   baby-steuncoach. Draai los: node --test test/baby.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

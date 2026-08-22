@@ -23,7 +23,7 @@
     if (!(social.connections || []).length){ toast(T('sal.geenconn','Nog geen connecties. Voeg eerst iemand toe in De Salon.')); return; }
     deelPost = postId;
     $('#shareList').innerHTML = social.connections.map(c =>
-      '<button class="sc-hit" style="width:100%;cursor:pointer;" data-deel="' + escT(c.key) + '"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' + initCN(c.codename) + '</span><b>' + escT(c.codename) + '</b><span style="color:var(--gold);font-size:0.72rem;">↗</span></button>'
+      '<button class="sc-hit" style="width:100%;cursor:pointer;" data-deel="' + escT(c.key) + '"><span class="sc-av" style="width:34px;height:34px;font-size:0.7rem;">' + initCN(c.codename) + '</span><b>' + escT(c.codename) + '</b><span style="color:var(--rtg-leesgoud,var(--gold));font-size:0.72rem;">↗</span></button>'
     ).join('');
     $('#shareList').querySelectorAll('[data-deel]').forEach(b => b.addEventListener('click', async () => {
       try {

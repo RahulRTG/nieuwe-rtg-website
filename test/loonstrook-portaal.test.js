@@ -30,7 +30,7 @@
    /api/supplier/payroll/contract uit server/routes/payroll-os-zaak.js. Dan is
    de run weer leeg en heeft de medewerker geen strook.
 
-   Draai los: node --experimental-sqlite --test test/loonstrook-portaal.test.js */
+   Draai los: node --test test/loonstrook-portaal.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

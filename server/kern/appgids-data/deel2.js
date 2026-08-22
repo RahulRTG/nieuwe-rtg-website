@@ -15,7 +15,7 @@ module.exports = Object.assign({
   '/apps/wallet.html': G('RTG Wallet: je ledenpas, tickets, sleutels, munten en klantenkaarten op een plek.',
     ['Bovenaan ligt je ledenpas: codenaam, lidnummer en een QR', 'Tik op een kaart voor het grote codescherm', 'Koop feestmunten, wissel ze in en voeg zelf kaarten toe'],
     'De zorgpas van de verzekeraar verschijnt hier vanzelf; wat je niet meer nodig hebt haal je er zo weer uit.'),
-  '/apps/rtgid.html': G('RTG iD: jouw digitale identiteit; inloggen met een tik, delen wat jij kiest.',
+  '/apps/rtgid.html': G('RTG iD: jouw digitale identiteit; inloggen met je passkey, delen wat jij kiest.',
     ['Voer de koppelcode van een dienst in en zie wie er aanklopt', 'Bevestig of weiger; er wordt nooit meer gedeeld dan gevraagd', 'Bekijk je inzagelog en trek toegang of machtigingen in'],
     'Een dienst die alleen "18 of ouder" hoeft te weten, krijgt precies dat bewijs; je geboortedatum blijft in de kluis.'),
   '/apps/office.html': G('RTG Office: tekstdocumenten en rekenbladen, automatisch bewaard.',

@@ -12,25 +12,25 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;flex-wrap:wrap;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;flex-wrap:wrap;}
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
   header h1{font-size:1.25rem;margin-top:.1rem;}
   header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
   main{padding:1rem;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .95rem;}
   .kaart + .kaart{margin-top:.7rem;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0 .45rem;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
-  .veld{flex:1;min-width:7rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
+  .veld{flex:1;min-width:7rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
   select.veld{min-width:9rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin:.2rem 0 .3rem;}
-  .tabs button{background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:inherit;font-size:.76rem;padding:.35rem .75rem;cursor:pointer;}
+  .tabs button{background:transparent;border:1px solid var(--line);border-radius:0;color:var(--muted);font:inherit;font-size:.76rem;padding:.35rem .75rem;cursor:pointer;}
   .tabs button.aan{color:var(--txt);border-color:var(--burgundy);}
-  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
   .pil.goed{color:#7FC79B;border-color:#2F5E42;}
-  .pil.let{color:var(--gold);border-color:#5C4E10;}
+  .pil.let{color:var(--rtg-leesgoud,var(--gold));border-color:#5C4E10;}
   .pil.fout{color:var(--burgundy);border-color:#5C1B2C;}
   .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.85rem;flex-wrap:wrap;}
   .lijnrij:last-child{border-bottom:none;}
@@ -40,7 +40,7 @@
   .stat{flex:1;min-width:6.5rem;text-align:center;padding:.3rem 0;}
   .stat b{font-size:1.2rem;display:block;}
   .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
-  .melder{font-size:.82rem;border-radius:10px;padding:.5rem .7rem;margin-top:.5rem;border:1px solid var(--line);line-height:1.5;}
+  .melder{font-size:.82rem;border-radius:0;padding:.5rem .7rem;margin-top:.5rem;border:1px solid var(--line);line-height:1.5;}
   .melder.fout{color:#F0A9BB;border-color:#5C1B2C;}
   .melder.goed{color:#9FD6B4;border-color:#2F5E42;}
   .uitleg{font-size:.78rem;color:var(--muted);line-height:1.55;}
@@ -50,7 +50,7 @@
 <body class="rtg-stijl">
 <header>
   <div><div class="ey">RTFoundation</div><h1>Governance</h1></div>
-  <a href="os.html">Foundation OS</a>
+  <a class="h-raak24" href="os.html">Foundation OS</a>
 </header>
 <main id="main">
   <div id="meldingTop"></div>
@@ -434,5 +434,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
      de rest, geen home-indicator, en sinds kort ook geen app-menu (dat wordt
      door deze laag binnengehaald). -->
 <script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
 </body>
 </html>

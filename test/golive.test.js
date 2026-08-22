@@ -2,7 +2,7 @@
    en bewijs dat hij zich dan ook zo gedraagt (demo dicht, geen dev-lekken,
    registreren en de technische pagina werken), dat een onveilige start wordt
    geweigerd, en dat de go-live-keuring goed keurt en afkeurt.
-   Draai los: node --experimental-sqlite --test test/golive.test.js */
+   Draai los: node --test test/golive.test.js */
 const test = require('node:test');
 /* De veilige productie-opstelling zet OFFICE_TOTP_SECRET, dus de kantoordeur
    vraagt nu ook de tweede factor. Zelfde idioom als bankbeveiliging.test.js. */
@@ -52,7 +52,7 @@ function post(pad, body) {
 let child;
 
 test('een onveilige productiestart wordt geweigerd (fail-fast, echt proces)', async () => {
-  const r = spawnSync(process.execPath, ['--experimental-sqlite', SERVER], {
+  const r = spawnSync(process.execPath, [SERVER], {
     env: { ...process.env, NODE_ENV: 'production', PORT: String(PORT), RTG_DATA_DIR: TMP },
     timeout: 20000, encoding: 'utf8'
   });
@@ -61,7 +61,7 @@ test('een onveilige productiestart wordt geweigerd (fail-fast, echt proces)', as
 });
 
 test('de veilige productiestart komt op en gedraagt zich als productie', async () => {
-  child = spawn(process.execPath, ['--experimental-sqlite', SERVER], { env: PROD_ENV, stdio: ['ignore', 'ignore', 'inherit'] });
+  child = spawn(process.execPath, [SERVER], { env: PROD_ENV, stdio: ['ignore', 'ignore', 'inherit'] });
   let op = false;
   // ruime marge: op een zwaar belaste CI-runner (Postgres-container + veel
    // parallelle server-starts) mag een koude productiestart wat langer duren

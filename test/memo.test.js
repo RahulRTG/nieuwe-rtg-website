@@ -1,7 +1,7 @@
 /* RTG Memo: de memo-flow door de Bestanden-kluis (map Memo's, upload,
    lijst, prullenbak) en de eerlijke Rahul-samenvatting van het transcript
    -- zonder AI-sleutel een demo die zegt wat hij is, nooit neptekst.
-   Draai los: node --experimental-sqlite --test test/memo.test.js */
+   Draai los: node --test test/memo.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

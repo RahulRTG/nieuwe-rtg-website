@@ -9,7 +9,7 @@
    betalen bestaat niet, een onbetaalde rekening verdwijnt niet maar wordt
    oninbaar MET een reden, en een offline bon die twee keer binnenkomt levert
    een keer omzet.
-   Draai: node --experimental-sqlite --test test/horeca-rekening.test.js */
+   Draai: node --test test/horeca-rekening.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

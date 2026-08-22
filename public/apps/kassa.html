@@ -16,30 +16,37 @@
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.15rem;}
   header{padding:.8rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
   header .ey{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
-  .pil{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem;color:var(--muted);}
+  .pil{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.2rem .6rem;color:var(--muted);}
   #modusKnop{margin-left:auto;}
   main{flex:1;display:grid;grid-template-columns:1.4fr 1fr;gap:.8rem;padding:.8rem;max-width:1100px;width:100%;margin:0 auto;}
   @media (max-width:700px){ main{grid-template-columns:1fr;} }
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.8rem;}
   .sec{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.2rem,1fr));gap:.5rem;}
-  .art{background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--txt);font:inherit;padding:.7rem .5rem;cursor:pointer;text-align:center;min-height:4.4rem;display:flex;flex-direction:column;justify-content:center;gap:.15rem;}
+  .art{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;padding:.7rem .5rem;cursor:pointer;text-align:center;min-height:4.4rem;display:flex;flex-direction:column;justify-content:center;gap:.15rem;}
   .art b{font-size:.86rem;line-height:1.25;}
   .art span{font-size:.74rem;color:var(--soft);}
   .art:active{border-color:var(--gold);}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .95rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.6rem .95rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .knop[disabled]{opacity:.4;cursor:default;}
-  .veld{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  .veld{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
   .regel{display:flex;gap:.5rem;align-items:center;border-bottom:1px solid var(--line);padding:.4rem 0;font-size:.86rem;}
   .regel .min{margin-left:auto;}
   .tot{display:flex;justify-content:space-between;font-size:1.05rem;margin:.6rem 0;font-weight:600;}
   .rij{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;}
   .leeg{color:var(--muted);font-size:.84rem;padding:.4rem 0;}
-  .band{border:1px solid var(--burgundy);border-radius:10px;color:var(--burgundy);font-size:.76rem;padding:.4rem .6rem;margin-bottom:.5rem;}
-  dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:16px;padding:1rem;max-width:20rem;width:92vw;margin:auto;}
+  .band{border:1px solid var(--burgundy);border-radius:0;color:var(--burgundy);font-size:.76rem;padding:.4rem .6rem;margin-bottom:.5rem;}
+  dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:0;padding:1rem;max-width:20rem;width:92vw;margin:auto;}
   dialog::backdrop{background:rgba(0,0,0,.6);}
   .hint{font-size:.74rem;color:var(--soft);line-height:1.5;}
+  /* De vaste vorm van een invoerdialoog: uitleg, een veld dat de rij vult, en
+     een knoppenrij eronder. Stond als los stijl-attribuut op elk element; drie
+     attributen erbij tikte meteen door in de meter inlineStijlAttributen
+     (npm run norm), en die houdt style-src-attr in de CSP open. */
+  dialog .hint{margin-bottom:.5rem;}
+  dialog .veld{flex:1;}
+  dialog .rij + .rij{margin-top:.6rem;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -73,6 +80,7 @@
     <div class="rij h-mt55">
       <button class="knop" id="payContant">Contant</button>
       <button class="knop" id="payRtg">RTG Pay-code</button>
+      <button class="knop" id="payKaart">Cadeaukaart</button>
       <button class="knop stil" id="payTafel" hidden>Op de tafel</button>
       <button class="knop stil" id="bonLeeg">Wis</button>
     </div>
@@ -131,6 +139,12 @@
   <p class="hint" style="margin-bottom:.5rem;">De gast toont de betaalcode (QR of cijfers) uit de app.</p>
   <div class="rij"><input class="veld h-flex1" id="payCode" placeholder="Betaalcode" autocomplete="off"></div>
   <div class="rij h-mt60"><button class="knop" id="payOk">Innen</button><button class="knop stil" id="payWeg">Annuleer</button></div>
+</dialog>
+<dialog id="dlgKaart">
+  <div class="sec">Cadeaukaart</div>
+  <p class="hint">De kaart moet van deze zaak zijn en genoeg saldo dragen; anders komt er geen bon. Het hele bonbedrag gaat eraf.</p>
+  <div class="rij"><input class="veld" id="kaartCode" placeholder="Kaartcode" autocomplete="off"></div>
+  <div class="rij"><button class="knop" id="kaartOk">Innen</button><button class="knop stil" id="kaartWeg">Annuleer</button></div>
 </dialog>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
@@ -264,6 +278,12 @@ $('#payContant').addEventListener('click', () => rekenAf('contant'));
 $('#payRtg').addEventListener('click', () => { if (BON.length) { $('#payCode').value = ''; $('#dlgPay').showModal(); $('#payCode').focus(); } });
 $('#payOk').addEventListener('click', () => { $('#dlgPay').close(); rekenAf('rtgpay', { payCode: $('#payCode').value.trim() }); });
 $('#payWeg').addEventListener('click', () => $('#dlgPay').close());
+/* De cadeaukaart is een BETAALWIJZE en geen aparte handeling: de bon draagt de
+   omzet, de kaart is hoe er betaald is. Aanslaan en daarna los verzilveren gaf
+   dezelfde omzet twee keer in de boekhouding (TAKEN.md 4.27). */
+$('#payKaart').addEventListener('click', () => { if (BON.length) { $('#kaartCode').value = ''; $('#dlgKaart').showModal(); $('#kaartCode').focus(); } });
+$('#kaartOk').addEventListener('click', () => { $('#dlgKaart').close(); rekenAf('cadeaukaart', { giftcardCode: $('#kaartCode').value.trim() }); });
+$('#kaartWeg').addEventListener('click', () => $('#dlgKaart').close());
 $('#payTafel').addEventListener('click', () => {
   if ($('#tafelRij').hidden) { $('#tafelRij').hidden = false; return; }
   rekenAf('tafel', { room: $('#tafelKies').value });

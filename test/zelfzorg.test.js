@@ -1,7 +1,7 @@
 /* De zelfzorg van het platform: opruimen, beschermen, repareren en upgraden,
    met de knoppen achter de kantoor-inlog. De automaat doet alleen het veilige
    werk; alles wat geld raakt wordt een advies, nooit een ingreep. Draai los:
-   node --experimental-sqlite --test test/zelfzorg.test.js */
+   node --test test/zelfzorg.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

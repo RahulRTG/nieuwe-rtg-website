@@ -25,7 +25,7 @@
   .scherm::after{content:'';flex:1 0 .2rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:2rem;margin:0;}
   .sub{color:var(--a-mat);text-align:center;margin-bottom:.6rem;max-width:26rem;}
-  .kaart-a{width:min(26rem,92vw);border:0;border-radius:18px;padding:1.05rem 1.25rem;cursor:pointer;
+  .kaart-a{width:min(26rem,92vw);border:0;border-radius:0;padding:1.05rem 1.25rem;cursor:pointer;
     display:flex;align-items:center;gap:1rem;font:inherit;text-align:left;background:var(--a-diep);
     color:var(--a-tekst);border-left:5px solid var(--a-cyaan);}
   .kaart-a b{font-size:1.25rem;display:block;}
@@ -35,26 +35,26 @@
   .kaart-a.m3{border-left-color:var(--a-lime);}
   .kaart-a.m4{border-left-color:var(--a-amber);}
   .kaart-a.m5{border-left-color:var(--a-paars);}
-  .duelbadge{margin-left:auto;background:rgba(53,224,212,.12);color:var(--a-cyaan);border-radius:999px;
+  .duelbadge{margin-left:auto;background:rgba(53,224,212,.12);color:var(--a-cyaan);border-radius:0;
     padding:.2rem .7rem;font-size:.78rem;font-weight:700;white-space:nowrap;}
   .m2 .duelbadge{background:rgba(242,92,168,.12);color:var(--a-magenta);}
-  .rand{background:transparent;border:2px solid var(--a-mat);color:var(--a-mat);border-radius:999px;
+  .rand{background:transparent;border:2px solid var(--a-mat);color:var(--a-mat);border-radius:0;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.4rem;}
-  .neon{background:var(--a-cyaan);border:0;color:#062522;border-radius:999px;padding:.8rem 2rem;
+  .neon{background:var(--a-cyaan);border:0;color:#062522;border-radius:0;padding:.8rem 2rem;
     font:inherit;font-size:1.1rem;font-weight:800;cursor:pointer;box-shadow:0 0 24px rgba(53,224,212,.35);}
   .neon[disabled]{opacity:.4;box-shadow:none;cursor:default;}
   .bovenrij{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;}
   .bovenrij[hidden]{display:none;}
-  .terugknop{background:rgba(14,18,32,.85);border:2px solid var(--a-cyaan);color:var(--a-tekst);border-radius:999px;
+  .terugknop{background:rgba(14,18,32,.85);border:2px solid var(--a-cyaan);color:var(--a-tekst);border-radius:0;
     padding:.5rem 1.05rem;font:inherit;font-size:.95rem;font-weight:700;cursor:pointer;}
   .kop-info{flex:1;text-align:center;font-weight:700;font-size:1.05rem;}
   .uitnodiging{width:min(26rem,92vw);background:rgba(242,92,168,.1);border:1px solid var(--a-magenta);
-    border-radius:14px;padding:.75rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.95rem;}
-  .uitnodiging button{margin-left:auto;background:var(--a-magenta);border:0;color:#2C0617;border-radius:999px;
+    border-radius:0;padding:.75rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.95rem;}
+  .uitnodiging button{margin-left:auto;background:var(--a-magenta);border:0;color:#2C0617;border-radius:0;
     padding:.45rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
   .keuze{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.45rem;}
   .keuze h3{margin:.4rem 0 .1rem;font-size:.95rem;color:var(--a-mat);text-transform:uppercase;letter-spacing:.08em;}
-  .persoon{display:flex;align-items:center;gap:.7rem;background:var(--a-diep);border-radius:12px;
+  .persoon{display:flex;align-items:center;gap:.7rem;background:var(--a-diep);border-radius:0;
     padding:.65rem .9rem;cursor:pointer;border:2px solid transparent;}
   .persoon.aan{border-color:var(--a-lime);}
   .persoon .wie{font-weight:700;}
@@ -64,17 +64,17 @@
   .som{font-size:clamp(2.6rem,10vw,4rem);font-weight:800;letter-spacing:.03em;text-shadow:0 0 30px rgba(53,224,212,.45);}
   .invoer{min-height:3.2rem;font-size:2.2rem;font-weight:800;color:var(--a-amber);letter-spacing:.06em;}
   .toetsen{display:grid;grid-template-columns:repeat(3,minmax(4.6rem,5.6rem));gap:.55rem;}
-  .toetsen button{font:inherit;font-size:1.5rem;font-weight:800;padding:.85rem 0;border-radius:14px;border:0;
+  .toetsen button{font:inherit;font-size:1.5rem;font-weight:800;padding:.85rem 0;border-radius:0;border:0;
     background:var(--a-diep);color:var(--a-tekst);cursor:pointer;}
   .toetsen .ok{background:var(--a-lime);color:#1D2B06;}
   .toetsen .wis{color:var(--a-magenta);font-size:1.1rem;}
   .stand{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.3rem;font-size:.92rem;}
-  .stand .rij{display:flex;gap:.6rem;align-items:center;background:rgba(255,255,255,.04);border-radius:10px;padding:.4rem .8rem;}
+  .stand .rij{display:flex;gap:.6rem;align-items:center;background:rgba(255,255,255,.04);border-radius:0;padding:.4rem .8rem;}
   .stand .rij b{flex:1;font-weight:700;}
   .stand .rij.ik b{color:var(--a-cyaan);}
   .voortgang{color:var(--a-mat);}
   /* het stoplicht van het reactieduel */
-  #licht{width:min(22rem,86vw);height:min(22rem,52vh);border-radius:26px;display:flex;align-items:center;
+  #licht{width:min(22rem,86vw);height:min(22rem,52vh);border-radius:0;display:flex;align-items:center;
     justify-content:center;font-size:1.5rem;font-weight:800;cursor:pointer;user-select:none;
     background:var(--a-diep);transition:background .12s;}
   #licht.rood{background:#8E2043;}
@@ -83,7 +83,7 @@
   .uitslagkop{font-size:1.7rem;font-weight:800;text-align:center;}
   /* het geheugenduel: vier vakken die oplichten */
   .pads{display:grid;grid-template-columns:repeat(2,minmax(7.2rem,8.8rem));gap:.8rem;}
-  .pad{height:7.2rem;border:0;border-radius:20px;cursor:pointer;opacity:.4;transition:opacity .12s;}
+  .pad{height:7.2rem;border:0;border-radius:0;cursor:pointer;opacity:.4;transition:opacity .12s;}
   .pad.aan{opacity:1;}
   .pad.p0{background:var(--a-cyaan);}
   .pad.p1{background:var(--a-magenta);}
@@ -586,5 +586,8 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Deze drie spelschermen dragen sessie.js niet (ze hebben geen
+     gezinsdeur nodig), maar wel dezelfde wereldbalk als de rest. -->
+<script src="sessie.js" defer></script>
 </body>
 </html>

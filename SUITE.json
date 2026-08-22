@@ -1,0 +1,16 @@
+{
+ "stempel": {
+  "op": "2026-08-20T23:34:02.662Z",
+  "commit": "a002e3de",
+  "boomVuil": false,
+  "node": "v24.18.0"
+ },
+ "uitleg": "De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt net zo hard opvalt als een register dat achterloopt.",
+ "grens": "zegt niets over WELKE toets zakte -- dat staat in de uitvoer van de ronde zelf. Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.",
+ "hoe": "npm test",
+ "gemeten": {
+  "bestanden": 1079,
+  "afsluitcode": 1,
+  "groen": false
+ }
+}

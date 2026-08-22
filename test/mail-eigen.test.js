@@ -265,8 +265,13 @@ test('bezorgen: een onbereikbare mailserver is tijdelijk, geen exception', async
   // een poort waar niets luistert: dat hoort GEEN kale fout naar boven te geven,
   // want de aanroeper moet kunnen besluiten het later nog eens te proberen
   const s = await nepMx();
-  const dichte = s.poort; s.srv.close();
-  await new Promise(r => setTimeout(r, 30));
+  /* WACHTEN TOT DE POORT ECHT DICHT IS, en niet 30 ms gokken. Deze toets wil
+     juist een poort waar NIETS luistert; is de server nog niet dicht als we
+     verbinden, dan praten we met een levende nepserver en meet de bewering iets
+     anders. server.close() roept zijn callback pas als de laatste verbinding weg
+     is -- dat is het teken, en het staat gewoon in de API. */
+  const dichte = s.poort;
+  await new Promise(k => s.srv.close(k));
   const uit = await direct.bezorg({ van: 'post@rtg.test', naar: 'lid@voorbeeld.test',
     bericht: 'x', mx: [{ exchange: '127.0.0.1' }], poort: dichte });
   assert.equal(uit.soort, 'tijdelijk');

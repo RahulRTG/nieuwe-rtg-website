@@ -3,7 +3,7 @@
    vooral wat de laag NIET doet: geen tweede administratie naast de vier
    domeinen, geen stil weggelaten stuk, geen verzonnen cijfer en geen betaald
    abonnement dat meelift op een gratis volgknop.
-   Draai los: node --experimental-sqlite --test test/mediaos.test.js */
+   Draai los: node --test test/mediaos.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

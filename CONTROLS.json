@@ -1,10 +1,10 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 12,
-    "groen": 10,
+    "controls": 13,
+    "groen": 12,
     "nietInBedrijf": 1,
-    "nietGroen": 1
+    "nietGroen": 0
   },
   "controls": [
     {
@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.594Z",
+        "at": "2026-08-18T09:57:20.342Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -50,24 +50,28 @@
       "wat": "wijziging en verwijdering MIDDEN in het auditspoor breken de keten aantoonbaar",
       "eigenaar": "Security",
       "bewijs": [
-        "test/keten.test.js"
+        "test/keten.test.js",
+        "test/securitylog-keten.test.js",
+        "test/boardlog-keten.test.js"
       ],
-      "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop())",
+      "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop(), securityLogKeten().top)",
       "dekking": {
-        "beproefd": 1,
-        "totaal": 4,
+        "beproefd": 5,
+        "totaal": 5,
         "eenheid": "auditjournalen aan de keten",
         "tellers": {},
-        "pct": 25
+        "pct": 100
       },
       "grens": "ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD nodig, en die is nog niet in bedrijf.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 30,
+        "beweringen": 46,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.768Z",
+        "at": "2026-08-18T09:57:53.619Z",
         "bestanden": [
-          "test/keten.test.js"
+          "test/keten.test.js",
+          "test/securitylog-keten.test.js",
+          "test/boardlog-keten.test.js"
         ]
       }
     },
@@ -77,25 +81,29 @@
       "wat": "het wegknippen van de NIEUWSTE auditregels valt op tegen een extern anker",
       "eigenaar": "Security",
       "bewijs": [
-        "test/keten.test.js"
+        "test/keten.test.js",
+        "test/ankerdienst.test.js",
+        "test/ankerdienst-echt.test.js"
       ],
-      "bewijsstuk": "inzagelog.anker() -- de momentopname die weggezet moet worden",
+      "bewijsstuk": "POST /api/office/anker -- het blok met de kop van elk journaal, plus de tegenproef",
       "dekking": {
         "beproefd": 0,
-        "totaal": 4,
-        "eenheid": "auditjournalen met een extern anker",
+        "totaal": 5,
+        "eenheid": "auditjournalen met een anker dat BUITEN staat",
         "tellers": {},
         "pct": 0
       },
-      "grens": "ONTWORPEN, NIET IN BEDRIJF. Het mechanisme is bewezen (een ingekorte kop en een herschreven regel worden tegen een anker allebei betrapt), maar er wordt nergens een anker weggezet. Zonder bestemming buiten deze database beschermt dit niets.",
+      "grens": "DE DIENST DRAAIT, HET ANKER STAAT NERGENS BUITEN. server/lib/ankerdienst.js verzamelt de kop van elk journaal in een blok en rekent ermee af zodra dat blok wordt teruggevoerd; de tegenproef is beproefd (vier weggeknipte regels worden betrapt terwijl de overgebleven keten perfect klopt). Wat ontbreekt is de BESTEMMING: zolang niemand het blok op een gescheiden plek wegzet, beschermt dit niets tegen kopafknipping. Die bestemming is met opzet geen taak van deze software -- een anker in dezelfde database is geen anker maar een tweede regel om te wijzigen. De dienst toont daarom \"niet in bedrijf\" tot er een blok wordt teruggevoerd, in plaats van groen omdat de code bestaat.",
       "inBedrijf": false,
       "laatstGroen": {
         "staat": "NIET IN BEDRIJF",
-        "beweringen": 30,
+        "beweringen": 44,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:17.925Z",
+        "at": "2026-08-18T09:58:05.035Z",
         "bestanden": [
-          "test/keten.test.js"
+          "test/keten.test.js",
+          "test/ankerdienst.test.js",
+          "test/ankerdienst-echt.test.js"
         ],
         "mechanismeBewezen": true,
         "reden": "ontworpen en bewezen, maar niet in gebruik -- zie grens"
@@ -129,7 +137,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:18.620Z",
+        "at": "2026-08-18T09:58:05.999Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -165,7 +173,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:18.787Z",
+        "at": "2026-08-18T09:58:06.267Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -181,20 +189,20 @@
       ],
       "bewijsstuk": "KLOK.json -- hoeveel code nog buiten de tijdmachine staat",
       "dekking": {
-        "beproefd": 2,
-        "totaal": 659,
+        "beproefd": 36,
+        "totaal": 655,
         "eenheid": "modules die de tijd vragen",
         "tellers": {
-          "directeTijdsaanroepen": 1298
+          "directeTijdsaanroepen": 1284
         },
-        "pct": 0.3
+        "pct": 5.5
       },
-      "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
+      "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1294 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:20.237Z",
+        "at": "2026-08-18T09:58:08.129Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -222,9 +230,10 @@
       },
       "grens": "gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.",
       "laatstGroen": {
-        "staat": "niet gemeten",
-        "reden": "geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)",
-        "at": "2026-08-12T14:59:28.787Z",
+        "staat": "GROEN",
+        "beweringen": 18,
+        "overgeslagen": 0,
+        "at": "2026-08-19T03:27:37.293Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -241,8 +250,8 @@
       ],
       "bewijsstuk": "ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd",
       "dekking": {
-        "beproefd": 2937,
-        "totaal": 2937,
+        "beproefd": 3081,
+        "totaal": 3081,
         "eenheid": "schrijfroutes met een rol",
         "tellers": {
           "doorbraken": 0,
@@ -257,7 +266,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:28.931Z",
+        "at": "2026-08-18T09:58:20.614Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -273,24 +282,24 @@
       ],
       "bewijsstuk": "INVOERPROEF.json -- per route hoeveel rommel erheen ging en wat eruit kwam",
       "dekking": {
-        "beproefd": 2510,
-        "totaal": 2936,
+        "beproefd": 2634,
+        "totaal": 3080,
         "eenheid": "routes waar rommel voorbij de poort kwam",
         "tellers": {
           "breuken": 0,
           "sporen": 0,
-          "achterEenPoort": 426,
+          "achterEenPoort": 446,
           "blindeRondes": 0,
-          "tokensHernieuwd": 13
+          "tokensHernieuwd": 12
         },
-        "pct": 85.5
+        "pct": 86
       },
       "grens": "meet twee foutklassen op routes met een herkenbare rol: omvallen op rommel (5xx of geen antwoord) en een antwoord dat interne details meegeeft. Hij zegt NIETS over of de validatie het juiste heeft geweigerd -- een route die alles slikt en 200 teruggeeft telt hier als dicht. Routes achter een tweede grendel (KYC, onboarding) staan als ongemeten met reden.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.085Z",
+        "at": "2026-08-18T09:58:20.883Z",
         "bestanden": [
           "test/invoerproef.test.js"
         ]
@@ -306,25 +315,57 @@
       ],
       "bewijsstuk": "IDEMPROEF.json -- per route de drie oproepen en wat eruit kwam",
       "dekking": {
-        "beproefd": 12,
-        "totaal": 106,
+        "beproefd": 855,
+        "totaal": 855,
         "eenheid": "routes waar een tweede effect zichtbaar zou zijn",
         "tellers": {
-          "onbeschermd": 94,
-          "ongemeten": 2830,
+          "onbeschermd": 0,
+          "ongemeten": 2236,
           "blindeRondes": 0,
-          "tokensHernieuwd": 24
+          "tokensHernieuwd": 22
         },
-        "pct": 11.3
+        "pct": 100
       },
       "grens": "kijkt van BUITEN naar het antwoord, niet naar de database. Een route die zijn tweede effect niet in het antwoord laat zien (een stille toevoeging aan een lijst die niet wordt teruggegeven) telt hier als ongemeten en niet als beschermd -- daarvoor is de per-route vingerafdruk nodig die er nog niet is. En \"onbeschermd\" is geen defect-oordeel: twee keer op bewaren drukken hoort twee notities op te leveren. Het is een TELLING van waar de belofte uit deze kolom niet geldt, zodat je weet welke routes hem wel nodig hebben.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 12,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.233Z",
+        "at": "2026-08-18T09:58:21.095Z",
         "bestanden": [
           "test/idemproef.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/auditproef.js",
+      "control": "AUDITSPOOR",
+      "wat": "elke geslaagde schrijfhandeling laat een regel na die niemand ongemerkt kan wijzigen",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/auditspoor.test.js"
+      ],
+      "bewijsstuk": "AUDITPROEF.json -- per route of er een spoor achterbleef, plus de ketencontrole",
+      "dekking": {
+        "beproefd": 860,
+        "totaal": 860,
+        "eenheid": "schrijfroutes die werkelijk werk deden",
+        "tellers": {
+          "gezakt": 0,
+          "ongemeten": 2231,
+          "blindeRondes": 0,
+          "ketenHeel": null
+        },
+        "pct": 100
+      },
+      "grens": "kijkt van BUITEN: hij ziet dat er een regel bij komt en dat de keten heel is. Hij controleert niet of die regel het juiste verhaal vertelt (de goede actor bij de goede handeling), en hij zegt niets over iemand met schrijftoegang tot de database die de HELE keten opnieuw uitrekent -- daarvoor moet het kopzegel buiten de deur worden vastgelegd.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 13,
+        "overgeslagen": 0,
+        "at": "2026-08-19T03:27:38.655Z",
+        "bestanden": [
+          "test/auditspoor.test.js"
         ]
       }
     },
@@ -339,26 +380,26 @@
       ],
       "bewijsstuk": "STAATPROEF.json -- per route welke collecties bewogen, en wat de herhaling deed",
       "dekking": {
-        "beproefd": 2338,
-        "totaal": 2936,
+        "beproefd": 2491,
+        "totaal": 3080,
         "eenheid": "routes waar de toestand is gemeten",
         "tellers": {
-          "state": 224,
-          "sideEffect": 224,
-          "rollback": 2107,
-          "rollbackGezakt": 7,
-          "idemBewezen": 124,
-          "idemGezakt": 100,
+          "state": 266,
+          "sideEffect": 266,
+          "rollback": 2217,
+          "rollbackGezakt": 8,
+          "idemBewezen": 174,
+          "idemGezakt": 92,
           "blindeRondes": 0
         },
-        "pct": 79.6
+        "pct": 80.9
       },
       "grens": "ziet de DATABASE en niets daarbuiten: een mail, een push of een betaling bij een derde valt er niet onder, dus SIDE_EFFECT betekent hier \"buiten de eigen collectie\" en niet \"buiten het huis\". Ziet ook geen wijziging die zichzelf binnen één verzoek opheft. Een route waar de eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 27,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.487Z",
+        "at": "2026-08-18T09:58:21.474Z",
         "bestanden": [
           "test/staatproef.test.js",
           "test/vingerafdruk.test.js"
@@ -375,21 +416,21 @@
       ],
       "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
       "dekking": {
-        "beproefd": 15044,
-        "totaal": 43857,
+        "beproefd": 16475,
+        "totaal": 46068,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 28431,
-          "gezakt": 122
+          "ongemeten": 29205,
+          "gezakt": 116
         },
-        "pct": 34.3
+        "pct": 35.8
       },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 17,
         "overgeslagen": 0,
-        "at": "2026-08-12T14:59:29.822Z",
+        "at": "2026-08-18T09:58:22.000Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

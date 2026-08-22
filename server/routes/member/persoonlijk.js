@@ -5,7 +5,7 @@ const { maakLiveTwin } = require('../../ai-live-twin');
 module.exports = (kern) => {
   const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, zorgVan, zorgZet, locDeel, locStopKlant, locMijn, stuurLus } = kern;
   const { fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, sparLijst, sparParkeer, sparStatus } = kern.fluister;
-  const aiStatus = () => require('../../ai').beschikbaarheid(kern.anthropic);
+  const aiStatus = () => require('../../ai-stand').beschikbaarheid(kern.anthropic);
 
 /* ---- de zorgvolle keten (kern/gastzorg.js) ----
    Het zorgprofiel: allergenen, dieet en medische aandachtspunten. Reist

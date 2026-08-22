@@ -41,6 +41,9 @@ app.post('/api/supplier/activiteit', supplierAuth, (req, res) => {
   res.json({ ok: true, activiteiten: s.activiteiten });
 });
 
+// de sluitdagen (dag dicht/open, zonder bestaande boekingen te raken): ./tickets-dicht.js
+require('./tickets-dicht')(kern, { heeftTickets });
+
 /* Het dagprogramma: per activiteit en tijdslot de bezetting en de gastenlijst.
    Voor de zaak-tab en de PDA (gids, security, ticketbalie). */
 app.post('/api/supplier/programma', supplierAuth, (req, res) => {

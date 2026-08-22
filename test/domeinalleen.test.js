@@ -47,12 +47,17 @@
    de eerste van de twee stappen is; TAKEN.md 5.14 houdt de tweede bij.
    ========================================================================== */
 const { test } = require('node:test');
+const { opstartGeduld } = require('./helper');
 const assert = require('node:assert');
 const cp = require('child_process');
 const http = require('http');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+/* Alleen voor drukte(): het geduld dat meeschaalt met de belasting. helper.js
+   laadt zelf niets zwaars, dus deze toets blijft verder gewoon zelfstandig --
+   hij start zijn eigen servers met een eigen RTG_DOMAINS. */
+const { drukte } = require('./helper');
 
 const ROOT = path.join(__dirname, '..');
 
@@ -83,17 +88,45 @@ function vraag(port, pad, methode) {
    Nu wacht hij op precies de vraag die erna komt, met dezelfde methode. Sterft
    de server, dan loopt hij af met de opstartlog erbij in plaats van met een
    ECONNRESET waar niemand iets aan heeft. */
-async function wachtTotOp(port, uitInfo, pad, methode, tot = 25000) {
-  const eind = Date.now() + tot;
+/* HET GEDULD KOMT UIT ./helper.js EN STAAT HIER NIET MEER ALS GETAL.
+
+   Hier stond `tot = 25000`, en dat is precies het getal dat helper.js al als te
+   krap had opgeschreven: "zeventig toetsen zakten daarop, allemaal met een
+   LEVEND kindproces". Deze toets start zijn servers zelf (hij zet RTG_DOMAINS,
+   dus de helper kan hij niet gebruiken) en had daardoor een tweede kopie van een
+   regel die aan de andere kant al was gerepareerd -- LAT.md regel 4.
+
+   Op 19 augustus 2026 kostte dat twee rode toetsen in een volle suite: belasting
+   8,5 op vier kernen, kindproces springlevend, en los gedraaid daarna drie keer
+   groen. Nu schaalt het geduld mee met de machine, uit dezelfde functie als de
+   helper (`opstartGeduld`).
+
+   EN HET KIND ZELF IS HET BETERE SIGNAAL. De oude vangst keek naar TEKST in de
+   opstartlog (`uncaughtException`, `"fataal":true`); die blijft, maar er staat
+   nu een hardere naast: is het proces GESTOPT, dan is er niets meer om op te
+   wachten en gaat hij meteen af met de log erbij. Een dood kind is een defect,
+   een levend kind onder belasting is drukte -- en dat verschil hoort in de
+   melding te staan en niet in het hoofd van wie hem leest. */
+async function wachtTotOp(port, uitInfo, pad, methode, kind, tot) {
+  const geduld = opstartGeduld();
+  const budget = tot || geduld.ms;
+  const gestart = Date.now();
+  const eind = gestart + budget;
   let laatste = null;
   while (Date.now() < eind) {
     if (uitInfo.fataal) throw new Error('server crashte bij opstart:\n' + uitInfo.log.slice(-2000));
+    if (kind && kind.exitCode != null)
+      throw new Error('server stopte tijdens opstarten (exit ' + kind.exitCode + ') na ' +
+        (Date.now() - gestart) + 'ms\n' + uitInfo.log.slice(-2000));
     try { const r = await vraag(port, pad, methode); if (r.status) return r; }
     catch (e) { laatste = e; }
     await new Promise(r => setTimeout(r, 250));
   }
-  throw new Error('server antwoordde niet op ' + (methode || 'GET') + ' ' + pad + ' binnen ' + tot +
-    'ms (laatste fout: ' + (laatste && laatste.message) + ')\n' + uitInfo.log.slice(-2000));
+  const leeft = kind ? kind.exitCode == null : null;
+  throw new Error('server antwoordde niet op ' + (methode || 'GET') + ' ' + pad + ' binnen ' + budget +
+    'ms (' + (leeft === null ? 'onbekend of het kind nog leefde' : leeft ? 'het kindproces LEEFDE nog' : 'het kindproces was gestopt') +
+    ', belasting ' + geduld.druk.toFixed(2) + ' per kern, geduld x' + geduld.extra +
+    '; laatste fout: ' + (laatste && laatste.message) + ')\n' + uitInfo.log.slice(-2000));
 }
 
 function boot(port, dataDir, domeinen) {
@@ -102,7 +135,7 @@ function boot(port, dataDir, domeinen) {
     NODE_ENV: 'test', RTG_DEMO: '1', ANTHROPIC_API_KEY: '', RTG_PG: '', RTG_STIL: '1'
   });
   if (domeinen) env.RTG_DOMAINS = domeinen; else delete env.RTG_DOMAINS;
-  const kind = cp.spawn(process.execPath, ['--experimental-sqlite', 'server/server.js'],
+  const kind = cp.spawn(process.execPath, ['server/server.js'],
     { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
   const uitInfo = { log: '', fataal: false };
   const vang = d => { uitInfo.log += d; if (/uncaughtException|"fataal":true|is not a function/.test(String(d))) uitInfo.fataal = true; };
@@ -117,7 +150,7 @@ async function opgestart(dataDir, domeinen, pad, methode) {
   for (let poging = 0; ; poging++) {
     const port = 36000 + Math.floor(Math.random() * 2000);
     const { kind, uitInfo } = boot(port, dataDir, domeinen);
-    try { await wachtTotOp(port, uitInfo, pad, methode); return { kind, uitInfo, port }; }
+    try { await wachtTotOp(port, uitInfo, pad, methode, kind); return { kind, uitInfo, port }; }
     catch (e) {
       kind.kill('SIGKILL');
       if (poging < 3 && /EADDRINUSE/.test(String(e.message))) continue;

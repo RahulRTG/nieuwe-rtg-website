@@ -1,0 +1,464 @@
+/* De Salon als besloten member journal, niet als hotelbrochure of eindeloze feed. */
+.salon-socialnav{position:fixed;z-index:51;top:var(--rtg-social-top);right:0;left:0;height:52px;display:flex;justify-content:center;background:rgba(248,247,243,.96);border-bottom:1px solid rgba(24,24,23,.12);backdrop-filter:blur(18px);}
+.salon-socialnav a{position:relative;display:flex;align-items:center;gap:.65rem;min-width:132px;padding:0 1.4rem;color:#625f57;text-decoration:none;font:600 .65rem/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
+.salon-socialnav a::after{content:"";position:absolute;right:1.4rem;bottom:-1px;left:1.4rem;height:2px;background:transparent;}
+.salon-socialnav a[aria-current="page"]{color:#191917;}.salon-socialnav a[aria-current="page"]::after{background:#9a7f3f;}
+.salon-socialnav small{color:#625f57;font-size:.46rem;letter-spacing:.04em;text-transform:none;}
+.rtg-salon-elite .salon-werkveld{min-height:100vh;padding-top:calc(var(--rtg-social-top) + 52px);background:#e9e7e1;color:#191917;}
+.rtg-salon-elite .salon-werkveld>header{position:relative;z-index:31;min-height:236px;padding:0 clamp(1.3rem,4vw,4.2rem);overflow:hidden;border:0;border-bottom:1px solid rgba(24,24,23,.12);background:linear-gradient(90deg,#ece9e2 0%,#ece9e2 67%,#1a1b19 67%,#1a1b19 100%);}
+.rtg-salon-elite .salon-werkveld>header::before{content:"";position:absolute;z-index:0;top:-132px;right:5vw;width:330px;height:330px;border:1px solid rgba(188,166,108,.26);border-radius:50%;box-shadow:0 0 0 50px rgba(188,166,108,.035),0 0 0 100px rgba(255,255,255,.018);}
+.rtg-salon-elite .salon-werkveld>header::after{content:"PRIVATE / 01";position:absolute;z-index:0;right:clamp(1.3rem,4vw,4.2rem);top:2.1rem;color:rgba(244,242,237,.42);font:500 .56rem/1 Inter,sans-serif;letter-spacing:.18em;}
+.rtg-salon-elite .kop{position:relative;z-index:1;min-height:172px;max-width:1320px;margin:0 auto;align-items:center;justify-content:space-between;}
+.rtg-salon-elite .kop>div{max-width:620px;}.rtg-salon-elite .kop .ey{color:#79652f;font-size:.59rem;letter-spacing:.2em;}
+.rtg-salon-elite .kop h1{margin-top:.45rem;color:#191917;font-size:clamp(2.8rem,4.4vw,4.7rem);line-height:.92;letter-spacing:-.04em;}
+.rtg-salon-elite .salon-belofte{max-width:48ch;margin:.75rem 0 0;color:#64615b;font-size:.85rem;line-height:1.6;}
+.rtg-salon-elite .salon-terug{display:inline-flex;align-items:center;min-height:46px;margin-right:.3rem;color:#eee9df;text-decoration:none;font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;}
+.rtg-salon-elite .tabs{position:relative;z-index:2;width:max-content;max-width:calc(100% - 145px);flex-wrap:nowrap!important;margin:0!important;overflow-x:auto!important;border:1px solid rgba(24,24,23,.1)!important;border-radius:0;background:rgba(249,248,244,.92);scrollbar-width:none;box-shadow:0 12px 30px rgba(38,36,31,.06);}
+.rtg-salon-elite .tabs::-webkit-scrollbar{display:none;}.rtg-salon-elite .tabs>button{flex:0 0 auto;min-height:62px;padding:.85rem clamp(.9rem,2vw,1.5rem)!important;border-right:1px solid rgba(24,24,23,.07)!important;color:#706d66!important;font-size:.66rem!important;}.rtg-salon-elite .tabs>button[aria-pressed="true"]{color:#191917!important;border-bottom-color:#7f1634!important;background:#fff!important;}
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{position:absolute;z-index:3;right:clamp(1.3rem,4vw,4.2rem);bottom:0;min-height:62px;border:1px solid rgba(255,255,255,.1)!important;border-bottom:0!important;border-radius:0!important;background:#252622!important;color:#eee9df!important;}
+.salon-stage{display:grid;grid-template-columns:minmax(0,920px) minmax(300px,340px);gap:clamp(2rem,4vw,4.5rem);max-width:1360px;margin:0 auto;padding:clamp(2rem,3.6vw,3.5rem) clamp(1rem,3vw,2.8rem) 8rem;}
+.rtg-salon-elite main{width:auto;max-width:none;margin:0;padding:0;color:#191917;}
+body[data-salon-tab="feed"].rtg-salon-elite main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.3rem;align-items:start;}
+body[data-salon-tab="feed"].rtg-salon-elite main>.post:first-of-type{grid-column:1/-1;}body[data-salon-tab="feed"].rtg-salon-elite main>.leeg,body[data-salon-tab="feed"].rtg-salon-elite main>.meer,body[data-salon-tab="feed"].rtg-salon-elite main>h2{grid-column:1/-1;}
+.rtg-salon-elite .post{position:relative;margin:0;padding:0;background:#f9f8f5;border:1px solid rgba(24,24,23,.1);border-radius:0;overflow:hidden;box-shadow:0 16px 38px rgba(38,36,31,.065);color:#191917;}
+.rtg-salon-elite .post .top{min-height:68px;padding:.72rem 1rem;border-bottom:1px solid rgba(24,24,23,.07);}.salon-avatar{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(127,22,52,.22);border-radius:50%;background:#eee9e0;color:#6f1730;font:500 .68rem "Bodoni Moda",serif;letter-spacing:.07em;}.salon-auteur{position:relative;display:flex;min-width:0;min-height:44px;flex-direction:column;align-items:flex-start;justify-content:center;}.rtg-salon-elite .post .naam{min-height:44px;padding:0 0 .78rem!important;border:0!important;background:transparent!important;color:#1b1b18!important;box-shadow:none!important;font-size:.82rem;}.rtg-salon-elite .post .plek{position:absolute;bottom:.08rem;left:0;color:#89857d;font-size:.64rem;pointer-events:none;}.rtg-salon-elite .post .merk{border:1px solid rgba(24,24,23,.11);border-radius:0;padding:.28rem .48rem;color:#79652f;font-size:.55rem;letter-spacing:.11em;text-transform:uppercase;}
+.rtg-salon-elite .kar{margin:0;background:#d7d3ca;}.rtg-salon-elite .kar img{height:auto;max-height:none;aspect-ratio:4/3;object-fit:cover;}.rtg-salon-elite main>.post:first-of-type .kar img{height:auto;aspect-ratio:16/9;object-fit:cover;}.rtg-salon-elite .kar .tel{border-radius:0;padding:.38rem .58rem;background:rgba(19,19,17,.68);color:#fff;}
+.rtg-salon-elite .post .tekst{min-height:72px;padding:1rem 1rem .65rem;color:#34332f;font-size:.84rem;line-height:1.62;}.rtg-salon-elite main>.post:first-of-type .tekst{min-height:0;font-size:.93rem;}.rtg-salon-elite .post .onderw{padding:0 1rem .75rem;}.rtg-salon-elite .post .onderw button{min-height:44px;border:0;border-radius:0;padding:.5rem .6rem;background:#efede7;color:#765f2c;}
+.rtg-salon-elite .rij{display:grid!important;grid-template-columns:repeat(3,auto) 1fr;gap:.35rem;margin:0;padding:.7rem 1rem .9rem;border-top:1px solid rgba(24,24,23,.08);}.rtg-salon-elite .rij button{min-width:44px;min-height:44px;border:1px solid rgba(24,24,23,.1);border-radius:0;padding:.5rem .7rem;background:transparent;color:#5e5b55;}.rtg-salon-elite .rij button:hover{background:#efede7;color:#191917;}.rtg-salon-elite .rij button[aria-pressed="true"]{border-color:rgba(127,22,52,.28);background:#f4e9ec;color:#7f1634;}.rtg-salon-elite .rij button:nth-of-type(n+4){opacity:.62;font-size:.67rem;}.rtg-salon-elite .rij .tijd{align-self:center;justify-self:end;margin:0;color:#8d8981;font-size:.62rem;}
+.salon-briefing{position:sticky;top:calc(var(--rtg-social-top) + 2rem);align-self:start;min-height:450px;padding:1.65rem;border:0;border-radius:0;background:#1b1c1a;color:#f1eee7;box-shadow:0 24px 52px rgba(26,25,22,.16);}.salon-paneelkop{display:block;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.12);color:#bca66c;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;}.salon-briefing h2{margin:1.4rem 0 .8rem;color:#f5f2eb;font:500 2rem/1.03 "Bodoni Moda",serif;}.salon-briefing>p{color:rgba(245,242,235,.58);font-size:.78rem;line-height:1.65;}
+.salon-briefing dl{margin:1.5rem 0 0;}.salon-briefing dl div{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:.85rem 0;border-top:1px solid rgba(255,255,255,.1);}.salon-briefing dt{color:rgba(245,242,235,.45);font-size:.59rem;letter-spacing:.1em;text-transform:uppercase;}.salon-briefing dd{margin:0;color:#f5f2eb;font-size:.72rem;}
+.salon-briefingacties{margin-top:1rem;border-block:1px solid rgba(255,255,255,.11);}.salon-briefingacties button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:.7rem 0;border:0;border-bottom:1px solid rgba(255,255,255,.09);border-radius:0;background:transparent;color:#f5f2eb;font-size:.72rem;text-align:left;cursor:pointer;}.salon-briefingacties button:last-child{border-bottom:0;}.salon-briefingacties button span{color:#bca66c;}.salon-kringlink{display:inline-flex;align-items:center;min-height:44px;margin-top:1.15rem;color:#bca66c;text-decoration:none;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;}
+body.rtg-stijl.rtg-salon-elite .kaart{padding:clamp(1.1rem,3vw,1.8rem);border:1px solid rgba(24,24,23,.1);border-radius:0;background:#f9f8f5;background-image:none;color:#191917;box-shadow:0 16px 38px rgba(38,36,31,.055);}body.rtg-stijl.rtg-salon-elite input:not([type=range]):not([type=checkbox]):not([type=radio]),body.rtg-stijl.rtg-salon-elite textarea,body.rtg-stijl.rtg-salon-elite select{min-height:48px;border:1px solid rgba(24,24,23,.14);border-radius:0;background:#fff;background-image:none;color:#191917;box-shadow:0 1px 2px rgba(28,27,24,.04);}body.rtg-stijl.rtg-salon-elite .knop,body.rtg-stijl.rtg-salon-elite .meer,body.rtg-stijl.rtg-salon-elite .aibalk button{min-height:48px;border-radius:0;padding:.75rem 1.1rem;}body.rtg-stijl.rtg-salon-elite .knop{background:#7f1634;background-image:none;color:#fff;}body.rtg-stijl.rtg-salon-elite .knop.stil{background:transparent;background-image:none;border-color:rgba(24,24,23,.18);color:#262621;}body.rtg-stijl.rtg-salon-elite .raster{gap:6px;background:transparent;}
+.salon-selectie{display:flex;align-items:center;gap:.35rem;grid-column:1/-1!important;padding:.8rem 1rem!important;color:#68655f;font-size:.76rem;}.salon-selectie b{color:#1e1e1b;}.salon-selectie .mini{min-width:44px;min-height:44px;margin-left:auto;border:0;background:transparent;color:#7f1634;cursor:pointer;}
+.salon-melding{position:fixed;z-index:90;top:calc(var(--rtg-social-top) + 1rem);right:clamp(1rem,3vw,2rem);width:min(420px,calc(100vw - 2rem));display:flex;align-items:flex-start;gap:1rem;padding:1rem 1rem 1rem 1.1rem;border:1px solid rgba(188,166,108,.28);border-radius:0;background:rgba(27,28,26,.98);box-shadow:0 22px 55px rgba(20,20,18,.25);color:#f2eee5;font-size:.78rem;line-height:1.55;backdrop-filter:blur(18px);}.salon-melding[hidden]{display:none;}.salon-melding span{flex:1;max-height:14rem;overflow:auto;}.salon-melding button{flex:0 0 44px;width:44px;height:44px;margin:-.55rem -.55rem 0 0;border:0;border-radius:0;background:transparent;color:#bca66c;font-size:1.25rem;cursor:pointer;}
+@media(max-width:1050px){.salon-stage{grid-template-columns:1fr;}.salon-briefing{position:static;display:grid;grid-template-columns:1fr 1fr;gap:0 2rem;min-height:0;}.salon-paneelkop,.salon-briefingacties,.salon-kringlink{grid-column:1/-1;}.rtg-salon-elite .salon-werkveld>header{background:linear-gradient(90deg,#ece9e2 0%,#ece9e2 74%,#1a1b19 74%,#1a1b19 100%);}}
+@media(max-width:760px){
+  .rtg-salon-elite{padding-bottom:68px!important;}.salon-socialnav{top:auto;bottom:0;height:68px;justify-content:stretch;border-top:1px solid rgba(255,255,255,.1);border-bottom:0;background:rgba(20,21,19,.98);}.salon-socialnav a{flex:1;min-width:0;justify-content:center;padding:0 .2rem;color:rgba(244,241,233,.44);font-size:.54rem;letter-spacing:.07em;}.salon-socialnav a::after{top:0;right:22%;bottom:auto;left:22%;}.salon-socialnav a[aria-current="page"]{color:#f3ecda;}.salon-socialnav small{display:none;}.rtg-salon-elite .salon-werkveld{padding-top:var(--rtg-social-top);}.rtg-salon-elite .aibalk{bottom:68px;}.salon-melding{top:calc(var(--rtg-social-top) + .65rem);right:1rem;}
+  .rtg-salon-elite .salon-werkveld>header{min-height:208px;padding:0 1rem;background:linear-gradient(90deg,#ece9e2 0%,#ece9e2 calc(100% - 70px),#1a1b19 calc(100% - 70px),#1a1b19 100%);}.rtg-salon-elite .salon-werkveld>header::before{top:-86px;right:-58px;width:190px;height:190px;}.rtg-salon-elite .salon-werkveld>header::after{display:none;}.rtg-salon-elite .kop{min-height:148px;align-items:center;}.rtg-salon-elite .kop h1{font-size:2.65rem;}.rtg-salon-elite .kop .ey{font-size:.54rem;}.rtg-salon-elite .salon-belofte{max-width:31ch;margin-top:.6rem;font-size:.76rem;line-height:1.5;}.rtg-salon-elite .salon-terug{display:none;}.rtg-salon-elite .tabs{width:auto;max-width:none;margin-inline:0!important;border-radius:0;}.rtg-salon-elite .tabs>button{min-height:58px;padding:.7rem .8rem!important;font-size:.62rem!important;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{top:1rem;right:1rem;bottom:auto;width:46px;min-width:46px;height:46px;min-height:46px;padding:0!important;overflow:hidden!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:0!important;background:rgba(255,255,255,.04)!important;color:transparent!important;font-size:0!important;}.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop::before{content:"↗";display:grid;place-items:center;color:#efe8d6;font-size:1rem;}
+  .salon-stage{display:block;margin:0;padding:1rem 0 7rem;}.salon-briefing{display:none;}.rtg-salon-elite main{padding:0 1rem;}body[data-salon-tab="feed"].rtg-salon-elite main{display:block;}.rtg-salon-elite .post{margin:0 0 1rem;border-radius:0;}.rtg-salon-elite .post .top{min-height:64px;padding:.62rem .85rem;}.salon-avatar{width:38px;height:38px;flex-basis:38px;}
+  .rtg-salon-elite .kar img,.rtg-salon-elite main>.post:first-of-type .kar img{height:auto;max-height:none;aspect-ratio:4/3;object-fit:cover;}.rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{min-height:0;padding:.85rem .9rem .55rem;font-size:.84rem;}.rtg-salon-elite .post .onderw{padding-inline:.9rem;}.rtg-salon-elite .rij{grid-template-columns:repeat(3,1fr);margin:0;padding:.65rem .8rem .85rem;}.rtg-salon-elite .rij button{padding:.45rem .22rem;font-size:.68rem;}.rtg-salon-elite .rij button:nth-of-type(n+4){border-top:1px solid rgba(24,24,23,.08);}.rtg-salon-elite .rij .tijd{grid-column:3;justify-self:end;padding:.45rem 0;}.rtg-salon-elite .kaart{margin:0 0 1rem;}.rtg-salon-elite .meer{width:100%;margin:0;}
+}
+
+/* ==========================================================================
+   ELITE MATERIAL PASS 2 · MEMBER JOURNAL
+   ========================================================================== */
+.salon-socialnav{background:#eee9de;border-bottom-color:rgba(44,38,27,.16);backdrop-filter:none;}
+.salon-socialnav a{border-inline-start:1px solid rgba(44,38,27,.08);}
+.salon-socialnav a:last-child{border-inline-end:1px solid rgba(44,38,27,.08);}
+.rtg-salon-elite .salon-werkveld{background:#dcd5c8;}
+.rtg-salon-elite .salon-werkveld>header{
+  min-height:262px;border-bottom-color:rgba(216,191,128,.26);
+  background:
+    linear-gradient(90deg,rgba(20,20,18,.98) 0%,rgba(24,24,21,.94) 52%,rgba(46,27,32,.68) 76%,rgba(17,18,16,.88) 100%),
+    url('/campagne/kyoto-suite.jpg') 72% 48%/cover no-repeat;
+}
+.rtg-salon-elite .salon-werkveld>header::before{right:4vw;border-color:rgba(205,184,121,.22);}
+.rtg-salon-elite .kop{min-height:190px;}
+.rtg-salon-elite .kop .ey{color:#cdb879;}
+.rtg-salon-elite .kop h1{color:#f6f1e7;font-size:clamp(3.15rem,5vw,5.25rem);}
+.rtg-salon-elite .salon-belofte{color:rgba(246,241,231,.62);font-family:"Bodoni Moda",Georgia,serif;font-size:.95rem;}
+.rtg-salon-elite .tabs{width:auto;max-width:calc(100% - 160px);border:1px solid rgba(205,184,121,.27)!important;border-bottom:0!important;border-radius:0;background:rgba(19,19,17,.84);box-shadow:none;}
+.rtg-salon-elite .tabs>button{min-height:70px;border-right-color:rgba(255,255,255,.09)!important;color:rgba(246,241,231,.5)!important;}
+.rtg-salon-elite .tabs>button:hover{background:rgba(255,255,255,.035)!important;color:#fff!important;}
+.rtg-salon-elite .tabs>button[aria-pressed="true"]{border-bottom-color:#cbb574!important;background:rgba(255,255,255,.075)!important;color:#f6f1e7!important;}
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{min-height:70px;border-color:rgba(205,184,121,.3)!important;border-radius:0!important;background:rgba(19,19,17,.9)!important;color:#e8dcb9!important;}
+.salon-stage{gap:1px;padding-top:2.4rem;background:transparent;}
+body[data-salon-tab="feed"].rtg-salon-elite main{gap:1px;background:rgba(31,30,26,.14);}
+.rtg-salon-elite .post{border-color:rgba(31,30,26,.14);border-radius:0;background:#f3eee3;box-shadow:none;}
+.rtg-salon-elite .post .top{min-height:76px;border-bottom-color:rgba(255,255,255,.09);background:#20211e;color:#f4eee2;}
+.salon-avatar{border-color:rgba(205,184,121,.42);border-radius:0;background:#302d27;color:#e4ce91;}
+.rtg-salon-elite .post .naam{color:#f4eee2!important;}
+.rtg-salon-elite .post .plek{color:rgba(244,238,226,.48);}
+.rtg-salon-elite .post .merk{border-color:rgba(205,184,121,.3);border-radius:0;color:#cdb879;}
+.rtg-salon-elite .kar{background:#b8b0a2;}
+.rtg-salon-elite .kar img{filter:saturate(.9) contrast(1.04);}
+.rtg-salon-elite .kar .tel{border-radius:0;background:rgba(16,16,14,.78);}
+.rtg-salon-elite .post .tekst{background:#f3eee3;color:#302f2a;}
+.rtg-salon-elite .post .onderw button{border-radius:0;background:#e7dfce;}
+.rtg-salon-elite .rij{border-top-color:rgba(31,30,26,.13);background:#ebe4d7;}
+.rtg-salon-elite .rij button{border-radius:0;background:transparent;}
+.rtg-salon-elite .rij button:hover{background:#f5efe3;}
+.rtg-salon-elite .rij button[aria-pressed="true"]{background:#e7d9dc;}
+.salon-briefing{border-top:2px solid #cbb574;border-radius:0;background:linear-gradient(155deg,#1a1b18 0%,#24231f 64%,#4a2932 150%);box-shadow:none;}
+body.rtg-stijl.rtg-salon-elite .kaart{border-radius:0;background:#f3eee3;box-shadow:none;}
+body.rtg-stijl.rtg-salon-elite input:not([type=range]):not([type=checkbox]):not([type=radio]),body.rtg-stijl.rtg-salon-elite textarea,body.rtg-stijl.rtg-salon-elite select{border-radius:0;background:#f8f3e9;box-shadow:none;}
+body.rtg-stijl.rtg-salon-elite .knop,body.rtg-stijl.rtg-salon-elite .meer,body.rtg-stijl.rtg-salon-elite .aibalk button{border-radius:0;}
+
+@media(max-width:1050px){
+  .rtg-salon-elite .salon-werkveld>header{background:linear-gradient(90deg,rgba(20,20,18,.97),rgba(43,27,31,.8)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+  .salon-briefing{border-top:2px solid #cbb574;}
+}
+@media(max-width:760px){
+  .salon-socialnav{background:rgba(20,21,19,.99);}
+  .salon-socialnav a{border-inline-start:0;}
+  .rtg-salon-elite .salon-werkveld>header{min-height:255px;padding:0 1rem;background:linear-gradient(90deg,rgba(18,18,16,.96),rgba(46,27,32,.67)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+  .rtg-salon-elite .kop{min-height:182px;}
+  .rtg-salon-elite .kop h1{color:#f6f1e7;font-size:3rem;}
+  .rtg-salon-elite .salon-belofte{color:rgba(246,241,231,.65);font-size:.82rem;}
+  .rtg-salon-elite .tabs{max-width:calc(100% - 52px);border-radius:0;}
+  .rtg-salon-elite .tabs>button{min-height:63px;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border-radius:0!important;}
+  .salon-stage{padding-top:1px;background:rgba(31,30,26,.14);}
+  .rtg-salon-elite main{padding:0;}
+  .rtg-salon-elite .post{margin:0 0 1px;border-radius:0;}
+}
+
+/* ==========================================================================
+   PRIVATE RESIDENCE · DE SALON
+
+   Een discreet ledenjournal: redactionele hiërarchie, papier en fotografie.
+   Geen kaartenwand, geen donkere dashboardpanelen en geen goud als decoratie.
+   ========================================================================== */
+.salon-socialnav{
+  top:var(--rtg-social-top);height:54px;justify-content:flex-start;
+  padding:0 clamp(1.5rem,5vw,6.5rem);border-bottom:1px solid rgba(23,23,18,.13);
+  background:rgba(244,241,234,.96);backdrop-filter:blur(18px);
+}
+.salon-socialnav a{
+  min-width:0;padding:0 clamp(1rem,2vw,1.8rem);border:0!important;
+  color:#7c776e;font-size:.55rem;font-weight:600;letter-spacing:.17em;
+}
+.salon-socialnav a:first-child{padding-left:0;}
+.salon-socialnav a::after{right:clamp(1rem,2vw,1.8rem);bottom:-1px;left:clamp(1rem,2vw,1.8rem);height:1px;}
+.salon-socialnav a:first-child::after{left:0;}
+.salon-socialnav a[aria-current="page"]{color:#171712;}
+.salon-socialnav a[aria-current="page"]::after{background:#691f32;}
+.salon-socialnav small{display:none;}
+.rtg-salon-elite .salon-werkveld{
+  padding-top:calc(var(--rtg-social-top) + 54px);background:#f1eee7;color:#171712;
+}
+.rtg-salon-elite .salon-werkveld>header{
+  min-height:294px;padding:0 clamp(1.5rem,5vw,6.5rem);overflow:hidden;
+  border-bottom:1px solid rgba(23,23,18,.14);background:#f1eee7;
+}
+.rtg-salon-elite .salon-werkveld>header::before{
+  top:0;right:0;width:34%;height:100%;border:0;border-radius:0;box-shadow:none;
+  background:
+    linear-gradient(90deg,#f1eee7 0%,rgba(241,238,231,.18) 28%,rgba(18,17,13,.08) 100%),
+    url('/campagne/kyoto-suite.jpg') center/cover no-repeat;
+}
+.rtg-salon-elite .salon-werkveld>header::after{
+  content:"JOURNAL  /  PRIVATE 01";top:2rem;right:clamp(1.5rem,4vw,4.5rem);
+  color:rgba(255,255,255,.72);font-size:.48rem;letter-spacing:.2em;
+}
+.rtg-salon-elite .kop{
+  min-height:220px;max-width:1600px;margin:0 auto;align-items:center;justify-content:flex-start;
+}
+.rtg-salon-elite .kop>div{max-width:640px;}
+.rtg-salon-elite .kop .ey{color:#691f32;font-size:.51rem;letter-spacing:.23em;}
+.rtg-salon-elite .kop h1{margin-top:.65rem;color:#171712;font-size:clamp(3.7rem,5.8vw,6.2rem);line-height:.86;}
+.rtg-salon-elite .salon-belofte{
+  max-width:43ch;margin-top:1.15rem;color:#625f57;font-family:Inter,system-ui,sans-serif;
+  font-size:.82rem;line-height:1.72;
+}
+.rtg-salon-elite .salon-terug{display:none;}
+.rtg-salon-elite .tabs{
+  width:66%;max-width:none;margin:0!important;overflow-x:auto!important;
+  border:0!important;border-radius:0;background:transparent;box-shadow:none;
+}
+.rtg-salon-elite .tabs>button{
+  min-height:72px;padding:0 clamp(.8rem,1.5vw,1.35rem)!important;
+  border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;
+  color:#625f57!important;font-size:.55rem!important;letter-spacing:.14em;
+}
+.rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
+.rtg-salon-elite .tabs>button:hover{color:#171712!important;background:transparent!important;}
+.rtg-salon-elite .tabs>button[aria-pressed="true"]{
+  border-bottom-color:#691f32!important;background:transparent!important;color:#171712!important;
+}
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{
+  right:clamp(1.5rem,5vw,6.5rem);bottom:0;min-height:72px;padding:0!important;
+  border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;
+  background:transparent!important;color:#fff!important;font-size:.54rem!important;letter-spacing:.15em;
+}
+.salon-stage{
+  grid-template-columns:minmax(0,960px) minmax(250px,300px);gap:clamp(3rem,6vw,8rem);
+  max-width:1450px;padding:clamp(3rem,5vw,5.5rem) clamp(1.5rem,5vw,6.5rem) 9rem;
+  background:transparent;
+}
+body[data-salon-tab="feed"].rtg-salon-elite main{display:block;background:transparent;}
+.rtg-salon-elite .post{
+  margin:0 0 4.8rem;padding:0;overflow:visible;border:0;border-radius:0;
+  background:transparent;box-shadow:none;color:#171712;
+}
+.rtg-salon-elite .post .top{
+  min-height:62px;padding:0 0 1rem;border-bottom:1px solid rgba(23,23,18,.14);
+  background:transparent;color:#171712;
+}
+.salon-avatar{
+  flex-basis:36px;width:36px;height:36px;border:1px solid rgba(23,23,18,.18);
+  border-radius:50%;background:transparent;color:#691f32;font-size:.61rem;
+}
+.rtg-salon-elite .post .naam{color:#171712!important;font-size:.75rem;letter-spacing:.02em;}
+.rtg-salon-elite .post .plek{color:#625f57;font-size:.59rem;}
+.rtg-salon-elite .post .merk{
+  padding:.28rem 0;border:0;border-bottom:1px solid rgba(105,31,50,.38);
+  border-radius:0;color:#691f32;font-size:.48rem;letter-spacing:.16em;
+}
+.rtg-salon-elite .kar{margin-top:1.2rem;background:#d8d1c4;}
+.rtg-salon-elite .kar img,.rtg-salon-elite main>.post:first-of-type .kar img{
+  width:100%;height:auto;max-height:none;aspect-ratio:16/10;object-fit:cover;
+  filter:saturate(.84) contrast(1.03);
+}
+.rtg-salon-elite .kar .tel{border-radius:0;background:rgba(18,17,13,.72);}
+.rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{
+  min-height:0;max-width:760px;padding:1.25rem 0 .7rem;background:transparent;
+  color:#34322d;font-family:"Bodoni Moda",Georgia,serif;font-size:1.08rem;line-height:1.62;
+}
+.rtg-salon-elite .post .onderw{padding:0 0 .9rem;}
+.rtg-salon-elite .post .onderw button{
+  min-height:44px;padding:.45rem .65rem .45rem 0;border:0;border-radius:0;background:transparent;
+  color:#746441;font-size:.6rem;letter-spacing:.08em;
+}
+.rtg-salon-elite .rij{
+  display:flex!important;margin:0;padding:.75rem 0 0;border-top:1px solid rgba(23,23,18,.14);
+  background:transparent;
+}
+.rtg-salon-elite .rij button{
+  min-width:44px;min-height:44px;padding:.4rem .8rem .4rem 0;border:0;border-radius:0;
+  background:transparent;color:#6e6a61;font-size:.63rem;
+}
+.rtg-salon-elite .rij button:hover{background:transparent;color:#171712;}
+.rtg-salon-elite .rij button[aria-pressed="true"]{border:0;background:transparent;color:#691f32;}
+.rtg-salon-elite .rij .tijd{margin-left:auto;color:#938e84;font-size:.56rem;}
+.salon-briefing{
+  top:calc(var(--rtg-social-top) + 3rem);min-height:0;padding:0 0 1.5rem;
+  border:0;border-top:1px solid #691f32;border-radius:0;background:transparent;
+  color:#171712;box-shadow:none;
+}
+.salon-paneelkop{padding:1.1rem 0;border-bottom:1px solid rgba(23,23,18,.14);color:#691f32;font-size:.48rem;letter-spacing:.2em;}
+.salon-briefing h2{margin:1.8rem 0 1rem;color:#171712;font-size:2.25rem;line-height:.98;}
+.salon-briefing>p{color:#6c685f;font-size:.72rem;line-height:1.75;}
+.salon-briefing dl{margin-top:1.8rem;}
+.salon-briefing dl div{border-top-color:rgba(23,23,18,.13);}
+.salon-briefing dt{color:#625f57;font-size:.48rem;}.salon-briefing dd{color:#171712;font-size:.64rem;}
+.salon-briefingacties{border-block-color:rgba(23,23,18,.14);}
+.salon-briefingacties button{border-bottom-color:rgba(23,23,18,.12);color:#171712;font-size:.64rem;}
+.salon-briefingacties button span{color:#691f32;}
+.salon-kringlink{color:#691f32;font-size:.55rem;letter-spacing:.14em;}
+body.rtg-stijl.rtg-salon-elite .kaart{
+  padding:clamp(1.2rem,3vw,2rem);border:1px solid rgba(23,23,18,.13);border-radius:0;
+  background:#f7f4ed;background-image:none;color:#171712;box-shadow:none;
+}
+body.rtg-stijl.rtg-salon-elite input:not([type=range]):not([type=checkbox]):not([type=radio]),
+body.rtg-stijl.rtg-salon-elite textarea,body.rtg-stijl.rtg-salon-elite select{
+  border-radius:0;background:#fbf9f4;background-image:none;box-shadow:none;
+}
+body.rtg-stijl.rtg-salon-elite .knop,body.rtg-stijl.rtg-salon-elite .meer,
+body.rtg-stijl.rtg-salon-elite .aibalk button{min-height:48px;border-radius:0;}
+body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
+.salon-melding{border-radius:0;background:rgba(247,244,237,.98);color:#171712;box-shadow:0 22px 55px rgba(20,18,14,.15);}
+.salon-melding button{color:#691f32;}
+
+@media(max-width:1050px){
+  .rtg-salon-elite .salon-werkveld>header{background:#f1eee7;}
+  .salon-stage{grid-template-columns:1fr;}
+  .salon-briefing{display:none;}
+}
+@media(max-width:760px){
+  .rtg-salon-elite{padding-bottom:64px!important;}
+  .salon-socialnav{
+    top:auto;bottom:0;height:64px;padding:0 0 env(safe-area-inset-bottom);justify-content:stretch;
+    border-top:1px solid rgba(23,23,18,.13);border-bottom:0;background:rgba(244,241,234,.98);
+  }
+  .salon-socialnav a{flex:1;justify-content:center;padding:0 .15rem;color:#625f57;font-size:.48rem;letter-spacing:.08em;}
+  .salon-socialnav a:first-child{padding-left:.15rem;}
+  .salon-socialnav a::after{top:0;right:27%;bottom:auto;left:27%;}
+  .salon-socialnav a:first-child::after{left:27%;}
+  .salon-socialnav a[aria-current="page"]{color:#171712;}
+  .rtg-salon-elite .salon-werkveld{padding-top:var(--rtg-social-top);}
+  .rtg-salon-elite .salon-werkveld>header{
+    min-height:255px;padding:0 1.25rem;background:#f1eee7;
+  }
+  .rtg-salon-elite .salon-werkveld>header::before{
+    right:0;width:92px;height:100%;opacity:.62;
+    background:linear-gradient(90deg,#f1eee7 0%,rgba(241,238,231,.18) 52%),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;
+  }
+  .rtg-salon-elite .salon-werkveld>header::after{display:none;}
+  .rtg-salon-elite .kop{min-height:184px;align-items:center;}
+  .rtg-salon-elite .kop>div{max-width:calc(100% - 48px);}
+  .rtg-salon-elite .kop h1{color:#171712;font-size:3.2rem;}
+  .rtg-salon-elite .salon-belofte{max-width:30ch;color:#625f57;font-size:.72rem;line-height:1.6;}
+  .rtg-salon-elite .tabs{width:calc(100% - 42px);max-width:none;}
+  .rtg-salon-elite .tabs>button{min-height:70px;padding:.2rem .85rem!important;font-size:.5rem!important;}
+  .rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{
+    top:1rem;right:1rem;bottom:auto;width:44px;min-width:44px;height:44px;min-height:44px;
+    border:1px solid rgba(23,23,18,.18)!important;color:transparent!important;
+  }
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop::before{color:#171712;}
+  .salon-stage{display:block;padding:2.2rem 0 6rem;background:transparent;}
+  .rtg-salon-elite main{padding:0 1.25rem!important;}
+  .rtg-salon-elite .post{margin:0 0 3.5rem;border:0;border-radius:0;}
+  .rtg-salon-elite .post .top{min-height:58px;padding-bottom:.85rem;}
+  .rtg-salon-elite .kar{margin-right:-1.25rem;margin-left:-1.25rem;}
+  .rtg-salon-elite .kar img,.rtg-salon-elite main>.post:first-of-type .kar img{aspect-ratio:4/5;}
+  .rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{padding-top:1.1rem;font-size:1rem;}
+  .rtg-salon-elite .rij{display:grid!important;grid-template-columns:repeat(3,1fr);padding-top:.65rem;}
+  .rtg-salon-elite .rij button{padding:.35rem .15rem;font-size:.62rem;}
+  .rtg-salon-elite .rij .tijd{grid-column:3;justify-self:end;padding:.4rem 0;}
+  .rtg-salon-elite .kaart{margin-bottom:1rem;}
+}
+
+/* FINAL MATERIAL CASCADE · de Salon is een besloten kamer, geen licht
+   lifestyle-template. */
+.rtg-salon-elite .rtg-social-commandbar{border-bottom-color:rgba(205,184,121,.22);background:#171815;color:#f4efe4;}
+.rtg-salon-elite .rtg-social-commandbar-brand{color:#f4efe4;}
+.rtg-salon-elite .rtg-social-commandbar-brand small{border-left-color:rgba(255,255,255,.15);color:rgba(244,239,228,.48);}
+.rtg-salon-elite .rtg-social-commandbar-state{color:rgba(244,239,228,.48);}
+.rtg-salon-elite .rtg-social-commandbar-state::before{background:#cdb879;}
+.rtg-salon-elite .rtg-social-commandbar .rtg-rahul-tab{border-left-color:rgba(255,255,255,.1)!important;color:#f4efe4!important;background:#1d1e1a!important;}
+.rtg-salon-elite .salon-werkveld{background:#dcd5c8;}
+.rtg-salon-elite .salon-werkveld>header{
+  min-height:270px;border-bottom-color:rgba(205,184,121,.26);
+  background:linear-gradient(90deg,rgba(20,20,18,.985),rgba(24,24,21,.93) 52%,rgba(46,27,32,.68) 78%,rgba(17,18,16,.88)),url('/campagne/kyoto-suite.jpg') 72% 48%/cover no-repeat;
+}
+.rtg-salon-elite .kop .ey{color:#cdb879;}
+.rtg-salon-elite .kop h1{color:#f6f1e7;}
+.rtg-salon-elite .salon-belofte{color:rgba(246,241,231,.62);font-family:"Bodoni Moda",Georgia,serif;font-size:.92rem;}
+.rtg-salon-elite .tabs{width:auto;max-width:calc(100% - 160px);border:1px solid rgba(205,184,121,.28)!important;border-bottom:0!important;background:rgba(19,19,17,.84);}
+.rtg-salon-elite .tabs>button{min-height:72px;border-right:1px solid rgba(255,255,255,.09)!important;color:rgba(246,241,231,.5)!important;}
+.rtg-salon-elite .tabs>button:first-child{padding-left:clamp(.8rem,1.5vw,1.35rem)!important;}
+.rtg-salon-elite .tabs>button:hover{background:rgba(255,255,255,.035)!important;color:#fff!important;}
+.rtg-salon-elite .tabs>button[aria-pressed="true"]{border-bottom-color:#cbb574!important;background:rgba(255,255,255,.075)!important;color:#f6f1e7!important;}
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:1px solid rgba(205,184,121,.3)!important;border-bottom:0!important;background:rgba(19,19,17,.9)!important;color:#e8dcb9!important;}
+.rtg-salon-elite .post{padding:0;overflow:hidden;border:1px solid rgba(31,30,26,.14);background:#f3eee3;}
+.rtg-salon-elite .post .top{min-height:72px;padding:0 1rem;border-bottom-color:rgba(255,255,255,.09);background:#20211e;color:#f4eee2;}
+.rtg-salon-elite .post .naam{color:#f4eee2!important;}
+.rtg-salon-elite .post .plek{color:rgba(244,238,226,.48);}
+.rtg-salon-elite .post .merk{border-color:rgba(205,184,121,.3);color:#cdb879;}
+.rtg-salon-elite .kar{margin:0;}
+.rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{padding-inline:1rem;background:#f3eee3;}
+.rtg-salon-elite .post .onderw{padding-inline:1rem;}
+.rtg-salon-elite .rij{padding-inline:1rem;background:#ebe4d7;}
+.salon-briefing{padding:1.65rem;border-top:2px solid #cbb574;background:linear-gradient(155deg,#1a1b18,#24231f 64%,#4a2932 150%);color:#f1eee7;}
+.salon-paneelkop{border-bottom-color:rgba(255,255,255,.12);color:#cbb574;}
+.salon-briefing h2{color:#f5f2eb;}.salon-briefing>p{color:rgba(245,242,235,.58);}
+.salon-briefing dl div{border-top-color:rgba(255,255,255,.1);}.salon-briefing dt{color:rgba(245,242,235,.45);}.salon-briefing dd{color:#f5f2eb;}
+.salon-briefingacties{border-block-color:rgba(255,255,255,.11);}.salon-briefingacties button{border-bottom-color:rgba(255,255,255,.09);color:#f5f2eb;}.salon-briefingacties button span,.salon-kringlink{color:#cbb574;}
+
+@media(max-width:1050px){
+  .rtg-salon-elite .salon-werkveld>header{background:linear-gradient(90deg,rgba(20,20,18,.97),rgba(43,27,31,.76)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+}
+@media(max-width:760px){
+  .rtg-salon-elite .rtg-social-commandbar{background:#171815;}
+  .salon-socialnav{background:rgba(20,21,19,.99);border-top-color:rgba(255,255,255,.1);}
+  .salon-socialnav a{color:rgba(244,239,227,.48);}.salon-socialnav a[aria-current="page"]{color:#fff;}
+  .rtg-salon-elite .salon-werkveld>header{min-height:265px;background:linear-gradient(100deg,rgba(18,18,16,.96),rgba(46,27,32,.66)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+  .rtg-salon-elite .salon-werkveld>header::before{display:none;}
+  .rtg-salon-elite .kop h1{color:#f6f1e7;}
+  .rtg-salon-elite .salon-belofte{color:rgba(246,241,231,.65);font-size:.78rem;}
+  .rtg-salon-elite .tabs{width:calc(100% - 48px);max-width:none;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border-color:rgba(205,184,121,.36)!important;background:rgba(19,19,17,.72)!important;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop::before{color:#e8dcb9;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{overflow:hidden!important;color:transparent!important;font-size:0!important;}
+  .rtg-salon-elite #osMenuBtn{color:#f4efe4!important;background:transparent!important;box-shadow:none!important;}
+  .rtg-salon-elite main{padding:0;}
+  .rtg-salon-elite .post{margin-bottom:1px;}
+  .rtg-salon-elite .kar{margin:0;}
+  .rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{padding-inline:1rem;}
+}
+
+/* QUIET LUXURY WINT DE CASCADE · De Salon blijft een licht ledenjournal. */
+.rtg-salon-elite .rtg-social-commandbar{border-bottom-color:rgba(23,23,18,.12);background:rgba(244,241,234,.96);color:#171712;}
+.rtg-salon-elite .rtg-social-commandbar-brand{color:#171712;}
+.rtg-salon-elite .rtg-social-commandbar-brand small{border-left-color:rgba(23,23,18,.16);color:rgba(23,23,18,.47);}
+.rtg-salon-elite .rtg-social-commandbar-state{color:rgba(23,23,18,.48);}
+.rtg-salon-elite .rtg-social-commandbar-state::before{background:#691f32;}
+.rtg-salon-elite .rtg-social-commandbar .rtg-rahul-tab{border-left-color:rgba(23,23,18,.13)!important;background:transparent!important;color:#171712!important;}
+.rtg-salon-elite .rtg-social-commandbar .rtg-rahul-tab small{color:rgba(23,23,18,.44)!important;}
+.rtg-salon-elite .salon-werkveld{background:#f1eee7;}
+.rtg-salon-elite .salon-werkveld>header{min-height:294px;border-bottom-color:rgba(23,23,18,.14);background:#f1eee7;}
+.rtg-salon-elite .salon-werkveld>header::before{display:block;top:0;right:0;width:34%;height:100%;border:0;border-radius:0;box-shadow:none;background:linear-gradient(90deg,#f1eee7,rgba(241,238,231,.18) 28%,rgba(18,17,13,.08)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
+.rtg-salon-elite .kop .ey{color:#691f32;}
+.rtg-salon-elite .kop h1{color:#171712;font-size:clamp(4rem,5.4vw,5.4rem)!important;line-height:.88;letter-spacing:-.045em;}
+.rtg-salon-elite .salon-belofte{color:#625f57;font-family:Inter,system-ui,sans-serif;font-size:.82rem;line-height:1.72;}
+.rtg-salon-elite .tabs{width:66%;max-width:none;border:0!important;background:transparent;}
+.rtg-salon-elite .tabs>button{width:auto!important;border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:#625f57!important;box-shadow:none!important;}
+.rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
+.rtg-salon-elite .tabs>button:hover{background:transparent!important;color:#171712!important;}
+.rtg-salon-elite .tabs>button[aria-pressed="true"]{border-bottom-color:#691f32!important;background:transparent!important;color:#171712!important;}
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:#fff!important;}
+.rtg-salon-elite .post{padding:0;overflow:visible;border:0;background:transparent;}
+.rtg-salon-elite .post .top{min-height:62px;padding:0 0 1rem;border-bottom-color:rgba(23,23,18,.14);background:transparent;color:#171712;}
+.rtg-salon-elite .post .naam{color:#171712!important;}
+.rtg-salon-elite .post .plek{color:#625f57;}
+.rtg-salon-elite .post .merk{border-color:rgba(105,31,50,.38);color:#691f32;}
+.rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{padding-inline:0;background:transparent;}
+.rtg-salon-elite .post .onderw{padding-inline:0;}
+.rtg-salon-elite .rij{padding-inline:0;background:transparent;}
+.rtg-salon-elite .salon-briefing{padding:0 0 1.5rem;border-top:1px solid #691f32;background:transparent;color:#171712;}
+.rtg-salon-elite .salon-paneelkop{border-bottom-color:rgba(23,23,18,.14);color:#691f32;}
+.rtg-salon-elite .salon-briefing h2{color:#171712;}
+.rtg-salon-elite .salon-briefing>p{color:#6c685f;}
+.rtg-salon-elite .salon-briefing dl div{border-top-color:rgba(23,23,18,.13);}
+.rtg-salon-elite .salon-briefing dt{color:#625f57;}
+.rtg-salon-elite .salon-briefing dd{color:#171712;}
+.rtg-salon-elite .salon-briefingacties{border-block-color:rgba(23,23,18,.14);}
+.rtg-salon-elite .salon-briefingacties button{border-bottom-color:rgba(23,23,18,.12);color:#171712;}
+.rtg-salon-elite .salon-briefingacties button span,.rtg-salon-elite .salon-kringlink{color:#691f32;}
+
+@media(max-width:1050px){.rtg-salon-elite .salon-werkveld>header{background:#f1eee7;}}
+@media(max-width:760px){
+  .rtg-salon-elite .rtg-social-commandbar{background:rgba(244,241,234,.98);}
+  .rtg-salon-elite .salon-socialnav{background:rgba(244,241,234,.98);border-top-color:rgba(23,23,18,.13);}
+  .rtg-salon-elite .salon-socialnav a{color:#625f57;}.rtg-salon-elite .salon-socialnav a[aria-current="page"]{color:#171712;}
+  .rtg-salon-elite .salon-werkveld>header{min-height:255px;background:#f1eee7;}
+  .rtg-salon-elite .salon-werkveld>header::before{display:block;width:92px;opacity:.62;}
+  .rtg-salon-elite .kop h1{color:#171712;font-size:3.2rem!important;}
+  .rtg-salon-elite .salon-belofte{color:#625f57;font-size:.72rem;}
+  .rtg-salon-elite .tabs{width:calc(100% - 42px);max-width:none;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:1px solid rgba(23,23,18,.18)!important;background:transparent!important;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop::before{color:#171712;}
+  .rtg-salon-elite #osMenuBtn{color:#171712!important;background:transparent!important;}
+  .rtg-salon-elite main{padding:0 1.25rem;}
+  .rtg-salon-elite .post{margin-bottom:3.5rem;}
+  .rtg-salon-elite .kar{margin-inline:-1.25rem;}
+  .rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{padding-inline:0;}
+}
+
+/* LEESBAARHEID · alle journal-labels blijven ook zonder inzoomen te lezen. */
+.salon-socialnav a{color:#5f5b53;font-size:.67rem;letter-spacing:.13em;}
+.rtg-salon-elite .kop .ey{font-size:.67rem;font-weight:600;letter-spacing:.2em;}
+.rtg-salon-elite .salon-belofte{max-width:47ch;color:#514e47;font-size:.96rem;line-height:1.68;}
+.rtg-salon-elite .tabs>button{color:#5f5b53!important;font-size:.67rem!important;font-weight:600;letter-spacing:.11em;}
+.rtg-salon-elite .salon-werkveld>header::after{font-size:.62rem;font-weight:600;text-shadow:0 1px 9px rgba(0,0,0,.7);}
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{font-size:.66rem!important;font-weight:600!important;text-shadow:0 1px 8px rgba(0,0,0,.72);}
+.rtg-salon-elite .post .naam{font-size:.84rem;font-weight:600;}
+.rtg-salon-elite .salon-avatar{font-size:.68rem;}
+.rtg-salon-elite .post .plek{color:#67635b;font-size:.7rem;}
+.rtg-salon-elite .post .merk{font-size:.62rem;font-weight:600;letter-spacing:.12em;}
+.rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{color:#2f2d28;font-size:1.13rem;line-height:1.65;}
+.rtg-salon-elite .post .onderw button{font-size:.72rem;}
+.rtg-salon-elite .rij button{color:#59564f;font-size:.73rem;}
+.rtg-salon-elite .rij .tijd{color:#6d685f;font-size:.68rem;}
+.salon-paneelkop{font-size:.64rem;font-weight:600;letter-spacing:.18em;}
+.salon-briefing>p{color:#57534c;font-size:.82rem;line-height:1.7;}
+.salon-briefing dt{color:#6d685f;font-size:.63rem;}
+.salon-briefing dd{font-size:.75rem;font-weight:500;}
+.salon-briefingacties button{font-size:.75rem;}
+.salon-kringlink{font-size:.68rem;font-weight:600;}
+
+@media(max-width:760px){
+  .salon-socialnav a{font-size:.63rem;font-weight:600;letter-spacing:.04em;}
+  .rtg-salon-elite .kop .ey{font-size:.65rem;}
+  .rtg-salon-elite .salon-belofte{font-size:.84rem;line-height:1.58;}
+  .rtg-salon-elite .tabs>button{font-size:.65rem!important;letter-spacing:.065em;}
+  .rtg-salon-elite .salon-werkveld>header{min-height:304px;}
+  .rtg-salon-elite .tabs{width:100%;max-width:100%;gap:0!important;flex-wrap:wrap!important;overflow:visible!important;}
+  .rtg-salon-elite .tabs>button{
+    min-height:48px;flex:0 0 33.333%!important;padding:.2rem .35rem!important;text-align:left;
+  }
+  .rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{
+    right:0;width:92px;min-width:92px;padding:0 .45rem!important;
+    background:rgba(20,19,16,.42)!important;color:#fff!important;
+    font-size:.63rem!important;letter-spacing:.06em;text-shadow:0 1px 8px rgba(0,0,0,.85);
+  }
+  .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop::before{display:none;}
+  .rtg-salon-elite .post .naam{font-size:.82rem;}
+  .rtg-salon-elite .post .plek{font-size:.7rem;}
+  .rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{font-size:1.04rem;line-height:1.62;}
+  .rtg-salon-elite .rij button{font-size:.7rem;}
+}

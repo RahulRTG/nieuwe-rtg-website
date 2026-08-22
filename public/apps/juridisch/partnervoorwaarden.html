@@ -15,14 +15,25 @@
     --line:var(--rtg-line); --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  /* body.rtg-stijl en niet body: de gedeelde UI-kit zet `body.rtg-stijl` en die
+   is specifieker, dus de verklaring hieronder verloor de GROND maar hield de
+   INKT -- bijna zwarte tekst op een bijna zwarte grond, 1,08:1. Een juridisch
+   stuk is een document en geen appvlak; het schildert zijn eigen vlak, en dan
+   allebei de kanten ervan. Zie data-rtg-eigenvlak op de body hierboven. */
+  /* EN MET data-rtg-eigenvlak ERBIJ, want anders wint de kit alsnog. `body.rtg-stijl`
+     hierboven is even specifiek als de regel in de gedeelde kit, dus besliste de
+     VOLGORDE -- en die kit wordt later ingesloten. Gemeten onder een thema stond
+     deze pagina daardoor gewoon donker (rgb(23,19,16)), leesbaar maar niet wat er
+     staat: een juridisch stuk hoort een document te zijn. Met het attribuut erbij
+     is de regel specifieker dan de kit en klopt de verklaring ook echt. */
+  body.rtg-stijl[data-rtg-eigenvlak]{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
   a{color:inherit;}
   .wrap{max-width:720px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
   header{padding:2rem 0;border-bottom:1px solid var(--line);background:var(--kap,rgba(12,12,11,0.86));}
   header .wrap{display:flex;justify-content:space-between;align-items:center;}
   header a{font-size:0.8rem;color:var(--grey);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;}
   main{padding:clamp(3rem,7vw,5rem) 0 5rem;}
-  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--leesgoud,var(--rtg-leesgoud,var(--gold-diep,#5E4F05)));font-weight:600;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(2rem,5vw,2.8rem);line-height:1.15;margin:0.8rem 0 0.4rem;}
   .updated{font-size:0.78rem;color:var(--grey-soft);}
   h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;margin:2.6rem 0 0.7rem;}
@@ -30,13 +41,13 @@
   ul{padding-left:1.2rem;margin:0.6rem 0;}
   li{margin:0.35rem 0;}
   b{color:var(--black);}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.2rem 1.4rem;margin:1.4rem 0;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:0;padding:1.2rem 1.4rem;margin:1.4rem 0;}
   footer{border-top:1px solid var(--line);padding:2rem 0;font-size:0.78rem;color:var(--grey-soft);}
   footer a{text-decoration:none;border-bottom:1px solid var(--line);}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body data-rtg-eigenvlak class="rtg-stijl">
 <header>
   <div class="wrap">
     <a href="/apps/juridisch.html">← Juridisch</a>
@@ -50,15 +61,16 @@
     <p class="updated">Laatst bijgewerkt: 22 juli 2026 · Deze voorwaarden gelden tussen RTG (merknaam Rahul Travel Group, KvK 82273510) en elk aangesloten partnerbedrijf: horeca, hotels en appartementen, vervoerders, autoverhuur en -verkoop, boten en jachten, activiteiten, vastgoed, mode en retail, groothandels, beveiligingsteams en zelfstandige professionals. Akkoord met deze voorwaarden (inclusief de verwerkersafspraken in artikel 5) is een voorwaarde om partner te worden.</p>
 
     <div class="card">
-      <p><b>In het kort.</b> U betaalt RTG <b>0% commissie</b>: elke euro omzet via RTG is volledig van u. RTG verdient aan de ledenbijdragen, niet aan u. In ruil vragen we drie dingen: lever de kwaliteit die RTG-leden verwachten, behandel gastgegevens volgens de afspraken hieronder, en houd uw verplichte bedrijfsaccount op De Salon levend.</p>
+      <p><b>In het kort.</b> U betaalt RTG <b>0% commissie</b>: RTG neemt geen aandeel in uw omzet. Rekent u af via RTG Pay, dan betaalt u daarvoor een vast tarief per transactie (artikel 1) &mdash; een prijs voor een dienst, geen percentage van wat u verdient. In ruil vragen we drie dingen: lever de kwaliteit die RTG-leden verwachten, behandel gastgegevens volgens de afspraken hieronder, en houd uw verplichte bedrijfsaccount op De Salon levend. Een partnerplek hoort bij een zakelijk abonnement (artikel 1); er is geen entree.</p>
     </div>
 
     <h2>1. Het partnerschap en 0% commissie</h2>
     <ul>
-      <li>RTG rekent <b>geen commissie, geen transactiekosten en geen licentiekosten</b> over uw omzet via de app of de kassa. De prijzen die u instelt, zijn de bedragen die u ontvangt.</li>
+      <li>RTG rekent <b>geen commissie over uw omzet</b>: geen percentage van wat u verkoopt via de app of de kassa, en geen licentiekosten. De prijzen die u instelt, zijn de bedragen die uw klant betaalt en die aan u toekomen.</li>
+      <li><b>Wel: de betaaldienst.</b> Rekent u af via RTG Pay, dan treedt RTG op als betaaldienstverlener en brengt daarvoor <b><span data-tarief="vast">&euro; 0,10</span> plus <span data-tarief="pct">1</span>% per transactie</b> in rekening, per betaling direct verrekend op uw partnerrekening en als aparte regel zichtbaar. Dat is een prijs voor een verleende dienst en nadrukkelijk geen aandeel in uw omzet: het bedrag hangt af van het aantal betalingen dat wij afhandelen, niet van wat u verdient. U bent niet verplicht via RTG Pay af te rekenen; doet u dat niet, dan brengt RTG u hiervoor niets in rekening. Een wijziging van dit tarief kondigen wij vooraf aan.</li>
       <li><b>Ledenprijsgarantie:</b> de prijs die u RTG-leden rekent is <b>nooit hoger dan uw eigen publieke prijs</b> (uw eigen website, uw prijslijst ter plaatse) voor dezelfde dienst op hetzelfde moment; de bedoeling is lager, omdat u bij RTG geen commissie afdraagt en die marge aan leden kunt doorgeven. Meldt een lid een lagere eigen publieke prijs, dan past u de prijs aan en zet u het verschil voor dat lid recht. Deze garantie gaat uitsluitend over uw eigen prijzen: RTG stelt <b>geen</b> eisen aan uw prijzen of aanwezigheid op andere verkoopkanalen.</li>
       <li>De partner-apps (kassa, werkplekken, personeel, backoffice, boekhouding) zijn kosteloos onderdeel van het partnerschap.</li>
-      <li><b>Founding-partners</b> (zelf aangemeld of onze uitnodiging geaccepteerd voor de sluitingsdatum van de founding-actie) betalen <b>geen entree en geen contributie</b>. Wie de uitnodiging eerst afsloeg of later toetreedt, betaalt eenmalig <b>&euro; 10.000 entree</b> en <b>&euro; 500 vaste contributie per jaar</b>, plus een jaarlijkse doorbelasting van de werkelijke onderhoudskosten van het platform (servers, energie, voorschotten en dergelijke), gespecificeerd op de factuur en zonder maximum. De sluitingsdatum wordt vooraf aangekondigd; de datum van aanmelding of uitnodiging is bepalend.</li>
+      <li><b>Wat het partnerschap kost.</b> Een partnerplek hoort bij een zakelijk RTG-abonnement: <b>RTG Business Lite</b> (<span data-pasprijs="business-lite">&euro; 150</span> per maand) of de <b>RTG Business Pass</b>. Dat is het enige vaste bedrag: er is <b>geen entree</b>, geen aparte contributie en geen doorbelasting van onderhoudskosten. Naast het abonnement betaalt u alleen wat u werkelijk verbruikt &mdash; de betaaldienst uit artikel 1 en, boven het inbegrepen tegoed, extra AI-capaciteit. <b>Founding-partners</b> (zelf aangemeld of onze uitnodiging geaccepteerd voor de sluitingsdatum van de founding-actie) betalen dat abonnement niet zolang de founding-afspraak loopt. De sluitingsdatum wordt vooraf aangekondigd; de datum van aanmelding of uitnodiging is bepalend.</li>
       <li>De leverancierscode en PIN's zijn bedrijfsgebonden. U beheert zelf wie toegang heeft en wie manager is.</li>
       <li>RTG-leden zijn en blijven leden van RTG. RTG bemiddelt: elke bestelling, rit of boeking komt als losse overeenkomst tot stand <b>tussen het lid en uw onderneming</b>.</li>
     </ul>
@@ -78,7 +90,7 @@
       <li>U kiest zelf het <b>betaalmoment</b>: vooraf (standaard: een bestelling, rit of boeking is pas definitief en zichtbaar na betaling) of achteraf (direct definitief, betaling volgt via de app).</li>
       <li>Bij betaling achteraf draagt u het incassorisico tot het lid heeft afgerekend; RTG ondersteunt met herinneringen in de app.</li>
       <li><b>Rechtstreekse ontvangsten en betaalverzoeken:</b> leden kunnen u los betalen (via de AI of De Salon) en u kunt betaalverzoeken sturen op codenaam. Ook die bedragen komen rechtstreeks bij u binnen; een open verzoek kunt u intrekken.</li>
-      <li>U ontvangt het volledige bedrag zonder inhoudingen van RTG; alleen de reguliere kosten van de betaaldienstverlener zijn voor uw rekening, volgens uw partnerovereenkomst.</li>
+      <li>U ontvangt het volledige bedrag zonder inhouding van commissie. De kosten van de betaaldienst zijn voor uw rekening: rekent u af via RTG Pay, dan is dat het tarief uit artikel 1 (RTG als betaaldienstverlener); gebruikt u een andere betaaldienstverlener, dan gelden diens kosten volgens uw eigen overeenkomst met die partij. Elke verrekening staat als aparte regel in uw overzicht, met de transactie waar zij bij hoort.</li>
     </ul>
 
     <h2>4. Uw verplichtingen</h2>
@@ -149,5 +161,34 @@
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script>
+/* Het betaaldiensttarief komt LIVE uit de commerciele kern (/api/betaaldiensttarief),
+   net als de pasprijzen op de voorwaardenpagina. Een bedrag in een juridisch
+   document dat los kan lopen van wat de code rekent, is precies hoe "0%
+   commissie" hier naast een commissieknop kon blijven staan (PRIJZEN.md 4.1).
+   Zonder verbinding blijven de gedrukte bedragen staan. */
+fetch('/api/betaaldiensttarief').then(r => (r.ok ? r.json() : null)).then(d => {
+  const t = d && d.betaaldienst;
+  if (!t) return;
+  const eur = c => '\u20AC ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  for (const el of document.querySelectorAll('[data-tarief="vast"]'))
+    if (Number.isFinite(t.vastCenten)) el.textContent = eur(t.vastCenten);
+  for (const el of document.querySelectorAll('[data-tarief="pct"]'))
+    if (Number.isFinite(t.pct)) el.textContent = String(t.pct);
+}).catch(() => {});
+/* De prijs van het zakelijke abonnement komt uit dezelfde bron als de
+   voorwaardenpagina voor leden: een bedrag in een juridisch document dat los kan
+   lopen van wat de code rekent, is hoe "0% commissie" hier naast een
+   commissieknop kon blijven staan (PRIJZEN.md 4.1). */
+fetch('/api/pasprijzen').then(r => (r.ok ? r.json() : null)).then(d => {
+  if (!d || !d.passen) return;
+  const eur = c => '\u20AC ' + (c / 100).toLocaleString('nl-NL',
+    { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 });
+  for (const el of document.querySelectorAll('[data-pasprijs]')) {
+    const p = d.passen[el.dataset.pasprijs];
+    if (p && Number.isFinite(p.maandCenten)) el.textContent = eur(p.maandCenten);
+  }
+}).catch(() => {});
+</script>
 </body>
 </html>

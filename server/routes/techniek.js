@@ -130,8 +130,9 @@ module.exports = (kern) => {
     const zid = String(req.body.id || '');
     const z = Object.prototype.hasOwnProperty.call(t.zekeringen, zid) ? t.zekeringen[zid] : null;
     if (!z) return res.status(404).json({ error: 'Onbekende zekering.' });
-    if (req.body.actie === 'reset') { z.aan = true; z.reden = null; z.sindsGesprongen = null; }
-    else if (req.body.actie === 'spring') { z.aan = false; z.reden = String(req.body.reden || 'handmatig uitgeschakeld').slice(0, 120); z.sindsGesprongen = Date.now(); }
+    // handmatig kent geen 'tot': wat de eigenaar trekt, blijft eruit tot hij het reset
+    if (req.body.actie === 'reset') { z.aan = true; z.reden = null; z.sindsGesprongen = null; z.tot = null; }
+    else if (req.body.actie === 'spring') { z.aan = false; z.reden = String(req.body.reden || 'handmatig uitgeschakeld').slice(0, 120); z.sindsGesprongen = Date.now(); z.tot = null; }
     else return res.status(400).json({ error: 'Actie moet reset of spring zijn.' });
     save();
     res.json({ ok: true, id: zid, aan: z.aan });
@@ -162,6 +163,7 @@ module.exports = (kern) => {
   require('./techniek/functie')(tctx);
   require('./techniek/boardroom')(tctx);
   require('./techniek/betalingen')(tctx);
+  require('./techniek/aikosten')(tctx);  // de stand van de modelkraan (server/ai-meter.js)
   require('./techniek/beheer')(tctx);
   require('./techniek/wacht')(tctx);
   require('./techniek/papieren')(tctx);

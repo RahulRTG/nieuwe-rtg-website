@@ -32,6 +32,18 @@ module.exports = [
     uitleg: 'De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.', paden: ['/api/pin', '/api/sleutelwoorden'] },
   { id: 'tg-zegel', categorie: 'Toegang en identiteit', naam: 'Zegel, codes en rechtenbeheer', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.', paden: ['/api/zegel', '/api/code', '/api/drm'] },
+  /* RTG Link staat NAAST de codelaag hierboven en niet erin, want het zijn twee
+     dingen: daar wordt een code gemaakt en ondertekend, hier wordt hij geduid --
+     wat is dit, en wat mag DEZE scanner er nu mee (LINK.md). Uit zetten haalt het
+     scannen weg zonder de codes zelf onbruikbaar te maken: een tafelcode blijft
+     een tafelcode, alleen het bedoelingsscherm en de capabilities gaan uit.
+
+     Alleen /api/link, en dat is met opzet. De gezinsdeur (/api/rtf/link) en de
+     kassadeur (/api/supplier/link) horen bij het oppervlak van die werelden: wie
+     de RTFoundation of de partnerkant uitzet, hoort ook hun scanweg mee uit te
+     zetten -- en niet andersom. */
+  { id: 'tg-link', categorie: 'Toegang en identiteit', naam: 'RTG Link (scannen en capabilities)', standaard: true, doelgroepen: ALLE,
+    uitleg: 'De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.', paden: ['/api/link'] },
   /* De adresopzoeker hoort bij DE PLEK WAAR EEN ADRES GEVRAAGD MAG WORDEN, en dat
      is deze poort: de intake vraagt er sinds de momenten geen meer. Hij hoort
      dus niet onder Onboarding -- wie daar de schakelaar omzet, zou anders ook de
@@ -47,8 +59,12 @@ module.exports = [
      zetten -- terwijl juist een uitnodigingslink iets is dat je wilt kunnen
      dichtdraaien als er misbruik van wordt gemaakt. Geen recht en geen
      infrastructuur, dus geen plaats op de BUITEN-lijst. */
-  { id: 'tg-werving', categorie: 'Toegang en identiteit', naam: 'Wervingslink van een werkgever', standaard: true, doelgroepen: ALLE,
-    uitleg: 'De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.', paden: ['/api/werving'] },
+  /* HIER STOND 'tg-werving' MET PAD /api/werving, en die deed niets. De functie
+     'werving' (cat-partners) claimt datzelfde pad en staat eerder in de
+     catalogus; bij een gelijk lange prefix wint de eerste, dus deze schakelaar
+     stond wel op het bord en schakelde geen enkele route. Weggehaald: dat
+     verandert niets aan het gedrag en scheelt een knop die loog. De fail-fast in
+     ./index.js maakt een tweede claim op hetzelfde pad voortaan onmogelijk. */
 
   // ---------- de kern van de app ----------
   { id: 'kern-state', categorie: 'Leden (RTG-app)', naam: 'De app-staat', standaard: true, doelgroepen: ALLE,

@@ -46,7 +46,7 @@
   function stream(){
     if (!window.EventSource) return;
     try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
-    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadVakbewijzen(); loadConcierge(); loadIncidenten(); loadSalonNaleving(); loadOntmoetingen(); loadTrust(); });
+    source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadVakbewijzen(); loadConcierge(); laadTafels(); loadIncidenten(); loadSalonNaleving(); loadOntmoetingen(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
     // Salon-ontmoetingen: SOS-alarm en het live camerabeeld (WebRTC-signaal)
     source.addEventListener('ontmoeting-sos', () => { loadOntmoetingen(); const p=$('#prices'); if(p) p.classList.add('flash'); });
@@ -92,5 +92,11 @@
     } catch (e) {}
   });
 
+  /* De knoppen van de reisbalie en de instellingen: één keer ophangen, niet bij
+     elke render. Anders krijgt dezelfde knop bij elke verversing een extra
+     luisteraar en zet één klik straks drie reizen neer. */
+  reisaanbodKnop();
+  instellingKnop();
+
   window.addEventListener('rtglang', () => { if (state){ render(); loadVerify(); } });
-})();
+

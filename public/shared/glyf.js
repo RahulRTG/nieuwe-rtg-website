@@ -39,6 +39,10 @@
     cercle: '<path d="M4 8.2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 2 2 0 0 0 0-4z"/><path d="M14 6.5v11" stroke-dasharray="1.4 2"/>',
 
     /* --- reizen & onderweg --- */
+    /* De wereldglyf van TravelOS. Bewust GEEN vliegtuig: die is al de glyf van
+       Vluchten, en een wereld die het teken van een van zijn eigen apps draagt,
+       leest als die app. Een bol met meridiaan is de reis zelf en geen vervoer. */
+    reizen: '<circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4c2.4 2.2 3.6 5 3.6 8s-1.2 5.8-3.6 8c-2.4-2.2-3.6-5-3.6-8s1.2-5.8 3.6-8z"/>',
     vluchten: '<path d="M11.2 3.4c.5 0 .9.5.9 1.3v4.7l7.4 4.4v1.8l-7.4-2.2v3.5l2.1 1.5v1.3l-3-.9-3 .9v-1.3l2.1-1.5v-3.5L3 15.6v-1.8l7.3-4.4V4.7c0-.8.4-1.3.9-1.3z"/>',
     ov: '<rect x="4.5" y="4.5" width="15" height="12.5" rx="2.2"/><path d="M4.5 12h15"/><circle cx="8" cy="19" r="1.4"/><circle cx="16" cy="19" r="1.4"/>',
     flits: '<path d="M8.5 20L11 4M15.5 20L13 4"/><path d="M12 6.5v1.6M12 11.2v1.6M12 15.9v1.6"/>',
@@ -202,5 +206,35 @@
     });
   }
 
-  window.RTGGlyf = { svg: svg, svgHTML: svgHTML, tekst: tekst, heeft: function (n) { return !!P[n]; } };
+  /* VUL DE TEGELS. `data-glyf="spelen"` op een leeg vak, en dit zet het
+     pictogram erin. Dat attribuut bestond al (apps/office schreef zijn eigen
+     lusje ervoor), maar er was nergens een gedeelde vuller -- en daardoor stond
+     de Foundation-hub met zesenvijftig LEGE icoonvakken op het scherm terwijl
+     deze set er compleet naast lag. Een iconenset die niemand aanroept is geen
+     iconenset.
+
+     Twee dingen die deze functie met opzet NIET doet. Hij overschrijft niets:
+     zit er al een <svg> in, dan laat hij hem staan, zodat een pagina die zijn
+     eigen vulling doet (office) niet twee pictogrammen krijgt, in welke
+     volgorde de scripts ook laden. En hij haalt niets weg bij een onbekende
+     naam: dan blijft het vak leeg zoals het was, want stil iets wissen is
+     erger dan stil niets doen. */
+  function vul(wortel) {
+    var lijst = (wortel || document).querySelectorAll('[data-glyf]');
+    for (var i = 0; i < lijst.length; i++) {
+      var el = lijst[i];
+      if (el.querySelector('svg')) continue;
+      var node = svg(el.getAttribute('data-glyf'));
+      if (node) el.appendChild(node);
+    }
+  }
+
+  window.RTGGlyf = { svg: svg, svgHTML: svgHTML, tekst: tekst, vul: vul,
+    heeft: function (n) { return !!P[n]; } };
+
+  /* Zelf aanslaan, zodat een pagina alleen het blad hoeft te laden. Staat de
+     DOM er al (script onderaan, of async), dan meteen. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { vul(); });
+  } else { vul(); }
 })();

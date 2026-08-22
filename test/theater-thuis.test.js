@@ -2,7 +2,7 @@
    apparaat; RTG bewaart alleen titel en affiche. Kijken loopt rechtstreeks
    (WebRTC-datakanaal) van maker naar kijker; de server is puur doorgeefluik
    voor de signalering en heeft de bytes nooit. Draai los:
-   node --experimental-sqlite --test test/theater-thuis.test.js */
+   node --test test/theater-thuis.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

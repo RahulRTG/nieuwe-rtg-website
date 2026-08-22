@@ -1,7 +1,7 @@
 /* De RTG-signatuurmond (public/shared/mond.js): het puntenveld dat de lippen
    vormt is een pure functie met diepte (z). Hier los getoetst in Node -- de
    WebGL-render en de 2D-terugval leven alleen in de browser.
-   Draai los: node --experimental-sqlite --test test/mond.test.js */
+   Draai los: node --test test/mond.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const Mond = require('../public/shared/mond');

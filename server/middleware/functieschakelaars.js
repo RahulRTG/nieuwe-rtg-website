@@ -30,18 +30,13 @@ function natieNaarLand(nat) {
   return null;
 }
 
-const ZIN = {
-  globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
-  pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
-  land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
-  plaats: 'Deze functie is in jouw woonplaats uitgeschakeld door de beheerder.',
-  persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
-  genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.',
-  /* De canary is geen storing en geen straf: de functie wordt uitgerold en is
-     nog niet aan iedereen toe. Dat hoort er ook zo te staan -- "uitgeschakeld
-     door de beheerder" zou een supportvraag opleveren die nergens over gaat. */
-  canary: 'Deze functie wordt stap voor stap uitgerold en staat nog niet voor iedereen open.'
-};
+/* De ZINNEN en de twee 503-antwoorden wonen in schakelaar-antwoord.js. Dat is
+   geen opsplitsing om de opsplitsing: dit bestand kwam met de uitleg erbij over
+   de omvanggrens van 10 kB, en de deltapoort hield dat tegen. Wat eruit is
+   gegaan hoort ook bij elkaar -- het is de vraag WAT een beller te horen krijgt,
+   los van de vraag OF hij erdoor mag. */
+const antwoord = require('./schakelaar-antwoord');
+const { ZIN, bekendeBeller } = antwoord;
 
 function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter, bevoegdVan }) {
   return (req, res, next) => {
@@ -81,10 +76,15 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
       const f = functies.functieVoorPad(p);
       if (f && f.vermogen) {
         const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
-        let gebruiker = null, tier = null;
+        let gebruiker = null, tier = null, sessie = null;
         try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
-        if (tok && !gebruiker) { try { const ses = sessionFor(tok); if (ses && ses.tier) tier = ses.tier; } catch (e) {} }
-        const doel = functies.doelgroepVanVerzoek(p, gebruiker) ||
+        /* De sessie hoort er ALTIJD bij te worden gehaald en niet alleen als het
+           accounttoken faalt: op de werkpaden van WorkOS leest
+           doelgroepVanVerzoek de relatie tot de organisatie uit de sessie, en
+           een medewerker die met zijn RTG-account binnenkwam heeft ALLEBEI. */
+        if (tok) { try { sessie = sessionFor(tok); } catch (e) {} }
+        if (tok && !gebruiker && sessie && sessie.tier) tier = sessie.tier;
+        const doel = functies.doelgroepVanVerzoek(p, gebruiker, sessie) ||
           (tier ? functies.tierNaarDoelgroep(tier) : null);
         const raakt = doel && Array.isArray(f.doelgroepen) && f.doelgroepen.includes(doel);
         if (raakt) {
@@ -99,11 +99,13 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
             if (land) oordeel = bevoegd.mag(f.vermogen, { land });
           }
           if (!oordeel.mag) {
-            return res.status(503).json({
-              error: oordeel.uitleg, functie: f.id, naam: f.naam,
-              reden: 'bevoegdheid', vermogen: oordeel.vermogen, bevoegdheidReden: oordeel.reden,
-              nodig: oordeel.nodig || undefined
-            });
+            /* Aan een vreemde vertellen we niet welke vergunning ontbreekt. De
+               alinea hierboven belooft te zwijgen tegen wie "niemand is", maar
+               doelgroepVanVerzoek() leidt de doelgroep ook uit het PAD af, dus
+               voor /api/supplier, /api/staff, /api/office en /api/foundation gold
+               dat niet. Zie schakelaar-antwoord.js. Blokkeren blijft blokkeren;
+               alleen de uitleg gaat eraf. */
+            return res.status(503).json(antwoord.bevoegdheid(bekendeBeller(gebruiker, tier || sessie), f, oordeel));
           }
         }
       }
@@ -133,10 +135,10 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
     try { if (tok) user = accounts.verifyToken(tok); } catch (e) {}
     // geen accounttoken? dan kan het een sessietoken zijn: een gast (de gratis
     // app) of een demo-pas; zo kan de boardroom ook de gratis app besturen
-    if (tok && !user) {
-      try { const s = sessionFor(tok); if (s && s.tier) sessieTier = s.tier; } catch (e) {}
-    }
-    const doelgroep = functies.doelgroepVanVerzoek(p, user) ||
+    let sessie = null;
+    if (tok) { try { sessie = sessionFor(tok); } catch (e) {} }
+    if (tok && !user && sessie && sessie.tier) sessieTier = sessie.tier;
+    const doelgroep = functies.doelgroepVanVerzoek(p, user, sessie) ||
       (sessieTier ? functies.tierNaarDoelgroep(sessieTier) : null);
 
     // de leveranciers-regie: alleen als er genre-regels staan (bewaard of als
@@ -167,10 +169,11 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
 
     const dicht = functies.padGeblokkeerd(p, staat, { doelgroep, land, plaats, persoon, genre: zaakGenre });
     if (dicht) {
-      return res.status(503).json({
-        error: ZIN[dicht.reden] || ZIN.globaal,
-        functie: dicht.id, naam: dicht.naam, reden: dicht.reden, doelgroep: doelgroep || undefined
-      });
+      /* Wie zich niet heeft bekendgemaakt, hoort alleen de neutrale zin -- de
+         naam van een functie is geen publieke informatie. Sinds 18 augustus
+         2026, en het is een besluit: zie de kop van schakelaar-antwoord.js voor
+         wat het kost en waarom de statuscode 503 blijft. */
+      return res.status(503).json(antwoord.dicht(bekendeBeller(user, sessie), dicht, doelgroep));
     }
     next();
   };

@@ -29,13 +29,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-overheid-'));
 
 /* De loketten waar een ambtenaar achter zit, met de rol die ze vragen. */
@@ -68,7 +64,7 @@ async function toon(page, base, app, token) {
     localStorage.removeItem('rtg_rijk_token');
   }, token || null);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1000);
+  await wachtOpRust(page);
   return page.evaluate(() => ({
     pad: location.pathname,
     tekst: document.body.innerText.replace(/\s+/g, ' ')
@@ -86,14 +82,15 @@ async function nieuwLid(base) {
 }
 
 test('achter het loket komt een gewoon lid niet: vijf ambtenarenschermen vragen om de medewerkersinlog',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const token = await nieuwLid(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -129,14 +126,15 @@ test('achter het loket komt een gewoon lid niet: vijf ambtenarenschermen vragen 
 });
 
 test('de burgerkant staat wel open: de loketten van de gemeente en het rijk',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const token = await nieuwLid(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 

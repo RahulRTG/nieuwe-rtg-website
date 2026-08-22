@@ -2,7 +2,7 @@
    campagneplanner (inplannen, valideren, weghalen, en het rijpe plan dat
    bij het overzicht vanzelf op De Salon verschijnt), de nieuwsbrief met de
    7-dagenrem, en de rolgrens (alleen management).
-   Draai los: node --experimental-sqlite --test test/prplus.test.js */
+   Draai los: node --test test/prplus.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');
@@ -43,10 +43,27 @@ test('1. campagneplanner: inplannen, valideren, weghalen en vanzelf publiceren',
     // een plan dat zo meteen rijp is: het overzicht publiceert het vanzelf
     r = await api(base, '/api/supplier/pr/plan', { tekst: 'Vanavond een proeverij aan zee.', publiceerOp: new Date(Date.now() + 800).toISOString() }, sup);
     assert.equal(r.status, 200);
-    await slaap(1200);
-    r = await api(base, '/api/supplier/pr/overzicht', {}, sup);
-    assert.equal(r.status, 200);
-    const c = r.body.campagnes.find(x => x.tekst.includes('proeverij'));
+    /* WACHTEN TOT HET PLAN RIJP EN GEPLAATST IS, en niet 1200 ms gokken.
+
+       Het plan staat op `publiceerOp = nu + 800 ms`, en het overzicht plaatst
+       het bij het eerste opvragen daarna. Er zijn dus twee dingen nodig: de
+       klok moet voorbij dat moment zijn, en er moet iemand kijken. De 1200 ms
+       dekten het eerste met marge en het tweede met geluk. Nu vragen we het
+       overzicht net zo lang op tot de campagne op `geplaatst` staat -- dat is
+       het teken, en het opvragen IS meteen de handeling die hem plaatst. */
+    let c = null;
+    {
+      const eind = Date.now() + 20000;
+      for (;;) {
+        r = await api(base, '/api/supplier/pr/overzicht', {}, sup);
+        assert.equal(r.status, 200);
+        c = (r.body.campagnes || []).find(x => x.tekst.includes('proeverij'));
+        if (c && c.status === 'geplaatst') break;
+        if (Date.now() >= eind) throw new Error('het rijpe plan werd binnen 20 s niet geplaatst (stand: ' +
+          (c ? c.status : 'campagne niet gevonden') + ')');
+        await slaap(50);
+      }
+    }
     assert.equal(c.status, 'geplaatst', 'rijp plan is gepubliceerd');
     assert.ok(c.postId, 'met een echte Salon-post');
     assert.ok(r.body.bereik.some(p => p.tekst.includes('proeverij')), 'en telt mee in het bereik');

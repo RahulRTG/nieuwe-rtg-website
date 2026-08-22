@@ -1,149 +1,157 @@
-/* Test voor de GEHEUGEN-motor (server/db/geheugen.js): de volledig in-memory
-   runtime-engine met versleutelde, incrementele, brok-per-collectie-opslag.
-   Toetst het beloofde: correctheid (round-trip), privacy (niets platte tekst op
-   schijf), zuinigheid (alleen veranderde brokken herschreven), en veiligheid
-   (knoei/corruptie valt op en rolt terug naar de vorige consistente generatie). */
-const { test } = require('node:test');
-const assert = require('node:assert');
-const fs = require('fs'), os = require('os'), path = require('path');
+/* De Memory Engine: van leren-toets-vergeten naar onthouden.
 
-// Een verse datamap + geen RTG_ENC_KEY: zo toetsen we de privacy-by-default
-// (de motor maakt en gebruikt zijn eigen sleutel).
+   De beloftes die hier hard worden gemaakt:
+
+   - een behaald leerdoel krijgt een herhaalmoment, en dat moment ligt in de
+     toekomst (niet vandaag: dan zou alles meteen open staan);
+   - een herhaling is DRIE vragen en loopt door dezelfde antwoordweg als een
+     oefensessie, zodat een herhaalvraag er hetzelfde uitziet als een nieuwe;
+   - herhalen is geen straf: de open lijst draagt geen datum en geen
+     achterstand, en een mindere herhaling wist het leerdoel niet;
+   - een geslaagde herhaling na een tijd is bewijs (Proof of Learning), een
+     mislukte herhaling wordt NIET als bewijs vastgelegd -- dit huis houdt geen
+     dossier bij van de missers van een kind;
+   - bewijs van school schuift het moment vooruit en nooit naar achteren.
+   Draai los: node --experimental-sqlite --test test/geheugen.test.js */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('fs'); const os = require('os'); const path = require('path');
+const { startServer, stop } = require('./helper');
+const { maakGeheugen, begin, uitstel, naOphaling, INTERVALLEN, HERHAAL_VRAGEN } = require('../server/kern/onderwijs-geheugen');
+
+let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geheugen-'));
-process.env.RTG_DATA_DIR = TMP;
-delete process.env.RTG_ENC_KEY;
+const api = (pad, body) => fetch(base + '/api' + pad, { method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+  body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+const los = (v) => { const m = String(v).match(/^(\d+) x (\d+)/); return m ? String(+m[1] * +m[2]) : 'x'; };
 
-const state = require('../server/db/state');
-const eng = require('../server/db/geheugen');
-const GDIR = eng.GDIR;
+test.before(async () => {
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  base = srv.base;
+  const u = Date.now().toString().slice(-8);
+  const reg = await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Leerling Geheugen', email: 'gh' + u + '@x.nl', phone: '06' + u,
+      password: 'geheim123', geboortedatum: '2005-04-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
+  token = reg.token;
+  if (!token) throw new Error('registratie mislukt: ' + JSON.stringify(reg).slice(0, 200));
+  const ins = await api('/onderwijs/inschrijf', { fase: 'po-g5' });
+  if (ins.status !== 200) throw new Error('inschrijven mislukt: ' + JSON.stringify(ins).slice(0, 200));
+});
+test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
-state.db.writable = true;
-const alleBestanden = d => { try { return fs.readdirSync(d).map(n => path.join(d, n)); } catch (e) { return []; } };
-const mtimes = () => Object.fromEntries(alleBestanden(GDIR).map(f => [f, fs.statSync(f).mtimeMs]));
+/* ---------- de planning los, zonder server: hier zit de regel ---------- */
+test('de reeks loopt vooruit bij een geslaagde ophaling en EEN stap terug bij een mindere', () => {
+  const rij = {}; const t0 = '2026-01-01T00:00:00.000Z';
+  assert.equal(begin(rij, t0), true);
+  assert.equal(rij.herhaal.stap, 0);
+  assert.ok(rij.herhaal.volgende > t0, 'het eerste moment ligt in de toekomst');
+  assert.equal(begin(rij, t0), false, 'een tweede keer beginnen verzet niets');
 
-test('verse map: nog geen generatie, laden geeft null (dan seedt de app)', () => {
-  assert.strictEqual(eng.laadGeheugen(), null);
+  naOphaling(rij, true, t0); assert.equal(rij.herhaal.stap, 1);
+  naOphaling(rij, true, t0); assert.equal(rij.herhaal.stap, 2);
+  const ver = rij.herhaal.volgende;
+  naOphaling(rij, false, t0);
+  assert.equal(rij.herhaal.stap, 1, 'een mindere dag zet je EEN trede terug, niet naar nul');
+  assert.ok(rij.herhaal.volgende < ver, 'en dan komt het eerder terug, want daar is herhalen voor');
+
+  // de bodem: blijven missen zet je nooit onder nul, de top nooit voorbij het einde
+  for (let i = 0; i < 5; i++) naOphaling(rij, false, t0);
+  assert.equal(rij.herhaal.stap, 0);
+  for (let i = 0; i < 20; i++) naOphaling(rij, true, t0);
+  assert.equal(rij.herhaal.stap, INTERVALLEN.length - 1);
 });
 
-test('round-trip: de data komt op de byte identiek terug van schijf', () => {
-  state.db.data = {
-    users: { u1: { codename: 'Valk 1', saldo: 100 }, u2: { codename: 'Valk 2', saldo: 0 } },
-    orders: [{ ref: 'O1', total: 16 }, { ref: 'O2', total: 40 }],
-    __schema: 1
-  };
-  eng.schrijfGeheugenNu();
-  const geladen = eng.laadGeheugen();
-  assert.deepStrictEqual(geladen, state.db.data);
+test('bewijs van school schuift het moment vooruit en nooit naar achteren', () => {
+  const rij = {}; const t0 = '2026-01-01T00:00:00.000Z';
+  begin(rij, t0);
+  naOphaling(rij, true, t0); naOphaling(rij, true, t0); // stap 2: ver weg
+  const ver = rij.herhaal.volgende;
+  assert.equal(uitstel(rij, t0), false, 'op dezelfde dag valt er niets vooruit te schuiven');
+  assert.equal(rij.herhaal.volgende, ver);
+  const later = new Date(new Date(t0).getTime() + 30 * 86400000).toISOString();
+  assert.equal(uitstel(rij, later), true);
+  assert.ok(rij.herhaal.volgende > ver, 'wat je op school laat zien, hoef je thuis niet nog eens');
+  assert.equal(rij.herhaal.stap, 2, 'uitstel raakt de reeks niet aan');
 });
 
-test('privacy: geen enkel gevoelig veld staat als platte tekst op schijf', () => {
-  state.db.data = { kluis: { codename: 'ZoekMijNiet7Q', pin: '424242', saldoCenten: 999 }, __schema: 1 };
-  eng.schrijfGeheugenNu();
-  const bestanden = alleBestanden(GDIR);
-  assert.ok(bestanden.length > 0, 'er moeten brokken op schijf staan');
-  for (const f of bestanden) {
-    const ruw = fs.readFileSync(f);
-    assert.ok(!ruw.includes(Buffer.from('ZoekMijNiet7Q')), 'codenaam lekt in ' + path.basename(f));
-    assert.ok(!ruw.includes(Buffer.from('424242')), 'pin lekt in ' + path.basename(f));
-    // elke brok begint met de magische markering van een versleuteld blok
-    if (f.endsWith('.rtgm')) assert.ok(ruw.subarray(0, 7).equals(Buffer.from('RTGMEM1')), 'brok niet versleuteld: ' + path.basename(f));
-  }
+/* ---------- en dezelfde regels door de hele machine heen ---------- */
+test('een behaald leerdoel krijgt een moment, en dat staat niet meteen open', async () => {
+  let r = (await api('/leerstof/oefen', { doel: 'rekenen.g5.tafels-tot-10' })).body;
+  for (let i = 0; i < 5; i++) r = (await api('/leerstof/antwoord', { antwoord: los(r.vraag) })).body;
+  assert.equal(r.behaald, true);
+
+  const h = await api('/leerstof/herhalen');
+  assert.equal(h.status, 200);
+  assert.equal(h.body.vragen, HERHAAL_VRAGEN);
+  assert.equal(h.body.open.length, 0, 'wat je net hebt gedaan hoef je vandaag niet te herhalen');
+  const later = h.body.later.find(x => x.doel === 'rekenen.g5.tafels-tot-10');
+  assert.ok(later, 'maar het staat wel gepland');
+  assert.ok(later.volgende > new Date().toISOString());
+
 });
 
-test('zuinig: alleen de veranderde collectie wordt herschreven', () => {
-  state.db.data = { a: { n: 1 }, b: { n: 1 }, c: { n: 1 }, __schema: 1 };
-  eng.schrijfGeheugenNu();
-  const voor = mtimes();
-  // even wachten zodat mtimes echt kunnen verschillen
-  const wacht = Date.now() + 15; while (Date.now() < wacht) { /* busy 15ms */ }
-  state.db.data.b = { n: 2 };            // alleen b verandert
-  eng.schrijfGeheugenNu();
-  const na = mtimes();
-  // tel de .rtgm-brokken (geen .bak, geen manifest) die van mtime veranderden
-  const brokVeranderd = Object.keys(na).filter(f =>
-    f.endsWith('.rtgm') && !f.includes('manifest') && voor[f] !== undefined && na[f] !== voor[f]).length;
-  assert.strictEqual(brokVeranderd, 1, 'precies één brok (b) hoort herschreven te zijn, niet a en c');
-  assert.deepStrictEqual(eng.laadGeheugen(), state.db.data);
+/* Herhalen is geen straf, en dat wordt in de SERVER afgedwongen en niet in het
+   scherm: de open lijst draagt geen datum en geen achterstand, dus er kan er
+   ook geen op een scherm belanden. Met een gemaakt paspoort, want alleen zo
+   staat er echt iets open -- een lege lijst bewijst niets. */
+test('een openstaande herhaling draagt geen datum en geen achterstand', () => {
+  const nu = '2026-06-01T00:00:00.000Z';
+  const paspoort = () => ({ doelen: {
+    'oud.doel': { op: '2026-01-01T00:00:00.000Z', herhaal: { stap: 2, volgende: '2026-03-01T00:00:00.000Z' } },
+    'verse.doel': { op: nu, herhaal: { stap: 0, volgende: '2026-12-01T00:00:00.000Z' } }
+  } });
+  const g = maakGeheugen({ paspoort, save: () => {}, nu: () => nu });
+  const r = g.herhalingen('sleutel');
+
+  assert.deepEqual(r.open, [{ doel: 'oud.doel' }], 'wat openstaat is het doel en verder niets');
+  assert.equal(r.aantal, 1);
+  assert.deepEqual(Object.keys(r.open[0]), ['doel'], 'geen datum, geen aantal dagen, geen achterstand');
+  // wat er nog aankomt mag wel een datum dragen: een vooruitzicht is geen verwijt
+  assert.equal(r.later.length, 1);
+  assert.equal(r.later[0].volgende, '2026-12-01T00:00:00.000Z');
+  assert.equal(g.staatOpen('sleutel', 'oud.doel'), true);
+  assert.equal(g.staatOpen('sleutel', 'verse.doel'), false);
 });
 
-test('verwijderde collectie: de brok verdwijnt van schijf', () => {
-  state.db.data = { blijft: { x: 1 }, gaatWeg: { y: 2 }, __schema: 1 };
-  eng.schrijfGeheugenNu();
-  const metBeide = alleBestanden(GDIR).filter(f => f.endsWith('.rtgm') && !f.includes('manifest')).length;
-  delete state.db.data.gaatWeg;
-  eng.schrijfGeheugenNu();
-  const naVerwijderen = alleBestanden(GDIR).filter(f => f.endsWith('.rtgm') && !f.includes('manifest') && !f.endsWith('.bak')).length;
-  assert.ok(naVerwijderen < metBeide, 'de brok van de verwijderde collectie hoort opgeruimd');
-  assert.deepStrictEqual(eng.laadGeheugen(), state.db.data);
+test('een herhaling is drie vragen door dezelfde weg, en een mindere ronde wist niets', async () => {
+  const start = await api('/leerstof/herhaal', { doel: 'rekenen.g5.tafels-tot-10' });
+  assert.equal(start.status, 200);
+  assert.equal(start.body.totaal, HERHAAL_VRAGEN, 'drie vragen, niet de hele les opnieuw');
+  // niets in de vraag zelf verraadt dat dit een herhaling is
+  assert.doesNotMatch(JSON.stringify(start.body), /herhaling|opnieuw|vergeten/i);
+
+  // alles fout: het leerdoel blijft staan, en er komt geen verwijt
+  let r = start.body;
+  for (let i = 0; i < HERHAAL_VRAGEN; i++) r = (await api('/leerstof/antwoord', { antwoord: 'fout' })).body;
+  assert.equal(r.klaar, true);
+  assert.equal(r.herhaald, true);
+  assert.equal(r.gelukt, false);
+  assert.doesNotMatch(r.slot, /fout|jammer|helaas|vergeten|achterstand|had je moeten/i);
+
+  const mijn = (await api('/onderwijs/mijn')).body;
+  assert.ok(mijn.doelen['rekenen.g5.tafels-tot-10'], 'een mindere herhaling wist het leerdoel niet');
+
+  // en een mislukte herhaling wordt niet als bewijs vastgelegd
+  const b = (await api('/onderwijs/bewijs', { doel: 'rekenen.g5.tafels-tot-10' })).body;
+  assert.equal(b.bewijs.filter(x => x.soort === 'herhaling').length, 0);
 });
 
-test('veiligheid: een geknoeide brok valt op en rolt terug naar de vorige generatie', () => {
-  // generatie 1
-  state.db.data = { geld: { saldo: 500 }, naam: { v: 'een' }, __schema: 1 };
-  eng.schrijfGeheugenNu();
-  const gen1 = JSON.parse(JSON.stringify(state.db.data));
-  // generatie 2 (verandert 'geld', zodat de oude 'geld'-brok als .bak bewaard blijft)
-  state.db.data.geld = { saldo: 999 };
-  eng.schrijfGeheugenNu();
-  // Realistisch: een afgekapte schrijf raakt alleen de brok die NU geschreven
-  // werd (die heeft een .bak van de vorige generatie). Flip een byte in precies
-  // die brok; onveranderde brokken (zoals 'naam') blijven heel.
-  let geknoeid = false;
-  for (const f of alleBestanden(GDIR)) {
-    if (f.endsWith('.rtgm') && !f.includes('manifest') && !f.endsWith('.bak') && fs.existsSync(f + '.bak')) {
-      const buf = fs.readFileSync(f);
-      if (buf.length > 40) { buf[buf.length - 1] ^= 0xFF; fs.writeFileSync(f, buf); geknoeid = true; }
-    }
-  }
-  assert.ok(geknoeid, 'er moet een zojuist geschreven brok zijn om mee te knoeien');
-  // laden mag NOOIT een half/geknoeid beeld geven: het rolt terug naar generatie 1
-  const geladen = eng.laadGeheugen();
-  assert.ok(geladen, 'er hoort een consistente generatie herstelbaar te zijn');
-  assert.strictEqual(geladen.geld.saldo, gen1.geld.saldo, 'moet terugrollen naar de vorige, consistente generatie');
+test('een geslaagde herhaling is bewijs, en het moment schuift naar achteren', async () => {
+  let r = (await api('/leerstof/herhaal', { doel: 'rekenen.g5.tafels-tot-10' })).body;
+  for (let i = 0; i < HERHAAL_VRAGEN; i++) r = (await api('/leerstof/antwoord', { antwoord: los(r.vraag) })).body;
+  assert.equal(r.gelukt, true);
+  assert.ok(r.volgende > new Date().toISOString());
+
+  const b = (await api('/onderwijs/bewijs', { doel: 'rekenen.g5.tafels-tot-10' })).body;
+  const herh = b.bewijs.filter(x => x.soort === 'herhaling');
+  assert.equal(herh.length, 1, 'een geslaagde ophaling na een tijd is beter bewijs dan de eerste keer');
+  assert.match(herh[0].detail, /na een tijd/);
+  assert.equal(b.beheersing.woord, 'stevig', 'twee soorten eigen bewijs: stevig, en zonder school niet sterk');
 });
 
-test('manifest kapot: valt terug op de manifest-backup', () => {
-  state.db.data = { alpha: { a: 1 }, __schema: 1 };
-  eng.schrijfGeheugenNu();                 // generatie 1
-  state.db.data.alpha = { a: 2 };
-  eng.schrijfGeheugenNu();                 // generatie 2 -> manifest.rtgm.bak = gen1
-  const manifest = path.join(GDIR, 'manifest.rtgm');
-  fs.writeFileSync(manifest, Buffer.from('kapot-geen-geldig-blok'));
-  const geladen = eng.laadGeheugen();
-  assert.ok(geladen && geladen.alpha, 'moet uit de manifest-backup kunnen laden');
-});
-
-/* HET CRASH-VENSTER WAARIN DE HELE DATABASE LEEG STARTTE.
-
-   De test hierboven KNOEIT het manifest; deze laat het VERDWIJNEN, en dat is
-   een ander geval met een heel andere afloop. Het schrijven eindigt met:
-   manifest hernoemen naar .bak, dan het nieuwe manifest wegschrijven. Tussen
-   die twee stappen bestaat manifest.rtgm niet. Een stroomstoring precies daar
-   liet de oude opzet `null` teruggeven -- met het commentaar "verse
-   installatie" -- en null betekent verderop: begin met de seed.
-
-   Dus niet een verloren generatie maar ALLES, terwijl de vorige generatie
-   compleet en leesbaar in .bak stond, een regel verderop netjes ingelezen maar
-   nooit bereikt. Niets faalde; de server startte gewoon op, leeg. */
-test('manifest WEG (crash tussen hernoemen en schrijven): rolt terug, seedt niet', () => {
-  state.db.data = { beta: { b: 1 }, __schema: 1 };
-  eng.schrijfGeheugenNu();                 // generatie 1
-  state.db.data.beta = { b: 2 };
-  eng.schrijfGeheugenNu();                 // generatie 2 -> .bak = gen1
-  const manifest = path.join(GDIR, 'manifest.rtgm');
-  assert.ok(fs.existsSync(manifest + '.bak'), 'er staat een vorige generatie klaar');
-  fs.unlinkSync(manifest);                 // de crash: hernoemd, nog niet herschreven
-
-  const geladen = eng.laadGeheugen();
-  assert.ok(geladen, 'er komt data terug in plaats van null (null = de seed, en dat is alles kwijt)');
-  assert.ok(geladen.beta, 'en het is de vorige generatie, niet een lege kast');
-});
-
-/* En de andere kant, zodat de fix niet doorslaat: ECHT niets op schijf hoort
-   nog steeds null te geven, want dan moet de app wel seeden. */
-test('echt verse map (geen manifest en geen backup) geeft nog steeds null', () => {
-  const manifest = path.join(GDIR, 'manifest.rtgm');
-  try { fs.unlinkSync(manifest); } catch (e) {}
-  try { fs.unlinkSync(manifest + '.bak'); } catch (e) {}
-  assert.strictEqual(eng.laadGeheugen(), null, 'zonder enige generatie: seeden');
+test('een doel dat je niet behaald hebt, kun je niet herhalen', async () => {
+  const r = await api('/leerstof/herhaal', { doel: 'rekenen.g5.delen' });
+  assert.equal(r.status, 400);
+  assert.match(r.body.error, /oefen het eerst/i);
 });

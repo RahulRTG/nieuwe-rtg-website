@@ -27,8 +27,8 @@
    het als "kan beter" in een lijst van 127 punten die niemand meer leest. Deze
    ratel is precies dat verschil.
 
-   Draai:  node --experimental-sqlite scripts/norm.js
-           node --experimental-sqlite scripts/norm.js --vastleggen
+   Draai:  node scripts/norm.js
+           node scripts/norm.js --vastleggen
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -50,6 +50,11 @@ const METERS = [
   { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },
   { sleutel: 'endpointsZonderTest', richting: 'omlaag', wat: 'endpoints die in geen enkele test voorkomen' },
   { sleutel: 'dekkingPct', richting: 'omhoog', wat: 'percentage endpoints dat in een test voorkomt' },
+  /* De 100%-richting: bewijs mag alleen groeien en schuld mag alleen krimpen.
+     Niet als ambitie maar als tand -- een gezakte cel of een gegroeide post
+     gaat vanaf nu langs een mens met een reden in NORM.json. */
+  { sleutel: 'bewijsCellenBewezen', richting: 'omhoog', wat: 'cellen (route x schakel) in de bewijsmatrix met bewijs' },
+  { sleutel: 'bewijsAchterstand', richting: 'omlaag', wat: 'openstaande bewijsschuld (meetwerk + instrument; de grens telt niet mee)' },
   { sleutel: 'keuringStuk', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "stuk"' },
   { sleutel: 'keuringScheef', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "scheef"' },
   /* keuringBeter WAS EEN GEBLENDE TELLER, en daarmee de enige meter in deze
@@ -173,6 +178,19 @@ const METERS = [
      ver de motor gekomen is, en dan betekent een stijging wat hij zegt. */
   { sleutel: 'toetsenOngevoeligPct', richting: 'omlaag', wat: 'aandeel van de GEMETEN toetsen dat een mutatie in eigen bron overleefde (%)' },
   { sleutel: 'toetsenNietGemeten', richting: 'omlaag', wat: 'toetsen waar de mutatiemotor nog niet langs is geweest' },
+  /* DE DERDE VOORRAAD, en hij stond als enige NIET op de ratel.
+     scripts/tandeloos.js telt beweringen die op een LEGE verzameling vanzelf
+     slagen: `assert.deepEqual(r.body.dingen, [])` bewijst niets als `dingen`
+     altijd leeg is. Dat was een CLI-only leeslijst -- je moest hem draaien om te
+     weten hoe hij ervoor stond, en dus wist niemand het. Zijn twee zusters
+     (endpointsZonderTest en toetsenNietGemeten) staan hier wel, en konden dus
+     niet stil groeien; deze wel.
+
+     Hij blijft een LEESLIJST en geen poort: soms is "er staat niets" precies wat
+     je toetst, en daar heeft dat script zijn eigen beoordeelde vrijstellingen
+     voor. De ratel zegt alleen dat het er niet MEER mogen worden zonder dat
+     iemand het opschrijft. */
+  { sleutel: 'beweringenZonderVulcontrole', richting: 'omlaag', wat: 'beweringen die op een lege verzameling vanzelf slagen (scripts/tandeloos.js)' },
   /* DEZE METER WAS EEN GEBLENDE TELLER, precies zoals keuringBeter dat was, en
      hij liep om dezelfde reden vast: hij telde twee onvergelijkbare dingen bij
      elkaar op, en de ene groep botste met een ANDERE meter in deze lijst.
@@ -218,24 +236,32 @@ const METERS = [
      gaan buiten de ontleder om en worden door CSP niet gecontroleerd -- ze zijn
      dus geen schuld maar juist de uitweg. */
   { sleutel: 'inlineStijlAttributen', richting: 'omlaag', wat: 'style="..."-attributen in public/ (houden style-src-attr open)' },
-  /* DE METER OP HET MEETGEREEDSCHAP ZELF. scripts/lib/bron.js at op 17 augustus
-     2026 224.031 tekens broncode op zonder dat een enkele teller afweek: 47
-     bestanden waren deels onzichtbaar voor elke keuring die op hem leunt. Die
-     fout is gerepareerd en test/bron.test.js bewaakt de vijf vormen die hem
-     opleverden -- maar dat is een lijst van bekende gevallen. Deze meter kruist
-     de verwijderaar met scripts/ast/lexer.js, een onafhankelijke lexer die de
-     taal wel kent, en telt de .js-bestanden waar code kwijtraakt of waar de
-     kruisproef niets kan zeggen. Zie scripts/lib/bronblind.js voor waarom de
-     voor de hand liggende meters (ratio, tekens, grootste blok) hier niets
-     scheiden, en waar deze proef ophoudt (HTML en CSS). */
-  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: 'bestanden (.js, en van .html zowel de inline scripts als de markup) waar de commentaar-verwijderaar bron kwijtraakt of niet gelezen kan worden' },
-  /* Vijftig bundels worden geserveerd als EEN bestand en bewerkt als 394 losse
-     delen, en die delen heten naar hun volgnummer (app-main-04aa.js). Hernoemen
-     is overwogen en afgeslagen -- vijftig mappen die van naam veranderen botst
-     met elke tak die openstaat -- dus draagt elk deel zijn onderwerp bovenin, en
-     zet scripts/deelindex.js daar BUNDELS.md van. Deze meter telt de delen die
-     dat nog niet doen. */
-  { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' }
+  /* DE TWEE METERS DIE OVER DE RATEL ZELF GAAN.
+
+     Alles hierboven bewaakt de code. Deze twee bewaken de BEWAKER, en ze staan
+     er omdat een ratel een eigenschap heeft die makkelijk over het hoofd wordt
+     gezien: hij kan alleen tegenhouden wat hij meet. Wat er niet in staat, kan
+     ongestraft alle kanten op -- niet omdat er een tand brak, maar omdat er
+     nooit een tand was. Een ratel die niet groeit, dekt over de tijd een steeds
+     kleiner deel van een steeds grotere codebase.
+
+     `ratelTanden` telt hoeveel meters er geratelde zijn en mag alleen OMHOOG.
+     Daarmee is de dekking van de ratel zelf niet meer stilzwijgend te
+     verkleinen: twee meters samenvoegen tot een (wat een keer legitiem is
+     gebeurd, zie de notitie over keuringBeter) is voortaan een handmatige
+     verlaging, met notitie en al -- en dat is precies de goede prijs. Niet
+     verboden, wel een besluit.
+
+     `metingenZonderRatel` telt de meetbestanden in de wortel die aan geen
+     enkele ratel hangen. Er wordt in dit huis veel meer gemeten dan geratelde:
+     21 meetbestanden, en bij zes ervan houdt niets de getallen tegen als ze de
+     verkeerde kant op lopen. Dat getal mag alleen omlaag, en het daalt door er
+     een ratel bij te zetten -- niet door er een regel bij te schrijven; zie de
+     kop van scripts/lib/metingen.js. */
+  { sleutel: 'ratelTanden', richting: 'omhoog', wat: 'meters die aan een ratel hangen (de ratel mag niet krimpen)' },
+  { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
+  { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' },
+  { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -399,6 +425,58 @@ function telOngeijkt(ijkBron, extraSleutels) {
    zijn eigen voorbeeldregel mee). Nagemeten over de hele testmap: alle
    honderdeen browsergevallen staan in *.e2e.js en alle zeventien dienstgevallen
    in *.test.js. De grens loopt daar dus precies. */
+const zonderBlokCommentaar = (b) => String(b)
+  .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+  .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+/* De tekenreeks-wringer woont sinds de vierde herhaling van deze fout in
+   scripts/lib/bron.js. De derde keer was hier: test/meterijk.test.js zet als
+   ijking een toets-met-skip in een TIJDELIJK bestand, en die regel staat dus
+   als letterlijke tekst in de ijking zelf -- waarop deze meter hem meetelde
+   als een echte zelfpoortende toets. Dezelfde fout als bij het commentaar, een
+   laag dieper. Een toets die zichzelf werkelijk overslaat schrijft
+   `{ skip: ... }` nooit binnen aanhalingstekens, dus dit kost geen enkele
+   echte melding (nagemeten over de hele testmap: alleen meterijk.test.js
+   verandert, 78 -> 77). De vierde keer trof keuring 25 in check.js, en die
+   gebruikt nu dezelfde functie. */
+const { zonderTekst } = require('./lib/bron');
+
+/* De twee wringers samen, en de enige vorm die naar buiten gaat. Zowel deze
+   meter als scripts/deltapoort.js moet een testbestand op dezelfde manier
+   schoonvegen voordat er skips geteld worden -- doet de poort dat anders dan de
+   ratel, dan houdt hij iets tegen wat de meter niet ziet, of andersom. */
+function schoon(bron) { return zonderTekst(zonderBlokCommentaar(bron)); }
+/* DE 100%-RICHTING, MECHANISCH. Twee tanden op de bewijslaag zelf: het aantal
+   bewezen cellen in de matrix mag alleen stijgen (richting omhoog), en de
+   openstaande bewijsschuld mag alleen dalen (richting omlaag). De soort
+   `grens` telt niet mee in de achterstand: dat is de rand van de methode, en
+   wie die als achterstand telt jaagt op een getal dat niet bestaat (zie de kop
+   van scripts/bewijsschuld.js).
+
+   Losse functie met de lezer als invoer, zodat de ijking hem nep-registers kan
+   voeren en hem echt ziet uitslaan -- zelfde snit als telSkips en
+   telInlineStijl, en om dezelfde reden (LAT.md regel 10). Kapotte of
+   ontbrekende invoer is een gezakte meting, geen nul (regel 3). */
+function telBewijslaag(lees) {
+  let matrix, schuld;
+  try { matrix = JSON.parse(lees('BEWIJSMATRIX.json')); } catch (e) {
+    throw new Error('BEWIJSMATRIX.json is niet leesbaar (' + e.message + '); draai npm run ' +
+      'bewijsmatrix:vast -- een meter zonder invoer is geen meter');
+  }
+  try { schuld = JSON.parse(lees('BEWIJSSCHULD.json')); } catch (e) {
+    throw new Error('BEWIJSSCHULD.json is niet leesbaar (' + e.message + '); draai node ' +
+      'scripts/bewijsschuld.js --vastleggen -- een meter zonder invoer is geen meter');
+  }
+  const bewezen = matrix.telling && matrix.telling.bewezen;
+  if (typeof bewezen !== 'number') {
+    throw new Error('BEWIJSMATRIX.json draagt geen telling.bewezen; dan is bewijsCellenBewezen niet gemeten');
+  }
+  const t = schuld.telling || {};
+  if (typeof t.meetwerk !== 'number' || typeof t.instrument !== 'number') {
+    throw new Error('BEWIJSSCHULD.json draagt geen telling.meetwerk/instrument; dan is bewijsAchterstand niet gemeten');
+  }
+  return { bewijsCellenBewezen: bewezen, bewijsAchterstand: t.meetwerk + t.instrument };
+}
+
 function telSkips(bestanden, lees) {
   const uit = { dienst: 0, browser: 0 };
   for (const f of bestanden) {
@@ -428,7 +506,7 @@ function meet(bronnen) {
      is een echte storing en die gooit alsnog, met de eerste regels van zijn
      eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
   const r = spawnSync(process.execPath,
-    ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
+    [path.join(__dirname, 'keuring.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
   let k = null;
   try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
@@ -478,21 +556,8 @@ function meet(bronnen) {
      2026-08-01 al een keer uit scripts/keuring.js gehaald (zie de eerste
      notitie in NORM.json); een meter die tekst leest in plaats van code komt
      kennelijk twee keer terug. Nu gaat de bron eerst door de wringer. */
-  const zonderCommentaar = (b) => String(b)
-    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
-    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
-  /* En de derde keer was een tekenreeks. test/meterijk.test.js zet als ijking
-     een toets-met-skip in een TIJDELIJK bestand, en die regel staat dus als
-     letterlijke tekst in de ijking zelf -- waarop deze meter hem meetelde als
-     een echte zelfpoortende toets. Dezelfde fout als hierboven, een laag
-     dieper: commentaar ging al door de wringer, tekst nog niet. Een toets die
-     zichzelf werkelijk overslaat schrijft `{ skip: ... }` nooit binnen
-     aanhalingstekens, dus dit kost geen enkele echte melding (nagemeten over
-     de hele testmap: alleen meterijk.test.js verandert, 78 -> 77). */
-  const zonderTekst = (b) => String(b)
-    .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
   const skips = telSkips(inMap.filter(n => /\.(test|e2e)\.js$/.test(n)),
-    (f) => zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8'))));
+    (f) => schoon(fs.readFileSync(path.join(testMap, f), 'utf8')));
   const zelfpoortendeToetsen = skips.dienst;
   const browserpoortToetsen = skips.browser;
 
@@ -533,6 +598,15 @@ function meet(bronnen) {
       if (!m) { nietGemeten++; continue; }
       if (m.staat === 'overleefd') overleefd++;
       else if (m.staat === 'gezakt') gezakt++;
+      /* 'geen bronmutatie mogelijk' is GEEN niet-gemeten: de motor is er wel
+         degelijk langs geweest en het oordeel staat gedocumenteerd in
+         GEEN_BRONMUTATIE, elk met zijn foutklasse met de hand nagetrokken.
+         Toen deze staat hier nog als niet-gemeten telde, werd de meter rood
+         van precies het eerlijke werk -- dertien overlevers herklasseren
+         duwde hem van 150 naar 158, terwijl er alleen MEER bekend was
+         geworden. Een meter die eerlijkheid bestraft, leert iedereen om
+         vaag te blijven (zelfde les als bij toetsenOngevoeligPct hierboven). */
+      else if (m.staat === 'geen bronmutatie mogelijk') { /* gekend, eigen categorie */ }
       else nietGemeten++;      // 'al rood', 'geen module gevonden', 'slaat zichzelf over', ...
     }
     const gemeten = overleefd + gezakt;
@@ -541,6 +615,29 @@ function meet(bronnen) {
        te bestaan; norm.js noemt hem dan als nieuw zonder grondwaarde. */
     if (!gemeten) throw new Error('MUTATIES.json bevat geen enkele gemeten toets; draai npm run mutatie voordat deze meter iets kan zeggen');
     return { ongevoeligPct: Math.round(1000 * overleefd / gemeten) / 10, nietGemeten, overleefd, gezakt };
+  })();
+
+  /* De derde voorraad: beweringen die op een lege verzameling vanzelf slagen.
+     scripts/tandeloos.js doet de meting; hier komt alleen het getal binnen. Hij
+     leest de toetsmap zelf, dus hij zakt vanzelf als die er niet is -- en dat
+     hoort (LAT.md regel 3). */
+  const tandeloos = (() => {
+    const eigen = bronnen && bronnen.meetTandeloos;
+    /* ONTHOUDEN, MAAR ALLEEN DE ECHTE METING. Deze telling leest en scant elk
+       toetsbestand; test/meterijk.test.js roept norm.meet() tientallen keren aan
+       (een keer per ijking) en zonder dit betaalt elke ijking die scan opnieuw --
+       een suite die daardoor minuten langer duurt, is een suite die iemand gaat
+       overslaan. Een INGEBRACHTE lezer wordt nooit onthouden: die is er juist om
+       een ANDER getal te geven, en een cache zou de ijking dan naar nul brengen
+       en hem stilletjes tandeloos maken. */
+    if (eigen) return keur(eigen());
+    if (tandeloosOnthouden === null) tandeloosOnthouden = keur(require('./tandeloos').meet({ stil: true }));
+    return tandeloosOnthouden;
+    function keur(r) {
+      if (!r || !Number.isFinite(r.meldingen) || !r.bekeken)
+        throw new Error('scripts/tandeloos.js gaf geen telling terug; dan is beweringenZonderVulcontrole niet gemeten');
+      return r.meldingen;
+    }
   })();
 
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
@@ -606,6 +703,34 @@ function meet(bronnen) {
   }
   const metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'), losseSleutels);
 
+  /* DE RATEL OVER ZICHZELF. `losseSleutels` is hierboven al verzameld voor
+     metersOngeijkt; dezelfde verzameling is precies wat hier geteld moet
+     worden, dus hij wordt niet opnieuw opgehaald (regel 4 geldt ook binnen een
+     functie). De prestatiemeters tellen mee: ook zij hangen aan een ratel, hij
+     staat alleen onder een andere sleutel in NORM.json. */
+  const geratelde = new Set(METERS.concat(PRESTATIEMETERS).map(m => m.sleutel).concat(losseSleutels));
+  const ratelTanden = geratelde.size;
+
+  /* En de meetbestanden waar GEEN ratel achter staat. Een regel in het register
+     telt alleen mee als hij na te trekken is: een `meter`-regel moet sleutels
+     noemen die werkelijk geratelde zijn, en een `eigenRatel`-regel moet naar een
+     bestaand bestand wijzen dat deze meting ook echt noemt. Een register vol
+     beweringen zou deze meter tot nul kunnen praten, en dan meet hij het
+     tegenovergestelde van wat hij moet meten. */
+  const { REGISTER, GEEN_METING } = require('./lib/metingen');
+  const metingen = fs.readdirSync(WORTEL).filter(f => f.endsWith('.json') && !GEEN_METING.has(f));
+  const metingenZonderRatel = metingen.filter(bestand => {
+    const regel = REGISTER[bestand];
+    if (!regel) return true;
+    if (Array.isArray(regel.meter)) return !regel.meter.every(sleutel => geratelde.has(sleutel));
+    if (regel.eigenRatel) {
+      const pad = path.join(WORTEL, regel.eigenRatel);
+      if (!fs.existsSync(pad)) return true;
+      return !fs.readFileSync(pad, 'utf8').includes(bestand);
+    }
+    return true;
+  }).length;
+
   /* EEN MISLUKTE METING IS GEEN NUL, en hier was dat de duurste vorm ervan.
 
      scripts/keuring.js start scripts/routekaart.js om de routes te krijgen.
@@ -623,12 +748,19 @@ function meet(bronnen) {
      Dus zakt hij, net als hierboven bij een ontbrekende ijkregistratie. */
   if (!k.cijfers.dekking || !k.cijfers.dekking.routes) {
     throw new Error('de routekaart gaf geen routes; dan zijn endpointsZonderTest en dekkingPct niet gemeten ' +
-      '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
+      '(draai: node scripts/routekaart.js --json)');
   }
 
+  /* De bewijslaag zelf aan de ratel; het hele verhaal staat bij telBewijslaag. */
+  const { bewijsCellenBewezen, bewijsAchterstand } = telBewijslaag(
+    (naam) => fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
+
   return {
+    bewijsCellenBewezen, bewijsAchterstand,
     metersOngeijkt,
     routesNietSchakelbaar,
+    bronBlindeBestanden,
+    delenZonderOnderwerp,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
     keuringStuk: k.stuk, keuringScheef: k.scheef,
@@ -639,10 +771,10 @@ function meet(bronnen) {
     kernOngebruikt: grenzen.kernOngebruikt,
     toetsenOngevoeligPct: mutaties.ongevoeligPct,
     toetsenNietGemeten: mutaties.nietGemeten,
+    beweringenZonderVulcontrole: tandeloos,
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen,
-    bronBlindeBestanden,
-    delenZonderOnderwerp
+    ratelTanden, metingenZonderRatel
   };
 }
 
@@ -657,6 +789,9 @@ function meet(bronnen) {
    Dat is precies LAT.md regel 3 (een meter zakt als zijn invoer ontbreekt), in
    de ratel die daar zelf over gaat. Nu: ontbreken mag (dat is de eerste keer),
    maar onleesbaar is een fout en die overschrijft niets. */
+/* De onthouden telling van scripts/tandeloos.js; zie de reden bij het gebruik. */
+let tandeloosOnthouden = null;
+
 function leesNorm() {
   if (!fs.existsSync(NORMBESTAND)) return null;                 // eerste keer: mag
   const ruw = fs.readFileSync(NORMBESTAND, 'utf8');
@@ -686,7 +821,8 @@ function leesPrestatie(bestand) {
   /* Een GEZAKTE ronde levert geen grondwaarde. De cijfers van een run die zijn
      eigen drempels niet haalde zijn geen norm om aan vast te houden. */
   if (c.oordeel !== 'PASS') return { reden: 'de laatste beproeving is GEZAKT (' + c.gezakteDrempels + ' drempel(s)); die cijfers zijn geen lat' };
-  return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid };
+  return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid,
+    kalibratie: c.machine && c.machine.kalibratieBasisMs || null };
 }
 
 /* Beweegt de meter de goede kant op, de verkeerde kant op, of staat hij stil? */
@@ -694,6 +830,76 @@ function oordeel(m, nu, norm) {
   if (nu === norm) return 'gelijk';
   const beter = m.richting === 'omlaag' ? nu < norm : nu > norm;
   return beter ? 'beter' : 'slechter';
+}
+
+/* ---------------------------- DE VEER -------------------------------------
+
+   Een ratel houdt tegen dat het slechter wordt. Over STILSTAND zegt hij niets,
+   en stilstand is groen: bij de laatste ronde stonden negentien van de
+   drieentwintig meters op "gelijk", en dat mag zo blijven tot in lengte van
+   dagen zonder dat er iets klaagt. inlineStijlAttributen mag eeuwig op 5863
+   blijven staan; de poort gaat gewoon open.
+
+   Dit is geen tand maar een veer. Hij verandert geen exitcode en houdt niets
+   tegen -- hij stelt alleen de vraag die de ratel niet stelt: welke meter staat
+   het langst stil terwijl er nog werk aan is?
+
+   WAAROM HIJ NIET ZAKT, EN DAT IS EEN KEUZE EN GEEN ZWAKTE. Een poort die op
+   stilstand zou zakken, koopt cosmetische winst: dan wordt er een attribuut
+   verplaatst om de datum te verzetten, en dat is precies het soort beweging dat
+   deze codebase al een keer heeft afgeleerd bij de dekkingsteller (op te poetsen
+   met een zoek-en-vervang). Voor "wat is het langst blijven liggen" werkt wijzen
+   beter dan dwingen: het antwoord is zelden oncomfortabel, alleen vergeten.
+
+   WELKE METERS MEEDOEN: alleen die met een BEKEND einde. Een meter die omlaag
+   moet en boven nul staat, of een percentage dat omhoog moet en onder de honderd.
+   `testbestanden` en `e2eBestanden` hebben geen plafond -- meer toetsen is altijd
+   beter en nooit af -- dus die zouden hier eeuwig bovenaan staan en de lijst
+   onbruikbaar maken. De prestatiemeters doen niet mee omdat ze alleen binnen
+   dezelfde machine vergelijkbaar zijn: een p99 die stilstaat op een andere runner
+   zegt niets. */
+function heeftEinde(m, waarde) {
+  if (typeof waarde !== 'number') return false;
+  if (m.richting === 'omlaag') return waarde > 0;
+  return /Pct$/.test(m.sleutel) && waarde < 100;
+}
+
+function dagenTussen(a, b) {
+  const ms = Date.parse(String(a) + 'T00:00:00Z') - 0;
+  const bs = Date.parse(String(b) + 'T00:00:00Z');
+  if (!Number.isFinite(ms) || !Number.isFinite(bs)) return null;
+  return Math.max(0, Math.round((bs - ms) / 86400000));
+}
+
+/* De meters die nog werk hebben, langste stilstand eerst. `sinds` staat in
+   NORM.json en wordt gezet op het moment dat een meter WERKELIJK verbetert.
+   Ontbreekt hij, dan geldt de dag waarop de norm is vastgelegd -- dat is de
+   eerste dag waarop we van deze meter iets weten, en het staat er als GESCHAT
+   bij zodat niemand die datum voor een meting aanziet. */
+function traagsteTanden(norm, vandaag) {
+  const sinds = (norm && norm.sinds) || {};
+  const grond = (norm && norm.vastgelegd) || null;
+  const uit = [];
+  for (const m of METERS) {
+    const waarde = norm && norm.meters ? norm.meters[m.sleutel] : undefined;
+    if (!heeftEinde(m, waarde)) continue;
+    const vanaf = sinds[m.sleutel] || grond;
+    if (!vanaf) continue;
+    const dagen = dagenTussen(vanaf, vandaag);
+    if (dagen === null) continue;
+    uit.push({ sleutel: m.sleutel, waarde, sinds: vanaf, geschat: !sinds[m.sleutel], dagen, wat: m.wat });
+  }
+  return uit.sort((a, b) => b.dagen - a.dagen || String(a.sleutel).localeCompare(b.sleutel));
+}
+
+function toonVeer(norm, vandaag) {
+  const traag = traagsteTanden(norm, vandaag);
+  if (!traag.length) return;
+  console.log('\n  \x1b[1mde veer\x1b[0m \x1b[2m(geen poort: welke meter staat het langst stil terwijl er nog werk aan is)\x1b[0m');
+  for (const t of traag.slice(0, 3))
+    console.log('  \x1b[2m' + String(t.dagen).padStart(4) + ' dagen  \x1b[0m' + t.sleutel.padEnd(22) +
+      String(t.waarde).padStart(6) + '\x1b[2m  sinds ' + t.sinds + (t.geschat ? ' (geschat: de dag van de grondwaarde)' : '') + '\x1b[0m');
+  if (traag.length > 3) console.log('  \x1b[2m' + (traag.length - 3) + ' meter(s) met minder stilstand niet getoond\x1b[0m');
 }
 
 function main() {
@@ -752,6 +958,29 @@ function main() {
     console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze ronde draaide op ' + pres.bron
       + ', de lat staat op ' + norm.prestatieBron + '.');
     console.log('  \x1b[2mEen p99 van een andere machine of modus is geen betere of slechtere p99, maar een andere.\x1b[0m');
+  } else if (heeftGrond && norm.prestatieKalibratie && pres.kalibratie &&
+      (pres.kalibratie / norm.prestatieKalibratie > 1.4 || norm.prestatieKalibratie / pres.kalibratie > 1.4)) {
+    /* DEZELFDE VORM IS NOG NIET DEZELFDE MACHINE. Twee cloudcontainers met
+       "4k/17g/linux/sqlite" bleken op ander silicium te draaien: de een
+       haalde p99 144, de ander consistent 233 -- en de kalibratie (dezelfde
+       vaste spin-werklast, in rust) verschilde navenant. Latenties vergelijken
+       tussen die twee is dezelfde fout als darwin met linux vergelijken,
+       alleen onzichtbaarder. De vorm-sleutel hierboven vangt dat niet; deze
+       gemeten snelheid wel. Factor 1,4 en niet strakker: de kalibratie zelf
+       heeft ruis (gemeten ruisfactor ~1,1-1,2 op een rustige machine). */
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: zelfde vorm (' + pres.bron + '), andere snelheid -- ' +
+      'kalibratie nu ' + pres.kalibratie + ' ms, bij de lat ' + norm.prestatieKalibratie + ' ms.');
+    console.log('  \x1b[2mEen p99 van trager silicium is geen slechtere p99, maar een andere. De lat verzet\x1b[0m');
+    console.log('  \x1b[2malleen wie op vergelijkbare snelheid meet, of met de hand (met reden, in de historie).\x1b[0m');
+  } else if (heeftGrond && norm.prestatieKalibratie && !pres.kalibratie) {
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze BEPROEVING.json draagt geen kalibratie; draai npm run beproeving opnieuw.');
+  } else if (heeftGrond && pres.kalibratie && !norm.prestatieKalibratie) {
+    /* De lat komt uit een tijd dat de snelheid niet werd meegemeten. Tegen
+       zo'n lat is elke vergelijking een gok -- misschien zelfde silicium,
+       misschien niet, en dat verschil is precies wat hier fout ging. */
+    console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: de lat draagt geen kalibratie (hij is gezet voordat de snelheid werd meegemeten).');
+    console.log('  \x1b[2mZet de lat met de hand op de cijfers van een ronde MET kalibratie (met reden, in de historie);\x1b[0m');
+    console.log('  \x1b[2mvanaf dan vergelijkt hij alleen nog metingen van vergelijkbaar silicium.\x1b[0m');
   } else {
     for (const m of PRESTATIEMETERS) {
       const v = pres.cijfers[m.sleutel];
@@ -788,12 +1017,17 @@ function main() {
     return 1;
   }
 
+  /* De veer komt NA het oordeel en voor de schrijfactie: hij hoort bij een
+     gehaalde ronde ("en wat ligt er dan nog?") en niet bij een gezakte, want dan
+     is de gezakte meter het onderwerp en niet de traagste. */
+  toonVeer(norm, new Date().toISOString().slice(0, 10));
+
   const teSchrijven = beterDan.length + nieuw.length + presBeter.length + presNieuw.length;
   if (teSchrijven && !vastleggen) {
     console.log('\n\x1b[32m  De norm is gehaald\x1b[0m' +
       (beterDan.length + presBeter.length ? ', en op ' + (beterDan.length + presBeter.length) + ' punt(en) ruim' : '') +
       (nieuw.length + presNieuw.length ? '; ' + (nieuw.length + presNieuw.length) + ' meter(s) wachten nog op een grondwaarde' : '') + '.');
-    console.log('  \x1b[2mLeg dat vast met: node --experimental-sqlite scripts/norm.js --vastleggen\x1b[0m\n');
+    console.log('  \x1b[2mLeg dat vast met: node scripts/norm.js --vastleggen\x1b[0m\n');
     return 0;
   }
   /* HIER STOND `if (beterDan.length && vastleggen)`. Een meter die je toevoegt
@@ -807,9 +1041,19 @@ function main() {
        De overige velden van NORM.json blijven staan: `notities` draagt de reden
        van een met de hand verlaagde norm, en die mag niet bij de eerstvolgende
        --vastleggen stilzwijgend verdwijnen. */
-    const uit = { ...norm, vastgelegd: new Date().toISOString().slice(0, 10), meters: { ...norm.meters } };
-    for (const b of beterDan) uit.meters[b.m.sleutel] = b.nu;
-    for (const m of METERS) if (uit.meters[m.sleutel] === undefined) uit.meters[m.sleutel] = nu[m.sleutel];
+    const vandaag = new Date().toISOString().slice(0, 10);
+    const uit = { ...norm, vastgelegd: vandaag, meters: { ...norm.meters }, sinds: { ...(norm.sinds || {}) } };
+    /* DE DATUM HOORT BIJ DE METER EN NIET BIJ HET BESTAND. `vastgelegd` staat op
+       de dag waarop er voor het LAATST iets is opgeschoven, welke meter dan ook.
+       Daaruit is niet af te lezen dat inlineStijlAttributen sinds april niet is
+       bewogen terwijl de dekking wekelijks stijgt -- en juist dat verschil is wat
+       de veer hierboven laat zien. Vandaar een datum per meter, gezet op het
+       moment dat hij werkelijk verbetert. */
+    for (const b of beterDan) { uit.meters[b.m.sleutel] = b.nu; uit.sinds[b.m.sleutel] = vandaag; }
+    for (const m of METERS) if (uit.meters[m.sleutel] === undefined) {
+      uit.meters[m.sleutel] = nu[m.sleutel];
+      uit.sinds[m.sleutel] = vandaag;                 // een nieuwe meter begint vandaag stil te staan
+    }
     /* De prestatielat schrijven we alleen als er cijfers ZIJN en ze van dezelfde
        machine en modus komen. Anders zou een ronde op een andere machine de lat
        stilletjes verzetten -- omhoog of omlaag, allebei fout. */
@@ -818,6 +1062,7 @@ function main() {
       for (const b of presBeter) uit.prestatie[b.m.sleutel] = b.nu;
       for (const n of presNieuw) uit.prestatie[n.m.sleutel] = n.nu;
       uit.prestatieBron = pres.bron;
+      if (pres.kalibratie) uit.prestatieKalibratie = pres.kalibratie;
       uit.prestatieGemeten = pres.gedraaid;
     }
     fs.writeFileSync(NORMBESTAND, JSON.stringify(uit, null, 2) + '\n');
@@ -846,4 +1091,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };
+module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel,
+  PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
+  telBewijslaag };

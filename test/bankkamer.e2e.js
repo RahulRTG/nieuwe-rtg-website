@@ -24,16 +24,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('de bankkamer toont de reconciliatie en de bevoegdheid, en liegt daar niet over',
-  { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bankkamer-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-KAMER-1' } });
   let browser;
@@ -71,7 +67,7 @@ test('de bankkamer toont de reconciliatie en de bevoegdheid, en liegt daar niet 
     const gezond = (await post('/api/office/bank/gezond', {}, kantoor.token)).body;
     assert.equal(gezond.railOpen, 1, 'de API telt een openstaande opdracht');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 1200 } });
     await ctx.addInitScript((tok) => {
       try { localStorage.setItem('rtg_member_token', tok.lid); localStorage.setItem('rtg_office_token', tok.kantoor); } catch (e) {}

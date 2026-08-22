@@ -13,7 +13,7 @@
       toekomst gaat niet weg; een tijdstip in het verleden wordt geweigerd in
       plaats van stil te mislukken.
    4. Een alias mag nooit het postvak van een ander opvangen.
-   Draai: node --experimental-sqlite --test test/rtmail-schrijf.test.js */
+   Draai: node --test test/rtmail-schrijf.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -115,8 +115,22 @@ test('een gepland concept dat aan de beurt is, gaat de deur uit zodra iemand kij
   // een tijdstip vlak in de toekomst, en dan even wachten: geen wekker nodig
   const zometeen = new Date(Date.now() + 1200).toISOString();
   const c = await schrijf(aTok, bAdres, 'Bijna', 'op tijd', zometeen);
-  await new Promise(r => setTimeout(r, 1500));
-  const lade = await post('/api/member/rtmail/concepten', {}, aTok);
+  /* WACHTEN TOT HET CONCEPT LOS IS, en niet 1500 ms gokken. Er zijn twee dingen
+     nodig: de klok moet voorbij `zometeen` zijn, EN iemand moet in de lade
+     kijken -- dat kijken is precies wat het versturen doet ("geen wekker
+     nodig"). Die twee dekte de anderhalve seconde met marge en geluk. Nu kijken
+     we net zo lang tot het concept er niet meer staat; dat kijken IS de
+     handeling. */
+  let lade = null;
+  {
+    const eind = Date.now() + 20000;
+    for (;;) {
+      lade = await post('/api/member/rtmail/concepten', {}, aTok);
+      if (lade.zojuistVerstuurd.includes(c.concept.id) || !lade.concepten.some(x => x.id === c.concept.id)) break;
+      if (Date.now() >= eind) throw new Error('het geplande concept ging binnen 20 s niet de deur uit');
+      await new Promise(r => setTimeout(r, 50));
+    }
+  }
   assert.ok(lade.zojuistVerstuurd.includes(c.concept.id) || !lade.concepten.some(x => x.id === c.concept.id),
     'het concept is losgemaakt');
   const bij_b = await post('/api/member/rtmail/vak', {}, bTok);

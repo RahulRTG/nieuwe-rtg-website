@@ -6,7 +6,7 @@
    18+-poort mag je dus een toernooitje spelen; wat daar al niet gebeurt (de
    uitslag in de blijvende log) gebeurt hier ook niet.
 
-   Draai los: node --experimental-sqlite --test test/speltoernooi.test.js */
+   Draai los: node --test test/speltoernooi.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

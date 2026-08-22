@@ -3,7 +3,7 @@
    leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,
    gigastrings, prototype-vergiftiging, diep geneste JSON, onzin-getallen)
    ketst overal netjes af zonder de data of het proces te raken.
-   Draai los: node --experimental-sqlite --test test/streng-poorten.test.js */
+   Draai los: node --test test/streng-poorten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -100,8 +100,22 @@ test('5. diep geneste JSON ketst af voordat er ook maar iets mee gebeurt', async
 });
 
 test('6. onzin-getallen: munten en declaraties weigeren NaN, negatief en te groot', async () => {
+  /* MET EEN PAS DIE DE KYC-POORT AL PASSEERT, en dat is geen omweg maar de enige
+     manier om te meten wat hier bedoeld wordt.
+
+     /api/wallet/munt/koop toetst EERST of dit lid uberhaupt met RTG Pay mag
+     betalen (payGate: een RTG Pass zonder gezien paspoort krijgt 403) en pas
+     daarna of het getal deugt. Die volgorde is juist -- je verwerkt geen invoer
+     van iemand die de handeling toch niet mag doen, en anders vertelt een 400
+     hem dat zijn invoer fout was terwijl hij hier helemaal niets mocht.
+
+     Deze toets ging uit van 400 en kreeg 403 op het eerste getal, waarna hij
+     stopte. Hij mat dus de KYC-poort en niet de getalpoort. Met een
+     Lifestyle-pas is payGate meteen ok en meet hij weer wat er in zijn naam
+     staat: dat -5, 0, 101, NaN, een miljard en null allemaal worden geweigerd. */
+  const betalend = (await api('/api/login', { tier: 'business', pasApp: 'zakelijk' })).body.token;
   for (const aantal of [-5, 0, 101, 'NaN', 1e9, null]) {
-    assert.equal((await api('/api/wallet/munt/koop', { zaak: 'Test', aantal }, lidTok)).status, 400, 'aantal ' + aantal);
+    assert.equal((await api('/api/wallet/munt/koop', { zaak: 'Test', aantal }, betalend)).status, 400, 'aantal ' + aantal);
   }
   const o = await api('/api/supplier/zorgpolis', {}, segur);
   assert.equal(o.status, 200);

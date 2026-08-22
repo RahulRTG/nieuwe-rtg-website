@@ -18,13 +18,13 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:6rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
   input,textarea,select,button{font:inherit;}
-  input,textarea,select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:.85rem;padding:.5rem .7rem;width:100%;}
+  input,textarea,select{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);font-size:.85rem;padding:.5rem .7rem;width:100%;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.45rem .9rem;border-radius:0 0 10px 10px;text-decoration:none;font-size:.8rem;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.45rem .9rem;border-radius:0;text-decoration:none;font-size:.8rem;}
   .skip:focus{top:0;}
   label{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .25rem;}
   /* De tabs in de kop (Mijn genootschappen / Mijn agenda / Zoeken / Oprichten)
@@ -44,27 +44,35 @@
   body.rtg-stijl .tabs > button:hover{color:var(--txt);border-bottom-color:transparent;}
   body.rtg-stijl .tabs > button[aria-pressed="true"]{color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1.1rem;max-width:660px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;margin-bottom:.8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-bottom:.8rem;}
   .kaart h2{font-size:1rem;margin-bottom:.4rem;}
   .knoppen{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}
-  .knop{background:var(--burgundy);border:1px solid var(--burgundy);color:#fff;border-radius:999px;padding:.4rem 1rem;font-size:.8rem;cursor:pointer;}
+  .knop{background:var(--burgundy);border:1px solid var(--burgundy);color:#fff;border-radius:0;padding:.4rem 1rem;font-size:.8rem;cursor:pointer;}
   .knop.stil{background:none;border-color:var(--line);color:var(--muted);}
-  .mini{background:none;border:none;color:var(--gold);font-size:.75rem;cursor:pointer;padding:0;text-decoration:underline;}
+  .mini{background:none;border:none;color:var(--rtg-leesgoud,var(--gold));font-size:.75rem;cursor:pointer;padding:0;text-decoration:underline;}
   .rij{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem 0;border-bottom:1px solid var(--line);}
   .rij:last-child{border-bottom:0;}
   .rij .tx{flex:1;min-width:0;}
   .rij b{font-weight:600;font-size:.9rem;}
   .rij small{display:block;color:var(--soft);font-size:.75rem;margin-top:.1rem;line-height:1.45;}
-  .merk{display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);color:var(--soft);border-radius:999px;padding:.05rem .45rem;margin-left:.35rem;}
-  .merk.op{border-color:var(--gold);color:var(--gold);}
-  .staaf{height:6px;border-radius:999px;background:var(--card2);overflow:hidden;margin-top:.25rem;}
+  .merk{display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);color:var(--soft);border-radius:0;padding:.05rem .45rem;margin-left:.35rem;}
+  .merk.op{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
+  .staaf{height:6px;border-radius:0;background:var(--card2);overflow:hidden;margin-top:.25rem;}
   .staaf i{display:block;height:100%;background:var(--burgundy);}
   .leeg{color:var(--soft);font-size:.85rem;padding:.6rem 0;}
-  .uit{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;font-size:.85rem;line-height:1.5;white-space:pre-wrap;}
-  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,rgba(12,12,11,.7));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
+  .uit{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;margin-top:.6rem;font-size:.85rem;line-height:1.5;white-space:pre-wrap;}
+  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 70%,transparent));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
   .aibalk form{display:flex;gap:.5rem;max-width:660px;margin:0 auto;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/social-suite.css" rel="stylesheet">
+<link href="/shared/social-intelligence.css" rel="stylesheet">
+<script src="/shared/social-suite.js" defer></script>
+<script src="/shared/social-intelligence.js" defer></script>
+<script src="/shared/social-intelligence-deck.js" defer></script>
+<script src="/shared/social-intelligence-runtime.js" defer></script>
+<script src="/shared/social-intelligence-data.js" defer></script>
+<script id="rtgAppMenuJs" src="/shared/appmenu.js" defer></script>
 </head>
 <body class="rtg-stijl">
 <a href="#main" class="skip">Naar de inhoud</a>
@@ -76,9 +84,9 @@
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="aibalk" id="aibalk" hidden>
   <div class="uit" id="aiuit" hidden aria-live="polite"></div>
-  <form id="aiform">
+  <form id="aiform" class="rtg-duimeind">
     <input id="aiin" placeholder="Zeg wat er moet gebeuren" aria-label="Zeg Rahul wat er moet gebeuren" autocomplete="off">
-    <button class="knop" type="submit">Vraag</button>
+    <button class="knop hoofd" type="submit" data-hoofdactie>Vraag</button>
   </form>
 </div>
 <script src="/shared/basis.js"></script>
@@ -140,7 +148,7 @@
       (g.mijnRol==='beheerder'?'<button class="knop stil" id="bgezond" type="button">Hoe staat het ervoor</button>'+
         '<button class="knop stil" id="balles" type="button">Neem alles mee</button>':'')+
       '<button class="knop stil" id="bvertrek" type="button">Vertrekken</button></div>'+
-      '<div class="uit" id="ugezond" hidden></div></div>';
+      '<div class="uit" id="ugezond" hidden></div></div><div class="kaart" id="kbeheer" hidden></div>';
 
     /* Wat heb je gemist? Met een bodem: staat er niets, dan zegt de app dat, in
        plaats van iets te verzinnen om je bezig te houden. */
@@ -183,15 +191,40 @@
               '<div class="staaf"><i style="width:'+pct+'%;"></i></div>';
           }).join('')+'<small class="h-mt30">'+x.peiling.totaal+' stemmen</small></div>' : '')+
           (x.reacties.length ? '<div class="h-mt40">'+x.reacties.map(function(r){
-            return '<small><b>'+esc(r.van)+':</b> '+esc(r.tekst)+'</small>'; }).join('')+'</div>' : '')+
+            return '<small><b>'+esc(r.van)+':</b> '+esc(r.tekst)+
+              (r.vanMij||g.mijnRol==='beheerder'?' <button class="mini" data-reactie-weg="'+x.id+'" data-reactie-id="'+r.id+'">verwijder reactie</button>':'')+
+              '</small>'; }).join('')+'</div>' : '')+
           '<div class="knoppen"><input data-reactie="'+x.id+'" placeholder="Reageren" aria-label="Reageren op dit bericht" style="max-width:60%;">'+
           '<button class="mini" data-reageer="'+x.id+'">plaatsen</button>'+
           (x.vanMij||g.mijnRol==='beheerder'?'<button class="mini" data-prikweg="'+x.id+'">weg</button>':'')+'</div></div></div>';
       }).join('') : '<div class="leeg">Het prikbord is nog leeg.</div>')+
-      (d.meer ? '<button class="knop stil" id="bmeer" type="button">Meer laden</button>' : (b.length?'<div class="leeg">Je bent bij.</div>':''))+
+      (d.meer ? '<button class="knop stil" id="bmeer" data-na="'+esc(d.volgende)+'" type="button">Meer laden</button>' : (b.length?'<div class="leeg">Je bent bij.</div>':''))+
       '</div>';
     toon(html);
     tekenBijgepraat(g.id);
+  }
+
+  /* De bestaande beheerroutes krijgen hier hun menselijke werkplek. De server
+     blijft beslissen wat mag; het scherm toont alleen de codenamen en grenzen
+     die `mijn` al teruggeeft. */
+  function tekenLeden(g){
+    var host = $('#kbeheer'); if (!host) return;
+    var beheer = g.mijnRol === 'beheerder';
+    var magNodigen = beheer || g.soort === 'openbaar';
+    var nauwer = ['openbaar','besloten','geheim'].filter(function(s){
+      return ['openbaar','besloten','geheim'].indexOf(s) >= ['openbaar','besloten','geheim'].indexOf(g.soort);
+    });
+    host.hidden = false;
+    host.innerHTML = '<h2>Leden en toegang</h2><p style="color:var(--soft);font-size:.78rem;line-height:1.5;">Codenamen beschermen de identiteit. Een uitnodiging wordt nooit automatisch lidmaatschap.</p>'+
+      (beheer?'<div class="uit"><label for="gnaam">Genootschap beheren</label><input id="gnaam" maxlength="70" value="'+esc(g.naam)+'">'+
+        '<label for="gsoort">Zichtbaarheid kan alleen strenger</label><select id="gsoort">'+nauwer.map(function(s){ return '<option value="'+s+'"'+(s===g.soort?' selected':'')+'>'+esc(SOORT[s])+'</option>'; }).join('')+'</select>'+
+        '<label for="gover">Waarover</label><textarea id="gover" rows="2" maxlength="600">'+esc(g.over)+'</textarea>'+
+        '<label for="gregels">Huisregels</label><textarea id="gregels" rows="2" maxlength="800">'+esc(g.regels)+'</textarea><div class="knoppen"><button class="knop" id="bgroepbewaar" type="button">Wijzigingen bewaren</button></div></div>':'')+
+      (magNodigen?'<div class="uit"><label for="guitnodig">Uitnodigen op codenaam</label><div style="display:flex;gap:.45rem;"><input id="guitnodig" maxlength="80" placeholder="codenaam"><button class="knop" id="bnodig" type="button">Uitnodigen</button></div></div>':'')+
+      '<div style="margin-top:.7rem;">'+(g.ledenlijst||[]).map(function(l){
+        return '<div class="rij"><div class="tx"><b>'+esc(l.codenaam)+(l.ikZelf?' (jij)':'')+'</b><small>'+esc(l.rol)+' · sinds '+esc(String(l.sinds||'').slice(0,10))+'</small></div>'+
+          (beheer&&!l.ikZelf?'<button class="mini" data-rol="'+esc(l.codenaam)+'" data-nieuwerol="'+(l.rol==='beheerder'?'lid':'beheerder')+'">'+(l.rol==='beheerder'?'maak lid':'maak beheerder')+'</button><button class="mini" data-eruit="'+esc(l.codenaam)+'">eruit</button>':'')+'</div>';
+      }).join('')+'</div>';
   }
 
   /* Bijgepraat: een korte lijst met een einde. Geen teller die oploopt en geen
@@ -306,7 +339,14 @@
     if (id === 'bleden') return api('/genootschap/mijn').then(function(d){
       var g = (d.groepen||[]).filter(function(x){ return String(x.id)===String(OPEN); })[0];
       if (!g) return melding('Kon de ledenlijst niet laden.');
-      melding('Leden: ' + (g.ledenlijst||[]).map(function(l){ return l.codenaam+' ('+l.rol+')'; }).join(', '));
+      tekenLeden(g);
+    });
+    if (id === 'bgroepbewaar') return api('/genootschap/pas-aan', { groep:OPEN, naam:$('#gnaam').value,
+      soort:$('#gsoort').value, over:$('#gover').value, regels:$('#gregels').value }).then(function(d){
+        melding(d.error||'Genootschap bijgewerkt.'); if(!d.error) openGroep(OPEN); });
+    if (id === 'bnodig') return api('/genootschap/nodig-uit', { groep:OPEN, wie:$('#guitnodig').value }).then(function(d){
+      melding(d.error||d.uitgenodigd+' is uitgenodigd en beslist zelf.');
+      if(!d.error) api('/genootschap/mijn').then(function(m){ var g=(m.groepen||[]).find(function(x){return String(x.id)===String(OPEN);}); if(g) tekenLeden(g); });
     });
     if (id === 'bgezien') return api('/genootschap/gezien', { groep:OPEN })
       .then(function(d){ if(d.error) return melding(d.error); tekenBijgepraat(OPEN); });
@@ -379,6 +419,18 @@
     var pw = ev.target.closest('[data-prikweg]');
     if (pw) return api('/genootschap/prik-weg', { groep:OPEN, id:pw.getAttribute('data-prikweg') })
       .then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+    var rw = ev.target.closest('[data-reactie-weg]');
+    if (rw) return api('/genootschap/reactie-weg', { groep:OPEN, id:rw.getAttribute('data-reactie-weg'),
+      reactieId:rw.getAttribute('data-reactie-id') }).then(function(d){ if(d.error) return melding(d.error); openGroep(OPEN); });
+    var rz = ev.target.closest('[data-rol]');
+    if (rz) return api('/genootschap/rol', { groep:OPEN, wie:rz.getAttribute('data-rol'), rol:rz.getAttribute('data-nieuwerol') })
+      .then(function(d){ melding(d.error||'Rol aangepast.'); if(!d.error) openGroep(OPEN); });
+    var eu = ev.target.closest('[data-eruit]');
+    if (eu) {
+      if (!confirm(eu.getAttribute('data-eruit')+' uit dit genootschap zetten?')) return;
+      return api('/genootschap/eruit', { groep:OPEN, wie:eu.getAttribute('data-eruit') })
+        .then(function(d){ melding(d.error||'Lid verwijderd.'); if(!d.error) openGroep(OPEN); });
+    }
   });
 
   $('#aiform').addEventListener('submit', function(ev){

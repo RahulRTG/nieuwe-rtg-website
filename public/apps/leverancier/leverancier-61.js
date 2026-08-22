@@ -6,7 +6,7 @@
         '<div class="field h-flex1"><label>'+T('menu.price','Prijs (€)')+'</label><input id="mnPrice" type="number" inputmode="decimal" placeholder="45"></div></div>'+
         '<div class="field"><label>'+T('menu.desc','Omschrijving')+'</label><input id="mnDesc" placeholder="'+T('menu.descph','Kort en smakelijk')+'"></div>'+
         '<div class="field"><label>'+T('menu.alg','Allergenen (komma\'s)')+'</label><input id="mnAlg" placeholder="vis, soja"></div>'+
-        '<div class="field"><label>'+T('menu.station','Werkplek')+'</label><select id="mnStation" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
+        '<div class="field"><label>'+T('menu.station','Werkplek')+'</label><select id="mnStation" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.8rem 1rem;font-size:0.9rem;color:var(--txt);outline:none;">'+
         '<option value="keuken"'+((S&&(S.type==='bar'||S.type==='club'))?'':' selected')+'>\uD83D\uDD25 '+T('menu.keuken','Keuken')+'</option>'+
         '<option value="bar"'+((S&&(S.type==='bar'||S.type==='club'))?' selected':'')+'>\uD83C\uDF78 Bar</option></select></div>'+
         '<button class="bigbtn" id="mnAdd">'+T('menu.addbtn','Zet op de kaart')+'</button></div>';
@@ -78,46 +78,3 @@
   function luchtPct(){ const st = state.settings || {}; return st.luchtzijde ? (Number.isFinite(Number(st.luchtToeslagPct)) ? Math.round(Number(st.luchtToeslagPct)) : 15) : 0; }
   function luchtPrijs(p){ const pct = luchtPct(); return pct ? Math.round(p * (1 + pct / 100) * 100) / 100 : p; }
   function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
-  /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
-     hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip
-     niet of tikt er niemand, dan komt het typvenster vanzelf. */
-  async function vraagPayCode(){
-    if (window.TapPay && TapPay.kan()){
-      const tap = window.confirm(T('pos.tapkeuze','Tap to pay: de gast tikt zijn toestel hiertegen. Liever de code scannen of typen? Kies dan Annuleren.'));
-      if (tap){
-        toast(''+T('pos.tap','Tap to pay: laat de gast het toestel hiertegen houden...'));
-        const code = await TapPay.lees(12000);
-        if (code){ toast(''+T('pos.tapok','Code ontvangen via tap to pay.')); return code; }
-        toast(T('pos.tapmis','Geen tik ontvangen; scan of typ de code van de gast.'));
-      }
-    }
-    // scan de betaal-QR op het scherm van de gast; het scanscherm biedt zelf een
-    // typveld aan als er geen camera is of de code niet leesbaar is
-    if (window.RTGScanknop){
-      return await new Promise((resolve) => {
-        let klaar = false;
-        RTGScanknop.open({
-          titel: T('pos.scanbetaal','Scan de betaalcode'),
-          hint: T('pos.scanbetaalhint','Scan de QR op het scherm van de gast.'),
-          handTekst: T('pos.oftyp','Of typ de betaalcode'),
-          onCode: (c) => { klaar = true; resolve(((c.tekst||'').trim().toUpperCase()) || null); },
-          onSluit: () => { if (!klaar) resolve(null); }
-        });
-      });
-    }
-    const c = window.prompt(T('pos.paycode','Betaalcode van de gast (uit de app):'));
-    return c ? c.trim().toUpperCase() : null;
-  }
-
-  function renderKassa(){
-    const el = $('#kassaWrap'); if (!el) return;
-    const type = S.type;
-    let html = '';
-    if (type==='restaurant'||type==='bar'||type==='club') html = kassaHoreca();
-    else if (type==='hotel'||type==='apartment'||type==='villa') html = kassaHotel();
-    else html = kassaVervoer();
-    html += kassaDay();
-    html += '<div id="zWrap"></div><div id="shiftWrap"></div>';
-    el.innerHTML = html;
-    bindKassa(type);
-    laadZ();

@@ -19,7 +19,7 @@
    verkeerde plek staat, handhaaft niets. Vandaar deze toets: dezelfde regel,
    nu in de suite die bij elke wijziging draait.
 
-   Draai los: node --experimental-sqlite --test test/bundeldelen.test.js */
+   Draai los: node --test test/bundeldelen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -12,22 +12,22 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:2rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
   header h1{font-size:1.25rem;margin-top:.1rem;}
   header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
   main{padding:1rem;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .95rem;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(13.5rem,1fr));gap:.7rem;}
   .kamer{cursor:pointer;}
   .kamer h2{font-size:1rem;}
   .kamer .mi{font-size:.74rem;color:var(--muted);margin:.25rem 0 .4rem;line-height:1.45;}
   .kpi{font-size:.72rem;color:var(--soft);}
-  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
-  .veld{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
+  .veld{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .taak{display:flex;gap:.5rem;align-items:center;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.85rem;}
   .taak.af span{opacity:.45;text-decoration:line-through;}
@@ -45,6 +45,11 @@
   <a href="os.html">Foundation OS</a>
   <a href="clubswerk.html">Clubs & steden</a>
   <a href="partner.html">Stadsraad-portaal</a>
+  <!-- Deze twee stonden op de GEZINSHUB, tussen de apps voor kinderen. Het
+       Clubportaal vraagt om een clubcode en spreekt met u aan; het Living Lab
+       is een onderzoekslab van het kantoor. Allebei horen ze hier. -->
+  <a href="club.html">Clubportaal</a>
+  <a href="/apps/livinglab.html">Living Lab</a>
   <a href="/apps/lab.html">Onderzoekslab</a>
   <a href="/apps/command.html">RTG Command</a>
 </header>
@@ -232,5 +237,6 @@ if (TOKEN) {
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
 </body>
 </html>

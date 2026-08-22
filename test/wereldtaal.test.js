@@ -2,7 +2,7 @@
    AI-sleutel. Geen volzin-vertaler (dat doet de AI), maar de 30
    school-kernwoorden zijn in elke taal aanwezig en compleet -- deze test is
    de bewaker: een nieuwe taal in het register MOET een kernregel krijgen.
-   Draai los: node --experimental-sqlite --test test/wereldtaal.test.js */
+   Draai los: node --test test/wereldtaal.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { TALEN } = require('../server/talen');

@@ -12,7 +12,7 @@
    - HET BEHEER-TOKEN REIST NOOIT MEE, ook niet naar de eigenaar.
    - EEN GEKOPPELD LID VINDT ZIJN EIGEN WERKRUIMTE TERUG, met zijn eigen token
      en niet dat van een ander.
-   Draai los: node --experimental-sqlite --test test/bedrijfeigenaar.test.js */
+   Draai los: node --test test/bedrijfeigenaar.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

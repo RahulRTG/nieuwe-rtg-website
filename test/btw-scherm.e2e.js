@@ -13,25 +13,18 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) })).json();
 
 test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-btwscherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -43,7 +36,7 @@ test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
     assert.ok(f.factuur && f.factuur.btwBedrag > 0, 'er staat een factuur met btw in het register');
     const btwOpFactuur = f.factuur.btwBedrag.toFixed(2).replace('.', ',');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -56,7 +49,7 @@ test('Kantoor: de btw-aangifte tekent zich en rekent met de eigen factuur',
       localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, login.token);
-    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app.active', { timeout: 20000 });
 
     await page.waitForSelector('[data-ksec="fin"]', { state: 'visible', timeout: 15000 });

@@ -10,6 +10,38 @@
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
   }
 
+  /* De websitebrief gaat pas naar de server NADAT de gebruiker in deze app is
+     ingelogd. Geen externe berichtendienst of openbaar aanvraag-endpoint:
+     dezelfde ingelogde /chat/send-lijn die de app zelf gebruikt. We wissen het
+     fragment pas na een geslaagde aanname, zodat een netwerkstoring de aanvraag
+     niet stil laat verdwijnen en een herlaad hem opnieuw kan proberen. */
+  let websiteAanvraagBezig = false;
+  async function verwerkWebsiteAanvraag(){
+    if (!websiteAanvraag || websiteAanvraagBezig || !user.account || !API.live) return;
+    websiteAanvraagBezig = true;
+    const regels = [
+      'Aanvraag via rtravelgroup.store', '',
+      'Wereld / behoefte: ' + websiteAanvraag.requirement,
+      'Naam: ' + websiteAanvraag.name,
+      'E-mail: ' + websiteAanvraag.email,
+      websiteAanvraag.phone ? 'Telefoon: ' + websiteAanvraag.phone : null,
+      '', 'Brief:', websiteAanvraag.message
+    ].filter(regel => regel !== null);
+    try {
+      const d = await API.call('/chat/send', { text: regels.join('\n') });
+      openTab('ai');
+      renderChatMsgs(d.messages, user.tier !== 'rtg');
+      websiteAanvraag = null;
+      history.replaceState(null, '', location.pathname + location.search);
+      toast(T('aanvraag.app.ok','Uw aanvraag staat in uw beveiligde RTG-lijn.'));
+    } catch(e){
+      openTab('ai');
+      const invoer = $('#askInput');
+      if (invoer) invoer.value = regels.join('\n');
+      toast(e.message || T('aanvraag.app.mis','De aanvraag staat klaar; verstuur hem zodra de verbinding terug is.'));
+    } finally { websiteAanvraagBezig = false; }
+  }
+
   function standaardChips(){
     const chips = lang()==='en'
       ? ['Yes, arrange it','What do you know about me?','What should I pack?','Plan my day','Arrange a restaurant']
@@ -49,7 +81,7 @@
   }));
 
   const zakStatusKnop = (p) =>
-    p.status === 'verbonden' ? '<span class="zak-open" style="color:var(--gold);border-color:var(--gold);">✓ ' + T('zak.verbonden','Verbonden') + '</span>'
+    p.status === 'verbonden' ? '<span class="zak-open" style="color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);">✓ ' + T('zak.verbonden','Verbonden') + '</span>'
     : p.status === 'aangevraagd' ? '<span class="zak-chip">' + T('zak.wacht','Aangevraagd') + '</span>'
     : p.status === 'wacht-op-u' ? '<span class="zak-chip mijn">' + T('zak.wachtu','Accepteer in Contacten') + '</span>'
     : '<button class="go js-zcon" data-key="' + escT(p.key) + '" style="padding:0.25rem 0.7rem;font-size:0.68rem;">+ ' + T('zak.verbind','Verbind') + '</button>';
@@ -61,7 +93,7 @@
     return '<div class="zak-kaart">' +
       '<div style="display:flex;align-items:center;gap:0.6rem;">' +
         '<div class="grow-min"><b>' + escT(p.naam) + '</b>' +
-        (p.pas ? ' <span style="font-size:0.56rem;letter-spacing:0.08em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0.08rem 0.4rem;vertical-align:middle;">' + (TIER_LABEL[p.pas] || p.pas) + '</span>' : '') +
+        (p.pas ? ' <span style="font-size:0.56rem;letter-spacing:0.08em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);border-radius:0;padding:0.08rem 0.4rem;vertical-align:middle;">' + (TIER_LABEL[p.pas] || p.pas) + '</span>' : '') +
         (p.openVoorWerk ? ' <span class="zak-open">' + T('zak.open','open voor werk') + '</span>' : '') +
         '<div style="font-size:0.74rem;color:var(--muted);">' + escT(p.kop) +
         (p.sector ? ' · ' + escT(p.sector) : '') + (p.plaats ? ' · ' + escT(p.plaats) : '') + '</div>' +

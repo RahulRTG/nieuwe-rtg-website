@@ -5,7 +5,7 @@
    het opschalen; de nood-fallback (noodstop en automatisch); sparen met rente; de
    wallet-brug; passen, krediet, incasso, zakelijk en de AI-bankier; en de
    sluitcontrole die na alles nog klopt.
-   Draai los: node --experimental-sqlite --test test/bank.test.js */
+   Draai los: node --test test/bank.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -172,10 +172,27 @@ test('sparen met rente: 1,5% per jaar wordt als echte boeking bijgeschreven', as
   assert.equal((await api('bank/rekening', { iban: spaar }, lid.token)).body.rekening.saldoCenten, 101500);
 });
 
-test('de brug met RTG Pay: van de wallet naar de bank, beide grootboeken blijven sluiten', async () => {
+/* DE BRUG IS EENRICHTINGSVERKEER SINDS 20 AUGUSTUS 2026, en deze toets is
+   omgedraaid. Hij deed hiervoor precies het omgekeerde: wallet -> bank met een
+   verwachte 200. Dat was toen waar, en het is nu een besluit dat het niet meer
+   mag: kern/bevoegdheid/lijst.js staat walletsaldo toe op grond van een BESLUIT
+   waarvan de tweede voorwaarde is dat het saldo niet wordt uitbetaald aan het
+   lid. Zolang de leden-bank uitstond was dat een belofte; met de bank live
+   liep de keten wallet -> bank -> SEPA gewoon naar buiten.
+
+   MUTATIE GEZIEN ZAKKEN: de weigering in kern/bank/walletbrug.js vervangen door
+   de oude implementatie; deze toets zakte op "van de wallet naar de bank kan
+   niet meer". Teruggedraaid, daarna groen. */
+test('de brug met RTG Pay is eenrichtingsverkeer: bank -> wallet mag, andersom niet', async () => {
   await api('pay/oplaad', { centen: 3000, idem: 'w1' }, lid.token);
-  const brug = await api('bank/van-wallet', { iban: lid.iban, centen: 2000 }, lid.token);
-  assert.equal(brug.status, 200);
+  const dicht = await api('bank/van-wallet', { iban: lid.iban, centen: 2000 }, lid.token);
+  assert.equal(dicht.status, 409, 'van de wallet naar de bank kan niet meer');
+  assert.match(dicht.body.error, /binnen RTG/i, 'en het lid leest waarom: ' + JSON.stringify(dicht.body).slice(0, 160));
+
+  /* De andere kant hoort juist WEL te werken -- anders bewijst de toets alleen
+     dat de brug stuk is (LAT.md regel 9). */
+  const open = await api('bank/naar-wallet', { iban: lid.iban, centen: 2000 }, lid.token);
+  assert.equal(open.status, 200, 'van de bank naar de wallet mag gewoon: ' + JSON.stringify(open.body).slice(0, 160));
   assert.equal((await oapi('bank/gezond', {}, 'RTG')).body.sluit.klopt, true, 'de som van alle bank-saldi is nul');
 });
 

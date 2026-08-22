@@ -19,7 +19,7 @@
    - GELEZEN IS PERSOONLIJK. Wie zijn eigen berichten wegleest, mag daarmee
      niet de ongelezen stand van een ander opruimen.
 
-   Draai los: node --experimental-sqlite --test test/foundation-rest.test.js
+   Draai los: node --test test/foundation-rest.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -55,6 +55,30 @@ function maakLagen({ db, save, crypto, journaal, register, kern }) {
     meting: require('../../meting'), functies: require('../../functies/register') });
   canary.tikker();
 
+  /* De uitrolregie: de trap uit functies/register/index.js vanzelf op, en bij
+     tegenwind vanzelf een tree terug. Zelfde tellers als de canary en de
+     servicedoelen, want twee metingen die elkaar kunnen tegenspreken maken
+     achteraf onbeslisbaar welke had moeten stoppen.
+
+     schakelFase komt LAAT binnen: hij hangt aan kern.afdelingen, en die wordt in
+     kernlaag1 gebouwd terwijl deze laag eerder aan de beurt kan zijn. Zelfde
+     patroon als weefsel hieronder.
+
+     Twee treden dragen een mensrem en gaan nooit vanzelf open -- geld en het
+     kanaal tussen twee leden. Waarom dat geen instelling is, staat in de kop
+     van ./uitrolregie.js. */
+  const uitrolregie = require('./uitrolregie').maakUitrolregie({
+    db, save, meting: require('../../meting'), functies: require('../../functies/register'),
+    schakelFase: (id, door) => {
+      const a = kern && kern.afdelingen;
+      if (!a || typeof a.schakelFase !== 'function') {
+        return { status: 503, error: 'De schakelkast is nog niet gebouwd.' };
+      }
+      return a.schakelFase(id, door);
+    }
+  });
+  uitrolregie.tikker();
+
   /* Stadsstart: een stad inrichten. Hij krijgt het landpakket mee omdat een
      stad zonder ingericht land een stad zonder munt en zonder tarieven is, en
      het weefsel omdat hij eerlijk moet kunnen melden dat die laag vandaag EEN
@@ -68,7 +92,7 @@ function maakLagen({ db, save, crypto, journaal, register, kern }) {
        er pas na de aanbouw. */
     weefsel: () => (kern && kern.weefsel) || null });
 
-  return { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart };
+  return { mdm, landpakket, apipoort, overname, zandbak, canary, uitrolregie, stadstart };
 }
 
 module.exports = { maakLagen };

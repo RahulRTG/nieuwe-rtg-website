@@ -17,7 +17,7 @@
    Elke bewering staat als exacte waarde en niet als "een van deze statussen"
    (regel 9 van de lat): een toets die zowel 200 als 403 goedkeurt, keurt niets.
 
-   Draai los: node --experimental-sqlite --test test/bureau.test.js */
+   Draai los: node --test test/bureau.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

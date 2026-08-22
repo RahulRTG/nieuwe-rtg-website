@@ -111,7 +111,10 @@ module.exports = (kern) => {
   });
   app.post('/api/supplier/beveiliging/pda/inklok', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
-    const r = bevInklok(req.supplier.code, gid(req), String(req.body.id || ''), req.body.lat, req.body.lng);
+    /* lat/lng gaan hier NIET meer in: de kern bewaarde ze op de dienst en niemand
+       las ze ooit (zie kern/beveiliging/pda/patrouille.js). Een client die ze
+       nog meestuurt wordt gewoon genegeerd. */
+    const r = bevInklok(req.supplier.code, gid(req), String(req.body.id || ''));
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json(r);
   });

@@ -4,24 +4,19 @@
    beide leden hun eigen inlog hebben. Draait alleen met een browser. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, nepMediaArgs, installeerNepMicrofoon } = require('./helper');
+const { startServer, letOpFouten, nepMediaArgs, installeerNepMicrofoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze: ./browser.js -- maar hier ZONDER de eigen driver. Die kent
-   geen aparte contexten met eigen permissies, en dat heeft deze toets nodig;
-   dan is overslaan eerlijker dan draaien op iets dat de vraag niet kent. */
-const { laadBrowser: kiesBrowser } = require('./browser');
-const laadBrowser = () => kiesBrowser({ eigenDriver: false });
-const pw = laadBrowser();
+const pw = laadPlaywright({ eigenDriver: false });
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 })).json();
 
 test('Meet: kamer maken, binnenkomen op code, echt verbinden en de hand opsteken',
-  { skip: pw ? false : 'geen playwright in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-meet-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -34,7 +29,7 @@ test('Meet: kamer maken, binnenkomen op code, echt verbinden en de hand opsteken
     const stB = await api(base, '/api/state', {}, regB.token);
     const codeB = stB.state.user.codename;
 
-    browser = await pw.chromium.launch({ args: nepMediaArgs() });
+    browser = await pw.chromium.launch(browserOpties(pw, { args: nepMediaArgs() }));
     const fouten = [];
     const open = async (token) => {
       const ctx = await browser.newContext({ permissions: ['camera', 'microphone'] });

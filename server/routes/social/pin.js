@@ -10,9 +10,19 @@
 
    Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
-  const { kern } = sctx;
+  const { kern, linkBon: bon } = sctx;
   const { app, auth, geenGast, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
           liveMaak, liveKijk, liveVerbind } = kern;
+
+/* DE BON WORDT GESCHREVEN WAAR DE HANDELING WORDT BEVESTIGD, en dat is hier:
+   deze twee loketten zijn de plek waar een verzoek echt de deur uitgaat. Niet
+   bij het opzoeken -- een bon per scan zou een register zijn van iedereen die je
+   ooit tegenkwam (LINK.md par. 3.8), en niet bij socialVerbind, want die wordt
+   ook langs het gewone zoeken op codenaam bereikt en dat is geen link-handeling.
+
+   De schrijver zelf staat in ../social.js, want de gezinskant doet hetzelfde bij
+   dezelfde handeling; twee kopieen zouden betekenen dat "mijn koppelingen" aan
+   de ene kant wel en aan de andere kant niet vertelt wat je gedaan hebt. */
 
 // mijn eigen pin (wordt bij de eerste keer opvragen gemaakt)
 app.post('/api/member/pin', auth, (req, res) => {
@@ -54,6 +64,7 @@ app.post('/api/member/pin/connect', auth, async (req, res) => {
   if (geenGast(req, res)) return;
   const r = await pinVerbind(req.session.key, req.body.pin);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  bon(req.session.key, 'vast', r.key);
   res.json({ ok: true, status: r.st, key: r.key, codename: r.codename });
 });
 
@@ -89,6 +100,12 @@ app.post('/api/member/pin/live/verbind', auth, async (req, res) => {
   if (geenGast(req, res)) return;
   const r = await liveVerbind(req.session.key, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  /* Zonder `naar`, en dat is geen vergeten veld. De levende weg geeft met opzet
+     geen sleutel terug (zie kern/sociaal/pin-live.js: het scherm hoeft niet te
+     weten hoe iemand in de database heet), en een bon is geen reden om die
+     keuze alsnog te omzeilen. WIE het was staat in de verbinding zelf; de bon
+     zegt DAT er via een levende code een verzoek uitging, en wanneer. */
+  bon(req.session.key, 'levend', null);
   res.json({ ok: true, status: r.st, codename: r.codename });
 });
 };

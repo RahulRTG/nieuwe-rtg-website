@@ -137,6 +137,13 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return { status: 200, ok: true, user };
   }
 
+  /* De stap-op-ceremonie (een handeling bevestigen in plaats van inloggen)
+     staat in ./webauthn-stapop.js; daar staat ook waarom die ceremonie aan een
+     DOEL hangt en niet alleen aan een account. */
+  const { stapOpOpties, stapOpMaak } = require('./webauthn-stapop')({
+    credsVan, zetChallenge, pakChallenge, vanB64, save,
+    generateAuthenticationOptions, verifyAuthenticationResponse });
+
   /* ---- beheer ---- */
   function publiekeLijst(user) {
     return credsVan(user.id).map(c => ({ id: c.id, naam: c.naam, apparaat: c.apparaat || null,
@@ -153,7 +160,8 @@ function maakWebauthn({ db, save, accounts, schoon }) {
 
   return { webauthnRegOpties: regOpties, webauthnRegMaak: regMaak, webauthnLoginOpties: loginOpties,
     webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
-    webauthnWeg: weg };
+    webauthnWeg: weg, webauthnStapOpOpties: stapOpOpties, webauthnStapOpMaak: stapOpMaak,
+    webauthnAantal: user => (user ? credsVan(user.id).length : 0) };
 }
 
 module.exports = { maakWebauthn, maakCeremonieOpslag };

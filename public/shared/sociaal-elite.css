@@ -1,0 +1,474 @@
+/* RTG Social als privé productomgeving: compact, precies en inhoudgedreven. */
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank{width:var(--rtg-social-rail);padding:calc(var(--rtg-social-top) + 1.15rem) .55rem .8rem;background:var(--rtg-product);border-right:1px solid rgba(255,255,255,.08);}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank nav{gap:.35rem;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a{position:relative;min-height:54px;justify-content:center;padding:.45rem;border:0;border-radius:0;color:rgba(244,242,237,.5);}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a span{position:relative;width:18px;height:18px;font-size:0;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a span::after{content:"";position:absolute;inset:2px;border:1px solid currentColor;border-radius:0;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a:nth-child(1) span::after{border-radius:0;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a:nth-child(2) span::after{transform:rotate(45deg);border-radius:0;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a:nth-child(4) span::after{border-radius:50%;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a:nth-child(5) span::after{inset:3px 1px 3px 4px;transform:skew(-12deg);border-radius:0;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a b{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a:hover{color:#fff;background:rgba(255,255,255,.06);}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a.actief{color:#f4f2ed;background:#292a26;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank a.actief::after{content:"";position:absolute;right:-.55rem;width:3px;height:22px;border-radius:0;background:#bca66c;}
+.rtg-social-elite:not(.rtg-salon-elite) main#inhoud{box-sizing:border-box;display:block;width:calc(100% - var(--rtg-social-rail));max-width:none;min-height:100vh;margin-left:var(--rtg-social-rail);padding:var(--rtg-social-top) clamp(1.4rem,3.2vw,3.6rem) 7rem;color:var(--rtg-txt);background:#e9e7e1;}
+.rtg-social-elite .merkkop{position:relative;min-height:180px;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,44ch) auto;align-items:center;gap:clamp(1.5rem,3vw,4rem);padding:2.2rem 0 1.8rem;border:0;}
+.rtg-social-elite .merkkop>div:first-child{display:contents;}
+.rtg-social-elite .sociaal-boven{grid-column:1;align-self:end;margin:0 0 .35rem;color:var(--rtg-brass);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;}
+.rtg-social-elite .merkkop h1{grid-column:1;align-self:start;max-width:15ch;margin:0;color:#171715;font-size:clamp(2.55rem,4.1vw,4.25rem);line-height:.98;letter-spacing:-.035em;}
+.rtg-social-elite .sociaal-inleiding{grid-column:2;grid-row:1/3;max-width:44ch;margin:0;color:var(--rtg-muted);font-size:.9rem;line-height:1.65;}
+.rtg-social-elite .sociaal-filter{grid-column:3;grid-row:1/3;min-width:116px;min-height:48px;margin:0;border:1px solid rgba(24,24,23,.18);border-radius:0;background:#f7f5f0;color:#242420;box-shadow:0 8px 24px rgba(36,34,29,.05);letter-spacing:.1em;text-transform:uppercase;}
+.rtg-social-elite .sociaal-filter[aria-expanded="true"]{border-color:rgba(127,22,52,.38);background:#fff;box-shadow:0 12px 34px rgba(36,34,29,.1);}
+.sociaal-filtermenu{position:absolute;z-index:60;top:calc(50% + 25px);right:0;width:min(330px,calc(100vw - 2rem));padding:.45rem;border:1px solid rgba(24,24,23,.13);border-radius:0;background:rgba(252,251,248,.98);box-shadow:0 22px 55px rgba(30,29,26,.17);backdrop-filter:blur(18px);}
+.rtg-social-elite .merkkop>.sociaal-filtermenu{display:block;}
+.rtg-social-elite .merkkop>.sociaal-filtermenu[hidden]{display:none;}
+.sociaal-filtermenu button{position:relative;width:100%;min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem .8rem .65rem 2.2rem;border:0;border-radius:0;background:transparent;color:#292925;text-align:left;font-size:.72rem;font-weight:600;letter-spacing:.04em;cursor:pointer;}
+.sociaal-filtermenu button::before{content:"";position:absolute;left:.82rem;width:8px;height:8px;border:1px solid #9e9990;border-radius:50%;}
+.sociaal-filtermenu button[aria-checked="true"]{background:#f0ede6;color:#6e1931;}
+.sociaal-filtermenu button[aria-checked="true"]::before{border-color:#7f1634;background:#7f1634;box-shadow:0 0 0 3px #eadde1;}
+.sociaal-filtermenu button:hover{background:#f4f2ed;}
+.sociaal-filtermenu small{color:#89857d;font-size:.59rem;font-weight:400;letter-spacing:0;}
+.rtg-social-elite .sociaal-ruimtes{display:flex;overflow-x:auto;border:1px solid rgba(24,24,23,.1);border-radius:0;background:rgba(248,247,243,.82);box-shadow:0 12px 34px rgba(35,33,29,.055);scrollbar-width:none;}
+.rtg-social-elite .sociaal-ruimtes a{min-height:72px;padding:1.05rem 1.15rem;border-right:1px solid rgba(24,24,23,.08);color:#64625d;font-size:.76rem;}
+.rtg-social-elite .sociaal-ruimtes a:first-child{padding-left:1.15rem;}.rtg-social-elite .sociaal-ruimtes a:last-child{border-right:0;}
+.rtg-social-elite .sociaal-ruimtes a small{margin-top:.3rem;color:#969188;font-size:.61rem;}
+.rtg-social-elite .sociaal-ruimtes a.actief{color:#171715;background:#fff;}
+.rtg-social-elite .sociaal-ruimtes a.actief::after{left:1.1rem;right:1.1rem;bottom:0;height:2px;background:#7f1634;box-shadow:none;}
+.rtg-social-elite .sociaal-ruimtes a.is-levend::before{background:#7f1634;box-shadow:none;}
+.sociaal-stage{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(340px,.78fr);grid-template-rows:auto auto;gap:16px;min-height:620px;margin-top:18px;border:0;background:transparent;}
+.sociaal-stage>#vandaagVak{grid-column:1!important;grid-row:1/3!important;}
+.sociaal-stage>.sociaal-briefing{grid-column:2!important;grid-row:1!important;}
+.sociaal-stage>.sociaal-kringpaneel{grid-column:2!important;grid-row:2!important;}
+#vandaagVak{position:relative;isolation:isolate;min-height:620px;margin:0!important;padding:2.2rem;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;border-radius:0;background:linear-gradient(180deg,rgba(10,10,9,.05),rgba(10,10,9,.08) 35%,rgba(10,10,9,.9) 100%),url('/campagne/hero.jpg') center/cover no-repeat!important;box-shadow:0 24px 54px rgba(36,34,29,.16);color:#f7f5ef;}
+#vandaagVak::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,transparent 22%,rgba(7,7,6,.58) 47%,rgba(7,7,6,.93) 100%),linear-gradient(90deg,rgba(7,7,6,.22),transparent 66%);}
+#vandaagVak .sociaal-uitgelicht{position:absolute;top:1.8rem;left:2.2rem;padding:.45rem .65rem;border-radius:0;background:rgba(16,17,15,.6);color:#f3ead1;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:.59rem;letter-spacing:.16em;text-transform:uppercase;}
+#vandaagVak>.regkop{position:absolute;top:clamp(17rem,23vw,21rem);right:2.2rem;left:2.2rem;margin:0;padding:0;border:0;}
+#vandaagVak>.regkop h2{color:#fff;font:500 clamp(2rem,3vw,3.15rem)/1 "Bodoni Moda",serif;letter-spacing:-.025em;text-transform:none;}
+#vandaagVak>.regkop .tel{color:rgba(255,255,255,.7);}
+#vandaag{position:absolute;top:clamp(21.4rem,29vw,25.4rem);left:2.2rem;width:min(calc(100% - 4.4rem),36rem);color:#fff;}
+#vandaag .cv-lijn{max-width:none;padding:.8rem 0 0;}
+#vandaag .cv-stip{grid-template-columns:4rem 1fr;}
+#vandaag .cv-uur,#vandaag .cv-toe{color:rgba(255,255,255,.7);}
+#vandaag .cv-wat{color:#fff;border-left-color:rgba(255,255,255,.3);}
+#vandaag .cv-titel{font-size:1rem;line-height:1.35;}
+#vandaag .watkan{min-width:104px;min-height:44px;margin-top:.65rem;border:1px solid rgba(255,255,255,.28);border-radius:0;background:rgba(12,12,11,.46);color:#f4ead0;}
+.sociaal-briefing,.sociaal-kringpaneel{min-width:0;padding:1.55rem;border:1px solid rgba(24,24,23,.1);border-radius:0;background:rgba(250,249,246,.94);box-shadow:0 16px 40px rgba(35,33,29,.065);}
+.sociaal-paneelkop{display:block;padding-bottom:1rem;border-bottom:1px solid var(--rtg-line);color:var(--rtg-brass);font-size:.58rem;letter-spacing:.17em;text-transform:uppercase;}
+.sociaal-briefing{display:flex;flex-direction:column;}.sociaal-briefing #stand{order:2;}.sociaal-briefing #rust{order:1;}.sociaal-briefing #klaar{order:3;}
+.sociaal-briefing .cv-rust{padding:1.2rem 0;}.sociaal-briefing .cv-rust h2{color:#191917;font-size:1.8rem;}.sociaal-briefing .cv-rust p{color:var(--rtg-muted);font-size:.79rem;line-height:1.55;}
+.sociaal-briefing .cv-stand{padding:1.05rem 0;border-top:1px solid var(--rtg-line);}.sociaal-briefing .cv-stand.rtg-rail::before{display:none;}.sociaal-briefing .cv-app{display:none;}.sociaal-briefing .cv-woord{color:#191917;font-size:1.75rem;}
+.sociaal-briefing .cv-cijfers{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.8rem;padding-top:.8rem;}.sociaal-briefing .cv-cijfers span{display:flex;flex-direction:column;gap:.2rem;color:var(--rtg-soft);font-size:.62rem;}.sociaal-briefing .cv-cijfers b{color:#191917;font:500 1.05rem "Bodoni Moda",serif;}
+.sociaal-briefing .klaarkop{margin:1rem 0 .45rem;color:var(--rtg-soft);}.sociaal-briefing .vst{margin:0;padding:.85rem;border:1px solid var(--rtg-line);border-left:3px solid #7f1634;border-radius:0;background:#f4f2ed;}.sociaal-briefing .vst .keuzes button{min-height:44px;border-radius:0;color:#22221f;}
+.sociaal-kringpaneel{position:relative;isolation:isolate;display:flex;min-height:190px;flex-direction:column;overflow:hidden;}.sociaal-kringpaneel::before{content:"";position:absolute;z-index:-1;width:205px;height:205px;right:-82px;bottom:-94px;border:1px solid rgba(154,127,63,.18);border-radius:50%;box-shadow:0 0 0 26px rgba(154,127,63,.035),0 0 0 52px rgba(127,22,52,.02);}.sociaal-kringpaneel>.regkop{margin:0 0 .85rem;padding:0 0 .85rem;}.sociaal-kringpaneel #kring{flex:1;color:var(--rtg-muted);}.sociaal-kringpaneel .reis{padding-left:.7rem;}.sociaal-kringpaneel .reis .doos{display:block;padding:.8rem 0;}.sociaal-kringpaneel .reis .dag{width:auto;display:block;text-align:left;margin-bottom:.4rem;}.sociaal-kringpaneel .reis .dag>*{display:inline;margin-right:.3rem;}.sociaal-kringpaneel .reis .kern h3{color:#181817;font-size:.86rem;}
+.sociaal-kringactie{display:flex;align-items:center;justify-content:space-between;min-height:46px;margin-top:.8rem;padding:.6rem 0 0;border-top:1px solid var(--rtg-line);color:#6f5a2c;text-decoration:none;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;}
+.sociaal-register,.sociaal-poorten{margin-top:2.6rem;}.sociaal-register>.regkop,.sociaal-poorten>.regkop{margin-top:0;}.sociaal-register .regkop h2,.sociaal-poorten .regkop h2{color:#252522;}
+.sociaal-register #lijn{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;background:transparent;border:0;}.sociaal-register .vak{margin:0;padding:1.2rem;border:1px solid var(--rtg-line);border-radius:0;background:#f8f7f3;}.sociaal-register .vak>h3{margin-bottom:.7rem;color:#76622f;}.sociaal-register .vak .mom{min-height:48px;color:#252522;}
+.sociaal-poorten .poorten{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;border:0;background:transparent;}.sociaal-poorten .poort{min-height:132px;padding:1.15rem;text-align:left;border:1px solid var(--rtg-line);border-radius:0;background:#f8f7f3;color:#252522;}.sociaal-poorten .poort .ic{margin:0 0 .85rem;color:#7f1634;}.sociaal-poorten .poort:hover{background:#fff;box-shadow:0 14px 30px rgba(35,33,29,.06);}
+@media(max-width:1100px){.rtg-social-elite .merkkop{grid-template-columns:1fr auto;}.rtg-social-elite .sociaal-inleiding{grid-column:1;grid-row:3;margin-top:.7rem;}.rtg-social-elite .sociaal-filter{grid-column:2;grid-row:1/4;}.sociaal-stage{grid-template-columns:1.4fr minmax(300px,.8fr);}.sociaal-poorten .poorten{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:760px){
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank{display:none;}.rtg-social-elite:not(.rtg-salon-elite) main#inhoud{width:100%;margin:0;padding:var(--rtg-social-top) 1rem 8.6rem;}
+  .rtg-social-elite .merkkop{position:relative;display:block;min-height:246px;padding:1.7rem 0 1.4rem;}.rtg-social-elite .merkkop>div:first-child{display:block;}.rtg-social-elite .sociaal-boven{display:block;margin:0 0 .75rem;}.rtg-social-elite .merkkop h1{max-width:9.5ch;font-size:2.65rem;line-height:1;}.rtg-social-elite .sociaal-inleiding{max-width:33ch;margin-top:.85rem;font-size:.8rem;line-height:1.55;}.rtg-social-elite .sociaal-filter{position:absolute;top:1.15rem;right:0;min-width:92px;min-height:44px;font-size:.66rem;}.sociaal-filtermenu{top:4.4rem;right:0;}
+  .rtg-social-elite .sociaal-ruimtes{position:fixed;z-index:45;right:0;bottom:calc(env(safe-area-inset-bottom) + 24px);left:0;margin:0;border:0;border-top:1px solid rgba(255,255,255,.1);border-radius:0;background:rgba(20,21,19,.97);box-shadow:0 -12px 35px rgba(0,0,0,.18);}.rtg-social-elite .sociaal-ruimtes a{flex:1 1 20%;min-width:0;min-height:68px;display:grid;place-items:center;padding:.45rem .18rem!important;border-right-color:rgba(255,255,255,.08);background:transparent!important;color:rgba(255,255,255,.58);font-size:.62rem;text-align:center;}.rtg-social-elite .sociaal-ruimtes a small,.rtg-social-elite .sociaal-ruimtes a.is-levend::before{display:none;}.rtg-social-elite .sociaal-ruimtes a.actief{color:#fff;}.rtg-social-elite .sociaal-ruimtes a.actief::after{left:.45rem;right:.45rem;background:#bca66c;}
+  .sociaal-stage{display:flex;min-height:0;flex-direction:column;margin-top:.8rem;gap:12px;}.sociaal-stage>#vandaagVak,.sociaal-stage>.sociaal-briefing,.sociaal-stage>.sociaal-kringpaneel{grid-column:auto!important;grid-row:auto!important;}#vandaagVak{order:1;min-height:360px;padding:1.35rem;border-radius:0;}#vandaagVak .sociaal-uitgelicht{top:1.2rem;left:1.25rem;}#vandaagVak>.regkop{position:relative;top:auto;right:auto;left:auto;margin-bottom:.75rem;}#vandaagVak>.regkop h2{font-size:2rem;}#vandaag{position:relative;top:auto;left:auto;width:100%;}.sociaal-briefing{order:2;padding:1.2rem;border-radius:0;}.sociaal-kringpaneel{order:3;padding:1.2rem;border-radius:0;}
+  .sociaal-register,.sociaal-poorten{margin-top:1.7rem;}.sociaal-register #lijn{grid-template-columns:1fr;gap:10px;}.sociaal-poorten .poorten{grid-template-columns:1fr 1fr;}.sociaal-poorten .poort{min-height:116px;}
+}
+
+/* ==========================================================================
+   ELITE MATERIAL PASS 2
+
+   Het dashboard wordt als één huis ontworpen: donkere architectuur, warm
+   papier en dun messing. Bediening ligt in het vlak in plaats van erop.
+   ========================================================================== */
+.rtg-social-elite:not(.rtg-salon-elite) main#inhoud{
+  background:
+    linear-gradient(90deg,rgba(70,55,30,.025) 1px,transparent 1px) 0 0/25% 100%,
+    #dcd5c8;
+}
+.rtg-social-elite .merkkop{
+  min-height:272px;
+  margin-inline:calc(clamp(1.4rem,3.2vw,3.6rem) * -1);
+  padding:3.2rem clamp(1.4rem,3.2vw,3.6rem) 2.35rem;
+  border-bottom:1px solid rgba(218,197,143,.28);
+  color:#f4efe3;
+  background:
+    linear-gradient(90deg,rgba(18,18,16,.98) 0%,rgba(24,24,21,.93) 48%,rgba(45,27,32,.65) 75%,rgba(17,18,16,.86) 100%),
+    url('/campagne/huis-omslag.jpg') 72% 46%/cover no-repeat;
+}
+.rtg-social-elite .merkkop::after{
+  content:"SOCIAL / PRIVATE EDITION";
+  position:absolute;right:clamp(1.4rem,3.2vw,3.6rem);top:2rem;
+  color:rgba(244,239,227,.32);font:600 .52rem/1 Inter,system-ui,sans-serif;
+  letter-spacing:.2em;
+}
+.rtg-social-elite .sociaal-boven{color:#cdb879;}
+.rtg-social-elite .merkkop h1{max-width:12ch;color:#f6f1e7;font-size:clamp(3.15rem,5vw,5.25rem);}
+.rtg-social-elite .sociaal-inleiding{color:rgba(246,241,231,.6);font-family:"Bodoni Moda",Georgia,serif;font-size:1rem;line-height:1.58;}
+.rtg-social-elite .sociaal-filter{
+  border:1px solid rgba(205,184,121,.5);border-radius:0;background:rgba(8,8,7,.28);
+  color:#e8ddbd;box-shadow:none;backdrop-filter:blur(8px);
+}
+.rtg-social-elite .sociaal-filter:hover,.rtg-social-elite .sociaal-filter:focus-visible,
+.rtg-social-elite .sociaal-filter[aria-expanded="true"]{border-color:#cdb879;background:rgba(8,8,7,.6);color:#fff;box-shadow:none;}
+.sociaal-filtermenu{top:auto;right:clamp(1.4rem,3.2vw,3.6rem);bottom:1.2rem;border:1px solid rgba(205,184,121,.34);border-radius:0;background:rgba(24,24,21,.98);box-shadow:0 22px 54px rgba(0,0,0,.28);}
+.sociaal-filtermenu button{border-radius:0;color:#e8e1d2;}
+.sociaal-filtermenu button[aria-checked="true"]{background:rgba(205,184,121,.12);color:#e6cf91;}
+.sociaal-filtermenu button:hover{background:rgba(255,255,255,.05);}
+.sociaal-filtermenu small{color:rgba(232,225,210,.48);}
+.rtg-social-elite .sociaal-ruimtes{
+  margin-inline:calc(clamp(1.4rem,3.2vw,3.6rem) * -1);border:0;border-bottom:1px solid rgba(255,255,255,.08);
+  border-radius:0;background:#1b1c19;box-shadow:none;
+}
+.rtg-social-elite .sociaal-ruimtes a{min-height:74px;padding-inline:clamp(1.1rem,2.4vw,2.2rem);border-right-color:rgba(255,255,255,.08);color:rgba(244,239,227,.5);}
+.rtg-social-elite .sociaal-ruimtes a small{color:rgba(244,239,227,.3);}
+.rtg-social-elite .sociaal-ruimtes a:hover{background:rgba(255,255,255,.035);color:#fff;}
+.rtg-social-elite .sociaal-ruimtes a.actief{color:#f7f1e4;background:#292923;}
+.rtg-social-elite .sociaal-ruimtes a.actief small{color:rgba(247,241,228,.52);}
+.rtg-social-elite .sociaal-ruimtes a.actief::after{background:#c9ad65;}
+.sociaal-stage{gap:1px;margin-top:22px;border:1px solid rgba(28,27,23,.15);background:rgba(28,27,23,.15);}
+#vandaagVak{min-height:650px;padding:2.35rem;border-radius:0;box-shadow:none;filter:saturate(1.08);}
+#vandaagVak .sociaal-uitgelicht{border:1px solid rgba(219,198,143,.34);border-radius:0;background:rgba(12,12,10,.56);color:#edddb1;}
+#vandaag .watkan{border-radius:0;background:rgba(10,10,9,.7);}
+.sociaal-briefing,.sociaal-kringpaneel{border:0;border-radius:0;box-shadow:none;}
+.sociaal-briefing{padding:1.75rem;background:linear-gradient(155deg,#1a1b18 0%,#24231f 64%,#4a2932 150%);color:#f4eee2;}
+.sociaal-briefing .sociaal-paneelkop{border-bottom-color:rgba(255,255,255,.12);color:#cbb574;}
+.sociaal-briefing .cv-rust h2,.sociaal-briefing .cv-woord,.sociaal-briefing .cv-cijfers b{color:#f5f0e5;}
+.sociaal-briefing .cv-rust p,.sociaal-briefing .cv-cijfers span,.sociaal-briefing .klaarkop{color:rgba(245,240,229,.5);}
+.sociaal-briefing .cv-stand{border-top-color:rgba(255,255,255,.12);}
+.sociaal-briefing .vst{border-color:rgba(255,255,255,.12);border-left-color:#cbb574;border-radius:0;background:rgba(255,255,255,.045);color:#f5f0e5;}
+.sociaal-briefing .vst .keuzes button{border-radius:0!important;background:rgba(255,255,255,.06)!important;color:#eee5cf!important;}
+.sociaal-kringpaneel{padding:1.65rem;background:#f1ecdf;}
+.sociaal-kringpaneel::before{border-color:rgba(127,22,52,.18);box-shadow:0 0 0 28px rgba(164,135,68,.045),0 0 0 56px rgba(127,22,52,.025);}
+.sociaal-register .vak,.sociaal-poorten .poort{border-radius:0;background:#f2ede2;box-shadow:none;}
+.sociaal-poorten .poort:hover{background:#f8f4ea;box-shadow:none;}
+
+@media(max-width:760px){
+  .rtg-social-elite:not(.rtg-salon-elite) main#inhoud{padding-inline:0;background:#dcd5c8;}
+  .rtg-social-elite .merkkop{min-height:300px;margin:0;padding:2rem 1.15rem 1.8rem;background-position:64% center;}
+  .rtg-social-elite .merkkop::after{display:none;}
+  .rtg-social-elite .merkkop h1{max-width:8.7ch;color:#f6f1e7;font-size:3rem;}
+  .rtg-social-elite .sociaal-inleiding{max-width:30ch;color:rgba(246,241,231,.66);font-size:.86rem;}
+  .rtg-social-elite .sociaal-filter{top:1.25rem;right:1rem;background:rgba(8,8,7,.55);}
+  .sociaal-filtermenu{top:4.8rem;right:1rem;bottom:auto;}
+  .rtg-social-elite .sociaal-ruimtes{margin:0;}
+  .sociaal-stage{margin:0;border:0;gap:1px;}
+  #vandaagVak{min-height:410px;padding:1.35rem;border-radius:0;}
+  .sociaal-briefing,.sociaal-kringpaneel{padding:1.35rem;border-radius:0;}
+  .sociaal-register,.sociaal-poorten{padding-inline:1rem;}
+}
+
+/* ==========================================================================
+   PRIVATE RESIDENCE · SOCIAL OVERVIEW
+
+   Geen verzameling dashboardkaarten, maar een persoonlijk ledenjournaal.
+   Beeld is het anker; briefing, tijdlijn en adressen vormen de rustige marge.
+   ========================================================================== */
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-bank{display:none;}
+.rtg-social-elite:not(.rtg-salon-elite) main#inhoud{
+  width:100%;max-width:1600px;min-height:100vh;margin:0 auto;
+  padding:var(--rtg-social-top) clamp(1.5rem,5vw,6.5rem) 8rem;
+  color:#171712;background:#f1eee7;
+}
+.rtg-social-elite .merkkop{
+  min-height:252px;margin:0;padding:3.45rem 0 2.6rem;
+  grid-template-columns:minmax(360px,1.1fr) minmax(280px,.72fr) auto;
+  gap:clamp(2rem,5vw,6rem);border-bottom:1px solid rgba(23,23,18,.14);
+  color:#171712;background:transparent;
+}
+.rtg-social-elite .merkkop::after{
+  content:"MEMBERS' JOURNAL  /  No. 01";top:1.25rem;right:0;
+  color:rgba(23,23,18,.34);font-size:.48rem;font-weight:600;letter-spacing:.2em;
+}
+.rtg-social-elite .sociaal-boven{color:#691f32;font-size:.54rem;letter-spacing:.23em;}
+.rtg-social-elite .merkkop h1{
+  max-width:11ch;color:#171712;font-size:clamp(3.4rem,5vw,5.4rem);
+  line-height:.91;letter-spacing:-.045em;
+}
+.rtg-social-elite .sociaal-inleiding{
+  max-width:37ch;color:#625f57;font-family:Inter,system-ui,sans-serif;
+  font-size:.84rem;line-height:1.78;
+}
+.rtg-social-elite .sociaal-filter{
+  min-width:108px;min-height:46px;padding-inline:1rem;
+  border:1px solid rgba(23,23,18,.2);border-radius:0;background:transparent;
+  color:#171712;box-shadow:none;font-size:.58rem;letter-spacing:.16em;
+}
+.rtg-social-elite .sociaal-filter:hover,.rtg-social-elite .sociaal-filter:focus-visible,
+.rtg-social-elite .sociaal-filter[aria-expanded="true"]{border-color:#691f32;background:transparent;color:#691f32;box-shadow:none;}
+.sociaal-filtermenu{
+  top:auto;right:0;bottom:1rem;width:310px;padding:.45rem;
+  border:1px solid rgba(23,23,18,.15);border-radius:0;background:rgba(247,244,237,.99);
+  box-shadow:0 24px 60px rgba(27,24,19,.14);
+}
+.sociaal-filtermenu button{border-radius:0;color:#24231f;}
+.sociaal-filtermenu button[aria-checked="true"]{background:#e9e3d8;color:#691f32;}
+.sociaal-filtermenu button:hover{background:#eeeadf;}
+.sociaal-filtermenu small{color:#817d74;}
+.rtg-social-elite .sociaal-ruimtes{
+  margin:0;padding:0;overflow-x:auto;border:0;border-bottom:1px solid rgba(23,23,18,.14);
+  border-radius:0;background:transparent;box-shadow:none;
+}
+.rtg-social-elite .sociaal-ruimtes a{
+  position:relative;min-height:59px;flex:0 0 auto;padding:0 clamp(1.25rem,2.3vw,2.5rem)!important;
+  display:flex;align-items:center;border:0!important;background:transparent!important;
+  color:#625f57;font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+}
+.rtg-social-elite .sociaal-ruimtes a:first-child{padding-left:0!important;}
+.rtg-social-elite .sociaal-ruimtes a small{display:none;}
+.rtg-social-elite .sociaal-ruimtes a:hover{color:#171712;background:transparent;}
+.rtg-social-elite .sociaal-ruimtes a.actief{color:#171712;background:transparent;}
+.rtg-social-elite .sociaal-ruimtes a.actief::after{
+  right:clamp(1.25rem,2.3vw,2.5rem);bottom:-1px;left:clamp(1.25rem,2.3vw,2.5rem);
+  height:1px;background:#691f32;
+}
+.rtg-social-elite .sociaal-ruimtes a:first-child::after{left:0;}
+.sociaal-stage{
+  min-height:700px;margin-top:2.5rem;gap:0;
+  grid-template-columns:minmax(0,1.86fr) minmax(310px,.7fr);
+  border:0;background:transparent;
+}
+#vandaagVak{
+  min-height:700px;padding:3rem;border-radius:0;box-shadow:none;
+  background:
+    linear-gradient(180deg,rgba(12,12,9,.03) 22%,rgba(12,12,9,.16) 50%,rgba(12,12,9,.83) 100%),
+    url('/campagne/hero.jpg') center/cover no-repeat!important;
+  filter:none;
+}
+#vandaagVak::after{background:linear-gradient(180deg,transparent 36%,rgba(8,8,6,.08) 55%,rgba(8,8,6,.76) 100%);}
+#vandaagVak .sociaal-uitgelicht{
+  top:2rem;left:2.2rem;padding:0 0 .55rem;border:0;border-bottom:1px solid rgba(255,255,255,.55);
+  border-radius:0;background:transparent;color:#fff;backdrop-filter:none;font-size:.5rem;letter-spacing:.22em;
+}
+#vandaagVak>.regkop{top:auto;right:3rem;bottom:10.8rem;left:3rem;}
+#vandaagVak>.regkop h2{max-width:9ch;font-size:clamp(2.8rem,4.2vw,4.6rem);line-height:.92;}
+#vandaag{top:auto;bottom:2.8rem;left:3rem;width:min(calc(100% - 6rem),38rem);}
+#vandaag .cv-stip{grid-template-columns:4.5rem 1fr;}
+#vandaag .watkan{border-radius:0;background:transparent;}
+.sociaal-briefing,.sociaal-kringpaneel{
+  padding:2.15rem 2rem;border:0;border-left:1px solid rgba(23,23,18,.14);
+  border-radius:0;background:#e9e4da;box-shadow:none;
+}
+.sociaal-paneelkop{padding-bottom:1.2rem;border-bottom-color:rgba(23,23,18,.14);color:#691f32;font-size:.5rem;letter-spacing:.22em;}
+.sociaal-briefing{background:#e9e4da;color:#171712;}
+.sociaal-briefing .sociaal-paneelkop{border-bottom-color:rgba(23,23,18,.14);color:#691f32;}
+.sociaal-briefing .cv-rust h2,.sociaal-briefing .cv-woord,.sociaal-briefing .cv-cijfers b{color:#171712;}
+.sociaal-briefing .cv-rust h2{font-size:2.15rem;line-height:1;}
+.sociaal-briefing .cv-rust p,.sociaal-briefing .cv-cijfers span,.sociaal-briefing .klaarkop{color:#625f57;}
+.sociaal-briefing .cv-stand{border-top-color:rgba(23,23,18,.14);}
+.sociaal-briefing .vst{
+  padding:1rem 0;border:0;border-top:1px solid rgba(23,23,18,.14);border-radius:0;
+  background:transparent;color:#171712;
+}
+.sociaal-briefing .vst .keuzes button{
+  border:1px solid rgba(23,23,18,.18)!important;border-radius:0!important;
+  background:transparent!important;color:#171712!important;
+}
+.sociaal-kringpaneel{min-height:220px;background:#f7f4ed;}
+.sociaal-kringpaneel::before{display:none;}
+.sociaal-register,.sociaal-poorten{margin-top:5rem;}
+.sociaal-register>.regkop,.sociaal-poorten>.regkop{padding-bottom:1rem;border-bottom:1px solid rgba(23,23,18,.16);}
+.sociaal-register .regkop h2,.sociaal-poorten .regkop h2{font-size:1.85rem;color:#171712;}
+.sociaal-register #lijn{grid-template-columns:repeat(3,minmax(0,1fr));gap:0;}
+.sociaal-register .vak{
+  margin:0;padding:1.5rem clamp(1rem,2.2vw,2.2rem);border:0;border-right:1px solid rgba(23,23,18,.13);
+  border-radius:0;background:transparent;
+}
+.sociaal-register .vak:first-child{padding-left:0;}.sociaal-register .vak:last-child{border-right:0;}
+.sociaal-register .vak>h3{color:#691f32;font-size:.5rem;letter-spacing:.2em;}
+.sociaal-poorten .poorten{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;}
+.sociaal-poorten .poort{
+  min-height:112px;padding:1.35rem 1.15rem;border:0;border-right:1px solid rgba(23,23,18,.13);
+  border-bottom:1px solid rgba(23,23,18,.13);border-radius:0;background:transparent;color:#171712;
+}
+.sociaal-poorten .poort:first-child{padding-left:0;}.sociaal-poorten .poort:last-child{border-right:0;}
+.sociaal-poorten .poort .ic{color:#691f32;}.sociaal-poorten .poort:hover{background:#eae5da;box-shadow:none;}
+
+@media(max-width:1100px){
+  .rtg-social-elite .merkkop{grid-template-columns:1fr auto;gap:1rem 2rem;}
+  .rtg-social-elite .sociaal-inleiding{grid-column:1;grid-row:3;max-width:48ch;margin-top:1rem;}
+  .rtg-social-elite .sociaal-filter{grid-column:2;grid-row:1/4;}
+  .sociaal-stage{grid-template-columns:minmax(0,1.4fr) minmax(290px,.7fr);}
+  .sociaal-poorten .poorten{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media(max-width:760px){
+  .rtg-social-elite:not(.rtg-salon-elite) main#inhoud{
+    width:100%;margin:0;padding:var(--rtg-social-top) 0 calc(7.1rem + env(safe-area-inset-bottom));
+    background:#f1eee7;
+  }
+  .rtg-social-elite .merkkop{
+    min-height:252px;margin:0;padding:2.35rem 1.25rem 2rem;display:block;
+    border-bottom:1px solid rgba(23,23,18,.14);background:transparent;
+  }
+  .rtg-social-elite .merkkop::after{content:"PRIVATE / 01";top:1rem;right:1.25rem;display:block;font-size:.43rem;}
+  .rtg-social-elite .sociaal-boven{margin:0 0 .8rem;}
+  .rtg-social-elite .merkkop h1{max-width:9ch;color:#171712;font-size:2.85rem;line-height:.93;}
+  .rtg-social-elite .sociaal-inleiding{max-width:34ch;margin-top:1rem;color:#625f57;font-size:.76rem;line-height:1.65;}
+  .rtg-social-elite .sociaal-filter{top:auto;right:1.25rem;bottom:1.45rem;min-width:94px;background:transparent;}
+  .sociaal-filtermenu{top:auto;right:1.25rem;bottom:4.8rem;}
+  .rtg-social-elite .sociaal-ruimtes{
+    position:fixed;z-index:45;right:0;bottom:0;left:0;margin:0;padding-bottom:env(safe-area-inset-bottom);
+    border-top:1px solid rgba(23,23,18,.13);border-bottom:0;background:rgba(244,241,234,.97);
+    box-shadow:0 -10px 30px rgba(31,27,20,.055);backdrop-filter:blur(18px);
+  }
+  .rtg-social-elite .sociaal-ruimtes a{
+    min-height:64px;flex:1 1 20%;justify-content:center;padding:.35rem .12rem!important;
+    color:#625f57;font-size:.5rem;letter-spacing:.08em;
+  }
+  .rtg-social-elite .sociaal-ruimtes a:first-child{padding-left:.12rem!important;}
+  .rtg-social-elite .sociaal-ruimtes a.actief{color:#171712;}
+  .rtg-social-elite .sociaal-ruimtes a.actief::after{top:0;right:27%;bottom:auto;left:27%;background:#691f32;}
+  .rtg-social-elite .sociaal-ruimtes a:first-child::after{left:27%;}
+  .sociaal-stage{display:flex;min-height:0;margin:0;gap:0;}
+  #vandaagVak{order:1;min-height:500px;padding:1.5rem;}
+  #vandaagVak .sociaal-uitgelicht{top:1.35rem;left:1.25rem;}
+  #vandaagVak>.regkop{right:1.25rem;bottom:12rem;left:1.25rem;}
+  #vandaagVak>.regkop h2{font-size:2.7rem;}
+  #vandaag{bottom:1.5rem;left:1.25rem;width:calc(100% - 2.5rem);}
+  .sociaal-briefing,.sociaal-kringpaneel{padding:2rem 1.25rem;border-left:0;border-bottom:1px solid rgba(23,23,18,.14);}
+  .sociaal-register,.sociaal-poorten{margin-top:3.5rem;padding-inline:1.25rem;}
+  .sociaal-register #lijn{grid-template-columns:1fr;}
+  .sociaal-register .vak{padding:1.2rem 0;border-right:0;border-bottom:1px solid rgba(23,23,18,.13);}
+  .sociaal-poorten .poorten{grid-template-columns:1fr 1fr;}
+  .sociaal-poorten .poort{min-height:104px;padding:1.1rem .8rem;}
+  .sociaal-poorten .poort:nth-child(2n){border-right:0;}
+}
+
+/* FINAL MATERIAL CASCADE · de residence blijft donker waar de architectuur
+   draagt, ook op het smalle scherm. */
+.rtg-social-elite .rtg-social-commandbar{
+  border-bottom-color:rgba(205,184,121,.22);background:#171815;color:#f4efe4;
+}
+.rtg-social-elite .rtg-social-commandbar-brand{color:#f4efe4;}
+.rtg-social-elite .rtg-social-commandbar-brand small{border-left-color:rgba(255,255,255,.15);color:rgba(244,239,228,.48);}
+.rtg-social-elite .rtg-social-commandbar-state{color:rgba(244,239,228,.48);}
+.rtg-social-elite .rtg-social-commandbar-state::before{background:#cdb879;}
+.rtg-social-elite .rtg-social-commandbar .rtg-rahul-tab{border-left-color:rgba(255,255,255,.1)!important;color:#f4efe4!important;background:#1d1e1a!important;}
+.rtg-social-elite .rtg-social-commandbar .rtg-rahul-tab small{color:rgba(244,239,228,.42)!important;}
+.rtg-social-elite:not(.rtg-salon-elite) main#inhoud{
+  max-width:none;background:linear-gradient(90deg,rgba(70,55,30,.026) 1px,transparent 1px) 0 0/25% 100%,#dcd5c8;
+}
+.rtg-social-elite .merkkop{
+  min-height:285px;margin-inline:calc(clamp(1.5rem,5vw,6.5rem) * -1);
+  padding:3.5rem clamp(1.5rem,5vw,6.5rem) 2.7rem;border-bottom-color:rgba(205,184,121,.25);color:#f4efe3;
+  background:linear-gradient(90deg,rgba(18,19,16,.985),rgba(24,24,21,.92) 54%,rgba(61,35,41,.64) 82%,rgba(18,19,16,.85)),url('/campagne/palacio.jpg') 72% 48%/cover no-repeat;
+}
+.rtg-social-elite .merkkop::after{content:"SOCIAL / PRIVATE EDITION";right:clamp(1.5rem,5vw,6.5rem);color:rgba(244,239,227,.34);}
+.rtg-social-elite .sociaal-boven{color:#cdb879;}
+.rtg-social-elite .merkkop h1{color:#f6f1e7;}
+.rtg-social-elite .sociaal-inleiding{color:rgba(246,241,231,.62);font-family:"Bodoni Moda",Georgia,serif;font-size:.96rem;line-height:1.62;}
+.rtg-social-elite .sociaal-filter{border-color:rgba(205,184,121,.5);background:rgba(8,8,7,.28);color:#e8ddbd;}
+.rtg-social-elite .sociaal-filter:hover,.rtg-social-elite .sociaal-filter:focus-visible,.rtg-social-elite .sociaal-filter[aria-expanded="true"]{border-color:#cdb879;background:rgba(8,8,7,.58);color:#fff;}
+.rtg-social-elite .sociaal-ruimtes{margin-inline:calc(clamp(1.5rem,5vw,6.5rem) * -1);padding-inline:clamp(1.5rem,5vw,6.5rem);border-bottom-color:rgba(255,255,255,.09);background:#1b1c19;}
+.rtg-social-elite .sociaal-ruimtes a,.rtg-social-elite .sociaal-ruimtes a.actief{color:rgba(244,239,227,.5);}
+.rtg-social-elite .sociaal-ruimtes a.actief{color:#f7f1e4;background:#292923!important;}
+.rtg-social-elite .sociaal-ruimtes a.actief::after{background:#c9ad65;}
+.sociaal-briefing{background:linear-gradient(155deg,#1a1b18,#24231f 64%,#4a2932 150%);color:#f4eee2;}
+.sociaal-briefing .sociaal-paneelkop{border-bottom-color:rgba(255,255,255,.12);color:#cbb574;}
+.sociaal-briefing .cv-rust h2,.sociaal-briefing .cv-woord,.sociaal-briefing .cv-cijfers b{color:#f5f0e5;}
+.sociaal-briefing .cv-rust p,.sociaal-briefing .cv-cijfers span,.sociaal-briefing .klaarkop{color:rgba(245,240,229,.5);}
+.sociaal-briefing .cv-stand{border-top-color:rgba(255,255,255,.12);}
+.sociaal-briefing .vst{border-top-color:rgba(255,255,255,.12);color:#f5f0e5;}
+.sociaal-briefing .vst .keuzes button{border-color:rgba(255,255,255,.14)!important;color:#eee5cf!important;}
+
+@media(max-width:760px){
+  .rtg-social-elite .rtg-social-commandbar{background:#171815;}
+  .rtg-social-elite:not(.rtg-salon-elite) .amn-knop.amn-zweef,.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop{color:#f4efe4!important;}
+  .rtg-social-elite:not(.rtg-salon-elite) main#inhoud{background:#dcd5c8;}
+  .rtg-social-elite .merkkop{min-height:315px;margin:0;padding:2.5rem 1.25rem 2rem;background:linear-gradient(100deg,rgba(18,19,16,.97),rgba(43,28,32,.74)),url('/campagne/palacio.jpg') 60% center/cover no-repeat;}
+  .rtg-social-elite .merkkop::after{content:"PRIVATE / 01";right:1.25rem;color:rgba(244,239,227,.42);}
+  .rtg-social-elite .merkkop h1{color:#f6f1e7;}
+  .rtg-social-elite .sociaal-inleiding{color:rgba(246,241,231,.65);font-size:.8rem;}
+  .rtg-social-elite .sociaal-filter{background:rgba(8,8,7,.5);}
+  .rtg-social-elite .sociaal-ruimtes{margin:0;padding:0;background:rgba(20,21,19,.99);border-top-color:rgba(255,255,255,.1);}
+  .rtg-social-elite .sociaal-ruimtes a{color:rgba(244,239,227,.48);}
+  .rtg-social-elite .sociaal-ruimtes a.actief{color:#fff;background:transparent!important;}
+  body.rtg-social-elite:not(.rtg-salon-elite) #osMenuBtn{color:#f4efe4!important;background:transparent!important;box-shadow:none!important;}
+}
+
+/* QUIET LUXURY WINT DE CASCADE · lichte residentie, bordeaux alleen als zegel. */
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar{border-bottom-color:rgba(23,23,18,.12);background:rgba(244,241,234,.96);color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-brand{color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-brand small{border-left-color:rgba(23,23,18,.16);color:rgba(23,23,18,.47);}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-state{color:rgba(23,23,18,.48);}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-state::before{background:#691f32;}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar .rtg-rahul-tab{border-left-color:rgba(23,23,18,.13)!important;background:transparent!important;color:#171712!important;}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar .rtg-rahul-tab small{color:rgba(23,23,18,.44)!important;}
+.rtg-social-elite:not(.rtg-salon-elite) main#inhoud{max-width:1600px;background:#f1eee7;}
+.rtg-social-elite:not(.rtg-salon-elite) .merkkop>div:first-of-type{display:contents!important;}
+.rtg-social-elite:not(.rtg-salon-elite) .merkkop{margin-inline:0;border-bottom-color:rgba(23,23,18,.14);color:#171712;background:transparent;}
+.rtg-social-elite:not(.rtg-salon-elite) .merkkop::after{content:"MEMBERS' JOURNAL  /  No. 01";right:0;color:rgba(23,23,18,.34);}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-boven{color:#691f32;}
+.rtg-social-elite:not(.rtg-salon-elite) .merkkop h1{color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-inleiding{color:#625f57;font-family:Inter,system-ui,sans-serif;font-size:.84rem;line-height:1.78;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter{border-color:rgba(23,23,18,.2);background:transparent;color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter:hover,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter:focus-visible,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter[aria-expanded="true"]{border-color:#691f32;background:transparent;color:#691f32;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes{margin-inline:0;padding-inline:0;border-bottom-color:rgba(23,23,18,.14);background:transparent;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief{color:#625f57;background:transparent!important;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief{color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief::after{background:#691f32;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing{background:#e9e4da;color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .sociaal-paneelkop{border-bottom-color:rgba(23,23,18,.14);color:#691f32;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-rust h2,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-woord,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-cijfers b{color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-rust p,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-cijfers span,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .klaarkop{color:#625f57;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .cv-stand,.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .vst{border-color:rgba(23,23,18,.14);color:#171712;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-briefing .vst .keuzes button{border-color:rgba(23,23,18,.18)!important;color:#171712!important;}
+
+@media(max-width:760px){
+  .rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar{background:rgba(244,241,234,.98);}
+  .rtg-social-elite:not(.rtg-salon-elite) .amn-knop.amn-zweef,.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop,
+  body.rtg-social-elite:not(.rtg-salon-elite) #osMenuBtn{color:#171712!important;background:transparent!important;}
+  .rtg-social-elite:not(.rtg-salon-elite) main#inhoud{background:#f1eee7;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop>div:first-of-type{display:block!important;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop{min-height:252px;margin:0;background:transparent;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop::after{content:"PRIVATE / 01";right:1.25rem;color:rgba(23,23,18,.34);}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop h1{color:#171712;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-inleiding{color:#625f57;font-size:.76rem;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter{background:transparent;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes{margin:0;padding:0 0 env(safe-area-inset-bottom);background:rgba(244,241,234,.98);border-top-color:rgba(23,23,18,.13);}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a{color:#625f57;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a.actief{color:#171712;background:transparent!important;}
+}
+
+/* LEESBAARHEID · redactionele typografie met echte ondergrenzen. */
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-boven{font-size:.68rem;letter-spacing:.2em;}
+.rtg-social-elite:not(.rtg-salon-elite) .merkkop::after{font-size:.63rem;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-inleiding{max-width:40ch;color:#514e47;font-size:.98rem;line-height:1.72;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter{font-size:.69rem;font-weight:600;letter-spacing:.13em;}
+.rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a{color:#5f5b53;font-size:.69rem;letter-spacing:.12em;}
+#vandaagVak::after{
+  background:
+    linear-gradient(180deg,rgba(10,10,8,.42) 0%,rgba(10,10,8,.08) 27%,transparent 45%),
+    linear-gradient(180deg,transparent 36%,rgba(8,8,6,.13) 55%,rgba(8,8,6,.88) 100%);
+}
+#vandaagVak .sociaal-uitgelicht{font-size:.65rem;font-weight:600;letter-spacing:.18em;text-shadow:0 1px 10px rgba(0,0,0,.7);}
+#vandaagVak>.regkop h2{text-shadow:0 2px 22px rgba(0,0,0,.5);}
+#vandaagVak>.regkop .tel{font-size:.74rem;color:rgba(255,255,255,.9);text-shadow:0 1px 8px rgba(0,0,0,.7);}
+#vandaag .cv-uur,#vandaag .cv-toe{color:rgba(255,255,255,.86);font-size:.77rem;}
+#vandaag .cv-titel{font-size:1.04rem;font-weight:500;text-shadow:0 1px 12px rgba(0,0,0,.72);}
+.sociaal-paneelkop{font-size:.64rem;font-weight:600;letter-spacing:.18em;}
+.sociaal-briefing .cv-rust p{color:#5e5a52;font-size:.85rem;line-height:1.65;}
+.sociaal-briefing .cv-cijfers span{color:#68645c;font-size:.7rem;line-height:1.35;}
+.sociaal-briefing .klaarkop{color:#68645c;font-size:.68rem;}
+.sociaal-briefing .vst{font-size:.82rem;line-height:1.55;}
+.sociaal-briefing .vst .wnr,.sociaal-briefing .vst .gevolg,.sociaal-briefing .vst .waarom{color:#625e56;font-size:.73rem;line-height:1.5;}
+.sociaal-kringpaneel #kring{color:#57534c;font-size:.82rem;line-height:1.55;}
+.sociaal-kringactie{font-size:.68rem;font-weight:600;letter-spacing:.1em;}
+.sociaal-register .vak>h3{font-size:.66rem;letter-spacing:.17em;}
+.sociaal-register .vak .mom{font-size:.86rem;line-height:1.45;}
+.sociaal-register .vak .mom .wie,.sociaal-register .vak .mom .uur{color:#6d685f;font-size:.73rem;}
+.sociaal-poorten .poort{font-size:.82rem;line-height:1.45;}
+.sociaal-poorten .poort small{color:#67635b;font-size:.71rem;line-height:1.45;}
+
+@media(max-width:760px){
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-boven{font-size:.65rem;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-inleiding{font-size:.88rem;line-height:1.65;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-filter{font-size:.68rem;}
+  .rtg-social-elite:not(.rtg-salon-elite) .merkkop::after{font-size:.65rem;}
+  .rtg-social-elite:not(.rtg-salon-elite) .sociaal-ruimtes a{font-size:.63rem;font-weight:600;letter-spacing:.045em;}
+  #vandaagVak .sociaal-uitgelicht{font-size:.65rem;}
+  #vandaagVak>.regkop .tel{font-size:.68rem;}
+  #vandaag .cv-uur,#vandaag .cv-toe{font-size:.75rem;}
+  #vandaag .cv-titel{font-size:1rem;line-height:1.4;}
+  .sociaal-paneelkop{font-size:.62rem;}
+  .sociaal-briefing .cv-rust p{font-size:.84rem;}
+}

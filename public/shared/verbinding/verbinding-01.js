@@ -41,7 +41,7 @@
       eigenToast = document.createElement('div');
       eigenToast.setAttribute('role', 'status');
       eigenToast.style.cssText = 'position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);z-index:100001;' +
-        'max-width:90vw;background:#222;color:#fff;padding:0.6rem 1rem;border-radius:10px;opacity:0;transition:opacity .2s;' +
+        'max-width:90vw;background:#222;color:#fff;padding:0.6rem 1rem;border-radius:0;opacity:0;transition:opacity .2s;' +
         'font:500 0.82rem/1.4 system-ui,-apple-system,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
       (document.body || document.documentElement).appendChild(eigenToast);
     }

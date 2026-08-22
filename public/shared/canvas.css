@@ -88,14 +88,18 @@ a.cv-kaart:hover { background: var(--rtg-card2, #FAF9F7); }
 }
 .cv-lijn .cv-wat { padding-bottom: 1.6rem; border-left: 1px solid var(--rtg-line, #DEDBD5);
   padding-left: 1.1rem; margin-left: -.55rem; position: relative;
-  color: inherit; text-decoration: none; }
+  color: inherit; text-decoration: none;
+  /* De lijn en zijn stip blijven staan als de regel wegschuift voor zijn acties
+     (shared/gebaar.css): de stip hangt op -3,5px BUITEN de regel, de rand ligt
+     er net binnen. Zonder deze twee maten veegt de tijdlijn zichzelf weg. */
+  --gb-inzet: 3px; --gb-marge: 5px; }
 .cv-lijn .cv-stip:last-child .cv-wat { border-left-color: transparent; }
 /* De stip draagt het signaal van het punt -- dezelfde vier kleuren als de
    Signal Rail en de registerregel, want een oranje stip hoort overal hetzelfde
    te betekenen. Zonder signaal is hij stil grijs en niet bordeaux: bordeaux is
    het accent van het merk, geen toestand. */
 .cv-lijn .cv-wat::before {
-  content: ''; position: absolute; left: -3.5px; top: .45rem;
+  content: ''; position: absolute; left: -3.5px; top: .45rem; z-index: 1;
   width: 6px; height: 6px; border-radius: 50%; background: var(--rtg-sig-stil, #DEDBD5);
 }
 .cv-lijn .cv-wat[data-sig="gezond"]::before   { background: var(--rtg-sig-gezond, #4C9A75); }

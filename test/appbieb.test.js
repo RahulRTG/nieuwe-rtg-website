@@ -1,7 +1,7 @@
 /* De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen
    namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je
    startscherm. Bladeren mag iedereen; installeren is een pas-voordeel.
-   Draai los: node --experimental-sqlite --test test/appbieb.test.js */
+   Draai los: node --test test/appbieb.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

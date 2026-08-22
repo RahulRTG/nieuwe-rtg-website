@@ -55,7 +55,7 @@ const isOk = (st) => !!(st && st.status >= 200 && st.status < 300);
 /* HET OORDEEL, apart en puur -- los toetsbaar in test/staatproef.test.js.
    `verschilVan(voor, na)` komt van de server (lib/vingerafdruk), zodat de regel
    voor "wat telt als een wijziging" op één plek staat. */
-function weegStaat({ a, b, d01, d12 }) {
+function weegStaat({ a, b, d01, d12, dStil }) {
   const uit = { state: 'ongemeten', sideEffect: 'ongemeten', rollback: 'ongemeten',
     idempotentie: 'ongemeten', collecties: (d01 && d01.collecties) || [] };
 
@@ -82,9 +82,31 @@ function weegStaat({ a, b, d01, d12 }) {
       uit.reden = 'geweigerd (status ' + a.status + '); de eenmalige wijziging in ' +
         uit.collecties.join(', ') + ' was inrichting -- de herhaling liet alles met rust';
     } else if (bewoog) {
-      uit.rollback = 'GEZAKT';
-      uit.reden = 'geweigerd (status ' + a.status + ') en de toestand veranderde toch, ook bij de ' +
-        'herhaling: ' + uit.collecties.join(', ');
+      /* DE DERDE RUISKLASSE: DE DOORLOPENDE OMGEVINGSSCHRIJVER. Zes rtfos-
+         routes stonden op GEZAKT met securityLog en sessions, en geen ervan
+         was na te spelen: wat daar bewoog waren tijdgebonden schrijvers (een
+         sessieverversing op het uur, een wachtlaag) die toevallig onder de
+         meetklok vielen -- bij de aanroep EN bij de herhaling, dus de
+         eerste-aanrakingsregel hierboven ving ze niet. `dStil` is het antwoord:
+         het verschil over een STIL venster zonder enige aanroep, direct na de
+         meting. Wat daar ook beweegt, beweegt vanzelf en valt deze route niet
+         toe te rekenen. Gemeten, niet geraden -- een vaste negeerlijst zou
+         hier de fout van de ruisvloer herhalen. */
+      const stil = new Set((dStil && dStil.collecties) || []);
+      const rest = [...new Set(uit.collecties.concat((d12 && d12.collecties) || []))]
+        .filter(c => !stil.has(c));
+      if (dStil && !rest.length) {
+        uit.rollback = 'bewezen';
+        uit.reden = 'geweigerd (status ' + a.status + '); alles wat bewoog (' +
+          uit.collecties.join(', ') + ') bewoog ook in het stille venster zonder aanroep -- ' +
+          'omgevingsruis, geen gevolg van de opdracht';
+      } else {
+        uit.rollback = 'GEZAKT';
+        uit.reden = 'geweigerd (status ' + a.status + ') en de toestand veranderde toch, ook bij de ' +
+          'herhaling: ' + (dStil ? rest.join(', ') +
+            (stil.size ? ' (omgevingsruis ' + [...stil].join(', ') + ' weggelaten na stille controle)' : '')
+            : uit.collecties.join(', '));
+      }
     } else {
       uit.rollback = 'bewezen';
       uit.reden = 'geweigerd (status ' + a.status + ') en er bleef niets staan';
@@ -109,14 +131,56 @@ function weegStaat({ a, b, d01, d12 }) {
   /* En omdat de meter voor DEZE route aantoonbaar gevoelig is, zegt de tweede
      oproep nu wel iets. */
   if (d12 && d12.aantal > 0) {
-    uit.idempotentie = 'GEZAKT';
-    uit.idemReden = 'de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ' +
-      d12.collecties.join(', ');
+    /* Dezelfde stille controle als bij de weigering hierboven: een herhaling
+       die alleen omgevingsruis raakte, is geen gezakte idempotentie. */
+    const stil = new Set((dStil && dStil.collecties) || []);
+    const idemRest = d12.collecties.filter(c => !stil.has(c));
+    if (dStil && !idemRest.length) {
+      uit.idempotentie = 'bewezen';
+      uit.idemReden = 'de herhaling bewoog alleen wat ook in het stille venster zonder aanroep ' +
+        'bewoog (' + d12.collecties.join(', ') + '): omgevingsruis, geen tweede uitvoering';
+    } else {
+      uit.idempotentie = 'GEZAKT';
+      uit.idemReden = 'de herhaling met dezelfde sleutel bewoog de toestand opnieuw: ' +
+        (dStil ? idemRest.join(', ') : d12.collecties.join(', '));
+    }
   } else if (d12) {
     uit.idempotentie = 'bewezen';
     uit.idemReden = 'de herhaling liet de toestand ongemoeid terwijl de eerste oproep hem wel bewoog';
   }
   return uit;
+}
+
+/* DE STAPELING: rondes vullen elkaar aan in plaats van elkaar te overschrijven.
+   Een volle ronde duurt uren en een container haalt dat niet; zonder stapeling
+   mat --max=N telkens dezelfde eerste N routes en gooide de rest van het
+   register weg -- en dan zakt de normtand bewijsCellenBewezen op een KLEINERE
+   meting, niet op slechtere code. Vers wint van oud, elke rij draagt zijn
+   op-stempel (oude rijen zonder stempel erven die van het oude register), en
+   de telling gaat over de samenvoeging. Puur en los toetsbaar, zelfde reden
+   als weegStaat. */
+function stapelRijen(oudeRijen, oudOp, versPerRoute, nuOp) {
+  const samen = new Map();
+  for (const rij of oudeRijen || []) {
+    samen.set(rij.methode + ' ' + rij.pad, { ...rij, op: rij.op || oudOp || null });
+  }
+  let versGemeten = 0;
+  for (const [sleutel, rij] of Object.entries(versPerRoute || {})) {
+    samen.set(sleutel, { ...rij, op: nuOp });
+    versGemeten++;
+  }
+  const rijen = [...samen.values()];
+  const telling = { state: 0, sideEffect: 0, rollback: 0, rollbackGezakt: 0, idemBewezen: 0, idemGezakt: 0, ongemeten: 0 };
+  for (const r of rijen) {
+    if (r.state === 'bewezen') telling.state++;
+    if (r.sideEffect === 'bewezen') telling.sideEffect++;
+    if (r.rollback === 'bewezen') telling.rollback++;
+    if (r.rollback === 'GEZAKT') telling.rollbackGezakt++;
+    if (r.idempotentie === 'bewezen') telling.idemBewezen++;
+    if (r.idempotentie === 'GEZAKT') telling.idemGezakt++;
+    if (r.state === 'ongemeten' && r.rollback === 'ongemeten') telling.ongemeten++;
+  }
+  return { rijen, telling, versGemeten };
 }
 
 /* Het verschil ONTDAAN van de ruis. Een aparte functie, zodat de regel op een
@@ -128,7 +192,7 @@ function zonderRuis(d, ruis) {
   return { ...d, gewijzigd, aantal: gewijzigd.length, collecties: gewijzigd.map(g => g.collectie) };
 }
 
-async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor, hernieuw, verschilVan, ruis, maxRoutes }) {
+async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor, hernieuw, verschilVan, ruis, stilOoit, maxRoutes }) {
   const perRoute = {};
   const tel = { state: 0, sideEffect: 0, rollback: 0, rollbackGezakt: 0, idemBewezen: 0, idemGezakt: 0, ongemeten: 0 };
   let oproepen = 0, hernieuwd = 0, afdrukken = 0;
@@ -146,35 +210,68 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
     const sleutel = 'staatproef-' + r.pad.replace(/\W+/g, '');
     const lijf = { ...lijfVoor(r), idem: sleutel, idempotentieSleutel: sleutel };
 
-    const doe = async () => {
+    /* DE HERNIEUWING SCHRIJFT ZELF, EN DAT VERGIFTIGDE HET VENSTER. Een 401
+       liet doe() opnieuw inloggen -- en een login schrijft securityLog en
+       sessions, BINNEN het venster f0..f1 dat aan deze route wordt
+       toegerekend. Voor een route die ook met een vers token 401 blijft geven
+       (verkeerde deelrol) vuurde dat bij de aanroep EN de herhaling: zes
+       rtfos-routes stonden zo op 'geweigerd en toch veranderd' zonder dat er
+       iets van hen bewoog. Daarom: hernieuwen mag alleen bij de EERSTE
+       aanroep, en vuurt hij, dan gaat het venster weg en begint de meting
+       opnieuw met een verse afdruk NA de login -- zonder tweede hernieuwing,
+       zodat er hoogstens een login per routemeting bestaat en die nooit in
+       een gemeten venster valt. De herhaling hernieuwt nooit: die hoort
+       hetzelfde token te dragen als de eerste aanroep. */
+    let hernieuwdNu = false;
+    const doe = async (magHernieuwen) => {
       let st = await post(r.pad, lijf, tokenVoor(r.rol));
       oproepen++;
-      if (st.status === 401 && hernieuw) {
-        if (await hernieuw(r.rol)) { hernieuwd++; st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++; }
+      if (magHernieuwen && st.status === 401 && hernieuw) {
+        if (await hernieuw(r.rol)) {
+          hernieuwd++; hernieuwdNu = true;
+          st = await post(r.pad, lijf, tokenVoor(r.rol)); oproepen++;
+        }
       }
       return st;
     };
 
-    const f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
-    const a = await doe();
+    let f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
+    let a = await doe(true);
+    if (hernieuwdNu && f0) {
+      f0 = await vingerafdruk(); afdrukken++;
+      a = await doe(false);
+    }
     const f1 = await vingerafdruk(); afdrukken++;
-    const b = await doe();
+    const b = await doe(false);
     const f2 = await vingerafdruk(); afdrukken++;
     vorige = f2;
     /* Zonder vingerafdrukken valt er niets te oordelen -- dan is de MEETOPSTELLING
        stuk en niet de route. Dat verschil hoort in het register te staan. */
     if (!f0 || !f1 || !f2) {
       vorige = null;
-      perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
+      perRoute[r.methode + ' ' + r.pad] = { methode: r.methode, pad: r.pad, rol: r.rol,
         state: 'ongemeten', sideEffect: 'ongemeten', rollback: 'ongemeten', idempotentie: 'ongemeten',
         reden: 'de vingerafdruk kwam niet terug' };
       tel.ongemeten++;
       continue;
     }
 
-    const o = weegStaat({ a, b, d01: zonderRuis(await verschilVan(f0, f1), ruis),
-      d12: zonderRuis(await verschilVan(f1, f2), ruis) });
-    perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
+    const d01 = zonderRuis(await verschilVan(f0, f1), ruis);
+    const d12 = zonderRuis(await verschilVan(f1, f2), ruis);
+    /* DE STILLE CONTROLE, alleen als hij iets kan beslissen: bewoog er bij de
+       aanroep EN bij de herhaling iets, dan kan dat een doorlopende
+       omgevingsschrijver zijn (zie weegStaat). Een kort venster zonder enige
+       aanroep laat zien wat er vanzelf beweegt; de wachttijd maakt het venster
+       vergelijkbaar met dat van een echte meting. Kost een vierde afdruk,
+       maar alleen op de routes waar de uitslag anders op ruis kan staan. */
+    let dStil = null;
+    if (d01.aantal > 0 && d12.aantal > 0) {
+      await new Promise(z => setTimeout(z, 250));
+      const f3 = await vingerafdruk(); afdrukken++;
+      if (f3) { dStil = zonderRuis(await verschilVan(f2, f3), ruis); vorige = f3; }
+    }
+    const o = weegStaat({ a, b, d01, d12, dStil });
+    perRoute[r.methode + ' ' + r.pad] = { methode: r.methode, pad: r.pad, rol: r.rol,
       statussen: [a.status, b.status], ...o };
 
     if (o.state === 'bewezen') tel.state++;
@@ -214,4 +311,18 @@ const CONTROL = {
     'eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.'
 };
 
-module.exports = { draaiStaatproef, weegStaat, zonderRuis, CONTROL };
+
+function ruisUit(geteld, rondes) {
+  const uit = new Set();
+  for (const [collectie, n] of geteld) if (n >= rondes) uit.add(collectie);
+  return uit;
+}
+
+function zonderTijdtik(d12, d01, stilOoit) {
+  if (!d12 || !stilOoit || !stilOoit.size) return d12;
+  const bewoogAl = new Set((d01 && d01.collecties) || []);
+  const gewijzigd = (d12.gewijzigd || []).filter(g => !(stilOoit.has(g.collectie) && !bewoogAl.has(g.collectie)));
+  return { ...d12, gewijzigd, aantal: gewijzigd.length, collecties: gewijzigd.map(g => g.collectie) };
+}
+
+module.exports = { draaiStaatproef, weegStaat, zonderRuis, zonderTijdtik, ruisUit, stapelRijen, CONTROL };

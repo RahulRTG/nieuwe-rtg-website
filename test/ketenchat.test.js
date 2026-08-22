@@ -2,7 +2,7 @@
    daarna EEN ketenkanaal; besloten deelgroepen zijn alleen voor de leden en
    de meldkamer-chefs van de betrokken korpsen kijken mee (lezen, niet
    schrijven). De noodknop draait op de bestaande security-route. Draai los:
-   node --experimental-sqlite --test test/ketenchat.test.js */
+   node --test test/ketenchat.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

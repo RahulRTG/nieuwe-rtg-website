@@ -31,13 +31,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfkind-'));
 
 const GESLOTEN = ['foundation/arena', 'foundation/bieb', 'foundation/geloofbieb', 'foundation/schoolbieb'];
@@ -73,7 +69,9 @@ async function toon(page, base, app) {
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.removeItem('rtf_sessie'); });
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1100);   // een omleiding zou hierbinnen gebeuren
+  /* Een omleiding gebeurt bij het laden; wachten tot het scherm STIL is (geen
+     lopend verzoek, geen hertekening) vangt hem, en wacht niet langer dan nodig. */
+  await wachtOpRust(page);
   return page.evaluate(() => ({
     pad: location.pathname,
     deur: !!document.querySelector('.rtgdeur'),
@@ -84,11 +82,11 @@ async function toon(page, base, app) {
 }
 
 test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -98,6 +96,7 @@ test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -133,11 +132,11 @@ test('de gesloten RTF-apps tonen een deur op de app zelf, niet de startpagina',
 });
 
 test('de klas-PDA opent pas na een eigen Foundation-profiel en vraagt buiten niets persoonlijks',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -147,6 +146,7 @@ test('de klas-PDA opent pas na een eigen Foundation-profiel en vraagt buiten nie
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -170,11 +170,11 @@ test('de klas-PDA opent pas na een eigen Foundation-profiel en vraagt buiten nie
 });
 
 test('de speeltuin en de speelhal roepen geen kind terug: geen ranglijst, geen reeks',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -184,6 +184,7 @@ test('de speeltuin en de speelhal roepen geen kind terug: geen ranglijst, geen r
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -218,11 +219,11 @@ test('de speeltuin en de speelhal roepen geen kind terug: geen ranglijst, geen r
 });
 
 test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -232,6 +233,7 @@ test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -256,7 +258,7 @@ test('schoolpartner zegt eerlijk dat een school zich eerst aanmeldt',
 });
 
 test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar doel',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -272,7 +274,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
     assert.equal(toegangRes.status, 200,
       'de Foundation-server laat het beheerprofiel bij het begeleidersbord: ' + (toegang.reden || toegang.error || 'onbekend'));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     await ctx.addInitScript(() => {
       try {
@@ -282,6 +284,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
       } catch (e) {}
     });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     const stuk = [];
@@ -289,7 +292,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
     for (const [naam, titel] of FOUNDATION_DEUREN) {
       const pad = '/apps/foundation/' + naam + '.html';
       await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(350);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         titel: document.title,
@@ -309,7 +312,7 @@ test('alle overige Foundation-schermen hebben hun eigen veilige deur of openbaar
     for (const [naam, doel] of FOUNDATION_OPEN) {
       const pad = '/apps/foundation/' + naam + '.html';
       await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(250);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         tekst: document.body.innerText.replace(/\s+/g, ' ').trim(),

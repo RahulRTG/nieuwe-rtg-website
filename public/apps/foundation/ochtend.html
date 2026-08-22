@@ -18,30 +18,30 @@
   .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.12rem;margin-bottom:.2rem;}
   .kop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.7rem;}
-  .reeks{display:inline-flex;align-items:center;gap:.3rem;font-size:.85rem;color:var(--goud2);white-space:nowrap;}
+  .reeks{display:inline-flex;align-items:center;gap:.3rem;font-size:.85rem;color:var(--accent-tekst);white-space:nowrap;}
   .reeks b{font-size:1.05rem;}
   .stap{display:flex;align-items:center;gap:.7rem;padding:.55rem 0;border-bottom:1px solid var(--lijn);}
   .stap:last-child{border-bottom:0;}
   .stap .vink{width:1.5rem;height:1.5rem;flex-shrink:0;accent-color:var(--goud2);}
   .stap .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .stap.af .t{text-decoration:line-through;color:var(--zacht);}
-  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;color:var(--zacht);width:2rem;height:2rem;font-size:.95rem;cursor:pointer;}
+  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;color:var(--zacht);width:2rem;height:2rem;font-size:.95rem;cursor:pointer;}
   .ikoon:hover{color:var(--txt);border-color:var(--goud);}
   .toevoeg{display:flex;gap:.5rem;margin:.8rem 0 .5rem;}
   .toevoeg .veld{flex:1;min-width:0;}
   .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.3rem;}
-  .chip{font-size:.78rem;padding:.3rem .6rem;border:1px solid var(--lijn);border-radius:999px;color:var(--zacht);background:transparent;cursor:pointer;}
+  .chip{font-size:.78rem;padding:.3rem .6rem;border:1px solid var(--lijn);border-radius:0;color:var(--zacht);background:transparent;cursor:pointer;}
   .chip:hover{color:var(--txt);border-color:var(--goud);}
-  .klaar-vlag{margin-top:.7rem;padding:.6rem .8rem;border:1px solid var(--goud);border-radius:12px;color:var(--goud2);font-size:.9rem;text-align:center;}
+  .klaar-vlag{margin-top:.7rem;padding:.6rem .8rem;border:1px solid var(--goud);border-radius:0;color:var(--accent-tekst);font-size:.9rem;text-align:center;}
   .bordrij{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--lijn);}
   .bordrij:last-child{border-bottom:0;}
   .bordrij .naam{flex:1;min-width:0;}
   .bordrij .meta{font-size:.8rem;color:var(--zacht);}
-  .bordrij .rk{font-size:.85rem;color:var(--goud2);white-space:nowrap;}
-  .vinkje{color:var(--goud2);}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .bordrij .rk{font-size:.85rem;color:var(--accent-tekst);white-space:nowrap;}
+  .vinkje{color:var(--accent-tekst);}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0;}
-  .kindkaart{border:1px solid var(--lijn);border-radius:12px;padding:.7rem .8rem;margin-bottom:.6rem;}
+  .kindkaart{border:1px solid var(--lijn);border-radius:0;padding:.7rem .8rem;margin-bottom:.6rem;}
   .kindkaart h3{font-size:.95rem;margin-bottom:.4rem;}
   .kindstap{display:flex;align-items:center;gap:.5rem;font-size:.85rem;padding:.25rem 0;}
   .kindstap .t{flex:1;min-width:0;}
@@ -62,9 +62,9 @@
     </div>
     <div id="mijnStappen"><div class="leeg">Laden…</div></div>
     <div id="klaarVlag"></div>
-    <div class="toevoeg">
+    <div class="toevoeg rtg-duimeind">
       <input class="veld" id="sWat" placeholder="Nog een stap, bijv. tas inpakken" maxlength="60">
-      <button class="knop" id="sDoe">Erbij</button>
+      <button class="knop" id="sDoe" data-hoofdactie>Erbij</button>
     </div>
     <div class="fout" id="sFout"></div>
     <div class="chips" id="voorbeelden"></div>

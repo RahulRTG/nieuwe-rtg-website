@@ -8,7 +8,7 @@
    Zelfde aanpak als de andere integratietests: een echte server als kindproces
    in een tijdelijke datamap, aangestuurd via global fetch. Geen extra packages.
 
-   Draai los: node --experimental-sqlite --test test/partner.test.js */
+   Draai los: node --test test/partner.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

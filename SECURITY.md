@@ -71,9 +71,33 @@ De beveiliging wordt in de CI en de testsuite continu bewaakt:
   IDOR, injectie, security-headers, path-traversal en brute-force.
 - **Strenge testpoort**: elke onverwachte 5xx, uncaughtException of
   unhandledRejection laat de suite falen.
+- **Stuklijst en herkomst** (`scripts/imageherkomst.js`): elke gepubliceerde
+  release krijgt een SBOM (CycloneDX 1.5) uit het image zelf, met een
+  Ed25519-handtekening die de stuklijst, het image-digest en de bron aan elkaar
+  bindt. Onderzoekers die willen weten wat er in een draaiende versie zit,
+  kunnen die opvragen; controleren kan met `npm run imageherkomst:controle`.
+  Wat het niet is: Sigstore. Er is geen transparantielogboek en geen derde
+  partij die meekijkt.
 
 Zet daarnaast in de repo-instellingen GitHub's eigen **Secret scanning** en
 **Push protection** aan; die vullen de bovenstaande lagen aan.
+
+### De noodrem-ladder bij brute force
+
+Bij brute-force-alarmen escaleert de afweer in drie treden, elk tijdgebonden
+en met melding aan de eigenaar (`server/beveiliging.js`):
+
+1. **Lokaal eerst**: elke bron gaat individueel in de zelf-dovende quarantaine
+   van De Wacht.
+2. **Vanaf drie bronnen**: nieuwe registraties dicht; dooft vanzelf na een uur.
+3. **Vanaf zes bronnen**: de *inlogpauze* — alleen de in- en uitschrijfpaden
+   dicht, tien minuten; wie al is ingelogd merkt niets.
+
+De volledige onderhoudsstand springt **nooit** automatisch: die knop is van de
+eigenaar. De eerdere noodrem deed dat wel en werkte daarmee als DoS-versterker
+(zes gespoofte bronnen = totale uitval tot een mens langskwam); de
+mega-beproeving legde dat bloot en `test/beveiliging.test.js` legt het huidige
+gedrag vast, mutatieproef inbegrepen.
 
 ### De identiteitskluis is aan zijn rij gebonden
 

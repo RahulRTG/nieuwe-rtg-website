@@ -104,8 +104,16 @@ async function bouwGezelschap(base, opties) {
       { pas, naam: l.naam, contact: l.email }, l.token);
     assert.equal(aanvraag.status, 200, 'aanvraag lukt: ' + JSON.stringify(aanvraag.body));
     assert.equal(aanvraag.body.aanmelding.gekoppeld, true, 'de aanvraag hangt aan het account');
-    const besluit = await post('/api/aanmelding/beslis',
-      { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'proefpubliek' }, persoonlijkKantoor);
+    /* Het contractbedrag hoort bij het besluit sinds de ladder: een contractuele
+       pas (Business, Lifestyle) heeft geen lijstprijs, dus accepteren zonder
+       afgesproken maandbedrag wordt geweigerd. De bodem komt uit de ladder en
+       staat hier niet als getal -- anders zou een verhoging van de bodem dit
+       proefpubliek laten zakken op een reden die niets met zijn onderwerp te
+       maken heeft. */
+    const trede = require('../server/kern/pasladder').trede(pas);
+    const lijf = { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'proefpubliek' };
+    if (trede && trede.contractueel) lijf.contractEuro = trede.bodemCenten / 100;
+    const besluit = await post('/api/aanmelding/beslis', lijf, persoonlijkKantoor);
     assert.equal(besluit.status, 200, 'het menselijke besluit lukt: ' + JSON.stringify(besluit.body));
     l.pas = pas;
     return l;
@@ -131,15 +139,15 @@ async function bouwGezelschap(base, opties) {
   /* Alle lagen uit foundation/gezinshulp.js. mini, kind en tiener zijn
      BESCHERMD; jong en volw niet. Beide soorten zitten er bewust in, want de
      grens is alleen te toetsen als je hem van twee kanten benadert. */
-  for (const [groep, naam, rol] of [
-    ['mini', 'Mees (4)', 'kind'],
-    ['kind', 'Kaya (8)', 'kind'],
-    ['tiener', 'Tim (14)', 'kind'],
-    ['jong', 'Jonas (19)', 'gezinslid'],
-    ['volw', 'Vera (41)', 'ouder']
+  for (const [groep, naam, rol, pin] of [
+    ['mini', 'Mees (4)', 'kind', '1111'],
+    ['kind', 'Kaya (8)', 'kind', '2222'],
+    ['tiener', 'Tim (14)', 'kind', '3333'],
+    ['jong', 'Jonas (19)', 'gezinslid', '4444'],
+    ['volw', 'Vera (41)', 'ouder', '5555']
   ]) {
     const p = await rtf('/gezin/profiel/maak',
-      { code: gezin.code, token: gezin.token, naam, rol, groep, pin: '1111' });
+      { code: gezin.code, token: gezin.token, naam, rol, groep, pin });
     assert.equal(p.status, 200, 'profiel ' + groep + ' lukt: ' + JSON.stringify(p.body));
     gezin.leden[groep] = { ...p.body.profiel, groep, rol };
   }

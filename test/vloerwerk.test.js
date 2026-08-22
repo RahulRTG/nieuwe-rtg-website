@@ -24,14 +24,14 @@
    En de derde: een bon van de buren is geen bon van jou. Dat is hier de
    scheiding tussen zaken.
 
-   Draai los: node --experimental-sqlite --test test/vloerwerk.test.js
+   Draai los: node --test test/vloerwerk.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 
 let srv, base, baas, ober, hotelBaas, hotelKamermeisje, lid;
 let tafelId = null, artikelId = null, bonRef = null;
@@ -65,8 +65,13 @@ test.before(async () => {
   /* Met telefoonnummer, want bestellen bij een zaak gaat langs de
      gegevenspoort (kern/gegevenspoort.js: bestelling -> telefoon). Die poort
      hoort hier niet beproefd te worden; die heeft zijn eigen toetsen. */
-  lid = (await api('/api/auth/register', { name: 'Vloer Gast', email: 'vl' + u + '@voorbeeld.test', phone: '06' + u,
-    password: 'vloergeheim12', geboortedatum: '1992-06-06', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const reg = (await api('/api/auth/register', { name: 'Vloer Gast', email: 'vl' + u + '@voorbeeld.test', phone: '06' + u,
+    password: 'vloergeheim12', geboortedatum: '1992-06-06', tier: 'rtg', pasApp: 'rtg' })).body;
+  lid = reg.token;
+  /* Door de keuring, want m5 is een glas van de bar: zonder geverifieerde
+     leeftijd geldt "onder de 18" en weigert de bestelling -- dan meet toets 2
+     de keuringspoort in plaats van de bon (zie keurLidGoed in ./helper.js). */
+  await keurLidGoed(base, lid, reg.state.user.codename, '1992-06-06');
   assert.ok(baas && ober && hotelBaas && lid, 'iedereen staat op de vloer');
 });
 test.after(() => {

@@ -11,14 +11,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
 
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -28,7 +24,7 @@ async function post(base, pad, body, token) {
 }
 
 test('Magnaat Partnerstudio: een officiële partner bouwt zonder geld of klantdata',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-partnerstudio-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp } });
   let browser;
@@ -41,7 +37,7 @@ test('Magnaat Partnerstudio: een officiële partner bouwt zonder geld of klantda
     assert.equal(login.status, 200);
     assert.ok(login.body.token, 'de manager ontvangt zijn eigen zaak-token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ serviceWorkers: 'block' });
     await context.addInitScript(token => {
       localStorage.setItem('rtg_sup_token', token);
@@ -52,7 +48,7 @@ test('Magnaat Partnerstudio: een officiële partner bouwt zonder geld of klantda
     const fouten = [];
     letOpFouten(page, fouten);
 
-    await page.goto(base + '/apps/magnaat-partnerstudio.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/magnaat-partnerstudio.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#kpis .kpi:nth-child(5)', { timeout: 15000 });
     assert.equal(new URL(page.url()).pathname, '/apps/magnaat-partnerstudio.html',
       'de ingelogde partner blijft in zijn Partnerstudio');

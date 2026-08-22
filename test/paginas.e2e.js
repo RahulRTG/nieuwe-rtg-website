@@ -45,14 +45,14 @@
    hij vroeg of laat op de klok in plaats van op de code -- en dat is precies
    het soort toets dat mensen uitzetten.
 
-   Draai los: node --experimental-sqlite --test test/paginas.e2e.js
+   Draai los: node --test test/paginas.e2e.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpNetstilte } = require('./helper');
 
 const PUB = path.join(__dirname, '..', 'public');
 
@@ -67,11 +67,7 @@ const BEWUSTE_STOP = /(^|: )geen sessie$/;
    luisteraar staat nu waar de andere twaalf al stonden. */
 const MAG_STUK = {};
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 function alleHtml(map) {
   const uit = [];
@@ -84,7 +80,7 @@ function alleHtml(map) {
 }
 
 test('elke pagina in public/ opent zonder onafgevangen fout',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const paginas = alleHtml(PUB).sort();
   assert.ok(paginas.length > 150, 'de scan vindt de pagina\'s (' + paginas.length + ')');
 
@@ -96,7 +92,7 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
   const kaal = [];       // pagina's zonder titel, taal of inhoud
   const ontbreekt = [];  // pagina's die een eigen bestand niet kunnen ophalen
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* Vier tabbladen naast elkaar. Bijna alle tijd is wachten (900 ms per
        pagina om late aanroepen te laten binnenkomen), dus serieel duurde dit
        ruim drie minuten en zo een kleine minuut. Elk tabblad heeft zijn eigen
@@ -132,11 +128,30 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
         missend.length = 0;
         let probe = null;
         try {
-          await page.goto(base + p, { waitUntil: 'load' });
-          // ruim laten uitlopen: de meeste schermen doen hun eerste api-aanroep
-          // pas na de load, en juist daar sneuvelt er iets. Bij 300ms miste hij
-          // apps/payroll.html, waarvan de fout uit een afgewezen aanroep komt.
-          await new Promise(r => setTimeout(r, 900));
+          /* `domcontentloaded` en niet `load`: `load` wacht tot ELK subverzoek
+             binnen is, en valt bij 258 pagina's onder belasting op een dag om op
+             zijn eigen tijdslimiet -- rood zonder dat er iets stuk is (TAKEN.md
+             4.39). De scan verliest er niets mee: de wacht hieronder blijft
+             juist doorlopen zolang er verzoeken binnenkomen, dus een plaatje of
+             een lettertype dat 404 geeft komt nog steeds langs `missend`. */
+          await page.goto(base + p, { waitUntil: 'domcontentloaded' });
+          /* LATEN UITPRATEN, niet 900 ms aftellen.
+
+             De meeste schermen doen hun eerste api-aanroep pas NA de load, en
+             juist daar sneuvelt er iets: bij 300 ms miste deze scan
+             apps/payroll.html, waarvan de fout uit een afgewezen aanroep komt.
+             Het antwoord daarop was 900 ms, en dat is dezelfde gok een maat
+             groter -- onder belasting nog steeds te kort, en 258 keer 900 ms is
+             bijna vier minuten die er meestal niet nodig zijn.
+
+             wachtOpNetstilte wacht op het GEDRAG: zolang het scherm verzoeken
+             blijft afvuren is het bezig, en zodra er 400 ms geen nieuw verzoek
+             meer begint is het uitgepraat. Zie test/helper.js voor waarom dit
+             niet Playwrights networkidle is (de SSE-lijn).
+
+             Gemeten op 19 augustus 2026: de hele scan duurt hierna 63 s. Alleen
+             al de vaste wachten die eruit gingen waren er samen meer dan 230. */
+          await wachtOpNetstilte(page);
           /* NA EEN META-REFRESH MEET JE DE BESTEMMING, NIET DEZE PAGINA.
 
              Drie paden zijn een briefje met `<meta http-equiv="refresh"

@@ -13,38 +13,38 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 88%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;text-decoration:none;}
   main{padding:1.1rem;max-width:920px;margin:0 auto;}
   .stil{color:var(--muted);font-size:.88rem;line-height:1.6;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;padding:.55rem 1rem;font:600 .88rem Inter,sans-serif;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;padding:.55rem 1rem;font:600 .88rem Inter,sans-serif;cursor:pointer;}
   .knop.stil2{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
-  .veld{background:#0C0C0B;border:1px solid #333;border-radius:10px;color:var(--txt);font:inherit;font-size:.92rem;padding:.55rem .75rem;}
+  .veld{background:#0C0C0B;border:1px solid #333;border-radius:0;color:var(--txt);font:inherit;font-size:.92rem;padding:.55rem .75rem;}
   .kop2{display:flex;align-items:baseline;gap:.6rem;border-bottom:1px solid var(--line);padding-bottom:.4rem;margin:1.4rem 0 .8rem;}
   .kop2 h2{font-size:1.1rem;}
   .kop2 .n{font-size:.72rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;}
   .apparaten{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.7rem;}
-  .ap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.8rem .9rem;display:flex;flex-direction:column;gap:.45rem;}
+  .ap{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.8rem .9rem;display:flex;flex-direction:column;gap:.45rem;}
   .ap.actief{border-color:var(--gold);}
   .ap .naam{display:flex;align-items:center;gap:.5rem;font-weight:600;font-size:.92rem;}
   .ap .staat{font-size:.76rem;color:var(--soft);}
   .schuif{width:100%;accent-color:var(--gold);}
-  .wissel{margin-left:auto;background:#333;border:none;border-radius:999px;width:2.6rem;height:1.4rem;position:relative;cursor:pointer;}
+  .wissel{margin-left:auto;background:#333;border:none;border-radius:0;width:2.6rem;height:1.4rem;position:relative;cursor:pointer;}
   .wissel::after{content:'';position:absolute;top:.15rem;left:.15rem;width:1.1rem;height:1.1rem;border-radius:50%;background:#999;transition:left .15s,background .15s;}
   .wissel.aan{background:var(--gold);}
   .wissel.aan::after{left:1.35rem;background:#000;}
   .scenes{display:flex;gap:.6rem;flex-wrap:wrap;}
-  .scene{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.7rem .9rem;display:flex;flex-direction:column;gap:.3rem;min-width:12rem;}
+  .scene{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .9rem;display:flex;flex-direction:column;gap:.3rem;min-width:12rem;}
   .scene b{font-size:.92rem;}
   .scene small{color:var(--soft);font-size:.76rem;line-height:1.4;}
-  .maker{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-top:.6rem;}
-  .voorstel{border:1px solid var(--gold);border-radius:12px;padding:.8rem .9rem;margin-top:.7rem;}
+  .maker{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-top:.6rem;}
+  .voorstel{border:1px solid var(--gold);border-radius:0;padding:.8rem .9rem;margin-top:.7rem;}
   .voorstel ul{margin:.4rem 0 0 1.1rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;}
-  .inlog a{color:var(--gold);}
+  .inlog a{color:var(--rtg-leesgoud,var(--gold));}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -67,9 +67,9 @@
   <div class="maker">
     <b style="font-size:.95rem;">Nieuwe scène met Rahul</b>
     <p class="stil" style="margin:.3rem 0 .6rem;">Vertel het moment; Rahul stelt de standen voor. U bekijkt, bewaart en start zelf.</p>
-    <div class="rij">
+    <div class="rij rtg-duimeind">
       <input class="veld" id="wens" maxlength="200" placeholder="Bijv. filmavond, rustige ochtend, iedereen weg…" style="flex:1;min-width:12rem;">
-      <button class="knop" id="maak">✶ Stel voor</button>
+      <button class="knop" id="maak" data-hoofdactie>✶ Stel voor</button>
     </div>
     <div class="voorstel" id="voorstel" hidden></div>
   </div>
@@ -130,7 +130,7 @@ async function laad(){
 function tekenMerken(){
   $('#merken').innerHTML = MERKEN.length ? MERKEN.map(m =>
     '<div class="scene"'+(m.verbonden?' style="border-color:var(--gold);"':'')+'><b>'+RTGGlyf.tekst(m.icon)+' '+esc(m.naam)+
-    (m.partner?' <small style="color:var(--gold);">partner</small>':'')+'</b>'+
+    (m.partner?' <small style="color:var(--rtg-leesgoud,var(--gold));">partner</small>':'')+'</b>'+
     '<small>'+esc(m.soort)+' · '+m.aantal+' apparaten · '+esc(m.uitleg)+'</small>'+
     '<div class="rij h-mt30">'+
     (m.verbonden ? '<button class="knop stil2 mlos" data-id="'+esc(m.id)+'">Ontkoppel</button>'

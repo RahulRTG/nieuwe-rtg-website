@@ -78,11 +78,13 @@
     const handel = '<button class="meer-btn" data-handel="1"><svg viewBox="0 0 24 24"><path d="M3 7h13l2 4h3v6H3z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><b>RTG Handel</b></button>';
     /* Mijn RTG-website: de automatische bedrijfssite op naam.rtg (eigen
        pagina, zelfde zaak-inlog). Zie server/kern/webplatform.js. */
+    const festival = '<button class="meer-btn" data-festival="1"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg><b>' + T('tab.festival','Festival') + '</b></button>';
     const web = '<button class="meer-btn" data-zaakweb="1"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><b>'+T('tab.zaakweb','Mijn website')+'</b></button>';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
-    ).join('') + web + office + rtmail + handel + ghost + scherm + '</div>';
+    ).join('') + web + office + rtmail + handel + ghost + festival + scherm + '</div>';
     el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
+    el.querySelectorAll('[data-festival]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/festival.html'; }));
     el.querySelectorAll('[data-zaakweb]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/zaakweb.html'; }));
     el.querySelectorAll('[data-office]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/office.html?werk=zaak'; }));
     el.querySelectorAll('[data-rtmail]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/leverancier-rtmail.html'; }));

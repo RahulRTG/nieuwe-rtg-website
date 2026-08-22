@@ -15,7 +15,7 @@
    5. DE POORT WORDT NIET NAGEBOUWD. kern/aipoort.js beslist wie er op mag.
    6. EEN KAPOT MODEL BREEKT HET SCHERM NIET: dan geldt dezelfde uitwijk.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-ontwerper.test.js */
+   Draai los: node --test test/onderneming-ontwerper.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

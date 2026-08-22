@@ -44,7 +44,7 @@
       'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}' +
       '.wrap{max-width:820px;margin:0 auto;}' +
       '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2.4rem;}' +
-      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}' +
+      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}' +
       '.cover h1{font-size:2.4rem;margin:.5rem 0 .3rem;}.cover .sub{color:var(--muted);font-size:.9rem;}' +
       'article{border-top:1px solid var(--line);padding:2rem 0;page-break-inside:avoid;}article:first-of-type{border-top:none;}' +
       'article header{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;}' +
@@ -53,18 +53,18 @@
       '.brief{color:var(--muted);font-size:.9rem;margin-bottom:.8rem;}' +
       '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}' +
       '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}' +
-      '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}' +
+      '.sw span{width:3.2rem;height:3.2rem;border-radius:0;border:1px solid var(--line);display:block;}' +
       '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}' +
       '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}' +
       '.verhaal{font-style:italic;margin-top:.8rem;font-size:.96rem;}' +
       '.kritiek{margin-top:1rem;border-left:2px solid var(--gold);padding-left:.8rem;font-size:.9rem;color:var(--muted);}' +
-      '.kritiek b{color:var(--gold);font-weight:600;}' +
-      '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}' +
+      '.kritiek b{color:var(--rtg-leesgoud,var(--gold));font-weight:600;}' +
+      '.spec{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-top:1.1rem;}' +
       '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}' +
       '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}' +
       '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}' +
       '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}' +
-      '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
+      '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
       '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.brief,.kritiek,.sw em{color:#555;}.sw b,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}.sw span{-webkit-print-color-adjust:exact;print-color-adjust:exact;}article,.cover,.spec{border-color:#ddd;}}' +
       '</style></head><body>' +
       '<div class="balk"><span>Collectieboek &middot; ' + esc(kop || 'RTG Atelier') + '</span><button id="pbtn" type="button">Print / PDF</button></div>' +

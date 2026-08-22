@@ -4,21 +4,17 @@
    bereik. Draait alleen waar een browser beschikbaar is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 const JPEG = Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==', 'base64');
 
 test('Scanner: foto\'s kiezen, de strook vult zich en de PDF landt in de kluis',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scanner-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -29,7 +25,7 @@ test('Scanner: foto\'s kiezen, de strook vult zich en de PDF landt in de kluis',
       body: JSON.stringify({ name: 'Scanlid', email: 'sc' + u + '@x.nl', phone: '06' + u,
         password: 'geheim123', geboortedatum: '1987-01-01', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
 
     /* DE WEDLOOP WORDT HIER EXPRES GEWONNEN, NIET AFGEWACHT.
@@ -96,7 +92,7 @@ test('Scanner: foto\'s kiezen, de strook vult zich en de PDF landt in de kluis',
    vervalt de belofte bij een fout, en daarom staat die regel hier vast: eerste
    klik meldt de storing, tweede klik bewaart gewoon. */
 test('een mislukte zoektocht naar de map Scans blokkeert het bewaren niet voorgoed',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scanner-hertry-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -107,7 +103,7 @@ test('een mislukte zoektocht naar de map Scans blokkeert het bewaren niet voorgo
       body: JSON.stringify({ name: 'Scanlid', email: 'sr' + u + '@x.nl', phone: '06' + u,
         password: 'geheim123', geboortedatum: '1987-01-01', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     /* De EERSTE zoektocht valt om, de tweede niet. Zo staat er een storing waar
        een mens overheen kan klikken, en geen dode knop. */

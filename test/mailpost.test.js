@@ -13,7 +13,7 @@
    4. De buitenpoort bewaart het originele bericht onveranderd en levert een
       afgeleide af in de onbetrouwde baan -- met de uitslag van de controles
       erbij, ook als die "niet gecontroleerd" is.
-   Draai: node --experimental-sqlite --test test/mailpost.test.js */
+   Draai: node --test test/mailpost.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

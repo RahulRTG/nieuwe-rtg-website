@@ -51,7 +51,7 @@ module.exports = (kern) => {
     if (tooManyTries(res, bucket)) return;
     const g = zoekInvite(req.body && req.body.kassacode);
     if (!g) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       return res.status(404).json({ error: 'Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe.' });
     }
     loginFails.delete(bucket);
@@ -71,7 +71,7 @@ module.exports = (kern) => {
 
     const g = zoekInvite(req.body && req.body.kassacode);
     if (!g) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       return res.status(404).json({ error: 'Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe.' });
     }
     if (accounts.staffByMember(g.s.code, lid.id)) {
@@ -99,14 +99,35 @@ module.exports = (kern) => {
 
   /* Het pad dat in de link staat. De pagina zelf is de gewone RTG-app: die
      kent de aanmelding, de onboarding en de verificatie al, en een tweede
-     aanmeldpagina zou een tweede waarheid over registreren worden. */
+     aanmeldpagina zou een tweede waarheid over registreren worden.
+
+     EEN OMLEIDING EN GEEN HERSCHRIJVING. Hier stond een interne herschrijving
+     (req.url = '/apps/app.html?werving=' + code, daarna next()), naar het model
+     van de voordeur. Dat kon op deze plek niet werken, en wel om twee redenen
+     tegelijk -- gevonden doordat de dekkingsmeting ook de routes buiten /api/
+     ging meten, en deze route bij het eerste echte verzoek 404 gaf:
+
+     1. De statische laag hangt in opzet/poortwachters.js en dus VOOR de
+        domeinroutes. Wat deze route aan next() doorgaf, kwam nooit meer bij een
+        laag die een .html kan uitleveren. De nonce-laag sloeg hem ook over: die
+        eist dat req.path op .html eindigt, en hier stond de query erachter.
+     2. Een herschrijving verandert alleen wat de SERVER uitlevert. De browser
+        blijft op /werken/AB12CD staan, zonder query -- dus kon de code de pagina
+        niet eens bereiken. De herschrijving was daarmee niet alleen kapot maar
+        ook zinloos.
+
+     Een 302 lost beide op: de browser vraagt /apps/app.html?werving=... op, en
+     die komt langs de nonce-laag zoals elke andere pagina. De reden dat de
+     voordeur bij '/' juist GEEN 302 gebruikt geldt hier niet -- daar gaat het om
+     de root zelf, hier om een uitnodigingslink van buiten.
+
+     WAT HIERMEE NIET IS OPGELOST: er is nog niets in public/ dat ?werving=
+     uitleest. De link brengt de genodigde nu naar de app in plaats van naar een
+     foutpagina; de code oppikken bij het aanmelden is werk dat nog moet gebeuren. */
   app.get('/werken/:code', (req, res, next) => {
     const code = String(req.params.code || '').trim().toUpperCase();
     if (!/^[A-Z0-9]{6}$/.test(code)) return next();
-    req.url = '/apps/app.html?werving=' + code;
-    const eigen = Object.getOwnPropertyDescriptor(req, 'path');
-    if (eigen && eigen.writable) req.path = req.url;
-    next();
+    res.redirect(302, '/apps/app.html?werving=' + code);
   });
 
   /* zoekInvite en verbindLid gaan mee de kern in: de registratie

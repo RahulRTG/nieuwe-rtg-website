@@ -24,43 +24,36 @@
    en de zevenstappenlat eronder. Een verraad dat de lat niet haalt, telt niet
    mee als bewijs; wat eraan ontbreekt staat erbij.
 
-   Draai:  node --experimental-sqlite scripts/ketenronde.js
-           node --experimental-sqlite scripts/ketenronde.js --seed=819226199
+   Draai:  node scripts/ketenronde.js
+           node scripts/ketenronde.js --seed=819226199
    ========================================================================== */
 'use strict';
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const { CATALOGUS } = require('../server/lib/verraad');
 const { beoordeel, isStilVerlies, voldoetAanLat, financieelOordeel } = require('./lib/ketenproef');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'KETENS.json');
 const SEED = (process.argv.slice(2).find(a => a.startsWith('--seed=')) || '--seed=819226199').slice(7);
 const VERRADEN = CATALOGUS.filter(v => v.waar && v.waar.includes('db/index.js')).map(v => v.naam);
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer(); s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
+/* De gedeelde wegwerpserver (scripts/lib/wegwerpserver.js) met magSterven:
+   deze ronde saboteert de start bewust en wil WETEN dat de server stierf.
+   Een hangende start telt hier ook als dood -- dat was altijd al de
+   betekenis van deze uitslag. De datamap is van de aanroeper en wordt
+   dus niet door de lib opgeruimd. */
 async function start(datamap, extra) {
-  const poort = await vrijePoort();
-  const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
-      STUN_UIT: '1', RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra } });
-  const eind = Date.now() + 45000;
-  while (Date.now() < eind) {
-    if (kind.exitCode !== null) return { kind, basis, dood: true };
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return { kind, basis, dood: false }; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return { kind, basis, dood: true };
+  try {
+    const s = await wegwerp({ naam: 'keten', datamap, magSterven: true, wachtMs: 45000,
+      env: { RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra } });
+    return { kind: s.kind, basis: s.basis, dood: s.dood };
+  } catch (e) { return { kind: null, basis: '', dood: true }; }
 }
 const stop = (s) => { try { s.kind.kill('SIGKILL'); } catch (e) {} };
 const post = async (basis, pad, lijf, tok) => {
@@ -230,6 +223,13 @@ async function draai(keten, verraadAan) {
   } finally { try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} }
 }
 
+/* DE WACHT. Hieronder start een echte ketenronde: servers, sabotage, en een
+   KETENS.json dat wordt overschreven. Zonder deze regel gebeurde dat ook bij een
+   gewone `require('./ketenronde')`. Bij de vier rolproeven kostte precies dat een
+   meting -- een laadcontrole zette ROLPROEF.json van 3377 beproefde routes terug
+   op 292, en het register zag er daarna volkomen normaal uit. */
+if (require.main !== module) { module.exports = {}; return; }
+
 (async () => {
   console.log('\n=== DE KETENRONDE ===\n  seed : ' + SEED + '\n');
   const uitslagen = [];
@@ -305,10 +305,19 @@ async function draai(keten, verraadAan) {
   console.log('  ----------------------------------------');
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Sabotage op echte businessketens, acht velden per scenario. Een verraad telt pas ' +
       'als bewijs wanneer het de zevenstappenlat haalt (zie scripts/lib/ketenproef.js): ' +
       'injecteerbaar, aantoonbaar toegeslagen, zichtbaar, reproduceerbaar, businessuitkomst ' +
       'gemeten, invariant beoordeeld, rollback beoordeeld.',
+    /* DE GRENS. Deze ronde saboteert de ketens die in KETENS staan, met EEN
+       seed. Wat er niet in staat is niet beproefd, en een keten die de lat haalt
+       is beproefd op DEZE zeven punten en niet op alles wat er mis kan gaan. */
+    grens: 'Alleen de ketens in scripts/lib/ketens; een businessproces dat daar niet ' +
+      'in staat is niet gesaboteerd. Per scenario EEN seed (' + SEED + '), dus dit is ' +
+      'geen uitputtende zoektocht naar verraad maar een herhaalbare steekproef. ' +
+      '"rollbackBewezen" zegt dat de terugdraai is WAARGENOMEN, niet dat elke ' +
+      'gedeeltelijke schrijfactie in het huis terugdraait.',
     seed: SEED,
     gemeten: { ketens: Object.keys(KETENS).length, scenarios: uitslagen.filter(u => u.verraad).length,
       voldoetAanLat: beoordeeld.length, rollbackBewezen: rollbackBewezen.length,

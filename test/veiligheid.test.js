@@ -6,7 +6,7 @@
    we starten een wacht, doen daarna helemaal niets meer namens dat toestel, en
    controleren dat het contact toch een alarm met de laatst bekende plek krijgt.
 
-   Draai los: node --experimental-sqlite --test test/veilig.test.js */
+   Draai los: node --test test/veilig.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

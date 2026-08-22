@@ -13,7 +13,7 @@
    4. ALLES OP CODENAAM. Een CRM is precies de plek waar die regel stilletjes
       zou sneuvelen.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-relaties.test.js */
+   Draai los: node --test test/onderneming-relaties.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

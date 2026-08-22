@@ -1,7 +1,7 @@
 /* Een account voor alles: mensen registreren zich EEN keer; personeel, zaak
    en kantoor zijn daarna koppelingen aan dat ene account (na bewijs van de
    bestaande werk-inlog) en accStart munt exact dezelfde sessies als de losse
-   logins. Draai los: node --experimental-sqlite --test test/eenaccount.test.js */
+   logins. Draai los: node --test test/eenaccount.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

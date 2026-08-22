@@ -89,6 +89,13 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      KERN mee, net als Life, want hij leest lagen die verspreid gemonteerd zijn. */
   Object.assign(kern, require('../kern/consent')({ kern }));
   require('../routes/consent')(grens('consent'));
+  /* De inzagekaart (kern/inzagekaart.js): de andere helft van diezelfde vraag.
+     Het Consent Center gaat over wat er OPENSTAAT, deze kaart over wat er IS
+     GEBEURD -- de drie sporen (RTG iD, paspoortlaag, inzagejournaal) op een
+     lijst. Leest alleen, schrijft niets, en staat naast consent omdat hij
+     dezelfde verspreid gemonteerde lagen nodig heeft. */
+  Object.assign(kern, require('../kern/inzagekaart')({ kern }));
+  require('../routes/inzagekaart')(grens('inzagekaart'));
   /* De tijdlijn (kern/tijdlijn.js): wat er in de tijd met u gebeurd is. Bezit
      niets en leidt niets af -- geen verbanden en geen score. Krijgt de KERN mee,
      net als Life en de dagcoach, en hangt daarom onderaan. */

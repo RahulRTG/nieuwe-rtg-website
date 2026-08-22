@@ -3,7 +3,7 @@
    op de bon en in het partneroverzicht -- geen verzamelfactuur achteraf.
    RTG stelt het tarief vanuit de boardroom (geld-regie); tikken tussen leden
    blijven kosteloos. Draai los:
-   node --experimental-sqlite --test test/betaaldienst.test.js */
+   node --test test/betaaldienst.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

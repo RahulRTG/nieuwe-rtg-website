@@ -29,13 +29,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosscherm-'));
 
 // het decor: een stad met een project, een gemeente met een code, en een
@@ -85,12 +81,12 @@ async function decor(base, officeCode) {
 }
 
 test('het Foundation OS-bestuursscherm toont de stad, de tabbladen en de zin van een grendel',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'RTFOS-SCHERM' } });
   let browser;
   try {
     const d = await decor(srv.base, 'RTFOS-SCHERM');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     // de service worker eruit: die haalt schermen vooruit op en zet ze in het
     // schermjournaal alsof deze toets ze heeft afgelegd (zie juridischeschermen.e2e.js)
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
@@ -145,12 +141,12 @@ test('het Foundation OS-bestuursscherm toont de stad, de tabbladen en de zin van
 });
 
 test('het gemeentenportaal toont cijfers en geen enkele persoon',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP + '-2', OFFICE_CODE: 'RTFOS-SCHERM2' } });
   let browser;
   try {
     const d = await decor(srv.base, 'RTFOS-SCHERM2');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

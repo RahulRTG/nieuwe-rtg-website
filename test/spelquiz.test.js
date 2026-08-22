@@ -17,7 +17,7 @@
       klasgenoot is een spel; die uitslag hoort geen schoolvoortgang te worden,
       want dan is winnen van een klasgenoot ineens een cijfer.
 
-   Draai los: node --experimental-sqlite --test test/spelquiz.test.js */
+   Draai los: node --test test/spelquiz.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

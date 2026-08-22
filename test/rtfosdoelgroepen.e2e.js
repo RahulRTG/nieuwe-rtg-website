@@ -23,13 +23,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, letOpFouten, kantoorAlsPersoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfosdoel-'));
 const OFFICE_CODE = 'RTFOSDOEL-KEURING';
 
@@ -102,7 +98,7 @@ const GEHEIM = ['0644433322', 'saskia@example.org', 'te streng tegen', 'Peter de
 function lekken(tekst) { return GEHEIM.filter(g => tekst.includes(g)); }
 
 async function schermMet(base, pw, pad) {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];
@@ -119,7 +115,7 @@ async function schermMet(base, pw, pad) {
 }
 
 test('het vrijwilligersscherm toont zijn planning en nergens zijn nummer of een evaluatie',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE } });
   let s;
   try {
@@ -157,7 +153,7 @@ test('het vrijwilligersscherm toont zijn planning en nergens zijn nummer of een 
 });
 
 test('het deelnemersscherm toont de stand in gewone taal en de knop om in te trekken',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP + '-2', OFFICE_CODE } });
   let s;
   try {
@@ -197,7 +193,7 @@ test('het deelnemersscherm toont de stand in gewone taal en de knop om in te tre
 });
 
 test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP + '-3', OFFICE_CODE } });
   let s;
   try {
@@ -242,12 +238,12 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
    staan, uren bevestigen -- op het scherm en niet op de API.
    ------------------------------------------------------------------------- */
 test('de coordinator geeft de code uit en bevestigt de gemelde uren, vanaf het bestuursscherm',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP + '-4', OFFICE_CODE } });
   let browser;
   try {
     const d = await decor(srv.base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

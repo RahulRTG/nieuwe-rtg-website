@@ -8,7 +8,7 @@
    BEWAART hier. Wie op zijn zwaarste moment iets opschrijft en zijn woorden ziet
    verdwijnen, wordt gestraft voor eerlijkheid -- en raakt kwijt wat hij net moest
    opschrijven. De weg naar hulp komt ERNAAST te staan.
-   Draai los: node --experimental-sqlite --test test/gedachten.test.js */
+   Draai los: node --test test/gedachten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

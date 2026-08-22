@@ -7,20 +7,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, bankDeur } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-')); }
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  // Geen Playwright-pakket? Onze eigen browser-driver (CDP over pipe), maar alleen als er een Chromium-binary is.
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 async function api(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -28,24 +20,7 @@ async function api(base, pad, body, token) {
   return (await fetch(base + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) })).json();
 }
 
-/* RTG Command is de landing op elke breedte, en sinds het springboard als
-   scherm verdween (WERELD.md) is er niets meer om naar op te vouwen. Deze helper
-   klikte de knop die dat deed; hij opent nu de deur in de VOET van de bank, en
-   dat is dezelfde weg die een lid heeft. `naam` is de tekst op die deur. */
-async function bankDeur(page, naam) {
-  await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 10000 });
-  const lade = page.locator('#rtgCommand .cmd-lade');
-  if (await lade.isVisible()) {
-    await lade.click();
-    await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
-  }
-  await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
-    .some((b) => b.textContent.trim() === n), naam, { timeout: 15000 });
-  await page.evaluate((n) => {
-    [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
-      .find((b) => b.textContent.trim() === n).click();
-  }, naam);
-}
+// bankDeur woont in ./helper.js: drie andere toetsbestanden gebruiken hem ook.
 
 // Gedeeld stramien: zet tokens/keys in localStorage, open de app, wacht tot het
 // inlogscherm weg is en de app-weergave zichtbaar is, en eis geen JS-fouten.
@@ -55,7 +30,7 @@ async function bootTest(opts) {
   let browser;
   try {
     const keys = await opts.tokens(base); // { rtg_sup_token: '...', ... }
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     /* DE INTAKE STAAT BUITEN DIT STRAMIEN. Een vers geregistreerd lid is niet
        `klaar`, dus opent app-main het onboardinggesprek en gaat #onbGate open
@@ -77,7 +52,7 @@ async function bootTest(opts) {
          klok is met het beginscherm meegegaan, zie WERELD.md -- dus is het
          rooster de enige vorm en zet deze toets niets meer voor. */
     }, keys);
-    await page.goto(base + opts.pad, { waitUntil: 'load' });
+    await page.goto(base + opts.pad, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
     await page.waitForSelector('#app', { state: 'visible', timeout: 5000 });
     if (opts.na) await opts.na(page);
@@ -90,7 +65,7 @@ async function bootTest(opts) {
 }
 
 test('Leverancier-app: de zaak-backoffice komt beveiligd op',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await bootTest({
     pad: '/apps/leverancier.html',
     tokens: async (base) => {
@@ -104,7 +79,7 @@ test('Leverancier-app: de zaak-backoffice komt beveiligd op',
 });
 
 test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await bootTest({
     pad: '/apps/app.html?pas=business',
     tokens: async (base) => {
@@ -139,17 +114,17 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
         return {
           koppen: [...nav.querySelectorAll('.cmd-kop')].map((k) => k.textContent.trim()),
           werelden: [...nav.querySelectorAll('button[data-url]')].map((b) => b.dataset.url)
-            .filter((u) => /^\/apps\/(rtg|kantoor|foundation)/.test(u)),
+            .filter((u) => /^\/apps\/(rtg|kantoor|reizen|foundation)/.test(u)),
           leeg: (document.querySelector('#rtgCommand .cmd-leeg') || {}).textContent || '',
           springboard: zicht('.os-thuisscherm'),
           klok: !!document.getElementById('homeKlok')
         };
       });
-      assert.deepEqual(start.koppen, ['Werelden', 'Software'],
-        'de bank scheidt de werelden niet van de software: ' + start.koppen.join(', '));
+      assert.deepEqual(start.koppen, ['Werelden'],
+        'de bank hoort alleen werelden te dragen (WERELDEN.md): ' + start.koppen.join(', '));
       assert.deepEqual(start.werelden,
-        ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-        'de drie werelden staan niet in de bank');
+        ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+        'de vier werelden staan niet in de bank');
       assert.match(start.leeg, /Kies een wereld/i,
         'de werktafel begint niet op een lege keuze: "' + start.leeg + '"');
       assert.equal(start.springboard, false, 'het springboard staat weer in beeld');
@@ -170,7 +145,7 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
 });
 
 test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DEZE TOETS WEES NAAR EEN PAGINA DIE VERHUISD IS.
 
      Hij opende /apps/wallet.html en zocht #ledenpas .ledenpas .cn. Dat pad is
@@ -199,16 +174,17 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 900 } });
     await ctx.addInitScript(t => {
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
 
     // 1. het oude pad blijft werken en komt uit bij de wallet-stand van RTG Geld
-    await page.goto(base + '/apps/wallet.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /\/apps\/geld\.html/.test(location.pathname + location.hash),
       null, { timeout: 15000 });
     assert.match(await page.evaluate(() => location.pathname + location.hash), /\/apps\/geld\.html#wallet$/,
@@ -228,9 +204,10 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
           juist die kant kan stil terugkomen: een pas op de homescreen is een
           codenaam die je aan iedereen laat zien die over je schouder meekijkt. */
     const thuis = await ctx.newPage();
+    await volgVerzoeken(thuis);
     await thuis.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await thuis.waitForSelector('#osMappen .os-app, .os-wm', { timeout: 15000, state: 'attached' });
-    await thuis.waitForTimeout(1200);
+    await wachtOpRust(thuis);
     const opThuis = await thuis.evaluate(() => ({
       pas: document.querySelectorAll('.wa-pas, #waPas, #ledenpas').length,
       codenaam: document.querySelectorAll('.wa-pas .cn, #ledenpas .cn').length
@@ -246,7 +223,7 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
 });
 
 test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -254,12 +231,12 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
     const reg = await api(base, '/api/auth/register', { name: 'Lid EN', email: 'appen@x.nl', phone: '0612345799',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'en'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
-    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
     /* De begroeting stond hier en is van het beginscherm af; de passregel
        eronder loopt langs dezelfde weg (T('app.membersince',...) uit het
@@ -282,7 +259,7 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
 });
 
 test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt doorgezet',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -308,12 +285,12 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
     const ref = ord.order.ref;
 
     // de leverancier opent de app en gaat via Meer naar Orders
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(t => { localStorage.setItem('rtg_sup_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, login.token);
-    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/leverancier.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app.active', { timeout: 15000 });
     // het Werk-OS: alle functies staan als apps op het springboard; de zaak
     // opent (na de sector-doorverwijzing) op het startscherm met dock
@@ -345,7 +322,7 @@ test('Leverancier-app: een betaalde bestelling komt bij Orders binnen en wordt d
 });
 
 test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -354,7 +331,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
     const fouten = [];
     letOpFouten(page, fouten);
@@ -363,7 +340,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     // onboarding-modal (die anders de app blokkeert) niet verschijnt.
     await page.route('**/api/onboarding/status', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
-    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 
     /* Naar het AI/concierge-scherm en een bericht met een XSS-payload sturen.
@@ -374,11 +351,42 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
        daarin Zoeken -- dat is Spotlight, en die brengt je met "Laat Rahul dit
        doen" naar precies hetzelfde scherm. Wat er daarna gemeten wordt is
        ongewijzigd: #chat mag de payload nooit uitvoeren. */
-    await bankDeur(page, 'Bedieningspaneel');
+    await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
+    /* EERST BEWIJZEN DAT HET PANEEL VAN DEZE KLIK OPEN IS, en pas dan typen.
+
+       Wachten op '#osZoekScrim.open' is niet genoeg, en dat is de kern. Die
+       klasse staat op een BLIJVEND element: is het paneel eerder in deze suite
+       al eens open geweest, dan kan de wachtregel de OUDE .open zien en
+       doorlopen voordat de klik van hierboven is afgehandeld. Daarna wist
+       openZoek() alsnog het veld -- die functie doet letterlijk
+       `zoekInput.value = ''; zoek(); zoekInput.focus();` (app-main.js) -- en dan
+       is wat page.fill() net had ingetypt weg, blijft de lijst leeg, en komt de
+       rij nooit meer, want er vuurt geen input-event meer.
+
+       De focus is het EINDE van openZoek(), dus een gefocust en leeg veld is het
+       bewijs dat die functie voor DEZE klik helemaal klaar is. Dat is wat hier
+       wordt afgewacht.
+
+       EERLIJK ERBIJ: dit is niet lokaal nagespeeld. Wat wel vaststaat komt uit
+       de CI-uitslag van 20 augustus, en die werd leesbaar doordat hier al een
+       waitForFunction stond: de toets zakte niet meer op een TypeError maar op
+       "Timeout 10000ms exceeded" -- de rij bleef dus TIEN SECONDEN weg. Daarmee
+       viel de vorige verklaring (de lijst is nog niet getekend) definitief af:
+       zoek() is een gewone synchrone input-listener. Een leeggemaakt veld is de
+       enige gevonden route waarlangs die rij lang wegblijft. Blijft hij ook
+       hierna zakken, dan is deze verklaring ook fout en moet de volgende stap
+       zijn: bij een storing de staat van het paneel afdrukken (waarde van het
+       veld, aantal knoppen, welke scrims open staan). */
+    await page.waitForFunction(() => {
+      const i = document.querySelector('#osZoekInput');
+      return !!i && document.activeElement === i && i.value === '';
+    }, null, { timeout: 10000 });
     await page.fill('#osZoekInput', 'iets vragen');
+    await page.waitForFunction(() => [...document.querySelectorAll('#osZoekLijst button')]
+      .some((x) => /Laat Rahul dit doen/i.test(x.textContent)), null, { timeout: 10000 });
     await page.evaluate(() => {
       const b = [...document.querySelectorAll('#osZoekLijst button')]
         .find((x) => /Laat Rahul dit doen/i.test(x.textContent));
@@ -389,7 +397,13 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.fill('#askInput', payload);
     await page.click('#askBtn');
     await page.waitForSelector('#chat .bubble.user', { timeout: 10000 });
-    await page.waitForTimeout(400); // geef een (eventuele) onerror de tijd om te vuren
+    /* Hier werd gewacht om een EVENTUELE onerror de tijd te geven -- wachten op
+       iets wat er juist niet hoort te zijn. Dat kan niet met "verschijnt het?",
+       dus wachten we tot het scherm stil is: geen lopend verzoek en geen
+       hertekening meer. Is er dan geen fout gevuurd, dan komt hij ook niet.
+       Drie stille rondes, want een enkele ronde is bij een polling van 100 ms
+       korter dan de 400 ms die hier vroeger stond. */
+    await wachtOpRust(page, null, { rondes: 3 });
 
     // de payload staat als TEKST in de bubbel, niet als uitgevoerd element
     assert.equal(await page.evaluate(() => document.querySelectorAll('#chat img').length), 0, 'de payload is niet als <img> uitgevoerd');
@@ -404,7 +418,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
 });
 
 test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De balk onderaan was een doorgeefluik naar zijn app; nu is het een gesprek
      dat op het beginscherm staat. Twee dingen die echt moeten kloppen: hij
      BEGINT uit zichzelf (anders is hij niet proactief, alleen aanwezig), en een
@@ -418,7 +432,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 430, height: 900 } });
     const fouten = [];
     letOpFouten(page, fouten);
@@ -427,7 +441,7 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 
     /* DE BELOFTE IS DEZELFDE, DE PLEK NIET.
@@ -460,7 +474,26 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     /* De lade van de bank glijdt in 280ms weg (command.css). Meten of de balk
        vrij ligt terwijl hij nog beweegt, meet de animatie en niet de stand. */
     await page.waitForFunction(() => !document.querySelector('#rtgCommand.bank-open'), null, { timeout: 5000 });
-    await page.waitForTimeout(350);
+    /* De lade glijdt in 280 ms weg; meten terwijl hij beweegt meet de animatie.
+       Wachten tot de balk STIL LIGT is de vraag zelf: twee metingen achter
+       elkaar op dezelfde plaats. */
+    /* DRIE GELIJKE LEZINGEN OP 100 MS, en niet twee op animatieframetempo.
+
+       Zo stond het eerst, en het viel af en toe om: Playwright kijkt standaard
+       per FRAME, en twee frames vlak na elkaar geven bij een overgang van 280 ms
+       makkelijk dezelfde AFGERONDE plaats -- de beweging is dan nog bezig en de
+       meting eronder valt er middenin. Drie gelijke lezingen op 100 ms vragen
+       200 ms stilstand, en zo lang staat deze balk tijdens zijn overgang nergens
+       stil. De teller gaat bij elke afwijkende lezing terug naar nul, dus het is
+       geen verkapte klok: duurt het langer, dan wacht hij langer. */
+    await wachtTot(page, () => {
+      const e = document.querySelector('#rtgCommand .cmd-balk');
+      if (!e) { window.__balkStil = 0; return false; }
+      const top = Math.round(e.getBoundingClientRect().top);
+      window.__balkStil = window.__balkVorige === top ? (window.__balkStil || 0) + 1 : 0;
+      window.__balkVorige = top;
+      return window.__balkStil >= 3;
+    }, null, { wat: 'een balk die stil ligt', polling: 100 });
     assert.equal(await page.evaluate(() => {
       const e = document.querySelector('#rtgCommand .cmd-balk'), r = e.getBoundingClientRect();
       const boven = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
@@ -484,15 +517,22 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
 });
 
 test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwijnt weer',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto(base + '/apps/personeel.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
+    /* De banner wordt door shared/verbinding.js GEMAAKT, en dat script zet pas
+       op zijn laatste regel window.RTGNet. Ga je offline voordat het zover is,
+       dan mist het verzoek de luisteraar en wacht deze toets op een banner die
+       nooit komt. `load` regelde dat vroeger impliciet, door op elk plaatje en
+       elk lettertype te wachten; dit is dezelfde garantie zonder die omweg --
+       en zonder de brosheid die eraan vastzit (TAKEN.md 4.39). */
+    await page.waitForFunction(() => !!window.RTGNet, null, { timeout: 15000 });
     // offline -> de banner schuift in beeld met een melding
     await context.setOffline(true);
     await page.waitForFunction(() => {
@@ -513,7 +553,7 @@ test('Verbinding: de offline-banner verschijnt bij verbindingsverlies en verdwij
 });
 
 test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await bootTest({
     pad: '/apps/backoffice.html',
     tokens: async (base) => {
@@ -547,18 +587,19 @@ test('Backoffice: het RTG-kantoor komt beveiligd op met de eigen code',
    toets meet het vak, niet de CSS-regel: hij zakt bij elke manier waarop het
    vak alsnog scheef wordt getrokken. */
 test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     // een smalle, hoge telefoon: juist daar knijpt max-width de breedte af
     const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
     await ctx.addInitScript(() => {
       try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
     });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     // zonder token: dan staat de poort er, en daar hangt de klok
     await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
 
@@ -580,7 +621,7 @@ test('Inlogpoort: het vak van de klok is vierkant, dus de schaduw is rond',
 });
 
 test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DIT IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT, en allebei de keren
      zag je het pas op een afdruk. Eerst zweefde de mond tientallen pixels onder
      de klok; daarna werd hij opgetrokken tot hij "aansloot", en toen begon de
@@ -600,7 +641,7 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     // twee maten: de verhouding hoort op allebei dezelfde te zijn
     for (const maat of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
       const ctx = await browser.newContext({ viewport: maat });
@@ -608,10 +649,11 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
         try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
       });
       const page = await ctx.newPage();
+      await volgVerzoeken(page);
       // zonder token: dan staat de poort er, en die is wat we meten
       await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#gate .ag-mond', { timeout: 15000 });
-      await page.waitForTimeout(1200);
+      await wachtOpRust(page);
 
       const r = await page.evaluate(() => {
         const klok = document.querySelector('#gate .os-lock .rtg-ring');
@@ -670,7 +712,7 @@ test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
    De toets meet allebei de kanten, want een reparatie die alleen de ene kant
    vastlegt kan de andere stilletjes weer stukmaken. */
 test('Leden-app: een verse start begint thuis, een onderbreking van seconden niet',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -679,7 +721,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const actieveView = async (page) => page.evaluate(() => {
       const v = document.querySelector('.view.active');
       return v ? v.getAttribute('data-view') : null;
@@ -693,7 +735,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
       localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'salon', t: Date.now() - 20000 }));
     }, [reg.token]);
     const pKort = await ctxKort.newPage();
-    await pKort.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await pKort.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await pKort.waitForSelector('.view.active', { timeout: 15000 });
     assert.equal(await actieveView(pKort), 'salon',
       'na een onderbreking van seconden staat u weer waar u was');
@@ -706,7 +748,7 @@ test('Leden-app: een verse start begint thuis, een onderbreking van seconden nie
       localStorage.setItem('rtg_actieve_tab', JSON.stringify({ tab: 'salon', t: Date.now() - 5 * 60000 }));
     }, [reg.token]);
     const pVers = await ctxVers.newPage();
-    await pVers.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'load' });
+    await pVers.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await pVers.waitForSelector('.view.active', { timeout: 15000 });
     assert.equal(await actieveView(pVers), 'home',
       'een verse start toont het beginscherm, niet de app waar u het laatst was');

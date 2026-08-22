@@ -71,7 +71,7 @@
        reden (module uit, stad geblokkeerd) telt daar niet meer mee als bewijs
        dat de stadsgrens dichtzit.
 
-   Draai los: node --experimental-sqlite --test test/rtfos-bestuur.test.js
+   Draai los: node --test test/rtfos-bestuur.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

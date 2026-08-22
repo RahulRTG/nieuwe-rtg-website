@@ -20,7 +20,7 @@
       dood te lopen op de basename-filter, niet op geluk.
 
    Draai los:
-   node --experimental-sqlite --test test/office-tweede-helft.test.js */
+   node --test test/office-tweede-helft.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -329,26 +329,51 @@ test('9. de boardroom deelt zijn eigen sleutels uit', async () => {
     'een lid komt niet eens door de kantoordeur');
 });
 
-test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass is de voorwaarde', async () => {
+test('10. een partneraanvraag beslissen: de Boardroom beslist, en een pas is de voorwaarde', async () => {
   // de uitgiftelijst van het kantoor (contracten) hoort er gewoon te staan
   const uit = await ko('uitgifte', {});
   assert.equal(uit.status, 200);
 
-  /* De aanvraagpoort leest het pas-bewijs met resolveSession(): die kent zowel
+  /* De aanvraagpoort leest het ledenbewijs met resolveSession(): die kent zowel
      een demosessie als een ECHT ledenaccount. Dat laatste is de weg die een
      klant in de praktijk loopt, en die weg toetsen we hier van begin tot eind:
-     registreren -> aanvraag afgewezen (nog geen pas) -> menselijk besluit tilt
-     het account naar Business -> opnieuw inloggen -> aanvraag lukt. */
+     de gratis gast komt er niet in, een gewone RTG Pass wel, en een account dat
+     later naar Business gaat blijft die weg gewoon lopen.
+
+     DE EIS IS EEN PAS, NIET DE BUSINESS PASS. Hier stond het omgekeerde: alleen
+     Business mocht aanvragen. Een pas is een lidmaatschapsniveau en geen
+     vergunning om te ondernemen; wie met een RTG Pass een zaak runt, is niet
+     minder ondernemer. Wat blijft staan is dat er een LID achter de aanvraag
+     hoort, want er gaat een bedrijfscode en een beheer-inlog de deur uit. */
   const t = Date.now().toString().slice(-7);
+  const gast = await post('/api/auth/register', { name: 'Gratis Gast', email: 'gg' + t + '@rtg.test',
+    password: 'Wachtwoord123', geboortedatum: '1988-03-11', tier: 'guest' });
+  assert.equal(gast.status, 200);
+  const zonderPas = await post('/api/partner/apply', { company: 'Zonder Pas BV', type: 'restaurant',
+    city: 'Rotterdam', contactName: 'A. Vragende', email: 'zp' + t + '@rtg.test', akkoord: true }, gast.body.token);
+  assert.equal(zonderPas.status, 403, 'zonder pas komt de aanvraag er niet in');
+  assert.doesNotMatch(zonderPas.body.error, /alleen (een|de) Business Pass/i);
+
   const gewoon = await post('/api/auth/register', { name: 'Partner Aanvrager', email: 'pa' + t + '@rtg.test',
     phone: '+31612340003', password: 'Wachtwoord123', geboortedatum: '1988-03-11' });
   assert.equal(gewoon.status, 200);
-  const zonderPas = await post('/api/partner/apply', { company: 'Zonder Pas BV', type: 'restaurant',
-    city: 'Rotterdam', contactName: 'A. Vragende', email: 'zp' + t + '@rtg.test', akkoord: true }, gewoon.body.token);
-  assert.equal(zonderPas.status, 403, 'zonder Business Pass komt de aanvraag er niet in');
-  assert.match(zonderPas.body.error, /Business Pass/);
+  assert.equal(gewoon.body.state.user.tier, 'rtg', 'zelf aanmelden levert een RTG Pass');
+  /* EEN CONSUMENTENPAS IS GEEN BEDRIJF. Hier stond dat een gewone RTG Pass een
+     partnerplek mocht aanvragen; dat was het antwoord van 18 augustus 2026 op
+     een poort die toen DE Business Pass eiste -- vanaf 5.000 euro, en daarmee
+     dicht voor het restaurant met acht man uit MARKT.md. Twee dagen later kwam
+     de trede die daar wel voor is: COMMERCIE.md 3b maakt RTG Business Lite
+     (150 euro) de partnerpoort. De poort vraagt sindsdien de capability
+     `can_be_partner` en geen pas-id, zodat een volgende trede zichzelf niet
+     opnieuw buitensluit. */
+  const metRtg = await post('/api/partner/apply', { company: 'Gewone Pas BV', type: 'restaurant',
+    city: 'Rotterdam', contactName: 'A. Vragende', email: 'gp' + t + '@rtg.test', akkoord: true }, gewoon.body.token);
+  assert.equal(metRtg.status, 403, 'een RTG Pass is persoonlijk en draagt geen partnerplek: '
+    + JSON.stringify(metRtg.body).slice(0, 160));
+  assert.match(String(metRtg.body.error || ''), /zakelijke pas/,
+    'en de weigering noemt de pas die het wel doet -- anders is 403 een doodlopende weg');
 
-  // het menselijke besluit: pas hierna bestaat de Business Pass
+  // en een menselijk besluit naar Business verandert daar niets aan
   await elevateTier(base, gewoon.body.token, 'business', kantoor);
   const zakelijk = await post('/api/auth/login', { login: 'pa' + t + '@rtg.test',
     password: 'Wachtwoord123', pasApp: 'business' });
@@ -364,7 +389,9 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass 
     'een verzonnen bedrijfstype ook niet');
 
   const aanvraag = await post('/api/partner/apply', { company: 'Proefpartner BV', type: 'restaurant',
-    city: 'Rotterdam', contactName: 'A. Vragende', email: 'pp' + t + '@rtg.test', akkoord: true }, zakelijk.body.token);
+    city: 'Rotterdam', contactName: 'A. Vragende', email: 'pp' + t + '@rtg.test', akkoord: true,
+    bevoegd: true, waarheidsgetrouw: true, kvkNummer: '68750110', vestigingsnummer: '000037178598',
+    bewijzen: { nvwa: 'NVWA-ROTTERDAM-' + t } }, zakelijk.body.token);
   assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 160));
 
   const stand = await ko('state', {});
@@ -377,6 +404,14 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass 
   assert.equal((await ko('partner/decide', { id: mijn.id, action: 'goedkeuren' })).status, 403);
   assert.equal((await br('partner/decide', { id: 'bestaatniet', action: 'goedkeuren' })).status, 404);
 
+  assert.equal((await br('partner/decide', { id: mijn.id, action: 'goedkeuren' })).status, 409,
+    'ook de Boardroom kan geen open register- of vergunningcontrole overslaan');
+  for (const eis of mijn.toelating.eisen) {
+    const uitkomst = eis.id === 'vergunningenscan' ? 'niet_van_toepassing' : 'geverifieerd';
+    const check = await br('partner/controle', { id: mijn.id, onderdeel: eis.id, uitkomst,
+      referentie: uitkomst === 'niet_van_toepassing' ? 'Geen extra lokale vergunning nodig' : 'Officieel register ' + eis.id });
+    assert.equal(check.status, 200, eis.id + ': ' + JSON.stringify(check.body).slice(0, 140));
+  }
   const goed = await br('partner/decide', { id: mijn.id, action: 'goedkeuren' });
   assert.equal(goed.status, 200, JSON.stringify(goed.body).slice(0, 200));
 
@@ -390,7 +425,7 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass 
 });
 
 /* Deze test toetste eerst de demoweg (/api/login), want de echte weg WERKTE
-   NIET: /api/partner/apply las het pas-bewijs met sessionFor(), en die kent
-   alleen de demosessies. Een echte Business Pass-houder kwam er dus nooit door.
+   NIET: /api/partner/apply las het ledenbewijs met sessionFor(), en die kent
+   alleen de demosessies. Een echte pashouder kwam er dus nooit door.
    Dat is nu gerepareerd (resolveSession, zie routes/member/partnerkanaal.js) en
    de test loopt de echte weg. Blijft deze test groen, dan blijft die weg open. */

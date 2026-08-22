@@ -20,7 +20,7 @@
    dingen: hij stopt, hij stopt met een foutcode, en hij noemt het een
    startfout in plaats van een uncaughtException.
 
-   Draai los: node --experimental-sqlite --test test/poortrace.test.js
+   Draai los: node --test test/poortrace.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -45,7 +45,7 @@ test('een bezette poort: de server stopt met een foutcode en noemt het een start
 
   try {
     // 2) de echte server erbovenop starten
-    const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+    const kind = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
       env: Object.assign({}, process.env, { PORT: String(poort), RTG_BIND: '127.0.0.1',
         RTG_DATA_DIR: TMP, SMTP_URL: '' }),
       stdio: ['ignore', 'pipe', 'pipe']

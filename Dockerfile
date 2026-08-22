@@ -22,8 +22,12 @@ FROM postgres:18-alpine AS backup-runtime
 RUN apk add --no-cache openssl
 
 # RTG / RTFoundation productie-image.
-# Node 22 (nodig voor --experimental-sqlite en de ingebouwde test-runner).
-FROM node:22-slim
+# Node 26: dezelfde major als CI draait, zodat de GELEVERDE runtime ook de
+# beproefde is. node:sqlite laadt hier zonder vlag (dat is zo sinds 22.13,
+# vandaar dat --experimental-sqlite uit de hele boom is); de ondergrens staat
+# in package.json (engines) en wordt afgedwongen in server/server.js, vóór
+# het eerste require.
+FROM node:26-slim
 
 # Alleen productie-afhankelijkheden; de dev-tools (terser, axe) horen niet in de
 # runtime-image. npm ci is reproduceerbaar op basis van de lockfile.
@@ -70,5 +74,5 @@ EXPOSE 3000 3100
 HEALTHCHECK --interval=30s --timeout=4s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
-# server.js herstart zichzelf met --experimental-sqlite; direct starten kan ook.
-CMD ["node", "--experimental-sqlite", "server/server.js"]
+# node:sqlite laadt sinds Node 22.13 zonder vlag; server.js start direct.
+CMD ["node", "server/server.js"]

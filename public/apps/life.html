@@ -24,12 +24,12 @@
   .sig .waarde{font-family:'Bodoni Moda',Georgia,serif;font-size:1.5rem;white-space:nowrap;}
   .sig .eenheid{display:block;color:var(--soft);font-size:.72rem;text-align:right;}
   .sig.leeg .waarde{font-family:'Inter',system-ui,sans-serif;font-size:.82rem;color:var(--soft);font-style:italic;}
-  .kaartje{border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin:.6rem 0;}
+  .kaartje{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin:.6rem 0;}
   .kaartje b{display:block;}
   .kaartje .m{color:var(--soft);font-size:.82rem;line-height:1.5;margin-top:.2rem;}
   .balk{height:2px;background:rgba(255,255,255,.10);margin:.6rem 0 0;}
   .balk i{display:block;height:2px;background:var(--goldlicht);}
-  .storing{border:1px solid var(--rood,#DE6E92);border-radius:10px;padding:.7rem .9rem;
+  .storing{border:1px solid var(--rood,#DE6E92);border-radius:0;padding:.7rem .9rem;
     margin:.6rem 0;font-size:.82rem;color:var(--soft);}
   .heen{display:inline-block;margin:.35rem .5rem 0 0;font-size:.82rem;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
@@ -48,7 +48,14 @@
   .dagrij .klok{font-family:'Bodoni Moda',Georgia,serif;font-size:1.2rem;min-width:3.4rem;}
   .dagrij .wat{flex:1 1 auto;font-size:.9rem;}
   .dagrij .wat .uit{display:block;color:var(--soft);font-size:.78rem;line-height:1.5;margin-top:.1rem;}
-  .dagrij .bron{font-size:.74rem;white-space:nowrap;}
+  /* DE BRON IS EEN LINK, en die had geen kleur -- dus zette de BROWSER er een:
+     rgb(158,158,255) op onyx (leesbaar, dus niemand zag het) en #0000EE zodra
+     color-scheme licht wordt. Dezelfde les als bij de app-links op media.html:
+     een kleur die je niet zelf zet, zet de browser. De huisinkt met een gouden
+     onderstreping -- goud is hier een accent en geen tekstkleur. */
+  .dagrij .bron{font-size:.74rem;white-space:nowrap;color:var(--txt);
+    text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:0.18em;
+    text-decoration-color:var(--rtg-leesgoud,var(--gold));}
   .dagrij.af .klok,.dagrij.af .wat b{color:var(--soft);}
   .losse{margin-top:1rem;}
 </style>

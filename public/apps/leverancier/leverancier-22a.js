@@ -66,13 +66,13 @@
     });
     el.querySelectorAll('[data-khire]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/apply/decide', { id: b.dataset.khire, action: 'aannemen' });
-        kantoorMsg = '\u2705 '+T('kt.hired','Aangenomen.')+' <b>'+escT(d.invite.naam)+'</b> '+T('kt.hired.geef','meldt zich zelf aan met bedrijfsnaam')+' <b>'+escT(d.bedrijf)+'</b> + '+T('kt.invite.code','Kassacode')+' <b style="color:var(--gold);font-family:monospace;letter-spacing:0.14em;">'+escT(d.invite.kassacode)+'</b>';
+        kantoorMsg = '\u2705 '+T('kt.hired','Aangenomen.')+' <b>'+escT(d.invite.naam)+'</b> '+T('kt.hired.geef','meldt zich zelf aan met bedrijfsnaam')+' <b>'+escT(d.bedrijf)+'</b> + '+T('kt.invite.code','Kassacode')+' <b style="color:var(--rtg-leesgoud,var(--gold));font-family:monospace;letter-spacing:0.14em;">'+escT(d.invite.kassacode)+'</b>';
         invData = null;
         await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kreset]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/staff/reset-pin', { staffId: b.dataset.kreset });
-        kantoorMsg = '\ud83d\udd11 '+T('kt.resetdone','Code gereset voor')+' <b>'+escT(d.staff.name)+'</b> \u00b7 '+T('kt.newpin','nieuwe pincode')+': <b style="color:var(--gold);">'+escT(d.pin)+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
+        kantoorMsg = '\ud83d\udd11 '+T('kt.resetdone','Code gereset voor')+' <b>'+escT(d.staff.name)+'</b> \u00b7 '+T('kt.newpin','nieuwe pincode')+': <b style="color:var(--rtg-leesgoud,var(--gold));">'+escT(d.pin)+'</b> ('+T('kt.pinonce','geef eenmalig door')+')';
         await refresh(); } catch(e){ toast(e.message); }
     }));
     el.querySelectorAll('[data-kinv]').forEach(b => b.addEventListener('click', async () => {

@@ -54,6 +54,7 @@ const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 const jsonUit = process.argv.includes('--json');
 const METER = 'onbewaakt';
+const RICHTING = 'omlaag';           // een plafond: meer onbewaakts is slechter
 
 function loop(map, filter, uit = []) {
   let namen = [];
@@ -169,7 +170,7 @@ function tabel() {
       dingen: () => {
         try {
           const { execFileSync } = require('child_process');
-          const uit = execFileSync(process.execPath, ['--experimental-sqlite', path.join(__dirname, 'routekaart.js'), '--json'],
+          const uit = execFileSync(process.execPath, [path.join(__dirname, 'routekaart.js'), '--json'],
             { cwd: WORTEL, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024 });
           return (JSON.parse(uit).routes || []).map(r => r.pad).filter(p => p && p.startsWith('/api/'));
         } catch (e) { return null; }   // null = niet te meten, en dat is geen nul

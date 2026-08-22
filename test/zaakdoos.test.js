@@ -5,14 +5,14 @@
       en werkt door (overschot melden op het keukenscherm), het journaal telt.
    3. De cloud komt terug op dezelfde poort: de doos speelt het journaal na en
       de actie staat daarna echt in de cloud.
-   Draai los: node --experimental-sqlite --test test/zaakdoos.test.js */
+   Draai los: node --test test/zaakdoos.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, vrijePoort, stop } = require('./helper');
+const { startServer, vrijePoort, stop, stopHard } = require('./helper');
 
 /* ELKE FETCH MET EEN DEADLINE -- EEN TWEEDE SLOT, EN NIET DE OORZAAK.
 
@@ -76,7 +76,7 @@ function stopCloud(kind) {
 }
 function startCloud() {
   stopCloud(cloudChild);
-  cloudChild = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+  cloudChild = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
     env: { ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
@@ -253,8 +253,11 @@ test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', asy
   // pinger tikt elke 10s, dus op een snelle runner kan het dagrapport (verderop)
   // anders pings=0 zien omdat de eerste tik nog niet gelopen had.
   await wachtOp('/api/doos/rapport', doos.base, d => d.pings >= 1);
-  cloudChild.kill('SIGKILL');
-  await new Promise(r => setTimeout(r, 300));
+  /* SIGKILL EN WACHTEN TOT HIJ WEG IS. De cloud gaat met opzet hard neer -- dat
+     is het onderwerp -- maar of hij al weg is, is een toestand en geen duur. Met
+     300 ms ernaast kon de doos hem nog even zien leven en dus nog niet
+     terugvallen op lokaal. */
+  await stopHard(cloudChild);
   // het eerstvolgende verzoek merkt het en valt door naar lokaal: inloggen
   // lukt gewoon, op de kloon-data van de doos zelf
   let login;
@@ -318,7 +321,7 @@ test('cloud-failover: valt de primaire cloud weg, dan pakt de doos de replica', 
   const dirBox = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-doos-fo-'));
   const portA = await vrijePoort();
   const portB = await vrijePoort();
-  const spawnCloud = (port, dir) => spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+  const spawnCloud = (port, dir) => spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
     env: { ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', PORT: String(port), RTG_DATA_DIR: dir, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-2' },
     stdio: ['ignore', 'ignore', 'inherit']
   });

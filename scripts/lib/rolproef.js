@@ -155,7 +155,11 @@ function weegAntwoord(status, lijf) {
    draaien: `--max=2000` las als "2000 per rol" en leverde 2000 pogingen in
    totaal, dus 1000 routes van de 2937. Een naam die het verkeerde belooft is een
    belofte in tekst (LAT.md, regel 6). */
-async function draaiRolproef({ post, routes, tokensVoor, maxPogingen }) {
+async function draaiRolproef({ post, routes, tokensVoor, maxPogingen, lijfVoor }) {
+  /* lijfVoor is optioneel: de aanroeper kan lijven verrijken (objectpool),
+     zodat ook routes die een BESTAAND object willen de rolvraag echt krijgen.
+     Zonder blijft het kale plausibele lijf het gedrag. */
+  const lijfVan = lijfVoor || ((r) => plausibelLijf(r.pad));
   const bevindingen = { tweexx: [], lekken: [], gewijzigd: [] };
   /* Per route wat er met hem is gebeurd -- de bewijsmatrix vult hier ACL en
      PRIVACY mee. Een route die NIET is geprobeerd staat er niet in, en dat is
@@ -200,7 +204,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen }) {
   const voor = await vingerafdruk(post, vastVoor());
   let gedaan = 0;
   for (const r of routes) {
-    if (r.method === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
+    if (r.methode === 'GET') continue;                 // schrijfroutes: dit gaat over mutaties
     if (r.rol === 'open' || !r.rol) continue;         // publiek: geen rol om te kruisen
     if (r.schakel) continue;                          // de schakelkast zou de hele proef vergiftigen
     for (const rol of rollen) {
@@ -208,7 +212,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen }) {
       if (maxPogingen && gedaan >= maxPogingen) break;
       const tk = vastVoor()[rol];
       if (!tk) continue;
-      const st = await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
+      const st = await post(r.pad, lijfVan(r), Array.isArray(tk) ? tk[0] : tk);
       gedaan++;
       const s = st.status;
       /* Het LIJF van de weigering. Hier hoort een foutmelding te staan en verder
@@ -221,8 +225,8 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPogingen }) {
          tweede uitvoer naast zet -- en dat is precies wat de bewijsmatrix wil --
          bouwt dan onvermijdelijk een tweede waarheid die er langzaam naast gaat
          lopen. Dezelfde les als bij de poortwacht. */
-      const sleutel = r.method + ' ' + r.pad;
-      const bij = perRoute[sleutel] || (perRoute[sleutel] = { methode: r.method, pad: r.pad, rol: r.rol, geprobeerd: [], acl: 'dicht', privacy: 'schoon' });
+      const sleutel = r.methode + ' ' + r.pad;
+      const bij = perRoute[sleutel] || (perRoute[sleutel] = { methode: r.methode, pad: r.pad, rol: r.rol, geprobeerd: [], acl: 'dicht', privacy: 'schoon' });
       bij.geprobeerd.push(rol);
       if (oordeel.tweexx) {
         bij.acl = 'OPEN';

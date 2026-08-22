@@ -4,7 +4,7 @@
    de persoon (staffId) en geldt in elke werk-app. Zonder AI-sleutel vangt
    het werkvloer-woordenboek (NL/EN naar ES) het op; met sleutel vertaalt
    Claude elke actieve wereldtaal volledig. Draai los:
-   node --experimental-sqlite --test test/moedertaal.test.js */
+   node --test test/moedertaal.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

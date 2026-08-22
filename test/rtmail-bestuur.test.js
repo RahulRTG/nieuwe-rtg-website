@@ -13,7 +13,7 @@
    5. Een juridische bewaring wint altijd van de bewaartermijn.
    6. Wat vernietigd is, laat het FEIT achter: aantal, tijdvak, wie en waarom --
       en de inhoud niet, want dat zou de vernietiging ongedaan maken.
-   Draai: node --experimental-sqlite --test test/rtmail-bestuur.test.js */
+   Draai: node --test test/rtmail-bestuur.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -194,8 +194,20 @@ test('een verlopen delegatie geeft een ANDERE fout dan nooit toegang gehad', asy
     { aan: aAdres, rechten: ['metadata', 'lezen'], tot: verleden, reden: 'kort even' }, bTok);
   const nu = await post('/api/member/rtmail/rechten', { postvak: bAdres }, aTok);
   assert.ok(nu.rechten.includes('lezen'), 'nu nog wel');
-  await new Promise(r => setTimeout(r, 1200));
-  const straks = await post('/api/member/rtmail/rechten', { postvak: bAdres }, aTok);
+  /* WACHTEN TOT HET RECHT ECHT WEG IS, en niet 1200 ms gokken. De delegatie
+     loopt tot nu+900 ms, dus 1200 was ruim -- maar "ruim" is geen teken. Het
+     vervallen zelf is af te lezen, en dat is meteen strenger: zo staat er dat
+     het recht WEGGAAT, niet dat het na 1,2 seconde toevallig weg was. */
+  let straks = null;
+  {
+    const eind = Date.now() + 20000;
+    for (;;) {
+      straks = await post('/api/member/rtmail/rechten', { postvak: bAdres }, aTok);
+      if (!straks.rechten.includes('lezen')) break;
+      if (Date.now() >= eind) throw new Error('de delegatie verliep niet binnen 20 s');
+      await new Promise(r => setTimeout(r, 50));
+    }
+  }
   assert.ok(!straks.rechten.includes('lezen'), 'na het venster niet meer');
   const e = await rauw('/api/member/rtmail/export', { postvak: bAdres, reden: 'nog een keer' }, aTok);
   assert.match(e.body.error, /verlopen op/, 'de melding zegt DAT het verlopen is, niet dat u nooit iets mocht');

@@ -17,7 +17,7 @@
         const bord = thuisData.bord;
         html += '<div class="tkc" style="grid-column:1/-1;border-color:var(--gold);"><h3>'+T('th.bord','Het host-dashboard')+'</h3>'+
           '<div class="st-row"><span>'+T('th.live','Huizen live')+'</span><b>'+bord.live+' / '+bord.huizen+'</b></div>'+
-          '<div class="st-row"><span>'+T('th.ink','Inkomsten (afgeronde verblijven)')+'</span><b style="color:var(--gold);">'+eur(bord.inkomstenTotaal)+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.ink','Inkomsten (afgeronde verblijven)')+'</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(bord.inkomstenTotaal)+'</b></div>'+
           '<div class="st-row"><span>'+T('th.bez','Bezetting komende 30 dagen')+'</span><b>'+bord.bezettingPct+'%</b></div>'+
           '<div class="st-row"><span>Superhost</span><b>'+(bord.superhost ? '★ '+T('th.ja','ja') : T('th.nog','nog niet (3 verblijven, gemiddeld 4,8+)'))+'</b></div>'+
           '<div class="tkc-who">'+T('th.uitbet','Uitbetalingen staan gepland naar de zakelijke RTG Rekening; RTG houdt 0% in. Gasten zien uw zaaknaam als host.')+'</div></div>';
@@ -43,14 +43,14 @@
           '<div class="st-row"><span>'+T('th.zomzet','Omzet exclusief btw')+'</span><b>'+eur(zb.omzetExclBtw||0)+'</b></div>'+
           '<div class="st-row"><span>'+T('th.zbtw','Logies-btw af te dragen')+'</span><b>'+eur(zb.btwAfTeDragen||0)+'</b></div>'+
           '<div class="st-row"><span>'+T('th.zcomm','Partnercommissie')+' ('+(zb.commissiePct||0)+'%)</span><b>'+eur(zb.commissie||0)+'</b></div>'+
-          '<div class="st-row"><span>'+T('th.znetto','Netto uitbetaling (gepland)')+'</span><b style="color:var(--gold);">'+eur(zb.nettoUitbetaling||0)+'</b></div>'+
+          '<div class="st-row"><span>'+T('th.znetto','Netto uitbetaling (gepland)')+'</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(zb.nettoUitbetaling||0)+'</b></div>'+
           '<div class="tkc-who">'+escT(zb.uitleg || T('th.zuit','Zet een huis commercieel om er beroepsmatig mee te verhuren: logies-btw uit de landtabel, langverblijf op maandtarief en boeken op factuur.'))+'</div></div>';
         html += '<div class="tkc h-volbreed"><h3>'+T('th.huizen','Ons aanbod op RTG Thuis')+'</h3>'+
           (thuisData.huizen.length ? thuisData.huizen.map(function(h){
             const zk = zVan(h.id);
             return '<div class="st-row"><span><b>'+escT(h.titel)+'</b> · '+escT(h.plaats)+' · '+eur(h.prijs)+'/'+T('th.nacht','nacht')+
               (h.rating.sterren ? ' · ★ '+h.rating.sterren : '')+(h.live ? '' : ' · '+T('th.pauze','gepauzeerd'))+
-              (zk ? ' · <span style="color:var(--gold);">'+T('th.zcom','commercieel')+' · btw '+zk.btwPct+'%'+(zk.zakelijk.maandprijs?' · '+eur(zk.zakelijk.maandprijs)+'/'+T('th.zmaand','maand'):'')+'</span>' : '')+
+              (zk ? ' · <span style="color:var(--rtg-leesgoud,var(--gold));">'+T('th.zcom','commercieel')+' · btw '+zk.btwPct+'%'+(zk.zakelijk.maandprijs?' · '+eur(zk.zakelijk.maandprijs)+'/'+T('th.zmaand','maand'):'')+'</span>' : '')+
               '<span class="sub" data-thadvuit="'+escT(h.id)+'">'+(h.instant?T('th.instant','instant boeken'):T('th.opaanvraag','op aanvraag'))+(h.keyless?' · keyless':'')+'</span></span>'+
               '<span><button class="obtn" data-thzak="'+escT(h.id)+'" data-thzaan="'+(zk?'1':'0')+'">'+(zk?T('th.zuitzet','Terug naar prive'):T('th.zaanzet','Maak commercieel'))+'</button> '+
               '<button class="obtn" data-thadv="'+escT(h.id)+'">'+T('th.advies','AI-prijsadvies')+'</button> <button class="obtn" data-thblok="'+escT(h.id)+'">'+T('th.blok','Blokkeer')+'</button></span></div>';

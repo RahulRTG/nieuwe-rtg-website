@@ -103,7 +103,13 @@ module.exports = Object.assign((ctx) => {
     db.data.suppliers.push({ code, name: a.bedrijf.naam, type: a.bedrijf.type,
       city: a.bedrijf.plaats || '', loc: null, rate: 0, menu: [], photos: [] });
     // de eigenaar krijgt een beheer-inlog met een eigen, eenmalig getoonde PIN
-    const pin = String(Math.floor(1000 + Math.random() * 9000));
+    /* accounts.makePin() en geen Math.random(): dit is de eerste inlog van de
+       eigenaar van een nieuwe zaak, dus een echte credential. Math.random is
+       geen cryptografische bron -- uit een handvol waarnemingen is de staat
+       van de generator af te leiden en daarmee de volgende PIN. Er bestond hier
+       al een huisfunctie voor (crypto.randomInt); deze plek had er stil een
+       tweede naast gezet. */
+    const pin = accounts.makePin();
     let staffId = null;
     try {
       const st = accounts.createStaffSync({ supplierCode: code, name: kap(a.naam, 60) || 'Eigenaar',

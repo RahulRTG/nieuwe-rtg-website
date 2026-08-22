@@ -9,23 +9,16 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
 test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tlscherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -40,7 +33,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
       body: JSON.stringify(body || {}) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -50,7 +43,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
     }, reg.token);
 
     /* 1. leeg is leeg, en zegt dat ook: geen lege lijst zonder uitleg. */
-    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const e = document.getElementById('lijst');
       return e && e.textContent.trim() && !/laden/i.test(e.textContent);
@@ -62,7 +55,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
        zijn herkomst -- zonder dat het hier is ingetikt. */
     await api('doelen/maak', { titel: '10 kilometer hardlopen', reden: 'ik wil het kunnen',
       eenheid: 'km', nulmeting: 2, streef: 10, streefOp: overDagen(60) });
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /10 kilometer/.test(document.getElementById('lijst').textContent),
       { timeout: 15000 });
 
@@ -87,7 +80,7 @@ test('Tijdlijn: alleen wat er echt was, met de laag waar het vandaan komt',
       body: JSON.stringify({ ok: true, vandaag: overDagen(0), maanden: [], aantal: 0, leeg: true,
         uitleg: 'x', storingen: ['De laag Zorg gaf een fout.'] })
     }));
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /De laag Zorg/.test(document.getElementById('storingen').textContent),
       { timeout: 10000 });
     assert.match(await page.textContent('#storingen'), /niet compleet/i,

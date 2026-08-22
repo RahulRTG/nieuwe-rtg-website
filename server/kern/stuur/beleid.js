@@ -11,6 +11,8 @@
    de gebruiker buiten het model bevestigt. Alles wat niet genoemd is blijft
    dicht, ook als de ingelogde gebruiker de onderliggende route zelf wel mag. */
 
+const { staatVan } = require('../../lib/vervalstaat');
+
 const DIRECT = Object.freeze({
   member: [
     /^\/api\/kantoorpakket\/(mijn|open|versies|uitslag)$/,
@@ -81,15 +83,44 @@ function raakt(lijst, pad) {
   return Array.isArray(lijst) && lijst.some(re => re.test(pad));
 }
 
+/* DE BEWIJSPOORT -- proof-aware routing (PROOF.md par. 8).
+
+   De allowlist hierboven zegt wat een mens ooit heeft goedgekeurd. Deze poort
+   zegt wat vandaag nog te vertrouwen is: staat de vervalstaat van een route op
+   GESCHORST (een bewijscel is gezakt -- het bewijs zegt zelf dat het niet
+   klopt), dan biedt het stuur die actie helemaal niet aan.
+
+   Dat is de omkering die deze laag onderscheidt. Niet: de AI probeert iets en
+   de beveiliging houdt hem misschien tegen. Maar: een onbewezen handeling
+   staat niet in de lijst waaruit de AI kiest. De schorspoort
+   (server/middleware/schorspoort.js) blijft eronder staan als vangnet voor het
+   echte verzoek; beide lezen dezelfde ene waarheid (server/lib/vervalstaat.js).
+
+   ALLEEN GESCHORST SLUIT, en dat is een bewuste grens. `verzwakt` draagt op
+   dit moment vrijwel elke route (er is bijna altijd een schakel ongemeten);
+   daarop sluiten zou de hele AI-laag dichtzetten en dat is precies de vorm van
+   "veiligheid" die mensen uitzetten. Geschorst is geen ontbrekend bewijs maar
+   TEGENSPREKEND bewijs, en dat is een ander ding.
+
+   Het stuur roept intern altijd met POST aan (zie server/kern/stuur.js), dus
+   dat is de methode waarop we de staat opzoeken. */
 function beleidVoor(pad, wereld) {
   const w = String(wereld || '');
   if (!Object.prototype.hasOwnProperty.call(DIRECT, w)) {
     return { niveau: 'verboden', reden: 'Het AI-stuur mist een geldige, servergekozen rol.' };
   }
-  if (raakt(DIRECT[w], pad)) return { niveau: 'direct', wereld: w };
-  if (raakt(VOORSTEL[w], pad)) return { niveau: 'voorstel', wereld: w };
-  return { niveau: 'verboden', wereld: w,
-    reden: 'Deze actie staat niet op de expliciete AI-allowlist voor ' + w + '.' };
+  const opDeLijst = raakt(DIRECT[w], pad) ? 'direct' : (raakt(VOORSTEL[w], pad) ? 'voorstel' : null);
+  if (!opDeLijst) {
+    return { niveau: 'verboden', wereld: w,
+      reden: 'Deze actie staat niet op de expliciete AI-allowlist voor ' + w + '.' };
+  }
+  const staat = staatVan('POST', pad);
+  if (staat && staat.staat === 'geschorst') {
+    return { niveau: 'verboden', wereld: w, vervalstaat: 'geschorst',
+      reden: 'Het bewijs achter deze actie is gezakt; hij is geschorst tot een hermeting slaagt. ' +
+        'Het AI-stuur kiest niet uit onbewezen handelingen.' };
+  }
+  return { niveau: opDeLijst, wereld: w, ...(staat ? { vervalstaat: staat.staat } : {}) };
 }
 
 function toegestanePaden(paden, wereld) {

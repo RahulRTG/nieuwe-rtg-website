@@ -38,7 +38,7 @@
     '.hv-chat[hidden]{display:none;}body.hv-ruimte{padding-bottom:3.6rem;}' +
     '.hv-beurt{display:flex;gap:.5rem;align-items:flex-end;max-width:100%;}' +
     '.hv-beurt.ik{flex-direction:row-reverse;}' +
-    '.hv-bel{max-width:76%;padding:.5rem .7rem;border-radius:14px;font-size:.86rem;line-height:1.5;' +
+    '.hv-bel{max-width:76%;padding:.5rem .7rem;border-radius:0;font-size:.86rem;line-height:1.5;' +
     'white-space:pre-wrap;overflow-wrap:anywhere;}' +
     '.hv-beurt.hij .hv-bel{background:#1A1817;color:#e8e6e3;border:1px solid #2f2c29;border-bottom-left-radius:5px;}' +
     /* De bordeaux van het logo, VAST. Niet var(--burgundy): in het leden-OS
@@ -49,7 +49,7 @@
     '.hv-beurt.mens .hv-bel{border-color:#857007;}' +
     /* De signatuurmond als zijn gezicht. Kleiner dan dit wordt hij een vlekje in
        plaats van lippen, en dan is geen gezicht beter dan een slecht gezicht. */
-    '.hv-kop{flex:0 0 auto;width:2.5rem;height:2.5rem;border-radius:999px;background:#0C0C0B;' +
+    '.hv-kop{flex:0 0 auto;width:2.5rem;height:2.5rem;border-radius:0;background:#0C0C0B;' +
     'border:1px solid #857007;display:flex;align-items:center;justify-content:center;overflow:hidden;}' +
     '.hv-kop canvas{width:2.5rem;height:auto;display:block;}' +
     '.hv-wie{font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#8A8680;margin-bottom:.15rem;}' +
@@ -57,7 +57,7 @@
     '.hv-beurt.ik .hv-tijd{color:rgba(255,255,255,.6);}' +
     /* hij is aan het typen: drie puntjes die om de beurt oplichten */
     '.hv-tikt{display:inline-flex;gap:.25rem;padding:.1rem 0;}' +
-    '.hv-tikt i{width:.34rem;height:.34rem;border-radius:999px;background:#8A8680;animation:hvTik 1.1s infinite;}' +
+    '.hv-tikt i{width:.34rem;height:.34rem;border-radius:0;background:#8A8680;animation:hvTik 1.1s infinite;}' +
     '.hv-tikt i:nth-child(2){animation-delay:.16s;}.hv-tikt i:nth-child(3){animation-delay:.32s;}' +
     '@keyframes hvTik{0%,60%,100%{opacity:.25;transform:translateY(0);}30%{opacity:1;transform:translateY(-2px);}}' +
     '@media (prefers-reduced-motion: reduce){.hv-tikt i{animation:none;opacity:.6;}}';
@@ -106,7 +106,11 @@
      standen en de regel "hij praat -> omhoog, jij antwoordt -> omlaag". Is die
      laag er niet (of nog niet geladen), dan doen we het oude, simpele: gewoon
      zichtbaar maken. Hier zelf .hidden zetten zou de standen omzeilen. */
+  var stilLaden = false;
   function inBeeld(van) {
+    /* Tijdens het ophalen van het oude gesprek klapt er niets open of dicht --
+       zie laadGesprek() hieronder voor wat dat anders kostte. */
+    if (stilLaden) return;
     if (kamer.naStand) kamer.naStand(van);
     else vak.hidden = false;
   }
@@ -172,10 +176,16 @@
       .then(function (d) {
         var m = (d && d.messages) || [];
         if (!m.length) return;
-        m.slice(-10).forEach(function (b) { beurt(b.from, b.text, b.at); });
-        /* Het opgehaalde gesprek staat er, maar hoeft niet in beeld te
-           springen: je begint waar je was, niet met een openklappend paneel. */
-        if (root.RTGChatScherm) root.RTGChatScherm.zet('min'); else vak.hidden = true;
+        /* DIT KLAPT NIETS OPEN -- EN NIETS DICHT. Je begint waar je was; dat
+           werd gedaan door het paneel achteraf op `min` te zetten. Die regel
+           sloot dus ook wat er intussen door iets ANDERS was geopend, want dit
+           antwoord komt over het net en landt op een willekeurig moment. Het
+           duurste geval: een betaalbevestiging in een dicht paneel, met de
+           focus al op "Ja, doorzetten". De stand wordt tijdens het inladen nu
+           niet meer aangeraakt -- dat haalt de race weg. */
+        stilLaden = true;
+        try { m.slice(-10).forEach(function (b) { beurt(b.from, b.text, b.at); }); }
+        finally { stilLaden = false; }
       })
       .catch(function () {});
   }

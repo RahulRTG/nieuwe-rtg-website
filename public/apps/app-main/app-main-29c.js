@@ -28,7 +28,7 @@
   function wereldBij() {
     if (!window.RTGCommand || !RTGCommand.werelden) return;
     RTGCommand.werelden(MAPPEN.filter(function (m) {
-      return m.wereld && m.items.some(itemZichtbaar);
+      return m.sleutel !== 'map-instellingen' && m.wereld && m.items.some(itemZichtbaar);
     }).map(function (m) {
       return {
         sleutel: m.sleutel,
@@ -64,6 +64,17 @@
        levert zijn eigen deur, want zijn plek is de mond in de schilbalk. Hier
        riep hij RTGRahul.open() aan -- de zwevende handenvrij-balk -- en dat zou
        een tweede Rahul zijn naast die in de balk. */
-    RTGCommand.systeem(knop ? [{ naam: T('os.cc', 'Bedieningspaneel'), teken: 'instel',
+    /* DIT HEET INSTELLINGEN EN NIET MEER BEDIENINGSPANEEL, en dat is geen
+       cosmetiek maar het opruimen van een botsing. In de voet van de bank
+       stonden twee knoppen: "Bedieningspaneel" (dit paneel: thema, taal, push,
+       Zegel, uitloggen en sinds WERELDEN.md ook wie je bent, RTG Veilig,
+       Passkeys en Juridisch) en "Instellingen" -- dat laatste is blad 3 van de
+       console en gaat over de ACTIEVE PAGINA. Twee keer hetzelfde woord voor
+       twee verschillende dingen, naast elkaar.
+
+       Het paneel is wat een lid instellingen noemt, dus krijgt het die naam.
+       De ander heet nu Pagina-instellingen, precies zoals zijn eigen blad zich
+       al noemde (shared/command/werktafel.js). */
+    RTGCommand.systeem(knop ? [{ naam: T('os.instellingen', 'Instellingen'), teken: 'instel',
       doe: function () { knop.click(); } }] : []);
   }

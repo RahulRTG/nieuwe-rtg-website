@@ -100,6 +100,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
       text: tekst, lang: (invoer && invoer.lang) || 'nl', at: nu(),
       baseLikes: 0, likedBy: {}, comments: [],
       reactiesVan: ['iedereen', 'vrienden', 'niemand'].includes(invoer && invoer.reactiesVan) ? invoer.reactiesVan : 'iedereen',
+      promoMag: (invoer && invoer.promoMag) === true,
       meldingen: []
     };
     db.data.posts.unshift(post);

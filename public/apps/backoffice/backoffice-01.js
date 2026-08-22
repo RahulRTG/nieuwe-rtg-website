@@ -28,8 +28,8 @@
     location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search));
   }
 
-  // Werk-OS-bord: Cmd+K (of de Panelen-knop in de kop) opent een springboard
-  // over het bord; een tik scrolt naar het paneel en licht het even op.
+  // WerkOS-bord: Cmd+K (of de Panelen-knop in de kop) opent het register
+  // over het bord; een keuze scrolt naar het paneel en licht het even op.
   let wosBord = null;
   function startWerkOS(){
     if (wosBord || !window.WerkOS) return;
@@ -39,9 +39,8 @@
       if (!el || apps.some(a => a.el === el)) return;
       const lab = h.querySelector('[data-i18n]');
       const ruw = ((lab ? lab.textContent : h.textContent) || '').trim().replace(/\s+/g, ' ');
-      const emoji = ((h.textContent || '').match(/\p{Extended_Pictographic}/u) || [])[0] || '▦';
       const naam = ruw.replace(/^[^\p{L}]+/u, '').replace(/[▾▸›\s]+$/g, '').split('·')[0].trim().slice(0, 26);
-      if (naam) apps.push({ naam, icoon: emoji, el });
+      if (naam) apps.push({ naam, glyf: 'paneel', el });
     });
     wosBord = WerkOS.bord({ titel: 'RTG Backoffice, alle panelen', apps, knopIn: document.querySelector('header .wrap > span') });
   }
@@ -52,11 +51,14 @@
     $('#liveInd').style.display = 'inline-flex';
     startWerkOS();
     render();
+    loadHandelsRegels();
+    loadFoundationRegistraties();
     laadTimeline();
     loadAanmeldingen();
     loadVerify();
     loadVakbewijzen();
     loadConcierge();
+    laadTafels();
     loadIncidenten();
     loadSalonNaleving();
     loadOntmoetingen();
@@ -81,7 +83,7 @@
     }
   })();
 
-  async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
+  async function refresh(){ try { state = (await call('/office/state')).state; render(); loadHandelsRegels(); loadFoundationRegistraties(); } catch(e){} }
 
   async function loadVerify(){
     let pend = [];
@@ -92,6 +94,12 @@
           '<div class="sub">'+escHtml(v.email||'')+' · '+escHtml(v.tier)+'</div></div>' +
         '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
         '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
+        /* De geboortedatum van het DOCUMENT. Voorgevuld met wat het lid zelf
+           opgaf, zodat de keurder vergelijkt in plaats van overtypt; wijkt hij
+           af, dan wint het document. Zonder dit veld rustte elke leeftijdsclaim
+           in het huis op een zelf ingetypte datum. */
+        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;">'+T('bo.dob','Geb. op document')+
+          '<input type="date" data-geb value="'+escHtml(v.geborenOpgegeven||'')+'" style="font:inherit;font-size:0.72rem;"></label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
         /* Langer bewaren dan de regel: het bewijs verdwijnt zodra de
@@ -106,7 +114,8 @@
         $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(API.token)+'&file='+encodeURIComponent(e.target.dataset.doc);
         $('#docScrim').classList.add('open');
       });
-      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve', row.querySelector('[data-face]').checked));
+      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve',
+        row.querySelector('[data-face]').checked, row.querySelector('[data-geb]').value));
       row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));
       row.querySelector('[data-bewaar]').addEventListener('click', () => bewaarVerzoek(id));
     });
@@ -121,7 +130,8 @@
     try { await call('/office/bewaarverzoek', { userId, reden: reden.trim() }); alert(T('bo.keep.ok','Vastgelegd. Het dossier blijft tot een jaar na het einde van het lidmaatschap; daarna wist de bewaarveger het alsnog.')); }
     catch(e){ alert(e.message); }
   }
-  async function decide(userId, decision, faceMatch){
-    try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch }); } catch(e){ alert(e.message); return; }
+  async function decide(userId, decision, faceMatch, geboortedatum){
+    try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch,
+      geboortedatum: geboortedatum || undefined }); } catch(e){ alert(e.message); return; }
     loadVerify();
   }

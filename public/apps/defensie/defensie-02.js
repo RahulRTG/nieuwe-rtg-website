@@ -6,8 +6,8 @@
     const p = d.paraatheid;
     $('#paraatheid').innerHTML =
       '<div class="kpi"><b style="color:var(--groen);">' + p.gevechtsgereed + '</b><span>gevechtsgereed</span></div>' +
-      '<div class="kpi"><b style="color:var(--gold);">' + p.beperkt + '</b><span>beperkt</span></div>' +
-      '<div class="kpi"><b style="color:var(--gold);">' + p.inOnderhoud + '</b><span>in onderhoud</span></div>' +
+      '<div class="kpi"><b style="color:var(--rtg-leesgoud,var(--gold));">' + p.beperkt + '</b><span>beperkt</span></div>' +
+      '<div class="kpi"><b style="color:var(--rtg-leesgoud,var(--gold));">' + p.inOnderhoud + '</b><span>in onderhoud</span></div>' +
       '<div class="kpi"><b style="color:var(--rood);">' + p.nietInzetbaar + '</b><span>niet inzetbaar</span></div>' +
       '<div class="kpi"><b>' + d.materieelDefect + '</b><span>materieel defect</span></div>';
     $('#eenheden').innerHTML = d.eenheden.length ? d.eenheden.map(e =>

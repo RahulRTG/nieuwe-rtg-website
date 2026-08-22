@@ -22,18 +22,18 @@
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;letter-spacing:0.02em;}
   .kop .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;}
+    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;}
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   .zoek{margin:0.4rem 1.1rem 0.8rem;}
-  .zoek input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+  .zoek input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
   .zoek input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
 
   main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 11rem);}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:0.9rem 0 0.6rem;}
   .stations{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.7rem;}
-  .station{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  .station{position:relative;border:1px solid var(--line);border-radius:0;overflow:hidden;
     aspect-ratio:1;cursor:pointer;background:var(--card);padding:0;text-align:left;color:var(--txt);font:inherit;}
   .station .hoes{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2.4rem;}
   .station .naam{position:absolute;left:0;right:0;bottom:0;padding:0.55rem 0.7rem;
@@ -52,34 +52,34 @@
   .wachtrij li b{color:var(--txt);font-weight:500;}
 
   .rahul{position:fixed;left:1.1rem;right:1.1rem;bottom:calc(env(safe-area-inset-bottom,0px) + 6.4rem);
-    background:rgba(21,19,18,0.9);border:1px solid var(--line);border-radius:12px;z-index:5;
+    background:rgba(21,19,18,0.9);border:1px solid var(--line);border-radius:0;z-index:5;
     padding:0.5rem 0.75rem;font-size:0.78rem;line-height:1.45;display:flex;gap:0.55rem;align-items:flex-start;}
-  .rahul b{color:var(--gold);font-weight:600;}
+  .rahul b{color:var(--rtg-leesgoud,var(--gold));font-weight:600;}
   .rahul .tekst{flex:1;min-width:0;}
   .rahul button{background:none;border:none;color:var(--txt);font-size:1rem;cursor:pointer;}
 
   .speler{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(18,16,15,0.96);
     border-top:1px solid var(--line);padding:0.55rem 1rem calc(env(safe-area-inset-bottom,0px) + 0.7rem);}
-  .speler .balk{height:3px;background:rgba(255,255,255,0.14);border-radius:2px;margin-bottom:0.55rem;overflow:hidden;}
+  .speler .balk{height:3px;background:rgba(255,255,255,0.14);border-radius:0;margin-bottom:0.55rem;overflow:hidden;}
   .speler .balk i{display:block;height:100%;width:0;background:var(--gold);transition:width 0.5s linear;}
   .speler .rij{display:flex;align-items:center;gap:0.7rem;}
   .speler .info{flex:1;min-width:0;}
   .speler .titel{font-size:0.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .speler .sub{font-size:0.7rem;color:var(--soft);}
   .speler button{background:none;border:none;color:var(--txt);font-size:1.35rem;cursor:pointer;min-width:40px;height:40px;}
-  .speler button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px;}
+  .speler button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:0;}
   .speler .afspeel{font-size:1.9rem;}
   canvas.golf{position:fixed;left:0;right:0;width:100%;height:54px;z-index:4;pointer-events:none;
     bottom:calc(env(safe-area-inset-bottom,0px) + 4.6rem);opacity:0.5;}
   .vis-verborgen{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
-  .samen{background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:14px;padding:0.8rem 0.9rem;margin-bottom:1.1rem;}
+  .samen{background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:0;padding:0.8rem 0.9rem;margin-bottom:1.1rem;}
   .samen-kop{display:flex;flex-direction:column;gap:0.15rem;margin-bottom:0.65rem;}
   .samen-kop b{font-size:0.9rem;}
   .samen-uit{font-size:0.7rem;color:var(--soft);line-height:1.45;}
   .samen-start{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;}
   .samen-start form{display:flex;gap:0.4rem;flex:1;min-width:180px;}
-  .samen-start input{flex:1;min-width:0;background:var(--bg,#0C0C0B);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.82rem;padding:0.5rem 0.7rem;letter-spacing:0.12em;}
-  .samen button{background:var(--gold,#857007);color:#0C0C0B;border:none;border-radius:10px;padding:0.55rem 0.9rem;font-weight:700;font-size:0.8rem;cursor:pointer;}
+  .samen-start input{flex:1;min-width:0;background:var(--bg,#0C0C0B);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.82rem;padding:0.5rem 0.7rem;letter-spacing:0.12em;}
+  .samen button{background:var(--gold,#857007);color:#0C0C0B;border:none;border-radius:0;padding:0.55rem 0.9rem;font-weight:700;font-size:0.8rem;cursor:pointer;}
   .samen-start form button{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:600;}
   .samen-in{display:flex;align-items:center;justify-content:space-between;gap:0.7rem;}
   #samenStatus{font-size:0.82rem;color:var(--txt);line-height:1.4;}
@@ -92,7 +92,7 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-rtg-eigenvlak="onyx">
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
   <h1>RTG Sound</h1>
@@ -134,7 +134,7 @@
       <div class="sub" id="spSub">Kies een station om te beginnen</div>
     </div>
     <button id="knopVorige" aria-label="Opnieuw beginnen"></button>
-    <button id="knopSpeel" class="afspeel" aria-label="Afspelen of pauzeren">▶</button>
+    <button id="knopSpeel" class="afspeel" data-hoofdactie aria-label="Afspelen of pauzeren">▶</button>
     <button id="knopVolgende" aria-label="Volgende track"></button>
   </div>
 </footer>

@@ -1,7 +1,7 @@
 /* De zorgketen (laag twee op de hulpdiensten): recepten van de spreekkamer
    naar de apotheek, de eerste hulp met triagekleuren, verwijzingen naar de
    medisch specialist en beauty medical (intake verplicht), en de agenda's.
-   Draai los: node --experimental-sqlite --test test/zorgketen.test.js */
+   Draai los: node --test test/zorgketen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -32,7 +32,7 @@
    photo/remove staat nog open. Een foto terugzetten kan; een kamer terugzetten
    met dezelfde id niet.
 
-   Draai los: node --experimental-sqlite --test test/zaak-inrichting.test.js
+   Draai los: node --test test/zaak-inrichting.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

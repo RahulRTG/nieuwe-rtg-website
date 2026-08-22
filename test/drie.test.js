@@ -1,7 +1,7 @@
 /* Drie (public/shared/drie.js): de pure kern van de 3D-laag -- mat4/vec3 en de
    meshbouwers -- draait ook in Node en is hier los getoetst (geen canvas nodig).
    De WebGL-renderer zelf leeft alleen in de browser en valt daar stil terug.
-   Draai los: node --experimental-sqlite --test test/drie.test.js */
+   Draai los: node --test test/drie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const Drie = require('../public/shared/drie');

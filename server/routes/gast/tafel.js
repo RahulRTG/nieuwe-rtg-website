@@ -31,9 +31,18 @@ module.exports = (kern) => {
     return false;
   };
 
-  /* De kaart van een zaak, in de vorm die de gast leest. `alcohol` volgt uit de
-     categorie of een expliciet vlaggetje op het item: de leeftijdsregel in
-     beleid.js hangt eraan, dus raden mag hier niet stil gebeuren. */
+  /* De kaart van een zaak, in de vorm die de gast leest.
+
+     `alcohol` komt van het ITEM en wordt hier niet meer geraden. Hier stond een
+     tweede gok overheen -- een regex op de naam (wijn|bier|gin|...) -- en die
+     kan het besluit van kern/supplierdefaults.js alleen maar de verkeerde kant
+     op overschrijven: "Virgin Colada (0%)" bevat de letters g-i-n, dus het ene
+     item dat zichzelf uitdrukkelijk alcoholvrij noemt werd hier weer drank.
+     supplierdefaults zet m.alcohol op ELKE kaart (bij het opstarten en bij elke
+     nieuwe partner): wat de zaak opgeeft wint, een zelfverklaard alcoholvrij
+     item is vrij, en een onbekend bar-item telt streng als alcohol. Twee
+     plekken die dezelfde vraag beantwoorden lopen uiteen (LAT-regel 4) -- en
+     deze twee waren al uiteengelopen. */
   function kaartVanZaak(zaakcode) {
     const s = findSupplier(zaakcode);
     const menu = (s && Array.isArray(s.menu)) ? s.menu : [];
@@ -45,7 +54,7 @@ module.exports = (kern) => {
       foto: m.foto || m.photo || m.image || null,
       centen: Math.round(Number(m.price) * 100), allergenen: Array.isArray(m.allergens) ? m.allergens : [],
       station: m.station || null,
-      alcohol: !!m.alcohol || /wijn|bier|cava|cocktail|gin|whisk|rum|vodka|borrel/i.test(String(m.name || '')),
+      alcohol: !!m.alcohol,
       uitverkocht: !!uit[m.id], sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
       twin: twins[m.id] && twins[m.id].publicatie ? { versie:twins[m.id].publicatie.versie,
         presentatie:twins[m.id].publicatie.presentatie||null, service:twins[m.id].publicatie.service||null,
@@ -61,7 +70,7 @@ module.exports = (kern) => {
   app.post('/api/gast/tafel', (req, res) => {
     if (geremd(req, res, 'qr')) return;
     const plek = sessie.zaakBijToken((req.body || {}).token);
-    if (!plek) { noteFailedTry(req.gastBucket); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel of kamer die wij kennen.', code: 'qr-onbekend' }); }
+    if (!plek) { noteFailedTry(req.gastBucket, req.ip); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel of kamer die wij kennen.', code: 'qr-onbekend' }); }
     const s = findSupplier(plek.zaakcode);
     /* Bij een KAMER wordt hier al gekeken of er een gastrekening op staat, dus
        voordat iemand een kaart doorbladert. Wie is uitgecheckt hoort dat meteen
@@ -87,7 +96,7 @@ module.exports = (kern) => {
     if (geremd(req, res, 'aanschuif')) return;
     const b = req.body || {};
     const plek = sessie.zaakBijToken(b.token);
-    if (!plek) { noteFailedTry(req.gastBucket); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel die wij kennen.', code: 'qr-onbekend' }); }
+    if (!plek) { noteFailedTry(req.gastBucket, req.ip); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel die wij kennen.', code: 'qr-onbekend' }); }
     const uit = sessie.schuifAan(plek.zaakcode, plek.plek, {
       soort: plek.soort, folioVan,
       naam: b.naam, codenaam: b.codenaam, lid: !!b.lid,

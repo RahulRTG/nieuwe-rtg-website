@@ -62,6 +62,13 @@ jobs:
       - name: De Beproeving (sqlite-schaal)
         run: npm run beproeving 2>&1 | tee beproeving.log
       # Ook als de stap hierboven zakt willen we de cijfers hebben.
+      # DE TIJD VERSTRIJKT ALLEEN HIER. Een schuld met een vervaldatum wordt in
+      # ci.yml pas opgemerkt als iemand pusht; op een stille week gebeurt dat
+      # niet, en dan verloopt hij ongezien. Deze wekelijkse stap is de enige die
+      # de kalender ziet lopen zonder dat er een mens aan te pas komt.
+      - name: Het verval (verlopen schulden en uitzonderingen)
+        if: always()
+        run: node scripts/normverval.js
       - name: De norm (structureel hard, prestatie alleen gemeten)
         if: always()
         run: npm run norm
@@ -96,7 +103,11 @@ jobs:
   dekking:
     name: Waargenomen endpoint-dekking en de samenhang
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # 90 was genoeg voor de suite plus de dekking; de meetronde komt er met
+    # ongeveer vijfendertig minuten bij (zeven instrumenten, elk tegen een eigen
+    # wegwerpserver). Een ronde die halverwege wordt afgekapt levert halve
+    # registers op, en die zien er hetzelfde uit als hele.
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -114,7 +125,14 @@ jobs:
       # Deze poort is wel hard: dekking is machine-onafhankelijk. De vloer staat
       # in NORM.json (dekkingWaargenomenPct, endpointsNooitAangeraakt).
       - name: Waargenomen endpoint-dekking (uit het journaal)
-        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+        run: node scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+      # Deze poort is wel hard: dekking is machine-onafhankelijk. En hij is sinds
+      # de dekkingsronde ook onvoorwaardelijk hard -- hier stond "de vloer staat in
+      # NORM.json (dekkingWaargenomenPct, endpointsNooitAangeraakt)", maar 100% is
+      # geen norm meer die je kunt verlagen: de stap zakt op elke route (methode +
+      # patroon, ook buiten /api/) die de suite niet heeft aangeraakt.
+      - name: Waargenomen routedekking, 100% is de eis (uit het journaal)
+        run: node scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       # De census: welke handhaver bewaakt welke categorie. Hij zakt als een
       # categorie zonder bewaker komt te staan.
       - name: De samenhang (wie bewaakt wat)
@@ -128,7 +146,7 @@ jobs:
       # wettenOnbewezen). Hij zakt wel als een RECEPT nergens meer naar wijst.
       - name: De sabotage (zet elke handhaver echt uit)
         if: always()
-        run: node --experimental-sqlite scripts/sabotage.js
+        run: node scripts/sabotage.js
       - name: Wat we weten, en wat niet
         if: always()
         run: npm run zekerheid || true
@@ -138,6 +156,41 @@ jobs:
         with:
           name: sabotage
           path: SABOTAGE.json
+          retention-days: 30
+      # ---- DE MEETRONDE: de bewijslaag, die tot nu toe NERGENS vanzelf draaide ----
+      #
+      # Poortwacht, de vier proeven, de ketenronde en de bewijsmatrix vulden acht
+      # registers, en geen van die instrumenten stond in een workflow. Ze liepen
+      # dus alleen als iemand eraan dacht -- precies de vorm waarin een ratel
+      # verslapt, en precies wat er gebeurde: POORTWACHT.json liep 196 routes
+      # achter voordat iemand het opmerkte.
+      #
+      # Hij LEGT NIETS VAST. De registers gaan als artefact mee en de ratels
+      # (bewijsmatrix, norm) oordelen; een ronde die zichzelf vastlegt, legt ook
+      # een verslechtering vast. Wie de uitslag wil overnemen, haalt het artefact
+      # op en commit hem met een reden.
+      - name: De meetronde (poortwacht, de vier proeven, de keten, de matrix)
+        if: always()
+        run: npm run meetronde
+      # Welk register hoort nog bij deze commit. Meldt en oordeelt niet: een
+      # register dat achterloopt op een commit die alleen een typefout repareerde
+      # is geen defect. || true dus.
+      - name: De versheid van de registers
+        if: always()
+        run: npm run versheid || true
+      - name: De registers van deze ronde bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: registers
+          path: |
+            POORTWACHT.json
+            ROLPROEF.json
+            INVOERPROEF.json
+            IDEMPROEF.json
+            STAATPROEF.json
+            KETENS.json
+            BEWIJSMATRIX.json
           retention-days: 30
       - name: Het journaal bewaren
         if: always()

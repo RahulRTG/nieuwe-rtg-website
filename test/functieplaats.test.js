@@ -9,7 +9,7 @@
    De schakel loopt via /api/boardroom/zet (alleen de eigenaar, techniek-inlog),
    dezelfde route als de land- en persoon-assen in test/boardroom.test.js.
 
-   Draai los: node --experimental-sqlite --test test/functieplaats.test.js */
+   Draai los: node --test test/functieplaats.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

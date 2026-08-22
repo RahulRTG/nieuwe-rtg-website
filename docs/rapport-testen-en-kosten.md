@@ -209,6 +209,61 @@ mengmodel is Haiku voor het dagelijkse werk en een zwaarder model alleen
 voor de momenten die erom vragen; dan blijft de AI-post bij duizenden
 gesprekken per maand in de tientallen euro's.
 
+#### Dat mengmodel staat er inmiddels ook echt
+
+Van de 31 aanroepplekken draaide alles op Opus. Nu:
+
+- **Haiku 4.5** waar de uitvoer VASTLIGT en machinaal wordt nagekeken: een
+  afspraak omzetten naar JSON (`kern/agenda.js`, met een deterministische
+  parser ervoor), een smart-home-scene (`kern/homekit.js`, waar
+  `schoonStanden()` alles buiten de echte apparaten en velden wegknipt en er
+  een demo-scene achter staat), en een advertentiezin (`kern/markt/toezicht.js`).
+- **Sonnet 5** waar het kort en feitelijk is en een mens het resultaat leest:
+  vertalen (`translate.js`, `translate/batch-model.js`), een tekst herschrijven
+  of voortzetten (`kern/office/delen.js`), de camera-vraag (`kern/kijken.js`),
+  een korte analyse (`kern/rtgonderzoeker.js`), het facturenloket, de
+  boerderij-adviseur, de content-strateeg, en de operator van RTG Command.
+- **Opus blijft** op negentien plekken, en dat is een BESLUIT en geen restje.
+
+Waarom die negentien blijven, want juist daar zit de meeste besparing (korte
+uitvoer, veel aanroepen):
+
+1. **Negen kindgerichte plekken** -- bijles, lesmaker, overhoren, schrijven,
+   projecten, babyboek, buddy, schrift, rtfschool. Wat een kind te horen krijgt
+   is geen kostenpost. LEVEN.md is daar expliciet over: nooit sturen maar
+   openen, en leren is geen wedstrijd.
+2. **Twee plekken met een MERKREGEL die niemand mechanisch afdwingt.**
+   `kern/kletspraat/gesprek.js` draagt "noem nooit een bestaand hotel,
+   restaurant, merk of stad" -- precies wat CLAUDE.md verbiedt -- en de
+   `schrob()` erachter haalt alleen AI-openers weg, niet merknamen.
+   `kern/bibliothecaris.js` praat in de RTF-stand met een kind en moet in de
+   Geloof-stand volstrekt neutraal blijven. Beide regels rusten volledig op het
+   instructievolgen van het model.
+3. **Acht plekken met merkstem, redenering of contract**: de ledenassistent
+   zelf (`kern/ai.js`, `routes/member/assistent.js`, met de tone of voice per
+   pas), de website-ontwerper, de bedrijfsontwerper, de intake met het
+   contract, en de drie controlekamers.
+
+De regel die hieruit volgt: een model mag lichter worden waar de uitvoer
+machinaal wordt nagekeken of waar een fout alleen een matige zin oplevert. Waar
+een regel alleen bestaat doordat het model hem opvolgt -- en zeker waar een kind
+meeleest -- blijft hij staan.
+
+#### En dit gaat alleen over de UITWIJK
+
+De tabel hierboven is een bovengrens en geen verwachting. `npm run live:init`
+schrijft `RTG_AI_UIT=1`: productie start zonder model, in de regelgestuurde
+werkmodus. En zodra er wel AI is, staat de eigen modelserver (`LOCAL_AI_URL`)
+vooraan in de keten -- met vier apart instelbare modellen (tekst, kort, tools,
+beeld), waarbij `max_tokens <= 200` vanzelf het korte model kiest. Externe
+aanbieders komen pas aan de beurt als de lokale laag iets niet kan of uitvalt.
+
+De bedragen hierboven gelden dus voor het deel dat die uitwijk haalt, niet voor
+al het verkeer. Hoe groot dat deel is, staat op `GET /api/techniek/ai/kosten`
+als `aandeelExtern`. Dat getal is belangrijker dan het bedrag: de keten is
+lokaal-eerst, dus het hoort laag te zijn, en loopt het op dan haakt de eigen
+modelserver af -- de rekening merkt dat eerder dan een mens.
+
 ### Samengevat
 
 | Scenario | Infra per maand | AI per maand (indicatie) |

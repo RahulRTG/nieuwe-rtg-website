@@ -24,7 +24,7 @@
    alleen beproefbaar. Eigen bestand, want die omgevingsvariabele wordt bij het
    laden gelezen en zou de vergelijkingen in txindex.test.js uithollen.
 
-   Draai los: node --experimental-sqlite --test test/txkap.test.js
+   Draai los: node --test test/txkap.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -34,7 +34,9 @@ const path = require('path');
 
 const DATA = process.env.RTG_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-txkap-'));
 process.env.TX_BOEKINGEN_CAP = '5';
-const { db, boekingMetRef, boekingenVoegToe } = require('../server/db');
+const { db } = require('../server/db');
+/* Rechtstreeks uit server/db/tx -- zie test/txindex.test.js voor het waarom. */
+const { boekingMetRef, boekingenVoegToe } = require('../server/db/tx');
 
 const BESTAND = path.join(DATA, 'archief', 'boekingen-afgekapt.jsonl');
 const maakB = i => ({ ref: 'RTG-C-' + i, supplierCode: 'PONTO', customerKey: 'user-1',

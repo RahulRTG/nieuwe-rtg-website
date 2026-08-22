@@ -10,7 +10,7 @@
      geen naam op;
    - de deur telt hoeveel mensen er binnen zijn, niet wie, en weigert boven de
      capaciteit -- ook bij herbetreding.
-   Draai: node --experimental-sqlite --test test/horeca-bezorg-club.test.js */
+   Draai: node --test test/horeca-bezorg-club.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

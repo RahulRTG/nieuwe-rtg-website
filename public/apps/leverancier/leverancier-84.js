@@ -49,12 +49,41 @@
   renderAIThread();
   buildPad();
   renderGate();
-  // het Werk-OS: springboard, dock, klok en Cmd+K over het bestaande tabmodel
+  // WerkOS: de echte stand eerst, daarna het werkregister, dock en Cmd+K.
   if (window.WerkOS) WerkOS.koppel({
     thuisTab: 'home', dock: ['orders', 'kassa', 'menu', 'ai', 'team'],
-    // het Meer-grid waaiert uit over het springboard: alle functies als apps
+    // Het Meer-grid vult het register aan met de overige bestaande functies.
     verberg: ['meer'], extra: { houder: '#meerWrap', knop: '.meer-btn' }
   });
+  /* WAT UW ZAAK KAN (kern/geschikt.js). Een uitspraak van de ondernemer, geen
+     keuring door RTG - net als de allergenen bij een gerecht. Wat hier niet
+     staat, wordt nergens als toegezegd gelezen: een lid met die eis krijgt de
+     zaak dan niet voorgesteld. De woordenlijst komt met de state mee, dus er is
+     hier geen tweede kopie. Staat aan het eind van de IIFE en niet bij
+     renderBeheer, want dat deel zit al tegen de bestandsgrens aan. */
+  function kaartGeschikt(){
+    const s = (state && state.supplier) || {};
+    const lijst = s.geschiktLijst || [], aan = s.geschikt || [];
+    if (!lijst.length) return '';
+    return '<div class="card"><div class="tt-h">'+T('gs.h','Wat uw zaak kan')+'</div>'+
+      '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">'+
+      T('gs.sub','Uw eigen opgave; RTG controleert dit niet. Wat u niet aankruist, geldt nergens als toegezegd: leden met die eis krijgen uw zaak dan niet voorgesteld.')+'</div>'+
+      lijst.map(e => '<label style="display:flex;gap:0.5rem;align-items:flex-start;padding:0.55rem 0;min-height:2.75rem;cursor:pointer;">'+
+        '<input type="checkbox" data-geschikt="'+e.id+'"'+(aan.indexOf(e.id) >= 0 ? ' checked' : '')+' style="margin-top:0.25rem;">'+
+        '<span><b style="font-size:0.84rem;">'+esc(e.label)+'</b>'+
+        '<span style="display:block;font-size:0.76rem;color:var(--muted);">'+esc(e.uitleg||'')+'</span></span></label>').join('')+
+      '<div class="tt-add"><button id="gsZet">'+T('gs.zet','Opslaan')+'</button></div></div>';
+  }
+  function koppelGeschikt(el, klaar){
+    const b = el.querySelector('#gsZet'); if (!b) return;
+    b.addEventListener('click', async () => {
+      const geschikt = Array.prototype.slice.call(el.querySelectorAll('[data-geschikt]'))
+        .filter(c => c.checked).map(c => c.dataset.geschikt);
+      try { await API.call('/supplier/settings', { geschikt }); toast(T('bh.saved','Opgeslagen, leden zien het direct.')); if (klaar) klaar(); }
+      catch(e){ toast(e.message); }
+    });
+  }
+
   restoreSession();
   if ('serviceWorker' in navigator && (location.protocol==='http:'||location.protocol==='https:')) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })();

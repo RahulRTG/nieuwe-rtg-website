@@ -1,6 +1,6 @@
 /* Het Mobility OS: een vervoerskern waar taxi, OV, pendel en charter op
    dezelfde ritten-, voertuig- en betaallaag draaien. Draai los:
-   node --experimental-sqlite --test test/mobiliteit.test.js
+   node --test test/mobiliteit.test.js
 
    Wat deze toetsen bewaken, en waarom juist dat:
 

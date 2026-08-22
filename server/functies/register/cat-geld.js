@@ -64,6 +64,19 @@ module.exports = [
     uitleg: 'Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.',
     paden: ['/api/pay/overzicht', '/api/pay/oplaad', '/api/pay/stuur', '/api/pay/verzoek', '/api/pay/tik', '/api/pay/tikcode', '/api/pay/tiks', '/api/pay/kascode'],
     vermogen: 'WALLET_SALDO' },
+  /* Tegoed staat als EIGEN schakelaar naast de wallet en niet erin. Het is
+     hetzelfde vermogen (gesloten circuit, zelfde plafonds), maar het is de
+     enige geldvorm hier die van eigenaar wisselt terwijl de ontvanger nog niet
+     bekend is. Wie dat wil uitzetten -- een land, een stad, een pas -- moet dat
+     kunnen zonder de wallet zelf te sluiten. */
+  { id: 'dom-pay-tegoed', categorie: 'Geld', naam: 'Tegoed voor een ander', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.',
+    paden: ['/api/pay/tegoed', '/api/pay/tegoed/koop', '/api/pay/tegoed/verzilver', '/api/pay/tegoed/terug'],
+    vermogen: 'WALLET_SALDO' },
+  { id: 'dom-pay-tegoed-zaak', categorie: 'Geld', naam: 'Tegoed vanuit een zaak', standaard: true, doelgroepen: ['leverancier'],
+    uitleg: 'Een zaak zet tegoed klaar voor personeel of klanten, en neemt verlopen tegoed terug.',
+    paden: ['/api/supplier/pay/tegoed', '/api/supplier/pay/tegoed/zet', '/api/supplier/pay/tegoed/terug'],
+    vermogen: 'WALLET_SALDO' },
   /* De partneruitbetaling hoort aan DEZELFDE partnerrail als de bank-SEPA, en
      dat was hij niet: de boardroom kon de sepa-rail uitzetten, waarna de bank
      stopte met overboeken terwijl partners gewoon doorbetaald werden. Een rail

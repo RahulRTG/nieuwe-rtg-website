@@ -18,7 +18,7 @@
   body{overflow:hidden;background:var(--h-nacht);}
   #doek{position:fixed;inset:0;display:block;touch-action:none;cursor:pointer;}
   .bovenrij{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;}
-  .terugknop{background:rgba(20,40,60,.85);border:2px solid var(--h-geel);color:#FFF;border-radius:999px;
+  .terugknop{background:rgba(20,40,60,.85);border:2px solid var(--h-geel);color:#FFF;border-radius:0;
     padding:.55rem 1.1rem;font:inherit;font-size:1rem;font-weight:700;cursor:pointer;}
   .opdracht{flex:1;text-align:center;color:#FFF;font-size:1.2rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5);min-height:1.6rem;}
   .menu{position:fixed;inset:0;z-index:10;background:linear-gradient(180deg,#1C3C58,#14283C);
@@ -28,7 +28,7 @@
   .menu.weg{display:none;}
   .menu h1{font-family:var(--serif);font-weight:500;color:#FFF;font-size:2rem;margin:0 0 .2rem;}
   .menu .sub{color:#BFD4EA;margin-bottom:.8rem;text-align:center;}
-  .spelkaartje{width:min(26rem,92vw);border:0;border-radius:22px;padding:1.1rem 1.3rem;cursor:pointer;
+  .spelkaartje{width:min(26rem,92vw);border:0;border-radius:0;padding:1.1rem 1.3rem;cursor:pointer;
     display:flex;align-items:center;gap:1rem;font:inherit;text-align:left;color:#14283C;}
   .spelkaartje b{font-size:1.3rem;display:block;}
   .spelkaartje span{font-size:.92rem;opacity:.85;}
@@ -38,9 +38,11 @@
   .h3k{background:var(--h-koraal);color:#3A0F08;}
   .h4k{background:var(--h-blauw);color:#0C2440;}
   .h5k{background:var(--h-gras);color:#12300C;}
-  .h6k{background:var(--h-lila);color:#F5F0FF;}
+  /* wit haalt op deze lila maximaal 3,3 -- ook op volle sterkte. Donkere inkt
+     haalt 5,1 en de kaart houdt zijn kleur. */
+  .h6k{background:var(--h-lila);color:#221436;}
   .h7k{background:#EF8FB2;color:#3C1024;}
-  .menu .naarhuis{background:transparent;border:2px solid #BFD4EA;color:#BFD4EA;border-radius:999px;
+  .menu .naarhuis{background:transparent;border:2px solid #BFD4EA;color:#BFD4EA;border-radius:0;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.6rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">

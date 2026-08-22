@@ -2,7 +2,7 @@
    Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind
    terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert
    en nooit beslist.
-   Draai los: node --experimental-sqlite --test test/leerstofvo.test.js */
+   Draai los: node --test test/leerstofvo.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -92,7 +92,15 @@ test('3. het niveau-advies adviseert en beslist nooit', async () => {
   assert.ok(a.body.doelenTotaal > 0);
   assert.ok(a.body.doelenBehaald >= 1, 'het behaalde procenten-doel telt mee');
   assert.ok(a.body.examens.length >= 1, 'de examentraining telt mee');
-  assert.match(a.body.advies, /advies, geen besluit/i);
-  assert.match(a.body.advies, /mensen en de officiele instellingen/i);
+  /* De grens komt sinds 20 augustus 2026 uit kern/schooladvies.js en staat niet
+     meer als losse zin in dit antwoord. Daarom hier de BELOFTE en niet een
+     bepaalde formulering: het is een advies, er staat bij wie beslist, en dat
+     staat ook in het veld dat een scherm als enige zou kunnen tonen. */
+  assert.match(a.body.advies, /advies en geen besluit/i);
+  assert.equal(a.body.besluitDoorMens, true);
+  assert.equal(a.body.adviesSoort, 'niveau');
+  assert.ok(a.body.beslist && a.body.beslist.length > 15, 'er staat niet bij wie beslist');
+  assert.ok(a.body.advies.includes(a.body.beslist),
+    'het veld dat het scherm toont noemt niet wie beslist');
   assert.match(a.body.eerlijk, /geen school of examenbureau/i);
 });

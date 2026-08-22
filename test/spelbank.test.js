@@ -21,7 +21,7 @@
       is, hoort er niet te zijn.
    7. DE KLOK BLIJFT DETERMINISTISCH, ook met rente en aflossing erin.
 
-   Draai los: node --experimental-sqlite --test test/spelbank.test.js */
+   Draai los: node --test test/spelbank.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

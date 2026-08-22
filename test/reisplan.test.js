@@ -1,6 +1,6 @@
 /* De multimodale reisplanner: taxi, OV en lopen naast elkaar, en een geboekte
    reis waarin ze samen EEN reis zijn. Draai los:
-   node --experimental-sqlite --test test/reisplan.test.js
+   node --test test/reisplan.test.js
 
    Wat deze toetsen bewaken:
 

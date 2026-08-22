@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0c0c0b">
-  <meta name="description" content="Vraag met uw RTG Business Pass een gecontroleerde partnerwerkplek aan.">
+  <meta name="description" content="Vraag als RTG-lid een gecontroleerde partnerwerkplek aan.">
   <title>Partner worden · RTG</title>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/fonts/fonts.css">
   <style>
     :root{--bg:#0c0c0b;--card:#171513;--card2:#211e1b;--text:#f4f1ec;--muted:rgba(244,241,236,.65);--line:rgba(255,255,255,.11);--gold:#b59a35;--bad:#df6b7d;--good:#78b78a}
     *{box-sizing:border-box}html{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}body{margin:0;min-height:100vh;background:radial-gradient(900px 600px at 82% -10%,rgba(181,154,53,.14),transparent 60%),var(--bg)}
-    a{color:inherit}.bar{display:flex;align-items:center;gap:1rem;padding:1rem clamp(1rem,4vw,3rem);border-bottom:1px solid var(--line)}.brand{font-family:"Bodoni Moda",serif;font-size:1.2rem}.brand i{color:var(--gold)}.bar a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none}
-    main{width:min(1060px,calc(100% - 2rem));margin:0 auto;padding:clamp(2rem,6vw,5rem) 0 5rem}.eyebrow{color:var(--gold);text-transform:uppercase;letter-spacing:.18em;font-size:.68rem;font-weight:700}h1{font-family:"Bodoni Moda",serif;font-size:clamp(2.2rem,6vw,4.8rem);font-weight:500;line-height:.98;max-width:850px;margin:.7rem 0 1rem}.lead{max-width:690px;color:var(--muted);line-height:1.75;font-size:1rem}
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.45fr);gap:1rem;margin-top:2.2rem}.card{background:linear-gradient(145deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:clamp(1rem,3vw,1.7rem)}h2{font-family:"Bodoni Moda",serif;font-weight:500;margin:0 0 1rem}.grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}.wide{grid-column:1/-1}label{display:grid;gap:.38rem;color:var(--muted);font-size:.75rem}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;background:#100f0e;color:var(--text);padding:.78rem .85rem;font:inherit;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(181,154,53,.12)}
-    .check{display:flex;align-items:flex-start;gap:.65rem;line-height:1.55}/* 24x24: het vakje zelf hoort te raken te zijn, niet alleen de zin ernaast (WCAG 2.5.8) */.check input{width:24px;height:24px;flex:0 0 auto;margin-top:.1rem}.bot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}.actions{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem}button,.button{border:1px solid var(--gold);background:var(--gold);color:#0b0b0a;border-radius:999px;padding:.72rem 1.15rem;font:700 .78rem Inter,sans-serif;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}.button.secondary{background:transparent;color:var(--text);border-color:var(--line)}
-    .msg{display:none;margin-top:1rem;border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;color:var(--muted);font-size:.82rem;line-height:1.55}.msg.on{display:block}.msg.bad{border-color:rgba(223,107,125,.45);color:#f2a0ad}.msg.good{border-color:rgba(120,183,138,.45);color:#a9d5b5}.steps{display:grid;gap:.8rem}.step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;align-items:start}.nr{width:2rem;height:2rem;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--gold);font:700 .72rem Inter}.step b{display:block;font-size:.84rem}.step span{display:block;color:var(--muted);font-size:.76rem;line-height:1.5;margin-top:.18rem}.status{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}.status-list{display:grid;gap:.55rem}.status-row{border:1px solid var(--line);border-radius:11px;padding:.7rem}.status-row b{display:block;font-size:.82rem}.status-row span{color:var(--muted);font-size:.72rem}.pill{display:inline-block;margin-top:.35rem;border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem;color:var(--gold)!important}
+    a{color:inherit}.bar{display:flex;align-items:center;gap:1rem;padding:1rem clamp(1rem,4vw,3rem);border-bottom:1px solid var(--line)}.brand{font-family:"Bodoni Moda",serif;font-size:1.2rem}.brand i{color:var(--rtg-leesgoud,var(--gold))}.bar a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none}
+    main{width:min(1060px,calc(100% - 2rem));margin:0 auto;padding:clamp(2rem,6vw,5rem) 0 5rem}.eyebrow{color:var(--rtg-leesgoud,var(--gold));text-transform:uppercase;letter-spacing:.18em;font-size:.68rem;font-weight:700}h1{font-family:"Bodoni Moda",serif;font-size:clamp(2.2rem,6vw,4.8rem);font-weight:500;line-height:.98;max-width:850px;margin:.7rem 0 1rem}.lead{max-width:690px;color:var(--muted);line-height:1.75;font-size:1rem}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.45fr);gap:1rem;margin-top:2.2rem}.card{background:linear-gradient(145deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:0;padding:clamp(1rem,3vw,1.7rem)}h2{font-family:"Bodoni Moda",serif;font-weight:500;margin:0 0 1rem}.grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}.wide{grid-column:1/-1}label{display:grid;gap:.38rem;color:var(--muted);font-size:.75rem}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:0;background:#100f0e;color:var(--text);padding:.78rem .85rem;font:inherit;outline:none}textarea{min-height:110px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(181,154,53,.12)}
+    .check{display:flex;align-items:flex-start;gap:.65rem;line-height:1.55}/* 24x24: het vakje zelf hoort te raken te zijn, niet alleen de zin ernaast (WCAG 2.5.8) */.check input{width:24px;height:24px;flex:0 0 auto;margin-top:.1rem}.bot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}.actions{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem}button,.button{border:1px solid var(--gold);background:var(--gold);color:#0b0b0a;border-radius:0;padding:.72rem 1.15rem;font:700 .78rem Inter,sans-serif;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}.button.secondary{background:transparent;color:var(--text);border-color:var(--line)}
+    .msg{display:none;margin-top:1rem;border:1px solid var(--line);border-radius:0;padding:.8rem 1rem;color:var(--muted);font-size:.82rem;line-height:1.55}.msg.on{display:block}.msg.bad{border-color:rgba(223,107,125,.45);color:#f2a0ad}.msg.good{border-color:rgba(120,183,138,.45);color:#a9d5b5}.steps{display:grid;gap:.8rem}.step{display:grid;grid-template-columns:2rem 1fr;gap:.7rem;align-items:start}.nr{width:2rem;height:2rem;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--rtg-leesgoud,var(--gold));font:700 .72rem Inter}.step b{display:block;font-size:.84rem}.step span{display:block;color:var(--muted);font-size:.76rem;line-height:1.5;margin-top:.18rem}.status{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line)}.status-list{display:grid;gap:.55rem}.status-row{border:1px solid var(--line);border-radius:0;padding:.7rem}.status-row b{display:block;font-size:.82rem}.status-row span{color:var(--muted);font-size:.72rem}.pill{display:inline-block;margin-top:.35rem;border:1px solid var(--line);border-radius:0;padding:.14rem .5rem;color:var(--rtg-leesgoud,var(--gold))!important}
     @media(max-width:760px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
   </style>
 </head>
@@ -24,7 +24,7 @@
   <main>
     <div class="eyebrow">Een gecontroleerde bedrijfswerkplek</div>
     <h1>Uw bedrijf werkt straks vanuit dezelfde RTG-software.</h1>
-    <p class="lead">Vraag met uw Business Pass een partnerplek aan. Na menselijke beoordeling krijgt uw bedrijf een eigen werkruimte, eerste manager, teamomgeving en ondernemer-poort. De zaak verschijnt pas voor leden nadat de inrichting compleet is.</p>
+    <p class="lead">Vraag als lid een partnerplek aan, met uw RTG-, Lifestyle- of Business Pass. Na menselijke beoordeling krijgt uw bedrijf een eigen werkruimte, eerste manager, teamomgeving en ondernemer-poort. De zaak verschijnt pas voor leden nadat de inrichting compleet is.</p>
     <div class="layout">
       <section class="card" aria-labelledby="formTitel">
         <h2 id="formTitel">Partneraanvraag</h2>
@@ -32,28 +32,50 @@
           <div class="grid">
             <label>Bedrijfsnaam<input name="company" maxlength="80" autocomplete="organization" required></label>
             <label>Type bedrijf<select name="type" required><option value="">Types laden…</option></select></label>
+            <label>Vestigingsland<select name="landCode" required><option value="NL">Nederland</option></select></label>
+            <label><span id="registratieLabel">KVK-nummer</span><input name="registratieNummer" inputmode="numeric" pattern="[0-9]{8}" minlength="8" maxlength="8" autocomplete="off" required></label>
+            <label id="vestigingVeld">KVK-vestigingsnummer<input name="vestigingsnummer" inputmode="numeric" pattern="[0-9]{12}" minlength="12" maxlength="12" autocomplete="off" required></label>
+            <label id="regioVeld" hidden>Staat of territorium<input name="regioOfStaat" maxlength="80" autocomplete="address-level1"></label>
+            <label class="wide" id="registerBronVeld" hidden>Link naar het officiële ondernemingsregister<input name="registerBron" type="url" maxlength="240" placeholder="https://officieel-register.example" autocomplete="url"><small id="registerHint"></small></label>
             <label>Plaats<input name="city" maxlength="60" autocomplete="address-level2" required></label>
             <label>Contactpersoon<input name="contactName" maxlength="60" autocomplete="name" required></label>
             <label>E-mailadres<input name="email" type="email" maxlength="80" autocomplete="email" required></label>
             <label>Telefoon<input name="phone" maxlength="30" autocomplete="tel"></label>
+            <label class="wide">Officiële bedrijfswebsite (optioneel)<input name="website" type="url" maxlength="240" placeholder="https://uwbedrijf.nl" autocomplete="url"></label>
+            <div class="wide"><span style="display:block;color:var(--muted);font-size:.75rem;margin-bottom:.4rem">Extra activiteiten</span><div class="checks">
+              <label class="check"><input name="voedsel" type="checkbox"><span>Voedsel of dranken</span></label>
+              <label class="check"><input name="alcohol" type="checkbox"><span>Alcohol schenken</span></label>
+              <label class="check"><input name="pakketreis" type="checkbox"><span>Pakketreizen verkopen</span></label>
+            </div></div>
+            <div class="wide"><span style="display:block;color:var(--muted);font-size:.75rem;margin-bottom:.4rem">Wereldwijde handel</span><div class="checks">
+              <label class="check"><input name="internationaleHandel" type="checkbox"><span>Internationaal inkopen of verkopen</span></label>
+              <label class="check"><input name="goederen" type="checkbox"><span>Goederen over landsgrenzen</span></label>
+              <label class="check"><input name="euBtw" type="checkbox"><span>Zakelijke EU-handel (btw/VIES)</span></label>
+              <label class="check"><input name="douane" type="checkbox"><span>EU-invoer, uitvoer of doorvoer</span></label>
+              <label class="check"><input name="gecontroleerdeGoederen" type="checkbox"><span>Dual-use of gecontroleerde goederen</span></label>
+              <label class="check"><input name="vsBetrokken" type="checkbox"><span>VS-partij, dollarbetaling of VS-goederen</span></label>
+            </div></div>
+            <div class="bewijs wide" id="bewijsVelden" aria-live="polite"></div>
             <label class="wide">Vertel kort waarom uw bedrijf bij RTG past<textarea name="note" maxlength="500"></textarea></label>
-            <label class="bot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
-            <label class="check wide"><input name="akkoord" type="checkbox" required><span>Ik ben bevoegd deze aanvraag te doen en ga akkoord met de partnervoorwaarden en verwerkersafspraken. Ik begrijp dat RTG de aanvraag persoonlijk beoordeelt.</span></label>
+            <label class="bot" aria-hidden="true">Extra website<input name="websiteExtra" tabindex="-1" autocomplete="off"></label>
+            <label class="check wide"><input name="bevoegd" type="checkbox" required><span>Ik ben bevoegd dit bedrijf te vertegenwoordigen.</span></label>
+            <label class="check wide"><input name="waarheidsgetrouw" type="checkbox" required><span>De registratie-, vestigings-, handels- en vergunninggegevens zijn volledig, juist en geldig. Ik meld wijzigingen direct.</span></label>
+            <label class="check wide"><input name="akkoord" type="checkbox" required><span>Ik ga akkoord met de partnervoorwaarden en verwerkersafspraken en begrijp dat RTG de officiële bronnen en fraudesignalen controleert.</span></label>
           </div>
-          <div class="actions"><button id="verstuur" type="submit">Aanvraag versturen</button><a class="button secondary" href="/apps/app.html?pas=business">Open Business Pass</a></div>
+          <div class="actions" data-hoofdactie><button id="verstuur" type="submit">Aanvraag versturen</button><a class="button secondary" href="/apps/app.html">Open uw pas</a></div>
           <div class="msg" id="melding" role="status" aria-live="polite"></div>
         </form>
       </section>
       <aside class="card">
         <h2>Zo werkt het</h2>
         <div class="steps">
-          <div class="step"><div class="nr">1</div><div><b>Business Pass</b><span>Uw actieve persoonlijke Business Pass bewijst wie de aanvraag doet.</span></div></div>
+          <div class="step"><div class="nr">1</div><div><b>Uw pas</b><span>Uw actieve persoonlijke pas bewijst wie de aanvraag doet. Welke pas dat is maakt niet uit; een pas hebben wel.</span></div></div>
           <div class="step"><div class="nr">2</div><div><b>Menselijke beoordeling</b><span>RTG controleert het bedrijf, de contactpersoon en de samenwerking.</span></div></div>
           <div class="step"><div class="nr">3</div><div><b>Persoonlijke manager</b><span>Na goedkeuring wordt uw account automatisch aan de eerste managerrol gekoppeld.</span></div></div>
           <div class="step"><div class="nr">4</div><div><b>Veilig online</b><span>Vul de Salon-pagina en rond de kassa- en werkintro af voordat de zaak zichtbaar wordt.</span></div></div>
           <div class="step"><div class="nr">5</div><div><b>Speelbaar in Magnaat</b><span>Bouw daarna in de Partnerstudio een digitale tweeling. RTG publiceert alleen een bewezen trainingsversie, zonder echt geld of klantdata.</span></div></div>
         </div>
-        <div class="status"><div class="eyebrow">Mijn aanvragen</div><div class="status-list" id="statusLijst"><p class="lead" style="font-size:.76rem">Log in met uw Business Pass om statussen te zien.</p></div></div>
+        <div class="status"><div class="eyebrow">Mijn aanvragen</div><div class="status-list" id="statusLijst"><p class="lead" style="font-size:.76rem">Log in met uw pas om statussen te zien.</p></div></div>
       </aside>
     </div>
   </main>
@@ -85,7 +107,7 @@
     };
     form.addEventListener('submit', async event => {
       event.preventDefault();
-      if (!token) { toon('Open eerst de Business Pass en log in. Kom daarna terug naar dit formulier.', 'bad'); return; }
+      if (!token) { toon('Open eerst uw pas en log in. Kom daarna terug naar dit formulier.', 'bad'); return; }
       if (!form.reportValidity()) return;
       knop.disabled = true;
       const data = Object.fromEntries(new FormData(form).entries());

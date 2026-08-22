@@ -15,7 +15,7 @@
    - een strook zonder valuta uitgeven (of erger: met een stille aanname);
    - een SEPA-betaalbestand maken voor een run die niet in euro's staat.
 
-   Draai los: node --experimental-sqlite --test test/payroll-valuta.test.js */
+   Draai los: node --test test/payroll-valuta.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

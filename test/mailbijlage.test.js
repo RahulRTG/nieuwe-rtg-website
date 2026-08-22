@@ -16,7 +16,7 @@
    De EICAR-testreeks is de industriestandaard om een scanner te beproeven: hij
    is niet schadelijk maar wordt door elke scanner herkend. Zo hoeft deze toets
    geen echte malware te dragen.
-   Draai: node --experimental-sqlite --test test/mailbijlage.test.js */
+   Draai: node --test test/mailbijlage.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

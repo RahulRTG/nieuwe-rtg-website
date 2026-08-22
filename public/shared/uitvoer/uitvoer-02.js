@@ -6,12 +6,16 @@
      klasse moet, omdat "header button{border:0}" al in de <head> staat en
      van een enkele klasse wint. */
   var LIJN = '1px solid var(--line,var(--lijn,#2A2724))';
-  var ZACHT = 'var(--muted,var(--zacht,#8A8680))';
+  /* --rtg-muted VOOR --muted: die eerste volgt het thema, de tweede is een
+     vaste grijstoon. Op een goudgetinte grond haalde #8A8680 4,07:1 waar 4,5
+     moet (0,72rem halfvet is geen grote tekst). Zelfde reparatie als in de
+     gedeelde tabbalk; zie A11Y-INGELOGD.json. */
+  var ZACHT = 'var(--rtg-muted,var(--muted,var(--zacht,#8A8680)))';
   var css = '.rtguitvoer-knop.rtguitvoer-knop,.rtguitvoer-rij button{background:none;cursor:pointer;' +
       'min-height:44px;padding:.5rem .9rem;white-space:nowrap;border:' + LIJN + ';color:' + ZACHT + ';' +
       'font:600 .72rem Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}' +
     '.rtguitvoer-knop.rtguitvoer-knop{margin-left:.5rem;align-self:center;}' +
-    '.rtguitvoer-knop:hover{color:var(--txt,#F7F5F1);}' +
+    '.rtguitvoer-knop:hover{color:var(--rtg-txt,var(--txt,#F7F5F1));}' +
     '.rtguitvoer-laag{position:fixed;inset:0;z-index:9991;display:flex;align-items:flex-end;' +
       'justify-content:center;background:rgba(0,0,0,.6);}' +
     '.rtguitvoer-laag[hidden]{display:none;}' +

@@ -1,3 +1,16 @@
+### DE LIVE-SONDE, MET TRIAGE.
+#
+# Elke vijf minuten de kritieke reizen van buitenaf lopen (DNS, TLS, rand en
+# app zitten dan allemaal in de meting -- zie scripts/sonde.js). Nieuw sinds
+# de triage: een rode sonde eindigt niet meer als kale exitcode 1, maar als
+# duiding -- WELKE laag is stuk (dns/tls/rand/app/deels) en of terugrollen
+# zou helpen. Die duiding gaat mee in de samenvatting en het artefact, en
+# herstel.yml maakt er een fix-issue van.
+#
+# De triage ADVISEERT alleen. `npm run deploy:terug` blijft een knop voor een
+# mens: een cron die op eigen gezag productie terugzet is een groter risico
+# dan de storing waar hij op reageert.
+
 name: Publieke live-sonde
 
 on:
@@ -17,8 +30,27 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: "22"
+          node-version-file: '.nvmrc'
       - name: Meet DNS, TLS, rand en kritieke gebruikersreizen van buitenaf
-        run: node scripts/sonde.js "$RTG_LIVE_URL"
+        id: meet
+        run: node scripts/sonde.js "$RTG_LIVE_URL" --json=sonde.json
         env:
           RTG_LIVE_URL: ${{ vars.RTG_LIVE_URL }}
+      # Alleen bij rood: de kale uitslag omzetten in een duiding. De triage
+      # zakt zelf ook (exitcode 1 bij een incident, 2 bij niets gemeten),
+      # zodat de workflow rood blijft en herstel.yml aanslaat.
+      - name: Triage -- welke laag is stuk, en helpt terugrollen?
+        if: failure() && steps.meet.outcome == 'failure'
+        run: |
+          node scripts/triage.js --uit=sonde.json 2>&1 | tee triage.log || STATUS=$?
+          { echo '## Triage van de live-sonde'; echo '```'; cat triage.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit ${STATUS:-0}
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: sonde
+          path: |
+            sonde.json
+            TRIAGE.json
+          retention-days: 30
+          if-no-files-found: ignore

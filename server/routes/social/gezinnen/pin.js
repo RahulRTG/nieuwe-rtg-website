@@ -14,29 +14,14 @@
 
    Gemount vanuit routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, rtfSociaal } = sctx;
+  const { kern, gezinsPoort, nietBeschermd, linkBon } = sctx;
   const { app, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
           liveMaak, liveKijk, liveVerbind } = kern;
 
-/* TWEE POORTEN ALS ECHTE MIDDLEWARE en niet als aanroep binnenin, zodat bij
-   elke route zichtbaar staat welke deuren hij heeft -- voor een lezer en voor
-   scripts/check.js regel 28, die een poort in een wrapper niet ziet. Zelfde
-   patroon en dezelfde reden als gezinsPoort in routes/tiener.js.
-
-   Ze staan los omdat het twee verschillende vragen zijn: hoor je bij dit gezin,
-   en ben je oud genoeg om zelf contacten te leggen. */
-function gezinsPoort(req, res, next) {
-  const sess = rtfSociaal(req, res);        // antwoordt zelf met 403 als er niets klopt
-  if (!sess) return;
-  req.gezinslid = sess;
-  next();
-}
-// het kind hoort te lezen waarom dit dicht staat, en met dezelfde woorden als
-// bij zoeken en verbinden (./vrienden.js)
-function nietBeschermd(req, res, next) {
-  if (req.gezinslid.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
-  next();
-}
+/* De twee poorten staan sinds RTG Link in ../gezinnen.js en komen hier mee: het
+   zijn twee besluiten (hoor je bij dit gezin, en ben je oud genoeg om zelf
+   contacten te leggen) en die horen op een plek te staan, niet in elk
+   deelbestand opnieuw. Ze blijven echte middleware, om de reden die daar staat. */
 
 app.post('/api/rtf/social/pin', gezinsPoort, nietBeschermd, (req, res) => {
   const s = req.gezinslid;
@@ -64,6 +49,10 @@ app.post('/api/rtf/social/pin/connect', gezinsPoort, nietBeschermd, async (req, 
   const s = req.gezinslid;
   const r = await pinVerbind(s.handle, req.body.pin);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  /* De bon, net als aan de ledenkant. Hij ontbrak hier, en dat was geen besluit
+     maar een vergeten helft: "mijn koppelingen" vertelde een gezinslid niets over
+     wat hij zelf had gedaan. De schrijver staat in ../../social.js. */
+  linkBon(s.handle, 'vast', r.key);
   res.json({ ok: true, status: r.st, key: r.key, codename: r.codename });
 });
 
@@ -92,6 +81,10 @@ app.post('/api/rtf/social/pin/live/verbind', gezinsPoort, nietBeschermd, async (
   const s = req.gezinslid;
   const r = await liveVerbind(s.handle, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
+  /* Zonder `naar`, en om dezelfde reden als aan de ledenkant: de levende weg
+     geeft met opzet geen sleutel terug. De bon zegt DAT er via een levende code
+     een verzoek uitging, en wanneer; wie het was staat in de verbinding zelf. */
+  linkBon(s.handle, 'levend', null);
   res.json({ ok: true, status: r.st, codename: r.codename });
 });
 };

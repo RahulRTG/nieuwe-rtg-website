@@ -6,7 +6,7 @@
    leggen het contract vast: een klas kan een fase van de ladder dragen, de
    trap volgt daaruit, een fase buiten de ladder wordt geweigerd, en de
    bibliotheek van een klas MET niveau bevat alleen het eigen deel.
-   Draai los: node --experimental-sqlite --test test/schoolniveau.test.js */
+   Draai los: node --test test/schoolniveau.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

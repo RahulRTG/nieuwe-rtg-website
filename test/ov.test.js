@@ -1,7 +1,7 @@
 /* RTG OV: al het vervoer in een app. Lijnen met haltes, live voertuigen via
    de PDA, twee snelle check-ins (oplichtende code of GPS-een-tik) en
    uitchecken met eerlijke km-prijs via RTG Pay. Draai los:
-   node --experimental-sqlite --test test/ov.test.js */
+   node --test test/ov.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

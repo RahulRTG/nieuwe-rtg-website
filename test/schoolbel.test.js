@@ -2,7 +2,7 @@
    belsignalen. Ouders bellen de leraar of een boom-tak-gezin; kinderen
    bewust niet (geen privekanaal leraar-kind). Geen telefoonnummers nodig:
    alles blijft binnen de app.
-   Draai los: node --experimental-sqlite --test test/schoolbel.test.js */
+   Draai los: node --test test/schoolbel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -65,12 +65,32 @@ async function leesTot(lezer, patroon, ms) {
   return tekst;
 }
 
+/* WACHTEN TOT HET KANAAL OPEN IS, en niet 200 ms gokken.
+
+   Een SSE-verbinding is pas bruikbaar als de SERVER de luisteraar in zijn lijst
+   heeft staan. Belt de toets eerder, dan gaat het signaal naar niemand en meldt
+   `bezorgd: 0` -- een rode uitslag over iets dat niet stuk is. Hier stond
+   daarvoor `setTimeout(200)`.
+
+   Het teken staat in de handler zelf (server/school/bellen.js): hij schrijft
+   `retry: 3000` en zet de client daarna in dezelfde tik in de set. Komt die
+   eerste brok bij ons binnen, dan is die regel dus gepasseerd en staan we
+   geregistreerd. Een brok LEZEN is daarmee precies de voorwaarde. */
+async function kanaalOpen(lezer, ms) {
+  const stuk = await Promise.race([
+    lezer.read(),
+    new Promise((_, weiger) => setTimeout(() => weiger(new Error(
+      'het belkanaal stuurde binnen ' + (ms || 10000) + 'ms geen enkele brok; de server heeft ons niet als luisteraar')), ms || 10000))
+  ]);
+  return Buffer.from(stuk.value || []).toString();
+}
+
 test('1. de ouder belt de leraar binnen de app: het signaal komt aan op het klas-belkanaal', async () => {
   const { klas, g } = await opzet('Bel');
   const kanaal = await fetch(BASE + '/api/foundation/school/belkanaal?klasCode=' + klas.code + '&leraarToken=' + encodeURIComponent(klas.leraarToken));
   assert.equal(kanaal.status, 200);
   const lezer = kanaal.body.getReader();
-  await new Promise(r => setTimeout(r, 200));
+  await kanaalOpen(lezer);
   const r = await json(await api('/school/bel', { code: g.code, token: g.token, klasCode: klas.code, naar: 'leraar', kind: 'ring' }));
   assert.equal(r.bezorgd, 1, 'binnen de app bezorgd, geen telefoonnummer nodig');
   const tekst = await leesTot(lezer, /"kind":"ring"/, 3000);
@@ -102,7 +122,7 @@ test('3. de telefoonboom belt in de app: gezin naar gezin, en de takken kennen h
   const kanaal = await fetch(BASE + '/api/foundation/school/belkanaal?klasCode=' + klas.code + '&code=' + g2.g.code + '&token=' + encodeURIComponent(g2.g.token));
   assert.equal(kanaal.status, 200);
   const lezer = kanaal.body.getReader();
-  await new Promise(r => setTimeout(r, 200));
+  await kanaalOpen(lezer);
   const r = await json(await api('/school/bel', { code: g.code, token: g.token, klasCode: klas.code, naar: g2.g.code, kind: 'ring' }));
   assert.equal(r.bezorgd, 1);
   await leesTot(lezer, /"kind":"ring"/, 3000);

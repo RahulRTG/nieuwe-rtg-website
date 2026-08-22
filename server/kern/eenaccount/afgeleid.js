@@ -39,14 +39,16 @@
    deze twee horen inhoudelijk bij elkaar. */
 'use strict';
 
+const { idVanKey } = require('../../lib/lidsleutel');
+
 const eigenaar = require('../../eigenaar');
 
 module.exports = ({ db, accounts }) => {
   function eigenaarKantoor(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
+    const id = idVanKey(key);
+    if (id == null) return null;
     let user = null;
-    try { user = accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    try { user = accounts.getUserById(id); } catch (e) { return null; }
     if (!user || !eigenaar.isEigenaar(accounts, user)) return null;
     return { rol: 'kantoor', code: null, staffId: null, naam: 'RTG-Backoffice',
       zaakNaam: null, at: null, viaEigenaar: true };

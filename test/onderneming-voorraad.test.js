@@ -17,7 +17,7 @@
    5. GEEN DEKKING IN DAGEN. Daarvoor zouden wij verbruik over tijd moeten
       kennen, en dat kennen wij alleen in de keuken en alleen binnen RTG.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-voorraad.test.js */
+   Draai los: node --test test/onderneming-voorraad.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

@@ -116,7 +116,14 @@ test('de bewijsstap houdt een gereguleerd genre tegen tot een mens tekent', () =
   const db = { data: { suppliers: [] } };
   const M = B({ db, save: () => {}, nu: () => '2026-08-11T00:00:00Z',
     kap: (v, n) => String(v == null ? '' : v).trim().slice(0, n),
-    accounts: { createStaffSync: () => ({ id: 1 }) } });
+    /* De nep-accounts gaf alleen createStaffSync terug. Toen provisioneer()
+       ging PINnen met de huisfunctie in plaats van met Math.random(), viel deze
+       toets om op "accounts.makePin is not a function" -- niet omdat het
+       product stuk was, maar omdat de dubbelganger een functie miste die het
+       echte object wel heeft. Daarom komt makePin hier uit de ECHTE module: een
+       dubbelganger die zelf een PIN verzint, bewijst niets over de PIN die de
+       eigenaar krijgt. */
+    accounts: { createStaffSync: () => ({ id: 1 }), makePin: require('../server/accounts/staff').makePin } });
 
   /* De acht bewijs-genres zijn nu aanvraagbaar -- dat is het punt van deze
      ronde. Zou de poort hieronder niet werken, dan is dat openzetten juist de

@@ -20,7 +20,7 @@
       de servicedesk zijn tickets; een jurist komt niet eens bij de klant,
       want die soort bestaat in zijn register niet.
 
-   Draai los: node --experimental-sqlite --test test/werkregister.test.js */
+   Draai los: node --test test/werkregister.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

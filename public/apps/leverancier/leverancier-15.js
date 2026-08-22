@@ -19,7 +19,7 @@
           '<div class="st-row"><span>'+T('fn.omzetmaand','Omzet deze maand')+'<span class="sub">'+T('fn.nulcom','RTG rekent 0% commissie')+'</span></span><b>'+eur(omzetMaand)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.minbtw','Af te dragen btw')+'</span><b style="color:var(--burgundy);">- '+eur(f.btwTotaal || 0)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.minloon','Loonkosten')+'</span><b style="color:var(--burgundy);">- '+eur(loonTot)+'</b></div>'+
-          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.overhoudt','Blijft over (indicatie)')+'</b></span><b style="color:var(--gold);font-size:1.05rem;">'+eur(nettoOver)+'</b></div>'+
+          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.overhoudt','Blijft over (indicatie)')+'</b></span><b style="color:var(--rtg-leesgoud,var(--gold));font-size:1.05rem;">'+eur(nettoOver)+'</b></div>'+
           '<div class="tkc-who">'+T('fn.netto.s','Indicatie vóór inkoop, huur en overige kosten. Uw omzet is volledig van u; RTG houdt niets in.')+'</div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
           '<button class="obtn" id="fnPdf">⤓ '+T('fn.exportpdf','Overzicht (PDF)')+'</button>'+
@@ -33,20 +33,20 @@
         html += '<div class="tkc"><h3>'+T('fn.btw','Btw deze maand')+' ('+f.maand+')</h3>'+
           (f.btw.length ? f.btw.map(r =>
             '<div class="st-row"><span>'+r.label+'<span class="sub">'+T('fn.omzet','omzet')+' '+eur(r.omzet)+' · '+T('fn.grondslag','grondslag')+' '+eur(r.grondslag)+' · '+r.tarief+'%</span></span>'+
-            '<b style="color:var(--gold);">'+eur(r.btw)+'</b></div>').join('')
+            '<b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(r.btw)+'</b></div>').join('')
             : '<div class="tkc-who">'+T('fn.geenomzet','Nog geen omzet deze maand.')+'</div>')+
-          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.afdragen','Af te dragen btw')+'</b></span><b style="color:var(--gold);">'+eur(f.btwTotaal)+'</b></div></div>';
+          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.afdragen','Af te dragen btw')+'</b></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(f.btwTotaal)+'</b></div></div>';
         html += btwKaart(); // de aangifte zelf; zie leverancier-12a.js
         html += '<div class="tkc"><h3>'+T('fn.personeel','Personeelskosten')+' ('+f.maand+')</h3>'+
           '<div class="st-row"><span>'+T('fn.uren','Geklokte uren')+' × € '+f.personeel.uurloon+'<span class="sub">'+f.personeel.uren+' '+T('fn.uur','uur')+'</span></span><b>'+eur(f.personeel.bruto)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.lasten','Werkgeverslasten')+'<span class="sub">~'+f.personeel.lastenPct+'% ('+f.landNaam+')</span></span><b>'+eur(f.personeel.lasten)+'</b></div>'+
           (f.personeel.vakantiegeld ? '<div class="st-row"><span>'+T('fn.vak','Vakantiegeldreserve')+'<span class="sub">'+f.personeel.vakantiegeldPct+'%</span></span><b>'+eur(f.personeel.vakantiegeld)+'</b></div>' : '')+
-          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.totaal','Totale loonkosten')+'</b></span><b style="color:var(--gold);">'+eur(f.personeel.totaal)+'</b></div>'+
+          '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.totaal','Totale loonkosten')+'</b></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(f.personeel.totaal)+'</b></div>'+
           '<div class="tkc-who">'+T('fn.minuur','Indicatie minimumuurloon')+': € '+f.personeel.uurloonMin+'</div></div>';
         html += '<div class="tkc h-volbreed"><h3>'+T('fn.gc','Cadeaukaarten')+'</h3>'+
           '<div class="st-row"><span>'+T('fn.gcverkocht','Verkocht deze maand')+'<span class="sub">'+T('fn.gcv.s','nog geen omzet, geen btw')+'</span></span><b>'+eur(f.giftcards.verkocht)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcin','Ingewisseld deze maand')+'<span class="sub">'+T('fn.gci.s','omzet + btw-moment')+'</span></span><b>'+eur(f.giftcards.ingewisseld)+'</b></div>'+
-          '<div class="st-row"><span>'+T('fn.gcopen','Openstaand saldo')+'<span class="sub">'+T('fn.gco.s','verplichting op de balans')+' · '+f.giftcards.aantal+' '+T('fn.kaarten','kaart(en)')+'</span></span><b style="color:var(--gold);">'+eur(f.giftcards.open)+'</b></div>'+
+          '<div class="st-row"><span>'+T('fn.gcopen','Openstaand saldo')+'<span class="sub">'+T('fn.gco.s','verplichting op de balans')+' · '+f.giftcards.aantal+' '+T('fn.kaarten','kaart(en)')+'</span></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(f.giftcards.open)+'</b></div>'+
           '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.4rem;">'+
           '<input class="st-in" id="gcBedrag" type="number" placeholder="€ 50" style="flex:1;min-width:80px;">'+
           '<button class="obtn primary" id="gcSell">'+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
@@ -67,7 +67,7 @@
           (!zakData ? '<div class="tkc-who">'+T('kt.laden','Laden...')+'</div>'
            : zakData.error ? '<div class="tkc-who">'+zakData.error+'</div>'
            : '<div class="st-row"><span>'+escT(zakData.rekening.naam)+'<span class="sub">'+escT(zakData.rekening.iban)+'</span></span>'+
-             '<b style="color:var(--gold);">'+eur((zakData.saldoCenten||0)/100)+'</b></div>'+
+             '<b style="color:var(--rtg-leesgoud,var(--gold));">'+eur((zakData.saldoCenten||0)/100)+'</b></div>'+
              ((zakData.afschrift||[]).slice(0,6).map(r=>'<div class="st-row"><span class="sub">'+escT(r.oms||r.soort)+'</span><span class="sub">'+(r.af?'− ':'+ ')+eur(r.centen/100)+'</span></div>').join('')||'<div class="tkc-who">'+T('fn.zak.leeg','Nog geen boekingen.')+'</div>')+
              '<div class="tkc-who">'+T('fn.zak.s','Hoort gratis bij het financiele hart: elke zaak bankiert onder de eigen vlag, naast de betalingen die via de kaart-rails lopen.')+'</div>')+
           '</div>';
@@ -76,7 +76,7 @@
           '<div id="accVragen" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.5rem 0;"></div>'+
           '<div class="row-gap"><input class="st-in" id="accQ" placeholder="'+T('fn.ai.ph','Bijv. hoeveel btw draag ik deze maand af?')+'" class="h-flex1">'+
           '<button class="obtn primary" id="accGo">'+T('fn.vraag','Vraag')+'</button></div>'+
-          '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:12px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
+          '<div id="accA" style="display:'+(accAntwoord?'block':'none')+';border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;margin-top:0.5rem;">'+accAntwoord+'</div>'+
           '<button class="obtn h-mt60" id="accAdvies">'+T('fn.adviezen','Stuur mij bij, geef adviezen')+'</button>'+
           '<div id="accAdv"></div></div>';
       }

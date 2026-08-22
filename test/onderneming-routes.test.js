@@ -16,7 +16,7 @@
       werkelijk opent. Een idee heeft geen debiteuren; dat mag een leeg antwoord
       geven, maar geen 500.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-routes.test.js */
+   Draai los: node --test test/onderneming-routes.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

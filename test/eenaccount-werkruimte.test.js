@@ -20,7 +20,7 @@
    - uit dienst betekent meteen weg -- ook voor een lijst die een tel eerder
      is gelezen.
 
-   Draai los: node --experimental-sqlite --test test/eenaccount-werkruimte.test.js */
+   Draai los: node --test test/eenaccount-werkruimte.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

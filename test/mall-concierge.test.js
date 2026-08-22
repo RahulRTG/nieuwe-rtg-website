@@ -16,7 +16,7 @@
         terug op gewoon zoeken -- en zegt dat erbij.
 
    Elke toets is met een mutatie nagetrokken (LAT-regel 2).
-   Draai los: node --experimental-sqlite --test test/mall-concierge.test.js */
+   Draai los: node --test test/mall-concierge.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

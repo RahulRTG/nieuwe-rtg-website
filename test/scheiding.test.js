@@ -21,7 +21,7 @@
       het is een lijst van plekken waar de scheiding niet uit de code af te
       lezen valt, en die lijst hoort leeg te zijn.
 
-   Draai los: node --experimental-sqlite --test test/scheiding.test.js */
+   Draai los: node --test test/scheiding.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -226,7 +226,14 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      en zet req.scimOrg, waarna elke bewerking door binnenOrg() gaat (zie
      server/scim/index.js). Dat is dezelfde soort poort als de andere hier --
      alleen is de sleutel van een klant in plaats van een sessie van een lid. */
-  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth)\s*[,)]|\.\.\.lid\b/;
+  /* gezinsPoort hoort in deze rij sinds de gezinskant zijn eigen linkdeur kreeg.
+     Hij is het spiegelbeeld van `auth` voor de RTFoundation: hij weigert met 403
+     zonder geldige gezinssessie (rtfSociaal) en zet req.gezinslid, waarna de
+     handler daaruit de handle haalt. Hij staat daarom OOK in VEELPARTIJ
+     hieronder -- een gezin is een van duizenden, dus "poortwachter zonder
+     eigenaarscontrole" is daar net zo goed een gat als bij een lid. Dat is het
+     verschil tussen deze poort leren kennen en hem uitzetten. */
+  const POORT = /,\s*(auth|supplierAuth|officeAuth|techAuth|boardroomAuth|huisAuth|baasAuth|eigenaarAlleen|scimAuth|gezinsPoort)\s*[,)]|\.\.\.lid\b/;
   /* Niet elke poort staat in de registratie. Een flink deel van het huis
      controleert in de handler zelf -- rtfSociaal(req, res), profiel(req, res),
      appSessie(req), rtf.verifieerProfiel(code, token) -- en stuurt bij twijfel
@@ -241,12 +248,12 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
      test verderop dat de handler req.scimOrg echt gebruikt, en is een SCIM-route
      die de organisatie vergeet net zo goed een fout als een member-route die de
      sessie vergeet. */
-  const VEELPARTIJ = /,\s*(auth|supplierAuth|huisAuth|scimAuth)\s*[,)]/;
+  const VEELPARTIJ = /,\s*(auth|supplierAuth|huisAuth|scimAuth|gezinsPoort)\s*[,)]/;
   /* req.<iets> dat een poortwachter zelf heeft gezet telt ook: huisAuth zet
      req.werkplekCode, de zaak-poort zet req.actor. En een helper mag naast de
      request ook het antwoord meekrijgen -- eisAccount(req, res) is net zo goed
      een afleiding uit DEZE request als cn(req). */
-  const GEBRUIKT = /req\.(session|techUser|supplier|staff|user|eigenaar|account|werkplekCode|actor|scimOrg)\b|\b[a-zA-Z_$][a-zA-Z0-9_$]*\(req[,)]/;
+  const GEBRUIKT = /req\.(session|techUser|supplier|staff|user|eigenaar|account|werkplekCode|actor|scimOrg|gezinslid)\b|\b[a-zA-Z_$][a-zA-Z0-9_$]*\(req[,)]/;
   const VRAAGID = /req\.(body|params|query)\.(id|ref|userId|memberId|key|code|codenaam)\b/;
   /* ---- de beoordeelde uitzonderingen ----
      Wat hierna nog opduikt is stuk voor stuk nagelopen en valt in twee soorten.
@@ -268,6 +275,11 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
            daar staat de controle. Een sessie eisen zou hier niets scheiden,
            want er valt niets te scheiden. */
   const GEDULD = {
+    /* De aanvrager heeft nog geen account. De 192-bit statussleutel is alleen
+       bij de aanvraag uitgegeven, staat gehasht in opslag en wordt met een
+       timing-safe vergelijking gecontroleerd. Zonder die bezitssleutel geeft
+       de route uitsluitend 403; de rem begrenst raden per IP. */
+    'server/routes/foundationregistratie.js POST /api/foundation/registratie/status': 'de willekeurige, gehashte statussleutel is de poort tot uitsluitend die ene aanvraag',
     /* (c) er wordt niets opgezocht: deze handler controleert alleen of de
        code zes tekens A-Z0-9 is en schrijft het adres om naar
        /apps/app.html?werving=<code>. Hij leest geen uitnodiging, geen

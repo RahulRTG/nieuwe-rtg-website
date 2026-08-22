@@ -36,7 +36,7 @@ module.exports = ({ FROM }) => {
      als de rest: staat RTG_ENC_KEY, dan versleuteld (.eml.enc), anders leesbaar
      (.txt) zodat lokaal ontwikkelen niet omslachtig wordt. Terugkijken kan met
      `npm run outbox`. */
-  function toOutbox(to, subject, text) {
+  function toOutbox(to, subject, text, opties) {
     fs.mkdirSync(OUTBOX, { recursive: true, mode: 0o700 });
     try { fs.chmodSync(OUTBOX, 0o700); } catch (e) {}
     /* De naam draagt de tijd EN een willekeurig staartje. Zonder dat staartje
@@ -47,7 +47,8 @@ module.exports = ({ FROM }) => {
        fout als de rest: een storing die je niet kunt zien. */
     const stamp = rtgKlok.datum().toISOString().replace(/[:.]/g, '-');
     const staart = require('crypto').randomBytes(4).toString('hex');
-    const bericht = `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
+    const van = opties && opties.from || FROM;
+    const bericht = `From: ${van}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
     const kluis = require('./kluis');
     const naam = stamp + '-' + staart + (kluis.AAN ? '.eml.enc' : '.txt');
     fs.writeFileSync(path.join(OUTBOX, naam), kluis.versleutel(bericht), { mode: 0o600 });

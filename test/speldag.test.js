@@ -18,13 +18,13 @@
    Dat is geen smaak maar `CLAUDE.md`: een dagstreak straft je voor de dag dat
    je niet meedoet, en dat is precies de ratel die hier niet hoort.
 
-   Draai los: node --experimental-sqlite --test test/speldag.test.js */
+   Draai los: node --test test/speldag.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, keurLidGoed } = require('./helper');
 
 /* ================= de laag zelf, met een verzonnen spelletje =================
    Het "spel" is: onthoud een woord en typ het terug. Meer heeft deze laag niet
@@ -61,7 +61,7 @@ function maakLaag(opties = {}) {
     },
     // 'kind' haalt de progressiegrens niet; de rest wel
     progressieMag: (h) => !/^kind/.test(h),
-    GEEN_PROGRESSIE: 'Scores en ranglijsten bestaan alleen voor leden met een geverifieerde volwassen leeftijd.',
+    GEEN_PROGRESSIE: 'Scores en ranglijsten bestaan alleen voor leden van wie RTG het identiteitsbewijs heeft gezien en die 18 of ouder zijn.',
     vandaag: () => datum
   });
   return { laag, bak, zetDatum: (d) => { datum = d; } };
@@ -207,7 +207,7 @@ test('onder de progressiegrens: gewoon spelen, niets bewaard, en niet in het vel
   assert.equal(r.bewaard, false);
   assert.equal(r.ranglijst, false);
   assert.equal(r.plaats, undefined, 'geen plaats, want geen bord');
-  assert.match(r.reden, /volwassen leeftijd/i);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/i);
 
   const dag = bak.spellen.dagopgave.proef['2026-08-11'];
   assert.equal(dag.spelers['kind-mila'].punten, undefined, 'er is geen getal weggeschreven');
@@ -319,6 +319,12 @@ async function lid(geboren = '1990-01-01') {
   const r = await json(await raw('/auth/register', { name: 'Dag ' + t, email: 'dg' + t + '@v.test',
     phone: '0644' + String(t).slice(-6), password: 'geheim123', geboortedatum: geboren, tier: 'rtg' }));
   assert.ok(r.token, 'aanmelden lukte niet: ' + JSON.stringify(r).slice(0, 200));
+  /* Door de keuring, tenzij de toets juist een minderjarige wil: de 18+-poort
+     kijkt sinds deze ronde echt naar het identiteitsbewijs
+     (server/kern/volwassen.js) en niet meer alleen naar een zelf ingetypt
+     jaartal. Een minderjarige komt er ook mét keuring niet door, en dat is
+     precies wat die toetsen willen zien. */
+  await keurLidGoed(BASE, r.token, r.state.user.codename);
   return r.token;
 }
 // een eigen oplosser, zodat de toets de code onder toets niet gebruikt om
@@ -415,7 +421,7 @@ test('onder de 18+-grens loopt de dagpuzzel gewoon, alleen zonder bord', async (
   const r = await json(await api('dag-klaar', { spel: 'sudoku', inzending: los(start.opgave.puzzel) }, tok));
   assert.equal(r.goed, true);
   assert.equal(r.bewaard, false);
-  assert.match(r.reden, /volwassen leeftijd/i);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/i);
   const stand = await json(await api('dag', { spel: 'sudoku' }, tok));
   assert.equal(stand.ranglijst, false);
   assert.deepEqual(stand.bord, []);

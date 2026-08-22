@@ -4,7 +4,7 @@
    bewezen wordt: het aanbod is cosmetisch en niet medisch, een geboekt slot is
    daarna weg voor iedereen (de agenda is een waarheid), een gast mag niet
    boeken, en de afspraak van een ander is niet te annuleren.
-   Draai los: node --experimental-sqlite --test test/verzorging-leden.test.js */
+   Draai los: node --test test/verzorging-leden.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -2,7 +2,7 @@
    sector. De werkgever kiest de modus en beheert het eigen assortiment
    (met prijs per stuk of per kilo); afrekenen loopt door de bestaande
    pos/sale, dus het dagoverzicht doet vanzelf mee.
-   Draai: node --experimental-sqlite --test test/kassa-modus.test.js */
+   Draai: node --test test/kassa-modus.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

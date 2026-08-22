@@ -1,138 +1,145 @@
 {
+  "stempel": {
+    "op": "2026-08-20T23:13:46.829Z",
+    "commit": "a732b304",
+    "boomVuil": true,
+    "node": "v24.18.0"
+  },
   "uitleg": "Gemeten uitslag van npm run sabotage: per systeemwet of het uitzetten van zijn handhaver ECHT iets rood maakte. Niet met de hand bijwerken -- npm run wetten vergelijkt de vingerafdruk van het recept en meldt het als de meting verlopen is.",
+  "grens": "Per wet is EEN sabotagezet geprobeerd. \"Raak\" betekent: deze handhaver staat aan en merkt DEZE zet. Het is geen bewijs dat de wet langs geen enkele andere weg te omzeilen is. Wetten met \"mensenwerk\" zijn helemaal niet machinaal beproefd.",
   "wetten": {
     "merk-pearl-is-warm": {
       "stand": "raak",
       "afdruk": "e47d10c9fe01f877",
       "reden": "Pearl is warm: nooit meer blauw dan rood",
       "wachter": "test:test/materiaal.test.js",
-      "duurMs": 182
+      "duurMs": 148
     },
     "vorm-status-niet-op-kleur": {
       "stand": "raak",
       "afdruk": "223d8101e527d636",
       "reden": "status leunt nooit op kleur alleen",
       "wachter": "test:test/ontwerp.test.js",
-      "duurMs": 218
+      "duurMs": 197
     },
     "techniek-sabotage-meet-zichzelf": {
       "stand": "raak",
       "afdruk": "10d7a3a44bc61253",
       "reden": "1. een wachter die AL rood was, telt nooit als bewijs",
       "wachter": "test:test/wetten.test.js",
-      "duurMs": 448
+      "duurMs": 343
     },
     "merk-kleurspelling": {
       "stand": "raak",
       "afdruk": "328128a2dad0e290",
       "reden": "keuringsregel 23 sloeg aan",
       "wachter": "check:23",
-      "duurMs": 106185
+      "duurMs": 127492
     },
     "merk-twee-letterrollen": {
       "stand": "raak",
       "afdruk": "d1229adf5443e82e",
       "reden": "er zijn precies twee letterrollen, en alles loopt daardoorheen",
       "wachter": "test:test/materiaal.test.js",
-      "duurMs": 191
+      "duurMs": 148
     },
     "merk-goud-is-mat": {
       "stand": "raak",
       "afdruk": "dbc3deca2baf008b",
       "reden": "Gold is mat champagne, geen internet-goud",
       "wachter": "test:test/materiaal.test.js",
-      "duurMs": 197
+      "duurMs": 149
     },
     "merk-geen-emoji": {
       "stand": "raak",
       "afdruk": "e94249f461d3a689",
       "reden": "keuringsregel 3b sloeg aan",
       "wachter": "check:3b",
-      "duurMs": 108178
+      "duurMs": 126032
     },
     "vorm-bodoni-ceremonieel": {
       "stand": "raak",
       "afdruk": "09b60539016aeb09",
       "reden": "serif staat op een gesloten lijst rollen en nergens anders",
       "wachter": "test:test/ontwerp.test.js",
-      "duurMs": 183
+      "duurMs": 200
     },
     "vorm-modus-is-volledig": {
       "stand": "raak",
       "afdruk": "970552b3c4d76e60",
       "reden": "elke modus zet ALLE dichtheidsmaten, niet een deel",
       "wachter": "test:test/ontwerp.test.js",
-      "duurMs": 195
+      "duurMs": 190
     },
     "vorm-geen-inline-handlers": {
       "stand": "raak",
       "afdruk": "5338b24c704300c7",
       "reden": "keuringsregel 2 sloeg aan",
       "wachter": "check:2",
-      "duurMs": 108652
+      "duurMs": 128867
     },
     "toegang-ai-belooft-niets": {
       "stand": "raak",
       "afdruk": "2fe4b59ba6887f8f",
       "reden": "keuringsregel 34 sloeg aan",
       "wachter": "check:34",
-      "duurMs": 105486
+      "duurMs": 126903
     },
     "toegang-ai-liegt-niet-over-boekingen": {
       "stand": "raak",
       "afdruk": "4f2ae0376690c7e2",
       "reden": "de prompt draagt Rahul nooit op te zeggen dat iets al geregeld is",
       "wachter": "test:test/rahul-eerlijk.test.js",
-      "duurMs": 205
+      "duurMs": 171
     },
     "toegang-codenaam-boven-naam": {
       "stand": "raak",
       "afdruk": "9714846f5b5e32dc",
       "reden": "de leden-prompt noemt de codenaam, niet de volledige naam",
       "wachter": "test:test/rahul-eerlijk.test.js",
-      "duurMs": 212
+      "duurMs": 173
     },
     "toegang-geen-kluisgegevens-van-een-ander": {
       "stand": "raak",
       "afdruk": "30188bba37f5900c",
       "reden": "3. geen enkel endpoint lekt een wachtwoordhash of een kluisveld",
       "wachter": "test:test/grens-sweep.test.js",
-      "duurMs": 36856
+      "duurMs": 39104
     },
     "toegang-grendel-hangt-aan-het-doel": {
       "stand": "raak",
       "afdruk": "9c349a5495a6bca8",
       "reden": "7. de pin-rem hangt aan het DOEL en wordt gedeeld met de losse personeelslogin",
       "wachter": "test:test/eenaccount.test.js",
-      "duurMs": 20554
+      "duurMs": 23282
     },
     "toegang-progressie-stopt-bij-18": {
       "stand": "raak",
       "afdruk": "224357a4951a37cd",
       "reden": "de progressiegrens hangt aan de echte leeftijdspoort in grens.js",
       "wachter": "test:test/spelbeleid.test.js",
-      "duurMs": 314
+      "duurMs": 251
     },
     "toegang-elke-route-heeft-een-poort": {
       "stand": "raak",
       "afdruk": "c1501bac29906a55",
       "reden": "keuringsregel 28 sloeg aan",
       "wachter": "check:28",
-      "duurMs": 106734
+      "duurMs": 132905
     },
     "toegang-authorization-echt-verifieren": {
       "stand": "raak",
       "afdruk": "d6e03b8671a106c4",
       "reden": "keuringsregel 29 sloeg aan",
       "wachter": "check:29",
-      "duurMs": 105214
+      "duurMs": 129983
     },
     "geld-conservatie": {
       "stand": "raak",
       "afdruk": "e1da19f09789588c",
       "reden": "gelijktijdige echte tikken bewaren geld op de cent en zakken nooit onder nul",
       "wachter": "test:test/geld-conservatie-last.test.js",
-      "duurMs": 11337
+      "duurMs": 11835
     },
     "geld-geen-autonome-betalingen": {
       "stand": "mensenwerk",
@@ -144,14 +151,14 @@
       "afdruk": "083f689cce42468e",
       "reden": "bijdrage: alleen wat u gaf, met een datum, en zonder som",
       "wachter": "test:test/levensgraafleven.test.js",
-      "duurMs": 185
+      "duurMs": 155
     },
     "leven-talent-blijft-bij-het-lid": {
       "stand": "raak",
       "afdruk": "9e6b4b936c01a182",
       "reden": "talenten: het eigen project en de eigen cv-vaardigheden, vertrouwelijk en alleen het lid",
       "wachter": "test:test/levensgraafleven.test.js",
-      "duurMs": 187
+      "duurMs": 156
     },
     "leven-kind-is-geen-profiel": {
       "stand": "mensenwerk",
@@ -168,116 +175,119 @@
       "afdruk": "382b9db0038fb713",
       "reden": "er wordt niets geschreven en er is geen route die toegang verleent",
       "wachter": "test:test/onderneming-toegang.test.js",
-      "duurMs": 244
+      "duurMs": 205
     },
     "concern-geen-score-zonder-afwijking": {
       "stand": "raak",
       "afdruk": "d679535723f47778",
       "reden": "de meter geeft altijd dezelfde vorm terug, ook zonder cijfer",
       "wachter": "test:test/onderneming-dagbeeld.test.js",
-      "duurMs": 234
+      "duurMs": 212
     },
     "concern-juridisch-gegeven-heeft-een-bron": {
-      "stand": "mensenwerk",
-      "afdruk": "fa5e55aeeb2b66a6",
-      "reden": "CONCERN.md noemt vier bronsoorten en eist ze per gegeven. In de code bestaat de bronsoort wel op sommige plekken, maar er is geen enkele poort die een juridisch gegeven ZONDER bron weigert -- niet in de opslag en niet op de route. De wet is dus opgeschreven en niet gehandhaafd. Dat is precies wat dit register zichtbaar hoort te maken."
+      "stand": "raak",
+      "afdruk": "080b150fd18731ea",
+      "reden": "een juridisch gegeven zonder bron bestaat niet",
+      "wachter": "test:test/concern.test.js",
+      "duurMs": 226
     },
     "concern-werknemer-koopt-geen-pas": {
       "stand": "raak",
       "afdruk": "ae7a0300a1fd5fa4",
       "reden": "een gekoppelde werkruimte is een sleutel aan het ene account, met eigen functie en bedrijf",
       "wachter": "test:test/eenaccount-werkruimte.test.js",
-      "duurMs": 30922
+      "duurMs": 34033
     },
     "werkruimte-alleen-een-verwijzing": {
       "stand": "raak",
       "afdruk": "2bd9516268f6fa90",
       "reden": "2. een geldige verwijzing wordt bewaard en NIET opgelost",
       "wachter": "test:test/werkgrens.test.js",
-      "duurMs": 10185
+      "duurMs": 12364
     },
     "wereld-een-app-een-wereld": {
       "stand": "raak",
       "afdruk": "c940a9401a6bb85c",
       "reden": "keuringsregel 44 sloeg aan",
       "wachter": "check:44",
-      "duurMs": 113612
+      "duurMs": 132463
     },
     "wereld-geen-twee-beginschermen": {
-      "stand": "blind",
+      "stand": "raak",
       "afdruk": "132d10527e2099dd",
-      "reden": "deze wachter was al rood voordat er iets gesaboteerd was (Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur); zijn rood bewijst hier niets",
-      "wachter": "e2e:test/appmenu.e2e.js"
+      "reden": "\u001b[33m2026-08-20T23:11:24.582Z WARN \u001b[0m [config] RTG_ENC_KEY niet gezet: versleuteling-at-rest is uit (prima voor lokaal, niet voor productie).",
+      "wachter": "e2e:test/appmenu.e2e.js",
+      "duurMs": 142541
     },
     "techniek-geen-productie-zonder-grootboek": {
       "stand": "raak",
       "afdruk": "22ed44b294cb29c4",
       "reden": "zonder grootboek gaat de start NIET door: json en geheugen worden geblokkeerd",
       "wachter": "test:test/opslagblokkade.test.js",
-      "duurMs": 191
+      "duurMs": 166
     },
     "techniek-domeingrens-houdt-tegen": {
       "stand": "raak",
       "afdruk": "bc62adc8153c9155",
       "reden": "een naam van een ANDER domein gooit, en de fout noemt domein en naam",
       "wachter": "test:test/domeingrens.test.js",
-      "duurMs": 189
+      "duurMs": 169
     },
     "techniek-elke-meter-is-geijkt": {
       "stand": "raak",
       "afdruk": "2e23cdf13df7b0d5",
       "reden": "keuringsregel 35 sloeg aan",
       "wachter": "check:35",
-      "duurMs": 106230
+      "duurMs": 130415
     },
     "techniek-geen-dode-configuratie": {
       "stand": "raak",
       "afdruk": "f536d93b122f25a4",
       "reden": "keuringsregel 27 sloeg aan",
       "wachter": "check:27",
-      "duurMs": 108411
+      "duurMs": 132616
     },
     "techniek-bedradingscontract": {
       "stand": "raak",
       "afdruk": "ee4a2bf0e2cc3f28",
       "reden": "keuringsregel 26 sloeg aan",
       "wachter": "check:26",
-      "duurMs": 115273
+      "duurMs": 129761
     },
     "techniek-zelfpoortende-toets-in-de-draaier": {
       "stand": "raak",
       "afdruk": "e20e9f0d559c99ed",
       "reden": "keuringsregel 25 sloeg aan",
       "wachter": "check:25",
-      "duurMs": 107302
+      "duurMs": 129487
     },
     "techniek-routepad-staat-voluit": {
       "stand": "raak",
       "afdruk": "0c754ca8e00cc053",
       "reden": "keuringsregel 45 sloeg aan",
       "wachter": "check:45",
-      "duurMs": 109392
+      "duurMs": 131643
     },
     "techniek-gegenereerde-kaarten-lopen-niet-achter": {
       "stand": "raak",
       "afdruk": "25c4e008ce3a8c7e",
       "reden": "keuringsregel 41 sloeg aan",
       "wachter": "check:41",
-      "duurMs": 106716
+      "duurMs": 136637
     },
     "techniek-strenge-toetspoort": {
       "stand": "raak",
       "afdruk": "60274c89a500a887",
       "reden": "detectie: crashes en 5xx tellen mee, client-fouten en ruis niet",
       "wachter": "test:test/strenge-poort.test.js",
-      "duurMs": 434
+      "duurMs": 339
     },
     "techniek-wetten-hebben-een-bron": {
       "stand": "raak",
       "afdruk": "01dd60c9b89073d8",
       "reden": "Het wetboek klopt niet:",
       "wachter": "script:node scripts/wetten.js --controle",
-      "duurMs": 76
+      "duurMs": 64
     }
   }
 }

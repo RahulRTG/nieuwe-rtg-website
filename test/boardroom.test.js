@@ -81,10 +81,23 @@ test('2. een functie uitzetten kleurt hem rood en blokkeert hem echt', async () 
   const zet = await api(base, '/api/boardroom/zet', { id: 'charter', aan: false }, owner);
   assert.equal(zet.status, 200);
   assert.equal(zet.body.status, 'uit');
-  // de middleware blokkeert nu het charter-pad (503), ook zonder inlog
-  const geblokt = await api(base, '/api/charter/aanbod', { city: 'Ibiza' });
+  /* De middleware blokkeert nu het charter-pad, en dat wordt bewezen op het LID
+     -- de mens voor wie de functie bedoeld was. Hier stond "ook zonder inlog"
+     met een vreemde als proefpersoon; sinds 18 augustus 2026 krijgt die alleen
+     de neutrale zin, want de catalogus van functies is geen publieke informatie
+     (besluit, zie de kop van server/middleware/schakelaar-antwoord.js). Dat is
+     een strengere eis dan hiervoor: een vreemde loopt sowieso tegen de deur, een
+     lid komt erdoorheen en hoort alsnog geblokkeerd te worden. */
+  const geblokt = await api(base, '/api/charter/aanbod', { city: 'Ibiza' }, lidToken);
   assert.equal(geblokt.status, 503, 'charter is uitgeschakeld');
   assert.equal(geblokt.body.functie, 'charter');
+  const vreemde = await api(base, '/api/charter/aanbod', { city: 'Ibiza' });
+  assert.equal(vreemde.status, 503, 'ook een vreemde komt er niet door');
+  for (const veld of ['functie', 'naam', 'reden', 'doelgroep']) {
+    assert.equal(veld in vreemde.body, false,
+      'een beller zonder inlog hoort de schakelkast niet te kunnen natekenen; kreeg "' +
+      veld + '" in ' + JSON.stringify(vreemde.body));
+  }
   const st = await api(base, '/api/boardroom/status', {}, owner);
   assert.equal(st.body.samenvatting.uit, UIT_STANDAARD + 1, 'de charter erbij');
 });

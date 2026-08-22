@@ -23,6 +23,8 @@
 
    Afgesplitst uit eenaccount.js toen die de 10 KB passeerde. */
 
+const { idVanKey } = require('../../lib/lidsleutel');
+
 const MAX_POGING = 5; // koppel-pogingen per account per minuut
 
 module.exports = (kctx) => {
@@ -56,8 +58,7 @@ module.exports = (kctx) => {
         logInlog('koppel', false, s.code + '#' + body.staffId, req);
         return { status: 401, error: 'Onjuiste PIN.' };
       }
-      const lidSleutel = /^user-(\d+)$/.exec(String(key || ''));
-      const lidId = lidSleutel ? Number(lidSleutel[1]) : null;
+      const lidId = idVanKey(key);
       const lid = lidId != null ? accounts.getUserById(lidId) : null;
       if (!lid) return { status: 403, error: 'Deze personeelsplek kan alleen aan een geldig RTG-account worden gekoppeld.' };
       if (staff.member_id != null && Number(staff.member_id) !== lidId) {

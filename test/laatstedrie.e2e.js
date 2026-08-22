@@ -23,19 +23,15 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('de laatste drie schermen: camera met beeld, en twee poorten die zeggen wat ze missen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-drie-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -43,8 +39,7 @@ test('de laatste drie schermen: camera met beeld, en twee poorten die zeggen wat
     /* De nep-camera. Zonder deze twee vlaggen vraagt Chromium toestemming die
        niemand kan geven, en dan toetst deze toets alleen het foutpad -- dat is
        ook nuttig, maar het bewijst niet dat de zoeker werkt. */
-    browser = await pw.chromium.launch({ args: ['--no-sandbox',
-      '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] });
+    browser = await pw.chromium.launch(browserOpties(pw, { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] }));
     const ctx = await browser.newContext({ permissions: ['camera'] });
     const fouten = [];
 

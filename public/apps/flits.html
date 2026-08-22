@@ -18,48 +18,48 @@
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
   .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:760px;margin:0 auto;}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
   .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
   button{font:inherit;cursor:pointer;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
   /* het rijscherm: rust, grote cijfers, niets dat afleidt */
   .rit{display:flex;flex-direction:column;align-items:center;padding:1.4rem 0 0.6rem;}
   .snelheid{font-family:'Bodoni Moda',serif;font-size:6.5rem;line-height:1;font-variant-numeric:tabular-nums;}
   .eenheid{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--soft);margin-top:0.3rem;}
   .waarschuwing{width:100%;display:none;align-items:center;gap:0.8rem;background:var(--card);
-    border:1px solid var(--rood);border-radius:14px;padding:0.9rem 1rem;margin-top:1rem;}
+    border:1px solid var(--rood);border-radius:0;padding:0.9rem 1rem;margin-top:1rem;}
   .waarschuwing.zien{display:flex;}
   .waarschuwing .wat{font-weight:600;white-space:nowrap;}
   .waarschuwing .sub{display:block;font-size:0.76rem;color:var(--soft);margin-top:0.15rem;}
   .waarschuwing .icoon{font-size:1.6rem;}
   .stemmen{margin-left:auto;display:flex;gap:0.4rem;}
-  .stemmen button{background:var(--card2);border:1px solid var(--line);border-radius:999px;color:var(--txt);
+  .stemmen button{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.76rem;padding:0.45rem 0.8rem;}
   .stemmen button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   /* melden: een rustige rij, geen kleuren die schreeuwen */
   .meldrij{display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;margin-top:1.1rem;}
   .meldrij button{display:flex;flex-direction:column;align-items:center;gap:0.35rem;background:var(--card);
-    border:1px solid var(--line);border-radius:14px;color:var(--txt);padding:0.85rem 0.3rem;font-size:0.72rem;}
+    border:1px solid var(--line);border-radius:0;color:var(--txt);padding:0.85rem 0.3rem;font-size:0.72rem;}
   .meldrij button .i{font-size:1.5rem;}
   .meldrij button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .meldrij button:disabled{opacity:0.35;cursor:default;}
   .lijst{font-size:0.82rem;line-height:1.6;}
   .lijst .r{display:flex;gap:0.6rem;border-top:1px solid var(--line);padding:0.4rem 0;align-items:baseline;}
   .lijst .r:first-child{border-top:none;}
-  .lijst .afstand{color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .lijst .afstand{color:var(--rtg-leesgoud,var(--gold));font-variant-numeric:tabular-nums;white-space:nowrap;}
   .lijst .wie{color:var(--soft);font-size:0.72rem;margin-left:auto;white-space:nowrap;}
   .uren{display:flex;gap:0.35rem;align-items:flex-end;height:64px;margin-top:0.4rem;}
   .uren .u{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.25rem;min-width:0;}
-  .uren .staaf{width:100%;max-width:22px;border-radius:3px 3px 0 0;background:var(--card2);border:1px solid var(--line);border-bottom:none;}
+  .uren .staaf{width:100%;max-width:22px;border-radius:0;background:var(--card2);border:1px solid var(--line);border-bottom:none;}
   .uren .staaf.druk{background:var(--rood);border-color:var(--rood);}
   .uren .staaf.middel{background:var(--gold);border-color:var(--gold);}
   .uren .t{font-size:0.56rem;color:var(--soft);font-variant-numeric:tabular-nums;}
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;font-size:0.8rem;
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
@@ -109,6 +109,12 @@
   </section>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<!-- plek.js VOOR de inline code: gpsStart() hieronder vraagt via RTGPlek om
+     je positie, maar dit script werd nergens geladen. window.RTGPlek was dus
+     altijd undefined, de vraag verscheen nooit en de tak eronder viel terug op
+     "schakelaar uit -> stil overslaan". De snelheidsmeter stond stil en niets
+     legde uit waarom. Defer mag: gpsStart draait op DOMContentLoaded. -->
+<script src="/shared/plek.js" defer></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
@@ -123,8 +129,13 @@
   // rustige spraak, alleen als het ertoe doet (nadering); geen gebabbel
   const spreek = t => { try { const u = new SpeechSynthesisUtterance(t); u.lang = 'nl-NL'; u.rate = 1.02; speechSynthesis.speak(u); } catch (e) {} };
 
-  const LAND = 'ES';                        // demo: Ibiza; in productie uit de live-locatie
-  let hier = { lat: 38.9089, lng: 1.4330 }; // demo-startpunt tot de gps spreekt
+  const LAND = 'ES';
+  /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
+     de gps spreekt". Dat is geen startpunt maar een bewering: dit scherm meldt
+     flitsers en files ROND JOU, en met dat punt keek je naar een eiland waar je
+     niet bent. Zonder locatie weten we niet waar je bent, en dat zegt het
+     scherm dan ook. */
+  let hier = null;
   let rond = null, alarmMelding = null, gesproken = {};
 
   /* Meenemen (shared/uitvoer.js): de meldingen die het netwerk rond u heeft
@@ -143,9 +154,11 @@
   /* ---- gps: snelheid en positie ---- */
   /* De schakelaar blijft de baas, maar zwijgen is hier geen optie: een
      snelheidsmeter zonder je positie meet niets. shared/plek.js vraagt het een
-     keer met de reden erbij; zeg je nee, dan blijft het demo-startpunt staan en
-     vraagt hij deze sessie niet opnieuw. De rauwe watchPosition blijft, want we
-     hebben coords.speed nodig en niet alleen de plek. */
+     keer met de reden erbij; zeg je nee, dan blijft het scherm leeg en zegt het
+     waarom. De rauwe watchPosition blijft, want we hebben coords.speed nodig en
+     niet alleen de plek. `opPlek` laat de opstart weten dat de eerste fix er is:
+     zonder plek valt er niets te tonen, met plek begint alles. */
+  let opPlek = null;
   async function gpsStart() {
     if (!('geolocation' in navigator)) return;
     if (window.RTGPlek && !RTGPlek.aan()) {
@@ -157,9 +170,11 @@
     }
     {
     navigator.geolocation.watchPosition(p => {
+      const eerste = !hier;
       hier = { lat: p.coords.latitude, lng: p.coords.longitude };
       const kmu = p.coords.speed != null ? Math.max(0, Math.round(p.coords.speed * 3.6)) : null;
       if (kmu != null) $('#snelheid').textContent = kmu;
+      if (eerste && opPlek) { const f = opPlek; opPlek = null; f(); }
     }, () => {}, { enableHighAccuracy: true });
     }
   }
@@ -177,6 +192,7 @@
     if (!gesproken[m.id]) { gesproken[m.id] = true; spreek(m.naam + ' over ' + (m.afstandKm < 1 ? Math.round(m.afstandKm * 1000) + ' meter' : m.afstandKm + ' kilometer')); }
   }
   async function ververs() {
+    if (!hier) return;                       // zonder plek is "rond mij" een lege vraag
     const r = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
     if (r.status !== 200) return;
     rond = r.body;
@@ -191,6 +207,7 @@
       const b = document.createElement('button'); b.type = 'button';
       b.innerHTML = '<span class="i" aria-hidden="true">' + s.icoon + '</span>' + s.naam;
       b.addEventListener('click', async () => {
+        if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om te kunnen melden.');
         const m = await api('meld', { soort: s.soort, lat: hier.lat, lng: hier.lng, land: LAND });
         if (m.body.error) return zeg(m.body.error);
         zeg(m.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : s.naam + ' gemeld voor het netwerk.');
@@ -240,6 +257,19 @@
   /* ---- start ---- */
   (async () => {
     if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    /* Zonder plek valt er niets te tonen. We wachten op de eerste fix in plaats
+       van een punt te verzinnen; komt hij niet, dan zegt de poort waarom. */
+    if (!hier) {
+      const gekregen = await new Promise(klaar => {
+        opPlek = () => klaar(true);
+        setTimeout(() => { if (opPlek) { opPlek = null; klaar(false); } }, 12000);
+      });
+      if (!gekregen) {
+        $('#poortReden').textContent = 'Dit scherm werkt op je locatie: flitsers, files en gevaar rond jou. Zet je locatie aan in het bedieningspaneel en open hem opnieuw.';
+        $('#vPoort').classList.remove('weg');
+        return;
+      }
+    }
     const eerste = await api('rond', { lat: hier.lat, lng: hier.lng, land: LAND });
     if (eerste.status !== 200) { $('#poortReden').textContent = eerste.body.error || 'Log eerst in via de app.'; $('#vPoort').classList.remove('weg'); return; }
     $('#vRit').classList.remove('weg');

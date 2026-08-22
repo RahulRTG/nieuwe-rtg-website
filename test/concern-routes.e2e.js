@@ -19,7 +19,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, postJson } = require('./helper');
 
 /* Eigen post-hulpje met de STATUS erbij: postJson() uit de helper geeft alleen
    het lichaam terug, en juist de code is hier de bewering (404 voor een vreemde,

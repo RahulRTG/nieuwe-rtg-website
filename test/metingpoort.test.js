@@ -30,7 +30,7 @@
         deur dicht.
      3. MET RTG_METRICS_TOKEN. Dan MOET het token mee, waar je ook vandaan belt.
 
-   Draai los: node --experimental-sqlite --test test/metingpoort.test.js
+   Draai los: node --test test/metingpoort.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

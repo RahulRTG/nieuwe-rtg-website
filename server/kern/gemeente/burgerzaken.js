@@ -6,11 +6,17 @@
 module.exports = (ctx) => {
   const { db, save, nu, vandaag, isDatum, id, ref, schoon, seed, deGemeente, sseToSupplier, BURGERZAKEN, BALIE_SLOTS } = ctx;
 
+  /* GEEN GEMEENTE, GEEN BALIE. `!g ||` betekende: is er geen gemeente, dan is de
+     balie OPEN. Dat is precies verkeerd om -- een balie van een gemeente die
+     niet bestaat kan niet open zijn, en met slots erbij zou iemand een afspraak
+     boeken waar niemand op hem wacht. De soorten blijven staan: dat is een
+     catalogus van wat een gemeente kán doen, geen belofte dat het hier kan. */
   function burgerzakenOverzicht() {
     seed();
     const g = deGemeente();
     return {
-      ok: true, open: !g || !g.gemeente || g.gemeente.balie.open !== false,
+      ok: true, open: !!(g && (!g.gemeente || g.gemeente.balie.open !== false)),
+      ...(g ? {} : { reden: 'Er is nog geen gemeente aangesloten; afspraken maken kan zodra dat wel zo is.' }),
       soorten: Object.entries(BURGERZAKEN).map(([k, v]) => ({ id: k, label: v.label, opAfspraak: v.balie, duurMin: v.duurMin }))
     };
   }
@@ -19,6 +25,7 @@ module.exports = (ctx) => {
   }
   function burgerzakenSlots(soort, datum) {
     seed();
+    if (!deGemeente()) return { status: 409, error: 'Er is nog geen gemeente aangesloten, dus er zijn geen baliemomenten.' };
     if (!BURGERZAKEN[soort] || !BURGERZAKEN[soort].balie) return { status: 400, error: 'Kies een balieproduct.' };
     if (!isDatum(datum) || datum < vandaag()) return { status: 400, error: 'Kies een datum vanaf vandaag.' };
     const g = deGemeente();

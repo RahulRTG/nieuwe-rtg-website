@@ -75,6 +75,38 @@ module.exports = (kern) => {
     }));
   });
 
+  /* de tik: ontvangen met een aanraking (tikcode), betalen met een knop
+
+     GEEN IDEM-SLEUTEL, en dat is een besluit. `npm run idemproef` noemt deze
+     route onbeschermd omdat een herhaling een andere code teruggeeft. Klopt --
+     maar tikCode zet eerst elke lopende code van dit lid op verlopen, dus na
+     twee oproepen leeft er precies een en valt er niets op te tellen. Het geld
+     beweegt bij /api/pay/tik, en die draagt de sleutel wel. Nagemeten in
+     test/pay.test.js ("twee keer een code vragen laat er een leven"). */
+
+  /* Tegoed: een lid koopt tegoed voor een ander (kern/pay/tegoed.js). Kopen en
+     verzilveren zijn geld-momenten en dragen dezelfde twee poorten als de rest
+     hier; het overzicht en het terugnemen niet -- kijken kost niets, en
+     terugnemen haalt je eigen geld op uit een bon die je zelf hebt betaald. */
+  app.post('/api/pay/tegoed', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(pay.tegoedOverzicht(liveCodename(req.session)));
+  });
+  app.post('/api/pay/tegoed/koop', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    if (kyc(req, res)) return;
+    stuur(res, await pay.tegoedKoop({ codenaam: liveCodename(req.session), centen: req.body.centen, aanCodenaam: req.body.aan, oms: req.body.oms, idem: req.body.idem }));
+  });
+  app.post('/api/pay/tegoed/verzilver', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    if (kyc(req, res)) return;
+    stuur(res, await pay.tegoedVerzilver({ codenaam: liveCodename(req.session), code: req.body.code, idem: req.body.idem }));
+  });
+  app.post('/api/pay/tegoed/terug', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await pay.tegoedTerug({ codenaam: liveCodename(req.session), tegoedId: String(req.body.id || ''), idem: req.body.idem }));
+  });
+
   // de tik: ontvangen met een aanraking (tikcode), betalen met een knop
   app.post('/api/pay/tikcode', auth, (req, res) => {
     if (geenGast(req, res)) return;
@@ -89,10 +121,31 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     res.json(pay.tikFeed(liveCodename(req.session)));
   });
-  // de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
+  /* de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
+
+     Zelfde besluit als bij tikcode hierboven: een herhaling verdringt de vorige
+     code in plaats van er een tweede naast te zetten, en het geld beweegt pas
+     bij /api/supplier/pay/in. Dezelfde toets meet het na. */
   app.post('/api/pay/kascode', auth, (req, res) => {
     if (geenEchtAccount(req, res)) return;
     res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));
+  });
+
+  /* De zaak zet tegoed klaar voor personeel of klanten (kern/pay/tegoed-zaak.js).
+     Klaarzetten en terugnemen zijn van de MANAGER en niet van elke ingelegde
+     medewerker, om dezelfde reden als bij uitbetalen hieronder: het haalt geld
+     uit de kas op een moment dat de eigenaar niet koos. Kijken mag iedereen --
+     dat is het werk. */
+  app.post('/api/supplier/pay/tegoed', supplierAuth, (req, res) => {
+    res.json(pay.tegoedZaakOverzicht(req.supplier.code));
+  });
+  app.post('/api/supplier/pay/tegoed/zet', supplierAuth, async (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, await pay.tegoedZaakKoop({ supplierCode: req.supplier.code, centen: req.body.centen, aanCodenaam: req.body.aan, oms: req.body.oms, idem: req.body.idem }));
+  });
+  app.post('/api/supplier/pay/tegoed/terug', supplierAuth, async (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, await pay.tegoedZaakTerug({ supplierCode: req.supplier.code, tegoedId: String(req.body.id || ''), idem: req.body.idem }));
   });
 
   // de partnerkant: code innen aan de kassa, saldo zien, uitbetalen

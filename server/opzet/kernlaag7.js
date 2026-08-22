@@ -16,8 +16,10 @@
      mediaos */
 'use strict';
 
+const { idVanKey } = require('../lib/lidsleutel');
+
 module.exports = (kern, hulp) => {
-  const { accounts, archief, bewerkCollectie, crypto, db, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, bewerkCollectie, crypto, db, etaMinutes, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -52,12 +54,13 @@ Object.assign(kern, require('../kern/werkbijlogin').maakWerkBijLogin({
    woonplaatsen (EUR 10 p.p. vooraf: EUR 5 RTG, EUR 5 aanbetaling zaak). */
 Object.assign(kern, require('../kern/vonk').maakVonk({
   db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
-  haversine, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
+  haversine, etaMinutes, findSupplier, reserveerTafel: kern.reserveerTafel, pay: kern.pay, notify, sseToCustomer, sseToOffice
 }));
 /* De voorspeller (kern/voorspel.js): leert het ritme van elk lid en elke
    zaak uit het RTG Pay-grootboek (de ene bron waar elke app in boekt) en
    zet verwachtingen klaar voor de apps en voor Rahul. */
-Object.assign(kern, require('../kern/voorspel').maakVoorspel({ db, findSupplier }));
+// plaats als bron erbij: zie kern/voorspel/index.js (PLAATS.md fase 3)
+Object.assign(kern, require('../kern/voorspel').maakVoorspel({ db, findSupplier, plaats: kern.plaats }));
 
 /* RTG Synergie (kern/synergie.js): zaken maken samen deals en pakketten;
    pas als elke deelnemer heeft getekend staat het pakket live, en RTG Pay
@@ -87,10 +90,10 @@ require('../kern/rahul').zetRahulBron(() => db.data.rahulProfiel || null);
    Leeftijd telt nog wel: onder de 18 het kind-hart, en de plagerige stand
    bestaat alleen voor volwassenen. */
 require('../kern/rahul').zetGeslachtBron((key) => {
-  const m = /^user-(\d+)$/.exec(String(key || ''));
-  if (!m) return null;
+  const id = idVanKey(key);
+  if (id == null) return null;
   let md = null;
-  try { md = accounts.getMemberState(Number(m[1])); } catch (e) { return null; }
+  try { md = accounts.getMemberState(id); } catch (e) { return null; }
   if (!md) return null;
   let lft = null;
   if (md.geboren) {
@@ -168,18 +171,11 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
 
-/* RTG One en Magnaat Wereld zijn overkoepelende werkruimtes. Ze worden hier
-   opgebouwd voordat kernlaag7b de routers ophangt, zodat de domeingrens nooit
-   een half gemonteerde motor kan doorgeven. */
-Object.assign(kern, require('../kern/rtgone')({ db, save, crypto }));
-const partnerstudio = require('../kern/magnaat-partnerstudio')({ db, save, crypto, findSupplier });
-Object.assign(kern, partnerstudio);
-Object.assign(kern, require('../kern/magnaatwereld')({
-  db, save, bewerkCollectie, crypto, functies: require('../functies'), sseToCustomer,
-  partnerstudio: partnerstudio.magnaatPartnerstudio, codenaamVan: kern.codenaamVan
-}));
+kern.foundationregistratie = require('../kern/foundationregistratie-register')({ db, save, crypto, schoon });
 
-// De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en
-// die moeten er dus al zijn. Uitleg: ./mediaos.js.
-require('./mediaos')(kern, hulp);
+/* De overkoepelende werkruimtes (RTG One, Magnaat Wereld) en de Media OS
+   staan in ./kernlaag7-ruimtes.js -- zie de kop daar. Nog steeds VOOR de
+   routers van kernlaag7b, want de kern wordt hier nog gevuld. */
+require('./kernlaag7-ruimtes')(kern, hulp);
+
 };

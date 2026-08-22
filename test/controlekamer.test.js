@@ -3,7 +3,7 @@
    doelgroep (bijv. Business-leden) en tegelijk aan blijft voor de andere
    (RTG-leden), dat alles via de aanvraag/bevestigingsstroom loopt, en dat de
    ingebouwde AI-hulp een bruikbaar voorstel teruggeeft.
-   Draai: node --experimental-sqlite --test test/controlekamer.test.js */
+   Draai: node --test test/controlekamer.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

@@ -104,7 +104,11 @@ module.exports = (deps) => {
   const { afschrift, gezondheid, overzicht } = require('./bord')(
     Object.assign({}, ctx, { sluitcontrole, opdrachten }));
 
-  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand,
+  /* Zelfde reden als bij pay: de zekering hoort op het bord (LAT.md regel 5).
+     motorStand hierboven gaat over DRIFT (loopt de spiegel gelijk met de
+     motor); dit gaat over of wij hem nog bellen. Twee verschillende vragen. */
+  const motorZekering = () => motorklant.stand();
+  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand, motorZekering,
     bankOpdrachten: (f) => opdrachten.lijst(f || {}),
     bankOpdrachtenOpen: () => opdrachten.openstaand(),
     bankOpdrachtenRonde: (a) => opdrachten.ronde(a || {}),

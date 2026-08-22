@@ -47,7 +47,7 @@ const K = { rood: '\x1b[31m', groen: '\x1b[32m', grijs: '\x1b[2m', reset: '\x1b[
 
 function routesVan(boom) {
   const uit = execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(boom, 'scripts/routekaart.js'), '--json'],
+    [path.join(boom, 'scripts/routekaart.js'), '--json'],
     { cwd: boom, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024 });
   const d = JSON.parse(uit);
   return (d.routes || d || []).map(r => (typeof r === 'string' ? r : r.pad || r.path)).filter(Boolean);

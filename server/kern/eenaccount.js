@@ -16,6 +16,8 @@
    drie soorten, met de twee remmen) staat in ./eenaccount/koppelen.js; hier de
    sleutelbos en het munten van de sessie. */
 
+const { idVanKey } = require('../lib/lidsleutel');
+
 function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, hasCred, DEMO,
   DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, rememberSession, logInlog, logActivity,
   supplierState, officeState, magWerken, pinInfo, pinCheck, pinSlot, persoonsPoort }) {
@@ -97,9 +99,9 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
       && (body.staffId != null ? r.staffId === Number(body.staffId) : true);
     const verwijderd = bestaand.filter(weg);
     db.data.accountRollen[key] = bestaand.filter(r => !weg(r));
-    const sleutel = /^user-(\d+)$/.exec(String(key));
-    if (sleutel) for (const r of verwijderd) {
-      if (r.rol === 'personeel' && r.staffId != null) accounts.releaseStaffMember(r.staffId, Number(sleutel[1]));
+    const lidId = idVanKey(key);
+    if (lidId != null) for (const r of verwijderd) {
+      if (r.rol === 'personeel' && r.staffId != null) accounts.releaseStaffMember(r.staffId, lidId);
     }
     save();
     return { status: 200, ok: true, verwijderd: voor - lijst(key).length };

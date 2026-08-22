@@ -6,7 +6,9 @@
    Draai: node --test test/merge3.property.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { merge3 } = require('../server/db');
+/* Rechtstreeks uit server/db/merge -- daar woont merge3; via de gevel laden
+   liet de mutatiemotor de her-export muteren in plaats van de logica. */
+const { merge3 } = require('../server/db/merge');
 
 // ---- deterministische RNG (mulberry32), zodat een fout herhaalbaar is ----
 function rng(seed) {

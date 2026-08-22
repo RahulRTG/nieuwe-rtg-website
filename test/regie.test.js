@@ -3,7 +3,7 @@
    doelgroep te sluiten), de grote hendel zet alles bij iedereen aan of uit
    (de interne backoffice blijft open), en de leden-app hoort via
    /api/member/apps welke apps hij moet verbergen. Draai los:
-   node --experimental-sqlite --test test/regie.test.js */
+   node --test test/regie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

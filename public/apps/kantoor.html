@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Kantoor</title>
+<title>WORK</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -23,12 +23,38 @@
   .dag .uur{display:block;margin-top:.1rem;font-size:.66rem;letter-spacing:.1em;
     color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);}
   .kern .open{font-variant-numeric:var(--rtg-cijfers);}
+  .doelgroep{margin:.2rem 0 1.7rem;padding:1rem;border:1px solid var(--rtg-line);
+    border-radius:0;background:rgba(255,255,255,.018);}
+  .doelgroepnav{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-bottom:1rem;}
+  .doelgroepnav a{display:grid;place-items:center;min-height:2.8rem;padding:.55rem .7rem;
+    border:1px solid var(--rtg-line);border-radius:0;color:var(--rtg-soft);
+    text-align:center;text-decoration:none;font-size:.62rem;font-weight:650;letter-spacing:.12em;
+    text-transform:uppercase;}
+  .doelgroepnav a:hover,.doelgroepnav a:focus-visible,.doelgroepnav a.actief{
+    color:var(--rtg-txt);border-color:var(--gold-rand);background:rgba(192,165,68,.07);}
+  .doelgroeptekst{text-align:center;}
+  .doelgroeptekst h2{margin:0;font:500 1.35rem "Bodoni Moda",serif;}
+  .doelgroeptekst p{max-width:42rem;margin:.45rem auto 0;color:var(--rtg-soft);
+    font-size:.76rem;line-height:1.55;}
+  .doelgroeppoorten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin-top:1rem;}
+  .doelgroeppoorten a{display:block;padding:.85rem;border:1px solid var(--rtg-line);
+    border-radius:0;color:inherit;text-decoration:none;}
+  .doelgroeppoorten a:hover,.doelgroeppoorten a:focus-visible{border-color:var(--gold-rand);}
+  .doelgroeppoorten b{display:block;font-size:.72rem;letter-spacing:.04em;}
+  .doelgroeppoorten span{display:block;margin-top:.3rem;color:var(--rtg-soft);
+    font-size:.68rem;line-height:1.45;}
+  .doelgroeppoorten em{display:block;margin-top:.7rem;color:var(--gold-tekst);
+    font-style:normal;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;}
+  [hidden]{display:none!important;}
+  @media(max-width:650px){.doelgroep{padding:.75rem}.doelgroepnav{gap:.25rem}
+    .doelgroepnav a{padding:.45rem .3rem;font-size:.52rem;letter-spacing:.06em}
+    .doelgroeppoorten{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="rtg-stijl" data-rtg-modus="pro">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 
-<!-- RTG Kantoor ORKESTREERT de kantoordomeinen en vervangt ze niet
+<!-- WORK ORKESTREERT de kantoordomeinen en vervangt ze niet
      (PLATFORM.md). RTG Office, Agenda, Notities en Bestanden houden elk hun
      eigen kern, hun eigen opslag en hun eigen werkstroom. Op de toetsvraag
      "zelfstandige capability of tweede ingang naar dezelfde?" is het antwoord
@@ -39,21 +65,42 @@
      Zou dit scherm ook opslaan, dan bestaat een taak op twee plekken
      (LAT.md regel 4). -->
 
-<!-- DE APPS VAN DEZE WERELD. RTG Kantoor is de werkplek: naast het eigen werk
+<!-- DE ONDERDELEN VAN DEZE APP. WORK is de werkplek: naast het eigen werk
      hangen hier de zaakkant (horeca, kassa, voorraad), de PDA's van het
      personeel en de overheidsloketten. Ze stonden geen van alle op een
      klikroute -- vijfentwintig schermen die draaien en die niemand kon vinden.
      Bij elkaar in EEN wereld en niet in een negende tegel, want het is
      hetzelfde: werk. De kopjes zijn er zodat de rij leesbaar blijft. -->
 <nav class="wereldapps" aria-label="Apps in deze wereld">
+  <b>Ingangen</b>
+  <a href="/apps/personeel.html">Personeel</a>
+  <a href="/apps/leverancier.html">Bedrijf beheren</a>
+  <a href="/apps/partner-worden.html">Bedrijf aanmelden</a>
   <b>Werk</b>
   <a href="/apps/rtgone.html">RTG One</a>
   <a href="/apps/rtmail.html">RTMail</a>
   <a href="/apps/magnaat.html">Magnaat</a>
+  <a href="/apps/office.html">Documenten</a>
+  <a href="/apps/onderneming.html">Onderneming</a>
+  <a href="/apps/loonstrook.html">Loon</a>
+  <a href="/apps/browser.html">Web</a>
+  <a href="/apps/sitemaker.html">Website</a>
+  <a href="/apps/rtgschool.html">School</a>
   <a href="/apps/gereedschap.html">Gereedschap</a>
   <a href="/apps/doos.html">Zaakdoos</a>
   <a href="/apps/klankwerk.html">Klankwerk</a>
   <a href="/apps/merken.html">Merken</a>
+  <!-- Deze twee kwamen met de samenvoeging mee in de WorkOS-lijst (MAPPEN)
+       maar stonden op geen enkele wereldpagina, en dus nergens: een app in een
+       wereld-lijst zonder ingang op die pagina is niet aan te tikken.
+       test/beginscherm.test.js meet dat. -->
+  <a href="/apps/onderneming.html">Mijn onderneming</a>
+  <a href="/apps/loonstrook.html">Mijn loon</a>
+  <!-- De routedekking hoort in deze wereld en niet op het techniekbord: dat
+       laatste is eigenaar-only, en de vraag "is elke route van dit huis
+       beproefd" hoort door het personeel na te kijken te zijn. -->
+  <a href="/apps/routedekking.html">Routedekking</a>
+  <a href="/apps/partner-network.html">Partner Network</a>
   <b>Zaak</b>
   <a href="/apps/horeca.html">Horeca</a>
   <a href="/apps/horeca-expeditie.html">Expeditie</a>
@@ -64,6 +111,7 @@
   <a href="/apps/horeca-haccp.html">HACCP</a>
   <a href="/apps/horeca-beheer.html">Beheer</a>
   <a href="/apps/kassa.html">Kassa</a>
+  <a href="/apps/zaakpay.html">RTG Pay</a>
   <a href="/apps/scanner.html">Scanner</a>
   <a href="/apps/werkruimte.html">Werkruimte</a>
   <a href="/apps/pakketten.html">Pakketten</a>
@@ -89,11 +137,37 @@
   <a href="/apps/leverancier-aanvragen.html">Aanvragen</a>
   <a href="/apps/lesmaker.html">Lesmaker</a>
   <a href="/apps/schoolpartner.html">Schoolpartner</a>
+  <a href="/apps/browser.html">Browser</a>
+  <a href="/apps/sitemaker.html">Website-maker</a>
 </nav>
 <main id="inhoud">
   <header class="merkkop">
-    <h1 class="rtg-ceremonie">RTG Kantoor</h1>
+    <h1 class="rtg-ceremonie">WORK<span class="onder">Personeel · Ondernemers · Bedrijf aanmelden</span></h1>
   </header>
+
+  <section class="doelgroep" aria-labelledby="workDoelgroepKop">
+    <nav class="doelgroepnav" aria-label="Voor wie is WORK">
+      <a class="actief" href="#personeel" data-work-kies="personeel" aria-current="page">Personeel</a>
+      <a href="#ondernemers" data-work-kies="ondernemers">Ondernemers en bedrijven</a>
+      <a href="#aanmelden" data-work-kies="aanmelden">Bedrijf aanmelden</a>
+    </nav>
+    <div class="doelgroeptekst"><h2 id="workDoelgroepKop">Uw werkdag, op uw eigen naam.</h2><p id="workDoelgroepUitleg">Open uw dienst, taken, team, loon en persoonlijke werkplek. Uw werkgever ziet alleen wat voor het werk nodig is; uw vertrouwenslijn blijft privé.</p></div>
+    <div class="doelgroeppoorten" data-work-paneel="personeel">
+      <a href="/apps/personeel.html"><b>Personeels-app</b><span>Dienst, taken, team, chat en vertrouwenslijn.</span><em>Open mijn werkdag</em></a>
+      <a href="/apps/loonstrook.html"><b>Mijn loon</b><span>Loonstroken van alle bedrijven waar u werkt.</span><em>Alleen voor u</em></a>
+      <a href="/apps/werk.html"><b>Mijn werkplek</b><span>De organisatieomgeving waarvoor u bent uitgenodigd.</span><em>Rolgestuurde toegang</em></a>
+    </div>
+    <div class="doelgroeppoorten" data-work-paneel="ondernemers" hidden>
+      <a href="/apps/onderneming.html"><b>Mijn onderneming</b><span>Van een eerste idee naar plan, oprichting en klant.</span><em>Voor ondernemers</em></a>
+      <a href="/apps/leverancier.html"><b>Mijn bedrijf</b><span>Orders, reserveringen, voorraad, personeel en bedrijfsregie.</span><em>Voor bestaande bedrijven</em></a>
+      <a href="/apps/concern.html"><b>Mijn concern</b><span>Meerdere bedrijven, vestigingen en mensen onder één dak.</span><em>Voor groepen</em></a>
+    </div>
+    <div class="doelgroeppoorten" data-work-paneel="aanmelden" hidden>
+      <a href="/apps/partner-worden.html"><b>Partneraanvraag</b><span>Meld een bestaand bedrijf gecontroleerd aan bij RTG.</span><em>Menselijke beoordeling</em></a>
+      <a href="/apps/onderneming.html"><b>Eerst voorbereiden</b><span>Werk uw idee, rechtsvorm en ondernemingsplan uit voordat u aanvraagt.</span><em>Geen Business Pass nodig</em></a>
+      <a href="/apps/app.html?pas=business"><b>Business Pass</b><span>Een actieve Business Pass is vereist om de partneraanvraag in te dienen.</span><em>Geen automatische toelating</em></a>
+    </div>
+  </section>
 
   <!-- LAAG 0 EN LAAG 1 VAN HET COMMAND CANVAS (CANVAS.md): eerst de stand, dan
        de rust, en pas daarna de functies. Hier stond een alarmbalk die
@@ -138,6 +212,7 @@
      niet. Zie CANVAS.md; de vorm staat in shared/canvas.css. -->
 <script src="/shared/canvas.js"></script>
 <script src="/shared/canvas-taal.js"></script>
+<script src="/apps/work-doelgroepen.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -193,7 +268,7 @@
   function tekenStand(d) {
     const t = d.telling || {};
     RTGCanvas.stand('#stand', {
-      app: 'RTG Kantoor',
+      app: 'WORK',
       stand: d.stand,
       cijfers: [
         [t.regels || 0, t.regels === 1 ? 'regel open' : 'regels open'],
@@ -295,6 +370,19 @@
       '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
       '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');
   }
+
+  /* ELKE REGEL DRAAGT ZIJN ACTIES (shared/gebaar.js). Veeg naar links: openen
+     of delen. Veeg naar rechts: het kenmerk of de hele regel overnemen. Veeg
+     door en de eerste van die kant gebeurt meteen.
+
+     De bouwer staat in de LAAG en niet hier: Sociaal en Reizen tekenen exact
+     dezelfde .reis-regel, en drie kopieen van dezelfde vraag lopen binnen een
+     maand uiteen (LAT.md regel 4). Gedelegeerd, dus dit hoeft maar een keer en
+     niet bij elke hertekening. De laag laadt zonder haast mee via
+     shared/basis.js; tot hij er is verandert er niets aan het scherm. */
+  function gebaren() { window.RTGGebaar.wereldregister($('#werkdag')); }
+  if (window.RTGGebaar) gebaren();
+  else document.addEventListener('rtg-gebaar', gebaren, { once: true });
 
   // klikken op een kenmerk kopieert het (ONTWERP.md: de referentie is wat een
   // professional zoekt, dus hij staat er en is met een klik mee te nemen)

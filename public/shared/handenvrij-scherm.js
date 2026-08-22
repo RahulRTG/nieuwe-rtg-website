@@ -55,8 +55,8 @@
     '.hv-greep{position:sticky;top:-.7rem;margin:-.7rem -.8rem .3rem;padding:.45rem .8rem .5rem;' +
     'background:#0C0C0B;border-bottom:1px solid #201e1c;display:flex;align-items:center;gap:.4rem;' +
     'z-index:2;touch-action:none;cursor:ns-resize;}' +
-    '.hv-lijn{width:2.2rem;height:.22rem;border-radius:999px;background:#3a3733;margin-right:auto;}' +
-    '.hv-sk{background:transparent;border:1px solid #3a3733;border-radius:9px;color:#cfccc7;' +
+    '.hv-lijn{width:2.2rem;height:.22rem;border-radius:0;background:#3a3733;margin-right:auto;}' +
+    '.hv-sk{background:transparent;border:1px solid #3a3733;border-radius:0;color:#cfccc7;' +
     'font:inherit;font-size:.72rem;line-height:1;padding:.32rem .45rem;cursor:pointer;flex:0 0 auto;}' +
     '.hv-sk:hover{border-color:var(--gold,#857007);color:#fff;}' +
     '.hv-sk:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:2px;}' +
@@ -196,6 +196,20 @@
   document.addEventListener('fullscreenchange', kijkVolScherm);
   document.addEventListener('webkitfullscreenchange', kijkVolScherm);
 
-  zet('min', false);
+  /* BEGINNEN IN DE STAND DIE ER AL IS. Hier stond kaal `zet('min', false)`, en
+     dat is bijna altijd goed: een verse pagina begint met een dicht paneel.
+
+     BIJNA. Deze module is een eigen script en laadt op zijn eigen moment. Alles
+     wat daarvóór het paneel opent -- een beurt uit handenvrij-chat.js, of de
+     bevestigingskaart uit handenvrij-geld.js -- werd door deze ene regel weer
+     dichtgeslagen, met inhoud en al. Na een herlaadactie is dat een echt venster
+     van tientallen milliseconden. Het duurste geval is de bevestiging van een
+     BETALING: die kaart zet de focus op "Ja, doorzetten" en Rahul vraagt hardop
+     of hij het zal doorzetten, terwijl het paneel dicht is.
+
+     `chat.hidden` staat bij het bouwen van de balk op true, dus false betekent
+     hier: iemand heeft hem bewust opengedaan. Die neemt deze laag over in plaats
+     van hem te overrulen. */
+  zet(chat.hidden ? 'min' : bewaardeStand(), false);
   root.RTGChatScherm = { zet: function (s) { zet(s, true); }, stand: function () { return stand; }, greep: greep };
 })(typeof self !== 'undefined' ? self : this);

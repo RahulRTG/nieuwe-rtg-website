@@ -19,8 +19,8 @@
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
   .wegen{display:flex;flex-direction:column;gap:.7rem;}
-  .weg{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;padding:.8rem 1rem;}
-  .weg b{color:var(--goud);}
+  .weg{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.8rem 1rem;}
+  .weg b{color:var(--rtg-leesgoud,var(--goud));}
   .weg p{color:var(--zacht);font-size:.88rem;line-height:1.45;margin-top:.2rem;}
   .knoprij{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem;}
 </style>
@@ -48,9 +48,9 @@
     <h2>Vraag het je studiecoach</h2>
     <div class="h">Nora denkt met je mee: wat zou je willen kunnen of worden, en welke gratis stap past daarbij?</div>
     <div class="chat" id="chat"><div class="b ai">Hoi, ik ben Nora. Wat zou je graag willen leren, of wat voor werk zou je willen doen? Dan zoeken we samen een haalbare, betaalbare weg. Klein beginnen mag altijd.</div></div>
-    <div class="rijveld">
+    <div class="rijveld rtg-duimeind">
       <textarea class="veld" id="vraag" rows="1" placeholder="Ik zou graag..." maxlength="1000"></textarea>
-      <button class="knop" id="stuur">Vraag</button>
+      <button class="knop" id="stuur" data-hoofdactie>Vraag</button>
     </div>
     <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je hier typt wordt niet bewaard.</div>
     <div class="knoprij h-mt90">

@@ -26,7 +26,7 @@
    telt -- precies zoals achter een reverse proxy in productie. Een bezoeker die
    rechtstreeks binnenkomt kan hem niet verzinnen; dat staat in test/ip.test.js.
 
-   Draai los: node --experimental-sqlite --test test/rtfcoderem.test.js
+   Draai los: node --test test/rtfcoderem.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

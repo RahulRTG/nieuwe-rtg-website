@@ -2,7 +2,7 @@
    juiste bonnummer, de bezorger vinkt af dat hij alles gepakt heeft, pas dan
    mag de rit vertrekken; de beste route kent voertuigkeuze en de terugmelding
    ruimt de bezorgerspositie op.
-   Draai: node --experimental-sqlite --test test/bezorgketen.test.js */
+   Draai: node --test test/bezorgketen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

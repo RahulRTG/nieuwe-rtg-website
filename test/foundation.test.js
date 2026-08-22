@@ -2,7 +2,7 @@
    het bord, het schrift, opgaven en de AI-bijles. Draait tegen een echte
    RTG-server in een tijdelijke datamap.
 
-   Draai los: node --experimental-sqlite --test test/foundation.test.js */
+   Draai los: node --test test/foundation.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -23,7 +23,20 @@ function api(pad, body) {
 const json = r => r.json();
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' }, wachtPad: '/api/foundation/health' }));
+  /* RTG_GEZIN_REM_UIT: dit bestand maakt zeventien gezinnen achter elkaar vanaf
+     hetzelfde adres, en /gezin/maak staat een quotum van acht per half uur toe
+     ('hooguit 8 nieuwe gezinnen per adres per half uur', server/foundation/
+     gezin.js). Dat quotum is geen storing maar een misbruikgrens: een echt
+     huishouden maakt geen negen gezinnen in dertig minuten.
+
+     Die rem stond vroeger uit zodra NODE_ENV=test, dus voor ELKE toets en ook
+     voor de rem op het RADEN van een gezinscode -- die daardoor nergens bewezen
+     werd (server/foundation/rem.js legt uit waarom dat erger is dan het klinkt).
+     Nu staat hij standaard aan en zet een toets hem uitdrukkelijk uit als hij
+     hem in de weg zit. Dit is zo'n toets, en dit is de reden. */
+  ({ child, base: BASE } = await startServer({
+    env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_GEZIN_REM_UIT: '1' },
+    wachtPad: '/api/foundation/health' }));
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -266,18 +279,31 @@ test('privacy: gevoelige data ligt versleuteld op schijf en het gezin kan alles 
   const kt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
 
   // gevoelige zaken achterlaten: locatie, gezondheidsinfo en een bericht
+  const opSchijf = () => ['db.json', 'store.db', 'store.db-wal']
+    .map(f => path.join(TMP, f)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
+  const voorSchrijven = opSchijf();
   await api('/gezin/locatie', { code: g.code, token: kt, status: 'op school', lat: 52.31337, lon: 4.94211 });
   await api('/gezin/oppasinfo', { code: g.code, token: g.token, allergie: 'GEHEIM-ALLERGIE-PINDAKAAS', eten: '', huisregels: '' });
   await api('/gezin/bericht', { code: g.code, token: kt, naar: 'allen', soort: 'hulp', tekst: 'GEHEIM-BERICHT-IK-WIL-PRATEN' });
-  await new Promise(r => setTimeout(r, 200)); // even wachten tot alles is weggeschreven
+  /* WACHTEN TOT DEZE SCHRIJFACTIES ER ECHT IN ZITTEN, en niet 200 ms gokken.
+
+     De beweringen hieronder zijn NEGATIEF: de allergie en het bericht staan niet
+     leesbaar op schijf. Daar zit een val in -- lees je te vroeg, dan staat er
+     nog niets van deze drie acties en is de bewering waar omdat er niets is.
+     Het anker is de schijf zelf: een afdruk van voor de acties, en wachten tot
+     de bytes veranderd zijn. */
+  {
+    const eind = Date.now() + 15000;
+    while (opSchijf() === voorSchrijven) {
+      if (Date.now() >= eind) throw new Error('wachtte 15 s tot de drie acties op schijf stonden, ' +
+        'en de bestanden veranderden niet; de beweringen hieronder zouden dan waar zijn omdat er NIETS staat');
+      await new Promise(r => setTimeout(r, 25));
+    }
+  }
 
   // het ruwe databasebestand mag deze gegevens niet leesbaar bevatten,
   // welke opslagmotor er ook draait (db.json, of store.db met zijn WAL)
-  const ruw = ['db.json', 'store.db', 'store.db-wal']
-    .map(f => path.join(TMP, f))
-    .filter(f => fs.existsSync(f))
-    .map(f => fs.readFileSync(f, 'utf8'))
-    .join('\n');
+  const ruw = opSchijf();
   assert.ok(ruw.length > 0, 'er ligt een databasebestand op schijf');
   assert.ok(ruw.includes('enc:'), 'er staat versleutelde data in de database');
   assert.ok(!ruw.includes('GEHEIM-ALLERGIE-PINDAKAAS'), 'de allergie-info staat niet leesbaar op schijf');

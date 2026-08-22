@@ -4,7 +4,7 @@
    gezin). Bewaakt de vier ingangen, de scheiding tussen drives,
    presentaties, meeschrijf-rechten bij delen, de versiegeschiedenis met
    terugzetten, sjablonen en de AI-schrijfhulp met eerlijke lokale uitwijk.
-   Draai los: node --experimental-sqlite --test test/kantoorpakket-alle.test.js */
+   Draai los: node --test test/kantoorpakket-alle.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

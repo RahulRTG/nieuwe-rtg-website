@@ -3,7 +3,7 @@
    mag pas een restaurant reserveren als het ID geverifieerd is, telt tot
    die verificatie standaard als "onder de 18" (geen alcohol), en kan wel
    gewoon met een QR-kassacode betalen.
-   Draai: node --experimental-sqlite --test test/gastregels.test.js */
+   Draai: node --test test/gastregels.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -133,4 +133,51 @@ test('betalen met QR kan wel gewoon: de gast krijgt een kassacode en de zaak int
   // de zaak int de code aan de kassa (het saldo laadt automatisch bij)
   const inn = await api('/api/supplier/pay/in', { code: d.code, centen: 500, oms: 'Lunch', idem: 'gasttest-1' }, managerToken);
   assert.equal(inn.status, 200, 'de QR-betaling van de gast wordt gewoon geind');
+});
+
+test('een zaak die het zorgprofiel leest, komt in het journaal van het lid', async () => {
+  /* DE ZWAARSTE INHOUD HAD HET LICHTSTE SPOOR. Allergieen, dieet en medische
+     aandachtspunten reisden mee naar een zaak, en het lid kon nergens zien
+     welke zaak ze had gelezen. De deel-schakelaar stond wel op het
+     toestemmingsscherm; de andere helft -- wie er werkelijk keek -- nergens.
+
+     En de rem erop: een restaurant dekt een tafel meerdere keren op een avond.
+     Zonder die rem verdrinkt het echte signaal in vijftig regels van dezelfde
+     zaak op dezelfde dag. */
+  const maakGastzorg = require('../server/kern/gastzorg');
+  const inzagelog = require('../server/inzagelog');
+  const db = { data: { inzageLog: [] } };
+  inzagelog.zet(db, () => {});
+  const G = maakGastzorg({ db, save: () => {}, crypto: require('crypto'),
+    schoon: (v, n) => String(v == null ? '' : v).trim().slice(0, n),
+    notify: () => {}, notifySupplier: () => {}, sseToSupplier: () => {}, sseToCustomer: () => {},
+    findSupplier: (c) => (c === 'KIK' ? { code: 'KIK', name: 'Kikunoi' } : null),
+    haversine: () => 0, etaMinutes: () => 0 });
+
+  G.zorgZet('user-7', { allergenen: ['noten'], dieet: '', medisch: '', delen: true });
+
+  // het lid vraagt zijn eigen profiel: dat is geen inzage
+  assert.ok(G.zorgVoor('user-7'), 'het profiel komt gewoon terug');
+  assert.equal(db.data.inzageLog.length, 0, 'je eigen profiel lezen staat niet in het journaal');
+
+  // een zaak leest het: dat wel
+  assert.ok(G.zorgVoor('user-7', { zaak: 'KIK', reden: 'tafel dekken' }));
+  assert.equal(db.data.inzageLog.length, 1, 'de zaak staat in het journaal');
+  assert.equal(db.data.inzageLog[0].door, 'Kikunoi', 'op naam van de zaak, niet op code');
+  assert.equal(db.data.inzageLog[0].bron, 'zorgprofiel');
+  assert.match(db.data.inzageLog[0].waarom, /tafel dekken/);
+
+  // en nog eens dezelfde dag levert geen tweede regel
+  G.zorgVoor('user-7', { zaak: 'KIK', reden: 'tafel dekken' });
+  G.zorgVoor('user-7', { zaak: 'KIK', reden: 'tafel dekken' });
+  assert.equal(db.data.inzageLog.length, 1, 'een zaak komt hoogstens een keer per dag in het journaal');
+
+  // een ANDERE zaak wel
+  G.zorgVoor('user-7', { zaak: 'ANDER', reden: 'bestelling' });
+  assert.equal(db.data.inzageLog.length, 2, 'maar een tweede zaak is een tweede regel');
+
+  // en zonder toestemming valt er niets te lezen en dus niets te noteren
+  G.zorgZet('user-7', { allergenen: ['noten'], dieet: '', medisch: '', delen: false });
+  assert.equal(G.zorgVoor('user-7', { zaak: 'DERDE' }), null);
+  assert.equal(db.data.inzageLog.length, 2, 'geen lezing, geen regel');
 });

@@ -3,7 +3,7 @@
    niveau, en vanaf 4 gaan de zwarte pistes dicht en blijven ze dicht),
    skipassen, materiaalverhuur, de skischool met vol-is-vol en
    instructeur-agenda, chalets zonder overlap en de cap-poorten.
-   Draai los: node --experimental-sqlite --test test/alpine.test.js */
+   Draai los: node --test test/alpine.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

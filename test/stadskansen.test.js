@@ -25,13 +25,13 @@
    de helft van de dwarsstraat, en dat is precies het kruispunt met de laan.
    Ze bonden daardoor aan de verkeerde straat en heetten "Marinastraat kolk"
    terwijl hun adres de Marinalaan was.
-   Draai los: node --experimental-sqlite --test test/stadskansen.test.js */
+   Draai los: node --test test/stadskansen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, drukte } = require('./helper');
 
 let srv, base, office, partner;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kansen-'));

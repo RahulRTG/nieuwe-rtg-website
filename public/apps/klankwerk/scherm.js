@@ -74,8 +74,13 @@
       v.innerHTML = '<div class="kop">Mijn stukken</div>' +
         (rijen || '<p class="stil">Nog niets gemaakt. Begin met een nieuw stuk; er staat meteen een maat in ' +
           'die klinkt, zodat u hoort wat u doet.</p>') +
-        '<div class="rij h-mt80">' +
-        '<button class="knop vol" id="nieuw" type="button">Nieuw stuk</button>' +
+        /* De twee beginwegen staan in de vaste strook onderaan en niet midden
+           op de pagina: gemeten stond "Nieuw stuk" op y 305 van 844, boven de
+           duimlijn (GRAMMATICA.md). Ze verhuizen samen -- "Leeg beginnen" is
+           dezelfde handeling zonder de voorgezette maat, en die twee uit
+           elkaar trekken maakt de keuze onleesbaar. */
+        '<div class="rij h-mt80 rtg-duimbalk">' +
+        '<button class="knop vol" id="nieuw" type="button" data-hoofdactie>Nieuw stuk</button>' +
         '<button class="knop" id="nieuwLeeg" type="button">Leeg beginnen</button></div>';
       Array.prototype.forEach.call(v.querySelectorAll('[data-id]'), function (b) {
         b.addEventListener('click', function () { openStuk(b.dataset.id); });

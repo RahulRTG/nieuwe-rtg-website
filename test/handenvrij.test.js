@@ -8,7 +8,7 @@
    spraakzin een handeling kunnen worden. Vandaar dat toets 5 de belangrijkste is:
    alles wat niet zeker navigatie is, hoort onveranderd naar Rahul te gaan.
 
-   Draai los: node --experimental-sqlite --test test/handenvrij.test.js */
+   Draai los: node --test test/handenvrij.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const H = require('../public/shared/handenvrij');

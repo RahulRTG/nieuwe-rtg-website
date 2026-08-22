@@ -2,7 +2,7 @@
    vijf categorieen - Partners (leveranciers), RTG-Backoffice, RTFoundation,
    Betalen & verificatie en Personeel & integraties. Verbatim afgesplitst uit
    register.js; de leden-groepen komen uit ./doelgroepen. */
-const { LEDEN, LEDEN_GAST } = require('./doelgroepen');
+const { LEDEN, LEDEN_GAST, WERKOS } = require('./doelgroepen');
 
 module.exports = [
   // ---- Partners (leveranciers) ----
@@ -48,6 +48,8 @@ module.exports = [
   { id: 'command-zien', categorie: 'RTG-Backoffice', naam: 'RTG Command: zien', standaard: true, doelgroepen: ['intern'],
     uitleg: 'De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.',
     paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal',
+      // het API-spoor hoort bij het zien; dichtzetten verbergt het en stopt het niet
+      '/api/command/apispoor',
       '/api/command/kwaliteit', '/api/command/graaf', '/api/command/herkomst', '/api/command/alarm',
       '/api/command/slo', '/api/command/sonde',
       /* De meldingsingang van de sonde hoort bij het zien en niet bij het doen:
@@ -64,7 +66,7 @@ module.exports = [
     uitleg: 'Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.',
     paden: ['/api/command/beleid', '/api/command/simulatie', '/api/command/agent', '/api/command/agents',
       '/api/command/recht', '/api/command/rechten', '/api/command/mandaat',
-      '/api/command/canary', '/api/command/zandbak', '/api/command/mdm',
+      '/api/command/canary', '/api/command/uitrol', '/api/command/zandbak', '/api/command/mdm',
       '/api/command/overname', '/api/command/apipoort', '/api/command/land', '/api/command/stad'] },
 
   // ---- RTFoundation ----
@@ -76,7 +78,7 @@ module.exports = [
     uitleg: 'De vacature- en sollicitatielaag binnen de RTFoundation-app.', paden: ['/api/rtf/apply', '/api/rtf/vacatures', '/api/rtf/solliciteer'] },
 
   // ---- Werk OS (de werkplek van een organisatie) ----
-  { id: 'bedrijf', categorie: 'RTG-Backoffice', naam: 'Werk OS (werkruimtes)', standaard: true, doelgroepen: ['intern', 'business'],
+  { id: 'bedrijf', categorie: 'RTG-Backoffice', naam: 'Werk OS (werkruimtes)', standaard: true, doelgroepen: WERKOS,
     uitleg: 'De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte werkt meer.', paden: ['/api/bedrijf'] },
 
   // ---- Betalen & verificatie ----
@@ -97,7 +99,7 @@ module.exports = [
      hij verbindt een mens aan een zaak. Kan de boardroom hem niet sluiten, dan
      is er bij misbruik geen knop -- alleen een uitrol. */
   { id: 'werving', categorie: 'Personeel & integraties', naam: 'Wervingslink (in dienst via een link)', standaard: true,
-    doelgroepen: ['leverancier', 'personeel'],
+    doelgroepen: WERKOS,
     uitleg: 'De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.',
     paden: ['/api/werving'] },
   { id: 'stuur', categorie: 'Personeel & integraties', naam: 'Rahul doet het (AI-stuur)', standaard: true,

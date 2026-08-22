@@ -11,6 +11,7 @@
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
+      await verwerkWebsiteAanvraag();
       if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
       loadSocial();
       checkOnboarding(); laadAgendaLid();
@@ -24,6 +25,10 @@
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
+    /* En zijn werktafel staat leeg. Sinds WERELD.md hervat de werktafel je
+       laatste bladen (shared/command/geheugen.js); zonder deze regel zou de
+       volgende mens op een gedeeld toestel de titels van de vorige zien. */
+    try { localStorage.removeItem('rtg_cmd_bladen'); } catch(e){}
     location.reload();
   }
 
@@ -70,7 +75,7 @@
       // De passkey is de voordeur: groot genoeg als eerste handeling, maar nog
       // steeds in de stille horlogetaal van het huis.
       '.ag-passkey{margin:0.95rem auto 0;background:color-mix(in srgb,var(--gold,#857007) 10%,transparent);' +
-        'border:1px solid color-mix(in srgb,var(--gold,#857007) 48%,transparent);border-radius:999px;color:var(--gold,#857007);' +
+        'border:1px solid color-mix(in srgb,var(--gold,#857007) 48%,transparent);border-radius:0;color:var(--gold,#857007);' +
         'font-family:inherit;font-size:0.82rem;letter-spacing:0.03em;cursor:pointer;min-height:44px;padding:0.65rem 1.15rem;' +
         'display:flex;align-items:center;justify-content:center;gap:0.48rem;min-width:min(18rem,82vw);}' +
       '.ag-passkey[hidden]{display:none;}' +

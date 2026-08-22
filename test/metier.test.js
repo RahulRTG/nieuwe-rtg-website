@@ -8,7 +8,7 @@
      verzinnen of weghalen;
    - de echte naam is een sleutel die je per werkgever afgeeft, die je kunt
      intrekken, en waarvan je in je eigen log ziet wie hem bekeek.
-   Draai los: node --experimental-sqlite --test test/metier.test.js */
+   Draai los: node --test test/metier.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

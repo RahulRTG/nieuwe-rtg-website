@@ -42,6 +42,14 @@
   }
 
   zet();
+  /* PAS HIERNA MAG HET ZACHT. De overgang in seizoen.css is voor een WISSELING
+     van het licht, niet voor het openen van een pagina -- zonder deze vlag fadet
+     elke pagina bij het laden acht tienden van een seconde naar zijn eigen kleur
+     toe, en dat is geen zonsondergang maar een flits. Twee frames wachten, want
+     de stijl van de pagina zelf kan een frame later landen dan deze regel. */
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () { d.documentElement.setAttribute('data-licht-zacht', ''); });
+  });
   // de zon draait door: elke vijf minuten opnieuw kijken
   var timer = setInterval(zet, 5 * 60000);
   if (timer && timer.unref) timer.unref();

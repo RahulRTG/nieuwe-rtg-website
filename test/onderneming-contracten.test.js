@@ -13,7 +13,7 @@
    4. EEN GEMISTE OPZEGDAG GAAT VOOR EEN NADERENDE. De eerste is al gebeurd en
       kost een jaar; de tweede is nog te halen.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-contracten.test.js */
+   Draai los: node --test test/onderneming-contracten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

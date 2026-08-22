@@ -11,7 +11,7 @@
      zet hem niet stil.
    - EEN OVERSCHRIJDING BLIJFT STAAN, ook als het ticket later netjes wordt
      opgelost, en sluiten kan niet met een leeg oplossingsveld.
-   Draai los: node --experimental-sqlite --test test/bedrijfklant.test.js */
+   Draai los: node --test test/bedrijfklant.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

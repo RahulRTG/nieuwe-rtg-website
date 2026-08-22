@@ -18,7 +18,7 @@
    5. HET BELANG HANGT AAN DE VESTIGING. Wordt de zaak verkocht, dan blijft het
       belang staan; anders schud je je aandeelhouders af door te verkopen.
 
-   Draai los: node --experimental-sqlite --test test/spelaandeel.test.js */
+   Draai los: node --test test/spelaandeel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

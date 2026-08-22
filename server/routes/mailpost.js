@@ -6,18 +6,18 @@
    - /api/office/mail/... : het BEHEER van de wachtrij. Achter de backoffice-
      inlog, want hier staat wie wat wanneer gestuurd heeft en waarom het
      misging.
-   - /api/mail/binnen : de BUITENPOORT. Die is publiek, want een vreemde
-     mailserver heeft geen inlog bij ons. Daarom staat er een rem op (aantal
-     per minuut) en gaat alles wat hier binnenkomt in de ONBETROUWDE baan --
-     wat de afzender ook beweert. Het origineel wordt bewaard, de afgeleide
-     gaat naar RTMAIL.
+   - /api/mail/ses : de productiepoort voor AWS SES. Alleen de Lambda-brug met
+     het gedeelde HMAC-geheim komt binnen. /api/mail/binnen blijft een lokale
+     proefpoort en wordt in de SES-stand hard gesloten.
 
    De buitenpoort neemt bewust NIET zelf een postvak aan uit de body: hij leest
    de To-kop van het bericht zelf. Een poort die de ontvanger uit een parameter
    haalt, is een open relay met extra stappen. */
 module.exports = (kern) => {
-  const { app, officeAuth, auth, supplierAuth, db, mailQ, mailIn, mailBijlage, mailAanname, rtmail, rtmailRecht, codenaamVan } = kern;
+  const { app, express, officeAuth, auth, supplierAuth, db, save, mailQ, mailIn,
+    mailBijlage, mailAanname, rtmail, rtmailRecht, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
+  const ses = require('../kern/ses-ontvangst')({ db, save });
   const body = (req) => (req && req.body) || {};
 
   /* ---- beheer van de wachtrij (backoffice) ---- */
@@ -54,6 +54,8 @@ module.exports = (kern) => {
      eerder een berg post voor niemand, in een postvak dat vanzelf ontstond. */
   let venster = 0, teller = 0;
   app.post('/api/mail/binnen', async (req, res) => {
+    if (String(process.env.MAIL_INBOUND_PROVIDER || '').toLowerCase() === 'aws-ses')
+      return res.status(404).json({ error:'Deze lokale proefpoort staat in de SES-stand dicht.' });
     const min = Math.floor(Date.now() / 60000);
     if (min !== venster) { venster = min; teller = 0; }
     if (++teller > 120) return res.status(429).json({ error: 'De buitenpoort staat even dicht; probeer het over een minuut.' });
@@ -69,6 +71,40 @@ module.exports = (kern) => {
       return res.status(status).json({ error: r.error, ...(r.origineel ? { origineel: r.origineel } : {}) });
     }
     res.json(r);
+  });
+
+  /* SES -> S3 -> Lambda -> deze poort. De body blijft het originele RFC
+     5322-bericht; metadata zit in kleine, ondertekende koppen. message/rfc822
+     is niet door de globale JSON-parser gelezen, dus deze parser ziet exact
+     dezelfde bytes als waarmee Lambda de HMAC maakte. */
+  app.post('/api/mail/ses', express.raw({ type:'message/rfc822', limit:'26mb' }), async (req, res) => {
+    const v=ses.controleer({
+      tijd:req.get('x-rtg-ses-timestamp'),
+      berichtId:req.get('x-rtg-ses-message-id'),
+      ontvanger:req.get('x-rtg-ses-recipient'),
+      handtekening:req.get('x-rtg-ses-signature'),
+      controles:{ spf:req.get('x-rtg-ses-spf'), dkim:req.get('x-rtg-ses-dkim'),
+        dmarc:req.get('x-rtg-ses-dmarc'), spam:req.get('x-rtg-ses-spam'),
+        virus:req.get('x-rtg-ses-virus') },
+      bytes:req.body
+    });
+    if (!v.ok) return res.status(v.status || 400).json({ error:v.error });
+    if (v.controles.virus === 'FAIL')
+      return res.status(422).json({ error:'SES heeft malware in dit bericht gevonden; het is niet afgeleverd.' });
+    const c=ses.claim(v);
+    if (c.dubbel) return res.json({ ok:true, dubbel:true });
+    if (c.bezig) return res.status(409).json({ error:'Deze SES-bezorging wordt al verwerkt.' });
+    try {
+      const r=await mailAanname.neemAan({ ruw:v.bytes.toString('utf8'),
+        envelopeNaar:v.ontvanger, envelopeVan:req.get('x-rtg-ses-mail-from') || '',
+        providerControles:v.controles });
+      if (r.error) { ses.vrij(c.sleutel); return res.status(r.status === 550 ? 404 : (r.status || 400)).json(r); }
+      ses.klaar(c.sleutel);
+      return res.json(r);
+    } catch (e) {
+      ses.vrij(c.sleutel);
+      throw e;
+    }
   });
 
   /* EEN BIJLAGE OPENEN. Twee ingangen (lid en zaak), en beide toetsen eerst of

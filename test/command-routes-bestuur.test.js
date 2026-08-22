@@ -22,7 +22,7 @@
    - trekIn() laten teruggeven zonder het recht te sluiten
      -> "een ingetrokken recht staat niet meer in de graaf" ZAKT (RAAK)
 
-   Draai los: node --experimental-sqlite --test test/command-routes-bestuur.test.js
+   Draai los: node --test test/command-routes-bestuur.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

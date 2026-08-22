@@ -18,13 +18,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, geenBrowser, browserOpties, volgVerzoeken, wachtOpRust, wachtOpTekst } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-horecascherm-'));
 
 async function zaakToken(base) {
@@ -39,17 +35,18 @@ async function zaakToken(base) {
 }
 
 test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const browserApi = pw.chromium ? pw : null;
     assert.ok(browserApi, 'er is een browser-API');
-    browser = await browserApi.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await browserApi.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
+    await volgVerzoeken(page);
 
     /* ---- uitgelogd: een deur, geen leeg scherm ---- */
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
@@ -58,7 +55,7 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       localStorage.removeItem('rtg_sup_token');
     });
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(900);
+    await wachtOpRust(page);
     const uit = await page.evaluate(() => ({ pad: location.pathname,
       deur: !!document.querySelector('.rtgdeur'), tekst: document.body.innerText.replace(/\s+/g, ' ') }));
     assert.equal(uit.pad, '/apps/horeca.html', 'de pagina stuurt niemand weg');
@@ -69,17 +66,17 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     const token = await zaakToken(base);
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, token);
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(700);
+    await wachtOpRust(page);
 
     await page.fill('#zTafel', 'Tafel 24');
     await page.fill('#zGasten', '2');
     await page.click('#zOpen');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /Tafel 24/);
     let tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Tafel 24/, 'de open rekening staat in de lijst');
 
     await page.click('[data-open]');
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     await page.fill('#zNaam', 'Tournedos');
     await page.fill('#zPrijs', '34.50');
     await page.fill('#zAantal', '2');
@@ -87,7 +84,7 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     await page.fill('#zStation', 'grill');
     await page.fill('#zAllergie', 'noten');
     await page.click('#zRegel');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /Tournedos/);
     tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Tournedos/, 'de regel staat op de rekening');
     assert.match(tekst, /noten/, 'de allergie staat op het zaalscherm');
@@ -95,20 +92,20 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
 
     // de keuken ziet nog niets: de gang is niet vrijgegeven
     await page.click('#tabKeuken');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /alleen wat de zaal heeft vrijgegeven/i);
     let keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.ok(!/Tournedos/.test(keuken), 'zonder vrijgave staat er niets op het keukenscherm');
     assert.match(keuken, /alleen wat de zaal heeft vrijgegeven/i, 'en het scherm zegt waarom');
 
     // gang vrijgeven in de zaal, daarna staat hij er wel -- met de allergie
     await page.click('#tabZaal');
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     await page.fill('#zVrijGang', '2');
     await page.fill('#zServeerOm', '19:42');
     await page.click('#zVrij');
-    await page.waitForTimeout(500);
+    await wachtOpRust(page);
     await page.click('#tabKeuken');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /Tournedos/);
     keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(keuken, /Tournedos/, 'na vrijgave staat de bon op het keukenscherm');
     assert.match(keuken, /Allergie: noten/, 'met de allergie in een eigen label');
@@ -117,7 +114,7 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
 
     // een stand doorzetten werkt vanaf het keukenscherm
     await page.click('[data-stand="gestart"]');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /Tafel 24/, { in: '#kRegie' });
     const regie = await page.evaluate(() => document.getElementById('kRegie').innerText.replace(/\s+/g, ' '));
     assert.match(regie, /Tafel 24/, 'de tafel staat op het regiescherm');
 

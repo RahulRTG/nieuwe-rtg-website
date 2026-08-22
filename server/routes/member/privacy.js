@@ -7,8 +7,8 @@ const inzagelog = require('../../inzagelog');
 const maakVergeten = require('../../kern/vergeten');
 
 module.exports = (kern) => {
-  const { app, auth, db, stateFor, myApplications, ordersVanKlant, commGast } = kern;
-  const { lidBoard, lidBoardLog } = kern.lidboard;
+  const { app, auth, db, stateFor, myApplications, ordersVanKlant, commGast, handelingsspoor } = kern;
+  const { lidBoard, lidBoardLog, lidBoardLogKeten } = kern.lidboard;
   const { wisLid } = maakVergeten(kern);
 
   app.post('/api/privacy/export', auth, (req, res) => {
@@ -46,6 +46,17 @@ module.exports = (kern) => {
          bij een kind is dat een ouder. */
       boardroom: typeof lidBoard === 'function' ? lidBoard(key) : null,
       boardroomLogboek: typeof lidBoardLog === 'function' ? lidBoardLog(key, 200) : [],
+      /* De ketenstand van dat journaal gaat mee in de export. Een spoor dat in
+         een AVG-inzage terechtkomt zonder de mogelijkheid om na te rekenen of
+         er aan gesleuteld is, vraagt van de betrokkene dat hij ons gelooft. */
+      boardroomLogboekKeten: typeof lidBoardLogKeten === 'function' ? lidBoardLogKeten(key) : null,
+      /* WAT ER ONDER UW SLEUTEL IS GEDAAN. Het handelingsspoor legt elke
+         geslaagde schrijfactie vast; hier krijgt de betrokkene de regels die
+         onder ZIJN sleutel staan, en niet die van een ander. Het spoor
+         bewaart de body niet, alleen een hash -- dus dit zegt WAT er is
+         gedaan en niet wat erin stond. */
+      handelingen: typeof handelingsspoor === 'object' && handelingsspoor
+        ? handelingsspoor.lijst({ over: key, max: 500 }) : null,
       // wie er in uw identiteitsdossier heeft gekeken, en waarom
       inzageInUwDossier: req.session.account ? inzagelog.voorBetrokkene(req.session.account.id) : []
     });
@@ -76,6 +87,14 @@ module.exports = (kern) => {
     // await: sinds de bytes (mediastore, kluis) meegaan is dit ook I/O, en de
     // bevestiging hoort pas te komen als het echt gebeurd is
     await wisLid(req.session);
+    /* HET SPOOR VAN DEZE HANDELING ZELF. Het API-spoor noteert een geslaagde
+       schrijfhandeling NA het antwoord (server/opzet/auditspoor.js), dus deze
+       aanroep zou de zojuist gewiste sleutel meteen weer terugzetten -- en de
+       bezem van test/vergeten.test.js vond hem daar ook. Wat er moet blijven is
+       DAT er is gewist en wanneer; wie het was hoort er niet meer bij te staan.
+       Vandaar dat de sessie hier zijn sleutel verliest voordat het antwoord de
+       deur uit gaat: het spoor schrijft dan "gewist". */
+    req.session = { key: 'gewist', tier: req.session.tier };
     res.json({ ok: true });
   });
 };

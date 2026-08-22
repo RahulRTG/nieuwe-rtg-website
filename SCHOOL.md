@@ -40,9 +40,9 @@ Gemeten op 19 augustus 2026, na de schermenronde van deze dag.
 
 | Wat er staat | Hoeveel | Waar |
 |---|---|---|
-| schooladministratie (server) | 42 modules, **168 endpoints** | `server/school/` |
+| schooladministratie (server) | 42 modules, **215 endpoints** | `server/school/` |
 | schermen | leraar, directie, gezin, campus, bibliotheek | `public/apps/schoolpartner*`, `public/apps/foundation/school*` |
-| dekking | **168 van 168** endpoints vanuit een scherm bereikbaar | `test/schoolschermen.test.js` |
+| dekking | **215 van 215** endpoints verantwoord (212 met een scherm, 3 in OPEN) | `test/schoolschermen.test.js` |
 | rollen en rechten | 15 rollen, recht per handeling, inzagejournaal met verplichte reden | `school/rollen.js` |
 | leerstofmotor | **166 leerdoelen**, 56 opgavengeneratoren, referentieniveaus 1F-4F | `kern/leerstof*.js` |
 | de Fabric | voorkennisgraaf, meerdere uitlegvormen en een eigen meting per doel, gekeurd bij het opstarten | `kern/leerstof-fabric.js` |
@@ -406,7 +406,7 @@ worden -- door de school, door ons, door een toezichthouder.
 | Een AI-tekst die iets vaststelt wordt gemeld | keuring op besluitende zinsdelen | **ja** -- de tekst wordt gemeld, niet stil bijgeschaafd |
 | Geen hulpvraag raakt zoek | SLA + opvolgbewijs | **ja** sinds 19 augustus 2026 (`test/opvolging.test.js`), met mutatie beproefd |
 | 114 talen | vertaaldekking, gerekend uit de tabel zelf | **dekking ja** (`test/taaldekking.test.js`): 114 talen in het register, 113 van de 113 doeltalen met alle 30 kernwoorden; **kwaliteit ongemeten** -- er is nog nooit een spreker langs deze tabel gelopen |
-| Elk endpoint heeft een scherm | registertoets | **ja**, 201 van 201 (gemeten 20 augustus 2026) |
+| Elk endpoint heeft een scherm | registertoets | **ja**, 215 van 215 (gemeten 22 augustus 2026; 212 met een scherm, 3 met naam en reden in OPEN -- zie test/schoolschermen.test.js) |
 
 Wie een belofte toevoegt zonder meting, voegt geen belofte toe maar een risico.
 

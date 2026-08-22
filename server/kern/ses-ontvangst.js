@@ -47,11 +47,37 @@ module.exports = ({ db, save, geheim, nu } = {}) => {
   const actief = secret.length >= 32;
 
   function controleer({ tijd, berichtId, ontvanger, bytes, handtekening, controles } = {}) {
-    if (!actief) return { status: 503, error: 'De SES-ontvangstbrug is niet ingericht.' };
+    /* NIET INGERICHT IS EEN ANTWOORD VOOR EEN BEVOEGDE, NIET VOOR EEN VREEMDE.
+
+       Hier stond deze controle als EERSTE, en dan gaf een verzoek zonder enige
+       handtekening een 503: "De SES-ontvangstbrug is niet ingericht." De ladder
+       ving dat op de trede "de dwaler" -- een verzoek zonder token dat een
+       serverfout uitlokt. Dat is twee dingen tegelijk fout. Het vertelt een
+       willekeurige buitenstaander hoe dit huis is ingericht, en het laat een
+       storing klinken waar een weigering hoort te staan.
+
+       De volgorde is nu: eerst de envelop en de handtekening, en pas als die
+       kloppen mag het antwoord verraden dat de brug niet is ingericht. Wie geen
+       geldige handtekening heeft, krijgt 401 -- en kan dus niet uit het verschil
+       aflezen of de brug aan staat. Wie er wel een heeft, krijgt de eerlijke
+       503 die hij nodig heeft om het te repareren.
+
+       Dit is het spiegelbeeld van de regel uit CONTROLPLANE.md dat ONBEKEND
+       geen synoniem van WEIGEREN is: binnen het huis hoort een storing niet als
+       overtreding te klinken, en naar buiten hoort hij helemaal niet te klinken. */
     const stamp = Number(tijd);
     const id = veiligId(berichtId);
     const naar = veiligAdres(ontvanger);
-    const ruw = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes || '');
+    /* ALLEEN EEN BUFFER OF EEN STRING IS BYTES. Hier stond `Buffer.from(bytes || '')`,
+       en dat gooit een TypeError zodra `bytes` iets anders is -- bijvoorbeeld het
+       lege object dat de globale JSON-parser achterlaat wanneer een aanroeper
+       GEEN message/rfc822 stuurt. Dat is precies wat een vreemde doet die op de
+       deur klopt, en het leverde een 500 op: een serverfout waar een nette
+       weigering hoort. De ladder ving hem pas nadat de 503 hierboven naar
+       achteren was verplaatst; daarvóór dekte die de crash af. Een lege buffer
+       valt hieronder gewoon door de envelopcontrole. */
+    const ruw = Buffer.isBuffer(bytes) ? bytes
+      : Buffer.from(typeof bytes === 'string' ? bytes : '');
     if (!Number.isInteger(stamp) || !id || !naar || !ruw.length)
       return { status: 400, error: 'Ongeldige SES-envelop.' };
     if (ruw.length > MAX_BYTES)
@@ -65,6 +91,9 @@ module.exports = ({ db, save, geheim, nu } = {}) => {
     if (!/^[a-f0-9]{64}$/.test(gekregen) ||
         !crypto.timingSafeEqual(Buffer.from(gekregen, 'hex'), Buffer.from(verwacht, 'hex')))
       return { status: 401, error: 'Ongeldige SES-handtekening.' };
+
+    /* Pas hier: de handtekening klopt, dus dit is een bevoegde aanroeper. */
+    if (!actief) return { status: 503, error: 'De SES-ontvangstbrug is niet ingericht.' };
     return { ok:true, tijd:stamp, berichtId:id, ontvanger:naar, bytes:ruw,
       controles:providerControles };
   }

@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-hulp-leerpas-5b3a6d6d';
+const CACHE = 'rtf-hulp-leerpas-9a147fc2';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/leren.html', '/apps/foundation/leerpaspoort.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
@@ -21,6 +21,11 @@ const SHELL = [
   '/apps/foundation/mediawijs.html',
   // de levenspas aan de gezinskant, met de gedeelde schil eronder
   '/apps/foundation/mijnbanden.html', '/shared/levenspas.js', '/shared/levenspas.css',
+  /* mail.html en registreren.html kwamen met de samenvoeging van 22 augustus
+     2026 op de hub te staan maar niet hier. Een tegel die de service worker niet
+     kent, geeft offline een wit scherm -- en dat is erger dan geen tegel, want
+     de gebruiker denkt dat de app stuk is. test/foundationschil.test.js meet dit. */
+  '/apps/foundation/mail.html', '/apps/foundation/registreren.html',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
   /* club en klas kwamen op de hub te staan toen elk scherm een klikroute
      kreeg; zonder deze twee regels geeft de app ze offline als wit scherm.

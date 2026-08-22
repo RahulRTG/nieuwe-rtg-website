@@ -176,7 +176,20 @@ test('een echte accountinlog komt in het beveiligingslogboek, gelukt en mislukt'
       body: '{}'
     }).then(r => r.json());
 
-    const leden = (log.log || []).filter(r => r.kanaal === 'lid');
+    /* TWEE KANALEN, EN DAT IS EEN BESLUIT VAN EEN ANDERE TOETS.
+
+       Deze toets ging uit van kanaal 'lid' voor alle drie de pogingen, en dat
+       klopte op de tak waar hij is geschreven. In de samenvoeging kwam
+       test/inlogspoor.test.js erbij, en die gaat er nu juist OVER: een mislukte
+       poging op de echte accountingang logt op kanaal 'account', met de reden
+       erbij -- credential stuffing is te zien als veel mislukte ACCOUNTpogingen
+       van een plek, en het adres van iemand die hier misschien niet eens lid is,
+       zetten we niet in de database.
+
+       Die toets bezit het begrip, deze niet: waar het hier om gaat is de
+       HASHKETEN onder het spoor, en daarvoor moeten er alleen regels ZIJN. Dus
+       telt hij nu de inlogpogingen op beide kanalen. */
+    const leden = (log.log || []).filter(r => r.kanaal === 'lid' || r.kanaal === 'account');
     assert.ok(leden.length >= 3, 'drie pogingen op de echte inlog horen erin te staan, kreeg ' + leden.length);
     assert.ok(leden.some(r => r.ok === true), 'de geslaagde');
     assert.ok(leden.some(r => r.ok === false), 'en de mislukte');

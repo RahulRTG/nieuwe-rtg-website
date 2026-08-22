@@ -45,7 +45,16 @@ module.exports = (kern) => {
     return sess && caps.mag(sess.tier, 'can_be_partner') ? sess : null;
   }
 
+  /* ACHTER DEZELFDE POORT ALS DE REST VAN DEZE MODULE. Dit stond open: de
+     ladder (trede "de dwaler") klopte op deze deur zonder sleutel en kreeg een
+     geslaagd antwoord. Wat eruit komt is geen geheim -- bedrijfstypes met hun
+     eisen -- maar het is wel de volledige kaart van wat RTG van een partner
+     vraagt, en die hoort bij iemand die partner MAG worden.
+     Het scherm dat hem aanroept (public/apps/partner-worden.js) stuurt de
+     ledentoken al mee, dus dit breekt niets. */
   app.post('/api/partner/types', (req, res) => {
+    if (!partnerSessie(req)) return res.status(403).json({ error: 'Log in met een pas die partner mag zijn (' +
+      caps.tredenMet('can_be_partner').map(t => (ladder.trede(t) || {}).naam || t).join(' of ') + ').' });
     const types = register.aanvraagbareGenres().map(code => {
       const def = db.data.supplierTypes[code] || register.GENRES[code];
       return { code, label: def.label, industry: def.industry,

@@ -17,7 +17,21 @@ module.exports = kern => {
     try { const p = mail.send(aan, onderwerp, tekst); if (p && p.catch) p.catch(() => {}); } catch (_) {}
   };
 
-  app.post('/api/foundation/registratie/catalogus', leesRem, (req, res) =>
+  /* ACHTER DE KANTOORPOORT, en dat is een besluit met een randje.
+
+     Dit stond open en werd door NIEMAND aangeroepen -- geen enkel scherm in
+     public/ vraagt hem op. Wat hij teruggeeft is de volledige eisencatalogus
+     per type plus de lijst actieve steden. Geen geheim, maar wel de complete
+     kaart van wat de Foundation vraagt en waar zij zit, gratis op te halen door
+     iedereen die het adres raadt. De ladder ving hem op de trede "de dwaler":
+     een route die zonder inlog een geslaagd antwoord geeft.
+
+     LET OP ALS DE AANVRAAGPAGINA HEM OOIT NODIG HEEFT. De registratie zelf
+     (/aanvragen hieronder) blijft bewust open achter zijn rem -- een school of
+     stichting heeft nog geen account. Wil dat formulier deze catalogus tonen,
+     open hem dan BEWUST via de PUBLIEK-lijst in scripts/poortwacht.js, met een
+     reden, en niet door deze poort weer weg te halen. */
+  app.post('/api/foundation/registratie/catalogus', officeAuth, leesRem, (req, res) =>
     res.json(foundationregistratie.catalogus()));
 
   app.post('/api/foundation/registratie/aanvragen', aanvraagRem, (req, res) => {

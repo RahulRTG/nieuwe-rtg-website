@@ -92,9 +92,22 @@ test('schoolsleutels blijven tijdelijk en verlopen na dertig minuten', () => {
    de naam uit de lijst is gehaald -- en dat is precies de bedoeling: de lijst
    hoort korter te worden en mag nooit stilletjes langer worden. */
 const OPEN = [
-  // Leeg. Elk endpoint van server/school/*.js is vanuit een scherm te bereiken.
-  // Komt hier ooit weer iets bij, dan hoort er een naam en een reden bij te
-  // staan -- en hoort die reden een tijdelijke te zijn.
+  /* DRIE ERBIJ OP 22 AUGUSTUS 2026, en twee ervan horen hier eigenlijk niet
+     thuis -- ze wachten niet op een scherm, ze zijn GESLOTEN.
+
+     school/maak en personeel/aanmeld geven in productie 410 en bestaan alleen
+     nog voor de geisoleerde toetssuite, die complete scholen als fixture nodig
+     heeft. Een scherm bouwen zou hier verkeerd zijn: nieuwe scholen lopen sinds
+     deze samenvoeging via de FOUNDATION-registratiebalie, met BRIN- en
+     privacycontrole ervoor. Ze staan hier omdat deze meter geen categorie
+     "bewust dicht" kent; die zou hij moeten krijgen, en dan horen deze twee
+     daarheen te verhuizen.
+
+     personeel/mail/verzonden is wel een echte: het postvak IN heeft een scherm,
+     de map VERZONDEN nog niet. Die hoort er te komen. */
+  'personeel/aanmeld',
+  'personeel/mail/verzonden',
+  'school/maak'
 ];
 
 function endpointsVanDeServer() {

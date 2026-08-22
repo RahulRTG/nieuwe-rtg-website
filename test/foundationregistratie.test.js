@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer } = require('./helper');
+const { startServer , wachtOpBestand } = require('./helper');
 
 let child, base, office, eigenaar;
 const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-foundation-reg-'));
@@ -31,7 +31,12 @@ test.after(() => {
 });
 
 test('catalogus toont de vier veilige deuren en officiële bronnen', async () => {
-  const r = await post('/api/foundation/registratie/catalogus');
+  /* MET DE KANTOORTOKEN. Deze route stond open en werd door de ladder gevonden
+     op de trede "de dwaler": een route die zonder inlog een geslaagd antwoord
+     geeft. Wat eruit komt is de volledige eisencatalogus plus de actieve steden.
+     Geen scherm vroeg hem op -- deze toets wel, en dat is precies waarom hij
+     nu meetekent voor de poort in plaats van eromheen te lopen. */
+  const r = await post('/api/foundation/registratie/catalogus', {}, office);
   assert.equal(r.status, 200);
   const d = await r.json();
   assert.deepEqual(Object.keys(d.types).sort(), ['partnerstichting','school','vrijwilliger']);
@@ -77,8 +82,11 @@ test('kantoor mag kijken, alleen Boardroom controleert en laat toe', async () =>
   assert.equal(besluit.toegang.beheerToken, undefined, 'het permanente directietoken verlaat de uitgifte niet');
   assert.ok(Date.parse(besluit.toegang.activatieVerlooptAt) > Date.now());
 
-  await new Promise(r => setTimeout(r, 100));
+  /* Wachten tot de activatiemail er ECHT is. Hier stond `setTimeout(r, 100)`:
+     een gok die op een trage machine te kort is en op een snelle tijd weggooit. */
   const outbox = path.join(map, 'outbox');
+  await wachtOpBestand(outbox, (naam, lees) => /#activeren=/i.test(lees()),
+    { wat: 'de activatiemail voor het schooladres' });
   const mails = fs.readdirSync(outbox).map(f => fs.readFileSync(path.join(outbox, f), 'utf8')).join('\n');
   const activatie = /#activeren=([A-Z0-9]+\.[a-f0-9]{48})/i.exec(mails);
   assert.ok(activatie, 'het gecontroleerde schooladres krijgt een eenmalige activatielink');

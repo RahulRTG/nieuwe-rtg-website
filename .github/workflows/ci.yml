@@ -88,7 +88,14 @@ jobs:
           --health-cmd "redis-cli ping" --health-interval 10s
           --health-timeout 5s --health-retries 5
     steps:
+      # fetch-depth: 0 is hier geen gemak maar de invoer van scripts/lib/semdiff.js:
+      # die vergelijkt met het punt waar de tak van de hoofdlijn afweek, en in een
+      # ondiepe kloon bestaat origin/main niet. Zonder dit geeft de diff nul
+      # bestanden en zakt test/semdiff.test.js op iets dat niets met de code te
+      # maken heeft. Zelfde reden als bij de deltapoort in de job hieronder.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '26'

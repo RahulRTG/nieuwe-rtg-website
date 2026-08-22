@@ -503,6 +503,33 @@ async function korteStand(page) {
 
 /* Wacht tot een uitdrukking in de pagina waar is. `wat` is de zin die in de
    foutmelding komt -- schrijf hem als wat je verwachtte, niet als code. */
+/* WACHTEN OP EEN BESTAND, en niet op een aantal milliseconden.
+
+   Een server die post schrijft, doet dat asynchroon: de route antwoordt, en even
+   later staat het bestand in de outbox. Toetsen losten dat op met `await
+   wacht(80)` -- een gok die te kort is op een trage machine en te lang op een
+   snelle, en die de wachtschuld (KLOKWACHT.json) laat groeien. Dit kijkt tot het
+   er ECHT is, en zegt bij een time-out wat het zocht en wat het wel vond.
+
+   Bewust geen Playwright: dit is de schijf en niet een pagina. */
+async function wachtOpBestand(map, past, opties) {
+  const fs = require('fs');
+  const ms = (opties && opties.ms) || 8000;
+  const wat = (opties && opties.wat) || 'een bestand in ' + map;
+  const tot = Date.now() + ms;
+  let laatst = [];
+  while (Date.now() < tot) {
+    try { laatst = fs.readdirSync(map); } catch (e) { laatst = []; }
+    const raak = typeof past === 'function'
+      ? laatst.filter((n) => past(n, () => fs.readFileSync(require('path').join(map, n), 'utf8')))
+      : laatst;
+    if (raak.length) return raak;
+    await new Promise((r) => setTimeout(r, 25));
+  }
+  throw new Error('wachtte ' + ms + 'ms op ' + wat + ', en die kwam niet. In de map stond: ' +
+    (laatst.length ? laatst.join(', ') : '(niets)'));
+}
+
 async function wachtTot(page, fn, arg, opties) {
   const ms = (opties && opties.ms) || WACHT_MS;
   const wat = (opties && opties.wat) || 'de verwachte toestand';
@@ -1073,6 +1100,6 @@ module.exports = { bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, el
   installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
-  wachtOpNetstilte, klikEnWacht, tekstVan, postJson,
+  wachtOpNetstilte, wachtOpBestand, klikEnWacht, tekstVan, postJson,
   // testhaken om de strenge poort zelf te kunnen verifieren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

@@ -32,6 +32,38 @@ function laatste(soort) {
   return alle.length ? alle[alle.length - 1][1] : null;
 }
 
+/* WACHTEN OP DE MAIL, NIET OP DE KLOK. Hier stond vijf keer `await wacht(80)`:
+   de server schrijft de post asynchroon, en tachtig milliseconden was de gok.
+   Te kort op een trage machine, en op een snelle weggegooide tijd -- plus vijf
+   posten wachtschuld in KLOKWACHT.json. Dit kijkt tot de sleutel er ECHT is. */
+async function wachtOpSleutel(soort, anders, opties) {
+  const ms=(opties && opties.ms) || 8000;
+  const tot=Date.now() + ms;
+  while (Date.now() < tot) {
+    const s=laatste(soort);
+    if (s && s !== anders) return s;
+    await new Promise(r => setTimeout(r, 20));
+  }
+  throw new Error('wachtte ' + ms + 'ms op een #' + soort + '-mail in de outbox, en die kwam niet.');
+}
+
+/* EN VOOR DE NEGATIEVE BEWERING een andere vorm, want "er komt niets" wordt niet
+   waar door langer te wachten. Dit wacht tot de outbox STIL ligt -- drie
+   metingen achter elkaar dezelfde inhoud -- en pas dan mag er iets over de
+   afwezigheid worden beweerd. */
+async function wachtOpStillePost(opties) {
+  const ms=(opties && opties.ms) || 4000;
+  const tot=Date.now() + ms;
+  let vorig=null, stil=0;
+  while (Date.now() < tot) {
+    const nu=post();
+    stil = nu === vorig ? stil + 1 : 0;
+    if (stil >= 3) return;
+    vorig=nu;
+    await new Promise(r => setTimeout(r, 25));
+  }
+}
+
 test.before(async () => {
   ({ child, base:BASE }=await startServer({ env:{ RTG_DATA_DIR:TMP, SMTP_URL:'', APP_URL:'https://rtf.test',
     RTG_MAIL_PUBLIEK_BASIS:'rahultravelgroup.com' } }));
@@ -53,8 +85,7 @@ test('directie-uitnodiging draagt de rol maar lekt geen activatiegeheim', async 
   assert.deepEqual(r.body.uitnodiging.rollen, ['hr']);
   assert.equal(r.body.personeelToken, undefined);
   assert.doesNotMatch(JSON.stringify(r.body), /[a-f0-9]{48}/i, 'het API-antwoord bevat geen linkgeheim');
-  await wacht(80);
-  const sleutel=laatste('uitnodiging');
+  const sleutel=await wachtOpSleutel('uitnodiging');
   assert.ok(sleutel, 'de persoonlijke uitnodiging is naar de mail-outbox gestuurd');
 
   const bekeken=await api('/school/personeel/uitnodiging/bekijk', { uitnodiging:sleutel });
@@ -80,8 +111,7 @@ test('ieder actief personeelslid krijgt een eigen afgeschermd RTG-postvak', asyn
     naam:'Karim de Vries', email:'karim@veiligeschool.nl', rollen:['leraar']
   }, D));
   assert.equal(uit.status, 200);
-  await wacht(80);
-  const sleutel=laatste('uitnodiging');
+  const sleutel=await wachtOpSleutel('uitnodiging');
   const actief=await api('/school/personeel/uitnodiging/accepteer', { uitnodiging:sleutel });
   assert.equal(actief.status, 200);
   assert.match(actief.body.medewerker.rtgMail, /^karim\.de\.vries@de-veilige-school(?:-\d+)?\.rtg$/);
@@ -126,8 +156,7 @@ test('latere inlog is neutraal, kort houdbaar en eenmalig', async () => {
   const bekend=await api('/school/personeel/inloglink', { schoolCode:D.schoolCode, email:'fatima@veiligeschool.nl' });
   assert.equal(onbekend.status, 200); assert.equal(bekend.status, 200);
   assert.equal(onbekend.body.bericht, bekend.body.bericht, 'het antwoord verraadt niet of het account bestaat');
-  await wacht(80);
-  const sleutel=laatste('inloggen');
+  const sleutel=await wachtOpSleutel('inloggen');
   assert.ok(sleutel, 'de eenmalige herinlog is naar hetzelfde schoolmailadres gestuurd');
   const open=await api('/school/personeel/inlog/accepteer', { inlog:sleutel });
   assert.equal(open.status, 200);
@@ -144,7 +173,7 @@ test('latere inlog is neutraal, kort houdbaar en eenmalig', async () => {
   })).status, 403, 'intrekken sluit ook het persoonlijke RTG-postvak meteen');
   const naIntrek=await api('/school/personeel/inloglink', { schoolCode:D.schoolCode, email:'fatima@veiligeschool.nl' });
   assert.equal(naIntrek.status, 200);
-  await wacht(80);
+  await wachtOpStillePost();
   assert.equal(laatste('inloggen'), sleutel, 'een ingetrokken account ontvangt geen nieuwe inloglink');
 });
 
@@ -152,8 +181,7 @@ test('directie kan een nog ongebruikte uitnodiging intrekken', async () => {
   const r=await api('/school/personeel/uitnodig', Object.assign({
     naam:'Sam van Administratie', email:'sam@veiligeschool.nl', rollen:['administratie']
   }, D));
-  await wacht(80);
-  const sleutel=laatste('uitnodiging');
+  const sleutel=await wachtOpSleutel('uitnodiging');
   assert.equal((await api('/school/personeel/uitnodiging/intrek', Object.assign({ uitnodigingId:r.body.uitnodiging.id }, D))).status, 200);
   assert.equal((await api('/school/personeel/uitnodiging/accepteer', { uitnodiging:sleutel })).status, 404);
 });

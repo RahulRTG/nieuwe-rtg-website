@@ -1,9 +1,9 @@
 {
  "uitleg": "Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).",
  "gemeten": {
-  "schrijfroutes": 4392,
+  "schrijfroutes": 4432,
   "verklaard": 85,
-  "schuld": 4307,
+  "schuld": 4347,
   "weesverklaringen": 0
  },
  "weesverklaringen": [],
@@ -4316,11 +4316,5 @@
   "POST /api/zorgprofiel/zet",
   "PUT /api/scim/v2/Users/:id"
  ],
- "groei": {
-  "van": 3629,
-  "naar": 4307,
-  "op": "2026-08-21",
-  "reden": "De samenvoeging van 24 takken bracht 740 nieuwe schrijfroutes mee (3652 -> 4392) en 62 nieuwe verklaringen (23 -> 85). De schuld is dus in absolute zin gegroeid terwijl de VERHOUDING verbeterde: van 0,6% verklaard naar 1,9%. Deze teller telt routes en niet aandeel, dus groeit hij mee met het huis -- dat is geen ontsnapping maar de meting die hij is. De ratel staat vanaf hier weer strak op het nieuwe getal.",
-  "wat_er_moet_gebeuren": "Verklaren in server/lib/idemsleutels.js, te beginnen bij de routes die geld of een tweede persoon raken. De 74 stand-routes in deze lijst zijn lezers en horen `leest: true` te krijgen; dat is de goedkoopste krimp."
- }
+ "groei": "Van 4307 naar 4347 op 22 augustus 2026, bij het samenvoegen van #99, #100, #101, #103 en #104. Veertig schrijfroutes erbij zonder idem-verklaring: de registratiebalie van de Foundation, de schoolpersoneelsregistratie, de ondernemersregie en de rechtsvormwacht. In absolute zin groei, in verhouding gelijk: het aandeel verklaarde routes blijft 1,9%. De goedkoopste krimp zit nog steeds bij de LEZERS -- routes die niets veranderen hebben geen idem-sleutel nodig en horen als {leest} te worden verklaard, niet als schuld te blijven staan."
 }

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '065aa2af';
+var RTG_BOUW = 'aa4e3be3';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -301,8 +301,32 @@ var RTG_BOUW = '065aa2af';
   const pasAdres = (doelPas) => {
     const p = new URLSearchParams(location.search);
     p.set('pas', doelPas);
-    return location.pathname + '?' + p.toString();
+    return location.pathname + '?' + p.toString() + location.hash;
   };
+
+  /* Een aanvraag van de publieke website reist uitsluitend in het fragment
+     (#aanvraag=...), niet in queryparameters. Een fragment wordt niet naar de
+     webserver gestuurd en belandt daardoor niet in toegangslogs. De app leest
+     alleen de eigen, versie-1 envelop, begrenst elk veld en bewaart hem enkel
+     in dit browservenster totdat de ingelogde app-lijn hem heeft aangenomen. */
+  function websiteAanvraagUitAdres(){
+    const raw = new URLSearchParams(location.hash.replace(/^#/, '')).get('aanvraag');
+    if (!raw || raw.length > 6000) return null;
+    try {
+      const basis = raw.replace(/-/g, '+').replace(/_/g, '/');
+      const binair = atob(basis + '='.repeat((4 - basis.length % 4) % 4));
+      const bytes = Uint8Array.from(binair, teken => teken.charCodeAt(0));
+      const data = JSON.parse(new TextDecoder().decode(bytes));
+      if (!data || data.version !== 1 || data.source !== 'rtravelgroup.store') return null;
+      const veld = (waarde, grens) => String(waarde || '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, grens);
+      const aanvraag = {
+        name: veld(data.name, 80), email: veld(data.email, 180), phone: veld(data.phone, 30),
+        requirement: veld(data.requirement, 100), message: veld(data.message, 500)
+      };
+      return aanvraag.name && aanvraag.email && aanvraag.requirement && aanvraag.message ? aanvraag : null;
+    } catch(e){ return null; }
+  }
+  let websiteAanvraag = websiteAanvraagUitAdres();
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';
@@ -507,6 +531,7 @@ var RTG_BOUW = '065aa2af';
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
     renderAll();
+    await verwerkWebsiteAanvraag();
     if (API.live && window.RTGRealtime){
       RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
     }
@@ -534,6 +559,7 @@ var RTG_BOUW = '065aa2af';
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
+      await verwerkWebsiteAanvraag();
       if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
       loadSocial();
       checkOnboarding(); laadAgendaLid();
@@ -8081,6 +8107,38 @@ var RTG_BOUW = '065aa2af';
     if (!API.live){ bubble(q, 'user'); setTimeout(() => bubble(aiAnswer(q), 'ai'), 400); return; }
     try { const d = await API.call('/chat/send', { text: q }); renderChatMsgs(d.messages, user.tier !== 'rtg'); }
     catch (e) { toast(e.message || 'Versturen mislukt.'); }
+  }
+
+  /* De websitebrief gaat pas naar de server NADAT de gebruiker in deze app is
+     ingelogd. Geen externe berichtendienst of openbaar aanvraag-endpoint:
+     dezelfde ingelogde /chat/send-lijn die de app zelf gebruikt. We wissen het
+     fragment pas na een geslaagde aanname, zodat een netwerkstoring de aanvraag
+     niet stil laat verdwijnen en een herlaad hem opnieuw kan proberen. */
+  let websiteAanvraagBezig = false;
+  async function verwerkWebsiteAanvraag(){
+    if (!websiteAanvraag || websiteAanvraagBezig || !user.account || !API.live) return;
+    websiteAanvraagBezig = true;
+    const regels = [
+      'Aanvraag via rtravelgroup.store', '',
+      'Wereld / behoefte: ' + websiteAanvraag.requirement,
+      'Naam: ' + websiteAanvraag.name,
+      'E-mail: ' + websiteAanvraag.email,
+      websiteAanvraag.phone ? 'Telefoon: ' + websiteAanvraag.phone : null,
+      '', 'Brief:', websiteAanvraag.message
+    ].filter(regel => regel !== null);
+    try {
+      const d = await API.call('/chat/send', { text: regels.join('\n') });
+      openTab('ai');
+      renderChatMsgs(d.messages, user.tier !== 'rtg');
+      websiteAanvraag = null;
+      history.replaceState(null, '', location.pathname + location.search);
+      toast(T('aanvraag.app.ok','Uw aanvraag staat in uw beveiligde RTG-lijn.'));
+    } catch(e){
+      openTab('ai');
+      const invoer = $('#askInput');
+      if (invoer) invoer.value = regels.join('\n');
+      toast(e.message || T('aanvraag.app.mis','De aanvraag staat klaar; verstuur hem zodra de verbinding terug is.'));
+    } finally { websiteAanvraagBezig = false; }
   }
 
   function standaardChips(){

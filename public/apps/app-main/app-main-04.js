@@ -11,6 +11,7 @@
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
+      await verwerkWebsiteAanvraag();
       if (window.RTGRealtime) RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
       loadSocial();
       checkOnboarding(); laadAgendaLid();

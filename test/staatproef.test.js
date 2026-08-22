@@ -239,7 +239,12 @@ test('na een hernieuwing begint de meting opnieuw, zodat de inlog er niet in val
     vingerafdruk: async () => ({ nr: ++beurt }),
     verschilVan: async (voor, na) => { afdrukken.push([voor.nr, na.nr]); return d(); },
     hernieuw: async () => { ingelogd++; return true; },
-    routes: [{ method: 'POST', pad: '/api/x', rol: 'office' }],
+    /* `methode` en niet `method`. De motor bouwt zijn sleutel als
+       methode + ' ' + pad, dus met de Engelse variant heet deze route
+       "undefined /api/x" en vindt de laatste bewering hem niet -- een
+       TypeError op undefined.rollback, precies waar de scherf op zakte. Tien
+       andere plekken in dit bestand hadden het al goed; deze ene niet. */
+    routes: [{ methode: 'POST', pad: '/api/x', rol: 'office' }],
     tokenVoor: () => 't', lijfVoor: () => ({})
   });
   assert.equal(ingelogd, 1, 'er wordt hooguit EEN keer hernieuwd, niet bij elke oproep');

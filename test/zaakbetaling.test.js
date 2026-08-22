@@ -50,6 +50,23 @@ async function lid() {
   });
   assert.ok(r.body.token, 'registreren hoort een token te geven');
   assert.equal((await api('/api/verify/upload', { image: MINI_PNG }, r.body.token)).status, 200);
+
+  /* EN HET KANTOOR TEKENT AF. Uploaden zet de aanvraag op `pending`; dat is een
+     INGEDIEND STUK en geen bewijs -- een mens van RTG kijkt ernaar en beslist
+     (CLAUDE.md). Zolang die handtekening ontbreekt, geldt "onbekende leeftijd =
+     standaard onder de 18" en dwingt de zaak vooraf betalen af, wat deze toets
+     over betalingssplitsing laat zakken op iets dat er niet over gaat.
+
+     Dit was tot 22 augustus 2026 niet nodig: idGeverifieerd() gaf toen `true`
+     voor ELK pas-lid, met de aanname "met paspoort geballoteerd". Die aanname
+     is eruit -- terecht -- en deze toets loopt de keuring nu gewoon af in plaats
+     van erop te leunen. */
+  const kantoor = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const wachtend = (await api('/api/office/verifications', {}, kantoor)).body.pending || [];
+  const mij = wachtend.find((x) => x.email === 'zb-' + u + '@toets.example') || wachtend[wachtend.length - 1];
+  assert.ok(mij, 'de keuring ziet de ingediende aanvraag');
+  assert.equal((await api('/api/office/verify', { userId: mij.userId || mij.id, decision: 'approve' }, kantoor)).status, 200);
+
   const o = await api('/api/pay/overzicht', {}, r.body.token);
   return { token: r.body.token, codenaam: o.body.codenaam };
 }

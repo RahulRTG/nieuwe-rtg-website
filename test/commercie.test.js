@@ -188,7 +188,15 @@ test('11. de partnerpoort staat open voor Business Lite, en hangt niet aan een p
      bij de aanvraag. Allebei gelezen, zodat een volgende verhuizing deze toets
      laat zakken in plaats van hem stil te laten slagen op een bestand dat de
      poort niet meer draagt. */
-  const bestanden = ['../server/routes/member/partnerkanaal.js', '../server/routes/member/partneraanvraag.js'];
+  /* De poort is op 22 augustus 2026 verhuisd, en deze toets zakte daarop --
+     precies zoals de opmerking hierboven belooft. Bij het samenvoegen stonden er
+     twee /api/partner/apply naast elkaar; de rijke versie (met de officiele
+     controles) heeft het gehaald, met de capability-poort ervoor. Die woont nu
+     in partneraanmelding.js (partnerSessie) en de aanvraag zelf in
+     partneraanmelding-aanvraag.js. */
+  const bestanden = ['../server/routes/member/partnerkanaal.js',
+    '../server/routes/member/partneraanmelding.js',
+    '../server/routes/member/partneraanmelding-aanvraag.js'];
   const bron = bestanden.map((b) => require('fs').readFileSync(require.resolve(b), 'utf8')).join('\n');
   assert.doesNotMatch(bron, /tier\s*!==\s*'business'/,
     'de poort hoort een capability te vragen en geen pas-id: anders sluit elke nieuwe trede zichzelf buiten');

@@ -1,18 +1,10 @@
-/* De ene catalogus en contexttaal van RTG Command. Router en werktafel lezen
-   dezelfde namen, zodat toevoegen nooit de betekenis van een index verandert.
-
-   WAT DEZE LIJST WEL EN NIET IS, sinds 19 augustus 2026. Hij tekende ook de
-   sectie "Software" in de bank, onder de werelden. Die sectie is weg
-   (WERELDEN.md): een app hoort in de context waarin een mens hem gebruikt, en
-   die twaalf hangen nu in MAPPEN in hun eigen wereld.
-
-   Wat hij nog WEL is, en waarom hij dus niet leeg mag: Rahuls routeertabel
-   (appUit -- "toon het gastdossier") en de bron van werkbladtitels (titelVan).
-   Een naam hier weghalen sloopt allebei. Toevoegen mag, maar dan moet de app
-   ook in een wereld hangen; test/wereldregister.test.js zakt anders. */
+/* De ene productcatalogus en contexttaal van RTG Command. De vele bestaande
+   domeinen blijven bereikbaar, maar een lid opent nog maar vier producten:
+   LIFE, WORK, FOUNDATION en INSTELLINGEN. */
 (function(w){
   'use strict';
-  var APPS=[['Vandaag','/apps/vandaag.html','home'],['Het Vooruitzicht','/apps/living-os.html','home'],['Privékantoor','/apps/lifestyle.html','home'],['Partner Network','/apps/partner-network.html','reis'],['Reizen & Veilig','/apps/reizen-veilig.html','reis'],['Leven','/apps/leven.html','home'],['Geld','/apps/geld-command.html','geld'],['Sociaal','/apps/sociaal.html','salon'],['Media','/apps/media.html','play'],['Horeca','/apps/horeca.html','salon'],['Gastdossier','/apps/reisboek.html','mens']],openTeller={};
+  var APPS=[['LIFE','/apps/rtg.html','home'],['WORK','/apps/kantoor.html','reis'],['FOUNDATION','/apps/foundation/index.html','home'],['INSTELLINGEN','/apps/ik.html','instel']],
+      HOOFDAPPS=APPS.slice(0,3),INSTELLINGEN=APPS[3],openTeller={};
   function appMetNaam(naam){for(var i=0;i<APPS.length;i++)if(APPS[i][0]===naam)return APPS[i];return null}
   function titelVan(url,t){if(t)return t;for(var i=0;i<APPS.length;i++)if(url.indexOf(APPS[i][1])===0)return APPS[i][0];return 'Werkblad'}
   function hash(s){var h=0;for(var i=0;i<s.length;i++)h=((h<<5)-h+s.charCodeAt(i))|0;return h}

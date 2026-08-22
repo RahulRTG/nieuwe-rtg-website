@@ -22,34 +22,63 @@
   .logo{font-family:var(--serif);font-size:2.3rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;}
   .logo b{color:var(--goud);font-weight:600;}
   .deck{color:var(--zacht);max-width:36rem;margin:.9rem auto 0;line-height:1.55;}
-  .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--goud);border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
+  .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--accent-tekst);border-radius:999px;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
   /* De hub in de RTG OS-look: de tegels zijn app-iconen op een hoofdscherm,
      squircles met een klein label eronder; de teksten en pijlen zwijgen. */
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem .5rem;}
-  @media(min-width:560px){.tiles{grid-template-columns:repeat(5,1fr);}}
-  @media(min-width:900px){.tiles{grid-template-columns:repeat(6,1fr);}}
-  @media(min-width:1400px){.tiles{grid-template-columns:repeat(8,1fr);}}
-  .tile{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.4rem .1rem;text-decoration:none;color:var(--txt);transition:transform .13s cubic-bezier(.22,.7,.3,1);position:relative;overflow:visible;background:none;border:none;box-shadow:none;}
+  /* AUTO-FILL, en niet een aantal kolommen per mediaquery.
+
+     Twee fouten zaten hier bovenop elkaar. Een grid-track van 1fr krimpt niet
+     onder de min-content van zijn item, en die min-content was het langste
+     label in kapitalen met letterspatie (VOORLEESVERHAALTJES, ~131px): vier
+     daarvan naast elkaar maakten de hub 736px breed op een telefoon van 390,
+     en de pagina schoof zijwaarts.
+
+     De tweede was subtieler en veroorzaakte de eerste. Het aantal kolommen
+     hing aan de breedte van het VENSTER, terwijl de tegels in een <main> van
+     hoogstens 840px staan. Op een scherm van 1440 vroeg de mediaquery dus om
+     acht kolommen in een vak van 686px -- tracks van 85px, waarin elk label
+     in drie stukken brak. Het venster meten en de container vullen is niet
+     hetzelfde ding.
+
+     auto-fill met een ondergrens lost allebei op: het grid kiest zelf hoeveel
+     kolommen er in ZIJN EIGEN breedte passen, en die kolom is nooit smaller
+     dan 6,5rem. Geen mediaquery die kan verlopen zodra de container verandert. */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(6.5rem,1fr));gap:1rem .5rem;}
+  /* GEEN .kaart. De tegel droeg die klasse en vocht hem daarna regel voor
+     regel af (background:none, border:none, box-shadow:none) -- behalve de
+     padding, en die won: body.rtg-stijl .kaart zette 19,2px waar de tegel om
+     1,6px vroeg. Daardoor kreeg het label 67px in een tegel van 108 en brak
+     het middenin een woord met ruimte ernaast. Een tegel is geen kaart maar
+     een app-icoon; hem de klasse niet geven is korter dan hem afvechten. */
+  .tile{display:flex;flex-direction:column;align-items:center;gap:.45rem;padding:.4rem .1rem;min-width:0;text-decoration:none;color:var(--txt);transition:transform .13s cubic-bezier(.22,.7,.3,1);position:relative;}
   .tile:hover{transform:translateY(-3px);border-color:transparent;}
   .tile:hover .ic{border-color:var(--goud);box-shadow:0 12px 26px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.09);}
   .tile:active .ic{transform:scale(.97);}
   .tile .ic{
     width:62px;height:62px;border-radius:19px;
-    display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+    display:flex;align-items:center;justify-content:center;color:var(--txt);
     background:linear-gradient(150deg,var(--paneel2),var(--paneel));
     border:1px solid var(--lijn);
     box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
     transition:border-color .13s cubic-bezier(.22,.7,.3,1), box-shadow .13s cubic-bezier(.22,.7,.3,1), transform .13s cubic-bezier(.22,.7,.3,1);
   }
-  .tile h2{font-family:var(--sans,inherit);font-weight:600;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:1.3;color:var(--zacht);}
+  /* het pictogram: dunne lijnen in de tekstkleur van de tegel (glyf.js),
+     goud zodra de tegel wordt aangeraakt -- zelfde beweging als de rand */
+  .tile .ic .rtg-glyf{width:26px;height:26px;}
+  .tile:hover .ic{color:var(--accent-tekst);}
+  .tile h2{font-family:var(--sans,inherit);font-weight:600;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:1.3;color:var(--zacht);width:100%;overflow-wrap:break-word;}
+  /* width:100%, niet max-width. De tegel is een kolom-flexbox met
+     align-items:center, en daardoor krimpt het label tot fit-content: het
+     stond in een vak van 67px terwijl de tegel er 108 was, en brak dus
+     middenin een woord met ruimte ernaast. */
   .tile p{display:none;}
   .tile .cta{display:none;}
   .gratis{margin-top:1.6rem;text-align:center;font-size:.85rem;color:var(--zacht);line-height:1.55;border-top:1px solid var(--lijn);padding-top:1.2rem;}
-  .gratis b{color:var(--goud);}
+  .gratis b{color:var(--accent-tekst);}
   /* AI-buddy-kiezer */
   .buddy{padding:.9rem 1rem;margin:.2rem 0 1.5rem;}
   .buddy-t{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin-bottom:.6rem;}
-  .buddy-nm{color:var(--goud);margin-left:.5rem;text-transform:none;letter-spacing:0;font-weight:600;}
+  .buddy-nm{color:var(--accent-tekst);margin-left:.5rem;text-transform:none;letter-spacing:0;font-weight:600;}
   .buddy-keuze{display:flex;gap:.6rem;}
   .buddy-b{flex:1;background:var(--paneel2);border:2px solid var(--lijn);border-radius:12px;padding:.55rem;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:.2rem;font-size:.85rem;cursor:pointer;transition:border-color .12s,transform .12s;}
   .buddy-b span{font-size:1.5rem;}
@@ -63,7 +92,7 @@
   .uitleg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-top:2rem;text-align:left;}
   @media(max-width:560px){.uitleg{grid-template-columns:1fr;}}
   .uitleg .u{padding:1rem 1.1rem;}
-  .uitleg .u b{color:var(--goud);display:block;margin-bottom:.3rem;}
+  .uitleg .u b{color:var(--accent-tekst);display:block;margin-bottom:.3rem;}
   .uitleg .u p{color:var(--zacht);font-size:.85rem;line-height:1.45;}
   .profwrap{max-width:40rem;margin:0 auto;text-align:center;padding-top:2.5rem;}
   .profgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(6rem,1fr));gap:1.2rem;margin-top:2rem;justify-content:center;}
@@ -85,20 +114,25 @@
   .klkies{display:flex;gap:.4rem;margin-bottom:.9rem;}
   .klkies button{width:1.8rem;height:1.8rem;border-radius:50%;border:2px solid transparent;}
   .klkies button.aan{border-color:var(--txt);transform:scale(1.12);}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
   .codebig{text-transform:uppercase;letter-spacing:.3em;text-align:center;font-size:1.25rem;font-weight:700;}
   .mini{text-align:center;margin-top:1.4rem;font-size:.82rem;color:var(--zacht);}
   /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
      2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
   .mini > a{display:inline-block;padding:.25rem 0;min-height:24px;}
-  .mini a{color:var(--goud);text-decoration:none;cursor:pointer;}
+  .mini a{color:var(--accent-tekst);text-decoration:none;cursor:pointer;}
   #balk{position:sticky;top:0;background:var(--bg);z-index:30;}
   h3.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.8rem 0 .8rem;}
   h3.sec:first-of-type{margin-top:.6rem;}
-  .passband{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;background:#241f16;border:1px solid var(--goud);color:var(--goud2);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;font-weight:600;}
+  /* [hidden] eerst: .passband zet display:inline-flex, en een klasseregel
+     verslaat het hidden-attribuut van de browser. Het element staat in de
+     bron mét hidden en wordt nergens gevuld, dus er stond een leeg bordeaux
+     pilletje van 31x13 midden op de voorpagina. */
+  .passband[hidden]{display:none;}
+  .passband{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;background:#241f16;border:1px solid var(--goud);color:var(--accent-tekst);border-radius:999px;padding:.35rem .9rem;font-size:.82rem;font-weight:600;}
   .wisbanner{background:#2a1512;border:1px solid var(--rood);border-radius:14px;padding:.9rem 1.1rem;margin-bottom:.6rem;line-height:1.5;font-size:.9rem;}
-  .wisbanner a{color:var(--goud2);font-weight:700;text-decoration:none;}
+  .wisbanner a{color:var(--accent-tekst);font-weight:700;text-decoration:none;}
   /* Toegankelijkheid: sla-over-link, alleen zichtbaar bij toetsenbordfocus */
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--goud);color:#0C0C0B;
     padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;
@@ -130,8 +164,14 @@
 <body class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header id="balk"></header>
-<!-- Het Living Lab hing aan niets; het hoort bij de stichting. -->
-<nav class="wereldapps" aria-label="Apps in deze wereld"><a href="/apps/livinglab.html">Living Lab</a><a href="beheer.html">Beheer</a><a href="club.html">Club</a><a href="klas.html">Klas</a></nav>
+<!-- HIER STOND EEN RIJ MET VIER LOSSE APPS, en die is opgegaan in de
+     wereldbalk. Beheer stond er dubbel: dat is een bestemming in de rail.
+     Het Clubportaal ("aanmelden met uw clubcode") en het Living Lab
+     ("RTF-kantoor") zijn geen gezinschermen maar organisatiekant; die
+     staan nu op kantoor.html, bij clubswerk, os en partner waar ze horen.
+     Alleen de Klas-PDA bleef: die is voor een kind in de les ("typ de
+     klascode van het bord en je voornaam") en staat hieronder als tegel
+     onder Leren en groeien. -->
 <main id="hoofd" tabindex="-1">
 
 <!-- 1. Welkom: nog geen gezin -->
@@ -193,196 +233,200 @@
 
   <h3 class="sec">Voor de kleinsten, samen met papa of mama</h3>
   <div class="tiles">
-    <a class="kaart tile" href="speeltuin.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>De Speeltuin</h2>
+    <a class="tile" href="speeltuin.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="spelen"></div><h2>De Speeltuin</h2>
       <span class="cta">Drie grote spelletjes, het scherm vol kleur →</span>
     </a>
-    <a class="kaart tile" href="tellen.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>Tellen tot tien</h2>
+    <a class="tile" href="tellen.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="grafiek"></div><h2>Tellen tot tien</h2>
       <span class="cta">Samen hardop meetellen →</span>
     </a>
-    <a class="kaart tile" href="kleuren.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>Kleuren en vormen</h2>
+    <a class="tile" href="kleuren.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="thema"></div><h2>Kleuren en vormen</h2>
       <span class="cta">Zoek de rode cirkel →</span>
     </a>
-    <a class="kaart tile" href="memorie.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>Memorie</h2>
+    <a class="tile" href="memorie.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="ontwerp"></div><h2>Memorie</h2>
       <span class="cta">Kaartjes en paren →</span>
     </a>
-    <a class="kaart tile" href="verhaaltje.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>Voorleesverhaaltjes</h2>
+    <a class="tile" href="verhaaltje.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="theater"></div><h2>Voorleesverhaaltjes</h2>
       <span class="cta">Zes korte verhalen →</span>
     </a>
-    <a class="kaart tile" href="liedjes.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>Liedjes en versjes</h2>
+    <a class="tile" href="liedjes.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="muziek"></div><h2>Liedjes en versjes</h2>
       <span class="cta">De tekst groot in beeld →</span>
     </a>
-    <a class="kaart tile" href="gevoel.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>Hoe voel je je?</h2>
+    <a class="tile" href="gevoel.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="hart"></div><h2>Hoe voel je je?</h2>
       <span class="cta">Tik het gezichtje aan →</span>
     </a>
   </div>
 
   <h3 class="sec">Leren en groeien</h3>
   <div class="tiles">
-    <a class="kaart tile" href="speelhal.html" data-grp="kind volw">
-      <div class="ic"></div><h2>De Speelhal</h2>
+    <a class="tile" href="speelhal.html" data-grp="kind volw">
+      <div class="ic" data-glyf="flits"></div><h2>De Speelhal</h2>
       <span class="cta">Zeven spellen die steeds moeilijker durven →</span>
     </a>
-    <a class="kaart tile" href="arena.html" data-grp="tiener jong">
-      <div class="ic"></div><h2>De Arena</h2>
+    <a class="tile" href="arena.html" data-grp="tiener jong">
+      <div class="ic" data-glyf="sport"></div><h2>De Arena</h2>
       <span class="cta">Duelleer met je vrienden of klasgenoten →</span>
     </a>
-    <a class="kaart tile" href="societeit.html" data-grp="jong volw">
-      <div class="ic"></div><h2>De Societeit</h2>
+    <a class="tile" href="societeit.html" data-grp="jong volw">
+      <div class="ic" data-glyf="cercle"></div><h2>De Societeit</h2>
       <span class="cta">Quiz en schat tegen wie jij uitdaagt →</span>
     </a>
   </div>
   <div class="tiles">
-    <a class="kaart tile" href="leren.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Leren</h2>
+    <a class="tile" href="leren.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="diploma"></div><h2>Leren</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="/apps/office.html?werk=rtf" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>RTG Office</h2>
+    <a class="tile" href="/apps/office.html?werk=rtf" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="office"></div><h2>RTG Office</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="bieb.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>App-Bibliotheek</h2>
+    <a class="tile" href="bieb.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="paneel"></div><h2>App-Bibliotheek</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="geloofbieb.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Geloof &amp; Wijsheid</h2>
+    <a class="tile" href="geloofbieb.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="ster"></div><h2>Geloof &amp; Wijsheid</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="schoolbieb.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>School-apps</h2>
+    <a class="tile" href="schoolbieb.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="browser"></div><h2>School-apps</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="beroepen.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Beroepen</h2>
+    <a class="tile" href="beroepen.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="werk"></div><h2>Beroepen</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="school.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>School</h2>
+    <a class="tile" href="school.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="gebouw"></div><h2>School</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="overhoren.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Overhoren</h2>
+    <a class="tile" href="klas.html" data-grp="kind tiener">
+      <div class="ic" data-glyf="podium"></div><h2>Klas</h2>
+      <span class="cta">Doe mee met de les van je juf of meester →</span>
+    </a>
+    <a class="tile" href="overhoren.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="taal"></div><h2>Overhoren</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="schrijven.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Schrijven</h2>
+    <a class="tile" href="schrijven.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="logboek"></div><h2>Schrijven</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="projecten.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Samen aan een project</h2>
+    <a class="tile" href="projecten.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="bouw"></div><h2>Samen aan een project</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="toetsen.html" data-grp="tiener">
-      <div class="ic"></div><h2>Toetsplanner</h2>
+    <a class="tile" href="toetsen.html" data-grp="tiener">
+      <div class="ic" data-glyf="pulse"></div><h2>Toetsplanner</h2>
       <span class="cta">Slim gespreid leren →</span>
     </a>
-    <a class="kaart tile" href="presenteren.html" data-grp="tiener jong">
-      <div class="ic"></div><h2>Spreekbeurt</h2>
+    <a class="tile" href="presenteren.html" data-grp="tiener jong">
+      <div class="ic" data-glyf="podium"></div><h2>Spreekbeurt</h2>
       <span class="cta">Opbouw, tijd en oefenklok →</span>
     </a>
-    <a class="kaart tile" id="tileDromen" href="dromen.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Onze dromen</h2>
+    <a class="tile" id="tileDromen" href="dromen.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="vonk"></div><h2>Onze dromen</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" id="tileWerk" href="werk.html" hidden data-grp="jong volw">
-      <div class="ic"></div><h2>Werk en vacatures</h2>
+    <a class="tile" id="tileWerk" href="werk.html" hidden data-grp="jong volw">
+      <div class="ic" data-glyf="tas"></div><h2>Werk en vacatures</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" id="tileRtg" href="/apps/app.html?pas=rtg" data-grp="tiener jong volw">
-      <div class="ic"></div><h2>Ontdek RTG</h2>
+    <a class="tile" id="tileRtg" href="/apps/app.html?pas=rtg" data-grp="tiener jong volw">
+      <div class="ic" data-glyf="rtg"></div><h2>Ontdek RTG</h2>
       <span class="cta">Je zit er al bij, gratis →</span>
     </a>
   </div>
 
   <h3 class="sec">Elke dag</h3>
   <div class="tiles">
-    <a class="kaart tile" id="tileBoekje" href="babyboek.html" data-grp="mini volw">
-      <div class="ic"></div><h2>Fotoboekje</h2>
+    <a class="tile" id="tileBoekje" href="babyboek.html" data-grp="mini volw">
+      <div class="ic" data-glyf="camera"></div><h2>Fotoboekje</h2>
       <span class="cta">Elke dag een momentje →</span>
     </a>
-    <a class="kaart tile" href="agenda.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Gezinsagenda</h2>
+    <a class="tile" href="agenda.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="agenda"></div><h2>Gezinsagenda</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="keuken.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Gezinskeuken</h2>
+    <a class="tile" href="keuken.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="table"></div><h2>Gezinskeuken</h2>
       <span class="cta">Weekmenu &amp; boodschappen →</span>
     </a>
-    <a class="kaart tile" href="ochtend.html" data-grp="mini kind volw">
-      <div class="ic"></div><h2>Ochtendritme</h2>
+    <a class="tile" href="ochtend.html" data-grp="mini kind volw">
+      <div class="ic" data-glyf="oogst"></div><h2>Ochtendritme</h2>
       <span class="cta">Fijn beginnen aan de dag →</span>
     </a>
-    <a class="kaart tile" href="verjaardagen.html" data-grp="mini kind tiener jong volw">
-      <div class="ic"></div><h2>Verjaardagen</h2>
+    <a class="tile" href="verjaardagen.html" data-grp="mini kind tiener jong volw">
+      <div class="ic" data-glyf="attenties"></div><h2>Verjaardagen</h2>
       <span class="cta">Wensen &amp; cadeaupotje →</span>
     </a>
-    <a class="kaart tile" href="gezondheid.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Gezondheidsmaatje</h2>
+    <a class="tile" href="gezondheid.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="zorg"></div><h2>Gezondheidsmaatje</h2>
       <span class="cta">Medicijnen, afspraken &amp; groei →</span>
     </a>
-    <a class="kaart tile" href="vrienden.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Contacten</h2>
+    <a class="tile" href="vrienden.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="vrienden"></div><h2>Contacten</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="/apps/spelen.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Spelen</h2>
+    <a class="tile" href="/apps/spelen.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="spelen"></div><h2>Spelen</h2>
       <span class="cta">Potje met vrienden →</span>
     </a>
-    <a class="kaart tile" href="zakgeld.html" data-grp="tiener">
-      <div class="ic"></div><h2>Zakgeld</h2>
+    <a class="tile" href="zakgeld.html" data-grp="tiener">
+      <div class="ic" data-glyf="wallet"></div><h2>Zakgeld</h2>
       <span class="cta">Jouw potje en spaardoelen →</span>
     </a>
-    <a class="kaart tile" href="budget.html" data-grp="tiener jong volw">
-      <div class="ic"></div><h2>Maandbegroting</h2>
+    <a class="tile" href="budget.html" data-grp="tiener jong volw">
+      <div class="ic" data-glyf="balans"></div><h2>Maandbegroting</h2>
       <span class="cta">Wat houd je over →</span>
     </a>
-    <a class="kaart tile" href="rechten.html" data-grp="tiener jong">
-      <div class="ic"></div><h2>Wat mag ik al</h2>
+    <a class="tile" href="rechten.html" data-grp="tiener jong">
+      <div class="ic" data-glyf="juridisch"></div><h2>Wat mag ik al</h2>
       <span class="cta">Per leeftijd, met werktijden →</span>
     </a>
-    <a class="kaart tile" href="contact.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Contact</h2>
+    <a class="tile" href="contact.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="berichten"></div><h2>Contact</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="markt.html" data-grp="jong volw">
-      <div class="ic"></div><h2>Koopje</h2>
+    <a class="tile" href="markt.html" data-grp="jong volw">
+      <div class="ic" data-glyf="store"></div><h2>Koopje</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="oppasinfo.html" data-grp="jong volw">
-      <div class="ic"></div><h2>Belangrijke info</h2>
+    <a class="tile" href="oppasinfo.html" data-grp="jong volw">
+      <div class="ic" data-glyf="meldingen"></div><h2>Belangrijke info</h2>
       <span class="cta">→</span>
     </a>
   </div>
 
   <h3 class="sec stil">Ook hier voor je, als je het nodig hebt</h3>
   <div class="tiles">
-    <a class="kaart tile" href="kompas.html" data-grp="tiener">
-      <div class="ic"></div><h2>Kompas</h2>
+    <a class="tile" href="kompas.html" data-grp="tiener">
+      <div class="ic" data-glyf="navigatie"></div><h2>Kompas</h2>
       <span class="cta">Voor alles waar je mee zit →</span>
     </a>
-    <a class="kaart tile" href="rust.html" data-grp="mini kind tiener jong volw">
-      <div class="ic"></div><h2>Even rust</h2>
+    <a class="tile" href="rust.html" data-grp="mini kind tiener jong volw">
+      <div class="ic" data-glyf="parasol"></div><h2>Even rust</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="veilig.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Veilig thuis</h2>
+    <a class="tile" href="veilig.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="schild"></div><h2>Veilig thuis</h2>
       <span class="cta">→</span>
     </a>
-    <a class="kaart tile" href="mediawijs.html" data-grp="tiener jong">
-      <div class="ic"></div><h2>Online wijs</h2>
+    <a class="tile" href="mediawijs.html" data-grp="tiener jong">
+      <div class="ic" data-glyf="wifi"></div><h2>Online wijs</h2>
       <span class="cta">Situaties van je telefoon →</span>
     </a>
     <!-- naast Veilig thuis en Online wijs, want dit gaat over dezelfde vraag:
          wie mag er iets van jou. Voor elke leeftijd die zelf kiest -->
-    <a class="kaart tile" href="mijnbanden.html" data-grp="kind tiener jong volw">
-      <div class="ic"></div><h2>Wie mag iets van mij zien</h2>
+    <a class="tile" href="mijnbanden.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="passkeys"></div><h2>Wie mag iets van mij zien</h2>
       <span class="cta">Per onderdeel, en tot wanneer →</span>
     </a>
   </div>
@@ -390,43 +434,43 @@
   <div id="secOuder" hidden>
     <h3 class="sec">Verder komen, voor jou als ouder</h3>
     <div class="tiles">
-      <a class="kaart tile" href="studie.html">
-        <div class="ic"></div><h2>Verder leren voor jou</h2>
+      <a class="tile" href="studie.html">
+        <div class="ic" data-glyf="ontdek"></div><h2>Verder leren voor jou</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="cv.html">
-        <div class="ic"></div><h2>CV-maker</h2>
+      <a class="tile" href="cv.html">
+        <div class="ic" data-glyf="pas"></div><h2>CV-maker</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="klusjes.html">
-        <div class="ic"></div><h2>Klusjes en sterren</h2>
+      <a class="tile" href="klusjes.html">
+        <div class="ic" data-glyf="gear"></div><h2>Klusjes en sterren</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="reis.html">
-        <div class="ic"></div><h2>Op reis met de foundation</h2>
+      <a class="tile" href="reis.html">
+        <div class="ic" data-glyf="reisboek"></div><h2>Op reis met de foundation</h2>
         <span class="cta">→</span>
       </a>
     </div>
     <h3 class="sec stil">Ook voor jou, als je het nodig hebt</h3>
     <div class="tiles">
-      <a class="kaart tile" href="opvoeden.html">
-        <div class="ic"></div><h2>Opvoedhulp</h2>
+      <a class="tile" href="opvoeden.html">
+        <div class="ic" data-glyf="rechterhand"></div><h2>Opvoedhulp</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="steun.html">
-        <div class="ic"></div><h2>Steun voor jou</h2>
+      <a class="tile" href="steun.html">
+        <div class="ic" data-glyf="mecenaat"></div><h2>Steun voor jou</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="geld.html">
-        <div class="ic"></div><h2>Geldmaatje</h2>
+      <a class="tile" href="geld.html">
+        <div class="ic" data-glyf="betalen"></div><h2>Geldmaatje</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="magazine.html">
-        <div class="ic"></div><h2>Magazine</h2>
+      <a class="tile" href="magazine.html">
+        <div class="ic" data-glyf="krant"></div><h2>Magazine</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="hulpwijzer.html">
-        <div class="ic"></div><h2>Hulpwijzer</h2>
+      <a class="tile" href="hulpwijzer.html">
+        <div class="ic" data-glyf="help"></div><h2>Hulpwijzer</h2>
         <span class="cta">→</span>
       </a>
     </div>
@@ -435,16 +479,16 @@
   <div id="secKind" hidden>
     <h3 class="sec">Voor jou</h3>
     <div class="tiles">
-      <a class="kaart tile" href="pesten.html" data-grp="kind tiener jong">
-        <div class="ic"></div><h2>Sterker dan pesten</h2>
+      <a class="tile" href="pesten.html" data-grp="kind tiener jong">
+        <div class="ic" data-glyf="megafoon"></div><h2>Sterker dan pesten</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="klusjes.html" data-grp="kind tiener">
-        <div class="ic"></div><h2>Klusjes en sterren</h2>
+      <a class="tile" href="klusjes.html" data-grp="kind tiener">
+        <div class="ic" data-glyf="gear"></div><h2>Klusjes en sterren</h2>
         <span class="cta">→</span>
       </a>
-      <a class="kaart tile" href="cv.html" data-grp="tiener jong">
-        <div class="ic"></div><h2>Je eerste cv</h2>
+      <a class="tile" href="cv.html" data-grp="tiener jong">
+        <div class="ic" data-glyf="pas"></div><h2>Je eerste cv</h2>
         <span class="cta">→</span>
       </a>
     </div>
@@ -806,6 +850,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/glyf.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 </body>
 </html>

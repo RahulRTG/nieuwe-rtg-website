@@ -29,7 +29,7 @@
   .tabs > button:hover,body.rtg-stijl .tabs > button:hover{color:var(--txt);border-bottom-color:transparent;}
   .tabs > button.aan,body.rtg-stijl .tabs > button.aan{background:none;color:var(--txt);border-bottom-color:var(--goud);}
   .veiligbalk{display:flex;gap:.6rem;align-items:flex-start;background:#181510;border:1px solid #3a3320;border-radius:12px;padding:.7rem .85rem;margin-bottom:1rem;font-size:.85rem;line-height:1.5;color:var(--zacht);}
-  .veiligbalk b{color:var(--goud2);}
+  .veiligbalk b{color:var(--accent-tekst);}
   .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
   .filters .veld{flex:1;min-width:8rem;padding:.6rem .8rem;font-size:.9rem;}
   .filters .veld.klein{max-width:6.5rem;flex:0 0 auto;}
@@ -38,7 +38,7 @@
   .ad .foto{aspect-ratio:1;background:var(--paneel2) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#4a453c;}
   .ad .body{padding:.6rem .7rem .8rem;display:flex;flex-direction:column;gap:.2rem;}
   .ad .titel{font-size:.9rem;font-weight:600;line-height:1.25;}
-  .ad .prijs{font-family:var(--serif);font-size:1.05rem;color:var(--goud2);}
+  .ad .prijs{font-family:var(--serif);font-size:1.05rem;color:var(--accent-tekst);}
   .ad .plaats{font-size:.76rem;color:var(--zacht);}
   .mini-badge{display:inline-flex;align-items:center;gap:.25rem;font-size:.68rem;font-weight:700;border-radius:999px;padding:.08rem .45rem;width:fit-content;}
   .mini-badge.gezin{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
@@ -58,7 +58,7 @@
   .detail .oms{color:var(--txt);line-height:1.55;white-space:pre-wrap;margin:.6rem 0;}
   .waarschuw{background:#2a1512;border:1px solid #6a2f2a;color:#f0a;border-radius:12px;padding:.7rem .85rem;font-size:.85rem;line-height:1.5;margin:.6rem 0;color:#e8a;}
   .veiligtips{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .85rem;font-size:.83rem;line-height:1.55;color:var(--zacht);margin:.6rem 0;}
-  .veiligtips b{color:var(--goud2);}
+  .veiligtips b{color:var(--accent-tekst);}
   .veiligtips ul{margin:.3rem 0 0 1rem;}
   .acties{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
   label.vl{display:block;font-size:.82rem;color:var(--zacht);margin:.7rem 0 .25rem;}
@@ -68,7 +68,7 @@
   .chips{display:flex;gap:.4rem;flex-wrap:wrap;}
   .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--zacht);border-radius:999px;padding:.4rem .8rem;font-size:.84rem;}
   .chip.aan{background:var(--goud);color:#1a1710;border-color:var(--goud);}
-  .aihint{font-size:.8rem;color:var(--goud2);margin-top:.3rem;line-height:1.45;}
+  .aihint{font-size:.8rem;color:var(--accent-tekst);margin-top:.3rem;line-height:1.45;}
   .fotorij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.4rem;}
   .fotorij .mini{width:4rem;height:4rem;border-radius:10px;object-fit:cover;border:1px solid var(--lijn);}
   .akkoord{display:flex;gap:.55rem;align-items:flex-start;font-size:.85rem;color:var(--zacht);line-height:1.45;margin:.8rem 0;}
@@ -81,7 +81,7 @@
   .chatrow .ct span{font-size:.78rem;color:var(--zacht);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .melding{margin:.5rem 0;font-size:.85rem;}
   .melding.ok{color:var(--groen);}
-  .melding.fout{color:var(--rood);}
+  .melding.fout{color:var(--rood-tekst);}
   .mijnkop{display:flex;justify-content:space-between;align-items:center;gap:.6rem;}
   .statuspil{font-size:.72rem;font-weight:700;border-radius:999px;padding:.15rem .55rem;}
   .statuspil.te-koop{background:#12241a;color:#7ecb8f;border:1px solid #2f6a45;}
@@ -435,7 +435,7 @@
     const verkoper = c.rol === 'verkoper';
     if (!d) {
       // nog geen deal: prijs afspreken
-      return '<div class="paneel" style="border-color:var(--goud);"><b>Veilig samen betalen</b>' +
+      return '<div class="paneel" style="border-color:var(--accent-tekst);"><b>Veilig samen betalen</b>' +
         '<div class="zacht" style="font-size:.83rem;line-height:1.5;margin:.3rem 0 .5rem;">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
         '<div class="rijveld"><input class="veld" id="dBedrag" type="number" inputmode="numeric" placeholder="€ prijs"><button type="button" class="knop" id="dAfspreek">Spreek prijs af</button></div></div>';
     }

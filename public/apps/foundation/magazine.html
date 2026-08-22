@@ -16,7 +16,10 @@
      helder, in je-vorm. Dunne, fijne randen (hairlines) -- nooit zwaar of te
      druk. Kleuren uit het logo (koningsblauw + goud) met een vrolijke groene
      pop, op de rustige donkere foundation-grond. */
-  :root{ --blauw:#3A62C4; --goud-h:#D9B45E; --groen-h:#6FBF7C; --lijnfijn:rgba(255,255,255,.10); --room:#F3EEE2; }
+  /* --blauw is de RAND- en vlakkleur van dit magazine; als tekst haalt hij op
+     zwart 3,3 en dat is te weinig. --blauw-tekst is dezelfde kleur, licht
+     genoeg om te lezen (5,2). Zelfde splitsing als goud/accent-tekst. */
+  :root{ --blauw:#3A62C4; --blauw-tekst:#5A7FD6; --goud-h:#D9B45E; --groen-h:#6FBF7C; --lijnfijn:rgba(255,255,255,.10); --room:#F3EEE2; }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:var(--sans),'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
   .serif{font-family:'Bodoni Moda',Georgia,serif;}
@@ -24,9 +27,12 @@
   a{color:inherit;}
   /* masthead-balk */
   .top{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.82));backdrop-filter:blur(8px);border-bottom:1px solid var(--lijnfijn);padding:.6rem 1.1rem;display:flex;align-items:center;gap:.7rem;max-width:48rem;margin:0 auto;}
+  /* .top .terug en niet .terug: iets in de gedeelde bladen zet deze knop op
+     het accent, en dat leest op 13px met 3,78 net niet. */
+  .top .terug{color:var(--txt);}
   .terug{background:transparent;border:1px solid var(--lijnfijn);color:var(--txt);border-radius:999px;padding:.35rem .75rem;font:inherit;font-size:.8rem;cursor:pointer;}
   .top .mh{font-family:'Bodoni Moda',serif;font-weight:600;letter-spacing:.02em;}
-  .top .mh b{color:var(--goud-h);}
+  .top .mh b{color:var(--accent-tekst);}
   /* cover */
   .cover{text-align:center;padding:2rem 0 1rem;}
   .cover .logo-img{display:block;width:min(100%,30rem);margin:0 auto 1.3rem;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);}
@@ -38,14 +44,14 @@
   /* cover-lijnen zoals op een echt blad */
   .coverlijnen{display:grid;gap:.5rem;margin:1.5rem auto 0;max-width:32rem;text-align:left;}
   .cl{display:flex;align-items:center;gap:.7rem;border:1px solid var(--lijnfijn);border-radius:14px;padding:.7rem .9rem;background:var(--paneel);}
-  .cl .n{flex:0 0 1.7rem;height:1.7rem;border-radius:50%;border:1px solid var(--goud-h);color:var(--goud-h);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;}
+  .cl .n{flex:0 0 1.7rem;height:1.7rem;border-radius:50%;border:1px solid var(--goud-h);color:var(--accent-tekst);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;}
   .cl .t{font-size:.95rem;}
-  .cl.b .n{border-color:var(--blauw);color:var(--blauw);}
+  .cl.b .n{border-color:var(--blauw);color:var(--blauw-tekst);}
   .cl.g .n{border-color:var(--groen-h);color:var(--groen-h);}
   /* artikel */
   .art{margin:2.6rem 0;}
-  .eyebrow{display:inline-block;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--goud-h);border:1px solid var(--lijnfijn);border-radius:999px;padding:.2rem .6rem;}
-  .eyebrow.b{color:var(--blauw);} .eyebrow.g{color:var(--groen-h);}
+  .eyebrow{display:inline-block;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--accent-tekst);border:1px solid var(--lijnfijn);border-radius:999px;padding:.2rem .6rem;}
+  .eyebrow.b{color:var(--blauw-tekst);} .eyebrow.g{color:var(--groen-h);}
   .art h2{font-size:clamp(1.4rem,5vw,2rem);font-weight:600;margin:.6rem 0 .7rem;text-wrap:balance;}
   .art p{color:#e9e4d9;font-size:1.04rem;margin:.65rem 0;}
   .art p b{color:var(--txt);}
@@ -64,8 +70,8 @@
   .kaartjes{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem;margin:1.2rem 0;}
   .kj{border:1px solid var(--lijnfijn);border-radius:16px;padding:1.1rem;background:var(--paneel);}
   .kj .chip{display:inline-block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;padding:.15rem .55rem;border-radius:999px;margin-bottom:.55rem;}
-  .kj:nth-child(1) .chip{color:var(--blauw);border:1px solid var(--blauw);}
-  .kj:nth-child(2) .chip{color:var(--goud-h);border:1px solid var(--goud-h);}
+  .kj:nth-child(1) .chip{color:var(--blauw-tekst);border:1px solid var(--blauw);}
+  .kj:nth-child(2) .chip{color:var(--accent-tekst);border:1px solid var(--goud-h);}
   .kj:nth-child(3) .chip{color:var(--groen-h);border:1px solid var(--groen-h);}
   .kj h3{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;margin-bottom:.3rem;}
   .kj p{color:var(--zacht);font-size:.9rem;line-height:1.55;}
@@ -76,7 +82,7 @@
   /* citaat, groot en speels */
   .quote{text-align:center;margin:2.4rem 0;}
   .quote p{font-family:'Bodoni Moda',serif;font-size:clamp(1.4rem,5vw,1.9rem);line-height:1.35;color:var(--txt);}
-  .quote p .hl{color:var(--goud-h);}
+  .quote p .hl{color:var(--accent-tekst);}
   .quote .bron{color:var(--zacht);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.7rem;}
   /* ingangen */
   .ingangen{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.7rem;margin-top:1rem;}

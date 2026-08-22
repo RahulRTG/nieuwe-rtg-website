@@ -30,8 +30,11 @@
     background:var(--s-paneel);color:var(--s-creme);}
   .kaart-s b{font-family:var(--serif);font-weight:500;font-size:1.35rem;display:block;}
   .kaart-s span{font-size:.9rem;color:var(--s-mat);}
+  /* .kaart-s span wint van .duelbadge op specificiteit, en zette het label
+     op de matte tint: 3,94 op het gouden pilletje. Deze regel wint terug. */
+  .kaart-s .duelbadge{color:var(--s-creme);}
   .kaart-s svg{width:2.9rem;height:2.9rem;flex:0 0 auto;}
-  .duelbadge{margin-left:auto;background:rgba(201,163,74,.14);color:var(--s-goud);border-radius:999px;
+  .duelbadge{margin-left:auto;background:rgba(201,163,74,.14);color:var(--s-creme);border-radius:999px;
     padding:.2rem .7rem;font-size:.78rem;font-weight:700;white-space:nowrap;}
   .rand{background:transparent;border:2px solid var(--s-mat);color:var(--s-mat);border-radius:999px;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.4rem;}
@@ -611,5 +614,8 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Deze drie spelschermen dragen sessie.js niet (ze hebben geen
+     gezinsdeur nodig), maar wel dezelfde wereldbalk als de rest. -->
+<script src="sessie.js" defer></script>
 </body>
 </html>

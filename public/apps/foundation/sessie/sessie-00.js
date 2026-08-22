@@ -12,6 +12,16 @@
       vscript.src = '/shared/verbinding.js';
       (document.head || document.documentElement).appendChild(vscript);
     }
+    /* De balk hieronder draagt pictogrammen (data-glyf). Dit bestand zit op elk
+       Foundation-scherm en shared/glyf.js op vier; zonder deze regel zou de
+       berichtenknop op zevenenzestig schermen een leeg vakje zijn -- precies de
+       fout die op de hub al zesenvijftig keer stond. Zelfde patroon als de
+       verbindingslaag hierboven: de component brengt mee wat hij nodig heeft. */
+    if (!document.querySelector('script[src="/shared/glyf.js"]')) {
+      var gscript = document.createElement('script');
+      gscript.src = '/shared/glyf.js';
+      (document.head || document.documentElement).appendChild(gscript);
+    }
   } catch (e) {}
   function lees() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
   function api(p, b) {

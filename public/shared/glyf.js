@@ -202,5 +202,35 @@
     });
   }
 
-  window.RTGGlyf = { svg: svg, svgHTML: svgHTML, tekst: tekst, heeft: function (n) { return !!P[n]; } };
+  /* VUL DE TEGELS. `data-glyf="spelen"` op een leeg vak, en dit zet het
+     pictogram erin. Dat attribuut bestond al (apps/office schreef zijn eigen
+     lusje ervoor), maar er was nergens een gedeelde vuller -- en daardoor stond
+     de Foundation-hub met zesenvijftig LEGE icoonvakken op het scherm terwijl
+     deze set er compleet naast lag. Een iconenset die niemand aanroept is geen
+     iconenset.
+
+     Twee dingen die deze functie met opzet NIET doet. Hij overschrijft niets:
+     zit er al een <svg> in, dan laat hij hem staan, zodat een pagina die zijn
+     eigen vulling doet (office) niet twee pictogrammen krijgt, in welke
+     volgorde de scripts ook laden. En hij haalt niets weg bij een onbekende
+     naam: dan blijft het vak leeg zoals het was, want stil iets wissen is
+     erger dan stil niets doen. */
+  function vul(wortel) {
+    var lijst = (wortel || document).querySelectorAll('[data-glyf]');
+    for (var i = 0; i < lijst.length; i++) {
+      var el = lijst[i];
+      if (el.querySelector('svg')) continue;
+      var node = svg(el.getAttribute('data-glyf'));
+      if (node) el.appendChild(node);
+    }
+  }
+
+  window.RTGGlyf = { svg: svg, svgHTML: svgHTML, tekst: tekst, vul: vul,
+    heeft: function (n) { return !!P[n]; } };
+
+  /* Zelf aanslaan, zodat een pagina alleen het blad hoeft te laden. Staat de
+     DOM er al (script onderaan, of async), dan meteen. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { vul(); });
+  } else { vul(); }
 })();

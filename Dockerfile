@@ -23,7 +23,7 @@ RUN apk add --no-cache openssl
 
 # RTG / RTFoundation productie-image.
 # Node 22 (nodig voor --experimental-sqlite en de ingebouwde test-runner).
-FROM node:22-slim
+FROM node:26-slim
 
 # Alleen productie-afhankelijkheden; de dev-tools (terser, axe) horen niet in de
 # runtime-image. npm ci is reproduceerbaar op basis van de lockfile.

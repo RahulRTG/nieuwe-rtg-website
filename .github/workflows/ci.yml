@@ -46,7 +46,17 @@ jobs:
     # geen tijd te winnen zonder de suite te splitsen. Ruimte voor de groei en
     # voor een trage runner, en niet zo hoog dat een echte vastloper er een uur
     # onder wegzakt.
-    timeout-minutes: 240
+    # DRIEHONDERDDERTIG, EN DAT IS GEEN RUIMER JASJE MAAR EEN GEMETEN GETAL.
+    # Op 22 augustus 2026 werd deze job na exact 240 minuten afgekapt: de
+    # toetsstap alleen al liep 3 uur 57 en was toen nog niet klaar. De
+    # samenvoeging bracht de suite van ~897 naar 1083 bestanden, en de stap
+    # draait met dekkingsinstrumentatie. Tegelijk gaat de gelijktijdigheid van
+    # de poort omhoog (RTG_GATE_CONCURRENCY, standaard 6 in plaats van de drie
+    # die Node op een viercore-runner koos); deze toetsen wachten vooral op een
+    # server en op schijf, niet op rekenwerk. De ruimere tijd is er zodat een
+    # ronde die net niet past niet opnieuw als "cancelled" eindigt -- niets zegt
+    # zo weinig als dat woord.
+    timeout-minutes: 330
     services:
       postgres:
         image: postgres:16-alpine

@@ -34,8 +34,105 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ==========================================================================
+  # DE TOETSSCHERVEN.
+  #
+  # De suite draaide in EEN stap: 1083 bestanden, en op 22 augustus 2026 werd de
+  # job na 240 minuten afgekapt terwijl de toetsstap alleen al 3 uur 57 liep.
+  # Verdelen kon tot nu toe niet, want `--test-coverage-lines` rekent per
+  # PROCES: elke scherf meet dan alleen wat hij zelf aanraakt en zakt op de
+  # vloer terwijl het geheel er ruim overheen zit.
+  #
+  # Dat is nu opgelost. Elke scherf schrijft zijn dekking als lcov weg; de job
+  # `test` hieronder telt ze op (scripts/lib/lcov.js) en handhaaft de vloer EEN
+  # keer over het totaal -- precies wat het ene proces ook deed.
+  #
+  # DE VERDELING GAAT OP KOSTEN EN NIET OP AANTAL (scripts/scherf.js), en de
+  # zes bronmuterende bestanden uit scripts/lib/geisoleerd.js draaien serieel op
+  # scherf 1. Dat laatste is geen extraatje maar een REPARATIE: `npm run
+  # test:gate` draaide `node --test test/*.test.js` rechtstreeks en negeerde die
+  # lijst, dus de poort die telt draaide anders dan de loper die het huis lokaal
+  # gebruikt.
+  #
+  # fail-fast staat uit: bij drie zakkende scherven wil je alle drie zien, niet
+  # de eerste.
+  # ==========================================================================
+  toetsscherf:
+    name: Toetsscherf ${{ matrix.scherf }} van 4
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        scherf: [1, 2, 3, 4]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rtgtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+      # Redis is geen luxe: twee toetsbestanden (grand-integratie, sloophamer)
+      # slaan ZICHZELF over zonder REDIS_URL. Ze stonden er dus wel, maar
+      # draaiden nooit -- vijftien toetsen die eruitzagen als dekking.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+      - run: npm ci
+      - name: Deze scherf, met dekking als lcov
+        run: |
+          set -o pipefail
+          mkdir -p dekking
+          uitslag=0
+          # De geisoleerde bestanden eerst, serieel, en alleen op scherf 1.
+          solo=$(node scripts/scherf.js --van ${{ matrix.scherf }} --totaal 4 --solo)
+          if [ -n "$solo" ]; then
+            node --experimental-test-coverage \
+                 --test-reporter=lcov --test-reporter-destination=dekking/solo.info \
+                 --test-reporter=spec --test-reporter-destination=stdout \
+                 --test --test-concurrency=1 $solo 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
+          fi
+          mijn=$(node scripts/scherf.js --van ${{ matrix.scherf }} --totaal 4)
+          node --experimental-test-coverage \
+               --test-reporter=lcov --test-reporter-destination=dekking/scherf.info \
+               --test-reporter=spec --test-reporter-destination=stdout \
+               --test --test-concurrency=${RTG_GATE_CONCURRENCY:-6} $mijn 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
+          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/scherf.log; fi
+          exit "$uitslag"
+        env:
+          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      - name: De dekking van deze scherf bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dekking-scherf-${{ matrix.scherf }}
+          path: dekking/*.info
+          if-no-files-found: error
+
   test:
     name: Tests, checks en build
+    # DEZE NAAM STAAT IN DE TAKBESCHERMING VAN main en verandert dus niet.
+    # Wat eronder gebeurt is wel veranderd: de zware toetsstap is naar
+    # `toetsscherf` hierboven verhuisd en deze job telt hun dekking op en
+    # handhaaft de vloer. De snelle keuringen (check.js, de deltapoort, de
+    # AST-scan, de norm, de bouw) blijven hier, want die zijn samen twee
+    # minuten en horen bij het oordeel over de tak als geheel.
+    needs: [toetsscherf]
     runs-on: ubuntu-latest
     # 1h08 op 18 aug, gecanceld op 90 min op 20 aug, en op 21 aug liep hij op
     # 150 min NOG. Gemeten in die afgebroken ronde: de unit-stap draaide toen al
@@ -46,17 +143,14 @@ jobs:
     # geen tijd te winnen zonder de suite te splitsen. Ruimte voor de groei en
     # voor een trage runner, en niet zo hoog dat een echte vastloper er een uur
     # onder wegzakt.
-    # DRIEHONDERDDERTIG, EN DAT IS GEEN RUIMER JASJE MAAR EEN GEMETEN GETAL.
-    # Op 22 augustus 2026 werd deze job na exact 240 minuten afgekapt: de
-    # toetsstap alleen al liep 3 uur 57 en was toen nog niet klaar. De
-    # samenvoeging bracht de suite van ~897 naar 1083 bestanden, en de stap
-    # draait met dekkingsinstrumentatie. Tegelijk gaat de gelijktijdigheid van
-    # de poort omhoog (RTG_GATE_CONCURRENCY, standaard 6 in plaats van de drie
-    # die Node op een viercore-runner koos); deze toetsen wachten vooral op een
-    # server en op schijf, niet op rekenwerk. De ruimere tijd is er zodat een
-    # ronde die net niet past niet opnieuw als "cancelled" eindigt -- niets zegt
-    # zo weinig als dat woord.
-    timeout-minutes: 330
+    # VEERTIG MINUTEN, want het zware werk staat niet meer in deze job. Op
+    # 22 augustus 2026 werd hij nog na 240 minuten afgekapt met de toetsstap op
+    # 3 uur 57; die stap is nu verdeeld over vier scherven die parallel lopen.
+    # Wat hier overblijft zijn de snelle keuringen, het optellen van de dekking
+    # en de bouw -- samen een paar minuten. Blijft hij hier hangen, dan is er
+    # iets anders aan de hand dan een groeiende suite, en dan hoort hij snel
+    # rood te staan in plaats van een uur te wachten.
+    timeout-minutes: 40
     services:
       postgres:
         image: postgres:16-alpine
@@ -164,15 +258,18 @@ jobs:
       # de hele suite; op 18 augustus 2026 kostte dat een ochtend. Sindsdien komt
       # het hele TAP-blok mee: de bewering, de verwachte en de gevonden waarde en
       # de stapel. Zie scripts/gezakte-toetsen.js.
-      - name: Unit- en integratietests + dekkingsvloer (json-opslag)
-        run: |
-          set -o pipefail
-          uitslag=0
-          npm run test:gate 2>&1 | tee /tmp/gate.log || uitslag=$?
-          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/gate.log; fi
-          exit "$uitslag"
-        env:
-          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      - name: De dekking van alle vier de scherven ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: dekking-scherf-*
+          path: dekking-scherven
+          merge-multiple: true
+      - name: De dekkingsvloer, over alle scherven opgeteld
+        # Fail-closed: ontbreekt er een scherf, dan wordt er NIET gerekend. Een
+        # som over drie van de vier is geen lagere dekking maar een andere
+        # meting, en die hoort niet te bepalen of een tak doorkomt.
+        run: node scripts/dekkingsvloer.js --scherven 4
+
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
       # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
       # kv-tabel en zouden elkaar bij parallel draaien resetten.

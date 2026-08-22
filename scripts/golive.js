@@ -12,6 +12,7 @@
    een lijst af met kruisjes en vinkjes. Exitcode 1 zolang er blokkerende
    punten zijn; 0 = klaar om live te gaan. */
 const fs = require('fs');
+const { maskerEmail, zonderGeheim } = require('./lib/geenlek');
 const path = require('path');
 const config = require('../server/config');
 
@@ -107,7 +108,12 @@ function leesEnvBestand(pad) {
       await c.end();
       goed('PostgreSQL bereikbaar (' + (Date.now() - t0) + ' ms).');
     } catch (e) {
-      blokkeer('DATABASE_URL is gezet maar de database antwoordt niet: ' + (e.message || e));
+      /* DE FOUT VAN DE DRIVER GAAT ER GEMASKEERD IN. Hierboven wordt
+         DATABASE_URL zo nodig zelf samengesteld uit het wachtwoordbestand, dus
+         die reeks DRAAGT een wachtwoord -- en een driverfout neemt de
+         verbindingsreeks nogal eens mee. Dat is een wachtwoord in de log op
+         precies het moment dat iemand de log gaat delen om hulp te vragen. */
+      blokkeer('DATABASE_URL is gezet maar de database antwoordt niet: ' + zonderGeheim(e.message || e));
     }
   }
 
@@ -144,7 +150,13 @@ function leesEnvBestand(pad) {
 
   // 5. de eigenaar (nogmaals expliciet, want dit is de sleutel van alles)
   if (env.RTG_OWNER_EMAIL && env.RTG_OWNER_EMAIL !== 'rahul@rtg.example')
-    goed('Eigenaar van de technische pagina: ' + env.RTG_OWNER_EMAIL);
+    /* GEMASKEERD, en dat is hier geen overdaad: dit huis draait op codenamen
+       (CLAUDE.md, privacy by design). Een adres in een terminalbuffer of in een
+       screenshot bij een hulpvraag is precies de terugweg van codenaam naar
+       mens die dat ontwerp wil voorkomen. De keuring wil alleen weten OF de
+       eigenaar gezet is en of hij niet nog op het voorbeeld staat; daar is de
+       gemaskeerde vorm genoeg voor. */
+    goed('Eigenaar van de technische pagina: ' + maskerEmail(env.RTG_OWNER_EMAIL));
 
   // 6. de tweede factor van de backoffice
   if (env.OFFICE_TOTP_SECRET)
@@ -191,7 +203,12 @@ function leesEnvBestand(pad) {
   // afdrukken, blokkers eerst
   uit.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));
   console.log('\n=== RTG go-live-keuring ===\n');
-  for (const [teken, tekst] of uit) console.log(' ' + teken + ' ' + tekst);
+  /* EN NOG EEN ZEEF OVER ALLES WAT ERUIT GAAT. De maskering bij de bron
+     hierboven is de echte reparatie; deze regel is de vangnetlaag voor de
+     volgende melding die iemand toevoegt zonder eraan te denken. Paden,
+     hostnamen en poortnummers blijven staan -- een keuring die niet meer zegt
+     WELK pad ontbreekt, wordt niet gedraaid. */
+  for (const [teken, tekst] of uit) console.log(' ' + teken + ' ' + zonderGeheim(tekst));
   const blokkers = uit.filter(x => x[2]).length;
 
   /* De punten die BUITEN de code liggen: geen kruisjes (de keuring kan ze

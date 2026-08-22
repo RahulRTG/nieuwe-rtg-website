@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 398 delen, 0 zonder onderwerp.**
+**51 bundels, 402 delen, 1 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -104,7 +104,7 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 6 delen, 670 regels in de delen
+`public/apps/backoffice/` -- 6 delen, 669 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -684,7 +684,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 729 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 771 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -747,13 +747,17 @@ omlaag.
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 3 delen, 475 regels in de delen
+`public/shared/werkos/` -- 7 delen, 676 regels in de delen, waarvan 1 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
 | `werkos-01.js` | RTG Werk-OS |
-| `werkos-02.js` | het dock onderin het werk-OS |
+| `werkos-01b.js` | De onderbalk is een onyx commandobalk, geen los merkobject |
+| `werkos-01bb.js` | Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar |
+| `werkos-01c.js` | Beweging bevestigt alleen een wissel van werkvlak |
+| `werkos-02.js` | Command Center |
 | `werkos-03.js` | bouwen en spiegelen |
+| `werkos-04.js` | -- |
 
 ## `shared/zaakcommand.js`
 

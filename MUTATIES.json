@@ -1530,6 +1530,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "geenlek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/geenlek.js",
+      "operator": "getal+1#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "gegevenspoort.test.js": {
       "soort": "server",
       "staat": "gezakt",

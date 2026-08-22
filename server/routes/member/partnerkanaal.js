@@ -73,9 +73,9 @@ module.exports = (kern) => {
       reiswijzer: wijzer.error ? null : wijzer });
   });
 
-  /* De partneraanvraag (/api/partner/apply) staat in ./partneraanvraag.js --
-     zie de kop daar. Hier blijft het BOEKEN via een partnerlink. */
-  require('./partneraanvraag')(kern);
+  /* DE PARTNERAANVRAAG WOONT IN ./partneraanmelding.js, samen met de types- en
+     de mijn-route. Er stonden twee versies van /api/partner/apply naast elkaar
+     na de samenvoeging; zie de kop daar voor welke is gebleven en waarom. */
   /* En de aanmeldmodule erbij: die draagt sinds deze samenvoeging /api/partner/types
      en /api/partner/applications/mijn. Zijn eigen /api/partner/apply is eruit --
      zie de kop daar; twee modules op hetzelfde adres is er een te veel. */

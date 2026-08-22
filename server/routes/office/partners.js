@@ -1,6 +1,7 @@
 /* Backoffice (deelmodule): partner- en schoolbesluiten en het vertrouwenskanaal met het personeel.
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 const { datum: klokDatum } = require('../../lib/klok');
+const toelatingscontrole = require('../../kern/bedrijfscontrole');
 
 module.exports = (octx) => {
   const { kern } = octx;
@@ -19,6 +20,20 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
     const bewijs = a.pas || a.businessPass;
     if (!bewijs || !bewijs.key)
       return res.status(409).json({ error: 'Deze aanvraag heeft geen ledenbewijs; zonder pas geen bedrijfscode. Vraag de aanvrager de aanvraag opnieuw te doen terwijl hij is ingelogd met zijn pas.' });
+
+    /* EN HET TOELATINGSDOSSIER, want een ledenbewijs is niet hetzelfde als een
+       afgeronde controle. Deze poort kwam met de samenvoeging mee in een tweede
+       versie van deze route; ik hield die van de verzameling (die de pas-eis en
+       het zaakabonnement draagt) en liet deze liggen. test/partnerpas.test.js
+       bewees binnen een dag waarom dat niet kon: "ook de eigenaar kan de
+       officiele controles niet overslaan" kreeg 200 in plaats van 409.
+
+       Dat is precies de vorm die COMMERCIE.md verbiedt -- een bewering die
+       AFGEDWONGEN heet zonder toets erachter. De eigenaar is hier niet de
+       uitzondering maar juist het geval dat ertoe doet: wie alles mag, moet
+       hier ook langs. */
+    const poort = toelatingscontrole.magGoedkeuren(a, Date.now());
+    if (!poort.ok) return res.status(409).json(poort);
     const code = makeSupplierCode(a.company);
     // Een nieuw goedgekeurde partner start OFFLINE: eerst door de ondernemer-
     // poort (Salon-pagina vullen + de rondleidingen), dan pas online en

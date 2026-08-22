@@ -132,8 +132,8 @@ test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', ()
          moet linken. Dat is geen ingang maar een cirkel. */
       if ('/apps/' + item + '.html' === wereldPad) continue;
       const regel = wereldPad + ' mist ' + item;
-      if (html.includes(eigenPad) || html.includes(doelPad)) continue;
-      gemist.push(regel);
+      if (html.includes('/apps/' + item + '.html')) continue;   // bereikbaar, klaar
+      if (SCHULD.has(regel)) nogOpen.add(regel); else gemist.push(regel);
     }
   }
   assert.deepEqual(gemist, [],

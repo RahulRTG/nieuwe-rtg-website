@@ -446,11 +446,11 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
 });
 
 test('partner worden: land en handelsactiviteit sturen de juiste bewijsvelden',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

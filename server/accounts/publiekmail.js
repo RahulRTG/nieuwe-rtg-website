@@ -16,13 +16,12 @@
 const S = require('./state');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
-const { getMemberState, saveMemberState } = require('./dossier');
 
 /* EEN FABRIEK, EN DAT IS GEEN VORMDWANG. `getUserById` woont in users.js, en
    users.js laadt deze module in -- rechtstreeks teruggrijpen maakt daar een
    kring van, en Node geeft dan een half gevulde module terug in plaats van een
    fout. Die vorm is stil, en stil is precies wat hier niet mag. */
-module.exports = ({ getUserById }) => {
+module.exports = ({ getUserById, getMemberState, saveMemberState }) => {
 
   // Alleen de HMAC van de publieke alias staat in de zoekkolom.
   function findByPublicMail(adres) {

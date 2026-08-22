@@ -60,27 +60,29 @@ const REGELS = [
          regel ving hem. Dat is de eerste keer dat de verboden graaf een NIEUWE
          overtreding vond in plaats van bestaande te bevestigen. */
       [/^server\/routes\/rtmail-lid\.js$/, 'zelf-inzage: het ingelogde lid leest zijn eigen naam bij zijn eigen mailadres'],
-      /* DEZELFDE DRIE AANROEPEN, EN EEN BEVINDING DIE GROTER IS DAN DEZE REGEL.
+      /* DEZELFDE DRIE AANROEPEN, EN DE REGEL DIE ERACHTER ZIT.
 
          auth/account.js, auth/inlog.js en rtmail-lid.js doen alle drie hetzelfde:
-         `mail-publiek.geefLid({ user, naam: realNameOf(user) })`. Technisch is
-         het zelf-inzage -- `user` is telkens het eigen account -- en daarom
-         staan ze hier.
+         `mail-publiek.geefLid({ user, naam: realNameOf(user) })`. `user` is
+         telkens het eigen account, dus dit is zelf-inzage.
 
-         MAAR KIJK WAT ER MET DIE NAAM GEBEURT. `naamLokaal()` in
-         kern/mail-publiek.js maakt er het LOKALE DEEL van een publiek mailadres
-         van: "Jan Jansen" wordt jan.jansen@<pas>.<groepsdomein>. Elk lid krijgt
-         dat adres AUTOMATISCH bij aanmelden en inloggen, zonder het te kiezen.
-         Daarmee is de echte naam zichtbaar voor iedereen die post van dat adres
-         ontvangt -- terwijl CLAUDE.md zegt dat klantdata op codenamen draait en
-         echte namen in de gescheiden kluis blijven, en dat dat ontwerp niet
-         omzeild wordt.
+         WAAR DIE NAAM HEEN GAAT, en waarom dat hier MAG. `naamLokaal()` in
+         kern/mail-publiek.js maakt er het lokale deel van een publiek mailadres
+         van: "Jan Jansen" wordt jan.jansen@<pas>.<groepsdomein>. Dat lijkt op het
+         eerste gezicht in strijd met de codenaam-regel, en bij het samenvoegen
+         van PR #100 is die vraag ook gesteld. Het antwoord is een bewust
+         onderscheid PER WERELD:
 
-         Dat is geen overtreding van DEZE regel maar een productbesluit, en het
-         staat hier omdat het anders nergens staat. De nette vorm is dat een lid
-         zijn publieke adres KIEST (codenaam of eigen naam), en dat het niet
-         vanzelf uit de kluis wordt afgeleid. Gevonden op 22 augustus 2026 door
-         keuringsregel 60, bij het samenvoegen van PR #100. */
+           RTG   een lid is naar buiten bereikbaar op zijn ECHTE naam. Dat is een
+                 zakelijke relatie met een reisbureau; post van jan.jansen@ hoort
+                 bij een mens die zich zo voorstelt.
+           RTF   de Foundation blijft op CODENAAM. foundationAdres() neemt het
+                 INTERNE lokale deel, en dat is de codenaam (zie `intern` in
+                 dezelfde module) -- niet naamLokaal().
+
+         Dat onderscheid staat in de code en is hier nagelopen; het is geen
+         toeval en geen omissie. Wie het ooit gelijktrekt, haalt of de
+         bereikbaarheid uit RTG of de codenaam uit RTF. */
       [/^server\/routes\/auth\/(?:account|inlog)\.js$/, 'zelf-inzage bij het uitgeven van het eigen publieke mailadres -- zie de bevinding hierboven']
     ],
     nooit: [

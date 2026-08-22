@@ -125,6 +125,6 @@ function setSchoolMail(dienst) { schoolMailBrug.dienst=dienst || null; }
 /* De leeftijdsgroepen en wat eruit volgt, wonen in ./foundation/leeftijdsgroepen.js
    -- zie de kop daar. Hier doorgegeven zodat niets buiten dit bestand iets
    van de opsplitsing merkt. */
-const { groepen, leerlingPassen } = require('./foundation/leeftijdsgroepen')({ GROEPEN, GROEP_INFO });
+const { groepen, leerlingPassen } = require('./foundation/leeftijdsgroepen')({ GROEPEN, GROEP_INFO, F, actualiseerGroep });
 
 module.exports = { setOnderwijs, router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };

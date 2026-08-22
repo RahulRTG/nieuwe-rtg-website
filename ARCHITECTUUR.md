@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4474 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4514 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4474 |
-| servermodules (`server/**/*.js`) | 2529 |
-| routebestanden (`server/routes/**`) | 498 |
-| kernmodules (`server/kern/**`) | 1568 |
-| schermen (`public/**/*.html`) | 264 |
+| API-endpoints | 4514 |
+| servermodules (`server/**/*.js`) | 2556 |
+| routebestanden (`server/routes/**`) | 501 |
+| kernmodules (`server/kern/**`) | 1584 |
+| schermen (`public/**/*.html`) | 266 |
 | gedeelde browsermodules (`public/shared/*.js`) | 266 |
-| toetsbestanden (`test/*.test.js`) | 1087 |
+| toetsbestanden (`test/*.test.js`) | 1099 |
 | schermtoetsen (`test/*.e2e.js`) | 156 |
 
 ## 2. De weg van een verzoek
@@ -101,14 +101,14 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 205 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 206 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 53 |
-| `member` | 664 | 62 | 10 | 414 |
-| `supplier` | 569 | 106 | 6 | 301 |
-| `office` | 54 | 14 | 3 | 75 |
+| `member` | 667 | 63 | 12 | 414 |
+| `supplier` | 569 | 106 | 6 | 302 |
+| `office` | 59 | 15 | 3 | 75 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 75 | 10 | 31 | 66 |
 | `techniek` | 58 | 15 | 1 | 51 |
@@ -123,7 +123,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 2971 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3003 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -131,8 +131,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1484 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 205 |
+| kern-namen die routes aanraken | 1485 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 206 |
 | daarvan door precies één domein | 1279 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
@@ -145,13 +145,13 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(176) auth(108) supplierAuth(59) officeAuth(38) db(36) liveCodename(29) status(27)
-accounts(24) schoon(22) managerOnly(17) codenaamVan(16) rtf(15) save(14) geenGast(12)
-tooManyTries(11) boardroomWie(11) crypto(11) anthropic(11) express(10) findSupplier(10)
-keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9) payrollOS(9) stuur(8)
-noteFailedTry(7) kern(7) sseToOffice(7) mail(6) sseToSupplier(6) pay(6) boardroomAuth(6)
-talen(6) appUrl(5) loginFails(5) overheid(5) notifySupplier(5) sseToCustomer(5)
-onboarding(5)
+app(177) auth(108) supplierAuth(59) officeAuth(39) db(36) liveCodename(29) status(27)
+accounts(25) schoon(22) managerOnly(17) codenaamVan(16) save(15) rtf(15)
+boardroomWie(12) geenGast(12) tooManyTries(11) crypto(11) express(11) anthropic(11)
+findSupplier(10) keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9)
+payrollOS(9) stuur(8) sseToOffice(8) mail(7) noteFailedTry(7) kern(7) boardroomAuth(7)
+sseToSupplier(6) pay(6) talen(6) appUrl(5) loginFails(5) overheid(5) notifySupplier(5)
+sseToCustomer(5) onboarding(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

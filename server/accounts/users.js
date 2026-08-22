@@ -181,7 +181,7 @@ function publicUser(u) {
 const { getMemberState, saveMemberState, setVerification, listByVerification,
   conversations, ledenRegisterRijen, deleteUser } = require('./dossier').maakDossier(getUserById);
 
-const { findByPublicMail, reservePublicMail } = require('./publiekmail')({ getUserById });
+const { findByPublicMail, reservePublicMail } = require('./publiekmail')({ getUserById, getMemberState, saveMemberState });
 
 module.exports = {
   createUser, createUserSync, getUserById, findByLogin, count, publicUser,

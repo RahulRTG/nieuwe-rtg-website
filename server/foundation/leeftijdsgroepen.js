@@ -17,7 +17,7 @@
    ./basis.js komen. Ze hier opnieuw opschrijven zou dezelfde lijst op twee
    plekken zetten, en die lopen uiteen (LAT.md regel 4).
    ========================================================================== */
-module.exports = ({ GROEPEN, GROEP_INFO }) => {
+module.exports = ({ GROEPEN, GROEP_INFO, F, actualiseerGroep }) => {
   /* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
 
      WAAROM DIT NAAR BUITEN MAG EN DE REST NIET. Sinds LEVEN.md par. 1.1 zijn

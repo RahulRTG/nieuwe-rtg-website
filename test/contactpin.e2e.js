@@ -171,7 +171,12 @@ test('de levende code wordt getekend, en de schakelaar maakt de vaste pin onvind
 
     // 1. de levende code: een echt getekende QR, met de aftelring eronder
     await page.click('#scPinLive');
-    await page.waitForSelector('#scPinLiveDoek canvas', { timeout: 30000 });
+    /* De aftelring staat er meteen; de QR volgt nadat de server de levende code
+       heeft uitgegeven. Wacht daarom op de volledige schermbelofte en niet op
+       het eerste canvas, anders wint een tragere CI-machine deze race. */
+    await page.waitForFunction(() =>
+      document.querySelectorAll('#scPinLiveDoek canvas').length === 2,
+    null, { timeout: 30000 });
     const live = await page.evaluate(() => {
       const cs = document.querySelectorAll('#scPinLiveDoek canvas');
       return { aantal: cs.length, breed: cs[0] ? cs[0].width : 0 };

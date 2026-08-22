@@ -360,6 +360,7 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/apps/app-main/app-main-52.js', 'een HTML-opbouw in een string, in een keer'],
     ['public/apps/personeel/personeel-17.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/apps/backoffice/backoffice-03.js', 'een opbouwfunctie zonder binnengrens'],
+    ['public/apps/chauffeur.js', 'de chauffeurs-PDA is een gesloten browser-state-machine: API-waarheid, ritfasen, apparaatmeldingen en locatiedeling delen dezelfde levenscyclus en worden samen afgebroken bij rit-einde'],
     ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],

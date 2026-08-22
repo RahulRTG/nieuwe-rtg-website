@@ -136,7 +136,13 @@ module.exports = (kern) => {
     stuur(res, opdrachtPositie(o.ref, { lat: req.body.lat, lng: req.body.lng }, 'chauffeur'));
   });
   app.post('/api/staff/mob/mijn', supplierAuth, (req, res) => {
-    stuur(res, dispatchBeeld(req.supplier.code, { vervoerder: req.supplier.code }));
+    /* De PDA moet onderscheid kunnen maken tussen een rit van DEZE chauffeur
+       en een andere lopende rit van dezelfde vervoerder. De identiteit komt
+       uitsluitend uit de ondertekende personeelssessie; nooit uit de body. */
+    const beeld = dispatchBeeld(req.supplier.code, { vervoerder: req.supplier.code });
+    beeld.actor = { name: req.actor && req.actor.name, staffId: req.actor && req.actor.staffId,
+      manager: !!(req.actor && req.actor.manager) };
+    stuur(res, beeld);
   });
   /* De werkkant (vervoerder, dispatcher, RTG) staat in ./mobiliteit/werkkant.js
      en krijgt dezelfde kern plus het gedeelde `stuur`-hulpje. Gesplitst om de

@@ -364,7 +364,9 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass 
     'een verzonnen bedrijfstype ook niet');
 
   const aanvraag = await post('/api/partner/apply', { company: 'Proefpartner BV', type: 'restaurant',
-    city: 'Rotterdam', contactName: 'A. Vragende', email: 'pp' + t + '@rtg.test', akkoord: true }, zakelijk.body.token);
+    city: 'Rotterdam', contactName: 'A. Vragende', email: 'pp' + t + '@rtg.test', akkoord: true,
+    bevoegd: true, waarheidsgetrouw: true, kvkNummer: '68750110', vestigingsnummer: '000037178598',
+    bewijzen: { nvwa: 'NVWA-ROTTERDAM-' + t } }, zakelijk.body.token);
   assert.equal(aanvraag.status, 200, JSON.stringify(aanvraag.body).slice(0, 160));
 
   const stand = await ko('state', {});
@@ -377,6 +379,14 @@ test('10. een partneraanvraag beslissen: de Boardroom beslist, de Business Pass 
   assert.equal((await ko('partner/decide', { id: mijn.id, action: 'goedkeuren' })).status, 403);
   assert.equal((await br('partner/decide', { id: 'bestaatniet', action: 'goedkeuren' })).status, 404);
 
+  assert.equal((await br('partner/decide', { id: mijn.id, action: 'goedkeuren' })).status, 409,
+    'ook de Boardroom kan geen open register- of vergunningcontrole overslaan');
+  for (const eis of mijn.toelating.eisen) {
+    const uitkomst = eis.id === 'vergunningenscan' ? 'niet_van_toepassing' : 'geverifieerd';
+    const check = await br('partner/controle', { id: mijn.id, onderdeel: eis.id, uitkomst,
+      referentie: uitkomst === 'niet_van_toepassing' ? 'Geen extra lokale vergunning nodig' : 'Officieel register ' + eis.id });
+    assert.equal(check.status, 200, eis.id + ': ' + JSON.stringify(check.body).slice(0, 140));
+  }
   const goed = await br('partner/decide', { id: mijn.id, action: 'goedkeuren' });
   assert.equal(goed.status, 200, JSON.stringify(goed.body).slice(0, 200));
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTFoundation</title>
+<title>FOUNDATION</title>
 <meta name="theme-color" content="#0C0C0B">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation-192.png">
@@ -131,17 +131,18 @@
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header id="balk"></header>
 <!-- Het Living Lab hing aan niets; het hoort bij de stichting. -->
-<nav class="wereldapps" aria-label="Apps in deze wereld"><a href="/apps/livinglab.html">Living Lab</a><a href="beheer.html">Beheer</a><a href="club.html">Club</a><a href="klas.html">Klas</a></nav>
+<nav class="wereldapps" aria-label="Apps in deze wereld"><a href="/apps/livinglab.html">Living Lab</a><a href="mail.html">Mail</a><a href="beheer.html">Beheer</a><a href="club.html">Club</a><a href="klas.html">Klas</a></nav>
 <main id="hoofd" tabindex="-1">
 
 <!-- 1. Welkom: nog geen gezin -->
 <section id="vWelkom" class="wrap" hidden>
   <div class="hero">
-    <div class="kick">RTFoundation</div>
+    <div class="kick">FOUNDATION</div>
     <div class="logo">Alles om <b>vooruit</b> te komen</div>
     <div class="knoprij">
       <button class="knop" id="bMaak">Maak een gezin aan</button>
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
+      <a class="knop grijs" href="registreren.html" style="text-decoration:none;">School, vrijwilliger of stichting</a>
     </div>
     <!-- MIJN LEVEN HOORT HIER, op het welkomscherm en niet tussen de tegels.
          De tegels zitten achter een gezinslogin; dit beeld hangt juist aan uw
@@ -239,6 +240,10 @@
     </a>
   </div>
   <div class="tiles">
+    <a class="kaart tile" href="mail.html" data-grp="kind tiener jong volw">
+      <div class="ic"></div><h2>RTF Mail</h2>
+      <span class="cta">Je eigen postvak op codenaam →</span>
+    </a>
     <a class="kaart tile" href="leren.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Leren</h2>
       <span class="cta">→</span>
@@ -327,7 +332,7 @@
       <div class="ic"></div><h2>Gezondheidsmaatje</h2>
       <span class="cta">Medicijnen, afspraken &amp; groei →</span>
     </a>
-    <a class="kaart tile" href="vrienden.html" data-grp="kind tiener jong volw">
+    <a class="kaart tile" href="/apps/foundation/vrienden.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>Contacten</h2>
       <span class="cta">→</span>
     </a>
@@ -464,6 +469,8 @@
   <div class="avkies" id="mAv"></div>
   <div class="klkies" id="mKl"></div>
   <input class="veld" id="mPin" placeholder="Kies een pincode (4 tot 6 cijfers)" inputmode="numeric" maxlength="6">
+  <label class="sub" style="display:flex;gap:.5rem;align-items:flex-start;margin:.6rem 0;"><input id="mBevoegd" type="checkbox" style="margin-top:.2rem;"> <span>Ik ben 18 jaar of ouder en mag deze gezinsruimte aanmaken.</span></label>
+  <label class="sub" style="display:flex;gap:.5rem;align-items:flex-start;margin:.6rem 0;"><input id="mPrivacy" type="checkbox" style="margin-top:.2rem;"> <span>Ik begrijp dat een app-koppeling geen officieel bewijs van familieband of ouderlijk gezag is.</span></label>
   <div class="fout" id="mFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="mDoe">Gezin aanmaken</button></div>
 </div></dialog>
@@ -471,19 +478,11 @@
 <!-- inloggen met gezinscode -->
 <dialog id="dlgLogin"><div class="kaart modal">
   <h3>Inloggen bij je gezin</h3>
-  <div class="sub">Vul de gezinscode in die je bij het aanmaken hebt gekregen.</div>
+  <div class="sub">Vul de gezinscode én je eigen pincode in. Zo tonen we nooit eerst alle namen.</div>
   <input class="veld codebig" id="gCode" placeholder="GEZINSCODE" maxlength="6" autocapitalize="characters">
+  <input class="veld" id="gPin" type="password" placeholder="Jouw pincode" inputmode="numeric" maxlength="6" autocomplete="current-password">
   <div class="fout" id="gFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="gDoe">Verder</button></div>
-</div></dialog>
-
-<!-- pincode voor een beschermd profiel -->
-<dialog id="dlgPin"><div class="kaart modal">
-  <h3 id="pinTitel">Pincode</h3>
-  <div class="sub">Dit profiel is beschermd met een pincode.</div>
-  <input class="veld codebig" id="pinIn" placeholder="••••" inputmode="numeric" maxlength="6" type="password">
-  <div class="fout" id="pinFout"></div>
-  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="pinDoe">Open profiel</button></div>
 </div></dialog>
 
 <!-- Verplichte onboarding + contract voor volwassen gezinsleden -->
@@ -514,7 +513,7 @@ const $ = s => document.querySelector(s);
 const api = Sessie.api;
 const AVATARS = ['','','','','','','','','','','','','','','','','','','',''];
 const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
-let mAv = '', mKl = KLEUREN[0], pinProfiel = null;
+let mAv = '', mKl = KLEUREN[0];
 
 /* Per leeftijdsgroep een eigen bril: de RTF-apps staan in het RTG OS (map
    RTFoundation) en openen de hub met ?groep=mini t/m ?groep=volw. De hub
@@ -643,51 +642,30 @@ async function start(){
     }
     Sessie.wisProfiel();
   }
-  if (s && s.code){ // gezin bekend: toon profielkiezer
+  if (s && s.code){ // profiel wisselen: opnieuw met de eigen PIN, zonder namenlijst
     location.hash='';
-    await profielen(s.code);
+    Sessie.wisProfiel(); toon('vWelkom'); $('#gCode').value=s.code;
+    try { $('#dlgLogin').showModal(); setTimeout(()=>$('#gPin').focus(),50); } catch(e){}
     return;
   }
   toon('vWelkom');
+  if (hash === '#nieuw-gezin') { try { $('#dlgMaak').showModal(); } catch(e){} }
 }
 
-async function profielen(code){
-  try{
-    const d = await api('/gezin/inloggen', { code });
-    Sessie.zet(Object.assign(Sessie.huidig()||{}, { code, gezin: d.gezin }));
-    $('#pGezinNaam').textContent = d.gezin.naam;
-    const grid = $('#pGrid'); grid.innerHTML='';
-    // in een leeftijd-app staan de passende profielen vooraan, met een accent
-    const ag = appGroep();
-    const lijst = ag ? d.profielen.slice().sort((a,b)=>((b.groep===ag)-(a.groep===ag))) : d.profielen;
-    lijst.forEach(p=>{
-      const past = ag && p.groep === ag;
-      const a = document.createElement('button'); a.className='prof';
-      a.innerHTML = '<span class="av" style="background:'+p.kleur+(past?';border-color:var(--goud)':'')+'">'+p.avatar+(p.heeftPin?'<span class="slot-pin"></span>':'')+'</span><span class="nm">'+esc(p.naam)+'</span><span class="slot">'+rolTekst(p)+(past?' · '+GROEP_APPS[ag].emoji:'')+'</span>';
-      a.onclick = ()=> kies(code, p);
-      grid.appendChild(a);
-    });
-    toon('vProfielen');
-  }catch(e){ alert(e.message); Sessie.uitloggen(); toon('vWelkom'); }
+function veiligeKeuzes(code, d, pin){
+  Sessie.zet({code,gezin:d.gezin});$('#pGezinNaam').textContent=d.gezin.naam;
+  const grid=$('#pGrid');grid.innerHTML='';
+  (d.keuzes||[]).forEach(p=>{const a=document.createElement('button');a.className='prof';
+    a.innerHTML='<span class="av" style="background:'+p.kleur+'">'+p.avatar+'</span><span class="nm">'+esc(p.naam)+'</span><span class="slot">'+rolTekst(p)+'</span>';
+    a.onclick=()=>open(code,p.id,pin);grid.appendChild(a);});toon('vProfielen');
 }
 function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }
 
-async function kies(code, p){
-  if (p.heeftPin){ pinProfiel = { code, id: p.id, naam: p.naam }; $('#pinTitel').textContent='Hoi '+p.naam; $('#pinIn').value=''; $('#pinFout').textContent=''; $('#dlgPin').showModal(); setTimeout(()=>$('#pinIn').focus(),50); return; }
-  await open(code, p.id, '');
-}
 async function open(code, profielId, pin){
   const d = await api('/gezin/profiel/kies', { code, profielId, pin });
   Sessie.zet({ code, token: d.token, gezin: d.gezin, profiel: d.profiel });
   location.hash=''; location.reload();
 }
-
-$('#pinDoe').addEventListener('click', async ()=>{
-  $('#pinFout').textContent='';
-  try{ await open(pinProfiel.code, pinProfiel.id, $('#pinIn').value.trim()); }
-  catch(e){ $('#pinFout').textContent = e.message; }
-});
-$('#pinIn').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#pinDoe').click(); });
 
 $('#bMaak').addEventListener('click', ()=> $('#dlgMaak').showModal());
 $('#bLogin').addEventListener('click', ()=> $('#dlgLogin').showModal());
@@ -696,17 +674,21 @@ $('#pAnder').addEventListener('click', ()=>{ Sessie.uitloggen(); toon('vWelkom')
 $('#mDoe').addEventListener('click', async ()=>{
   $('#mFout').textContent='';
   try{
-    const d = await api('/gezin/maak', { gezinsnaam: $('#mGezin').value, naam: $('#mNaam').value, pin: $('#mPin').value.trim(), avatar: mAv, kleur: mKl });
+    const d = await api('/gezin/maak', { gezinsnaam: $('#mGezin').value, naam: $('#mNaam').value, pin: $('#mPin').value.trim(), avatar: mAv, kleur: mKl,
+      bevoegdGezin:$('#mBevoegd').checked, privacyAkkoord:$('#mPrivacy').checked });
     Sessie.zet({ code: d.code, token: d.token, gezin: d.gezin, profiel: d.profiel });
     $('#dlgMaak').close();
-    alert('Je gezin is aangemaakt! Deel de gezinscode met je gezin: ' + d.code + '\n\nSchrijf hem ergens op; hiermee logt iedereen in.');
-    location.reload();
+    location.href='beheer.html#gezinsopbouw';
   }catch(e){ $('#mFout').textContent = e.message; }
 });
 $('#gDoe').addEventListener('click', async ()=>{
   $('#gFout').textContent='';
   const code = $('#gCode').value.trim().toUpperCase();
-  try{ await api('/gezin/inloggen', { code }); $('#dlgLogin').close(); await profielen(code); }
+  const pin=$('#gPin').value.trim();
+  try{ const d=await api('/gezin/inloggen',{code,pin});$('#dlgLogin').close();
+    if(d.token){Sessie.zet({code,token:d.token,gezin:d.gezin,profiel:d.profiel});location.hash='';location.reload();}
+    else veiligeKeuzes(code,d,pin);
+  }
   catch(e){ $('#gFout').textContent = e.message; }
 });
 

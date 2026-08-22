@@ -26,6 +26,21 @@ Object.assign(kern, require('../kern/fiscaal/btwaangifte').maakBtwAangifte({ db,
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
 
+/* Officiele handels-, douane-, register- en sanctiebronnen worden eveneens
+   gevolgd. Een inhoudswijziging opent hercontroles; de bron kan dus nooit
+   zelfstandig een juridische grendel versoepelen. */
+kern.handelsregelwacht = require('../kern/handelsregelwacht')({ db, save });
+if (process.env.HANDELSREGELS_UIT !== '1') {
+  const handelsTimer = setInterval(() => { kern.handelsregelwacht.check().catch(() => {}); },
+    Number(process.env.HANDELSREGELS_CHECK_MS || 21600000));
+  if (handelsTimer.unref) handelsTimer.unref();
+  if (process.env.NODE_ENV === 'production') {
+    const eerste = setTimeout(() => { kern.handelsregelwacht.check().catch(() => {}); },
+      Number(process.env.HANDELSREGELS_EERSTE_CHECK_MS || 15000));
+    if (eerste.unref) eerste.unref();
+  }
+}
+
 /* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
    minister-president en het eigen hotel van elke afdeling -- alle drie
    kamers van RTG Kantoren. */

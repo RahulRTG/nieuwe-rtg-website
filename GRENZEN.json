@@ -259,6 +259,11 @@
     "facturatie": [
       "facturatie"
     ],
+    "foundationregistratie": [
+      "boardroomAuth",
+      "foundationregistratie",
+      "mail"
+    ],
     "flits": [
       "flitsMeld",
       "flitsRond",
@@ -1153,6 +1158,7 @@
       "ensureSupplierDefaults",
       "findSupplier",
       "forgetSession",
+      "handelsregelwacht",
       "logInlog",
       "loginFails",
       "mail",
@@ -1847,6 +1853,7 @@
       "weddings",
       "weekdagFactor",
       "werkAdvies",
+      "werkmail",
       "werkvensterVan",
       "wervingsLink",
       "zaakBoard",

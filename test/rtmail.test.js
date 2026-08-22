@@ -6,10 +6,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 
-function maak() {
+function maak(integriteitSleutel) {
   const db = { data: {} };
   let saves = 0;
-  const rtmail = require('../server/kern/rtmail')({ db, save: () => { saves++; }, crypto });
+  const rtmail = require('../server/kern/rtmail')({ db, save: () => { saves++; }, crypto, integriteitSleutel });
   return { rtmail, db, saves: () => saves };
 }
 
@@ -99,6 +99,30 @@ test('bijlagen bestaan niet: wat er ook binnenkomt, er wordt niets te openen bew
   const m = rtmail.stuur({ van: 'iemand', naar: 'lelie', tekst: 'zie bijlage', bijlagen: [{ naam: 'virus.exe', data: 'x' }] });
   assert.deepEqual(m.bijlagen, []);
   assert.deepEqual(rtmail.postvak('lelie')[0].bijlagen, []);
+});
+
+test('ieder nieuw bericht krijgt een HMAC-zegel en gewijzigde inhoud wordt geblokkeerd', () => {
+  const { rtmail, db } = maak(crypto.randomBytes(32));
+  const m = rtmail.stuur({ van:'sakura', naar:'bloem', onderwerp:'Echt', tekst:'Oorspronkelijk', bron:'zaak' });
+  assert.equal(rtmail.controleerIntegriteit(m), 'ongeschonden');
+  assert.equal(rtmail.postvak('bloem')[0].veiligheid.integriteit, 'ongeschonden');
+
+  db.data.rtmail.berichten[0].tekst = 'Achteraf veranderd';
+  const geblokkeerd = rtmail.postvak('bloem')[0];
+  assert.equal(geblokkeerd.veiligheid.integriteit, 'gewijzigd');
+  assert.equal(geblokkeerd.veiligheid.inhoudGeblokkeerd, true);
+  assert.match(geblokkeerd.onderwerp, /Geblokkeerd/);
+  assert.doesNotMatch(geblokkeerd.tekst, /Achteraf veranderd/);
+});
+
+test('oude post zonder zegel blijft herkenbaar als legacy en wordt niet achteraf bekrachtigd', () => {
+  const { rtmail, db } = maak(crypto.randomBytes(32));
+  db.data.rtmail = { berichten:[{ id:'oud', van:'a@rtmail', naar:'b@rtmail',
+    onderwerp:'Oud', tekst:'Van voor de zegellaag', soort:'bericht', bron:'lid', vertrouwd:true,
+    at:new Date().toISOString(), gelezen:false }] };
+  const oud = rtmail.postvak('b')[0];
+  assert.equal(oud.veiligheid.integriteit, 'legacy');
+  assert.equal(oud.tekst, 'Van voor de zegellaag');
 });
 
 /* ---- het adres per lidmaatschap (kern/rtmail-adres.js) ---- */

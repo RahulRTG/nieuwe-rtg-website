@@ -34,7 +34,12 @@ const FROM = process.env.MAIL_FROM || 'Rahul Travel Group <no-reply@rahultravelg
 const DIRECT = process.env.MAIL_DIRECT === '1';
 const DKIM_SLEUTEL = process.env.DKIM_PRIVATE_KEY || '';
 const DKIM_SELECTOR = process.env.DKIM_SELECTOR || 'rtg';
+const PROVIDER_DKIM = process.env.MAIL_PROVIDER_DKIM === '1';
 const MAIL_DOMEIN = process.env.MAIL_DOMEIN || (/@([^>\s]+)/.exec(FROM) || [])[1] || '';
+const mailPubliek = require('./kern/mail-publiek')({});
+const smtpDkim = () => DKIM_SLEUTEL && MAIL_DOMEIN ? {
+  priveSleutel: DKIM_SLEUTEL, domein: MAIL_DOMEIN, selector: DKIM_SELECTOR
+} : undefined;
 
 let transporter = null;
 if (SMTP_URL) {
@@ -76,10 +81,10 @@ const { bouwBericht } = require('./mail-opstellen')({ FROM, MAIL_DOMEIN, DKIM_SL
    verstuurd wordt en waar het blijft als dat niet lukt, daar staat HOE het over
    de lijn gaat (MX opzoeken, SMTP praten, de meldingen van de andere kant
    lezen). Twee onderwerpen, twee lezers. */
-const stuurDirect = (to, subject, text) =>
-  require('./mail-bezorgen').stuurDirect({ to, subject, text, FROM, bouwBericht, toOutbox });
+const stuurDirect = (to, subject, text, opties) =>
+  require('./mail-bezorgen').stuurDirect({ to, subject, text, FROM, bouwBericht, toOutbox, opties });
 
-function send(to, subject, text) {
+function send(to, subject, text, opties) {
   if (!to) return;
   /* EEN BERICHT DAT NERGENS HEEN KAN, MOET JE KUNNEN ZIEN.
 
@@ -103,20 +108,31 @@ function send(to, subject, text) {
   const isMail = /@/.test(String(to));
   if (!isMail) return sendSms(String(to).replace(/^sms:/i, ''), subject, text);
   if (transporter && (!SMTP_SANDBOX || kanalen.smtpAan())) {
-    transporter.sendMail({ from: FROM, to, subject, text })
+    transporter.sendMail({ from: opties && opties.from || FROM,
+      envelopeFrom: opties && opties.envelopeFrom || FROM,
+      to, subject, text, dkim: smtpDkim() })
       .then(() => { console.log(`[mail] verzonden naar ${to}: ${subject}`); journaal(true, 'smtp'); })
-      .catch(e => { console.warn('[mail] verzenden mislukt, naar outbox:', e.message); journaal(false, 'smtp', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
+      .catch(e => { console.warn('[mail] verzenden mislukt, naar outbox:', e.message); journaal(false, 'smtp', e.message); try { toOutbox(to, subject, text, opties); } catch (e2) {} });
     return;
   }
-  if (DIRECT) return stuurDirect(to, subject, text);
-  try { toOutbox(to, subject, text); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); }
+  if (DIRECT) return stuurDirect(to, subject, text, opties);
+  try { toOutbox(to, subject, text, opties); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); }
+}
+
+/* Alleen een alias die door de server uit een intern postvak is afgeleid, mag
+   als zichtbare afzender naar buiten. De envelope-afzender blijft MAIL_FROM,
+   zodat SPF, retourpost en reputatie op één gecontroleerd domein rusten. */
+function sendAls(internVan, to, subject, text) {
+  const publiekVan = mailPubliek.publiek(internVan);
+  if (!publiekVan) return send(to, subject, text);
+  return send(to, subject, text, { from: publiekVan, envelopeFrom: FROM });
 }
 
 async function bezorgNu(to, subject, text) {
   if (!to || !/@/.test(String(to))) return { ok: false, soort: 'permanent', waarom: 'dat is geen e-mailadres' };
   if (transporter && (!SMTP_SANDBOX || kanalen.smtpAan())) {
     try {
-      await transporter.sendMail({ from: FROM, to, subject, text });
+      await transporter.sendMail({ from: FROM, to, subject, text, dkim: smtpDkim() });
       return { ok: true, soort: 'bezorgd', via: 'smarthost' };
     } catch (e) {
       const m = String((e && e.message) || '');
@@ -138,7 +154,9 @@ async function bezorgNu(to, subject, text) {
    laat herstel en het techniekbord fail-closed beslissen; een sms:...-bericht
    in de outbox is zichtbaar, maar is géén bezorgde tweede factor. */
 module.exports = {
-  send, sendSms, bezorgNu, configured: CONFIGURED || DIRECT,
+  send, sendAls, sendSms, bezorgNu, configured: CONFIGURED || DIRECT,
+  publiekMailActief: mailPubliek.actief, publiekMailBasis: mailPubliek.basis,
+  providerDkim: PROVIDER_DKIM && CONFIGURED,
   liveConfigured: (CONFIGURED && !SMTP_SANDBOX) || DIRECT,
   sandboxConfigured: CONFIGURED && SMTP_SANDBOX,
   smsConfigured: false, smsSandboxConfigured: smsSandbox.enabled,

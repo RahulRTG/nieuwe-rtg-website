@@ -94,7 +94,15 @@ const MIGRATIES = [
      account. Alles wat VOOR die grens is uitgegeven, geldt niet meer. Zonder dit
      bleef wie eenmaal binnen was dertig dagen binnen -- ook na een volledig
      herstel, en juist dan wil je hem eruit. Zie accounts/tokens.js. */
-  { n: 5, naam: 'sessies-vanaf', op: (db) => voegKolomToe(db, 'users', 'sessies_vanaf', 'INTEGER NOT NULL DEFAULT 0') }
+  { n: 5, naam: 'sessies-vanaf', op: (db) => voegKolomToe(db, 'users', 'sessies_vanaf', 'INTEGER NOT NULL DEFAULT 0') },
+  /* Alleen de HMAC-zoekwaarde van het actuele publieke ledenadres staat naast
+     het account. De leesbare naam blijft in de kluis; zo kan inkomende post in
+     O(1) naar het juiste lid zonder een namenlijst of codenaamkoppeling in de
+     operationele database te bouwen. */
+  { n: 6, naam: 'publieke-ledenmail', op: (db) => {
+    voegKolomToe(db, 'users', 'public_mail_hash', 'TEXT');
+    db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_public_mail_hash ON users(public_mail_hash) WHERE public_mail_hash IS NOT NULL');
+  } }
 ];
 
 module.exports = { MIGRATIES, voegKolomToe, accountsBasis };

@@ -4,52 +4,10 @@ const { datum: klokDatum } = require('../../lib/klok');
 
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { accounts, app, appUrl, boardroomAuth, boardroomWie, db, ensureSupplierDefaults, findSupplier,
-          forgetSession, logActivity, mail, makeSupplierCode, officeAuth, save, sessions, schoon,
+  const { app, boardroomAuth, boardroomWie, db, findSupplier,
+          forgetSession, logActivity, officeAuth, save, sessions, schoon,
           sseClients, sseSend, sseToOffice, sseToSupplier,
           ondernemingRegie, ondernemingProvisioningZet, ondernemingBijdrageZet, rechtsvormwacht } = kern;
-app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
-  const a = db.data.partnerApplications.find(x => x.id === req.body.id);
-  if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
-  if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
-  if (req.body.action === 'goedkeuren') {
-    // de toegangseis geldt ook hier: geen Business Pass-bewijs bij de
-    // aanvraag, dan gaat er geen bedrijfscode de deur uit
-    if (!a.businessPass || !a.businessPass.key)
-      return res.status(409).json({ error: 'Deze aanvraag heeft geen Business Pass-bewijs; zonder Business Pass geen bedrijfscode. Vraag de aanvrager de aanvraag opnieuw te doen met een actieve Business Pass.' });
-    const code = makeSupplierCode(a.company);
-    // Een nieuw goedgekeurde partner start OFFLINE: eerst door de ondernemer-
-    // poort (Salon-pagina vullen + de rondleidingen), dan pas online en
-    // zichtbaar voor leden. online:false zet ensureSupplierDefaults niet terug.
-    const s = { code, name: a.company, type: a.type, city: a.city, loc: null, rate: 0.12, menu: [], online: false };
-    ensureSupplierDefaults(s);
-    db.data.suppliers.push(s);
-    const pin = accounts.makePin();
-    await accounts.createStaff({ supplierCode: code, name: a.contactName, role: 'manager', func: 'Beheer', pin });
-    a.status = 'goedgekeurd'; a.code = code;
-    save();
-    const url = appUrl(req);
-    mail.send(a.email, 'Welkom als partner van Rahul Travel Group',
-      'Beste ' + a.contactName + ',\n\n' + a.company + ' is goedgekeurd als RTG-partner.\n\n' +
-      'Uw leverancierscode: ' + code + '\nUw manager-PIN: ' + pin + ' (op naam van ' + a.contactName + ')\n\n' +
-      'Open de partner-app op ' + url + '/apps/leverancier.html, kies uw bedrijf via de code, ' +
-      'log in als management met uw PIN en stel uw pagina, menukaart en team in.\n\n' +
-      'Uw zaak staat nog offline. Loop eerst even de ondernemer-poort door: vul uw ' +
-      'Salon-pagina (een bio en een foto) en volg de korte rondleidingen door de kassa ' +
-      'en de werk-apps. Daarna zet u uw zaak zelf online en bent u zichtbaar voor leden.\n\n' +
-      'Uw bedrijfsaccount op De Salon is direct aangemaakt; dit is een vast onderdeel van elk RTG-partnerschap. ' +
-      'Via Kantoor, Marketing stelt u uw profiel in, plaatst u berichten, aanbiedingen en polls, en ziet u uw volgers en cijfers.\n\nRahul Travel Group');
-    sseToOffice('sync', { scope: 'team' });
-    return res.json({ ok: true, code, pin });
-  }
-  a.status = 'afgewezen';
-  save();
-  mail.send(a.email, 'Uw partner-aanvraag bij Rahul Travel Group',
-    'Beste ' + a.contactName + ',\n\nNa beoordeling kunnen we ' + a.company + ' op dit moment helaas geen partnerplek aanbieden.\n\nRahul Travel Group');
-  sseToOffice('sync', { scope: 'team' });
-  res.json({ ok: true });
-});
-
 /* Een partnerschap openen en sluiten is boardroomwerk: het maakt of verbreekt
    toegang tot een volledige bedrijfswerkplek. Een schorsing trekt daarom niet
    alleen nieuwe logins dicht, maar wist ook alle bestaande sessies en sluit

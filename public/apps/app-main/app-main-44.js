@@ -61,15 +61,10 @@
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){
-    const code = prompt('Vul de gezinscode in die je van het gezin kreeg:');
-    if (!code) return;
+    const uitnodiging = prompt('Plak de persoonlijke uitnodigingslink of code die je van het gezin kreeg:');
+    if (!uitnodiging) return;
     try {
-      const d = await API.call('/rtf/profielen', { code: code.trim().toUpperCase() });
-      const namen = d.profielen.map((p,i)=> (i+1)+'. '+p.naam + (p.gekoppeld?' (al gekoppeld)':'')).join('\n');
-      const keuze = prompt('Gezin "'+d.gezinNaam+'". Welk profiel ben jij?\n'+namen+'\n\nTyp het nummer:');
-      const idx = parseInt(keuze,10)-1;
-      if (isNaN(idx) || !d.profielen[idx]) return;
-      const r = await API.call('/rtf/koppel', { code: code.trim().toUpperCase(), profielId: d.profielen[idx].id });
+      const r = await API.call('/rtf/uitnodiging/accepteer', { uitnodiging: uitnodiging.trim() });
       toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu ook op je telefoon.');
       await refreshState(); renderFoundation(); openTab('gezin');
       ensurePush(true);

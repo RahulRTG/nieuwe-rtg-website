@@ -41,10 +41,13 @@ test('de losse onderwijsdelen zijn vanuit de gezamenlijke schil verbonden', () =
   assert.match(partner, /href="\/apps\/foundation\/schoolbieb\.html"/);
 });
 
-test('directie, leraar en gezin krijgen elk een eigen professioneel dashboard', () => {
-  for (const id of ['vPoort', 'vDirectie', 'dKpis', 'dEnterprise', 'dBeheer', 'vLeraar', 'lKpis', 'lWerk']) {
+test('directie, personeel, leraar en gezin krijgen elk een eigen professioneel dashboard', () => {
+  for (const id of ['vPoort', 'linkBevestiging', 'vDirectie', 'dUitnodigen', 'dKpis', 'dEnterprise', 'dBeheer',
+    'vPersoneel', 'pWerk', 'vLeraar', 'lKpis', 'lWerk']) {
     assert.ok(partner.includes('id="' + id + '"'), 'School Partner mist #' + id);
   }
+  for (const script of ['toegang.js', 'directie-personeel.js', 'personeel.js'])
+    assert.ok(partner.includes('/apps/schoolpartner/' + script), 'School Partner mist personeelsmodule ' + script);
   for (const id of ['vGezin', 'schoolWelkom', 'schoolKerncijfers', 'schoolLijst', 'vLeraar']) {
     assert.ok(school.includes('id="' + id + '"'), 'School mist #' + id);
   }

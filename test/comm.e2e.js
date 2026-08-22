@@ -235,11 +235,11 @@ test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen s
         'de knop "nieuw gesprek" staat buiten beeld (' + maat.plusRechts + ' > ' + maat.venster + ')');
       assert.equal(maat.overloop, false, 'het scherm loopt horizontaal over');
 
-      /* HET BEGINSCHERM TOONT ALLEEN NOG DE DRIE HOOFDWERELDEN.
+      /* HET BEGINSCHERM TOONT ALLEEN NOG DE VIER HOOFDAPPS.
 
          Hier stond dat Bellen en Videobellen niet meer als eigen app in de
          functierij mochten staan, en dat Berichten er WEL in stond. Die rij
-         bestaat niet meer: het beginscherm draagt de drie hoofdwerelden en verder
+         bestaat niet meer: het beginscherm draagt de vier hoofdapps en verder
          geen losse apps. De oude bewering zou nu eisen dat er een rij is.
 
          Wat de bewering waard was, blijft: contact met iemand is EEN ding en
@@ -259,7 +259,7 @@ test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen s
          terug, dan zakt deze regel. */
       const bundel = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app-main.js'), 'utf8');
       assert.match(bundel, /const FUNCTIES = \[\s*\]/,
-        'het beginscherm draagt weer losse app-tegels naast de drie hoofdwerelden');
+        'het beginscherm draagt weer losse app-tegels naast de vier hoofdapps');
 
       // en Berichten is bereikbaar vanuit zijn wereld
       await page.goto(base + '/apps/sociaal.html', { waitUntil: 'domcontentloaded' });

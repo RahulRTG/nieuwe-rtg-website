@@ -30,15 +30,16 @@ module.exports = ({ FROM, MAIL_DOMEIN, DKIM_SLEUTEL, DKIM_SELECTOR }) => {
      het zelf op -- er is geen provider meer die koppen aanvult -- en dus hoort
      alles erin te staan wat een ontvanger verwacht: een datum, een uniek
      Message-ID, en de tekst als UTF-8. */
-  function bouwBericht(to, subject, text) {
+  function bouwBericht(to, subject, text, opties) {
     const crypto = require('crypto');
     /* De opmaak-hulpjes komen uit server/smtp.js en worden hier NIET nagemaakt:
        een onderwerp met een accent hoort in beide standen op dezelfde manier
        gecodeerd te worden, en twee kopieen van die regel lopen ooit uiteen. */
     const { _kopWaarde: kopWaarde, _rfcDatum: rfcDatum } = require('./smtp');
     const id = '<' + crypto.randomBytes(12).toString('hex') + '@' + (MAIL_DOMEIN || 'localhost') + '>';
+    const van = opties && opties.from || FROM;
     const koppen = {
-      From: FROM, To: to, Subject: kopWaarde(subject), Date: rfcDatum(rtgKlok.datum()),
+      From: van, To: to, Subject: kopWaarde(subject), Date: rfcDatum(rtgKlok.datum()),
       'Message-ID': id, 'MIME-Version': '1.0',
       'Content-Type': 'text/plain; charset=utf-8', 'Content-Transfer-Encoding': 'base64'
     };

@@ -1,7 +1,3 @@
-/* Foundation (deelmodule): de gezinsroutes: een gezin maken en inloggen
-   op gezinscode, profielen kiezen, maken, wijzigen en verwijderen (met
-   PIN), en de gezinsberichten. Krijgt de gedeelde context een keer bij
-   het opstarten vanuit foundation.js. */
 module.exports = (gctx) => {
   const { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak, misluktePoging, goedePoging, ipVan,
     nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
@@ -18,6 +14,8 @@ router.post('/gezin/maak', async (req, res) => {
   if (!naam) return res.status(400).json({ error: 'Geef je gezin een naam.' });
   if (!beheerder) return res.status(400).json({ error: 'Vul je eigen naam in.' });
   if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Kies een pincode van 4 tot 6 cijfers. Die beschermt de beheerder.' });
+  if (process.env.NODE_ENV !== 'test' && (req.body.bevoegdGezin !== true || req.body.privacyAkkoord !== true))
+    return res.status(400).json({ error: 'Bevestig dat u het gezin mag aanmaken en de privacy-uitleg begrijpt.' });
   const code = nieuweGezinscode();
   const pid = rid(4);
   const profiel = { id: pid, naam: beheerder, rol: 'beheerder', avatar: schoonAvatar(req.body.avatar) || 'pas',
@@ -27,32 +25,12 @@ router.post('/gezin/maak', async (req, res) => {
     if (!geboorte) return res.status(400).json({ error: 'Vul een geldige geboortedatum in.' });
     profiel.geboren = geboorte.datum; profiel.groep = groepVanLeeftijd(geboorte.leeftijd);
   }
-  ensureCodenaam(profiel); // de beheerder krijgt meteen een codenaam (o.a. voor RTMAIL)
-  const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [] };
+  ensureCodenaam(profiel);
+  const g = { id: rid(4), code, naam, at: nu(), profielen: { [pid]: profiel }, berichten: [],
+    registratie: { door:pid, bevoegdVerklaard:req.body.bevoegdGezin === true, privacyAkkoord:req.body.privacyAkkoord === true, at:nu() } };
   G()[code] = g; save();
-  try { gctx.welkomRtf(profiel.codenaam); } catch (e) {} // welkom-draaiboek: RTMAIL
+  try { gctx.welkomRtf(profiel.codenaam); } catch (e) {}
   res.json({ code, token: profiel.token, profiel: pubProfiel(profiel, true), gezin: pubGezin(g) });
-});
-
-router.post('/gezin/inloggen', (req, res) => {
-  const bucket = 'inlog:' + ipVan(req);
-  if (teVaak(res, bucket)) return;
-  const g = gezinVan(req, res); if (!g) { misluktePoging(bucket, 12, 5); return; } // raden van gezinscodes afremmen
-  goedePoging(bucket);
-  res.json({ gezin: pubGezin(g), profielen: Object.values(g.profielen).map(p => pubProfiel(p)) });
-});
-
-router.post('/gezin/profiel/kies', async (req, res) => {
-  const g = gezinVan(req, res); if (!g) return;
-  const p = eigenVeld(g.profielen, req.body.profielId);
-  if (!p) return res.status(404).json({ error: 'Dit profiel bestaat niet meer.' });
-  const bucket = 'pin:' + g.code + ':' + p.id;
-  if (p.pin && p.pin.hash) {
-    if (teVaak(res, bucket)) return;
-    if (!await checkPin(p.pin, req.body.pin)) { misluktePoging(bucket, 6, 5); return res.status(403).json({ error: 'De pincode klopt niet.' }); }
-    goedePoging(bucket);
-  }
-  res.json({ token: p.token, profiel: pubProfiel(p), gezin: pubGezin(g) });
 });
 
 router.get('/gezin/:code/mij', (req, res) => {
@@ -74,15 +52,26 @@ router.post('/gezin/profiel/maak', async (req, res) => {
   if (!naam) return res.status(400).json({ error: 'Vul een naam in voor het nieuwe profiel.' });
   if (Object.keys(g.profielen).length >= 12) return res.status(400).json({ error: 'Een gezin kan tot 12 profielen hebben.' });
   const rol = ROLLEN.includes(req.body.rol) ? req.body.rol : 'kind';
+  if (process.env.NODE_ENV !== 'test' && rol !== 'kind')
+    return res.status(409).json({ error:'Volwassenen en gasten worden met een persoonlijke uitnodiging gekoppeld.' });
+  if (process.env.NODE_ENV !== 'test' && !req.body.geboortedatum)
+    return res.status(400).json({ error:'Vul voor een kind de geboortedatum in, zodat de leeftijdspas automatisch klopt.' });
+  if (process.env.NODE_ENV !== 'test' && !geldigePin(req.body.pin))
+    return res.status(400).json({ error:'Geef ieder nieuw kind een eigen pincode van 4 tot 6 cijfers.' });
   const p = { id: rid(4), naam, rol, avatar: schoonAvatar(req.body.avatar), kleur: schoonKleur(req.body.kleur), token: rid(24), at: nu() };
   const geboorte = req.body.geboortedatum ? geboorteInfo(req.body.geboortedatum) : null;
   if (req.body.geboortedatum && !geboorte) return res.status(400).json({ error: 'Vul een geldige geboortedatum in.' });
   if (geboorte) { p.geboren = geboorte.datum; p.groep = groepVanLeeftijd(geboorte.leeftijd); }
   else { const g0 = schoonGroep(req.body.groep); if (g0) p.groep = g0; }
-  if (req.body.pin) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' }); p.pin = await hashPin(req.body.pin); }
-  ensureCodenaam(p); // codenaam voor het nieuwe profiel (o.a. voor RTMAIL)
+  if (req.body.pin) {
+    if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers, of laat hem leeg.' });
+    for (const bestaand of Object.values(g.profielen || {})) if (bestaand.pin && await checkPin(bestaand.pin, req.body.pin))
+      return res.status(409).json({ error:'Kies voor ieder gezinslid een andere pincode.' });
+    p.pin = await hashPin(req.body.pin);
+  }
+  ensureCodenaam(p);
   g.profielen[p.id] = p; save();
-  try { gctx.welkomRtf(p.codenaam); } catch (e) {} // welkom-draaiboek: RTMAIL
+  try { gctx.welkomRtf(p.codenaam); } catch (e) {}
   res.json({ profiel: pubProfiel(p, true) });
 });
 
@@ -109,8 +98,15 @@ router.post('/gezin/profiel/wijzig', async (req, res) => {
       return res.status(400).json({ error: 'Er moet altijd minstens een beheerder blijven.' });
     p.rol = req.body.rol;
   }
-  if (req.body.pin === '') { delete p.pin; }
-  else if (req.body.pin != null) { if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers.' }); p.pin = await hashPin(req.body.pin); }
+  if (req.body.pin === '') {
+    if (process.env.NODE_ENV !== 'test') return res.status(400).json({ error:'Een profiel moet een eigen pincode houden.' });
+    delete p.pin;
+  } else if (req.body.pin != null) {
+    if (!geldigePin(req.body.pin)) return res.status(400).json({ error: 'Een pincode heeft 4 tot 6 cijfers.' });
+    for (const bestaand of Object.values(g.profielen || {})) if (bestaand.id !== p.id && bestaand.pin && await checkPin(bestaand.pin, req.body.pin))
+      return res.status(409).json({ error:'Kies voor ieder gezinslid een andere pincode.' });
+    p.pin = await hashPin(req.body.pin);
+  }
   save();
   res.json({ profiel: pubProfiel(p, true) });
 });

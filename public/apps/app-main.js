@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '4416650d';
+var RTG_BOUW = 'f71de07b';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3873,16 +3873,12 @@ var RTG_BOUW = '4416650d';
      langs een echte grens: hierboven staat de registry van alle apps en de
      vaste functierij, hieronder de MAPPEN waarin die apps vallen en de vraag
      welke ervan bij welke pas horen. */
-  /* ---------- de hoofdwerelden, boven de klok ----------
-     Drie duidelijke huizen vervangen de losse domeinmappen: RTG voor het
-     persoonlijke leven en onderweg, RTG Kantoor voor werk en onderneming, en
-     RTFoundation voor de stichting en het gezin eromheen. De pas bepaalt wat
-     binnen zo'n huis beschikbaar is, nooit of de voordeur er armer uitziet.
-
-     Daarom bewaart deze lijst alleen de drie vaste hoofdwerelden. Alle apps
-     blijven in precies één wereld ingedeeld en premiumrechten worden pas op
-     onderdeelniveau toegepast. Zo blijft RTG voor elke pas compleet ogen,
-     terwijl Lifestyle en Business aantoonbaar meer mogelijkheden ontsluiten.
+  /* ---------- de vier apps, boven de klok ----------
+     LIFE, WORK, FOUNDATION en INSTELLINGEN vervangen alle losse voordeuren.
+     De bestaande domeinen blijven als onderdelen in precies één product
+     ingedeeld; samenvoegen van de schil verwijdert hun data of logica niet.
+     De pas bepaalt wat binnen een product beschikbaar is, nooit hoeveel
+     hoofdapps de voordeur toont.
 
      Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
      een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
@@ -3890,7 +3886,7 @@ var RTG_BOUW = '4416650d';
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- één gecentreerde rij --- */
-    { sleutel: 'map-rtg', naam: 'RTG', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
+    { sleutel: 'map-rtg', naam: 'LIFE', wereld: '/apps/rtg.html', glyf: 'rtg', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
@@ -3898,7 +3894,7 @@ var RTG_BOUW = '4416650d';
       'link:nalatenschap', 'link:logboek',
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+      'tab:salon', 'link:pulse', 'os:snaps', 'link:camera',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
        tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
@@ -3913,10 +3909,9 @@ var RTG_BOUW = '4416650d';
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
-      'link:nieuws', 'link:krant', 'link:sport',
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
-    { sleutel: 'map-werk', naam: 'RTG Kantoor', wereld: '/apps/kantoor.html', glyf: 'office', items: [
-      'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
+      'link:nieuws', 'link:krant', 'link:sport', 'link:veilig'] },
+    { sleutel: 'map-werk', naam: 'WORK', wereld: '/apps/kantoor.html', glyf: 'office', items: [
+      'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
@@ -3945,7 +3940,12 @@ var RTG_BOUW = '4416650d';
        nooit in beeld komen (openMap navigeert, zie 26.js). Het
        levens-command-center staat daarom als tegel OP de hub zelf, in de
        oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
-    { sleutel: 'map-rtf', naam: 'RTFoundation', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
+    { sleutel: 'map-rtf', naam: 'FOUNDATION', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: [
+      'os:rtf', 'link:vrienden'] },
+    /* Identiteit, toegang, voorkeuren en juridische keuzes horen bij de
+       gebruiker zelf. Ze staan niet meer verstopt als diensten van LIFE. */
+    { sleutel: 'map-instellingen', naam: 'INSTELLINGEN', wereld: '/apps/ik.html', glyf: 'gear', items: [
+      'link:passkeys', 'link:juridisch'] }
   ];
 
   /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
@@ -5215,7 +5215,7 @@ var RTG_BOUW = '4416650d';
   function wereldBij() {
     if (!window.RTGCommand || !RTGCommand.werelden) return;
     RTGCommand.werelden(MAPPEN.filter(function (m) {
-      return m.wereld && m.items.some(itemZichtbaar);
+      return m.sleutel !== 'map-instellingen' && m.wereld && m.items.some(itemZichtbaar);
     }).map(function (m) {
       return {
         sleutel: m.sleutel,
@@ -6874,15 +6874,10 @@ var RTG_BOUW = '4416650d';
     catch(e){ toast(e.message); }
   }
   async function rtfKoppelStart(){
-    const code = prompt('Vul de gezinscode in die je van het gezin kreeg:');
-    if (!code) return;
+    const uitnodiging = prompt('Plak de persoonlijke uitnodigingslink of code die je van het gezin kreeg:');
+    if (!uitnodiging) return;
     try {
-      const d = await API.call('/rtf/profielen', { code: code.trim().toUpperCase() });
-      const namen = d.profielen.map((p,i)=> (i+1)+'. '+p.naam + (p.gekoppeld?' (al gekoppeld)':'')).join('\n');
-      const keuze = prompt('Gezin "'+d.gezinNaam+'". Welk profiel ben jij?\n'+namen+'\n\nTyp het nummer:');
-      const idx = parseInt(keuze,10)-1;
-      if (isNaN(idx) || !d.profielen[idx]) return;
-      const r = await API.call('/rtf/koppel', { code: code.trim().toUpperCase(), profielId: d.profielen[idx].id });
+      const r = await API.call('/rtf/uitnodiging/accepteer', { uitnodiging: uitnodiging.trim() });
       toast('Gekoppeld aan '+r.gezinNaam+'. Je krijgt hun meldingen nu ook op je telefoon.');
       await refreshState(); renderFoundation(); openTab('gezin');
       ensurePush(true);

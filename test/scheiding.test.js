@@ -268,6 +268,11 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
            daar staat de controle. Een sessie eisen zou hier niets scheiden,
            want er valt niets te scheiden. */
   const GEDULD = {
+    /* De aanvrager heeft nog geen account. De 192-bit statussleutel is alleen
+       bij de aanvraag uitgegeven, staat gehasht in opslag en wordt met een
+       timing-safe vergelijking gecontroleerd. Zonder die bezitssleutel geeft
+       de route uitsluitend 403; de rem begrenst raden per IP. */
+    'server/routes/foundationregistratie.js POST /api/foundation/registratie/status': 'de willekeurige, gehashte statussleutel is de poort tot uitsluitend die ene aanvraag',
     /* (c) er wordt niets opgezocht: deze handler controleert alleen of de
        code zes tekens A-Z0-9 is en schrijft het adres om naar
        /apps/app.html?werving=<code>. Hij leest geen uitnodiging, geen

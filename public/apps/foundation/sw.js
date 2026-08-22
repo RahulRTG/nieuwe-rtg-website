@@ -2,15 +2,15 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-hulp-leerpas-5f70d1d2';
+const CACHE = 'rtf-foundation-werelden-8a9acb1b';
 const SHELL = [
-  '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
+  '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/registreren.html', '/apps/foundation/registreren.js', '/apps/foundation/campus.html',
   '/apps/foundation/leren.html', '/apps/foundation/leerpaspoort.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
   '/apps/foundation/cv.html', '/apps/foundation/rust.html', '/apps/foundation/reis.html',
   '/apps/foundation/geld.html', '/apps/foundation/hulpwijzer.html', '/apps/foundation/dromen.html',
   '/apps/foundation/opvoeden.html', '/apps/foundation/steun.html', '/apps/foundation/studie.html',
   '/apps/foundation/veilig.html', '/apps/foundation/pesten.html', '/apps/foundation/oppasinfo.html',
-  '/apps/foundation/agenda.html', '/apps/foundation/klusjes.html',
+  '/apps/foundation/agenda.html', '/apps/foundation/mail.html', '/apps/foundation/klusjes.html',
   '/apps/foundation/keuken.html', '/apps/foundation/ochtend.html', '/apps/foundation/verjaardagen.html', '/apps/foundation/gezondheid.html',
   '/apps/foundation/overhoren.html', '/apps/foundation/schrijven.html', '/apps/foundation/projecten.html',
   '/apps/foundation/babyboek.html',

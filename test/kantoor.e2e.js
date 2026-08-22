@@ -95,6 +95,7 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
         })),
         lijnZichtbaar: !document.querySelector('#vandaagVak').hidden,
         poorten: [...document.querySelectorAll('.poort')].map(p => p.getAttribute('href')),
+        ingangen: [...document.querySelectorAll('.wereldapps a')].map(a => a.getAttribute('href')),
         /* Alles waarmee je GEGEVENS zou kunnen veranderen. Twee dingen tellen
            met reden niet mee: de referentieknop kopieert alleen, en de
            hamburger van het app-menu is navigatie -- die staat sinds de
@@ -126,6 +127,10 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
     // de vier poorten wijzen naar de vier specialisten, en niet naar zichzelf
     assert.deepEqual(beeld.poorten,
       ['/apps/office.html', '/apps/agenda.html', '/apps/notities.html', '/apps/bestanden.html']);
+    for (const doel of ['/apps/onderneming.html', '/apps/loonstrook.html', '/apps/browser.html',
+      '/apps/sitemaker.html', '/apps/rtgschool.html']) {
+      assert.ok(beeld.ingangen.includes(doel), 'WORK mist de zichtbare ingang ' + doel);
+    }
 
     /* 4. LAAG 3: wat vandaag op de klok staat, staat op de tijdlijn -- en daar
        alleen. Het register eronder houdt wat er verder speelt; stond de

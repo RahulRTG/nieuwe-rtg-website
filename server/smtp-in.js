@@ -103,12 +103,21 @@ module.exports = ({ aanname, naam, starttls }) => {
         const af = data.regel(lijn);
         if (!af) return;
         const envelop = van;
+        const ontvangers = naar.slice();
         reset();
         if (af.teGroot) { zeg(552, 'Dit bericht is groter dan ' + MAX_BYTES + ' bytes.'); return; }
-        const r = await aanname.neemAan({ ruw: af.ruw, ip, envelopeVan: envelop, helo });
-        if (r && r.ok) { zeg(250, 'Aangenomen (' + r.id + ')'); return; }
+        const uitkomsten = [];
+        for (const envelopeNaar of ontvangers) {
+          uitkomsten.push(await aanname.neemAan({ ruw: af.ruw, ip,
+            envelopeVan: envelop, envelopeNaar, helo }));
+        }
+        const fout = uitkomsten.find(r => !r || !r.ok);
+        if (!fout) {
+          zeg(250, 'Aangenomen (' + uitkomsten.map(r => r.id).join(',') + ')');
+          return;
+        }
         // welke code daarbij hoort en waarom: zie ./smtp-in-data.js
-        zeg(antwoordCode(r), (r && r.error) || 'Kon dit bericht niet aannemen.');
+        zeg(antwoordCode(fout), (fout && fout.error) || 'Kon dit bericht niet aannemen.');
         return;
       }
 

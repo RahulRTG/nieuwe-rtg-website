@@ -100,14 +100,25 @@
       </div>
       <div class="enterprise-belofte"><b>Veilig per rol</b>Je sessie is tijdelijk. Rechten worden bij ieder verzoek opnieuw door de server gecontroleerd en gevoelige inzage komt in het journaal.</div>
     </section>
+    <div class="kaart" id="linkBevestiging" hidden aria-live="polite"></div>
     <div class="poort-grid">
       <div class="kaart">
-        <div class="kop">Open jouw werkruimte</div>
-        <div class="school-rolkop"><span class="school-avatar">S</span><div><strong>Beveiligde schooltoegang</strong><span>De sleutel blijft alleen in deze tabsessie</span></div></div>
+        <div class="kop">Stuur mij een inloglink</div>
+        <div class="school-rolkop"><span class="school-avatar">S</span><div><strong>Persoonlijke schooltoegang</strong><span>Alleen naar het eerder gecontroleerde schoolmailadres</span></div></div>
+        <div class="rij">
+          <input class="veld" id="mailCode" placeholder="Schoolcode" autocapitalize="characters" autocomplete="organization" spellcheck="false" aria-label="Schoolcode">
+          <input class="veld" id="mailAdres" placeholder="Jouw schoolmail" type="email" autocomplete="email" spellcheck="false" aria-label="Schoolmailadres">
+          <button class="knop p" id="mailGa" type="button">Stuur eenmalige link</button>
+        </div>
+        <div class="school-veiligheidsrij"><span><b>15 minuten</b>De link verloopt snel en werkt één keer.</span><span><b>Tijdelijk</b>Sluit de tab en de sessie verdwijnt.</span><span><b>Privé</b>Een onbekend adres krijgt hetzelfde neutrale antwoord.</span></div>
+      </div>
+      <div class="kaart">
+        <div class="kop">Directie of bestaande toegangssleutel</div>
+        <p class="stil">De directie opent hiermee de school na de gecontroleerde activatie. Bestaande personeelssleutels blijven bruikbaar tijdens de overgang.</p>
         <div class="rij">
           <input class="veld" id="inCode" placeholder="Schoolcode" autocapitalize="characters" autocomplete="organization" spellcheck="false" aria-label="Schoolcode">
           <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false" aria-label="Persoonlijke toegangssleutel">
-          <button class="knop p" id="inGa" type="button">Veilig openen</button>
+          <button class="knop" id="inGa" type="button">Veilig openen</button>
         </div>
         <div class="school-veiligheidsrij"><span><b>Tijdelijk</b>Sluit de tab en de sleutel verdwijnt.</span><span><b>Rolgestuurd</b>Alleen jouw bevoegdheden worden geladen.</span><span><b>Controleerbaar</b>Gevoelige inzage wordt gelogd.</span></div>
       </div>
@@ -129,6 +140,7 @@
       <div class="enterprise-belofte"><b>Beslissen met grenzen</b>Cijfervoorstellen blijven advies. Zorginzage vraagt een reden. De systeembeheerder komt niet in leerlingdossiers.</div>
     </section>
     <div class="kpis" id="dKpis" aria-live="polite"></div>
+    <div id="dUitnodigen"></div>
     <div class="enterprise-start">
       <div class="kaart">
         <div class="kop">Personeel en toelating</div>
@@ -144,6 +156,18 @@
     <div id="dBeheer"></div>
   </div>
 
+  <!-- werkruimte voor administratie, HR, zorg, gebouw en andere schoolrollen -->
+  <div id="vPersoneel" hidden>
+    <section class="enterprise-hero">
+      <div><span class="ey">Personeelswerkruimte</span><h2 id="pWelkom">Jouw werk, met jouw bevoegdheden.</h2><p>De directie bepaalt de rollen. De server controleert bij iedere handeling opnieuw wat daarbij hoort.</p>
+        <div class="enterprise-acties" id="pRollen"></div>
+      </div>
+      <div class="enterprise-belofte"><b>Minimale toegang</b>Geen algemene schooldeur: zorg, financiën, HR, administratie en veiligheid blijven afzonderlijk afgeschermd.</div>
+    </section>
+    <div id="pMail"></div>
+    <div id="pWerk"></div>
+  </div>
+
   <!-- leraar-werkbank -->
   <div id="vLeraar" hidden>
     <section class="enterprise-hero">
@@ -152,6 +176,7 @@
       </div>
       <div class="enterprise-belofte"><b>Kindveilig ontworpen</b>Geen privékanaal tussen leraar en kind. Ouders lezen standaard mee; vertrouwelijke hulp volgt een aparte bevoegdheid.</div>
     </section>
+    <div id="lMail"></div>
     <!-- rtgdeel-vast: de klassenkiezer blijft in elk deel van het menu staan;
          zonder klas heeft de werkbank eronder geen betekenis -->
     <div class="kaart rtgdeel-vast" id="lKlassenKaart">
@@ -253,12 +278,16 @@
 <script src="/shared/schoolbel.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
+<script src="/apps/schoolpartner/toegang.js"></script>
 <script src="/apps/schoolpartner/toetsen.js"></script>
 <script src="/apps/schoolpartner/hulplijn.js"></script>
 <script src="/apps/schoolpartner/excursie.js"></script>
 <script src="/apps/schoolpartner/directie.js"></script>
+<script src="/apps/schoolpartner/directie-personeel.js"></script>
 <script src="/apps/schoolpartner/enterprise.js"></script>
 <script src="/apps/schoolpartner/enterprise-beheer.js"></script>
+<script src="/apps/schoolpartner/personeel.js"></script>
+<script src="/apps/schoolpartner/mail.js"></script>
 <script src="/apps/schoolpartner/app.js"></script>
 <script>try { if (self !== top) document.documentElement.classList.add('in-campus'); } catch (e) {}</script>
 <script src="/shared/deelmenu.js" defer></script>

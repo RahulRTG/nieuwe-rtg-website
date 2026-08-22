@@ -144,7 +144,7 @@ async function wachtWerelden(page) {
   await page.waitForFunction(() => {
     const app = document.getElementById('app');
     return !!(app && app.classList.contains('active') &&
-      document.querySelectorAll('#osMappen .os-app').length === 3);
+      document.querySelectorAll('#osMappen .os-app').length === 4);
   }, null, { timeout: 60000 });
   /* De werktafel hoort er dan ook te zijn: de intake staat buiten deze toetsen
      (zie metLid), dus is #onbGate dicht en is er geen grendel meer. */
@@ -157,9 +157,8 @@ async function wachtWerelden(page) {
   }, null, { timeout: 20000 });
 }
 
-/* De drie werelden zoals ze in de bank staan, in volgorde. De software eronder
-   blijft buiten beeld: die komt uit de catalogus van Command en niet uit MAPPEN,
-   en deze toetsen gaan over de werelden. */
+/* De drie inhoudswerelden zoals ze in de bank staan, in volgorde. Instellingen
+   is de vaste vierde wereld in de voet van de bank. */
 async function werelden(page) {
   return page.evaluate(() => {
     const nav = document.querySelector('#rtgCommand .cmd-nav');
@@ -415,7 +414,7 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
   });
 });
 
-test('de bank zet de drie werelden boven de software, en het springboard is weg',
+test('de bank toont alleen de drie inhoudswerelden en Instellingen, en het springboard is weg',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   /* DEZE TOETS IS MEEVERHUISD MET WAT HIJ MEET.
 
@@ -443,11 +442,13 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
     await openLade(page);
 
     const b = await werelden(page);
-    assert.deepEqual(b.koppen, ['Werelden', 'Software'],
-      'de bank hoort de werelden van de software te scheiden, gevonden: ' + b.koppen.join(', '));
+    assert.deepEqual(b.koppen, ['Apps'],
+      'de bank hoort alleen de vier mega-apps te tonen, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
       ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact RTG, RTG Kantoor en RTFoundation bovenaan te dragen');
+      'de bank hoort exact LIFE, WORK en FOUNDATION bovenaan te dragen');
+    assert.equal(await page.locator('#rtgCommand [data-cmd="settings"]').textContent(), 'INSTELLINGEN',
+      'INSTELLINGEN hoort de vaste vierde mega-app in de voet te zijn');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
     assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
       'deze werelden staan wel in de bank maar zijn nul groot');
@@ -511,7 +512,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
     const b = await werelden(page);
     assert.deepEqual(b.werelden.map((w) => w.url),
       ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
+      'de bank hoort exact LIFE, WORK en FOUNDATION te dragen');
     const kaal = b.werelden.filter((w) => !w.glyf);
     assert.deepEqual(kaal.map((w) => w.naam), [],
       'deze werelden dragen geen eigen glyf maar het standaard icoon:\n' +

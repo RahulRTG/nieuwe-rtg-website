@@ -17,7 +17,8 @@
 const { eigenVeld } = require('./kern/util'); // veilige objecttoegang (geen prototype-pollution)
 
 module.exports = (ctx) => {
-  const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic } = ctx;
+  const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+    encS, decS, teVaak, misluktePoging, goedePoging, ipVan, schoolMailBrug } = ctx;
 
   function K() {
     const f = F();
@@ -47,11 +48,15 @@ module.exports = (ctx) => {
     return sch;
   }
   // personeels-authenticatie: schoolcode + personeel-token (status telt apart)
-  function personeelVan(req, res) {
+  function personeelVan(req, res, opties) {
     const sch = eigenVeld(S(), String(req.body.schoolCode || '').trim().toUpperCase());
     const tok = String(req.body.personeelToken || '');
     const p = sch && tok ? Object.values(sch.personeel || {}).find(x => x.token === tok) : null;
     if (!p) { res.status(403).json({ error: 'Onbekende school of verkeerd personeel-token.' }); return null; }
+    if (p.status !== 'actief' && !(opties && opties.ookNietActief)) {
+      res.status(403).json({ error: p.status === 'ingetrokken' ? 'Uw schooltoegang is ingetrokken.' : 'De school moet uw toegang eerst goedkeuren.' });
+      return null;
+    }
     return { sch, p };
   }
 
@@ -106,7 +111,9 @@ module.exports = (ctx) => {
   /* De drie lagen (beheer, klas, gezin) draaien als submodules op een
      gedeelde context, een keer opgebouwd bij het opstarten; de klaslaag
      levert gemiddelde() aan de gezinslaag via die context. */
-  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic, encS, decS,
+    teVaak, misluktePoging, goedePoging, ipVan,
+    schoolMailBrug,
     eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
@@ -130,6 +137,9 @@ module.exports = (ctx) => {
      smaak: dossier en organisatie halen leerlingLijst() uit de context die
      inschrijving.js daar neerzet. */
   Object.assign(sctx, require('./school/rollen')(sctx)); // rollen, rechten, inzagejournaal
+  Object.assign(sctx, require('./school/personeel-mail')(sctx)); // persoonlijke naam@school.rtg-post
+  Object.assign(sctx, require('./school/personeelstoegang')(sctx)); // directie nodigt persoonlijk uit
+  require('./school/personeel-inlog')(sctx); // eenmalige schoolmail-link + intrekken
   Object.assign(sctx, require('./school/webhook')(sctx)); // de bezorger; zet sctx.meld voor de lagen hieronder
   require('./school/inschrijving')(sctx); // aanmelding, wachtlijst, plaatsing, uitschrijving, overstap
   Object.assign(sctx, require('./school/dossier')(sctx)); // dossier, contact, documenten, zorg
@@ -154,4 +164,5 @@ module.exports = (ctx) => {
   require('./school/koppelingen')(sctx); // integraties, webhooks, export
   Object.assign(sctx, require('./school/ouderportaal')(sctx)); // toestemming en afspraken
   require('./school/ouderportaal-mijn')(sctx); // het ene overzicht van het gezin
+  return { schoolMailAdresActief:sctx.schoolMailAdresActief };
 };

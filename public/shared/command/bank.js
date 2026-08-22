@@ -98,17 +98,15 @@
       werelden=werelden.filter(function(x){return x&&x.naam&&x.url});
       nav.textContent='';
       if(werelden.length){
-        nav.appendChild(kopje('Werelden'));
+        nav.appendChild(kopje('Apps'));
         werelden.forEach(function(x){nav.appendChild(deur(x.naam,x.url,x.teken))});
-        nav.appendChild(kopje('Software'));
       }
-      APPS.forEach(function(a){nav.appendChild(deur(a[0],a[1],null,a[2]))});
       vulVoet();
       // de kiezer achter de plus: hetzelfde aanbod, alleen op een breed scherm
       var kz=root.querySelector('.cmd-kiezer');
       if(!kz)return;
       kz.textContent='';
-      werelden.map(function(x){return[x.naam,x.url]}).concat(APPS.map(function(a){return[a[0],a[1]]}))
+      werelden.map(function(x){return[x.naam,x.url]})
         .forEach(function(p){var b=d.createElement('button');b.textContent=p[0];
           b.onclick=function(){kz.hidden=true;o.open(p[1],p[0])};kz.appendChild(b)});
     }

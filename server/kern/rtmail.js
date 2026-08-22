@@ -1,37 +1,16 @@
-/* RTMAIL: het eigen, interne postsysteem van het RTG-platform. Geen externe
-   e-mail (dat blijft server/mail.js met SMTP/outbox), maar een postvak-op-
-   codenaam binnen het huis zelf -- de rail waarover de automatiseringen straks
-   hun berichten sturen: een ontvangstbevestiging aan een sollicitant, een
-   inkoopvoorstel naar een groothandel, een factuur-seintje, een bericht van de
-   overheid. Alles op codenamen/zaakcodes; echte namen blijven in de kluis.
-
-   Adres: "<code>@rtmail" (kleine letters). De vaste systeem-afzender is
-   "rtg@rtmail" -- daar komt alles vandaan wat het platform zelf verstuurt.
-   Zero-dependency: alleen db, save en crypto (voor de id's) komen binnen.
-
-   VEILIGSTE MAIL VAN HET HUIS. Twee banen, streng gescheiden:
-   - VERTROUWD (systeem/Rahul, geverifieerd RTG/RTF-lid, geverifieerde RTG/RTF-
-     zaak): de premium, snelle, AI-gedreven beleving.
-   - ONBETROUWD (al het andere -- een afzender buiten de code, of niet te
-     verifiëren): links zijn nooit te openen en bijlagen bestaan niet. Nul
-     phishing-, nul malware-oppervlak.
-   Het vertrouwen wordt GESTEMPELD bij het versturen (de afzender is dan door de
-   inlog geverifieerd), niet achteraf geraden. De standaard is onbetrouwbaar:
-   wie geen bron meegeeft, is niet vertrouwd. RTMAIL draagt bovendien nooit een
-   te openen bijlage -- de body is platte tekst, punt.
-
-   Bewust adviserend/onthoudend: RTMAIL bezorgt en bewaart, maar besluit niets
-   en raakt geen geld -- een geld- of toegangs-actie loopt altijd langs de
-   bestaande poorten waar een mens beslist. */
+/* Intern RTG-postsysteem. Vertrouwde systeem-, lid-, zaak- en schoolpost loopt
+   gescheiden van externe post. Externe links openen niet en bijlagen bestaan
+   hier niet. Een geld- of toegangsactie blijft altijd bij de bestaande poort. */
 const adresLaag = require('./rtmail-adres');
 const { datum: klokDatum } = require('../lib/klok');
 
-module.exports = ({ db, save, crypto }) => {
+module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   const SYSTEEM = 'rtg@rtmail';
   const MAX = 20000; // ruwe bovengrens op het totaal, zodat het geheugen begrensd blijft
   // De bronnen die het vertrouwen bepalen. Alleen deze drie zijn vertrouwd;
   // alles daarbuiten valt terug op 'extern' en is dus geblokkeerd.
-  const VERTROUWDE_BRONNEN = ['systeem', 'lid', 'zaak'];
+  const VERTROUWDE_BRONNEN = ['systeem', 'lid', 'zaak', 'school'];
+  const veiligheid = require('./rtmail-veiligheid')({ crypto, sleutel:integriteitSleutel });
 
   const kap = (s, n) => String(s == null ? '' : s).slice(0, n);
   // adres normaliseren: kleine letters, geen rare tekens, en "@rtmail" erachter
@@ -43,17 +22,7 @@ module.exports = ({ db, save, crypto }) => {
     return s.slice(0, 80);
   }
 
-  /* HET POSTVAK HANGT AAN HET LINKERDEEL, NIET AAN HET DOMEIN.
-     Sinds de domeinen per lidmaatschap bestaan (kern/rtmail-adres.js) heeft
-     iemand met de RTG Pass "x@rtgpass.rtg" en na een overstap "x@lifestyle.rtg".
-     Post aan het oude adres moet gewoon aankomen -- een lidmaatschap dat
-     verandert mag geen post laten verdwijnen. Daarom vergelijken we binnen ons
-     eigen huis op het linkerdeel; buiten het huis geldt het hele adres.
-
-     Bekende eigenschap, van vóór deze ronde: codenamen en zaakcodes delen die
-     ene naamruimte. Twee identiteiten met hetzelfde linkerdeel zouden dus
-     hetzelfde postvak zien. Dat was met "@rtmail" al zo; het scheiden ervan zou
-     bestaande post onbereikbaar maken, en dat is de ergere fout. */
+  // Binnen RTG blijft het linkerdeel leidend, zodat een paswissel geen post breekt.
   const zelfdeBus = adresLaag.zelfdeBus;
 
   /* De veiligheidsscan op de tekst staat in ./rtmail-links.js: dat is
@@ -73,12 +42,7 @@ module.exports = ({ db, save, crypto }) => {
     return db.data.rtmail;
   }
 
-  /* Een bericht bezorgen. "naar" is verplicht; "van" valt terug op de systeem-
-     afzender. "bron" bepaalt het vertrouwen (systeem/lid/zaak = vertrouwd; al het
-     andere = 'extern', geblokkeerd) en hoort door de geverifieerde inlog gezet te
-     worden -- niet door de client. Een bijlage bestaat niet: wat er ook binnenkomt,
-     er wordt niets opgeslagen dat te openen valt. Geeft het bezorgde bericht terug
-     (of een { error } bij een leeg adres). */
+  // De geverifieerde serverroute zet `bron`; de client bepaalt dit vertrouwen niet.
   function stuur({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}) {
     const naarA = normAdres(naar);
     if (!naarA) return { error: 'Geen geldig ontvang-adres.' };
@@ -111,6 +75,7 @@ module.exports = ({ db, save, crypto }) => {
       if (ouder) { msg.draad = ouder.draad || ouder.id; msg.antwoordOp = ouder.id; }
     }
     if (!msg.draad) msg.draad = msg.id;
+    veiligheid.zegel(msg);
     s.berichten.unshift(msg);
     if (s.berichten.length > MAX) s.berichten.length = MAX;
     save();
@@ -137,16 +102,26 @@ module.exports = ({ db, save, crypto }) => {
     return stuur({ van: SYSTEEM, naar, onderwerp, tekst, soort: soort || 'systeem', bron: 'systeem' });
   }
 
-  const pub = m => ({
-    id: m.id, van: m.van, naar: m.naar, onderwerp: m.onderwerp, tekst: m.tekst, soort: m.soort,
+  const pub = m => {
+    const veilig = veiligheid.publiek(m), stuk = veilig.inhoudGeblokkeerd;
+    return ({
+    id: m.id, van: m.van, naar: m.naar,
+    onderwerp:stuk ? '[Geblokkeerd: integriteitscontrole mislukt]' : m.onderwerp,
+    tekst:stuk ? 'De opgeslagen inhoud wijkt af van het cryptografische RTG-zegel. Open of beantwoord dit bericht niet; meld het bij de beheerder.' : m.tekst,
+    soort: m.soort,
     bron: m.bron || (m.van === SYSTEEM ? 'systeem' : 'extern'),
-    vertrouwd: m.vertrouwd != null ? !!m.vertrouwd : (m.van === SYSTEEM),
-    links: m.links || scanLinks(m.tekst),
+    vertrouwd:stuk ? false : (m.vertrouwd != null ? !!m.vertrouwd : (m.van === SYSTEEM)),
+    links:stuk ? { externeLinks:[], aantal:0, gevaarlijk:true } : (m.links || scanLinks(m.tekst)),
     bijlagen: [],
     draad: m.draad || m.id, antwoordOp: m.antwoordOp || null,
     workflow: Array.isArray(m.workflow) ? m.workflow.slice(-20) : [],
-    at: m.at, gelezen: !!m.gelezen
-  });
+    at: m.at, gelezen: !!m.gelezen, veiligheid:veilig
+  }); };
+
+  /* Alleen voor een legitieme naverwerking binnen dezelfde bezorgketen, zoals
+     het toevoegen van de uitkomst van de bijlagescanner. `bewaar` staat daar
+     aan, zodat inhoud en nieuw zegel atomisch in dezelfde opslagronde landen. */
+  function herzegel(m, bewaar) { veiligheid.zegel(m); if (bewaar) save(); return m; }
 
   // Het postvak IN van een adres (nieuwste eerst).
   function postvak(adres, { limit = 60 } = {}) {
@@ -190,6 +165,7 @@ module.exports = ({ db, save, crypto }) => {
   }
 
   return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees, workflow,
+    publiek:pub, herzegel, controleerIntegriteit:veiligheid.controleer,
     zetNaBezorging,
     // de adreslaag doorgeven, zodat routes en tests er maar een bron voor hebben
     DOMEINEN: adresLaag.DOMEINEN, adresVoor: adresLaag.adresVoor, ontleed: adresLaag.ontleed,

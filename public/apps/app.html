@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="4416650d">
+<meta name="rtg-bouw" content="f71de07b">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1209,12 +1209,11 @@
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 
-  /* 1. de hoofdwerelden, bovenaan -- één gecentreerde rij van drie.
+  /* 1. de vier apps, bovenaan -- één gecentreerde rij.
 
-        RTG, RTG Kantoor en RTFoundation als één rustige vorm. De tegels houden
-        de compacte rastermaat; ze worden niet uitgerekt om de beschikbare
-        breedte te vullen, want dan voelt drie als een leeg raster in plaats van
-        een bewuste keuze. */
+        De voordeur toont LIFE, WORK, FOUNDATION en INSTELLINGEN als één
+        rustige vorm. De tegels houden de compacte rastermaat, zodat de klok
+        de kern van het scherm blijft. */
   .os-mappen{
     display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
     margin-top:calc(var(--e) * 0.9);flex-shrink:0;
@@ -1705,7 +1704,7 @@
       <!-- HIER STONDEN DRIE KNOPJES, EN NU STAAT ER GEEN.
 
            De batterij, de bel en het bedieningspaneel lagen los naast elkaar
-           boven een scherm dat verder alleen lucht, een klok en drie werelden
+           boven een scherm dat verder alleen lucht, een klok en vier apps
            is. Drie tekens naast elkaar is een stapeling, en de merkregel zegt:
            één signatuurelement, geen stapeling van trucjes. Ze zitten nu in
            het bedieningspaneel, dat je van de bovenrand omlaag haalt

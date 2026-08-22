@@ -54,6 +54,25 @@ test('Social OS heeft overal dezelfde vijf primaire ruimtes', () => {
   }
 });
 
+test('de suiteschil gebruikt echte routes en laat appbediening voorgaan op beschrijvende tekst', () => {
+  const suite = lees('public/shared/social-suite.js');
+  const salon = lees('public/apps/salon.html');
+  const genootschap = lees('public/apps/genootschap.html');
+
+  assert.match(suite, /persoon\.href = '\/apps\/salon\.html#ik'/,
+    'de profielzegel opent de bestaande Salon-profielruimte');
+  assert.doesNotMatch(suite, /\/apps\/profiel\.html/,
+    'de schil verzint geen profielpagina die niet bestaat');
+  assert.match(salon, /BEGIN_TAB=.*inzicht\|ik.*location\.hash/,
+    'de Salon kan de profielruimte rechtstreeks openen');
+  assert.doesNotMatch(suite, /Mensen, voorkeuren en reisgereedheid rond uw gezelschap/,
+    'de hero kaapt de bestaande tabnaam Uw gezelschap niet');
+  assert.match(genootschap, /<script id="rtgAppMenuJs" src="\/shared\/appmenu\.js" defer><\/script>/,
+    'Genootschap wacht niet op een laat dynamisch appmenu');
+  assert.match(suite, /plaatsKringmenu[\s\S]*kop\.insertBefore\(knop, kop\.firstChild\)/,
+    'de Kringen-kop houdt het appmenu buiten de ingeklapte mobiele titelrij');
+});
+
 test('de privéwereld ontsluit bestaande capabilities zonder een tweede gegevenslaag', () => {
   const privé = lees('public/apps/sociaal-prive.html');
   for (const route of ['/apps/meet.html', '/apps/vonk.html', '/apps/rendezvous.html',
@@ -70,6 +89,10 @@ test('de nieuwe suiteschil bewaakt bruikbare bediening en responsieve panelen', 
   assert.match(css, /body\.rtg-suite-page button,[\s\S]*min-height:44px/);
   assert.match(css, /@media\(min-width:1280px\)[\s\S]*rtg-message-context/);
   assert.match(css, /@media\(max-width:900px\)[\s\S]*rtg-suitenav[\s\S]*bottom:0/);
+  assert.match(css, /rtg-social-circles>header\.ios-nav>#osMenuBtn\{display:flex!important;\}/,
+    'de mobiele Kringen-schil houdt de veilige systeemdeur zichtbaar');
+  assert.doesNotMatch(css, /rtg-social-circles[^}]*#osMenuBtn\{[^}]*display:none/,
+    'geen responsieve regel mag het appmenu verbergen');
 });
 
 test('de Social-filter bedient echte serverregels en is volledig met toetsenbord te gebruiken', () => {

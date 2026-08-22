@@ -43,7 +43,7 @@
   var staat = maak('span', 'rtg-suitestate', actief === 'private' ? 'Privé · toegang bewaakt' : 'Besloten ledennetwerk');
   balk.appendChild(staat);
   var persoon = maak('a', 'rtg-suiteperson');
-  persoon.href = '/apps/profiel.html';
+  persoon.href = '/apps/salon.html#ik';
   persoon.setAttribute('aria-label', 'Open uw profiel');
   persoon.appendChild(maak('span', 'rtg-suiteperson-copy', 'Rahul'));
   persoon.appendChild(maak('span', 'rtg-suiteperson-seal', 'R'));
@@ -71,7 +71,7 @@
     '/apps/vonk.html': ['Verified introductions', 'Vonk', 'Een kleine dagelijkse selectie op codenaam, zonder eindeloos vegen.'],
     '/apps/rendezvous.html': ['Lifestyle Pass · besloten', 'Rendez-vous', 'Profiel, ontdekking en wederzijdse matches met uw beslissing als laatste stap.'],
     '/apps/cercle.html': ['Clubs and reciprocity', 'Cercle', 'Dresscodes, toegang en gastpassen in één discreet ledenregister.'],
-    '/apps/entourage.html': ['Your travelling party', 'Entourage', 'Mensen, voorkeuren en reisgereedheid rond uw gezelschap.'],
+    '/apps/entourage.html': ['Your travelling party', 'Entourage', 'Mensen, voorkeuren en reisgereedheid voor wie met u meereist.'],
     '/apps/attenties.html': ['Remembered with care', 'Attenties', 'Belangrijke momenten en voorkeuren, zonder sociale druk of publieke score.']
   };
   if (helden[pad]) {
@@ -87,6 +87,20 @@
     var heroMark = maak('span', 'rtg-suitehero-mark', actief === 'private' ? 'PRIVATE / 01' : 'SOCIAL / 01');
     hero.appendChild(heroMark);
     nav.insertAdjacentElement('afterend', hero);
+  }
+
+  /* Kringen gebruikt op mobiel de formele tabband als volledige kop. iOS zet
+     het appmenu normaal in de titelrij, maar die rij is daar bewust ingeklapt.
+     Zet de veilige systeemdeur daarom na alle defer-scripts rechtstreeks in de
+     zichtbare kop; dezelfde knop en luisteraar blijven intact. */
+  if (pad === '/apps/genootschap.html') {
+    var plaatsKringmenu = function () {
+      var knop = document.getElementById('osMenuBtn');
+      var kop = document.querySelector('body.rtg-social-circles > header.ios-nav');
+      if (knop && kop && knop.parentElement !== kop) kop.insertBefore(knop, kop.firstChild);
+    };
+    if (document.readyState === 'complete') window.setTimeout(plaatsKringmenu, 0);
+    else document.addEventListener('DOMContentLoaded', plaatsKringmenu, { once: true });
   }
 
   if (pad === '/apps/comm.html') {

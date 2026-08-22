@@ -161,7 +161,8 @@
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
-let TAB='feed', ONDERWERP='', ZOEK='', NA=null, POSTS=[], NIEUW={media:[]}, ARCHIEF=false, TERUG_PROFIEL='';
+const BEGIN_TAB=(/^#(feed|ontdek|plaats|bewaard|inzicht|ik)$/.exec(location.hash)||[])[1]||'feed';
+let TAB=BEGIN_TAB, ONDERWERP='', ZOEK='', NA=null, POSTS=[], NIEUW={media:[]}, ARCHIEF=false, TERUG_PROFIEL='';
 let MELD_TIMER=null;
 
 const TABS=[['feed','Feed'],['ontdek','Ontdekken'],['plaats','Plaatsen'],['bewaard','Bewaard'],['inzicht','Inzicht'],['ik','Mijn profiel']];

@@ -243,9 +243,8 @@ Vijf dingen liggen daar vast:
 - **Loslaten kan alleen wat van jou is**, of door een manager die een tafel moet
   deblokkeren.
 
-*Wat hier nog niet in zit:* de bar heeft geen eigen werkstand. Een drankgang is
-nu gewoon een gang met station `bar`, dus hij staat op dezelfde lijst. Het
-groeperen tot drankgolven (BAR hierboven) is een eigen stap.
+*Dat is inmiddels gedaan:* de bar heeft sinds 23 augustus 2026 een eigen
+werkstand — zie punt 4b hieronder.
 
 **3b. De rekening kan eindelijk ook terug.** *Gedaan.* Er waren achttien
 endpoints zonder scherm; vijf daarvan heeft een bediening elk uur nodig, en het
@@ -334,6 +333,45 @@ met meerdere mensen erbij, en dat hoort niet op een telefoon in een broekzak.
 had, bleek hij aan de verkeerde kant van de domeingrens te staan. Niet de grens
 opgerekt maar het begrip verplaatst: een kaart is een eigenschap van de ZAAK, en
 beide deuren zijn lezers (`test/horeca-kaart.test.js`).
+
+**4b. BAR als eigen werkstand — af.** Een drankgang was gewoon een gang met
+station `bar`, dus stond hij tussen de gerechten op het keukenbord. Een barman
+die soep op zijn bord ziet staan, gaat dat bord niet lezen.
+
+**Een bar is geen keuken met andere gerechten.** Een keuken groepeert op GANG —
+een gang gaat samen de deur uit. Een bar groepeert op twee assen tegelijk die
+met elkaar vechten:
+
+- **de ronde** — vier mensen proosten samen, dus een ronde moet samen landen;
+- **de stapel** — drie gin-tonics over twee tafels zijn één handeling achter de
+  bar: één keer de gin pakken, drie glazen naast elkaar.
+
+`kern/horeca/bar.js` lost die botsing **niet** op met een algoritme, want dat zou
+een volgorde verzinnen. Het toont ze allebei: de golven (per tafel, oudste eerst)
+en de stapel (dezelfde drank over alle open golven, alleen wat nog gemaakt moet
+worden). De barman ziet wat er moet en wat er samen kan, en beslist zelf —
+dezelfde grens als de drukterem.
+
+Wat er bewust **niet** in zit:
+
+- **Geen grens op hoe lang een drankje mag staan.** IJs smelt en schuim zakt, dus
+  die grens is echt — maar hij is nergens vastgelegd, en hem hier verzinnen zou
+  een getal maken dat niemand gemeten heeft. Wat er wél staat is hoeveel minuten
+  het eerste glas al op de rest van zijn ronde wacht (`staat`). Een complete
+  ronde wacht op een drager en niet op zichzelf; die staat op de pas, zodat
+  hetzelfde wachten nooit twee keer geteld wordt.
+- **Geen alcoholcontrole.** De kaart weet welk item alcohol bevat, de regel niet;
+  de leeftijdsregel woont in `kern/gast/beleid.js` en de controle aan tafel is een
+  menselijke handeling. Een half vlaggetje op het barbord zou de indruk wekken
+  dat de bar het bewaakt, en dat is erger dan niets.
+- **Geen tweede orderstaat en geen tweede deur naar "klaar".** Aanzetten en klaar
+  melden gaan over `/keuken/stand`, precies zoals bij de keuken.
+
+Eén ding ging hier meteen mis en is de moeite waard om te onthouden: de teller
+zei *"glazen te maken"* en telde **regels**. Een regel "2× gin-tonic" is één
+regel en twee glazen. Een getal dat iets anders telt dan zijn label zegt, is
+precies de fout die grens 7 verbiedt — en geen van de eerste toetsen zag het; de
+browsertoets viel erover.
 
 **5. Venue Edge**: de clientkant van offline. De serverkant ligt er, en de
 kassa is de eerste die hem gebruikt — zie hieronder. De zaal, de bar en de PDA

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1034 bestanden en 6909 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1034 bestanden en 6910 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1034 |
-| losse beweringen (`test(...)`) | 6909 |
+| losse beweringen (`test(...)`) | 6910 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 869 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-908 bestanden, 6689 beweringen.
+908 bestanden, 6690 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -339,7 +339,7 @@ toets omvalt.
 | `kassa-premium.test.js` | 7 | gezakt op `liegpoort /api/` | De premium-laag van De Kassa, gewoon inbegrepen: derving (verspil, breuk, eigen gebruik, repro), retour als minbon, wachtbonnen (parkeren en terughalen), korting met reden op de bon, het dagrapport en de kasopmaak. |
 | `kern-afgeleid.test.js` | 4 | gezakt op `===->!==` | Tests voor de zuivere afgeleide berekeningen (server/kern/afgeleid.js). |
 | `kern-events.test.js` | 6 | geen bruikbare mutatie | Tests voor de event-/keukenlaag (server/kern/events.js). De functies dragen crypto + sectiesForOrder; we voeren echte stubs op. |
-| `kern-fiscaal.test.js` | 12 | gezakt op `===->!==` | Tests voor de fiscale/financiele laag (server/kern/fiscaal.js). De rekenlaag draagt db + helpers; we voeren een minimale db-stub op. |
+| `kern-fiscaal.test.js` | 13 | gezakt op `===->!==` | Tests voor de fiscale/financiele laag (server/kern/fiscaal.js). De rekenlaag draagt db + helpers; we voeren een minimale db-stub op. |
 | `kern-live.test.js` | 5 | gezakt op `===->!==` | Tests voor de live-/geo-laag (server/kern/live.js). De functies dragen db + de bus + SSE-routers + geo + i18n; we voeren stubs op en gebruiken de echte geo-helpers. |
 | `kern-util.test.js` | 4 | gezakt op `!==->===` | Zuivere kern-hulpjes (server/kern/util.js): los testbaar, geen server nodig. |
 | `keten.test.js` | 30 | gezakt op `===->!==#0` | DE KETEN (server/lib/keten.js) en het inzagejournaal dat eraan hangt. WAT HIER BEWEZEN WORDT. |

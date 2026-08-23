@@ -72,8 +72,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   list.unshift(sale);
   db.data.posSales[req.supplier.code] = list.slice(0, 300);
-  /* Nu de bon er is, gaat het saldo eraf, met de bon erbij. `bron: 'kassa'`
-     onderscheidt hem van de handmatige afboeking, die geen omzet draagt. */
+  // saldo eraf met de bon erbij; `bron` scheidt hem van de handmatige afboeking
   if (gcKaart) {
     gcKaart.saldo = Math.round((gcKaart.saldo - total) * 100) / 100;
     gcKaart.verzilveringen = gcKaart.verzilveringen || [];
@@ -110,6 +109,7 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   if (!o.paid) {
     // afrekenen via RTG-lidmaatschap; komt als omzet in het dagoverzicht
     o.paid = true;
+    o.betaaldMet = 'rtg'; // de werkelijke betaalwijze, voor de dagafsluiting (TAKEN.md 4.54)
     /* HET MOMENT VAN BETALEN, en dat stond hier als enige betaalweg niet bij.
        Elke andere weg zet paidAt (bestellen.js, rekening.js, tafelticket), en de
        hele verslaglegging valt daarop terug: het dagrapport, de maandboekhouding

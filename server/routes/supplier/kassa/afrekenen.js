@@ -1,8 +1,10 @@
-/* Kassa (deelmodule): het afrekenen: uitchecken (per kamer of tafel, met
-   splitsen) en cadeaukaarten verkopen en innen. Krijgt de gedeelde kern
-   een keer bij het opstarten vanuit routes/supplier/kassa.js. */
+/* Kassa (deelmodule): het afrekenen: uitchecken per kamer of tafel (met
+   splitsen) en het tafelticket. Krijgt de gedeelde kern een keer bij het
+   opstarten vanuit routes/supplier/kassa.js. Cadeaukaarten stonden hier ook,
+   en zijn naar ./cadeaukaart.js verhuisd: ze hebben niets met afrekenen te
+   maken en dit bestand liep tegen de omvangsgrens van keuringsregel 13. */
 module.exports = (kern) => {
-  const { app, crypto, db, facturatie, gcCode, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
+  const { app, crypto, db, facturatie, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
           sseToSupplier, supplierAuth, pay, tafelticket } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
@@ -87,6 +89,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   for (const o of chk.bonnen) {
     o.paid = true;
     o.paidAt = new Date().toISOString();
+    o.betaaldMet = method; // waarmee de tafel werkelijk afrekende (TAKEN.md 4.54)
     if (o.status === 'wacht-op-betaling' || o.status === 'nieuw') o.status = 'geserveerd';
     o.rekeningVoldaan = true;
     if (!codenames.includes(o.customerCodename)) codenames.push(o.customerCodename);
@@ -120,34 +123,5 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
   sseToOffice('sync', { scope: 'orders' });
   res.json({ ok: true, sale, table: chk.table, aantalBonnen: chk.bonnen.length, subtotaal: chk.subtotaal, gasten: codenames.length });
-});
-
-app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
-  const bedrag = Math.round(Number(req.body.bedrag));
-  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
-    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
-  db.data.giftcards.unshift(kaart);
-  db.data.giftcards = db.data.giftcards.slice(0, 20000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
-  res.json({ ok: true, kaart });
-});
-
-app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  const g = (db.data.giftcards || []).find(x => x.code === code && x.supplierCode === req.supplier.code);
-  if (!g) return res.status(404).json({ error: 'Deze cadeaukaart kennen we hier niet.' });
-  const bedrag = Math.round(Number(req.body.bedrag) * 100) / 100;
-  if (!(bedrag > 0)) return res.status(400).json({ error: 'Geen geldig bedrag.' });
-  if (bedrag > g.saldo) return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + g.saldo + ' op deze kaart.' });
-  g.saldo = Math.round((g.saldo - bedrag) * 100) / 100;
-  g.verzilveringen = g.verzilveringen || [];
-  /* `bron: 'handmatig'`: alleen SALDO af, dus geen omzet, btw of factuur. De
-     gewone weg is de kassa met betaalwijze 'cadeaukaart' (TAKEN.md 4.27). */
-  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor: req.actor.name, bron: 'handmatig' });
-  save();
-  logActivity(req.supplier.code, req.actor, 'boekte € ' + bedrag + ' met de hand af van cadeaukaart ' + g.code + ' (rest € ' + g.saldo + ', geen kassabon)');
-  res.json({ ok: true, saldo: g.saldo, kaart: { code: g.code, saldo: g.saldo } });
 });
 };

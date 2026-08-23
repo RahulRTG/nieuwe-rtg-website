@@ -6592,6 +6592,10 @@
       (r.fooien?'<div class="st-row"><span>'+T('pos.fooien','Fooien')+'</span><b>'+eur(r.fooien)+'</b></div>':'')+
       (r.btw||[]).map(b => '<div class="st-row"><span>'+esc(b.label)+' · '+b.tarief+'% btw</span><b>'+eur(b.omzet)+' <span class="sub">'+T('pos.z.waarvanbtw','waarvan btw')+' '+eur(b.btw)+'</span></b></div>').join('')+
       Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
+      /* Openstaand gezet is GEEN ontvangst: die posten komen bij de check-out
+         alsnog als bon langs. Ze stonden tot deze ronde tussen de ontvangsten,
+         waardoor de som het dubbele van de lade was (TAKEN.md 4.54). */
+      Object.entries(r.openstaandGezet||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.open','Openstaand gezet')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
       '<button class="bigbtn" id="zCsv" class="h-mt50">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
       '<div class="softline h-mt30">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
     const k = el.querySelector('#zCsv');

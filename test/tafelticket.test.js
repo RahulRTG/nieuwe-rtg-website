@@ -160,6 +160,21 @@ test('3. afrekenen op contant laat de boekhouding met precies de som van de bonn
     // en de bundelbon staat er wel degelijk -- hij telt alleen niet als omzet mee
     assert.ok(af.body.sale && af.body.sale.omzetElders === 'bestellingen',
       'de gebundelde kassabon draagt het merk waaraan de boekhouding hem herkent');
+
+    /* DE DAGAFSLUITING, over dezelfde tafel (TAKEN.md 4.54). De eenheidstoetsen
+       in test/kern-fiscaal.test.js voeren `betaaldMet` zelf op; deze toets rijdt
+       de ECHTE keten, want een rapport dat op een veld leunt dat geen enkele
+       route zet, klopt alleen in een stub. Er is aan tafel contant betaald, dus
+       daar hoort het te staan -- niet onder 'app', waar het tot deze ronde
+       stond, en niet twee keer. */
+    const z = (await api(base, '/api/supplier/dagrapport', {}, tokStaff)).body;
+    assert.equal(z.betaalwijzen.contant, af.body.subtotaal,
+      'de tafel staat onder contant: dat is waarmee er werkelijk is afgerekend');
+    assert.ok(!z.betaalwijzen.app, 'en niet onder app, want er is niet in de app betaald');
+    assert.equal(Object.values(z.betaalwijzen).reduce((x, v) => x + v, 0), z.omzet,
+      'de betaalwijzen tellen op tot de omzet van de dag');
+    assert.equal(z.bonnen, af.body.aantalBonnen,
+      'het aantal verkopen, zonder de bundelbon die er als vierde papiertje overheen ging');
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

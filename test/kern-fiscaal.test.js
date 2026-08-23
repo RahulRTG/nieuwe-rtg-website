@@ -111,12 +111,16 @@ test('financeVoor: een openstaande tafelrekening telt pas bij het afrekenen mee'
     'de gebundelde check-outbon draagt de omzet van kamer en tafel samen');
 });
 
-test('dagrapport: het Z-rapport telt een tafelticket ook maar een keer als omzet', () => {
-  /* Dezelfde fout stond in het zusterrapport, en daar was hij ERGER: het
-     Z-rapport telde de bestellingen en de bundelbon allebei, dus stond er 436
-     bij een tafel van 218 -- inclusief de btw-pot. De dagafsluiting is het
-     getal waar het personeel de kassa mee opmaakt, dus dat is dagelijks
-     zichtbaar fout geweest. */
+test('dagrapport: een bestelling van VOOR de betaalwijze-ronde valt terug op de app', () => {
+  /* Deze toets kwam uit de 4.28-ronde: het Z-rapport telde de bestellingen en de
+     bundelbon allebei, dus stond er 436 bij een tafel van 218, btw-pot en al.
+     Dat deel staat nu in de brede toets hieronder.
+
+     Wat hier OVERBLIJFT is een geval dat de brede toets juist niet dekt: deze
+     bestellingen dragen geen `betaaldMet`, want dat veld bestond nog niet. Elke
+     bestelling die al in de database stond is er zo een. Ze horen niet te
+     verdwijnen uit de betaalwijzen en ook niet dubbel te tellen -- ze vallen
+     terug op 'app', wat ze tot deze ronde allemaal waren. */
   const dag = new Date().toISOString().slice(0, 10);
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [{ name: 'Sushi', station: 'keuken' }], settings: { land: 'NL' } };
   const db = stubDb({
@@ -130,8 +134,9 @@ test('dagrapport: het Z-rapport telt een tafelticket ook maar een keer als omzet
   const z = dagrapport(s, dag);
   assert.equal(z.omzet, 218, 'de omzet van de dag, niet twee keer dezelfde tafel');
   assert.equal(z.btw.reduce((x, r) => x + r.omzet, 0), 218, 'en de btw-grondslag telt hem ook een keer');
-  // maar de kassalade is wel degelijk 218 contant rijker, en er ging een bon uit
-  assert.equal(z.betaalwijzen.contant, 218, 'de betaalwijze blijft staan: er is echt contant binnengekomen');
+  assert.deepEqual(z.betaalwijzen, { app: 218 }, 'zonder betaaldMet: terugval op app, en niet weggelaten');
+  assert.equal(Object.values(z.betaalwijzen).reduce((x, v) => x + v, 0), z.omzet,
+    'ook op oude gegevens tellen de betaalwijzen op tot de omzet');
 });
 
 /* CADEAUKAARTEN TELLEN NIET NAAST DE KASSABON (TAKEN.md 4.27).
@@ -161,6 +166,55 @@ test('financeVoor: een cadeaukaart aan de kassa telt een keer, via de bon', () =
   assert.equal(fin.giftcards.handmatig, 50, 'en staat apart gemeld');
   assert.ok(fin.regels.some(r => /met de hand/.test(r) && /50/.test(r)),
     'met een regel in het overzicht die zegt dat dit bedrag buiten omzet en aangifte valt');
+});
+
+/* HET Z-RAPPORT TELT ELKE EURO EEN KEER, LANGS ELKE WEG (TAKEN.md 4.54).
+
+   Drie fouten tegelijk, alle drie in dezelfde lus. `omzet` telde op VOOR de
+   uitsluiting van uitstel en interne verrekening, dus telde die mee (218 bij
+   109 verkocht). `bonnen` telde elk papiertje, ook de twee die bij dezelfde
+   verkoop horen. En `betaalwijzen` telde het uitstel EN de afrekening, samen het
+   dubbele van de lade, met een aan tafel contant afgerekende bestelling onder
+   'app'. De btw-pot deed het al goed -- dat was het bewijs dat de uitsluiting
+   zelf klopte en alleen te laat kwam.
+
+   Deze toets loopt alle ZEVEN wegen langs waarlangs geld bij een zaak
+   binnenkomt, want de fouten zaten in verschillende wegen en een toets op een
+   enkel geval had de rest gemist. De vierde bewering is de belangrijkste: de
+   betaalwijzen tellen op tot de omzet. Zolang dat waar is, kan de kasopmaak
+   erop steunen. */
+test('dagrapport: alle zeven wegen tellen hun omzet, bonnen en betaalwijzen precies een keer', () => {
+  const dag = new Date().toISOString().slice(0, 10);
+  const s = { code: 'K', type: 'horeca', menu: [{ name: 'Sushi', station: 'keuken' }], settings: { land: 'NL' } };
+  const order = w => ({ supplierCode: 'K', paid: true, paidAt: dag, betaaldMet: w,
+    items: [{ name: 'Sushi', price: 109, qty: 1 }] });
+  const kassabon = o => Object.assign({ total: 109, method: 'contant', items: null, at: dag }, o);
+
+  //             naam                        gegevens                                              omzet bonnen betaalwijzen        openstaand
+  const wegen = [
+    ['losse kassabon', { posSales: { K: [kassabon()] } }, 109, 1, { contant: 109 }, {}],
+    ['bestelling in de app', { orders: [order('app')] }, 109, 1, { app: 109 }, {}],
+    ['RTG-ophaalcode aan de balie', { orders: [order('rtg')], posSales: { K: [kassabon({ method: 'rtg' })] } },
+      109, 1, { rtg: 109 }, {}],
+    ['tafelticket, contant afgerekend', { orders: [order('contant'), order('contant')],
+      posSales: { K: [kassabon({ total: 218, omzetElders: 'bestellingen' })] } }, 218, 2, { contant: 218 }, {}],
+    ['op de kamer, dan check-out', { posSales: { K: [kassabon({ method: 'kamer', settled: true }), kassabon()] } },
+      109, 1, { contant: 109 }, { kamer: 109 }],
+    ['op de tafel, dan afrekenen', { posSales: { K: [kassabon({ method: 'tafel', settled: true }), kassabon()] } },
+      109, 1, { contant: 109 }, { tafel: 109 }],
+    ['cadeaukaart aan de kassa', { posSales: { K: [kassabon({ method: 'cadeaukaart' })] } },
+      109, 1, { cadeaukaart: 109 }, {}]
+  ];
+  for (const [naam, data, omzet, bonnen, wijzen, openstaand] of wegen) {
+    const z = maakFiscaal({ db: stubDb(data), centen, btwSplit }).dagrapport(s, dag);
+    assert.equal(z.omzet, omzet, naam + ': de omzet van de dag');
+    assert.equal(z.btw.reduce((x, r) => x + r.omzet, 0), omzet, naam + ': en dezelfde btw-grondslag');
+    assert.equal(z.bonnen, bonnen, naam + ': het aantal verkopen, niet het aantal papiertjes');
+    assert.deepEqual(z.betaalwijzen, wijzen, naam + ': onder de betaalwijze waarmee er echt is afgerekend');
+    assert.deepEqual(z.openstaandGezet, openstaand, naam + ': uitstel staat apart, niet als ontvangst');
+    assert.equal(Object.values(z.betaalwijzen).reduce((x, v) => x + v, 0), z.omzet,
+      naam + ': de betaalwijzen tellen op tot de omzet -- hier steunt de kasopmaak op');
+  }
 });
 
 test('cannedBoekhouder: antwoordt gericht op btw, personeel en cadeaukaarten', () => {

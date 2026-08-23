@@ -55,6 +55,7 @@ module.exports = (ctx) => {
       if (v) { o.regieKorting = v; voordeel += v; }
       o.paid = true;
       o.paidAt = nu;
+      o.betaaldMet = 'app'; // de werkelijke betaalwijze, voor de dagafsluiting (TAKEN.md 4.54)
       o.rekeningVoldaan = true; // afgerekend als deel van een gezamenlijke rekening
       if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
       // de fooi voor het team komt een keer op de rekening (op de eerste bon)

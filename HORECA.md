@@ -142,6 +142,10 @@ iets bouwt dat er al is:
 - **114 talen** staan in `public/shared/i18n.js`.
 - **Een gastprofiel bewaart voorkeuren en géén waarde-per-gast**, en dat is een
   toets en geen belofte (`test/horeca-vloer.test.js`).
+- **De werklijst van de PDA is er** (`kern/horeca/werklijst.js`,
+  `/apps/horeca-pda.html`): wat is mijn eerstvolgende handeling, geordend op
+  minuten over een grens die het huis zelf al had vastgelegd. Zie punt 4
+  hieronder voor wat er wel en niet in zit.
 
 ## Wat er nieuw moet, in volgorde
 
@@ -253,8 +257,56 @@ vóóraf, fooi wordt nooit voorgevuld, samenvoegen zegt het bedrag hardop terug,
 oninbaar staat apart onderaan omdat het geen administratieve handeling is. Van
 achttien naar twaalf endpoints zonder scherm.
 
-**4. PDA SERVICE** als eigen werkstand, met rolmodi (bediening, runner, host,
-wijkhoofd, manager) op één app.
+**4. PDA SERVICE als eigen werkstand — de werklijst staat, het opnemen nog niet.**
+
+`/apps/horeca-pda.html` beantwoordt de vraag van deze werkstand: *wat is mijn
+eerstvolgende handeling?* Alle andere horecaschermen zijn per TAFEL of per
+STATION geordend; dit is het enige dat per HANDELING is geordend, en dat is een
+andere vraag — de stand is per tafel, de handeling is per mens.
+
+**De hele kunst zit in de volgorde, en die is geen score.** Een lijst die
+"urgentie 82" naast "urgentie 74" zet, verzint een weging tussen dingen die niet
+in dezelfde eenheid staan — een mening die eruitziet als een meting (grens 7).
+In plaats daarvan wordt elke taak vergeleken met een grens **die al bestond**:
+
+| soort | grens | waar hij vandaan komt |
+|---|---|---|
+| verzoek | 3 tot 12 min, per soort | `SOORTEN[soort].oudNa` in `kern/gast/verzoek.js` |
+| pas | 2 min | `PASMARGE` in `kern/horeca/cadans.js` |
+| belofte | het serveermoment zelf | de afspraak met de gast |
+| opnemen | **geen** | er is er nergens een |
+
+De lijst is daarom **twee lijsten**, en dat is de belofte zelf. *Nu* bevat alleen
+taken die over zo'n grens zijn, geordend op hoeveel minuten eroverheen — dus een
+"er is iets niet goed" van tien minuten (grens 3) gaat vóór een "mag dit weg?"
+van achttien (grens 12). *Ook open* bevat de rest, op minuten en zonder rangorde,
+want daar is niets aan gemeten. Liever twee eerlijke lijsten dan één lijst met
+een verzonnen getal erin.
+
+De grenzen worden **geleend en niet nagemaakt**: een tweede tabel met dezelfde
+getallen loopt uiteen op de dag dat iemand er een aanpast. `test/horeca-werklijst.test.js`
+houdt dat vast, en ook dat er nergens een score op een taak of een telling per
+medewerker staat (grenzen 5 en 7).
+
+**De modus is een lens en geen recht.** Bediening, runner en alles filteren welke
+soorten je ziet; ze veranderen niets aan wat je mag. Wie de PDA opent is al
+ingelogd als medewerker van deze zaak, en daar zitten de rechten. Een modus die
+iets zou afschermen, was een tweede rechtenmodel — precies wat `CONCERN.md`
+verbiedt. Een onbekende modus valt daarom terug op *alles* en verbergt nooit
+stilletjes werk.
+
+**Er is geen wijk, en het scherm doet niet alsof.** Een sectie-indeling ("tafels
+1 tot 8 zijn van Sanne") bestaat nergens in de data, dus toont de lijst de hele
+zaak en zegt dat er ook bij. Wie hem per wijk wil, heeft eerst een wijk nodig —
+dat is een ontwerpbesluit en geen veld. Datzelfde geldt voor de rolmodi *host* en
+*wijkhoofd*: die vragen aankomst- en wijkgegevens, en zolang die er niet zijn,
+komen ze er niet als lege knop bij.
+
+**Wat er nog niet is, en dat staat er liever dan dat het lijkt te ontbreken:**
+opnemen en afrekenen gebeuren nog op het zaalscherm. Een tafel die wacht op een
+bestelling staat wél als taak, met een weg ernaartoe. De PDA sluit dus twee van
+de vijf handelingen uit de brief — ophalen en oplossen — en nog niet ontvangen,
+opnemen en afrekenen.
 
 **5. Venue Edge**: de clientkant van offline. De serverkant ligt er, en de
 kassa is de eerste die hem gebruikt — zie hieronder. De zaal, de bar en de PDA

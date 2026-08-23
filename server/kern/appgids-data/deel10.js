@@ -3,6 +3,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = Object.assign({
+  '/apps/horeca-pda.html': G('PDA Service: wat is uw eerstvolgende handeling, geordend op wie het langst op ons wacht.',
+    ['Kies uw werkstand: bediening, runner of alles -- dat is een lens en geen recht',
+      'Werk "Nu" af: alleen taken die over een grens zijn die het huis zelf heeft vastgelegd',
+      'Pak op en geef uit; twee mensen die naar dezelfde tafel lopen is de fout die de claim oplost'],
+    'De volgorde is minuten OVER een grens en niet minuten: een "er is iets niet goed" van vijf minuten gaat voor een "mag dit weg?" van acht.'),
   '/apps/horeca-expeditie.html': G('Expeditie en keukenregie: de pas, waar een tafel compleet de deur uit gaat.',
     ['Zie per tafel en gang hoeveel borden klaar zijn en hoe lang het eerste al koud staat',
       'Geef zelf uit; er wordt niets automatisch afgevinkt',

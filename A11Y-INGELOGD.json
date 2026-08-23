@@ -54,7 +54,7 @@
     "de bel in de leveranciers-app mat 0x34 -- hij had wel width:34px maar werd door zijn flexouder platgedrukt; flex:0 0 auto erbij",
     "de navigatieknoppen van de partnerstudio waren op telefoonformaat LEEG: bij <=1050px verbergt een regel het label en bij <=680px verbergt een tweede regel het nummer, en onder de 680 gelden ze allebei. Vier knoppen van 20x20 zonder tekst. Dat is geen maatprobleem maar een defect, en het stond er alleen omdat niemand dat scherm ooit op telefoonformaat in die staat had gemeten"
    ],
-   "en toen stond hij weer op nul": "0 van 260 schermen, in beide sessies"
+   "en toen stond hij weer op nul": "0 van 261 schermen, in beide sessies"
   }
  },
  "hoe het nul werd": {

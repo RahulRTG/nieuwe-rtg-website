@@ -855,16 +855,39 @@ zetten hem, en **3346 van de 3706 routes** dragen een handeling nu in één vorm
 | gezag | `boardroomAuth`, `huisAuth`, `techAuth` |
 | context | de envelop, op elke route (pad, methode, tijd via `lib/klok`) |
 | correlatie | `server/log.js` — `req.id`, óók terug als `X-Request-Id` |
-| **doel, intent, wijzigingen, risicoklasse, omkeerbaarheid** | **geen enkele** |
+| doel, wijzigingen | `server/opzet/handeling.js` — **achteraf** gemeten |
+| **intent, risicoklasse, omkeerbaarheid** | **geen enkele** |
 
-Die laatste vijf staan er bewust niet in: een poortwachter kent ze niet. Ze
-ontstaan pas als de handeling bekend is en de opslaglaag weet wat er verandert.
-Ze bij de poort verzinnen zou de envelop laten liegen, en daar gaat beleid op.
+De laatste drie staan er bewust niet in. Dat zijn geen waarnemingen maar
+**oordelen** — wat probeerde iemand te bereiken, hoe zwaar weegt dit, is het
+terug te draaien — en die zijn niet af te lezen uit een verzoek of uit een
+rij-telling. Ze verzinnen zou de envelop laten liegen, en daar gaat beleid op.
 
-De poortwachter weet WIE. `server/db/index.js` — één functie waar 2700
-aanroepen doorheen gaan — weet WAT ER VERANDERT. De envelop is de eerste helft
-van de brug daartussen; zonder de tweede helft is er nog geen risicobudget,
-blast radius of bewijsbonnetje.
+**De tweede helft van de brug: `server/opzet/handeling.js`.** De poortwachter
+weet WIE; `server/db/index.js` — één functie waar 2700 aanroepen doorheen gaan —
+weet WAT ER VERANDERT. De handelingslaag verbindt die twee zonder een van beide
+aan te raken: hij telt bij binnenkomst en aan het eind van elk verzoek de rijen
+per collectie, via dezelfde `AsyncLocalStorage` die `server/db/bijeen.js` al
+gebruikt. Het verschil is wat dit ene verzoek werkelijk veranderde.
+
+```
++1 boekingen        een normale reservering
+-4280 medewerkers   iets heel anders, en tot nu toe technisch hetzelfde verzoek
+```
+
+Boven `RTG_HANDELING_GRENS` (standaard 250 rijen) komt er een logregel met het
+correlatie-id erbij. Dat is de eerste vorm van blast radius die dit huis kent.
+
+**Bewust niet in `save()`.** Daar zou per schrijfactie gemeten worden in plaats
+van per verzoek, op het heetste pad, in de functie die geld vastlegt. Gemeten
+kosten van de huidige plek: ~0,13 ms op een p50 van 13 ms.
+
+**Twee dingen die hij niet ziet**, allebei met een toets erop zodat niemand hem
+later voor meer aanziet dan hij is: een wijziging *binnen* een rij (vierduizend
+mensen op non-actief beweegt geen rij-aantal — `handeling.raakt()` is daarvoor
+de uitweg en is nog nergens aangeroepen), en een vervanging met gelijk aantal.
+En hij meet **achteraf**: een massamutatie is te zien en te melden, niet te
+weigeren. Detecteren is niet tegenhouden.
 
 **Het identiteitsoordeel** is het scherpste veld: `bewezen` betekent dat er een
 persoon of geverifieerd huis aan hangt, `anoniem` dat de sessie geldig is maar
@@ -877,7 +900,7 @@ npm run envelop:velden   # per veld wie hem vaststelt, en over hoeveel routes
 npm run envelop:vast     # vastleggen (weigert een verslechtering)
 ```
 
-`veldenZonderHuis` (5), `actorVormen` (7) en `routesZonderEnvelop` (360) mogen
+`veldenZonderHuis` (3), `actorVormen` (7) en `routesZonderEnvelop` (360) mogen
 alleen omlaag. De meter zakt ook als een poortwachter zijn eigenschap of zijn
 `envelop.zet()` niet meer zet — dan meet hij niets meer en hoort hij te vallen
 in plaats van een lager, mooier getal te melden.

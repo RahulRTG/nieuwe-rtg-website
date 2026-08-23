@@ -1,8 +1,8 @@
 {
-  "uitleg": "Wat weet RTG op het moment dat een poortwachter JA zegt? `veldenZonderHuis` telt de envelopvelden die GEEN enkele poortwachter vaststelt; `actorVormen` telt onder hoeveel verschillende namen \"wie handelt hier\" op het verzoek wordt gezet. BEIDE MOGEN ALLEEN OMLAAG. Zonder een envelop die actor en wijziging samen draagt, is er geen risicobudget, geen blast radius en geen bonnetje te bouwen -- hoe de rest ook wordt ingericht.",
+  "uitleg": "Wat weet RTG op het moment dat een poortwachter JA zegt, en wat is er daarna werkelijk veranderd? `veldenZonderHuis` telt de envelopvelden die door NIEMAND worden gevuld; `actorVormen` telt onder hoeveel verschillende namen \"wie handelt hier\" op het verzoek wordt gezet; `routesZonderEnvelop` telt de routes zonder canonieke vorm. ALLE DRIE MOGEN ALLEEN OMLAAG. EEN GRENS DIE ER NOG NIET IS: `doel` en `wijzigingen` worden ACHTERAF gemeten (server/opzet/handeling.js). Daarmee is een massamutatie te ZIEN en te melden, maar niet te WEIGEREN -- daarvoor zou de omvang voor de uitvoering bekend moeten zijn, en dat vraagt een simulatie die hier niet bestaat. Detecteren is niet tegenhouden, en dat verschil hoort in het register te staan in plaats van in iemands hoofd.",
   "hoe": "node scripts/envelop.js --velden",
   "gemeten": {
-    "veldenZonderHuis": 5,
+    "veldenZonderHuis": 3,
     "actorVormen": 7,
     "routesZonderEnvelop": 360,
     "routesMetEnvelop": 3346,
@@ -11,16 +11,8 @@
   },
   "veldenZonderHuis": [
     {
-      "veld": "doel",
-      "wat": "welk object wordt geraakt"
-    },
-    {
       "veld": "intent",
       "wat": "wat de actor probeert te bereiken"
-    },
-    {
-      "veld": "wijzigingen",
-      "wat": "wat er precies gaat veranderen, voor het gebeurt"
     },
     {
       "veld": "risicoklasse",

@@ -272,6 +272,32 @@ function tabel() {
           ' envelopvelden hebben GEEN enkele drager (' + zonder.join(', ') +
           ') -- dat getal staat in ENVELOP.json en mag alleen omlaag';
       })()
+    },
+    {
+      /* WAT EEN VERZOEK WERKELIJK VERANDERT. De vorige twee soorten gaan over
+         gezag en over wat er bij de poort bekend is; deze gaat over de andere
+         kant van de brug. Zonder een laag die telt wat er beweegt, is "1 boeking
+         erbij" technisch hetzelfde verzoek als "4280 medewerkers weg".
+
+         BEWAAKT betekent hier: de laag hangt echt in de verzoekketen EN er staat
+         een toets op die hem heeft zien uitslaan -- inclusief een die een ECHTE
+         server start, want een laag die db.data niet kan ophalen meet voor eeuwig
+         nul en ziet er dan precies zo uit als een rustig systeem. */
+      soort: 'handelingsmeting (wat verandert dit verzoek)',
+      bewaker: ['server/opzet/handeling.js', 'test/handeling.test.js'],
+      wat: 'elk verzoek telt de rijen per collectie voor en na; boven een grens komt er een melding',
+      dingen: () => ['server/opzet/handeling.js'],
+      bewaakt: () => {
+        const laag = lees('server/opzet/handeling.js');
+        const keten = lees('server/opzet/verzoekketen.js');
+        const toets = lees('test/handeling.test.js');
+        /* Het pad is relatief aan verzoekketen.js zelf ('./handeling'), niet
+           'opzet/handeling' -- die eerste versie van deze controle sloeg meteen
+           aan toen de mount verhuisde, en dat is precies waar deze census voor is. */
+        return !!laag && /require\(['"]\.\/handeling['"]\)/.test(keten) && /ECHTE SERVER/.test(toets);
+      },
+      kanttekening: 'ziet GEEN wijziging binnen een rij (4000 mensen op non-actief beweegt geen rij-aantal); ' +
+        'de meting is ACHTERAF, dus een massamutatie is te zien en te melden maar niet te weigeren'
     }
   ];
 }

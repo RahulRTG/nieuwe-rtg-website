@@ -111,13 +111,16 @@ test('de velden zonder huis zijn precies de velden die niemand vult', () => {
      het totaal verdwijnt. `context` en `correlatie` staan erbij sinds de
      canonieke envelop er is; correlatie kwam er al vandaan (server/log.js) en
      werd door de eerste versie van deze meter ten onrechte als dakloos geteld. */
-  for (const veld of ['actor', 'tenant', 'capability', 'gezag', 'context', 'correlatie']) {
+  for (const veld of ['actor', 'tenant', 'capability', 'gezag', 'context', 'correlatie', 'doel', 'wijzigingen']) {
     assert.equal(zonder.has(veld), false, veld + ' hoort een drager te hebben');
   }
-  /* En de vijf die er NIET zijn, ook met naam: die kent een poortwachter niet,
-     en ze verzinnen zou de envelop laten liegen. */
-  for (const veld of ['doel', 'intent', 'wijzigingen', 'risicoklasse', 'omkeerbaarheid']) {
-    assert.equal(zonder.has(veld), true, veld + ' zou geen drager mogen hebben zolang er geen handelingslaag is');
+  /* En de drie die er NIET zijn, ook met naam. Dit zijn geen waarnemingen maar
+     OORDELEN -- hoe zwaar weegt dit, is het terug te draaien, wat probeerde de
+     actor te bereiken. Ze zijn niet af te lezen uit een verzoek of uit een
+     rij-telling; daarvoor is beleid nodig dat er nog niet is. Ze verzinnen zou
+     de envelop laten liegen, en daar gaat beleid op. */
+  for (const veld of ['intent', 'risicoklasse', 'omkeerbaarheid']) {
+    assert.equal(zonder.has(veld), true, veld + ' is een oordeel en geen waarneming; die hoort geen stille drager te krijgen');
   }
 });
 

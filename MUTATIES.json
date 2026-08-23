@@ -1819,6 +1819,14 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "handeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/handeling.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "handelsketen.test.js": {
       "soort": "server",
       "staat": "gezakt",

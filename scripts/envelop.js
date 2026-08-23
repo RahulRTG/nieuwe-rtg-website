@@ -65,9 +65,9 @@ const VELDEN = [
   { id: 'actor', wat: 'wie handelt hier' },
   { id: 'tenant', wat: 'binnen welk huis (zaak, werkplek, gezin)' },
   { id: 'capability', wat: 'welk begrensd recht wordt gebruikt' },
-  { id: 'doel', wat: 'welk object wordt geraakt' },
+  { id: 'doel', wat: 'welke collecties zijn geraakt (achteraf; niet WELKE rij)' },
   { id: 'intent', wat: 'wat de actor probeert te bereiken' },
-  { id: 'wijzigingen', wat: 'wat er precies gaat veranderen, voor het gebeurt' },
+  { id: 'wijzigingen', wat: 'wat er is veranderd (ACHTERAF gemeten; de vooraf-variant, die kan tegenhouden, bestaat niet)' },
   { id: 'risicoklasse', wat: 'hoe zwaar deze handeling weegt' },
   { id: 'omkeerbaarheid', wat: 'is dit terug te draaien, en hoe' },
   { id: 'gezag', wat: 'waar de bevoegdheid vandaan komt (de keten)' },
@@ -134,7 +134,22 @@ const MIDDLEWARE = [
   { naam: 'log.middleware', bestand: 'server/log.js',
     zet: [{ veld: 'correlatie', via: 'req.id' }],
     opmerking: 'zet een correlatie-id op elk verzoek en geeft hem terug als X-Request-Id; ' +
-               'de envelop maakt er GEEN tweede, die zou uiteenlopen' }
+               'de envelop maakt er GEEN tweede, die zou uiteenlopen' },
+  /* DE HANDELINGSLAAG. De poortwachter kan `doel` en `wijzigingen` niet weten --
+     die ontstaan pas als de handeling gebeurd is. server/opzet/handeling.js telt
+     daarom bij binnenkomst en aan het eind de rijen per collectie; het verschil
+     is wat dit ene verzoek werkelijk veranderde. Dat is de eerste vorm van blast
+     radius die dit huis kent.
+
+     WAT HIJ NIET ZIET staat in zijn eigen kop en in test/handeling.test.js met
+     een toets erop: een wijziging BINNEN een rij beweegt geen rij-aantal en is
+     onzichtbaar. `doel` en `wijzigingen` hebben dus een huis, maar geen volledig
+     huis -- en dat verschil hoort hier te staan in plaats van weggemiddeld. */
+  { naam: 'handeling.middleware', bestand: 'server/opzet/handeling.js',
+    zet: [{ veld: 'doel', via: 'req.handeling' },
+          { veld: 'wijzigingen', via: 'req.handeling' }],
+    opmerking: 'telt de rijen per collectie voor en na het verzoek; ziet GEEN wijziging binnen een rij ' +
+               '(raakt() is de uitweg daarvoor en is nog nergens aangeroepen)' }
 ];
 
 /* DE CANONIEKE ENVELOP (server/opzet/envelop.js). Welke velden draagt hij, en
@@ -342,11 +357,15 @@ function meet() {
 
 function stand(nu) {
   return {
-    uitleg: 'Wat weet RTG op het moment dat een poortwachter JA zegt? `veldenZonderHuis` telt de ' +
-      'envelopvelden die GEEN enkele poortwachter vaststelt; `actorVormen` telt onder hoeveel ' +
-      'verschillende namen "wie handelt hier" op het verzoek wordt gezet. BEIDE MOGEN ALLEEN OMLAAG. ' +
-      'Zonder een envelop die actor en wijziging samen draagt, is er geen risicobudget, geen blast ' +
-      'radius en geen bonnetje te bouwen -- hoe de rest ook wordt ingericht.',
+    uitleg: 'Wat weet RTG op het moment dat een poortwachter JA zegt, en wat is er daarna werkelijk ' +
+      'veranderd? `veldenZonderHuis` telt de envelopvelden die door NIEMAND worden gevuld; ' +
+      '`actorVormen` telt onder hoeveel verschillende namen "wie handelt hier" op het verzoek wordt ' +
+      'gezet; `routesZonderEnvelop` telt de routes zonder canonieke vorm. ALLE DRIE MOGEN ALLEEN OMLAAG. ' +
+      'EEN GRENS DIE ER NOG NIET IS: `doel` en `wijzigingen` worden ACHTERAF gemeten ' +
+      '(server/opzet/handeling.js). Daarmee is een massamutatie te ZIEN en te melden, maar niet te ' +
+      'WEIGEREN -- daarvoor zou de omvang voor de uitvoering bekend moeten zijn, en dat vraagt een ' +
+      'simulatie die hier niet bestaat. Detecteren is niet tegenhouden, en dat verschil hoort in het ' +
+      'register te staan in plaats van in iemands hoofd.',
     hoe: 'node scripts/envelop.js --velden',
     gemeten: { veldenZonderHuis: nu.veldenZonderHuis, actorVormen: nu.aantalActorVormen,
       routesZonderEnvelop: nu.routesZonderEnvelop,

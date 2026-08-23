@@ -91,11 +91,29 @@ test('resetcontract: welke storingen er ook in gingen, na reset is de stand die 
 
   /* En dezelfde storing hoort na een reset dezelfde samenvatting te geven als
      na een verse start -- inclusief de VOLGORDE, want die is het enige waar de
-     volgteller aan te merken is. */
+     volgteller aan te merken is.
+
+     ZONDER DE TIJDSTEMPELS, en dat is een reparatie. Eerst stond hier een kale
+     deepEqual over de hele samenvatting, en die vergeleek ook `eerst` en
+     `laatst` -- twee Date.now()-waarden uit twee verschillende aanroepen. Die
+     zijn meestal gelijk omdat het binnen een milliseconde gebeurt, en soms niet.
+     Zo zakte deze toets een keer op de vier in een ronde met andere bestanden
+     erbij, wat er precies uitziet als een spookfout maar het niet is: hij hing
+     aan de wandklok. Een toets die op de klok kan zakken bewaakt niets meer,
+     want de volgende keer krijgt hij het voordeel van de twijfel.
+
+     De tijdstempels zelf blijven wel gecontroleerd, alleen op wat ze horen te
+     ZIJN (een getal) en niet op welke waarde ze toevallig kregen. */
+  const zonderTijd = (s) => ({
+    totaal: s.totaal, distinct: s.distinct,
+    recent: s.recent.map(g => ({ bericht: g.bericht, waar: g.waar, aantal: g.aantal, bron: g.bron }))
+  });
   stil(() => log.uitzondering(boem('na de reset'), { p: '/api/na' }));
   const na = log.foutenSamenvatting();
+  assert.ok(na.recent.every(g => Number.isFinite(g.eerst) && Number.isFinite(g.laatst)),
+    'de tijdstempels horen er wel te zijn, ze worden alleen niet op waarde vergeleken');
   stil(() => { log.foutenReset(); log.uitzondering(boem('na de reset'), { p: '/api/na' }); });
-  assert.deepEqual(log.foutenSamenvatting(), na,
+  assert.deepEqual(zonderTijd(log.foutenSamenvatting()), zonderTijd(na),
     'dezelfde storing na een reset hoort dezelfde samenvatting te geven als na een verse start');
   stil(() => log.foutenReset());
 });

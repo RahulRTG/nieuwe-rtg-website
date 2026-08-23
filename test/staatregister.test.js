@@ -232,8 +232,16 @@ test('functieUitReset pakt de aangeroepen functie uit de zin', () => {
 test('nieuwe muteerbare toestand zonder registratie geeft exitcode 1', () => {
   const boom = maakBoom('staatpoort');
   try {
-    const schoon = execFileSync(process.execPath, [path.join(boom.pad, 'scripts', 'staat.js'), '--json'],
-      { cwd: boom.pad, encoding: 'utf8' });
+    /* Eerst de nulmeting, en die moet EXITCODE 0 geven -- anders zegt de rest
+       van deze toets niets. Sinds de resetdekking erbij zit kan staat.js ook om
+       een andere reden 1 geven, en dan hoort hier te staan waarom en niet een
+       kale exec-fout. */
+    let schoon = '', schoonCode = 0;
+    try {
+      schoon = execFileSync(process.execPath, [path.join(boom.pad, 'scripts', 'staat.js'), '--json'],
+        { cwd: boom.pad, encoding: 'utf8' });
+    } catch (e) { schoonCode = e.status; schoon = e.stdout || '{}'; }
+    assert.equal(schoonCode, 0, 'de kopie hoort schoon te beginnen, maar staat.js gaf 1: ' + schoon.slice(0, 400));
     assert.deepEqual(JSON.parse(schoon).ongeregistreerd, [], 'de kopie hoort schoon te beginnen');
 
     const p = binnen(boom.pad, path.join(boom.pad, 'server', 'kern', 'zz-staatproef.js'));

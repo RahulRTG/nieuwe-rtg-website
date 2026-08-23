@@ -34,15 +34,17 @@
 const { RECHTEN, ROLLEN } = require('../../bedrijf/rollen-register');
 const pkg = require('../../../package.json');
 
+/* Wat er NIET in dit antwoord staat, met naam en reden. De lijst hoort te
+   krimpen en dat is hij ook gaan doen: `entitlements`, `quotas` en `lifecycle`
+   stonden hier tot het contract, het quotum en de levensloop er waren. Wat
+   overblijft staat er nog steeds MET reden -- een veld dat wegvalt uit deze
+   lijst zonder dat het gebouwd is, is de stille versie van een belofte. */
 const NIET_GEBOUWD = [
-  { veld: 'entitlements', reden: 'Er bestaat geen abonnement per werkruimte. Toegang volgt nu uit rollen, niet uit een contract.' },
-  { veld: 'quotas', reden: 'De rem telt per IP en niet per tenant; er is geen verbruik per klant om tegen af te zetten.' },
   { veld: 'policies', reden: 'Datalocatie, sleutelmodel en bewaartermijn zijn platformbreed geregeld, niet per tenant instelbaar.' },
-  { veld: 'trust', reden: 'De bewijslaag meet het platform, niet een tenantvariant. Er is dus geen bewijsstand voor deze klant.' },
-  { veld: 'lifecycle', reden: 'Proef, opzegging, bewaring en vernietiging bestaan als begrip in de plannen en niet als toestand in de code.' }
+  { veld: 'trust', reden: 'De bewijslaag meet het platform, niet een tenantvariant. Er is dus geen bewijsstand voor deze klant.' }
 ];
 
-module.exports = ({ db, register, brug, merkVan, bedrijf }) => {
+module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop }) => {
   function ruimte(code) {
     const w = db.data.werkruimtes || {};
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
@@ -62,6 +64,10 @@ module.exports = ({ db, register, brug, merkVan, bedrijf }) => {
     if (!w) return null;
     const t = register.vanWerkruimte(code);
     const r = rechten(lid);
+    /* Het contract en het verbruik reizen mee, want dit is de enige plek waar
+       een scherm ze mag lezen. Wat er NIET wordt afgedwongen staat erin met
+       reden -- anders leest een grens die niemand meet als een werkende. */
+    const c = t && contract ? contract.van(t.org) : null;
 
     return {
       versie: 1,
@@ -78,6 +84,12 @@ module.exports = ({ db, register, brug, merkVan, bedrijf }) => {
         beheerdDoorProvider: lid.bron === 'idp',
         rtgGekoppeld: !!lid.rtgKey
       },
+      contract: c ? { pakket: c.pakket, naam: c.naam, tot: c.tot, loopt: c.loopt,
+        grenzen: c.grenzen, verbruik: c.verbruik, nietAfgedwongen: c.nietAfgedwongen, let: c.let } : null,
+      /* Alleen de STAND en niet het hele logboek: een medewerker hoort te
+         kunnen zien dat zijn werkruimte in de opzegging zit, en niet wie er
+         wanneer wat over besloot -- dat is contractgeschiedenis. */
+      levensloop: t && levensloop ? (() => { const l = levensloop.stand(t.org); return l ? { stand: l.stand, sinds: l.sinds, bewaarTot: l.bewaarTot, let: l.let } : null; })() : null,
       rollen: r ? r.rollen : [],
       rechten: r ? r.rechten : [],
       rechtenkaart: { alle: RECHTEN, rollen: ROLLEN.map(x => ({ id: x.id, naam: x.naam })) },

@@ -410,6 +410,10 @@ const EIGEN_MODULE = new Map([
      werkruimte laten schrijven laat toets 3 zakken, en de bewaringsplicht
      negeren laat toets 6 zakken. */
   ['tenantuitgang.test.js', ['server/kern/tenant/uitgang.js', 'server/kern/tenant/levensloop.js']],
+  /* tenantcontract.test.js start de server EN draait daarnaast de teller los.
+     Nagetrokken: de grens op het aantal werkruimtes weghalen laat toets 1
+     zakken, en de teller niet laten bijten laat toets 5 zakken. */
+  ['tenantcontract.test.js', ['server/kern/tenant/contract.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

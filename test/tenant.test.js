@@ -158,11 +158,27 @@ test('6. de bootstrap noemt wat er niet is, en verzint geen quotum', async () =>
   assert.equal(b.identiteit.via, 'lid-token');
   assert.equal(b.identiteit.beheerdDoorProvider, false, 'deze is met de hand toegelaten');
 
+  /* HET CONTRACT EN HET VERBRUIK ZIJN ER, en stonden hier tot voor kort als
+     niet-gebouwd. Ze horen nu MET echte waarden in het antwoord: een pakket, de
+     grenzen die eruit volgen, en wat er dit uur van op is. */
+  assert.equal(b.contract.pakket, 'proef', 'het pakket staat erin');
+  assert.equal(b.contract.loopt, true);
+  assert.ok(b.contract.grenzen.apiPerUur > 0, 'met een grens die geldt');
+  assert.ok(b.contract.verbruik.apiDitUur > 0, 'en met het echte verbruik van dit uur');
+  assert.equal(b.contract.verbruik.werkruimtes, 1);
+  assert.ok(b.contract.nietAfgedwongen.some(x => /opslag/.test(x.grens)),
+    'en wat er NIET wordt afgedwongen staat er met naam bij');
+  assert.equal(b.levensloop.stand, 'actief', 'de stand van de levensloop reist mee');
+  assert.equal(b.levensloop.log, undefined, 'maar niet het logboek -- dat is contractgeschiedenis');
+
+  /* De lijst met wat er niet is, hoort te KRIMPEN en niet stil te verdwijnen.
+     Wat er nog op staat, staat er met een reden. */
   const velden = b.nietGebouwd.map(x => x.veld);
-  for (const v of ['entitlements', 'quotas', 'policies', 'trust', 'lifecycle'])
+  for (const v of ['policies', 'trust'])
     assert.ok(velden.includes(v), v + ' staat als niet-gebouwd in het antwoord');
-  assert.equal(b.quotas, undefined, 'en niet als lege waarde die als "geen verbruik" leest');
-  assert.equal(b.entitlements, undefined);
+  for (const v of ['entitlements', 'quotas', 'lifecycle'])
+    assert.ok(!velden.includes(v), v + ' is gebouwd en hoort niet meer op de lijst');
+  assert.equal(b.quotas, undefined, 'en er staat geen leeg veld dat als "geen verbruik" leest');
   for (const n of b.nietGebouwd) assert.ok(n.reden && n.reden.length > 20, n.veld + ' heeft een reden');
 });
 

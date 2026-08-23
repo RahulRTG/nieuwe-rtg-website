@@ -19,7 +19,12 @@ const merkkern = require('./merkkern');
 const { ROLLEN } = require('../../bedrijf/rollen-register');
 
 module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
-  const register = require('./register')({ db, save, schoon, findSupplier });
+  /* Het contract staat VOOR het register: dat laatste vraagt hem of er nog een
+     werkruimte bij mag, en de contractlaag leest de tenants rechtstreeks uit de
+     opslag. Zo hangt de grens aan de handeling en niet aan een route, en toch
+     kennen de twee elkaar maar in één richting. */
+  const contract = require('./contract')({ db, save, schoon });
+  const register = require('./register')({ db, save, schoon, findSupplier, contract });
   const brug = require('./brug')({ db, save, register });
 
   /* ---------- het merk van een tenant ----------
@@ -95,13 +100,16 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
     return { ok: true, groepen: t.groepen.filter(g => g.werkruimte === code) };
   }
 
-  const bootstrap = require('./bootstrap')({ db, register, brug, merkVan, bedrijf });
-
   /* De uitgang en de levensloop hangen aan elkaar: het vernietigingsbewijs
      wordt met dezelfde catalogus gerekend als een uitvoer, want anders bewijst
      het iets over een andere telling dan de klant ooit heeft meegekregen. */
   const uitgang = require('./uitgang')({ db, save, crypto: null, register, merkVan });
   const levensloop = require('./levensloop')({ db, save, schoon, register, uitgang });
 
-  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap, uitgang, levensloop };
+  /* De bootstrap komt als LAATSTE: hij leest alle lagen hierboven en schrijft
+     zelf niets. Zou hij eerder staan, dan zou hij ze met een omweg moeten
+     opvragen en is de volgorde van dit bestand een raadsel. */
+  const bootstrap = require('./bootstrap')({ db, register, brug, merkVan, bedrijf, contract, levensloop });
+
+  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap, uitgang, levensloop, contract };
 };

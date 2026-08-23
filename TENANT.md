@@ -284,6 +284,42 @@ veld `regie` wijst aan waar de klok dan wel woont. Er is een vierde grond
 omdat wij het nodig hebben, maar omdat de klantovereenkomst een uitlooptijd
 geeft.
 
+## 6c. Het contract en het quotum
+
+**Een verlopen contract is geen noodknop.** Het weigert NIEUWE inrichting -- een
+werkruimte erbij -- en verder niets: de mensen die er werken blijven werken en de
+uitvoer blijft open. Toegang sluiten is een handeling in de levensloop, met een
+reden, een actor en een spoor. Zou een factuur dat kunnen, dan hebben wij een
+knop waarmee we het bedrijf van een klant stilleggen, en die knop hoort niet te
+bestaan.
+
+**In het contract staan alleen grenzen die worden afgedwongen.** Drie pakketten
+(proef, zakelijk, concern) met twee grenzen die echt bijten: het aantal
+werkruimtes onder de tenant en het aantal verzoeken per uur. Wat een
+verkooppraatje verder belooft -- opslag, aantal leden, supportvenster,
+hersteltijd -- staat in `nietAfgedwongen` met de reden, want een grens in een
+object waar geen enkele regel code naar kijkt leest voor elk scherm als een
+werkende limiet.
+
+Een uitzondering op een grens kan, maar **alleen omhoog en met een reden**: een
+grens die stil naar beneden gaat valt pas op als een klant vastloopt. En een
+pakketwissel zet de uitzonderingen terug, anders blijft een ruimte die ooit bij
+een pilot hoorde stilletjes staan na een downgrade.
+
+**Het quotum telt per tenant en overleeft een herstart.** De rem op de deur
+(`middleware/remmen.js`) telt per IP en beschermt de server; die zegt niets over
+wie er te veel gebruikt, want honderd medewerkers komen van honderd adressen en
+een kantoorproxy komt met honderd man van één. Pas per tenant is "u zit aan uw
+grens" een zin die klopt en die iemand kan oplossen -- en dat is ook het
+eerlijke deel van fairness: wie eroverheen gaat merkt het zelf en niet zijn
+buurman. De teller staat in de opslag, per uur; `save()` is write-behind dus het
+kost geen schrijfactie per verzoek.
+
+**Geteld wordt op de twee deuren van de werkruimte** (`beheerVan` en `lidVan` in
+`bedrijf/index.js`) en niet op 104 routes: daar is het volledig, en daar kan het
+niet vergeten worden bij route 105. De **uitvoer telt nooit mee en wordt nooit
+geweigerd** -- exit-recht dat op een teller kan stuklopen is geen recht.
+
 ## 7. De lat
 
 Wat een tenantvariant moet halen. **Per regel staat erbij of hij vandaag
@@ -300,8 +336,8 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 | Claims | 0 enterprisebeweringen zonder bron | gemeten voor de bootstrap; **niet** voor losse schermteksten |
 | Merkdekking | 100% van schermen, mails, documenten en meldingen uit de merkkern | **niet gehaald**: alleen schermen (4.55) |
 | Exit | een volledige export is aantoonbaar opnieuw in te lezen | gemeten (`test/tenantuitgang.test.js` toets 3) |
-| Contract | elke runtime-bevoegdheid is te herleiden tot een actief contract | **niet gebouwd** (5.56) |
-| Quota | per tenant, en een herstart wist ze niet | **niet gebouwd**; de rem telt per IP |
+| Contract | de grenzen die gelden komen uit een pakket, en wat niet wordt afgedwongen staat er met reden bij | gemeten (`test/tenantcontract.test.js`) |
+| Quota | per tenant, en een herstart wist ze niet | gemeten (`test/tenantcontract.test.js` 5-7) |
 | Levenscyclus | elke tenantstand met reden, actor en bewijs | gemeten (`test/tenantuitgang.test.js`, `test/tenantspine.test.js` 12-14) |
 | Codeforks | 0 klantspecifieke forks | gehaald, en dat is de reden dat het merk uit getypeerde velden komt en niet uit vrije CSS of JS |
 
@@ -321,7 +357,10 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    met bewijs. Wat hier NIET onder valt en apart moet: de bijlagen en media van
    een werkruimte (die wonen buiten `db.data.werkruimtes`), en een uitvoer in een
    leesbaar formaat naast de machineleesbare -- beide open in `TAKEN.md` 5.56.
-7. **Contract & quota** — open. Abonnement, bevoegdheden, verbruik, support.
+7. **Contract & quota** — gedaan. Drie pakketten, twee afgedwongen grenzen,
+   een teller per tenant per uur die een herstart overleeft, en een verlopen
+   contract dat niemand buitensluit. Niet afgedwongen en met naam genoemd:
+   opslag, aantal leden, supportvenster en hersteltijd.
 8. **Tenantstatus & bewijs** — open. En de harde volgorde: een SLA mag pas
    zichtbaar worden als contract, meting, incidentproces én herstelbewijs
    bestaan. `SLO.md` zegt vandaag met zoveel woorden dat er geen SLA is.

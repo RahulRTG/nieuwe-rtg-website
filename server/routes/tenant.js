@@ -72,6 +72,7 @@ module.exports = (kern) => {
      enige moment dat hij telt. Ook in de bewaring werkt deze deur; alleen na
      de vernietiging is er niets meer om op te halen, en dan zegt de 404 dat. */
   app.post('/api/tenant/export', (req, res) => {
+    req.geenQuotum = true;              // exit-recht loopt niet stuk op een teller
     const w = bedrijf.beheerVan(req, res); if (!w) return;
     const uit = tenant.uitgang.exporteer(w.code);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });

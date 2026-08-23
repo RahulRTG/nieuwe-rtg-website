@@ -110,6 +110,7 @@
       "findSupplier",
       "rtmailTeam",
       "rtmailVak",
+      "tenant",
       "werkplekken"
     ],
     "bestanden": [

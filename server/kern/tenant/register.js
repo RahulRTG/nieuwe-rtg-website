@@ -39,7 +39,7 @@
 
 const ORG = /^[A-Z0-9][A-Z0-9-]{1,30}$/;
 
-module.exports = ({ db, save, schoon, findSupplier }) => {
+module.exports = ({ db, save, schoon, findSupplier, contract }) => {
   function pot() {
     if (!db.data.tenants || typeof db.data.tenants !== 'object') db.data.tenants = {};
     return db.data.tenants;
@@ -136,6 +136,14 @@ module.exports = ({ db, save, schoon, findSupplier }) => {
       }
       const ander = Object.values(pot()).find(x => x.org !== t.org && x[veld].includes(c));
       if (ander) return { error: 'Deze code hoort al bij de tenant ' + ander.org + '.', status: 409 };
+      /* De contractgrens staat HIER en niet in de route: een controle in een
+         route is een controle die de volgende aanroeper mist. Alleen op
+         werkruimtes -- een zaak is een relatie en geen productinstantie, en
+         daar rekenen we niet voor. */
+      if (veld === 'werkruimtes' && contract && !t[veld].includes(c)) {
+        const mag = contract.magWerkruimteErbij(t.org);
+        if (!mag.ok) return { error: mag.reden, status: 402 };
+      }
       if (!t[veld].includes(c)) t[veld].push(c);
     } else {
       t[veld] = t[veld].filter(x => x !== c);

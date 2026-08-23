@@ -57,6 +57,24 @@ module.exports = (tctx) => {
     res.json(uit);
   });
 
+  /* ---------- het contract ----------
+     Bij de eigenaar, want dit IS de commerciele afspraak. Een klant die zijn
+     eigen pakket kan zetten heeft geen pakket. Lezen zonder `pakket` in het
+     lijf; zetten met. */
+  app.post('/api/techniek/tenant/contract', techAuth, eigenaarAlleen, (req, res) => {
+    const b = req.body || {};
+    const alleenLezen = b.pakket == null && b.tot === undefined && b.werkruimtes == null && b.apiPerUur == null;
+    if (alleenLezen) {
+      const c = T().contract.van(b.org);
+      return c ? res.json({ ok: true, contract: c, pakketten: T().contract.PAKKETTEN })
+        : res.status(404).json({ error: 'Die tenant kennen we niet.' });
+    }
+    const uit = T().contract.zet(b.org, { ...b, door: b.door || wie(req) });
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    log.info('tenant contract', { org: String(b.org || '').toUpperCase(), pakket: uit.contract.pakket, door: wie(req) });
+    res.json(uit);
+  });
+
   /* ---------- de levensloop ----------
      Opzeggen, bewaren en de bewaringsplicht. Bij de eigenaar en niet bij de
      klant: dit gaat over het contract, en een klant die zijn eigen tenant in

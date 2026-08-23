@@ -5660,6 +5660,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "tenantcontract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "tenantspine.test.js": {
       "soort": "puur",
       "staat": "gezakt",

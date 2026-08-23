@@ -17,11 +17,11 @@ op telefoonformaat (390x844).
 
 | poort | staat | wat hij tegenhoudt |
 |---|---|---|
-| contrast, drie staten | **0** van 261 | tekst die te bleek is om te lezen |
-| structuur (alt, label, naam, taal, titel) | **0** van 261 | een knop of veld zonder naam |
+| contrast, drie staten | **0** van 262 | tekst die te bleek is om te lezen |
+| structuur (alt, label, naam, taal, titel) | **0** van 262 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
-| raakvlak (24x24) | **0** van 261, in twee sessies | een knop die een trillende hand niet raakt |
+| raakvlak (24x24) | **0** van 262, in twee sessies | een knop die een trillende hand niet raakt |
 
 Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
 elke push over alle schermen -- structuur en contrast in DRIE staten, het

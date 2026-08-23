@@ -65,6 +65,21 @@
     <p class="stil z-mt40" id="mLet"></p>
   </div>
 
+  <!-- WAT RAHUL DEED, EN WAT HIJ VOORSTELT. Een actiebon die niemand leest, is
+       geen bon maar een logregel. Deze staat daarom op het scherm van de
+       manager en niet in een bestand. -->
+  <div class="kaart" id="mRahulKaart">
+    <div class="kop">Rahul: wat er is gedaan en wat wacht (<span id="mRahulTelling">-</span>)</div>
+    <div class="rij">
+      <input class="veld" id="mRahulGrens" type="number" min="0" max="100000" placeholder="Kortingsgrens in centen" aria-label="Kortingsgrens van Rahul in centen" style="flex:0 1 14rem;">
+      <button class="knop" id="mRahulGrensZet" type="button">Grens zetten</button>
+      <button class="knop stil" id="mRahulGrensWeg" type="button">Grens weghalen</button>
+    </div>
+    <p class="stil z-mt40" id="mRahulGrensUit"></p>
+    <div id="mRahulBonnen" class="z-mt60"></div>
+    <p class="stil z-mt40" id="mRahulLet"></p>
+  </div>
+
   <div class="kaart">
     <div class="kop">Signalen (<span id="mSignaalTelling">-</span>)</div>
     <div id="mSignalen"></div>
@@ -170,6 +185,7 @@
 <script src="/apps/horeca/beheer-pols.js"></script>
 <script src="/apps/horeca/beheer-missions.js"></script>
 <script src="/apps/horeca/beheer-simulation.js"></script>
+<script src="/apps/horeca/beheer-rahul.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

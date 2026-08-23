@@ -448,9 +448,51 @@ Bewezen in een echte browser (`test/kassawachtrij.e2e.js`), inclusief het geval
 dat ertoe doet: het verzoek kwam aan, het antwoord verdween onderweg, de
 wachtrij stuurde hem opnieuw — en er staat één bon.
 
-**6. Action receipts en de rechtenlaag van Rahul.** Vandaag kent de horeca twee
-rechten: `supplierAuth` en `managerOnly`. Dat is te grof voor wat hieronder
-staat.
+**6. Action receipts en de rechtenlaag van Rahul — af.** De horeca kende twee
+rechten: `supplierAuth` (bent u van deze zaak) en `managerOnly` (bent u de baas).
+Dat is genoeg voor een MENS achter een scherm en veel te grof voor een AI die
+handelingen voorstelt. *Mag Rahul dit* is namelijk geen vraag over wie hij is,
+maar over **wat de handeling doet**.
+
+`kern/horeca/rahul-register.js` zet elke handeling in een van vier lagen:
+
+| laag | wat het betekent |
+|---|---|
+| **verboden** | nooit, ook niet als voorstel. Er is geen instelling die dit aanzet en geen knop die het alsnog goedkeurt |
+| **mensbevestigt** | Rahul mag het voorbereiden; een mens bevestigt. Het voorstel verandert niets |
+| **mag** | Rahul mag het uitvoeren, met een actiebon |
+| **onbekend** | valt terug op *mensbevestigt* — nooit op *mag* |
+
+De zes uit de opdracht staan erin, en wáár ze staan is een besluit. *Een
+medewerker beoordelen* en *een alcoholbeperking negeren* zijn **verboden**: bij
+de eerste omdat grens 5 zegt dat er geen ranglijst op mensen komt en een
+AI-oordeel die ranglijst is met één regel, bij de tweede omdat er geen situatie
+bestaat waarin het legitiem is — dus ook geen voorstel. *Een allergie aanpassen*,
+*een betaling uitvoeren*, *een voorraadverschil wegboeken* en *een hoge korting
+toekennen* zijn **mensbevestigt**.
+
+**"Nooit ongemerkt" is geen belofte maar een eigenschap**, en die komt uit één
+plek: de enige weg waarlangs Rahul iets doet, loopt door `rahul-recht.js`, en die
+weg schrijft **altijd** een actiebon. Ook bij een weigering — juist dan, want een
+poging die niemand ziet is de gevaarlijkste. De bon draagt wat er gebeurde, wie
+erachter zat, welke laag gold **en waarom die laag gold**; "geweigerd" zonder
+waarom is een muur, met waarom is het een regel die iemand kan aanvechten. Hij is
+append-only: er is geen functie die een bon wist of herschrijft, alleen een FIFO
+die de oudste laat wijken zodat de opslag begrensd blijft — dezelfde vorm als
+`kern/geldbeleid/actielog.js`, en om dezelfde reden.
+
+**Er is geen verzonnen kortingsgrens.** Een "hoge" korting vraagt een bedrag, en
+dat bedrag zet de zaak zelf. Zolang het niet is ingesteld vraagt **elke** korting
+van Rahul een mens — een drempel verzinnen zou hier een getal maken dat niemand
+heeft afgesproken (grens 7), en het scherm zegt dat met zoveel woorden in plaats
+van een bedrag te tonen.
+
+**En de bonnen staan op een scherm.** Een actiebon die niemand leest is geen bon
+maar een logregel; "ongemerkt" gaat over wat een mens ziet. Ze staan daarom op
+`/apps/horeca-beheer.html`, inclusief de geweigerde, met de reden erbij en met
+één bevestigknop per voorstel — er is bewust geen knop die een stapel in één keer
+goedkeurt, want dat is precies hoe een bevestiging een formaliteit wordt
+(`test/horeca-rahul.test.js`, `test/horeca-rahul.e2e.js`).
 
 ## De grenzen
 

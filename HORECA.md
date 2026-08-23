@@ -129,7 +129,9 @@ iets bouwt dat er al is:
   10,00 door drie (`test/horeca-rekening.test.js`).
 - **De offline-wachtrij is er aan de serverkant** en is idempotent op
   `clientId` — `POST /api/supplier/horeca/offline/sync`. Er is alleen nog geen
-  enkele client die hem gebruikt.
+  enkele client die hem gebruikt. De KASSA heeft er sinds 23 augustus 2026 wel
+  een (`apps/kassa/wachtrij.js`, op `pos/sale`); de zaal en de bar niet, want
+  een rekening leeft over vele aanroepen en dat is meer dan opnieuw versturen.
 - **De duwstroom draait**: elke standwijziging stuurt
   `sseToSupplier(code, 'sync', { scope: 'keuken' })` over `/api/supplier/stream`.
   VUUR, de zaal en de pas luisteren mee via `RTGHoreca.luister()`, met een trage
@@ -254,7 +256,40 @@ achttien naar twaalf endpoints zonder scherm.
 **4. PDA SERVICE** als eigen werkstand, met rolmodi (bediening, runner, host,
 wijkhoofd, manager) op één app.
 
-**5. Venue Edge**: de clientkant van offline. De serverkant ligt er.
+**5. Venue Edge**: de clientkant van offline. De serverkant ligt er, en de
+kassa is de eerste die hem gebruikt — zie hieronder. De zaal, de bar en de PDA
+volgen nog niet: die werken niet met één verzoek per handeling maar met een
+rekening die over tientallen aanroepen leeft, en dan is opnieuw versturen niet
+genoeg. Dat vraagt een lokale werkelijkheid die samengevoegd wordt, niet een rij.
+
+**5a. De kassa zonder lijn — af.** Een bon die niet weg kon ging verloren; nu
+staat hij in de wachtrij van dat toestel, zichtbaar in een strook boven het
+werkvlak, en gaat hij vanzelf weg zodra de lijn terug is.
+
+Het gevaarlijke deel zat niet in de wachtrij maar in de HERHALING, en dat is
+eerst gerepareerd. `pos/sale` gaf de meegestuurde `idem`-sleutel alleen door aan
+RTG Pay, en dan nog alleen bij method `rtgpay`: contant en pin kenden helemaal
+geen herhaling. Twee keer versturen gaf twee bonnen, twee keer voorraadafboeking
+en twee facturen. De kassa stuurde de sleutel al jaren mee en niemand keek ernaar.
+Nu staat het HELE verzoek binnen `kern/kassa/herhaling.js`, op dezelfde
+machinerie als het geld (`lib/idem.js`), inclusief de binding aan het verzoek:
+dezelfde sleutel met een ander bedrag is een 409 en geen stille "gelukt".
+
+Vier regels die de wachtrij dragen, elk met een mutatietoets erachter:
+
+- **De sleutel wordt één keer gemaakt**, bij het afrekenen, en reist mee de rij
+  in. Wie hem per poging ververst heeft geen vangnet maar een omzetverdubbelaar.
+- **RTG Pay wacht nooit.** Contant ligt in de la en pin gaat buiten ons om; een
+  betaalcode moet op het moment zelf gecontroleerd worden.
+- **Een geweigerde bon loopt vast en gaat niet rond**, mét de reden in beeld.
+  Een 502/503/504 van een tussenlaag telt daarbij als storing, niet als oordeel.
+- **`at` blijft de tijd van aankomst.** Het moment van de kassa reist mee als
+  `offlineVanaf` en staat op de bon, maar bepaalt niets — anders kiest een client
+  op welke dag zijn omzet valt.
+
+Bewezen in een echte browser (`test/kassawachtrij.e2e.js`), inclusief het geval
+dat ertoe doet: het verzoek kwam aan, het antwoord verdween onderweg, de
+wachtrij stuurde hem opnieuw — en er staat één bon.
 
 **6. Action receipts en de rechtenlaag van Rahul.** Vandaag kent de horeca twee
 rechten: `supplierAuth` en `managerOnly`. Dat is te grof voor wat hieronder

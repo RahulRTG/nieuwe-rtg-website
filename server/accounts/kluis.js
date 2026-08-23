@@ -75,11 +75,73 @@ function phoneHash(phone) {
 const scryptAsync = (pw, salt, len) => new Promise((resolve, reject) =>
   crypto.scrypt(pw, salt, len, (err, key) => err ? reject(err) : resolve(key)));
 
-function hashPasswordSync(pw) {
+/* HET SEEDVENSTER: EEN ZOUT PER WACHTWOORD, MAAR ALLEEN TIJDENS DE DEMOSTART.
+
+   Gemeten op 23 augustus 2026: een testserver deed bij het opstarten 220
+   scryptSync-aanroepen in 9,1 seconden -- twee derde van een boot van 13,6
+   seconden. Voor VIER wachtwoorden: 112x '5678', 71x '1234', 35x 'werk' en 2x
+   'Imran'. Alle vier staan letterlijk in deze repository, want het is de
+   demoseed. De suite start 647 servers, dus dat was anderhalf uur rekenwerk per
+   ronde om vier bekende woorden 220 keer opnieuw te hashen.
+
+   Wat hier NIET gebeurt is het verlagen van de scrypt-kosten. De parameters
+   blijven die van Node (N=16384), het opslagformaat blijft zout:hash, en
+   verifyPassword rekent onveranderd de volle prijs. Het enige wat verandert is
+   dat DEZELFDE seed-invoer binnen EEN demostart hetzelfde zout deelt.
+
+   Drie grendels, want een snelheidstruc die in productie lekt is geen truc maar
+   een gat:
+
+   1. RTG_DEMO=1. Dat is in productie een BLOKKERENDE startfout
+      (server/config/productie-lokaal.js), dus geen belofte maar een machine.
+   2. NODE_ENV !== 'production', als tweede slot op dezelfde deur.
+   3. Het venster gaat DICHT vlak voor app.listen (server/opzet/luister.js).
+      Daarna deelt niets meer een zout -- ook niet in demostand, ook niet in de
+      runtime-paden die toevallig een Sync-variant gebruiken (de eigenaars-PIN
+      van een nieuw bedrijf in kern/aanmeldingen/bedrijf.js is er zo een).
+
+   Dat derde slot is het belangrijkste: zonder dat zou het venster de hele
+   levensduur van het proces openstaan en zou de memo ongebonden groeien met
+   elke pincode die er in de demo bijkomt.
+
+   Handhaver: test/seedvenster.test.js. Die eist alle drie de grendels, en het
+   derde bij een ECHTE server (twee registraties met hetzelfde wachtwoord
+   krijgen na de start een verschillend zout) en niet alleen in-proces. Haal een
+   grendel weg en die toets zakt; dat is met alle drie nagelopen. */
+let seedVensterOpen = process.env.RTG_DEMO === '1' && process.env.NODE_ENV !== 'production';
+const seedZouten = new Map();
+let seedHergebruik = 0;
+
+function versZout(pw) {
   const salt = crypto.randomBytes(16);
   const hash = crypto.scryptSync(String(pw), salt, 64);
   return salt.toString('hex') + ':' + hash.toString('hex');
 }
+
+function hashPasswordSync(pw) {
+  if (!seedVensterOpen) return versZout(pw);
+  const sleutel = String(pw);
+  const bestaand = seedZouten.get(sleutel);
+  if (bestaand) { seedHergebruik++; return bestaand; }
+  const verse = versZout(sleutel);
+  seedZouten.set(sleutel, verse);
+  return verse;
+}
+
+/* Het venster sluiten. Geeft terug of het openstond en wat het opleverde, zodat
+   de aanroeper dat kan loggen en een toets het kan nakijken -- een sluiter die
+   stil niets doet is geen sluiter (LAT-regel 5), en een besparing die niemand
+   meet verdwijnt ongemerkt weer (LAT-regel 10). Idempotent: twee keer sluiten
+   is geen fout. */
+function sluitSeedvenster() {
+  const stondOpen = seedVensterOpen;
+  const hergebruikt = seedHergebruik;
+  const woorden = seedZouten.size;
+  seedVensterOpen = false;
+  seedZouten.clear();
+  return { stondOpen, woorden, hergebruikt };
+}
+function seedvensterOpen() { return seedVensterOpen; }
 async function hashPassword(pw) {
   const salt = crypto.randomBytes(16);
   const hash = await scryptAsync(String(pw), salt, 64);
@@ -103,5 +165,6 @@ function sign(body) { return crypto.createHmac('sha256', S.SECRET).update(body).
 
 module.exports = {
   CODENAMES, enc, dec, encVeld, decVeld, emailHash, normalizePhone, phoneHash,
-  scryptAsync, hashPasswordSync, hashPassword, verifyPassword, makeCodename, sign
+  scryptAsync, hashPasswordSync, hashPassword, verifyPassword, makeCodename, sign,
+  sluitSeedvenster, seedvensterOpen
 };

@@ -49,6 +49,27 @@ module.exports = function luister(deps) {
     // veiligadres.js waarschuwt op http en wijst op https de weg naar het toestel
     require('./veiligadres')({ PORT, HOST });
   }
+  /* HET SEEDVENSTER DICHT, EN WEL HIER.
+
+     Tijdens de demostart mogen gelijke seed-wachtwoorden een zout delen (zie de
+     kop bij hashPasswordSync in accounts/kluis.js); dat scheelt 215 van de 220
+     scrypt-rondes bij elke boot. Vanaf het moment dat de server LUISTERT is elk
+     wachtwoord dat erbij komt van een echte gebruiker, en dan hoort er weer een
+     vers zout per account te zijn.
+
+     Deze regel staat met opzet VOOR app.listen en niet in de callback erna: die
+     callback vuurt pas op een volgende tik van de event-loop, en in dat gaatje
+     kan een verzoek al binnen zijn. Dicht voordat de deur opengaat.
+
+     Stond het venster open, dan zeggen we wat het opleverde -- zonder dat getal
+     is niet te zien of de besparing er nog is. */
+  if (accounts && typeof accounts.sluitSeedvenster === 'function') {
+    const seedvenster = accounts.sluitSeedvenster();
+    if (seedvenster.stondOpen) {
+      log.info('[demoseed] seedvenster dicht', { woorden: seedvenster.woorden, hergebruikt: seedvenster.hergebruikt });
+    }
+  }
+
   const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
 
   /* De twee MAILPOORTEN die naast de site staan -- IMAP (meelezen) en SMTP

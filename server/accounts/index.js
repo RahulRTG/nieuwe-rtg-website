@@ -133,6 +133,10 @@ module.exports = {
   init, checkpoint, schrijfKluisRing, RING_FILE,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
+  /* Het seedvenster: open tijdens de demostart, dicht vlak voor app.listen.
+     Zie de kop bij hashPasswordSync in ./kluis.js voor het waarom en de drie
+     grendels; opzet/luister.js is de enige die hem sluit. */
+  sluitSeedvenster: kluis.sluitSeedvenster, seedvensterOpen: kluis.seedvensterOpen,
   ...users,
   ...staff
 };

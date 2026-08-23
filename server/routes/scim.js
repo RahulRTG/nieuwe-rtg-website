@@ -141,6 +141,12 @@ module.exports = (kern) => {
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }
   });
 
+  /* De groepen staan in ./scim-groepen.js: dit bestand ging er met 11.874 bytes
+     van over de 10 kB van keuringsregel 13, en de naad is echt -- hier staan de
+     MENSEN, daar staan de verzamelingen waar ze in zitten. */
+  require('./scim-groepen')({ app, kern, accounts, scim, vorm, filter, log,
+    BASIS, remmen, scimAuth, stuurScim, stuurFout });
+
   /* ---------- uit dienst ----------
      DELETE zet op non-actief en wist niets. Zie de kop van server/scim/index.js
      voor waarom dat geen halve maatregel is maar de juiste. */

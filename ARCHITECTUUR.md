@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4004 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4005 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4004 |
-| servermodules (`server/**/*.js`) | 2210 |
-| routebestanden (`server/routes/**`) | 458 |
-| kernmodules (`server/kern/**`) | 1348 |
+| API-endpoints | 4005 |
+| servermodules (`server/**/*.js`) | 2214 |
+| routebestanden (`server/routes/**`) | 459 |
+| kernmodules (`server/kern/**`) | 1350 |
 | schermen (`public/**/*.html`) | 260 |
 | gedeelde browsermodules (`public/shared/*.js`) | 223 |
-| toetsbestanden (`test/*.test.js`) | 910 |
-| schermtoetsen (`test/*.e2e.js`) | 127 |
+| toetsbestanden (`test/*.test.js`) | 912 |
+| schermtoetsen (`test/*.e2e.js`) | 128 |
 
 ## 2. De weg van een verzoek
 
@@ -117,7 +117,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2262 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2263 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -145,6 +145,7 @@ boardroomWie(11) crypto(11) findSupplier(11) anthropic(11) tooManyTries(10) geen
 rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8)
 logActivity(8) noteFailedTry(7) stuur(7) sseToOffice(7) mail(6) boardroomAuth(6)
 talen(6) loginFails(5) sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
+tenant(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

@@ -28,7 +28,7 @@ function ledenTabel(leden) {
   const uit = ['| Naam | Functie | Stand | Rollen | Herkomst |', '|---|---|---|---|---|'];
   for (const l of rijen) {
     const rollen = (l.rollen || []).map(r => r.id + (r.tot ? ' tot ' + r.tot : '') + (r.bron === 'idp' ? ' (provider)' : '')).join(', ');
-    uit.push('| ' + [esc(l.naam), esc(l.functie) || '—', esc(l.status),
+    uit.push('| ' + [esc(l.naam), esc(l.functie) || '-', esc(l.status),
       esc(rollen) || 'geen', l.bron === 'idp' ? 'identiteitsprovider' : 'met de hand'].join(' | ') + ' |');
   }
   return uit.join('\n') + '\n';
@@ -81,7 +81,7 @@ function maak(uitvoer) {
   r.push('## Wat er NIET in zit');
   r.push('');
   r.push('- De sleutels: het beheer-token, de lid-tokens en de koppeling naar RTG-accounts.');
-  r.push('  Die zijn er bewust uit — een uitvoer is een archief en geen sleutelbos, en die');
+  r.push('  Die zijn er bewust uit: een uitvoer is een archief en geen sleutelbos, en die');
   r.push('  laatste koppelt buiten de identiteitskluis om een werkruimtelid aan een');
   r.push('  RTG-account.');
   r.push('- Documenten, agenda en post van de medewerkers. Die horen bij hun eigen');

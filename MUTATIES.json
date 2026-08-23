@@ -4964,6 +4964,14 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "scimgroepen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/scim/groepen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "scriptbundel.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -5660,6 +5668,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "tenantbewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "tenantcontract.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6326,6 +6342,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "werkcommandbalk.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/command.js",
+      "operator": "getal+1#5",
+      "gezakt": 1,
+      "geprobeerd": 19
     },
     "werkgebeurtenis.test.js": {
       "soort": "puur",

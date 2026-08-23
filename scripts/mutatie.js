@@ -418,6 +418,14 @@ const EIGEN_MODULE = new Map([
      voorwaarden op ja, het auditspoor als vast vinkje, en een bron die blijft
      staan als de bewering vervalt. Alle drie raak. */
   ['tenantbewijs.test.js', ['server/kern/tenant/bewijs.js']],
+  /* scimgroepen.test.js praat SCIM tegen de kindserver. Nagetrokken: de
+     nesting-weigering weghalen laat toets 2 zakken, en de org-grens in
+     groepen.js weghalen laat toets 3 zakken. */
+  ['scimgroepen.test.js', ['server/scim/groepen.js']],
+  /* werkcommandbalk.e2e.js draait in een browser tegen de kindserver.
+     Nagetrokken: de rechtenscheiding in public/apps/werk/kern.js weghalen (elke
+     403 weer als "uw sleutel deugt niet" lezen) laat hem zakken. */
+  ['werkcommandbalk.e2e.js', ['public/apps/werk/kern.js', 'public/apps/werk/command.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

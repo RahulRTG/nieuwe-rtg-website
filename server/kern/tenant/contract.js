@@ -79,7 +79,7 @@ module.exports = ({ db, save, schoon }) => {
       org: t.org, pakket: c.pakket, naam: (PAKKETTEN[c.pakket] || PAKKETTEN.proef).naam,
       ingegaan: c.ingegaan, tot: c.tot || null, loopt: loopt(c),
       grenzen: g,
-      verbruik: { werkruimtes: t.werkruimtes.length, apiDitUur: telling(t).n, uurGrens: g.apiPerUur },
+      verbruik: { werkruimtes: t.werkruimtes.length, apiDitUur: uurteller(t).n, uurGrens: g.apiPerUur },
       nietAfgedwongen: NIET_AFGEDWONGEN,
       let: loopt(c) ? null
         : 'Dit contract is verlopen. Er komt geen nieuwe inrichting meer bij; wie er werkt blijft werken en de uitvoer blijft open. ' +
@@ -145,7 +145,7 @@ module.exports = ({ db, save, schoon }) => {
   }
 
   /* ---------- het quotum ---------- */
-  function telling(t) {
+  function uurteller(t) {
     const c = pot(t);
     const uur = Math.floor(Date.now() / UUR);
     if (!c.teller || c.teller.uur !== uur) c.teller = { uur, n: 0, geweigerd: 0 };
@@ -160,7 +160,7 @@ module.exports = ({ db, save, schoon }) => {
     if (!t) return { ok: true, buitenContract: true };
     const c = pot(t);
     const g = grenzenVan(c);
-    const teller = telling(t);
+    const teller = uurteller(t);
     if (teller.n >= g.apiPerUur) {
       teller.geweigerd++;
       save();

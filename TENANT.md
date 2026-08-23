@@ -410,8 +410,19 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 3. **Merkkern** — gedaan voor de definitie en het Werk OS; Theater en Webmerk
    lezen nog uit hun eigen kopie (4.55).
 4. **Tenant Bootstrap** — gedaan, ondertekening open (4.56).
-5. **Identiteitsbrug** — gedaan voor OIDC-groepen en SCIM-deactivatie. SAML en
-   SCIM `/Groups` staan open (4.54).
+5. **Identiteitsbrug** — gedaan voor OIDC-groepen, SCIM-deactivatie én SCIM
+   `/Groups`. Een groepswijziging bij de klant werkt nu meteen door in plaats
+   van pas bij de volgende inlog; bij het inloggen wordt de unie van de
+   tokenclaim en de SCIM-tabel genomen.
+
+   **SAML is niet gebouwd, en dat is een besluit** — hetzelfde soort besluit als
+   bij `sovereign`. Een SAML-SP vraagt XML-canonicalisatie en
+   XML-DSig-verificatie; dit huis heeft nul runtime-afhankelijkheden. De keuze
+   is dus: die regel laten wijken, of zelf een cryptografische primitief
+   schrijven waarvan de faalvorm een **stille authenticatie-bypass** is
+   (XML Signature Wrapping). Dat is een besluit van de eigenaar. Komt hij er,
+   dan hoort hij in dezelfde federatiepoort uit te komen op het claimcontract
+   dat OIDC al gebruikt — niet als tweede laag ernaast. Zie `TAKEN.md` 4.54.
 6. **Levenscyclus en uitgang** — gedaan. Export met catalogus en recept, een
    leesbaar overzicht ernaast, inlezen in een nieuwe werkruimte, vier standen,
    bewaringsplicht, vernietiging met bewijs.

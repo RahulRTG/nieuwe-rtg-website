@@ -105,11 +105,26 @@ test('3. het auditspoor komt uit het journaal en niet uit een vinkje', async () 
   assert.match(na.bron, /wie het journaal leest staat er zelf in/);
 });
 
-test('4. zonder identiteitsprovider bestaat de SSO-bewering niet', async () => {
-  const s = (await api('/api/tenant/status', { werkruimte: ruimte, beheerToken: beheer })).body.status;
-  const sso = rij(s, 'eigen-identiteitsprovider');
-  assert.equal(sso.mag, false, 'deze tenant heeft geen koppeling');
-  assert.match(sso.reden, /geen SSO-koppeling/);
+test('4. de SSO-bewering volgt de koppeling, ook over het verschil in hoofdletters heen', async () => {
+  const lees = async () => rij((await api('/api/tenant/status', { werkruimte: ruimte, beheerToken: beheer })).body.status, 'eigen-identiteitsprovider');
+
+  const zonder = await lees();
+  assert.equal(zonder.mag, false, 'deze tenant heeft nog geen koppeling');
+  assert.match(zonder.reden, /geen SSO-koppeling/);
+
+  /* DEZE TOETS VOND EEN ECHTE FOUT. De tenant draagt zijn org in HOOFDLETTERS
+     (O-S), en sso/koppelingen.js bewaart hem in kleine letters. vind() zocht op
+     de ruwe tekst, dus deze bewering stond bij iedereen op onwaar -- ook bij
+     een klant met een keurig werkende provider. Een org is nu
+     hoofdletterongevoelig, genormaliseerd op één plek: bij het lezen. */
+  const k = await api('/api/techniek/sso', { org: 'O-S', naam: 'Statusklant',
+    issuer: 'https://idp.statusklant.nl', clientId: 'cid', clientSecret: 'geheim',
+    domeinen: 'statusklant.nl' }, tech);
+  assert.equal(k.status, 200, 'de koppeling staat er: ' + JSON.stringify(k.body).slice(0, 140));
+
+  const met = await lees();
+  assert.equal(met.mag, true, 'en de bewering vindt hem, ondanks het verschil in hoofdletters');
+  assert.match(met.bron, /actieve OIDC-koppeling op 1 domein/);
 });
 
 test('5. "eigen domein" en "SLA" staan er altijd, en altijd op nee', async () => {

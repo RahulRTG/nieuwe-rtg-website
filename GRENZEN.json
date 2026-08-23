@@ -1366,6 +1366,7 @@
       "samen"
     ],
     "scim": [
+      "accounts",
       "tenant"
     ],
     "sleutelwoorden": [
@@ -1516,6 +1517,7 @@
       "sport"
     ],
     "sso": [
+      "accounts",
       "appUrl",
       "logInlog",
       "stateFor",

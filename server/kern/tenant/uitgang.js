@@ -17,16 +17,14 @@
       met naam in GEHEIM, en een toets rekent af dat geen enkel geheim uit de
       opstelling in de uitvoer voorkomt.
 
-   2. DE CHECKSUM IS ONGEZOUTEN, en dat is precies het verschil met
-      lib/vingerafdruk.js. Die zout per PROCES, omdat hij van buiten alleen mag
-      tonen DAT er iets veranderde. Een exportcatalogus moet juist op een andere
-      machine, in een ander jaar, door een andere partij na te rekenen zijn.
-      Twee instrumenten met tegengestelde eisen; ze delen daarom geen code.
+   2. DE CHECKSUM IS ONGEZOUTEN, anders dan lib/vingerafdruk.js: die zout per
+      proces omdat hij alleen mag tonen DAT er iets veranderde. Een catalogus
+      moet juist elders en later na te rekenen zijn. Tegengestelde eisen, dus
+      geen gedeelde code.
 
-   3. INLEZEN MAAKT ALTIJD EEN NIEUWE WERKRUIMTE, en nooit over een bestaande
-      heen. Een herstel dat kan overschrijven is een wapen zodra iemand het
-      verkeerde bestand kiest. En de leden komen terug ZONDER sleutel: toegang
-      teruggeven is een besluit van een mens, geen bijwerking van een herstel.
+   3. INLEZEN MAAKT ALTIJD EEN NIEUWE WERKRUIMTE. Een herstel dat kan
+      overschrijven is een wapen zodra iemand het verkeerde bestand kiest. De
+      leden komen terug ZONDER sleutel: toegang teruggeven is een besluit.
    ========================================================================== */
 'use strict';
 

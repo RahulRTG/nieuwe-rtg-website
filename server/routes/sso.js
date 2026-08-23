@@ -24,6 +24,7 @@ const sso = require('../sso');
 const koppelingen = require('../sso/koppelingen');
 const oidc = require('../sso/oidc');
 const staat = require('../sso/staat');
+const scimGroepen = require('../scim/groepen');
 const { log } = require('../log');
 
 const OVERDRACHT = 'sso-overdracht';
@@ -121,7 +122,15 @@ module.exports = (kern) => {
          pas met de provider. */
       try {
         if (kern.tenant) {
-          const uit = kern.tenant.brug.uitClaims(k.org, claims.groups, 'user-' + user.id, claims.name);
+          /* DE TWEE BRONNEN VAN GROEPSLIDMAATSCHAP, SAMEN. De claim uit het
+             token zegt wat de provider NU meestuurt; de SCIM-tabel zegt wat
+             hij ons eerder heeft geduwd. Alleen de claim lezen zou betekenen
+             dat een inlog de rollen wist die via /Groups zijn gezet -- en dan
+             is de nieuwe deur zijn eigen sloper. Alleen SCIM lezen zou een
+             provider die geen /Groups gebruikt buitensluiten. Dus de UNIE. */
+          const uitScim = scimGroepen.groepenVan(k.org, user.id);
+          const alleGroepen = [...new Set([].concat(Array.isArray(claims.groups) ? claims.groups : [], uitScim))];
+          const uit = kern.tenant.brug.uitClaims(k.org, alleGroepen, 'user-' + user.id, claims.name);
           if (uit.ok && uit.werkruimtes.length) log.info('tenant.brug', { org: k.org, werkruimtes: uit.werkruimtes.length });
         }
       } catch (e) {

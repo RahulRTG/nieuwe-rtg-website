@@ -62,7 +62,7 @@
     "test": "node scripts/test-runner.js",
     "test:coverage": "node --experimental-sqlite --experimental-test-coverage --test test/*.test.js",
     "pretest:gate": "npm run motor:build",
-    "test:gate": "node --experimental-sqlite --experimental-test-coverage --test-coverage-lines=78 --test-coverage-branches=78 --test-coverage-functions=65 --test test/*.test.js",
+    "test:gate": "node scripts/test-runner.js --dekking=78,78,65",
     "audit": "npm audit --audit-level=high",
     "secrets": "node scripts/geheimen.js",
     "schermen": "node scripts/schermen.js",

@@ -171,5 +171,10 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
         'De moederwerkruimte reist niet mee -- die verwijst naar een code die hier niet hoeft te bestaan.' };
   }
 
-  return { exporteer, controleer, lees, catalogus, som, canoniek, GEHEIM, VERSIE };
+  /* De leesbare vorm staat in een eigen bestand: hij is een OVERZICHT en geen
+     tweede uitvoer, en die twee door elkaar laten lopen is precies hoe er twee
+     waarheden ontstaan. */
+  const leesbaar = (uitvoer) => require('./uitgang-leesbaar').maak(uitvoer);
+
+  return { exporteer, controleer, lees, leesbaar, catalogus, som, canoniek, GEHEIM, VERSIE };
 };

@@ -239,6 +239,19 @@ een herstel dat kan overschrijven is een wapen zodra iemand het verkeerde
 bestand kiest. En de leden komen terug **zonder sleutel**: toegang teruggeven is
 een besluit van een mens, geen bijwerking van een herstel.
 
+**Een correctie op wat hier eerst stond.** Bij het opschrijven van deze laag
+noteerde ik dat de bijlagen en media van een werkruimte buiten
+`db.data.werkruimtes` wonen en dus niet meegaan. Dat is nagemeten en het klopt
+niet: de Werk OS-laag kent **geen bijlagen**. Een contract is er metadata met
+een uitgerekende opzegdag, geen PDF; er is nergens een upload. Alles wat een
+werkruimte bezit, staat in haar eigen subboom en gaat dus mee.
+
+Wat er wél buiten valt, en dat is een keuze en geen gat: de documenten, de
+agenda en de post van de **medewerkers**. Die horen bij hun eigen RTG-account —
+de werkruimte zag daar altijd al alleen tellingen van (`bedrijf/aansluiting.js`)
+— en wie ze wil, vraagt zijn eigen inzage aan. Het leesbare overzicht zegt dat
+met zoveel woorden onder "Wat er NIET in zit".
+
 ### De levensloop
 
 Vier standen, en geen zeven. `voorbereiding`, `proef` en `beperkt` stonden in de
@@ -399,11 +412,9 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 4. **Tenant Bootstrap** — gedaan, ondertekening open (4.56).
 5. **Identiteitsbrug** — gedaan voor OIDC-groepen en SCIM-deactivatie. SAML en
    SCIM `/Groups` staan open (4.54).
-6. **Levenscyclus en uitgang** — gedaan. Export met catalogus en recept,
-   inlezen in een nieuwe werkruimte, vier standen, bewaringsplicht, vernietiging
-   met bewijs. Wat hier NIET onder valt en apart moet: de bijlagen en media van
-   een werkruimte (die wonen buiten `db.data.werkruimtes`), en een uitvoer in een
-   leesbaar formaat naast de machineleesbare -- beide open in `TAKEN.md` 5.56.
+6. **Levenscyclus en uitgang** — gedaan. Export met catalogus en recept, een
+   leesbaar overzicht ernaast, inlezen in een nieuwe werkruimte, vier standen,
+   bewaringsplicht, vernietiging met bewijs.
 7. **Contract & quota** — gedaan. Drie pakketten, twee afgedwongen grenzen,
    een teller per tenant per uur die een herstart overleeft, en een verlopen
    contract dat niemand buitensluit. Niet afgedwongen en met naam genoemd:

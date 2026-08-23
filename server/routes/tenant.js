@@ -76,6 +76,12 @@ module.exports = (kern) => {
     const w = bedrijf.beheerVan(req, res); if (!w) return;
     const uit = tenant.uitgang.exporteer(w.code);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    /* `vorm: 'leesbaar'` geeft een overzicht in Markdown. Platte tekst en geen
+       PDF: een archief hoort over tien jaar nog open te gaan zonder een
+       bibliotheek die tegen die tijd niet meer bestaat. */
+    if (String((req.body || {}).vorm) === 'leesbaar') {
+      return res.type('text/markdown; charset=utf-8').send(tenant.uitgang.leesbaar(uit.uitvoer));
+    }
     res.json({ ok: true, ...uit.uitvoer });
   });
 

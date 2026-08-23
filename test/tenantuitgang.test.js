@@ -140,6 +140,31 @@ test('3. de uitvoer gaat er weer in, en levert dezelfde catalogus op', async () 
   assert.equal(lid.token, undefined, 'maar zonder sleutel: toegang teruggeven is een besluit');
 });
 
+test('3b. er is ook een LEESBARE uitvoer, en die doet zich niet voor als de echte', async () => {
+  const r = await fetch(base + '/api/tenant/export', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ werkruimte: ruimte, beheerToken: beheer, vorm: 'leesbaar' }) });
+  assert.equal(r.status, 200);
+  assert.match(r.headers.get('content-type') || '', /text\/markdown/, 'platte tekst, geen PDF');
+  const md = await r.text();
+
+  assert.match(md, /# Uitvoer van Vertrekkende Klant BV/, 'met de naam van de klant');
+  assert.match(md, /\| Pia \|/, 'en de mensen met hun rollen');
+  assert.match(md, /projectleider/);
+  assert.match(md, /12345678/, 'de bedrijfsgegevens staan erin');
+
+  /* DE BELANGRIJKSTE REGEL VAN DIT OVERZICHT: het zegt zelf dat het het
+     overzicht is en niet de uitvoer. Twee volledige uitvoeren naast elkaar
+     zouden de vraag oproepen welke van de twee geldt. */
+  assert.match(md, /Dit overzicht is niet de uitvoer zelf/);
+  assert.match(md, /Zelf narekenen/, 'en het recept staat er ook in');
+  assert.match(md, /Wat er NIET in zit/, 'inclusief wat er ontbreekt en waarom');
+
+  /* En hij lekt net zomin als de JSON. */
+  assert.ok(!md.includes(beheer), 'geen beheer-token in het overzicht');
+  assert.ok(!md.includes(lidToken), 'en geen lid-token');
+});
+
 test('4. de bewaring sluit de toegang -- en de uitgang blijft open', async () => {
   const zonderReden = await api('/api/techniek/tenant/levensloop', { org: ORG, naar: 'opzegging' }, tech);
   assert.equal(zonderReden.status, 400, 'een levensloop zonder reden is later niet te reconstrueren');

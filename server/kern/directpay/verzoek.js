@@ -4,33 +4,41 @@
    er rechtstreeks binnenkwam plus de openstaande verzoeken. Krijgt de gedeelde ctx van
    kern/directpay/index.js. */
 module.exports = (ctx) => {
-  const { db, save, ensure, centenVan, id, schoon, nu, ledger, publiek, betaalDirect,
+  const { db, save, ensure, centenVan, id, schoon, nu, ledger, publiek, betaalDirect, metIdem,
     findSupplier, sseToSupplier, MIN_CENTEN, MAX_CENTEN,
     directBetalingMetRef, directBetalingenVanZaak,
     betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe } = ctx;
 
   /* De leverancier stuurt een betaalverzoek op codenaam (of open aan wie het
      bekijkt). Het lid rekent het met Face ID af. */
-  function verzoekMaak({ supplierCode, actorName, naarCodename, bedragCenten, omschrijving }) {
+  async function verzoekMaak({ supplierCode, actorName, naarCodename, bedragCenten, omschrijving, idem }) {
     ensure();
     const s = findSupplier(supplierCode);
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog.' };
-    const v = {
-      ref: id('BV'), supplierCode: s.code, supplierName: s.name,
-      naarCodename: naarCodename ? schoon(naarCodename, 40) : null,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Betaalverzoek',
-      status: 'open', door: schoon(actorName, 60) || 'Beheer', betaaldDoor: null, betaaldRef: null, at: nu()
-    };
-    /* Ging met unshift + slice(0, 100000): een kopie van de hele array bij elk
-       verzoek, en de staart eraf zonder dat er iets bewaard werd. Nu via de
-       transactie-index, net als de betalingen zelf. */
-    betaalVerzoekenVoegToe(v);
-    save();
-    try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
-    return { status: 200, ok: true, verzoek: verzoekPubliek(v) };
+    /* EEN DUBBELTIK MAAKT HIER GELD (TAKEN.md 4.55). Elke oproep gaf een nieuw
+       verzoek met een eigen ref, en twee verzoeken van hetzelfde bedrag kan de
+       gast ALLEBEI afrekenen. De afdruk draagt de zaak, de ontvanger en het
+       bedrag -- niet de omschrijving: vrije tekst is geen ander verzoek en mag
+       dus geen 409 opleveren (zie de kop van server/lib/idem.js). */
+    return metIdem(idem ? 'bv:' + s.code + ':' + String(idem).slice(0, 60) : null,
+      'bv|' + s.code + '|' + (naarCodename ? schoon(naarCodename, 40) : '') + '|' + cent, () => {
+      const v = {
+        ref: id('BV'), supplierCode: s.code, supplierName: s.name,
+        naarCodename: naarCodename ? schoon(naarCodename, 40) : null,
+        bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Betaalverzoek',
+        status: 'open', door: schoon(actorName, 60) || 'Beheer', betaaldDoor: null, betaaldRef: null, at: nu()
+      };
+      /* Ging met unshift + slice(0, 100000): een kopie van de hele array bij elk
+         verzoek, en de staart eraf zonder dat er iets bewaard werd. Nu via de
+         transactie-index, net als de betalingen zelf. */
+      betaalVerzoekenVoegToe(v);
+      save();
+      try { sseToSupplier(s.code, 'sync', { scope: 'ontvangsten' }); } catch (e) {}
+      return { status: 200, ok: true, verzoek: verzoekPubliek(v) };
+    });
   }
   function verzoekPubliek(v) {
     return { ref: v.ref, supplierCode: v.supplierCode, supplierName: v.supplierName, naarCodename: v.naarCodename,

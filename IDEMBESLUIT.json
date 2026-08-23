@@ -5,14 +5,16 @@
   "creatie": "Een tweede oproep maakt een tweede item. Hinderlijk bij een dubbeltik, maar het raakt geen geld en het is soms juist gewenst (twee keer dezelfde notitie mag). Besloten: acceptabel zonder idem-sleutel.",
   "berekening": "Een POST die rekent of opzoekt en niets blijvends aanmaakt. Een tweede oproep hoort een VERSE uitkomst te geven; dat de proef verschil ziet, is precies goed.",
   "instelling": "Een waarde zetten of bewaren. Twee keer dezelfde waarde zetten geeft dezelfde eindstand -- effectief idempotent. Dat de proef verschil ziet, komt van een tijdstempel of een volgnummer in het antwoord, niet van een tweede effect.",
-  "tebeslissen": "HIER IS NOG GEEN BESLUIT OVER GENOMEN. Staat met naam in deze lijst zodat het niet als \"afgehandeld\" meetelt."
+  "tebeslissen": "HIER IS NOG GEEN BESLUIT OVER GENOMEN. Staat met naam in deze lijst zodat het niet als \"afgehandeld\" meetelt.",
+  "beschermd": "Liep hier onbeschermd en dat KOSTTE geld. Sinds de reparatie loopt de route door server/lib/idem.js; hij blijft in dit register staan zodat de geschiedenis zichtbaar is."
  },
  "telling": {
   "creatie": 40,
   "berekening": 35,
   "instelling": 12,
-  "tebeslissen": 12,
-  "code-maker": 3
+  "tebeslissen": 10,
+  "code-maker": 3,
+  "beschermd": 2
  },
  "routes": {
   "/api/agenda/toevoegen": {
@@ -256,8 +258,8 @@
    "klasse": "creatie"
   },
   "/api/supplier/betaalverzoek": {
-   "klasse": "tebeslissen",
-   "vraag": "Twee verzoeken van hetzelfde bedrag kunnen ALLEBEI worden betaald door de gast. Verdient waarschijnlijk een idem-sleutel."
+   "klasse": "beschermd",
+   "reden": "Raakte geld: elke oproep maakte een nieuw item (een cadeaukaart met saldo, een betaalbaar verzoek). Sinds TAKEN.md 4.55 loopt de route door metIdem met een afdruk op de geld-bepalende velden, en zet de app de knop op slot tijdens het verzoek."
   },
   "/api/supplier/command/operator/plan": {
    "klasse": "berekening"
@@ -278,8 +280,8 @@
    "klasse": "berekening"
   },
   "/api/supplier/giftcard/sell": {
-   "klasse": "tebeslissen",
-   "vraag": "Twee klikken geven TWEE cadeaukaarten met saldo -- de zaak geeft dan echt geld weg. Verdient waarschijnlijk een idem-sleutel."
+   "klasse": "beschermd",
+   "reden": "Raakte geld: elke oproep maakte een nieuw item (een cadeaukaart met saldo, een betaalbaar verzoek). Sinds TAKEN.md 4.55 loopt de route door metIdem met een afdruk op de geld-bepalende velden, en zet de app de knop op slot tijdens het verzoek."
   },
   "/api/supplier/horeca/bon/maak": {
    "klasse": "creatie"

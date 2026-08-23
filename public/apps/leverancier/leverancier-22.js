@@ -10,12 +10,21 @@
     const fnC = el.querySelector('#fnCsv'); if (fnC) fnC.addEventListener('click', () => dlBestand('/supplier/finance/export', { formaat: 'csv' }, 'RTG-boekhouding.csv'));
     btwBedrading(el); // de knoppen van de btw-aangifte; zie leverancier-12a.js
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
+      /* TWEE MAATREGELEN, EN ZE DOEN VERSCHILLENDE DINGEN (TAKEN.md 4.55).
+         De knop op slot vangt de DUBBELTIK: twee klikken binnen een seconde
+         sturen niet twee verzoeken. De idem-sleutel vangt de HERHALING van
+         dezelfde poging -- een hapering, of iemand die na een timeout opnieuw
+         probeert terwijl het verzoek wel is aangekomen. Zonder de sleutel gaf
+         dat een tweede cadeaukaart met saldo, en die is gewoon inwisselbaar. */
+      if (gS.disabled) return;
+      gS.disabled = true;
       try {
-        const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
+        const d = await API.call('/supplier/giftcard/sell',
+          { bedrag: Number(el.querySelector('#gcBedrag').value), idem: RTGIdem('gc') });
         finMsg = ''+T('fn.gcklaar','Cadeaukaart verkocht. Geef deze code mee:')+' <b style="color:var(--gold);">'+d.kaart.code+'</b> (€ '+d.kaart.bedrag+')';
         finData = null;
-        renderStation();
-      } catch(e){ toast(e.message); }
+        renderStation();   // hertekent het scherm, dus de knop komt vers terug
+      } catch(e){ gS.disabled = false; toast(e.message); }
     });
     const gR = el.querySelector('#gcRedeem'); if (gR) gR.addEventListener('click', async () => {
       try {

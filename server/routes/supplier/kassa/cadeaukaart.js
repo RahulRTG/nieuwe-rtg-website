@@ -13,17 +13,28 @@
    omzet -- en financeVoor meldt apart hoeveel er zo is afgeboekt. */
 module.exports = (kern) => {
   const { app, db, gcCode, logActivity, save, supplierAuth } = kern;
+  /* EEN DUBBELTIK GAF HIER TWEE KAARTEN MET SALDO (TAKEN.md 4.55), en die zijn
+     allebei inwisselbaar -- de zaak geeft het tweede bedrag weg. Dezelfde module
+     als RTG Pay en RTG Bank, met een eigen store zodat de sleutelruimtes
+     gescheiden blijven. De afdruk draagt de zaak en het bedrag; dat is wat een
+     verzoek hier bepaalt. */
+  const metIdem = require('../../../lib/idem')({ d: () => db.data, save, naam: 'kassaIdem', bijeen: db.bijeen });
 
-app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
+app.post('/api/supplier/giftcard/sell', supplierAuth, async (req, res) => {
   const bedrag = Math.round(Number(req.body.bedrag));
   if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
-    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
-  db.data.giftcards.unshift(kaart);
-  db.data.giftcards = db.data.giftcards.slice(0, 20000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
-  res.json({ ok: true, kaart });
+  const idem = req.body.idem ? 'gc:' + req.supplier.code + ':' + String(req.body.idem).slice(0, 60) : null;
+  const r = await metIdem(idem, 'gc|' + req.supplier.code + '|' + bedrag, () => {
+    const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
+      kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
+    db.data.giftcards.unshift(kaart);
+    db.data.giftcards = db.data.giftcards.slice(0, 20000);
+    save();
+    logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
+    return { ok: true, kaart };
+  });
+  if (r && r.error) return res.status(r.status || 409).json({ error: r.error });
+  res.json(r);
 });
 
 app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {

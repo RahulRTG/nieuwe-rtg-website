@@ -481,3 +481,50 @@ test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding 
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* -------------------------------------------------------------------------
+   10. EEN CADEAUKAART VERKOPEN WAS NIET IDEMPOTENT (TAKEN.md 4.55)
+
+   Elke oproep maakte een NIEUWE kaart met saldo. Een hapering of een retry na
+   een timeout gaf dus een tweede kaart van hetzelfde bedrag -- en die is
+   gewoon inwisselbaar, dus de zaak geeft dat bedrag echt weg. Gevonden bij het
+   opschrijven van de idempotentie-besluiten (4.30).
+
+   Wat een idem-sleutel WEL en NIET doet, want dat verschil hoort hier te
+   staan: hij vangt de HERHALING van dezelfde poging. Twee bewuste verkopen
+   achter elkaar horen twee kaarten te geven, en dat blijft zo -- die hebben
+   elk hun eigen sleutel. De dubbeltik zelf wordt aan de knop gevangen.
+   ------------------------------------------------------------------------- */
+test('10. een cadeaukaart verkopen met dezelfde sleutel geeft EEN kaart, geen twee', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    const eerste = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-1' }, mgr);
+    assert.equal(eerste.status, 200);
+    const code = eerste.body.kaart.code;
+
+    const herhaald = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-1' }, mgr);
+    assert.equal(herhaald.status, 200);
+    assert.equal(herhaald.body.kaart.code, code, 'dezelfde kaart terug, geen tweede met saldo');
+    assert.equal(herhaald.body.herhaald, true, 'de server merkt de herhaling zelf');
+
+    // een verse sleutel is wel een echte tweede verkoop
+    const tweede = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-2' }, mgr);
+    assert.notEqual(tweede.body.kaart.code, code, 'twee bewuste verkopen geven twee kaarten');
+
+    // dezelfde sleutel voor een ander bedrag is een fout, geen stille echo
+    const ander = await api(base, '/api/supplier/giftcard/sell', { bedrag: 500, idem: 'gc-vast-1' }, mgr);
+    assert.equal(ander.status, 409, 'dezelfde sleutel voor een ander bedrag wordt geweigerd');
+
+    /* En de proef op de som die er echt toe doet: hoeveel saldo staat er nu bij
+       deze zaak open? Twee kaarten van 250, niet drie -- want de herhaling en
+       de geweigerde 409 mogen geen saldo hebben aangemaakt. */
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(fin.body.giftcards.open, 500, 'het openstaande kaartsaldo is 2 x 250, niet meer');
+    assert.equal(fin.body.giftcards.aantal, 2, 'en er staan twee kaarten, geen vier');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

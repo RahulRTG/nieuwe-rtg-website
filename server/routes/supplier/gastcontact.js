@@ -77,10 +77,11 @@ app.post('/api/supplier/klant/salon', supplierAuth, (req, res) => {
 app.post('/api/supplier/ontvangsten', supplierAuth, (req, res) => {
   res.json(dpOntvangsten(req.supplier.code));
 });
-app.post('/api/supplier/betaalverzoek', supplierAuth, (req, res) => {
+app.post('/api/supplier/betaalverzoek', supplierAuth, async (req, res) => {
   const cent = req.body.centen != null ? Math.round(Number(req.body.centen)) : Math.round(Number(req.body.bedrag) * 100);
-  const r = dpVerzoekMaak({ supplierCode: req.supplier.code, actorName: req.actor.name,
-    naarCodename: req.body.codename, bedragCenten: cent, omschrijving: req.body.omschrijving });
+  // `idem` van de app: twee keer klikken hoort EEN verzoek te geven (TAKEN.md 4.55)
+  const r = await dpVerzoekMaak({ supplierCode: req.supplier.code, actorName: req.actor.name,
+    naarCodename: req.body.codename, bedragCenten: cent, omschrijving: req.body.omschrijving, idem: req.body.idem });
   if (r.error) return res.status(r.status).json({ error: r.error });
   logActivity(req.supplier.code, req.actor, 'stuurde een betaalverzoek van € ' + (cent / 100).toFixed(2));
   res.json(r);

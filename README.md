@@ -3400,7 +3400,17 @@ te zien in plaats van dat hij in uw cijfer verdwijnt. Onder de vloer van vijftig
 verzoeken komt er **geen** percentage maar de reden (nul fouten op drie
 verzoeken leest groener dan elk echt cijfer), routes zonder functie krijgen een
 eigen regel in plaats van te verdwijnen, en het venster staat erbij: de meting
-zit in het geheugen van dit proces en is dus geen maandcijfer. De stand is zichtbaar voor het
+zit in het geheugen van dit proces en is dus geen maandcijfer. Op die pagina staat ook de enige regel die een klant zelf waar kan
+maken: een knop **Herstelproef doen** (`kern/tenant/herstelproef.js`). Die
+exporteert de werkruimte, leest de uitvoer terug in een tijdelijke werkruimte,
+legt de inhoud per soort naast het origineel en ruimt die tijdelijke werkruimte
+daarna op -- altijd, ook als er onderweg iets stukloopt. Het resultaat wordt
+vastgelegd met een datum en wordt de bewering "Uitvoer teruggelezen en
+gecontroleerd". Wat het bewijst is het **exit-pad**; wat het NIET bewijst is dat
+onze eigen dagback-up terug te zetten is, en dat is de claim waar een SLA aan
+hangt -- die voorwaarde blijft dus op nee staan, ook na een geslaagde proef.
+
+De stand is zichtbaar voor het
 beheer-token of voor een lid met het recht `werkruimte` (dat draagt alleen
 `directie`) -- die tweede sleutel is er omdat het beheer-token in het Werk OS
 nergens wordt ingetypt, en een pagina die niemand kan openen is hetzelfde als

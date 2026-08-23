@@ -484,6 +484,16 @@ const EIGEN_MODULE = new Map([
      gooiende functiekaart laten doorslaan (dan is een fout in de CATALOGUS een
      storing in de METING). */
   ['metingcapaciteit.test.js', ['server/meting-capaciteit.js']],
+  /* DE HERSTELPROEF. Vijf mutaties, vijf raak -- maar DRIE ervan overleefden
+     eerst, en dat was terecht: ze gaan over dingen die via de API niet waar te
+     nemen zijn. De tijdelijke werkruimte laten staan is onzichtbaar zolang er
+     geen leespad naar de werkruimtebak is; `gelukt: true` hardcoderen valt niet
+     op zolang elke echte proef slaagt; en een proef die nooit verloopt merk je
+     pas over een halfjaar. Met een nagemaakte uitgang (toets 8, 9 en 10) zijn
+     ze alle drie wel te zien. Een toets die alleen kijkt waar het licht is,
+     dekt niet wat hij lijkt te dekken. Vijfde: een mislukte proef alsnog als
+     bewijs tellen. */
+  ['tenantherstelproef.test.js', ['server/kern/tenant/herstelproef.js', 'server/kern/tenant/bewijs-sla.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

@@ -5731,6 +5731,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "tenantherstelproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/herstelproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
     "tenantspine.test.js": {
       "soort": "puur",
       "staat": "gezakt",

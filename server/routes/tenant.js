@@ -99,18 +99,17 @@ module.exports = (kern) => {
      je grens zit, gaat dicht op precies het moment dat je hem nodig hebt.
 
      TWEE SLEUTELS, EN DAT IS EEN VERRUIMING MET EEN REDEN. Hij stond alleen
-     achter het beheer-token. Dat token typt niemand in het Werk OS in -- dat
-     scherm draait op een lid-token -- dus de stand bestond wel en was
-     onbereikbaar vanaf de enige plek waar hij hoort te staan. Een pagina die
-     niemand kan openen is hetzelfde als een pagina die er niet is.
+     achter het beheer-token, en dat typt niemand in het Werk OS in -- dat
+     scherm draait op een lid-token. De stand bestond dus en was onbereikbaar
+     vanaf de enige plek waar hij hoort te staan; een pagina die niemand kan
+     openen is hetzelfde als een pagina die er niet is.
 
-     De tweede sleutel is daarom een LID met het recht `werkruimte`, en dat is
-     geen willekeurige verruiming: in het rollenregister draagt alleen
-     `directie` dat recht, en dat is per definitie wie deze werkruimte beheert.
-     Wat er te zien is, past ook bij die persoon: contract, pakket, verbruik,
-     levensloop en de beweringen met hun bron -- geen persoonsgegevens, geen
-     journaalINHOUD (alleen het aantal regels) en geen sleutels. Wie het recht
-     mist, krijgt de 403 die het rollenmodel al geeft, met het recht erbij. */
+     De tweede sleutel is een LID met het recht `werkruimte`. In het
+     rollenregister draagt alleen `directie` dat, en dat is per definitie wie
+     deze werkruimte beheert. Wat er te zien is past daarbij: contract, pakket,
+     verbruik, levensloop en de beweringen met hun bron -- geen
+     persoonsgegevens, geen journaalINHOUD (alleen het aantal regels), geen
+     sleutels. Wie het recht mist krijgt de 403 van het rollenmodel. */
   app.post('/api/tenant/status', (req, res) => {
     req.geenQuotum = true;
     const w = viaBeheerOfDirectie(req, res); if (!w) return;
@@ -118,6 +117,23 @@ module.exports = (kern) => {
     if (!t) return res.json({ ok: true, tenant: null,
       let: 'Deze werkruimte hoort bij geen enkele organisatie met een contract. Er is dus geen tenantstand; de platformcijfers staan in SLO.md.' });
     res.json({ ok: true, status: tenant.bewijs.stand(t.org) });
+  });
+
+  /* ---------- de herstelproef ----------
+     Exporteren, teruglezen in een tijdelijke werkruimte, de catalogus per soort
+     vergelijken, en die tijdelijke werkruimte weer weg. Achter dezelfde deur
+     als de status, en NIET meegeteld in het quotum: dit is de proef op het
+     exit-recht, en die hoort niet stuk te lopen op een teller.
+
+     Wat hij bewijst staat in het antwoord zelf, en de grens staat er hard bij:
+     dit is het EXIT-pad en niet het terugzetten van de dagback-up van het
+     platform. Die tweede claim hangt onder de SLA en blijft onbewezen. */
+  app.post('/api/tenant/herstelproef', (req, res) => {
+    req.geenQuotum = true;
+    const w = viaBeheerOfDirectie(req, res); if (!w) return;
+    const uit = tenant.herstelproef.doe(w.code, req.body && req.body.beheerToken ? 'beheer' : 'directie');
+    if (uit.error) return res.status(uit.status || 400).json(uit);
+    res.json(uit);
   });
 
   /* Het beheer-token OF een lid met het recht `werkruimte`. Er wordt geen derde

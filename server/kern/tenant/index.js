@@ -106,11 +106,18 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
   const uitgang = require('./uitgang')({ db, save, crypto: null, register, merkVan });
   const levensloop = require('./levensloop')({ db, save, schoon, register, uitgang });
 
+  /* De herstelproef: exporteren, teruglezen in een tijdelijke werkruimte, de
+     catalogus per soort vergelijken, en die tijdelijke werkruimte weer weg.
+     Hij hangt aan de uitgang en niet ernaast, want hij bewijst precies die weg
+     en geen andere -- het terugzetten van de dagback-up van het PLATFORM is
+     een andere claim en blijft onbewezen. */
+  const herstelproef = require('./herstelproef')({ db, save, register, uitgang });
+
   /* De bewijslaag: welke enterprisebewering mag er vandaag op een scherm, en
      met welke bron. Hij leest de andere lagen en de omgeving (versleuteling,
      back-ups, de SSO-koppeling) en schrijft zelf niets. */
   const bewijs = require('./bewijs')({
-    register, contract, levensloop, db,
+    register, contract, levensloop, db, herstelproef,
     ssoKoppelingen: require('../../sso/koppelingen')
   });
 
@@ -119,5 +126,5 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
      opvragen en is de volgorde van dit bestand een raadsel. */
   const bootstrap = require('./bootstrap')({ db, register, brug, merkVan, bedrijf, contract, levensloop, bewijs });
 
-  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap, uitgang, levensloop, contract, bewijs };
+  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap, uitgang, levensloop, contract, bewijs, herstelproef };
 };

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1049 bestanden en 6986 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1050 bestanden en 6996 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1049 |
-| losse beweringen (`test(...)`) | 6986 |
+| toetsbestanden | 1050 |
+| losse beweringen (`test(...)`) | 6996 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 884 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 885 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-920 bestanden, 6763 beweringen.
+921 bestanden, 6773 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -818,6 +818,7 @@ toets omvalt.
 | `tenant.test.js` | 8 | gezakt op `===->!==#0` | DE TENANT CONTROL PLANE OVER DE LIJN -- de routes, het merk en de bootstrap. De regels van de spine en de brug staan in test/tenantspine.test.js; hier gaat het om wat er door de deur komt. |
 | `tenantbewijs.test.js` | 7 | gezakt op `===->!==#0` | DE BEWIJSPOORT -- geen enterprisebewering zonder bron. Dit bestand bestaat om een fout die dit huis echt heeft gemaakt: public/shared/enterprise-shell.js zette "Enterprise beveiligd · versleutelde werkruimte · audit... |
 | `tenantcontract.test.js` | 9 | gezakt op `===->!==#0` | HET CONTRACT EN HET QUOTUM -- wat een tenant mag, en hoeveel. Twee beweringen die van buiten niet te zien zijn, en allebei gaan ze over wat er NIET gebeurt: 1. |
+| `tenantherstelproef.test.js` | 10 | gezakt op `===->!==#0` | DE HERSTELPROEF -- en het verschil dat hij NIET mag verdoezelen. Een uitvoer die niemand ooit heeft teruggelezen, is een belofte. |
 | `tenantspine.test.js` | 15 | gezakt op `===->!==#0` | DE TENANT SPINE EN DE IDENTITEITSBRUG -- de regels, zonder server. Dit huis had drie codes die alle drie "de klant" leken te betekenen. |
 | `tenantuitgang.test.js` | 7 | gezakt op `===->!==#0` | DE UITGANG EN DE LEVENSLOOP -- weggaan zonder je geschiedenis te verliezen. Exit-recht is niet af met een knop die JSON teruggeeft. |
 | `terrein-en-panden.test.js` | 5 | gezakt op `liegpoort /api/` | TERREIN, PANDEN EN DIEREN -- 6 endpoints uit de supplier-groep. gebouw/zaal/weg, golf/tee/weg, pand/foto, charter/fotos, boerderij/dier en boerderij/water stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |

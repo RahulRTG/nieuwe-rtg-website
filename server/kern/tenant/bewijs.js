@@ -15,10 +15,13 @@
    het verschil tussen een afspraak en een gewoonte.
 
    DE CIJFERS ZIJN PLATFORMBREED EN DAT STAAT ERBIJ. De SLO's meten de hele
-   server, niet deze klant, en er is geen meting per capability. Een
-   statuspagina die platformcijfers als "uw beschikbaarheid" presenteert, is
-   preciezer dan de meting en dus onwaar. Wat we per tenant WEL weten -- zijn
-   contract, zijn levensloop, zijn verbruik -- staat apart.
+   server en niet deze klant. Een statuspagina die platformcijfers als "uw
+   beschikbaarheid" presenteert, is preciezer dan de meting en dus onwaar.
+   Sinds server/meting-capaciteit.js is er wel een meting per CAPABILITY, en
+   die staat er ook: daarmee is te zien of een storing zat in een onderdeel dat
+   deze klant gebruikt. Een cijfer per ORGANISATIE is er nog steeds niet, en
+   dus staat er ook geen. Wat we per tenant WEL weten -- zijn contract, zijn
+   levensloop, zijn verbruik -- staat apart.
 
    ER IS GEEN SLA, en dat is hier een berekening en geen mening: vier
    voorwaarden, en zolang er een van vier ontbreekt komt hij niet op `mag`.
@@ -26,24 +29,14 @@
    ========================================================================== */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const kluis = require('../../kluis');
 
-const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, '..', '..', 'data');
-
-/* Hoe oud mag de laatste dagback-up zijn voordat de bewering vervalt. Eén dag
-   speling: de back-up draait 's nachts, dus "gisteren" is de normale stand. */
-const BACKUP_DAGEN = 2;
-
-function laatsteBackup() {
-  try {
-    const map = path.join(DATA_DIR, 'backups');
-    if (!fs.existsSync(map)) return null;
-    const dagen = fs.readdirSync(map).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
-    return dagen.length ? dagen[dagen.length - 1] : null;
-  } catch (e) { return null; }
-}
+/* Wat de OMGEVING levert (back-ups, meting, een incidentproces) staat in
+   ./bewijs-sla.js. Dat is een andere vraag dan "welke bewering mag er op een
+   scherm", en de twee lopen alleen bij de SLA samen. */
+const sla = require('./bewijs-sla');
+const laatsteBackup = sla.laatsteBackup;
+const BACKUP_DAGEN = sla.BACKUP_DAGEN;
 
 /* De meting per capability. LUI geladen en in een try: deze module wordt ook
    los getoetst, zonder server en zonder functiecatalogus, en dan hoort er geen
@@ -59,30 +52,13 @@ function perCapability() {
   }
 }
 
-module.exports = ({ register, contract, levensloop, ssoKoppelingen, db }) => {
+module.exports = ({ register, contract, levensloop, ssoKoppelingen, db, herstelproef }) => {
   function werkruimtesVan(t) {
     const w = db.data.werkruimtes || {};
     return t.werkruimtes.map(c => (Object.prototype.hasOwnProperty.call(w, c) ? w[c] : null)).filter(Boolean);
   }
 
-  /* De vier voorwaarden onder een SLA, elk met hun eigen antwoord. Ze staan
-     los opgesomd en niet als één boolean: "nee" zonder te zeggen wat er
-     ontbreekt, is een dichte deur zonder sleutelgat. */
-  function slaVoorwaarden(t) {
-    const c = contract.van(t.org);
-    const back = laatsteBackup();
-    return [
-      { wat: 'een lopend contract', ja: !!(c && c.loopt),
-        reden: c && c.loopt ? 'pakket ' + c.pakket : 'er loopt geen contract voor deze organisatie' },
-      { wat: 'een meting', ja: true,
-        reden: 'server/meting.js telt elk verzoek; de doelen staan in SLO.json' },
-      { wat: 'een incidentproces met een gemeten reactietijd', ja: false,
-        reden: 'DATALEK.md beschrijft de 72-uursklok voor een datalek, maar er is geen ticketstroom die een reactietijd meet' },
-      { wat: 'een herstelproef', ja: false,
-        reden: back ? 'er staat een dagback-up van ' + back + ', maar het TERUGZETTEN is niet per tenant beproefd'
-          : 'er is geen dagback-up gevonden in de datamap' }
-    ];
-  }
+  const slaVoorwaarden = sla.maak({ contract, herstelproef });
 
   /* ---------- de beweringen ----------
      Elke regel: wat er op een scherm zou mogen staan, en waaraan je vandaag
@@ -90,6 +66,7 @@ module.exports = ({ register, contract, levensloop, ssoKoppelingen, db }) => {
      getoond -- dat is het hele punt van deze vorm. */
   function beweringen(t) {
     const c = contract.van(t.org);
+    const hp = herstelproef ? herstelproef.laatsteGeslaagde(t.org) : null;
     const l = levensloop.stand(t.org);
     const ruimtes = werkruimtesVan(t);
     const journaalregels = ruimtes.reduce((n, w) => n + ((w.journaal || []).length), 0);
@@ -119,6 +96,17 @@ module.exports = ({ register, contract, levensloop, ssoKoppelingen, db }) => {
       { id: 'dagelijkse-backup', tekst: 'Dagelijkse back-up', mag: !!backVers,
         bron: backVers ? 'laatste dagback-up: ' + back : null,
         reden: backVers ? null : (back ? 'de laatste back-up is van ' + back + ' en dus ouder dan ' + BACKUP_DAGEN + ' dagen' : 'er is geen dagback-up gevonden') },
+
+      /* DE UITVOER IS BEPROEFD, of hij is dat niet -- en dan staat er wat er
+         ontbreekt. Dit is de enige bewering hier die een klant zelf kan laten
+         ontstaan: hij drukt op de knop, de uitvoer wordt teruggelezen in een
+         tijdelijke werkruimte en de catalogus gaat per soort naast de eerste.
+         Wat het NIET is, staat in de bron: dit gaat over het exit-pad en niet
+         over het terugzetten van de dagback-up van het platform. */
+      { id: 'uitvoer-beproefd', tekst: 'Uitvoer teruggelezen en gecontroleerd', mag: !!(hp && hp.ok),
+        bron: hp && hp.ok ? 'op ' + hp.proef.at.slice(0, 10) + ' teruggelezen: ' + hp.proef.soorten +
+          ' soorten, ' + hp.proef.objecten + ' objecten, geen verschil. Dit bewijst het exit-pad, niet de platform-back-up.' : null,
+        reden: hp && hp.ok ? null : (hp ? hp.reden : 'de herstelproef is hier niet beschikbaar') },
 
       /* Twee beweringen die met opzet ALTIJD nee zijn. Ze staan er juist
          daarom: weglaten leest als vergeten, en dan typt iemand ze een keer

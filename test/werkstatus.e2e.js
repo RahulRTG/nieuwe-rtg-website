@@ -58,7 +58,11 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
     await post('/api/techniek/tenant/bind', { org: 'O-STAND', soort: 'werkruimte', code: w.werkruimte }, tech);
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    /* Een hoog venster: dit scherm heeft twee kolommen met elk vier kaarten, en
+   op 720 pixels valt de onderste knop buiten beeld. Een groter venster is
+   eerlijker dan de knop programmatisch aanklikken -- dan toets je of hij
+   BEREIKBAAR is en niet alleen of hij bestaat. */
+    const ctx = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 1500, height: 1400 } });
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -128,6 +132,25 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
     /* Wat WEL waar is, staat er met zijn bron en niet als los vinkje. */
     assert.match(p.waar, /Commercieel contract|Auditspoor|Versleutelde opslag/,
       'wat waar is staat er: ' + p.waar);
+
+    /* DE HERSTELPROEF ALS KNOP -- de enige regel op deze pagina die een klant
+       zelf waar kan maken. Vooraf staat de bewering op nee met de reden; na een
+       druk op de knop staat hij op ja met een datum. */
+    assert.match(p.nietWaar, /Uitvoer teruggelezen/, 'vooraf staat hij bij wat NIET waar is');
+    /* De kolommen van dit scherm scrollen elk apart, dus de knop staat buiten
+       het venster tot je erheen scrolt -- net als voor een mens. */
+    await page.evaluate(() => document.getElementById('stProef').scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(200);
+    await page.click('#stProef');
+    await page.waitForTimeout(1800);
+    const uitslag = await page.evaluate(() => document.getElementById('stProefUit').innerText.replace(/\s+/g, ' '));
+    assert.match(uitslag, /Geslaagd/, 'de proef slaagt: ' + uitslag);
+    assert.match(uitslag, /soorten/);
+    const nu2 = await lees();
+    assert.match(nu2.waar, /Uitvoer teruggelezen/, 'en daarna staat hij bij wat WEL waar is');
+    assert.ok(!/Uitvoer teruggelezen/.test(nu2.nietWaar), 'en niet meer bij wat niet waar is');
+    /* En de SLA blijft op nee: dit bewijst het exit-pad en niet de back-up. */
+    assert.match(nu2.nietWaar, /SLA/, 'de SLA blijft ontbreken');
 
     /* VERVERSEN VERVERST WAT ER OPEN STAAT. Dat deed het niet: de knop las
        `vStart.hidden ? 'modules' : 'start'` -- een gok die klopte bij twee

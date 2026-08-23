@@ -480,6 +480,28 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 6. **Levenscyclus en uitgang** — gedaan. Export met catalogus en recept, een
    leesbaar overzicht ernaast, inlezen in een nieuwe werkruimte, vier standen,
    bewaringsplicht, vernietiging met bewijs.
+
+   **En de uitgang is nu ook BEPROEFD, op knopdruk** (`kern/tenant/herstelproef.js`,
+   `POST /api/tenant/herstelproef`). Een uitvoer die niemand ooit heeft
+   teruggelezen is een belofte; dit maakt er een datum van. De proef exporteert,
+   leest terug in een tijdelijke werkruimte — dezelfde functie die een
+   vertrekkende klant gebruikt, geen aparte lus — legt de catalogus per soort
+   naast de eerste, en ruimt die tijdelijke werkruimte daarna op. Altijd, ook
+   als er onderweg iets stukloopt.
+
+   **Wat het bewijst en wat niet, en dat onderscheid is de kern.** Wel: dat deze
+   organisatie haar data terugkrijgt. Niet: dat de dagback-up van het *platform*
+   terug te zetten is — een andere claim, met een ander faalpad, en het is de
+   claim waar een SLA aan hangt. Die SLA-voorwaarde blijft daarom op nee staan,
+   óók na een geslaagde proef, met een reden die allebei noemt. Ze door elkaar
+   laten lopen zou de makkelijkste manier zijn om die voorwaarde op ja te
+   krijgen zonder dat er iets is veranderd.
+
+   Eén ding is hier fout gegaan en het staat in de code: de tijdelijke
+   werkruimte kreeg eerst een merk `proef: true` **op** de werkruimte. Dat veld
+   is gewone inhoud, dus het kwam in de uitvoer — en de vergelijking meldde
+   trouw dat er een soort `proef` was bijgekomen. Een marker die in het gemeten
+   object zit, meet zichzelf. Het register staat nu ernaast.
 7. **Contract & quota** — gedaan. Drie pakketten, twee afgedwongen grenzen,
    een teller per tenant per uur die een herstart overleeft, en een verlopen
    contract dat niemand buitensluit. Niet afgedwongen en met naam genoemd:

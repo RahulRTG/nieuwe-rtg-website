@@ -1680,7 +1680,14 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
+  /* `viaBeheerOfDirectie` (routes/tenant.js) is geen derde poort maar een keuze
+     tussen de twee die er al zijn: het beheer-token, of een lid met het recht
+     `werkruimte`. Hij belandde hier omdat deze regel 800 tekens vooruitkijkt en
+     bij de volgende route stopt -- staat de helperfunctie achter een tweede
+     route, dan valt zijn 403 buiten het venster en heet de eerste route
+     ongepoort. Bij naam noemen is eerlijker dan de code herschikken om een
+     tekstafstand te plezieren. */
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
      regel toevoegt schrijft er een reden bij die klopt; kun je dat niet, dan is

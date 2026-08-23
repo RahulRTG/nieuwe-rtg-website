@@ -109,8 +109,46 @@
       '<p class="stil">' + esc(p.nietGemeten || '') + '</p>' + capabilities(p.perCapability);
   }
 
+  /* DE HERSTELPROEF ALS KNOP. Hij verandert niets aan de werkruimte van de
+     klant -- er wordt geexporteerd, teruggelezen in een tijdelijke werkruimte
+     en die gaat daarna weg. Wat hij WEL doet is een bewering laten ontstaan,
+     en dat is precies waarom hij hier hoort: dit is de enige regel op deze
+     pagina die een klant zelf waar kan maken. */
+  function proefKnop() {
+    var knop = $('stProef');
+    if (!knop || knop._aan) return;
+    knop._aan = true;
+    knop.addEventListener('click', function () {
+      var s = K.sessie();
+      if (!s) return;
+      knop.disabled = true;
+      $('stProefUit').innerHTML = '<p class="stil">Bezig: exporteren, teruglezen, vergelijken…</p>';
+      fetch('/api/tenant/herstelproef', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) })
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (d) {
+          knop.disabled = false;
+          if (!d.proef) return ($('stProefUit').innerHTML = '<p class="stil">' + esc(d.error || 'Dat is niet gelukt.') + '</p>');
+          var p = d.proef;
+          $('stProefUit').innerHTML =
+            rij(p.gelukt ? 'Geslaagd' : 'Niet geslaagd',
+              p.soorten + ' soorten, ' + p.objecten + ' objecten') +
+            (p.verschillen.length
+              ? p.verschillen.map(function (v) { return rij(v.soort, v.wat); }).join('')
+              : '') +
+            '<p class="stil">' + esc(d.let) + '</p>';
+          window.RTGWerkStatus.laad();      // de bewering verandert mee
+        })
+        .catch(function () {
+          knop.disabled = false;
+          $('stProefUit').innerHTML = '<p class="stil">De proef is niet uitgevoerd. Er staat hier met opzet geen uitslag in de plaats.</p>';
+        });
+    });
+  }
+
   window.RTGWerkStatus = {
     laad: function () {
+      proefKnop();
       var s = K.sessie();
       if (!s) return;
       $('stLet').textContent = 'Laden…';

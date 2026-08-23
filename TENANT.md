@@ -528,6 +528,20 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    (`functies.functieVoorPad`, dezelfde kaart waarmee een eigenaar een functie
    uitzet). Er komt dus geen tweede telling en geen tweede catalogus bij.
 
+   **En één bewering bleek zwakker dan hij eruitzag.** "Dagelijkse back-up"
+   stond op ja zodra er een MAP bestond die `YYYY-MM-DD` heette — leeg, half
+   weggeschreven of met een `db.json` van nul bytes maakte niet uit. Dat is
+   precies de vorm waar deze laag tegen is: een bewering waarvan het enige
+   bewijs is dat er iets *staat* dat eruitziet als bewijs. `server/backupstand.js`
+   kijkt nu na of elk bestand dat LEEFT ook in de back-up staat en niet leeg is,
+   en of `db.json` opent. De BAK-01-check in `server/techniek.js` leest dezelfde
+   functie: twee oordelen over dezelfde back-up lopen vroeg of laat uiteen, en
+   dan zijn het geen oordelen meer maar meningen.
+
+   Wat het NIET is, en dat staat er ook zo: een aanwezigheidscontrole met
+   tanden, geen herstelproef. Of de INHOUD klopt, weet je pas als je hem
+   terugzet — en dat is de SLA-voorwaarde die nog steeds op nee staat.
+
    Wat dit WEL oplost: de reden dat er geen tenantcijfer stond, was dat een
    storing in een onderdeel dat een klant niet gebruikt als ZIJN storing zou
    verschijnen. Dat is nu te zien — per capability, met de drukste eerst.

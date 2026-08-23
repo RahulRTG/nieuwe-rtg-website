@@ -3390,6 +3390,18 @@ staat er uitgerekend -- vier voorwaarden, met de twee die ontbreken bij naam.
 Er staat geen beschikbaarheidscijfer voor de klant op maar de zin waarom niet:
 de telling gaat per routepatroon en draagt geen tenant.
 
+Eén bewering op die pagina bleek zwakker dan hij eruitzag, en dat is
+gerepareerd: **"Dagelijkse back-up" hing aan een mapNAAM.** Bestond er een map
+die `YYYY-MM-DD` heette, dan stond de bewering op ja -- leeg, half weggeschreven
+of met een `db.json` van nul bytes maakte niet uit. `server/backupstand.js`
+kijkt nu na of elk bestand dat in de levende datamap staat ook in de back-up
+staat en niet leeg is, en of `db.json` opent; de BAK-01-check in de technische
+pagina leest dezelfde functie. Een leeg `-wal` telt daarbij als gezond (dat is
+het na een checkpoint), en een bestand dat hier niet bestaat wordt de back-up
+niet verweten -- allebei omdat een meter die vals alarm geeft, genegeerd wordt.
+Het is een aanwezigheidscontrole met tanden en geen herstelproef: of de inhoud
+klopt weet je pas als je hem terugzet.
+
 Wat er wel staat is de **meting per capability** (`server/meting-capaciteit.js`).
 Dat was het laatste open punt van deze laag, en het is opgelost door twee dingen
 aan elkaar te knopen die er allebei al waren: de meting telt per routepatroon,

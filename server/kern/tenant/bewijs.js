@@ -37,6 +37,12 @@ const kluis = require('../../kluis');
 const sla = require('./bewijs-sla');
 const laatsteBackup = sla.laatsteBackup;
 const BACKUP_DAGEN = sla.BACKUP_DAGEN;
+/* Los binden en niet `sla.backupStand()` aanroepen: binnen beweringen() staat
+   een lokale `const sla = slaVoorwaarden(t)`, en die overschaduwt de module.
+   De aanroep viel dan in de dode zone van die lokale en gooide "Cannot access
+   'sla' before initialization" -- op de server, met een 500 en zeven gezakte
+   toetsen. Dezelfde valkuil als in herstelproef.js. */
+const backupStand = sla.backupStand;
 
 /* De meting per capability. LUI geladen en in een try: deze module wordt ook
    los getoetst, zonder server en zonder functiecatalogus, en dan hoort er geen
@@ -71,7 +77,8 @@ module.exports = ({ register, contract, levensloop, ssoKoppelingen, db, herstelp
     const ruimtes = werkruimtesVan(t);
     const journaalregels = ruimtes.reduce((n, w) => n + ((w.journaal || []).length), 0);
     const sso = ssoKoppelingen ? ssoKoppelingen.vind(t.org) : null;
-    const back = laatsteBackup();
+    const bstand = backupStand();
+    const back = bstand.er ? bstand.dag : null;
     const backVers = back && (Date.now() - Date.parse(back)) / 86400000 < BACKUP_DAGEN;
     const sla = slaVoorwaarden(t);
     const slaMist = sla.filter(v => !v.ja);
@@ -93,9 +100,16 @@ module.exports = ({ register, contract, levensloop, ssoKoppelingen, db, herstelp
         bron: c && c.loopt ? 'pakket ' + c.pakket + (c.tot ? ', tot ' + c.tot : ', voor onbepaalde tijd') : null,
         reden: c && c.loopt ? null : 'het contract is verlopen of nog niet gezet' },
 
-      { id: 'dagelijkse-backup', tekst: 'Dagelijkse back-up', mag: !!backVers,
-        bron: backVers ? 'laatste dagback-up: ' + back : null,
-        reden: backVers ? null : (back ? 'de laatste back-up is van ' + back + ' en dus ouder dan ' + BACKUP_DAGEN + ' dagen' : 'er is geen dagback-up gevonden') },
+      /* DE BACK-UP IS NAGEKEKEN EN NIET ALLEEN GETELD. Deze bewering stond op ja
+         zodra er een MAP bestond die YYYY-MM-DD heette -- leeg, half
+         weggeschreven of met een db.json van nul bytes maakte niet uit. Nu moet
+         hij vers EN compleet zijn, en waar dat niet zo is staat er wat eraan
+         mankeert. Zie server/backupstand.js. */
+      { id: 'dagelijkse-backup', tekst: 'Dagelijkse back-up', mag: !!(backVers && bstand.compleet),
+        bron: backVers && bstand.compleet ? 'dagback-up van ' + back + ', nagekeken: ' + bstand.reden : null,
+        reden: !back ? 'er is geen dagback-up gevonden'
+          : !backVers ? 'de laatste back-up is van ' + back + ' en dus ouder dan ' + BACKUP_DAGEN + ' dagen'
+            : 'de back-up van ' + back + ' is niet compleet: ' + bstand.reden },
 
       /* DE UITVOER IS BEPROEFD, of hij is dat niet -- en dan staat er wat er
          ontbreekt. Dit is de enige bewering hier die een klant zelf kan laten

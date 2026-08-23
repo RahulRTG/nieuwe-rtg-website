@@ -494,6 +494,12 @@ const EIGEN_MODULE = new Map([
      dekt niet wat hij lijkt te dekken. Vijfde: een mislukte proef alsnog als
      bewijs tellen. */
   ['tenantherstelproef.test.js', ['server/kern/tenant/herstelproef.js', 'server/kern/tenant/bewijs-sla.js']],
+  /* DE BACK-UPSTAND. Vijf mutaties, vijf raak: alles compleet noemen (dat IS de
+     oude toestand -- de bewering hing aan een mapnaam), de leegtecontrole eruit,
+     db.json niet openen, een leeg -wal toch als fout tellen (het valse alarm dat
+     de meter waardeloos maakt), en de oudste in plaats van de nieuwste back-up
+     pakken. */
+  ['backupstand.test.js', ['server/backupstand.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

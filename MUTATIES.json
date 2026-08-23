@@ -322,6 +322,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "backupstand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/backupstand.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
     "backupvolledig.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"

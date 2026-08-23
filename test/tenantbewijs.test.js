@@ -148,6 +148,24 @@ test('5. "eigen domein" en "SLA" staan er altijd, en altijd op nee', async () =>
   for (const v of sla.voorwaarden) assert.ok(v.reden && v.reden.length > 10, v.wat + ' legt zich uit');
 });
 
+test('5b. de back-upbewering hangt aan de INHOUD en niet aan een mapnaam', async () => {
+  /* Deze bewering stond op ja zodra er een MAP bestond die YYYY-MM-DD heette.
+     Leeg, half weggeschreven of met een db.json van nul bytes maakte niet uit --
+     een bewering waarvan het enige bewijs is dat er iets STAAT dat eruitziet
+     als bewijs. Het nakijken zelf zit in server/backupstand.js (met een eigen
+     toets); hier wordt alleen vastgelegd dat de BEWERING eraan hangt. */
+  const s = (await api('/api/tenant/status', { werkruimte: ruimte, beheerToken: beheer })).body.status;
+  const b = s.beweringen.find(x => x.id === 'dagelijkse-backup');
+  assert.ok(b, 'de bewering bestaat');
+  if (b.mag) {
+    assert.match(b.bron, /nagekeken/, 'op ja alleen met het resultaat van de controle erbij: ' + b.bron);
+    assert.match(b.bron, /aanwezig en niet leeg|db.json opent/, b.bron);
+  } else {
+    assert.ok(b.reden && b.reden.length > 20, 'en op nee met een reden die zegt WAT eraan mankeert: ' + b.reden);
+    assert.ok(!b.bron, 'zonder bron');
+  }
+});
+
 test('6. de platformcijfers worden niet als tenantcijfers gepresenteerd', async () => {
   const s = (await api('/api/tenant/status', { werkruimte: ruimte, beheerToken: beheer })).body.status;
   assert.match(s.platformbreed.wat, /over de hele server en niet over deze organisatie/);

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1032 bestanden en 6879 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1035 bestanden en 6897 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1032 |
-| losse beweringen (`test(...)`) | 6879 |
+| toetsbestanden | 1035 |
+| losse beweringen (`test(...)`) | 6897 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 867 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 870 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-906 bestanden, 6659 beweringen.
+908 bestanden, 6676 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -808,6 +808,8 @@ toets omvalt.
 | `techniek-functies.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietest: functieschakelaars met bevestiging. Een schakelactie maakt een AANVRAAG; er verandert pas iets nadat de eigenaar (Rahul) accepteert. |
 | `techniek-sso-scim.test.js` | 7 | gezakt op `liegpoort /api/` | DE BEDIENINGSLAAG VAN HET PLATFORM -- techniek, SSO, SCIM en de meting. Negenentwintig endpoints die de waargenomen dekkingsmeting als nooit aangeroepen aanwees, en ze horen bij elkaar: dit is de keten waarmee een... |
 | `techniek.test.js` | 11 | gezakt op `!==->===#0` | Tests voor de techniek-motor (server/techniek.js): de gezondheidschecks en de zekeringen. Zuiver, met een nagemaakte ctx; geen server of database nodig. |
+| `tenant.test.js` | 8 | gezakt op `===->!==#0` | DE TENANT CONTROL PLANE OVER DE LIJN -- de routes, het merk en de bootstrap. De regels van de spine en de brug staan in test/tenantspine.test.js; hier gaat het om wat er door de deur komt. |
+| `tenantspine.test.js` | 9 | gezakt op `===->!==#0` | DE TENANT SPINE EN DE IDENTITEITSBRUG -- de regels, zonder server. Dit huis had drie codes die alle drie "de klant" leken te betekenen. |
 | `terrein-en-panden.test.js` | 5 | gezakt op `liegpoort /api/` | TERREIN, PANDEN EN DIEREN -- 6 endpoints uit de supplier-groep. gebouw/zaal/weg, golf/tee/weg, pand/foto, charter/fotos, boerderij/dier en boerderij/water stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `theater-thuis.test.js` | 4 | gezakt op `liegpoort /api/` | Het Thuisarchief van RTG Theater: de maker bewaart de video op het eigen apparaat; RTG bewaart alleen titel en affiche. Kijken loopt rechtstreeks (WebRTC-datakanaal) van maker naar kijker; de server is puur... |
 | `theater.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Theater: de videobibliotheek op bioscoopniveau. Kanalen gaan pas open na menselijke goedkeuring; de bytes blijven exact het origineel (geen hercompressie) en komen met range-streaming terug; reacties op codenaam;... |
@@ -946,7 +948,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-126 bestanden, 220 beweringen.
+127 bestanden, 221 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1068,6 +1070,7 @@ toets omvalt.
 | `wereldbreedte.e2e.js` | 1 | genoemd | ELKE WERELD PAST OP EEN TELEFOON. Vier van de twaalf werelden liepen op 390px rechts buiten beeld: Partner Network 558, Private Office 557, Living OS 532, Instant Reality 459. |
 | `wereldlaag.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Wereld. test/wereldlaag.test.js bewijst de server-kant; deze bewijst dat de APP het doet, en vooral dat de NAAD werkt. |
 | `werkblad.e2e.js` | 1 | -- | RTG Kantoren en de middenconsole in een echte browser. Twee dingen die alleen daar te zien zijn: 1. |
+| `werkmerk.e2e.js` | 1 | gezakt op `&&->||#1` | HET MERK VAN DE KLANT IN EEN ECHTE BROWSER -- en waar het ophoudt. Dit is de white-label-vraag op het scherm waar hij toe doet: de medewerker van een klant ziet zijn eigen organisatie boven zijn werkruimte staan. |
 | `werkruimte-objecten.e2e.js` | 1 | genoemd | Scherm-test voor stap 7 uit WERKRUIMTE.md: objecten slepen tussen apps. Wat hier bewezen wordt is niet dat er iets beweegt, maar de twee regels die dit een operating environment maken in plaats van een desktop met... |
 | `werkruimte.e2e.js` | 1 | -- | Scherm-test voor de RTG Werkruimte: stap 5 (werkruimtes bewaren en terughalen) en stap 6 (het commandopalet) uit WERKRUIMTE.md. Wat hier bewezen wordt is dat de kamer ECHT terugkomt -- niet dat er een knop staat. |
 | `werkscherm.e2e.js` | 3 | -- | Het Werk OS-scherm in een echte browser: /apps/werk.html. Drie beweringen die van buiten NIET te zien zijn aan een groene API-toets: 1. |

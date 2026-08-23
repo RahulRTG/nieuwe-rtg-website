@@ -5652,6 +5652,22 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "tenant.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "tenantspine.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/register.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "terrein-en-panden.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6337,6 +6353,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "werkmerk.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/merk.js",
+      "operator": "&&->||#1",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "werkplaats-uitgifte.test.js": {
       "soort": "server",

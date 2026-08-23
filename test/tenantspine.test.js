@@ -14,10 +14,15 @@
    Draai los: node --test test/tenantspine.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const path = require('path');
 
-const WORTEL = path.join(__dirname, '..', 'server');
-const { ROLLEN } = require(path.join(WORTEL, 'bedrijf/rollen-register'));
+/* Rechtstreekse requires en geen samengesteld pad: de mutatiemotor leest de
+   requires van een toets om te weten WELKE module hij op de proef stelt
+   (scripts/mutatie.js, modulesVan). Een pad dat met path.join wordt opgebouwd
+   ziet hij niet, en dan telt deze toets als niet-gemeten terwijl hij dat wel
+   is. */
+const { ROLLEN } = require('../server/bedrijf/rollen-register');
+const maakRegister = require('../server/kern/tenant/register');
+const maakBrug = require('../server/kern/tenant/brug');
 
 /* Een minimale opslag in dezelfde vorm als db.data. Geen mock van de module
    die getoetst wordt -- alleen de bak eronder. */
@@ -27,8 +32,8 @@ function opzet() {
   const schoon = (t, n) => String(t == null ? '' : t).slice(0, n).trim();
   const zaken = { ESVEDRA: { code: 'ESVEDRA', name: 'Es Vedra' } };
   const findSupplier = (c) => zaken[String(c).toUpperCase()] || null;
-  const register = require(path.join(WORTEL, 'kern/tenant/register'))({ db, save, schoon, findSupplier });
-  const brug = require(path.join(WORTEL, 'kern/tenant/brug'))({ db, save, register });
+  const register = maakRegister({ db, save, schoon, findSupplier });
+  const brug = maakBrug({ db, save, register });
   const werkruimte = (code, naam) => {
     db.data.werkruimtes[code] = { code, naam, leden: {}, journaal: [] };
     return db.data.werkruimtes[code];

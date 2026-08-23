@@ -390,6 +390,21 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* DE TENANTLAAG: twee toetsen die de server als kindproces starten en dus
+     geen require van hun module dragen. Beide regels zijn met een mutatie
+     nagetrokken en niet gegokt.
+
+     tenant.test.js -> kern/tenant/index.js: de merkcontrole eruit halen
+     (`if (t.merk) return t.merk`) laat toets 4 zakken, en de groepsafbeelding
+     zonder tenant toestaan laat toets 5 zakken. -> kern/tenant/bootstrap.js:
+     een lege `quotas: {}` in het antwoord zetten laat toets 6 zakken.
+
+     werkmerk.e2e.js -> public/apps/werk/merk.js: de herkomstregel uit de voet
+     laten laat hem zakken. De grenscontrole zelf (de kleur die buiten de
+     merkbalk lekt) zit in de CSS en niet in een module -- die mutatie is met
+     de hand gedaan en staat in TENANT.md, niet hier. */
+  ['tenant.test.js', ['server/kern/tenant/index.js', 'server/kern/tenant/bootstrap.js']],
+  ['werkmerk.e2e.js', ['public/apps/werk/merk.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

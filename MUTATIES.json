@@ -706,6 +706,11 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "bronkas.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "btw-aangifte.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -116,6 +116,18 @@ test('2b: een bestand erbij of eraf maakt de kas ook ongeldig', () => {
   });
 });
 
+/* Twee soorten kapot, en ze worden door twee verschillende dingen gepakt.
+
+   De eerste versie van deze toets schreef er alleen ' half geschreven ' in. Dat
+   ziet de kas al aan de VORM -- er staat geen regeleinde op plek 64 -- en de
+   integriteitskop komt er niet eens aan te pas. Dat bleek toen ik die kop met
+   een mutatie weghaalde en de toets gewoon groen bleef: AFGESLAGEN, en dus een
+   toets die zijn eigen bewering niet dekte (LAT-regel 9).
+
+   De tweede soort is de gevaarlijke: een kasbestand met een PERFECT geldige
+   vorm waarvan alleen de inhoud niet meer klopt. Een halve schrijfactie op een
+   volle schijf ziet er zo uit, en zonder de sha op de eerste regel komt daar
+   een antwoord uit dat er goed uitziet en het niet is. */
 test('3: een kapotte kas valt terug op rekenen en dient geen rommel op', () => {
   metBoom((boom, kasHome) => {
     fs.writeFileSync(path.join(boom, 'a.txt'), 'aaa');
@@ -123,10 +135,21 @@ test('3: een kapotte kas valt terug op rekenen en dient geen rommel op', () => {
     const map = path.join(kasHome, path.basename(kas.kasMap(boom)));
     const bestanden = fs.readdirSync(map).filter(n => n.endsWith('.kas'));
     assert.equal(bestanden.length, 1, 'er hoort precies een kasbestand te staan, gevonden: ' + bestanden.join(', '));
-    fs.writeFileSync(path.join(map, bestanden[0]), ' half geschreven ');
+    const kasBestand = path.join(map, bestanden[0]);
+    const echt = fs.readFileSync(kasBestand, 'utf8');
 
+    // (a) onherkenbare vorm: dit hoort de vormcontrole al te pakken
+    fs.writeFileSync(kasBestand, ' half geschreven ');
+    assert.equal(draaiInKind(boom, kasHome).uit, een.uit, 'een vormloze kas mag geen andere uitkomst geven');
+
+    // (b) GELDIGE vorm, verkeerde inhoud -- alleen de sha op regel een ziet dit
+    const kop = echt.slice(0, echt.indexOf('\n'));
+    assert.equal(kop.length, 64, 'de kop hoort een sha256 in hex te zijn');
+    fs.writeFileSync(kasBestand, kop + '\n' + 'zzz-heel-iets-anders');
     const na = draaiInKind(boom, kasHome);
-    assert.equal(na.uit, een.uit, 'een kapotte kas mag NOOIT een andere uitkomst opleveren dan vers rekenen');
+    assert.equal(na.uit, een.uit,
+      'een kasbestand met een geldige kop maar verkeerde inhoud werd opgediend: de kas controleert zijn eigen inhoud niet');
+    assert.equal(na.gerekend, 1, 'en hij hoort dat opnieuw uit te rekenen in plaats van iets te verzinnen');
   });
 });
 
@@ -159,6 +182,27 @@ test('het UI-register geeft koud en warm hetzelfde antwoord, ook op wat NIET mag
       'een verzonnen tekst hoort NIET toegestaan te zijn -- zonder deze regel bewijst de vergelijking hierboven niets');
     assert.ok(koud.aantal > 1000, 'het register hoort echt gevuld te zijn (' + koud.aantal + ')');
   } finally { try { fs.rmSync(kasHome, { recursive: true, force: true }); } catch (e) {} }
+});
+
+test('5: de kas groeit niet onbeperkt -- hoogstens drie standen per soort', () => {
+  metBoom((boom, kasHome) => {
+    /* Zes verschillende broncodestanden achter elkaar. Zonder opruimen staan er
+       daarna zes kasbestanden; een broncodestand kost in het echt 16 MB, dus
+       dat is geen netheid maar het verschil tussen een versnelling en een lek. */
+    for (let i = 0; i < 6; i++) {
+      fs.writeFileSync(path.join(boom, 'a.txt'), 'stand-' + i);
+      draaiInKind(boom, kasHome);
+    }
+    const map = path.join(kasHome, path.basename(kas.kasMap(boom)));
+    const over = fs.readdirSync(map).filter(n => n.endsWith('.kas'));
+    assert.equal(over.length, 3, 'na zes standen horen er drie te staan, gevonden: ' + over.length);
+
+    /* En de NIEUWSTE hoort erbij te zitten: opruimen dat de verkeerde weggooit
+       maakt de kas per saldo trager in plaats van kleiner. */
+    fs.writeFileSync(path.join(boom, 'a.txt'), 'stand-5');
+    assert.equal(draaiInKind(boom, kasHome).gerekend, 0,
+      'de laatste stand hoort bewaard te zijn gebleven; anders ruimt hij de verkeerde op');
+  });
 });
 
 test('de kas schrijft nooit in de repository', () => {

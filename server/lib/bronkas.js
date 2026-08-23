@@ -179,8 +179,39 @@ function geheugen({ wortel, naam, sleutel, bereken, naarTekst, vanTekst }) {
     const tmp = bestand + '.' + process.pid + '.tmp';
     fs.writeFileSync(tmp, inpak(naarTekst(vers)));
     fs.renameSync(tmp, bestand);
+    ruimOp(map, naam);
   } catch (e) { tellers.fout++; }
   return vers;
 }
 
-module.exports = { manifestVan, sleutelUit, leesVersie, geheugen, bestandenOnder, kasMap, tellers };
+/* DE KAS MAG NIET ONBEPERKT GROEIEN.
+
+   Een broncodestand kost hier 16 MB (12 MB capability-graaf, 3 MB UI-register).
+   Elke wijziging aan de bron maakt een NIEUWE sleutel en dus een nieuw paar.
+   Wie een dag lang schakelt tussen takken laat zo honderden megabytes in de
+   tijdelijke map achter -- en dan is een versnelling een lek geworden.
+
+   Drie per soort blijven staan, op leeftijd. Niet een: heen en weer springen
+   tussen twee takken is normaal, en met een enkele plek zou dat elke keer weer
+   1,3 seconde per serverstart kosten. Drie vangt dat op zonder de map te laten
+   groeien.
+
+   Opruimen is nooit een reden om te falen: een bestand dat net door een andere
+   server is weggehaald geeft ENOENT, en die leest dan gewoon opnieuw. */
+function ruimOp(map, naam, houd) {
+  houd = houd || 3;
+  let namen;
+  try { namen = fs.readdirSync(map); } catch (e) { return; }
+  const mijn = namen.filter(n => n.startsWith(naam + '-') && n.endsWith('.kas'))
+    .map(n => {
+      const p = path.join(map, n);
+      try { return { p, t: fs.statSync(p).mtimeMs }; } catch (e) { return null; }
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.t - a.t);
+  for (const oud of mijn.slice(houd)) {
+    try { fs.unlinkSync(oud.p); } catch (e) { /* al weg, of van iemand anders */ }
+  }
+}
+
+module.exports = { manifestVan, sleutelUit, leesVersie, geheugen, bestandenOnder, kasMap, ruimOp, tellers };

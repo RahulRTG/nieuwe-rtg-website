@@ -418,6 +418,42 @@ function telSkips(bestanden, lees) {
 /* `bronnen` is er alleen voor de IJKING (test/meterijk.test.js) en is optioneel:
    zonder argument leest deze meter alles van schijf zoals altijd. Zie de uitleg
    bij `mutaties` hieronder voor waarom dat er is. */
+/* WELKE METER WAAR VANDAAN KOMT -- EN WAAROM DAT HIER STAAT.
+
+   meet() rekende de hele wereld uit en gaf 25 getallen terug. De ijking
+   (test/meterijk.test.js) roept hem 24 keer aan en leest er telkens EEN van.
+   Dat kostte 43,5 seconde per aanroep, waarvan 35,7 in een gespawnde
+   scripts/keuring.js -- ook als de gevraagde meter een readdir van test/ was.
+   Vierentwintig keer de wereld opnieuw analyseren voor een getal dat je al
+   kunt uitrekenen zonder hem.
+
+   `meet({ alleen: [...] })` rekent alleen de bronnen uit waar de gevraagde
+   meters op berusten. Deze tabel is dat contract: per bron de meters die eruit
+   komen. Hij staat hier en niet verspreid door meet(), zodat je in EEN oogopslag
+   ziet wat een meter nodig heeft -- en zodat een nieuwe meter die je vergeet toe
+   te voegen meteen opvalt in plaats van stil een verkeerd getal te geven.
+
+   DE HANDHAVER IS test/normsubset.test.js: die eist voor ELKE meter dat
+   meet({alleen:[m]})[m] exact gelijk is aan meet()[m]. Zet een meter in de
+   verkeerde groep en die toets zakt -- nagelopen met een mutatie. Zonder die
+   toets zou dit een snelheidstruc zijn die stil verkeerde getallen kan geven,
+   en dat is precies het soort meter waar LAT-regel 10 over gaat. */
+const METERBRONNEN = {
+  // de dure: een gespawnde keuring over de hele codebase (35,7 s)
+  keuring: ['endpointsZonderTest', 'dekkingPct', 'keuringStuk', 'keuringScheef',
+    'keuringTeGroot', 'keuringOmvang', 'keuringDubbeling', 'keuringDekkingAdvies'],
+  blind: ['bronBlindeBestanden'],
+  delen: ['delenZonderOnderwerp'],
+  grenzen: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'],
+  schakelbaar: ['routesNietSchakelbaar'],
+  stijl: ['inlineStijlAttributen'],
+  mutaties: ['toetsenOngevoeligPct', 'toetsenNietGemeten'],
+  skips: ['zelfpoortendeToetsen', 'browserpoortToetsen'],
+  ijkregister: ['metersOngeijkt'],
+  // goedkoop genoeg om altijd te doen: een readdir en een package.json
+  altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
+};
+
 /* MEET EEN BOOM, NIET PER SE DEZE BOOM.
 
    `bronnen.wortel` zegt WELKE werkboom gemeten wordt; zonder die optie is dat
@@ -439,6 +475,17 @@ function meet(bronnen) {
      half klopt en dat nergens zegt. Node cachet per opgelost pad, dus elke boom
      krijgt vanzelf zijn eigen exemplaar. */
   const SCRIPTS = path.join(WORTEL, 'scripts');
+
+  /* Welke bronnen heeft deze aanroep nodig? Zonder `alleen` allemaal, precies
+     zoals voorheen -- de CLI en scripts/normbasis.js willen het hele beeld. */
+  const alleen = (bronnen && bronnen.alleen) ? new Set([].concat(bronnen.alleen)) : null;
+  if (alleen) {
+    const bekend = new Set(Object.values(METERBRONNEN).flat());
+    for (const m of alleen) {
+      if (!bekend.has(m)) throw new Error('meet({alleen}) kent de meter "' + m + '" niet; zet hem in METERBRONNEN');
+    }
+  }
+  const nodig = (bron) => !alleen || METERBRONNEN[bron].some(m => alleen.has(m));
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
      moment dat er iets te meten viel -- de meetketen brak als de meting niet
@@ -450,14 +497,16 @@ function meet(bronnen) {
      teruggeeft is geslaagd; een keuring die niets teruggeeft (of onleesbaars)
      is een echte storing en die gooit alsnog, met de eerste regels van zijn
      eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
+  let k = null;
+  if (nodig('keuring')) {
   const r = spawnSync(process.execPath,
     ['--experimental-sqlite', path.join(SCRIPTS, 'keuring.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
-  let k = null;
   try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
   if (!k || !k.cijfers) {
     throw new Error('de keuring gaf geen leesbaar rapport (exit ' + r.status + '): ' +
       String(r.stderr || r.stdout || '').trim().split('\n').slice(0, 3).join(' | ').slice(0, 300));
+  }
   }
 
   /* De dependencies tellen we uit package.json zelf en niet uit een rapport:
@@ -514,7 +563,7 @@ function meet(bronnen) {
      de hele testmap: alleen meterijk.test.js verandert, 78 -> 77). */
   const zonderTekst = (b) => String(b)
     .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
-  const skips = telSkips(inMap.filter(n => /\.(test|e2e)\.js$/.test(n)),
+  const skips = !nodig('skips') ? {} : telSkips(inMap.filter(n => /\.(test|e2e)\.js$/.test(n)),
     (f) => zonderTekst(zonderCommentaar(fs.readFileSync(path.join(testMap, f), 'utf8'))));
   const zelfpoortendeToetsen = skips.dienst;
   const browserpoortToetsen = skips.browser;
@@ -543,7 +592,7 @@ function meet(bronnen) {
 
      Wat hiermee NIET is bewezen: dat de standaardlezer naar het juiste pad
      wijst. Dat is die ene regel hieronder, en die staat er onbedekt bij. */
-  const mutaties = (() => {
+  const mutaties = !nodig('mutaties') ? {} : (() => {
     const p = path.join(WORTEL, 'MUTATIES.json');
     const lees = (bronnen && bronnen.leesMutaties) || (() => fs.readFileSync(p, 'utf8'));
     let rauw;
@@ -567,6 +616,8 @@ function meet(bronnen) {
   })();
 
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
+  let inlineStijlAttributen;
+  if (nodig('stijl')) {
   const PUB = path.join(WORTEL, 'public');
   const bundelPaden = new Set(Object.keys(require(path.join(SCRIPTS, 'bundel')).bundels).map(k => path.join(PUB, k)));
   const stijlBestanden = [];
@@ -578,42 +629,53 @@ function meet(bronnen) {
       if (/\.(html|js)$/.test(naam) && !bundelPaden.has(p)) stijlBestanden.push(p);
     }
   })(PUB);
-  const inlineStijlAttributen = telInlineStijl(p => fs.readFileSync(p, 'utf8'), stijlBestanden);
+  inlineStijlAttributen = telInlineStijl(p => fs.readFileSync(p, 'utf8'), stijlBestanden);
+  }
 
   /* De kruisproef op de commentaar-verwijderaar, uit dezelfde bron als de toets
      die hem bewaakt (regel 4: geen tweede implementatie). Faalt hij, dan zakt de
      meter in plaats van stil nul te geven -- juist bij een meter die over
      blindheid gaat is een stille nul de ergste uitkomst. */
   let bronBlindeBestanden;
-  try { bronBlindeBestanden = require(path.join(SCRIPTS, 'lib', 'bronblind')).meetBlind({ wortel: WORTEL }).ongedekt; }
-  catch (e) { throw new Error('de kruisproef op de commentaar-verwijderaar kon niet draaien (' + e.message + '); een meter zonder invoer is geen meter'); }
+  if (nodig('blind')) {
+    try { bronBlindeBestanden = require(path.join(SCRIPTS, 'lib', 'bronblind')).meetBlind({ wortel: WORTEL }).ongedekt; }
+    catch (e) { throw new Error('de kruisproef op de commentaar-verwijderaar kon niet draaien (' + e.message + '); een meter zonder invoer is geen meter'); }
+  }
 
   /* De delen zonder onderwerpregel, uit dezelfde bron als BUNDELS.md zelf
      (regel 4: geen tweede implementatie). */
   let delenZonderOnderwerp;
-  try {
-    const { delenVan } = require(path.join(SCRIPTS, 'deelindex'));
-    delenZonderOnderwerp = Object.values(require(path.join(SCRIPTS, 'bundel')).bundels)
-      .reduce((som, map) => som + delenVan(map).filter(d => !d.onderwerp).length, 0);
-  } catch (e) { throw new Error('de bundeldelen konden niet worden gelezen (' + e.message + '); een meter zonder invoer is geen meter'); }
+  if (nodig('delen')) {
+    try {
+      const { delenVan } = require(path.join(SCRIPTS, 'deelindex'));
+      delenZonderOnderwerp = Object.values(require(path.join(SCRIPTS, 'bundel')).bundels)
+        .reduce((som, map) => som + delenVan(map).filter(d => !d.onderwerp).length, 0);
+    } catch (e) { throw new Error('de bundeldelen konden niet worden gelezen (' + e.message + '); een meter zonder invoer is geen meter'); }
+  }
 
   /* De grenzen uit dezelfde bron als het losse script (regel 4: geen tweede
      implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
-  let grenzen;
-  try { grenzen = require(path.join(SCRIPTS, 'grenzen')).meet(); }
-  catch (e) { throw new Error('de grenzen konden niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+  let grenzen = {};
+  if (nodig('grenzen')) {
+    try { grenzen = require(path.join(SCRIPTS, 'grenzen')).meet(); }
+    catch (e) { throw new Error('de grenzen konden niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+  }
 
   /* De schakelbaarheid uit dezelfde bron als het losse script: een tweede
      implementatie zou binnen een week uiteenlopen (regel 4). */
-  let routesNietSchakelbaar = 0;
-  try { routesNietSchakelbaar = require(path.join(SCRIPTS, 'schakelbaar')).meet().ongedekt.length; }
-  catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+  let routesNietSchakelbaar;
+  if (nodig('schakelbaar')) {
+    try { routesNietSchakelbaar = require(path.join(SCRIPTS, 'schakelbaar')).meet().ongedekt.length; }
+    catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
+  }
 
   /* Hoeveel meters staan er in de ijk-registratie met alleen een REDEN? Die
      hebben we dus NIET zien uitslaan. De teller leest het registratiebestand
      zelf, want een getal dat je hier hardcodeert is precies het soort meter
      waar regel 10 over gaat. Ontbreekt het bestand, dan is niets geijkt en
      hoort deze meter dat te zeggen in plaats van stil nul te geven. */
+  let metersOngeijkt;
+  if (nodig('ijkregister')) {
   const ijkPad = path.join(WORTEL, 'test/meterijk.test.js');
   if (!fs.existsSync(ijkPad)) {
     throw new Error('test/meterijk.test.js ontbreekt; dan is geen enkele meter geijkt en kan deze meter niet meten');
@@ -627,7 +689,8 @@ function meet(bronnen) {
     const bron = fs.readFileSync(path.join(WORTEL, 'scripts', b), 'utf8');
     for (const m of bron.matchAll(/^const METER[A-Z_]*\s*=\s*'([a-zA-Z0-9]+)'/gm)) losseSleutels.push(m[1]);
   }
-  const metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'), losseSleutels);
+  metersOngeijkt = telOngeijkt(fs.readFileSync(ijkPad, 'utf8'), losseSleutels);
+  }
 
   /* EEN MISLUKTE METING IS GEEN NUL, en hier was dat de duurste vorm ervan.
 
@@ -644,19 +707,26 @@ function meet(bronnen) {
      dat gebeurde vanzelf toen de kaart over de 146 kilobyte kwam. LAT.md regel 3
      zegt wat er dan hoort te gebeuren: een meter zakt als zijn invoer ontbreekt.
      Dus zakt hij, net als hierboven bij een ontbrekende ijkregistratie. */
-  if (!k.cijfers.dekking || !k.cijfers.dekking.routes) {
+  /* Alleen als de keuring ook echt gedraaid heeft. Zonder `k` is deze meting
+     niet mislukt maar niet GEVRAAGD -- dat is een ander ding, en hier hard
+     zakken zou elke deelmeting zonder keuringmeter omgooien. */
+  if (k && (!k.cijfers.dekking || !k.cijfers.dekking.routes)) {
     throw new Error('de routekaart gaf geen routes; dan zijn endpointsZonderTest en dekkingPct niet gemeten ' +
       '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
   }
 
-  return {
+  /* Bij `alleen` komen ALLEEN de gevraagde sleutels terug. Niet de rest op
+     undefined laten staan: dan zou `na.X - voor.X` voor een meter die je niet
+     hebt gevraagd stilletjes NaN worden en de proef om de verkeerde reden
+     zakken -- of, erger, 0 lijken. Een sleutel die er niet is, is er niet. */
+  const alles = {
     metersOngeijkt,
     routesNietSchakelbaar,
-    endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
-    dekkingPct: k.cijfers.dekking.pct || 0,
-    keuringStuk: k.stuk, keuringScheef: k.scheef,
-    keuringTeGroot: (k.cijfers.uitschieters || {}).teGroot || 0,
-    ...telPerGroep(k),
+    endpointsZonderTest: k ? (k.cijfers.dekking.ongedekt || []).length : undefined,
+    dekkingPct: k ? (k.cijfers.dekking.pct || 0) : undefined,
+    keuringStuk: k ? k.stuk : undefined, keuringScheef: k ? k.scheef : undefined,
+    keuringTeGroot: k ? ((k.cijfers.uitschieters || {}).teGroot || 0) : undefined,
+    ...(k ? telPerGroep(k) : {}),
     kernBreedte: grenzen.kernBreedte, kernGedeeld: grenzen.kernGedeeld,
     kernBreedsteBestand: grenzen.kernBreedsteBestand,
     kernOngebruikt: grenzen.kernOngebruikt,
@@ -667,6 +737,10 @@ function meet(bronnen) {
     bronBlindeBestanden,
     delenZonderOnderwerp
   };
+  if (!alleen) return alles;
+  const uit = {};
+  for (const m of alleen) uit[m] = alles[m];
+  return uit;
 }
 
 /* ONTBREEKT HIJ, OF IS HIJ KAPOT? DAT IS NIET HETZELFDE.
@@ -869,4 +943,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };
+module.exports = { meet, METERBRONNEN, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };

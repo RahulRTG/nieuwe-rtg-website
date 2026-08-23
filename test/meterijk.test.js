@@ -129,7 +129,8 @@ function metIjkRoutes(voor) {
     extra += "  kern.app.post('" + IJKSTAM + 'n' + i + "', (req, res) => res.json({ ok: true }));\n";
   }
   extra += '};\n';
-  const na = metAanbouw('server/routes/klok.js', extra, () => meet());
+  const na = metAanbouw('server/routes/klok.js', extra,
+    () => meet({ alleen: ['endpointsZonderTest', 'dekkingPct', 'keuringDekkingAdvies'] }));
   _routeGat = { zonderTest: na.endpointsZonderTest - voor.endpointsZonderTest,
     pctVal: voor.dekkingPct - na.dekkingPct,
     /* De honderd ijkroutes zitten onder /api/zzijkproef/, dus ze vormen een NIEUW
@@ -183,12 +184,12 @@ const IJKINGEN = {
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
-      () => meet().testbestanden - voor.testbestanden)
+      () => meet({ alleen: ['testbestanden'] }).testbestanden - voor.testbestanden)
   },
   e2eBestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.e2e.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
-      () => meet().e2eBestanden - voor.e2eBestanden)
+      () => meet({ alleen: ['e2eBestanden'] }).e2eBestanden - voor.e2eBestanden)
   },
   zelfpoortendeToetsen: {
     // een toets die zichzelf overslaat MOET meetellen; de vorm met een
@@ -196,7 +197,7 @@ const IJKINGEN = {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\nconst aan = false;\n" +
       "test('ijk', { skip: aan ? false : 'geen dienst' }, () => {});\n",
-      () => meet().zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
+      () => meet({ alleen: ['zelfpoortendeToetsen'] }).zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
   },
   browserpoortToetsen: {
     /* DE TWEEDE HELFT VAN DEZELFDE TELLING, en de proef staat er vooral om de
@@ -220,7 +221,7 @@ const IJKINGEN = {
     // een productbestand vlak onder de 10 kB-grens hoort opgemerkt te worden
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(9900) + '";\nmodule.exports = { x };\n',
-      () => meet().keuringOmvang - voor.keuringOmvang)
+      () => meet({ alleen: ['keuringOmvang'] }).keuringOmvang - voor.keuringOmvang)
   },
   keuringTeGroot: {
     /* HETZELFDE BESTAND, MAAR DAN ECHT TE GROOT. En dat is niet zomaar een
@@ -234,7 +235,7 @@ const IJKINGEN = {
        andere wegvalt. */
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(12000) + '";\nmodule.exports = { x };\n',
-      () => meet().keuringTeGroot - voor.keuringTeGroot)
+      () => meet({ alleen: ['keuringTeGroot'] }).keuringTeGroot - voor.keuringTeGroot)
   },
   inlineStijlAttributen: {
     /* DE RATEL OP DE LAATSTE unsafe-inline. Twee kanten geijkt, want dit getal
@@ -495,7 +496,7 @@ const IJKINGEN = {
       const namen = fs.readdirSync(path.join(WORTEL, 'test'))
         .filter(n => n.endsWith('.test.js')).sort().slice(0, 3);
       for (const naam of namen) j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
-      const na = meet({ leesMutaties: () => JSON.stringify(j) });
+      const na = meet({ alleen: ['toetsenOngevoeligPct'], leesMutaties: () => JSON.stringify(j) });
       return na.toetsenOngevoeligPct - voor.toetsenOngevoeligPct;
     }
   },
@@ -508,7 +509,7 @@ const IJKINGEN = {
       const gemeten = Object.keys(j.toetsen).filter(k => j.toetsen[k].staat === 'gezakt' || j.toetsen[k].staat === 'overleefd');
       if (!gemeten.length) throw new Error('MUTATIES.json bevat geen enkele gemeten toets, dus deze ijking kan niets aanwijzen');
       delete j.toetsen[gemeten[0]];
-      const na = meet({ leesMutaties: () => JSON.stringify(j) });
+      const na = meet({ alleen: ['toetsenNietGemeten'], leesMutaties: () => JSON.stringify(j) });
       return na.toetsenNietGemeten - voor.toetsenNietGemeten;
     }
   },
@@ -523,7 +524,7 @@ const IJKINGEN = {
         const j = JSON.parse(oud);
         j.dependencies = Object.assign({}, j.dependencies, { 'zz-ijk-tijdelijk': '^1.0.0' });
         fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        return meet().dependencies - voor.dependencies;
+        return meet({ alleen: ['dependencies'] }).dependencies - voor.dependencies;
       } finally { fs.writeFileSync(p, oud); }
     }
   },
@@ -541,7 +542,7 @@ const IJKINGEN = {
         const j = JSON.parse(oud);
         j.devDependencies = Object.assign({}, j.devDependencies, { 'zz-ijk-dev': '^1.0.0' });
         fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        const na = meet();
+        const na = meet({ alleen: ['dependencies', 'devPakketten'] });
         assert.equal(na.dependencies, voor.dependencies,
           'een dev-pakket hoort de RUNTIME-meter met rust te laten, anders is de scheiding er alleen op papier');
         return na.devPakketten - voor.devPakketten;
@@ -663,7 +664,7 @@ const IJKINGEN = {
       '  const { app } = kern;\n' +
       '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ realName: \'Jan Jansen\' }));\n' +
       '};\n',
-      () => meet().keuringStuk - voor.keuringStuk)
+      () => meet({ alleen: ['keuringStuk'] }).keuringStuk - voor.keuringStuk)
   },
   keuringScheef: {
     /* Een tekst die zegt dat een boeking bevestigd is. Dat mag dit huis nooit
@@ -678,7 +679,7 @@ const IJKINGEN = {
          dat te zien. */
       '/* tijdelijk ijkbestand */\n' +
       'module.exports = () => ({ melding: \'Uw boeking is bevestigd en staat klaar.\' });\n',
-      () => meet().keuringScheef - voor.keuringScheef)
+      () => meet({ alleen: ['keuringScheef'] }).keuringScheef - voor.keuringScheef)
   },
   keuringDubbeling: {
     /* DRIE KERNMODULES MET DEZELFDE FUNCTIENAAM. De reden die hier stond
@@ -692,7 +693,7 @@ const IJKINGEN = {
         'function zzIjkTijdelijkeNaam(x) { return x; }\n' +
         'module.exports = { zzIjkTijdelijkeNaam };\n';
       const ga = (i) => i === paden.length
-        ? meet().keuringDubbeling - voor.keuringDubbeling
+        ? meet({ alleen: ['keuringDubbeling'] }).keuringDubbeling - voor.keuringDubbeling
         : metTijdelijkBestand(paden[i], inhoud, () => ga(i + 1));
       return ga(0);
     }
@@ -731,7 +732,7 @@ const IJKINGEN = {
       '  const { app } = kern;\n' +
       '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ ok: true }));\n' +
       '};\n',
-      () => meet().routesNietSchakelbaar - voor.routesNietSchakelbaar)
+      () => meet({ alleen: ['routesNietSchakelbaar'] }).routesNietSchakelbaar - voor.routesNietSchakelbaar)
   },
   onbewaakt: {
     /* EEN REGEL IN LAT.md ZONDER HANDHAVER. De reden die hier stond ("gaat over
@@ -975,9 +976,13 @@ test('DE TEGENPROEF: een BRUIKBARE lezer laat de meter gewoon meten', () => {
   /* Zonder deze zou de toets hierboven ook groen blijven als meet() ALTIJD
      gooit, en dan bewijst hij dat een kapotte meter goed gebouwd is. */
   const echt = fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8');
-  const na = meet({ leesMutaties: () => echt });
+  /* Allebei de mutatiemeters opvragen: deze toets leest ze allebei, en ze komen
+     uit dezelfde bron dus het kost niets extra. Vraag je er een niet op, dan is
+     hij er niet -- en dat merkte deze toets meteen toen hij nog alleen
+     toetsenNietGemeten vroeg. Precies de bedoeling: niet gevraagd is niet 0. */
+  const na = meet({ alleen: ['toetsenNietGemeten', 'toetsenOngevoeligPct'], leesMutaties: () => echt });
   assert.equal(typeof na.toetsenOngevoeligPct, 'number');
-  assert.equal(na.toetsenNietGemeten, meet().toetsenNietGemeten,
+  assert.equal(na.toetsenNietGemeten, meet({ alleen: ['toetsenNietGemeten'] }).toetsenNietGemeten,
     'dezelfde inhoud via de lezer hoort hetzelfde getal te geven als van schijf');
 });
 

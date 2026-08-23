@@ -3281,6 +3281,16 @@
       "gezakt": 1,
       "geprobeerd": 10
     },
+    "normsubset.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "gezakt": 0,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "scripts/norm.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
+    },
     "notities.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -37,6 +37,44 @@ function definities(bron) {
   return uit;
 }
 
+/* HOEVEEL ER OPENSTAAN, per genummerde paragraaf. Een OPEN regel draagt zijn
+   nummer kaal (`| 4.24 |`), een afgeronde doorgestreept (`| ~~4.24~~ |`) -- dus
+   dit is `definities()` met precies de vorm die daar bewust wordt genegeerd.
+
+   Waarom dit hier woont en niet alleen in de kop van TAKEN.md: een getal dat
+   niemand narekent veroudert stil. Op 23 augustus 2026 stond er "zesentachtig"
+   terwijl het er vierennegentig waren, en zes van die vierennegentig waren al af
+   maar niet doorgestreept -- ze telden dus mee als werk dat er niet meer was. */
+function openPerParagraaf(bron) {
+  const uit = new Map();
+  let sectie = null;
+  for (const r of bron.split('\n')) {
+    if (/^## /.test(r)) {
+      const kop = /^## (\d+)\./.exec(r);
+      sectie = kop ? kop[1] : null;
+      if (sectie) uit.set(sectie, 0);
+      continue;
+    }
+    if (sectie && /^\|\s*\d+\.\d+\s*\|/.test(r)) uit.set(sectie, uit.get(sectie) + 1);
+  }
+  return uit;
+}
+
+/* De telling zoals hij BEWEERD wordt bovenaan TAKEN.md:
+   `**Open: 78** -- §1 11, §2 9, §3 4, §4 23, §5 31`. Null als hij er niet staat;
+   de toets maakt daar een gezakte toets van en niet een stille nul. */
+function gemeldeTelling(bron) {
+  /* Het scheidingsteken is `--` en niet een breed streepje. Dat is geen
+     smaakkwestie: keuringsregel 3 houdt brede streepjes uit de bron, en een
+     regex is ook bron. Een tweede vorm toestaan zou hier dode code zijn --
+     TAKEN.md schrijft er maar een. */
+  const m = /\*\*Open:\s*(\d+)\*\*\s*--\s*((?:§\d+\s+\d+[,\s]*)+)/.exec(bron);
+  if (!m) return null;
+  const per = new Map();
+  for (const p of m[2].matchAll(/§(\d+)\s+(\d+)/g)) per.set(p[1], Number(p[2]));
+  return { totaal: Number(m[1]), per };
+}
+
 function dubbelingen(bron) {
   return [...definities(bron)].filter(([, regels]) => regels.length > 1)
     .map(([nummer, regels]) => nummer + ' (regels ' + regels.join(', ') + ')');
@@ -74,4 +112,4 @@ function losseVerwijzingen(bron, wortel, vergeven = {}) {
     .map(v => v.bestand + ' -> ' + v.nummer);
 }
 
-module.exports = { definities, dubbelingen, verwijzingen, losseVerwijzingen };
+module.exports = { definities, dubbelingen, verwijzingen, losseVerwijzingen, openPerParagraaf, gemeldeTelling };

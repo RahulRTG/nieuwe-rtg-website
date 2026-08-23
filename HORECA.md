@@ -172,11 +172,27 @@ regels toe of terug naar de tafel, en de stoel reist mee tot op de bon bij de
 pas — de runner leest een naam, geen nummer. De gastendeur en de bedieningsdeur
 komen op dezelfde `deelnemers` uit; wie via de QR aanschuift staat op het
 zaalscherm, en wat de bediening op zijn naam zet ziet hij op zijn telefoon.
-*Wat nog niet is aangesloten:* de zaalsplitsing gebruikt nog het naïeve
-`perPersoon` in plaats van de stoelbewuste `verdeel()` uit
-`kern/gast/verdeling.js` (per product, per persoon, percentage). Dat is de
-volgende voor de hand liggende stap, en hij hoort naar de kern te verhuizen in
-plaats van gekopieerd te worden.
+**2b. De verdeling deelt nu één rekensom.** *Gedaan.* Die stond in
+`kern/gast/verdeling.js` en was daarmee alleen bereikbaar voor wie zelf de QR
+scande; de bediening had één knop (`perPersoon: n` — door drieën en klaar)
+terwijl de gast op zijn telefoon al per product, per persoon of op percentage
+kon verdelen. Eén tafel, twee antwoorden op "wie betaalt wat". De rekensom staat
+nu in `kern/horeca/verdeling.js` en beide deuren gebruiken hem; een toets legt
+de twee antwoorden naast elkaar en eist dat ze identiek zijn.
+
+Wat daarbij uit elkaar is gehaald en uit elkaar moet blijven:
+
+- **Splitsen** (`horeca/schuif.js`) knipt één rekening in twee rekeningen — de
+  tafel gaat uit elkaar. **Verdelen** laat het er één en spreekt alleen af wie
+  welk deel betaalt. Twee handelingen met bijna dezelfde naam; door elkaar halen
+  levert een rekening op die twee keer bestaat. Beide blijven bestaan, want ze
+  beantwoorden verschillende vragen.
+- **Besteld** en **betaalt** zijn twee bedragen per stoel en staan allebei op
+  het scherm, elk met hun eigen woord. Wie €46 bestelde kan €80,67 betalen omdat
+  de fles voor de tafel over iedereen gaat. Dat door elkaar halen is precies
+  waar een tafel ruzie over krijgt.
+- **Het spoor draagt wie het deed.** Een verdeling van de bediening staat op
+  haar naam en niet als "gast".
 
 **3. Claim op uitgifte.** Een gereed product gaat naar de relevante medewerker,
 niet naar iedereen; wie claimt, laat de taak bij de rest verdwijnen. Het patroon

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1034 bestanden en 6896 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1035 bestanden en 6905 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1034 |
-| losse beweringen (`test(...)`) | 6896 |
+| toetsbestanden | 1035 |
+| losse beweringen (`test(...)`) | 6905 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 867 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 23 |
-| niets van beide | 96 |
+| niets van beide | 97 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-908 bestanden, 6676 beweringen.
+909 bestanden, 6685 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -302,6 +302,7 @@ toets omvalt.
 | `horeca-hotel-event.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 4: de gastrekening van het hotel en de zakelijke kant van een event. Wat hier bewezen wordt: - op de kamer boeken kan alleen als daar een open gastrekening staat, en een restaurantrekening die op... |
 | `horeca-keuken.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 2: het keukenscherm. Getoetst zijn de beloftes, niet de knoppen: - de keuken ziet niets van een gang die de zaal nog niet heeft vrijgegeven; - de allergie staat op elke weergave, ook op het... |
 | `horeca-rekening.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 1: de rekening die blijft leven -- openen, regels, gangen, verplaatsen, samenvoegen, splitsen, fooi, betalen, bonnen en de offline-wachtrij. De zwaarste bewering staat in de eerste twee toetsen en... |
+| `horeca-verdeling.test.js` | 9 | -- | RTG Horeca: DE VERDELING -- wie betaalt welk deel van één rekening. Deze rekensom stond in kern/gast/ en was daardoor alleen bereikbaar voor wie zelf de QR scande. |
 | `horeca-vloer.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 5: HACCP, de fooienpot, de loonkosten, het gastprofiel en het dagbeeld. Wat hier bewezen wordt: - een temperatuur buiten de grens kan niet worden genoteerd zonder actie, en een correctie laat de... |
 | `horlogewerk.test.js` | 11 | gezakt op `!==->===` | Het RTG-uurwerk (public/shared/horlogewerk.js): de pure, wiskundig kloppende mechaniek van het RTG-horloge. Deze toets bewijst de foutmarge 0,0 -- de perioden, de frequentie en de wijzerhoeken moeten tot op de bit... |
 | `hospitality-universe.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

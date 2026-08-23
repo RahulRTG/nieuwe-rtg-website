@@ -27,6 +27,7 @@ module.exports = (kern) => {
   require('./horeca/rekening')(ctx);   // openen, regels, gangen, lijst
   require('./horeca/gezelschap')(ctx); // wie zit er aan tafel, en wat staat op wiens naam
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
+  require('./horeca/verdeling')(ctx);  // wie betaalt welk deel -- één rekening, geen knip
   require('./horeca/betalen')(ctx);    // korting, fooi, betalen, oninbaar
   require('./horeca/bonnen')(ctx);     // cadeaubon en tegoed, offline-sync, happy hour
   require('./horeca/keuken')(ctx);     // het keukenscherm: stations en standen

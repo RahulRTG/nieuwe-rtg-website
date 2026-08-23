@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3994 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3995 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3994 |
-| servermodules (`server/**/*.js`) | 2201 |
-| routebestanden (`server/routes/**`) | 457 |
-| kernmodules (`server/kern/**`) | 1341 |
+| API-endpoints | 3995 |
+| servermodules (`server/**/*.js`) | 2203 |
+| routebestanden (`server/routes/**`) | 458 |
+| kernmodules (`server/kern/**`) | 1342 |
 | schermen (`public/**/*.html`) | 260 |
 | gedeelde browsermodules (`public/shared/*.js`) | 224 |
-| toetsbestanden (`test/*.test.js`) | 908 |
+| toetsbestanden (`test/*.test.js`) | 909 |
 | schermtoetsen (`test/*.e2e.js`) | 126 |
 
 ## 2. De weg van een verzoek
@@ -104,7 +104,7 @@ zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 641 | 57 | 10 | 398 |
-| `supplier` | 566 | 103 | 10 | 296 |
+| `supplier` | 567 | 104 | 10 | 296 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 71 | 9 | 39 | 60 |

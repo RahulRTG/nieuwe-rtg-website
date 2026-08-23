@@ -29,9 +29,17 @@
     }).join('');
   }
 
-  function teken(rekId, g) {
+  function teken(rekId, g, verdeling) {
     rekening = rekId;
     stoelen = g.stoelen || [];
+    /* Twee bedragen per stoel, en ze betekenen NIET hetzelfde: wat iemand heeft
+       besteld, en wat hij volgens de afgesproken verdeling betaalt. Bij "ieder
+       wat hij nam" liggen ze dicht bij elkaar; bij gelijk delen juist niet. Ze
+       door elkaar halen is precies waar een tafel ruzie over krijgt, dus staan
+       ze allebei met hun eigen woord erbij. */
+    var deel = {};
+    (verdeling && verdeling.delen || []).forEach(function (d) { deel[d.nr] = d.centen; });
+
     var rijen = stoelen.map(function (s) {
       return '<div class="item"><span><b>' + esc(s.handle) + '</b>' +
         /* Wie van zijn eigen telefoon bestelt, staat er anders bij -- niet als
@@ -39,7 +47,8 @@
         (s.eigenSessie ? ' <span class="tag">eigen telefoon</span>' : '') +
         ' <span class="stil">· ' + s.regels + ' regel(s)</span>' +
         (s.allergieen.length ? ' <span class="allergie">' + s.allergieen.map(esc).join(', ') + '</span>' : '') +
-        '</span><span class="rij"><span class="stil">' + euro(s.centen) + '</span>' +
+        '</span><span class="rij"><span class="stil">besteld ' + euro(s.centen) + '</span>' +
+        (deel[s.nr] != null ? '<span class="tag aan">betaalt ' + euro(deel[s.nr]) + '</span>' : '') +
         '<button class="knop" data-hernoem="' + s.nr + '">Naam</button>' +
         (s.eigenSessie ? '' : '<button class="knop" data-stoelweg="' + s.nr + '">Weg</button>') +
         '</span></div>';

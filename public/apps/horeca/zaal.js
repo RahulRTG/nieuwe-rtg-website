@@ -53,7 +53,7 @@
       /* Eerst het gezelschap, dan de regels: de keuzelijst naast een regel komt
          uit het gezelschap, dus die moet geladen zijn voor we regels tekenen. */
       api('/gezelschap', { rekeningId: rek.id }).then(function (g) {
-        if (!g.body.error) G().teken(rek.id, g.body.gezelschap);
+        if (!g.body.error) G().teken(rek.id, g.body.gezelschap, rek.verdeling);
         tekenRegels(rek);
       });
     });
@@ -139,6 +139,20 @@
         meld('Gesplitst in ' + r.body.delen.length + ' delen, samen ' + euro(som) + '.');
         huidig = null;
         laad();
+      });
+    });
+    /* VERDELEN, en dat is iets anders dan splitsen hierboven. Splitsen knipt
+       de tafel in losse rekeningen; verdelen laat het er een en spreekt alleen
+       af wie welk deel betaalt. Dezelfde rekensom die de gast op zijn telefoon
+       gebruikt (kern/horeca/verdeling.js), dus de tafel krijgt door beide
+       deuren hetzelfde antwoord. */
+    $('zVerdeel').addEventListener('click', function () {
+      if (!huidig) return meld('Open eerst een rekening.');
+      api('/rekening/verdeel', { rekeningId: huidig, wijze: $('zWijze').value }).then(function (r) {
+        if (r.body.error) return meld(r.body.error);
+        var d = r.body.verdeling.delen;
+        meld(d.map(function (x) { return (x.handle || ('stoel ' + x.nr)) + ' ' + euro(x.centen); }).join(' · '));
+        toon(huidig, true);
       });
     });
     $('zBetaal').addEventListener('click', function () {

@@ -103,6 +103,19 @@
         <button class="knop" id="zSplitsGa" type="button">Splits per persoon</button>
         <button class="knop p" id="zBetaal" type="button">Afrekenen (pin)</button>
       </div>
+      <!-- VERDELEN IS IETS ANDERS DAN SPLITSEN, en daarom staat het op een
+           eigen regel met zijn eigen uitleg. Splitsen knipt de tafel in losse
+           rekeningen; verdelen laat het er één en spreekt alleen af wie welk
+           deel betaalt. Door elkaar halen levert een rekening op die twee keer
+           bestaat. -->
+      <div class="rij z-mt60">
+        <select class="veld" id="zWijze" aria-label="Verdelen volgens" style="flex:0 1 13rem;">
+          <option value="product">Ieder wat hij nam</option>
+          <option value="gelijk">Gelijk over de tafel</option>
+        </select>
+        <button class="knop" id="zVerdeel" type="button">Verdeel de rekening</button>
+        <span class="stil">Eén rekening; alleen wie welk deel betaalt.</span>
+      </div>
     </div>
   </section>
 

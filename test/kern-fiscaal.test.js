@@ -134,6 +134,35 @@ test('dagrapport: het Z-rapport telt een tafelticket ook maar een keer als omzet
   assert.equal(z.betaalwijzen.contant, 218, 'de betaalwijze blijft staan: er is echt contant binnengekomen');
 });
 
+/* CADEAUKAARTEN TELLEN NIET NAAST DE KASSABON (TAKEN.md 4.27).
+
+   financeVoor telde elke inwisseling apart als omzet, terwijl de inwisseling
+   geen factuur boekte. Twee gevolgen tegelijk: de btw-aangifte MISTE die omzet
+   (die telt facturen) en de boekhouding telde hem DUBBEL zodra de kassa de bon
+   ook aansloeg -- gemeten 100 bij 50 verkocht. Sinds die ronde is 'cadeaukaart'
+   een betaalwijze aan de kassa en draagt de gewone bon de omzet. */
+test('financeVoor: een cadeaukaart aan de kassa telt een keer, via de bon', () => {
+  const maand = new Date().toISOString().slice(0, 7);
+  const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL' } };
+  const kaart = bron => ({ supplierCode: 'KIKUNOI', bedrag: 100, saldo: 50, at: maand + '-01',
+    verzilveringen: [{ bedrag: 50, at: maand + '-05', bron }] });
+  const omzetVan = db => maakFiscaal({ db, centen, btwSplit }).financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0);
+
+  // de kassaweg: een bon van 50 die de kaart afboekt -- 50, niet 100
+  assert.equal(omzetVan(stubDb({
+    giftcards: [kaart('kassa')],
+    posSales: { KIKUNOI: [{ total: 50, method: 'cadeaukaart', items: null, at: maand + '-05' }] }
+  })), 50, 'de bon draagt de omzet; de inwisseling telt er niet naast');
+
+  // de handmatige afboeking maakt geen bon, dus draagt geen omzet -- maar dat
+  // wordt wel MELD, want geld dat buiten de boeken valt mag niet stil zijn
+  const fin = maakFiscaal({ db: stubDb({ giftcards: [kaart('handmatig')] }), centen, btwSplit }).financeVoor(s);
+  assert.equal(fin.btw.reduce((x, r) => x + r.omzet, 0), 0, 'een afboeking zonder bon is geen omzet');
+  assert.equal(fin.giftcards.handmatig, 50, 'en staat apart gemeld');
+  assert.ok(fin.regels.some(r => /met de hand/.test(r) && /50/.test(r)),
+    'met een regel in het overzicht die zegt dat dit bedrag buiten omzet en aangifte valt');
+});
+
 test('cannedBoekhouder: antwoordt gericht op btw, personeel en cadeaukaarten', () => {
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL', uurloon: 20 } };
   const { financeVoor, cannedBoekhouder } = maakFiscaal({ db: stubDb(), centen, btwSplit });

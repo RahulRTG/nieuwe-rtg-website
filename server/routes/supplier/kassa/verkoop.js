@@ -44,6 +44,16 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak
     betaaldienstKosten = p.kosten || 0;
   }
+  /* Cadeaukaart: als bij RTG Pay eerst het GELD, dan pas de bon. Fail-closed:
+     onbekende code of te weinig saldo geeft geen bon (TAKEN.md 4.27). */
+  let gcKaart = null;
+  if (method === 'cadeaukaart') {
+    const gc = String(req.body.gcCode || '').trim().toUpperCase();
+    gcKaart = (db.data.giftcards || []).find(x => x.code === gc && x.supplierCode === req.supplier.code);
+    if (!gcKaart) return res.status(404).json({ error: 'Deze cadeaukaart kennen we hier niet.' });
+    if (gcKaart.saldo < total)
+      return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + gcKaart.saldo + ' op deze kaart.' });
+  }
   const sale = {
     id: crypto.randomBytes(4).toString('hex'),
     bon: pickupCode(),
@@ -62,6 +72,15 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   list.unshift(sale);
   db.data.posSales[req.supplier.code] = list.slice(0, 300);
+  /* Nu de bon er is, gaat het saldo eraf, met de bon erbij. `bron: 'kassa'`
+     onderscheidt hem van de handmatige afboeking, die geen omzet draagt. */
+  if (gcKaart) {
+    gcKaart.saldo = Math.round((gcKaart.saldo - total) * 100) / 100;
+    gcKaart.verzilveringen = gcKaart.verzilveringen || [];
+    gcKaart.verzilveringen.push({ bedrag: total, at: sale.at, actor: req.actor.name, bron: 'kassa', saleId: sale.id });
+    sale.gcCode = gcKaart.code;
+    sale.gcRest = gcKaart.saldo;
+  }
   save();
   // het keukenbrein boekt de ingredienten van de bon af via de recepten
   try { kern.keuken.boekVerkoopAf(req.supplier, items || [], 'kassa (' + req.actor.name + ')'); } catch (e) {}

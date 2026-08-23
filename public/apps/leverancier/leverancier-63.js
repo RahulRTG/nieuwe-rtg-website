@@ -10,6 +10,7 @@
         '<button class="obtn primary js-pay" data-method="kamer">'+T('pos.toroom','Op de kamer')+'</button>'+
         '<button class="obtn js-pay" data-method="rtgpay">RTG Pay</button>'+
         '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
+        '<button class="obtn js-pay" data-method="cadeaukaart">'+T('pos.gc','Cadeaukaart')+'</button>'+
       '</div></div>' + kassaOpenRooms();
   }
 

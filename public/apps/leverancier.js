@@ -6506,7 +6506,7 @@
   const mNaam = x => MENU_VERTAAL.map[x.id] || x.name;
   function luchtPct(){ const st = state.settings || {}; return st.luchtzijde ? (Number.isFinite(Number(st.luchtToeslagPct)) ? Math.round(Number(st.luchtToeslagPct)) : 15) : 0; }
   function luchtPrijs(p){ const pct = luchtPct(); return pct ? Math.round(p * (1 + pct / 100) * 100) / 100 : p; }
-  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
+  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='cadeaukaart'?T('pos.gc','Cadeaukaart'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
   /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
      hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip
      niet of tikt er niemand, dan komt het typvenster vanzelf. */
@@ -6618,6 +6618,7 @@
         '<button class="obtn" id="posClear"'+(total?'':' disabled')+'>'+T('pos.clear','Leegmaken')+'</button>'+
         '<button class="obtn primary js-pay" data-method="rtgpay"'+(total?'':' disabled')+'>'+T('pos.payrtg','Afrekenen, RTG Pay')+'</button>'+
         '<button class="obtn js-pay" data-method="contant"'+(total?'':' disabled')+'>'+T('pos.cash','Contant')+'</button>'+
+        '<button class="obtn js-pay" data-method="cadeaukaart"'+(total?'':' disabled')+'>'+T('pos.gc','Cadeaukaart')+'</button>'+
       '</div>'+
       ((state.tables||[]).length ? '<div class="pos-pay h-mt40">'+
         '<select id="posTafel" style="flex:1;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;">'+
@@ -6647,6 +6648,7 @@
         '<button class="obtn primary js-pay" data-method="kamer">'+T('pos.toroom','Op de kamer')+'</button>'+
         '<button class="obtn js-pay" data-method="rtgpay">RTG Pay</button>'+
         '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
+        '<button class="obtn js-pay" data-method="cadeaukaart">'+T('pos.gc','Cadeaukaart')+'</button>'+
       '</div></div>' + kassaOpenRooms();
   }
 
@@ -6791,10 +6793,18 @@
       body.payCode = await vraagPayCode(); if (!body.payCode) return;
       body.idem = RTGIdem('pos');
     }
+    /* Cadeaukaart: de bon draagt de omzet en trekt het saldo af, in EEN
+       handeling. Daarom hoort de code hier en niet in het boekhoudscherm --
+       daar boekt hij alleen saldo af en telt er niets als omzet. */
+    if (method === 'cadeaukaart'){
+      body.gcCode = (window.prompt(T('pos.gcvraag','Code van de cadeaukaart (bijv. RTG-GC-A1B2C3):'))||'').trim();
+      if (!body.gcCode) return;
+    }
     try {
       const d = await API.call('/supplier/pos/sale', body);
       bon = {};
       toast(T('pos.done','Afgerekend:')+' '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+'), '+T('pos.bonnr','bon')+' '+d.sale.bon+
+        (d.sale.gcCode ? ' · '+T('pos.gcrest','restsaldo')+' '+eur(d.sale.gcRest) : '')+
         (d.sale.betaaldienstKosten ? ' · '+T('pos.kosten','betaaldienst')+' '+eur(d.sale.betaaldienstKosten/100)+' '+T('pos.kostendirect','direct verrekend') : ''));
       await refresh(); openTab('kassa');
     } catch(e){ toast(e.message); }

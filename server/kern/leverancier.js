@@ -10,11 +10,20 @@
    de werk-kern, omdat supplierState werkgeverSollicitatie meeneemt. */
 
 const HK_STATUSES = ['schoon', 'vuil', 'bezig', 'bezet', 'defect'];
-/* Aan de kassa zijn er twee manieren van betalen: contant of RTG Pay (de
-   betaalcode uit de app, geind via het grootboek). 'kamer' en 'tafel' zijn
-   geen betaling maar uitstel: de last komt bij de check-out of het afrekenen
-   van de tafel alsnog langs deze twee. */
-const POS_METHODS = ['contant', 'rtgpay', 'kamer', 'tafel'];
+/* Aan de kassa zijn er drie manieren van betalen: contant, RTG Pay (de
+   betaalcode uit de app, geind via het grootboek) of een cadeaukaart van deze
+   zaak. 'kamer' en 'tafel' zijn geen betaling maar uitstel: de last komt bij de
+   check-out of het afrekenen van de tafel alsnog langs de andere drie.
+
+   'cadeaukaart' is er bewust als BETAALWIJZE en niet als aparte omzetstroom.
+   Een cadeaukaart is een meervoudig inwisselbare voucher: de btw hoort bij de
+   inwisseling, en de inwisseling is het moment waarop er iets over de toonbank
+   gaat. Dus draagt de gewone kassabon de omzet -- met de echte artikelen, de
+   echte btw-splitsing en een factuur -- en trekt diezelfde bon het saldo van de
+   kaart af. Telde de boekhouding de inwisseling er nog eens apart bij, dan
+   stond de omzet dubbel zodra de kassa de bon ook aansloeg; gemeten 100 bij 50
+   verkocht (TAKEN.md 4.27). */
+const POS_METHODS = ['contant', 'rtgpay', 'cadeaukaart', 'kamer', 'tafel'];
 const DOOR_RELOCK_MS = 10000;
 const TABLE_STATUSES = ['vrij', 'bezet', 'gereserveerd', 'dicht'];
 /* Elke zaak is baas over de eigen opties. Alles kan aan of uit, met een

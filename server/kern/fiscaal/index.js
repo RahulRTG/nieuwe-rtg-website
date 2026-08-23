@@ -34,23 +34,12 @@ function maakFiscaal({ db, centen, btwSplit }) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
     }
-    /* WELKE KASSABONNEN HIER NIET MEETELLEN, en waarom. Alle vier om dezelfde
-       reden: de omzet staat al ergens anders in deze telling, en zonder deze
-       regel staat de maand van de zaak te hoog.
-
-       - `rtg`: de bon van pos/redeem hoort bij een bestelling die hierboven bij
-         `orders` al is geteld (zie routes/supplier/kassa/verkoop.js).
-       - `kamer` EN `tafel`: een openstaande rekening, nog niet afgerekend. De
-         omzet komt binnen bij de check-out, die er een gebundelde bon overheen
-         legt. `tafel` stond hier niet, terwijl pos/checkout op precies dit paar
-         filtert -- een tafelrekening telde dus twee keer: een keer als los
-         bonnetje op de tafel en een keer in de bundel.
-       - `omzetElders`: een gebundelde bon waarvan de ONDERDELEN al geteld zijn.
-         Het tafelticket rekent bestellingen af; die staan hierboven al bij
-         `orders`, dus de bundel eroverheen mag er niet nog eens bij (TAKEN.md
-         4.28). Dat is een merk en geen methode, want de methode moet `contant`
-         of `rtgpay` blijven: dat is hoe er werkelijk betaald is, en de
-         dagafsluiting rekent daarop. */
+    /* Vier soorten kassabonnen tellen hier niet mee, alle vier omdat hun omzet
+       al ergens anders in deze telling staat (TAKEN.md 4.28): `rtg` hoort bij
+       een bestelling hierboven; `kamer` en `tafel` zijn open rekeningen die pas
+       bij de check-out binnenkomen; en `omzetElders` merkt een gebundelde bon
+       waarvan de onderdelen al geteld zijn. Dat laatste is een merk en geen
+       methode: de methode moet blijven zeggen hoe er echt betaald is. */
     for (const v of db.data.posSales[s.code] || []) {
       if (v.omzetElders || v.method === 'rtg' || v.method === 'kamer' || v.method === 'tafel' || !inMaand(v.at)) continue;
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
@@ -64,12 +53,20 @@ function maakFiscaal({ db, centen, btwSplit }) {
       if (b.supplierCode !== s.code || !b.paid || b.status === 'geweigerd' || !inMaand(b.paidAt || b.at)) continue;
       tel('dienst', b.price || 0);
     }
-    // cadeaukaarten (meervoudig inwisselbaar): btw-moment is de inwisseling
+    /* CADEAUKAARTEN: het btw-moment blijft de inwisseling, maar die wordt hier
+       niet meer apart opgeteld -- dat was een tweede telling naast de kassabon
+       (TAKEN.md 4.27). 'cadeaukaart' is nu een betaalwijze, dus de bon draagt
+       omzet, btw en factuur en is hierboven al geteld. De HANDMATIGE afboeking
+       maakt geen bon en dus geen omzet; die wordt apart gemeld, want geld dat
+       buiten de boeken valt mag niet stil zijn. */
     const kaarten = (db.data.giftcards || []).filter(g => g.supplierCode === s.code);
     const gcVerkocht = kaarten.filter(g => inMaand(g.at)).reduce((x, g) => x + g.bedrag, 0);
-    let gcIngewisseld = 0;
-    for (const g of kaarten) for (const w of g.verzilveringen || []) if (inMaand(w.at)) gcIngewisseld += w.bedrag;
-    if (gcIngewisseld) tel(basisCat, gcIngewisseld);
+    let gcIngewisseld = 0, gcHandmatig = 0;
+    for (const g of kaarten) for (const w of g.verzilveringen || []) {
+      if (!inMaand(w.at)) continue;
+      gcIngewisseld += w.bedrag;
+      if (w.bron !== 'kassa') gcHandmatig += w.bedrag;
+    }
     const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
     const btw = Object.entries(potten).map(([cat, omzet]) =>
       ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(omzet, tarief.tariefVan(s, cat)) }))
@@ -92,11 +89,12 @@ function maakFiscaal({ db, centen, btwSplit }) {
         totaal: centen(bruto * (1 + L.lasten + L.vakantiegeld)),
         uurloonMin: L.uurloonMin
       },
-      giftcards: { verkocht: centen(gcVerkocht), ingewisseld: centen(gcIngewisseld), open: gcOpen, aantal: kaarten.length },
+      giftcards: { verkocht: centen(gcVerkocht), ingewisseld: centen(gcIngewisseld), handmatig: centen(gcHandmatig), open: gcOpen, aantal: kaarten.length },
       regels: [
         L.aangifte,
         L.extra,
-        'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans en de btw hoort bij de inwisseling.',
+        'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans en de btw hoort bij de inwisseling. Reken een kaart af op de kassa met betaalwijze "cadeaukaart": die bon draagt de omzet, de btw en de factuur.',
+        ...(gcHandmatig > 0 ? ['Let op: € ' + centen(gcHandmatig) + ' is deze maand met de hand van een cadeaukaart afgeboekt in dit scherm, zonder kassabon. Dat bedrag staat NIET in de omzet en niet in de btw-aangifte. Sla die verkopen aan op de kassa met betaalwijze "cadeaukaart".'] : []),
         'Indicatie minimumuurloon in ' + L.naam + ': € ' + L.uurloonMin + ' per uur. Reken bovenop het brutoloon ~' + Math.round(L.lasten * 100) + '% werkgeverslasten' + (L.vakantiegeld ? ' en ' + Math.round(L.vakantiegeld * 1000) / 10 + '% vakantiegeld' : '') + '.',
         'Dit overzicht is voorlichting (peiljaar ' + FISCAAL_PEILJAAR + '), geen fiscaal advies; de aangifte en afdracht blijven de verantwoordelijkheid van de onderneming.'
       ]
@@ -111,7 +109,7 @@ function maakFiscaal({ db, centen, btwSplit }) {
     if (/personeel|loon|salaris|lasten|vakantiegeld|kost/.test(v))
       return 'Deze maand: ' + fin.personeel.uren + ' geklokte uren tegen € ' + fin.personeel.uurloon + ' = € ' + fin.personeel.bruto + ' bruto. Daar komt ~' + fin.personeel.lastenPct + '% werkgeverslasten (€ ' + fin.personeel.lasten + ')' + (fin.personeel.vakantiegeld ? ' en ' + fin.personeel.vakantiegeldPct + '% vakantiegeldreserve (€ ' + fin.personeel.vakantiegeld + ')' : '') + ' bij: totaal € ' + fin.personeel.totaal + '. Indicatie minimumuurloon in ' + L.naam + ': € ' + fin.personeel.uurloonMin + '.';
     if (/cadeau|bon|kaart|voucher|gift/.test(v))
-      return 'Uw cadeaukaarten zijn meervoudig inwisselbaar: de verkoop (deze maand € ' + fin.giftcards.verkocht + ') is nog geen omzet en kent geen btw. Pas bij inwisseling (deze maand € ' + fin.giftcards.ingewisseld + ') boekt u omzet met btw. Het openstaande saldo van € ' + fin.giftcards.open + ' staat als verplichting op de balans.';
+      return 'Uw cadeaukaarten zijn meervoudig inwisselbaar: de verkoop (deze maand € ' + fin.giftcards.verkocht + ') is nog geen omzet en kent geen btw. Pas bij inwisseling (deze maand € ' + fin.giftcards.ingewisseld + ') boekt u omzet met btw, en dat gaat via de kassabon: reken af met betaalwijze "cadeaukaart", dan draagt die bon de omzet, de btw en de factuur.' + (fin.giftcards.handmatig > 0 ? ' Let op: € ' + fin.giftcards.handmatig + ' daarvan is met de hand afgeboekt zonder kassabon en staat dus NIET in uw omzet of aangifte.' : '') + ' Het openstaande saldo van € ' + fin.giftcards.open + ' staat als verplichting op de balans.';
     if (/aangifte|deadline|wanneer|termijn/.test(v))
       return L.aangifte + ' ' + L.extra;
     return 'Uw maand in ' + L.naam + ': af te dragen btw € ' + fin.btwTotaal + ', personeelskosten € ' + fin.personeel.totaal + ' (' + fin.personeel.uren + ' uur), cadeaukaarten € ' + fin.giftcards.open + ' open. Vraag me naar btw, personeelskosten, cadeaukaarten of aangiftetermijnen. Dit is voorlichting, geen bindend fiscaal advies.';

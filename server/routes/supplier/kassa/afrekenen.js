@@ -100,12 +100,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
     notify(o.customerKey || o.customerTier, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
   }
-  /* Een gebundelde kassabon voor het hele tafelticket -- het kassastuk van de
-     zaak. `omzetElders` zegt aan de maandboekhouding dat de omzet hierboven al
-     per bestelling is geteld: zonder dat merk telde financeVoor de bestellingen
-     EN deze bundel, en stond de maand van de zaak te hoog (TAKEN.md 4.28). De
-     methode blijft staan op hoe er echt betaald is, want de dagafsluiting en de
-     kasstroom rekenen daarop; alleen de omzettelling slaat hem over. */
+  // `omzetElders`: hierboven al per bestelling geteld (TAKEN.md 4.28)
   const sale = {
     id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
     desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
@@ -148,9 +143,11 @@ app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
   if (bedrag > g.saldo) return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + g.saldo + ' op deze kaart.' });
   g.saldo = Math.round((g.saldo - bedrag) * 100) / 100;
   g.verzilveringen = g.verzilveringen || [];
-  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor: req.actor.name });
+  /* `bron: 'handmatig'`: alleen SALDO af, dus geen omzet, btw of factuur. De
+     gewone weg is de kassa met betaalwijze 'cadeaukaart' (TAKEN.md 4.27). */
+  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor: req.actor.name, bron: 'handmatig' });
   save();
-  logActivity(req.supplier.code, req.actor, 'inde € ' + bedrag + ' van cadeaukaart ' + g.code + ' (rest € ' + g.saldo + ')');
+  logActivity(req.supplier.code, req.actor, 'boekte € ' + bedrag + ' met de hand af van cadeaukaart ' + g.code + ' (rest € ' + g.saldo + ', geen kassabon)');
   res.json({ ok: true, saldo: g.saldo, kaart: { code: g.code, saldo: g.saldo } });
 });
 };

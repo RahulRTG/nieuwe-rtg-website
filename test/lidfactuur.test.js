@@ -19,11 +19,15 @@
    Punt 3 en 4 zijn het hele doel. Een factuur die er wel is maar een ander
    bedrag draagt, is geen reparatie maar een derde cijfer erbij.
 
-   WAT DEZE TOETS NIET DEKT, en dat hoort erbij te staan: bij een cadeaukaart
-   en bij een tafelticket op 'contant' telt de maandboekhouding zelf dubbel
-   (TAKEN.md 4.27 en 4.28). Die twee gevallen staan met opzet niet in toets 7 --
-   niet omdat ze niet bestaan, maar omdat ze een defect aan de ANDERE kant zijn
-   en hier dus niets over deze reparatie zouden zeggen.
+   HIER STOND EEN CAVEAT, en die is op 23 augustus 2026 vervallen: bij een
+   cadeaukaart en bij een tafelticket op 'contant' telde de maandboekhouding
+   zelf dubbel (TAKEN.md 4.27 en 4.28). Ze stonden met opzet niet in toets 7,
+   omdat ze een defect aan de ANDERE kant waren en daar dus niets over deze
+   reparatie zouden zeggen. Allebei gerepareerd: het tafelticket in
+   test/tafelticket.test.js 3 en test/kern-fiscaal.test.js, en de cadeaukaart
+   hieronder in toets 9 -- die staat er nu wel bij, want sinds 'cadeaukaart' een
+   betaalwijze aan de kassa is, is het geen defect aan de andere kant meer maar
+   gewoon een zevende betaalweg met een factuur.
 
    Draai los: node --experimental-sqlite --test test/lidfactuur.test.js */
 const test = require('node:test');
@@ -387,4 +391,93 @@ test('8. een factuur die NIET lukt komt op het techniekbord, en trekt de betalin
   maakFactuurVoorLid(null)(Object.assign({ ref: 'REF-GEEN' }, bon));
   assert.equal(log.foutenSamenvatting().totaal, 0, 'geen motor is geen storing');
   log.foutenReset();
+});
+
+/* -------------------------------------------------------------------------
+   9. DE CADEAUKAART (TAKEN.md 4.27)
+
+   Dit geval stond hierboven met zoveel woorden als NIET gedekt, en met reden:
+   de inwisseling boekte geen factuur (dus de aangifte miste hem) EN de
+   boekhouding telde hem apart naast de kassabon (dus die telde dubbel). Twee
+   fouten in tegengestelde richting over hetzelfde geld.
+
+   Sinds die reparatie is 'cadeaukaart' een BETAALWIJZE aan de kassa: de gewone
+   bon draagt de omzet, de artikelen, de btw en de factuur, en diezelfde bon
+   trekt het saldo van de kaart af. Deze toets rekent een echte bon af met een
+   echte kaart en legt daarna dezelfde twee cijfers naast elkaar als toets 7.
+   ------------------------------------------------------------------------- */
+test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding blijven gelijk', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    const lid = await registreer(base);
+    const kaartMenu = (await api(base, '/api/supplier/menu/get', { code: 'KIKUNOI' }, lid)).body;
+    const eten = (kaartMenu.menu || []).find(x => x.station !== 'bar');
+    const bar = (kaartMenu.menu || []).find(x => x.station === 'bar');
+    assert.ok(eten && bar, 'de zaak heeft eten en drank; anders meet deze toets maar een tarief');
+
+    // een cadeaukaart van 500 verkopen -- dat is nog GEEN omzet
+    const verkoop = await api(base, '/api/supplier/giftcard/sell', { bedrag: 500 }, mgr);
+    assert.equal(verkoop.status, 200);
+    const gcCode = verkoop.body.kaart.code;
+
+    const voor = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((voor.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100), 0,
+      'een verkochte cadeaukaart is nog geen omzet: het saldo is een verplichting');
+
+    // en nu een bon van 2 gerechten + 1 drankje, afgerekend MET de kaart
+    const items = [{ name: eten.name, qty: 2, price: eten.price }, { name: bar.name, qty: 1, price: bar.price }];
+    const totaal = Math.round((eten.price * 2 + bar.price) * 100) / 100;
+    const bon = await api(base, '/api/supplier/pos/sale',
+      { items, total: totaal, method: 'cadeaukaart', gcCode }, mgr);
+    assert.equal(bon.status, 200, JSON.stringify(bon.body).slice(0, 200));
+    assert.equal(bon.body.sale.method, 'cadeaukaart');
+    assert.equal(bon.body.sale.gcRest, Math.round((500 - totaal) * 100) / 100, 'het saldo is met de bon afgeboekt');
+    await even();
+
+    // dezelfde twee cijfers als in toets 7, op de grondslag (exclusief btw)
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    const omzetBoekhouding = Math.round((fin.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100);
+    const btwBoekhouding = Math.round((fin.body.btwTotaal || 0) * 100);
+    assert.ok(omzetBoekhouding > 0, 'de boekhouding telt deze bon');
+    assert.equal(new Set((fin.body.btw || []).map(r => r.tarief)).size, 2, 'twee tarieven: eten en drank');
+
+    const op = await api(base, '/api/supplier/btw/opmaken', { periode: fin.body.maand }, mgr);
+    assert.equal(op.status, 200, JSON.stringify(op.body).slice(0, 200));
+    const omzetAangifte = (op.body.aangifte.tarieven || []).reduce((s, t) => s + t.omzetCenten, 0);
+
+    assert.equal(omzetAangifte, omzetBoekhouding,
+      'de aangifte telt exact de omzet van de boekhouding; telde de inwisseling er nog apart bij, dan stond hier het dubbele');
+    assert.equal(op.body.aangifte.verschuldigdCenten, btwBoekhouding, 'en dezelfde af te dragen btw');
+
+    /* FAIL-CLOSED, net als RTG Pay: eerst het geld, dan pas de bon. Een kaart
+       zonder dekking en een code die niet bestaat leveren geen bon op -- en dus
+       ook geen omzet. Zonder deze twee zou de betaalwijze een gratis bon zijn:
+       de omzet zou tellen terwijl er niets tegenover staat. */
+    const teDuur = await api(base, '/api/supplier/pos/sale',
+      { items, total: 5000, method: 'cadeaukaart', gcCode }, mgr);
+    assert.equal(teDuur.status, 409, 'meer dan het saldo wordt geweigerd');
+    const onbekend = await api(base, '/api/supplier/pos/sale',
+      { items, total: 1, method: 'cadeaukaart', gcCode: 'RTG-GC-ZZZZZZ' }, mgr);
+    assert.equal(onbekend.status, 404, 'een onbekende kaart wordt geweigerd');
+    await even();
+    const naWeigering = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((naWeigering.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100), omzetBoekhouding,
+      'een geweigerde betaling laat geen bon en dus geen omzet achter');
+
+    /* De handmatige afboeking blijft bestaan als correctiemiddel, maar draagt
+       geen omzet -- en zegt dat ook, want geld dat buiten de boeken valt hoort
+       nooit stilletjes te verdwijnen. */
+    const hand = await api(base, '/api/supplier/giftcard/redeem', { code: gcCode, bedrag: 25 }, mgr);
+    assert.equal(hand.status, 200);
+    const na = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((na.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100), omzetBoekhouding,
+      'een handmatige afboeking verandert de omzet niet');
+    assert.equal(na.body.giftcards.handmatig, 25, 'maar staat wel apart gemeld');
+    assert.ok(na.body.regels.some(r => /met de hand/.test(r)), 'met een waarschuwing in het overzicht');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
 });

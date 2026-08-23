@@ -3286,12 +3286,56 @@ tenant kan zonder SSO bestaan -- niet elke klant heeft een provider.
   gereed · Commercial" beweerde zonder bron. Een enterprisebewering hoort een
   bron te hebben; tot die er is, staat de bewering er niet.
 
-`test/tenantspine.test.js` (9, de regels), `test/tenant.test.js` (8, over de
-lijn) en `test/werkmerk.e2e.js` (het scherm) leggen dit vast; elf mutaties, alle
-elf RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
+**De uitgang: weggaan zonder je geschiedenis te verliezen.**
+`kern/tenant/uitgang.js` + `kern/tenant/levensloop.js`. Exit-recht is niet af
+met een knop die JSON teruggeeft; de bewering wordt pas waar als de uitvoer
+WEER IN TE LEZEN is en er hetzelfde uit komt.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/tenant/export` | De hele werkruimte eruit, met catalogus, checksums en het recept (beheer-token) |
+| `POST /api/techniek/tenant/invoer` | Een uitvoer inlezen in een NIEUWE werkruimte (eigenaar) |
+| `POST /api/techniek/tenant/levensloop` | Lezen en zetten: actief, opzegging, bewaring (eigenaar) |
+| `POST /api/techniek/tenant/bewaringsplicht` | Een legal hold aan of uit, met grond (eigenaar) |
+| `POST /api/techniek/tenant/vernietig` | Vernietigen na de termijn, met bewijs (eigenaar) |
+
+- **De uitvoer neemt de hele subboom mee, met een lijst van wat eruit MOET.**
+  Een soort die iemand vergeet toe te voegen ontbreekt anders stilzwijgend in de
+  export van een vertrekkende klant. Eruit gaan `beheerToken`, `token`,
+  `lidToken` en `rtgKey` -- die laatste niet uit geheimhouding maar omdat hij
+  buiten de kluis om een werkruimtelid aan een RTG-account koppelt.
+- **Het recept reist mee, en dat is het bewijs.** Een checksum die alleen de
+  producent kan narekenen bewijst de ontvanger niets. De uitvoer zegt hoe:
+  sha256 over de canonieke JSON per soort, en daarna over de catalogus. De som
+  is ongezouten -- anders dan `lib/vingerafdruk.js`, die per proces zout omdat
+  hij alleen mag tonen DAT er iets veranderde.
+- **Inlezen maakt altijd een nieuwe werkruimte**, nooit over een bestaande heen,
+  en de leden komen terug zonder sleutel: toegang teruggeven is een besluit.
+- **Vier standen en geen zeven.** `voorbereiding`, `proef` en `beperkt` dwongen
+  niets af en staan er dus niet. De bewaring sluit de toegang door de SLEUTELS
+  in te trekken en niet met een vlag die elke route apart moet lezen.
+- **Uitvoer kan in elke stand behalve `vernietigd`**, ook in de bewaring en ook
+  bij een betalingsachterstand: een klant die zijn rekening niet betaalt
+  verliest zijn geld en niet zijn geschiedenis.
+- **Vernietigen kan niet voor de termijn en niet onder een bewaringsplicht**, en
+  levert een bewijs met aantallen en checksums en zonder persoonsgegevens -- een
+  vernietigingsbewijs met namen erin is een kopie van wat vernietigd moest
+  worden.
+- **De generieke veger komt hier niet langs.** `werkruimtes` en `tenants` stonden
+  in de gatenlijst van het bewaarbeleid; ze er met een gewone termijn bij zetten
+  zou erger zijn geweest dan het gat, want hun datumveld is een aanmaakmoment en
+  90 dagen daarop wist elke klant die langer dan negentig dagen bestaat. Vandaar
+  de derde vorm `eigenRegie` in `bewaarbeleid.js`: hij telt mee, verdwijnt uit de
+  gatenlijst, en `veeg()` raakt hem nooit aan.
+
+`test/tenantspine.test.js` (15, de regels), `test/tenant.test.js` (8, over de
+lijn), `test/tenantuitgang.test.js` (6, de uitgang) en `test/werkmerk.e2e.js`
+(het scherm) leggen dit vast; zeventien mutaties, alle zeventien RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
 merkcontrole overslaan, een leeg quotum in de bootstrap zetten, de IdP een
 ontslag laten herstellen, deprovisioning over alle tenants laten lopen en de
-accentkleur op de RTG-kopbalk lekken.
+accentkleur op de RTG-kopbalk lekken, de geheimen in de export laten staan, een
+invoer over een bestaande werkruimte heen schrijven, de bewaringsplicht negeren
+en de veger wel aan de eigen regie laten komen.
 
 ### RTG Web Platform (de automatische bedrijfssite en de browser die bedrijven begrijpt)
 

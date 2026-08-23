@@ -315,6 +315,23 @@ test('12. na de termijn wordt er vernietigd, met een bewijs zonder persoonsgegev
   assert.ok(!tekst.includes('Uitrol'), 'en geen inhoud');
 });
 
+test('12b. de bewaring trekt de SLEUTEL in, en niet alleen de status', () => {
+  /* Deze toets bestaat omdat een mutatie hem miste. De toets over de lijn zag
+     de deur dichtgaan, maar dat kwam door de statuswijziging: `l.token = null`
+     weghalen liet alles groen. Twee mechanismen, een bewijs -- en dan bewaakt
+     niemand het mechanisme waar de kop van levensloop.js over spreekt. Een
+     achtergebleven sleutel is bovendien de gevaarlijkste helft: een status is
+     terug te zetten, een gelekte sleutel niet. */
+  const { db, tenant } = loopOpzet();
+  tenant.levensloop.zet('O-W', { naar: 'opzegging', reden: 'Stopt.' });
+  tenant.levensloop.zet('O-W', { naar: 'bewaring', reden: 'Uitloop.' });
+
+  const lid = db.data.werkruimtes.W1.leden.a;
+  assert.equal(lid.token, null, 'de sleutel is weg uit de opslag');
+  assert.equal(lid.status, 'uit dienst', 'en de status staat erop');
+  assert.match(lid.uitReden, /Bewaring/, 'met de reden erbij');
+});
+
 test('13. na de vernietiging valt er niets meer op te halen, en niets meer te doen', () => {
   const { db, tenant } = loopOpzet();
   const L = tenant.levensloop;

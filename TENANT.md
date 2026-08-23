@@ -197,6 +197,93 @@ niemand anders gelezen dan het eigen scherm; wij zouden onze eigen handtekening
 controleren. Zodra een tweede proces hem doorkrijgt in plaats van hem zelf op te
 bouwen, hoort hij ondertekend te worden — `TAKEN.md` 4.56.
 
+## 6b. De uitgang: weggaan zonder je geschiedenis te verliezen
+
+Exit-recht is de eis waar een inkoper een verkoop op stukmaakt, en hij is niet
+af met een knop die JSON teruggeeft. De bewering is dat een organisatie bij ons
+weg kan en haar werk meeneemt, en die maak je alleen waar door de uitvoer
+**weer in te lezen** en aan te tonen dat er hetzelfde uit komt.
+`test/tenantuitgang.test.js` toets 3 doet precies dat.
+
+**De uitvoer neemt de hele subboom mee, met een lijst van wat eruit MOET** --
+niet een lijst van wat erin mag. Dat is de omgekeerde richting van hoe je een
+API-antwoord bouwt, en met opzet: een soort die iemand vergeet toe te voegen
+ontbreekt anders stilzwijgend in de export van een vertrekkende klant, en dat
+merkt niemand tot het te laat is. Wat er niet in mag staat met naam in `GEHEIM`
+(`beheerToken`, `token`, `lidToken`, `rtgKey`), en de toets doorzoekt de hele
+uitvoer op de sleutels die werkelijk zijn uitgedeeld in plaats van drie velden
+te prikken.
+
+`rtgKey` staat er niet vanwege geheimhouding maar vanwege het codenaam-ontwerp:
+hij legt buiten de kluis om een verband tussen een werkruimtelid en een
+RTG-account. De personeelsnamen gaan wél mee -- dat is de eigen administratie
+van de werkgever.
+
+**Het recept reist mee, en dat is het eigenlijke bewijs.** Een checksum die
+alleen de producent kan narekenen bewijst de ontvanger niets; wij zouden even
+goed kunnen liegen over de uitkomst. In de uitvoer staat daarom hoe je hem
+narekent: sha256 over de canonieke JSON (sleutels alfabetisch) per soort, en
+daarna over de catalogus. Drie regels aan de ontvangende kant, zonder ons. Er
+stond een endpoint om het na te laten rekenen; dat is er weer uit, om precies
+deze reden -- en omdat open rekenwerk over willekeurige JSON een deur is die
+niemand nodig heeft.
+
+De checksum is **ongezouten**, en dat is het verschil met `lib/vingerafdruk.js`:
+die zout per proces omdat hij alleen mag tonen DÁT er iets veranderde. Een
+exportcatalogus moet juist op een andere machine, in een ander jaar, door een
+andere partij na te rekenen zijn. Twee instrumenten met tegengestelde eisen; ze
+delen daarom geen code.
+
+**Inlezen maakt altijd een nieuwe werkruimte**, nooit over een bestaande heen --
+een herstel dat kan overschrijven is een wapen zodra iemand het verkeerde
+bestand kiest. En de leden komen terug **zonder sleutel**: toegang teruggeven is
+een besluit van een mens, geen bijwerking van een herstel.
+
+### De levensloop
+
+Vier standen, en geen zeven. `voorbereiding`, `proef` en `beperkt` stonden in de
+plannen en dwingen niets af; een toestand die niets doet leest op een scherm als
+een werkend mechanisme.
+
+| Stand | Wat er geldt |
+|---|---|
+| `actief` | alles werkt |
+| `opzegging` | het einde is aangekondigd; alles werkt nog gewoon door |
+| `bewaring` | de toegang is dicht, de klok naar vernietiging loopt |
+| `vernietigd` | de gegevens zijn weg; alleen het bewijs blijft |
+
+- **Uitvoer kan in elke stand behalve `vernietigd`**, ook in de bewaring en ook
+  bij een betalingsachterstand. Er is nergens een voorwaarde die de export van
+  een stand of een betaalstatus af laat hangen: een klant die zijn rekening niet
+  betaalt verliest zijn geld en niet zijn geschiedenis. Zou dat wel mogen, dan
+  is exit-recht een gunst -- precies op het moment dat hij telt.
+- **De bewaring sluit de toegang door de sleutels in te trekken**, niet met een
+  vlag die elke route apart moet lezen. Een lid-token wordt tegen `l.token`
+  gehouden; is die weg, dan is de deur overal tegelijk dicht. Het beheer-token
+  blijft werken, want de klant moet zijn uitvoer nog kunnen ophalen.
+- **Vernietigen kan niet voor de termijn en niet onder een bewaringsplicht**, en
+  levert een bewijs met aantallen en checksums en **zonder persoonsgegevens** --
+  een vernietigingsbewijs met namen erin is een kopie van precies dat wat
+  vernietigd moest worden.
+- Uit `bewaring` en `vernietigd` komt niemand terug. Dat zijn eindstanden.
+
+### De veger komt hier niet langs
+
+`werkruimtes` en `tenants` stonden nergens in het bewaarbeleid en dus in de
+gatenlijst van `zonderBeleid()`. Ze er met een gewone termijn bij zetten zou
+erger zijn geweest dan het gat: hun datumveld is een **aanmaakmoment**, dus een
+termijn van 90 dagen laat de generieke veger elke klant wissen die langer dan
+negentig dagen bestaat. De klok hoort pas bij de opzegging te beginnen, kan
+onder een bewaringsplicht stilstaan en eindigt met een bewijs -- dat is een
+levensloop en geen termijn.
+
+Vandaar een derde vorm in `bewaarbeleid.js`: **`eigenRegie`**. De tak telt mee in
+het rapport, verdwijnt uit de gatenlijst, en `veeg()` komt er niet langs. Het
+veld `regie` wijst aan waar de klok dan wel woont. Er is een vierde grond
+`contract` bijgekomen, want wij bewaren dit niet omdat de wet het eist en niet
+omdat wij het nodig hebben, maar omdat de klantovereenkomst een uitlooptijd
+geeft.
+
 ## 7. De lat
 
 Wat een tenantvariant moet halen. **Per regel staat erbij of hij vandaag
@@ -212,10 +299,10 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 | Kruistenant | een deprovisioning bij A raakt niets bij B | gemeten |
 | Claims | 0 enterprisebeweringen zonder bron | gemeten voor de bootstrap; **niet** voor losse schermteksten |
 | Merkdekking | 100% van schermen, mails, documenten en meldingen uit de merkkern | **niet gehaald**: alleen schermen (4.55) |
-| Exit | een volledige export is aantoonbaar opnieuw in te lezen | **niet gebouwd** (5.56) |
+| Exit | een volledige export is aantoonbaar opnieuw in te lezen | gemeten (`test/tenantuitgang.test.js` toets 3) |
 | Contract | elke runtime-bevoegdheid is te herleiden tot een actief contract | **niet gebouwd** (5.56) |
 | Quota | per tenant, en een herstart wist ze niet | **niet gebouwd**; de rem telt per IP |
-| Levenscyclus | elke tenantstand met reden, actor en bewijs | **niet gebouwd** (5.56) |
+| Levenscyclus | elke tenantstand met reden, actor en bewijs | gemeten (`test/tenantuitgang.test.js`, `test/tenantspine.test.js` 12-14) |
 | Codeforks | 0 klantspecifieke forks | gehaald, en dat is de reden dat het merk uit getypeerde velden komt en niet uit vrije CSS of JS |
 
 ## 8. De bouwvolgorde
@@ -229,8 +316,11 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 4. **Tenant Bootstrap** — gedaan, ondertekening open (4.56).
 5. **Identiteitsbrug** — gedaan voor OIDC-groepen en SCIM-deactivatie. SAML en
    SCIM `/Groups` staan open (4.54).
-6. **Levenscyclus** — open. Provisioning, export, legal hold, bewaring,
-   vernietiging en een herstelproef.
+6. **Levenscyclus en uitgang** — gedaan. Export met catalogus en recept,
+   inlezen in een nieuwe werkruimte, vier standen, bewaringsplicht, vernietiging
+   met bewijs. Wat hier NIET onder valt en apart moet: de bijlagen en media van
+   een werkruimte (die wonen buiten `db.data.werkruimtes`), en een uitvoer in een
+   leesbaar formaat naast de machineleesbare -- beide open in `TAKEN.md` 5.56.
 7. **Contract & quota** — open. Abonnement, bevoegdheden, verbruik, support.
 8. **Tenantstatus & bewijs** — open. En de harde volgorde: een SLA mag pas
    zichtbaar worden als contract, meting, incidentproces én herstelbewijs

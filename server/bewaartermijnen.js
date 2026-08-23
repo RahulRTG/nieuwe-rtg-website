@@ -35,7 +35,14 @@
    datum valt er niets te verlopen en hoort de opschoning bij de functie zelf
    (zie kern/zelfzorg/opruimen.js voor de 24-uursregels). */
 
-const { BELEID, DAG } = require('./bewaarbeleid');
+/* Het beleid komt uit TWEE bestanden en wordt hier samengevoegd, niet in de
+   tabel zelf: ./bewaarbeleid.js zat al op 98% van de 10 kB-grens, en de takken
+   met eigen regie zijn bovendien een ander soort regel (een termijn waarvan de
+   klok elders loopt en waar veeg() van afblijft). Ze bij elkaar zetten in de
+   MOTOR is de goede plek -- die kent het verschil al. */
+const { BELEID: GEWONE_TERMIJNEN, DAG } = require('./bewaarbeleid');
+const { EIGEN_REGIE } = require('./bewaarbeleid-eigenregie');
+const BELEID = GEWONE_TERMIJNEN.concat(EIGEN_REGIE);
 
 const msVan = (v) => {
   if (v == null) return NaN;

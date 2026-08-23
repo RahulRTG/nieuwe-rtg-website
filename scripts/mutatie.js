@@ -405,6 +405,11 @@ const EIGEN_MODULE = new Map([
      de hand gedaan en staat in TENANT.md, niet hier. */
   ['tenant.test.js', ['server/kern/tenant/index.js', 'server/kern/tenant/bootstrap.js']],
   ['werkmerk.e2e.js', ['public/apps/werk/merk.js']],
+  /* tenantuitgang.test.js start de server als kindproces. Nagetrokken: de
+     GEHEIM-lijst leegmaken laat toets 1 zakken, de invoer over een bestaande
+     werkruimte laten schrijven laat toets 3 zakken, en de bewaringsplicht
+     negeren laat toets 6 zakken. */
+  ['tenantuitgang.test.js', ['server/kern/tenant/uitgang.js', 'server/kern/tenant/levensloop.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

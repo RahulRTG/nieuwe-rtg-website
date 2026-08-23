@@ -5668,6 +5668,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "tenantuitgang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/uitgang.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "terrein-en-panden.test.js": {
       "soort": "server",
       "staat": "gezakt",

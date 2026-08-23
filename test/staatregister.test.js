@@ -141,7 +141,35 @@ test('elke geregistreerde wortel heeft een eigenaar en een geldige klasse', () =
       assert.ok(r.reset && r.reset !== 'onbekend', id + ' heet herstelbaar maar noemt geen reset');
       assert.ok(r.bewijs, id + ' heet herstelbaar maar noemt geen bewijs dat die reset werkt');
     }
+    /* EEN CLASSIFICATIE ZONDER VORM IS EEN MENING ZONDER PLAATS IN DE LIJST.
+       Zodra een mens er iets van vindt (bron begint met 'hand'), hoort de vorm
+       erbij: die bepaalt WELKE reparatie deze wortel deelbaar maakt, en die
+       vormen zijn met acht tegelijk te doen in plaats van een voor een. */
+    if (String(r.bron || '').startsWith('hand')) {
+      assert.ok(staat.PATRONEN.includes(r.patroon),
+        id + ' is met de hand geclassificeerd maar heeft geen geldig patroon (' + r.patroon + '); ' +
+        'kies uit: ' + staat.PATRONEN.join(', '));
+    }
+    if (r.patroon !== undefined) {
+      assert.ok(staat.PATRONEN.includes(r.patroon), id + ' heeft een onbekend patroon: ' + r.patroon);
+    }
   }
+});
+
+/* De vormlijst is een WERKLIJST en moet dus ook echt gevuld raken. Deze toets
+   zakt niet op een getal maar op de vraag of het register nog iets zegt: staan
+   alle handmatige wortels op een handvol vormen, dan is er iets te plannen. */
+test('de patronen delen het werk op in vormen die per stuk te repareren zijn', () => {
+  const reg = staat.leesRegister();
+  const perVorm = {};
+  for (const r of Object.values(reg.wortels)) {
+    if (!r.patroon) continue;
+    perVorm[r.patroon] = (perVorm[r.patroon] || 0) + 1;
+  }
+  const vormen = Object.keys(perVorm);
+  assert.ok(vormen.length >= 3,
+    'er horen meerdere vormen in het register te staan, anders zegt de indeling niets (' + JSON.stringify(perVorm) + ')');
+  for (const v of vormen) assert.ok(staat.PATRONEN.includes(v), 'onbekende vorm in het register: ' + v);
 });
 
 /* IS DE BELOOFDE RESET OOK EEN ECHTE RESET?

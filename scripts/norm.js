@@ -208,12 +208,27 @@ const METERS = [
      beginstand; EEN onbekende singleton maakt honderd geisoleerde toetsen
      waardeloos zonder dat er iets rood wordt.
 
-     Twee meters, en ze zeggen iets anders. `staatOngeregistreerd` is nieuwe
-     toestand die niemand heeft gezien: die hoort 0 te zijn en te blijven.
+     Drie meters, en ze zeggen alledrie iets anders. `staatOngeregistreerd` is
+     nieuwe toestand die niemand heeft gezien: die hoort 0 te zijn en te blijven.
      `staatOnbekend` is toestand die WEL in STATE.json staat maar nog geen
-     levensduur heeft; dat is het eerlijke gat, en het mag alleen kleiner. */
+     levensduur heeft; dat is het eerlijke gat, en het mag alleen kleiner.
+
+     EN DAN DE DERDE, EN DIE IS ER OM MIJZELF TEGEN TE HOUDEN. `staatOnbekend`
+     omlaag brengen is namelijk gratis: zet elke onbekende wortel op
+     `procesgebonden` en de meter staat op nul, terwijl er precies niets is
+     veranderd -- een onbekende wortel TELDE al als procesgebonden. Dat is een
+     ratel bewegen zonder de waarheid te bewegen, en dat is erger dan een ratel
+     die stilstaat, want daarna gelooft niemand hem meer.
+
+     Daarom telt `staatProcesgebonden` wat er ECHT een vers proces afdwingt:
+     onbekend plus procesgebonden samen. Classificeren verplaatst een wortel van
+     de ene meter naar de andere en laat deze staan; hij zakt alleen als een
+     wortel aantoonbaar deelbaar wordt (bootvast, afgeleid, of herstelbaar met
+     een reset die de bron haalt). Dit is het getal waar het hergebruik van
+     servers werkelijk aan hangt. */
   { sleutel: 'staatOngeregistreerd', richting: 'omlaag', wat: 'muteerbare toestand in server/ die niet in STATE.json staat' },
   { sleutel: 'staatOnbekend', richting: 'omlaag', wat: 'geregistreerde toestandswortels zonder levensduurklasse (tellen als procesgebonden)' },
+  { sleutel: 'staatProcesgebonden', richting: 'omlaag', wat: 'wortels die een VERS proces afdwingen (onbekend + procesgebonden); dit getal blokkeert serverhergebruik' },
   /* Een DUUR op de wandklok. Niet hetzelfde als de klokschuld in KLOK.json:
      die telt hoeveel code de tijd aan het OS vraagt (beproefbaarheid), deze
      hoeveel code een verstreken tijd op de verkeerde klok uitrekent. Dat
@@ -481,7 +496,7 @@ const METERBRONNEN = {
   mutaties: ['toetsenOngevoeligPct', 'toetsenNietGemeten'],
   skips: ['zelfpoortendeToetsen', 'browserpoortToetsen'],
   ijkregister: ['metersOngeijkt'],
-  staat: ['staatOngeregistreerd', 'staatOnbekend', 'duurOpWandklok'],
+  staat: ['staatOngeregistreerd', 'staatOnbekend', 'staatProcesgebonden', 'duurOpWandklok'],
   // goedkoop genoeg om altijd te doen: een readdir en een package.json
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
@@ -749,7 +764,7 @@ function meet(bronnen) {
 
   /* De toestandscensus. Draait alleen als er een toestandsmeter gevraagd is:
      hij ontleedt ruim tweeduizend bestanden en kost drie seconden. */
-  let staatOngeregistreerd, staatOnbekend, duurOpWandklok;
+  let staatOngeregistreerd, staatOnbekend, staatProcesgebonden, duurOpWandklok;
   if (nodig('staat')) {
     const { scan } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
     const census = scan({ wortel: WORTEL });
@@ -766,8 +781,14 @@ function meet(bronnen) {
     const bekend = register.wortels;
     staatOngeregistreerd = census.wortels.filter(w => !bekend[w.id]).length;
     const levend = new Set(census.wortels.map(w => w.id));
+    const telt = ([id, r]) => levend.has(id) || r.bron === 'hand';
     staatOnbekend = Object.entries(bekend)
-      .filter(([id, r]) => (levend.has(id) || r.bron === 'hand') && (!r.levensduur || r.levensduur === 'onbekend')).length;
+      .filter(([id, r]) => telt([id, r]) && (!r.levensduur || r.levensduur === 'onbekend')).length;
+    /* Wat er echt een vers proces afdwingt. Een onbekende wortel telt hier mee,
+       want onbekend IS procesgebonden tot iemand het tegendeel aantoont; zo kan
+       classificeren dit getal niet omlaag praten. */
+    staatProcesgebonden = Object.entries(bekend)
+      .filter(([id, r]) => telt([id, r]) && (!r.levensduur || r.levensduur === 'onbekend' || r.levensduur === 'procesgebonden')).length;
   }
 
   /* Bij `alleen` komen ALLEEN de gevraagde sleutels terug. Niet de rest op
@@ -791,7 +812,7 @@ function meet(bronnen) {
     inlineStijlAttributen,
     bronBlindeBestanden,
     delenZonderOnderwerp,
-    staatOngeregistreerd, staatOnbekend, duurOpWandklok
+    staatOngeregistreerd, staatOnbekend, staatProcesgebonden, duurOpWandklok
   };
   if (!alleen) return alles;
   const uit = {};

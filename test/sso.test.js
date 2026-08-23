@@ -286,3 +286,64 @@ test('28. een provider op een intern adres wordt niet aangeroepen (SSRF)', async
   assert.throws(() => keurUrl('http://idp.test/x'), /https/);
   assert.ok(keurUrl('https://idp.klantje.test/x'), 'een gewoon extern https-adres mag wel');
 });
+
+/* ============================================================================
+   RESETCONTRACTEN -- fase C van de verificatie-runtime.
+
+   Beide caches hieronder zijn `herstelbaar` in STATE.json, en dat is pas iets
+   waard als het bewezen is in plaats van beloofd. Waarom het uitmaakt: een
+   gedeelde server die een sleutelbos of een discovery-document van de vorige
+   toets vasthoudt geeft geen fout maar een VERKEERD ANTWOORD -- een token dat
+   met de sleutels van een andere identiteitsprovider wordt gecontroleerd. Dat
+   is in auth het ergst denkbare lek van toets naar toets.
+
+   De vorm van het contract is steeds dezelfde: vul de cache aantoonbaar, leeg
+   hem, en eis dat wat er daarna gebeurt gelijk is aan een verse start. Niet
+   "de reset gaf geen fout" -- dat bewijst niets.
+   ========================================================================== */
+const jwks = require('../server/sso/jwks');
+
+test('resetcontract: jwks.leeg() haalt de sleutelbos echt uit de kast', async () => {
+  let opgehaald = 0;
+  const bos = { keys: [{ kid: 'reset-1', kty: 'RSA' }] };
+  const bron = jwks.maakBos(async () => { opgehaald++; return bos; });
+  const adres = 'https://idp.reset.test/jwks';
+
+  jwks.leeg();
+  await bron.bos(adres);
+  await bron.bos(adres);
+  assert.equal(opgehaald, 1, 'de tweede keer hoort uit de kast te komen, anders toetst de reset niets');
+
+  jwks.leeg();
+  await bron.bos(adres);
+  assert.equal(opgehaald, 2, 'na leeg() hoort hij opnieuw op te halen, net als bij een verse start');
+
+  /* En per adres, want zo gebruikt de productiecode hem ook: een gewijzigde
+     koppeling leegt alleen zijn eigen adres. */
+  jwks.leeg(adres);
+  await bron.bos(adres);
+  assert.equal(opgehaald, 3, 'leeg(adres) hoort precies dat adres te vergeten');
+
+  /* En een ANDER adres leegmaken mag dit adres niet raken -- anders zou leeg()
+     hierboven ook per ongeluk goed kunnen gaan. */
+  jwks.leeg('https://idp.iemand-anders.test/jwks');
+  await bron.bos(adres);
+  assert.equal(opgehaald, 3, 'een ander adres leegmaken hoort deze kast met rust te laten');
+  jwks.leeg();
+});
+
+test('resetcontract: oidc.leegOntdek() vergeet het discovery-document', async () => {
+  let gehaald = 0;
+  const doc = { issuer: ISS, authorization_endpoint: ISS + '/auth', token_endpoint: ISS + '/token', jwks_uri: ISS + '/jwks' };
+  const haal = async () => { gehaald++; return doc; };
+
+  oidc.leegOntdek();
+  await oidc.ontdek(ISS, haal);
+  await oidc.ontdek(ISS, haal);
+  assert.equal(gehaald, 1, 'de tweede keer hoort uit de cache te komen, anders toetst de reset niets');
+
+  oidc.leegOntdek();
+  await oidc.ontdek(ISS, haal);
+  assert.equal(gehaald, 2, 'na leegOntdek() hoort hij opnieuw te ontdekken, net als bij een verse start');
+  oidc.leegOntdek();
+});

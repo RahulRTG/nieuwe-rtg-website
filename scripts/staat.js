@@ -55,6 +55,50 @@ const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'STATE.json');
 const KLASSEN = ['bootvast', 'toetsgebonden', 'herstelbaar', 'procesgebonden', 'onbekend'];
 
+/* WAAROM HET REGISTER OOK EEN VORM BIJHOUDT.
+
+   Honderdtien wortels die een vers proces afdwingen is een muur. Diezelfde
+   honderdtien zijn, als je ze op vorm sorteert, een werklijst met acht regels --
+   en per vorm is er EEN reparatie in plaats van honderdtien. Dat is het hele
+   nut van dit veld: niet netjes willen zijn, maar van "onbekend gebied" een
+   geordende hoeveelheid werk maken.
+
+   De vormen komen uit de bron en zijn niet bedacht: dit is wat er in server/db,
+   server/accounts en server/kern werkelijk staat.
+
+     verbinding   een greep op iets buiten dit proces (pg, sqlite, redis, pool,
+                  een voorbereide statement). Deelbaar zodra een toets een
+                  bestaande verbinding kan overnemen in plaats van openen.
+     timer        een wachtende setTimeout/setInterval. De gevaarlijkste vorm:
+                  een timer loopt DOOR terwijl de volgende toets draait en
+                  schrijft dan gegevens van de vorige weg. Fix: stopAlles().
+     vlucht       een vlag over werk dat loopt of nog moet (vuil, bezig).
+                  Deelbaar zodra er een punt is waarop alles stil is.
+     spiegel      cache of memo van gegevens die ergens anders wonen. Bijna
+                  altijd herstelbaar: leegmaken is genoeg, alleen bestaat die
+                  aanroep vaak nog niet.
+     merk         een tijdmerk over de laatste keer dat iets gebeurde: wanneer,
+                  of hoe lang het duurde. Stuurt geen uitkomst aan, wel wanneer
+                  iets weer mag.
+     voortgang    teller of generatie die echte voortgang draagt.
+     bedrading    een callback of venster dat bij het opzetten wordt neergezet
+                  en daarna staat.
+     afleiding    luie of eenmalige berekening van iets dat vaststaat.
+
+   EN EEN KLASSE DIE ER BEWUST NIET BIJ KWAM. Ik wilde hier `afgeleid` naast
+   `bootvast` zetten: lui berekend, maar het antwoord ligt vast, dus deelbaar.
+   Toen ik de kandidaten naliep bleef er geen enkele over die het eerlijk kon
+   dragen -- de sleutel in db/geheugen-kluis.js lijkt zuiver, maar een toets die
+   server/data leegmaakt houdt in een gedeeld proces de oude sleutel vast, en
+   dat is precies wat de klasse zou ontkennen. Een klasse zonder lid is een
+   ratel die nooit is zien vuren (LAT-regel 10), dus hij is er niet. De VORM
+   `afleiding` blijft, want die is er wel. Komt er een echt lid, dan is dit de
+   plek om hem alsnog toe te voegen.
+
+   Het veld is verplicht zodra een mens een klasse invult (test/staatregister),
+   want een classificatie zonder vorm is een mening zonder plaats in de lijst. */
+const PATRONEN = ['verbinding', 'timer', 'vlucht', 'spiegel', 'merk', 'voortgang', 'bedrading', 'afleiding'];
+
 function leesRegister() {
   try {
     const r = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
@@ -273,4 +317,4 @@ if (require.main === module) {
     (perKlasse.herstelbaar ? ', en elke beloofde reset raakt zijn wortel echt aan' : '') + '.\n');
 }
 
-module.exports = { meet, schrijfRegister, leesRegister, dekking, functieUitReset, KLASSEN };
+module.exports = { meet, schrijfRegister, leesRegister, dekking, functieUitReset, KLASSEN, PATRONEN };

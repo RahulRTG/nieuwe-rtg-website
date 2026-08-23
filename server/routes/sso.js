@@ -20,15 +20,18 @@
    het nog een halve minuut geldig was. Een tweede poging krijgt niets.
    ========================================================================== */
 const rem = require('../rem');
-const sso = require('../sso');
 const koppelingen = require('../sso/koppelingen');
 const oidc = require('../sso/oidc');
 const staat = require('../sso/staat');
-const scimGroepen = require('../scim/groepen');
+const binnenkomst = require('../sso/binnenkomst');
 const { log } = require('../log');
 
-const OVERDRACHT = 'sso-overdracht';
-const OVERDRACHT_MS = 60000;
+/* Geen destructurering, en dat is geen stijl. scripts/grenzen.js telt elk
+   `{ naam } = iets;` in een routebestand als een naam die uit de KERN wordt
+   gepakt -- `const { OVERDRACHT } = binnenkomst;` liet kernBreedte met een
+   stijgen voor een constante die niets met de kern te maken heeft. Een meter
+   met een blinde vlek voed je niet met ruis. */
+const OVERDRACHT = binnenkomst.OVERDRACHT;
 
 module.exports = (kern) => {
   const { app, accounts, appUrl, stateFor, logInlog } = kern;
@@ -98,49 +101,12 @@ module.exports = (kern) => {
         redirectUri: terugAdres(req), code: req.query.code, verifier: s.verifier
       }, { nonce: s.nonce });
 
-      const { user, nieuw, gekoppeld } = await sso.aanmelden(accounts, k, claims);
-      /* Wat er WEL in het logboek komt: dat er is ingelogd, via welke koppeling,
-         en of het een nieuw account was. Niet het e-mailadres, niet de naam --
-         het codenaam-ontwerp geldt ook voor onze eigen logregels. */
-      log.info('sso.inlog', { org: k.org, codenaam: user.codename, nieuw, gekoppeld });
-      if (typeof logInlog === 'function') logInlog('sso', true, k.org, req);
-
-      /* DE IDENTITEITSBRUG. Tot hier ging dit over een RTG-account; een
-         werkruimte van het Werk OS werkt met een eigen lid. De brug legt die
-         twee aan elkaar aan de hand van de groepen die de provider meestuurt --
-         en doet NIETS zolang de beheerder van die werkruimte geen groep aan een
-         rol heeft gekoppeld (kern/tenant/brug.js).
-
-         De claim heet `groups`: één bron, geen tweede naam ernaast. Wat de
-         provider niet meestuurt, bestaat voor deze ronde niet.
-
-         Een fout hier laat de INLOG staan en wordt luid gelogd. Dit gaat over
-         de werkplek en niet over het account; iemand buitensluiten uit zijn
-         eigen RTG-omgeving omdat een journaalregel in een werkruimte niet
-         wegkwam, is het verkeerde antwoord op het verkeerde probleem. Dat het
-         misging mag alleen nooit stil zijn -- dan lopen rollen ongemerkt uit de
-         pas met de provider. */
-      try {
-        if (kern.tenant) {
-          /* DE TWEE BRONNEN VAN GROEPSLIDMAATSCHAP, SAMEN. De claim uit het
-             token zegt wat de provider NU meestuurt; de SCIM-tabel zegt wat
-             hij ons eerder heeft geduwd. Alleen de claim lezen zou betekenen
-             dat een inlog de rollen wist die via /Groups zijn gezet -- en dan
-             is de nieuwe deur zijn eigen sloper. Alleen SCIM lezen zou een
-             provider die geen /Groups gebruikt buitensluiten. Dus de UNIE. */
-          const uitScim = scimGroepen.groepenVan(k.org, user.id);
-          const alleGroepen = [...new Set([].concat(Array.isArray(claims.groups) ? claims.groups : [], uitScim))];
-          const uit = kern.tenant.brug.uitClaims(k.org, alleGroepen, 'user-' + user.id, claims.name);
-          if (uit.ok && uit.werkruimtes.length) log.info('tenant.brug', { org: k.org, werkruimtes: uit.werkruimtes.length });
-        }
-      } catch (e) {
-        log.error('tenant.brug mislukt', { org: k.org, fout: e.message });
-      }
-
-      const bewijs = accounts.issueActionToken(user.id, OVERDRACHT, OVERDRACHT_MS);
-      const pas = user.tier === 'lifestyle' || user.tier === 'business' ? user.tier : 'rtg';
-      res.redirect(302, '/apps/app.html?pas=' + pas + '&sso=' + encodeURIComponent(bewijs) +
-        '&terug=' + encodeURIComponent(s.terug));
+      /* Alles wat hierna gebeurt -- aanmelden, loggen, de identiteitsbrug, het
+         overdrachtsbewijs, de terugreis -- staat in sso/binnenkomst.js, omdat
+         de SAML-deur er precies dezelfde vijf dingen moet doen. Twee kopieen
+         lopen uiteen, en dan hangt iemands rol af van welke knop hij gebruikte
+         (LAT-regel 4). */
+      await binnenkomst.binnen(kern, k, claims, req, res, s.terug, 'oidc');
     } catch (e) {
       /* De reden gaat het logboek in, niet het antwoord: "dit adres valt buiten
          de domeinen van deze koppeling" vertelt een buitenstaander meer over

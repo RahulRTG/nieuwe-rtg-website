@@ -425,14 +425,45 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    van pas bij de volgende inlog; bij het inloggen wordt de unie van de
    tokenclaim en de SCIM-tabel genomen.
 
-   **SAML is niet gebouwd, en dat is een besluit** — hetzelfde soort besluit als
-   bij `sovereign`. Een SAML-SP vraagt XML-canonicalisatie en
-   XML-DSig-verificatie; dit huis heeft nul runtime-afhankelijkheden. De keuze
-   is dus: die regel laten wijken, of zelf een cryptografische primitief
-   schrijven waarvan de faalvorm een **stille authenticatie-bypass** is
-   (XML Signature Wrapping). Dat is een besluit van de eigenaar. Komt hij er,
-   dan hoort hij in dezelfde federatiepoort uit te komen op het claimcontract
-   dat OIDC al gebruikt — niet als tweede laag ernaast. Zie `TAKEN.md` 4.54.
+   **SAML is er sindsdien ook** (`server/sso/saml/`, `routes/sso-saml.js`). Hij
+   stond hier als een besluit om hem NIET te bouwen, met een reden die klopte:
+   een SAML-SP vraagt XML-canonicalisatie en XML-DSig-verificatie, dit huis
+   heeft nul runtime-afhankelijkheden, en de faalvorm van zelfbouw is een
+   **stille authenticatie-bypass**. Dat besluit is teruggedraaid, en het enige
+   wat die reden onschadelijk maakt is dat er nu op geschoten wordt.
+
+   **Hij komt uit op hetzelfde claimcontract als OIDC.** Wat een assertie moet
+   doen om `{ sub, email, email_verified, name, groups }` op te leveren, is de
+   zorg van `sso/saml/`; daarna loopt hij door `sso/binnenkomst.js` — dezelfde
+   vijf stappen, dezelfde identiteitsbrug, hetzelfde overdrachtsbewijs. In
+   `binnenkomst.js` staat geen enkele `if (saml)`, en dat is de eis: twee deuren
+   die hetzelfde doen lopen uiteen, en dan hangt iemands rol af van welke knop
+   hij gebruikte.
+
+   **Het profiel is zo smal dat de aanval er niet in past.** Precies één
+   `Assertion` in het hele document en precies één `Signature`; het ondertekende
+   element moet de OUDER van die handtekening zijn; een ID moet naar precies één
+   element wijzen; en — de regel waar het om draait — de assertie die we LEZEN
+   moet een nazaat zijn van het stuk dat is GECONTROLEERD. Geen SHA-1, geen
+   HMAC, geen XPath- of XSLT-transform, en de sleutel komt nooit uit `KeyInfo`
+   maar altijd uit de koppeling. Verder: `InResponseTo` moet bij een verzoek
+   horen dat wij hebben gestuurd (dat sluit de ongevraagde, IdP-initiated inlog
+   af), en zowel het verzoek als de assertie werkt één keer.
+
+   **En er is op geschoten.** `test/samlxsw.test.js` bouwt echte, geldig
+   ondertekende antwoorden met een wegwerpsleutel en verminkt ze daarna: XSW met
+   een tweede assertie, een handtekening die een ANDER element dekt (en
+   wiskundig klopt), een handtekening die is losgemaakt van zijn element, een
+   ongetekende assertie, inhoud die na het ondertekenen is veranderd, een
+   verlopen assertie en een verkeerd publiek. `test/samlc14n.test.js` legt onze
+   canonicalisatie naast die van libxml2 — onszelf toetsen met onszelf zegt over
+   c14n niets. Dertien mutaties met de hand geprobeerd, dertien raak.
+
+   **Wat er NIET is, met de reden.** Wij ondertekenen het AuthnRequest niet: dat
+   bewijst aan de provider dat het verzoek van ons komt en zegt niets over de
+   veiligheid van het ANTWOORD, en dat is de kant waar de aanval zit. Providers
+   die het eisen kunnen hier niet terecht. Ook geen versleutelde asserties
+   (`EncryptedAssertion`) en geen Single Logout.
 6. **Levenscyclus en uitgang** — gedaan. Export met catalogus en recept, een
    leesbaar overzicht ernaast, inlezen in een nieuwe werkruimte, vier standen,
    bewaringsplicht, vernietiging met bewijs.

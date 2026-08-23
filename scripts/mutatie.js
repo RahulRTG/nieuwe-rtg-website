@@ -436,6 +436,27 @@ const EIGEN_MODULE = new Map([
      (toets 1, en dan vallen er vijf om), de taken BUITEN een gestopt project
      niet meer tellen (toets 4), en nietGerekend leegmaken (toets 5). */
   ['werkgevolg.test.js', ['server/bedrijf/gevolg.js']],
+  /* DE SAML-DEUR. Dertien mutaties met de hand geprobeerd, dertien raak -- en
+     een veertiende die NIET raak was omdat hij niet muteerde: de zin
+     `if (!X.isNazaatVan(assertie, gecontroleerd))` staat ook in de KOP van
+     antwoord.js, dus de eerste vervanging trof het commentaar en de code bleef
+     staan. Dat zag eruit als een overlevende toets terwijl er niets was
+     veranderd. Vandaar dat deze motor op de code-regel muteert en niet op een
+     losse zin, en vandaar dat het hier staat: een mutatie die je niet hebt zien
+     landen, is geen mutatie.
+
+     samlxsw -> antwoord.js: de isNazaatVan-regel eruit (toets 3), het publiek
+     niet controleren (8), het verlopen niet controleren (7), meer dan een
+     assertie toestaan (2). -> handtekening.js: de ouder-koppeling eruit (4),
+     dubbele IDs toestaan (10), de digestvergelijking altijd goed (6), sha1
+     alsnog toestaan (11).
+     samlc14n -> c14n.js: de attributen niet sorteren, de naamruimten niet
+     sorteren. Beide zakken tegen libxml2 en niet tegen onszelf.
+     samlpoort -> sso/saml/index.js: een verzoek niet verwijderen bij gebruik,
+     de org-controle op een verzoek eruit, een assertie zonder ID toelaten. */
+  ['samlxsw.test.js', ['server/sso/saml/antwoord.js', 'server/sso/saml/handtekening.js']],
+  ['samlc14n.test.js', ['server/sso/saml/c14n.js', 'server/sso/saml/xml.js']],
+  ['samlpoort.test.js', ['server/sso/saml/index.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

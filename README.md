@@ -3378,19 +3378,57 @@ hem naar ons toe en beweegt de werkruimte mee in hetzelfde verzoek -- ook, en
 juist, voor wie eruit gaat. Een groep draagt een naam en leden en verder niets:
 geen rechten (die staan in de groepsafbeelding, gezet door een mens) en geen
 nesting. Bij het inloggen wordt de unie van de tokenclaim en de SCIM-tabel
-genomen. **SAML is een besluit en geen taak**: dat vraagt XML-DSig-verificatie,
-en dit huis heeft nul runtime-afhankelijkheden -- zie `TAKEN.md` 4.54.
+genomen.
+
+**SAML** (`server/sso/saml/`, `POST /api/sso/saml/acs`). Dit stond hier als een
+besluit om het NIET te bouwen: een SAML-SP vraagt XML-canonicalisatie en
+XML-DSig-verificatie, dit huis heeft nul runtime-afhankelijkheden, en de
+faalvorm van zelfbouw is een **stille authenticatie-bypass**. Hij is er nu, en
+wat die reden onschadelijk maakt is niet een belofte maar een aanvalstoets.
+
+Hij komt uit op **hetzelfde claimcontract als OIDC** en loopt daarna door
+dezelfde `sso/binnenkomst.js` -- dezelfde vijf stappen, dezelfde
+identiteitsbrug, hetzelfde overdrachtsbewijs, geen enkele `if (saml)`. Het
+profiel is smal met opzet: precies EEN `Assertion` en EEN `Signature` in het
+document, het ondertekende element moet de OUDER van de handtekening zijn, een
+ID moet naar precies EEN element wijzen, en **de assertie die we lezen moet een
+nazaat zijn van het stuk dat is gecontroleerd** -- dat laatste is de regel waar
+XML Signature Wrapping op stukloopt. Geen SHA-1, geen HMAC, geen XPath- of
+XSLT-transform; de sleutel komt nooit uit `KeyInfo` maar uit de koppeling.
+`InResponseTo` moet bij een verzoek horen dat wij hebben gestuurd (dat sluit de
+ongevraagde, IdP-initiated inlog af), en zowel het verzoek als de assertie werkt
+een keer. Niet gebouwd, met de reden: wij ondertekenen het AuthnRequest niet
+(dat bewijst iets aan de provider en niets over het ANTWOORD, en daar zit de
+aanval), geen versleutelde asserties en geen Single Logout.
+
+Inrichten doet de eigenaar met `POST /api/techniek/sso/saml` (entityID, SSO-adres
+en het ondertekencertificaat, dat meteen wordt gelezen); wat de klant bij zijn
+provider invult staat op `/api/sso/saml/metadata`. De SAML-velden hangen aan de
+BESTAANDE koppeling en niet aan een tweede tabel -- twee koppelingen zouden twee
+domeinlijsten betekenen die uiteen kunnen lopen, en de domeinlijst is de
+beveiliging.
 
 `test/tenantspine.test.js` (15, de regels), `test/tenant.test.js` (8, over de
 lijn), `test/tenantuitgang.test.js` (7, de uitgang), `test/tenantcontract.test.js`
-(7), `test/tenantbewijs.test.js` (7), `test/scimgroepen.test.js` (5) en de
-schermtoetsen `test/werkmerk.e2e.js` en `test/werkcommandbalk.e2e.js` leggen dit
-vast; drieentwintig mutaties, alle drieentwintig RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
+(7), `test/tenantbewijs.test.js` (7), `test/scimgroepen.test.js` (5), de
+SAML-toetsen (`samlxsw` 12 -- de aanvallen, `samlc14n` 5 -- libxml2 als
+scheidsrechter, `samlpoort` 6, `samlacs` 4 -- de echte deur) en de schermtoetsen
+`test/werkmerk.e2e.js` en `test/werkcommandbalk.e2e.js` leggen dit
+vast; zesendertig mutaties, alle zesendertig RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
 merkcontrole overslaan, een leeg quotum in de bootstrap zetten, de IdP een
 ontslag laten herstellen, deprovisioning over alle tenants laten lopen en de
 accentkleur op de RTG-kopbalk lekken, de geheimen in de export laten staan, een
 invoer over een bestaande werkruimte heen schrijven, de bewaringsplicht negeren
-en de veger wel aan de eigen regie laten komen.
+en de veger wel aan de eigen regie laten komen. Aan de SAML-kant: de
+nazaat-regel eruit halen, de handtekening van zijn element losmaken, twee
+asserties toestaan, dubbele ID's toestaan, de digestvergelijking altijd goed
+laten zijn, SHA-1 alsnog toelaten, het publiek en het verlopen niet
+controleren, de attributen en de naamruimten niet sorteren (die twee zakken
+tegen libxml2 en niet tegen onszelf), een verzoek niet verwijderen bij gebruik,
+de org-controle op een verzoek weghalen en een assertie zonder ID toelaten. Er
+was ook een mutatie die NIET landde -- de gezochte zin stond ook in het
+commentaar -- en die staat in `scripts/mutatie.js`, want een mutatie die je niet
+hebt zien landen is geen mutatie.
 
 ### RTG Web Platform (de automatische bedrijfssite en de browser die bedrijven begrijpt)
 

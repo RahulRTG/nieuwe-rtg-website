@@ -73,14 +73,36 @@
     let t = null; try { t = localStorage.getItem('rtg_office_token'); } catch(e){}
     if (!t){ naarInlog(); return; }
     API.token = t;
+    /* TWEE DINGEN DIE NIET IN DEZELFDE try HOREN, en dat kostte een oneindige lus.
+       Hier stond `state = await call('/office/state'); enterApp();` samen in een
+       try met een catch die het token weggooit en naar de inlog stuurt. Dat klopt
+       voor de EERSTE regel: een sessie die de server niet kent, is geen sessie.
+       Voor de tweede klopt het niet -- enterApp() bouwt het scherm op, en als daar
+       iets omvalt is dat geen authenticatieprobleem. De catch wiste dan toch het
+       token en stuurde door naar /apps/personeel.html?kantoor=1&terug=..., waar de
+       poort een geldige kantoorsessie zag en meteen terugstuurde naar `terug`.
+       Backoffice heen, poort terug, zeven keer per seconde, eindeloos: in vier
+       seconden laadde de pagina zichzelf 42 keer opnieuw. Voor een medewerker een
+       knipperend scherm, voor de server een storm.
+
+       Het spoor dat het verraadde was een verzoek zonder Authorization-header:
+       /api/aanmelding/betalingen vertrok tokenloos terwijl /aanmelding/lijst uit
+       dezelfde functie hem negen milliseconden eerder nog wel droeg. Het token was
+       er dus tussenuit gehaald terwijl het scherm nog aan het laden was.
+
+       Nu staan ze los. Zakt het scherm, dan blijft u ingelogd en zegt de console
+       WAT er omviel -- in plaats van u stil uit te loggen om een fout die niets met
+       inloggen te maken had. */
     try {
       state = (await call('/office/state')).state;
-      enterApp();
     } catch(e){
       API.token = null;
       try { localStorage.removeItem('rtg_office_token'); } catch(e2){}
       naarInlog();
+      return;
     }
+    try { enterApp(); }
+    catch(e){ console.error('[backoffice] het scherm kwam niet op:', e); }
   })();
 
   async function refresh(){ try { state = (await call('/office/state')).state; render(); loadHandelsRegels(); loadFoundationRegistraties(); } catch(e){} }

@@ -34,20 +34,45 @@ const { log } = require('../log');
 module.exports = (kern) => {
   const { app, appUrl, logInlog } = kern;
 
-  /* Onze eigen entityID en antwoordadres. Ze komen uit de configuratie en NOOIT
-     uit een kop van het verzoek: wie de Host-kop mag verzinnen, zou anders het
-     publiek van een assertie kunnen verschuiven -- en dan controleert de
-     Audience-toets zichzelf. */
-  const acsAdres = (req) => appUrl(req) + '/api/sso/saml/acs';
-  const onzeId = (req) => appUrl(req) + '/saml/metadata';
+  /* ONZE EIGEN entityID EN ANTWOORDADRES -- UIT DE CONFIGURATIE, EN NERGENS
+     ANDERS VANDAAN.
+
+     Hier stond `appUrl(req)`, met een commentaar erboven dat zei dat deze twee
+     nooit uit een kop van het verzoek komen. Dat commentaar klopte niet met de
+     code: buiten productie valt appUrl(req) terug op de Origin-kop en anders op
+     de Host-kop. En dat is hier geen schoonheidsfoutje maar een gat in de
+     controle zelf -- `onzeId` is precies de waarde waartegen de Audience van
+     een assertie wordt gehouden, en `acsAdres` de waarde waartegen de
+     Recipient. Wie de kop mag verzinnen, verschuift dus het publiek dat wij
+     accepteren, en dan controleert de Audience-toets zichzelf.
+
+     `appUrl(null)` geeft de geconfigureerde basis en anders een lege string:
+     zonder verzoek kan er ook geen kop in sluipen. Dat is met opzet dezelfde
+     functie en geen tweede kopie van de configuratielogica.
+
+     Is er geen basis geconfigureerd, dan gaat deze deur NIET open met een
+     gegokte identiteit maar dicht MET de reden -- dezelfde keuze als bij de
+     modus `sovereign`. Een SP die zijn eigen naam van de beller leert, heeft
+     geen naam. */
+  const basis = () => appUrl(null);
+  const acsAdres = () => basis() + '/api/sso/saml/acs';
+  const onzeId = () => basis() + '/saml/metadata';
+
+  const zonderBasis = (res) => {
+    if (basis()) return false;
+    res.status(503).json({ error: 'SAML staat uit: dit huis heeft geen vast webadres geconfigureerd (APP_URL of RTG_DOMAINS).',
+      waarom: 'De entityID en het antwoordadres van een SP zijn identiteit. Zouden wij ze uit de Host- of Origin-kop van het verzoek afleiden, dan bepaalt de beller waartegen wij de Audience en de Recipient van een assertie houden -- en dan controleert die toets zichzelf.' });
+    return true;
+  };
 
   /* ---------- 1. de heenreis ---------- */
   app.get('/api/sso/saml/start', rem({ windowMs: 60000, limit: 30 }), (req, res) => {
+    if (zonderBasis(res)) return;
     const k = saml.samlVan(req.query.org);
     if (!k || !k.actief) return res.status(404).json({ error: 'Onbekende of uitgezette SAML-koppeling.' });
     try {
       const { url } = saml.verzoekUrl(k, {
-        acs: acsAdres(req), entityId: onzeId(req), terug: staat.veiligTerug(req.query.terug)
+        acs: acsAdres(), entityId: onzeId(), terug: staat.veiligTerug(req.query.terug)
       });
       res.redirect(302, url);
     } catch (e) {
@@ -68,6 +93,7 @@ module.exports = (kern) => {
   };
 
   app.post('/api/sso/saml/acs', rem({ windowMs: 60000, limit: 30 }), formulier, async (req, res) => {
+    if (zonderBasis(res)) return;
     const velden = req.formulier || new URLSearchParams('');
     const relay = String(velden.get('RelayState') || '');
     const rauw = String(velden.get('SAMLResponse') || '');
@@ -87,7 +113,7 @@ module.exports = (kern) => {
     try {
       const xml = Buffer.from(rauw.replace(/\s+/g, ''), 'base64').toString('utf8');
       const uit = antwoord.lees(xml, s, {
-        entityId: onzeId(req), acs: acsAdres(req), verzoekId: verzoek.id
+        entityId: onzeId(), acs: acsAdres(), verzoekId: verzoek.id
       });
       /* Eenmalig gebruik. Dit staat NA de controle en niet ervoor: een assertie
          die de controle niet haalt, hoort de teller van een geldige niet te
@@ -112,18 +138,24 @@ module.exports = (kern) => {
      certificaat noemen dat nergens voor wordt gebruikt is een belofte zonder
      dekking. */
   app.get('/api/sso/saml/metadata', rem({ windowMs: 60000, limit: 30 }), (req, res) => {
+    if (zonderBasis(res)) return;
     const xml = '<?xml version="1.0"?>' +
-      '<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="' + esc(onzeId(req)) + '">' +
+      '<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="' + esc(onzeId()) + '">' +
       '<SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true"' +
       ' protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">' +
       '<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>' +
       '<AssertionConsumerService index="0" isDefault="true"' +
-      ' Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="' + esc(acsAdres(req)) + '"/>' +
+      ' Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="' + esc(acsAdres()) + '"/>' +
       '</SPSSODescriptor></EntityDescriptor>';
     res.set('Content-Type', 'application/samlmetadata+xml').send(xml);
   });
 
+  /* `>` hoort er ook in. Hij is in XML alleen verplicht na `]]`, maar een
+     escape die vier van de vijf tekens pakt is precies de vorm waar een
+     scanner over valt -- en terecht: wie hem later hergebruikt voor iets
+     anders dan een attribuut, heeft een gat. */
   function esc(s) {
-    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 };

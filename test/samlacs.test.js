@@ -29,7 +29,15 @@ const idp = require('./saml-idp');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-samlacs-'));
 const kp = idp.sleutelpaar('acs.test');
 const UITGEVER = 'https://idp.klant-saml.nl/meta';
-let srv, base, tech, ACS, ONS;
+/* DE SP-IDENTITEIT KOMT UIT DE CONFIGURATIE EN NIET UIT HET ADRES WAAR DE
+   TOETS TOEVALLIG OP LUISTERT. Dat is het punt: `onzeId` is de waarde
+   waartegen de Audience van een assertie wordt gehouden. Zou hij uit de Host-
+   of Origin-kop komen, dan bepaalt de beller waartegen wij controleren. De
+   verzoeken gaan dus naar `base`, maar wie wij ZIJN staat hieronder vast. */
+const ONS_ADRES = 'https://rtg.test';
+const ACS = ONS_ADRES + '/api/sso/saml/acs';
+const ONS = ONS_ADRES + '/saml/metadata';
+let srv, base, tech;
 
 const json = (pad, body, token) => fetch(base + pad, {
   method: 'POST',
@@ -63,10 +71,8 @@ function antwoordVoor(id, extra) {
 }
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, APP_URL: ONS_ADRES } });
   base = srv.base;
-  ACS = base + '/api/sso/saml/acs';
-  ONS = base + '/saml/metadata';
   tech = (await json('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
 
   const k = await json('/api/techniek/sso', { org: 'O-SAML', naam: 'Klant SAML', issuer: 'https://idp.klant-saml.nl',
@@ -140,4 +146,66 @@ test('4. hetzelfde antwoord een tweede keer werkt niet', async () => {
      opgevangen, is hier niets waard. */
   assert.equal((await postAcs(xml, '')).status, 400);
   assert.equal((await postAcs(xml, '_verzonnen')).status, 400);
+});
+
+test('5. de SP-identiteit verschuift niet met een verzonnen Origin-kop', async () => {
+  /* DE AANVAL. `onzeId` is de waarde waartegen de Audience van een assertie
+     wordt gehouden en `acsAdres` die waartegen de Recipient. Kwamen die uit de
+     Host- of Origin-kop -- en dat deden ze, want appUrl(req) valt buiten
+     productie daarop terug -- dan kan iemand met een assertie die voor een
+     ANDERE dienst is uitgegeven hier binnenkomen door simpelweg de goede kop
+     mee te sturen. Dan controleert de Audience-toets zichzelf.
+
+     Hier is dat na te spelen: een geldig ondertekende assertie voor
+     https://boef.nl, aangeboden met precies die Origin-kop erbij. */
+  const relay = await heenreis();
+  const vals = idp.geldig({
+    id: '_a-boef', issuer: UITGEVER, sub: 'saml-user-1', acs: 'https://boef.nl/api/sso/saml/acs',
+    inResponseTo: relay, publiek: 'https://boef.nl/saml/metadata', email: 'pia@klant-saml.nl', key: kp.key });
+
+  const r = await fetch(base + '/api/sso/saml/acs', {
+    method: 'POST', redirect: 'manual',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: 'https://boef.nl' },
+    body: new URLSearchParams({ SAMLResponse: Buffer.from(vals.xml, 'utf8').toString('base64'), RelayState: relay })
+  });
+  assert.equal(r.status, 401, 'de kop verschuift ons publiek niet');
+
+  /* En de metadata noemt nog steeds ons eigen adres, ook met die kop erbij. */
+  const m = await fetch(base + '/api/sso/saml/metadata', { headers: { Origin: 'https://boef.nl' } });
+  const xml = await m.text();
+  assert.ok(xml.includes('entityID="' + ONS + '"'), 'de entityID staat vast: ' + xml.slice(0, 160));
+  assert.ok(!xml.includes('boef.nl'), 'en de kop komt nergens in het antwoord terug');
+});
+
+test('6. zonder geconfigureerd webadres gaat de SAML-deur NIET open', async () => {
+  /* DIT IS DE TOETS DIE DE REPARATIE BEWIJST, en toets 5 hierboven doet dat
+     niet: met APP_URL gezet kan de Origin-kop sowieso niet meespelen, dus daar
+     overleeft de oude code de proef gewoon. Het verschil zit in de opstelling
+     ZONDER configuratie -- precies waar appUrl(req) terugviel op de Host- of
+     Origin-kop.
+
+     Oude gedrag: de deur ging open met een identiteit die de beller meegaf.
+     Nieuw gedrag: de deur gaat dicht MET de reden. Een SP die zijn eigen naam
+     van de beller leert, heeft geen naam. */
+  const tmp2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-samlacs2-'));
+  const srv2 = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: tmp2 } });   // geen APP_URL
+  try {
+    for (const [pad, opties] of [
+      ['/api/sso/saml/metadata', {}],
+      ['/api/sso/saml/start?org=O-SAML', { redirect: 'manual' }],
+      ['/api/sso/saml/acs', { method: 'POST', redirect: 'manual',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: 'https://boef.nl' },
+        body: new URLSearchParams({ SAMLResponse: 'x', RelayState: 'y' }) }]
+    ]) {
+      const r = await fetch(srv2.base + pad, opties);
+      assert.equal(r.status, 503, pad + ' hoort dicht te zijn zonder vast webadres');
+      const b = await r.json();
+      assert.match(b.error, /geen vast webadres/);
+      assert.match(b.waarom, /controleert die toets zichzelf/,
+        'en de weigering zegt WAAROM, niet alleen dat het niet kan');
+    }
+  } finally {
+    stop(srv2 && srv2.child);
+    try { fs.rmSync(tmp2, { recursive: true, force: true }); } catch (e) {}
+  }
 });

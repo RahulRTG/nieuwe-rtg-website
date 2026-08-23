@@ -3457,6 +3457,14 @@ een keer. Niet gebouwd, met de reden: wij ondertekenen het AuthnRequest niet
 (dat bewijst iets aan de provider en niets over het ANTWOORD, en daar zit de
 aanval), geen versleutelde asserties en geen Single Logout.
 
+**SAML vraagt een geconfigureerd webadres.** De entityID en het antwoordadres
+van een SP zijn identiteit, en dat zijn precies de waarden waartegen de Audience
+en de Recipient van een assertie worden gehouden. Ze komen daarom uit `APP_URL`
+(of `RTG_DOMAINS`) en niet uit de Host- of Origin-kop van het verzoek -- anders
+bepaalt de beller waartegen wij controleren. Staat er geen webadres, dan
+weigeren de drie SAML-routes met die reden in plaats van open te gaan met een
+gegokte naam.
+
 Inrichten doet de eigenaar met `POST /api/techniek/sso/saml` (entityID, SSO-adres
 en het ondertekencertificaat, dat meteen wordt gelezen); wat de klant bij zijn
 provider invult staat op `/api/sso/saml/metadata`. De SAML-velden hangen aan de

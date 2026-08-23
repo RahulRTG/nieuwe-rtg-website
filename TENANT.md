@@ -472,6 +472,18 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    canonicalisatie naast die van libxml2 — onszelf toetsen met onszelf zegt over
    c14n niets. Dertien mutaties met de hand geprobeerd, dertien raak.
 
+   **De SP-identiteit komt uit de configuratie, en anders gaat de deur niet
+   open.** `onzeId` is de waarde waartegen de Audience van een assertie wordt
+   gehouden en `acsAdres` die waartegen de Recipient. Die stonden eerst op
+   `appUrl(req)` — met een commentaar erboven dat zei dat ze nooit uit een kop
+   van het verzoek komen, terwijl `appUrl(req)` buiten productie precies dat
+   doet: terugvallen op Origin en anders op Host. Wie de kop mag verzinnen,
+   verschuift dan het publiek dat wij accepteren, en dan controleert de
+   Audience-toets zichzelf. Ze komen nu uit `appUrl(null)` — dezelfde functie,
+   maar zonder verzoek kan er geen kop in sluipen — en zonder geconfigureerd
+   webadres (`APP_URL` of `RTG_DOMAINS`) weigeren alle drie de routes met de
+   reden. Een SP die zijn eigen naam van de beller leert, heeft geen naam.
+
    **Wat er NIET is, met de reden.** Wij ondertekenen het AuthnRequest niet: dat
    bewijst aan de provider dat het verzoek van ons komt en zegt niets over de
    veiligheid van het ANTWOORD, en dat is de kant waar de aanval zit. Providers

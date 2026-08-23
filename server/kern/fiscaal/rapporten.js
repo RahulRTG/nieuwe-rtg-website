@@ -32,9 +32,18 @@ module.exports = (ctx) => {
     for (const v of db.data.posSales[s.code] || []) {
       if (!opDag(v.at)) continue;
       bonnen++;
-      omzet += v.total || 0;
       const m = v.method || 'contant';
       betaalwijzen[m] = centen((betaalwijzen[m] || 0) + (v.total || 0));
+      /* Een GEBUNDELDE bon (het tafelticket) telt hier niet als omzet: de
+         bestellingen eronder staan hierboven al geteld. Zonder deze regel gaf
+         het Z-rapport het dubbele van wat er verkocht was -- gemeten: 436 bij
+         een tafel van 218 (TAKEN.md 4.28). Hij telt wel als bon en wel als
+         betaalwijze: er is een bonnetje uitgedraaid en er is echt contant
+         binnengekomen. Wat er dan nog scheef staat -- de bestellingen staan
+         onder `app` terwijl er aan tafel contant is betaald -- vraagt een
+         besluit over wat een Z-rapport hoort te tonen; zie TAKEN.md 4.54. */
+      if (v.omzetElders) continue;
+      omzet += v.total || 0;
       if (m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening: de btw loopt via de hoofdboeking
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);

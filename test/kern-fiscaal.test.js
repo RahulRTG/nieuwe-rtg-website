@@ -65,6 +65,75 @@ test('financeVoor: personeelskosten uit klokuren met land-specifieke lasten', ()
   assert.equal(fin.personeel.totaal, centen(200 * (1 + 0.28 + 0.08)), 'bruto + lasten + vakantiegeld');
 });
 
+/* DE OMZET TELT EEN KEER, OOK ALS ER EEN BON OVERHEEN GAAT.
+
+   Twee wegen leggen een GEBUNDELDE kassabon over posten die zelf al omzet zijn,
+   en allebei telden ze daardoor dubbel in de maandboekhouding (TAKEN.md 4.28):
+
+     - het tafelticket rekent bestellingen af en legt er een bundelbon overheen;
+     - pos/checkout rekent openstaande kamer- EN tafelbonnen af, maar financeVoor
+       sloeg alleen `kamer` over.
+
+   De btw-aangifte had er geen last van (die telt facturen, en die staan per
+   bon), dus dit was alleen zichtbaar als je de boekhouding naast de bonnen
+   legde. Vandaar deze twee toetsen: ze vergelijken de getelde omzet met de som
+   van wat er werkelijk verkocht is. */
+test('financeVoor: een tafelticket telt de bestellingen een keer, niet ook de bundelbon', () => {
+  const maand = new Date().toISOString().slice(0, 7);
+  const s = { code: 'KIKUNOI', type: 'horeca', menu: [{ name: 'Sushi', station: 'keuken' }], settings: { land: 'NL' } };
+  const db = stubDb({
+    orders: [
+      { supplierCode: 'KIKUNOI', paid: true, paidAt: maand + '-05', items: [{ name: 'Sushi', price: 109, qty: 1 }] },
+      { supplierCode: 'KIKUNOI', paid: true, paidAt: maand + '-05', items: [{ name: 'Sushi', price: 109, qty: 1 }] }
+    ],
+    // de gebundelde kassabon die /tafelticket/afrekenen eroverheen legt
+    posSales: { KIKUNOI: [{ total: 218, method: 'contant', items: null, omzetElders: 'bestellingen', at: maand + '-05' }] }
+  });
+  const { financeVoor } = maakFiscaal({ db, centen, btwSplit });
+  const omzet = financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0);
+  assert.equal(omzet, 218, 'de twee bestellingen, en de bundelbon eroverheen niet nog eens');
+});
+
+test('financeVoor: een openstaande tafelrekening telt pas bij het afrekenen mee', () => {
+  const maand = new Date().toISOString().slice(0, 7);
+  const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL' } };
+  const bon = m => ({ total: 50, method: m, items: null, room: 'Tafel 7', at: maand + '-05' });
+  const { financeVoor } = maakFiscaal({ db: stubDb({ posSales: { KIKUNOI: [bon('tafel')] } }), centen, btwSplit });
+  assert.equal(financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0), 0,
+    'een bon die nog op de tafel staat is nog niet afgerekend');
+
+  // en na de check-out: alleen de bundel, niet de bundel PLUS de losse posten
+  const na = maakFiscaal({ db: stubDb({ posSales: { KIKUNOI: [
+    { ...bon('tafel'), settled: true }, { ...bon('kamer'), room: 'Kamer 3', settled: true },
+    { total: 100, method: 'contant', items: null, at: maand + '-05' }
+  ] } }), centen, btwSplit });
+  assert.equal(na.financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0), 100,
+    'de gebundelde check-outbon draagt de omzet van kamer en tafel samen');
+});
+
+test('dagrapport: het Z-rapport telt een tafelticket ook maar een keer als omzet', () => {
+  /* Dezelfde fout stond in het zusterrapport, en daar was hij ERGER: het
+     Z-rapport telde de bestellingen en de bundelbon allebei, dus stond er 436
+     bij een tafel van 218 -- inclusief de btw-pot. De dagafsluiting is het
+     getal waar het personeel de kassa mee opmaakt, dus dat is dagelijks
+     zichtbaar fout geweest. */
+  const dag = new Date().toISOString().slice(0, 10);
+  const s = { code: 'KIKUNOI', type: 'horeca', menu: [{ name: 'Sushi', station: 'keuken' }], settings: { land: 'NL' } };
+  const db = stubDb({
+    orders: [
+      { supplierCode: 'KIKUNOI', paid: true, paidAt: dag, items: [{ name: 'Sushi', price: 109, qty: 1 }] },
+      { supplierCode: 'KIKUNOI', paid: true, paidAt: dag, items: [{ name: 'Sushi', price: 109, qty: 1 }] }
+    ],
+    posSales: { KIKUNOI: [{ total: 218, method: 'contant', items: null, omzetElders: 'bestellingen', at: dag }] }
+  });
+  const { dagrapport } = maakFiscaal({ db, centen, btwSplit });
+  const z = dagrapport(s, dag);
+  assert.equal(z.omzet, 218, 'de omzet van de dag, niet twee keer dezelfde tafel');
+  assert.equal(z.btw.reduce((x, r) => x + r.omzet, 0), 218, 'en de btw-grondslag telt hem ook een keer');
+  // maar de kassalade is wel degelijk 218 contant rijker, en er ging een bon uit
+  assert.equal(z.betaalwijzen.contant, 218, 'de betaalwijze blijft staan: er is echt contant binnengekomen');
+});
+
 test('cannedBoekhouder: antwoordt gericht op btw, personeel en cadeaukaarten', () => {
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL', uurloon: 20 } };
   const { financeVoor, cannedBoekhouder } = maakFiscaal({ db: stubDb(), centen, btwSplit });

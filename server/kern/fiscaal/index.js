@@ -34,8 +34,25 @@ function maakFiscaal({ db, centen, btwSplit }) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
     }
+    /* WELKE KASSABONNEN HIER NIET MEETELLEN, en waarom. Alle vier om dezelfde
+       reden: de omzet staat al ergens anders in deze telling, en zonder deze
+       regel staat de maand van de zaak te hoog.
+
+       - `rtg`: de bon van pos/redeem hoort bij een bestelling die hierboven bij
+         `orders` al is geteld (zie routes/supplier/kassa/verkoop.js).
+       - `kamer` EN `tafel`: een openstaande rekening, nog niet afgerekend. De
+         omzet komt binnen bij de check-out, die er een gebundelde bon overheen
+         legt. `tafel` stond hier niet, terwijl pos/checkout op precies dit paar
+         filtert -- een tafelrekening telde dus twee keer: een keer als los
+         bonnetje op de tafel en een keer in de bundel.
+       - `omzetElders`: een gebundelde bon waarvan de ONDERDELEN al geteld zijn.
+         Het tafelticket rekent bestellingen af; die staan hierboven al bij
+         `orders`, dus de bundel eroverheen mag er niet nog eens bij (TAKEN.md
+         4.28). Dat is een merk en geen methode, want de methode moet `contant`
+         of `rtgpay` blijven: dat is hoe er werkelijk betaald is, en de
+         dagafsluiting rekent daarop. */
     for (const v of db.data.posSales[s.code] || []) {
-      if (v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
+      if (v.omzetElders || v.method === 'rtg' || v.method === 'kamer' || v.method === 'tafel' || !inMaand(v.at)) continue;
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
     }

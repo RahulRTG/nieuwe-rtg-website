@@ -100,11 +100,17 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
     notify(o.customerKey || o.customerTier, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
   }
-  // een gebundelde kassabon voor het hele tafelticket
+  /* Een gebundelde kassabon voor het hele tafelticket -- het kassastuk van de
+     zaak. `omzetElders` zegt aan de maandboekhouding dat de omzet hierboven al
+     per bestelling is geteld: zonder dat merk telde financeVoor de bestellingen
+     EN deze bundel, en stond de maand van de zaak te hoog (TAKEN.md 4.28). De
+     methode blijft staan op hoe er echt betaald is, want de dagafsluiting en de
+     kasstroom rekenen daarop; alleen de omzettelling slaat hem over. */
   const sale = {
     id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
     desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
     room: chk.table, items: null, total: chk.subtotaal, method,
+    omzetElders: 'bestellingen',
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);

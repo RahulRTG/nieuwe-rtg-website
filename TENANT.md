@@ -424,9 +424,20 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    scherm nog niet), en meting per capability -- zonder die tweede kan een
    storing in een onderdeel dat een klant niet gebruikt niet van zijn eigen
    storing worden onderscheiden.
-9. **Command bar en AI** — open. Het werkcommand-register (15 soorten) draagt
-   het al; de AI hoort door dezelfde 18 rechten te lopen als de mens, niet langs
-   een tweede rechtenmodel.
+9. **Command bar** — gedaan voor de VRAAGKANT. De balk in het Werk OS zocht
+   niet: hij matchte een woord, opende een tab en zei erbij "Rechten en
+   handelingen volgen uw rol" -- tekst zonder dekking, want er werd nergens een
+   recht gelezen. Hij loopt nu over `/api/bedrijf/zoek`, dat het register per
+   verzoek uit de rechten van het lid opbouwt: een soort waarvoor je het recht
+   mist zit er niet in, wordt niet gefilterd maar bestaat niet. Hij meldt ook
+   in hoeveel soorten er is gezocht in plaats van te doen alsof hij alles zag.
+
+   De HANDELKANT is er bewust niet. Zoeken en openen is samenstellen en
+   klaarzetten; wie iets wil veranderen drukt zelf op de knop die daarvoor
+   bestaat. Een machine die zelf handelt in een werksysteem heeft een actiebon
+   en een bevestigingsmodel nodig, en die bestaan hier niet -- dat bouwen zonder
+   die twee is precies de belofte-zonder-code waar de rest van dit document
+   over gaat. Staat als open punt in `TAKEN.md`.
 10. **Digital twin en extension fabric** — open.
 
 ## 9. De grenzen

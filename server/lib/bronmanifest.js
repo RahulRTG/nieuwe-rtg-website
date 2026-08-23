@@ -45,8 +45,27 @@ function bestandenOnder(map, filter, uit) {
 /* Het manifest: pad -> sha256 van de inhoud, EEN keer per proces per map.
    Meerdere afnemers over dezelfde map delen dit dus. */
 const manifesten = new Map();
-function manifestVan(map, filter, merk) {
+
+/* HET GEHEUGEN IS PER PROCES, EN DAT IS NIET ALTIJD WAT JE WILT.
+
+   Voor een draaiende server is het precies goed: de broncodestand van de START
+   hoort te gelden en niet die van halverwege. Maar er is een afnemer met een
+   ander patroon, en die brak er meteen op. De meterijking verandert de bron met
+   OPZET -- ze legt een bekend-fout bestand neer -- en meet daarna opnieuw, in
+   HETZELFDE proces. Met een onthouden manifest is de sleutel dan onveranderd,
+   dus komt de oude uitslag uit de kas en beweegt de meter niet.
+
+   Gemeten toen ik dat deed: een verse boom gaf 143 wortels, daarna een bestand
+   met een nieuwe wortel erbij, en de tweede telling gaf in 3 milliseconden
+   opnieuw 143. De ijking zou daarop zakken (dat is de bedoeling), maar een
+   census die stil achterloopt is precies wat deze hele kas niet mag doen.
+
+   Vandaar `vers`: wie weet dat de bron onder hem kan veranderen, vraagt om een
+   nieuwe lezing. De kosten zijn ongeveer 110 ms voor 2200 bestanden -- lezen en
+   hashen is goedkoop, dat was de hele aanleiding. */
+function manifestVan(map, filter, merk, opties) {
   const sleutel = path.resolve(map) + '|' + (merk || '');
+  if (opties && opties.vers) manifesten.delete(sleutel);
   if (manifesten.has(sleutel)) return manifesten.get(sleutel);
   const uit = new Map();
   for (const p of bestandenOnder(map, filter).sort()) {

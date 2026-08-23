@@ -76,6 +76,44 @@ test('de eigenaar is de map waarin de wortel woont', () => {
   assert.equal(eigenaarVan('server/betaal.js'), 'server');
 });
 
+/* DE VAL DIE IK ER ZELF IN BOUWDE, en die stil regresseert.
+
+   De census gaat door server/lib/bronkas.js zodat hij niet bij elke aanroep
+   2,7 seconde kost. Die kas onthoudt zijn bestandsmanifest PER PROCES, en voor
+   een draaiende server is dat juist goed: de broncodestand van de START hoort te
+   gelden. Maar de meterijking verandert de bron met OPZET en meet daarna
+   opnieuw, in hetzelfde proces. Met een onthouden manifest is de sleutel dan
+   onveranderd en komt de OUDE census terug.
+
+   Toen ik dat deed gaf een verse boom 143 wortels, en na een bestand met een
+   nieuwe wortel erbij gaf de tweede telling in 3 milliseconden opnieuw 143.
+   Sindsdien vraagt de scanner om een verse lezing. Deze toets houdt dat vast:
+   hij telt twee keer in HETZELFDE proces met een wijziging ertussen. */
+test('een tweede census in hetzelfde proces ziet een bestand dat er net bij kwam', () => {
+  const boom = maakBoom('censusvers');
+  try {
+    const { scan } = require('../scripts/lib/staatscan.js');
+    const voor = scan({ wortel: boom.pad });
+    const p = binnen(boom.pad, path.join(boom.pad, 'server', 'kern', 'zz-censusproef.js'));
+    fs.writeFileSync(p, 'let ijkTeller = 0;\nfunction tik() { ijkTeller++; }\nmodule.exports = { tik };\n');
+
+    const na = scan({ wortel: boom.pad });
+    assert.equal(na.wortels.length, voor.wortels.length + 1,
+      'de census kwam uit de kas terwijl de bron veranderd was: de sleutel is niet meebewogen');
+    assert.ok(na.wortels.some(w => w.id === 'server/kern/zz-censusproef.js#ijkTeller'),
+      'en de nieuwe wortel hoort er met naam in te staan');
+
+    /* En de andere kant: zonder wijziging hoort hij WEL uit de kas te komen,
+       anders is de hele kas weg en kost elke meting weer seconden. */
+    const t0 = Date.now();
+    const nogmaals = scan({ wortel: boom.pad });
+    const kosten = Date.now() - t0;
+    assert.equal(nogmaals.wortels.length, na.wortels.length);
+    assert.ok(kosten < 1000,
+      'een onveranderde boom hoort uit de kas te komen; ' + kosten + ' ms betekent dat hij opnieuw telde');
+  } finally { boom.ruimOp(); }
+});
+
 /* DE ECHTE BOOM. Hier hoort niets ongeregistreerd te staan; dat is de hele
    afspraak. Zakt dit, dan heeft iemand muteerbare toestand toegevoegd zonder
    er een eigenaar bij te zetten. */

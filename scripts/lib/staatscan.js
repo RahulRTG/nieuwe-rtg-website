@@ -229,9 +229,49 @@ function scanBestand(bron, relPad) {
 /* De hele boom. Een bestand dat de eigen parser niet leest is GEEN nul: dat
    wordt geteld en genoemd, want een scanner die stil overslaat meet niets
    (LAT-regel 3). */
+/* DE CENSUS KOMT UIT DE BRONKAS ALS DE BRON NIET VERANDERD IS.
+
+   Een volledige scan ontleedt 2202 bestanden en kost 2,7 seconde. Dat is prima
+   voor `npm run staat`, maar hij zit ook in norm.meet(), en die wordt tijdens
+   de meterijking een stuk of tien keer aangeroepen -- op steeds een ANDERE boom,
+   want dat is precies wat een ijking doet. Zonder geheugen kostte dat 54
+   seconden extra op de ronde, en dat was schuld die ik met de zichtbaarheid
+   zelf had gemaakt.
+
+   De sleutel is dezelfde als bij de andere afnemers: een sha256 over de INHOUD
+   van elk gescand bestand plus over de broncode van deze scanner. Verandert er
+   een byte -- en tijdens een ijking verandert er met opzet een byte -- dan is de
+   sleutel anders en wordt er opnieuw geteld. Een ijking kan hier dus niet op
+   een oude uitslag stranden; dat is geen belofte maar een gevolg van de sleutel.
+
+   De kas ligt in server/lib omdat de server hem ook gebruikt. Dat scripts/ uit
+   server/ leest is hier de bestaande richting (check.js, a11y.js en beproeving.js
+   doen het ook); andersom zou het niet mogen. */
 function scan({ wortel, mappen } = {}) {
   wortel = wortel || path.join(__dirname, '..', '..');
   mappen = mappen || ['server'];
+  let kas = null;
+  try { kas = require('../../server/lib/bronkas'); } catch (e) { kas = null; }
+  if (kas) {
+    /* `vers`: deze scanner draait ook tijdens de meterijking, die de bron met
+       opzet verandert en daarna opnieuw meet in HETZELFDE proces. Een onthouden
+       manifest zou dan een sleutel geven die niet is meebewogen, en dan komt de
+       OUDE census uit de kas. Zie de kop bij manifestVan. */
+    const delen = mappen.map(m => kas.manifestVan(path.join(wortel, m), (p) => p.endsWith('.js'), 'staat', { vers: true }));
+    delen.push(kas.leesVersie([__filename]), mappen.join('|'));
+    return kas.geheugen({
+      wortel, naam: 'staatcensus', sleutel: kas.sleutelUit(delen),
+      bereken: () => scanEcht(wortel, mappen),
+      naarTekst: (u) => JSON.stringify(u),
+      /* Een census zonder wortels is geen census maar een mislukking; dan rekent
+         de kas liever opnieuw dan een lege uitslag op te dienen (LAT-regel 3). */
+      vanTekst: (t) => { const u = JSON.parse(t); return (u && Array.isArray(u.wortels)) ? u : null; }
+    });
+  }
+  return scanEcht(wortel, mappen);
+}
+
+function scanEcht(wortel, mappen) {
   const uit = {
     wortels: [], onleesbaar: [], bestanden: 0,
     klok: { datumLezing: 0, datumBouw: 0, dateNow: 0, hrtime: 0, perf: 0 },

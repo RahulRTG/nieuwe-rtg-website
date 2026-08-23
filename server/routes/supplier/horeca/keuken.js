@@ -36,6 +36,11 @@ module.exports = (kern) => {
      `loopt`/`norm` zeggen wat er al mis is, `startOm`/`baan` zeggen wat er nu
      moet gebeuren. Zie kern/horeca/cadans.js en HORECA.md. */
   const cadanslaag = require('../../../kern/horeca/cadans');
+  /* De stoel hoort op de bon. Een gang komt samen de deur uit (punt 3
+     hieronder), maar bij de tafel moet elk bord bij de juiste persoon staan --
+     en dan is "gastNr 3" een nummer waar een runner niets aan heeft. De naam
+     erbij komt uit kern/horeca/gezelschap.js, want daar staat wie er zit. */
+  const gezelschap = require('../../../kern/horeca/gezelschap')({ horeca, schoon });
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
 
   /* Een regel zoals de keuken hem ziet. `loopt` telt vanaf de vrijgave door de
@@ -48,7 +53,8 @@ module.exports = (kern) => {
       rekeningId: rek.id, regelId: regel.id, tafel: rek.tafel, kanaal: rek.kanaal,
       gast: rek.naam, gasten: rek.gasten, kamer: rek.kamer || null,
       naam: regel.naam, aantal: regel.aantal, gang: regel.gang, station: regel.station || 'warm',
-      allergie: regel.allergie || null, notitie: regel.notitie || null, gastNr: regel.gastNr,
+      allergie: regel.allergie || null, notitie: regel.notitie || null,
+      gastNr: regel.gastNr, stoel: gezelschap.handleVan(rek, regel.gastNr),
       stand: regel.stand, besteldAt: regel.at, vrijAt: regel.vrijAt || null, serveerOm: regel.serveerOm || null,
       loopt: minuten, norm, over: Math.max(0, minuten - norm),
       urgentie: minuten > norm + 5 ? 'te laat' : minuten > norm ? 'let op' : 'op tijd'

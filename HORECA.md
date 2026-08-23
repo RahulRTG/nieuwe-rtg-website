@@ -76,8 +76,8 @@ Dit is geen wenslijst; het meeste staat er. Gemeten op 23 augustus 2026 tegen
 | Schakel | Stand | Waar |
 |---|---|---|
 | bezoek | **staat**, als `rekening` met `kanaal` en `geopendAt` | `kern/horeca.js` |
-| gezelschap | **half**: `gasten` is een aantal, geen gezelschap | `rekening/open` |
-| gast/stoel | **ONTBREEKT** | — |
+| gezelschap | **staat**, als `rekening.deelnemers` | `kern/horeca/gezelschap.js` |
+| gast/stoel | **staat**, als `deelnemer.nr` ↔ `regel.gastNr` | idem, plus `kern/gast/sessie.js` |
 | bestelling → gang | **staat**, met `gang/vrij` als expliciete vrijgave | `horeca/rekening.js` |
 | bereidingsstappen | **half**: één norm per gerecht, geen stappen | `keukenlaag.js` |
 | station | **staat** | `keuken/bord` |
@@ -87,14 +87,28 @@ Dit is geen wenslijst; het meeste staat er. Gemeten op 23 augustus 2026 tegen
 | betaling | **staat**, dertien wijzen, splitsen tot op de cent | `horeca/betalen.js` |
 | bewijs | **half**: bon en logboek wel, action receipt niet | `horeca/bonnen.js` |
 
-**De stoel is het ontbrekende scharnier.** Er is nergens in de horecakern een
-`stoel` of een `gezelschap`; er is een rekening met een aantal gasten en een
-platte lijst regels. Vrijwel alles wat dit document belooft, hangt daaraan: per
-stoel bestellen, per stoel splitsen, "stoel 1 entrecote" op de pas, de runner
-die weet waar het bord heen moet, de allergie die aan een persoon hangt in
-plaats van aan een regel. **Bouw dat één keer goed, en de helft van de rest
-volgt vanzelf. Bouw het niet, en elke werkstand hierboven krijgt zijn eigen
-halve oplossing.**
+**De stoel was het ontbrekende scharnier — en hij bleek al te bestaan.** Bij het
+bouwen ervan kwam iets anders boven tafel dan verwacht: een rekening kende al
+`deelnemers` (nr, handle, lid, leeftijd) en een regel kende al `gastNr`, en
+`kern/gast/verdeling.js` splitste daar al mee, inclusief de fles wijn die op
+niemands naam staat. Wat ontbrak was niet het model maar **de tweede deur**: je
+kwam er uitsluitend bij door zelf de QR te scannen. Wie de bestelling liet
+opnemen door de gastvrouw — dus de meerderheid — zat aan een tafel zonder
+stoelen.
+
+`kern/horeca/gezelschap.js` is die deur, op dezelfde data. Drie dingen liggen
+daar vast, en alle drie komen ze uit een toets die eerst zakte:
+
+- **Een stoel is geen sessie.** Een stoel die de bediening aanmaakt krijgt nooit
+  de `hash` waarmee een gastsessie zich legitimeert. Zonder die grens is "voeg
+  een stoel toe" een achterdeur naar een vreemde rekening.
+- **Een nummer wordt nooit hergebruikt**, ook niet als er iemand is opgestaan —
+  daarvoor houdt de rekening een teller bij. Een bon die bij de pas "stoel 2"
+  zegt, mag na een wisseling niet naar iemand anders wijzen. De `handle` draagt
+  de betekenis ("bij het raam", "de jarige"), het nummer de identiteit.
+- **Een stoel weghalen haalt nooit geld weg.** De regels vallen terug op de
+  tafel, worden geteld en gemeld. En de invariant wordt hard getoetst: na
+  afloop wijst geen enkele regel meer naar een stoel die niet bestaat.
 
 ## Wat er al staat en niet opnieuw gebouwd moet worden
 
@@ -153,7 +167,16 @@ vooruit ("deze bon loopt 14 van 12 minuten"). Choreografie rekent terug: doel
 regisseren echt maakt, en hij kan bovenop `bereidingsMinuten()` zonder één
 bestaand veld te breken.
 
-**2. Stoel en gezelschap.** Het ontbrekende scharnier hierboven.
+**2. Stoel en gezelschap.** *Gedaan.* De bediening zet stoelen aan tafel, wijst
+regels toe of terug naar de tafel, en de stoel reist mee tot op de bon bij de
+pas — de runner leest een naam, geen nummer. De gastendeur en de bedieningsdeur
+komen op dezelfde `deelnemers` uit; wie via de QR aanschuift staat op het
+zaalscherm, en wat de bediening op zijn naam zet ziet hij op zijn telefoon.
+*Wat nog niet is aangesloten:* de zaalsplitsing gebruikt nog het naïeve
+`perPersoon` in plaats van de stoelbewuste `verdeel()` uit
+`kern/gast/verdeling.js` (per product, per persoon, percentage). Dat is de
+volgende voor de hand liggende stap, en hij hoort naar de kern te verhuizen in
+plaats van gekopieerd te worden.
 
 **3. Claim op uitgifte.** Een gereed product gaat naar de relevante medewerker,
 niet naar iedereen; wie claimt, laat de taak bij de rest verdwijnen. Het patroon

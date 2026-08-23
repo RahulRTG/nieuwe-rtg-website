@@ -76,9 +76,18 @@
     </div>
     <div class="kaart" id="zDetailKaart" hidden>
       <div class="kop" id="zDetailKop">Rekening</div>
-      <div id="zDetail"></div>
+      <!-- WIE ER ZIT, BOVEN WAT ER BESTELD IS. Een bestelling opnemen begint bij
+           de persoon: "en voor u?" gaat over een stoel, niet over een regel.
+           Wat op niemands naam staat, blijft gewoon van de tafel. -->
+      <div id="zGezelschap"></div>
+      <div class="rij z-mt40">
+        <input class="veld" id="zStoelNaam" maxlength="40" placeholder="Naam of plek" aria-label="Naam of plek van de stoel" style="flex:0 1 11rem;">
+        <button class="knop" id="zStoelBij" type="button">Stoel erbij</button>
+      </div>
+      <div id="zDetail" class="z-mt60"></div>
       <div class="rij z-mt60">
         <input class="veld" id="zNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Product">
+        <select class="veld" id="zVoor" aria-label="Voor wie" style="flex:0 1 10rem;"><option value="">Voor de tafel</option></select>
         <input class="veld" id="zPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs" style="flex:0 1 7rem;">
         <input class="veld" id="zAantal" type="number" min="1" max="99" value="1" aria-label="Aantal" style="flex:0 1 5rem;">
         <input class="veld" id="zGang" type="number" min="0" max="9" value="1" aria-label="Gang" style="flex:0 1 5rem;">
@@ -117,6 +126,7 @@
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/gezelschap.js"></script>
 <script src="/apps/horeca/zaal.js"></script>
 <script src="/apps/horeca/verzoeken.js"></script>
 <script src="/apps/horeca/keuken.js"></script>

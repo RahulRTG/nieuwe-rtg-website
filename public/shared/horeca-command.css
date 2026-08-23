@@ -58,3 +58,8 @@
 .bon .tag.baan.risico{color:#f093ab;border-color:rgba(194,58,94,.6)}
 .bon .tag.baan.wacht{color:#b4cbe6}
 .bon .tag.baan.hierna{color:#bdb6af}
+
+/* De stoel op de bon: geen tag tussen de tags, want dan leest een runner hem
+   niet. Hij hoort bij de tafelnaam en draagt zijn eigen kleur -- met de tekst
+   erin, zodat kleur nooit de enige drager is. */
+.bon .stoel{display:inline-block;margin-left:8px;border:1px solid rgba(192,165,68,.45);border-radius:99px;padding:2px 10px;font:600 14px Inter,system-ui,sans-serif;color:#e0cd77;vertical-align:middle}

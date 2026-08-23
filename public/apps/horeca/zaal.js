@@ -1,11 +1,22 @@
 /* RTG Horeca (scherm): de zaal -- open rekeningen, een regel erop, een gang
    vrijgeven, splitsen en afrekenen.
 
-   Twee dingen die dit scherm expres laat zien en die in de meeste kassa's
-   verstopt zitten: de LIJSTPRIJS naast de kortingsprijs (zodat een gast kan
-   zien wat er van de kaart af ging), en bij het splitsen de som van de delen
-   naast het totaal. Dat tweede is geen sier: het is de bewering die de server
-   ook doet, en als hij hier niet klopt, klopt er iets niet. */
+   Wie er aan tafel zit staat in horeca/gezelschap.js: dat is een ander
+   onderwerp, en samen paste het niet meer binnen de modulemaat van dit huis.
+   Dit bestand vraagt daar de keuzelijst "voor wie" op en laat het zichzelf
+   tekenen.
+
+   DRIE DINGEN DIE DIT SCHERM EXPRES LAAT ZIEN en die in de meeste kassa's
+   verstopt zitten:
+
+   - DE LIJSTPRIJS naast de kortingsprijs, zodat een gast kan zien wat er van de
+     kaart af ging.
+   - BIJ HET SPLITSEN de som van de delen naast het totaal. Dat is geen sier:
+     het is de bewering die de server ook doet, en als hij hier niet klopt,
+     klopt er iets niet.
+   - VOOR WIE EEN REGEL IS, naast de regel zelf en niet in een menu eronder.
+     Het is de vraag die de bediening aan tafel het vaakst moet corrigeren
+     ("nee, de zeebaars was voor mij"). */
 (function () {
   'use strict';
   var huidig = null;
@@ -15,6 +26,7 @@
   var euro = function (c) { return window.RTGHoreca.euro(c); };
   var api = function (p, b) { return window.RTGHoreca.api(p, b); };
   var meld = function (t) { window.RTGHoreca.meld(t); };
+  var G = function () { return window.RTGHorecaGezelschap; };
 
   function laad() {
     api('/rekeningen', { status: 'open' }).then(function (r) {
@@ -26,9 +38,7 @@
           '<span class="rij"><span class="stil">' + euro(x.totalen.netto) + '</span>' +
           '<button class="knop" data-open="' + esc(x.id) + '">Openen</button></span></div>';
       }).join('') || '<p class="stil">Er staat niets open.</p>';
-      Array.prototype.forEach.call($('zLijst').querySelectorAll('[data-open]'), function (b) {
-        b.addEventListener('click', function () { toon(b.dataset.open); });
-      });
+      window.RTGHoreca.bind($('zLijst'), 'open', function (b) { toon(b.getAttribute('data-open')); });
       if (huidig) toon(huidig, true);
     });
   }
@@ -40,24 +50,51 @@
       huidig = rek.id;
       $('zDetailKaart').hidden = false;
       $('zDetailKop').textContent = (rek.tafel || rek.kanaal) + ' · ' + rek.gasten + ' gast(en)';
-      $('zDetail').innerHTML = (rek.regels || []).map(function (x) {
-        return '<div class="item"><span>' + x.aantal + '× ' + esc(x.naam) +
-          (x.gang ? ' <span class="tag">gang ' + x.gang + '</span>' : '') +
-          (x.station ? ' <span class="tag">' + esc(x.station) + '</span>' : '') +
-          (x.allergie ? ' <span class="allergie">' + esc(x.allergie) + '</span>' : '') +
-          (x.vrijAt ? ' <span class="tag aan">' + esc(x.stand) + '</span>' : ' <span class="tag">niet vrijgegeven</span>') +
-          '</span><span class="stil">' + euro(x.centen * x.aantal) +
-          (x.happy ? ' <span class="tag">' + esc(x.happy) + ', van ' + euro(x.lijstprijs) + '</span>' : '') +
-          '</span></div>';
-      }).join('') || '<p class="stil">Nog niets besteld.</p>';
-      $('zDetail').insertAdjacentHTML('beforeend',
-        '<div class="item"><span><b>Te betalen</b></span><span class="stil"><b>' + euro(rek.totalen.teBetalen) + '</b>' +
-        (rek.totalen.korting ? ' (korting ' + euro(rek.totalen.korting) + ')' : '') +
-        (rek.totalen.fooi ? ' · fooi ' + euro(rek.totalen.fooi) : '') + '</span></div>');
+      /* Eerst het gezelschap, dan de regels: de keuzelijst naast een regel komt
+         uit het gezelschap, dus die moet geladen zijn voor we regels tekenen. */
+      api('/gezelschap', { rekeningId: rek.id }).then(function (g) {
+        if (!g.body.error) G().teken(rek.id, g.body.gezelschap);
+        tekenRegels(rek);
+      });
+    });
+  }
+
+  function tekenRegels(rek) {
+    $('zDetail').innerHTML = (rek.regels || []).map(function (x) {
+      return '<div class="item"><span>' + x.aantal + '× ' + esc(x.naam) +
+        (x.gang ? ' <span class="tag">gang ' + x.gang + '</span>' : '') +
+        (x.station ? ' <span class="tag">' + esc(x.station) + '</span>' : '') +
+        (x.allergie ? ' <span class="allergie">' + esc(x.allergie) + '</span>' : '') +
+        (x.vrijAt ? ' <span class="tag aan">' + esc(x.stand) + '</span>' : ' <span class="tag">niet vrijgegeven</span>') +
+        '</span><span class="rij">' +
+        '<select class="veld" aria-label="Voor wie is ' + esc(x.naam) + '" data-regelstoel="' + esc(x.id) + '">' +
+        G().opties(x.gastNr) + '</select>' +
+        '<span class="stil">' + euro(x.centen * x.aantal) +
+        (x.happy ? ' <span class="tag">' + esc(x.happy) + ', van ' + euro(x.lijstprijs) + '</span>' : '') +
+        '</span></span></div>';
+    }).join('') || '<p class="stil">Nog niets besteld.</p>';
+
+    $('zDetail').insertAdjacentHTML('beforeend',
+      '<div class="item"><span><b>Te betalen</b></span><span class="stil"><b>' + euro(rek.totalen.teBetalen) + '</b>' +
+      (rek.totalen.korting ? ' (korting ' + euro(rek.totalen.korting) + ')' : '') +
+      (rek.totalen.fooi ? ' · fooi ' + euro(rek.totalen.fooi) : '') + '</span></div>');
+
+    Array.prototype.forEach.call($('zDetail').querySelectorAll('[data-regelstoel]'), function (sel) {
+      sel.addEventListener('change', function () {
+        api('/rekening/regel/stoel', { rekeningId: huidig, regelId: sel.getAttribute('data-regelstoel'), nr: sel.value })
+          .then(function (r) {
+            if (r.body.error) return meld(r.body.error);
+            meld(r.body.handle ? 'Staat nu op ' + r.body.handle + '.' : 'Staat nu op de tafel.');
+            toon(huidig, true);
+          });
+      });
     });
   }
 
   function bind() {
+    G().bind();
+    G().bijWijziging = function () { if (huidig) toon(huidig, true); };
+
     $('zOpen').addEventListener('click', function () {
       api('/rekening/open', { kanaal: $('zKanaal').value, tafel: $('zTafel').value.trim(),
         gasten: Number($('zGasten').value) || 1 }).then(function (r) {
@@ -73,9 +110,14 @@
       if (!naam) return meld('Wat wordt er besteld?');
       api('/rekening/regel', { rekeningId: huidig, naam: naam, prijs: Number($('zPrijs').value) || 0,
         aantal: Number($('zAantal').value) || 1, gang: Number($('zGang').value) || 0,
-        station: $('zStation').value.trim(), allergie: $('zAllergie').value.trim() }).then(function (r) {
+        station: $('zStation').value.trim(), allergie: $('zAllergie').value.trim(),
+        // leeg = voor de tafel; de server maakt er null van
+        gastNr: $('zVoor').value || null }).then(function (r) {
         if (r.body.error) return meld(r.body.error);
         $('zNaam').value = ''; $('zPrijs').value = ''; $('zAllergie').value = '';
+        /* De stoel blijft staan: wie een gang opneemt, blijft meestal even bij
+           dezelfde persoon. Leegmaken zou elke tweede regel weer op de tafel
+           zetten. */
         laad();
       });
     });
@@ -107,6 +149,11 @@
         if (r.body.gesloten) huidig = null;
         laad();
       });
+    });
+    /* De zaal luistert mee op dezelfde stroom als de keuken: schuift er een
+       gast aan met de QR, dan staat hij hier zonder dat iemand ververst. */
+    window.RTGHoreca.luister('horeca', function () {
+      if (!document.hidden && huidig) toon(huidig, true);
     });
   }
 

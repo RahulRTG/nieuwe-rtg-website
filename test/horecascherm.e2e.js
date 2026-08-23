@@ -93,6 +93,28 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     assert.match(tekst, /noten/, 'de allergie staat op het zaalscherm');
     assert.match(tekst, /69[.,]00/, 'het bedrag telt op (2 x 34,50)');
 
+    /* ---- de stoel, van het zaalscherm tot aan de pas ----
+       De API heeft hier zijn eigen toets (test/horeca-gezelschap.js). Wat DAAR
+       niet uit blijkt is of de bediening er ook bij kan en of de runner het
+       ziet -- en dat is precies het gat waar deze suite voor bestaat. */
+    await page.fill('#zStoelNaam', 'Bij het raam');
+    await page.click('#zStoelBij');
+    await page.waitForTimeout(500);
+    tekst = await page.evaluate(() => document.getElementById('zGezelschap').innerText.replace(/\s+/g, ' '));
+    assert.match(tekst, /Bij het raam/, 'de stoel staat op het zaalscherm');
+    assert.match(tekst, /Op de tafel/, 'en wat op niemands naam staat, blijft zichtbaar van de tafel');
+
+    // de tournedos naar die stoel, via de keuzelijst naast de regel
+    await page.evaluate(() => {
+      const rij = [...document.querySelectorAll('#zDetail .item')].find(x => x.textContent.includes('Tournedos'));
+      const sel = rij.querySelector('select[data-regelstoel]');
+      sel.value = String([...sel.options].find(o => o.text === 'Bij het raam').value);
+      sel.dispatchEvent(new Event('change'));
+    });
+    await page.waitForTimeout(700);
+    tekst = await page.evaluate(() => document.getElementById('zGezelschap').innerText.replace(/\s+/g, ' '));
+    assert.match(tekst, /Bij het raam .*1 regel/, 'de regel telt nu bij die stoel: ' + tekst.slice(0, 120));
+
     // de keuken ziet nog niets: de gang is niet vrijgegeven
     await page.click('#tabKeuken');
     await page.waitForTimeout(600);
@@ -114,6 +136,8 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     assert.match(keuken, /Allergie: noten/, 'met de allergie in een eigen label');
     assert.match(keuken, /serveren 19:42/i, 'en met de gewenste serveertijd');
     assert.match(keuken, /van \d+ min/, 'de looptijd staat naast de norm, niet alleen een kleur');
+    assert.match(keuken, /Bij het raam/, 'en de stoel staat op de bon, zodat de runner weet waar het bord heen gaat');
+    assert.match(keuken, /aanzetten \d\d:\d\d/, 'de cadans zegt wanneer het aan moet, niet alleen hoe lang het loopt');
 
     // een stand doorzetten werkt vanaf het keukenscherm
     await page.click('[data-stand="gestart"]');

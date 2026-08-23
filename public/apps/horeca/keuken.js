@@ -57,7 +57,11 @@
       ? '<span class="tag baan ' + esc(baan) + '">' + BAANWOORD[baan] +
         (b.startOm ? ' · aanzetten ' + esc(klokje(b.startOm)) : '') + '</span>'
       : '';
-    return '<b>' + esc(b.tafel || b.kanaal) + '</b>' +
+    return '<b>' + esc(b.tafel || b.kanaal) +
+      /* DE STOEL STAAT BIJ DE TAFEL EN NIET ONDERAAN. Een gang gaat samen de
+         deur uit, maar bij de tafel moet elk bord bij de juiste persoon staan --
+         en een runner die vier borden draagt, leest dat in één blik of niet. */
+      (b.stoel ? ' <span class="stoel">' + esc(b.stoel) + '</span>' : '') + '</b>' +
       ' <span class="tag">gang ' + b.gang + '</span>' +
       ' <span class="tag">' + esc(b.station) + '</span>' +
       baanTag +

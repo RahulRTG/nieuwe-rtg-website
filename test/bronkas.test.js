@@ -37,20 +37,26 @@ const KASBRON = path.join(WORTEL, 'server', 'lib', 'bronkas.js');
 /* Een piepklein nepboompje plus een teller, in een eigen proces. Geeft terug
    hoe vaak er ECHT gerekend is en wat eruit kwam. TMPDIR wijst naar een eigen
    map, zodat deze proef nooit de kas van een echte serverstart aanraakt. */
+/* De paden gaan als ARGUMENT mee en niet ingebakken in de codetekst. Dat is
+   niet alleen netter: check.js scant op een require met iets anders dan een
+   lokaal pad erin, en een samengeplakte string ziet er precies zo uit. Een
+   regel die op een toets vals alarm slaat, leert niemand meer iets. */
+const KINDCODE = [
+  'const [kasbron, boom] = process.argv.slice(1);',
+  'const kas = require(kasbron);',
+  'const fs = require("fs");',
+  'let gerekend = 0;',
+  'const sleutel = kas.sleutelUit([kas.manifestVan(boom, p => p.endsWith(".txt"), "proef"), "v1"]);',
+  'const uit = kas.geheugen({',
+  '  wortel: boom, naam: "proef", sleutel,',
+  '  bereken: () => { gerekend++; return fs.readdirSync(boom).sort().join(","); },',
+  '  naarTekst: (s) => s, vanTekst: (t) => t',
+  '});',
+  'console.log(JSON.stringify({ uit, gerekend, sleutel: sleutel.slice(0, 12), tellers: kas.tellers }));'
+].join('\n');
+
 function draaiInKind(boom, kasHome) {
-  const code = [
-    'const kas = require(' + JSON.stringify(KASBRON) + ');',
-    'const fs = require("fs");',
-    'let gerekend = 0;',
-    'const sleutel = kas.sleutelUit([kas.manifestVan(' + JSON.stringify(boom) + ', p => p.endsWith(".txt"), "proef"), "v1"]);',
-    'const uit = kas.geheugen({',
-    '  wortel: ' + JSON.stringify(boom) + ', naam: "proef", sleutel,',
-    '  bereken: () => { gerekend++; return fs.readdirSync(' + JSON.stringify(boom) + ').sort().join(","); },',
-    '  naarTekst: (s) => s, vanTekst: (t) => t',
-    '});',
-    'console.log(JSON.stringify({ uit, gerekend, sleutel: sleutel.slice(0, 12), tellers: kas.tellers }));'
-  ].join('\n');
-  const uit = execFileSync(process.execPath, ['-e', code], {
+  const uit = execFileSync(process.execPath, ['-e', KINDCODE, KASBRON, boom], {
     encoding: 'utf8', env: Object.assign({}, process.env, { TMPDIR: kasHome })
   });
   return JSON.parse(uit.trim().split('\n').pop());
@@ -131,13 +137,15 @@ test('het UI-register geeft koud en warm hetzelfde antwoord, ook op wat NIET mag
   const kasHome = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uikas-'));
   try {
     const code = [
-      'const { maakUiBronnen } = require(' + JSON.stringify(path.join(WORTEL, 'server', 'lib', 'ui-bronnen.js')) + ');',
-      'const kas = require(' + JSON.stringify(KASBRON) + ');',
-      'const u = maakUiBronnen(' + JSON.stringify(path.join(WORTEL, 'public')) + ', []);',
+      'const [uibron, kasbron, publicDir] = process.argv.slice(1);',
+      'const { maakUiBronnen } = require(uibron);',
+      'const kas = require(kasbron);',
+      'const u = maakUiBronnen(publicDir, []);',
       'const monsters = ["Opslaan", "Annuleren", "zzdit-is-geen-ui-tekst-" + "a".repeat(40)];',
       'console.log(JSON.stringify({ aantal: u.aantal, oordeel: monsters.map(m => u.toegestaan(m)), raak: kas.tellers.raak }));'
     ].join('\n');
-    const proef = () => JSON.parse(execFileSync(process.execPath, ['-e', code], {
+    const argumenten = [path.join(WORTEL, 'server', 'lib', 'ui-bronnen.js'), KASBRON, path.join(WORTEL, 'public')];
+    const proef = () => JSON.parse(execFileSync(process.execPath, ['-e', code].concat(argumenten), {
       encoding: 'utf8', env: Object.assign({}, process.env, { TMPDIR: kasHome })
     }).trim().split('\n').pop());
 

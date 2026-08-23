@@ -53,39 +53,10 @@ module.exports = ({
   root = path.resolve(__dirname, '../..'), functies,
   volledigeWerkprocessen = [], werkrouteFabriek = null
 }) => {
-  /* DEZELFDE GRAAF, ELKE START OPNIEUW UITGEREKEND.
-
-     scan() leest de app-schermen en alle serverbronnen, bouwt daar een
-     capability-graaf uit op en kostte daarmee ruim 800 ms bij elke serverstart
-     (455 ms hier plus 391 ms in magnaat-dekkingsmatrix). De suite start 647
-     servers. De uitkomst hangt uitsluitend af van die bestanden, van de
-     functievlaggen en van de code van de scanners zelf -- dus zit hij in de
-     bronkas, met een sleutel over de INHOUD daarvan (lib/bronkas.js).
-
-     De vlaggen en de werkprocessen gaan als tekst in de sleutel mee en niet als
-     bestandshash: ze komen als parameter binnen, niet van schijf. Vergeet je
-     dat, dan blijft een oude graaf geldig nadat er een functievlag is
-     bijgekomen -- de bestanden zijn immers niet veranderd. */
+  // Uit de bronkas zolang de bron niet verandert; zie ./magnaat-capabilities-kas.js.
   function scan() {
-    const kas = require('../lib/bronkas');
-    const sleutel = kas.sleutelUit([
-      kas.manifestVan(path.join(root, 'public', 'apps'), (p) => p.endsWith('.html'), 'cap-apps'),
-      kas.manifestVan(path.join(root, 'server'), (p) => p.endsWith('.js'), 'cap-server'),
-      kas.leesVersie([__filename, path.join(__dirname, 'magnaat-capabilities-bronnen.js'),
-        path.join(__dirname, 'magnaat-dekkingsmatrix.js'), path.join(__dirname, 'magnaat-kantoorregels.js'),
-        path.join(__dirname, 'magnaat-werkroutefabriek.js')]),
-      JSON.stringify(Array.isArray(functies && functies.FUNCTIES) ? functies.FUNCTIES : []),
-      JSON.stringify(volledigeWerkprocessen || []),
-      typeof werkrouteFabriek === 'function' ? 'fabriek' : 'geen'
-    ]);
-    return kas.geheugen({
-      wortel: root, naam: 'capability-graaf', sleutel,
-      bereken: scanEcht,
-      naarTekst: (g) => JSON.stringify(g),
-      /* Een lege of half geschreven kas geeft null en dan rekent de kas gewoon
-         opnieuw; hij mag nooit een halve graaf teruggeven. */
-      vanTekst: (t) => { const g = JSON.parse(t); return (g && typeof g === 'object') ? g : null; }
-    });
+    return require('./magnaat-capabilities-kas')
+      .viaKas({ root, functies, volledigeWerkprocessen, werkrouteFabriek }, scanEcht);
   }
 
   function scanEcht() {

@@ -38,6 +38,14 @@ public/dist/
 # het routejournaal van de laatste suite-run: invoer voor scripts/dekking.js,
 # geen bron. Wordt bij elke `npm test` opnieuw geschreven.
 .routejournaal
+
+# de gemeten wandkloktijd per toetsbestand. scripts/test-runner.js schrijft hem
+# en gebruikt hem om de traagste bestanden eerst te starten. Dit is een meting
+# van DEZE machine (kernen, schijf, wat er verder draaide) en geen eigenschap
+# van de code, dus hij hoort niet in de repo. Weggooien mag: dan draait de
+# volgende ronde alfabetisch en meet hij zichzelf opnieuw in.
+.testtijden.json
+.testtijden.ruw
 # idem voor de schermen: invoer voor scripts/schermen.js, geen bronbestand
 .schermjournaal
 

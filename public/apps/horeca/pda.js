@@ -33,9 +33,10 @@
    waar een taak ook "gedaan" kan worden -- dat is een tweede plek waar hij kan
    blijven hangen.
 
-   WAT ER NOG NIET IS, en dat staat er liever dan dat het lijkt te ontbreken:
-   opnemen en afrekenen gebeuren nog op het zaalscherm. Een tafel die wacht op
-   een bestelling staat hier wel als taak, met een weg ernaartoe. */
+   TWEE VENSTERS, EEN SCHERM. De werklijst hieronder zegt WAT er moet gebeuren;
+   de tafel (pda-tafel.js) is waar het gebeurt -- ontvangen, opnemen, gangen
+   sturen en afrekenen. Ze wisselen elkaar af en staan niet naast elkaar: op een
+   telefoon in een hand is twee kolommen geen ontwerp maar een compromis. */
 (function () {
   'use strict';
   var K = window.RTGHoreca;
@@ -61,10 +62,13 @@
         : K.knop('Ik draag hem', { pak: t.rekeningId, gang: t.gang }, true)) +
         K.knop('Uitgegeven', { uit: t.rekeningId, gang: t.gang });
     }
-    if (t.soort === 'opnemen') {
-      return '<a class="knop" href="/apps/horeca.html#rek-' + esc(t.rekeningId) + '">Open op het zaalscherm</a>';
-    }
-    return '';  // belofte: dit is werk van de keuken; de bediening hoort het te weten
+    if (t.soort === 'opnemen') return K.knop('Opnemen', { tafel: t.rekeningId }, true);
+    /* Een beloftetaak heeft geen knop: dit is werk van de keuken. Wat de
+       bediening ermee doet -- de tafel geruststellen, de chef aanspreken -- is
+       geen handeling die een systeem afvinkt. Wel een weg naar de tafel, want
+       daar staat wat de gast besteld heeft. */
+    if (t.soort === 'belofte') return K.knop('Bekijk de tafel', { tafel: t.rekeningId });
+    return '';
   }
 
   function borden(t) {
@@ -124,6 +128,7 @@
     K.bind($('main'), 'uit', function (b) {
       api('/pas/uit', { rekeningId: b.dataset.uit, gang: b.dataset.gang }).then(na);
     });
+    K.bind($('main'), 'tafel', function (b) { open(b.dataset.tafel); });
   }
 
   /* Na een handeling: de fout van de server LATEN STAAN en niet vertalen. Een
@@ -142,10 +147,60 @@
     });
   }
 
+  /* ---- het wisselen tussen de twee vensters ---- */
+  function open(rekeningId) {
+    $('pLijst').hidden = true;
+    $('pTafel').hidden = false;
+    window.RTGPdaTafel.toon(rekeningId, terug);
+  }
+  function terug() {
+    $('pTafel').hidden = true;
+    $('pLijst').hidden = false;
+    haal();
+  }
+  $('tTerug').addEventListener('click', terug);
+
+  /* ONTVANGEN. Een tafel openen is de eerste handeling van de avond en stond
+     alleen op het zaalscherm -- dus liep de bediening met een telefoon in de
+     hand naar binnen om een tafel te openen. */
+  $('pNieuw').addEventListener('click', function () {
+    var tafel = $('pNieuwTafel').value.trim();
+    if (!tafel) return meld('Welke tafel of plek?');
+    var gasten = parseInt($('pNieuwGasten').value, 10);
+    api('/rekening/open', { kanaal: 'tafel', tafel: tafel, gasten: gasten > 0 ? gasten : 1 })
+      .then(function (r) {
+        if (r.body.error) return meld(r.body.error);
+        $('pNieuwTafel').value = '';
+        open(r.body.rekening.id);
+      });
+  });
+
+  /* De open tafels: niet alles wat open staat is een TAAK (een tafel die net
+     eten kreeg wacht nergens op), maar je moet er wel bij kunnen. */
+  $('pTafels').addEventListener('click', function () {
+    api('/rekeningen', { status: 'open' }).then(function (r) {
+      var lijst = r.body.rekeningen || [];
+      if (!lijst.length) return meld('Er staat geen enkele rekening open.');
+      $('pNu').innerHTML = '<p class="pda-som">Open tafels</p>' + lijst.map(function (x) {
+        return '<article class="pda-taak"><div class="pda-kop">' +
+          '<span class="pda-tafel">' + esc(x.tafel || x.kanaal) + '</span>' +
+          '<span class="pda-min">' + K.euro(x.totalen.netto) + '</span></div>' +
+          '<div class="pda-acties">' + K.knop('Open', { tafel: x.id }, true) + '</div></article>';
+      }).join('');
+      $('pOpen').innerHTML = '';
+      K.bind($('pNu'), 'tafel', function (b) { open(b.dataset.tafel); });
+    });
+  });
+
   $('pVerversNu').addEventListener('click', haal);
   /* De duwstroom: een verzoek of een klaar bord van een collega hoort hier
      binnen te komen zonder dat iemand op "ververs" drukt. Zonder scope, want
      deze lijst leest uit drie bronnen tegelijk. */
-  K.luister('', haal);
+  /* De duwstroom raakt allebei de vensters: staat de tafel open, dan wordt DIE
+     ververst -- anders zou een collega die een gang vrijgeeft, dit scherm
+     terugsturen naar de lijst. */
+  K.luister('', function () {
+    if ($('pTafel').hidden) haal(); else window.RTGPdaTafel.ververs();
+  });
   haal();
 })();

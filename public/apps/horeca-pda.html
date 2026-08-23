@@ -48,6 +48,20 @@
   .pda-leeg{border:1px dashed var(--pda-lijn);border-radius:14px;padding:1.1rem;
             font-size:14px;line-height:1.6;color:var(--pda-stil);}
   .pda-voet{margin-top:1.4rem;font-size:13px;line-height:1.6;color:var(--pda-stil);}
+  .pda-tafelkop{font-family:'Bodoni Moda',serif;font-weight:500;font-size:22px;margin-top:.8rem;}
+  .pda-veldlabel{display:flex;flex-direction:column;gap:.2rem;font-size:13px;color:var(--pda-stil);flex:1 1 7rem;}
+  .pda-veldlabel select{min-height:44px;}
+  #tAllergie,#tStoelNaam,#pNieuwTafel,#pNieuwGasten{min-height:44px;}
+  .pda-cat{margin-top:.8rem;font:600 13px Inter,system-ui;letter-spacing:.1em;
+           text-transform:uppercase;color:var(--pda-stil);}
+  .pda-items{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem;}
+  .pda-items button{min-height:52px;flex:1 1 9rem;border:1px solid var(--pda-lijn);border-radius:12px;
+                    background:transparent;color:var(--pda-txt);font:500 14px Inter,system-ui;
+                    padding:.4rem .6rem;text-align:left;cursor:pointer;}
+  .pda-items button em{display:block;font-style:normal;font-size:13px;color:var(--pda-stil);}
+  .pda-items button.uit{border-style:dashed;}
+  .pda-stoel{display:flex;align-items:center;gap:.5rem;min-height:44px;font-size:15px;}
+  .pda-stoel span{flex:1;}
 </style>
 </head>
 <body class="rtg-stijl">
@@ -58,7 +72,16 @@
   <button class="knop" id="pVerversNu" type="button">Ververs</button>
 </header>
 <main id="main">
+<section id="pLijst">
   <div class="pda-modi" id="pModi" role="group" aria-label="Werkstand"></div>
+  <div class="rij" style="margin-top:.6rem;gap:.4rem;">
+    <input class="veld h-flex1" id="pNieuwTafel" maxlength="30" placeholder="Tafel of plek" aria-label="Tafel of plek">
+    <input class="veld" id="pNieuwGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten" style="flex:0 1 5rem;">
+  </div>
+  <div class="pda-acties" style="margin-top:.4rem;">
+    <button class="knop p" id="pNieuw" type="button">Tafel openen</button>
+    <button class="knop" id="pTafels" type="button">Open tafels</button>
+  </div>
 
   <section class="pda-groep" aria-labelledby="pNuKop">
     <h2 id="pNuKop">Nu &mdash; over de grens</h2>
@@ -73,10 +96,62 @@
   <p class="pda-voet" id="pUitleg"></p>
   <p class="pda-voet">Deze lijst toont de hele zaak. Een wijkindeling bestaat hier
   nog niet, dus er wordt niet gedaan alsof: wat u ziet is alles wat open staat.</p>
+</section>
+
+<!-- DE TAFEL. Ontvangen, opnemen, gangen sturen en afrekenen -- de drie
+     handelingen die nog op het zaalscherm stonden. Verdelen en splitsen blijven
+     daar wel: dat is een gesprek aan tafel en geen handeling met een duim. -->
+<section id="pTafel" hidden>
+  <div class="pda-modi">
+    <button class="knop" id="tTerug" type="button">&#8592; Werklijst</button>
+  </div>
+  <h2 class="pda-tafelkop" id="tKop">&nbsp;</h2>
+  <p class="pda-som" id="tSom"></p>
+
+  <div class="pda-groep">
+    <h2>Aan tafel</h2>
+    <div id="tStoelen"></div>
+    <div class="rij" style="margin-top:.5rem;gap:.4rem;">
+      <input class="veld h-flex1" id="tStoelNaam" maxlength="40" placeholder="Naam of plek (bv. bij het raam)" aria-label="Naam of plek van de stoel">
+      <button class="knop" id="tStoelBij" type="button">Stoel erbij</button>
+    </div>
+  </div>
+
+  <div class="pda-groep">
+    <h2>Op de rekening</h2>
+    <div id="tRegels"></div>
+  </div>
+
+  <div class="pda-groep">
+    <h2>Bestellen</h2>
+    <div class="rij" style="gap:.4rem;flex-wrap:wrap;">
+      <label class="pda-veldlabel">Gang
+        <select class="veld" id="tGang" aria-label="Voor welke gang">
+          <option value="0">geen gang</option><option value="1" selected>1</option>
+          <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+        </select></label>
+      <label class="pda-veldlabel">Voor wie
+        <select class="veld" id="tVoor" aria-label="Voor wie is deze bestelling"></select></label>
+    </div>
+    <input class="veld" id="tAllergie" maxlength="120" placeholder="Allergie van deze gast (gaat ongefilterd naar de keuken)" aria-label="Allergie" style="margin-top:.4rem;width:100%;">
+    <div id="tKaart"></div>
+    <p class="pda-voet">De prijs komt van de kaart van de zaak en niet van dit
+    scherm. Uitverkochte gerechten staan er met hun vlag bij: de gast kan ze niet
+    kiezen, u ziet ze wel.</p>
+  </div>
+
+  <div class="pda-groep">
+    <h2>Afrekenen</h2>
+    <div class="pda-acties" id="tBetaal"></div>
+    <p class="pda-voet">Splitsen en verdelen staan op het zaalscherm: dat is een
+    gesprek aan tafel en geen handeling met een duim.</p>
+  </div>
+</section>
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/pda-tafel.js"></script>
 <script src="/apps/horeca/pda.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

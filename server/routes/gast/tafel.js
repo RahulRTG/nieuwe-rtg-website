@@ -31,27 +31,11 @@ module.exports = (kern) => {
     return false;
   };
 
-  /* De kaart van een zaak, in de vorm die de gast leest. `alcohol` volgt uit de
-     categorie of een expliciet vlaggetje op het item: de leeftijdsregel in
-     beleid.js hangt eraan, dus raden mag hier niet stil gebeuren. */
-  function kaartVanZaak(zaakcode) {
-    const s = findSupplier(zaakcode);
-    const menu = (s && Array.isArray(s.menu)) ? s.menu : [];
-    const h = kern.horeca.H(zaakcode);
-    const uit = (h.instel && h.instel.uitverkocht) || {};
-    const twins = h.dishTwins || {};
-    return menu.map(m => ({
-      id: m.id, naam: m.name, uitleg: m.desc || null, cat: m.cat || 'Overig',
-      foto: m.foto || m.photo || m.image || null,
-      centen: Math.round(Number(m.price) * 100), allergenen: Array.isArray(m.allergens) ? m.allergens : [],
-      station: m.station || null,
-      alcohol: !!m.alcohol || /wijn|bier|cava|cocktail|gin|whisk|rum|vodka|borrel/i.test(String(m.name || '')),
-      uitverkocht: !!uit[m.id], sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
-      twin: twins[m.id] && twins[m.id].publicatie ? { versie:twins[m.id].publicatie.versie,
-        presentatie:twins[m.id].publicatie.presentatie||null, service:twins[m.id].publicatie.service||null,
-        pairing:twins[m.id].publicatie.pairing||null } : null
-    }));
-  }
+  /* De kaart van een zaak. De opbouw staat sinds 23 augustus 2026 in
+     kern/horeca/kaart.js en niet meer hier: de bediening leest op de PDA
+     dezelfde kaart, en die staat aan de andere kant van de domeingrens. Een
+     kaart is een eigenschap van de ZAAK; deze deur is een lezer. */
+  const { kaartVanZaak } = require('../../kern/horeca/kaart')({ findSupplier, horeca: kern.horeca });
   kern.gastKaartVanZaak = kaartVanZaak;
 
   /* ---------- de QR scannen ----------

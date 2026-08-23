@@ -15,6 +15,10 @@
    5. DE MODUS IS EEN LENS: de runner ziet de gang wel en het verzoek niet.
    6. HET SCHERM VINKT NIETS ZELF AF: na "Ik draag hem" staat de bon nog steeds
       op klaar, en pas "Uitgegeven" haalt hem van de lijst.
+   7. DE HELE KETEN DRAAIT OP DIT SCHERM: een tafel openen, van de kaart
+      bestellen, de gang naar de keuken sturen en afrekenen. En de PRIJS komt
+      van de kaart en niet van de telefoon -- dat is de bewering die het meest
+      kost als hij niet klopt.
 
    Draait alleen waar een browser is.
    ========================================================================== */
@@ -159,6 +163,72 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.equal(naUit.regels[0].stand, 'uitgegeven', 'nu pas is hij uitgegeven');
     beeld = await lees();
     assert.doesNotMatch(beeld.nu + beeld.open, /PDA-DRAAG/, 'en dan is de taak weg');
+
+    /* ---- 7. de hele keten op dit scherm ---- */
+    await page.click('#tTerug').catch(() => {});
+    await page.waitForTimeout(300);
+
+    // ONTVANGEN
+    await page.fill('#pNieuwTafel', 'PDA-KETEN');
+    await page.fill('#pNieuwGasten', '3');
+    await page.click('#pNieuw');
+    await page.waitForTimeout(900);
+    assert.equal(await page.evaluate(() => document.getElementById('pTafel').hidden), false,
+      'na het openen staat de tafel in beeld');
+    assert.match(await page.evaluate(() => document.getElementById('tKop').textContent),
+      /PDA-KETEN/, 'en het is de juiste tafel');
+
+    // een stoel erbij, zodat een bord straks een naam draagt
+    await page.fill('#tStoelNaam', 'bij het raam');
+    await page.click('#tStoelBij');
+    await page.waitForTimeout(600);
+    assert.match(await page.evaluate(() => document.getElementById('tStoelen').innerText),
+      /bij het raam/, 'de stoel zit aan tafel');
+
+    // OPNEMEN: van de kaart, met een allergie en voor die stoel
+    await page.selectOption('#tVoor', { label: 'bij het raam' });
+    await page.fill('#tAllergie', 'schaaldieren');
+    const kaartKnop = await page.$('#tKaart [data-item]');
+    assert.ok(kaartKnop, 'de kaart van de zaak staat op de PDA');
+    const wat = await kaartKnop.evaluate(el => el.textContent);
+    await kaartKnop.click();
+    await page.waitForTimeout(800);
+    const opRekening = await page.evaluate(() => document.getElementById('tRegels').innerText);
+    assert.match(opRekening, /schaaldieren/, 'de allergie staat op de regel');
+    assert.match(opRekening, /nog niet naar de keuken/, 'en de keuken ziet hem nog niet');
+
+    /* DE PRIJS KOMT VAN DE KAART. Wat het scherm toont moet gelijk zijn aan wat
+       de server op de rekening zette -- en die haalt hem uit kern/horeca/kaart.js. */
+    const alle = (await H('/rekeningen', { status: 'open' })).body.rekeningen;
+    const keten = alle.find(x => x.tafel === 'PDA-KETEN');
+    const vol = (await H('/rekening', { rekeningId: keten.id })).body.rekening;
+    const kaart = (await H('/kaart', {})).body.groepen[0].items[0];
+    assert.equal(vol.regels[0].naam, kaart.naam, 'de naam komt van de kaart');
+    assert.equal(vol.regels[0].centen, kaart.centen, 'en de prijs ook');
+    assert.match(wat.replace(/\s+/g, ' '), new RegExp(kaart.naam), 'zoals hij op de knop stond');
+    assert.ok(vol.regels[0].gastNr, 'de regel hangt aan de stoel');
+
+    // GANGEN STUREN
+    const naarKeuken = await page.$('#tRegels [data-vrij]');
+    assert.ok(naarKeuken, 'er staat een knop om de gang naar de keuken te sturen');
+    await naarKeuken.click();
+    await page.waitForTimeout(800);
+    const naVrij = (await H('/rekening', { rekeningId: keten.id })).body.rekening;
+    assert.ok(naVrij.regels[0].vrijAt, 'nu pas ziet de keuken hem');
+    assert.equal(await page.evaluate(() => !!document.querySelector('#tRegels [data-vrij]')), false,
+      'en de knop is weg, want er staat niets meer open');
+
+    // AFREKENEN
+    const betaal = await page.$('#tBetaal [data-betaal="pin"]');
+    assert.ok(betaal, 'er staat een pinknop met het openstaande bedrag');
+    assert.match(await betaal.evaluate(el => el.textContent), /\d/, 'met een bedrag erin');
+    await betaal.click();
+    await page.waitForTimeout(900);
+    const naBetaal = (await H('/rekening', { rekeningId: keten.id })).body.rekening;
+    assert.equal(naBetaal.status, 'betaald', 'de rekening is betaald');
+    assert.equal(naBetaal.openstaand, 0);
+    assert.equal(await page.evaluate(() => document.getElementById('pLijst').hidden), false,
+      'en het scherm staat weer op de werklijst');
 
     assert.deepEqual(fouten, [], 'geen scriptfouten op de PDA');
   } finally {

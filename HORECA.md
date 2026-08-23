@@ -257,7 +257,7 @@ vóóraf, fooi wordt nooit voorgevuld, samenvoegen zegt het bedrag hardop terug,
 oninbaar staat apart onderaan omdat het geen administratieve handeling is. Van
 achttien naar twaalf endpoints zonder scherm.
 
-**4. PDA SERVICE als eigen werkstand — de werklijst staat, het opnemen nog niet.**
+**4. PDA SERVICE als eigen werkstand — af.**
 
 `/apps/horeca-pda.html` beantwoordt de vraag van deze werkstand: *wat is mijn
 eerstvolgende handeling?* Alle andere horecaschermen zijn per TAFEL of per
@@ -302,11 +302,38 @@ dat is een ontwerpbesluit en geen veld. Datzelfde geldt voor de rolmodi *host* e
 *wijkhoofd*: die vragen aankomst- en wijkgegevens, en zolang die er niet zijn,
 komen ze er niet als lege knop bij.
 
-**Wat er nog niet is, en dat staat er liever dan dat het lijkt te ontbreken:**
-opnemen en afrekenen gebeuren nog op het zaalscherm. Een tafel die wacht op een
-bestelling staat wél als taak, met een weg ernaartoe. De PDA sluit dus twee van
-de vijf handelingen uit de brief — ophalen en oplossen — en nog niet ontvangen,
-opnemen en afrekenen.
+**Twee vensters, één scherm.** De werklijst zegt WAT er moet gebeuren; de tafel
+is waar het gebeurt. Ze wisselen elkaar af en staan niet naast elkaar: op een
+telefoon in één hand is twee kolommen geen ontwerp maar een compromis. Daarmee
+sluit de PDA de hele keten uit de brief — ontvangen, opnemen, gangen sturen,
+ophalen, oplossen, afrekenen.
+
+Vier dingen liggen in dat tweede venster vast:
+
+- **De prijs komt van de kaart en niet van het scherm.** Elke bestelling gaat als
+  `itemId` naar de server, die naam, prijs en station uit `kern/horeca/kaart.js`
+  haalt — dezelfde kaart die de gast leest. Zou de PDA de prijs meesturen, dan
+  bepaalt een telefoon wat een biertje kost. Vrij typen blijft kunnen: een
+  special is echt werk, geen misbruik.
+- **Uitverkocht wordt getoond en niet verborgen.** De gastdeur laat zulke items
+  niet kiezen; de bediening hoort te zien dat iets op is en mag na overleg met de
+  keuken alsnog aanslaan. Wegfilteren maakt van "op" een geheim.
+- **De context wordt één keer gezet en daarna getikt.** Gang, stoel en allergie
+  staan bóven de kaart, niet in een dialoog per gerecht. Wie voor elke tik drie
+  schermen door moet, typt het straks op een blocnote — en dan weet het systeem
+  niets meer.
+- **Gang vrijgeven blijft een aparte handeling.** Er wordt niets automatisch
+  doorgestuurd; de zaal bepaalt het tempo van het diner, de keuken dat van de
+  bereiding.
+
+**Splitsen en verdelen blijven op het zaalscherm.** Dat is een gesprek aan tafel
+met meerdere mensen erbij, en dat hoort niet op een telefoon in een broekzak.
+
+**De kaart is verhuisd naar de kern** (`kern/horeca/kaart.js`). Hij stond in
+`routes/gast/tafel.js` en werd aan de kern gehangen; toen de bediening hem nodig
+had, bleek hij aan de verkeerde kant van de domeingrens te staan. Niet de grens
+opgerekt maar het begrip verplaatst: een kaart is een eigenschap van de ZAAK, en
+beide deuren zijn lezers (`test/horeca-kaart.test.js`).
 
 **5. Venue Edge**: de clientkant van offline. De serverkant ligt er, en de
 kassa is de eerste die hem gebruikt — zie hieronder. De zaal, de bar en de PDA

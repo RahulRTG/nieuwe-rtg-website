@@ -1293,6 +1293,14 @@
       "gezakt": 1,
       "scherp": "overleefd"
     },
+    "envelop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/envelop.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
     "ervaring.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -834,6 +834,47 @@ zwijgend het oude woord schrijven. Beide mogen alleen omlaag. Wat de meter
 níét ziet staat in zijn kop: een zesde schaal met helemaal eigen woorden is hier
 onzichtbaar, net zoals `WETTEN.json` alleen bevat wat iemand heeft opgeschreven.
 
+### De envelop (`npm run envelop`)
+
+`npm run gezag` telt de plekken die beslissen *of* de machine iets zelf mag.
+Deze meet de vraag ervoor: **als een poortwachter JA zegt, welke feiten liggen
+er dan op tafel?**
+
+Bijna elke route loopt door een van elf poortwachters, en `auth` draagt daar al
+beleid (403 als het lid de functie in zijn boardroom heeft uitgezet). De naad is
+dus niet het probleem. Wat erop ligt wel:
+
+| envelopveld | wie stelt hem vast |
+|---|---|
+| actor | acht poortwachters, in **zeven verschillende vormen** |
+| tenant | `supplierAuth`, `huisAuth` |
+| capability | alleen `auth`, en als aan/uit-schakelaar — geen bedrag, geen bereik |
+| gezag | `boardroomAuth`, `huisAuth` |
+| doel, intent, wijzigingen, risicoklasse, omkeerbaarheid, context, correlatie | **geen enkele** |
+
+De poortwachter weet WIE. `server/db/index.js` — één functie waar 2700
+aanroepen doorheen gaan — weet WAT ER VERANDERT. Daartussen bestaat geen object
+dat allebei draagt, en zonder dat object is er geen risicobudget, geen blast
+radius en geen bewijsbonnetje te bouwen, hoe de rest ook wordt ingericht.
+
+```bash
+npm run envelop          # de stand, en de ratel
+npm run envelop:velden   # per veld wie hem vaststelt, en over hoeveel routes
+npm run envelop:vast     # vastleggen (weigert een verslechtering)
+```
+
+`veldenZonderHuis` (7) en `actorVormen` (7) mogen alleen omlaag. De meter zakt
+ook als een poortwachter zijn eigenschap niet meer zet — dan meet hij niets meer
+en hoort hij te vallen in plaats van een lager, mooier getal te melden.
+
+**De bevinding die in het register staat:** het kantoortoken kent geen personen.
+`officeAuth` laat in de kantoor-tak niets achter, en `routes/uitgifte.js`
+compenseert met `req.body.wie` — bij een documentenuitgifte *met*
+vier-ogenprincipe is de ondertekenaar dus een tekenreeks die de aanroeper zelf
+typt. Dat is een gedocumenteerd ontwerpgevolg, geen slordigheid, en RTG heeft
+hetzelfde gat elders al dichtgezet: `boardroomAuth` weigert het anonieme
+kantoortoken juist omdat het geen identiteit draagt.
+
 ### De systeemwetten (`npm run wetten`, `npm run sabotage`, `npm run zekerheid`)
 
 De toetsen en keuringen hierboven vragen allemaal hetzelfde: *zakt er iets?*

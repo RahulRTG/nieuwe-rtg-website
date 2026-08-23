@@ -91,6 +91,15 @@ jobs:
       # niets meer) of als een vastgelegde tegenspraak van vorm verandert.
       - name: Het gezag (vijf schalen voor een vraag, mag alleen krimpen)
         run: npm run gezag
+      # DE ENVELOP: wat weet RTG op het moment dat een poortwachter JA zegt?
+      # Zeven van de elf velden die een controlelaag nodig heeft (doel, intent,
+      # wijzigingen, risicoklasse, omkeerbaarheid, context, correlatie) worden
+      # door GEEN enkele poortwachter vastgesteld, en de actor draagt zeven
+      # verschillende namen. Beide mogen alleen omlaag. Deze stap kost seconden
+      # en zakt ook als een poortwachter zijn eigenschap niet meer zet -- dan
+      # meet de meter niets meer en hoort hij te vallen, niet stil te dalen.
+      - name: De envelop (wat ligt er op tafel als het gezag wordt verleend)
+        run: npm run envelop
       # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/

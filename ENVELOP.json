@@ -1,0 +1,157 @@
+{
+  "uitleg": "Wat weet RTG op het moment dat een poortwachter JA zegt? `veldenZonderHuis` telt de envelopvelden die GEEN enkele poortwachter vaststelt; `actorVormen` telt onder hoeveel verschillende namen \"wie handelt hier\" op het verzoek wordt gezet. BEIDE MOGEN ALLEEN OMLAAG. Zonder een envelop die actor en wijziging samen draagt, is er geen risicobudget, geen blast radius en geen bonnetje te bouwen -- hoe de rest ook wordt ingericht.",
+  "hoe": "node scripts/envelop.js --velden",
+  "gemeten": {
+    "veldenZonderHuis": 7,
+    "actorVormen": 7,
+    "routesMetPoortwachter": 3349,
+    "routesTotaal": 3706
+  },
+  "veldenZonderHuis": [
+    {
+      "veld": "doel",
+      "wat": "welk object wordt geraakt"
+    },
+    {
+      "veld": "intent",
+      "wat": "wat de actor probeert te bereiken"
+    },
+    {
+      "veld": "wijzigingen",
+      "wat": "wat er precies gaat veranderen, voor het gebeurt"
+    },
+    {
+      "veld": "risicoklasse",
+      "wat": "hoe zwaar deze handeling weegt"
+    },
+    {
+      "veld": "omkeerbaarheid",
+      "wat": "is dit terug te draaien, en hoe"
+    },
+    {
+      "veld": "context",
+      "wat": "apparaat, tijd, dienst, hoeveelheid"
+    },
+    {
+      "veld": "correlatie",
+      "wat": "welke keten van handelingen hier bij hoort"
+    }
+  ],
+  "actorVormen": [
+    "req.actor",
+    "req.boardroomKey",
+    "req.drive",
+    "req.gast",
+    "req.gezinslid",
+    "req.session",
+    "req.techUser"
+  ],
+  "poortwachters": [
+    {
+      "naam": "auth",
+      "bestand": "server/opzet/diensten2.js",
+      "routes": 1375,
+      "zet": [
+        "actor <- req.session",
+        "capability <- lidBoardUit"
+      ],
+      "opmerking": "de enige die al beleid draagt: 403 als het lid de functie in zijn boardroom heeft uitgezet. De capability is een aan/uit-schakelaar per functie, geen begrensd recht (geen bedrag, geen bereik)"
+    },
+    {
+      "naam": "supplierAuth",
+      "bestand": "server/opzet/leverancierpoort.js",
+      "routes": 969,
+      "zet": [
+        "actor <- req.actor",
+        "tenant <- req.supplier"
+      ],
+      "opmerking": "de rijkste envelop van de elf: persoon EN huis, met rol, staffId en of hij manager is"
+    },
+    {
+      "naam": "officeAuth",
+      "bestand": "server/kern/kantoor/index.js",
+      "routes": 713,
+      "zet": [],
+      "opmerking": "zet in de kantoor-tak NIETS op het verzoek; alleen de eigenaar-tak zet req.eigenaar. Zie de bevinding kantoortoken-kent-geen-personen"
+    },
+    {
+      "naam": "boardroomAuth",
+      "bestand": "server/kern/kantoor/index.js",
+      "routes": 58,
+      "zet": [
+        "actor <- req.boardroomKey",
+        "gezag <- req.boardroomBaas"
+      ],
+      "opmerking": "de enige poortwachter die een BRON van bevoegdheid meegeeft (eigenaar, of van hem gekregen). Hij weigert het anonieme kantoortoken met zoveel woorden -- het precedent voor de reparatie"
+    },
+    {
+      "naam": "techAuth",
+      "bestand": "server/routes/techniek.js",
+      "routes": 56,
+      "zet": [
+        "actor <- req.techUser"
+      ],
+      "opmerking": "meldt een geldig account dat hier niets te zoeken heeft als kritiek: rechten-escalatie"
+    },
+    {
+      "naam": "gastAuth",
+      "bestand": "server/routes/gast.js",
+      "routes": 16,
+      "zet": [
+        "actor <- req.gast"
+      ],
+      "opmerking": "de actor is een TAFEL en geen persoon; dat is hier juist en het hoort in de envelop te staan"
+    },
+    {
+      "naam": "huisAuth",
+      "bestand": "server/routes/werkplek.js",
+      "routes": 62,
+      "zet": [
+        "tenant <- req.werkplekCode",
+        "gezag <- req.werkplekBaas"
+      ],
+      "opmerking": "de tenant komt uit req.body.bedrijf en wordt daarna gecontroleerd met werkplek.magIn -- de volgorde klopt, maar de envelop draagt hier geen actor"
+    },
+    {
+      "naam": "baasAuth",
+      "bestand": "server/routes/werkplek.js",
+      "routes": 3,
+      "zet": [],
+      "opmerking": "controleert alleen; laat niets achter"
+    },
+    {
+      "naam": "huisPoort",
+      "bestand": "server/routes/kantoorpakket-huis.js",
+      "routes": 44,
+      "zet": [
+        "actor <- req.drive"
+      ],
+      "opmerking": "req.drive draagt sleutel en kring in een - achtste - eigen vorm"
+    },
+    {
+      "naam": "gezinsPoort",
+      "bestand": "server/routes/tiener.js",
+      "routes": 36,
+      "zet": [
+        "actor <- req.gezinslid"
+      ],
+      "opmerking": "weigert gasten; de rol zit in de sessie en niet in de envelop"
+    },
+    {
+      "naam": "rtfPoort",
+      "bestand": "server/routes/kantoorpakket-huis.js",
+      "routes": 17,
+      "zet": [
+        "actor <- req.drive"
+      ],
+      "opmerking": "zelfde vorm als huisPoort, andere herkomst"
+    }
+  ],
+  "bevindingen": [
+    {
+      "naam": "kantoortoken-kent-geen-personen",
+      "wat": "Het kantoortoken is anoniem: officeAuth laat in de kantoor-tak niets op het verzoek achter. Bij de documentenuitgifte MET vier-ogenprincipe wordt de ondertekenaar daarom uit de body gelezen (req.body.wie), dus de identiteit onder een handtekening is een tekenreeks die de aanroeper zelf typt.",
+      "ernst": "Dit is een gedocumenteerd ONTWERPGEVOLG en geen slordigheid -- de kop van routes/uitgifte.js zegt het zelf. RTG heeft hetzelfde gat elders al herkend en dichtgezet: boardroomAuth weigert het anonieme kantoortoken juist omdat het geen identiteit draagt. Zolang het blijft staan kan geen enkele envelop over deze 712 routes een actor dragen die ergens tegen te houden is."
+    }
+  ]
+}

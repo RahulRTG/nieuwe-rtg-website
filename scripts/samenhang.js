@@ -229,6 +229,37 @@ function tabel() {
         return !!bron && v.schaal.every(trede => bron.includes("'" + trede + "'"));
       },
       kanttekening: 'bewaakt = de schaal is te vinden; het zegt niets over of de vijf schalen elkaar tegenspreken -- GEZAG.json houdt de bekende tegenspraak apart bij'
+    },
+    {
+      /* WAT LIGT ER OP TAFEL ALS DE POORT OPENGAAT. De vorige soort telt de
+         plekken die beslissen OF iets mag; deze kijkt naar de elf poortwachters
+         waar bijna elke route doorheen loopt en vraagt welke FEITEN zij
+         achterlaten. Zonder die feiten op een plek is er geen risicobudget en
+         geen blast radius te bouwen, hoe de rest ook wordt ingericht.
+
+         BEWAAKT betekent hier: de poortwachter staat in ENVELOP.json en zet daar
+         ook echt wat het register belooft. Het zegt niets over of het veld KLOPT
+         -- het scherpste geval (een kantoortoken zonder persoon, waardoor de
+         ondertekenaar uit de body komt) staat als bevinding apart. */
+      soort: 'poortwachters (wat weet RTG bij het verlenen van gezag)',
+      bewaker: ['scripts/envelop.js', 'test/envelop.test.js'],
+      wat: 'elke poortwachter staat in ENVELOP.json en zet daar ook echt de eigenschappen die het register noemt',
+      dingen: () => {
+        const e = JSON.parse(lees('ENVELOP.json') || '{}');
+        return (e.poortwachters || []).map(p => p.naam + ' (' + p.bestand + ')');
+      },
+      bewaakt: naam => {
+        const e = JSON.parse(lees('ENVELOP.json') || '{}');
+        const p = (e.poortwachters || []).find(x => naam.startsWith(x.naam + ' ('));
+        if (!p) return false;
+        const bron = lees(p.bestand);
+        if (!bron || !new RegExp('function\\s+' + p.naam + '\\s*\\(').test(bron)) return false;
+        return (p.zet || []).every(z => {
+          const via = String(z).split(' <- ')[1] || '';
+          return !via.startsWith('req.') || new RegExp(via.replace('.', '\\.') + '\\s*=').test(bron);
+        });
+      },
+      kanttekening: 'zeven van de elf envelopvelden hebben GEEN enkele drager (doel, intent, wijzigingen, risicoklasse, omkeerbaarheid, context, correlatie) -- dat getal staat in ENVELOP.json en mag alleen omlaag'
     }
   ];
 }

@@ -708,8 +708,11 @@
     },
     "bronkas.test.js": {
       "soort": "puur",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 1
+      "staat": "gezakt",
+      "module": "server/lib/bronkas.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "btw-aangifte.test.js": {
       "soort": "server",

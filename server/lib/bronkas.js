@@ -8,33 +8,10 @@
    schermsuite nog eens 184. Dat is bij elke start opnieuw dezelfde 24 MB
    ontleden voor een antwoord dat niet is veranderd.
 
-   Gemeten op 23 augustus 2026, en het getal dat de oplossing bepaalt:
-
-     de boom aflopen        16 ms
-     alles stat'en          11 ms
-     alles LEZEN            47 ms   <- 24 MB
-     alles lezen EN hashen 112 ms
-     ui-bronnen bouwen     619 ms   <- dit is parsen, geen I/O
-     ui-bronnen terugleren  35 ms   uit de kas
-
-   Lezen is dus goedkoop en PARSEN is duur. Daarom hoeft deze kas geen mtimes te
-   vertrouwen: de sleutel is een sha256 over de echte inhoud van elk bestand dat
-   in de berekening meegaat. Verandert er een byte, dan verandert de sleutel en
-   wordt er opnieuw gerekend. Er bestaat geen "de klok liep achter"-geval, geen
-   "mijn editor bewaarde de mtime"-geval en geen `git checkout`-geval.
-
-   DAT IS EEN BEWUSTE KEUZE EN GEEN OMISSIE. De snelle weg die bouwsystemen
-   nemen -- alleen stat'en en de inhoud-hash uit een eerdere ronde vertrouwen --
-   zou 112 ms terugbrengen naar 27. Dat scheelt over de hele suite ongeveer een
-   minuut, en het kost de enige eigenschap waar je bij een cache iets aan hebt:
-   dat hij niet kan liegen. Een van de drie afnemers is bovendien een
-   VEILIGHEIDSregister (welke tekst naar een modelaanbieder mag), en daar is een
-   stille verouderde uitkomst geen traagheid maar een gat. 112 ms op een boot van
-   3,4 seconde is die zekerheid waard.
-
-   EEN MANIFEST, MEERDERE AFNEMERS. De boom wordt EEN keer afgelopen en gehasht
-   per proces; elke afnemer leidt daar zijn eigen sleutel uit af over precies de
-   bestanden die hij leest. Drie afnemers kosten dus geen drie rondes.
+   Wat er in de sleutel zit en waarom hij aan de INHOUD hangt en niet aan
+   mtimes, staat in ./bronmanifest.js. Hier staat wat er met de uitkomst
+   gebeurt: waar hij blijft, hoe je weet dat hij gaaf is, en wanneer hij weg
+   mag.
 
    FAALT HIJ, DAN REKENT HIJ. Elke fout in de kas -- geen schrijfrechten, een
    halve regel, een schijf die vol is -- leidt tot gewoon opnieuw uitrekenen. Een
@@ -57,66 +34,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
-
-const OVERSLAAN = new Set(['node_modules', '.git', 'dist', 'data', 'coverage']);
-
-/* Alle bestanden onder een map die aan het filter voldoen, gesorteerd. Sorteren
-   is geen netheid maar een voorwaarde: readdir geeft geen gegarandeerde
-   volgorde, en een sleutel die van de volgorde afhangt is bij elke start anders.
-   Dan heb je een cache die nooit raak is en wel elke keer geld kost. */
-function bestandenOnder(map, filter, uit) {
-  uit = uit || [];
-  let items;
-  try { items = fs.readdirSync(map, { withFileTypes: true }); } catch (e) { return uit; }
-  for (const item of items) {
-    if (OVERSLAAN.has(item.name)) continue;
-    const p = path.join(map, item.name);
-    if (item.isDirectory()) bestandenOnder(p, filter, uit);
-    else if (!filter || filter(p)) uit.push(p);
-  }
-  return uit;
-}
-
-/* Het manifest: pad -> sha256 van de inhoud, EEN keer per proces per map.
-   Meerdere afnemers over dezelfde map delen dit dus. */
-const manifesten = new Map();
-function manifestVan(map, filter, merk) {
-  const sleutel = path.resolve(map) + '|' + (merk || '');
-  if (manifesten.has(sleutel)) return manifesten.get(sleutel);
-  const uit = new Map();
-  for (const p of bestandenOnder(map, filter).sort()) {
-    try { uit.set(p, crypto.createHash('sha256').update(fs.readFileSync(p)).digest()); }
-    catch (e) { /* net verdwenen: telt als afwezig, en dat verandert de sleutel */ }
-  }
-  manifesten.set(sleutel, uit);
-  return uit;
-}
-
-/* De sleutel over een verzameling manifesten, plus wat de afnemer zelf als
-   versie meegeeft. Die VERSIE is niet optioneel: verandert de scanner van
-   gedrag zonder dat de bronbestanden veranderen, dan zou de oude uitkomst nog
-   passen bij de nieuwe sleutel. Vandaar dat elke afnemer de eigen broncode
-   meehasht -- zie leesVersie(). */
-function sleutelUit(delen) {
-  const h = crypto.createHash('sha256');
-  for (const deel of delen) {
-    if (deel instanceof Map) {
-      for (const [p, sha] of deel) { h.update(p); h.update(sha); }
-    } else h.update(String(deel));
-  }
-  return h.digest('hex');
-}
-
-/* De eigen broncode van een afnemer meehashen. Zonder dit blijft een oude
-   uitkomst geldig nadat de scanner zelf is veranderd -- de invoer is immers
-   hetzelfde -- en dan meet je met een nieuwe scanner een oud antwoord. */
-function leesVersie(bestanden) {
-  const h = crypto.createHash('sha256');
-  for (const b of [].concat(bestanden)) {
-    try { h.update(fs.readFileSync(b)); } catch (e) { h.update('?'); }
-  }
-  return h.digest('hex').slice(0, 16);
-}
+const manifest = require('./bronmanifest');
 
 function kasMap(wortel) {
   const stempel = crypto.createHash('sha256').update(path.resolve(wortel)).digest('hex').slice(0, 12);
@@ -214,4 +132,10 @@ function ruimOp(map, naam, houd) {
   }
 }
 
-module.exports = { manifestVan, sleutelUit, leesVersie, geheugen, bestandenOnder, kasMap, ruimOp, tellers };
+/* De vingerafdruk-kant komt uit ./bronmanifest.js en wordt hier doorgegeven, zodat
+   een afnemer maar EEN module hoeft te kennen. */
+module.exports = {
+  manifestVan: manifest.manifestVan, sleutelUit: manifest.sleutelUit,
+  leesVersie: manifest.leesVersie, bestandenOnder: manifest.bestandenOnder,
+  geheugen, kasMap, ruimOp, tellers
+};

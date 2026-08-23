@@ -76,7 +76,20 @@ function schrijf(niveau, bericht, velden) {
     process.stdout.write(JSON.stringify(regel) + '\n');
   } else {
     const extra = velden && Object.keys(velden).length ? ' ' + JSON.stringify(velden) : '';
-    const stroom = niveau === 'error' || niveau === 'warn' ? process.stderr : process.stdout;
+    /* ALLE DIAGNOSTIEK NAAR STDERR, EN DAT IS EEN REPARATIE.
+
+       Hier gingen debug en info naar stdout. Dat breekt elk gereedschap dat een
+       server START en zijn eigen antwoord op stdout zet -- routekaart.js,
+       keuring.js en dekking.js doen dat alledrie met --json. Die dempen daarvoor
+       console.log, maar dit bestand schreef rechtstreeks naar process.stdout en
+       glipte daar langs: een enkele log.info bij de start zette `npm run norm`
+       meteen op "de routekaart gaf geen routes" -- niet omdat er geen routes
+       waren, maar omdat er een regel voor de JSON stond.
+
+       Stdout is een datakanaal, stderr is voor diagnostiek. Zo hoeft geen enkel
+       gereedschap te weten welke logregels bestaan. In JSON-stand (productie of
+       LOG_JSON=1) blijft stdout de bestemming: dan IS het log de data. */
+    const stroom = process.stderr;
     stroom.write(`${KLEUR[niveau]}${tijd} ${niveau.toUpperCase().padEnd(5)}${KLEUR.reset} ${bericht}${extra}\n`);
   }
 }

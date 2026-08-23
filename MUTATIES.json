@@ -1297,9 +1297,17 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/envelop.js",
-      "operator": "getal+1#0",
+      "operator": "&&->||#0",
+      "gezakt": 8,
+      "geprobeerd": 3
+    },
+    "envelopvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/envelop.js",
+      "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 4
+      "geprobeerd": 1
     },
     "ervaring.test.js": {
       "soort": "server",

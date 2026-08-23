@@ -12,6 +12,7 @@
 
 const { txLedgerAantal } = require('../../db'); // gecachete grootboek-teller (O(1), ~10 s vers)
 const inzagelog = require('../../inzagelog');  // spoor bij elke blik in de identiteitskluis
+const envelop = require('../../opzet/envelop');
 
 function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
@@ -20,9 +21,22 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     const header = req.get('authorization') || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     const sess = token && sessionFor(token);
-    if (sess && sess.role === 'office') return next();
+    if (sess && sess.role === 'office') {
+      // geen lidKey = geen mens achter dit token; zie ENVELOP.json (bevinding)
+      envelop.zet(req, { soort: 'kantoor', id: sess.lidKey || null,
+        identiteit: sess.lidKey ? 'bewezen' : 'anoniem' });
+      return next();
+    }
     // de eigenaar komt ook met zijn eigen accountlogin binnen (geen aparte code nodig)
-    try { if (token && eigenaar.isEigenaar(accounts, accounts.verifyToken(token))) { req.eigenaar = true; return next(); } } catch (e) {}
+    try {
+      const u = token && accounts.verifyToken(token);
+      if (u && eigenaar.isEigenaar(accounts, u)) {
+        req.eigenaar = true;
+        envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id,
+          identiteit: 'bewezen', gezagBron: 'eigenaar', gezagBaas: true });
+        return next();
+      }
+    } catch (e) {}
     return res.status(401).json({ error: 'Geen backoffice-sessie.' });
   }
 
@@ -61,6 +75,10 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       }
       req.boardroomKey = key;
       req.boardroomBaas = boardroomBaas(key);
+      // scherper dan officeAuth: een sleutel EN waar de bevoegdheid vandaan komt
+      envelop.zet(req, { soort: req.boardroomBaas ? 'eigenaar' : 'kantoor', id: key,
+        identiteit: 'bewezen', gezagBron: req.boardroomBaas ? 'eigenaar' : 'toegekend',
+        gezagBaas: !!req.boardroomBaas });
       next();
     });
   }

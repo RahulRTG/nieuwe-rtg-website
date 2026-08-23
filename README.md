@@ -844,18 +844,32 @@ Bijna elke route loopt door een van elf poortwachters, en `auth` draagt daar al
 beleid (403 als het lid de functie in zijn boardroom heeft uitgezet). De naad is
 dus niet het probleem. Wat erop ligt wel:
 
-| envelopveld | wie stelt hem vast |
+`server/opzet/envelop.js` is de canonieke vorm: tien van de elf poortwachters
+zetten hem, en **3346 van de 3706 routes** dragen een handeling nu in één vorm.
+
+| envelopveld | wie vult hem |
 |---|---|
-| actor | acht poortwachters, in **zeven verschillende vormen** |
-| tenant | `supplierAuth`, `huisAuth` |
-| capability | alleen `auth`, en als aan/uit-schakelaar — geen bedrag, geen bereik |
-| gezag | `boardroomAuth`, `huisAuth` |
-| doel, intent, wijzigingen, risicoklasse, omkeerbaarheid, context, correlatie | **geen enkele** |
+| actor | tien poortwachters, via de envelop — mét een identiteitsoordeel |
+| tenant | `supplierAuth`, `huisAuth`, `gastAuth`, de gezins- en werkplekpoorten |
+| capability | `auth`, als aan/uit-schakelaar per functie — geen bedrag, geen bereik |
+| gezag | `boardroomAuth`, `huisAuth`, `techAuth` |
+| context | de envelop, op elke route (pad, methode, tijd via `lib/klok`) |
+| correlatie | `server/log.js` — `req.id`, óók terug als `X-Request-Id` |
+| **doel, intent, wijzigingen, risicoklasse, omkeerbaarheid** | **geen enkele** |
+
+Die laatste vijf staan er bewust niet in: een poortwachter kent ze niet. Ze
+ontstaan pas als de handeling bekend is en de opslaglaag weet wat er verandert.
+Ze bij de poort verzinnen zou de envelop laten liegen, en daar gaat beleid op.
 
 De poortwachter weet WIE. `server/db/index.js` — één functie waar 2700
-aanroepen doorheen gaan — weet WAT ER VERANDERT. Daartussen bestaat geen object
-dat allebei draagt, en zonder dat object is er geen risicobudget, geen blast
-radius en geen bewijsbonnetje te bouwen, hoe de rest ook wordt ingericht.
+aanroepen doorheen gaan — weet WAT ER VERANDERT. De envelop is de eerste helft
+van de brug daartussen; zonder de tweede helft is er nog geen risicobudget,
+blast radius of bewijsbonnetje.
+
+**Het identiteitsoordeel** is het scherpste veld: `bewezen` betekent dat er een
+persoon of geverifieerd huis aan hangt, `anoniem` dat de sessie geldig is maar
+geen persoon draagt. Dat laatste is niet hypothetisch — zie de bevinding
+hieronder.
 
 ```bash
 npm run envelop          # de stand, en de ratel
@@ -863,17 +877,30 @@ npm run envelop:velden   # per veld wie hem vaststelt, en over hoeveel routes
 npm run envelop:vast     # vastleggen (weigert een verslechtering)
 ```
 
-`veldenZonderHuis` (7) en `actorVormen` (7) mogen alleen omlaag. De meter zakt
-ook als een poortwachter zijn eigenschap niet meer zet — dan meet hij niets meer
-en hoort hij te vallen in plaats van een lager, mooier getal te melden.
+`veldenZonderHuis` (5), `actorVormen` (7) en `routesZonderEnvelop` (360) mogen
+alleen omlaag. De meter zakt ook als een poortwachter zijn eigenschap of zijn
+`envelop.zet()` niet meer zet — dan meet hij niets meer en hoort hij te vallen
+in plaats van een lager, mooier getal te melden.
+
+De zeven oude actorvormen (`req.session`, `req.actor`, `req.boardroomKey`,
+`req.techUser`, `req.gast`, `req.gezinslid`, `req.drive`) staan er nog naast en
+blijven geteld: de envelop is **additief** toegevoegd. Een vervanging in het
+authenticatiepad van 3349 routes ineens is precies het soort wijziging waarvan
+je pas maanden later merkt wat er stuk ging, dus gaat die schuld route voor
+route omlaag.
 
 **De bevinding die in het register staat:** het kantoortoken kent geen personen.
-`officeAuth` laat in de kantoor-tak niets achter, en `routes/uitgifte.js`
-compenseert met `req.body.wie` — bij een documentenuitgifte *met*
-vier-ogenprincipe is de ondertekenaar dus een tekenreeks die de aanroeper zelf
-typt. Dat is een gedocumenteerd ontwerpgevolg, geen slordigheid, en RTG heeft
-hetzelfde gat elders al dichtgezet: `boardroomAuth` weigert het anonieme
+`routes/uitgifte.js` compenseert met `req.body.wie` — bij een documentenuitgifte
+*met* vier-ogenprincipe is de ondertekenaar dus een tekenreeks die de aanroeper
+zelf typt. Dat is een gedocumenteerd ontwerpgevolg, geen slordigheid, en RTG
+heeft hetzelfde gat elders al dichtgezet: `boardroomAuth` weigert het anonieme
 kantoortoken juist omdat het geen identiteit draagt.
+
+Sinds de enveloprone is die bevinding **zichtbaar en niet opgelost**:
+`officeAuth` zet nu wel een envelop, maar met `identiteit: 'anoniem'` zodra de
+sessie geen `lidKey` draagt. Wat nog niet gebeurt, is dat de uitgifte daar iets
+mee doet. De reparatie is een besluit en geen code: óf het kantoor krijgt een
+sessie met een persoon, óf de vier-ogen-uitgifte weigert een anonieme envelop.
 
 ### De systeemwetten (`npm run wetten`, `npm run sabotage`, `npm run zekerheid`)
 

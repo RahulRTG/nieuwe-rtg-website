@@ -259,7 +259,19 @@ function tabel() {
           return !via.startsWith('req.') || new RegExp(via.replace('.', '\\.') + '\\s*=').test(bron);
         });
       },
-      kanttekening: 'zeven van de elf envelopvelden hebben GEEN enkele drager (doel, intent, wijzigingen, risicoklasse, omkeerbaarheid, context, correlatie) -- dat getal staat in ENVELOP.json en mag alleen omlaag'
+      /* HET GETAL KOMT UIT HET REGISTER en staat hier niet uitgeschreven. Dat is
+         geen netheid: er stond "zeven van de elf" toen het er nog zeven waren,
+         en na de enveloprone waren het er vijf terwijl de zin bleef staan --
+         een belofte in tekst die niet meer waar was (LAT.md regel 6), in het
+         gereedschap dat over samenhang gaat. */
+      kanttekening: (() => {
+        const e = JSON.parse(lees('ENVELOP.json') || '{}');
+        const zonder = (e.veldenZonderHuis || []).map(v => v.veld);
+        if (!zonder.length) return 'elk envelopveld heeft een drager -- controleer of dat klopt voor je het gelooft';
+        return zonder.length + ' van de ' + ((e.poortwachters || []).length ? 11 : '?') +
+          ' envelopvelden hebben GEEN enkele drager (' + zonder.join(', ') +
+          ') -- dat getal staat in ENVELOP.json en mag alleen omlaag';
+      })()
     }
   ];
 }

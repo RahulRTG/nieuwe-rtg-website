@@ -119,6 +119,19 @@ nooit wordt aangeroepen. Daarnaast staat `niveau: 'hand'` als kale tekenreeks in
 achttien Command-modules die `risico.js` niet importeren: hernoem de trede en die
 achttien schrijven zwijgend het oude woord.
 
+*En dezelfde fout een laag lager, waar hij het meest kost:* "wie handelt hier"
+stond op ZEVEN plekken op het verzoek -- `req.session`, `req.actor`,
+`req.boardroomKey`, `req.techUser`, `req.gast`, `req.gezinslid`, `req.drive`.
+Zeven namen voor een begrip betekent dat er niets generieks op kan staan: een
+teller, een rem, een bonnetje of een blast radius zou zeven keer geschreven
+moeten worden, en de achtste poortwachter zou de eerste zeven weer niet kennen.
+`server/opzet/envelop.js` is sinds augustus 2026 de canonieke vorm, en tien van
+de elf poortwachters zetten hem. Hij is er ADDITIEF bij gezet en heeft niets
+weggehaald -- een vervanging in het authenticatiepad van 3349 routes ineens is
+precies het soort wijziging waarvan je pas maanden later merkt wat er stuk ging.
+De zeven oude vormen blijven daarom geteld in `ENVELOP.json` tot ze route voor
+route zijn afgebouwd.
+
 **Handhaver:** `check.js` regel 26 (elke naam die je uit een module haalt bestaat
 daar), regel 25, regel 27, regel 28 (de publieke-routelijst mag geen namen
 bevatten die niet meer bestaan of die inmiddels een eigen poort hebben),
@@ -350,7 +363,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
 | hoeveel losse schalen beantwoorden "mag de machine dit zelf" (vijf, en ze kennen elkaar niet) | `GEZAG.json` + `scripts/gezag.js` |
-| wat een poortwachter vaststelt voor hij JA zegt (zeven van elf velden: niemand) | `ENVELOP.json` + `scripts/envelop.js` |
+| wat een poortwachter vaststelt voor hij JA zegt, en de canonieke vorm daarvoor | `ENVELOP.json` + `scripts/envelop.js` + `server/opzet/envelop.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |

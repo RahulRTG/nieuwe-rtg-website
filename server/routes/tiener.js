@@ -1,6 +1,8 @@
 /* Domein "tiener": de toetsplanner en het zakgeldpotje. Alleen via de
    RTFoundation (gezinscode + profieltoken); dit zijn de eigen spullen van het
    profiel, dus gasten (oppas, familie) blijven erbuiten. */
+const envelop = require('../opzet/envelop');
+
 module.exports = (kern) => {
   const { app, rtf, tiener } = kern;
 
@@ -13,6 +15,9 @@ module.exports = (kern) => {
     if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
     if (sess.gast) return res.status(403).json({ error: 'Dit is van de gezinsleden zelf.' });
     req.gezinslid = sess;
+    envelop.zet(req, { soort: 'gezinslid', id: sess.handle || sess.profielId || null,
+      rol: sess.rol || null, identiteit: 'bewezen',
+      tenantSoort: 'gezin', tenantId: String(req.body.code || '').toUpperCase() || null });
     next();
   }
   const stuur = (res, r) => r.error ? res.status(r.status).json({ error: r.error }) : res.json(r);

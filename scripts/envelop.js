@@ -79,48 +79,96 @@ const VELDEN = [
    poortwachter op het verzoek achterlaat, en die eigenschap moet in zijn bestand
    terug te vinden zijn -- anders meet deze meter niets meer en zakt hij. */
 const POORTWACHTERS = [
-  { naam: 'auth', bestand: 'server/opzet/diensten2.js',
+  { naam: 'auth', bestand: 'server/opzet/diensten2.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.session' },
           { veld: 'capability', via: 'lidBoardUit' }],
-    opmerking: 'de enige die al beleid draagt: 403 als het lid de functie in zijn boardroom heeft uitgezet. ' +
+    opmerking: 'de enige die al beleid droeg: 403 als het lid de functie in zijn boardroom heeft uitgezet. ' +
                'De capability is een aan/uit-schakelaar per functie, geen begrensd recht (geen bedrag, geen bereik)' },
-  { naam: 'supplierAuth', bestand: 'server/opzet/leverancierpoort.js',
+  { naam: 'supplierAuth', bestand: 'server/opzet/leverancierpoort.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.actor' },
           { veld: 'tenant', via: 'req.supplier' }],
-    opmerking: 'de rijkste envelop van de elf: persoon EN huis, met rol, staffId en of hij manager is' },
-  { naam: 'officeAuth', bestand: 'server/kern/kantoor/index.js',
+    opmerking: 'de rijkste van de elf: persoon EN huis, met rol, staffId en of hij manager is -- de maat waar de andere tien naartoe groeien' },
+  { naam: 'officeAuth', bestand: 'server/kern/kantoor/index.js', envelop: true,
     zet: [],
-    opmerking: 'zet in de kantoor-tak NIETS op het verzoek; alleen de eigenaar-tak zet req.eigenaar. ' +
-               'Zie de bevinding kantoortoken-kent-geen-personen' },
-  { naam: 'boardroomAuth', bestand: 'server/kern/kantoor/index.js',
+    opmerking: 'liet tot deze ronde NIETS achter. Zet nu een envelop die eerlijk zegt wat hij is: ' +
+               "identiteit 'bewezen' als de sessie een lidKey draagt, anders 'anoniem'. " +
+               'Zie de bevinding kantoortoken-kent-geen-personen -- die is hiermee ZICHTBAAR, niet opgelost' },
+  { naam: 'boardroomAuth', bestand: 'server/kern/kantoor/index.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.boardroomKey' },
           { veld: 'gezag', via: 'req.boardroomBaas' }],
-    opmerking: 'de enige poortwachter die een BRON van bevoegdheid meegeeft (eigenaar, of van hem gekregen). ' +
-               'Hij weigert het anonieme kantoortoken met zoveel woorden -- het precedent voor de reparatie' },
-  { naam: 'techAuth', bestand: 'server/routes/techniek.js',
+    opmerking: 'weigert het anonieme kantoortoken met zoveel woorden -- het precedent voor de reparatie van officeAuth' },
+  { naam: 'techAuth', bestand: 'server/routes/techniek.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.techUser' }],
     opmerking: 'meldt een geldig account dat hier niets te zoeken heeft als kritiek: rechten-escalatie' },
-  { naam: 'gastAuth', bestand: 'server/routes/gast.js',
+  { naam: 'gastAuth', bestand: 'server/routes/gast.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.gast' }],
-    opmerking: 'de actor is een TAFEL en geen persoon; dat is hier juist en het hoort in de envelop te staan' },
-  { naam: 'huisAuth', bestand: 'server/routes/werkplek.js',
+    opmerking: "de actor is een TAFEL en geen persoon; de envelop zegt dat met 'anoniem' in plaats van er een aan te nemen" },
+  { naam: 'huisAuth', bestand: 'server/routes/werkplek.js', envelop: true,
     zet: [{ veld: 'tenant', via: 'req.werkplekCode' },
           { veld: 'gezag', via: 'req.werkplekBaas' }],
     opmerking: 'de tenant komt uit req.body.bedrijf en wordt daarna gecontroleerd met werkplek.magIn -- ' +
-               'de volgorde klopt, maar de envelop draagt hier geen actor' },
-  { naam: 'baasAuth', bestand: 'server/routes/werkplek.js',
+               'de volgorde klopt; de envelop draagt sinds deze ronde ook de sleutelhouder als actor' },
+  { naam: 'baasAuth', bestand: 'server/routes/werkplek.js', envelop: false,
     zet: [],
-    opmerking: 'controleert alleen; laat niets achter' },
-  { naam: 'huisPoort', bestand: 'server/routes/kantoorpakket-huis.js',
+    opmerking: 'controleert alleen en staat altijd NA huisAuth, die de envelop al heeft gezet; ' +
+               'er zelf een tweede zetten zou de eerste overschrijven met minder' },
+  { naam: 'huisPoort', bestand: 'server/routes/kantoorpakket-huis.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.drive' }],
-    opmerking: 'req.drive draagt sleutel en kring in een - achtste - eigen vorm' },
-  { naam: 'gezinsPoort', bestand: 'server/routes/tiener.js',
+    opmerking: 'req.drive draagt sleutel en kring in een eigen vorm; de envelop staat er nu naast' },
+  { naam: 'gezinsPoort', bestand: 'server/routes/tiener.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.gezinslid' }],
-    opmerking: 'weigert gasten; de rol zit in de sessie en niet in de envelop' },
-  { naam: 'rtfPoort', bestand: 'server/routes/kantoorpakket-huis.js',
+    opmerking: 'weigert gasten; de rol zit sinds deze ronde ook in de envelop' },
+  { naam: 'rtfPoort', bestand: 'server/routes/kantoorpakket-huis.js', envelop: true,
     zet: [{ veld: 'actor', via: 'req.drive' }],
-    opmerking: 'zelfde vorm als huisPoort, andere herkomst' }
+    opmerking: 'zelfde vorm als huisPoort, andere herkomst; een oppas is bekend maar mag niet bewerken' }
 ];
+
+/* WAT ER BUITEN DE POORTWACHTERS OM AL WORDT VASTGESTELD, en dat stond hier
+   eerst niet. De eerste versie van deze meter keek ALLEEN naar de elf
+   poortwachters en meldde daarom dat `correlatie` geen huis had. Fout: de
+   logmiddleware (server/log.js) zet `req.id` op ELK verzoek en echoot hem als
+   X-Request-Id. Een meter die de vraag te smal stelt geeft een getal dat te
+   hoog is, en dat is precies zo misleidend als een getal dat te laag is
+   (LAT.md regel 10). */
+const MIDDLEWARE = [
+  { naam: 'log.middleware', bestand: 'server/log.js',
+    zet: [{ veld: 'correlatie', via: 'req.id' }],
+    opmerking: 'zet een correlatie-id op elk verzoek en geeft hem terug als X-Request-Id; ' +
+               'de envelop maakt er GEEN tweede, die zou uiteenlopen' }
+];
+
+/* DE CANONIEKE ENVELOP (server/opzet/envelop.js). Welke velden draagt hij, en
+   staan die daar ook echt? Een veld telt pas als "hij heeft een huis" wanneer de
+   envelopmodule hem draagt EN er poortwachters zijn die een envelop zetten --
+   een vorm die niemand vult is geen huis. */
+const ENVELOPMODULE = {
+  bestand: 'server/opzet/envelop.js',
+  /* DE BEWIJSZIN WIJST NAAR DE ECHTE DRAGER, en niet naar de veldnaam. Hier
+     stond eerst 'capability:', en dat kon niet zakken: het VANGNET in zet() zet
+     ook `capability: null`, dus de naam bleef staan als de drager verdween.
+     Precies de vorm uit LAT.md regel 9 -- gevonden doordat de mutatie in
+     test/envelop.test.js werd afgeslagen. Elke zin hieronder komt nu uit maak(),
+     de enige plek waar het veld ECHT wordt gevuld. */
+  draagt: [
+    { veld: 'actor', bewijs: 'actor: { soort, id,' },
+    { veld: 'tenant', bewijs: 'tenant: g.tenantId ?' },
+    { veld: 'capability', bewijs: 'capability: tekst(g.capability' },
+    { veld: 'gezag', bewijs: 'gezag: g.gezagBron ?' },
+    { veld: 'context', bewijs: 'context: context(req, fouten)' },
+    { veld: 'correlatie', bewijs: 'correlatie: leesVeilig(' }
+  ],
+  /* EEN SLOT DRAGEN IS NIET HETZELFDE ALS HEM VULLEN, en dat verschil hoort in
+     het getal. De envelop heeft op alle 3346 routes een `tenant`-veld, maar
+     alleen supplierAuth, huisAuth en gastAuth zetten er iets in -- "tenant: 3346
+     routes" melden zou een slot voor een feit laten doorgaan. Deze twee velden
+     zijn de enige die de envelop ZELF op elke route invult; de rest is een slot
+     dat een poortwachter moet vullen. */
+  vultAltijd: ['context', 'correlatie'],
+  /* WAT HIJ BEWUST NIET DRAAGT. Een poortwachter kent deze niet: ze ontstaan pas
+     als de handeling bekend is en de opslaglaag weet wat er verandert. Ze hier
+     verzinnen zou de envelop laten liegen, en daar gaat beleid op. */
+  draagtNiet: ['doel', 'intent', 'wijzigingen', 'risicoklasse', 'omkeerbaarheid']
+};
 
 /* BEVINDINGEN die met de hand zijn vastgesteld en die deze meter bij elke ronde
    opnieuw natrekt aan een LETTERLIJKE zin uit de bron. Verdwijnt de zin, dan is
@@ -134,12 +182,16 @@ const BEVINDINGEN = [
          '(req.body.wie), dus de identiteit onder een handtekening is een tekenreeks die de aanroeper zelf typt.',
     ernst: 'Dit is een gedocumenteerd ONTWERPGEVOLG en geen slordigheid -- de kop van routes/uitgifte.js zegt het ' +
            'zelf. RTG heeft hetzelfde gat elders al herkend en dichtgezet: boardroomAuth weigert het anonieme ' +
-           'kantoortoken juist omdat het geen identiteit draagt. Zolang het blijft staan kan geen enkele envelop ' +
-           'over deze 712 routes een actor dragen die ergens tegen te houden is.',
+           'kantoortoken juist omdat het geen identiteit draagt. ' +
+           'SINDS DE ENVELOPRONDE IS HIJ ZICHTBAAR EN NIET OPGELOST: officeAuth zet nu wel een envelop, maar die ' +
+           "draagt identiteit 'anoniem' zodra de sessie geen lidKey heeft -- precies wat het is. Wat nog niet " +
+           'gebeurt is dat de vier-ogen-uitgifte daar iets mee DOET; hij leest nog steeds req.body.wie. ' +
+           'De reparatie is een besluit en geen code: of het kantoor krijgt een sessie met een persoon (zoals de ' +
+           'leverancierskant met req.actor), of de uitgifte weigert een anonieme envelop zoals de boardroom dat doet.',
     kanten: [
       { bestand: 'server/routes/uitgifte.js', zin: "const wieOffice = req => String((req.body || {}).wie || '')" },
       { bestand: 'server/routes/uitgifte.js', zin: 'het kantoor-token kent geen' },
-      { bestand: 'server/kern/kantoor/index.js', zin: "if (sess && sess.role === 'office') return next();" }
+      { bestand: 'server/kern/kantoor/index.js', zin: "identiteit: sess.lidKey ? 'bewezen' : 'anoniem'" }
     ]
   }
 ];
@@ -201,6 +253,28 @@ function meet() {
         : new RegExp('\\b' + z.via + '\\b');
       if (!patroon.test(code)) stuk.push(p.naam + ': zet ' + z.via + ' niet (meer) in ' + p.bestand);
     }
+    /* Zegt het register dat deze poortwachter een canonieke envelop zet, dan
+       moet die aanroep er ook staan. Zonder deze regel zou het wegvallen van
+       envelop.zet() het aantal velden-met-huis stilzwijgend laten stijgen. */
+    if (p.envelop && !/envelop\.zet\s*\(/.test(code))
+      stuk.push(p.naam + ': zet geen canonieke envelop meer in ' + p.bestand);
+  }
+  for (const m of MIDDLEWARE) {
+    const code = bron.get(m.bestand);
+    if (code == null) { stuk.push(m.naam + ': ' + m.bestand + ' bestaat niet meer'); continue; }
+    for (const z of m.zet) {
+      const eig = z.via.replace(/^req\./, '');
+      if (!new RegExp('req\\.' + eig + '\\s*=').test(code))
+        stuk.push(m.naam + ': zet ' + z.via + ' niet (meer) in ' + m.bestand);
+    }
+  }
+  {
+    const code = bron.get(ENVELOPMODULE.bestand);
+    if (code == null) stuk.push('de envelopmodule ' + ENVELOPMODULE.bestand + ' bestaat niet');
+    else for (const d of ENVELOPMODULE.draagt) {
+      if (!code.includes(d.bewijs))
+        stuk.push('de envelop draagt ' + d.veld + ' niet meer (' + d.bewijs + ' weg uit ' + ENVELOPMODULE.bestand + ')');
+    }
   }
 
   /* ROUTES PER POORTWACHTER. Uit de bron, want de routekaart kent de middleware
@@ -220,11 +294,30 @@ function meet() {
     }
   }
 
-  /* PER VELD: wie stelt hem vast, en over hoeveel routes. */
+  /* ROUTES MET EEN CANONIEKE ENVELOP. Dit is het getal dat de kant op moet die
+     de rest mogelijk maakt: hoeveel routes dragen een handeling in EEN vorm? */
+  const envelopRoutes = POORTWACHTERS.filter(p => p.envelop)
+    .reduce((n, p) => n + perPoort.get(p.naam), 0);
+
+  /* PER VELD: wie stelt hem vast, en over hoeveel routes. Drie bronnen, en ze
+     tellen alle drie -- de poortwachter (per route), de middleware (elk verzoek)
+     en de canonieke envelop (overal waar een poortwachter hem zet). */
+  const envelopDraagt = new Set(ENVELOPMODULE.draagt.map(d => d.veld));
   const perVeld = VELDEN.map(v => {
-    const dragers = POORTWACHTERS.filter(p => p.zet.some(z => z.veld === v.id));
-    const bereik = dragers.reduce((n, p) => n + perPoort.get(p.naam), 0);
-    return { ...v, dragers: dragers.map(p => p.naam), bereik };
+    const dragers = POORTWACHTERS.filter(p => p.zet.some(z => z.veld === v.id)).map(p => p.naam);
+    const uitMiddleware = MIDDLEWARE.filter(m => m.zet.some(z => z.veld === v.id)).map(m => m.naam);
+    const altijd = ENVELOPMODULE.vultAltijd.includes(v.id);
+    const uitEnvelop = envelopDraagt.has(v.id) && envelopRoutes > 0
+      ? [altijd ? 'envelop' : 'envelop (slot)'] : [];
+    const alle = [...dragers, ...uitMiddleware, ...uitEnvelop];
+    /* BEREIK = waar het veld ECHT gevuld wordt. Een slot telt niet mee: de
+       envelop draagt overal een tenant-veld, maar het is alleen gevuld waar een
+       poortwachter hem zet. */
+    const bereik = uitMiddleware.length ? routes
+      : altijd ? envelopRoutes
+      : POORTWACHTERS.filter(p => p.zet.some(z => z.veld === v.id))
+          .reduce((n, p) => n + perPoort.get(p.naam), 0);
+    return { ...v, dragers: alle, bereik, slot: !altijd && uitEnvelop.length > 0 };
   });
   const zonderHuis = perVeld.filter(v => !v.dragers.length);
 
@@ -242,7 +335,8 @@ function meet() {
   });
 
   return { stuk, routes, zonderPoort, zonderVoorbeeld, perPoort, perVeld, zonderHuis,
-    actorVormen, bevindingen,
+    actorVormen, bevindingen, envelopRoutes,
+    routesZonderEnvelop: routes - envelopRoutes,
     veldenZonderHuis: zonderHuis.length, aantalActorVormen: actorVormen.length };
 }
 
@@ -255,6 +349,8 @@ function stand(nu) {
       'radius en geen bonnetje te bouwen -- hoe de rest ook wordt ingericht.',
     hoe: 'node scripts/envelop.js --velden',
     gemeten: { veldenZonderHuis: nu.veldenZonderHuis, actorVormen: nu.aantalActorVormen,
+      routesZonderEnvelop: nu.routesZonderEnvelop,
+      routesMetEnvelop: nu.envelopRoutes,
       routesMetPoortwachter: nu.routes - nu.zonderPoort, routesTotaal: nu.routes },
     veldenZonderHuis: nu.zonderHuis.map(v => ({ veld: v.id, wat: v.wat })),
     actorVormen: nu.actorVormen,
@@ -290,7 +386,9 @@ function main() {
   console.log('  routes met een geregistreerde poortwachter : ' +
     (nu.routes - nu.zonderPoort) + ' van ' + nu.routes);
   console.log('  envelopvelden zonder huis                  : ' + nu.veldenZonderHuis + ' van ' + VELDEN.length);
-  console.log('  vormen waarin de actor wordt neergezet     : ' + nu.aantalActorVormen +
+  console.log('  routes met een canonieke envelop           : ' + nu.envelopRoutes +
+    ' van ' + nu.routes + '   (zonder: ' + nu.routesZonderEnvelop + ')');
+  console.log('  oude actorvormen die nog gelezen worden    : ' + nu.aantalActorVormen +
     '  (' + nu.actorVormen.join(', ') + ')');
 
   console.log('\n  per poortwachter:');
@@ -322,7 +420,9 @@ function main() {
 
   if (VASTLEGGEN) {
     if (oud && (nu.veldenZonderHuis > oud.gemeten.veldenZonderHuis ||
-                nu.aantalActorVormen > oud.gemeten.actorVormen)) {
+                nu.aantalActorVormen > oud.gemeten.actorVormen ||
+                nu.routesZonderEnvelop > (oud.gemeten.routesZonderEnvelop != null
+                  ? oud.gemeten.routesZonderEnvelop : Infinity))) {
       console.log('\n  GEWEIGERD: de ratel legt geen verslechtering vast (' +
         oud.gemeten.veldenZonderHuis + '/' + oud.gemeten.actorVormen + ' -> ' +
         nu.veldenZonderHuis + '/' + nu.aantalActorVormen + ').');
@@ -340,6 +440,8 @@ function main() {
     slechter.push('velden zonder huis ' + oud.gemeten.veldenZonderHuis + ' -> ' + nu.veldenZonderHuis);
   if (nu.aantalActorVormen > oud.gemeten.actorVormen)
     slechter.push('actorvormen ' + oud.gemeten.actorVormen + ' -> ' + nu.aantalActorVormen);
+  if (oud.gemeten.routesZonderEnvelop != null && nu.routesZonderEnvelop > oud.gemeten.routesZonderEnvelop)
+    slechter.push('routes zonder envelop ' + oud.gemeten.routesZonderEnvelop + ' -> ' + nu.routesZonderEnvelop);
 
   if (slechter.length) {
     console.log('\n  ZAKT: ' + slechter.join('; ') + '.');
@@ -348,7 +450,8 @@ function main() {
     return 1;
   }
   if (nu.veldenZonderHuis < oud.gemeten.veldenZonderHuis ||
-      nu.aantalActorVormen < oud.gemeten.actorVormen) {
+      nu.aantalActorVormen < oud.gemeten.actorVormen ||
+      (oud.gemeten.routesZonderEnvelop != null && nu.routesZonderEnvelop < oud.gemeten.routesZonderEnvelop)) {
     console.log('\n  BETER dan ENVELOP.json (' + oud.gemeten.veldenZonderHuis + '/' + oud.gemeten.actorVormen +
       ' -> ' + nu.veldenZonderHuis + '/' + nu.aantalActorVormen + '). Zet de ratel strakker met --vastleggen.');
     return 0;
@@ -357,6 +460,6 @@ function main() {
   return 0;
 }
 
-module.exports = { meet, stand, main, VELDEN, POORTWACHTERS, BEVINDINGEN };
+module.exports = { meet, stand, main, VELDEN, POORTWACHTERS, MIDDLEWARE, ENVELOPMODULE, BEVINDINGEN };
 
 if (require.main === module) process.exit(main());

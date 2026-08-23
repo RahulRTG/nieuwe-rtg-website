@@ -9,6 +9,7 @@ const techniek = require('../techniek');
 const functies = require('../functies');
 const eigenaar = require('../eigenaar');
 const inzagelog = require('../inzagelog');
+const envelop = require('../opzet/envelop');
 const { log } = require('../log');
 
 module.exports = (kern) => {
@@ -69,6 +70,8 @@ module.exports = (kern) => {
         { bron: 'user:' + user.id });
       return res.status(403).json({ error: 'Geen toegang tot de technische pagina.' });
     }
+    envelop.zet(req, { soort: 'techniek', id: 'user-' + user.id, identiteit: 'bewezen',
+      gezagBron: isEigenaar(user) ? 'eigenaar' : 'toegekend', gezagBaas: !!isEigenaar(user) });
     req.techUser = user; next();
   }
   function eigenaarAlleen(req, res, next) {

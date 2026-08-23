@@ -96,19 +96,28 @@ test('elke geregistreerde poortwachter bestaat en zet echt wat het register zegt
   }
 });
 
-test('de zeven velden zonder huis zijn precies de velden die niemand vaststelt', () => {
+test('de velden zonder huis zijn precies de velden die niemand vult', () => {
   const nu = envelop.meet();
   const zonder = new Set(nu.zonderHuis.map(v => v.id));
   for (const v of envelop.VELDEN) {
-    const dragers = envelop.POORTWACHTERS.filter(p => p.zet.some(z => z.veld === v.id));
-    assert.equal(zonder.has(v.id), dragers.length === 0,
-      'veld ' + v.id + ': de lijst "zonder huis" klopt niet met het register');
+    const uitPoort = envelop.POORTWACHTERS.some(p => p.zet.some(z => z.veld === v.id));
+    const uitMiddleware = envelop.MIDDLEWARE.some(m => m.zet.some(z => z.veld === v.id));
+    const uitEnvelop = envelop.ENVELOPMODULE.draagt.some(d => d.veld === v.id);
+    assert.equal(zonder.has(v.id), !(uitPoort || uitMiddleware || uitEnvelop),
+      'veld ' + v.id + ': de lijst "zonder huis" klopt niet met de drie bronnen in het register');
   }
-  /* De vier die WEL een huis hebben, met naam -- zodat een stille verschuiving
+  /* De zes die WEL een huis hebben, met naam -- zodat een stille verschuiving
      naar boven (een veld raakt zijn drager kwijt) hier zakt en niet alleen in
-     het totaal verdwijnt. */
-  for (const veld of ['actor', 'tenant', 'capability', 'gezag']) {
+     het totaal verdwijnt. `context` en `correlatie` staan erbij sinds de
+     canonieke envelop er is; correlatie kwam er al vandaan (server/log.js) en
+     werd door de eerste versie van deze meter ten onrechte als dakloos geteld. */
+  for (const veld of ['actor', 'tenant', 'capability', 'gezag', 'context', 'correlatie']) {
     assert.equal(zonder.has(veld), false, veld + ' hoort een drager te hebben');
+  }
+  /* En de vijf die er NIET zijn, ook met naam: die kent een poortwachter niet,
+     en ze verzinnen zou de envelop laten liegen. */
+  for (const veld of ['doel', 'intent', 'wijzigingen', 'risicoklasse', 'omkeerbaarheid']) {
+    assert.equal(zonder.has(veld), true, veld + ' zou geen drager mogen hebben zolang er geen handelingslaag is');
   }
 });
 
@@ -117,10 +126,10 @@ test('de zeven velden zonder huis zijn precies de velden die niemand vaststelt',
 test('MUTATIE: een poortwachter die een nieuwe actorvorm neerzet laat de ratel zakken', () => {
   const voor = envelop.meet().aantalActorVormen;
   metVervangen('scripts/envelop.js',
-    "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js',\n    zet: [],",
-    "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js',\n    zet: [{ veld: 'actor', via: 'req.werkplekBaas' }],", () => {
+    "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js', envelop: false,\n    zet: [],",
+    "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js', envelop: false,\n    zet: [{ veld: 'actor', via: 'req.werkplekBaas' }],", () => {
       const r = draai();
-      assert.equal(getal(r.uit, 'vormen waarin de actor wordt neergezet'), voor + 1,
+      assert.equal(getal(r.uit, 'oude actorvormen die nog gelezen worden'), voor + 1,
         'de meter ziet de nieuwe actorvorm niet -- dan meet hij niets');
       assert.equal(r.code, 1, 'de ratel hoort te zakken:\n' + r.uit);
       assert.match(r.uit, /ZAKT/);
@@ -132,8 +141,8 @@ test('MUTATIE: een poortwachter die een nieuwe actorvorm neerzet laat de ratel z
 test('MUTATIE: --vastleggen weigert een verslechtering, en raakt het register niet aan', () => {
   metBewaardRegister((voor) => {
     metVervangen('scripts/envelop.js',
-      "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js',\n    zet: [],",
-      "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js',\n    zet: [{ veld: 'actor', via: 'req.werkplekBaas' }],", () => {
+      "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js', envelop: false,\n    zet: [],",
+      "{ naam: 'baasAuth', bestand: 'server/routes/werkplek.js', envelop: false,\n    zet: [{ veld: 'actor', via: 'req.werkplekBaas' }],", () => {
         const r = draai(['--vastleggen']);
         assert.equal(r.code, 1, 'de ratel legt geen verslechtering vast:\n' + r.uit);
         assert.match(r.uit, /GEWEIGERD/);
@@ -155,6 +164,45 @@ test('MUTATIE: een poortwachter die zijn eigenschap niet meer zet maakt de meter
     assert.match(r.uit, /techAuth.*req\.techUser/);
   });
   assert.equal(draai().code, 0, 'na herstel meet hij weer gewoon');
+});
+
+test('MUTATIE: een poortwachter die de CANONIEKE ENVELOP niet meer zet, maakt de meter stuk', () => {
+  /* Dit is de bewering die de hele ronde draagt: het register zegt dat tien van
+     de elf poortwachters een envelop zetten, en zonder deze controle zou het
+     wegvallen van envelop.zet() het aantal velden-met-huis stilzwijgend laten
+     STIJGEN -- de meter zou groener worden precies op het moment dat de laag
+     verdwijnt. Dat is de val uit LAT.md regel 10, hier met een toets erop. */
+  metVervangen('server/routes/techniek.js', 'envelop.zet(req,', 'zzGeenEnvelop(req,', () => {
+    const r = draai();
+    assert.equal(r.code, 2, 'een poortwachter zonder envelop hoort de meter stuk te verklaren:\n' + r.uit);
+    assert.match(r.uit, /techAuth: zet geen canonieke envelop meer/);
+  });
+  assert.equal(draai().code, 0, 'na herstel meet hij weer gewoon');
+});
+
+test('MUTATIE: verliest de envelopmodule een veld, dan zakt de meter ook', () => {
+  /* De andere kant van dezelfde vraag: het register zegt dat de envelop zes
+     velden draagt. Draagt hij er nog maar vijf, dan klopt "vijf velden zonder
+     huis" niet meer -- en dat mag niet stil gebeuren. */
+  metVervangen('server/opzet/envelop.js', 'capability: tekst(g.capability, 120),', 'zzcap: tekst(g.capability, 120),', () => {
+    const r = draai();
+    assert.equal(r.code, 2);
+    assert.match(r.uit, /de envelop draagt capability niet meer/);
+  });
+});
+
+test('de canonieke envelop staat in ELKE poortwachter die het register zo noemt', () => {
+  /* Niet alleen het totaal: per bestand, zodat een enkele poortwachter niet stil
+     kan afhaken terwijl de andere negen het getal overeind houden. */
+  for (const p of envelop.POORTWACHTERS.filter(x => x.envelop)) {
+    const bron = fs.readFileSync(path.join(WORTEL, p.bestand), 'utf8');
+    assert.match(bron, /envelop\.zet\s*\(/, p.naam + ' (' + p.bestand + ') zet geen canonieke envelop');
+    /* Het pad is relatief aan het bestand zelf: vanuit server/opzet/ is dat
+       './envelop', vanuit server/routes/ '../opzet/envelop'. Op de mapnaam
+       matchen zou de eerste ten onrechte afkeuren. */
+    assert.match(bron, /require\(['"][^'"]*\benvelop['"]\)/,
+      p.bestand + ' haalt de envelopmodule niet op');
+  }
 });
 
 test('MUTATIE: een verdwenen poortwachter maakt de meter ook stuk', () => {

@@ -38,4 +38,50 @@ function zoek(q){
       (top.length?' \u2014 '+top.slice(0,5).join(' \u00b7 '):'')+'.';
   }).catch(function(){ctx.textContent='De zoekopdracht kwam niet aan.';});
 }
-function ask(){var q=$('wkRahulInput').value.trim().toLowerCase();if(!q)return;$('wkRahulInput').value='';if(/onboard|indienst|persoon|medewerker|personeel|eerste 90/.test(q))open('people');else if(/klant|verkoop|relatie/.test(q))open('klanten');else if(/service|ticket|storing/.test(q))open('service');else if(/besluit|akkoord|stem/.test(q))open('besluit');else if(/contract|recht/.test(q))open('recht');else if(/release|bouw|software/.test(q))open('bouw');else if(/apparaat|licentie|it/.test(q))open('it');else if(/kennis|beleid|procedure/.test(q))open('kennis');else open('projecten');zoek(q)}$('wkRahulSend').onclick=ask;$('wkRahulInput').onkeydown=function(e){if(e.key==='Enter')ask()};$('wkMouth').onclick=function(){$('wkRahulInput').focus()}})();
+
+/* HANDELEN VIA DE BALK, MET DE KETEN ERIN. Eerst vragen we of dit een
+   HANDELING is. Levert dat een voornemen op, dan komt dat op het scherm met
+   wat het gaat raken en een knop om te bevestigen -- en pas die knop voert uit.
+   Begrijpt de zeef er geen handeling in, dan is het een ZOEKOPDRACHT.
+
+   De volgorde is met opzet zo: zoeken is onschuldig en handelen niet, dus de
+   dure vraag wordt eerst gesteld en het onschuldige antwoord is de terugval. */
+function toonPlan(p){
+  var ctx=$('wkRahulContext');
+  ctx.innerHTML='<b>'+K.esc(p.samenvatting)+'</b><br><small>Raakt: '+
+    K.esc((p.raakt||[]).map(function(r){return r.soort+' ('+r.wat+')'}).join(', ')||'niets')+
+    ' \u00b7 recht: '+K.esc(p.recht)+'</small><br>'+
+    '<small>Er is nog niets gebeurd. Bevestigen doet u.</small> '+
+    '<button class="knop p" type="button" id="wkDoe">Voer uit</button>';
+  $('wkDoe').onclick=function(){
+    $('wkDoe').disabled=true;
+    K.api('/handeling/doe',{planId:p.id,bevestiging:p.bevestiging}).then(function(r){
+      var d=r.body||{};
+      if(d.error)return void(ctx.textContent=d.error);
+      var b=d.actiebon||{};
+      ctx.textContent='Uitgevoerd: '+(b.resultaat?b.resultaat.soort+' "'+b.resultaat.titel+'"':b.samenvatting)+
+        '. Vastgelegd als actiebon '+b.id+', en in het journaal.';
+    });
+  };
+}
+function probeer(q){
+  var ctx=$('wkRahulContext');
+  if(!ctx)return;
+  ctx.textContent='Even kijken\u2026';
+  K.api('/handeling/plan',{bedoeling:q}).then(function(r){
+    var d=r.body||{};
+    /* Een rechtenweigering is GEEN reden om te gaan zoeken: de gebruiker
+       bedoelde een handeling, en dan hoort hij te horen welk recht hij mist
+       in plaats van een lijst treffers. */
+    if(r.status===403&&d.recht)return void(ctx.textContent=d.error);
+    if(d.plan)return toonPlan(d.plan);
+    zoek(q);
+  }).catch(function(){zoek(q)});
+}
+function ask(){
+  /* DE TEKST BLIJFT ZOALS DE GEBRUIKER HEM TYPTE. Hier stond .toLowerCase(),
+     en dat was onschuldig zolang de balk alleen op woorden routeerde. Nu de
+     tekst ook de TITEL van een taak of ticket wordt, verminkt het de invoer:
+     "Dakgoot vervangen" werd "dakgoot vervangen". De kleine letters zijn alleen
+     voor de woordmatch hieronder; wat naar de server gaat is `q`. */
+  var q=$('wkRahulInput').value.trim();if(!q)return;$('wkRahulInput').value='';var k=q.toLowerCase();if(/onboard|indienst|persoon|medewerker|personeel|eerste 90/.test(k))open('people');else if(/klant|verkoop|relatie/.test(k))open('klanten');else if(/service|ticket|storing/.test(k))open('service');else if(/besluit|akkoord|stem/.test(k))open('besluit');else if(/contract|recht/.test(k))open('recht');else if(/release|bouw|software/.test(k))open('bouw');else if(/apparaat|licentie|it/.test(k))open('it');else if(/kennis|beleid|procedure/.test(k))open('kennis');else open('projecten');probeer(q)}$('wkRahulSend').onclick=ask;$('wkRahulInput').onkeydown=function(e){if(e.key==='Enter')ask()};$('wkMouth').onclick=function(){$('wkRahulInput').focus()}})();

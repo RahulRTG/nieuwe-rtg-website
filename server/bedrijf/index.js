@@ -166,5 +166,10 @@ module.exports = (kern) => {
   require('./uitval')(sctx);
   // Zoeken, dossier en samenhang: leest de soorten van alle lagen hierboven.
   require('./inzicht')(sctx);
+  /* Handelen via de commandobalk. Als LAATSTE, want hij leunt op de poort van
+     rollen.js, op zetWie() van wieis.js en op de bakken van taak.js en
+     service.js -- en hij schrijft in die bakken en niet in een eigen opslag
+     ernaast. */
+  require('./handeling')(sctx);
   return sctx;
 };

@@ -116,6 +116,25 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
       'HR heeft geen recht op projecten en vindt het dus niet: ' + alsHr);
     assert.match(alsHr, /soort\(en\)/, 'maar krijgt wel te horen waar er is gezocht: ' + alsHr);
 
+    /* ---- de handelkant: klaarzetten, en pas op de knop uitvoeren ---- */
+    const alsPlan = (await vraag(pl.lidToken, 'maak een taak Dakgoot vervangen')).tekst;
+    assert.match(alsPlan, /Dakgoot vervangen/, 'de balk stelt een handeling voor: ' + alsPlan);
+    assert.match(alsPlan, /Er is nog niets gebeurd/, 'en zegt dat er nog niets is gebeurd');
+
+    /* De taak bestaat pas NA de knop. Dat is het hele verschil tussen
+       klaarzetten en doen, en het is van buiten niet te zien aan de tekst. */
+    const voorKnop = await api('/taken', { werkruimte: w.werkruimte, lidToken: pl.lidToken });
+    assert.ok(!JSON.stringify(voorKnop).includes('Dakgoot'), 'nog geen taak');
+
+    await page.click('#wkDoe');
+    await page.waitForTimeout(700);
+    const naKnop = await page.evaluate(() => document.getElementById('wkRahulContext').innerText.replace(/\s+/g, ' '));
+    assert.match(naKnop, /Uitgevoerd/, 'na de knop wel: ' + naKnop);
+    assert.match(naKnop, /actiebon/, 'met een actiebon erbij');
+
+    const naLijst = await api('/taken', { werkruimte: w.werkruimte, lidToken: pl.lidToken });
+    assert.ok(JSON.stringify(naLijst).includes('Dakgoot vervangen'), 'en de taak staat er echt');
+
     assert.deepEqual(fouten, [], 'geen fouten in de console: ' + fouten.join(' | '));
   } finally {
     if (browser) await browser.close();

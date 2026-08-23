@@ -453,12 +453,33 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    mist zit er niet in, wordt niet gefilterd maar bestaat niet. Hij meldt ook
    in hoeveel soorten er is gezocht in plaats van te doen alsof hij alles zag.
 
-   De HANDELKANT is er bewust niet. Zoeken en openen is samenstellen en
-   klaarzetten; wie iets wil veranderen drukt zelf op de knop die daarvoor
-   bestaat. Een machine die zelf handelt in een werksysteem heeft een actiebon
-   en een bevestigingsmodel nodig, en die bestaan hier niet -- dat bouwen zonder
-   die twee is precies de belofte-zonder-code waar de rest van dit document
-   over gaat. Staat als open punt in `TAKEN.md`.
+   De **handelkant** staat er ook, en precies zoals hij hoorde te staan: met de
+   twee dingen die eerst ontbraken. De keten is
+
+       bedoeling -> plan -> geraakte objecten -> rechtencontrole ->
+       BEVESTIGING door een mens -> uitvoering -> actiebon
+
+   en er wordt geen schakel overgeslagen. Vijf regels dragen hem:
+
+   - **Plannen verandert niets.** De toets legt de hele werkruimte voor en na
+     naast elkaar; er mag geen byte verschillen.
+   - **Bevestigen doet de mens.** Een plan draagt een geheim dat één keer wordt
+     getoond; zonder dat geheim voert niets uit. Dezelfde regel als in LIFE.md:
+     samenstellen en klaarzetten mag een machine, bevestigen niet.
+   - **Het recht wordt bij de UITVOERING opnieuw gerekend.** Anders overleeft
+     een plan van tien uur een rol die om half elf werd ingetrokken -- en dan is
+     tijdelijke toegang permanent.
+   - **Een plan is van één persoon en voor één keer.**
+   - **De zeef is een regel en geen model.** `CLAUDE.md` legt dat vast:
+     controleerbare extractie gebruikt geen model. Wat de zeef niet begrijpt
+     wordt geen plan; er komt een eerlijk "dit begrijp ik niet" in plaats van
+     een gok die iemand bevestigt omdat er nu eenmaal een knop staat.
+
+   De lijst werkwoorden is **gesloten** (`bedrijf/handeling-lijst.js`): er is
+   geen algemene "voer maar uit". Elke regel is een werkwoord dat iemand met dat
+   recht ook met de hand had mogen doen, en wie er een bijzet schrijft ook de
+   uitvoering -- er is met opzet geen generieke weg die elke nieuwe regel meteen
+   uitvoerbaar maakt.
 10. **Digital twin en extension fabric** — **niet gebouwd, en niet als
     ontbrekende laag maar als besluit.** De vraag die een twin moet
     beantwoorden -- "wat raakt het als deze vestiging sluit" -- wordt door het

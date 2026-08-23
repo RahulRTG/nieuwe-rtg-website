@@ -426,6 +426,10 @@ const EIGEN_MODULE = new Map([
      Nagetrokken: de rechtenscheiding in public/apps/werk/kern.js weghalen (elke
      403 weer als "uw sleutel deugt niet" lezen) laat hem zakken. */
   ['werkcommandbalk.e2e.js', ['public/apps/werk/kern.js', 'public/apps/werk/command.js']],
+  /* werkhandeling.test.js: nagetrokken met drie mutaties -- de
+     bevestigingscontrole weghalen, het recht niet opnieuw rekenen bij de
+     uitvoering, en een plan van een ander uitvoerbaar maken. Alle drie raak. */
+  ['werkhandeling.test.js', ['server/bedrijf/handeling.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

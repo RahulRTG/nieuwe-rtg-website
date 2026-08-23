@@ -2,6 +2,7 @@
    relatielaag na levering. */
 'use strict';
 const { coord } = require('../../kern/util');
+const klok = require('../../lib/klok');
 
 module.exports = (kern) => {
   const { app, auth, schoon, foodcourt, buitenshuis, naad, verzoeklaag, horeca,
@@ -58,7 +59,7 @@ module.exports = (kern) => {
     const uit = verzoeklaag.vraag(x.s.code, x.rek, (x.rek.deelnemers || [])[0], {
       soort:'hulp', tekst:schoon((req.body || {}).tekst, 140) || 'Er is iets niet goed met deze bestelling.' });
     if (uit.error) return res.status(uit.status || 400).json({ error:uit.error, code:uit.code });
-    x.rek.incident = { status:'open', verzoekId:uit.verzoek.id, at:new Date().toISOString() };
+    x.rek.incident = { status:'open', verzoekId:uit.verzoek.id, at:klok.datum().toISOString() };
     save();
     if (sseToSupplier) sseToSupplier(x.s.code, 'sync', { scope:'eten' });
     res.json(uit);
@@ -78,7 +79,7 @@ module.exports = (kern) => {
     if (!(score >= 1 && score <= 5)) return res.status(400).json({ error:'Geef 1 tot 5 sterren.' });
     const rev = { id:'rev-' + kern.crypto.randomBytes(5).toString('hex'), supplierCode:x.s.code,
       supplierName:x.s.name, soort:'eten', ref, key:req.session.key, codename:handleVan(req), score,
-      tekst:schoon((req.body || {}).tekst, 300) || '', at:new Date().toISOString() };
+      tekst:schoon((req.body || {}).tekst, 300) || '', at:klok.datum().toISOString() };
     db.data.reviews = db.data.reviews || []; db.data.reviews.unshift(rev); db.data.reviews = db.data.reviews.slice(0, 20000);
     db.data.reviewStats = db.data.reviewStats || {};
     const st = db.data.reviewStats[x.s.code] = db.data.reviewStats[x.s.code] || { som:0, aantal:0 };

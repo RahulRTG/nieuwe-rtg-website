@@ -6424,6 +6424,7 @@
         '</div>'
       ).join('')
     ).join('') : '<div class="empty">'+T('sup.nomenu','Nog geen menukaart. Voeg gerechten toe zodat gasten vooraf kunnen bestellen.')+'</div>';
+/* Een gerecht met ingrediënten, dieetlabels en keuzes aan de menukaart toevoegen. */
     if (canEdit){
       html += '<div class="card h-mt120"><div class="tt-h">'+T('menu.add','Gerecht toevoegen')+'</div>'+
         '<div class="field"><label>'+T('menu.name','Naam')+'</label><input id="mnName" placeholder="'+T('menu.nameph','Bijv. gegrilde octopus')+'"></div>'+
@@ -6456,7 +6457,7 @@
       try { await API.call('/supplier/menu', { menu: [...(state.menu||[]), item] }); toast(T('menu.added','Staat op de kaart, gasten zien het direct.')); await refresh(); openTab('menu'); } catch(e){ toast(e.message); }
     });
   }
-
+/* Menukaart, dynamische prijzen, locatie en de sectorgebonden kassa. */
   // ---- dynamische prijs ----
   function renderPrice(){
     const h = state.prices || [];
@@ -8999,6 +9000,7 @@
     catch(e){ const el=$('#etenWerkblad'); if(el) el.innerHTML='<section class="eten-werk"><div class="eten-leeg">'+esc(e.message)+'</div></section>'; }
     finally { etenBezig=false; }
   }
+/* Live synchronisatie, meldingen en het opstarten van het partnerwerkblad. */
   async function loadNotifs(){ try { const d = await API.call('/supplier/notifications', {}); } catch(e){} }
   $('#bell').addEventListener('click', () => { $('#notifPanel').classList.add('open'); $('#notifScrim').classList.add('open'); if (notifs.some(n=>!n.read)){ notifs.forEach(n=>n.read=true); API.call('/supplier/notifications/read').catch(()=>{}); renderBell(); } });
   $('#notifClose').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });

@@ -2,8 +2,9 @@
 'use strict';
 const b = require('./orderbeeld-basis');
 const capaciteit = require('./capaciteit');
+const klok = require('../../lib/klok');
 
-module.exports = function projecteerRekening({ zaakcode, zaak, rekening, horecaDoos, nuMs = Date.now() }) {
+module.exports = function projecteerRekening({ zaakcode, zaak, rekening, horecaDoos, nuMs = klok.nu() }) {
   const rek = rekening, regels = rek.regels || [], t = b.totalen(rek);
   const productie = b.productieVan(regels);
   const assen = { acceptatie:b.acceptatieVan(rek, regels), productie,
@@ -38,7 +39,7 @@ module.exports = function projecteerRekening({ zaakcode, zaak, rekening, horecaD
       bezorger:rek.fulfillment && rek.fulfillment.bezorger || null },
     statussen:assen, fase, status:{ sleutel:fase, label:tekst[0], uitleg:tekst[1],
       voortgang:{ ontvangen:12, bevestigd:25, keuken:48, 'bijna-klaar':66, klaar:78, onderweg:90, geleverd:100, geannuleerd:100 }[fase] || 12 },
-    eta:{ minuten:etaMinuten, verwachtAt:new Date(nuMs + etaMinuten * 60000).toISOString(),
+    eta:{ minuten:etaMinuten, verwachtAt:verwachtAt(nuMs, etaMinuten),
       keukenMinuten:minutenKeuken, ritMinuten:rit,
       uitleg:etaMinuten ? minutenKeuken + ' min keuken' + (rit ? ' + ' + rit + ' min rit' : '') + (extra ? ' + ' + extra + ' min capaciteitsmarge' : '') : 'Afgerond' },
     tijdlijn:b.tijdlijnVan(rek, assen, fase), allergieControle:regels.some(r => r.bevestiging === 'wacht'),
@@ -47,3 +48,9 @@ module.exports = function projecteerRekening({ zaakcode, zaak, rekening, horecaD
     _rekening:rek
   };
 };
+
+function verwachtAt(nuMs, minuten) {
+  const datum = klok.datum();
+  datum.setTime(nuMs + minuten * 60000);
+  return datum.toISOString();
+}

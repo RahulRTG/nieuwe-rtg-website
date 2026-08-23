@@ -2,6 +2,7 @@
    de browser: alleen keuze-id's worden geaccepteerd en op de actuele kaart van
    de zaak geprijsd. */
 'use strict';
+const klok = require('../../lib/klok');
 
 function configuratie(item, invoer) {
   const gekozen = new Set(Array.isArray(invoer) ? invoer.map(String) : []);
@@ -27,7 +28,7 @@ function prijsversie(items) {
   const bron = items.map(x => [x.itemId, x.centen, x.aantal, (x.opties || []).map(o => o.id).join(',')].join(':')).join('|');
   let h = 2166136261;
   for (let i = 0; i < bron.length; i++) { h ^= bron.charCodeAt(i); h = Math.imul(h, 16777619); }
-  return { id:'pv-' + (h >>> 0).toString(16), gecontroleerdAt:new Date().toISOString() };
+  return { id:'pv-' + (h >>> 0).toString(16), gecontroleerdAt:klok.datum().toISOString() };
 }
 
 module.exports = { configuratie, prijsversie };

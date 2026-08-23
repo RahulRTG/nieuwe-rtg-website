@@ -3,6 +3,7 @@
 'use strict';
 const beeld = require('./orderbeeld');
 const capaciteit = require('./capaciteit');
+const klok = require('../../lib/klok');
 
 module.exports = (kern, horeca) => {
   const { ordersVanZaak, schoon } = kern;
@@ -20,7 +21,7 @@ module.exports = (kern, horeca) => {
   };
 
   function alleVan(s) {
-    const h = doos(s.code), vandaag = new Date().toISOString().slice(0, 10);
+    const h = doos(s.code), vandaag = klok.datum().toISOString().slice(0, 10);
     const horecaOrders = Object.values(h.rekeningen || {})
       .filter(r => beeld.OPEN_KANALEN.includes(r.kanaal) && (r.regels || []).length)
       .map(r => beeld.projecteerRekening({ zaakcode:s.code, zaak:s, rekening:r, horecaDoos:h }))

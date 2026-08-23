@@ -1,3 +1,4 @@
+/* Live synchronisatie, meldingen en het opstarten van het partnerwerkblad. */
   async function loadNotifs(){ try { const d = await API.call('/supplier/notifications', {}); } catch(e){} }
   $('#bell').addEventListener('click', () => { $('#notifPanel').classList.add('open'); $('#notifScrim').classList.add('open'); if (notifs.some(n=>!n.read)){ notifs.forEach(n=>n.read=true); API.call('/supplier/notifications/read').catch(()=>{}); renderBell(); } });
   $('#notifClose').addEventListener('click', () => { $('#notifPanel').classList.remove('open'); $('#notifScrim').classList.remove('open'); });

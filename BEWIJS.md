@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1045 bestanden en 6953 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1046 bestanden en 6959 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1045 |
-| losse beweringen (`test(...)`) | 6953 |
+| toetsbestanden | 1046 |
+| losse beweringen (`test(...)`) | 6959 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 867 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 23 |
-| niets van beide | 107 |
+| niets van beide | 108 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-915 bestanden, 6729 beweringen.
+916 bestanden, 6735 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -306,6 +306,7 @@ toets omvalt.
 | `horeca-keuken.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 2: het keukenscherm. Getoetst zijn de beloftes, niet de knoppen: - de keuken ziet niets van een gang die de zaal nog niet heeft vrijgegeven; - de allergie staat op elke weergave, ook op het... |
 | `horeca-pas.test.js` | 11 | -- | RTG Horeca: DE PAS -- wie pakt een gereed staande gang op, en wie draagt hem. Het patroon bestond al voor gastverzoeken ("ik ga" en "gedaan" zijn twee knoppen), maar niet voor het eten bij de pas. |
 | `horeca-rekening.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 1: de rekening die blijft leven -- openen, regels, gangen, verplaatsen, samenvoegen, splitsen, fooi, betalen, bonnen en de offline-wachtrij. De zwaarste bewering staat in de eerste twee toetsen en... |
+| `horeca-stappen.test.js` | 6 | -- | RTG Horeca: BEREIDINGSSTAPPEN -- een gerecht is zelden één handeling. De keten in HORECA.md loopt bestelling -> gang -> gerecht -> BEREIDINGSSTAPPEN -> station, en die ene schakel was er niet. |
 | `horeca-verdeling.test.js` | 9 | -- | RTG Horeca: DE VERDELING -- wie betaalt welk deel van één rekening. Deze rekensom stond in kern/gast/ en was daardoor alleen bereikbaar voor wie zelf de QR scande. |
 | `horeca-vloer.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 5: HACCP, de fooienpot, de loonkosten, het gastprofiel en het dagbeeld. Wat hier bewezen wordt: - een temperatuur buiten de grens kan niet worden genoteerd zonder actie, en een correctie laat de... |
 | `horeca-werklijst.test.js` | 7 | -- | RTG Horeca: DE WERKLIJST -- wat is mijn eerstvolgende handeling? De rekensom achter PDA SERVICE. |

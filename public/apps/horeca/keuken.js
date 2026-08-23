@@ -34,51 +34,11 @@
   var api = function (p, b) { return K.api(p, b); };
   var meld = function (t) { K.meld(t); };
   var bezig = false;
-
-  var BAANWOORD = { nu: 'NU', hierna: 'HIERNA', wacht: 'WACHT', risico: 'RISICO' };
-
-  function klokje(iso) {
-    if (!iso) return '';
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
-  }
-
-  /* De binnenkant van een bon. Apart van het maken, want bij een verversing
-     wordt alleen dit vervangen -- het element zelf blijft staan en dus blijft
-     de hoogte van alles erboven gelijk. */
-  function inhoud(b) {
-    var kleur = (b.urgentie === 'te laat' || b.urgentie === 'let op') ? 'laat' : 'aan';
-    var baan = b.baan && BAANWOORD[b.baan] ? b.baan : '';
-    /* Wat de kok moet WETEN staat als woorden op de bon, niet alleen als tint:
-       de baan met zijn tijd, en waarom die tijd zo is. Zonder de tekst is de
-       baan een kleurtje, en dan is punt 2 hierboven voor niets geschreven. */
-    var baanTag = baan
-      ? '<span class="tag baan ' + esc(baan) + '">' + BAANWOORD[baan] +
-        (b.startOm ? ' · aanzetten ' + esc(klokje(b.startOm)) : '') + '</span>'
-      : '';
-    return '<b>' + esc(b.tafel || b.kanaal) +
-      /* DE STOEL STAAT BIJ DE TAFEL EN NIET ONDERAAN. Een gang gaat samen de
-         deur uit, maar bij de tafel moet elk bord bij de juiste persoon staan --
-         en een runner die vier borden draagt, leest dat in één blik of niet. */
-      (b.stoel ? ' <span class="stoel">' + esc(b.stoel) + '</span>' : '') + '</b>' +
-      ' <span class="tag">gang ' + b.gang + '</span>' +
-      ' <span class="tag">' + esc(b.station) + '</span>' +
-      baanTag +
-      (b.doelOm ? ' <span class="tag">op tafel ' + esc(klokje(b.doelOm)) + '</span>' : '') +
-      (b.serveerOm ? ' <span class="tag">serveren ' + esc(b.serveerOm) + '</span>' : '') +
-      ' <span class="tag ' + kleur + '">' + b.loopt + ' van ' + b.norm + ' min</span>' +
-      (b.allergie ? '<div><span class="allergie">Allergie: ' + esc(b.allergie) + '</span></div>' : '') +
-      '<div class="wat">' + b.aantal + '× ' + esc(b.naam) +
-      (b.notitie ? ' <span class="stil">· ' + esc(b.notitie) + '</span>' : '') + '</div>' +
-      (b.samenMet && b.samenMet.length
-        ? '<div class="stil samen">gaat samen met ' + b.samenMet.map(esc).join(', ') + '</div>' : '') +
-      (b.cadans ? '<div class="stil som">' + esc(b.cadans) + '</div>' : '') +
-      '<div class="rij">' + ['gestart', 'bereid', 'klaar', 'uitgegeven'].map(function (s) {
-        return '<button class="knop' + (b.stand === s ? ' p' : '') + '" data-stand="' + s +
-          '" data-rek="' + esc(b.rekeningId) + '" data-regel="' + esc(b.regelId) + '">' + s + '</button>';
-      }).join('') + '</div>';
-  }
+  /* Hoe een bon eruitziet, staat in ./keuken-bon.js -- zie de kop daar voor
+     waarom die naad daar ligt. Dit bestand gaat over hoe het BORD zich
+     gedraagt. */
+  var inhoud = function (b) { return window.RTGHorecaKeukenBon.inhoud(b); };
+  var klokje = function (iso) { return window.RTGHorecaKeukenBon.klokje(iso); };
 
   function bindBon(el) {
     K.bind(el, 'stand', function (b) {

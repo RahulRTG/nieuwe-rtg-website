@@ -43,6 +43,11 @@
 .bon .stil{font-size:13px!important}
 .bon .som{color:#9a938c}
 .bon .allergie{font-size:16px;font-weight:600}
+/* DE BEREIDINGSSTAPPEN. Een genummerde lijst en geen opsomming: de volgorde is
+   de betekenis -- de stappen lopen na elkaar, niet tegelijk. Zestien pixels,
+   want dit is bontekst en die ondergrens staat in HORECA.md. */
+.bon .stappen{margin:8px 0 0;padding-left:22px;font-size:16px;line-height:1.55}
+.bon .stappen li{margin-top:3px}
 .bon .rij{gap:6px;margin-top:10px}
 .bon .rij .knop{flex:1 1 auto;min-height:52px;font-size:15px!important;padding:12px 10px!important}
 

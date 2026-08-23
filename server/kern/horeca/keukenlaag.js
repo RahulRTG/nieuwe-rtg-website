@@ -15,6 +15,8 @@
    dat is de enige reden dat iemand een wachttijd gelooft. */
 'use strict';
 
+const { stappenVan } = require('./stappen');
+
 // hoe lang een gerecht normaal duurt zonder eigen opgave van de zaak
 const STANDAARD = { koud: 6, warm: 14, grill: 12, frituur: 8, pizza: 9, sushi: 10,
   patisserie: 10, bar: 3, koffie: 3, roomservice: 18, afhaal: 10 };
@@ -22,7 +24,16 @@ const STANDAARD = { koud: 6, warm: 14, grill: 12, frituur: 8, pizza: 9, sushi: 1
 // de kanalen waarbij iemand fysiek in de zaak zit: die tellen mee voor bezetting
 const BINNEN = ['tafel', 'qr', 'bar', 'terras', 'club', 'hotelrestaurant'];
 
+/* DE NORM IS DE SOM VAN DE STAPPEN, als die er zijn. Een gerecht met stappen
+   heeft geen tweede totaaltijd ernaast: die twee zouden uiteenlopen zodra
+   iemand er een aanpast, en dan plant de keuken met het ene getal terwijl het
+   bord het andere toont (LAT-regel 4, en zie kern/horeca/stappen.js).
+
+   Geen stappen is geen fout: dan geldt precies wat er altijd al gold -- de
+   eigen tijd van de zaak, en anders de standaard van het station. */
 function bereidingsMinuten(h, regel) {
+  const stappen = stappenVan(h, regel.naam);
+  if (stappen) return Math.max(1, Math.min(180, stappen.reduce((n, s) => n + s.minuten, 0)));
   const eigen = ((h.instel || {}).bereidingstijden || {})[String(regel.naam || '').toLowerCase()];
   if (eigen) return Math.max(1, Math.min(180, Number(eigen)));
   return STANDAARD[String(regel.station || '').toLowerCase()] || 12;

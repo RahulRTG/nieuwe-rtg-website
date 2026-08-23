@@ -373,6 +373,43 @@ regel en twee glazen. Een getal dat iets anders telt dan zijn label zegt, is
 precies de fout die grens 7 verbiedt — en geen van de eerste toetsen zag het; de
 browsertoets viel erover.
 
+**4c. Bereidingsstappen — af.** De keten in dit document loopt `bestelling →
+gang → gerecht → bereidingsstappen → station`, en die ene schakel was er niet.
+Een regel droeg één station en één norm, dus rekende de cadans één startmoment
+terug. Voor een tournedos die drie minuten koud gemarineerd wordt, acht minuten
+grilt en drie minuten saus krijgt aan de warme kant, is dat één moment voor drie
+plekken — en dan begint de grill te vroeg of de sauzier te laat.
+
+`kern/horeca/stappen.js` legt per gerecht een geordende lijst stappen vast, elk
+met een station en een aantal minuten. Drie dingen liggen daarbij vast:
+
+- **De norm is de som van de stappen**, en er staat geen tweede getal naast. Een
+  eigen bereidingstijd naast stappen zou uiteenlopen zodra iemand er één aanpast,
+  en dan plant de keuken met het ene getal terwijl het bord het andere toont.
+- **Geen stappen is geen fout.** Verreweg de meeste gerechten zijn één handeling;
+  wie niets invult houdt exact het oude gedrag — de eigen tijd van de zaak, en
+  anders de standaard van het station. Wissen valt terug; het wordt nooit nul.
+- **De stappen lopen na elkaar, niet parallel.** Twee dingen tegelijk doen kán in
+  een echte keuken, maar dat is een keuze van de kok en niet iets wat een plansom
+  mag aannemen — aannemen dat het parallel gaat, maakt de belofte aan de gast
+  korter dan hij is.
+
+De cadans geeft elke stap zijn eigen aanzetmoment, teruggerekend vanaf de pas; de
+eerste stap begint precies waar het gerecht zonder stappen ook zou zijn begonnen.
+Ze staan als genummerde lijst op de keukenbon, met station en tijd
+(`test/horeca-stappen.test.js`, en de browsertoets kijkt of ze het scherm halen —
+een rekensom die niemand ziet, is geen functie).
+
+**Wat hier nog niet in zit:** een stap stuurt nog geen stationsbord. Een gerecht
+met een grill-stap staat op het bord van het station van de RÉGEL, niet op dat
+van de stap. Dat is de volgende snede, en hij raakt `/keuken/bord`.
+
+Twee bestanden gingen bij deze plak over de 10 kB-grens en zijn geknipt op een
+echte naad, niet op een regelnummer: `cadans-doel.js` (de pure rekensom: wanneer
+hoort een gang op tafel, en in welke baan valt een gerecht) naast `cadans.js` (de
+projectie daarvan over de rekeningen), en `keuken-bon.js` (hoe een bon eruitziet)
+naast `keuken.js` (hoe het bord zich gedraagt).
+
 **5. Venue Edge**: de clientkant van offline. De serverkant ligt er, en de
 kassa is de eerste die hem gebruikt — zie hieronder. De zaal, de bar en de PDA
 volgen nog niet: die werken niet met één verzoek per handeling maar met een

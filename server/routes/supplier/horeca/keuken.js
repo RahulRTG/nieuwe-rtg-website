@@ -96,6 +96,10 @@ module.exports = (kern) => {
       r.baan = c.baan; r.startOm = c.startOm; r.startOver = c.startOver;
       r.doelOm = c.doelOm; r.doelOver = c.doelOver; r.passOm = c.passOm;
       r.gangCompleet = c.gangCompleet; r.samenMet = c.samenMet; r.cadans = c.rekensom;
+      /* De bereidingsstappen, elk met hun eigen startmoment (kern/horeca/stappen.js).
+         `null` als de zaak er geen heeft vastgelegd -- en dan is er niets
+         veranderd aan wat dit bord altijd al toonde. */
+      r.stappen = c.stappen; r.stations = c.stations;
     }
     /* Volgorde: wat het eerst AAN moet, staat bovenaan. Waar geen cadans is
        (een regel zonder vrijgave haalt het bord niet, maar wees voorzichtig),

@@ -75,6 +75,14 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     /* ---- ingelogd: de dienst draait ---- */
     const token = await zaakToken(base);
     const api = zaakApi(base, token);
+    /* De bereidingsstappen van dit gerecht, vooraf vastgelegd: drie minuten
+       marineren, acht grillen, drie saus. Dat maakt de norm 14 en geeft elke
+       stap zijn eigen aanzetmoment (kern/horeca/stappen.js). */
+    await api('/keuken/stappen', { naam: 'Tournedos', stappen: [
+      { station: 'koud', minuten: 3, wat: 'marineren' },
+      { station: 'grill', minuten: 8, wat: 'grillen' },
+      { station: 'warm', minuten: 3, wat: 'saus afwerken' }
+    ] });
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, token);
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(700);
@@ -144,6 +152,20 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     assert.match(keuken, /Allergie: noten/, 'met de allergie in een eigen label');
     assert.match(keuken, /serveren 19:42/i, 'en met de gewenste serveertijd');
     assert.match(keuken, /van \d+ min/, 'de looptijd staat naast de norm, niet alleen een kleur');
+
+    /* DE BEREIDINGSSTAPPEN STAAN OP DE BON, elk met zijn eigen aanzetmoment.
+       Zonder dit is de hele stappenlaag een rekensom die niemand ziet: de kok
+       krijgt nog steeds een gerecht van veertien minuten aan een station in
+       plaats van drie handelingen op drie plekken. */
+    assert.match(keuken, /marineren/, 'de eerste stap staat op de bon');
+    assert.match(keuken, /grillen/, 'de tweede ook');
+    assert.match(keuken, /saus afwerken/, 'en de derde');
+    assert.match(keuken, /koud/, 'met het station van de stap erbij');
+    assert.match(keuken, /van 14 min/, 'en de norm is de som van de stappen (3 + 8 + 3)');
+    const stapTijden = await page.evaluate(() =>
+      [...document.querySelectorAll('.bon .stappen li')].map(li => li.textContent.replace(/\s+/g, ' ')));
+    assert.ok(stapTijden.length >= 3, 'de stappen staan als eigen lijst: ' + JSON.stringify(stapTijden));
+    assert.ok(stapTijden.every(t => /\d\d:\d\d/.test(t)), 'elk met een aanzettijd: ' + JSON.stringify(stapTijden));
     assert.match(keuken, /Bij het raam/, 'en de stoel staat op de bon, zodat de runner weet waar het bord heen gaat');
     assert.match(keuken, /aanzetten \d\d:\d\d/, 'de cadans zegt wanneer het aan moet, niet alleen hoe lang het loopt');
 

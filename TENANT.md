@@ -333,6 +333,16 @@ kost geen schrijfactie per verzoek.
 niet vergeten worden bij route 105. De **uitvoer telt nooit mee en wordt nooit
 geweigerd** -- exit-recht dat op een teller kan stuklopen is geen recht.
 
+**Hoe vaak hij naar de schijf gaat, en wat dat kost.** De eerste versie riep
+`save()` bij elk verzoek aan, en `save()` loopt bij SQLite langs een
+`JSON.stringify` van élke collectie -- daarmee werd elke leesactie in een
+werkruimte een schrijfactie op het hele bestand. Nu: het eerste verzoek van een
+uur, elke 25e, en elke weigering. De prijs staat erbij en is bewust gekozen: bij
+een herstart gaan hooguit 24 tellingen verloren. Dit is een eerlijkheidsgrens en
+geen betaalmeter -- wie er structureel doorheen loopt haalt de grens ook met
+vierentwintig verzoeken minder. Wat het niet mag zijn is een teller die bij nul
+begint, en dat blijft hij ook met deze vloedlijn niet.
+
 ## 6d. De bewijspoort: geen bewering zonder bron
 
 Dit is de laag die de dode enterprise-schil onmogelijk maakt.

@@ -136,10 +136,11 @@ test('4. het verbruik wordt geteld, en de uitvoer telt niet mee', async () => {
 function opzet(grens) {
   const db = { data: { tenants: { 'O-Q': { org: 'O-Q', naam: 'Q', werkruimtes: [], zaken: [], groepen: [], bij: new Date().toISOString() } } } };
   const schoon = (t, n) => String(t == null ? '' : t).slice(0, n).trim();
-  const contract = maakContract({ db, save: () => {}, schoon });
+  const schrijfsels = { n: 0 };
+  const contract = maakContract({ db, save: () => { schrijfsels.n++; }, schoon });
   contract.van('O-Q');                                        // maakt het contractvak aan
   db.data.tenants['O-Q'].contract.apiPerUur = grens;          // een grens die in een toets te halen is
-  return { db, contract };
+  return { db, contract, schrijfsels };
 }
 
 test('5. de teller bijt op zijn grens, en telt per uur', () => {
@@ -180,4 +181,39 @@ test('7. een werkruimte zonder tenant kent geen grens en geen teller', () => {
   const r = contract.tel('O-BESTAATNIET');
   assert.equal(r.ok, true);
   assert.equal(r.buitenContract, true, 'en zegt dat met zoveel woorden');
+});
+
+test('8. de teller schrijft niet bij elk verzoek naar schijf', () => {
+  /* DIT IS EEN PRESTATIEREGEL MET EEN GRENS, en hij staat er omdat de eerste
+     versie hem overtrad: tel() riep save() bij ELK verzoek aan, en save() loopt
+     bij SQLite langs een JSON.stringify van elke collectie. Daarmee werd elke
+     LEESactie in een werkruimte een schrijfactie op het hele bestand -- het
+     soort regressie dat pas bij een drukke klant zichtbaar wordt.
+
+     Wat het kost staat er ook: bij een herstart gaan hooguit VLOEDLIJN-1
+     tellingen verloren. Dat is de juiste prijs voor een eerlijkheidsgrens; wat
+     het NIET mag zijn is een teller die bij nul begint. */
+  const { contract, schrijfsels } = opzet(10000);
+  const V = contract.VLOEDLIJN;
+
+  contract.tel('O-Q');
+  assert.equal(schrijfsels.n, 1, 'het eerste verzoek van een uur gaat wel naar schijf');
+
+  for (let i = 2; i < V; i++) contract.tel('O-Q');
+  assert.equal(schrijfsels.n, 1, 'de ' + (V - 2) + ' daarna niet');
+
+  contract.tel('O-Q');
+  assert.equal(schrijfsels.n, 2, 'op de vloedlijn wel');
+  assert.ok(V >= 10 && V <= 100, 'en de vloedlijn is een redelijk getal: ' + V);
+});
+
+test('9. een weigering gaat altijd naar schijf', () => {
+  /* Zeldzaam en zwaar: dat een tenant tegen zijn grens liep, is precies het
+     feit dat een herstart niet mag wissen. */
+  const { contract, schrijfsels } = opzet(1);
+  contract.tel('O-Q');
+  const voor = schrijfsels.n;
+  const over = contract.tel('O-Q');
+  assert.equal(over.ok, false);
+  assert.equal(schrijfsels.n, voor + 1, 'de weigering is weggeschreven');
 });

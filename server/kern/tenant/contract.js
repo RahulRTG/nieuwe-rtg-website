@@ -152,9 +152,20 @@ module.exports = ({ db, save, schoon }) => {
     return c.teller;
   }
 
-  /* Eén verzoek meetellen. Geeft terug of het nog mag. Bewust GEEN save() per
-     verzoek in de telling zelf: save() is write-behind, dus hij mag hier staan,
-     maar we schrijven alleen als de teller echt bewoog. */
+  /* Hoe vaak de teller naar de SCHIJF gaat. De teller staat altijd in db.data
+     en klopt dus binnen het proces tot op het verzoek; save() is de weg naar
+     schijf, en die loopt bij SQLite langs een JSON.stringify van ELKE
+     collectie. Per verzoek save() aanroepen maakt van elke LEESactie in een
+     werkruimte een schrijfactie op het hele bestand.
+
+     Dus: eerste verzoek van een uur, elke VLOEDLIJN verzoeken, en elke
+     weigering. De prijs staat erbij: bij een herstart gaan hooguit
+     VLOEDLIJN-1 tellingen verloren. Dit is een eerlijkheidsgrens en geen
+     betaalmeter -- wie er structureel doorheen loopt haalt de grens ook met
+     vierentwintig verzoeken minder. Zie TENANT.md. */
+  const VLOEDLIJN = 25;
+
+  /* Eén verzoek meetellen. Geeft terug of het nog mag. */
   function tel(org) {
     const t = haal(org);
     if (!t) return { ok: true, buitenContract: true };
@@ -163,15 +174,15 @@ module.exports = ({ db, save, schoon }) => {
     const teller = uurteller(t);
     if (teller.n >= g.apiPerUur) {
       teller.geweigerd++;
-      save();
+      save();                                   // een weigering is zeldzaam en telt zwaar
       return { ok: false, gebruikt: teller.n, grens: g.apiPerUur,
         reden: 'Deze organisatie zit aan haar uurgrens van ' + g.apiPerUur + ' verzoeken (pakket "' + c.pakket + '"). ' +
           'Over een uur telt hij opnieuw. Uitvoer van uw gegevens wordt nooit geweigerd.' };
     }
     teller.n++;
-    save();
+    if (teller.n === 1 || teller.n % VLOEDLIJN === 0) save();
     return { ok: true, gebruikt: teller.n, grens: g.apiPerUur };
   }
 
-  return { van, zet, magWerkruimteErbij, tel, PAKKETTEN, NIET_AFGEDWONGEN };
+  return { van, zet, magWerkruimteErbij, tel, PAKKETTEN, NIET_AFGEDWONGEN, VLOEDLIJN };
 };

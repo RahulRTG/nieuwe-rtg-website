@@ -97,6 +97,27 @@ function onthoud(k, jsonBytes, waarde, nu) {
    plaats van op verouderde maten te vertrouwen. */
 function vergeet(k) { laatsteGrootte.delete(k); laatsteLengte.delete(k); laatsteCheck.delete(k); }
 
+/* ALLES vergeten en de naronde afzeggen: terug naar de stand van een verse
+   start. Dat is iets anders dan vergeet(k) in een lus, en het verschil is de
+   timer -- die overleeft elke hoeveelheid vergeet-aanroepen en vuurt daarna
+   alsnog met de save-functie van de VORIGE eigenaar in de hand.
+
+   Waarvoor. Fase C van de verificatie-runtime: 647 serverstarts kosten een
+   derde van alle toetstijd, en hergebruik mag pas als van elke muteerbare
+   wortel bewezen is dat hij terug kan naar zijn beginstand. Deze module heeft
+   er vier (drie maten en de timer), en die staan sinds vandaag in STATE.json
+   als `herstelbaar` met deze functie als reset. scripts/staat.js leest die
+   belofte na in de bron: raakt deze functie een van de vier niet aan, dan gaat
+   die poort rood. Het gedrag zelf staat in test/opslag-voorcheck.test.js.
+
+   Geen productiepad roept dit aan, en dat is de bedoeling: dit is de naad waar
+   een toets een module op zijn beginstand zet, net als jwks.leeg() en
+   oidc.leegOntdek(). */
+function vergeetAlles() {
+  laatsteGrootte.clear(); laatsteLengte.clear(); laatsteCheck.clear();
+  if (naTimer) { clearTimeout(naTimer); naTimer = null; }
+}
+
 /* Eén naronde plannen voor wat is overgeslagen. De aanroeper geeft zijn eigen
    save-functie mee; deze module weet niet hoe er geschreven wordt. */
 let naTimer = null;
@@ -106,4 +127,4 @@ function planNaronde(save) {
   if (naTimer.unref) naTimer.unref();
 }
 
-module.exports = { magOverslaan, onthoud, vergeet, planNaronde, lengteVan, exactNodig, GROOT_BYTES, GROOT_MS };
+module.exports = { magOverslaan, onthoud, vergeet, vergeetAlles, planNaronde, lengteVan, exactNodig, GROOT_BYTES, GROOT_MS };

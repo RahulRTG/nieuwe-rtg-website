@@ -690,43 +690,47 @@
     },
     "server/db/voorcheck.js#laatsteCheck": {
       "eigenaar": "server/db",
-      "levensduur": "procesgebonden",
-      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
-      "soort": "map",
-      "bron": "hand-na-scan",
+      "levensduur": "herstelbaar",
       "patroon": "merk",
-      "toelichting": "Zie laatsteGrootte: vergeet(k) werkt per collectie, niet als geheel.",
-      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
+      "reset": "voorcheck.vergeetAlles()",
+      "bewijs": "test/opslag-voorcheck.test.js -- het resetcontract vergelijkt twee echte modulekopieen op een batterij invoeren",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "soort": "map",
+      "toelichting": "Wanneer een collectie voor het laatst volledig is nagekeken. Zelfde verhaal als laatsteLengte: niet los waarneembaar, gedekt door de bronpoort."
     },
     "server/db/voorcheck.js#laatsteGrootte": {
       "eigenaar": "server/db",
-      "levensduur": "procesgebonden",
-      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
-      "soort": "map",
-      "bron": "hand-na-scan",
+      "levensduur": "herstelbaar",
       "patroon": "spiegel",
-      "toelichting": "Onthouden maten per collectie, zodat een dure stringify overgeslagen mag worden. vergeet(k) bestaat wel, maar alleen PER COLLECTIE -- dat is geen reset naar de verse stand en dus geen contract.",
-      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
+      "reset": "voorcheck.vergeetAlles()",
+      "bewijs": "test/opslag-voorcheck.test.js -- het resetcontract vergelijkt twee echte modulekopieen op een batterij invoeren",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "soort": "map",
+      "toelichting": "Onthouden bytes per collectie. Deze is als enige van de drie maten waarneembaar via magOverslaan(): hij staat vooraan en kort de rest af. Het gedragsbewijs dekt dus deze; de twee hieronder worden gedekt door de bronpoort in scripts/staat.js, die nakijkt of vergeetAlles() ze allebei echt aanraakt."
     },
     "server/db/voorcheck.js#laatsteLengte": {
       "eigenaar": "server/db",
-      "levensduur": "procesgebonden",
-      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
-      "soort": "map",
-      "bron": "hand-na-scan",
+      "levensduur": "herstelbaar",
       "patroon": "spiegel",
-      "toelichting": "Zie laatsteGrootte: vergeet(k) werkt per collectie, niet als geheel.",
-      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
+      "reset": "voorcheck.vergeetAlles()",
+      "bewijs": "test/opslag-voorcheck.test.js -- het resetcontract vergelijkt twee echte modulekopieen op een batterij invoeren",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "soort": "map",
+      "toelichting": "Onthouden aantal items per collectie. Niet los waarneembaar: zodra laatsteGrootte leeg is kort magOverslaan() af voordat deze wordt gelezen. Twee mutaties bevestigden dat (AFGESLAGEN op het gedrag). Gedekt door de bronpoort in scripts/staat.js."
     },
     "server/db/voorcheck.js#naTimer": {
       "eigenaar": "server/db",
-      "levensduur": "procesgebonden",
-      "reset": "geen -- timer: Wachtende timer",
-      "soort": "binding-let",
-      "bron": "hand-na-scan",
+      "levensduur": "herstelbaar",
       "patroon": "timer",
-      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
-      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
+      "reset": "voorcheck.vergeetAlles()",
+      "bewijs": "test/opslag-voorcheck.test.js -- het resetcontract vergelijkt twee echte modulekopieen op een batterij invoeren",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "soort": "binding-let",
+      "toelichting": "De geplande naronde. De gevaarlijkste van de vier: hij overleeft elke hoeveelheid vergeet(k)-aanroepen en vuurt daarna alsnog met de save-functie van de VORIGE eigenaar. Het gedragsbewijs plant er twee met een reset ertussen en eist dat alleen de tweede vuurt."
     },
     "server/eigenaar.js#overgedragen": {
       "eigenaar": "server",

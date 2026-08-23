@@ -3,9 +3,10 @@
 
    WAAROM DIT ER IS. Tijd veroorzaakt een fout die geen enkele toets hier kan
    vinden, en de reden is simpel: er is niets om aan te draaien. Op de dag dat
-   dit bestand werd geschreven stonden er 1313 directe tijdsaanroepen in
-   server/ -- 736 keer `new Date()` en 577 keer `Date.now()` -- verspreid over
-   667 bestanden. Elk daarvan vraagt het aan het besturingssysteem, en het
+   dit bestand werd geschreven stonden er ruim dertienhonderd directe
+   tijdsaanroepen in server/, verspreid over ruim zeshonderd bestanden. De
+   actuele stand staat in KLOK.json en niet hier: een getal in een kop
+   veroudert zonder dat iets klaagt. Elk daarvan vraagt het aan het besturingssysteem, en het
    besturingssysteem zegt altijd de waarheid.
 
    Daardoor is een hele klasse vragen onbeantwoordbaar:
@@ -38,7 +39,7 @@
    is. Hard en meteen, want een klok die pas bij de eerste factuur opvalt, is de
    duurste variant.
 
-   WAT DIT NOG NIET IS, en dat hoort erbij: de 1313 aanroepen zijn hiermee niet
+   WAT DIT NOG NIET IS, en dat hoort erbij: die aanroepen zijn hiermee niet
    verplaatst. Dit bestand maakt het MOGELIJK; scripts/klok.js telt wat er nog
    staat en KLOK.json houdt dat getal een kant op. Een module die de klok niet
    gebruikt, is met RTG_KLOK gewoon niet te verzetten -- dat is geen verborgen
@@ -157,9 +158,14 @@ const CONTROL = {
   dekking: { register: 'KLOK.json', beproefd: 'gemeten.modulesOpDeKlok',
     totaal: 'gemeten.bestanden', eenheid: 'modules die de tijd vragen',
     tellers: { directeTijdsaanroepen: 'gemeten.totaal' } },
-  grens: 'alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1294 ' +
-    'directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, ' +
-    'niet over de hele server.'
+  /* GEEN GETAL MEER IN DEZE ZIN. Hier stond "KLOK.json staat op 1294", en dat
+     klopte al niet meer: de stand is 1281 en is vandaag twee keer bewogen. Een
+     getal dat je hier overschrijft veroudert zonder dat iets klaagt (LAT-regel
+     6), en het staat een regel verderop in KLOK.json zelf. */
+  grens: 'alleen code die DEZE klok gebruikt is te verzetten; de rest vraagt de tijd aan het ' +
+    'besturingssysteem. Hoeveel dat er zijn staat in KLOK.json (gemeten.totaal) en wordt door ' +
+    'scripts/klok.js bewaakt. Een tijdproef bewijst dus iets over de modules op de klok, ' +
+    'niet over de hele server. En sinds() is met opzet NIET te verzetten: die meet duur, geen datum.'
 };
 
 module.exports = { nu, datum, sinds, verstreken, verschoven, uitleg, lees, EENHEDEN, CONTROL };

@@ -126,6 +126,12 @@ test('4b. ieder appscherm krijgt in Magnaat vóór zijn eigen code de dichte tra
   assert.doesNotMatch(CSP('abc123'), /connect-src 'none'/, 'de gewone RTG-app behoudt zijn verbindingen');
   assert.equal(magnaatHtml('<head></head>', false), '<head></head>');
 
+  const versieTag = '<script src="/apps/magnaat-sandbox.js?v=bouw123"></script>';
+  const metVersie = magnaatHtml('<html><head></head><body>' + versieTag + '</body></html>', true);
+  assert.equal((metVersie.match(/magnaat-sandbox\.js/g) || []).length, 1);
+  assert.match(metVersie, /<head><script src="\/apps\/magnaat-sandbox\.js\?v=bouw123"><\/script>/,
+    'de vroege sandbox behoudt zijn cachebrekende bouwversie');
+
   const tag = '<script src="/apps/magnaat-sandbox.js"></script>';
   const genest = magnaatHtml('<html><head></head><body><scr' + tag + 'ipt>alert(1)</script></body></html>', true);
   assert.equal((genest.match(/src="\/apps\/magnaat-sandbox\.js"/g) || []).length, 1,

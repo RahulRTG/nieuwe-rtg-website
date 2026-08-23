@@ -218,7 +218,7 @@ $('#maak').addEventListener('click', async () => {
     VOORSTEL = r.voorstel;
     const alle = HUIS.kamers.flatMap(k => k.apparaten);
     $('#voorstel').hidden = false;
-    $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(demo-voorstel; met AI-sleutel bouwt Rahul hem zelf)</small>':'')+
+    $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(lokaal basisvoorstel; met AI-koppeling bouwt Rahul het persoonlijk)</small>':'')+
       '<p class="stil h-mt20">'+esc(VOORSTEL.uitleg)+'</p>'+
       '<ul>'+Object.entries(VOORSTEL.standen).map(([id,s]) => { const a = alle.find(x => x.id === id); return '<li>'+esc(a?a.naam:id)+': '+esc(JSON.stringify(s).replace(/[{}"]/g,'').replace(/,/g,', ').replace(/aan:true/,'aan').replace(/aan:false/,'uit'))+'</li>'; }).join('')+'</ul>'+
       '<div class="rij h-mt60"><button class="knop" id="vBewaar">Bewaar als scène</button><span class="stil">Sloten doet u altijd zelf; die zitten er nooit in.</span></div>';

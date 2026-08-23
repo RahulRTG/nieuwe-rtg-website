@@ -43,7 +43,7 @@ test('bewust uit betekent geen rails en elke geldbeweging weigert fail-closed', 
     set: (k, v) => opslag.set(k, v), env: {} });
   assert.deepEqual(rail.mogelijkheden(), {
     standaard: 'uit', rails: [], uit: true,
-    uitleg: 'Betalen staat bewust uitgeschakeld; er is geen demo- of echte betaalrail actief.'
+    uitleg: 'Betalen staat bewust uitgeschakeld; er is geen betaalrail actief.'
   });
   await assert.rejects(() => rail.maakBetaling({ bedrag: 1895 }), /bewust uitgeschakeld/i);
   await assert.rejects(() => rail.haalBetaling('demo', 'demo-1'), /bewust uitgeschakeld/i);

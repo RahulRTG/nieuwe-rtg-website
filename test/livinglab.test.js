@@ -422,7 +422,7 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
 });
 
 /* DE STARTDATA. Twee dingen die allebei moeten kloppen, en het tweede is het
-   belangrijkste: de demostand geeft een BRUIKBAAR lab (met tekenbevoegden,
+   belangrijkste: Magnaat Test geeft een BRUIKBAAR lab (met tekenbevoegden,
    want zonder die kan er niets ondertekend worden), en er staat GEEN enkel
    verzonnen onderzoeksresultaat in. Een lab dat opstart met nepbevindingen
    leert zijn gebruikers precies het omgekeerde van wat de bewijsmotor
@@ -431,32 +431,42 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
    In productie start het Living Lab leeg -- een echt lab hoort door de RTF zelf
    te worden neergezet. */
 test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten', () => {
-  const laad = (stand) => {
+  const laad = (stand, magnaat) => {
     const oud = process.env.NODE_ENV, oudDemo = process.env.RTG_DEMO;
+    const oudMagnaat = process.env.RTG_MAGNAAT_TEST;
     process.env.NODE_ENV = stand;
     delete process.env.RTG_DEMO;
+    if (magnaat) process.env.RTG_MAGNAAT_TEST = '1';
+    else delete process.env.RTG_MAGNAAT_TEST;
     delete require.cache[require.resolve('../server/seed')];
     delete require.cache[require.resolve('../server/seed/livinglab')];
     const uit = require('../server/seed')();
     process.env.NODE_ENV = oud; if (oudDemo != null) process.env.RTG_DEMO = oudDemo;
+    else delete process.env.RTG_DEMO;
+    if (oudMagnaat != null) process.env.RTG_MAGNAAT_TEST = oudMagnaat;
+    else delete process.env.RTG_MAGNAAT_TEST;
     delete require.cache[require.resolve('../server/seed')];
     return uit;
   };
 
-  const demo = laad('development').livingLab;
-  assert.equal(demo.labs.length, 1, 'de demostand geeft één lab');
-  const tek = demo.labs[0].tekenaars.map(t => t.rol);
+  const echt = laad('development', false).livingLab;
+  assert.deepEqual(echt, { labs: [], studies: [], themas: [], apparatuur: [], audit: [], paspoorten: [] },
+    'de echte versie start zonder synthetisch Living Lab');
+
+  const proef = laad('development', true).livingLab;
+  assert.equal(proef.labs.length, 1, 'Magnaat Test geeft één lab');
+  const tek = proef.labs[0].tekenaars.map(t => t.rol);
   for (const rol of ['professional', 'reviewer', 'toezichthouder'])
     assert.ok(tek.includes(rol), 'er is een ' + rol + ' -- zonder register kan er niets ondertekend worden');
-  assert.ok(demo.labs[0].tekenaars.some(t => t.onafhankelijk),
+  assert.ok(proef.labs[0].tekenaars.some(t => t.onafhankelijk),
     'er is een ONAFHANKELIJKE tekenaar; klasse hoog vraagt er een');
-  assert.ok(demo.themas.length >= 2, 'er staan vragen uit de buurt klaar');
-  assert.ok(demo.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
+  assert.ok(proef.themas.length >= 2, 'er staan vragen uit de buurt klaar');
+  assert.ok(proef.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
     'er staat een nooit-gekalibreerd apparaat bij: dat weigert een reservering en legt uit waarom');
 
   /* Geen verzonnen resultaten. De ene studie staat bij de eerste stap en haar
      dossier is leeg -- geen conclusie, geen bewijsgraad, geen deelnemer. */
-  for (const s of demo.studies) {
+  for (const s of proef.studies) {
     assert.equal(s.stap, 'vraagstuk', 'een seed-studie staat bij het vraagstuk');
     assert.deepEqual(s.dossier.conclusies, [], 'geen verzonnen conclusies in de startdata');
     assert.deepEqual(s.dossier.deelnemers, [], 'geen verzonnen deelnemers');

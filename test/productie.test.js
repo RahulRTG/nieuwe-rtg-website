@@ -4,6 +4,7 @@
    NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js,
    omdat die de secret bij het inladen leest. */
 process.env.STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || 'test-webhook-secret';
+process.env.NODE_ENV = 'test';
 process.env.RTG_DEMO = '1';
 
 const test = require('node:test');
@@ -180,6 +181,11 @@ test('config: buiten productie nooit blokkeren', () => {
   assert.equal(r.fouten.length, 0);
 });
 
+test('config: Magnaat Test wordt in productie hard geweigerd', () => {
+  const r = config.valideer({ NODE_ENV: 'production', RTG_MAGNAAT_TEST: '1' });
+  assert.ok(r.fouten.some(f => /RTG_MAGNAAT_TEST/.test(f)));
+});
+
 test('config: ongeldige PORT wordt afgekeurd', () => {
   const r = config.valideer({ NODE_ENV: 'development', PORT: '99999' });
   assert.ok(r.fouten.some(f => /PORT/.test(f)));
@@ -202,20 +208,20 @@ test('db.schrijfDuurzaam: schrijft atomisch, laat geen .tmp achter, met 0600', (
 
 /* ---------- betaal-naad ---------- */
 
-test('betaal: demo-provider bevestigt en is idempotent', async () => {
+test('betaal: Magnaat Test-provider bevestigt synthetisch en is idempotent', async () => {
   const a = await betaal.maakBetaling({ bedrag: 1500, referentie: 'inv-9', idempotentieSleutel: 'sleutel-A' });
-  assert.equal(a.aanbieder, 'demo');
+  assert.equal(a.aanbieder, 'magnaat-test');
   assert.equal(a.status, 'betaald');
   const b = await betaal.maakBetaling({ bedrag: 1500, referentie: 'inv-9', idempotentieSleutel: 'sleutel-A' });
   assert.equal(b.id, a.id, 'zelfde idempotentiesleutel geeft dezelfde betaling');
   assert.equal(b.herhaald, true);
 });
 
-test('betaal: zonder Stripe en zonder bewuste demo geeft de rail nooit fictief succes', () => {
+test('betaal: zonder echte provider en buiten Magnaat geeft de rail nooit fictief succes', () => {
   const proef = spawnSync(process.execPath, ['-e',
     "const b=require('./server/betaal'); b.maakBetaling({bedrag:100}).then(()=>process.exit(9)).catch(e=>{if(e.code!=='BETAALRAIL_UIT')process.exit(8)})"], {
     cwd: path.join(__dirname, '..'), encoding: 'utf8',
-    env: { ...process.env, RTG_DEMO: '', STRIPE_DEMO_BEWUST: '', STRIPE_SECRET_KEY: '' }
+    env: { ...process.env, NODE_ENV: 'development', RTG_DEMO: '', RTG_MAGNAAT_TEST: '', STRIPE_DEMO_BEWUST: '1', STRIPE_SECRET_KEY: '' }
   });
   assert.equal(proef.status, 0, proef.stderr || proef.stdout);
 });

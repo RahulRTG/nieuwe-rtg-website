@@ -1,24 +1,18 @@
 (function (R) {
   'use strict';
   var $ = R.$, $$ = R.$$, maak = R.maak;
-  function rahulAntwoord(vraag) {
-    var q = vraag.toLowerCase();
-    if (q.includes('taxi') || q.includes('rit') || q.includes('chauffeur')) {
-      var naar = /naar\s+(.+)$/i.exec(vraag); R.wisselBlad('taxi');
-      if (naar && naar[1]) { $('#naarVeld').value = naar[1].replace(/[?.!]+$/, ''); R.staat.bestemming = null; $('#naarVeld').dispatchEvent(new Event('input')); }
-      return 'Ik heb Taxi geopend. Kies de bestemming en controleer voertuig, moment en prijsindicatie.';
-    }
-    if (q.includes('reis') || q.includes('vlucht')) { R.wisselBlad('reizen'); return 'Uw complete reisoverzicht staat open.'; }
-    if (q.includes('actie') || q.includes('betaling')) { R.wisselBlad('vandaag'); return 'De villa-betaling staat als eerstvolgende actie klaar.'; }
-    return 'Ik kan uw reizen openen, een taxi klaarzetten of de open acties tonen.';
-  }
   function voegChat(tekst, soort) {
     var p = maak('p', 'chatregel ' + soort, tekst); $('#rahulChat').appendChild(p); p.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   function vraagRahul(vraag) {
     var tekst = String(vraag || '').trim(); if (!tekst) return;
-    voegChat(tekst, 'gebruiker'); var antwoord = rahulAntwoord(tekst);
-    setTimeout(function () { voegChat(antwoord, 'assistent'); }, 260);
+    voegChat(tekst, 'gebruiker');
+    if (!R.token) { voegChat('Log eerst in. Ik toon geen verzonnen reisantwoord zonder uw beveiligde ledensessie.', 'assistent'); return; }
+    voegChat('Ik controleer uw actuele RTG-gegevens…', 'assistent');
+    var wacht = $('#rahulChat').lastElementChild;
+    R.api('/api/fluister', { q: tekst, context: { wereld: 'travel', scherm: R.staat.blad } })
+      .then(function (r) { wacht.textContent = r.antwoord || 'Er kwam geen antwoord terug.'; })
+      .catch(function (e) { wacht.textContent = e.message; });
   }
   function initMoment() {
     var d = new Date(Date.now() + 3600000); d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5, 0, 0);
@@ -30,7 +24,7 @@
     if (!i.value.trim()) { R.wisselBlad('rahul'); return; } R.wisselBlad('rahul'); vraagRahul(i.value); i.value = ''; });
 
   var uur = new Date().getHours();
-  $('#groet').textContent = (uur < 12 ? 'GOEDEMORGEN' : uur < 18 ? 'GOEDEMIDDAG' : 'GOEDEAVOND') + (R.token ? '' : ' · DEMOSTAND');
+  $('#groet').textContent = (uur < 12 ? 'GOEDEMORGEN' : uur < 18 ? 'GOEDEMIDDAG' : 'GOEDEAVOND') + (R.token ? '' : ' · INLOG NODIG');
   initMoment();
   var eersteBlad = location.hash.replace('#', '');
   R.wisselBlad(['vandaag', 'reizen', 'taxi', 'rahul'].includes(eersteBlad) ? eersteBlad : 'vandaag', false);

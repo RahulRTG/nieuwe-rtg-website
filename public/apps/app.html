@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="4416650d">
+<meta name="rtg-bouw" content="6880d97b">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1638,14 +1638,14 @@
      beginscherm) is weg met dat tweede scherm zelf. De kaartjes staan nu in
      de app waar ze horen; daar hoeft niets meer gekozen of gesleept. */
 </style>
-<script src="/shared/command/catalog.js" defer></script>
-<script src="/shared/command/console.js" defer></script>
-<script src="/shared/command/verdeler.js" defer></script>
-<script src="/shared/command/bank.js" defer></script>
-<script src="/shared/command/praat.js" defer></script>
-<script src="/shared/command/inlogpoort.js" defer></script>
-<script src="/shared/command/werktafel.js" defer></script>
-<script src="/shared/command.js" defer></script>
+<script src="/shared/command/catalog.js?v=6880d97b" defer></script>
+<script src="/shared/command/console.js?v=6880d97b" defer></script>
+<script src="/shared/command/verdeler.js?v=6880d97b" defer></script>
+<script src="/shared/command/bank.js?v=6880d97b" defer></script>
+<script src="/shared/command/praat.js?v=6880d97b" defer></script>
+<script src="/shared/command/inlogpoort.js?v=6880d97b" defer></script>
+<script src="/shared/command/werktafel.js?v=6880d97b" defer></script>
+<script src="/shared/command.js?v=6880d97b" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -1834,11 +1834,9 @@
                tweede helft is de merkregel die ook in de voorwaarden staat: over
                passen, goedkeuringen en boekingen beslist altijd een mens. -->
           <p class="os-aiwet" id="osAiWet">Rahul is een AI · over passen en boekingen beslist altijd een mens</p>
-          <!-- De demo-melding stond op het bureaublad (/apps/index.html). Die
-               pagina is weg, maar de mededeling niet: een lid moet kunnen zien
-               dat er niet echt wordt afgerekend of besteld. Ze staat daarom
-               hier, op de homescreen, naast de AI-regel. -->
-          <p class="os-aiwet" id="osDemoWet" data-i18n="os.demo" hidden>Demo · alles werkt, alleen echt betalen, echte bestellingen en de Boardroom staan uit</p>
+          <!-- Alleen Magnaat maakt dit element zichtbaar. De echte app heeft
+               geen demo- of voorbeeldstand. -->
+          <p class="os-aiwet" id="osDemoWet" hidden>MAGNAAT TEST · geïsoleerde trainingskopie · geen echte productieacties</p>
         </div>
       </div>
 
@@ -2325,7 +2323,8 @@
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js"></script>
+<script src="/apps/magnaat-sandbox.js?v=6880d97b"></script>
+<script src="/apps/magnaat-data.js?v=6880d97b"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>
 window.I18N = { en: {
@@ -2447,7 +2446,7 @@ window.I18N = { en: {
   'sal.bezet':'Busy.', 'sal.geweigerd':'Call declined.', 'sal.opgehangen':'Call ended.',
   'gate.title':'The app.<br>Your membership, <em>always</em> with you.',
   'gate.deck':'Bookings, one-tap payment, your personal AI and The Salon, and your account runs on your codename, not your real name.',
-  'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo profile',
+  'gate.user':'Email or username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or create an account',
   'gate.guest':'Free, no pass', 'gate.guest.s':'Pay at partners, browse The Salon and apply for jobs',
   'app.guestsub':'Free, no pass', 'app.guest.k':'Free account', 'app.guest.title':'No pass',
   'app.guest.body':'You can pay at RTG partners in the app, browse the photos in The Salon and apply for vacancies with your CV. Liking and replying to members is part of a pass.',
@@ -2490,7 +2489,7 @@ window.I18N = { en: {
   'bo2.2fa':'Forgot your password? You recover it on the website in two steps: a link by email plus a code on your phone.',
   'bo2.huidig':'Current password', 'bo2.nieuw':'New password', 'bo2.wijzig':'Change password',
   'bo2.verstuur':'Resend confirmation email', 'bo2.gestuurd':'Confirmation email sent.', 'bo2.gewijzigd':'Password changed.',
-  'bo2.demo':'You are using a demo profile. With a real account you manage your password and two-step recovery here.',
+  'bo2.demo':'Magnaat test profile · account management and two-step recovery are disabled in this isolated training.',
   'bo2.vb':'For your Business Pass', 'bo2.vb.s':'Your invoices are accounting-ready. The AI bookkeeper and freelance tax tool live under Payments; your network under Salon.',
   'bo2.boekhouder':'AI bookkeeper', 'bo2.vl':'For your Lifestyle Pass',
   'bo2.vl.s':'Your concierge thinks ahead under AI; your professional network lives under Salon.', 'bo2.concierge':'Concierge',
@@ -2510,8 +2509,8 @@ window.I18N = { en: {
   'pi.uitleg':'You decide. If you approve, the partner sees this for 10 minutes; then it expires automatically.',
   'pi.goed':'Approve', 'pi.weiger':'Refuse', 'pi.gedeeld':'shared', 'pi.lopend':'The view is active. You can withdraw it.',
   'pi.trek':'Withdraw', 'pi.goedok':'Approved.', 'pi.weigerok':'Refused.', 'pi.trekok':'Withdrawn.',
-  'os.demo':'Demo &middot; everything works; only real payments, real orders and the Boardroom are switched off.',
-  'gate.note':'Demo account: username <b>Rahul</b>, password <b>Imran</b>. Or choose a profile.',
+  'os.demo':'MAGNAAT TEST &middot; isolated training copy &middot; no real production actions.',
+  'gate.note':'Sign in with your own account or create one.',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
   'msg.from':'translated from', 'msg.orig':'show original', 'msg.showtrans':'show translation',
   'app.tab.home':'Home', 'app.tab.trips':'Journeys', 'app.tab.pay':'Payments', 'app.tab.ai':'AI', 'app.tab.salon':'Salon', 'app.tab.tp':'On site',
@@ -2533,7 +2532,7 @@ window.I18N = { en: {
   'live.preorder':'Pre-order now so it is ready when you arrive.', 'live.preorderbtn':'Order ahead',
   'live.simulate':'Simulate ride', 'live.taxi':'Request a taxi', 'live.share':'Share my location',
   'live.notaxi':'No transport partner available at this destination.', 'live.taxireq':'has been requested. You will see the taxi approach live.',
-  'live.shared':'Location shared with your partners.', 'live.geodenied':'Location unavailable. Use "Simulate ride" for the demo.', 'live.geono':'Location is not available here.',
+  'live.shared':'Location shared with your partners.', 'live.geodenied':'Location unavailable. Enter the location manually.', 'live.geono':'Location is not available here.',
   'live.nosim':'Choose a destination first.', 'live.simstart':'Simulation started, you are approaching the destination.',
   'live.door':'Open the door', 'live.dooropen':'is open. It locks itself after', 'live.sec':'seconds.',
   'app.pc.sub':'Direct contact, under your codename', 'app.pc.ph':'Type a message', 'app.pc.send':'Send',

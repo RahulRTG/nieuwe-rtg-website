@@ -120,7 +120,7 @@
       el.appendChild(staaf); el.appendChild(t); uren.appendChild(el);
     }
     $('#urenSub').textContent = drukste
-      ? 'Drukste uur: ' + drukste.tijd + ' (' + drukste.kans + '%' + (drukste.drukPunt ? ', rond ' + drukste.drukPunt : '') + ')' + (drukste.regen ? ' · regen in het weerbeeld (demo)' : '') + '.'
+      ? 'Drukste uur: ' + drukste.tijd + ' (' + drukste.kans + '%' + (drukste.drukPunt ? ', rond ' + drukste.drukPunt : '') + ')' + (drukste.regen ? ' · regen in het beschikbare weerbeeld' : '') + '.'
       : '';
     const lijst = $('#lijst'); lijst.innerHTML = '';
     if (!d.waarschuwingen.length) {

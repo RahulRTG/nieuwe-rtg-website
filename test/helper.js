@@ -159,7 +159,10 @@ async function startEens(opts) {
          juist bewijzen dat de grendels dichtzitten, en de config weigert dan
          terecht te starten met RTG_DEMO=1. Deze standaard zette zulke toetsen
          stil om. */
-      ...(((opts.env || {}).NODE_ENV) === 'production' ? {} : { RTG_DEMO: '1' }),
+      ...(((opts.env || {}).NODE_ENV) === 'production' ||
+        Object.prototype.hasOwnProperty.call(opts.env || {}, 'RTG_DEMO') ||
+        Object.prototype.hasOwnProperty.call(opts.env || {}, 'RTG_MAGNAAT_TEST')
+        ? {} : { RTG_MAGNAAT_TEST: '1' }),
       ...process.env, NODE_ENV: 'test',
       RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
       ...(eigenMap ? { RTG_DATA_DIR: eigenMap } : {}),

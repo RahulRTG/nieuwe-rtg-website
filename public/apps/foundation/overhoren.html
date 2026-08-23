@@ -210,7 +210,7 @@ $('#mMaak').addEventListener('click', async () => {
 $('#mAi').addEventListener('click', async () => {
   $('#mFout').textContent = '';
   $('#mAi').disabled = true; $('#mAi').textContent = '…';
-  try { const d = await api('lijst-ai', { onderwerp: $('#mOnderwerp').value, groep }); $('#mOnderwerp').value=''; if (d.demo) $('#mFout').textContent = 'De buddy koos een kant-en-klaar setje (demo).'; laadLijsten(); }
+  try { const d = await api('lijst-ai', { onderwerp: $('#mOnderwerp').value, groep }); $('#mOnderwerp').value=''; if (d.demo) $('#mFout').textContent = 'De buddy koos een gecontroleerd setje uit de vaste basis.'; laadLijsten(); }
   catch (e) { $('#mFout').textContent = e.message; }
   $('#mAi').disabled = false; $('#mAi').textContent = 'Maak';
 });

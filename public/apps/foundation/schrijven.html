@@ -86,7 +86,7 @@ $('#lees').addEventListener('click', async () => {
     const d = await api('schrijf-feedback', { tekst: $('#tekst').value, opdracht: $('#opdracht').textContent, groep, buddy });
     laatsteFeedback = d.feedback;
     $('#fb').hidden = false;
-    $('#fb').innerHTML = '<small>' + (d.demo ? 'je buddy (demo)' : 'je buddy') + ' las mee</small>' + esc(d.feedback);
+    $('#fb').innerHTML = '<small>' + (d.demo ? 'je buddy met de vaste taalbasis' : 'je buddy') + ' las mee</small>' + esc(d.feedback);
   } catch (e) { $('#fout').textContent = e.message; }
   $('#lees').disabled = false; $('#lees').textContent = 'Buddy leest mee';
 });

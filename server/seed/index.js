@@ -1,11 +1,11 @@
 /* Startdata voor de RTG-portaal-backend. Wordt bij de eerste start
    naar server/data/db.json geschreven; verwijder dat bestand om te resetten.
 
-   In PRODUCTIE (zonder RTG_DEMO) start het platform schoon: geen demozaken,
+   In elke echte omgeving start het platform schoon: geen voorbeeldzaken,
    geen voorbeeldposts in De Salon en geen fictieve reizen op de boekpagina.
    Echte partners komen binnen via de partneraanvraag (met Business Pass),
-   echte leden via hun eigen account. De demo-inhoud blijft volledig
-   beschikbaar voor lokaal en demogebruik.
+   echte leden via hun eigen account. Synthetische inhoud bestaat uitsluitend
+   in de geïsoleerde Magnaat-testomgeving.
 
    De volledige startset is opgesplitst in vier datamodules: ./leden (Salon,
    facturen, reis), ./partners (partnerkanaal + grootboeken), ./leveranciers
@@ -14,7 +14,7 @@
    onderzoeksresultaten) en ./media (uitgegeven muziek uit het Klankwerk). */
 
 module.exports = function seed() {
-  const demo = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
+  const demo = require('../testomgeving').actief(process.env);
   const vol = maakVolledigeSeed();
   if (demo) return vol;
   return Object.assign(vol, {
@@ -24,6 +24,9 @@ module.exports = function seed() {
     partnerTrips: [],   // geen fictieve reizen op boeken.html
     invoices: [],
     contacts: [],
+    creatorCredit: {},
+    creatorLikes: {},
+    trip: { dest: '', dates: '', days: 0, items: [] },
     /* Het Living Lab start in productie leeg: een echt lab hoort door de RTF
        zelf te worden neergezet, met echte tekenbevoegden. De demostand krijgt
        de steiger (lab, tekenaars, apparatuur, buurtvragen) maar nooit verzonnen

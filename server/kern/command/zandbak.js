@@ -102,7 +102,7 @@ function maakZandbak({ db, save, crypto, zaai, register, catalogus }) {
          daar bewust zonder demozaken (zie server/seed/index.js). Dat hoort er
          te staan, anders lijkt het een storing. */
       let: objecten ? null : 'deze zandbak is leeg. In productie start de zaaiset zonder demogegevens; ' +
-        'zet RTG_DEMO=1 op een proefinstallatie, of voer zelf rijen in via de recepten.'
+        'gebruik de afzonderlijke Magnaat-testomgeving, of voer zelf rijen in via de recepten.'
     };
   }
 

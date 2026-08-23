@@ -20,7 +20,7 @@ module.exports = function maakMeldingen(deps) {
     ensureSupplierDefaults, save, sessions, tokenHash, webpush
   } = deps;
 function initRealtime() {
-  /* accounts gaat mee omdat de opruiming van de demozaken (zonder RTG_DEMO) ook
+  /* accounts gaat mee omdat de opruiming van testzaken buiten Magnaat Test ook
      het personeel van die zaken uit de identiteitskluis moet halen. */
   require('../kern/initdata')({ db, save, crypto, sessions, tokenHash, ensureSupplierDefaults, webpush, DEMO, PERSONAS, GIDS_SEED_TIERS, accounts });
 }

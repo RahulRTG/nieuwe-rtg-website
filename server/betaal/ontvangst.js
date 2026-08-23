@@ -10,15 +10,15 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
   };
   function mogelijkheden() {
     if (uit) return { standaard: 'uit', rails: [], uit: true,
-      uitleg: 'Betalen staat bewust uitgeschakeld; er is geen demo- of echte betaalrail actief.' };
+      uitleg: 'Betalen staat bewust uitgeschakeld; er is geen betaalrail actief.' };
     const rails = [];
     if (stripe) rails.push({ id: 'stripe', label: 'Stripe · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
     if (mollie) rails.push({ id: 'mollie', label: 'Mollie · iDEAL of bankbetaling', soort: 'doorsturen', echt: true });
     if (adyen) rails.push({ id: 'adyen', label: 'Adyen · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
-    if (!rails.length && standaard === 'demo')
-      rails.push({ id: 'demo', label: 'Demobetaling', soort: 'demo', echt: false });
+    if (!rails.length && standaard === 'magnaat-test')
+      rails.push({ id: 'magnaat-test', label: 'Magnaat Test · synthetische betaling', soort: 'test', echt: false });
     if (!rails.length) return { standaard: 'uit', rails: [], uit: true,
-      uitleg: 'Geen betaalprovider of bewuste demo actief; de betaalrail staat fail-closed.' };
+      uitleg: 'Geen echte betaalprovider actief; de betaalrail staat fail-closed.' };
     return { standaard, rails };
   }
 
@@ -29,7 +29,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       if (gevraagd === 'stripe' && stripe) return 'stripe';
       if (gevraagd === 'mollie' && mollie) return 'mollie';
       if (gevraagd === 'adyen' && adyen) return 'adyen';
-      if (gevraagd === 'demo' && standaard === 'demo' && !stripe && !mollie && !adyen) return 'demo';
+      if (gevraagd === 'magnaat-test' && standaard === 'magnaat-test' && !stripe && !mollie && !adyen) return 'magnaat-test';
       throw new Error('Betaalprovider "' + gevraagd + '" is niet beschikbaar. Er is niets afgeschreven.');
     }
     if (String(opdracht && opdracht.methode || '').toLowerCase() === 'ideal' && mollie) return 'mollie';
@@ -88,11 +88,11 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       const p = await adyen.paymentLinks.create(parameters, { idempotencyKey: sleutel });
       res = { id: p.id, status: p.status, checkoutUrl: p.url, aanbieder: 'adyen',
         betaalId: p.pspReference || null, bedrag: Math.round(bedrag), valuta, referentie };
-    } else if (rail === 'demo') {
-      res = { id: 'demo_' + crypto.randomBytes(8).toString('hex'), status: 'betaald',
-        aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie };
+    } else if (rail === 'magnaat-test') {
+      res = { id: 'magnaat_' + crypto.randomBytes(8).toString('hex'), status: 'betaald',
+        aanbieder: 'magnaat-test', bedrag: Math.round(bedrag), valuta, referentie };
     } else {
-      const e = new Error('Geen betaalprovider actief. Stel een provider in of zet de demo-betaalstand bewust aan.');
+      const e = new Error('Geen betaalprovider actief. Koppel een echte provider; oefenen kan uitsluitend in Magnaat Test.');
       e.code = 'BETAALRAIL_UIT';
       throw e;
     }
@@ -153,9 +153,9 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       return { id: r.pspReference || r.id, status: r.status || 'received',
         aanbieder: 'adyen', providerId, bedrag: Math.round(bedrag), valuta };
     }
-    if (aanbieder === 'demo' && !stripe && !mollie && !adyen)
-      return { id: 'demo_ref_' + crypto.randomBytes(8).toString('hex'), status: 'refunded',
-        aanbieder: 'demo', providerId, bedrag: Math.round(bedrag), valuta };
+    if (aanbieder === 'magnaat-test' && standaard === 'magnaat-test' && !stripe && !mollie && !adyen)
+      return { id: 'magnaat_ref_' + crypto.randomBytes(8).toString('hex'), status: 'refunded',
+        aanbieder: 'magnaat-test', providerId, bedrag: Math.round(bedrag), valuta };
     throw new Error('Deze betaalprovider is niet beschikbaar voor terugbetalen.');
   }
 

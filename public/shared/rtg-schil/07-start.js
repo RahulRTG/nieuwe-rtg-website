@@ -16,7 +16,9 @@
        hij weet niets van domeinen -- maar het palet moet ergens uit kunnen
        putten, dus geeft de pagina zijn lijst mee. */
     schil.apps = (opties.apps || []).slice();
+    schil.actionPrefix = opties.actionPrefix || 'Open';
     w.addEventListener('resize', schik);
+    w.addEventListener('rtg-edge-layout', schik);
     /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
        is een eigen pagina, maar altijd onze eigen. */
     w.addEventListener('message', function (e) {

@@ -64,7 +64,7 @@ function merkGeseed(ctx, voorZaaien) {
   for (const s of zaken) if (basisCodes.has(s.code)) s.geseed = true;
 }
 
-/* Livegang-schoonmaak: zonder RTG_DEMO horen de demozaken niet in de catalogus,
+/* Schoonmaak: buiten Magnaat Test horen geseede testzaken niet in de catalogus,
    ook niet als de database ooit als demo begon. Echte partners (via de aanvraag
    met een Business Pass) blijven onaangeroerd.
 
@@ -92,7 +92,6 @@ function ruimDemozakenOp(ctx) {
   if (DEMO) return;
 
   const weg = (db.data.suppliers || []).filter(s => s.geseed);
-  if (!weg.length) return;
   const codes = new Set(weg.map(s => s.code));
   db.data.suppliers = (db.data.suppliers || []).filter(s => !codes.has(s.code));
 
@@ -103,9 +102,54 @@ function ruimDemozakenOp(ctx) {
   if (accounts && typeof accounts.deactivateStaffVanZaak === 'function')
     for (const code of codes) personen += accounts.deactivateStaffVanZaak(code);
 
-  // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)
-  db.data.posts = (db.data.posts || []).filter(p => !(typeof p.id === 'number' && p.id >= 1 && p.id <= 6));
-  save();
-  console.log('[start] demozaken opgeruimd (geen RTG_DEMO): ' + weg.length +
-    ' zaken, ' + personen + ' personeelsaccounts inactief.');
+  /* Ook alle oudere top-level testdata opruimen. Een verse echte database is
+     sinds server/seed/index.js al leeg, maar een bestaande datamap kan ooit in
+     de vroegere demostand zijn begonnen. Alleen exacte seed-identiteiten gaan
+     weg; echte rijen die er later bij kwamen blijven staan. */
+  const leden = require('../../seed/leden');
+  const partners = require('../../seed/partners');
+  const lab = require('../../seed/livinglab').livingLab;
+  const muziek = require('../../seed/media').muziekUitgaven;
+  let overige = 0;
+  function zonder(lijst, isTest) {
+    const bron = Array.isArray(lijst) ? lijst : [];
+    const uit = bron.filter(x => !isTest(x));
+    overige += bron.length - uit.length;
+    return uit;
+  }
+  const testPosts = new Set(leden.posts.map(p => String(p.id) + '|' + p.author));
+  db.data.posts = zonder(db.data.posts, p => testPosts.has(String(p.id) + '|' + p.author));
+  const testFacturen = new Set(leden.invoices.map(x => x.id));
+  db.data.invoices = zonder(db.data.invoices, x => testFacturen.has(x.id));
+  const testContacten = new Set(leden.contacts.map(x => x.higher + '|' + x.rtg));
+  db.data.contacts = zonder(db.data.contacts, x => testContacten.has(x.higher + '|' + x.rtg));
+  const testPartners = new Set(partners.partners.map(x => x.code + '|' + x.name));
+  db.data.partners = zonder(db.data.partners, x => testPartners.has(x.code + '|' + x.name));
+  const testReizen = new Set(partners.partnerTrips.map(x => x.id));
+  db.data.partnerTrips = zonder(db.data.partnerTrips, x => testReizen.has(x.id));
+
+  if (JSON.stringify(db.data.trip || {}) === JSON.stringify(leden.trip)) {
+    db.data.trip = { dest: '', dates: '', days: 0, items: [] }; overige++;
+  }
+  if (JSON.stringify(db.data.creatorCredit || {}) === JSON.stringify(leden.creatorCredit)) {
+    db.data.creatorCredit = {}; overige++;
+  }
+  if (JSON.stringify(db.data.creatorLikes || {}) === JSON.stringify(leden.creatorLikes)) {
+    db.data.creatorLikes = {}; overige++;
+  }
+
+  const labIds = Object.fromEntries(['labs', 'studies', 'themas', 'apparatuur', 'audit'].map(k =>
+    [k, new Set((lab[k] || []).map(x => x.id))]));
+  if (db.data.livingLab) for (const k of Object.keys(labIds))
+    db.data.livingLab[k] = zonder(db.data.livingLab[k], x => labIds[k].has(x.id));
+  if (db.data.muziekUitgaven) {
+    const trackIds = new Set((muziek.lijst || []).map(x => x.id));
+    db.data.muziekUitgaven.lijst = zonder(db.data.muziekUitgaven.lijst, x => trackIds.has(x.id));
+  }
+
+  if (weg.length || personen || overige) {
+    save();
+    console.log('[start] Magnaat-testdata opgeruimd (echte omgeving): ' + weg.length +
+      ' zaken, ' + personen + ' personeelsaccounts, ' + overige + ' overige rijen/sets.');
+  }
 }

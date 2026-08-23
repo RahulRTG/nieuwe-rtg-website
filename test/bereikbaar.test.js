@@ -61,7 +61,10 @@ function noemt(p) {
      schermen uit terwijl de drie hoofdwerelden er gewoon stonden. Een graaf die de
      verkeerde randen volgt, meet niets. */
   try {
-    for (const m of fs.readFileSync(eigen, 'utf8').matchAll(/<script[^>]+src="(\/[^"]+\.js)"/g)) {
+    /* Een bouwversie achter de bron hoort bij hetzelfde script. Zonder deze
+       queryvariant sloeg de graaf juist de versievaste Command-catalogus over,
+       terwijl de browser hem wel laadt en de knoppen dus echt zichtbaar zijn. */
+    for (const m of fs.readFileSync(eigen, 'utf8').matchAll(/<script[^>]+src="(\/[^"?]+\.js)(?:\?[^"]*)?"/g)) {
       bestanden.push(path.join(WORTEL, 'public', m[1].replace(/^\//, '')));
     }
   } catch (e) { /* pagina onleesbaar: dan levert hij ook geen randen */ }

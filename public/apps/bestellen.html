@@ -696,7 +696,7 @@
     $('#betaalOpties').innerHTML = keuzes.map(function (k) {
       return '<label class="betaaloptie"><input type="radio" name="betaalwijze" value="' + esc(k.id) + '"' +
         (k.id === BETAALKEUZE ? ' checked' : '') + '><span><b>' + esc(k.label) + '</b></span>' +
-        '<em class="' + (k.demo ? 'demo' : '') + '">' + (k.demo ? 'DEMO · geen echt geld' : k.provider ? 'Providerbevestiging' : 'Aan de zaak') + '</em></label>';
+        '<em class="' + (k.demo ? 'demo' : '') + '">' + (k.demo ? 'MAGNAAT TEST · geen echt geld' : k.provider ? 'Providerbevestiging' : 'Aan de zaak') + '</em></label>';
     }).join('');
     tekenGeldschild(j.geldschild);
     $('#betaalBewijs').hidden = true;

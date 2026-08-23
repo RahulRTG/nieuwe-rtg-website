@@ -2,7 +2,7 @@
      partners worden na de eerste geldige roster-opvraag aan de lokale
      schermcatalogus toegevoegd; de server blijft de enige bron van waarheid. */
   const DEMO_BEDRIJVEN = new Set(Object.keys(BEDRIJVEN));
-  let demoOmgeving = location.protocol === 'file:';
+  let demoOmgeving = false;
   const geldigeBedrijfscode = c => /^[A-Z0-9_-]{2,32}$/.test(String(c || '').toUpperCase());
 
   async function laadOmgeving() {
@@ -10,7 +10,7 @@
     try {
       const r = await fetch('/api/health');
       const h = r.ok ? await r.json() : null;
-      demoOmgeving = !!(h && h.demo);
+      demoOmgeving = !!(h && h.omgeving === 'magnaat-test' && h.testomgeving === true);
     } catch (e) { demoOmgeving = false; }
   }
 

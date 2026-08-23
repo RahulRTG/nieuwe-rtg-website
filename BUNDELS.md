@@ -13,13 +13,13 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 84 delen, 8886 regels in de delen
+`public/apps/app-main/` -- 84 delen, 8840 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `app-main-01.js` | de bouwstempel: HTML en script moeten van dezelfde bouw zijn |
 | `app-main-02.js` | de API-laag van de app: elke aanroep met token, taal en foutafhandeling |
-| `app-main-02a.js` | de demomelding: een demo is een toestand, geen terugval na een storing |
+| `app-main-02a.js` | De trainingsmelding bestaat uitsluitend in Magnaat |
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |
@@ -186,7 +186,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 105 delen, 9022 regels in de delen
+`public/apps/leverancier/` -- 105 delen, 9021 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -684,7 +684,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 729 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 767 regels in de delen
 
 | deel | onderwerp |
 |---|---|

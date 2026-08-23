@@ -179,15 +179,45 @@ test('computer en PDA tonen de echte RTG-app in een afgeschermde spelstand', () 
   const kern = fs.readFileSync(path.join(basis, 'app-main', 'app-main-02.js'), 'utf8');
   const os = fs.readFileSync(path.join(basis, 'app-main', 'app-main-24a2.js'), 'utf8');
   const sandbox = fs.readFileSync(path.join(basis, 'magnaat-sandbox.js'), 'utf8');
+  const testdata = fs.readFileSync(path.join(basis, 'magnaat-data.js'), 'utf8');
+  const chauffeurHtml = fs.readFileSync(path.join(basis, 'chauffeur.html'), 'utf8');
+  const chauffeur = fs.readFileSync(path.join(basis, 'chauffeur.js'), 'utf8');
+  const locatie = fs.readFileSync(path.join(basis, 'leverancier', 'leverancier-61.js'), 'utf8');
+  const stadTestvloot = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'stad', 'demovloot.js'), 'utf8');
   assert.equal((magnaat.match(/src="\/apps\/app\.html\?pas=business&amp;magnaat=1"/g) || []).length, 2);
   assert.equal((magnaat.match(/allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"/g) || []).length, 2);
-  assert.match(app, /<script src="\/apps\/magnaat-sandbox\.js"><\/script>/);
+  assert.match(app, /<script src="\/apps\/magnaat-sandbox\.js\?v=[a-f0-9]+"><\/script>/);
+  assert.match(app, /<script src="\/apps\/magnaat-data\.js\?v=[a-f0-9]+"><\/script>/);
   assert.match(kern, /if \(magnaatProef\) API\.enabled = false;/);
   assert.match(sandbox, /url\.pathname\.indexOf\('\/api\/'\) === 0/);
   assert.match(sandbox, /window\.RTCPeerConnection/);
   assert.match(sandbox, /Object\.defineProperty\(window, 'localStorage'/);
   assert.match(sandbox, /window\.XMLHttpRequest\.prototype\.send/);
   assert.match(sandbox, /document\.addEventListener\('submit'/);
+  assert.match(testdata, /if \(window\.RTG_MAGNAAT_PROEF !== true\) return;/,
+    'synthetische OS-data bestaat alleen na de sandboxpoort');
+  assert.match(testdata, /TEST-0158/);
+  assert.match(sandbox, /id = 'rtgMagnaatTestMark'/,
+    'ieder testscherm draagt een zichtbaar Magnaat Test-keurmerk');
+  assert.ok(chauffeurHtml.indexOf('/apps/magnaat-sandbox.js') < chauffeurHtml.indexOf('/apps/chauffeur.js'),
+    'ook het losse chauffeurscherm zet eerst de Magnaat-sandbox neer');
+  assert.match(chauffeur, /demo: window\.RTG_MAGNAAT_PROEF === true/,
+    'synthetische chauffeursritten bestaan uitsluitend in Magnaat Test');
+  assert.doesNotMatch(chauffeur, /demo: !token|searchParams\.get\('demo'\)/,
+    'een ontbrekende sessie of generieke query mag geen testrit openen');
+  assert.doesNotMatch(locatie, /API\.call\('\/supplier\/location', \{ lat: S\.loc\.lat/,
+    'geweigerde gps-toegang mag nooit een verzonnen zaakpositie versturen');
+  assert.match(stadTestvloot, /require\('\.\.\/\.\.\/testomgeving'\)\.actief\(process\.env\)/);
+  assert.match(stadTestvloot, /if \(!MAGNAAT_TEST\) \{ zorgPlaats\(\); return; \}/,
+    'de gesimuleerde Stadsdozen blijven uit de echte installatie');
+  const schilKern = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'rtg-schil', '01-kern.js'), 'utf8');
+  const schilSurfaces = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'rtg-schil', '03-surfaces.js'), 'utf8');
+  const commandWerktafel = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'command', 'werktafel.js'), 'utf8');
+  assert.match(schilKern, /doel\.searchParams\.set\('magnaat', '1'\)/,
+    'de werktafel houdt lokale vervolgschermen in Magnaat');
+  assert.match(schilSurfaces, /var veiligeUrl = oppervlakUrl/);
+  assert.match(commandWerktafel, /RTG_MAGNAAT_URL/,
+    'ook Command houdt ieder ingesloten vervolgscherm in Magnaat Test');
   assert.match(magnaat, /data-ctl-open/);
   assert.match(magnaat, /openControlScreen/);
   assert.match(magnaat, /\^\\\/apps\\\/\[\^\?\#\]\+\\\.html\$/,

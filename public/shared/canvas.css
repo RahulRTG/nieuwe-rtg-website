@@ -142,6 +142,10 @@ a.cv-wat:focus-visible { outline: 1px solid var(--rtg-goud, #857007); outline-of
   mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
 }
 .wereldapps::-webkit-scrollbar { display: none; }
+/* In een Edge Surface is de functierand al de wereldnavigator. Een tweede,
+   uitgeschreven appstrook in ieder kader is dubbel en neemt vooral op een
+   half scherm de inhoud over. */
+.rtg-in-frame .wereldapps { display: none; }
 /* Ligt er een zwevende hamburger linksboven (shared/appmenu.js zet die klasse
    op de body), dan begint de rij daarachter. Anders leest de eerste naam als
    "ving Lab" -- wat er op de RTFoundation ook stond, verstopt achter een

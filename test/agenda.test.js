@@ -14,7 +14,15 @@ function api(base, pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-function morgen() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); }
+function morgen() {
+  // Meet dezelfde lokale kalenderdag als de agenda-parser. Rond middernacht
+  // kan `setDate()` gevolgd door een directe UTC-afdruk anders een dag
+  // terugvallen, terwijl het product bewust vanaf lokale middag rekent.
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
 
 let srv, base, lid, sup;
 test.before(async () => {

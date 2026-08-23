@@ -46,6 +46,7 @@ const eigenaar = require('./eigenaar');
 const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
+const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
 const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, centen, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
@@ -205,7 +206,7 @@ try {
    aanroep; twee plekken die hetzelfde schema maken is precies hoe ze uit elkaar
    gaan lopen. */
 accounts.init();
-/* DEMO-MODUS: UIT, TENZIJ IEMAND HEM BEWUST AANZET.
+/* SYNTHETISCHE DATA: ALLEEN IN MAGNAAT TEST.
 
    Hier stond `NODE_ENV !== 'production' || RTG_DEMO === '1'`, met de belofte
    erboven dat de demo-inlog "nooit per ongeluk open op productie" staat. Die
@@ -218,10 +219,10 @@ accounts.init();
    met de vaste code 'RTG-OFFICE' die in deze repo te lezen staat -- en achter
    die deur ligt de identiteitskluis met echte namen en paspoortscans.
 
-   Een slot dat opengaat als iemand iets vergeet is geen slot. Aanzetten kan
-   alleen nog uitdrukkelijk, met RTG_DEMO=1. Wie lokaal demonstreert zet die
-   vlag; een server die niets weet, doet niets. */
-const DEMO = process.env.RTG_DEMO === '1';
+   Een slot dat opengaat als iemand iets vergeet is geen slot. De echte vier
+   werelden hebben daarom geen demo-stand. Alleen de afzonderlijke Magnaat-
+   testomgeving mag synthetische accounts en gegevens laden. */
+const DEMO = testomgeving.actief(process.env);
 // Het eigenaarsaccount (Rahul Imran Ismail), zodat Rahul/Imran ook via de
 // echte accountlogin werkt. Bestaat het account al (een oudere lokale
 // database), dan krijgt het hier de juiste naam; de kluis blijft de bron.
@@ -664,8 +665,9 @@ function memberTemplate() {
 // het proces leeft.)
 app.get('/api/health', (req, res) => {
   const model = require('./ai').beschikbaarheid(anthropic);
+  const omgeving = testomgeving.status(process.env);
   res.json({
-    ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
+    ok: true, ...omgeving, ai: model.modus, verwerking: model.verwerking,
     betalen: betaal.AANBIEDER,
     server: Number(process.env.RTG_SERVER || 1), active: db.writable,
     domeinen: process.env.RTG_DOMAINS || 'alle',

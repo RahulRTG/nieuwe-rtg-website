@@ -162,12 +162,11 @@ function leesEnvBestand(pad) {
   if (env.OFFICE_TOTP_SECRET)
     goed('Backoffice-2FA (TOTP) staat aan.');
 
-  // 7. de demo-inlog: het universele demo-account (naam/wachtwoord) mag in
-  //    productie niet meer werken. Het is uit zodra NODE_ENV=production, tenzij
-  //    iemand hem bewust met RTG_DEMO=1 weer aanzet (de config-keuring hierboven
-  //    blokkeert dat geval al). Hier bevestigen we alleen dat hij uitstaat.
-  if (process.env.RTG_DEMO !== '1')
-    goed('Demo-inlog (universeel account) staat uit in productie; leden loggen in via hun account, personeel met pincode.');
+  // 7. Magnaat Test en de verouderde snelle testinlog mogen nooit op de echte
+  //    installatie werken. De configuratiekeuring blokkeert beide standen;
+  //    hier bevestigen we de bedoelde eindstand nogmaals zichtbaar.
+  if (process.env.RTG_MAGNAAT_TEST !== '1' && process.env.RTG_DEMO !== '1')
+    goed('Magnaat Test en snelle testinlog staan uit; leden loggen in via hun account, personeel met pincode.');
 
   /* De papieren kant, als ECHTE controle in plaats van een herinnering.
 

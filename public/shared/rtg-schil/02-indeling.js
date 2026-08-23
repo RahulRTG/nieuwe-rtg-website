@@ -17,22 +17,25 @@
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
     if (standaard()) {
-      var bank = Math.min(166, Math.max(148, Math.round(m.b * .12)));
-      var tabhoog = 49;
-      zet(schil.console, 0, 0, bank, m.h);
-      if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
+      /* De Edge System-randen zijn de enige navigator. In het vlak liggen
+         maximaal vier echte apps: 1, 2 of 2 x 2. Op een telefoon is het altijd
+         precies de actieve app. */
+      zet(schil.console, 0, 0, 0, 0);
+      if (schil.tabs) zet(schil.tabs, 0, 0, 0, 0);
       if (!n) return;
-      var werkbreed = m.b - bank;
-      var werkhoog = m.h - tabhoog;
-      var sk = n <= 3 ? n : 2;
-      var sr = Math.ceil(n / sk);
-      var sw = Math.floor(werkbreed / sk);
-      var sh = Math.floor(werkhoog / sr);
-      schil.surfaces.forEach(function (s, i) {
+      var limiet = m.b < 720 ? 1 : parseInt(d.body.dataset.rtgLayout || '2', 10);
+      if ([1, 2, 4].indexOf(limiet) < 0) limiet = 1;
+      var zichtbaar = schil.surfaces.slice(0, limiet);
+      if (schil.actief && zichtbaar.indexOf(schil.actief) < 0) zichtbaar[zichtbaar.length - 1] = schil.actief;
+      schil.surfaces.forEach(function (s) { s.el.toggleAttribute('data-edge-visible', zichtbaar.indexOf(s) >= 0); });
+      var k = zichtbaar.length;
+      var sk = k === 4 ? 2 : (k === 2 && m.b >= 760 ? 2 : 1);
+      var sr = Math.ceil(k / sk), sw = Math.floor(m.b / sk), sh = Math.floor(m.h / sr);
+      zichtbaar.forEach(function (s, i) {
         var c = i % sk, r = Math.floor(i / sk);
-        zet(s.el, bank + c * sw, tabhoog + r * sh,
-          c === sk - 1 ? werkbreed - c * sw : sw,
-          r === sr - 1 ? werkhoog - r * sh : sh);
+        zet(s.el, c * sw, r * sh,
+          c === sk - 1 ? m.b - c * sw : sw,
+          r === sr - 1 ? m.h - r * sh : sh);
       });
       return;
     }

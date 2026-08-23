@@ -3,20 +3,38 @@
 
   var pad = w.location.pathname;
   var modules = {
-    '/apps/vluchten.html': { naam: 'VLUCHTEN', actief: 'reizen' },
-    '/apps/hotels.html': { naam: 'VERBLIJVEN', actief: 'reizen' },
-    '/apps/reisbureau.html': { naam: 'REISBUREAU', actief: 'reizen' },
-    '/apps/ov.html': { naam: 'MOBILITEIT', actief: 'reizen' },
-    '/apps/navigatie.html': { naam: 'NAVIGATIE', actief: 'reizen', kaart: true },
-    '/apps/rit.html': { naam: 'RITSTATUS', actief: 'taxi' },
-    '/apps/reisboek.html': { naam: 'REISBOEK', actief: 'reizen' },
-    '/apps/hangar.html': { naam: 'PRIVATE MOBILITY', actief: 'reizen' }
+    '/apps/vluchten.html': { id: 'vluchten', naam: 'VLUCHTEN', actief: 'reizen' },
+    '/apps/hotels.html': { id: 'hotels', naam: 'VERBLIJVEN', actief: 'reizen' },
+    '/apps/reisbureau.html': { id: 'reisbureau', naam: 'REISBUREAU', actief: 'reizen' },
+    '/apps/ov.html': { id: 'mobiliteit', naam: 'MOBILITEIT', actief: 'reizen' },
+    '/apps/navigatie.html': { id: 'navigatie', naam: 'NAVIGATIE', actief: 'reizen', kaart: true },
+    '/apps/rit.html': { id: 'rit', naam: 'RITSTATUS', actief: 'taxi' },
+    '/apps/reisboek.html': { id: 'reisboek', naam: 'REISBOEK', actief: 'reizen' },
+    '/apps/hangar.html': { id: 'hangar', naam: 'PRIVATE MOBILITY', actief: 'reizen' }
   };
   var module = modules[pad] || { naam: 'REIZEN', actief: 'reizen' };
   var body = d.body;
   if (!body || body.querySelector('.tos-topbar')) return;
   body.classList.add('travel-os');
   if (module.kaart) body.classList.add('travel-os-map');
+  /* De oude brede Travel-balken worden alleen als terugval gebouwd. De nieuwe
+     Edge System-schil houdt exact dezelfde functies op dezelfde plaats als de
+     drie andere werelden. In een werktafel-iframe komt er geen tweede schil. */
+  if (new URLSearchParams(w.location.search).get('embed') === '1') {
+    body.classList.add('rtg-edge-embed');
+    return;
+  }
+  if (w.RTGEdge) {
+    w.RTGEdge.start({
+      world: 'travel',
+      context: { scope: 'REIZEN', title: module.naam, tool: module.id || 'vandaag', actie: 'Verder in ' + module.naam },
+      onAction: function () {
+        var knop = body.querySelector('main .knop:not([disabled]),main button.hoofd:not([disabled]),main [data-primary]');
+        if (knop) knop.click();
+      }
+    });
+    return;
+  }
 
   function maak(tag, klasse, tekst) {
     var el = d.createElement(tag);

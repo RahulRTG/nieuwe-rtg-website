@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '4416650d';
+var RTG_BOUW = '6880d97b';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -79,55 +79,19 @@ var RTG_BOUW = '4416650d';
     }
   }
 
-  /* ---------- lokale demo-data (fallback zonder backend) ---------- */
+  /* ---------- gegevens: echt via API, synthetisch alleen via Magnaat ---------- */
 
-  const PERSONAS = {
-    rtg:       {name:'K. Kiss',    full:'Katja Kiss',    since:'Maart 2026',    number:'RTG · 2026 · 8841', codename:'Amberen Vos',      tier:'rtg'},
-    lifestyle: {name:'F. Johanna', full:'Fleur Johanna', since:'Augustus 2025', number:'LSP · 2025 · 0217', codename:'Gouden Ibis',      tier:'lifestyle'},
-    business:  {name:'R. Imran',   full:'Rahul Imran',   since:'November 2025', number:'BSP · 2025 · 1104', codename:'Noordelijke Ster', tier:'business'}
-  };
+  const MAGNAAT = window.RTG_MAGNAAT_PROEF && window.RTG_MAGNAAT_DATA
+    ? window.RTG_MAGNAAT_DATA : {};
+  const PERSONAS = MAGNAAT.personas || {};
   const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass', partner:'RTG-partner'};
 
   let user = null;
-  let invoices = [
-    {id:'RTG-2026-0158', desc:'Ibiza, Aguamarina, 3 nachten', netto:1740, bijdrage:150, status:'open', date:'Vervalt 28 juli 2026'},
-    {id:'RTG-2026-0141', desc:'Villa Bahia Ibiza, Cala Jondal, 4 nachten', netto:2240, bijdrage:180, status:'open', date:'Vervalt 15 augustus 2026'},
-    {id:'RTG-2026-0093', desc:'Privejet Schiphol - Ibiza (retour, gedeeld)', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
-    {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
-  ];
-  let trip = {
-    dest:'Ibiza', dates:'18 - 25 juli 2026', days:7,
-    items:[
-      {when:'18 jul', title:'Lijnvlucht RTG-1263, Amsterdam Schiphol → Ibiza', sub:'Economy comfort · 2 personen', status:'paid', label:'Bevestigd'},
-      {when:'18 jul', title:'Privétransfer luchthaven → Aguamarina', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
-      {when:'18-21 jul', title:'Aguamarina Ibiza, Sea-view suite', sub:'3 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
-      {when:'19 jul', title:'Diner, Sal de Mar', sub:'Chef-menu · 21:00 uur', status:'req', label:'In aanvraag'},
-      {when:'20 jul', title:'Privéboot naar Formentera', sub:'Met de groep · 10:00 uur', status:'paid', label:'Bevestigd'},
-      {when:'21-25 jul', title:'Villa Bahia Ibiza, Cala Jondal', sub:'4 nachten, eigen zwembad', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
-    ]
-  };
-  let posts = [
-    {id:1, author:'Katja Kiss', tier:'rtg', place:'Ibiza', visual:'v-ibiza',
-     text:'Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij in de villa boven Cala Jondal. Rahul kwam met de privéjet, wij pakten de ochtendvlucht, en toch checken we samen in.',
-     likes:168, liked:false, comments:[{who:'Timothy de Groot', tier:'rtg', text:'Tussen twee tentamens door even bijkomen, precies wat ik nodig had.'}]},
-    {id:2, author:'Rahul Imran', tier:'business', place:'Ibiza', visual:'v-ibiza',
-     text:'Ochtend: twee calls vanaf het terras. Middag: boot naar Formentera met de groep. De jet stond klaar op Schiphol Business Aviation.',
-     likes:96, liked:false, comments:[]},
-    {id:3, author:'Fleur Johanna', tier:'lifestyle', place:'Gstaad', visual:'v-gstaad',
-     text:'Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet in Gstaad, open haard, en morgen de piste op. Op je 69e mag dat.',
-     likes:132, liked:false, comments:[
-       {who:'Marieke Hooi', tier:'lifestyle', text:'Als schooldirectrice tel ik de dagen af tot de vakantie; deze is het waard.'},
-       {who:'William Draak', tier:'business', text:'Vanuit Monaco groeten wij Gstaad. De boekhouding klopt, de rosé ook.'}
-     ]},
-    {id:4, author:'Dani da Cruz Carvalho', tier:'business', place:'Monaco', visual:'v-monaco',
-     text:'Na mijn voetbaljaren dacht ik alles gezien te hebben in Monaco, maar aankomen op codenaam en toch als vanouds ontvangen worden, dat is nieuw.',
-     likes:214, liked:false, comments:[]},
-    {id:5, author:'Feroz Mohammed', tier:'business', place:'Dubai', visual:'v-dubai',
-     text:'Een week Dubai met vrienden: de een in de wolkenkrabber-suite, de ander in een strandappartement aan de Palm. Ik werk voor de Nederlandse staat, maar deze dagen tel ik even niet mee.',
-     likes:78, liked:false, comments:[]}
-  ];
-  let creatorLikes = 320;
-  let rtf = { gekoppeld: [], meldingen: [] }; // RTFoundation-gezinnen die dit lid als oppas/familie koppelde
+  let invoices = MAGNAAT.invoices || [];
+  let trip = MAGNAAT.trip || { dest:'', dates:'', days:0, items:[] };
+  let posts = MAGNAAT.posts || [];
+  let creatorLikes = Number(MAGNAAT.creatorLikes || 0);
+  let rtf = MAGNAAT.foundation || { gekoppeld: [], meldingen: [] };
 
   /* ---------- backend-koppeling ---------- */
 
@@ -282,13 +246,8 @@ var RTG_BOUW = '4416650d';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
   }
-/* de demomelding: een demo is een toestand, geen terugval na een storing */
-  const explicieteDemo = magnaatProef || zoekParams.get('demo') === '1';
-
-  /* Een demo is een toestand, geen terugval na een storing. De melding stond
-     altijd op het homescreen en daardoor leek ook een echte installatie een
-     demo. De server vertelt nu zelf of RTG_DEMO aanstaat. Bij Magnaat en bij
-     ?demo=1 is de keuze al expliciet en is geen netwerkantwoord nodig. */
+/* De trainingsmelding bestaat uitsluitend in Magnaat. De echte app kent geen
+   queryparameter, health-status of netwerkfout die voorbeelddata kan openen. */
   function zetDemoMelding(aan, tekst) {
     const el = document.getElementById('osDemoWet');
     if (!el) return;
@@ -296,12 +255,7 @@ var RTG_BOUW = '4416650d';
     if (tekst) { el.removeAttribute('data-i18n'); el.textContent = tekst; }
   }
   if (magnaatProef) {
-    zetDemoMelding(true, 'Magnaat · afgeschermde trainingskopie · geen echte klant-, geld- of productieactie');
-  } else if (explicieteDemo) {
-    zetDemoMelding(true);
-  } else if (API.enabled) {
-    fetch('/api/health').then(r => r.ok ? r.json() : null)
-      .then(h => zetDemoMelding(!!(h && h.demo))).catch(() => zetDemoMelding(false));
+    zetDemoMelding(true, 'MAGNAAT TEST · geïsoleerde trainingskopie · geen echte klant-, geld- of productieactie');
   }
   /* ---------- pas-thema (kleuren van de website) ----------
      RTG krijgt het bordeauxrode thema, Lifestyle het parelmoeren thema,
@@ -435,8 +389,8 @@ var RTG_BOUW = '4416650d';
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
-        if (!explicieteDemo){
-          toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        if (!magnaatProef){
+          toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
         }
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
@@ -450,10 +404,10 @@ var RTG_BOUW = '4416650d';
           API.token = data.token;
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
-      } else if (explicieteDemo) {
+      } else if (magnaatProef) {
         user = {...PERSONAS[tier]};
       } else {
-        toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
       }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
@@ -2078,7 +2032,7 @@ var RTG_BOUW = '4416650d';
       '<div class="klets-draad">' + (g.beurten || []).map(b =>
         '<div class="dm-m' + (b.mij ? ' mine' : '') + '">' + escT(b.tekst) + '</div>').join('') + '</div>' +
       '<p style="font-size:.75rem;color:var(--soft);line-height:1.6;margin-top:.9rem;">' + escT(g.noot || '') +
-      (g.echt ? '' : ' Dit is een demogesprek: er staat geen AI-sleutel ingesteld.') + '</p>' +
+      (g.echt ? '' : ' Dit antwoord komt uit de ingebouwde assistent; vrije AI is niet actief.') + '</p>' +
       '<button class="knop h-mt70" id="kletsTerug">Terug</button>';
     const t = $('#kletsTerug');
     if (t) t.addEventListener('click', async () => kletsTekenLeeg(await kletsLaad()));
@@ -5871,7 +5825,7 @@ var RTG_BOUW = '4416650d';
       navigator.geolocation.getCurrentPosition(async pos => {
         try { liveData = (await API.call('/live/update', { lat: pos.coords.latitude, lng: pos.coords.longitude })).live; renderLivePanel(); toast(T('live.shared','Locatie gedeeld met uw partners.')); }
         catch (e){ toast(e.message); }
-      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Gebruik "Simuleer rit" voor de demo.')), { timeout: 4000 });
+      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Vul de locatie handmatig in.')), { timeout: 4000 });
     } else toast(T('live.geono','Locatie is hier niet beschikbaar.'));
   }
 
@@ -8136,7 +8090,7 @@ var RTG_BOUW = '4416650d';
         (user.emailVerified === false ? knopje('boVerstuur', T('bo2.verstuur','Stuur bevestigingsmail opnieuw')) : ''));
     } else {
       html += kaart('' + T('bo2.beveiliging','Beveiliging'),
-        '<div class="fineprint">' + T('bo2.demo','U gebruikt een demoprofiel. Met een echt account beheert u hier uw wachtwoord en tweestapsherstel.') + '</div>');
+        '<div class="fineprint">' + T('bo2.demo','Magnaat-testprofiel · accountbeheer en tweestapsherstel zijn in deze geïsoleerde training uitgeschakeld.') + '</div>');
     }
 
     // weergave: RTG en Lifestyle kunnen tussen het pas-thema en klassiek donker

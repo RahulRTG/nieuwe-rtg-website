@@ -298,7 +298,7 @@ document.addEventListener('keydown', ev => {
 function toonMomenten(m){
   $('#mLijst').innerHTML = (m && m.items && m.items.length) ?
     '<div class="h-mt70">' + m.items.map(x => '<div class="idee"><b>' + esc(x.titel) + '</b><div>' + esc(x.hoe) + '</div></div>').join('') +
-    (m.demo ? '<div class="leeg" style="padding:0;">De buddy koos uit een vast setje (demo).</div>' : '') + '</div>' : '';
+    (m.demo ? '<div class="leeg" style="padding:0;">De buddy koos uit de gecontroleerde vaste basis.</div>' : '') + '</div>' : '';
 }
 async function laad(){
   try { const [d, t] = await Promise.all([api('boek'), api('tijdlijn')]); toonBoek(d, t); } catch (e) {}

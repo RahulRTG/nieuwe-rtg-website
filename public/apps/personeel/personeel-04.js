@@ -79,7 +79,7 @@
     $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
       '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
       '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
-      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>' : '');
+      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Magnaat Test: manager 1234, medewerker 5678.')+'</div>' : '');
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
     // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
     // opnieuw proberen; de server vergelijkt en bewaart er niets van

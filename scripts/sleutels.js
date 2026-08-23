@@ -75,7 +75,7 @@ const regels = [
 ];
 
 if (priveBeta) {
-  regels.push(['RTG_PRIVATE_BETA', '1', 'ALLEEN LOKAAL: mail blijft in de outbox en betalingen zijn demo']);
+  regels.push(['RTG_PRIVATE_BETA', '1', 'ALLEEN LOKAAL: mail blijft in de outbox']);
 } else {
   regels.push(
     ['DATABASE_URL', docker ? '' : 'postgresql://VUL-IN', docker ? 'Docker bouwt deze veilig uit het aparte PostgreSQL-geheim' : 'HANDMATIG: PostgreSQL (verplicht bij meerdere instances/vloot)'],
@@ -84,7 +84,7 @@ if (priveBeta) {
   );
 }
 if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmatige werkmodus blijft beschikbaar']);
-if (zonderBetalen) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of demo-betaalrail; elke betaalactie weigert fail-closed']);
+if (zonderBetalen || priveBeta) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: zonder echte provider weigert elke betaalactie fail-closed']);
 if (zonderSms) regels.push(['RTG_HERSTEL_SMS_UIT_BEWUST', '1', 'BEWUST: telefoonherstel weigert fail-closed zolang geen echte SMS-provider is gekoppeld']);
 if (nativeTls) regels.push(
   ['RTG_TLS', '1', 'native TLS/HTTP2 in RTG zelf'],

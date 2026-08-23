@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1032 bestanden en 6879 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1033 bestanden en 6889 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1032 |
-| losse beweringen (`test(...)`) | 6879 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
+| toetsbestanden | 1033 |
+| losse beweringen (`test(...)`) | 6889 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 47 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 867 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 95 |
+| niets van beide | 96 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-906 bestanden, 6659 beweringen.
+907 bestanden, 6669 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -189,7 +189,7 @@ toets omvalt.
 | `deavond.test.js` | 5 | gezakt op `liegpoort /api/` | EEN AVOND IN HET HUIS -- de keuken, een event, het hotel en de gasten. WAAROM DIT ER IS De vorige toetsen volgen een mens (levensloop) of een bestelling (bezorging). |
 | `deelindex.test.js` | 5 | gezakt op `+->-#0` | DE INDEX VAN DE BUNDELDELEN LOOPT NIET ACHTER. BUNDELS.md wordt voortgebracht door scripts/deelindex.js. |
 | `defensie.test.js` | 7 | gezakt op `liegpoort /api/` | De defensie-toren: paraatheid, materieel en onderhoud, bevoorrading, de oefenagenda en de staf-AI. Uitdrukkelijk logistiek en organisatie: de AI weigert alles wat richting wapeninzet of doelbestrijding gaat. |
-| `demostand.test.js` | 5 | gezakt op `liegpoort /api/` | De demo-stand hoort UIT te staan als niemand erom vraagt. WAT ER OPENSTOND, op de echte server, op het open internet: 1. |
+| `demostand.test.js` | 7 | gezakt op `liegpoort /api/` | De demo-stand hoort UIT te staan als niemand erom vraagt. WAT ER OPENSTOND, op de echte server, op het open internet: 1. |
 | `demozaken.test.js` | 4 | gezakt op `liegpoort /api/` | DE LIVEGANG-SCHOONMAAK: welke zaken verdwijnen er zonder RTG_DEMO, en welke niet. WAT ER MISGING De opruiming stond in initdata/deel7-salon.js en draaide dus VOOR deel8, deel9 en deel10. |
 | `directpay.test.js` | 7 | gezakt op `liegpoort /api/` | Rechtstreeks betalen van klant naar leverancier, met Face ID, via de AI en de Salon. Het lid betaalt zelf of rekent een betaalverzoek van de partner af; het geld gaat rechtstreeks naar de leverancier (ontvangst-teller). |
 | `doelen.test.js` | 8 | gezakt op `liegpoort /api/` | De doelenmotor (kern/doelen.js). Het punt van deze motor is dat mijlpalen worden AFGELEID en niet bewaard: een gemiste week is dan geen mislukking maar een ander pad. |
@@ -206,6 +206,7 @@ toets omvalt.
 | `duurzaamheidskosten.test.js` | 5 | gezakt op `return-weg#0` | DE KOSTENMETING VAN DE DUURZAME COMMIT -- het oordeel, los van twee servers. De ronde zelf start twee servers en duurt minuten; daar komt niemand met een mutatie bij. |
 | `dyncode-e2e.test.js` | 5 | gezakt op `liegpoort /api/` | Dynamische RTG-code, end-to-end via de routes: alleen een app-sessie kan een code maken (/api/code/dyn) of verifieren (/api/code/scan); een generieke lezer zonder inlog komt er niet langs. npm test |
 | `dyncode.test.js` | 6 | gezakt op `!==->===` | Dynamische gesloten RTG-code (kern/dyncode.js): kort houdbare, HMAC-onder- tekende tokens die alleen ons systeem maakt en verifieert. npm test |
+| `edge-system.test.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `eenaccount-werkruimte.test.js` | 3 | gezakt op `liegpoort /api/` | Een inlog voor alles -- ook voor het RTG Werk OS. WAT HIER OP HET SPEL STAAT. |
 | `eenaccount.test.js` | 9 | gezakt op `liegpoort /api/` | Een account voor alles: mensen registreren zich EEN keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene account (na bewijs van de bestaande werk-inlog) en accStart munt exact dezelfde sessies als de... |
 | `eigen-website.test.js` | 6 | gezakt op `liegpoort /api/` | DE EIGEN WEBSITE VAN EEN LID -- 5 endpoints van de Website-maker. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: site/haal, site/publiceer, site/offline, site/fotos en site/foto-weg. |
@@ -597,7 +598,7 @@ toets omvalt.
 | `postdatum.test.js` | 13 | gezakt op `liegpoort /api/` | Postdatums: de datums die in uw eigen post staan, als VOORSTEL. Wat hier bewezen wordt, en waarom juist dit: de lezer drie vormen herkend, en de twijfelgevallen NIET geraden -- "03/04/2026" wordt overgeslagen met de... |
 | `productie-installatie.test.js` | 4 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-motor.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `productie.test.js` | 19 | gezakt op `===->!==#0` | Tests voor de productie-hardening: config-validatie, duurzame opslag, betaal-naad (idempotentie + webhook-verificatie) en de logger. NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js, omdat die... |
+| `productie.test.js` | 20 | gezakt op `===->!==#0` | Tests voor de productie-hardening: config-validatie, duurzame opslag, betaal-naad (idempotentie + webhook-verificatie) en de logger. NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js, omdat die... |
 | `provider-sandbox.test.js` | 11 | gezakt op `===->!==#0` | Contracttests voor de volledig lokale provider-sandboxes. Geen enkele toets maakt netwerkverkeer of beweegt geld; subprocessen isoleren de env-standen. |
 | `proxykop.test.js` | 9 | gezakt op `===->!==#0` | DE X-FORWARDED-KOPPEN: van rechts lezen, niet van links. Gevonden in de randronde. |
 | `prplus.test.js` | 2 | gezakt op `liegpoort /api/` | PR-plus (server): de volle PR-kamer van elke zaak. Getoetst: de campagneplanner (inplannen, valideren, weghalen, en het rijpe plan dat bij het overzicht vanzelf op De Salon verschijnt), de nieuwsbrief met de... |

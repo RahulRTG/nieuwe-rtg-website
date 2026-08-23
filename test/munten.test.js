@@ -7,6 +7,8 @@
       afdracht loopt gewoon mee. De backoffice ziet de euro-ontvangst.
    Draai: npm test */
 process.env.MUNT_AAN = '1';
+process.env.NODE_ENV = 'test';
+process.env.RTG_MAGNAAT_TEST = '1';
 process.env.MUNT_WEBHOOK_SECRET = 'munt-test-secret-1234567890';
 process.env.MUNT_MUNTEN = 'btc,eth,usdc';
 

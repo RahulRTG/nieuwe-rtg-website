@@ -69,7 +69,7 @@ async function start(extra) {
   const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
-      STUN_UIT: '1', RTG_DEMO: '1', ...extra }
+      STUN_UIT: '1', RTG_MAGNAAT_TEST: '1', ...extra }
   });
   const eind = Date.now() + 60000;
   while (Date.now() < eind) {

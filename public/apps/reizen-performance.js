@@ -4,16 +4,12 @@
   R.$ = function (s, r) { return (r || d).querySelector(s); };
   R.$$ = function (s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); };
   try { R.token = localStorage.getItem('rtg_member_token'); } catch (e) { R.token = null; }
-  R.plekken = [
-    { naam: 'Schiphol Airport', sub: 'Luchthaven · Amsterdam', lat: 52.3105, lng: 4.7683, stad: 'Amsterdam' },
-    { naam: 'Amsterdam Centraal', sub: 'Station · Amsterdam', lat: 52.3791, lng: 4.9003, stad: 'Amsterdam' },
-    { naam: 'Rotterdam The Hague Airport', sub: 'Luchthaven · Rotterdam', lat: 51.9569, lng: 4.4372, stad: 'Rotterdam' },
-    { naam: 'Utrecht Centraal', sub: 'Station · Utrecht', lat: 52.0894, lng: 5.1101, stad: 'Utrecht' },
-    { naam: 'Ibiza Airport', sub: 'Luchthaven · Ibiza', lat: 38.8729, lng: 1.3731, stad: 'Ibiza' },
-    { naam: 'Ibiza Marina', sub: 'Haven · Ibiza', lat: 38.9144, lng: 1.4432, stad: 'Ibiza' }
-  ];
-  R.staat = { blad: 'vandaag', reizen: null, bestemming: R.plekken[0], vertrek: null,
-    moment: 'nu', voertuig: 'limousine', voertuigLabel: 'EXECUTIVE', indicatie: 68,
+  /* Bestemmingen en aanbod komen uit Mobility OS. Geen ingebouwde plaatsenlijst:
+     als de bron niet antwoordt, werkt het scherm niet overtuigend door met een
+     oud voorbeeld. */
+  R.plekken = [];
+  R.staat = { blad: 'vandaag', reizen: null, bestemming: null, vertrek: null,
+    moment: 'nu', voertuig: 'limousine', voertuigLabel: 'EXECUTIVE', indicatie: null,
     personen: 2, koffers: 2, zoekTimer: null };
 
   var toastTimer;

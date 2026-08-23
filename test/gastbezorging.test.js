@@ -126,8 +126,8 @@ test('de checkout rekent opnieuw op de server en laat geen lege rekening achter'
     'de checkout mag niet doen alsof er al online is betaald');
   assert.ok(uit.body.betaling.keuzes.some(x => x.id === 'ontvangst'),
     'betalen bij ontvangst blijft een expliciete keuze');
-  assert.ok(uit.body.betaling.keuzes.some(x => x.provider === 'demo'),
-    'lokaal is de veilige providernaad zichtbaar als demo en nooit als echt geld');
+  assert.ok(uit.body.betaling.keuzes.some(x => x.provider === 'magnaat-test'),
+    'alleen Magnaat toont de synthetische provider en nooit als echt geld');
   assert.ok(uit.body.geldschild && uit.body.geldschild.titel,
     'de klant krijgt een eigen Geldschild-oordeel, zonder dat het de keuze overneemt');
 
@@ -286,7 +286,7 @@ test('online bestellen blijft uit de keuken tot de betaalwaarheid definitief is'
     'zonder providerbevestiging mag geen bon in de keuken staan');
 
   const betaal = await post('/api/gast/bezorg/betaling/start', { zaak: 'KIKUNOI',
-    rekeningId, idem: 'online-betaling-1', aanbieder: 'demo' }, lid);
+    rekeningId, idem: 'online-betaling-1', aanbieder: 'magnaat-test' }, lid);
   assert.equal(betaal.status, 200, JSON.stringify(betaal.body).slice(0, 220));
   assert.equal(betaal.body.betaling.status, 'BEVESTIGD');
   assert.equal(betaal.body.betaling.afgehandeld, true);

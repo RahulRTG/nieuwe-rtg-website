@@ -38,9 +38,9 @@ const pw = laadPlaywright();
    SCHERMEN die op een telefoon moeten passen, en dat blijft gelden als de
    catalogus ooit anders wordt ingedeeld. */
 const WERELDEN = [
-  '/apps/vandaag.html', '/apps/instant-reality.html', '/apps/private-office.html',
-  '/apps/living-os.html', '/apps/partner-network.html', '/apps/reizen-veilig.html',
-  '/apps/leven.html', '/apps/geld-command.html', '/apps/sociaal.html',
+  '/apps/vandaag.html', '/apps/instant-reality.html', '/apps/lifestyle.html',
+  '/apps/living-os.html', '/apps/partner-worden.html', '/apps/reizen-veilig.html',
+  '/apps/leven.html', '/apps/geld.html', '/apps/sociaal.html',
   '/apps/media.html', '/apps/horeca.html', '/apps/reisboek.html',
 ];
 
@@ -88,9 +88,7 @@ test('elke wereld past op een telefoon van 390px', { skip: pw ? false : 'geen Pl
          een gebruiker kan hem nooit bereiken. */
       const navSelector = {
         '/apps/instant-reality.html': '.ir-shell>aside',
-        '/apps/private-office.html': '.po-rail',
-        '/apps/living-os.html': '.lo-rail',
-        '/apps/partner-network.html': '.pn-rail'
+        '/apps/living-os.html': '.lo-rail'
       }[url];
       if (navSelector) {
         const nr = await page.evaluate((sel) => {

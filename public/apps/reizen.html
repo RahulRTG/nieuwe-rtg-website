@@ -11,6 +11,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/canvas.css" rel="stylesheet">
 <link href="/apps/reizen-performance.css" rel="stylesheet">
+<link href="/shared/rtg-edge-system.css" rel="stylesheet">
 </head>
 <body>
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -31,35 +32,24 @@
         <div class="dagkop">
           <p class="micro" id="groet">GOEDEMIDDAG</p>
           <div class="bestemmingkop">
-            <h1 id="titelVandaag">IBIZA</h1>
-            <span class="gereed" id="gereedTeller">4/4 GEREED</span>
+            <h1 id="titelVandaag">UW REIZEN</h1>
+            <span class="gereed" id="gereedTeller">0/0 GEREED</span>
           </div>
-          <p class="sub" id="dagzin">Alles staat klaar.</p>
+          <p class="sub" id="dagzin">Uw actuele reisgegevens worden opgehaald.</p>
         </div>
 
-        <div class="vandaagraster">
+        <div class="vandaagraster" id="dagRaster" hidden>
           <section class="volgendblok" aria-labelledby="volgendTitel">
             <div class="micro" id="volgendTitel">VOLGENDE</div>
-            <div class="tijdregel"><strong id="volgendTijd">18:20</strong><span id="volgendLabel">Chauffeur arriveert</span></div>
-            <div class="routekort"><span id="volgendVan">THUIS</span><b aria-hidden="true">→</b><span id="volgendNaar">SCHIPHOL</span></div>
-            <div class="vluchtregel"><span id="volgendExtra">VLUCHT 21:05</span></div>
+            <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
+            <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
+            <div class="vluchtregel"><span id="volgendExtra"></span></div>
             <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
           </section>
 
           <div class="reiscontext">
-            <section class="prestatiepad" aria-label="Reisverloop">
-              <div class="padlijn" aria-hidden="true"></div>
-              <div class="padpunt nu"><span>NU</span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i></div>
-              <div class="padpunt actief"><span>18:20<small>RIT</small></span><i></i></div>
-              <div class="padpunt"><span>21:05<small>VLUCHT</small></span><i></i></div>
-              <div class="padpunt einde"><span>00:10<small>IBIZA</small></span><i><svg viewBox="0 0 24 24"><path d="M12 21s6-5.3 6-11a6 6 0 1 0-12 0c0 5.7 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg></i></div>
-            </section>
 
-            <section class="statuslijst" aria-label="Reisstatus">
-              <button type="button" data-statusactie="vlucht"><i class="statusicoon goed">✓</i><span><b>Vlucht bevestigd</b><small>KL 1609 · stoel 4A</small></span><em>›</em></button>
-              <button type="button" data-statusactie="diner"><i class="statusicoon wacht">◷</i><span><b>Diner in afwachting</b><small>Partner bevestigt uiterlijk 17:00</small></span><em>›</em></button>
-              <button type="button" data-statusactie="betaling"><i class="statusicoon let">!</i><span><b>Betaling villa</b><small>Actie van u nodig</small></span><strong>NU BETALEN</strong><em>›</em></button>
-            </section>
+            <section class="statuslijst" id="statusLijst" aria-label="Reisstatus"></section>
           </div>
         </div>
 
@@ -125,7 +115,7 @@
                   <button type="button" class="locatieknop" data-locatie aria-label="Gebruik mijn huidige locatie"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button>
                 </label>
                 <label>
-                  <i class="routepunt aankomst"></i><span><small>NAAR</small><input id="naarVeld" name="naar" value="Schiphol Airport" autocomplete="off" aria-controls="bestemmingSuggesties" aria-expanded="false"></span>
+                  <i class="routepunt aankomst"></i><span><small>NAAR</small><input id="naarVeld" name="naar" placeholder="Zoek een bestemming" autocomplete="off" aria-controls="bestemmingSuggesties" aria-expanded="false"></span>
                   <button type="button" class="wisselknop" data-wissel aria-label="Wissel vertrek en bestemming">⇅</button>
                 </label>
               </fieldset>
@@ -141,7 +131,7 @@
               <label class="laterinvoer" hidden>Vertrekdatum en tijd<input id="vertrekLater" type="datetime-local" name="vertrek"></label>
             </form>
 
-            <section class="routekaart" aria-label="Routevoorbeeld">
+            <section class="routekaart" aria-label="Route">
               <svg class="kaartlijnen" viewBox="0 0 720 210" preserveAspectRatio="none" aria-hidden="true">
                 <g class="straten"><path d="M0 38 170 74 270 8 520 62 720 18M18 190 124 84 292 164 450 98 720 156M62 0 180 210M354 0 312 210M604 0 530 210M0 122 720 112"/><path d="M0 82 130 112 244 70 394 128 540 76 720 92"/></g>
                 <path class="ritlijn" d="M78 145c88-92 176 48 268-20 80-60 146-65 294-72"/>
@@ -154,22 +144,22 @@
           <div class="taxirechts">
             <section class="voertuigen" aria-labelledby="voertuigTitel">
               <h2 id="voertuigTitel" class="sr-only">Kies uw voertuig</h2>
-              <button class="voertuig actief" type="button" data-voertuig="limousine" data-label="EXECUTIVE" data-prijs="68" aria-pressed="true">
+              <button class="voertuig actief" type="button" data-voertuig="limousine" data-label="EXECUTIVE" aria-pressed="true" disabled>
                 <svg viewBox="0 0 160 48" aria-hidden="true"><path d="M9 32h8l8-14h75l20 5 22 9v6H9zM38 18l15-9h42l18 9M43 18h58"/><circle cx="38" cy="37" r="8"/><circle cx="119" cy="37" r="8"/></svg>
-                <span><b>EXECUTIVE</b><small>5 min · 4 personen</small></span><strong><small>INDICATIE</small>€68</strong>
+                <span><b>EXECUTIVE</b><small>4 personen</small></span><strong><small>LIVE AANBOD</small></strong>
               </button>
-              <button class="voertuig" type="button" data-voertuig="taxi" data-label="COMFORT" data-prijs="42" aria-pressed="false">
+              <button class="voertuig" type="button" data-voertuig="taxi" data-label="COMFORT" aria-pressed="false" disabled>
                 <svg viewBox="0 0 160 48" aria-hidden="true"><path d="M9 32h8l8-14h75l20 5 22 9v6H9zM38 18l15-9h42l18 9M43 18h58"/><circle cx="38" cy="37" r="8"/><circle cx="119" cy="37" r="8"/></svg>
-                <span><b>COMFORT</b><small>7 min · 4 personen</small></span><strong><small>INDICATIE</small>€42</strong>
+                <span><b>COMFORT</b><small>4 personen</small></span><strong><small>LIVE AANBOD</small></strong>
               </button>
-              <button class="voertuig" type="button" data-voertuig="taxibus" data-label="VAN" data-prijs="84" aria-pressed="false">
+              <button class="voertuig" type="button" data-voertuig="taxibus" data-label="VAN" aria-pressed="false" disabled>
                 <svg viewBox="0 0 160 48" aria-hidden="true"><path d="M10 10h102l30 18v10H10zM112 10v18h30M26 10v18h86"/><circle cx="38" cy="37" r="8"/><circle cx="119" cy="37" r="8"/></svg>
-                <span><b>VAN</b><small>9 min · 7 personen</small></span><strong><small>INDICATIE</small>€84</strong>
+                <span><b>VAN</b><small>7 personen</small></span><strong><small>LIVE AANBOD</small></strong>
               </button>
             </section>
 
             <div class="vertrouwen"><span><svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z"/><path d="m9 12 2 2 4-5"/></svg>RTG-chauffeur gescreend</span><span>Prijs staat vast na aanvraag</span></div>
-            <button class="actieknop boekknop" type="submit" form="taxiForm" id="boekRit"><span>VRAAG EXECUTIVE AAN · ± €68</span><b aria-hidden="true">→</b></button>
+            <button class="actieknop boekknop" type="submit" form="taxiForm" id="boekRit"><span>VRAAG EXECUTIVE AAN · PRIJS VOLGT</span><b aria-hidden="true">→</b></button>
             <p class="annuleren">Kosteloos annuleren tot vertrek chauffeur</p>
 
             <section class="lopendeRit" id="lopendeRit" hidden aria-live="polite"></section>
@@ -189,7 +179,7 @@
           <p class="chatregel assistent">Waar kan ik bij helpen?</p>
         </div>
         <div class="snelvragen" aria-label="Snelle vragen">
-          <button type="button" data-vraag="Boek een taxi naar Schiphol">Taxi naar Schiphol</button>
+          <button type="button" data-vraag="Help mij een taxi naar de luchthaven aanvragen">Taxi naar luchthaven</button>
           <button type="button" data-vraag="Laat mijn volgende reis zien">Volgende reis</button>
           <button type="button" data-vraag="Welke actie staat nog open?">Open acties</button>
         </div>
@@ -253,7 +243,27 @@
      tijdlijn. De performance-interface verandert de bediening, niet de waarheid. -->
 <script src="/shared/canvas.js"></script>
 <script src="/shared/canvas-taal.js"></script>
+<script src="/shared/rtg-edge-worlds.js"></script>
+<script src="/shared/rtg-edge-icons.js"></script>
+<script src="/shared/rtg-edge-library.js"></script>
+<script src="/shared/rtg-edge-system.js"></script>
 <script>
+if (new URLSearchParams(location.search).get('embed') === '1') {
+  document.body.classList.add('rtg-edge-embed');
+} else {
+  RTGEdge.start({
+    world: 'travel',
+    context: { scope: 'REIZEN', title: 'Vandaag', tool: 'vandaag', actie: 'Open reis' },
+    onAction: () => document.querySelector('.appblad:not([hidden]) .actieknop:not([disabled])')?.click()
+  });
+  document.addEventListener('click', e => {
+    const tab = e.target.closest('[data-tab]');
+    if (!tab) return;
+    const namen = { vandaag: 'Vandaag', reizen: 'Uw reizen', taxi: 'Taxi', rahul: 'Rahul' };
+    RTGEdge.setContext({ scope: 'REIZEN', title: namen[tab.dataset.tab] || 'Travel OS',
+      tool: tab.dataset.tab === 'taxi' ? 'rit' : 'vandaag', actie: tab.dataset.tab === 'taxi' ? 'Vraag rit aan' : 'Open reis' });
+  });
+}
 /* Deze adapter staat bewust in het scherm: test/canvas.test.js bewaakt dat elke
    wereld dezelfde gemeten stand en tijdlijn gebruikt. De rest van de interactie
    staat in reizen-performance.js. */

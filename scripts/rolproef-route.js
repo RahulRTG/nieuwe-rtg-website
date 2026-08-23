@@ -89,7 +89,7 @@ async function wacht(basis, ms) {
        nooit heeft aangeraakt. De demo-vlag mint alleen de TOKENS -- de routes die
        daarna worden beproefd zijn de echte, met hun echte bewakers ervoor. */
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
+      RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
   });
 
   const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };

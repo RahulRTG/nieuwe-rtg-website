@@ -272,7 +272,7 @@ function boot() {
        terwijl het rapport anders suggereerde. De personas en demozaken zijn de
        meetinstrumenten van deze beproeving; zonder hen meet ze niets. */
     const env = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
-      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
+      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_MAGNAAT_TEST: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
       NODE_OPTIONS: '--max-old-space-size=8192' };
     if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
     child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'],

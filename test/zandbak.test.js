@@ -94,7 +94,7 @@ test('een lege zandbak zegt dat hij leeg is', () => {
   const z = maakZandbak({ db, save: () => {}, crypto, zaai: () => ({}), register: REGISTER, catalogus: RECEPT });
   const k = z.maak('leeg', { door: 'ik' }).zandbak;
   assert.equal(k.objecten, 0);
-  assert.match(k.let, /RTG_DEMO/);
+  assert.match(k.let, /Magnaat-testomgeving/);
 });
 
 test('een verlopen zandbak wordt opgeruimd', () => {

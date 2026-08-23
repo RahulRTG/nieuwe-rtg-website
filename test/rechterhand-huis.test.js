@@ -44,7 +44,15 @@ const raw = (pad, body, token) => fetch(base + '/api/' + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const rh = (pad, body) => raw('member/rechterhand/' + pad, body, lid);
 
-const dag = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+/* De Rechterhand rekent in de lokale kalender van de server. Een UTC-datum
+   schuift in het uur rond middernacht al naar morgen en maakt negen dagen
+   daardoor acht. Werk op het lokale middaguur, ook over een DST-grens. */
+const dag = (n) => {
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + n);
+  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
+};
 const dagmaand = (n) => dag(n).slice(5);
 
 test.before(async () => {

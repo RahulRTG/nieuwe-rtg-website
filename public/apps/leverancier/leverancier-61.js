@@ -57,12 +57,11 @@
       navigator.geolocation.getCurrentPosition(async pos => {
         try { await API.call('/supplier/location', { lat: pos.coords.latitude, lng: pos.coords.longitude, label: 'Live positie' }); toast(T('sup.locshared','Live locatie gedeeld met gasten.')); await refresh(); }
         catch(e){ toast(e.message); }
-      }, () => demoShare(), { timeout: 4000 });
-    } else demoShare();
+      }, () => locatieGeweigerd(), { timeout: 4000 });
+    } else locatieGeweigerd();
   }
-  async function demoShare(){
-    try { await API.call('/supplier/location', { lat: S.loc.lat, lng: S.loc.lng, label: S.loc.label }); toast(T('sup.locshareddemo','Locatie gedeeld (demo-positie).')); }
-    catch(e){ toast(e.message); }
+  function locatieGeweigerd(){
+    toast(T('sup.locnotshared','Locatie niet gedeeld. Geef locatietoegang om uw werkelijke positie te delen.'));
   }
 
   // ---- kassa, per sector ----

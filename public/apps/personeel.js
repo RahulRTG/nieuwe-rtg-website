@@ -363,7 +363,7 @@
      partners worden na de eerste geldige roster-opvraag aan de lokale
      schermcatalogus toegevoegd; de server blijft de enige bron van waarheid. */
   const DEMO_BEDRIJVEN = new Set(Object.keys(BEDRIJVEN));
-  let demoOmgeving = location.protocol === 'file:';
+  let demoOmgeving = false;
   const geldigeBedrijfscode = c => /^[A-Z0-9_-]{2,32}$/.test(String(c || '').toUpperCase());
 
   async function laadOmgeving() {
@@ -371,7 +371,7 @@
     try {
       const r = await fetch('/api/health');
       const h = r.ok ? await r.json() : null;
-      demoOmgeving = !!(h && h.demo);
+      demoOmgeving = !!(h && h.omgeving === 'magnaat-test' && h.testomgeving === true);
     } catch (e) { demoOmgeving = false; }
   }
 
@@ -496,7 +496,7 @@
     $('#gateStep').innerHTML = '<button class="gback" id="gb3">← '+T('pd.back','Terug')+'</button>'+
       '<div style="margin-top:0.4rem;font-size:0.9rem;"><b>'+esc(nm)+'</b> · '+BEDRIJVEN[c].name+'</div>'+
       '<div class="pinrow"><input id="pinInp" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"><button id="pinGo">'+T('pd.login','Inloggen')+'</button></div>'+
-      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Demo: manager 1234, medewerker 5678.')+'</div>' : '');
+      (demoOmgeving && DEMO_BEDRIJVEN.has(c) ? '<div class="pd-demo-hint">'+T('pd.pinhint','Magnaat Test: manager 1234, medewerker 5678.')+'</div>' : '');
     $('#gb3').addEventListener('click', () => stepWie(secId, c));
     // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
     // opnieuw proberen; de server vergelijkt en bewaart er niets van

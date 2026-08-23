@@ -81,8 +81,8 @@
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
-        if (!explicieteDemo){
-          toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        if (!magnaatProef){
+          toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
         }
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
@@ -96,10 +96,10 @@
           API.token = data.token;
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
-      } else if (explicieteDemo) {
+      } else if (magnaatProef) {
         user = {...PERSONAS[tier]};
       } else {
-        toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
       }
     }
     if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;

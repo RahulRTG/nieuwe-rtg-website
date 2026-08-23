@@ -27,3 +27,24 @@
    hand met tremor niet te raken. Alleen de maat gaat omhoog; de tekst, de
    kleur en de dichtheid blijven precies zoals ze waren. */
 .lo-panel>header button{min-height:24px;display:inline-flex;align-items:center;}
+
+/* Living OS toont alleen serverdata. De oude replay-klok was een vast
+   voorbeeld en is daarom bewust uitgeschakeld. */
+.lo-replay .lo-top:after{content:none}
+.lo-policy-row{display:flex;justify-content:space-between;gap:10px;margin:0;padding:9px 0;border-top:1px solid var(--line);font-size:8px}
+.lo-policy-row span{color:#918a83;text-align:right}
+#loMandates>p{display:grid;grid-template-columns:27px 1fr auto;align-items:center;gap:8px;margin:0;padding:9px 0;border-top:1px solid var(--line)}
+#loMandates>p>i{width:25px;height:25px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:8px}
+#loMandates>p span{display:flex;flex-direction:column}#loMandates>p b{font-size:8px}#loMandates>p small{font-size:7px;color:#817b75}#loMandates>p em{font-style:normal;font-size:6px;color:#72bd94}
+@media (min-width:761px) and (max-width:1050px){
+  body[data-lo-view="intent"] .lo-intent{display:block}
+  body[data-lo-view="intent"] .lo-decisions{display:none}
+}
+@media(max-width:760px){
+  .lo-panel{display:none!important}
+  body[data-lo-view="intent"] .lo-intent,
+  body[data-lo-view="universe"] .lo-worlds,
+  body[data-lo-view="worlds"] .lo-worlds,
+  body[data-lo-view="decisions"] .lo-decisions,
+  body[data-lo-view="evidence"] .lo-decisions{display:block!important}
+}

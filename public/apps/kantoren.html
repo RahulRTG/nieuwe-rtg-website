@@ -3187,7 +3187,7 @@ function stadRenderNodes(){
   $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online · ' + STADWERK + ' klus(sen) open op de veld-lijst</div>' + rij.map(n =>
     '<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;' + bkLijn + '">' +
     '<span style="width:.6rem;height:.6rem;border-radius:50%;background:' + (n.online ? 'var(--gold)' : 'var(--soft)') + ';"></span>' +
-    '<span style="flex:1;min-width:13rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +
+    '<span style="flex:1;min-width:13rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">Magnaat Test</span>' : '') +
       '<br><span style="font-size:.75rem;color:var(--soft);">' + esc(n.serial) + ' · ' + n.sensoren.map(esc).join(', ') + '</span></span>' +
     '<button class="knop stil" data-doosstop="' + n.serial + '" style="font-size:.75rem;">Uit dienst</button></div>').join('');
   $('#stadNodes').querySelectorAll('[data-doosstop]').forEach(b => b.addEventListener('click', async () => {

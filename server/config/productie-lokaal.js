@@ -5,6 +5,8 @@ function keurLokaleBouwstanden(env, fouten, waarschuwingen) {
   const priveBeta = env.RTG_PRIVATE_BETA === '1';
   if (env.RTG_DEMO === '1')
     fouten.push('RTG_DEMO=1 in productie: de demo-inlog zou openstaan. Zet hem uit.');
+  if (env.RTG_MAGNAAT_TEST === '1')
+    fouten.push('RTG_MAGNAAT_TEST=1 in productie: Magnaat Test hoort op een afzonderlijke testinstallatie. Zet hem uit.');
 
   for (const naam of ['SMTP_SANDBOX', 'SMS_SANDBOX', 'STRIPE_CONNECT_SANDBOX', 'SEPA_SANDBOX']) {
     if (env[naam] === '1')
@@ -23,7 +25,7 @@ function keurLokaleBouwstanden(env, fouten, waarschuwingen) {
     if (!lokaal)
       fouten.push('RTG_PRIVATE_BETA=1 mag alleen met een lokaal APP_URL (localhost, .local of een privaat netwerkadres). Een private beta mag nooit per ongeluk publiek staan.');
     else
-      waarschuwingen.push('RTG_PRIVATE_BETA=1: alleen lokaal bouwen; mail blijft in de outbox en demo-betalingen zijn geen echte betalingen. Verwijder deze vlag voor publieke livegang.');
+      waarschuwingen.push('RTG_PRIVATE_BETA=1: alleen lokaal bouwen; mail blijft in de outbox. Betalen is echt gekoppeld of fail-closed uit. Verwijder deze vlag voor publieke livegang.');
   }
   return priveBeta;
 }

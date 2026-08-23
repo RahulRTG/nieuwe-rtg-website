@@ -36,6 +36,7 @@ module.exports = (kern) => {
      `loopt`/`norm` zeggen wat er al mis is, `startOm`/`baan` zeggen wat er nu
      moet gebeuren. Zie kern/horeca/cadans.js en HORECA.md. */
   const cadanslaag = require('../../../kern/horeca/cadans');
+  const stappenlaag = require('../../../kern/horeca/stappen');
   /* De stoel hoort op de bon. Een gang komt samen de deur uit (punt 3
      hieronder), maar bij de tafel moet elk bord bij de juiste persoon staan --
      en dan is "gastNr 3" een nummer waar een runner niets aan heeft. De naam
@@ -83,8 +84,22 @@ module.exports = (kern) => {
            allergie gaat eerst langs een medewerker" is anders alleen een
            melding op een scherm en geen grendel. */
         if (regel.bevestiging === 'wacht') continue;
-        if (station && String(regel.station || 'warm') !== station) continue;
-        rijen.push(bord(h, rek, regel));
+        /* WELK STATION ZIET DIT GERECHT. Met bereidingsstappen is dat elk
+           station dat eraan werkt en niet alleen dat van de regel -- een
+           tournedos met een grill-stap die op het warme bord staat, is precies
+           de fout die de stappen moesten oplossen. Zonder stappen verandert er
+           niets (kern/horeca/stappen.js). */
+        const mijne = stappenlaag.stationsVanRegel(h, regel);
+        if (station && !mijne.includes(String(station).toLowerCase())) continue;
+        const rij = bord(h, rek, regel);
+        /* WIE MAG DE STAND ZETTEN: het LAATSTE station, want daar verlaat het
+           gerecht de keuken richting de pas. Zou de grill "klaar" mogen melden
+           terwijl de saus nog moet, dan staat er een bord bij de pas dat niet af
+           is. Elk ander station ziet zijn eigen stap en kijkt verder mee. */
+        rij.eigenaarStation = stappenlaag.eigenaarStation(h, regel);
+        rij.magZetten = !station || String(station).toLowerCase() === rij.eigenaarStation;
+        rij.mijnStap = station ? stappenlaag.stapVoorStation(h, regel, station) : null;
+        rijen.push(rij);
       }
     }
     /* De cadans erbij, per regel. Additief: geen bestaand veld verandert, dus
@@ -108,8 +123,16 @@ module.exports = (kern) => {
     rijen.sort((a, b) =>
       (a.startOm && b.startOm ? Date.parse(a.startOm) - Date.parse(b.startOm) : 0) ||
       String(a.serveerOm || '~').localeCompare(String(b.serveerOm || '~')) || b.loopt - a.loopt);
+    /* `perStation` telt op WELKE BORDEN een gerecht staat, en dat is met
+       stappen meer dan een. Op het station van de REGEL tellen zou hier het
+       verkeerde getal geven: de grill ziet dan nul terwijl er acht minuten
+       grillwerk op zijn bord staat. */
     const stations = {};
-    for (const r of rijen) stations[r.station] = (stations[r.station] || 0) + 1;
+    for (const r of rijen) {
+      for (const st of stappenlaag.stationsVanRegel(h, { naam: r.naam, station: r.station })) {
+        stations[st] = (stations[st] || 0) + 1;
+      }
+    }
     res.json({ ok: true, station: station || 'alle', aantal: rijen.length, bonnen: rijen.slice(0, 200),
       perStation: stations, teLaat: rijen.filter(r => r.urgentie === 'te laat').length,
       banen: cadanslaag.banen(rijen), standen: REGELSTANDEN });

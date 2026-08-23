@@ -92,4 +92,75 @@ function stationsVan(stappen) {
   return uit;
 }
 
-module.exports = { stappenVan, zetStappen, stationsVan, schoneLijst, MAXSTAPPEN, MAXMIN };
+/* ---------- WELK STATION ZIET DIT GERECHT ----------
+
+   Een gerecht met stappen hoort op het bord van ELK station dat eraan werkt, en
+   niet alleen op dat van de regel. Een tournedos met een grill-stap die op het
+   warme bord staat, is precies de fout die de stappen moesten oplossen: de
+   grill weet niet dat hij hem moet aanzetten.
+
+   Zonder stappen blijft het wat het was: één station, dat van de regel. */
+function stationsVanRegel(h, regel) {
+  const stappen = stappenVan(h, regel.naam);
+  if (stappen) return stationsVan(stappen);
+  return [String(regel.station || 'warm').toLowerCase()];
+}
+
+/* WIE MAG DE STAND ZETTEN. Het LAATSTE station, want daar verlaat het gerecht
+   de keuken richting de pas.
+
+   Dit is geen detail maar de reden dat een gerecht op meer borden mag staan.
+   Zou elk station de stand mogen zetten, dan meldt de grill "klaar" terwijl de
+   saus nog moet -- en dan staat er een bord bij de pas dat niet af is. Elk
+   ander station ziet zijn eigen stap en kijkt verder mee; zetten doet de
+   laatste. */
+function eigenaarStation(h, regel) {
+  const stappen = stappenVan(h, regel.naam);
+  if (stappen && stappen.length) return stappen[stappen.length - 1].station;
+  return String(regel.station || 'warm').toLowerCase();
+}
+
+/* De stap van EEN station, met wat ervoor en erna komt. Een kok die alleen zijn
+   eigen stap ziet, weet niet of hij begint of afmaakt -- en dat verandert wat
+   hij doet met een bord dat te vroeg klaar is.
+
+   Er staat NIET bij welke stap "nu loopt". Stappen worden niet afgevinkt (zie
+   de kop van dit bestand): dat zou een tweede orderstaat zijn naast de stand
+   van de regel. Wat er staat is het plan, en de kok ziet zelf waar hij is. */
+function stapVoorStation(h, regel, station) {
+  const stappen = stappenVan(h, regel.naam);
+  if (!stappen) return null;
+  const st = String(station || '').toLowerCase();
+  const i = stappen.findIndex((x) => x.station === st);
+  if (i < 0) return null;
+  return {
+    stap: stappen[i], nummer: i + 1, totaal: stappen.length,
+    vorige: i > 0 ? stappen[i - 1].station : null,
+    volgende: i < stappen.length - 1 ? stappen[i + 1].station : null,
+    laatste: i === stappen.length - 1
+  };
+}
+
+/* DE BELASTING PER STATION. Met stappen tellen de minuten van een stap bij het
+   station van die STAP -- de grill draagt acht minuten van een tournedos en
+   niet veertien. Zonder stappen valt alles op het station van de regel, precies
+   zoals het was.
+
+   `valMinuten` is de norm voor een gerecht zonder stappen. Die komt van buiten
+   omdat bereidingsMinuten() in keukenlaag.js woont en dat bestand DIT bestand
+   al gebruikt; andersom zou een kringetje zijn. */
+function minutenPerStation(h, regel, valMinuten) {
+  const stappen = stappenVan(h, regel.naam);
+  const aantal = Math.max(1, parseInt(regel.aantal, 10) || 1);
+  const uit = {};
+  if (stappen) {
+    for (const s of stappen) uit[s.station] = (uit[s.station] || 0) + s.minuten * aantal;
+    return uit;
+  }
+  const st = String(regel.station || 'warm').toLowerCase();
+  uit[st] = Math.max(0, Number(valMinuten) || 0) * aantal;
+  return uit;
+}
+
+module.exports = { stappenVan, zetStappen, stationsVan, stationsVanRegel, eigenaarStation,
+  stapVoorStation, minutenPerStation, schoneLijst, MAXSTAPPEN, MAXMIN };

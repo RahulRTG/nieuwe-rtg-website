@@ -166,6 +166,34 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       [...document.querySelectorAll('.bon .stappen li')].map(li => li.textContent.replace(/\s+/g, ' ')));
     assert.ok(stapTijden.length >= 3, 'de stappen staan als eigen lijst: ' + JSON.stringify(stapTijden));
     assert.ok(stapTijden.every(t => /\d\d:\d\d/.test(t)), 'elk met een aanzettijd: ' + JSON.stringify(stapTijden));
+
+    /* EEN STAP STUURT HET STATIONSBORD. Op het bord van de GRILL staat het
+       gerecht met de grill-stap groot, en de statusknoppen staan er NIET -- het
+       warme station maakt af en meldt klaar. Zou de grill dat mogen, dan staat
+       er een bord bij de pas dat niet af is. */
+    await page.fill('#kStation', 'grill');
+    await page.click('#kToon');
+    await page.waitForTimeout(700);
+    const grill = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
+    assert.match(grill, /Tournedos/, 'de tournedos staat op het bord van de grill');
+    assert.match(grill, /grillen/, 'met de eigen stap van dit station');
+    assert.match(grill, /stap 2 van 3/, 'en waar die stap in de rij staat');
+    assert.match(grill, /komt van koud/, 'met wat ervoor komt');
+    assert.match(grill, /gaat naar warm/, 'en wat erna');
+    assert.match(grill, /warm maakt af en meldt klaar/i, 'en wie hem afmaakt');
+    assert.equal(await page.evaluate(() =>
+      !!document.querySelector('.bon [data-stand]')), false,
+      'de grill heeft geen statusknoppen: die horen bij het laatste station');
+
+    await page.fill('#kStation', 'warm');
+    await page.click('#kToon');
+    await page.waitForTimeout(700);
+    assert.equal(await page.evaluate(() =>
+      !!document.querySelector('.bon [data-stand]')), true,
+      'het laatste station heeft ze wel');
+    await page.fill('#kStation', '');
+    await page.click('#kToon');
+    await page.waitForTimeout(500);
     assert.match(keuken, /Bij het raam/, 'en de stoel staat op de bon, zodat de runner weet waar het bord heen gaat');
     assert.match(keuken, /aanzetten \d\d:\d\d/, 'de cadans zegt wanneer het aan moet, niet alleen hoe lang het loopt');
 

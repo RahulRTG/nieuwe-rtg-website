@@ -56,6 +56,16 @@
          is drie handelingen op drie plekken -- en dan hoort de grill een ander
          moment te horen dan de sauzier. Zonder stappen staat hier niets, en dan
          is dit bord precies wat het altijd was (kern/horeca/stappen.js). */
+      /* MIJN STAP, als dit bord van een station is. De kok ziet zijn eigen
+         handeling groot, en daaronder het hele plan klein -- want wie alleen
+         zijn eigen stap ziet, weet niet of hij begint of afmaakt, en dat
+         verandert wat hij doet met een bord dat te vroeg klaar is. */
+      (b.mijnStap
+        ? '<div class="mijnstap"><b>' + esc(b.mijnStap.stap.wat || 'uw stap') + '</b> · ' +
+          b.mijnStap.stap.minuten + ' min · stap ' + b.mijnStap.nummer + ' van ' + b.mijnStap.totaal +
+          (b.mijnStap.vorige ? ' · komt van ' + esc(b.mijnStap.vorige) : ' · u begint') +
+          (b.mijnStap.volgende ? ' · gaat naar ' + esc(b.mijnStap.volgende) : ' · u maakt af') +
+          '</div>' : '') +
       (b.stappen && b.stappen.length
         ? '<ol class="stappen">' + b.stappen.map(function (st) {
             return '<li><span class="tag">' + esc(st.station) + '</span> ' +
@@ -63,10 +73,16 @@
               ' <span class="stil">' + esc(klokje(st.startOm)) + ' · ' + st.minuten + ' min</span></li>';
           }).join('') + '</ol>' : '') +
       (b.cadans ? '<div class="stil som">' + esc(b.cadans) + '</div>' : '') +
-      '<div class="rij">' + ['gestart', 'bereid', 'klaar', 'uitgegeven'].map(function (s) {
-        return '<button class="knop' + (b.stand === s ? ' p' : '') + '" data-stand="' + s +
-          '" data-rek="' + esc(b.rekeningId) + '" data-regel="' + esc(b.regelId) + '">' + s + '</button>';
-      }).join('') + '</div>';
+      /* ALLEEN HET LAATSTE STATION ZET DE STAND. Zou de grill "klaar" mogen
+         melden terwijl de saus nog moet, dan staat er een bord bij de pas dat
+         niet af is. De knoppen staan er dus niet; in plaats daarvan staat er
+         WIE het afmaakt, zodat het geen stilte is maar een antwoord. */
+      (b.magZetten === false
+        ? '<div class="stil som">' + esc(b.eigenaarStation) + ' maakt af en meldt klaar.</div>'
+        : '<div class="rij">' + ['gestart', 'bereid', 'klaar', 'uitgegeven'].map(function (s) {
+            return '<button class="knop' + (b.stand === s ? ' p' : '') + '" data-stand="' + s +
+              '" data-rek="' + esc(b.rekeningId) + '" data-regel="' + esc(b.regelId) + '">' + s + '</button>';
+          }).join('') + '</div>');
   }
 
   window.RTGHorecaKeukenBon = { inhoud: inhoud, klokje: klokje, BAANWOORD: BAANWOORD };

@@ -15,7 +15,7 @@
    dat is de enige reden dat iemand een wachttijd gelooft. */
 'use strict';
 
-const { stappenVan } = require('./stappen');
+const { stappenVan, minutenPerStation } = require('./stappen');
 
 // hoe lang een gerecht normaal duurt zonder eigen opgave van de zaak
 const STANDAARD = { koud: 6, warm: 14, grill: 12, frituur: 8, pizza: 9, sushi: 10,
@@ -50,8 +50,14 @@ function openWerk(h, kokken) {
     if (rek.status !== 'open') continue;
     for (const regel of (rek.regels || [])) {
       if (regel.stand === 'klaar' || regel.stand === 'uitgegeven') continue;
-      const st = String(regel.station || 'warm');
-      perStation[st] = (perStation[st] || 0) + bereidingsMinuten(h, regel) * regel.aantal;
+      /* DE MINUTEN VAN EEN STAP TELLEN BIJ HET STATION VAN DIE STAP. De grill
+         draagt acht minuten van een tournedos en niet veertien; het warme
+         station draagt de drie van de saus. Zonder stappen valt alles op het
+         station van de regel, precies zoals het was. Zie
+         kern/horeca/stappen.js voor waarom die verdeling daar woont. */
+      for (const [st, min] of Object.entries(minutenPerStation(h, regel, bereidingsMinuten(h, regel)))) {
+        perStation[st] = (perStation[st] || 0) + min;
+      }
       regels++;
     }
   }

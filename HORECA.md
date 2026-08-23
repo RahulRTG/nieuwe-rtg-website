@@ -405,9 +405,24 @@ Ze staan als genummerde lijst op de keukenbon, met station en tijd
 (`test/horeca-stappen.test.js`, en de browsertoets kijkt of ze het scherm halen —
 een rekensom die niemand ziet, is geen functie).
 
-**Wat hier nog niet in zit:** een stap stuurt nog geen stationsbord. Een gerecht
-met een grill-stap staat op het bord van het station van de RÉGEL, niet op dat
-van de stap. Dat is de volgende snede, en hij raakt `/keuken/bord`.
+**En sinds dezelfde dag stuurt een stap ook het stationsbord.** Een gerecht staat
+op het bord van **elk** station dat eraan werkt — een tournedos met een grill-stap
+die alleen op het warme bord stond, was precies de fout die de stappen moesten
+oplossen: de grill wist niet dat hij hem moest aanzetten. Elk station ziet daarbij
+**zijn eigen stap** (wat, hoeveel minuten, de hoeveelste van hoeveel, waar het
+vandaan komt en waar het heen gaat), en de belasting van een station is de som
+van zijn eigen stap-minuten — de grill draagt acht minuten van een tournedos en
+niet veertien.
+
+Eén regel maakt dat veilig: **alleen het laatste station zet de stand.** Daar
+verlaat het gerecht de keuken richting de pas. Zou de grill "klaar" mogen melden
+terwijl de saus nog moet, dan staat er een bord bij de pas dat niet af is. De
+andere stations zien geen knoppen maar wél wie het afmaakt — geen stilte, maar
+een antwoord.
+
+Er staat nergens welke stap *nu loopt*. Stappen worden niet afgevinkt: dat zou
+een tweede orderstaat zijn naast de stand van de regel. Wat er staat is het plan;
+de kok ziet zelf waar hij is.
 
 Twee bestanden gingen bij deze plak over de 10 kB-grens en zijn geknipt op een
 echte naad, niet op een regelnummer: `cadans-doel.js` (de pure rekensom: wanneer
@@ -596,14 +611,6 @@ meting naast staat, en tot die tijd is het een plan.
 
 Vier dingen, elk met de reden waarom het een eigen snede is en niet een restje
 van iets hierboven.
-
-**Een stap stuurt nog geen stationsbord.** Een gerecht met een grill-stap staat
-op het bord van het station van de RÉGEL, niet op dat van de stap. De cadans
-weet het al (elke stap draagt zijn station en zijn aanzetmoment); `/keuken/bord`
-filtert nog op `regel.station`. Dat is niet één regel code: zodra een gerecht op
-twee borden kan staan, moet er ook bepaald worden wie hem doorzet en wanneer hij
-van het ene bord verdwijnt. Een half doorgevoerde versie is erger dan geen,
-want dan telt hetzelfde werk twee keer.
 
 **Venue Edge voor de zaal, de bar en de PDA.** De kassa heeft zijn offline-rij
 (punt 5a), maar daar is een handeling ook echt één verzoek. Een rekening leeft

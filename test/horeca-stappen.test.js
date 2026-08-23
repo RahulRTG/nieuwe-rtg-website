@@ -142,3 +142,72 @@ test('6. stappen vastleggen is manager-werk', async () => {
   assert.equal(nog.status, 200, 'lezen mag wel: een kok hoort te zien wat er staat');
   assert.equal(nog.body.stappen.length, 2, 'en er is niets veranderd');
 });
+
+/* ---------- Een stap stuurt het stationsbord ----------
+   Tot 23 augustus 2026 stond een gerecht op het bord van het station van de
+   REGEL. Een tournedos met een grill-stap stond dus op het warme bord, en de
+   grill wist niet dat hij hem moest aanzetten -- precies de fout die de stappen
+   moesten oplossen. */
+
+const stationBord = async (station) => (await M('/keuken/bord', { station })).body;
+
+test('7. een gerecht staat op het bord van ELK station dat eraan werkt', async () => {
+  const b = (await M('/keuken/bord', {})).body;
+  const alles = b.bonnen.find(x => x.naam === 'Tournedos');
+  assert.ok(alles, 'hij staat op het bord van alles');
+
+  for (const st of ['koud', 'grill', 'warm']) {
+    const bord = await stationBord(st);
+    assert.ok(bord.bonnen.find(x => x.naam === 'Tournedos'),
+      'de tournedos staat op het bord van ' + st);
+  }
+  const vreemd = await stationBord('frituur');
+  assert.equal(vreemd.bonnen.find(x => x.naam === 'Tournedos'), undefined,
+    'en niet op een station waar hij niets te zoeken heeft');
+});
+
+test('8. elk station ziet ZIJN stap, met wat ervoor en erna komt', async () => {
+  const grill = (await stationBord('grill')).bonnen.find(x => x.naam === 'Tournedos');
+  assert.ok(grill.mijnStap, 'de grill ziet zijn eigen stap');
+  assert.equal(grill.mijnStap.stap.wat, 'grillen');
+  assert.equal(grill.mijnStap.stap.minuten, 8, 'acht minuten, niet de veertien van het hele gerecht');
+  assert.equal(grill.mijnStap.nummer, 2);
+  assert.equal(grill.mijnStap.totaal, 3);
+  assert.equal(grill.mijnStap.vorige, 'koud', 'hij weet waar het vandaan komt');
+  assert.equal(grill.mijnStap.volgende, 'warm', 'en waar het heen gaat');
+  assert.equal(grill.mijnStap.laatste, false);
+
+  const koud = (await stationBord('koud')).bonnen.find(x => x.naam === 'Tournedos');
+  assert.equal(koud.mijnStap.vorige, null, 'het eerste station begint');
+  assert.equal(koud.mijnStap.stap.minuten, 3);
+});
+
+test('9. alleen het LAATSTE station mag de stand zetten', async () => {
+  /* Zou de grill "klaar" mogen melden terwijl de saus nog moet, dan staat er
+     een bord bij de pas dat niet af is. */
+  const warm = (await stationBord('warm')).bonnen.find(x => x.naam === 'Tournedos');
+  const grill = (await stationBord('grill')).bonnen.find(x => x.naam === 'Tournedos');
+  const koud = (await stationBord('koud')).bonnen.find(x => x.naam === 'Tournedos');
+
+  assert.equal(warm.eigenaarStation, 'warm', 'het laatste station is de eigenaar');
+  assert.equal(warm.magZetten, true);
+  assert.equal(grill.magZetten, false, 'de grill kijkt mee en zet niet');
+  assert.equal(koud.magZetten, false);
+});
+
+test('10. de minuten van een stap tellen bij het station van die stap', async () => {
+  const druk = (await M('/keuken/druk', {})).body;
+  assert.equal(druk.perStation.grill, 8, 'de grill draagt acht minuten van de tournedos');
+  assert.equal(druk.perStation.koud, 3 + 6, 'koud draagt drie van de tournedos plus de gazpacho');
+  assert.equal(druk.perStation.warm, 3, 'en het warme station de drie van de saus');
+  assert.equal(druk.openMinuten, 20, 'de som blijft 14 + 6, alleen anders verdeeld');
+});
+
+test('11. zonder stappen verandert er niets aan de borden', async () => {
+  const koud = (await stationBord('koud')).bonnen.find(x => x.naam === 'Gazpacho');
+  assert.ok(koud, 'de gazpacho staat op het koude bord, want daar staat zijn regel');
+  assert.equal(koud.mijnStap, null, 'zonder stappen is er geen eigen stap');
+  assert.equal(koud.magZetten, true, 'en het station van de regel mag gewoon zetten');
+  const grill = (await stationBord('grill')).bonnen.find(x => x.naam === 'Gazpacho');
+  assert.equal(grill, undefined, 'en hij staat nergens anders');
+});

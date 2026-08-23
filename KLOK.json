@@ -2,9 +2,9 @@
   "uitleg": "Directe tijdsaanroepen (new Date() / Date.now() zonder argument) in server/. MAG ALLEEN KRIMPEN -- zie test/klok.test.js. Wie de tijd aan het OS vraagt, doet niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd of een verlopen mandaat.",
   "hoe": "node scripts/klok.js --top",
   "gemeten": {
-    "totaal": 1284,
-    "bestanden": 655,
-    "modulesOpDeKlok": 36
+    "totaal": 1289,
+    "bestanden": 662,
+    "modulesOpDeKlok": 51
   },
   "vrijgesteld": [
     {
@@ -18,6 +18,14 @@
     {
       "bestand": "server/routelog.js",
       "reden": "meetgereedschap; een journaal met een verzette tijdstempel is onbruikbaar"
+    }
+  ],
+  "correcties": [
+    {
+      "datum": "2026-08-23",
+      "van": 1284,
+      "naar": 1289,
+      "reden": "De teller kon een deel van de code niet zien. Hij maskeerde commentaar en tekenreeksen met een eigen scanner, en die kent geen REGEX-LITERALS. In server/foundation/buddy.js:16 staat .replace(/^Je bent \"[^\"]+\"/, ...): de aanhalingstekens binnen die regex openden voor het masker een tekenreeks die pas 55 regels verderop sloot. Alles daartussen was onzichtbaar, inclusief de Date.now() op regel 43. Idem in server/kern/concern/voorstel.js en server/meting.js.\n\nDat is geen verslechtering van de code maar een liegende meter (LAT-regel 10): in die 55 regels had iemand er ongemerkt tien bij kunnen zetten zonder dat de ratel bewoog. Sinds vandaag telt scripts/klok.js via scripts/lib/staatscan.js, die de eigen parser uit scripts/ast/ gebruikt; een parser hoeft niet te raden waar een tekenreeks ophoudt. process.hrtime() en performance.now() tellen er nu ook bij -- evengoed kloklezingen, en het masker zag ze helemaal niet (er staan er op dit moment nul).\n\nDe vijf stonden er dus al. Het getal is niet gestegen, het zicht is gestegen."
     }
   ]
 }

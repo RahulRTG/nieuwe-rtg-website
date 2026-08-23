@@ -645,16 +645,6 @@ const IJKINGEN = {
         finally { fs.writeFileSync(regPad, oud); }
       })
   },
-  klokDirect: {
-    /* Drie kloklezingen erbij, en een new Date(x) die NIET mee hoort te tellen.
-       Zonder die vierde regel zou de proef ook slagen als de meter elke
-       Date-constructie telde, en dan meet hij 1788 in plaats van 1297. */
-    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
-      'const a = new Date();\nconst b = Date.now();\nconst c = new Date();\n' +
-      'const d = new Date("2026-01-01");\nmodule.exports = { a, b, c, d };\n',
-      () => meet({ alleen: ['klokDirect'] }).klokDirect - voor.klokDirect)
-  },
-
   metersOngeijkt: {
     /* De meter die de ongeijkte meters telt, moet zelf uitslaan -- anders
        bewaakt een ongeijkte meter het ijken. Hij krijgt twee verzonnen

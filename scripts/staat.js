@@ -22,6 +22,11 @@
      - een wortel op `onbekend` telt mee in staatOnbekend, en die meter mag
        alleen omlaag
 
+   DE KLOKSCHULD HOORT HIER NIET. Die staat in KLOK.json en wordt door
+   scripts/klok.js bewaakt -- sinds vandaag met dezelfde scanner als hieronder,
+   maar met een eigen vrijstellingslijst. Het getal in dit overzicht is context,
+   geen tweede ratel; twee ratels op een schuld lopen uiteen (LAT-regel 4).
+
    Zo kan er geen nieuwe onbekende toestand bijkomen zonder dat iemand er een
    besluit over neemt, en wordt het gat kleiner in plaats van vergeten.
 
@@ -150,9 +155,14 @@ if (require.main === module) {
     console.log('    ' + k.padEnd(20) + String(perKlasse[k]).padStart(6) + merk);
   }
   console.log('');
-  console.log('  directe kloklezingen    ' + String(uitslag.klokLezingen).padStart(6) +
-    '   (new Date() ' + uitslag.klok.datumLezing + ', Date.now ' + uitslag.klok.dateNow +
-    ', hrtime ' + uitslag.klok.hrtime + ', performance ' + uitslag.klok.perf + ')');
+  /* De klokschuld staat hier ALS CONTEXT en niet als tweede ratel: KLOK.json is
+     daar de eigenaar van, en scripts/klok.js telt hem met dezelfde scanner. Het
+     getal hier is de RUWE stand (zonder de drie vrijgestelde bestanden), dus het
+     mag een paar hoger zijn dan wat KLOK.json noemt. Wie hem wil bewaken draait
+     `node scripts/klok.js`. */
+  console.log('  kloklezingen (ruw)      ' + String(uitslag.klokLezingen).padStart(6) +
+    '   new Date() ' + uitslag.klok.datumLezing + ', Date.now ' + uitslag.klok.dateNow +
+    '  -- de ratel staat in KLOK.json');
   console.log('  new Date(x) constructie ' + String(uitslag.klok.datumBouw).padStart(6) + '   (leest de klok NIET)');
   console.log('  Math.random             ' + String(uitslag.willekeur.math).padStart(6));
   console.log('  crypto-willekeur        ' + String(uitslag.willekeur.crypto).padStart(6));

@@ -214,11 +214,17 @@ const METERS = [
      levensduur heeft; dat is het eerlijke gat, en het mag alleen kleiner. */
   { sleutel: 'staatOngeregistreerd', richting: 'omlaag', wat: 'muteerbare toestand in server/ die niet in STATE.json staat' },
   { sleutel: 'staatOnbekend', richting: 'omlaag', wat: 'geregistreerde toestandswortels zonder levensduurklasse (tellen als procesgebonden)' },
-  /* De kloklezingen. Zolang code rechtstreeks de wandklok afleest, is een
-     gedeelde server een flake-machine en kost elke wachttoets echte seconden.
-     new Date(x) telt hier NIET mee: dat construeert een datum uit iets dat er
-     al was en leest de klok niet. */
-  { sleutel: 'klokDirect', richting: 'omlaag', wat: 'directe kloklezingen in server/ (new Date(), Date.now, hrtime, performance.now)' },
+  /* DE KLOKSCHULD STAAT HIER NIET, EN DAT IS EEN BESLUIT.
+
+     Hier heeft een `klokDirect` gestaan die de kloklezingen telde. Dat was een
+     TWEEDE ratel op dezelfde schuld: KLOK.json doet dat al, met een eigen
+     vrijstellingslijst, en die twee gaven ook meteen twee verschillende
+     getallen (1297 tegen 1284). Twee plekken die een waarheid vasthouden lopen
+     uiteen -- LAT-regel 4, en hier binnen een dag.
+
+     Wat er van die dubbeling WEL is overgebleven: scripts/klok.js telt sinds
+     vandaag via dezelfde AST-scanner, en dat bleek de bestaande teller te
+     repareren. Zie de correctie in KLOK.json. */
   { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan omdat een DIENST ontbreekt (Postgres, Redis, openssl)' },
   { sleutel: 'browserpoortToetsen', richting: 'omhoog', wat: 'schermtoetsen achter de browserpoort (bewaakt door test/browserpoort.e2e.js)' },
   { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' },
@@ -469,7 +475,7 @@ const METERBRONNEN = {
   mutaties: ['toetsenOngevoeligPct', 'toetsenNietGemeten'],
   skips: ['zelfpoortendeToetsen', 'browserpoortToetsen'],
   ijkregister: ['metersOngeijkt'],
-  staat: ['staatOngeregistreerd', 'staatOnbekend', 'klokDirect'],
+  staat: ['staatOngeregistreerd', 'staatOnbekend'],
   // goedkoop genoeg om altijd te doen: een readdir en een package.json
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
@@ -737,11 +743,10 @@ function meet(bronnen) {
 
   /* De toestandscensus. Draait alleen als er een toestandsmeter gevraagd is:
      hij ontleedt ruim tweeduizend bestanden en kost drie seconden. */
-  let staatOngeregistreerd, staatOnbekend, klokDirect;
+  let staatOngeregistreerd, staatOnbekend;
   if (nodig('staat')) {
     const { scan } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
     const census = scan({ wortel: WORTEL });
-    klokDirect = census.klokLezingen;
     let register = null;
     try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'STATE.json'), 'utf8')); } catch (e) { register = null; }
     /* GEEN REGISTER IS GEEN NUL. Zonder STATE.json is niet bekend welke
@@ -779,7 +784,7 @@ function meet(bronnen) {
     inlineStijlAttributen,
     bronBlindeBestanden,
     delenZonderOnderwerp,
-    staatOngeregistreerd, staatOnbekend, klokDirect
+    staatOngeregistreerd, staatOnbekend
   };
   if (!alleen) return alles;
   const uit = {};

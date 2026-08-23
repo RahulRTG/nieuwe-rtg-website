@@ -32,8 +32,7 @@
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
     "staatOngeregistreerd": 0,
-    "staatOnbekend": 114,
-    "klokDirect": 1297
+    "staatOnbekend": 114
   },
   "notities": [
     {
@@ -449,6 +448,11 @@
       "datum": "2026-08-23",
       "meter": "toetsenOngevoeligPct 1.1 -> 1.3 (test/normsubset.test.js kwam erbij en staat als 'overleefd')",
       "reden": "De norm gaat OMHOOG en dat is hier geen erosie maar een eerlijke uitslag, met naam.\n\ntest/normsubset.test.js is de handhaver onder meet({alleen:[...]}) in scripts/norm.js: voor elke meter moet een deelmeting exact hetzelfde getal geven als een volledige. Die toets is met de hand op twee mutaties nagelopen en zakt op allebei -- een meter in de verkeerde bron zetten, en een meter uit de tabel halen. Op het CONTRACT is hij dus RAAK.\n\nDe mutatiemotor komt daar niet bij. Hij is traag (120 s), dus de motor probeert er precies EEN operator op: het eerste === in scripts/norm.js omdraaien, en dat is regel 340 (typeof echt === 'number' bij keuringDekkingAdvies). Deze toets vergelijkt meet() met meet(), twee wegen door dezelfde code, en die verschuiven allebei even hard. Dat is AFGESLAGEN in de zin van LAT-regel 2, geen gat: dezelfde mutatie is nagelopen op test/meterijk.test.js en die zakt er wel op, met zoveel woorden -- 'meter \"keuringDekkingAdvies\" zag de bekend-foute invoer NIET (verschil 0)'. De regel heeft dus een handhaver, alleen niet deze toets.\n\nWat er WEL aan de toets is toegevoegd naar aanleiding hiervan: een paar getallen die langs een andere weg zijn geteld (het aantal toetsbestanden uit de map, de dependencies uit package.json), zodat hij niet uitsluitend zichzelf met zichzelf vergelijkt.\n\nWie deze norm weer omlaag wil: dat kan door normsubset sneller te maken, want dan probeert de motor er meer dan een operator op."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "klokDirect verwijderd (stond op 1297)",
+      "reden": "Deze meter was een tweede ratel op de klokschuld die KLOK.json al bijhoudt, en de twee gaven meteen verschillende getallen: 1297 hier tegen 1284 daar. Het verschil zat in de vrijstellingslijst van KLOK.json en in een gat in de oude teller daar.\n\nTwee plekken die dezelfde waarheid vasthouden lopen uiteen (LAT-regel 4), dus is deze weg en blijft KLOK.json de enige. Wat er van de dubbeling overbleef is een verbetering: scripts/klok.js telt sinds vandaag via dezelfde AST-scanner en zag daardoor vijf aanroepen die het oude commentaarmasker miste. Zie de correctie in KLOK.json."
     }
   ],
   "prestatie": {

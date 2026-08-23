@@ -79,6 +79,9 @@ const bundels = {
   // De bureau-PDA: één werking voor de drie ontwerpbureaus (studio, hardware,
   // architect). Deel 1 is de tabel met wat per bureau verschilt, deel 2 de
   // werking die daarvoor drie keer bestond en uit elkaar liep.
+  // De cookiemelding: zij meet de grond waarop zij staat, en die meting groeide
+  // haar bestand uit. Twee delen: de melding zelf en de grondmeting.
+  'shared/cookie.js': 'shared/cookie',
   'shared/bureaupda.js': 'shared/bureaupda',
   'apps/techniek.js': 'apps/techniek',
   'apps/meldkamer.js': 'apps/meldkamer',

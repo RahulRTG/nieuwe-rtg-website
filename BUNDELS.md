@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**57 bundels, 439 delen, 3 zonder onderwerp.**
+**58 bundels, 442 delen, 3 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -112,13 +112,14 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 8 delen, 930 regels in de delen
+`public/apps/backoffice/` -- 9 delen, 1074 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `backoffice-01.js` | de backoffice: de basis (helpers, taal, elementen) |
 | `backoffice-01b.js` | backoffice, vervolg van deel 01 |
 | `backoffice-01c.js` | backoffice, vervolg van deel 01b: DE OFFICIELE BRONWACHT |
+| `backoffice-01d.js` | backoffice, DE VAKBEWIJZEN |
 | `backoffice-02.js` | paspoort-incidenten: RTG beoordeelt of een opgeeiste identiteit vrijkomt |
 | `backoffice-03.js` | Live meekijken bij een SOS: het lid stuurt een WebRTC-aanbod via de office- stream ('ontmoeting-signaal'); wij openen... |
 | `backoffice-03c.js` | DE REISBALIE EN DE INSTELLINGEN -- twee kantoorschermen voor twee deuren die er wel waren maar nergens op uitkwamen |
@@ -575,6 +576,15 @@ omlaag.
 |---|---|
 | `clipdeler-01.js` | DE CLIPDELER -- korte video's die het toestel van de maker nooit verlaten |
 | `clipdeler-02.js` | de ontvangende kant van een gedeelde clip |
+
+## `shared/cookie.js`
+
+`public/shared/cookie/` -- 2 delen, 191 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `cookie-01.js` | Cookiemelding voor de site en de apps |
+| `cookie-02.js` | De lagen MENGEN in plaats van op de eerste dekkende te wachten |
 
 ## `shared/deelmenu.js`
 

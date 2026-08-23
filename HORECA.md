@@ -143,13 +143,30 @@ iets bouwt dat er al is:
 
 ## Wat er nieuw moet, in volgorde
 
-**0. Eerst leesbaar en levend, dan pas slim.** Op 23 augustus 2026 gemeten op
-`/apps/horeca.html`: 73% van de zichtbare tekstelementen stond onder 12px, 39%
-onder 8px, de kleinste tekst was 5px, en 66–70% van de raakvlakken was lager dan
-44px. Het keukenbord ververste zichzelf niet — na twintig seconden met een nieuw
-vrijgegeven gerecht stond het er nog niet op. Er valt niets te choreograferen op
-een scherm dat een kok niet kan lezen en dat stilstaat. *Stand: gedaan voor
-VUUR; de vijf andere werkstanden staan nog op de oude maten.*
+**0. Eerst leesbaar en levend, dan pas slim.** *Gedaan.* Op 23 augustus 2026
+gemeten op `/apps/horeca.html`: 73% van de zichtbare tekstelementen stond onder
+12px, 39% onder 8px, de kleinste tekst was 5px, en 66–70% van de raakvlakken was
+lager dan 44px. Het keukenbord ververste zichzelf niet — na twintig seconden met
+een nieuw vrijgegeven gerecht stond het er nog niet op. Er valt niets te
+choreograferen op een scherm dat een kok niet kan lezen en dat stilstaat.
+
+De hele schil staat nu op de ondergrens uit *Vorm per werkplek* hieronder: 61
+lettermaten in `horeca-command.css` opgehoogd van 5–11px naar 12–14px (plus 8 in
+`horeca-enterprise-modules.css`), en elk raakvlak minstens 44px. Op dezelfde
+schermen, met een echte dienst erin:
+
+| Werkstand | kleinste tekst | onder 12px | raakvlakken onder 44px |
+|---|---|---|---|
+| VUUR | 5px → **11px** | 39% → **6%** | 66% → **0 van 27** |
+| ZAAL / VLOER | 8px → **11px** | 73% → **10%** | 32 van 32 → **0 van 32** |
+| journey-toren | 5px → **12px** | 64% → **0%** | — |
+| spatial command | 5px → **12px** | 90% → **0%** | 3 van 9 → **0 van 9** |
+
+En tien grijstinten die tussen 2,48:1 en 4,55:1 stonden, zijn opgehoogd tot
+minstens 4,6:1 — gerekend tegen `#111`, de lichtste ondoorzichtige grond in de
+schil. De eerste poging rekende tegen de donkerste grond en liet er zes staan op
+4,36. De merkkleur `--burgundy-on-dark` is niet aangeraakt: die draagt hier een
+rand en geen tekst.
 
   **Wat hier eerst ten onrechte stond, en waarom het hier blijft staan.** Deze
   regel meldde ook dat één tik op een bon de scrollpositie 5.182 pixels weggooit
@@ -259,11 +276,17 @@ grens, vervalt de functie.*
 6. **Een rem toont zijn rekensom en sluit niets.** De drukterem, het tijdslot,
    de bezorgzone: elk nee draagt zijn getal en zijn reden. Een rem die alleen
    "nee" zegt, stuurt de klant naar een ander.
-7. **Wat niet gemeten is, wordt niet als getal getoond.** Concreet openstaand
-   punt: de journey-toren toont vandaag een voortgangsring van 12/30/48/64/78%
-   die uit een toestandslabel komt en niets meet. Dat percentage hoort weg of
-   het hoort een echte meting te worden. Hetzelfde geldt voor elke toekomstige
-   "score".
+7. **Wat niet gemeten is, wordt niet als getal getoond.** De journey-toren toonde
+   een voortgangsring van 12/30/48/64/78% die uit een toestandslabel kwam; met
+   zes tafels in beeld stond er zes keer 30%. Ernaast stond "course sync", een
+   score van 0 tot 100 die via een verzonnen factor 8 uit een spreiding in
+   minuten werd gerekend. Allebei weg. Er staat nu wat te tellen valt: hoeveel
+   van de bestelde regels zijn uitgegeven (een breuk mét zijn noemer, en bij een
+   tafel die niets bestelde een streepje in plaats van 0%), en hoeveel minuten de
+   gerechten van een gang uit elkaar lopen. `test/horeca-journey.test.js` houdt
+   het vast en weigert elk veld waarvan de naam op een score lijkt. Dezelfde eis
+   geldt voor elke toekomstige "score" — en de gastkant (`kern/gast/order-beeld.js`,
+   de servicebalk op `gast.html` en `bestellen.html`) draagt hem nog wél.
 8. **Rush Mode mag nooit een veiligheidsgrendel verbergen.** Minder tonen
    betekent minder statistiek, minder instellingen, minder tekst — nooit minder
    allergie, minder bevestiging of minder noodbediening.

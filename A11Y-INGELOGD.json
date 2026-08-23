@@ -1,64 +1,87 @@
 {
-  "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, en doet daarna een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8). Sinds 17 augustus 2026 staan alle drie op nul. Dit bestand is daarmee geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
-  "gemeten": "2026-08-17",
-  "uitgelogd": {
-    "structureel": 0,
-    "contrast": 0
-  },
-  "ingelogd": {
-    "structureel": 0,
-    "contrast": 0
-  },
-  "raakvlak": {
-    "onder24": 0,
-    "waar": "de derde ronde: 390x844, ingelogd, 600ms na load -- en wie iets vindt, meet nog een keer",
-    "stand bij het openen van deze ronde": "267 raakvlakken op 188 van de 259 schermen",
-    "de twee oorzaken die het leeuwendeel droegen": [
-      "de home-indicator van de iOS-schil stond op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146 gevallen)",
-      "op 22 schermen zet ios.js die pil neer terwijl het scherm ios.css NIET laadt; zonder stijl krimpt een lege knop tot zijn inhoud (4x4 op comm.html, 16x6 op geld.html) en staat hij toch in de tabvolgorde"
-    ],
-    "en de staart van 82 die daarna overbleef": [
-      ".fx-kop (de kaartkop van \"een ding tegelijk\") en .rp-pad (de drie paden onder de Rahulpoort): gedeelde componenten, dus een regel per component",
-      "de terugweg: .rtg-terug en body.rtg-stijl .terug kregen min-height EN min-width -- vaak is het alleen een pijl. Bewust min-* en geen padding: deze selector is specifieker dan de .terug van een pagina, en padding hier overschreef die van residentie.html (dat brak bij de eerste poging en kwam terug op 13x27)",
-      "zes kale aanvinkvakjes van 13x13 (memo, scanner, thuis, partner-worden, en veilig/wacht.js voor veilig + thuiswacht): het label klikte al mee, het vakje zelf niet",
-      "twee rijen navigatielinks (geld.html tien stuks op 18 hoog, media.html acht op 20)",
-      "de Command-modus-schermen (living-os, partner-network, private-office): knoppen van 8px tekst meten 11 hoog. Alleen de maat is omhoog; tekst, kleur en dichtheid blijven",
-      "zes losse links die in hun eentje een alinea vullen -- geen link IN een zin, dus geen WCAG-uitzondering",
-      ".ios-nav-acties: dezelfde les als de pil, een laag hoger. De component brengt nu ook daar zijn ondergrens mee, want vier schermen laden ios.js zonder ios.css",
-      ".gback in de kantoorpoort (49x16): een element, vier schermen -- backoffice, kantoorpda, magnaat-kantoor en het Foundation OS sturen allemaal door naar /apps/personeel.html?kantoor=1"
-    ],
-    "twee dingen die geen maatprobleem bleken maar een defect": [
-      "pay.html: de drie hoofdknoppen heetten .knop.merk, en rtg-ui.css gebruikt .merk voor een statuslabel (body.rtg-stijl .status,.merk,.badge) -- die selector is specifieker. De betaalknop rendeerde als badge van 9,9px hoofdletters in een pilletje van 19 hoog in plaats van een schermbrede bordeaux knop. Hernoemd naar .knop.hoofd, de naam die de rest van dit huis gebruikt.",
-      "muziek.html en camera.html laadden shared/spraak.js met defer terwijl het inline script eronder tijdens het parsen `if (window.Spraak)` doet. Die voorwaarde was dus altijd onwaar en de microfoonknop is nooit gekoppeld geweest -- hij stond er als lege knop van 0x0, onzichtbaar en onraakbaar, met de naam \"Spraaksturing: zeg wat u wilt horen\" in de tabvolgorde. defer eraf, en spraak.js zet het rusticoon nu meteen in plaats van pas bij de eerste klik."
-    ],
-    "de meetfout die deze ronde zelf maakte": "zorgbalie.html meldde een pil van precies 24 pixels als te klein. De pil klopte; de PAGINA stond 600ms na load nog midden in een schaal-animatie op 99,827%, en dan meet 24 er 23,96. Eerste reparatie was wachten tot document.getAnimations() leeg was, en die was fout om een andere reden: op de meeste schermen loopt er ALTIJD iets (de wereldklok tikt), dus liep bijna elke pagina tegen de tijdgrens aan en werd de ronde drie keer zo traag. Nu meet hij een keer, en alleen waar hij iets vindt nog een tweede keer na het uitlopen. Dat kost niets op een schoon scherm, en een scherm dat PERMANENT geschaald is meldt zich in die tweede meting gewoon weer -- terecht, want dan is de knop ook echt te klein.",
-    "wat de ronde vond dat niemand zocht": "De navigatielinks op geld.html bleven na de reparatie 20px hoog. De oorzaak was niet de regel maar een DEEL dat niemand laadde: ik had de stijl van het Overzicht-paneel naar overzicht-a.js verplaatst (het bestand liep tegen de 10 KB-maat aan) en public/apps/geld/ blijkt geen bundelmap maar een reeks losse <script src>. Het nieuwe deel stond dus in geen enkele pagina, stijl() viel stil terug op een lege string en het hele paneel tekende ongestyled door. Contrast en structuur bleven groen; alleen de raakvlakronde zag het, en die noemde het een te kleine knop. Twee dingen gerepareerd: het script staat nu in geld.html, en die stille terugval is weg -- een ontbrekend deel schreeuwt nu in de console in plaats van door te tekenen."
-  },
-  "hoe het nul werd": {
-    "stand bij het openen van de ingelogde ronde": "0 structureel, 25 contrast -- negen unieke plekken, want de scan noemt hoogstens drie voorbeelden per soort",
-    "het patroon": "Vrijwel alles was hetzelfde: het accent (#C23A5E, --burgundy-on-dark) als KLEINE tekst op een donkere grond, 3,78:1 waar WCAG AA 4,5 vraagt onder 24px. Dat accent is voor grote tekst; kleine tekst op zwart hoort wit te zijn. Die regel stond al in CLAUDE.md, hij was alleen op negen plekken niet toegepast.",
-    "wat er is veranderd": [
-      "wereld.html  .kop .wie b -> --rtg-txt (het accent als pasnaam-label, 11,8px)",
-      "wereld.html  .werelden button[aria-current] -> --rtg-acc-inkt (bijna-zwart OP het accent, dezelfde fout omgekeerd; de inkt volgt nu de dagkleur mee)",
-      "mall.html    .tref .wie.part -> wit, rand blijft bordeaux (partnermerker, 9,9px)",
-      "magnaat.html een blok van veertien accent-als-tekst-rollen -> wit; dit scherm zet --gold in zijn RTG-thema op #C23A5E, dus het raakte exit, eyebrow, ni, btn.subtle, mode .tag, cap-code, country, verified, lane, dt, guard i, task-seal, dienst-effect en d-status tegelijk",
-      "shared/rahul-tab.js  de inkt van de Rahul-tab wordt nu GEMETEN in plaats van vastgezet: style-base.js had twee vaste grijzen die voor een donkere balk zijn gekozen (#99918a, #746d67), en die haalden 2,85:1 op een lichte balk en 3,78:1 op een donkere. Er bestaat geen middengrijs dat allebei haalt, dus leest de tab de helderheid van zijn eigen balk en kiest #F2EEE8/#8A8680 (donker) of #3A3733/#5A5651 (licht).",
-      "stad.html    de stand 'druk' van --burgundy naar --rtg-rood: het bordeaux haalde 3,41:1 bij 18,4px niet-vet (te weinig; het accent mag pas vanaf 24px of 18,66px vet), de huisrode haalt 6,02:1 op dezelfde kaart. De betekenis blijft dus in de kleur, alleen leesbaar."
-    ]
-  },
-  "waarom hier geen bovengrens meer staat": "Tot vandaag stond hier 25 als tijdelijke bovengrens, met de reden erbij: op dag een hard afkeuren zou de poort rood zetten tot iemand negen CSS-plekken had nagelopen, en dan wordt zo'n poort uitgezet. Die negen zijn nagelopen, dus vervalt de constructie. Een bovengrens die niet meer nodig is, hoort weg -- anders leest hij als ruimte die er niet is.",
-  "de instabiliteit die hier stond, en wat ervan over is": "Twee ronden op dezelfde boom gaven eerder 25 en 24. Ik heb dat eerst als meetruis opgeschreven ('welke van de negen stond op tijd in beeld'), en dat was te makkelijk. De echte oorzaak is dat de ingelogde staat DATA-afhankelijk is: stad.html kleurt een waarde alleen bordeaux als een domein op dat moment ECHT druk is. Tijdens mijn gerichte meting op dat scherm stond hij er niet, dus boekte ik hem als opgelost -- en de volle ronde daarna ving hem alsnog. Dat is geen flakkering maar een bevinding die soms rendert. De les hoort hier te staan: een scherm dat geen bevinding geeft in EEN meting is niet schoon; alleen de volle ronde telt, en ook die ziet maar een moment van de ingelogde staat.",
-  "bekende grens van deze meting": "De scan bekijkt elk scherm 600ms na load, in EEN toestand van de data. Kleuren die van gegevens afhangen (een drempelwaarde, een status, een telling) kunnen daardoor tussen ronden verschijnen en verdwijnen. Wie deze poort scherper wil: geef de ingelogde ronde een vaste, geseede dataset in plaats van wat er toevallig staat. Zolang dat er niet is, is een groene ronde een sterk signaal en geen bewijs voor elke toestand.",
-  "harde poorten": [
-    "structureel = 0 in BEIDE staten",
-    "contrast = 0 in BEIDE staten",
-    "raakvlak onder 24x24 = 0 op telefoonformaat, ingelogd"
+ "uitleg": "De a11y-scan keurt elk scherm in DRIE staten (uitgelogd, als lid, en als zaak) op structuur en contrast, en meet het raakvlak (WCAG 2.5.8) op telefoonformaat in twee sessies. Alles staat op nul. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
+ "gemeten": "2026-08-23",
+ "uitgelogd": {
+  "structureel": 0,
+  "contrast": 0
+ },
+ "ingelogd": {
+  "structureel": 0,
+  "contrast": 0
+ },
+ "zaak": {
+  "structureel": 0,
+  "contrast": 0,
+  "waar": "de derde staat: ingelogd met rtg_sup_token, de zaak-inlog van een manager",
+  "waarom deze ronde er is": "De scan logde in met rtg_member_token. Alles achter een ZAAK-inlog -- de horecaschermen, de kassa, het personeelsscherm, de leveranciers-app -- draagt rtg_sup_token, en kreeg dus de DEUR te zien: een lege schil met een inlogkaart, die netjes nul oplevert. \"Nul over alle schermen\" was waar voor de staat die gemeten werd en onwaar voor de staat waarin het personeel werkt.",
+  "wat de eerste meting vond": "Met de hand gemeten over negen horecaschermen op 23 augustus 2026: zonder zaak-sessie 0 structureel en 0 contrast, met zaak-sessie 1 structureel en 15 contrast. Precies dezelfde schermen.",
+  "en wat daarvan is gerepareerd": [
+   "de structurele: twee naamloze velden in de kassa (het vraagveld van de dialoog en de tafelkeuze) -- aria-labelledby op de kop die de vraag al draagt, en een aria-label op de select",
+   "de vijftien contrastfouten: tien grijstinten in horeca-command.css en een in horeca-enterprise-modules.css stonden tussen 2,48:1 en 4,55:1. Opgehoogd tot minstens 4,6:1 -- en gerekend tegen #111, de LICHTSTE ondoorzichtige grond in de schil. De eerste poging rekende tegen #080808 (de donkerste) en liet er zes staan op 4,36.",
+   "de merkkleur is niet aangeraakt: --burgundy-on-dark (#C23A5E) draagt hier alleen een rand en geen tekst"
+  ]
+ },
+ "raakvlak": {
+  "onder24": 0,
+  "waar": "390x844, in twee sessies (lid en zaak), 600ms na load -- en wie iets vindt, meet nog een keer",
+  "stand bij het openen van deze ronde": "267 raakvlakken op 188 van de 259 schermen",
+  "de twee oorzaken die het leeuwendeel droegen": [
+   "de home-indicator van de iOS-schil stond op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146 gevallen)",
+   "op 22 schermen zet ios.js die pil neer terwijl het scherm ios.css NIET laadt; zonder stijl krimpt een lege knop tot zijn inhoud (4x4 op comm.html, 16x6 op geld.html) en staat hij toch in de tabvolgorde"
   ],
-  "wat de vensterafsluiting kapotmaakte, en wat dat leerde": {
-    "waarom dit hier staat": "De maatregel van 17 augustus -- een open venster sluit de rest van de pagina af met inert -- brak drie schermtoetsen. Ze stonden alle drie in de CI en niet in de a11y-poort, dus de poort bleef groen terwijl er iets stuk was. Dat hoort in dit register, want het zegt iets over de grens van deze poort: hij meet of een scherm TOEGANKELIJK is, niet of het nog WERKT.",
-    "1. loslaten mocht niet wachten": "Het afsluiten hangt in een requestAnimationFrame om mutaties te bundelen, en het loslaten hing daaraan vast. Een pagina die haar venster sluit en in dezelfde tik de focus terugzet op de knop waar de tik vandaan kwam, zet hem dan op een INERT element -- de focus valt weg. Loslaten gebeurt nu meteen (modaalLos in shared/basis/basis-01c.js).",
-    "2. de focus terugzetten is nu de taak van de laag die hem wegnam": "Zelfs zonder dat frame lukt het de pagina niet: zij sluit en focust in EEN tik, terwijl inert pas daarna weggaat. De gedeelde laag houdt daarom bij waar de focus vandaan kwam (een focusin-luisteraar; achteraf vragen is te laat, want de pagina zet de focus zelf al in het venster) en geeft hem terug als hij bij het loslaten nergens meer staat. \"Nergens\" is meer dan body: de focus blijft eerst nog even staan op de knop in het zojuist verborgen venster, een element zonder afmetingen.",
-    "3. de laatste modaal wint, niet de eerste": "Op app.html staat de onboardingpoort in de markup en wordt een later venster aan het eind van body gehangen. De laag nam de EERSTE aria-modal en sloot alles daarbuiten af -- inclusief het nieuwere venster van pin-herstel, dat bovenop stond, in beeld was en onaanklikbaar werd; de tik viel door naar het veld eronder. Later in de boom is bovenop, dus telt de laatste.",
-    "en een gat dat daarbij aan het licht kwam": "Dat venster van pin-herstel had role=\"dialog\" maar geen aria-modal, terwijl het modaal LIGT: een scrim over de hele pagina op z-index 9990. Een schermlezer las dus de pagina eronder gewoon door. Dat is dezelfde soort belofte-zonder-code als elders: wat modaal is, zegt dat. Nu staat het er."
+  "en de staart van 82 die daarna overbleef": [
+   ".fx-kop (de kaartkop van \"een ding tegelijk\") en .rp-pad (de drie paden onder de Rahulpoort): gedeelde componenten, dus een regel per component",
+   "de terugweg: .rtg-terug en body.rtg-stijl .terug kregen min-height EN min-width -- vaak is het alleen een pijl. Bewust min-* en geen padding: deze selector is specifieker dan de .terug van een pagina, en padding hier overschreef die van residentie.html (dat brak bij de eerste poging en kwam terug op 13x27)",
+   "zes kale aanvinkvakjes van 13x13 (memo, scanner, thuis, partner-worden, en veilig/wacht.js voor veilig + thuiswacht): het label klikte al mee, het vakje zelf niet",
+   "twee rijen navigatielinks (geld.html tien stuks op 18 hoog, media.html acht op 20)",
+   "de Command-modus-schermen (living-os, partner-network, private-office): knoppen van 8px tekst meten 11 hoog. Alleen de maat is omhoog; tekst, kleur en dichtheid blijven",
+   "zes losse links die in hun eentje een alinea vullen -- geen link IN een zin, dus geen WCAG-uitzondering",
+   ".ios-nav-acties: dezelfde les als de pil, een laag hoger. De component brengt nu ook daar zijn ondergrens mee, want vier schermen laden ios.js zonder ios.css",
+   ".gback in de kantoorpoort (49x16): een element, vier schermen -- backoffice, kantoorpda, magnaat-kantoor en het Foundation OS sturen allemaal door naar /apps/personeel.html?kantoor=1"
+  ],
+  "twee dingen die geen maatprobleem bleken maar een defect": [
+   "pay.html: de drie hoofdknoppen heetten .knop.merk, en rtg-ui.css gebruikt .merk voor een statuslabel (body.rtg-stijl .status,.merk,.badge) -- die selector is specifieker. De betaalknop rendeerde als badge van 9,9px hoofdletters in een pilletje van 19 hoog in plaats van een schermbrede bordeaux knop. Hernoemd naar .knop.hoofd, de naam die de rest van dit huis gebruikt.",
+   "muziek.html en camera.html laadden shared/spraak.js met defer terwijl het inline script eronder tijdens het parsen `if (window.Spraak)` doet. Die voorwaarde was dus altijd onwaar en de microfoonknop is nooit gekoppeld geweest -- hij stond er als lege knop van 0x0, onzichtbaar en onraakbaar, met de naam \"Spraaksturing: zeg wat u wilt horen\" in de tabvolgorde. defer eraf, en spraak.js zet het rusticoon nu meteen in plaats van pas bij de eerste klik."
+  ],
+  "de meetfout die deze ronde zelf maakte": "zorgbalie.html meldde een pil van precies 24 pixels als te klein. De pil klopte; de PAGINA stond 600ms na load nog midden in een schaal-animatie op 99,827%, en dan meet 24 er 23,96. Eerste reparatie was wachten tot document.getAnimations() leeg was, en die was fout om een andere reden: op de meeste schermen loopt er ALTIJD iets (de wereldklok tikt), dus liep bijna elke pagina tegen de tijdgrens aan en werd de ronde drie keer zo traag. Nu meet hij een keer, en alleen waar hij iets vindt nog een tweede keer na het uitlopen. Dat kost niets op een schoon scherm, en een scherm dat PERMANENT geschaald is meldt zich in die tweede meting gewoon weer -- terecht, want dan is de knop ook echt te klein.",
+  "wat de ronde vond dat niemand zocht": "De navigatielinks op geld.html bleven na de reparatie 20px hoog. De oorzaak was niet de regel maar een DEEL dat niemand laadde: ik had de stijl van het Overzicht-paneel naar overzicht-a.js verplaatst (het bestand liep tegen de 10 KB-maat aan) en public/apps/geld/ blijkt geen bundelmap maar een reeks losse <script src>. Het nieuwe deel stond dus in geen enkele pagina, stijl() viel stil terug op een lege string en het hele paneel tekende ongestyled door. Contrast en structuur bleven groen; alleen de raakvlakronde zag het, en die noemde het een te kleine knop. Twee dingen gerepareerd: het script staat nu in geld.html, en die stille terugval is weg -- een ontbrekend deel schreeuwt nu in de console in plaats van door te tekenen.",
+  "wat de zaakronde erbij bracht, en wat ervan is gerepareerd": {
+   "stand bij het openen": "27 raakvlakken: 22 in de zaakstaat over vijftien schermen, en 5 op salon.html in de lidstaat -- die laatste kwamen pas in beeld doordat de scan nu in demostand draait, want een leeg scherm meet per definitie schoon",
+   "vijf oorzaken, geen zevenentwintig losse gevallen": [
+    "kale aanvinkvakjes van 13x13 (bezorging, clubdeur, kassa): de regel stond al in veiligheid.css maar gescoped op .mini. Verhuisd naar rtg-ui.css, waar de rest van de raakvlakmaten staat -- een componentregel op een plek komt op de volgende plek terug als bevinding (LAT-regel 4)",
+    "de link van de inlog-terugval (\"Log eerst in ... Naar de app\"), 20px hoog op twaalf schermen. Eerst als `.inlog a` gerepareerd; toen bleef er precies een scherm over dat diezelfde kaart met een andere klassenaam schrijft (rtgschool.html), en dat was het moment om de regel op te schrijven zoals hij werkelijk luidt: een link die in zijn eentje een alinea vult is geen link IN een zin, en krijgt de knopmaat",
+    "de auteursknoppen in De Salon: 23px, een pixel te kort",
+    "de bel in de leveranciers-app mat 0x34 -- hij had wel width:34px maar werd door zijn flexouder platgedrukt; flex:0 0 auto erbij",
+    "de navigatieknoppen van de partnerstudio waren op telefoonformaat LEEG: bij <=1050px verbergt een regel het label en bij <=680px verbergt een tweede regel het nummer, en onder de 680 gelden ze allebei. Vier knoppen van 20x20 zonder tekst. Dat is geen maatprobleem maar een defect, en het stond er alleen omdat niemand dat scherm ooit op telefoonformaat in die staat had gemeten"
+   ],
+   "en toen stond hij weer op nul": "0 van 260 schermen, in beide sessies"
   }
+ },
+ "hoe het nul werd": {
+  "stand bij het openen van de ingelogde ronde": "0 structureel, 25 contrast -- negen unieke plekken, want de scan noemt hoogstens drie voorbeelden per soort",
+  "het patroon": "Vrijwel alles was hetzelfde: het accent (#C23A5E, --burgundy-on-dark) als KLEINE tekst op een donkere grond, 3,78:1 waar WCAG AA 4,5 vraagt onder 24px. Dat accent is voor grote tekst; kleine tekst op zwart hoort wit te zijn. Die regel stond al in CLAUDE.md, hij was alleen op negen plekken niet toegepast.",
+  "wat er is veranderd": [
+   "wereld.html  .kop .wie b -> --rtg-txt (het accent als pasnaam-label, 11,8px)",
+   "wereld.html  .werelden button[aria-current] -> --rtg-acc-inkt (bijna-zwart OP het accent, dezelfde fout omgekeerd; de inkt volgt nu de dagkleur mee)",
+   "mall.html    .tref .wie.part -> wit, rand blijft bordeaux (partnermerker, 9,9px)",
+   "magnaat.html een blok van veertien accent-als-tekst-rollen -> wit; dit scherm zet --gold in zijn RTG-thema op #C23A5E, dus het raakte exit, eyebrow, ni, btn.subtle, mode .tag, cap-code, country, verified, lane, dt, guard i, task-seal, dienst-effect en d-status tegelijk",
+   "shared/rahul-tab.js  de inkt van de Rahul-tab wordt nu GEMETEN in plaats van vastgezet: style-base.js had twee vaste grijzen die voor een donkere balk zijn gekozen (#99918a, #746d67), en die haalden 2,85:1 op een lichte balk en 3,78:1 op een donkere. Er bestaat geen middengrijs dat allebei haalt, dus leest de tab de helderheid van zijn eigen balk en kiest #F2EEE8/#8A8680 (donker) of #3A3733/#5A5651 (licht).",
+   "stad.html    de stand 'druk' van --burgundy naar --rtg-rood: het bordeaux haalde 3,41:1 bij 18,4px niet-vet (te weinig; het accent mag pas vanaf 24px of 18,66px vet), de huisrode haalt 6,02:1 op dezelfde kaart. De betekenis blijft dus in de kleur, alleen leesbaar."
+  ]
+ },
+ "waarom hier geen bovengrens meer staat": "Tot vandaag stond hier 25 als tijdelijke bovengrens, met de reden erbij: op dag een hard afkeuren zou de poort rood zetten tot iemand negen CSS-plekken had nagelopen, en dan wordt zo'n poort uitgezet. Die negen zijn nagelopen, dus vervalt de constructie. Een bovengrens die niet meer nodig is, hoort weg -- anders leest hij als ruimte die er niet is.",
+ "de instabiliteit die hier stond, en wat ervan over is": "Twee ronden op dezelfde boom gaven eerder 25 en 24. Ik heb dat eerst als meetruis opgeschreven ('welke van de negen stond op tijd in beeld'), en dat was te makkelijk. De echte oorzaak is dat de ingelogde staat DATA-afhankelijk is: stad.html kleurt een waarde alleen bordeaux als een domein op dat moment ECHT druk is. Tijdens mijn gerichte meting op dat scherm stond hij er niet, dus boekte ik hem als opgelost -- en de volle ronde daarna ving hem alsnog. Dat is geen flakkering maar een bevinding die soms rendert. De les hoort hier te staan: een scherm dat geen bevinding geeft in EEN meting is niet schoon; alleen de volle ronde telt, en ook die ziet maar een moment van de ingelogde staat.",
+ "bekende grens van deze meting": "De scan bekijkt elk scherm 600ms na load, in EEN toestand van de data. Kleuren die van gegevens afhangen (een drempelwaarde, een status, een telling) kunnen daardoor tussen ronden verschijnen en verdwijnen. Wie deze poort scherper wil: geef de ingelogde ronde een vaste, geseede dataset in plaats van wat er toevallig staat. Zolang dat er niet is, is een groene ronde een sterk signaal en geen bewijs voor elke toestand.",
+ "harde poorten": [
+  "structureel = 0 in BEIDE staten",
+  "contrast = 0 in BEIDE staten",
+  "raakvlak onder 24x24 = 0 op telefoonformaat, ingelogd"
+ ],
+ "wat de vensterafsluiting kapotmaakte, en wat dat leerde": {
+  "waarom dit hier staat": "De maatregel van 17 augustus -- een open venster sluit de rest van de pagina af met inert -- brak drie schermtoetsen. Ze stonden alle drie in de CI en niet in de a11y-poort, dus de poort bleef groen terwijl er iets stuk was. Dat hoort in dit register, want het zegt iets over de grens van deze poort: hij meet of een scherm TOEGANKELIJK is, niet of het nog WERKT.",
+  "1. loslaten mocht niet wachten": "Het afsluiten hangt in een requestAnimationFrame om mutaties te bundelen, en het loslaten hing daaraan vast. Een pagina die haar venster sluit en in dezelfde tik de focus terugzet op de knop waar de tik vandaan kwam, zet hem dan op een INERT element -- de focus valt weg. Loslaten gebeurt nu meteen (modaalLos in shared/basis/basis-01c.js).",
+  "2. de focus terugzetten is nu de taak van de laag die hem wegnam": "Zelfs zonder dat frame lukt het de pagina niet: zij sluit en focust in EEN tik, terwijl inert pas daarna weggaat. De gedeelde laag houdt daarom bij waar de focus vandaan kwam (een focusin-luisteraar; achteraf vragen is te laat, want de pagina zet de focus zelf al in het venster) en geeft hem terug als hij bij het loslaten nergens meer staat. \"Nergens\" is meer dan body: de focus blijft eerst nog even staan op de knop in het zojuist verborgen venster, een element zonder afmetingen.",
+  "3. de laatste modaal wint, niet de eerste": "Op app.html staat de onboardingpoort in de markup en wordt een later venster aan het eind van body gehangen. De laag nam de EERSTE aria-modal en sloot alles daarbuiten af -- inclusief het nieuwere venster van pin-herstel, dat bovenop stond, in beeld was en onaanklikbaar werd; de tik viel door naar het veld eronder. Later in de boom is bovenop, dus telt de laatste.",
+  "en een gat dat daarbij aan het licht kwam": "Dat venster van pin-herstel had role=\"dialog\" maar geen aria-modal, terwijl het modaal LIGT: een scrim over de hele pagina op z-index 9990. Een schermlezer las dus de pagina eronder gewoon door. Dat is dezelfde soort belofte-zonder-code als elders: wat modaal is, zegt dat. Nu staat het er."
+ }
 }

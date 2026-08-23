@@ -69,7 +69,7 @@
     <div id="bon"><div class="leeg">Nog leeg; tik links een artikel aan.</div></div>
     <div class="tot"><span>Totaal</span><span id="totaal">€ 0,00</span></div>
     <div class="rij" id="badgeRij" hidden><input class="veld h-flex1" id="badgeNaam" placeholder="Naam van de collega (interne verrekening)"></div>
-    <div class="rij" id="tafelRij" hidden><select class="veld h-flex1" id="tafelKies"></select></div>
+    <div class="rij" id="tafelRij" hidden><select class="veld h-flex1" id="tafelKies" aria-label="Tafel voor deze bon"></select></div>
     <div class="rij h-mt55">
       <button class="knop" id="payContant">Contant</button>
       <button class="knop" id="payRtg">RTG Pay-code</button>
@@ -111,7 +111,7 @@
 <dialog id="dlgVraag">
   <div class="sec" id="vraagKop"></div>
   <p class="hint" id="vraagUitleg" style="margin-bottom:.5rem;"></p>
-  <div class="rij"><input class="veld h-flex1" id="vraagVeld" autocomplete="off"></div>
+  <div class="rij"><input class="veld h-flex1" id="vraagVeld" autocomplete="off" aria-labelledby="vraagKop" aria-describedby="vraagUitleg"></div>
   <div class="rij h-mt60"><button class="knop" id="vraagOk">Akkoord</button><button class="knop stil" id="vraagWeg">Annuleer</button></div>
 </dialog>
 <dialog id="dlgInfo">

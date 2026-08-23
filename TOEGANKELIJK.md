@@ -17,16 +17,33 @@ op telefoonformaat (390x844).
 
 | poort | staat | wat hij tegenhoudt |
 |---|---|---|
-| contrast, beide staten | **0** van 259 | tekst die te bleek is om te lezen |
-| structuur (alt, label, naam, taal, titel) | **0** van 259 | een knop of veld zonder naam |
+| contrast, drie staten | **0** van 260 | tekst die te bleek is om te lezen |
+| structuur (alt, label, naam, taal, titel) | **0** van 260 | een knop of veld zonder naam |
 | springlink | eerste tabstop op elk scherm met een schil | vijftien tabs door dezelfde balk, elk scherm opnieuw |
 | ondertitels | 21 van 29 media-elementen geregeld; alle opgenomen vormen | video die je zonder geluid niet kunt volgen |
-| raakvlak (24x24) | **0** van 259, op telefoonformaat | een knop die een trillende hand niet raakt |
+| raakvlak (24x24) | **0** van 260, in twee sessies | een knop die een trillende hand niet raakt |
 
 Die vijf zakken de bouw als iemand ze breekt. `scripts/a11y.js` draait ze bij
-elke push over alle schermen -- structuur en contrast in twee staten, het
-raakvlak in een derde ronde op telefoonformaat (390x844, ingelogd; wie iets
-vindt, meet nog een keer). `check.js` regel 49 doet het ondertitelregister.
+elke push over alle schermen -- structuur en contrast in DRIE staten, het
+raakvlak op telefoonformaat (390x844) in twee sessies; wie iets vindt, meet nog
+een keer. `check.js` regel 49 doet het ondertitelregister.
+
+**De derde staat is er sinds 23 augustus 2026, en waarom dat nodig was.** De scan
+logde in met een lidmaatschapstoken. Alles achter een ZAAK-inlog -- de
+horecaschermen, de kassa, het personeelsscherm, de leveranciers-app -- draagt een
+ander token, en kreeg dus de DEUR te zien: een lege schil met een inlogkaart, die
+netjes nul oplevert. "Nul over alle schermen" was waar voor de staat die gemeten
+werd, en onwaar voor de staat waarin het personeel werkt. Dezelfde negen
+horecaschermen gaven met een zaak-sessie 1 structurele en 15 contrastfouten.
+
+Twee dingen kwamen daar bovenop, en ze horen erbij omdat ze dezelfde vorm hebben:
+de scan draaide in deze omgeving HELEMAAL NIET (hij koos een Playwright waarvan
+de Chromium ontbrak, en concludeerde daaruit "geen browser" met exitcode 0), en
+hij draaide zonder demostand -- dus met lege lijsten, waar een leeg scherm per
+definitie schoon meet. Beide zijn weg: de browserkeuze komt nu uit
+`test/browser.js` (die probeert te STARTEN in plaats van te laden) en de
+wegwerpserver draait in demostand. Samen brachten die drie dingen 27 raakvlakken
+aan het licht die er altijd al waren.
 
 ## De instellingen die een lid zelf zet
 

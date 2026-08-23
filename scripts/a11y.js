@@ -44,16 +44,25 @@ const { alleSchermen } = require('./schermen');
    public. */
 const PAGINAS = alleSchermen().concat(['/site/404.html']);
 
+/* DE BROWSERKEUZE KOMT UIT test/browser.js, en niet meer uit een eigen kopie.
+
+   Hier stond dezelfde functie die dat bestand ooit voor 94 andere bestanden
+   heeft opgeruimd: hij koos de EERSTE Playwright die te REQUIREN viel. Dat gaat
+   mis zodra het pakket er wel is maar de bijbehorende Chromium niet -- en dat is
+   precies wat hier gebeurde. De require lukte, de launch zakte op "Executable
+   doesn't exist", en deze scan concludeerde daaruit "geen browser beschikbaar"
+   en sloot zichzelf af met exitcode 0.
+
+   Een poort die groen meldt omdat hij niets heeft gemeten, is erger dan geen
+   poort. Dat is dezelfde fout als de blinde vlek die deze scan zelf had: waar
+   staat "nul", moet ook echt nul gemeten zijn.
+
+   test/browser.js probeert te STARTEN in plaats van te laden en loopt de
+   kandidaten af tot er een echt opent, met de eigen driver als laatste. Het
+   contract is hetzelfde: null als er niets is, anders iets met .chromium.launch. */
 function laadPlaywright() {
-  const paden = [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules'];
-  for (const p of paden) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); }
-    catch (e) { /* volgende pad */ }
-  }
-  // Geen Playwright-pakket? Val terug op onze eigen browser-driver (CDP over de
-  // pipe-transport), maar alleen als er echt een Chromium-binary staat.
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
+  try { return require('../test/browser').laadBrowser(); }
+  catch (e) { return null; }
 }
 
 /* DE ECHTE SERVER, NIET EEN STATISCHE MAP.
@@ -82,12 +91,26 @@ function startEchteServer() {
         const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-a11y-'));
         const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(ROOT, 'server', 'server.js')], {
           cwd: ROOT, stdio: 'ignore',
-          env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1' }
+          /* RTG_DEMO: de demozaken (en dus de zaak-inlog van de derde ronde)
+             worden alleen in demostand gezaaid -- test/helper.js doet hetzelfde.
+             Zonder die vlag kende deze wegwerpserver geen enkele leverancier en
+             viel de zaakronde om op "Deze leverancierscode kennen we niet".
+             Het is bovendien de betere stand om a11y in te meten: de schermen
+             hebben er echte inhoud in plaats van lege lijsten. */
+          env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
+            STUN_UIT: '1', RTG_DEMO: '1' }
         });
         const basis = 'http://127.0.0.1:' + poort;
         const stop = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
+        /* WACHTEN OP /api/ready EN NIET OP /api/health.
+
+           Health is op zodra de poort luistert; de opslagpoortwachter geeft
+           daarna nog 503 op ELKE API tot de opslag echt geladen is. Deze scan
+           wachtte op health en deed meteen daarna zijn inlogverzoeken -- die
+           vielen dan op een 503, en de scan concludeerde "geen sessie". Dezelfde
+           reden waarom test/helper.js hier al op /api/ready wacht. */
         for (let i = 0; i < 300; i++) {
-          try { if ((await fetch(basis + '/api/health')).ok) return klaar({ basis, stop }); } catch (e) { /* nog niet op */ }
+          try { if ((await fetch(basis + '/api/ready')).ok) return klaar({ basis, stop }); } catch (e) { /* nog niet op */ }
           await new Promise(r => setTimeout(r, 200));
         }
         stop(); mis(new Error('de server kwam niet op'));
@@ -129,6 +152,37 @@ function startEchteServer() {
     await browser.close(); server.stop(); process.exit(1);
   }
 
+  /* EN EEN ECHTE ZAAK-SESSIE, want een lidmaatschapstoken opent de helft van dit
+     huis niet.
+
+     Dit was de blinde vlek van deze scan, en hij was groot. Alles wat achter een
+     ZAAK-inlog zit -- de horecaschermen, de kassa, het personeelsscherm, de
+     leveranciers-app -- draagt `rtg_sup_token` en niet `rtg_member_token`. Met
+     alleen een lid kreeg de scan daar de DEUR te zien: een lege schil met een
+     inlogkaart, die netjes nul fouten oplevert. "Nul over alle schermen" was dus
+     waar voor de staat die gemeten werd en onwaar voor de staat waarin het
+     personeel werkt.
+
+     Gemeten op 23 augustus 2026, met de hand, over negen horecaschermen: zonder
+     zaak-sessie 0 structureel en 0 contrast, met zaak-sessie 1 structureel en 15
+     contrast. Precies dezelfde schermen. Dat verschil hoort in de poort te
+     zitten en niet in het hoofd van wie het toevallig een keer heeft nagemeten. */
+  const roster = await fetch(basis + '/api/supplier/roster', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'KIKUNOI' })
+  }).then(r => r.json()).catch(() => ({}));
+  const baas = ((roster || {}).staff || []).find(x => x.role === 'manager') || ((roster || {}).staff || [])[0];
+  const zaak = baas ? await fetch(basis + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'KIKUNOI', staffId: baas.id, pin: '1234' })
+  }).then(r => r.json()).catch(() => ({})) : {};
+  if (!zaak || !zaak.token) {
+    console.error('[a11y] MISLUKT: geen zaak-sessie, dus de zaakronde zou stil worden overgeslagen.');
+    console.error('        roster: ' + JSON.stringify(roster).slice(0, 200));
+    console.error('        inlog:  ' + JSON.stringify(zaak).slice(0, 200));
+    await browser.close(); server.stop(); process.exit(1);
+  }
+
   /* De keuring gaat via evaluate en niet via addScriptTag: de echte server stuurt
      een CSP met nonce mee en die blokkeert een inline script. In een IIFE, want
      evaluate met een string verwacht een expressie en BRON begint met functies. */
@@ -137,12 +191,22 @@ function startEchteServer() {
   let totaal = 0, contrastTotaal = 0;
   const perRonde = [];
 
-  for (const ronde of [{ naam: 'uitgelogd', token: null }, { naam: 'ingelogd', token: lid.token }]) {
+  /* Drie staten, en elke staat zet zijn EIGEN sleutels. Niet allebei de tokens
+     tegelijk: een scherm dat zowel een lid als een zaak herkent, kiest dan zelf
+     welke het toont, en dan meet de scan iets wat in het echt zelden voorkomt. */
+  for (const ronde of [
+    { naam: 'uitgelogd', sleutels: null },
+    { naam: 'ingelogd', sleutels: { rtg_member_token: lid.token } },
+    { naam: 'zaak', sleutels: { rtg_sup_token: zaak.token } }
+  ]) {
     const context = await browser.newContext({ serviceWorkers: 'block' });
-    if (ronde.token) {
-      await context.addInitScript((t) => {
-        try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-      }, ronde.token);
+    if (ronde.sleutels) {
+      await context.addInitScript((s) => {
+        try {
+          for (const k of Object.keys(s)) localStorage.setItem(k, s[k]);
+          localStorage.setItem('rtg_cookieinfo_v1', '1');
+        } catch (e) {}
+      }, ronde.sleutels);
     }
     const page = await context.newPage();
     let struct = 0, contr = 0;
@@ -187,23 +251,34 @@ function startEchteServer() {
      ronde op 390x844 en niet op het bureaubladvenster van de twee ronden
      hierboven. Diezelfde knop kan op een breed scherm ruim genoeg zijn.
 
-     INGELOGD. Uitgelogd zie je op de meeste schermen alleen de poort. De maat
-     van een knop hangt bovendien nauwelijks van de sessie af, dus een tweede
-     staat zou vooral tijd kosten.
+     INGELOGD, EN IN BEIDE SESSIES. Uitgelogd zie je op de meeste schermen alleen
+     de poort. Hier stond dat een tweede staat "vooral tijd zou kosten" omdat de
+     maat van een knop nauwelijks van de sessie afhangt -- maar dat gaat over
+     DEZELFDE knop, en het punt is dat een zaakscherm met een lidmaatschapstoken
+     helemaal GEEN knoppen laat zien. De hele horeca-, kassa- en personeelskant
+     werd daardoor gemeten als een lege inlogkaart. Deze ronde loopt nu over
+     beide sessies.
 
      EN WIE IETS VINDT, MEET NOG EEN KEER. Een scherm dat binnenkomt met een
      schaal-animatie staat een halve seconde op 99,8%, en dan meet een knop van
      precies 24 pixels er 23,96. Dat is geen bevinding maar een moment. Zie de
      opmerking bij die tweede meting hieronder voor waarom het GEEN wachten op
      alle animaties is geworden. */
-  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-  await telefoon.addInitScript((t) => {
-    try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-  }, lid.token);
-  const tel = await telefoon.newPage();
   const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
   let raakTotaal = 0;
-  console.log(`\n[a11y] ===== ronde RAAKVLAK (${PAGINAS.length} schermen, 390x844, ingelogd) =====`);
+  for (const staat of [
+    { naam: 'lid', sleutels: { rtg_member_token: lid.token } },
+    { naam: 'zaak', sleutels: { rtg_sup_token: zaak.token } }
+  ]) {
+  const telefoon = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await telefoon.addInitScript((sl) => {
+    try {
+      for (const k of Object.keys(sl)) localStorage.setItem(k, sl[k]);
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    } catch (e) {}
+  }, staat.sleutels);
+  const tel = await telefoon.newPage();
+  console.log(`\n[a11y] ===== ronde RAAKVLAK (${PAGINAS.length} schermen, 390x844, ${staat.naam}) =====`);
   for (const pad of PAGINAS) {
     await tel.goto(basis + pad, { waitUntil: 'load' });
     await tel.waitForTimeout(600);
@@ -236,12 +311,13 @@ function startEchteServer() {
     }
     if (res.klein.length) {
       raakTotaal += res.klein.length;
-      console.log(`\n[a11y] ${pad} (raakvlak): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+      console.log(`\n[a11y] ${pad} (raakvlak, ${staat.naam}): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
       for (const w of res.klein.slice(0, 6)) console.log(`  · ${w}`);
     }
   }
   await telefoon.close();
-  console.log(`[a11y] ronde raakvlak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
+  }
+  console.log(`[a11y] ronde raakvlak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS} (lid en zaak samen)`);
 
   await browser.close();
   server.stop();
@@ -265,12 +341,19 @@ function startEchteServer() {
   const grens = JSON.parse(fs.readFileSync(path.join(ROOT, 'A11Y-INGELOGD.json'), 'utf8'));
   const uitgelogd = perRonde.find(r => r.naam === 'uitgelogd') || { struct: 0, contr: 0 };
   const ingelogd = perRonde.find(r => r.naam === 'ingelogd') || { struct: 0, contr: 0 };
+  const zaakronde = perRonde.find(r => r.naam === 'zaak') || { struct: 0, contr: 0 };
   const fouten = [];
   if (totaal > 0) fouten.push(`${totaal} structurele overtreding(en) -- die zijn in beide staten hard nul`);
   if (uitgelogd.contr > grens.uitgelogd.contrast)
     fouten.push(`${uitgelogd.contr} contrastfouten uitgelogd, de grens is ${grens.uitgelogd.contrast}`);
   if (ingelogd.contr > grens.ingelogd.contrast)
     fouten.push(`${ingelogd.contr} contrastfouten ingelogd, de grens is ${grens.ingelogd.contrast} -- er is er een BIJGEKOMEN`);
+  /* De zaakronde leest zijn eigen grens. Hij staat apart van `ingelogd` omdat
+     het andere schermen zijn: alles achter de zaak-inlog. Zou hij bij ingelogd
+     worden opgeteld, dan kan een reparatie aan de ene kant een verslechtering
+     aan de andere kant maskeren. */
+  if (zaakronde.contr > (grens.zaak || {}).contrast)
+    fouten.push(`${zaakronde.contr} contrastfouten in de zaakronde, de grens is ${(grens.zaak || {}).contrast} -- er is er een BIJGEKOMEN`);
   /* Het raakvlak leest zijn grens uit hetzelfde register, en zijn oordeel staat
      in raakvlakkeuring.veltRaakvlak -- puur, dus test/raakvlak.test.js kan het
      zonder browser laten zakken. */
@@ -284,7 +367,10 @@ function startEchteServer() {
   if (raakOordeel.melding) console.log(raakOordeel.melding);
   if (ingelogd.contr < grens.ingelogd.contrast)
     console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
-  console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
-    `contrast uitgelogd nul, ingelogd ${ingelogd.contr} binnen de grens van ${grens.ingelogd.contrast}. ` +
-    `Raakvlak op telefoonformaat: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
+  if (zaakronde.contr < ((grens.zaak || {}).contrast || 0))
+    console.log(`\n[a11y] De grens kan strakker: zaak ${zaakronde.contr} tegen ${(grens.zaak || {}).contrast} in A11Y-INGELOGD.json.`);
+  console.log(`\n[a11y] ${PAGINAS.length} schermen in DRIE staten: uitgelogd, als lid, en als zaak. ` +
+    `Structuur nul in alle drie; contrast uitgelogd nul, lid ${ingelogd.contr} (grens ${grens.ingelogd.contrast}), ` +
+    `zaak ${zaakronde.contr} (grens ${(grens.zaak || {}).contrast}). ` +
+    `Raakvlak op telefoonformaat, lid en zaak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

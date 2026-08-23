@@ -63,6 +63,30 @@ module.exports = (kern) => {
       let: 'Rollen uit een groep worden bij elke inlog opnieuw gezet. Valt de groep weg, dan valt de rol weg; handmatig gegeven rollen blijven staan.' });
   });
 
+  /* ---------- de uitgang ----------
+     Achter het beheer-token van de werkruimte zelf, want dit is HAAR data. Er
+     zit met opzet GEEN voorwaarde op de stand van de tenant of op een
+     betaalstatus: een klant die zijn rekening niet betaalt verliest zijn geld
+     en niet zijn geschiedenis. Zou dat wel mogen, dan is exit-recht een gunst
+     in plaats van een recht -- en dan is de hele belofte niets waard op het
+     enige moment dat hij telt. Ook in de bewaring werkt deze deur; alleen na
+     de vernietiging is er niets meer om op te halen, en dan zegt de 404 dat. */
+  app.post('/api/tenant/export', (req, res) => {
+    const w = bedrijf.beheerVan(req, res); if (!w) return;
+    const uit = tenant.uitgang.exporteer(w.code);
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    res.json({ ok: true, ...uit.uitvoer });
+  });
+
+  /* HIER STOND EEN DEUR OM DE UITVOER TE LATEN NAREKENEN, en die is er weer uit.
+     Twee redenen, en de tweede is de zwaarste. Een open deur die sha256 rekent
+     over willekeurige JSON is rekenwerk dat een vreemde bij ons kan bestellen.
+     En belangrijker: een checksum die door de PRODUCENT wordt nagerekend
+     bewijst de ontvanger niets -- wij zouden even goed kunnen liegen over de
+     uitkomst. Wat wel bewijst is het RECEPT, en dat reist mee in het antwoord:
+     sha256 over de canonieke JSON (sleutels alfabetisch) per soort, en daarna
+     over de catalogus. Drie regels code aan de ontvangende kant, zonder ons. */
+
   app.post('/api/tenant/groepen', (req, res) => {
     const w = bedrijf.beheerVan(req, res); if (!w) return;
     const t = tenant.register.vanWerkruimte(w.code);

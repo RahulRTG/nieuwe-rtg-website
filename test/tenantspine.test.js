@@ -263,3 +263,86 @@ test('11. alleen wat de klant zette geldt als keuze', () => {
     'een tweede bewaring vult aan en gooit de eerste niet weg');
   assert.equal(tenant.merkVan('O-M').merk.naam, 'Imran Group One');
 });
+
+/* ---------- de vernietiging zelf ----------
+   Over de lijn is deze tak niet te halen: de bewaartermijn is minimaal dertig
+   dagen en een toets kan de klok niet vooruitzetten. Hier wordt de termijn in
+   de opslag teruggezet -- dat is precies wat de tijd ook zou doen, en het is de
+   enige tak van deze laag die gegevens ONOMKEERBAAR weghaalt. Ongetoetst laten
+   omdat hij lastig te bereiken is, is bij die tak de verkeerde keuze. */
+function loopOpzet() {
+  const db = { data: { werkruimtes: {}, tenants: {} } };
+  const schoon = (t, n) => String(t == null ? '' : t).slice(0, n).trim();
+  const tenant = maakTenant({ db, save: () => {}, schoon, findSupplier: () => null, bedrijf: () => null });
+  db.data.werkruimtes.W1 = { code: 'W1', naam: 'Klant', at: new Date().toISOString(),
+    beheerToken: 'geheim', journaal: [],
+    leden: { a: { id: 'a', naam: 'Pia', status: 'actief', token: 'sleutel-a', rollen: [] } },
+    projecten: { p1: { id: 'p1', naam: 'Uitrol' } } };
+  tenant.register.zet({ org: 'O-W', naam: 'Klant' });
+  tenant.register.bind('O-W', 'werkruimte', 'W1', true);
+  return { db, tenant };
+}
+const verstrijk = (db) => { db.data.tenants['O-W'].levensloop.bewaarTot = new Date(Date.now() - 1000).toISOString(); };
+
+test('12. na de termijn wordt er vernietigd, met een bewijs zonder persoonsgegevens', () => {
+  const { db, tenant } = loopOpzet();
+  const L = tenant.levensloop;
+  L.zet('O-W', { naar: 'opzegging', reden: 'Klant stopt.' });
+  L.zet('O-W', { naar: 'bewaring', reden: 'Uitloop.' });
+  verstrijk(db);
+
+  assert.equal(L.vernietig('O-W', {}).status, 400, 'er tekent altijd iemand');
+
+  const uit = L.vernietig('O-W', { door: 'R. Imran' });
+  assert.equal(uit.ok, true);
+  assert.equal(db.data.werkruimtes.W1, undefined, 'de werkruimte is weg');
+  assert.deepEqual(db.data.tenants['O-W'].werkruimtes, [], 'en de binding ook');
+  assert.equal(L.stand('O-W').stand, 'vernietigd');
+
+  const b = uit.bewijs;
+  assert.equal(b.door, 'R. Imran');
+  assert.equal(b.werkruimtes.length, 1);
+  assert.ok(b.werkruimtes[0].catalogus.find(c => c.soort === 'projecten').aantal === 1,
+    'het bewijs telt wat er weg is');
+  assert.match(b.checksum, /^[0-9a-f]{64}$/);
+
+  /* HET BEWIJS MAG NIET ZIJN WAT HET BEWIJST. Een vernietigingsbewijs met de
+     naam van een medewerker erin is een kopie van precies dat wat vernietigd
+     moest worden -- en die blijft dan voor altijd staan. */
+  const tekst = JSON.stringify(b);
+  assert.ok(!tekst.includes('Pia'), 'geen namen in het bewijs');
+  assert.ok(!tekst.includes('sleutel-a'), 'en geen sleutels');
+  assert.ok(!tekst.includes('Uitrol'), 'en geen inhoud');
+});
+
+test('13. na de vernietiging valt er niets meer op te halen, en niets meer te doen', () => {
+  const { db, tenant } = loopOpzet();
+  const L = tenant.levensloop;
+  L.zet('O-W', { naar: 'opzegging', reden: 'Stopt.' });
+  L.zet('O-W', { naar: 'bewaring', reden: 'Uitloop.' });
+  verstrijk(db);
+  L.vernietig('O-W', { door: 'R. Imran' });
+
+  assert.equal(tenant.uitgang.exporteer('W1').status, 404, 'er is niets meer te exporteren');
+  assert.equal(L.vernietig('O-W', { door: 'R. Imran' }).status, 409, 'en niets meer te vernietigen');
+  assert.equal(L.zet('O-W', { naar: 'actief', reden: 'Toch terug.' }).status, 409,
+    'vernietigd is een eindstand -- daar komt niemand uit terug');
+  assert.ok(db.data.tenants['O-W'].levensloop.bewijs, 'alleen het bewijs blijft staan');
+});
+
+test('14. een bewaringsplicht wint van een verstreken termijn', () => {
+  const { db, tenant } = loopOpzet();
+  const L = tenant.levensloop;
+  L.zet('O-W', { naar: 'opzegging', reden: 'Stopt.' });
+  L.zet('O-W', { naar: 'bewaring', reden: 'Uitloop.' });
+  verstrijk(db);
+  L.houdVast('O-W', true, 'Lopend geschil.', 'R. Imran');
+
+  const poging = L.vernietig('O-W', { door: 'R. Imran' });
+  assert.equal(poging.status, 409);
+  assert.match(poging.error, /bewaringsplicht/);
+  assert.ok(db.data.werkruimtes.W1, 'en er is niets weggehaald');
+
+  L.houdVast('O-W', false, null, 'R. Imran');
+  assert.equal(L.vernietig('O-W', { door: 'R. Imran' }).ok, true, 'opgeheven: dan kan het wel');
+});

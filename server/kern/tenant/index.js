@@ -97,5 +97,11 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
 
   const bootstrap = require('./bootstrap')({ db, register, brug, merkVan, bedrijf });
 
-  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap };
+  /* De uitgang en de levensloop hangen aan elkaar: het vernietigingsbewijs
+     wordt met dezelfde catalogus gerekend als een uitvoer, want anders bewijst
+     het iets over een andere telling dan de klant ooit heeft meegekregen. */
+  const uitgang = require('./uitgang')({ db, save, crypto: null, register, merkVan });
+  const levensloop = require('./levensloop')({ db, save, schoon, register, uitgang });
+
+  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap, uitgang, levensloop };
 };

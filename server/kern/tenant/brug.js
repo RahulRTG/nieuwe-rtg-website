@@ -41,6 +41,7 @@
 
 const crypto = require('crypto');
 const { ROLLEN } = require('../../bedrijf/rollen-register');
+const { schrijf: schrijfJournaal } = require('./journaal');
 
 const REDEN_UIT = 'Identiteitsprovider: groepslidmaatschap vervallen.';
 const REDEN_SCIM = 'Identiteitsprovider: account gedeactiveerd (SCIM).';
@@ -55,15 +56,10 @@ module.exports = ({ db, save, register }) => {
     const w = ruimtes();
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
   }
-  /* Het journaal van de werkruimte, in dezelfde vorm als bedrijf/rollen.js hem
-     schrijft. Buitenom een rij toevoegen zou een tweede vorm opleveren in
-     hetzelfde journaal, en dan leest de auditor twee soorten regels. */
-  function journaal(w, wat, waarover, reden) {
-    w.journaal = w.journaal || [];
-    w.journaal.unshift({ id: crypto.randomBytes(4).toString('hex'), wie: 'identiteitsprovider',
-      wieId: null, wat, waarover: waarover || null, reden: reden || null, at: nu() });
-    w.journaal = w.journaal.slice(0, 20000);
-  }
+  /* Het journaal van de werkruimte gaat via ./journaal.js: er zijn drie
+     schrijvers en een eigen vorm per schrijver levert een journaal op waarin de
+     auditor twee soorten regels leest. */
+  const journaal = (w, wat, waarover, reden) => schrijfJournaal(w, 'identiteitsprovider', wat, waarover, reden);
 
   const lidVanKey = (w, rtgKey) => Object.values(w.leden || {}).find(l => l.rtgKey === rtgKey) || null;
   const handmatig = (l) => (l.rollen || []).filter(r => r.bron !== 'idp');

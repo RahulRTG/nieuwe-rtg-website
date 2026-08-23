@@ -57,6 +57,55 @@ module.exports = (tctx) => {
     res.json(uit);
   });
 
+  /* ---------- de levensloop ----------
+     Opzeggen, bewaren en de bewaringsplicht. Bij de eigenaar en niet bij de
+     klant: dit gaat over het contract, en een klant die zijn eigen tenant in
+     de bewaring kan zetten, kan de toegang van zijn collega's sluiten. Zijn
+     UITVOER kan hij altijd zelf ophalen -- dat staat in routes/tenant.js en
+     hangt met opzet aan geen enkele stand. */
+  app.post('/api/techniek/tenant/levensloop', techAuth, eigenaarAlleen, (req, res) => {
+    const b = req.body || {};
+    if (!b.naar) {
+      const s = T().levensloop.stand(b.org);
+      return s ? res.json({ ok: true, levensloop: s }) : res.status(404).json({ error: 'Die tenant kennen we niet.' });
+    }
+    const uit = T().levensloop.zet(b.org, { ...b, door: b.door || wie(req) });
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    log.warn('tenant levensloop', { org: String(b.org || '').toUpperCase(), naar: b.naar, door: wie(req) });
+    res.json(uit);
+  });
+
+  app.post('/api/techniek/tenant/bewaringsplicht', techAuth, eigenaarAlleen, (req, res) => {
+    const b = req.body || {};
+    const uit = T().levensloop.houdVast(b.org, b.aan !== false, b.reden, b.door || wie(req));
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    log.warn('tenant bewaringsplicht', { org: String(b.org || '').toUpperCase(), aan: b.aan !== false, door: wie(req) });
+    res.json(uit);
+  });
+
+  /* Vernietigen. Onomkeerbaar, dus met de drie deuren ervoor in de kern en
+     niet hier: een controle in een route is een controle die de volgende
+     aanroeper mist. */
+  app.post('/api/techniek/tenant/vernietig', techAuth, eigenaarAlleen, (req, res) => {
+    const b = req.body || {};
+    const uit = T().levensloop.vernietig(b.org, { door: b.door || wie(req) });
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    log.warn('tenant vernietigd', { org: String(b.org || '').toUpperCase(), door: wie(req),
+      werkruimtes: uit.bewijs.werkruimtes.length });
+    res.json(uit);
+  });
+
+  /* Een uitvoer weer inlezen. Bij de eigenaar omdat er een NIEUWE werkruimte
+     uit komt en niemand anders die mag laten ontstaan; hij landt bewust nooit
+     over een bestaande heen. */
+  app.post('/api/techniek/tenant/invoer', techAuth, eigenaarAlleen, (req, res) => {
+    const b = req.body || {};
+    const uit = T().uitgang.lees(b.uitvoer, { naam: b.naam });
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    log.info('tenant invoer', { werkruimte: uit.werkruimte, door: wie(req) });
+    res.json(uit);
+  });
+
   /* Het merk van de tenant. Komt er als ONDERTEKEND manifest uit; het geheim
      erachter blijft binnen, net als bij de SSO-koppelingen. */
   app.post('/api/techniek/tenant/merk', techAuth, eigenaarAlleen, (req, res) => {

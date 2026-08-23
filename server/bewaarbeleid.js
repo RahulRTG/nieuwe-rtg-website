@@ -128,7 +128,30 @@ const BELEID = [
   { tak: 'weefselZaken', label: 'stadszaken (openbare ruimte)', dagen: 3 * JAAR / DAG, grond: 'nodig',
     vorm: 'lijst', datum: 'at', waarom: 'draagt codenaam en vrije tekst van een melder' },
   { tak: 'weefselWerk', label: 'werkorders openbare ruimte', dagen: 3 * JAAR / DAG, grond: 'nodig',
-    vorm: 'lijst', datum: 'at', waarom: 'de uitvoering; wat er is gedaan blijft in de onderhoudshistorie' }
+    vorm: 'lijst', datum: 'at', waarom: 'de uitvoering; wat er is gedaan blijft in de onderhoudshistorie' },
+
+  /* ---- twee takken met EIGEN REGIE, en waarom ze niet door de veger gaan ----
+
+     De werkruimtes van klanten en hun tenants stonden hier niet, en daardoor
+     stonden ze in de gatenlijst van zonderBeleid(): data zonder termijn. Ze er
+     met een gewone termijn bij zetten zou erger zijn geweest dan het gat.
+
+     De klok van een werkruimte begint namelijk bij de OPZEGGING en niet bij het
+     aanmaken. Een regel `dagen: 90` op het veld `at` laat de veger elke klant
+     wissen die langer dan negentig dagen bestaat -- dat is precies de soort
+     stille ramp waar dit hele bestand tegen bestaat. En er hoort een
+     bewaringsplicht overheen te kunnen (een lopende zaak), plus een
+     vernietigingsbewijs achteraf. Dat is een levensloop, geen termijn.
+
+     Daarom `vorm: 'eigenRegie'`: hij TELT mee in het rapport, hij verdwijnt uit
+     de gatenlijst, en de veger raakt hem nooit aan. Het veld `regie` zegt waar
+     de klok dan wel woont, zodat de volgende lezer niet hoeft te zoeken. */
+  { tak: 'werkruimtes', label: 'werkruimtes van klanten (Werk OS)', dagen: 90, grond: 'contract',
+    vorm: 'eigenRegie', datum: 'at', regie: 'server/kern/tenant/levensloop.js',
+    waarom: 'de termijn loopt vanaf de opzegging, kan onder een bewaringsplicht stilstaan, en eindigt met een vernietigingsbewijs' },
+  { tak: 'tenants', label: 'tenants (contract, merk en groepsafbeelding)', dagen: 90, grond: 'contract',
+    vorm: 'eigenRegie', datum: 'bij', regie: 'server/kern/tenant/levensloop.js',
+    waarom: 'de tenant blijft na vernietiging bestaan met alleen zijn bewijs erin; dat is het bewijs zelf en hoort niet weg te vallen' }
 ];
 
 

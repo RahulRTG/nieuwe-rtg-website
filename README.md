@@ -3387,8 +3387,20 @@ en een scherm mag alleen tonen wat op `mag: true` staat.
 het Werk OS). Het is met opzet het tegenovergestelde van een badgemuur: de
 beweringen die vandaag NIET waar zijn staan er ook, met hun reden, en de SLA
 staat er uitgerekend -- vier voorwaarden, met de twee die ontbreken bij naam.
-Er staat geen beschikbaarheidscijfer op maar de zin waarom niet: de meting is
-platformbreed en niet per organisatie. De stand is zichtbaar voor het
+Er staat geen beschikbaarheidscijfer voor de klant op maar de zin waarom niet:
+de telling gaat per routepatroon en draagt geen tenant.
+
+Wat er wel staat is de **meting per capability** (`server/meting-capaciteit.js`).
+Dat was het laatste open punt van deze laag, en het is opgelost door twee dingen
+aan elkaar te knopen die er allebei al waren: de meting telt per routepatroon,
+en `functies.functieVoorPad` weet welke functie bij welk pad hoort -- dezelfde
+kaart waarmee een eigenaar een functie uitzet. Daarmee is de oorspronkelijke
+bezwaar weg: een storing in een onderdeel dat u niet gebruikt is nu als zodanig
+te zien in plaats van dat hij in uw cijfer verdwijnt. Onder de vloer van vijftig
+verzoeken komt er **geen** percentage maar de reden (nul fouten op drie
+verzoeken leest groener dan elk echt cijfer), routes zonder functie krijgen een
+eigen regel in plaats van te verdwijnen, en het venster staat erbij: de meting
+zit in het geheugen van dit proces en is dus geen maandcijfer. De stand is zichtbaar voor het
 beheer-token of voor een lid met het recht `werkruimte` (dat draagt alleen
 `directie`) -- die tweede sleutel is er omdat het beheer-token in het Werk OS
 nergens wordt ingetypt, en een pagina die niemand kan openen is hetzelfde als

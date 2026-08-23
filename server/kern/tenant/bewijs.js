@@ -45,6 +45,20 @@ function laatsteBackup() {
   } catch (e) { return null; }
 }
 
+/* De meting per capability. LUI geladen en in een try: deze module wordt ook
+   los getoetst, zonder server en zonder functiecatalogus, en dan hoort er geen
+   crash te komen maar een eerlijke `null` met de reden -- een meter zonder
+   invoer zakt, hij gokt niet (LAT-regel 3). */
+function perCapability() {
+  try {
+    const meting = require('../../meting');
+    const functies = require('../../functies');
+    return require('../../meting-capaciteit').stand(meting, functies);
+  } catch (e) {
+    return { nietBeschikbaar: 'De meting per capability is hier niet te lezen (' + e.message + ').' };
+  }
+}
+
 module.exports = ({ register, contract, levensloop, ssoKoppelingen, db }) => {
   function werkruimtesVan(t) {
     const w = db.data.werkruimtes || {};
@@ -130,11 +144,11 @@ module.exports = ({ register, contract, levensloop, ssoKoppelingen, db }) => {
       contract: contract.van(t.org),
       beweringen: rijen,
       toonbaar: rijen.filter(r => r.mag).map(r => r.id),
-      platformbreed: {
+      platformbreed: Object.assign({
         wat: 'De SLO-doelen en de beschikbaarheidscijfers gaan over de hele server en niet over deze organisatie.',
         waar: 'SLO.md en /api/metrics',
-        nietGemeten: 'Er is geen meting per organisatie en geen meting per capability. Een storing in een onderdeel dat u niet gebruikt, zou hier als uw storing verschijnen -- daarom staat er hier geen cijfer.'
-      },
+        nietGemeten: 'Er is geen meting per ORGANISATIE: de telling gaat per routepatroon en draagt geen tenant. Er staat hier daarom geen beschikbaarheidscijfer voor u. Wat er wel is, is de meting per CAPABILITY hieronder -- daarmee is te zien of een storing zat in een onderdeel dat u gebruikt.'
+      }, { perCapability: perCapability() }),
       let: 'Een scherm mag alleen tonen wat hierboven op mag:true staat. Wat op false staat, staat er met de reden -- ' +
         'weglaten leest als vergeten, en dan typt iemand het een keer met de hand.'
     };

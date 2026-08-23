@@ -477,6 +477,13 @@ const EIGEN_MODULE = new Map([
      platformblok zetten, de extra weergaven niet sluiten bij een tabwissel, en
      Ververs weer laten gokken welk scherm er open staat. */
   ['werkstatus.e2e.js', ['public/apps/werk/status.js', 'public/apps/werk/app.js']],
+  /* DE METING PER CAPABILITY. Vier mutaties, vier raak: de vloer eruit (dan
+     krijgt drie verzoeken een geruststellende 0,0%), routes zonder functie
+     weglaten (dan klopt het totaal terwijl er iets ontbreekt), een 4xx als
+     storing meetellen (dan telt elke verkeerde inlog als downtime), en een
+     gooiende functiekaart laten doorslaan (dan is een fout in de CATALOGUS een
+     storing in de METING). */
+  ['metingcapaciteit.test.js', ['server/meting-capaciteit.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

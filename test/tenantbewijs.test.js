@@ -151,7 +151,7 @@ test('5. "eigen domein" en "SLA" staan er altijd, en altijd op nee', async () =>
 test('6. de platformcijfers worden niet als tenantcijfers gepresenteerd', async () => {
   const s = (await api('/api/tenant/status', { werkruimte: ruimte, beheerToken: beheer })).body.status;
   assert.match(s.platformbreed.wat, /over de hele server en niet over deze organisatie/);
-  assert.match(s.platformbreed.nietGemeten, /geen meting per organisatie/);
+  assert.match(s.platformbreed.nietGemeten, /geen meting per ORGANISATIE/i);
 
   /* De harde vorm van dezelfde eis: er staat NERGENS een beschikbaarheids- of
      uptimegetal in dit antwoord. Een cijfer dat de meting niet kan dragen, is
@@ -160,6 +160,29 @@ test('6. de platformcijfers worden niet als tenantcijfers gepresenteerd', async 
   const tekst = JSON.stringify(s);
   assert.ok(!/99[.,]\d/.test(tekst), 'geen 99,9-achtig getal in de tenantstand');
   assert.ok(!/uptime|beschikbaarheid *: *\d/i.test(tekst), 'en geen uptimecijfer');
+
+  /* WAT ER SINDSDIEN WEL IS: de meting per CAPABILITY. De reden dat er geen
+     tenantcijfer staat, was dat een storing in een onderdeel dat een klant
+     niet gebruikt als ZIJN storing zou verschijnen. Dat is nu op te lossen door
+     te kijken WELK onderdeel het was -- en niet door alsnog een totaalcijfer
+     op te schrijven. */
+  const pc = s.platformbreed.perCapability;
+  assert.ok(pc && Array.isArray(pc.capabilities), 'de capabilitystand staat erin: ' + JSON.stringify(pc).slice(0, 200));
+  assert.ok(pc.venster && pc.venster.sinds, 'met het venster erbij');
+  assert.match(pc.venster.let, /geen maandcijfer/, 'en met wat dat venster NIET is');
+  assert.ok(pc.capabilities.length, 'en er is deze run al verkeer geweest');
+
+  /* De vloer: een capability met te weinig verzoeken krijgt GEEN percentage
+     maar een reden. Nul fouten op drie verzoeken leest groener dan het is. */
+  for (const c of pc.capabilities) {
+    if (c.verzoeken >= pc.vloer) assert.equal(typeof c.foutpercentage, 'number', c.id);
+    else {
+      assert.equal(c.foutpercentage, null, c.id + ' krijgt geen percentage');
+      assert.match(c.nietGemeten, /te weinig verzoeken/, c.id + ' zegt waarom');
+    }
+  }
+  assert.ok(pc.nietGemeten.some(n => n.wat === 'per organisatie'),
+    'en wat ook hier niet gemeten wordt, staat er met naam');
 });
 
 test('7. een werkruimte zonder tenant krijgt geen verzonnen stand', async () => {

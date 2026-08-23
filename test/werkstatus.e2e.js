@@ -114,7 +114,16 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
     assert.ok(!/\d+[,.]\d+\s?%/.test(p.alles) && !/99[,.]\d/.test(p.alles),
       'er staat geen beschikbaarheidspercentage op dit scherm: ' + p.alles.slice(0, 300));
     assert.match(p.platform, /niet over deze organisatie/);
-    assert.match(p.platform, /geen meting per capability/, 'en waarom er geen cijfer staat');
+    assert.match(p.platform, /geen meting per ORGANISATIE/i, 'en waarom er geen cijfer voor DEZE klant staat');
+
+    /* DE METING PER CAPABILITY staat er wel, en dat is de reparatie van precies
+       die reden: een storing in een onderdeel dat u niet gebruikt hoort niet als
+       uw storing te lezen, en dat los je op door te tonen WELK onderdeel het was
+       -- niet door alsnog een totaalcijfer op te schrijven. */
+    assert.match(p.platform, /Sinds \d{4}-\d{2}-\d{2}/, 'met het venster erbij: ' + p.platform.slice(0, 200));
+    assert.match(p.platform, /geen maandcijfer/, 'en met wat dat venster NIET is');
+    assert.match(p.platform, /serverfouten over \d+ verzoeken|te weinig verzoeken/,
+      'en per onderdeel een cijfer of de reden dat het er niet is');
 
     /* Wat WEL waar is, staat er met zijn bron en niet als los vinkje. */
     assert.match(p.waar, /Commercieel contract|Auditspoor|Versleutelde opslag/,

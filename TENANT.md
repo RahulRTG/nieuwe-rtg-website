@@ -499,9 +499,30 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    sleutel is een lid met het recht `werkruimte` — in het rollenregister draagt
    alleen `directie` dat, en dat is per definitie wie de werkruimte beheert.
 
-   Nog open: meting per capability. Zonder die kan een storing in een onderdeel
-   dat een klant niet gebruikt niet van zijn eigen storing worden onderscheiden,
-   en daarom staat er ook op dit scherm geen cijfer.
+   **En de meting per capability is er sindsdien ook** (`server/meting-capaciteit.js`).
+   Dat was het laatste open punt van deze laag, en het is opgelost door twee
+   dingen aan elkaar te knopen die er allebei al waren: de meting telt per
+   ROUTEPATROON, en de boardroom weet al welke functie bij welk pad hoort
+   (`functies.functieVoorPad`, dezelfde kaart waarmee een eigenaar een functie
+   uitzet). Er komt dus geen tweede telling en geen tweede catalogus bij.
+
+   Wat dit WEL oplost: de reden dat er geen tenantcijfer stond, was dat een
+   storing in een onderdeel dat een klant niet gebruikt als ZIJN storing zou
+   verschijnen. Dat is nu te zien — per capability, met de drukste eerst.
+
+   Wat het NIET oplost, en dat staat er ook zo: er is nog steeds geen meting per
+   ORGANISATIE, en er komt dus nog steeds geen beschikbaarheidscijfer voor een
+   klant op het scherm. De telling gaat per routepatroon en draagt geen tenant;
+   dat veranderen betekent elke aanroep aan een organisatie knopen, en dat is
+   precies het soort veld dat in een metrics-endpoint niet thuishoort.
+
+   Twee dingen die hier hard zijn: **een percentage over te weinig verzoeken
+   wordt niet gegeven** (onder de vloer staat er `null` met de reden — nul
+   fouten op drie verzoeken leest groener dan elk echt cijfer), en **wat geen
+   functie heeft verdwijnt niet** maar krijgt een eigen regel, want een totaal
+   dat klopt terwijl er iets ontbreekt is de gevaarlijkste vorm. Het venster
+   staat er ook bij: de meting zit in het geheugen van dit proces, dus dit is
+   geen maandcijfer en mag zo niet gelezen worden.
 9. **Command bar** — gedaan voor de VRAAGKANT. De balk in het Werk OS zocht
    niet: hij matchte een woord, opende een tab en zei erbij "Rechten en
    handelingen volgen uw rol" -- tekst zonder dekking, want er werd nergens een

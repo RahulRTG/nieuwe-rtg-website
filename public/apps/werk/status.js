@@ -82,10 +82,31 @@
     }).join('') + '<p class="stil">' + esc(b.reden || 'Alle vier de voorwaarden zijn vervuld.') + '</p>';
   }
 
+  /* DE METING PER CAPABILITY, en waarom hij hier staat in plaats van een
+     totaalcijfer. Een storing in een onderdeel dat u niet gebruikt hoort niet
+     als uw storing te lezen. Dat is niet op te lossen met een preciezer
+     percentage maar door te tonen WELK onderdeel het was -- en per onderdeel
+     te zeggen of er genoeg verkeer was om er iets over te zeggen. */
+  function capabilities(pc) {
+    if (!pc) return '';
+    if (pc.nietBeschikbaar) return '<p class="stil">' + esc(pc.nietBeschikbaar) + '</p>';
+    var kop = '<p class="stil">Sinds ' + esc(String(pc.venster.sinds).slice(0, 16).replace('T', ' ')) +
+      ' · ' + pc.verzoeken + ' verzoeken. ' + esc(pc.venster.let) + '</p>';
+    if (!pc.capabilities.length) return kop + '<p class="stil">Nog geen verkeer in dit venster.</p>';
+    return kop + pc.capabilities.map(function (c) {
+      var waarde = c.foutpercentage === null
+        ? c.nietGemeten
+        : c.foutpercentage + '% serverfouten over ' + c.verzoeken + ' verzoeken';
+      return rij(c.naam, waarde);
+    }).join('') +
+      '<p class="stil">Ook hier niet gemeten: ' +
+      esc((pc.nietGemeten || []).map(function (n) { return n.wat; }).join(', ')) + '.</p>';
+  }
+
   function platform(st) {
     var p = st.platformbreed || {};
     $('stPlatform').innerHTML = rij('Wat', p.wat || '') + rij('Waar', p.waar || '') +
-      '<p class="stil">' + esc(p.nietGemeten || '') + '</p>';
+      '<p class="stil">' + esc(p.nietGemeten || '') + '</p>' + capabilities(p.perCapability);
   }
 
   window.RTGWerkStatus = {

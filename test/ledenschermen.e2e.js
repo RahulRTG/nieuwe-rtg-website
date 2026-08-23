@@ -5,12 +5,11 @@
    andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar
    doet dit huis een reeks beloften over zichzelf die nergens anders staan.
 
-   DE EERLIJKHEIDSMELDING OP HET BUREAUBLAD is de belangrijkste. index.html zegt
-   met zoveel woorden dat dit een demo is en WAT er precies uit staat: echte
-   betalingen, echte bestellingen en de boardroom. Dat is de zin die voorkomt dat
-   iemand denkt dat hij een echte order plaatst. Hij is met een tekstopschoning
-   weg, en dan ziet het huis er precies zo uit terwijl de mededeling verdwenen
-   is -- de stilste manier om oneerlijk te worden.
+   DE EERLIJKHEIDSMELDING VAN MAGNAAT TEST is de belangrijkste. De echte vier
+   werelden kennen geen demo. Alleen de afzonderlijke testwereld benoemt zichzelf
+   als Magnaat Test en zegt zichtbaar dat klantdata, geldstromen en
+   productieacties buiten bereik blijven. Zo kan een test nooit voor echt worden
+   aangezien en draagt productie tegelijk geen proeftekst.
 
    DE PRIVACYBELOFTEN. "Wie ben ik voor Rahul" opent met "alles hier is van u, en
    alles is optioneel"; Vonk en Rendez-vous draaien op codenaam. Dat laatste is
@@ -68,13 +67,10 @@ async function nieuwLid(base) {
    gaan kijken. Zonder dat argument blijft dit precies wat het was: even wachten
    en dan lezen.
 
-   WAAROM DAT ERBIJ IS GEKOMEN. De vaste seconde hieronder was een mes op de
-   snede: gemeten kwam de demo-melding er op ~1000 ms, dus of de toets slaagde
-   hing af van hoe druk de machine was. Hij ging om toen er een domein bijkwam,
-   en de melding die je dan krijgt ("het zegt dat dit een demo is: Naar de
-   inhoud MEENEMEN ...") wijst naar een scherm dat niets mankeert. Zo'n rood
-   kost precies het vertrouwen dat een toets moet leveren, en de volgende
-   persoon zoekt het op de verkeerde plek.
+   WAAROM DAT ERBIJ IS GEKOMEN. Een vaste seconde was een mes op de snede:
+   asynchrone schermtekst kwam soms pas daarna, afhankelijk van hoe druk de
+   machine was. Dan wees de fout naar een scherm dat niets mankeerde en zocht
+   de volgende persoon op de verkeerde plek.
 
    Wachten op een VOORWAARDE lost dat op zonder de bewering te verzwakken:
    verschijnt de tekst niet, dan zakt de toets alsnog -- maar dan met "gewacht
@@ -112,7 +108,7 @@ async function opstelling() {
   return { browser, page, fouten };
 }
 
-test('het bureaublad zegt eerlijk dat dit een demo is, en wat er precies uit staat',
+test('Magnaat Test benoemt zichzelf en houdt klantdata en productieacties buiten bereik',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -121,17 +117,17 @@ test('het bureaublad zegt eerlijk dat dit een demo is, en wat er precies uit sta
     const o = await opstelling();
     browser = o.browser;
 
-    const r = await toon(o.page, base, 'index', token, 'demo');
-    assert.equal(r.pad, '/apps/index.html', 'het bureaublad opent');
+    const r = await toon(o.page, base, 'magnaat', token, 'Magnaat Test');
+    assert.equal(r.pad, '/apps/magnaat.html', 'de afgeschermde testwereld opent');
 
-    /* DE MELDING ZELF. Niet alleen "demo" -- dat kan van alles betekenen -- maar
-       ook WAT er uit staat. Een demo-melding zonder die opsomming laat een lid
-       gissen of zijn bestelling nu wel of niet is doorgegaan. */
-    assert.match(r.tekst, /demo/i, 'het zegt dat dit een demo is: ' + r.tekst.slice(0, 200));
-    assert.match(r.tekst, /betaling|payment/i, 'en noemt de betalingen');
-    assert.match(r.tekst, /bestelling|order/i, 'en de bestellingen');
-    assert.match(r.tekst, /boardroom/i, 'en de boardroom');
-
+    /* Magnaat Test is de enige testversie. De melding noemt daarom niet meer
+       de brede en verwarrende term "demo", maar wel de harde grens met de
+       echte omgeving. */
+    assert.match(r.tekst, /Magnaat Test/i, 'het benoemt de testomgeving expliciet');
+    assert.match(r.tekst, /afgeschermd van klantdata|klantdata .*buiten bereik/i,
+      'en sluit echte klantdata uit');
+    assert.match(r.tekst, /afgeschermd van .*productieacties|productieacties .*buiten bereik/i,
+      'en sluit productieacties uit');
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
   } finally {
     if (browser) await browser.close();

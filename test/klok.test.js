@@ -158,6 +158,83 @@ test('een schrikkeldagkind wordt ook in een gewoon jaar jarig', () => {
   assert.equal(inProces({ RTG_KLOK: '2029-03-01T12:00:00Z' }, code), '17');
 });
 
+/* ---------- de monotone klok: duur is geen datum ---------- */
+
+/* DE FOUTKLASSE DIE HIERMEE VERDWIJNT. Een duur die als `Date.now() - t0` is
+   uitgerekend wordt kleiner zodra de wandklok achteruit gaat -- bij een
+   NTP-correctie, bij wintertijd, en hier bij RTG_KLOK=-1u. Een timeout van
+   dertig seconden verloopt dan nooit meer, een failback-venster springt open,
+   een uptime wordt negatief.
+
+   Deze twee toetsen zetten die klok echt terug en meten allebei dezelfde duur:
+   een op de wandklok, een op de monotone. De eerste hoort te breken en de
+   tweede niet. Zonder die eerste helft zou de tweede ook groen blijven als de
+   monotone klok gewoon de wandklok was. */
+function inKind(env, code) {
+  return JSON.parse(execFileSync(process.execPath, ['-e', code, path.join(WORTEL, 'server', 'lib', 'klok.js')],
+    { encoding: 'utf8', env: Object.assign({}, process.env, env) }).trim().split('\n').pop());
+}
+
+const DUURPROEF = [
+  'const k = require(process.argv[1]);',
+  // twee merken zetten met de WANDklok en met de MONOTONE klok, en er tussenin
+  // net doen alsof er een uur verstrijkt door de klok terug te lezen
+  'const wandVoor = k.nu(); const monoVoor = k.sinds();',
+  'for (let i = 0; i < 2e6; i++);',
+  'const wandNa = k.nu(); const monoNa = k.sinds();',
+  'console.log(JSON.stringify({ wand: wandNa - wandVoor, mono: monoNa - monoVoor, klok: k.nu() }));'
+].join('\n');
+
+test('de monotone klok telt vooruit en is NIET door RTG_KLOK te verzetten', () => {
+  const gelijk = inKind({ RTG_KLOK: '' }, DUURPROEF);
+  const terug = inKind({ RTG_KLOK: '-1u' }, DUURPROEF);
+
+  /* De wandklok staat in het tweede proces echt een uur terug -- anders zegt de
+     rest van deze toets niets. */
+  assert.ok(terug.klok < gelijk.klok - 3500000,
+    'RTG_KLOK=-1u hoort de wandklok echt terug te zetten (verschil ' + (gelijk.klok - terug.klok) + ' ms)');
+
+  /* En de gemeten DUUR is in beide processen gewoon een kleine positieve tijd:
+     de verschuiving is bij het laden vastgezet, dus hij zit in beide merken. */
+  for (const [naam, uit] of [['gelijke klok', gelijk], ['klok een uur terug', terug]]) {
+    assert.ok(uit.mono >= 0, 'de monotone duur kan niet negatief zijn (' + naam + '): ' + uit.mono);
+    assert.ok(uit.mono < 60000, 'de monotone duur hoort een lus te meten en geen uur (' + naam + '): ' + uit.mono);
+  }
+});
+
+test('een duur op de WANDklok breekt als de klok terugloopt; op de monotone niet', () => {
+  /* Hier zetten we de klok NIET via RTG_KLOK (dat verschuift bij het laden en
+     zit dus in beide merken) maar echt tussen de twee metingen door, door de
+     wandklok-lezing te vervangen. Dat is precies wat een NTP-correctie doet. */
+  const code = [
+    'const k = require(process.argv[1]);',
+    'const echt = Date.now;',
+    'const wandVoor = k.nu(); const monoVoor = k.sinds();',
+    'for (let i = 0; i < 2e6; i++);',
+    // de wandklok springt een uur terug, midden in de meting
+    'Date.now = () => echt.call(Date) - 3600000;',
+    'const wandDuur = k.nu() - wandVoor;',
+    'const monoDuur = k.sinds() - monoVoor;',
+    'console.log(JSON.stringify({ wandDuur, monoDuur }));'
+  ].join('\n');
+  const uit = inKind({ RTG_KLOK: '' }, code);
+
+  assert.ok(uit.wandDuur < 0,
+    'de proef moet de wandklok echt terugzetten, anders bewijst de regel hieronder niets (wandDuur ' + uit.wandDuur + ')');
+  assert.ok(uit.monoDuur >= 0,
+    'de monotone klok hoort van een teruglopende wandklok niets te merken; gemeten ' + uit.monoDuur + ' ms');
+  assert.ok(uit.monoDuur < 60000, 'en hij hoort nog steeds een lus te meten: ' + uit.monoDuur + ' ms');
+});
+
+test('verstreken(merk) is hetzelfde als sinds() - merk', () => {
+  const { sinds, verstreken } = require('../server/lib/klok.js');
+  const merk = sinds();
+  const a = verstreken(merk);
+  const b = sinds() - merk;
+  assert.ok(b >= a, 'later gemeten hoort niet kleiner te zijn');
+  assert.ok(b - a < 50, 'en ze horen dicht bij elkaar te liggen: ' + a + ' tegen ' + b);
+});
+
 /* ---------- de schuldmeter ---------- */
 
 test('de klokschuld telt alleen tijdsvragen en geen omrekeningen', () => {

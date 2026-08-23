@@ -91,6 +91,47 @@ const VERSCHUIVING = INSTELLING.ms;
 const nu = VERSCHUIVING === 0 ? () => Date.now() : () => Date.now() + VERSCHUIVING;
 const datum = VERSCHUIVING === 0 ? () => new Date() : () => new Date(Date.now() + VERSCHUIVING);
 
+/* ---------- DE MONOTONE KLOK: voor DUUR, niet voor DATUM ----------
+
+   TWEE KLOKKEN, EN DAT IS GEEN LUXE. `nu()` en `datum()` hierboven zeggen HOE
+   LAAT het is. Deze zegt HOE LANG iets duurt. Dat lijkt hetzelfde en is het niet,
+   en het verschil is een foutklasse die met de wandklok niet te vermijden is.
+
+   De wandklok kan namelijk ACHTERUIT. Bij een NTP-correctie, bij de overgang
+   naar wintertijd, en hier ook bij RTG_KLOK=-1u. Elke duur die als
+   `Date.now() - t0` is uitgerekend wordt op dat moment kleiner, of negatief:
+
+     een timeout van 30 seconden verloopt nooit meer, of meteen
+     een failback-venster van vijf minuten springt open of dicht
+     een uptime van drie dagen wordt min een uur
+     een rate limiter geeft iedereen weer een volle emmer
+
+   Er staan op dit moment 101 plekken in server/ die een duur op de wandklok
+   uitrekenen. Niet allemaal fout -- "zeven dagen geleden" hoort juist een DATUM
+   te zijn -- maar wie een timeout of een venster meet, hoort hier te zijn.
+
+   `sinds()` telt milliseconden vanaf het begin van dit proces en kan per
+   definitie niet achteruit. Hij is met opzet NIET door RTG_KLOK te verzetten:
+   dat is geen omissie maar de hele eigenschap. Een verzette wandklok hoort een
+   verlopen mandaat te kunnen laten zien; hij hoort een timeout van dertig
+   seconden niet stiekem te veranderen. Wie beide verzet, toetst niets meer --
+   dan meet de proef zijn eigen instelling.
+
+   Waarom performance.now() en niet process.hrtime(): dezelfde monotone bron,
+   maar meteen in milliseconden als getal. hrtime geeft bigint-nanoseconden en
+   die moeten overal weer omgerekend worden -- drie omrekeningen verderop staat
+   er dan alsnog een afrondingsfout in een venster.
+
+   Handhaver: test/klok.test.js -- met RTG_KLOK=-1u loopt de wandklok een uur
+   terug terwijl deze gewoon dooretelt. */
+const sinds = () => performance.now();
+
+/* Hoeveel tijd is er verstreken sinds een eerder `sinds()`-merk. Bestaat apart
+   zodat een aanroeper niet zelf hoeft af te trekken: `Date.now() - t0` is
+   precies de vorm die we hier weg willen hebben, en `sinds() - t0` leest er nog
+   steeds als. `verstreken(t0)` zegt wat het is. */
+const verstreken = (merk) => performance.now() - merk;
+
 /* Voor logs en voor de schermtoets: staat er iets scheef, en hoeveel. */
 const verschoven = () => VERSCHUIVING !== 0;
 const uitleg = () => (VERSCHUIVING === 0 ? 'de klok loopt gelijk'
@@ -112,4 +153,4 @@ const CONTROL = {
     'niet over de hele server.'
 };
 
-module.exports = { nu, datum, verschoven, uitleg, lees, EENHEDEN, CONTROL };
+module.exports = { nu, datum, sinds, verstreken, verschoven, uitleg, lees, EENHEDEN, CONTROL };

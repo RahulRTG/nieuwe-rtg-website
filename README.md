@@ -3328,9 +3328,41 @@ WEER IN TE LEZEN is en er hetzelfde uit komt.
   de derde vorm `eigenRegie` in `bewaarbeleid.js`: hij telt mee, verdwijnt uit de
   gatenlijst, en `veeg()` raakt hem nooit aan.
 
+**Het contract en het quotum.** Drie pakketten (proef, zakelijk, concern) met
+twee grenzen die echt bijten: het aantal werkruimtes onder de tenant en het
+aantal verzoeken per uur. Wat een verkooppraatje verder belooft -- opslag,
+aantal leden, supportvenster, hersteltijd -- staat in `nietAfgedwongen` met de
+reden. Een **verlopen contract is geen noodknop**: het weigert nieuwe
+inrichting en verder niets; wie er werkt blijft werken en de uitvoer blijft
+open. De teller staat per uur in de opslag (een teller die bij elke herstart op
+nul begint is geen quotum maar een suggestie) en wordt geteld op de twee deuren
+van de werkruimte, niet op 104 routes.
+
+**De bewijspoort.** `POST /api/tenant/status`. Zeven beweringen die elk OF een
+bron OF een reden dragen -- versleutelde opslag (staat `RTG_ENC_KEY` gezet),
+auditspoor (het aantal journaalregels), eigen identiteitsprovider (een actieve
+koppeling), lopend contract, dagelijkse back-up, en twee die **altijd nee** zijn:
+eigen domein en SLA. Die laatste is een berekening: vier voorwaarden, waarvan er
+vandaag twee ontbreken. Er staat **geen beschikbaarheidsgetal** in de
+tenantstand -- de meting is platformbreed, en een cijfer dat de meting niet kan
+dragen is preciezer dan de werkelijkheid. Dit is de laag die de weggehaalde
+enterprise-schil onmogelijk maakt: een bewering is nu een object met een bron,
+en een scherm mag alleen tonen wat op `mag: true` staat.
+
+**SCIM `/Groups`.** Een groepswijziging bij de klant werkte pas door bij de
+volgende inlog; bij een sessie van dertig dagen dus een maand. Nu duwt de IdP
+hem naar ons toe en beweegt de werkruimte mee in hetzelfde verzoek -- ook, en
+juist, voor wie eruit gaat. Een groep draagt een naam en leden en verder niets:
+geen rechten (die staan in de groepsafbeelding, gezet door een mens) en geen
+nesting. Bij het inloggen wordt de unie van de tokenclaim en de SCIM-tabel
+genomen. **SAML is een besluit en geen taak**: dat vraagt XML-DSig-verificatie,
+en dit huis heeft nul runtime-afhankelijkheden -- zie `TAKEN.md` 4.54.
+
 `test/tenantspine.test.js` (15, de regels), `test/tenant.test.js` (8, over de
-lijn), `test/tenantuitgang.test.js` (6, de uitgang) en `test/werkmerk.e2e.js`
-(het scherm) leggen dit vast; zeventien mutaties, alle zeventien RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
+lijn), `test/tenantuitgang.test.js` (7, de uitgang), `test/tenantcontract.test.js`
+(7), `test/tenantbewijs.test.js` (7), `test/scimgroepen.test.js` (5) en de
+schermtoetsen `test/werkmerk.e2e.js` en `test/werkcommandbalk.e2e.js` leggen dit
+vast; drieentwintig mutaties, alle drieentwintig RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
 merkcontrole overslaan, een leeg quotum in de bootstrap zetten, de IdP een
 ontslag laten herstellen, deprovisioning over alle tenants laten lopen en de
 accentkleur op de RTG-kopbalk lekken, de geheimen in de export laten staan, een

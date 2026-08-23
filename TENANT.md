@@ -449,7 +449,24 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    en een bevestigingsmodel nodig, en die bestaan hier niet -- dat bouwen zonder
    die twee is precies de belofte-zonder-code waar de rest van dit document
    over gaat. Staat als open punt in `TAKEN.md`.
-10. **Digital twin en extension fabric** — open.
+10. **Digital twin en extension fabric** — **niet gebouwd, en niet als
+    ontbrekende laag maar als besluit.** De vraag die een twin moet
+    beantwoorden -- "wat raakt het als deze vestiging sluit" -- wordt door het
+    werkcommand-register al beantwoord: `POST /api/bedrijf/dossier` geeft de
+    feiten, **wie ernaar verwijst** en de tijdlijn, en `/api/bedrijf/wandel`
+    loopt twee stappen verder. Een laag die die twee onder een nieuwe naam
+    samenvat, voegt een woord toe en geen vermogen -- en zet er een tweede
+    lezing van dezelfde graaf naast (`LAT.md` regel 4).
+
+    Wat een twin er WEL bovenop zou moeten leggen, bestaat geen van allen:
+    kosten per wijziging, de contracten die eraan hangen als afdwingbaar
+    gegeven, de controls die erdoor geraakt worden, en een rollback. Die vier
+    bouwen is vier lagen werk; ze *tonen* zonder ze te hebben, is precies de
+    belofte-zonder-code waar dit hele document over gaat.
+
+    De volgorde als hij er ooit komt: eerst kosten per object (er is vandaag
+    geen kostprijs per werkruimte-object), dan de koppeling contract-object,
+    dan pas een scherm dat "simuleer" heet.
 
 ## 9. De grenzen
 

@@ -41,6 +41,11 @@ module.exports = (kern) => {
      en dan is "gastNr 3" een nummer waar een runner niets aan heeft. De naam
      erbij komt uit kern/horeca/gezelschap.js, want daar staat wie er zit. */
   const gezelschap = require('../../../kern/horeca/gezelschap')({ horeca, schoon });
+  const paslaag = require('../../../kern/horeca/pas')({ horeca, schoon });
+  /* De stempels bij een standwissel staan in keukenlaag.js en niet hier: de pas
+     geeft een hele gang in een tik uit, en twee plekken die `stand` zetten,
+     zetten op een dag niet meer dezelfde tijdstempels erbij (LAT-regel 4). */
+  const { zetStand } = require('../../../kern/horeca/keukenlaag');
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
 
   /* Een regel zoals de keuken hem ziet. `loopt` telt vanaf de vrijgave door de
@@ -82,8 +87,6 @@ module.exports = (kern) => {
         rijen.push(bord(h, rek, regel));
       }
     }
-    /* Volgorde: de gewenste serveertijd eerst (die is een afspraak met de gast),
-       daarna wie het langst loopt. Bewust NIET op wie het duurst is. */
     /* De cadans erbij, per regel. Additief: geen bestaand veld verandert, dus
        een scherm dat hem nog niet kent, blijft precies werken zoals het deed. */
     const cadans = new Map(cadanslaag.cadansVanZaak(h).map(r => [r.regelId, r]));
@@ -120,10 +123,10 @@ module.exports = (kern) => {
     const vooruit = REGELSTANDEN.indexOf(naar) > REGELSTANDEN.indexOf(van);
     if (!vooruit && !schoon(req.body.reden, 120))
       return res.status(400).json({ error: 'Terugzetten van "' + van + '" naar "' + naar + '" kan, maar noteer waarom; dat blijft op de bon staan.' });
-    regel.stand = naar;
-    if (naar === 'gestart' && !regel.startAt) regel.startAt = nu();
-    if (naar === 'klaar') regel.klaarAt = nu();
-    if (naar === 'uitgegeven') regel.uitAt = nu();
+    zetStand(regel, naar, nu());
+    /* Ging de laatste regel van een gang de deur uit, dan hoort de claim van de
+       pas niet te blijven staan. */
+    if (naar === 'uitgegeven') paslaag.ruimOp(rek);
     if (!vooruit) regel.correcties = (regel.correcties || []).concat([{ van, naar, reden: schoon(req.body.reden, 120), at: nu(), door: req.actor.name }]).slice(-10);
     save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'keuken' });

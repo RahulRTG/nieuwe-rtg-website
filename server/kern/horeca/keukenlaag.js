@@ -50,4 +50,22 @@ function openWerk(h, kokken) {
     rekensom: openMinuten + ' bereidingsminuten open, gedeeld door ' + capaciteit + ' kok(s).' };
 }
 
-module.exports = { STANDAARD, BINNEN, bereidingsMinuten, openWerk };
+/* De standwissel van EEN regel, met de tijdstempels die erbij horen.
+
+   Dit stond in de handler van keuken/stand en nergens anders -- tot de pas een
+   hele gang in één tik wilde uitgeven. Twee plekken die `stand` zetten, zetten
+   op een dag niet meer dezelfde stempels erbij, en dan klopt `uitAt` op de ene
+   bon wel en op de andere niet (LAT-regel 4).
+
+   Wat hier NIET in zit is of de wissel MAG: vooruit mag altijd, terug alleen
+   met een reden, en dat oordeel hoort bij de aanroeper. Deze functie schrijft
+   alleen op wat er gebeurd is. */
+function zetStand(regel, naar, nuIso) {
+  regel.stand = naar;
+  if (naar === 'gestart' && !regel.startAt) regel.startAt = nuIso;
+  if (naar === 'klaar') regel.klaarAt = nuIso;
+  if (naar === 'uitgegeven') regel.uitAt = nuIso;
+  return regel;
+}
+
+module.exports = { STANDAARD, BINNEN, bereidingsMinuten, openWerk, zetStand };

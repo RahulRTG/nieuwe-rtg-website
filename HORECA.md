@@ -81,8 +81,8 @@ Dit is geen wenslijst; het meeste staat er. Gemeten op 23 augustus 2026 tegen
 | bestelling → gang | **staat**, met `gang/vrij` als expliciete vrijgave | `horeca/rekening.js` |
 | bereidingsstappen | **half**: één norm per gerecht, geen stappen | `keukenlaag.js` |
 | station | **staat** | `keuken/bord` |
-| pass | **staat**, en geeft niets automatisch uit | `horeca/expeditie.js` |
-| runner | **ONTBREEKT** als rol met een claim | — |
+| pass | **staat**, met claim per gang; geeft niets automatisch uit | `kern/horeca/pas.js` |
+| runner | **half**: de claim staat, de rol nog niet | `kern/horeca/pas.js` |
 | uitserveren | **staat** als stand `uitgegeven` | `keuken/stand` |
 | betaling | **staat**, dertien wijzen, splitsen tot op de cent | `horeca/betalen.js` |
 | bewijs | **half**: bon en logboek wel, action receipt niet | `horeca/bonnen.js` |
@@ -130,9 +130,11 @@ iets bouwt dat er al is:
 - **De offline-wachtrij is er aan de serverkant** en is idempotent op
   `clientId` — `POST /api/supplier/horeca/offline/sync`. Er is alleen nog geen
   enkele client die hem gebruikt.
-- **De duwstroom is er al**: elke standwijziging stuurt
-  `sseToSupplier(code, 'sync', { scope: 'keuken' })`, en `/api/supplier/stream`
-  draait. Alleen luistert geen horecascherm ernaar.
+- **De duwstroom draait**: elke standwijziging stuurt
+  `sseToSupplier(code, 'sync', { scope: 'keuken' })` over `/api/supplier/stream`.
+  VUUR, de zaal en de pas luisteren mee via `RTGHoreca.luister()`, met een trage
+  terugval eronder — een keuken die stilstaat is erger dan een die traag is. De
+  overige horecaschermen hangen er nog niet aan.
 - **Servicegolf, guest recovery, dish twin, spatial venue, folio, event,
   polsband, HACCP, bezorgzone** — allemaal aanwezig met endpoint en scherm.
 - **114 talen** staan in `public/shared/i18n.js`.
@@ -194,11 +196,33 @@ Wat daarbij uit elkaar is gehaald en uit elkaar moet blijven:
 - **Het spoor draagt wie het deed.** Een verdeling van de bediening staat op
   haar naam en niet als "gast".
 
-**3. Claim op uitgifte.** Een gereed product gaat naar de relevante medewerker,
-niet naar iedereen; wie claimt, laat de taak bij de rest verdwijnen. Het patroon
-bestaat al voor gastverzoeken (`open → opgepakt → klaar`, met "ik ga" en
-"gedaan" als twee verschillende knoppen, precies omdat er anders twee mensen of
-niemand loopt). Datzelfde patroon over de pas en de bar.
+**3. Claim op uitgifte.** *Gedaan.* Een complete gang die bij de pas staat, is
+een draagtaak met een mens eraan: oppakken, loslaten, overnemen, en de hele gang
+in één tik uitgeven. Zonder die claim lopen er twee mensen naar tafel 8, of
+geen — precies de fout die de gastverzoeken al eerder hebben opgelost, met
+dezelfde twee knoppen. `kern/horeca/pas.js`, en op het scherm boven de
+regielijst, want daar loopt de tijd doorheen: eten dat klaar staat wordt koud.
+
+Vijf dingen liggen daar vast:
+
+- **Alleen een complete gang staat op de pas.** Een halve gang is geen taak, en
+  hem oppakken wordt geweigerd mét wat er nog in de keuken staat. Dat is de hele
+  belofte van gangregie.
+- **Een claim is van één mens.** De tweede hoort wie hem heeft en hoe lang al —
+  de claim wordt nooit stilzwijgend afgepakt.
+- **Claimen vinkt niets af.** De borden blijven op `klaar` tot een mens uitgeeft
+  (grens 4 hieronder).
+- **Overnemen is een eigen handeling**, met beide namen erin en in het logboek.
+  Er staat géén tijdslimiet waarna het systeem een claim zelf laat vallen: dat
+  zou een verzonnen getal zijn, en het zou de claim juist wegnemen wanneer het
+  druk is. Wat er wél staat is hoe lang hij loopt — een feit waar een collega op
+  mag handelen.
+- **Loslaten kan alleen wat van jou is**, of door een manager die een tafel moet
+  deblokkeren.
+
+*Wat hier nog niet in zit:* de bar heeft geen eigen werkstand. Een drankgang is
+nu gewoon een gang met station `bar`, dus hij staat op dezelfde lijst. Het
+groeperen tot drankgolven (BAR hierboven) is een eigen stap.
 
 **4. PDA SERVICE** als eigen werkstand, met rolmodi (bediening, runner, host,
 wijkhoofd, manager) op één app.

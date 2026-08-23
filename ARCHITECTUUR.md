@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3995 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4000 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3995 |
-| servermodules (`server/**/*.js`) | 2203 |
-| routebestanden (`server/routes/**`) | 458 |
-| kernmodules (`server/kern/**`) | 1342 |
+| API-endpoints | 4000 |
+| servermodules (`server/**/*.js`) | 2205 |
+| routebestanden (`server/routes/**`) | 459 |
+| kernmodules (`server/kern/**`) | 1343 |
 | schermen (`public/**/*.html`) | 260 |
 | gedeelde browsermodules (`public/shared/*.js`) | 224 |
-| toetsbestanden (`test/*.test.js`) | 909 |
+| toetsbestanden (`test/*.test.js`) | 910 |
 | schermtoetsen (`test/*.e2e.js`) | 126 |
 
 ## 2. De weg van een verzoek
@@ -104,7 +104,7 @@ zie §5 -- er zijn nog 191 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 641 | 57 | 10 | 398 |
-| `supplier` | 567 | 104 | 10 | 296 |
+| `supplier` | 572 | 105 | 10 | 297 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 71 | 9 | 39 | 60 |
@@ -125,13 +125,13 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1414 |
+| kern-namen die routes aanraken | 1415 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 191 |
-| daarvan door precies één domein | 1223 |
+| daarvan door precies één domein | 1224 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
-Dat derde getal is de opening: 86% van wat er in de gedeelde zak zit, wordt door
+Dat derde getal is de opening: 87% van wat er in de gedeelde zak zit, wordt door
 precies één domein gebruikt. Dat hoort geen gedeelde kern te zijn maar bezit van dat
 domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen zakken.
 

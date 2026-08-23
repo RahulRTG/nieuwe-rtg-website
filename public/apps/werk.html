@@ -29,6 +29,7 @@
   </div>
 
   <div id="inhoud" hidden>
+    <div id="wkMerk" class="wk-merk" hidden></div>
     <div class="tabs wk-hidden-tabs" role="tablist" aria-label="Weergave">
       <button class="knop" id="tabStart" role="tab" aria-selected="true" type="button">Start</button>
       <button class="knop" id="tabModules" role="tab" aria-selected="false" type="button">Modules</button>
@@ -51,6 +52,11 @@
         <div class="kop">Nog niet gemeten</div>
         <div id="wNiet"></div>
         <p class="stil h-mt40">Wat hier staat, staat er als niet gemeten en niet als nul. Een leeg vak op een dashboard leest als "rustig", en dat is precies de leugen die dit scherm niet vertelt.</p>
+      </div>
+      <div class="kaart">
+        <div class="kop">Niet gebouwd voor uw organisatie</div>
+        <div id="wkNietGebouwd"></div>
+        <p class="stil h-mt40">Abonnement, verbruik, bewaartermijn en bewijsstand per organisatie bestaan hier nog niet. Ze staan er met de reden en niet als lege waarde -- een leeg quotum leest als "geen verbruik".</p>
       </div>
       </article><article class="wk-view wk-authority"><div class="wk-ey">AUTHORITY TABLE</div><h2>Besluiten met menselijke autoriteit.</h2>
       <div class="kaart">
@@ -96,6 +102,7 @@
 </section><section class="wk-rahul" aria-label="Rahul AI"><header><button id="wkMouth" type="button" aria-label="Praat met Rahul">◌</button><span><b>Rahul</b><small>AI · BESCHIKBAAR</small></span><button id="wkRahulExpand" type="button" aria-label="Terug naar werkblad" aria-expanded="true">↙</button></header><div class="wk-rahul-conversation"><span>RAHUL · WORK INTELLIGENCE</span><h2>Waarmee kan ik uw organisatie helpen?</h2><small id="wkRahulContext">Ik zie wat werk blokkeert, wie bevoegd is en welke beslissing het meeste vrijgeeft.</small></div><div class="wk-rahul-compose"><input id="wkRahulInput" placeholder="Vraag Rahul…"><button id="wkRahulSend" type="button" aria-label="Verstuur naar Rahul">→</button></div></section></main></div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/apps/werk/kern.js"></script>
+<script src="/apps/werk/merk.js"></script>
 <script src="/apps/werk/start.js"></script>
 <script src="/apps/werk/modules.js"></script>
 <script src="/apps/werk/acties.js"></script>

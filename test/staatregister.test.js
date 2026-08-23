@@ -19,7 +19,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { scanBestand, eigenaarVan } = require('../scripts/lib/staatscan.js');
+const { scanBestand, eigenaarVan, schrijversIn } = require('../scripts/lib/staatscan.js');
 const { maakBoom, binnen } = require('../scripts/lib/ephemere-boom');
 const staat = require('../scripts/staat.js');
 
@@ -142,6 +142,88 @@ test('elke geregistreerde wortel heeft een eigenaar en een geldige klasse', () =
       assert.ok(r.bewijs, id + ' heet herstelbaar maar noemt geen bewijs dat die reset werkt');
     }
   }
+});
+
+/* IS DE BELOOFDE RESET OOK EEN ECHTE RESET?
+
+   Een register dat `herstelbaar` zegt met een reset erbij, is tot dat moment een
+   ZIN. Op zulke zinnen wordt straks een server hergebruikt, en een gedeelde
+   server die lekt geeft geen fout maar een verkeerd antwoord.
+
+   De aanleiding is een eigen misser. Ik schreef een resetcontract voor
+   server/log.js dat met zoveel woorden beweerde de volgteller mee te nemen; toen
+   ik `foutVolg = 0` uit foutenReset() sloopte bleef die toets groen. Dat lag niet
+   aan de toets: foutVolg bepaalt alleen de onderlinge volgorde van foutgroepen en
+   komt nergens naar buiten, dus aan de buitenkant is een doorlopende teller
+   onwaarneembaar. Waarneembaarheid kon dat bewijs niet leveren; de bron wel.
+
+   schrijversIn() zegt per moduleniveau-binding binnen WELKE functies erin
+   geschreven wordt. Daarmee is "reset: log.foutenReset()" een controleerbare
+   bewering geworden. */
+test('schrijversIn zegt welke functie in welke wortel schrijft', () => {
+  const r = schrijversIn(
+    'let teller = 0;\nconst kaart = new Map();\n' +
+    'function tel() { teller++; }\n' +
+    'function wis() { teller = 0; kaart.clear(); }\n' +
+    'function kijk() { return kaart.size + teller; }\n', 'p.js');
+  assert.deepEqual([...r.schrijvers.get('teller')].sort(), ['tel', 'wis']);
+  assert.deepEqual([...r.schrijvers.get('kaart')], ['wis']);
+  assert.ok(r.functies.has('kijk'), 'de functienamen van het bestand horen er ook in te staan');
+  assert.ok(!r.schrijvers.has('kijk'), 'lezen is geen schrijven');
+});
+
+test('schrijversIn rekent een schrijfactie toe aan ALLE omsluitende functies', () => {
+  const r = schrijversIn('let x = 0;\nfunction buiten() { [1].forEach(() => { x = 1; }); }\n', 'p.js');
+  assert.deepEqual([...r.schrijvers.get('x')], ['buiten'],
+    'een reset die zijn werk in een callback doet, doet het nog steeds');
+});
+
+test('een pijlfunctie in een const krijgt de naam van die const', () => {
+  const r = schrijversIn('let x = 0;\nconst wis = () => { x = 0; };\n', 'p.js');
+  assert.deepEqual([...r.schrijvers.get('x')], ['wis']);
+  assert.ok(r.functies.has('wis'));
+});
+
+/* DE ECHTE POORT. Elke wortel die `herstelbaar` heet, moet een reset noemen die
+   hem in de bron ook echt aanraakt -- en een bewijsbestand dat bestaat. */
+test('elke beloofde reset raakt zijn wortel echt aan', () => {
+  const beeld = staat.meet();
+  assert.deepEqual(beeld.ongedekt.map(g => g.id + ': ' + g.reden), [],
+    'een reset die zijn wortel niet aanraakt is erger dan geen reset: op die belofte ' +
+    'wordt straks een server hergebruikt');
+  /* En hij hoort echt iets te controleren: nul herstelbare wortels zou hier
+     groen zijn om de verkeerde reden (LAT-regel 9). */
+  assert.ok(beeld.perKlasse.herstelbaar >= 3,
+    'er horen herstelbare wortels te zijn om te controleren (' + beeld.perKlasse.herstelbaar + ')');
+});
+
+test('een reset die de wortel niet aanraakt wordt gezien, en de twee gebreken worden uit elkaar gehouden', () => {
+  const reg = (reset, bewijs) => ({
+    wortels: { 'server/log.js#foutVolg': { levensduur: 'herstelbaar', reset, bewijs, eigenaar: 'server' } }
+  });
+  assert.deepEqual(staat.dekking(reg('log.foutenReset()', 'test/fout-aggregatie.test.js'), WORTEL), [],
+    'de echte reset hoort te kloppen; klopt die niet, dan zegt de rest hieronder niets');
+
+  const raakt = staat.dekking(reg('log.foutenSamenvatting()', 'test/fout-aggregatie.test.js'), WORTEL);
+  assert.equal(raakt.length, 1);
+  assert.equal(raakt[0].gebrek, 'raaktNiet', 'foutenSamenvatting bestaat wel maar schrijft niets');
+
+  const weg = staat.dekking(reg('log.zetTerug()', 'test/fout-aggregatie.test.js'), WORTEL);
+  assert.equal(weg[0].gebrek, 'ontbreekt', 'zetTerug bestaat helemaal niet in dat bestand');
+
+  const proza = staat.dekking(reg('na een herstart', 'test/fout-aggregatie.test.js'), WORTEL);
+  assert.equal(proza[0].gebrek, 'ontbreekt', 'een omschrijving zonder haakjes is geen aanroepbare reset');
+
+  const bewijsweg = staat.dekking(reg('log.foutenReset()', 'test/bestaat-echt-niet.test.js'), WORTEL);
+  assert.equal(bewijsweg[0].gebrek, 'bewijsWeg', 'een bewijs dat naar een verdwenen toets wijst telt niet');
+});
+
+test('functieUitReset pakt de aangeroepen functie uit de zin', () => {
+  assert.equal(staat.functieUitReset('log.foutenReset()'), 'foutenReset');
+  assert.equal(staat.functieUitReset('accounts.sluitSeedvenster()'), 'sluitSeedvenster');
+  assert.equal(staat.functieUitReset('log.onError(null)'), 'onError');
+  assert.equal(staat.functieUitReset('geen -- pas na een herstart'), null);
+  assert.equal(staat.functieUitReset(undefined), null);
 });
 
 /* En de poort zelf: nieuwe toestand hoort de ronde ROOD te maken. In een

@@ -64,9 +64,8 @@ test('een string-fout (geen Error) crasht de aggregatie niet', () => {
 
    Hier wordt de ring bewust VOL geduwd (RING is 60) en er overheen, met
    verschillende vingerafdrukken en verschillende aantallen, plus een storing
-   zonder plaats en een met een lege boodschap. Dat raakt de verdringing, de
-   groepering en de volgteller alle drie. Daarna moet alles weer zijn zoals bij
-   de start.
+   zonder plaats en een met een lege boodschap. Dat raakt de verdringing en de
+   groepering. Daarna moet alles weer zijn zoals bij de start.
 
    Deze drie wortels staan daarom in STATE.json als `herstelbaar`, met deze
    toets als bewijs. Zonder zo'n proef zouden ze `onbekend` blijven en dus als
@@ -90,10 +89,9 @@ test('resetcontract: welke storingen er ook in gingen, na reset is de stand die 
   assert.deepEqual(log.foutenSamenvatting(), vers,
     'na reset hoort de stand exact gelijk te zijn aan die van een verse start');
 
-  /* En de volgteller mag ook niet doorlopen: die ordent "recentst geraakt", dus
-     een teller die na reset verder telt geeft een volgende toets een andere
-     volgorde dan een verse start zou geven. Dat is precies het soort verschil
-     dat je nooit ziet tot het een keer uitmaakt. */
+  /* En dezelfde storing hoort na een reset dezelfde samenvatting te geven als
+     na een verse start -- inclusief de VOLGORDE, want die is het enige waar de
+     volgteller aan te merken is. */
   stil(() => log.uitzondering(boem('na de reset'), { p: '/api/na' }));
   const na = log.foutenSamenvatting();
   stil(() => { log.foutenReset(); log.uitzondering(boem('na de reset'), { p: '/api/na' }); });
@@ -101,6 +99,26 @@ test('resetcontract: welke storingen er ook in gingen, na reset is de stand die 
     'dezelfde storing na een reset hoort dezelfde samenvatting te geven als na een verse start');
   stil(() => log.foutenReset());
 });
+
+/* WAT DEZE TOETS NIET BEWIJST, EN WAAROM DAT HIER STAAT.
+
+   Hierboven stond eerst een alinea die beweerde dat de volgteller (foutVolg)
+   werd meegenomen. Dat was niet waar. Ik heb `foutVolg = 0` uit foutenReset()
+   gesloopt en de toets bleef groen -- niet omdat hij slecht geschreven was,
+   maar omdat foutVolg alleen de ONDERLINGE volgorde van foutgroepen bepaalt en
+   nergens naar buiten komt. Na een reset is de kaart leeg, dus alle nieuwe
+   groepen krijgen weer oplopende nummers en de volgorde is identiek, of de
+   teller nu bij 0 of bij 97 verder gaat. Aan de buitenkant is er niets te zien.
+
+   Een toets die dat toch beweert is precies LAT-regel 9: hij kan niet zakken en
+   geeft dekking die er niet is. Weghalen dus, en het bewijs leggen waar het wel
+   ligt -- in de bron. scripts/staat.js leest sinds vandaag de functie die
+   STATE.json als reset noemt en kijkt of die de wortel ook echt aanraakt; zie
+   `dekking()` daar en de poort in test/staatregister.test.js. Haal die regel uit
+   foutenReset() en die poort gaat rood.
+
+   Dit is dus geen gat maar een verplaatsing: waarneembaar gedrag wordt hier
+   getoetst, onwaarneembare toestand in de bron. */
 
 /* De vierde wortel van dit bestand: de haak naar een externe tracker. Die zit
    niet in foutenReset() -- terecht, want hem stilletjes losmaken zou in

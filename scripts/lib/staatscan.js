@@ -273,6 +273,93 @@ function scanBestand(bron, relPad) {
   return { wortels, klok, willekeur, timers, listeners, envSchrijf, globalSchrijf, duurOpWandklok };
 }
 
+/* WIE ZET DEZE WORTEL TERUG? -- de vraag die van een reset een contract maakt.
+
+   STATE.json laat een mens per wortel `herstelbaar` invullen met een reset
+   erbij: "log.foutenReset()". Dat is tot hier een ZIN. Of die functie de wortel
+   ook echt aanraakt staat er niet, en niemand merkt het als iemand er later een
+   regel uit haalt.
+
+   Dat is geen theoretisch gat. Ik schreef een resetcontract voor server/log.js
+   dat met zoveel woorden beweerde de volgteller mee te nemen ("de volgteller
+   mag ook niet doorlopen"), en toen ik `foutVolg = 0` uit foutenReset() sloopte
+   bleef de toets groen. De reden is dat foutVolg alleen de VOLGORDE van groepen
+   bepaalt en nergens naar buiten komt: aan de buitenkant is een doorlopende
+   teller niet te zien. Een waarneembaarheidstoets kan dat dus niet bewijzen --
+   niet omdat ik hem slecht schreef, maar omdat het bewijs daar niet ligt.
+
+   Het ligt in de bron. Deze functie zegt, per moduleniveau-binding, binnen
+   WELKE functies er in die binding geschreven wordt. Daarmee wordt "reset:
+   log.foutenReset()" een controleerbare bewering: staat foutVolg niet in de
+   schrijvers van foutenReset, dan is het register een leugen en gaat de poort
+   rood. Haal de regel weg en het is meteen te zien.
+
+   Toegerekend aan ALLE omsluitende functies, niet alleen de dichtstbijzijnde:
+   een reset die zijn werk in een hulpfunctie of een callback doet, doet het nog
+   steeds. Liever een schrijver te veel dan een rood die niet klopt. */
+function functienaamOp(pad, i) {
+  const fn = pad[i];
+  if (fn.id && fn.id.name) return fn.id.name;
+  const ouder = pad[i - 1];
+  if (!ouder) return null;
+  if (ouder.type === 'VariableDeclarator' && ouder.id && ouder.id.name) return ouder.id.name;
+  if ((ouder.type === 'Property' || ouder.type === 'MethodDefinition') && ouder.key) {
+    return ouder.key.name || ouder.key.value || null;
+  }
+  if (ouder.type === 'AssignmentExpression' && ouder.left) {
+    const l = ouder.left;
+    if (l.type === 'Identifier') return l.name;
+    if (l.type === 'MemberExpression' && l.property) return l.property.name || null;
+  }
+  return null;
+}
+
+function omsluitendeFuncties(pad) {
+  const uit = [];
+  for (let i = 0; i < pad.length; i++) {
+    if (!/Function/.test(pad[i].type)) continue;
+    const naam = functienaamOp(pad, i);
+    if (naam) uit.push(naam);
+  }
+  return uit;
+}
+
+/* { wortelnaam -> Set(functienamen die erin schrijven) }, plus de functienamen
+   die het bestand uberhaupt kent. Dat tweede is nodig om onderscheid te maken
+   tussen "de reset raakt de wortel niet aan" en "de reset bestaat hier niet",
+   en dat zijn twee verschillende fouten met twee verschillende reparaties. */
+function schrijversIn(bron, relPad) {
+  const boom = parse(bron);
+  const schrijvers = new Map();
+  const functies = new Set();
+  const noteer = (naam, pad) => {
+    if (!schrijvers.has(naam)) schrijvers.set(naam, new Set());
+    for (const f of omsluitendeFuncties(pad)) schrijvers.get(naam).add(f);
+  };
+  loop(boom, (n, pad) => {
+    if (/Function/.test(n.type)) {
+      const naam = functienaamOp(pad.concat(n), pad.length);
+      if (naam) functies.add(naam);
+    }
+    if (n.type === 'AssignmentExpression' && n.left) {
+      if (n.left.type === 'Identifier') noteer(n.left.name, pad);
+      if (n.left.type === 'MemberExpression' && n.left.object && n.left.object.type === 'Identifier') {
+        noteer(n.left.object.name, pad);
+      }
+    }
+    if (n.type === 'UpdateExpression' && n.argument && n.argument.type === 'Identifier') noteer(n.argument.name, pad);
+    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression') {
+      const o = n.callee.object, pr = n.callee.property || {};
+      if (o && o.type === 'Identifier' && MUTMETHODE.test(pr.name || '')) noteer(o.name, pad);
+      if (o && o.type === 'Identifier' && o.name === 'Object' && pr.name === 'assign') {
+        const eerste = (n.arguments || [])[0];
+        if (eerste && eerste.type === 'Identifier') noteer(eerste.name, pad);
+      }
+    }
+  });
+  return { bestand: relPad, functies, schrijvers };
+}
+
 /* De hele boom. Een bestand dat de eigen parser niet leest is GEEN nul: dat
    wordt geteld en genoemd, want een scanner die stil overslaat meet niets
    (LAT-regel 3). */
@@ -359,4 +446,4 @@ function eigenaarVan(relPad) {
   return delen.slice(0, Math.min(2, delen.length - 1)).join('/') || 'server';
 }
 
-module.exports = { scan, scanBestand, bestandenOnder, eigenaarVan, MUTMETHODE };
+module.exports = { scan, scanBestand, schrijversIn, bestandenOnder, eigenaarVan, MUTMETHODE };

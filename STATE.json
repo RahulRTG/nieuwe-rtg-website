@@ -769,38 +769,51 @@
     },
     "server/log.js#foutGroepen": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "log.foutenReset()",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/fout-aggregatie.test.js -- het resetcontract vult de ring en eist daarna de verse stand",
+      "toelichting": "Ring van maximaal 60 foutgroepen, alleen RAM. Leegmaken herstelt hem volledig."
     },
     "server/log.js#foutHaak": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "log.onError(null)",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/fout-aggregatie.test.js -- het resetcontract hangt een haak op, maakt hem los en eist dat hij zwijgt",
+      "toelichting": "Optionele externe fouttracker (Sentry o.i.d.). onError(iets-anders-dan-een-functie) maakt hem los."
     },
     "server/log.js#foutTotaal": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "log.foutenReset()",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/fout-aggregatie.test.js -- het resetcontract vergelijkt de stand na reset met een verse start",
+      "toelichting": "Teller van alle gemelde uitzonderingen sinds de start."
     },
     "server/log.js#foutVolg": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "log.foutenReset()",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "scripts/staat.js -- de resetdekking leest foutenReset() uit de bron; aan de buitenkant is deze teller NIET waarneembaar",
+      "toelichting": "Monotone volgteller die alleen de VOLGORDE van foutgroepen bepaalt en nergens naar buiten komt. Daardoor kan geen enkele waarneembaarheidstoets bewijzen dat hij wordt teruggezet -- het bewijs is de bronregel in foutenReset(), en die wordt hier machinaal nagekeken."
     },
     "server/log.js#journaalStuk": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- de code zegt met zoveel woorden \"en dat blijft zo tot een herstart\"",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "toelichting": "Grendel die een kapot doorgeefjournaal EEN keer meldt in plaats van bij elk verzoek. Beweegt alleen op het foutpad: in een gezond proces staat hij de hele rit op false en kost hij dus niets. Slaat hij wel om, dan is de belofte \"een keer per proces\" opgebruikt en zou een hergebruikte server een tweede, andere journaalstoring stilzwijgend inslikken. Daarom vers proces, en niet stiekem herstelbaar noemen."
     },
     "server/mail.js#transporter": {
       "eigenaar": "server",

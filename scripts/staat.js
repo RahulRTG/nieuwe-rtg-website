@@ -49,7 +49,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { scan, eigenaarVan } = require('./lib/staatscan.js');
+const { scan, eigenaarVan, schrijversIn } = require('./lib/staatscan.js');
 
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'STATE.json');
@@ -79,10 +79,79 @@ function vergelijk(uitslag, register) {
   return { ongeregistreerd, verdwenen, perKlasse };
 }
 
+/* IS DE BELOOFDE RESET OOK EEN ECHTE RESET?
+
+   `levensduur: "herstelbaar"` met `reset: "log.foutenReset()"` is tot hier een
+   ZIN. Wie die zin gelooft, hergebruikt straks een server op grond van een
+   belofte -- en een gedeelde server die lekt geeft geen fout maar een verkeerd
+   antwoord. LAT-regel 6: een belofte in tekst hoort een belofte in code te zijn.
+
+   Deze controle leest de genoemde functie uit de BRON en kijkt of die de wortel
+   ook echt aanraakt. Dat is geen luxe. Ik schreef een resetcontract voor
+   server/log.js dat beweerde de volgteller mee te nemen; toen ik `foutVolg = 0`
+   uit foutenReset() sloopte bleef die toets groen, want foutVolg bepaalt alleen
+   de volgorde van foutgroepen en komt nergens naar buiten. Aan de buitenkant is
+   een doorlopende teller niet waarneembaar; in de bron is hij dat wel.
+
+   Twee soorten gebrek, want ze hebben twee verschillende reparaties:
+     ontbreekt  de genoemde functie staat niet in dat bestand -- verkeerde naam,
+                of de reset woont elders (zet dan `resetIn` op dat bestand)
+     raaktNiet  de functie bestaat maar schrijft deze wortel niet
+
+   Een reset zonder haakjes ("na een herstart") is geen reset maar een
+   omschrijving; die telt als `ontbreekt`, want er valt niets aan te roepen.
+
+   Het `bewijs`-veld gaat door dezelfde molen: het noemt een toetsbestand, en dat
+   bestand hoort te bestaan. Een bewijs dat naar een verwijderde toets wijst is
+   dezelfde leugen, alleen een verdieping hoger. */
+function functieUitReset(tekst) {
+  const treffers = String(tekst || '').match(/([A-Za-z_$][\w$]*)\s*\(/g);
+  if (!treffers) return null;
+  return treffers[treffers.length - 1].replace(/\s*\($/, '');
+}
+
+function dekking(register, wortel) {
+  const uit = [];
+  if (!register || !register.wortels) return uit;
+  const gelezen = new Map();
+  const lees = (rel) => {
+    if (gelezen.has(rel)) return gelezen.get(rel);
+    let r = null;
+    try { r = schrijversIn(fs.readFileSync(path.join(wortel, rel), 'utf8'), rel); } catch (e) { r = null; }
+    gelezen.set(rel, r);
+    return r;
+  };
+  for (const [id, r] of Object.entries(register.wortels)) {
+    if (r.levensduur !== 'herstelbaar') continue;
+    const naam = id.split('#')[1];
+    const bestand = r.resetIn || id.split('#')[0];
+    const fn = functieUitReset(r.reset);
+    if (!fn) { uit.push({ id, bestand, reset: r.reset, gebrek: 'ontbreekt', reden: 'de reset noemt geen aanroepbare functie' }); continue; }
+    const bron = lees(bestand);
+    if (!bron) { uit.push({ id, bestand, reset: r.reset, functie: fn, gebrek: 'ontbreekt', reden: bestand + ' is niet te lezen' }); continue; }
+    if (!bron.functies.has(fn)) {
+      uit.push({ id, bestand, reset: r.reset, functie: fn, gebrek: 'ontbreekt', reden: fn + ' bestaat niet in ' + bestand });
+      continue;
+    }
+    const wie = bron.schrijvers.get(naam);
+    if (!wie || !wie.has(fn)) {
+      uit.push({ id, bestand, reset: r.reset, functie: fn, gebrek: 'raaktNiet', reden: fn + ' schrijft niet in ' + naam });
+      continue;
+    }
+    const bewijspad = (String(r.bewijs || '').match(/[\w./-]+\.(?:test\.js|js)/) || [])[0];
+    if (!bewijspad || !fs.existsSync(path.join(wortel, bewijspad))) {
+      uit.push({ id, bestand, reset: r.reset, functie: fn, gebrek: 'bewijsWeg',
+        reden: bewijspad ? 'het bewijs wijst naar ' + bewijspad + ', en dat bestand bestaat niet'
+                         : 'het bewijs noemt geen toetsbestand' });
+    }
+  }
+  return uit;
+}
+
 function meet() {
   const uitslag = scan({ wortel: WORTEL });
   const register = leesRegister();
-  return { uitslag, register, ...vergelijk(uitslag, register) };
+  return { uitslag, register, ongedekt: dekking(register, WORTEL), ...vergelijk(uitslag, register) };
 }
 
 function schrijfRegister(uitslag, register) {
@@ -129,15 +198,16 @@ function schrijfRegister(uitslag, register) {
 if (require.main === module) {
   const argv = process.argv.slice(2);
   const beeld = meet();
-  const { uitslag, register, ongeregistreerd, verdwenen, perKlasse } = beeld;
+  const { uitslag, register, ongeregistreerd, verdwenen, perKlasse, ongedekt } = beeld;
 
   if (argv.includes('--json')) {
     console.log(JSON.stringify({
       wortels: uitslag.wortels.length, klokLezingen: uitslag.klokLezingen,
       ongeregistreerd: ongeregistreerd.map(w => w.id), verdwenen, perKlasse,
+      ongedekt: ongedekt.map(g => ({ id: g.id, gebrek: g.gebrek, reden: g.reden })),
       willekeur: uitslag.willekeur, timers: uitslag.timers, listeners: uitslag.listeners
     }));
-    process.exit(ongeregistreerd.length ? 1 : 0);
+    process.exit(ongeregistreerd.length || ongedekt.length ? 1 : 0);
   }
 
   if (argv.includes('--vastleggen')) {
@@ -182,6 +252,13 @@ if (require.main === module) {
     for (const id of verdwenen.slice(0, 8)) console.log('    ' + id);
     console.log('    ruim op met: node scripts/staat.js --vastleggen');
   }
+  /* Een reset die zijn wortel niet aanraakt is erger dan geen reset: op grond
+     van die belofte wordt straks een server hergebruikt. */
+  if (ongedekt.length) {
+    console.error('\n  BELOOFDE RESET DIE DE WORTEL NIET AANRAAKT (' + ongedekt.length + '):');
+    for (const g of ongedekt) console.error('    ' + g.id + '\n        ' + g.reden + '  (reset: ' + g.reset + ')');
+    console.error('\n  Repareer de reset, of zet de wortel op procesgebonden.\n');
+  }
   if (ongeregistreerd.length) {
     console.error('\n  NIEUWE MUTEERBARE TOESTAND ZONDER REGISTRATIE (' + ongeregistreerd.length + '):');
     for (const w of ongeregistreerd.slice(0, 12)) console.error('    ' + w.soort.padEnd(14) + w.id + '  (regel ' + w.lijn + ')');
@@ -191,7 +268,9 @@ if (require.main === module) {
     console.error('  daarna een eigenaar en een levensduur.\n');
     process.exit(1);
   }
-  console.log('\n  Alle muteerbare toestand staat in het register.\n');
+  if (ongedekt.length) process.exit(1);
+  console.log('\n  Alle muteerbare toestand staat in het register' +
+    (perKlasse.herstelbaar ? ', en elke beloofde reset raakt zijn wortel echt aan' : '') + '.\n');
 }
 
-module.exports = { meet, schrijfRegister, leesRegister, KLASSEN };
+module.exports = { meet, schrijfRegister, leesRegister, dekking, functieUitReset, KLASSEN };

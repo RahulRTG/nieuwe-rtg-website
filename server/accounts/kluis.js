@@ -139,6 +139,15 @@ function sluitSeedvenster() {
   const woorden = seedZouten.size;
   seedVensterOpen = false;
   seedZouten.clear();
+  /* En de teller terug op nul, want dit bestand belooft in STATE.json dat
+     sluitSeedvenster() alle drie de seedwortels herstelt. Die regel stond hier
+     niet: het venster en de memo gingen dicht, de teller liep door. Dat is geen
+     gedragsfout -- de teller stuurt niets aan -- maar wel een register dat iets
+     beweert wat de code niet doet, en op zulke beweringen wordt straks een
+     server hergebruikt. Gevonden door scripts/staat.js zelf, die sinds vandaag
+     nakijkt of een beloofde reset zijn wortel ook echt aanraakt. Het getal is
+     hierboven al veiliggesteld en gaat gewoon mee terug. */
+  seedHergebruik = 0;
   return { stondOpen, woorden, hergebruikt };
 }
 function seedvensterOpen() { return seedVensterOpen; }

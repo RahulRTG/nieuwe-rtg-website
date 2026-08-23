@@ -32,6 +32,7 @@
    werken, want de klant moet zijn uitvoer nog kunnen ophalen.
    ========================================================================== */
 'use strict';
+const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 const { schrijf } = require('./journaal');
 
@@ -51,7 +52,7 @@ const MAG = {
 };
 
 module.exports = ({ db, save, schoon, register, uitgang }) => {
-  const nu = () => new Date().toISOString();
+  const nu = () => klokDatum().toISOString();
 
   function ruimte(code) {
     const w = db.data.werkruimtes || {};
@@ -116,7 +117,7 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
       const dagen = o.bewaardagen == null ? STANDAARD_BEWAARDAGEN : Number(o.bewaardagen);
       if (!Number.isFinite(dagen) || dagen < MIN_DAGEN || dagen > MAX_DAGEN)
         return { error: 'Een bewaartermijn ligt tussen ' + MIN_DAGEN + ' en ' + MAX_DAGEN + ' dagen.', status: 400 };
-      v.bewaarTot = new Date(Date.now() + dagen * DAG).toISOString();
+      v.bewaarTot = new Date(klokNu() + dagen * DAG).toISOString();
       v.bewaardagen = dagen;
       const gesloten = sluitToegang(t, 'Bewaring: ' + reden);
       noteer(t, 'levensloop-bewaring', reden + ' (' + gesloten + ' sleutels ingetrokken, termijn ' + dagen + ' dagen)', door);
@@ -154,7 +155,7 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
     const v = vak(t);
     if (v.stand !== 'bewaring') return { error: 'Vernietigen kan alleen vanuit de bewaring; deze tenant staat op "' + v.stand + '".', status: 409 };
     if (v.legalHold) return { error: 'Er ligt een bewaringsplicht op deze tenant: ' + (v.legalHoldReden || 'zonder grond genoteerd') + '.', status: 409 };
-    if (v.bewaarTot && Date.now() < Date.parse(v.bewaarTot))
+    if (v.bewaarTot && klokNu() < Date.parse(v.bewaarTot))
       return { error: 'De bewaartermijn loopt tot ' + v.bewaarTot.slice(0, 10) + '. Tot die datum wordt er niets vernietigd.', status: 409 };
     const door = schoon(o.door, 80);
     if (!door) return { error: 'Wie tekent voor deze vernietiging?', status: 400 };

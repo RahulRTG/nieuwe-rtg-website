@@ -17,21 +17,21 @@
       een grens in een object waar geen enkele regel code naar kijkt, leest voor
       elk scherm als een werkende limiet.
 
-   HET QUOTUM OVERLEEFT EEN HERSTART, en dat is dezelfde eis die
-   kern/command/apipoort.js aan zichzelf stelt: een teller die bij elke herstart
-   op nul begint is geen quotum maar een suggestie -- en juist een tenant die te
-   hard loopt, veroorzaakt de herstart. Hij staat daarom in de opslag, per uur,
+   HET QUOTUM OVERLEEFT EEN HERSTART, dezelfde eis die kern/command/apipoort.js
+   aan zichzelf stelt: een teller die bij elke herstart op nul begint is geen
+   quotum maar een suggestie -- en juist een tenant die te hard loopt,
+   veroorzaakt de herstart. Hij staat daarom in de opslag, per uur,
    en save() is write-behind dus het kost geen schrijfactie per verzoek.
 
    WAAROM PER TENANT EN NIET PER IP. De rem op de deur (middleware/remmen.js)
-   telt per IP en beschermt de server. Die zegt niets over de vraag wie er te
-   veel gebruikt: honderd medewerkers van een klant komen van honderd adressen,
-   en een klant achter een kantoorproxy komt met honderd man van één adres. Pas
-   per tenant is "u zit aan uw grens" een zin die klopt en die iemand kan
-   oplossen. Dat is ook het eerlijke deel van fairness: wie eroverheen gaat,
-   merkt het zelf en niet zijn buurman.
+   telt per IP en beschermt de server; die zegt niets over wie er te veel
+   gebruikt. Honderd medewerkers van een klant komen van honderd adressen, en
+   een klant achter een kantoorproxy met honderd man van één. Pas per tenant is
+   "u zit aan uw grens" een zin die klopt en die iemand kan oplossen -- en gaat
+   iemand eroverheen, dan merkt hij het zelf en niet zijn buurman.
    ========================================================================== */
 'use strict';
+const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 const UUR = 3600000;
 
@@ -54,7 +54,7 @@ const NIET_AFGEDWONGEN = [
 ];
 
 module.exports = ({ db, save, schoon }) => {
-  const nu = () => new Date().toISOString();
+  const nu = () => klokDatum().toISOString();
   const eigen = (o, k) => (o && Object.prototype.hasOwnProperty.call(o, String(k)) ? o[String(k)] : null);
   const haal = (org) => eigen(db.data.tenants || {}, String(org || '').trim().toUpperCase());
 
@@ -62,7 +62,7 @@ module.exports = ({ db, save, schoon }) => {
     if (!t.contract) t.contract = { pakket: 'proef', ingegaan: t.bij || nu(), tot: null, door: null };
     return t.contract;
   }
-  const loopt = (c) => !c.tot || Date.parse(c.tot) > Date.now();
+  const loopt = (c) => !c.tot || Date.parse(c.tot) > klokNu();
   const grenzenVan = (c) => {
     const p = PAKKETTEN[c.pakket] || PAKKETTEN.proef;
     return { werkruimtes: c.werkruimtes != null ? c.werkruimtes : p.werkruimtes,
@@ -147,7 +147,7 @@ module.exports = ({ db, save, schoon }) => {
   /* ---------- het quotum ---------- */
   function uurteller(t) {
     const c = pot(t);
-    const uur = Math.floor(Date.now() / UUR);
+    const uur = Math.floor(klokNu() / UUR);
     if (!c.teller || c.teller.uur !== uur) c.teller = { uur, n: 0, geweigerd: 0 };
     return c.teller;
   }

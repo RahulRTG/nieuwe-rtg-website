@@ -41,6 +41,7 @@
       die je niet kunt naspelen.
    ========================================================================== */
 'use strict';
+const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 /* Hoe lang een geslaagde proef meetelt. Een halfjaar: lang genoeg dat niemand
    hem als een dagelijkse taak ervaart, kort genoeg dat "we hebben het ooit
@@ -120,7 +121,7 @@ module.exports = ({ db, save, register, uitgang, log }) => {
 
   function leg(code, uitslag) {
     const t = register.vanWerkruimte(code);
-    const rij = Object.assign({ at: new Date().toISOString(), werkruimte: code }, uitslag);
+    const rij = Object.assign({ at: klokDatum().toISOString(), werkruimte: code }, uitslag);
     if (t) {
       const opslag = db.data.tenants[t.org];
       opslag.herstelproeven = [rij].concat(opslag.herstelproeven || []).slice(0, 20);
@@ -143,7 +144,7 @@ module.exports = ({ db, save, register, uitgang, log }) => {
     if (!goed.length) return { ok: false, reden: rijen.length
       ? 'de laatste herstelproef (' + rijen[0].at.slice(0, 10) + ') is niet geslaagd'
       : 'er is voor deze organisatie nog geen herstelproef gedaan' };
-    const dagen = Math.floor((Date.now() - Date.parse(goed[0].at)) / 86400000);
+    const dagen = Math.floor((klokNu() - Date.parse(goed[0].at)) / 86400000);
     if (dagen > GELDIG_DAGEN)
       return { ok: false, reden: 'de laatste geslaagde herstelproef is van ' + goed[0].at.slice(0, 10) +
         ' en daarmee ouder dan ' + GELDIG_DAGEN + ' dagen', proef: goed[0] };

@@ -34,6 +34,7 @@
       zodanig op een scherm komen.
    ========================================================================== */
 'use strict';
+const { nu: klokNu } = require('./lib/klok');
 
 /* Onder dit aantal verzoeken in het venster geven we geen percentage. Vijftig:
    laag genoeg dat een rustige capability toch een cijfer krijgt, hoog genoeg
@@ -93,7 +94,7 @@ function stand(meting, functies) {
   return {
     venster: {
       sinds: new Date(reeksen.gestart).toISOString(),
-      seconden: Math.round((Date.now() - reeksen.gestart) / 1000),
+      seconden: Math.round((klokNu() - reeksen.gestart) / 1000),
       let: 'De meting zit in het geheugen van dit proces en begint bij een herstart opnieuw. Dit is dus geen maandcijfer en mag ook niet zo gelezen worden.'
     },
     vloer: VLOER,

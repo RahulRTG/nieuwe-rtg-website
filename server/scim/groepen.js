@@ -28,6 +28,7 @@
    waarom sso/index.js op `sub` matcht en niet op adres. Een adres verandert.
    ========================================================================== */
 'use strict';
+const { datum: klokDatum } = require('../lib/klok');
 
 const S = require('../accounts/state');
 
@@ -73,7 +74,7 @@ function maak(org, naam, leden, externeId) {
   const n = String(naam || '').trim();
   if (!n) { const e = new Error('Een groep heeft een displayName nodig.'); e.status = 400; e.scimType = 'invalidValue'; throw e; }
   if (opNaam(org, n)) { const e = new Error('Deze groep bestaat al.'); e.status = 409; e.scimType = 'uniqueness'; throw e; }
-  const nu = new Date().toISOString();
+  const nu = klokDatum().toISOString();
   const r = S.db.prepare('INSERT INTO scim_groepen (org, naam, externe_id, leden, created_at) VALUES (?, ?, ?, ?, ?)')
     .run(String(org), n, externeId ? String(externeId) : null, JSON.stringify(schoonLeden(leden)), nu);
   return vind(org, r.lastInsertRowid);

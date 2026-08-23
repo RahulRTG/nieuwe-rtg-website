@@ -40,6 +40,7 @@
    herstelproef, en het mag ook niet voor het tweede doorgaan.
    ========================================================================== */
 'use strict';
+const { nu: klokNu } = require('./lib/klok');
 
 const fs = require('fs');
 const path = require('path');
@@ -58,7 +59,7 @@ function lees(datadir) {
 
   const dag = dagen[dagen.length - 1];
   const dir = path.join(map, dag);
-  const ouderdom = Math.floor((Date.now() - Date.parse(dag)) / 86400000);
+  const ouderdom = Math.floor((klokNu() - Date.parse(dag)) / 86400000);
   return Object.assign({ er: true, dag, ouderdom, bewaard: dagen.length }, inhoud(datadir, dir));
 }
 

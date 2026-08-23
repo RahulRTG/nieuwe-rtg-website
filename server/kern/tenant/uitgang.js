@@ -27,6 +27,7 @@
       leden komen terug ZONDER sleutel: toegang teruggeven is een besluit.
    ========================================================================== */
 'use strict';
+const { datum: klokDatum } = require('../../lib/klok');
 
 const crypto = require('crypto');
 
@@ -75,8 +76,8 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
   }
 
   /* De catalogus: per top-sleutel een aantal en een checksum. Hij staat NAAST
-     de inhoud en niet eroverheen -- wie de uitvoer krijgt kan hem zo narekenen
-     zonder onze code te hebben. */
+     de inhoud en niet eroverheen: wie de uitvoer krijgt rekent hem na zonder
+     onze code te hebben. */
   function catalogus(inhoud) {
     return Object.keys(inhoud).sort().map(soort => ({ soort, aantal: tel(inhoud[soort]), checksum: som(inhoud[soort]) }));
   }
@@ -96,7 +97,7 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const cat = catalogus(inhoud);
     const uitvoer = {
       versie: VERSIE,
-      at: (opties && opties.at) || new Date().toISOString(),
+      at: (opties && opties.at) || klokDatum().toISOString(),
       tenant: t ? { org: t.org, naam: t.naam, modus: t.modus } : null,
       merk: t && merkVan ? merkVan(t.org) : null,
       werkruimte: kop,
@@ -104,9 +105,8 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
       catalogus: cat,
       checksum: som(cat),
       /* HET RECEPT REIST MEE, en niet als beleefdheid: een checksum die alleen
-         wij kunnen narekenen is geen bewijs voor de partij die vertrekt. Met
-         deze twee regels rekent zij hem zelf na, zonder onze code en zonder
-         ons te hoeven geloven. */
+         wij kunnen narekenen bewijst de vertrekkende partij niets. Met deze
+         twee regels rekent zij hem zelf na, zonder ons te geloven. */
       recept: 'checksum per soort = sha256(canonieke JSON van die soort); ' +
         'checksum van de uitvoer = sha256(canonieke JSON van de catalogus). ' +
         'Canoniek = JSON met de sleutels van elk object alfabetisch gesorteerd, zonder witruimte.',
@@ -157,7 +157,7 @@ module.exports = ({ db, save, crypto: crypt, register, merkVan }) => {
     const w = { code, naam: o.naam || kop.naam || 'Herstelde werkruimte',
       land: kop.land || 'NL', valuta: kop.valuta || 'EUR', taal: kop.taal || 'nl',
       moeder: null, kvk: kop.kvk || null, btwNummer: kop.btwNummer || null,
-      beheerToken: munt.randomBytes(24).toString('hex'), at: new Date().toISOString() };
+      beheerToken: munt.randomBytes(24).toString('hex'), at: klokDatum().toISOString() };
     for (const k of Object.keys(uitvoer.inhoud)) w[k] = JSON.parse(JSON.stringify(uitvoer.inhoud[k]));
 
     w.leden = w.leden || {};

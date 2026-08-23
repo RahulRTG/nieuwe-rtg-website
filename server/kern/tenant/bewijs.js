@@ -28,6 +28,7 @@
    SLO.md zegt hetzelfde in woorden; dit is dezelfde zin in code.
    ========================================================================== */
 'use strict';
+const { nu: klokNu } = require('../../lib/klok');
 
 const kluis = require('../../kluis');
 
@@ -79,7 +80,7 @@ module.exports = ({ register, contract, levensloop, ssoKoppelingen, db, herstelp
     const sso = ssoKoppelingen ? ssoKoppelingen.vind(t.org) : null;
     const bstand = backupStand();
     const back = bstand.er ? bstand.dag : null;
-    const backVers = back && (Date.now() - Date.parse(back)) / 86400000 < BACKUP_DAGEN;
+    const backVers = back && (klokNu() - Date.parse(back)) / 86400000 < BACKUP_DAGEN;
     const sla = slaVoorwaarden(t);
     const slaMist = sla.filter(v => !v.ja);
 

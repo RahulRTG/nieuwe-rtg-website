@@ -38,6 +38,7 @@
       een stand die de volgende synchronisatie ongedaan maakt, en dat is de
       gevaarlijkste soort stille toegang. */
 'use strict';
+const { datum: klokDatum } = require('../../lib/klok');
 
 const crypto = require('crypto');
 const { ROLLEN } = require('../../bedrijf/rollen-register');
@@ -47,7 +48,7 @@ const REDEN_UIT = 'Identiteitsprovider: groepslidmaatschap vervallen.';
 const REDEN_SCIM = 'Identiteitsprovider: account gedeactiveerd (SCIM).';
 
 module.exports = ({ db, save, register }) => {
-  const nu = () => new Date().toISOString();
+  const nu = () => klokDatum().toISOString();
   const dag = () => nu().slice(0, 10);
   const bestaatRol = (id) => ROLLEN.some(r => r.id === id);
 

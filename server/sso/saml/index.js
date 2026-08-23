@@ -29,6 +29,7 @@
       voorziening voordoet.
    ========================================================================== */
 'use strict';
+const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const S = require('../../accounts/state');
@@ -55,9 +56,9 @@ function nieuwId() { return '_' + crypto.randomBytes(20).toString('hex'); }
 
 function bewaarVerzoek(org, terug) {
   const id = nieuwId();
-  S.db.prepare('DELETE FROM saml_verzoeken WHERE tot < ?').run(Date.now());
+  S.db.prepare('DELETE FROM saml_verzoeken WHERE tot < ?').run(klokNu());
   S.db.prepare('INSERT INTO saml_verzoeken (id, org, terug, tot) VALUES (?, ?, ?, ?)')
-    .run(id, String(org), String(terug || '/'), Date.now() + VERZOEK_MS);
+    .run(id, String(org), String(terug || '/'), klokNu() + VERZOEK_MS);
   return id;
 }
 /* Ophalen EN meteen weghalen: een verzoek is voor een keer. Twee antwoorden op
@@ -66,7 +67,7 @@ function neemVerzoekBijId(id) {
   const r = S.db.prepare('SELECT * FROM saml_verzoeken WHERE id = ?').get(String(id || ''));
   if (!r) return null;
   S.db.prepare('DELETE FROM saml_verzoeken WHERE id = ?').run(r.id);
-  return r.tot < Date.now() ? null : r;
+  return r.tot < klokNu() ? null : r;
 }
 /* De org komt UIT de rij en niet uit het verzoek van de bezoeker. Dat is geen
    detail: als de aanroeper de org zou meegeven, kon iemand een verzoek-ID van
@@ -80,10 +81,10 @@ function neemVerzoek(id, org) {
 /* Eenmalig gebruik van een assertie. Geeft false als hij al gebruikt is. */
 function markeerGebruikt(assertieId, org, tot) {
   if (!assertieId) return false;         // geen ID = niet te ontdubbelen = weigeren
-  S.db.prepare('DELETE FROM saml_gebruikt WHERE tot < ?').run(Date.now());
+  S.db.prepare('DELETE FROM saml_gebruikt WHERE tot < ?').run(klokNu());
   try {
     S.db.prepare('INSERT INTO saml_gebruikt (assertie_id, org, tot) VALUES (?, ?, ?)')
-      .run(String(assertieId), String(org), Number(tot) || Date.now() + VERZOEK_MS);
+      .run(String(assertieId), String(org), Number(tot) || klokNu() + VERZOEK_MS);
     return true;
   } catch (e) { return false; }          // schending van de sleutel = al gebruikt
 }
@@ -99,7 +100,7 @@ function verzoekUrl(koppeling, { acs, entityId, terug }) {
   const id = bewaarVerzoek(koppeling.org, terug);
   const xml = '<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"' +
     ' xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"' +
-    ' ID="' + id + '" Version="2.0" IssueInstant="' + new Date().toISOString() + '"' +
+    ' ID="' + id + '" Version="2.0" IssueInstant="' + klokDatum().toISOString() + '"' +
     ' Destination="' + esc(koppeling.samlSsoUrl) + '"' +
     ' ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"' +
     ' AssertionConsumerServiceURL="' + esc(acs) + '">' +

@@ -36,6 +36,7 @@
    leest als een werkend mechanisme. Wat hier wel staat, wordt hier ook
    gehandhaafd. */
 'use strict';
+const { datum: klokDatum } = require('../../lib/klok');
 
 const ORG = /^[A-Z0-9][A-Z0-9-]{1,30}$/;
 
@@ -44,7 +45,7 @@ module.exports = ({ db, save, schoon, findSupplier, contract }) => {
     if (!db.data.tenants || typeof db.data.tenants !== 'object') db.data.tenants = {};
     return db.data.tenants;
   }
-  const nu = () => new Date().toISOString();
+  const nu = () => klokDatum().toISOString();
   const norm = (c) => String(c || '').trim().toUpperCase();
   /* Eigen veld, geen prototype: pot() is een gewoon object en "constructor" is
      een geldige tekenreeks voor een gebruiker die iets probeert. */

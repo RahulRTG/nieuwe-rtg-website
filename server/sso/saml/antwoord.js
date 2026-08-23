@@ -42,6 +42,7 @@
    maar deze hele redenering.
    ========================================================================== */
 'use strict';
+const { nu: klokNu } = require('../../lib/klok');
 const X = require('./xml');
 const { controleer } = require('./handtekening');
 
@@ -93,7 +94,7 @@ function alles(attrs, namen) {
    bepalen: onze entityID, ons antwoordadres, en het verzoek-ID dat wij hebben
    uitgegeven. */
 function lees(xmlTekst, koppeling, verwacht, nu) {
-  const nuMs = nu || Date.now();
+  const nuMs = nu || klokNu();
   const wortel = X.lees(xmlTekst);
   if (wortel.ns !== PROTO || wortel.naam !== 'Response')
     throw new Error('dit is geen samlp:Response');

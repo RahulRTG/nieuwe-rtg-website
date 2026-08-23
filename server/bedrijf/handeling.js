@@ -36,6 +36,7 @@
       niet" in plaats van een gok die iemand bevestigt omdat er een knop staat.
    ========================================================================== */
 'use strict';
+const { nu: klokNu } = require('../lib/klok');
 
 const { veiligGelijk } = require('../kern/util');
 
@@ -57,7 +58,7 @@ module.exports = (sctx) => {
      alleen groeit, is een lijst met geheimen die niemand meer bekijkt. */
   function veeg(w) {
     const p = P(w);
-    const grens = Date.now() - GELDIG_MS;
+    const grens = klokNu() - GELDIG_MS;
     for (const id of Object.keys(p)) if (Date.parse(p[id].at) < grens) delete p[id];
   }
 

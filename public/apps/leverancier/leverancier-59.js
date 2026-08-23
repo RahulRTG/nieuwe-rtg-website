@@ -14,7 +14,6 @@
       o.guestArrived ? E('div', { class: 'enroute here' }, '' + T('sup.guesthere', 'Gast is gearriveerd. Serveer nu.'))
         : (o.guestEtaMin != null ? E('div', { class: 'enroute' }, '' + T('sup.guesteta', 'Gast onderweg, arriveert over ~') + o.guestEtaMin + ' ' + T('sup.min', 'min') + '. ' + T('sup.readyontime', 'Zet op tijd klaar.')) : null),
       o.allergyNote ? E('div', { class: 'allergy' }, '' + T('sup.allergy', 'Allergie:') + ' ' + o.allergyNote) : null,
-      // het zorgprofiel van de gast reist automatisch mee (alleen met toestemming)
       o.zorg ? E('div', { class: 'allergy' }, '' + T('sup.zorgp', 'Zorgprofiel gast:') + ' ' + zorgTekst(o.zorg)) : null,
       o.tagSalon ? E('div', { class: 'salon' }, '✦ ' + T('sup.wantssalon', 'Gast wil dit taggen voor De Salon')) : null,
       E('div', { class: 'acts' },
@@ -26,15 +25,13 @@
   }
   function renderOrders(){
     renderReserveringen();
+    laadEtenWerkblad();
     const list = state.orders || [];
     const wrap = $('#orderList');
     if (!list.length){ Util.vervang(wrap, Util.el('div', { class: 'empty' }, T('sup.noorders', 'Nog geen bestellingen. Zodra een RTG-gast bij u bestelt, verschijnt het hier, live.'))); return; }
     Util.vervang(wrap, list.map(orderKaart));
   }
 
-  /* De tafelplanning: vandaag als gedekte avond (tafels, komst, walk-ins) en
-     de komende dagen als lijst. Elke rij draagt zijn eigen knoppen: bevestigen,
-     tafel toewijzen, gast is er, no-show, vertrokken. */
   const RES_PILL = { aangevraagd:'nieuw', bevestigd:'bereiding', aangekomen:'klaar' };
   function resStatusTekst(st){
     return st==='aangevraagd'?T('res.st.nieuw','nieuw'):st==='bevestigd'?T('res.bevestigd','bevestigd'):st==='aangekomen'?T('res.st.er','aan tafel'):st==='no-show'?'no-show':st==='afgerond'?T('res.st.weg','vertrokken'):st;
@@ -51,10 +48,8 @@
       '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
         (r.tafel?' ·  '+esc(r.tafel):'')+(r.notitie?' ·  '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
         (r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
-      (knoppen.length
-        ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
-        : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+
-    '</div>';
+      (knoppen.length ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
+        : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+'</div>';
   }
   async function renderReserveringen(){
     const wrap = $('#resWrap');
@@ -64,14 +59,9 @@
     try { plan = await API.call('/supplier/tafelplan', {}); } catch(e){ plan = { reserveringen: [], tafels: [], verwachtePersonen: 0, openAanvragen: 0, zonderTafel: 0 }; }
     if (!plan.reserveringen.length && !later.length && !plan.tafels.length){ wrap.innerHTML = ''; return; }
     const chips = plan.tafels.length
-      ? '<div class="pos-chips h-mt50">'+plan.tafels.map(t =>
-          t.status==='vrij'
-            ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
-            : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>'
-        ).join('')+'</div>'+
-        '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>'
-      : '';
-    // de open rekeningen: alles wat de kassa op de tafel zette, hier afrekenen
+      ? '<div class="pos-chips h-mt50">'+plan.tafels.map(t => t.status==='vrij'
+        ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
+        : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>').join('')+'</div>'+ '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>' : '';
     const rekeningen = plan.tafels.filter(t => t.rekening);
     const rekBlok = rekeningen.length
       ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'">'+

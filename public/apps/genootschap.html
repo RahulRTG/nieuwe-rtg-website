@@ -61,6 +61,9 @@
   .staaf i{display:block;height:100%;background:var(--burgundy);}
   .leeg{color:var(--soft);font-size:.85rem;padding:.6rem 0;}
   .uit{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem .8rem;margin-top:.6rem;font-size:.85rem;line-height:1.5;white-space:pre-wrap;}
+  .beheer-uitleg{color:var(--soft);font-size:.78rem;line-height:1.5;}
+  .beheer-nodig{display:flex;gap:.45rem;}
+  .beheer-leden{margin-top:.7rem;}
   .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 70%,transparent));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
   .aibalk form{display:flex;gap:.5rem;max-width:660px;margin:0 auto;}
 </style>
@@ -215,13 +218,13 @@
       return ['openbaar','besloten','geheim'].indexOf(s) >= ['openbaar','besloten','geheim'].indexOf(g.soort);
     });
     host.hidden = false;
-    host.innerHTML = '<h2>Leden en toegang</h2><p style="color:var(--soft);font-size:.78rem;line-height:1.5;">Codenamen beschermen de identiteit. Een uitnodiging wordt nooit automatisch lidmaatschap.</p>'+
+    host.innerHTML = '<h2>Leden en toegang</h2><p class="beheer-uitleg">Codenamen beschermen de identiteit. Een uitnodiging wordt nooit automatisch lidmaatschap.</p>'+
       (beheer?'<div class="uit"><label for="gnaam">Genootschap beheren</label><input id="gnaam" maxlength="70" value="'+esc(g.naam)+'">'+
         '<label for="gsoort">Zichtbaarheid kan alleen strenger</label><select id="gsoort">'+nauwer.map(function(s){ return '<option value="'+s+'"'+(s===g.soort?' selected':'')+'>'+esc(SOORT[s])+'</option>'; }).join('')+'</select>'+
         '<label for="gover">Waarover</label><textarea id="gover" rows="2" maxlength="600">'+esc(g.over)+'</textarea>'+
         '<label for="gregels">Huisregels</label><textarea id="gregels" rows="2" maxlength="800">'+esc(g.regels)+'</textarea><div class="knoppen"><button class="knop" id="bgroepbewaar" type="button">Wijzigingen bewaren</button></div></div>':'')+
-      (magNodigen?'<div class="uit"><label for="guitnodig">Uitnodigen op codenaam</label><div style="display:flex;gap:.45rem;"><input id="guitnodig" maxlength="80" placeholder="codenaam"><button class="knop" id="bnodig" type="button">Uitnodigen</button></div></div>':'')+
-      '<div style="margin-top:.7rem;">'+(g.ledenlijst||[]).map(function(l){
+      (magNodigen?'<div class="uit"><label for="guitnodig">Uitnodigen op codenaam</label><div class="beheer-nodig"><input id="guitnodig" maxlength="80" placeholder="codenaam"><button class="knop" id="bnodig" type="button">Uitnodigen</button></div></div>':'')+
+      '<div class="beheer-leden">'+(g.ledenlijst||[]).map(function(l){
         return '<div class="rij"><div class="tx"><b>'+esc(l.codenaam)+(l.ikZelf?' (jij)':'')+'</b><small>'+esc(l.rol)+' · sinds '+esc(String(l.sinds||'').slice(0,10))+'</small></div>'+
           (beheer&&!l.ikZelf?'<button class="mini" data-rol="'+esc(l.codenaam)+'" data-nieuwerol="'+(l.rol==='beheerder'?'lid':'beheerder')+'">'+(l.rol==='beheerder'?'maak lid':'maak beheerder')+'</button><button class="mini" data-eruit="'+esc(l.codenaam)+'">eruit</button>':'')+'</div>';
       }).join('')+'</div>';

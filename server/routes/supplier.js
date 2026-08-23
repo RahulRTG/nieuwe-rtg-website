@@ -27,6 +27,7 @@ require('./supplier/wensen')(kern);
 require('./supplier/genrepuls')(kern);
 require('./supplier/genreplan')(kern);
 require('./supplier/genreblik')(kern);
+require('./supplier/eten')(kern); // een operationeel orderbeeld boven horeca + oudere orders
 
 app.post('/api/supplier/schedule', supplierAuth, (req, res) => res.json(scheduleFor(req.supplier.code)));
 

@@ -2,9 +2,17 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const realityRuntime = require('../public/shared/social-intelligence-runtime.js');
 
 const ROOT = path.join(__dirname, '..');
 const lees = bestand => fs.readFileSync(path.join(ROOT, bestand), 'utf8');
+
+test('de gedeelde commandotoets vraagt altijd een bewuste sneltoets', () => {
+  assert.equal(realityRuntime.isCommandKey(null), false);
+  assert.equal(realityRuntime.isCommandKey({ ctrlKey:true, metaKey:false, key:'k' }), true);
+  assert.equal(realityRuntime.isCommandKey({ ctrlKey:false, metaKey:true, key:'K' }), true);
+  assert.equal(realityRuntime.isCommandKey({ ctrlKey:false, metaKey:false, key:'k' }), false);
+});
 
 test('Sociaal en De Salon delen dezelfde elite-schil zonder hun functies samen te voegen', () => {
   const sociaal = lees('public/apps/sociaal.html');

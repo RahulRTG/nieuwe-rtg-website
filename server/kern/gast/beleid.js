@@ -85,10 +85,13 @@ module.exports = ({ horeca }) => {
 
   function magBestellen(zaakcode, kanaal) {
     const b = beleidVan(zaakcode);
+    const h = H(zaakcode);
     if (!b.bestellen) return nee('bestellen-uit',
       'Deze zaak neemt bestellingen alleen via de bediening aan. Vraag een medewerker.');
     if (!b.kanalen.includes(String(kanaal))) return nee('kanaal-dicht',
       'Zelf bestellen kan hier niet op dit kanaal (' + kanaal + '). Vraag een medewerker.');
+    if (['bezorging','afhaal'].includes(String(kanaal)) && h.etenCapaciteit && h.etenCapaciteit.open === false)
+      return nee('capaciteit-gepauzeerd', 'De keuken heeft nieuwe thuisbestellingen tijdelijk gepauzeerd. Probeer het later opnieuw.');
     return ja();
   }
 
@@ -107,8 +110,10 @@ module.exports = ({ horeca }) => {
     if (!item) return nee('item-onbekend', 'Dit gerecht staat niet op de kaart van deze zaak.');
     const h = H(zaakcode);
     const uit = (h.instel && h.instel.uitverkocht) || {};
-    if (uit[item.id]) return nee('uitverkocht',
-      'Dit gerecht is door de keuken op uitverkocht gezet.', { sinds: uit[item.id].at || null });
+    const capaciteitPauze = ((h.etenCapaciteit || {}).gepauzeerdeItems || []).map(String).includes(String(item.id));
+    if (uit[item.id] || item.uitverkocht || capaciteitPauze) return nee('uitverkocht',
+      capaciteitPauze ? 'Dit gerecht is tijdelijk gepauzeerd om de keukenbelofte eerlijk te houden.'
+        : 'Dit gerecht is door de keuken op uitverkocht gezet.', { sinds:uit[item.id] && uit[item.id].at || null });
     const b = beleidVan(zaakcode);
     if (item.alcohol && b.alcoholLeeftijd) {
       /* De grendel hangt aan het DOEL en niet aan de aanvrager (LAT-regel 7):

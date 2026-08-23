@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4514 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4523 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4514 |
-| servermodules (`server/**/*.js`) | 2556 |
-| routebestanden (`server/routes/**`) | 501 |
-| kernmodules (`server/kern/**`) | 1584 |
+| API-endpoints | 4523 |
+| servermodules (`server/**/*.js`) | 2566 |
+| routebestanden (`server/routes/**`) | 503 |
+| kernmodules (`server/kern/**`) | 1592 |
 | schermen (`public/**/*.html`) | 266 |
 | gedeelde browsermodules (`public/shared/*.js`) | 266 |
-| toetsbestanden (`test/*.test.js`) | 1099 |
+| toetsbestanden (`test/*.test.js`) | 1100 |
 | schermtoetsen (`test/*.e2e.js`) | 156 |
 
 ## 2. De weg van een verzoek
@@ -107,7 +107,7 @@ zie §5 -- er zijn nog 206 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 53 |
 | `member` | 667 | 63 | 12 | 414 |
-| `supplier` | 569 | 106 | 6 | 302 |
+| `supplier` | 573 | 107 | 6 | 302 |
 | `office` | 59 | 15 | 3 | 75 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 75 | 10 | 31 | 66 |
@@ -123,7 +123,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3003 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3008 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -149,8 +149,8 @@ app(177) auth(108) supplierAuth(59) officeAuth(39) db(36) liveCodename(29) statu
 accounts(25) schoon(22) managerOnly(17) codenaamVan(16) save(15) rtf(15)
 boardroomWie(12) geenGast(12) tooManyTries(11) crypto(11) express(11) anthropic(11)
 findSupplier(10) keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9)
-payrollOS(9) stuur(8) sseToOffice(8) mail(7) noteFailedTry(7) kern(7) boardroomAuth(7)
-sseToSupplier(6) pay(6) talen(6) appUrl(5) loginFails(5) overheid(5) notifySupplier(5)
+payrollOS(9) stuur(8) sseToOffice(8) mail(7) noteFailedTry(7) kern(7) sseToSupplier(7)
+boardroomAuth(7) pay(6) notifySupplier(6) talen(6) appUrl(5) loginFails(5) overheid(5)
 sseToCustomer(5) onboarding(5)
 ```
 

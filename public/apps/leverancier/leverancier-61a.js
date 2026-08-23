@@ -1,3 +1,4 @@
+  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
 /* HOE EEN BETAALCODE VAN EEN GAST BINNENKOMT, en daarna de kassa-opbouw.
 
    Dit is de tweede helft van ./leverancier-61.js. Dat bestand ging over de

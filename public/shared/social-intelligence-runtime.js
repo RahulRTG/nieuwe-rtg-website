@@ -3,6 +3,12 @@
 (function () {
   'use strict';
 
+  function isCommandKey(event) {
+    return !!(event && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k');
+  }
+  if (typeof module !== 'undefined' && module.exports) module.exports = { isCommandKey: isCommandKey };
+  if (typeof document === 'undefined') return;
+
   function run() {
     var view = window.RTGRealityEngine;
     if (!view) return;
@@ -44,7 +50,7 @@
     closeButton.addEventListener('click', closeDeck);
     scrim.addEventListener('click', function (event) { if (event.target === scrim) closeDeck(); });
     document.addEventListener('keydown', function (event) {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      if (isCommandKey(event)) {
         event.preventDefault();
         if (scrim.hidden) openDeck(); else closeDeck();
       }

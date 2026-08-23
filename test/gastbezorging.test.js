@@ -300,3 +300,71 @@ test('online bestellen blijft uit de keuken tot de betaalwaarheid definitief is'
   assert.equal(b.status, 'betaald');
   assert.equal(b.openstaand, 0);
 });
+
+test('RTG Eten brengt zoeken, ontdekken, Concierge en partnersturing op echte routes samen', async () => {
+  const ontdek = await post('/api/gast/eten/ontdekken', { filters:{ bezorgen:true } }, LID);
+  assert.equal(ontdek.status, 200, JSON.stringify(ontdek.body).slice(0, 200));
+  assert.ok(Array.isArray(ontdek.body.restaurants));
+  const doel = ontdek.body.restaurants.find(x => x.code === 'KIKUNOI') || ontdek.body.restaurants[0];
+  assert.ok(doel, 'ontdekken levert ten minste een bezorgende zaak');
+
+  const zoeken = await post('/api/gast/eten/zoeken', { zoek:doel.naam }, LID);
+  assert.equal(zoeken.status, 200);
+  assert.ok(zoeken.body.restaurants.some(x => x.code === doel.code));
+
+  const concierge = await post('/api/gast/eten/concierge', {
+    vraag:'Japans voor twee, maximaal €80 en zonder noten'
+  }, LID);
+  assert.equal(concierge.status, 200);
+  assert.equal(concierge.body.concierge.filters.personen, 2);
+  assert.equal(concierge.body.concierge.filters.budgetCenten, 8000);
+
+  const werkblad = await post('/api/supplier/eten/werkblad', { rol:'management' }, ZAAK);
+  assert.equal(werkblad.status, 200);
+  assert.ok(Array.isArray(werkblad.body.orders));
+
+  const cap = await post('/api/supplier/eten/capaciteit', {
+    wijzig:true, auto:false, open:true, extraMinuten:12, limietMinuten:40, kokken:2
+  }, ZAAK);
+  assert.equal(cap.status, 200);
+  assert.equal(cap.body.capaciteit.extraMinuten, 12);
+
+  const korting = await post('/api/supplier/eten/instellingen', {
+    actie:'bewaar-korting', code:'THUIS10', procent:10, actief:true
+  }, ZAAK);
+  assert.equal(korting.status, 200);
+  assert.ok(korting.body.kortingscodes.some(x => x.code === 'THUIS10'));
+});
+
+test('klant en partner doorlopen dezelfde RTG Eten-order tot hulp en beoordeling', async () => {
+  const lid = await maakLid('Eten keten', true);
+  const kaart = await kaartVan();
+  const item = kaart.filter(x => !x.alcohol && !x.uitverkocht)
+    .sort((a, b) => b.centen - a.centen)[0];
+  const bestel = await post('/api/gast/bezorg/bestel', {
+    zaak:'KIKUNOI', postcode:'1011AB', adres:'Damstraat 18', idem:'eten-keten-1',
+    items:[{ itemId:item.id, aantal:2 }]
+  }, lid);
+  assert.equal(bestel.status, 200, JSON.stringify(bestel.body).slice(0, 220));
+  const rekeningId = bestel.body.rekening.rekeningId;
+
+  const probleem = await post('/api/gast/eten/probleem', {
+    zaak:'KIKUNOI', rekeningId, tekst:'Controleer alstublieft de verpakking.'
+  }, lid);
+  assert.equal(probleem.status, 200, JSON.stringify(probleem.body).slice(0, 180));
+
+  for (const status of ['geaccepteerd','in-bereiding','klaar','overgedragen','onderweg','geleverd']) {
+    const stap = await post('/api/supplier/eten/status', { rekeningId, status }, ZAAK);
+    assert.equal(stap.status, 200, status + ': ' + JSON.stringify(stap.body).slice(0, 180));
+    assert.equal(stap.body.order.fase, status === 'geaccepteerd' ? 'bevestigd'
+      : status === 'in-bereiding' ? 'keuken'
+        : status === 'overgedragen' ? 'klaar'
+          : status === 'geleverd' ? 'geleverd' : status);
+  }
+
+  const beoordeling = await post('/api/gast/eten/beoordeel', {
+    zaak:'KIKUNOI', rekeningId, score:5, tekst:'Netjes en warm aangekomen.'
+  }, lid);
+  assert.equal(beoordeling.status, 200, JSON.stringify(beoordeling.body).slice(0, 180));
+  assert.equal(beoordeling.body.review.score, 5);
+});

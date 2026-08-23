@@ -18,6 +18,18 @@
      nadat er een functievlag bij is gekomen -- de bestanden zijn immers niet
      veranderd, en dat is precies het soort stille fout waar een cache om
      berucht is.
+   - DE MOTORSTAND UIT DE OMGEVING, en die ben ik in de eerste versie vergeten.
+     magnaat-capabilities-bronnen.js leest vijf variabelen (de stand, het pad
+     naar de binary, het canary-percentage, de canary-sleutel en de globale
+     noodstop) en die bepalen mede of de graaf 'javascript' of 'rust' als bron
+     noemt. Zonder die vijf in de sleutel gaf een omgeschakelde motorstand de
+     OUDE graaf terug: test/magnaat-capabilities.test.js verwachtte 'rust' en
+     kreeg 'javascript'. Ik had de waarschuwing hierboven zelf opgeschreven en
+     maakte er meteen daaronder hetzelfde geval van.
+   - DE BINARY ZELF, om dezelfde reden. Hij staat buiten de gescande mappen,
+     dus geen enkel manifest ziet hem; toch verandert de uitkomst als hij
+     verandert (de pariteitsproef draait er echt tegenaan). Hij gaat als
+     bestandshash mee.
 
    Deze laag staat los van de scanner omdat het twee dingen zijn: WAT er gemeten
    wordt, en WANNEER dat opnieuw moet. En omdat magnaat-capabilities.js anders
@@ -27,6 +39,12 @@
    langs test/magnaat-capabilities.test.js. */
 'use strict';
 const path = require('path');
+
+/* De omgevingsvariabelen die de motorstand bepalen; gelijk te houden aan wat
+   magnaat-capabilities-bronnen.js leest. test/bronkas.test.js loopt die bron af
+   en eist dat elke gelezen RTG_-variabele hier staat. */
+const MOTORVLAGGEN = ['RTG_CAPABILITY_RUST_MODE', 'RTG_CAPABILITY_RUST_BIN',
+  'RTG_CAPABILITY_RUST_CANARY_PCT', 'RTG_CAPABILITY_RUST_CANARY_KEY', 'RTG_RUST_ALLES_UIT'];
 
 function viaKas({ root, functies, volledigeWerkprocessen, werkrouteFabriek }, bereken) {
   const kas = require('../lib/bronkas');
@@ -43,7 +61,16 @@ function viaKas({ root, functies, volledigeWerkprocessen, werkrouteFabriek }, be
     ]),
     JSON.stringify(Array.isArray(functies && functies.FUNCTIES) ? functies.FUNCTIES : []),
     JSON.stringify(volledigeWerkprocessen || []),
-    typeof werkrouteFabriek === 'function' ? 'fabriek' : 'geen'
+    typeof werkrouteFabriek === 'function' ? 'fabriek' : 'geen',
+    /* De motorstand uit de omgeving. Deze vijf staan met naam in
+       magnaat-capabilities-bronnen.js; wie er daar een bijzet, zet hem hier bij
+       (test/bronkas.test.js houdt dat vast). Als LIJST en niet als process.env
+       in zijn geheel: dan zou elke willekeurige variabele de kas ongeldig maken
+       en is er geen kas meer. */
+    MOTORVLAGGEN.map(n => n + '=' + (process.env[n] === undefined ? '' : process.env[n])).join('|'),
+    /* En de binary waar die stand naar wijst: die ligt buiten de gescande
+       mappen, dus geen manifest ziet hem. */
+    process.env.RTG_CAPABILITY_RUST_BIN ? kas.leesVersie([process.env.RTG_CAPABILITY_RUST_BIN]) : 'geen-binary'
   ]);
   return kas.geheugen({
     wortel: root, naam: 'capability-graaf', sleutel, bereken,
@@ -55,4 +82,4 @@ function viaKas({ root, functies, volledigeWerkprocessen, werkrouteFabriek }, be
   });
 }
 
-module.exports = { viaKas };
+module.exports = { viaKas, MOTORVLAGGEN };

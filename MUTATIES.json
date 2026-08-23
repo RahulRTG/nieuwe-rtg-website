@@ -4392,6 +4392,22 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "resetcontract-schrijfpad.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/geheugen.js",
+      "operator": "&&->||#2",
+      "gezakt": 1,
+      "geprobeerd": 20
+    },
+    "resetcontract-voorcheck.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/voorcheck.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "residentie.test.js": {
       "soort": "server",
       "staat": "gezakt",

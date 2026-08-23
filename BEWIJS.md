@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1036 bestanden en 6926 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1038 bestanden en 6927 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1036 |
-| losse beweringen (`test(...)`) | 6926 |
+| toetsbestanden | 1038 |
+| losse beweringen (`test(...)`) | 6927 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 870 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 872 |
 | **overleefd**: geen mutatie kreeg hem rood | 11 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-910 bestanden, 6706 beweringen.
+912 bestanden, 6707 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -540,7 +540,7 @@ toets omvalt.
 | `ontwerp.test.js` | 9 | geen module gevonden | RTG Design System 2.0: de regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |
-| `opslag-voorcheck.test.js` | 8 | gezakt op `!==->===#0` | De goedkope voorcheck van de SQLite-opslag (server/db/sqlite.js). Verandering opsporen kostte een JSON.stringify van ELKE collectie bij ELKE save; op de echte store (164 collecties, 1,0 MB, waarvan `sessions` 780 KB)... |
+| `opslag-voorcheck.test.js` | 6 | gezakt op `!==->===#0` | De goedkope voorcheck van de SQLite-opslag (server/db/sqlite.js). Verandering opsporen kostte een JSON.stringify van ELKE collectie bij ELKE save; op de echte store (164 collecties, 1,0 MB, waarvan `sessions` 780 KB)... |
 | `opslagblokkade.test.js` | 5 | gezakt op `true->false#0` | DE OPSLAGBLOKKADE: START DEZE PRODUCTIESTAND WEL OP EEN GROOTBOEK? WAAROM DEZE TOETS ER IS TAKEN 4.7 zegt dat de json- en geheugenstand geen transactiegrootboek hebben, en dat dat "klaar" is zodra die standen in... |
 | `opslagpoort.test.js` | 6 | gezakt op `true->false#0` | GEEN GROOTBOEK, GEEN PRODUCTIE. Zonder rij-voor-rij grootboek is er maar een vangnet voor een collectie die haar grens raakt: db/tx/index.js schrijft de staart naar archief/ en kapt pas als dat gelukt is. |
 | `ov-operatie.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -638,6 +638,8 @@ toets omvalt.
 | `rem.test.js` | 6 | gezakt op `&&->||#0` | Test voor de eigen rate-limiter (server/rem.js): binnen het venster mag een sleutel tot `limit` verzoeken, daarboven springt de rem aan; sleutels tellen los; `skip` slaat over; een verlopen venster telt weer vanaf... |
 | `rendezvous.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en Rahul stelt een jetset-date voor op een gedeelde locatie. |
 | `reservering-beleid.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `resetcontract-schrijfpad.test.js` | 2 | gezakt op `&&->||#2` | RESETCONTRACT: het schrijfpad van de opslag -- fase C van de runtime. server/db/snapshot.js en server/db/geheugen.js zijn allebei een write-behind: ze verzamelen wijzigingen en schrijven ze in een venster weg. |
+| `resetcontract-voorcheck.test.js` | 1 | gezakt op `!==->===#0` | RESETCONTRACT: server/db/voorcheck.js -- fase C van de verificatie-runtime. 647 serverstarts kosten een derde van alle toetstijd. |
 | `residentie.test.js` | 5 | gezakt op `liegpoort /api/` | De Residence: het virtuele grandhotel. Toegang (leden wel, gasten niet), bewegen door de zaal (grid, meubels blokkeren, zitmeubels laten zitten), praten en emotes, de eigen suite met het RTG Maison-atelier... |
 | `residentie2.test.js` | 5 | gezakt op `liegpoort /api/` | De Residence, samen spelen: uitdagen en accepteren in de juiste zaal, om de beurt spelen met een timing-nauwkeurigheid, een eerlijke uitslag zonder ranglijsten, de vragen van het huis aan het diner, en de... |
 | `residentie3.test.js` | 4 | gezakt op `liegpoort /api/` | De Residence, het paar en de directeur: samen "vast" wandelen (verzoek, volgen bij stap en kamerwissel, losmaken), koppel tegen koppel spelen (2 tegen 2 met teamstand) en Rahul, de directeur, die het vragenspel... |

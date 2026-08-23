@@ -160,4 +160,16 @@ function saveGeheugen() {
 }
 function flushGeheugen() { if (db.writable && saveVuil) { try { schrijfGeheugenNu(); } catch (e) {} } }
 
-module.exports = { laadGeheugen, saveGeheugen, flushGeheugen, schrijfGeheugenNu, GDIR };
+/* TERUG NAAR VERS -- de naad waar een toets deze module op zijn beginstand zet;
+   in elke db-module dezelfde naam. Eerst afzeggen, dan openstaand werk afmaken,
+   dan pas de merken terug: een reset die saveVuil leegzet terwijl er nog werk
+   openstaat gooit gegevens weg. laatsteSha en generatie gaan MET OPZET niet
+   mee -- die beschrijven de SCHIJF en niet dit proces; zie STATE.json en de kop
+   van scripts/staat.js. */
+function terugNaarVers() {
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+  if (db.writable && saveVuil) { try { schrijfGeheugenNu(); } catch (e) {} }
+  saveVuil = false; saveDuur = 0; saveKlaar = -Infinity; saveT0 = 0;
+}
+
+module.exports = { laadGeheugen, saveGeheugen, flushGeheugen, schrijfGeheugenNu, terugNaarVers, GDIR };

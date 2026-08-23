@@ -41,6 +41,35 @@
    Zolang een wortel op `onbekend` staat, telt hij als procesgebonden: dat is de
    veilige aanname, en hij kost dus een serverstart.
 
+   WAT DE CLASSIFICATIE AAN HET LICHT BRACHT, EN DAT IS GROTER DAN DE WORTELS.
+
+   Bij het classificeren van db/geheugen.js liep ik vast op twee wortels die je
+   niet KUNT terugzetten: laatsteSha en generatie beschrijven niet dit proces
+   maar de SCHIJF. Een vers proces zet ze niet op nul, het leest ze uit het
+   manifest. Toen ik doortelde waar dat nog meer geldt, kwam dit eruit:
+
+     - de datamap wordt op 10 plekken in server/ als MODULECONSTANTE gebonden
+       (server/db/opslag.js:12 en negen andere), dus bij het laden
+     - 678 van de 1042 toetsbestanden zetten een eigen RTG_DATA_DIR, 676 daarvan
+       een verse tijdelijke map
+     - 647 toetsbestanden starten een server EN zetten een eigen datamap;
+       34 starten er een zonder dat te doen
+
+   Die 647 zijn precies de 647 serverstarts waar dit hele programma om begon.
+   Het is dus geen toeval en geen los feit: een toets start een eigen server
+   omdat hij een eigen SCHIJF wil, en de schijf ligt vast op het moment dat de
+   modules laden.
+
+   Dat verschuift de volgorde van het werk. De 97 wortels zijn een echte
+   voorwaarde, maar ze zijn niet de bindende. Zolang elke toets zijn eigen
+   datamap maakt, deelt geen enkele van die 647 ooit een server -- hoe netjes
+   elke module ook terug naar vers kan. Een verificatiecontext is dus niet
+   "een server plus resets" maar "een server plus EEN datamap plus een
+   aantoonbare terugzetting van allebei".
+
+   Daarom staat het hier en niet in een notitie: wie de volgende stap zet, zet
+   hem op de datamap en niet op wortel nummer 98.
+
    Draai:
      node scripts/staat.js               het beeld, en exitcode 1 bij iets nieuws
      node scripts/staat.js --vastleggen  nieuwe wortels als 'onbekend' bijzetten

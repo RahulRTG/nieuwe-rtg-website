@@ -112,7 +112,7 @@ function vergeet(k) { laatsteGrootte.delete(k); laatsteLengte.delete(k); laatste
    er vier (drie maten en de timer), en die staan sinds vandaag in STATE.json
    als `herstelbaar` met deze functie als reset. scripts/staat.js leest die
    belofte na in de bron: raakt deze functie een van de vier niet aan, dan gaat
-   die poort rood. Het gedrag zelf staat in test/opslag-voorcheck.test.js.
+   die poort rood. Het gedrag zelf staat in test/resetcontract-voorcheck.test.js.
 
    Geen productiepad roept dit aan, en dat is de bedoeling: dit is de naad waar
    een toets een module op zijn beginstand zet, net als jwks.leeg() en

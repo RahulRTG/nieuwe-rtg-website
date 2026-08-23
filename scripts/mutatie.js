@@ -394,6 +394,13 @@ const EIGEN_MODULE = new Map([
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */
   ['domeinalleen.test.js', ['server/opzet/routes.js']],
+  /* De resetcontracten laden hun module met een BEREKEND pad (path.join met de
+     wortel), omdat ze de modulecache eerst leegmaken om een echt verse kopie te
+     krijgen. De regex hierboven zoekt naar een letterlijke require en vindt dan
+     niets; zonder deze regels zouden ze als "geen module gevonden" tellen
+     terwijl ze juist scherp meten. Beide met de hand nagetrokken en raak. */
+  ['resetcontract-voorcheck.test.js', ['server/db/voorcheck.js']],
+  ['resetcontract-schrijfpad.test.js', ['server/db/snapshot.js', 'server/db/geheugen.js']],
   /* VIER TOETSEN DIE DE LIEGPOORT OVERLEEFDEN OMDAT HIJ ZE NIET RAAKT, en dat
      is precies waar de uitleg hierboven over gaat: het overleven zei niets over
      de toets en alles over de verkeerde proef. Alle vier bevatten een require

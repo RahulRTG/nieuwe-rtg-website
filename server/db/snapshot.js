@@ -83,7 +83,7 @@ const snapshotVuil = () => saveVuil;
    METEEN schrijft of een venster inplant. Blijven ze staan, dan gedraagt een
    hergebruikte module zich anders dan een verse -- en dat is precies wat een
    toets die na een andere draait niet mag merken. Zie het resetcontract in
-   test/opslag-voorcheck.test.js.
+   test/resetcontract-schrijfpad.test.js.
 
    Wat hier niet met gedrag te bewijzen is: snapshotVol en snapshotWaarschuwing
    komen alleen in beeld boven ~512 MB aan data. Die twee worden gedekt door de

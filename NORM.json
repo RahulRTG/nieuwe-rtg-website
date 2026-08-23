@@ -6,11 +6,11 @@
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 910,
+    "testbestanden": 912,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 126,
-    "keuringOmvang": 159,
+    "keuringOmvang": 160,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -34,9 +34,14 @@
     "staatOngeregistreerd": 0,
     "staatOnbekend": 43,
     "duurOpWandklok": 36,
-    "staatProcesgebonden": 97
+    "staatProcesgebonden": 92
   },
   "notities": [
+    {
+      "datum": "2026-08-23",
+      "meter": "keuringOmvang 159 -> 160 (server/db/geheugen.js van 9091 naar 9773 bytes)",
+      "reden": "De resetnaad terugNaarVers() erbij, plus de uitleg waarom laatsteSha en generatie er MET OPZET niet in zitten (die beschrijven de schijf en niet dit proces). Daarmee komt het bestand in de band 9400-10240: nog niet te groot, wel vlak onder de grens. Ik heb de uitleg al teruggebracht tot zes regels; korter maken zou de subtiliteit weghalen die precies de reden is dat deze functie er staat, en de rest van de reden staat nu in STATE.json en in de kop van scripts/staat.js. Het bestand opknippen op zijn natuurlijke naad (laden tegenover schrijven) is een echte ingreep in een module die de duurzaamheidsgarantie draagt, en dat is geen wisselgeld voor 373 bytes. Bewuste stap, geen erosie: keuringTeGroot blijft 5 en dat is de grens die er toe doet."
+    },
     {
       "datum": "2026-08-18",
       "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",

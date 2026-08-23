@@ -46,6 +46,20 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     publiekePrijs: publiek,
     price: ledenPrijs(publiek, m.price),
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],
+    ingredienten: Array.isArray(m.ingredienten) ? m.ingredienten.slice(0, 40).map(a => schoon(a, 40)).filter(Boolean) : [],
+    dieet: Array.isArray(m.dieet) ? m.dieet.slice(0, 12).map(a => schoon(a, 24).toLowerCase()).filter(Boolean) : [],
+    opties: Array.isArray(m.opties) ? m.opties.slice(0, 12).map((g, gi) => ({
+      id:schoon(g && g.id, 30) || 'groep-' + gi,
+      naam:schoon(g && g.naam, 50) || 'Kies een optie', verplicht:!!(g && g.verplicht),
+      min:Math.max(0, Math.min(10, parseInt(g && g.min, 10) || (g && g.verplicht ? 1 : 0))),
+      max:Math.max(1, Math.min(10, parseInt(g && g.max, 10) || 1)),
+      keuzes:Array.isArray(g && g.keuzes) ? g.keuzes.slice(0, 30).map((k, ki) => ({
+        id:schoon(k && k.id, 30) || 'keuze-' + gi + '-' + ki,
+        naam:schoon(k && k.naam, 50) || 'Optie',
+        prijsCenten:Math.max(0, Math.min(100000, parseInt(k && k.prijsCenten, 10) || 0)),
+        allergenen:Array.isArray(k && k.allergenen) ? k.allergenen.slice(0, 12).map(a => schoon(a, 20)).filter(Boolean) : []
+      })) : []
+    })).filter(g => g.keuzes.length) : [],
     station: m.station === 'bar' ? 'bar' : 'keuken',
     sectie: ['warm', 'koud', 'snack', 'dessert'].includes(m.sectie) ? m.sectie : 'warm',
     // het vuurplan: eigen bereidingstijd in minuten (0 of leeg = nominale tijd per kant)

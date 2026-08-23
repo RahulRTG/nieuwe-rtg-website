@@ -25,6 +25,7 @@
 /* De reis van de gast. De rekening draagt waar hij is; de stap volgt uit wat er
    gebeurt en wordt niet door een scherm gezet. */
 const REIS = ['plaatsgenomen', 'besteld', 'geserveerd', 'afrekenen', 'vertrokken'];
+const product = require('../eten/product');
 
 module.exports = ({ save, schoon, horeca, regelbouw, beleid }) => {
   const { H, nu } = horeca;
@@ -95,10 +96,15 @@ module.exports = ({ save, schoon, horeca, regelbouw, beleid }) => {
       const magDit = beleid.magItem(zaakcode, item, deelnemer);
       if (!magDit.mag) return { status: 409, error: magDit.uitleg, code: magDit.code,
         item: item ? item.name : String(wens.itemId || '') };
+      const cfg = product.configuratie(item || {}, wens.keuzes);
+      if (cfg.error) return cfg;
       const uit = bouwRegel(zaakcode, {
-        naam: item.name, centen: Math.round(Number(item.price) * 100), groep: item.cat || null,
+        itemId:item.id, naam: item.name, centen: Math.round(Number(item.price) * 100) + cfg.meerprijsCenten, groep: item.cat || null,
         aantal: wens.aantal, gang: wens.gang, station: item.station || null,
         notitie: wens.notitie, allergie: allergie || wens.allergie || null,
+        opties:cfg.keuzes, ingredienten:item.ingredienten || [],
+        allergenen:[...(item.allergenen || []), ...cfg.allergenen].filter((x, i, a) => a.indexOf(x) === i),
+        prepMin:item.prepMin || null,
         gastNr: deelnemer ? deelnemer.nr : null
       }, deelnemer ? deelnemer.handle : 'gast');
       if (uit.error) return { status: uit.status || 400, error: uit.error, code: 'regel' };
@@ -106,6 +112,10 @@ module.exports = ({ save, schoon, horeca, regelbouw, beleid }) => {
     }
 
     const som = klaar.reduce((t, r) => t + r.centen * r.aantal, 0);
+    const prijsversie = product.prijsversie(klaar.map(r => ({ itemId:r.itemId, centen:r.centen,
+      aantal:r.aantal, opties:r.opties || [] })));
+    rek.prijsversie = prijsversie;
+    for (const r of klaar) r.prijsversie = prijsversie.id;
     const bevestig = beleid.bevestigingNodig(zaakcode, { allergie, totaalCenten: som });
     for (const r of klaar) {
       if (bevestig) { r.bevestiging = 'wacht'; r.bevestigingUitleg = bevestig.uitleg; r.bevestigingCode = bevestig.code; }

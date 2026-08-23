@@ -94,6 +94,7 @@ module.exports = (kern) => {
   require('./gast/bezorgen')(ctx);  // bezorgen en afhalen vanaf de ledenapp
   require('./gast/club')(ctx);      // polsbandtegoed en minimum spend
   require('./gast/foodcourt')(ctx); // een mandje bij meer loketten tegelijk
+  require('./gast/eten')(ctx);      // zoeken, ontdekken, Concierge en de relatielaag
   require('./gast/pols')(ctx);      // hoe druk het nu is, en zelf melden vanaf de tafel
   require('./gast/verzoek')(ctx);   // iets vragen: bediening, de rekening, iets dat niet goed is
 };

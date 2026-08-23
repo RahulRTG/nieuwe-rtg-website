@@ -61,6 +61,8 @@ module.exports = ({ horeca }) => {
       regels: regels.map(r => ({
         id: r.id, naam: r.naam, aantal: r.aantal, centen: r.centen, lijstprijs: r.lijstprijs,
         happy: r.happy || null, gang: r.gang, allergie: r.allergie || null, notitie: r.notitie || null,
+        itemId: r.itemId || null, opties: r.opties || [], ingredienten: r.ingredienten || [],
+        allergenen: r.allergenen || [], prijsversie: r.prijsversie || null,
         stand: r.stand, gastNr: r.gastNr || null,
         doorHandle: r.gastNr && wie(r.gastNr) ? wie(r.gastNr).handle : null,
         bevestiging: r.bevestiging || null, bevestigingUitleg: r.bevestigingUitleg || null

@@ -26,19 +26,58 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const WORTEL = path.join(__dirname, '..');
-// Los gestart pakt deze bronmuterende ijking zelf het afbouwslot. Via de
-// testrunner bezit de ouder dat slot al en geeft hij dit expliciet door.
+/* DEZE IJKING RAAKT DE ECHTE BOOM NIET MEER AAN.
+
+   Elke proef hieronder zet iets bekend-fouts neer om te zien of een meter
+   uitslaat. Dat gebeurde in de repository zelf, netjes opgeruimd in een
+   finally, en toch was het fout: andere toetsen scannen diezelfde boom en
+   zakten op een halve mutatie. De reparatie daarvoor was een isolatielijst in
+   scripts/test-runner.js -- dit bestand serieel, na alle andere -- en die lijst
+   kostte in zijn eentje 794 van de 1882 seconden wandklok van de hele suite,
+   met drie van de vier kernen stil. En de CI-poort gebruikte die runner niet
+   eens, dus daar gold de isolatie helemaal niet.
+
+   Nu maakt deze ijking een WEGWERPKOPIE van de werkboom en muteert daarbinnen
+   (scripts/lib/ephemere-boom.js). WORTEL wijst naar die kopie, dus alles wat
+   hieronder `path.join(WORTEL, ...)` doet -- de proefbestanden, de gespawnde
+   keuring, de routekaart, de dekking -- landt vanzelf in de kopie. Het
+   gereedschap komt ook UIT die kopie: een meter die deze repository leest
+   terwijl de mutatie in de kopie ligt, meet nul en zou de proef stil laten
+   slagen.
+
+   De kopie kost 1,4 seconde. De isolatie kostte 794. */
+const { maakBoom, binnen } = require('../scripts/lib/ephemere-boom');
+const BOOM = maakBoom('meterijk');
+const WORTEL = BOOM.pad;
+test.after(() => BOOM.ruimOp());
+
+/* Het afbouwslot blijft, maar niet meer omdat deze ijking de bron muteert --
+   dat doet hij niet meer. Hij blijft omdat een volledige afbouwronde en een
+   ijking die twintig keer de hele keuring draait elkaars machine opeten. */
 if (process.env.RTG_AFBOUW_SLOT_ACTIEF !== '1') require('../scripts/afbouw-slot').pak('meterijking');
 const norm = require('../scripts/norm.js');
+
+/* Meten doet de kopie, altijd. Deze wikkel bestaat zodat geen enkele proef
+   per ongeluk meet() zonder wortel aanroept -- dat zou deze repository
+   meten terwijl de mutatie in de kopie ligt, en dan slaagt de proef met een
+   verschil van nul om precies de verkeerde reden (LAT-regel 9). */
+const meet = (extra) => norm.meet(Object.assign({ wortel: WORTEL }, extra || {}));
+
+/* Gereedschap uit de gemeten boom, om dezelfde reden. */
+const uitBoom = (rel) => require(path.join(WORTEL, 'scripts', rel));
 const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';
 const meld = (tekst) => { if (VERBOSE) process.stderr.write('[meterijk] ' + tekst + '\n'); };
 
 /* Een proef doet drie dingen: iets kapots neerzetten, meten, opruimen. Het
    opruimen staat in een finally, want een ijking die rommel achterlaat is
-   erger dan geen ijking. */
+   erger dan geen ijking.
+
+   binnen() is de grendel en niet de belofte: hij gooit als het pad buiten de
+   wegwerpkopie wijst. Zonder die regel zou "wij muteren de echte boom niet"
+   een voornemen zijn, en een `..` in een relPad of een WORTEL die ooit weer
+   naar deze repository wijst zou er stil doorheen glijden. */
 function metTijdelijkBestand(relPad, inhoud, doe) {
-  const vol = path.join(WORTEL, relPad);
+  const vol = binnen(WORTEL, path.join(WORTEL, relPad));
   assert.equal(fs.existsSync(vol), false, 'de ijking overschrijft nooit een bestaand bestand: ' + relPad);
   fs.writeFileSync(vol, inhoud);
   try { return doe(); } finally { try { fs.unlinkSync(vol); } catch (e) {} }
@@ -50,7 +89,7 @@ function metTijdelijkBestand(relPad, inhoud, doe) {
    uit de tekst die we vooraf lazen, precies zoals bij package.json: dan blijft
    de opmaak byte voor byte zoals hij was. */
 function metAanbouw(relPad, extra, doe) {
-  const vol = path.join(WORTEL, relPad);
+  const vol = binnen(WORTEL, path.join(WORTEL, relPad));
   assert.equal(fs.existsSync(vol), true, 'de ijking bouwt alleen aan iets dat bestaat: ' + relPad);
   const oud = fs.readFileSync(vol, 'utf8');
   try { fs.writeFileSync(vol, oud + extra); return doe(); }
@@ -90,7 +129,7 @@ function metIjkRoutes(voor) {
     extra += "  kern.app.post('" + IJKSTAM + 'n' + i + "', (req, res) => res.json({ ok: true }));\n";
   }
   extra += '};\n';
-  const na = metAanbouw('server/routes/klok.js', extra, () => norm.meet());
+  const na = metAanbouw('server/routes/klok.js', extra, () => meet());
   _routeGat = { zonderTest: na.endpointsZonderTest - voor.endpointsZonderTest,
     pctVal: voor.dekkingPct - na.dekkingPct,
     /* De honderd ijkroutes zitten onder /api/zzijkproef/, dus ze vormen een NIEUW
@@ -144,12 +183,12 @@ const IJKINGEN = {
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
-      () => norm.meet().testbestanden - voor.testbestanden)
+      () => meet().testbestanden - voor.testbestanden)
   },
   e2eBestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.e2e.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
-      () => norm.meet().e2eBestanden - voor.e2eBestanden)
+      () => meet().e2eBestanden - voor.e2eBestanden)
   },
   zelfpoortendeToetsen: {
     // een toets die zichzelf overslaat MOET meetellen; de vorm met een
@@ -157,7 +196,7 @@ const IJKINGEN = {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\nconst aan = false;\n" +
       "test('ijk', { skip: aan ? false : 'geen dienst' }, () => {});\n",
-      () => norm.meet().zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
+      () => meet().zelfpoortendeToetsen - voor.zelfpoortendeToetsen)
   },
   browserpoortToetsen: {
     /* DE TWEEDE HELFT VAN DEZELFDE TELLING, en de proef staat er vooral om de
@@ -181,7 +220,7 @@ const IJKINGEN = {
     // een productbestand vlak onder de 10 kB-grens hoort opgemerkt te worden
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(9900) + '";\nmodule.exports = { x };\n',
-      () => norm.meet().keuringOmvang - voor.keuringOmvang)
+      () => meet().keuringOmvang - voor.keuringOmvang)
   },
   keuringTeGroot: {
     /* HETZELFDE BESTAND, MAAR DAN ECHT TE GROOT. En dat is niet zomaar een
@@ -195,7 +234,7 @@ const IJKINGEN = {
        andere wegvalt. */
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       '/* ijkbestand */\n' + 'const x = "' + 'y'.repeat(12000) + '";\nmodule.exports = { x };\n',
-      () => norm.meet().keuringTeGroot - voor.keuringTeGroot)
+      () => meet().keuringTeGroot - voor.keuringTeGroot)
   },
   inlineStijlAttributen: {
     /* DE RATEL OP DE LAATSTE unsafe-inline. Twee kanten geijkt, want dit getal
@@ -247,7 +286,7 @@ const IJKINGEN = {
        een blind bestand in server/ achterlaat, laat elke andere meting van deze
        ronde meebewegen. */
     proef: () => {
-      const { meetBlind } = require('../scripts/lib/bronblind');
+      const { meetBlind } = uitBoom('lib/bronblind');
       const kapot = (b) => String(b)
         .replace(/\/\*[\s\S]*?\*\//g, ' ')
         .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
@@ -312,15 +351,15 @@ const IJKINGEN = {
        boom een getal geeft dat leeft. Zonder die laatste regel zou een zeef die
        nergens meer wordt aangeroepen hier gewoon groen blijven. */
     proef: () => {
-      const { onderwerpVan } = require('../scripts/lib/bundeldeel');
+      const { onderwerpVan } = uitBoom('lib/bundeldeel');
       const met = onderwerpVan('/* de contactpin: je eigen code, als tekst en als QR */\ncode();');
       assert.equal(met, 'de contactpin: je eigen code, als tekst en als QR', 'een onderwerp wordt gezien');
       assert.equal(onderwerpVan('  const x = 1;\n  /* pas hieronder een uitleg die lang genoeg is */'), null,
         'een deel dat met code begint draagt geen onderwerpregel');
       assert.equal(onderwerpVan('/* deel 4b */\ncode();'), null, 'zeven letters is geen onderwerp');
 
-      const { delenVan } = require('../scripts/deelindex');
-      const { bundels } = require('../scripts/bundel');
+      const { delenVan } = uitBoom('deelindex');
+      const { bundels } = uitBoom('bundel');
       const delen = Object.values(bundels).flatMap(m => delenVan(m));
       assert.ok(delen.length > 300, 'de teller leest echt de delen (' + delen.length + ')');
       const kaal = delen.filter(d => !d.onderwerp).length;
@@ -335,7 +374,7 @@ const IJKINGEN = {
      te ijken -- dan meet je of hij draait en niet of hij ziet. */
   kernBreedte: {
     proef: () => {
-      const grenzen = require('../scripts/grenzen');
+      const grenzen = uitBoom('grenzen');
       const een = grenzen.bereikVan('module.exports = (kern) => { const { app, db, save } = kern; };');
       assert.deepEqual([...een].sort(), ['app', 'db', 'save'], 'een destructurering wordt geteld');
       const twee = grenzen.bereikVan('module.exports = (kern) => { kern.app.get("/x", () => kern.db); };');
@@ -353,7 +392,7 @@ const IJKINGEN = {
        eigenschap die meer dan een domein aanraakt is koppeling; een die maar
        een domein aanraakt hoort in dat domein. */
     proef: () => {
-      const grenzen = require('../scripts/grenzen');
+      const grenzen = uitBoom('grenzen');
       const a = grenzen.bereikVan('const { app, eigenA } = kern;');
       const b = grenzen.bereikVan('const { app, eigenB } = kern;');
       const samen = new Map();
@@ -368,7 +407,7 @@ const IJKINGEN = {
   },
   kernBreedsteBestand: {
     proef: () => {
-      const grenzen = require('../scripts/grenzen');
+      const grenzen = uitBoom('grenzen');
       const namen = Array.from({ length: 42 }, (_, i) => 'n' + i);
       const breed = grenzen.bereikVan('const { ' + namen.join(', ') + ' } = kern;');
       assert.equal(breed.size, 42, 'een breed bestand wordt op zijn volle breedte geteld');
@@ -382,7 +421,7 @@ const IJKINGEN = {
        van een maat: een naam die een bestand uit de kern pakt en nooit gebruikt.
        Drie beweringen, en de derde is degene die telt. */
     proef: () => {
-      const grenzen = require('../scripts/grenzen');
+      const grenzen = uitBoom('grenzen');
       const dood = grenzen.pakVsGebruik('const { app, db, save } = kern;\napp.get("/x", () => 1);');
       assert.deepEqual(dood.ongebruikt.sort(), ['db', 'save'],
         'gepakt en niet gebruikt: db en save; app wordt wel gebruikt');
@@ -441,7 +480,7 @@ const IJKINGEN = {
      Beide zijn in dit huis al gebeurd (eerlijkheidspunt 6.4 en, deze sessie,
      server/lokaal-tls.js dat gemuteerd bleef staan na een kill).
 
-     norm.meet() neemt nu een LEZER aan. De verzonnen uitslag gaat er als tekst
+     meet() neemt nu een LEZER aan. De verzonnen uitslag gaat er als tekst
      in, dus de meter doet nog steeds alles zelf: lezen, parsen, tellen. Wat er
      niet meer gebeurt, is op schijf schrijven -- en dus is er ook niets meer om
      terug te zetten of te verliezen. */
@@ -456,7 +495,7 @@ const IJKINGEN = {
       const namen = fs.readdirSync(path.join(WORTEL, 'test'))
         .filter(n => n.endsWith('.test.js')).sort().slice(0, 3);
       for (const naam of namen) j.toetsen[naam] = { soort: 'puur', staat: 'overleefd' };
-      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      const na = meet({ leesMutaties: () => JSON.stringify(j) });
       return na.toetsenOngevoeligPct - voor.toetsenOngevoeligPct;
     }
   },
@@ -469,7 +508,7 @@ const IJKINGEN = {
       const gemeten = Object.keys(j.toetsen).filter(k => j.toetsen[k].staat === 'gezakt' || j.toetsen[k].staat === 'overleefd');
       if (!gemeten.length) throw new Error('MUTATIES.json bevat geen enkele gemeten toets, dus deze ijking kan niets aanwijzen');
       delete j.toetsen[gemeten[0]];
-      const na = norm.meet({ leesMutaties: () => JSON.stringify(j) });
+      const na = meet({ leesMutaties: () => JSON.stringify(j) });
       return na.toetsenNietGemeten - voor.toetsenNietGemeten;
     }
   },
@@ -484,7 +523,7 @@ const IJKINGEN = {
         const j = JSON.parse(oud);
         j.dependencies = Object.assign({}, j.dependencies, { 'zz-ijk-tijdelijk': '^1.0.0' });
         fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        return norm.meet().dependencies - voor.dependencies;
+        return meet().dependencies - voor.dependencies;
       } finally { fs.writeFileSync(p, oud); }
     }
   },
@@ -502,7 +541,7 @@ const IJKINGEN = {
         const j = JSON.parse(oud);
         j.devDependencies = Object.assign({}, j.devDependencies, { 'zz-ijk-dev': '^1.0.0' });
         fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
-        const na = norm.meet();
+        const na = meet();
         assert.equal(na.dependencies, voor.dependencies,
           'een dev-pakket hoort de RUNTIME-meter met rust te laten, anders is de scheiding er alleen op papier');
         return na.devPakketten - voor.devPakketten;
@@ -516,7 +555,7 @@ const IJKINGEN = {
        precies de kant waarlangs een nieuw scherm binnenkomt: iemand zet een
        app neer, niemand opent hem, en het getal hoort meteen op te lopen. */
     proef: () => {
-      const schermen = require('../scripts/schermen.js');
+      const schermen = uitBoom('schermen.js');
 
       /* Eerst de scherpte van de meter zelf: een scherm dat ALLEEN door een
          veegtoets is aangeraakt mag niet als getoetst tellen. Dat is precies
@@ -581,7 +620,7 @@ const IJKINGEN = {
        bewaakt een ongeijkte meter het ijken. Hij krijgt twee verzonnen
        registraties: in de ene draagt een ECHTE metersleutel een reden, in de
        andere dezelfde sleutel een proef. Het verschil hoort exact 1 te zijn.
-       Geen norm.meet() nodig, en dat is geen luiheid: telOngeijkt() neemt zijn
+       Geen meet() nodig, en dat is geen luiheid: telOngeijkt() neemt zijn
        bron als invoer juist zodat deze ijking kan bestaan. */
     proef: () => {
       const bouw = (regel) => 'const IJKINGEN = {\n  ' + regel + '\n};\n';
@@ -624,7 +663,7 @@ const IJKINGEN = {
       '  const { app } = kern;\n' +
       '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ realName: \'Jan Jansen\' }));\n' +
       '};\n',
-      () => norm.meet().keuringStuk - voor.keuringStuk)
+      () => meet().keuringStuk - voor.keuringStuk)
   },
   keuringScheef: {
     /* Een tekst die zegt dat een boeking bevestigd is. Dat mag dit huis nooit
@@ -639,7 +678,7 @@ const IJKINGEN = {
          dat te zien. */
       '/* tijdelijk ijkbestand */\n' +
       'module.exports = () => ({ melding: \'Uw boeking is bevestigd en staat klaar.\' });\n',
-      () => norm.meet().keuringScheef - voor.keuringScheef)
+      () => meet().keuringScheef - voor.keuringScheef)
   },
   keuringDubbeling: {
     /* DRIE KERNMODULES MET DEZELFDE FUNCTIENAAM. De reden die hier stond
@@ -653,7 +692,7 @@ const IJKINGEN = {
         'function zzIjkTijdelijkeNaam(x) { return x; }\n' +
         'module.exports = { zzIjkTijdelijkeNaam };\n';
       const ga = (i) => i === paden.length
-        ? norm.meet().keuringDubbeling - voor.keuringDubbeling
+        ? meet().keuringDubbeling - voor.keuringDubbeling
         : metTijdelijkBestand(paden[i], inhoud, () => ga(i + 1));
       return ga(0);
     }
@@ -692,7 +731,7 @@ const IJKINGEN = {
       '  const { app } = kern;\n' +
       '  app.post(\'/api/zz-ijk/proef\', (req, res) => res.json({ ok: true }));\n' +
       '};\n',
-      () => norm.meet().routesNietSchakelbaar - voor.routesNietSchakelbaar)
+      () => meet().routesNietSchakelbaar - voor.routesNietSchakelbaar)
   },
   onbewaakt: {
     /* EEN REGEL IN LAT.md ZONDER HANDHAVER. De reden die hier stond ("gaat over
@@ -712,7 +751,7 @@ const IJKINGEN = {
        dezelfde optelling die het script op het scherm zet en in NORM.json
        vastlegt. Een eigen sommetje hier zou zijn eigen sommetje ijken. */
     proef: () => {
-      const samenhang = require('../scripts/samenhang.js');
+      const samenhang = uitBoom('samenhang.js');
       const tel = () => samenhang.totaalOnbewaakt(samenhang.meet());
       const voor = tel();
       return metAanbouw('LAT.md',
@@ -738,7 +777,7 @@ const IJKINGEN = {
        precies zoals metAanbouw dat doet -- een ijking die het wetboek anders
        opgemaakt achterlaat, is zelf de wijziging waar keuringsregel 41 op valt. */
     proef: () => {
-      const wetboek = require('../scripts/lib/wetboek.js');
+      const wetboek = uitBoom('lib/wetboek.js');
       const tel = () => { const { boek } = wetboek.lees(); return wetboek.onbewezen(boek, wetboek.leesUitslag()); };
       const voor = tel();
       const pad = path.join(WORTEL, 'WETTEN.json');
@@ -842,7 +881,7 @@ function prestatieIjking(sleutel) {
 }
 
 test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
-  const voor = norm.meet();
+  const voor = meet();
   const geijkt = Object.keys(IJKINGEN).filter(k => IJKINGEN[k].proef);
   assert.ok(geijkt.length >= 5, 'er zijn ijkingen om te draaien (' + geijkt.length + ')');
 
@@ -927,18 +966,18 @@ test('een onbruikbaar MUTATIES.json laat de meter ZAKKEN en niet stil nul melden
     ['geen enkele meting', () => JSON.stringify({ toetsen: {} })],
     ['alleen niet-gemeten uitslagen', () => JSON.stringify({ toetsen: { 'a11ykeuring.test.js': { staat: 'geen module gevonden' } } })]
   ]) {
-    assert.throws(() => norm.meet({ leesMutaties: lezer }), /MUTATIES\.json/,
-      'met "' + wat + '" hoort norm.meet() te gooien in plaats van een getal te geven');
+    assert.throws(() => meet({ leesMutaties: lezer }), /MUTATIES\.json/,
+      'met "' + wat + '" hoort meet() te gooien in plaats van een getal te geven');
   }
 });
 
 test('DE TEGENPROEF: een BRUIKBARE lezer laat de meter gewoon meten', () => {
-  /* Zonder deze zou de toets hierboven ook groen blijven als norm.meet() ALTIJD
+  /* Zonder deze zou de toets hierboven ook groen blijven als meet() ALTIJD
      gooit, en dan bewijst hij dat een kapotte meter goed gebouwd is. */
   const echt = fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8');
-  const na = norm.meet({ leesMutaties: () => echt });
+  const na = meet({ leesMutaties: () => echt });
   assert.equal(typeof na.toetsenOngevoeligPct, 'number');
-  assert.equal(na.toetsenNietGemeten, norm.meet().toetsenNietGemeten,
+  assert.equal(na.toetsenNietGemeten, meet().toetsenNietGemeten,
     'dezelfde inhoud via de lezer hoort hetzelfde getal te geven als van schijf');
 });
 

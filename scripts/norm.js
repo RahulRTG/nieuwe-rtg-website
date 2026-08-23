@@ -36,8 +36,11 @@ const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
 
-const WORTEL = path.join(__dirname, '..');
-const NORMBESTAND = path.join(WORTEL, 'NORM.json');
+/* BASIS is DEZE repository. meet() mag een andere boom meten (zie de kop daar);
+   alles buiten meet() -- NORM.json, BEPROEVING.json -- hoort altijd bij deze. */
+const BASIS = path.join(__dirname, '..');
+const WORTEL = BASIS;
+const NORMBESTAND = path.join(BASIS, 'NORM.json');
 
 /* Elke meter met de richting waarin hij mag bewegen. `omlaag` betekent: een
    lager getal is beter (minder ongedekte endpoints). `omhoog`: hoger is beter. */
@@ -299,7 +302,7 @@ function telInlineStijl(lees, bestanden) {
    3. EEN ANDERE MODUS. sqlite en Postgres meten niet hetzelfde platform.
       Zelfde behandeling.
    ========================================================================== */
-const PRESTATIEBESTAND = path.join(WORTEL, 'BEPROEVING.json');
+const PRESTATIEBESTAND = path.join(BASIS, 'BEPROEVING.json');
 const PRESTATIEMETERS = [
   { sleutel: 'p99Ms', richting: 'omlaag', wat: 'latentie p99 onder de storm (ms)' },
   { sleutel: 'doorvoerPerSec', richting: 'omhoog', wat: 'afgehandelde verzoeken per seconde onder de storm' },
@@ -415,7 +418,27 @@ function telSkips(bestanden, lees) {
 /* `bronnen` is er alleen voor de IJKING (test/meterijk.test.js) en is optioneel:
    zonder argument leest deze meter alles van schijf zoals altijd. Zie de uitleg
    bij `mutaties` hieronder voor waarom dat er is. */
+/* MEET EEN BOOM, NIET PER SE DEZE BOOM.
+
+   `bronnen.wortel` zegt WELKE werkboom gemeten wordt; zonder die optie is dat
+   deze repository, precies zoals voorheen. Hij bestaat voor de ijking: sinds
+   test/meterijk.test.js zijn bekend-foute invoer in een WEGWERPKOPIE neerlegt
+   (scripts/lib/ephemere-boom.js) in plaats van in de echte boom, moet de meting
+   ook over die kopie gaan -- anders meet je de mutatie niet.
+
+   Belangrijk: het gereedschap komt dan UIT die boom (`<wortel>/scripts/...`) en
+   niet van hiernaast. Een keuring van deze repository die met cwd naar een
+   kopie wijst, scant nog steeds deze repository -- ze bepaalt haar wortel uit
+   haar eigen __dirname. Dat is precies de val waar dit stuk omheen loopt. */
 function meet(bronnen) {
+  const WORTEL = (bronnen && bronnen.wortel) ? path.resolve(bronnen.wortel) : BASIS;
+  /* ALLE hulpmodules komen uit de gemeten boom, niet alleen de keuring. Elk van
+     deze (bundel, deelindex, grenzen, schakelbaar, bronblind) bepaalt zijn eigen
+     wortel uit zijn eigen __dirname. Redirect je er maar een paar, dan meet de
+     ene helft de kopie en de andere helft deze repository -- een uitslag die
+     half klopt en dat nergens zegt. Node cachet per opgelost pad, dus elke boom
+     krijgt vanzelf zijn eigen exemplaar. */
+  const SCRIPTS = path.join(WORTEL, 'scripts');
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
      moment dat er iets te meten viel -- de meetketen brak als de meting niet
@@ -428,7 +451,7 @@ function meet(bronnen) {
      is een echte storing en die gooit alsnog, met de eerste regels van zijn
      eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
   const r = spawnSync(process.execPath,
-    ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
+    ['--experimental-sqlite', path.join(SCRIPTS, 'keuring.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
   let k = null;
   try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
@@ -545,7 +568,7 @@ function meet(bronnen) {
 
   /* De style="..."-attributen in public/, buiten de bouwuitvoer en de bundels om. */
   const PUB = path.join(WORTEL, 'public');
-  const bundelPaden = new Set(Object.keys(require('./bundel').bundels).map(k => path.join(PUB, k)));
+  const bundelPaden = new Set(Object.keys(require(path.join(SCRIPTS, 'bundel')).bundels).map(k => path.join(PUB, k)));
   const stijlBestanden = [];
   (function loop(map) {
     for (const naam of fs.readdirSync(map)) {
@@ -562,28 +585,28 @@ function meet(bronnen) {
      meter in plaats van stil nul te geven -- juist bij een meter die over
      blindheid gaat is een stille nul de ergste uitkomst. */
   let bronBlindeBestanden;
-  try { bronBlindeBestanden = require('./lib/bronblind').meetBlind({ wortel: WORTEL }).ongedekt; }
+  try { bronBlindeBestanden = require(path.join(SCRIPTS, 'lib', 'bronblind')).meetBlind({ wortel: WORTEL }).ongedekt; }
   catch (e) { throw new Error('de kruisproef op de commentaar-verwijderaar kon niet draaien (' + e.message + '); een meter zonder invoer is geen meter'); }
 
   /* De delen zonder onderwerpregel, uit dezelfde bron als BUNDELS.md zelf
      (regel 4: geen tweede implementatie). */
   let delenZonderOnderwerp;
   try {
-    const { delenVan } = require('./deelindex');
-    delenZonderOnderwerp = Object.values(require('./bundel').bundels)
+    const { delenVan } = require(path.join(SCRIPTS, 'deelindex'));
+    delenZonderOnderwerp = Object.values(require(path.join(SCRIPTS, 'bundel')).bundels)
       .reduce((som, map) => som + delenVan(map).filter(d => !d.onderwerp).length, 0);
   } catch (e) { throw new Error('de bundeldelen konden niet worden gelezen (' + e.message + '); een meter zonder invoer is geen meter'); }
 
   /* De grenzen uit dezelfde bron als het losse script (regel 4: geen tweede
      implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
   let grenzen;
-  try { grenzen = require('./grenzen').meet(); }
+  try { grenzen = require(path.join(SCRIPTS, 'grenzen')).meet(); }
   catch (e) { throw new Error('de grenzen konden niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
   /* De schakelbaarheid uit dezelfde bron als het losse script: een tweede
      implementatie zou binnen een week uiteenlopen (regel 4). */
   let routesNietSchakelbaar = 0;
-  try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
+  try { routesNietSchakelbaar = require(path.join(SCRIPTS, 'schakelbaar')).meet().ongedekt.length; }
   catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
   /* Hoeveel meters staan er in de ijk-registratie met alleen een REDEN? Die

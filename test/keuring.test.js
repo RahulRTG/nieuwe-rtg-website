@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
+const { maakBoom, binnen } = require('../scripts/lib/ephemere-boom');
 const { keur } = require('../scripts/keuring.js');
 const uitslag = keur();
 
@@ -70,19 +71,34 @@ test('en die uitzondering is geen blinddoek: echt losgekoppelde code wordt nog g
 
      In een APART PROCES, want de Keuring bouwt haar bestandslijst een keer op
      bij het laden: een bestand dat daarna ontstaat ziet ze niet, en dan zou
-     deze toets groen staan om de verkeerde reden. */
-  const pad = path.join(WORTEL, 'server', 'kern', 'zz-keuringproef-dood.js');
-  assert.equal(fs.existsSync(pad), false, 'het proefbestand mag er nog niet staan');
-  fs.writeFileSync(pad, '/* tijdelijk proefbestand van test/keuring.test.js */\nmodule.exports = () => ({});\n');
+     deze toets groen staan om de verkeerde reden.
+
+     EN IN EEN WEGWERPKOPIE, niet in deze repository. Hier stond
+     path.join(WORTEL, ...) -- een echt bestand in server/kern/, netjes
+     opgeruimd in een finally. Toch verkeerd: andere toetsen scannen diezelfde
+     map, en die zien dan een dode module verschijnen die er niet hoort. Dat is
+     de reden dat dit bestand op de isolatielijst van de testrunner stond, en
+     dat die lijst bestond. Een toets muteert nooit gedeelde bronstaat; zie
+     scripts/lib/ephemere-boom.js. */
+  const boom = maakBoom('keuringproef');
   try {
+    const pad = binnen(boom.pad, path.join(boom.pad, 'server', 'kern', 'zz-keuringproef-dood.js'));
+    assert.equal(fs.existsSync(pad), false, 'het proefbestand mag er nog niet staan');
+    fs.writeFileSync(pad, '/* tijdelijk proefbestand van test/keuring.test.js */\nmodule.exports = () => ({});\n');
+    /* De keuring UIT de kopie, niet die van hiernaast: een keuring bepaalt haar
+       wortel uit haar eigen __dirname, dus de onze zou de kopie nooit zien. */
     const uit = require('child_process').execFileSync(process.execPath,
-      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'keuring.js'), '--json'],
-      { cwd: WORTEL, maxBuffer: 1e9, encoding: 'utf8' });
+      ['--experimental-sqlite', path.join(boom.pad, 'scripts', 'keuring.js'), '--json'],
+      { cwd: boom.pad, maxBuffer: 1e9, encoding: 'utf8' });
     const dood = JSON.parse(uit).bevindingen.filter(b => b.groep === 'dode code').map(b => b.waar);
     assert.ok(dood.some(p => p.includes('zz-keuringproef-dood')),
       'een module die niemand aanroept hoort gemeld te worden; gevonden: ' + dood.join(', '));
+    /* En de echte boom is niet aangeraakt. Zonder deze regel zou een WORTEL die
+       ooit weer hierheen wijst er stil doorheen glijden. */
+    assert.equal(fs.existsSync(path.join(WORTEL, 'server', 'kern', 'zz-keuringproef-dood.js')), false,
+      'de proef hoort in de wegwerpkopie te staan en niet in deze repository');
   } finally {
-    fs.unlinkSync(pad);
+    boom.ruimOp();
   }
 });
 

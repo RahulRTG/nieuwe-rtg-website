@@ -3472,5 +3472,108 @@ console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet
   }
 }
 
+/* ===========================================================================
+   51) geen toets schrijft in de gedeelde bronboom
+
+   DE INVARIANT: een toets observeert of muteert nooit gedeelde bronstaat.
+
+   WAAR HIJ UIT KOMT. Twee toetsbestanden legden hun proefbestand in de echte
+   repository neer. test/meterijk.test.js zette er een stuk of twintig keer iets
+   bekend-fouts in om te zien of de meters uitslaan; test/keuring.test.js legde
+   er een dode module neer om te zien of de keuring die vindt. Allebei ruimden
+   ze netjes op, en allebei waren ze fout, want andere toetsen SCANNEN diezelfde
+   boom. Wie tegelijk draait ziet een halve mutatie en zakt op iets dat niet
+   stuk is.
+
+   Wat dat kostte was niet alleen ruis. De reparatie was een isolatielijst in
+   scripts/test-runner.js -- deze bestanden serieel, na alle andere -- en die
+   lijst was op 23 augustus 2026 goed voor 941 van de 1882 seconden wandklok van
+   de hele suite, met drie van de vier kernen stil. Erger nog: de CI-poort
+   draaide `npm run test:gate`, een kale `node --test test/*.test.js`, en die
+   kent die lijst niet. "Groen lokaal" en "groen in CI" waren daarmee niet
+   dezelfde bewering.
+
+   Allebei zijn gevolgen van een oorzaak. Sinds scripts/lib/ephemere-boom.js
+   werken die toetsen in een wegwerpkopie (1,4 s) en is de isolatie overbodig.
+   Deze regel houdt dat zo.
+
+   WAT HIJ WEL EN NIET ZIET. Hij is tekstueel en dus voorzichtig: hij zoekt een
+   SCHRIJFactie waarvan het doelpad uit een wortel-constante komt (WORTEL, ROOT,
+   REPO, of __dirname + '..'). Een pad dat via een variabele binnenkomt ziet hij
+   niet. Dat is geen garantie maar een ondergrens -- en precies de vorm waarin
+   deze twee gevallen geschreven stonden. Lezen uit de boom is gewoon goed en
+   telt niet mee: alleen het EERSTE argument van een schrijfaanroep wordt
+   gewogen, zodat een copyFileSync(uit de boom, naar /tmp) er niet in loopt.
+   =========================================================================== */
+console.log('\n51) geen toets schrijft in de gedeelde bronboom');
+{
+  /* Eigen commentaarstripper: de andere twee in dit bestand staan in hun eigen
+     blok, en een naam uit een vreemd bereik plukken is precies wat regel 50
+     hierboven verbiedt. */
+  const zonderCommentaar = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+
+  /* WELK ARGUMENT HET DOEL IS, verschilt per functie -- en dat is geen detail.
+     De eerste versie van deze regel woog altijd argument 1 en wees daarmee
+     test/sentinel.test.js aan op `copyFileSync(path.join(ROOT, motor), naar tmp)`:
+     die LEEST uit de boom en schrijft naar een tijdelijke map, wat juist de
+     goede vorm is. Bij copyFileSync, renameSync en cpSync is argument 1 de
+     BRON. Uit de boom lezen mag altijd. */
+  const DOEL_EERSTE = ['writeFileSync', 'appendFileSync', 'mkdirSync', 'rmSync', 'unlinkSync', 'createWriteStream'];
+  const DOEL_TWEEDE = ['copyFileSync', 'renameSync', 'cpSync'];
+  const SCHRIJVERS = new RegExp('\\b(?:fs\\.)?(' + DOEL_EERSTE.concat(DOEL_TWEEDE).join('|') + ')\\s*\\(');
+  const WORTELWOORD = /\b(WORTEL|ROOT|REPO|REPO_ROOT)\b|__dirname\s*,\s*['"]\.\./;
+
+  /* De argumenten uit een aanroep halen met respect voor nesting en tekst.
+     path.join(ROOT, 'a/b') is EEN argument, ook al staat er een komma in. */
+  function argumenten(tekst) {
+    const uit = [];
+    let diep = 0, huidig = '', quote = null;
+    for (let i = 0; i < tekst.length; i++) {
+      const c = tekst[i];
+      if (quote) { huidig += c; if (c === quote && tekst[i - 1] !== '\\') quote = null; continue; }
+      if (c === '"' || c === "'" || c === '`') { quote = c; huidig += c; continue; }
+      if (c === '(' || c === '[' || c === '{') diep++;
+      else if (c === ')' && diep === 0) { uit.push(huidig); return uit; }
+      else if (c === ')' || c === ']' || c === '}') diep--;
+      else if (c === ',' && diep === 0) { uit.push(huidig); huidig = ''; continue; }
+      huidig += c;
+    }
+    uit.push(huidig);
+    return uit;
+  }
+
+  const testMap = path.join(ROOT, 'test');
+  const kapot = [];
+  let gekeken = 0, aanroepen = 0;
+  for (const naam of (fs.existsSync(testMap) ? fs.readdirSync(testMap) : []).sort()) {
+    if (!/\.(test|e2e)\.js$/.test(naam)) continue;
+    let bron; try { bron = fs.readFileSync(path.join(testMap, naam), 'utf8'); } catch (e) { continue; }
+    gekeken++;
+    const regels = zonderCommentaar(bron).split('\n');
+    for (let i = 0; i < regels.length; i++) {
+      const m = SCHRIJVERS.exec(regels[i]);
+      if (!m) continue;
+      aanroepen++;
+      /* De aanroep mag over meer regels lopen; neem er een paar mee zodat een
+         doel op de volgende regel niet stil wegvalt. */
+      const staart = regels.slice(i, i + 3).join(' ');
+      const args = argumenten(staart.slice(staart.indexOf(m[0]) + m[0].length));
+      const doel = DOEL_TWEEDE.includes(m[1]) ? args[1] : args[0];
+      if (doel && WORTELWOORD.test(doel)) kapot.push(naam + ':' + (i + 1) + '  ' + regels[i].trim().slice(0, 100));
+    }
+  }
+  if (kapot.length) {
+    for (const k of kapot.slice(0, 10)) {
+      fout('deze toets schrijft in de gedeelde bronboom: ' + k +
+        ' -- gebruik scripts/lib/ephemere-boom.js (een wegwerpkopie) of een map in os.tmpdir()');
+    }
+    if (kapot.length > 10) fout('... en nog ' + (kapot.length - 10));
+  } else {
+    ok(gekeken + ' toetsbestanden, ' + aanroepen + ' schrijfaanroepen: geen enkele wijst in de gedeelde bronboom');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

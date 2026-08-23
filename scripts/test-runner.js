@@ -17,8 +17,9 @@
        de zes geisoleerde  941 s serieel, 3 van de 4 kernen stil
          waarvan meterijk  794 s
 
-   Twee dingen staan daarmee vast, en ze zijn allebei het tegenovergestelde van
-   wat je zou gokken.
+   Die staart is daarna grotendeels opgeruimd door de oorzaak weg te nemen; zie
+   de kop bij GEISOLEERD hieronder. De twee waarnemingen eronder gelden nog
+   steeds, en ze zijn allebei het tegenovergestelde van wat je zou gokken.
 
    1. DE BATCH IS AF. Vier werkers op vier kernen, factor 4,0 -- daar zit geen
       seconde meer in. Meer tegelijk draaien maakt het ERGER: bij 8 tegelijk
@@ -35,27 +36,30 @@
       precies een getal. Dat is de eerstvolgende grote knop, en hij zit niet in
       dit bestand.
 
-   DE VOLGORDE. Hier stond `.sort()`, alfabetisch. Sinds
-   scripts/lib/tijdreporter.js de tijden opschrijft, kan de ronde de traagste
-   bestanden eerst starten (Longest Processing Time First). EERLIJK GEZEGD: dat
-   leverde bij de meting hierboven NIETS op -- 55 s alfabetisch tegen 56 en 57 s
-   met journaal, en dat kan ook niet anders bij een batch die al op factor 4,0
-   draait. Het staat er als verzekering en niet als winst: gaat er ooit een
-   bestand van minuten in de batch zitten, dan bepaalt zijn startmoment wel de
-   wandklok. Zet er dus geen getal bij dat er niet is (LAT-regel 10).
+   DE VOLGORDE BLIJFT ALFABETISCH, EN DAT IS EEN GEMETEN BESLUIT.
 
-   Wat het journaal WEL opleverde is de tabel hierboven. Voor die tabel bestond
-   er geen enkele bron: node --test schrijft in TAP-modus geen bestandstotalen,
-   dus "welke toets is traag" was hier een vraag waar je een eigen meting voor
-   moest opzetten. De lijst onderaan een ronde is daarmee het nuttigste deel van
-   deze wijziging, niet de sortering.
+   Hier heeft "traagste eerst" gestaan (Longest Processing Time First), gevoed
+   door het tijdjournaal. Het klonk goed en het leverde drie keer niets op:
 
-   Een bestand dat nog niet in het journaal staat (nieuw of net hernoemd) gaat
-   VOOROP: over de duur ervan weten we niets, en onbekend werk vroeg beginnen
-   kost hooguit een plek in de rij terwijl het aan het eind de ronde kan
-   verlengen. De eerste ronde op een verse checkout heeft geen journaal en valt
-   terug op alfabetisch -- precies zoals het was. Het journaal staat in
-   .gitignore: het is een meting van DEZE machine en hoort niet in de repo. */
+     40 bestanden   alfabetisch 55 s   traagste eerst 56 en 57 s
+     907 bestanden  alfabetisch 1515 s traagste eerst 1534 s
+
+   De reden staat in het cijfer erboven: de batch draait op factor 3,2 van de 4
+   en dat komt NIET doordat er een lange staart achteraan bungelt. Het komt
+   doordat meterijk.test.js zelf een subprocesstorm is -- hij start een stuk of
+   twintig keuringen, elk een eigen proces -- en die rekenen mee op dezelfde vier
+   kernen als de vier toetswerkers. De machine is overtekend, niet slecht
+   gepland. Een andere startvolgorde verplaatst dan alleen wie er wacht.
+
+   Dus is de sortering eruit. Een optimalisatie die drie metingen lang nul geeft
+   is geen verzekering maar losse complexiteit, en alfabetisch heeft er nog een
+   voordeel bij: dezelfde volgorde bij elke ronde. Wie hem terugzet, zet er een
+   meting bij (LAT-regel 10).
+
+   WAT WEL BLIJFT is het journaal en de lijst onderaan. Daar bestond geen enkele
+   bron voor -- node --test schrijft in TAP-modus geen bestandstotalen -- en elk
+   getal in deze kop komt eruit. Het journaal staat in .gitignore: het is een
+   meting van DEZE machine en geen eigenschap van de code. */
 'use strict';
 const fs = require('fs');
 const os = require('os');
@@ -72,13 +76,51 @@ const argv = process.argv.slice(2);
 const reporter = (argv.find(a => a.startsWith('--reporter=')) || '').slice(11);
 const selectie = (argv.find(a => a.startsWith('--bestanden=')) || '').slice(12)
   .split(',').map(s => s.trim()).filter(Boolean);
+/* DE DEKKINGSVLOER, VIA DEZE RUNNER EN NIET ERNAAST.
+
+   De CI-poort draaide `npm run test:gate`: een kale `node --test test/*.test.js`
+   met dekkingsvlakken erbij. Dat is een TWEEDE draaier voor dezelfde suite, en
+   twee draaiers voor een ding lopen uiteen (LAT-regel 4) -- dat is hier ook
+   gebeurd: de isolatie die deze runner uitvoerde, kende die poort niet.
+
+   `--dekking=regels,takken,functies` laat deze runner die rol overnemen. De
+   vloer geldt over de BATCH; de vier belasting-geisoleerde bestanden draaien er
+   zonder dekkingsmeting achteraan, want node kan de meting van meerdere
+   processen niet optellen. Wat dat voor de vloer betekent staat in de commit die
+   hem invoerde, gemeten en niet geschat. */
+const dekking = (argv.find(a => a.startsWith('--dekking=')) || '').slice(10)
+  .split(',').map(s => Number(s.trim())).filter(n => Number.isFinite(n) && n >= 0);
+if (argv.some(a => a.startsWith('--dekking=')) && dekking.length !== 3) {
+  console.error('[tests] --dekking wil drie getallen: regels,takken,functies');
+  process.exit(2);
+}
+/* WAT HIER NIET MEER STAAT, EN WAAROM DAT DE HELE WINST IS.
+
+   Hier stonden ook keuring.test.js en meterijk.test.js, en die twee waren
+   samen goed voor 866 van de 941 seconden seriele staart. Ze stonden er omdat
+   ze hun proefbestand in de ECHTE boom neerlegden: meterijk zet twintig keer
+   iets bekend-fouts neer om te zien of een meter uitslaat, keuring.test.js legt
+   een dode module neer. Andere toetsen scannen diezelfde boom, dus moesten die
+   twee alleen draaien.
+
+   Dat was een pleister op een oorzaak (LAT-regel 1). De oorzaak is weg: allebei
+   werken ze nu in een wegwerpkopie (scripts/lib/ephemere-boom.js, 1,4 s), en
+   check.js regel 51 houdt vol dat geen enkele toets nog in de gedeelde bronboom
+   schrijft. Daarmee is de isolatie overbodig -- en, belangrijker dan de tijd:
+   de CI-poort draait `npm run test:gate`, een kale `node --test test/*.test.js`
+   die deze lijst nooit heeft gekend. Zolang de lijst nodig was, waren "groen
+   lokaal" en "groen in CI" niet dezelfde bewering.
+
+   WAT ER WEL BLIJFT STAAN zijn vier bestanden die hier om een ANDERE reden
+   staan: niet mutatie maar belasting. Ze zetten elk een hele server op en
+   liepen onder volle machine tegen hun eigen healthcheck-grens. Samen kosten ze
+   75 s; dat is de moeite van dat risico nu niet waard. Wie ze er ooit afhaalt,
+   haalt ze er een voor een af en meet erbij. */
 const GEISOLEERD = new Set([
   'boot-smoke.test.js',
   'grens-sweep.test.js',
   'klok.test.js',
-  'zaakdoos.test.js',
-  'keuring.test.js',
-  'meterijk.test.js'
+  'zaakdoos.test.js'
 ]);
 const gevraagd = Number(process.env.RTG_TEST_CONCURRENCY);
 const concurrency = Number.isInteger(gevraagd) && gevraagd > 0
@@ -105,27 +147,21 @@ function leesTijden() {
   } catch (e) { return {}; }
 }
 const bekend = leesTijden();
-const msVan = (n) => Number(bekend['test/' + n]) || 0;
-const onbekendAantal = bestanden.filter(n => !msVan(n)).length;
-/* Longest first, onbekend vooraan. De alfabetische volgorde blijft de
-   tiebreaker, zodat twee even dure bestanden niet elke ronde van plek wisselen
-   en een verschil in uitkomst niet aan de volgorde kan liggen. */
-bestanden.sort((a, b) => {
-  const ma = msVan(a), mb = msVan(b);
-  if (!ma && !mb) return a < b ? -1 : a > b ? 1 : 0;
-  if (!ma) return -1;
-  if (!mb) return 1;
-  return mb - ma || (a < b ? -1 : a > b ? 1 : 0);
-});
 
 const journaal = path.join(WORTEL, '.routejournaal');
 try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 try { fs.unlinkSync(TIJDEN_RUW); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_TESTTIJDEN_RUW: TIJDEN_RUW };
 
-function draai(namen, parallel) {
+function draai(namen, parallel, metDekking) {
   if (!namen.length) return 0;
   const args = ['--experimental-sqlite', '--test', '--test-concurrency=' + parallel];
+  if (metDekking && dekking.length === 3) {
+    args.push('--experimental-test-coverage',
+      '--test-coverage-lines=' + dekking[0],
+      '--test-coverage-branches=' + dekking[1],
+      '--test-coverage-functions=' + dekking[2]);
+  }
   /* De tijdmeter komt ERBIJ, niet in plaats van. Zodra je node een tweede
      --test-reporter meegeeft vervalt zijn eigen standaard, dus die zetten we
      hier expliciet met dezelfde regel die node zelf hanteert (spec op een
@@ -176,12 +212,9 @@ function verwerkTijden() {
 
 const gewoon = bestanden.filter(n => !GEISOLEERD.has(n));
 const geïsoleerd = bestanden.filter(n => GEISOLEERD.has(n));
-console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk'
-  + (onbekendAantal === bestanden.length
-    ? ' (geen tijdjournaal: alfabetisch)'
-    : ' (traagste eerst; ' + onbekendAantal + ' zonder gemeten tijd vooraan)'));
+console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk (alfabetisch)');
 const begon = Date.now();
-let code = draai(gewoon, concurrency);
+let code = draai(gewoon, concurrency, true);
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);
   const uit = draai([naam], 1);

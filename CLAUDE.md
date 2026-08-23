@@ -42,6 +42,21 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`TENANT.md` is de buitenkant van de bedrijvenkant** — hoe een partner het
+Werk OS onder zijn eigen naam gebruikt zonder dat er een tweede platform
+ontstaat. Lees die vóór je aan white-label, SSO-inrichting of "enterprise"
+werkt. De kern in vier regels: **`org` IS de klant** (de juridische,
+beveiligings- en contractgrens), een werkruimtecode is een productinstantie
+daarbinnen, een leverancierscode is een relatie en nooit een identiteit, en er
+komt geen vijfde begrip bij. Drie grenzen die niet mogen sneuvelen: het merk
+van een klant geldt binnen zijn eigen blok (de RTG-schil verft niet mee), de
+herkomstregel is in geen enkele modus uit te zetten (wiens software je
+personeelsdossier bewaart is een AVG-vraag, geen merkvraag), en een
+enterprisebewering op een scherm heeft een bron — daarom weigert de modus
+`sovereign` mét de reden in plaats van te bestaan als knop. Wat er nog niet is
+(levenscyclus, contract, quota, bewijs per klant) staat in het antwoord van de
+server als `nietGebouwd` met de reden, en niet als lege waarde.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

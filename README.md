@@ -3215,6 +3215,84 @@ Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. D
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
+### RTG Tenant Control Plane (de klant als ding, en het Werk OS onder zijn eigen naam)
+
+`server/kern/tenant/` + `/api/tenant/...` + `/api/techniek/tenant`. Het
+diepte-document is **`TENANT.md`**; hier staat wat er draait.
+
+Dit huis had **drie codes die alle drie "de klant" leken te betekenen** --
+`org` (de sleutel van `sso_koppelingen` en de SCIM-sleutels), de werkruimtecode
+`W...` van het Werk OS, en de leverancierscode -- zonder een draad ertussen.
+Daardoor kon niemand zeggen welke werkruimtes onder welk contract vielen, droeg
+het Werk OS nergens de naam van zijn eigen klant, en moest een medewerker die
+via de provider van zijn werkgever inlogde daarna alsnog met de hand in de
+werkruimte worden gezet -- inclusief het met de hand weer weghalen, wat bij
+uitdiensttreding de stap is die overslaat.
+
+**`org` is vanaf nu de tenant**: de juridische, beveiligings- en contractgrens.
+Een werkruimtecode is een productinstantie daarbinnen, een leverancierscode is
+een zakelijke relatie en nooit een identiteit, en een RTG-account is een mens.
+Er komt geen vierde identiteitsmodel bij; de bestaande worden verbonden. Een
+tenant kan zonder SSO bestaan -- niet elke klant heeft een provider.
+
+| Endpoint | Doel |
+|---|---|
+| `GET/POST /api/techniek/tenant` | De tenants lezen en zetten (eigenaar) |
+| `POST /api/techniek/tenant/bind` `{org, soort, code}` | Een werkruimte of zaak eraan hangen (eigenaar) |
+| `POST /api/techniek/tenant/merk` `{org, merk}` | Het merk van de tenant (eigenaar) |
+| `POST /api/tenant/bootstrap` | Wie bedient dit scherm: tenant, werkruimte, merk, rollen, rechten |
+| `POST /api/tenant/bootstrap/mijn` | Hetzelfde via de eigen RTG-sessie, voor wie via zijn provider binnenkwam |
+| `POST /api/tenant/groep` · `/groepen` | Een IdP-groep aan een rol koppelen (beheerder van die werkruimte) |
+
+- **Een werkruimte of zaak hoort bij hooguit EEN tenant.** Twee tenants die
+  dezelfde werkruimte opeisen, geven een werkruimte waarvan het merk -- en
+  straks het contract en de export -- afhangt van wie er het laatst schreef.
+- **Drie presentatiemodi, en de derde weigert.** `powered` (klantmerk met
+  zichtbare RTG-schil) en `private` (RTG alleen nog in de herkomst- en
+  juridische regels) bestaan. `sovereign` belooft een eigen domein, eigen
+  sleutels en een eigen runtime, en dit huis heeft geen externe hosting, geen
+  certificaat-machinerie voor domeinen van derden en geen routering op
+  hostnaam -- dus die modus weigert MET de reden en de volgorde uit `TAKEN.md`
+  4.21. Weglaten leest als vergeten; weigeren met een reden leest als een
+  besluit.
+- **Een merkkern in plaats van een derde huisstijlsysteem.**
+  `kern/tenant/merkkern.js` is de definitie (welke velden, welke waarden, welke
+  standaard, waar het ophoudt) waar Theater en Webmerk uit kunnen gaan lezen;
+  de opslag blijft per scope waar hij hoort. Het manifest is **ondertekend en
+  aan de modus gebonden**: klopt het niet met zichzelf, dan komt de
+  standaardstijl naar buiten met de reden erbij -- niet het manifest dat er
+  stond. Vandaag bestuurt het alleen de schermen van het Werk OS; e-mail,
+  documenten en meldingen dragen het niet (`TAKEN.md` 4.55).
+- **De herkomstregel is in geen enkele modus uit te zetten.** Ook in `private`
+  blijft in de voet staan wiens software dit is. Wie je personeelsdossier
+  bewaart is geen merkvraag maar een AVG-vraag, en het antwoord mag niet
+  afhangen van een verkoopcontract.
+- **De kleur van een klant geldt binnen zijn eigen blok.** De accentkleur komt
+  op de merkbalk en nergens anders; `test/werkmerk.e2e.js` loopt in een echte
+  browser ELK element daarbuiten na op die kleur.
+- **De identiteitsbrug**: IdP-groep -> tenant -> werkruimte -> tijdgebonden rol
+  -> de 18 werkwoordrechten (`kern/tenant/brug.js`). Vier regels dragen hem:
+  zonder groepsafbeelding komt er niemand binnen (de huisregel "aanmelden is
+  niet binnen zijn" blijft dus staan), een IdP-rol is beheerd en vervalt met de
+  groep terwijl handmatige rollen blijven, een IdP herstelt geen ontslag, en een
+  SCIM-deactivatie sluit de werkplek in élke werkruimte van diezelfde tenant --
+  synchroon binnen het verzoek, en zonder iets van een andere tenant te raken.
+- **De bootstrap noemt wat er niet is.** `entitlements`, `quotas`, `policies`,
+  `trust` en `lifecycle` staan in `nietGebouwd` met een reden per veld, en niet
+  als lege waarde: een leeg quotum leest als "geen verbruik". Het Werk OS zet
+  die lijst ook op het scherm.
+- **Wat er is weggehaald.** `public/shared/enterprise-shell.{js,css}` was dode
+  code -- door geen enkele pagina ingeladen -- die "Enterprise beveiligd · audit
+  gereed · Commercial" beweerde zonder bron. Een enterprisebewering hoort een
+  bron te hebben; tot die er is, staat de bewering er niet.
+
+`test/tenantspine.test.js` (9, de regels), `test/tenant.test.js` (8, over de
+lijn) en `test/werkmerk.e2e.js` (het scherm) leggen dit vast; elf mutaties, alle
+elf RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
+merkcontrole overslaan, een leeg quotum in de bootstrap zetten, de IdP een
+ontslag laten herstellen, deprovisioning over alle tenants laten lopen en de
+accentkleur op de RTG-kopbalk lekken.
+
 ### RTG Web Platform (de automatische bedrijfssite en de browser die bedrijven begrijpt)
 
 De Website-maker (`/apps/sitemaker.html`, `kern/webmaker.js`) en de RTG-browser (`/apps/browser.html`, browserkant in `kern/webmaker-blader.js`) hebben er een laag bij: `server/kern/webplatform.js`, met een principe -- **automatic first, customizable forever**.

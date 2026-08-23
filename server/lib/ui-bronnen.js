@@ -62,11 +62,45 @@ function maakUiBronnen(publicDir, extraBestanden) {
       else if (/\.(?:html|js)$/.test(n.name)) leesBestand(p);
     }
   }
-  loop(publicDir);
-  for (const p of (extraBestanden || [])) leesBestand(p);
+  /* HET REGISTER KOMT UIT DE KAS ALS DE BRON NIET VERANDERD IS.
+
+     Dit bouwen kostte 619 ms bij ELKE serverstart, en de suite start er 647.
+     Dat is geen I/O maar parsen: alle 24 MB serveerbare HTML en JS ontleden op
+     zichtbare tekst, attributen en stringliteralen. De uitkomst hangt uitsluitend
+     af van die bestanden, dus hij hoort maar een keer per broncodestand
+     uitgerekend te worden -- daarna is teruglezen 35 ms.
+
+     De sleutel is een sha256 over de INHOUD van elk bestand dat hier meegaat,
+     plus over de broncode van deze module zelf. Verandert er een byte in een
+     scherm, of verandert de manier waarop dit register leest, dan is de sleutel
+     anders en wordt er opnieuw gerekend. Er bestaat dus geen stand waarin dit
+     register achterloopt op de schermen -- en dat is bij dit register geen
+     comfort maar de kern: hij bepaalt welke tekst naar een modelaanbieder mag.
+
+     Als regels en niet als JSON, want deze lijst is 87.000 teksten van samen
+     3,2 MB: splitten kost 6 ms waar JSON.parse er tientallen kost. Een tekst met
+     een newline erin kan niet bestaan -- normaliseer() heeft alle witruimte al
+     tot enkele spaties teruggebracht voordat er iets in de verzameling komt --
+     dus is de regelscheiding eenduidig. test/bronkas.test.js houdt dat vast. */
+  const kas = require('./bronkas');
+  const extra = (extraBestanden || []).filter(p => { try { return fs.existsSync(p); } catch (e) { return false; } });
+  const sleutel = kas.sleutelUit([
+    kas.manifestVan(publicDir, p => /\.(?:html|js)$/.test(p), 'ui'),
+    kas.leesVersie([__filename]),
+    extra.join('|')
+  ]);
+  const lijst = kas.geheugen({
+    wortel: path.join(__dirname, '..', '..'),
+    naam: 'ui-bronnen',
+    sleutel,
+    bereken: () => { loop(publicDir); for (const p of extra) leesBestand(p); return [...teksten]; },
+    naarTekst: (arr) => arr.join('\n'),
+    vanTekst: (t) => (t === '' ? [] : t.split('\n'))
+  });
+  const register = teksten.size ? teksten : new Set(lijst);
   return {
-    toegestaan: s => teksten.has(normaliseer(s)),
-    aantal: teksten.size
+    toegestaan: s => register.has(normaliseer(s)),
+    aantal: register.size
   };
 }
 

@@ -49,19 +49,11 @@ module.exports = function luister(deps) {
     // veiligadres.js waarschuwt op http en wijst op https de weg naar het toestel
     require('./veiligadres')({ PORT, HOST });
   }
-  /* HET SEEDVENSTER DICHT, VOOR DE DEUR OPENGAAT. Wat het venster is en waarom
-     het mag bestaan staat bij hashPasswordSync in accounts/kluis.js; hier staat
-     alleen waarom het JUIST HIER dichtgaat. Vanaf listen is elk wachtwoord dat
-     erbij komt van een echte gebruiker. En met opzet voor app.listen en niet in
-     de callback erna: die vuurt pas een tik later, en in dat gaatje kan een
-     verzoek al binnen zijn. Het getal erbij, anders is niet te zien of de
-     besparing er nog is (LAT-regel 10). */
-  if (accounts && typeof accounts.sluitSeedvenster === 'function') {
-    const seedvenster = accounts.sluitSeedvenster();
-    if (seedvenster.stondOpen) {
-      log.info('[demoseed] seedvenster dicht', { woorden: seedvenster.woorden, hergebruikt: seedvenster.hergebruikt });
-    }
-  }
+  /* De laatste handelingen voor de deur opengaat -- het seedvenster dicht en
+     wat de bronkas uitspaarde -- staan in ./startslot.js. Ze horen VOOR
+     app.listen en niet in de callback erna: die vuurt pas een tik later, en
+     in dat gaatje kan een verzoek al binnen zijn. */
+  require('./startslot')({ accounts, log });
 
   const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
 

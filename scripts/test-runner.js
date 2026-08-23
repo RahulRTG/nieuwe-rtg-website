@@ -23,14 +23,8 @@ const argv = process.argv.slice(2);
 const reporter = (argv.find(a => a.startsWith('--reporter=')) || '').slice(11);
 const selectie = (argv.find(a => a.startsWith('--bestanden=')) || '').slice(12)
   .split(',').map(s => s.trim()).filter(Boolean);
-const GEISOLEERD = new Set([
-  'boot-smoke.test.js',
-  'grens-sweep.test.js',
-  'klok.test.js',
-  'zaakdoos.test.js',
-  'keuring.test.js',
-  'meterijk.test.js'
-]);
+const { isGeisoleerd } = require('./lib/geisoleerd');
+
 const gevraagd = Number(process.env.RTG_TEST_CONCURRENCY);
 const concurrency = Number.isInteger(gevraagd) && gevraagd > 0
   ? Math.min(gevraagd, 32)
@@ -65,8 +59,8 @@ function draai(namen, parallel) {
   return r.status == null ? 2 : r.status;
 }
 
-const gewoon = bestanden.filter(n => !GEISOLEERD.has(n));
-const geïsoleerd = bestanden.filter(n => GEISOLEERD.has(n));
+const gewoon = bestanden.filter(n => !isGeisoleerd(n));
+const geïsoleerd = bestanden.filter(n => isGeisoleerd(n));
 console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk');
 let code = draai(gewoon, concurrency);
 for (const naam of geïsoleerd) {

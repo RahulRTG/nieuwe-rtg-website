@@ -365,6 +365,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | hoeveel losse schalen beantwoorden "mag de machine dit zelf" (vijf, en ze kennen elkaar niet) | `GEZAG.json` + `scripts/gezag.js` |
 | wat een poortwachter vaststelt voor hij JA zegt, en de canonieke vorm daarvoor | `ENVELOP.json` + `scripts/envelop.js` + `server/opzet/envelop.js` |
 | wat een verzoek werkelijk verandert (rijen per collectie, voor en na) | `server/opzet/handeling.js` + `test/handeling.test.js` |
+| een massaverwijdering tegengehouden VOORDAT hij landt (standaard: melden) | `server/opzet/begroting.js` + `server/db/state.js` |
+| een bronmuterende toets draait alleen, niet naast een server die diezelfde bron leest | `scripts/lib/geisoleerd.js` + `test/bronmutanten.test.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |

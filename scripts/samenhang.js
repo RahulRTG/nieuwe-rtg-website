@@ -297,7 +297,45 @@ function tabel() {
         return !!laag && /require\(['"]\.\/handeling['"]\)/.test(keten) && /ECHTE SERVER/.test(toets);
       },
       kanttekening: 'ziet GEEN wijziging binnen een rij (4000 mensen op non-actief beweegt geen rij-aantal); ' +
-        'de meting is ACHTERAF, dus een massamutatie is te zien en te melden maar niet te weigeren'
+        'de meting is ACHTERAF -- tegenhouden doet server/opzet/begroting.js, en die staat op melden'
+    },
+    {
+      /* DE ENIGE LAAG DIE IETS KAN WEIGEREN. De handelingsmeting ziet een
+         massamutatie nadat hij gebeurd is; deze houdt hem tegen op de drempel.
+         BEWAAKT betekent hier: de val hangt echt aan db.data (de accessor in
+         server/db/state.js is het enige punt waar alle elf toekenningen
+         doorheen gaan) EN er staat een toets op die hem heeft zien WEIGEREN --
+         met de oude collectie aantoonbaar nog intact na de poging. Een poort
+         waarvan alleen bewezen is dat hij meldt, is geen poort. */
+      soort: 'begroting (kan een massamutatie weigeren)',
+      bewaker: ['server/opzet/begroting.js', 'test/begroting.test.js'],
+      wat: 'een hervulling die te veel rijen wegneemt wordt gewogen voordat hij landt',
+      dingen: () => ['server/opzet/begroting.js'],
+      bewaakt: () => {
+        const laag = lees('server/opzet/begroting.js');
+        const staat = lees('server/db/state.js');
+        const toets = lees('test/begroting.test.js');
+        return !!laag && /begroting'\)\.bewaak/.test(staat) && /onaangeroerd/.test(toets);
+      },
+      kanttekening: 'staat standaard op MELDEN; RTG_BEGROTING=weigeren zet de tand erin, ' +
+        'en dat kan pas als de catalogus van legitieme grote krimpen er is (TAKEN.md 4.62)'
+    },
+    {
+      /* WIE ER AAN DE ECHTE BRON ZIT, DRAAIT ALLEEN. Een toets die een echt
+         bronbestand hernoemt om zijn meter te ijken, laat een ANDERE toets
+         omvallen die op dat moment een server start -- met een fout die naar
+         een onschuldig bestand wijst. Dat is hier echt gebeurd. */
+      soort: 'bronmuterende toetsen (draaien alleen)',
+      bewaker: ['scripts/lib/geisoleerd.js', 'test/bronmutanten.test.js'],
+      wat: 'elke toets die server/, scripts/ of public/ overschrijft, staat in de isolatielijst van de draaier',
+      dingen: () => {
+        try { return require('./lib/geisoleerd').GEISOLEERD.slice(); } catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const draaier = lees('scripts/test-runner.js');
+        return /require\('\.\/lib\/geisoleerd'\)/.test(draaier) && bestaat('test/bronmutanten.test.js');
+      },
+      kanttekening: 'ziet alleen de schrijfvormen die dit huis vandaag gebruikt; een toets die via een SCRIPT schrijft valt erbuiten'
     }
   ];
 }

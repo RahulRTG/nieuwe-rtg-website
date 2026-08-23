@@ -435,6 +435,14 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "begroting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/begroting.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
     "belasting-groothandels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -704,6 +712,14 @@
       "module": "scripts/lib/bronblind.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "bronmutanten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/geisoleerd.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "btw-aangifte.test.js": {

@@ -925,6 +925,50 @@ sessie geen `lidKey` draagt. Wat nog niet gebeurt, is dat de uitgifte daar iets
 mee doet. De reparatie is een besluit en geen code: óf het kantoor krijgt een
 sessie met een persoon, óf de vier-ogen-uitgifte weigert een anonieme envelop.
 
+### De begroting (`RTG_BEGROTING`)
+
+De handelingsmeting hierboven ziet een massamutatie **nadat** hij is gebeurd.
+`server/opzet/begroting.js` is de laag die hem kan **tegenhouden**.
+
+Een echte droge run kan hier niet: een route stuurt post, roept een betaaldienst
+aan en schrijft bestanden — zo'n handler twee keer draaien is gevaarlijker dan
+wat je ermee voorkomt. Maar een massaverwijdering ziet er in deze code bijna
+altijd hetzelfde uit:
+
+| idiom | plekken |
+|---|---|
+| `db.data.X = []` | 142 |
+| `db.data.X = …slice(…)` | 82 |
+| `db.data.X = …filter(…)` | 30 |
+| `db.data.X.splice(…)` | 3 |
+| `db.data.X.length = 0` | 0 |
+
+**254 van de 257** zijn een *hervulling*, en die is te onderscheppen vóórdat hij
+landt — met een `set`-val op `db.data` (de accessor staat in
+`server/db/state.js`, het enige punt waar alle elf toekenningen doorheen gaan).
+Op dat moment zijn de oude en de nieuwe lengte allebei bekend en is er nog niets
+gebeurd. Geen simulatie, maar de echte handeling tegengehouden op de drempel.
+
+```
+RTG_BEGROTING=weigeren     de tand erin (standaard: melden)
+RTG_BEGROTING_KRIMP=1000   hoeveel rijen één hervulling mag wegnemen
+```
+
+**Hij staat standaard op melden, en dat is een besluit.** Weigeren aanzetten over
+3706 routes is precies het soort wijziging waarvan je pas in productie merkt wat
+er stuk ging: er zijn legitieme grote krimpen (de bewaarveger, archivering) en
+die catalogus bestaat nog niet. In meldmodus schrijft hij
+`begroting: zou zijn geweigerd` met collectie, aantal en correlatie-id — en dat
+log *is* de catalogus. Meten, ratelen, dan handhaven.
+
+**Buiten een verzoek gebeurt er niets.** Een cronjob, de onderhoudsveger, een
+migratie en het inlezen van de seed hebben geen handelingscontext; dat is het
+huis dat zijn eigen werk doet, geen actor met een budget. Een begroting die het
+opstarten breekt is erger dan geen begroting.
+
+**Kosten:** een Proxy op `db.data` raakt elke leesactie. Gemeten op 450 sleutels:
+0,02 µs per leesactie, 59 ns per schrijfactie. Op een p50 van 13 ms niet te zien.
+
 ### De systeemwetten (`npm run wetten`, `npm run sabotage`, `npm run zekerheid`)
 
 De toetsen en keuringen hierboven vragen allemaal hetzelfde: *zakt er iets?*

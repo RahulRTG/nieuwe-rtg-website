@@ -1364,7 +1364,9 @@
     "samen": [
       "samen"
     ],
-    "scim": [],
+    "scim": [
+      "tenant"
+    ],
     "sleutelwoorden": [
       "swInfo",
       "swWeg",
@@ -1515,7 +1517,8 @@
     "sso": [
       "appUrl",
       "logInlog",
-      "stateFor"
+      "stateFor",
+      "tenant"
     ],
     "stad": [
       "stad",
@@ -1901,8 +1904,14 @@
       "staat",
       "stad",
       "techniek",
+      "tenant",
       "wacht",
       "zekeringMag"
+    ],
+    "tenant": [
+      "bedrijf",
+      "findSupplier",
+      "tenant"
     ],
     "theater": [
       "resolveSession",

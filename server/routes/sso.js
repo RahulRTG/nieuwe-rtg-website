@@ -104,6 +104,30 @@ module.exports = (kern) => {
       log.info('sso.inlog', { org: k.org, codenaam: user.codename, nieuw, gekoppeld });
       if (typeof logInlog === 'function') logInlog('sso', true, k.org, req);
 
+      /* DE IDENTITEITSBRUG. Tot hier ging dit over een RTG-account; een
+         werkruimte van het Werk OS werkt met een eigen lid. De brug legt die
+         twee aan elkaar aan de hand van de groepen die de provider meestuurt --
+         en doet NIETS zolang de beheerder van die werkruimte geen groep aan een
+         rol heeft gekoppeld (kern/tenant/brug.js).
+
+         De claim heet `groups`: één bron, geen tweede naam ernaast. Wat de
+         provider niet meestuurt, bestaat voor deze ronde niet.
+
+         Een fout hier laat de INLOG staan en wordt luid gelogd. Dit gaat over
+         de werkplek en niet over het account; iemand buitensluiten uit zijn
+         eigen RTG-omgeving omdat een journaalregel in een werkruimte niet
+         wegkwam, is het verkeerde antwoord op het verkeerde probleem. Dat het
+         misging mag alleen nooit stil zijn -- dan lopen rollen ongemerkt uit de
+         pas met de provider. */
+      try {
+        if (kern.tenant) {
+          const uit = kern.tenant.brug.uitClaims(k.org, claims.groups, 'user-' + user.id, claims.name);
+          if (uit.ok && uit.werkruimtes.length) log.info('tenant.brug', { org: k.org, werkruimtes: uit.werkruimtes.length });
+        }
+      } catch (e) {
+        log.error('tenant.brug mislukt', { org: k.org, fout: e.message });
+      }
+
       const bewijs = accounts.issueActionToken(user.id, OVERDRACHT, OVERDRACHT_MS);
       const pas = user.tier === 'lifestyle' || user.tier === 'business' ? user.tier : 'rtg';
       res.redirect(302, '/apps/app.html?pas=' + pas + '&sso=' + encodeURIComponent(bewijs) +

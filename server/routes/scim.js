@@ -47,6 +47,28 @@ module.exports = (kern) => {
     next();
   }
 
+  /* DE CASCADE BIJ UIT DIENST.
+
+     Een SCIM-deactivatie zette tot nu toe het RTG-ACCOUNT uit. Wie via zijn
+     werkgever ook in een werkruimte van het Werk OS zat, hield daar zijn
+     lid-token -- en dat token werkt zonder RTG-account gewoon door, want een
+     werkruimtelid is met opzet een eigen identiteit. "Uit dienst" bij de klant
+     liet de werkplek dus openstaan.
+
+     Hij draait SYNCHROON, binnen dit verzoek. Dat is de hele belofte: krijgt de
+     IdP zijn 204, dan is de toegang in elke werkruimte van deze tenant al weg.
+     Een wachtrij zou van uitdiensttreding een tijdvenster maken, en bij een
+     ontslag op staande voet is dat venster precies het probleem. */
+  function cascade(org, user) {
+    if (!kern.tenant) return;
+    try {
+      const uit = kern.tenant.brug.deprovisioneer(org, 'user-' + user.id);
+      if (uit.geraakt.length) log.warn('scim.werkruimte-ingetrokken', { org, id: user.id, werkruimtes: uit.geraakt.length });
+    } catch (e) {
+      log.error('scim.cascade mislukt', { org, id: user.id, fout: e.message });
+    }
+  }
+
   const remmen = rem({ windowMs: 60000, limit: 600 });
 
   /* ---------- ontdekking: wat kunnen wij ---------- */
@@ -100,6 +122,7 @@ module.exports = (kern) => {
     if (!herkend) return stuurFout(res, 400, 'Alleen het veld `active` kan via SCIM worden gewijzigd.', 'invalidValue');
     try {
       const u = scim.zetActief(accounts, req.scimOrg, req.params.id, actief);
+      if (!actief) cascade(req.scimOrg, u);
       log.warn('scim.actief', { org: req.scimOrg, id: u.id, actief: u.actief === 1 });
       stuurScim(res, 200, vorm.gebruiker(u, accounts.emailOf(u), BASIS));
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }
@@ -112,6 +135,7 @@ module.exports = (kern) => {
     const aan = !(req.body && req.body.active === false);
     try {
       const u = scim.zetActief(accounts, req.scimOrg, req.params.id, aan);
+      if (!aan) cascade(req.scimOrg, u);
       log.warn('scim.actief', { org: req.scimOrg, id: u.id, actief: u.actief === 1, via: 'put' });
       stuurScim(res, 200, vorm.gebruiker(u, accounts.emailOf(u), BASIS));
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }
@@ -123,6 +147,7 @@ module.exports = (kern) => {
   app.delete(BASIS + '/Users/:id', remmen, scimAuth, (req, res) => {
     try {
       const u = scim.zetActief(accounts, req.scimOrg, req.params.id, false);
+      cascade(req.scimOrg, u);
       log.warn('scim.uitdienst', { org: req.scimOrg, id: u.id });
       res.status(204).end();
     } catch (e) { stuurFout(res, e.status || 400, e.message, e.scimType); }

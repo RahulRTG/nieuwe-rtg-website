@@ -23,6 +23,12 @@ const assert = require('node:assert/strict');
 const { ROLLEN } = require('../server/bedrijf/rollen-register');
 const maakRegister = require('../server/kern/tenant/register');
 const maakBrug = require('../server/kern/tenant/brug');
+const maakTenant = require('../server/kern/tenant');
+
+/* De merkkern ondertekent met een sleutel die de accountlaag bij het opstarten
+   zet. Deze toets start geen server, dus die sleutel wordt hier gezet -- een
+   vaste, zodat de handtekening in de toets te reproduceren is. */
+require('../server/accounts/state').SECRET = Buffer.alloc(32, 7);
 
 /* Een minimale opslag in dezelfde vorm als db.data. Geen mock van de module
    die getoetst wordt -- alleen de bak eronder. */
@@ -212,4 +218,48 @@ test('9. alleen een rol die bestaat, en het journaal noemt geen namen', () => {
     assert.equal(r.wie, 'identiteitsprovider', 'het journaal noemt de bron en niet de mens');
     assert.ok(!/Imran/.test(JSON.stringify(r)), 'en nergens de naam uit het token');
   }
+});
+
+/* ---------- het merk: de handtekening en wat er als KEUZE geldt ---------- */
+function merkOpzet() {
+  const db = { data: { werkruimtes: {}, tenants: {} } };
+  const schoon = (t, n) => String(t == null ? '' : t).slice(0, n).trim();
+  const tenant = maakTenant({ db, save: () => {}, schoon, findSupplier: () => null, bedrijf: () => null });
+  tenant.register.zet({ org: 'O-M', naam: 'Imran Group' });
+  return { db, tenant };
+}
+
+test('10. een merk dat buitenom is gewijzigd, komt er niet uit', () => {
+  const { db, tenant } = merkOpzet();
+  tenant.merkZet('O-M', { naam: 'Imran Group One', accent: '#1B7F5A' });
+  assert.equal(tenant.merkVan('O-M').merk.naam, 'Imran Group One');
+
+  /* Rechtstreeks in de opslag, want dat IS het geval waarvoor de handtekening
+     bestaat: een backup die wordt teruggezet, een migratie, een fout in een
+     ander proces. Een merk uit de opslag vertrouwen zou betekenen dat de naam
+     van de ene klant boven de wereld van de andere kan komen. */
+  db.data.tenants['O-M'].merk.merk.naam = 'Andere Klant BV';
+
+  const na = tenant.merkVan('O-M');
+  assert.equal(na.merk.naam, 'Imran Group', 'de standaard valt terug op de tenantnaam');
+  assert.notEqual(na.merk.naam, 'Andere Klant BV', 'en zeker niet op wat er in de opslag was gezet');
+  assert.match(na.let, /klopte niet met zijn eigen handtekening/, 'met de reden erbij');
+  assert.match(na.herkomst, /Rahul Travel Group/, 'de herkomstregel staat er ook dan');
+});
+
+test('11. alleen wat de klant zette geldt als keuze', () => {
+  const { db, tenant } = merkOpzet();
+  tenant.merkZet('O-M', { naam: 'Imran Group One' });
+
+  /* De standaardkleur mag GEEN gekozen kleur worden. Bouwt de volgende
+     bewaring voort op het manifest in plaats van op de ruwe velden, dan staat
+     hier ineens een accent dat niemand heeft gekozen -- en dan volgt deze
+     tenant een wijziging van de RTG-standaard nooit meer. */
+  assert.deepEqual(Object.keys(db.data.tenants['O-M'].merkVelden), ['naam']);
+  assert.equal(tenant.merkVan('O-M').merk.accent, '#7F1634', 'naar buiten toe wel volledig ingevuld');
+
+  tenant.merkZet('O-M', { payoff: 'Werk zoals het hoort' });
+  assert.deepEqual(Object.keys(db.data.tenants['O-M'].merkVelden).sort(), ['naam', 'payoff'],
+    'een tweede bewaring vult aan en gooit de eerste niet weg');
+  assert.equal(tenant.merkVan('O-M').merk.naam, 'Imran Group One');
 });

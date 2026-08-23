@@ -16,6 +16,7 @@
 'use strict';
 
 const merkkern = require('./merkkern');
+const { ROLLEN } = require('../../bedrijf/rollen-register');
 
 module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
   const register = require('./register')({ db, save, schoon, findSupplier });
@@ -30,9 +31,14 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
   function merkZet(org, rauw) {
     const t = register.haal(org);
     if (!t) return { error: 'Die tenant kennen we niet.', status: 404 };
-    const huidig = (t.merk && t.merk.merk) || {};
-    const n = merkkern.normaliseer(rauw, huidig, schoon);
+    /* Voortbouwen op de RUWE velden en niet op het manifest. Dat verschil is
+       klein en het maakt uit: een manifest is altijd volledig ingevuld, dus wie
+       daarop verder bouwt legt de STANDAARD vast als een keuze van de klant.
+       Wie alleen een naam zet, heeft daarmee geen accentkleur gekozen -- en
+       `eigen` zou anders vanaf de eerste bewaring altijd waar zijn. */
+    const n = merkkern.leesMerkvelden(rauw, t.merkVelden || {}, schoon);
     if (n.error) return n;
+    t.merkVelden = n.merk;
     t.merk = merkkern.manifest(t.org, t.modus, n.merk, t.naam);
     t.bij = new Date().toISOString();
     save();
@@ -79,7 +85,6 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
     }
 
     const rol = String(o.rol || '');
-    const { ROLLEN } = require('../../bedrijf/rollen-register');
     if (!ROLLEN.some(r => r.id === rol))
       return { error: 'Onbekende rol: ' + rol + '.', status: 400 };
     if (t.groepen.some(g => g.werkruimte === code && g.groep === groep && g.rol === rol))

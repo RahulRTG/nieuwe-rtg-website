@@ -149,6 +149,11 @@ iets bouwt dat er al is:
 
 ## Wat er nieuw moet, in volgorde
 
+*Stand op 23 augustus 2026: punt 0 tot en met 6 zijn af. Wat er nog ligt, staat
+niet meer als los punt in deze lijst maar in **Wat er hierna ligt** onderaan —
+telkens met de reden waarom het een eigen snede is en niet een restje van iets
+hierboven.*
+
 **0. Eerst leesbaar en levend, dan pas slim.** *Gedaan.* Op 23 augustus 2026
 gemeten op `/apps/horeca.html`: 73% van de zichtbare tekstelementen stond onder
 12px, 39% onder 8px, de kleinste tekst was 5px, en 66–70% van de raakvlakken was
@@ -185,7 +190,7 @@ rand en geen tekst.
   herbouwen bij elke tik van elke collega. De les hoort erbij: een getal uit een
   meetscript is pas een feit als het script zelf ook is nagerekend.
 
-**1. Cadans: terugrekenen vanaf het serveermoment.** Vandaag rekent de keuken
+**1. Cadans: terugrekenen vanaf het serveermoment.** *Gedaan.* Vandaag rekent de keuken
 vooruit ("deze bon loopt 14 van 12 minuten"). Choreografie rekent terug: doel
 19:42 → entrecote starten 19:26, zeebaars 19:31, risotto 19:32, passcontrole
 19:40. Dit is de kleinste verandering die het verschil tussen registreren en
@@ -586,6 +591,37 @@ bestellingen, gelijke bezetting, dezelfde storingen, dezelfde personeelssterkte
 
 De laatste regel is de belangrijkste. Dit document is pas waar wanneer er een
 meting naast staat, en tot die tijd is het een plan.
+
+## Wat er hierna ligt
+
+Vier dingen, elk met de reden waarom het een eigen snede is en niet een restje
+van iets hierboven.
+
+**Een stap stuurt nog geen stationsbord.** Een gerecht met een grill-stap staat
+op het bord van het station van de RÉGEL, niet op dat van de stap. De cadans
+weet het al (elke stap draagt zijn station en zijn aanzetmoment); `/keuken/bord`
+filtert nog op `regel.station`. Dat is niet één regel code: zodra een gerecht op
+twee borden kan staan, moet er ook bepaald worden wie hem doorzet en wanneer hij
+van het ene bord verdwijnt. Een half doorgevoerde versie is erger dan geen,
+want dan telt hetzelfde werk twee keer.
+
+**Venue Edge voor de zaal, de bar en de PDA.** De kassa heeft zijn offline-rij
+(punt 5a), maar daar is een handeling ook echt één verzoek. Een rekening leeft
+over tientallen aanroepen, dus opnieuw versturen lost daar niets op — dat vraagt
+een lokale werkelijkheid die wordt samengevoegd, niet een rij. Een andere klasse
+probleem, en hij verdient een eigen ontwerp.
+
+**Een wijk.** De werklijst toont de hele zaak omdat een sectie-indeling nergens
+in de data bestaat. Wie hem per wijk wil, heeft eerst een wijk nodig: wie hoort
+bij welke tafels, wie neemt over bij een pauze, en wat gebeurt er met een tafel
+waarvan de wijk uitklokt. Dat is een ontwerpbesluit en geen veld. De rolmodi
+*host* en *wijkhoofd* wachten hierop; ze staan er bewust niet als lege knop bij.
+
+**Meer uitvoerders achter de rechtenlaag.** Het register van Rahul is compleet —
+alle zes de handelingen uit de opdracht staan erin met hun laag. De uitvoerders
+zijn dat niet: alleen `korting.toekennen` doet werkelijk iets, de rest levert een
+actiebon en verder niets. Dat is geen gat maar de juiste volgorde: een handeling
+zonder deur hoort een besluit te blijven tot die deur er is.
 
 ## De echte wauw
 

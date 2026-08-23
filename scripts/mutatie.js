@@ -457,6 +457,26 @@ const EIGEN_MODULE = new Map([
   ['samlxsw.test.js', ['server/sso/saml/antwoord.js', 'server/sso/saml/handtekening.js']],
   ['samlc14n.test.js', ['server/sso/saml/c14n.js', 'server/sso/saml/xml.js']],
   ['samlpoort.test.js', ['server/sso/saml/index.js']],
+  /* DE MERKKERN als enige bron. Zes mutaties, zes raak -- maar niet allemaal
+     tegen dezelfde toets, en dat is met opzet. merkkern.test.js kent de
+     WAARDEREGELS en de STRUCTUUR (de drie consumenten lezen de definitie en
+     dragen er geen kopie meer van); dat de drie er ook echt doorheen LOPEN, is
+     alleen te zien aan hun eigen servertoetsen. De rechtencontrole van webmerk
+     uitzetten laat merkkern.test.js dus groen -- en webplatform.test.js zakken.
+     Zo hoort het: een structuurtoets die runtime-gedrag claimt, claimt te veel.
+
+     merkkern -> tenant/merkkern.js: de hexcontrole eruit, de themalijst eruit,
+     `huidig` muteren in plaats van kopieren. Alle drie raak.
+     webplatform -> kern/webmerk.js, huisstijl -> kern/theater/huisstijl.js,
+     journalistiek-redactie -> kern/journalistiek.js: elk de weigering
+     overslaan, en elk raak. */
+  ['merkkern.test.js', ['server/kern/tenant/merkkern.js']],
+  /* DE ORGANISATIESTAND OP HET SCHERM. Vijf mutaties, vijf raak: alleen de
+     groene vinkjes tonen (dan is het weer een badgemuur), de rechtencontrole
+     op /api/tenant/status weghalen, een beschikbaarheidscijfer in het
+     platformblok zetten, de extra weergaven niet sluiten bij een tabwissel, en
+     Ververs weer laten gokken welk scherm er open staat. */
+  ['werkstatus.e2e.js', ['public/apps/werk/status.js', 'public/apps/werk/app.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

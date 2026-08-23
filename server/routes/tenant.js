@@ -95,17 +95,44 @@ module.exports = (kern) => {
      over de catalogus. Drie regels code aan de ontvangende kant, zonder ons. */
 
   /* ---------- de status- en bewijsstand ----------
-     Achter het beheer-token van de werkruimte, en NIET meegeteld in het
-     quotum: een statuspagina die dichtgaat zodra je aan je grens zit, gaat
-     dicht op precies het moment dat je hem nodig hebt. */
+     NIET meegeteld in het quotum: een statuspagina die dichtgaat zodra je aan
+     je grens zit, gaat dicht op precies het moment dat je hem nodig hebt.
+
+     TWEE SLEUTELS, EN DAT IS EEN VERRUIMING MET EEN REDEN. Hij stond alleen
+     achter het beheer-token. Dat token typt niemand in het Werk OS in -- dat
+     scherm draait op een lid-token -- dus de stand bestond wel en was
+     onbereikbaar vanaf de enige plek waar hij hoort te staan. Een pagina die
+     niemand kan openen is hetzelfde als een pagina die er niet is.
+
+     De tweede sleutel is daarom een LID met het recht `werkruimte`, en dat is
+     geen willekeurige verruiming: in het rollenregister draagt alleen
+     `directie` dat recht, en dat is per definitie wie deze werkruimte beheert.
+     Wat er te zien is, past ook bij die persoon: contract, pakket, verbruik,
+     levensloop en de beweringen met hun bron -- geen persoonsgegevens, geen
+     journaalINHOUD (alleen het aantal regels) en geen sleutels. Wie het recht
+     mist, krijgt de 403 die het rollenmodel al geeft, met het recht erbij. */
   app.post('/api/tenant/status', (req, res) => {
     req.geenQuotum = true;
-    const w = bedrijf.beheerVan(req, res); if (!w) return;
+    const w = viaBeheerOfDirectie(req, res); if (!w) return;
     const t = tenant.register.vanWerkruimte(w.code);
     if (!t) return res.json({ ok: true, tenant: null,
       let: 'Deze werkruimte hoort bij geen enkele organisatie met een contract. Er is dus geen tenantstand; de platformcijfers staan in SLO.md.' });
     res.json({ ok: true, status: tenant.bewijs.stand(t.org) });
   });
+
+  /* Het beheer-token OF een lid met het recht `werkruimte`. Er wordt geen derde
+     manier bedacht om "mag deze aanroeper hier bij" te beantwoorden: allebei de
+     takken vragen het aan bedrijf/index.js, net als de rest van dit bestand. */
+  function viaBeheerOfDirectie(req, res) {
+    if (req.body && req.body.beheerToken) return bedrijf.beheerVan(req, res);
+    const s = bedrijf.lidVan(req, res); if (!s) return null;
+    const rechten = bedrijf.rechtenVan ? bedrijf.rechtenVan(s.l) : [];
+    if (!rechten.includes('werkruimte')) {
+      res.status(403).json({ error: 'Daar heeft u het recht "werkruimte" voor nodig, of het beheer-token.', recht: 'werkruimte' });
+      return null;
+    }
+    return s.w;
+  }
 
   app.post('/api/tenant/groepen', (req, res) => {
     const w = bedrijf.beheerVan(req, res); if (!w) return;

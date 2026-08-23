@@ -22,6 +22,15 @@
    worden bij elke bewaring opnieuw opgelegd. Een vestiging die het logo van
    het merk kan omverven, is precies waarom een keten hier centraal beheer
    wil. */
+/* WAT EEN GELDIG MERK IS, STAAT NIET HIER. Dit bestand had zijn eigen kopie van
+   "een accentkleur is een hexcode" en "een thema is licht of donker", en die
+   kopie was al uit elkaar gelopen met die van het Theater: daar gaf een foute
+   kleur een 400, hier werd hij STIL genegeerd. Voor wie de knop indrukt is dat
+   het verschil tussen een melding en de indruk dat het gelukt is -- en de
+   tweede is de erge. De definitie staat in kern/tenant/merkkern.js; de OPSLAG
+   blijft hier, want een keten is niet hetzelfde als een contract. */
+const merkkern = require('./tenant/merkkern');
+
 module.exports = ({ db, save, scho, webmaker, findSupplier }) => {
   const MAX_VESTIGINGEN = 500;
 
@@ -74,9 +83,16 @@ module.exports = ({ db, save, scho, webmaker, findSupplier }) => {
     const m = haal(code);
     if (!m) return { error: 'Merk niet gevonden.', status: 404 };
     const d = ontwerp || {};
+    /* Eerst het merk, want een foute kleur hoort het SJABLOON ook niet te laten
+       doorgaan: half bewaren is de vorm waarin niemand ziet wat er is gebeurd. */
+    const stijl = merkkern.leesMerkvelden(
+      { thema: d.thema == null ? null : d.thema, accent: d.accent == null ? null : d.accent },
+      m.huisstijl, scho);
+    if (stijl.error) return { error: stijl.error, status: stijl.status || 400 };
+    m.huisstijl = stijl.merk;
     m.sjabloon = { titel: scho(d.titel, 80) || m.naam, blokken: Array.isArray(d.blokken) ? d.blokken : [], paginas: Array.isArray(d.paginas) ? d.paginas : [] };
-    if (['licht', 'donker'].includes(d.thema)) m.huisstijl.thema = d.thema;
-    if (/^#[0-9a-fA-F]{6}$/.test(String(d.accent || ''))) m.huisstijl.accent = d.accent;
+    /* `kleuren` is van dit bestand en niet van de merkkern: een keten mag vrije
+       kleuren aan zijn sjabloon hangen, een tenant niet. */
     if (d.kleuren === null || (d.kleuren && typeof d.kleuren === 'object')) m.huisstijl.kleuren = d.kleuren || null;
     m.bij = new Date().toISOString();
     save();

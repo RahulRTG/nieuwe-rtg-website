@@ -3278,14 +3278,25 @@ tenant kan zonder SSO bestaan -- niet elke klant heeft een provider.
   hostnaam -- dus die modus weigert MET de reden en de volgorde uit `TAKEN.md`
   4.21. Weglaten leest als vergeten; weigeren met een reden leest als een
   besluit.
-- **Een merkkern in plaats van een derde huisstijlsysteem.**
+- **Een merkkern in plaats van een vierde huisstijlsysteem.**
   `kern/tenant/merkkern.js` is de definitie (welke velden, welke waarden, welke
-  standaard, waar het ophoudt) waar Theater en Webmerk uit kunnen gaan lezen;
-  de opslag blijft per scope waar hij hoort. Het manifest is **ondertekend en
-  aan de modus gebonden**: klopt het niet met zichzelf, dan komt de
-  standaardstijl naar buiten met de reden erbij -- niet het manifest dat er
-  stond. Vandaag bestuurt het alleen de schermen van het Werk OS; e-mail,
-  documenten en meldingen dragen het niet (`TAKEN.md` 4.55).
+  standaard, waar het ophoudt), en sinds kort ook echt de **enige**: het huis
+  had het merk-idee vier keer, en die vier waren al uit elkaar gelopen. Het
+  Theater weigerde een foute accentkleur met een melding; `kern/webmerk.js` en
+  `kern/journalistiek.js` negeerden hem **stil** en gaven `ok: true` terug met
+  de oude kleur erin. Voor wie de knop indrukt is dat het verschil tussen weten
+  dat het niet mocht en denken dat het gelukt is. Alle drie lezen nu
+  `leesMerkvelden()`; de opslag blijft per scope waar hij hoort, en de
+  leesstandaard mag verschillen (een krant staat standaard op licht, een
+  werkruimte op donker) -- alleen wat GELDIG is, is overal hetzelfde.
+  `test/merkkern.test.js` bewaakt zowel de waarderegels als de structuur, want
+  zonder dat tweede komt de vijfde kopie er gewoon weer bij.
+
+  Het manifest is **ondertekend en aan de modus gebonden**: klopt het niet met
+  zichzelf, dan komt de standaardstijl naar buiten met de reden erbij -- niet
+  het manifest dat er stond. Het bestuurt alleen de schermen van het Werk OS;
+  e-mail, documenten, facturen, meldingen, het PWA-manifest en de AI-toon
+  dragen het niet.
 - **De herkomstregel is in geen enkele modus uit te zetten.** Ook in `private`
   blijft in de voet staan wiens software dit is. Wie je personeelsdossier
   bewaart is geen merkvraag maar een AVG-vraag, en het antwoord mag niet
@@ -3371,6 +3382,17 @@ tenantstand -- de meting is platformbreed, en een cijfer dat de meting niet kan
 dragen is preciezer dan de werkelijkheid. Dit is de laag die de weggehaalde
 enterprise-schil onmogelijk maakt: een bewering is nu een object met een bron,
 en een scherm mag alleen tonen wat op `mag: true` staat.
+
+**En dat scherm staat er nu ook** (`apps/werk/status.js`, onder Instellingen in
+het Werk OS). Het is met opzet het tegenovergestelde van een badgemuur: de
+beweringen die vandaag NIET waar zijn staan er ook, met hun reden, en de SLA
+staat er uitgerekend -- vier voorwaarden, met de twee die ontbreken bij naam.
+Er staat geen beschikbaarheidscijfer op maar de zin waarom niet: de meting is
+platformbreed en niet per organisatie. De stand is zichtbaar voor het
+beheer-token of voor een lid met het recht `werkruimte` (dat draagt alleen
+`directie`) -- die tweede sleutel is er omdat het beheer-token in het Werk OS
+nergens wordt ingetypt, en een pagina die niemand kan openen is hetzelfde als
+een pagina die er niet is.
 
 **SCIM `/Groups`.** Een groepswijziging bij de klant werkte pas door bij de
 volgende inlog; bij een sessie van dertig dagen dus een maand. Nu duwt de IdP

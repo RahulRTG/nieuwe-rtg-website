@@ -417,8 +417,21 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    is weg: dode code die nergens werd ingeladen en "Enterprise beveiligd · audit
    gereed · Commercial" beweerde zonder een bron die dat kon dragen.
 2. **Tenant Spine** — gedaan. `org` canoniek, de codes expliciet gekoppeld.
-3. **Merkkern** — gedaan voor de definitie en het Werk OS; Theater en Webmerk
-   lezen nog uit hun eigen kopie (4.55).
+3. **Merkkern** — gedaan, en sinds kort ook echt de ENIGE bron. Het huis had
+   het merk-idee vier keer: deze kern, `kern/theater/huisstijl.js`,
+   `kern/webmerk.js` en `kern/journalistiek.js`. Ze waren al uit elkaar gelopen,
+   en niet op een detail: het Theater weigerde een foute accentkleur met een
+   melding, Webmerk en Journalistiek negeerden hem **stil** en gaven `ok: true`
+   terug met de oude kleur erin. Voor wie de knop indrukt is dat het verschil
+   tussen weten dat het niet mocht en denken dat het gelukt is, en de stille
+   variant was in de meerderheid. Alle drie lezen nu `leesMerkvelden()`;
+   `test/merkkern.test.js` bewaakt zowel de waarderegels als de STRUCTUUR (de
+   drie dragen geen eigen hexcontrole of themalijst meer), want zonder dat
+   tweede komt de vijfde kopie er gewoon weer bij.
+
+   Wat de merkkern nog steeds NIET bestuurt, en dat blijft hier staan omdat een
+   opsomming zonder die zin als dekking leest: e-mail, documenten, facturen,
+   meldingen, het PWA-manifest en de AI-toon dragen het merk van de klant niet.
 4. **Tenant Bootstrap** — gedaan, ondertekening open (4.56).
 5. **Identiteitsbrug** — gedaan voor OIDC-groepen, SCIM-deactivatie én SCIM
    `/Groups`. Een groepswijziging bij de klant werkt nu meteen door in plaats
@@ -471,11 +484,24 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    een teller per tenant per uur die een herstart overleeft, en een verlopen
    contract dat niemand buitensluit. Niet afgedwongen en met naam genoemd:
    opslag, aantal leden, supportvenster en hersteltijd.
-8. **Tenantstatus & bewijs** — gedaan voor de bewijspoort en de SLA-volgorde.
-   Nog open: een statusPAGINA voor de beheerder (het antwoord staat er, het
-   scherm nog niet), en meting per capability -- zonder die tweede kan een
-   storing in een onderdeel dat een klant niet gebruikt niet van zijn eigen
-   storing worden onderscheiden.
+8. **Tenantstatus & bewijs** — gedaan, inclusief het scherm. De bewijspoort
+   maakte van elke bewering een object met een bron of een reden; dat antwoord
+   bestond en had geen scherm, en dan is het een JSON die niemand opent. Het
+   staat nu onder **Instellingen** in het Werk OS (`apps/werk/status.js`), en
+   het is met opzet het tegenovergestelde van een badgemuur: de beweringen die
+   vandaag NIET waar zijn staan er ook, met hun reden, en de SLA staat er
+   uitgerekend — vier voorwaarden, met de twee die ontbreken bij naam. Er staat
+   geen beschikbaarheidscijfer op, maar de zin waarom niet.
+
+   De deur is daarbij verruimd, met een reden: hij stond alleen achter het
+   beheer-token, en dat token typt niemand in het Werk OS in. Een pagina die
+   niemand kan openen is hetzelfde als een pagina die er niet is. De tweede
+   sleutel is een lid met het recht `werkruimte` — in het rollenregister draagt
+   alleen `directie` dat, en dat is per definitie wie de werkruimte beheert.
+
+   Nog open: meting per capability. Zonder die kan een storing in een onderdeel
+   dat een klant niet gebruikt niet van zijn eigen storing worden onderscheiden,
+   en daarom staat er ook op dit scherm geen cijfer.
 9. **Command bar** — gedaan voor de VRAAGKANT. De balk in het Werk OS zocht
    niet: hij matchte een woord, opende een tab en zei erbij "Rechten en
    handelingen volgen uw rol" -- tekst zonder dekking, want er werd nergens een

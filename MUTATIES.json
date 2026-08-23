@@ -3055,6 +3055,14 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "merkkern.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/merkkern.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "meterijk.test.js": {
       "soort": "puur",
       "staat": "muteert zelf",
@@ -6487,6 +6495,14 @@
     "werkruimte-kantoor.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "werkstatus.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/status.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "werktoen.test.js": {
       "soort": "server",

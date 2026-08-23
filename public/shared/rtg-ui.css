@@ -152,6 +152,15 @@
 .rtg-rij .rtg-tekst{flex:1;min-width:0;}
 .rtg-naam{font-weight:600;font-size:.95rem;}
 .rtg-sub{font-size:.8rem;color:var(--rtg-soft);margin-top:.1rem;}
+/* EEN LINK ZONDER KLASSE VALT TERUG OP DE BROWSERSTANDAARD, en dat is een
+   blauwpaars (rgb(158,158,255)) dat niemand hier heeft gekozen. Op
+   /apps/reisuitnodiging.html staat zo'n link midden in een .rtg-sub op een
+   accentvlak, en dan haalt hij 1,9:1 op bordeaux en 2,2:1 op royal. Hij erft nu
+   de inkt van de tekst waar hij in staat -- die is per definitie leesbaar op de
+   grond waar zij zelf staat -- en houdt zijn onderstreping, zodat hij nog steeds
+   als link leest. Alleen voor een link ZONDER eigen klasse: wie een knop of een
+   eigen kleur meebrengt, houdt die. */
+.rtg-sub a:not([class]){color:inherit;text-decoration:underline;}
 /* een rij die je kunt aantikken blijft een knop, geen div met een klikhandler */
 button.rtg-rij{width:100%;background:none;border-left:none;border-right:none;border-bottom:none;
   color:inherit;font:inherit;text-align:left;cursor:pointer;}

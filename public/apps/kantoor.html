@@ -43,7 +43,13 @@
   .doelgroeppoorten b{display:block;font-size:.72rem;letter-spacing:.04em;}
   .doelgroeppoorten span{display:block;margin-top:.3rem;color:var(--rtg-soft);
     font-size:.68rem;line-height:1.45;}
-  .doelgroeppoorten em{display:block;margin-top:.7rem;color:var(--gold-tekst);
+  /* GOUD IS EEN ACCENT EN GEEN TEKSTKLEUR OP EEN ACCENT. Deze poorten krijgen
+     per thema de accentgrond, en --gold-tekst haalde daarop 1,53:1 (champagne),
+     2,4 (bordeaux) en 2,2 (royal) -- negen keer, op de regel die zegt voor wie
+     de poort is. --rtg-muted is de gedempte toon die MET het thema meedraait en
+     haalt 8,11 / 5,69 / 6,42:1 op diezelfde drie gronden. Het bovenschrift
+     blijft dus klein en ingetogen, alleen leesbaar. */
+  .doelgroeppoorten em{display:block;margin-top:.7rem;color:var(--rtg-muted);
     font-style:normal;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;}
   [hidden]{display:none!important;}
   @media(max-width:650px){.doelgroep{padding:.75rem}.doelgroepnav{gap:.25rem}

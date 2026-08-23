@@ -31,10 +31,22 @@
       'gap:0.5rem;flex-wrap:wrap;background:none;border:0;box-shadow:none;padding:0.3rem 0.6rem;' +
       'font-family:var(--rtg-interface,Inter,system-ui,sans-serif);font-size:0.7rem;line-height:1.4;' +
       'letter-spacing:0.01em;text-align:center;}' +
-    '#rtg-cookie span{color:var(--rtg-soft,rgba(244,240,233,0.52));}' +
+    /* DE MELDING DRAAGT background:none EN ERFT DUS DE PAGINAGROND, en daarom
+       kan hier geen enkele vaste kleur staan. Tot 22 augustus 2026 stond er een
+       lichte ivoortint: op een licht thema gaf dat 1,03:1 -- onzichtbare tekst
+       onder een juridische mededeling, en precies daar waar hij het meest telt.
+       De huistokens waren de eerste reparatie en bleken niet genoeg: op de drie
+       juridische pagina's en op /site/404.html wordt rtg-themas.css helemaal
+       niet geladen, dus vielen --rtg-soft en --rtg-txt terug op hun donkere
+       basiswaarde boven een lichte grond. light-dark() hangt niet aan een
+       stylesheet maar aan color-scheme, en die staat wel overal goed: dark voor
+       elk thema (rtg-themas.css regel 15), light voor champagne, en licht als
+       standaard op een pagina zonder thema -- wat die pagina's ook zijn.
+       Gemeten: 6,51:1 licht en 8,97:1 donker. */
+    '#rtg-cookie span{color:light-dark(#5C5952,#B4AFA6);}' +
     /* de twee klikbare woorden dragen alleen een onderlijn, geen vlak */
     '#rtg-cookie a,#rtg-cookie button{background:none;border:0;padding:0;margin:0;cursor:pointer;' +
-      'font:inherit;color:var(--rtg-txt,rgba(244,240,233,0.82));text-decoration:none;' +
+      'font:inherit;color:light-dark(#3A3733,#EDE9E1);text-decoration:none;' +
       'border-bottom:1px solid rgba(244,240,233,0.28);}' +
     '#rtg-cookie a:hover,#rtg-cookie button:hover,' +
     '#rtg-cookie a:focus-visible,#rtg-cookie button:focus-visible{color:var(--gold-tekst,#C0A544);' +

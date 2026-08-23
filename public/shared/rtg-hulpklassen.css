@@ -133,4 +133,11 @@
    tekstkleur (CLAUDE.md). Op de schoolpartner-grond haalde bordeaux 2,84:1
    en wit 14,67:1; de eis is 4,5. De onderstreping blijft, anders is het
    geen link meer maar tekst met een pijl erachter. */
-.h-witlink { color: #fff !important; text-decoration: underline !important; }
+/* GEEN HARD WIT MEER. Deze klasse heet "witlink" omdat zij voor een donkere
+   grond is bedacht, en zij staat op precies EEN scherm: schoolpartner.html.
+   Daar is de grond licht (rgb(249,247,243)) en haalde wit 1,07:1 -- een link
+   die er niet is. Dezelfde fout als in de cookiemelding, en dezelfde
+   reparatie: light-dark() hangt aan color-scheme en niet aan een stylesheet,
+   dus hij klopt ook op een pagina zonder themalaag. Gemeten 11,04:1 licht en
+   16,16:1 donker. */
+.h-witlink { color: light-dark(#3A3733, #FFFFFF) !important; text-decoration: underline !important; }

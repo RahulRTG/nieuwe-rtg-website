@@ -205,6 +205,38 @@ test('5: de kas groeit niet onbeperkt -- hoogstens drie standen per soort', () =
   });
 });
 
+/* EEN SLEUTEL DIE EEN INVOER MIST, GEEFT STIL HET OUDE ANTWOORD.
+
+   Dit is hier echt gebeurd, en het kostte een dag om het te zien. De
+   capability-graaf ging door de kas, maar de sleutel bevatte alleen de
+   BESTANDEN -- niet de vijf omgevingsvariabelen die de motorstand bepalen.
+   Schakel je van javascript naar rust, dan verandert er geen byte op schijf,
+   dus bleef de sleutel gelijk en kwam de oude graaf terug:
+   test/magnaat-capabilities.test.js verwachtte 'rust' en kreeg 'javascript'.
+
+   Erger dan de fout was hoe hij zich verstopte: die toets stond al rood omdat
+   de Rust-motor in deze omgeving niet gebouwd was, en ik heb die drie rode
+   toetsen een dag lang 'omgeving' genoemd zonder het na te gaan. Een bekende
+   rode toets is een uitstekende plek om een echte fout in te verbergen.
+
+   Deze toets houdt de lijst gelijk aan wat de scanner werkelijk leest: hij
+   loopt de bron van magnaat-capabilities-bronnen.js af en eist dat elke
+   RTG_-variabele die daar wordt gelezen ook in de sleutel zit. */
+test('elke omgevingsvariabele die de capability-scan leest, zit in de kassleutel', () => {
+  const kaslaag = require('../server/kern/magnaat-capabilities-kas.js');
+  const bron = fs.readFileSync(path.join(WORTEL, 'server', 'kern', 'magnaat-capabilities-bronnen.js'), 'utf8');
+  const gelezen = new Set();
+  for (const m of bron.matchAll(/\benv\.(RTG_[A-Z_]+)/g)) gelezen.add(m[1]);
+
+  assert.ok(gelezen.size >= 4,
+    'de scan hoort echt omgevingsvariabelen te lezen; gevonden: ' + [...gelezen].join(', '));
+  for (const naam of gelezen) {
+    assert.ok(kaslaag.MOTORVLAGGEN.includes(naam),
+      naam + ' wordt door de capability-scan gelezen maar zit niet in de kassleutel. ' +
+      'Dan geeft een omgeschakelde stand stil de OUDE graaf terug.');
+  }
+});
+
 test('de kas schrijft nooit in de repository', () => {
   assert.ok(!kas.kasMap(WORTEL).startsWith(path.resolve(WORTEL) + path.sep),
     'de kas hoort in os.tmpdir() te staan en niet in de broncodeboom (check.js regel 51)');

@@ -414,6 +414,10 @@ const EIGEN_MODULE = new Map([
      Nagetrokken: de grens op het aantal werkruimtes weghalen laat toets 1
      zakken, en de teller niet laten bijten laat toets 5 zakken. */
   ['tenantcontract.test.js', ['server/kern/tenant/contract.js']],
+  /* tenantbewijs.test.js: nagetrokken met drie mutaties -- de SLA zonder zijn
+     voorwaarden op ja, het auditspoor als vast vinkje, en een bron die blijft
+     staan als de bewering vervalt. Alle drie raak. */
+  ['tenantbewijs.test.js', ['server/kern/tenant/bewijs.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

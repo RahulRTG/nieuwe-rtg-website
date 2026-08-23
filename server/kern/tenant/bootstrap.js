@@ -44,7 +44,7 @@ const NIET_GEBOUWD = [
   { veld: 'trust', reden: 'De bewijslaag meet het platform, niet een tenantvariant. Er is dus geen bewijsstand voor deze klant.' }
 ];
 
-module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop }) => {
+module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop, bewijs }) => {
   function ruimte(code) {
     const w = db.data.werkruimtes || {};
     return Object.prototype.hasOwnProperty.call(w, String(code)) ? w[String(code)] : null;
@@ -90,6 +90,14 @@ module.exports = ({ db, register, brug, merkVan, bedrijf, contract, levensloop }
          kunnen zien dat zijn werkruimte in de opzegging zit, en niet wie er
          wanneer wat over besloot -- dat is contractgeschiedenis. */
       levensloop: t && levensloop ? (() => { const l = levensloop.stand(t.org); return l ? { stand: l.stand, sinds: l.sinds, bewaarTot: l.bewaarTot, let: l.let } : null; })() : null,
+      /* ALLEEN DE BEWERINGEN DIE VANDAAG WAAR ZIJN, met hun bron. De REDENEN
+         waarom de andere niet mogen blijven bij de beheerder
+         (/api/tenant/status): dat een organisatie geen SSO en geen
+         versleutelde opslag heeft, is een lijstje zwakke plekken en geen
+         mededeling voor iedereen die er werkt. Wat hier staat is precies wat
+         een scherm mag tonen -- niet meer, en met een bron erbij. */
+      beweringen: t && bewijs ? (bewijs.stand(t.org) || { beweringen: [] }).beweringen
+        .filter(b => b.mag).map(b => ({ id: b.id, tekst: b.tekst, bron: b.bron })) : [],
       rollen: r ? r.rollen : [],
       rechten: r ? r.rechten : [],
       rechtenkaart: { alle: RECHTEN, rollen: ROLLEN.map(x => ({ id: x.id, naam: x.naam })) },

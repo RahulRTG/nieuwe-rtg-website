@@ -106,10 +106,18 @@ module.exports = ({ db, save, schoon, findSupplier, bedrijf }) => {
   const uitgang = require('./uitgang')({ db, save, crypto: null, register, merkVan });
   const levensloop = require('./levensloop')({ db, save, schoon, register, uitgang });
 
+  /* De bewijslaag: welke enterprisebewering mag er vandaag op een scherm, en
+     met welke bron. Hij leest de andere lagen en de omgeving (versleuteling,
+     back-ups, de SSO-koppeling) en schrijft zelf niets. */
+  const bewijs = require('./bewijs')({
+    register, contract, levensloop, db,
+    ssoKoppelingen: require('../../sso/koppelingen')
+  });
+
   /* De bootstrap komt als LAATSTE: hij leest alle lagen hierboven en schrijft
      zelf niets. Zou hij eerder staan, dan zou hij ze met een omweg moeten
      opvragen en is de volgorde van dit bestand een raadsel. */
-  const bootstrap = require('./bootstrap')({ db, register, brug, merkVan, bedrijf, contract, levensloop });
+  const bootstrap = require('./bootstrap')({ db, register, brug, merkVan, bedrijf, contract, levensloop, bewijs });
 
-  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap, uitgang, levensloop, contract };
+  return { register, brug, merkkern, merkZet, merkVan, groepZet, bootstrap, uitgang, levensloop, contract, bewijs };
 };

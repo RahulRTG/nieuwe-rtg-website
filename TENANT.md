@@ -320,6 +320,52 @@ kost geen schrijfactie per verzoek.
 niet vergeten worden bij route 105. De **uitvoer telt nooit mee en wordt nooit
 geweigerd** -- exit-recht dat op een teller kan stuklopen is geen recht.
 
+## 6d. De bewijspoort: geen bewering zonder bron
+
+Dit is de laag die de dode enterprise-schil onmogelijk maakt.
+
+`public/shared/enterprise-shell.js` zette "Enterprise beveiligd · versleutelde
+werkruimte · audit gereed · Commercial" op het scherm, en geen van die vier had
+een bron. Het probleem was niet die ene schil maar dat een bewering een stuk
+**tekst** was, en tekst kun je altijd typen. `server/kern/tenant/bewijs.js`
+maakt er een object van met een bron: `stand(org)` geeft per bewering terug of
+hij vandaag waar is en waarom (of waarom niet), en een scherm mag alleen tonen
+wat op `mag: true` staat.
+
+| Bewering | Waar hij vandaan komt |
+|---|---|
+| Versleutelde opslag | staat `RTG_ENC_KEY` gezet |
+| Auditspoor | het aantal journaalregels over de werkruimtes van deze tenant |
+| Eigen identiteitsprovider | een actieve SSO-koppeling op deze org |
+| Commercieel contract | een lopend contract |
+| Dagelijkse back-up | de nieuwste map in `<datamap>/backups`, hooguit twee dagen oud |
+| Eigen domein | **altijd nee**, met de reden en `TAKEN.md` 4.21 |
+| SLA met een boete | **altijd nee** zolang een van vier voorwaarden ontbreekt |
+
+De laatste twee staan er juist omdat ze nee zijn: weglaten leest als vergeten,
+en dan typt iemand ze een keer met de hand. En de SLA is een **berekening en
+geen mening** — vier voorwaarden (een lopend contract, een meting, een
+incidentproces met een gemeten reactietijd, een herstelproef), waarvan er
+vandaag twee ontbreken. `SLO.md` zegt hetzelfde in woorden; dit is dezelfde zin
+in code.
+
+**De cijfers zijn platformbreed en dat staat erbij.** De SLO's meten de hele
+server en niet deze klant, en er is geen meting per capability. Daarom staat er
+in de tenantstand **geen enkel beschikbaarheidsgetal** — een cijfer dat de
+meting niet kan dragen is preciezer dan de werkelijkheid en dus onwaar, en het
+zou het eerste zijn wat een scherm oppikt. `test/tenantbewijs.test.js` toets 6
+rekent af dat er geen "99,9"-achtig getal in voorkomt.
+
+**Wie ziet wat.** De volledige stand, inclusief de redenen waarom iets níét mag,
+zit achter het beheer-token (`/api/tenant/status`). De bootstrap geeft elk lid
+alleen de beweringen die wél waar zijn, met hun bron: dat een organisatie geen
+SSO en geen versleutelde opslag heeft is een lijstje zwakke plekken en geen
+mededeling voor iedereen die er werkt.
+
+In het Werk OS stond in de kopbalk nog "Organisatie beschermd", vast in de HTML.
+Die tekst komt nu uit `bootstrap.beweringen` — en is er dus niet meer als er
+niets waar is.
+
 ## 7. De lat
 
 Wat een tenantvariant moet halen. **Per regel staat erbij of hij vandaag
@@ -333,7 +379,7 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 | Identiteit | IdP-groep → org → werkruimte → rol volledig te volgen | gemeten |
 | Deprovisioning | intrekking werkt in élke werkruimte van die tenant, binnen het verzoek | gemeten |
 | Kruistenant | een deprovisioning bij A raakt niets bij B | gemeten |
-| Claims | 0 enterprisebeweringen zonder bron | gemeten voor de bootstrap; **niet** voor losse schermteksten |
+| Claims | 0 enterprisebeweringen zonder bron | gemeten (`test/tenantbewijs.test.js`): elke bewering heeft een bron of een reden, en de kopbalk van het Werk OS leest ze uit die lijst |
 | Merkdekking | 100% van schermen, mails, documenten en meldingen uit de merkkern | **niet gehaald**: alleen schermen (4.55) |
 | Exit | een volledige export is aantoonbaar opnieuw in te lezen | gemeten (`test/tenantuitgang.test.js` toets 3) |
 | Contract | de grenzen die gelden komen uit een pakket, en wat niet wordt afgedwongen staat er met reden bij | gemeten (`test/tenantcontract.test.js`) |
@@ -362,9 +408,11 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    een teller per tenant per uur die een herstart overleeft, en een verlopen
    contract dat niemand buitensluit. Niet afgedwongen en met naam genoemd:
    opslag, aantal leden, supportvenster en hersteltijd.
-8. **Tenantstatus & bewijs** — open. En de harde volgorde: een SLA mag pas
-   zichtbaar worden als contract, meting, incidentproces én herstelbewijs
-   bestaan. `SLO.md` zegt vandaag met zoveel woorden dat er geen SLA is.
+8. **Tenantstatus & bewijs** — gedaan voor de bewijspoort en de SLA-volgorde.
+   Nog open: een statusPAGINA voor de beheerder (het antwoord staat er, het
+   scherm nog niet), en meting per capability -- zonder die tweede kan een
+   storing in een onderdeel dat een klant niet gebruikt niet van zijn eigen
+   storing worden onderscheiden.
 9. **Command bar en AI** — open. Het werkcommand-register (15 soorten) draagt
    het al; de AI hoort door dezelfde 18 rechten te lopen als de mens, niet langs
    een tweede rechtenmodel.

@@ -88,6 +88,19 @@ module.exports = (kern) => {
      sha256 over de canonieke JSON (sleutels alfabetisch) per soort, en daarna
      over de catalogus. Drie regels code aan de ontvangende kant, zonder ons. */
 
+  /* ---------- de status- en bewijsstand ----------
+     Achter het beheer-token van de werkruimte, en NIET meegeteld in het
+     quotum: een statuspagina die dichtgaat zodra je aan je grens zit, gaat
+     dicht op precies het moment dat je hem nodig hebt. */
+  app.post('/api/tenant/status', (req, res) => {
+    req.geenQuotum = true;
+    const w = bedrijf.beheerVan(req, res); if (!w) return;
+    const t = tenant.register.vanWerkruimte(w.code);
+    if (!t) return res.json({ ok: true, tenant: null,
+      let: 'Deze werkruimte hoort bij geen enkele organisatie met een contract. Er is dus geen tenantstand; de platformcijfers staan in SLO.md.' });
+    res.json({ ok: true, status: tenant.bewijs.stand(t.org) });
+  });
+
   app.post('/api/tenant/groepen', (req, res) => {
     const w = bedrijf.beheerVan(req, res); if (!w) return;
     const t = tenant.register.vanWerkruimte(w.code);

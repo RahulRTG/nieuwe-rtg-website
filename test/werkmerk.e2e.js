@@ -87,6 +87,7 @@ test('het Werk OS draagt de naam van de klant, en de RTG-schil verft niet mee',
         eigenschap: shell ? getComputedStyle(shell).getPropertyValue('--wk-merk-accent').trim() : '',
         nietGebouwd: (document.getElementById('wkNietGebouwd') || {}).innerText || '',
         contract: (document.getElementById('wkContract') || {}).innerText || '',
+        vertrouwen: (document.getElementById('wkVertrouwen') || {}).innerText || '',
         /* De grenscontrole loopt ALLES na wat buiten de merkbalk staat. Twee
            eigenschappen van twee elementen prikken zou een lek missen dat
            precies ergens anders zit -- en dan zakt deze toets niet terwijl de
@@ -134,6 +135,15 @@ test('het Werk OS draagt de naam van de klant, en de RTG-schil verft niet mee',
     assert.match(m.contract, /Verzoeken dit uur/, 'met de teller erbij');
     assert.match(m.contract, /worden nergens gemeten, dus ze gelden ook niet/,
       'en met wat er NIET onder valt');
+
+    /* DE VERTROUWENSREGEL IN DE KOPBALK KOMT UIT DE BEWIJSPOORT. Hier stond
+       "Organisatie beschermd" vast in de HTML, zonder bron -- dezelfde soort
+       tekst als op de weggehaalde enterprise-schil. Wat er nu staat, staat er
+       omdat er een bron voor is; en wat er niet is, staat er niet. */
+    assert.match(m.vertrouwen, /Commercieel contract/, 'wat waar is staat er: ' + m.vertrouwen);
+    assert.ok(!/SLA|Eigen domein|Versleutelde opslag/.test(m.vertrouwen),
+      'en wat geen bron heeft staat er niet: ' + m.vertrouwen);
+    assert.ok(!/Organisatie beschermd/.test(m.vertrouwen), 'de oude tekst zonder bron is weg');
 
     /* ---- de werkruimte ZONDER tenant: bewering 3 ---- */
     await inloggen(zonder.werkruimte, lidB.lidToken);

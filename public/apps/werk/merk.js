@@ -70,6 +70,20 @@
       '. Die grenzen worden nergens gemeten, dus ze gelden ook niet.</p>';
   }
 
+  /* DE VERTROUWENSREGEL IN DE KOPBALK. Hier stond "Organisatie beschermd" --
+     vast in de HTML, zonder iets erachter. Dat is dezelfde soort tekst als op
+     de weggehaalde enterprise-schil, en dit is de reparatie: hij komt uit
+     bootstrap.beweringen, en dat zijn per definitie alleen de beweringen die
+     vandaag een BRON hebben. Is er niets waar, dan staat er niets. */
+  function vertrouwen(b) {
+    var el = document.getElementById('wkVertrouwen');
+    if (!el) return;
+    var r = (b && b.beweringen) || [];
+    if (!r.length) { el.textContent = ''; el.removeAttribute('title'); return; }
+    el.textContent = r.map(function (x) { return x.tekst; }).join(' \u00b7 ');
+    el.setAttribute('title', r.map(function (x) { return x.tekst + ': ' + x.bron; }).join('\n'));
+  }
+
   function nietGebouwd(b) {
     var el = document.getElementById('wkNietGebouwd');
     if (!el) return;
@@ -90,7 +104,7 @@
         .then(function (r) { return r.json().catch(function () { return {}; }); })
         .then(function (d) {
           var b = d.bootstrap || null;
-          toon(b); contract(b); nietGebouwd(b);
+          toon(b); contract(b); vertrouwen(b); nietGebouwd(b);
           return b;
         })
         .catch(function () { return null; });   // een merk dat niet laadt, laat het werk staan

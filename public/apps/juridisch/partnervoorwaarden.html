@@ -26,7 +26,13 @@
      deze pagina daardoor gewoon donker (rgb(23,19,16)), leesbaar maar niet wat er
      staat: een juridisch stuk hoort een document te zijn. Met het attribuut erbij
      is de regel specifieker dan de kit en klopt de verklaring ook echt. */
-  body.rtg-stijl[data-rtg-eigenvlak]{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  /* EN ZIJ ZEGT OOK DAT ZIJ LICHT IS. Deze pagina draagt thema onyx (de
+     themalaag zet dan color-scheme:dark) en schildert daarna haar EIGEN witte
+     grond. Alles wat het kleurschema volgt koos daardoor de donkere stand op een
+     lichte pagina -- de cookiemelding kwam zo op 1,03:1 terecht, onzichtbare
+     tekst onder een juridisch stuk. Wie zijn eigen grond schildert, hoort ook
+     zijn eigen schema te melden. */
+    body.rtg-stijl[data-rtg-eigenvlak]{color-scheme:light;background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
   a{color:inherit;}
   .wrap{max-width:720px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
   header{padding:2rem 0;border-bottom:1px solid var(--line);background:var(--kap,rgba(12,12,11,0.86));}

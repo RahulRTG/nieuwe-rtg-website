@@ -286,6 +286,9 @@ Vier regels die de wachtrij dragen, elk met een mutatietoets erachter:
 - **`at` blijft de tijd van aankomst.** Het moment van de kassa reist mee als
   `offlineVanaf` en staat op de bon, maar bepaalt niets — anders kiest een client
   op welke dag zijn omzet valt.
+- **Een bon hoort bij de zaak waar hij is opgesteld.** De rij staat op het
+  toestel, de zaak komt uit het token; wordt er tussendoor bij een andere zaak
+  ingelogd, dan blijft de bon staan tot iemand weer bij de eigen zaak inlogt.
 
 Bewezen in een echte browser (`test/kassawachtrij.e2e.js`), inclusief het geval
 dat ertoe doet: het verzoek kwam aan, het antwoord verdween onderweg, de

@@ -17,6 +17,12 @@ test('het randenstelsel heeft een vaste dunne geometrie en maximaal 2 x 2',()=>{
   assert.match(kern,/\[1, 2, 4\]/);
   assert.match(lees('public/shared/rtg-schil/02-indeling.js'),/k === 4 \? 2/);
   assert.match(lees('public/shared/rtg-schil/03-surfaces.js'),/surfaces\.length >= 4/);
+  const schilCss=lees('public/shared/rtg-schil.css');
+  assert.match(schilCss,/\.rtg-handle button\{[\s\S]*min-width:24px;min-height:24px/);
+  assert.match(schilCss,/\.rtg-console \.rijtje button\{[\s\S]*min-width:24px;min-height:24px/);
+  assert.match(css,/\.rtg-edge-crumbs button\{min-width:24px;min-height:24px/);
+  assert.match(css,/\.rtg-edge-bottom>button,\.rtg-edge-bottom>a,\.rtg-edge-history\{height:var\(--edge-bottom\)/);
+  assert.match(css,/\.rtg-edge-action button\{min-width:24px;min-height:24px/);
   assert.match(css,/@media\(max-width:767px\)[\s\S]*\.rtg-edge-layout\{display:none!important\}/);
 });
 

@@ -80,7 +80,8 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
 .rtg-handle .rek{margin-left:auto;}
 .rtg-handle button{
   background:none;border:0;color:var(--rtg-soft);cursor:pointer;
-  padding:.1rem .3rem;border-radius:6px;font:inherit;font-size:.8rem;line-height:1;
+  min-width:24px;min-height:24px;display:grid;place-items:center;padding:0;
+  border-radius:6px;font:inherit;font-size:.8rem;line-height:1;
 }
 .rtg-handle button:hover,.rtg-handle button:focus-visible{color:var(--rtg-goud);}
 
@@ -135,7 +136,7 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
 .rtg-console .rijtje{display:flex;flex-wrap:wrap;gap:.35rem;}
 .rtg-console .rijtje button{
   background:none;border:1px solid var(--rtg-line);border-radius:99px;
-  padding:.25rem .6rem;color:var(--rtg-muted);font:inherit;font-size:.76rem;cursor:pointer;
+  min-width:24px;min-height:24px;padding:.25rem .6rem;color:var(--rtg-muted);font:inherit;font-size:.76rem;cursor:pointer;
 }
 .rtg-console .rijtje button:hover,.rtg-console .rijtje button:focus-visible{
   border-color:var(--rtg-goud);color:var(--rtg-txt);}

@@ -29,7 +29,10 @@ test('Rahul routeert op appnaam en niet op de positie in de catalogus', () => {
     'open Private Office': ['/apps/rtg.html', 'LIFE'],
     'open het restaurant': ['/apps/kantoor.html', 'WORK'],
     'toon mijn onderneming': ['/apps/kantoor.html', 'WORK'],
-    'open de stichting': ['/apps/foundation/index.html', 'FOUNDATION'],
+    /* os-portaal.html en niet index.html: dat laatste is de speeltuin (de
+       kinder- en gezinskant) en een binnenscherm. Zie de toelichting boven
+       de lijst in shared/command/catalog.js. */
+    'open de stichting': ['/apps/foundation/os-portaal.html', 'FOUNDATION'],
     'open mijn passkeys': ['/apps/ik.html', 'INSTELLINGEN']
   };
   for (const [vraag, verwacht] of Object.entries(gevallen)) {

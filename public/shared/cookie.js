@@ -31,10 +31,10 @@
       'gap:0.5rem;flex-wrap:wrap;background:none;border:0;box-shadow:none;padding:0.3rem 0.6rem;' +
       'font-family:var(--rtg-interface,Inter,system-ui,sans-serif);font-size:0.7rem;line-height:1.4;' +
       'letter-spacing:0.01em;text-align:center;}' +
-    '#rtg-cookie span{color:rgba(244,240,233,0.52);}' +
+    '#rtg-cookie span{color:var(--rtg-soft,rgba(244,240,233,0.52));}' +
     /* de twee klikbare woorden dragen alleen een onderlijn, geen vlak */
     '#rtg-cookie a,#rtg-cookie button{background:none;border:0;padding:0;margin:0;cursor:pointer;' +
-      'font:inherit;color:rgba(244,240,233,0.82);text-decoration:none;' +
+      'font:inherit;color:var(--rtg-txt,rgba(244,240,233,0.82));text-decoration:none;' +
       'border-bottom:1px solid rgba(244,240,233,0.28);}' +
     '#rtg-cookie a:hover,#rtg-cookie button:hover,' +
     '#rtg-cookie a:focus-visible,#rtg-cookie button:focus-visible{color:var(--gold-tekst,#C0A544);' +

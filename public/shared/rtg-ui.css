@@ -93,7 +93,6 @@
      november. Goud is van dit merk en haalt ruim 7:1, het hele jaar door.
      Zelfde splitsing als --ios-accent in shared/ios.css en --accent-tekst in
      apps/foundation/stijl.css: het accent kleurt, de tekst leest. */
-  --rtg-acc-tekst:var(--gold-tekst,#C0A544);
   /* De inkt die OP het accent leesbaar is; zie shared/dagkleur.css. Zonder
      dagkleur valt hij terug op wit, dat op de bordeaux-terugval 5,17:1 haalt. */
   --rtg-acc-inkt:var(--dag-inkt, #FFFFFF);
@@ -420,10 +419,21 @@ body.rtg-stijl [role="button"].hoofd{
      van een gekrompen vak is 24 pixels. Op /apps/bestanden.html en
      /apps/galerij.html werd de hoofdhandeling daardoor 24 breed -- de regel
      maakte de knop kleiner in plaats van bereikbaarder. */
-  .ios-nav-acties [data-hoofdactie],
-  .rtg-duimeind > [data-hoofdactie]{
+  .ios-nav-acties [data-hoofdactie]{
     width:auto;max-width:none;flex:0 0 auto;
   }
+  /* .rtg-duimeind STAAT HIERONDER EN NIET HIER, en dat is een reparatie van
+     22 augustus 2026. De uitzondering rust op een AANNAME: deze knop deelt zijn
+     regel met een veld, dus volle breedte zou die regel uit elkaar trekken. Op
+     390 pixels is die aanname onwaar -- de rij wrapt, het veld pakt de volle
+     breedte en de knop valt eronder, smal en links. Dertien schermen zetten hun
+     hoofdhandeling daarmee precies in het kwart waar de duim van een
+     rechtshandige niet komt (bieb, club, dromen, geloofbieb, hulpwijzer,
+     ochtend, studie, home, labpas, mall, pulse, rtgschool) en bestellen deed
+     hetzelfde voor een linkshandige.
+     De uitzondering geldt dus alleen waar zijn premisse geldt: vanaf 431, boven
+     de breedste telefoon. Daaronder wint de volle-breedteregel weer, en dat is
+     volgens dezelfde afspraak nooit een duimgebrek maar een andere vorm. */
 
   /* De hoofdhandeling in de kopbalk: zie .rtg-duimbalk hieronder. Met opmaak
      alleen lukte dit niet -- .ios-nav en de kopbalken van deze schermen dragen
@@ -661,4 +671,12 @@ body.rtg-stijl .kpi{
 @media (prefers-reduced-transparency:reduce){
   .rtg-groep,body.rtg-stijl .kaart,body.rtg-stijl .sec,
   body.rtg-stijl .paneel,body.rtg-stijl .groep{background:var(--rtg-card);}
+}
+
+/* De veldrij-uitzondering, alleen boven telefoonbreedte -- zie de toelichting
+   bij .ios-nav-acties hierboven. */
+@media(min-width:431px) and (max-width:760px){
+  .rtg-duimeind > [data-hoofdactie]{
+    width:auto;max-width:none;flex:0 0 auto;
+  }
 }

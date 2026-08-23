@@ -388,8 +388,8 @@
 /* QUIET LUXURY WINT DE CASCADE · lichte residentie, bordeaux alleen als zegel. */
 .rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar{border-bottom-color:rgba(23,23,18,.12);background:rgba(244,241,234,.96);color:#171712;}
 .rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-brand{color:#171712;}
-.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-brand small{border-left-color:rgba(23,23,18,.16);color:rgba(23,23,18,.47);}
-.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-state{color:rgba(23,23,18,.48);}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-brand small{border-left-color:rgba(23,23,18,.16);color:#69695F;}
+.rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-state{color:#69695F;}
 .rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar-state::before{background:#691f32;}
 .rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar .rtg-rahul-tab{border-left-color:rgba(23,23,18,.13)!important;background:transparent!important;color:#171712!important;}
 .rtg-social-elite:not(.rtg-salon-elite) .rtg-social-commandbar .rtg-rahul-tab small{color:rgba(23,23,18,.44)!important;}

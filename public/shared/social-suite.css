@@ -176,7 +176,7 @@ body.rtg-social-messages .hulprij button{min-height:36px!important;border-radius
 .rtg-message-context>p{color:rgba(234,230,220,.6);font-size:.78rem;line-height:1.7;}
 .rtg-context-register{margin:2rem 0 0;}
 .rtg-context-register div{display:flex;justify-content:space-between;gap:1rem;padding:.85rem 0;border-top:1px solid rgba(255,255,255,.1);}
-.rtg-context-register dt{color:rgba(234,230,220,.48);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;}
+.rtg-context-register dt{color:#A4A19A;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;}
 .rtg-context-register dd{margin:0;color:#e8debf;font-size:.72rem;}
 .rtg-context-help{margin-top:2rem;padding:1rem 0;border-top:1px solid rgba(190,167,101,.44);}
 .rtg-context-help b,.rtg-context-help span{display:block;}
@@ -242,19 +242,19 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
 .private-hero p{max-width:650px;color:rgba(245,241,231,.62);font-size:.92rem;line-height:1.75;}
 .private-hero-register{align-self:end;margin:0 4vw 3.6rem 0;padding:1.5rem 0;border-top:1px solid rgba(200,176,111,.5);}
 .private-hero-register span,.private-hero-register b{display:block;}
-.private-hero-register span{color:rgba(245,241,231,.45);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;}
+.private-hero-register span{color:#8F8D87;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;}
 .private-hero-register b{margin-top:.55rem;color:#e9dcba;font:500 1.15rem/1.25 "Bodoni Moda",Georgia,serif;}
 .private-directory{display:grid;grid-template-columns:270px minmax(0,1fr);width:min(1440px,100%);margin:0 auto;border-right:1px solid rgba(255,255,255,.09);border-left:1px solid rgba(255,255,255,.09);}
 .private-directory-intro{padding:3rem 2rem;border-right:1px solid rgba(255,255,255,.1);}
 .private-directory-intro h2{font:500 1.75rem/1.08 "Bodoni Moda",Georgia,serif;}
-.private-directory-intro p{margin-top:.8rem;color:rgba(239,235,225,.48);font-size:.74rem;line-height:1.65;}
+.private-directory-intro p{margin-top:.8rem;color:#888680;font-size:.74rem;line-height:1.65;}
 .private-directory-intro a{display:inline-block;margin-top:2rem;color:#d2bd88;font-size:.68rem;letter-spacing:.08em;text-decoration:none;text-transform:uppercase;}
 .private-rooms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
 .private-room{position:relative;min-height:270px;padding:2rem 1.65rem;display:flex;flex-direction:column;color:inherit;text-decoration:none;border-right:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,rgba(255,255,255,.035),transparent 52%);}
 .private-room:nth-child(3n){border-right:0;}
 .private-room::before{content:"";position:absolute;top:0;left:1.65rem;width:34px;height:2px;background:#bda567;transform:scaleX(.35);transform-origin:left;transition:transform .25s ease;}
 .private-room:hover::before,.private-room:focus-visible::before{transform:scaleX(1);}
-.private-room-number{color:rgba(239,235,225,.3);font-size:.58rem;letter-spacing:.14em;}
+.private-room-number{color:#888680;font-size:.58rem;letter-spacing:.14em;}
 .private-room h3{margin:auto 0 .6rem;color:#f0ece2;font:500 1.55rem/1 "Bodoni Moda",Georgia,serif;}
 .private-room p{min-height:3.8em;color:rgba(239,235,225,.5);font-size:.7rem;line-height:1.6;}
 .private-room-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.08);color:#c9b57f;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;}
@@ -361,7 +361,7 @@ body.rtg-social-messages .lijst{background:linear-gradient(165deg,#20211e 0%,#18
 body.rtg-social-messages .lijst-kop{padding:2rem 1.45rem .95rem!important;border-bottom:1px solid rgba(255,255,255,.08);}
 body.rtg-social-messages .lijst-kop h1{color:#f3ede1;}
 body.rtg-social-messages .zoekrij input{border-color:rgba(255,255,255,.11)!important;background:rgba(0,0,0,.18)!important;color:#f3ede1!important;}
-body.rtg-social-messages .zoekrij input::placeholder{color:rgba(243,237,225,.38);}
+body.rtg-social-messages .zoekrij input::placeholder{color:#949189;}
 body.rtg-social-messages .nieuwknop{border:1px solid rgba(205,184,121,.36)!important;background:transparent!important;color:#d5bd7c!important;}
 body.rtg-social-messages .laden{padding:0 1.15rem!important;border-bottom-color:rgba(255,255,255,.09)!important;}
 body.rtg-social-messages .laden button{color:rgba(243,237,225,.38)!important;}
@@ -389,7 +389,7 @@ body.rtg-social-messages[data-pane="lijst"] .bubbels::after{content:"Alleen zich
 body.rtg-social-messages .bub{border-radius:0!important;}
 body.rtg-social-messages .invoer{position:relative;z-index:1;padding:1rem 1.25rem 1.05rem!important;border-top-color:rgba(45,39,28,.18)!important;background:#1c1d1a!important;color:#eee8dc;}
 body.rtg-social-messages .invoerrij textarea{border-color:rgba(255,255,255,.12)!important;background:rgba(0,0,0,.22)!important;color:#f3ede1!important;}
-body.rtg-social-messages .invoerrij textarea::placeholder{color:rgba(243,237,225,.38);}
+body.rtg-social-messages .invoerrij textarea::placeholder{color:#949189;}
 body.rtg-social-messages .stuurknop{border:1px solid rgba(205,184,121,.4)!important;background:#2b2b25!important;}
 body.rtg-social-messages .stuurknop svg{stroke:#e2ca8a;}
 body.rtg-social-messages .hulprij button{border-color:rgba(255,255,255,.12)!important;color:rgba(243,237,225,.58)!important;background:transparent!important;}

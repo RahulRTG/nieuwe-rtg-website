@@ -670,6 +670,18 @@ function startEchteServer() {
   }
   if (tabu.klein.length > (tabGrens.klein || 0)) {
     fouten.push(`${tabu.klein.length} scherm(en) met een raakvlak onder ${raakvlak.GRENS}x${raakvlak.GRENS} op tabletformaat, de grens is ${tabGrens.klein || 0}`);
+  }
+  /* DE ACCOLADE HIERBOVEN IS OP 22 AUGUSTUS 2026 TERUGGEZET, en wat zij tegenhield
+     is het hele oordeel. Bij de samenvoeging van 20 augustus (9c7411c8) raakte zij
+     zoek en schoof haar sluiting naar het einde van de functie. Alles hieronder --
+     de themaronde, `if (fouten.length) process.exit(1)` en de slotregel -- lag
+     daarmee BINNEN deze tabletcontrole, en die staat op nul. De poort telde dus
+     nog wel (137 contrastfouten uitgelogd, 124 ingelogd, 148 op royal) en velde
+     niets: exit 0, zonder slotregel. Dezelfde soort fout als de inlogrem die wel
+     telde en niet remde, en hij is precies zo onzichtbaar: de inspringing bleef
+     kloppen, dus het LAS goed.
+     Wat dit leert over de poort zelf: een keuring die slaagt hoort haar eigen
+     slotregel te schrijven, want de afwezigheid daarvan was het enige spoor.
   /* DE THEMA'S STAAN OP NUL, EN DAT WAS EEN WEG VAN TWEE DAGEN.
      Hier stond dat ze een BOVENGRENS hadden en geen nul, met de reden erbij: wat
      er na de onzichtbare tekst overbleef leek EEN soort -- het goud en de andere
@@ -725,5 +737,4 @@ function startEchteServer() {
     `Tabletronde op 834: ${tabu.breed.length} te breed, ${tabu.klein.length} met een te klein raakvlak. ` +
     `Thema's: ` + perThema.map(t => `${t.thema} ${t.contr} (grens ${(grens.themas || {})[t.thema]})`).join(', ') + '.');
 
-}
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

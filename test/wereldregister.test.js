@@ -209,10 +209,21 @@ test('geen wereld draagt de naam van een app uit de softwarecatalogus', () => {
      DE MUTATIE: zet de catalogusnaam van /apps/living-os.html terug op
      'Living OS'. */
   const CAT = fs.readFileSync(path.join(PUB, 'shared/command/catalog.js'), 'utf8');
-  const m = /var APPS=(\[[\s\S]*?\]),openTeller/.exec(CAT);
+  /* DE LEZER STOPT BIJ HET EINDE VAN DE LIJST EN NIET BIJ `openTeller`, en dat
+     is op 22 augustus 2026 gerepareerd. Het oude patroon liep door tot vlak voor
+     `,openTeller` -- prima zolang daar niets tussen stond, maar de catalogus
+     leidt er nu twee namen uit af (`HOOFDAPPS=APPS.slice(0,3),INSTELLINGEN=
+     APPS[3]`). Het vangnet slikte die mee, en `Function` kreeg een uitdrukking
+     die APPS aanriep terwijl APPS nog niet bestond: ReferenceError. De toets
+     zakte dus op zijn eigen lezer en niet op een bevinding -- het ergste soort
+     rood, want het zegt niets over het huis. Nu wordt de LIJST gelezen: van `[[`
+     tot en met de bijbehorende `]]`. */
+  const m = /var APPS=(\[\[[\s\S]*?\]\])\s*,/.exec(CAT);
   assert.ok(m, 'de APPS-lijst in shared/command/catalog.js is niet meer te lezen');
+  assert.ok(!/[A-Za-z_$]\w*\s*\(/.test(m[1].replace(/'[^']*'/g, '')),
+    'de gelezen APPS-lijst bevat een aanroep en is dus geen kale lijst meer');
   const APPS = Function('return (' + m[1] + ');')();
-  assert.ok(APPS.length >= 5, 'de softwarecatalogus is leeg; deze toets meet dan niets');
+  assert.ok(APPS.length >= 4, 'de softwarecatalogus telt minder dan de vier producten die catalog.js verklaart; deze toets meet dan niets');
 
   const kaal = (x) => String(x).toLowerCase().replace(/[\s·-]+/g, '');
   const catNamen = new Map(APPS.map((a) => [kaal(a[0]), a[0]]));
@@ -243,21 +254,55 @@ test('elke app uit de softwarecatalogus hangt in een wereld', () => {
      DE MUTATIE: haal 'link:horeca' uit de items van WorkOS. Deze toets hoort
      dan Horeca bij naam te noemen. */
   const CAT = fs.readFileSync(path.join(PUB, 'shared/command/catalog.js'), 'utf8');
-  const m = /var APPS=(\[[\s\S]*?\]),openTeller/.exec(CAT);
+  /* DE LEZER STOPT BIJ HET EINDE VAN DE LIJST EN NIET BIJ `openTeller`, en dat
+     is op 22 augustus 2026 gerepareerd. Het oude patroon liep door tot vlak voor
+     `,openTeller` -- prima zolang daar niets tussen stond, maar de catalogus
+     leidt er nu twee namen uit af (`HOOFDAPPS=APPS.slice(0,3),INSTELLINGEN=
+     APPS[3]`). Het vangnet slikte die mee, en `Function` kreeg een uitdrukking
+     die APPS aanriep terwijl APPS nog niet bestond: ReferenceError. De toets
+     zakte dus op zijn eigen lezer en niet op een bevinding -- het ergste soort
+     rood, want het zegt niets over het huis. Nu wordt de LIJST gelezen: van `[[`
+     tot en met de bijbehorende `]]`. */
+  const m = /var APPS=(\[\[[\s\S]*?\]\])\s*,/.exec(CAT);
   assert.ok(m, 'de APPS-lijst in shared/command/catalog.js is niet meer te lezen');
+  assert.ok(!/[A-Za-z_$]\w*\s*\(/.test(m[1].replace(/'[^']*'/g, '')),
+    'de gelezen APPS-lijst bevat een aanroep en is dus geen kale lijst meer');
   const APPS = Function('return (' + m[1] + ');')();
-  assert.ok(APPS.length >= 5, 'de softwarecatalogus is leeg; deze toets meet dan niets');
+  assert.ok(APPS.length >= 4, 'de softwarecatalogus telt minder dan de vier producten die catalog.js verklaart; deze toets meet dan niets');
 
-  /* Elk adres dat via een wereld te bereiken is, uit LINKS en uit OSAPPS. */
+  /* Elk adres dat te BEREIKEN is, en dat is meer dan de items van een wereld.
+     Deze toets telde alleen die items, en veroordeelde daarmee drie apps die
+     gewoon te vinden zijn:
+
+       - het HUIS van een wereld (`w.wereld`) stond er niet bij. WorkOS woont op
+         /apps/kantoor.html; dat is geen item IN de wereld maar de wereld zelf.
+       - de mappen ZONDER wereld stonden er niet bij. MAPPEN draagt naast de vier
+         werelden ook Instellingen, met opzet zonder `wereld` (zie app-main.js):
+         dat is RTG Core, en Core heeft in de bank een gezicht -- het
+         bedieningspaneel in de voet. /apps/ik.html hangt daar gewoon in.
+
+     De vraag die deze toets stelt is "is dit nog te vinden", en niet "staat dit
+     in een wereldtegel". Een adres dat via het bedieningspaneel opengaat is
+     gevonden. Wat de toets onverkort blijft vangen is het geval waarvoor hij is
+     geschreven: een app die in de catalogus staat en in MAPPEN nergens voorkomt.
+
+     DE MUTATIE: haal 'link:ik' uit de items van map-instellingen in app-main.js.
+     Deze toets hoort dan INSTELLINGEN bij naam te noemen. */
   const bereikbaar = new Set();
-  for (const x of ITEMS) {
-    let u = null;
-    if (x.item.startsWith('link:')) u = (LINKS[x.item.slice(5)] || {}).url;
-    if (x.item.startsWith('os:')) u = (OSAPPS[x.item.slice(3)] || {}).url;
-    if (u) bereikbaar.add(kaal(u));
+  const uitItem = (item) => {
+    if (item.startsWith('link:')) return (LINKS[item.slice(5)] || {}).url;
+    if (item.startsWith('os:')) return (OSAPPS[item.slice(3)] || {}).url;
+    return null;
+  };
+  for (const map of MAPPEN) {
+    if (map.wereld) bereikbaar.add(kaal(map.wereld));
+    for (const item of (map.items || [])) {
+      const u = uitItem(item);
+      if (u) bereikbaar.add(kaal(u));
+    }
   }
   const zoek = APPS.filter((a) => !bereikbaar.has(kaal(a[1])))
-    .map((a) => a[0] + ' (' + a[1] + ') staat in de catalogus maar in geen enkele wereld');
+    .map((a) => a[0] + ' (' + a[1] + ') staat in de catalogus maar nergens in MAPPEN');
   assert.deepEqual(zoek, [], 'deze apps zijn nergens meer te vinden');
 });
 

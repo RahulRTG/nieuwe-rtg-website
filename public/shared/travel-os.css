@@ -334,6 +334,16 @@ body.travel-os-map .poort a{border-radius:0!important;background:linear-gradient
   body.travel-os-map .zoekwrap{top:calc(var(--tos-top) + env(safe-area-inset-top,0px) + 3.7rem) !important;left:1rem !important}
   body.travel-os-map .legenda{left:1rem}
   body.travel-os-map .paneel{left:0 !important;bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px)) !important}
+  /* GEPARKEERD MOET GEPARKEERD BLIJVEN. De regel hierboven tilt het routepaneel
+     op zodat het boven de Travel OS-balk uitkomt -- terecht, want anders valt het
+     erachter. Maar navigatie.html parkeert dat paneel met translateY(102%), en
+     die 102% is berekend op bottom:0. Opgetild met 78 pixels tilt 102% van zijn
+     eigen hoogte hem niet meer buiten beeld: er bleef 89 pixel paneel onderaan
+     staan, zichtbaar en half aanraakbaar, op een scherm waar niemand een route
+     had gekozen. De parkeerstand telt de optilling nu mee. */
+  body.travel-os-map .paneel:not(.zien){
+    transform:translateY(calc(102% + var(--tos-bottom) + env(safe-area-inset-bottom,0px))) !important;
+  }
   body.travel-os-map .poort{top:calc(var(--tos-top) + env(safe-area-inset-top,0px)) !important;left:0 !important;bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px)) !important}
 }
 

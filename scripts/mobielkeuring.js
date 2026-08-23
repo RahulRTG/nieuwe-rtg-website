@@ -208,6 +208,34 @@ function mobielInPagina(opt) {
        hoogte moet in beeld staan voordat dit meetelt. */
     var binnen = Math.min(rr.bottom, H) - Math.max(rr.top, 0);
     if (binnen < 24 || binnen < rr.height * 0.25) continue;
+    /* WAT ER NOG NAAR TOE TE SCROLLEN VALT, IS NIET BUITEN BEREIK -- en dat
+       onderscheid ontbrak hier. De regel hierboven is geschreven voor een VASTE
+       balk, en die heeft geen uitweg: hij blijft staan waar hij staat, dus wat
+       er onder de rand uitsteekt is weg. Een `sticky` is iets anders. Zolang
+       hij niet vastgeklonken staat, is hij gewone inhoud in een scrollend vak.
+
+       Dat kwam boven op /apps/office.html: de zoekrij (sticky, 160 hoog) stond
+       op y 715..875 bij een venster van 844 en werd als halve balk gemeld. Maar
+       de pagina zelf scrolt niet (body overflow:hidden) terwijl haar OUDER dat
+       wel doet -- 249 pixels ruimte -- en die ouder loopt zelf tot y 782, dus
+       de rij wordt daar sowieso afgeknipt. Ze is met een veeg gewoon te zien.
+       Een gebrek melden dat met scrollen verdwijnt, leert mensen de melding
+       negeren, en dat kost de echte balken hun geloofwaardigheid.
+
+       De grens blijft dus scherp waar hij hoort: alleen een sticky ontsnapt,
+       alleen als er in de richting van het uitsteeksel echt nog ruimte is. Een
+       position:fixed komt hier nooit langs. */
+    if (st.position === 'sticky') {
+      var ruimte = 0;
+      for (var o = el.parentElement; o; o = o.parentElement) {
+        var os = getComputedStyle(o);
+        if (!/auto|scroll/.test(os.overflowY)) continue;
+        ruimte = Math.max(ruimte, o.scrollHeight - o.clientHeight - o.scrollTop);
+      }
+      var pagina = document.scrollingElement || document.documentElement;
+      ruimte = Math.max(ruimte, pagina.scrollHeight - pagina.clientHeight - pagina.scrollTop);
+      if (ruimte >= rr.bottom - H) continue;
+    }
     balkenBuiten.push(merk(el) + ' y ' + Math.round(rr.top) + '..' + Math.round(rr.bottom) + ' bij ' + H);
     if (balkenBuiten.length >= 5) break;
   }

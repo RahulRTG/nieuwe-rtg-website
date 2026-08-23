@@ -115,7 +115,12 @@
       werelden=werelden.filter(function(x){return x&&x.naam&&x.url});
       nav.textContent='';
       if(werelden.length){
-        nav.appendChild(kopje('Apps'));
+        /* 'Werelden' EN NIET 'Apps'. De vier-producten-ronde hernoemde dit kopje
+           terwijl de lijst eronder `werelden` heet en uit MAPPEN komt. Dat is
+           geen synoniem maar het verschil dat WERELDEN.md maakt: een wereld is
+           een context waar je in leeft, een app is een capability. Besloten bij
+           het landen van #100: de bank blijft 'Werelden'. */
+        nav.appendChild(kopje('Werelden'));
         werelden.forEach(function(x){nav.appendChild(deur(x.naam,x.url,x.teken))});
       }
       vulVoet();

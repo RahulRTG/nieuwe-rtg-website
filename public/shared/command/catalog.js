@@ -1,9 +1,19 @@
+/* FOUNDATION WEES NAAR DE SPEELTUIN. /apps/foundation/index.html draagt "De
+   Speeltuin", "Tellen tot tien" en "Voorleesverhaaltjes" -- de kinder- en
+   gezinskant, en een BINNENscherm: veertien schermen in de Foundation linken
+   ernaartoe. Rahul stuurde een lid dat "foundation" zei dus naar het kinderdeel,
+   terwijl de bank de ledendeur opende. Twee voordeuren naar hetzelfde product,
+   en de catalogus wees de verkeerde aan. Nu os-portaal.html, hetzelfde adres dat
+   FoundationOS als item draagt (link:rtfportaal), zodat Rahul en de bank op
+   dezelfde deur uitkomen. Gevonden op 22 augustus 2026 door
+   test/wereldregister.test.js, die vraagt of elk catalogusadres ergens in MAPPEN
+   staat. */
 /* De ene productcatalogus en contexttaal van RTG Command. De vele bestaande
    domeinen blijven bereikbaar, maar een lid opent nog maar vier producten:
    LIFE, WORK, FOUNDATION en INSTELLINGEN. */
 (function(w){
   'use strict';
-  var APPS=[['LIFE','/apps/rtg.html','home'],['WORK','/apps/kantoor.html','reis'],['FOUNDATION','/apps/foundation/index.html','home'],['INSTELLINGEN','/apps/ik.html','instel']],
+  var APPS=[['LIFE','/apps/rtg.html','home'],['WORK','/apps/kantoor.html','reis'],['FOUNDATION','/apps/foundation/os-portaal.html','home'],['INSTELLINGEN','/apps/ik.html','instel']],
       HOOFDAPPS=APPS.slice(0,3),INSTELLINGEN=APPS[3],openTeller={};
   function appMetNaam(naam){for(var i=0;i<APPS.length;i++)if(APPS[i][0]===naam)return APPS[i];return null}
   function titelVan(url,t){if(t)return t;for(var i=0;i<APPS.length;i++)if(url.indexOf(APPS[i][1])===0)return APPS[i][0];return 'Werkblad'}

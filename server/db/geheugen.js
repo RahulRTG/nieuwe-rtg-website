@@ -129,8 +129,8 @@ function schrijfGeheugenNu() {
   try { if (fs.existsSync(MANIFEST)) fs.renameSync(MANIFEST, MANIFEST + '.bak'); } catch (e) {}
   generatie++;
   schrijfDuurzaam(MANIFEST, versleutel(rtgjson.stringify({ v: 1, generatie, at: Date.now(), keys: manKeys })), 0o600);
-  saveDuur = Date.now() - (saveT0 || Date.now());
-  saveKlaar = Date.now();
+  saveDuur = saveT0 ? verstreken(saveT0) : 0;
+  saveKlaar = sinds();
   return geschreven;
 }
 
@@ -141,16 +141,21 @@ function schrijfGeheugenNu() {
    van de tijd schrijven). Bij een crash gaat hooguit één venster verloren;
    afsluiten flusht altijd eerst (flushGeheugen). */
 const SAVE_MS = Number(process.env.RTG_SAVE_MS || 250);
-let saveTimer = null, saveVuil = false, saveDuur = 0, saveKlaar = 0, saveT0 = 0;
+// Duur, geen moment: monotone klok. Waarom en de -Infinity: sinds() in lib/klok.js.
+// saveT0 blijft 0: die wordt met `saveT0 || ...` op waarheid getoetst, en
+// -Infinity is waar. saveKlaar krijgt wel -Infinity, want daar is 0 een
+// MOMENT en dat zou het eerste venster dichtzetten.
+const { sinds, verstreken } = require('../lib/klok');
+let saveTimer = null, saveVuil = false, saveDuur = 0, saveKlaar = -Infinity, saveT0 = 0;
 function saveGeheugen() {
   if (!db.writable) return;
   saveVuil = true;
   if (saveTimer) return;
   const venster = Math.max(SAVE_MS, saveDuur * 4);
-  const sinds = Date.now() - saveKlaar;
-  saveT0 = Date.now();
-  if (sinds >= venster) { try { schrijfGeheugenNu(); } catch (e) { console.warn('[geheugen] save mislukt:', e.message); } return; }
-  saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) { saveT0 = Date.now(); try { schrijfGeheugenNu(); } catch (e) { console.warn('[geheugen] save mislukt:', e.message); } } }, venster - sinds);
+  const sindsdien = verstreken(saveKlaar);
+  saveT0 = sinds();
+  if (sindsdien >= venster) { try { schrijfGeheugenNu(); } catch (e) { console.warn('[geheugen] save mislukt:', e.message); } return; }
+  saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) { saveT0 = sinds(); try { schrijfGeheugenNu(); } catch (e) { console.warn('[geheugen] save mislukt:', e.message); } } }, venster - sindsdien);
   if (saveTimer.unref) saveTimer.unref();
 }
 function flushGeheugen() { if (db.writable && saveVuil) { try { schrijfGeheugenNu(); } catch (e) {} } }

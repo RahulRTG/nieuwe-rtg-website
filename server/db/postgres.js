@@ -74,7 +74,9 @@ function planFlush() {
 // een verse-genoeg cache, en de stringify-stall van het hele db.data raakt de
 // p99 dan hooguit een paar keer per uur in plaats van elke halve minuut.
 // (Bij het afsluiten schrijft flushBijAfsluiten sowieso nog een verse snapshot.)
-let laatsteLokaleSnap = 0;
+// Duur, geen moment: monotone klok. Zie sinds() in lib/klok.js.
+const { sinds, verstreken } = require('../lib/klok');
+let laatsteLokaleSnap = -Infinity;
 const PG_SNAP_MS = Number(process.env.PG_SNAP_MS || 300000);
 
 /* DE REM ZAT MAAR OP EEN VAN DE TWEE PADEN, EN OP HET DRUKSTE NIET.
@@ -102,8 +104,8 @@ const PG_SNAP_MS = Number(process.env.PG_SNAP_MS || 300000);
    aantal rijen terug, en nul rijen is geen reden om de hele kast weg te
    schrijven. */
 function snapshotAlsHetMag() {
-  if (Date.now() - laatsteLokaleSnap < PG_SNAP_MS) return false;
-  laatsteLokaleSnap = Date.now();
+  if (verstreken(laatsteLokaleSnap) < PG_SNAP_MS) return false;
+  laatsteLokaleSnap = sinds();
   schrijfLokaleSnapshotStil();
   return true;
 }
@@ -180,9 +182,9 @@ async function flushBijAfsluiten() {
 // Ping de database voor de gezondheidscheck; geeft de antwoordtijd in ms.
 async function pgPing() {
   if (STORE !== 'postgres' || !pg) throw new Error('PostgreSQL is niet actief.');
-  const t = Date.now();
+  const t = sinds();
   await pg.pool.query('SELECT 1');
-  return Date.now() - t;
+  return verstreken(t);
 }
 // Pool-verzadiging (alleen in Postgres-modus) voor de health/ready-checks.
 function pgPoolStatus() { return (pg && pg.poolStatus) ? pg.poolStatus() : null; }

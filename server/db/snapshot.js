@@ -22,18 +22,20 @@ const db = state.db;
 const { DATA_DIR, DB_FILE, STORE, besloten, beslotenMap, schrijfDuurzaam } = opslag;
 
 const SAVE_MS = Number(process.env.RTG_SAVE_MS || 250);
-let saveTimer = null, saveVuil = false, saveDuur = 0, saveKlaar = 0;
+// Duur, geen moment: monotone klok. Waarom en de -Infinity: sinds() in lib/klok.js.
+const { sinds, verstreken } = require('../lib/klok');
+let saveTimer = null, saveVuil = false, saveDuur = 0, saveKlaar = -Infinity;
 // Boven ~512 MB serialiseert V8 geen string meer ("Invalid string length"): dan
 // is de JSON-snapshotopslag vol. We proberen 'm dan niet bij ELKE save opnieuw
 // (dat blokkeert de event-loop telkens seconden op een zinloze poging), maar
 // koelen 60 s af en waarschuwen luid dat de Postgres-opslag nodig is voor deze
 // omvang. Zodra de data weer past, herstelt het zichzelf.
-let snapshotVol = false, snapshotWaarschuwing = 0;
+let snapshotVol = false, snapshotWaarschuwing = -Infinity;
 
 function schrijfSnapshotNu() {
   saveVuil = false;
-  if (snapshotVol && Date.now() - snapshotWaarschuwing < 60000) { saveKlaar = Date.now(); return; }
-  const t0 = Date.now();
+  if (snapshotVol && verstreken(snapshotWaarschuwing) < 60000) { saveKlaar = sinds(); return; }
+  const t0 = sinds();
   try {
     beslotenMap(DATA_DIR);
     // compact (geen pretty-print): bij grote data scheelt dat ~40% tijd en ruimte
@@ -44,23 +46,23 @@ function schrijfSnapshotNu() {
     snapshotVol = false;
   } catch (e) {
     if (/Invalid string length|string longer than|Cannot create a string/i.test(e.message || '')) {
-      snapshotVol = true; snapshotWaarschuwing = Date.now();
+      snapshotVol = true; snapshotWaarschuwing = sinds();
       console.error('[db] datastore te groot voor een JSON-snapshot (' + e.message +
         '). Schakel voor deze omvang over op STORE=postgres; snapshots worden 60 s overgeslagen.');
     } else {
       console.warn('[db] snapshot schrijven mislukt:', e.message);
     }
   }
-  saveDuur = Date.now() - t0;
-  saveKlaar = Date.now();
+  saveDuur = verstreken(t0);
+  saveKlaar = sinds();
 }
 function planSnapshot() {
   saveVuil = true;
   if (saveTimer) return;
   const venster = Math.max(SAVE_MS, saveDuur * 4);
-  const sinds = Date.now() - saveKlaar;
-  if (sinds >= venster) return schrijfSnapshotNu(); // losse actie: meteen, net als vroeger
-  saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) schrijfSnapshotNu(); }, venster - sinds);
+  const sindsdien = verstreken(saveKlaar);
+  if (sindsdien >= venster) return schrijfSnapshotNu(); // losse actie: meteen, net als vroeger
+  saveTimer = setTimeout(() => { saveTimer = null; if (saveVuil) schrijfSnapshotNu(); }, venster - sindsdien);
   if (saveTimer.unref) saveTimer.unref();
 }
 // Staat er nog iets in de write-behind? (het afsluiten schrijft dan eerst.)

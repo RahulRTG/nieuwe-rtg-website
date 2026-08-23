@@ -86,11 +86,25 @@ function inFunctie(pad) {
    nooit meer of meteen, een venster springt open, een uptime wordt negatief.
    server/lib/klok.js heeft daar sinds vandaag sinds() en verstreken(merk) voor.
 
-   HET VERSCHIL MET DATUMREKENEN, want anders telt deze meter iets dat nooit
-   nul kan worden. `Date.now() - 7 * 86400000` is geen duur maar een MOMENT:
-   zeven dagen geleden. Dat hoort juist op de wandklok, want het gaat over de
-   kalender. Alleen als de andere kant geen kaal getal is, wordt er een
-   verstreken tijd gemeten -- 112 keer tegen 19 keer datumrekenen.
+   TWEE DINGEN DIE HIER NIET BIJ HOREN, want een meter die zijn nul niet kan
+   halen wordt uitgezet -- en dan bewaakt hij niets meer.
+
+   1. KALENDERREKENEN. `Date.now() - 7 * 86400000` is geen duur maar een MOMENT:
+      zeven dagen geleden. Dat hoort juist op de wandklok, want het gaat over de
+      kalender. Herkenbaar aan een kale getallenkant, of aan een
+      vermenigvuldiging met een tijdseenheid (1000, 60000, 3600000, 86400000).
+      Negentien plekken.
+
+   2. DE LEEFTIJD VAN EEN BEWAARD MOMENT. `Date.now() - Date.parse(m.at)` en
+      `Date.now() - a.at` meten hoe oud een rij in de opslag is. Dat KAN niet
+      monotoon: het bewaarde getal is een wandklok-moment en de monotone teller
+      begint bij elke start opnieuw bij nul. Herkenbaar aan Date.parse(),
+      .getTime(), .valueOf() of een veld op een object (a.at, rij.aangemaakt) --
+      een lokale `let` is een merk in dit proces, een veld komt uit de opslag.
+      Zesenvijftig plekken.
+
+   Zonder die twee telde de meter 109 en was er 56 daarvan onbereikbaar. Nu telt
+   hij 53, en dat zijn er 53 die iemand echt kan verhuizen.
 
    DIT IS GEEN TWEEDE KLOKSCHULD. KLOK.json telt hoeveel code de tijd aan het OS
    vraagt; dat gaat over RTG_KLOK en over beproefbaarheid. Deze telt hoeveel code
@@ -98,6 +112,37 @@ function inFunctie(pad) {
    andere reparatie. Ze overlappen in regels en niet in betekenis. */
 const isDateNow = (n) => n && n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
   && (n.callee.object || {}).name === 'Date' && (n.callee.property || {}).name === 'now';
+
+const TIJDSEENHEID = new Set(['1000', '60000', '3600000', '86400000', '604800000']);
+
+/* Een uitdrukking die een BEWAARD moment terugleest, en dus per definitie op de
+   wandklok hoort. Een veld op een object komt uit de opslag; een lokale binding
+   is een merk in dit proces en kan wel monotoon. */
+function bewaardMoment(n) {
+  if (!n) return false;
+  if (n.type === 'MemberExpression') return true;
+  if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression') {
+    const o = (n.callee.object || {}).name, pr = (n.callee.property || {}).name;
+    if (o === 'Date' && pr === 'parse') return true;
+    if (pr === 'getTime' || pr === 'valueOf') return true;
+  }
+  if (n.type === 'BinaryExpression' || n.type === 'LogicalExpression') {
+    return bewaardMoment(n.left) || bewaardMoment(n.right);
+  }
+  return false;
+}
+
+/* Vermenigvuldigen met een tijdseenheid maakt van een getal een AFSTAND op de
+   kalender: `dagen() * 86400000` is geen duur maar hoeveel je terugtelt. */
+function kalenderafstand(n) {
+  if (!n || n.type !== 'BinaryExpression' || n.operator !== '*') return false;
+  for (const kant of [n.left, n.right]) {
+    if (!kant) continue;
+    const rauw = String(kant.raw === undefined ? kant.value : kant.raw);
+    if ((kant.type === 'Literal' || kant.type === 'NumericLiteral') && TIJDSEENHEID.has(rauw)) return true;
+  }
+  return false;
+}
 
 function alleenGetallen(n) {
   if (!n) return false;
@@ -197,7 +242,9 @@ function scanBestand(bron, relPad) {
     }
     if (n.type === 'BinaryExpression' && n.operator === '-' && (isDateNow(n.left) || isDateNow(n.right))) {
       const ander = isDateNow(n.left) ? n.right : n.left;
-      if (!alleenGetallen(ander)) duurOpWandklok++;   // geen kalenderrekenen maar een verstreken tijd
+      // alleen wat ECHT naar de monotone klok kan: geen kalenderrekenen, en niet
+      // de leeftijd van een moment dat in de opslag staat
+      if (!alleenGetallen(ander) && !kalenderafstand(ander) && !bewaardMoment(ander)) duurOpWandklok++;
     }
     if (!inFunctie(pad) && n.type === 'CallExpression' && n.callee) {
       const c = n.callee;

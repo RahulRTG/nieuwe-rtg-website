@@ -33,7 +33,7 @@
     "delenZonderOnderwerp": 0,
     "staatOngeregistreerd": 0,
     "staatOnbekend": 114,
-    "duurOpWandklok": 109
+    "duurOpWandklok": 36
   },
   "notities": [
     {
@@ -454,6 +454,11 @@
       "datum": "2026-08-23",
       "meter": "klokDirect verwijderd (stond op 1297)",
       "reden": "Deze meter was een tweede ratel op de klokschuld die KLOK.json al bijhoudt, en de twee gaven meteen verschillende getallen: 1297 hier tegen 1284 daar. Het verschil zat in de vrijstellingslijst van KLOK.json en in een gat in de oude teller daar.\n\nTwee plekken die dezelfde waarheid vasthouden lopen uiteen (LAT-regel 4), dus is deze weg en blijft KLOK.json de enige. Wat er van de dubbeling overbleef is een verbetering: scripts/klok.js telt sinds vandaag via dezelfde AST-scanner en zag daardoor vijf aanroepen die het oude commentaarmasker miste. Zie de correctie in KLOK.json."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "duurOpWandklok 109 -> 43 (scherpere meter, geen codeverbetering)",
+      "reden": "De meter telde alles wat een verstreken tijd op de wandklok uitrekende. Twee soorten daarvan zijn NIET te repareren, en een meter die zijn nul niet kan halen wordt uitgezet.\n\n1. Kalenderrekenen. `Date.now() - 7 * 86400000` is geen duur maar een moment: zeven dagen geleden. Dat hoort juist op de wandklok. Ook `dagen() * 86400000` is dat -- vermenigvuldigen met een tijdseenheid maakt van een getal een afstand op de kalender. Samen 29 plekken.\n\n2. De leeftijd van een BEWAARD moment. `Date.now() - Date.parse(m.at)` en `Date.now() - a.at` meten hoe oud een rij in de opslag is. Dat kan niet monotoon: het bewaarde getal is een wandklok-moment, en de monotone teller begint bij elke start opnieuw bij nul. Herkenbaar aan Date.parse, .getTime, .valueOf of een VELD op een object -- een lokale let is een merk in dit proces, een veld komt uit de opslag. 37 plekken.\n\nWat overblijft zijn 43 plekken die iemand echt naar sinds() kan verhuizen. Het getal is dus niet gedaald doordat de code beter werd; de meter meet nu wat er te repareren valt. De drie vensters die vandaag al verhuisd zijn (grootboek, ledengids, tx/ledger) zaten in dat deel en zijn er dus af."
     }
   ],
   "prestatie": {

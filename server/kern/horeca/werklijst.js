@@ -38,10 +38,17 @@
    modus die iets zou afschermen, zou een tweede rechtenmodel zijn -- en dat is
    precies wat CONCERN.md verbiedt.
 
-   ER IS GEEN WIJK. Een sectie-indeling ("tafels 1 tot 8 zijn van Sanne")
-   bestaat nergens in de data, dus doet deze lijst niet alsof: hij toont de hele
-   zaak. Wie hem per wijk wil, heeft eerst een wijk nodig -- en dat is een
-   ontwerpbesluit en geen veld. */
+   DE WIJK IS EEN TWEEDE LENS, NAAST DE MODUS, en met opzet een andere. De
+   modus filtert op SOORT werk (verzoek, pas, belofte); de wijk filtert op WIENS
+   tafel het is. Twee vragen, twee knoppen -- ze in een keuzelijst samenvoegen
+   zou "runner in mijn wijk" onmogelijk maken, en dat is juist een bestaande
+   werkstand.
+
+   EN DE WIJK VERBERGT NOOIT ZONDER HET TE ZEGGEN. Filtert deze lijst op wijk,
+   dan staat er bij hoeveel taken hij daarmee NIET toont. Een filter dat zwijgt
+   over wat het wegliet, is een filter waarin werk verdwijnt -- en op een drukke
+   avond is dat precies de tafel waar het misgaat. Zie kern/horeca/wijk.js voor
+   de drie regels die de verdeling veilig houden. */
 'use strict';
 
 const cadans = require('./cadans');
@@ -60,98 +67,40 @@ const MODI = {
   alles: { naam: 'Alles', soorten: ['verzoek', 'pas', 'belofte', 'opnemen'] }
 };
 
-const MIN = 60000;
-const minutenSinds = (at, nuMs) => at ? Math.max(0, Math.round((nuMs - Date.parse(at)) / MIN)) : 0;
-const hhmm = (ms) => {
-  const d = new Date(ms);
-  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-};
+/* WAAROM ER GEEN MODUS "WIJKHOOFD" IN DEZE LIJST STAAT. Een wijkhoofd stelt een
+   andere vraag dan de rest: niet "wat moet ik nu doen" maar "wie heeft ons nu
+   nodig, en hoe verdelen we dat". Dat is de vraag van VLOER, en het antwoord is
+   geen takenlijst maar een verdeling -- welke wijk draagt hoeveel, en wie draagt
+   hem. Dat staat als eigen blok in het antwoord (`wijkbeeld`) en niet als vierde
+   knop, want een knop die iets heel anders toont dan de drie ernaast, leert
+   niemand kennen. */
 
 module.exports = ({ horeca, schoon, verzoeklaag }) => {
-  const pas = require('./pas')({ horeca, schoon });
-  /* De grenzen per soort komen uit de verzoekenlaag ZELF en worden hier niet
-     nagemaakt. Een tweede tabel met dezelfde getallen is een tweede waarheid,
-     en die loopt uit elkaar op de dag dat iemand er een aanpast. */
-  const SOORTEN = verzoeklaag.SOORTEN || {};
+  const wijklaag = require('./wijk')({ horeca, schoon });
+  /* Waar een taak vandaan komt, staat in ./werklijst-bronnen.js -- zie de kop
+     daar voor waarom die naad daar ligt. Dit bestand ordent en filtert. */
+  const { vanVerzoeken, vanPas, vanBelofte, vanOpnemen } =
+    require('./werklijst-bronnen')({ horeca, schoon, verzoeklaag });
 
-  /* ---- de drie soorten met een bestaande grens ---- */
-
-  function vanVerzoeken(code, nuMs) {
-    const rij = verzoeklaag.wachtrij(code).verzoeken || [];
-    return rij.map((v) => {
-      const grens = (SOORTEN[v.soort] || {}).oudNa;
-      return {
-        soort: 'verzoek', id: 'verzoek:' + v.id, bronId: v.id,
-        tafel: v.tafel || null, rekeningId: v.rekeningId || null,
-        wat: v.naam + (v.tekst ? ' -- ' + v.tekst : ''),
-        wacht: v.minuten, grens: typeof grens === 'number' ? grens : null,
-        over: typeof grens === 'number' ? v.minuten - grens : null,
-        door: v.opgepaktDoor || null,
-        rekensom: 'Staat ' + v.minuten + ' min open; voor "' + v.naam + '" rekent het huis ' +
-          (typeof grens === 'number' ? grens + ' min' : 'geen grens') + '.'
-      };
-    });
-  }
-
-  function vanPas(h, nuMs) {
-    return pas.gereed(h).map((g) => ({
-      soort: 'pas', id: 'pas:' + g.rekeningId + ':' + g.gang,
-      tafel: g.tafel || null, rekeningId: g.rekeningId, gang: g.gang,
-      wat: 'Gang ' + g.gang + ' staat compleet bij de pas (' + g.borden + ' bord' +
-        (g.borden === 1 ? '' : 'en') + ')',
-      wacht: g.gereedSinds, grens: PASMARGE, over: g.gereedSinds - PASMARGE,
-      door: g.claim ? g.claim.naam : null,
-      /* De runner draagt borden en geen regels: welk bord naar welke stoel gaat
-         en welke allergie eraan hangt, hoort MEE en niet een scherm verderop.
-         Een allergie die de drager niet ziet, is precies de fout die dit huis
-         niet mag maken (HORECA.md, grens 1). */
-      borden: g.regels, allergieen: g.allergieen,
-      rekensom: 'Compleet sinds ' + g.gereedSinds + ' min; de keuken plant ' + PASMARGE +
-        ' min tussen de pas en de tafel.'
-    }));
-  }
-
-  /* Een gang die zijn eigen serveermoment voorbij is en nog niet compleet is.
-     Compleet-en-te-laat staat al in de paslijst hierboven -- twee taken voor
-     hetzelfde bord zou de lijst dubbel maken en de mens laten kiezen welke van
-     de twee hij wegwerkt. */
-  function vanBelofte(h, nuMs) {
-    const uit = [];
-    for (const rek of Object.values(h.rekeningen || {})) {
-      if (rek.status !== 'open' && rek.status !== 'betaald') continue;
-      for (const g of cadans.cadansVanRekening(h, rek, nuMs)) {
-        if (g.compleet) continue;
-        if (g.doelOver >= 0) continue;
-        uit.push({
-          soort: 'belofte', id: 'belofte:' + rek.id + ':' + g.gang,
-          tafel: rek.tafel || rek.kanaal, rekeningId: rek.id, gang: g.gang,
-          wat: 'Gang ' + g.gang + ' is over zijn serveermoment (' + g.klaar + ' van ' + g.totaal + ' klaar)',
-          wacht: -g.doelOver, grens: 0, over: -g.doelOver, door: null,
-          rekensom: 'Zou om ' + hhmm(Date.parse(g.doelOm)) + ' op tafel staan. ' + g.rekensom
-        });
-      }
+  /* Hoeveel open werk draagt elke wijk, en wie draagt hem. Bewust GEEN score en
+     geen vergelijking tussen mensen (grens 5): het getal is het aantal taken,
+     hoort bij de WIJK en niet bij de mens, en de naam staat er alleen bij zodat
+     iemand weet wie hij moet aanspreken. Tafels die in geen enkele wijk zitten
+     staan als "zonder wijk" -- die zijn van iedereen en horen niet te
+     verdwijnen omdat ze nergens bij horen. */
+  function wijkbeeldVan(h, taken) {
+    const wijken = wijklaag.lijst(h);
+    const beeld = wijken.map((w) => ({ id: w.id, naam: w.naam, tafels: w.tafels.length,
+      van: w.van ? w.van.naam : null, taken: 0, nu: 0 }));
+    const zonder = { id: null, naam: 'Zonder wijk', tafels: null, van: null, taken: 0, nu: 0 };
+    for (const t of taken) {
+      const w = wijken.find((x) => x.tafels.includes(String(t.tafel || '')));
+      const vak = w ? beeld.find((b) => b.id === w.id) : zonder;
+      vak.taken++;
+      if (typeof t.over === 'number' && t.over > 0) vak.nu++;
     }
-    return uit;
-  }
-
-  /* ---- en de soort zonder grens ---- */
-
-  function vanOpnemen(h, nuMs) {
-    const uit = [];
-    for (const rek of Object.values(h.rekeningen || {})) {
-      if (rek.status !== 'open') continue;
-      if ((rek.regels || []).length) continue;
-      uit.push({
-        soort: 'opnemen', id: 'opnemen:' + rek.id,
-        tafel: rek.tafel || rek.kanaal, rekeningId: rek.id,
-        wat: 'Open zonder bestelling' + (rek.gasten ? ' (' + rek.gasten + ' gasten)' : ''),
-        wacht: minutenSinds(rek.geopendAt || rek.at, nuMs),
-        grens: null, over: null, door: rek.door || null,
-        rekensom: 'Geopend om ' + hhmm(Date.parse(rek.geopendAt || rek.at)) +
-          '. Er is nergens vastgelegd hoe lang een tafel zonder bestelling mag staan.'
-      });
-    }
-    return uit;
+    if (zonder.taken) beeld.push(zonder);
+    return beeld.sort((a, b) => b.nu - a.nu || b.taken - a.taken);
   }
 
   /* De lijst zelf. TWEE groepen, en de scheiding is de hele belofte van deze
@@ -171,6 +120,18 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
     if (soorten.includes('belofte')) alles = alles.concat(vanBelofte(h, nuMs));
     if (soorten.includes('opnemen')) alles = alles.concat(vanOpnemen(h, nuMs));
 
+    /* De wijklens. `mijn` toont alleen tafels die van mij zijn -- en "van mij"
+       is ruim: een tafel zonder wijk en een wijk zonder mens zijn van iedereen
+       (kern/horeca/wijk.js). Wat wegvalt wordt GETELD en teruggegeven; het
+       verdwijnt niet stil. */
+    const opWijk = (opties && opties.wijk === 'mijn') && (opties && opties.staffId != null);
+    const ongefilterd = alles;
+    let verborgen = 0;
+    if (opWijk) {
+      alles = alles.filter((t) => wijklaag.vanMij(h, t.tafel, opties.staffId));
+      verborgen = ongefilterd.length - alles.length;
+    }
+
     const nu = alles.filter((t) => typeof t.over === 'number' && t.over > 0)
       .sort((a, b) => b.over - a.over || b.wacht - a.wacht);
     const open = alles.filter((t) => !(typeof t.over === 'number' && t.over > 0))
@@ -179,9 +140,18 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
     return {
       modus, modi: Object.keys(MODI).map((id) => ({ id, naam: MODI[id].naam })),
       nu, open,
+      wijk: opWijk ? 'mijn' : 'alles',
+      mijnWijken: (opties && opties.staffId != null) ? wijklaag.mijne(h, opties.staffId).map((w) => w.naam) : [],
+      verborgen,
+      /* HET WIJKBEELD: hoeveel open werk draagt elke wijk, en wie draagt hem.
+         Geteld over ALLE taken van deze modus, ook die de wijklens wegfilterde --
+         anders zou een wijkhoofd de drukte van een collega niet zien, en dat is
+         nou juist de vraag die hij stelt. */
+      wijkbeeld: wijkbeeldVan(h, ongefilterd),
       let: 'De volgorde van "nu" is hoeveel minuten een taak over een grens is die ' +
         'het huis zelf heeft vastgelegd. Wat geen grens heeft, staat eronder op ' +
-        'minuten en zonder rangorde -- daar is niets aan gemeten.'
+        'minuten en zonder rangorde -- daar is niets aan gemeten.' +
+        (verborgen ? ' ' + verborgen + ' taak(en) staan buiten uw wijk en worden hier niet getoond.' : '')
     };
   }
 

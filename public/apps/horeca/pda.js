@@ -43,60 +43,19 @@
   if (!K.poort()) return;
 
   var esc = K.esc, api = K.api, meld = K.meld;
+  /* Hoe een taak eruitziet, staat in ./pda-taak.js -- zie de kop daar voor
+     waarom die naad daar ligt. Dit bestand gaat over hoe het SCHERM zich
+     gedraagt. */
+  var kaart = function (t, inNu) { return window.RTGPdaTaak.kaart(t, inNu); };
   var MODUS = 'alles';
-  try { MODUS = localStorage.getItem('rtg_pda_modus') || 'alles'; } catch (e) {}
+  var WIJKLENS = 'alles';
+  try {
+    MODUS = localStorage.getItem('rtg_pda_modus') || 'alles';
+    WIJKLENS = localStorage.getItem('rtg_pda_wijk') || 'alles';
+  } catch (e) {}
   var LAATST = null;
 
   function $(id) { return document.getElementById(id); }
-
-  /* De knoppen per soort. Alleen bestaande deuren; wat hier niet staat, kan
-     hier niet gedaan worden -- en dan zegt de kaart waar het wel kan. */
-  function acties(t) {
-    if (t.soort === 'verzoek') {
-      return (t.door ? '' : K.knop('Ik ga', { vz: t.bronId, stand: 'opgepakt' }, true)) +
-        K.knop('Gedaan', { vz: t.bronId, stand: 'klaar' });
-    }
-    if (t.soort === 'pas') {
-      return (t.door
-        ? K.knop('Loslaten', { los: t.rekeningId, gang: t.gang })
-        : K.knop('Ik draag hem', { pak: t.rekeningId, gang: t.gang }, true)) +
-        K.knop('Uitgegeven', { uit: t.rekeningId, gang: t.gang });
-    }
-    if (t.soort === 'opnemen') return K.knop('Opnemen', { tafel: t.rekeningId }, true);
-    /* Een beloftetaak heeft geen knop: dit is werk van de keuken. Wat de
-       bediening ermee doet -- de tafel geruststellen, de chef aanspreken -- is
-       geen handeling die een systeem afvinkt. Wel een weg naar de tafel, want
-       daar staat wat de gast besteld heeft. */
-    if (t.soort === 'belofte') return K.knop('Bekijk de tafel', { tafel: t.rekeningId });
-    return '';
-  }
-
-  function borden(t) {
-    if (!t.borden || !t.borden.length) return '';
-    return '<ul class="pda-borden">' + t.borden.map(function (b) {
-      return '<li><span>' + esc(b.aantal + 'x ' + b.naam) + '</span><em>' +
-        esc(b.stoel || 'gedeeld') + (b.allergie ? ' &middot; ' + esc(b.allergie) : '') + '</em></li>';
-    }).join('') + '</ul>';
-  }
-
-  /* De kop van een kaart draagt het getal waarop de lijst geordend is, en dat
-     is voor "nu" de overschrijding en voor "ook open" de wachttijd. Twee lijsten
-     met twee getallen is eerlijker dan een lijst met een getal dat soms iets
-     anders betekent. */
-  function kaart(t, inNu) {
-    var min = inNu ? ('+' + t.over + ' min') : (t.wacht + ' min');
-    return '<article class="pda-taak' + (inNu ? ' over' : '') + '">' +
-      '<div class="pda-kop"><span class="pda-tafel">' + esc(t.tafel || '-') + '</span>' +
-      '<span class="pda-min">' + esc(min) + '</span></div>' +
-      '<p class="pda-wat">' + esc(t.wat) + '</p>' +
-      borden(t) +
-      ((t.allergieen && t.allergieen.length)
-        ? '<span class="pda-allergie">Allergie: ' + esc(t.allergieen.join(', ')) + '</span>' : '') +
-      '<p class="pda-som">' + esc(t.rekensom) + '</p>' +
-      (t.door ? '<p class="pda-door">' + esc(t.vanMij ? 'U heeft dit opgepakt.' : t.door + ' heeft dit opgepakt.') + '</p>' : '') +
-      '<div class="pda-acties">' + acties(t) + '</div>' +
-      '</article>';
-  }
 
   function teken(d) {
     LAATST = d;
@@ -110,11 +69,29 @@
       haal();
     });
 
+    /* DE WIJKLENS, en meteen eronder wat hij NIET toont. Een filter dat zwijgt
+       over wat het wegliet, is een filter waarin werk verdwijnt -- en op een
+       drukke avond is dat precies de tafel waar het misgaat. */
+    $('pWijkLens').innerHTML = [['alles', 'Hele zaak'], ['mijn', 'Mijn wijk']].map(function (x) {
+      return '<button type="button" data-wijklens="' + x[0] + '" aria-pressed="' +
+        (x[0] === d.wijk ? 'true' : 'false') + '">' + x[1] + '</button>';
+    }).join('');
+    K.bind($('pWijkLens'), 'wijklens', function (b) {
+      WIJKLENS = b.dataset.wijklens;
+      try { localStorage.setItem('rtg_pda_wijk', WIJKLENS); } catch (e) {}
+      haal();
+    });
+    $('pWijkUit').textContent = d.wijk === 'mijn'
+      ? ((d.mijnWijken.length ? 'Uw wijk: ' + d.mijnWijken.join(', ') + '. ' : 'U draagt geen wijk; u ziet alles wat van niemand is. ') +
+         (d.verborgen ? d.verborgen + ' taak(en) staan buiten uw wijk en worden hier niet getoond.' : 'Er valt niets buiten.'))
+      : '';
+
     $('pNu').innerHTML = d.nu.length ? d.nu.map(function (t) { return kaart(t, true); }).join('')
       : '<p class="pda-leeg">Niets staat over zijn grens. Dat is geen stilte maar de bedoeling.</p>';
     $('pOpen').innerHTML = d.open.length ? d.open.map(function (t) { return kaart(t, false); }).join('')
       : '<p class="pda-leeg">Niets open.</p>';
     $('pUitleg').textContent = d.let || '';
+    window.RTGPdaWijk.teken(d.wijkbeeld || [], d.mijnWijken || [], na);
 
     K.bind($('main'), 'vz', function (b) {
       api('/verzoeken/zet', { verzoek: b.dataset.vz, stand: b.dataset.stand }).then(na);
@@ -141,7 +118,7 @@
   }
 
   function haal() {
-    return api('/werklijst', { modus: MODUS }).then(function (r) {
+    return api('/werklijst', { modus: MODUS, wijk: WIJKLENS }).then(function (r) {
       if (r.body.error) return meld(r.body.error);
       teken(r.body);
     });

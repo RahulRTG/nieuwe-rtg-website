@@ -20,7 +20,14 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/horeca/werklijst', supplierAuth, (req, res) => {
     const ik = req.actor.name;
-    const uit = werk.werklijst(H(req.supplier.code), req.supplier.code, { modus: req.body.modus });
+    const uit = werk.werklijst(H(req.supplier.code), req.supplier.code, {
+      modus: req.body.modus,
+      /* De wijklens staat NAAST de modus en niet erin: de modus filtert op soort
+         werk, de wijk op wiens tafel het is. Samengevoegd zou "runner in mijn
+         wijk" onmogelijk zijn, en dat is juist een bestaande werkstand. */
+      wijk: req.body.wijk,
+      staffId: req.actor.staffId == null ? null : String(req.actor.staffId)
+    });
     const merk = (t) => Object.assign({}, t, { vanMij: !!(t.door && t.door === ik) });
     res.json(Object.assign({ ok: true }, uit, {
       nu: uit.nu.map(merk), open: uit.open.map(merk),

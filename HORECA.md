@@ -146,6 +146,8 @@ iets bouwt dat er al is:
   `/apps/horeca-pda.html`): wat is mijn eerstvolgende handeling, geordend op
   minuten over een grens die het huis zelf al had vastgelegd. Zie punt 4
   hieronder voor wat er wel en niet in zit.
+- **De wijk bestaat** (`kern/horeca/wijk.js`): welke tafels van wie zijn, met
+  als harde regel dat een wijk werk verdeelt en nooit verbergt.
 
 ## Wat er nieuw moet, in volgorde
 
@@ -299,12 +301,41 @@ iets zou afschermen, was een tweede rechtenmodel — precies wat `CONCERN.md`
 verbiedt. Een onbekende modus valt daarom terug op *alles* en verbergt nooit
 stilletjes werk.
 
-**Er is geen wijk, en het scherm doet niet alsof.** Een sectie-indeling ("tafels
-1 tot 8 zijn van Sanne") bestaat nergens in de data, dus toont de lijst de hele
-zaak en zegt dat er ook bij. Wie hem per wijk wil, heeft eerst een wijk nodig —
-dat is een ontwerpbesluit en geen veld. Datzelfde geldt voor de rolmodi *host* en
-*wijkhoofd*: die vragen aankomst- en wijkgegevens, en zolang die er niet zijn,
-komen ze er niet als lege knop bij.
+**De wijk is een tweede lens, naast de modus** — en met opzet een andere. De
+modus filtert op SOORT werk (verzoek, pas, belofte); de wijk op WIENS tafel het
+is. Ze samenvoegen zou "runner in mijn wijk" onmogelijk maken, en dat is juist
+een bestaande werkstand.
+
+Een wijk mag werk **verdelen** en nooit **verbergen**. Dat is geen slogan maar
+vier regels, elk met een toets (`kern/horeca/wijk.js`, `test/horeca-wijk.test.js`):
+
+1. **Een tafel die in geen enkele wijk zit, is van iedereen.** Wie hem vergeet in
+   te delen, verliest hem niet — anders zou de eerste vergeten tafel de laatste
+   zijn die iemand ziet.
+2. **Een wijk die niemand draagt, is van iedereen.** Iemand klokt uit of vergeet
+   zijn wijk te nemen: dan valt het werk terug naar de ploeg in plaats van in een
+   gat.
+3. **Een tafel hoort bij hoogstens één wijk**, en verhuizen gebeurt zichtbaar —
+   twee wijken op dezelfde tafel geven twee antwoorden op "van wie is dit".
+4. **Een lijst die filtert, zegt hoeveel hij niet toont.** Een filter dat zwijgt
+   over wat het wegliet, is een filter waarin werk verdwijnt.
+
+Indelen is manager-werk; **nemen en loslaten doet de bediening zelf**, aan het
+begin en het eind van een dienst. Ook een manager pakt een wijk niet
+stilzwijgend af — hij kan hem wel vrijmaken. Dat is dezelfde vorm als de claim
+op de pas, en om dezelfde reden.
+
+**Het wijkhoofd staat er als blok en niet als vierde knop.** *"Wie heeft ons nú
+nodig, en hoe verdelen we dat"* is een andere vraag dan *"wat moet ik nu doen"*,
+en een knop die iets heel anders toont dan de drie ernaast leert niemand kennen.
+Het wijkbeeld telt per wijk hoeveel open werk er is en wie hem draagt — over
+**alle** taken, ook die de wijklens wegfilterde, want anders zou een wijkhoofd de
+drukte van een collega niet zien. Het getal hoort bij de **wijk** en niet bij de
+mens: er komt geen ranglijst op medewerkers (grens 5); de naam staat erbij zodat
+je weet wie je moet aanspreken, niet om te vergelijken.
+
+De rolmodus *host* wacht nog: die vraagt de aankomststroom, en dat is een eigen
+snede — zie **Wat er hierna ligt**.
 
 **Twee vensters, één scherm.** De werklijst zegt WAT er moet gebeuren; de tafel
 is waar het gebeurt. Ze wisselen elkaar af en staan niet naast elkaar: op een
@@ -618,11 +649,12 @@ over tientallen aanroepen, dus opnieuw versturen lost daar niets op — dat vraa
 een lokale werkelijkheid die wordt samengevoegd, niet een rij. Een andere klasse
 probleem, en hij verdient een eigen ontwerp.
 
-**Een wijk.** De werklijst toont de hele zaak omdat een sectie-indeling nergens
-in de data bestaat. Wie hem per wijk wil, heeft eerst een wijk nodig: wie hoort
-bij welke tafels, wie neemt over bij een pauze, en wat gebeurt er met een tafel
-waarvan de wijk uitklokt. Dat is een ontwerpbesluit en geen veld. De rolmodi
-*host* en *wijkhoofd* wachten hierop; ze staan er bewust niet als lege knop bij.
+**De rolmodus host.** De werklijst kent vier bronnen: een gastverzoek, de pas,
+een gebroken belofte en een tafel zonder bestelling. Een host werkt op een vijfde
+die er nog niet in zit: de aankomststroom (`/arrivals`), waar beloften wachten
+op een persoonlijke controle vóór de gast er is. De grens ligt daar voor de hand
+— het afgesproken aankomstmoment zelf — maar het is een eigen bron met een eigen
+levensloop, en die hoort niet als bijzin bij de wijk.
 
 **Meer uitvoerders achter de rechtenlaag.** Het register van Rahul is compleet —
 alle zes de handelingen uit de opdracht staan erin met hun laag. De uitvoerders

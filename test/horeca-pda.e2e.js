@@ -15,7 +15,10 @@
    5. DE MODUS IS EEN LENS: de runner ziet de gang wel en het verzoek niet.
    6. HET SCHERM VINKT NIETS ZELF AF: na "Ik draag hem" staat de bon nog steeds
       op klaar, en pas "Uitgegeven" haalt hem van de lijst.
-   7. DE HELE KETEN DRAAIT OP DIT SCHERM: een tafel openen, van de kaart
+   7. DE WIJK IS EEN TWEEDE LENS, NAAST DE MODUS, en hij zegt wat hij niet
+      toont. Een filter dat zwijgt over wat het wegliet, is een filter waarin
+      werk verdwijnt.
+   8. DE HELE KETEN DRAAIT OP DIT SCHERM: een tafel openen, van de kaart
       bestellen, de gang naar de keuken sturen en afrekenen. En de PRIJS komt
       van de kaart en niet van de telefoon -- dat is de bewering die het meest
       kost als hij niet klopt.
@@ -164,7 +167,44 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     beeld = await lees();
     assert.doesNotMatch(beeld.nu + beeld.open, /PDA-DRAAG/, 'en dan is de taak weg');
 
-    /* ---- 7. de hele keten op dit scherm ---- */
+    /* ---- 7. de wijklens ----
+       De modus filtert op SOORT werk, de wijk op WIENS tafel het is. Twee
+       lenzen, twee rijen knoppen: samengevoegd zou "runner in mijn wijk"
+       onmogelijk zijn. */
+    await page.click('[data-modus="alles"]');
+    await page.waitForTimeout(600);
+
+    const wijk = (await H('/wijk/zet', { naam: 'Terras', tafels: ['PDA-DRAAG'] })).body.wijk;
+    await H('/wijk/neem', { wijkId: wijk.id });
+    await page.click('#pVerversNu');
+    await page.waitForTimeout(800);
+
+    const wijkbeeld = await page.evaluate(() => document.getElementById('pWijken').innerText.replace(/\s+/g, ' '));
+    assert.match(wijkbeeld, /Terras/, 'de wijk staat in het wijkbeeld');
+    assert.match(wijkbeeld, /draagt deze wijk/, 'met wie hem draagt');
+    assert.match(wijkbeeld, /Zonder wijk/, 'en de tafels die in geen wijk zitten staan er apart');
+
+    await page.click('[data-wijklens="mijn"]');
+    await page.waitForTimeout(800);
+    let beeldW = await lees();
+    assert.match(beeldW.nu + beeldW.open, /PDA-DRAAG/, 'mijn eigen wijk staat er');
+    assert.match(beeldW.nu + beeldW.open, /PDA-LEEG/, 'een tafel zonder wijk is van iedereen');
+    const uitleg = await page.evaluate(() => document.getElementById('pWijkUit').textContent);
+    assert.match(uitleg, /Terras/, 'het scherm zegt welke wijk u draagt: ' + uitleg);
+    assert.match(uitleg, /niets buiten|niet getoond/, 'en of er iets buiten valt');
+
+    /* Nu de wijk loslaten: dan is hij van niemand, dus van iedereen -- en de
+       tafel hoort NIET te verdwijnen. */
+    await page.click('[data-wijklaat]');
+    await page.waitForTimeout(800);
+    beeldW = await lees();
+    assert.match(beeldW.nu + beeldW.open, /PDA-DRAAG/,
+      'een wijk die niemand draagt is van iedereen; de tafel verdwijnt niet');
+
+    await page.click('[data-wijklens="alles"]');
+    await page.waitForTimeout(600);
+
+    /* ---- 8. de hele keten op dit scherm ---- */
     await page.click('#tTerug').catch(() => {});
     await page.waitForTimeout(300);
 

@@ -74,6 +74,11 @@
 <main id="main">
 <section id="pLijst">
   <div class="pda-modi" id="pModi" role="group" aria-label="Werkstand"></div>
+  <!-- DE WIJK IS EEN TWEEDE LENS, naast de modus en met opzet een eigen rij:
+       de modus filtert op SOORT werk, de wijk op WIENS tafel het is. In een
+       keuzelijst samengevoegd zou "runner in mijn wijk" onmogelijk zijn. -->
+  <div class="pda-modi" id="pWijkLens" role="group" aria-label="Wijk"></div>
+  <p class="pda-som" id="pWijkUit"></p>
   <div class="rij" style="margin-top:.6rem;gap:.4rem;">
     <input class="veld h-flex1" id="pNieuwTafel" maxlength="30" placeholder="Tafel of plek" aria-label="Tafel of plek">
     <input class="veld" id="pNieuwGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten" style="flex:0 1 5rem;">
@@ -93,9 +98,12 @@
     <div id="pOpen"></div>
   </section>
 
+  <section class="pda-groep" aria-labelledby="pWijkKop">
+    <h2 id="pWijkKop">Wijken</h2>
+    <div id="pWijken"></div>
+  </section>
+
   <p class="pda-voet" id="pUitleg"></p>
-  <p class="pda-voet">Deze lijst toont de hele zaak. Een wijkindeling bestaat hier
-  nog niet, dus er wordt niet gedaan alsof: wat u ziet is alles wat open staat.</p>
 </section>
 
 <!-- DE TAFEL. Ontvangen, opnemen, gangen sturen en afrekenen -- de drie
@@ -151,6 +159,8 @@
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/pda-taak.js"></script>
+<script src="/apps/horeca/pda-wijk.js"></script>
 <script src="/apps/horeca/pda-tafel.js"></script>
 <script src="/apps/horeca/pda.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>

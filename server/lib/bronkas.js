@@ -36,9 +36,18 @@ const path = require('path');
 const crypto = require('crypto');
 const manifest = require('./bronmanifest');
 
-function kasMap(wortel) {
-  const stempel = crypto.createHash('sha256').update(path.resolve(wortel)).digest('hex').slice(0, 12);
-  return path.join(os.tmpdir(), 'rtg-bronkas-' + stempel);
+/* EEN kasmap, niet een per boom.
+
+   Hier hing de map aan het pad van de werkboom. Samen met de absolute paden in
+   het manifest betekende dat: twee bomen met identieke inhoud deelden niets. De
+   sleutel hangt aan de INHOUD, dus de plek hoort er niet in -- een wegwerpkopie
+   met dezelfde bytes mag hetzelfde antwoord krijgen, en dat is precies wat de
+   meterijking en een verse checkout nodig hebben.
+
+   Veilig omdat de sleutel een sha256 over alle inhoud is: twee projecten met
+   verschillende bestanden krijgen verschillende sleutels en zien elkaar niet. */
+function kasMap() {
+  return path.join(os.tmpdir(), 'rtg-bronkas');
 }
 
 const tellers = { raak: 0, mis: 0, fout: 0, bespaardMs: 0 };
@@ -73,8 +82,8 @@ function ontpak(rauw, vanTekst) {
 /* De kern. `bereken` levert de verse uitkomst; `naarTekst`/`vanTekst` maken hem
    opslaanbaar. Geen JSON afdwingen: de grootste afnemer is een lijst van 87.000
    teksten en die gaat als regels tien keer sneller heen en weer dan als JSON. */
-function geheugen({ wortel, naam, sleutel, bereken, naarTekst, vanTekst }) {
-  const map = kasMap(wortel);
+function geheugen({ naam, sleutel, bereken, naarTekst, vanTekst }) {
+  const map = kasMap();
   const bestand = path.join(map, naam + '-' + sleutel.slice(0, 32) + '.kas');
   try {
     const rauw = fs.readFileSync(bestand, 'utf8');

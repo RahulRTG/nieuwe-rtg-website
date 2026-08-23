@@ -73,7 +73,7 @@ function viaKas({ root, functies, volledigeWerkprocessen, werkrouteFabriek }, be
     process.env.RTG_CAPABILITY_RUST_BIN ? kas.leesVersie([process.env.RTG_CAPABILITY_RUST_BIN]) : 'geen-binary'
   ]);
   return kas.geheugen({
-    wortel: root, naam: 'capability-graaf', sleutel, bereken,
+    naam: 'capability-graaf', sleutel, bereken,
     naarTekst: (g) => JSON.stringify(g),
     /* Een graaf die geen object is, is geen graaf: dan rekent de kas opnieuw.
        De gaafheid van het BESTAND bewaakt de kas zelf met een sha op de

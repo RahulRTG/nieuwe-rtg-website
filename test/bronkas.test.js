@@ -33,6 +33,9 @@ const { execFileSync } = require('child_process');
 const WORTEL = path.join(__dirname, '..');
 const kas = require('../server/lib/bronkas');
 const KASBRON = path.join(WORTEL, 'server', 'lib', 'bronkas.js');
+/* De wegwerpkopie: nodig voor de proef dat identieke inhoud dezelfde sleutel
+   geeft, en dat is juist het geval waar die kopie voor bestaat. */
+const { maakBoom, binnen } = require('../scripts/lib/ephemere-boom');
 
 /* Een piepklein nepboompje plus een teller, in een eigen proces. Geeft terug
    hoe vaak er ECHT gerekend is en wat eruit kwam. TMPDIR wijst naar een eigen
@@ -48,7 +51,7 @@ const KINDCODE = [
   'let gerekend = 0;',
   'const sleutel = kas.sleutelUit([kas.manifestVan(boom, p => p.endsWith(".txt"), "proef"), "v1"]);',
   'const uit = kas.geheugen({',
-  '  wortel: boom, naam: "proef", sleutel,',
+  '  naam: "proef", sleutel,',
   '  bereken: () => { gerekend++; return fs.readdirSync(boom).sort().join(","); },',
   '  naarTekst: (s) => s, vanTekst: (t) => t',
   '});',
@@ -132,7 +135,7 @@ test('3: een kapotte kas valt terug op rekenen en dient geen rommel op', () => {
   metBoom((boom, kasHome) => {
     fs.writeFileSync(path.join(boom, 'a.txt'), 'aaa');
     const een = draaiInKind(boom, kasHome);
-    const map = path.join(kasHome, path.basename(kas.kasMap(boom)));
+    const map = path.join(kasHome, path.basename(kas.kasMap()));
     const bestanden = fs.readdirSync(map).filter(n => n.endsWith('.kas'));
     assert.equal(bestanden.length, 1, 'er hoort precies een kasbestand te staan, gevonden: ' + bestanden.join(', '));
     const kasBestand = path.join(map, bestanden[0]);
@@ -193,7 +196,7 @@ test('5: de kas groeit niet onbeperkt -- hoogstens drie standen per soort', () =
       fs.writeFileSync(path.join(boom, 'a.txt'), 'stand-' + i);
       draaiInKind(boom, kasHome);
     }
-    const map = path.join(kasHome, path.basename(kas.kasMap(boom)));
+    const map = path.join(kasHome, path.basename(kas.kasMap()));
     const over = fs.readdirSync(map).filter(n => n.endsWith('.kas'));
     assert.equal(over.length, 3, 'na zes standen horen er drie te staan, gevonden: ' + over.length);
 
@@ -237,8 +240,39 @@ test('elke omgevingsvariabele die de capability-scan leest, zit in de kassleutel
   }
 });
 
+/* DE SLEUTEL HANGT AAN DE INHOUD, NIET AAN DE PLEK.
+
+   Het manifest hashte eerst het ABSOLUTE pad van elk bestand. Twee bomen met
+   exact dezelfde inhoud kregen daardoor twee verschillende sleutels -- en juist
+   die twee bestaan hier voortdurend, want de meterijking werkt in een
+   wegwerpkopie van de werkboom. Die kopie begon dus altijd koud, ook als er geen
+   byte verschilde: een volledige keuring van 36 seconden die niemand nodig had.
+
+   Nu zijn de paden relatief en is er een gedeelde kasmap. Dat mag omdat geen
+   enkel bewaard antwoord een absoluut pad bevat -- de census, het UI-register en
+   de capability-graaf gebruiken alle drie path.relative. Deze toets houdt beide
+   kanten vast: identieke inhoud geeft dezelfde sleutel, en EEN gewijzigde byte
+   nog steeds een andere. */
+test('een kopie met dezelfde inhoud krijgt dezelfde sleutel; een gewijzigde byte niet', () => {
+  const boom = maakBoom('sleutelplek');
+  try {
+    const merk = (wortel) => kas.sleutelUit([
+      kas.manifestVan(path.join(wortel, 'server'), (p) => p.endsWith('.js'), 'plekproef', { vers: true })
+    ]);
+    assert.equal(merk(boom.pad), merk(WORTEL),
+      'een kopie met identieke inhoud hoort dezelfde sleutel te krijgen; anders begint elke ' +
+      'wegwerpkopie koud en is de kas daar waardeloos');
+
+    const p = binnen(boom.pad, path.join(boom.pad, 'server', 'kern', 'zz-plekproef.js'));
+    fs.writeFileSync(p, 'module.exports = 1;\n');
+    assert.notEqual(merk(boom.pad), merk(WORTEL),
+      'en een gewijzigde byte hoort de sleutel wel te veranderen -- anders deelt hij ' +
+      'twee bomen die niet gelijk zijn');
+  } finally { boom.ruimOp(); }
+});
+
 test('de kas schrijft nooit in de repository', () => {
-  assert.ok(!kas.kasMap(WORTEL).startsWith(path.resolve(WORTEL) + path.sep),
+  assert.ok(!kas.kasMap().startsWith(path.resolve(WORTEL) + path.sep),
     'de kas hoort in os.tmpdir() te staan en niet in de broncodeboom (check.js regel 51)');
-  assert.ok(kas.kasMap(WORTEL).startsWith(os.tmpdir()), 'de kas hoort onder de tijdelijke map te vallen');
+  assert.ok(kas.kasMap().startsWith(os.tmpdir()), 'de kas hoort onder de tijdelijke map te vallen');
 });

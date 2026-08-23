@@ -67,9 +67,24 @@ function manifestVan(map, filter, merk, opties) {
   const sleutel = path.resolve(map) + '|' + (merk || '');
   if (opties && opties.vers) manifesten.delete(sleutel);
   if (manifesten.has(sleutel)) return manifesten.get(sleutel);
+  /* RELATIEVE paden in de vingerafdruk, en dat is geen netheid.
+
+     Hier stond het absolute pad. Twee bomen met exact dezelfde inhoud kregen
+     daardoor twee verschillende sleutels, en juist die twee bestaan hier: de
+     meterijking werkt in een WEGWERPKOPIE van de werkboom (LAT-regel 1, zie
+     scripts/lib/ephemere-boom.js). Die kopie begon dus altijd koud, ook als er
+     geen byte verschilde -- en dat is precies een volledige keuring van 36
+     seconden die niemand nodig had.
+
+     Relatief mag omdat de uitkomst van elke afnemer relatief IS: nagegaan dat er
+     in geen enkel bewaard antwoord een absoluut pad voorkomt (de census, het
+     UI-register en de capability-graaf gebruiken alle drie path.relative). Waar
+     de boom staat doet er dus niet toe; wat erin staat wel. */
   const uit = new Map();
+  const basis = path.resolve(map);
   for (const p of bestandenOnder(map, filter).sort()) {
-    try { uit.set(p, crypto.createHash('sha256').update(fs.readFileSync(p)).digest()); }
+    const rel = path.relative(basis, p).split(path.sep).join('/');
+    try { uit.set(rel, crypto.createHash('sha256').update(fs.readFileSync(p)).digest()); }
     catch (e) { /* net verdwenen: telt als afwezig, en dat verandert de sleutel */ }
   }
   manifesten.set(sleutel, uit);

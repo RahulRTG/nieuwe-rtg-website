@@ -90,7 +90,6 @@ function maakUiBronnen(publicDir, extraBestanden) {
     extra.join('|')
   ]);
   const lijst = kas.geheugen({
-    wortel: path.join(__dirname, '..', '..'),
     naam: 'ui-bronnen',
     sleutel,
     bereken: () => { loop(publicDir); for (const p of extra) leesBestand(p); return [...teksten]; },

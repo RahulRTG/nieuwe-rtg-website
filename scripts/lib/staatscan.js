@@ -307,7 +307,7 @@ function scan({ wortel, mappen } = {}) {
     const delen = mappen.map(m => kas.manifestVan(path.join(wortel, m), (p) => p.endsWith('.js'), 'staat', { vers: true }));
     delen.push(kas.leesVersie([__filename]), mappen.join('|'));
     return kas.geheugen({
-      wortel, naam: 'staatcensus', sleutel: kas.sleutelUit(delen),
+      naam: 'staatcensus', sleutel: kas.sleutelUit(delen),
       bereken: () => scanEcht(wortel, mappen),
       naarTekst: (u) => JSON.stringify(u),
       /* Een census zonder wortels is geen census maar een mislukking; dan rekent

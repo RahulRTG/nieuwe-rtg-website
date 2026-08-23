@@ -58,16 +58,26 @@ test('losse bestanden in de backupmap kosten geen enkele backup', () => {
 });
 
 test('de bestandsopslag staat in de lijst die meegaat', () => {
-  /* Geen server nodig: de lijst staat in de bron. Wie hem inkort, ziet hier
-     welke map hij weghaalt -- en waarom dat erg is. */
-  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'opzet', 'backup.js'), 'utf8');
-  const m = /const BACKUP_MAPPEN = \[([^\]]*)\]/.exec(bron);
-  assert.ok(m, 'BACKUP_MAPPEN hoort in server/opzet/backup.js te staan');
-  const mappen = m[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean);
+  /* De lijst is uit server/opzet/backup.js verhuisd naar ./backup-lijst.js,
+     omdat server/backupstand.js hem ook moet lezen om NA te kijken of een
+     backup compleet is -- en een tweede kopie van deze lijst is precies hoe
+     grootboek.db er ooit buiten viel.
+
+     Deze toets las de BRON met een reguliere expressie en zakte dus op de
+     verhuizing terwijl er niets aan de lijst was veranderd. Hij leest hem nu
+     als module. Dat is ook sterker: hij toetst de WAARDE die de backup
+     gebruikt, en niet de vorm van een regel tekst. */
+  const { BACKUP_MAPPEN } = require('../server/opzet/backup-lijst');
+  assert.ok(Array.isArray(BACKUP_MAPPEN) && BACKUP_MAPPEN.length, 'BACKUP_MAPPEN hoort een gevulde lijst te zijn');
   for (const nodig of ['archief', 'uploads', 'media', 'bestanden', 'outbox']) {
-    assert.ok(mappen.includes(nodig),
-      'de map "' + nodig + '" hoort mee in de backup; anders verwijst een teruggezet systeem naar bestanden die er niet zijn. Nu: ' + mappen.join(', '));
+    assert.ok(BACKUP_MAPPEN.includes(nodig),
+      'de map "' + nodig + '" hoort mee in de backup; anders verwijst een teruggezet systeem naar bestanden die er niet zijn. Nu: ' + BACKUP_MAPPEN.join(', '));
   }
+  /* En de backup gebruikt die lijst ook echt -- anders staat hij er wel en
+     doet hij niets. */
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'opzet', 'backup.js'), 'utf8');
+  assert.match(bron, /require\('\.\/backup-lijst'\)/, 'backup.js hoort de lijst te lezen en geen eigen kopie te dragen');
+  assert.ok(!/const BACKUP_MAPPEN = \[/.test(bron), 'en er hoort geen tweede kopie in backup.js te staan');
 });
 
 test('een dagbackup wordt pas zichtbaar na een complete marker en atomische wissel', () => {

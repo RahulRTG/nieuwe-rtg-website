@@ -39,12 +39,18 @@ test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } cat
 let n = 0;
 /* Een datamap met een backup erin, precies zoals server/opzet/backup.js hem
    achterlaat: de levende bestanden in de wortel, een kopie in backups/<dag>. */
-function huis({ leeft, kopie, dag }) {
+function huis({ leeft, kopie, dag, marker }) {
   const wortel = path.join(TMP, 'h' + (++n));
-  const bdir = path.join(wortel, 'backups', dag || new Date().toISOString().slice(0, 10));
+  const d = dag || new Date().toISOString().slice(0, 10);
+  const bdir = path.join(wortel, 'backups', d);
   fs.mkdirSync(bdir, { recursive: true });
   for (const [naam, inhoud] of Object.entries(leeft || {})) fs.writeFileSync(path.join(wortel, naam), inhoud);
   for (const [naam, inhoud] of Object.entries(kopie || {})) fs.writeFileSync(path.join(bdir, naam), inhoud);
+  /* De schrijver zet deze marker als de dag af is en wisselt de map dan pas
+     atomisch naar zijn plek (server/opzet/backup.js). Zonder marker hoort een
+     map dus nooit zichtbaar te zijn -- en telt hij hier ook niet. */
+  if (marker !== false) fs.writeFileSync(path.join(bdir, '.complete'),
+    JSON.stringify(marker || { dag: d, klaar: new Date().toISOString(), bestanden: Object.keys(kopie || {}).length }));
   return wortel;
 }
 const GOED = { 'db.json': '{"a":1}', 'rtg.db': 'xx' };
@@ -97,6 +103,8 @@ test('4. wat hier niet leeft, wordt de back-up niet verweten', () => {
   assert.equal(b.compleet, true, b.reden);
   assert.equal(b.gecontroleerd, 2, 'alleen wat er echt is: ' + b.gecontroleerd);
   assert.match(b.reden, /2 bestand\(en\) aanwezig/);
+  assert.match(b.reden, /afgerond volgens \.complete/, 'en het oordeel van de schrijver staat vooraan');
+  assert.equal(b.klaar.bestanden, 2, 'de marker zelf komt mee');
 });
 
 test('5. geen map, geen dagmap, geen oordeel -- elk met zijn eigen reden', () => {
@@ -127,4 +135,24 @@ test('6. de oudste back-ups tellen niet mee; de NIEUWSTE is het oordeel', () => 
   assert.equal(b.compleet, false, 'en die is leeg, dus niet compleet');
   assert.equal(b.bewaard, 2);
   assert.ok(b.ouderdom > 2000, 'de ouderdom wordt gerekend en niet aangenomen');
+});
+
+test('7. zonder .complete-marker is de dag nooit afgemaakt', () => {
+  /* DIT STOND ER EERST NIET IN, en dat was een fout van dezelfde soort als het
+     gat dat deze meter dicht: server/opzet/backup.js schrijft na afloop een
+     `.complete` en wisselt de map dan pas atomisch naar zijn plek. Dat is het
+     gezaghebbende "ik ben klaar" -- en er stond een eigen oordeel naast zonder
+     dat het gelezen werd. Een tweede mening over hetzelfde is geen controle. */
+  const b = bs.lees(huis({ leeft: GOED, kopie: GOED, marker: false }));
+  assert.equal(b.er, true, 'de map staat er');
+  assert.equal(b.compleet, false);
+  assert.match(b.reden, /geen \.complete-marker/);
+  assert.equal(b.gecontroleerd, 0, 'er wordt niet eens geteld: de map hoort er niet te zijn');
+
+  const kapot = path.join(TMP, 'kapottemarker');
+  fs.mkdirSync(path.join(kapot, 'backups', '2026-01-01'), { recursive: true });
+  fs.writeFileSync(path.join(kapot, 'backups', '2026-01-01', '.complete'), '{niet');
+  const k = bs.lees(kapot);
+  assert.equal(k.compleet, false);
+  assert.match(k.reden, /onleesbaar/);
 });

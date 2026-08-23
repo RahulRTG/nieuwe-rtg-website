@@ -24,6 +24,15 @@
       verschil ziet tussen "een bestand van 40 MB" en "een bestand van 40 MB
       dat halverwege is afgekapt".
 
+   3. DE .complete-MARKER VAN DE SCHRIJVER ZELF. Die stond hier eerst niet in,
+      en dat was een fout van dezelfde soort als het gat dat dit bestand dicht:
+      server/opzet/backup.js schrijft na afloop een `.complete` met de dag en
+      het aantal bestanden, en wisselt de map dan pas atomisch naar zijn
+      plek. Dat is het gezaghebbende signaal "ik ben klaar" -- en ik had er
+      een eigen oordeel naast gezet zonder het te lezen. Nu is het het eerste
+      dat wordt nagekeken; de tellingen hierboven zijn de tweede laag ("de
+      schrijver zegt dat hij klaar is, en de bestanden zijn er ook echt").
+
    WAT ER NIET WORDT NAGEKEKEN, en dat hoort erbij te staan: of de inhoud KLOPT
    (daar is een terugzetproef voor, en die is er niet -- zie kern/tenant/
    bewijs-sla.js), of de sqlite-bestanden openen, en of de tweede kopie op
@@ -55,6 +64,20 @@ function lees(datadir) {
 
 /* De vergelijking: alles wat LEEFT en op de lijst staat, hoort er ook te zijn. */
 function inhoud(datadir, dir) {
+  /* Eerst het oordeel van de schrijver. Ontbreekt de marker, dan is deze map
+     nooit afgemaakt en hoeft er verder niets geteld te worden -- de
+     atomische wissel had hem dan nooit zichtbaar mogen maken. */
+  const marker = path.join(dir, '.complete');
+  if (!fs.existsSync(marker))
+    return { compleet: false, mist: [], leeg: [], jsonFout: null, gecontroleerd: 0, klaar: null,
+      reden: 'de map draagt geen .complete-marker; server/opzet/backup.js zet die pas als de dag af is' };
+  let klaar = null;
+  try { klaar = JSON.parse(fs.readFileSync(marker, 'utf8')); }
+  catch (e) {
+    return { compleet: false, mist: [], leeg: [], jsonFout: null, gecontroleerd: 0, klaar: null,
+      reden: 'de .complete-marker is onleesbaar (' + e.message + ')' };
+  }
+
   let lijst;
   /* Dezelfde lijst die de backup SCHRIJFT (./opzet/backup-lijst.js). Hem hier
      opnieuw intypen zou de bekende fout zijn: twee lijsten van hetzelfde lopen
@@ -97,12 +120,12 @@ function inhoud(datadir, dir) {
 
   const stuk = mist.length || leeg.length || jsonFout;
   return {
-    gecontroleerd: gezien, mist, leeg, jsonFout,
+    gecontroleerd: gezien, mist, leeg, jsonFout, klaar,
     compleet: !stuk,
     reden: stuk
       ? [mist.length ? 'mist ' + mist.join(', ') : null,
         leeg.length ? 'leeg: ' + leeg.join(', ') : null, jsonFout].filter(Boolean).join('; ')
-      : gezien + ' bestand(en) aanwezig en niet leeg, db.json opent'
+      : 'afgerond volgens .complete, ' + gezien + ' bestand(en) aanwezig en niet leeg, db.json opent'
   };
 }
 

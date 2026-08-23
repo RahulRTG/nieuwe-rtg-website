@@ -2785,7 +2785,11 @@
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
-      "staat": "geen toetsen gedraaid"
+      "staat": "gezakt",
+      "module": "server/kern/magnaatwereld.js",
+      "operator": "!==->===#0",
+      "gezakt": 12,
+      "geprobeerd": 4
     },
     "mail-eigen.test.js": {
       "soort": "puur",

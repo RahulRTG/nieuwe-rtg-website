@@ -221,6 +221,39 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     const naWeigering = await rapport();
     assert.equal(naWeigering.bonnen, 3, 'en er kwam geen omzet bij');
 
+    /* ---- 5. een bon hoort bij de zaak waar hij is opgesteld ----
+       De rij staat op het TOESTEL, de zaak komt uit het token. Wordt er
+       tussendoor bij een andere zaak ingelogd, dan zou een wachtende bon op de
+       boeken van die andere zaak landen. Hier wordt dat nagebootst door de zaak
+       op het scherm te verzetten terwijl er nog een bon in de rij staat. */
+    await page.click('#infoDicht');   // de dialoog van hierboven staat nog open
+    await page.waitForTimeout(200);
+    stand = 'af';
+    const knop5 = await page.$('.art');
+    await knop5.click();
+    await page.click('#payContant');
+    await page.waitForTimeout(500);
+    assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1, 'de bon wacht');
+
+    /* De lijn is hier gewoon OPEN (stand 'door'): het enige dat deze bon
+       tegenhoudt is dat hij bij een andere zaak hoort. En er staat geen "nu
+       proberen" meer, want er valt niets te proberen -- dat is het punt. */
+    stand = 'door';
+    await page.evaluate(() => RTGKassaWachtrij.zaak('Een heel andere zaak'));
+    await page.waitForTimeout(900);
+    assert.equal(await page.$('#wachtNu'), null, 'geen knop om het toch te proberen');
+    assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1,
+      'de bon gaat NIET mee naar de boeken van een andere zaak');
+    assert.equal((await rapport()).bonnen, 3, 'en er kwam geen omzet bij');
+    const vreemd = await page.evaluate(() => document.getElementById('wachtStrook').innerText);
+    assert.match(vreemd, /hoort bij Sal de Mar/, 'de strook zegt bij welke zaak hij hoort: ' + vreemd);
+
+    /* En terug bij de eigen zaak gaat hij gewoon alsnog weg. */
+    await page.evaluate(() => RTGKassaWachtrij.zaak('Sal de Mar'));
+    await page.waitForTimeout(900);
+    assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 0, 'bij de eigen zaak gaat hij alsnog weg');
+    assert.equal((await rapport()).bonnen, 4, 'en telt dan als EEN bon');
+
     assert.deepEqual(fouten, [], 'geen scriptfouten op het kassascherm');
   } finally {
     if (browser) try { await browser.close(); } catch (e) {}

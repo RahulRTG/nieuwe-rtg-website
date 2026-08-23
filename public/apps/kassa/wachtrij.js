@@ -31,6 +31,11 @@
       van de lijn geeft een storm en verliest de volgorde van de avond.
    5. VOL IS VOL, EN DAT ZEGGEN WE. Bij de bovengrens weigert de kassa een
       nieuwe offline bon in plaats van stilletjes de oudste te vergeten.
+   6. EEN BON HOORT BIJ DE ZAAK WAAR HIJ IS OPGESTELD. De rij staat op het
+      TOESTEL en de zaak komt uit het token; wordt er tussendoor bij een andere
+      zaak ingelogd, dan zou een wachtende bon op de boeken van die andere zaak
+      landen. Zulke bonnen blijven staan tot iemand weer bij de eigen zaak
+      inlogt, en de kassa zegt welke zaak dat is.
 
    WAT DIT NIET REPAREERT. De tijd op de bon blijft de tijd van AANKOMST bij de
    server; het moment waarop de kassa hem opstelde reist mee als `offlineVanaf`
@@ -56,6 +61,7 @@
 
   var W = {
     _token: null,
+    _zaak: null,
     _bezig: false,
     _bijWijziging: function () {},
 
@@ -70,9 +76,27 @@
       if (W.rij().length) W.leeg();
     },
 
+    /* De naam van de zaak komt pas binnen als de kassa zijn instellingen heeft
+       opgehaald, dus na zet(). Daarom apart. */
+    zaak: function (naam) {
+      W._zaak = naam || null;
+      W._bijWijziging(W.stand());
+      if (W.rij().length) W.leeg();
+    },
+
     rij: function () { return lees(SLEUTEL); },
     vastgelopen: function () { return lees(VAST); },
-    stand: function () { return { wacht: W.rij().length, vast: W.vastgelopen().length }; },
+    /* `vreemd` telt de bonnen die bij een ANDERE zaak horen dan de zaak waar nu
+       op is ingelogd -- die wachten op hun eigen inlog en niet op de lijn. */
+    vreemd: function () {
+      if (!W._zaak) return [];
+      return W.rij().filter(function (p) { return p.zaak && p.zaak !== W._zaak; });
+    },
+    stand: function () {
+      var v = W.vreemd();
+      return { wacht: W.rij().length - v.length, vast: W.vastgelopen().length,
+        vreemd: v.length, vreemdeZaak: v.length ? v[0].zaak : null };
+    },
 
     /* Het enige pad waarlangs de kassa afrekent. Lukt het verzoek, dan komt het
        antwoord van de server terug. Ketst het af op het NETWERK, dan gaat de
@@ -86,7 +110,7 @@
         if (r.length >= MAX) throw new Error('De wachtrij zit vol (' + MAX + ' bonnen). Herstel eerst de verbinding.');
         /* HIER staat de sleutel al in `body`: hij is bij het afrekenen gemaakt
            en wordt nooit meer vervangen. Zie regel 1. */
-        r.push({ body: body, opgesteld: new Date().toISOString(), pogingen: 0 });
+        r.push({ body: body, zaak: W._zaak || null, opgesteld: new Date().toISOString(), pogingen: 0 });
         if (!schrijf(SLEUTEL, r)) throw new Error('Deze kassa kan niets bewaren; de bon is niet geregistreerd.');
         W._bijWijziging(W.stand());
         return { gewacht: true };
@@ -102,6 +126,10 @@
         var r = W.rij();
         if (!r.length) return Promise.resolve();
         var post = r[0];
+        /* Regel 6: nooit een bon van de ene zaak op de boeken van de andere.
+           Stoppen en niet overslaan -- de volgorde van de avond blijft zo heel,
+           en de strook zegt welke zaak deze bonnen thuishoren. */
+        if (post.zaak && W._zaak && post.zaak !== W._zaak) return Promise.resolve();
         return W._stuur(Object.assign({}, post.body, { offlineVanaf: post.opgesteld })).then(function () {
           var l = lees(SLEUTEL); l.shift(); schrijf(SLEUTEL, l);
           W._bijWijziging(W.stand());

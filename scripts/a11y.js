@@ -38,6 +38,8 @@ const STRICT = process.env.A11Y_STRICT === '1';
    EERSTE render bekeken, uitgelogd, en alles wat achter de inlog opengaat blijft
    ongemeten. Dat is de volgende stap en geen eigenschap van deze lijst. */
 const { alleSchermen } = require('./schermen');
+/* Wie iets vindt, meet nog een keer -- een plek, twee ronden. */
+const hermeet = require('./a11y-hermeet');
 /* alleSchermen() loopt public/apps af. Het 404-scherm staat in public/site en
    viel daarmee buiten de keuring -- terwijl het juist een scherm is dat een
    bezoeker onverwacht krijgt. Er is geen derde plek: dit zijn alle .html onder
@@ -216,7 +218,9 @@ function startEchteServer() {
       await page.goto(basis + pad, { waitUntil: 'load' });
       await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen
       let res;
-      try { res = await page.evaluate(KEUR); }
+      /* WIE IETS VINDT, MEET NOG EEN KEER -- zie scripts/a11y-hermeet.js voor
+         waarom deze ronde hem nodig had en waarom hij de poort niet verzwakt. */
+      try { res = await hermeet(page, KEUR, (r) => r.overtredingen.length || r.contrast.length); }
       catch (e) {
         console.error(`[a11y] ${pad} (${ronde.naam}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
         struct += 1; continue;
@@ -261,9 +265,11 @@ function startEchteServer() {
 
      EN WIE IETS VINDT, MEET NOG EEN KEER. Een scherm dat binnenkomt met een
      schaal-animatie staat een halve seconde op 99,8%, en dan meet een knop van
-     precies 24 pixels er 23,96. Dat is geen bevinding maar een moment. Zie de
-     opmerking bij die tweede meting hieronder voor waarom het GEEN wachten op
-     alle animaties is geworden. */
+     precies 24 pixels er 23,96. Dat is geen bevinding maar een moment. Die
+     tweede meting woont sinds 23 augustus 2026 in scripts/a11y-hermeet.js --
+     de contrastronde hierboven bleek hem net zo hard nodig te hebben, en toen
+     hoorde hij niet langer als kopie in deze ene ronde te staan. Daar staat ook
+     waarom het GEEN wachten op alle animaties is geworden. */
   const RAAK = '(function(){' + raakvlak.BRON + '\nreturn window.__a11yRaakvlak(' + raakvlak.GRENS + ')})()';
   let raakTotaal = 0;
   for (const staat of [
@@ -283,31 +289,10 @@ function startEchteServer() {
     await tel.goto(basis + pad, { waitUntil: 'load' });
     await tel.waitForTimeout(600);
     let res;
-    try { res = await tel.evaluate(RAAK); }
+    try { res = await hermeet(tel, RAAK, (r) => r.klein.length); }
     catch (e) {
       console.error(`[a11y] ${pad} (raakvlak): de meting kon niet draaien -- ${e.message.split('\n')[0]}`);
       continue;
-    }
-    /* WIE IETS VINDT, MEET NOG EEN KEER. Een scherm dat binnenkomt met een
-       schaal-animatie staat 600ms na load op 99,827%, en dan meet een knop van
-       precies 24 pixels er 23,96 -- dat is een moment en geen maat. Zo meldde
-       zorgbalie.html een pil die klopte.
-
-       Wachten tot ALLE animaties uit zijn was de eerste poging, en die kostte te
-       veel: op de meeste schermen loopt er altijd iets (de wereldklok tikt), dus
-       liep bijna elke pagina tegen de tijdgrens aan en werd de ronde drie keer zo
-       traag. Een tweede meting kost alleen iets op de schermen die iets vinden,
-       en dat zijn er hopelijk nul. Een scherm dat PERMANENT geschaald is, meldt
-       zich in die tweede meting gewoon weer -- en terecht, want dan is de knop
-       ook echt te klein. */
-    if (res.klein.length) {
-      try {
-        await tel.waitForFunction(
-          () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
-          null, { timeout: 1500 });
-      } catch (e) { /* een scherm dat blijft bewegen meten we zoals het staat */ }
-      await tel.waitForTimeout(300);
-      try { res = await tel.evaluate(RAAK); } catch (e) { /* de eerste meting blijft staan */ }
     }
     if (res.klein.length) {
       raakTotaal += res.klein.length;

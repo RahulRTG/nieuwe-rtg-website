@@ -189,6 +189,8 @@ async function laad(zet){
   catch (e) { $('#artGrid').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
   const m = modus();
   $('#zaakNaam').textContent = INSTEL.naam;
+  // regel 6 van de wachtrij: een bon hoort bij de zaak waar hij is opgesteld
+  if (window.RTGKassaWachtrij) RTGKassaWachtrij.zaak(INSTEL.naam);
   $('#modusNaam').textContent = m.naam;
   $('#schermKnop').textContent = INSTEL.scherm ? INSTEL.scherm.naam : 'Kassa benoemen';
   // dit toestel kent zijn scherm niet (meer), maar de zaak heeft er wel: kies er een
@@ -287,11 +289,13 @@ async function rekenAf(method, extra){
 function toonWachtrij(stand){
   const el = $('#wachtStrook');
   if (!el) return;
-  if (!stand.wacht && !stand.vast) { el.hidden = true; el.innerHTML = ''; return; }
+  if (!stand.wacht && !stand.vast && !stand.vreemd) { el.hidden = true; el.innerHTML = ''; return; }
   el.hidden = false;
   let h = '';
   if (stand.wacht) h += '<span><b>' + stand.wacht + '</b> bon' + (stand.wacht === 1 ? '' : 'nen') + ' wacht' + (stand.wacht === 1 ? '' : 'en') + ' op verbinding.</span><button id="wachtNu">Nu proberen</button>';
   if (stand.vast) h += '<span><b>' + stand.vast + '</b> vastgelopen.</span><button id="wachtVast">Bekijken</button>';
+  if (stand.vreemd) h += '<span><b>' + stand.vreemd + '</b> bon' + (stand.vreemd === 1 ? '' : 'nen') + ' hoort bij ' +
+    esc(stand.vreemdeZaak) + '; log daar in om ze te versturen.</span>';
   el.innerHTML = h;
   const nu = $('#wachtNu'); if (nu) nu.addEventListener('click', () => RTGKassaWachtrij.leeg());
   const vt = $('#wachtVast'); if (vt) vt.addEventListener('click', toonVastgelopen);

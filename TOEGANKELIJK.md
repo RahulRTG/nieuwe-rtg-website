@@ -28,6 +28,20 @@ elke push over alle schermen -- structuur en contrast in DRIE staten, het
 raakvlak op telefoonformaat (390x844) in twee sessies; wie iets vindt, meet nog
 een keer. `check.js` regel 49 doet het ondertitelregister.
 
+**"Wie iets vindt, meet nog een keer" geldt sinds 23 augustus 2026 voor ALLE
+ronden**, en niet meer alleen voor het raakvlak. Alleen daar stond hij, en
+daardoor was de contrastronde niet streng maar onbetrouwbaar: twee volledige
+scans op dezelfde code gaven twee uitkomsten, met dezelfde bevinding op een
+ander scherm in een andere ronde -- en dezelfde pagina daarna twaalf keer op rij
+gemeten gaf twaalf keer nul. De oorzaak is dat de keuring omhoog klimt tot een
+ondoorzichtige achtergrond, en dat een pagina die zijn eigen grond nog niet
+heeft geverfd er dus een leent van iets erboven. `scripts/a11y-hermeet.js`
+draagt die tweede meting nu voor beide ronden. Dat verzwakt de poort niet: een
+echte fout meldt zich in de tweede meting gewoon weer, en
+`test/a11y-hermeet.e2e.js` houdt precies dat vast -- een blijvend te bleke regel
+blijft staan, een grond die er een tel later niet meer is telt niet. Een poort
+die af en toe zomaar rood wordt, leert mensen om hem te negeren.
+
 **De derde staat is er sinds 23 augustus 2026, en waarom dat nodig was.** De scan
 logde in met een lidmaatschapstoken. Alles achter een ZAAK-inlog -- de
 horecaschermen, de kassa, het personeelsscherm, de leveranciers-app -- draagt een

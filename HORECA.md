@@ -699,8 +699,10 @@ meting naast staat, en tot die tijd is het een plan.
 
 ## Wat er hierna ligt
 
-Vier dingen, elk met de reden waarom het een eigen snede is en niet een restje
-van iets hierboven.
+*De vier punten die hier op 23 augustus 2026 stonden zijn er twee geworden: het
+stationsbord per stap, de wijk en de uitvoerders achter de rechtenlaag zijn af,
+en Venue Edge is af voor de PDA. Wat overblijft staat hieronder, elk met de
+reden waarom het een eigen snede is en niet een restje van iets hierboven.*
 
 **Venue Edge voor de zaal en de bar.** De PDA kan nu zonder lijn een bestelling
 opnemen (punt 5b), en dat is bewust het enige. Het zaalscherm en het barscherm

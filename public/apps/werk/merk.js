@@ -48,6 +48,28 @@
     balk.hidden = false;
   }
 
+  /* Het pakket en het verbruik OP HET SCHERM, en niet pas in een 429. Een
+     grens waar je tegenaan loopt zonder hem te hebben zien naderen, voelt als
+     een storing; dezelfde grens met een teller ernaast is een afspraak. */
+  function contract(b) {
+    var el = document.getElementById('wkContract');
+    if (!el) return;
+    var c = b && b.contract;
+    if (!c) {
+      el.innerHTML = '<p class="stil">Deze werkruimte hoort bij geen enkele organisatie met een contract, dus er geldt geen pakket en geen grens.</p>';
+      return;
+    }
+    var rij = function (l, r) { return '<div class="item"><span>' + esc(l) + '</span><span class="stil">' + esc(r) + '</span></div>'; };
+    el.innerHTML =
+      rij('Pakket', c.naam + (c.tot ? ' \u00b7 tot ' + c.tot : '')) +
+      rij('Werkruimtes', c.verbruik.werkruimtes + ' van ' + c.grenzen.werkruimtes) +
+      rij('Verzoeken dit uur', c.verbruik.apiDitUur + ' van ' + c.grenzen.apiPerUur) +
+      (c.let ? '<p class="stil">' + esc(c.let) + '</p>' : '') +
+      '<p class="stil">Wat hier NIET onder valt: ' +
+      esc(c.nietAfgedwongen.map(function (n) { return n.grens; }).join(', ')) +
+      '. Die grenzen worden nergens gemeten, dus ze gelden ook niet.</p>';
+  }
+
   function nietGebouwd(b) {
     var el = document.getElementById('wkNietGebouwd');
     if (!el) return;
@@ -68,7 +90,7 @@
         .then(function (r) { return r.json().catch(function () { return {}; }); })
         .then(function (d) {
           var b = d.bootstrap || null;
-          toon(b); nietGebouwd(b);
+          toon(b); contract(b); nietGebouwd(b);
           return b;
         })
         .catch(function () { return null; });   // een merk dat niet laadt, laat het werk staan

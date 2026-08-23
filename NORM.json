@@ -1,15 +1,15 @@
 {
   "vastgelegd": "2026-08-23",
   "meters": {
-    "endpointsZonderTest": 1192,
+    "endpointsZonderTest": 1191,
     "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 905,
+    "testbestanden": 910,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 126,
+    "e2eBestanden": 127,
     "keuringOmvang": 159,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
@@ -20,7 +20,7 @@
     "schermenZonderToets": 0,
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4936,
-    "browserpoortToetsen": 196,
+    "browserpoortToetsen": 197,
     "kernBreedte": 1414,
     "kernGedeeld": 193,
     "kernBreedsteBestand": 71,
@@ -30,7 +30,8 @@
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "bronBlindeBestanden": 0,
-    "delenZonderOnderwerp": 0
+    "delenZonderOnderwerp": 0,
+    "schermenZonderVormtaal": 183
   },
   "notities": [
     {
@@ -446,6 +447,11 @@
       "datum": "2026-08-23",
       "meter": "kernBreedte 1413 -> 1414; kernGedeeld 191 -> 193 (de Tenant Control Plane)",
       "reden": "De tenantlaag (kern/tenant/). Twee meters gaan omhoog en dat is hier de prijs van een laag erbij, geen erosie -- maar het staat er met naam bij, want dat is het verschil.\n\nkernBreedte +1: precies een naam, `tenant`. De laag hangt zichzelf op in routes/tenant.js, zoals routes/bedrijf.js dat met `bedrijf` doet.\n\nkernGedeeld +2, en beide zijn een BEWUSTE koppeling en geen lek. (1) `tenant` wordt door vier domeinen gelezen -- tenant, techniek (het beheer hoort bij de eigenaar), sso (de brug loopt bij het inloggen) en scim (de deprovisioning) -- en dat is precies wat een contractgrens is: hij raakt identiteit en beheer, anders is het geen grens maar een veld. Alle vier staan in GRENZEN.json, dus geen enkel ander domein komt erbij. (2) `bedrijf` wordt nu ook door tenant gelezen, en dat is de goede kant op: routes/tenant.js hergebruikt beheerVan() en lidVan() van de werkruimte in plaats van een derde manier te bedenken om \"mag deze aanroeper hier bij\" te beantwoorden. Die koppeling weghalen zou de meter verlagen en de code slechter maken -- twee antwoorden op een toegangsvraag is de fout van LAT-regel 4.\n\nWat NIET omhoog ging en dat is de controle op dit verhaal: routesNietSchakelbaar bleef 0 (de vier nieuwe routes staan in de functiecatalogus), keuringTeGroot bleef 5, keuringDubbeling bleef 115 en toetsenNietGemeten bleef 155 -- de drie nieuwe toetsen zijn door de mutatiemotor gehaald en alle drie gezakt."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "schermenZonderVormtaal: nieuw op 183",
+      "reden": "Het RTG Design System 2.0 was volledig gespecificeerd (ONTWERP.md), had een tokenlaag (public/shared/rtg-ontwerp.css), een materialenleer (rtg-materiaal.css) en negentien groene toetsen -- en werd door EEN van de 185 app-pagina's ingesloten. rtg-materiaal.css door nul. test/ontwerp.test.js meet de tokenlaag tegen zichzelf, dus die stand kon jaren blijven staan zonder dat er iets rood werd.\n\nDeze meter telt de app-pagina's die de tokenlaag NIET insluiten, en mag alleen omlaag. Geteld op de insluiting en niet op het gebruik: een pagina die hem laadt kan er nog weinig mee doen, maar een pagina die hem niet laadt kan er zeker niets mee. Dat is de goedkope, eerlijke ondergrens van adoptie.\n\nHij begint op 183 en niet op 184: werk.html sluit hem vanaf nu in, met data-rtg-modus=\"pro\", en de zeven kleurtokens van dat scherm verwijzen naar de materialenleer in plaats van hun eigen hexcodes te dragen. Die waarden klopten toevallig (#7f1634 is de logo-bordeaux, #c0a544 is --gold-tekst), maar het was een kopie -- en een kopie loopt uit de pas zodra de bron verandert, in precies het scherm dat aan partners wordt verkocht."
     }
   ],
   "prestatie": {

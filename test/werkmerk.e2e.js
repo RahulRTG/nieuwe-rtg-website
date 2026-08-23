@@ -86,6 +86,7 @@ test('het Werk OS draagt de naam van de klant, en de RTG-schil verft niet mee',
         merkRand: kleur(balk),
         eigenschap: shell ? getComputedStyle(shell).getPropertyValue('--wk-merk-accent').trim() : '',
         nietGebouwd: (document.getElementById('wkNietGebouwd') || {}).innerText || '',
+        contract: (document.getElementById('wkContract') || {}).innerText || '',
         /* De grenscontrole loopt ALLES na wat buiten de merkbalk staat. Twee
            eigenschappen van twee elementen prikken zou een lek missen dat
            precies ergens anders zit -- en dan zakt deze toets niet terwijl de
@@ -123,8 +124,16 @@ test('het Werk OS draagt de naam van de klant, en de RTG-schil verft niet mee',
     assert.match(m.tekst, /Rahul Travel Group/, 'de herkomstregel staat in de voet, ook in private');
     assert.match(m.tekst, /eigen domein bestaat hier niet/, 'en de grens staat erbij');
 
-    assert.match(m.nietGebouwd, /quotas|entitlements/,
+    assert.match(m.nietGebouwd, /policies|trust/,
       'wat er per organisatie niet is, staat op het scherm en niet alleen in de JSON');
+
+    /* Het pakket en het verbruik staan er OOK, en dat is de andere helft van
+       dezelfde eerlijkheid: een grens waar je tegenaan loopt zonder hem te
+       hebben zien naderen, voelt als een storing. */
+    assert.match(m.contract, /Proef/, 'het pakket staat op het scherm');
+    assert.match(m.contract, /Verzoeken dit uur/, 'met de teller erbij');
+    assert.match(m.contract, /worden nergens gemeten, dus ze gelden ook niet/,
+      'en met wat er NIET onder valt');
 
     /* ---- de werkruimte ZONDER tenant: bewering 3 ---- */
     await inloggen(zonder.werkruimte, lidB.lidToken);

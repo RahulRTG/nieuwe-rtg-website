@@ -339,6 +339,7 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
 | Contract | de grenzen die gelden komen uit een pakket, en wat niet wordt afgedwongen staat er met reden bij | gemeten (`test/tenantcontract.test.js`) |
 | Quota | per tenant, en een herstart wist ze niet | gemeten (`test/tenantcontract.test.js` 5-7) |
 | Levenscyclus | elke tenantstand met reden, actor en bewijs | gemeten (`test/tenantuitgang.test.js`, `test/tenantspine.test.js` 12-14) |
+| Vormtaal | het Werk OS draait op de tokenlaag van ONTWERP.md en niet op een eigen palet | gedeeltelijk: werk.html draagt hem, 183 andere pagina's nog niet (meter `schermenZonderVormtaal`) |
 | Codeforks | 0 klantspecifieke forks | gehaald, en dat is de reden dat het merk uit getypeerde velden komt en niet uit vrije CSS of JS |
 
 ## 8. De bouwvolgorde

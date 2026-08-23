@@ -159,6 +159,20 @@ jobs:
       # staat; deze stap zakt zodra een van die meters SLECHTER wordt. Beter mag
       # altijd -- dan meldt hij dat de norm strakker gezet kan worden. Zonder
       # deze stap zakt kwaliteit weg zonder dat iemand een besluit neemt.
+      # FASE A VAN DE VERIFICATIE-RUNTIME: welke muteerbare toestand bestaat er,
+      # en wie is ervan? 647 serverstarts kosten 35% van alle toetstijd, en dat
+      # wordt pas minder als een server hergebruikt kan worden. Hergebruik mag
+      # alleen als van elke muteerbare wortel bekend is wie hem bezit en of hij
+      # terug kan naar zijn beginstand -- EEN onbekende singleton maakt honderd
+      # keurig geisoleerde toetsen waardeloos, en dat merk je niet, want een
+      # gedeelde server die lekt geeft geen fout maar een verkeerd antwoord.
+      #
+      # Deze stap is STATISCH en kost drie seconden. Hij zakt zodra er
+      # muteerbare toestand in server/ bij komt die niet in STATE.json staat.
+      # Het gat zelf (wortels zonder levensduurklasse) staat als staatOnbekend
+      # in NORM.json en mag daar alleen kleiner worden.
+      - name: Alle muteerbare toestand heeft een eigenaar (STATE.json)
+        run: npm run staat
       - name: De norm (mag alleen strakker, nooit losser)
         run: npm run norm
 

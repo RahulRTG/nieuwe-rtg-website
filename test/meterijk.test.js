@@ -616,6 +616,45 @@ const IJKINGEN = {
       } finally { fs.rmSync(ijkmap, { recursive: true, force: true }); }
     }
   },
+  /* DE TOESTANDSRATEL. Alle drie de proeven leggen een bestand in de
+     WEGWERPKOPIE neer (nooit in deze repository -- zie de kop bovenaan) en
+     eisen dat de betreffende meter dat ziet.
+
+     De bestandsnaam draagt met opzet geen `zz-ijk`-patroon dat op een echte
+     wortel lijkt: de scanner kijkt naar de VORM van de code en niet naar de
+     naam, dus een gewoon ogende module is hier de eerlijkste proef. */
+  staatOngeregistreerd: {
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      'let ijkTeller = 0;\nfunction tik() { ijkTeller++; }\nmodule.exports = { tik };\n',
+      () => meet({ alleen: ['staatOngeregistreerd'] }).staatOngeregistreerd - voor.staatOngeregistreerd)
+  },
+  staatOnbekend: {
+    /* Deze meter telt wat er WEL in STATE.json staat maar geen levensduur
+       heeft. Een nieuw bestand telt daar dus niet in mee -- dat is de andere
+       meter. Hier voegen we een wortel toe EN registreren we hem als onbekend,
+       precies zoals `node scripts/staat.js --vastleggen` dat zou doen. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      'let ijkTeller = 0;\nfunction tik() { ijkTeller++; }\nmodule.exports = { tik };\n', () => {
+        const regPad = path.join(WORTEL, 'STATE.json');
+        const reg = JSON.parse(fs.readFileSync(regPad, 'utf8'));
+        reg.wortels['server/kern/zz-ijk-tijdelijk.js#ijkTeller'] =
+          { eigenaar: 'server/kern', levensduur: 'onbekend', reset: 'onbekend', soort: 'binding-let', bron: 'scan' };
+        const oud = fs.readFileSync(regPad, 'utf8');
+        fs.writeFileSync(regPad, JSON.stringify(reg, null, 2) + '\n');
+        try { return meet({ alleen: ['staatOnbekend'] }).staatOnbekend - voor.staatOnbekend; }
+        finally { fs.writeFileSync(regPad, oud); }
+      })
+  },
+  klokDirect: {
+    /* Drie kloklezingen erbij, en een new Date(x) die NIET mee hoort te tellen.
+       Zonder die vierde regel zou de proef ook slagen als de meter elke
+       Date-constructie telde, en dan meet hij 1788 in plaats van 1297. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      'const a = new Date();\nconst b = Date.now();\nconst c = new Date();\n' +
+      'const d = new Date("2026-01-01");\nmodule.exports = { a, b, c, d };\n',
+      () => meet({ alleen: ['klokDirect'] }).klokDirect - voor.klokDirect)
+  },
+
   metersOngeijkt: {
     /* De meter die de ongeijkte meters telt, moet zelf uitslaan -- anders
        bewaakt een ongeijkte meter het ijken. Hij krijgt twee verzonnen

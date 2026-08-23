@@ -5428,6 +5428,14 @@
       "gezakt": 5,
       "geprobeerd": 2
     },
+    "staatregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/staatscan.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "stad.test.js": {
       "soort": "server",
       "staat": "gezakt",

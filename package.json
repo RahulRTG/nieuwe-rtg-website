@@ -69,6 +69,8 @@
     "e2e": "rm -f .schermjournaal && RTG_ROUTELOG=.schermjournaal node --experimental-sqlite --test --test-concurrency=1 --test-timeout=600000 test/*.e2e.js",
     "test:pg": "node scripts/pgtoetsen.js",
     "icons": "node scripts/icons.js",
+    "staat": "node scripts/staat.js",
+    "staat:vast": "node scripts/staat.js --vastleggen",
     "norm": "node --experimental-sqlite scripts/norm.js",
     "norm:vast": "node --experimental-sqlite scripts/norm.js --vastleggen",
     "norm:basis": "node scripts/normbasis.js",

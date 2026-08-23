@@ -200,6 +200,25 @@ const METERS = [
 
      Apart geteld is dit niet losser maar STRAKKER: de dienstgroep ratelt nu op
      17 in plaats van te mogen wegvallen tegen de honderdeen browsergevallen. */
+  /* DE TOESTANDSRATEL -- fase A van de verificatie-runtime.
+
+     647 serverstarts kosten 35% van alle toetstijd, en dat wordt pas minder als
+     een server hergebruikt kan worden. Hergebruik mag alleen als van elke
+     muteerbare wortel bekend is wie hem bezit en of hij terug kan naar zijn
+     beginstand; EEN onbekende singleton maakt honderd geisoleerde toetsen
+     waardeloos zonder dat er iets rood wordt.
+
+     Twee meters, en ze zeggen iets anders. `staatOngeregistreerd` is nieuwe
+     toestand die niemand heeft gezien: die hoort 0 te zijn en te blijven.
+     `staatOnbekend` is toestand die WEL in STATE.json staat maar nog geen
+     levensduur heeft; dat is het eerlijke gat, en het mag alleen kleiner. */
+  { sleutel: 'staatOngeregistreerd', richting: 'omlaag', wat: 'muteerbare toestand in server/ die niet in STATE.json staat' },
+  { sleutel: 'staatOnbekend', richting: 'omlaag', wat: 'geregistreerde toestandswortels zonder levensduurklasse (tellen als procesgebonden)' },
+  /* De kloklezingen. Zolang code rechtstreeks de wandklok afleest, is een
+     gedeelde server een flake-machine en kost elke wachttoets echte seconden.
+     new Date(x) telt hier NIET mee: dat construeert een datum uit iets dat er
+     al was en leest de klok niet. */
+  { sleutel: 'klokDirect', richting: 'omlaag', wat: 'directe kloklezingen in server/ (new Date(), Date.now, hrtime, performance.now)' },
   { sleutel: 'zelfpoortendeToetsen', richting: 'omlaag', wat: 'toetsen die zichzelf overslaan omdat een DIENST ontbreekt (Postgres, Redis, openssl)' },
   { sleutel: 'browserpoortToetsen', richting: 'omhoog', wat: 'schermtoetsen achter de browserpoort (bewaakt door test/browserpoort.e2e.js)' },
   { sleutel: 'e2eBestanden', richting: 'omhoog', wat: 'schermtoetsen (*.e2e.js, draaien niet mee in npm test)' },
@@ -450,6 +469,7 @@ const METERBRONNEN = {
   mutaties: ['toetsenOngevoeligPct', 'toetsenNietGemeten'],
   skips: ['zelfpoortendeToetsen', 'browserpoortToetsen'],
   ijkregister: ['metersOngeijkt'],
+  staat: ['staatOngeregistreerd', 'staatOnbekend', 'klokDirect'],
   // goedkoop genoeg om altijd te doen: een readdir en een package.json
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
@@ -715,6 +735,29 @@ function meet(bronnen) {
       '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
   }
 
+  /* De toestandscensus. Draait alleen als er een toestandsmeter gevraagd is:
+     hij ontleedt ruim tweeduizend bestanden en kost drie seconden. */
+  let staatOngeregistreerd, staatOnbekend, klokDirect;
+  if (nodig('staat')) {
+    const { scan } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
+    const census = scan({ wortel: WORTEL });
+    klokDirect = census.klokLezingen;
+    let register = null;
+    try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'STATE.json'), 'utf8')); } catch (e) { register = null; }
+    /* GEEN REGISTER IS GEEN NUL. Zonder STATE.json is niet bekend welke
+       toestand er bezit heeft, en dan hoort deze meter dat te zeggen in plaats
+       van keurig 0 te melden -- LAT-regel 3. */
+    if (!register || !register.wortels) {
+      throw new Error('STATE.json ontbreekt of is onleesbaar; dan is geen enkele toestandswortel geregistreerd ' +
+        '(leg hem aan met: node scripts/staat.js --vastleggen)');
+    }
+    const bekend = register.wortels;
+    staatOngeregistreerd = census.wortels.filter(w => !bekend[w.id]).length;
+    const levend = new Set(census.wortels.map(w => w.id));
+    staatOnbekend = Object.entries(bekend)
+      .filter(([id, r]) => (levend.has(id) || r.bron === 'hand') && (!r.levensduur || r.levensduur === 'onbekend')).length;
+  }
+
   /* Bij `alleen` komen ALLEEN de gevraagde sleutels terug. Niet de rest op
      undefined laten staan: dan zou `na.X - voor.X` voor een meter die je niet
      hebt gevraagd stilletjes NaN worden en de proef om de verkeerde reden
@@ -735,7 +778,8 @@ function meet(bronnen) {
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen,
     bronBlindeBestanden,
-    delenZonderOnderwerp
+    delenZonderOnderwerp,
+    staatOngeregistreerd, staatOnbekend, klokDirect
   };
   if (!alleen) return alles;
   const uit = {};

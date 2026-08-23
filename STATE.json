@@ -1,0 +1,1023 @@
+{
+  "vastgelegd": "2026-08-23",
+  "uitleg": "Muteerbare toestandswortels in server/. Geschreven door scripts/staat.js; levensduur en reset vult een MENS in. Een wortel die de scan vindt en hier niet staat, is een fout.",
+  "klassen": [
+    "bootvast",
+    "toetsgebonden",
+    "herstelbaar",
+    "procesgebonden",
+    "onbekend"
+  ],
+  "wortels": {
+    "server/accounts/kluis.js#seedHergebruik": {
+      "eigenaar": "server/accounts",
+      "levensduur": "herstelbaar",
+      "reset": "accounts.sluitSeedvenster()",
+      "soort": "binding-let",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/seedvenster.test.js -- de besparingstoets leest deze teller uit sluitSeedvenster()",
+      "toelichting": "Alleen een teller voor het logregel-getal; heeft geen invloed op gedrag."
+    },
+    "server/accounts/kluis.js#seedVensterOpen": {
+      "eigenaar": "server/accounts",
+      "levensduur": "herstelbaar",
+      "reset": "accounts.sluitSeedvenster()",
+      "soort": "binding-let",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/seedvenster.test.js -- grendel 3 draait de echte boot en eist dat het venster dicht is zodra de server luistert",
+      "toelichting": "Staat open tijdens de demoseed en gaat dicht vlak voor app.listen. Sluiten is idempotent."
+    },
+    "server/accounts/kluis.js#seedZouten": {
+      "eigenaar": "server/accounts",
+      "levensduur": "herstelbaar",
+      "reset": "accounts.sluitSeedvenster()",
+      "soort": "map",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/seedvenster.test.js -- na het sluiten krijgt elk account een vers zout",
+      "toelichting": "Memo van zout per seedwachtwoord; wordt bij het sluiten geleegd en daarna nooit meer gevuld."
+    },
+    "server/accounts/mirror.js#externCb": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#idBlok": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#idRefillBezig": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#mirrorTimer": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#pg": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#pgKlaar": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#verwijderdeUsers": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "set",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#vuileStaff": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "set",
+      "bron": "scan"
+    },
+    "server/accounts/mirror.js#vuileUsers": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "set",
+      "bron": "scan"
+    },
+    "server/accounts/state.js#_cache": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/accounts/state.js#_cacheDb": {
+      "eigenaar": "server/accounts",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/betaal.js#adyen": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/betaal.js#bewaar": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/betaal.js#geheugen": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/betaal.js#haalOp": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/betaal.js#mollie": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/betaal.js#stripe": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen-kluis.js#KEY": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen.js#generatie": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen.js#laatsteSha": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen.js#saveDuur": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen.js#saveKlaar": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen.js#saveT0": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen.js#saveTimer": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/geheugen.js#saveVuil": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/grootboek.js#grootCache": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/grootboek.js#grootN": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/grootboek.js#grootNAt": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/grootboek.js#grootPool": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/ledengids.js#ledenCache": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/ledengids.js#ledenN": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/ledengids.js#ledenNAt": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/ledengids.js#ledenPool": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/ledengids.js#ledenRev": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#laatsteLokaleSnap": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#pg": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#pgFlushBezig": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#pgFlushTimer": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#pgKlaar": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#pgPoll": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#pgVeilig": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#pgVuil": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#snelBelofte": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#snelBezig": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#snelTimer": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/postgres.js#snelVuil": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/redis.js#rPub": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/redis.js#rSub": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/redis.js#versie": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/snapshot.js#saveDuur": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/snapshot.js#saveKlaar": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/snapshot.js#saveTimer": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/snapshot.js#saveVuil": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/snapshot.js#snapshotVol": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/snapshot.js#snapshotWaarschuwing": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/sqlite.js#kvdb": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/sqlite.js#laatsteJson": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/sqlite.js#pollTimer": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/sqlite.js#stmt": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/sqlite.js#toegepast": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/state.js#externCb": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/tx/index.js#kapPauzeTot": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/tx/ledger.js#achter": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/tx/ledger.js#txNAt": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/tx/ledger.js#txVeegBezig": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/tx/ledger.js#txVeegTimer": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/tx/ledger.js#venster": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/db/voorcheck.js#laatsteCheck": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/voorcheck.js#laatsteGrootte": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/voorcheck.js#laatsteLengte": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/db/voorcheck.js#naTimer": {
+      "eigenaar": "server/db",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/eigenaar.js#overgedragen": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/foundation.js#gctx": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/inzagelog.js#DB": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/inzagelog.js#SAVE": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/journaalhaak.js#ontvanger": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/appbieb.js#PER_CAT_TELLING": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/command/landpakket.js#onthouden": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/command/slo.js#onthouden": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/geloofbieb.js#TRADITIES": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "array",
+      "bron": "scan"
+    },
+    "server/kern/geloofbieb.js#TRAD_LABEL": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/leerstof.js#DOELEN": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/leerstof.js#PER_FASE": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/leerstof.js#PER_GROEP": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/magnaat-capabilities-bronnen.js#waarschuwingen": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "set",
+      "bron": "scan"
+    },
+    "server/kern/magnaat-dekkingsmatrix.js#BRON_CACHE": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/kern/magnaat-dekkingsmatrix.js#TEST_CACHE": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/kern/office/sjablonen.js#SJABLONEN": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/postdatum-lezer.js#MAANDEN": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/rahul.js#geslachtBron": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/rahul.js#profielBron": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/rahul/stemming.js#OP_ID": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/kern/rijksbieb.js#SOM_WAARDE": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/schoolbieb.js#NAMEN": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "array",
+      "bron": "scan"
+    },
+    "server/kern/schoolbieb.js#SOM_WAARDE": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/spellen/magnaat/kaart.js#gebouwd": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/kern/spellen/quiz-school.js#STOF": {
+      "eigenaar": "server/kern",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/kern/spellen/register.js#bezig": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/tijdzone.js#landVindReg": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/kern/totp.js#gebruikt": {
+      "eigenaar": "server/kern",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/kluis.js#KEY": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/lib/bronkas.js#tellers": {
+      "eigenaar": "server/lib",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/lib/bronmanifest.js#manifesten": {
+      "eigenaar": "server/lib",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/lib/verraad.js#geslagen": {
+      "eigenaar": "server/lib",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/log.js#foutGroepen": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/log.js#foutHaak": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/log.js#foutTotaal": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/log.js#foutVolg": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/log.js#journaalStuk": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/mail.js#transporter": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/meting-lus.js#lus": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/meting.js#staat": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/middleware/voordeur.js#paginaHaak": {
+      "eigenaar": "server/middleware",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/muntbetaal.js#bewaar": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/muntbetaal.js#geheugen": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/muntbetaal.js#haalOp": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/opzet/domeingrens.js#gelogd": {
+      "eigenaar": "server/opzet",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "set",
+      "bron": "scan"
+    },
+    "server/opzet/domeingrens.js#gemeld": {
+      "eigenaar": "server/opzet",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "set",
+      "bron": "scan"
+    },
+    "server/pg/sync.js#GEDEKT": {
+      "eigenaar": "server/pg",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/routelog.js#bestand": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/routelog.js#gezien": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "set",
+      "bron": "scan"
+    },
+    "server/routelog.js#stuk": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/server.js#anthropic": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/server.js#eigenWeb": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/server.js#lidDeps": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/server.js#loginFails": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/server.js#webmerk": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/sso/jwks.js#kast": {
+      "eigenaar": "server/sso",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/sso/oidc.js#ontdekt": {
+      "eigenaar": "server/sso",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/translate.js#anthropic": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/translate.js#cache": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/translate/woordenboek/index.js#EN2NL": {
+      "eigenaar": "server/translate",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/trio.js#caLoket": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/trio.js#tlsCert": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/vloot.js#kinderen": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "map",
+      "bron": "scan"
+    },
+    "server/vloot.js#stoppen": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/vloot.js#upstreams": {
+      "eigenaar": "server",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
+      "soort": "object",
+      "bron": "scan"
+    },
+    "server/web/bestanden.js#bestandHaak": {
+      "eigenaar": "server/web",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/web/routing.js#patroonHaak": {
+      "eigenaar": "server/web",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    },
+    "server/webpush.js#vapid": {
+      "eigenaar": "server",
+      "levensduur": "onbekend",
+      "reset": "onbekend",
+      "soort": "binding-let",
+      "bron": "scan"
+    }
+  }
+}

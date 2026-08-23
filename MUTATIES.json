@@ -1690,6 +1690,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "gezag.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gezag.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
     "gezelschap.test.js": {
       "soort": "server",
       "staat": "gezakt",

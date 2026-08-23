@@ -199,6 +199,36 @@ function tabel() {
         const blok = tekst.slice(start, eind < 0 ? undefined : eind);
         return /\*\*Handhaver:\*\*/.test(blok);
       }
+    },
+    {
+      /* WIE MAG WAT ZELF. Tot deze soort erbij kwam keek er niemand naar de
+         vraag die in RTG op vijf plekken los van elkaar wordt beantwoord --
+         stuur/beleid.js, command/risico.js, geldbeleid/regels.js,
+         stadsweefsel/ainiveau.js en bureau/delegatie.js hebben elk een eigen
+         schaal, en geen van de vijf kan de andere vier lezen. Dat is precies
+         het soort ding waar deze census voor is: niet "zakt er iets" maar
+         "kijkt er iemand".
+
+         BEWAAKT betekent hier: de schaal staat nog letterlijk in zijn bestand,
+         zodat scripts/gezag.js er iets over kan zeggen. Het betekent NIET dat
+         de vijf schalen met elkaar kloppen -- dat kan geen enkele machine
+         vaststellen zolang ze geen gedeelde noemer hebben, en dat is nu juist
+         de openstaande post die GEZAG.json met naam vasthoudt. */
+      soort: 'gezagsvocabulaires (mag de machine dit zelf)',
+      bewaker: ['scripts/gezag.js', 'test/gezag.test.js'],
+      wat: 'elke schaal die autonomie verdeelt staat in GEZAG.json en wordt daar tegen de code nagetrokken',
+      dingen: () => {
+        const g = JSON.parse(lees('GEZAG.json') || '{}');
+        return (g.vocabulaires || []).map(v => v.bestand);
+      },
+      bewaakt: p => {
+        const g = JSON.parse(lees('GEZAG.json') || '{}');
+        const v = (g.vocabulaires || []).find(x => x.bestand === p);
+        if (!v) return false;
+        const bron = lees(p);
+        return !!bron && v.schaal.every(trede => bron.includes("'" + trede + "'"));
+      },
+      kanttekening: 'bewaakt = de schaal is te vinden; het zegt niets over of de vijf schalen elkaar tegenspreken -- GEZAG.json houdt de bekende tegenspraak apart bij'
     }
   ];
 }

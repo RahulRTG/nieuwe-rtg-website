@@ -103,10 +103,28 @@ recht op vergetelheid in Postgres-stand niets deed. De pasprijs stond in de
 boardroom en nog een keer hard in `kern/lid.js`. De rate limiter `teVaak` stond
 in drie kernmodules, en geen van de kopieen had de opruimronde van het origineel.
 
+*En het duurste geval, want het zit in de veiligheid zelf:* de vraag "mag de
+machine dit zelf doen" wordt op VIJF plekken beantwoord, met vijf verschillende
+schalen -- `stuur/beleid.js` (verboden/voorstel/direct), `command/risico.js`
+(hand/assist/auto), `geldbeleid/regels.js` (kijken/voorstellen/klaarzetten/
+automatisch), `stadsweefsel/ainiveau.js` (waarnemen tot verboden) en
+`bureau/delegatie.js` (informeren tot autonoom). Elk van de vijf is op zichzelf
+zorgvuldig gebouwd; het bezwaar is dat geen van de vijf de andere vier kan lezen,
+dus geen mens en geen machine kan ze naast elkaar leggen. Ze zijn dan ook al
+uiteengelopen: `ainiveau.js` zet "een vergunning of aanvraag afwijzen" op niveau
+4 ("hier komt geen machine aan, met of zonder sleutel") terwijl `stuur/beleid.js`
+precies die handeling als `voorstel` toelaat, en `magAutomatisch()` -- dat in zijn
+eigen commentaar "de enige plek die daar antwoord op geeft" heet -- op die weg
+nooit wordt aangeroepen. Daarnaast staat `niveau: 'hand'` als kale tekenreeks in
+achttien Command-modules die `risico.js` niet importeren: hernoem de trede en die
+achttien schrijven zwijgend het oude woord.
+
 **Handhaver:** `check.js` regel 26 (elke naam die je uit een module haalt bestaat
 daar), regel 25, regel 27, regel 28 (de publieke-routelijst mag geen namen
-bevatten die niet meer bestaan of die inmiddels een eigen poort hebben), en
-`scripts/kruisscan.js`.
+bevatten die niet meer bestaan of die inmiddels een eigen poort hebben),
+`scripts/kruisscan.js`, en voor het gezagsgeval `scripts/gezag.js` + `GEZAG.json`
+(het aantal schalen en het aantal losse niveaunamen mag alleen omlaag, en een
+vastgelegde tegenspraak wordt bij elke ronde opnieuw nagetrokken).
 
 ### 5. Niets slaat stil over
 
@@ -331,6 +349,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | elke meter een keer zien uitslaan voor hij een oordeel draagt | `test/meterijk.test.js` + `check.js` regel 35 |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
+| hoeveel losse schalen beantwoorden "mag de machine dit zelf" (vijf, en ze kennen elkaar niet) | `GEZAG.json` + `scripts/gezag.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |

@@ -801,6 +801,39 @@ Regel voor dit bestand: vind je een nieuw soort stille fout, dan komt er een
 scanner bij. En een scanner die roept bij dingen die kloppen is erger dan geen
 scanner -- dus liever iets milder dan valse alarmen.
 
+### Het gezag (`npm run gezag`)
+
+Wie mag hier iets zélf doen, en hoeveel? RTG beantwoordt die vraag op **vijf**
+plekken, met vijf verschillende schalen:
+
+| schaal | waar | bestuurt |
+|---|---|---|
+| verboden / voorstel / direct | `kern/stuur/beleid.js` | de AI over HTTP-routes, per rol |
+| hand / assist / auto | `kern/command/risico.js` | handelingen in RTG Command |
+| kijken / voorstellen / klaarzetten / automatisch | `kern/geldbeleid/regels.js` | geldregels van een lid |
+| waarnemen / adviseren / voorbereiden / begrensd / verboden | `kern/stadsweefsel/ainiveau.js` | handelingen van het stadsweefsel |
+| informeren / aanbevelen / voorbereiden / uitvoeren / autonoom | `kern/bureau/delegatie.js` | wat het bureau namens een lid doet |
+
+Elk van de vijf is op zichzelf zorgvuldig gebouwd. Het bezwaar is dat er **geen
+gedeelde noemer** is: geen van de vijf drukt zijn handelingen uit in een
+namespace die een van de andere vier kan lezen, dus geen mens en geen machine
+kan ze naast elkaar leggen. Dat is `LAT.md` regel 4 op de plek waar hij het
+duurst is, en ze zijn dan ook al uiteengelopen — de bekende tegenspraak staat
+met naam in `GEZAG.json`.
+
+```bash
+npm run gezag         # de stand, en de ratel: het aantal mag alleen omlaag
+npm run gezag:lijst   # welke bestanden een trede overschrijven zonder hem op te halen
+npm run gezag:vast    # de stand vastleggen (weigert een verslechtering)
+```
+
+De meter telt twee dingen. **Vocabulaires** (5): losse schalen. **Losse
+niveaunamen** (22): bestanden die `niveau: 'hand'` als kale tekenreeks schrijven
+zonder `risico.js` te importeren — hernoem de trede en die tweeëntwintig blijven
+zwijgend het oude woord schrijven. Beide mogen alleen omlaag. Wat de meter
+níét ziet staat in zijn kop: een zesde schaal met helemaal eigen woorden is hier
+onzichtbaar, net zoals `WETTEN.json` alleen bevat wat iemand heeft opgeschreven.
+
 ### De systeemwetten (`npm run wetten`, `npm run sabotage`, `npm run zekerheid`)
 
 De toetsen en keuringen hierboven vragen allemaal hetzelfde: *zakt er iets?*

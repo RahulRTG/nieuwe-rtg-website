@@ -2356,6 +2356,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "krimpronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/begroting.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "kruisscan.test.js": {
       "soort": "puur",
       "staat": "gezakt",

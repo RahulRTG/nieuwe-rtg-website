@@ -95,6 +95,8 @@
     "envelop": "node scripts/envelop.js",
     "envelop:velden": "node scripts/envelop.js --velden",
     "envelop:vast": "node scripts/envelop.js --vastleggen",
+    "krimp": "node scripts/krimpronde.js",
+    "krimp:vast": "node scripts/krimpronde.js --vastleggen",
     "gezag": "node scripts/gezag.js",
     "gezag:lijst": "node scripts/gezag.js --lijst",
     "gezag:vast": "node scripts/gezag.js --vastleggen",

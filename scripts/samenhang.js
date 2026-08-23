@@ -318,7 +318,34 @@ function tabel() {
         return !!laag && /begroting'\)\.bewaak/.test(staat) && /onaangeroerd/.test(toets);
       },
       kanttekening: 'staat standaard op MELDEN; RTG_BEGROTING=weigeren zet de tand erin, ' +
-        'en dat kan pas als de catalogus van legitieme grote krimpen er is (TAKEN.md 4.62)'
+        'en dat kan pas als de catalogus van legitieme grote krimpen er is (KRIMP.json, TAKEN.md 4.62)'
+    },
+    {
+      /* DE CATALOGUS, EN VOORAL: HET BEWIJS DAT ER GEMETEN IS. De ronde draait
+         de suite met de grens op 1 en telt wat er dan zou zijn geweigerd. Zijn
+         gevaarlijkste uitslag is een LEEG getal dat op een uitslag lijkt -- nul
+         meldingen betekent er kromp niets OF de val stond niet aan. Daarom
+         schrijft de begroting bij haar eerste installatie een levensteken, en
+         weigert de ronde een uitslag te geven als dat teken ontbreekt of op de
+         standaardgrens staat. BEWAAKT betekent hier: die twee bestanden dragen
+         diezelfde regel nog steeds, en er is een toets die dat vastprikt aan de
+         ECHTE regel in plaats van aan een nagetypte. */
+      soort: 'krimpcatalogus (welke grote krimpen zijn legitiem)',
+      bewaker: ['scripts/krimpronde.js', 'test/krimpronde.test.js'],
+      wat: 'de suite draait met de grens op 1; wat er dan zou zijn geweigerd, staat in KRIMP.json',
+      dingen: () => {
+        try { return [JSON.parse(lees('KRIMP.json')).gemeten].map(g =>
+          'gewaakt=' + g.processenGewaakt + ' grens=' + g.gemetenGrens + ' krimpen=' + g.hervullingen); }
+        catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const laag = lees('server/opzet/begroting.js');
+        const ronde = lees('scripts/krimpronde.js');
+        return /'begroting: waakt'/.test(laag) && /begroting: waakt/.test(ronde) &&
+          bestaat('KRIMP.json') && bestaat('test/krimpronde.test.js');
+      },
+      kanttekening: 'de catalogus is een ONDERGRENS: de suite doet wat de toetsen doen en niet wat ' +
+        'gebruikers doen, dus een legitieme grote krimp die geen toets uitlokt staat er niet in'
     },
     {
       /* WIE ER AAN DE ECHTE BRON ZIT, DRAAIT ALLEEN. Een toets die een echt

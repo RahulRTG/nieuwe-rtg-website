@@ -1,79 +1,91 @@
 /* ============================================================================
    DE BEGROTING -- de eerste laag die een handeling kan WEIGEREN.
 
-   WAAROM DIT ER IS. server/opzet/handeling.js meet wat een verzoek heeft
-   veranderd, ACHTERAF. Daarmee is een massamutatie te zien en te melden, maar
-   niet tegen te houden: als de logregel er staat, zijn de rijen al weg.
-   Detecteren is niet tegenhouden. Dit bestand is het verschil.
+   WAAROM DIT ER IS. server/opzet/handeling.js meet ACHTERAF wat een verzoek
+   heeft veranderd: een massamutatie is daarmee te zien en te melden, maar niet
+   tegen te houden -- als de logregel er staat, zijn de rijen al weg. Detecteren
+   is niet tegenhouden, en dit bestand is het verschil.
 
    HOE HET KAN ZONDER HET SCHRIJFPAD TE HERSCHRIJVEN, en dat is de hele vondst.
-   Een echte voorproef -- de handeling eerst tegen een kopie draaien -- kan hier
-   niet: een route stuurt post, roept een betaaldienst aan en schrijft bestanden.
-   Zo'n handler twee keer draaien is gevaarlijker dan wat we ermee zouden
-   voorkomen.
+   Een echte voorproef -- de handeling eerst tegen een kopie draaien -- kan niet:
+   een route stuurt post, roept een betaaldienst aan, schrijft bestanden. Die
+   twee keer draaien is gevaarlijker dan wat het voorkomt.
 
-   Maar een massamutatie ziet er in deze code bijna altijd hetzelfde uit. Geteld
-   op de dag dat dit bestand werd geschreven:
+   Maar een massamutatie ziet er hier bijna altijd hetzelfde uit: `db.data.X`
+   krijgt een filter, een slice of een lege lijst toegewezen. De telling per vorm
+   staat in README.md ("De begroting"), en die is de enige -- hij stond hier ook
+   als tabel en dat zijn twee plekken voor een waarheid (LAT.md regel 4).
 
-       db.data.X = ...filter(...)      30
-       db.data.X = ...slice(...)       82
-       db.data.X = []                 142     -> samen 254
-       db.data.X.splice(...)            3
-       db.data.X.length = 0             0
+   Wat je hier moet weten: het zijn er ongeveer 116, en de EERSTE LEZING ZEI 254.
+   Die was te royaal, want 138 van de 142 `= []` staan achter een
+   `if (!Array.isArray(db.data.X))` -- dat is een collectie AANMAKEN en geen
+   leeghalen, en de val slaat er terecht niet op aan (de oude waarde is dan geen
+   array).
 
-   Vierentwintig van de vijfentwintig keer is een massaverwijdering een
-   HERVULLING van de collectie, en die is te onderscheppen VOORDAT hij landt --
-   met een `set`-val op db.data. Op dat moment is de oude lengte bekend, de
-   nieuwe ook, en is er nog niets gebeurd. Dat is geen simulatie maar iets
-   beters: de echte handeling, tegengehouden op de drempel.
+   Die 116 zijn te onderscheppen VOORDAT ze landen, met een `set`-val op db.data:
+   daar is de oude lengte bekend, de nieuwe ook, en is er nog niets gebeurd. Geen
+   simulatie maar de echte handeling, tegengehouden op de drempel.
+
+   WAT DAT NIET IS: dekking. Deze laag dekt de VORM van een massaverwijdering,
+   niet elke plek waar dit huis rijen kwijtraakt.
 
    WAT ER NIET ONDER VALT, en dat hoort er hard bij: de drie splice-plekken, elke
-   wijziging BINNEN een rij, en alles wat via push groeit. Groei is hier
-   trouwens bewust geen weigering -- een collectie die te hard groeit is een
-   ander probleem (opslag, niet verlies), en er een grens op zetten zou legitiem
-   werk breken zonder dat er iets onherstelbaars tegenover staat.
+   wijziging BINNEN een rij, en alles wat via push groeit. Groei is bewust geen
+   weigering -- te hard groeien is opslag en geen verlies, en er een grens op
+   zetten breekt legitiem werk zonder dat er iets onherstelbaars tegenover staat.
 
-   WAT HET KOST. Een Proxy op db.data raakt elke leesactie. Gemeten op 450
-   sleutels: 251 ms zonder en 294 ms met, over twee miljoen leesacties -- 0,02
-   microseconde per leesactie. Een schrijfactie kost 59 nanoseconde. Op een p50
-   van 13 ms is dat niet te zien.
+   WAT HET KOST. Gemeten op 450 sleutels, twee miljoen leesacties: 251 ms zonder
+   Proxy, 294 ms met -- 0,02 microseconde per lees, 59 nanoseconde per schrijf.
+   Op een p50 van 13 ms is dat niet te zien.
 
    EN DE BELANGRIJKSTE KEUZE: HIJ STAAT STANDAARD OP MELDEN.
 
-   Een weigering die vandaag aangaat over 3706 routes is precies het soort
-   wijziging waarvan je pas in productie merkt wat er stuk ging. Er zijn hier
-   LEGITIEME grote krimpen -- de bewaarveger, het archiveren, de kappen als
-   `slice(0, 60000)` -- en die catalogus bestaat nog niet. Dus meet deze laag
-   eerst wat er WEL zou zijn geweigerd, en dat getal bouwt de catalogus. Met
-   RTG_BEGROTING=weigeren gaat de tand erin.
+   Een weigering die vandaag aangaat over 3706 routes is het soort wijziging
+   waarvan je pas in productie merkt wat er stuk ging. Er zijn LEGITIEME grote
+   krimpen -- de bewaarveger, het archiveren, de kappen als `slice(0, 60000)`.
+   KRIMP.json is de catalogus daarvan, en scripts/krimpronde.js zegt erbij wat
+   hij NIET dekt. Met RTG_BEGROTING=weigeren gaat de tand erin. Meten, ratelen,
+   dan handhaven: het mechanisme staat er, getoetst en bewezen weigerend, met de
+   trekker nog niet overgehaald.
 
-   Dat is geen halfheid maar de volgorde die dit huis overal aanhoudt: meten,
-   ratelen, dan handhaven. Wat er nu al is, is het mechanisme -- getoetst,
-   bewezen weigerend -- met de trekker nog niet overgehaald.
-
-   BUITEN EEN VERZOEK GEBEURT ER NIETS. Een cronjob, de onderhoudsveger, een
-   migratie en het inlezen van de seed hebben geen handelingscontext, en die
-   horen nooit geweigerd te worden: dat zijn geen actoren met een budget maar
-   het huis dat zijn eigen werk doet.
+   BUITEN EEN VERZOEK GEBEURT ER NIETS. Een cronjob, de veger, een migratie en de
+   seed hebben geen handelingscontext en horen nooit geweigerd te worden: dat is
+   geen actor met een budget maar het huis dat zijn eigen werk doet.
    ========================================================================== */
 'use strict';
 
 const handeling = require('./handeling');
 
 /* De grens: hoeveel rijen mag EEN hervulling in EEN verzoek wegnemen. Bewust een
-   getal en geen tabel per actor: die tabel zou verzonnen zijn, en een verzonnen
-   risicoklasse is gevaarlijker dan geen. Welke actoren een eigen grens nodig
-   hebben, moet uit de meting komen. */
+   getal en geen tabel per actor: zo'n tabel zou verzonnen zijn, en een verzonnen
+   risicoklasse is gevaarlijker dan geen. Welke actor een eigen grens nodig
+   heeft, moet uit de meting komen. */
+const STANDAARDGRENS = 1000;
 const KRIMPGRENS = (() => {
   const n = Number(process.env.RTG_BEGROTING_KRIMP);
-  return Number.isFinite(n) && n > 0 ? n : 1000;
+  return Number.isFinite(n) && n > 0 ? n : STANDAARDGRENS;
 })();
 
 const MODUS = process.env.RTG_BEGROTING === 'weigeren' ? 'weigeren' : 'melden';
 
-/* Wat er is tegengehouden of zou zijn tegengehouden, sinds het opstarten. Dit is
-   het getal dat de catalogus bouwt: zolang hier legitieme handelingen in staan,
-   kan de tand er niet in. */
+/* HET LEVENSTEKEN -- de regel die bewijst DAT deze val aanstond. Zonder hem
+   betekent "nul meldingen" twee onvergelijkbare dingen: er kromp niets, of de
+   val stond niet aan. scripts/krimpronde.js zocht dat verschil eerst in het
+   woord "begroting:" en trapte in twee toetsnamen; het verhaal staat in zijn
+   kop (LAT.md regel 3). Een verlaagde grens of de weigerstand krijgt warn (dus
+   stderr); de gewone stand DEBUG en geen info, want info gaat naar stdout en
+   daar zet scripts/routekaart.js zijn JSON neer -- dat brak npm run norm meteen.
+   Een keer per proces: redis.js vervangt db.data bij elke externe wijziging. */
+let gewaakt = false;
+function levensteken(meld, modus, grens) {
+  if (gewaakt) return;
+  gewaakt = true;
+  meld(modus === 'melden' && grens === STANDAARDGRENS ? 'debug' : 'warn',
+    'begroting: waakt', { modus, grens });
+}
+
+/* Wat er is tegengehouden of zou zijn, sinds het opstarten. Dit getal bouwt de
+   catalogus: zolang er legitieme handelingen in staan, kan de tand er niet in. */
 const teller = { gezien: 0, overschreden: 0, geweigerd: 0, laatste: [] };
 
 function onthoud(rij) {
@@ -81,9 +93,9 @@ function onthoud(rij) {
   if (teller.laatste.length > 25) teller.laatste.length = 25;
 }
 
-/* De fout die een geweigerde handeling oplevert. Een eigen klasse zodat een
-   route hem kan herkennen en er een net antwoord van kan maken in plaats van een
-   500 -- en zodat hij in een log niet op een programmeerfout lijkt. */
+/* De fout van een geweigerde handeling. Een eigen klasse zodat een route hem
+   herkent en er een net antwoord van maakt in plaats van een 500, en zodat hij
+   in een log niet op een programmeerfout lijkt. */
 class BegrotingOverschreden extends Error {
   constructor(collectie, krimp, grens) {
     super('[begroting] deze handeling neemt ' + krimp + ' rijen weg uit "' + collectie +
@@ -96,9 +108,8 @@ class BegrotingOverschreden extends Error {
   }
 }
 
-/* De beoordeling, los van de Proxy zodat een toets hem kan voeden zonder een
-   database op te tuigen -- en zodat het oordeel dat op het scherm komt hetzelfde
-   is als wat een toets ijkt (LAT.md regel 10). */
+/* De beoordeling, los van de Proxy: zo kan een toets hem voeden zonder database,
+   en is wat een toets ijkt hetzelfde als wat er echt gebeurt (LAT.md regel 10). */
 function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
   const o = opties || {};
   const grens = Number.isFinite(o.grens) ? o.grens : KRIMPGRENS;
@@ -114,8 +125,8 @@ function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
   return { oordeel: 'meld', krimp, grens, rij };
 }
 
-/* Dezelfde Proxy voor dezelfde onderliggende data, zodat `db.data === db.data`
-   blijft kloppen en niemand twee verschillende wikkels om een ding krijgt. */
+/* Dezelfde Proxy voor dezelfde data, zodat `db.data === db.data` blijft kloppen
+   en niemand twee wikkels om een ding krijgt. */
 const wikkels = new WeakMap();
 
 function bewaak(data, deps) {
@@ -128,20 +139,21 @@ function bewaak(data, deps) {
   /* DE MODUS IS HIER OVERSCHRIJFBAAR, en dat is geen testluik maar een eis. Las
      deze wikkel alleen de module-constante, dan was de WEIGERSTAND niet te
      beproeven zonder de hele suite met een omgevingsvlag te draaien -- en een
-     poort die je niet in zijn handhavende stand kunt zien werken, is een poort
-     waarvan niemand weet of hij dichtgaat (LAT.md regel 10). */
+     poort die je niet dicht hebt zien gaan, is een poort waarvan niemand weet of
+     hij dichtgaat (LAT.md regel 10). */
   const modus = (deps && deps.modus) || MODUS;
   const grens = (deps && Number.isFinite(deps.grens)) ? deps.grens : KRIMPGRENS;
+  levensteken(meld, modus, grens);
 
   const wikkel = new Proxy(data, {
     set(doel, sleutel, waarde) {
       const oud = doel[sleutel];
-      /* Alleen een collectie die door een ANDERE collectie wordt vervangen is
-         hier interessant. Al het andere (een teller, een object, een nieuwe
-         sleutel) gaat er ongemoeid door. */
+      /* Alleen een collectie die door een ANDERE collectie wordt vervangen telt
+         hier. Al het andere -- een teller, een object, een nieuwe sleutel --
+         gaat ongemoeid door. */
       if (!Array.isArray(oud) || !Array.isArray(waarde)) { doel[sleutel] = waarde; return true; }
-      /* Buiten een verzoek: het huis doet zijn eigen werk (veger, migratie,
-         seed). Daar hoort geen budget op te staan. */
+      /* Buiten een verzoek doet het huis zijn eigen werk (veger, migratie,
+         seed); daar hoort geen budget op. */
       const h = nu.huidige();
       if (!h) { doel[sleutel] = waarde; return true; }
 
@@ -154,8 +166,8 @@ function bewaak(data, deps) {
           id: h.correlatie, p: h.pad, collectie: String(sleutel), rijen: uit.krimp, grens: uit.grens });
         throw new BegrotingOverschreden(String(sleutel), uit.krimp, uit.grens);
       }
-      /* MELDEN: hij gaat door, maar niet stil. Dit is het getal dat de catalogus
-         bouwt van wat er legitiem groot is (LAT.md regel 5). */
+      /* MELDEN: hij gaat door, maar niet stil -- dit getal bouwt de catalogus
+         van wat er legitiem groot is (LAT.md regel 5). */
       meld('warn', 'begroting: zou zijn geweigerd', {
         id: h.correlatie, p: h.pad, collectie: String(sleutel), rijen: uit.krimp, grens: uit.grens });
       doel[sleutel] = waarde;
@@ -168,9 +180,9 @@ function bewaak(data, deps) {
 }
 
 function stand() {
-  return { modus: MODUS, grens: KRIMPGRENS,
+  return { modus: MODUS, grens: KRIMPGRENS, waakt: gewaakt,
     gezien: teller.gezien, overschreden: teller.overschreden, geweigerd: teller.geweigerd,
     laatste: teller.laatste.slice(0, 10) };
 }
 
-module.exports = { bewaak, beoordeel, stand, BegrotingOverschreden, KRIMPGRENS, MODUS };
+module.exports = { bewaak, beoordeel, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };

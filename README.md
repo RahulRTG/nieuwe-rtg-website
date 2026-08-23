@@ -937,14 +937,16 @@ altijd hetzelfde uit:
 
 | idiom | plekken |
 |---|---|
-| `db.data.X = []` | 142 |
+| `db.data.X = []` | 142 — waarvan **138 een initialisatie** |
 | `db.data.X = …slice(…)` | 82 |
 | `db.data.X = …filter(…)` | 30 |
 | `db.data.X.splice(…)` | 3 |
 | `db.data.X.length = 0` | 0 |
 
-**254 van de 257** zijn een *hervulling*, en die is te onderscheppen vóórdat hij
-landt — met een `set`-val op `db.data` (de accessor staat in
+Ongeveer **116** daarvan zijn een echte *hervulling* die rijen wegneemt; de 138
+`= []` achter `if (!Array.isArray(…))` maken een collectie aan en halen niets
+leeg (de val slaat daar terecht niet op aan). Die 116 zijn te onderscheppen
+vóórdat ze landen — met een `set`-val op `db.data` (de accessor staat in
 `server/db/state.js`, het enige punt waar alle elf toekenningen doorheen gaan).
 Op dat moment zijn de oude en de nieuwe lengte allebei bekend en is er nog niets
 gebeurd. Geen simulatie, maar de echte handeling tegengehouden op de drempel.
@@ -956,10 +958,38 @@ RTG_BEGROTING_KRIMP=1000   hoeveel rijen één hervulling mag wegnemen
 
 **Hij staat standaard op melden, en dat is een besluit.** Weigeren aanzetten over
 3706 routes is precies het soort wijziging waarvan je pas in productie merkt wat
-er stuk ging: er zijn legitieme grote krimpen (de bewaarveger, archivering) en
-die catalogus bestaat nog niet. In meldmodus schrijft hij
-`begroting: zou zijn geweigerd` met collectie, aantal en correlatie-id — en dat
-log *is* de catalogus. Meten, ratelen, dan handhaven.
+er stuk ging: er zijn legitieme grote krimpen (de bewaarveger, archivering). In
+meldmodus schrijft hij `begroting: zou zijn geweigerd` met collectie, aantal en
+correlatie-id — en dat log *is* de catalogus. Meten, ratelen, dan handhaven.
+
+#### De krimpronde (`npm run krimp`, `KRIMP.json`)
+
+`scripts/krimpronde.js` draait de hele suite met `RTG_BEGROTING_KRIMP=1` en zet
+bij elkaar wat er dan zou zijn geweigerd. Eerste ronde: **707 processen met de
+val aan, allemaal op grens 1, en nul hervullingen erboven.**
+
+Dat is een uitslag en geen groen licht, en `KRIMP.json` zegt er zelf drie dingen
+bij. **(1)** De catalogus is een *ondergrens*: de suite doet wat de toetsen doen,
+niet wat gebruikers doen. **(2)** Een grens van 1 laat één rij *door*, en dat is
+de vorm van bijna elke verwijdering hier (`db.data.X = X.filter(r => r.id !== id)`);
+een gerichte proef op 0,5 over `vergeten`, `media` en `techniek-sso-scim` gaf óók
+nul, dus op die paden ziet de val helemaal geen hervulling. **(3)** Geen enkele
+toets ziet een *echte route* de val laten aanslaan — de dertien in
+`test/begroting.test.js` voeden de laag rechtstreeks. De laag is dus bewezen
+wéigerend, niet bewezen bereikbaar; dat staat als eerstvolgende stap in TAKEN.md
+4.62.
+
+**En de ronde viel eerst zelf in de val die hij moest afdekken.** Om "er kromp
+niets" te onderscheiden van "de val stond niet aan" zocht hij het woord
+`begroting:` in het log — en matchte op twee *toetsnamen* over een
+projectbegroting. Hij zou dus "de begroting was aan het woord" hebben gemeld over
+een ronde waarin de module geen letter schreef: de gevaarlijkste uitslag die hij
+kan geven, want die leest als geruststelling (LAT-regel 3). Gerepareerd bij de
+oorzaak, niet in de zeef: de wikkel schrijft nu bij zijn eerste installatie zelf
+`begroting: waakt` mét de grens erin, en de ronde weigert een uitslag als dat
+teken ontbreekt of op de standaardgrens staat. `test/krimpronde.test.js` prikt
+dat vast aan de échte regel die de begroting schrijft — zes mutaties, alle zes
+raak.
 
 **Buiten een verzoek gebeurt er niets.** Een cronjob, de onderhoudsveger, een
 migratie en het inlezen van de seed hebben geen handelingscontext; dat is het

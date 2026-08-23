@@ -31,6 +31,11 @@ module.exports = (kern) => {
      niet hier: de polslaag toont dezelfde wachttijd aan een gast, en die kan
      niet bij een functie die in een leveranciersroute wordt gemaakt. */
   const { bereidingsMinuten } = require('../../../kern/horeca/keukenlaag');
+  /* De cadans rekent TERUG vanaf het serveermoment; het bord hieronder rekent
+     vooruit vanaf de vrijgave. Allebei nodig, en allebei op dezelfde regels:
+     `loopt`/`norm` zeggen wat er al mis is, `startOm`/`baan` zeggen wat er nu
+     moet gebeuren. Zie kern/horeca/cadans.js en HORECA.md. */
+  const cadanslaag = require('../../../kern/horeca/cadans');
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
 
   /* Een regel zoals de keuken hem ziet. `loopt` telt vanaf de vrijgave door de
@@ -73,12 +78,28 @@ module.exports = (kern) => {
     }
     /* Volgorde: de gewenste serveertijd eerst (die is een afspraak met de gast),
        daarna wie het langst loopt. Bewust NIET op wie het duurst is. */
-    rijen.sort((a, b) => String(a.serveerOm || '~').localeCompare(String(b.serveerOm || '~')) || b.loopt - a.loopt);
+    /* De cadans erbij, per regel. Additief: geen bestaand veld verandert, dus
+       een scherm dat hem nog niet kent, blijft precies werken zoals het deed. */
+    const cadans = new Map(cadanslaag.cadansVanZaak(h).map(r => [r.regelId, r]));
+    for (const r of rijen) {
+      const c = cadans.get(r.regelId);
+      if (!c) continue;
+      r.baan = c.baan; r.startOm = c.startOm; r.startOver = c.startOver;
+      r.doelOm = c.doelOm; r.doelOver = c.doelOver; r.passOm = c.passOm;
+      r.gangCompleet = c.gangCompleet; r.samenMet = c.samenMet; r.cadans = c.rekensom;
+    }
+    /* Volgorde: wat het eerst AAN moet, staat bovenaan. Waar geen cadans is
+       (een regel zonder vrijgave haalt het bord niet, maar wees voorzichtig),
+       valt hij terug op de oude volgorde: afgesproken serveertijd, dan wie het
+       langst loopt. Bewust NIET op wie het duurst is. */
+    rijen.sort((a, b) =>
+      (a.startOm && b.startOm ? Date.parse(a.startOm) - Date.parse(b.startOm) : 0) ||
+      String(a.serveerOm || '~').localeCompare(String(b.serveerOm || '~')) || b.loopt - a.loopt);
     const stations = {};
     for (const r of rijen) stations[r.station] = (stations[r.station] || 0) + 1;
     res.json({ ok: true, station: station || 'alle', aantal: rijen.length, bonnen: rijen.slice(0, 200),
       perStation: stations, teLaat: rijen.filter(r => r.urgentie === 'te laat').length,
-      standen: REGELSTANDEN });
+      banen: cadanslaag.banen(rijen), standen: REGELSTANDEN });
   });
 
   /* ---------- een regel doorzetten ---------- */

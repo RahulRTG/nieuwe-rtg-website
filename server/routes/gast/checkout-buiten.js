@@ -1,6 +1,7 @@
 /* De serverbevestigde controlesheet voor bezorgen en afhalen. Zuiver: opent
    geen rekening, reserveert geen slot en gelooft geen prijs uit de browser. */
 'use strict';
+const product = require('../../kern/eten/product');
 
 module.exports = ({ kern, horeca, bezorglaag, beleid, schoon }) => function checkoutVan(s, b, kanaal) {
   const magBestellen = beleid.magBestellen(s.code, kanaal);
@@ -16,9 +17,14 @@ module.exports = ({ kern, horeca, bezorglaag, beleid, schoon }) => function chec
       item: item ? item.naam : String(wens.itemId || '') };
     const aantal = Math.max(1, Math.min(99, parseInt(wens.aantal, 10) || 1));
     const happy = horeca.happyKorting(s.code, item.cat || null, horeca.nu());
-    const centen = happy ? Math.round(item.centen * (100 - happy.procent) / 100) : item.centen;
+    const cfg = product.configuratie(item, wens.keuzes);
+    if (cfg.error) return cfg;
+    const basisCenten = item.centen + cfg.meerprijsCenten;
+    const centen = happy ? Math.round(basisCenten * (100 - happy.procent) / 100) : basisCenten;
     regels.push({ itemId: item.id, naam: item.naam, aantal, centen,
-      totaalCenten: centen * aantal, happy: happy ? happy.naam + ' -' + happy.procent + '%' : null });
+      totaalCenten: centen * aantal, basisCenten, opties:cfg.keuzes,
+      allergenen:[...(item.allergenen || []), ...cfg.allergenen].filter((x, i, a) => a.indexOf(x) === i),
+      happy: happy ? happy.naam + ' -' + happy.procent + '%' : null });
   }
   const subtotaalCenten = regels.reduce((t, r) => t + r.totaalCenten, 0);
   const sloten = bezorglaag.slotenVan(s.code, schoon(b.datum, 10));
@@ -45,12 +51,25 @@ module.exports = ({ kern, horeca, bezorglaag, beleid, schoon }) => function chec
       bevestigbaar = false; blokkade = 'Vul het bezorgadres in voordat je bevestigt.'; blokkadeCode = 'adres';
     }
   }
+  const kortingscode = String(schoon(b.kortingscode, 30) || '').toUpperCase() || null;
+  const korting = kortingscode && (s.kortingscodes || []).find(k => String(k.code || '').toUpperCase() === kortingscode && k.actief !== false);
+  if (kortingscode && !korting) { bevestigbaar = false; blokkade = 'Deze kortingscode is niet geldig.'; blokkadeCode = 'kortingscode'; }
+  const kortingCenten = korting ? Math.min(subtotaalCenten,
+    korting.procent ? Math.round(subtotaalCenten * Math.max(0, Math.min(100, Number(korting.procent))) / 100)
+      : Math.max(0, Number(korting.centen) || 0)) : 0;
+  const fooiCenten = Math.max(0, Math.min(50000, parseInt(b.fooiCenten, 10) || 0));
+  const prijsversie = product.prijsversie(regels);
+  const genoemdeAllergie = schoon(b.allergie, 120).toLowerCase();
+  const waarschuwingen = genoemdeAllergie ? regels.filter(r => (r.allergenen || []).some(a => genoemdeAllergie.includes(String(a).toLowerCase())))
+    .map(r => r.naam + ' vermeldt: ' + r.allergenen.join(', ')) : [];
   return { ok: true, zaak: { code: s.code, naam: s.name }, kanaal,
-    regels, subtotaalCenten, bezorgkostenCenten, totaalCenten: subtotaalCenten + bezorgkostenCenten,
+    regels, prijsversie, subtotaalCenten, bezorgkostenCenten, kortingCenten, fooiCenten,
+    totaalCenten: subtotaalCenten + bezorgkostenCenten - kortingCenten + fooiCenten,
     bevestigbaar, blokkade, blokkadeCode, datum: sloten.datum, sloten: vrijeSloten, tijd: gevraagdTijdstip,
     bezorg: check ? { bezorgbaar: !!check.bezorgbaar, zone: check.zone || null,
       minuten: check.zone ? check.zone.minuten : null, minimumCenten: check.minimumCenten || 0,
       tekortCenten: check.tekort || 0, gratisBezorging: !!check.gratisBezorging } : null,
+    kortingscode, waarschuwingen,
     bevestiging: beleid.bevestigingNodig(s.code, { allergie: schoon(b.allergie, 120), totaalCenten: subtotaalCenten }),
     betaling: { status: 'openstaand', wijze: 'bij-ontvangst',
       label: kanaal === 'bezorging' ? 'Betaling volgt bij ontvangst' : 'Betaling volgt bij afhalen',

@@ -56,6 +56,15 @@ test('er is geen weg die uitvoert zonder bevestiging', () => {
     'en bevestig is de enige die iets in een domein verandert');
 });
 
+test('iedere echte beleidskeuze krijgt een begrijpelijke regel in het log', () => {
+  const { c } = opzet();
+  c.logBeleid('k', { knop: 'bereik', aan: false });
+  c.logBeleid('k', { horizon: 30 });
+  assert.match(c.log('k')[1].wat, /schakelaar "bereik" uit/);
+  assert.match(c.log('k')[0].wat, /horizon 30 dagen/);
+  assert.doesNotMatch(c.log('k').map(x => x.wat).join(' '), /geen wijziging/);
+});
+
 /* DE MUTATIE: laat bevestig() de keuze niet toetsen tegen v.keuzes, of vul een
    standaardkeuze in als er geen is meegegeven. Dan is klaarzetten stiekem
    uitvoeren geworden. */

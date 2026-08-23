@@ -259,7 +259,7 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
 .private-room p{min-height:3.8em;color:rgba(239,235,225,.5);font-size:.7rem;line-height:1.6;}
 .private-room-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.08);color:#c9b57f;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;}
 .private-support{box-sizing:border-box;display:flex;align-items:center;gap:1.2rem;width:min(1440px,100%);margin:0 auto;padding:1.5rem 2rem 5rem;border-right:1px solid rgba(255,255,255,.09);border-left:1px solid rgba(255,255,255,.09);}
-.private-support>span{margin-right:auto;color:rgba(239,235,225,.36);font-size:.59rem;letter-spacing:.13em;text-transform:uppercase;}
+.private-support>span{margin-right:auto;color:#888680;font-size:.59rem;letter-spacing:.13em;text-transform:uppercase;}
 .private-support a{min-height:44px;display:flex;align-items:center;color:rgba(239,235,225,.65);font-size:.68rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.14);}
 
 @media(max-width:900px){
@@ -371,7 +371,7 @@ body.rtg-social-messages .gsp:hover{background:rgba(255,255,255,.035);}
 body.rtg-social-messages .gsp[aria-current="true"]{box-shadow:inset 2px 0 #cdb879;background:rgba(205,184,121,.105);}
 body.rtg-social-messages .gsp .rond{border-radius:0;border-color:rgba(205,184,121,.25);background:#2d2d27;color:#dfca91;}
 body.rtg-social-messages .gsp .stip{border-color:#20211e;}
-body.rtg-social-messages .gsp .mid span,body.rtg-social-messages .gsp time{color:rgba(234,228,216,.42);}
+body.rtg-social-messages .gsp .mid span,body.rtg-social-messages .gsp time{color:#939088;}
 body.rtg-social-messages .draad{position:relative;background:#eee8dc!important;}
 body.rtg-social-messages .draad::before{content:"PRIVATE CORRESPONDENCE";position:absolute;z-index:0;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(63,54,36,.075);font:500 clamp(1.2rem,2.3vw,2.2rem)/1 "Bodoni Moda",Georgia,serif;letter-spacing:.16em;white-space:nowrap;pointer-events:none;}
 body.rtg-social-messages[data-pane="lijst"] .draad::before{top:47%;color:rgba(63,54,36,.15);}

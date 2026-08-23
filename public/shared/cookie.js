@@ -43,10 +43,10 @@
        elk thema (rtg-themas.css regel 15), light voor champagne, en licht als
        standaard op een pagina zonder thema -- wat die pagina's ook zijn.
        Gemeten: 6,51:1 licht en 8,97:1 donker. */
-    '#rtg-cookie span{color:light-dark(#5C5952,#B4AFA6);}' +
+    '#rtg-cookie span{color:var(--rtg-cookie-zacht);}' +
     /* de twee klikbare woorden dragen alleen een onderlijn, geen vlak */
     '#rtg-cookie a,#rtg-cookie button{background:none;border:0;padding:0;margin:0;cursor:pointer;' +
-      'font:inherit;color:light-dark(#3A3733,#EDE9E1);text-decoration:none;' +
+      'font:inherit;color:var(--rtg-cookie-inkt);text-decoration:none;' +
       'border-bottom:1px solid rgba(244,240,233,0.28);}' +
     '#rtg-cookie a:hover,#rtg-cookie button:hover,' +
     '#rtg-cookie a:focus-visible,#rtg-cookie button:focus-visible{color:var(--gold-tekst,#C0A544);' +
@@ -105,10 +105,62 @@
     geefRuimteTerug();
   });
   el.appendChild(p); el.appendChild(a); el.appendChild(knop);
+  /* DE GROND METEN IN PLAATS VAN HEM AANNEMEN. Deze melding draagt
+     background:none en erft dus de paginagrond, en die is niet te voorspellen:
+     eerst stond hier een vaste lichte inkt (1,03:1 op een licht thema), daarna de
+     huistokens (die op /site/404.html en de juridische pagina's niet bestaan) en
+     daarna light-dark() -- en toen bleek er een derde soort pagina te zijn, die
+     thema onyx draagt en toch een lichte grond schildert: salon, sociaal,
+     berichten, comm en de drie juridische stukken. Elke AANNAME over de grond
+     klopte ergens niet.
+     Dus wordt hij gemeten, precies zoals shared/rahul-tab/inkt.js dat doet: klim
+     op tot het eerste vlak dat echt iets schildert, reken zijn helderheid uit en
+     kies daarop. Geen drempel maar een vergelijking; wat er ook onder komt, de
+     melding blijft leesbaar. */
+  function helderheid(rgb) {
+    var k = rgb.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * k[0] + 0.7152 * k[1] + 0.0722 * k[2];
+  }
+  function grondOnder(node) {
+    for (var n = node; n && n.nodeType === 1; n = n.parentElement) {
+      var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/.exec(getComputedStyle(n).backgroundColor || '');
+      if (m && (m[4] === undefined || parseFloat(m[4]) > 0.5)) return [+m[1], +m[2], +m[3]];
+    }
+    return null;
+  }
+  /* EN ALS ER NIETS GESCHILDERD IS, VRAAGT HIJ HET AAN DE BUURTEKST. Veel
+     schermen laten hun body doorzichtig en schilderen pas een laag dieper; dan
+     levert de klim niets op. Wit aannemen was daar fout (hotels.html kreeg zo een
+     donkere inkt op een zwart scherm). De inkt van de pagina zelf weet het wel:
+     lichte tekst betekent een donkere grond. Dezelfde afleiding als in
+     shared/rahul-tab/inkt.js. */
+  function grondIsDonker() {
+    var g = grondOnder(el.parentElement || document.body);
+    if (g) return helderheid(g) < 0.35;
+    var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(document.body).color || '');
+    return m ? helderheid([+m[1], +m[2], +m[3]]) > 0.5 : false;
+  }
+  function kiesInkt() {
+    var donker = grondIsDonker();
+    el.style.setProperty('--rtg-cookie-zacht', donker ? '#B4AFA6' : '#5C5952');
+    el.style.setProperty('--rtg-cookie-inkt',  donker ? '#EDE9E1' : '#3A3733');
+  }
   var plaats = function () {
     document.body.appendChild(el);
+    kiesInkt();
     meetRuimte();
-    if (window.requestAnimationFrame) window.requestAnimationFrame(meetRuimte);
+    if (window.requestAnimationFrame) window.requestAnimationFrame(function () { kiesInkt(); meetRuimte(); });
+    /* EN HIJ BLIJFT KIJKEN. De grond staat niet altijd al vast als deze melding
+       verschijnt: de juridische pagina's krijgen hun `data-rtg-eigenvlak` van een
+       script, en tot dat moment dragen ze nog de donkere themagrond. Wie een keer
+       meet, meet daar het verkeerde moment -- de melding koos dan de lichte inkt
+       voor een grond die een tel later wit werd. Een waarnemer op de attributen
+       van html en body is genoeg: elke themawissel loopt daarlangs. */
+    if (window.MutationObserver) {
+      var kijker = new MutationObserver(kiesInkt);
+      kijker.observe(document.documentElement, { attributes: true, attributeFilter: ['data-rtg-thema', 'class', 'style'] });
+      kijker.observe(document.body, { attributes: true, attributeFilter: ['data-rtg-eigenvlak', 'data-rtg-vlak', 'class', 'style'] });
+    }
     window.addEventListener('resize', meetRuimte);
   };
   if (document.body) plaats(); else document.addEventListener('DOMContentLoaded', plaats);

@@ -51,7 +51,11 @@
   .pda-tafelkop{font-family:'Bodoni Moda',serif;font-weight:500;font-size:22px;margin-top:.8rem;}
   .pda-veldlabel{display:flex;flex-direction:column;gap:.2rem;font-size:13px;color:var(--pda-stil);flex:1 1 7rem;}
   .pda-veldlabel select{min-height:44px;}
-  #tAllergie,#tStoelNaam,#pNieuwTafel,#pNieuwGasten{min-height:44px;}
+  #tAllergie,#tStoelNaam,#pNieuwTafel,#pNieuwGasten,#lTafel,#lGasten,#lStoel,#lAllergie{min-height:44px;}
+  /* DE EDGE-STROOK IS OPZETTELIJK LUID, net als bij de kassa: een bestelling die
+     nog niet bij de server is, is werk dat nergens staat. */
+  #pEdgeStrook{margin-top:.5rem;padding:.55rem .7rem;border:1px solid var(--pda-accent);
+               border-radius:10px;background:rgba(194,58,94,.12);font-size:14px;line-height:1.5;}
   .pda-cat{margin-top:.8rem;font:600 13px Inter,system-ui;letter-spacing:.1em;
            text-transform:uppercase;color:var(--pda-stil);}
   .pda-items{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem;}
@@ -86,7 +90,9 @@
   <div class="pda-acties" style="margin-top:.4rem;">
     <button class="knop p" id="pNieuw" type="button">Tafel openen</button>
     <button class="knop" id="pTafels" type="button">Open tafels</button>
+    <button class="knop" id="pLokaal" type="button">Opnemen zonder lijn</button>
   </div>
+  <div id="pEdgeStrook" hidden></div>
 
   <section class="pda-groep" aria-labelledby="pNuKop">
     <h2 id="pNuKop">Nu &mdash; over de grens</h2>
@@ -104,6 +110,49 @@
   </section>
 
   <p class="pda-voet" id="pUitleg"></p>
+</section>
+
+<!-- OPNEMEN ZONDER LIJN. Een eigen venster en geen stand van het tafelvenster:
+     dat bewerkt een rekening die op de server staat, dit bouwt een pakket dat er
+     nog heen moet. Een tik die soms wel en soms niet een server raakt, is
+     precies het soort scherm waar een bediening niet meer op durft te
+     vertrouwen. -->
+<section id="pLokaalVenster" hidden>
+  <div class="pda-modi">
+    <button class="knop" id="lTerug" type="button">&#8592; Werklijst</button>
+  </div>
+  <h2 class="pda-tafelkop">Opnemen zonder lijn</h2>
+  <p class="pda-som">De kaart komt van dit toestel en kan verouderd zijn. De
+  bestelling gaat weg zodra er verbinding is, en blijft dan op de rekening staan
+  tot de zaal hem vrijgeeft &mdash; er wordt niets automatisch doorgestuurd en
+  niets betaald.</p>
+
+  <div class="rij" style="margin-top:.5rem;gap:.4rem;">
+    <input class="veld h-flex1" id="lTafel" maxlength="30" placeholder="Tafel of plek" aria-label="Tafel of plek">
+    <input class="veld" id="lGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten" style="flex:0 1 5rem;">
+  </div>
+  <div class="rij" style="gap:.4rem;flex-wrap:wrap;margin-top:.4rem;">
+    <label class="pda-veldlabel">Gang
+      <select class="veld" id="lGang" aria-label="Voor welke gang">
+        <option value="0">geen gang</option><option value="1" selected>1</option>
+        <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+      </select></label>
+    <label class="pda-veldlabel">Voor wie
+      <input class="veld" id="lStoel" maxlength="40" placeholder="stoel of naam" aria-label="Voor wie is deze bestelling"></label>
+  </div>
+  <input class="veld" id="lAllergie" maxlength="120" placeholder="Allergie van deze gast (gaat ongefilterd naar de keuken)" aria-label="Allergie" style="margin-top:.4rem;width:100%;">
+
+  <div class="pda-groep">
+    <h2>Opgenomen</h2>
+    <div id="lLijst"></div>
+    <p class="pda-som" id="lTotaal"></p>
+    <div class="pda-acties"><button class="knop p" id="lOpnemen" type="button">Bestelling opnemen</button></div>
+  </div>
+
+  <div class="pda-groep">
+    <h2>Van de kaart</h2>
+    <div id="lKaart"></div>
+  </div>
 </section>
 
 <!-- DE TAFEL. Ontvangen, opnemen, gangen sturen en afrekenen -- de drie
@@ -159,6 +208,10 @@
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
+<script src="/shared/id.js"></script>
+<script src="/shared/wachtrij.js"></script>
+<script src="/apps/horeca/edge.js"></script>
+<script src="/apps/horeca/pda-lokaal.js"></script>
 <script src="/apps/horeca/pda-taak.js"></script>
 <script src="/apps/horeca/pda-wijk.js"></script>
 <script src="/apps/horeca/pda-tafel.js"></script>

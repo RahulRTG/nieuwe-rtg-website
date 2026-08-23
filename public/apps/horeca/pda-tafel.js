@@ -35,6 +35,13 @@
   var K = window.RTGHoreca;
   var esc = K.esc, euro = K.euro, api = K.api, meld = K.meld;
   var REK = null, KAART = null, KLAAR = function () {};
+  /* DE KAART WORDT BEWAARD OP HET TOESTEL. Zonder lijn is er geen kaart, en
+     zonder kaart kan er niets worden opgenomen -- dan is de offline-rij een
+     vangnet onder een trapeze die er niet is. Hij wordt ververst zodra er wel
+     een lijn is; wat er staat is dus hoogstens de kaart van vanochtend, en dat
+     is oneindig veel beter dan niets. */
+  var KAARTSLEUTEL = 'rtg_pda_kaart';
+  try { KAART = JSON.parse(localStorage.getItem(KAARTSLEUTEL) || 'null'); } catch (e) {}
 
   function $(id) { return document.getElementById(id); }
 
@@ -178,15 +185,24 @@
   }
 
   window.RTGPdaTafel = {
+    // de bewaarde kaart, voor het opnemen zonder lijn (pda-lokaal.js)
+    kaart: function () { return KAART; },
     /* `klaar` roept de werklijst terug: een betaalde tafel hoort niet als lege
        schil te blijven staan. */
     toon: function (rekeningId, klaar) {
       REK = { id: rekeningId };
       KLAAR = klaar || function () {};
       if (!window.RTGPdaTafel._gebonden) { window.RTGPdaTafel._gebonden = true; bind(); }
-      var eerst = KAART ? Promise.resolve() : api('/kaart', {}).then(function (r) {
-        KAART = r.body.groepen || []; tekenKaart();
-      });
+      /* Altijd proberen te verversen, ook als er al een kaart in het geheugen
+         staat: een gerecht dat vanmiddag van de kaart ging, hoort vanavond niet
+         meer aan te slaan. Lukt het niet, dan blijft de bewaarde kaart staan. */
+      var eerst = api('/kaart', {}).then(function (r) {
+        if (r.body.groepen) {
+          KAART = r.body.groepen;
+          try { localStorage.setItem(KAARTSLEUTEL, JSON.stringify(KAART)); } catch (e) {}
+        }
+        tekenKaart();
+      }, function () { tekenKaart(); });
       return eerst.then(haal);
     },
     ververs: function () { if (REK) return haal(); }

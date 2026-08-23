@@ -132,10 +132,39 @@
   }
   function terug() {
     $('pTafel').hidden = true;
+    $('pLokaalVenster').hidden = true;
     $('pLijst').hidden = false;
     haal();
   }
   $('tTerug').addEventListener('click', terug);
+  $('lTerug').addEventListener('click', terug);
+
+  /* OPNEMEN ZONDER LIJN. Bereikbaar met of zonder verbinding, want een
+     bediening kan niet eerst uitzoeken of het netwerk het doet -- zie
+     apps/horeca/edge.js voor waarom juist het OPNEMEN het enige is dat offline
+     moet werken. */
+  $('pLokaal').addEventListener('click', function () {
+    $('pLijst').hidden = true;
+    $('pTafel').hidden = true;
+    $('pLokaalVenster').hidden = false;
+    window.RTGPdaLokaal.toon(terug);
+  });
+
+  /* De strook die zegt hoeveel bestellingen er op dit toestel staan. Zonder die
+     strook is een wachtrij een geheim, en dan gaat iemand ervan uit dat het
+     verstuurd is. */
+  function toonEdge(stand) {
+    var el = $('pEdgeStrook');
+    if (!el) return;
+    if (!stand.wacht && !stand.vast && !stand.vreemd) { el.hidden = true; el.textContent = ''; return; }
+    el.hidden = false;
+    var t = [];
+    if (stand.wacht) t.push(stand.wacht + ' bestelling(en) staan op dit toestel en gaan weg zodra er verbinding is.');
+    if (stand.vast) t.push(stand.vast + ' vastgelopen; de server wilde ze niet.');
+    if (stand.vreemd) t.push(stand.vreemd + ' hoort bij ' + stand.vreemdeZaak + '; log daar in om ze te versturen.');
+    el.textContent = t.join(' ');
+  }
+  if (window.RTGHorecaEdge) RTGHorecaEdge.zet(K.token, toonEdge);
 
   /* ONTVANGEN. Een tafel openen is de eerste handeling van de avond en stond
      alleen op het zaalscherm -- dus liep de bediening met een telefoon in de

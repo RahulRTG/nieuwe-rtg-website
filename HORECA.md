@@ -461,11 +461,45 @@ hoort een gang op tafel, en in welke baan valt een gerecht) naast `cadans.js` (d
 projectie daarvan over de rekeningen), en `keuken-bon.js` (hoe een bon eruitziet)
 naast `keuken.js` (hoe het bord zich gedraagt).
 
-**5. Venue Edge**: de clientkant van offline. De serverkant ligt er, en de
-kassa is de eerste die hem gebruikt — zie hieronder. De zaal, de bar en de PDA
-volgen nog niet: die werken niet met één verzoek per handeling maar met een
-rekening die over tientallen aanroepen leeft, en dan is opnieuw versturen niet
-genoeg. Dat vraagt een lokale werkelijkheid die samengevoegd wordt, niet een rij.
+**5. Venue Edge** — *af, en met opzet niet compleet.* De serverkant lag er al;
+de kassa was de eerste client (5a), de PDA de tweede (5b).
+
+**5b. De PDA zonder lijn — af, en de keuze is het interessante deel.**
+
+Een kassabon is **één** verzoek; een rekening leeft over tientallen aanroepen —
+openen, regel, regel, stoel, gang vrijgeven, betalen. Opnieuw versturen lost daar
+niets op. De uitweg is dan ook niet *alles* offline maken maar **kiezen**, en die
+keuze volgt uit één vraag: *wat is er kwijt als het misgaat?*
+
+| handeling | zonder lijn |
+|---|---|
+| **opnemen** | **de bestelling is weg.** De gast heeft besteld, de bediening liep naar het scherm, en er staat niets. Het enige dat een avond werkelijk breekt |
+| gang vrijgeven | zinloos: het keukenscherm is óók offline. Zodra de lijn terug is geeft de zaal hem vrij — met de kennis van dát moment, wat beter is |
+| standen zetten | idem: de keuken die het bord zou lezen, is er niet |
+| verzoeken | de telefoon van de gast is ook offline; er komt niets binnen |
+| betalen | raakt geld en een tweede weg waarlangs het beweegt. Een eigen besluit, geen bijvangst |
+
+Dus doet `apps/horeca/edge.js` **één** ding: een bestelling die zonder lijn is
+opgenomen, blijft op het toestel en gaat als geheel weg zodra de lijn terug is.
+Drie dingen maken dat veilig:
+
+- **De kaart wordt op het toestel bewaard** zodra er wél verbinding is. Zonder
+  kaart is een offline-rij een vangnet onder een trapeze die er niet is. Wat je
+  ziet kan de kaart van vanochtend zijn, en dat staat er ook bij.
+- **De allergie reist mee**, en dáárom kent `offline/sync` nu twee soorten. Een
+  *verkochte* bardoos landt als `uitgegeven` (er valt niets meer te maken); een
+  *opgenomen* bestelling landt als `besteld`, mét gang, station, stoel en
+  allergie. Zou hij als geserveerd binnenkomen, dan is er een bord "geserveerd"
+  dat niemand heeft gemaakt — en is de allergie een veld op een bon die niemand
+  meer leest.
+- **Er wordt niets vrijgegeven en niets betaald.** De bestelling landt op de
+  rekening en blijft daar tot de zaal hem doorstuurt.
+
+**De rij zelf is nu gedeeld** (`shared/wachtrij.js`). Toen de horeca er ook een
+nodig had waren er twee mogelijkheden: een tweede rij schrijven, of erkennen dat
+"werk dat niet weg kon" overal hetzelfde probleem is. Twee rijen lopen uiteen op
+de dag dat iemand er één repareert. De kassa draait sindsdien op dezelfde
+mechaniek, en beide browsertoetsen bewaken hem.
 
 **5a. De kassa zonder lijn — af.** Een bon die niet weg kon ging verloren; nu
 staat hij in de wachtrij van dat toestel, zichtbaar in een strook boven het
@@ -668,11 +702,12 @@ meting naast staat, en tot die tijd is het een plan.
 Vier dingen, elk met de reden waarom het een eigen snede is en niet een restje
 van iets hierboven.
 
-**Venue Edge voor de zaal, de bar en de PDA.** De kassa heeft zijn offline-rij
-(punt 5a), maar daar is een handeling ook echt één verzoek. Een rekening leeft
-over tientallen aanroepen, dus opnieuw versturen lost daar niets op — dat vraagt
-een lokale werkelijkheid die wordt samengevoegd, niet een rij. Een andere klasse
-probleem, en hij verdient een eigen ontwerp.
+**Venue Edge voor de zaal en de bar.** De PDA kan nu zonder lijn een bestelling
+opnemen (punt 5b), en dat is bewust het enige. Het zaalscherm en het barscherm
+hebben die rij niet: daar wordt niet opgenomen maar bewérkt — een gang vrijgeven,
+een stand zetten, splitsen — en dat vraagt een lokale werkelijkheid die wordt
+samengevoegd, geen rij die opnieuw verstuurt. Een andere klasse probleem, en hij
+verdient een eigen ontwerp.
 
 **De rolmodus host.** De werklijst kent vier bronnen: een gastverzoek, de pas,
 een gebroken belofte en een tafel zonder bestelling. Een host werkt op een vijfde

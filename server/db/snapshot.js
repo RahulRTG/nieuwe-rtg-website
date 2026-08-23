@@ -68,4 +68,31 @@ function planSnapshot() {
 // Staat er nog iets in de write-behind? (het afsluiten schrijft dan eerst.)
 const snapshotVuil = () => saveVuil;
 
-module.exports = { schrijfSnapshotNu, planSnapshot, snapshotVuil };
+/* TERUG NAAR VERS -- de naad waar een toets deze module op zijn beginstand zet.
+   Dezelfde naam als in db/voorcheck.js, en om dezelfde reden: een gedeelde
+   server die straks tussen twee toetsen wordt schoongemaakt hoeft niet per
+   module te weten hoe die naad daar toevallig heet.
+
+   EERST SCHRIJVEN, DAN VERGETEN. Een reset die saveVuil op false zet terwijl er
+   nog een write-behind openstaat gooit gegevens weg -- dat is geen schone lei
+   maar dataverlies, en juist in een gedeelde server zou het lijken alsof de
+   VORIGE toets niets had opgeslagen. Dus: timer afzeggen, openstaand werk
+   afmaken, en pas daarna de merken terug op hun beginwaarde.
+
+   Waarom de merken meemoeten: saveKlaar en saveDuur bepalen of planSnapshot()
+   METEEN schrijft of een venster inplant. Blijven ze staan, dan gedraagt een
+   hergebruikte module zich anders dan een verse -- en dat is precies wat een
+   toets die na een andere draait niet mag merken. Zie het resetcontract in
+   test/opslag-voorcheck.test.js.
+
+   Wat hier niet met gedrag te bewijzen is: snapshotVol en snapshotWaarschuwing
+   komen alleen in beeld boven ~512 MB aan data. Die twee worden gedekt door de
+   bronpoort in scripts/staat.js, die nakijkt of deze functie ze echt aanraakt. */
+function terugNaarVers() {
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+  if (saveVuil) schrijfSnapshotNu();
+  saveVuil = false; saveDuur = 0; saveKlaar = -Infinity;
+  snapshotVol = false; snapshotWaarschuwing = -Infinity;
+}
+
+module.exports = { schrijfSnapshotNu, planSnapshot, snapshotVuil, terugNaarVers };

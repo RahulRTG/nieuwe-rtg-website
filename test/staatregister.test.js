@@ -246,6 +246,44 @@ test('een reset die de wortel niet aanraakt wordt gezien, en de twee gebreken wo
   assert.equal(bewijsweg[0].gebrek, 'bewijsWeg', 'een bewijs dat naar een verdwenen toets wijst telt niet');
 });
 
+/* EEN TIMER OP NULL ZETTEN IS HEM NIET AFZEGGEN, en dat kostte me een mutatie.
+   `saveTimer = null` haalt alleen het handvat weg; de timer loopt door en vuurt
+   met de save-functie van de VORIGE eigenaar. Voor de schrijvers-tabel is dat
+   een keurige schrijfactie, dus die keurde het goed -- en het gedrag kon het
+   niet zien, want de reset schrijft openstaand werk al weg en dan doet de wees
+   niets meer. Daarom eist de poort bij vorm `timer` een echte clear. */
+test('een reset die de timer alleen op null zet, wordt niet als afzeggen geteld', () => {
+  const reg = (naam, patroon) => ({
+    wortels: { ['proef.js#' + naam]: { levensduur: 'herstelbaar', patroon, eigenaar: 'x',
+      reset: 'terugNaarVers()', resetIn: 'proef.js', bewijs: 'test/staatregister.test.js' } }
+  });
+  const boom = maakBoom('timerpoort');
+  try {
+    const schrijf = (bron) => fs.writeFileSync(binnen(boom.pad, path.join(boom.pad, 'proef.js')), bron);
+    const meet = (naam, patroon) => staat.dekking(reg(naam, patroon), boom.pad);
+
+    schrijf('let t = null;\nfunction plan() { t = setTimeout(() => {}, 10); }\nfunction terugNaarVers() { t = null; }\n');
+    assert.deepEqual(meet('t', 'timer').map(g => g.gebrek), ['timerNietAfgezegd'],
+      'alleen op null zetten hoort te worden gezien');
+    assert.deepEqual(meet('t', 'vlucht'), [],
+      'bij een andere vorm is schrijven wel genoeg; anders zou de eis nergens over gaan');
+
+    schrijf('let t = null;\nfunction plan() { t = setTimeout(() => {}, 10); }\n' +
+            'function terugNaarVers() { if (t) { clearTimeout(t); t = null; } }\n');
+    assert.deepEqual(meet('t', 'timer'), [], 'met een echte clearTimeout hoort hij goed te keuren');
+
+    schrijf('let t = null;\nfunction plan() { t = setInterval(() => {}, 10); }\n' +
+            'function terugNaarVers() { clearInterval(t); t = null; }\n');
+    assert.deepEqual(meet('t', 'timer'), [], 'clearInterval telt net zo goed');
+
+    /* En afzeggen zonder het handvat weg te halen is ook niet af: dan denkt
+       planNaronde() nog steeds dat er een timer loopt en plant hij er geen. */
+    schrijf('let t = null;\nfunction plan() { t = setTimeout(() => {}, 10); }\nfunction terugNaarVers() { clearTimeout(t); }\n');
+    assert.deepEqual(meet('t', 'timer').map(g => g.gebrek), ['raaktNiet'],
+      'wel afzeggen maar het handvat laten staan hoort ook te worden gezien');
+  } finally { boom.ruimOp(); }
+});
+
 test('functieUitReset pakt de aangeroepen functie uit de zin', () => {
   assert.equal(staat.functieUitReset('log.foutenReset()'), 'foutenReset');
   assert.equal(staat.functieUitReset('accounts.sluitSeedvenster()'), 'sluitSeedvenster');

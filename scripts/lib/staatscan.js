@@ -327,14 +327,28 @@ function omsluitendeFuncties(pad) {
 /* { wortelnaam -> Set(functienamen die erin schrijven) }, plus de functienamen
    die het bestand uberhaupt kent. Dat tweede is nodig om onderscheid te maken
    tussen "de reset raakt de wortel niet aan" en "de reset bestaat hier niet",
-   en dat zijn twee verschillende fouten met twee verschillende reparaties. */
+   en dat zijn twee verschillende fouten met twee verschillende reparaties.
+
+   EN APART: WIE ZEGT ER EEN TIMER AF. Dat is niet hetzelfde als erin schrijven,
+   en het verschil kostte me een mutatie. Een reset die `saveTimer = null` doet
+   zonder clearTimeout haalt alleen het handvat weg; de timer zelf blijft staan
+   en vuurt gewoon, met de save-functie van de vorige eigenaar in de hand. Voor
+   de schrijvers-tabel is dat een keurige schrijfactie, dus die keurde het goed
+   -- en het gedrag kon het niet zien, want de reset schrijft openstaand werk al
+   weg en dan doet de wees niets meer. Vandaar deze tweede tabel: bij een wortel
+   met vorm `timer` eist scripts/staat.js hierop, niet op schrijvers. */
 function schrijversIn(bron, relPad) {
   const boom = parse(bron);
   const schrijvers = new Map();
+  const afgezegd = new Map();
   const functies = new Set();
   const noteer = (naam, pad) => {
     if (!schrijvers.has(naam)) schrijvers.set(naam, new Set());
     for (const f of omsluitendeFuncties(pad)) schrijvers.get(naam).add(f);
+  };
+  const noteerAfgezegd = (naam, pad) => {
+    if (!afgezegd.has(naam)) afgezegd.set(naam, new Set());
+    for (const f of omsluitendeFuncties(pad)) afgezegd.get(naam).add(f);
   };
   loop(boom, (n, pad) => {
     if (/Function/.test(n.type)) {
@@ -348,6 +362,11 @@ function schrijversIn(bron, relPad) {
       }
     }
     if (n.type === 'UpdateExpression' && n.argument && n.argument.type === 'Identifier') noteer(n.argument.name, pad);
+    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'Identifier'
+        && /^clear(Timeout|Interval|Immediate)$/.test(n.callee.name)) {
+      const eerste = (n.arguments || [])[0];
+      if (eerste && eerste.type === 'Identifier') noteerAfgezegd(eerste.name, pad);
+    }
     if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression') {
       const o = n.callee.object, pr = n.callee.property || {};
       if (o && o.type === 'Identifier' && MUTMETHODE.test(pr.name || '')) noteer(o.name, pad);
@@ -357,7 +376,7 @@ function schrijversIn(bron, relPad) {
       }
     }
   });
-  return { bestand: relPad, functies, schrijvers };
+  return { bestand: relPad, functies, schrijvers, afgezegd };
 }
 
 /* De hele boom. Een bestand dat de eigen parser niet leest is GEEN nul: dat

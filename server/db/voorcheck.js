@@ -97,8 +97,12 @@ function onthoud(k, jsonBytes, waarde, nu) {
    plaats van op verouderde maten te vertrouwen. */
 function vergeet(k) { laatsteGrootte.delete(k); laatsteLengte.delete(k); laatsteCheck.delete(k); }
 
-/* ALLES vergeten en de naronde afzeggen: terug naar de stand van een verse
-   start. Dat is iets anders dan vergeet(k) in een lus, en het verschil is de
+/* TERUG NAAR VERS -- de naad waar een toets deze module op zijn beginstand zet.
+
+   De naam is met opzet in elke module dezelfde: een gedeelde server die straks
+   tussen twee toetsen wordt schoongemaakt hoeft dan niet per module te weten
+   hoe die naad daar toevallig heet. Hier betekent het: alles vergeten en de
+   naronde afzeggen. Dat is iets anders dan vergeet(k) in een lus, en het verschil is de
    timer -- die overleeft elke hoeveelheid vergeet-aanroepen en vuurt daarna
    alsnog met de save-functie van de VORIGE eigenaar in de hand.
 
@@ -113,7 +117,7 @@ function vergeet(k) { laatsteGrootte.delete(k); laatsteLengte.delete(k); laatste
    Geen productiepad roept dit aan, en dat is de bedoeling: dit is de naad waar
    een toets een module op zijn beginstand zet, net als jwks.leeg() en
    oidc.leegOntdek(). */
-function vergeetAlles() {
+function terugNaarVers() {
   laatsteGrootte.clear(); laatsteLengte.clear(); laatsteCheck.clear();
   if (naTimer) { clearTimeout(naTimer); naTimer = null; }
 }
@@ -127,4 +131,4 @@ function planNaronde(save) {
   if (naTimer.unref) naTimer.unref();
 }
 
-module.exports = { magOverslaan, onthoud, vergeet, vergeetAlles, planNaronde, lengteVan, exactNodig, GROOT_BYTES, GROOT_MS };
+module.exports = { magOverslaan, onthoud, vergeet, terugNaarVers, planNaronde, lengteVan, exactNodig, GROOT_BYTES, GROOT_MS };

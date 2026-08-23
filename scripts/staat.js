@@ -141,6 +141,10 @@ function vergelijk(uitslag, register) {
      ontbreekt  de genoemde functie staat niet in dat bestand -- verkeerde naam,
                 of de reset woont elders (zet dan `resetIn` op dat bestand)
      raaktNiet  de functie bestaat maar schrijft deze wortel niet
+     timerNietAfgezegd
+                bij vorm `timer`: de reset raakt hem wel aan maar zegt hem niet
+                af. `saveTimer = null` haalt alleen het handvat weg -- de timer
+                loopt door en vuurt met de save-functie van de vorige eigenaar.
 
    Een reset zonder haakjes ("na een herstart") is geen reset maar een
    omschrijving; die telt als `ontbreekt`, want er valt niets aan te roepen.
@@ -176,6 +180,18 @@ function dekking(register, wortel) {
     if (!bron.functies.has(fn)) {
       uit.push({ id, bestand, reset: r.reset, functie: fn, gebrek: 'ontbreekt', reden: fn + ' bestaat niet in ' + bestand });
       continue;
+    }
+    /* Bij een TIMER is schrijven niet genoeg: `saveTimer = null` haalt het
+       handvat weg en laat de timer staan, en die vuurt daarna gewoon met de
+       functie van de vorige eigenaar. Dat is de gevaarlijkste vorm die er is,
+       dus die eist een echte clearTimeout/clearInterval. */
+    if (r.patroon === 'timer') {
+      const weg = bron.afgezegd.get(naam);
+      if (!weg || !weg.has(fn)) {
+        uit.push({ id, bestand, reset: r.reset, functie: fn, gebrek: 'timerNietAfgezegd',
+          reden: fn + ' zegt ' + naam + ' niet af met clearTimeout/clearInterval; hem op null zetten laat de timer lopen' });
+        continue;
+      }
     }
     const wie = bron.schrijvers.get(naam);
     if (!wie || !wie.has(fn)) {

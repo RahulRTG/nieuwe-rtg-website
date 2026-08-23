@@ -17,7 +17,8 @@
       "bron": "hand-na-scan",
       "gedeeldNaReset": true,
       "bewijs": "test/seedvenster.test.js -- de besparingstoets leest deze teller uit sluitSeedvenster()",
-      "toelichting": "Alleen een teller voor het logregel-getal; heeft geen invloed op gedrag."
+      "toelichting": "Alleen een teller voor het logregel-getal; heeft geen invloed op gedrag.",
+      "patroon": "voortgang"
     },
     "server/accounts/kluis.js#seedVensterOpen": {
       "eigenaar": "server/accounts",
@@ -27,7 +28,8 @@
       "bron": "hand-na-scan",
       "gedeeldNaReset": true,
       "bewijs": "test/seedvenster.test.js -- grendel 3 draait de echte boot en eist dat het venster dicht is zodra de server luistert",
-      "toelichting": "Staat open tijdens de demoseed en gaat dicht vlak voor app.listen. Sluiten is idempotent."
+      "toelichting": "Staat open tijdens de demoseed en gaat dicht vlak voor app.listen. Sluiten is idempotent.",
+      "patroon": "vlucht"
     },
     "server/accounts/kluis.js#seedZouten": {
       "eigenaar": "server/accounts",
@@ -37,70 +39,98 @@
       "bron": "hand-na-scan",
       "gedeeldNaReset": true,
       "bewijs": "test/seedvenster.test.js -- na het sluiten krijgt elk account een vers zout",
-      "toelichting": "Memo van zout per seedwachtwoord; wordt bij het sluiten geleegd en daarna nooit meer gevuld."
+      "toelichting": "Memo van zout per seedwachtwoord; wordt bij het sluiten geleegd en daarna nooit meer gevuld.",
+      "patroon": "spiegel"
     },
     "server/accounts/mirror.js#externCb": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading: Callback of venster dat bij het opzetten wordt neergezet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord.",
+      "blokkeert": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord."
     },
     "server/accounts/mirror.js#idBlok": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang: Teller of generatie die echte voortgang draagt",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "Gereserveerd blok identiteitsnummers, dat per uitgifte opschuift (idBlok.volgende++). Een gedeeld proces deelt dus de nummerreeks: een toets die op een bepaald id rekent krijgt het volgende van de vorige toets.",
+      "blokkeert": "Teller of generatie die echte voortgang draagt. Loopt door over toetsen heen en verandert daarmee wat de volgende toets ziet."
     },
     "server/accounts/mirror.js#idRefillBezig": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/accounts/mirror.js#mirrorTimer": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/accounts/mirror.js#pg": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/accounts/mirror.js#pgKlaar": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/accounts/mirror.js#verwijderdeUsers": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "set",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Wachtrij van te verwijderen accounts. Blijft die staan, dan verwijdert de spiegeling in de VOLGENDE toets alsnog een account dat daar gewoon hoort te bestaan.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/accounts/mirror.js#vuileStaff": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "set",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/accounts/mirror.js#vuileUsers": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "set",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/accounts/state.js#_cache": {
       "eigenaar": "server/accounts",
@@ -160,381 +190,543 @@
     },
     "server/db/geheugen-kluis.js#KEY": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- afleiding: Luie of eenmalige berekening van iets dat vaststaat",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "afleiding",
+      "toelichting": "De versleutelsleutel wordt eenmalig geladen uit RTG_ENC_KEY of data/geheugen.key. Ziet er zuiver uit, en is het net niet: een toets die server/data leegmaakt houdt in een gedeeld proces de OUDE sleutel vast, en schrijft dan gegevens die een vers proces niet meer kan ontsleutelen. Precies daarom is dit geen deelbare afleiding.",
+      "blokkeert": "Luie of eenmalige berekening van iets dat vaststaat."
     },
     "server/db/geheugen.js#generatie": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang: Teller of generatie die echte voortgang draagt",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "Teller of generatie die echte voortgang draagt. Loopt door over toetsen heen en verandert daarmee wat de volgende toets ziet.",
+      "blokkeert": "Teller of generatie die echte voortgang draagt. Loopt door over toetsen heen en verandert daarmee wat de volgende toets ziet."
     },
     "server/db/geheugen.js#laatsteSha": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/geheugen.js#saveDuur": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/geheugen.js#saveKlaar": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/geheugen.js#saveT0": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/geheugen.js#saveTimer": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/db/geheugen.js#saveVuil": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/grootboek.js#grootCache": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/grootboek.js#grootN": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/grootboek.js#grootNAt": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/grootboek.js#grootPool": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/ledengids.js#ledenCache": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/ledengids.js#ledenN": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/ledengids.js#ledenNAt": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/ledengids.js#ledenPool": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/ledengids.js#ledenRev": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Omgekeerde codenaam-cache. Deze draagt meer dan tempo: een codenaam van een lid uit de vorige toets blijft vindbaar, en dat is in een p2p-betaling een verkeerde ontvanger in plaats van een trage.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/postgres.js#laatsteLokaleSnap": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/postgres.js#pg": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/postgres.js#pgFlushBezig": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/postgres.js#pgFlushTimer": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/db/postgres.js#pgKlaar": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/postgres.js#pgPoll": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/db/postgres.js#pgVeilig": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading: Callback of venster dat bij het opzetten wordt neergezet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord.",
+      "blokkeert": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord."
     },
     "server/db/postgres.js#pgVuil": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/postgres.js#snelBelofte": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/postgres.js#snelBezig": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/postgres.js#snelTimer": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/db/postgres.js#snelVuil": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/redis.js#rPub": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/redis.js#rSub": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/redis.js#versie": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang: Teller of generatie die echte voortgang draagt",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "Teller of generatie die echte voortgang draagt. Loopt door over toetsen heen en verandert daarmee wat de volgende toets ziet.",
+      "blokkeert": "Teller of generatie die echte voortgang draagt. Loopt door over toetsen heen en verandert daarmee wat de volgende toets ziet."
     },
     "server/db/snapshot.js#saveDuur": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/snapshot.js#saveKlaar": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/snapshot.js#saveTimer": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/db/snapshot.js#saveVuil": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/snapshot.js#snapshotVol": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/snapshot.js#snapshotWaarschuwing": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/sqlite.js#kvdb": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/sqlite.js#laatsteJson": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/sqlite.js#pollTimer": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/db/sqlite.js#stmt": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Voorbereide SQLite-statements, gebonden aan de database die bij sqliteInit openging. Blijven wijzen naar dat bestand, ook als een volgende toets een ander data-pad zet.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/sqlite.js#toegepast": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/state.js#externCb": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading: Callback of venster dat bij het opzetten wordt neergezet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord.",
+      "blokkeert": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord."
     },
     "server/db/tx/index.js#kapPauzeTot": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/tx/ledger.js#achter": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding: Greep op iets buiten dit proces",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen.",
+      "blokkeert": "Greep op iets buiten dit proces. Blijft open tussen toetsen; een tweede toets erft de verbinding en daarmee de sessiestand van de eerste. Deelbaar zodra een toets een bestaande verbinding kan OVERNEMEN in plaats van openen."
     },
     "server/db/tx/ledger.js#txNAt": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/tx/ledger.js#txVeegBezig": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht: Vlag over werk dat loopt of nog moet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat.",
+      "blokkeert": "Vlag over werk dat loopt of nog moet. Blijft staan als een toets halverwege stopt, en dan denkt de volgende dat er al iets onderweg is. Deelbaar zodra er een punt is waarop alles aantoonbaar stil staat."
     },
     "server/db/tx/ledger.js#txVeegTimer": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/db/tx/ledger.js#venster": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading: Callback of venster dat bij het opzetten wordt neergezet",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord.",
+      "blokkeert": "Callback of venster dat bij het opzetten wordt neergezet. Blijft wijzen naar de opzet van de VORIGE toets; dat geeft geen fout maar een verkeerd antwoord."
     },
     "server/db/voorcheck.js#laatsteCheck": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- merk: Tijdmerk over de laatste keer dat iets gebeurde",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "merk",
+      "toelichting": "Zie laatsteGrootte: vergeet(k) werkt per collectie, niet als geheel.",
+      "blokkeert": "Tijdmerk over de laatste keer dat iets gebeurde. Stuurt geen uitkomst aan, wel wanneer iets weer MAG: een toets die meteen na een andere draait kan daardoor een overgeslagen ronde zien. Deelbaar zodra hij samen met zijn vlag teruggezet kan worden."
     },
     "server/db/voorcheck.js#laatsteGrootte": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Onthouden maten per collectie, zodat een dure stringify overgeslagen mag worden. vergeet(k) bestaat wel, maar alleen PER COLLECTIE -- dat is geen reset naar de verse stand en dus geen contract.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/voorcheck.js#laatsteLengte": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel: Cache of memo van gegevens die ergens anders wonen",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Zie laatsteGrootte: vergeet(k) werkt per collectie, niet als geheel.",
+      "blokkeert": "Cache of memo van gegevens die ergens anders wonen. In principe de makkelijkste vorm -- leegmaken is genoeg -- maar die aanroep bestaat hier nog niet, en zonder aanroep is het een belofte."
     },
     "server/db/voorcheck.js#naTimer": {
       "eigenaar": "server/db",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- timer: Wachtende timer",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "timer",
+      "toelichting": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten.",
+      "blokkeert": "Wachtende timer. De gevaarlijkste vorm: hij loopt DOOR terwijl de volgende toets draait en schrijft dan gegevens van de vorige weg. Deelbaar zodra deze module een stopAlles() heeft die de timer wist en de toets erop kan wachten."
     },
     "server/eigenaar.js#overgedragen": {
       "eigenaar": "server",
@@ -657,10 +849,12 @@
     },
     "server/kern/postdatum-lezer.js#MAANDEN": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (staat vast na het laden)",
       "soort": "object",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "afleiding",
+      "toelichting": "Maandnaam -> nummer, op moduleniveau gevuld met een forEach. De scanner ziet die schrijfactie BINNEN een functie staan en noemt hem daarom bewegend, terwijl de callback bij het laden draait en daarna nooit meer. Nagemeten of het loont om de scanner dat onderscheid te leren: dit is de ENIGE wortel in server/ waar het uitmaakt (1 van 143), dus met de hand, niet met een regel."
     },
     "server/kern/rahul.js#geslachtBron": {
       "eigenaar": "server/kern",
@@ -775,7 +969,8 @@
       "bron": "hand-na-scan",
       "gedeeldNaReset": true,
       "bewijs": "test/fout-aggregatie.test.js -- het resetcontract vult de ring en eist daarna de verse stand",
-      "toelichting": "Ring van maximaal 60 foutgroepen, alleen RAM. Leegmaken herstelt hem volledig."
+      "toelichting": "Ring van maximaal 60 foutgroepen, alleen RAM. Leegmaken herstelt hem volledig.",
+      "patroon": "voortgang"
     },
     "server/log.js#foutHaak": {
       "eigenaar": "server",
@@ -785,7 +980,8 @@
       "bron": "hand-na-scan",
       "gedeeldNaReset": true,
       "bewijs": "test/fout-aggregatie.test.js -- het resetcontract hangt een haak op, maakt hem los en eist dat hij zwijgt",
-      "toelichting": "Optionele externe fouttracker (Sentry o.i.d.). onError(iets-anders-dan-een-functie) maakt hem los."
+      "toelichting": "Optionele externe fouttracker (Sentry o.i.d.). onError(iets-anders-dan-een-functie) maakt hem los.",
+      "patroon": "bedrading"
     },
     "server/log.js#foutTotaal": {
       "eigenaar": "server",
@@ -795,7 +991,8 @@
       "bron": "hand-na-scan",
       "gedeeldNaReset": true,
       "bewijs": "test/fout-aggregatie.test.js -- het resetcontract vergelijkt de stand na reset met een verse start",
-      "toelichting": "Teller van alle gemelde uitzonderingen sinds de start."
+      "toelichting": "Teller van alle gemelde uitzonderingen sinds de start.",
+      "patroon": "voortgang"
     },
     "server/log.js#foutVolg": {
       "eigenaar": "server",
@@ -805,7 +1002,8 @@
       "bron": "hand-na-scan",
       "gedeeldNaReset": true,
       "bewijs": "scripts/staat.js -- de resetdekking leest foutenReset() uit de bron; aan de buitenkant is deze teller NIET waarneembaar",
-      "toelichting": "Monotone volgteller die alleen de VOLGORDE van foutgroepen bepaalt en nergens naar buiten komt. Daardoor kan geen enkele waarneembaarheidstoets bewijzen dat hij wordt teruggezet -- het bewijs is de bronregel in foutenReset(), en die wordt hier machinaal nagekeken."
+      "toelichting": "Monotone volgteller die alleen de VOLGORDE van foutgroepen bepaalt en nergens naar buiten komt. Daardoor kan geen enkele waarneembaarheidstoets bewijzen dat hij wordt teruggezet -- het bewijs is de bronregel in foutenReset(), en die wordt hier machinaal nagekeken.",
+      "patroon": "voortgang"
     },
     "server/log.js#journaalStuk": {
       "eigenaar": "server",
@@ -813,7 +1011,8 @@
       "reset": "geen -- de code zegt met zoveel woorden \"en dat blijft zo tot een herstart\"",
       "soort": "binding-let",
       "bron": "hand-na-scan",
-      "toelichting": "Grendel die een kapot doorgeefjournaal EEN keer meldt in plaats van bij elk verzoek. Beweegt alleen op het foutpad: in een gezond proces staat hij de hele rit op false en kost hij dus niets. Slaat hij wel om, dan is de belofte \"een keer per proces\" opgebruikt en zou een hergebruikte server een tweede, andere journaalstoring stilzwijgend inslikken. Daarom vers proces, en niet stiekem herstelbaar noemen."
+      "toelichting": "Grendel die een kapot doorgeefjournaal EEN keer meldt in plaats van bij elk verzoek. Beweegt alleen op het foutpad: in een gezond proces staat hij de hele rit op false en kost hij dus niets. Slaat hij wel om, dan is de belofte \"een keer per proces\" opgebruikt en zou een hergebruikte server een tweede, andere journaalstoring stilzwijgend inslikken. Daarom vers proces, en niet stiekem herstelbaar noemen.",
+      "patroon": "vlucht"
     },
     "server/mail.js#transporter": {
       "eigenaar": "server",
@@ -943,17 +1142,23 @@
     },
     "server/sso/jwks.js#kast": {
       "eigenaar": "server/sso",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "jwks.leeg()",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache van sleutelbossen per adres. leeg() wist hem volledig, leeg(adres) precies dat adres.",
+      "bewijs": "test/sso.test.js -- het resetcontract vult de kast aantoonbaar, leegt hem en eist dat er opnieuw wordt opgehaald"
     },
     "server/sso/oidc.js#ontdekt": {
       "eigenaar": "server/sso",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "oidc.leegOntdek()",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Cache van OIDC-discovery per issuer. leegOntdek() wist hem volledig.",
+      "bewijs": "test/sso.test.js -- het resetcontract ontdekt twee keer, leegt en eist een derde ontdekking"
     },
     "server/translate.js#anthropic": {
       "eigenaar": "server",

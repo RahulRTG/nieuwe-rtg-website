@@ -268,6 +268,23 @@ if (require.main === module) {
     const merk = k === 'onbekend' && perKlasse[k] ? '   <- deze kosten een serverstart' : '';
     console.log('    ' + k.padEnd(20) + String(perKlasse[k]).padStart(6) + merk);
   }
+  /* DE WERKLIJST. Honderdzeven wortels die een vers proces afdwingen is een
+     muur; dezelfde honderdzeven op vorm gesorteerd is een lijst van acht
+     regels, met per regel EEN reparatie. Daarom staat hij hier en niet in een
+     notitie. */
+  const perVorm = {};
+  for (const [id, r] of Object.entries(register ? register.wortels : {})) {
+    if (!r.patroon) continue;
+    if (r.levensduur === 'herstelbaar' || r.levensduur === 'bootvast') continue;
+    perVorm[r.patroon] = (perVorm[r.patroon] || 0) + 1;
+  }
+  const vormen = Object.entries(perVorm).sort((a, b) => b[1] - a[1]);
+  if (vormen.length) {
+    console.log('\n  wat het hergebruik tegenhoudt, op vorm:');
+    for (const [v, n] of vormen) console.log('    ' + v.padEnd(20) + String(n).padStart(6));
+    const rest = Object.values(register.wortels).filter(r => r.levensduur === 'onbekend' && !r.patroon).length;
+    if (rest) console.log('    ' + '(nog geen vorm)'.padEnd(20) + String(rest).padStart(6));
+  }
   console.log('');
   /* De klokschuld staat hier ALS CONTEXT en niet als tweede ratel: KLOK.json is
      daar de eigenaar van, en scripts/klok.js telt hem met dezelfde scanner. Het

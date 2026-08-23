@@ -32,8 +32,9 @@
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
     "staatOngeregistreerd": 0,
-    "staatOnbekend": 109,
-    "duurOpWandklok": 36
+    "staatOnbekend": 43,
+    "duurOpWandklok": 36,
+    "staatProcesgebonden": 107
   },
   "notities": [
     {

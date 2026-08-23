@@ -645,6 +645,40 @@ const IJKINGEN = {
         finally { fs.writeFileSync(regPad, oud); }
       })
   },
+  staatProcesgebonden: {
+    /* HIER ZIT DE HELE REDEN DAT DEZE METER BESTAAT, dus hij wordt ook zo
+       geijkt. `staatOnbekend` omlaag brengen is gratis: zet een onbekende
+       wortel op `procesgebonden` en die meter zakt, terwijl er niets is
+       veranderd -- onbekend TELDE al als procesgebonden. Deze meter hoort dat
+       niet mee te maken.
+
+       De proef legt daarom EEN wortel neer en meet twee keer: als `onbekend` en
+       als `procesgebonden`. Beide keren hoort deze meter met precies 1 te
+       stijgen. Ging hij bij de tweede lezing naar 0, dan telde hij alleen
+       procesgebonden mee en was hij net zo makkelijk weg te schrijven als de
+       meter waar hij tegenwicht voor is. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      'let ijkTeller = 0;\nfunction tik() { ijkTeller++; }\nmodule.exports = { tik };\n', () => {
+        const regPad = path.join(WORTEL, 'STATE.json');
+        const oudTekst = fs.readFileSync(regPad, 'utf8');
+        const lees = (klasse) => {
+          const reg = JSON.parse(oudTekst);
+          reg.wortels['server/kern/zz-ijk-tijdelijk.js#ijkTeller'] =
+            { eigenaar: 'server/kern', levensduur: klasse, reset: 'onbekend', soort: 'binding-let', bron: 'scan' };
+          fs.writeFileSync(regPad, JSON.stringify(reg, null, 2) + '\n');
+          return meet({ alleen: ['staatProcesgebonden'] }).staatProcesgebonden - voor.staatProcesgebonden;
+        };
+        try {
+          const alsOnbekend = lees('onbekend');
+          const alsProces = lees('procesgebonden');
+          assert.equal(alsOnbekend, 1, 'een onbekende wortel hoort mee te tellen: onbekend IS procesgebonden');
+          assert.equal(alsProces, 1,
+            'dezelfde wortel op procesgebonden zetten verandert niets aan de werkelijkheid, dus deze meter ' +
+            'hoort niet te zakken; doet hij dat wel, dan is hij net zo weg te schrijven als staatOnbekend');
+          return alsOnbekend;
+        } finally { fs.writeFileSync(regPad, oudTekst); }
+      })
+  },
   duurOpWandklok: {
     /* Twee duurmetingen erbij, en een DATUMberekening die NIET mee hoort te
        tellen -- "zeven dagen geleden" hoort juist op de wandklok, want dat gaat

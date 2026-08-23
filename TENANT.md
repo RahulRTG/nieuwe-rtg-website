@@ -480,24 +480,59 @@ gemeten wordt**, want een lat waarvan de helft een voornemen is, is geen lat.
    recht ook met de hand had mogen doen, en wie er een bijzet schrijft ook de
    uitvoering -- er is met opzet geen generieke weg die elke nieuwe regel meteen
    uitvoerbaar maakt.
-10. **Digital twin en extension fabric** — **niet gebouwd, en niet als
-    ontbrekende laag maar als besluit.** De vraag die een twin moet
-    beantwoorden -- "wat raakt het als deze vestiging sluit" -- wordt door het
-    werkcommand-register al beantwoord: `POST /api/bedrijf/dossier` geeft de
-    feiten, **wie ernaar verwijst** en de tijdlijn, en `/api/bedrijf/wandel`
-    loopt twee stappen verder. Een laag die die twee onder een nieuwe naam
-    samenvat, voegt een woord toe en geen vermogen -- en zet er een tweede
-    lezing van dezelfde graaf naast (`LAT.md` regel 4).
+10. **De gevolgsimulatie** — `bedrijf/gevolg.js`, `POST /api/bedrijf/gevolg`.
+    Dit stond hier eerst als *niet gebouwd, en niet als ontbrekende laag maar
+    als besluit*, met het argument dat `POST /api/bedrijf/dossier` de vraag al
+    beantwoordt. **Dat argument klopte niet, en het verschil is precies wat
+    deze laag bestaansrecht geeft.**
 
-    Wat een twin er WEL bovenop zou moeten leggen, bestaat geen van allen:
-    kosten per wijziging, de contracten die eraan hangen als afdwingbaar
-    gegeven, de controls die erdoor geraakt worden, en een rollback. Die vier
-    bouwen is vier lagen werk; ze *tonen* zonder ze te hebben, is precies de
-    belofte-zonder-code waar dit hele document over gaat.
+    Het dossier kijkt naar **binnen**: wat hoort bij dit object, wie verwijst
+    ernaar, wat is de tijdlijn. Dit kijkt **vooruit**: wat breekt er als het
+    weg is. Wie overweegt een medewerker uit dienst te zetten wil niet weten
+    wie er naar hem verwijst — hij wil weten wat er níét af komt. De toets
+    maakt dat hard met een taak van Hakim die wacht op een taak van Pia: die
+    taak staat in geen enkel dossier van Pia, en valt wel stil.
 
-    De volgorde als hij er ooit komt: eerst kosten per object (er is vandaag
-    geen kostprijs per werkruimte-object), dan de koppeling contract-object,
-    dan pas een scherm dat "simuleer" heet.
+    Drie wijzigingen, en de lijst is **gesloten**: `lid.uit-dienst`,
+    `project.stop`, `werkruimte.sluiten`. Gesloten omdat er per wijziging
+    iemand moet weten wat "af" betekent voor elke soort, en dat is niet uit de
+    graaf af te leiden. Wat er niet in staat krijgt geen gok maar een 400 met
+    de drie die er wel zijn.
+
+    Het antwoord heeft twee lijsten en die zijn niet even veel waard. `raakt`
+    is te maken uit de graaf; **`blijftOpen` is waar deze laag voor bestaat** —
+    taken zonder eigenaar, taken van anderen die op dat werk wachten, tickets
+    zonder behandelaar, kennisartikelen zonder eigenaar, besluiten die op een
+    stem wachten die niet meer komt.
+
+    Drie regels die niet mogen sneuvelen:
+
+    - **Simuleren verandert niets.** Er staat geen `save()` in het bestand. De
+      toets legt de hele werkruimte voor en na naast elkaar; er mag geen byte
+      verschillen. Een simulatie met een bijwerking is de duurste soort bug,
+      want juist deze knop drukt iemand in om te *kijken*.
+    - **Hij volgt de rechten.** Wie `service` mist ziet de servicekant niet,
+      wie `besluit` mist de besluitkant niet, wie `mens` mist ziet niet welke
+      rollen vervallen. Niet weggefilterd achteraf — de tak draait niet.
+    - **Wat niet gerekend wordt, staat er met naam en reden.** Vier dingen, en
+      het zijn precies de vier die hierboven als reden stonden om deze laag
+      niet te bouwen: kosten (er is geen kostprijs per werkruimte-object),
+      contracten (de bibliotheek weet niet welk contract aan welk project
+      hangt), controls (`CONTROLS.json` meet het platform en niet de objecten
+      van een klant) en terugdraaien (er is geen rollback). Ze staan in
+      `nietGerekend` in élk antwoord. Een simulatie die daarover zwijgt leest
+      als een volledige impactanalyse, en dat is hij niet.
+
+    Eén eerlijkheid in het antwoord zelf: een kennisartikel draagt alleen een
+    eigenaars**naam** en geen id (`kennis.js` gebruikt `zetWie()` niet). Die rij
+    draagt daarom `opNaam: true` — twee mensen die Pia heten leveren daar
+    elkaars artikelen op, en dat staat er in plaats van dat het verzwegen
+    wordt. Overal waar er wél een id is, wint de sleutel van de naam.
+
+    Nagetrokken met vijf mutaties, alle vijf raak: de wachtende taken van
+    anderen weglaten, het rechtenhek op de servicekant weghalen, een bijwerking
+    in de simulatie zetten, de taken buiten een gestopt project niet meer
+    tellen, en `nietGerekend` leegmaken.
 
 ## 9. De grenzen
 

@@ -2771,6 +2771,29 @@ motoren (`server/bedrijf/inzicht.js`):
 | `POST /api/bedrijf/samenhang` | De vorm van het geheel: soorten, randen, en wat niet gemeten mocht worden |
 | `POST /api/bedrijf/wandel` `{type, id, diepte}` | Wat er twee stappen verderop ligt — de klant achter het ticket achter het issue |
 
+**Daarnaast twee routes die géén vraag over een object beantwoorden**, en dat
+onderscheid is precies waarom ze niet in de tabel hierboven staan:
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/bedrijf/handeling/plan` · `/doe` · `/bonnen` | De balk mag ook handelen: bedoeling → plan → geraakte objecten → rechtencontrole → bevestiging door een mens → uitvoering → actiebon |
+| `POST /api/bedrijf/gevolg` `{wijziging}` | Wat blijft er **open** als deze wijziging doorgaat — vooruit kijken in plaats van naar binnen |
+
+De handelkant slaat geen schakel over: **plannen verandert niets** (de toets
+legt de hele werkruimte voor en na naast elkaar), **zonder de bevestigingscode
+gebeurt er niets**, en **het recht wordt bij de uitvoering opnieuw gerekend** —
+anders overleeft een plan een rol die intussen is ingetrokken. De lijst
+werkwoorden is gesloten (`bedrijf/handeling-lijst.js`); er is geen algemene
+uitvoerknop.
+
+De gevolgsimulatie is geen tweede lezing van dezelfde graaf. Het dossier kijkt
+naar **binnen** (wat hoort bij dit object), `gevolg` kijkt **vooruit** (wat
+breekt er als het weg is): een taak van iemand anders die op werk van de
+vertrekker wacht, staat in geen enkel dossier van die vertrekker en valt wel
+stil. Er staat geen `save()` in het bestand, hij volgt dezelfde rechten als de
+rest, en wat hij níét rekent — kosten, contracten, controls, terugdraaien —
+staat met reden in élk antwoord.
+
 **Twee assen van scope, en allebei door weglaten.** De werkruimte: elke soort
 draagt een `lees(db)` die alleen zijn eigen werkruimte opent, dus er bestaat
 geen pad waarlangs een rij van een andere organisatie naar buiten komt. En het

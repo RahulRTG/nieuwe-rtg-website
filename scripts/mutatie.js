@@ -430,6 +430,12 @@ const EIGEN_MODULE = new Map([
      bevestigingscontrole weghalen, het recht niet opnieuw rekenen bij de
      uitvoering, en een plan van een ander uitvoerbaar maken. Alle drie raak. */
   ['werkhandeling.test.js', ['server/bedrijf/handeling.js']],
+  /* werkgevolg.test.js: nagetrokken met vijf mutaties, alle vijf raak -- de
+     wachtende taken van anderen weglaten (toets 2), het rechtenhek op de
+     servicekant weghalen (toets 3), een bijwerking in de simulatie zetten
+     (toets 1, en dan vallen er vijf om), de taken BUITEN een gestopt project
+     niet meer tellen (toets 4), en nietGerekend leegmaken (toets 5). */
+  ['werkgevolg.test.js', ['server/bedrijf/gevolg.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

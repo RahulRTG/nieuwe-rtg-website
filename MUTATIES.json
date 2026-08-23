@@ -6366,6 +6366,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "werkgevolg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/gevolg.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "werkgezondheid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6379,6 +6387,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "werkhandeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/handeling.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "werkindienst.test.js": {
       "soort": "server",

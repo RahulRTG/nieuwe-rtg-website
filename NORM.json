@@ -1,16 +1,16 @@
 {
   "vastgelegd": "2026-08-23",
   "meters": {
-    "endpointsZonderTest": 1191,
+    "endpointsZonderTest": 1179,
     "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 910,
+    "testbestanden": 914,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 127,
-    "keuringOmvang": 159,
+    "e2eBestanden": 128,
+    "keuringOmvang": 161,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -20,7 +20,7 @@
     "schermenZonderToets": 0,
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4936,
-    "browserpoortToetsen": 197,
+    "browserpoortToetsen": 198,
     "kernBreedte": 1414,
     "kernGedeeld": 193,
     "kernBreedsteBestand": 71,
@@ -452,6 +452,11 @@
       "datum": "2026-08-23",
       "meter": "schermenZonderVormtaal: nieuw op 183",
       "reden": "Het RTG Design System 2.0 was volledig gespecificeerd (ONTWERP.md), had een tokenlaag (public/shared/rtg-ontwerp.css), een materialenleer (rtg-materiaal.css) en negentien groene toetsen -- en werd door EEN van de 185 app-pagina's ingesloten. rtg-materiaal.css door nul. test/ontwerp.test.js meet de tokenlaag tegen zichzelf, dus die stand kon jaren blijven staan zonder dat er iets rood werd.\n\nDeze meter telt de app-pagina's die de tokenlaag NIET insluiten, en mag alleen omlaag. Geteld op de insluiting en niet op het gebruik: een pagina die hem laadt kan er nog weinig mee doen, maar een pagina die hem niet laadt kan er zeker niets mee. Dat is de goedkope, eerlijke ondergrens van adoptie.\n\nHij begint op 183 en niet op 184: werk.html sluit hem vanaf nu in, met data-rtg-modus=\"pro\", en de zeven kleurtokens van dat scherm verwijzen naar de materialenleer in plaats van hun eigen hexcodes te dragen. Die waarden klopten toevallig (#7f1634 is de logo-bordeaux, #c0a544 is --gold-tekst), maar het was een kopie -- en een kopie loopt uit de pas zodra de bron verandert, in precies het scherm dat aan partners wordt verkocht."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "keuringOmvang 159 -> 161 (bedrijf/handeling.js en bedrijf/gevolg.js)",
+      "reden": "Twee nieuwe werkmodules zitten vlak onder de 10 kB-grens: handeling.js op 9731 en gevolg.js op 9682 bytes. Dat is een echte verslechtering en geen meetfout, dus hij staat hier met naam.\n\nWaarom ze niet gesplitst zijn. Bij handeling.js is dat WEL gebeurd: de werkwoordentabel staat apart in handeling-lijst.js, want die tabel groeit met elk werkwoord erbij en dan zou het bestand vanzelf over de grens lopen. Wat overblijft is de keten zelf -- plan, bevestiging, uitvoering, bon -- en die uit elkaar trekken zou de enige plek waar je die vier achter elkaar kunt lezen kapotmaken. gevolg.js is drie simulaties van elk zo'n vijftien regels plus de kop die uitlegt waarom deze laag geen wrapper om het dossier is; daar valt niets uit te halen dat ergens anders beter staat.\n\nWat dit NIET is: keuringTeGroot bleef 5. Geen van beide is over de grens; ze zitten eronder. De tand blijft daarmee doen waar hij voor is -- als een van deze twee er overheen gaat, klaagt de andere meter.\n\nWat er tegenover staat, en dat is geen verrekening maar een aparte meter: endpointsZonderTest ging van 1191 naar 1179. Die winst is geen nieuw werk maar een reparatie van de METING -- werkgevolg.test.js en werkhandeling.test.js plakten hun routes aan elkaar (`base + '/api/bedrijf' + pad`), waardoor twaalf endpoints die WEL getoetst worden als ongedekt telden. Ze noemen hun routes nu voluit."
     }
   ],
   "prestatie": {

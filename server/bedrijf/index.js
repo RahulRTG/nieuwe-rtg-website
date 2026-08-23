@@ -171,5 +171,9 @@ module.exports = (kern) => {
      service.js -- en hij schrijft in die bakken en niet in een eigen opslag
      ernaast. */
   require('./handeling')(sctx);
+  /* De gevolgsimulatie: wat blijft er open als deze wijziging doorgaat. Leest
+     alle bakken hierboven en schrijft in geen enkele -- er staat niet eens een
+     save() in. */
+  require('./gevolg')(sctx);
   return sctx;
 };

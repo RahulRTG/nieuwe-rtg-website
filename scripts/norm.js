@@ -214,6 +214,12 @@ const METERS = [
      levensduur heeft; dat is het eerlijke gat, en het mag alleen kleiner. */
   { sleutel: 'staatOngeregistreerd', richting: 'omlaag', wat: 'muteerbare toestand in server/ die niet in STATE.json staat' },
   { sleutel: 'staatOnbekend', richting: 'omlaag', wat: 'geregistreerde toestandswortels zonder levensduurklasse (tellen als procesgebonden)' },
+  /* Een DUUR op de wandklok. Niet hetzelfde als de klokschuld in KLOK.json:
+     die telt hoeveel code de tijd aan het OS vraagt (beproefbaarheid), deze
+     hoeveel code een verstreken tijd op de verkeerde klok uitrekent. Dat
+     laatste breekt zodra de wandklok terugloopt -- NTP, wintertijd, RTG_KLOK.
+     server/lib/klok.js sinds() en verstreken() zijn de reparatie. */
+  { sleutel: 'duurOpWandklok', richting: 'omlaag', wat: 'verstreken tijd uitgerekend op de wandklok in plaats van de monotone klok' },
   /* DE KLOKSCHULD STAAT HIER NIET, EN DAT IS EEN BESLUIT.
 
      Hier heeft een `klokDirect` gestaan die de kloklezingen telde. Dat was een
@@ -475,7 +481,7 @@ const METERBRONNEN = {
   mutaties: ['toetsenOngevoeligPct', 'toetsenNietGemeten'],
   skips: ['zelfpoortendeToetsen', 'browserpoortToetsen'],
   ijkregister: ['metersOngeijkt'],
-  staat: ['staatOngeregistreerd', 'staatOnbekend'],
+  staat: ['staatOngeregistreerd', 'staatOnbekend', 'duurOpWandklok'],
   // goedkoop genoeg om altijd te doen: een readdir en een package.json
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
@@ -743,10 +749,11 @@ function meet(bronnen) {
 
   /* De toestandscensus. Draait alleen als er een toestandsmeter gevraagd is:
      hij ontleedt ruim tweeduizend bestanden en kost drie seconden. */
-  let staatOngeregistreerd, staatOnbekend;
+  let staatOngeregistreerd, staatOnbekend, duurOpWandklok;
   if (nodig('staat')) {
     const { scan } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
     const census = scan({ wortel: WORTEL });
+    duurOpWandklok = census.duurOpWandklok;
     let register = null;
     try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'STATE.json'), 'utf8')); } catch (e) { register = null; }
     /* GEEN REGISTER IS GEEN NUL. Zonder STATE.json is niet bekend welke
@@ -784,7 +791,7 @@ function meet(bronnen) {
     inlineStijlAttributen,
     bronBlindeBestanden,
     delenZonderOnderwerp,
-    staatOngeregistreerd, staatOnbekend
+    staatOngeregistreerd, staatOnbekend, duurOpWandklok
   };
   if (!alleen) return alles;
   const uit = {};

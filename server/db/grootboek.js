@@ -9,11 +9,13 @@
    tabel klaar. Zie ./gidsen.js, dat dit deel met de ledengids samenvoegt. */
 let grootPool = null;              // blijft null zonder Postgres: dan is alles hier inert
 const grootCache = new Map();      // code -> zaak-object of null (niet gevonden)
-let grootN = 0, grootNAt = 0;
+// Duur, geen moment: monotone klok. Waarom en de -Infinity: sinds() in lib/klok.js.
+const { sinds } = require('../lib/klok');
+let grootN = 0, grootNAt = -Infinity;
 
 async function ververGrootN() {
   if (!grootPool) return 0;
-  try { const r = await grootPool.query('SELECT count(*)::bigint AS c FROM suppliers_big'); grootN = Number(r.rows[0].c); grootNAt = Date.now(); } catch (e) {}
+  try { const r = await grootPool.query('SELECT count(*)::bigint AS c FROM suppliers_big'); grootN = Number(r.rows[0].c); grootNAt = sinds(); } catch (e) {}
   return grootN;
 }
 async function laadGroot(code) {
@@ -35,7 +37,7 @@ function grootSupplierSync(code) {
   return null;
 }
 function grootAantal() {
-  if (grootPool && Date.now() - grootNAt > 10000) { grootNAt = Date.now(); ververGrootN().catch(() => {}); }
+  if (grootPool && sinds() - grootNAt > 10000) { grootNAt = sinds(); ververGrootN().catch(() => {}); }
   return grootN;
 }
 

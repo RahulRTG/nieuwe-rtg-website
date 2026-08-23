@@ -15,7 +15,9 @@ const ledenCache = new Map();      // key -> { codename, tier } of null (niet ge
 // upsert is fire-and-forget). Zonder deze cache kan een p2p-betaling naar een
 // zojuist geregistreerd lid "codenaam onbekend" krijgen tot de schrijf landt.
 const ledenRev = new Map();        // codename_lower -> { key, codename, tier }
-let ledenN = 0, ledenNAt = 0;
+// Duur, geen moment: monotone klok. Waarom en de -Infinity: sinds() in lib/klok.js.
+const { sinds } = require('../lib/klok');
+let ledenN = 0, ledenNAt = -Infinity;
 
 /* De zoekkant woont in ./ledengids-zoek.js (dit bestand liep over de 10 kB).
    De pool gaat mee als FUNCTIE en niet als waarde: hij wordt pas bij init()
@@ -26,7 +28,7 @@ const { ledenGidsExact, ledenGidsZoek } =
 
 async function ververLedenN() {
   if (!ledenPool) return 0;
-  try { const r = await ledenPool.query('SELECT count(*)::bigint AS c FROM member_dir'); ledenN = Number(r.rows[0].c); ledenNAt = Date.now(); } catch (e) {}
+  try { const r = await ledenPool.query('SELECT count(*)::bigint AS c FROM member_dir'); ledenN = Number(r.rows[0].c); ledenNAt = sinds(); } catch (e) {}
   return ledenN;
 }
 async function laadLid(key) {
@@ -63,7 +65,7 @@ async function ledenGidsHaalWacht(key) {
   return ledenCache.get(key) || null;
 }
 function ledenGidsAantal() {
-  if (ledenPool && Date.now() - ledenNAt > 10000) { ledenNAt = Date.now(); ververLedenN().catch(() => {}); }
+  if (ledenPool && sinds() - ledenNAt > 10000) { ledenNAt = sinds(); ververLedenN().catch(() => {}); }
   return ledenN;
 }
 // Nieuw of gewijzigd lid: cache meteen bijwerken (zodat een lezer direct na een

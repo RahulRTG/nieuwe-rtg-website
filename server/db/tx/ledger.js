@@ -81,10 +81,12 @@ async function txLedgerTel(naam, klant) {
 // Synchrone, gecachete totalen (zelfde patroon als ledenGidsAantal): de
 // KPI-lezers blijven synchroon en krijgen een teller die hooguit ~10 s achterloopt.
 const txN = Object.fromEntries(NAMEN.map(n => [n, 0]));
-let txNAt = 0;
+// Duur, geen moment: monotone klok. Waarom en de -Infinity: sinds() in lib/klok.js.
+const { sinds } = require('../../lib/klok');
+let txNAt = -Infinity;
 function txLedgerAantal(naam) {
-  if (achter && Date.now() - txNAt > 10000) {
-    txNAt = Date.now();
+  if (achter && sinds() - txNAt > 10000) {
+    txNAt = sinds();
     (async () => { try { for (const n of NAMEN) txN[n] = await txLedgerTel(n); } catch (e) {} })();
   }
   return txN[naam] || 0;

@@ -79,6 +79,36 @@ function inFunctie(pad) {
   return pad.some(x => /Function/.test(x.type) || x.type === 'MethodDefinition');
 }
 
+/* EEN DUUR OP DE WANDKLOK -- de foutklasse die de monotone klok wegneemt.
+
+   `Date.now() - t0` wordt kleiner zodra de wandklok achteruit gaat: bij een
+   NTP-correctie, bij wintertijd, bij RTG_KLOK=-1u. Een timeout verloopt dan
+   nooit meer of meteen, een venster springt open, een uptime wordt negatief.
+   server/lib/klok.js heeft daar sinds vandaag sinds() en verstreken(merk) voor.
+
+   HET VERSCHIL MET DATUMREKENEN, want anders telt deze meter iets dat nooit
+   nul kan worden. `Date.now() - 7 * 86400000` is geen duur maar een MOMENT:
+   zeven dagen geleden. Dat hoort juist op de wandklok, want het gaat over de
+   kalender. Alleen als de andere kant geen kaal getal is, wordt er een
+   verstreken tijd gemeten -- 112 keer tegen 19 keer datumrekenen.
+
+   DIT IS GEEN TWEEDE KLOKSCHULD. KLOK.json telt hoeveel code de tijd aan het OS
+   vraagt; dat gaat over RTG_KLOK en over beproefbaarheid. Deze telt hoeveel code
+   een DUUR op de verkeerde klok uitrekent, en dat is een ander gebrek met een
+   andere reparatie. Ze overlappen in regels en niet in betekenis. */
+const isDateNow = (n) => n && n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
+  && (n.callee.object || {}).name === 'Date' && (n.callee.property || {}).name === 'now';
+
+function alleenGetallen(n) {
+  if (!n) return false;
+  if (n.type === 'Literal' || n.type === 'NumericLiteral') {
+    return /^[\d._]+(e[+-]?\d+)?$/i.test(String(n.raw === undefined ? n.value : n.raw));
+  }
+  if (n.type === 'BinaryExpression') return alleenGetallen(n.left) && alleenGetallen(n.right);
+  if (n.type === 'UnaryExpression') return alleenGetallen(n.argument);
+  return false;
+}
+
 function scanBestand(bron, relPad) {
   const boom = parse(bron);
   const kandidaat = new Map();
@@ -112,6 +142,7 @@ function scanBestand(bron, relPad) {
   const klok = { datumLezing: 0, datumBouw: 0, dateNow: 0, hrtime: 0, perf: 0 };
   const willekeur = { math: 0, crypto: 0 };
   let timers = 0, listeners = 0, envSchrijf = 0, globalSchrijf = 0;
+  let duurOpWandklok = 0;
 
   loop(boom, (n, pad) => {
     if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression') {
@@ -164,6 +195,10 @@ function scanBestand(bron, relPad) {
     if (n.type === 'NewExpression' && n.callee && n.callee.name === 'Date') {
       if ((n.arguments || []).length) klok.datumBouw++; else klok.datumLezing++;
     }
+    if (n.type === 'BinaryExpression' && n.operator === '-' && (isDateNow(n.left) || isDateNow(n.right))) {
+      const ander = isDateNow(n.left) ? n.right : n.left;
+      if (!alleenGetallen(ander)) duurOpWandklok++;   // geen kalenderrekenen maar een verstreken tijd
+    }
     if (!inFunctie(pad) && n.type === 'CallExpression' && n.callee) {
       const c = n.callee;
       const naam = c.type === 'Identifier' ? c.name : (c.type === 'MemberExpression' ? ((c.property || {}).name || '') : '');
@@ -188,7 +223,7 @@ function scanBestand(bron, relPad) {
       bron: 'scan'
     });
   }
-  return { wortels, klok, willekeur, timers, listeners, envSchrijf, globalSchrijf };
+  return { wortels, klok, willekeur, timers, listeners, envSchrijf, globalSchrijf, duurOpWandklok };
 }
 
 /* De hele boom. Een bestand dat de eigen parser niet leest is GEEN nul: dat
@@ -200,7 +235,7 @@ function scan({ wortel, mappen } = {}) {
   const uit = {
     wortels: [], onleesbaar: [], bestanden: 0,
     klok: { datumLezing: 0, datumBouw: 0, dateNow: 0, hrtime: 0, perf: 0 },
-    willekeur: { math: 0, crypto: 0 }, timers: 0, listeners: 0, envSchrijf: 0, globalSchrijf: 0
+    willekeur: { math: 0, crypto: 0 }, timers: 0, listeners: 0, envSchrijf: 0, globalSchrijf: 0, duurOpWandklok: 0
   };
   for (const map of mappen) {
     for (const p of bestandenOnder(path.join(wortel, map)).sort()) {
@@ -218,6 +253,7 @@ function scan({ wortel, mappen } = {}) {
       uit.listeners += deel.listeners;
       uit.envSchrijf += deel.envSchrijf;
       uit.globalSchrijf += deel.globalSchrijf;
+      uit.duurOpWandklok += deel.duurOpWandklok;
     }
   }
   uit.wortels.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));

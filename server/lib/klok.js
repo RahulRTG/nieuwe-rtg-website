@@ -122,8 +122,17 @@ const datum = VERSCHUIVING === 0 ? () => new Date() : () => new Date(Date.now() 
    die moeten overal weer omgerekend worden -- drie omrekeningen verderop staat
    er dan alsnog een afrondingsfout in een venster.
 
+   EEN VAL BIJ HET MIGREREN, en die staat hier omdat hij op elke plek terugkomt.
+   Wie `let merk = 0` had staan bij een wandklok-venster, moet er `-Infinity` van
+   maken. `Date.now() - 0` is namelijk een enorm getal, dus zo'n venster stond bij
+   de start altijd open; `sinds() - 0` is bijna nul, dus met 0 zou het de eerste
+   tien seconden na de start juist DICHT staan. Een verversing die de eerste tien
+   seconden overslaat is precies het soort verschil dat je pas in productie ziet.
+
    Handhaver: test/klok.test.js -- met RTG_KLOK=-1u loopt de wandklok een uur
-   terug terwijl deze gewoon dooretelt. */
+   terug terwijl deze gewoon dooretelt, en een tweede proef zet de wandklok
+   midden in de meting terug (zoals NTP doet) en eist dat de wandklok-duur
+   NEGATIEF wordt en de monotone niet. */
 const sinds = () => performance.now();
 
 /* Hoeveel tijd is er verstreken sinds een eerder `sinds()`-merk. Bestaat apart

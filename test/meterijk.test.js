@@ -645,6 +645,18 @@ const IJKINGEN = {
         finally { fs.writeFileSync(regPad, oud); }
       })
   },
+  duurOpWandklok: {
+    /* Twee duurmetingen erbij, en een DATUMberekening die NIET mee hoort te
+       tellen. Zonder die derde regel zou de proef ook slagen als de meter elke
+       aftrekking van Date.now() telde -- en dan is hij nooit af te lossen, want
+       "zeven dagen geleden" hoort juist op de wandklok. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      'const t0 = Date.now();\nfunction duurA() { return Date.now() - t0; }\n' +
+      'function duurB(m) { return Date.now() - m > 10000; }\n' +
+      'const week = Date.now() - 7 * 86400000;\nmodule.exports = { duurA, duurB, week };\n',
+      () => meet({ alleen: ['duurOpWandklok'] }).duurOpWandklok - voor.duurOpWandklok)
+  },
+
   metersOngeijkt: {
     /* De meter die de ongeijkte meters telt, moet zelf uitslaan -- anders
        bewaakt een ongeijkte meter het ijken. Hij krijgt twee verzonnen

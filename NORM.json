@@ -8,7 +8,7 @@
     "dependencies": 0,
     "testbestanden": 905,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 17,
+    "zelfpoortendeToetsen": 18,
     "e2eBestanden": 126,
     "keuringOmvang": 159,
     "keuringDubbeling": 115,
@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 155,
+    "toetsenNietGemeten": 156,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -33,6 +33,11 @@
     "delenZonderOnderwerp": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-23",
+      "meter": "toetsenNietGemeten 155 -> 156; zelfpoortendeToetsen 17 -> 18 (test/grafsteen.pg.test.js)",
+      "reden": "Een Postgres-toets erbij (TAKEN.md 4.38, de grafsteen tegen een herrijzende kv-rij). Twee meters gaan een omhoog, en dat is bij deze twee de prijs van een toets erbij en geen erosie -- maar het staat er met naam bij, want dat is het verschil.\n\nzelfpoortendeToetsen +1: een pg-toets die zichzelf overslaat als er geen DATABASE_URL is. Dat is niet te vermijden en het is het patroon van alle tien de andere pg-toetsen; de runner npm run test:pg is juist gebouwd om ze WEL te draaien, elk in een eigen database. Deze staat daar in de lijst.\n\ntoetsenNietGemeten +1: de mutatiemotor is nog niet langs dit bestand geweest -- het bestaat pas sinds vandaag. Handmatig zijn er wel vijf mutaties op gedraaid en gezien zakken (laadAlles die geen grafstenen meldt, het opstartpad dat ze niet toepast, haalNieuwer die ze negeert, de flush die eroverheen schrijft, en een schrijf die de grafsteen niet opheft). Twee daarvan kwamen er eerst ongestraft doorheen omdat de twee schakels elkaar afdekten; daar zijn twee toetsen bij gekomen die elk een schakel apart aanwijzen. Deze +1 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen."
+    },
     {
       "datum": "2026-08-18",
       "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",

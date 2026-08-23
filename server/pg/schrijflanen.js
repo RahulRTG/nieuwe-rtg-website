@@ -57,7 +57,22 @@ function maakSchrijflanen(ctx, laatsteSchrijf) {
        geen bijgewerkte cache achterlaten. */
     async function schrijfEen(client, k, jOns) {
       await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
-      const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [k]);
+      const huidig = await client.query('SELECT val, ver, weg FROM kv WHERE key = $1 FOR UPDATE', [k]);
+      /* EEN GRAFSTEEN DIE WIJ NOG NIET HEBBEN GEZIEN (TAKEN.md 4.38). Iemand
+         heeft deze collectie gewist terwijl wij hem nog in de werkkopie hadden.
+         Niet mergen -- `val` is dan leeg en JSON.parse zou struikelen, en
+         terugschrijven zou het wissen ongedaan maken op elke node behalve die
+         waar het commando liep. We passen het wissen toe en slaan de schrijf
+         over. Hebben we de grafsteen WEL al toegepast (`ver` niet nieuwer dan
+         wat wij kennen), dan is dit gewoon opnieuw vullen en gaat hij door: een
+         grafsteen zegt "die staat van toen is weg", niet "deze naam mag nooit
+         meer". */
+      if (huidig.rows.length && huidig.rows[0].weg && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {
+        delete dataNu[k];
+        laatsteJson.delete(k);
+        toegepast.set(k, Number(huidig.rows[0].ver));
+        return null;
+      }
       /* De lijst `gewijzigd` is vóór het wachten op het slot gemaakt. Een
          directe collectietransactie in DIT proces kan intussen al gecommit en
          de lokale werkkopie vervangen hebben. Schrijf dan de verse werkkopie,
@@ -73,14 +88,18 @@ function maakSchrijflanen(ctx, laatsteSchrijf) {
       const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
       const ver = Number(nv.rows[0].v);
       await client.query(
+        // `weg = false`: schrijven heft een grafsteen op. Zonder dit zou een
+        // opnieuw gevulde collectie als gewist blijven gelden en stilzwijgend
+        // verdwijnen -- dan hadden we het herrijzen geruild voor dataverlies.
         `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
-         ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, bijgewerkt = now()`,
+         ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, weg = false, bijgewerkt = now()`,
         [k, naarStore(j), ver]
       );
       await client.query(`SELECT pg_notify($1, $2)`, [KANAAL, k]);
       return { j, ver };
     }
-    const naCommit = (k, r) => { laatsteJson.set(k, r.j); laatsteSchrijf.set(k, Date.now()); toegepast.set(k, r.ver); geschreven++; };
+    // `r` is null als de schrijf is overgeslagen omdat er een verse grafsteen lag.
+    const naCommit = (k, r) => { if (!r) return; laatsteJson.set(k, r.j); laatsteSchrijf.set(k, Date.now()); toegepast.set(k, r.ver); geschreven++; };
     /* DE RIJSTROOK IS EEN GEHEEL. paySaldi en payIdem elk in een eigen
        transactie committen liet een venster staan: een kill -9 tussen die twee
        commits gaf een schijf waarop het geld staat en de idem-sleutel niet, en

@@ -14,10 +14,18 @@
    2. alleen buiten NODE_ENV=production
    3. alleen TOT app.listen -- daarna krijgt elk account weer een vers zout
 
-   De derde is de belangrijkste en wordt daarom niet in-proces getoetst maar op
-   een ECHTE server: twee registraties met hetzelfde wachtwoord moeten na de
-   start een verschillende hash in de database hebben staan. Een venster dat per
-   ongeluk openblijft, is in-proces niet te zien maar hier wel.
+   De derde is de belangrijkste, en de eerste toets ervoor was er een die NIET
+   kon zakken -- precies de vorm waar LAT-regel 9 voor waarschuwt. Hij
+   registreerde twee leden met hetzelfde wachtwoord op een draaiende server en
+   eiste verschillende zouten. Dat slaagde altijd, ook met het sluiten eruit
+   gesloopt: /api/auth/register loopt via de ASYNCHRONE hashPassword, en die
+   raakt de memo nooit. De toets keek naar een deur waar het venster niet zit.
+
+   Nu draait de echte boot (server/server.js, tot en met app.listen) in een
+   eigen proces en wordt daarna GEVRAAGD of het venster dicht is. Haal het
+   sluiten weg en dat antwoord wordt 'true'. De registratieproef blijft staan,
+   maar dan voor wat hij wel bewijst: dat registreren de volle asynchrone weg
+   loopt en elk lid een eigen zout krijgt.
 
    Draai los: node --experimental-sqlite --test test/seedvenster.test.js */
 'use strict';
@@ -81,10 +89,12 @@ test('het formaat en de controle veranderen niet: een gedeeld zout blijft gewoon
   assert.equal(await k.verifyPassword('iets anders', h), false);
 });
 
-/* DE ECHTE PROEF. Een draaiende server, twee verse registraties met hetzelfde
-   wachtwoord. Blijft het venster per ongeluk openstaan, dan krijgen die twee
-   dezelfde hash -- en dat is precies wat hier niet mag. */
-test('op een draaiende server krijgen twee accounts met hetzelfde wachtwoord een verschillend zout', async (t) => {
+/* Registreren loopt via de asynchrone hashPassword en krijgt dus per lid een
+   vers zout. Dat is GEEN proef op het seedvenster (die staat hieronder, en de
+   eerste versie hiervan deed alsof van wel): deze weg raakt de memo helemaal
+   niet. Wat hij wel tegenhoudt is dat iemand registreren ooit naar de sync-weg
+   verlegt -- dan zouden twee leden met hetzelfde wachtwoord een zout delen. */
+test('registreren geeft elk lid een eigen zout (de asynchrone weg, niet de seedweg)', async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-seedvenster-'));
   const srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } });
   t.after(() => { stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -120,8 +130,36 @@ test('op een draaiende server krijgen twee accounts met hetzelfde wachtwoord een
   assert.ok(b && b.password_hash, 'het tweede verse account hoort in de kluis te staan');
 
   assert.notEqual(zoutVan(a.password_hash), zoutVan(b.password_hash),
-    'twee NA de start geregistreerde accounts delen een zout: het seedvenster stond nog open toen de server luisterde');
+    'twee geregistreerde leden delen een zout: registreren loopt niet meer via de asynchrone hashPassword');
   assert.notEqual(a.password_hash, b.password_hash, 'en dus ook niet dezelfde hash');
+});
+
+/* GRENDEL 3, OP DE ECHTE BOOT. Het hele server.js draait hier op, inclusief
+   opzet/luister.js, en zodra hij luistert vragen we de kluis of het venster
+   dicht is. Dit is de enige toets die het sluiten werkelijk vastpakt: haal de
+   regel in luister.js weg en dit antwoord wordt 'true'. */
+test('grendel 3: zodra de echte server luistert, is het seedvenster dicht', () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-seedvenster-boot-'));
+  try {
+    const uit = execFileSync(process.execPath, ['--experimental-sqlite', '-e', `
+      const { server } = require('./server/server.js');
+      const zeg = () => {
+        const k = require('./server/accounts/kluis');
+        console.log('VENSTER=' + JSON.stringify({ open: k.seedvensterOpen(), luistert: server.listening }));
+        process.exit(0);
+      };
+      if (server.listening) zeg(); else server.on('listening', zeg);
+    `], {
+      cwd: WORTEL, encoding: 'utf8', timeout: 120000,
+      env: { ...process.env, RTG_DEMO: '1', NODE_ENV: 'test', PORT: '0', SMTP_URL: '', RTG_DATA_DIR: TMP }
+    });
+    const regel = uit.split('\n').find(r => r.startsWith('VENSTER='));
+    assert.ok(regel, 'de proefserver hoort zijn vensterstand te melden; uitvoer was:\n' + uit.slice(-800));
+    const stand = JSON.parse(regel.slice(8));
+    assert.equal(stand.luistert, true, 'de server hoort te luisteren als we dit vragen');
+    assert.equal(stand.open, false,
+      'het seedvenster stond NOG OPEN toen de server luisterde: opzet/luister.js sluit hem niet meer');
+  } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
 });
 
 /* En de andere kant op: de besparing moet er ook ECHT zijn. Zonder deze toets

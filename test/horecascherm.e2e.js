@@ -38,6 +38,13 @@ async function zaakToken(base) {
   return inlog.token;
 }
 
+/* De zaak-API, met het token erin. De meervoudsvariant van deze suite
+   (horecaschermen.e2e.js) heeft zijn eigen versie; die is daar gedefinieerd en
+   hier dus niet beschikbaar. */
+const zaakApi = (base, token) => (pad, body) => fetch(base + '/api/supplier/horeca' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+  body: JSON.stringify(body || {}) }).then(r => r.json());
+
 test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -67,6 +74,7 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
 
     /* ---- ingelogd: de dienst draait ---- */
     const token = await zaakToken(base);
+    const api = zaakApi(base, token);
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, token);
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(700);
@@ -144,6 +152,75 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     await page.waitForTimeout(600);
     const regie = await page.evaluate(() => document.getElementById('kRegie').innerText.replace(/\s+/g, ' '));
     assert.match(regie, /Tafel 24/, 'de tafel staat op het regiescherm');
+
+    /* ---- de handelingen OP een rekening ----
+       Achttien endpoints hadden geen scherm; dit zijn de vijf die een bediening
+       elk uur nodig heeft. Het scherpst bij `regel/weg`: je kon iets op een
+       rekening zetten en er niets meer af halen. */
+    const rek3 = await api('/rekening/open', { kanaal: 'tafel', tafel: 'Tafel 11', gasten: 2 });
+    await api('/rekening/regel', { rekeningId: rek3.rekening.id, naam: 'Oesters', prijs: 24, station: 'koud', gang: 1 });
+    await api('/rekening/regel', { rekeningId: rek3.rekening.id, naam: 'Vergissing', prijs: 99, station: 'koud', gang: 1 });
+    const rek4 = await api('/rekening/open', { kanaal: 'tafel', tafel: 'Tafel 12', gasten: 2 });
+    await api('/rekening/regel', { rekeningId: rek4.rekening.id, naam: 'Wijn', prijs: 40, station: 'bar', gang: 0 });
+
+    await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(900);
+    await page.evaluate(() => {
+      [...document.querySelectorAll('#zLijst [data-open]')]
+        .find(b => b.closest('.item').textContent.includes('Tafel 11')).click();
+    });
+    await page.waitForTimeout(900);
+
+    // een misgetikte regel eraf, zolang de keuken er niet aan begon
+    const eraf = await page.evaluate(() => {
+      const rij = [...document.querySelectorAll('#zDetail .item')].find(x => x.textContent.includes('Vergissing'));
+      return rij && !!rij.querySelector('[data-regelweg]');
+    });
+    assert.ok(eraf, 'een niet-vrijgegeven regel krijgt een eraf-knop');
+    await page.evaluate(() => {
+      [...document.querySelectorAll('#zDetail .item')].find(x => x.textContent.includes('Vergissing'))
+        .querySelector('[data-regelweg]').click();
+    });
+    await page.waitForTimeout(900);
+    let stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
+    assert.equal(stand.regels.length, 1, 'de regel is er echt af');
+    assert.equal(stand.totalen.bruto, 2400);
+
+    // korting vraagt een reden, en het SCHERM vraagt hem -- niet pas de server
+    await page.fill('#zKortProcent', '10');
+    await page.click('#zKorting');
+    await page.waitForTimeout(500);
+    let melding = await page.evaluate(() => document.getElementById('melding').innerText);
+    assert.match(melding, /Waarom wordt er korting gegeven/, 'zonder reden gebeurt er niets');
+    stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
+    assert.equal(stand.totalen.korting, 0, 'en er staat ook geen korting op');
+
+    await page.fill('#zKortReden', 'stamgast');
+    await page.click('#zKorting');
+    await page.waitForTimeout(900);
+    stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
+    assert.equal(stand.totalen.korting, 240, '10% van 24,00');
+
+    // samenvoegen VERPLAATST: de som is precies het geheel
+    const voor = stand.totalen.netto;
+    const ander = (await api('/rekening', { rekeningId: rek4.rekening.id })).rekening.totalen.netto;
+    /* De juiste rekening KIEZEN en niet de eerste pakken: er staan er meer open
+       (Tafel 24 uit het eerste deel van deze toets), en selectedIndex 1 pakte
+       die. Dan meet de assertie hieronder iets anders dan er gebeurt. */
+    const gekozen = await page.evaluate(() => {
+      const s = document.getElementById('zSamenMet');
+      const o = [...s.options].find(x => x.text.indexOf('Tafel 12') === 0);
+      if (!o) return null;
+      s.value = o.value;
+      return o.value;
+    });
+    assert.equal(gekozen, rek4.rekening.id, 'Tafel 12 staat in de samenvoeglijst');
+    await page.click('#zVoegSamen');
+    await page.waitForTimeout(1200);
+    stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
+    assert.equal(stand.totalen.netto, voor + ander, 'samenvoegen brengt geen cent bij of af');
+    melding = await page.evaluate(() => document.getElementById('melding').innerText);
+    assert.match(melding, /Samengevoegd/, 'en het scherm zegt het bedrag hardop terug');
 
     assert.deepEqual(fouten, [], 'geen paginafouten: ' + fouten.join(' | '));
   } finally {

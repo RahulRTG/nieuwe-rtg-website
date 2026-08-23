@@ -99,9 +99,36 @@
         <input class="veld" id="zVrijGang" type="number" min="0" max="9" value="1" aria-label="Gang vrijgeven" style="flex:0 1 5rem;">
         <input class="veld" id="zServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Serveertijd" style="flex:0 1 7rem;">
         <button class="knop" id="zVrij" type="button">Gang vrijgeven</button>
+      </div>
+      <!-- DE TAFEL ZELF: gasten schuiven op, of twee tafels worden er een.
+           Beide handelingen VERPLAATSEN alleen; de server rekent voor en na en
+           weigert als er een cent bij of af zou komen. -->
+      <div class="rij z-mt60">
+        <input class="veld" id="zNaarTafel" maxlength="30" placeholder="Naar tafel" aria-label="Verplaatsen naar welke tafel" style="flex:0 1 8rem;">
+        <button class="knop" id="zVerplaats" type="button">Verplaats</button>
+        <select class="veld" id="zSamenMet" aria-label="Samenvoegen met welke rekening" style="flex:0 1 12rem;"><option value="">Samenvoegen met...</option></select>
+        <button class="knop" id="zVoegSamen" type="button">Voeg samen</button>
+      </div>
+      <!-- KORTING DRAAGT ALTIJD EEN REDEN, en fooi wordt nooit voorgevuld.
+           Allebei een regel uit de kern, hier zichtbaar gemaakt. -->
+      <div class="rij z-mt60">
+        <input class="veld" id="zKortProcent" type="number" min="0" max="100" placeholder="%" aria-label="Kortingspercentage" style="flex:0 1 5rem;">
+        <input class="veld" id="zKortBedrag" type="number" min="0" step="0.01" placeholder="of bedrag" aria-label="Kortingsbedrag" style="flex:0 1 7rem;">
+        <input class="veld" id="zKortReden" maxlength="80" placeholder="Reden voor de korting" aria-label="Reden voor de korting" style="flex:1 1 11rem;">
+        <button class="knop" id="zKorting" type="button">Korting</button>
+        <input class="veld" id="zFooiBedrag" type="number" min="0" step="0.01" placeholder="Fooi" aria-label="Fooi" style="flex:0 1 6rem;">
+        <button class="knop" id="zFooi" type="button">Fooi erop</button>
+      </div>
+      <div class="rij z-mt60">
         <input class="veld" id="zSplits" type="number" min="2" max="20" placeholder="Splits in" aria-label="Splitsen per persoon" style="flex:0 1 6rem;">
         <button class="knop" id="zSplitsGa" type="button">Splits per persoon</button>
         <button class="knop p" id="zBetaal" type="button">Afrekenen (pin)</button>
+      </div>
+      <!-- ONINBAAR IS GEEN ADMINISTRATIEVE HANDELING: het blijft in de
+           dagcijfers staan en vraagt altijd een reden. -->
+      <div class="rij z-mt60">
+        <input class="veld" id="zOninbaarReden" maxlength="160" placeholder="Waarom is deze rekening oninbaar?" aria-label="Reden oninbaar" style="flex:1 1 14rem;">
+        <button class="knop" id="zOninbaar" type="button">Boek oninbaar</button>
       </div>
       <!-- VERDELEN IS IETS ANDERS DAN SPLITSEN, en daarom staat het op een
            eigen regel met zijn eigen uitleg. Splitsen knipt de tafel in losse
@@ -141,6 +168,7 @@
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/gezelschap.js"></script>
 <script src="/apps/horeca/zaal.js"></script>
+<script src="/apps/horeca/rekeningacties.js"></script>
 <script src="/apps/horeca/verzoeken.js"></script>
 <script src="/apps/horeca/keuken.js"></script>
 <script src="/apps/horeca/app.js"></script>

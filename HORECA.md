@@ -241,6 +241,16 @@ Vijf dingen liggen daar vast:
 nu gewoon een gang met station `bar`, dus hij staat op dezelfde lijst. Het
 groeperen tot drankgolven (BAR hierboven) is een eigen stap.
 
+**3b. De rekening kan eindelijk ook terug.** *Gedaan.* Er waren achttien
+endpoints zonder scherm; vijf daarvan heeft een bediening elk uur nodig, en het
+scherpst was `rekening/regel/weg` — je kon iets op een rekening zetten en er
+niets meer af halen. Nu staan `regel/weg`, `verplaats`, `voeg-samen`, `korting`,
+`fooi` en `oninbaar` op het zaalscherm (`horeca/rekeningacties.js`), met de
+regels van de kern zichtbaar in plaats van verborgen: korting vraagt zijn reden
+vóóraf, fooi wordt nooit voorgevuld, samenvoegen zegt het bedrag hardop terug, en
+oninbaar staat apart onderaan omdat het geen administratieve handeling is. Van
+achttien naar twaalf endpoints zonder scherm.
+
 **4. PDA SERVICE** als eigen werkstand, met rolmodi (bediening, runner, host,
 wijkhoofd, manager) op één app.
 

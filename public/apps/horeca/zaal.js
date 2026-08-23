@@ -27,6 +27,7 @@
   var api = function (p, b) { return window.RTGHoreca.api(p, b); };
   var meld = function (t) { window.RTGHoreca.meld(t); };
   var G = function () { return window.RTGHorecaGezelschap; };
+  var A = function () { return window.RTGHorecaActies; };
 
   function laad() {
     api('/rekeningen', { status: 'open' }).then(function (r) {
@@ -52,6 +53,7 @@
       $('zDetailKop').textContent = (rek.tafel || rek.kanaal) + ' · ' + rek.gasten + ' gast(en)';
       /* Eerst het gezelschap, dan de regels: de keuzelijst naast een regel komt
          uit het gezelschap, dus die moet geladen zijn voor we regels tekenen. */
+      A().zet(rek.id);
       api('/gezelschap', { rekeningId: rek.id }).then(function (g) {
         if (!g.body.error) G().teken(rek.id, g.body.gezelschap, rek.verdeling);
         tekenRegels(rek);
@@ -69,6 +71,13 @@
         '</span><span class="rij">' +
         '<select class="veld" aria-label="Voor wie is ' + esc(x.naam) + '" data-regelstoel="' + esc(x.id) + '">' +
         G().opties(x.gastNr) + '</select>' +
+        /* ERAF KAN ALLEEN ZOLANG DE KEUKEN ER NIET AAN BEGON. Daarna is het
+           derving, en dat is een andere knop met een reden -- de server weigert
+           het ook. Die grens hoort op het scherm te staan en niet pas in een
+           foutmelding. */
+        (x.stand === 'besteld'
+          ? '<button class="knop" data-regelweg="' + esc(x.id) + '" aria-label="Haal ' + esc(x.naam) + ' van de rekening">Eraf</button>'
+          : '') +
         '<span class="stil">' + euro(x.centen * x.aantal) +
         (x.happy ? ' <span class="tag">' + esc(x.happy) + ', van ' + euro(x.lijstprijs) + '</span>' : '') +
         '</span></span></div>';
@@ -78,6 +87,15 @@
       '<div class="item"><span><b>Te betalen</b></span><span class="stil"><b>' + euro(rek.totalen.teBetalen) + '</b>' +
       (rek.totalen.korting ? ' (korting ' + euro(rek.totalen.korting) + ')' : '') +
       (rek.totalen.fooi ? ' · fooi ' + euro(rek.totalen.fooi) : '') + '</span></div>');
+
+    window.RTGHoreca.bind($('zDetail'), 'regelweg', function (b) {
+      api('/rekening/regel/weg', { rekeningId: huidig, regelId: b.getAttribute('data-regelweg') })
+        .then(function (r) {
+          if (r.body.error) return meld(r.body.error);
+          meld('Van de rekening gehaald.');
+          toon(huidig, true);
+        });
+    });
 
     Array.prototype.forEach.call($('zDetail').querySelectorAll('[data-regelstoel]'), function (sel) {
       sel.addEventListener('change', function () {
@@ -94,6 +112,16 @@
   function bind() {
     G().bind();
     G().bijWijziging = function () { if (huidig) toon(huidig, true); };
+    /* De handelingen OP een rekening staan in horeca/rekeningacties.js: dat is
+       een ander onderwerp (geld en tafels, niet bestellen), en samen paste het
+       niet meer binnen de modulemaat van dit huis. `opnieuw` zegt of de hele
+       lijst moet herladen -- na splitsen of afrekenen bestaat deze rekening
+       niet meer zoals hij was. */
+    A().bind();
+    A().bijWijziging = function (opnieuw) {
+      if (opnieuw) { huidig = null; laad(); return; }
+      laad();
+    };
 
     $('zOpen').addEventListener('click', function () {
       api('/rekening/open', { kanaal: $('zKanaal').value, tafel: $('zTafel').value.trim(),
@@ -127,41 +155,6 @@
         serveerOm: $('zServeerOm').value.trim() }).then(function (r) {
         meld(r.body.error || (r.body.vrijgegeven + ' regel(s) naar de keuken.'));
         if (!r.body.error) laad();
-      });
-    });
-    $('zSplitsGa').addEventListener('click', function () {
-      if (!huidig) return meld('Open eerst een rekening.');
-      var n = Number($('zSplits').value) || 0;
-      if (n < 2) return meld('In hoeveel delen?');
-      api('/rekening/splits', { rekeningId: huidig, perPersoon: n }).then(function (r) {
-        if (r.body.error) return meld(r.body.error);
-        var som = (r.body.delen || []).reduce(function (t, d) { return t + d.totalen.netto; }, 0);
-        meld('Gesplitst in ' + r.body.delen.length + ' delen, samen ' + euro(som) + '.');
-        huidig = null;
-        laad();
-      });
-    });
-    /* VERDELEN, en dat is iets anders dan splitsen hierboven. Splitsen knipt
-       de tafel in losse rekeningen; verdelen laat het er een en spreekt alleen
-       af wie welk deel betaalt. Dezelfde rekensom die de gast op zijn telefoon
-       gebruikt (kern/horeca/verdeling.js), dus de tafel krijgt door beide
-       deuren hetzelfde antwoord. */
-    $('zVerdeel').addEventListener('click', function () {
-      if (!huidig) return meld('Open eerst een rekening.');
-      api('/rekening/verdeel', { rekeningId: huidig, wijze: $('zWijze').value }).then(function (r) {
-        if (r.body.error) return meld(r.body.error);
-        var d = r.body.verdeling.delen;
-        meld(d.map(function (x) { return (x.handle || ('stoel ' + x.nr)) + ' ' + euro(x.centen); }).join(' · '));
-        toon(huidig, true);
-      });
-    });
-    $('zBetaal').addEventListener('click', function () {
-      if (!huidig) return meld('Open eerst een rekening.');
-      api('/betaal', { rekeningId: huidig, wijze: 'pin' }).then(function (r) {
-        if (r.body.error) return meld(r.body.error);
-        meld(r.body.gesloten ? 'Betaald en gesloten.' : 'Nog open: ' + euro(r.body.openstaand));
-        if (r.body.gesloten) huidig = null;
-        laad();
       });
     });
     /* De zaal luistert mee op dezelfde stroom als de keuken: schuift er een

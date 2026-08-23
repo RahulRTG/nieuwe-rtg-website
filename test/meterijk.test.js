@@ -647,14 +647,26 @@ const IJKINGEN = {
   },
   duurOpWandklok: {
     /* Twee duurmetingen erbij, en een DATUMberekening die NIET mee hoort te
-       tellen. Zonder die derde regel zou de proef ook slagen als de meter elke
-       aftrekking van Date.now() telde -- en dan is hij nooit af te lossen, want
-       "zeven dagen geleden" hoort juist op de wandklok. */
+       tellen -- "zeven dagen geleden" hoort juist op de wandklok, want dat gaat
+       over de kalender.
+
+       PRECIES TWEE, en niet "meer dan nul". De ijklus hierboven eist alleen dat
+       een meter uitslaat, en dat deed deze ook toen ik de scheiding tussen duur
+       en datumrekenen met een mutatie weghaalde: het verschil werd 3 in plaats
+       van 2 en de proef bleef groen. AFGESLAGEN, dus telde deze proef de
+       eigenschap niet die hij beweert te toetsen (LAT-regel 9). Vandaar de
+       exacte eis hier, binnen de proef zelf. */
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       'const t0 = Date.now();\nfunction duurA() { return Date.now() - t0; }\n' +
       'function duurB(m) { return Date.now() - m > 10000; }\n' +
       'const week = Date.now() - 7 * 86400000;\nmodule.exports = { duurA, duurB, week };\n',
-      () => meet({ alleen: ['duurOpWandklok'] }).duurOpWandklok - voor.duurOpWandklok)
+      () => {
+        const verschil = meet({ alleen: ['duurOpWandklok'] }).duurOpWandklok - voor.duurOpWandklok;
+        assert.equal(verschil, 2,
+          'er staan twee duurmetingen en een datumberekening in het proefbestand; ' +
+          'telt de meter er drie, dan telt hij kalenderrekenen mee en is hij nooit af te lossen');
+        return verschil;
+      })
   },
 
   metersOngeijkt: {

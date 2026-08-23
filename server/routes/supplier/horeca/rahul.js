@@ -8,36 +8,19 @@
    lezen, is geen model maar een verrassing -- en dan gaat een manager gokken
    waarom iets niet gebeurt.
 
-   DE UITVOERDERS STAAN HIER EN NIET IN DE KERN, en dat is opzet: de kern
-   beslist WAT er mag, deze laag weet HOE het gebeurt. Een handeling zonder
-   uitvoerder is geen fout; de bon is dan het besluit en niets meer -- en dat is
-   precies wat een voorstel hoort te zijn zolang er geen deur voor is. */
+   DE UITVOERDERS STAAN IN ./rahul-doen.js en niet in de kern, en dat is opzet:
+   de kern beslist WAT er mag, die laag weet HOE het gebeurt. Een handeling
+   zonder uitvoerder is geen fout; de bon is dan het besluit en niets meer -- en
+   dat is precies wat een voorstel hoort te zijn zolang er geen deur voor is.
+   Zie de kop daar voor de twee die er met opzet géén krijgen. */
 'use strict';
 
 module.exports = (kern) => {
-  const { app, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
-  const { H, nu, id, centen, totaal, openstaand } = horeca;
+  const { app, save, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
+  const { H } = horeca;
   const registerlaag = require('../../../kern/horeca/rahul-register');
   const recht = require('../../../kern/horeca/rahul-recht')({ horeca, save });
-
-  /* De uitvoerders. Alleen handelingen die HIER staan, veranderen echt iets;
-     de rest levert een bon en verder niets. */
-  const UITVOERDERS = {
-    /* Korting: dezelfde vorm als /korting hiernaast -- reden verplicht, en het
-       bedrag komt in centen zodat de grens uit de zaakinstelling erop past. */
-    'korting.toekennen': (h, g, wie) => {
-      const rek = h.rekeningen[String((g || {}).rekeningId || '')];
-      if (!rek) return { error: 'Deze rekening kennen we niet.' };
-      if (rek.status !== 'open') return { error: 'Deze rekening is al ' + rek.status + '.' };
-      const reden = schoon((g || {}).reden, 80);
-      if (!reden) return { error: 'Een korting draagt altijd een reden.' };
-      const bedrag = centen((g || {}).centen);
-      if (!bedrag) return { error: 'Geef een bedrag in centen.' };
-      rek.kortingen.push({ id: id(3), reden: reden + ' (via Rahul, bevestigd door ' + wie + ')',
-        procent: null, centen: bedrag, at: nu(), door: wie });
-      return { let: 'Korting van ' + (bedrag / 100).toFixed(2) + ' geboekt op ' + (rek.tafel || rek.id) + '.' };
-    }
-  };
+  const UITVOERDERS = require('./rahul-doen')(kern);
 
   const wieVan = (req) => req.actor.name;
 
@@ -78,7 +61,8 @@ module.exports = (kern) => {
       handeling: b.handeling, door: wieVan(req), gegevens: b.gegevens, waarom: b.waarom,
       doen: () => {
         const f = UITVOERDERS[String(b.handeling || '').toLowerCase()];
-        return f ? f(h, b.gegevens, wieVan(req)) : { let: 'Geen uitvoerder voor deze handeling; alleen vastgelegd.' };
+        return f ? f(h, b.gegevens, wieVan(req), req.supplier)
+          : { let: 'Geen uitvoerder voor deze handeling; alleen vastgelegd.' };
       }
     });
     sseToSupplier(req.supplier.code, 'sync', { scope: 'horeca' });
@@ -94,7 +78,8 @@ module.exports = (kern) => {
     const h = H(req.supplier.code);
     const uit = recht.bevestig(h, (req.body || {}).bonId, wieVan(req), (bon) => {
       const f = UITVOERDERS[bon.handeling];
-      return f ? f(h, bon.gegevens, wieVan(req)) : { let: 'Geen uitvoerder voor deze handeling; alleen vastgelegd.' };
+      return f ? f(h, bon.gegevens, wieVan(req), req.supplier)
+        : { let: 'Geen uitvoerder voor deze handeling; alleen vastgelegd.' };
     });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     logActivity(req.supplier.code, req.actor, 'bevestigde een voorstel van Rahul: ' + uit.bon.wat);

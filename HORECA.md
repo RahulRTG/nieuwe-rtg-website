@@ -538,6 +538,31 @@ van Rahul een mens — een drempel verzinnen zou hier een getal maken dat nieman
 heeft afgesproken (grens 7), en het scherm zegt dat met zoveel woorden in plaats
 van een bedrag te tonen.
 
+**De uitvoerders maken de handeling strenger, niet losser.** Het register was
+compleet, de uitvoerders niet: alleen `korting.toekennen` deed werkelijk iets.
+Wat er nu bij staat (`rahul-doen.js`) voegt geen vrijheid toe maar controle:
+
+- **`allergie.aanpassen`** zet de allergie én zet de regel terug op
+  `bevestiging: 'wacht'`. Dat mechanisme bestond al — een wachtende regel haalt
+  het keukenbord niet en staat in de wachtrij tot iemand hem aftekent — en het
+  is precies wat grens 1 vraagt: een mens bevestigt, en bij de pas nog een keer.
+  Alleen de allergie zetten zou betekenen dat een bord doorloopt op informatie
+  die een model heeft aangeraakt.
+- **`voorraad.wegboeken`** loopt over `keuken.telling()`, de bestaande deur met
+  de naam van wie telde. Een eigen afboeking hier zou een tweede weg zijn
+  waarlangs voorraad verandert, en dan klopt de dervinghistorie niet meer.
+- **`werklijst.samenvatten`** en **`gang.voorstellen`** zijn regelwerk zonder
+  model: de samenvatting komt uit de lijst zelf, het gangvoorstel uit het oudste
+  niet-vrijgegeven bonnetje. Vrijgeven blijft een tik van de zaal.
+
+**Twee handelingen krijgen met opzet géén uitvoerder.** `betaling.uitvoeren`
+nooit: een mens die een betaling bevestigt, **is** de mens die hem uitvoert — op
+het scherm waar betalen hoort. Een tweede betaalweg hierlangs zou een tweede
+plek zijn waar geld beweegt (LAT-regel 4). De actiebon legt vast dat Rahul het
+voorstelde; de handeling gebeurt waar hij altijd al gebeurde.
+`mise.adviseren` voorlopig niet: die rekensom zit binnen in de handler van
+`/autopilot`, en hem hier namaken zou een tweede mise-berekening geven.
+
 **En de bonnen staan op een scherm.** Een actiebon die niemand leest is geen bon
 maar een logregel; "ongemerkt" gaat over wat een mens ziet. Ze staan daarom op
 `/apps/horeca-beheer.html`, inclusief de geweigerde, met de reden erbij en met
@@ -655,12 +680,6 @@ die er nog niet in zit: de aankomststroom (`/arrivals`), waar beloften wachten
 op een persoonlijke controle vóór de gast er is. De grens ligt daar voor de hand
 — het afgesproken aankomstmoment zelf — maar het is een eigen bron met een eigen
 levensloop, en die hoort niet als bijzin bij de wijk.
-
-**Meer uitvoerders achter de rechtenlaag.** Het register van Rahul is compleet —
-alle zes de handelingen uit de opdracht staan erin met hun laag. De uitvoerders
-zijn dat niet: alleen `korting.toekennen` doet werkelijk iets, de rest levert een
-actiebon en verder niets. Dat is geen gat maar de juiste volgorde: een handeling
-zonder deur hoort een besluit te blijven tot die deur er is.
 
 ## De echte wauw
 

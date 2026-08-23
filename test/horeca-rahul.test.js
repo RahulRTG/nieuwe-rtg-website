@@ -165,3 +165,103 @@ test('7. een mislukte uitvoering zegt dat, en beweert niet dat het lukte', async
   assert.match(r.body.bon.uitkomst, /kennen we niet/);
   await M('/rahul/grens', { centen: null });
 });
+
+/* ---------- De uitvoerders ----------
+   Het register was compleet, de uitvoerders niet: alleen korting deed
+   werkelijk iets. Wat hier bij komt is geen "meer knoppen voor Rahul" maar het
+   omgekeerde -- elke uitvoerder hieronder maakt de handeling STRENGER dan hij
+   zonder Rahul zou zijn. */
+
+async function tafelMetGerecht(naam, allergie) {
+  const r = (await M('/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
+  const regel = (await M('/rekening/regel', { rekeningId: r.id, naam: 'Tournedos', prijs: 34,
+    aantal: 1, gang: 1, station: 'grill', allergie: allergie || '' })).body.regel;
+  await M('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  return { id: r.id, regelId: regel.id };
+}
+const opBord = async (naam) => ((await M('/keuken/bord', {})).body.bonnen || []).find(x => x.tafel === naam);
+
+test('8. een allergie via Rahul zet de regel terug op wachten bij de pas', async () => {
+  const t = await tafelMetGerecht('RA-1', 'noten');
+  assert.ok(await opBord('RA-1'), 'de keuken ziet hem eerst gewoon');
+
+  const v = await M('/rahul/doe', { handeling: 'allergie.aanpassen',
+    gegevens: { rekeningId: t.id, regelId: t.regelId, allergie: 'noten, schaaldieren' },
+    waarom: 'De gast noemde het aan tafel' });
+  assert.equal(v.body.bon.stand, 'wacht', 'een allergie wijzigen vraagt altijd een mens');
+  const tussen = (await M('/rekening', { rekeningId: t.id })).body.rekening;
+  assert.equal(tussen.regels[0].allergie, 'noten', 'en er is nog niets veranderd');
+
+  const ja = await M('/rahul/bevestig', { bonId: v.body.bon.id });
+  assert.equal(ja.status, 200);
+  const na = (await M('/rekening', { rekeningId: t.id })).body.rekening;
+  assert.equal(na.regels[0].allergie, 'noten, schaaldieren', 'nu pas staat hij erop');
+
+  /* EN DIT IS DE HELE POINTE (grens 1): de keuken gaat niet verder op
+     informatie die een model heeft aangeraakt. De regel wacht op een tweede
+     controle bij de pas, en het keukenbord toont hem tot die tijd niet. */
+  assert.equal(na.regels[0].bevestiging, 'wacht', 'de regel wacht op een tweede controle');
+  assert.equal(await opBord('RA-1'), undefined, 'en de keuken ziet hem niet meer');
+
+  const wachtrij = (await M('/gast/wachtrij', {})).body;
+  assert.ok(JSON.stringify(wachtrij).includes('Rahul'), 'hij staat in de bestaande wachtrij met de reden erbij');
+
+  await M('/gast/bevestig', { rekeningId: t.id, regelId: t.regelId, akkoord: true });
+  assert.ok(await opBord('RA-1'), 'na het aftekenen loopt hij weer');
+});
+
+test('9. samenvatten mag Rahul zelf, en telt alleen wat er staat', async () => {
+  const r = await M('/rahul/doe', { handeling: 'werklijst.samenvatten', gegevens: { modus: 'alles' } });
+  assert.equal(r.body.bon.laag, 'mag', 'lezen en herformuleren verandert niets aan de zaak');
+  assert.equal(r.body.bon.stand, 'uitgevoerd', 'dus geen bevestiging nodig');
+  assert.match(r.body.bon.uitkomst, /open zonder grens|Er staat niets open/,
+    'en de uitkomst komt uit de lijst zelf: ' + r.body.bon.uitkomst);
+});
+
+/* Tel over de HELE zaak hoeveel regels de zaal heeft vrijgegeven. Een voorstel
+   mag dat getal niet aanraken -- en op EEN tafel kijken is niet genoeg, want dan
+   ontsnapt een voorstel dat een andere tafel vrijgeeft. Zo gevonden: de eerste
+   versie van deze toets keek alleen naar RA-2 en bleef groen onder precies die
+   mutatie. */
+async function vrijgegevenInDeZaak() {
+  const lijst = (await M('/rekeningen', { status: 'open' })).body.rekeningen || [];
+  let n = 0;
+  for (const x of lijst) {
+    const vol = (await M('/rekening', { rekeningId: x.id })).body.rekening;
+    n += (vol.regels || []).filter(r => r.vrijAt).length;
+  }
+  return n;
+}
+
+test('10. een gangvoorstel verandert niets; vrijgeven blijft een tik van de zaal', async () => {
+  const rek = (await M('/rekening/open', { kanaal: 'tafel', tafel: 'RA-2', gasten: 2 })).body.rekening;
+  await M('/rekening/regel', { rekeningId: rek.id, naam: 'Soep', prijs: 9, aantal: 1, gang: 1, station: 'warm' });
+  const voor = await vrijgegevenInDeZaak();
+
+  const r = await M('/rahul/doe', { handeling: 'gang.voorstellen', gegevens: {} });
+  assert.equal(r.body.bon.stand, 'uitgevoerd');
+  assert.match(r.body.bon.uitkomst, /vrijgegeven|geen gang/, 'het is een voorstel: ' + r.body.bon.uitkomst);
+
+  assert.equal(await vrijgegevenInDeZaak(), voor,
+    'nergens in de zaak is een gang vrijgegeven door dit voorstel');
+});
+
+test('11. een betaling krijgt NOOIT een uitvoerder, ook niet na bevestiging', async () => {
+  /* Dat is geen nalatigheid maar de juiste uitkomst: een mens die een betaling
+     bevestigt, IS de mens die hem uitvoert -- op het scherm waar betalen hoort.
+     Een tweede betaalweg langs deze kant zou een tweede plek zijn waar geld
+     beweegt (LAT-regel 4). De bon legt vast dat Rahul het voorstelde. */
+  const rek = (await M('/rekening/open', { kanaal: 'tafel', tafel: 'RA-3', gasten: 1 })).body.rekening;
+  await M('/rekening/regel', { rekeningId: rek.id, naam: 'Menu', prijs: 50, aantal: 1, gang: 1, station: 'warm' });
+
+  const v = await M('/rahul/doe', { handeling: 'betaling.uitvoeren',
+    gegevens: { rekeningId: rek.id, wijze: 'pin' } });
+  assert.equal(v.body.bon.stand, 'wacht');
+  const ja = await M('/rahul/bevestig', { bonId: v.body.bon.id });
+  assert.equal(ja.status, 200);
+  assert.match(ja.body.bon.uitkomst, /Geen uitvoerder/, 'de bon zegt eerlijk dat er niets is uitgevoerd');
+
+  const na = (await M('/rekening', { rekeningId: rek.id })).body.rekening;
+  assert.equal(na.status, 'open', 'de rekening staat nog gewoon open');
+  assert.equal(na.betalingen.length, 0, 'en er is geen cent verplaatst');
+});

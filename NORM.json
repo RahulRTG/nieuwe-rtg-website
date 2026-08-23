@@ -31,7 +31,7 @@
     "devPakketten": 1,
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
-    "schermenZonderVormtaal": 183
+    "schermenZonderVormtaal": 184
   },
   "notities": [
     {
@@ -457,6 +457,11 @@
       "datum": "2026-08-23",
       "meter": "keuringOmvang 159 -> 161 (bedrijf/handeling.js en bedrijf/gevolg.js)",
       "reden": "Twee nieuwe werkmodules zitten vlak onder de 10 kB-grens: handeling.js op 9731 en gevolg.js op 9682 bytes. Dat is een echte verslechtering en geen meetfout, dus hij staat hier met naam.\n\nWaarom ze niet gesplitst zijn. Bij handeling.js is dat WEL gebeurd: de werkwoordentabel staat apart in handeling-lijst.js, want die tabel groeit met elk werkwoord erbij en dan zou het bestand vanzelf over de grens lopen. Wat overblijft is de keten zelf -- plan, bevestiging, uitvoering, bon -- en die uit elkaar trekken zou de enige plek waar je die vier achter elkaar kunt lezen kapotmaken. gevolg.js is drie simulaties van elk zo'n vijftien regels plus de kop die uitlegt waarom deze laag geen wrapper om het dossier is; daar valt niets uit te halen dat ergens anders beter staat.\n\nWat dit NIET is: keuringTeGroot bleef 5. Geen van beide is over de grens; ze zitten eronder. De tand blijft daarmee doen waar hij voor is -- als een van deze twee er overheen gaat, klaagt de andere meter.\n\nWat er tegenover staat, en dat is geen verrekening maar een aparte meter: endpointsZonderTest ging van 1191 naar 1179. Die winst is geen nieuw werk maar een reparatie van de METING -- werkgevolg.test.js en werkhandeling.test.js plakten hun routes aan elkaar (`base + '/api/bedrijf' + pad`), waardoor twaalf endpoints die WEL getoetst worden als ongedekt telden. Ze noemen hun routes nu voluit."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "schermenZonderVormtaal 183 -> 184 (kwam mee met de merge van main)",
+      "reden": "Deze plus een komt NIET uit deze tak. Bij het binnenhalen van main (2eb6036) kwamen er twee nieuwe app-pagina's mee -- public/apps/sociaal-prive.html en public/apps/chauffeur.html -- en geen van beide sluit rtg-ontwerp.css of rtg-materiaal.css in.\n\nDat is geen verwijt aan die pagina's: de meter BESTAAT op main nog niet. Hij is in deze tak toegevoegd en staat dus in geen enkele andere tak in de weg. Tot main hem heeft, zal elke nieuwe pagina van elders hem laten stijgen -- en dat is precies wat je van een ratel mag verwachten die nog niet is aangekomen.\n\nWaarom ik die twee pagina's niet even zelf de tokenlaag heb gegeven: het is een regel erbij, maar in een MERGE-commit een scherm van iemand anders aanraken dat ik nooit heb gezien, is de verkeerde plek. De meter telt de insluiting en niet het gebruik, dus het zou de teller wel verlagen zonder dat iemand die pagina's aan de vormtaal heeft gehouden -- een groen cijfer zonder dat er iets is nagekeken, en dat is precies waar deze hele ronde tegen is.\n\nWat er WEL hoort te gebeuren: als deze tak op main landt, gaat de meter mee en horen die twee pagina's een eigen regel te krijgen. Zolang dat niet is gebeurd, staat het hier."
     }
   ],
   "prestatie": {

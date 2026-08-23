@@ -101,9 +101,7 @@ module.exports = (kern) => {
     const uit = orderlaag.bestel(s.code, rek, lop.deelnemer, {
       items: b.items, allergie: schoon(b.allergie, 120) || null,
       idem: b.idem, apparaat: schoon(b.apparaat, 40) || null,
-      kaartVan: (id) => { const m = kaart.find(x => x.id === id); return m
-        ? { id: m.id, name: m.naam, price: m.centen / 100, cat: m.cat, station: m.station, alcohol: m.alcohol,
-          opties:m.opties, ingredienten:m.ingredienten, allergenen:m.allergenen, prepMin:m.prepMin } : null; }
+      kaartVan: id => buitenshuis.bestelProduct(kaart.find(x => x.id === id))
     });
     if (uit.error) return stuur(res, uit);
     if (uit.herhaald) return res.json(uit);

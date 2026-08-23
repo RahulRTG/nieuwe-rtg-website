@@ -5,10 +5,15 @@ const { coord } = require('../../kern/util');
 const klok = require('../../lib/klok');
 
 module.exports = (kern) => {
-  const { app, auth, schoon, foodcourt, buitenshuis, naad, verzoeklaag, horeca,
+  const { app, auth, schoon, buitenshuis, naad, verzoeklaag, horeca,
     findSupplier, haversine, db, save, notifySupplier, sseToSupplier } = kern;
   const ontdek = require('../../kern/eten/ontdekken');
   const orders = require('../../kern/eten/orderbeeld');
+  /* De reserveerpleinfabriek is stateloos: deze lezer gebruikt dezelfde db en
+     dezelfde save als de rest van de gastlaag. Zo hoeft de gastcontext geen
+     instantie uit het leveranciersdomein te lenen. */
+  const restaurantplein = require('../../kern/foodcourt')
+    .maakFoodcourt({ db, save, crypto:kern.crypto }).foodcourt;
   const handleVan = naad.handleVanReq;
 
   function persoonlijkeSets(req) {
@@ -18,7 +23,7 @@ module.exports = (kern) => {
   }
 
   function resultaat(req, modus) {
-    const basis = foodcourt.overzicht();
+    const basis = restaurantplein.overzicht();
     const p = persoonlijkeSets(req);
     const b = req.body || {};
     const vrij = modus === 'concierge' ? ontdek.conciergeFilters(schoon(b.vraag, 320), basis.keukens) : {};

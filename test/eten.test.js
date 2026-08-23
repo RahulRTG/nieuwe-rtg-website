@@ -32,6 +32,7 @@ test('Concierge maakt zichtbare filters en houdt de keuze bij de gast', () => {
   assert.deepEqual(f.dieet, ['vegan']);
   assert.deepEqual(f.zonderAllergenen, ['noten']);
   assert.equal(f.menselijkeControle, true);
+  assert.equal(ontdek.conciergeFilters('Japans voor twee', ['Japans']).personen, 2);
 });
 
 test('automatische capaciteit wordt dezelfde actuele belofte voor gast en partner', () => {

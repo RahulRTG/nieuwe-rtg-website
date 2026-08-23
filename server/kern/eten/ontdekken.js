@@ -5,12 +5,16 @@
 
 const woorden = s => String(s || '').toLowerCase().split(/[^a-zà-ÿ0-9€]+/).filter(w => w.length > 1);
 const bevat = (tekst, zoek) => zoek.every(w => tekst.includes(w));
+const GETALLEN = { een:1, twee:2, drie:3, vier:4, vijf:5, zes:6,
+  zeven:7, acht:8, negen:9, tien:10, elf:11, twaalf:12 };
 
 function conciergeFilters(vraag, keukens) {
   const q = String(vraag || '').trim().slice(0, 320);
   const laag = q.toLowerCase();
   const bedrag = laag.match(/(?:max(?:imaal)?|onder|tot)\s*€?\s*(\d{1,4})/) || laag.match(/€\s*(\d{1,4})/);
   const personen = laag.match(/(?:voor|met)\s+(\d{1,2})\s*(?:personen|mensen|man|gasten)?/);
+  const personenWoord = laag.match(/(?:voor|met)\s+(een|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|elf|twaalf)\b/);
+  const aantalPersonen = personen ? Number(personen[1]) : personenWoord ? GETALLEN[personenWoord[1]] : null;
   const tijd = laag.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\b/);
   const keuken = (keukens || []).find(k => laag.includes(String(k).toLowerCase())) || null;
   const dieet = [];
@@ -27,7 +31,7 @@ function conciergeFilters(vraag, keukens) {
     && !allergenen.includes(w) && !(keuken && String(keuken).toLowerCase().includes(w))).slice(0, 8).join(' ');
   return { zoek, keuken, dieet, zonderAllergenen:allergenen,
     budgetCenten:bedrag ? Number(bedrag[1]) * 100 : null,
-    personen:personen ? Math.max(1, Math.min(30, Number(personen[1]))) : null,
+    personen:aantalPersonen == null ? null : Math.max(1, Math.min(30, aantalPersonen)),
     tijd:tijd ? String(tijd[1]).padStart(2, '0') + ':' + tijd[2] : null,
     bezorging:/bezorg|thuis|aan de deur/.test(laag) ? true : null,
     menselijkeControle:allergenen.length > 0 };

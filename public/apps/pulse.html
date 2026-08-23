@@ -55,6 +55,11 @@
   .post .tekst .tag{color:var(--gold);}
   .post .acts{display:flex;gap:.4rem;margin-top:.6rem;align-items:center;flex-wrap:wrap;}
   .post .acts .aan{border-color:var(--burgundy);color:var(--burgundy);}
+  .profiel-post{padding:1rem;}
+  .profiel-label{font-size:.65rem;letter-spacing:.16em;color:var(--gold);}
+  .profiel-naam{font-size:1.7rem;margin-top:.25rem;}
+  .profiel-eigen{color:var(--soft);font-size:.78rem;}
+  .profiel-waarderingen{color:var(--soft);font-size:.75rem;}
   .reacties{border-top:1px solid var(--line);margin-top:.6rem;padding-top:.5rem;}
   .reactie{font-size:.85rem;color:var(--muted);padding:.2rem 0;line-height:1.5;}
   .reactie b{color:var(--txt);font-weight:600;}
@@ -100,9 +105,9 @@ let SOORT='volgend';
 async function toonProfiel(key){
   let p; try{ p=await api('profiel',key?{key}:{}) }catch(e){ return meld(e.message); }
   FEED=null; PLANK=null;
-  const post=(x)=>'<div class="post"><div class="kop"><span class="wie">'+esc(p.codenaam)+glans(x)+'</span><span class="tijd">'+tijd(x.at)+'</span></div><div class="tekst">'+mooi(x.tekst)+'</div><div class="acts"><button class="knop stil" data-profiel-open="'+x.id+'">'+x.reacties.length+' reacties</button><span style="color:var(--soft);font-size:.75rem;">'+x.likes+' waarderingen</span></div><div class="reacties" id="pr-'+x.id+'" hidden>'+x.reacties.map(r=>'<div class="reactie"><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+'</div></div>';
-  $('#main').innerHTML='<div class="post" style="padding:1rem;"><div class="kop"><div><div style="font-size:.65rem;letter-spacing:.16em;color:var(--gold);">CODENAAMPROFIEL</div><h2 style="font-size:1.7rem;margin-top:.25rem;">'+esc(p.codenaam)+'</h2></div><span class="tijd">'+p.volgers+' volgers</span></div><div class="acts">'+
-    (!p.zelf?'<button class="knop" id="profielVolg">'+(p.volgIk?'Ontvolgen':'Volgen')+'</button>':'<span style="color:var(--soft);font-size:.78rem;">Dit is uw profiel.</span>')+
+  const post=(x)=>'<div class="post"><div class="kop"><span class="wie">'+esc(p.codenaam)+glans(x)+'</span><span class="tijd">'+tijd(x.at)+'</span></div><div class="tekst">'+mooi(x.tekst)+'</div><div class="acts"><button class="knop stil" data-profiel-open="'+x.id+'">'+x.reacties.length+' reacties</button><span class="profiel-waarderingen">'+x.likes+' waarderingen</span></div><div class="reacties" id="pr-'+x.id+'" hidden>'+x.reacties.map(r=>'<div class="reactie"><b>'+esc(r.codenaam)+'</b> '+mooi(r.tekst)+'</div>').join('')+'</div></div>';
+  $('#main').innerHTML='<div class="post profiel-post"><div class="kop"><div><div class="profiel-label">CODENAAMPROFIEL</div><h2 class="profiel-naam">'+esc(p.codenaam)+'</h2></div><span class="tijd">'+p.volgers+' volgers</span></div><div class="acts">'+
+    (!p.zelf?'<button class="knop" id="profielVolg">'+(p.volgIk?'Ontvolgen':'Volgen')+'</button>':'<span class="profiel-eigen">Dit is uw profiel.</span>')+
     '<button class="knop stil" id="profielTerug">Terug naar de feed</button></div></div>'+
     (p.posts.length?p.posts.map(post).join(''):'<div class="leeg">Deze codenaam heeft nog niets geplaatst.</div>');
   $('#profielTerug').onclick=laad;

@@ -1300,6 +1300,14 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "eten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/eten/product.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "eu-naleving.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -5072,6 +5080,14 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 2
+    },
+    "social-elite.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/social-intelligence-runtime.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "socialebeleid.test.js": {
       "soort": "puur",

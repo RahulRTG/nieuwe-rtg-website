@@ -114,8 +114,59 @@ async function wacht(basis, ms) {
   console.log('  routes met een herkenbare rol        : ' + routes.length);
   console.log('  oproepen per route                   : 3  (K1, K1 opnieuw, K2 vers)');
 
+  /* ============================================================================
+     DE WERELD KLAARZETTEN, VOOR ER GEMETEN WORDT.
+
+     Het plausibele lijf is voor alle routes hetzelfde, en dat kan niet anders:
+     het weet niet welke IBAN of welke codenaam er in DEZE database bestaan. Het
+     gevolg was dat 2.221 routes hun eerste oproep zagen stranden op "deed geen
+     werk" -- 1.100 keer een 404 en 562 keer een 403. Een route die niets doet,
+     kun je niet betrappen op een tweede keer doen.
+
+     Bij de GELDROUTES was dat het scherpst, en daar zaten maar twee oorzaken
+     onder in plaats van eenenveertig (TAKEN.md 4.30):
+
+       - eenendertig `/api/bank/*`-routes gaven 403 omdat de leden-bank in een
+         verse database nog niet LIVE staat. Dat is een schakelaar, geen defect.
+       - zes `/api/pay/*`-routes gaven 404 omdat er geen tweede codenaam bestaat
+         om geld naar te sturen, en geen kascode om te innen.
+
+     Dus zet deze voorbereiding eerst de wereld klaar en geeft ze de gevonden
+     ECHTE waarden terug. Gemeten: twaalf van de vierentwintig onderzochte
+     geld- en bankroutes gaan hierdoor van een foutstatus naar echt werk.
+
+     WAT DIT NIET DOET: het lijf van de rolproef en de invoerproef veranderen.
+     Die delen `plausibelLijf`, en hun registers zouden dan in dezelfde ronde
+     verschuiven -- twee grote uitslagen door elkaar. De verrijking is een laag
+     die alleen deze proef eroverheen legt. */
+  async function bereidVoor() {
+    const extra = {};
+    const stil = async (pad, lijf, tok) => { try { return await post(pad, lijf, tok); } catch (e) { return { status: 0 }; } };
+    // de leden-bank live zetten: dit opent in een klap de bankroutes die 403 gaven
+    await stil('/api/office/bank/leden', { aan: true }, tokens.office);
+    // akkoord geven opent de eerste rekening, en die heeft een echte IBAN
+    const akk = await stil('/api/bank/akkoord', {}, tokens.member);
+    const iban = akk.data && akk.data.rekening && akk.data.rekening.iban;
+    if (iban) extra.iban = iban;
+    // een TWEEDE lid, want geld sturen vraagt een ontvanger die niet jezelf is
+    const ander = (await stil('/api/login', { tier: 'lifestyle' })).data;
+    if (ander && ander.token) {
+      await stil('/api/bank/akkoord', {}, ander.token);
+      const cn = (await stil('/api/pay/overzicht', {}, ander.token)).data;
+      if (cn && cn.codenaam) { extra.aan = cn.codenaam; extra.codenaam = cn.codenaam; extra.naarCodenaam = cn.codenaam; }
+    }
+    // een kascode om te innen (eenmalig bruikbaar; een verrijking, geen garantie)
+    const kas = await stil('/api/pay/kascode', { centen: 100 }, tokens.member);
+    const code = kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code));
+    if (code) extra.code = code;
+    return extra;
+  }
+  const extra = await bereidVoor();
+  console.log('  wereld klaargezet                    : ' +
+    (Object.keys(extra).length ? Object.keys(extra).join(', ') : 'NIETS -- de proef meet dan als vanouds'));
+
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
-    lijfVoor: (r) => plausibelLijf(r.pad), maxRoutes: MAX });
+    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra }), maxRoutes: MAX });
 
   if (uit.meterStuk) {
     console.error('\n  DE METER IS BLIND: ' + uit.meterStuk);
@@ -132,9 +183,28 @@ async function wacht(basis, ms) {
   console.log('  ongemeten                            : ' + t.ongemeten +
     '   <- geen werk gedaan, of het antwoord reageert niet op een nieuwe oproep');
 
+  /* ============================================================================
+     ELKE ONBESCHERMDE ROUTE DRAAGT EEN BESLUIT (TAKEN.md 4.30).
+
+     "Onbeschermd" is een telling en geen defect -- twee keer op bewaren drukken
+     hoort twee notities op te leveren. Maar dan moet iemand dat wel HEBBEN
+     BESLOTEN, en niet: het stond er en niemand keek. Het verschil tussen die
+     twee is precies wat deze lijst zonder besluitregister niet kon laten zien.
+
+     IDEMBESLUIT.json draagt per route waarom een herhaling daar mag (of niet).
+     Wat hier onbeschermd uitkomt en er NIET in staat, is een route waarover nog
+     niemand heeft nagedacht. Die worden bij naam genoemd. Ze maken deze proef
+     niet rood -- dat zou een bevinding zijn en geen blindheid -- maar ze staan
+     in het register onder `zonderBesluit`, zodat het getal niet stilletjes kan
+     groeien. */
   const onbeschermd = Object.values(uit.perRoute).filter(r => r.idempotentie === 'onbeschermd');
-  for (const r of onbeschermd.slice(0, 20)) console.log('      ' + r.methode + ' ' + r.pad);
+  let besluiten = {};
+  try { besluiten = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')).routes || {}; } catch (e) {}
+  const zonderBesluit = onbeschermd.filter(r => !besluiten[r.pad]).map(r => r.pad);
+  for (const r of onbeschermd.slice(0, 20)) console.log('      ' + r.methode + ' ' + r.pad + (besluiten[r.pad] ? '' : '   <- GEEN BESLUIT'));
   if (onbeschermd.length > 20) console.log('      ... en nog ' + (onbeschermd.length - 20));
+  console.log('  onbeschermd MET een besluit          : ' + (onbeschermd.length - zonderBesluit.length) + ' / ' + onbeschermd.length);
+  if (zonderBesluit.length) console.log('      zonder besluit in IDEMBESLUIT.json: ' + zonderBesluit.length);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     uitleg: 'Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de ' +
@@ -144,7 +214,10 @@ async function wacht(basis, ms) {
     gemeten: { routesMetRol: routes.length, beoordeeld,
       beschermd: t.beschermd, onbeschermd: t.onbeschermd, ongemeten: t.ongemeten,
       oproepen: uit.oproepen, tokensHernieuwd: uit.hernieuwd,
-      blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX },
+      blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
+      wereldKlaargezet: Object.keys(extra),
+      onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length },
+    zonderBesluit,
     perRoute: Object.values(uit.perRoute)
   }, null, 1) + '\n');
   console.log('\n  weggeschreven in IDEMPROEF.json');

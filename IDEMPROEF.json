@@ -1,16 +1,25 @@
 {
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
  "gemeten": {
-  "routesMetRol": 3074,
-  "beoordeeld": 115,
-  "beschermd": 15,
-  "onbeschermd": 100,
-  "ongemeten": 2959,
-  "oproepen": 9246,
+  "routesMetRol": 3100,
+  "beoordeeld": 118,
+  "beschermd": 16,
+  "onbeschermd": 102,
+  "ongemeten": 2982,
+  "oproepen": 9324,
   "tokensHernieuwd": 24,
   "blindeRondes": 0,
-  "begrenzing": 0
+  "begrenzing": 0,
+  "wereldKlaargezet": [
+   "iban",
+   "aan",
+   "codenaam",
+   "naarCodenaam",
+   "code"
+  ],
+  "onbeschermdMetBesluit": 102
  },
+ "zonderBesluit": [],
  "perRoute": [
   {
    "methode": "POST",
@@ -39,6 +48,18 @@
   {
    "methode": "POST",
    "pad": "/api/aanmelding/betalingen",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/bewijs/herkeuring",
    "rol": "office",
    "idempotentie": "ongemeten",
    "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
@@ -593,11 +614,11 @@
    "pad": "/api/bank/advies",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -605,11 +626,11 @@
    "pad": "/api/bank/afschrift",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -617,11 +638,11 @@
    "pad": "/api/bank/afschrift.csv",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -629,11 +650,11 @@
    "pad": "/api/bank/akkoord",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -641,11 +662,11 @@
    "pad": "/api/bank/bevries",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -653,11 +674,11 @@
    "pad": "/api/bank/bulk",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -665,11 +686,11 @@
    "pad": "/api/bank/hart",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -677,11 +698,11 @@
    "pad": "/api/bank/inzichten",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -725,11 +746,11 @@
    "pad": "/api/bank/naar-wallet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 402)",
    "statussen": [
-    403,
-    403,
-    403
+    402,
+    402,
+    402
    ]
   },
   {
@@ -737,11 +758,11 @@
    "pad": "/api/bank/overboek",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -761,11 +782,11 @@
    "pad": "/api/bank/pas/betaal",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -773,11 +794,11 @@
    "pad": "/api/bank/pas/bevries",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -785,11 +806,11 @@
    "pad": "/api/bank/pas/limiet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -797,11 +818,11 @@
    "pad": "/api/bank/pas/sluit",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -809,11 +830,11 @@
    "pad": "/api/bank/pas/uitgeven",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ]
   },
   {
@@ -821,11 +842,11 @@
    "pad": "/api/bank/passen",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -833,11 +854,11 @@
    "pad": "/api/bank/rekening",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -845,11 +866,11 @@
    "pad": "/api/bank/rekening/open",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ]
   },
   {
@@ -857,11 +878,11 @@
    "pad": "/api/bank/rente-voorbeeld",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -869,11 +890,11 @@
    "pad": "/api/bank/salaris",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -881,11 +902,11 @@
    "pad": "/api/bank/sepa",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ]
   },
   {
@@ -893,23 +914,23 @@
    "pad": "/api/bank/spaardoel",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ]
   },
   {
    "methode": "POST",
    "pad": "/api/bank/storten",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -917,11 +938,11 @@
    "pad": "/api/bank/terugkerend",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -929,11 +950,11 @@
    "pad": "/api/bank/terugkerend/stop",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -941,11 +962,11 @@
    "pad": "/api/bank/terugkerend/zet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ]
   },
   {
@@ -953,11 +974,11 @@
    "pad": "/api/bank/van-wallet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 402)",
    "statussen": [
-    403,
-    403,
-    403
+    402,
+    402,
+    402
    ]
   },
   {
@@ -965,11 +986,11 @@
    "pad": "/api/bank/vastelasten",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -977,11 +998,11 @@
    "pad": "/api/bank/veeg",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ]
   },
   {
@@ -4322,6 +4343,66 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/gast/eten/beoordeel",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/concierge",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/ontdekken",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/probleem",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/eten/zoeken",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/gast/foodcourt/bestel",
    "rol": "member",
    "idempotentie": "ongemeten",
@@ -6893,11 +6974,11 @@
    "pad": "/api/leven/band/vraag",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ]
   },
   {
@@ -8009,11 +8090,11 @@
    "pad": "/api/mediaos/maker",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ]
   },
   {
@@ -8021,11 +8102,11 @@
    "pad": "/api/mediaos/meldingen",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ]
   },
   {
@@ -8141,11 +8222,11 @@
    "pad": "/api/mediaos/volg",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    400,
-    400,
-    400
+    409,
+    409,
+    409
    ]
   },
   {
@@ -10426,6 +10507,102 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/connect",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live",
+   "rol": "member",
+   "idempotentie": "onbeschermd",
+   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/kijk",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/verbind",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/nieuw",
+   "rol": "member",
+   "idempotentie": "onbeschermd",
+   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/uit",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/zoek",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
    ]
   },
   {
@@ -12821,11 +12998,11 @@
    "pad": "/api/muziek/samen/nodig",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    400,
-    400,
-    400
+    404,
+    404,
+    404
    ]
   },
   {
@@ -13661,11 +13838,11 @@
    "pad": "/api/office/bank/afschrift",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ]
   },
   {
@@ -13877,11 +14054,11 @@
    "pad": "/api/office/bank/rekening/bevries",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ]
   },
   {
@@ -13901,11 +14078,11 @@
    "pad": "/api/office/bank/rekening/rood",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ]
   },
   {
@@ -16498,6 +16675,54 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/intrek",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/nummer",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/teken",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijzen",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
    ]
   },
   {
@@ -19900,12 +20125,12 @@
    "methode": "POST",
    "pad": "/api/pay/stuur",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ]
   },
   {
@@ -19949,11 +20174,11 @@
    "pad": "/api/pay/verzoek",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ]
   },
   {
@@ -25168,11 +25393,11 @@
    "methode": "POST",
    "pad": "/api/supplier/agenda/verwijder",
    "rol": "supplier",
-   "idempotentie": "beschermd",
-   "reden": "de herhaling werd geweigerd (status 503)",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
     200,
-    503,
+    200,
     200
    ]
   },
@@ -27190,6 +27415,54 @@
     404,
     404,
     404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/capaciteit",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/instellingen",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/status",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/eten/werkblad",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
    ]
   },
   {
@@ -30773,11 +31046,11 @@
    "pad": "/api/supplier/metier/naam",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ]
   },
   {
@@ -31719,6 +31992,18 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/payroll/stroken",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
+   "statussen": [
+    200,
+    200,
+    200
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/persoonseis",
    "rol": "supplier",
    "idempotentie": "ongemeten",
    "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
@@ -34658,6 +34943,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/theater/ondertitels",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/theater/reactie",
    "rol": "member",
    "idempotentie": "ongemeten",
@@ -35354,6 +35651,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/vakbewijs",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vakbewijs/zet",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ]
+  },
+  {
+   "methode": "POST",
    "pad": "/api/vastgoed/aanbod",
    "rol": "member",
    "idempotentie": "ongemeten",
@@ -36041,11 +36362,11 @@
    "pad": "/api/vonk/blokkeer",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ]
   },
   {
@@ -36365,11 +36686,11 @@
    "pad": "/api/wereld/gesprek",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    400,
-    400,
-    400
+    403,
+    403,
+    403
    ]
   },
   {
@@ -36437,11 +36758,11 @@
    "pad": "/api/wereld/profiel/van",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ]
   },
   {

@@ -1,0 +1,337 @@
+{
+ "uitleg": "Per route waarom een HERHAALDE oproep daar wel of niet iets nieuws mag doen. IDEMPROEF.json telt welke routes onbeschermd zijn; dit bestand zegt of dat besloten is of alleen maar zo gegroeid. Een route die daar onbeschermd uitkomt en hier ontbreekt, staat in IDEMPROEF.json onder \"zonderBesluit\" -- dat getal hoort niet te groeien. \"onbeschermd\" is geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
+ "klassen": {
+  "code-maker": "Elke oproep hoort iets NIEUWS te geven -- een code die twee keer hetzelfde is, is stuk. Onbeschermd is hier de bedoeling en geen tekort.",
+  "creatie": "Een tweede oproep maakt een tweede item. Hinderlijk bij een dubbeltik, maar het raakt geen geld en het is soms juist gewenst (twee keer dezelfde notitie mag). Besloten: acceptabel zonder idem-sleutel.",
+  "berekening": "Een POST die rekent of opzoekt en niets blijvends aanmaakt. Een tweede oproep hoort een VERSE uitkomst te geven; dat de proef verschil ziet, is precies goed.",
+  "instelling": "Een waarde zetten of bewaren. Twee keer dezelfde waarde zetten geeft dezelfde eindstand -- effectief idempotent. Dat de proef verschil ziet, komt van een tijdstempel of een volgnummer in het antwoord, niet van een tweede effect.",
+  "tebeslissen": "HIER IS NOG GEEN BESLUIT OVER GENOMEN. Staat met naam in deze lijst zodat het niet als \"afgehandeld\" meetelt."
+ },
+ "telling": {
+  "creatie": 40,
+  "berekening": 35,
+  "instelling": 12,
+  "tebeslissen": 12,
+  "code-maker": 3
+ },
+ "routes": {
+  "/api/agenda/toevoegen": {
+   "klasse": "creatie"
+  },
+  "/api/bestanden/upstart": {
+   "klasse": "creatie"
+  },
+  "/api/command/alarm": {
+   "klasse": "berekening"
+  },
+  "/api/command/operator/plan": {
+   "klasse": "berekening"
+  },
+  "/api/command/puls": {
+   "klasse": "berekening"
+  },
+  "/api/command/slo": {
+   "klasse": "berekening"
+  },
+  "/api/command/sonde/draai": {
+   "klasse": "berekening"
+  },
+  "/api/command/start": {
+   "klasse": "creatie"
+  },
+  "/api/command/zaak/open": {
+   "klasse": "creatie"
+  },
+  "/api/concern/entiteit/nieuw": {
+   "klasse": "creatie"
+  },
+  "/api/concern/nieuw": {
+   "klasse": "creatie"
+  },
+  "/api/concern/opname/maak": {
+   "klasse": "creatie"
+  },
+  "/api/gedachten/zet": {
+   "klasse": "instelling"
+  },
+  "/api/gemeente/meld": {
+   "klasse": "tebeslissen",
+   "vraag": "Twee identieke meldingen in de wachtrij van een gemeente: dubbel werk voor de behandelaar, of twee echte meldingen?"
+  },
+  "/api/genootschap/richt-op": {
+   "klasse": "creatie"
+  },
+  "/api/gewoonten/maak": {
+   "klasse": "creatie"
+  },
+  "/api/home/alles-uit": {
+   "klasse": "instelling"
+  },
+  "/api/live/start": {
+   "klasse": "creatie"
+  },
+  "/api/mall/lijst/nieuw": {
+   "klasse": "creatie"
+  },
+  "/api/mediaos/lijst/maak": {
+   "klasse": "creatie"
+  },
+  "/api/mediaos/samen/start": {
+   "klasse": "creatie"
+  },
+  "/api/meet/maak": {
+   "klasse": "creatie"
+  },
+  "/api/member/leren/project-maak": {
+   "klasse": "creatie"
+  },
+  "/api/member/magnaat/economie/beslis": {
+   "klasse": "berekening"
+  },
+  "/api/member/pin/live": {
+   "klasse": "tebeslissen",
+   "vraag": "Een contactpin live zetten. Waarschijnlijk dezelfde eindstand, maar niet nagekeken."
+  },
+  "/api/member/pin/nieuw": {
+   "klasse": "creatie"
+  },
+  "/api/metier/kaart": {
+   "klasse": "berekening"
+  },
+  "/api/muziek/maak": {
+   "klasse": "creatie"
+  },
+  "/api/muziek/rahul": {
+   "klasse": "berekening"
+  },
+  "/api/office/architect/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/architect/project": {
+   "klasse": "creatie"
+  },
+  "/api/office/atelier/collectie": {
+   "klasse": "creatie"
+  },
+  "/api/office/atelier/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/atelierweb/bewaar": {
+   "klasse": "instelling"
+  },
+  "/api/office/bank/mislukking": {
+   "klasse": "tebeslissen",
+   "vraag": "Idem: een teller of een stand die twee keer wordt gezet."
+  },
+  "/api/office/bank/nood": {
+   "klasse": "tebeslissen",
+   "vraag": "Een noodschakelaar twee keer omzetten. Waarschijnlijk onschadelijk (dezelfde eindstand), maar het is een BANKschakelaar en dat verdient een uitgesproken besluit."
+  },
+  "/api/office/betalingen/status": {
+   "klasse": "berekening"
+  },
+  "/api/office/hardware/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/hardware/serie": {
+   "klasse": "berekening"
+  },
+  "/api/office/ideeen/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/kantoorpakket/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/merk/sjabloon": {
+   "klasse": "berekening"
+  },
+  "/api/office/onderzoeker/ontwikkel": {
+   "klasse": "berekening"
+  },
+  "/api/office/payroll/dekking": {
+   "klasse": "berekening"
+  },
+  "/api/office/payroll/regels/haal": {
+   "klasse": "berekening"
+  },
+  "/api/office/rampbeeld/evaluatie": {
+   "klasse": "berekening"
+  },
+  "/api/office/rechtsvormwacht/check": {
+   "klasse": "berekening"
+  },
+  "/api/office/redactie/artikel/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/regering": {
+   "klasse": "berekening"
+  },
+  "/api/office/regering/briefing": {
+   "klasse": "berekening"
+  },
+  "/api/office/rtgai": {
+   "klasse": "berekening"
+  },
+  "/api/office/studio/collectie": {
+   "klasse": "creatie"
+  },
+  "/api/office/studio/lookbook": {
+   "klasse": "berekening"
+  },
+  "/api/office/studio/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/weefsel/indicatoren": {
+   "klasse": "berekening"
+  },
+  "/api/office/weefsel/werk/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/weefsel/wijken": {
+   "klasse": "berekening"
+  },
+  "/api/office/werkplaats/maak": {
+   "klasse": "creatie"
+  },
+  "/api/office/zelfzorg/bescherm": {
+   "klasse": "tebeslissen",
+   "vraag": "Onderhoudsactie op de doos zelf. Twee keer draaien: onschadelijk of niet?"
+  },
+  "/api/office/zelfzorg/herstel": {
+   "klasse": "tebeslissen",
+   "vraag": "Idem."
+  },
+  "/api/office/zelfzorg/opruim": {
+   "klasse": "tebeslissen",
+   "vraag": "Idem -- en opruimen twee keer draaien kan meer weggooien dan bedoeld."
+  },
+  "/api/office/zelfzorg/upgrade": {
+   "klasse": "tebeslissen",
+   "vraag": "Idem, en een upgrade twee keer starten is het soort ding dat je een keer wilt."
+  },
+  "/api/onboarding/teken": {
+   "klasse": "instelling"
+  },
+  "/api/onderneming/nieuw": {
+   "klasse": "creatie"
+  },
+  "/api/ov/code": {
+   "klasse": "code-maker"
+  },
+  "/api/overheid/water/meld": {
+   "klasse": "tebeslissen",
+   "vraag": "Zelfde vraag als bij gemeente/meld."
+  },
+  "/api/pay/kascode": {
+   "klasse": "code-maker"
+  },
+  "/api/pay/tikcode": {
+   "klasse": "code-maker"
+  },
+  "/api/privacy/export": {
+   "klasse": "berekening"
+  },
+  "/api/rtgone/frictie": {
+   "klasse": "berekening"
+  },
+  "/api/salon/bio": {
+   "klasse": "instelling"
+  },
+  "/api/salon/plaats": {
+   "klasse": "creatie"
+  },
+  "/api/samen/maak": {
+   "klasse": "creatie"
+  },
+  "/api/site/bewaar": {
+   "klasse": "instelling"
+  },
+  "/api/site/persoonlijk": {
+   "klasse": "instelling"
+  },
+  "/api/supplier/aanwezig/leeg": {
+   "klasse": "instelling"
+  },
+  "/api/supplier/agenda/toevoegen": {
+   "klasse": "creatie"
+  },
+  "/api/supplier/betaalverzoek": {
+   "klasse": "tebeslissen",
+   "vraag": "Twee verzoeken van hetzelfde bedrag kunnen ALLEBEI worden betaald door de gast. Verdient waarschijnlijk een idem-sleutel."
+  },
+  "/api/supplier/command/operator/plan": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/command/puls": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/command/start": {
+   "klasse": "creatie"
+  },
+  "/api/supplier/facturen/maak": {
+   "klasse": "creatie"
+  },
+  "/api/supplier/gebouwpand/bhv": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/gebouwplus/lead": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/giftcard/sell": {
+   "klasse": "tebeslissen",
+   "vraag": "Twee klikken geven TWEE cadeaukaarten met saldo -- de zaak geeft dan echt geld weg. Verdient waarschijnlijk een idem-sleutel."
+  },
+  "/api/supplier/horeca/bon/maak": {
+   "klasse": "creatie"
+  },
+  "/api/supplier/horeca/rekening/open": {
+   "klasse": "creatie"
+  },
+  "/api/supplier/horeca/simulatie/maak": {
+   "klasse": "creatie"
+  },
+  "/api/supplier/horeca/venue/concept": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/horeca/wave/voorstel": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/kantoorpakket/maak": {
+   "klasse": "creatie"
+  },
+  "/api/supplier/mall/sync": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/mep/daily": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/onboarding/zet": {
+   "klasse": "instelling"
+  },
+  "/api/supplier/rooster/voorstel": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/samenwerking/oproep": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/security": {
+   "klasse": "berekening"
+  },
+  "/api/supplier/site/bewaar": {
+   "klasse": "instelling"
+  },
+  "/api/supplier/staff/invite": {
+   "klasse": "tebeslissen",
+   "vraag": "Twee uitnodigingen naar dezelfde persoon: hinderlijk, of moet de tweede de eerste vervangen?"
+  },
+  "/api/supplier/werkbeleid/zet": {
+   "klasse": "instelling"
+  },
+  "/api/toestellen/koppel": {
+   "klasse": "instelling"
+  },
+  "/api/wallet/voeg": {
+   "klasse": "creatie"
+  }
+ }
+}

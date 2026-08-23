@@ -17,7 +17,15 @@
    een bibliotheek die tegen die tijd niet meer bestaat. */
 'use strict';
 
-const esc = (t) => String(t == null ? '' : t).replace(/\|/g, '\\|').replace(/\n+/g, ' ').trim();
+/* Een cel afschermen. DE BACKSLASH GAAT EERST, en dat is geen cosmetiek:
+   schermen we alleen de pijp af, dan wordt een naam die letterlijk `\|` bevat
+   `\\|` -- en dat leest een markdownlezer als "een echte backslash, gevolgd door
+   een CELSCHEIDING". Wie zijn eigen naam mag kiezen, kiest dan de kolommen van
+   iemand anders, en dan liegt het overzicht over wie welke rol had. Eerst de
+   backslash verdubbelen, dan pas de pijp. Regeleindes gaan er allebei uit: een
+   losse \r breekt de rij bij een lezer die op \r splitst net zo goed. */
+const esc = (t) => String(t == null ? '' : t)
+  .replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/[\r\n]+/g, ' ').trim();
 
 /* De mensen zijn de enige soort die we UITSCHRIJVEN, en met reden: bij een
    overgang is "wie had welke rol, en tot wanneer" de vraag die de nieuwe

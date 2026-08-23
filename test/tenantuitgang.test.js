@@ -22,6 +22,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const leesbaar = require('../server/kern/tenant/uitgang-leesbaar');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitgang-'));
 const ORG = 'O-EXIT';
@@ -163,6 +164,39 @@ test('3b. er is ook een LEESBARE uitvoer, en die doet zich niet voor als de echt
   /* En hij lekt net zomin als de JSON. */
   assert.ok(!md.includes(beheer), 'geen beheer-token in het overzicht');
   assert.ok(!md.includes(lidToken), 'en geen lid-token');
+});
+
+/* De naam van een mens is INVOER, en dit overzicht is een tabel. Een naam die
+   letterlijk een backslash voor een pijp draagt, schuift zonder de juiste
+   volgorde van afschermen een eigen kolom de tabel in -- en dan staat er in het
+   archief een andere rol achter iemands naam dan hij had. Dit is de reden dat
+   `esc` eerst de backslash verdubbelt en pas daarna de pijp afschermt. */
+test('3c. een naam kan geen eigen kolom in het overzicht openen', () => {
+  const gemeen = 'Pia \\| beheerder';               // backslash, dan pijp
+  const md = leesbaar.ledenTabel({
+    a: { naam: gemeen, functie: 'balie', status: 'actief', rollen: [] },
+    b: { naam: 'Jan\rSmit', functie: 'balie', status: 'actief', rollen: [] },
+  });
+
+  /* Splits op ELK regeleinde, ook een losse \r: een lezer die daarop splitst
+     ziet anders een rij die wij niet geschreven hebben. */
+  const regels = md.trim().split(/\r\n|\r|\n/);
+  assert.equal(regels.length, 4, 'kop, streep en twee rijen -- een regeleinde breekt de tabel niet');
+
+  const rij = regels.find(l => l.includes('Pia'));
+  /* Lees de rij zoals een markdownlezer dat doet: een backslash neemt het
+     volgende teken mee, en alleen een pijp die dat NIET overkomt scheidt. */
+  const cellen = [];
+  let cel = '';
+  for (let i = 0; i < rij.length; i += 1) {
+    if (rij[i] === '\\') { cel += rij[i + 1] === undefined ? '\\' : rij[i + 1]; i += 1; continue; }
+    if (rij[i] === '|') { cellen.push(cel.trim()); cel = ''; continue; }
+    cel += rij[i];
+  }
+  cellen.push(cel.trim());
+
+  assert.equal(cellen.length, 7, 'vijf kolommen tussen twee lege randen, en geen kolom erbij');
+  assert.equal(cellen[1], gemeen, 'en de naam komt er ongeschonden weer uit');
 });
 
 test('4. de bewaring sluit de toegang -- en de uitgang blijft open', async () => {

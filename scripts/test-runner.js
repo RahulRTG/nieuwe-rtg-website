@@ -194,8 +194,27 @@ if (process.env.RTG_VORM_UIT !== '1') {
   }
 }
 
+/* HET LEESSPOOR AAN. Deze ronde schrijft op welk bestand onder deze repo elke
+   toets werkelijk LEEST, ook wat geen enkele require aanwijst. Vijfenvijftig
+   toetsbestanden lopen een map af; test/ast-grens.test.js leest er 495 onder
+   server/routes/ terwijl de graaf er vier kende, en een wijziging in zo'n route
+   selecteerde die toets dus niet.
+
+   De voorlader kost niets (gemeten: binnen de ruis over zes bestanden) en hij
+   gaat via NODE_OPTIONS mee naar elk kindproces, inclusief de servers -- want
+   het spoor van een server hoort bij de toets die hem startte. Uit te zetten met
+   RTG_LEESSPOOR_UIT=1. */
+const spoorPad = path.join(WORTEL, '.leesspoor.jsonl');
+const spoorAan = process.env.RTG_LEESSPOOR_UIT !== '1';
+if (spoorAan) { try { fs.unlinkSync(spoorPad); } catch (e) { if (e.code !== 'ENOENT') throw e; } }
+
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_TESTTIJDEN_RUW: TIJDEN_RUW,
-  ...(vormPad ? { RTG_VORM: vormPad } : {}) };
+  ...(vormPad ? { RTG_VORM: vormPad } : {}),
+  ...(spoorAan ? {
+    RTG_LEESSPOOR: spoorPad,
+    NODE_OPTIONS: [process.env.NODE_OPTIONS || '', '--require ' + path.join(__dirname, 'lib', 'leesspoor.js')]
+      .filter(Boolean).join(' ')
+  } : {}) };
 
 function draai(namen, parallel, metDekking) {
   if (!namen.length) return 0;
@@ -294,6 +313,21 @@ if (gemeten) {
   console.log('        ^ samen ' + Math.round(100 * top / somMs) + '% van de opgetelde tijd.');
 } else {
   console.log('\n[tests] ronde: ' + wandklok + ' s wandklok (geen tijden gemeten).');
+}
+
+/* HET SPOOR VAN DEZE RONDE ERBIJ. Het register groeit en verliest nooit iets:
+   wat deze ronde niet werd gelezen kan een volgende ronde alsnog worden gelezen,
+   dus alleen toevoegen. Mislukt het, dan is dat een MELDING en geen stille
+   stilte -- een register dat ongemerkt niet meer bijwerkt, laat de graaf denken
+   dat hij weet wat hij niet weet. */
+if (spoorAan) {
+  const r = spawnSync(process.execPath, [path.join(__dirname, 'leesspoor.js'), '--spoor', spoorPad],
+    { cwd: WORTEL, encoding: 'utf8' });
+  const uit = ((r.stdout || '') + (r.stderr || '')).trim();
+  if (uit) console.log(uit.split('\n').map(l => '[tests] ' + l).join('\n'));
+  if (r.status !== 0) console.error('[tests] LET OP: het leesspoor is NIET samengevoegd. De bewijsgraaf ' +
+    'blijft dan op de vorige stand staan en kent de nieuwe leeskanten niet.');
+  try { fs.unlinkSync(spoorPad); } catch (e) {}
 }
 
 /* En de tegenmeting: welke servers zijn er tijdens deze ronde ouderloos

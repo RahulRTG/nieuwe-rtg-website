@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 157,
+    "toetsenNietGemeten": 158,
     "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -36,9 +36,14 @@
     "duurOpWandklok": 29,
     "staatProcesgebonden": 92,
     "datamapVastgeklonken": 11,
-    "bewijsOnbekend": 169
+    "bewijsOnbekend": 170
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "bewijsOnbekend 169 -> 170 en toetsenNietGemeten 157 -> 158 (test/leesspoor.test.js)",
+      "reden": "Het leesspoor: de bewijsgraaf leidde afhankelijkheden af uit REQUIRES, en was daarmee blind voor code die wordt GELEZEN. test/ast-grens.test.js had vier afhankelijkheden volgens de graaf en leest er gemeten 505, waarvan 495 onder server/routes/ -- precies de bestanden waar de beveiligingsregel over gaat. Een wijziging in zo'n route selecteerde die toets dus niet. Dat is geen traagheid maar een plannerMISS, en er zijn vijfenvijftig toetsbestanden die een map aflopen.\n\nDe nieuwe toets zelf start kindprocessen met `-e` en een broncodestring om de voorlader te kunnen stellen; daar kan geen statische graaf doorheen kijken, dus telt hij als onbekend. Dat is de veilige stand: hij draait altijd. En de mutatiemotor is er nog niet langs -- de kern-bewering is wel met de hand gemuteerd en staat als tegenproef IN de toets (toets 4 eist dat de graaf de kant ZONDER register NIET heeft; zonder die bewering zou een register dat niets doet ook groen geven)."
+    },
     {
       "datum": "2026-08-24",
       "meter": "bewijsOnbekend 167 -> 169 en toetsenNietGemeten 155 -> 157 (twee toetsbestanden erbij)",

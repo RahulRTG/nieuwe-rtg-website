@@ -216,8 +216,44 @@ function startEenServer(bestand) {
    ALTIJD gedraaid; nooit overgeslagen, nooit "waarschijnlijk niet nodig". Een
    planner die gokt is erger dan geen planner: die maakt een groene ronde die
    niets betekent, en dat merk je pas in productie. */
+/* HET LEESSPOOR: KANTEN DIE GEEN REQUIRE ACHTERLAAT.
+
+   Deze graaf leidt afhankelijkheden af uit requires. Dat is exact voor code die
+   wordt GEIMPORTEERD en blind voor code die wordt GELEZEN. test/ast-grens.test.js
+   is het duidelijkste geval: vier afhankelijkheden volgens de requires, terwijl
+   die toets gemeten 505 bestanden inleest -- 495 onder server/routes/, precies
+   waar de beveiligingsregel over gaat. Een wijziging in zo'n route selecteerde
+   die toets dus niet, en er zijn vijfenvijftig toetsen die een map aflopen.
+
+   LEESSPOOR.json bevat wat er tijdens echte rondes is gelezen en niet uit een
+   require volgde (scripts/lib/leesspoor.js meet het, scripts/leesspoor.js voegt
+   samen). Die kanten komen er hier bij.
+
+   DRIE DINGEN DIE HIER NIET GEBEUREN, alle drie met opzet:
+
+   - er wordt nooit een kant WEGGEHAALD. Een waarneming is een ondergrens: wat
+     deze ronde niet werd gelezen kan volgende ronde alsnog worden gelezen. Door
+     alleen toe te voegen kiest de planner er meer en nooit minder.
+   - een toets wordt hier niet `volledig` van, en verlaat de bak `altijd` niet.
+     Zie de volgorde hieronder: dat oordeel valt op de STATISCHE sluiting, voor
+     het spoor erbij komt.
+   - het register is geen VOORWAARDE. Zonder LEESSPOOR.json doet deze graaf
+     precies wat hij deed -- met de oude blinde vlek, maar zonder te breken. */
+function leesspoorKanten(wortel) {
+  try {
+    const r = JSON.parse(fs.readFileSync(path.join(wortel, 'LEESSPOOR.json'), 'utf8'));
+    return (r && r.toetsen && typeof r.toetsen === 'object') ? r.toetsen : null;
+  } catch (e) { return null; }
+}
+
 function graaf(opties) {
   const wortel = (opties && opties.wortel) || WORTEL;
+  /* `zonderSpoor` is er voor scripts/leesspoor.js zelf: die moet het VERSCHIL
+     bepalen tussen wat waargenomen is en wat de graaf zonder spoor al wist. Met
+     spoor zou het register zichzelf voeden en na een ronde niets meer toevoegen
+     -- een lus die stil op nul uitkomt. En voor test/leesspoor.test.js, die
+     precies dat verschil moet kunnen stellen. */
+  const spoor = (opties && opties.zonderSpoor) ? null : ((opties && opties.spoor) || leesspoorKanten(wortel));
   const testmap = path.join(wortel, 'test');
   const memo = new Map();
   const serverSluiting = sluiting(path.join(wortel, 'server', 'server.js'), memo);
@@ -238,9 +274,25 @@ function graaf(opties) {
        en dan zou een wijziging IN de helper geen enkele toets selecteren. De
        kruisproef tegen de mutatiemotor wees het meteen aan: strenge-poort.test.js
        is bewezen gevoelig voor test/helper.js en werd overgeslagen. */
-    const bron = [...bestanden].filter(f => AFHANKELIJK.some(m => f.startsWith(path.join(wortel, m) + path.sep)));
+    /* EERST HET OORDEEL, DAN PAS DE WAARNEMING -- en die volgorde is het punt.
+
+       soort en volledig bepalen of een toets in `altijd` belandt: de veilige bak
+       die de planner nooit overslaat. Die twee worden UITSLUITEND uit de
+       statische sluiting gerekend. Zou het leesspoor meetellen, dan zou een
+       toets met nul requires maar wel waargenomen lezingen uit `altijd`
+       KLIMMEN -- van "draait altijd" naar "draait soms", op grond van een
+       ondergrens. Dan haalt de waarneming een garantie weg in plaats van er een
+       toe te voegen, en precies dat mag ze niet.
+
+       Ik heb dat zelf eerst fout gehad: de kanten stonden erbij voordat het
+       oordeel viel. test/leesspoor.test.js stelt het nu als bewering. */
+    const statisch = [...bestanden].filter(f => AFHANKELIJK.some(m => f.startsWith(path.join(wortel, m) + path.sep)));
     const volledig = !eigen.berekend && (!boot || !serverSluiting.berekend);
-    const soort = bron.length === 0 ? 'onbekend' : (boot ? 'serverboot' : 'statisch');
+    const soort = statisch.length === 0 ? 'onbekend' : (boot ? 'serverboot' : 'statisch');
+    if (spoor && Array.isArray(spoor[naam])) {
+      for (const rel of spoor[naam]) bestanden.add(path.join(wortel, rel));
+    }
+    const bron = [...bestanden].filter(f => AFHANKELIJK.some(m => f.startsWith(path.join(wortel, m) + path.sep)));
     perToets.set(naam, { bestanden: bron, soort, volledig });
   }
 
@@ -276,5 +328,5 @@ function onbekendeAfhankelijkheden(g) {
   return n;
 }
 
-module.exports = { losOpNaarBestand, requiresVan, sluiting, berekendBereik, BEREKEND_BEREIK,
+module.exports = { losOpNaarBestand, requiresVan, sluiting, berekendBereik, BEREKEND_BEREIK, leesspoorKanten,
   graaf, onbekendeAfhankelijkheden, startEenServer, WORTEL, MAPPEN, AFHANKELIJK };

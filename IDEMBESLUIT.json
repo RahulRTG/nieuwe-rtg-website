@@ -18,9 +18,8 @@
   "creatie": 42,
   "berekening": 39,
   "instelling": 14,
-  "beschermd": 6,
-  "code-maker": 4,
-  "tebeslissen": 9
+  "beschermd": 15,
+  "code-maker": 4
  },
  "routes": {
   "/api/agenda/toevoegen": {
@@ -350,40 +349,40 @@
    "reden": "Verlengen zet geldigTot op VANDAAG + 10 jaar, absoluut en niet opgeteld bij de vorige datum -- twee keer verlengen geeft dus dezelfde einddatum en niet twintig jaar rijbewijs. Vastgehouden in test/overheid.test.js 3, en met een mutatie (optellen in plaats van absoluut) gezien zakken. Wat er bij een herhaling WEL twee keer gebeurt, en dat hoort hier te staan in plaats van weggestreept: de inwoner krijgt een tweede bericht dat zijn rijbewijs is verlengd. Een dubbele brief is hinderlijk; het rijbewijs zelf schuift niet twee keer op. Berichten aan een mens gaan daarom NIET in de vastleggingslijst -- een tweede brief is iets dat iemand ziet."
   },
   "/api/bank/overboek": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een interne overboeking gaat door boekAsync zonder idem-sleutel; een herhaling na een timeout boekt het bedrag nog een keer naar de tegenrekening. De kop van kern/bank/overboeken.js belooft idempotentie op de CLEARENDE paden (storten, sepa) en die twee zijn ook echt beschermd -- een interne overboeking valt daar niet onder, en dat verschil was tot nu toe niet gemeten. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, doel en bedrag. De sleutelruimte bankIdem is bij deze ronde uit kern/bank/overboeken.js naar de gedeelde ctx van kern/bank/index.js verhuisd -- hij bestond al, maar alleen storten en sepa kwamen erbij."
   },
   "/api/bank/bulk": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een batchbetaling aan meerdere begunstigden, zonder sleutel. Een herhaling betaalt de hele batch nog een keer. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, soort run, aantal posten en het TOTAAL -- niet de losse IBAN's en niet de volgorde. Vijfduizend begunstigden in een afdruk is een sleutel die niemand meer kan vergelijken, en dezelfde run anders gesorteerd is dezelfde opdracht."
   },
   "/api/bank/salaris": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. De salarisrun, zonder sleutel. Een herhaling betaalt alle lonen nog een keer -- van de tien is dit het bedrag dat het hardst kan oplopen. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Zelfde batch-afdruk als bulk. De KANTOORkant (/api/office/bank/salaris/run) krijgt zijn sleutel niet van een knop maar uit het betaalbestand zelf (loonrun-id + bestand-id): die blijft gelden over sessies, schermen en medewerkers heen, dus twee kantoormedewerkers die tegelijk op Uitbetalen drukken betalen samen EEN keer uit."
   },
   "/api/bank/pas/betaal": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een paskaartbetaling, zonder sleutel. Een herhaling schrijft het bedrag nog een keer af en telt nog een keer mee voor de daglimiet. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: de pas en het bedrag. De sleutel valt NA de daglimietcontrole, zodat een geweigerde betaling er geen verbruikt -- anders zou de correctie erna een 409 krijgen op de afdruk van de mislukking."
   },
   "/api/bank/naar-wallet": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. De brug van de bankrekening naar de wallet, zonder sleutel. Anders dan de vier hierboven blijft het geld bij hetzelfde lid -- het staat alleen op de verkeerde plek. Hinderlijk, geen verlies. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: rekening en bedrag. Hier weegt de sleutel zwaarder dan elders in de bank: de brug raakt TWEE grootboeken, en tussen die twee boekingen zit een handmatige terugdraai die twee gelijktijdige retries konden kruisen."
   },
   "/api/bank/van-wallet": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. De brug terug, zonder sleutel. Zelfde afweging als naar-wallet: binnen hetzelfde lid. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Zelfde als naar-wallet, andere richting."
   },
   "/api/bank/terugkerend/zet": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een vaste betaling zetten, zonder sleutel. Een dubbele vaste betaling betaalt niet een keer te veel maar ELKE MAAND -- de enige van de tien waar de fout zich blijft herhalen tot iemand hem opmerkt. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: bron, doel, bedrag en interval. Dit was de duurste van de negen -- een dubbele vaste betaling betaalt niet een keer te veel maar elke maand -- en tegelijk de goedkoopste reparatie."
   },
   "/api/bank/pas/uitgeven": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Twee klikken geven twee geldige passen op dezelfde rekening. Zelfde vorm als de dubbele kassacode uit 4.56: een vergeten tweede pas is een open deur, hier naar het saldo. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: rekening en paskaartsoort; de naam niet (vrije tekst). Wie er bewust twee wil, doet een nieuwe poging met een verse sleutel -- dat blijft mogen, en dat is precies het verschil tussen een dubbeltik en een tweede besluit."
   },
   "/api/pay/verzoek": {
-   "klasse": "tebeslissen",
-   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een klompje vragen, zonder sleutel. Twee verzoeken van hetzelfde bedrag kunnen ALLEBEI door de vriend worden betaald -- precies het geval dat in 4.55 voor supplier/betaalverzoek is gerepareerd, aan de ledenkant. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+   "klasse": "beschermd",
+   "reden": "Gerepareerd op 24 augustus (TAKEN.md 4.57): loopt nu door metIdem uit server/lib/idem.js, met de afdruk op de geld-bepalende velden en de vrije omschrijving er nadrukkelijk NIET in. Afdruk: de ontvangers (gesorteerd, dus dezelfde groep in een andere volgorde is hetzelfde verzoek) en het bedrag per persoon. Dit is de ledenkant van wat in 4.55 voor supplier/betaalverzoek is gedaan."
   },
   "/api/bank/rekening/open": {
    "klasse": "creatie",

@@ -93,7 +93,14 @@ module.exports = (ctx) => {
     if (!bestand.posten.length) { veilig(res, () => ({ status: 400, error: 'Niemand met een netto bedrag om uit te betalen.' })); return; }
 
     const posten = bestand.posten.map(p => ({ naarIban: p.iban, centen: p.centen, oms: 'Salaris ' + run.periode }));
-    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten });
+    /* DE SLEUTEL KOMT HIER NIET VAN DE CLIENT, en dat is een verschil met de
+       negen routes uit TAKEN.md 4.57. Een salarisrun betaalt EEN definitieve
+       loonrun uit, en dat betaalbestand heeft een eigen id -- dat is een betere
+       sleutel dan wat een knop verzint, want hij blijft gelden over sessies,
+       schermen en medewerkers heen. Twee kantoormedewerkers die tegelijk op
+       Uitbetalen drukken, betalen zo samen EEN keer uit. */
+    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten,
+      idem: 'loonrun:' + run.id + ':' + bestand.id });
     veilig(res, () => {
       if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + run.code + ' (' + run.periode + ') uit loonrun ' + run.id + ': ' +
         r.geboekt + ' netto loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }

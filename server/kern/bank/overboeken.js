@@ -8,16 +8,14 @@
    twee grootboeken tegelijk raakt, en die regel hoort niet tussen deze.
    Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, bijeen, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje } = ctx;
+  const { db, save, bijeen, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje, metIdem } = ctx;
 
   const eigenaar = (iban, codenaam) => { const m = rekMeta(iban); return m && (!codenaam || m.codenaam === String(codenaam).trim()); };
 
   /* Idempotentie die een herstart overleeft: dezelfde sleutel geeft exact
-     hetzelfde antwoord terug en clearet nooit twee keer. */
-  // met verzoek-binding; dezelfde module als RTG Pay, zie ../../lib/idem.js.
-  // De save-bundel legt boeking en idem-sleutel als EEN commit vast; de kaart-
-  // wacht in het werk raakt door de context-binding geen andere verzoeken.
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen });
+     hetzelfde antwoord terug en clearet nooit twee keer. Hij werd hier gemaakt
+     en woont sinds 4.57 in de gedeelde ctx (kern/bank/index.js), zodat de hele
+     bank er gebruik van maakt en niet alleen dit bestand. */
 
   /* Storten: extern geld op een rekening zetten. De knop bepaalt hoe het clearet:
      - partner/hybride: via de kaart-naad (Apple Pay/kaart), tegenrekening extern:kaart;
@@ -50,15 +48,28 @@ module.exports = (ctx) => {
     });
   }
 
-  // interne overboeking tussen twee rekeningen (direct, geen kosten)
-  async function overboek({ vanIban, naarIban, centen, oms, codenaam }) {
+  /* Interne overboeking tussen twee rekeningen (direct, geen kosten).
+
+     De idem-sleutel stond hier NIET, en dat is precies wat de idemproef vond
+     (TAKEN.md 4.57): een retry na een timeout boekte het bedrag nog een keer
+     naar de tegenrekening. De kop van dit bestand belooft idempotentie op de
+     CLEARENDE paden -- storten en sepa -- en die belofte klopte; een interne
+     overboeking viel er alleen buiten en niemand had dat opgeschreven.
+
+     De afdruk draagt de geld-bepalende velden en NIET de omschrijving: een
+     andere tekst is geen ander verzoek en mag geen 409 geven (zie de kop van
+     ../../lib/idem.js). */
+  async function overboek({ vanIban, naarIban, centen, oms, codenaam, idem }) {
     if (!eigenaar(vanIban, codenaam)) return { status: 404, error: 'De bronrekening bestaat niet.' };
     if (!rekMeta(naarIban)) return { status: 404, error: 'De tegenrekening bestaat niet.' };
-    const b = await boekAsync({ van: vanIban, naar: naarIban, centen: Math.round(Number(centen)), soort: 'overboeking', oms: oms || 'Overboeking' });
-    if (b.error) return b;
-    seintje(rekMeta(vanIban).codenaam);
-    seintje(rekMeta(naarIban).codenaam);
-    return { ok: true, saldoCenten: saldoVan(vanIban), boeking: b.boeking };
+    const c = Math.round(Number(centen));
+    return metIdem(idem ? 'overboek:' + vanIban + ':' + idem : null, 'overboek|' + vanIban + '|' + naarIban + '|' + c, async () => {
+      const b = await boekAsync({ van: vanIban, naar: naarIban, centen: c, soort: 'overboeking', oms: oms || 'Overboeking' });
+      if (b.error) return b;
+      seintje(rekMeta(vanIban).codenaam);
+      seintje(rekMeta(naarIban).codenaam);
+      return { ok: true, saldoCenten: saldoVan(vanIban), boeking: b.boeking };
+    });
   }
 
   /* Uitgaande SEPA naar een externe bank, achter de betaal-naad (payout). Een

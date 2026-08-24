@@ -159,6 +159,28 @@ test('nood-fallback: noodstop laat alles weer via de kaart clearen; drie mislukk
   await naarPartner();
 });
 
+/* Een vers lid met een eigen rekening en saldo. De toetsen bovenaan werken op
+   een gedeeld `lid` en lopen daar tegen het maximumaantal rekeningen aan; wie
+   een schone stand nodig heeft, hoort er zelf een te maken in plaats van op de
+   opruimstand van een andere toets te leunen. */
+let versTeller = 0;
+async function versLid(centen) {
+  /* Een ECHTE registratie en niet /api/login: die demo-inlog geeft steeds
+     dezelfde codenaam terug, dus het "verse" lid zou hetzelfde lid zijn -- met
+     dezelfde volle rekeninglijst. Dat kostte een ronde om te zien. */
+  const u = Date.now().toString().slice(-8) + (++versTeller);
+  const reg = await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Dubbeltik ' + versTeller, email: 'dt' + u + '@x.nl', phone: '06' + u,
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
+  assert.ok(reg.token, 'het verse lid is geregistreerd');
+  const akk = await api('bank/akkoord', {}, reg.token);
+  assert.equal(akk.status, 200, 'akkoord opent de eerste rekening');
+  assert.ok(akk.body.rekening, 'en die rekening is er ook echt: ' + JSON.stringify(akk.body).slice(0, 140));
+  const iban = akk.body.rekening.iban;
+  if (centen) assert.equal((await api('bank/storten', { iban, centen, idem: 'vers' + iban }, reg.token)).status, 200);
+  return { token: reg.token, iban };
+}
+
 async function nieuweRekening(soort, centen) {
   const iban = (await api('bank/rekening/open', { soort }, lid.token)).body.rekening.iban;
   if (centen) await api('bank/storten', { iban, centen, idem: 'f' + iban }, lid.token);
@@ -684,4 +706,125 @@ test('de partnerrail geldt voor iedereen die eraan hangt, en een besluit staat o
 
   assert.equal((await oapi('bank/partnerrail', { rail: 'sepa', aan: true }, 'RTG')).status, 200, 'rail weer aan');
   assert.equal((await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'rail-aan' }, lid.token)).status, 200);
+});
+
+/* ---------------------------------------------------------------------------
+   DE DUBBELTIK OP DE BANK (TAKEN.md 4.57)
+
+   Acht bankroutes deden bij een herhaalde oproep het werk gewoon nog een keer:
+   een tweede overboeking, een tweede bulkrun, een tweede salarisrun, een tweede
+   pasbetaling, een tweede pas, een tweede vaste betaling en twee keer de
+   walletbrug over. De kop van kern/bank/overboeken.js beloofde idempotentie op
+   de CLEARENDE paden -- storten en sepa -- en die belofte klopte; alles daarbuiten
+   viel er alleen buiten, en niemand had dat opgeschreven.
+
+   Waarom dit lang onzichtbaar bleef, en dat is de les: de idempotentieproef kwam
+   er niet eens aan toe. Zonder bestaande rekening, pas of tegenrekening gaven
+   deze routes 404, en een route die geen werk doet, kun je niet betrappen op een
+   tweede keer doen. Pas toen de proef de wereld klaarzette (4.30), deden ze werk
+   -- en meteen bleek dat de herhaling meeliep.
+
+   Deze toets meet daarom niet het ANTWOORD maar wat er van het geld overblijft.
+   Een route die netjes `herhaald: true` meldt en ondertussen doorboekt, komt
+   daar niet mee weg. */
+test('een dubbeltik op de bank boekt niet twee keer -- gemeten aan het saldo', async () => {
+  /* Een VERS lid, want de toetsen hierboven hebben op `lid` het maximum aantal
+     rekeningen bereikt -- en een toets die op de opruimstand van een andere
+     toets leunt, zakt op een dag om de verkeerde reden. */
+  const k = await versLid(5000000);
+  const naar = (await api('bank/rekening/open', { soort: 'zakelijk' }, k.token)).body.rekening.iban;
+  const saldo = async () => (await api('bank/rekening', { iban: k.iban }, k.token)).body.rekening.saldoCenten;
+  const van = k.iban;
+
+  /* Per route: dezelfde sleutel twee keer (mag niets extra's doen) en dan een
+     VERSE sleutel (moet wel werken). Die derde is de ijking -- zonder hem zou
+     een route die helemaal niets doet ook groen staan. */
+  const pas = (await api('bank/pas/uitgeven', { iban: van, soort: 'debit', idem: 'dt-pas' }, k.token)).body.pas.id;
+  /* Alle ZES routes die het saldo raken. naar-wallet staat voor van-wallet, want
+     die tweede haalt terug wat de eerste erheen bracht; een negatieve wallet
+     zou op "onvoldoende saldo" stranden en dan meet deze toets niets. */
+  const gevallen = [
+    ['bank/overboek', { vanIban: van, naarIban: naar, centen: 1000 }, 1000],
+    ['bank/naar-wallet', { iban: van, centen: 1000 }, 1000],
+    ['bank/van-wallet', { iban: van, centen: 500 }, -500],
+    ['bank/bulk', { vanIban: van, posten: [{ naarIban: naar, centen: 700 }] }, 700],
+    ['bank/salaris', { vanIban: van, posten: [{ naarIban: naar, centen: 900 }] }, 900],
+    ['bank/pas/betaal', { id: pas, centen: 1100 }, 1100]
+  ];
+  for (const [pad, lijf, kost] of gevallen) {
+    const voor = await saldo();
+    const a = await api(pad, { ...lijf, idem: 'dt-' + pad }, k.token);
+    assert.equal(a.status, 200, pad + ' doet de eerste keer echt werk');
+    const na1 = await saldo();
+    assert.equal(voor - na1, kost, pad + ': de eerste oproep kost precies een keer');
+
+    const b = await api(pad, { ...lijf, idem: 'dt-' + pad }, k.token);
+    assert.equal(b.status, 200, pad + ': de herhaling geeft hetzelfde antwoord terug');
+    assert.equal(b.body.herhaald, true, pad + ': en zegt er zelf bij dat het een herhaling was');
+    assert.equal(await saldo(), na1, pad + ': DE HERHALING KOST NIETS -- dit is de hele toets');
+
+    const c = await api(pad, { ...lijf, idem: 'vers-' + pad }, k.token);
+    assert.equal(c.status, 200);
+    assert.equal(na1 - (await saldo()), kost, pad + ': een VERSE sleutel doet het werk wel -- anders bewijst het bovenstaande niets');
+  }
+
+  /* Dezelfde sleutel met een ANDER bedrag is geen herhaling maar een ander
+     verzoek, en hoort een 409 te geven in plaats van stil het bewaarde antwoord.
+     Zonder die binding krijgt de client "gelukt" voor iets wat nooit is geboekt
+     (zie de kop van server/lib/idem.js). */
+  assert.equal((await api('bank/overboek', { vanIban: van, naarIban: naar, centen: 9999, idem: 'dt-bank/overboek' }, k.token)).status, 409,
+    'zelfde sleutel, ander bedrag: dat is een conflict en geen herhaling');
+  assert.equal((await api('bank/bulk', { vanIban: van, posten: [{ naarIban: naar, centen: 12345 }], idem: 'dt-bank/bulk' }, k.token)).status, 409,
+    'ook als het bedrag in de posten zit');
+
+  /* En een andere OMSCHRIJVING is juist GEEN ander verzoek: vrije tekst hoort
+     niet in de afdruk, anders geeft een tikfout-correctie een 409. */
+  const stand = await saldo();
+  const zelfde = await api('bank/overboek', { vanIban: van, naarIban: naar, centen: 1000, oms: 'andere tekst', idem: 'dt-bank/overboek' }, k.token);
+  assert.equal(zelfde.status, 200, 'een andere omschrijving is geen ander verzoek');
+  assert.equal(await saldo(), stand, 'en boekt dus ook niets');
+});
+
+test('een dubbeltik maakt geen tweede pas, vaste betaling of klompje', async () => {
+  /* Dezelfde regel, maar hier telt niet het saldo maar het AANTAL. Een vergeten
+     tweede pas is een open deur naar het saldo (zelfde vorm als de dubbele
+     kassacode uit 4.56), en een dubbele vaste betaling betaalt niet een keer te
+     veel maar ELKE MAAND -- de duurste van de negen. */
+  const k = await versLid(100000);
+  const iban = k.iban;
+  const naar = (await api('bank/rekening/open', { soort: 'spaar' }, k.token)).body.rekening.iban;
+  const tel = {
+    pas: async () => ((await api('bank/passen', {}, k.token)).body.passen || []).filter(p => p.iban === iban).length,
+    tk: async () => ((await api('bank/terugkerend', {}, k.token)).body.terugkerend || []).filter(t => t.vanIban === iban).length
+  };
+  const gevallen = [
+    ['bank/pas/uitgeven', { iban, soort: 'debit' }, tel.pas],
+    ['bank/terugkerend/zet', { vanIban: iban, naarIban: naar, centen: 300, interval: 'maand' }, tel.tk]
+  ];
+  for (const [pad, lijf, meet] of gevallen) {
+    const voor = await meet();
+    assert.equal((await api(pad, { ...lijf, idem: 'tel-' + pad }, k.token)).status, 200);
+    const na1 = await meet();
+    assert.equal(na1, voor + 1, pad + ': de eerste oproep maakt er een');
+    assert.equal((await api(pad, { ...lijf, idem: 'tel-' + pad }, k.token)).body.herhaald, true);
+    assert.equal(await meet(), na1, pad + ': DE HERHALING MAAKT ER GEEN TWEEDE');
+    assert.equal((await api(pad, { ...lijf, idem: 'tel-vers-' + pad }, k.token)).status, 200);
+    assert.equal(await meet(), na1 + 1, pad + ': wie er bewust twee wil, krijgt er twee -- met een verse sleutel');
+  }
+
+  /* Het klompje aan de PAY-kant. Twee verzoeken van hetzelfde bedrag kunnen
+     ALLEBEI door de vriend worden betaald; dat is precies wat in 4.55 voor
+     supplier/betaalverzoek is gerepareerd, en dit is de ledenkant ervan. */
+  const vriend = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
+  const cn = (await api('pay/overzicht', {}, vriend.token)).body.codenaam;
+  const mijne = async () => ((await api('pay/overzicht', {}, k.token)).body.vanMij || []).length;
+  const voor = await mijne();
+  assert.equal((await api('pay/verzoek', { aan: [cn], totaalCenten: 2500, idem: 'kl-1' }, k.token)).status, 200);
+  assert.equal(await mijne(), voor + 1);
+  assert.equal((await api('pay/verzoek', { aan: [cn], totaalCenten: 2500, idem: 'kl-1' }, k.token)).body.herhaald, true);
+  assert.equal(await mijne(), voor + 1, 'de herhaling zet geen tweede klompje uit');
+  assert.equal((await api('pay/verzoek', { aan: [cn], totaalCenten: 3500, idem: 'kl-1' }, k.token)).status, 409,
+    'zelfde sleutel, ander bedrag: een conflict');
+  assert.equal((await api('pay/verzoek', { aan: [cn], totaalCenten: 2500, idem: 'kl-2' }, k.token)).status, 200);
+  assert.equal(await mijne(), voor + 2, 'en met een verse sleutel mag het wel');
 });

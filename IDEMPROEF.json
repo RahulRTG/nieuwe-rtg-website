@@ -3,8 +3,8 @@
  "gemeten": {
   "routesMetRol": 3100,
   "beoordeeld": 139,
-  "beschermd": 31,
-  "onbeschermd": 108,
+  "beschermd": 40,
+  "onbeschermd": 99,
   "ongemeten": 2961,
   "oproepen": 9324,
   "tokensHernieuwd": 24,
@@ -36,7 +36,7 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 18,
-  "onbeschermdMetBesluit": 108
+  "onbeschermdMetBesluit": 99
  },
  "zonderBesluit": [],
  "tegenspraken": [],
@@ -966,8 +966,8 @@
    "methode": "POST",
    "pad": "/api/bank/bulk",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -977,9 +977,7 @@
     "a": {
      "bankBoekingen": 1
     },
-    "b": {
-     "bankBoekingen": 1
-    },
+    "b": {},
     "c": {
      "bankBoekingen": 1
     }
@@ -1074,8 +1072,8 @@
    "methode": "POST",
    "pad": "/api/bank/naar-wallet",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -1086,10 +1084,7 @@
      "bankBoekingen": 1,
      "payBoekingen": 1
     },
-    "b": {
-     "payBoekingen": 1,
-     "bankBoekingen": 1
-    },
+    "b": {},
     "c": {
      "payBoekingen": 1,
      "bankBoekingen": 1
@@ -1100,8 +1095,8 @@
    "methode": "POST",
    "pad": "/api/bank/overboek",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -1111,9 +1106,7 @@
     "a": {
      "bankBoekingen": 1
     },
-    "b": {
-     "bankBoekingen": 1
-    },
+    "b": {},
     "c": {
      "bankBoekingen": 1
     }
@@ -1140,8 +1133,8 @@
    "methode": "POST",
    "pad": "/api/bank/pas/betaal",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -1151,9 +1144,7 @@
     "a": {
      "bankBoekingen": 1
     },
-    "b": {
-     "bankBoekingen": 1
-    },
+    "b": {},
     "c": {
      "bankBoekingen": 1
     }
@@ -1214,8 +1205,8 @@
    "methode": "POST",
    "pad": "/api/bank/pas/uitgeven",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -1299,8 +1290,8 @@
    "methode": "POST",
    "pad": "/api/bank/salaris",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -1310,9 +1301,7 @@
     "a": {
      "bankBoekingen": 1
     },
-    "b": {
-     "bankBoekingen": 1
-    },
+    "b": {},
     "c": {
      "bankBoekingen": 1
     }
@@ -1417,8 +1406,8 @@
    "methode": "POST",
    "pad": "/api/bank/terugkerend/zet",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -1428,9 +1417,7 @@
     "a": {
      "bankTerugkerend": 1
     },
-    "b": {
-     "bankTerugkerend": 1
-    },
+    "b": {},
     "c": {
      "bankTerugkerend": 1
     }
@@ -1440,8 +1427,8 @@
    "methode": "POST",
    "pad": "/api/bank/van-wallet",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -1452,10 +1439,7 @@
      "payBoekingen": 1,
      "bankBoekingen": 1
     },
-    "b": {
-     "payBoekingen": 1,
-     "bankBoekingen": 1
-    },
+    "b": {},
     "c": {
      "payBoekingen": 1,
      "bankBoekingen": 1
@@ -28782,8 +28766,8 @@
    "methode": "POST",
    "pad": "/api/pay/verzoek",
    "rol": "member",
-   "idempotentie": "onbeschermd",
-   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
     200,
     200,
@@ -28793,9 +28777,7 @@
     "a": {
      "payVerzoeken": 1
     },
-    "b": {
-     "payVerzoeken": 1
-    },
+    "b": {},
     "c": {
      "payVerzoeken": 1
     }

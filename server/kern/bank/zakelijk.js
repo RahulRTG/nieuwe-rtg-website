@@ -10,11 +10,25 @@
 const { LANDEN } = require('../fiscaal');
 
 module.exports = (ctx) => {
-  const { schoon, d, boekAsync, rekMeta, saldoVan, bodem, rekeningen, accounts } = ctx;
+  const { schoon, d, boekAsync, rekMeta, saldoVan, bodem, rekeningen, accounts, metIdem } = ctx;
 
   const MAX_POSTEN = 5000;
 
-  async function batch({ vanIban, posten, codenaam, oms, soort }) {
+  /* DE AFDRUK VAN EEN BATCH is de bronrekening, het soort run en het TOTAAL van
+     de posten -- niet de omschrijvingen, en niet de volgorde. Twee keer dezelfde
+     salarisrun versturen is dezelfde opdracht, ook als de regels anders
+     gesorteerd binnenkomen; een run met een ander totaal is een andere opdracht
+     en hoort een 409 te geven in plaats van stilletjes het bewaarde antwoord.
+     De begunstigden zitten er via het totaal en het aantal in, en niet als
+     lijst: vijfduizend IBAN's in een afdruk is een sleutel die niemand meer kan
+     vergelijken. */
+  const batchAfdruk = (vanIban, soort, posten) => {
+    let totaal = 0;
+    for (const p of posten) { const c = Math.round(Number(p && p.centen)); if (Number.isFinite(c)) totaal += c; }
+    return (soort || 'bulk') + '|' + vanIban + '|' + posten.length + '|' + totaal;
+  };
+
+  async function batch({ vanIban, posten, codenaam, oms, soort, idem }) {
     const m = rekMeta(vanIban);
     if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De bronrekening bestaat niet.' };
     if (m.bevroren) return { status: 423, error: 'Deze rekening is bevroren.' };
@@ -33,13 +47,18 @@ module.exports = (ctx) => {
       schoonPosten.push({ naar, centen: c, oms: schoon((p && p.oms) || oms, 120) || (soort === 'salaris' ? 'Salaris' : 'Betaling') });
     }
     if (saldoVan(vanIban) - totaal < bodem(vanIban)) return { status: 402, error: 'Onvoldoende saldo of rood-staan-ruimte voor de hele batch.' };
-    // en dan pas boeken (de voorcontrole maakt dat dit niet half blijft steken)
-    let geboekt = 0;
-    for (const p of schoonPosten) {
-      const b = await boekAsync({ van: vanIban, naar: p.naar, centen: p.centen, soort: soort || 'bulk', oms: p.oms });
-      if (b.ok) geboekt++;
-    }
-    return { ok: true, geboekt, aantal: schoonPosten.length, totaalCenten: totaal, saldoCenten: saldoVan(vanIban) };
+    /* De sleutel valt hier en niet eerder: alles hierboven weigert zonder te
+       boeken, en een geweigerde opdracht hoort geen sleutel te verbruiken --
+       anders geeft de correctie erna een 409 op de afdruk van de mislukking. */
+    return metIdem(idem ? 'batch:' + vanIban + ':' + idem : null, batchAfdruk(vanIban, soort, posten), async () => {
+      // en dan pas boeken (de voorcontrole maakt dat dit niet half blijft steken)
+      let geboekt = 0;
+      for (const p of schoonPosten) {
+        const b = await boekAsync({ van: vanIban, naar: p.naar, centen: p.centen, soort: soort || 'bulk', oms: p.oms });
+        if (b.ok) geboekt++;
+      }
+      return { ok: true, geboekt, aantal: schoonPosten.length, totaalCenten: totaal, saldoCenten: saldoVan(vanIban) };
+    });
   }
 
   /* Het salarisvoorstel: de brug tussen de klokuren van een zaak en de

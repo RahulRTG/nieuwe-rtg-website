@@ -47,7 +47,7 @@ module.exports = (kern) => {
   // een Klompje vragen (een of meer vrienden, met of zonder splitsen)
   app.post('/api/pay/verzoek', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, await pay.verzoekMaak({ van: liveCodename(req.session), aan: req.body.aan, totaalCenten: req.body.totaalCenten, perCenten: req.body.perCenten, oms: req.body.oms, splitsMetMij: req.body.splitsMetMij === true }));
+    stuur(res, await pay.verzoekMaak({ van: liveCodename(req.session), aan: req.body.aan, totaalCenten: req.body.totaalCenten, perCenten: req.body.perCenten, oms: req.body.oms, splitsMetMij: req.body.splitsMetMij === true, idem: req.body.idem }));
   });
   // een Klompje betalen: EEN knop
   app.post('/api/pay/verzoek/betaal', auth, async (req, res) => {

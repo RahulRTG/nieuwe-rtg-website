@@ -74,7 +74,7 @@
     $('#bkOdoe').addEventListener('click', async function () {
       var centen = Math.round(Number($('#bkObed').value) * 100);
       try {
-        await Geld.api('/api/bank/overboek', { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen });
+        await Geld.api('/api/bank/overboek', { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen, idem: B.sleutel('overboek') });
         $('#bkObed').value = ''; await B.herlaad();
       } catch (e) { Geld.melding(e.message); }
     });
@@ -98,13 +98,13 @@
       var euroS = prompt('Hoeveel naar je RTG Pay-wallet? (euro)');
       if (euroS == null) return;
       try {
-        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: Math.round(Number(euroS) * 100) });
+        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: Math.round(Number(euroS) * 100), idem: B.sleutel('naarwallet') });
         await B.herlaad();
       } catch (e) { Geld.melding(e.message); }
     });
     elk('[data-bkpas]', async function (b) {
       try {
-        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit' });
+        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit', idem: B.sleutel('pasuit') });
         Geld.melding('Pas uitgegeven: ' + r.pas.nummer);
       } catch (e) { Geld.melding(e.message); }
     });

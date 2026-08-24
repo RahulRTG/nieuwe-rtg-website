@@ -82,9 +82,20 @@ module.exports = (deps) => {
      in ./uitgang; het gat dat dit dicht in ../betaalopdracht/index.js. */
   const opdrachten = require('./uitgang')({ opdrachten: betaalOpdrachten, boekAsync, rekMeta, seintje });
 
+  /* DE IDEM-SLEUTELS VAN DE BANK, EEN KEER EN VOOR IEDEREEN.
+
+     Dit stond in ./overboeken.js, en daar had alleen dat bestand er iets aan:
+     storten en sepa liepen erdoor en de rest van de bank niet. De idemproef
+     mat dat op 24 augustus voor het eerst echt, en toen bleek wat er onder die
+     grens lag -- een herhaalde overboeking, bulkrun, salarisrun of pasbetaling
+     boekte gewoon nog een keer (TAKEN.md 4.57). Nu hangt hij in de gedeelde
+     ctx, met EEN sleutelruimte (`bankIdem`) voor de hele bank, zoals RTG Pay
+     dat ook doet. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen });
+
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
-    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje, opdrachten };
+    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje, opdrachten, metIdem };
 
   const rek = require('./rekeningen')(ctx);
   const over = require('./overboeken')(ctx);

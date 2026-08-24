@@ -135,18 +135,12 @@ Object.assign(kern, require('../kern/studio').maakStudio({ db, save, crypto, ant
 Object.assign(kern, require('../kern/hardwarelab').maakHardwarelab({ db, save, crypto, anthropic, schoon }));
 
 /* Het doorgeefjournaal (kern/doorgeefjournaal.js): een leesbare regel per
-   binnenkomend verzoek en per uitgaand bericht. Vroeg in de rij, want de haak
-   waar de lagen eronder aan melden (server/journaalhaak.js) moet vanaf het
-   eerste verzoek bezet zijn -- anders mist het journaal juist de opstartfase,
-   en dat is precies waar vannacht de storingen zaten. */
-/* Het bewaarde deel woont in een BESTAND en niet in een collectie: een logboek
-   groeit alleen maar aan, en een collectie wordt bij elke save() in zijn geheel
-   opnieuw geserialiseerd. Zie de kop van kern/journaalbestand.js voor wat dat
-   kostte (gemiddeld 32,9 ms per save, piek 101 ms). */
-const journaalBoek = require('../kern/journaalbestand').maakJournaalbestand({
-  dir: require('path').join(require('../db').DATA_DIR, 'journaal') });
-Object.assign(kern, require('../kern/doorgeefjournaal').maakDoorgeefjournaal({ db, save, bestand: journaalBoek }));
-kern.journaalBoek = journaalBoek;
+   binnenkomend verzoek en per uitgaand bericht. Vroeg in de rij: de haak waar
+   de lagen eronder aan melden (server/journaalhaak.js) moet vanaf het
+   eerste verzoek bezet zijn -- anders mist het journaal de opstartfase, en daar
+   zaten de storingen. Het bewaarde deel gaat naar een BESTAND en niet naar een
+   collectie; zie kern/journaalbestand.js. */
+Object.assign(kern, require('../kern/journaalbestand').metBestand({ db, save }));
 
 /* Het stadsweefsel (kern/stadsweefsel/): de ondergrond onder de stad --
    geografie, objecten, indicatoren, begroting, besluitvorming en het

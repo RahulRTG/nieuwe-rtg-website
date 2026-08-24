@@ -39,23 +39,16 @@ const BEWAARD_MAX = 20000;     // harde bovengrens op schijf, los van de termijn
 /* IN BLOKKEN SNOEIEN, NIET PER REGEL -- en dat is geen detail.
 
    Beide lijsten hierboven werden bijgehouden met `splice(0, 1)` zodra ze een
-   regel te lang waren. Een splice vooraan verschuift de HELE array: op het
-   venster is dat 4.000 verplaatsingen per verzoek, op het bewaarde deel 20.000.
-   Bij een paar duizend verzoeken per seconde is dat tientallen miljoenen
-   verplaatsingen per seconde voor het weggooien van EEN regel. In het
-   CPU-profiel van 24 augustus 2026 was deze functie daarmee de duurste van de
-   hele applicatie: 8,3% van alle rekentijd, meer dan het routeren zelf.
+   regel te lang waren. Een splice vooraan verschuift de HELE array: 4.000
+   verplaatsingen per verzoek op het venster, 20.000 op het bewaarde deel, om
+   EEN regel weg te halen. In het CPU-profiel van 24 augustus 2026 was dit
+   daarmee de duurste functie van de hele applicatie (zie PRESTATIES.md).
 
    De grens blijft precies wat hij was -- de lijst gaat NOOIT over het maximum
    heen. Het verschil is dat we bij overschrijding een BLOK ineens weghalen en
    dus onder het maximum uitkomen, in plaats van er telkens exact op te gaan
-   zitten. Zo kost het snoeien eens per BLOK-regels wat het eerst per regel
-   kostte, en dat is geamortiseerd niets.
-
-   Wat je ervoor inlevert, eerlijk gezegd: het venster houdt geen 4.000 regels
-   maar tussen de 3.800 en 4.000. Het scherm leest er `slice(-n)` uit met een n
-   die daar ver onder ligt, dus dat is niet te zien -- maar het staat hier omdat
-   het wel een echt verschil is en geen afronding. */
+   zitten. Het venster houdt daardoor tussen de 3.800 en 4.000 regels; het scherm
+   leest er `slice(-n)` uit met een n die daar ver onder ligt. */
 const BLOK = (max) => Math.max(1, Math.floor(max * 0.05));
 const VENSTER_BLOK = BLOK(VENSTER);
 const BEWAARD_BLOK = BLOK(BEWAARD_MAX);
@@ -66,26 +59,7 @@ function snoei(lijst, max, blok) {
   lijst.splice(0, lijst.length - max + blok);
 }
 
-/* Een pad zonder de veranderlijke stukken: /api/lid/42/pas wordt /api/lid/:id/pas.
-   Zo tellen honderd verzoeken naar honderd leden als EEN regel in een overzicht,
-   en staat er bovendien geen id in het journaal dat naar een persoon leidt. */
-function padVorm(p) {
-  return String(p || '')
-    .replace(/\/[0-9a-f]{16,}/gi, '/:sleutel')
-    .replace(/\/\d+/g, '/:id')
-    .slice(0, 120);
-}
-
-/* Een bestemming zonder de persoon erin: 'sms:+31612345678' wordt 'sms', en een
-   e-mailadres wordt het domein. Het journaal moet laten zien DAT er post uitging
-   en of het lukte, niet aan wie. */
-function bestemmingVorm(naar) {
-  const s = String(naar || '');
-  if (s.startsWith('sms:')) return 'sms';
-  const at = s.indexOf('@');
-  if (at > 0) return 'mail:' + s.slice(at + 1).slice(0, 40);
-  return s.slice(0, 40) || 'onbekend';
-}
+const { padVorm, bestemmingVorm } = require('./journaalvorm');
 
 function maakDoorgeefjournaal({ db, save, nu, bestand }) {
   const klok = nu || (() => new Date().toISOString());
@@ -95,50 +69,21 @@ function maakDoorgeefjournaal({ db, save, nu, bestand }) {
 
      Het stond in db.data.doorgeefjournaal: een array van 20.000 regels, dus een
      blob in een rij van de opslag. Elke save() ergens in de applicatie
-     serialiseerde die hele lijst opnieuw om er een regel bij te zetten -- 3,6 MB
-     werk voor 200 byte nieuwe gegevens. Gemeten kostte dat gemiddeld 32,9 ms per
-     save met een piek van 101 ms, synchroon op de event-loop. Zie de kop van
-     kern/journaalbestand.js voor de hele meting.
-
-     Een logboek is geen toestand: er wordt alleen achteraan bij geschreven en
-     vooraan afgesneden. Dat hoort in een bestand. */
+     serialiseerde die hele lijst opnieuw om er een regel bij te zetten. Een
+     logboek is geen toestand -- er wordt alleen achteraan bij geschreven en
+     vooraan afgesneden -- en hoort dus in een bestand. Zie de kop van
+     kern/journaalbestand.js voor de meting en de afwegingen. */
+  /* Het bestand wordt MEEGEGEVEN en niet hier gepakt. Even stond hier een
+     standaardboek als er niets was meegegeven; dat scheelde een regel bij de
+     aanroeper en leverde verborgen gedeelde staat op -- toetsen die geen bestand
+     meegaven schreven allemaal in dezelfde map en zagen elkaars regels. Zonder
+     bestand blijft het oude terugvalpad (een collectie) gelden. */
   const boek = bestand || null;
 
-  /* De verhuizing gebeurt EEN keer, bij het aanmaken, en alleen als er nog een
-     oude collectie ligt. Zonder dit zou een bestaande installatie zijn
-     geschiedenis kwijtraken op het moment van bijwerken -- stil, want niemand
-     kijkt elke dag in het journaal. */
-  function verhuisOude() {
-    if (!boek) return 0;
-    const oud = db.data && db.data.doorgeefjournaal;
-    if (!Array.isArray(oud) || !oud.length) return 0;
-    let n = 0;
-    for (const r of oud) if (boek.voegToe(r)) n++;
-    /* EERST BEWIJZEN DAT HET GESCHREVEN IS, DAN PAS WEGGOOIEN.
-
-       Hier stond `boek.spoelNu(); delete db.data.doorgeefjournaal;` -- zonder
-       naar de uitkomst te kijken. Een volle schijf of een onschrijfbare map
-       maakte daarmee van een verhuizing een verwijdering: weg uit de database,
-       nooit in het bestand, en niets dat erover klaagde. Precies de storing waar
-       dit journaal juist voor bestaat.
-
-       Nu blijft de oude collectie gewoon staan als de spoeling niet compleet
-       lukte. Dan is er hooguit dubbel werk bij de volgende start; het alternatief
-       is de geschiedenis kwijt. */
-    const weg = boek.spoelNu();
-    const stand = boek.stand();
-    if (stand.stuk || weg < n) {
-      console.warn('[journaal] verhuizing NIET voltooid (' + weg + ' van ' + n +
-        ' regels geschreven' + (stand.stuk ? ', reden: ' + stand.stuk : '') +
-        '). De oude collectie blijft staan; er gaat niets verloren.');
-      return 0;
-    }
-    delete db.data.doorgeefjournaal;
-    try { save(); } catch (e) {}
-    console.log('[journaal] ' + n + ' bewaarde regels verhuisd van de database naar ' + stand.map);
-    return n;
-  }
-  try { verhuisOude(); } catch (e) { console.warn('[journaal] verhuizen mislukt:', e.message); }
+  /* De eenmalige verhuizing van een oude collectie naar het bestand staat in
+     ./journaalverhuizing.js -- hij draait een keer per installatie. */
+  try { require('./journaalverhuizing').verhuisOude({ db, save, boek }); }
+  catch (e) { console.warn('[journaal] verhuizen mislukt:', e.message); }
 
   /* Zonder bestand (een toets die er geen meegeeft) blijft het oude gedrag
      bestaan, zodat deze module ook los te gebruiken is. */
@@ -193,29 +138,12 @@ function maakDoorgeefjournaal({ db, save, nu, bestand }) {
       const lijst = rij();
       lijst.push(regel);
       snoei(lijst, BEWAARD_MAX, BEWAARD_BLOK);
-      /* NIET bij elke regel save(): dat zou van elk verzoek een schrijfactie
-         maken.
-
-         EN BIJ EEN MISLUKKING OOK NIET METEEN, en dat is een correctie op wat
-         hier stond. De gedachte was goed -- juist die regel wil je terugvinden
-         als de server daarna omvalt -- maar de prijs was fout: het journaal is
-         EEN blob in EEN rij, dus elke save() serialiseert en versleutelt de hele
-         lijst opnieuw. Nagemeten op een verse installatie: 500 verzoeken naar
-         een onbekend pad gaven 1002 schrijfacties en lieten de WAL met 4,18 MB
-         groeien (13,9 kB per verzoek), en de prijs LIEP OP met de lijst: 0,72 ms
-         bij 159 kB journaal, 3,63 ms bij 1114 kB. Bij de eigen bovengrens van
-         20.000 regels is dat ~10 ms geblokkeerde lus per mislukt verzoek, en het
-         zakt daarna nooit meer.
-
-         Erger dan traag: een willekeurige bezoeker kon met een GET naar een
-         niet-bestaand pad een schijfschrijving afdwingen. Dat is de enige plek
-         in het huis waar dat kon.
-
-         Nu: hooguit EEN keer per seconde spoelen. Een mislukking is daarmee
-         hooguit een seconde later op schijf -- en een server die precies in dat
-         venster omvalt, laat een regel liggen die in het VENSTER wel stond. Die
-         ruil is de goede kant op: een journaal dat de server traag maakt, is
-         zelf de storing geworden. */
+      /* Dit is het TERUGVALPAD: zonder bestand blijft het journaal een collectie.
+         Dan geldt nog steeds: niet bij elke regel save(), want het journaal is
+         dan een blob in een rij en elke save serialiseert de hele lijst opnieuw.
+         Erger dan traag was dat een willekeurige bezoeker met een GET naar een
+         onbekend pad een schijfschrijving kon afdwingen -- de enige plek in het
+         huis waar dat kon. Vandaar hooguit een spoeling per seconde. */
       if (regel.mislukt) plan();
     }
     return regel;

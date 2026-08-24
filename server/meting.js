@@ -32,37 +32,22 @@
 /* Emmers in seconden. Onder de 25 ms fijnmazig (daar zit het normale werk),
    daarboven grover (daar gaat het toch al mis).
 
-   DE ONDERSTE DRIE EMMERS ZIJN ERBIJ GEKOMEN, en dat is een correctie op een
+   DE ONDERSTE VIJF EMMERS ZIJN ERBIJ GEKOMEN, en dat is een correctie op een
    blinde vlek die niemand zag omdat het bord er prima uitzag.
 
-   De reeks begon op 5 ms. Gemeten op 24 augustus 2026, onder een last van 5.300
-   verzoeken per seconde over 2.064 echte routes: 99,41% van alle verzoeken viel
-   in die EERSTE emmer. Het gemiddelde lag op 0,46 ms. Daarmee was elk percentiel
-   onder de 5 ms geen meting maar een rekenkundig verzinsel binnen een enkele
-   emmer -- p50, p90 en p95 kwamen op precies dezelfde waarde uit voor een server
-   die twee keer zo snel was als de andere.
+   De reeks begon op 5 ms. Gemeten op 24 augustus 2026 viel 99,41% van alle
+   verzoeken in die EERSTE emmer, bij een gemiddelde van 0,46 ms. Elk percentiel
+   onder de 5 ms was daarmee geen meting maar een verzinsel binnen een enkele
+   emmer: twee servers waarvan de ene twee keer zo snel was, rapporteerden
+   dezelfde p50, p90, p95 en p99.
 
    Dat is erger dan onnauwkeurig. SLO.md legt doelen vast op p90 en p99 van deze
-   reeks, en zegt erbij dat wij daarop te controleren zijn. Een instrument dat
-   0,3 ms niet van 4,9 ms kan onderscheiden, kan een verbetering niet aantonen en
-   -- belangrijker -- een verslechtering niet zien tot hij de 5 ms passeert. Een
-   route die tien keer trager wordt van 0,4 naar 4 ms, blijft op dit bord
-   onzichtbaar.
+   reeks; een instrument dat 0,3 ms niet van 4,9 ms kan onderscheiden ziet een
+   route die tien keer trager wordt pas als hij de 5 ms passeert. Waarom het er
+   vijf werden en geen drie is gemeten, niet gegokt: zie PRESTATIES.md.
 
-   Vijf emmers erbij (0,1 / 0,25 / 0,5 / 1 / 2,5 ms) leggen precies daar de
-   verdeling open. Dat het er vijf werden en niet drie is zelf gemeten: met een
-   ondergrens van 0,5 ms viel nog altijd 99,26% in de eerste emmer, dus ook p99
-   lag er nog binnen. Pas onder de 0,25 ms komt de verdeling echt uit elkaar.
-
-   De prijs is 45% meer tijdreeksen, en dat is de goede kant van de ruil: het
-   aantal emmers ligt vast per route, dus het geheugen blijft begrensd -- de
-   eigenschap waar keuze 2 hieronder over gaat, verandert er niet door.
-
-   Wat dit NIET doet: de streefwaarden in SLO.md bijstellen. Die staan er nog
-   zoals ze gekozen zijn (p90 < 250 ms, p99 < 1 s) en dat is nu aantoonbaar
-   duizend keer ruimer dan wat het systeem werkelijk doet. Ze bijstellen is een
-   besluit met een foutbudget eraan vast, en dat hoort in SLO.md thuis en niet
-   in een emmerlijst. Het verschil is dat het nu een KEUZE is en geen gok. */
+   De prijs is 45% meer tijdreeksen; het aantal emmers ligt vast per route, dus
+   het geheugen blijft begrensd -- keuze 2 hieronder verandert er niet door. */
 const EMMERS = [0.0001, 0.00025, 0.0005, 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 
 const staat = {

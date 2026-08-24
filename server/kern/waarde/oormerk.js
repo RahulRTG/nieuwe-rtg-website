@@ -35,10 +35,15 @@
    betalen zonder dat er iets mis is. */
 'use strict';
 
+/* De tijd komt uit de huisklok (server/lib/klok.js) en niet uit het
+   besturingssysteem: een vervaldatum of wachttijd die zich van RTG_KLOK niets
+   aantrekt, is niet te beproeven. Wie zelf een klok meegeeft, houdt die. */
+const { nu: klokNu } = require('../../lib/klok');
+
 const MAX_PER_REKENING = 20;   // meer dan twintig potjes op een rekening is ruis
 const MAX_NAAM = 60;
 
-function maakOormerk({ db, save, crypto, nu = () => Date.now() }) {
+function maakOormerk({ db, save, crypto, nu = klokNu }) {
   function bak() {
     if (!db.data.waardeOormerken || typeof db.data.waardeOormerken !== 'object') db.data.waardeOormerken = {};
     return db.data.waardeOormerken;

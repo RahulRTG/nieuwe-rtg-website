@@ -38,7 +38,10 @@
 const MIN_CENTEN = 100;   // onder een euro terugstorten kost meer dan het opbrengt
 
 module.exports = (ctx) => {
-  const { rekLid, saldoVan, metIdem, boekAsync, waarde, opdrachten, seintje } = ctx;
+  /* De tijd uit de ctx van de paylaag: de wachttijd op een gewijzigd IBAN is een
+     beveiligingsmaatregel, en een maatregel die je niet kunt vooruitspoelen kun
+     je ook niet beproeven. */
+  const { rekLid, saldoVan, metIdem, boekAsync, waarde, opdrachten, seintje, nu } = ctx;
   const rekening = require('./uitbetaalrekening')(ctx);
 
   /* De bevoegdheid komt uit kern/bevoegdheid, en die laag wordt NA pay gemount
@@ -75,7 +78,7 @@ module.exports = (ctx) => {
     if (!b.mag) blokkades.push({ wat: b.reden === 'stand' ? 'stand' : 'bevoegdheid', uitleg: b.uitleg });
     if (!u) blokkades.push({ wat: 'rekening', uitleg: 'Er staat nog geen rekening op uw naam waar dit heen kan.' });
     else if (!rekening.bruikbaar(u)) blokkades.push({ wat: 'wachttijd', bruikbaarVanaf: u.bruikbaarVanaf,
-      uitleg: 'Deze rekening kan pas over ' + Math.max(1, Math.round((u.bruikbaarVanaf - Date.now()) / 3600000)) + ' uur ontvangen.' });
+      uitleg: 'Deze rekening kan pas over ' + Math.max(1, Math.round((u.bruikbaarVanaf - nu()) / 3600000)) + ' uur ontvangen.' });
     if (vrij < MIN_CENTEN) blokkades.push({ wat: 'bedrag',
       uitleg: saldo > vrij
         ? 'Er is nu niets beschikbaar; een deel van uw saldo staat vastgezet of apart.'

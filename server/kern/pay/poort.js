@@ -22,7 +22,7 @@
    oordeel uit -- en het is dezelfde reden waarom ./stand.js bestaat. */
 'use strict';
 
-module.exports = ({ saldoVan, grootboek, waarde }) => {
+module.exports = ({ saldoVan, grootboek, waarde, nu }) => {
   /* De eigen grens van het lid komt uit kern/geldbeleid, en die laag wordt NA
      pay gemount (kernlaag3b). Vandaar late binding, zoals de bankdekking in
      ./opladen.js. Niet gekoppeld = geen eigen grenzen, en dan gedraagt alles
@@ -41,9 +41,12 @@ module.exports = ({ saldoVan, grootboek, waarde }) => {
   function besteedDoor(codenaam) {
     if (!waarde) return { dag: 0, maand: 0 };
     const eigen = new Set(waarde.positiesVan(codenaam));
-    const nu = new Date();
-    const dagSleutel = nu.toISOString().slice(0, 10);
-    const maandSleutel = nu.toISOString().slice(0, 7);
+    /* Uit de huisklok en niet uit het besturingssysteem: dag- en maandgrenzen
+       zijn precies wat je met een verzette klok (RTG_KLOK) wilt beproeven --
+       wat doet een daglimiet die middernacht passeert? */
+    const vandaag = new Date(nu());
+    const dagSleutel = vandaag.toISOString().slice(0, 10);
+    const maandSleutel = vandaag.toISOString().slice(0, 7);
     let dag = 0, maand = 0;
     for (const r of grootboek()) {
       if (!eigen.has(r.van) || r.soort === 'terug') continue;

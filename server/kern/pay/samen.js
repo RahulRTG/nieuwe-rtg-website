@@ -27,13 +27,16 @@
 
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { grootboek, rekLid, saldoVan, boekAsync, zorgSaldo, waarde, schoon } = ctx;
+  /* De tijd uit de ctx van de paylaag. Het dagvenster hieronder bepaalt welke
+     boekingen als 'vandaag' tellen voor een daglimiet; met een klok aan het OS
+     is een middernachtproef niet te doen. */
+  const { grootboek, rekLid, saldoVan, boekAsync, zorgSaldo, waarde, schoon, nu } = ctx;
 
   /* Wat is er vandaag al van deze positie afgegaan? Zonder dit getal is een
      dagmaximum in het beleid een regel die nooit bijt -- en een regel die nooit
      bijt, is erger dan geen regel, want er staat wel een belofte tegenover. */
   function dagBestedVan(rek) {
-    const dag = new Date().toISOString().slice(0, 10);
+    const dag = new Date(nu()).toISOString().slice(0, 10);
     let som = 0;
     for (const r of grootboek()) {
       if (r.van !== rek) continue;
@@ -49,7 +52,7 @@ module.exports = (ctx) => {
   function stelSamen({ codenaam, centen, genre, ontvanger, soort }) {
     if (!waarde) return { ok: true, delen: [{ rek: rekLid(codenaam), centen: Math.round(Number(centen)), eigen: true }] };
     return waarde.samenstellen({ codenaam, centen, genre, ontvanger, soort,
-      saldoVan, dagBestedVan, nu: Date.now() });
+      saldoVan, dagBestedVan, nu: nu() });
   }
 
   async function betaalUit({ codenaam, naar, centen, genre, oms, ref, idem, soort }) {

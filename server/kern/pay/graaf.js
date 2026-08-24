@@ -24,10 +24,12 @@
 
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { grootboek, rekLid, rekPartner, saldoVan, waarde, treasuryBeleid } = ctx;
+  /* De tijd uit de ctx van de paylaag: een periode van dertig dagen die aan het
+     besturingssysteem wordt gevraagd, schuift niet mee met RTG_KLOK. */
+  const { grootboek, rekLid, rekPartner, saldoVan, waarde, treasuryBeleid, nu } = ctx;
 
   const MAX_RIJEN = 4000;   // een graaf over een half jaar kassabonnen hoeft niet dieper
-  const dagenTerug = n => Date.now() - Math.min(370, Math.max(1, Math.round(Number(n) || 30))) * 86400000;
+  const dagenTerug = n => nu() - Math.min(370, Math.max(1, Math.round(Number(n) || 30))) * 86400000;
 
   function rijen(vanaf) {
     const uit = [];
@@ -67,7 +69,7 @@ module.exports = (ctx) => {
     const sorteer = m => [...m.values()].sort((a, b) => b.centen - a.centen).slice(0, 20);
     const posities = (waarde ? waarde.positiesVan(codenaam) : [rekLid(codenaam)])
       .map(rek => ({ rek, naam: naam(rek), saldo: saldoVan(rek) }));
-    return { ok: true, codenaam, sindsDagen: Math.round((Date.now() - vanaf) / 86400000),
+    return { ok: true, codenaam, sindsDagen: Math.round((nu() - vanaf) / 86400000),
       binnengekomen: inTotaal, uitgegeven: uitTotaal,
       bronnen: sorteer(bronnen), bestemmingen: sorteer(bestemmingen),
       posities, staatNu: posities.reduce((s, p) => s + p.saldo, 0) };
@@ -91,7 +93,7 @@ module.exports = (ctx) => {
     const netto = Math.max(0, ontvangen - kosten);
     const btw = Math.round(netto * (b.btwPct || 0) / 100);
     const loon = Math.round(netto * (b.payrollPct || 0) / 100);
-    return { ok: true, supplierCode, sindsDagen: Math.round((Date.now() - vanaf) / 86400000),
+    return { ok: true, supplierCode, sindsDagen: Math.round((nu() - vanaf) / 86400000),
       ontvangen, aantal, uitbetaald,
       /* De opsplitsing draagt per regel of hij uit het grootboek komt of uit een
          percentage. Wie dat verschil niet ziet, leest een schatting als een

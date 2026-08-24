@@ -65,7 +65,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
      saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
      Optioneel: zonder `waarde` is dit exact de regel die hier altijd stond. */
-  const waardePoort = require('./poort')({ saldoVan, grootboek, waarde });
+  const waardePoort = require('./poort')({ saldoVan, grootboek, waarde, nu });
   // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
   // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
   // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).

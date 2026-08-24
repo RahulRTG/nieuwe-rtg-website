@@ -29,11 +29,16 @@
    uitvallen: `open()` telt alleen wat nog geldt. */
 'use strict';
 
+/* De tijd komt uit de huisklok (server/lib/klok.js) en niet uit het
+   besturingssysteem: een vervaldatum of wachttijd die zich van RTG_KLOK niets
+   aantrekt, is niet te beproeven. Wie zelf een klok meegeeft, houdt die. */
+const { nu: klokNu } = require('../../lib/klok');
+
 const MAX_PER_REKENING = 50;      // meer openstaande reserveringen is een lek, geen gebruik
 const STANDAARD_MS = 60 * 60 * 1000;   // een uur
 const MAX_MS = 24 * 60 * 60 * 1000;    // niets houdt geld langer dan een dag vast
 
-function maakReserve({ db, save, crypto, nu = () => Date.now() }) {
+function maakReserve({ db, save, crypto, nu = klokNu }) {
   function bak() {
     if (!Array.isArray(db.data.waardeReserves)) db.data.waardeReserves = [];
     return db.data.waardeReserves;

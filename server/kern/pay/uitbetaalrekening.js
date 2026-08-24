@@ -60,8 +60,11 @@ function ibanGeldig(ruw) {
 const kort = s => String(s).slice(0, 2) + ' ••• ' + String(s).slice(-4);
 
 module.exports = (ctx) => {
-  const { schoon, accounts } = ctx;
-  const nu = () => Date.now();
+  /* De klok komt uit de ctx van de paylaag en wordt hier niet opnieuw aan het
+     besturingssysteem gevraagd: de wachttijd van 24 uur op een gewijzigd IBAN is
+     de kern van deze module, en een wachttijd die niet vooruit te spoelen is,
+     is ook niet te beproeven. */
+  const { schoon, accounts, nu } = ctx;
 
   function dossier(userId) {
     try { return accounts.getMemberState(userId) || {}; } catch (e) { return null; }

@@ -24,6 +24,11 @@
    waar het beleid het strengst is. */
 'use strict';
 
+/* De tijd uit de huisklok (server/lib/klok.js) voor het geval de aanroeper er
+   geen meegeeft: welke potjes bijna vervallen bepaalt de volgorde, en die vraag
+   hoort met een verzette klok gesteld te kunnen worden. */
+const { nu: klokNu } = require('../../lib/klok');
+
 module.exports = ({ KLASSEN, positie, positiesVan, beschikbaar, toets }) => {
 
   /* Hoe beperkt is deze positie? Hoger = eerder opmaken. De volgorde is een
@@ -45,7 +50,7 @@ module.exports = ({ KLASSEN, positie, positiesVan, beschikbaar, toets }) => {
      en het grootboek bij, deze laag niet. Zo blijft er één bron voor het geld. */
   function samenstellen({ codenaam, centen, genre, ontvanger, soort, saldoVan, dagBestedVan, eigenBeleid, nu }) {
     const doel = Math.round(Number(centen) || 0);
-    const klok = Number(nu) || Date.now();
+    const klok = Number(nu) || klokNu();
     if (doel <= 0) return { status: 400, error: 'Dat bedrag kan niet.' };
     const eigenRek = 'lid:' + codenaam;
 

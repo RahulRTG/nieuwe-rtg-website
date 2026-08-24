@@ -34,7 +34,9 @@
 
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { d, save, rekPartner, saldoVan, waarde, grootboek } = ctx;
+  /* De tijd uit de ctx van de paylaag; 'vandaag ontvangen' hoort mee te schuiven
+     met een verzette klok, anders is de dagomzet niet te beproeven. */
+  const { d, save, rekPartner, saldoVan, waarde, grootboek, nu } = ctx;
 
   function beleidBak() {
     if (!d().payTreasury || typeof d().payTreasury !== 'object') d().payTreasury = {};
@@ -102,7 +104,7 @@ module.exports = (ctx) => {
     const apart = waarde ? waarde.apart(rek) : 0;
     const vast = waarde ? waarde.gereserveerd(rek) : 0;
     const beschikbaar = saldo - apart - vast;
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = new Date(nu()).toISOString().slice(0, 10);
     let ontvangenVandaag = 0;
     for (const r of grootboek()) {
       if (r.naar !== rek) continue;

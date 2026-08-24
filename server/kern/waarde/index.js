@@ -28,6 +28,10 @@
 'use strict';
 
 const { KLASSEN, SOORTEN, STANDAARD, ONBEKEND } = require('./klassen');
+/* De tijd komt uit de huisklok en niet uit het besturingssysteem: een
+   vervaldatum die zich van RTG_KLOK niets aantrekt, is niet te beproeven.
+   Wie zelf een klok meegeeft (de toetsen doen dat) houdt die gewoon. */
+const { nu: klokNu } = require('../../lib/klok');
 const { toets } = require('./policy');
 const { maakReserve } = require('./reserve');
 
@@ -49,7 +53,7 @@ function klasseVan(rek) {
   return null;
 }
 
-function maakWaarde({ db, save, crypto, nu = () => Date.now() }) {
+function maakWaarde({ db, save, crypto, nu = klokNu }) {
   const reserve = maakReserve({ db, save, crypto, nu });
   /* Oormerken (./oormerk.js) zijn de tweede manier waarop geld vaststaat, en
      met opzet een ander begrip dan een reservering: iemand anders houdt uw geld

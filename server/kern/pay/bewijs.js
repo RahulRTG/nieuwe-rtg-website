@@ -32,10 +32,14 @@
 
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { d, saldi, grootboek, saldoVan, waarde } = ctx;
+  /* De tijd komt uit de ctx van de paylaag en niet uit het besturingssysteem:
+     een bewijs dat zijn eigen ouderdom aan het OS vraagt, is met een verzette
+     klok (RTG_KLOK) niet te beproeven -- en verlopen bewijs is juist wat deze
+     laag moet kunnen zien. */
+  const { d, saldi, grootboek, saldoVan, waarde, nu } = ctx;
 
-  const bewezen = (id, wat, bewijs) => ({ id, wat, staat: 'bewezen', bewijs, gemetenOp: Date.now() });
-  const gezakt = (id, wat, uitleg, bewijs) => ({ id, wat, staat: 'gezakt', uitleg, bewijs, gemetenOp: Date.now() });
+  const bewezen = (id, wat, bewijs) => ({ id, wat, staat: 'bewezen', bewijs, gemetenOp: nu() });
+  const gezakt = (id, wat, uitleg, bewijs) => ({ id, wat, staat: 'gezakt', uitleg, bewijs, gemetenOp: nu() });
   const onbewezen = (id, wat, uitleg) => ({ id, wat, staat: 'niet-bewezen', uitleg, gemetenOp: null });
 
   /* 1. Het grootboek sluit. De som van alle saldi is exact nul en geen leden- of
@@ -124,7 +128,7 @@ module.exports = (ctx) => {
     const laatst = d().payAfstemming && d().payAfstemming.op;
     if (!laatst) return onbewezen('afstemming', 'Afgestemd met de betaaldienst',
       'Er is nog nooit een afstemming met het afschrift van de betaaldienst vastgelegd. Dit huis haalt dat afschrift niet op, dus deze controle kan niet vanzelf slagen.');
-    const ouderdomUur = Math.round((Date.now() - laatst) / 3600000);
+    const ouderdomUur = Math.round((nu() - laatst) / 3600000);
     if (ouderdomUur > 48) return gezakt('afstemming', 'Afgestemd met de betaaldienst',
       'De laatste afstemming is ' + ouderdomUur + ' uur oud; een bewijs dat verlopen is, bewijst niets meer.', { laatst, ouderdomUur });
     return { id: 'afstemming', wat: 'Afgestemd met de betaaldienst', staat: 'bewezen',

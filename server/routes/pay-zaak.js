@@ -61,7 +61,14 @@ module.exports = (kern, { stuur }) => {
     if (r.ok) sseToOffice('sync', { scope: 'pay' });
     stuur(res, r);
   });
+  /* LEZEN IS HIER ZWAARDER DAN SCHRIJVEN. `budgetGeef` hierboven kost geld en
+     vroeg de manager al; deze route kost niets, maar geeft per regel de
+     CODENAAM van de ontvanger, zijn restant en waaraan het gebonden is. Bij een
+     werkgever met maaltijdbudget is dat het personeelsdossier in tabelvorm --
+     en elke collega met een PDA kon het opvragen. Precies het gegeven waarvoor
+     de codenamenlaag bestaat. */
   app.post('/api/supplier/pay/budget/lijst', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
     stuur(res, pay.budgettenVan(req.supplier.code));
   });
 

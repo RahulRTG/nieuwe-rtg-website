@@ -27,6 +27,10 @@
    genoeg staat. Het saldo is de zaak van ./index.js. */
 'use strict';
 
+/* De tijd komt uit de huisklok (server/lib/klok.js) en niet uit het
+   besturingssysteem: een vervaldatum of wachttijd die zich van RTG_KLOK niets
+   aantrekt, is niet te beproeven. Wie zelf een klok meegeeft, houdt die. */
+const { nu: klokNu } = require('../../lib/klok');
 const { KLASSEN, STANDAARD } = require('./klassen');
 
 const zinnen = {
@@ -64,7 +68,7 @@ function toets(positie, handeling, eigenBeleid) {
   const p = positie || {};
   const h = handeling || {};
   const k = KLASSEN[p.klasse] || KLASSEN[STANDAARD];
-  const nu = h.nu instanceof Date ? h.nu : new Date(h.nu || Date.now());
+  const nu = h.nu instanceof Date ? h.nu : new Date(h.nu || klokNu());
   const centen = Math.round(Number(h.centen) || 0);
 
   // -- laag 1: de klasse. Hier staat wat de soort waarde nooit mag. --

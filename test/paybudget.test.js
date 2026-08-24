@@ -22,6 +22,9 @@
    5. UITBETAALBARE WAARDE IS NIET UIT TE GEVEN. Anders was uitgifte een manier
       om de bevoegdhedenlijst te omzeilen.
    6. DE PORTEFEUILLE TELT VRIJ EN GEBONDEN NIET BIJ ELKAAR OP.
+   7. DE LIJST VAN UITGEDEELDE BUDGETTEN IS AAN DE MANAGER. Die lijst noemt per
+      regel een codenaam met een restant erachter; voor een werkgever is dat het
+      personeelsdossier in tabelvorm.
 
    Draai los: node --experimental-sqlite --test test/paybudget.test.js */
 const test = require('node:test');
@@ -169,4 +172,37 @@ test('een uitgever kan niet uitdelen wat hij niet heeft, en uitbetaalbaar is nie
   assert.equal(fout.status, 403, 'uitbetaalbare waarde is niet uit te geven');
   assert.match(fout.body.error, /bevoegdheid/, 'en het antwoord zegt waar dat wel hoort');
   assert.equal(await sluit(), true);
+});
+
+test('de lijst met uitgedeelde budgetten is aan de manager, niet aan de vloer', async () => {
+  /* WAT HIER WORDT NAGETROKKEN, en waarom het niet vanzelf spreekt.
+
+     `supplier/pay/budget` (uitdelen) vroeg vanaf het begin de manager, want dat
+     kost de zaak geld. De LIJST vroeg dat niet -- en die is voor de privacy de
+     zwaardere van de twee: hij geeft per regel de codenaam van de ontvanger,
+     zijn restant en waaraan het gebonden is. Bij een werkgever met een
+     maaltijdbudget kon dus elke collega met een PDA zien wie hoeveel kreeg.
+
+     De vloerlogin is een echte tweede sessie (personeelspin), niet een gefnuikt
+     token: de rol komt uit het rooster en niet uit het verzoek. */
+  const man = await api('supplier/pay/budget/lijst', {}, sup.token);
+  assert.equal(man.status, 200, 'de manager ziet zijn eigen uitgedeelde budgetten');
+  assert.ok(man.body.posities.some(p => p.aan === lid.codenaam),
+    'en het budget van dit lid staat erin, op codenaam');
+  assert.equal(man.body.uitstaandCenten,
+    man.body.posities.reduce((n, p) => n + p.saldo, 0),
+    'het uitstaande bedrag is de som van de restanten en niet van het uitgedeelde');
+
+  const roster = await (await fetch(base + '/api/supplier/roster', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: sup.code }) })).json();
+  const vloer = roster.staff.find(x => x.role !== 'manager');
+  assert.ok(vloer, 'deze zaak heeft vloerpersoneel op het rooster');
+  const inlog = await (await fetch(base + '/api/supplier/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: sup.code, staffId: vloer.id, pin: '5678' }) })).json();
+  assert.ok(inlog.token, 'en die kan gewoon inloggen op de PDA');
+
+  const vl = await api('supplier/pay/budget/lijst', {}, inlog.token);
+  assert.equal(vl.status, 403, 'maar komt niet bij de lijst');
+  assert.equal(vl.body.posities, undefined, 'en krijgt geen enkele regel mee');
 });

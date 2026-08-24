@@ -98,7 +98,7 @@ module.exports = (kern) => {
       cadeaukaart: 'cadeaukaart', kamer: 'op de kamer', tafel: 'op de tafel', pin: 'PIN' };
     for (const [wijze, bedrag] of Object.entries(r.betaalwijzen)) res.write(rij([r.datum, 'Ontvangsten ' + (WIJZE[wijze] || wijze), 'betaalwijze', geld(bedrag), '', '', '']));
     /* Openstaand gezet is geen ontvangst en hoort dus niet tussen de
-       betaalwijzen: het komt bij de check-out alsnog langs (TAKEN.md 4.54). */
+       betaalwijzen: het komt bij de check-out alsnog langs (TAKEN.md 4.59). */
     for (const [wijze, bedrag] of Object.entries(r.openstaandGezet || {})) res.write(rij([r.datum, 'Openstaand gezet ' + (WIJZE[wijze] || wijze), 'openstaand', geld(bedrag), '', '', '']));
     if (r.fooien) res.write(rij([r.datum, 'Fooien (voor het team)', 'fooi', geld(r.fooien), '', '', '']));
     res.end();

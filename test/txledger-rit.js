@@ -25,10 +25,11 @@ process.env.TX_KAP = '1000';
 
   const dbmod = require('../server/db');
   const { db, load, startPostgres, ordersVoegToe, orderMetRef, boekingenVoegToe,
-    txLedgerTel, txLedgerVanKlant, txLedgerVanZaak, txVeegNu } = dbmod;
+    payBoekingenVoegToe, txLedgerTel, txLedgerVanKlant, txLedgerVanZaak, txVeegNu } = dbmod;
+  const { vensterTopUp } = require('../server/db/tx');
   load();
   await startPostgres();
-  db.data.orders = []; db.data.boekingen = [];
+  db.data.orders = []; db.data.boekingen = []; db.data.payBoekingen = [];
 
   const BASIS = Date.parse('2026-01-01T00:00:00Z');
   const maakOrder = i => ({ ref: 'RTG-O-IT' + i, supplierCode: 'KIKUNOI', customerKey: 'user-1', customerTier: 'rtg',
@@ -52,12 +53,55 @@ process.env.TX_KAP = '1000';
   await txVeegNu();
   const naMutatie = (await txLedgerVanZaak('orders', 'KIKUNOI', 5, 0)).find(o => o.ref === kop.ref);
 
+
+  /* ==== RTG PAY: EEN TIJDSTIP IN MILLISECONDEN, EN EEN VENSTER VOORBIJ EEN
+     BLADZIJDE (TAKEN.md 4.39) ====
+
+     Twee dingen in EEN ronde, omdat ze dezelfde rijen nodig hebben.
+
+     (1) Een pay-boeking draagt `at` als GETAL (Date.now()), waar de vier andere
+         collecties een ISO-tekst dragen. De Postgres-kolom is een timestamptz,
+         en beide wegen naar het grootboek slikken een mislukte insert: zonder
+         normalisatie blijft `payLedger` gewoon op nul staan terwijl er nergens
+         een fout te zien is.
+
+     (2) Er worden er ZEVENHONDERD gemaakt, met opzet meer dan de bladzijde van
+         vijfhonderd waar vensterTopUp het ooit bij liet. Gaat de blob verloren
+         (de crash binnen het trage-flush-venster), dan hoort de start het hele
+         venster terug te halen en niet de eerste bladzijde ervan. */
+  const PAY_N = 700;
+  for (let i = 0; i < PAY_N; i++) payBoekingenVoegToe({ id: 'PB-IT' + i, van: 'lid:a', naar: 'lid:b',
+    centen: 100 + i, soort: 'boeking', oms: 'rit', ref: null, at: BASIS + i * 1000 });
+  await txVeegNu();
+  const payLedger = await txLedgerTel('payBoekingen');
+  /* De kolom zelf: staat er een echt tijdstip in, of struikelde de insert? Een
+     timestamptz komt als Date terug; een mislukte insert geeft geen rij. */
+  const kolom = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+  const q = await kolom.query("SELECT at FROM tx_ledger WHERE soort='payboeking' ORDER BY at DESC LIMIT 1");
+  const payTijdstip = q.rows.length ? new Date(q.rows[0].at).getTime() : 0;
+  await kolom.end();
+  // de blob is de crash niet doorgekomen; het grootboek heeft alles nog
+  db.data.payBoekingen = [];
+  await vensterTopUp();
+  const payTopUp = db.data.payBoekingen.length;
+  const payNieuwsteEerst = !!(db.data.payBoekingen[0] && db.data.payBoekingen[0].id === 'PB-IT' + (PAY_N - 1));
+  /* En een tweede ronde op een venster dat al klopt hoort NIETS te doen: geen
+     dubbele regels, geen andere volgorde, en niet eens een nieuwe array. Zo
+     blijft een herstart die twee keer bijvult even goed als een die dat een keer
+     doet. */
+  const voorTweede = db.data.payBoekingen;
+  await vensterTopUp();
+  const payTweedeRondeRaakteNiets = db.data.payBoekingen === voorTweede &&
+    db.data.payBoekingen.length === payTopUp;
+
   console.log(JSON.stringify({
     ramOrders, ramBoekingen, ledgerOrders, ledgerBoekingen,
     historieN: historie.length, historieEerste: historie[0] && historie[0].ref,
     historieIsOud: historie.every(o => !db.data.orders.some(r => r.ref === o.ref)),
     mutatieStatus: naMutatie && naMutatie.status,
-    vensterNogVindbaar: !!orderMetRef(kop.ref)
+    vensterNogVindbaar: !!orderMetRef(kop.ref),
+    payLedger, payTopUp, payNieuwsteEerst, payTweedeRondeRaakteNiets,
+    payTijdstipIsBasis: payTijdstip === BASIS + (PAY_N - 1) * 1000
   }));
   await dbmod.flushBijAfsluiten();
   process.exit(0);

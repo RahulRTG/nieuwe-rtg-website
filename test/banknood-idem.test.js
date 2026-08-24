@@ -4,7 +4,7 @@
    automatisch de noodstop: de clearing valt dan terug op de kaart-rails. Elke
    oproep telde een op. Een monitoring die dezelfde mislukking twee keer meldt
    -- een retry, een dubbele webhook -- kon de bank daarmee onterecht in nood
-   zetten (TAKEN.md 4.56).
+   zetten (TAKEN.md 4.61).
 
    Er is op dit moment nog geen aanroeper: geen scherm en geen interne code
    roept deze route aan. Juist daarom ligt het contract nu vast, voor er een is.

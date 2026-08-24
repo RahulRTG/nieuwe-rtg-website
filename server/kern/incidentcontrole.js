@@ -8,12 +8,25 @@
 
 const crypto = require('crypto');
 const klok = require('../lib/klok');
+const { maakBeschermstand } = require('./beschermstand');
+const { maakBescherm } = require('./incidentcontrole-bescherm');
+
+/* VIJF STANDEN, EN HET IS GEEN LADDER. `waakzaam`, `beperkt` en `isolatie`
+   lopen van licht naar zwaar; `beschermd` staat er dwars op. Hij houdt MEER
+   tegen dan `beperkt` (zes hele categorieën in plaats van genoemde functies) en
+   MINDER dan `isolatie` (het lezen en tien categorieën lopen door). Wie er een
+   getal van maakt -- "niveau 3" -- gaat op een dag `beschermd` overslaan omdat
+   `isolatie` hoger klinkt, en dat is precies de keuze die grens 6.10 wil
+   voorkomen. */
+const MODI = ['normaal', 'waakzaam', 'beperkt', 'beschermd', 'isolatie'];
 
 function kopie(v) { return JSON.parse(JSON.stringify(v)); }
 function eigen(o, k) { return Object.prototype.hasOwnProperty.call(o || {}, k); }
 function fout(status, tekst) { const e = new Error(tekst); e.status = status; throw e; }
 
-module.exports = function maakIncidentcontrole({ db, save, functies, beveilig }) {
+module.exports = function maakIncidentcontrole({ db, save, functies, beveilig, journaal }) {
+  const beschermstand = maakBeschermstand({ functies });
+
   function techniek() {
     if (!db.data.techniek) db.data.techniek = {};
     const t = db.data.techniek;
@@ -24,7 +37,7 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig })
     const s = t.incidentcontrole;
     if (!Array.isArray(s.audit)) s.audit = [];
     if (!Number.isSafeInteger(s.revisie)) s.revisie = 0;
-    if (!['normaal', 'waakzaam', 'beperkt', 'isolatie'].includes(s.modus)) s.modus = 'normaal';
+    if (!MODI.includes(s.modus)) s.modus = 'normaal';
     return { t, s };
   }
 
@@ -134,6 +147,12 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig })
     return status();
   }
 
+  /* DE VEILIGE NOODSTAND, en waarom hij in een eigen bestand staat: hij is de
+     enige van de vijf die GEEN enkele schakelaar omzet. Zie
+     ./incidentcontrole-bescherm.js. */
+  const bescherm = maakBescherm({ techniek, redenVan, nieuwActief, schrijfAudit,
+    save, meld, status, fout, journaal });
+
   function herstel(redenIn, actor) {
     const reden = redenVan(redenIn);
     const { t, s } = techniek();
@@ -155,6 +174,7 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig })
 
   function status() {
     const { t, s } = techniek();
+    const beschermd = s.modus === 'beschermd';
     const uit = functies.FUNCTIES.filter(f => !functies.functieAan(f.id, t.functies));
     return {
       modus: s.modus, revisie: s.revisie, actief: s.actief ? {
@@ -164,11 +184,19 @@ module.exports = function maakIncidentcontrole({ db, save, functies, beveilig })
       onderhoud: !!(t.zekeringen.onderhoud && t.zekeringen.onderhoud.aan === false),
       functiesUit: uit.length,
       uit: uit.slice(0, 100).map(f => ({ id: f.id, naam: f.naam, categorie: f.categorie })),
+      /* De beschermstand vertelt WAT hij tegenhoudt en wat er doorloopt, ook
+         als hij uit staat. Een noodknop waarvan je pas tijdens het incident
+         leest wat hij doet, is een knop die niemand indrukt. */
+      bescherming: { aan: beschermd,
+        onderdelen: beschermstand.onderdelen({ zegel: (s.actief && s.actief.zegel) || null }),
+        bevriest: Object.keys(beschermstand.BEVRIEST),
+        looptDoor: Object.keys(beschermstand.LOOPT_DOOR),
+        uitzonderingen: beschermstand.UITZONDERINGEN },
       auditAantal: s.audit.length,
       audit: s.audit.slice(-50).reverse(),
       laatstGesloten: s.laatstGesloten || null
     };
   }
 
-  return { status, waakzaam, beperk, isoleer, herstel };
+  return { status, waakzaam, beperk, bescherm, isoleer, herstel, beschermstand, MODI };
 };

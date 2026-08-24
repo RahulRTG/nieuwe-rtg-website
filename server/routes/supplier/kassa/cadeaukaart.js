@@ -11,14 +11,21 @@
    omzet, de btw en de factuur, en trekt diezelfde bon het saldo af. Wat hier
    staat is het correctiemiddel -- alleen saldo eraf, zonder bon en dus zonder
    omzet -- en financeVoor meldt apart hoeveel er zo is afgeboekt. */
-module.exports = (kern) => {
+module.exports = (kern, herhaling) => {
   const { app, db, gcCode, logActivity, save, supplierAuth } = kern;
-  /* EEN DUBBELTIK GAF HIER TWEE KAARTEN MET SALDO (TAKEN.md 4.55), en die zijn
-     allebei inwisselbaar -- de zaak geeft het tweede bedrag weg. Dezelfde module
-     als RTG Pay en RTG Bank, met een eigen store zodat de sleutelruimtes
-     gescheiden blijven. De afdruk draagt de zaak en het bedrag; dat is wat een
-     verzoek hier bepaalt. */
-  const metIdem = require('../../../lib/idem')({ d: () => db.data, save, naam: 'kassaIdem', bijeen: db.bijeen });
+  /* EEN DUBBELTIK GAF HIER TWEE KAARTEN MET SALDO (TAKEN.md 4.60), en die zijn
+     allebei inwisselbaar -- de zaak geeft het tweede bedrag weg. De afdruk
+     draagt de zaak en het bedrag; dat is wat een verzoek hier bepaalt.
+
+     DE INSTANTIE KOMT VAN BUITEN, en dat is geen stijlkwestie. Hier stond een
+     eigen `require('lib/idem')` op dezelfde store (`kassaIdem`). Twee
+     exemplaren op dezelfde store delen de BEWAARDE sleutels wel en de lopende
+     niet: de vlucht-tabel voor twee verzoeken die tegelijk binnenkomen leeft
+     per instantie. Twee gelijktijdige dubbeltikken hadden dus allebei door
+     kunnen lopen -- precies de fout die deze regel moest afdekken. De kassa
+     heeft daarom EEN herhalingslaag voor al zijn deuren; zie de kop van
+     kern/kassa/herhaling.js. */
+  const metIdem = herhaling.metEigenAfdruk;
 
 app.post('/api/supplier/giftcard/sell', supplierAuth, async (req, res) => {
   const bedrag = Math.round(Number(req.body.bedrag));

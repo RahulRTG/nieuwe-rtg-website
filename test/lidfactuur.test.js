@@ -454,7 +454,20 @@ test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding 
     /* FAIL-CLOSED, net als RTG Pay: eerst het geld, dan pas de bon. Een kaart
        zonder dekking en een code die niet bestaat leveren geen bon op -- en dus
        ook geen omzet. Zonder deze twee zou de betaalwijze een gratis bon zijn:
-       de omzet zou tellen terwijl er niets tegenover staat. */
+       de omzet zou tellen terwijl er niets tegenover staat.
+
+       EN ZE BEWAKEN NOG IETS DAT GEEN ASSERTIE HIER KAN ZIEN. Beide takken
+       zitten binnen de herhalingslaag van de kassa (kern/kassa/herhaling.js),
+       en die eist dat het werk zijn antwoord TERUGGEEFT in plaats van het zelf
+       te versturen. Stond er `res.status(404).json(...)`, dan ging de Express-
+       `res` als antwoord terug -- een object dat naar zichzelf verwijst
+       (res.req.res...) -- en liep de serialisatie eromheen vast op "Maximum
+       call stack size exceeded". De twee statuscodes hieronder blijven daarbij
+       gewoon KLOPPEN, want het antwoord was al verstuurd; wat zakt is de
+       strenge poort in test/helper.js, die de uitzondering van de server
+       meeleest. Zo is deze fout ook gevonden. Wie hier ooit terugvalt op
+       res.json(), ziet deze asserties dus groen blijven en het bestand toch
+       rood worden -- dat is de bedoeling. */
     const teDuur = await api(base, '/api/supplier/pos/sale',
       { items, total: 5000, method: 'cadeaukaart', gcCode }, mgr);
     assert.equal(teDuur.status, 409, 'meer dan het saldo wordt geweigerd');
@@ -483,7 +496,7 @@ test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding 
 });
 
 /* -------------------------------------------------------------------------
-   10. EEN CADEAUKAART VERKOPEN WAS NIET IDEMPOTENT (TAKEN.md 4.55)
+   10. EEN CADEAUKAART VERKOPEN WAS NIET IDEMPOTENT (TAKEN.md 4.60)
 
    Elke oproep maakte een NIEUWE kaart met saldo. Een hapering of een retry na
    een timeout gaf dus een tweede kaart van hetzelfde bedrag -- en die is

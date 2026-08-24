@@ -168,7 +168,7 @@ test('financeVoor: een cadeaukaart aan de kassa telt een keer, via de bon', () =
     'met een regel in het overzicht die zegt dat dit bedrag buiten omzet en aangifte valt');
 });
 
-/* HET Z-RAPPORT TELT ELKE EURO EEN KEER, LANGS ELKE WEG (TAKEN.md 4.54).
+/* HET Z-RAPPORT TELT ELKE EURO EEN KEER, LANGS ELKE WEG (TAKEN.md 4.59).
 
    Drie fouten tegelijk, alle drie in dezelfde lus. `omzet` telde op VOOR de
    uitsluiting van uitstel en interne verrekening, dus telde die mee (218 bij

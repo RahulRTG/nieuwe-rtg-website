@@ -299,7 +299,7 @@ test('18. De gemeentebalie-AI verleent de eerste vergunning', async () => {
   assert.ok(mijn.body.vergunningen.some(v => v.status === 'verleend'), 'een vergunning is verleend door de AI');
 });
 
-/* Zelfde venster-afspraak als bij de gemeente (TAKEN.md 4.56): dezelfde melder,
+/* Zelfde venster-afspraak als bij de gemeente (TAKEN.md 4.61): dezelfde melder,
    dezelfde soort en dezelfde tekst binnen een minuut is EEN melding aan het
    waterschap, geen tweede dossier voor de behandelaar. */
 test('19. dezelfde watermelding binnen een minuut geeft hetzelfde meldnummer', async () => {

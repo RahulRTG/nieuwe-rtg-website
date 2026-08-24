@@ -79,55 +79,20 @@ test('een pay-regel landt in het grootboek met een tijdstip dat een timestamptz 
   }
 });
 
-/* ==========================================================================
-   DEZELFDE VRAAG AAN EEN ECHTE POSTGRES.
+/* DEZELFDE VRAAG AAN EEN ECHTE POSTGRES staat NIET hier, en dat is een keuze.
 
    De ronde hierboven leest de VORM in de SQLite-kolom en leidt daaruit af dat
-   Postgres hem aanneemt. Afleiden is geen meten, dus staat dezelfde vraag hier
-   nog een keer tegen de echte database -- overgeslagen zonder DATABASE_URL,
-   zoals de andere pg-toetsen in deze suite.
+   Postgres hem aanneemt. Afleiden is geen meten, dus dezelfde vraag staat ook
+   tegen de echte database -- maar in `test/txledger.pg.test.js`, achter de skip
+   die dat bestand al heeft, en niet hier achter een nieuwe.
 
-   Waarom dit meer is dan netheid: met het tijdstip als GETAL geeft /api/pay/stuur
-   nog steeds 200 en klopt het saldo, en komt de regel alleen NIET in tx_ledger.
-   Gemeten met de mutatie erop: "stuur: 200" en daarna geen enkele rij. Dat is de
-   stilste vorm van stuk die er in deze laag bestaat, en alleen een echte Postgres
-   laat hem zien.
-
-   Draai:  DATABASE_URL=postgres://postgres@127.0.0.1:5433/rtgtest \
-             node --experimental-sqlite --test test/pay-grootboek.test.js
-   ========================================================================== */
-const PG = process.env.DATABASE_URL || process.env.PG_URL;
-const GEEN_PG = PG ? false : 'geen DATABASE_URL: of een timestamptz het tijdstip aanneemt, is alleen tegen een echte Postgres te meten';
-
-test('in Postgres-stand landt de pay-regel echt in tx_ledger', { skip: GEEN_PG }, async () => {
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-payledger-pg-'));
-  let srv = null, pool = null;
-  try {
-    srv = await startServer({ env: { RTG_STORE: 'postgres', DATABASE_URL: PG, RTG_DATA_DIR: TMP, SMTP_URL: '' } });
-    const A = await login(srv.base, 'rtg');
-    const B = await login(srv.base, 'lifestyle');
-    await api(srv.base, 'pay/oplaad', { centen: 20000, idem: 'pg-op' }, A.token);
-    const r = await api(srv.base, 'pay/stuur', { aan: B.codenaam, centen: 1234, oms: 'pgproef', idem: 'pg-1' }, A.token);
-    assert.equal(r.status, 200, 'de overdracht wordt bevestigd');
-    const ref = r.body.boeking;
-    assert.ok(ref, 'en levert een boekings-id');
-
-    const { Pool } = require('../server/pgwire');
-    pool = new Pool({ connectionString: PG });
-    let rij = null;
-    for (let i = 0; i < 40 && !rij; i++) {
-      const q = await pool.query("SELECT ref, at, totaal FROM tx_ledger WHERE soort = 'payboeking' AND ref = $1", [ref]);
-      rij = q.rows[0] || null;
-      if (!rij) await new Promise(k => setTimeout(k, 200));
-    }
-    assert.ok(rij, 'de bevestigde regel staat als eigen rij in tx_ledger -- een 200 zonder rij is de stilste vorm van stuk');
-    assert.equal(Number(rij.totaal), 1234, 'met het bedrag uit `centen`');
-  } finally {
-    try { if (pool) await pool.end(); } catch (e) {}
-    try { stop(srv && srv.child); } catch (e) {}
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
-  }
-});
+   Waarom dat uitmaakt: `zelfpoortendeToetsen` in NORM.json telt de toetsen die
+   zichzelf kunnen overslaan omdat een DIENST ontbreekt, en die meter mag alleen
+   omlaag. Hij bestaat omdat acht pg-toetsbestanden maandenlang meetelden als
+   dekking zonder ooit te draaien. Een nieuwe skip hier zou die tand een slag
+   terugdraaien voor een vraag die net zo goed past bij het bestand dat het
+   grootboek in Postgres al toetst. Het meetwerk staat in `test/txledger-rit.js`
+   (payLedger, payTijdstip, payTopUp) en de asserties in dat toetsbestand. */
 
 /* ==========================================================================
    DE TWEE WEGEN UIT ELKAAR HOUDEN.

@@ -79,15 +79,21 @@ const CHECKS = [
   },
   {
     id: 'backups', naam: 'Back-ups', code: 'BAK-01', categorie: 'Data',
+    /* HIJ KEEK NAAR DE NAAM VAN EEN MAP. Bestond er een map die YYYY-MM-DD
+       heette, dan stond deze check op groen -- leeg, half weggeschreven of met
+       een db.json van nul bytes maakte niet uit. Het nakijken staat nu in
+       server/backupstand.js, en de bewering "Dagelijkse back-up" in de
+       tenantstand leest dezelfde functie: twee oordelen over dezelfde back-up
+       lopen vroeg of laat uiteen, en dan is er geen back-upstand meer maar
+       twee meningen. */
     run: (c) => {
       try {
-        const bdir = c.path.join(c.DATA_DIR, 'backups');
-        if (!c.fs.existsSync(bdir)) return { status: 'waarschuwing', detail: 'Nog geen back-up gemaakt (wordt dagelijks aangemaakt).' };
-        const dagen = c.fs.readdirSync(bdir).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
-        if (!dagen.length) return { status: 'waarschuwing', detail: 'Geen dagback-up gevonden.' };
-        const laatste = dagen[dagen.length - 1];
-        const ouderdomDagen = Math.floor((Date.now() - new Date(laatste).getTime()) / 86400000);
-        return { status: ouderdomDagen > 1 ? 'waarschuwing' : 'ok', detail: `Laatste back-up: ${laatste} (${ouderdomDagen} dag(en) geleden). ${dagen.length} bewaard.` };
+        const b = require('./backupstand').lees(c.DATA_DIR);
+        if (!b.er) return { status: 'waarschuwing', detail: b.reden.charAt(0).toUpperCase() + b.reden.slice(1) + '.' };
+        const kop = `Laatste back-up: ${b.dag} (${b.ouderdom} dag(en) geleden). ${b.bewaard} bewaard.`;
+        if (b.ouderdom > 1) return { status: 'waarschuwing', detail: kop };
+        if (!b.compleet) return { status: 'waarschuwing', detail: kop + ' NIET COMPLEET: ' + b.reden + '.' };
+        return { status: 'ok', detail: kop + ' Nagekeken: ' + b.reden + '.' };
       } catch (e) { return { status: 'waarschuwing', detail: 'Kon back-ups niet lezen.' }; }
     }
   }

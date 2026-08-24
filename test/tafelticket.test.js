@@ -161,7 +161,7 @@ test('3. afrekenen op contant laat de boekhouding met precies de som van de bonn
     assert.ok(af.body.sale && af.body.sale.omzetElders === 'bestellingen',
       'de gebundelde kassabon draagt het merk waaraan de boekhouding hem herkent');
 
-    /* DE DAGAFSLUITING, over dezelfde tafel (TAKEN.md 4.54). De eenheidstoetsen
+    /* DE DAGAFSLUITING, over dezelfde tafel (TAKEN.md 4.59). De eenheidstoetsen
        in test/kern-fiscaal.test.js voeren `betaaldMet` zelf op; deze toets rijdt
        de ECHTE keten, want een rapport dat op een veld leunt dat geen enkele
        route zet, klopt alleen in een stub. Er is aan tafel contant betaald, dus

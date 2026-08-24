@@ -146,7 +146,7 @@ test('een verzonnen, verlopen of al gebruikte code opent niets', async () => {
   }
 });
 
-/* TWEE KLIKKEN GAVEN TWEE GELDIGE KASSACODES (TAKEN.md 4.56).
+/* TWEE KLIKKEN GAVEN TWEE GELDIGE KASSACODES (TAKEN.md 4.61).
 
    Een uitnodiging is geen gewone creatie-route: een vergeten tweede code is een
    open deur naar personeelstoegang, en de manager ziet die tweede meestal niet

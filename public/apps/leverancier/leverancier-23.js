@@ -1,7 +1,7 @@
 /* een medewerker uitnodigen */
     const ktInvite = el.querySelector('#ktInvite'); if (ktInvite) ktInvite.addEventListener('click', async () => {
       // knop op slot tegen de dubbeltik, sleutel tegen een herhaalde poging:
-      // een vergeten tweede kassacode is een open deur (TAKEN.md 4.56)
+      // een vergeten tweede kassacode is een open deur (TAKEN.md 4.61)
       if (ktInvite.disabled) return;
       ktInvite.disabled = true;
       try {

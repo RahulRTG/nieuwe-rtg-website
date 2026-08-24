@@ -16,6 +16,31 @@ interpreteert de regels drie keer en houdt drie ontwerpen over.
 
 ---
 
+## 0a. Waar dit systeem vandaag wordt gedragen
+
+*Toegevoegd 23 augustus 2026, want dit ontbrak en de afwezigheid was niet te
+zien.*
+
+Deze specificatie was volledig: de tokenlaag staat in
+`public/shared/rtg-ontwerp.css`, de materialenleer in
+`public/shared/rtg-materiaal.css`, en `test/ontwerp.test.js` (19 toetsen) en
+`test/materiaal.test.js` (10) houden ze streng. Maar die toetsen meten de
+**tokenlaag tegen zichzelf**. Van de 185 app-pagina's sloot er precies **één**
+`rtg-ontwerp.css` in, en `rtg-materiaal.css` **nul**.
+
+Een ontwerpsysteem dat nergens wordt ingesloten is geen systeem maar een
+document. Sinds vandaag telt `schermenZonderVormtaal` in `NORM.json` hoeveel
+pagina's hem niet dragen, en die meter mag alleen omlaag — geteld op de
+insluiting en niet op het gebruik, want dat is de goedkope en eerlijke
+ondergrens van adoptie.
+
+`/apps/werk.html` is de eerste die hem echt draagt: `data-rtg-modus="pro"`, en
+de zeven kleurtokens van dat scherm verwijzen naar de materialenleer in plaats
+van hun eigen hexcodes te dragen. Die waarden klopten toevallig — `#7f1634` is
+de logo-bordeaux en `#c0a544` is `--gold-tekst` — maar het was een kopie, en
+een kopie loopt uit de pas zodra de bron verandert. Uitgerekend in het scherm
+dat aan partners wordt verkocht.
+
 ## 0. Wat we niet doen
 
 We maken van RTG geen grijze corporate SaaS-doos. De bordeaux-gouden identiteit,

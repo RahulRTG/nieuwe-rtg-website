@@ -10,7 +10,7 @@
     const fnC = el.querySelector('#fnCsv'); if (fnC) fnC.addEventListener('click', () => dlBestand('/supplier/finance/export', { formaat: 'csv' }, 'RTG-boekhouding.csv'));
     btwBedrading(el); // de knoppen van de btw-aangifte; zie leverancier-12a.js
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
-      /* TWEE MAATREGELEN, EN ZE DOEN VERSCHILLENDE DINGEN (TAKEN.md 4.55).
+      /* TWEE MAATREGELEN, EN ZE DOEN VERSCHILLENDE DINGEN (TAKEN.md 4.60).
          De knop op slot vangt de DUBBELTIK: twee klikken binnen een seconde
          sturen niet twee verzoeken. De idem-sleutel vangt de HERHALING van
          dezelfde poging -- een hapering, of iemand die na een timeout opnieuw

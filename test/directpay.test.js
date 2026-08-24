@@ -108,7 +108,7 @@ test('7. tempolimiet: hooguit 12 betaalpogingen per minuut, maar een idempotente
   assert.equal(retry.body.betaling.ref, eerste.body.betaling.ref, 'zelfde betaling, niet nog een keer afgeschreven');
 });
 
-/* HET MAKEN VAN EEN BETAALVERZOEK WAS NIET IDEMPOTENT (TAKEN.md 4.55).
+/* HET MAKEN VAN EEN BETAALVERZOEK WAS NIET IDEMPOTENT (TAKEN.md 4.60).
 
    Het AFREKENEN had die bescherming al (toets 5 en 7 hierboven); het AANMAKEN
    niet. Elke oproep gaf een nieuw verzoek met een eigen ref, en twee verzoeken

@@ -653,6 +653,24 @@ test('22. een merk met vestigingen: een sjabloon, en toch per vestiging een eige
     ] } }, office);
   assert.equal(sj.status, 200, JSON.stringify(sj.body));
 
+  /* EEN ONGELDIGE MERKWAARDE STRANDT HIER PRECIES ZOALS OVERAL. Dit ging lang
+     mis: webmerk negeerde een foute kleur STIL en gaf 200 terug met de oude
+     kleur erin, terwijl het Theater met dezelfde invoer een 400 gaf. Sinds
+     kern/tenant/merkkern.js de enige bron is, is dat overal hetzelfde -- en
+     het SJABLOON gaat dan ook niet door: half bewaren is de vorm waarin
+     niemand ziet wat er is gebeurd. */
+  const kleurFout = await api('/api/office/merk/sjabloon', { code: 'ZEILHUIS', ontwerp: {
+    titel: 'Mag niet', accent: 'goud', blokken: [{ type: 'hero', kop: 'Mag niet' }] } }, office);
+  assert.equal(kleurFout.status, 400);
+  assert.match(kleurFout.body.error, /hexcode/);
+  const themaFout = await api('/api/office/merk/sjabloon', { code: 'ZEILHUIS', ontwerp: {
+    titel: 'Mag niet', thema: 'neon', blokken: [{ type: 'hero', kop: 'Mag niet' }] } }, office);
+  assert.equal(themaFout.status, 400);
+  assert.match(themaFout.body.error, /licht of donker/);
+  const nog = await api('/api/office/merk/haal', { code: 'ZEILHUIS' }, office);
+  assert.equal(nog.body.merk.huisstijl.accent, '#857007', 'en het merk staat er nog zoals het was');
+  assert.equal(nog.body.merk.sjabloon.titel, 'Zeilhuis', 'het sjabloon is niet half overschreven');
+
   const rol = await api('/api/office/merk/uitrol', { code: 'ZEILHUIS' }, office);
   assert.equal(rol.status, 200, JSON.stringify(rol.body));
   assert.equal(rol.body.uitgerold.length, 2, 'beide vestigingen hebben nu een site');

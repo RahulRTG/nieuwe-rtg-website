@@ -1,20 +1,33 @@
-/* Kassa (deelmodule): de verkoop: de losse kassaverkoop (contant of RTG
-   Pay, met keukenafboeking) en het innen of uitgeven op RTG-code. Krijgt
-   de gedeelde kern een keer bij het opstarten vanuit
-   routes/supplier/kassa.js. */
-module.exports = (kern) => {
-  const { POS_METHODS, app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
-          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, pay, ordersVanZaak } = kern;
+/* Kassa (deelmodule): de verkoop -- de losse kassaverkoop (contant, pin, RTG
+   Pay of cadeaukaart, met keukenafboeking). Krijgt de gedeelde kern en de
+   herhalingslaag van de hele kassa een keer bij het opstarten vanuit
+   routes/supplier/kassa.js.
+
+   Het INNEN op een RTG-ophaalcode stond hier ook en staat nu in ./innen.js:
+   daar bestaat de bestelling al, hier ontstaat de bon op dat moment. Dit
+   bestand kwam op 10,4 kB en daarmee over keuringsregel 13. */
+module.exports = (kern, herhaling) => {
+  const { POS_METHODS, app, crypto, db, facturatie, logActivity, pickupCode, save,
+          sseToSupplier, supplierAuth, pay } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
+/* DE HELE VERKOOP STAAT BINNEN eenmalig(), en niet alleen de betaling. De
+   sleutel lag hier al jaren (kassa.html stuurt `idem` mee) maar ging alleen
+   naar RTG Pay, en dan nog alleen bij method 'rtgpay'. Contant en pin kenden
+   dus geen herhaling: twee keer versturen gaf twee bonnen, twee keer
+   voorraadafboeking en twee facturen. Wie alleen het geld ontdubbelt houdt bij
+   een herhaling nog steeds een tweede bon over zonder geld erachter, dus staat
+   het hele verzoek erbinnen. Zie kern/kassa/herhaling.js voor wat een
+   herhaling is: dezelfde sleutel, nooit hetzelfde bedrag. */
 app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
+ const antwoord = await herhaling.eenmalig('sale', req.supplier.code, req.body, async () => {
   let total = Number(req.body.total);
-  if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
+  if (!(total > 0) || total > 100000) return { status: 400, error: 'Geen geldig bedrag.' };
   const method = POS_METHODS.includes(req.body.method) ? req.body.method : 'contant';
   // op de tafel zetten kan alleen op een echte tafel; afrekenen komt later
   if (method === 'tafel' && !(req.supplier.tables || []).some(t => t.name === String(req.body.room || '')))
-    return res.status(400).json({ error: 'Kies een tafel om de bon op te zetten.' });
+    return { status: 400, error: 'Kies een tafel om de bon op te zetten.' };
   let items = Array.isArray(req.body.items)
     ? req.body.items.slice(0, 40).map(i => ({ name: String(i.name || '').slice(0, 80), qty: Math.max(1, parseInt(i.qty, 10) || 1), price: Math.max(0, Number(i.price) || 0) }))
     : null;
@@ -39,20 +52,31 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
       centen: Math.round(total * 100), oms: req.supplier.name,
       idem: req.body.idem
     });
-    if (p.error) return res.status(p.status || 400).json({ error: p.error });
+    if (p.error) return { status: p.status || 400, error: p.error };
     betaler = p.van;
     // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak
     betaaldienstKosten = p.kosten || 0;
   }
   /* Cadeaukaart: als bij RTG Pay eerst het GELD, dan pas de bon. Fail-closed:
-     onbekende code of te weinig saldo geeft geen bon (TAKEN.md 4.27). */
+     onbekende code of te weinig saldo geeft geen bon (TAKEN.md 4.27).
+
+     DE FOUT GAAT TERUG ALS WAARDE EN NIET ALS res.json(), en dat verschil is
+     hier niet cosmetisch. Deze twee regels stonden er al voor de herhalingslaag
+     eromheen kwam (kern/kassa/herhaling.js), en die eist dat `werk` het
+     ANTWOORD TERUGGEEFT -- alleen zo kan een herhaling exact hetzelfde antwoord
+     krijgen. Wie hier res.json() doet, geeft de Express-`res` terug als
+     antwoord, en dat object verwijst naar zichzelf (res.req.res...). De
+     serialisatie eromheen liep daarop vast met "Maximum call stack size
+     exceeded" -- geen enkele assertie zag het, alleen de strenge poort in
+     test/helper.js. Beide kanten waren los goed en samen fout; precies het
+     soort naad waar een automatische samenvoeging niets van merkt. */
   let gcKaart = null;
   if (method === 'cadeaukaart') {
     const gc = String(req.body.gcCode || '').trim().toUpperCase();
     gcKaart = (db.data.giftcards || []).find(x => x.code === gc && x.supplierCode === req.supplier.code);
-    if (!gcKaart) return res.status(404).json({ error: 'Deze cadeaukaart kennen we hier niet.' });
+    if (!gcKaart) return { status: 404, error: 'Deze cadeaukaart kennen we hier niet.' };
     if (gcKaart.saldo < total)
-      return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + gcKaart.saldo + ' op deze kaart.' });
+      return { status: 409, error: 'Onvoldoende saldo: er staat nog € ' + gcKaart.saldo + ' op deze kaart.' };
   }
   const sale = {
     id: crypto.randomBytes(4).toString('hex'),
@@ -67,6 +91,13 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
     items, total, method, betaler, luchtzijde,
     betaaldienstKosten: betaaldienstKosten || null,
+    /* EEN BON UIT DE OFFLINE-WACHTRIJ DRAAGT ZIJN EIGEN MOMENT, maar bepaalt er
+       niets mee. `at` blijft de tijd van AANKOMST, want dat is de tijd die de
+       server zelf heeft gezien; `offlineVanaf` is wat de kassa erover zegt.
+       Andersom zou de client de datum van de omzet kunnen kiezen, en dat is
+       precies de knop waarmee je een dagrapport verschuift. Alleen als sein,
+       nooit als bron. */
+    offlineVanaf: req.body.offlineVanaf ? String(req.body.offlineVanaf).slice(0, 30) : null,
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
@@ -94,61 +125,9 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
     koper: { naam: req.body.codenaam || betaler || sale.room || 'Kasklant' }, regels: factuurRegels, methode: method, ref: sale.id
   }, req.body.codenaam || betaler).catch(() => {});
-  res.json({ ok: true, sale, betaler });
+  return { ok: true, sale, betaler };
+ });
+ if (antwoord && antwoord.error) return res.status(antwoord.status || 400).json({ error: antwoord.error });
+ res.json(antwoord);
 });
-
-app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  if (!code) return res.status(400).json({ error: 'Voer een ophaalcode in.' });
-  const o = ordersVanZaak(req.supplier.code).find(x => x.pickup === code);
-  if (!o) return res.status(404).json({ error: 'Onbekende code voor dit bedrijf.' });
-  if (o.refunded || o.status === 'geweigerd') return res.status(409).json({ error: 'Deze bestelling is geannuleerd.' });
-  if (o.status === 'geserveerd') return res.status(409).json({ error: 'Code ' + code + ' is al uitgegeven.' });
-  const wasPaid = o.paid;
-  let sale = null;
-  if (!o.paid) {
-    // afrekenen via RTG-lidmaatschap; komt als omzet in het dagoverzicht
-    o.paid = true;
-    o.betaaldMet = 'rtg'; // de werkelijke betaalwijze, voor de dagafsluiting (TAKEN.md 4.54)
-    /* HET MOMENT VAN BETALEN, en dat stond hier als enige betaalweg niet bij.
-       Elke andere weg zet paidAt (bestellen.js, rekening.js, tafelticket), en de
-       hele verslaglegging valt daarop terug: het dagrapport, de maandboekhouding
-       en de kantoorcijfers rekenen met `paidAt || at`. Zonder paidAt telde een
-       bon die vorige maand is geplaatst en vandaag wordt opgehaald mee in de
-       VORIGE maand -- en dan wijkt hij af van de factuur hieronder, die de datum
-       van vandaag draagt. */
-    o.paidAt = new Date().toISOString();
-    sale = {
-      id: crypto.randomBytes(4).toString('hex'),
-      bon: pickupCode(),
-      actor: req.actor.name,
-      desc: 'RTG-code ' + code + ' (' + o.ref + ')',
-      room: null,
-      items: o.items, total: o.total, method: 'rtg',
-      at: new Date().toISOString()
-    };
-    const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
-    list.unshift(sale);
-    db.data.posSales[req.supplier.code] = list.slice(0, 300);
-    /* HIER wordt de bestelling afgerekend, dus hier hoort de factuur -- en
-       nergens anders: betaalde het lid al in de app, dan is hij daar geboekt en
-       staat deze tak (`if (!o.paid)`) niet aan. Deze bon krijgt method 'rtg' en
-       wordt door financeVoor overgeslagen om dubbeltelling te vermijden; zonder
-       de factuur hieronder viel de omzet daarmee helemaal buiten de btw.
-       Via dezelfde routine als de app-kant (kern/lidacties/factuur.js), want
-       twee wegen naar dezelfde bon horen dezelfde factuur op te leveren. */
-    factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
-      codenaam: o.customerCodename, ref: o.ref, methode: 'rtg', regels: regelsVanItems(o.items) });
-  }
-  o.status = 'geserveerd';
-  save();
-  logActivity(req.supplier.code, req.actor, 'gaf bestelling ' + o.ref + ' uit op code ' + code + (wasPaid ? '' : ' en rekende € ' + o.total + ' af (RTG)'));
-  broadcastSync([o.customerTier], 'orders');
-  sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
-  notify(o.customerTier, { icon: 'ster', title: req.supplier.name, body: 'Uw bestelling is uitgegeven. Veel plezier.', scope: 'orders' });
-  res.json({ ok: true, order: { ref: o.ref, codename: o.customerCodename, items: o.items, total: o.total, wasPaid }, sale });
-});
-
 };

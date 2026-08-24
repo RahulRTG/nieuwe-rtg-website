@@ -1,17 +1,17 @@
 {
-  "vastgelegd": "2026-08-19",
+  "vastgelegd": "2026-08-24",
   "meters": {
-    "endpointsZonderTest": 1192,
+    "endpointsZonderTest": 1173,
     "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 905,
+    "testbestanden": 940,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 19,
-    "e2eBestanden": 126,
-    "keuringOmvang": 159,
-    "keuringDubbeling": 115,
+    "zelfpoortendeToetsen": 18,
+    "e2eBestanden": 136,
+    "keuringOmvang": 169,
+    "keuringDubbeling": 121,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -19,18 +19,19 @@
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
     "keuringTeGroot": 5,
-    "inlineStijlAttributen": 4936,
-    "browserpoortToetsen": 196,
-    "kernBreedte": 1413,
-    "kernGedeeld": 191,
+    "inlineStijlAttributen": 4905,
+    "browserpoortToetsen": 206,
+    "kernBreedte": 1418,
+    "kernGedeeld": 194,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 162,
-    "toetsenOngevoeligPct": 1.1,
+    "toetsenNietGemeten": 173,
+    "toetsenOngevoeligPct": 1.3,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "bronBlindeBestanden": 0,
-    "delenZonderOnderwerp": 0
+    "delenZonderOnderwerp": 0,
+    "schermenZonderVormtaal": 184
   },
   "notities": [
     {
@@ -51,12 +52,24 @@
     {
       "datum": "2026-08-24",
       "meter": "toetsenNietGemeten 156 -> 158 (test/banknood-idem.test.js, test/dubbelemelding.test.js)",
-      "reden": "Twee toetsbestanden erbij bij de laatste tien idempotentie-besluiten (TAKEN.md 4.56). De mutatiemotor is er nog niet langs geweest -- ze bestaan pas sinds vandaag -- en dat is de hele +2. Prijs van toetsen erbij, geen erosie, maar het staat er met naam bij want dat is het verschil.\n\nHandmatig zijn er acht mutaties op gedraaid en gezien zakken: de herhalingscontrole uit de gemeentemelding, het venster op nul, het venster op oneindig, de melder-controle eruit, de stop-bij-oude eruit, de banknood-sleutel negeren, clearingGelukt de sleutels niet laten wissen, en de uitnodiging de sleutel laten negeren.\n\nTwee daarvan kwamen er eerst ongestraft doorheen. Het venster op oneindig liet alle routetoetsen groen -- die melden binnen dezelfde seconde -- terwijl een oneindig venster betekent dat een inwoner hetzelfde probleem NOOIT meer kan melden. Daar is test/dubbelemelding.test.js voor gekomen, die de klok zelf meegeeft en het venster aan beide kanten aanwijst. Die +1 is dus juist het gevolg van een gat dat het namuteren vond.\n\nDeze +2 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen."
+      "reden": "Twee toetsbestanden erbij bij de laatste tien idempotentie-besluiten (TAKEN.md 4.61). De mutatiemotor is er nog niet langs geweest -- ze bestaan pas sinds vandaag -- en dat is de hele +2. Prijs van toetsen erbij, geen erosie, maar het staat er met naam bij want dat is het verschil.\n\nHandmatig zijn er acht mutaties op gedraaid en gezien zakken: de herhalingscontrole uit de gemeentemelding, het venster op nul, het venster op oneindig, de melder-controle eruit, de stop-bij-oude eruit, de banknood-sleutel negeren, clearingGelukt de sleutels niet laten wissen, en de uitnodiging de sleutel laten negeren.\n\nTwee daarvan kwamen er eerst ongestraft doorheen. Het venster op oneindig liet alle routetoetsen groen -- die melden binnen dezelfde seconde -- terwijl een oneindig venster betekent dat een inwoner hetzelfde probleem NOOIT meer kan melden. Daar is test/dubbelemelding.test.js voor gekomen, die de klok zelf meegeeft en het venster aan beide kanten aanwijst. Die +1 is dus juist het gevolg van een gat dat het namuteren vond.\n\nDeze +2 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen."
     },
     {
       "datum": "2026-08-23",
       "meter": "toetsenNietGemeten 155 -> 156; zelfpoortendeToetsen 17 -> 18 (test/grafsteen.pg.test.js)",
       "reden": "Een Postgres-toets erbij (TAKEN.md 4.38, de grafsteen tegen een herrijzende kv-rij). Twee meters gaan een omhoog, en dat is bij deze twee de prijs van een toets erbij en geen erosie -- maar het staat er met naam bij, want dat is het verschil.\n\nzelfpoortendeToetsen +1: een pg-toets die zichzelf overslaat als er geen DATABASE_URL is. Dat is niet te vermijden en het is het patroon van alle tien de andere pg-toetsen; de runner npm run test:pg is juist gebouwd om ze WEL te draaien, elk in een eigen database. Deze staat daar in de lijst.\n\ntoetsenNietGemeten +1: de mutatiemotor is nog niet langs dit bestand geweest -- het bestaat pas sinds vandaag. Handmatig zijn er wel vijf mutaties op gedraaid en gezien zakken (laadAlles die geen grafstenen meldt, het opstartpad dat ze niet toepast, haalNieuwer die ze negeert, de flush die eroverheen schrijft, en een schrijf die de grafsteen niet opheft). Twee daarvan kwamen er eerst ongestraft doorheen omdat de twee schakels elkaar afdekten; daar zijn twee toetsen bij gekomen die elk een schakel apart aanwijzen. Deze +1 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1416 -> 1418; kernGedeeld 193 -> 194 (het zegel van de veilige noodstand, OPNIEUW GEMETEN na het samengaan met main)",
+      "reden": "Twee kern-namen erbij in het domein `techniek`, en het is allebei dezelfde koppeling: `command` (nu ook door techniek gelezen -- daar komt kernGedeeld +1 vandaan) en `journaal`, de doorgegeven ketenlezer.\n\nWAAROM DIE KOPPELING ER MOEST KOMEN. De veilige noodstand (BESTUUR.md par. 7.6, grens 6.10) moet bij het omzetten het BEWIJS veiligstellen. Het enige bewijs in dit huis dat kán breken als er achteraf iets aan de historie verandert, is de hashketen van het journaal van RTG Command. Die wordt bij het aanzetten nagelopen en de uitslag komt als zegel in het audit van de incidentcontrole; vanaf dat punt is aantoonbaar of er nog aan is gerommeld.\n\nDe incidentcontrole woont in `routes/techniek/`, het journaal in `kern/command/`. Er waren dus twee wegen: de keten daar lezen, of een tweede keten voor de techniekkant bouwen. Het tweede spaart de teller en dupliceert de regel -- precies de ruil die LAT.md regel 4 verbiedt, en bij BEWIJS is hij het duurst: twee ketens die iets anders zeggen over dezelfde dag maken elkaar allebei waardeloos. De koppeling gaat maar één kant op en is LUI (`() => kern.command && kern.command.journaal`), want kern.command bestaat op montagetijd nog niet.\n\nWAT NIET OMHOOG GING, en dat is de controle op dit verhaal. keuringOmvang bleef staan -- elk bestand dat door dit werk in de waarschuwingsband kwam is op een naad geknipt (`bedrijf/deuren.js`, `beschermstand-lijst.js`, `incidentcontrole-bescherm.js`, `vlootbeeld-incidenten.js`, `functieschakelaars-tekst.js`, `routes/techniek/knoppen.js`). keuringTeGroot bleef 5 en routesNietSchakelbaar bleef 0.",
+      "eerlijkheidshalve": "DEZE GETALLEN ZIJN OPNIEUW GEMETEN NA HET SAMENGAAN MET MAIN, en niet overgenomen van ervoor. Main verzette zelf de basislijn: kernBreedte stond daar al op 1416 (de horeca-werkstand VLOER), inlineStijlAttributen op 4905 en browserpoortToetsen op 206. Mijn eigen notitie van eerder vandaag rekende tegen 1415 en is daarmee vervallen; dit is de enige die telt. Van de 1418 zijn er dus twee van deze tak.\n\nTwee meters stonden tijdens deze ronde OOK rood en zijn GEREPAREERD in plaats van opgerekt.\n\n(1) keuringDubbeling kwam op 116 door een functie `zegelVan` in kern/incidentcontrole-bescherm.js, die daarmee de derde in de kern werd naast kern/command/overname.js en kern/tafelticket.js -- drie functies met dezelfde naam die niets met elkaar te maken hebben. Precies waar die meter voor bestaat, en het advies erbij ('geef ze een eigen naam zodat de gelijkenis niet misleidt') was hier het juiste: hij heet nu `bewijszegel`, wat hij ook is.\n\n(2) endpointsZonderTest en keuringDekkingAdvies stonden rood door vijf tenantroutes die als ongedekt telden omdat de toets zijn paden aan elkaar plakte. Die noemt ze nu voluit, en dat legde een echt gat bloot: /api/tenant/bijstand/intrekken was werkelijk ongetoetst en heeft nu een eigen toets.\n\nWat ik NIET heb gedaan is --vastleggen draaien. Meerdere meters lezen beter dan hun norm; een deel van die winst is van deze tak en een deel van main, en hem in één keer op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1414 -> 1415 (RTG Bijstand en het vlootbeeld)",
+      "reden": "Een kern-naam erbij: `bijstand`. Dat is de hele verslechtering, en het is de prijs van een laag erbij en geen erosie -- maar hij staat er met naam bij, want dat is het verschil.\n\nWAAROM DIE NAAM ER MOEST KOMEN. De bijstandslaag woont in kern/command/ (bijstand.js met -niveaus, -klant, -rtg en -diagnose ernaast), maar de KLANT praat er ook mee: hij is degene die uitnodigt, goedkeurt en intrekt. Zijn routes staan in routes/tenant/bijstand.js, en het domein `tenant` mag van GRENZEN.json niet aan `command`. Er waren dus twee wegen: `command` opzetten in de tenantgrens, of een smallere deur maken. Het eerste zet de HELE bestuurslaag open voor de klantkant om een sessie te kunnen aanvragen -- vijftien namen erbij in plaats van een, en precies de soort opening die de domeingrens moet tegenhouden. Het tweede kost een naam. Die naam wijst naar hetzelfde object (`kern.command.bijstand`), dus er is geen tweede bijstandslaag: het is een deur en geen kopie.\n\nWAT NIET OMHOOG GING, en dat is de controle op dit verhaal. kernGedeeld bleef 193: `bijstand` wordt door precies EEN domein aangeraakt. Het RTG-kantoor leest de laag niet via de kern maar via routes/command/toezicht.js, dat al in het commanddomein zit. keuringTeGroot bleef 5, keuringOmvang bleef 161 en keuringDubbeling bleef 115 -- de nieuwe modules zijn geknipt op naden die er waren (het niveautabelletje, de klantkant, de RTG-kant en de diagnose staan los), en routes/tenant.js is er zelfs KLEINER van geworden doordat de poort naar tenant/poort.js verhuisde. routesNietSchakelbaar bleef 0.",
+      "eerlijkheidshalve": "Drie meters stonden na deze ronde OOK rood en zijn gerepareerd in plaats van opgerekt. Dat is geen verrekening tegen de kernBreedte hierboven -- het is wat er verder gebeurd is.\n\n(1) endpointsZonderTest stond op 1183. Vijf tenantroutes voor bijstand telden als ongedekt omdat test/bijstandketen.test.js zijn paden aan elkaar plakte (`api('/api/tenant/bijstand' + pad)`) -- exact dezelfde fout als in de notitie van 23 augustus over werkgevolg en werkhandeling, twee dagen eerder. De toets noemt zijn routes nu voluit. Een van de zes, /api/tenant/bijstand/intrekken, werd daarmee zichtbaar als echt ongetoetst en heeft nu een eigen toets (toets 9: de klant neemt de uitnodiging midden in de sessie terug). De meter staat op 1178, onder de norm.\n\n(2) keuringDekkingAdvies 57 -> 56 volgt daaruit: het tenantdomein had gaten door diezelfde vijf.\n\n(3) toetsenNietGemeten stond op 155 door test/bijstandscherm.e2e.js. Ik heb die meter NIET verhoogd maar de mutatiemotor er met de hand overheen gedraaid -- hij leest vanzelf alleen *.test.js, maar hij neemt een bestandsnaam aan als argument. Dat legde meteen een echte fout bloot: de toets stond op \"al rood\", oftewel hij zakte zonder dat er iets gemuteerd was. Er stond een eigen kopie van de playwright-zoeker in, en die kiest de eerste die te REQUIREN valt terwijl de bijbehorende Chromium er niet hoeft te staan -- de fout waarvoor test/browser.js precies bestaat en die daar in de kop beschreven staat. De toets gebruikt nu laadBrowser() en draait echt. Zonder deze meting had er een groene schermtoets in de repo gestaan die in werkelijkheid nooit een scherm heeft gezien.\n\n(4) Diezelfde kapotte kopie stond ook in test/command.e2e.js, en die is NIET van deze ronde -- hij staat er al op HEAD en zakte daar dus ook. Omdat dat bestand de schermen dekt die deze ronde uitbreidt (de werkplekken Bijstand en De vloot), is hij hier meteen omgezet naar laadBrowser() en met de motor gemeten; hij zakt op de liegpoort, ook in de scherpe ronde. Daardoor leest toetsenNietGemeten nu 153 tegen een norm van 154. Ik zet die norm NIET op 153: dat is de winst van een reparatie in een bestand dat ik niet gebouwd heb, en de volgende ronde hoort hem niet als mijn lat te erven.\n\nWAT HIER BLIJFT LIGGEN: er staan nog 29 andere e2e-bestanden met dezelfde kapotte kopie van de playwright-zoeker (te vinden met `grep -l \"function laadPlaywright\" test/*.js`), tegenover 97 die de gedeelde laadBrowser() gebruiken. Die 29 zijn in deze omgeving stil rood: ze zakken op \"Executable doesn't exist\" in plaats van over te slaan of te draaien. Dat is een eigen veegronde en geen onderdeel van deze functie, dus hij zit niet in deze commit -- maar hij staat hier zodat niemand hem opnieuw hoeft te ontdekken.\n\nWat ik NIET heb gedaan is --vastleggen draaien. Vijf meters lezen beter dan hun norm (endpointsZonderTest 1178, testbestanden 930, browserpoortToetsen 200, e2eBestanden 130, inlineStijlAttributen 4935); die winst is deels van deze ronde en deels van eerder, en hem in een keer op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
     },
     {
       "datum": "2026-08-18",
@@ -468,10 +481,54 @@
       "eerlijkheidshalve": "De som stond op 126 toen de norm werd vastgelegd en op 130 toen hij werd gesplitst. Over die vier is geen ratel meer die klaagt. Ze zijn ontstaan door bestanden toe te voegen, niet door iets te laten verslechteren, en de enige inhoudelijke van de vijf (teVaak) is opgelost door de vier rate limiters op server/pinslot.js samen te voegen. Wie de oude, strengere som terug wil: zet keuringBeter terug in scripts/norm.js met grondwaarde 126 en knip vier bestanden op die vlak onder de 10 kB-grens zitten."
     },
     {
+      "datum": "2026-08-23",
+      "meter": "kernBreedte 1413 -> 1414; kernGedeeld 191 -> 193 (de Tenant Control Plane)",
+      "reden": "De tenantlaag (kern/tenant/). Twee meters gaan omhoog en dat is hier de prijs van een laag erbij, geen erosie -- maar het staat er met naam bij, want dat is het verschil.\n\nkernBreedte +1: precies een naam, `tenant`. De laag hangt zichzelf op in routes/tenant.js, zoals routes/bedrijf.js dat met `bedrijf` doet.\n\nkernGedeeld +2, en beide zijn een BEWUSTE koppeling en geen lek. (1) `tenant` wordt door vier domeinen gelezen -- tenant, techniek (het beheer hoort bij de eigenaar), sso (de brug loopt bij het inloggen) en scim (de deprovisioning) -- en dat is precies wat een contractgrens is: hij raakt identiteit en beheer, anders is het geen grens maar een veld. Alle vier staan in GRENZEN.json, dus geen enkel ander domein komt erbij. (2) `bedrijf` wordt nu ook door tenant gelezen, en dat is de goede kant op: routes/tenant.js hergebruikt beheerVan() en lidVan() van de werkruimte in plaats van een derde manier te bedenken om \"mag deze aanroeper hier bij\" te beantwoorden. Die koppeling weghalen zou de meter verlagen en de code slechter maken -- twee antwoorden op een toegangsvraag is de fout van LAT-regel 4.\n\nWat NIET omhoog ging en dat is de controle op dit verhaal: routesNietSchakelbaar bleef 0 (de vier nieuwe routes staan in de functiecatalogus), keuringTeGroot bleef 5, keuringDubbeling bleef 115 en toetsenNietGemeten bleef 155 -- de drie nieuwe toetsen zijn door de mutatiemotor gehaald en alle drie gezakt."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "schermenZonderVormtaal: nieuw op 183",
+      "reden": "Het RTG Design System 2.0 was volledig gespecificeerd (ONTWERP.md), had een tokenlaag (public/shared/rtg-ontwerp.css), een materialenleer (rtg-materiaal.css) en negentien groene toetsen -- en werd door EEN van de 185 app-pagina's ingesloten. rtg-materiaal.css door nul. test/ontwerp.test.js meet de tokenlaag tegen zichzelf, dus die stand kon jaren blijven staan zonder dat er iets rood werd.\n\nDeze meter telt de app-pagina's die de tokenlaag NIET insluiten, en mag alleen omlaag. Geteld op de insluiting en niet op het gebruik: een pagina die hem laadt kan er nog weinig mee doen, maar een pagina die hem niet laadt kan er zeker niets mee. Dat is de goedkope, eerlijke ondergrens van adoptie.\n\nHij begint op 183 en niet op 184: werk.html sluit hem vanaf nu in, met data-rtg-modus=\"pro\", en de zeven kleurtokens van dat scherm verwijzen naar de materialenleer in plaats van hun eigen hexcodes te dragen. Die waarden klopten toevallig (#7f1634 is de logo-bordeaux, #c0a544 is --gold-tekst), maar het was een kopie -- en een kopie loopt uit de pas zodra de bron verandert, in precies het scherm dat aan partners wordt verkocht."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "keuringOmvang 159 -> 161 (bedrijf/handeling.js en bedrijf/gevolg.js)",
+      "reden": "Twee nieuwe werkmodules zitten vlak onder de 10 kB-grens: handeling.js op 9731 en gevolg.js op 9682 bytes. Dat is een echte verslechtering en geen meetfout, dus hij staat hier met naam.\n\nWaarom ze niet gesplitst zijn. Bij handeling.js is dat WEL gebeurd: de werkwoordentabel staat apart in handeling-lijst.js, want die tabel groeit met elk werkwoord erbij en dan zou het bestand vanzelf over de grens lopen. Wat overblijft is de keten zelf -- plan, bevestiging, uitvoering, bon -- en die uit elkaar trekken zou de enige plek waar je die vier achter elkaar kunt lezen kapotmaken. gevolg.js is drie simulaties van elk zo'n vijftien regels plus de kop die uitlegt waarom deze laag geen wrapper om het dossier is; daar valt niets uit te halen dat ergens anders beter staat.\n\nWat dit NIET is: keuringTeGroot bleef 5. Geen van beide is over de grens; ze zitten eronder. De tand blijft daarmee doen waar hij voor is -- als een van deze twee er overheen gaat, klaagt de andere meter.\n\nWat er tegenover staat, en dat is geen verrekening maar een aparte meter: endpointsZonderTest ging van 1191 naar 1179. Die winst is geen nieuw werk maar een reparatie van de METING -- werkgevolg.test.js en werkhandeling.test.js plakten hun routes aan elkaar (`base + '/api/bedrijf' + pad`), waardoor twaalf endpoints die WEL getoetst worden als ongedekt telden. Ze noemen hun routes nu voluit."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "schermenZonderVormtaal 183 -> 184 (kwam mee met de merge van main)",
+      "reden": "Deze plus een komt NIET uit deze tak. Bij het binnenhalen van main (2eb6036) kwamen er twee nieuwe app-pagina's mee -- public/apps/sociaal-prive.html en public/apps/chauffeur.html -- en geen van beide sluit rtg-ontwerp.css of rtg-materiaal.css in.\n\nDat is geen verwijt aan die pagina's: de meter BESTAAT op main nog niet. Hij is in deze tak toegevoegd en staat dus in geen enkele andere tak in de weg. Tot main hem heeft, zal elke nieuwe pagina van elders hem laten stijgen -- en dat is precies wat je van een ratel mag verwachten die nog niet is aangekomen.\n\nWaarom ik die twee pagina's niet even zelf de tokenlaag heb gegeven: het is een regel erbij, maar in een MERGE-commit een scherm van iemand anders aanraken dat ik nooit heb gezien, is de verkeerde plek. De meter telt de insluiting en niet het gebruik, dus het zou de teller wel verlagen zonder dat iemand die pagina's aan de vormtaal heeft gehouden -- een groen cijfer zonder dat er iets is nagekeken, en dat is precies waar deze hele ronde tegen is.\n\nWat er WEL hoort te gebeuren: als deze tak op main landt, gaat de meter mee en horen die twee pagina's een eigen regel te krijgen. Zolang dat niet is gebeurd, staat het hier."
+    },
+    {
       "datum": "2026-08-24",
-      "meter": "zelfpoortendeToetsen 18 -> 19",
-      "reden": "Met de hand verhoogd, en dat is het verlagen van de lat -- dus met de reden erbij. TAKEN.md 4.39 bracht payBoekingen in het transactiegrootboek. De fout die daaronder zat is alleen in Postgres zichtbaar: een pay-regel draagt `at` als GETAL (Date.now()) terwijl de grootboekkolom een timestamptz is, en beide wegen naar het grootboek slikken de mislukte insert (txLedgerZet vangt hem, de veegronde meldt alleen \"veegronde mislukt\"). Netto geeft /api/pay/stuur 200, klopt het saldo, en staat er geen enkele rij -- gemeten tegen een echte Postgres, met en zonder de reparatie. In SQLite is de kolom TEKST en gaat een getal er gewoon in, dus daar is de fout onzichtbaar. De enige toets die dat kan aantonen vraagt een echte database en poort zichzelf, net als de elf andere pg-toetsen.",
-      "eerlijkheidshalve": "Deze meter bestaat omdat acht pg-toetsbestanden maandenlang meetelden als dekking zonder ooit te draaien. Dat risico is hier gedekt op de manier die daarvoor bedacht is: het bestand staat in scripts/pgtoetsen.js en krijgt daar een eigen wegwerpdatabase, en keuringsregel 25 zakt zodra een zelf-poortende toets NIET in die draaier staat. De ronde is ook echt gedraaid (tegen PostgreSQL 16, met de mutatie op tijdstipVan gezien zakken), en zes van de zeven rondes in datzelfde bestand poorten zichzelf niet en draaien gewoon mee in npm test. Wie de tand terug op 18 wil: dat kan alleen door de pg-ronde te schrappen, en dan is de duurste fout van deze taak weer ongetoetst."
+      "meter": "keuringOmvang 161 -> 169 (VLOER: de zesde werkstand)",
+      "reden": "Deze tak zet drie nieuwe bestanden vlak onder de 10 kB-grens (pda-tafel.js op 10102, wijk-overdracht.js op 9992, werklijst.js op 9761) en laat er vijf bestaande in die band groeien. Dat is een echte verslechtering, geen meetfout, en hij staat hier met naam.\n\nWaarom ze niet verder gesplitst zijn. Ze ZIJN al gesplitst, en telkens op een naad: de overdrachtlaag ging van een bestand naar vijf (wijk-doos, wijk-deel, wijk-leen, wijk-antwoord, wijk-overdracht), de cadans gaf zijn doelberekening af, de werklijst zijn bronnen, de PDA zijn taak-, wijk- en ontvangstblok. Wat er nu in elk bestand staat is een ding: het aanbod, het antwoord, de leen. Nog een snede zou de enige plek kapotmaken waar je die keten achter elkaar kunt lezen.\n\nEN DEZE METER TREKT TEGEN DE VOLGENDE IN. Elke splitsing die keuringOmvang omlaag brengt, geeft keuringDubbeling er een paar bij: vijf kleine modules met een `lijst`, een `zet` en een `terug` zijn vijf keer dezelfde naam. De twee getallen zijn niet tegelijk te optimaliseren, en dat is geen excuus maar de reden dat ze allebei met naam in deze lijst horen in plaats van dat er een wordt weggepoetst."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "keuringDubbeling 115 -> 121 (VLOER: de zesde werkstand)",
+      "reden": "Rechtstreeks gevolg van de splitsingen hierboven. De wijklaag bestaat nu uit vijf kernmodules en die delen een kleine, gelijkvormige buitenkant: `doos`, `zet`, `lijst`, `terug`, `van`. Dat is precies wat je wilt -- ze doen op hun eigen laag hetzelfde soort ding -- maar de teller ziet zes namen die in meer dan twee kernmodules staan.\n\nWat er tegenover staat: geen van die namen is een KOPIE. `wijk-doos.doos` is de enige doos, `wijk-leen.zet` zet een leen en `wijk.zet` zet een wijk. LAT-regel 4 gaat over een tweede rekensom, niet over een tweede naam. Waar er wel dubbeling dreigde -- minutenSinds, en de zin die zegt waar een aanbod over gaat -- is die naar een plek gebracht (wijk-doos.js)."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1414 -> 1416 (VLOER: de zesde werkstand)",
+      "reden": "Twee kern-eigenschappen erbij die een route aanraakt. De nieuwe overdrachtdeur heeft `accounts` nodig om te controleren dat een aanbod naar iemand gaat die hier werkelijk werkt, en de wijkdeur leest de leenlaag mee zodat de drukte per wijk niet liegt over wat er uitstaat. Allebei lezen, geen nieuwe schrijfweg."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenNietGemeten 154 -> 173 (VLOER: de zesde werkstand)",
+      "reden": "Twintig nieuwe toetsbestanden op deze tak waar de mutatiemotor nog niet langs is geweest. Dit meet de dekking van het INSTRUMENT, niet van de code -- en dat verschil is hier belangrijk, want de regels die ertoe doen ZIJN met mutaties nagetrokken, alleen met de hand: twaalf op de overdrachtkern, zes op het vloerscherm, drie op de telling die naar de PDA reist, en drie ervan overleefden de eerste ronde en hebben een scherpere toets gekregen. Dat staat in de commits.\n\nWAAROM DE MOTOR ER NIET IN EEN KEER LANGS IS. Twee redenen, en de eerste is een eigenschap van het instrument: scripts/mutatie.js leest alleen `*.test.js`. Zeven van de twintig zijn `*.e2e.js`, en die telt scripts/norm.js wel mee maar kan de motor structureel niet meten. Die zeven komen dus nooit uit deze teller, hoe lang hij ook draait. De tweede: het serverdeel duurt uren en muteert ondertussen bronbestanden, dus hij hoort alleen te draaien als er niets anders aan de werkboom gebeurt. Dat is eigen werk en geen restje van deze tak."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenOngevoeligPct 1.1 -> 1.3 (VLOER: de zesde werkstand)",
+      "reden": "Van 1,1 naar 1,3 procent, en dit is een gevolg van MEER meten en niet van slechter werk: door het voluit schrijven van de routes (zie endpointsZonderTest hieronder) herkent de motor vier toetsen nu wel als gemeten, en een deel daarvan overleefde zijn mutatie. De noemer groeit, de teller ook.\n\nHet getal blijft een schuld en wordt hier niet weggeredeneerd -- maar de kop van deze meter in scripts/norm.js zegt zelf waarom hij een aandeel is en geen aantal: een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen met meten."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "endpointsZonderTest 1179 -> 1173, inlineStijlAttributen 4936 -> 4905 (allebei STRAKKER)",
+      "reden": "Twee reparaties, geen nieuw werk, en allebei gevonden doordat de norm rood ging.\n\nendpointsZonderTest: twintig toetsbestanden op deze tak plakten hun routes aan elkaar (`api('/api/supplier/horeca' + pad)`), waardoor 372 aanroepen naar endpoints die WEL getoetst worden als ongedekt telden -- scripts/lib/routedekking.js zoekt de route als TEKST. Precies dezelfde fout als in werkgevolg.test.js op 23 augustus, en dezelfde oplossing: de route staat nu voluit in elke aanroep. Netto zes endpoints onder de oude norm, ondanks dertien nieuwe endpoints erbij.\n\ninlineStijlAttributen: 55 style-attributen weg uit horeca.html, horeca-beheer.html, horeca-pda.html en horeca/bar.js. Ze zijn klassen geworden in shared/zaakscherm.css, in de lijn die daar al lag (.z-mt40 en zijn buren, met dezelfde reden erbij: style-src-attr in de CSP kan pas dicht als ze weg zijn). En schermenZonderVormtaal ging van 187 terug naar 184 doordat de drie nieuwe horecaschermen de tokenlaag van ONTWERP.md nu insluiten."
     }
   ],
   "prestatie": {

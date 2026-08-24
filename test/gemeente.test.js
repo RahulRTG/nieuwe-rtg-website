@@ -153,7 +153,7 @@ test('9. een melding met GPS-coördinaten bewaart de locatie', async () => {
   assert.ok(mine, 'de melding staat in mijn overzicht');
 });
 
-/* DEZELFDE MELDING TWEE KEER IS EEN MELDING (TAKEN.md 4.56).
+/* DEZELFDE MELDING TWEE KEER IS EEN MELDING (TAKEN.md 4.61).
 
    Elke oproep maakte een nieuw dossier met een eigen meldnummer, dus een
    hapering of een ongeduldige tweede tik gaf de behandelaar twee keer dezelfde

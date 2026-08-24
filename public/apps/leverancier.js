@@ -2839,7 +2839,7 @@
     const fnC = el.querySelector('#fnCsv'); if (fnC) fnC.addEventListener('click', () => dlBestand('/supplier/finance/export', { formaat: 'csv' }, 'RTG-boekhouding.csv'));
     btwBedrading(el); // de knoppen van de btw-aangifte; zie leverancier-12a.js
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
-      /* TWEE MAATREGELEN, EN ZE DOEN VERSCHILLENDE DINGEN (TAKEN.md 4.55).
+      /* TWEE MAATREGELEN, EN ZE DOEN VERSCHILLENDE DINGEN (TAKEN.md 4.60).
          De knop op slot vangt de DUBBELTIK: twee klikken binnen een seconde
          sturen niet twee verzoeken. De idem-sleutel vangt de HERHALING van
          dezelfde poging -- een hapering, of iemand die na een timeout opnieuw
@@ -3100,7 +3100,7 @@
 /* een medewerker uitnodigen */
     const ktInvite = el.querySelector('#ktInvite'); if (ktInvite) ktInvite.addEventListener('click', async () => {
       // knop op slot tegen de dubbeltik, sleutel tegen een herhaalde poging:
-      // een vergeten tweede kassacode is een open deur (TAKEN.md 4.56)
+      // een vergeten tweede kassacode is een open deur (TAKEN.md 4.61)
       if (ktInvite.disabled) return;
       ktInvite.disabled = true;
       try {
@@ -5804,7 +5804,7 @@
       if (!(bedrag >= 0.5)) { toast(T('zb.bedragmin','Kies een bedrag van minstens € 0,50.')); return; }
       /* Knop op slot tegen de dubbeltik, idem-sleutel tegen een herhaalde
          poging. Twee verzoeken van hetzelfde bedrag kan de gast namelijk
-         ALLEBEI afrekenen (TAKEN.md 4.55). */
+         ALLEBEI afrekenen (TAKEN.md 4.60). */
       if (bvSend.disabled) return;
       bvSend.disabled = true;
       try { await API.call('/supplier/betaalverzoek', { codename: ($('#bvCode')||{}).value, bedrag, omschrijving: ($('#bvOms')||{}).value, idem: RTGIdem('bv') }); toast(''+T('zb.verzoekgestuurd','Betaalverzoek verstuurd.')); renderZaakBoard(); }
@@ -6612,7 +6612,7 @@
       Object.entries(r.betaalwijzen||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.ontv','Ontvangsten')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
       /* Openstaand gezet is GEEN ontvangst: die posten komen bij de check-out
          alsnog als bon langs. Ze stonden tot deze ronde tussen de ontvangsten,
-         waardoor de som het dubbele van de lade was (TAKEN.md 4.54). */
+         waardoor de som het dubbele van de lade was (TAKEN.md 4.59). */
       Object.entries(r.openstaandGezet||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.open','Openstaand gezet')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
       '<button class="bigbtn" id="zCsv" class="h-mt50">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
       '<div class="softline h-mt30">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';

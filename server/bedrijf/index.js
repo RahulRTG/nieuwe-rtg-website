@@ -38,29 +38,9 @@ module.exports = (kern) => {
   }
   const code = () => { let c; do { c = 'W' + crypto.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (W()[c]); return c; };
 
-  /* De twee sleutels, precies zoals bij de schoollaag: een beheer-token voor
-     wie de werkruimte opende, en een lid-token per medewerker. Ze staan naast
-     elkaar en niet in elkaar: een beheerder is geen medewerker met extra
-     vinkjes maar een aparte sleutel, zodat "wie deed dit" nooit vaag wordt. */
-  function ruimteVan(req) {
-    return eigenVeld(W(), String((req.body || {}).werkruimte || '').trim().toUpperCase()) || null;
-  }
-  function beheerVan(req, res) {
-    const w = ruimteVan(req);
-    if (!w || w.beheerToken !== String(req.body.beheerToken || '')) {
-      res.status(403).json({ error: 'Onbekende werkruimte of verkeerd beheer-token.' });
-      return null;
-    }
-    return w;
-  }
-  function lidVan(req, res) {
-    const w = ruimteVan(req);
-    const tok = String(req.body.lidToken || '');
-    const l = w && tok ? Object.values(w.leden || {}).find(x => x.token === tok) : null;
-    if (!l) { res.status(403).json({ error: 'Onbekende werkruimte of verkeerd lid-token.' }); return null; }
-    if (l.status !== 'actief') { res.status(403).json({ error: 'Dit lidmaatschap staat op ' + l.status + '.' }); return null; }
-    return { w, l };
-  }
+  /* De twee deuren staan in ./deuren.js: het contractquotum en de
+     organisatiemeting hangen eraan, en die horen op één plek te hangen. */
+  const { ruimteVan, beheerVan, lidVan } = require('./deuren')({ kern, W, eigenVeld });
 
   const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld };
 
@@ -145,5 +125,14 @@ module.exports = (kern) => {
   require('./uitval')(sctx);
   // Zoeken, dossier en samenhang: leest de soorten van alle lagen hierboven.
   require('./inzicht')(sctx);
+  /* Handelen via de commandobalk. Als LAATSTE, want hij leunt op de poort van
+     rollen.js, op zetWie() van wieis.js en op de bakken van taak.js en
+     service.js -- en hij schrijft in die bakken en niet in een eigen opslag
+     ernaast. */
+  require('./handeling')(sctx);
+  /* De gevolgsimulatie: wat blijft er open als deze wijziging doorgaat. Leest
+     alle bakken hierboven en schrijft in geen enkele -- er staat niet eens een
+     save() in. */
+  require('./gevolg')(sctx);
   return sctx;
 };

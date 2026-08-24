@@ -267,7 +267,7 @@
   },
   "/api/supplier/betaalverzoek": {
    "klasse": "beschermd",
-   "reden": "Raakte geld: elke oproep maakte een nieuw item (een cadeaukaart met saldo, een betaalbaar verzoek). Sinds TAKEN.md 4.55 loopt de route door metIdem met een afdruk op de geld-bepalende velden, en zet de app de knop op slot tijdens het verzoek."
+   "reden": "Raakte geld: elke oproep maakte een nieuw item (een cadeaukaart met saldo, een betaalbaar verzoek). Sinds TAKEN.md 4.60 loopt de route door metIdem met een afdruk op de geld-bepalende velden, en zet de app de knop op slot tijdens het verzoek."
   },
   "/api/supplier/command/operator/plan": {
    "klasse": "berekening"
@@ -289,7 +289,7 @@
   },
   "/api/supplier/giftcard/sell": {
    "klasse": "beschermd",
-   "reden": "Raakte geld: elke oproep maakte een nieuw item (een cadeaukaart met saldo, een betaalbaar verzoek). Sinds TAKEN.md 4.55 loopt de route door metIdem met een afdruk op de geld-bepalende velden, en zet de app de knop op slot tijdens het verzoek."
+   "reden": "Raakte geld: elke oproep maakte een nieuw item (een cadeaukaart met saldo, een betaalbaar verzoek). Sinds TAKEN.md 4.60 loopt de route door metIdem met een afdruk op de geld-bepalende velden, en zet de app de knop op slot tijdens het verzoek."
   },
   "/api/supplier/horeca/bon/maak": {
    "klasse": "creatie"

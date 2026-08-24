@@ -117,7 +117,7 @@ module.exports = (kern) => {
          check-out nog een keer langs, als gewone bon. Ze telden hier allebei
          mee, dus stond een kamerrekening dubbel in de dagomzet EN in de
          uitsplitsing per betaalwijze. Ze staan nu apart: zichtbaar wat er open
-         is gezet, zonder dat het als ontvangst meetelt (TAKEN.md 4.54). */
+         is gezet, zonder dat het als ontvangst meetelt (TAKEN.md 4.59). */
       if (s.method === 'kamer' || s.method === 'tafel') {
         openstaandGezet[s.method] = Math.round(((openstaandGezet[s.method] || 0) + s.total) * 100) / 100;
         continue;

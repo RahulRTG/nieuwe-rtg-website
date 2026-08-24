@@ -1,20 +1,28 @@
 /* Kassa (deelmodule): het afrekenen: uitchecken per kamer of tafel (met
    splitsen) en het tafelticket. Krijgt de gedeelde kern een keer bij het
-   opstarten vanuit routes/supplier/kassa.js. Cadeaukaarten stonden hier ook,
-   en zijn naar ./cadeaukaart.js verhuisd: ze hebben niets met afrekenen te
-   maken en dit bestand liep tegen de omvangsgrens van keuringsregel 13. */
-module.exports = (kern) => {
+   opstarten vanuit routes/supplier/kassa.js, samen met de herhalingslaag van
+   de hele kassa (kern/kassa/herhaling.js -- EEN instantie voor alle deuren,
+   zie de reden daar).
+
+   Cadeaukaarten stonden hier ook en zijn naar ./cadeaukaart.js verhuisd: ze
+   hebben niets met afrekenen te maken en dit bestand liep tegen de
+   omvangsgrens van keuringsregel 13. `gcCode` ging met ze mee. */
+module.exports = (kern, herhaling) => {
   const { app, crypto, db, facturatie, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
           sseToSupplier, supplierAuth, pay, tafelticket } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
+/* Dezelfde herhalingslaag als de verkoop hiernaast: uitchecken sluit lasten
+   EN maakt een bon, dus een tweede aankomst van hetzelfde verzoek zou een
+   tweede bon geven op lasten die al gesloten zijn. Zie kern/kassa/herhaling.js. */
 app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
+ const antwoord = await herhaling.eenmalig('checkout', req.supplier.code, req.body, async () => {
   const room = String(req.body.room || '').slice(0, 60);
   const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   const open = list.filter(s => (s.method === 'kamer' || s.method === 'tafel') && !s.settled && s.room === room);
-  if (!open.length) return res.status(404).json({ error: 'Geen open rekening voor deze kamer of tafel.' });
+  if (!open.length) return { status: 404, error: 'Geen open rekening voor deze kamer of tafel.' };
   let total = 0;
   for (const s of open) total += s.total;
   // eerst het geld (bij RTG Pay via de betaalcode), dan pas de lasten sluiten
@@ -25,7 +33,7 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
       centen: Math.round(total * 100), oms: 'Check-out ' + room + ', ' + req.supplier.name,
       idem: req.body.idem
     });
-    if (p.error) return res.status(p.status || 400).json({ error: p.error });
+    if (p.error) return { status: p.status || 400, error: p.error };
     betaler = p.van;
     // de kosten van de betaaldienst, per transactie DIRECT verrekend met de zaak
     betaaldienstKosten = p.kosten || 0;
@@ -65,7 +73,10 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
     if (v.error) splitsFout = v.error;
     else gesplitst = { vrienden: splitsMet.length, perPersoon: v.perPersoon };
   }
-  res.json({ ok: true, sale, betaler, gesplitst, splitsFout });
+  return { ok: true, sale, betaler, gesplitst, splitsFout };
+ });
+ if (antwoord && antwoord.error) return res.status(antwoord.status || 400).json({ error: antwoord.error });
+ res.json(antwoord);
 });
 
 /* Tafelticket: alle openstaande bonnen van dezelfde tafel op EEN ticket. De AI
@@ -89,7 +100,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   for (const o of chk.bonnen) {
     o.paid = true;
     o.paidAt = new Date().toISOString();
-    o.betaaldMet = method; // waarmee de tafel werkelijk afrekende (TAKEN.md 4.54)
+    o.betaaldMet = method; // waarmee de tafel werkelijk afrekende (TAKEN.md 4.59)
     if (o.status === 'wacht-op-betaling' || o.status === 'nieuw') o.status = 'geserveerd';
     o.rekeningVoldaan = true;
     if (!codenames.includes(o.customerCodename)) codenames.push(o.customerCodename);

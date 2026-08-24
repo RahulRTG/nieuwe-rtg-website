@@ -1319,11 +1319,14 @@ bedoeling (LAT-regel 4).
 Schermen: `/apps/horeca.html` is de dienst zelf -- de zaal (rekening openen,
 bestellen met de allergie in een eigen veld, een gang vrijgeven, splitsen,
 afrekenen) en de keuken (het stationsbord met looptijd naast de norm, de standen
-en het regiescherm). Daarnaast staan er zeven werkschermen, bereikbaar vanaf die
+en het regiescherm). Daarnaast staan er tien werkschermen, bereikbaar vanaf die
 pagina:
 
 | Scherm | Waarvoor |
 | --- | --- |
+| `/apps/horeca-pda.html` | PDA SERVICE: wat is mijn eerstvolgende handeling, geordend op minuten over een grens die het huis zelf al had vastgelegd -- met een wijklens die zegt hoeveel hij niet toont |
+| `/apps/horeca-vloer.html` | VLOER: de verdeling met de drukte per wijk en wie hem draagt, een wijk (of een paar tafels) overdragen als aanbod aan een collega, nee zeggen met een reden, uitgeleende tafels teruggeven, en het indelen zelf (manager) |
+| `/apps/horeca-bar.html` | BAR: de ronden op wachttijd naast de stapel (dezelfde drank over meerdere tafels is een handeling), met de stoel en de allergie op het glas |
 | `/apps/horeca-expeditie.html` | de pas: per tafel en gang wat er klaar is en hoe lang het eerste bord al koud staat, uitgeven met de hand, en de drukterem met zijn rekensom |
 | `/apps/horeca-bezorg.html` | zones, adrescheck, tijdsloten in keukenminuten, de ritvolgorde, en de rit zelf van inpakken tot afleverbewijs |
 | `/apps/horeca-hotel.html` | de gastrekening (folio), de nachtrun, de borg, en roomservice die op de kamer wordt geboekt |
@@ -2771,6 +2774,29 @@ motoren (`server/bedrijf/inzicht.js`):
 | `POST /api/bedrijf/samenhang` | De vorm van het geheel: soorten, randen, en wat niet gemeten mocht worden |
 | `POST /api/bedrijf/wandel` `{type, id, diepte}` | Wat er twee stappen verderop ligt — de klant achter het ticket achter het issue |
 
+**Daarnaast twee routes die géén vraag over een object beantwoorden**, en dat
+onderscheid is precies waarom ze niet in de tabel hierboven staan:
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/bedrijf/handeling/plan` · `/doe` · `/bonnen` | De balk mag ook handelen: bedoeling → plan → geraakte objecten → rechtencontrole → bevestiging door een mens → uitvoering → actiebon |
+| `POST /api/bedrijf/gevolg` `{wijziging}` | Wat blijft er **open** als deze wijziging doorgaat — vooruit kijken in plaats van naar binnen |
+
+De handelkant slaat geen schakel over: **plannen verandert niets** (de toets
+legt de hele werkruimte voor en na naast elkaar), **zonder de bevestigingscode
+gebeurt er niets**, en **het recht wordt bij de uitvoering opnieuw gerekend** —
+anders overleeft een plan een rol die intussen is ingetrokken. De lijst
+werkwoorden is gesloten (`bedrijf/handeling-lijst.js`); er is geen algemene
+uitvoerknop.
+
+De gevolgsimulatie is geen tweede lezing van dezelfde graaf. Het dossier kijkt
+naar **binnen** (wat hoort bij dit object), `gevolg` kijkt **vooruit** (wat
+breekt er als het weg is): een taak van iemand anders die op werk van de
+vertrekker wacht, staat in geen enkel dossier van die vertrekker en valt wel
+stil. Er staat geen `save()` in het bestand, hij volgt dezelfde rechten als de
+rest, en wat hij níét rekent — kosten, contracten, controls, terugdraaien —
+staat met reden in élk antwoord.
+
 **Twee assen van scope, en allebei door weglaten.** De werkruimte: elke soort
 draagt een `lees(db)` die alleen zijn eigen werkruimte opent, dus er bestaat
 geen pad waarlangs een rij van een andere organisatie naar buiten komt. En het
@@ -3214,6 +3240,262 @@ Het ontwerpbesluit dat alles draagt: **de Media OS bezit die vier domeinen niet.
 Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. Dat is een andere stroom (een relay-boom over kijkers, met een betaalde toegangsdeur ervoor) en geen kopie van het clip-protocol; de kaart verwijst daarvoor naar het Podium en zegt waarom. Staat als 4.12 in `TAKEN.md`.
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
+
+### RTG Tenant Control Plane (de klant als ding, en het Werk OS onder zijn eigen naam)
+
+`server/kern/tenant/` + `/api/tenant/...` + `/api/techniek/tenant`. Het
+diepte-document is **`TENANT.md`**; hier staat wat er draait.
+
+Dit huis had **drie codes die alle drie "de klant" leken te betekenen** --
+`org` (de sleutel van `sso_koppelingen` en de SCIM-sleutels), de werkruimtecode
+`W...` van het Werk OS, en de leverancierscode -- zonder een draad ertussen.
+Daardoor kon niemand zeggen welke werkruimtes onder welk contract vielen, droeg
+het Werk OS nergens de naam van zijn eigen klant, en moest een medewerker die
+via de provider van zijn werkgever inlogde daarna alsnog met de hand in de
+werkruimte worden gezet -- inclusief het met de hand weer weghalen, wat bij
+uitdiensttreding de stap is die overslaat.
+
+**`org` is vanaf nu de tenant**: de juridische, beveiligings- en contractgrens.
+Een werkruimtecode is een productinstantie daarbinnen, een leverancierscode is
+een zakelijke relatie en nooit een identiteit, en een RTG-account is een mens.
+Er komt geen vierde identiteitsmodel bij; de bestaande worden verbonden. Een
+tenant kan zonder SSO bestaan -- niet elke klant heeft een provider.
+
+| Endpoint | Doel |
+|---|---|
+| `GET/POST /api/techniek/tenant` | De tenants lezen en zetten (eigenaar) |
+| `POST /api/techniek/tenant/bind` `{org, soort, code}` | Een werkruimte of zaak eraan hangen (eigenaar) |
+| `POST /api/techniek/tenant/merk` `{org, merk}` | Het merk van de tenant (eigenaar) |
+| `POST /api/tenant/bootstrap` | Wie bedient dit scherm: tenant, werkruimte, merk, rollen, rechten |
+| `POST /api/tenant/bootstrap/mijn` | Hetzelfde via de eigen RTG-sessie, voor wie via zijn provider binnenkwam |
+| `POST /api/tenant/groep` · `/groepen` | Een IdP-groep aan een rol koppelen (beheerder van die werkruimte) |
+
+- **Een werkruimte of zaak hoort bij hooguit EEN tenant.** Twee tenants die
+  dezelfde werkruimte opeisen, geven een werkruimte waarvan het merk -- en
+  straks het contract en de export -- afhangt van wie er het laatst schreef.
+- **Drie presentatiemodi, en de derde weigert.** `powered` (klantmerk met
+  zichtbare RTG-schil) en `private` (RTG alleen nog in de herkomst- en
+  juridische regels) bestaan. `sovereign` belooft een eigen domein, eigen
+  sleutels en een eigen runtime, en dit huis heeft geen externe hosting, geen
+  certificaat-machinerie voor domeinen van derden en geen routering op
+  hostnaam -- dus die modus weigert MET de reden en de volgorde uit `TAKEN.md`
+  4.21. Weglaten leest als vergeten; weigeren met een reden leest als een
+  besluit.
+- **Een merkkern in plaats van een vierde huisstijlsysteem.**
+  `kern/tenant/merkkern.js` is de definitie (welke velden, welke waarden, welke
+  standaard, waar het ophoudt), en sinds kort ook echt de **enige**: het huis
+  had het merk-idee vier keer, en die vier waren al uit elkaar gelopen. Het
+  Theater weigerde een foute accentkleur met een melding; `kern/webmerk.js` en
+  `kern/journalistiek.js` negeerden hem **stil** en gaven `ok: true` terug met
+  de oude kleur erin. Voor wie de knop indrukt is dat het verschil tussen weten
+  dat het niet mocht en denken dat het gelukt is. Alle drie lezen nu
+  `leesMerkvelden()`; de opslag blijft per scope waar hij hoort, en de
+  leesstandaard mag verschillen (een krant staat standaard op licht, een
+  werkruimte op donker) -- alleen wat GELDIG is, is overal hetzelfde.
+  `test/merkkern.test.js` bewaakt zowel de waarderegels als de structuur, want
+  zonder dat tweede komt de vijfde kopie er gewoon weer bij.
+
+  Het manifest is **ondertekend en aan de modus gebonden**: klopt het niet met
+  zichzelf, dan komt de standaardstijl naar buiten met de reden erbij -- niet
+  het manifest dat er stond. Het bestuurt alleen de schermen van het Werk OS;
+  e-mail, documenten, facturen, meldingen, het PWA-manifest en de AI-toon
+  dragen het niet.
+- **De herkomstregel is in geen enkele modus uit te zetten.** Ook in `private`
+  blijft in de voet staan wiens software dit is. Wie je personeelsdossier
+  bewaart is geen merkvraag maar een AVG-vraag, en het antwoord mag niet
+  afhangen van een verkoopcontract.
+- **De kleur van een klant geldt binnen zijn eigen blok.** De accentkleur komt
+  op de merkbalk en nergens anders; `test/werkmerk.e2e.js` loopt in een echte
+  browser ELK element daarbuiten na op die kleur.
+- **De identiteitsbrug**: IdP-groep -> tenant -> werkruimte -> tijdgebonden rol
+  -> de 18 werkwoordrechten (`kern/tenant/brug.js`). Vier regels dragen hem:
+  zonder groepsafbeelding komt er niemand binnen (de huisregel "aanmelden is
+  niet binnen zijn" blijft dus staan), een IdP-rol is beheerd en vervalt met de
+  groep terwijl handmatige rollen blijven, een IdP herstelt geen ontslag, en een
+  SCIM-deactivatie sluit de werkplek in élke werkruimte van diezelfde tenant --
+  synchroon binnen het verzoek, en zonder iets van een andere tenant te raken.
+- **De bootstrap noemt wat er niet is.** `entitlements`, `quotas`, `policies`,
+  `trust` en `lifecycle` staan in `nietGebouwd` met een reden per veld, en niet
+  als lege waarde: een leeg quotum leest als "geen verbruik". Het Werk OS zet
+  die lijst ook op het scherm.
+- **Wat er is weggehaald.** `public/shared/enterprise-shell.{js,css}` was dode
+  code -- door geen enkele pagina ingeladen -- die "Enterprise beveiligd · audit
+  gereed · Commercial" beweerde zonder bron. Een enterprisebewering hoort een
+  bron te hebben; tot die er is, staat de bewering er niet.
+
+**De uitgang: weggaan zonder je geschiedenis te verliezen.**
+`kern/tenant/uitgang.js` + `kern/tenant/levensloop.js`. Exit-recht is niet af
+met een knop die JSON teruggeeft; de bewering wordt pas waar als de uitvoer
+WEER IN TE LEZEN is en er hetzelfde uit komt.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/tenant/export` | De hele werkruimte eruit, met catalogus, checksums en het recept (beheer-token) |
+| `POST /api/techniek/tenant/invoer` | Een uitvoer inlezen in een NIEUWE werkruimte (eigenaar) |
+| `POST /api/techniek/tenant/levensloop` | Lezen en zetten: actief, opzegging, bewaring (eigenaar) |
+| `POST /api/techniek/tenant/bewaringsplicht` | Een legal hold aan of uit, met grond (eigenaar) |
+| `POST /api/techniek/tenant/vernietig` | Vernietigen na de termijn, met bewijs (eigenaar) |
+
+- **De uitvoer neemt de hele subboom mee, met een lijst van wat eruit MOET.**
+  Een soort die iemand vergeet toe te voegen ontbreekt anders stilzwijgend in de
+  export van een vertrekkende klant. Eruit gaan `beheerToken`, `token`,
+  `lidToken` en `rtgKey` -- die laatste niet uit geheimhouding maar omdat hij
+  buiten de kluis om een werkruimtelid aan een RTG-account koppelt.
+- **Het recept reist mee, en dat is het bewijs.** Een checksum die alleen de
+  producent kan narekenen bewijst de ontvanger niets. De uitvoer zegt hoe:
+  sha256 over de canonieke JSON per soort, en daarna over de catalogus. De som
+  is ongezouten -- anders dan `lib/vingerafdruk.js`, die per proces zout omdat
+  hij alleen mag tonen DAT er iets veranderde.
+- **Inlezen maakt altijd een nieuwe werkruimte**, nooit over een bestaande heen,
+  en de leden komen terug zonder sleutel: toegang teruggeven is een besluit.
+- **Vier standen en geen zeven.** `voorbereiding`, `proef` en `beperkt` dwongen
+  niets af en staan er dus niet. De bewaring sluit de toegang door de SLEUTELS
+  in te trekken en niet met een vlag die elke route apart moet lezen.
+- **Uitvoer kan in elke stand behalve `vernietigd`**, ook in de bewaring en ook
+  bij een betalingsachterstand: een klant die zijn rekening niet betaalt
+  verliest zijn geld en niet zijn geschiedenis.
+- **Vernietigen kan niet voor de termijn en niet onder een bewaringsplicht**, en
+  levert een bewijs met aantallen en checksums en zonder persoonsgegevens -- een
+  vernietigingsbewijs met namen erin is een kopie van wat vernietigd moest
+  worden.
+- **De generieke veger komt hier niet langs.** `werkruimtes` en `tenants` stonden
+  in de gatenlijst van het bewaarbeleid; ze er met een gewone termijn bij zetten
+  zou erger zijn geweest dan het gat, want hun datumveld is een aanmaakmoment en
+  90 dagen daarop wist elke klant die langer dan negentig dagen bestaat. Vandaar
+  de derde vorm `eigenRegie` in `bewaarbeleid.js`: hij telt mee, verdwijnt uit de
+  gatenlijst, en `veeg()` raakt hem nooit aan.
+
+**Het contract en het quotum.** Drie pakketten (proef, zakelijk, concern) met
+twee grenzen die echt bijten: het aantal werkruimtes onder de tenant en het
+aantal verzoeken per uur. Wat een verkooppraatje verder belooft -- opslag,
+aantal leden, supportvenster, hersteltijd -- staat in `nietAfgedwongen` met de
+reden. Een **verlopen contract is geen noodknop**: het weigert nieuwe
+inrichting en verder niets; wie er werkt blijft werken en de uitvoer blijft
+open. De teller staat per uur in de opslag (een teller die bij elke herstart op
+nul begint is geen quotum maar een suggestie) en wordt geteld op de twee deuren
+van de werkruimte, niet op 104 routes.
+
+**De bewijspoort.** `POST /api/tenant/status`. Zeven beweringen die elk OF een
+bron OF een reden dragen -- versleutelde opslag (staat `RTG_ENC_KEY` gezet),
+auditspoor (het aantal journaalregels), eigen identiteitsprovider (een actieve
+koppeling), lopend contract, dagelijkse back-up, en twee die **altijd nee** zijn:
+eigen domein en SLA. Die laatste is een berekening: vier voorwaarden, waarvan er
+vandaag twee ontbreken. Er staat **geen beschikbaarheidsgetal** in de
+tenantstand -- de meting is platformbreed, en een cijfer dat de meting niet kan
+dragen is preciezer dan de werkelijkheid. Dit is de laag die de weggehaalde
+enterprise-schil onmogelijk maakt: een bewering is nu een object met een bron,
+en een scherm mag alleen tonen wat op `mag: true` staat.
+
+**En dat scherm staat er nu ook** (`apps/werk/status.js`, onder Instellingen in
+het Werk OS). Het is met opzet het tegenovergestelde van een badgemuur: de
+beweringen die vandaag NIET waar zijn staan er ook, met hun reden, en de SLA
+staat er uitgerekend -- vier voorwaarden, met de twee die ontbreken bij naam.
+Er staat geen beschikbaarheidscijfer voor de klant op maar de zin waarom niet:
+de telling gaat per routepatroon en draagt geen tenant.
+
+Eén bewering op die pagina bleek zwakker dan hij eruitzag, en dat is
+gerepareerd: **"Dagelijkse back-up" hing aan een mapNAAM.** Bestond er een map
+die `YYYY-MM-DD` heette, dan stond de bewering op ja -- leeg, half weggeschreven
+of met een `db.json` van nul bytes maakte niet uit. `server/backupstand.js`
+kijkt nu na of elk bestand dat in de levende datamap staat ook in de back-up
+staat en niet leeg is, en of `db.json` opent; de BAK-01-check in de technische
+pagina leest dezelfde functie. Een leeg `-wal` telt daarbij als gezond (dat is
+het na een checkpoint), en een bestand dat hier niet bestaat wordt de back-up
+niet verweten -- allebei omdat een meter die vals alarm geeft, genegeerd wordt.
+Het is een aanwezigheidscontrole met tanden en geen herstelproef: of de inhoud
+klopt weet je pas als je hem terugzet.
+
+Wat er wel staat is de **meting per capability** (`server/meting-capaciteit.js`).
+Dat was het laatste open punt van deze laag, en het is opgelost door twee dingen
+aan elkaar te knopen die er allebei al waren: de meting telt per routepatroon,
+en `functies.functieVoorPad` weet welke functie bij welk pad hoort -- dezelfde
+kaart waarmee een eigenaar een functie uitzet. Daarmee is de oorspronkelijke
+bezwaar weg: een storing in een onderdeel dat u niet gebruikt is nu als zodanig
+te zien in plaats van dat hij in uw cijfer verdwijnt. Onder de vloer van vijftig
+verzoeken komt er **geen** percentage maar de reden (nul fouten op drie
+verzoeken leest groener dan elk echt cijfer), routes zonder functie krijgen een
+eigen regel in plaats van te verdwijnen, en het venster staat erbij: de meting
+zit in het geheugen van dit proces en is dus geen maandcijfer. Op die pagina staat ook de enige regel die een klant zelf waar kan
+maken: een knop **Herstelproef doen** (`kern/tenant/herstelproef.js`). Die
+exporteert de werkruimte, leest de uitvoer terug in een tijdelijke werkruimte,
+legt de inhoud per soort naast het origineel en ruimt die tijdelijke werkruimte
+daarna op -- altijd, ook als er onderweg iets stukloopt. Het resultaat wordt
+vastgelegd met een datum en wordt de bewering "Uitvoer teruggelezen en
+gecontroleerd". Wat het bewijst is het **exit-pad**; wat het NIET bewijst is dat
+onze eigen dagback-up terug te zetten is, en dat is de claim waar een SLA aan
+hangt -- die voorwaarde blijft dus op nee staan, ook na een geslaagde proef.
+
+De stand is zichtbaar voor het
+beheer-token of voor een lid met het recht `werkruimte` (dat draagt alleen
+`directie`) -- die tweede sleutel is er omdat het beheer-token in het Werk OS
+nergens wordt ingetypt, en een pagina die niemand kan openen is hetzelfde als
+een pagina die er niet is.
+
+**SCIM `/Groups`.** Een groepswijziging bij de klant werkte pas door bij de
+volgende inlog; bij een sessie van dertig dagen dus een maand. Nu duwt de IdP
+hem naar ons toe en beweegt de werkruimte mee in hetzelfde verzoek -- ook, en
+juist, voor wie eruit gaat. Een groep draagt een naam en leden en verder niets:
+geen rechten (die staan in de groepsafbeelding, gezet door een mens) en geen
+nesting. Bij het inloggen wordt de unie van de tokenclaim en de SCIM-tabel
+genomen.
+
+**SAML** (`server/sso/saml/`, `POST /api/sso/saml/acs`). Dit stond hier als een
+besluit om het NIET te bouwen: een SAML-SP vraagt XML-canonicalisatie en
+XML-DSig-verificatie, dit huis heeft nul runtime-afhankelijkheden, en de
+faalvorm van zelfbouw is een **stille authenticatie-bypass**. Hij is er nu, en
+wat die reden onschadelijk maakt is niet een belofte maar een aanvalstoets.
+
+Hij komt uit op **hetzelfde claimcontract als OIDC** en loopt daarna door
+dezelfde `sso/binnenkomst.js` -- dezelfde vijf stappen, dezelfde
+identiteitsbrug, hetzelfde overdrachtsbewijs, geen enkele `if (saml)`. Het
+profiel is smal met opzet: precies EEN `Assertion` en EEN `Signature` in het
+document, het ondertekende element moet de OUDER van de handtekening zijn, een
+ID moet naar precies EEN element wijzen, en **de assertie die we lezen moet een
+nazaat zijn van het stuk dat is gecontroleerd** -- dat laatste is de regel waar
+XML Signature Wrapping op stukloopt. Geen SHA-1, geen HMAC, geen XPath- of
+XSLT-transform; de sleutel komt nooit uit `KeyInfo` maar uit de koppeling.
+`InResponseTo` moet bij een verzoek horen dat wij hebben gestuurd (dat sluit de
+ongevraagde, IdP-initiated inlog af), en zowel het verzoek als de assertie werkt
+een keer. Niet gebouwd, met de reden: wij ondertekenen het AuthnRequest niet
+(dat bewijst iets aan de provider en niets over het ANTWOORD, en daar zit de
+aanval), geen versleutelde asserties en geen Single Logout.
+
+**SAML vraagt een geconfigureerd webadres.** De entityID en het antwoordadres
+van een SP zijn identiteit, en dat zijn precies de waarden waartegen de Audience
+en de Recipient van een assertie worden gehouden. Ze komen daarom uit `APP_URL`
+(of `RTG_DOMAINS`) en niet uit de Host- of Origin-kop van het verzoek -- anders
+bepaalt de beller waartegen wij controleren. Staat er geen webadres, dan
+weigeren de drie SAML-routes met die reden in plaats van open te gaan met een
+gegokte naam.
+
+Inrichten doet de eigenaar met `POST /api/techniek/sso/saml` (entityID, SSO-adres
+en het ondertekencertificaat, dat meteen wordt gelezen); wat de klant bij zijn
+provider invult staat op `/api/sso/saml/metadata`. De SAML-velden hangen aan de
+BESTAANDE koppeling en niet aan een tweede tabel -- twee koppelingen zouden twee
+domeinlijsten betekenen die uiteen kunnen lopen, en de domeinlijst is de
+beveiliging.
+
+`test/tenantspine.test.js` (15, de regels), `test/tenant.test.js` (8, over de
+lijn), `test/tenantuitgang.test.js` (7, de uitgang), `test/tenantcontract.test.js`
+(7), `test/tenantbewijs.test.js` (7), `test/scimgroepen.test.js` (5), de
+SAML-toetsen (`samlxsw` 12 -- de aanvallen, `samlc14n` 5 -- libxml2 als
+scheidsrechter, `samlpoort` 6, `samlacs` 4 -- de echte deur) en de schermtoetsen
+`test/werkmerk.e2e.js` en `test/werkcommandbalk.e2e.js` leggen dit
+vast; zesendertig mutaties, alle zesendertig RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
+merkcontrole overslaan, een leeg quotum in de bootstrap zetten, de IdP een
+ontslag laten herstellen, deprovisioning over alle tenants laten lopen en de
+accentkleur op de RTG-kopbalk lekken, de geheimen in de export laten staan, een
+invoer over een bestaande werkruimte heen schrijven, de bewaringsplicht negeren
+en de veger wel aan de eigen regie laten komen. Aan de SAML-kant: de
+nazaat-regel eruit halen, de handtekening van zijn element losmaken, twee
+asserties toestaan, dubbele ID's toestaan, de digestvergelijking altijd goed
+laten zijn, SHA-1 alsnog toelaten, het publiek en het verlopen niet
+controleren, de attributen en de naamruimten niet sorteren (die twee zakken
+tegen libxml2 en niet tegen onszelf), een verzoek niet verwijderen bij gebruik,
+de org-controle op een verzoek weghalen en een assertie zonder ID toelaten. Er
+was ook een mutatie die NIET landde -- de gezochte zin stond ook in het
+commentaar -- en die staat in `scripts/mutatie.js`, want een mutatie die je niet
+hebt zien landen is geen mutatie.
 
 ### RTG Web Platform (de automatische bedrijfssite en de browser die bedrijven begrijpt)
 
@@ -3989,6 +4271,122 @@ De werkplek-tab opent de bestaande apps (Office, RTMail, Agenda, Meet, Bestanden
 
 Kern: `server/kern/command/` (register, zoek, object, oorzaak, operator, risico, runbooks, beleid, journaal, zaken, toezicht, toegang, puls, simulatie, werkbesparing), routes `/api/command/*` in `server/routes/command/`, frontend `public/apps/command/` (gebundeld naar `public/apps/command.js`), getoetst in `test/command.test.js`.
 
+### De gezondheidskaart: doen de vermogens het, en hoe hard weten we dat
+
+De puls hierboven zegt hoe de **gegevens** ervoor staan: hoeveel objecten, wat staat er open, waar verloopt een termijn. Dat is een goede vraag en het is niet dezelfde vraag als *doet betalen het?*. Een domein kan brandschoon zijn terwijl de dienst eronder plat ligt, en andersom. `server/kern/command/gezondheid.js` beantwoordt die tweede vraag, en het verschil met elk ander statusbord zit in één veld: **de bewijsgraad**.
+
+Een bord dat "Betalen: OK" toont, zegt niet waarom het dat weet. Dat kan zijn omdat er 4.812 verzoeken zonder fout langskwamen, omdat er zojuist een proef is gedraaid die het werkelijk heeft gedaan, omdat er geen klachten binnenkwamen, of omdat er niemand heeft gekeken. Vier graden dus -- **onbekend, vermoed, gemeten, bewezen** -- en daarnaast de uitslag **niet vast te stellen**, die geen storing is en geen groen. Zonder die laatste is de rest waardeloos: dan is het bord het groenst op de dag dat er nog niets draait.
+
+**Twaalf vermogens en geen 191 schakelaars.** De kaart (`kern/command/vermogens.js`) groepeert de functiecatalogus per CATEGORIE: acht diensten (binnenkomen, betalen, de ledenkant, het sociale, de eigen apps, de zakenkant, de RTFoundation, het kantoor) en vier fundamenten die geen verkeer hebben en toch stuk kunnen zijn (bereikbaar, de gegevens, de sporen, het bewaren). Per categorie is grover en het veroudert niet: een nieuwe schakelaar landt vanzelf bij het goede vermogen. Bij het opstarten faalt de kaart als een categorie in geen enkel vermogen valt -- die schakelaars zouden anders stil van het bord verdwijnen, en dan staat er groen omdat er niets staat.
+
+**Hij meet niets zelf**, en dat is dezelfde regel als in het alarm en om dezelfde reden. Elk getal komt uit een laag die er al was: de meting per capability, de servicedoelen, de sonde, het alarm, de gegevenskwaliteit, de hashketen van het journaal, de back-upstand. Een kaart met een eigen meting zegt op een dag iets anders dan het scherm waar hij over gaat.
+
+**Elke bron draagt wat hij NIET aantoont**, op het scherm en niet in een voetnoot. De scherpste is de back-up: `server/backupstand.js` kijkt na of de bestanden er zijn en of db.json opent, en dat is geen terugzetproef -- die bestaat platformbreed niet. Dat vermogen heeft daarom een **plafond** en komt nooit hoger dan "gemeten", ook niet na een geslaagde controleronde. Elk ander bord zet hier "Backup: OK" neer.
+
+**De doorwerking kleurt niets rood.** Een vermogen dat zelf klopt maar leunt op iets met een storing, blijft in orde staan met de zin erbij: *"De zakenkant werkt. Wat hier via betalen loopt, wacht."* Alles rood kleuren omdat er ergens iets stuk is, maakt van een kaart een alarmklok.
+
+**En de knop Controleer weigert waar hij moet.** Een ronde voert echt iets uit -- de sonde loopt zijn reizen, de hashketen wordt nagerekend, de gegevens worden gescand, de back-up wordt opengemaakt. Maar voor de meeste diensten bestaat zo'n proef niet: betalen bewijzen betekent betalen, en dat doet dit huis niet met het geld van een lid om een scherm groen te krijgen. Zo'n ronde meldt "niets gecontroleerd", blijft staan als gebeurtenis met een datum en een naam, en geeft **geen oordeel**. Dat laatste is er na een echte fout: in de eerste ronde tegen een draaiende server zette een controle op *betalen* -- die niets kon doen -- dat vermogen van "niet vast te stellen" op "in orde". Een knop die groen maakt door hem in te drukken.
+
+Werkplek **Gezondheid** onder *Zien*; kern in `server/kern/command/gezondheid.js` (met `vermogens.js`, `gezondheid-bronnen.js`, `gezondheid-fundament.js`, `gezondheid-proef.js`, `gezondheid-taal.js`), routes `/api/command/gezondheid*`, scherm `public/apps/command/command-17.js`. Getoetst in `test/gezondheidskaart.test.js` (veertien beweringen, acht mutaties). De richting waar deze laag in past, en de grenzen die daarbij horen, staan in **`BESTUUR.md`**.
+
+### Herstel als transactie: de twee stappen die een herstelknop normaal niet heeft
+
+De runbooks hadden de helft hiervan al. Elke wijziging heeft dezelfde vorm -- één veld op één object van een bekende soort -- en draagt de oude waarde per object mee, dus terugdraaien is geen extra code maar hetzelfde mechanisme omgekeerd. Dat is meteen de momentopname: een tweede kopie ernaast zou op een dag iets anders zeggen dan de eerste. Wat ontbrak zijn de twee stappen eromheen, en dat zijn precies de twee die op elk ander beheerscherm ontbreken. De keten is nu **voorcontrole → momentopname → uitvoeren → verificatie → vastleggen**, en bij een mislukte verificatie automatisch **terug**. `POST /api/command/runbook/voer` is het enige pad ernaartoe; rechtstreeks langs `runbooks.voer()` gaat niet meer, want een tweede ingang die de keten overslaat maakt de belofte meteen leeg.
+
+**De voorcontrole** is vier genoemde voorwaarden, elk met een eigen uitslag en reden: het veld staat niet op de bevroren lijst, de weg terug bestaat werkelijk als het certificaat er een belooft, het aantal gevallen blijft binnen de bovengrens van het certificaat, en het fundament (bereikbaar, de gegevens, de sporen) staat niet op storing -- gegevens rechtzetten terwijl dat wankelt is hoe je er een tweede storing bij maakt. Een echte ronde wordt door een weigering tegengehouden; **een droogloop niet**, want droog draaien is juist hoe je erachter komt dat de voorcontrole niet houdt.
+
+**Een voorwaarde die niet te controleren is, slaagt niet.** De zaak-kant draait dezelfde recepten zonder gezondheidskaart; die controle komt daar in de keten met `gecontroleerd: false` en de reden erbij, en blokkeert niets. Dat staat er dan ook zo, in plaats van stil voor geslaagd door te gaan.
+
+**Het certificaat** staat bij het recept (`runbookcatalogus.js`): hoe groot het mag worden, hoe de weg terug loopt, waaraan achteraf wordt nagekeken, en een versie. `maxObjecten` is iets anders dan de rondegrens uit het beleid -- die zegt hoeveel er per keer mag, dit zegt op hoeveel gevallen dit recept ooit is beproefd. Een recept **zonder** certificaat draait gewoon door, maar de uitslag meldt dat erbij: geen bovengrens afgesproken, en de weg terug is alleen wat `terugDraaibaar` zegt. Een standaardcertificaat verzinnen zou een ongecertificeerd recept laten lezen als een gecertificeerd recept.
+
+**De verificatie kijkt positief na**, en dat is de kern: niet "er ging niets mis" maar staat het veld werkelijk op de bedoelde waarde, en is de aanleiding werkelijk weg. Raakte de ronde nul objecten, dan is de uitslag `niet van toepassing` en uitdrukkelijk niet "geslaagd" -- een herstelknop die stil niets doet en groen meldt, is erger dan een knop die niets doet. Mislukt de verificatie, dan draait de ronde zichzelf terug, maar alleen als het certificaat die weg belooft: een automatische terugdraaiing op een recept dat daar niet voor staat, zou een tweede ongeplande wijziging zijn bovenop de eerste.
+
+De uitslag gaat terug **op de ronde zelf** en in het journaal. Een verificatie die alleen in het antwoord van dat ene verzoek bestaat, is morgen weg -- en dan staat er in de historie een ronde zonder enig bewijs dat er ooit is nagekeken. In de rondelijst staat `niet nagekeken` daarom als uitslag en niet als leegte.
+
+Kern: `server/kern/command/transactie.js` (de keten) en `transactie-poorten.js` (de voorcontrole en de verificatie); het teruglezen van rondes verhuisde naar `runbooks-historie.js` toen `runbooks.js` door zijn omvangsgrens ging, op de naad die er al lag. Getoetst in `test/hersteltransactie.test.js` (negen beweringen, zes mutaties) op de echte receptenmotor met een rij die zijn schrijfactie **weigert** -- zo ziet de transactie precies wat zij in het echt zou zien als een wijziging niet plakt. De bedrading in `test/command-routes-herstel.test.js`. De richting en de grenzen staan in **`BESTUUR.md`**.
+
+### Het incident als object: de machine opent, een mens sluit
+
+Zonder dit is een storing een alarm plus een journaalregel, en die twee verdwijnen allebei in een lijst: het alarm zwijgt zodra de drempel terugloopt, en de journaalregel staat tussen tienduizend andere. `server/kern/command/incident.js` maakt er een object van met een nummer waar je naar kunt verwijzen, een begin, een gemeten omvang, de maatregelen, een status en een verslag.
+
+**Dit is geen tweede uitzonderingenrij.** `zaken.js` gaat over één geval dat de machine niet zelf kon afhandelen, met een eigenaar, een termijn en een besluit. Een incident gaat over een **vermogen** dat het niet doet -- andere gegevens, andere werkstroom, andere levensduur. Dat is de toetsvraag uit `PLATFORM.md`, en hij valt hier op "zelfstandige capability".
+
+**De machine opent, een mens sluit.** `weeg()` leest de gezondheidskaart en opent een incident voor elk vermogen dat op storing komt; een storing die niemand vastlegt is een storing waar niemand van leert. Sluiten doet hij niet, want dan zou er een incident in de historie staan zonder conclusie: herstelt de bron zich, dan wordt het incident `hersteld` gemarkeerd en wacht het op een verslag. Dat is werkvoorraad van een eigen soort en wordt apart geteld -- de storing is weg en de les is nooit getrokken.
+
+**Sluiten kan niet terwijl het nog stuk is.** Een gesloten incident boven een lopende storing is een leugen in de historie, en het is de makkelijkste om te vertellen: het scherm wordt er rustiger van. Het kan wel met `toch` en een reden, en dan staat dat in het verslag -- een besluit in plaats van een vergissing. Een grendel zonder uitweg wordt omzeild in plaats van gebruikt.
+
+**De impact is gemeten, en wat niet te meten is staat erbij.** Dit is de gevaarlijkste tekst op een incidentscherm: *"23 facturen vertraagd, 0 verloren, 0 dubbel verwerkt"* is precies wat een eigenaar wil lezen en precies wat je niet mag schrijven zonder iets dat die drie kan tellen. Elk getal komt uit een bevinding van de gezondheidskaart; drie dingen staan er standaard als **niet gemeten** met de reden erbij, en dat zijn feiten over deze code: hoeveel leden of organisaties het raakte (`server/meting.js` telt per routepatroon en draagt geen tenant), of er iets verloren ging en of er iets dubbel is verwerkt (het transactie-grootboek dekt de collecties in `server/db/tx/collecties.js`, niet het hele platform). Dat blok staat op het scherm als eigen kop en niet in een voetnoot.
+
+**De oorzaak is een aanleiding en geen feit.** Er is geen veld `oorzaak` met een zin erin maar een lijst aanleidingen met per stuk de bron en de hardheid. Leunt het vermogen op iets dat óók stuk is, dan is dat de sterkere kandidaat -- met de zin erbij dat gelijktijdigheid geen oorzaak bewijst. Vindt hij niets, dan staat er "geen aanleiding gevonden", en dat is een uitslag en geen reden om er een te verzinnen.
+
+En de **momentopname bij het ontstaan blijft staan**, naast de stand van nu: alleen de eerste tonen laat een opgelost incident als lopend lezen, alleen de tweede maakt onzichtbaar wat er toen aan de hand was.
+
+Kern: `server/kern/command/incident.js` (de levensloop), `incident-impact.js` (de omvang en de aanleidingen) en `incident-verslag.js` (afsluiten en teruglezen); routes `/api/command/incident*` achter `command-doen`; scherm `public/apps/command/command-18.js`. Getoetst in `test/incident.test.js` (tien beweringen, zes mutaties).
+
+### De configuratietijdlijn: wat is er vlak daarvoor veranderd?
+
+Bij een storing stelt iedereen dezelfde vraag als eerste, en die was hier niet te beantwoorden -- niet omdat het nergens stond maar omdat het op drie plekken stond in drie vormen: het journaal van RTG Command, de aanvragen aan de schakelkast (`techniek.functieVerzoeken`) en het auditspoor van de incidentcontrole. `server/kern/command/tijdlijn.js` legt ze op één lijn.
+
+**Het is een samenvoeging en geen vierde opslag.** Er wordt niets bewaard; elke regel komt uit een bron die er al was en draagt de naam van die bron. Een eigen kopie zou op een dag iets anders zeggen dan het scherm waar zij vandaan kwam, en dan is de tijdlijn het minst betrouwbare bewijsstuk van de drie.
+
+**Volgorde is geen oorzaak**, en die zin komt van de server en niet van het scherm. `rondom(moment, minuten)` zegt dat er zevenendertig seconden eerder iets is gewijzigd; hij zegt niet dat dat het veroorzaakte. Een tijdlijn zonder die zin wordt binnen een week gelezen als een oorzakenlijst.
+
+**En "niets gevonden" is niet "niets gebeurd".** Een leeg venster antwoordt met zoveel woorden dat er in déze drie bronnen niets staat -- een uitrol, een wijziging op de machine of een schrijfactie buiten Command zou er ook niet in staan. Wat elke bron mist staat per bron; wat geen van drieën ziet staat als aparte lijst. Dat is precies de verwarring waarmee iemand een oorzaak uitsluit die er wel degelijk was.
+
+**Een aanvraag die niets veranderde staat er toch in**, met de status erbij: wie zoekt naar wat er veranderde, wil ook zien wat er bíjna veranderde. Het aantal regels en het aantal dat werkelijk iets veranderde staan apart, anders leest "vijf wijzigingen vlak ervoor" als vijf wijzigingen.
+
+De lijn staat op de werkplek **Journaal** en in het dossier van elk incident, achter de knop *"Wat veranderde er vlak hiervoor?"*. Getoetst in `test/tijdlijn.test.js` (acht beweringen, zes mutaties); één ervan legde een echte fout bloot die er al in zat: `Number(minuten || 30)` maakte van een gevraagd venster van **nul** minuten er stil dertig.
+
+### RTG Bijstand: support die binnenkomt zonder de sleutel te krijgen
+
+Een leverancier die zijn klanten wil helpen, geeft zijn supportafdeling meestal een beheerdersaccount op alles. Dat werkt, en het is de reden dat *"onze engineer heeft even in uw omgeving gekeken"* een zin is die niemand kan controleren: er was geen begin, geen einde, geen onderwerp en geen spoor.
+
+**Toegang is hier een uitnodiging en geen recht, en dat is de vorm en niet een instelling.** Er is geen route aan de kantoorkant die een sessie aanmaakt. De klantkant staat in `server/kern/command/bijstand-klant.js`, de RTG-kant in `bijstand-rtg.js`, en wie dat wil veranderen moet aan de klantkant bijbouwen -- dat valt op. Er staat zelfs een fail-fast op een naam die aan beide kanten voorkomt: `Object.assign` laat de RTG-kant winnen, dus een functie die daar `vraag` gaat heten zou de klantkant stilzwijgend vervangen terwijl het andere bestand nog steeds de enige plek *lijkt* waar een sessie ontstaat.
+
+Vier niveaus, elk met een eigen maximale looptijd: **kijken** (alleen de diagnose, 60 min), **meedenken** (mag voorstellen, 120 min), **herstellen** (uitvoeren ná goedkeuring per handeling, 60 min) en **nood** (30 min).
+
+**Waarom `nood` geen uitzondering is op de eerste regel.** De verleiding is een stand waarin RTG bij een ernstig incident zelf naar binnen kan; die komt er niet. Wat `nood` doet is de goedkeuring **vooraf** geven in plaats van per handeling -- omdat een klant die om half drie 's nachts belt niet naast het scherm gaat zitten om vinkjes te zetten. Dat is zijn besluit, met een verplichte reden, voor een half uur, en elke handeling verschijnt onmiddellijk in het spoor dat hij live meeleest. Op de handeling staat dan letterlijk `besluitDoor: 'vooraf, bij het openen van de noodsessie'`; in het verslag moet leesbaar zijn wie wanneer ja zei.
+
+**Verlopen is een toestand en geen opruimactie.** `stand()` rekent hem bij elke lezing uit de klok -- een sessie die pas dichtgaat als er een schoonmaker langskomt, staat tussendoor open, en dan hangt "verloopt vanzelf" van een cron af. **En de klant kan de uitnodiging terugnemen, zonder uit te leggen waarom**: `trekIn()` zet de sessie op `ingetrokken`, en daarmee staat RTG buiten -- niet met een 403 die zegt "mag niet meer", maar omdat de sessie niet meer loopt. De route vraagt met opzet geen reden; een uitnodiging die je niet zonder uitleg kunt terugnemen is een recht met een wachttijd. **Een gedeelde kantoorcode betreedt geen klantomgeving**: die naam kan niet in een verslag staan als degene die het deed, dus hij komt er niet in.
+
+**Inhoud is dicht.** De diagnose geeft structuur, tellingen en toestanden, plus de platformstand met de zin erbij dat die over ons gaat en niet over deze klant. De *namen* van werkruimtes en groepen zitten achter een apart, gemotiveerd verzoek dat de klant goedkeurt. En er is een derde laag die niet bestaat: de identiteitskluis, persoonsgegevens en de inhoud van berichten en bestanden. Dat is geen strengheid maar bouw -- `server/accounts.js` heeft zijn eigen poort met een verplichte reden, een regel in het inzagejournaal en bericht aan de betrokkene, en die deur loopt niet door deze laag. Elk antwoord draagt die `nooit`-lijst met een reden per post.
+
+**En deze laag voert zelf niets uit.** `voerUit()` bewaakt de toestemming en schrijft de uitslag op; wat er werkelijk aan gegevens verandert loopt door de hersteltransactie. Een tweede schrijfpad zou wijzigingen opleveren die de voorcontrole en de verificatie overslaan.
+
+Kern: `server/kern/command/bijstand.js` (de vorm), `bijstand-klant.js` (uitnodigen, goedkeuren, intrekken), `bijstand-rtg.js` (betreden, kijken, voorstellen, uitvoeren, afsluiten), `bijstand-niveaus.js` en `bijstand-diagnose.js`. Klantroutes `/api/tenant/bijstand/*` (achter dezelfde poort als de rest van de tenantlaag, `server/routes/tenant/poort.js`), RTG-routes `/api/command/bijstand/*`. Schermen: werkplek **Bijstand** in RTG Command en een kaart in het Werk OS (`public/apps/werk/bijstand.js`). Getoetst in `test/bijstand.test.js` (twaalf beweringen, negen mutaties), `test/bijstandketen.test.js` (negen toetsen over de echte routes: de keten, de twee grenzen die alleen over de lijn te zien zijn, en het intrekken) en `test/bijstandscherm.e2e.js`.
+
+**En de klant krijgt een bericht, in zijn eigen journaal.** Hij kón alles al zien -- het spoor loopt live mee, het dossier staat open, de kaart in het Werk OS toont de sessie -- maar alleen *als hij keek*. `server/kern/command/bijstand-melden.js` schrijft nu een regel in het werkruimtejournaal van de klant op de vier momenten dat RTG handelt: binnenkomen, een goedgekeurde handeling uitvoeren, om namen vragen, afsluiten. Dat kanaal is een besluit: het bestaat al, hij leest het al, het overleeft een gesloten tabblad, en het is auditeerbaar. De afzender is `RTG Bijstand` en niet de codenaam van de medewerker -- die zegt de klant niets en geeft ons een naam in zijn dossier die er niet hoort; het sessie-id staat er wel bij. **Wat er bewust niet bij komt is een mail of een telefoonmelding**: dat is hetzelfde kanaalbesluit als bij het alarm in `SLO.md`, en het hoort een klant in te stellen in plaats van stilzwijgend te krijgen. Getoetst in `test/bijstandbericht.test.js` (vier toetsen, drie mutaties).
+
+De **domeingrens** geeft de tenantkant daarbij precies deze ene laag: `kern.bijstand` hangt los aan de kern, zodat `GRENZEN.json` niet heel RTG Command hoeft open te zetten voor een klantroute.
+
+### De veilige noodstand: beschermen in plaats van uitzetten
+
+Een noodknop die alles platlegt, wordt niet gebruikt. De incidentcontrole (`server/kern/incidentcontrole.js`) kende drie standen en alle drie zetten iets **uit**: waakzaam, beperkt, isolatie. Wie onder druk moet kiezen tussen niets doen en alles dichtgooien, doet meestal niets.
+
+De vijfde stand is `beschermd` (`server/kern/beschermstand.js` + `-lijst.js`, aangezet via `incidentcontrole-bescherm.js`). **De methode is hier het verkeerde signaal, en dat is gemeten**: dit huis heeft 3728 POST-routes tegenover 35 GET-routes, dus "alleen GET laten doorlopen" zou alles hebben tegengehouden -- isolatie met een vriendelijkere naam. De regel is daarom: **per categorie bevriezen, met een gesloten lijst uitzonderingen.** Zes van de zestien functiecategorieën bevriezen (identiteit, rechten, de twee geldcategorieën, partners, integraties); de andere tien werken door, RTG-Backoffice voorop -- dat is de hand die repareert en de hand die de stand weer opheft. Binnen een bevroren categorie loopt een GET altijd door, en lopen vier met naam genoemde functies door: `tg-inlog` (wie dit bevriest zet ook het lezen stil), `dom-veiligheid` en `dom-kmar` (hulp- en grensdiensten stilzetten kost meer dan de storing) en `dom-foutmelder` (het kanaal waarlangs we hóren dat er iets mis is).
+
+**Drie fail-fasts bij het laden**, niet bij het eerste incident: elke categorie staat in precies één emmer, elke uitzondering bestaat nog, en elke uitzondering zit in een categorie die werkelijk bevriest. Een nieuwe categorie laat de server dus niet starten in plaats van stilzwijgend te blijven schrijven.
+
+**Deze stand zet geen enkele schakelaar om.** Opheffen is daardoor geen herstelactie met een eigen risico maar het wegnemen van een vlag -- en om dezelfde reden vraagt hij geen bevestigingszin: een drempel opwerpen voor de veilige keuze duwt mensen naar de onveilige. Bij het omzetten wordt het bewijs **vastgezet**: de hashketen van het journaal wordt nagelopen en de uitslag komt als zegel in het audit. Wat daarna aan de historie verandert, breekt daartegen. **Sleutels roteren gebeurt niet**, en dat staat in het antwoord van de server als `nietAfgedwongen` mét de reden: er is geen rotatiemechanisme voor `secret.key`/`vault.key`, en roteren betekent alles opnieuw versleutelen -- een migratie, geen noodhandeling. Handhaving hangt aan één aanroep in `middleware/functieschakelaars.js`; er komt geen tweede poort naast de schakelkast. Getoetst in `test/beschermstand.test.js` (zes toetsen, vier mutaties).
+
+### Het vlootbeeld: alle organisaties, tot waar de uitnodiging begint
+
+Twee dingen moeten hier tegelijk waar zijn en ze trekken tegengesteld. Support moet van alle organisaties naar één werkruimte kunnen zakken zonder van gereedschap te wisselen -- anders wordt één externe storing bij achthonderd klanten achthonderd keer hetzelfde uitzoekwerk. En tegelijk mag "ik kan tot op werkruimteniveau kijken" niet betekenen "ik mag alles lezen".
+
+Vandaar de regel die `server/kern/command/vlootbeeld.js` zijn vorm geeft: **het vlootbeeld toont wat RTG zonder uitnodiging mag zien, en houdt op waar de uitnodiging begint.** De afdaling eindigt met `dieper.mag: false`, de reden erbij en hoe je dan wél verder komt. Een lege diepte leest als "er is niets"; dit zegt "hier mag ik niet zonder toestemming".
+
+**Eén hoofdincident is één incident.** De incidenten hangen aan een *vermogen* en niet aan een klant. Er staat dus bij hoeveel organisaties er **bestaan**, en daarnaast hoeveel er minstens iets van merkten -- een **ondergrens** en geen aantal (zie hieronder). Zonder dat onderscheid wordt "812 organisaties" binnen een week gelezen als "812 klanten hadden hier last van". En er staat nog steeds **geen beschikbaarheidscijfer per klant**: dat vraagt álle verzoeken van een klant over een hele periode, `kern/tenant/bewijs.js` weigert het cijfer al aan de klant, en het intern wél gebruiken zou betekenen dat wij een getal hanteren dat wij extern onwaar noemen.
+
+Werkplek **De vloot** in RTG Command; getoetst in `test/vlootbeeld.test.js` (zes toetsen, zes mutaties).
+
+### De meting die een tenant draagt: een ondergrens, geen aantal
+
+"Hoeveel klanten merkten deze storing" was hier tot 24 augustus onbeantwoordbaar, en dat was geen luiheid. `server/meting.js` telt met opzet per **routepatroon** en nooit per klant (een tijdreeks per klant is een miljoen tijdreeksen, en dan valt de monitoring om voordat de server dat doet), en houdt met opzet persoonsgegevens uit een eindpunt dat gescrapet wordt door een systeem dat doorgaans minder streng bewaakt is dan de database. Een `tenant`-label breekt allebei die regels.
+
+`server/meting-tenant.js` staat daarom **naast** de metrics en niet erin: geen `tekst()`-functie, geen HELP, geen TYPE, en de org-codes verlaten de module niet -- het antwoord is een aantal. Hij telt **per functie** en niet per routepatroon, dezelfde keuze die `vermogens.js` maakt: een routepatroon verandert bij elke verbouwing, een functie-id is een productafspraak. Over meerdere functies telt de **unie** en niet de som.
+
+Geteld wordt waar het compleet kan: bij de twee deuren van de werkruimte (`server/bedrijf/deuren.js`), waar elke route van die laag langskomt en de tenant toch al is opgezocht voor het contractquotum. Ledenverkeer, zaakverkeer en verkeer van buiten dragen geen organisatie en tellen als `nietToegewezen`. Wie hier "vijf organisaties" leest, weet dus: **minstens vijf, en van een deel weten we het niet** -- en dat deel staat erbij. Harde bovengrens van 200 organisaties per functie met `afgekapt: true`, en een venster van een uur. Getoetst in `test/metingtenant.test.js` (vijf toetsen, drie mutaties).
+
 ## De Regie van de zaak: dezelfde logica, maar alleen over de eigen zaak
 
 RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het niet zien -- hij heeft dezelfde soort laag nodig over **zijn eigen zaak**. Die staat in `server/kern/zaakcommand/` en hangt als werkgebied **Regie** in de zaak-app (`/apps/leverancier.html`) en als tegel **Regie** in de personeels-PDA (`/apps/personeel.html`).
@@ -3996,6 +4394,8 @@ RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het n
 **De motoren zijn dezelfde, de gegevens niet.** Journaal, beleid, risico, uitzonderingen, runbooks, operator en werkbesparing komen uit `kern/command/`; ze kregen daarvoor twee haken. De eerste is het **register als parameter**: `zoek.js` en `object.js` importeren geen register meer maar krijgen er een. De tweede is het **vak**: elke motor slaat op in een object dat de aanroeper aanwijst. Zo heeft elke zaak zijn eigen hashketen, zijn eigen grenzen en zijn eigen lijst, met één implementatie eronder.
 
 **De scope heeft twee assen, en de tweede kwam er door een lek.** De eerste versie scoopte alleen op de zaak — en toen kon een ober via de zoekbalk de verlofaanvragen en sollicitaties van zijn collega's lezen, gegevens die overal elders achter `managerOnly` staan. De reparatie is **weglaten en niet filteren**: een soort met `as: 'leiding'` staat niet in het register van een medewerker. Hij is er niet, dus geen enkele lezer kan hem vinden — ook de afhankelijkhedenscan niet, die álle soorten langsloopt. Een filter had op één van die lezers vergeten kunnen worden. `leiding` staat standaard op false: wie de vlag vergeet ziet te weinig, en dat is de goede kant om fout te gaan.
+
+**En het herstel loopt sinds 24 augustus door dezelfde transactie als aan de RTG-kant.** Tot dan riep deze laag `runbooks.voer()` rechtstreeks aan: wel een momentopname, geen voorcontrole en geen verificatie. Een ondernemer die op "rechtzetten" drukte kreeg dus dezelfde groene ronde of het gelukt was of stil niets had gedaan. Alle vier de zaak-recepten dragen nu een certificaat met een bovengrens (25 of 50, **lager** dan aan de RTG-kant: de schaal van een zaak is de schaal van één onderneming) en beide verificaties, `veld-staat-op-doel` én `oorzaak-weg`. De gezondheidskaart gaat er bewust niet in -- die gaat over het platform en een ondernemer heeft er geen zeggenschap over -- en `transactie-poorten.js` meldt dat als `fundament-gezond: gecontroleerd false` mét de reden, in plaats van een controle die er stilzwijgend niet is. Getoetst in `test/zaaktransactie.test.js` (vijf toetsen, drie mutaties).
 
 **Isolatie is bouw, geen belofte.** De zaakcode komt uitsluitend uit de sessie (`supplierAuth` zet `req.supplier` uit `sess.code`); geen enkele route in dit domein leest een code uit de body. Het register van een zaak kent alleen de eigen soorten, en elk van die soorten draagt zijn eigen `lees()` die op de zaakcode sluit. Zoeken op de code van de buurman levert daarom niet "niets gevonden na filtering" op maar niets, omdat er niets te vinden is.
 

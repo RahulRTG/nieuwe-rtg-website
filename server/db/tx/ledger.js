@@ -132,27 +132,14 @@ const initLedgerSqlite = (opslag, log) => start(require('./sqliteachter')(opslag
 // Netjes afronden bij het afsluiten (alleen de SQLite-achterkant heeft werk).
 function afrondLedger() { if (achter && achter.afronden) achter.afronden(); }
 
-// Venster-top-up uit het grootboek: items die al als rij in het grootboek staan
-// maar nog niet in de blob, komen hier terug in het venster.
-async function vensterTopUp(log) {
-  const warn = m => { if (log && log.warn) log.warn(m); };
-  if (!achter || !db.data) return;
-  for (const naam of NAMEN) {
-    try {
-      const rijen = await achter.recent(TX_SOORT[naam], 500);
-      const arr = Array.isArray(db.data[naam]) ? db.data[naam] : (db.data[naam] = []);
-      const bekend = new Set(arr.map(t => t && sleutelVan(naam, t)).filter(x => x != null));
-      const missend = [];
-      for (const t of lees(rijen)) if (!bekend.has(sleutelVan(naam, t))) missend.push(t);
-      if (missend.length) {
-        missend.sort((a, b) => String(b.at || '').localeCompare(String(a.at || ''))); // nieuwste eerst, zoals unshift
-        db.data[naam] = missend.concat(arr);
-        console.log('[tx] ' + missend.length + ' ' + naam + ' uit het grootboek teruggezet in het venster (kv liep achter).');
-      }
-    } catch (e) { warn('[db] venster-top-up ' + naam + ' mislukt: ' + e.message); }
-  }
-}
-
+/* De omgekeerde beweging van de veegronde hierboven: bij het OPSTARTEN het
+   venster aanvullen met wat al als rij in het grootboek staat maar niet meer in
+   de blob. Staat in ./topup.js, met de reden erbij waarom het geen enkele
+   bladzijde van vijfhonderd meer is. De achterkant gaat als FUNCTIE mee: hij
+   wordt pas gezet als het grootboek start. */
+const vensterTopUp = require('./topup')({
+  db, achter: () => achter, COLLECTIES, NAMEN, TX_SOORT, sleutelVan, lees
+});
 module.exports = { checkpointGrootboek,
   /* Welke collecties een rij-voor-rij grootboek achter zich hebben. Dit is de
      ENIGE plek waar dat staat; de opslaglaag leidt er zijn afsluit-volgorde uit

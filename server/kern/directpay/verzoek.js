@@ -18,7 +18,7 @@ module.exports = (ctx) => {
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog.' };
-    /* EEN DUBBELTIK MAAKT HIER GELD (TAKEN.md 4.55). Elke oproep gaf een nieuw
+    /* EEN DUBBELTIK MAAKT HIER GELD (TAKEN.md 4.60). Elke oproep gaf een nieuw
        verzoek met een eigen ref, en twee verzoeken van hetzelfde bedrag kan de
        gast ALLEBEI afrekenen. De afdruk draagt de zaak, de ontvanger en het
        bedrag -- niet de omschrijving: vrije tekst is geen ander verzoek en mag

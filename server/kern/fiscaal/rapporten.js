@@ -28,7 +28,7 @@ module.exports = (ctx) => {
       for (const it of o.items || []) { const b = (it.price || 0) * (it.qty || 1); t += b; tel(catVan(it.name), b); }
       omzet += t;
       // onder de betaalwijze waarmee er ECHT is afgerekend: een bestelling die
-      // aan tafel contant is voldaan hoort niet onder 'app' (TAKEN.md 4.54).
+      // aan tafel contant is voldaan hoort niet onder 'app' (TAKEN.md 4.59).
       // Oudere bestellingen dragen dat veld niet en waren allemaal app-betalingen.
       const wijze = o.betaaldMet || 'app';
       betaalwijzen[wijze] = centen((betaalwijzen[wijze] || 0) + t);
@@ -36,7 +36,7 @@ module.exports = (ctx) => {
     /* WAT EEN KASSABON HIER IS. Omzet, bonnen en betaalwijzen lopen samen: een
        bon telt mee als hij OMZET draagt, en dan onder zijn eigen betaalwijze.
        Daarmee tellen de betaalwijzen altijd op tot de omzet, en kan de kasopmaak
-       er rechtstreeks op steunen (TAKEN.md 4.54).
+       er rechtstreeks op steunen (TAKEN.md 4.59).
 
        Twee soorten vallen af omdat hun omzet hierboven al bij de bestellingen
        staat: `rtg` (de bon van pos/redeem) en `omzetElders` (de bundelbon van

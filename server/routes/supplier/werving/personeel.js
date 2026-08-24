@@ -38,7 +38,7 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
 
 // Manager nodigt een medewerker uit: geeft een eenmalige kassacode terug.
 /* EEN VERGETEN TWEEDE CODE IS EEN OPEN DEUR NAAR PERSONEELSTOEGANG, en dat
-   weegt zwaarder dan bij een gewone creatie-route (TAKEN.md 4.56). Twee keer
+   weegt zwaarder dan bij een gewone creatie-route (TAKEN.md 4.61). Twee keer
    klikken gaf twee geldige kassacodes voor dezelfde persoon; de manager moest er
    dan zelf een intrekken en zag de tweede meestal niet. Dezelfde sleutel geeft
    nu dezelfde uitnodiging terug. Een VERSE sleutel is wel een echte tweede

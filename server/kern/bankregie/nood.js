@@ -25,7 +25,7 @@ module.exports = (ctx) => {
      trekt bij NOOD_DREMPEL automatisch de noodstop -- clearing valt dan terug
      op de kaart-rails -- dus dezelfde mislukking twee keer melden kan de bank
      onterecht in nood zetten. Er is nog geen aanroeper; juist daarom ligt het
-     contract nu vast, voor er een is (TAKEN.md 4.56). Zonder sleutel telt elke
+     contract nu vast, voor er een is (TAKEN.md 4.61). Zonder sleutel telt elke
      oproep gewoon op: dat blijft mogelijk, maar dan is het een keuze. */
   function clearingMislukt(reden, sleutel) {
     const b = d();

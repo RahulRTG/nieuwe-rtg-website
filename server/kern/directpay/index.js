@@ -61,7 +61,7 @@ function maakDirectpay(ctxIn) {
   }
   const centenVan = (v) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? n : NaN; };
 
-  /* Idempotentie voor het MAKEN van een betaalverzoek (TAKEN.md 4.55). Het
+  /* Idempotentie voor het MAKEN van een betaalverzoek (TAKEN.md 4.60). Het
      AFREKENEN had het al, via idemZoek/idemBewaar hieronder; het aanmaken niet,
      en daar kost een dubbeltik echt geld: twee verzoeken van hetzelfde bedrag
      kan de gast allebei betalen. Dezelfde module als RTG Pay en RTG Bank, met

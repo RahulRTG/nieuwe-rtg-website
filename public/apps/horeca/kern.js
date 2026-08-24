@@ -80,6 +80,59 @@
       Array.prototype.forEach.call(wortel.querySelectorAll('[data-' + attr + ']'), function (b) {
         b.addEventListener('click', function () { doen(b); });
       });
+    },
+
+    /* ---- DE DUWSTROOM ------------------------------------------------------
+       Elke standwijziging in de keuken stuurt al jaren
+       `sseToSupplier(code, 'sync', { scope: 'keuken' })`, en /api/supplier/stream
+       draait. Alleen luisterde geen enkel horecascherm ernaar, dus stond het
+       keukenbord stil tot iemand op "Toon" drukte -- gemeten: na twintig
+       seconden met een nieuw vrijgegeven gerecht stond het er nog niet op.
+
+       EEN STROOM PER PAGINA, niet een per module. Vier modules die elk hun eigen
+       EventSource openen, zijn vier verbindingen op een tablet die de hele avond
+       aanstaat (LAT-regel 4).
+
+       EN ALTIJD EEN TERUGVAL. Een keuken die stilstaat is erger dan een keuken
+       die traag is: valt de stroom weg, dan haalt de trage klok het werk op tot
+       hij terug is. Daarom hangt de terugval aan de verbinding en niet aan het
+       geluk dat EventSource het doet.
+
+       LET OP BIJ SCHERMTOETSEN: een pagina die hier luistert houdt een
+       verbinding open, dus `waitUntil: 'networkidle'` wordt NOOIT bereikt en
+       loopt in zijn timeout. Gebruik 'load'. Zelfde reden als in
+       test/clipdeler.e2e.js, waar dat al een keer is uitgezocht. */
+    _luisteraars: [],
+    luister: function (scope, doen) {
+      var K = window.RTGHoreca;
+      K._luisteraars.push({ scope: scope, doen: doen });
+      K._verbind();
+    },
+    _roep: function (scope) {
+      window.RTGHoreca._luisteraars.forEach(function (l) {
+        if (!l.scope || l.scope === scope || scope === 'terugval') {
+          try { l.doen(scope); } catch (e) {}
+        }
+      });
+    },
+    _verbind: function () {
+      var K = window.RTGHoreca;
+      if (K._verbonden || !TOKEN) return;
+      K._verbonden = true;
+      // de trage terugval staat er ALTIJD, ook als de stroom het straks doet
+      setInterval(function () { if (!K._live) K._roep('terugval'); }, 15000);
+      if (!window.EventSource) return;
+      try { K._es = new EventSource('/api/supplier/stream?token=' + encodeURIComponent(TOKEN)); }
+      catch (e) { return; }
+      K._es.addEventListener('hello', function () { K._live = true; });
+      K._es.addEventListener('sync', function (e) {
+        var scope = '';
+        try { scope = (JSON.parse(e.data) || {}).scope || ''; } catch (x) {}
+        K._live = true;
+        K._roep(scope);
+      });
+      // EventSource verbindt zelf opnieuw; tot die tijd neemt de terugval het over
+      K._es.onerror = function () { K._live = false; };
     }
   };
 })();

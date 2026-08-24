@@ -20,6 +20,10 @@ module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
   const { KANALEN, H, nu, id, totaal, openstaand } = horeca;
   const { bouwRegel } = require('../../../kern/horeca/regel')({ schoon, horeca });
+  /* Dezelfde kaartopbouw die de gastdeur leest (kern/horeca/kaart.js). Niet
+     `kern.gastKaartVanZaak`: dat is een naam van het gast-domein en het
+     supplier-domein hoort daar niet in te grijpen. */
+  const { kaartVanZaak, kaartPerGroep } = require('../../../kern/horeca/kaart')({ findSupplier: kern.findSupplier, horeca });
 
   const rekVan = (req, res) => {
     const h = H(req.supplier.code);
@@ -60,10 +64,46 @@ module.exports = (kern) => {
      De regel zelf wordt gebouwd in kern/horeca/regel.js, want de gastenkant
      (routes/gast/) zet dezelfde regel op dezelfde rekening. Twee kopieen van
      deze rekensom betekent twee antwoorden op "wat kost dit met happy hour". */
+  /* ---------- DE KAART VAN DE ZAAK, voor de bediening ----------
+
+     Dezelfde kaart die de gast op zijn telefoon ziet (kern/horeca/kaart.js) en
+     met opzet geen tweede opbouw. Een tweede kaart is een tweede antwoord op
+     "wat kost een biertje" en op "staat dit gerecht uitverkocht" -- en dan wijst
+     de gast op zijn scherm terwijl de bediening iets anders ziet (LAT-regel 4).
+
+     WEL EEN VERSCHIL, EN DAT IS GEEN INCONSEQUENTIE: uitverkochte gerechten
+     blijven hier STAAN, met hun vlag. De gast hoort ze niet te kunnen kiezen;
+     de bediening hoort te kunnen zien dat ze op zijn, en mag na overleg met de
+     keuken alsnog iets aanslaan. Wegfilteren zou van "op" een geheim maken. */
+  app.post('/api/supplier/horeca/kaart', supplierAuth, (req, res) => {
+    const groepen = kaartPerGroep(req.supplier.code).map(g => ({ cat: g.cat,
+      items: g.items.map(i => ({ id: i.id, naam: i.naam, centen: i.centen, station: i.station,
+        alcohol: i.alcohol, uitverkocht: i.uitverkocht, allergenen: i.allergenen })) }));
+    res.json({ ok: true, aantal: groepen.reduce((n, g) => n + g.items.length, 0), groepen,
+      let: 'Uitverkochte gerechten staan er met hun vlag bij: de gast kan ze niet kiezen, de bediening ziet ze wel.' });
+  });
+
   app.post('/api/supplier/horeca/rekening/regel', supplierAuth, (req, res) => {
     const r = rekVan(req, res); if (!r) return;
     if (r.status !== 'open') return res.status(409).json({ error: 'Deze rekening is al ' + r.status + '.' });
-    const uit = bouwRegel(req.supplier.code, req.body, req.actor.name);
+    /* EEN ITEM VAN DE KAART DRAAGT ZIJN PRIJS NIET MEE UIT DE CLIENT. Wie
+       `itemId` stuurt, krijgt naam, prijs en station van de kaart van de zaak --
+       precies zoals de gastkant het al deed (routes/gast/bestellen.js). Zou de
+       PDA de prijs meesturen, dan bepaalt een scherm wat een biertje kost, en
+       dan is er geen enkele controle meer op wat er wordt aangeslagen.
+
+       Vrij typen blijft kunnen: een special, een gang uit een arrangement of
+       iets dat niet op de kaart staat, is echt werk en geen misbruik. Wat er
+       niet mag, is een itemId MET een eigen prijs -- dan zou de kaartprijs
+       ongemerkt overschreven kunnen worden. */
+    let invoer = req.body;
+    if (req.body.itemId) {
+      const item = kaartVanZaak(req.supplier.code).find(x => x.id === String(req.body.itemId));
+      if (!item) return res.status(404).json({ error: 'Dit gerecht staat niet op de kaart van deze zaak.' });
+      invoer = Object.assign({}, req.body, { naam: item.naam, centen: item.centen,
+        station: req.body.station || item.station || null, prijs: undefined, itemId: item.id });
+    }
+    const uit = bouwRegel(req.supplier.code, invoer, req.actor.name);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     const regel = uit.regel;
     r.regels.push(regel);

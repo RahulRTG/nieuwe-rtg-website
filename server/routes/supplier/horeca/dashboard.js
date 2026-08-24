@@ -23,6 +23,26 @@
 module.exports = (kern) => {
   const { app, schoon, supplierAuth, horeca } = kern;
   const { H, nu, centen, totaal, openstaand } = horeca;
+  const dienstmeting = require('../../../kern/horeca/dienstmeting')({ horeca });
+
+  /* ---------- DE DIENSTMETING ----------
+
+     De meetlat onderaan HORECA.md had twaalf regels met een lat en nergens een
+     getal. Dit is het instrument dat er een getal naast kan zetten -- en, waar
+     dat niet kan, met zoveel woorden zegt dat het niet gemeten is en waarom.
+
+     Van de twaalf zijn er een handvol werkelijk te meten uit de data die er is.
+     De verleiding is om de rest op nul te zetten; twaalf groene vinkjes staan
+     mooi. Dat is precies wat grens 7 verbiedt. Zie kern/horeca/dienstmeting.js
+     voor de drie soorten (gemeten, constructie, niet-gemeten). */
+  app.post('/api/supplier/horeca/dienstmeting', supplierAuth, (req, res) => {
+    const h = H(req.supplier.code);
+    const datum = schoon(req.body.datum, 10) || nu().slice(0, 10);
+    res.json(Object.assign({ ok: true }, dienstmeting.meet(h, datum), {
+      let: 'Wat niet gemeten is, staat als niet gemeten -- met de reden erbij. Een nul ' +
+        'die uit het ontbreken van gegevens komt, is geen resultaat maar een lege avond.'
+    }));
+  });
 
   app.post('/api/supplier/horeca/dagbeeld', supplierAuth, (req, res) => {
     const h = H(req.supplier.code);

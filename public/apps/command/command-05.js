@@ -5,6 +5,14 @@
    gebeuren, dan pas doen. Een runbook waarvan niemand ooit de droogloop heeft
    gelezen, is een knop waarvan niemand weet wat hij doet.
 
+   EN SINDS DE TRANSACTIE STAAT DE KETEN OP HET SCHERM. Een ronde loopt
+   voorcontrole -> momentopname -> uitvoeren -> verificatie -> vastleggen, en
+   bij een mislukte verificatie automatisch terug. De droogloop toont de
+   voorcontrole (ook als die zou weigeren -- daar is hij voor), en elke ronde in
+   de lijst draagt zijn verificatie. "Niet nagekeken" staat er als uitslag en
+   niet als leegte: een oude ronde van vóór de transactie hoort niet te lezen
+   als een ronde die is nagekeken.
+
    ELKE RONDE IS TERUG TE DRAAIEN ZOLANG NIEMAND ANDERS ERAAN ZAT. De kern zet
    alleen terug wat nog de waarde heeft die de ronde erin zette; wat sindsdien
    door iemand anders is gewijzigd, blijft staan en wordt geteld als
@@ -56,6 +64,7 @@
         '<p class="meta">' + (r.droog ? 'droogloop' : 'uitgevoerd') + ' door ' + esc(r.door) + ' · ' +
         r.geraakt + ' van ' + r.totaalKandidaten + ' · ' + C.niveau(r.niveau) + ' · risico ' + C.getal(r.score) +
         (r.reden ? ' · ' + esc(r.reden) : '') + '</p>' +
+        (r.droog ? '' : '<p class="meta">' + verificatie(r.verificatie) + '</p>') +
         (r.voorbeelden && r.voorbeelden.length ? '<div class="meta h-mt40">' +
           r.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') +
           (r.geraakt > r.voorbeelden.length ? '<br>… en nog ' + (r.geraakt - r.voorbeelden.length) : '') + '</div>' : '') +
@@ -67,15 +76,45 @@
     return u;
   }
 
+  /* De uitslag van de verificatie in één regel. `null` is hier een UITSLAG:
+     deze ronde is niet langs een verificatie gekomen, en dat is iets anders dan
+     een geslaagde. */
+  function verificatie(v) {
+    if (!v) return '<span class="cniveau geen">niet nagekeken</span> Deze ronde liep niet langs een verificatie.';
+    if (v.nietVanToepassing) return '<span class="cniveau geen">niets te verifiëren</span> ' + esc(v.waarom);
+    return '<span class="cniveau ' + (v.goed ? 'ok' : 'mis') + '">verificatie ' +
+      (v.goed ? 'geslaagd' : 'mislukt') + '</span> ' + esc(v.waarom);
+  }
+
+  /* De voorcontrole bij een droogloop. Hij toont ook wat er NIET gecontroleerd
+     kon worden -- dat is precies het soort voorwaarde dat je anders voor
+     geslaagd aanziet. */
+  function voorcontrole(v, cert) {
+    if (!v) return '';
+    var u = '<div class="h-mt50"><b>Voorcontrole:</b> ' +
+      (v.mag ? 'alle gecontroleerde voorwaarden houden.' : 'dit zou een echte ronde tegenhouden.') + '</div>';
+    u += '<ul class="h-keten">' + v.stappen.map(function (s) {
+      var merk = !s.gecontroleerd ? '<span class="cniveau geen">niet gecontroleerd</span>'
+        : '<span class="cniveau ' + (s.goed ? 'ok' : 'mis') + '">' + (s.goed ? 'houdt' : 'weigert') + '</span>';
+      return '<li>' + merk + ' <b>' + esc(s.naam) + '</b> · ' + esc(s.waarom) + '</li>';
+    }).join('') + '</ul>';
+    if (cert && cert.ongecertificeerd) u += '<div class="meta">' + esc(cert.waarom) + '</div>';
+    else if (cert) u += '<div class="meta">Certificaat v' + cert.versie + ' · ten hoogste ' +
+      (cert.maxObjecten == null ? 'geen grens' : cert.maxObjecten + ' objecten') + ' · weg terug: ' +
+      esc(cert.terugweg) + ' · nagekeken op: ' + esc((cert.verificaties || []).join(', ')) + '</div>';
+    return u;
+  }
+
   function bind() {
     document.querySelectorAll('[data-droog]').forEach(function (b) {
       b.onclick = function () {
         api('runbook/voer', { id: b.dataset.droog, droog: true }).then(function (r) {
           var vak = document.querySelector('#droog-' + b.dataset.droog);
-          vak.innerHTML = '<div style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;">' +
+          vak.innerHTML = '<div class="h-droog">' +
             '<b>Droogloop:</b> ' + r.run.geraakt + ' van ' + r.run.totaalKandidaten + ' geval(len) zouden veranderen.<br>' +
             r.run.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') +
-            (r.overgeslagen ? '<br>' + r.overgeslagen + ' vallen buiten deze ronde.' : '') + '</div>';
+            (r.overgeslagen ? '<br>' + r.overgeslagen + ' vallen buiten deze ronde.' : '') +
+            voorcontrole(r.voorcontrole, r.certificaat) + '</div>';
         }).catch(function (e) { if (!e.stil) C.meld(e.message); });
       };
     });
@@ -84,7 +123,19 @@
         var reden = prompt('Waarom voert u dit herstel uit? (komt in het journaal)');
         if (!reden) return;
         api('runbook/voer', { id: b.dataset.voer, droog: false, reden: reden, menselijkAkkoord: true })
-          .then(function (r) { C.meld(r.run.geraakt + ' geval(len) hersteld.'); return C.ververs(); })
+          .then(function (r) {
+            /* De melding zegt de UITSLAG en niet alleen het aantal. Een ronde
+               die zichzelf heeft teruggedraaid en "12 hersteld" meldt, is de
+               ergste melding die dit scherm kan geven. */
+            C.meld(r.teruggedraaid
+              ? 'De verificatie mislukte; de ronde is teruggedraaid (' + r.teruggedraaid.teruggezet + ' teruggezet).'
+              : r.verificatie && r.verificatie.goed === false
+                ? 'De verificatie mislukte en terugdraaien lukte niet: ' + (r.terugMislukt || r.verificatie.waarom)
+                : r.verificatie && r.verificatie.nietVanToepassing
+                  ? 'Er veranderde niets, dus er viel niets te verifiëren.'
+                  : r.run.geraakt + ' geval(len) hersteld en nagekeken.');
+            return C.ververs();
+          })
           .then(laad).catch(function (e) { if (!e.stil) C.meld(e.message); });
       };
     });

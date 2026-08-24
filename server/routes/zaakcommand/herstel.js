@@ -13,10 +13,22 @@ module.exports = ({ app, supplierAuth, managerOnly, veilig, laag, wie }) => {
   app.post('/api/supplier/command/runbooks', supplierAuth, (req, res) => veilig(res, () =>
     ({ runbooks: laag(req).runbooks.lijst() })));
 
+  /* DIT LOOPT SINDS VANDAAG DOOR DE HERSTELTRANSACTIE en niet meer rechtstreeks
+     door runbooks.voer(). Dat is geen laag ertussen om de laag: `voer()` deed
+     de wijziging en droeg de oude waarde mee, maar er stond niets VOOR (mag dit
+     nu, op deze schaal, met deze weg terug) en niets ERNA (is het werkelijk
+     gelukt). Een ondernemer die op "rechtzetten" drukt kreeg dus dezelfde
+     groene ronde of het nu gelukt was of stil niets had gedaan.
+
+     Het antwoord wordt daarmee breder en niet anders: `run`, `oordeel` en
+     `overgeslagen` staan er nog precies zo, met `certificaat`, `voorcontrole`,
+     `verificatie` en `keten` erbij. Een scherm dat de oude velden leest, blijft
+     werken; een scherm dat het nieuwe toont, kan eindelijk laten zien waarom
+     iets werd tegengehouden. */
   app.post('/api/supplier/command/runbook/voer', supplierAuth, (req, res) => veilig(res, () => {
     const droog = req.body.droog !== false;
     if (!droog && !managerOnly(req, res)) return null;
-    return laag(req).runbooks.voer(String(req.body.id || ''), {
+    return laag(req).transactie.draai(String(req.body.id || ''), {
       droog, door: wie(req), reden: req.body.reden,
       alleen: Array.isArray(req.body.alleen) ? req.body.alleen : null,
       menselijkAkkoord: !!req.body.menselijkAkkoord

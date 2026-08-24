@@ -113,6 +113,29 @@ const VOORTGANG = path.join(WORTEL, 'server', 'data', 'mutatie-voortgang.json');
    een overlever uit de ondiepe ronde waar de A-diepe ronde nog overheen moet.
    Die twee gelden ook ONDER --verlopen niet als gedaan, want daar gaat het niet
    om houdbaarheid maar om werk dat nooit af is gekomen. */
+/* EEN OVERLEVER UIT DE ONDIEPE RONDE IS NOG GEEN OORDEEL.
+
+   Fase A probeert EEN plek per operator. Blijft een toets daar groen, dan heet
+   hij "overleefd" -- maar dat is precies de uitslag waar de A-diepe ronde
+   overheen gaat, met acht plekken. Van de vijf gevallen die ik vandaag terug
+   moest halen deed A-diep er vijf van vijf alsnog zakken.
+
+   Zolang die tweede ronde niet is gelopen, is "overleefd" dus een TUSSENSTAND
+   en geen bewering. Hij stond er wel als bewering: de motor schrijft na elk
+   bestand weg (dat moet -- een ronde van uren mag bij een ctrl-C niet alles
+   verliezen), en wie tussen fase A en A-diep afbreekt, laat die toetsen als
+   ONGEVOELIG in het register achter. Dat getal staat in NORM.json en ging zo
+   van 1,2 naar 1,7 zonder dat er een regel code was veranderd.
+
+   Deze functie staat op moduleniveau en niet in main(), en dat is met opzet:
+   binnen main() was hij niet los te toetsen, en toen ik hem daar wegmutéérde
+   zakte er niets (LAT.md regel 10). Nu houdt test/bewijsvers.test.js hem vast,
+   samen met moetOverslaan() hieronder -- die twee zijn een keten en alleen
+   samen het gedrag. */
+function voorlopigMaken(r) {
+  return (r && r.staat === 'overleefd') ? Object.assign({}, r, { voorlopig: true }) : r;
+}
+
 function moetOverslaan(naam, opties) {
   const o = opties || {};
   if (o.opnieuw) return false;
@@ -904,25 +927,6 @@ if (require.main === module) {
     return uit;
   };
 
-  /* EEN OVERLEVER UIT DE ONDIEPE RONDE IS NOG GEEN OORDEEL.
-
-     Fase A probeert EEN plek per operator. Blijft een toets daar groen, dan
-     heet hij "overleefd" -- maar dat is precies de uitslag waar de A-diepe
-     ronde hieronder overheen gaat, met acht plekken. Van de vijf gevallen die
-     ik vandaag terugvond deed A-diep er vijf van vijf alsnog zakken.
-
-     Zolang die tweede ronde niet is gelopen, is "overleefd" dus een TUSSENSTAND
-     en geen bewering. Hij stond er wel als bewering: de motor schrijft na elk
-     bestand weg (dat moet, een ronde van uren mag niet bij een ctrl-C alles
-     verliezen), en wie tussen fase A en A-diep afbreekt, laat vijf toetsen als
-     ONGEVOELIG in het register achter. Dat getal staat in NORM.json en gaat de
-     verkeerde kant op zonder dat er iets aan de code is veranderd.
-
-     `voorlopig` markeert dat. gedaan() ziet het als niet-gedaan, dus een
-     afgebroken ronde pakt hem de volgende keer weer op, en de A-diepe ronde
-     haalt de vlag weg zodra er echt acht plekken zijn geprobeerd. */
-  const voorlopigMaken = (r) => (r && r.staat === 'overleefd') ? Object.assign({}, r, { voorlopig: true }) : r;
-
   const doe = (lijst, proef) => {
     let n = 0;
     for (const naam of lijst) {
@@ -1008,7 +1012,7 @@ if (require.main === module) {
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 
-module.exports = { OPERATOREN, muteer, codemasker, modulesVan, moetOverslaan, UITSLAG, VOORTGANG, NIET_MUTEREN,
+module.exports = { OPERATOREN, muteer, codemasker, modulesVan, moetOverslaan, voorlopigMaken, UITSLAG, VOORTGANG, NIET_MUTEREN,
   SPOOR, ruimEerderOp, schrijfSpoor, metMutatie,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js

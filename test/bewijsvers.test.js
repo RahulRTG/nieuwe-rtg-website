@@ -187,10 +187,22 @@ test('een ondiepe overlever is een tussenstand en geen oordeel, in alle regimes'
      Een ondiepe overlever heet daarom `voorlopig`, en dat is geen etiket maar
      een keuze: hij telt in GEEN van de drie regimes als gedaan, ook niet onder
      --verlopen. Daar gaat het om houdbaarheid; hier om werk dat nooit af kwam. */
+  /* DE KETEN, EN NIET ALLEEN DE HELFT ERVAN. Toen ik dit als twee losse
+     beweringen schreef, kon ik de vlag WEGMUTEREN uit de ondiepe ronde zonder
+     dat er iets zakte: moetOverslaan() werd getoetst met een handgeschreven
+     `voorlopig: true`, en dus met een register dat de motor zelf nooit meer
+     zou schrijven (LAT.md regel 10). De uitslag komt daarom uit
+     voorlopigMaken(), precies zoals de ronde hem wegschrijft. */
   const uitslag = {
-    'ondiep.test.js': { soort: 'puur', staat: 'overleefd', voorlopig: true, toetsSha: 'aa' },
+    'ondiep.test.js': motor.voorlopigMaken({ soort: 'puur', staat: 'overleefd', toetsSha: 'aa' }),
     'diep.test.js': { soort: 'puur', staat: 'overleefd', toetsSha: 'aa' }
   };
+  assert.equal(uitslag['ondiep.test.js'].voorlopig, true,
+    'de ondiepe ronde MOET de vlag zetten; zonder die stap zegt de rest van deze toets niets');
+  assert.equal(motor.voorlopigMaken({ staat: 'gezakt' }).voorlopig, undefined,
+    'en alleen bij een overlever: een gezakte toets is meteen een oordeel');
+  assert.equal(motor.voorlopigMaken({ staat: 'al rood' }).voorlopig, undefined,
+    'en ook niet bij een reden waarom er niet gemeten is');
   assert.equal(motor.moetOverslaan('ondiep.test.js', { uitslag }), false,
     'zonder vlag: een ondiepe overlever hoort de diepe ronde alsnog te krijgen');
   assert.equal(motor.moetOverslaan('ondiep.test.js', { uitslag, verlopenNamen: new Set() }), false,

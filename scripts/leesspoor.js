@@ -58,7 +58,91 @@ function statischPerToets() {
   return uit;
 }
 
-function voegToe(spoorPad) {
+/* WAT EEN KALE SERVERBOOT LEEST, EEN KEER GEMETEN.
+
+   De eerste versie hiervan schreef 749.950 kanten over 546 toetsen: een register
+   van 27 megabyte waarin 1360 paden 546 keer staan. Dat komt niet door een fout
+   in de meting maar doordat de meting KLOPT: elke server scant bij het opstarten
+   public/ (ui-bronnen, de capability-graaf) en tientallen kernmappen, en elke
+   toets die een server start leest dus diezelfde 1360 bestanden.
+
+   Die verzameling hoort een keer opgeschreven te worden en niet 546 keer. Ze
+   wordt hier GEMETEN -- een kale server booten met de voorlader aan -- en niet
+   geraden met een drempel ("paden die meer dan de helft van de toetsen leest").
+   Een drempel zou bij een andere samenstelling van de suite iets anders
+   betekenen; een gemeten boot betekent altijd hetzelfde.
+
+   De sleutel eronder is dezelfde vorm als bij de gietvorm: verandert er iets in
+   server/ of public/, dan wordt hij opnieuw gemeten. */
+async function meetServerboot() {
+  const { spawn } = require('child_process');
+  const net = require('net');
+  const os = require('os');
+  const kas = require('../server/lib/bronkas');
+  const sleutel = kas.sleutelUit([
+    kas.manifestVan(path.join(WORTEL, 'server'), (p) => p.endsWith('.js'), 'spoorboot', { vers: true }),
+    kas.manifestVan(path.join(WORTEL, 'public'), () => true, 'spoorbootpub', { vers: true }),
+    'node=' + process.versions.node, 'v1'
+  ]).slice(0, 16);
+
+  const spoor = path.join(os.tmpdir(), 'rtg-serverboot-' + process.pid + '.jsonl');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spoorboot-'));
+  const poort = await new Promise((res, rej) => {
+    const s = net.createServer(); s.unref(); s.on('error', rej);
+    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
+  });
+  const kind = spawn(process.execPath,
+    ['--experimental-sqlite', '--require', path.join(__dirname, 'lib', 'leesspoor.js'),
+      path.join(WORTEL, 'server', 'server.js')],
+    { cwd: WORTEL, stdio: ['ignore', 'ignore', 'ignore'],
+      env: Object.assign({}, process.env, { NODE_ENV: 'test', RTG_DEMO: '1', RTG_DEV_LINKS: '1',
+        SMTP_URL: '', RTG_DATA_DIR: map, PORT: String(poort),
+        RTG_LEESSPOOR: spoor, RTG_TOETS: 'zz-serverboot.test.js' }) });
+  const tot = Date.now() + 120000;
+  try {
+    for (;;) {
+      if (kind.exitCode != null) throw new Error('de server stopte tijdens het meten (exit ' + kind.exitCode + ')');
+      if (Date.now() > tot) throw new Error('de server werd niet klaar binnen 120 s');
+      const r = await fetch('http://127.0.0.1:' + poort + '/api/ready',
+        { headers: { 'X-Forwarded-Proto': 'https' } }).catch(() => null);
+      if (r && r.ok) break;
+      await new Promise(x => setTimeout(x, 100));
+    }
+    await new Promise(res => { kind.once('exit', res); kind.kill('SIGTERM');
+      setTimeout(() => { try { kind.kill('SIGKILL'); } catch (e) {} res(); }, 20000).unref(); });
+  } finally {
+    try { kind.kill('SIGKILL'); } catch (e) {}
+    try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
+  }
+  let paden = [];
+  try {
+    paden = [...new Set(fs.readFileSync(spoor, 'utf8').split('\n').filter(Boolean)
+      .map(r => { try { return JSON.parse(r).p; } catch (e) { return null; } })
+      .filter(p => p && /^(server|scripts|public|test)\//.test(p)))].sort();
+  } finally { try { fs.unlinkSync(spoor); } catch (e) {} }
+  /* Een lege of belachelijk korte lijst is geen "de server leest niets" maar een
+     kapotte meting; die hoort niet als waarheid het register in (LAT-regel 3). */
+  if (paden.length < 100) throw new Error('een kale serverboot las maar ' + paden.length
+    + ' bestanden; dat is geen meting maar een storing');
+  return { sleutel, paden };
+}
+
+/* HEEFT DEZE TOETS EEN SERVER GEDRAAID?
+
+   Niet "leest hij de helft van de bootlijst" -- dat was de eerste versie en die
+   herkende er twee van de 546. De bootlijst telt 3511 bestanden; wat een toets
+   ERBOVENOP leest is er hooguit een paar honderd. De vraag is dus andersom: valt
+   wat deze toets las grotendeels BINNEN de bootlijst?
+
+   Zit hij er ten onrechte bij, dan krijgt hij de bootpaden erbij van de graaf en
+   worden zijn afhankelijkheden groter -- de planner kiest hem dan vaker. Dat is
+   de goede kant om fout te zitten, en de reden dat deze drempel mag bestaan. */
+function heeftGeboot(overlap, eigenAantal) {
+  if (!eigenAantal || overlap < 100) return false;
+  return overlap >= eigenAantal * 0.6;
+}
+
+async function voegToe(spoorPad) {
   let regels = [];
   try { regels = fs.readFileSync(spoorPad, 'utf8').split('\n').filter(Boolean); }
   catch (e) { console.error('[leesspoor] geen spoor te lezen op ' + spoorPad + ': ' + e.message); process.exit(1); }
@@ -79,18 +163,56 @@ function voegToe(spoorPad) {
 
   const statisch = statischPerToets();
   const oud = leesRegister();
+
+  /* DE KALE SERVERBOOT ERUIT. Opnieuw meten als de sleutel niet meer klopt --
+     dan is er iets in server/ of public/ veranderd en zegt de oude lijst niets
+     meer. Lukt het meten niet, dan gaat het GEEN stilte worden: dan valt hij
+     terug op de vorige lijst en zegt hij dat erbij. */
+  let serverboot = (oud && oud.serverboot) || { sleutel: null, paden: [] };
+  try {
+    const vers = await meetServerboot();
+    if (vers.sleutel !== serverboot.sleutel) {
+      console.log('[leesspoor] kale serverboot opnieuw gemeten: ' + vers.paden.length + ' bestanden');
+    }
+    serverboot = vers;
+  } catch (e) {
+    console.error('[leesspoor] de kale serverboot kon NIET gemeten worden (' + e.message + '); ' +
+      'de vorige lijst van ' + serverboot.paden.length + ' bestanden blijft staan. Het register wordt ' +
+      'daardoor groter, niet onjuist.');
+  }
+  const bootSet = new Set(serverboot.paden);
+
   const toetsen = Object.assign({}, oud ? oud.toetsen : {});
+  const bootToetsen = new Set((oud && oud.serverbootVoor) || []);
   let nieuweKanten = 0;
   for (const [toets, gelezen] of waargenomen) {
     const bekend = statisch.get(toets) || new Set();
+    /* Heeft deze toets een server gestart? Dan erft hij de kale-bootlijst en
+       hoeven die 1360 paden niet nog een keer bij hem te staan. Herkenbaar aan
+       een ruime overlap met die lijst -- een toets die er de helft van leest,
+       heeft een server aan gehad. */
+    let overlap = 0;
+    for (const p of gelezen) if (bootSet.has(p)) overlap++;
+    const startteServer = heeftGeboot(overlap, gelezen.size);
+    if (startteServer) bootToetsen.add(toets);
+
     const extra = new Set(toetsen[toets] || []);
     for (const p of gelezen) {
       if (bekend.has(p) || extra.has(p)) continue;
+      if (startteServer && bootSet.has(p)) continue;
       /* Alleen bestanden die de planner ook KAN wegen: bron, geen uitvoer. */
       if (!/^(server|scripts|public|test)\//.test(p)) continue;
       extra.add(p); nieuweKanten++;
     }
     if (extra.size) toetsen[toets] = [...extra].sort();
+  }
+  /* En wat er al in het register stond en nu in de bootlijst zit, mag daar weg:
+     dat is geen kant die verdwijnt maar dezelfde kant op een plek waar hij een
+     keer staat in plaats van 546 keer. */
+  for (const toets of Object.keys(toetsen)) {
+    if (!bootToetsen.has(toets)) continue;
+    const zonder = toetsen[toets].filter(p => !bootSet.has(p));
+    if (zonder.length) toetsen[toets] = zonder; else delete toetsen[toets];
   }
 
   const stand = {
@@ -102,20 +224,70 @@ function voegToe(spoorPad) {
     gemetenOp: new Date().toISOString(),
     rondes: (oud && Number(oud.rondes) || 0) + 1,
     gemeten: { toetsenMetExtra: Object.keys(toetsen).length,
-      kantenTotaal: Object.values(toetsen).reduce((n, l) => n + l.length, 0), nieuweKantenDezeRonde: nieuweKanten },
+      kantenTotaal: Object.values(toetsen).reduce((n, l) => n + l.length, 0),
+      nieuweKantenDezeRonde: nieuweKanten,
+      serverbootPaden: serverboot.paden.length, toetsenMetServerboot: bootToetsen.size },
+    serverboot,
+    serverbootVoor: [...bootToetsen].sort(),
     toetsen
   };
   fs.writeFileSync(REGISTER, JSON.stringify(stand, null, 1) + '\n');
   console.log('[leesspoor] ronde ' + stand.rondes + ' toegevoegd: ' + nieuweKanten + ' nieuwe kanten, '
-    + stand.gemeten.kantenTotaal + ' totaal over ' + stand.gemeten.toetsenMetExtra + ' toetsen'
+    + stand.gemeten.kantenTotaal + ' eigen kanten over ' + stand.gemeten.toetsenMetExtra + ' toetsen, plus '
+    + serverboot.paden.length + ' kale-bootpaden voor ' + bootToetsen.size + ' toetsen'
     + (stuk ? '  (' + stuk + ' onleesbare regels overgeslagen)' : ''));
+}
+
+/* HERSCHIKKEN ZONDER NIEUWE RONDE. Het register van voor de kale-bootlijst had
+   749.950 kanten en 27 megabyte, met 1360 paden 546 keer opgeschreven. Dat hoeft
+   geen nieuwe ronde van achttien minuten te kosten om recht te zetten: de paden
+   staan er al, ze staan alleen op de verkeerde plek. Deze stap meet de kale boot
+   en haalt hem uit de toetsen die hem aantoonbaar hebben gedraaid.
+
+   Er verdwijnt geen enkele KANT: wat uit een toetslijst gaat, komt in de
+   gedeelde lijst terug, en scripts/lib/bewijsgraaf.js voegt die er weer bij. */
+async function herschik() {
+  const oud = leesRegister();
+  if (!oud) { console.error('[leesspoor] er is geen register om te herschikken.'); process.exit(1); }
+  const serverboot = await meetServerboot();
+  const bootSet = new Set(serverboot.paden);
+  const toetsen = {}; const bootToetsen = new Set((oud.serverbootVoor || []));
+  for (const [toets, lijst] of Object.entries(oud.toetsen || {})) {
+    const overlap = lijst.filter(p => bootSet.has(p)).length;
+    const startteServer = heeftGeboot(overlap, lijst.length);
+    if (startteServer) bootToetsen.add(toets);
+    const eigen = startteServer ? lijst.filter(p => !bootSet.has(p)) : lijst;
+    if (eigen.length) toetsen[toets] = eigen;
+  }
+  const stand = Object.assign({}, oud, {
+    gemetenOp: new Date().toISOString(),
+    gemeten: { toetsenMetExtra: Object.keys(toetsen).length,
+      kantenTotaal: Object.values(toetsen).reduce((n, l) => n + l.length, 0),
+      nieuweKantenDezeRonde: 0,
+      serverbootPaden: serverboot.paden.length, toetsenMetServerboot: bootToetsen.size },
+    serverboot, serverbootVoor: [...bootToetsen].sort(), toetsen
+  });
+  fs.writeFileSync(REGISTER, JSON.stringify(stand, null, 1) + '\n');
+  console.log('[leesspoor] herschikt: ' + stand.gemeten.kantenTotaal + ' eigen kanten over '
+    + stand.gemeten.toetsenMetExtra + ' toetsen, plus ' + serverboot.paden.length
+    + ' kale-bootpaden voor ' + bootToetsen.size + ' toetsen');
+}
+
+if (argv.includes('--herschik')) {
+  herschik().then(() => process.exit(0))
+    .catch(e => { console.error('[leesspoor] herschikken mislukt: ' + e.message); process.exit(1); });
+  return;
 }
 
 if (argv.includes('--vergeet')) {
   try { fs.unlinkSync(REGISTER); console.log('[leesspoor] register weg.'); } catch (e) { console.log('[leesspoor] er was niets.'); }
   process.exit(0);
 }
-if (spoorArg) { voegToe(spoorArg); process.exit(0); }
+if (spoorArg) {
+  voegToe(spoorArg).then(() => process.exit(0))
+    .catch(e => { console.error('[leesspoor] samenvoegen mislukt: ' + e.message); process.exit(1); });
+  return;
+}
 
 const r = leesRegister();
 if (!r) { console.log('Nog geen LEESSPOOR.json. Draai een ronde en voeg het spoor toe met --spoor.'); process.exit(0); }

@@ -240,10 +240,23 @@ function startEenServer(bestand) {
    - het register is geen VOORWAARDE. Zonder LEESSPOOR.json doet deze graaf
      precies wat hij deed -- met de oude blinde vlek, maar zonder te breken. */
 function leesspoorKanten(wortel) {
-  try {
-    const r = JSON.parse(fs.readFileSync(path.join(wortel, 'LEESSPOOR.json'), 'utf8'));
-    return (r && r.toetsen && typeof r.toetsen === 'object') ? r.toetsen : null;
-  } catch (e) { return null; }
+  let r;
+  try { r = JSON.parse(fs.readFileSync(path.join(wortel, 'LEESSPOOR.json'), 'utf8')); }
+  catch (e) { return null; }
+  if (!r || !r.toetsen || typeof r.toetsen !== 'object') return null;
+  /* DE KALE SERVERBOOT WORDT EEN KEER OPGESCHREVEN EN HIER WEER UITGEDEELD.
+
+     Elke server scant bij het opstarten public/ en tientallen kernmappen: 1360
+     bestanden. Die 546 keer in het register zetten gaf 750.000 kanten en 27
+     megabyte -- dezelfde waarheid, 546 keer. Ze staan er nu een keer, met de
+     lijst toetsen die hem aantoonbaar hebben gedraaid; hier komen ze er weer
+     bij, zodat de graaf precies dezelfde kanten ziet als voorheen. */
+  const boot = (r.serverboot && Array.isArray(r.serverboot.paden)) ? r.serverboot.paden : [];
+  const voor = Array.isArray(r.serverbootVoor) ? r.serverbootVoor : [];
+  if (!boot.length || !voor.length) return r.toetsen;
+  const uit = Object.assign({}, r.toetsen);
+  for (const toets of voor) uit[toets] = (uit[toets] || []).concat(boot);
+  return uit;
 }
 
 function graaf(opties) {

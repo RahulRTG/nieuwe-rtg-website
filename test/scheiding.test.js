@@ -234,8 +234,23 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
 
      In plaats van al die helpernamen op te sommen (een lijst die veroudert
      zodra iemand een nieuwe schrijft) herkennen we de VORM: de handler weigert
-     ergens met 401/403. Dat kan hij alleen als hij iets heeft gecontroleerd. */
-  const POORT_IN_BODY = /res\.status\(\s*40[13]\s*\)|(rtfSociaal|appSessie|profiel|eisAccount)\s*\(\s*req/;
+     ergens met 401/403. Dat kan hij alleen als hij iets heeft gecontroleerd.
+
+     `viaBeheerOfDirectie` staat er sinds 24 augustus bij, en met een reden die
+     hem NIET tot uitzondering maakt. Hij is de deur van de tenantlaag
+     (server/routes/tenant/poort.js): beheer-token OF een lid met het recht
+     `werkruimte`, en anders 400 of 403 -- allebei via bedrijf/deuren.js. De
+     vorm die deze scan zoekt staat er dus wel degelijk, alleen een bestand
+     verderop, en per-bestand lezen ziet dat niet. Precies dezelfde reden
+     waarom rtfSociaal, appSessie, profiel en eisAccount hier al staan.
+
+     Wat dit NIET wegneemt: de tweede eis blijft staan. Elke tenantroute moet de
+     identiteit uit DEZE request ook echt gebruiken, en dat doet hij --
+     `orgVan(w, res)` leidt de organisatie af uit de werkruimte van de beller en
+     nooit uit de body, en elke kernaanroep krijgt die org als eerste argument.
+     test/bijstandketen.test.js toets 6 bewijst dat over de lijn: de buurman
+     krijgt een 404 en geen 403, want een 403 bevestigt dat de sessie bestaat. */
+  const POORT_IN_BODY = /res\.status\(\s*40[13]\s*\)|(rtfSociaal|appSessie|profiel|eisAccount|viaBeheerOfDirectie)\s*\(\s*req/;
   /* SCIM is bij uitstek veelpartij: elke klant heeft een eigen sleutel en mag
      alleen bij zijn eigen mensen. Daarom staat scimAuth hier OOK -- zo eist de
      test verderop dat de handler req.scimOrg echt gebruikt, en is een SCIM-route

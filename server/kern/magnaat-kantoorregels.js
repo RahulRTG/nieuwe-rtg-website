@@ -58,6 +58,30 @@ const REGELS = [
      de functie niet, dekt de helft en meldt zich niet. */
   [/\/api\/tenant(?:\/|$)/, 'intern', 'Intern & IT'],
 
+  /* DE APP STORE, en met opzet TWEE regels en niet een -- om precies dezelfde
+     reden als de tenant control plane hierboven: dit kanaal doet twee dingen
+     met twee eigenaren, en een blanket-regel legt ze allebei bij de verkeerde.
+
+     HET GELD (de bon, de aanschaf, het btw-land van het lid, de afdracht en de
+     teruggave) hoort bij Financien, om dezelfde reden als elke andere
+     geldstroom in dit huis: er komt geen tweede boekhouding naast RTG Pay, dus
+     ook geen tweede eigenaar ervan. Een teruggaverecht dat een mens afhandelt,
+     is een financiele handeling en geen technische.
+
+     AL HET ANDERE -- de keuring, de cel, de brug, de bundelintegriteit, de
+     controleronde en wat er in de winkel van te zien is -- hoort bij Techniek &
+     De Wacht. Wat dit kanaal bijzonder maakt is niet dat er iets wordt verkocht
+     maar dat er CODE VAN BUITEN draait; wie dat toelaat en bewaakt, is dezelfde
+     ruimte die de storingen en de incidenten heeft. Bij Verkoop zou het niet
+     kloppen: die verkoopt geen vreemde code, en de vraag die hier fout kan gaan
+     is nooit een verkoopvraag.
+
+     Zonder deze twee regels viel het hele kanaal in de terugval, en die blijft
+     met opzet rood: onbekend werk hoort niet stilletjes bij Onderzoek te
+     belanden. Vijftig controlepunten stonden daardoor op 99,9%. */
+  [/appstore.*(?:bon|koop|landen|omzet|teruggave|afdracht|btw)/, 'financien', 'Financiën'],
+  [/appstore|appcel/, 'techniek', 'Techniek & De Wacht'],
+
   /* Geld, handel en groei. */
   [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen/, 'financien', 'Financiën'],
   [/marketing|campagne|analytics|\/merk/, 'marketing', 'Marketing'],

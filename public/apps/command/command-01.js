@@ -1,6 +1,6 @@
 /* RTG Command, deel 1: de schil.
 
-   ÉÉN APP, TIEN WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
+   ÉÉN APP, VIJFTIEN WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
    gedeelde kantoorgesprek, niet een eigen codeveld), de rail, het schakelen
    tussen werkplekken en de gedeelde hulpjes die de andere delen gebruiken.
 
@@ -65,8 +65,26 @@
      daarna besturen. De laatste twee (werk, journaal) zijn de spiegels. */
   var WERKPLEKKEN = [
     { id: 'puls', naam: 'Command Center', sec: 'Zien', teller: function (s) { return s.puls ? s.puls.domeinen.filter(function (d) { return d.stand !== 'in orde' && d.stand !== 'leeg'; }).length : 0; } },
+    /* De teller telt storingen EN wat opnieuw moet worden vastgesteld, en niet
+       wat "niet vast te stellen" is. Dat laatste is op een verse installatie
+       bijna alles, en een rail die dan permanent op elf staat, wordt genegeerd
+       -- terwijl vervallen bewijs juist iets is dat iemand kan wegwerken. */
+    { id: 'gezondheid', naam: 'Gezondheid', sec: 'Zien', teller: function (s) {
+      var g = s.start && s.start.gezondheid; if (!g || !g.tel) return 0;
+      return g.tel.storing + g.tel.moetOpnieuw; } },
     { id: 'zoek', naam: 'Zoek alles', sec: 'Zien' },
     { id: 'operator', naam: 'Operator', sec: 'Doen' },
+    /* Incidenten staan VOOR de uitzonderingen: een uitzondering is één geval
+       dat een mens moet beslissen, een incident is een vermogen dat het niet
+       doet. Dat tweede gaat voor. */
+    { id: 'incidenten', naam: 'Incidenten', sec: 'Doen', teller: function (s) {
+      var g = s.start && s.start.incidenten; return g ? g.open + g.bezig + g.wachtOpVerslag : 0; } },
+    /* Bijstand telt wat er op ONS wacht, niet wat er loopt: een sessie waarin
+       een klant zit te wachten tot iemand van RTG binnenkomt, is het enige wat
+       hier echt dringt. */
+    { id: 'bijstand', naam: 'Bijstand', sec: 'Doen', teller: function (s) {
+      var b = s.start && s.start.bijstand; return b && b.wachtOpRtg ? b.wachtOpRtg : 0; } },
+    { id: 'vloot', naam: 'De vloot', sec: 'Zien' },
     { id: 'zaken', naam: 'Uitzonderingen', sec: 'Doen', teller: function (s) { return s.puls ? s.puls.zaken.open : 0; } },
     { id: 'herstel', naam: 'Herstel', sec: 'Doen', teller: function (s) { return s.puls ? s.puls.herstel.kandidaten : 0; } },
     { id: 'beleid', naam: 'Beleid', sec: 'Besturen', teller: function (s) { return s.puls ? s.puls.beleid.voorstellenOpen : 0; } },

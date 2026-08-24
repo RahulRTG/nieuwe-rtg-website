@@ -115,8 +115,27 @@ test('het spoor VOEGT alleen kanten toe: geen toets verlaat de bak "draait altij
      Ik had dat zelf eerst fout: de kanten stonden erbij voordat het oordeel viel.
      Deze bewering is de reden dat het opviel. */
   const { graaf } = require('../scripts/lib/bewijsgraaf.js');
-  const met = graaf();
   const zonder = graaf({ zonderSpoor: true });
+
+  /* EEN SPOOR DAT HET WEL ZOU KUNNEN. Het echte register raakt vandaag alleen
+     toetsen die toch al statische afhankelijkheden hebben, en dan kan deze
+     bewering niet uitslaan -- een toets die niet kan zakken, meet niets
+     (LAT-regel 9). Dus krijgt de graaf hier een VERZONNEN spoor mee dat precies
+     de gevaarlijke vorm heeft: een toets die NU in "draait altijd" zit, met een
+     waargenomen lezing erbij. Zou het spoor het oordeel raken, dan zou hij die
+     bak nu verlaten. */
+  const kandidaat = zonder.altijd.find(n => (zonder.perToets.get(n) || {}).soort === 'onbekend');
+  assert.ok(kandidaat, 'er hoort minstens een toets zonder statische afhankelijkheden te zijn; ' +
+    'zonder zo\'n toets kan deze bewering niet uitslaan');
+  const verzonnen = graaf({ spoor: { [kandidaat]: ['server/db/opslag.js'] } });
+  assert.ok(verzonnen.altijd.includes(kandidaat),
+    kandidaat + ' heeft geen enkele require en hoort dus ALTIJD te draaien. Een waargenomen lezing ' +
+    'erbij mag hem daar niet uit tillen: dan gaat hij van "draait altijd" naar "draait soms" op ' +
+    'grond van een ondergrens, en haalt de meting een garantie weg in plaats van er een toe te voegen.');
+  assert.equal((verzonnen.perToets.get(kandidaat) || {}).soort, 'onbekend',
+    'en zijn soort hoort onbekend te blijven: dat is een statische vraag');
+
+  const met = graaf();
   assert.deepEqual(met.altijd, zonder.altijd,
     'het leesspoor hoort de bak "draait altijd" ONGEMOEID te laten. Wordt hij kleiner, dan slaat de ' +
     'planner voortaan toetsen over omdat een MEETRONDE toevallig een pad niet nam.');

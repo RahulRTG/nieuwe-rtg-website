@@ -88,7 +88,13 @@ per onderdeel staat er of het **staat**, **een stap weg** is, **een besluit
 vraagt** of **jaren weg** is — zodat niemand die vier voor elkaar aanziet. De
 belangrijkste zin staat in paragraaf 2: **een universeel objectmodel moet worden
 GEVONDEN in de domeinen, niet eroverheen verklaard** — dat is precies de fout die
-de oude super-app-regel al een keer heeft voorkomen.
+de oude super-app-regel al een keer heeft voorkomen. **Die meting is gedaan**
+(`scripts/objectmodel.js`, `OBJECTMODEL.json`) en de uitkomst is streng: 71% van
+de velden hoort bij precies één domein, en **`Asset` bestaat niet** — tafel,
+kamer, podium en leaseauto delen niets buiten hun verpakking. Wat er wél uitkwam
+zijn vier kandidaten, waarvan er één de drempel haalt: een **ontwerpopdracht**,
+gedeeld door architect, atelier, hardwarelab en studio. Voeg geen type toe dat
+niet uit die meting komt.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

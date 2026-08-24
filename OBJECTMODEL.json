@@ -1,0 +1,772 @@
+{
+  "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
+  "vastgelegd": "2026-08-24",
+  "gemeten": {
+    "bestanden": 1442,
+    "vormen": 1140,
+    "velden": 1661,
+    "modules": 581,
+    "domeinen": 216,
+    "envelopDrempel": 13,
+    "envelop": 35,
+    "veldenDomeineigen": 1179,
+    "veldenGedeeldVanafVier": 155,
+    "gelijkendeVormparen": 16
+  },
+  "envelop": [
+    "aantal",
+    "at",
+    "bedrag",
+    "bron",
+    "categorie",
+    "centen",
+    "code",
+    "codenaam",
+    "datum",
+    "door",
+    "gemaakt",
+    "icon",
+    "id",
+    "key",
+    "label",
+    "naam",
+    "naar",
+    "notitie",
+    "omschrijving",
+    "prijs",
+    "reden",
+    "ref",
+    "sinds",
+    "soort",
+    "status",
+    "supplierCode",
+    "tekst",
+    "tijd",
+    "titel",
+    "tot",
+    "type",
+    "uitleg",
+    "van",
+    "wat",
+    "wie"
+  ],
+  "gedeeld": [
+    {
+      "veld": "stand",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/bureau",
+        "kern/command",
+        "kern/concern",
+        "kern/eten",
+        "kern/gast"
+      ]
+    },
+    {
+      "veld": "aan",
+      "domeinen": 11,
+      "waar": [
+        "kern/afdelingen",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/klok",
+        "kern/lidboard",
+        "kern/pay"
+      ]
+    },
+    {
+      "veld": "vanMij",
+      "domeinen": 11,
+      "waar": [
+        "kern/berichten",
+        "kern/bestanden",
+        "kern/genootschap",
+        "kern/meet",
+        "kern/metier",
+        "kern/muziek"
+      ]
+    },
+    {
+      "veld": "op",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/bestanden",
+        "kern/bureau",
+        "kern/galerij",
+        "kern/gedachten",
+        "kern/klok"
+      ]
+    },
+    {
+      "veld": "eenheid",
+      "domeinen": 11,
+      "waar": [
+        "kern/boerderij",
+        "kern/command",
+        "kern/groothandel",
+        "kern/keuken",
+        "kern/life",
+        "kern/magnaat-partnerstudio-bedrijf"
+      ]
+    },
+    {
+      "veld": "vraag",
+      "domeinen": 10,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/command",
+        "kern/livinglab",
+        "kern/magnaat-economenlab-rapport",
+        "kern/magnaat-economie",
+        "kern/magnaatwereld"
+      ]
+    },
+    {
+      "veld": "klaar",
+      "domeinen": 10,
+      "waar": [
+        "kern/afdelingen",
+        "kern/beveiliging",
+        "kern/borden",
+        "kern/eten",
+        "kern/magnaat-partnerstudio-basis",
+        "kern/muziek"
+      ]
+    },
+    {
+      "veld": "af",
+      "domeinen": 10,
+      "waar": [
+        "kern/afdelingen",
+        "kern/bank",
+        "kern/klok",
+        "kern/leren",
+        "kern/livinglab",
+        "kern/rtfclubs"
+      ]
+    },
+    {
+      "veld": "doel",
+      "domeinen": 10,
+      "waar": [
+        "kern/appstore",
+        "kern/defensie",
+        "kern/labfonds",
+        "kern/magnaat-trainingslobby",
+        "kern/rtfclubs",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "sleutel",
+      "domeinen": 10,
+      "waar": [
+        "kern/appstore",
+        "kern/concern",
+        "kern/magnaat-capabilities",
+        "kern/magnaatwereld",
+        "kern/mailsleutel",
+        "kern/mailwachtrij"
+      ]
+    },
+    {
+      "veld": "waarde",
+      "domeinen": 10,
+      "waar": [
+        "kern/assets",
+        "kern/bureau",
+        "kern/command",
+        "kern/concern",
+        "kern/levensgraaf",
+        "kern/onboarding"
+      ]
+    },
+    {
+      "veld": "actief",
+      "domeinen": 10,
+      "waar": [
+        "kern/bank",
+        "kern/beveiliging",
+        "kern/command",
+        "kern/concern",
+        "kern/livinglab",
+        "kern/mall"
+      ]
+    },
+    {
+      "veld": "niveau",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/geldgraaf",
+        "kern/levenslijn",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "land",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/concern",
+        "kern/labfonds",
+        "kern/ledenbalie",
+        "kern/livinglab",
+        "kern/magnaatwereld"
+      ]
+    },
+    {
+      "veld": "open",
+      "domeinen": 10,
+      "waar": [
+        "kern/concern",
+        "kern/labfonds",
+        "kern/livinglab",
+        "kern/luchthaven",
+        "kern/mall",
+        "kern/samenwerking"
+      ]
+    },
+    {
+      "veld": "vervalt",
+      "domeinen": 9,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/command",
+        "kern/koppel",
+        "kern/levensband",
+        "kern/levensgraaf",
+        "kern/munten"
+      ]
+    },
+    {
+      "veld": "besluit",
+      "domeinen": 9,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/appstore",
+        "kern/gemeente",
+        "kern/labfonds",
+        "kern/ledenbalie-zaken",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "capaciteit",
+      "domeinen": 9,
+      "waar": [
+        "kern/alpine-demo",
+        "kern/clubs",
+        "kern/gebouw-demo",
+        "kern/mobiliteit",
+        "kern/rtfos",
+        "kern/spellen"
+      ]
+    },
+    {
+      "veld": "zaak",
+      "domeinen": 9,
+      "waar": [
+        "kern/appstore",
+        "kern/avond",
+        "kern/bureau",
+        "kern/fiscaal",
+        "kern/mobiliteit",
+        "kern/overheid"
+      ]
+    },
+    {
+      "veld": "prijsCenten",
+      "domeinen": 9,
+      "waar": [
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/eten",
+        "kern/geloofbieb",
+        "kern/reisbieb",
+        "kern/rtfbieb"
+      ]
+    },
+    {
+      "veld": "soortLabel",
+      "domeinen": 9,
+      "waar": [
+        "kern/bank",
+        "kern/boerderij",
+        "kern/concern",
+        "kern/gemeente",
+        "kern/mall",
+        "kern/overheid"
+      ]
+    },
+    {
+      "veld": "waarom",
+      "domeinen": 9,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/concern",
+        "kern/gewoonten",
+        "kern/livinglab",
+        "kern/onderneming"
+      ]
+    },
+    {
+      "veld": "wanneer",
+      "domeinen": 9,
+      "waar": [
+        "kern/checklijst",
+        "kern/defensie",
+        "kern/hulpdienst",
+        "kern/levenslijn",
+        "kern/mall",
+        "kern/onderneming"
+      ]
+    },
+    {
+      "veld": "voor",
+      "domeinen": 9,
+      "waar": [
+        "kern/command",
+        "kern/creator",
+        "kern/koppel",
+        "kern/livinglab",
+        "kern/office",
+        "kern/overheid"
+      ]
+    },
+    {
+      "veld": "ok",
+      "domeinen": 9,
+      "waar": [
+        "kern/koppel",
+        "kern/leren",
+        "kern/mailaanname",
+        "kern/mailsleutel",
+        "kern/mailwachtrij",
+        "kern/ontmoeting"
+      ]
+    },
+    {
+      "veld": "onderwerp",
+      "domeinen": 9,
+      "waar": [
+        "bedrijf",
+        "kern/mailwachtrij",
+        "kern/postdatum",
+        "kern/rtfos",
+        "kern/rtmail",
+        "kern/rtmail-bewaar"
+      ]
+    },
+    {
+      "veld": "versie",
+      "domeinen": 8,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/livinglab",
+        "kern/rijksbieb"
+      ]
+    },
+    {
+      "veld": "totaal",
+      "domeinen": 8,
+      "waar": [
+        "kern/assets",
+        "kern/command",
+        "kern/facturatie",
+        "kern/magnaat-dekkingsmatrix",
+        "kern/mobiliteit",
+        "kern/onderneming"
+      ]
+    },
+    {
+      "veld": "opties",
+      "domeinen": 8,
+      "waar": [
+        "kern/autoverkoop",
+        "kern/concern",
+        "kern/eten",
+        "kern/gast",
+        "kern/horeca",
+        "kern/magnaat-werkroutefabriek"
+      ]
+    },
+    {
+      "veld": "duurMin",
+      "domeinen": 8,
+      "waar": [
+        "kern/avond",
+        "kern/care",
+        "kern/gemeente",
+        "kern/leverancier",
+        "kern/mall",
+        "kern/trainingsschema"
+      ]
+    },
+    {
+      "veld": "actie",
+      "domeinen": 8,
+      "waar": [
+        "bedrijf",
+        "kern/bankregie",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/magnaat-controle",
+        "kern/rtmail-regels"
+      ]
+    },
+    {
+      "veld": "rol",
+      "domeinen": 8,
+      "waar": [
+        "kern/concern",
+        "kern/livinglab",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "toelichting",
+      "domeinen": 8,
+      "waar": [
+        "kern/koppel",
+        "kern/levenslijn",
+        "kern/muziek-uitgave",
+        "kern/overheid",
+        "kern/regering",
+        "kern/stadsweefsel"
+      ]
+    },
+    {
+      "veld": "geldigTot",
+      "domeinen": 7,
+      "waar": [
+        "bedrijf",
+        "kern/aanmeldingen",
+        "kern/concern",
+        "kern/mobiliteit",
+        "kern/rtfos",
+        "kern/wallet"
+      ]
+    },
+    {
+      "veld": "doelgroep",
+      "domeinen": 7,
+      "waar": [
+        "kern/afdelingen",
+        "kern/geloofbieb",
+        "kern/magnaatwereld",
+        "kern/rtfos",
+        "kern/stadsweefsel",
+        "kern/thuis"
+      ]
+    },
+    {
+      "veld": "plek",
+      "domeinen": 7,
+      "waar": [
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/hulpdienst",
+        "kern/mall",
+        "kern/rtfos",
+        "kern/veiligheid"
+      ]
+    },
+    {
+      "veld": "detail",
+      "domeinen": 7,
+      "waar": [
+        "kern/afdelingen",
+        "kern/bureau",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-partnerstudio-basis",
+        "kern/magnaat-trainingslobby"
+      ]
+    },
+    {
+      "veld": "kamer",
+      "domeinen": 7,
+      "waar": [
+        "kern/afdelingen",
+        "kern/bureau",
+        "kern/gast",
+        "kern/homemerken",
+        "kern/levensgraaf",
+        "kern/magnaat-trainingslobby-regie"
+      ]
+    },
+    {
+      "veld": "waar",
+      "domeinen": 7,
+      "waar": [
+        "bedrijf",
+        "kern/afdelingen",
+        "kern/antivirus",
+        "kern/assets",
+        "kern/bureau",
+        "kern/hoteldorp"
+      ]
+    },
+    {
+      "veld": "regels",
+      "domeinen": 7,
+      "waar": [
+        "kern/agent",
+        "kern/facturatie",
+        "kern/gast",
+        "kern/magnaat-economie",
+        "kern/mall",
+        "kern/vakwerk"
+      ]
+    }
+  ],
+  "paren": [
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/command/runbookcatalogus.js",
+      "b": "server/kern/zaakcommand/runbooks.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "actie",
+        "klantImpact",
+        "oorzaak",
+        "past",
+        "terugDraaibaar",
+        "veld"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/command/index.js",
+      "b": "server/kern/zaakcommand/beeld.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "niveau",
+        "score",
+        "vierOgen",
+        "waarom",
+        "waaromNiet"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
+      "gedeeld": [
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/webplatform-live.js",
+      "b": "server/kern/webplatform.js",
+      "domeinA": "kern/webplatform-live",
+      "domeinB": "kern/webplatform",
+      "gedeeld": [
+        "lk",
+        "lt",
+        "rk",
+        "rt"
+      ]
+    },
+    {
+      "gelijkenis": 0.86,
+      "a": "server/kern/command/runbookcatalogus.js",
+      "b": "server/kern/zaakcommand/runbooks.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "actie",
+        "klantImpact",
+        "oorzaak",
+        "past",
+        "terugDraaibaar",
+        "veld"
+      ]
+    },
+    {
+      "gelijkenis": 0.83,
+      "a": "server/kern/tenant/brug.js",
+      "b": "server/bedrijf/leden.js",
+      "domeinA": "kern/tenant",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "afdeling",
+        "extern",
+        "functie",
+        "rollen",
+        "token"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
+      "gedeeld": [
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
+      ]
+    },
+    {
+      "gelijkenis": 0.78,
+      "a": "server/kern/mall/demozaken.js",
+      "b": "server/kern/retail/vloer.js",
+      "domeinA": "kern/mall",
+      "domeinB": "kern/retail",
+      "gedeeld": [
+        "drop",
+        "foto",
+        "materiaal",
+        "price",
+        "publiekePrijs",
+        "sku",
+        "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.75,
+      "a": "server/kern/architect/index.js",
+      "b": "server/kern/atelier/index.js",
+      "domeinA": "kern/architect",
+      "domeinB": "kern/atelier",
+      "gedeeld": [
+        "brief",
+        "collectie",
+        "concept",
+        "huis",
+        "kritiek",
+        "updatedAt"
+      ]
+    },
+    {
+      "gelijkenis": 0.75,
+      "a": "server/kern/architect/index.js",
+      "b": "server/kern/hardwarelab/index.js",
+      "domeinA": "kern/architect",
+      "domeinB": "kern/hardwarelab",
+      "gedeeld": [
+        "brief",
+        "collectie",
+        "concept",
+        "huis",
+        "kritiek",
+        "updatedAt"
+      ]
+    },
+    {
+      "gelijkenis": 0.75,
+      "a": "server/kern/architect/index.js",
+      "b": "server/kern/studio/index.js",
+      "domeinA": "kern/architect",
+      "domeinB": "kern/studio",
+      "gedeeld": [
+        "brief",
+        "collectie",
+        "concept",
+        "huis",
+        "kritiek",
+        "updatedAt"
+      ]
+    },
+    {
+      "gelijkenis": 0.75,
+      "a": "server/kern/atelier/index.js",
+      "b": "server/kern/hardwarelab/index.js",
+      "domeinA": "kern/atelier",
+      "domeinB": "kern/hardwarelab",
+      "gedeeld": [
+        "brief",
+        "collectie",
+        "concept",
+        "huis",
+        "kritiek",
+        "updatedAt"
+      ]
+    },
+    {
+      "gelijkenis": 0.75,
+      "a": "server/kern/atelier/index.js",
+      "b": "server/kern/studio/index.js",
+      "domeinA": "kern/atelier",
+      "domeinB": "kern/studio",
+      "gedeeld": [
+        "brief",
+        "collectie",
+        "concept",
+        "huis",
+        "kritiek",
+        "updatedAt"
+      ]
+    },
+    {
+      "gelijkenis": 0.75,
+      "a": "server/kern/hardwarelab/index.js",
+      "b": "server/kern/studio/index.js",
+      "domeinA": "kern/hardwarelab",
+      "domeinB": "kern/studio",
+      "gedeeld": [
+        "brief",
+        "collectie",
+        "concept",
+        "huis",
+        "kritiek",
+        "updatedAt"
+      ]
+    },
+    {
+      "gelijkenis": 0.67,
+      "a": "server/kern/tenant/brug.js",
+      "b": "server/bedrijf/leden.js",
+      "domeinA": "kern/tenant",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "afdeling",
+        "extern",
+        "functie",
+        "rollen"
+      ]
+    },
+    {
+      "gelijkenis": 0.63,
+      "a": "server/kern/gast/order-beeld.js",
+      "b": "server/kern/horeca/regel.js",
+      "domeinA": "kern/gast",
+      "domeinB": "kern/horeca",
+      "gedeeld": [
+        "allergenen",
+        "allergie",
+        "gang",
+        "gastNr",
+        "happy",
+        "ingredienten",
+        "itemId",
+        "lijstprijs",
+        "opties",
+        "stand"
+      ]
+    }
+  ]
+}

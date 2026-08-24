@@ -115,8 +115,62 @@ Zonder die meting is `Asset` een aanname, en aannames over gedeelde vorm zijn in
 dit huis al een keer fout geweest. Mét die meting is het een van de sterkste
 onderdelen van het hele plan.
 
-**Dit is de eerste echte opdracht van de Developer Cloud**, en het is meetwerk
-en geen ontwerpwerk.
+### De meting is gedaan. Dit kwam eruit.
+
+`scripts/objectmodel.js` leest per module de vormen die hij wegschrijft (een
+object met een `id` en vier of meer velden), trekt de **envelop** eraf — de
+velden die zoveel domeinen delen dat ze verpakking zijn en geen type — en kijkt
+dan pas welke vormen uit VERSCHILLENDE domeinen op elkaar lijken. De uitkomst
+staat in `OBJECTMODEL.json`; `test/objectmodel.test.js` bewaakt dat hij meet wat
+hij zegt te meten.
+
+```
+1140 bewaarde vormen, 581 modules, 216 domeinen, 1661 verschillende velden
+  35 velden zijn envelop (aantal at bron code datum door id naam status ...)
+1179 van 1661 velden (71%) horen bij PRECIES EEN domein
+  16 vormparen uit verschillende domeinen lijken op elkaar
+```
+
+**Er is geen universeel objectmodel in deze code.** Zeventig procent van de
+velden woont in één domein, en van 1140 vormen zijn er zestien paren die na
+aftrek van de envelop nog op elkaar lijken. De 155 velden die vier of meer
+domeinen delen, zijn bij inspectie gewone woorden — `stand`, `aan`, `op`, `af`,
+`klaar`, `doel`, `waarde`, `actief` — en geen gedeelde betekenis.
+
+**En `Asset` bestaat niet.** Dat is geen blinde vlek maar een uitkomst: de
+vormen zijn wél gemeten. Een tafel komt in 4 domeinen voor, een kamer in 15, een
+voertuig in 11, een podium in 1 — en géén van die vier vormt met een van de
+andere een gelijkend paar. Tafel, kamer, podium en leaseauto delen in deze
+codebase niets buiten hun verpakking. Precies wat `PLATFORM.md` bij Cercle en
+Entourage al liet zien.
+
+### Maar er kwamen vier échte kandidaten uit, en dat is de winst
+
+| kandidaat | domeinen | gedeelde velden |
+|---|---|---|
+| **een ontwerpopdracht** | `architect`, `atelier`, `hardwarelab`, `studio` | `brief concept collectie huis kritiek updatedAt` |
+| **een product** | `mall`, `retail` | `sku price publiekePrijs varianten foto materiaal drop` |
+| **een rol bij een organisatie** | `tenant`, `bedrijf` | `afdeling functie rollen extern token` |
+| **een besteld item** | `gast`, `horeca` | `itemId opties gang allergenen lijstprijs stand` |
+
+De eerste haalt de drempel die par. 2 zelf stelde: **vier domeinen delen hem, en
+niet zijn verpakking maar zijn kern.** Dat is het eerste echte objecttype van de
+Developer Cloud, en het is niet wat iemand had geraden: geen `Asset` maar een
+`Ontwerpopdracht`. Dat is precies waarom er is gemeten.
+
+### En de meting vond nog iets, ongevraagd
+
+`kern/command` en `kern/zaakcommand` delen twee vormen met gelijkenis **1,00**:
+`actie klantImpact oorzaak past terugDraaibaar veld` en `niveau score vierOgen
+waarom waaromNiet`. Dat zijn geen twee domeinen die een type delen — dat is
+hetzelfde ding dat twee keer is gebouwd. Dat hoort in `TAKEN.md` en niet in een
+SDK; het staat hier omdat een meting die alleen vindt waar hij naar zocht, niet
+goed genoeg kijkt.
+
+**Fase 1 is daarmee af.** Wat er volgt is niet "bouw het objectmodel" maar: neem
+de vier kandidaten, open per kandidaat de betrokken modules, en beslis per stuk
+of de gedeelde velden ook een gedeelde BETEKENIS hebben. Een gedeelde naam is dat
+niet, en dat blijft de reden dat een mens dit beslist en geen script.
 
 ---
 
@@ -220,7 +274,7 @@ is wat de rest MOGELIJK maakt.
 
 | fase | wat | waarom eerst |
 |---|---|---|
-| **1. Het objectmodel meten** (par. 2) | tel welke velden echte domeinen delen | zonder dit is elke SDK een gok, en een SDK die je terugneemt is erger dan geen SDK |
+| ~~**1. Het objectmodel meten**~~ ✅ | `scripts/objectmodel.js` + `OBJECTMODEL.json`; de uitkomst staat in par. 2 | zonder dit is elke SDK een gok, en een SDK die je terugneemt is erger dan geen SDK |
 | **2. Capabilities met een doel** | een aanroep zegt WAT en WAARVOOR, een weigering legt uit waarom | dit is de kern van punt 10, 11, 22, 26 en 97 tegelijk, en het verdiept het bestaande machtigingsmodel in plaats van er een tweede naast te zetten |
 | **3. De vergunningsdiff** | een nieuwe versie die MEER vraagt, vraagt opnieuw | zonder dit kan een app stilletjes groeien in bevoegdheden -- vandaag een gat |
 | **4. De SDK en de CLI** | `rtg new`, `rtg dev`, typings, één foutmodel | pas zinvol als 1 t/m 3 staan; anders codificeert hij het verkeerde |
@@ -229,8 +283,10 @@ is wat de rest MOGELIJK maakt.
 | **7. Enterprise: private catalogus, policy-as-code, deployment** | punten 31 t/m 35, 70 t/m 74 | leunt volledig op `org` uit TENANT.md, die staat |
 | **8. Serverside extensies** | punt 86/87/88 | eigen document, eigen bewijslast (par. 3.4) |
 
-**Fase 2 en 3 zijn hieronder al begonnen** (zie `APPSTORE.md`); fase 1 is de
-eerste echte opdracht en is meetwerk.
+**Fase 1, 2 en 3 staan.** Fase 1 is gemeten (par. 2), fase 2 en 3 zijn gebouwd
+(zie `APPSTORE.md`: het doel bij een machtiging, en de vergunningsdiff). Fase 4
+is de eerstvolgende, en hij kan nu ook: een SDK die de vier kandidaten uit par. 2
+als eerste types neemt, is gebouwd op een meting in plaats van op een aanname.
 
 ---
 

@@ -1899,7 +1899,7 @@ const kern = {
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, betaalWaarheid, betaalRegie, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
-  crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
+  crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,

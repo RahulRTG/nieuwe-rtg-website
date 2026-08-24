@@ -261,8 +261,13 @@ test('na verwijderen is het account echt weg', async () => {
 test('de bezem door de hele database: geen sleutel, codenaam of naam meer', async () => {
   /* De server heeft zijn eigen kopie in het geheugen; we lezen wat er op schijf
      staat, want dat is wat na een herstart terugkomt en wat in een backup
-     belandt. Dat is de eerlijke maat voor "weg". */
-  await wacht(600);
+     belandt. Dat is de eerlijke maat voor "weg".
+
+     BEWUST GEEN WACHTTIJD. De verwijderroute heeft al succes gemeld. Als de
+     opslag dan nog moet landen, was dat antwoord te vroeg en kan een directe
+     herstart of backup het verwijderde lid terughalen. Onder de volledige
+     parallelle suite gebeurde precies dat; solo verborg de vroegere 600 ms
+     wachttijd de race meestal. */
   const bestand = path.join(TMP, 'db.json');
   assert.ok(fs.existsSync(bestand), 'er staat een databasebestand: ' + bestand);
   const data = JSON.parse(fs.readFileSync(bestand, 'utf8'));

@@ -31,7 +31,7 @@
    de HELE database en rekenen af wat er nog van het lid in staat -- voor elke
    pas apart, want een Lifestyle-lid heeft takken die een RTG-lid niet heeft. */
 module.exports = function maakVergeten(kern) {
-  const { db, save, accounts, sessions, forgetSession, fs, path, UPLOAD_DIR,
+  const { db, save, bijeen, accounts, sessions, forgetSession, fs, path, UPLOAD_DIR,
     broadcastSync, gidsWeg, liveCodename, media, bestanden } = kern;
   /* Het lidboard staat onder een eigen naam op de kern; alleen het wissen van
      het logboek is hier nodig. */
@@ -123,7 +123,19 @@ module.exports = function maakVergeten(kern) {
        nodig is). Wat overblijft is de-geidentificeerd. */
     // alle sessies van dit lid uitloggen
     for (const [h, sess] of sessions) if (sess.key === key) forgetSession(h);
-    save();
+    /* EEN SUCCESANTWOORD BETEKENT HIER OOK: OP SCHIJF.
+
+       De gewone save() is write-behind. Onder de volledige parallelle suite
+       bleek daardoor dat /api/privacy/delete al 200 teruggaf terwijl db.json
+       nog alle persoonsgegevens en zelfs het vakbewijs bevatte. Een losse
+       wachttijd in de test maskeert die race; een herstart of backup kan hem in
+       productie net zo goed raken.
+
+       De bestaande duurzame bundel houdt save() het ene mutatiepunt en dwingt
+       daarna de opslag af voordat wisLid terugkeert. Daarmee geldt voor een
+       definitieve AVG-wissing dezelfde simpele waarheid als voor geld en eigen
+       werk: bevestigd is vastgelegd. */
+    await bijeen(() => { save(); }, { duurzaam: true });
     broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
     /* En dan pas de bytes. Ná save(), zodat een fout in de opslag (S3 even
        onbereikbaar) de administratieve wissing niet terugdraait: het lid is dan

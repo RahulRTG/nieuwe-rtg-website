@@ -3084,7 +3084,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
-    ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen']
+    ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen'],
+    ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

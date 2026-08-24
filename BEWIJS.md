@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1076 |
 | losse beweringen (`test(...)`) | 7171 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 892 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 908 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 23 |
-| niets van beide | 113 |
+| alleen in de kop *genoemd*, nog niet gemeten | 19 |
+| niets van beide | 101 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -298,26 +298,26 @@ toets omvalt.
 | `herstelproef.test.js` | 3 | gezakt op `liegpoort /api/` | HERSTELPROEF -- werkt de backup echt, of nemen we dat aan? Een backup die je nooit hebt teruggezet is geen backup maar een aanname. |
 | `herstelzondertelefoon.test.js` | 2 | gezakt op `liegpoort /api/` | HERSTELLEN MOET KUNNEN, OOK ZONDER TELEFOONNUMMER. WAT ER MISGING. |
 | `homekit.test.js` | 5 | gezakt op `liegpoort /api/` | De RTG Home Kit: alle elektronica op een plek, scenes met AI-hulp, en de vaste veiligheidsregel dat sloten nooit via een scene of de AI gaan. |
-| `horeca-bar.test.js` | 8 | -- | RTG Horeca: DE BAR -- welke drankgolf moet nu gemaakt worden? Een bar is geen keuken met andere gerechten. |
+| `horeca-bar.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Horeca: DE BAR -- welke drankgolf moet nu gemaakt worden? Een bar is geen keuken met andere gerechten. |
 | `horeca-bezorg-club.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 3: de eigen bezorgdienst en de club. Wat hier bewezen wordt: - een adres buiten de zone krijgt een REDEN, geen kale weigering; - de capaciteitsrem telt in keukenminuten en noemt het eerstvolgende... |
-| `horeca-cadans.test.js` | 7 | -- | RTG Horeca: de cadans -- terugrekenen vanaf het serveermoment. Wat hier bewezen wordt, en waarom juist dat: 1. |
-| `horeca-dienstmeting.test.js` | 6 | -- | RTG Horeca: DE DIENSTMETING -- de meetlat, met wat er werkelijk gemeten is. Onderaan HORECA.md staat een meetlat met twaalf regels, en naast elke regel stond een LAT ("0", "structureel kleiner") en nergens een getal. |
-| `horeca-edge.test.js` | 6 | -- | RTG Horeca: VENUE EDGE -- de bestelling die zonder lijn is opgenomen. De kassa had zijn offline-rij al; de zaal en de PDA niet, en daar zat een echte reden onder: een kassabon is EEN verzoek, een rekening leeft over... |
-| `horeca-gezelschap.test.js` | 10 | genoemd | RTG Horeca: het gezelschap aan een rekening, van de kant van de BEDIENING. De data bestond al -- een rekening kent `deelnemers`, een regel kent `gastNr`, en kern/gast/verdeling.js splitst er al mee. |
-| `horeca-host.test.js` | 5 | -- | RTG Horeca: DE ROLMODUS HOST -- de aankomststroom als vijfde taakbron. De werklijst kende vier bronnen: een gastverzoek, de pas, een gebroken belofte en een tafel zonder bestelling. |
+| `horeca-cadans.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Horeca: de cadans -- terugrekenen vanaf het serveermoment. Wat hier bewezen wordt, en waarom juist dat: 1. |
+| `horeca-dienstmeting.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Horeca: DE DIENSTMETING -- de meetlat, met wat er werkelijk gemeten is. Onderaan HORECA.md staat een meetlat met twaalf regels, en naast elke regel stond een LAT ("0", "structureel kleiner") en nergens een getal. |
+| `horeca-edge.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Horeca: VENUE EDGE -- de bestelling die zonder lijn is opgenomen. De kassa had zijn offline-rij al; de zaal en de PDA niet, en daar zat een echte reden onder: een kassabon is EEN verzoek, een rekening leeft over... |
+| `horeca-gezelschap.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Horeca: het gezelschap aan een rekening, van de kant van de BEDIENING. De data bestond al -- een rekening kent `deelnemers`, een regel kent `gastNr`, en kern/gast/verdeling.js splitst er al mee. |
+| `horeca-host.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Horeca: DE ROLMODUS HOST -- de aankomststroom als vijfde taakbron. De werklijst kende vier bronnen: een gastverzoek, de pas, een gebroken belofte en een tafel zonder bestelling. |
 | `horeca-hotel-event.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 4: de gastrekening van het hotel en de zakelijke kant van een event. Wat hier bewezen wordt: - op de kamer boeken kan alleen als daar een open gastrekening staat, en een restaurantrekening die op... |
-| `horeca-journey.test.js` | 4 | -- | RTG Horeca: de gastreis-toren, en de regel die hem verbouwde. HORECA.md grens 7: WAT NIET GEMETEN IS, WORDT NIET ALS GETAL GETOOND. |
-| `horeca-kaart.test.js` | 5 | -- | RTG Horeca: DE KAART VAN EEN ZAAK -- één opbouw, twee deuren. De kaart stond in routes/gast/tafel.js en werd aan de kern gehangen. |
+| `horeca-journey.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Horeca: de gastreis-toren, en de regel die hem verbouwde. HORECA.md grens 7: WAT NIET GEMETEN IS, WORDT NIET ALS GETAL GETOOND. |
+| `horeca-kaart.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Horeca: DE KAART VAN EEN ZAAK -- één opbouw, twee deuren. De kaart stond in routes/gast/tafel.js en werd aan de kern gehangen. |
 | `horeca-keuken.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 2: het keukenscherm. Getoetst zijn de beloftes, niet de knoppen: - de keuken ziet niets van een gang die de zaal nog niet heeft vrijgegeven; - de allergie staat op elke weergave, ook op het... |
-| `horeca-pas.test.js` | 11 | -- | RTG Horeca: DE PAS -- wie pakt een gereed staande gang op, en wie draagt hem. Het patroon bestond al voor gastverzoeken ("ik ga" en "gedaan" zijn twee knoppen), maar niet voor het eten bij de pas. |
-| `horeca-rahul.test.js` | 11 | genoemd | RTG Horeca: WAT RAHUL MAG, en de actiebon die er altijd bij hoort. De opdracht was letterlijk: een AI-voorstel kan nooit ONGEMERKT een allergie aanpassen, een betaling uitvoeren, een medewerker beoordelen, een... |
+| `horeca-pas.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: DE PAS -- wie pakt een gereed staande gang op, en wie draagt hem. Het patroon bestond al voor gastverzoeken ("ik ga" en "gedaan" zijn twee knoppen), maar niet voor het eten bij de pas. |
+| `horeca-rahul.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: WAT RAHUL MAG, en de actiebon die er altijd bij hoort. De opdracht was letterlijk: een AI-voorstel kan nooit ONGEMERKT een allergie aanpassen, een betaling uitvoeren, een medewerker beoordelen, een... |
 | `horeca-rekening.test.js` | 13 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 1: de rekening die blijft leven -- openen, regels, gangen, verplaatsen, samenvoegen, splitsen, fooi, betalen, bonnen en de offline-wachtrij. De zwaarste bewering staat in de eerste twee toetsen en... |
-| `horeca-samenvoegen.test.js` | 7 | -- | RTG Horeca: SAMENVOEGEN -- wat een toestel zonder lijn deed, en wat daarvan nog waar is. De kassa en de PDA sturen een PAKKET opnieuw: een bon, een opgenomen bestelling. |
-| `horeca-stappen.test.js` | 11 | -- | RTG Horeca: BEREIDINGSSTAPPEN -- een gerecht is zelden één handeling. De keten in HORECA.md loopt bestelling -> gang -> gerecht -> BEREIDINGSSTAPPEN -> station, en die ene schakel was er niet. |
-| `horeca-verdeling.test.js` | 9 | -- | RTG Horeca: DE VERDELING -- wie betaalt welk deel van één rekening. Deze rekensom stond in kern/gast/ en was daardoor alleen bereikbaar voor wie zelf de QR scande. |
+| `horeca-samenvoegen.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Horeca: SAMENVOEGEN -- wat een toestel zonder lijn deed, en wat daarvan nog waar is. De kassa en de PDA sturen een PAKKET opnieuw: een bon, een opgenomen bestelling. |
+| `horeca-stappen.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: BEREIDINGSSTAPPEN -- een gerecht is zelden één handeling. De keten in HORECA.md loopt bestelling -> gang -> gerecht -> BEREIDINGSSTAPPEN -> station, en die ene schakel was er niet. |
+| `horeca-verdeling.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Horeca: DE VERDELING -- wie betaalt welk deel van één rekening. Deze rekensom stond in kern/gast/ en was daardoor alleen bereikbaar voor wie zelf de QR scande. |
 | `horeca-vloer.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 5: HACCP, de fooienpot, de loonkosten, het gastprofiel en het dagbeeld. Wat hier bewezen wordt: - een temperatuur buiten de grens kan niet worden genoteerd zonder actie, en een correctie laat de... |
 | `horeca-werklijst.test.js` | 7 | gezakt op `getal+1#4` | RTG Horeca: DE WERKLIJST -- wat is mijn eerstvolgende handeling? De rekensom achter PDA SERVICE. |
-| `horeca-wijk.test.js` | 20 | genoemd | RTG Horeca: DE WIJK -- welke tafels zijn van wie. De werklijst toonde de hele zaak, en dat stond er ook bij: een sectie-indeling bestond nergens, dus deed het scherm niet alsof. |
+| `horeca-wijk.test.js` | 20 | gezakt op `liegpoort /api/` | RTG Horeca: DE WIJK -- welke tafels zijn van wie. De werklijst toonde de hele zaak, en dat stond er ook bij: een sectie-indeling bestond nergens, dus deed het scherm niet alsof. |
 | `horlogewerk.test.js` | 11 | gezakt op `!==->===` | Het RTG-uurwerk (public/shared/horlogewerk.js): de pure, wiskundig kloppende mechaniek van het RTG-horloge. Deze toets bewijst de foutmarge 0,0 -- de perioden, de frequentie en de wijzerhoeken moeten tot op de bit... |
 | `hospitality-universe.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `housekeeping.test.js` | 6 | gezakt op `liegpoort /api/` | De housekeeper-flow: kamerstatus in een tik per stap, en de nieuwe vrijgave voor vroege check-in (de overschot-techniek voor het hotel): alleen een schone kamer kan vrij, en elke andere status haalt de vrijgave... |
@@ -351,7 +351,7 @@ toets omvalt.
 | `kantoorwereld.test.js` | 11 | gezakt op `===->!==#0` | RTG Kantoor, de samenhanglaag. Wat hier getoetst wordt is niet of de lijst klopt -- dat weten de vier domeinen zelf -- maar of deze laag zich aan zijn eigen belofte houdt: hij bezit niets, hij verzint niets, en hij... |
 | `kantoren-uitbreiding.test.js` | 5 | gezakt op `liegpoort /api/` | De kantoren-uitbreiding: vijf nieuwe kamers (Support team, Ingenieurs, Consumenten- en Partner-abonnementen, Kantine), de kantine-kaart van vandaag, en de identiteitskluis-inzage: kamers met naamInzage (en de... |
 | `kantoren.test.js` | 12 | gezakt op `liegpoort /api/` | De RTG-kantoren en de boardroom: vijfentwintig afdelingskamers met echte cijfers, taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan schakelen (globaal en per doelgroep, en het werkt echt: het... |
-| `kassa-herhaling.test.js` | 8 | -- | RTG Kassa: dezelfde bon twee keer versturen mag niet twee keer omzet zijn. WAAROM DEZE TOETS ER IS. |
+| `kassa-herhaling.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Kassa: dezelfde bon twee keer versturen mag niet twee keer omzet zijn. WAAROM DEZE TOETS ER IS. |
 | `kassa-modus.test.js` | 5 | gezakt op `liegpoort /api/` | De Kassa: een kassa-app voor elke zaak, met een omschakelbare modus per sector. De werkgever kiest de modus en beheert het eigen assortiment (met prijs per stuk of per kilo); afrekenen loopt door de bestaande... |
 | `kassa-premium.test.js` | 7 | gezakt op `liegpoort /api/` | De premium-laag van De Kassa, gewoon inbegrepen: derving (verspil, breuk, eigen gebruik, repro), retour als minbon, wachtbonnen (parkeren en terughalen), korting met reden op de bon, het dagrapport en de kasopmaak. |
 | `kern-afgeleid.test.js` | 4 | gezakt op `===->!==` | Tests voor de zuivere afgeleide berekeningen (server/kern/afgeleid.js). |
@@ -871,7 +871,7 @@ toets omvalt.
 | `upload-poort.test.js` | 4 | gezakt op `liegpoort /api/` | DEZELFDE INHOUD, TWEE WEGEN NAAR BINNEN -- EN MAAR EEN POORT. De Ontsmetter hangt als scan-net over elke verzoek-body: alles wat eruitziet als een complete data-URL ("data:<mime>;base64,<...>") wordt gescand, waar in... |
 | `uploadquarantaine.test.js` | 5 | gezakt op `===->!==#0` | De uploadgrens in het klein: bytes staan tijdens de keuring in een aparte map, bereiken de route alleen na de eigen én externe scan, en blijven bij geen enkel oordeel als terugvindbaar virusbestand liggen. |
 | `vakbewijs-kluis.test.js` | 5 | gezakt op `true->false#0` | HET NUMMER WOONT IN DE KLUIS -- gemeten aan de OPSLAG, niet aan de uitgang. WAAROM DIT EEN EIGEN BESTAND IS. |
-| `vakbewijs-routes.test.js` | 10 | genoemd | DE WEG VAN EEN VAKBEWIJS, OVER ECHTE ROUTES. WAAROM DIT BESTAAT, EN HET STAAT ZWART OP WIT IN test/persoonseis.test.js: daar is een mutatie AFGESLAGEN. |
+| `vakbewijs-routes.test.js` | 10 | gezakt op `liegpoort /api/` | DE WEG VAN EEN VAKBEWIJS, OVER ECHTE ROUTES. WAAROM DIT BESTAAT, EN HET STAAT ZWART OP WIT IN test/persoonseis.test.js: daar is een mutatie AFGESLAGEN. |
 | `vakken.test.js` | 4 | gezakt op `liegpoort /api/` | De vakmannen-golf: tien alledaagse vakken (autogarage, schoonmaak, hovenier, wasserij, rijschool, dierenarts, tandarts, fotograaf, verhuizer, IT-hulp) op de vakwerk-motor, elk met een demo-zaak op het Dienstenplein;... |
 | `vakpro.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro: de pro-laag van de dienstverlenende genres -- de offerte-keten (lid vraagt vrije klus, zaak biedt prijs, lid geeft akkoord en de klus staat als bevestigde boeking klaar), de digitale werkbon die met de... |
 | `vakpro2.test.js` | 4 | gezakt op `liegpoort /api/` | Vakwerk Pro, laag 2: team-capaciteit (overlappende boekingen tot het aantal vaklieden), vaste afspraken (ritmes die de volgende afspraak inplannen, door beide kanten te stoppen), de wachtlijst met automatisch seintje... |

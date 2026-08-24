@@ -288,3 +288,26 @@ test('18. De gemeentebalie-AI verleent de eerste vergunning', async () => {
   const mijn = await api(base, '/api/gemeente/vergunningen/mijn', {}, lid);
   assert.ok(mijn.body.vergunningen.some(v => v.status === 'verleend'), 'een vergunning is verleend door de AI');
 });
+
+/* Zelfde venster-afspraak als bij de gemeente (TAKEN.md 4.56): dezelfde melder,
+   dezelfde soort en dezelfde tekst binnen een minuut is EEN melding aan het
+   waterschap, geen tweede dossier voor de behandelaar. */
+test('19. dezelfde watermelding binnen een minuut geeft hetzelfde meldnummer', async () => {
+  const eerste = await api(base, '/api/overheid/water/meld',
+    { soort: 'wateroverlast', tekst: 'Duiker verstopt bij de molen' }, lid);
+  assert.equal(eerste.status, 200);
+  const ref = eerste.body.melding.ref;
+
+  const nogmaals = await api(base, '/api/overheid/water/meld',
+    { soort: 'wateroverlast', tekst: 'Duiker verstopt bij de molen' }, lid);
+  assert.equal(nogmaals.body.melding.ref, ref, 'hetzelfde meldnummer terug');
+  assert.equal(nogmaals.body.herhaald, true, 'gemerkt als herhaling');
+
+  const mijn = await api(base, '/api/overheid/water/meldingen/mijn', {}, lid);
+  const zelfde = (mijn.body.meldingen || []).filter(m => m.tekst === 'Duiker verstopt bij de molen');
+  assert.equal(zelfde.length, 1, 'de melder heeft er zelf ook maar een');
+
+  const ander = await api(base, '/api/overheid/water/meld',
+    { soort: 'wateroverlast', tekst: 'En het riool bij de brug ruikt' }, lid);
+  assert.notEqual(ander.body.melding.ref, ref, 'een andere melding komt gewoon binnen');
+});

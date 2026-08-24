@@ -145,3 +145,43 @@ test('een verzonnen, verlopen of al gebruikte code opent niets', async () => {
     fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
+
+/* TWEE KLIKKEN GAVEN TWEE GELDIGE KASSACODES (TAKEN.md 4.56).
+
+   Een uitnodiging is geen gewone creatie-route: een vergeten tweede code is een
+   open deur naar personeelstoegang, en de manager ziet die tweede meestal niet
+   -- hij moest hem zelf intrekken. Dezelfde sleutel geeft nu dezelfde
+   uitnodiging terug; een VERSE sleutel is wel een echte tweede, want twee
+   mensen met dezelfde voornaam uitnodigen mag gewoon. */
+test('een herhaalde uitnodiging met dezelfde sleutel geeft EEN kassacode, geen twee', async () => {
+  const TMP = versDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
+  try {
+    const mgr = await managerSessie(base);
+    const eerste = await post(base, '/api/supplier/staff/invite', { name: 'Noor', func: 'Bediening', idem: 'inv-vast' }, mgr);
+    assert.equal(eerste.status, 200);
+    const code = eerste.data.invite.kassacode;
+
+    const nogmaals = await post(base, '/api/supplier/staff/invite', { name: 'Noor', func: 'Bediening', idem: 'inv-vast' }, mgr);
+    assert.equal(nogmaals.status, 200);
+    assert.equal(nogmaals.data.invite.kassacode, code, 'dezelfde code terug, geen tweede open deur');
+    assert.equal(nogmaals.data.herhaald, true, 'de server merkt de herhaling zelf');
+
+    // er staat er ook maar EEN open bij de werkgever
+    const lijst = await post(base, '/api/supplier/staff/invites', {}, mgr);
+    const voorNoor = (lijst.data.invites || []).filter(i => i.naam === 'Noor');
+    assert.equal(voorNoor.length, 1, 'de werkgever ziet een openstaande uitnodiging, niet twee');
+
+    // een verse sleutel is een echte tweede uitnodiging
+    const tweede = await post(base, '/api/supplier/staff/invite', { name: 'Noor', func: 'Bediening', idem: 'inv-vers' }, mgr);
+    assert.notEqual(tweede.data.invite.kassacode, code, 'met een andere sleutel mag het wel');
+
+    // dezelfde sleutel met een andere ROL is een fout, geen stille echo
+    const anders = await post(base, '/api/supplier/staff/invite',
+      { name: 'Noor', func: 'Bediening', role: 'manager', idem: 'inv-vast' }, mgr);
+    assert.equal(anders.status, 409, 'dezelfde sleutel voor een andere rol wordt geweigerd');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

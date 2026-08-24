@@ -152,3 +152,40 @@ test('9. een melding met GPS-coördinaten bewaart de locatie', async () => {
   const mine = mijn.body.meldingen.find(x => x.ref === m.body.melding.ref);
   assert.ok(mine, 'de melding staat in mijn overzicht');
 });
+
+/* DEZELFDE MELDING TWEE KEER IS EEN MELDING (TAKEN.md 4.56).
+
+   Elke oproep maakte een nieuw dossier met een eigen meldnummer, dus een
+   hapering of een ongeduldige tweede tik gaf de behandelaar twee keer dezelfde
+   kapotte lantaarnpaal in zijn wachtrij.
+
+   Waarom hier een VENSTER en geen idem-sleutel: die vangt alleen de herhaling
+   van dezelfde poging, en twee losse tikken maken elk een verse sleutel. Bij
+   geld is dat juist goed (twee keer een kaart verkopen mag), hier niet. */
+test('dezelfde melding binnen een minuut geeft hetzelfde meldnummer, niet een tweede dossier', async () => {
+  const eerste = await api(base, '/api/gemeente/meld',
+    { categorie: 'verlichting', tekst: 'Lantaarnpaal 12 doet het niet' }, lid);
+  assert.equal(eerste.status, 200);
+  const ref = eerste.body.melding.ref;
+
+  const nogmaals = await api(base, '/api/gemeente/meld',
+    { categorie: 'verlichting', tekst: 'Lantaarnpaal 12 doet het niet' }, lid);
+  assert.equal(nogmaals.status, 200);
+  assert.equal(nogmaals.body.melding.ref, ref, 'hetzelfde meldnummer terug');
+  assert.equal(nogmaals.body.herhaald, true, 'en de server zegt er zelf bij dat het een herhaling was');
+
+  // de behandelaar ziet er ook maar EEN
+  const lijst = await api(base, '/api/gemeente/meldingen', {}, gem);
+  const zelfde = (lijst.body.meldingen || []).filter(m => m.tekst === 'Lantaarnpaal 12 doet het niet');
+  assert.equal(zelfde.length, 1, 'de wachtrij van de behandelaar heeft er een, geen twee');
+
+  // ANDERE tekst is een echte tweede melding -- het venster is geen blokkade
+  const ander = await api(base, '/api/gemeente/meld',
+    { categorie: 'verlichting', tekst: 'En paal 13 flikkert ook' }, lid);
+  assert.notEqual(ander.body.melding.ref, ref, 'een andere melding komt gewoon binnen');
+
+  // en dezelfde tekst in een ANDERE categorie ook: dat is een ander dossier
+  const andereCat = await api(base, '/api/gemeente/meld',
+    { categorie: 'wegdek', tekst: 'Lantaarnpaal 12 doet het niet' }, lid);
+  assert.notEqual(andereCat.body.melding.ref, ref, 'zelfde tekst, andere categorie: eigen dossier');
+});

@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 156,
+    "toetsenNietGemeten": 158,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -33,6 +33,11 @@
     "delenZonderOnderwerp": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenNietGemeten 156 -> 158 (test/banknood-idem.test.js, test/dubbelemelding.test.js)",
+      "reden": "Twee toetsbestanden erbij bij de laatste tien idempotentie-besluiten (TAKEN.md 4.56). De mutatiemotor is er nog niet langs geweest -- ze bestaan pas sinds vandaag -- en dat is de hele +2. Prijs van toetsen erbij, geen erosie, maar het staat er met naam bij want dat is het verschil.\n\nHandmatig zijn er acht mutaties op gedraaid en gezien zakken: de herhalingscontrole uit de gemeentemelding, het venster op nul, het venster op oneindig, de melder-controle eruit, de stop-bij-oude eruit, de banknood-sleutel negeren, clearingGelukt de sleutels niet laten wissen, en de uitnodiging de sleutel laten negeren.\n\nTwee daarvan kwamen er eerst ongestraft doorheen. Het venster op oneindig liet alle routetoetsen groen -- die melden binnen dezelfde seconde -- terwijl een oneindig venster betekent dat een inwoner hetzelfde probleem NOOIT meer kan melden. Daar is test/dubbelemelding.test.js voor gekomen, die de klok zelf meegeeft en het venster aan beide kanten aanwijst. Die +1 is dus juist het gevolg van een gat dat het namuteren vond.\n\nDeze +2 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen."
+    },
     {
       "datum": "2026-08-23",
       "meter": "toetsenNietGemeten 155 -> 156; zelfpoortendeToetsen 17 -> 18 (test/grafsteen.pg.test.js)",

@@ -17,12 +17,15 @@
     const name = ($('#ttName').value||'').trim();
     const func = ($('#ttFunc') && $('#ttFunc').value || '').trim();
     const role = $('#ttRole').value;
+    const knop = $('#ttAdd');
+    if (knop) { if (knop.disabled) return; knop.disabled = true; }
     try {
-      const d = await API.call('/supplier/staff/invite', { name, func, role });
+      // zie leverancier-23.js: knop op slot tegen de dubbeltik, sleutel tegen de retry
+      const d = await API.call('/supplier/staff/invite', { name, func, role, idem: RTGIdem('inv') });
       lastPin = { name: d.invite.naam || name || T('kt.staff','Medewerker'), kassacode: d.invite.kassacode, bedrijf: d.bedrijf };
       toast(T('team.invited','Uitnodiging gemaakt. Kassacode: ')+d.invite.kassacode);
       await refresh(); openTab('team');
-    } catch(e){ toast(e.message); }
+    } catch(e){ if (knop) knop.disabled = false; toast(e.message); }
   }
   async function removeStaff(id){
     try { await API.call('/supplier/staff/remove', { staffId: id }); toast(T('team.removed','Verwijderd uit het team.')); await refresh(); openTab('team'); }

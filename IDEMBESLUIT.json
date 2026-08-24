@@ -6,15 +6,14 @@
   "berekening": "Een POST die rekent of opzoekt en niets blijvends aanmaakt. Een tweede oproep hoort een VERSE uitkomst te geven; dat de proef verschil ziet, is precies goed.",
   "instelling": "Een waarde zetten of bewaren. Twee keer dezelfde waarde zetten geeft dezelfde eindstand -- effectief idempotent. Dat de proef verschil ziet, komt van een tijdstempel of een volgnummer in het antwoord, niet van een tweede effect.",
   "tebeslissen": "HIER IS NOG GEEN BESLUIT OVER GENOMEN. Staat met naam in deze lijst zodat het niet als \"afgehandeld\" meetelt.",
-  "beschermd": "Liep hier onbeschermd en dat KOSTTE geld. Sinds de reparatie loopt de route door server/lib/idem.js; hij blijft in dit register staan zodat de geschiedenis zichtbaar is."
+  "beschermd": "Liep hier onbeschermd en dat kostte iets wat niet mocht: geld, of dubbel werk bij een behandelaar, of een open deur. Sinds de reparatie is de herhaling afgevangen; ze blijven in dit register staan zodat de geschiedenis zichtbaar is."
  },
  "telling": {
   "creatie": 40,
-  "berekening": 35,
-  "instelling": 12,
-  "tebeslissen": 10,
-  "code-maker": 3,
-  "beschermd": 2
+  "berekening": 39,
+  "instelling": 13,
+  "beschermd": 6,
+  "code-maker": 4
  },
  "routes": {
   "/api/agenda/toevoegen": {
@@ -57,8 +56,8 @@
    "klasse": "instelling"
   },
   "/api/gemeente/meld": {
-   "klasse": "tebeslissen",
-   "vraag": "Twee identieke meldingen in de wachtrij van een gemeente: dubbel werk voor de behandelaar, of twee echte meldingen?"
+   "klasse": "beschermd",
+   "reden": "Dezelfde melder, categorie en tekst binnen een minuut geven hetzelfde meldnummer terug. Een idem-sleutel volstond hier niet: twee losse tikken zijn voor metIdem twee verzoeken, en niemand wil dezelfde put twee keer in de wachtrij van een behandelaar. Zie kern/dubbelemelding.js."
   },
   "/api/genootschap/richt-op": {
    "klasse": "creatie"
@@ -91,8 +90,8 @@
    "klasse": "berekening"
   },
   "/api/member/pin/live": {
-   "klasse": "tebeslissen",
-   "vraag": "Een contactpin live zetten. Waarschijnlijk dezelfde eindstand, maar niet nagekeken."
+   "klasse": "code-maker",
+   "reden": "liveMaak() geeft een verse code met een eigen geldigheidsduur. Een levende code die twee keer hetzelfde is, is stuk -- zelfde klasse als pay/kascode."
   },
   "/api/member/pin/nieuw": {
    "klasse": "creatie"
@@ -122,12 +121,12 @@
    "klasse": "instelling"
   },
   "/api/office/bank/mislukking": {
-   "klasse": "tebeslissen",
-   "vraag": "Idem: een teller of een stand die twee keer wordt gezet."
+   "klasse": "beschermd",
+   "reden": "De teller trekt bij de drempel automatisch de noodstop, dus dezelfde mislukte clearing twee keer melden kon de bank onterecht in nood zetten. Een sleutel die aan de MISLUKKING hangt telt nu een keer; bij een geslaagde clearing gaan teller en sleutels samen op nul. Er is nog geen aanroeper -- het contract ligt vast voor er een is."
   },
   "/api/office/bank/nood": {
-   "klasse": "tebeslissen",
-   "vraag": "Een noodschakelaar twee keer omzetten. Waarschijnlijk onschadelijk (dezelfde eindstand), maar het is een BANKschakelaar en dat verdient een uitgesproken besluit."
+   "klasse": "instelling",
+   "reden": "Zet de noodstop AAN. Twee keer zetten geeft dezelfde eindstand (nood actief); alleen het auditspoor krijgt twee regels, en dat is bij een noodschakelaar eerder gewenst dan hinderlijk."
   },
   "/api/office/betalingen/status": {
    "klasse": "berekening"
@@ -196,20 +195,20 @@
    "klasse": "creatie"
   },
   "/api/office/zelfzorg/bescherm": {
-   "klasse": "tebeslissen",
-   "vraag": "Onderhoudsactie op de doos zelf. Twee keer draaien: onschadelijk of niet?"
+   "klasse": "berekening",
+   "reden": "Beschermronde: leest de stand en geeft adviezen. Verandert niets blijvends, dus een verse uitkomst per oproep is de bedoeling."
   },
   "/api/office/zelfzorg/herstel": {
-   "klasse": "tebeslissen",
-   "vraag": "Idem."
+   "klasse": "berekening",
+   "reden": "Reparatieronde: herstelt wat stuk is. Een tweede ronde vindt niets meer te repareren."
   },
   "/api/office/zelfzorg/opruim": {
-   "klasse": "tebeslissen",
-   "vraag": "Idem -- en opruimen twee keer draaien kan meer weggooien dan bedoeld."
+   "klasse": "berekening",
+   "reden": "Veegt verlopen snaps en verhalen op LEEFTIJD. Een tweede ronde vindt niets meer en verandert dus niets; dat het antwoord verschilt (0 acties in plaats van N) is precies wat je wilt zien."
   },
   "/api/office/zelfzorg/upgrade": {
-   "klasse": "tebeslissen",
-   "vraag": "Idem, en een upgrade twee keer starten is het soort ding dat je een keer wilt."
+   "klasse": "berekening",
+   "reden": "Draait de wachtende schemamigraties, met een back-up ervoor. Een tweede oproep meldt \"al op schema v.., niets te doen\" -- dezelfde eindstand."
   },
   "/api/onboarding/teken": {
    "klasse": "instelling"
@@ -221,8 +220,8 @@
    "klasse": "code-maker"
   },
   "/api/overheid/water/meld": {
-   "klasse": "tebeslissen",
-   "vraag": "Zelfde vraag als bij gemeente/meld."
+   "klasse": "beschermd",
+   "reden": "Zelfde venster-afspraak als bij de gemeente, op melder + soort + tekst."
   },
   "/api/pay/kascode": {
    "klasse": "code-maker"
@@ -323,8 +322,8 @@
    "klasse": "instelling"
   },
   "/api/supplier/staff/invite": {
-   "klasse": "tebeslissen",
-   "vraag": "Twee uitnodigingen naar dezelfde persoon: hinderlijk, of moet de tweede de eerste vervangen?"
+   "klasse": "beschermd",
+   "reden": "Twee klikken gaven twee geldige kassacodes voor dezelfde persoon, en een vergeten tweede code is een open deur naar personeelstoegang. Dezelfde sleutel geeft dezelfde uitnodiging; een verse sleutel is een echte tweede uitnodiging."
   },
   "/api/supplier/werkbeleid/zet": {
    "klasse": "instelling"

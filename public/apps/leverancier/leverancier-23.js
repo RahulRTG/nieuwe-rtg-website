@@ -1,14 +1,18 @@
 /* een medewerker uitnodigen */
     const ktInvite = el.querySelector('#ktInvite'); if (ktInvite) ktInvite.addEventListener('click', async () => {
+      // knop op slot tegen de dubbeltik, sleutel tegen een herhaalde poging:
+      // een vergeten tweede kassacode is een open deur (TAKEN.md 4.56)
+      if (ktInvite.disabled) return;
+      ktInvite.disabled = true;
       try {
-        const d = await API.call('/supplier/staff/invite', { name: el.querySelector('#ktName').value.trim(), func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value });
+        const d = await API.call('/supplier/staff/invite', { name: el.querySelector('#ktName').value.trim(), func: el.querySelector('#ktFunc').value.trim(), role: el.querySelector('#ktRole').value, idem: RTGIdem('inv') });
         kantoorMsg = T('kt.invite.done','Uitnodiging klaar. Geef deze twee dingen door aan uw medewerker:')+'<br>'+
           '<b>'+T('kt.invite.biz','Bedrijfsnaam')+':</b> '+escT(d.bedrijf)+'<br>'+
           '<b>'+T('kt.invite.code','Kassacode')+':</b> <span style="font-family:monospace;font-size:1.25rem;letter-spacing:0.18em;color:var(--gold);">'+escT(d.invite.kassacode)+'</span><br>'+
           '<span class="sub">'+T('kt.invite.note','Eenmalig, 30 dagen geldig.')+'</span>';
         toast(T('kt.invite.toast','Kassacode aangemaakt.'));
-        invData = null; laadInvites();
-      } catch(e){ toast(e.message); }
+        invData = null; laadInvites();   // hertekent, dus de knop komt vers terug
+      } catch(e){ ktInvite.disabled = false; toast(e.message); }
     });
     const ktBuzz = el.querySelector('#ktBuzz'); if (ktBuzz) ktBuzz.addEventListener('click', async () => {
       try { await API.call('/supplier/team/buzz', { all: true }); toast(T('kt.buzzed','Iedereen opgeroepen.')); } catch(e){ toast(e.message); }

@@ -73,8 +73,9 @@ const geefAfbouwSlotVrij = pak('volledige Node-tests');
 /* Welke servers zijn er tijdens deze ronde blijven staan? De teller staat in
    scripts/lib/wezen.js zodat hij te toetsen is (test/wezen.test.js); de kop daar
    vertelt waarom hij bestaat. */
-const { ouderlozeServers, nieuweWezen } = require('./lib/wezen');
+const { ouderlozeServers, nieuweWezen, machinebeeld } = require('./lib/wezen');
 const wezenVooraf = ouderlozeServers(WORTEL);
+const machineVooraf = machinebeeld(WORTEL);
 const TESTMAP = path.join(WORTEL, 'test');
 const TIJDEN = path.join(WORTEL, '.testtijden.json');
 const TIJDEN_RUW = path.join(WORTEL, '.testtijden.ruw');
@@ -237,6 +238,17 @@ if (gemeten) {
   console.log('\n[tests] ronde: ' + wandklok + ' s wandklok, ' + Math.round(somMs / 1000)
     + ' s opgeteld over ' + lijst.length + ' bestanden (factor '
     + (wandklok ? (somMs / 1000 / wandklok).toFixed(1) : '-') + 'x parallel).');
+  /* DE OMSTANDIGHEDEN ERBIJ, want zonder die is een rondetijd geen meting maar
+     een indruk. Op 24 augustus stond een grondmeting van 920 s naast rondes van
+     1130 en 1172 s, en dat verschil is eerst voor een regressie aangezien -- het
+     was een ontwikkelserver die er tussendoor bij was gekomen, plus een gelekte
+     server. Op vier kernen is dat de helft van de machine. */
+  if (machineVooraf) {
+    console.log('[tests] gemeten op ' + machineVooraf.kernen + ' kernen, met '
+      + machineVooraf.servers + ' RTG-serverproces(sen) al actief bij de start'
+      + (machineVooraf.belasting != null ? ', belasting ' + machineVooraf.belasting.toFixed(2) : '')
+      + '. Twee rondes zijn alleen vergelijkbaar als deze regel gelijk is.');
+  }
   console.log('[tests] traagste bestanden:');
   for (const [b, ms] of lijst.slice(0, 12)) {
     console.log('        ' + String(Math.round(ms / 1000)).padStart(5) + ' s  ' + b);

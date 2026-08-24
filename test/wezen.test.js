@@ -23,7 +23,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 const cp = require('child_process');
-const { ouderlozeServers, nieuweWezen } = require('../scripts/lib/wezen.js');
+const { ouderlozeServers, nieuweWezen, machinebeeld } = require('../scripts/lib/wezen.js');
 
 const WORTEL = path.join(__dirname, '..');
 const SERVERPAD = path.join(WORTEL, 'server', 'server.js');
@@ -104,4 +104,42 @@ test('niet kunnen kijken is iets anders dan niets vinden', () => {
   assert.equal(nieuweWezen(null, echt), null, 'geen voormeting: dan weten we niets');
   assert.equal(nieuweWezen(echt, null), null, 'geen nameting: idem');
   assert.deepEqual(nieuweWezen(echt, echt), [], 'twee gelijke metingen: dan is er echt niets bijgekomen');
+});
+
+/* ============================================================================
+   EN DE OMSTANDIGHEDEN VAN EEN RONDE.
+
+   Een rondetijd zonder zijn omstandigheden is geen meting maar een indruk. Op
+   24 augustus stond hier een grondmeting van 920 s naast rondes van 1130 en
+   1172 s, en dat verschil is eerst voor een regressie aangezien. Het was er
+   geen: tussen die metingen door kwam er een ontwikkelserver bij (drie werkers)
+   en draaide er een gelekte server mee -- op vier kernen de halve machine, en
+   geen van beide stond in de uitvoer.
+   ========================================================================== */
+test('het machinebeeld telt de servers en kent de kernen', () => {
+  const beeld = machinebeeld(WORTEL);
+  assert.notEqual(beeld, null, 'ps hoort leesbaar te zijn');
+  assert.equal(typeof beeld.servers, 'number', 'het aantal serverprocessen hoort een getal te zijn');
+  assert.ok(beeld.kernen >= 1, 'er hoort minstens een kern te zijn (' + beeld.kernen + ')');
+
+  /* Een verzonnen processenlijst, zodat de telling zelf vastligt en niet
+     afhangt van wat er toevallig draait. */
+  const nep = () => ({ status: 0, stdout: [
+    '  101     1 node ' + path.join(WORTEL, 'server', 'server.js'),
+    '  102   101 node ' + path.join(WORTEL, 'server', 'server.js'),
+    '  103     1 node ' + path.join(WORTEL, 'server', 'trio.js'),
+    '  104     1 node /ergens/anders/server.js',
+    '  105     1 bash -c iets'
+  ].join('\n') });
+  const geteld = machinebeeld(WORTEL, nep);
+  assert.equal(geteld.servers, 3,
+    'twee server.js en een trio.js van DEZE boom horen te tellen; een server.js elders niet');
+});
+
+test('geen leesbare processenlijst geeft ook hier null en geen nul', () => {
+  /* Anders zou de ronde "0 servers actief" melden terwijl er niet gekeken is,
+     en dan is die regel erger dan geen regel (LAT-regel 3). */
+  for (const lezer of [() => { throw new Error('geen ps'); }, () => null, () => ({ status: 1, stdout: '' })]) {
+    assert.equal(machinebeeld(WORTEL, lezer), null);
+  }
 });

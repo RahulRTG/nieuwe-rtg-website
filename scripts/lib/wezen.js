@@ -70,4 +70,32 @@ function nieuweWezen(vooraf, na) {
   return [...na].filter(([pid]) => !vooraf.has(pid)).map(([pid, cmd]) => ({ pid, cmd }));
 }
 
-module.exports = { ouderlozeServers, nieuweWezen, leesProcessen };
+/* WAT DRAAIDE ER NOG MEER? -- de context waarzonder een rondetijd niets zegt.
+
+   Op 24 augustus stond hier een grondmeting van 920 s naast rondes van 1130 en
+   1172 s, en ik heb dat verschil eerst voor een regressie aangezien. Het was er
+   geen: tussen die metingen door was er een ontwikkelserver bijgekomen (trio.js
+   met drie werkers) en draaide er een gelekte server mee. Op een machine met
+   vier kernen is dat de helft van de capaciteit, en geen van beide stond in de
+   uitvoer van de ronde.
+
+   Een getal zonder zijn omstandigheden is geen meting maar een indruk. Sinds
+   vandaag zet de ronde er daarom bij hoeveel RTG-serverprocessen er draaiden en
+   wat de belasting was, zodat de volgende lezer twee rondes kan vergelijken
+   zonder ps te hoeven raden. */
+function machinebeeld(wortel, lezer) {
+  const basis = wortel || WORTEL;
+  let uit = null;
+  try { uit = (lezer || leesProcessen)(); } catch (e) { return null; }
+  if (!uit || uit.status !== 0 || !uit.stdout) return null;
+  const pad = path.join(basis, 'server');
+  let servers = 0;
+  for (const regel of uit.stdout.split('\n')) {
+    if (/\bnode\b/.test(regel) && regel.includes(pad) && /server\.js|trio\.js/.test(regel)) servers++;
+  }
+  let last = null;
+  try { last = require('os').loadavg()[0]; } catch (e) { last = null; }
+  return { servers, kernen: require('os').availableParallelism ? require('os').availableParallelism() : require('os').cpus().length, belasting: last };
+}
+
+module.exports = { ouderlozeServers, nieuweWezen, leesProcessen, machinebeeld };

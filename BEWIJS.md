@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1040 bestanden en 6945 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1040 bestanden en 6947 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1040 |
-| losse beweringen (`test(...)`) | 6945 |
+| losse beweringen (`test(...)`) | 6947 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 874 |
 | **overleefd**: geen mutatie kreeg hem rood | 11 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-914 bestanden, 6725 beweringen.
+914 bestanden, 6727 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -922,7 +922,7 @@ toets omvalt.
 | `werkwaarom.test.js` | 5 | gezakt op `liegpoort /api/` | WAAROM LOOPT DIT PROJECT ACHTER: de oorzaak wordt gemeten, niet geraden. Vijf beweringen: 1. |
 | `werving-link.test.js` | 3 | gezakt op `liegpoort /api/` | De wervingslink: een werkgever nodigt iemand uit die nog geen RTG-account heeft, en die persoon is na het aanmelden meteen personeel. WAT HIER GEREPAREERD IS. |
 | `wetten.test.js` | 9 | gezakt op `===->!==#0` | De ijking van het wettenregister: wie de wetten meet, wordt hier zelf gemeten. WAAROM DIT BESTAAT. |
-| `wezen.test.js` | 4 | gezakt op `!==->===#0` | BLIJFT ER EEN SERVER STAAN NA EEN TOETSRONDE? Op 24 augustus draaide er tijdens een ronde een server/server.js met PPID 1: geen ouder meer, achtergebleven uit een toetskind dat zelf netjes afsloot. |
+| `wezen.test.js` | 6 | gezakt op `!==->===#0` | BLIJFT ER EEN SERVER STAAN NA EEN TOETSRONDE? Op 24 augustus draaide er tijdens een ronde een server/server.js met PPID 1: geen ouder meer, achtergebleven uit een toetskind dat zelf netjes afsloot. |
 | `wiring-contract.test.js` | 2 | overleefd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `wisselen-en-historie.test.js` | 5 | gezakt op `liegpoort /api/` | WISSELEN VAN AFDELING, EN DE RITHISTORIE -- 3 endpoints. supplier/wissel, supplier/wissel/opties en supplier/ride/history stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `woonplaats-poort.test.js` | 6 | gezakt op `&&->||#0` | DE WOONPLAATS MAG NIET STIL VERDWIJNEN. De intake vraagt sinds de momenten geen adres meer (kern/onboarding.js). |

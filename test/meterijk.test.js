@@ -1099,13 +1099,31 @@ test('een onbruikbaar MUTATIES.json laat de meter ZAKKEN en niet stil nul melden
      onleesbaar (de lezer gooit), geen json, en geldige json zonder een enkele
      gemeten toets -- dat laatste is de stilste van de drie, want daar is er wel
      een bestand en klopt de vorm. */
+  /* GERICHT METEN, EN EEN KEER NIET.
+
+     Deze vier aanroepen deden `meet()` zonder `alleen`, en dat rekende elke keer
+     de hele wereld uit -- inclusief de keuring van 52 seconden -- om daarna bij de
+     mutatiebron te struikelen. Vier keer, dus ruim drie minuten om iets over een
+     JSON-bestand te bewijzen. Dat is dezelfde fout als in de ijklus hierboven, een
+     verdieping hoger.
+
+     Drie gaan nu gericht op de mutatiebron. Dat is niet zwakker maar scherper: het
+     laat zien dat de fout UIT DIE BRON komt en niet toevallig ergens anders vandaan.
+
+     De vierde blijft met opzet ongericht, en juist de stilste van de vier: geldige
+     json, kloppende vorm, alleen geen enkele gemeten toets. Die bewijst wat een
+     gerichte meting niet kan -- dat een kapotte MUTATIES.json ook een VOLLEDIGE
+     ronde omgooit, en dus `npm run norm` en de CI-poort. 52 seconden voor de
+     end-to-end bewering, in plaats van 208 voor vier keer dezelfde. */
+  const stilste = 'alleen niet-gemeten uitslagen';
   for (const [wat, lezer] of [
     ['onleesbaar', () => { throw new Error('ENOENT'); }],
     ['geen json', () => 'dit is geen json'],
     ['geen enkele meting', () => JSON.stringify({ toetsen: {} })],
-    ['alleen niet-gemeten uitslagen', () => JSON.stringify({ toetsen: { 'a11ykeuring.test.js': { staat: 'geen module gevonden' } } })]
+    [stilste, () => JSON.stringify({ toetsen: { 'a11ykeuring.test.js': { staat: 'geen module gevonden' } } })]
   ]) {
-    assert.throws(() => meet({ leesMutaties: lezer }), /MUTATIES\.json/,
+    const bronnen = wat === stilste ? {} : { alleen: ['toetsenNietGemeten', 'toetsenOngevoeligPct'] };
+    assert.throws(() => meet(Object.assign({ leesMutaties: lezer }, bronnen)), /MUTATIES\.json/,
       'met "' + wat + '" hoort meet() te gooien in plaats van een getal te geven');
   }
 });

@@ -173,4 +173,6 @@ function foutMiddleware() {
   };
 }
 
-module.exports = { log, middleware, foutMiddleware };
+/* De drempel naar buiten, zodat de techniekcontrole LOG-01 kan zien OF er per
+   verzoek gelogd wordt in plaats van dat te raden uit de omgeving. */
+module.exports = { log, middleware, foutMiddleware, NIVEAU_WAARDE: DREMPEL };

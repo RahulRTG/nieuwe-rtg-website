@@ -78,6 +78,37 @@ const CHECKS = [
     }
   },
   {
+    id: 'logstroom', naam: 'Logstroom', code: 'LOG-01', categorie: 'Runtime',
+    /* WAAR DE LOG HEEN GAAT, BEPAALT OF HIJ DE SERVER OPHOUDT.
+
+       Node kiest zijn stdout-stroom op wat eraan hangt. Een PIJP (systemd,
+       docker, `| logger`) geeft een Socket en schrijft asynchroon. Een BESTAND
+       geeft een SyncWriteStream, en dan is elke regel een synchrone
+       schrijfactie -- op de event-loop, midden in het afhandelen van een
+       verzoek. Met LOG_LEVEL=info schrijft elk verzoek een regel, dus dan
+       betaalt elk verzoek dat.
+
+       Gemeten op 24 augustus 2026 onder last (zie PRESTATIES.md): de synchrone
+       schrijfactie stond op 5,2% van alle rekentijd, en het verschil tussen een
+       bestand en een pijp was 26% op de event-loop-p99 (26,7 -> 19,8 ms) en 40%
+       op de hoogste uitschieter (114 -> 68 ms).
+
+       Dit is een INRICHTINGSkeuze en geen fout, dus hooguit een waarschuwing:
+       wie zijn uitvoer naar een bestand leidt, hoort te weten wat het kost. */
+    run: () => {
+      const soort = (process.stdout && process.stdout.constructor && process.stdout.constructor.name) || 'onbekend';
+      const perVerzoek = (require('./log').NIVEAU_WAARDE || 20) <= 20;   // info of debug
+      if (soort !== 'SyncWriteStream') {
+        return { status: 'ok', detail: 'stdout is ' + soort + ': schrijft asynchroon, de event-loop blijft vrij.' };
+      }
+      if (!perVerzoek) {
+        return { status: 'ok', detail: 'stdout is een bestand (synchroon), maar er wordt niet per verzoek gelogd (LOG_LEVEL boven info).' };
+      }
+      return { status: 'waarschuwing', detail: 'stdout is een BESTAND: elke verzoekregel is een synchrone schrijfactie op de event-loop ' +
+        '(gemeten 5,2% CPU en 26% hogere event-loop-p99). Laat de uitvoer door een pijp lopen (systemd, docker, | logger), of zet LOG_LEVEL=warn.' };
+    }
+  },
+  {
     id: 'backups', naam: 'Back-ups', code: 'BAK-01', categorie: 'Data',
     /* HIJ KEEK NAAR DE NAAM VAN EEN MAP. Bestond er een map die YYYY-MM-DD
        heette, dan stond deze check op groen -- leeg, half weggeschreven of met

@@ -277,6 +277,40 @@ om te herstellen -- meestal het langste deel van de keten. Zie `SLO.md`.
 meting: bij een dagelijkse back-up is dat tot 24 uur. Wil je daaronder, dan is
 er vaker back-uppen nodig, of Postgres met point-in-time recovery.
 
+### Laat de log door een PIJP lopen, niet naar een bestand
+
+Node kiest zijn stdout-stroom op wat eraan hangt, en dat bepaalt of het loggen de
+server ophoudt:
+
+```
+node server.js | logger        ->  Socket           asynchroon   (systemd, docker)
+node server.js > /var/log/rtg  ->  SyncWriteStream  SYNCHROON
+```
+
+Met `LOG_LEVEL=info` — de standaard — schrijft **elk verzoek** een regel. Op een
+bestand is dat dus per verzoek een synchrone schrijfactie, midden op de
+event-loop, terwijl er een verzoek wordt afgehandeld.
+
+Gemeten op 24 augustus 2026, dezelfde last, alleen de bestemming van stdout
+verschilt (zie `PRESTATIES.md` voor de opstelling):
+
+| Meter | naar een bestand | door een pijp |
+|---|---:|---:|
+| Event-loop p99 | 26,7 ms | **19,8 ms** |
+| Event-loop max | 114,3 ms | **68,0 ms** |
+
+Draai je onder **systemd of Docker**, dan zit je goed: die hangen er allebei een
+pijp aan en je hoeft niets te doen. Alleen wie zelf `> bestand` schrijft — of dat
+in een start-script heeft staan — betaalt de prijs. Twee uitwegen:
+
+- laat de uitvoer door een pijp lopen (`| logger`, `| rotatelogs`, een
+  logverzamelaar), of
+- zet `LOG_LEVEL=warn`, dan verdwijnt de regel per verzoek en blijft alleen wat
+  misgaat.
+
+Techniekcontrole **LOG-01** op het backoffice-statusbord kijkt hiernaar en zegt in
+welke stand je staat, dus je hoeft het niet te onthouden.
+
 ### Zet een proxy ervoor? Strip dan `token` uit zijn access log
 
 De live-verbindingen (SSE) kunnen geen `Authorization`-header meesturen —

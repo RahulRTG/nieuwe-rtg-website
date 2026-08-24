@@ -301,6 +301,60 @@ bestandsnaam was `Date.now()`, dus twee rotaties binnen dezelfde milliseconde
 schreven stilzwijgend over elkaar heen -- een heel journaalbestand weg zonder
 foutmelding. De stempel loopt nu altijd door.
 
+## De grootste post nagemeten: hij is grotendeels geen verspilling
+
+Na het bovenstaande stond `writev` bovenaan het profiel, en dat leek de volgende
+grote slag. Een verse profielronde op een stille machine (77.909 monsters, 200 us,
+onder 6.967 verzoeken per seconde) splitst die post echter in twee heel
+verschillende dingen, en dat verschil is de hele uitkomst:
+
+| Post | Aandeel | Wie roept het aan |
+|---|---:|---|
+| `writev` | 17,1% | `res.json` -> het ANTWOORD naar de klant |
+| `writeBuffer` | 5,2% | `writeSync` -> `SyncWriteStream` -> `log.js` |
+
+De eerste is geen verspilling maar het werk zelf: bytes naar een socket schrijven
+IS wat een webserver doet. Daar valt niets weg te halen zonder minder of kleinere
+antwoorden te sturen, en dat is een productbesluit en geen optimalisatie. Dat is
+de eerlijke uitkomst van deze ronde: de grootste post is geen defect.
+
+De tweede is dat wel, en hij zat verstopt achter een aanname. Node kiest zijn
+stdout-stroom op wat eraan hangt:
+
+```
+een PIJP    (systemd, docker, `| logger`)  ->  Socket           asynchroon
+een BESTAND (`node server.js > log`)       ->  SyncWriteStream  SYNCHROON
+```
+
+Met `LOG_LEVEL=info` -- de standaard -- schrijft elk verzoek een regel. Op een
+bestand is dat dus per verzoek een synchrone schrijfactie, midden op de
+event-loop. Gemeten, dezelfde last, alleen de bestemming van stdout verschilt:
+
+| Meter | log -> bestand | log -> pijp | Verschil |
+|---|---:|---:|---:|
+| Event-loop p99 | 26,7 ms | 19,8 ms | **26%** |
+| Event-loop max | 114,3 ms | 68,0 ms | **40%** |
+| Gemiddelde duur | 0,313 ms | 0,320 ms | gelijk |
+
+**Let op wat hier NIET staat: doorvoer.** Die was in de pijp-opstelling juist
+lager (143k tegen 156k verzoeken), en dat is een eigenschap van de meetmachine en
+niet van de software: de `cat` die aan de andere kant van de pijp leest, vecht op
+vier kernen mee om dezelfde CPU. Op een machine met een echte logverzamelaar
+speelt dat niet. De event-loop-cijfers zijn wel houdbaar, want die meten precies
+waar een synchrone schrijfactie pijn doet.
+
+Wat hieruit volgt is geen codewijziging maar een INRICHTINGSkeuze, en die hoort
+niet stil te blijven. Techniekcontrole **LOG-01** op het bord kijkt sinds vandaag
+naar de stroom en zegt het met de meting erbij: staat stdout aan een bestand
+terwijl er per verzoek gelogd wordt, dan is dat een waarschuwing met het advies
+(pijp, of `LOG_LEVEL=warn`). Hangt er een pijp aan, of wordt er niet per verzoek
+gelogd, dan staat hij groen.
+
+`test/logstroom.test.js` start daarvoor ECHTE processen in plaats van
+process.stdout na te bootsen: het ding dat getoetst wordt is het gedrag van Node
+zelf, en een nagemaakte stroom met de goede constructornaam bewijst alleen dat de
+check een string vergelijkt.
+
 ## Wat de winst vasthoudt
 
 Een prestatiewinst die alleen in dit document staat, is een winst die over een

@@ -58,64 +58,18 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      EEN bundel (zie lib/idem.js); deze vlag maakt die bundel ook duurzaam. */
   const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen, duurzaam: true });
 
-  /* ---------- het grootboek zelf ----------
-     `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek
-     (geen guard meer). Gedeeld door de JS-guard (boek, schaduw-modus) en door de
-     motor-spiegel (boekAsync, motor-modus past de door de motor bevestigde regel
-     toe). */
-  function pasToe(rij) {
-    saldi()[rij.van] = saldoVan(rij.van) - rij.centen;
-    saldi()[rij.naar] = saldoVan(rij.naar) + rij.centen;
-    grootboek().unshift(rij);
-    if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
-    save();
-  }
   /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
      saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
      Optioneel: zonder `waarde` is dit exact de regel die hier altijd stond. */
   const waardePoort = require('./poort')({ saldoVan, grootboek, waarde, nu });
-  // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
-  // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
-  // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
-  function boek({ van, naar, centen, soort, oms, ref, genre, dagBesteed }) {
-    if (betalingenUit) return uitFout();
-    if (geldModus === 'motor') {
-      const bron = (new Error().stack || '').split('\n')[2] || '';
-      throw new Error('pay.boek (synchroon) is niet toegestaan in RTG_MOTOR_GELD=motor; gebruik boekAsync.' + bron);
-    }
-    const c = Math.round(Number(centen));
-    if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
-    if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
-    const dicht = waardePoort({ van, naar, centen: c, soort, genre, dagBesteed });
-    if (dicht) return dicht;
-    const rij = { id: id('PB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 120), ref: ref || null, at: nu() };
-    pasToe(rij);
-    schaduw.spiegel(rij); // schaduw-modus: naar de Rust-motor (no-op als uit)
-    return { ok: true, boeking: rij };
-  }
-  /* De async boeking: het EEN choke-point voor de cutover. In schaduw-modus is
-     dit exact de sync-guard (gewoon awaitbaar gemaakt) -- geen gedragsverandering.
-     In motor-modus gaat de boeking geguard naar de motor (de autoriteit); pas als
-     die hem bevestigt, spiegelt de JS-engine dezelfde regel. Weigert de motor
-     (onvoldoende saldo) of is hij onbereikbaar, dan verandert er NIETS aan de
-     JS-saldi -- de fout gaat netjes terug naar de caller. */
-  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed }) {
-    if (betalingenUit) return uitFout();
-    if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref, genre, dagBesteed });
-    /* Ook in motor-modus langs de waardepoort, en met opzet HIER in JS: de motor
-       kent de klassen, het beleid en de reserveringen niet -- die wonen in de
-       metadata aan deze kant, precies zoals de bank-guard in kern/bank/grootboek.js
-       om dezelfde reden in JS bleef staan. Eerst toetsen, dan pas de motor. */
-    const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
-    if (dicht) return dicht;
-    const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
-    if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
-    // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
-    const b = r.boeking;
-    const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
-    pasToe(rij);
-    return { ok: true, boeking: rij };
-  }
+  /* DE SCHRIJFWEG van het grootboek -- pasToe, boek en boekAsync -- staat in
+     ./boeking.js. Dat is een ander onderwerp dan dit bestand: wie daar iets
+     verandert, verandert wat er met GELD gebeurt; wie hier iets verandert,
+     verandert welke ONDERDELEN aan elkaar hangen. */
+  const { pasToe, boek, boekAsync } = require('./boeking')({
+    saldi, saldoVan, grootboek, save, id, schoon, nu, waardePoort,
+    betalingenUit, uitFout, geldModus, motorklant, schaduw, MIN_CENTEN, MAX_CENTEN });
+
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */

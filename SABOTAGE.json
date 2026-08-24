@@ -129,10 +129,10 @@
     },
     "geld-conservatie": {
       "stand": "raak",
-      "afdruk": "e1da19f09789588c",
+      "afdruk": "df25b4e8b5b6e069",
       "reden": "gelijktijdige echte tikken bewaren geld op de cent en zakken nooit onder nul",
       "wachter": "test:test/geld-conservatie-last.test.js",
-      "duurMs": 11337
+      "duurMs": 15727
     },
     "geld-geen-autonome-betalingen": {
       "stand": "mensenwerk",

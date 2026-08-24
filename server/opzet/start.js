@@ -51,7 +51,9 @@ module.exports = function start(deps) {
     startPostgres, DEMO, zetEigenaarsAccount,
     // de papieren van het demopersoneel; draait daar direct na initRealtime()
     demoPapieren: () => require('../kern/staffseed-papieren').zaaiPapieren({
-      db, save, accounts, findSupplier: kern.findSupplier, log }) });
+      db, save, accounts, findSupplier: kern.findSupplier, log }),
+    // de RTG-vloot in het RDW-register; hoort NA de zaai, zie kernlaag2.js
+    registreerVloot: () => (kern.overheid && kern.overheid.registreerVloot()) });
 
   /* Periodiek onderhoud: verlopen snelheidslimiet-tellers en oude event-buffers
      opruimen, zodat het geheugen niet langzaam volloopt bij veel unieke

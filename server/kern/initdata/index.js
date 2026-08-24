@@ -31,6 +31,28 @@ module.exports = function initRealtime(ctx) {
      deel7 neer, en zonder bio en foto is een zaak voor leden onzichtbaar. */
   if (typeof ctx.salonProfielen === 'function') ctx.salonProfielen();
 
+  /* EN DE STANDAARDVELDEN OVER ALLES HEEN, AAN HET EIND.
+
+     deel1-basis draait ensureSupplierDefaults over de zaken die er dan staan --
+     en zet daarna zelf ESVEDRA neer. deel2 doet hetzelfde met MACE. Allebei
+     activiteitenzaken, allebei zonder het veld `transfer` dat een activiteitzaak
+     hoort te hebben. Bij de VOLGENDE start pikte de lus in deel1 ze alsnog op,
+     dus op een database die al eens gedraaid had was er niets aan te zien. Alleen
+     een VERSE installatie miste het veld, en die stand haalt geen enkele
+     ontwikkelaar meer op na de eerste dag.
+
+     Gevonden door een zelfgezaaide installatie te vergelijken met een gegoten
+     (test/gietvorm.test.js): het enige verschil tussen 142 collecties was een
+     veldnaam op suppliers.
+
+     Elk deel zijn eigen aanroep laten doen is de reparatie die dit gat opnieuw
+     maakt zodra iemand een zaak toevoegt en het vergeet -- precies wat hier twee
+     keer is gebeurd. Een sweep aan het eind kan dat niet vergeten. De lus in
+     deel1 blijft staan: die MOET voor de latere delen draaien, want die lezen de
+     velden van bestaande zaken. Dit is geen tweede waarheid maar dezelfde
+     normalisatie nog een keer, en hij is niet voor niets idempotent. */
+  for (const s of (ctx.db.data.suppliers || [])) ctx.ensureSupplierDefaults(s);
+
   merkGeseed(ctx, voorZaaien);
   ruimDemozakenOp(ctx);
 };

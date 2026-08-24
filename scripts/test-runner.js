@@ -158,7 +158,44 @@ const bekend = leesTijden();
 const journaal = path.join(WORTEL, '.routejournaal');
 try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 try { fs.unlinkSync(TIJDEN_RUW); } catch (e) { if (e.code !== 'ENOENT') throw e; }
-const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_TESTTIJDEN_RUW: TIJDEN_RUW };
+/* DE GIETVORM, EEN KEER VOOR DE HELE RONDE.
+
+   468 van de 673 toetsbestanden laten hun server exact dezelfde datamap zaaien.
+   Dat kost 566 ms per start. scripts/vorm.js zet die map een keer klaar (2,6 s)
+   en test/helper.js giet hem in elke toets die er recht op heeft -- elke toets
+   houdt zijn EIGEN verse map en zijn EIGEN verse proces, alleen de moeite om
+   die map te vullen wordt gedeeld. Er kan dus geen toestand van de ene toets
+   naar de andere lekken; test/gietvorm.test.js bewijst dat de gegoten
+   installatie collectie voor collectie gelijk is aan een zelfgezaaide.
+
+   HIER en niet in de helper, om twee redenen. De sleutel van de vorm is een hash
+   over de hele serverboom en kost 100 ms; die hoort een keer per ronde gerekend
+   te worden en niet een keer per toetsbestand. En vier werkers die tegelijk
+   ontdekken dat er nog geen vorm is, zouden er vier tegelijk gaan gieten.
+
+   Mislukt het gieten, dan gebeurt er NIETS bijzonders: er komt een regel bij en
+   elke toets zaait gewoon zelf, precies zoals voor deze wijziging. Een ronde mag
+   niet stukgaan op een versnelling. */
+let vormPad = '';
+if (process.env.RTG_VORM_UIT !== '1') {
+  const t0 = Date.now();
+  try {
+    const r = spawnSync(process.execPath, [path.join(__dirname, 'vorm.js')],
+      { cwd: WORTEL, encoding: 'utf8', timeout: 5 * 60 * 1000 });
+    if (r.status === 0) {
+      vormPad = spawnSync(process.execPath, [path.join(__dirname, 'vorm.js'), '--pad'],
+        { cwd: WORTEL, encoding: 'utf8' }).stdout.trim();
+    }
+    if (vormPad) console.log('[tests] gietvorm klaar in ' + (Date.now() - t0) + ' ms: ' + vormPad);
+    else console.log('[tests] geen gietvorm (' + ((r.stderr || '').trim().split('\n').pop() || 'onbekend')
+      + '); elke toets zaait zelf');
+  } catch (e) {
+    console.log('[tests] geen gietvorm (' + e.message + '); elke toets zaait zelf');
+  }
+}
+
+const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_TESTTIJDEN_RUW: TIJDEN_RUW,
+  ...(vormPad ? { RTG_VORM: vormPad } : {}) };
 
 function draai(namen, parallel, metDekking) {
   if (!namen.length) return 0;

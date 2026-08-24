@@ -15,6 +15,14 @@ if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
   process.exit(r.status == null ? 1 : r.status);
 }
 
+/* De compilatiekas AAN, en zo vroeg mogelijk: alles wat hierna geladen wordt
+   profiteert ervan, alles daarvoor niet. Hij bewaart de compilatie van de ruim
+   vijftienhonderd modules die deze server laadt (1374 ms van een boot van 2054,
+   gemeten met een CPU-profiel) en scheelt 189 ms per start. Sleutelt op de
+   inhoud van elk bestand, dus oude code draaien kan niet; mislukt het, dan
+   gebeurt er niets. Zie server/lib/compilekas.js. */
+require('./lib/compilekas');
+
 /* Wachtwoord-hashing (scrypt) rekent in de libuv-threadpool, die standaard
    maar 4 draden heeft, ongeacht de machine. scrypt is puur rekenwerk, dus de
    juiste maat is: evenveel draden als CPU-kernen (gemeten: op een 4-kernen

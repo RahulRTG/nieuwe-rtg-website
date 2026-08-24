@@ -33,7 +33,7 @@
 
 module.exports = function opslagStart(deps) {
   const { log, accounts, initRealtime, startGedeeld, startSqliteSync, startPostgres,
-    DEMO, zetEigenaarsAccount, demoPapieren } = deps;
+    DEMO, zetEigenaarsAccount, demoPapieren, registreerVloot } = deps;
 
   initRealtime();
   /* De papieren van het demopersoneel, en NA initRealtime() met opzet: de
@@ -43,6 +43,13 @@ module.exports = function opslagStart(deps) {
      over gaat. Zie kern/staffseed-papieren.js voor wat er gezaaid wordt. */
   if (DEMO && demoPapieren) {
     try { demoPapieren(); } catch (e) { log.warn('[demo] papieren zaaien mislukt', { fout: e.message }); }
+  }
+  /* De RTG-vloot in het RDW-register, en NA initRealtime() om dezelfde reden als
+     de papieren hierboven: de verhuurzaken worden pas daar gezaaid. Hij stond in
+     opzet/kernlaag2.js en deed daar op een verse installatie niets -- zie de
+     uitleg daar. Idempotent, dus een tweede start doet geen kwaad. */
+  if (registreerVloot) {
+    try { registreerVloot(); } catch (e) { log.warn('[rdw] vloot registreren mislukt', { fout: e.message }); }
   }
   // Gedeelde data via Redis aanzetten (JSON-opslag, lees-replica's).
   startGedeeld().catch(e => console.warn('[db] gedeelde data mislukt:', e.message));

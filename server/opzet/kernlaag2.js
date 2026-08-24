@@ -157,7 +157,24 @@ Object.assign(kern, require('../kern/overheid').maakOverheid({ db, save, crypto,
   bankLive: () => !!(kern.bank && kern.bankLedenAan && kern.bankLedenAan()),
   bankBoek: o => kern.bank.boekAsync(o), bankSaldo: i => kern.bank.saldoVan(i) }));
 kern.overheid.seed();
-// de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
-// kenteken-check op een huurauto de APK-status teruggeeft
-kern.overheid.registreerVloot();
+/* DE VLOOT WORDT HIER NIET MEER GEREGISTREERD, EN DAT IS EEN REPARATIE.
+
+   Hier stond `kern.overheid.registreerVloot()` -- de RTG-vloot (autoverhuur,
+   tweewielers) in het RDW-register zetten. Op deze plek deed hij op een VERSE
+   installatie niets: op dit moment staan er twaalf zaken in db.data, en de 65
+   demozaken -- inclusief de twee verhuurzaken met samen zes voertuigen -- komen
+   pas later, in initRealtime() vanuit opzet/opslagstart.js. Gemeten:
+
+     boot 1 (verse map)  suppliers=12  verhuur=0  registreerVloot gaf 0
+     boot 2 (zelfde map) suppliers=77  verhuur=2  registreerVloot gaf 6
+
+   Een verse installatie had dus een LEEG RDW-register tot iemand toevallig de
+   huurroute raakte -- die roept hem nog eens aan, en daarom is dit nooit
+   opgevallen. Precies de vorm van LAT-regel 5: het faalde niet, het deed niets.
+
+   Gevonden door twee servers te vergelijken: een die zelf zaaide en een die uit
+   de gietvorm (scripts/vorm.js) kwam. Alle 142 collecties waren gelijk, op deze
+   ene na -- en dat verschil was niet de vorm maar deze volgorde. Hij staat nu in
+   opzet/opslagstart.js, direct na initRealtime(), naast demoPapieren dat daar om
+   exact dezelfde reden staat. */
 };

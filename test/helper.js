@@ -77,6 +77,69 @@ function luisterOpFouten(child) {
   });
 }
 
+/* DE GIETVORM EN WIE ER RECHT OP HEEFT.
+
+   Alleen deze sleutels mag een toets aan startServer meegeven en toch uit de
+   vorm gegoten worden. SMTP_URL staat erop omdat 824 van de 833 aanroepen hem
+   op de lege tekenreeks zetten -- dat is niet "een mailserver kiezen" maar
+   "geen echte mail versturen", en dat verandert niets aan wat er in de datamap
+   komt. Een NIET-lege waarde is wel een keuze en valt er dus buiten.
+
+   RTG_DATA_DIR staat erop omdat 638 van de 673 bestanden hun eigen verse map
+   maken en meegeven. Die map is dan van de TOETS, niet van de helper -- daarom
+   wordt er alleen in gegoten als hij LEEG is (zie isLeeg hieronder). Een lege
+   map krijgt van de server precies de zaai die de vorm bevat, dus gieten
+   verandert niets aan wat de toets ziet.
+
+   Alles wat hier niet op staat -- OFFICE_CODE, DEMO_SUPPLIER, RTG_ENC_KEY,
+   NODE_ENV=production, een eigen script -- laat de server gewoon zelf zaaien.
+   Ik weet niet zeker dat OFFICE_CODE de zaai niet raakt, en dat is precies de
+   reden dat hij er niet op staat: raden is hier geen optie.
+
+   `geenVorm: true` zet het uit voor een enkele aanroep. Dat is er voor
+   test/gietvorm.test.js, die juist een server MET en een ZONDER vorm naast
+   elkaar moet kunnen zetten om te bewijzen dat ze hetzelfde opleveren -- zonder
+   die schakelaar zou die toets zichzelf niet kunnen stellen. */
+const VORM_TOEGESTAAN = new Set(['SMTP_URL', 'RTG_DATA_DIR']);
+const gietVorm = (() => {
+  try { return require('../scripts/vorm.js'); } catch (e) { return null; }
+})();
+
+/* IS DEZE MAP LEEG? Alleen in een lege map mag gegoten worden.
+
+   Dat is de hele veiligheidsregel, en hij is bewust van deze vorm: een lege
+   datamap krijgt van de server precies de zaai die de vorm bevat, dus wie er
+   giet verandert niets aan wat die toets ziet -- alleen aan hoe lang het duurt.
+   Staat er al iets (een db.json die de toets zelf neerzette, een tweede start
+   op dezelfde map bij een herstarttoets), dan is de toestand van die map een
+   BEWERING van de toets en daar blijven we vanaf.
+
+   Een map die niet te lezen is telt als niet-leeg. Bij twijfel zaait de server
+   zelf; dat kost een halve seconde en geen zekerheid. */
+function isLeeg(map) {
+  try { return fs.readdirSync(map).length === 0; }
+  catch (e) { return e.code === 'ENOENT'; }   // bestaat nog niet: de server maakt hem zo
+}
+
+/* Waar mag er gegoten worden, of null. */
+function gietDoel(opts, eigenMap) {
+  if (!gietVorm || process.env.RTG_VORM_UIT === '1' || opts.geenVorm) return null;
+  if (opts.script) return null;                     // een ander startscript zaait misschien anders
+  const env = opts.env || {};
+  for (const sleutel of Object.keys(env)) {
+    if (!VORM_TOEGESTAAN.has(sleutel)) return null;
+    if (sleutel === 'SMTP_URL' && env[sleutel]) return null;
+  }
+  /* De omgeving van de LOPER moet dezelfde zijn als waarin de vorm is gegoten:
+     die lekt hieronder via `...process.env` door naar elke kindserver. Klopt
+     het merk niet, of is er geen vorm, dan gebeurt er niets. */
+  try { if (!gietVorm.erIsEenVorm() || !gietVorm.omgevingKlopt(process.env)) return null; }
+  catch (e) { return null; }
+  const doel = eigenMap || (env.RTG_DATA_DIR ? String(env.RTG_DATA_DIR) : null);
+  if (!doel) return null;
+  return isLeeg(doel) ? doel : null;
+}
+
 async function startEens(opts) {
   const script = opts.script || path.join(__dirname, '..', 'server', 'server.js');
   // Standaard wachten op /api/ready, niet alleen /api/health: sinds de
@@ -138,6 +201,21 @@ async function startEens(opts) {
      die ook. */
   const eigenMap = (opts.env && ('RTG_DATA_DIR' in opts.env)) || process.env.RTG_DATA_DIR
     ? null : fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-toets-'));
+  /* EN DIE VERSE MAP KRIJGT DE GIETVORM MEE, als hij daar recht op heeft.
+
+     Zaaien kost 566 ms per start en 472 van de 673 toetsbestanden laten hun
+     server precies dezelfde zaai-arbeid doen. scripts/vorm.js zet die uitkomst
+     een keer klaar; hier wordt hij ingegoten. De toets houdt zijn EIGEN verse
+     map en zijn EIGEN verse proces -- alleen de moeite om die map te vullen
+     wordt gedeeld, dus er kan geen toestand van de ene toets naar de andere.
+
+     De poort is streng en dat is met opzet: alleen als deze toets NIETS aan de
+     server meegeeft dat kan veranderen wat er gezaaid wordt. Wie wel iets
+     meegeeft zaait gewoon zelf, en dat kost een halve seconde. Een vorm die
+     stilletjes de verkeerde data levert geeft geen fout maar een verkeerd
+     antwoord, en dat is de duurste soort fout die er is. */
+  const giet = gietDoel(opts, eigenMap);
+  if (giet) { try { fs.mkdirSync(giet, { recursive: true, mode: 0o700 }); } catch (e) {} gietVorm.gietIn(giet); }
   const child = spawn(process.execPath, ['--experimental-sqlite', script], {
     /* RTG_TOETS: welke toets deze server start. De server schrijft dat mee in
        het schermjournaal, zodat scripts/schermen.js een VEEGTOETS (een die
@@ -460,4 +538,10 @@ async function bankDeur(page, naam, opties) {
 module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
-  _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };
+  _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) },
+  /* En de beslissing van de gietvorm, zodat test/gietvorm.test.js hem kan
+     stellen zonder er een server bij te starten. De eerste versie van die
+     toets zette een eigen db.json in de map om "niet leeg" na te bootsen; die
+     db.json was geen geldige installatie en de server viel er op om. De
+     beweringen gingen dus over een crash in plaats van over de beslissing. */
+  _vorm: { gietDoel, isLeeg } };

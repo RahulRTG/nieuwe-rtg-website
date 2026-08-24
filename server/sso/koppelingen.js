@@ -79,8 +79,22 @@ function geheimVan(org) {
 function lijst() {
   return S.db.prepare('SELECT * FROM sso_koppelingen ORDER BY naam').all().map(rij2koppeling);
 }
+/* EEN ORG IS HOOFDLETTERONGEVOELIG, en die regel hoort HIER te staan.
+
+   zet() bewaart de org in kleine letters. vind() zocht op de ruwe tekst, en dat
+   ging op twee plekken mis waar niemand naar keek. (1) De beheerroute voor de
+   SCIM-sleutel geeft door wat de eigenaar intypt: wie "O-KLANT" typte bij het
+   aanmaken EN bij het sleutelverzoek, kreeg "maak eerst de koppeling aan" te
+   zien terwijl die er gewoon stond. (2) De tenantlaag draagt de org in
+   hoofdletters (kern/tenant/register.js) en vroeg hier of er een koppeling was
+   -- het antwoord was altijd nee, en de bewering "eigen identiteitsprovider"
+   stond dus bij iedereen op onwaar.
+
+   Normaliseren bij het LEZEN en niet bij elke aanroeper: een regel die je op
+   vier plaatsen moet onthouden, wordt op de vijfde vergeten. */
 function vind(org) {
-  return rij2koppeling(S.db.prepare('SELECT * FROM sso_koppelingen WHERE org = ?').get(String(org || '')));
+  const o = String(org || '').trim().toLowerCase();
+  return rij2koppeling(S.db.prepare('SELECT * FROM sso_koppelingen WHERE org = ?').get(o));
 }
 /* Waar hoort dit e-mailadres thuis? Dit stuurt "typ je werkmail" naar de juiste
    provider. Alleen actieve koppelingen tellen: een uitgezette koppeling hoort

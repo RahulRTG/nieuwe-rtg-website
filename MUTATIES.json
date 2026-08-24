@@ -322,6 +322,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "backupstand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/backupstand.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
     "backupvolledig.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -2785,7 +2793,11 @@
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
-      "staat": "geen toetsen gedraaid"
+      "staat": "gezakt",
+      "module": "server/kern/magnaatwereld.js",
+      "operator": "!==->===#0",
+      "gezakt": 12,
+      "geprobeerd": 4
     },
     "mail-eigen.test.js": {
       "soort": "puur",
@@ -3063,6 +3075,14 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "merkkern.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/merkkern.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "meterijk.test.js": {
       "soort": "puur",
       "staat": "muteert zelf",
@@ -3081,6 +3101,14 @@
       "module": "server/meting.js",
       "operator": ">=->>#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "metingcapaciteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/meting-capaciteit.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "metingen.test.js": {
@@ -4799,6 +4827,37 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "samlacs.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "samlc14n.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/xml.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 3
+    },
+    "samlpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/index.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "samlxsw.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/saml/antwoord.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
     "satelliet.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4971,6 +5030,14 @@
       "operator": "return-weg#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "scimgroepen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/scim/groepen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "scriptbundel.test.js": {
       "soort": "puur",
@@ -5668,6 +5735,54 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "tenant.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "tenantbewijs.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/bewijs.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "tenantcontract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "tenantherstelproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/herstelproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "tenantspine.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/register.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "tenantuitgang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/tenant/uitgang.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "terrein-en-panden.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6311,6 +6426,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "werkcommandbalk.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/command.js",
+      "operator": "getal+1#5",
+      "gezakt": 1,
+      "geprobeerd": 19
+    },
     "werkgebeurtenis.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6326,6 +6449,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "werkgevolg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/gevolg.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "werkgezondheid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6340,6 +6471,14 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "werkhandeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/handeling.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "werkindienst.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6353,6 +6492,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "werkmerk.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/merk.js",
+      "operator": "&&->||#1",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "werkplaats-uitgifte.test.js": {
       "soort": "server",
@@ -6392,6 +6539,14 @@
     "werkruimte-kantoor.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "werkstatus.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/status.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "werktoen.test.js": {
       "soort": "server",

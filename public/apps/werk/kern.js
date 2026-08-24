@@ -50,7 +50,22 @@
         headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lijf) })
         .then(function (r) {
           return r.json().catch(function () { return {}; }).then(function (b) {
-            if (r.status === 403 && sessie) { window.RTGWerk.wis(); window.RTGWerk.poort(); }
+            /* TWEE SOORTEN 403, EN ZE HOREN NIET HETZELFDE TE BETEKENEN.
+
+               Hier stond: elke 403 wist de sessie en gooide de inlogkaart open.
+               Dat klopt voor "verkeerd lid-token", maar niet voor "daar heeft u
+               het recht X voor nodig" -- en dat tweede is de gewone gang van
+               zaken in een werkruimte met rollen. Gevolg: wie het recht `cijfer`
+               miste werd bij het LADEN uitgelogd, want het startscherm haalt het
+               directiebeeld op en dat vraagt dat recht. Zijn sleutel was prima;
+               het scherm zei alleen iets anders.
+
+               De server maakt het onderscheid al: een rechtenweigering draagt
+               het veld `recht`, een sleutelweigering niet. Daar leunen we op --
+               en op niets anders, want een tekstvergelijking op de foutmelding
+               breekt zodra iemand een woord verandert. */
+            var rechtenfout = b && typeof b.recht === 'string';
+            if (r.status === 403 && sessie && !rechtenfout) { window.RTGWerk.wis(); window.RTGWerk.poort(); }
             return { status: r.status, body: b };
           });
         });

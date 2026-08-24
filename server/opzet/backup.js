@@ -10,7 +10,7 @@
    ook aan direct na een overname (zie de cluster-route in server.js), want een
    server die net het roer heeft gekregen hoort niet een dag te wachten.
 
-   WAT ERIN HOORT staat in BACKUP_BESTANDEN en BACKUP_MAPPEN, op EEN plek. Die
+   WAT ERIN HOORT staat in ./backup-lijst.js, op EEN plek. Die
    opsomming stond ooit twee keer letterlijk in backupData -- een keer voor de
    lokale kopie en een keer voor RTG_BACKUP_DIR -- en er ontbraken drie dingen
    in de tweede. Die uitleg staat hieronder waar hij hoort.
@@ -26,40 +26,8 @@ module.exports = function maakBackup(deps) {
   const { fs, path, DATA_DIR, db, accounts, checkpointSqlite, checkpointGrootboek } = deps;
 
   const BACKUP_DIR = path.join(DATA_DIR, 'backups');
-  /* WAT ER IN EEN BACKUP HOORT -- OP EEN PLEK.
-
-     Deze opsomming stond twee keer letterlijk in backupData (een keer voor de
-     lokale kopie, een keer voor RTG_BACKUP_DIR), en er ontbraken drie dingen die
-     er alle drie in horen:
-
-     - grootboek.db: het transactiegrootboek (db/tx/sqliteachter.js) is een EIGEN
-       sqlite-bestand, niet store.db. In de standaardopslag liggen daar de
-       bestellingen en boekingen in. Die stonden dus in geen enkele backup.
-     - archief/: alles wat buiten het RAM-venster is geveegd (archief.js). Juist
-       de oudste gegevens -- de enige die je niet meer uit het geheugen kunt
-       halen -- werden niet bewaard.
-     - papieren.json: het datalek-belschema en de AVG-antwoorden. Dat bestand
-       staat bewust buiten de database EN in .gitignore, dus een backup was de
-       enige plek waar het kon overleven. Sinds de eigenaar het in de boardroom
-       invult, is dat geen theorie meer.
-
-     Twee lijsten van hetzelfde lopen uiteen zodra iemand er een aanraakt; dat is
-     precies hoe grootboek.db erbuiten kon vallen. Vandaar een. */
-  const BACKUP_BESTANDEN = ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal',
-    'grootboek.db', 'grootboek.db-wal', 'papieren.json'];
-  /* DE BESTANDSOPSLAG HOORT ER OOK BIJ.
-
-     Hier stond alleen 'archief'. De database ging mee, de BESTANDEN niet -- en
-     de verwijzingen ernaar wel. Een teruggezette backup gaf dus een systeem dat
-     naar bestanden wijst die er niet zijn: paspoortscans, media in de Salon,
-     gedeelde bestanden, en de outbox met alles wat nog niet bezorgd was.
-
-     Dit is dezelfde soort fout als de sleutels die niet in de backup zaten:
-     bewaren wat naar iets verwijst, zonder te bewaren waarnaar het verwijst.
-
-     'uploads' draagt ook de identiteitsscans, dus deze mappen staan met dezelfde
-     rechten (0700/0600) in de backup als daarbuiten -- zie kopieerMap. */
-  const BACKUP_MAPPEN = ['archief', 'uploads', 'media', 'bestanden', 'outbox'];
+  // De twee lijsten staan in ./backup-lijst.js; server/backupstand.js leest ze ook.
+  const { BACKUP_BESTANDEN, BACKUP_MAPPEN } = require('./backup-lijst');
 
   /* Een map kopieren, plat en zonder verrassingen: alleen gewone bestanden, een
      niveau diep per submap. Het archief is een map met maandbestanden, geen boom
@@ -197,5 +165,5 @@ module.exports = function maakBackup(deps) {
     } catch (e) { console.warn('[backup] mislukt:', e.message); }
   }
 
-  return { backupData, BACKUP_DIR };
+  return { backupData, BACKUP_DIR, BACKUP_BESTANDEN, BACKUP_MAPPEN };
 };

@@ -49,6 +49,7 @@
 const fs = require('fs');
 const path = require('path');
 const kluis = require('../kluis');
+const rtgKlok = require('../lib/klok');
 
 const MAX_BYTES = Number(process.env.RTG_JOURNAAL_BYTES || 2 * 1024 * 1024);
 const MAX_BESTANDEN = Number(process.env.RTG_JOURNAAL_BESTANDEN || 5);
@@ -60,7 +61,10 @@ const HUIDIG = 'huidig.log';
    toets die rotatie wil zien, moet dat kunnen zonder 2 MB weg te schrijven. */
 function maakJournaalbestand({ dir, nu, maxBytes, maxBestanden, vensterMs, stapelMax } = {}) {
   const map = dir;
-  const klok = nu || (() => Date.now());
+  /* De tijd komt uit server/lib/klok.js en niet rechtstreeks van het
+     besturingssysteem: dan kan een toets hem verzetten, en telt deze module niet
+     mee in de klokschuld (scripts/klok.js ratelt daarop). */
+  const klok = nu || rtgKlok.nu;
   const GRENS_BYTES = Number(maxBytes || MAX_BYTES);
   const GRENS_BESTANDEN = Number(maxBestanden || MAX_BESTANDEN);
   const SPOEL_MS = Number(vensterMs || VENSTER_MS);

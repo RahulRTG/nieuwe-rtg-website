@@ -213,6 +213,17 @@ const api = (pad, body, herkans) => fetch(pad, {
   if (p) return p;
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
+/* De stand van de App Store staat HIER en niet bij zijn eigen blok verderop.
+
+   Reden, en het is geen smaak: de startregel hieronder roept laadAppstore() aan
+   terwijl het script nog wordt doorlopen, en tekenStore() leest AS.mijn VOOR
+   zijn eerste await. Een `const` die verderop staat, zit op dat moment nog in
+   zijn dode zone -- en dan valt de hele App Store-afdeling stil met
+   "Cannot access 'AS' before initialization", zonder dat er iets op het scherm
+   verandert. De afdelingen erboven ontkomen daaraan omdat ze toevallig eerst
+   iets ophalen; toeval is een slechte reden om ergens op te vertrouwen. */
+const AS = { zoek: '', pagina: 1, mijn: false };
+
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
@@ -573,8 +584,8 @@ async function tekenApps(){
    Installeren is hier ook iets anders. Bij de Bibliotheek zet je een app op je
    startscherm; hier GEEF je iets weg, per machtiging, met een vinkje. Daarom
    staat wat een app krijgt EN wat hij nooit krijgt op de kaart zelf.
-   Zie APPSTORE.md. */
-const AS = { zoek: '', pagina: 1, mijn: false };
+   Zie APPSTORE.md. De stand (AS) staat bovenaan bij de startregel; waarom staat
+   daar. */
 async function laadAppstore(){
   $('#appstore').innerHTML =
     '<div class="etage" id="appstoreEtage"><div class="etage-kop"><h2>App Store</h2>'+

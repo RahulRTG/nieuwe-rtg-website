@@ -143,3 +143,78 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* De twee schermen eromheen, in dezelfde browser. Ze staan hier en niet in een
+   API-toets omdat de fout die deze toets vond ALLEEN in een venster bestaat: de
+   startregel van mall.html roept laadAppstore() aan terwijl het script nog wordt
+   doorlopen, en een `const` die verderop stond zat op dat moment nog in zijn
+   dode zone. Gevolg: de hele afdeling viel stil, de API antwoordde vrolijk 200,
+   en geen enkele toets over de lijn merkte iets. */
+test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-ui-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  const base = srv.base;
+  let browser = null;
+  try {
+    const tech = (await api(base, '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
+    const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
+    const chef = (roster.staff || []).find(x => x.role === 'manager');
+    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    const lid = (await api(base, '/api/auth/register', { name: 'Winkel Lid', email: 'winkel@x.nl', phone: '0612345676',
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+    await api(base, '/api/techniek/tenant', { org: 'O-WINKEL', naam: 'Winkel Uitgeverij' }, tech);
+    await api(base, '/api/techniek/tenant/bind', { org: 'O-WINKEL', soort: 'zaak', code: 'KIKUNOI' }, tech);
+    await api(base, '/api/appstore/uitgever/aanvraag', { naam: 'Winkel Uitgeverij', contact: 'dev@winkel.nl' }, sup);
+    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-WINKEL', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+    const inz = await api(base, '/api/appstore/uitgever/inzenden', {
+      manifest: { sleutel: 'winkel-proef', naam: 'Winkelproef', versie: '1.0.0', categorie: 'leven',
+        uitleg: 'Een proefapp om de winkelkant van de App Store te tonen.',
+        machtigingen: ['opslag.eigen', 'profiel.basis'] },
+      bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
+    assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
+    await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+
+    browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+
+    // ---- de winkel in de Mall ----
+    const page = await browser.newPage();
+    const fouten = [];
+    page.on('pageerror', (e) => fouten.push(String(e && e.message || e)));
+    await page.goto(base + '/apps/app.html');
+    await page.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
+    await page.goto(base + '/apps/mall.html');
+    await page.waitForSelector('#asGrid .boutiek', { timeout: 20000 });
+    assert.deepEqual(fouten, [], 'de Mall boot zonder onopgevangen fouten');
+    assert.equal(await page.locator('#asGrid input[data-m]').count(), 2,
+      'wat de app vraagt staat als vinkje op de kaart -- een toestemming die je pas na het drukken ziet, is geen keuze');
+    const kaart = await page.textContent('#asGrid .boutiek');
+    assert.match(kaart, /Winkel Uitgeverij/, 'van wie de app is, staat erbij');
+    assert.match(kaart, /Nooit:/, 'en wat hij NOOIT krijgt staat er even groot bij');
+
+    // een vinkje weglaten en installeren: dan krijgt de app er een
+    await page.uncheck('#asGrid input[data-m][data-m="profiel.basis"]');
+    await page.click('#asGrid .asZet');
+    await page.waitForSelector('#asGrid a:has-text("Openen")', { timeout: 15000 });
+    const mijn = await api(base, '/api/appstore/mijn', {}, lid);
+    assert.deepEqual(mijn.body.apps[0].verleend.map(m => m.id), ['opslag.eigen'],
+      'het lid gaf er een van de twee, en dat is wat er staat');
+
+    // ---- het uitgeversbureau ----
+    const p2 = await browser.newPage();
+    const f2 = [];
+    p2.on('pageerror', (e) => f2.push(String(e && e.message || e)));
+    await p2.goto(base + '/apps/app.html');
+    await p2.evaluate((t) => localStorage.setItem('rtg_sup_token', t), sup);
+    await p2.goto(base + '/apps/appstore-uitgever.html');
+    await p2.waitForSelector('#mSleutel', { timeout: 20000 });
+    assert.deepEqual(f2, [], 'het uitgeversbureau boot zonder onopgevangen fouten');
+    assert.equal(await p2.locator('input[data-mach]').count(), 3, 'alle drie de machtigingen staan er om te vragen');
+    assert.ok(await p2.locator('#bProef').count(), 'en de proefkeuring staat er');
+    assert.match(await p2.textContent('body'), /Winkelproef/, 'de eigen app staat in de lijst');
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+    stop(srv && srv.child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

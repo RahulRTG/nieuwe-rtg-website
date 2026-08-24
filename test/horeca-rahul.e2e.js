@@ -1,4 +1,4 @@
-/* DE ACTIEBONNEN VAN RAHUL op het scherm: /apps/horeca-beheer.html.
+/* HET BEHEERSCHERM: de actiebonnen van Rahul en de meetlat van de dienst.
 
    De regels staan vast in test/horeca-rahul.test.js. Wat hier bewezen wordt is
    het deel dat de hele opdracht draagt: "nooit ongemerkt" gaat over wat een
@@ -12,6 +12,11 @@
       de rekening; erna wel, met de naam van de mens op de bon.
    4. DE GRENS STAAT ER ALS TEKST EN NIET ALS VERZONNEN GETAL: zonder instelling
       zegt het scherm met zoveel woorden dat elke korting een mens vraagt.
+   5. DE MEETLAT TOONT WAT NIET GEMETEN IS ALS NIET GEMETEN. Twaalf regels, en
+      wat er geen bron voor heeft krijgt geen nul maar een streepje met een
+      reden. Een nul die uit het ontbreken van gegevens komt, is geen resultaat
+      maar een lege avond -- en dat is precies de fout die een meetlat
+      waardeloos maakt.
 
    Draait alleen waar een browser is.
    ========================================================================== */
@@ -93,6 +98,43 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
     assert.match(beeld.bonnen, new RegExp('Bevestigd door ' + mgr.name.split(' ')[0]),
       'en de naam van de mens staat op de bon: ' + beeld.bonnen.slice(0, 200));
     assert.equal((await page.$$('[data-bevestig]')).length, 0, 'er valt niets meer te bevestigen');
+
+    /* ---- 5. de meetlat ---- */
+    const meet = await page.evaluate(() => ({
+      telling: document.getElementById('mMeetTelling').textContent,
+      lat: document.getElementById('mMeetlat').innerText.replace(/\s+/g, ' ')
+    }));
+    assert.match(meet.telling, /gemeten/, 'de kop telt de soorten: ' + meet.telling);
+    assert.match(meet.telling, /niet gemeten/, 'inclusief wat er niet gemeten is');
+
+    assert.match(meet.lat, /spreiding tussen gerechten van dezelfde gang/,
+      'de regels van HORECA.md staan er woordelijk');
+    assert.match(meet.lat, /geen spreiding van nul/i,
+      'en een lege avond krijgt geen nul maar een reden: ' + meet.lat.slice(0, 200));
+
+    /* EN ER STAAT WERKELIJK GEEN GETAL. De reden alleen is niet genoeg: een
+       scherm dat de uitleg toont en er tóch een nul naast zet, liegt met een
+       voetnoot. Dus wordt de waardekolom van die regel apart nagekeken. */
+    const zonderGetal = await page.evaluate(() => {
+      const rij = [...document.querySelectorAll('#mMeetlat .item')]
+        .find(el => el.innerText.indexOf('spreiding tussen gerechten') >= 0);
+      if (!rij) return null;
+      const cellen = rij.querySelectorAll(':scope > span');
+      return cellen[cellen.length - 1].textContent.trim();
+    });
+    assert.ok(zonderGetal !== null, 'de regel staat op het scherm');
+    assert.doesNotMatch(zonderGetal, /\d/,
+      'de waardekolom van een niet-gemeten regel draagt geen getal, maar: "' + zonderGetal + '"');
+    assert.match(meet.lat, /uit het model/,
+      'een nul die uit het ontwerp komt, staat als zodanig');
+    assert.match(meet.lat, /ranglijst/,
+      'en de reden waarom bedieningshandelingen niet geteld worden, is een besluit');
+
+    /* GEEN SAMENVATTEND CIJFER. "9 van de 12 groen" telt dingen op die niet in
+       dezelfde eenheid staan, en verbergt dat er acht helemaal niet gemeten
+       worden. */
+    assert.doesNotMatch(meet.telling, /%|score|van de 12/i,
+      'er staat geen samenvattend cijfer: ' + meet.telling);
 
     assert.deepEqual(fouten, [], 'geen scriptfouten op het beheerscherm');
   } finally {

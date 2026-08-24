@@ -757,6 +757,39 @@ bestellingen, gelijke bezetting, dezelfde storingen, dezelfde personeelssterkte
 De laatste regel is de belangrijkste. Dit document is pas waar wanneer er een
 meting naast staat, en tot die tijd is het een plan.
 
+**Het instrument staat er sinds 23 augustus 2026** (`kern/horeca/dienstmeting.js`,
+zichtbaar op `/apps/horeca-beheer.html`). Het meet geen echte avond — dat vraagt
+een zaak, een dienst en iemand die meekijkt — maar het zet per regel neer wat er
+werkelijk uit de data komt. En de hele kunst zit in wat het **niet** zegt: van de
+twaalf regels zijn er maar een handvol te meten, en de verleiding is om de rest
+op nul te zetten. Twaalf groene vinkjes staan mooi. Elke regel draagt daarom een
+soort:
+
+| soort | wat het betekent |
+|---|---|
+| **gemeten** | er staat een getal, met zijn eenheid en de rekensom erbij |
+| **uit het model** | nul omdat de data het niet anders *kan* weergeven — een eigenschap van het ontwerp, geen prestatie van de dienst |
+| **niet gemeten** | geen bron. Met de reden erbij, zodat iemand die bron kan bouwen in plaats van te vergeten dat hij ontbreekt |
+
+Vandaag: **drie gemeten** (dubbele boekingen, onbevestigde allergiewijzigingen,
+kritieke AI-acties zonder bewijs — plus tijd tot eerste drank, spreiding en
+beloofde gereedtijd zodra er een dienst is gedraaid), **één uit het model**
+(dubbel geclaimde uitgiftes: een claim woont per gang in één veld en twee passen
+daar niet in), en **acht niet gemeten**. Twee van die acht zijn een besluit en
+geen tekort: *bedieningshandelingen per bestelling* wordt niet geteld omdat een
+systeem dat handelingen per medewerker telt een halve stap van een ranglijst
+staat (grens 5), en *statische "enterprise"-beloften* is een leesoordeel over
+deze tekst — een scherm dat er een getal bij zet, liegt.
+
+Er staat met opzet **geen samenvattend cijfer**. "Negen van de twaalf groen" telt
+dingen op die niet in dezelfde eenheid staan en verbergt dat er acht helemaal
+niet gemeten worden.
+
+**Een lege avond geeft geen nullen.** Nul complete gangen is niet "spreiding 0"
+maar "niet gemeten"; een lege avond is geen perfecte avond. Dat is de fout die
+een meetlat waardeloos maakt, en `test/horeca-dienstmeting.test.js` houdt hem
+tegen.
+
 ## Wat er hierna ligt
 
 *De vier punten die hier op 23 augustus 2026 stonden zijn alle vier af: het
@@ -766,12 +799,12 @@ rolmodus host. Wat er nu ligt staat hieronder — en de eerlijkste zin van dit
 document staat nog steeds onderaan de meetlat: dit is pas waar wanneer er een
 meting van een echte dienst naast staat.*
 
-**Een dienst meten.** Alles hierboven is met toetsen bewezen en met geen enkele
-avond. De meetlat onderaan dit document noemt de getallen die ertoe doen —
-spreiding binnen een gang, beloofde versus werkelijke gereedtijd, dubbel
-geclaimde uitgiftes — en er staat nog nergens een gemeten waarde naast. Dat is
-geen bouwwerk maar een proef, en hij vraagt een zaak, een avond en iemand die
-meekijkt.
+**Een dienst draaien.** Het instrument staat er (zie de meetlat hierboven); wat
+ontbreekt is een avond om er doorheen te halen. Alles in dit document is met
+toetsen bewezen en met geen enkele dienst. Dat is geen bouwwerk maar een proef,
+en hij vraagt een zaak, een avond en iemand die meekijkt. Zolang die er niet is
+geweest, staat er bij acht van de twaalf meetpunten "niet gemeten" — en dat is de
+eerlijkste zin die dit document over zichzelf kan zeggen.
 
 **De vloer (VLOER) heeft geen eigen scherm.** Vijf van de zes werkstanden staan
 er: TAFEL, PDA SERVICE, VUUR, BAR en REGIE. De maître ziet de zaak nu via het

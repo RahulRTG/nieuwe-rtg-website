@@ -25,6 +25,9 @@
      belofte   het serveermoment zelf, dus grens nul. Een gang die zijn eigen
                doel voorbij is, is te laat -- en de bediening hoort dat te weten
                vóór de gast het vraagt.
+     aankomst  het afgesproken AANKOMSTmoment van een Arrival Pass. Een belofte
+               die nog openstaat terwijl de gast al binnen is, is een ander soort
+               te laat dan een die nog twee uur heeft.
 
    EN WAT GEEN GRENS HEEFT, KRIJGT ER GEEN. Een tafel die openstaat zonder
    bestelling wacht ergens op, maar er is nergens vastgelegd hoe lang dat mag
@@ -64,7 +67,11 @@ const PASMARGE = cadans.PASMARGE;
 const MODI = {
   bediening: { naam: 'Bediening', soorten: ['verzoek', 'belofte', 'opnemen'] },
   runner: { naam: 'Runner', soorten: ['pas'] },
-  alles: { naam: 'Alles', soorten: ['verzoek', 'pas', 'belofte', 'opnemen'] }
+  /* De host werkt op de aankomststroom: beloften die op een persoonlijke
+     controle wachten VOORDAT de gast er is. `opnemen` staat erbij omdat een
+     tafel die net is gezet en nog niets besteld heeft, ook aan de host hangt. */
+  host: { naam: 'Host', soorten: ['aankomst', 'opnemen'] },
+  alles: { naam: 'Alles', soorten: ['verzoek', 'pas', 'belofte', 'aankomst', 'opnemen'] }
 };
 
 /* WAAROM ER GEEN MODUS "WIJKHOOFD" IN DEZE LIJST STAAT. Een wijkhoofd stelt een
@@ -79,7 +86,7 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
   const wijklaag = require('./wijk')({ horeca, schoon });
   /* Waar een taak vandaan komt, staat in ./werklijst-bronnen.js -- zie de kop
      daar voor waarom die naad daar ligt. Dit bestand ordent en filtert. */
-  const { vanVerzoeken, vanPas, vanBelofte, vanOpnemen } =
+  const { vanVerzoeken, vanPas, vanBelofte, vanOpnemen, vanAankomst } =
     require('./werklijst-bronnen')({ horeca, schoon, verzoeklaag });
 
   /* Hoeveel open werk draagt elke wijk, en wie draagt hem. Bewust GEEN score en
@@ -118,6 +125,7 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
     if (soorten.includes('verzoek')) alles = alles.concat(vanVerzoeken(code, nuMs));
     if (soorten.includes('pas')) alles = alles.concat(vanPas(h, nuMs));
     if (soorten.includes('belofte')) alles = alles.concat(vanBelofte(h, nuMs));
+    if (soorten.includes('aankomst')) alles = alles.concat(vanAankomst(h, nuMs));
     if (soorten.includes('opnemen')) alles = alles.concat(vanOpnemen(h, nuMs));
 
     /* De wijklens. `mijn` toont alleen tafels die van mij zijn -- en "van mij"

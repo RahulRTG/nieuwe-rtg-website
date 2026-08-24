@@ -106,6 +106,12 @@
       api('/pas/uit', { rekeningId: b.dataset.uit, gang: b.dataset.gang }).then(na);
     });
     K.bind($('main'), 'tafel', function (b) { open(b.dataset.tafel); });
+    /* Een belofte aftekenen: de bestaande deur van Invisible Arrival. `akkoord`
+       is expliciet true -- deze knop zegt "ik heb dit gedaan", en dat is de
+       enige betekenis die hij mag hebben. */
+    K.bind($('main'), 'belofte', function (b) {
+      api('/arrival/promise', { arrivalId: b.dataset.arrival, id: b.dataset.belofte, akkoord: true }).then(na);
+    });
   }
 
   /* Na een handeling: de fout van de server LATEN STAAN en niet vertalen. Een
@@ -166,37 +172,8 @@
   }
   if (window.RTGHorecaEdge) RTGHorecaEdge.zet(K.token, toonEdge);
 
-  /* ONTVANGEN. Een tafel openen is de eerste handeling van de avond en stond
-     alleen op het zaalscherm -- dus liep de bediening met een telefoon in de
-     hand naar binnen om een tafel te openen. */
-  $('pNieuw').addEventListener('click', function () {
-    var tafel = $('pNieuwTafel').value.trim();
-    if (!tafel) return meld('Welke tafel of plek?');
-    var gasten = parseInt($('pNieuwGasten').value, 10);
-    api('/rekening/open', { kanaal: 'tafel', tafel: tafel, gasten: gasten > 0 ? gasten : 1 })
-      .then(function (r) {
-        if (r.body.error) return meld(r.body.error);
-        $('pNieuwTafel').value = '';
-        open(r.body.rekening.id);
-      });
-  });
-
-  /* De open tafels: niet alles wat open staat is een TAAK (een tafel die net
-     eten kreeg wacht nergens op), maar je moet er wel bij kunnen. */
-  $('pTafels').addEventListener('click', function () {
-    api('/rekeningen', { status: 'open' }).then(function (r) {
-      var lijst = r.body.rekeningen || [];
-      if (!lijst.length) return meld('Er staat geen enkele rekening open.');
-      $('pNu').innerHTML = '<p class="pda-som">Open tafels</p>' + lijst.map(function (x) {
-        return '<article class="pda-taak"><div class="pda-kop">' +
-          '<span class="pda-tafel">' + esc(x.tafel || x.kanaal) + '</span>' +
-          '<span class="pda-min">' + K.euro(x.totalen.netto) + '</span></div>' +
-          '<div class="pda-acties">' + K.knop('Open', { tafel: x.id }, true) + '</div></article>';
-      }).join('');
-      $('pOpen').innerHTML = '';
-      K.bind($('pNu'), 'tafel', function (b) { open(b.dataset.tafel); });
-    });
-  });
+  // ontvangen en de open tafels staan in ./pda-ontvangst.js -- zie de kop daar
+  window.RTGPdaOntvangst.bind(open);
 
   $('pVerversNu').addEventListener('click', haal);
   /* De duwstroom: een verzoek of een klaar bord van een collega hoort hier

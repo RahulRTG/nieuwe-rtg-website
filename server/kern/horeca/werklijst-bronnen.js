@@ -90,6 +90,55 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
     return uit;
   }
 
+  /* DE AANKOMSTSTROOM -- de bron van de host.
+
+     Een Arrival Pass draagt BELOFTEN, en sommige daarvan wachten expliciet op
+     een mens: een toegankelijke route, een allergiebriefing voor de keuken, een
+     bijzonder moment. Die staan er al jaren (routes/supplier/horeca/
+     invisible-arrival.js); wat ontbrak is dat ze op een werklijst kwamen.
+
+     DE GRENS IS HET AFGESPROKEN AANKOMSTMOMENT ZELF, en die is niet verzonnen:
+     de gast heeft een tijd gekregen en die staat op de pass. Een belofte die
+     nog openstaat terwijl de gast al binnen is, is te laat -- en dat is een
+     ander soort te laat dan "we hebben er nog twee uur voor".
+
+     `wacht` telt vanaf het moment dat de aanvraag binnenkwam: zo lang staat de
+     belofte al open. `grens` is hoeveel minuten er tussen die aanvraag en de
+     aankomst zaten. Dat maakt `over` precies wat je wilt weten -- hoeveel
+     minuten geleden de gast er had moeten zijn terwijl wij nog niets hadden
+     afgetekend. */
+  function vanAankomst(h, nuMs) {
+    const uit = [];
+    for (const a of Object.values(h.arrivals || {})) {
+      if (!a || !Array.isArray(a.beloften)) continue;
+      if (a.vervaltAt && Date.parse(a.vervaltAt) < nuMs) continue;
+      const open = a.beloften.filter((p) => /wacht|voorgesteld/.test(String(p.status || '')));
+      if (!open.length) continue;
+      const aankomstMs = Date.parse(String(a.datum) + 'T' + String(a.tijd) + ':00');
+      const aanvraagMs = Date.parse(a.at || '');
+      if (isNaN(aankomstMs) || isNaN(aanvraagMs)) continue;
+      const wacht = Math.max(0, Math.round((nuMs - aanvraagMs) / MIN));
+      const grens = Math.max(0, Math.round((aankomstMs - aanvraagMs) / MIN));
+      uit.push({
+        soort: 'aankomst', id: 'aankomst:' + a.id, bronId: a.id,
+        tafel: a.tafel || null, rekeningId: null,
+        wat: 'Aankomst ' + a.tijd + ', ' + a.personen + ' gast(en): ' + open.length +
+          ' belofte(n) wachten op een persoonlijke controle',
+        wacht, grens, over: wacht - grens,
+        door: null,
+        /* De open beloften reizen mee, want een host die niet ziet WELKE
+           belofte wacht, moet eerst een ander scherm openen -- en dan is dit
+           geen werklijst maar een verwijzing. */
+        beloften: open.map((p) => ({ id: p.id, label: p.label, status: p.status, bewijs: p.bewijs || null })),
+        rekensom: 'Aangevraagd om ' + hhmm(aanvraagMs) + ', de gast wordt om ' + a.tijd +
+          ' verwacht. ' + (wacht > grens
+            ? 'Dat moment is ' + (wacht - grens) + ' min voorbij.'
+            : 'Er is nog ' + (grens - wacht) + ' min.')
+      });
+    }
+    return uit;
+  }
+
   /* ---- en de soort zonder grens ---- */
 
   function vanOpnemen(h, nuMs) {
@@ -110,5 +159,5 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
     return uit;
   }
 
-  return { vanVerzoeken, vanPas, vanBelofte, vanOpnemen, PASMARGE };
+  return { vanVerzoeken, vanPas, vanBelofte, vanOpnemen, vanAankomst, PASMARGE };
 };

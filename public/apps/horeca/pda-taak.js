@@ -28,6 +28,15 @@
         : K.knop('Ik draag hem', { pak: t.rekeningId, gang: t.gang }, true)) +
         K.knop('Uitgegeven', { uit: t.rekeningId, gang: t.gang });
     }
+    /* DE HOST TEKENT EEN BELOFTE PERSOONLIJK AF. Eén knop per belofte en niet
+       één voor alle: "persoonlijk gecontroleerd" betekent dat iemand het
+       werkelijk heeft gedaan, en een knop die er vijf tegelijk afvinkt maakt
+       van die zin een formaliteit. De deur is de bestaande /arrival/promise. */
+    if (t.soort === 'aankomst') {
+      return (t.beloften || []).map(function (p) {
+        return K.knop(p.label + ' gecontroleerd', { belofte: p.id, arrival: t.bronId }, true);
+      }).join('');
+    }
     if (t.soort === 'opnemen') return K.knop('Opnemen', { tafel: t.rekeningId }, true);
     /* Een beloftetaak heeft geen knop: dit is werk van de keuken. Wat de
        bediening ermee doet -- de tafel geruststellen, de chef aanspreken -- is
@@ -35,6 +44,17 @@
        daar staat wat de gast besteld heeft. */
     if (t.soort === 'belofte') return K.knop('Bekijk de tafel', { tafel: t.rekeningId });
     return '';
+  }
+
+  /* De open beloften onder de kaart: een host die niet ziet WELKE belofte
+     wacht, moet eerst een ander scherm openen -- en dan is dit geen werklijst
+     maar een verwijzing. */
+  function beloften(t) {
+    if (!t.beloften || !t.beloften.length) return '';
+    return '<ul class="pda-borden">' + t.beloften.map(function (p) {
+      return '<li><span>' + esc(p.label) + '</span><em>' + esc(p.status) +
+        (p.bewijs ? ' &middot; ' + esc(p.bewijs) : '') + '</em></li>';
+    }).join('') + '</ul>';
   }
 
   function borden(t) {
@@ -55,7 +75,7 @@
       '<div class="pda-kop"><span class="pda-tafel">' + esc(t.tafel || '-') + '</span>' +
       '<span class="pda-min">' + esc(min) + '</span></div>' +
       '<p class="pda-wat">' + esc(t.wat) + '</p>' +
-      borden(t) +
+      borden(t) + beloften(t) +
       ((t.allergieen && t.allergieen.length)
         ? '<span class="pda-allergie">Allergie: ' + esc(t.allergieen.join(', ')) + '</span>' : '') +
       '<p class="pda-som">' + esc(t.rekensom) + '</p>' +

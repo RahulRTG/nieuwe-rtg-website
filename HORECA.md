@@ -334,8 +334,26 @@ drukte van een collega niet zien. Het getal hoort bij de **wijk** en niet bij de
 mens: er komt geen ranglijst op medewerkers (grens 5); de naam staat erbij zodat
 je weet wie je moet aanspreken, niet om te vergelijken.
 
-De rolmodus *host* wacht nog: die vraagt de aankomststroom, en dat is een eigen
-snede — zie **Wat er hierna ligt**.
+**De host is de vierde modus, en werkt op een vijfde bron.** De werklijst kende
+vier: een gastverzoek, de pas, een gebroken belofte en een tafel zonder
+bestelling. Een host werkt op de **aankomststroom** — een Arrival Pass draagt
+beloften, en sommige wachten expliciet op een mens: een toegankelijke route, een
+allergiebriefing voor de keuken, een bijzonder moment. Die stonden er al jaren;
+wat ontbrak is dat ze op een werklijst kwamen.
+
+De grens is het **afgesproken aankomstmoment zelf**, en die is niet verzonnen:
+de gast heeft een tijd gekregen en die staat op de pass. Een belofte die nog
+openstaat terwijl de gast al binnen is, is een ander soort te laat dan een die
+nog twee uur heeft. `wacht` telt vanaf de aanvraag, `grens` is de tijd tussen
+aanvraag en aankomst — dus `over` is precies hoeveel minuten geleden de gast er
+had moeten zijn terwijl wij nog niets hadden afgetekend.
+
+De open beloften **reizen mee met de taak**: een host die niet ziet wélke belofte
+wacht, moet eerst een ander scherm openen, en dan is dit geen werklijst maar een
+verwijzing. En er staat **één knop per belofte**, niet één voor alle: "persoonlijk
+gecontroleerd" betekent dat iemand het werkelijk heeft gedaan, en een knop die er
+drie tegelijk afvinkt maakt van die zin een formaliteit. Wat al berekend is
+(operationele capaciteit) wacht op niemand en staat er dus niet bij.
 
 **Twee vensters, één scherm.** De werklijst zegt WAT er moet gebeuren; de tafel
 is waar het gebeurt. Ze wisselen elkaar af en staan niet naast elkaar: op een
@@ -710,13 +728,6 @@ hebben die rij niet: daar wordt niet opgenomen maar bewérkt — een gang vrijge
 een stand zetten, splitsen — en dat vraagt een lokale werkelijkheid die wordt
 samengevoegd, geen rij die opnieuw verstuurt. Een andere klasse probleem, en hij
 verdient een eigen ontwerp.
-
-**De rolmodus host.** De werklijst kent vier bronnen: een gastverzoek, de pas,
-een gebroken belofte en een tafel zonder bestelling. Een host werkt op een vijfde
-die er nog niet in zit: de aankomststroom (`/arrivals`), waar beloften wachten
-op een persoonlijke controle vóór de gast er is. De grens ligt daar voor de hand
-— het afgesproken aankomstmoment zelf — maar het is een eigen bron met een eigen
-levensloop, en die hoort niet als bijzin bij de wijk.
 
 ## De echte wauw
 

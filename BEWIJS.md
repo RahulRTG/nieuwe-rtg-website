@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1051 bestanden en 6990 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1052 bestanden en 6995 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1051 |
-| losse beweringen (`test(...)`) | 6990 |
+| toetsbestanden | 1052 |
+| losse beweringen (`test(...)`) | 6995 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 867 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 25 |
-| niets van beide | 111 |
+| niets van beide | 112 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-919 bestanden, 6764 beweringen.
+920 bestanden, 6769 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -301,6 +301,7 @@ toets omvalt.
 | `horeca-cadans.test.js` | 7 | -- | RTG Horeca: de cadans -- terugrekenen vanaf het serveermoment. Wat hier bewezen wordt, en waarom juist dat: 1. |
 | `horeca-edge.test.js` | 6 | -- | RTG Horeca: VENUE EDGE -- de bestelling die zonder lijn is opgenomen. De kassa had zijn offline-rij al; de zaal en de PDA niet, en daar zat een echte reden onder: een kassabon is EEN verzoek, een rekening leeft over... |
 | `horeca-gezelschap.test.js` | 10 | genoemd | RTG Horeca: het gezelschap aan een rekening, van de kant van de BEDIENING. De data bestond al -- een rekening kent `deelnemers`, een regel kent `gastNr`, en kern/gast/verdeling.js splitst er al mee. |
+| `horeca-host.test.js` | 5 | -- | RTG Horeca: DE ROLMODUS HOST -- de aankomststroom als vijfde taakbron. De werklijst kende vier bronnen: een gastverzoek, de pas, een gebroken belofte en een tafel zonder bestelling. |
 | `horeca-hotel-event.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 4: de gastrekening van het hotel en de zakelijke kant van een event. Wat hier bewezen wordt: - op de kamer boeken kan alleen als daar een open gastrekening staat, en een restaurantrekening die op... |
 | `horeca-journey.test.js` | 4 | -- | RTG Horeca: de gastreis-toren, en de regel die hem verbouwde. HORECA.md grens 7: WAT NIET GEMETEN IS, WORDT NIET ALS GETAL GETOOND. |
 | `horeca-kaart.test.js` | 5 | -- | RTG Horeca: DE KAART VAN EEN ZAAK -- één opbouw, twee deuren. De kaart stond in routes/gast/tafel.js en werd aan de kern gehangen. |

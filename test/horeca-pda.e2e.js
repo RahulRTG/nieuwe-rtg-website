@@ -12,7 +12,8 @@
       afronden zijn twee knoppen, en na "Ik ga" staat er wie het heeft.
    4. EEN COMPLETE GANG IS EEN DRAAGTAAK MET DE BORDEN EN DE ALLERGIE EROP. Een
       allergie die de drager niet ziet, is de fout die dit huis niet mag maken.
-   5. DE MODUS IS EEN LENS: de runner ziet de gang wel en het verzoek niet.
+   5. DE MODUS IS EEN LENS: de runner ziet de gang wel en het verzoek niet, en
+      de host ziet de aankomsten die de anderen niet zien.
    6. HET SCHERM VINKT NIETS ZELF AF: na "Ik draag hem" staat de bon nog steeds
       op klaar, en pas "Uitgegeven" haalt hem van de lijst.
    7. DE WIJK IS EEN TWEEDE LENS, NAAST DE MODUS, en hij zegt wat hij niet
@@ -113,7 +114,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
       modi: [...document.querySelectorAll('#pModi button')].map(b => b.textContent)
     }));
     let beeld = await lees();
-    assert.deepEqual(beeld.modi, ['Bediening', 'Runner', 'Alles'], 'de drie werkstanden staan er');
+    assert.deepEqual(beeld.modi, ['Bediening', 'Runner', 'Host', 'Alles'], 'de vier werkstanden staan er');
 
     /* 2. de scheiding. Alleen wat over een vastgelegde grens is, staat in "nu";
        een tafel zonder bestelling heeft geen grens en komt er dus nooit in, hoe
@@ -166,6 +167,67 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.equal(naUit.regels[0].stand, 'uitgegeven', 'nu pas is hij uitgegeven');
     beeld = await lees();
     assert.doesNotMatch(beeld.nu + beeld.open, /PDA-DRAAG/, 'en dan is de taak weg');
+
+    /* ---- 5b. de host ziet de aankomststroom ----
+       Een belofte die op een persoonlijke controle wacht, staat met naam en al
+       op de kaart -- een host die eerst een ander scherm moet openen om te zien
+       WELKE belofte wacht, heeft geen werklijst maar een verwijzing. */
+    const tijd = new Date(Date.now() + 2 * 3600000);
+    const hh = String(tijd.getHours()).padStart(2, '0') + ':' + String(tijd.getMinutes()).padStart(2, '0');
+    const pass = (await post(base, '/api/arrival/request', {
+      requestToken: 'pdahostaanvraagcode1234.geheimgeheimgeheim1234ab',
+      supplierCode: 'KIKUNOI', naam: 'Aankomst', datum: new Date().toISOString().slice(0, 10),
+      tijd: hh, personen: 2, allergie: true })).body.pass;
+    assert.ok(pass, 'de aankomst is aangevraagd');
+
+    await page.click('[data-modus="host"]');
+    await page.waitForTimeout(800);
+    let host = await lees();
+    assert.match(host.nu + host.open, /Aankomst /, 'de aankomst staat op de lijst van de host');
+    /* De beloften als LIJST, niet alleen als knoplabel: de statustekst
+       ("wacht-op-mens") staat alleen in de lijst, dus die onderscheidt de twee.
+       Zonder dat onderscheid blijft deze toets groen als de lijst verdwijnt en
+       er alleen knoppen overblijven -- en dan ziet een host niet wat er wacht
+       maar alleen wat hij kan indrukken. */
+    assert.match(host.nu + host.open, /Allergiebriefing keuken/, 'met de belofte die wacht');
+    assert.match(host.nu + host.open, /wacht-op-mens/, 'met de stand van die belofte erbij');
+    assert.doesNotMatch(host.nu + host.open, /Operationele capaciteit/,
+      'en niet met wat al berekend is: dat wacht op niemand');
+
+    /* EEN KNOP PER BELOFTE, en niet een voor alle. "Persoonlijk gecontroleerd"
+       betekent dat iemand het werkelijk heeft gedaan; een knop die er drie
+       tegelijk afvinkt maakt van die zin een formaliteit. Dus tikken we ze hier
+       ook stuk voor stuk aan. */
+    const knoppen = await page.$$('[data-belofte]');
+    assert.ok(knoppen.length >= 2, 'elke wachtende belofte heeft een eigen knop: ' + knoppen.length);
+    for (let i = 0; i < knoppen.length + 2; i++) {
+      const knop = await page.$('[data-belofte]');
+      if (!knop) break;
+      await knop.click();
+      await page.waitForTimeout(700);
+    }
+    host = await lees();
+    assert.doesNotMatch(host.nu + host.open, /Aankomst /,
+      'na het aftekenen wacht er niets meer, dus is het geen taak meer');
+
+    /* EN DE BELOFTE IS BEVESTIGD, NIET AFGEWEZEN. Die twee halen allebei de
+       taak van de lijst, maar voor de gast is het verschil enorm: bevestigd
+       betekent "wij regelen het", afgewezen betekent "dit gaat niet lukken".
+       Een knop die "gecontroleerd" heet en het tweede doet, is een leugen. */
+    const arrivals = (await H('/arrivals', {})).body;
+    const naAf = arrivals.arrivals.find(x => x.id === pass.id);
+    assert.ok(naAf, 'de pass bestaat nog');
+    assert.equal(arrivals.openBeloften, 0, 'en er wacht niets meer op een mens');
+    const volle = (await H('/arrivals', {})).body.arrivals.find(x => x.id === pass.id);
+    const standen = (volle.beloften || []).map(b => b.status);
+    assert.ok(standen.length, 'de beloften staan er nog: ' + JSON.stringify(standen));
+    assert.ok(!standen.includes('niet-mogelijk'),
+      'geen enkele belofte is afgewezen: ' + standen.join(', '));
+    assert.ok(standen.some(x => x === 'persoonlijk-bevestigd'),
+      'ze zijn persoonlijk bevestigd: ' + standen.join(', '));
+
+    await page.click('[data-modus="alles"]');
+    await page.waitForTimeout(600);
 
     /* ---- 7. de wijklens ----
        De modus filtert op SOORT werk, de wijk op WIENS tafel het is. Twee

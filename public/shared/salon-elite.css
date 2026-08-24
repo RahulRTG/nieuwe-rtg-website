@@ -379,7 +379,13 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
 .rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
 .rtg-salon-elite .tabs>button:hover{background:transparent!important;color:#171712!important;}
 .rtg-salon-elite .tabs>button[aria-pressed="true"]{border-bottom-color:#691f32!important;background:transparent!important;color:#171712!important;}
-.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:#fff!important;}
+/* Deze knop stond op #fff terwijl zijn achtergrond in DEZE variant transparant
+   werd -- en de grond eronder is #F1EEE7. Wit op bijna-wit: gemeten 1,16:1,
+   terwijl WCAG AA voor deze maat 4,5 vraagt. Alles eromheen in dit blok is al
+   licht (de tabs op #625f57, de koppen op #171712), dus dit is een kleur die is
+   blijven staan toen de rest omdraaide. Hij krijgt nu dezelfde rusttint als de
+   tabs waar hij naast hangt: 5,5:1. */
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:#625f57!important;}
 .rtg-salon-elite .post{padding:0;overflow:visible;border:0;background:transparent;}
 .rtg-salon-elite .post .top{min-height:62px;padding:0 0 1rem;border-bottom-color:rgba(23,23,18,.14);background:transparent;color:#171712;}
 .rtg-salon-elite .post .naam{color:#171712!important;}

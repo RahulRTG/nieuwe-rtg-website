@@ -1,8 +1,24 @@
-/* App-gids data, deel10: de zeven werkschermen van het Horeca OS naast
+/* App-gids data, deel10: de acht werkschermen van het Horeca OS naast
    /apps/horeca.html (dat in deel8 staat). Zie ../appgids.js voor de uitleg. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = Object.assign({
+  '/apps/horeca-pda.html': G('PDA Service: wat is uw eerstvolgende handeling, geordend op wie het langst op ons wacht.',
+    ['Kies uw werkstand: bediening, runner of alles -- dat is een lens en geen recht',
+      'Werk "Nu" af: alleen taken die over een grens zijn die het huis zelf heeft vastgelegd',
+      'Pak op en geef uit; twee mensen die naar dezelfde tafel lopen is de fout die de claim oplost'],
+    'De volgorde is minuten OVER een grens en niet minuten: een "er is iets niet goed" van vijf minuten gaat voor een "mag dit weg?" van acht.'),
+  '/apps/horeca-bar.html': G('Bar: welke drankgolf moet nu gemaakt worden, en wat kan er samen.',
+    ['Lees bovenaan de stapel: dezelfde drank over meerdere tafels is EEN handeling achter de bar',
+      'Werk de ronden af, oudste eerst; een ronde landt samen op tafel',
+      'Zet aan en meld klaar -- dezelfde deur als de keuken, dus nooit twee wegen naar dezelfde stand'],
+    'Er staat geen grens op hoe lang een drankje mag staan: die is nergens vastgelegd. Wel hoeveel minuten het eerste glas al op de rest wacht.'),
+  '/apps/horeca-vloer.html': G('Vloer: wie heeft ons nu nodig, en hoe verdelen we dat.',
+    ['Lees de verdeling: per wijk hoeveel werk er open staat en wie hem draagt',
+      'Neem een wijk die niemand draagt; wat van iedereen is, verdwijnt het makkelijkst',
+      'Draag over als iemand achterop raakt -- een hele wijk, of vink een paar tafels aan',
+      'Kunt u niet? Zeg nee met een reden; de ander ziet dat op zijn eigen scherm'],
+    'Tijdens een aanbod draagt de aanbieder de wijk nog. Zo bestaat er geen moment waarop een wijk van niemand is, en valt er geen tafel tussen twee mensen door.'),
   '/apps/horeca-expeditie.html': G('Expeditie en keukenregie: de pas, waar een tafel compleet de deur uit gaat.',
     ['Zie per tafel en gang hoeveel borden klaar zijn en hoe lang het eerste al koud staat',
       'Geef zelf uit; er wordt niets automatisch afgevinkt',
@@ -41,7 +57,8 @@ module.exports = Object.assign({
   '/apps/horeca-beheer.html': G('Beheer: de dag over alle kanalen, de fooienpot, de loonkosten, de signalen en de pols van nu.',
     ['Lees de omzet per kanaal en per betaalwijze, met fooi en oninbaar apart',
       'Verdeel de fooienpot over gewerkte uren; de som van de delen is exact de pot',
-      'Vul bij de pols in wat we niet kunnen meten: sfeer, geluid, terras. Wat wij wel meten staat erboven en kun je niet bijstellen'],
+      'Vul bij de pols in wat we niet kunnen meten: sfeer, geluid, terras. Wat wij wel meten staat erboven en kun je niet bijstellen',
+      'Lees de actiebonnen van Rahul: wat hij deed, wat wacht op u, en wat is geweigerd -- met de reden erbij'],
     'Er staat geen omzetprognose op dit scherm: wat er staat is wat er nu open staat en wat er vandaag is binnengekomen. Wat je bij de pols invult vervalt na drie uur.'),
   '/apps/zakelijk.html': G('Zakelijk vervoer: het reisbeleid van uw bedrijf, de ritten die op uw akkoord wachten en het maandoverzicht.',
     ['Zet de grenzen: maximum per rit, budget per medewerker, tijden, steden en kostenplaatsen',

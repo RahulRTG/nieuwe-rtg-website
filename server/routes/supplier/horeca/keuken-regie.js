@@ -13,10 +13,11 @@
      systeem dat zelf de bestellingen dichtzet, sluit op de drukste avond van
      het jaar de omzet af. Het besluit hoort bij de chef, met het getal erbij. */
 module.exports = (kern) => {
-  const { app, save, supplierAuth, horeca } = kern;
+  const { app, save, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
   const { H } = horeca;
   const bord = kern.horecaBord;
   const { openWerk } = require('../../../kern/horeca/keukenlaag');
+  const stappen = require('../../../kern/horeca/stappen');
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
 
   /* ---------- het regiescherm van de chef ----------
@@ -91,5 +92,37 @@ module.exports = (kern) => {
     if (req.body.kokken != null) h.instel.kokken = Math.max(1, Math.min(60, parseInt(req.body.kokken, 10) || 3));
     save();
     res.json({ ok: true, gezet: n, kokken: h.instel.kokken || null });
+  });
+
+  /* ---------- BEREIDINGSSTAPPEN ----------
+
+     Een gerecht is zelden een handeling aan een station. Wie stappen vastlegt,
+     krijgt daarmee ook zijn norm: de som van de stappen IS de bereidingstijd,
+     en er staat geen tweede getal naast (zie kern/horeca/stappen.js).
+
+     Dit is manager-werk. Niet omdat een kok het niet zou weten -- juist wel --
+     maar omdat het de planning van de hele avond verzet: een stap erbij
+     verschuift elk startmoment van dat gerecht op elk bord. */
+  app.post('/api/supplier/horeca/keuken/stappen', supplierAuth, (req, res) => {
+    const h = H(req.supplier.code);
+    const naam = String((req.body || {}).naam || '');
+    if (req.body.stappen === undefined) {
+      // alleen lezen: wat staat er nu voor dit gerecht (of voor alles)
+      if (!naam) return res.json({ ok: true, alles: (h.instel || {}).bereidingsstappen || {} });
+      return res.json({ ok: true, naam: naam.toLowerCase(), stappen: stappen.stappenVan(h, naam) });
+    }
+    if (!managerOnly(req, res)) return;
+    const uit = stappen.zetStappen(h, naam, req.body.stappen);
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    save();
+    logActivity(req.supplier.code, req.actor, uit.gewist
+      ? 'wiste de bereidingsstappen van ' + uit.naam
+      : 'legde ' + uit.stappen.length + ' bereidingsstappen vast voor ' + uit.naam + ' (' + uit.minuten + ' min)');
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'keuken' });
+    res.json(Object.assign({ ok: true }, uit, {
+      let: uit.gewist
+        ? 'Gewist. Dit gerecht valt terug op de eigen tijd van de zaak, en anders op de standaard van zijn station.'
+        : 'De som van de stappen is vanaf nu de bereidingstijd van dit gerecht; er staat geen tweede getal naast.'
+    }));
   });
 };

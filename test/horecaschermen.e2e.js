@@ -107,6 +107,51 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
     assert.match(tekst, /bereidingsminuten open, gedeeld door \d+ kok/i,
       'de drukterem toont zijn rekensom en niet alleen een uitkomst');
 
+    /* ---- de claim op de pas ----
+       Een tweede tafel, want de eerste bewijst hierboven al iets anders. Wat
+       hier bewezen wordt is dat een HALVE gang geen draagtaak is, en dat een
+       complete gang een mens krijgt voordat er iemand mee loopt. */
+    assert.match(tekst, /klaar om te dragen \(0/i, 'een halve gang staat niet op de draaglijst');
+
+    const rek2 = await api('/rekening/open', { kanaal: 'tafel', tafel: 'Tafel 9', gasten: 2 });
+    await api('/gezelschap/stoel', { rekeningId: rek2.rekening.id, handle: 'Bij het raam' });
+    const gez = await api('/gezelschap', { rekeningId: rek2.rekening.id });
+    const stoelNr = gez.gezelschap.stoelen[0].nr;
+    for (const naam of ['Coquille', 'Bisque']) {
+      const g = await api('/rekening/regel', { rekeningId: rek2.rekening.id, naam, prijs: 20, station: 'warm', gang: 1 });
+      const id = g.rekening.regels[g.rekening.regels.length - 1].id;
+      if (naam === 'Coquille') await api('/rekening/regel/stoel', { rekeningId: rek2.rekening.id, regelId: id, nr: stoelNr });
+    }
+    await api('/gang/vrij', { rekeningId: rek2.rekening.id, gang: 1 });
+    const verse = (await api('/rekening', { rekeningId: rek2.rekening.id })).rekening.regels;
+    for (const r of verse) await api('/keuken/stand', { rekeningId: rek2.rekening.id, regelId: r.id, stand: 'klaar' });
+
+    await open(page, base, token, '/apps/horeca-expeditie.html');
+    tekst = await lees(page);
+    assert.match(tekst, /klaar om te dragen \(1/i, 'de complete gang staat er wel');
+    assert.match(tekst, /nog van niemand/, 'en heeft nog geen mens');
+    assert.match(tekst, /Bij het raam/, 'met per bord waar het heen moet');
+
+    const pakknop = await page.$('#ePas [data-pak]');
+    assert.ok(pakknop, 'een complete gang krijgt een oppakknop');
+    await pakknop.click();
+    await page.waitForTimeout(900);
+    tekst = await lees(page);
+    assert.match(tekst, /jij hebt hem/, 'na oppakken staat er wie hem heeft');
+
+    // en oppakken vinkt niets af: de borden staan nog op klaar
+    const nogKlaar = (await api('/rekening', { rekeningId: rek2.rekening.id })).rekening.regels;
+    assert.ok(nogKlaar.every(r => r.stand === 'klaar'), 'oppakken is geen uitgeven');
+
+    const gangUit = await page.$('#ePas [data-gangUit], #ePas [data-ganguit]');
+    assert.ok(gangUit, 'en de hele gang kan in een tik de deur uit');
+    await gangUit.click();
+    await page.waitForTimeout(1200);
+    tekst = await lees(page);
+    assert.match(tekst, /klaar om te dragen \(0/i, 'daarna staat de gang niet meer op de draaglijst');
+    const naGang = (await api('/rekening', { rekeningId: rek2.rekening.id })).rekening.regels;
+    assert.ok(naGang.every(r => r.stand === 'uitgegeven'), 'alle borden van de gang zijn uitgegeven');
+
     const uitgeef = await page.$('[data-uit]');
     assert.ok(uitgeef, 'een bord dat klaar is, krijgt een uitgeefknop');
     await uitgeef.click();

@@ -294,7 +294,13 @@ function tabel() {
         /* Het pad is relatief aan verzoekketen.js zelf ('./handeling'), niet
            'opzet/handeling' -- die eerste versie van deze controle sloeg meteen
            aan toen de mount verhuisde, en dat is precies waar deze census voor is. */
-        return !!laag && /require\(['"]\.\/handeling['"]\)/.test(keten) && /ECHTE SERVER/.test(toets);
+        /* DE HERSTELPOORT TELT MEE, en dat is geen extra eis maar de kern. Zonder
+           hem is de context na het lezen van de body weg, en dan is de begroting
+           blind voor elke POST met een body -- precies de verzoeken die iets
+           veranderen. Deze census zei toen "bewaakt" over een laag die niets zag. */
+        return !!laag && /require\(['"]\.\/handeling['"]\)/.test(keten) &&
+          /handeling'\)\.hervat\(\)/.test(keten) && /ECHTE SERVER/.test(toets) &&
+          /function hervat\(/.test(laag);
       },
       kanttekening: 'ziet GEEN wijziging binnen een rij (4000 mensen op non-actief beweegt geen rij-aantal); ' +
         'de meting is ACHTERAF -- tegenhouden doet server/opzet/begroting.js, en die staat op melden'
@@ -308,14 +314,21 @@ function tabel() {
          met de oude collectie aantoonbaar nog intact na de poging. Een poort
          waarvan alleen bewezen is dat hij meldt, is geen poort. */
       soort: 'begroting (kan een massamutatie weigeren)',
-      bewaker: ['server/opzet/begroting.js', 'test/begroting.test.js'],
+      bewaker: ['server/opzet/begroting.js', 'test/begroting.test.js', 'test/begrotingroute.test.js'],
       wat: 'een hervulling die te veel rijen wegneemt wordt gewogen voordat hij landt',
       dingen: () => ['server/opzet/begroting.js'],
       bewaakt: () => {
         const laag = lees('server/opzet/begroting.js');
         const staat = lees('server/db/state.js');
         const toets = lees('test/begroting.test.js');
-        return !!laag && /begroting'\)\.bewaak/.test(staat) && /onaangeroerd/.test(toets);
+        /* BEWEZEN WEIGEREND IS NIET BEWEZEN BEREIKBAAR. De dertien in
+           test/begroting.test.js voeden de laag rechtstreeks; test/begrotingroute.js
+           loopt een ECHTE route met een echte server, en die vond dat de laag daar
+           niets zag. Zonder die tweede toets stond hier "bewaakt" over een poort
+           waar in het echt nooit iemand langs kwam. */
+        const route = lees('test/begrotingroute.test.js');
+        return !!laag && /begroting'\)\.bewaak/.test(staat) && /onaangeroerd/.test(toets) &&
+          /TEGENPROEF/.test(route);
       },
       kanttekening: 'staat standaard op MELDEN; RTG_BEGROTING=weigeren zet de tand erin, ' +
         'en dat kan pas als de catalogus van legitieme grote krimpen er is (KRIMP.json, TAKEN.md 4.62)'

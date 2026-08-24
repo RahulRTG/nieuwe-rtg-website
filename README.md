@@ -965,31 +965,50 @@ correlatie-id — en dat log *is* de catalogus. Meten, ratelen, dan handhaven.
 #### De krimpronde (`npm run krimp`, `KRIMP.json`)
 
 `scripts/krimpronde.js` draait de hele suite met `RTG_BEGROTING_KRIMP=1` en zet
-bij elkaar wat er dan zou zijn geweigerd. Eerste ronde: **707 processen met de
-val aan, allemaal op grens 1, en nul hervullingen erboven.**
+bij elkaar wat er dan zou zijn geweigerd. De eerste ronde gaf **nul** over 6806
+toetsen — en dat leek een uitslag.
 
-Dat is een uitslag en geen groen licht, en `KRIMP.json` zegt er zelf drie dingen
-bij. **(1)** De catalogus is een *ondergrens*: de suite doet wat de toetsen doen,
-niet wat gebruikers doen. **(2)** Een grens van 1 laat één rij *door*, en dat is
-de vorm van bijna elke verwijdering hier (`db.data.X = X.filter(r => r.id !== id)`);
-een gerichte proef op 0,5 over `vergeten`, `media` en `techniek-sso-scim` gaf óók
-nul, dus op die paden ziet de val helemaal geen hervulling. **(3)** Geen enkele
-toets ziet een *echte route* de val laten aanslaan — de dertien in
-`test/begroting.test.js` voeden de laag rechtstreeks. De laag is dus bewezen
-wéigerend, niet bewezen bereikbaar; dat staat als eerstvolgende stap in TAKEN.md
-4.62.
+**Het was er geen: de laag was blind.** `test/begrotingroute.test.js` liep de
+kortste echte weg — een lid maakt een stuk in RTG Studio en haalt het weg, met de
+grens op een halve rij — en de val zag niets. Niet omdat hij er niet hing (hij
+meldde `begroting: waakt`), en niet omdat de route niets weghaalde (de tegenproef
+laat het stuk wél verdwijnen), maar omdat `handeling.huidige()` daar `null` gaf.
 
-**En de ronde viel eerst zelf in de val die hij moest afdekken.** Om "er kromp
-niets" te onderscheiden van "de val stond niet aan" zocht hij het woord
-`begroting:` in het log — en matchte op twee *toetsnamen* over een
-projectbegroting. Hij zou dus "de begroting was aan het woord" hebben gemeld over
-een ronde waarin de module geen letter schreef: de gevaarlijkste uitslag die hij
-kan geven, want die leest als geruststelling (LAT-regel 3). Gerepareerd bij de
-oorzaak, niet in de zeef: de wikkel schrijft nu bij zijn eerste installatie zelf
-`begroting: waakt` mét de grens erin, en de ronde weigert een uitslag als dat
-teken ontbreekt of op de standaardgrens staat. `test/krimpronde.test.js` prikt
-dat vast aan de échte regel die de begroting schrijft — zes mutaties, alle zes
-raak.
+De oorzaak zit in de keten: `server/web/body.js` leest de body met
+`req.on('end')`, en die luisteraar hangt aan een async-bron die al bestond
+vóórdat `context.run()` openging. De rest van de keten liep dus buiten de
+AsyncLocalStorage-winkel. **Elke POST met een body raakte hem kwijt — en dat is
+elke mutatie.** Gerepareerd met `hervat()` in `server/opzet/handeling.js`,
+opgehangen ná de lijfpoort (bewust `context.run()` en niet `enterWith()`: die
+tweede kan op een keep-alive-verbinding doorlekken naar het volgende verzoek).
+
+De ronde daarna vond wél iets:
+
+```
+processen met de val aan    : 708
+grenzen die zij meldden     : 1 (708x)
+hervullingen boven de grens : 2
+
+  rijen  keer  collectie
+      2     1  posts        /api/privacy/delete
+      2     1  contacts     /api/privacy/delete
+```
+
+Dat is precies een legitieme grote krimp: een lid dat zijn eigen gegevens
+weghaalt. **De catalogus is nog te dun om de tand erin te zetten** — een grens
+van 1 laat elke verwijdering van één rij door, en dat is de vorm van bijna alles
+hier (`db.data.X = X.filter(r => r.id !== id)`). Wie ook die wil zien, draait met
+`RTG_BEGROTING_KRIMP=0.5`.
+
+Twee dingen die `KRIMP.json` zelf zegt: de catalogus is een **ondergrens** (de
+suite doet wat de toetsen doen, niet wat gebruikers doen), en hij is **geen
+oordeel** — welke grens bij een collectie hoort, is een besluit van een mens.
+
+En de ronde viel eerst zelf in de val die hij moest afdekken: om "er kromp niets"
+te scheiden van "de val stond niet aan" zocht hij het woord `begroting:` in het
+log, en matchte op twee *toetsnamen* over een projectbegroting. Gerepareerd bij de
+oorzaak: de wikkel schrijft nu zelf `begroting: waakt` mét zijn grens erin, en de
+ronde weigert een uitslag zonder dat teken of op de standaardgrens.
 
 **Buiten een verzoek gebeurt er niets.** Een cronjob, de onderhoudsveger, een
 migratie en het inlezen van de seed hebben geen handelingscontext; dat is het

@@ -8,19 +8,24 @@
    radius te berekenen, en zonder blast radius geen risicobudget en geen
    bewijsbonnetje. Dit bestand is de tweede helft van die brug.
 
-   HET SCHRIJFPAD BLIJFT ONGEMOEID, en dat is de belangrijkste ontwerpkeuze.
-   De voor de hand liggende plek was `save()` in server/db/index.js -- de ene
-   functie waar 2700 aanroepen doorheen gaan. Maar daar zou de meting per
-   SCHRIJFACTIE gebeuren (vaak meerdere per verzoek), op het heetste pad van het
-   huis, in een functie die geld vastlegt. De vraag die blast radius stelt is een
-   andere: wat heeft DIT VERZOEK veranderd. Dus meten we bij het begin en het
-   eind van het verzoek, en raakt save() niets aan. Eén meting per verzoek in
-   plaats van een per schrijfactie, en nul risico op de weg waar het geld loopt.
+   HET SCHRIJFPAD BLIJFT ONGEMOEID, en dat is de belangrijkste ontwerpkeuze. De
+   voor de hand liggende plek was `save()` in server/db/index.js -- de ene functie
+   waar 2700 aanroepen doorheen gaan. Daar zou de meting per SCHRIJFACTIE
+   gebeuren (vaak meerdere per verzoek), op het heetste pad van het huis, in een
+   functie die geld vastlegt. Maar blast radius vraagt iets anders: wat heeft DIT
+   VERZOEK veranderd. Dus meten we aan het begin en het eind van het verzoek --
+   een meting per verzoek, en nul risico op de weg waar het geld loopt.
 
    HOE HET VERZOEK EN DE OPSLAG ELKAAR VINDEN. Via AsyncLocalStorage, precies
    zoals server/db/bijeen.js dat al doet voor de save-bundel. Dat is geen nieuwe
    truc maar een bestaande, en hem hier nabouwen zou een tweede contextmechanisme
    geven dat het eerste niet kent (LAT.md regel 4).
+
+   EN DIE CONTEXT OVERLEEFT HET LEZEN VAN DE BODY NIET: server/web/body.js leest
+   met req.on('end'), en die luisteraar hangt aan een async-bron van voor
+   context.run(). Elke POST met een body raakte de winkel dus kwijt -- en dat is
+   elke mutatie. hervat() zet de keten na de lijfpoort terug; het verhaal staat
+   in test/begrotingroute.test.js, die hem vond.
 
    WAT ER GEMETEN WORDT, en waarom juist dat. Per top-level collectie in db.data
    het AANTAL RIJEN, bij het begin en aan het eind. Het verschil is de
@@ -31,11 +36,10 @@
    WAT DEZE METING NIET ZIET, en dat hoort er hard bij te staan:
 
    - EEN WIJZIGING BINNEN EEN RIJ. Vierduizend medewerkers op non-actief zetten
-     verandert geen enkel rij-aantal en is hier onzichtbaar. Dat is de grootste
-     blinde vlek en hij is bewust geaccepteerd: het alternatief is een diep diff
-     over de hele database bij elk verzoek, en dat kost meer dan het waard is.
-     Wie die klasse wil vangen, hoort de handeling zelf te laten zeggen wat hij
-     aanraakt -- daar is `raakt()` voor, en die is vandaag nog nergens aangeroepen.
+     verandert geen rij-aantal en is hier onzichtbaar: de grootste blinde vlek,
+     bewust geaccepteerd, want het alternatief is een diep diff over de hele
+     database bij elk verzoek. Wie die klasse wil vangen, laat de handeling zelf
+     zeggen wat hij aanraakt -- daar is `raakt()` voor, nog nergens aangeroepen.
    - VERVANGING MET GELIJK AANTAL. Vijf rijen weg en vijf erbij is delta nul.
    - WAT ER NIET DOOR EEN VERZOEK KOMT. Een cronjob, de onderhoudsveger of een
      migratie draait buiten deze context; die zijn hier onzichtbaar en horen dat
@@ -183,4 +187,23 @@ function middleware(deps) {
   };
 }
 
-module.exports = { middleware, huidige, raakt, sluit, tel, verschil, GRENS };
+/* De herstelpoort. Het waarom staat in de kop; hier de keuze en de rest-gaten.
+
+   Bewust context.run() en niet enterWith(): die tweede verandert de OMLIGGENDE
+   context, en op een keep-alive-verbinding kan dat de handeling van het ene
+   verzoek in het volgende laten doorlekken.
+
+   WAT ER BUITEN VALT: routes die de body ZELF rauw lezen. De betaal-webhooks
+   staan met opzet VOOR het ontleden (een handtekening gaat over de rauwe body)
+   en komen hier nooit langs; de theater-upload leest zijn eigen stroom erna.
+   Voor allebei geldt: de begroting ziet ze niet. Een tweede express.json() op
+   een route is geen gat -- die ziet req._body al gezet en leest niets. */
+function hervat() {
+  return function handelingHervat(req, res, next) {
+    const h = req && req.handeling;
+    if (!h || context.getStore() === h) return next();
+    return context.run(h, () => next());
+  };
+}
+
+module.exports = { middleware, hervat, huidige, raakt, sluit, tel, verschil, GRENS };

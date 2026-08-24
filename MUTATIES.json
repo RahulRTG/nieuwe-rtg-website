@@ -443,6 +443,13 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "begrotingroute.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "belasting-groothandels.test.js": {
       "soort": "server",
       "staat": "gezakt",

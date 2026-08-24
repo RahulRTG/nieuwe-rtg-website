@@ -115,6 +115,11 @@ module.exports = function verzoekketen(deps) {
 
   require('./lijfpoort')({ app, express, db, save, log, betaal, betaalWaarheid, muntbetaal,
     opslagKlaar, zaakdoos, muntenVan, settleFactuurVan, opdrachtenVan });
+  /* NA de lijfpoort, want die leest de body -- en dat lezen breekt de
+     handelingscontext van stap 3. Zonder deze regel is server/opzet/begroting.js
+     blind voor elke POST met een body, en dat is elke mutatie. Het hele verhaal
+     staat bij hervat() in ./handeling.js. */
+  app.use(require('./handeling').hervat());
 
   return {
     schild, zetWacht, lieg,

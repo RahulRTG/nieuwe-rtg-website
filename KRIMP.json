@@ -1,12 +1,37 @@
 {
-  "uitleg": "Welke collecties krimpen tijdens de TOETSEN, en hoeveel. Bouwt de catalogus die TAKEN.md 4.62 nodig heeft voordat RTG_BEGROTING=weigeren aan kan. DRIE DINGEN DIE ERBIJ HOREN. (1) ONDERGRENS: de suite doet wat de toetsen doen, niet wat gebruikers doen -- een legitieme grote krimp die geen toets uitlokt, staat hier niet in. (2) EEN GRENS VAN 1 LAAT EEN RIJ DOOR. Een hervulling die precies een rij wegneemt komt er ongemeld doorheen, en dat is de vorm van bijna elke verwijdering in dit huis: db.data.X = X.filter(r => r.id !== id). Een gerichte proef met de grens op 0,5 over test/vergeten.test.js, test/media.test.js en test/techniek-sso-scim.test.js gaf OOK nul, dus op die paden ziet de val helemaal geen hervulling. De nul hierboven is daarmee net zo goed een uitspraak over wat de toetsen DOEN als over wat er krimpt -- en er is nog geen enkele toets die een ECHTE route de val ziet laten aanslaan; de dertien in test/begroting.test.js voeden de laag rechtstreeks. (3) GEEN OORDEEL: welke grens bij een collectie hoort, is een besluit van een mens.",
+  "uitleg": "Welke collecties krimpen tijdens de TOETSEN, en hoeveel. Bouwt de catalogus die TAKEN.md 4.62 nodig heeft voordat RTG_BEGROTING=weigeren aan kan. VIER DINGEN DIE ERBIJ HOREN. (1) DE EERSTE RONDE TELDE NIETS, EN DAT WAS EEN DEFECT. Hij gaf nul over 6806 toetsen, en dat leek een uitslag. Het was er geen: de handelingscontext van server/opzet/handeling.js overleeft het LEZEN VAN DE BODY niet (server/web/body.js leest met req.on(end), en die luisteraar hangt aan een async-bron van voor context.run), dus stapte de begroting op elke POST met een body meteen uit -- en dat is elke mutatie. server/opzet/handeling.js hervat() zet de keten na de lijfpoort terug; test/begrotingroute.test.js vond het en houdt het tegen. Alles hieronder komt uit de eerste ronde NA die reparatie. (2) ONDERGRENS: de suite doet wat de toetsen doen, niet wat gebruikers doen -- een legitieme grote krimp die geen toets uitlokt, staat hier niet in. (3) EEN GRENS VAN 1 LAAT EEN RIJ DOOR. Een hervulling die precies een rij wegneemt komt er ongemeld doorheen, en dat is de vorm van bijna elke verwijdering in dit huis: db.data.X = X.filter(r => r.id !== id). Wat hieronder staat zijn dus de krimpen van TWEE rijen of meer; wie ook de enkele wil zien, draait met RTG_BEGROTING_KRIMP=0.5. (4) GEEN OORDEEL: welke grens bij een collectie hoort, is een besluit van een mens.",
   "hoe": "node scripts/krimpronde.js",
   "gemeten": {
-    "hervullingen": 0,
-    "collecties": 0,
-    "grootste": 0,
-    "processenGewaakt": 707,
+    "hervullingen": 2,
+    "collecties": 2,
+    "grootste": 2,
+    "processenGewaakt": 708,
     "gemetenGrens": 1
   },
-  "collecties": []
+  "collecties": [
+    {
+      "collectie": "posts",
+      "keer": 1,
+      "grootste": 2,
+      "gemiddeld": 2,
+      "paden": [
+        {
+          "pad": "/api/privacy/delete",
+          "rijen": 2
+        }
+      ]
+    },
+    {
+      "collectie": "contacts",
+      "keer": 1,
+      "grootste": 2,
+      "gemiddeld": 2,
+      "paden": [
+        {
+          "pad": "/api/privacy/delete",
+          "rijen": 2
+        }
+      ]
+    }
+  ]
 }

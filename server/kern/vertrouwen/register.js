@@ -16,108 +16,47 @@
    step-up-laag erboven mag daar zelf een besluit over nemen -- maar dan wel
    een besluit, en niet een stilte die als groen leest.
 
-   PER HANDELING VIER DINGEN, en ze zeggen elk iets anders:
-
-     eenheid      waarin we tellen. "personen" is geen "records": tien records
-                  over een persoon zijn een persoon.
-     omkeerbaar   kan RTG het gevolg ongedaan maken? Let op de vangvraag: een
-                  EXPORT is niet omkeerbaar. De knop is daarna misschien weg,
-                  maar de gegevens zijn het huis uit en dat is niet terug te
-                  draaien. Wie hier "true" invult omdat het scherm een
-                  ongedaan-knop heeft, liegt tegen de bon van laag 5.
-     vast         de absolute grens, voor als er nog geen eigen grondslag is
-                  (zie blootstelling.js: koude start).
-     gevoelig     raakt het bijzondere persoonsgegevens? Dan telt hetzelfde
-                  aantal zwaarder, want de schade per eenheid is groter.
+   De tabel zelf staat in ./soorten.js; de regels waar hij aan moet voldoen
+   staan hieronder.
    ========================================================================== */
 'use strict';
 
-/* De soorten. `eenheidEen` staat er los bij en wordt niet afgeleid: het
-   Nederlands laat zich niet met een regel ontmeervoudigen (personen -> persoon,
-   niet "personen" min een s), en "1 personen" op een bevestigingsscherm is
-   precies het detail dat een product goedkoop laat lijken.
-
-   Elke regel hier hoort bij iets wat in dit huis ECHT bestaat; een
-   soort verzinnen voor de volledigheid maakt de lijst onbetrouwbaar als geheel.
-   Groeit de lijst, dan groeit hij met een handeling die er is. */
-const SOORTEN = [
-  {
-    id: 'tenant.uitvoer',
-    naam: 'De volledige uitvoer van een werkruimte',
-    eenheid: 'objecten', eenheidEen: 'object',
-    omkeerbaar: false,
-    waaromNiet: 'De gegevens verlaten het huis. Een uitvoer is niet in te trekken.',
-    vast: 2000,
-    gevoelig: true
-  },
-  {
-    id: 'mens.uitdienst',
-    naam: 'Iemand uit dienst zetten',
-    eenheid: 'personen', eenheidEen: 'persoon',
-    omkeerbaar: true,
-    vast: 5,
-    gevoelig: false
-  },
-  {
-    id: 'mens.gevoelig.inzage',
-    naam: 'Inzage in bijzondere persoonsgegevens',
-    eenheid: 'personen', eenheidEen: 'persoon',
-    omkeerbaar: false,
-    waaromNiet: 'Gezien is gezien. Het journaal legt vast dat het gebeurde, niet dat het ongedaan is.',
-    vast: 25,
-    gevoelig: true
-  },
-  {
-    id: 'rol.geven',
-    naam: 'Een rol toekennen',
-    eenheid: 'rollen', eenheidEen: 'rol',
-    omkeerbaar: true,
-    vast: 3,
-    gevoelig: false,
-    poort: 'POST /api/bedrijf/lid/rollen'
-  },
-  {
-    id: 'werkruimte.sluiten',
-    naam: 'Een werkruimte sluiten',
-    eenheid: 'werkruimtes', eenheidEen: 'werkruimte',
-    omkeerbaar: true,
-    vast: 1,
-    gevoelig: false
-  },
-  {
-    id: 'tenant.vernietig',
-    naam: 'Een tenant vernietigen',
-    eenheid: 'tenants', eenheidEen: 'tenant',
-    omkeerbaar: false,
-    waaromNiet: 'Vernietiging is het doel van de handeling; er is per definitie geen weg terug.',
-    vast: 1,
-    gevoelig: true,
-    /* ZWAAR BIJ EEN. De meter meet volume, en dat is voor bijna alles de goede
-       maat -- maar niet voor een handeling die al bij het eerste exemplaar
-       onherstelbaar is. Zonder deze ondergrens komt een tenant vernietigen uit
-       op "licht", want een is niet veel. Dat is precies de vorm van fout waar
-       een risicometer aan doodgaat: hij rekent netjes en het antwoord klopt
-       niet. Wie hier een soort bijzet met `minstens`, zegt: het aantal doet er
-       niet toe, dit is altijd al erg. */
-    minstens: 'uitzonderlijk',
-    waaromMinstens: 'Vernietigen is onherstelbaar, en dat geldt al bij de eerste.',
-    poort: 'POST /api/techniek/tenant/vernietig'
-  }
-];
+/* De tabel zelf staat in ./soorten.js -- zie de kop daar voor waarom. */
+const { SOORTEN } = require('./soorten');
 
 /* De banden op volgorde, zodat een ondergrens te vergelijken is met een
    berekende zwaarte. Staat hier en niet in de meter: het is een eigenschap van
    de schaal en niet van de berekening. */
 const BANDEN = ['licht', 'zwaar', 'uitzonderlijk'];
 
-/* WELKE SOORT HEEFT EEN POORT, en welke niet. `poort` noemt de deur die de
-   handeling werkelijk tegenhoudt; ontbreekt hij, dan wordt deze soort wel
-   GEMETEN maar niet TEGENGEHOUDEN. Dat verschil hoort zichtbaar te zijn en niet
-   te verdwijnen in een groen vinkje: de Trust State telt de kritieke soorten
-   zonder poort, en dat getal hoort naar nul.
+/* ELKE SOORT NOEMT ZIJN DEUR. Hier gold ooit "elke regel hoort bij iets wat
+   ECHT bestaat", en dat was bedoeld en niet afdwingbaar -- niemand controleerde
+   het. Bij het aansluiten van de rolpoort bleek wat dat kost: twee van de zes
+   soorten beschreven een handeling die niet bestaat, en de simulatie van laag 7
+   rekende `mens.gevoelig.inzage` mee als CATASTROFAAL PAD terwijl er geen deur
+   is om doorheen te gaan. Een vals rood kost net zoveel geloofwaardigheid als
+   een vals groen: wie twee keer een alarm naspeurt dat nergens over gaat, kijkt
+   de derde keer niet meer.
 
-   Voor de meeste soorten hierboven staat er dus niets, en dat is de waarheid
-   van vandaag en geen vergetelheid. */
+   DRIE STANDEN, EN ZE HOREN NIET OP EEN HOOP.
+
+     gepoort              er is een deur en die houdt tegen
+     gemeten              er is een deur, die meet en laat door -- met de reden
+     zonderHandeling      er is geen deur; dit is een besluit, geen pad
+
+   De Trust State telt de tweede en noemt de derde apart; de simulatie van laag
+   7 rekent alleen met soorten die een deur hebben. Een soort die hier ontbreekt
+   levert nog steeds `gemeten: false` bij de meter -- ongewogen is niet licht. */
+const heeftHandeling = (s) => !!(s && s.waar);
+function stand(s) {
+  if (!s) return null;
+  if (!s.waar) return 'zonderHandeling';
+  return s.poort ? 'gepoort' : 'gemeten';
+}
+/* Alleen soorten met een deur. Wie hier de hele lijst zou gebruiken, laat de
+   simulatie paden melden waar geen route achter zit -- een vals rood, en dat
+   kost net zoveel geloofwaardigheid als een vals groen. */
+const METDEUR = () => SOORTEN.filter(heeftHandeling);
 
 /* Wat deze meter NIET meeweegt, met naam. Dezelfde regel als `nietGerekend` in
    bedrijf/gevolg.js: een meting die zwijgt over haar randen leest als een
@@ -134,4 +73,4 @@ const BIJ_ID = new Map(SOORTEN.map(s => [s.id, s]));
    en moet daar iets mee, en dat is de bedoeling. */
 function soort(id) { return BIJ_ID.get(String(id || '')) || null; }
 
-module.exports = { SOORTEN, NIET_GEREKEND, BANDEN, soort };
+module.exports = { SOORTEN, NIET_GEREKEND, BANDEN, soort, stand, heeftHandeling, METDEUR };

@@ -15,6 +15,17 @@
       blinde vlek niet.
    5. De Trust State telt en verzint niet -- ook niet als het getal ongunstig is.
 
+   ZES MUTATIES OP DE STAND VAN EEN SOORT, zes keer raak -- en de derde alleen
+   nadat de toets was aangescherpt (hij overleefde eerst, en dat was een gat in
+   de TOETS en niet in de code):
+
+     R.METDEUR() -> R.SOORTEN in bereik.js       vals rood terug in de simulatie
+     R.METDEUR() -> R.SOORTEN in staat.js        soorten zonder route als gat
+     een gat met een reden telt niet meer mee    de gunstige nul
+     heeftHandeling() geeft altijd waar          alles heeft opeens een deur
+     een openstaand punt zonder reden erbij      een getal zonder houvast
+     zonderHandeling leeggemaakt                 een besluit dat stil verdwijnt
+
    Draai los: node --test test/vertrouwenbereik.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -84,10 +95,17 @@ test('4. de simulatie noemt het catastrofale pad, en verzwijgt zijn blinde vlek 
   const bak = { werkruimtes: {}, vertrouwen: {} };
   const u = Br.simuleer(bak, 'lid-3', { rechtenVan, alleRechten: RECHTEN });
 
-  /* Een catastrofaal pad is ONOMKEERBAAR EN ONGEHINDERD. Vandaag zijn dat er
-     twee -- de uitvoer en de gevoelige inzage -- en die staan er dus, want een
-     simulator die alleen goed nieuws geeft is een folder. */
+  /* Een catastrofaal pad is ONOMKEERBAAR EN ONGEHINDERD, en het staat er ook
+     als er een besluit onder ligt: de uitvoer krijgt met opzet nooit een poort,
+     maar wie het beheer-token heeft haalt er wel onomkeerbaar gegevens mee het
+     huis uit. Een simulator die alleen goed nieuws geeft is een folder.
+
+     HIER STONDEN ER TWEE, en de tweede was er geen. `mens.gevoelig.inzage`
+     telde mee terwijl er geen route bestaat die het doet -- een vals rood, en
+     dat kost net zoveel geloofwaardigheid als een vals groen. Zie toets 4b. */
   assert.ok(u.catastrofaal.length >= 1, 'de stand van vandaag is niet nul, en dat hoort er te staan');
+  for (const c of u.catastrofaal) assert.ok(R.soort(c.soort).waar,
+    c.soort + ' staat als pad in de simulatie, dus er hoort een route achter te zitten');
   assert.match(u.oordeel, /ongehinderd kan doen/);
   for (const c of u.catastrofaal) {
     const s = R.soort(c.soort);
@@ -113,6 +131,34 @@ test('4. de simulatie noemt het catastrofale pad, en verzwijgt zijn blinde vlek 
     'ongehinderd maar omkeerbaar is hooguit vervelend');
 });
 
+test('4b. een soort zonder route is geen pad -- maar hij verdwijnt ook niet', () => {
+  /* Het register beschreef twee handelingen die in dit huis niet bestaan: er is
+     geen route die een werkruimte sluit, en het recht `mens.gevoelig` staat wel
+     in de rollentabel maar wordt door geen enkele route gevraagd. De simulatie
+     rekende de tweede mee als CATASTROFAAL PAD.
+
+     Beide kanten van de reparatie horen vast te liggen, want ze zijn allebei
+     makkelijk kapot te maken: hem meetellen levert een vals alarm, hem
+     WEGGOOIEN maakt een genomen besluit onzichtbaar. */
+  const zonder = R.SOORTEN.filter(x => !R.heeftHandeling(x)).map(x => x.id);
+  assert.ok(zonder.length >= 1, 'die stand is vandaag niet leeg');
+
+  const u = Br.simuleer({ werkruimtes: {} }, 'niemand', { rechtenVan: () => [], alleRechten: RECHTEN });
+  for (const id of zonder) {
+    assert.equal(u.catastrofaal.some(c => c.soort === id), false, id + ' heeft geen deur en is dus geen pad');
+    assert.equal(u.kan.some(k => k.soort === id), false, id + ' kan niemand doen');
+    const genoemd = u.zonderHandeling.find(x => x.soort === id);
+    assert.ok(genoemd, id + ' hoort wel met naam genoemd te worden');
+    assert.ok(genoemd.reden.length > 40, id + ' zonder echte reden is een stilte');
+  }
+
+  /* En de andere kant: elke soort MET een route hoort er wel in te zitten. */
+  const b = Br.van({ werkruimtes: {} }, 'niemand', () => []);
+  for (const s of R.METDEUR()) assert.ok(b.grenzen.some(g => g.soort === s.id),
+    s.id + ' heeft een route en hoort dus wel gerekend te worden');
+  assert.equal(b.grenzen.length, R.METDEUR().length, 'en geen enkele soort zonder route');
+});
+
 test('5. de Trust State telt, en verzint niets -- ook geen gunstige nul', () => {
   const s = St.staat({ bonnen: [], ongewogen: 0 }, HANDELINGEN);
   const bij = (wat) => s.eigenschappen.find(e => new RegExp(wat).test(e.wat));
@@ -121,13 +167,43 @@ test('5. de Trust State telt, en verzint niets -- ook geen gunstige nul', () => 
   assert.equal(bij('gebroken schakels').aantal, 0);
   for (const e of s.eigenschappen) assert.ok(e.bron && e.bron.length > 10, e.wat + ' zonder bron');
 
-  /* HET ONGUNSTIGE GETAL, en dat is de kern van deze toets. Vijf van de zes
-     soorten hebben geen poort: ze worden wel gemeten en niet tegengehouden.
-     Dat hoort als getal op de HUD te staan en niet weggerond te worden. */
+  /* HET ONGUNSTIGE GETAL, en dat is de kern van deze toets: er zijn soorten met
+     een route en zonder poort, en dat hoort als getal op de HUD te staan.
+
+     EN HET IS BIJNA NUL GEWORDEN. Toen elke soort een reden kreeg voor zijn
+     ontbrekende poort, viel dit getal op nul -- want "er staat een reden bij"
+     leek genoeg. Dat is precies de gunstige nul waar deze laag tegen is. Een
+     BESLUIT dat er nooit een poort komt (het exit-recht van de klant) is af;
+     een GAT waarvoor de meting nog moet worden gebouwd, telt mee. Die twee
+     staan sindsdien in twee velden en niet in een. */
   const zonder = bij('niet tegengehouden');
   assert.ok(zonder.aantal > 0, 'dit huis houdt nog lang niet alles tegen, en dat staat er');
-  assert.ok(zonder.details.includes('tenant.uitvoer'));
-  assert.equal(zonder.details.includes('tenant.vernietig'), false, 'die heeft er wel een');
+  assert.equal(zonder.aantal, zonder.details.length, 'het getal en de lijst horen hetzelfde te zeggen');
+  for (const d of zonder.details) {
+    assert.ok(/: .{40,}/.test(d),
+      'een openstaand punt zonder reden is een getal waar niemand iets mee kan: ' + d);
+    /* EN ELK OPENSTAAND PUNT HOORT EEN DEUR TE HEBBEN. Deze regel ontbrak, en
+       een mutatie liep er dwars doorheen: wie R.METDEUR() hier terugdraait naar
+       R.SOORTEN, telt de twee soorten zonder route mee als ontbrekende poort --
+       een getal dat door geen enkele poort omlaag kan, want er is niets om
+       tegen te houden. Het viel niet op omdat de terugvalreden ("er is geen
+       reden opgeschreven") toevallig lang genoeg was voor de regel hierboven. */
+    const id = d.split(':')[0];
+    assert.ok(R.soort(id) && R.soort(id).waar,
+      id + ' staat als ontbrekende poort op de HUD, maar er is geen route die het doet');
+    assert.ok(R.soort(id).waaromNogGeenPoort,
+      id + ' staat als openstaand punt zonder opgeschreven reden');
+  }
+  assert.ok(zonder.details.some(d => d.startsWith('mens.uitdienst')),
+    'de uitdienststelling heeft geen poort die kan afgaan, en dat is een gat');
+  assert.equal(zonder.details.some(d => d.startsWith('tenant.vernietig')), false, 'die heeft er wel een');
+  assert.equal(zonder.details.some(d => d.startsWith('tenant.uitvoer')), false,
+    'de uitvoer krijgt met opzet nooit een poort en is dus geen openstaand punt');
+
+  /* Maar hij verdwijnt niet: een besluit hoort leesbaar te blijven, anders
+     bouwt de volgende alsnog de poort die er nooit hoort te komen. */
+  assert.ok(s.bewustZonderPoort.some(b => b.soort === 'tenant.uitvoer' && /exit-recht/.test(b.reden)),
+    'het besluit staat er als besluit, met de reden');
 
   /* En wat niet te meten is, staat als niet-gemeten MET reden. */
   assert.ok(s.nietGemeten.length >= 3);

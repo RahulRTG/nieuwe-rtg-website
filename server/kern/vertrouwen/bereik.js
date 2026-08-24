@@ -79,7 +79,13 @@ function ruimtes(bak, actor) {
    twee tellers die hetzelfde moeten vinden lopen uiteen (LAT.md regel 4). */
 function grenzen(bak, actor) {
   const uit = [];
-  for (const s of R.SOORTEN) {
+  /* ALLEEN SOORTEN MET EEN DEUR. Een soort zonder route is een besluit dat nog
+     moet worden uitgevoerd, geen pad dat een aanvaller kan lopen -- en hem hier
+     meerekenen leverde precies een vals rood op: `mens.gevoelig.inzage` stond
+     als catastrofaal pad in de simulatie terwijl er geen route is die het doet.
+     Wat er WEL over die soorten te zeggen valt, staat in `zonderHandeling`
+     hieronder: benoemd, met de reden, en niet weggelaten. */
+  for (const s of R.METDEUR()) {
     const eigen = gewoonte.lees((bak && bak.vertrouwen) || {}, actor, s.id);
     /* Zoek het grootste aantal dat NET niet om een tweede moment vraagt: dat is
        precies hoever een overgenomen sessie ongehinderd komt. Binair, want de
@@ -107,6 +113,8 @@ function van(bak, actor, rechtenVan) {
     werkruimtes: w,
     rechten: [...rechten].sort(),
     grenzen: grenzen(bak, actor),
+    zonderHandeling: R.SOORTEN.filter(s => !R.heeftHandeling(s))
+      .map(s => ({ soort: s.id, naam: s.naam, reden: s.waaromGeenHandeling || 'geen reden opgeschreven' })),
     nietGemodelleerd: NIET_GEMODELLEERD
   };
 }
@@ -133,7 +141,16 @@ function simuleer(bak, actor, { rechtenVan, alleRechten } = {}) {
   const catastrofaal = b.grenzen.filter(g => {
     const s = R.soort(g.soort);
     return s && !s.omkeerbaar && g.ongehinderd > 0;
-  }).map(g => ({ soort: g.soort, tot: g.ongehinderd + ' ' + g.eenheid }));
+  }).map(g => {
+    const s = R.soort(g.soort);
+    /* EEN BESLUIT MAAKT HET GEVOLG NIET KLEINER. De uitvoer krijgt met opzet
+       nooit een poort, maar wie het beheer-token heeft haalt er wel
+       onomkeerbaar gegevens mee het huis uit. Dat blijft dus staan, met de
+       reden erbij: precies wat een CIO wil horen over een gelekte sleutel. */
+    return { soort: g.soort, tot: g.ongehinderd + ' ' + g.eenheid,
+      bijBesluit: s.waaromGeenPoort || null,
+      nogGeenPoort: s.waaromNogGeenPoort || null };
+  });
 
   return {
     actor: b.actor,
@@ -143,6 +160,7 @@ function simuleer(bak, actor, { rechtenVan, alleRechten } = {}) {
     tegengehouden: b.grenzen.filter(g => g.ongehinderd === 0)
       .map(g => ({ soort: g.soort, reden: g.reden || 'de poort vraagt hier altijd een tweede bevestiging' })),
     catastrofaal,
+    zonderHandeling: b.zonderHandeling,
     oordeel: catastrofaal.length
       ? 'Er is een onomkeerbare handeling die deze actor ongehinderd kan doen.'
       : 'Geen catastrofaal pad langs de gemodelleerde routes.',

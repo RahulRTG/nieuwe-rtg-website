@@ -41,8 +41,22 @@ function staat(bak, handelingen, scanner) {
   const b = bak || {};
   const keten = bon.controleer(b);
   const groei = insluiting.keurTabel(handelingen || {});
-  const zonderPoort = R.SOORTEN.filter(s => s.minstens === 'uitzonderlijk' && !s.poort);
-  const gemeten = R.SOORTEN.filter(s => !s.poort);
+  /* ALLEEN SOORTEN MET EEN DEUR TELLEN ALS OPENSTAAND PUNT. Een soort zonder
+     route heeft geen poort nodig -- er is niets om tegen te houden. Hem
+     meetellen maakte van een niet-uitgevoerd besluit een beveiligingsgat, en
+     dan staat er een getal boven nul dat door geen enkele poort omlaag gaat.
+     Wat er wel over te zeggen valt staat in `nietGemeten`, met de reden.
+
+     EN "GEMETEN, NIET TEGENGEHOUDEN" IS NIET EEN DING. Een soort waar met zoveel
+     woorden nooit een poort voor komt (de uitvoer is het exit-recht van de
+     klant) is een AF BESLUIT; een soort waar de poort nog ontbreekt is WERK.
+     Ze op een hoop gooien maakt het getal onbruikbaar in de ene richting -- en
+     ze allebei als "reden opgeschreven" wegstrepen maakt het nul, en dat is een
+     groen bord met een gat erin. Alleen de tweede telt hier. */
+  const metDeur = R.METDEUR();
+  const zonderPoort = metDeur.filter(s => s.minstens === 'uitzonderlijk' && !s.poort);
+  const gemeten = metDeur.filter(s => !s.poort && !s.waaromGeenPoort);
+  const bewust = metDeur.filter(s => !s.poort && s.waaromGeenPoort);
 
   return {
     eigenschappen: [
@@ -59,12 +73,19 @@ function staat(bak, handelingen, scanner) {
         bron: 'het handelingenregister: soorten met minstens "uitzonderlijk" en geen poort',
         details: zonderPoort.map(s => s.id) },
       { wat: 'soorten die wel worden gemeten maar niet tegengehouden', aantal: gemeten.length,
-        bron: 'het handelingenregister: soorten zonder poort',
-        details: gemeten.map(s => s.id) }
+        bron: 'het handelingenregister: soorten met een route, zonder poort en zonder besluit daarover',
+        details: gemeten.map(s => s.id + ': ' + (s.waaromNogGeenPoort || 'er is geen reden opgeschreven, en dat is zelf het punt')) }
       ,
       scannerEigenschap(scanner)
     ].filter(Boolean),
-    nietGemeten: NIET_GEMETEN.concat(scannerGat(scanner)),
+    /* Bewust zonder poort: geen eigenschap die op nul hoort, maar een lijst
+       besluiten. Wie hem als openstaand punt zou tonen, vraagt om een poort die
+       er nooit hoort te komen. */
+    bewustZonderPoort: bewust.map(s => ({ soort: s.id, reden: s.waaromGeenPoort })),
+    nietGemeten: NIET_GEMETEN
+      .concat(R.SOORTEN.filter(s => !R.heeftHandeling(s))
+        .map(s => ({ wat: 'de handeling "' + s.naam.toLowerCase() + '"', reden: s.waaromGeenHandeling || 'geen reden opgeschreven' })))
+      .concat(scannerGat(scanner)),
     /* De bonketen kan ook AFGEKAPT zijn -- normaal bij een begrensd journaal --
        en dat is iets anders dan gebroken. Wie die twee op een hoop gooit, krijgt
        een alarm bij normaal gedrag en kijkt er daarna niet meer naar. */

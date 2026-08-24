@@ -390,9 +390,8 @@ register te staan.
 **Laag 4 tot en met 8.** De insluitingscontrole draait bij het opstarten en
 gooit. Het bereik en de simulatie zijn berekend uit dezelfde meter als de
 poort, en dragen `nietGemodelleerd` mee. De Trust State telt vijf absolute
-eigenschappen -- en enkele staan vandaag NIET op nul, want VIER van de zes
-handelingssoorten worden wel gemeten en niet tegengehouden. Dat getal hoort
-naar nul door poorten te bouwen, niet door de meter bij te stellen. De deuren
+eigenschappen -- en die staan niet allemaal op nul. Dat getal hoort naar nul
+door poorten te bouwen, niet door de meter bij te stellen. De deuren
 staan in `server/routes/techniek/vertrouwen.js`, achter de eigenaar: een blast
 radius is een kaart van de zwakke plekken, en dat is precies wat een aanvaller
 wil weten.
@@ -424,21 +423,45 @@ Daarnaast, los van de keten — en deze drie zijn gedaan:
   huis: een anker in dezelfde database is geen anker maar een tweede regel om
   te wijzigen.
 
-En wat er daarna nog steeds openstaat, met naam: **vier van de zes
-handelingssoorten hebben nog geen poort** -- `tenant.uitvoer`,
-`mens.uitdienst`, `werkruimte.sluiten` en `mens.gevoelig.inzage`. Ze worden
-gemeten en niet tegengehouden, en twee ervan (de tenantuitvoer en de gevoelige
-inzage) zijn onomkeerbaar en staan dus als catastrofaal pad in de simulatie.
+**Wat er daarna nog openstond bleek deels niet te bestaan.** Bij het naslaan
+van de vier resterende soorten kwam er iets anders boven: TWEE ervan
+beschrijven een handeling die in dit huis niet is gebouwd. Er is geen route die
+een werkruimte sluit, en het recht `mens.gevoelig` staat wel in de rollentabel
+maar wordt door geen enkele route gevraagd -- `werkPoort()` wordt met `mens`
+aangeroepen en nooit met `mens.gevoelig`.
 
-De structurele reden is weg: er is nu een mens die kan bevestigen. Wat rest is
-per deur werk, en het is per deur ook echt iets anders. `mens.uitdienst` en
-`werkruimte.sluiten` hangen aan `beheerVan` en kunnen langs dezelfde poort als
-de rollen. `mens.gevoelig.inzage` hangt aan `werkPoort` met een reden erbij, en
-daar moet eerst worden geteld WAT er wordt ingezien -- een omvang die niemand
-telt, is geen omvang. En `tenant.uitvoer` is de moeilijkste: die gaat open op
-het beheer-token van de klant, en dat is met opzet zo (exit-recht dat op een
-mens kan stuklopen is geen recht). Daar hoort de poort dus NIET te blokkeren
-maar te meten en te melden, en dat doet hij vandaag al.
+Dat was niet onschuldig. De simulatie rekende `mens.gevoelig.inzage` mee als
+**catastrofaal pad**: onomkeerbaar, geen poort, dus ongehinderd. Alleen was er
+geen deur om doorheen te gaan. Een vals rood kost net zoveel geloofwaardigheid
+als een vals groen -- wie twee keer een alarm naspeurt dat nergens over gaat,
+kijkt de derde keer niet meer. Sindsdien noemt elke soort in het register zijn
+deur, en staat er per soort een van drie standen:
+
+| stand | betekenis | telt als |
+|---|---|---|
+| **gepoort** | er is een route en die houdt tegen | — |
+| **gemeten** | er is een route, die meet en laat door | een besluit OF een gat |
+| **zonder handeling** | er is geen route; dit is een besluit, geen pad | `nietGemeten`, met reden |
+
+En binnen "gemeten" liggen nog twee dingen die niet hetzelfde zijn, en dat
+onderscheid is er bijgekomen omdat het getal anders naar nul viel:
+
+- `waaromGeenPoort` -- hier komt **nooit** een poort, en dat is af. De
+  tenantuitvoer is het exit-recht van de klant; een uitvoer die op een drempel
+  kan stuklopen is geen recht maar een gunst. Hij blijft wél als catastrofaal
+  pad in de simulatie staan, mét de reden: een besluit maakt het gevolg niet
+  kleiner, en "wie mijn beheer-token heeft, haalt onomkeerbaar gegevens uit
+  het huis" is precies wat een CIO hoort te horen.
+- `waaromNogGeenPoort` -- hier is **nog** geen poort, en dat telt mee. Dat
+  geldt vandaag voor `mens.uitdienst`: die route zet een mens per aanroep uit
+  dienst en deze meter weegt volume per aanroep, dus een drempel van vijf kan
+  daar nooit afgaan. Een poort die niet kan afgaan is een bewering zonder
+  inhoud. Wat een zuivering wél verraadt is TEMPO -- vijf op een dag -- en die
+  meting bestaat in deze laag niet.
+
+Toen elke soort een reden kreeg, viel het aantal openstaande punten even op
+nul. Dat is precies de gunstige nul waar par. 3.2 tegen is, en de toets die
+hem vandaag tegenhoudt is er daarna bij gekomen.
 
 HIER STOND "een rem per account naast die per IP", en die klopte niet. Dit huis
 heeft er al drie: IP+account (10 pogingen), de bron alleen (50) en het doel

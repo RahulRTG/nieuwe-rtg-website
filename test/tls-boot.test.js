@@ -142,6 +142,35 @@ test('met RTG_TLS=1 praat de hele server https, en http komt er niet door', asyn
   }
 });
 
+/* DE POORTWACHTER STOPPEN, MET ZIJN KINDEREN.
+
+   server/trio.js start drie server.js-werkers achter zich en heeft een nette
+   afsluiter die ze alledrie een SIGTERM geeft. Die afsluiter draait alleen als
+   het signaal te VANGEN is -- en SIGKILL is dat niet. Hier stond kill('SIGKILL'),
+   dus de werkers werden losgelaten en bleven achter met PPID 1. Twee gingen
+   daarna stuk op hun gesloten pijp; de derde draaide de hele toetsronde door en
+   at een van de vier kernen op. De ronde bleef groen, alleen trager -- en trager
+   leest als een drukke machine.
+
+   Dus: eerst een SIGTERM aan de hele PROCESGROEP (het minteken voor de pid), dan
+   wachten zodat trio zijn werkers echt meeneemt, en alleen als hij dan nog leeft
+   een SIGKILL op diezelfde groep als vangnet. Zo loopt het echte productiepad
+   ook nog eens mee in plaats van dat het wordt omzeild.
+
+   scripts/test-runner.js telt sinds vandaag de ouderloze servers voor en na een
+   ronde; deze reparatie is wat die poort aan het licht bracht. */
+async function stopTrio(kind) {
+  if (!kind || kind.exitCode !== null) return;
+  const groep = -kind.pid;                       // negatief = de hele procesgroep
+  const klaar = new Promise(r => kind.once('exit', r));
+  try { process.kill(groep, 'SIGTERM'); } catch (e) { try { kind.kill('SIGTERM'); } catch (e2) {} }
+  await Promise.race([klaar, new Promise(r => setTimeout(r, 5000))]);
+  if (kind.exitCode === null) {
+    try { process.kill(groep, 'SIGKILL'); } catch (e) { try { kind.kill('SIGKILL'); } catch (e2) {} }
+    await Promise.race([klaar, new Promise(r => setTimeout(r, 2000))]);
+  }
+}
+
 test('npm run telefoon: de POORTWACHTER termineert https, en dat is het commando dat iemand intypt', async () => {
   /* WAAROM DEZE ERBIJ MOEST. `npm start` draait niet server.js maar
      server/trio.js -- de poortwachter met drie werkers -- en die heeft zijn eigen
@@ -172,7 +201,20 @@ test('npm run telefoon: de POORTWACHTER termineert https, en dat is het commando
       RTG_LOKAAL_TLS: '1', PORT: String(port), RTG_TRIO_BASIS: String(trioBasis),
       RTG_DATA_DIR: dataDir, NODE_ENV: 'test', RTG_DEMO: '1', ANTHROPIC_API_KEY: '', RTG_PG: ''
     });
-    kind = cp.spawn(process.execPath, ['server/trio.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });
+    /* EIGEN PROCESGROEP, want deze poortwachter heeft KINDEREN.
+
+       server/trio.js start drie server.js-werkers achter zich. Hieronder stond
+       kind.kill('SIGKILL'), en SIGKILL is niet te vangen: de nette afsluiter van
+       trio.js (die zijn drie werkers een SIGTERM geeft) draaide dus nooit, en de
+       werkers bleven staan met PPID 1. Twee gingen daarna vanzelf stuk op hun
+       gesloten pijp; de derde bleef de hele toetsronde draaien en at een van de
+       vier kernen op. De ronde was gewoon groen -- alleen trager, en dat leest
+       als een drukke machine.
+
+       Met `detached` krijgt trio zijn eigen procesgroep, en kan de afsluiter
+       hieronder de hele groep aanspreken in plaats van alleen de vader. */
+    kind = cp.spawn(process.execPath, ['server/trio.js'],
+      { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
     const uitInfo = { log: '', fataal: false };
     const vang = d => { uitInfo.log += d; if (/lokale https lukte niet/.test(String(d))) uitInfo.fataal = true; };
     kind.stdout.on('data', vang);
@@ -184,7 +226,7 @@ test('npm run telefoon: de POORTWACHTER termineert https, en dat is het commando
     assert.equal(uitInfo.fataal, false,
       'de poortwachter kon geen lokaal certificaat maken:\n' + uitInfo.log.slice(-1200));
   } finally {
-    if (kind) kind.kill('SIGKILL');
+    await stopTrio(kind);
     try { fs.rmSync(dataDir, { recursive: true, force: true }); } catch (e) {}
   }
 });

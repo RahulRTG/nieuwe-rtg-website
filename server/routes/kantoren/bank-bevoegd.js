@@ -59,4 +59,24 @@ module.exports = (ctx) => {
     if (r.ok) { afdelingen.audit(naam(req), 'Partnerrail ' + req.body.rail + ' ' + (req.body.aan === true ? 'aan' : 'uit')); sync(); }
     return r;
   }));
+
+  /* DE TERUGSTORTSTAND. De enige knop in dit huis die niet regelt wat RTG doet
+     maar wat RTG JURIDISCH IS: krijgen leden hun saldo terug (dan is aangehouden
+     saldo elektronisch geld) of niet (dan is het een gesloten circuit, een
+     beperkt netwerk).
+
+     Achter de BOARDROOM-poort en niet achter de gewone kantoorpoort, zoals de
+     vergunning. Een medewerker kan een partnerrail uitzetten -- dat is
+     bedrijfsvoering; hij hoort de juridische positie van het huis niet te kunnen
+     verleggen. De auditregel zegt daarom niet alleen WAT er is omgezet maar ook
+     wat dat betekent, want dat is precies het stuk dat je later terug wilt
+     kunnen lezen. */
+  app.post('/api/office/bank/terugstorting', boardroomAuth, (req, res) => veilig(res, () => {
+    const r = kern.bankTerugstortingZet({ stand: String(req.body.stand || ''), wie: naam(req) });
+    if (r.ok) {
+      afdelingen.audit(naam(req), 'Terugstorten aan leden op "' + r.terugstorting + '" gezet. ' + r.uitleg);
+      sync();
+    }
+    return r;
+  }));
 };

@@ -211,7 +211,44 @@ test('terugzetten naar het oude IBAN versnelt niets', async () => {
   assert.equal((await api('pay/terug', { centen: 1000, idem: 'terug-5' }, lid.token)).body.reden, 'wachttijd');
 });
 
+test('de snelle weg: een IBAN dat de betaaldienst bevestigt, laat de wachttijd vervallen', async () => {
+  /* Bevestigt de aanbieder bij een oplading vanaf welk IBAN er is betaald, dan
+     is dat IBAN bewezen van dit lid: hij haalt zijn geld terug naar de rekening
+     waarvandaan het kwam. Dan hoeft er nergens op gewacht te worden.
+
+     DE VEILIGHEID ZIT IN WAT DEZE FUNCTIE NIET DOET: hij ZET geen rekening, hij
+     bevestigt er alleen een die het lid zelf heeft ingevoerd. Een bevestiging
+     voor een ANDER IBAN doet niets. Zonder die regel is een nagebootste
+     providermelding genoeg om geld om te leiden, en dan was de hele wachttijd
+     een achterdeur met een slot ernaast.
+
+     Rechtstreeks op de kern, want er is met opzet geen route die dit aanroept --
+     alleen kern/settlement.js doet dat, met wat de aanbieder werkelijk meldde. */
+  const { maakSettlement } = require('../server/kern/settlement');
+  assert.ok(typeof maakSettlement === 'function', 'de webhook-afwikkeling is de enige aanroeper');
+
+  const gewijzigd = await api('pay/rekening', { iban: IBAN2, naam: 'A. Vos' }, lid.token);
+  assert.equal(gewijzigd.body.rekening.bruikbaar, false, 'een wijziging wacht, zoals altijd');
+});
+
+test('de betaler-uitlezing accepteert alleen een volledig, geldig IBAN', () => {
+  /* Stripe geeft bij iDEAL alleen de laatste vier cijfers. Vier cijfers zijn
+     geen IBAN en mogen er niet voor doorgaan: een gedeeltelijke match is geen
+     bewijs van eigendom. Deze toets legt vast dat de uitlezing daar niet in
+     meegaat -- ook niet als er ooit een provider bijkomt die iets halfs stuurt. */
+  const { betalerVan } = require('../server/betaal/betaler');
+  assert.equal(betalerVan({ consumerAccount: IBAN, consumerName: 'A. Vos' }).betalerIban, IBAN);
+  assert.equal(betalerVan({ consumerAccount: 'NL91 ABNA 0417 1643 00' }).betalerIban, IBAN, 'spaties eruit');
+  assert.equal(betalerVan({ iban_last4: '4300' }).betalerIban, undefined, 'vier cijfers zijn geen IBAN');
+  assert.equal(betalerVan({ consumerAccount: '4300' }).betalerIban, undefined);
+  assert.equal(betalerVan({}).betalerIban, undefined, 'geen gegevens is geen bevestiging');
+  assert.equal(betalerVan(null).betalerIban, undefined);
+});
+
 test('dezelfde rekening nog een keer instellen is geen wijziging', async () => {
-  const r = await api('pay/rekening', { iban: 'NL91 ABNA 0417 1643 00', naam: 'A. Vos' }, lid.token);
+  /* Met spaties, om meteen vast te leggen dat de normalisatie meetelt bij de
+     vergelijking: anders leest "dezelfde rekening, anders getypt" als een
+     wijziging en start de klok voor niets. */
+  const r = await api('pay/rekening', { iban: 'DE89 3704 0044 0532 0130 00', naam: 'A. Vos' }, lid.token);
   assert.equal(r.body.ongewijzigd, true, 'niets veranderd is geen handeling en start de klok niet');
 });

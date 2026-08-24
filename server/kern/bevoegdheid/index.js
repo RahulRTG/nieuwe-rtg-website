@@ -45,7 +45,7 @@
    vergunning alleen wat hier is vastgelegd, niet de code eromheen. */
 'use strict';
 
-const { RANG, SOORTEN, VERMOGENS, zinnen } = require('./lijst');
+const { RANG, SOORTEN, VERMOGENS, zinnen, gezichtVan } = require('./lijst');
 
 /* `state` levert wat er is VASTGELEGD en wat er NU draait:
      vergunning()  -> null of { soort, nummer, entiteit, landen: [], tot: <ms> }
@@ -53,7 +53,17 @@ const { RANG, SOORTEN, VERMOGENS, zinnen } = require('./lijst');
      clearing()    -> { eigen: bool, kaart: bool }  (kern/bankregie)
    De klok komt binnen zodat een toets een verlopen vergunning kan tonen zonder
    te wachten. */
-function maakBevoegdheid({ vergunning, partnerRails, clearing, nu = () => Date.now() }) {
+function maakBevoegdheid({ vergunning, partnerRails, clearing, terugstorting, nu = () => Date.now() }) {
+
+  /* Het GELDENDE gezicht van een vermogen (./lijst.js kiest het; zie daar waarom
+     WALLET_SALDO en LID_UITBETALING er twee hebben). Ontbreekt de stand, dan
+     valt hij terug op het strengste gezicht: niet meegeven is veilig, alleen
+     niet volledig. */
+  function stand() {
+    if (typeof terugstorting !== 'function') return null;
+    try { return terugstorting(); } catch (e) { return null; }
+  }
+  const vermogen = id => gezichtVan(VERMOGENS[id], stand());
 
   /* Welke rail voert deze handeling uit? Niet de aanroeper bepaalt dat maar de
      stand van de knop: draait de eigen bank, dan doen we het zelf en zijn we
@@ -80,9 +90,16 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, nu = () => Date.n
      hem weg en de landtoets slaat over -- dat is geen versoepeling maar een
      erkenning dat niet elke handeling aan een land hangt. */
   function mag(id, { land } = {}) {
-    const f = VERMOGENS[id];
+    const f = vermogen(id);
     if (!f) return { mag: false, reden: 'onbekend', uitleg: zinnen.onbekend, vermogen: id };
     if (f.soort === 'software') return { mag: true, vermogen: id, via: 'software' };
+    /* Een STAND is geen storing en geen ontbrekende vergunning maar een keuze
+       van RTG, en het antwoord hoort dat verschil te maken. Wie leest "hiervoor
+       is een vergunning nodig" gaat wachten op iets dat nooit komt; wie leest
+       "dit doen we niet" weet waar hij aan toe is. De reden komt uit het gezicht
+       zelf, want die is per handeling anders. */
+    if (f.soort === 'stand') return { mag: false, reden: 'stand', uitleg: f.reden || zinnen.stand,
+      vermogen: id, hangtAf: f.hangtAf || null };
     /* Een besluit is geen vergunning en hoort er ook niet op te lijken; vandaar
        een eigen `via`. De GROND staat in de lijst en wordt daar door matrix()
        opgehaald -- hij stond eerst ook in dit antwoord, maar niemand las hem
@@ -131,12 +148,18 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, nu = () => Date.n
       rail: railVan(),
       vergunning: v.er ? { soort: v.soort, nummer: v.nummer, entiteit: v.entiteit, landen: v.landen, tot: v.tot, verlopen: v.verlopen } : null,
       partnerRails: partnerRails() || {},
+      /* De matrix toont het GELDENDE gezicht, niet de kale lijstregel. Bij een
+         afhankelijk vermogen staat er dus 'besluit' of 'rail' naar gelang de
+         stand, met 'hangtAf' erbij zodat een bestuurder ziet WAAROM het dat nu
+         is. Zou hier de rauwe regel staan, dan las het bord 'afhankelijk' --
+         een woord dat niets zegt over wat er op dit moment geldt. */
+      terugstorting: stand(),
       regels: Object.keys(VERMOGENS).map(id => {
-        const f = VERMOGENS[id];
+        const f = vermogen(id);
         const r = mag(id, { land });
         return { id, naam: f.naam, soort: f.soort, nodig: f.eigenNodig || f.nodig || null,
           partnerRail: f.partnerRail || null, mag: r.mag, reden: r.reden || null, via: r.via || null,
-          besluit: f.besluit || null };
+          besluit: f.besluit || null, hangtAf: f.hangtAf || null };
       })
     };
   }

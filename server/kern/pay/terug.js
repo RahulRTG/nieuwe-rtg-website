@@ -68,7 +68,11 @@ module.exports = (ctx) => {
     const b = bevoegdheid();
     const u = userId ? rekening.ibanVan(userId) : null;
     const blokkades = [];
-    if (!b.mag) blokkades.push({ wat: 'bevoegdheid', uitleg: b.uitleg });
+    /* Twee soorten "kan niet", en het scherm hoort ze uit elkaar te houden. Een
+       ontbrekende bevoegdheid is een toestand die kan veranderen; de STAND
+       `gesloten` is een keuze van RTG en verandert niet vanzelf. Wie leest
+       "hiervoor is een vergunning nodig" gaat wachten op iets dat niet komt. */
+    if (!b.mag) blokkades.push({ wat: b.reden === 'stand' ? 'stand' : 'bevoegdheid', uitleg: b.uitleg });
     if (!u) blokkades.push({ wat: 'rekening', uitleg: 'Er staat nog geen rekening op uw naam waar dit heen kan.' });
     else if (!rekening.bruikbaar(u)) blokkades.push({ wat: 'wachttijd', bruikbaarVanaf: u.bruikbaarVanaf,
       uitleg: 'Deze rekening kan pas over ' + Math.max(1, Math.round((u.bruikbaarVanaf - Date.now()) / 3600000)) + ' uur ontvangen.' });

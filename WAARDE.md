@@ -159,6 +159,16 @@ als eerste. Hij is de bodem die er ook is als de waardelaag niet gemount is. Een
 optionele laag die stilzwijgend een controle meeneemt, neemt hem weg zodra
 iemand hem niet mount.
 
+**De aard van de handeling is waar dit fout kan gaan, en één keer ook is
+gegaan.** De poort leidt uit `van` en `naar` af wát er gebeurt — besteden,
+overdragen, uitbetalen, huisintern of teruggave — en pas die aard bepaalt welke
+regels gelden. Die afleiding las een boeking van `partner:` naar `lid:` als
+*overdragen*, en een partnersaldo is niet overdraagbaar. Gevolg: elke teruggave,
+terugbetaling en creditering in het hele huis werd geweigerd. Geld teruggeven is
+geen overdracht, en de regel staat er nu structureel: gaat waarde van een **zaak**
+naar een **lid**, dan is dat geld dat terugkomt bij de klant. Een lijst met
+soortnamen zou hebben gewerkt tot de volgende die iemand verzint.
+
 De toets in JS en niet in de Rust-motor, ook in `RTG_MOTOR_GELD=motor`: de motor
 kent de klassen, het beleid en de reserveringen niet, want die metadata woont
 aan deze kant. Dezelfde reden waarom de bank-guard in `kern/bank/grootboek.js`
@@ -352,6 +362,34 @@ Botst een functie met een grens, dan **vervalt de functie**.
 
    Wat er van de oorspronkelijke drie voorwaarden over is, is het **plafond** —
    en dat blijft juist nu staan.
+
+   **En de positie is omkeerbaar, zonder dat de knop ooit losraakt van zijn
+   betekenis.** RTG kan beide posities innemen; dat is een legitieme
+   bedrijfskeuze en er is een schakelaar voor
+   (`/api/office/bank/terugstorting`, boardroomwerk). Het gevaar zit niet in de
+   keuze maar in de ontkoppeling: een knop die de belofte aan leden omzet
+   terwijl de vergunningsvraag blijft staan, is een manier om om de
+   vergunningplicht heen te komen.
+
+   Daarom is `WALLET_SALDO` geen vaste soort meer maar **afhankelijk**: de
+   bevoegdhedenlijst draagt twee volledig uitgeschreven gezichten en de stand
+   bepaalt welke geldt.
+
+   | Stand | `WALLET_SALDO` | `LID_UITBETALING` | Wat RTG dan is |
+   |---|---|---|---|
+   | `gesloten` | besluit, met grond | bestaat niet | beperkt netwerk, geen vergunning |
+   | `open` | rail, e-geldinstelling | rail, sepa | uitgever van elektronisch geld |
+
+   Er bestaat dus geen stand waarin de code iets anders doet dan het document
+   zegt — dat was precies de fout die dit traject heeft blootgelegd, en dit is
+   de vorm die hem structureel uitsluit. Ontbreekt de stand, dan geldt per
+   vermogen het **strengste** gezicht, en dat is niet voor allebei hetzelfde:
+   bij `WALLET_SALDO` de rail (die kan weigeren, een besluit nooit), bij
+   `LID_UITBETALING` juist `gesloten`.
+
+   Eén route hangt er bewust **niet** aan: `/api/pay/terugstand`, dat uitlegt
+   wáárom het niet kan. Een deur mag op slot; het bordje ernaast hoort leesbaar
+   te blijven.
 4. **Het plafond is de grond, niet een instelling.** Zodra het plafond
    losgelaten wordt, is de klasse iets anders geworden en hoort hij van soort
    te wisselen. Verhogen is een besluit met een handtekening.
@@ -441,11 +479,23 @@ terugstorting.
 
 **Wat open blijft, en bewust niet stilletjes is opgelost:**
 
-- **De snelle weg om de wachttijd over te slaan.** Bevestigt de betaaldienst bij
-  een oplading welk IBAN er betaalde, dan is dat IBAN bewezen van dit lid en kan
-  de wachttijd vervallen. `ibanBevestigd` staat klaar en werkt; er is alleen nog
-  niets dat hem aanroept, want `server/betaal.js` geeft geen betaler-IBAN terug.
-  Dat staat er als functie mét die uitleg, niet als lege plek.
+- ~~**De snelle weg om de wachttijd over te slaan.**~~ **Gevoed.** Bevestigt de
+  aanbieder bij een oplading vanaf welk IBAN er is betaald, dan is dat IBAN
+  bewezen van dit lid en vervalt de wachttijd: hij haalt zijn geld terug naar de
+  rekening waarvandaan het kwam. `server/betaal/betaler.js` leest het uit,
+  `kern/settlement.js` bevestigt het bij de juiste persoon.
+
+  Alleen **Mollie** levert een volledig IBAN (`details.consumerAccount`). Stripe
+  geeft bij iDEAL enkel `iban_last4` — vier cijfers zijn geen IBAN en mogen er
+  niet voor doorgaan; Adyen levert het in de notificatie en niet op het object
+  dat wij ophalen. Dat verschil staat in de code met zoveel woorden, want "geen
+  betalerIban" leest anders als een storing terwijl het bij twee van de drie de
+  normale uitkomst is.
+
+  **De veiligheid zit in wat het níet doet:** een bevestiging ZET nooit een
+  bestemming, hij bevestigt er alleen een die het lid zelf heeft ingevoerd.
+  Anders is een nagebootste providermelding genoeg om geld om te leiden, en dan
+  is de wachttijd een slot naast een openstaande achterdeur.
 - **De afstemming met de betaaldienst.** Het bewijsbord zegt eerlijk dat hij
   nooit is gedaan. Dat oplossen vraagt het echte afschrift ophalen en regel voor
   regel vergelijken — een eigen stuk werk, geen vinkje.

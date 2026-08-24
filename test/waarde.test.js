@@ -129,6 +129,30 @@ test('de klasse weigert wat de klasse niet mag: een werkgeversbudget gaat niet n
   assert.equal(w.poort({ van: 'lid:GERDA', naar: 'lid:FRANK', centen: 5000, soort: 'p2p', saldoVan }), null);
 });
 
+test('geld teruggeven is geen overdracht -- een zaak mag een klant compenseren', () => {
+  /* DIT IS EEN FOUT DIE ECHT IS GEMAAKT, en hij was stil. Een zaak die een
+     reiziger compenseert voor een uitgevallen bus boekt van `partner:` naar
+     `lid:`. De poort las dat als 'overdragen', en een partnersaldo is niet
+     overdraagbaar -- dus weigerde hij ELKE teruggave, terugbetaling en
+     creditering in het hele huis. test/ovkaart.test.js viel er als eerste over;
+     er was geen foutmelding die zei wat er werkelijk aan de hand was.
+
+     De regel is structureel: gaat waarde van een ZAAK naar een LID, dan is dat
+     geld dat terugkomt bij de klant. Een lijst met soortnamen ('terug',
+     'ovteruggave', ...) zou werken tot de volgende die iemand verzint. */
+  const { w } = bouw(klok);
+  const saldoVan = () => 100000;
+  assert.equal(w.poort({ van: 'partner:NS', naar: 'lid:ANNA', centen: 500, soort: 'ovteruggave', saldoVan }), null,
+    'een compensatie aan een reiziger mag');
+  assert.equal(w.poort({ van: 'partner:NS', naar: 'lid:ANNA', centen: 500, soort: 'terug', saldoVan }), null,
+    'en een teruggedraaide deelbetaling ook');
+
+  /* En het mag niet zo ruim worden dat de overdrachtsregel eronder wegvalt: een
+     werkgeversbudget blijft onoverdraagbaar aan een ander lid. */
+  w.registreer({ rek: 'lid:EVA', klasse: 'EMPLOYER_BUDGET', uitgever: 'WERKGEVER' });
+  assert.equal(w.poort({ van: 'lid:EVA', naar: 'lid:FRANK', centen: 500, soort: 'p2p', saldoVan }).reden, 'overdracht');
+});
+
 test('het beleid van de uitgever geldt: op genre en op tijdvenster', () => {
   const { w } = bouw(klok);
   w.registreer({ rek: 'lid:HANS', klasse: 'EMPLOYER_BUDGET', uitgever: 'WERKGEVER',
@@ -198,7 +222,7 @@ test('elke klasse draagt een grond, en uitbetaalbaarheid hangt aan een bevoegdhe
      een soort zijn die iets kan weigeren. Een `besluit` kan dat niet -- dat
      staat per definitie altijd open -- dus een uitbetaalbaarheid die op een
      besluit leunt, is geen grens maar een aanname. */
-  const { VERMOGENS } = require('../server/kern/bevoegdheid/lijst');
+  const { VERMOGENS, gezichtVan } = require('../server/kern/bevoegdheid/lijst');
   for (const [id, k] of Object.entries(KLASSEN)) {
     assert.ok(k.grond && k.grond.length > 40, id + ' hoort een grond te dragen die uitlegt waarom hij mag bestaan');
     assert.ok(['nee', 'leden', 'vrij'].includes(k.overdraagbaar), id + ' heeft een geldige overdraagbaarheid');
@@ -206,10 +230,17 @@ test('elke klasse draagt een grond, en uitbetaalbaarheid hangt aan een bevoegdhe
       const v = uitbetaalVermogenVan(id);
       assert.ok(v, id + ' is uitbetaalbaar en moet zeggen waarop dat rust');
       assert.ok(VERMOGENS[v], id + ' verwijst naar ' + v + ', en dat vermogen bestaat niet in de bevoegdhedenlijst');
-      assert.notEqual(VERMOGENS[v].soort, 'besluit',
-        id + ' leunt op een besluit, en een besluit kan niets weigeren');
-      assert.ok(VERMOGENS[v].eigenNodig || VERMOGENS[v].nodig,
-        v + ' hoort over de eigen rails een vergunning te vragen');
+      /* Een vermogen kan twee GEZICHTEN hebben (afhankelijk van een stand), en
+         dan moet ELK gezicht iets kunnen weigeren -- niet gemiddeld, niet in de
+         stand die vandaag toevallig geldt. Een uitbetaalbaarheid die in één
+         stand op een besluit leunt, is in die stand geen grens. */
+      for (const stand of ['gesloten', 'open', null]) {
+        const g = gezichtVan(VERMOGENS[v], stand);
+        assert.notEqual(g.soort, 'besluit',
+          v + ' is in stand ' + stand + ' een besluit, en een besluit kan niets weigeren');
+        assert.ok(g.soort === 'stand' || g.eigenNodig || g.nodig,
+          v + ' hoort in stand ' + stand + ' iets te vragen of dicht te staan');
+      }
     } else {
       assert.equal(uitbetaalVermogenVan(id), null, id + ' is niet uitbetaalbaar en hoort geen vermogen te noemen');
     }
@@ -218,20 +249,38 @@ test('elke klasse draagt een grond, en uitbetaalbaarheid hangt aan een bevoegdhe
   }
 });
 
-test('walletsaldo is geen besluit meer: het aanhouden ervan hangt aan een rail', () => {
+test('de terugstortstand bepaalt de juridische positie, en beide standen kloppen', () => {
   /* Het besluit WALLET_SALDO droeg zijn eigen vervalclausule -- verandert de
      uitbetaalbaarheid, de geslotenheid of het plafond, dan hoort het vermogen
-     van soort te wisselen. Die clausule is ingegaan. Deze toets bewaakt dat de
-     wissel echt is gedaan en niet alleen is opgeschreven. */
-  const { VERMOGENS } = require('../server/kern/bevoegdheid/lijst');
-  assert.equal(VERMOGENS.WALLET_SALDO.soort, 'rail', 'het is geen besluit meer');
-  assert.equal(VERMOGENS.WALLET_SALDO.eigenNodig, 'elektronischgeldinstelling',
+     van soort te wisselen. RTG wil BEIDE posities kunnen innemen, en dat is een
+     legitieme bedrijfskeuze; het gevaar is dat de knop losraakt van wat hij
+     juridisch betekent. Deze toets bewaakt dat er geen stand bestaat waarin de
+     code iets anders doet dan het document zegt. */
+  const { VERMOGENS, gezichtVan } = require('../server/kern/bevoegdheid/lijst');
+
+  const dicht = gezichtVan(VERMOGENS.WALLET_SALDO, 'gesloten');
+  assert.equal(dicht.soort, 'besluit', 'gesloten circuit: een besluit, geen vergunning nodig');
+  assert.match(dicht.besluit, /beperkt netwerk/, 'met de grond die dat draagt');
+  assert.match(dicht.besluit, /vervalt deze grond/, 'en met wanneer die grond vervalt');
+  assert.equal(gezichtVan(VERMOGENS.LID_UITBETALING, 'gesloten').soort, 'stand',
+    'in die stand bestaat terugstorten niet -- geen "mag even niet" maar "hoort er niet bij"');
+
+  const open = gezichtVan(VERMOGENS.WALLET_SALDO, 'open');
+  assert.equal(open.soort, 'rail', 'inwisselbaar saldo is elektronisch geld');
+  assert.equal(open.eigenNodig, 'elektronischgeldinstelling',
     'klantgeld aanhouden dat inwisselbaar is, vraagt meer dan een betaalinstelling');
-  assert.ok(VERMOGENS.LID_UITBETALING, 'en de terugstorting is een eigen vermogen');
-  assert.equal(VERMOGENS.LID_UITBETALING.eigenNodig, 'elektronischgeldinstelling');
+  const uit = gezichtVan(VERMOGENS.LID_UITBETALING, 'open');
+  assert.equal(uit.eigenNodig, 'elektronischgeldinstelling');
   /* Apart van elkaar, met opzet: bij een storing op de uitbetaalrail hoort de
      wallet niet mee te vallen. */
-  assert.notEqual(VERMOGENS.LID_UITBETALING.partnerRail, VERMOGENS.WALLET_SALDO.partnerRail);
+  assert.notEqual(uit.partnerRail, open.partnerRail);
+
+  /* ZONDER STAND geldt het strengste gezicht, en dat is per vermogen een ANDER
+     gezicht: bij WALLET_SALDO de rail (die kan weigeren, een besluit nooit), bij
+     LID_UITBETALING juist gesloten (die staat altijd nee). Een terugval die
+     simpelweg altijd hetzelfde gezicht koos, zou er een van beide openzetten. */
+  assert.equal(gezichtVan(VERMOGENS.WALLET_SALDO, null).soort, 'rail');
+  assert.equal(gezichtVan(VERMOGENS.LID_UITBETALING, null).soort, 'stand');
 });
 
 

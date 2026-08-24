@@ -32,50 +32,73 @@ const VERMOGENS = {
 
   PARTNER_UITBETALING: { soort: 'rail', naam: 'Partnersaldo uitbetalen naar de bank', eigenNodig: 'betaalinstelling', partnerRail: 'sepa' },
 
-  /* HIER STOND EEN BESLUIT, EN DAT IS OP 24 AUGUSTUS 2026 VERVALLEN.
+  /* -- afhankelijk: dezelfde handeling is een ANDERE handeling geworden --
 
-     WALLET_SALDO was jarenlang van de soort `besluit`: toegestaan omdat RTG had
-     VASTGESTELD dat het buiten de vergunningplicht viel, en niet omdat er een
-     vergunning lag of een partner het deed. De redenering was een beperkt
-     netwerk, en hij stond op drie voorwaarden: saldo alleen binnen RTG te
-     besteden, niet uitbetaald aan het lid, en een maximum per wallet en per
-     boeking. Het besluit droeg zijn eigen vervalclausule -- verandert een van
-     die drie, dan hoort dit vermogen van soort te wisselen.
+     WALLET_SALDO was jarenlang een `besluit`: toegestaan omdat RTG had
+     VASTGESTELD dat het buiten de vergunningplicht viel. De redenering was een
+     beperkt netwerk, en hij stond op drie voorwaarden -- saldo alleen binnen RTG
+     te besteden, niet uitbetaald aan het lid, en plafonds -- met een
+     vervalclausule erbij: verandert een van die drie, dan hoort dit vermogen van
+     soort te wisselen.
 
-     Rahul heeft besloten dat leden hun saldo moeten kunnen terugstorten op hun
-     eigen rekening. Dat is de tweede voorwaarde, en daarmee is de clausule
-     ingegaan. Niet als formaliteit: saldo dat tegen de nominale waarde
-     inwisselbaar is voor de houder, IS elektronisch geld. Een besluit kan dat
-     niet wegschrijven, want het gaat over wat de handeling is en niet over hoe
-     we hem noemen.
+     Op 24 augustus 2026 is besloten dat leden hun saldo moeten kunnen
+     terugstorten. Dat is de tweede voorwaarde. Saldo dat tegen de nominale
+     waarde inwisselbaar is voor de houder, IS elektronisch geld; een besluit kan
+     dat niet wegschrijven, want het gaat over wat de handeling is en niet over
+     hoe we hem noemen.
 
-     Dus wisselt hij van soort, precies zoals afgesproken. Van `besluit` naar
-     `rail`: draait de partnerrail (de partij die het geld aanhoudt en bevoegd
-     is), dan levert RTG het scherm en de administratie. Over de EIGEN rails
-     moet RTG het zelf mogen, en dan is de eis elektronischgeldinstelling en
-     niet betaalinstelling -- klantgeld aanhouden dat inwisselbaar is, is een
-     zwaardere handeling dan een betaling doorgeven.
+     EN DAAROM STAAT HIER GEEN KEUZE MAAR EEN AFHANKELIJKHEID. RTG wil beide
+     posities kunnen innemen -- dat is een legitieme bedrijfskeuze, en het is
+     precies waarom die keuze niet los mag staan van wat hij juridisch betekent.
+     Vandaar `soort: 'afhankelijk'`: welk gezicht geldt, hangt af van de
+     terugstortstand in de boardroom (kern/bankregie/vergunning.js).
 
-     Dit is precies waar deze hele laag voor is gebouwd: de ervaring kon af
-     zonder te doen alsof er bevoegdheden waren die er niet zijn, en bij een
-     echte vergunning verandert alleen wat er in de boardroom is vastgelegd.
+       gesloten -> een BESLUIT. Geen uitbetaling aan het lid, dus een gesloten
+                   circuit met plafonds, dus een beperkt netwerk. Geen
+                   vergunning nodig, en de grond staat erbij zodat iemand hem
+                   kan tegenspreken.
+       open     -> een RAIL. Draait de partnerrail (de partij die het geld
+                   aanhoudt en bevoegd is), dan levert RTG het scherm en de
+                   administratie. Over de EIGEN rails moet RTG het zelf mogen,
+                   en dan is de eis elektronischgeldinstelling en niet
+                   betaalinstelling: klantgeld aanhouden dat inwisselbaar is, is
+                   zwaarder dan een betaling doorgeven.
 
-     Wat er van de drie voorwaarden OVER is, en waar het wordt afgedwongen:
+     Zo kan de knop om zonder dat er ooit een stand bestaat waarin de code iets
+     anders doet dan het document zegt. Dat was de fout die dit hele traject
+     heeft blootgelegd, en dit is de vorm die hem structureel uitsluit.
+
+     Waar de voorwaarden worden afgedwongen die in BEIDE standen gelden:
        plafond per wallet   kern/waarde/klassen.js  (plafondCenten per klasse)
        plafond per boeking  kern/pay/stand.js       (MAX_CENTEN)
        alleen binnen RTG    kern/waarde/policy.js   (bestedingsgebied)
        en de poort erlangs  kern/pay/poort.js       (bij elke boeking) */
-  WALLET_SALDO: { soort: 'rail', naam: 'Walletsaldo van leden aanhouden',
-    eigenNodig: 'elektronischgeldinstelling', partnerRail: 'rekeningen' },
+  WALLET_SALDO: { soort: 'afhankelijk', naam: 'Walletsaldo van leden aanhouden',
+    hangtAf: 'terugstorting', zonderStand: 'open',   // een rail kan weigeren, een besluit nooit
+    gesloten: { soort: 'besluit',
+      besluit: 'Een gesloten circuit met harde plafonds: saldo is alleen binnen RTG te besteden, ' +
+        'wordt niet uitbetaald aan het lid en kent een maximum per wallet en per boeking. ' +
+        'RTG rekent dit tot een beperkt netwerk. Zet de boardroom het terugstorten open, dan ' +
+        'vervalt deze grond en wordt dit vermogen een rail met een vergunningseis.' },
+    open: { soort: 'rail', eigenNodig: 'elektronischgeldinstelling', partnerRail: 'rekeningen' } },
 
   /* De terugstorting zelf. Apart van WALLET_SALDO omdat het een andere handeling
      is: het aanhouden van saldo en het uitbetalen ervan kunnen los van elkaar
-     dicht staan, en bij een storing bij de uitbetaalrail hoort de wallet niet
-     mee te vallen. Elke uitbetaalbare waardeklasse noemt haar vermogen bij naam
+     dicht staan, en bij een storing op de uitbetaalrail hoort de wallet niet mee
+     te vallen. Elke uitbetaalbare waardeklasse noemt haar vermogen bij naam
      (kern/waarde/klassen.js, `uitbetaalVermogen`), zodat uitbetaalbaarheid nooit
-     met één boolean aan te zetten is zonder te zeggen waarop hij rust. */
-  LID_UITBETALING: { soort: 'rail', naam: 'Walletsaldo terugstorten naar het lid',
-    eigenNodig: 'elektronischgeldinstelling', partnerRail: 'sepa' },
+     met één boolean aan te zetten is zonder te zeggen waarop hij rust.
+
+     In de stand `gesloten` bestaat deze handeling niet -- niet "hij mag even
+     niet", maar hij hoort niet bij wat RTG dan is. Het antwoord zegt dat ook met
+     zoveel woorden, want "geweigerd" zonder reden stuurt een lid naar de
+     helpdesk voor iets dat een bewuste keuze is. */
+  LID_UITBETALING: { soort: 'afhankelijk', naam: 'Walletsaldo terugstorten naar het lid',
+    hangtAf: 'terugstorting', zonderStand: 'gesloten',   // bij twijfel gaat er geen geld het huis uit
+    gesloten: { soort: 'stand',
+      reden: 'RTG betaalt walletsaldo op dit moment niet terug aan leden. Saldo is bedoeld om ' +
+        'binnen RTG te besteden.' },
+    open: { soort: 'rail', eigenNodig: 'elektronischgeldinstelling', partnerRail: 'sepa' } },
 
   // -- puur vergunning: geen partner doet dit voor ons, en geen rail verandert het --
   KREDIET_EIGEN_BOEK: { soort: 'vergunning', naam: 'Krediet uit eigen boek', nodig: 'bank' },
@@ -90,7 +113,34 @@ const zinnen = {
   land: 'De vergunning geldt niet voor dit land.',
   rail: 'De partner die dit voor RTG doet, staat op dit moment uit.',
   'alleen-eigen': 'Dit kan alleen over de eigen rails, en die clearen op dit moment niet.',
+  /* `stand` is geen storing en geen ontbrekende vergunning maar een KEUZE, en
+     het antwoord hoort dat verschil te maken. Wie leest "hiervoor is een
+     vergunning nodig" gaat wachten; wie leest "dit doen we niet" weet waar hij
+     aan toe is. De echte reden komt uit het gezicht zelf en overschrijft deze
+     zin -- hij staat hier alleen voor het geval iemand een stand-gezicht maakt
+     zonder reden erbij. */
+  stand: 'Deze handeling staat uit; dat is een keuze van RTG en geen storing.',
   onbekend: 'Deze handeling staat niet in de bevoegdhedenlijst.'
 };
 
-module.exports = { RANG, SOORTEN, VERMOGENS, zinnen };
+/* WELK GEZICHT GELDT ER NU? Een vermogen van de soort `afhankelijk` draagt twee
+   volledig uitgeschreven gezichten en een `hangtAf` die zegt welke stand
+   beslist. Deze functie plakt het geldende gezicht op de naam en het id, zodat
+   de rest van de motor er niets van hoeft te weten: hij ziet gewoon een besluit,
+   een rail of een stand.
+
+   Ontbreekt de stand (de aanroeper geeft hem niet), dan geldt `zonderStand`:
+   het strengste gezicht, en dat is per vermogen een ANDER gezicht. Bij
+   WALLET_SALDO is `open` het strengste (een rail die een vergunning vraagt kan
+   weigeren, een besluit nooit); bij LID_UITBETALING is `gesloten` het strengste
+   (die staat altijd nee). Een terugval die simpelweg altijd `open` koos, zou de
+   ene goed doen en de andere juist openzetten -- vandaar dat elk vermogen zelf
+   zegt welke het is, in plaats van dat deze functie het raadt. Onwetendheid is
+   geen toestemming. */
+function gezichtVan(f, stand) {
+  if (!f || f.soort !== 'afhankelijk') return f;
+  const naam = (stand && f[stand]) ? stand : f.zonderStand;
+  return { ...f[naam], naam: f.naam, hangtAf: f.hangtAf, stand: (stand && f[stand]) ? stand : null };
+}
+
+module.exports = { RANG, SOORTEN, VERMOGENS, zinnen, gezichtVan };

@@ -53,7 +53,9 @@ module.exports = (kern) => {
   app.post('/api/pay/oplaad', auth, async (req, res) => {
     if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
-    stuur(res, await pay.laadOp({ codenaam: liveCodename(req.session), centen: req.body.centen, idem: req.body.idem }));
+    stuur(res, await pay.laadOp({ codenaam: liveCodename(req.session), centen: req.body.centen, idem: req.body.idem,
+      // voor het bevestigen van het betaler-IBAN als de aanbieder dat meestuurt
+      userId: (req.session.account && req.session.account.id) || null }));
   });
   // geld sturen naar een codenaam: EEN knop, autolaad inbegrepen
   app.post('/api/pay/stuur', auth, async (req, res) => {

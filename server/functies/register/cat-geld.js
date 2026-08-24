@@ -76,10 +76,17 @@ module.exports = [
 
      `/rekening` staat erbij: dat verplaatst geen geld, maar het zet wel de
      bestemming klaar. Een bestemming kunnen wijzigen terwijl er niets heen kan,
-     is een knop die belooft wat hij niet waarmaakt. */
+     is een knop die belooft wat hij niet waarmaakt.
+
+     `/terugstand` staat er BEWUST NIET BIJ, en dat is geen weglating. Dat is de
+     route die uitlegt WAAROM het niet kan -- met de blokkades en hun reden erin.
+     Hangt hij aan hetzelfde vermogen, dan geeft hij een kale 503 zodra de
+     terugstorting dichtstaat, en dan kan een lid niet eens meer zien dat het een
+     keuze van RTG is en geen storing. Een deur mag op slot; het bordje ernaast
+     hoort leesbaar te blijven. */
   { id: 'dom-pay-terug', categorie: 'Geld', naam: 'Saldo terugstorten naar het lid', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het eigen walletsaldo terugstorten naar de eigen bankrekening.',
-    paden: ['/api/pay/terug', '/api/pay/terugstand', '/api/pay/rekening'],
+    paden: ['/api/pay/terug', '/api/pay/rekening'],
     vermogen: 'LID_UITBETALING' },
   /* De pre-autorisatie hangt aan WALLET_SALDO en niet aan de kassa-schakelaar:
      wat hier gebeurt is dat een deel van het WALLETSALDO VAN EEN LID wordt

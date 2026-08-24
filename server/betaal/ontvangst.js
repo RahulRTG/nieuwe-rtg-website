@@ -100,6 +100,12 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     return res;
   }
 
+  /* Wie er betaalde en vanaf welk IBAN: ./betaler.js. Daar staat ook waarom
+     alleen Mollie dat geeft, en -- belangrijker -- wat je er NIET mee mag doen:
+     een bevestiging zet nooit een uitbetaalbestemming, hij bevestigt er alleen
+     een die het lid zelf heeft ingevoerd. */
+  const { betalerVan } = require('./betaler');
+
   async function haalBetaling(aanbieder, id) {
     weigerUit();
     if (aanbieder === 'mollie' && mollie) {
@@ -108,7 +114,8 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
         referentie: p.metadata && p.metadata.referentie,
         bedrag: p.amount && Math.round(Number(p.amount.value) * 100),
         valuta: p.amount && String(p.amount.currency || '').toLowerCase(),
-        checkoutUrl: p._links && p._links.checkout && p._links.checkout.href };
+        checkoutUrl: p._links && p._links.checkout && p._links.checkout.href,
+        ...betalerVan(p.details) };
     }
     if (aanbieder === 'stripe' && stripe) {
       const isSessie = String(id).startsWith('cs_');

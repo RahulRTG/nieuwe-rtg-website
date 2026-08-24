@@ -33,7 +33,14 @@ Object.assign(kern, bankregie);
 const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
   vergunning: bankregie.bankVergunning,
   partnerRails: bankregie.bankPartnerRails,
-  clearing: bankregie.bankClearing
+  clearing: bankregie.bankClearing,
+  /* De terugstortstand bepaalt WELK GEZICHT de vermogens WALLET_SALDO en
+     LID_UITBETALING hebben: gesloten circuit (een besluit, beperkt netwerk) of
+     inwisselbaar saldo (een rail met een e-geldvergunning). Een schakelaar die
+     de juridische positie verandert, hoort die verandering ook meteen in de
+     bevoegdheidsvraag te laten doorwerken -- anders is hij een manier om
+     eromheen te komen. */
+  terugstorting: bankregie.bankTerugstorting
 });
 kern.bevoegd = bevoegd;
 /* DE TERUGSTORTING AANSLUITEN OP DE BEVOEGDHEID. Sinds leden hun saldo kunnen

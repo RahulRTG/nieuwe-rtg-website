@@ -55,15 +55,23 @@ de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
 paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
 oplaadmoment — en dát is het echte voordeel.
 
-**Let op de wissel van 24 augustus 2026.** `WALLET_SALDO` wás een *besluit* (RTG
-stelde zelf vast dat een gesloten circuit met plafonds buiten de vergunningplicht
-viel). Sinds leden hun saldo kunnen terugstorten is dat circuit niet gesloten
-meer en is die grond vervallen: saldo dat tegen de nominale waarde inwisselbaar
-is voor de houder, is elektronisch geld. Het vermogen is daarom van soort
-gewisseld naar een *rail* met `elektronischgeldinstelling` over de eigen rails,
-en de terugstorting is een eigen vermogen (`LID_UITBETALING`, sepa-rail) zodat
-een storing op de uitbetaalrail de wallet niet meesleept. Zet dat niet terug
-zonder de terugstorting eerst te sluiten.
+**Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
+is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
+schakelaar *ís* de juridische positie — geen twee dingen die toevallig
+samenhangen. `WALLET_SALDO` is daarom geen vaste soort maar **afhankelijk**, met
+twee uitgeschreven gezichten in `kern/bevoegdheid/lijst.js`:
+
+| Stand | `WALLET_SALDO` | `LID_UITBETALING` | Wat RTG dan is |
+|---|---|---|---|
+| `gesloten` | besluit, met grond | bestaat niet | beperkt netwerk, geen vergunning |
+| `open` (standaard) | rail, e-geldinstelling | rail, sepa | uitgever van elektronisch geld |
+
+Saldo dat tegen de nominale waarde inwisselbaar is voor de houder ís elektronisch
+geld; dat valt niet weg te schrijven. Bouw hier dus nooit een pad omheen dat de
+belofte aan leden verandert zonder dat de bevoegdheidsvraag meebeweegt — dan is
+de knop een manier om om de vergunningplicht heen te komen. Ontbreekt de stand,
+dan geldt per vermogen het strengste gezicht, en dat is niet voor allebei
+hetzelfde.
 
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht

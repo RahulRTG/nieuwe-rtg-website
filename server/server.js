@@ -1558,7 +1558,9 @@ const { maakSettlement } = require('./kern/settlement');
    bijschrijven, en dat is precies wat er misging: kaart afgeschreven, wallet
    niet bijgeschreven, webhook antwoordde 200 ok. */
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd,
-  payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null) });
+  payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null),
+  // bevestigt het IBAN waarvandaan is opgeladen, zodat de wachttijd op DIE rekening vervalt
+  payIbanBevestigd: (a) => (kern.pay && kern.pay.ibanBevestigd ? kern.pay.ibanBevestigd(a) : null) });
 
 /* De maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): de derde
    betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn en de

@@ -60,7 +60,25 @@ module.exports = ({ positie, beschikbaar, ruimte, reserve, toets, nu }) => {
          gebeurt: de uitzondering heeft een naam en een reden, zodat de volgende
          die hem leest ziet dat er over is nagedacht. */
       const HUISINTERN = ['extern:bank', 'extern:treasury'];
+      /* GELD TERUGGEVEN IS GEEN OVERDRACHT, en dat onderscheid ontbrak hier.
+
+         Een zaak die een reiziger compenseert voor een uitgevallen bus boekt van
+         `partner:` naar `lid:`. Dat werd hierboven als 'overdragen' gelezen, en
+         een partnersaldo is niet overdraagbaar -- dus weigerde de poort elke
+         teruggave. test/ovkaart.test.js viel er als eerste over, en terecht: het
+         is dezelfde beweging als een terugbetaling, een creditnota of een
+         geannuleerd kaartje.
+
+         De regel is structureel en geen lijst met soortnamen: gaat er waarde van
+         een ZAAK naar een LID, dan is dat per definitie geld dat terugkomt bij de
+         klant. Een zaak deelt geen saldo uit aan willekeurige leden -- daar is
+         `budget` voor, en dat loopt langs ./uitgifte.js met een eigen klasse.
+         Een lijst met namen ('terug', 'ovteruggave', ...) zou hier alleen werken
+         tot de volgende die iemand verzint. */
+      const vanZaak = bron.klasse === 'PARTNER_SETTLEMENT';
+      const naarLid = String(naar || '').startsWith('lid:') || String(naar || '').startsWith('waarde:');
       const aard = soort === 'uitbetaling' ? 'uitbetalen'
+        : (vanZaak && naarLid) ? 'teruggave'
         : String(naar || '').startsWith('lid:') ? 'overdragen'
         : HUISINTERN.includes(String(naar || '')) ? 'huisintern'
         : 'besteden';

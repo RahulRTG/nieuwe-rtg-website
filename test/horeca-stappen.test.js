@@ -36,8 +36,8 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const M = (pad, body) => api('/api/supplier/horeca' + pad, body, tokM);
-const V = (pad, body) => api('/api/supplier/horeca' + pad, body, tokV);
+const M = (pad, body) => api(pad, body, tokM);
+const V = (pad, body) => api(pad, body, tokV);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -55,20 +55,20 @@ test.after(() => {
 
 /* Een tafel met één gerecht, vrijgegeven, zodat de cadans hem ziet. */
 async function opTafel(tafel, naam, station) {
-  const r = (await M('/rekening/open', { kanaal: 'tafel', tafel, gasten: 1 })).body.rekening;
-  await M('/rekening/regel', { rekeningId: r.id, naam, prijs: 30, aantal: 1, gang: 1, station });
-  await M('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  const r = (await M('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel, gasten: 1 })).body.rekening;
+  await M('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam, prijs: 30, aantal: 1, gang: 1, station });
+  await M('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
   return r.id;
 }
-const bord = async () => (await M('/keuken/bord', {})).body;
+const bord = async () => (await M('/api/supplier/horeca/keuken/bord', {})).body;
 const opBord = async (naam) => (await bord()).bonnen.find(x => x.naam === naam);
 
 test('1. de som van de stappen is de bereidingstijd', async () => {
   await opTafel('S1', 'Tournedos', 'warm');
-  const zonder = (await M('/keuken/druk', {})).body;
+  const zonder = (await M('/api/supplier/horeca/keuken/druk', {})).body;
   assert.ok(zonder.openMinuten >= 12, 'zonder stappen geldt de standaard van het station (14 voor warm)');
 
-  const gezet = await M('/keuken/stappen', { naam: 'Tournedos', stappen: [
+  const gezet = await M('/api/supplier/horeca/keuken/stappen', { naam: 'Tournedos', stappen: [
     { station: 'koud', minuten: 3, wat: 'marineren' },
     { station: 'grill', minuten: 8, wat: 'grillen' },
     { station: 'warm', minuten: 3, wat: 'saus afwerken' }
@@ -77,24 +77,24 @@ test('1. de som van de stappen is de bereidingstijd', async () => {
   assert.equal(gezet.body.minuten, 14, '3 + 8 + 3');
   assert.equal(gezet.body.stappen.length, 3);
 
-  const met = (await M('/keuken/druk', {})).body;
+  const met = (await M('/api/supplier/horeca/keuken/druk', {})).body;
   assert.equal(met.openMinuten, 14, 'de drukterem rekent met de som en niet met de stationstandaard');
 });
 
 test('2. een eigen bereidingstijd verliest van de stappen, en staat er niet naast', async () => {
-  await M('/keuken/tijden', { tijden: { tournedos: 40 } });
-  const met = (await M('/keuken/druk', {})).body;
+  await M('/api/supplier/horeca/keuken/tijden', { tijden: { tournedos: 40 } });
+  const met = (await M('/api/supplier/horeca/keuken/druk', {})).body;
   assert.equal(met.openMinuten, 14, 'de stappen winnen; er is maar een getal');
 
-  await M('/keuken/stappen', { naam: 'Tournedos', stappen: [] });
-  const na = (await M('/keuken/druk', {})).body;
+  await M('/api/supplier/horeca/keuken/stappen', { naam: 'Tournedos', stappen: [] });
+  const na = (await M('/api/supplier/horeca/keuken/druk', {})).body;
   assert.equal(na.openMinuten, 40, 'na wissen valt hij terug op de eigen tijd van de zaak');
 
-  await M('/keuken/tijden', { tijden: {} });
+  await M('/api/supplier/horeca/keuken/tijden', { tijden: {} });
 });
 
 test('3. elke stap draagt zijn eigen startmoment, na elkaar', async () => {
-  await M('/keuken/stappen', { naam: 'Tournedos', stappen: [
+  await M('/api/supplier/horeca/keuken/stappen', { naam: 'Tournedos', stappen: [
     { station: 'koud', minuten: 3, wat: 'marineren' },
     { station: 'grill', minuten: 8, wat: 'grillen' },
     { station: 'warm', minuten: 3, wat: 'saus afwerken' }
@@ -125,7 +125,7 @@ test('4. een gerecht zonder stappen verandert niet', async () => {
 });
 
 test('5. een halve stap valt weg in plaats van als nul mee te tellen', async () => {
-  const r = await M('/keuken/stappen', { naam: 'Zeebaars', stappen: [
+  const r = await M('/api/supplier/horeca/keuken/stappen', { naam: 'Zeebaars', stappen: [
     { station: 'grill', minuten: 7 },
     { station: '', minuten: 5 },          // geen station
     { station: 'warm', minuten: 0 },      // geen tijd
@@ -136,9 +136,9 @@ test('5. een halve stap valt weg in plaats van als nul mee te tellen', async () 
 });
 
 test('6. stappen vastleggen is manager-werk', async () => {
-  const nee = await V('/keuken/stappen', { naam: 'Zeebaars', stappen: [{ station: 'grill', minuten: 9 }] });
+  const nee = await V('/api/supplier/horeca/keuken/stappen', { naam: 'Zeebaars', stappen: [{ station: 'grill', minuten: 9 }] });
   assert.ok(nee.status === 403 || nee.status === 401, 'de vloer legt geen planning vast: ' + nee.status);
-  const nog = await V('/keuken/stappen', { naam: 'Zeebaars' });
+  const nog = await V('/api/supplier/horeca/keuken/stappen', { naam: 'Zeebaars' });
   assert.equal(nog.status, 200, 'lezen mag wel: een kok hoort te zien wat er staat');
   assert.equal(nog.body.stappen.length, 2, 'en er is niets veranderd');
 });
@@ -149,10 +149,10 @@ test('6. stappen vastleggen is manager-werk', async () => {
    grill wist niet dat hij hem moest aanzetten -- precies de fout die de stappen
    moesten oplossen. */
 
-const stationBord = async (station) => (await M('/keuken/bord', { station })).body;
+const stationBord = async (station) => (await M('/api/supplier/horeca/keuken/bord', { station })).body;
 
 test('7. een gerecht staat op het bord van ELK station dat eraan werkt', async () => {
-  const b = (await M('/keuken/bord', {})).body;
+  const b = (await M('/api/supplier/horeca/keuken/bord', {})).body;
   const alles = b.bonnen.find(x => x.naam === 'Tournedos');
   assert.ok(alles, 'hij staat op het bord van alles');
 
@@ -196,7 +196,7 @@ test('9. alleen het LAATSTE station mag de stand zetten', async () => {
 });
 
 test('10. de minuten van een stap tellen bij het station van die stap', async () => {
-  const druk = (await M('/keuken/druk', {})).body;
+  const druk = (await M('/api/supplier/horeca/keuken/druk', {})).body;
   assert.equal(druk.perStation.grill, 8, 'de grill draagt acht minuten van de tournedos');
   assert.equal(druk.perStation.koud, 3 + 6, 'koud draagt drie van de tournedos plus de gazpacho');
   assert.equal(druk.perStation.warm, 3, 'en het warme station de drie van de saus');

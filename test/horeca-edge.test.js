@@ -39,7 +39,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -54,9 +54,9 @@ test.after(() => {
 });
 
 const rekVanTafel = async (tafel) => {
-  const lijst = (await H('/rekeningen', { status: 'open' })).body.rekeningen || [];
+  const lijst = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen || [];
   const kort = lijst.find(x => x.tafel === tafel);
-  return kort ? (await H('/rekening', { rekeningId: kort.id })).body.rekening : null;
+  return kort ? (await H('/api/supplier/horeca/rekening', { rekeningId: kort.id })).body.rekening : null;
 };
 
 const OPGENOMEN = {
@@ -68,7 +68,7 @@ const OPGENOMEN = {
 };
 
 test('1. een opgenomen bestelling komt binnen als "besteld"', async () => {
-  const r = await H('/offline/sync', { bonnen: [OPGENOMEN] });
+  const r = await H('/api/supplier/horeca/offline/sync', { bonnen: [OPGENOMEN] });
   assert.equal(r.status, 200);
   assert.equal(r.body.nieuw, 1);
 
@@ -96,18 +96,18 @@ test('3. er wordt niets vrijgegeven: de keuken ziet hem nog niet', async () => {
   const rek = await rekVanTafel('EDGE-1');
   for (const regel of rek.regels) assert.ok(!regel.vrijAt, regel.naam + ' is niet vrijgegeven');
 
-  const bord = (await H('/keuken/bord', {})).body.bonnen || [];
+  const bord = (await H('/api/supplier/horeca/keuken/bord', {})).body.bonnen || [];
   assert.equal(bord.find(x => x.tafel === 'EDGE-1'), undefined,
     'de keuken ziet hem pas als de zaal hem doorstuurt');
 
   // en de zaal kan hem gewoon doorsturen als zij dat wil
-  await H('/gang/vrij', { rekeningId: rek.id, gang: 1 });
-  const na = (await H('/keuken/bord', {})).body.bonnen || [];
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: rek.id, gang: 1 });
+  const na = (await H('/api/supplier/horeca/keuken/bord', {})).body.bonnen || [];
   assert.ok(na.find(x => x.tafel === 'EDGE-1'), 'na de tik van de zaal wel');
 });
 
 test('4. een opgenomen bestelling is nooit betaald', async () => {
-  await H('/offline/sync', { bonnen: [Object.assign({}, OPGENOMEN,
+  await H('/api/supplier/horeca/offline/sync', { bonnen: [Object.assign({}, OPGENOMEN,
     { clientId: 'edge-2', tafel: 'EDGE-2', betaald: true, wijze: 'contant' })] });
   const rek = await rekVanTafel('EDGE-2');
   assert.ok(rek, 'hij staat er');
@@ -116,21 +116,21 @@ test('4. een opgenomen bestelling is nooit betaald', async () => {
 });
 
 test('5. dezelfde clientId is dezelfde bestelling, en dat wordt geteld', async () => {
-  const voor = (await H('/rekeningen', { status: 'open' })).body.rekeningen.length;
-  const r = await H('/offline/sync', { bonnen: [OPGENOMEN] });
+  const voor = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen.length;
+  const r = await H('/api/supplier/horeca/offline/sync', { bonnen: [OPGENOMEN] });
   assert.equal(r.body.nieuw, 0, 'geen tweede rekening');
   assert.equal(r.body.dubbel, 1, 'en de herhaling wordt geteld, niet stil overgeslagen');
-  const na = (await H('/rekeningen', { status: 'open' })).body.rekeningen.length;
+  const na = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen.length;
   assert.equal(na, voor, 'er kwam niets bij');
 });
 
 test('6. een verkochte bardoos gedraagt zich precies zoals altijd', async () => {
-  await H('/offline/sync', { bonnen: [{ clientId: 'edge-bar', kanaal: 'bar', tafel: 'EDGE-BAR',
+  await H('/api/supplier/horeca/offline/sync', { bonnen: [{ clientId: 'edge-bar', kanaal: 'bar', tafel: 'EDGE-BAR',
     betaald: true, wijze: 'contant',
     regels: [{ naam: 'Gin-tonic', centen: 1200, aantal: 2, gang: 3, station: 'bar', allergie: 'kinine' }] }] });
-  const rek = await rekVanTafel('EDGE-BAR') || (await H('/rekeningen', { status: 'betaald' })).body.rekeningen
+  const rek = await rekVanTafel('EDGE-BAR') || (await H('/api/supplier/horeca/rekeningen', { status: 'betaald' })).body.rekeningen
     .find(x => x.tafel === 'EDGE-BAR');
-  const vol = (await H('/rekening', { rekeningId: rek.id })).body.rekening;
+  const vol = (await H('/api/supplier/horeca/rekening', { rekeningId: rek.id })).body.rekening;
   assert.equal(vol.status, 'betaald', 'aan de bar is al betaald');
   assert.equal(vol.regels[0].stand, 'uitgegeven', 'en er valt niets meer te maken');
   assert.equal(vol.regels[0].gang, 0, 'gang, station en allergie horen niet op een bon die niemand meer leest');

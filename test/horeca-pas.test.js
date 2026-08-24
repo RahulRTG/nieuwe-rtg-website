@@ -32,8 +32,8 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 // twee collega's aan dezelfde zaak: A is manager, B is dat niet
-const A = (pad, body) => api('/api/supplier/horeca' + pad, body, tokA);
-const B = (pad, body) => api('/api/supplier/horeca' + pad, body, tokB);
+const A = (pad, body) => api(pad, body, tokA);
+const B = (pad, body) => api(pad, body, tokB);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -55,26 +55,26 @@ test.after(() => {
 /* Een tafel met een vrijgegeven gang. `klaar` zegt hoeveel borden er klaar
    gemeld worden; de rest blijft in de keuken staan. */
 async function gang(tafel, gerechten, klaar) {
-  const r = (await A('/rekening/open', { kanaal: 'tafel', tafel, gasten: gerechten.length })).body.rekening;
+  const r = (await A('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel, gasten: gerechten.length })).body.rekening;
   const ids = [];
   for (const g of gerechten) {
-    const regel = (await A('/rekening/regel', { rekeningId: r.id, naam: g.naam, prijs: 20, aantal: 1,
+    const regel = (await A('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: g.naam, prijs: 20, aantal: 1,
       gang: 1, station: g.station || 'warm', allergie: g.allergie || '' })).body.regel;
     ids.push(regel.id);
     if (g.stoel) {
-      await A('/gezelschap/stoel', { rekeningId: r.id, handle: g.stoel });
-      const beeld = (await A('/gezelschap', { rekeningId: r.id })).body.gezelschap;
+      await A('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: g.stoel });
+      const beeld = (await A('/api/supplier/horeca/gezelschap', { rekeningId: r.id })).body.gezelschap;
       const s = beeld.stoelen.find(x => x.handle === g.stoel);
-      await A('/rekening/regel/stoel', { rekeningId: r.id, regelId: regel.id, nr: s.nr });
+      await A('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: regel.id, nr: s.nr });
     }
   }
-  await A('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  await A('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
   for (const id of ids.slice(0, klaar == null ? ids.length : klaar))
-    await A('/keuken/stand', { rekeningId: r.id, regelId: id, stand: 'klaar' });
+    await A('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: id, stand: 'klaar' });
   return { id: r.id, regels: ids };
 }
 
-const paslijst = async (t) => (await (t === 'B' ? B : A)('/pas/gereed', {})).body;
+const paslijst = async (t) => (await (t === 'B' ? B : A)('/api/supplier/horeca/pas/gereed', {})).body;
 const opDePas = async (tafel, t) => (await paslijst(t)).gereed.find(x => x.tafel === tafel);
 
 test('alleen een complete gang staat op de pas', async () => {
@@ -91,7 +91,7 @@ test('alleen een complete gang staat op de pas', async () => {
 
 test('een halve gang oppakken wordt geweigerd, met wat er nog mist', async () => {
   const g = await gang('P3', [{ naam: 'Tartaar' }, { naam: 'Zeebaars' }], 1);
-  const mis = await A('/pas/pak', { rekeningId: g.id, gang: 1 });
+  const mis = await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
   assert.equal(mis.status, 409);
   assert.equal(mis.body.code, 'niet-compleet');
   assert.match(mis.body.error, /1 van de 2/);
@@ -100,26 +100,26 @@ test('een halve gang oppakken wordt geweigerd, met wat er nog mist', async () =>
 
 test('een claim is van één mens, en de tweede hoort wie hem heeft', async () => {
   const g = await gang('P4', [{ naam: 'Oesters' }]);
-  const eerst = await A('/pas/pak', { rekeningId: g.id, gang: 1 });
+  const eerst = await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
   assert.equal(eerst.status, 200);
   assert.equal(eerst.body.claim.naam, naamA);
 
-  const tweede = await B('/pas/pak', { rekeningId: g.id, gang: 1 });
+  const tweede = await B('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
   assert.equal(tweede.status, 409);
   assert.equal(tweede.body.code, 'al-geclaimd');
   assert.match(tweede.body.error, new RegExp(naamA), 'het zegt WIE hem heeft: ' + tweede.body.error);
   assert.match(tweede.body.error, /minuten geleden/);
 
   // en nog eens oppakken door dezelfde persoon is geen fout
-  const nogeens = await A('/pas/pak', { rekeningId: g.id, gang: 1 });
+  const nogeens = await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
   assert.equal(nogeens.status, 200);
   assert.equal(nogeens.body.al, true);
 });
 
 test('claimen vinkt niets af: de borden staan nog op klaar', async () => {
   const g = await gang('P5', [{ naam: 'Ribeye' }]);
-  await A('/pas/pak', { rekeningId: g.id, gang: 1 });
-  const rek = (await A('/rekening', { rekeningId: g.id })).body.rekening;
+  await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
+  const rek = (await A('/api/supplier/horeca/rekening', { rekeningId: g.id })).body.rekening;
   assert.equal(rek.regels[0].stand, 'klaar', 'oppakken is geen uitgeven');
   assert.ok(!rek.regels[0].uitAt, 'en er staat geen uitgiftetijd op');
   const rij = await opDePas('P5');
@@ -129,7 +129,7 @@ test('claimen vinkt niets af: de borden staan nog op klaar', async () => {
 
 test('van mij staat er als markering bij, niet als filter', async () => {
   const g = await gang('P6', [{ naam: 'Kaas' }]);
-  await A('/pas/pak', { rekeningId: g.id, gang: 1 });
+  await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
   const bijA = (await paslijst()).gereed.find(x => x.tafel === 'P6');
   const bijB = (await paslijst('B')).gereed.find(x => x.tafel === 'P6');
   assert.equal(bijA.vanMij, true);
@@ -139,8 +139,8 @@ test('van mij staat er als markering bij, niet als filter', async () => {
 
 test('overnemen is een eigen handeling, met beide namen erin', async () => {
   const g = await gang('P7', [{ naam: 'Tarte' }]);
-  await A('/pas/pak', { rekeningId: g.id, gang: 1 });
-  const over = await B('/pas/overneem', { rekeningId: g.id, gang: 1 });
+  await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
+  const over = await B('/api/supplier/horeca/pas/overneem', { rekeningId: g.id, gang: 1 });
   assert.equal(over.status, 200);
   assert.equal(over.body.van, naamA);
   assert.equal(over.body.claim.naam, naamB);
@@ -152,7 +152,7 @@ test('overnemen is een eigen handeling, met beide namen erin', async () => {
 
   // een gang die niemand heeft, hoef je niet over te nemen
   const g2 = await gang('P8', [{ naam: 'Koffie' }]);
-  const mis = await B('/pas/overneem', { rekeningId: g2.id, gang: 1 });
+  const mis = await B('/api/supplier/horeca/pas/overneem', { rekeningId: g2.id, gang: 1 });
   assert.equal(mis.status, 404);
   assert.match(mis.body.error, /gewoon oppakken/);
 });
@@ -161,21 +161,21 @@ test('loslaten kan alleen wat van jou is; een manager mag deblokkeren', async ()
   const g = await gang('P9', [{ naam: 'Bier' }]);
 
   // A (manager) pakt op; B (geen manager) mag hem NIET loslaten
-  await A('/pas/pak', { rekeningId: g.id, gang: 1 });
-  const vreemd = await B('/pas/los', { rekeningId: g.id, gang: 1 });
+  await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
+  const vreemd = await B('/api/supplier/horeca/pas/los', { rekeningId: g.id, gang: 1 });
   assert.equal(vreemd.status, 403, 'een collega klikt niet zomaar andermans claim weg');
   assert.match(vreemd.body.error, new RegExp(naamA), 'en hoort wie hem heeft');
   assert.match(vreemd.body.error, /Neem hem over/, 'met de weg vooruit erbij');
   assert.equal((await opDePas('P9')).claim.naam, naamA, 'de claim staat er nog');
 
   // wie hem zelf heeft, mag hem zelf loslaten
-  const zelf = await A('/pas/los', { rekeningId: g.id, gang: 1 });
+  const zelf = await A('/api/supplier/horeca/pas/los', { rekeningId: g.id, gang: 1 });
   assert.equal(zelf.status, 200);
   assert.equal(zelf.body.losgelaten, naamA);
 
   // en een manager mag een tafel deblokkeren die een ander heeft opgepakt
-  await B('/pas/pak', { rekeningId: g.id, gang: 1 });
-  const doorManager = await A('/pas/los', { rekeningId: g.id, gang: 1 });
+  await B('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
+  const doorManager = await A('/api/supplier/horeca/pas/los', { rekeningId: g.id, gang: 1 });
   assert.equal(doorManager.status, 200, 'de manager kan een tafel deblokkeren');
   assert.equal(doorManager.body.losgelaten, naamB);
   assert.equal((await opDePas('P9')).claim, null);
@@ -183,12 +183,12 @@ test('loslaten kan alleen wat van jou is; een manager mag deblokkeren', async ()
 
 test('de hele gang in één tik uitgeven; daarna is hij van de lijst af', async () => {
   const g = await gang('P10', [{ naam: 'Entrecote' }, { naam: 'Zeebaars' }, { naam: 'Risotto' }]);
-  await A('/pas/pak', { rekeningId: g.id, gang: 1 });
-  const uit = await A('/pas/uit', { rekeningId: g.id, gang: 1 });
+  await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
+  const uit = await A('/api/supplier/horeca/pas/uit', { rekeningId: g.id, gang: 1 });
   assert.equal(uit.status, 200);
   assert.equal(uit.body.uitgegeven, 3, 'drie borden in één handeling');
 
-  const rek = (await A('/rekening', { rekeningId: g.id })).body.rekening;
+  const rek = (await A('/api/supplier/horeca/rekening', { rekeningId: g.id })).body.rekening;
   for (const r of rek.regels) {
     assert.equal(r.stand, 'uitgegeven');
     assert.ok(r.uitAt, 'met een uitgiftetijd erop');
@@ -200,17 +200,17 @@ test('de hele gang in één tik uitgeven; daarna is hij van de lijst af', async 
 
 test('een gang die nog niet compleet is, kan ook niet uitgegeven worden', async () => {
   const g = await gang('P11', [{ naam: 'Soep' }, { naam: 'Brood' }], 1);
-  const mis = await A('/pas/uit', { rekeningId: g.id, gang: 1 });
+  const mis = await A('/api/supplier/horeca/pas/uit', { rekeningId: g.id, gang: 1 });
   assert.equal(mis.status, 409);
   assert.match(mis.body.error, /Brood/, 'en het zegt wat er nog staat');
 });
 
 test('de claim verdwijnt ook als de laatste bon los wordt uitgegeven', async () => {
   const g = await gang('P12', [{ naam: 'Espresso' }]);
-  await A('/pas/pak', { rekeningId: g.id, gang: 1 });
+  await A('/api/supplier/horeca/pas/pak', { rekeningId: g.id, gang: 1 });
   // niet via /pas/uit maar via de losse standwissel van het keukenscherm
-  await A('/keuken/stand', { rekeningId: g.id, regelId: g.regels[0], stand: 'uitgegeven' });
-  const rek = (await A('/rekening', { rekeningId: g.id })).body.rekening;
+  await A('/api/supplier/horeca/keuken/stand', { rekeningId: g.id, regelId: g.regels[0], stand: 'uitgegeven' });
+  const rek = (await A('/api/supplier/horeca/rekening', { rekeningId: g.id })).body.rekening;
   assert.ok(!rek.pas || !rek.pas['1'], 'een claim op een lege gang blijft niet staan');
 });
 

@@ -35,7 +35,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const S = (pad, body) => api('/api/supplier' + pad, body, tok);
+const S = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -49,13 +49,13 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-const dag = () => S('/kassa/dagrapport', {}).then(r => r.body);
+const dag = () => S('/api/supplier/kassa/dagrapport', {}).then(r => r.body);
 
 test('1. dezelfde idem-sleutel levert een bon, niet twee', async () => {
   const voor = await dag();
   const bon = { total: 12.5, method: 'contant', items: [{ name: 'Koffie', qty: 1, price: 12.5 }], idem: 'wachtrij-1' };
-  const a = await S('/pos/sale', bon);
-  const b = await S('/pos/sale', bon);
+  const a = await S('/api/supplier/pos/sale', bon);
+  const b = await S('/api/supplier/pos/sale', bon);
   assert.equal(a.body.ok, true, 'de eerste verkoop lukt');
   assert.equal(b.body.ok, true, 'de herhaling geeft geen fout');
   const na = await dag();
@@ -65,8 +65,8 @@ test('1. dezelfde idem-sleutel levert een bon, niet twee', async () => {
 
 test('2. de herhaling geeft dezelfde bon terug', async () => {
   const bon = { total: 8, method: 'contant', items: [{ name: 'Thee', qty: 1, price: 8 }], idem: 'wachtrij-2' };
-  const a = await S('/pos/sale', bon);
-  const b = await S('/pos/sale', bon);
+  const a = await S('/api/supplier/pos/sale', bon);
+  const b = await S('/api/supplier/pos/sale', bon);
   assert.equal(b.body.sale.id, a.body.sale.id, 'zelfde bon-id');
   assert.equal(b.body.sale.bon, a.body.sale.bon, 'zelfde bonnummer');
   assert.equal(b.body.herhaald, true, 'en het antwoord zegt dat het een herhaling was');
@@ -75,16 +75,16 @@ test('2. de herhaling geeft dezelfde bon terug', async () => {
 test('3. zonder sleutel blijven twee gelijke verkopen twee verkopen', async () => {
   const voor = await dag();
   const bon = { total: 4.25, method: 'contant', items: [{ name: 'Water', qty: 1, price: 4.25 }] };
-  await S('/pos/sale', bon);
-  await S('/pos/sale', bon);
+  await S('/api/supplier/pos/sale', bon);
+  await S('/api/supplier/pos/sale', bon);
   const na = await dag();
   assert.equal(na.bonnen - voor.bonnen, 2, 'geen ontdubbeling op bedrag');
 });
 
 test('4. dezelfde sleutel voor een ander bedrag is een conflict', async () => {
-  await S('/pos/sale', { total: 20, method: 'contant', idem: 'wachtrij-4' });
+  await S('/api/supplier/pos/sale', { total: 20, method: 'contant', idem: 'wachtrij-4' });
   const voor = await dag();
-  const r = await S('/pos/sale', { total: 60, method: 'contant', idem: 'wachtrij-4' });
+  const r = await S('/api/supplier/pos/sale', { total: 60, method: 'contant', idem: 'wachtrij-4' });
   assert.equal(r.status, 409, 'geen stille "gelukt" voor een ander verzoek');
   const na = await dag();
   assert.equal(na.bonnen - voor.bonnen, 0, 'en er komt geen bon bij');
@@ -95,8 +95,8 @@ test('5. een andere omschrijving is niet een ander verzoek', async () => {
      woorden). De kassa zet er de modus, de badgenaam en de kassanaam in; dat
      mag verschillen tussen twee pogingen zonder dat het een conflict wordt. */
   const bon = { total: 6, method: 'contant', items: [{ name: 'Bier', qty: 1, price: 6 }], idem: 'wachtrij-5' };
-  const a = await S('/pos/sale', Object.assign({}, bon, { desc: 'De Kassa (bar)' }));
-  const b = await S('/pos/sale', Object.assign({}, bon, { desc: 'De Kassa (bar) - opnieuw verstuurd' }));
+  const a = await S('/api/supplier/pos/sale', Object.assign({}, bon, { desc: 'De Kassa (bar)' }));
+  const b = await S('/api/supplier/pos/sale', Object.assign({}, bon, { desc: 'De Kassa (bar) - opnieuw verstuurd' }));
   assert.equal(b.status, 200, 'geen conflict op vrije tekst');
   assert.equal(b.body.sale.id, a.body.sale.id, 'en het is nog steeds dezelfde bon');
 });
@@ -105,9 +105,9 @@ test('6. dezelfde sleutel met een andere bon is ook een conflict', async () => {
   /* Het totaal alleen is te grof. Twee bonnen van 10 euro met verschillende
      regels zijn twee verschillende verzoeken -- de voorraadafboeking en de
      factuurregels hangen aan die regels, niet aan het bedrag. */
-  await S('/pos/sale', { total: 10, method: 'contant', items: [{ name: 'Koffie', qty: 1, price: 10 }], idem: 'wachtrij-6' });
+  await S('/api/supplier/pos/sale', { total: 10, method: 'contant', items: [{ name: 'Koffie', qty: 1, price: 10 }], idem: 'wachtrij-6' });
   const voor = await dag();
-  const r = await S('/pos/sale', { total: 10, method: 'contant', items: [{ name: 'Thee', qty: 1, price: 10 }], idem: 'wachtrij-6' });
+  const r = await S('/api/supplier/pos/sale', { total: 10, method: 'contant', items: [{ name: 'Thee', qty: 1, price: 10 }], idem: 'wachtrij-6' });
   assert.equal(r.status, 409, 'een andere bon onder dezelfde sleutel is geen herhaling');
   const na = await dag();
   assert.equal(na.bonnen - voor.bonnen, 0, 'en er komt geen bon bij');
@@ -118,7 +118,7 @@ test('7. een bon uit de wachtrij draagt zijn eigen moment maar verzet de omzet n
      moment van AANKOMST. Zou `at` uit de client komen, dan kan een kassa kiezen
      op welke dag zijn omzet valt -- de knop waarmee je een dagrapport verschuift. */
   const gisteren = new Date(Date.now() - 26 * 3600 * 1000).toISOString();
-  const r = await S('/pos/sale', { total: 9, method: 'contant', idem: 'wachtrij-7', offlineVanaf: gisteren });
+  const r = await S('/api/supplier/pos/sale', { total: 9, method: 'contant', idem: 'wachtrij-7', offlineVanaf: gisteren });
   assert.equal(r.body.sale.offlineVanaf, gisteren, 'het moment van de kassa staat op de bon');
   assert.equal(r.body.sale.at.slice(0, 10), new Date().toISOString().slice(0, 10),
     'maar de bon telt op de dag dat hij aankwam');
@@ -131,9 +131,9 @@ test('8. het antwoord dat onderweg verloren ging komt terug, niet een tweede bon
      KWAM aan en werd verwerkt, maar het antwoord haalde de kassa niet. De
      wachtrij stuurt hem daarna nog een keer, met dezelfde sleutel. */
   const bon = { total: 31.4, method: 'pin', items: [{ name: 'Menu', qty: 2, price: 15.7 }], idem: 'wachtrij-8' };
-  const eerste = await S('/pos/sale', bon);            // aangekomen; antwoord raakte "kwijt"
+  const eerste = await S('/api/supplier/pos/sale', bon);            // aangekomen; antwoord raakte "kwijt"
   const voor = await dag();
-  const opnieuw = await S('/pos/sale', Object.assign({}, bon, { offlineVanaf: new Date().toISOString() }));
+  const opnieuw = await S('/api/supplier/pos/sale', Object.assign({}, bon, { offlineVanaf: new Date().toISOString() }));
   const na = await dag();
   assert.equal(na.bonnen - voor.bonnen, 0, 'de herhaling maakt geen tweede bon');
   assert.equal(opnieuw.body.sale.bon, eerste.body.sale.bon, 'en geeft het bonnummer van de eerste terug');

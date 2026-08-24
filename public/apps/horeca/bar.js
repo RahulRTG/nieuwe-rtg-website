@@ -69,9 +69,9 @@
         (g.gang ? '<span>gang ' + g.gang + '</span>' : '') +
         '<span class="b-min">' + g.sinds + ' min</span></div>' +
         (g.staat > 0
-          ? '<p class="b-voet" style="margin:.3rem 0 0;">Het eerste glas staat ' + g.staat +
+          ? '<p class="b-voet z-mt30">Het eerste glas staat ' + g.staat +
             ' min te wachten op de rest van deze ronde.</p>'
-          : (g.compleet ? '<p class="b-voet" style="margin:.3rem 0 0;">Compleet; wacht op een drager (zie de pas).</p>' : '')) +
+          : (g.compleet ? '<p class="b-voet z-mt30">Compleet; wacht op een drager (zie de pas).</p>' : '')) +
         '<ul class="b-regels">' + g.regels.map(function (r) { return regel(g, r); }).join('') + '</ul>' +
         '</article>';
     }).join('') : '<p class="b-leeg">Geen open ronden. Wat de zaal niet heeft vrijgegeven, staat hier niet.</p>';

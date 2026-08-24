@@ -54,7 +54,7 @@
   <div class="kaart">
     <div class="kop">De dag over alle kanalen</div>
     <div class="rij">
-      <input class="veld" id="mDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum" style="flex:0 1 11rem;">
+      <input class="veld z-b11" id="mDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum">
       <button class="knop" id="mDagToon" type="button">Toon</button>
     </div>
     <div id="mKanalen" class="z-mt60"></div>
@@ -71,7 +71,7 @@
   <div class="kaart" id="mMeetKaart">
     <div class="kop">De meetlat van deze dienst (<span id="mMeetTelling">-</span>)</div>
     <div class="rij">
-      <input class="veld" id="mMeetDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de dienstmeting" style="flex:0 1 11rem;">
+      <input class="veld z-b11" id="mMeetDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de dienstmeting">
       <button class="knop" id="mMeetToon" type="button">Meet</button>
     </div>
     <div id="mMeetlat" class="z-mt60"></div>
@@ -84,7 +84,7 @@
   <div class="kaart" id="mRahulKaart">
     <div class="kop">Rahul: wat er is gedaan en wat wacht (<span id="mRahulTelling">-</span>)</div>
     <div class="rij">
-      <input class="veld" id="mRahulGrens" type="number" min="0" max="100000" placeholder="Kortingsgrens in centen" aria-label="Kortingsgrens van Rahul in centen" style="flex:0 1 14rem;">
+      <input class="veld z-b14" id="mRahulGrens" type="number" min="0" max="100000" placeholder="Kortingsgrens in centen" aria-label="Kortingsgrens van Rahul in centen">
       <button class="knop" id="mRahulGrensZet" type="button">Grens zetten</button>
       <button class="knop stil" id="mRahulGrensWeg" type="button">Grens weghalen</button>
     </div>
@@ -102,24 +102,24 @@
   <div class="kaart">
     <div class="kop">Fooienpot</div>
     <div class="rij">
-      <input class="veld" id="pDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de pot" style="flex:0 1 11rem;">
-      <input class="veld" id="pExtra" type="number" min="0" step="0.01" placeholder="Contante fooi erbij" aria-label="Contante fooi" style="flex:0 1 10rem;">
+      <input class="veld z-b11" id="pDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de pot">
+      <input class="veld z-b10" id="pExtra" type="number" min="0" step="0.01" placeholder="Contante fooi erbij" aria-label="Contante fooi">
       <button class="knop p" id="pVerdeel" type="button">Verdelen</button>
     </div>
     <div class="rij z-mt60">
       <input class="veld" id="pNaam1" maxlength="60" placeholder="Naam" aria-label="Naam 1">
-      <input class="veld" id="pUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 1" style="flex:0 1 6rem;">
-      <input class="veld" id="pWeging1" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 1" style="flex:0 1 6rem;">
+      <input class="veld z-b6" id="pUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 1">
+      <input class="veld z-b6" id="pWeging1" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 1">
     </div>
     <div class="rij z-mt40">
       <input class="veld" id="pNaam2" maxlength="60" placeholder="Naam" aria-label="Naam 2">
-      <input class="veld" id="pUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 2" style="flex:0 1 6rem;">
-      <input class="veld" id="pWeging2" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 2" style="flex:0 1 6rem;">
+      <input class="veld z-b6" id="pUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 2">
+      <input class="veld z-b6" id="pWeging2" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 2">
     </div>
     <div class="rij z-mt40">
       <input class="veld" id="pNaam3" maxlength="60" placeholder="Naam" aria-label="Naam 3">
-      <input class="veld" id="pUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 3" style="flex:0 1 6rem;">
-      <input class="veld" id="pWeging3" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 3" style="flex:0 1 6rem;">
+      <input class="veld z-b6" id="pUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 3">
+      <input class="veld z-b6" id="pWeging3" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 3">
     </div>
     <div id="pVerdeling" class="z-mt60"></div>
     <p class="stil z-mt40" id="pPotLet"></p>
@@ -130,32 +130,32 @@
   <div class="kaart">
     <div class="kop">Loonkosten tegenover omzet</div>
     <div class="rij">
-      <input class="veld" id="lDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de diensten" style="flex:0 1 11rem;">
+      <input class="veld z-b11" id="lDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de diensten">
       <button class="knop p" id="pLoon" type="button">Berekenen</button>
     </div>
     <div class="rij z-mt60">
       <input class="veld" id="lNaam1" maxlength="60" placeholder="Naam" aria-label="Dienst 1 naam">
-      <input class="veld" id="lUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 1 uren" style="flex:0 1 6rem;">
-      <input class="veld" id="lUurloon1" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 1 uurloon" style="flex:0 1 7rem;">
-      <select class="veld" id="lAfdeling1" aria-label="Dienst 1 afdeling" style="flex:0 1 8rem;">
+      <input class="veld z-b6" id="lUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 1 uren">
+      <input class="veld z-b7" id="lUurloon1" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 1 uurloon">
+      <select class="veld z-b8" id="lAfdeling1" aria-label="Dienst 1 afdeling">
         <option value="zaal">Zaal</option><option value="keuken">Keuken</option>
         <option value="bar">Bar</option><option value="afwas">Afwas</option>
       </select>
     </div>
     <div class="rij z-mt40">
       <input class="veld" id="lNaam2" maxlength="60" placeholder="Naam" aria-label="Dienst 2 naam">
-      <input class="veld" id="lUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 2 uren" style="flex:0 1 6rem;">
-      <input class="veld" id="lUurloon2" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 2 uurloon" style="flex:0 1 7rem;">
-      <select class="veld" id="lAfdeling2" aria-label="Dienst 2 afdeling" style="flex:0 1 8rem;">
+      <input class="veld z-b6" id="lUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 2 uren">
+      <input class="veld z-b7" id="lUurloon2" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 2 uurloon">
+      <select class="veld z-b8" id="lAfdeling2" aria-label="Dienst 2 afdeling">
         <option value="keuken">Keuken</option><option value="zaal">Zaal</option>
         <option value="bar">Bar</option><option value="afwas">Afwas</option>
       </select>
     </div>
     <div class="rij z-mt40">
       <input class="veld" id="lNaam3" maxlength="60" placeholder="Naam" aria-label="Dienst 3 naam">
-      <input class="veld" id="lUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 3 uren" style="flex:0 1 6rem;">
-      <input class="veld" id="lUurloon3" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 3 uurloon" style="flex:0 1 7rem;">
-      <select class="veld" id="lAfdeling3" aria-label="Dienst 3 afdeling" style="flex:0 1 8rem;">
+      <input class="veld z-b6" id="lUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 3 uren">
+      <input class="veld z-b7" id="lUurloon3" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 3 uurloon">
+      <select class="veld z-b8" id="lAfdeling3" aria-label="Dienst 3 afdeling">
         <option value="bar">Bar</option><option value="zaal">Zaal</option>
         <option value="keuken">Keuken</option><option value="afwas">Afwas</option>
       </select>

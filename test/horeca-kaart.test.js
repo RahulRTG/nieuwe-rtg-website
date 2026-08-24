@@ -32,7 +32,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -47,11 +47,11 @@ test.after(() => {
 });
 
 const zaakKaart = async () => {
-  const g = (await H('/kaart', {})).body.groepen || [];
+  const g = (await H('/api/supplier/horeca/kaart', {})).body.groepen || [];
   return g.reduce((uit, x) => uit.concat(x.items), []);
 };
 async function gastKaart(tafel) {
-  const qr = (await H('/gast/qr', { tafel })).body;
+  const qr = (await H('/api/supplier/horeca/gast/qr', { tafel })).body;
   return (await api('/api/gast/tafel', { token: qr.token })).body.kaart || [];
 }
 
@@ -69,7 +69,7 @@ test('1. de gast en de bediening lezen dezelfde kaart met dezelfde prijzen', asy
 
 test('2. uitverkocht staat op de kaart van de bediening en is voor de gast dicht', async () => {
   const eerste = (await zaakKaart())[0];
-  await H('/gast/uitverkocht', { itemId: eerste.id, uit: true });
+  await H('/api/supplier/horeca/gast/uitverkocht', { itemId: eerste.id, uit: true });
 
   const zaak = await zaakKaart();
   const bij = zaak.find(x => x.id === eerste.id);
@@ -81,38 +81,38 @@ test('2. uitverkocht staat op de kaart van de bediening en is voor de gast dicht
     'en de gast ziet dezelfde vlag');
 
   // en de bediening mag hem na overleg met de keuken alsnog aanslaan
-  const rek = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'K-UIT', gasten: 1 })).body.rekening;
-  const r = await H('/rekening/regel', { rekeningId: rek.id, itemId: eerste.id, aantal: 1 });
+  const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'K-UIT', gasten: 1 })).body.rekening;
+  const r = await H('/api/supplier/horeca/rekening/regel', { rekeningId: rek.id, itemId: eerste.id, aantal: 1 });
   assert.equal(r.status, 200, 'de bediening wordt niet tegengehouden: ' + JSON.stringify(r.body).slice(0, 120));
 
-  await H('/gast/uitverkocht', { itemId: eerste.id, uit: false });
+  await H('/api/supplier/horeca/gast/uitverkocht', { itemId: eerste.id, uit: false });
 });
 
 test('3. de prijs komt van de kaart, ook als de client er een meestuurt', async () => {
   const item = (await zaakKaart())[0];
-  const rek = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'K-PRIJS', gasten: 1 })).body.rekening;
+  const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'K-PRIJS', gasten: 1 })).body.rekening;
 
-  const eigen = await H('/rekening/regel', { rekeningId: rek.id, itemId: item.id, prijs: 0.01, aantal: 1 });
+  const eigen = await H('/api/supplier/horeca/rekening/regel', { rekeningId: rek.id, itemId: item.id, prijs: 0.01, aantal: 1 });
   assert.equal(eigen.body.regel.centen, item.centen, 'een euro-prijs van de client wordt genegeerd');
 
-  const centen = await H('/rekening/regel', { rekeningId: rek.id, itemId: item.id, centen: 1, aantal: 1 });
+  const centen = await H('/api/supplier/horeca/rekening/regel', { rekeningId: rek.id, itemId: item.id, centen: 1, aantal: 1 });
   assert.equal(centen.body.regel.centen, item.centen, 'en een centenprijs ook');
 
   assert.equal(centen.body.regel.naam, item.naam, 'de naam komt eveneens van de kaart');
 });
 
 test('4. een onbekend item is een fout en geen regel van nul', async () => {
-  const rek = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'K-ONB', gasten: 1 })).body.rekening;
-  const r = await H('/rekening/regel', { rekeningId: rek.id, itemId: 'bestaat-niet' });
+  const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'K-ONB', gasten: 1 })).body.rekening;
+  const r = await H('/api/supplier/horeca/rekening/regel', { rekeningId: rek.id, itemId: 'bestaat-niet' });
   assert.equal(r.status, 404);
   assert.match(r.body.error, /staat niet op de kaart/);
-  const na = (await H('/rekening', { rekeningId: rek.id })).body.rekening;
+  const na = (await H('/api/supplier/horeca/rekening', { rekeningId: rek.id })).body.rekening;
   assert.equal(na.regels.length, 0, 'en er staat niets op de rekening');
 });
 
 test('5. vrij typen blijft kunnen, want een special is echt werk', async () => {
-  const rek = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'K-VRIJ', gasten: 1 })).body.rekening;
-  const r = await H('/rekening/regel', { rekeningId: rek.id, naam: 'Special van de chef', prijs: 27.5, aantal: 1 });
+  const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'K-VRIJ', gasten: 1 })).body.rekening;
+  const r = await H('/api/supplier/horeca/rekening/regel', { rekeningId: rek.id, naam: 'Special van de chef', prijs: 27.5, aantal: 1 });
   assert.equal(r.status, 200);
   assert.equal(r.body.regel.naam, 'Special van de chef');
   assert.equal(r.body.regel.centen, 2750);

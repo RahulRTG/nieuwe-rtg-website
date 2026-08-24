@@ -76,12 +76,12 @@ test('het vloerscherm toont de verdeling en draagt een wijk over',
     assert.ok(vloer, 'de demozaak heeft naast de manager nog iemand');
     const tokM = (await post(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
     const tokA = (await post(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: vloer.id, pin: '5678' })).body.token;
-    const M = (pad, body) => post(base, '/api/supplier/horeca' + pad, body, tokM);
+    const M = (pad, body) => post(base, pad, body, tokM);
 
     // een wijk met een tafel waar een gast om hulp vraagt, zodat er drukte te tonen is
-    const w = (await M('/wijk/zet', { naam: 'Serre', tafels: ['VL1', 'VL2'] })).body.wijk;
-    await M('/rekening/open', { kanaal: 'tafel', tafel: 'VL1', gasten: 2 });
-    const qr = (await M('/gast/qr', { tafel: 'VL1' })).body;
+    const w = (await M('/api/supplier/horeca/wijk/zet', { naam: 'Serre', tafels: ['VL1', 'VL2'] })).body.wijk;
+    await M('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'VL1', gasten: 2 });
+    const qr = (await M('/api/supplier/horeca/gast/qr', { tafel: 'VL1' })).body;
     const aan = (await post(base, '/api/gast/aanschuiven', { token: qr.token, naam: 'Gast' })).body;
     await post(base, '/api/gast/verzoek', { sleutel: aan.sleutel, soort: 'hulp', tekst: 'iets met VL1' });
 

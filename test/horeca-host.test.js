@@ -34,7 +34,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -65,7 +65,7 @@ async function aanvraag(n, opties) {
   assert.equal(r.status, 200, 'de aanvraag lukt: ' + JSON.stringify(r.body).slice(0, 160));
   return r.body.pass;
 }
-const lijst = async (modus) => (await H('/werklijst', { modus })).body;
+const lijst = async (modus) => (await H('/api/supplier/horeca/werklijst', { modus })).body;
 const taken = (d) => d.nu.concat(d.open);
 const aankomsten = (d) => taken(d).filter(t => t.soort === 'aankomst');
 
@@ -93,16 +93,16 @@ test('2. de open beloften reizen mee, en alleen die op een MENS wachten', async 
 });
 
 test('3. een afgetekende belofte verdwijnt, en zonder open beloften is het geen taak', async () => {
-  const pass = (await H('/arrivals', {})).body.arrivals[0];
+  const pass = (await H('/api/supplier/horeca/arrivals', {})).body.arrivals[0];
   const voor = aankomsten(await lijst('host')).find(x => x.bronId === pass.id);
   const hoeveel = voor.beloften.length;
 
-  await H('/arrival/promise', { arrivalId: pass.id, id: voor.beloften[0].id, akkoord: true });
+  await H('/api/supplier/horeca/arrival/promise', { arrivalId: pass.id, id: voor.beloften[0].id, akkoord: true });
   const na = aankomsten(await lijst('host')).find(x => x.bronId === pass.id);
   assert.equal(na.beloften.length, hoeveel - 1, 'er wacht er een minder');
 
   for (const b of na.beloften) {
-    await H('/arrival/promise', { arrivalId: pass.id, id: b.id, akkoord: true });
+    await H('/api/supplier/horeca/arrival/promise', { arrivalId: pass.id, id: b.id, akkoord: true });
   }
   const weg = aankomsten(await lijst('host')).find(x => x.bronId === pass.id);
   assert.equal(weg, undefined, 'een pass zonder open beloften is geen taak meer');

@@ -35,7 +35,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -49,7 +49,7 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-const meet = async () => (await H('/dienstmeting', {})).body;
+const meet = async () => (await H('/api/supplier/horeca/dienstmeting', {})).body;
 const punt = (m, stuk) => m.meetpunten.find(x => x.naam.indexOf(stuk) >= 0);
 
 test('1. een lege avond geeft geen nullen maar "niet gemeten"', async () => {
@@ -94,23 +94,23 @@ test('4. een echte dienst komt er als getal uit', async () => {
   /* Een tafel met een drank en een gang van twee borden, met een afgesproken
      serveertijd. Alles wordt echt door de keuken gezet, dus de tijdstempels
      komen van de server. */
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'MEET-1', gasten: 2 })).body.rekening;
-  const glas = (await H('/rekening/regel', { rekeningId: r.id, naam: 'Gin-tonic', prijs: 12,
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'MEET-1', gasten: 2 })).body.rekening;
+  const glas = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Gin-tonic', prijs: 12,
     aantal: 1, gang: 1, station: 'bar' })).body.regel;
-  const a = (await H('/rekening/regel', { rekeningId: r.id, naam: 'Tartaar', prijs: 22,
+  const a = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Tartaar', prijs: 22,
     aantal: 1, gang: 2, station: 'koud' })).body.regel;
-  const b = (await H('/rekening/regel', { rekeningId: r.id, naam: 'Zeebaars', prijs: 29,
+  const b = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Zeebaars', prijs: 29,
     aantal: 1, gang: 2, station: 'warm' })).body.regel;
 
-  await H('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
   const straks = new Date(Date.now() + 30 * 60000);
   const serveerOm = String(straks.getHours()).padStart(2, '0') + ':' + String(straks.getMinutes()).padStart(2, '0');
-  await H('/gang/vrij', { rekeningId: r.id, gang: 2, serveerOm });
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 2, serveerOm });
 
-  await H('/keuken/stand', { rekeningId: r.id, regelId: glas.id, stand: 'klaar' });
-  await H('/keuken/stand', { rekeningId: r.id, regelId: glas.id, stand: 'uitgegeven' });
-  await H('/keuken/stand', { rekeningId: r.id, regelId: a.id, stand: 'klaar' });
-  await H('/keuken/stand', { rekeningId: r.id, regelId: b.id, stand: 'klaar' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: glas.id, stand: 'klaar' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: glas.id, stand: 'uitgegeven' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: a.id, stand: 'klaar' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: b.id, stand: 'klaar' });
 
   const m = await meet();
 
@@ -147,16 +147,16 @@ test('6. een onbevestigde allergiewijziging die toch doorliep, wordt geteld', as
   const m1 = await meet();
   const voor = punt(m1, 'onbevestigde allergie').waarde;
 
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'MEET-2', gasten: 1 })).body.rekening;
-  const regel = (await H('/rekening/regel', { rekeningId: r.id, naam: 'Menu', prijs: 40,
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'MEET-2', gasten: 1 })).body.rekening;
+  const regel = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Menu', prijs: 40,
     aantal: 1, gang: 1, station: 'warm', allergie: 'noten' })).body.regel;
-  await H('/gang/vrij', { rekeningId: r.id, gang: 1 });
-  await H('/keuken/stand', { rekeningId: r.id, regelId: regel.id, stand: 'klaar' });
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: regel.id, stand: 'klaar' });
 
   // Rahul past de allergie aan; dat zet de regel terug op wachten
-  const v = await H('/rahul/doe', { handeling: 'allergie.aanpassen',
+  const v = await H('/api/supplier/horeca/rahul/doe', { handeling: 'allergie.aanpassen',
     gegevens: { rekeningId: r.id, regelId: regel.id, allergie: 'noten, gluten' } });
-  await H('/rahul/bevestig', { bonId: v.body.bon.id });
+  await H('/api/supplier/horeca/rahul/bevestig', { bonId: v.body.bon.id });
 
   const m2 = await meet();
   assert.equal(punt(m2, 'onbevestigde allergie').waarde, voor + 1,

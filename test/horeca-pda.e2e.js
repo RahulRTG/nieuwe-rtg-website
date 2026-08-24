@@ -71,17 +71,17 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     const mgr = (roster.staff || []).find(x => x.role === 'manager') || roster.staff[0];
     const tok = (await post(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
     assert.ok(tok, 'de zaak-inlog werkt');
-    const H = (pad, body) => post(base, '/api/supplier/horeca' + pad, body, tok);
+    const H = (pad, body) => post(base, pad, body, tok);
 
     // een tafel met een complete gang met een allergie erop: een draagtaak
-    const draag = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'PDA-DRAAG', gasten: 2 })).body.rekening;
-    const regel = (await H('/rekening/regel', { rekeningId: draag.id, naam: 'Tournedos', prijs: 34.5,
+    const draag = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'PDA-DRAAG', gasten: 2 })).body.rekening;
+    const regel = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: draag.id, naam: 'Tournedos', prijs: 34.5,
       aantal: 1, gang: 1, station: 'grill', allergie: 'noten' })).body.regel;
-    await H('/gang/vrij', { rekeningId: draag.id, gang: 1 });
-    await H('/keuken/stand', { rekeningId: draag.id, regelId: regel.id, stand: 'klaar' });
+    await H('/api/supplier/horeca/gang/vrij', { rekeningId: draag.id, gang: 1 });
+    await H('/api/supplier/horeca/keuken/stand', { rekeningId: draag.id, regelId: regel.id, stand: 'klaar' });
 
     // een tafel die openstaat zonder bestelling: geen grens, dus nooit in "nu"
-    await H('/rekening/open', { kanaal: 'tafel', tafel: 'PDA-LEEG', gasten: 4 });
+    await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'PDA-LEEG', gasten: 4 });
 
     /* En een halve gang met een afgesproken serveertijd die AL VOORBIJ is: die
        is over zijn grens (het serveermoment zelf) en hoort dus in "nu". Twintig
@@ -89,14 +89,14 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
        kern/horeca/cadans.js rekent. */
     const toen = new Date(Date.now() - 20 * 60000);
     const serveerOm = String(toen.getHours()).padStart(2, '0') + ':' + String(toen.getMinutes()).padStart(2, '0');
-    const laat = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'PDA-LAAT', gasten: 2 })).body.rekening;
-    const l1 = (await H('/rekening/regel', { rekeningId: laat.id, naam: 'Tartaar', prijs: 22, aantal: 1, gang: 1, station: 'koud' })).body.regel;
-    await H('/rekening/regel', { rekeningId: laat.id, naam: 'Zeebaars', prijs: 29, aantal: 1, gang: 1, station: 'warm' });
-    await H('/gang/vrij', { rekeningId: laat.id, gang: 1, serveerOm });
-    await H('/keuken/stand', { rekeningId: laat.id, regelId: l1.id, stand: 'klaar' });
+    const laat = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'PDA-LAAT', gasten: 2 })).body.rekening;
+    const l1 = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: laat.id, naam: 'Tartaar', prijs: 22, aantal: 1, gang: 1, station: 'koud' })).body.regel;
+    await H('/api/supplier/horeca/rekening/regel', { rekeningId: laat.id, naam: 'Zeebaars', prijs: 29, aantal: 1, gang: 1, station: 'warm' });
+    await H('/api/supplier/horeca/gang/vrij', { rekeningId: laat.id, gang: 1, serveerOm });
+    await H('/api/supplier/horeca/keuken/stand', { rekeningId: laat.id, regelId: l1.id, stand: 'klaar' });
 
     // en een gast die om hulp vraagt: grens 3 minuten
-    const qr = (await H('/gast/qr', { tafel: 'PDA-DRAAG' })).body;
+    const qr = (await H('/api/supplier/horeca/gast/qr', { tafel: 'PDA-DRAAG' })).body;
     const aan = (await post(base, '/api/gast/aanschuiven', { token: qr.token, naam: 'Sam' })).body;
     assert.ok(aan.sleutel, 'de gast zit aan tafel');
     const vz = (await post(base, '/api/gast/verzoek', { sleutel: aan.sleutel, soort: 'hulp',
@@ -146,7 +146,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.ok(pak, 'er staat een knop om de gang te dragen');
     await pak.click();
     await page.waitForTimeout(700);
-    const naPak = (await H('/rekening', { rekeningId: draag.id })).body.rekening;
+    const naPak = (await H('/api/supplier/horeca/rekening', { rekeningId: draag.id })).body.rekening;
     assert.equal(naPak.regels[0].stand, 'klaar', 'het bord staat nog op klaar, niet op uitgegeven');
     beeld = await lees();
     assert.match(beeld.nu + beeld.open, /PDA-DRAAG/, 'en de taak staat er nog, want hij is niet uitgegeven');
@@ -163,7 +163,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     /* en uitgeven haalt hem er wel af */
     await page.click('[data-uit]');
     await page.waitForTimeout(700);
-    const naUit = (await H('/rekening', { rekeningId: draag.id })).body.rekening;
+    const naUit = (await H('/api/supplier/horeca/rekening', { rekeningId: draag.id })).body.rekening;
     assert.equal(naUit.regels[0].stand, 'uitgegeven', 'nu pas is hij uitgegeven');
     beeld = await lees();
     assert.doesNotMatch(beeld.nu + beeld.open, /PDA-DRAAG/, 'en dan is de taak weg');
@@ -214,11 +214,11 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
        taak van de lijst, maar voor de gast is het verschil enorm: bevestigd
        betekent "wij regelen het", afgewezen betekent "dit gaat niet lukken".
        Een knop die "gecontroleerd" heet en het tweede doet, is een leugen. */
-    const arrivals = (await H('/arrivals', {})).body;
+    const arrivals = (await H('/api/supplier/horeca/arrivals', {})).body;
     const naAf = arrivals.arrivals.find(x => x.id === pass.id);
     assert.ok(naAf, 'de pass bestaat nog');
     assert.equal(arrivals.openBeloften, 0, 'en er wacht niets meer op een mens');
-    const volle = (await H('/arrivals', {})).body.arrivals.find(x => x.id === pass.id);
+    const volle = (await H('/api/supplier/horeca/arrivals', {})).body.arrivals.find(x => x.id === pass.id);
     const standen = (volle.beloften || []).map(b => b.status);
     assert.ok(standen.length, 'de beloften staan er nog: ' + JSON.stringify(standen));
     assert.ok(!standen.includes('niet-mogelijk'),
@@ -236,8 +236,8 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     await page.click('[data-modus="alles"]');
     await page.waitForTimeout(600);
 
-    const wijk = (await H('/wijk/zet', { naam: 'Terras', tafels: ['PDA-DRAAG'] })).body.wijk;
-    await H('/wijk/neem', { wijkId: wijk.id });
+    const wijk = (await H('/api/supplier/horeca/wijk/zet', { naam: 'Terras', tafels: ['PDA-DRAAG'] })).body.wijk;
+    await H('/api/supplier/horeca/wijk/neem', { wijkId: wijk.id });
     await page.click('#pVerversNu');
     await page.waitForTimeout(800);
 
@@ -326,10 +326,10 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     /* DE PRIJS KOMT VAN DE KAART. Wat het scherm toont moet gelijk zijn aan wat
        de server op de rekening zette -- en die haalt hem uit kern/horeca/kaart.js. */
-    const alle = (await H('/rekeningen', { status: 'open' })).body.rekeningen;
+    const alle = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen;
     const keten = alle.find(x => x.tafel === 'PDA-KETEN');
-    const vol = (await H('/rekening', { rekeningId: keten.id })).body.rekening;
-    const kaart = (await H('/kaart', {})).body.groepen[0].items[0];
+    const vol = (await H('/api/supplier/horeca/rekening', { rekeningId: keten.id })).body.rekening;
+    const kaart = (await H('/api/supplier/horeca/kaart', {})).body.groepen[0].items[0];
     assert.equal(vol.regels[0].naam, kaart.naam, 'de naam komt van de kaart');
     assert.equal(vol.regels[0].centen, kaart.centen, 'en de prijs ook');
     assert.match(wat.replace(/\s+/g, ' '), new RegExp(kaart.naam), 'zoals hij op de knop stond');
@@ -340,7 +340,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.ok(naarKeuken, 'er staat een knop om de gang naar de keuken te sturen');
     await naarKeuken.click();
     await page.waitForTimeout(800);
-    const naVrij = (await H('/rekening', { rekeningId: keten.id })).body.rekening;
+    const naVrij = (await H('/api/supplier/horeca/rekening', { rekeningId: keten.id })).body.rekening;
     assert.ok(naVrij.regels[0].vrijAt, 'nu pas ziet de keuken hem');
     assert.equal(await page.evaluate(() => !!document.querySelector('#tRegels [data-vrij]')), false,
       'en de knop is weg, want er staat niets meer open');
@@ -351,7 +351,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.match(await betaal.evaluate(el => el.textContent), /\d/, 'met een bedrag erin');
     await betaal.click();
     await page.waitForTimeout(900);
-    const naBetaal = (await H('/rekening', { rekeningId: keten.id })).body.rekening;
+    const naBetaal = (await H('/api/supplier/horeca/rekening', { rekeningId: keten.id })).body.rekening;
     assert.equal(naBetaal.status, 'betaald', 'de rekening is betaald');
     assert.equal(naBetaal.openstaand, 0);
     assert.equal(await page.evaluate(() => document.getElementById('pLijst').hidden), false,

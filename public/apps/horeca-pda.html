@@ -9,6 +9,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <link href="/shared/zaakscherm.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 <style>
@@ -84,11 +85,11 @@
        keuzelijst samengevoegd zou "runner in mijn wijk" onmogelijk zijn. -->
   <div class="pda-modi" id="pWijkLens" role="group" aria-label="Wijk"></div>
   <p class="pda-som" id="pWijkUit"></p>
-  <div class="rij" style="margin-top:.6rem;gap:.4rem;">
+  <div class="rij z-mt60 z-gap40">
     <input class="veld h-flex1" id="pNieuwTafel" maxlength="30" placeholder="Tafel of plek" aria-label="Tafel of plek">
-    <input class="veld" id="pNieuwGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten" style="flex:0 1 5rem;">
+    <input class="veld z-b5" id="pNieuwGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten">
   </div>
-  <div class="pda-acties" style="margin-top:.4rem;">
+  <div class="pda-acties z-mt40">
     <button class="knop p" id="pNieuw" type="button">Tafel openen</button>
     <button class="knop" id="pTafels" type="button">Open tafels</button>
     <button class="knop" id="pLokaal" type="button">Opnemen zonder lijn</button>
@@ -128,11 +129,11 @@
   tot de zaal hem vrijgeeft &mdash; er wordt niets automatisch doorgestuurd en
   niets betaald.</p>
 
-  <div class="rij" style="margin-top:.5rem;gap:.4rem;">
+  <div class="rij z-mt40 z-gap40">
     <input class="veld h-flex1" id="lTafel" maxlength="30" placeholder="Tafel of plek" aria-label="Tafel of plek">
-    <input class="veld" id="lGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten" style="flex:0 1 5rem;">
+    <input class="veld z-b5" id="lGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten">
   </div>
-  <div class="rij" style="gap:.4rem;flex-wrap:wrap;margin-top:.4rem;">
+  <div class="rij z-gap40 z-wrap z-mt40">
     <label class="pda-veldlabel">Gang
       <select class="veld" id="lGang" aria-label="Voor welke gang">
         <option value="0">geen gang</option><option value="1" selected>1</option>
@@ -141,7 +142,7 @@
     <label class="pda-veldlabel">Voor wie
       <input class="veld" id="lStoel" maxlength="40" placeholder="stoel of naam" aria-label="Voor wie is deze bestelling"></label>
   </div>
-  <input class="veld" id="lAllergie" maxlength="120" placeholder="Allergie van deze gast (gaat ongefilterd naar de keuken)" aria-label="Allergie" style="margin-top:.4rem;width:100%;">
+  <input class="veld z-mt40 z-vol" id="lAllergie" maxlength="120" placeholder="Allergie van deze gast (gaat ongefilterd naar de keuken)" aria-label="Allergie">
 
   <div class="pda-groep">
     <h2>Opgenomen</h2>
@@ -169,7 +170,7 @@
   <div class="pda-groep">
     <h2>Aan tafel</h2>
     <div id="tStoelen"></div>
-    <div class="rij" style="margin-top:.5rem;gap:.4rem;">
+    <div class="rij z-mt40 z-gap40">
       <input class="veld h-flex1" id="tStoelNaam" maxlength="40" placeholder="Naam of plek (bv. bij het raam)" aria-label="Naam of plek van de stoel">
       <button class="knop" id="tStoelBij" type="button">Stoel erbij</button>
     </div>
@@ -182,7 +183,7 @@
 
   <div class="pda-groep">
     <h2>Bestellen</h2>
-    <div class="rij" style="gap:.4rem;flex-wrap:wrap;">
+    <div class="rij z-gap40 z-wrap">
       <label class="pda-veldlabel">Gang
         <select class="veld" id="tGang" aria-label="Voor welke gang">
           <option value="0">geen gang</option><option value="1" selected>1</option>
@@ -191,7 +192,7 @@
       <label class="pda-veldlabel">Voor wie
         <select class="veld" id="tVoor" aria-label="Voor wie is deze bestelling"></select></label>
     </div>
-    <input class="veld" id="tAllergie" maxlength="120" placeholder="Allergie van deze gast (gaat ongefilterd naar de keuken)" aria-label="Allergie" style="margin-top:.4rem;width:100%;">
+    <input class="veld z-mt40 z-vol" id="tAllergie" maxlength="120" placeholder="Allergie van deze gast (gaat ongefilterd naar de keuken)" aria-label="Allergie">
     <div id="tKaart"></div>
     <p class="pda-voet">De prijs komt van de kaart van de zaak en niet van dit
     scherm. Uitverkochte gerechten staan er met hun vlag bij: de gast kan ze niet

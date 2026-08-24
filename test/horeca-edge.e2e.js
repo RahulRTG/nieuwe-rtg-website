@@ -42,7 +42,7 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     const roster = (await post(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const mgr = (roster.staff || []).find(x => x.role === 'manager') || roster.staff[0];
     const tok = (await post(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
-    const H = (pad, body) => post(base, '/api/supplier/horeca' + pad, body, tok);
+    const H = (pad, body) => post(base, pad, body, tok);
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
@@ -60,7 +60,7 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     }, tok);
 
     /* ---- 1. eerst één keer mét lijn, zodat de kaart bewaard wordt ---- */
-    const rek = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'EDGE-WARM', gasten: 2 })).body.rekening;
+    const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'EDGE-WARM', gasten: 2 })).body.rekening;
     await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
     await page.waitForTimeout(900);
     await page.click('#pTafels');
@@ -105,7 +105,7 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     assert.equal(strook.verborgen, false, 'en dat staat luid op het scherm');
     assert.match(strook.tekst, /op dit toestel/, strook.tekst);
 
-    const tussen = (await H('/rekeningen', { status: 'open' })).body.rekeningen;
+    const tussen = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen;
     assert.equal(tussen.find(x => x.tafel === 'EDGE-KOUD'), undefined,
       'bij de server staat nog niets');
 
@@ -127,10 +127,10 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     assert.equal(await page.evaluate(() => RTGHorecaEdge.rij().length), 0, 'de rij is leeg');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.vastgelopen().length), 0, 'en niets liep vast');
 
-    const lijst = (await H('/rekeningen', { status: 'open' })).body.rekeningen;
+    const lijst = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen;
     const kort = lijst.find(x => x.tafel === 'EDGE-KOUD');
     assert.ok(kort, 'de bestelling staat nu bij de server');
-    const vol = (await H('/rekening', { rekeningId: kort.id })).body.rekening;
+    const vol = (await H('/api/supplier/horeca/rekening', { rekeningId: kort.id })).body.rekening;
     assert.equal(vol.gasten, 4);
     assert.equal(vol.regels.length, 1);
     assert.equal(vol.regels[0].stand, 'besteld', 'de keuken moet hem nog maken');
@@ -161,14 +161,14 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     await page.waitForTimeout(900);
     assert.equal(await page.evaluate(() => RTGHorecaEdge.rij().length), 1,
       'de PDA denkt dat het misging en zet hem in de rij');
-    const naVerlies = (await H('/rekeningen', { status: 'open' })).body.rekeningen
+    const naVerlies = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen
       .filter(x => x.tafel === 'EDGE-LOST').length;
     assert.equal(naVerlies, 1, 'terwijl de server hem wel degelijk verwerkte');
 
     slikAntwoord = false;
     await page.evaluate(() => RTGHorecaEdge.leeg());
     await page.waitForTimeout(1200);
-    assert.equal((await H('/rekeningen', { status: 'open' })).body.rekeningen
+    assert.equal((await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen
       .filter(x => x.tafel === 'EDGE-LOST').length, 1,
       'de herhaling levert GEEN tweede bestelling op');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.rij().length), 0, 'en de rij is leeg');

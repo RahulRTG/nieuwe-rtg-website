@@ -35,7 +35,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -49,11 +49,11 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-const reisVan = async (tafel) => (await H('/journey', {})).body.reizen.find(r => r.tafel === tafel);
+const reisVan = async (tafel) => (await H('/api/supplier/horeca/journey', {})).body.reizen.find(r => r.tafel === tafel);
 
 test('geen enkel veld van een gastreis is een verzonnen percentage', async () => {
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'J1', gasten: 2 })).body.rekening;
-  await H('/rekening/regel', { rekeningId: r.id, naam: 'Oesters', prijs: 24, aantal: 1, gang: 1, station: 'koud' });
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'J1', gasten: 2 })).body.rekening;
+  await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Oesters', prijs: 24, aantal: 1, gang: 1, station: 'koud' });
   const reis = await reisVan('J1');
   assert.ok(reis, 'de tafel staat in de toren');
 
@@ -72,20 +72,20 @@ test('geen enkel veld van een gastreis is een verzonnen percentage', async () =>
 });
 
 test('de breuk is te tellen, en klopt met de rekening', async () => {
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'J2', gasten: 2 })).body.rekening;
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'J2', gasten: 2 })).body.rekening;
   const ids = [];
   for (const naam of ['Soep', 'Brood', 'Kaas']) {
-    const g = (await H('/rekening/regel', { rekeningId: r.id, naam, prijs: 10, aantal: 1, gang: 1, station: 'koud' })).body.regel;
+    const g = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam, prijs: 10, aantal: 1, gang: 1, station: 'koud' })).body.regel;
     ids.push(g.id);
   }
-  await H('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
 
   let reis = await reisVan('J2');
   assert.deepEqual(reis.geserveerd, { uitgegeven: 0, besteld: 3 });
 
   for (const id of ids.slice(0, 2)) {
-    await H('/keuken/stand', { rekeningId: r.id, regelId: id, stand: 'klaar' });
-    await H('/keuken/stand', { rekeningId: r.id, regelId: id, stand: 'uitgegeven' });
+    await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: id, stand: 'klaar' });
+    await H('/api/supplier/horeca/keuken/stand', { rekeningId: r.id, regelId: id, stand: 'uitgegeven' });
   }
   reis = await reisVan('J2');
   assert.deepEqual(reis.geserveerd, { uitgegeven: 2, besteld: 3 }, 'twee van de drie de deur uit');
@@ -93,7 +93,7 @@ test('de breuk is te tellen, en klopt met de rekening', async () => {
 });
 
 test('een tafel die niets bestelde heeft geen nul maar niets', async () => {
-  await H('/rekening/open', { kanaal: 'tafel', tafel: 'J3', gasten: 4 });
+  await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'J3', gasten: 4 });
   const reis = await reisVan('J3');
   assert.deepEqual(reis.geserveerd, { uitgegeven: 0, besteld: 0 },
     'nul van nul: het scherm hoort hier een streepje te tonen en geen 0%');
@@ -101,11 +101,11 @@ test('een tafel die niets bestelde heeft geen nul maar niets', async () => {
 });
 
 test('de spreiding staat in minuten, en synchroon volgt uit hetzelfde getal', async () => {
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'J4', gasten: 2 })).body.rekening;
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'J4', gasten: 2 })).body.rekening;
   for (const [naam, station] of [['Oesters', 'koud'], ['Ribeye', 'grill']]) {
-    await H('/rekening/regel', { rekeningId: r.id, naam, prijs: 30, aantal: 1, gang: 1, station });
+    await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam, prijs: 30, aantal: 1, gang: 1, station });
   }
-  await H('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
   const reis = await reisVan('J4');
   const gang = reis.gangen[0];
 

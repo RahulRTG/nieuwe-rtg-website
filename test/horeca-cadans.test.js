@@ -161,7 +161,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -176,12 +176,12 @@ test.after(() => {
 });
 
 test('het keukenbord draagt de cadans, en verandert geen bestaand veld', async () => {
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'C1', gasten: 2 })).body;
-  await H('/rekening/regel', { rekeningId: r.rekening.id, naam: 'Risotto', prijs: 24, aantal: 1, gang: 1, station: 'warm' });
-  await H('/rekening/regel', { rekeningId: r.rekening.id, naam: 'Oesters', prijs: 18, aantal: 1, gang: 1, station: 'koud' });
-  await H('/gang/vrij', { rekeningId: r.rekening.id, gang: 1, serveerOm: '19:42' });
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'C1', gasten: 2 })).body;
+  await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.rekening.id, naam: 'Risotto', prijs: 24, aantal: 1, gang: 1, station: 'warm' });
+  await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.rekening.id, naam: 'Oesters', prijs: 18, aantal: 1, gang: 1, station: 'koud' });
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.rekening.id, gang: 1, serveerOm: '19:42' });
 
-  const bord = (await H('/keuken/bord', {})).body;
+  const bord = (await H('/api/supplier/horeca/keuken/bord', {})).body;
   const risotto = bord.bonnen.find(b => b.naam === 'Risotto');
   const oesters = bord.bonnen.find(b => b.naam === 'Oesters');
   assert.ok(risotto && oesters, 'beide bonnen staan op het bord');

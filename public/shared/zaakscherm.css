@@ -52,6 +52,30 @@ a.knop{display:inline-block;text-decoration:none;}
 .z-mt40{margin-top:.4rem;}
 .z-mt60{margin-top:.6rem;}
 .z-mt80{margin-top:.8rem;}
+.z-mb90{margin-bottom:.9rem;}
+.z-mt30{margin-top:.3rem;}
+.z-gap40{gap:.4rem;}
+.z-wrap{flex-wrap:wrap;}
+.z-vol{width:100%;}
+/* Breedtewens van een veld in een rij. Tien maten, want dat is wat er in de
+   horecaschermen stond -- als attribuut, tot hier. Ze zeggen alle tien
+   hetzelfde: krimpen mag, groeien niet, en begin op zoveel rem. */
+.z-b5{flex:0 1 5rem;}
+.z-b6{flex:0 1 6rem;}
+.z-b7{flex:0 1 7rem;}
+.z-b8{flex:0 1 8rem;}
+.z-b9{flex:0 1 9rem;}
+.z-b10{flex:0 1 10rem;}
+.z-b11{flex:0 1 11rem;}
+.z-b12{flex:0 1 12rem;}
+.z-b13{flex:0 1 13rem;}
+.z-b14{flex:0 1 14rem;}
+/* De strook die zegt hoeveel handelingen er nog op dit toestel staan. Opzettelijk
+   luid: werk dat nog niet bij de server is, is werk dat nergens staat. */
+.z-edge{border-color:#C23A5E;background:rgba(194,58,94,.1);}
+/* En twee die juist WEL groeien. */
+.z-g11{flex:1 1 11rem;}
+.z-g14{flex:1 1 14rem;}
 .bon{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;margin-bottom:.5rem;}
 .bon b{font-size:.95rem;}
 .allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:6px;

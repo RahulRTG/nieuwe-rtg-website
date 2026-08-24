@@ -37,7 +37,7 @@
     <button class="knop" id="tabKeuken" role="tab" aria-selected="false" type="button">Keuken</button>
   </div>
 
-  <nav class="rij hq-legacy-nav" aria-label="De rest van het Horeca OS" style="margin-bottom:.9rem;">
+  <nav class="rij hq-legacy-nav z-mb90" aria-label="De rest van het Horeca OS">
     <a class="knop" href="/apps/horeca-pda.html">PDA Service</a>
     <a class="knop" href="/apps/horeca-vloer.html">Vloer</a>
     <a class="knop" href="/apps/horeca-bar.html">Bar</a>
@@ -53,13 +53,13 @@
   <section id="vZaal" aria-label="De zaal">
     <!-- Opzettelijk luid: een gang die nog niet bij de keuken is, is werk dat
          nergens staat. -->
-    <div id="zEdgeStrook" class="kaart" hidden style="border-color:#C23A5E;background:rgba(194,58,94,.1);"></div>
+    <div id="zEdgeStrook" class="kaart z-edge" hidden></div>
     <div class="kaart">
       <div class="kop">Nieuwe rekening</div>
       <div class="rij">
         <input class="veld" id="zTafel" maxlength="30" placeholder="Tafel of plek" aria-label="Tafel of plek">
-        <input class="veld" id="zGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten" style="flex:0 1 6rem;">
-        <select class="veld" id="zKanaal" aria-label="Kanaal" style="flex:0 1 9rem;">
+        <input class="veld z-b6" id="zGasten" type="number" min="1" max="99" value="2" aria-label="Aantal gasten">
+        <select class="veld z-b9" id="zKanaal" aria-label="Kanaal">
           <option value="tafel">Tafel</option><option value="bar">Bar</option>
           <option value="terras">Terras</option><option value="club">Club</option>
           <option value="afhaal">Afhaal</option><option value="roomservice">Roomservice</option>
@@ -87,53 +87,53 @@
            Wat op niemands naam staat, blijft gewoon van de tafel. -->
       <div id="zGezelschap"></div>
       <div class="rij z-mt40">
-        <input class="veld" id="zStoelNaam" maxlength="40" placeholder="Naam of plek" aria-label="Naam of plek van de stoel" style="flex:0 1 11rem;">
+        <input class="veld z-b11" id="zStoelNaam" maxlength="40" placeholder="Naam of plek" aria-label="Naam of plek van de stoel">
         <button class="knop" id="zStoelBij" type="button">Stoel erbij</button>
       </div>
       <div id="zDetail" class="z-mt60"></div>
       <div class="rij z-mt60">
         <input class="veld" id="zNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Product">
-        <select class="veld" id="zVoor" aria-label="Voor wie" style="flex:0 1 10rem;"><option value="">Voor de tafel</option></select>
-        <input class="veld" id="zPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs" style="flex:0 1 7rem;">
-        <input class="veld" id="zAantal" type="number" min="1" max="99" value="1" aria-label="Aantal" style="flex:0 1 5rem;">
-        <input class="veld" id="zGang" type="number" min="0" max="9" value="1" aria-label="Gang" style="flex:0 1 5rem;">
-        <input class="veld" id="zStation" maxlength="30" placeholder="Station" aria-label="Station" style="flex:0 1 7rem;">
-        <input class="veld" id="zAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie" style="flex:0 1 9rem;">
+        <select class="veld z-b10" id="zVoor" aria-label="Voor wie"><option value="">Voor de tafel</option></select>
+        <input class="veld z-b7" id="zPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs">
+        <input class="veld z-b5" id="zAantal" type="number" min="1" max="99" value="1" aria-label="Aantal">
+        <input class="veld z-b5" id="zGang" type="number" min="0" max="9" value="1" aria-label="Gang">
+        <input class="veld z-b7" id="zStation" maxlength="30" placeholder="Station" aria-label="Station">
+        <input class="veld z-b9" id="zAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie">
         <button class="knop p" id="zRegel" type="button">Zet erop</button>
       </div>
       <div class="rij z-mt60">
-        <input class="veld" id="zVrijGang" type="number" min="0" max="9" value="1" aria-label="Gang vrijgeven" style="flex:0 1 5rem;">
-        <input class="veld" id="zServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Serveertijd" style="flex:0 1 7rem;">
+        <input class="veld z-b5" id="zVrijGang" type="number" min="0" max="9" value="1" aria-label="Gang vrijgeven">
+        <input class="veld z-b7" id="zServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Serveertijd">
         <button class="knop" id="zVrij" type="button">Gang vrijgeven</button>
       </div>
       <!-- DE TAFEL ZELF: gasten schuiven op, of twee tafels worden er een.
            Beide handelingen VERPLAATSEN alleen; de server rekent voor en na en
            weigert als er een cent bij of af zou komen. -->
       <div class="rij z-mt60">
-        <input class="veld" id="zNaarTafel" maxlength="30" placeholder="Naar tafel" aria-label="Verplaatsen naar welke tafel" style="flex:0 1 8rem;">
+        <input class="veld z-b8" id="zNaarTafel" maxlength="30" placeholder="Naar tafel" aria-label="Verplaatsen naar welke tafel">
         <button class="knop" id="zVerplaats" type="button">Verplaats</button>
-        <select class="veld" id="zSamenMet" aria-label="Samenvoegen met welke rekening" style="flex:0 1 12rem;"><option value="">Samenvoegen met...</option></select>
+        <select class="veld z-b12" id="zSamenMet" aria-label="Samenvoegen met welke rekening"><option value="">Samenvoegen met...</option></select>
         <button class="knop" id="zVoegSamen" type="button">Voeg samen</button>
       </div>
       <!-- KORTING DRAAGT ALTIJD EEN REDEN, en fooi wordt nooit voorgevuld.
            Allebei een regel uit de kern, hier zichtbaar gemaakt. -->
       <div class="rij z-mt60">
-        <input class="veld" id="zKortProcent" type="number" min="0" max="100" placeholder="%" aria-label="Kortingspercentage" style="flex:0 1 5rem;">
-        <input class="veld" id="zKortBedrag" type="number" min="0" step="0.01" placeholder="of bedrag" aria-label="Kortingsbedrag" style="flex:0 1 7rem;">
-        <input class="veld" id="zKortReden" maxlength="80" placeholder="Reden voor de korting" aria-label="Reden voor de korting" style="flex:1 1 11rem;">
+        <input class="veld z-b5" id="zKortProcent" type="number" min="0" max="100" placeholder="%" aria-label="Kortingspercentage">
+        <input class="veld z-b7" id="zKortBedrag" type="number" min="0" step="0.01" placeholder="of bedrag" aria-label="Kortingsbedrag">
+        <input class="veld z-g11" id="zKortReden" maxlength="80" placeholder="Reden voor de korting" aria-label="Reden voor de korting">
         <button class="knop" id="zKorting" type="button">Korting</button>
-        <input class="veld" id="zFooiBedrag" type="number" min="0" step="0.01" placeholder="Fooi" aria-label="Fooi" style="flex:0 1 6rem;">
+        <input class="veld z-b6" id="zFooiBedrag" type="number" min="0" step="0.01" placeholder="Fooi" aria-label="Fooi">
         <button class="knop" id="zFooi" type="button">Fooi erop</button>
       </div>
       <div class="rij z-mt60">
-        <input class="veld" id="zSplits" type="number" min="2" max="20" placeholder="Splits in" aria-label="Splitsen per persoon" style="flex:0 1 6rem;">
+        <input class="veld z-b6" id="zSplits" type="number" min="2" max="20" placeholder="Splits in" aria-label="Splitsen per persoon">
         <button class="knop" id="zSplitsGa" type="button">Splits per persoon</button>
         <button class="knop p" id="zBetaal" type="button">Afrekenen (pin)</button>
       </div>
       <!-- ONINBAAR IS GEEN ADMINISTRATIEVE HANDELING: het blijft in de
            dagcijfers staan en vraagt altijd een reden. -->
       <div class="rij z-mt60">
-        <input class="veld" id="zOninbaarReden" maxlength="160" placeholder="Waarom is deze rekening oninbaar?" aria-label="Reden oninbaar" style="flex:1 1 14rem;">
+        <input class="veld z-g14" id="zOninbaarReden" maxlength="160" placeholder="Waarom is deze rekening oninbaar?" aria-label="Reden oninbaar">
         <button class="knop" id="zOninbaar" type="button">Boek oninbaar</button>
       </div>
       <!-- VERDELEN IS IETS ANDERS DAN SPLITSEN, en daarom staat het op een
@@ -142,7 +142,7 @@
            deel betaalt. Door elkaar halen levert een rekening op die twee keer
            bestaat. -->
       <div class="rij z-mt60">
-        <select class="veld" id="zWijze" aria-label="Verdelen volgens" style="flex:0 1 13rem;">
+        <select class="veld z-b13" id="zWijze" aria-label="Verdelen volgens">
           <option value="product">Ieder wat hij nam</option>
           <option value="gelijk">Gelijk over de tafel</option>
         </select>

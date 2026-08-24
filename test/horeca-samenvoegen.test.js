@@ -36,7 +36,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -51,14 +51,14 @@ test.after(() => {
 });
 
 async function tafel(naam, vrij) {
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
-  const regel = (await H('/rekening/regel', { rekeningId: r.id, naam: 'Gin-tonic', prijs: 12,
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
+  const regel = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: 'Gin-tonic', prijs: 12,
     aantal: 1, gang: 1, station: 'bar' })).body.regel;
-  if (vrij !== false) await H('/gang/vrij', { rekeningId: r.id, gang: 1 });
+  if (vrij !== false) await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
   return { id: r.id, regelId: regel.id };
 }
-const standVan = async (t) => ((await H('/rekening', { rekeningId: t.id })).body.rekening.regels[0] || {}).stand;
-const voeg = (handelingen) => H('/offline/handelingen', { handelingen });
+const standVan = async (t) => ((await H('/api/supplier/horeca/rekening', { rekeningId: t.id })).body.rekening.regels[0] || {}).stand;
+const voeg = (handelingen) => H('/api/supplier/horeca/offline/handelingen', { handelingen });
 
 test('1. vooruit mag: het glas dat de bar zonder lijn op klaar zette, komt aan', async () => {
   const t = await tafel('SV-1');
@@ -73,7 +73,7 @@ test('1. vooruit mag: het glas dat de bar zonder lijn op klaar zette, komt aan',
 test('2. achteruit mag nooit, en het toestel hoort waarom', async () => {
   const t = await tafel('SV-2');
   // een collega is sneller: het bord is al de deur uit
-  await H('/keuken/stand', { rekeningId: t.id, regelId: t.regelId, stand: 'uitgegeven' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: t.id, regelId: t.regelId, stand: 'uitgegeven' });
 
   const r = await voeg([{ clientId: 'sv-2', soort: 'stand', rekeningId: t.id, regelId: t.regelId, naar: 'klaar' }]);
   assert.equal(r.body.geweigerd, 1);
@@ -90,7 +90,7 @@ test('3. dezelfde handeling telt een keer, en geeft de eerste uitkomst terug', a
   assert.equal(eerst.body.gedaan, 1);
 
   // intussen zet een collega hem verder
-  await H('/keuken/stand', { rekeningId: t.id, regelId: t.regelId, stand: 'klaar' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: t.id, regelId: t.regelId, stand: 'klaar' });
 
   const weer = await voeg([{ clientId: 'sv-3', soort: 'stand', rekeningId: t.id, regelId: t.regelId, naar: 'gestart' }]);
   assert.equal(weer.body.uitkomsten[0].herhaald, true, 'hij herkent de herhaling');
@@ -119,7 +119,7 @@ test('5. vrijgeven voegt samen en is idempotent', async () => {
 
 test('6. wat niet samenvoegbaar is, gaat niet offline', async () => {
   const t = await tafel('SV-6');
-  const voor = (await H('/rekening', { rekeningId: t.id })).body.rekening;
+  const voor = (await H('/api/supplier/horeca/rekening', { rekeningId: t.id })).body.rekening;
 
   const r = await voeg([
     { clientId: 'sv-6a', soort: 'korting', rekeningId: t.id, centen: 500, reden: 'sorry' },
@@ -129,7 +129,7 @@ test('6. wat niet samenvoegbaar is, gaat niet offline', async () => {
   assert.equal(r.body.geweigerd, 3, 'geld en verwijderen gaan niet offline');
   for (const u of r.body.uitkomsten) assert.match(u.reden, /kan niet offline/, u.reden);
 
-  const na = (await H('/rekening', { rekeningId: t.id })).body.rekening;
+  const na = (await H('/api/supplier/horeca/rekening', { rekeningId: t.id })).body.rekening;
   assert.equal(na.totalen.korting, voor.totalen.korting, 'er is geen korting geboekt');
   assert.equal(na.betalingen.length, 0, 'geen cent verplaatst');
   assert.equal(na.regels.length, voor.regels.length, 'en geen regel weggehaald');

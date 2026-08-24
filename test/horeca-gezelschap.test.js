@@ -32,7 +32,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -48,15 +48,15 @@ test.after(() => {
 
 // een tafel met een paar regels; geeft de rekening terug
 async function tafel(naam, regels) {
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
-  for (const x of (regels || [])) await H('/rekening/regel', Object.assign({ rekeningId: r.id }, x));
-  return (await H('/rekening', { rekeningId: r.id })).body.rekening;
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
+  for (const x of (regels || [])) await H('/api/supplier/horeca/rekening/regel', Object.assign({ rekeningId: r.id }, x));
+  return (await H('/api/supplier/horeca/rekening', { rekeningId: r.id })).body.rekening;
 }
 
 test('de bediening zet stoelen aan tafel, en die stoel is geen inlog', async () => {
   const r = await tafel('S1');
-  const een = (await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Bij het raam' })).body;
-  const twee = (await H('/gezelschap/stoel', { rekeningId: r.id })).body;
+  const een = (await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Bij het raam' })).body;
+  const twee = (await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id })).body;
 
   assert.equal(een.stoel.nr, 1);
   assert.equal(een.stoel.handle, 'Bij het raam');
@@ -66,7 +66,7 @@ test('de bediening zet stoelen aan tafel, en die stoel is geen inlog', async () 
   // DE GRENS: geen sleutel, dus geen sessie
   assert.equal(een.stoel.eigenSessie, false);
   assert.equal(twee.stoel.eigenSessie, false);
-  const beeld = (await H('/gezelschap', { rekeningId: r.id })).body.gezelschap;
+  const beeld = (await H('/api/supplier/horeca/gezelschap', { rekeningId: r.id })).body.gezelschap;
   assert.ok(!JSON.stringify(beeld).includes('hash'), 'de sleutelafdruk komt nooit naar buiten');
   assert.equal(beeld.gasten, 2);
 });
@@ -77,17 +77,17 @@ test('een regel gaat naar een stoel, en het beeld telt op tot de rekening', asyn
     { naam: 'Zeebaars', prijs: 38, aantal: 1, gang: 2, station: 'warm' },
     { naam: 'Fles wijn', prijs: 42, aantal: 1, gang: 0, station: 'bar' }
   ]);
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Anne' });
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Sam' });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Anne' });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Sam' });
 
   const entrecote = r.regels.find(x => x.naam === 'Entrecote');
   const zeebaars = r.regels.find(x => x.naam === 'Zeebaars');
-  const naar1 = (await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: entrecote.id, nr: 1 })).body;
+  const naar1 = (await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: entrecote.id, nr: 1 })).body;
   assert.equal(naar1.naar, 1);
   assert.equal(naar1.handle, 'Anne');
-  await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: zeebaars.id, nr: 2 });
+  await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: zeebaars.id, nr: 2 });
 
-  const g = (await H('/gezelschap', { rekeningId: r.id })).body.gezelschap;
+  const g = (await H('/api/supplier/horeca/gezelschap', { rekeningId: r.id })).body.gezelschap;
   const anne = g.stoelen.find(s => s.nr === 1), sam = g.stoelen.find(s => s.nr === 2);
   assert.equal(anne.centen, 4600);
   assert.equal(sam.centen, 3800);
@@ -95,7 +95,7 @@ test('een regel gaat naar een stoel, en het beeld telt op tot de rekening', asyn
   assert.equal(g.gedeeld.centen, 4200);
 
   // punt 4: stoelen plus gedeeld is exact het bruto bedrag van de rekening
-  const rek = (await H('/rekening', { rekeningId: r.id })).body.rekening;
+  const rek = (await H('/api/supplier/horeca/rekening', { rekeningId: r.id })).body.rekening;
   const som = g.stoelen.reduce((t, s) => t + s.centen, 0) + g.gedeeld.centen;
   assert.equal(som, rek.totalen.bruto);
   assert.equal(g.centenTotaal, rek.totalen.bruto);
@@ -103,10 +103,10 @@ test('een regel gaat naar een stoel, en het beeld telt op tot de rekening', asyn
 
 test('een regel kan ook terug naar de tafel', async () => {
   const r = await tafel('S3', [{ naam: 'Koffie', prijs: 4, aantal: 1, gang: 3, station: 'koffie' }]);
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Kim' });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Kim' });
   const koffie = r.regels[0];
-  await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: koffie.id, nr: 1 });
-  const terug = (await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: koffie.id, nr: 0 })).body;
+  await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: koffie.id, nr: 1 });
+  const terug = (await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: koffie.id, nr: 0 })).body;
   assert.equal(terug.naar, null);
   assert.equal(terug.gezelschap.gedeeld.regels, 1);
   assert.equal(terug.gezelschap.stoelen[0].centen, 0);
@@ -117,18 +117,18 @@ test('een stoel weghalen haalt geen geld weg, en zegt wat er is gebeurd', async 
     { naam: 'Oesters', prijs: 24, aantal: 2, gang: 1, station: 'koud' },
     { naam: 'Tartaar', prijs: 26, aantal: 1, gang: 1, station: 'koud' }
   ]);
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Robin' });
-  for (const x of r.regels) await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: x.id, nr: 1 });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Robin' });
+  for (const x of r.regels) await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: x.id, nr: 1 });
 
-  const voor = (await H('/rekening', { rekeningId: r.id })).body.rekening.totalen.bruto;
+  const voor = (await H('/api/supplier/horeca/rekening', { rekeningId: r.id })).body.rekening.totalen.bruto;
   assert.equal(voor, 2 * 2400 + 2600);
 
-  const weg = (await H('/gezelschap/stoel/weg', { rekeningId: r.id, nr: 1 })).body;
+  const weg = (await H('/api/supplier/horeca/gezelschap/stoel/weg', { rekeningId: r.id, nr: 1 })).body;
   assert.equal(weg.losgemaakt, 2);
   assert.match(weg.let, /staan nu op de tafel/);
   assert.match(weg.let, /Robin/);
 
-  const na = (await H('/rekening', { rekeningId: r.id })).body.rekening;
+  const na = (await H('/api/supplier/horeca/rekening', { rekeningId: r.id })).body.rekening;
   assert.equal(na.totalen.bruto, voor, 'het bedrag verandert niet');
   assert.equal(na.regels.length, 2, 'de regels staan er nog');
   assert.equal(weg.gezelschap.gedeeld.regels, 2);
@@ -148,35 +148,35 @@ test('een stoel weghalen haalt geen geld weg, en zegt wat er is gebeurd', async 
 
 test('een nummer wordt nooit hergebruikt', async () => {
   const r = await tafel('S5');
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Een' });
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Twee' });
-  await H('/gezelschap/stoel/weg', { rekeningId: r.id, nr: 2 });
-  const nieuw = (await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Drie' })).body;
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Een' });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Twee' });
+  await H('/api/supplier/horeca/gezelschap/stoel/weg', { rekeningId: r.id, nr: 2 });
+  const nieuw = (await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Drie' })).body;
   assert.equal(nieuw.stoel.nr, 3, 'niet opnieuw 2: een bon die "stoel 2" zei wijst dan naar iemand anders');
 });
 
 test('een stoel hernoemen kan; een onbekende stoel niet', async () => {
   const r = await tafel('S6');
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Gast 1' });
-  const her = (await H('/gezelschap/stoel', { rekeningId: r.id, nr: 1, handle: 'De jarige' })).body;
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Gast 1' });
+  const her = (await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, nr: 1, handle: 'De jarige' })).body;
   assert.equal(her.stoel.handle, 'De jarige');
   assert.equal(her.stoel.nr, 1, 'hernoemen maakt geen nieuwe stoel');
 
-  const mis = await H('/gezelschap/stoel', { rekeningId: r.id, nr: 9, handle: 'Niemand' });
+  const mis = await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, nr: 9, handle: 'Niemand' });
   assert.equal(mis.status, 404);
   assert.match(mis.body.error, /zit niet aan deze rekening/);
 
-  const leeg = await H('/gezelschap/stoel', { rekeningId: r.id, nr: 1, handle: '' });
+  const leeg = await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, nr: 1, handle: '' });
   assert.equal(leeg.status, 400, 'hernoemen naar niets is geen hernoemen');
 });
 
 test('de keukenbon draagt de stoel met zijn naam, niet als nummer', async () => {
   const r = await tafel('S7', [{ naam: 'Ribeye', prijs: 46, aantal: 1, gang: 2, station: 'grill' }]);
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Bij het raam' });
-  await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[0].id, nr: 1 });
-  await H('/gang/vrij', { rekeningId: r.id, gang: 2 });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Bij het raam' });
+  await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[0].id, nr: 1 });
+  await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 2 });
 
-  const bord = (await H('/keuken/bord', {})).body;
+  const bord = (await H('/api/supplier/horeca/keuken/bord', {})).body;
   const bon = bord.bonnen.find(b => b.tafel === 'S7');
   assert.ok(bon, 'de bon staat op het bord');
   assert.equal(bon.gastNr, 1);
@@ -184,36 +184,36 @@ test('de keukenbon draagt de stoel met zijn naam, niet als nummer', async () => 
 });
 
 test('wie via de QR aanschuift staat op het bedieningsscherm, en andersom', async () => {
-  const qr = (await H('/gast/qr', { tafel: 'S8' })).body;
+  const qr = (await H('/api/supplier/horeca/gast/qr', { tafel: 'S8' })).body;
   assert.ok(qr.token, 'de zaak maakt een tafeltoken');
   const aan = (await api('/api/gast/aanschuiven', { token: qr.token, naam: 'Noor' })).body;
   assert.ok(aan.sleutel, 'de gast krijgt een sleutel');
 
   // de bediening vindt dezelfde rekening en ziet Noor zitten
-  const open = (await H('/rekeningen', { status: 'open' })).body.rekeningen.find(x => x.tafel === 'S8');
+  const open = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen.find(x => x.tafel === 'S8');
   assert.ok(open, 'de gastrekening staat gewoon in de lijst van de zaal');
-  const g = (await H('/gezelschap', { rekeningId: open.id })).body.gezelschap;
+  const g = (await H('/api/supplier/horeca/gezelschap', { rekeningId: open.id })).body.gezelschap;
   const noor = g.stoelen.find(s => s.handle === 'Noor');
   assert.ok(noor, 'Noor zit aan tafel');
   assert.equal(noor.eigenSessie, true, 'hij heeft wel een eigen telefoon');
 
   // punt 5: die kan de bediening niet zomaar wegklikken
-  const weg = await H('/gezelschap/stoel/weg', { rekeningId: open.id, nr: noor.nr });
+  const weg = await H('/api/supplier/horeca/gezelschap/stoel/weg', { rekeningId: open.id, nr: noor.nr });
   assert.equal(weg.status, 409);
   assert.match(weg.body.error, /eigen telefoon/);
 
   // en wat de bediening op zijn naam zet, telt bij hem
-  const r = (await H('/rekening/regel', { rekeningId: open.id, naam: 'Bier', prijs: 6, aantal: 2, gang: 0, station: 'bar' })).body.regel;
-  await H('/rekening/regel/stoel', { rekeningId: open.id, regelId: r.id, nr: noor.nr });
-  const na = (await H('/gezelschap', { rekeningId: open.id })).body.gezelschap;
+  const r = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: open.id, naam: 'Bier', prijs: 6, aantal: 2, gang: 0, station: 'bar' })).body.regel;
+  await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: open.id, regelId: r.id, nr: noor.nr });
+  const na = (await H('/api/supplier/horeca/gezelschap', { rekeningId: open.id })).body.gezelschap;
   assert.equal(na.stoelen.find(s => s.nr === noor.nr).centen, 1200);
 });
 
 test('een regel naar een stoel die niet bestaat, gaat niet door', async () => {
   const r = await tafel('S9', [{ naam: 'Water', prijs: 3, aantal: 1, gang: 0, station: 'bar' }]);
-  const mis = await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[0].id, nr: 7 });
+  const mis = await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[0].id, nr: 7 });
   assert.equal(mis.status, 404);
-  const g = (await H('/gezelschap', { rekeningId: r.id })).body.gezelschap;
+  const g = (await H('/api/supplier/horeca/gezelschap', { rekeningId: r.id })).body.gezelschap;
   assert.equal(g.gedeeld.regels, 1, 'de regel staat nog gewoon op de tafel');
 });
 
@@ -222,12 +222,12 @@ test('een allergie hangt aan de persoon die hem heeft', async () => {
     { naam: 'Pasta', prijs: 22, aantal: 1, gang: 2, station: 'warm', allergie: 'noten' },
     { naam: 'Salade', prijs: 16, aantal: 1, gang: 2, station: 'koud' }
   ]);
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Jules' });
-  await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'Max' });
-  await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[0].id, nr: 1 });
-  await H('/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[1].id, nr: 2 });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Jules' });
+  await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'Max' });
+  await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[0].id, nr: 1 });
+  await H('/api/supplier/horeca/rekening/regel/stoel', { rekeningId: r.id, regelId: r.regels[1].id, nr: 2 });
 
-  const g = (await H('/gezelschap', { rekeningId: r.id })).body.gezelschap;
+  const g = (await H('/api/supplier/horeca/gezelschap', { rekeningId: r.id })).body.gezelschap;
   assert.deepEqual(g.stoelen.find(s => s.nr === 1).allergieen, ['noten']);
   assert.deepEqual(g.stoelen.find(s => s.nr === 2).allergieen, [], 'niet de hele tafel krijgt het label');
 });

@@ -62,19 +62,19 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     const roster = (await post(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const mgr = (roster.staff || []).find(x => x.role === 'manager') || roster.staff[0];
     const tok = (await post(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
-    const H = (pad, body) => post(base, '/api/supplier/horeca' + pad, body, tok);
+    const H = (pad, body) => post(base, pad, body, tok);
 
     /* Twee tafels met dezelfde drank erop, plus een gerecht dat er niet hoort. */
     async function tafel(naam, regels) {
-      const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
-      const stoel = (await H('/gezelschap/stoel', { rekeningId: r.id, handle: 'bij het raam' })).body.stoel;
+      const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
+      const stoel = (await H('/api/supplier/horeca/gezelschap/stoel', { rekeningId: r.id, handle: 'bij het raam' })).body.stoel;
       const ids = [];
       for (const x of regels) {
-        const reg = (await H('/rekening/regel', { rekeningId: r.id, naam: x.naam, prijs: 9, aantal: x.aantal || 1,
+        const reg = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: x.naam, prijs: 9, aantal: x.aantal || 1,
           gang: 1, station: x.station || 'bar', allergie: x.allergie || '', gastNr: x.stoel ? stoel.nr : undefined })).body.regel;
         ids.push(reg.id);
       }
-      await H('/gang/vrij', { rekeningId: r.id, gang: 1 });
+      await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: 1 });
       return { id: r.id, regels: ids };
     }
     const t1 = await tafel('BAR-A', [
@@ -117,10 +117,10 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     await page.waitForTimeout(700);
 
     beeld = await lees();
-    const bord = (await H('/bar', {})).body;
+    const bord = (await H('/api/supplier/horeca/bar', {})).body;
     const gt = bord.stapel.find(x => x.naam === 'Gin-tonic');
     assert.ok(!gt || !gt.regelIds.includes(welke), 'een glas dat klaar staat, hoeft niet nog eens gemaakt');
-    const rek = (await H('/rekening', { rekeningId: t1.id })).body.rekening;
+    const rek = (await H('/api/supplier/horeca/rekening', { rekeningId: t1.id })).body.rekening;
     assert.equal(rek.regels.find(x => x.id === welke).stand, 'klaar',
       'en de stand staat op de rekening zelf, via dezelfde deur als de keuken');
 
@@ -145,14 +145,14 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
       tekst: document.getElementById('bEdgeStrook').textContent }));
     assert.equal(strook.verborgen, false, 'en dat staat op het scherm');
     assert.match(strook.tekst, /op dit toestel/, strook.tekst);
-    const tussenC = (await H('/rekening', { rekeningId: t3.id })).body.rekening;
+    const tussenC = (await H('/api/supplier/horeca/rekening', { rekeningId: t3.id })).body.rekening;
     assert.equal(tussenC.regels[0].stand, 'besteld', 'bij de server is er nog niets gebeurd');
 
     lijnDicht = false;
     await page.evaluate(() => RTGHorecaEdge.handLeeg());
     await page.waitForTimeout(1000);
     assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 0, 'de rij is leeg');
-    const naC = (await H('/rekening', { rekeningId: t3.id })).body.rekening;
+    const naC = (await H('/api/supplier/horeca/rekening', { rekeningId: t3.id })).body.rekening;
     assert.equal(naC.regels[0].stand, 'gestart', 'en de handeling is alsnog aangekomen');
 
     /* EEN COLLEGA DIE SNELLER WAS. Het glas gaat online de deur uit terwijl dit
@@ -165,12 +165,12 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     await page.waitForTimeout(800);
     assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 1, 'hij wacht');
 
-    await H('/keuken/stand', { rekeningId: t3.id, regelId: t3.regels[0], stand: 'uitgegeven' });
+    await H('/api/supplier/horeca/keuken/stand', { rekeningId: t3.id, regelId: t3.regels[0], stand: 'uitgegeven' });
 
     lijnDicht = false;
     await page.evaluate(() => RTGHorecaEdge.handLeeg());
     await page.waitForTimeout(1000);
-    const eindC = (await H('/rekening', { rekeningId: t3.id })).body.rekening;
+    const eindC = (await H('/api/supplier/horeca/rekening', { rekeningId: t3.id })).body.rekening;
     assert.equal(eindC.regels[0].stand, 'uitgegeven',
       'de offline-melding zet het bord niet terug naar klaar');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 0,

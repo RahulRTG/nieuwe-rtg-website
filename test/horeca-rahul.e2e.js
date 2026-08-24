@@ -42,14 +42,14 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
     const roster = (await post(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const mgr = (roster.staff || []).find(x => x.role === 'manager') || roster.staff[0];
     const tok = (await post(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
-    const H = (pad, body) => post(base, '/api/supplier/horeca' + pad, body, tok);
+    const H = (pad, body) => post(base, pad, body, tok);
 
-    const rek = (await H('/rekening/open', { kanaal: 'tafel', tafel: 'RB-1', gasten: 2 })).body.rekening;
-    await H('/rekening/regel', { rekeningId: rek.id, naam: 'Menu', prijs: 120, aantal: 1, gang: 1, station: 'warm' });
-    await H('/rahul/doe', { handeling: 'korting.toekennen',
+    const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'RB-1', gasten: 2 })).body.rekening;
+    await H('/api/supplier/horeca/rekening/regel', { rekeningId: rek.id, naam: 'Menu', prijs: 120, aantal: 1, gang: 1, station: 'warm' });
+    await H('/api/supplier/horeca/rahul/doe', { handeling: 'korting.toekennen',
       gegevens: { rekeningId: rek.id, centen: 3000, reden: 'wachttijd goedgemaakt' },
       waarom: 'De gang stond 22 minuten over zijn serveermoment' });
-    await H('/rahul/doe', { handeling: 'medewerker.beoordelen', gegevens: { wie: 'iemand' },
+    await H('/api/supplier/horeca/rahul/doe', { handeling: 'medewerker.beoordelen', gegevens: { wie: 'iemand' },
       waarom: 'Rahul wilde de dienst evalueren' });
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
@@ -84,7 +84,7 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
     assert.match(beeld.grens, /geen kortingsgrens/i, 'zonder instelling staat er geen bedrag: ' + beeld.grens);
 
     /* 3: bevestigen doet het werk, en pas dan */
-    const voor = (await H('/rekening', { rekeningId: rek.id })).body.rekening;
+    const voor = (await H('/api/supplier/horeca/rekening', { rekeningId: rek.id })).body.rekening;
     assert.equal(voor.totalen.korting, 0, 'voor de tik staat er niets op de rekening');
 
     const knoppen = await page.$$('[data-bevestig]');
@@ -92,7 +92,7 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
     await knoppen[0].click();
     await page.waitForTimeout(900);
 
-    const na = (await H('/rekening', { rekeningId: rek.id })).body.rekening;
+    const na = (await H('/api/supplier/horeca/rekening', { rekeningId: rek.id })).body.rekening;
     assert.equal(na.totalen.korting, 3000, 'na de tik staat de korting erop');
     beeld = await lees();
     assert.match(beeld.bonnen, new RegExp('Bevestigd door ' + mgr.name.split(' ')[0]),

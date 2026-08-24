@@ -30,7 +30,7 @@ const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const H = (pad, body) => api('/api/supplier/horeca' + pad, body, tok);
+const H = (pad, body) => api(pad, body, tok);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -46,17 +46,17 @@ test.after(() => {
 
 /* Een tafel met regels. `vrij` bepaalt of de zaal de gang doorstuurt. */
 async function tafel(naam, regels, vrij) {
-  const r = (await H('/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
+  const r = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: naam, gasten: 2 })).body.rekening;
   const ids = [];
   for (const x of regels) {
-    const reg = (await H('/rekening/regel', { rekeningId: r.id, naam: x.naam, prijs: x.prijs || 8,
+    const reg = (await H('/api/supplier/horeca/rekening/regel', { rekeningId: r.id, naam: x.naam, prijs: x.prijs || 8,
       aantal: x.aantal || 1, gang: x.gang == null ? 1 : x.gang, station: x.station })).body.regel;
     ids.push(reg.id);
   }
-  if (vrij !== false) await H('/gang/vrij', { rekeningId: r.id, gang: regels[0].gang == null ? 1 : regels[0].gang });
+  if (vrij !== false) await H('/api/supplier/horeca/gang/vrij', { rekeningId: r.id, gang: regels[0].gang == null ? 1 : regels[0].gang });
   return { id: r.id, regels: ids };
 }
-const bord = async () => (await H('/bar', {})).body;
+const bord = async () => (await H('/api/supplier/horeca/bar', {})).body;
 const golfVan = (b, t) => b.golven.find(g => g.tafel === t);
 
 test('1. een golf is de drank van een tafel; eten hoort er niet in', async () => {
@@ -88,7 +88,7 @@ test('3. wat al klaar staat, telt niet meer mee in de stapel', async () => {
   let b = await bord();
   assert.ok(b.stapel.find(x => x.naam === 'Negroni'), 'eerst staat hij te maken');
 
-  await H('/keuken/stand', { rekeningId: t.id, regelId: t.regels[0], stand: 'klaar' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: t.id, regelId: t.regels[0], stand: 'klaar' });
   b = await bord();
   assert.equal(b.stapel.find(x => x.naam === 'Negroni'), undefined,
     'een glas dat al staat, maak je niet nog eens');
@@ -105,7 +105,7 @@ test('4. "staat" telt hoe lang het eerste glas op de rest wacht', async () => {
   let g = golfVan(await bord(), 'B4');
   assert.equal(g.staat, 0, 'zolang er niets klaar is, staat er niets te wachten');
 
-  await H('/keuken/stand', { rekeningId: t.id, regelId: t.regels[0], stand: 'klaar' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: t.id, regelId: t.regels[0], stand: 'klaar' });
   g = golfVan(await bord(), 'B4');
   assert.equal(g.klaar, 1);
   assert.equal(g.compleet, false);
@@ -113,7 +113,7 @@ test('4. "staat" telt hoe lang het eerste glas op de rest wacht', async () => {
 
   /* Een complete ronde wacht niet meer op zichzelf maar op een drager, en die
      staat op de pas. Anders zou hetzelfde wachten twee keer geteld worden. */
-  await H('/keuken/stand', { rekeningId: t.id, regelId: t.regels[1], stand: 'klaar' });
+  await H('/api/supplier/horeca/keuken/stand', { rekeningId: t.id, regelId: t.regels[1], stand: 'klaar' });
   g = golfVan(await bord(), 'B4');
   assert.equal(g.staat, 0, 'een complete ronde wacht op de pas en niet op zichzelf');
 });

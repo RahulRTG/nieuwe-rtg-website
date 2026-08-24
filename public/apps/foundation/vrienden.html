@@ -103,6 +103,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/meelezen.js"></script>
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -816,7 +817,17 @@ async function haalIce(){ try{ iceConfig=(await (await fetch('/api/ice')).json()
 // het recht niet doorgeeft, weigering, geen apparaat, bezet) in plaats van een
 // melding die de gebruiker naar een knop stuurt die er niet is.
 async function pakMedia(video){ try{ return await RTGMedia.vraag({ audio:true, video: video?{facingMode:'user'}:false }, { stil:true }); }catch(e){ meld((e.rtg && (e.rtg.kort+'. '+e.rtg.uitleg)) || 'Geen toegang tot microfoon of camera.'); return null; } }
-function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $('#belRemote').srcObject=null; $('#belLocal').srcObject=null; } }
+function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $('#belRemote').srcObject=null; $('#belLocal').srcObject=null; if(belMee) belMee.leeg(); } }
+/* MEELEZEN: zonder tekstbaan kan wie doof is niet meedoen aan dit gesprek
+   (TOEGANKELIJK.md). Wat erin staat is getypt door een mens en niet uit spraak
+   herkend -- zie de kop van /shared/meelezen.js. */
+let belMee = null;
+function belMeeBaan(){
+  if(belMee || !window.RTGMeelezen) return belMee;
+  belMee = window.RTGMeelezen.maak({ stuur: r => { if(call) belSein(call.met,'tekst',{payload:{r}}); } });
+  const vak = $('#belOv'); if(vak) vak.appendChild(belMee.el);
+  return belMee;
+}
 function belTimer(){ if(!call) return; const n=Math.round((Date.now()-call.t0)/1000); $('#belTijd').textContent=Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
 function toonBel(naam, video){ $('#belNaam').textContent=naam; $('#belAv').textContent=initcn(naam); $('#belAudio').style.display=video?'none':'flex'; $('#belLocal').style.display=video?'':'none'; $('#belCam').style.display=video?'':'none'; $('#belTijd').textContent='belt...'; belUI(true); }
 function maakPc(){
@@ -852,8 +863,10 @@ async function opBelsignaal(d){
   else if(d.kind==='offer'){ const pc=maakPc(); await pc.setRemoteDescription(d.payload); await flushIce(); const answer=await pc.createAnswer(); await pc.setLocalDescription(answer); belSein(call.met,'answer',{payload:answer}); }
   else if(d.kind==='answer'){ await call.pc.setRemoteDescription(d.payload); await flushIce(); }
   else if(d.kind==='ice'){ if(call.pc && call.pc.remoteDescription){ try{ await call.pc.addIceCandidate(d.payload); }catch(e){} } else call.pendingIce.push(d.payload); }
+  else if(d.kind==='tekst'){ const m=belMeeBaan(); if(m && d.payload && d.payload.r) m.voed(d.payload.r,{ wie:d.codename, bron:'mens' }); }
   else if(['hangup','decline','busy'].includes(d.kind)){ meld(d.kind==='busy'?'In gesprek.':d.kind==='decline'?'Oproep geweigerd.':'Gesprek beeindigd.'); eindeBel(false); }
 }
+belMeeBaan();
 $('#belWeg').addEventListener('click', ()=> eindeBel(true));
 $('#belMute').addEventListener('click', ()=>{ if(!call) return; const t=call.stream.getAudioTracks()[0]; if(!t) return; t.enabled=!t.enabled; $('#belMute').style.opacity=t.enabled?'1':'.4'; });
 $('#belCam').addEventListener('click', ()=>{ if(!call) return; const t=call.stream.getVideoTracks()[0]; if(!t) return; t.enabled=!t.enabled; $('#belCam').style.opacity=t.enabled?'1':'.4'; });

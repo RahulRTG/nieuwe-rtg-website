@@ -14,6 +14,7 @@
   var api = null, meld = null, kamer = null, ik = null, opWeg = null;
   var stream = null, scherm = null, ice = null;
   var peers = {}; // codenaam -> { pc, wachtrij, el }
+  var mee = null; // de tekstbaan van het gesprek (shared/meelezen.js)
 
   function haalIce() {
     return fetch('/api/ice').then(function (r) { return r.json(); })
@@ -125,6 +126,9 @@
     if (d.kind === 'weg') { sluit(d.van); return; }
     if (d.kind === 'dicht') { meld('De gastheer heeft de kamer gesloten.'); stop(); return; }
     if (d.kind === 'hand') { meld(d.van + ' steekt de hand op.'); return; }
+    /* Een meegetypte regel. Staat VOOR de peer-regel hieronder: tekst hoort geen
+       verbinding op te zetten met iemand die er nog niet is. */
+    if (d.kind === 'tekst') { if (mee && d.payload && d.payload.r) mee.voed(d.payload.r, { wie: d.van, bron: 'mens' }); return; }
     var p = peers[d.van] || maakPeer(d.van);
     if (d.kind === 'offer') {
       p.pc.setRemoteDescription(new RTCSessionDescription(d.payload)).then(function () {
@@ -147,6 +151,16 @@
   /* ---- starten en stoppen ---- */
   function start(opties) {
     api = opties.api; meld = opties.meld; kamer = opties.kamer; ik = opties.ik; opWeg = opties.opWeg;
+    /* MEELEZEN in de kamer. Anders dan bij een gesprek van twee gaat een regel
+       hier naar IEDEREEN die er zit: de seinweg kent alleen een genoemd doel,
+       dus we lopen de deelnemers langs. Wie later binnenkomt mist wat er voor
+       zijn tijd is getypt -- dat is dezelfde grens als bij het gesprek zelf. */
+    if (window.RTGMeelezen && !mee) {
+      mee = window.RTGMeelezen.maak({ ik: ik, stuur: function (regel) {
+        Object.keys(peers).forEach(function (n) { if (n !== ik) sein(n, 'tekst', { r: regel }); });
+      } });
+      var vak = $('#tegels'); if (vak && vak.parentNode) vak.parentNode.insertBefore(mee.el, vak.nextSibling);
+    }
     $('#lobby').style.display = 'none';
     $('#kamer').style.display = 'flex';
     $('#tegels').innerHTML = '';

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '4416650d';
+var RTG_BOUW = '215e6043';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1850,10 +1850,26 @@ var RTG_BOUW = '4416650d';
   /* ---- bellen en videobellen (WebRTC) ---- */
   let call = null;        // { pc, stream, withKey, naam, video, richting, pendingIce, timer, t0 }
   let inkomend = null;    // { from, codename, video }
+  let csMee = null;       // de tekstbaan van het gesprek (shared/meelezen.js)
+
+  /* MEELEZEN. Zonder tekstbaan kan wie doof is niet meedoen aan een gesprek in
+     dit huis (TOEGANKELIJK.md). Wat erin staat is getypt door een mens en niet
+     uit spraak herkend -- zie de kop van /shared/meelezen.js voor waarom hier
+     geen automatische ondertiteling in zit. */
+  function csBaan(){
+    if (csMee || !window.RTGMeelezen) return csMee;
+    csMee = window.RTGMeelezen.maak({ stuur: r => {
+      if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
+    } });
+    csMee.el.style.cssText += 'position:absolute;left:12px;right:12px;bottom:96px;z-index:4;color:#F7F5F1;';
+    const scherm = $('#callScreen'); if (scherm) scherm.appendChild(csMee.el);
+    return csMee;
+  }
 
   function belUI(open){
     $('#callScreen').classList.toggle('open', !!open);
-    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; }
+    if (open) csBaan();
+    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; if (csMee) csMee.leeg(); }
   }
   function belTimer(){
     if (!call) return;
@@ -1995,6 +2011,9 @@ var RTG_BOUW = '4416650d';
     } else if (d.kind === 'ice'){
       if (call.pc && call.pc.remoteDescription) { try { await call.pc.addIceCandidate(d.payload); } catch(e){} }
       else call.pendingIce.push(d.payload);
+    } else if (d.kind === 'tekst'){
+      const m = csBaan();
+      if (m && d.payload && d.payload.r) m.voed(d.payload.r, { wie: d.codename, bron: 'mens' });
     } else if (d.kind === 'hangup' || d.kind === 'decline' || d.kind === 'busy'){
       toast(d.kind === 'busy' ? T('sal.bezet','In gesprek.') : d.kind === 'decline' ? T('sal.geweigerd','Oproep geweigerd.') : T('sal.opgehangen','Gesprek beëindigd.'));
       eindeGesprek(false);

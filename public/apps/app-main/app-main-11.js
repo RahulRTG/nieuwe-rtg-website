@@ -17,6 +17,9 @@
     } else if (d.kind === 'ice'){
       if (call.pc && call.pc.remoteDescription) { try { await call.pc.addIceCandidate(d.payload); } catch(e){} }
       else call.pendingIce.push(d.payload);
+    } else if (d.kind === 'tekst'){
+      const m = csBaan();
+      if (m && d.payload && d.payload.r) m.voed(d.payload.r, { wie: d.codename, bron: 'mens' });
     } else if (d.kind === 'hangup' || d.kind === 'decline' || d.kind === 'busy'){
       toast(d.kind === 'busy' ? T('sal.bezet','In gesprek.') : d.kind === 'decline' ? T('sal.geweigerd','Oproep geweigerd.') : T('sal.opgehangen','Gesprek beëindigd.'));
       eindeGesprek(false);

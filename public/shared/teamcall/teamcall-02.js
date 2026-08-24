@@ -84,6 +84,10 @@
       else p.queue.push(d.payload);
       return;
     }
+    if (d.kind === 'tekst'){
+      if (mee && d.payload && d.payload.r) mee.voed(d.payload.r, { wie: d.vanNaam || d.van, bron: 'mens' });
+      return;
+    }
     if (d.kind === 'hangup' || d.kind === 'leave'){
       sluitPeer(d.van);
       if (!peers.size && !kamer && stream) einde();

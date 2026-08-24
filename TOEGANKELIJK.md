@@ -66,14 +66,43 @@ staat, niet of hij zegt wat er te zien is. Dat kan alleen een mens.
 ondertitelspoor dat de maker zelf schrijft; een clip had dat al, en de drie
 spelers gebruiken dezelfde band. De feed laat zien wat ondertiteld is.
 
-**Houdt op bij: de acht live vormen.** Zes gesprekken (videogesprek,
-gezinsgesprek, bellen met een vriend, de vergaderkamer, de teamcall, het
-schoolgesprek) en twee uitzendingen (het Podium, en het SOS-beeld van een lid
-naar het kantoor). Een `<track>` kan daar niet bestaan, want het beeld ontstaat
-nu. Wat er hoort is spraak-naar-tekst tijdens het gesprek, en dat bestaat hier
-niet. **Dit is een besluit en geen taak**: zolang het niet genomen is, kan een
-dove deelnemer niet meedoen aan een gesprek in dit huis, en dat hoort zo hard te
-staan.
+**Sinds 24 augustus loopt er een TEKSTBAAN mee door alle zes de gesprekken.**
+Videogesprek, gezinsgesprek, bellen met een vriend, de vergaderkamer, de
+teamcall en het schoolgesprek dragen `shared/meelezen.js`: een baan onder het
+gesprek waarin deelnemers meeschrijven en die bij iedereen live meeloopt. Wie
+doof is kan daarmee het gesprek volgen en eraan meedoen -- lezen wat er getypt
+wordt, en zelf typen. Bij het schoolgesprek weegt dat het zwaarst, want dat is
+alleen geluid: daar valt niet eens van te liplezen.
+
+**Dat is GEEN ondertiteling, en dit register mag daar niet voor worden
+opgepoetst.** Er wordt niets van spraak naar tekst omgezet: wat in de baan staat,
+staat er omdat een mens het heeft getypt. WCAG 1.2.4 is dus niet gehaald, en de
+acht tellen in de keuring gewoon door als open. Wat er wel is veranderd, is
+waar de afhankelijkheid ligt: van "kan niet meedoen" naar "kan meedoen als de
+anderen meetypen". Dat is minder dan ondertiteling en meer dan niets, en die twee
+zinnen horen allebei te staan.
+
+**Waarom er geen automatische ondertiteling in zit is een BESLUIT.**
+Spraakherkenning in de browser stuurt het geluid van het gesprek naar een server
+van de leverancier, en dit huis draait op codenamen met de echte namen in een
+aparte kluis -- het gesprek van twee leden naar buiten sturen om er tekst van te
+maken is precies wat dat ontwerp voorkomt. De weg die hier wel past loopt langs
+een lokaal model (`LOCAL_AI_URL`), en dat is een inrichtingskeuze. De naad
+daarvoor ligt klaar en neemt niets aan: een regel met bron `machine` komt in
+dezelfde baan en staat er zichtbaar als machinetekst bij, want tekst die een
+machine heeft geraden is iets anders dan tekst die iemand heeft geschreven.
+
+**De twee uitzendingen staan er anders voor, en die twee verschillen onderling.**
+Het Podium heeft al een tekstbaan: de kanaalchat naast de uitzending, met
+`aria-live`, waarin de uitzender kan meeschrijven. Het SOS-scherm heeft er geen.
+Dat is de eerlijke stand en niet een gat dat nog even gedicht wordt: **wie doof
+is kan geen SOS-dienst draaien**, want daar komt het geluid van een lid in nood
+binnen en er is niets dat het opschrijft. Een noodscherm is niet de plek om er
+ongevraagd iets bij te zetten; dat is een besluit dat RTG neemt.
+
+De keuring houdt dit vast en niet alleen dit document: een gesprek dat de
+tekstbaan verliest, laat `npm run check` regel 49 zakken -- gemeten door hem uit
+het schoolgesprek te halen en de keuring te zien klagen.
 
 Wat hier eerst stond als "ook open" -- een spraakbericht in de teamchat zonder
 tekstversie -- bleek bij het narekenen geen gat maar DOOD HOUT. De speler stond

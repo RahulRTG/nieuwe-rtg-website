@@ -40,10 +40,26 @@
   /* ---- bellen en videobellen (WebRTC) ---- */
   let call = null;        // { pc, stream, withKey, naam, video, richting, pendingIce, timer, t0 }
   let inkomend = null;    // { from, codename, video }
+  let csMee = null;       // de tekstbaan van het gesprek (shared/meelezen.js)
+
+  /* MEELEZEN. Zonder tekstbaan kan wie doof is niet meedoen aan een gesprek in
+     dit huis (TOEGANKELIJK.md). Wat erin staat is getypt door een mens en niet
+     uit spraak herkend -- zie de kop van /shared/meelezen.js voor waarom hier
+     geen automatische ondertiteling in zit. */
+  function csBaan(){
+    if (csMee || !window.RTGMeelezen) return csMee;
+    csMee = window.RTGMeelezen.maak({ stuur: r => {
+      if (call) API.call('/member/call', { toKey: call.withKey, kind: 'tekst', payload: { r } }).catch(()=>{});
+    } });
+    csMee.el.style.cssText += 'position:absolute;left:12px;right:12px;bottom:96px;z-index:4;color:#F7F5F1;';
+    const scherm = $('#callScreen'); if (scherm) scherm.appendChild(csMee.el);
+    return csMee;
+  }
 
   function belUI(open){
     $('#callScreen').classList.toggle('open', !!open);
-    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; }
+    if (open) csBaan();
+    if (!open){ $('#csRemote').srcObject = null; $('#csLocal').srcObject = null; if (csMee) csMee.leeg(); }
   }
   function belTimer(){
     if (!call) return;

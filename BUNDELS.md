@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 402 delen, 0 zonder onderwerp.**
+**51 bundels, 404 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 84 delen, 8886 regels in de delen
+`public/apps/app-main/` -- 84 delen, 8905 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -158,12 +158,13 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 2 delen, 169 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 191 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `gezin-rt-01.js` | GezinRT: chatten en (beeld)bellen tussen gezinsleden, in de app |
 | `gezin-rt-02.js` | WebRTC bellen |
+| `gezin-rt-03.js` | Gezin-RT, deel 3: HET GESPREKSSCHERM zelf -- de stijl en de opbouw van de overlay, plus de tekstbaan erin (shared/mee... |
 
 ## `apps/foundation/samen.js`
 
@@ -186,7 +187,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 109 delen, 9058 regels in de delen
+`public/apps/leverancier/` -- 109 delen, 9093 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -724,11 +725,12 @@ omlaag.
 
 ## `shared/teamcall.js`
 
-`public/shared/teamcall/` -- 2 delen, 267 regels in de delen
+`public/shared/teamcall/` -- 3 delen, 290 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `teamcall-01.js` | De teamcall: echt (video)bellen op de werkvloer via WebRTC |
+| `teamcall-01b.js` | TeamCall, deel 1b: DE VORMGEVING van de gespreksoverlay |
 | `teamcall-02.js` | de publieke knoppen |
 
 ## `shared/uitvoer.js`

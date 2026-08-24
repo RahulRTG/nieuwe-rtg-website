@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 160,
+    "toetsenNietGemeten": 161,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -33,6 +33,11 @@
     "delenZonderOnderwerp": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenNietGemeten 160 -> 161 (test/meelezen.test.js)",
+      "reden": "Een toetsbestand erbij bij de tekstbaan in een live gesprek (TAKEN.md 4.31): shared/meelezen.js geeft de zes gesprekken een weg naar tekst, zodat wie doof is kan meedoen. De mutatiemotor is er nog niet langs geweest -- het bestand bestaat pas sinds vandaag -- en dat is de hele +1.\n\nHandmatig zijn er zes mutaties gedraaid en gezien zakken: de regel als HTML in plaats van als tekst neerzetten (de DOM-stomp in de toets gooit dan, en dat is met opzet de hardste), machinetekst niet als machinetekst merken, een binnenkomende regel de baan niet laten openvouwen, de eigen regel pas na de echo tonen, de baan laten vollopen, en de ontvangkant uit het schoolgesprek halen. Daarnaast is de keuring zelf nagemeten: haal RTGMeelezen uit een gespreksbestand en check.js regel 49 zakt op het anker.\n\nDeze +1 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen."
+    },
     {
       "datum": "2026-08-24",
       "meter": "toetsenNietGemeten 158 -> 160 (test/staatlog.test.js, test/idemwereld.test.js)",

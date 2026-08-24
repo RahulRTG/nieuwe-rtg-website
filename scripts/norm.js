@@ -586,8 +586,15 @@ const KEURING_ANALYSES = (() => {
      zou een tweede plek maken die dezelfde waarheid vasthoudt (LAT-regel 4), dus
      hij wordt gevraagd. `stuk` komt uit EEN analyse van 0,01 s; `scheef` uit vijf,
      waaronder de dekking van 40 s -- die blijft dus duur, en terecht. */
+  /* LETTERLIJKE PADEN IN require(), en dat is geen stijl maar een eis van de
+     bewijsgraaf. Hier stond `require(path.join(SCRIPTS, 'keuring.js'))`, en
+     scripts/lib/bewijsgraaf.js kan zo'n pad niet volgen: het telt als een
+     berekende require, en dan heet de hele sluiting van dit bestand ONVOLLEDIG.
+     Elke toets die norm.js laadt moest daardoor altijd draaien. Dezelfde fout is
+     eerder gemaakt in scripts/vorm.js; hij kost niets om te vermijden en het
+     scheelt de planner werk. */
   try {
-    const keuring = require(path.join(BASIS, 'scripts', 'keuring.js'));
+    const keuring = require('./keuring.js');
     if (typeof keuring.analysesVoorSoort === 'function') {
       tabel.keuringStuk = keuring.analysesVoorSoort('stuk');
       tabel.keuringScheef = keuring.analysesVoorSoort('scheef');
@@ -773,7 +780,7 @@ function meet(bronnen) {
   let inlineStijlAttributen;
   if (nodig('stijl')) {
   const PUB = path.join(WORTEL, 'public');
-  const bundelPaden = new Set(Object.keys(require(path.join(SCRIPTS, 'bundel')).bundels).map(k => path.join(PUB, k)));
+  const bundelPaden = new Set(Object.keys(require('./bundel').bundels).map(k => path.join(PUB, k)));
   const stijlBestanden = [];
   (function loop(map) {
     for (const naam of fs.readdirSync(map)) {
@@ -792,7 +799,7 @@ function meet(bronnen) {
      blindheid gaat is een stille nul de ergste uitkomst. */
   let bronBlindeBestanden;
   if (nodig('blind')) {
-    try { bronBlindeBestanden = require(path.join(SCRIPTS, 'lib', 'bronblind')).meetBlind({ wortel: WORTEL }).ongedekt; }
+    try { bronBlindeBestanden = require('./lib/bronblind').meetBlind({ wortel: WORTEL }).ongedekt; }
     catch (e) { throw new Error('de kruisproef op de commentaar-verwijderaar kon niet draaien (' + e.message + '); een meter zonder invoer is geen meter'); }
   }
 
@@ -801,8 +808,8 @@ function meet(bronnen) {
   let delenZonderOnderwerp;
   if (nodig('delen')) {
     try {
-      const { delenVan } = require(path.join(SCRIPTS, 'deelindex'));
-      delenZonderOnderwerp = Object.values(require(path.join(SCRIPTS, 'bundel')).bundels)
+      const { delenVan } = require('./deelindex');
+      delenZonderOnderwerp = Object.values(require('./bundel').bundels)
         .reduce((som, map) => som + delenVan(map).filter(d => !d.onderwerp).length, 0);
     } catch (e) { throw new Error('de bundeldelen konden niet worden gelezen (' + e.message + '); een meter zonder invoer is geen meter'); }
   }
@@ -811,7 +818,7 @@ function meet(bronnen) {
      implementatie). Faalt hij, dan zakt de meter in plaats van stil nul te geven. */
   let grenzen = {};
   if (nodig('grenzen')) {
-    try { grenzen = require(path.join(SCRIPTS, 'grenzen')).meet(); }
+    try { grenzen = require('./grenzen').meet(); }
     catch (e) { throw new Error('de grenzen konden niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
   }
 
@@ -819,7 +826,7 @@ function meet(bronnen) {
      implementatie zou binnen een week uiteenlopen (regel 4). */
   let routesNietSchakelbaar;
   if (nodig('schakelbaar')) {
-    try { routesNietSchakelbaar = require(path.join(SCRIPTS, 'schakelbaar')).meet().ongedekt.length; }
+    try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
     catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
   }
 
@@ -876,7 +883,7 @@ function meet(bronnen) {
      hij ontleedt ruim tweeduizend bestanden en kost drie seconden. */
   let staatOngeregistreerd, staatOnbekend, staatProcesgebonden, datamapVastgeklonken, duurOpWandklok;
   if (nodig('staat')) {
-    const { scan, datamapVast } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
+    const { scan, datamapVast } = require('./lib/staatscan.js');
     const census = scan({ wortel: WORTEL });
     /* ALLEEN ALS ERNAAR GEVRAAGD IS. Deze teller loopt met een eigen ontleding
        over server/ en kost koud 6,5 seconde; hij stond hier onvoorwaardelijk, dus
@@ -914,7 +921,7 @@ function meet(bronnen) {
      require-ketens van ruim duizend toetsbestanden en kost acht seconden. */
   let bewijsOnbekend;
   if (nodig('bewijsgraaf')) {
-    const bg = require(path.join(SCRIPTS, 'lib', 'bewijsgraaf.js'));
+    const bg = require('./lib/bewijsgraaf.js');
     const g = bg.graaf({ wortel: WORTEL });
     if (!g) throw new Error('de bewijsgraaf kon niet worden opgebouwd; dan is er geen deelverzameling te verantwoorden');
     bewijsOnbekend = bg.onbekendeAfhankelijkheden(g);
@@ -924,7 +931,7 @@ function meet(bronnen) {
      modules en de toetsbestanden: goedkoop, maar niet gratis, dus op verzoek. */
   let bewijsVerlopen;
   if (nodig('bewijsvers')) {
-    const bv = require(path.join(SCRIPTS, 'bewijsvers.js'));
+    const bv = require('./bewijsvers.js');
     const u = bv.meet({ wortel: WORTEL });
     if (!u) throw new Error('MUTATIES.json is niet te lezen; dan valt er niets over de houdbaarheid te zeggen');
     bewijsVerlopen = u.verlopen;

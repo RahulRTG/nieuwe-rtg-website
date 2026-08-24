@@ -80,7 +80,37 @@ const BEREKEND_BEREIK = {
   /* payroll laadt .json-jaargangen, geen code. Die kunnen het gedrag wel
      veranderen (tarieven), dus ze horen in de graaf -- vandaar `ook` naast de
      gewone .js-regel. */
-  'server/kern/payroll/index.js': { map: 'server/kern/payroll/jaargangen', ook: '.json' }
+  'server/kern/payroll/index.js': { map: 'server/kern/payroll/jaargangen', ook: '.json' },
+
+  /* HET DUURSTE GAT VAN ALLEMAAL ZAT IN EEN HULPJE VAN DE TOETSEN, en het koste
+     92 toetsen hun bewijsruimte.
+
+     test/browser.js zoekt een Playwright:
+
+         require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright')
+
+     Dat is een berekende require, dus de graaf zette elke sluiting die er langs
+     komt op "onvolledig" -- en dat zijn alle schermtoetsen. Gevolg: 92 toetsen
+     die de planner ALTIJD moest draaien, want van een onvolledige bewijsruimte
+     mag je niets weglaten.
+
+     Maar kijk waar hij heen kan: het argument is in beide takken het PAKKET
+     playwright. Dat woont in node_modules en kan per definitie geen bestand in
+     deze repository zijn -- een commit hier verandert er niets aan. Het bereik
+     is dus leeg, en leeg is iets anders dan onbekend: het eerste is een
+     antwoord, het tweede is het ontbreken ervan.
+
+     De lege lijst zegt precies dat, en test/bewijsgraaf.test.js houdt hem tegen
+     de bron: staat er ooit een require bij die WEL naar binnen wijst, dan klopt
+     deze regel niet meer en zakt die toets. */
+  'test/browser.js': { bestanden: [] },
+
+  /* scripts/controls.js laadt zijn bronnen uit een lijst (BRONNEN) met
+     require(path.join(WORTEL, rel)). Die lijst staat daar en wordt hier NIET
+     herhaald -- twee plekken met dezelfde waarheid lopen binnen een week uiteen
+     (LAT.md regel 4), en dat is precies waarom de routes-regel hierboven ook uit
+     de bron wordt gelezen. */
+  'scripts/controls.js': { uitBron: () => require('../controls').BRONNEN }
 };
 
 /* Wat kan een berekende require in dit bestand bereiken? Onbekend -> null, en
@@ -90,6 +120,15 @@ function berekendBereik(relPad, wortel) {
   if (!regel) return null;
   const uit = [];
   for (const b of regel.bestanden || []) uit.push(path.join(wortel, b));
+  /* Een lijst die uit de BRON zelf komt. Mislukt het lezen, dan is het bereik
+     ONBEKEND en niet leeg -- anders zou een hernoemde module deze sluiting stil
+     compleet verklaren terwijl er een gat in zit (LAT.md regel 3). */
+  if (regel.uitBron) {
+    let lijst;
+    try { lijst = regel.uitBron(); } catch (e) { return null; }
+    if (!Array.isArray(lijst) || !lijst.length) return null;
+    for (const b of lijst) uit.push(path.join(wortel, b));
+  }
   if (regel.map) {
     const dir = path.join(wortel, regel.map);
     try {
@@ -322,8 +361,31 @@ function graaf(opties) {
        Ik heb dat zelf eerst fout gehad: de kanten stonden erbij voordat het
        oordeel viel. test/leesspoor.test.js stelt het nu als bewering. */
     const statisch = [...bestanden].filter(f => AFHANKELIJK.some(m => f.startsWith(path.join(wortel, m) + path.sep)));
-    const volledig = !eigen.berekend && (!boot || !serverSluiting.berekend);
-    const soort = statisch.length === 0 ? 'onbekend' : (boot ? 'serverboot' : 'statisch');
+    /* EEN TOETS DIE EEN BROWSER STUURT, HEEFT EEN BEWIJSRUIMTE DIE GEEN REQUIRE
+       KAN ZIEN -- en dat moet hier STAAN in plaats van per ongeluk uitkomen.
+
+       Wat er gebeurde: test/browser.js zoekt zijn Playwright met een berekende
+       require, en daardoor heetten alle 92 schermtoetsen "onvolledig". Dat was
+       de goede uitkomst om de verkeerde reden. Toen ik die require netjes
+       verantwoordde (hij wijst naar een npm-pakket en kan geen bestand in deze
+       repo raken), werden die 92 ineens "volledig" -- en test/bewijsgraaf.test.js
+       zakte meteen: de planner zou camerascherm.e2e.js overslaan bij een
+       wijziging in public/shared/media.js, terwijl de mutatiemotor heeft BEWEZEN
+       dat die toets daarop zakt.
+
+       Dat is de kern. Een schermtoets laadt public/ niet via require maar via
+       HTTP, in een browser. De require-graaf kan die kant per definitie niet
+       zien, en dus is zijn bewijsruimte niet vast te stellen -- niet omdat er
+       een pad onvolgbaar is, maar omdat het pad er niet doorheen loopt.
+
+       Het leesspoor is wél de goede weg hiervoor (de server LEEST die bestanden
+       als hij ze serveert), maar LEESSPOOR.json heeft vandaag geen enkele
+       e2e-ronde: 21 toetsen, geen browsertoets erbij. Tot die ronde er is, hoort
+       een schermtoets in de bak `altijd`, en nu staat er ook waarom. */
+    const browserGedreven = bestanden.has(path.join(wortel, 'test', 'browser.js'));
+    const volledig = !eigen.berekend && !browserGedreven && (!boot || !serverSluiting.berekend);
+    const soort = browserGedreven ? 'browser'
+      : (statisch.length === 0 ? 'onbekend' : (boot ? 'serverboot' : 'statisch'));
     if (spoor && Array.isArray(spoor[naam])) {
       for (const rel of spoor[naam]) bestanden.add(path.join(wortel, rel));
     }

@@ -662,11 +662,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/bewijsgraaf.js",
-      "operator": "return-weg#2",
+      "operator": "return-weg#4",
       "gezakt": 1,
-      "geprobeerd": 4,
+      "geprobeerd": 6,
       "toetsSha": "ed0e6a6c03a4",
-      "moduleSha": "9f96278694ce"
+      "moduleSha": "30a64e60b194"
     },
     "bewijsmatrix.test.js": {
       "soort": "puur",
@@ -812,7 +812,7 @@
       "gezakt": 5,
       "geprobeerd": 1,
       "toetsSha": "4e1bb7787055",
-      "moduleSha": "8e91b5fb9ec3"
+      "moduleSha": "4d47ec4d74ec"
     },
     "btw-aangifte.test.js": {
       "soort": "server",
@@ -3666,7 +3666,7 @@
       "gezakt": 2,
       "geprobeerd": 22,
       "toetsSha": "d8a1c777f829",
-      "moduleSha": "786dd27189f3"
+      "moduleSha": "3279cda1ba3b"
     },
     "normsubset.test.js": {
       "soort": "puur",
@@ -3676,7 +3676,7 @@
       "gezakt": 20,
       "geprobeerd": 3,
       "toetsSha": "6ab50ae06562",
-      "moduleSha": "786dd27189f3"
+      "moduleSha": "3279cda1ba3b"
     },
     "notities.test.js": {
       "soort": "server",
@@ -6071,11 +6071,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/staatscan.js",
-      "operator": "===->!==#0",
+      "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 3,
-      "toetsSha": "94ca5cf5c95e",
-      "moduleSha": "2573bd610334"
+      "geprobeerd": 1,
+      "toetsSha": "410c0c21091e",
+      "moduleSha": "5a5796db8dc6"
     },
     "stad.test.js": {
       "soort": "server",

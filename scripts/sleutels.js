@@ -79,7 +79,8 @@ if (priveBeta) {
 } else {
   regels.push(
     ['DATABASE_URL', docker ? '' : 'postgresql://VUL-IN', docker ? 'Docker bouwt deze veilig uit het aparte PostgreSQL-geheim' : 'HANDMATIG: PostgreSQL (verplicht bij meerdere instances/vloot)'],
-    ['REDIS_URL', docker ? 'redis://redis:6379' : 'redis://VUL-IN', 'HANDMATIG: realtime over meerdere instances'],
+    ['REDIS_URL', docker ? 'redis://redis:6379' : 'redis://VUL-IN', 'HANDMATIG: realtime en gedeelde PIN-antifraude over meerdere instances'],
+    ['RTG_PIN_ENTERPRISE', '1', 'productie start alleen met een gedeelde Redis-PIN-fraudeteller'],
     ['SMTP_URL', smtpUrl, 'HANDMATIG: anders worden e-mails niet echt verstuurd']
   );
 }

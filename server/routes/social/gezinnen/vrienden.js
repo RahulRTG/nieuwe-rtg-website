@@ -2,10 +2,11 @@
    (met ouderakkoord), dm, snaps en verhalen. Gemount vanuit
    routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, pinClusterRem } = sctx;
   const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
           socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
-          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;
+          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart,
+          pinNormaliseer } = kern;
 /* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
    maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
    contract (geen paspoort; dat is voor de reispas). */
@@ -42,7 +43,18 @@ app.post('/api/rtf/social/connect', async (req, res) => {
 app.post('/api/rtf/social/oudervoeg', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder voegt contacten toe voor een kind.' });
-  const r = await ouderVerbind(s.g.code, String(req.body.kindHandle || ''), String(req.body.pin || req.body.codenaam || ''));
+  const kindHandle = String(req.body.kindHandle || '');
+  const invoer = String(req.body.pin || req.body.codenaam || '');
+  const isPin = !!pinNormaliseer(invoer);
+  if (isPin) {
+    const deur = await pinClusterRem.voor({ actor: kindHandle, bron: req.ip });
+    if (!deur.ok) return res.status(deur.status).json({ error: deur.error });
+  }
+  const r = await ouderVerbind(s.g.code, kindHandle, invoer);
+  if (isPin && r.error && r.status === 404) {
+    const geteld = await pinClusterRem.misser();
+    if (!geteld.ok) return res.status(geteld.status).json({ error: geteld.error });
+  }
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });

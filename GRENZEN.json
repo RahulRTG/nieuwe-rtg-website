@@ -295,6 +295,7 @@
       "logActivity",
       "naad",
       "noteFailedTry",
+      "notifySupplier",
       "orderlaag",
       "polslaag",
       "sessie",
@@ -457,9 +458,9 @@
       "bankPartnerRailZet",
       "bankSalarisRekeningen",
       "bankVergunningZet",
+      "betaal",
       "betaalRegie",
       "bevoegd",
-      "betaal",
       "boardroomAuth",
       "boardroomLijst",
       "geldBetaaldienst",
@@ -472,8 +473,8 @@
       "hardware",
       "ideeen",
       "magnaatLeren",
-      "mall",
       "mail",
+      "mall",
       "naam",
       "pay",
       "payrollOS",
@@ -1347,6 +1348,11 @@
       "rtmailBewaar",
       "rtmailRecht"
     ],
+    "rtmail-lid": [
+      "agenda",
+      "facturatie",
+      "leren"
+    ],
     "rtmail-schrijf": [
       "mailSleutel",
       "rtmailRegels",
@@ -1369,6 +1375,9 @@
       "accounts",
       "tenant"
     ],
+    "scim-groepen": [
+      "tenant"
+    ],
     "sleutelwoorden": [
       "swInfo",
       "swWeg",
@@ -1382,6 +1391,7 @@
       "socialewereld"
     ],
     "social": [
+      "appUrl",
       "blokkeer",
       "commDm",
       "connectieTussen",
@@ -1411,7 +1421,9 @@
       "naamlaag",
       "onboarding",
       "ouderVerbind",
+      "pinClusterRem",
       "pinKaart",
+      "pinNormaliseer",
       "pinUit",
       "pinVerbind",
       "pinVernieuw",
@@ -1434,6 +1446,9 @@
       "verhaalBekijken",
       "verhaalPlaatsen",
       "verhalenVoor",
+      "webauthnActieMaak",
+      "webauthnActieNodig",
+      "webauthnActieOpties",
       "webpush"
     ],
     "socialerahul": [
@@ -1522,6 +1537,10 @@
       "logInlog",
       "stateFor",
       "tenant"
+    ],
+    "sso-saml": [
+      "appUrl",
+      "logInlog"
     ],
     "stad": [
       "stad",
@@ -1708,6 +1727,8 @@
       "horeca",
       "horecaBord",
       "horecaFolioBoek",
+      "horecaGezelschap",
+      "horecaPas",
       "horecaPubliek",
       "horecaRekVan",
       "hulpdienst",
@@ -1970,6 +1991,35 @@
       "overheid",
       "uitgifte"
     ],
+    "vakbewijs": [
+      "accounts",
+      "app",
+      "auth",
+      "db",
+      "findSupplier",
+      "logActivity",
+      "notify",
+      "officeAuth",
+      "persoonseis",
+      "sendPushToUser",
+      "sleutelLid",
+      "supplierAuth",
+      "vakbewijsIntrek",
+      "vakbewijsNummer",
+      "vakbewijsTeken",
+      "vakbewijsZet",
+      "vakbewijzenVan",
+      "vakbewijzenVerlopend"
+    ],
+    "vakbewijs-kantoor": [
+      "persoonseis",
+      "sendPushToUser",
+      "stuur",
+      "vakbewijsIntrek",
+      "vakbewijsNummer",
+      "vakbewijsTeken",
+      "vakbewijzenVerlopend"
+    ],
     "veiligheid": [
       "alarmAfsluiten",
       "alarmSlaan",
@@ -2107,6 +2157,7 @@
       "werkplek"
     ],
     "werkplek-bureaus": [],
+    "werkplek-bureaus-b": [],
     "werkvloer": [
       "checklijst",
       "koppel",
@@ -2150,26 +2201,6 @@
       "status",
       "wallet",
       "zorgpolis"
-    ],
-    "vakbewijs": [
-      "accounts",
-      "app",
-      "auth",
-      "db",
-      "findSupplier",
-      "logActivity",
-      "notify",
-      "officeAuth",
-      "persoonseis",
-      "sendPushToUser",
-      "sleutelLid",
-      "supplierAuth",
-      "vakbewijsIntrek",
-      "vakbewijsNummer",
-      "vakbewijsTeken",
-      "vakbewijsZet",
-      "vakbewijzenVan",
-      "vakbewijzenVerlopend"
     ]
   }
 }

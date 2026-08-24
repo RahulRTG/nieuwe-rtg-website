@@ -87,7 +87,9 @@ function keur(env, fouten, waarschuwingen) {
     /* RTG_VAULT_KEY en RTG_SECRET_KEY stonden hier vroeger als waarschuwing.
        Ze zijn nu blokkerende fouten (punt 2b hierboven) -- twee keer melden zou
        de lijst alleen langer maken zonder iets toe te voegen. */
-    if (!env.REDIS_URL) waarschuwingen.push('REDIS_URL niet gezet: realtime werkt alleen binnen één proces (niet over meerdere instances).');
+    if (!env.REDIS_URL) waarschuwingen.push('REDIS_URL niet gezet: realtime en de gedeelde RTG-PIN-frauderem werken alleen binnen één proces (niet over meerdere instances).');
+    if (env.RTG_PIN_ENTERPRISE === '1' && !env.REDIS_URL)
+      fouten.push('RTG_PIN_ENTERPRISE=1 vereist REDIS_URL: zonder gedeelde teller kan een aanval PIN-pogingen over meerdere instances verdelen.');
     // Media (Salon-foto's, snaps) op lokale schijf worden niet gedeeld tussen
     // instances; bij meerdere instances is S3-compatibele opslag (of een gedeeld
     // volume) nodig zodat elke server dezelfde foto's ziet.

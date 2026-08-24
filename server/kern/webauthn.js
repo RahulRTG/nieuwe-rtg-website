@@ -137,6 +137,10 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return { status: 200, ok: true, user };
   }
 
+  const { webauthnActieNodig, webauthnActieOpties, webauthnActieMaak } =
+    require('./webauthn-actie')({ crypto, generateAuthenticationOptions,
+      verifyAuthenticationResponse, credsVan, zetChallenge, pakChallenge, vanB64, save });
+
   /* ---- beheer ---- */
   function publiekeLijst(user) {
     return credsVan(user.id).map(c => ({ id: c.id, naam: c.naam, apparaat: c.apparaat || null,
@@ -153,7 +157,7 @@ function maakWebauthn({ db, save, accounts, schoon }) {
 
   return { webauthnRegOpties: regOpties, webauthnRegMaak: regMaak, webauthnLoginOpties: loginOpties,
     webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
-    webauthnWeg: weg };
+    webauthnWeg: weg, webauthnActieNodig, webauthnActieOpties, webauthnActieMaak };
 }
 
 module.exports = { maakWebauthn, maakCeremonieOpslag };

@@ -112,7 +112,7 @@ test('de sociale balk toont je eigen pin en tekent er een echte QR van',
     // 1. de pin staat er echt, en het is dezelfde als die de server kent
     await page.waitForFunction(() => {
       const el = document.getElementById('scPinCode');
-      return el && /^[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$/.test(el.textContent.trim());
+      return el && /^[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$/.test(el.textContent.trim());
     }, null, { timeout: 30000 });
     const opScherm = (await page.textContent('#scPinCode')).trim();
     const vanServer = await api(base, '/api/member/pin', {}, A.token);

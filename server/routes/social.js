@@ -24,7 +24,8 @@ function rtfSociaal(req, res) {
 
   /* De leden- en gezinnenlaag draaien als submodules op de gedeelde kern
      plus de sessie-helpers, een keer gemount bij het opstarten. */
-  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal };
+  const pinClusterRem = require('../kern/sociaal/pin-clusterrem')({ crypto: kern.crypto });
+  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, pinClusterRem };
   require('./social/leden')(sctx);
   require('./social/pin')(sctx);
   require('./social/snaps')(sctx);

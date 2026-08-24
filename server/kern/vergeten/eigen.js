@@ -20,6 +20,9 @@
    rekent af wat er nog van het lid in staat; die bewaakt dat deze lijst
    compleet blijft. */
 'use strict';
+const crypto = require('crypto');
+const { vingerafdruk: pinVingerafdruk } = require('../sociaal/pin-tombstone');
+const klok = require('../../lib/klok');
 
 /* Elke naam hier is een tak die ALLEEN over dit lid gaat. Als lijst en niet als
    losse regels: zo is in een oogopslag te zien wat er meegaat, en is er een
@@ -38,7 +41,8 @@ const EIGEN_TAKKEN = [
   'ontmoetVoorkeur', 'ontmoetPosities',   // Salon-ontmoetingen en uw positie daarin
   'accountRollen',      // uw koppelingen aan werkplekken
   'ledenBoard',         // uw eigen boardroom: wat u wel en niet deelt
-  'contactPins'         // uw contactpin: het adres waarmee anderen u toevoegden
+  'contactPins',        // uw contactpin: het adres waarmee anderen u toevoegden
+  'contactPinSecurity'  // uw noodslot en eigen PIN-veiligheidsjournaal
 ];
 
 module.exports = ({ db, lidBoardLogWis }) => {
@@ -48,6 +52,16 @@ module.exports = ({ db, lidBoardLogWis }) => {
      zijn ze daarna niet meer terug te vinden en blijven ze als wees op schijf
      staan. Verzamelen voor het weggooien, want daarna is de link weg. */
   function wisEigen(key, noteerPostBeelden, teWissen) {
+    /* Het account verdwijnt, maar zijn oude adres mag nooit aan een volgende
+       persoon worden uitgegeven. Alleen de domeingescheiden hash blijft over,
+       zonder accountkoppeling of leesbare PIN. Dit moet VOOR EIGEN_TAKKEN,
+       want die lus verwijdert contactPins[key]. */
+    const contactPin = db.data.contactPins && db.data.contactPins[key] && db.data.contactPins[key].pin;
+    if (contactPin) {
+      if (!db.data.contactPinRetired) db.data.contactPinRetired = {};
+      const v = pinVingerafdruk(crypto, contactPin);
+      if (!db.data.contactPinRetired[v]) db.data.contactPinRetired[v] = { at: klok.datum().toISOString(), reden: 'account_verwijderd' };
+    }
     // cv en live-locatie weg, gastchats weg, likes weg
     delete db.data.cvs[key];
     delete db.data.live[key];

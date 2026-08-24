@@ -52,6 +52,16 @@ test('config: veilige productie is foutloos', () => {
   assert.equal(r.waarschuwingen.length, 0, 'geen enkele waarschuwing: ' + JSON.stringify(r.waarschuwingen));
 });
 
+test('config: enterprise RTG-PIN vereist een gedeelde Redis-rem', () => {
+  const basis = { NODE_ENV: 'production', RTG_PIN_ENTERPRISE: '1', RTG_ENC_KEY: 'a'.repeat(64),
+    RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echt.nl' };
+  const zonder = config.valideer(basis);
+  assert.ok(zonder.fouten.some(f => /RTG_PIN_ENTERPRISE.*REDIS_URL/.test(f)),
+    'enterprise mag niet stil terugvallen op losse tellers per instance');
+  const met = config.valideer({ ...basis, REDIS_URL: 'redis://cache' });
+  assert.ok(!met.fouten.some(f => /RTG_PIN_ENTERPRISE.*REDIS_URL/.test(f)));
+});
+
 test('config: herstel-SMS moet echt bestaan of bewust fail-closed staan', () => {
   const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', SMTP_URL: 'smtp://x',

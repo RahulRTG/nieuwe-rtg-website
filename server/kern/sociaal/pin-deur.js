@@ -8,12 +8,13 @@
    TWEE REMMEN, EN DE TWEEDE ONTBRAK.
 
    De eerste telt per VRAGER: dertig pogingen per uur per lid. Die remt de
-   ongeduldige en de spammer, en tegen het raden van EEN bepaalde pin is hij
-   ruim genoeg -- 32^8 is 1,1 biljoen mogelijkheden.
+   ongeduldige en de spammer, en tegen het raden van EEN bepaalde v2-pin is hij
+   ruim genoeg -- 32^10 is ruim 1 biljard mogelijkheden. Bestaande v1-pins van
+   acht tekens blijven geldig tot hun eigenaar ze vernieuwt.
 
    Maar wie de pin van niemand in het bijzonder zoekt, raadt niet EEN pin: hij
    zoekt of er ergens IEMAND achter zit. Met honderdduizend leden is de kans per
-   gok ongeveer 1 op 11 miljoen, en de enige echte kosten zijn accounts -- en een
+   gok ongeveer 1 op 11 miljard, en de enige echte kosten zijn accounts -- en een
    account kost een e-mailadres. Twintig accounts is twintig keer dertig, en de
    teller van het ene account ziet niets van het andere.
 
@@ -36,25 +37,42 @@
    iedereen een minuut lang dicht. Dat is een bewuste ruil: zoeken op codenaam
    werkt gewoon door, bestaande vrienden merken niets, en het alternatief is een
    deur die alleen per bezoeker telt en dus bij genoeg bezoekers niet telt. Deze
-   rem woont in het geheugen en telt per proces -- dezelfde bekende beperking als
-   elke rem in dit huis (zie server/pinslot.js), en hij hoort bij de stap naar
-   gedeelde opslag.
+   De directe rem woont in het geheugen en blijft dus ook zonder infrastructuur
+   werken. De HTTP-rand voegt met REDIS_URL dezelfde grenzen atomisch over alle
+   instances toe (./pin-clusterrem.js); RTG_PIN_ENTERPRISE=1 maakt die gedeelde
+   laag verplicht en laat productie anders niet starten.
    --------------------------------------------------------------------------- */
+const klok = require('../../lib/klok');
+
 module.exports = (ctx) => {
 const { codenaamVan, soortVan, isBeschermdHandle, isGeblokkeerd, sociaalRate,
-  statusVan, connectieTussen, socialVerbind, pinHuidig, pinNormaliseer, handleVanPin } = ctx;
+  statusVan, connectieTussen, socialVerbind, pinHuidig, pinNormaliseer, handleVanPin,
+  pinBevroren, pinBeveiligingNoteer, pinIntentMaak, pinIntentGebruik, crypto } = ctx;
 
 const UUR = 60 * 60 * 1000;
 const MIS_VENSTER = 60 * 1000;
 const MIS_PER_MINUUT = 120;   // een misser is zeldzaam bij echt gebruik; raden is niets anders
+const BRON_PER_UUR = 120;      // een bron kan accounts rouleren, maar niet zijn netwerkspoor
 
 const misBudget = { vanaf: 0, n: 0 };
+const bronBudget = new Map();
 function misserGeteld() {
-  const nu = Date.now();
+  const nu = klok.nu();
   if (nu - misBudget.vanaf > MIS_VENSTER) { misBudget.vanaf = nu; misBudget.n = 0; }
   misBudget.n++;
 }
-const deurDicht = () => (Date.now() - misBudget.vanaf <= MIS_VENSTER) && misBudget.n >= MIS_PER_MINUUT;
+const deurDicht = () => (klok.nu() - misBudget.vanaf <= MIS_VENSTER) && misBudget.n >= MIS_PER_MINUUT;
+function bronMag(bron) {
+  if (!bron) return true; // kerntoetsen en interne aanroepen hebben geen HTTP-bron
+  const sleutel = crypto.createHash('sha256').update(String(bron)).digest('hex').slice(0, 24);
+  const nu = klok.nu();
+  let b = bronBudget.get(sleutel);
+  if (!b || b.reset < nu) { b = { n: 0, reset: nu + UUR }; bronBudget.set(sleutel, b); }
+  b.n++;
+  if (bronBudget.size > 5000)
+    for (const [k, v] of bronBudget) if (v.reset < nu) bronBudget.delete(k);
+  return b.n <= BRON_PER_UUR;
+}
 
 /* Opzoeken wie er achter een pin zit -- zonder iets te doen. Dat is met opzet
    een aparte stap: het scherm toont eerst "dit is Gouden Ibis", en de MENS
@@ -67,11 +85,14 @@ const deurDicht = () => (Date.now() - misBudget.vanaf <= MIS_VENSTER) && misBudg
    die jou blokkeerde, en de pin staat uit. Anders is het verschil in de
    foutmelding precies het gaatje waardoor je alsnog kunt vaststellen dat een
    kind bestaat -- of dat een pin ooit van iemand wás. */
-function pinZoek(mij, ruw) {
+function pinZoek(mij, ruw, context) {
   const pin = pinNormaliseer(ruw);
-  if (!pin) return { status: 400, error: 'Een pin bestaat uit acht tekens, bijvoorbeeld 7K2M-9XPQ.' };
+  if (!pin) return { status: 400, error: 'Een RTG PIN heeft acht of tien tekens, bijvoorbeeld 7K2M9-XPQH3.' };
+  if (pinBevroren(mij)) return { status: 423, error: 'Je RTG PIN staat in het noodslot. Zet het slot uit voordat je een nieuwe PIN-handeling doet.' };
   if (!sociaalRate(mij, 'pinzoek', 30, UUR))
     return { status: 429, error: 'Te veel pins geprobeerd. Probeer het over een uur opnieuw.' };
+  if (!bronMag(context && context.bron))
+    return { status: 429, error: 'Te veel PIN-verzoeken vanaf deze verbinding. Probeer het later opnieuw.' };
   /* De huisrem staat NA de eigen rem en VOOR het opzoeken: wie zelf al te snel
      ging, hoort dat te horen, en het budget van het huis mag niet opgaan aan een
      opzoeking die toch al geweigerd werd. */
@@ -79,7 +100,9 @@ function pinZoek(mij, ruw) {
   if (pinHuidig(mij) === pin) return { status: 400, error: 'Dat is je eigen pin.' };
   const kaart = kijk(mij, handleVanPin(pin));
   if (!kaart) { misserGeteld(); return { status: 404, error: 'Deze pin kennen we niet.' }; }
-  return { status: 200, ...kaart };
+  const intent = pinIntentMaak({ actor: mij, doel: kaart.key, bron: 'vast', referentie: pin });
+  pinBeveiligingNoteer(kaart.key, 'pin_bekeken', { bron: 'vast', uitkomst: 'getoond', doel: codenaamVan(mij) });
+  return { status: 200, ...kaart, bevestiging: intent.token, bevestigingVervalt: intent.exp };
 }
 
 /* Wat het scherm van een gevonden mens te zien krijgt -- of niets, en dan is dat
@@ -88,7 +111,7 @@ function pinZoek(mij, ruw) {
    dezelfde manier moet zwijgen; twee kopieen van deze regel is hoe de ene
    variant een beschermd kind gaat verklappen dat de andere afschermt. */
 function kijk(mij, doel) {
-  if (!doel || isBeschermdHandle(doel) || isGeblokkeerd(mij, doel)) return null;
+  if (!doel || pinBevroren(doel) || isBeschermdHandle(doel) || isGeblokkeerd(mij, doel)) return null;
   return { key: doel, codename: codenaamVan(doel), tier: soortVan(doel),
     st: statusVan(mij, connectieTussen(mij, doel)) };
 }
@@ -102,11 +125,20 @@ function kijk(mij, doel) {
    iemand via zijn pin binnenkwam. Dat is het signaal waarmee hij kan besluiten
    zijn pin te vernieuwen; zonder dat verschil merkt hij nooit dat de pin die
    hij ooit in een groepsapp zette, nog steeds rondgaat. */
-async function pinVerbind(mij, ruw) {
-  const gevonden = pinZoek(mij, ruw);
-  if (gevonden.error) return gevonden;
-  const r = await socialVerbind(mij, gevonden.key, false, 'pin');
-  return r.error ? r : { ...r, key: gevonden.key, codename: gevonden.codename };
+async function pinVerbind(mij, ruw, bevestiging) {
+  if (pinBevroren(mij)) return { status: 423, error: 'Je RTG PIN staat in het noodslot.' };
+  const pin = pinNormaliseer(ruw);
+  if (!pin) return { status: 400, error: 'Ongeldige RTG PIN.' };
+  const intent = await pinIntentGebruik(bevestiging, { actor: mij, bron: 'vast', referentie: pin });
+  if (!intent) return { status: 409, error: 'De bevestiging is verlopen. Zoek de RTG PIN opnieuw op en controleer de ontvanger.' };
+  const doel = handleVanPin(pin);
+  const kaart = doel === intent.doel ? kijk(mij, doel) : null;
+  if (!kaart) return { status: 409, error: 'De RTG PIN is gewijzigd of niet meer beschikbaar. Zoek opnieuw.' };
+  const r = await socialVerbind(mij, doel, false, 'pin');
+  if (r.error) return r;
+  pinBeveiligingNoteer(mij, 'pin_bevestigd', { bron: 'vast', uitkomst: 'verzoek', doel: kaart.codename });
+  pinBeveiligingNoteer(doel, 'pin_verzoek', { bron: 'vast', uitkomst: 'ontvangen', doel: codenaamVan(mij) });
+  return { ...r, key: doel, codename: kaart.codename };
 }
 
 /* De rauwe oplossing, voor de ouderkant (zie ouderVerbind in
@@ -120,12 +152,12 @@ function pinNaarHandle(ruw) {
   const pin = pinNormaliseer(ruw);
   if (!pin || deurDicht()) return null;
   const doel = handleVanPin(pin);
-  if (!doel) misserGeteld();
+  if (!doel || pinBevroren(doel)) { misserGeteld(); return null; }
   return doel;
 }
 
 // alleen voor de toetsen: het budget terugzetten zonder een minuut te wachten
-function pinDeurReset() { misBudget.vanaf = 0; misBudget.n = 0; }
+function pinDeurReset() { misBudget.vanaf = 0; misBudget.n = 0; bronBudget.clear(); }
 
 return { pinZoek, pinVerbind, pinNaarHandle, pinKijk: kijk, pinDeurReset, MIS_PER_MINUUT };
 };

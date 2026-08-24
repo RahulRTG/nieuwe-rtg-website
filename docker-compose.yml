@@ -43,6 +43,7 @@ services:
       RTG_ENV_FILE: /run/secrets/rtg_env
       RTG_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       REDIS_URL: redis://redis:6379
+      RTG_PIN_ENTERPRISE: ${RTG_PIN_ENTERPRISE:-1}
       RTG_MOTOR_SHADOW: http://motor:3100
       RTG_MOTOR_GELD_URL: http://motor:3100
       RTG_MOTOR_GELD: ${RTG_MOTOR_GELD:-schaduw}

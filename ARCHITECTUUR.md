@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4055 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4056 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4055 |
-| servermodules (`server/**/*.js`) | 2270 |
+| API-endpoints | 4056 |
+| servermodules (`server/**/*.js`) | 2275 |
 | routebestanden (`server/routes/**`) | 471 |
-| kernmodules (`server/kern/**`) | 1382 |
+| kernmodules (`server/kern/**`) | 1387 |
 | schermen (`public/**/*.html`) | 264 |
 | gedeelde browsermodules (`public/shared/*.js`) | 229 |
 | toetsbestanden (`test/*.test.js`) | 940 |
@@ -107,7 +107,7 @@ zie §5 -- er zijn nog 193 kern-namen die meer dan één domein aanraakt.
 | `supplier` | 598 | 111 | 10 | 297 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
-| `social` | 71 | 9 | 39 | 60 |
+| `social` | 72 | 9 | 39 | 66 |
 | `techniek` | 67 | 15 | 1 | 53 |
 | `zakelijk` | 13 | 2 | 0 | 25 |
 | `wereld` | 15 | 3 | 0 | 0 |
@@ -125,9 +125,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1416 |
+| kern-namen die routes aanraken | 1420 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 193 |
-| daarvan door precies één domein | 1223 |
+| daarvan door precies één domein | 1227 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -140,12 +140,12 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(172) auth(105) supplierAuth(55) officeAuth(36) db(36) status(27) liveCodename(25)
-accounts(23) schoon(21) managerOnly(16) save(15) rtf(15) codenaamVan(15)
-boardroomWie(11) crypto(11) findSupplier(11) anthropic(11) tooManyTries(10) geenGast(10)
-rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8)
-logActivity(8) noteFailedTry(7) stuur(7) sseToOffice(7) mail(6) sseToSupplier(6)
-notifySupplier(6) boardroomAuth(6) talen(6) appUrl(5) loginFails(5) logInlog(5)
-overheid(5) sseToCustomer(5)
+accounts(23) schoon(21) managerOnly(16) save(15) rtf(15) codenaamVan(15) crypto(12)
+boardroomWie(11) findSupplier(11) anthropic(11) tooManyTries(10) geenGast(10) rtmail(10)
+express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8) logActivity(8)
+noteFailedTry(7) stuur(7) sseToOffice(7) appUrl(6) mail(6) sseToSupplier(6)
+notifySupplier(6) boardroomAuth(6) talen(6) loginFails(5) logInlog(5) overheid(5)
+sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

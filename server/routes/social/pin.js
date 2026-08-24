@@ -10,9 +10,35 @@
 
    Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
-  const { kern } = sctx;
+  const { kern, pinClusterRem } = sctx;
   const { app, auth, geenGast, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
-          liveMaak, liveKijk, liveVerbind } = kern;
+          liveMaak, liveKijk, liveVerbind, appUrl,
+          webauthnActieOpties, webauthnActieMaak } = kern;
+  const PIN_ACTIES = new Set(['rtg-pin-vernieuw', 'rtg-pin-noodslot-uit', 'rtg-pin-vast-aan']);
+  const oorsprong = req => { try { return new URL(appUrl(req)).origin; } catch (e) { return ''; } };
+  const gastheer = req => { try { return new URL(oorsprong(req)).hostname; } catch (e) { return req.hostname; } };
+  const binding = (req, actie) => 'rtg-pin-security-v1|' + actie + '|' + req.session.key;
+  async function bewijs(req, actie) {
+    // Demo-/oude tiers zonder eigen account kunnen geen passkey bezitten. Een
+    // echt account mét passkey moet hem altijd opnieuw tonen; de kern beslist
+    // dit op basis van de opgeslagen credentials, niet op basis van clientdata.
+    if (!req.session.account) return { status: 200, ok: true, nodig: false };
+    return webauthnActieMaak(req.session.account, actie, binding(req, actie),
+      req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
+  }
+
+/* Een action-bound passkeychallenge voor de drie handelingen die een gestolen
+   open sessie niet zelfstandig mag doen. Er komt geen algemeen 2FA-token uit:
+   de challenge hoort bij exact een actienaam en het huidige account. */
+app.post('/api/member/pin/actie/opties', auth, async (req, res) => {
+  if (geenGast(req, res)) return;
+  const actie = String(req.body.actie || '');
+  if (!PIN_ACTIES.has(actie)) return res.status(400).json({ error: 'Onbekende PIN-veiligheidshandeling.' });
+  if (!req.session.account) return res.json({ nodig: false });
+  const r = await webauthnActieOpties(req.session.account, actie, binding(req, actie), gastheer(req));
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 
 // mijn eigen pin (wordt bij de eerste keer opvragen gemaakt)
 app.post('/api/member/pin', auth, (req, res) => {
@@ -23,49 +49,74 @@ app.post('/api/member/pin', auth, (req, res) => {
 /* een nieuwe pin: het intrekken van een adres. Wie de oude nog heeft -- op een
    oude foto van de QR, in een oude groepsapp -- kan er niets meer mee.
    Bestaande vrienden merken er niets van; die staan op de sleutel. */
-app.post('/api/member/pin/nieuw', auth, (req, res) => {
+app.post('/api/member/pin/nieuw', auth, async (req, res) => {
   if (geenGast(req, res)) return;
+  const b = await bewijs(req, 'rtg-pin-vernieuw');
+  if (b.error) return res.status(b.status || 401).json({ error: b.error });
   const r = pinVernieuw(req.session.key);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ pin: r.pin, toon: r.toon });
+  res.json({ pin: r.pin, toon: r.toon, uit: r.uit, versie: r.versie,
+    gemaaktOp: r.gemaaktOp, laatstGewijzigd: r.laatstGewijzigd,
+    bevroren: r.bevroren, bevrorenSinds: r.bevrorenSinds,
+    gebeurtenissen: r.gebeurtenissen });
 });
 
 /* de pin uitzetten (en weer aan). Vernieuwen helpt tegen een pin die is
    rondgegaan; dit is het andere verzoek: ik wil helemaal niet zo gevonden
    worden. De levende code hieronder blijft wel werken -- zie de uitleg bij
    pinUit in kern/sociaal/pin.js. */
-app.post('/api/member/pin/uit', auth, (req, res) => {
+app.post('/api/member/pin/uit', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = pinUit(req.session.key, req.body.uit !== false);
+  const opties = Object.prototype.hasOwnProperty.call(req.body || {}, 'bevroren')
+    ? { bevroren: req.body.bevroren !== false } : null;
+  const actie = opties && !opties.bevroren ? 'rtg-pin-noodslot-uit'
+    : (!opties && req.body.uit === false ? 'rtg-pin-vast-aan' : null);
+  if (actie) {
+    const b = await bewijs(req, actie);
+    if (b.error) return res.status(b.status || 401).json({ error: b.error });
+  }
+  const r = pinUit(req.session.key, req.body.uit !== false, opties);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ pin: r.pin, toon: r.toon, uit: r.uit });
+  res.json({ pin: r.pin, toon: r.toon, uit: r.uit, versie: r.versie,
+    gemaaktOp: r.gemaaktOp, laatstGewijzigd: r.laatstGewijzigd,
+    bevroren: r.bevroren, bevrorenSinds: r.bevrorenSinds,
+    gebeurtenissen: r.gebeurtenissen });
 });
 
 // wie zit er achter deze pin? (kijken, nog niets doen)
-app.post('/api/member/pin/zoek', auth, (req, res) => {
+app.post('/api/member/pin/zoek', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = pinZoek(req.session.key, req.body.pin);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ key: r.key, codename: r.codename, tier: r.tier, status: r.st });
+  const deur = await pinClusterRem.voor({ actor: req.session.key, bron: req.ip });
+  if (!deur.ok) return res.status(deur.status).json({ error: deur.error });
+  const r = pinZoek(req.session.key, req.body.pin, { bron: req.ip });
+  if (r.error) {
+    if (r.status === 404) {
+      const geteld = await pinClusterRem.misser();
+      if (!geteld.ok) return res.status(geteld.status).json({ error: geteld.error });
+    }
+    return res.status(r.status).json({ error: r.error });
+  }
+  res.json({ codename: r.codename, tier: r.tier, status: r.st,
+    bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt });
 });
 
 // en dan pas: het verzoek versturen
 app.post('/api/member/pin/connect', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = await pinVerbind(req.session.key, req.body.pin);
+  const r = await pinVerbind(req.session.key, req.body.pin, req.body.bevestiging);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true, status: r.st, key: r.key, codename: r.codename });
+  res.json({ ok: true, status: r.st, codename: r.codename });
 });
 
 /* ---------- de levende code: dezelfde volgorde, kortere houdbaarheid ----------
-   Een verse, ondertekende code die na een minuut niets meer is en je vaste pin
+   Een verse, ondertekende code die na 45 seconden niets meer is en je vaste pin
    niet draagt (kern/sociaal/pin-live.js). Het scherm haalt hem telkens opnieuw
    op zolang hij getoond wordt; daar is de code op gebouwd. */
 app.post('/api/member/pin/live', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const r = liveMaak(req.session.key);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs });
+  res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs, doel: r.doel });
 });
 
 /* kijken wie er achter een gescande code zit -- de code gaat hier NIET op.
@@ -81,13 +132,14 @@ app.post('/api/member/pin/live/kijk', auth, (req, res) => {
   if (geenGast(req, res)) return;
   const r = liveKijk(req.session.key, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ codename: r.codename, tier: r.tier, status: r.st });
+  res.json({ codename: r.codename, tier: r.tier, status: r.st,
+    bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt });
 });
 
 // en dan pas versturen; nu is de code op
 app.post('/api/member/pin/live/verbind', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = await liveVerbind(req.session.key, req.body.livecode);
+  const r = await liveVerbind(req.session.key, req.body.livecode, req.body.bevestiging);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st, codename: r.codename });
 });

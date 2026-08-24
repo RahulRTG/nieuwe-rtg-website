@@ -142,6 +142,28 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   assert.ok(sessie.body.token, 'en er komt een echte sessie uit, net als bij een wachtwoord');
   assert.equal(sessie.body.state.user.tier, 'rtg', 'op de pas van het lid zelf');
 
+  /* De RTG PIN gebruikt diezelfde passkey voor een action-bound step-up. Een
+     gestolen open sessie mag een noodslot wel AAN zetten (veilig), maar niet
+     opheffen of het adres vernieuwen zonder de eigenaar opnieuw op het toestel
+     te controleren. */
+  const dicht = await api('/api/member/pin/uit', { bevroren: true }, lid);
+  assert.equal(dicht.status, 200);
+  assert.equal(dicht.body.bevroren, true);
+  assert.notEqual((await api('/api/member/pin/uit', { bevroren: false }, lid)).status, 200,
+    'een open sessie alleen kan het noodslot niet opheffen zodra een passkey bestaat');
+  const stap = await api('/api/member/pin/actie/opties', { actie: 'rtg-pin-noodslot-uit' }, lid);
+  assert.equal(stap.status, 200);
+  assert.equal(stap.body.nodig, true);
+  assert.equal(stap.body.opties.userVerification, 'required');
+  const stapAntwoord = auth.loginAntwoord(stap.body.opties.challenge, origin, 4);
+  const open = await api('/api/member/pin/uit', { bevroren: false,
+    ceremonie: stap.body.ceremonie, antwoord: stapAntwoord }, lid);
+  assert.equal(open.status, 200, 'de passkey bevestigt precies het opheffen van het noodslot');
+  assert.equal(open.body.bevroren, false);
+  assert.notEqual((await api('/api/member/pin/nieuw', {
+    ceremonie: stap.body.ceremonie, antwoord: stapAntwoord }, lid)).status, 200,
+  'dezelfde action-bound ceremonie is niet herbruikbaar voor PIN-vernieuwing');
+
   /* DE TEGENPROEF OP DE HANDTEKENING: dezelfde ceremonie met een ANDERE sleutel
      komt er niet doorheen. Zonder deze regel zou deze toets ook groen staan op
      een server die de handtekening helemaal niet controleert.

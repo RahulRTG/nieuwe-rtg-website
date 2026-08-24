@@ -83,6 +83,11 @@ module.exports = (ctx) => {
   // De contactpin: de eigen code waarmee twee mensen elkaar toevoegen zonder te
   // zoeken (kern/sociaal/pin.js). Geen geheim maar een adres -- zie de kop daar.
   if (!db.data.contactPins) db.data.contactPins = {};             // handle -> { pin, at }
+  // Hash-tombstones zonder lidkoppeling: een ingetrokken RTG PIN wordt nooit
+  // opnieuw aan een andere persoon uitgegeven. De veiligheidsstaat is wel per
+  // lid en gaat bij het recht op vergetelheid gewoon mee.
+  if (!db.data.contactPinRetired) db.data.contactPinRetired = {}; // sha256(pin) -> { at, reden }
+  if (!db.data.contactPinSecurity) db.data.contactPinSecurity = {}; // handle -> noodslot + eigen journaal
   if (!db.data.memberChats) db.data.memberChats = {};              // 'sleutelA|sleutelB' -> { messages, read }
   if (!db.data.memberDir) db.data.memberDir = {};                  // sleutel -> { codename, tier }
   for (const t of GIDS_SEED_TIERS)

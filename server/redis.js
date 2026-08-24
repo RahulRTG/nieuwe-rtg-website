@@ -6,6 +6,7 @@
        const r = createClient({ url });
        r.on('error', cb); await r.connect();
        await r.set(k, v); await r.get(k);
+       await r.eval(script, [key], [argument]);
        await r.publish(kanaal, tekst);
        await r.subscribe(kanaal, bericht => ...);   // callback krijgt de ruwe payload
    Redis ZELF (de server/broker) bouwen we nooit -- dit is alleen de client.
@@ -123,6 +124,11 @@ function createClient(opts) {
     get(k) { return stuur(['GET', k]); },
     set(k, v) { return stuur(['SET', k, v]); },
     del(k) { return stuur(['DEL', k]); },
+    eval(script, keys, args) {
+      const ks = Array.isArray(keys) ? keys : [];
+      const as = Array.isArray(args) ? args : [];
+      return stuur(['EVAL', script, ks.length, ...ks, ...as]);
+    },
     publish(kanaal, bericht) { return stuur(['PUBLISH', kanaal, bericht]); },
     subscribe(kanaal, fn) { abos.set(kanaal, fn); return stuur(['SUBSCRIBE', kanaal]); },
     unsubscribe(kanaal) { abos.delete(kanaal); return stuur(['UNSUBSCRIBE', kanaal]); },

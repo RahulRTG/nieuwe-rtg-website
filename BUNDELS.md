@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 402 delen, 0 zonder onderwerp.**
+**51 bundels, 403 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 84 delen, 8886 regels in de delen
+`public/apps/app-main/` -- 85 delen, 8959 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -33,6 +33,7 @@ omlaag.
 | `app-main-08.js` | de onboarding: het paspoort scannen of een bestand kiezen |
 | `app-main-09.js` | de storyrij bovenaan De Salon |
 | `app-main-09a.js` | de contactpin: je eigen code, als tekst en als QR |
+| `app-main-09a1.js` | jouw RTG PIN: stand, veiligheidsjournaal en vaste QR |
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
 | `app-main-09b.js` | de directe berichten openen |
 | `app-main-10.js` | de directe berichten: versturen en aan het gesprek toevoegen |

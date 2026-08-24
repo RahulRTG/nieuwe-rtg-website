@@ -21,8 +21,8 @@
   function bouwTafel(code, tafel) { return 'rtg:tafel:' + String(code || '') + ':' + encodeURIComponent(String(tafel == null ? '' : tafel)); }
   function bouwKas(code) { return 'rtg:kas:' + String(code || ''); }
   function bouwEntree(code) { return 'rtg:entree:' + String(code || ''); }
-  // de contactpin zonder streepje: het scherm toont 'A1B2-C3D4', de code draagt
-  // 'A1B2C3D4' -- de server normaliseert allebei, maar kort scant prettiger
+  // De contactpin zonder streepje: v2 toont 'A1B2C-D3E4F' en de code draagt
+  // 'A1B2CD3E4F'. Ook bestaande v1-pins (vier-vier) blijven werken.
   function bouwPin(pin) { return 'rtg:pin:' + String(pin || '').toUpperCase().replace(/[^0-9A-Z]/g, ''); }
 
   // lees een gescande tekst; geeft altijd een object met .soort terug

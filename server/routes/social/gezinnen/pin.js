@@ -14,7 +14,7 @@
 
    Gemount vanuit routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, rtfSociaal } = sctx;
+  const { kern, rtfSociaal, pinClusterRem } = sctx;
   const { app, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
           liveMaak, liveKijk, liveVerbind } = kern;
 
@@ -46,28 +46,45 @@ app.post('/api/rtf/social/pin/nieuw', gezinsPoort, nietBeschermd, (req, res) => 
   const s = req.gezinslid;
   const r = pinVernieuw(s.handle);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ pin: r.pin, toon: r.toon, uit: r.uit });
+  res.json({ pin: r.pin, toon: r.toon, uit: r.uit, versie: r.versie,
+    gemaaktOp: r.gemaaktOp, laatstGewijzigd: r.laatstGewijzigd,
+    bevroren: r.bevroren, bevrorenSinds: r.bevrorenSinds,
+    gebeurtenissen: r.gebeurtenissen });
 });
 app.post('/api/rtf/social/pin/uit', gezinsPoort, nietBeschermd, (req, res) => {
   const s = req.gezinslid;
-  const r = pinUit(s.handle, req.body.uit !== false);
+  const opties = Object.prototype.hasOwnProperty.call(req.body || {}, 'bevroren')
+    ? { bevroren: req.body.bevroren !== false } : null;
+  const r = pinUit(s.handle, req.body.uit !== false, opties);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ pin: r.pin, toon: r.toon, uit: r.uit });
+  res.json({ pin: r.pin, toon: r.toon, uit: r.uit, versie: r.versie,
+    gemaaktOp: r.gemaaktOp, laatstGewijzigd: r.laatstGewijzigd,
+    bevroren: r.bevroren, bevrorenSinds: r.bevrorenSinds,
+    gebeurtenissen: r.gebeurtenissen });
 });
-app.post('/api/rtf/social/pin/zoek', gezinsPoort, nietBeschermd, (req, res) => {
+app.post('/api/rtf/social/pin/zoek', gezinsPoort, nietBeschermd, async (req, res) => {
   const s = req.gezinslid;
-  const r = pinZoek(s.handle, req.body.pin);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ key: r.key, codename: r.codename, tier: r.tier, status: r.st });
+  const deur = await pinClusterRem.voor({ actor: s.handle, bron: req.ip });
+  if (!deur.ok) return res.status(deur.status).json({ error: deur.error });
+  const r = pinZoek(s.handle, req.body.pin, { bron: req.ip });
+  if (r.error) {
+    if (r.status === 404) {
+      const geteld = await pinClusterRem.misser();
+      if (!geteld.ok) return res.status(geteld.status).json({ error: geteld.error });
+    }
+    return res.status(r.status).json({ error: r.error });
+  }
+  res.json({ codename: r.codename, tier: r.tier, status: r.st,
+    bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt });
 });
 app.post('/api/rtf/social/pin/connect', gezinsPoort, nietBeschermd, async (req, res) => {
   const s = req.gezinslid;
-  const r = await pinVerbind(s.handle, req.body.pin);
+  const r = await pinVerbind(s.handle, req.body.pin, req.body.bevestiging);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true, status: r.st, key: r.key, codename: r.codename });
+  res.json({ ok: true, status: r.st, codename: r.codename });
 });
 
-/* De levende code: een verse, ondertekende QR die na een minuut niets meer is
+/* De levende code: een verse, ondertekende QR die na 45 seconden niets meer is
    en de vaste pin niet draagt (kern/sociaal/pin-live.js). Juist hier nuttig --
    twee gezinnen die elkaar op een verjaardag treffen houden een telefoon op in
    plaats van een codenaam te spellen.
@@ -80,17 +97,18 @@ app.post('/api/rtf/social/pin/live', gezinsPoort, nietBeschermd, (req, res) => {
   const s = req.gezinslid;
   const r = liveMaak(s.handle);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs });
+  res.json({ token: r.token, exp: r.exp, ttlMs: r.ttlMs, doel: r.doel });
 });
 app.post('/api/rtf/social/pin/live/kijk', gezinsPoort, nietBeschermd, (req, res) => {
   const s = req.gezinslid;
   const r = liveKijk(s.handle, req.body.livecode);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ codename: r.codename, tier: r.tier, status: r.st });
+  res.json({ codename: r.codename, tier: r.tier, status: r.st,
+    bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt });
 });
 app.post('/api/rtf/social/pin/live/verbind', gezinsPoort, nietBeschermd, async (req, res) => {
   const s = req.gezinslid;
-  const r = await liveVerbind(s.handle, req.body.livecode);
+  const r = await liveVerbind(s.handle, req.body.livecode, req.body.bevestiging);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st, codename: r.codename });
 });

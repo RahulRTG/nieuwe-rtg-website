@@ -24,7 +24,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { execFileSync } = require('child_process');
-const { startServer, stopNet } = require('./helper');
+const { startServer, stopNet, bewaakKind } = require('./helper');
 
 const WORTEL = path.join(__dirname, '..');
 const verseMap = () => fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-eerstescan-'));
@@ -66,6 +66,39 @@ test('een verse installatie scant bij de start, een tweede start niet opnieuw', 
     'een tweede start op dezelfde installatie hoort NIET opnieuw te scannen. Verandert dit getal, ' +
     'dan draait elke herstart weer door de capability-kas -- 463 ms van een boot van 1839, voor een ' +
     'overzicht dat op dat moment niemand opvraagt.');
+});
+
+/* Een server starten en zijn stderr MEELEZEN. De bronkas schrijft bij het
+   opstarten een regel zodra er iets uit de kas is gehaald ("N uit de kas"); staat
+   die regel er niet, dan is er niets uit de kas gelezen. Dat is de enige
+   waarneming van buitenaf die zegt of de capability-graaf bij de start is
+   opgebouwd -- de kas zelf ligt in os.tmpdir() en niet in de repo, dus het
+   leesspoor ziet hem niet, en op de tijd afgaan zou een toets opleveren die op een
+   drukke machine willekeurig zakt. */
+async function startEnLees(map) {
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: map }, geenVorm: true, stderr: 'pipe' });
+  let uit = '';
+  srv.child.stderr.on('data', (b) => { uit += b.toString(); });
+  bewaakKind(srv.child);          // de strenge poort leest alsnog mee
+  await stopNet(srv.child, 20000);
+  return uit;
+}
+
+test('een tweede start leest de capability-kas NIET meer', async (t) => {
+  const map = verseMap();
+  t.after(() => { try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {} });
+
+  const eerste = await startEnLees(map);
+  assert.match(eerste, /\[bronkas\][^\n]*uit de kas/,
+    'de eerste start van een verse installatie scant, en leest daarvoor de bronkas');
+
+  const tweede = await startEnLees(map);
+  assert.doesNotMatch(tweede, /\[bronkas\][^\n]*uit de kas/,
+    'een tweede start hoort de bronkas met RUST te laten. Staat die regel er wel, dan is de ' +
+    'capability-graaf alsnog opgebouwd -- 463 ms van een boot van 1839, voor een overzicht dat op dat ' +
+    'moment niemand opvraagt. Dit is de bewering die de vorige versie van deze toets MISTE: die keek ' +
+    'naar laatsteScan, en dat getal blijft in beide gevallen gelijk omdat de dagelijkse grens de ' +
+    'scan al overslaat. De aanroep gebeurde wel, en dat is precies wat hier telt.');
 });
 
 test('het overzicht werkt ook als er bij de start niet is gescand', async (t) => {

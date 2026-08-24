@@ -24,7 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
-const { gedektIn } = require('./lib/routedekking');
+const { gedektIn, gedektenIn } = require('./lib/routedekking');
 
 const WORTEL = path.join(__dirname, '..');
 const bevindingen = [];
@@ -152,8 +152,10 @@ function dekking() {
   /* De vorm zelf woont in ./lib/routedekking.js: scripts/nieuweroutes.js stelt
      dezelfde vraag over de routes die in een tak NIEUW zijn, en twee kopieen van
      deze zeef zouden binnen een week uiteenlopen (LAT.md regel 4). */
-  const gedekt = (route) => gedektIn(route, testTekst);
-  const ongedekt = apiRoutes.filter(r => !gedekt(r));
+  /* In EEN doorloop in plaats van 29.365 keer een tekst van 10 MB doorzoeken;
+     zie de kop van gedektenIn(). Dezelfde zeef, dezelfde uitslag: 16,9 s -> 0,3 s. */
+  const gedekteRoutes = gedektenIn(apiRoutes, testTekst);
+  const ongedekt = apiRoutes.filter(r => !gedekteRoutes.has(r));
   const pct = apiRoutes.length ? Math.round((apiRoutes.length - ongedekt.length) / apiRoutes.length * 100) : 100;
   if (pct < 60) meld('scheef', 'dekking', 'Minder dan zestig procent van de endpoints komt in een test voor (' + pct + '%).',
     null, 'Elke ronde een paar endpoints erbij is genoeg; begin bij de lijst hieronder.');

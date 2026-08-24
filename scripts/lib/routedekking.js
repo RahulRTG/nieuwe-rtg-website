@@ -26,15 +26,49 @@
    als losse string is een aanroep, bank/overzicht in lopende tekst niet. */
 'use strict';
 
-function gedektIn(route, testTekst) {
-  if (testTekst.includes(route)) return true;
+/* DE ZEVEN VORMEN STAAN OP EEN PLEK, en dat is de reden dat de snelle en de
+   losse vraag niet uit elkaar KUNNEN lopen. Wie hier een vorm bijzet, zet hem
+   voor allebei bij; een tweede lijst zou precies het gat maken waar de kop
+   hierboven voor waarschuwt. */
+function patronenVoor(route) {
   const staart = route.slice(5);          // zonder '/api/'
+  const uit = [route];
   for (const vorm of [staart, '/' + staart]) {
-    if (testTekst.includes("'" + vorm + "'") ||
-        testTekst.includes('"' + vorm + '"') ||
-        testTekst.includes('`' + vorm + '`')) return true;
+    uit.push("'" + vorm + "'", '"' + vorm + '"', '`' + vorm + '`');
   }
+  return uit;
+}
+
+function gedektIn(route, testTekst) {
+  for (const p of patronenVoor(route)) if (testTekst.includes(p)) return true;
   return false;
 }
 
-module.exports = { gedektIn };
+/* DEZELFDE VRAAG VOOR ALLE ROUTES TEGELIJK, EN DAT SCHEELT ACHTTIEN SECONDEN.
+
+   gedektIn() per route is 4195 x 7 = 29.365 aanroepen van String.includes over
+   een tekst van 10 MB: ruim 126 gigabyte scannen, en gemeten 16,9 seconde. En
+   die vraag wordt niet een keer per ronde gesteld maar bij elke meting die
+   endpointsZonderTest, dekkingPct of keuringScheef nodig heeft -- in de
+   meterijking alleen al 85 van de 126 seconden.
+
+   scripts/lib/veelzoek.js draait het om: alle patronen EEN keer in een boom, de
+   tekst EEN keer erdoorheen (Aho-Corasick). Gemeten op de echte toetscode: 327
+   ms in plaats van 16.899, met exact dezelfde 2874 gedekte routes.
+
+   Dat "exact dezelfde" is hier geen bijzin. Deze uitkomst voedt twee
+   RATELTANDEN (endpointsZonderTest en dekkingPct in NORM.json), en een snellere
+   zoeker die net iets anders vindt is geen versnelling maar een stille
+   verschuiving van een norm. test/veelzoek.test.js houdt de twee daarom tegen
+   elkaar op de ECHTE toetscode, route voor route. */
+function gedektenIn(routes, testTekst) {
+  const { welkeKomenVoor } = require('./veelzoek');
+  const alle = [];
+  for (const r of routes) for (const p of patronenVoor(r)) alle.push(p);
+  const gevonden = welkeKomenVoor(testTekst, alle);
+  const uit = new Set();
+  for (const r of routes) if (patronenVoor(r).some(p => gevonden.has(p))) uit.add(r);
+  return uit;
+}
+
+module.exports = { gedektIn, gedektenIn, patronenVoor };

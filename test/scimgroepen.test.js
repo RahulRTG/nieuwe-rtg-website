@@ -39,6 +39,17 @@ function api(pad, body, token) {
    route in de toetsbron, en een pad dat met string-plakwerk wordt opgebouwd
    telt als ongetest -- terwijl hij dat niet is. De meter goed voeden is beter
    dan de norm verlagen met een uitleg erbij. */
+
+/* EN DE ROUTE MET EEN PARAMETER, want die valt buiten de regel hierboven: het
+   pad van EEN groep is nooit letterlijk op te schrijven, er staat een id in.
+   Een pad dat met + aan elkaar wordt geplakt is precies het plakwerk waar die
+   zeef niet doorheen kijkt, en scripts/nieuweroutes.js liet deze tak er dan
+   ook op zakken -- "nieuwe route zonder toets" -- terwijl vier toetsen hem wel
+   degelijk aanroepen. Dus staat het PATROON hier voluit en wordt het concrete pad
+   daaruit gemaakt. Dat is de zeef goed voeden en niet omzeilen: de aanroep
+   noemt de route die hij raakt. */
+const GROEP = '/api/scim/v2/Groups/:id';
+const groepPad = (id) => GROEP.replace(':id', id);
 function scim(pad, opties, sleutel) {
   const o = opties || {};
   return fetch(base + pad, {
@@ -112,10 +123,10 @@ test('3. de sleutel van de ene organisatie opent de groepen van de andere niet',
   assert.equal(vanB.body.totalResults, 0, 'B ziet die van A niet');
 
   const id = vanA.body.Resources[0].id;
-  const stiekem = await scim('/api/scim/v2/Groups/' + id, {}, sleutelB);
+  const stiekem = await scim(groepPad(id), {}, sleutelB);
   assert.equal(stiekem.status, 404, 'ook niet met het id in de hand');
 
-  const patch = await scim('/api/scim/v2/Groups/' + id, { methode: 'PATCH',
+  const patch = await scim(groepPad(id), { methode: 'PATCH',
     lijf: { Operations: [{ op: 'add', path: 'members', value: [{ value: '1' }] }] } }, sleutelB);
   assert.equal(patch.status, 404, 'en al helemaal niet om er iemand in te zetten');
 
@@ -125,30 +136,30 @@ test('3. de sleutel van de ene organisatie opent de groepen van de andere niet',
 
 test('4. de drie PATCH-vormen die IdP\'s echt sturen, worden alle drie herkend', async () => {
   const id = (await scim('/api/scim/v2/Groups', {}, sleutelA)).body.Resources[0].id;
-  const leden = async () => (await scim('/api/scim/v2/Groups/' + id, {}, sleutelA)).body.members.map(m => m.value);
+  const leden = async () => (await scim(groepPad(id), {}, sleutelA)).body.members.map(m => m.value);
 
-  await scim('/api/scim/v2/Groups/' + id, { methode: 'PATCH',
+  await scim(groepPad(id), { methode: 'PATCH',
     lijf: { Operations: [{ op: 'add', path: 'members', value: [{ value: '7' }, { value: '9' }] }] } }, sleutelA);
   assert.deepEqual(await leden(), ['7', '9'], 'add zet er twee in');
 
   /* De remove-vorm met het id IN HET PAD; dit is de vorm die Entra stuurt en
      die het vaakst wordt vergeten. */
-  await scim('/api/scim/v2/Groups/' + id, { methode: 'PATCH',
+  await scim(groepPad(id), { methode: 'PATCH',
     lijf: { Operations: [{ op: 'remove', path: 'members[value eq "7"]' }] } }, sleutelA);
   assert.deepEqual(await leden(), ['9'], 'remove met een filter in het pad haalt er een uit');
 
-  await scim('/api/scim/v2/Groups/' + id, { methode: 'PATCH',
+  await scim(groepPad(id), { methode: 'PATCH',
     lijf: { Operations: [{ op: 'replace', path: 'members', value: [{ value: '3' }] }] } }, sleutelA);
   assert.deepEqual(await leden(), ['3'], 'replace vervangt de hele lijst');
 
-  const onzin = await scim('/api/scim/v2/Groups/' + id, { methode: 'PATCH',
+  const onzin = await scim(groepPad(id), { methode: 'PATCH',
     lijf: { Operations: [{ op: 'replace', path: 'kleur', value: 'blauw' }] } }, sleutelA);
   assert.equal(onzin.status, 400, 'wat we niet herkennen, melden we -- stil slagen is erger');
 });
 
 test('5. een groep weghalen wist de groep en niet de mensen', async () => {
   const id = (await scim('/api/scim/v2/Groups', {}, sleutelA)).body.Resources[0].id;
-  const weg = await fetch(base + '/api/scim/v2/Groups/' + id,
+  const weg = await fetch(base + groepPad(id),
     { method: 'DELETE', headers: { Authorization: 'Bearer ' + sleutelA } });
   assert.equal(weg.status, 204);
   assert.equal((await scim('/api/scim/v2/Groups', {}, sleutelA)).body.totalResults, 0);

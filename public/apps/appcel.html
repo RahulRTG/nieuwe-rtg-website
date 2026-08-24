@@ -60,8 +60,24 @@
   <button class="knop" id="watMag" type="button" aria-expanded="false">Wat mag deze app?</button>
 </header>
 
-<div class="cel">
-  <div id="frameWrap" style="height:100%;"></div>
+<main class="cel" id="cel">
+  <div id="frameWrap" style="height:100%;">
+    <!-- HET KADER STAAT HIER EN NIET IN EEN SCRIPT, EN allow IS LEEG.
+
+         Overal elders in dit huis geeft de mediapoort (/shared/media.js) een
+         kader camera en microfoon door, want anders vallen die in dat venster
+         stil weg. Hier is het omgekeerde de bedoeling. Dit is een app van een
+         DERDE, en camera of microfoon is geen recht dat een lid ooit heeft
+         verleend (kern/appstore/machtigingen.js kent ze niet eens). Een leeg
+         allow zegt dat hardop, op de plek waar iemand het zou willen aanvullen.
+
+         En het staat in de markup en niet in een createElement, zodat de
+         sandbox-lijst hier als EEN waarde op EEN regel staat: er hoort maar een
+         vlag in, en elke vlag erbij geeft de cel iets terug wat hij niet hoort
+         te hebben. test/appstore-cel.test.js zakt daarop. -->
+    <iframe id="cel-kader" sandbox="allow-scripts" allow="" referrerpolicy="no-referrer"
+            title="Een app van een andere partij, in een afgeschermde cel" hidden></iframe>
+  </div>
   <div class="paneel" id="paneel" role="dialog" aria-label="Wat mag deze app">
     <div class="binnen">
       <h2>Wat mag deze app?</h2>
@@ -74,7 +90,7 @@
       </div>
     </div>
   </div>
-</div>
+</main>
 
 <div class="melding" id="melding" role="status"></div>
 
@@ -111,7 +127,15 @@ const api = (pad, body) => fetch(pad, {
 const SLEUTEL = (() => { try { return new URLSearchParams(location.search).get('app') || ''; } catch (e) { return ''; } })();
 let frame = null, STAND = null;
 
-function toon(t, sub){ $('#frameWrap').innerHTML = '<div class="leeg">'+esc(t)+(sub?'<br><br>'+esc(sub):'')+'</div>'; }
+/* Een melding in plaats van een app. Het kader zelf blijft staan (verborgen):
+   het draagt de sandbox en het lege allow, en die twee horen niet afhankelijk
+   te zijn van welke tak van deze functie er is gelopen. */
+function toon(t, sub){
+  const f = $('#cel-kader'); if (f) f.hidden = true;
+  let m = document.getElementById('celMelding');
+  if (!m) { m = document.createElement('div'); m.id = 'celMelding'; m.className = 'leeg'; $('#frameWrap').appendChild(m); }
+  m.textContent = t + (sub ? ' ' + sub : '');
+}
 
 async function open(){
   if (!TOKEN) return toon('Log eerst in.', 'Deze app hoort bij je RTG-account; open de app en log in.');
@@ -124,18 +148,13 @@ async function open(){
   $('#van').textContent = 'versie ' + d.versie + (d.uitgever ? ' · van ' + d.uitgever.naam : '');
   document.title = d.naam + ' · App Store';
 
-  /* De iframe wordt met createElement gemaakt en niet met innerHTML: zo staat
-     de sandbox-lijst hier als EEN waarde op EEN regel, en niet als een stuk
-     tekst dat iemand later per ongeluk aanvult. Er hoort maar een vlag in te
-     staan; elke vlag erbij geeft de cel iets terug wat hij niet hoort te
-     hebben, en test/appstore-cel.test.js zakt daarop. */
-  const f = document.createElement('iframe');
-  f.setAttribute('sandbox', 'allow-scripts');
-  f.setAttribute('referrerpolicy', 'no-referrer');
-  f.setAttribute('title', d.naam + ' — een app van ' + (d.uitgever ? d.uitgever.naam : 'een derde partij'));
+  /* Het kader staat al in de markup, met zijn sandbox en zijn lege allow. Hier
+     wordt alleen nog gezegd WELKE app erin komt -- en dat pad komt van de
+     server (/api/appstore/open) en niet uit de adresbalk. */
+  const f = $('#cel-kader');
+  f.title = d.naam + ' - een app van ' + (d.uitgever ? d.uitgever.naam : 'een derde partij');
+  f.hidden = false;
   f.src = d.start;
-  $('#frameWrap').innerHTML = '';
-  $('#frameWrap').appendChild(f);
   frame = f;
 }
 
@@ -188,5 +207,7 @@ $('#weg').addEventListener('click', async () => {
 
 open();
 </script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

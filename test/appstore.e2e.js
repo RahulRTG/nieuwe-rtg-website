@@ -16,7 +16,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -100,8 +100,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     // ---- de browser ----
     browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
     const page = await browser.newPage();
-    const fouten = [];
-    page.on('pageerror', (e) => fouten.push(String(e && e.message || e)));
+    const fouten = letOpFouten(page, []);
     await page.goto(base + '/apps/app.html');
     await page.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
     await page.goto(base + '/apps/appcel.html?app=cel-proef');
@@ -179,8 +178,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
 
     // ---- de winkel in de Mall ----
     const page = await browser.newPage();
-    const fouten = [];
-    page.on('pageerror', (e) => fouten.push(String(e && e.message || e)));
+    const fouten = letOpFouten(page, []);
     await page.goto(base + '/apps/app.html');
     await page.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
     await page.goto(base + '/apps/mall.html');
@@ -202,8 +200,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
 
     // ---- het uitgeversbureau ----
     const p2 = await browser.newPage();
-    const f2 = [];
-    p2.on('pageerror', (e) => f2.push(String(e && e.message || e)));
+    const f2 = letOpFouten(p2, []);
     await p2.goto(base + '/apps/app.html');
     await p2.evaluate((t) => localStorage.setItem('rtg_sup_token', t), sup);
     await p2.goto(base + '/apps/appstore-uitgever.html');

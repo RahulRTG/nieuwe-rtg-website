@@ -18,12 +18,20 @@ const AV = { scan: () => ({ verdict: 'schoon', redenen: [] }), definities: () =>
 const B = (pad, s) => ({ pad, buf: Buffer.from(s) });
 const MAN = { start: 'index.html', icoon: null };
 
-test('1. de cel krijgt precies EEN sandbox-vlag, en dat is allow-scripts', () => {
+test('1. de cel krijgt precies EEN sandbox-vlag, en camera noch microfoon', () => {
   const s = lees_('public/apps/appcel.html');
-  const m = /setAttribute\('sandbox',\s*'([^']*)'\)/.exec(s);
-  assert.ok(m, 'de celpagina zet de sandbox expliciet');
-  assert.equal(m[1], 'allow-scripts',
-    'elke vlag erbij geeft de cel iets terug wat hij niet hoort te hebben; allow-same-origin geeft hem onze herkomst en daarmee de sessie van het lid');
+  const kader = /<iframe\b[^>]*>/.exec(s);
+  assert.ok(kader, 'het kader staat in de markup en niet in een script, zodat de lijst er als een waarde staat');
+  const sandbox = /\bsandbox="([^"]*)"/.exec(kader[0]);
+  assert.ok(sandbox, 'en het draagt een sandbox');
+  assert.equal(sandbox[1], 'allow-scripts',
+    'elke vlag erbij geeft de cel iets terug wat hij niet hoort te hebben; de vlag die de herkomst teruggeeft, geeft hem de sessie van het lid');
+  /* Overal elders in dit huis krijgt een kader RTGMedia.kader() mee, dat camera
+     en microfoon doorgeeft. Hier is het omgekeerde de bedoeling: dat zijn geen
+     rechten die een lid ooit heeft verleend -- de machtigingencatalogus kent ze
+     niet eens -- dus staat er een LEEG allow, hardop, op de plek waar iemand het
+     zou willen aanvullen. */
+  assert.match(kader[0], /\ballow=""/, 'het kader geeft geen enkel apparaatrecht door aan een derde');
   /* Ook nergens anders in het bestand, ook niet in een string die iemand later
      als tweede plek gebruikt. Dit is grens 1 en die kent geen uitzondering. */
   assert.ok(!/allow-same-origin/.test(s), 'de vlag die de herkomst teruggeeft komt in dit bestand niet voor');

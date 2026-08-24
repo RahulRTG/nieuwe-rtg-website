@@ -106,7 +106,7 @@ async function kiesMap(input){
   }
   BUNDEL = uit;
   $('#bundelStand').textContent = uit.length
-    ? uit.length + ' bestanden · ' + Math.round(uit.reduce((n, x) => n + x.bytes, 0) / 1024) + ' kB — ' + uit.map(x => x.pad).slice(0, 6).join(', ') + (uit.length > 6 ? ' …' : '')
+    ? uit.length + ' bestanden · ' + Math.round(uit.reduce((n, x) => n + x.bytes, 0) / 1024) + ' kB - ' + uit.map(x => x.pad).slice(0, 6).join(', ') + (uit.length > 6 ? ' …' : '')
     : 'Nog geen map gekozen.';
 }
 
@@ -142,7 +142,7 @@ async function inzenden(){
 
 function tekenAanvraag(){
   return '<div class="kaart"><h2>Word uitgever</h2>'+
-    '<p class="sub">Je zaak hangt onder een organisatie; die organisatie wordt de uitgever. Een mens van RTG laat je toe — dat is geen formaliteit, want vanaf dat moment staat er een aanspreekbare partij achter elke app die je publiceert.</p>'+
+    '<p class="sub">Je zaak hangt onder een organisatie; die organisatie wordt de uitgever. Een mens van RTG laat je toe - dat is geen formaliteit, want vanaf dat moment staat er een aanspreekbare partij achter elke app die je publiceert.</p>'+
     '<div class="rij"><div style="flex:1;min-width:12rem;"><label class="vlak" for="uNaam">Naam waaronder je publiceert</label>'+
       '<input class="veld" id="uNaam" style="width:100%;" maxlength="120" value="'+esc((STAND.uitgever && STAND.uitgever.naam) || STAND.organisatie || '')+'"></div>'+
       '<div style="flex:1;min-width:12rem;"><label class="vlak" for="uContact">Contact voor RTG</label>'+
@@ -172,7 +172,7 @@ function tekenInzenden(){
         ['sociaal','reizen','eten','media','geld','spelen','leven','veiligheid'].map(c => '<option>'+c+'</option>').join('')+'</select></div>'+
       '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld" id="mStart" style="width:100%;" maxlength="80" placeholder="index.html"></div>'+
     '</div>'+
-    '<div style="margin-top:.6rem;"><label class="vlak" for="mUitleg">Uitleg (20–260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
+    '<div style="margin-top:.6rem;"><label class="vlak" for="mUitleg">Uitleg (20-260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
       '<textarea class="veld" id="mUitleg" style="width:100%;min-height:4.4rem;" maxlength="260"></textarea></div>'+
     '<div style="margin-top:.8rem;"><span class="vlak">Wat je vraagt</span>'+m+'</div>'+
     '<div style="margin-top:.9rem;"><label class="vlak" for="mMap">Je bundel (kies de map van je app)</label>'+
@@ -195,7 +195,7 @@ function tekenApps(){
       '<table><tr><th>versie</th><th>stand</th><th>hash</th><th>ingezonden</th><th>besluit</th></tr>'+
       a.versies.map(v => '<tr><td>'+esc(v.versie)+'</td><td>'+esc(v.status)+'</td><td><code>'+esc(v.hash.slice(0,12))+'</code></td>'+
         '<td>'+esc(String(v.at).slice(0,16).replace('T',' '))+'</td>'+
-        '<td>'+(v.besluit ? esc(v.besluit.door)+(v.besluit.reden ? ' — '+esc(v.besluit.reden) : '') : '—')+'</td></tr>').join('')+
+        '<td>'+(v.besluit ? esc(v.besluit.door)+(v.besluit.reden ? ' - '+esc(v.besluit.reden) : '') : '-')+'</td></tr>').join('')+
       '</table></div>').join('')+'</div>';
 }
 
@@ -221,11 +221,13 @@ async function laad(){
   if ($('#bProef')) $('#bProef').addEventListener('click', proef);
   if ($('#bIn')) $('#bIn').addEventListener('click', inzenden);
   document.querySelectorAll('.aTrek').forEach(b => b.addEventListener('click', async () => {
-    try { await api('/api/appstore/uitgever/intrekken', { sleutel: b.dataset.s, reden: 'ingetrokken door de uitgever' }); meld('Ingetrokken — ook bij de leden die hem al hadden.'); laad(); }
+    try { await api('/api/appstore/uitgever/intrekken', { sleutel: b.dataset.s, reden: 'ingetrokken door de uitgever' }); meld('Ingetrokken - ook bij de leden die hem al hadden.'); laad(); }
     catch (e) { meld(e.message); }
   }));
 }
 laad();
 </script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
 </body>
 </html>

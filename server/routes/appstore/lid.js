@@ -9,7 +9,7 @@
    met opzet in de LEDEN-routes en niet bij de uitgever: de aanroep gebeurt in de
    sessie van het lid, met wat het lid heeft verleend. */
 module.exports = (kern) => {
-  const { app, auth, appstore, appstoreWinkel, appstoreBrug, codenaamVan } = kern;
+  const { app, auth, appstoreWinkel, appstoreBrug, codenaamVan } = kern;
 
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Apps van derden op je startscherm zetten is voor betalende leden. Bladeren mag je gewoon.' }); return true; }

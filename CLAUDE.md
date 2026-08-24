@@ -74,6 +74,21 @@ zelf af, en wat niet gemeten is wordt niet als getal getoond. Daar staat ook wat
 er al staat en dus NIET opnieuw gebouwd moet worden — de rekening is al één
 waarheid over alle kanalen, en het ontbrekende scharnier is de **stoel**.
 
+**`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als
+backoffice maar als één laag waarin een mens ziet wat er draait, of het gezond
+is, en **hoe hard dat bewijs is**. Lees die vóór je aan een bestuursscherm, een
+meter of een herstelknop werkt. De kern in één zin: *een cockpit die niet kan
+zakken, is een dashboard.* Daaruit volgt de huisregel die overal geldt waar dit
+huis iets beweert: elke bewering draagt een **bewijsgraad** (onbekend, vermoed,
+gemeten, bewezen) met een datum, `niet vast te stellen` is een eersteklas uitslag
+naast in orde en storing, en **vervallen bewijs is geen bewijs**. Twee grenzen
+die niet mogen sneuvelen: de laag die iets toont, meet het niet (anders zeggen
+twee schermen op een dag iets anders over hetzelfde), en toegang van RTG tot de
+omgeving van een klant is een **uitnodiging en geen recht** — geen permanent
+`admin = true`, ook niet voor ons eigen kantoor. Wat er wel en niet staat, staat
+er gemeten bij; wat er nog niet is, staat er mét de grens waarbinnen het gebouwd
+moet worden.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

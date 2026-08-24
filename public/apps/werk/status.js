@@ -161,7 +161,7 @@
           if (r.status === 403) {
             $('stKop').textContent = 'Deze stand hoort bij het beheer.';
             $('stLet').textContent = r.body.error || '';
-            ['stContract', 'stWaar', 'stNietWaar', 'stSla', 'stPlatform']
+            ['stContract', 'stWaar', 'stNietWaar', 'stSla', 'stPlatform', 'stBijstand']
               .forEach(function (id) { leeg($(id), 'Niet zichtbaar zonder het recht "werkruimte".'); });
             return;
           }
@@ -176,6 +176,10 @@
           $('stKop').textContent = st.naam + '.';
           $('stLet').textContent = st.let || '';
           contract(st); beweringen(st); sla(st); platform(st);
+          /* De bijstand hangt aan DEZELFDE laadbeurt: twee schermen die elk hun
+             eigen moment kiezen, staan op een dag verschillende dingen te
+             zeggen over dezelfde organisatie. */
+          if (window.RTGWerkBijstand) window.RTGWerkBijstand.laad();
         })
         .catch(function () {
           $('stLet').textContent = 'De stand is nu niet op te halen. Er staat hier met opzet niets in de plaats.';

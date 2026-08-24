@@ -2286,6 +2286,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "kleef-readyourwrites.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "kleine-grendels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5945,6 +5952,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "trio-kleef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/trio-kleef.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "txgeld.test.js": {
       "soort": "puur",

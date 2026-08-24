@@ -257,8 +257,8 @@ Er staan nu vijf emmers onder de oude ondergrens.
 
 ### Wat NIET is gedaan, en waarom
 
-**Meer kernen benutten.** Onderzocht en gemeten, niet gebouwd — zie
-`docs/meerkernig.md`. Kort: drie schrijvende processen delen probleemloos één
+**Meer kernen benutten.** Onderzocht en gemeten; stap 1 (de kleefroutering) is
+inmiddels wél gebouwd, zie hieronder en `docs/meerkernig.md`. Kort: drie schrijvende processen delen probleemloos één
 SQLite-store, en een sessie van proces A is meteen geldig op proces B (12 van 12,
 0 ms, dankzij de Redis-bus). Twee processen op een gedeelde store schalen sinds
 de journaalverhuizing 1,5x (8.586 → 12.894/s) zonder dat de staart eronder lijdt;
@@ -268,9 +268,24 @@ geschreven. Postgres levert daar bovenop +7% doorvoer en −21% p99 (13.760/s, p
 18,1 ms), maar is geen voorwaarde meer. Wat wél breekt is read-your-writes: een
 lid ziet zijn eigen zojuist opgeslagen notitie op het andere proces pas na 733 ms
 (mediaan) op SQLite, en na 140 ms op Postgres — kleiner, niet nul. Volgorde die
-eruit volgt: eerst sticky routing op de sessie, dan verkeer verdelen (op een
+eruit volgt: eerst kleefroutering op de sessie, dan verkeer verdelen (op een
 machine met meer kernen dan het experiment processen heeft), en de opslagkeuze
 als inrichtingsbeslissing daarnaast.
+
+**En die eerste stap staat er nu.** `server/trio-kleef.js` stuurt een lid steeds
+naar hetzelfde proces (op zijn token, met rendezvous-hashing zodat bij een uitval
+alleen de leden van díé server verhuizen), `server/trio-spreiding.js` laat alle
+gezonde servers verkeer aannemen, en `db.leider` staat los van `db.writable`
+zodat backup, zelfzorgautomaat en het roerwerk van de RTG-AI bij één server
+blijven. Aan te zetten met `RTG_SPREIDING=1`; zonder `REDIS_URL` weigert de
+poortwachter dat mét de reden, want zonder bus deelt geen enkel proces zijn
+sessies. `test/kleef-readyourwrites.test.js` bewijst het op twee echte servers:
+zonder kleven 0 van de 6 zichtbaar, met kleven 6 van de 6.
+
+**Wat er van die drie dus nog openstaat** is stap 2 en 3: verkeer echt verdelen
+(de schakelaar staat er, maar er is een machine nodig waarop het eerlijk te meten
+valt — vier kernen met een meedraaiende belastingsgenerator is dat niet) en de
+opslagkeuze. Beide zijn inrichtings- en meetwerk, geen code.
 
 **De streefwaarden in `SLO.md`.** Die staan er nog zoals ze gekozen zijn (p90 <
 250 ms, p99 < 1 s) en zijn nu aantoonbaar meer dan duizend keer ruimer dan wat

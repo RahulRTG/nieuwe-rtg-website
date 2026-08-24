@@ -843,6 +843,40 @@ Standaard staan database, sleutels en uploads in `server/data`. Met
 op productie los van de app-schijf te zetten (bijvoorbeeld op een aparte
 volume of secrets-mount) en om tests te isoleren.
 
+## Spreiding: het trio laten meewerken (RTG_SPREIDING)
+
+Standaard neemt precies één van de drie servers verkeer aan en staan de andere
+twee stand-by. Dat is een failover-opstelling, geen schaalopstelling. Met
+`RTG_SPREIDING=1` nemen alle gezonde servers verkeer aan:
+
+```bash
+RTG_SPREIDING=1 REDIS_URL=redis://127.0.0.1:6379 npm start
+```
+
+Elke server heeft dan een **rol**: `leider` (schrijft, neemt verkeer aan, en doet
+het werk dat per installatie één keer hoort te gebeuren — de backup, de
+zelfzorgautomaat, het routinewerk van de RTG-AI), `volger` (schrijft en neemt
+verkeer aan, verder niets) of `uit` (stand-by). Zonder de schakelaar bestaat
+`volger` niet en is alles precies zoals het was.
+
+**Kleefroutering.** Een lid gaat steeds naar hetzelfde proces, gekozen op zijn
+token (`server/trio-kleef.js`). Dat is geen optimalisatie maar de voorwaarde:
+zonder kleven bewaart een lid een notitie op proces A, vraagt zijn lijst op bij
+proces B en ziet zijn eigen notitie niet staan — gemeten mediaan 733 ms op
+SQLite en 139–141 ms op Postgres (`docs/meerkernig.md`). De keuze gebruikt
+rendezvous-hashing en geen modulo, zodat bij het wegvallen van een server alleen
+de leden van díé server verhuizen en de rest blijft staan.
+
+**`REDIS_URL` is verplicht.** Sessies wonen in een `Map` per proces en worden
+over de bus gedeeld; zonder Redis is die bus in-proces. Het inloggen heeft nog
+geen token en gaat naar de leider, het volgende verzoek kleeft aan een ander
+proces dat de sessie niet kent — 401, voor iedereen. Vraagt u spreiding zonder
+`REDIS_URL`, dan zet de poortwachter hem **niet** aan en zegt in het logboek
+waarom.
+
+De failover verandert niet: valt een server weg, dan gaat zijn verkeer naar de
+overgebleven servers en neemt zo nodig een ander het leiderschap over.
+
 ## Noodserver (tweede adres, andere machine)
 
 Naast de drie hoofdservers met poortwachter (`npm start`) is er een losse

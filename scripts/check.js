@@ -2026,7 +2026,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     ["server/foundation/basis.js|const h = ((req.get && req.get('authorization')) || '');",
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
-      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
+      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
+    ["server/trio-kleef.js|const kop = (req && req.headers && req.headers.authorization) || '';",
+      'de poortwachter gebruikt het token als ROUTELABEL en niets anders: het gaat rechtstreeks een hash in en de uitkomst is een servernummer. ' +
+      'Er wordt niets verleend -- de gekozen server draait de volledige stapel en verifieert zelf, dus een verzonnen Bearer levert daar gewoon een 401 op. ' +
+      'Zou hier ooit iets aan een tokenwaarde worden opgehangen (een quotum per proces, een tarief per proces), dan vervalt deze reden.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {

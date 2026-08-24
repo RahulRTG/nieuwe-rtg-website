@@ -71,7 +71,9 @@ module.exports = ({ db, save, zelfzorgVan }) => {
       }
     }
     /* ---- 4. aan het roer: het veilige routinewerk, elke ronde ---- */
-    if (s.fase === 'aan-het-roer' && db.writable !== false) {
+    /* db.leider en niet db.writable: in spreidingsmodus schrijven alle servers,
+       en dan zou het roer-routinewerk drie keer per ronde draaien. */
+    if (s.fase === 'aan-het-roer' && db.leider !== false) {
       s.roerRondes += 1;
       const zz = zelfzorgVan ? zelfzorgVan() : null;
       const acties = [];

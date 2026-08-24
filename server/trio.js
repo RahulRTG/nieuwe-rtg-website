@@ -46,11 +46,22 @@ function stuurDoor(req, res, body, idx, magOpnieuw) {
     pres.pipe(res); // streamt ook SSE gewoon door
   });
   proxy.on('error', async () => {
-    s.healthy = false; s.healthySince = 0;
+    /* Ook s.rol, en niet alleen s.healthy: 'onbereikbaar betekent rol uit' is de
+       invariant waar trio-wacht.js op leunt, en een invariant die op een van de
+       twee plekken niet wordt gezet, is er geen. kleefDoel() filtert toevallig
+       ook op healthy, dus het gedrag klopte -- maar dan hangt het aan een detail
+       in een andere module in plaats van aan de regel zelf. */
+    s.healthy = false; s.healthySince = 0; s.rol = 'uit';
     if (res.headersSent || !magOpnieuw) { try { res.destroy(); } catch (e) {} return; }
     await wacht.kiesActieve('server ' + s.nr + ' liet een verzoek vallen');
     const actief = wacht.actieve();
-    if (actief >= 0 && actief !== idx) stuurDoor(req, res, body, actief, false);
+    if (actief < 0) return uitleg503(res);
+    /* Opnieuw kleven en niet blind naar de leider: de gevallen server staat nu
+       op rol 'uit' (hierboven), dus kleefDoel wijst dit lid vanzelf een ANDERE
+       meeloper toe -- en de rest van de leden blijft staan waar hij stond. Dat
+       is de hele reden dat er rendezvous-hashing onder zit. */
+    const opnieuw = wacht.kleefDoel(req, actief);
+    if (opnieuw !== idx) stuurDoor(req, res, body, opnieuw, false);
     else uitleg503(res);
   });
   if (body && body.length) proxy.end(body); else proxy.end();
@@ -83,7 +94,12 @@ const afhandelen = (req, res) => {
     if (groot > 20 * 1024 * 1024) { res.writeHead(413, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Verzoek te groot.' })); return; }
     const idx = await wacht.wachtOpActieve(15000);
     if (idx < 0) return uitleg503(res);
-    stuurDoor(req, res, Buffer.concat(delen), idx, true);
+    /* De leider is de TERUGVAL, niet automatisch de bestemming. Staat spreiding
+       aan, dan kiest de kleefroutering (./trio-kleef.js) welke meelopende server
+       dit lid krijgt -- steeds dezelfde, zodat een lid zijn eigen zojuist
+       opgeslagen gegevens terugziet. Staat spreiding uit, dan geeft kleefDoel de
+       terugval ongewijzigd terug en gaat er niets anders dan voorheen. */
+    stuurDoor(req, res, Buffer.concat(delen), wacht.kleefDoel(req, idx), true);
   });
 };
 const poort = LOKAAL_TLS ? https.createServer({ key: tlsCert.key, cert: tlsCert.cert }, afhandelen)
@@ -132,7 +148,15 @@ poort.on('error', e => {
   setInterval(wacht.hartslag, CHECK_MS);
   setTimeout(() => {
     console.log('');
-    console.log('  Drie servers draaien: 1 actief (poort ' + servers[0].port + '), 2 en 3 standby (' + servers[1].port + ', ' + servers[2].port + ').');
+    /* De stand hardop, en niet de standaardstand als er een andere draait: een
+       opstartregel die "2 en 3 standby" zegt terwijl ze allebei verkeer aannemen,
+       is precies de soort onwaarheid waar een storingsdienst uren op zoekt. */
+    if (wacht.spreiding.aan()) {
+      console.log('  Drie servers draaien en nemen ALLE DRIE verkeer aan (poorten ' + servers.map(s => s.port).join(', ') + '),');
+      console.log('  met server 1 als leider. Een lid gaat steeds naar hetzelfde proces (kleefroutering op de sessie).');
+    } else {
+      console.log('  Drie servers draaien: 1 actief (poort ' + servers[0].port + '), 2 en 3 standby (' + servers[1].port + ', ' + servers[2].port + ').');
+    }
     console.log('  De site staat op ' + (LOKAAL_TLS ? 'https' : 'http') + '://localhost:' + PORT + '. Valt een server uit, dan neemt de volgende het direct over');
     console.log('  en wordt de gevallen server automatisch herstart.');
     if (LOKAAL_TLS) console.log(require('./lokaal-tls').startUitleg(tlsCert, PORT));

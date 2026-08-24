@@ -164,15 +164,11 @@ _Bijgesteld na de nameting hierboven: stap 1 en stap 3 zijn van plaats gewisseld
 
 Niet "verdeel het verkeer". Wel, op deze volgorde:
 
-1. **Sticky routing op de sessie.** Nu de eerste stap, want dit is het enige dat
-   read-your-writes echt sluit — op SQLite (733 ms) én op Postgres (140 ms). Het
-   trio proxyt al per verzoek (`server/trio.js`), dus een lid consequent naar
-   hetzelfde proces sturen is een kleine ingreep op een bestaande laag, en het
-   valt netjes terug op een ander proces als er een omvalt: de sessie blijft
-   immers geldig (de bus doet zijn werk, zie boven).
+1. ~~**Sticky routing op de sessie.**~~ **GEBOUWD** — zie de volgende paragraaf.
 2. **Verkeer verdelen**, en meten op een machine waar het te meten valt. Dit mag
    nu vóór de opslagkeuze: gedeelde SQLite schaalt 1,5x op twee processen zonder
-   dat de staart eronder lijdt.
+   dat de staart eronder lijdt. De schakelaar staat er (`RTG_SPREIDING=1`); wat
+   ontbreekt is een machine waarop het eerlijk te meten valt.
 3. **Een opslag die echt gelijktijdig schrijft.** Geen voorwaarde meer, wel een
    verbetering. `STORE=postgres` bestaat al in deze codebase
    (`server/db/postgres.js`, write-behind met `DATABASE_URL`) en levert op twee
@@ -180,9 +176,58 @@ Niet "verdeel het verkeer". Wel, op deze volgorde:
    `server/pgaccounts.js` (LISTEN/NOTIFY). Daar staat het beheer van een Postgres
    tegenover. Een inrichtingsbeslissing dus, geen blokkade.
 
-Stap 2 zonder stap 1 kost geen doorvoer meer, maar levert nog steeds de
-read-your-writes-bug op die willekeurig lijkt en onmogelijk te reproduceren is,
-want of je hem ziet hangt af van welk proces je verzoek ving.
+## Stap 1 is gebouwd: kleefroutering
+
+`server/trio-kleef.js` kiest per verzoek welk proces dit lid krijgt, en
+`server/trio-spreiding.js` bepaalt welke servers kandidaat zijn. Aanzetten met
+`RTG_SPREIDING=1`; standaard verandert er niets aan wat de poortwachter altijd
+al deed.
+
+**De sleutel is het token**, niet het IP-adres (dat deelt een heel kantoor of een
+mobiele mast) en niet een eigen cookie (dat zou een vierde identiteitsbegrip
+toevoegen). Het token is per apparaat verschillend en leeft precies zolang als de
+sessie — dat is exact de korrel waarop read-your-writes speelt. Het token verlaat
+de module niet: naar buiten gaat alleen een getal.
+
+**Rendezvous-hashing, geen modulo.** Bij `merk % aantal` verhuist bijna iedereen
+zodra er een server bij komt of wegvalt, en elke verhuizing is een lid dat zijn
+eigen zojuist opgeslagen gegevens even niet ziet. Gemeten in
+`test/trio-kleef.test.js`, met de modulo ernaast als referentie. Van 20.000
+tokens over drie servers, waarna server 2 wegvalt:
+
+| | leden van de weggevallen server | leden die onnodig verhuizen |
+|---|---:|---:|
+| kleefroutering | 6.649 | **0** |
+| modulo | 6.669 | **6.617** |
+
+Die 6.617 zijn leden van server 0 en 1 die niets mankeerde en die bij een modulo
+tóch een ander proces krijgen — allemaal een read-your-writes-venster voor niets.
+
+**Drie rollen in plaats van twee.** Tot nu toe viel "mag ik schrijven?" samen met
+"ben ik degene die de backup maakt?", want er was precies één schrijvende server.
+In spreidingsmodus schrijven ze allemaal, dus is `db.leider` een aparte vlag
+naast `db.writable` (`server/db/state.js`). De backup, de zelfzorgautomaat en het
+routinewerk van de RTG-AI hangen aan de leider; anders trekken drie servers
+tegelijk aan dezelfde bestanden.
+
+**Spreiding zonder `REDIS_URL` weigert, met de reden.** Sessies wonen in een Map
+per proces en gaan over de bus; zonder Redis is die bus in-proces. Het inloggen
+heeft nog geen token en gaat naar de leider, het volgende verzoek kleeft aan een
+ander proces dat de sessie niet kent — 401, meteen, voor iedereen. Dat is geen
+randgeval maar de gewone gang van zaken.
+
+**En het bewijs.** `test/kleef-readyourwrites.test.js` start twee echte servers op
+dezelfde opslag met de kruisprocespoll op tien minuten, zodat "niet zichtbaar"
+een uitkomst is en geen kans. Zonder kleefroutering ziet het lid 0 van de 6
+notities op het andere proces; met kleefroutering 6 van de 6, en alle twaalf
+verzoeken gingen naar hetzelfde proces. Beide helften zijn met een mutatie
+omgelegd gezien.
+
+Wat hiermee **niet** is opgelost: een lid dat van proces verhuist omdat zijn
+proces omvalt, valt eenmalig terug in hetzelfde venster van 733 ms (SQLite) of
+140 ms (Postgres). Dat is de prijs van een uitval en niet van de gewone gang van
+zaken, en hij treft alleen de leden van de weggevallen server — dat is precies
+waarom er rendezvous-hashing onder zit en geen modulo.
 
 ## De proeven overdoen
 

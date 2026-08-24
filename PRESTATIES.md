@@ -424,10 +424,31 @@ document onderuit haalde. Kort:
   kleiner (mediaan 139-141 ms) maar nog steeds niet nul, want de
   write-behind-cache blijft in het geheugen staan.
 
-De volgorde is dus: eerst sticky routing op de sessie -- het enige dat
+De volgorde is dus: eerst kleefroutering op de sessie -- het enige dat
 read-your-writes echt sluit -- dan verkeer verdelen, en de opslagkeuze als
 inrichtingsbeslissing daarnaast. Die middelste stap is op een machine met vier
 kernen en een meedraaiende belastingsgenerator sowieso niet eerlijk te meten.
+
+### De kleefroutering is gebouwd
+
+`server/trio-kleef.js` kiest per verzoek welk proces een lid krijgt, op zijn
+token; `server/trio-spreiding.js` zegt welke servers kandidaat zijn. Aan te
+zetten met `RTG_SPREIDING=1`, en standaard verandert er niets aan wat de
+poortwachter altijd al deed.
+
+| Wat | Waarom zo |
+|---|---|
+| De sleutel is het **token** | Een IP-adres deelt een heel kantoor of een mobiele mast; een eigen cookie zou een vierde identiteitsbegrip toevoegen. Het token is per apparaat en leeft precies zolang als de sessie. Het verlaat de module niet: naar buiten gaat een getal |
+| **Rendezvous-hashing**, geen modulo | Valt een server weg, dan verhuizen alleen zijn eigen leden. Gemeten over 20.000 tokens: kleefroutering verhuist er 0 onnodig, een modulo 6.617 |
+| Drie **rollen** in plaats van twee | `db.leider` staat nu los van `db.writable`: in spreidingsmodus schrijven alle servers, maar backup, zelfzorgautomaat en het roerwerk van de RTG-AI blijven bij één |
+| Spreiding **weigert** zonder `REDIS_URL` | Zonder bus deelt geen enkel proces zijn sessies. Inloggen gaat naar de leider, het volgende verzoek kleeft elders -- 401 voor iedereen. Dat wordt gezegd, niet stilgehouden |
+
+Het bewijs staat in `test/kleef-readyourwrites.test.js`: twee echte servers op
+dezelfde opslag met de kruisprocespoll op tien minuten, zodat "niet zichtbaar"
+een uitkomst is en geen kans. **Zonder** kleefroutering ziet het lid 0 van de 6
+notities op het andere proces, **met** kleefroutering 6 van de 6 -- en alle
+twaalf verzoeken gingen naar hetzelfde proces. Beide helften zijn met een mutatie
+omgelegd gezien, en `test/trio-kleef.test.js` doet hetzelfde voor de keuze zelf.
 
 ## Browserstart
 

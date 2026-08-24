@@ -53,8 +53,11 @@ function gedektIn(route, testTekst) {
    meterijking alleen al 85 van de 126 seconden.
 
    scripts/lib/veelzoek.js draait het om: alle patronen EEN keer in een boom, de
-   tekst EEN keer erdoorheen (Aho-Corasick). Gemeten op de echte toetscode: 327
-   ms in plaats van 16.899, met exact dezelfde 2874 gedekte routes.
+   tekst EEN keer erdoorheen (Aho-Corasick). Gemeten op de echte toetscode van
+   24 augustus 2026: 327 ms in plaats van 16.899, met dezelfde 3004 gedekte
+   routes van 4195. Dat getal drijft met elke toets die erbij komt; wat NIET
+   mag drijven is dat de twee zeven hetzelfde getal geven, en dat is wat de
+   toets bewaakt -- niet het getal zelf.
 
    Dat "exact dezelfde" is hier geen bijzin. Deze uitkomst voedt twee
    RATELTANDEN (endpointsZonderTest en dekkingPct in NORM.json), en een snellere

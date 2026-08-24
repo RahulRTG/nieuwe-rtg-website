@@ -1,12 +1,12 @@
 {
   "vastgelegd": "2026-08-24",
   "meters": {
-    "endpointsZonderTest": 1192,
+    "endpointsZonderTest": 1191,
     "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 922,
+    "testbestanden": 923,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 126,
@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 163,
+    "toetsenNietGemeten": 162,
     "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -36,7 +36,7 @@
     "duurOpWandklok": 29,
     "staatProcesgebonden": 92,
     "datamapVastgeklonken": 11,
-    "bewijsOnbekend": 175,
+    "bewijsOnbekend": 171,
     "bewijsVerlopen": 874
   },
   "notities": [

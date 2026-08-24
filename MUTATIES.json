@@ -5989,6 +5989,16 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "veelzoek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 6,
+      "toetsSha": "c50e899f9115",
+      "moduleSha": "e2a09a438fb5"
+    },
     "veiligadres.test.js": {
       "soort": "puur",
       "staat": "gezakt",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1059 bestanden en 7072 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1060 bestanden en 7082 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1059 |
-| losse beweringen (`test(...)`) | 7072 |
+| toetsbestanden | 1060 |
+| losse beweringen (`test(...)`) | 7082 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 895 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 896 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-930 bestanden, 6849 beweringen.
+931 bestanden, 6859 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -848,6 +848,7 @@ toets omvalt.
 | `trainingsschema.test.js` | 10 | gezakt op `liegpoort /api/` | Het trainingsschema (kern/trainingsschema.js). dezelfde reden: RTG schrijft geen trainingsschema voor. |
 | `transfer.test.js` | 5 | gezakt op `liegpoort /api/` | De eigen transferdienst van een activiteitenzaak: alleen met een geldig ticket, prijs 0 (inclusief) of het afgesproken bedrag, en iedereen ziet elkaar: de zaak de rit en de chauffeur, de chauffeur de klant, en de... |
 | `trio-kleef.test.js` | 11 | gezakt op `===->!==#0` | KLEEFROUTERING EN SPREIDING (server/trio-kleef.js, server/trio-spreiding.js). Dit is de laag die bepaalt WELK serverproces een lid krijgt. |
+| `trio-werkers.test.js` | 10 | gezakt op `!==->===#0` | MEER VOORDEURPROCESSEN (server/trio-werkers.js, server/trio-schaduw.js). De poortwachter was gemeten het plafond: 90% van EEN kern terwijl de drie servers op ongeveer de helft stonden. |
 | `txgeld.test.js` | 6 | gezakt op `true->false#0` | DE TWEE GELDCOLLECTIES IN HET GROOTBOEK. directBetalingen en betaalVerzoeken werden bijgehouden met db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N); Dat is precies waar boeking 50.001 aan verdween (zie... |
 | `txindex.test.js` | 2 | gezakt op `return-weg#0` | Transactie-index: bewijs dat de O(1)-helpers exact hetzelfde antwoorden als de naieve scans die ze vervangen, ook na mutaties, vervanging van de array (archief/venster/pg-sync) en schrijven BUITEN de helpers om... |
 | `txkap.test.js` | 4 | gezakt op `true->false#0` | DE GRENS OP DE BOEKINGEN: WAT ERBUITEN VALT, VALT NIET WEG. De levende boekingen-collectie heeft een plafond (50000). |

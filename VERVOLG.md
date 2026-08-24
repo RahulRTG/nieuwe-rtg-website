@@ -282,10 +282,22 @@ poortwachter dat mét de reden, want zonder bus deelt geen enkel proces zijn
 sessies. `test/kleef-readyourwrites.test.js` bewijst het op twee echte servers:
 zonder kleven 0 van de 6 zichtbaar, met kleven 6 van de 6.
 
-**Wat er van die drie dus nog openstaat** is stap 2 en 3: verkeer echt verdelen
-(de schakelaar staat er, maar er is een machine nodig waarop het eerlijk te meten
-valt — vier kernen met een meedraaiende belastingsgenerator is dat niet) en de
-opslagkeuze. Beide zijn inrichtings- en meetwerk, geen code.
+**Stap 2 leverde een plafond op dat niemand had verwacht.** Met spreiding aan
+namen alle drie de servers verkeer aan en bewoog de doorvoer 1,4%. De rekentijd
+per proces wees de dader aan: de poortwachter zelf, op 90% van één kern, terwijl
+de servers op de helft stonden en de machine 2,33 van vier kernen gebruikte.
+`RTG_POORTWACHTERS=N` splitst de voordeur in een hoofd die alleen bewaakt en N
+werkers op dezelfde poort (`SO_REUSEPORT`): 7.282 → 9.399/s met twee (+29%), p50
+van 8,62 naar 6,18 ms. `server/trio-werkers.js`, `server/trio-schaduw.js`,
+`server/trio-proxy.js`, `test/trio-werkers.test.js`.
+
+**Wat er nu nog openstaat.** Meten op een machine waar het te meten valt — vier
+kernen met de belastingsgenerator erop is dat niet, en boven de twee voordeuren
+is er niets meer te zien. En de opslagkeuze: Postgres gaf door de klemmende
+poortwachter heen geen verschil (6.864 tegen 6.877, ruis), wat ook logisch is,
+want er was geen ruimte om verschil te maken. Zodra de voordeur niet meer klemt
+is dat opnieuw te meten; op twee kale processen was het eerder +7% doorvoer en
+−21% p99. Beide zijn meetwerk op andere hardware, geen code.
 
 **De streefwaarden in `SLO.md`.** Die staan er nog zoals ze gekozen zijn (p90 <
 250 ms, p99 < 1 s) en zijn nu aantoonbaar meer dan duizend keer ruimer dan wat

@@ -479,6 +479,13 @@ achter de poortwachter, met Postgres en Redis overal aan.**
      rendezvous-hashing zodat bij een uitval alleen de leden van díé server
      verhuizen. De backup, de zelfzorgautomaat en het roerwerk van de RTG-AI
      blijven bij één server (`db.leider`, zichtbaar in `/api/health`).
+
+     **Zet er dan ook `RTG_POORTWACHTERS=N` bij.** De poortwachter is zelf één
+     Node-proces en was gemeten het plafond: 90% van één kern terwijl de servers
+     op de helft stonden. Met N voordeurprocessen op dezelfde poort
+     (`SO_REUSEPORT`) ging de doorvoer 29% omhoog en de p50 28% omlaag. Zonder
+     deze schakelaar levert spreiding vrijwel niets op — 1,4% gemeten. Werkt niet
+     samen met `RTG_LOKAAL_TLS`; zet TLS er dan vóór.
    - **Kubernetes/containers**: het Docker-image (§1) draait ongewijzigd;
      schaal per domein-deployment met de Redis-bus en Postgres als gedeelde laag.
 

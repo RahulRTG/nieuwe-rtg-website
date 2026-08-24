@@ -5961,6 +5961,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "trio-werkers.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/trio-schaduw.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 6
+    },
     "txgeld.test.js": {
       "soort": "puur",
       "staat": "gezakt",

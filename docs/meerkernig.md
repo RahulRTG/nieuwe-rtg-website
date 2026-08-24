@@ -229,6 +229,87 @@ proces omvalt, valt eenmalig terug in hetzelfde venster van 733 ms (SQLite) of
 zaken, en hij treft alleen de leden van de weggevallen server — dat is precies
 waarom er rendezvous-hashing onder zit en geen modulo.
 
+## Stap 2 en 3 gemeten: de poortwachter was het plafond
+
+Met de kleefroutering erin is de matrix door de ECHTE poortwachter gemeten, één
+clientproces, 24 gelijktijdig, 2.064 routes, 20 seconden. Elke werker draagt zijn
+eigen `Authorization`-kop — zonder token is er geen kleefsleutel en gaat álles
+naar de leider, en dan meet je met spreiding aan precies dezelfde opstelling als
+met spreiding uit.
+
+| Opstelling | Doorvoer | p50 | p99 |
+|---|---:|---:|---:|
+| kale server, geen poortwachter | 7.426/s | 2,32 ms | 15,4 ms |
+| trio SQLite, spreiding **uit** | 6.780/s | 2,69 ms | 15,5 ms |
+| trio SQLite, spreiding **aan** | 6.877/s | 2,71 ms | 13,8 ms |
+| trio Postgres, spreiding aan | 6.864/s | 2,71 ms | 13,7 ms |
+
+Drie servers laten meewerken leverde **1,4%** op, Postgres eronder leggen niets
+(6.864 tegen 6.877 is ruis), en alle drie de trio-regels liggen ónder één kale
+server. Dat laatste was het aanknopingspunt.
+
+De rekentijd per proces gaf het antwoord zonder dat er iets te beredeneren viel:
+
+| clients | doorvoer | **poortwachter** | server 1/2/3 | p99 |
+|---:|---:|---:|---:|---:|
+| 1 | 7.235/s | **84%** van een kern | 44 / 44 / 62% | 12,9 ms |
+| 2 | 7.547/s | **87%** | 47 / 47 / 53% | 20,4 ms |
+| 3 | 7.696/s | **90%** | 47 / 48 / 49% | 28,7 ms |
+
+De poortwachter loopt naar 90% van één kern en blijft daar hangen; de servers
+zitten op ongeveer de helft en hebben ruimte over; samen gebruikt de serverkant
+2,33 van de vier kernen, dus de machine is niet vol. Meer last geeft dan ook geen
+doorvoer maar wachtrij: +6% tegen een p99 die meer dan verdubbelt. Dat is het
+handschrift van één verzadigde draad.
+
+**Niet de opslag, niet de servers, niet de machine: de voordeur zelf.** Verkeer
+verdelen over drie servers heeft geen zin zolang alles door één proces moet dat
+per verzoek het lichaam buffert, de koppen kopieert en een tweede socket opent.
+
+### En wat er toen gebeurde
+
+`RTG_POORTWACHTERS=N` splitst de voordeur: een **hoofd** die de servers bewaakt en
+zelf geen verkeer aanneemt, en N **werkers** die op dezelfde poort luisteren met
+`SO_REUSEPORT`. Dezelfde last, drie clients:
+
+| voordeuren | doorvoer | p50 | p99 | voordeur-CPU | servers | samen |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1 (zoals het was) | 7.282/s | 8,62 ms | 28,5 ms | 0,86 kern | 1,40 | 2,26 |
+| 2 | **9.399/s** | 6,18 ms | 30,2 ms | 1,13 kern | 1,60 | 2,73 |
+| 3 | **9.596/s** | 5,88 ms | 29,3 ms | 1,26 kern | 1,58 | 2,83 |
+
+**+29% doorvoer en −28% op de p50** bij twee voordeuren. Van twee naar drie komt
+er nog 2% bij, en daar is deze machine op: tien processen op vier kernen. Wat het
+op een grotere machine doet, staat hier niet — dat is precies het voorbehoud dat
+bovenaan dit document ook al stond.
+
+### Wat de meting nog meer opleverde
+
+Twee gaten die alleen uit het draaien kwamen, niet uit het lezen:
+
+1. **Een verzoek zonder token kon op een 503 uitkomen** terwijl er twee gezonde
+   servers naast stonden. In de hoofdstand kiest `kiesActieve()` synchroon een
+   nieuwe leider; in een werker is het alleen een seintje naar de hoofd, dus wees
+   de terugval nog even naar de server die net omviel — en een verzoek zonder
+   kleefsleutel heeft niets anders. De chaosproef liet het zien: 1 mislukt
+   verzoek waar de hoofdstand er 0 had. Na de reparatie 556 verzoeken, 0 mislukt.
+2. **Werkers bleven als wees achter** als de hoofd hard werd omgelegd. Ze hielden
+   de poort vast met een stand die nooit meer bijwerkte. Na twee chaosrondes
+   stonden er vier van. Het dichtvallen van de IPC-lijn is nu het signaal om te
+   sluiten; hoofd omgelegd, nul processen over.
+
+### De volgorde nu
+
+Stap 1 (kleefroutering) en het plafond van stap 2 zijn weg. Wat er overblijft:
+
+- **Meten op een machine waar het te meten valt.** Vier kernen met de
+  belastingsgenerator erop is geen plek om te zien wat N processen doen. De
+  schakelaars staan er; het getal moet ergens anders vandaan komen.
+- **De opslagkeuze.** Postgres gaf door de poortwachter heen geen verschil, en
+  dat is ook logisch: er was geen ruimte om verschil te maken. Zodra de voordeur
+  niet meer klemt, is dit opnieuw te meten — en dan geldt weer wat er eerder
+  stond: +7% doorvoer en −21% p99 op twee processen, plus gedeelde accounts.
+
 ## De proeven overdoen
 
 De scripts staan niet in de repo (het zijn wegwerpmetingen), maar de opstelling

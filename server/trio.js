@@ -19,6 +19,17 @@ const http = require('http');
 const https = require('https');
 const crypto = require('crypto');
 const { maakWacht } = require('./trio-wacht');
+const { koppelWerkers } = require('./trio-werkers');
+const { maakSchaduw, startWerker } = require('./trio-schaduw');
+
+/* DIT BESTAND DRAAIT IN TWEE GEDAANTEN. Zonder RTG_POORTWACHTERS is er er een:
+   de voordeur die zelf luistert en tegelijk de drie servers bewaakt, precies
+   zoals altijd. Met RTG_POORTWACHTERS=N wordt dit proces de HOOFD (bewaakt de
+   servers, luistert zelf niet) en start het N kopieen van zichzelf als WERKER
+   (luisteren op dezelfde poort met SO_REUSEPORT, bewaken niets). De reden staat
+   in ./trio-werkers.js: de voordeur was gemeten het plafond, niet de servers. */
+const WERKER = process.env.RTG_TRIO_WERKER === '1';
+const WERKER_NR = process.env.RTG_TRIO_WERKER_NR || '1';
 
 const LOKAAL_TLS = process.env.RTG_LOKAAL_TLS === '1';
 
@@ -30,46 +41,19 @@ const SLEUTEL = crypto.randomBytes(24).toString('hex'); // deelt het trio onderl
 const FAILBACK_MS = 10000;  // zo lang moet een herstelde server stabiel zijn
 const CHECK_MS = 2000;      // hartslagcontrole
 
-const log = m => console.log('[poortwachter] ' + m);
-const wacht = maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log });
+const log = m => console.log('[poortwachter' + (WERKER ? ' ' + WERKER_NR : '') + '] ' + m);
+/* Een werker krijgt zijn stand van de hoofd in plaats van uit eigen hartslagen.
+   Beide hebben dezelfde vorm, dus alles hieronder praat tegen `wacht` zonder te
+   weten in welke gedaante het draait. */
+const wacht = WERKER ? maakSchaduw({ log }) : maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log });
 const { servers } = wacht;
 
-/* ---------- de poortwachter: al het verkeer naar de actieve server ---------- */
+/* Hoeveel voordeurprocessen, en of ze mogen. Zie ./trio-werkers.js. */
+const { VOORDEUREN, werkers } = koppelWerkers({ WERKER, wacht, servers, log, LOKAAL_TLS });
 
-function stuurDoor(req, res, body, idx, magOpnieuw) {
-  const s = servers[idx];
-  const headers = { ...req.headers };
-  headers['x-forwarded-for'] = (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'] + ', ' : '') + (req.socket.remoteAddress || '');
-  if (!headers['x-forwarded-proto']) headers['x-forwarded-proto'] = LOKAAL_TLS ? 'https' : 'http';
-  const proxy = http.request({ host: '127.0.0.1', port: s.port, path: req.url, method: req.method, headers }, pres => {
-    res.writeHead(pres.statusCode, pres.headers);
-    pres.pipe(res); // streamt ook SSE gewoon door
-  });
-  proxy.on('error', async () => {
-    /* Ook s.rol, en niet alleen s.healthy: 'onbereikbaar betekent rol uit' is de
-       invariant waar trio-wacht.js op leunt, en een invariant die op een van de
-       twee plekken niet wordt gezet, is er geen. kleefDoel() filtert toevallig
-       ook op healthy, dus het gedrag klopte -- maar dan hangt het aan een detail
-       in een andere module in plaats van aan de regel zelf. */
-    s.healthy = false; s.healthySince = 0; s.rol = 'uit';
-    if (res.headersSent || !magOpnieuw) { try { res.destroy(); } catch (e) {} return; }
-    await wacht.kiesActieve('server ' + s.nr + ' liet een verzoek vallen');
-    const actief = wacht.actieve();
-    if (actief < 0) return uitleg503(res);
-    /* Opnieuw kleven en niet blind naar de leider: de gevallen server staat nu
-       op rol 'uit' (hierboven), dus kleefDoel wijst dit lid vanzelf een ANDERE
-       meeloper toe -- en de rest van de leden blijft staan waar hij stond. Dat
-       is de hele reden dat er rendezvous-hashing onder zit. */
-    const opnieuw = wacht.kleefDoel(req, actief);
-    if (opnieuw !== idx) stuurDoor(req, res, body, opnieuw, false);
-    else uitleg503(res);
-  });
-  if (body && body.length) proxy.end(body); else proxy.end();
-}
-function uitleg503(res) {
-  res.writeHead(503, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ error: 'Alle servers zijn tijdelijk onbereikbaar; ze worden automatisch herstart. Probeer het over een paar seconden opnieuw.' }));
-}
+/* Het doorsturen zelf -- wat er met EEN verzoek gebeurt -- staat in
+   ./trio-proxy.js. Hier blijft alleen het opzetten, starten en stoppen. */
+const { stuurDoor, uitleg503 } = require('./trio-proxy').maakProxy({ wacht, servers, LOKAAL_TLS });
 
 /* Het certificaat wordt bij elke start opnieuw uitgegeven voor de adressen die
    deze computer nu heeft; de CA eronder blijft dezelfde, dus wat u eenmaal op
@@ -105,25 +89,8 @@ const afhandelen = (req, res) => {
 const poort = LOKAAL_TLS ? https.createServer({ key: tlsCert.key, cert: tlsCert.cert }, afhandelen)
   : http.createServer(afhandelen);
 
-/* Een klein http-loketje ernaast, alleen om het CA-bestand op te halen. Uw
-   telefoon vertrouwt onze certificaten nog niet, dus dat bestand moet langs een
-   gewone verbinding binnenkomen; alle andere adressen sturen we door naar de
-   beveiligde site. Verder staat er niets op dit loket. */
-let caLoket = null;
-if (LOKAAL_TLS) {
-  caLoket = http.createServer((req, res) => {
-    if (require('./lokaal-tls').loketAntwoord(req, res, tlsCert, PORT)) return;
-    const gastheer = String(req.headers.host || '').split(':')[0] || 'localhost';
-    // de voorpagina vertelt een mens of hij binnen is en wat er nog moet gebeuren
-    if ((req.url || '/').split('?')[0] === '/') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      return res.end(require('./lokaal-tls').loketPagina(PORT, gastheer));
-    }
-    res.writeHead(302, { Location: 'https://' + gastheer + ':' + PORT + (req.url || '/') });
-    res.end();
-  });
-  caLoket.on('error', e => console.error('[poortwachter] CA-loket: ' + e.message));
-}
+/* Het CA-loketje ernaast staat in ./trio-loket.js. */
+const caLoket = LOKAAL_TLS ? require('./trio-loket').maakCaLoket({ tlsCert, PORT }) : null;
 poort.on('error', e => {
   if (e.code === 'EADDRINUSE') { console.error('Poort ' + PORT + ' is al in gebruik. Draait de site al?'); process.exit(1); }
   console.error('[poortwachter]', e.message);
@@ -132,8 +99,16 @@ poort.on('error', e => {
 /* ---------- netjes starten en stoppen ---------- */
 
 (async () => {
+  /* EEN WERKER LUISTERT ALLEEN. reusePort laat de kernel de verbindingen over de
+     processen verdelen; zonder die vlag geeft de tweede listen een EADDRINUSE. */
+  if (WERKER) return startWerker({ poort, PORT, HOST, log });
   const poortGestart = () => log('luistert op ' + (LOKAAL_TLS ? 'https' : 'http') + '://' + (HOST || 'localhost') + ':' + PORT);
-  if (HOST) poort.listen(PORT, HOST, poortGestart); else poort.listen(PORT, poortGestart);
+  // Met voordeurprocessen luistert dit proces zelf NIET: zijn event-loop blijft
+  // vrij voor de hartslag, en dat maakt de bewaking juist betrouwbaarder.
+  if (!werkers) { if (HOST) poort.listen(PORT, HOST, poortGestart); else poort.listen(PORT, poortGestart); }
+  if (VOORDEUREN > 0 && LOKAAL_TLS) log('RTG_POORTWACHTERS=' + VOORDEUREN + ' NIET aangezet: met RTG_LOKAAL_TLS geeft elk ' +
+    'voordeurproces bij het starten zijn eigen certificaat uit, en dan ziet een telefoon per verbinding een ander ' +
+    'certificaat van dezelfde site. Zet TLS ervoor (reverse proxy) als u meerdere voordeuren wilt.');
   if (caLoket) {
     const loketGestart = () => log('CA-loket op http://' + (HOST || 'localhost') + ':' + (PORT + 10) + '/rtg-ca.crt');
     if (HOST) caLoket.listen(PORT + 10, HOST, loketGestart); else caLoket.listen(PORT + 10, loketGestart);
@@ -145,12 +120,16 @@ poort.on('error', e => {
   await wacht.kiesActieve(null);
   wacht.startServer(1);
   wacht.startServer(2);
-  setInterval(wacht.hartslag, CHECK_MS);
+  if (werkers) werkers.startAlle();
+  /* Na elke hartslag de stand delen. deel() stuurt alleen als er iets veranderd
+     is, dus in rust gaat er niets over de lijn. */
+  setInterval(async () => { await wacht.hartslag(); if (werkers) werkers.deel(); }, CHECK_MS);
   setTimeout(() => {
     console.log('');
     /* De stand hardop, en niet de standaardstand als er een andere draait: een
        opstartregel die "2 en 3 standby" zegt terwijl ze allebei verkeer aannemen,
        is precies de soort onwaarheid waar een storingsdienst uren op zoekt. */
+    if (werkers) console.log('  ' + VOORDEUREN + ' voordeurprocessen delen poort ' + PORT + '; dit proces bewaakt alleen.');
     if (wacht.spreiding.aan()) {
       console.log('  Drie servers draaien en nemen ALLE DRIE verkeer aan (poorten ' + servers.map(s => s.port).join(', ') + '),');
       console.log('  met server 1 als leider. Een lid gaat steeds naar hetzelfde proces (kleefroutering op de sessie).');
@@ -166,9 +145,12 @@ poort.on('error', e => {
 
 for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
   if (wacht.gestopt()) return;
-  log(sig + ' ontvangen, alle servers worden netjes gestopt');
+  log(sig + ' ontvangen, ' + (WERKER ? 'deze voordeur sluit' : 'alle servers worden netjes gestopt'));
   wacht.stop();
-  poort.close();
+  /* Eerst de voordeuren, dan de servers: andersom staan er nog processen
+     verkeer aan te nemen naar backends die net gesloten zijn. */
+  if (werkers) werkers.stop();
+  try { poort.close(); } catch (e) {}
   if (caLoket) try { caLoket.close(); } catch (e) {}
-  setTimeout(() => process.exit(0), 3000);
+  setTimeout(() => process.exit(0), WERKER ? 1000 : 3000);
 });

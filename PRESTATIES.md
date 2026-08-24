@@ -443,6 +443,47 @@ poortwachter altijd al deed.
 | Drie **rollen** in plaats van twee | `db.leider` staat nu los van `db.writable`: in spreidingsmodus schrijven alle servers, maar backup, zelfzorgautomaat en het roerwerk van de RTG-AI blijven bij één |
 | Spreiding **weigert** zonder `REDIS_URL` | Zonder bus deelt geen enkel proces zijn sessies. Inloggen gaat naar de leider, het volgende verzoek kleeft elders -- 401 voor iedereen. Dat wordt gezegd, niet stilgehouden |
 
+### En daarna bleek de poortwachter zelf het plafond
+
+Met de kleefroutering erin nam elk van de drie servers verkeer aan -- en bewoog
+de doorvoer 1,4%. De rekentijd per proces zei waarom, zonder dat er iets te
+beredeneren viel:
+
+| clients | doorvoer | poortwachter | server 1/2/3 | p99 |
+|---:|---:|---:|---:|---:|
+| 1 | 7.235/s | **84%** van een kern | 44 / 44 / 62% | 12,9 ms |
+| 2 | 7.547/s | **87%** | 47 / 47 / 53% | 20,4 ms |
+| 3 | 7.696/s | **90%** | 47 / 48 / 49% | 28,7 ms |
+
+De voordeur loopt naar 90% van EEN kern en blijft daar; de servers zitten op de
+helft; de serverkant gebruikt 2,33 van de vier kernen, dus de machine is niet
+vol. Meer last geeft geen doorvoer maar wachtrij: +6% tegen een p99 die
+verdubbelt. Niet de opslag, niet de servers, niet de machine -- het proces dat
+per verzoek het lichaam buffert, de koppen kopieert en een tweede socket opent.
+
+`RTG_POORTWACHTERS=N` splitst dat: een HOOFD die alleen de servers bewaakt, en N
+WERKERS die op dezelfde poort luisteren met `SO_REUSEPORT`.
+
+| voordeuren | doorvoer | p50 | p99 | voordeur-CPU | servers |
+|---:|---:|---:|---:|---:|---:|
+| 1 (zoals het was) | 7.282/s | 8,62 ms | 28,5 ms | 0,86 kern | 1,40 |
+| 2 | **9.399/s** | 6,18 ms | 30,2 ms | 1,13 kern | 1,60 |
+| 3 | 9.596/s | 5,88 ms | 29,3 ms | 1,26 kern | 1,58 |
+
+**+29% doorvoer, -28% p50.** Boven de twee is deze machine op: tien processen op
+vier kernen. Wat het op een grotere machine doet, staat er niet -- dat is niet
+hier te meten en dat blijft zo staan tot het ergens anders gemeten is.
+
+Twee gaten kwamen alleen uit het draaien, niet uit het lezen. Een verzoek ZONDER
+token kon op een 503 uitkomen terwijl er twee gezonde servers naast stonden: in
+de hoofdstand kiest kiesActieve() synchroon een nieuwe leider, in een werker is
+het een seintje, dus wees de terugval nog even naar de server die net omviel. De
+chaosproef liet het zien (1 mislukt tegen 0 in de hoofdstand); na de reparatie
+556 verzoeken en 0 mislukt. En werkers bleven als WEES achter als de hoofd hard
+werd omgelegd -- na twee chaosrondes stonden er vier, met de poort vast en een
+stand die nooit meer bijwerkte. Het dichtvallen van de IPC-lijn is nu het sein om
+te sluiten: hoofd omgelegd, nul processen over.
+
 Het bewijs staat in `test/kleef-readyourwrites.test.js`: twee echte servers op
 dezelfde opslag met de kruisprocespoll op tien minuten, zodat "niet zichtbaar"
 een uitkomst is en geen kans. **Zonder** kleefroutering ziet het lid 0 van de 6

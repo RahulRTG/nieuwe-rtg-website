@@ -11,6 +11,20 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- DE VORMTAAL VAN ONTWERP.md, en die ontbrak hier terwijl dit scherm er wel
+     op leunde. `data-rtg-modus="pro"` hieronder zette de dichtheid van de
+     Pro-modus, maar die tokens wonen in rtg-ontwerp.css en die werd niet
+     geladen -- dus de modus deed niets. Erger: de eigen stijl van dit scherm
+     schrijft `font-variant-numeric:var(--rtg-cijfers)` op elk bedrag, en die
+     token komt uit datzelfde bestand. Bedragen lijnden dus al die tijd niet
+     uit, zonder dat iets het meldde.
+
+     rtg-materiaal.css erbij omdat de standen naar --gold-rand verwijzen in
+     plaats van een hexcode te kopieren (ONTWERP.md par. 0a: een kopie loopt uit
+     de pas zodra de bron verandert). NA rtg-ui.css, zodat de materialenleer
+     erover heen kan liggen -- dezelfde volgorde als in /apps/werk.html. -->
+<link href="/shared/rtg-materiaal.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <link href="/shared/canvas.css" rel="stylesheet">
 <!-- de vormtaal van een wereldscherm (balk, register, regkop); gedeeld met
      Reizen, Kantoor en Sociaal in plaats van overgetikt (LAT.md regel 4) -->
@@ -72,6 +86,11 @@
   </section>
 </main>
 
+<!-- id.js vooraan en zonder defer: RTGId maakt de idempotentiesleutel van een
+     terugstorting (apps/geld/waardeb.js), en die sleutel is wat een dubbeltik
+     tegenhoudt. Een id uit de klok is voorspelbaar en dus geen sleutel;
+     keuringsregel 15 bewaakt allebei -- de bron en het laden. -->
+<script src="/shared/id.js"></script>
 <script src="/apps/geld/hulp.js"></script>
 <!-- De volgorde van de scripts is de volgorde van de standenbalk: het
      overzicht eerst (daar bestaat de wereld voor), dan wat u dagelijks
@@ -85,6 +104,14 @@
 <script src="/apps/geld/overzichtc.js"></script>
 <script src="/apps/geld/wallet.js"></script>
 <script src="/apps/geld/walletb.js"></script>
+<!-- Waarde staat direct achter de wallet, en dat is de volgorde met opzet: de
+     wallet toont EEN saldo, deze stand toont waarom dat getal alleen niet meer
+     genoeg is zodra er een werkgeversbudget of een gemeentetegoed naast staat.
+     Drie delen om onder de 10 KB te blijven (scripts/check.js regel 13); het
+     laatste registreert de stand. -->
+<script src="/apps/geld/waarde.js"></script>
+<script src="/apps/geld/waardeb.js"></script>
+<script src="/apps/geld/waardec.js"></script>
 <script src="/apps/geld/bank.js"></script>
 <script src="/apps/geld/bankb.js"></script>
 <script src="/apps/geld/bankc.js"></script>

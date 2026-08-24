@@ -89,6 +89,11 @@
   }
   // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
+  /* De treasury van de zaak (leverancier-19b.js). Twee antwoorden naast elkaar
+     en niet een: `tresData` is de STAND (wat staat er, wat is apart gezet) en
+     `tresGraaf` is waar de omzet heen ging. Die tweede is afgeleid uit het
+     grootboek en de eerste niet -- ze samenvoegen zou dat verschil verstoppen. */
+  let tresData = null, tresGraaf = null, tresBusy = false, tresMsg = '';
   let zakData = null, zakBusy = false;
   let thuisData = null, thuisBusy = false;
   let wvData = null, wvBusy = false, wvTab = 'koppel';
@@ -120,4 +125,25 @@
     catch(e){ finData = { error: e.message }; }
     finBusy = false;
     renderStation();
+  }
+  /* De graaf mag mislukken zonder het bord mee te nemen: hij is de uitleg bij de
+     stand en niet de stand zelf. Zou een storing daar het hele scherm leeg
+     laten, dan ziet een ondernemer niets terwijl zijn saldo gewoon bekend is. */
+  async function laadTreasury(){
+    if (tresBusy) return;
+    tresBusy = true;
+    try { tresData = await API.call('/supplier/pay/treasury', {}); }
+    catch(e){ tresData = { error: e.message }; }
+    try { tresGraaf = await API.call('/supplier/pay/graaf', { dagen: 30 }); }
+    catch(e){ tresGraaf = null; }
+    tresBusy = false;
+    renderStation();
+  }
+  async function treasuryZet(body, gelukt){
+    try {
+      const r = await API.call('/supplier/pay/treasury/zet', body);
+      tresMsg = gelukt; tresData = null; tresGraaf = null;
+      if (r && r.error) tresMsg = r.error;
+    } catch(e){ tresMsg = e.message; }
+    laadTreasury();
   }

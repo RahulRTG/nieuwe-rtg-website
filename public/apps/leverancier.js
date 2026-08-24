@@ -1615,6 +1615,11 @@
   }
   // boekhouding: btw per genre, personeelskosten en cadeaukaarten, per land
   let finData = null, finBusy = false, finMsg = '', accAntwoord = '';
+  /* De treasury van de zaak (leverancier-19b.js). Twee antwoorden naast elkaar
+     en niet een: `tresData` is de STAND (wat staat er, wat is apart gezet) en
+     `tresGraaf` is waar de omzet heen ging. Die tweede is afgeleid uit het
+     grootboek en de eerste niet -- ze samenvoegen zou dat verschil verstoppen. */
+  let tresData = null, tresGraaf = null, tresBusy = false, tresMsg = '';
   let zakData = null, zakBusy = false;
   let thuisData = null, thuisBusy = false;
   let wvData = null, wvBusy = false, wvTab = 'koppel';
@@ -1646,6 +1651,27 @@
     catch(e){ finData = { error: e.message }; }
     finBusy = false;
     renderStation();
+  }
+  /* De graaf mag mislukken zonder het bord mee te nemen: hij is de uitleg bij de
+     stand en niet de stand zelf. Zou een storing daar het hele scherm leeg
+     laten, dan ziet een ondernemer niets terwijl zijn saldo gewoon bekend is. */
+  async function laadTreasury(){
+    if (tresBusy) return;
+    tresBusy = true;
+    try { tresData = await API.call('/supplier/pay/treasury', {}); }
+    catch(e){ tresData = { error: e.message }; }
+    try { tresGraaf = await API.call('/supplier/pay/graaf', { dagen: 30 }); }
+    catch(e){ tresGraaf = null; }
+    tresBusy = false;
+    renderStation();
+  }
+  async function treasuryZet(body, gelukt){
+    try {
+      const r = await API.call('/supplier/pay/treasury/zet', body);
+      tresMsg = gelukt; tresData = null; tresGraaf = null;
+      if (r && r.error) tresMsg = r.error;
+    } catch(e){ tresMsg = e.message; }
+    laadTreasury();
   }
   /* ---- de btw-aangifte van de zaak (server: kern/fiscaal/btwaangifte.js) ----
 
@@ -1884,6 +1910,11 @@
       ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
     );
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
+    /* TREASURY voor elke zaak, ongeacht genre. Geld dat binnenkomt is niet
+       hetzelfde als geld dat van u is: er zit btw in en er komt een loonrun aan.
+       Dat geldt voor een taxibedrijf net zo hard als voor een restaurant, dus
+       deze sectie hangt niet aan een genre. */
+    secs.push(['treasury','\u25C8',T('kt.treasury','Treasury')]);
     if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'bo';
     let html = '<div class="st-chips">'+secs.map(s2 =>
       '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';
@@ -2566,6 +2597,88 @@
         '<div class="row-gap"><input class="st-in" id="ktVp" placeholder="'+T('kt.kenteken','Kenteken / registratie')+'" class="h-flex2"><input class="st-in" id="ktVs" type="number" placeholder="4" class="h-flex1"></div>'+
         '<button class="bigbtn" id="ktVAdd" class="h-mt20">'+T('kt.vadd','Voertuig toevoegen')+'</button></div></div>';
     }
+/* TREASURY: geld dat binnenkomt is niet hetzelfde als geld dat van u is.
+
+   De klassieke manier waarop een horecazaak omvalt, is niet dat er te weinig
+   binnenkwam maar dat er te veel uitging omdat het saldo eruitzag als winst. Er
+   zat btw in die nog afgedragen moest worden en er kwam een loonrun aan.
+
+   Dit bord houdt daarom VIER getallen uit elkaar die op elk ander scherm een
+   getal zijn -- saldo, apart gezet, vastgezet en beschikbaar -- en zet daar het
+   enige antwoord onder dat een ondernemer echt zoekt: hoeveel kan ik vandaag
+   uitgeven zonder dat het straks pijn doet.
+
+   HET HEEFT TANDEN, en dat is geen schermkwestie: `uitbetaal` op de server
+   betaalt BESCHIKBAAR uit en niet het saldo (kern/pay/kassa.js). Zonder die
+   helft zou dit bord een geruststelling tonen die de volgende uitbetaling
+   meeneemt.
+
+   WAT ER GESCHAT IS, ZEGT DAT OOK. De percentages zijn een instelling van de
+   zaak, geen aangifte; kern/fiscaal rekent de werkelijke btw. Dat staat op het
+   scherm en niet alleen in de code -- een apart gezet bedrag dat zich voordoet
+   als een afdracht is gevaarlijker dan geen bedrag. */
+    if (kantoorSec === 'treasury'){
+      if (!tresData){
+        laadTreasury();
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.treasury','Treasury')+'</h3><div class="tkc-who">'+T('kt.laden','Laden...')+'</div></div>';
+      } else if (tresData.error){
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.treasury','Treasury')+'</h3><div class="tkc-who">'+tresData.error+'</div></div>';
+      } else {
+        const tr = tresData;
+        if (tresMsg){ html += '<div class="tkc h-volbreed h-goudrand">'+tresMsg+'</div>'; }
+        /* De vier getallen naast elkaar, en met opzet niet opgeteld tot een
+           "totaal". Wie ze optelt, krijgt het saldo terug -- en dat getal was
+           nou juist het misverstand. */
+        html += '<div class="tkc h-volbreed"><h3>'+T('kt.trstand','Wat er staat')+'</h3>'+
+          '<div class="st-row"><span>'+T('kt.trsaldo','Op uw RTG-rekening')+'</span><b>'+eur(tr.saldo/100)+'</b></div>'+
+          '<div class="st-row"><span>'+T('kt.trapart','Zelf apart gezet')+'<span class="sub">'+T('kt.trapartsub','btw, loonreserve')+'</span></span><b>'+eur(tr.apartGezet/100)+'</b></div>'+
+          (tr.gereserveerd ? '<div class="st-row"><span>'+T('kt.trvast','Vastgezet bij een lid')+'<span class="sub">'+T('kt.trvastsub','borgen die nog lopen')+'</span></span><b>'+eur(tr.gereserveerd/100)+'</b></div>' : '')+
+          '<div class="st-row"><span><b>'+T('kt.trvrij','Beschikbaar')+'</b><span class="sub">'+T('kt.trvrijsub','dit kan worden uitbetaald')+'</span></span><b>'+eur(tr.beschikbaar/100)+'</b></div>'+
+          (tr.onderBuffer
+            ? '<div class="tkc-who">'+T('kt.tronder','U zit onder de bodem die u zelf heeft ingesteld. Dat is geen storing, maar het is wel het signaal waar u de bodem voor heeft gezet.')+'</div>'
+            : '<div class="st-row"><span>'+T('kt.trliq','Vrij boven uw eigen bodem')+'</span><b>'+eur(tr.vrijeLiquiditeit/100)+'</b></div>')+
+          '<div class="tkc-who">'+T('kt.trvandaag','Vandaag ontvangen')+': '+eur(tr.ontvangenVandaag/100)+'</div></div>';
+
+        /* De oormerken zelf, elk met een knop om vrij te geven -- dat is de
+           handeling die erbij hoort: de btw is afgedragen, dus het geld is weer
+           van u. Zonder die knop is apart zetten een eenrichtingsweg. */
+        const om = tr.oormerken || [];
+        html += '<div class="tkc"><h3>'+T('kt.troorm','Apart gezet')+'</h3>'+
+          (om.length ? om.map(o => '<div class="st-row"><span>'+o.naam+
+            (o.doel ? '<span class="sub">'+o.doel+'</span>' : '')+'</span>'+
+            '<span><b>'+eur(o.centen/100)+'</b> <button class="obtn" data-trvrij="'+o.id+'">'+T('kt.trvrijgeef','Vrijgeven')+'</button></span></div>').join('')
+            : '<div class="tkc-who">'+T('kt.trgeenoorm','U heeft nog niets apart gezet.')+'</div>')+
+          '<div class="st-form"><div class="row-gap"><input class="st-in h-flex2" id="trNaam" placeholder="'+T('kt.trnaam','Waarvoor, bijv. Btw Q3')+'"><input class="st-in h-flex1" id="trBedrag" type="number" inputmode="decimal" placeholder="€"></div>'+
+          '<button class="bigbtn h-mt20" id="trApart">'+T('kt.trapartzet','Apart zetten')+'</button></div>'+
+          '<div class="tkc-who">'+T('kt.troormnote','Er beweegt geen geld: apart gezet geld staat gewoon op uw rekening. Het telt alleen niet mee als beschikbaar, en gaat dus niet mee bij een uitbetaling.')+'</div></div>';
+
+        /* De regels die het automatisch doen. Per ONTVANGST en niet een keer per
+           dag: een dagelijkse taak is een taak die kan uitvallen, en dan is er
+           een dag waarop het saldo weer als winst leest. */
+        const b = tr.beleid || {};
+        html += '<div class="tkc"><h3>'+T('kt.trregels','Automatisch bij elke ontvangst')+'</h3>'+
+          '<div class="st-form"><div class="row-gap">'+
+          '<input class="st-in h-flex1" id="trBtw" type="number" inputmode="decimal" placeholder="'+T('kt.trbtwpct','Btw %')+'" value="'+(b.btwPct||0)+'">'+
+          '<input class="st-in h-flex1" id="trLoon" type="number" inputmode="decimal" placeholder="'+T('kt.trloonpct','Loon %')+'" value="'+(b.payrollPct||0)+'">'+
+          '<input class="st-in h-flex1" id="trBuffer" type="number" inputmode="decimal" placeholder="'+T('kt.trbuffer','Bodem €')+'" value="'+((b.bufferCenten||0)/100)+'">'+
+          '</div><button class="bigbtn h-mt20" id="trBeleid">'+T('kt.trbewaar','Bewaren')+'</button></div>'+
+          '<div class="tkc-who">'+T('kt.trschat','Deze percentages zijn een schatting die u zelf instelt. De werkelijke btw-aangifte rekent uw boekhouding; dit zet alleen geld apart.')+'</div></div>';
+
+        /* WAAR DE EURO HEEN GING. Let op de vlag per regel: de kosten staan echt
+           in het grootboek, het btw- en loondeel zijn een percentage. Een
+           schatting die zich voordoet als een afdracht is gevaarlijker dan geen
+           bedrag, dus staat het verschil op het scherm. */
+        if (tresGraaf && tresGraaf.opsplitsing){
+          html += '<div class="tkc h-volbreed"><h3>'+T('kt.trgraaf','Waar uw omzet heen ging')+'</h3>'+
+            '<div class="tkc-who">'+T('kt.trperiode','Laatste')+' '+tresGraaf.sindsDagen+' '+T('kt.trdagen','dagen')+' · '+
+              tresGraaf.aantal+' '+T('kt.trbetalingen','betalingen')+' · '+eur(tresGraaf.ontvangen/100)+'</div>'+
+            tresGraaf.opsplitsing.map(o => '<div class="st-row"><span>'+o.wat+
+              '<span class="sub">'+(o.afgeleid ? T('kt.trafgeleid','geschat &middot; ')+o.uitleg : T('kt.trecht','uit het grootboek'))+'</span></span>'+
+              '<b>'+eur(o.centen/100)+'</b></div>').join('')+
+            '</div>';
+        }
+      }
+    }
 /* het tarief van de zaak */
     if (kantoorSec === 'tarief'){
       const t2 = (state.settings && state.settings.tarief) || {};
@@ -2649,59 +2762,6 @@
         '<select class="st-in" id="svSoort" class="h-flex1"><option value="dienst">'+T('kt.svdienst','Dienst')+'</option><option value="product">'+T('kt.svproduct','Product')+'</option></select></div>'+
         '<button class="bigbtn" id="svAdd" class="h-mt20">'+T('kt.svadd','Zet in de RTG-app')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.svnote','Leden zien dit direct in de app en boeken met datum en tijd; u houdt 100% van de prijs.')+'</div></div>';
-    }
-    /* Vakwerk Pro op het vandaag-bord: de functies waar vakbedrijven elders
-       per maand voor betalen -- offertes, werkbonnen, het klantenboek en de
-       onderhoudsherinneringen. Alles op codenaam. */
-    if (kantoorSec === 'vandaag' && vakData && !vakData.error && vakPro && vakPro.ok){
-      const open = vakPro.offertes.filter(o => o.status === 'aangevraagd');
-      const gedaan = vakPro.offertes.filter(o => o.status !== 'aangevraagd').slice(0, 5);
-      html += '<div class="tkc h-volbreed"><h3>'+T('vp.offertes','Offertes')+' ('+open.length+')</h3>'+
-        '<div class="tkc-who h-mt0">'+T('vp.offertes.s','Leden vragen vrije klussen aan; u antwoordt met een prijs. Bij akkoord staat de klus direct als bevestigde boeking in de agenda.')+'</div>'+
-        (open.length ? open.map(o =>
-          '<div class="st-row h-wrap"><span style="flex:1 1 100%;">'+o.omschrijving+
-            '<span class="sub">'+o.klant+(o.wens?' · '+T('vp.wens','gewenst')+' '+o.wens:'')+' · '+o.at.slice(0,10)+'</span></span>'+
-          '<span class="acts" style="flex:1 1 100%;display:flex;gap:0.35rem;align-items:center;">'+
-            '<input class="st-in" type="number" placeholder="€" data-vpprijs="'+o.id+'" style="flex:1;min-width:4rem;">'+
-            '<input class="st-in" placeholder="'+T('vp.toel','Toelichting (optioneel)')+'" data-vptoel="'+o.id+'" style="flex:2;min-width:6rem;">'+
-            '<button class="obtn primary" data-vpbied="'+o.id+'">'+T('vp.bied','Bied aan')+'</button>'+
-            '<button class="obtn warn" data-vpwei="'+o.id+'">✕</button></span></div>').join('')
-          : '<div class="tkc-who">'+T('vp.geenoff','Geen open offerte-aanvragen.')+'</div>')+
-        (gedaan.length ? '<div class="tkc-who h-mt40">'+gedaan.map(o => o.status+': '+o.omschrijving.slice(0,40)+(o.prijs?' ('+eur(o.prijs)+')':'')).join(' · ')+'</div>' : '')+'</div>';
-      // werkbonnen: afgeronde klussen netjes afsluiten voor de klant
-      if (vakPro.werkbonOpen.length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.werkbon','Werkbonnen')+' ('+vakPro.werkbonOpen.length+')</h3>'+
-        '<div class="tkc-who h-mt0">'+T('vp.werkbon.s','Sluit een afgeronde klus af met een digitale werkbon; het lid ziet hem bij de boeking.')+'</div>'+
-        vakPro.werkbonOpen.map(b =>
-          '<div class="st-row h-wrap"><span style="flex:1 1 100%;">'+b.dienst+'<span class="sub">'+b.klant+(b.datum?' · '+b.datum:'')+'</span></span>'+
-          '<span class="acts" style="flex:1 1 100%;display:flex;gap:0.35rem;">'+
-            '<input class="st-in" placeholder="'+T('vp.wbwerk','Uitgevoerd werk')+'" data-vpwbw="'+b.ref+'" style="flex:2;min-width:7rem;">'+
-            '<input class="st-in" placeholder="'+T('vp.wbmat','Materiaal (optioneel)')+'" data-vpwbm="'+b.ref+'" style="flex:2;min-width:6rem;">'+
-            '<button class="obtn primary" data-vpwb="'+b.ref+'">'+T('vp.wbdoe','Werkbon')+'</button></span></div>').join('')+'</div>';
-      // het klantenboek: vaste klanten op codenaam, met een eigen notitie
-      html += '<div class="tkc h-volbreed"><h3>'+T('vp.klanten','Klantenboek')+' ('+vakPro.klanten.length+')</h3>'+
-        '<div class="tkc-who h-mt0">'+T('vp.klanten.s','Uw klanten op codenaam: historie, omzet en uw eigen notitie. Echte namen kent dit boek bewust niet.')+'</div>'+
-        (vakPro.klanten.length ? vakPro.klanten.slice(0,8).map(k =>
-          '<div class="st-row h-wrap"><span>'+k.codenaam+'<span class="sub">'+k.aantal+' '+(vakData.werkMv||'boekingen')+' · '+eur(k.omzet)+(k.laatste?' · '+T('vp.laatst','laatst')+' '+k.laatste:'')+'</span></span>'+
-          '<span class="acts" style="flex:1 1 100%;display:flex;gap:0.35rem;">'+
-            '<input class="st-in" placeholder="'+T('vp.notitie','Eigen notitie, bijv. sleutel bij de buren')+'" value="'+(k.notitie||'').replace(/"/g,'&quot;')+'" data-vpnin="'+k.codenaam+'" class="h-flex1">'+
-            '<button class="obtn" data-vpnzet="'+k.codenaam+'">'+T('vp.bewaar','Bewaar')+'</button></span></div>').join('')
-          : '<div class="tkc-who">'+T('vp.geenklant','Nog geen klanten; na de eerste boeking vult dit boek zichzelf.')+'</div>')+'</div>';
-      // onderhoud: wie op basis van het herhaal-interval weer aan de beurt is
-      if (vakPro.onderhoud.length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.onderhoud','Onderhoud verlopen')+' ('+vakPro.onderhoud.length+')</h3>'+
-        '<div class="tkc-who h-mt0">'+T('vp.onderhoud.s','Deze klanten zijn volgens het herhaal-interval weer aan de beurt; een herinnering sturen kan een keer per 30 dagen.')+'</div>'+
-        vakPro.onderhoud.map(o =>
-          '<div class="st-row"><span>'+o.codenaam+'<span class="sub">'+o.dienst+' · '+T('vp.laatst','laatst')+' '+o.laatst+' · '+o.mndGeleden+' '+T('vp.mnd','mnd geleden')+'</span></span>'+
-          '<span class="acts">'+(o.herinnerd?'<span class="sub">'+T('vp.herinnerd','herinnerd')+'</span>':'<button class="obtn" data-vpher="'+o.codenaam+'" data-vpherd="'+o.dienstId+'">'+T('vp.herinner','Herinner')+'</button>')+'</span></div>').join('')+'</div>';
-    }
-    if (kantoorSec === 'diensten'){
-      // herhaal-onderhoud: een interval per dienst (bijv. APK: 12 maanden)
-      const svv = (state.services || []).filter(x => (x.soort||'dienst') === 'dienst');
-      if (svv.length) html += '<div class="tkc h-volbreed"><h3>'+T('vp.herhaal','Herhaal-onderhoud')+'</h3>'+
-        '<div class="tkc-who h-mt0">'+T('vp.herhaal.s','Geef een dienst een herhaal-interval in maanden; klanten die aan de beurt zijn verschijnen op het vandaag-bord.')+'</div>'+
-        svv.map(x =>
-          '<div class="st-row"><span>'+x.name+'<span class="sub">'+(x.herhaalMnd?T('vp.elke','elke')+' '+x.herhaalMnd+' '+T('vp.mnd2','maanden'):T('vp.geenherhaal','geen herhaling'))+'</span></span>'+
-          '<span class="acts" style="display:flex;gap:0.35rem;"><input class="st-in" type="number" min="1" max="60" placeholder="'+T('vp.mnd2','maanden')+'" value="'+(x.herhaalMnd||'')+'" data-vphin="'+x.id+'" style="width:5.5rem;">'+
-          '<button class="obtn" data-vphzet="'+x.id+'">'+T('vp.bewaar','Bewaar')+'</button></span></div>').join('')+'</div>';
     }
     /* Vakwerk Pro, tweede laag: vaste afspraken, wachtlijst, beoordelingen
        en de team-capaciteit -- ook dit elders betaalde functies. */
@@ -2796,7 +2856,7 @@
   }
 
   function bindKantoor(el){
-    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; thuisData = null; wvData = null; renderStation(); }));
+    el.querySelectorAll('[data-ksec]').forEach(b => b.addEventListener('click', () => { kantoorSec = b.dataset.ksec; kantoorMsg=''; histData = null; histPage = 1; boData = null; finData = null; finMsg = ''; mktData = null; mktMsg = ''; invData = null; vakData = null; vakAiMsg = ''; vakUren = null; thuisData = null; wvData = null; tresData = null; tresGraaf = null; tresMsg = ''; renderStation(); }));
     // Salon-bedrijfsaccount: bio, aanbiedingen (plaatsen en verzilveren) en polls
     const mkB = el.querySelector('#mkBioSave'); if (mkB) mkB.addEventListener('click', async () => {
       try { await API.call('/supplier/salon/bio', { bio: el.querySelector('#mkBio').value }); mktMsg = ''+T('mk.bioklaar','Bio opgeslagen.'); mktData = null; renderStation(); } catch(e){ toast(e.message); }
@@ -2827,6 +2887,51 @@
       } catch(e){ toast(e.message); }
     });
     // boekhouding: land en uurloon opslaan, cadeaukaarten en de AI-boekhouder
+/* De handelingen van het treasury-bord (leverancier-19b.js): apart zetten,
+   vrijgeven en de automatische regels.
+
+   LOSSE REGELS EN GEEN FUNCTIE, en dat is hier geen stijlkeuze. De delen van
+   deze app zijn stukken van EEN bestand: leverancier-21.js begint bindKantoor()
+   en leverancier-22.js loopt daar middenin door. Een fragment landt dus in de
+   scope waar zijn buren staan. Dit blok stond eerst als `function
+   bindTreasury(el)` in een fragment tussen 20 en 21 -- en dat is de scope van de
+   tekenfunctie, niet van bindKantoor. De aanroep werd daarmee een
+   ReferenceError en het treasury-vak bleef leeg; scripts/check.js regel 37 ving
+   dat voordat een mens het zag.
+
+   Eigen fragment omdat leverancier-21.js er anders over de keuringsgrens van
+   10240 byte gaat. Het sorteert na 21 en voor 22, dus middenin bindKantoor --
+   precies waar deze regels horen.
+
+   Vrijgeven is de handeling die er echt bij hoort. De btw is afgedragen, dus
+   het geld is weer van u; zonder die knop is apart zetten een eenrichtingsweg. */
+
+    /* TREASURY (leverancier-19b.js). Drie handelingen: apart zetten, vrijgeven
+       en de automatische regels. Vrijgeven is de handeling die er echt bij
+       hoort -- de btw is afgedragen, dus het geld is weer van u; zonder die
+       knop is apart zetten een eenrichtingsweg. */
+    el.querySelectorAll('[data-trvrij]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/pay/treasury/vrij', { id: b.dataset.trvrij });
+        tresMsg = ''+T('kt.trvrijklaar','Vrijgegeven. Dit bedrag is weer beschikbaar.'); }
+      catch(e){ tresMsg = e.message; }
+      tresData = null; tresGraaf = null; laadTreasury();
+    }));
+    const trA = el.querySelector('#trApart'); if (trA) trA.addEventListener('click', async () => {
+      const naam = (el.querySelector('#trNaam')||{}).value || '';
+      const euroIn = parseFloat(((el.querySelector('#trBedrag')||{}).value || '').replace(',', '.'));
+      if (!naam || !isFinite(euroIn)) { toast(T('kt.trvul','Vul een naam en een bedrag in.')); return; }
+      try { await API.call('/supplier/pay/treasury/apart', { naam: naam, centen: Math.round(euroIn * 100) });
+        tresMsg = ''+T('kt.trapartklaar','Apart gezet. Dit gaat niet mee bij een uitbetaling.'); }
+      catch(e){ tresMsg = e.message; }
+      tresData = null; tresGraaf = null; laadTreasury();
+    });
+    const trB = el.querySelector('#trBeleid'); if (trB) trB.addEventListener('click', () => {
+      const num = (id) => parseFloat(((el.querySelector(id)||{}).value || '').replace(',', '.'));
+      const buf = num('#trBuffer');
+      treasuryZet({ btwPct: num('#trBtw'), payrollPct: num('#trLoon'),
+        bufferCenten: isFinite(buf) ? Math.round(buf * 100) : undefined },
+      ''+T('kt.trbeleidklaar','De regels staan. Vanaf de volgende ontvangst gaat dit deel meteen apart.'));
+    });
 /* de instellingen van de zaak opslaan */
     const fnS = el.querySelector('#fnSave'); if (fnS) fnS.addEventListener('click', async () => {
       try {

@@ -125,3 +125,70 @@ test('de gewogen uitzonderingen leven nog allemaal', () => {
   }
   assert.ok(n >= 1, 'er hoort minstens een gewogen uitzondering te staan');
 });
+
+/* ============================================================================
+   DE SOORTENTABEL IS EEN BEWERING OVER DEZE BRON, DUS HIJ WORDT NAGELOPEN.
+
+   scripts/keuring.js zegt in SOORTEN_PER_ANALYSE welke analyse welke soort
+   bevinding kan melden. Daar hangt iets aan: `keur(['privacy'])` geeft een ECHTE
+   telling van `stuk` terug in plaats van null, omdat privacy() de enige analyse
+   is die stuk meldt. Dat scheelt de meter keuringStuk 47 seconden -- hij hoefde
+   de dekkingsanalyse van 40 seconden nooit, hij kreeg hem alleen omdat de regel
+   "alleen bij een volledige ronde" te bot was.
+
+   Maar zodra die tabel niet meer klopt, telt een deelronde te weinig en geldt
+   dat als een BETERE score. Daarom wordt hij hier uit de bron afgeleid en
+   vergeleken: verplaatst iemand een meld()-aanroep naar een andere analyse, dan
+   zakt deze toets in plaats van dat de tabel stilletjes verkeerd wordt.
+   ========================================================================== */
+test('SOORTEN_PER_ANALYSE klopt met wat de analyses echt melden', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const bronPad = path.join(__dirname, '..', 'scripts', 'keuring.js');
+  const bron = fs.readFileSync(bronPad, 'utf8');
+  const { SOORTEN_PER_ANALYSE, ALLE_ANALYSES, analysesVoorSoort } = require('../scripts/keuring.js');
+
+  /* Per analyse het stuk bron tussen zijn eigen `function x(` en die van de
+     volgende, en daarin elke meld('soort', ...). */
+  const grenzen = ALLE_ANALYSES
+    .map(n => [n, bron.indexOf('\nfunction ' + n + '(')])
+    .filter(x => x[1] >= 0)
+    .sort((a, b) => a[1] - b[1]);
+  assert.equal(grenzen.length, ALLE_ANALYSES.length,
+    'elke analyse hoort als functie in de bron te staan; anders leest deze toets het verkeerde stuk');
+
+  const echt = {};
+  for (let i = 0; i < grenzen.length; i++) {
+    const [naam, start] = grenzen[i];
+    const eind = i + 1 < grenzen.length ? grenzen[i + 1][1] : bron.indexOf('function keur(');
+    const stuk = bron.slice(start, eind);
+    echt[naam] = [...new Set([...stuk.matchAll(/meld\('(\w+)'/g)].map(m => m[1]))].sort();
+  }
+
+  for (const naam of ALLE_ANALYSES) {
+    assert.deepEqual((SOORTEN_PER_ANALYSE[naam] || []).slice().sort(), echt[naam],
+      'de tabel zegt dat ' + naam + ' ' + JSON.stringify(SOORTEN_PER_ANALYSE[naam]) +
+      ' meldt, maar in de bron meldt hij ' + JSON.stringify(echt[naam]) +
+      '. Een deelronde telt dan te weinig, en te weinig geldt als een betere score.');
+  }
+
+  /* En de eigenschap waar de besparing op rust, met zoveel woorden. */
+  assert.deepEqual(analysesVoorSoort('stuk'), ['privacy'],
+    'stuk komt uit een analyse van 0,01 s; komt daar iets bij, dan wordt keuringStuk weer duur -- ' +
+    'dat mag, maar dan hoort deze zin mee te veranderen');
+});
+
+test('een deelronde telt een soort pas als ELKE bron van die soort gedraaid heeft', () => {
+  const { keur } = require('../scripts/keuring.js');
+
+  const alleenPrivacy = keur(['privacy']);
+  assert.equal(typeof alleenPrivacy.stuk, 'number',
+    'privacy is de enige die stuk meldt, dus die telling is hier compleet');
+  assert.equal(alleenPrivacy.scheef, null, 'scheef komt ook uit dekking en die draaide niet');
+  assert.equal(alleenPrivacy.beter, null, 'beter ook niet');
+
+  const alleenUitschieters = keur(['uitschieters']);
+  assert.equal(alleenUitschieters.stuk, null,
+    'privacy draaide niet, dus stuk hoort null te zijn en niet 0 -- nul zou als de beste score gelden');
+  assert.equal(alleenUitschieters.scheef, null, 'scheef komt uit vijf analyses, niet uit deze ene');
+});

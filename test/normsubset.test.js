@@ -141,12 +141,35 @@ test('de besparing bestaat: een meting zonder de keuring is veel sneller dan een
 test('de keuringtabel is volledig, en wie erin ontbreekt wordt LANGZAAM en niet stil verkeerd', () => {
   const tabel = norm.KEURING_ANALYSES;
   assert.ok(tabel && Object.keys(tabel).length, 'de tabel bestaat');
-  /* stuk en scheef tellen bevindingen over ALLE analyses heen; die horen er
-     juist NIET in te staan, want dan zou een deelronde ze te laag zetten en
-     zou een kleiner getal als een betere score gelden. */
-  for (const m of ['keuringStuk', 'keuringScheef']) {
-    assert.equal(tabel[m], undefined,
-      m + ' hoort NIET in de tabel: hij telt over alle analyses heen, dus een deelronde geeft een te laag getal');
+  /* KEURINGSTUK EN KEURINGSCHEEF STAAN ER WEL IN, MAAR NIET MET DE HAND.
+
+     Hier stond eerst dat ze er juist NIET in mochten staan: ze tellen
+     bevindingen, en een deelronde zou dat te laag zetten. Dat was veilig en te
+     bot -- `stuk` komt uit EEN analyse (privacy, 0,01 s), en de meter betaalde
+     er 47 seconden voor omdat er ook een dekkingsanalyse van 40 seconden in de
+     volle ronde zat waar hij niets aan heeft.
+
+     De regel is nu scherper in plaats van losser: hun analyseset wordt OPGEVRAAGD
+     bij de keuring (analysesVoorSoort), die als enige weet welke analyse welke
+     soort meldt. Twee plekken met dezelfde waarheid zouden uiteenlopen
+     (LAT-regel 4), dus er is er een. En vraagt norm.js er te weinig aan, dan
+     geeft keuring.js `null` in plaats van een te laag getal -- dan valt de meter
+     om en wordt hij niet stil optimistisch. */
+  const keuring = require('../scripts/keuring.js');
+  for (const [meter, soort] of [['keuringStuk', 'stuk'], ['keuringScheef', 'scheef']]) {
+    assert.deepEqual(tabel[meter], keuring.analysesVoorSoort(soort),
+      meter + ' hoort zijn analyses van de keuring te krijgen en niet met de hand ingevuld te zijn; ' +
+      'anders lopen twee lijsten met dezelfde waarheid uiteen');
+    assert.ok(tabel[meter].length, meter + ' hoort minstens een analyse nodig te hebben');
+  }
+  /* En de veiligheidsklep die overblijft: een keuringmeter die hier NIET staat,
+     dwingt de volle ronde af. Wie er later een toevoegt en dit vergeet, wordt dus
+     langzaam en niet stil verkeerd. */
+  const ongenoemd = BRONNEN.keuring.filter(m => !tabel[m]);
+  for (const m of ongenoemd) {
+    const deel = norm.meet({ alleen: [m] });
+    assert.notEqual(deel[m], undefined,
+      m + ' staat niet in de tabel en hoort daarom de VOLLE keuring te krijgen; hij kwam leeg terug');
   }
   /* En elke meter die er wel in staat, noemt bestaande analyses. */
   const bekend = new Set(require('../scripts/keuring.js').ALLE_ANALYSES);

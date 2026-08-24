@@ -510,6 +510,38 @@ const ANALYSES = {
 };
 const ALLE_ANALYSES = Object.keys(ANALYSES);
 
+/* WELKE ANALYSE KAN WELKE SOORT BEVINDING MELDEN?
+
+   `volledig` was te bot. Het telde stuk, scheef en beter alleen bij een volledige
+   ronde, en dat is veilig maar duur: `stuk` komt in dit hele bestand uit EEN
+   analyse -- privacy(), goed voor 0,01 seconde -- terwijl de meter ervoor de
+   volle 52 seconden betaalde omdat er ergens ook een dekkingsanalyse van 40
+   seconden in de ronde zat waar hij niets aan heeft.
+
+   Met deze tabel wordt de regel scherper in plaats van losser: een telling komt
+   terug zodra ELKE analyse die zo'n bevinding kan melden ook echt gedraaid heeft.
+   Mist er een, dan is het nog steeds null en geen te laag getal (LAT-regel 3).
+
+   De tabel is een BEWERING over de code, dus hij wordt nagelopen en niet
+   geloofd: test/keuring.test.js leest de bron van dit bestand en eist dat elke
+   meld()-aanroep in een analyse hier ook staat. Verplaatst iemand een melding,
+   dan zakt die toets in plaats van dat deze tabel stilletjes verkeerd wordt. */
+const SOORTEN_PER_ANALYSE = {
+  dekking: ['beter', 'scheef'],
+  beloftes: ['scheef'],
+  privacy: ['stuk'],
+  pariteit: ['scheef'],
+  dubbelingen: ['beter'],
+  ongebruikt: ['scheef'],
+  i18n: ['beter'],
+  uitschieters: ['scheef', 'beter']
+};
+
+/* Welke analyses moeten gedraaid hebben voordat een telling van deze soort klopt? */
+function analysesVoorSoort(soort) {
+  return ALLE_ANALYSES.filter(a => (SOORTEN_PER_ANALYSE[a] || []).includes(soort));
+}
+
 function keur(alleen) {
   const gevraagd = (alleen && alleen.length) ? alleen.filter(n => ANALYSES[n]) : ALLE_ANALYSES;
   if (alleen && alleen.length && !gevraagd.length) {
@@ -518,12 +550,15 @@ function keur(alleen) {
   const volledig = gevraagd.length === ALLE_ANALYSES.length;
   const cijfers = {};
   for (const naam of gevraagd) cijfers[naam] = ANALYSES[naam]();
-  const tel = (soort) => bevindingen.filter(b => b.soort === soort).length;
+  const gedraaid = new Set(gevraagd);
+  /* Een telling klopt zodra elke analyse die zo'n bevinding KAN melden ook echt
+     gedraaid heeft -- niet pas bij een volledige ronde. Zie SOORTEN_PER_ANALYSE. */
+  const tel = (soort) => analysesVoorSoort(soort).every(a => gedraaid.has(a))
+    ? bevindingen.filter(b => b.soort === soort).length
+    : null;
   return {
     cijfers, bevindingen, volledig, analyses: gevraagd,
-    stuk: volledig ? tel('stuk') : null,
-    scheef: volledig ? tel('scheef') : null,
-    beter: volledig ? tel('beter') : null
+    stuk: tel('stuk'), scheef: tel('scheef'), beter: tel('beter')
   };
 }
 
@@ -559,4 +594,4 @@ if (require.main === module) {
   process.exit(r.stuk ? 1 : 0);
 }
 
-module.exports = { keur, ALLE_ANALYSES };
+module.exports = { keur, ALLE_ANALYSES, SOORTEN_PER_ANALYSE, analysesVoorSoort };

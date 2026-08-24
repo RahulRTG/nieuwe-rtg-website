@@ -552,11 +552,26 @@ const METERBRONNEN = {
    ontbreekt dwingt daarom de VOLLE ronde af -- dus wie later een keuringmeter
    toevoegt en deze tabel vergeet, wordt langzaam en niet stil verkeerd.
    test/normsubset.test.js houdt vast dat de tabel klopt. */
-const KEURING_ANALYSES = {
-  endpointsZonderTest: ['dekking'], dekkingPct: ['dekking'], keuringDekkingAdvies: ['dekking'],
-  keuringTeGroot: ['uitschieters'], keuringOmvang: ['uitschieters'],
-  keuringDubbeling: ['dubbelingen']
-};
+const KEURING_ANALYSES = (() => {
+  const tabel = {
+    endpointsZonderTest: ['dekking'], dekkingPct: ['dekking'], keuringDekkingAdvies: ['dekking'],
+    keuringTeGroot: ['uitschieters'], keuringOmvang: ['uitschieters'],
+    keuringDubbeling: ['dubbelingen']
+  };
+  /* keuringStuk en keuringScheef tellen bevindingen, en welke analyses zo'n
+     bevinding kunnen melden weet de keuring zelf. Die lijst hier overschrijven
+     zou een tweede plek maken die dezelfde waarheid vasthoudt (LAT-regel 4), dus
+     hij wordt gevraagd. `stuk` komt uit EEN analyse van 0,01 s; `scheef` uit vijf,
+     waaronder de dekking van 40 s -- die blijft dus duur, en terecht. */
+  try {
+    const keuring = require(path.join(BASIS, 'scripts', 'keuring.js'));
+    if (typeof keuring.analysesVoorSoort === 'function') {
+      tabel.keuringStuk = keuring.analysesVoorSoort('stuk');
+      tabel.keuringScheef = keuring.analysesVoorSoort('scheef');
+    }
+  } catch (e) { /* oudere keuring zonder die kennis: dan blijft het de volle ronde */ }
+  return tabel;
+})();
 
 /* MEET EEN BOOM, NIET PER SE DEZE BOOM.
 

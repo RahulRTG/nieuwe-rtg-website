@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE SCHERMEN MET EEN EIGEN SESSIESOORT, EN DE TWEE DOORVERWIJSSTUBS.
+   DE SCHERMEN MET EEN EIGEN SESSIESOORT, EN DE DOORVERWIJSSTUBS.
 
    Twaalf van de vijftien schermen die na TAKEN 4.9 nog geen eigen toets hadden.
    Ze stonden er allemaal om dezelfde reden op: ze draaien niet op de ledenpas
@@ -23,9 +23,10 @@
    5.5, de Arena, het RTF-kantoor en de Societeit -- dit was de laatste van die
    familie. Hij toont nu zijn eigen deur, en dat ligt hieronder vast.
 
-   DE TWEE STUBS ZIJN GEEN UITZONDERING MAAR EEN BELOFTE. `kantoorpda.html` en
-   `zorgbalie.html` zijn bewust geen apps (TAKEN 5.1): het zijn doorverwijzingen
-   met een meta-refresh naar `personeel.html`. Precies daarom horen ze getoetst:
+   DE STUBS ZIJN GEEN UITZONDERING MAAR EEN BELOFTE. `kantoorpda.html`,
+   `zorgbalie.html`, `partner-network.html` en `private-office.html` zijn bewust
+   geen dubbele apps maar doorverwijzingen naar hun echte productpagina. Precies
+   daarom horen ze getoetst:
    een stub die niet doorverwijst is een wit scherm voor iemand die op zijn werk
    staat, en aan een meta-refresh valt niets af te lezen zonder hem te draaien.
 
@@ -73,12 +74,18 @@ const EIGEN_SLEUTEL = [
   { app: 'scherm', eist: /leverancier-app|tweede scherm/i }
 ];
 
-/* De twee stubs, met waar ze heen horen te wijzen. `kantoor=1` is geen detail:
+/* De stubs, met waar ze heen horen te wijzen. `kantoor=1` is geen detail:
    dat is het verschil tussen de kantoorcode-inlog en de gewone personeelsinlog,
-   en de zorgbalie hoort juist de gewone te krijgen. */
+   en de zorgbalie hoort juist de gewone te krijgen. De twee oude wereldnamen
+   bewaren bovendien hun context in query en fragment wanneer ze naar de echte
+   productpagina gaan. */
 const STUBS = [
   { app: 'kantoorpda', naar: '/apps/personeel.html', zoek: 'kantoor=1' },
-  { app: 'zorgbalie', naar: '/apps/personeel.html', zoek: null }
+  { app: 'zorgbalie', naar: '/apps/personeel.html', zoek: null },
+  { app: 'partner-network', naar: '/apps/partner-worden.html', zoek: null,
+    achtervoegsel: '?bron=rand#aanvragen', bewaart: 'bron=rand', fragment: '#aanvragen' },
+  { app: 'private-office', naar: '/apps/lifestyle.html', zoek: null,
+    achtervoegsel: '?bron=rand#kantoor', bewaart: 'bron=rand', fragment: '#kantoor' }
 ];
 
 /* Een schone bezoeker: cookie-melding weg, en GEEN enkele sessiesleutel. Dat
@@ -87,8 +94,8 @@ const STUBS = [
 const SLEUTELS = ['rtg_member_token', 'rtg_office_token', 'rtg_sup_token',
   'rtf_sessie', 'rtf_club_code', 'rtf_raadcode'];
 
-async function toon(page, base, app) {
-  const pad = '/apps/' + app + '.html';
+async function toon(page, base, app, achtervoegsel) {
+  const pad = '/apps/' + app + '.html' + (achtervoegsel || '');
   /* Een meta-refresh met content="0" breekt de navigatie af (ERR_ABORTED) en
      vernielt de context van een evaluate die er middenin valt. Dat is bij deze
      twaalf geen randgeval maar de kern, dus wordt het opgevangen in plaats van
@@ -108,6 +115,7 @@ async function toon(page, base, app) {
   await page.waitForTimeout(1300);
   return page.evaluate(() => ({
     pad: location.pathname + location.search,
+    fragment: location.hash,
     deur: !!document.querySelector('.rtgdeur'),
     tekst: document.body.innerText.replace(/\s+/g, ' ').trim()
   }));
@@ -186,7 +194,7 @@ test('het clubswerk-kantoor toont zijn eigen deur en stuurt niemand meer weg',
   }
 });
 
-test('de twee doorverwijsstubs komen echt op de personeelsinlog uit',
+test('alle doorverwijsstubs komen echt op hun productpagina uit (' + STUBS.length + ')',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -195,13 +203,17 @@ test('de twee doorverwijsstubs komen echt op de personeelsinlog uit',
     browser = o.browser;
 
     for (const s of STUBS) {
-      const r = await toon(o.page, base, s.app);
+      const r = await toon(o.page, base, s.app, s.achtervoegsel);
       assert.ok(r.pad.startsWith(s.naar),
         s.app + ' komt uit op ' + s.naar + ' (nu: ' + r.pad + ')');
       if (s.zoek) assert.ok(r.pad.includes(s.zoek),
         s.app + ' vraagt de kantoorcode-inlog (' + s.zoek + '): ' + r.pad);
       else assert.equal(r.pad.includes('kantoor=1'), false,
         s.app + ' vraagt juist NIET de kantoorcode-inlog: ' + r.pad);
+      if (s.bewaart) assert.ok(r.pad.includes(s.bewaart),
+        s.app + ' bewaart de context in de query: ' + r.pad);
+      if (s.fragment) assert.equal(r.fragment, s.fragment,
+        s.app + ' bewaart het fragment voor de doelpagina');
       /* En er staat ook echt een inlog, geen half geladen scherm. */
       assert.ok(r.tekst.length > 80, s.app + ': het doel is leeg (' + r.tekst.length + ' tekens)');
     }

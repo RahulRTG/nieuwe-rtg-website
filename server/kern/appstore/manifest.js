@@ -27,7 +27,7 @@
 
 const { isMachtiging, MACHTIGINGEN, NIET_GEBOUWD } = require('./machtigingen');
 
-const SLEUTELS = ['sleutel', 'naam', 'versie', 'uitleg', 'categorie', 'start', 'icoon', 'machtigingen', 'taal'];
+const SLEUTELS = ['sleutel', 'naam', 'versie', 'uitleg', 'categorie', 'start', 'icoon', 'machtigingen', 'taal', 'prijsCenten'];
 const CATEGORIEEN = ['sociaal', 'reizen', 'eten', 'media', 'geld', 'spelen', 'leven', 'veiligheid'];
 const TALEN = ['nl', 'en'];
 
@@ -99,8 +99,29 @@ function lees(ruw) {
     }
   }
 
+  /* DE PRIJS STAAT IN HET MANIFEST, en dat is een besluit en geen plek.
+
+     Een prijs die naast de versie zou leven, kan veranderen zonder dat er
+     iemand naar heeft gekeken -- en dan verkoopt een uitgever morgen voor het
+     tienvoudige wat RTG gisteren heeft goedgekeurd. Hier hoort hij bij de
+     bundel, gaat hij door dezelfde keuring, en betekent een prijswijziging een
+     nieuwe versie met een nieuwe handtekening van een mens.
+
+     De bovengrens is er om dezelfde reden als elke andere grens in dit huis:
+     niet omdat EUR 500 een magisch getal is, maar omdat een bedrag zonder
+     bovengrens een typefout is die niemand tegenhoudt. */
+  let prijs = 0;
+  if (ruw.prijsCenten != null && ruw.prijsCenten !== '') {
+    prijs = Number(ruw.prijsCenten);
+    if (!Number.isInteger(prijs) || prijs < 0 || prijs > 50000) {
+      fout('prijsCenten', 'De prijs is een heel aantal centen, van 0 (gratis) tot 50000 (EUR 500). Laat hem weg als je app gratis is.');
+    } else if (prijs > 0 && prijs < 50) {
+      fout('prijsCenten', 'Een prijs onder de 50 cent kost meer aan afhandeling dan hij opbrengt. Maak hem gratis, of vraag ten minste EUR 0,50.');
+    }
+  }
+
   if (fouten.length) return { ok: false, manifest: null, fouten };
-  return { ok: true, fouten: [], manifest: { sleutel, naam, versie, uitleg, categorie, start, icoon: icoon || null, machtigingen: gevraagd, taal } };
+  return { ok: true, fouten: [], manifest: { sleutel, naam, versie, uitleg, categorie, start, icoon: icoon || null, machtigingen: gevraagd, taal, prijsCenten: prijs } };
 }
 
 module.exports = { lees, SLEUTELS, CATEGORIEEN, TALEN, PAD_VORM, VERSIE_VORM, SLEUTEL_VORM };

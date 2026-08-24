@@ -33,4 +33,32 @@ module.exports = (kern) => {
 
   // het journaal: elke beslissing over een derde, aangroeiend en niet te herschrijven
   app.post('/api/appstore/kantoor/journaal', officeAuth, (req, res) => res.json({ journaal: appstore.journaal(req.body.n) }));
+
+  /* ---- de betaalde kant ----
+     De AFDRACHT geldt voor elke uitgever tegelijk en werkt alleen vooruit: een
+     bon die al is geschreven wordt nooit herrekend. Daarom draagt hij een naam
+     en een reden, en staat hij in het journaal.
+
+     De TERUGGAVERECHTEN zijn wat er overblijft als RTG of een uitgever een app
+     intrekt die iemand had gekocht (kern/appstore/teruggave.js). Ze worden
+     KLAARGEZET; hier beslist een mens, en pas dan beweegt er geld. */
+  const geld = () => appstore.geld;
+  const geenGeld = (res) => res.status(503).json({ error: 'De betaallaag draait niet mee.', nietGebouwd: 'RTG Pay is in dit proces niet gemount.' });
+
+  app.post('/api/appstore/kantoor/afdracht', officeAuth, (req, res) => {
+    if (!geld()) return geenGeld(res);
+    if (req.body.procent == null) return res.json({ afdracht: geld().afdracht(), max: geld().AFDRACHT_MAX });
+    antwoord(res, geld().afdrachtZet({ procent: req.body.procent, reden: req.body.reden, door: naam(req) }));
+  });
+
+  app.post('/api/appstore/kantoor/teruggaven', officeAuth, (req, res) => {
+    if (!geld()) return geenGeld(res);
+    res.json({ open: geld().openRechten(),
+      let: 'Een ingetrokken app die iemand had gekocht, laat een recht achter. Terugbetalen of afwijzen is een besluit van een mens; er gebeurt hier niets vanzelf.' });
+  });
+  app.post('/api/appstore/kantoor/teruggave', officeAuth, async (req, res) => {
+    if (!geld()) return geenGeld(res);
+    antwoord(res, await geld().rechtDoe({ id: req.body.id, besluit: String(req.body.besluit || ''),
+      reden: req.body.reden, door: naam(req), idem: req.body.idem }));
+  });
 };

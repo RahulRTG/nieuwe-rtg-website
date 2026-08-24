@@ -47,7 +47,7 @@ const { INZENDINGEN_PER_UUR } = require('./versies');
 const STATUS_UITGEVER = ['aangevraagd', 'toegelaten', 'geweigerd', 'geschorst'];
 const STATUS_VERSIE = ['wacht-op-mens', 'gepubliceerd', 'geweigerd', 'ingetrokken'];
 
-function maakAppstore({ db, save, dir, antivirus, log }) {
+function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier }) {
   const opslag = maakOpslag({ dir, log });
   const nu = () => datum().toISOString();
   const id = (p) => p + crypto.randomBytes(6).toString('hex');
@@ -144,13 +144,20 @@ function maakAppstore({ db, save, dir, antivirus, log }) {
   /* En het aftekenen apart daarvan (./besluit.js): dat is de ENIGE plek waar een
      versie live gaat, en die scheiding is de reden dat grens 2 na te lezen is
      zonder de hele motor door te moeten. */
-  const { wachtrij, besluit, intrekken, mijnUitgeverij } =
+  const { wachtrij, besluit, intrekken: intrekkenKaal, mijnUitgeverij } =
     require('./besluit')({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV });
+
+  /* De naad met het geld (./naad.js): daar wordt de betaalde kant opgebouwd en
+     wordt intrekken uitgebreid met de teruggaverechten. Apart bestand omdat het
+     een NAAD is en geen laag -- het is de enige plek waar de store en het geld
+     elkaar raken, en dat hoort een naam te hebben. */
+  const { geld, intrekken } = require('./naad')({
+    S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier, intrekkenKaal });
 
   const motor = { S, journaal, boek, opslag, nu, save,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,
-    publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER };
+    publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER, geld };
 
   /* De drie lagen komen als EEN geheel naar buiten. Zou de winkel of de brug
      apart moeten worden opgebouwd, dan is er een volgorde die iemand fout kan

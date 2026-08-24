@@ -58,6 +58,14 @@ module.exports = (kern) => {
     return Object.assign({ status: 200 }, r);
   }));
 
+  /* Wat mijn verkopen hebben opgeleverd: aantallen en bedragen, nooit wie. Een
+     uitgever hoort niet te kunnen zien welk lid zijn app kocht -- ook niet op
+     codenaam, want een codenaam plus een tijdstip is een spoor. */
+  app.post('/api/appstore/uitgever/omzet', supplierAuth, metOrg((req, o) => {
+    if (!appstore.geld) return { status: 503, error: 'De betaallaag draait niet mee.', nietGebouwd: 'RTG Pay is in dit proces niet gemount.' };
+    return Object.assign({ status: 200 }, appstore.geld.omzet(o.org));
+  }));
+
   // wat een lid straks te zien krijgt bij een van mijn apps
   app.post('/api/appstore/uitgever/voorbeeld', supplierAuth, metOrg((req, o) => {
     const a = appstore.app(req.body.sleutel);

@@ -115,6 +115,7 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      De drie lagen komen als een geheel binnen: motor, winkel en brug. Zie
      APPSTORE.md voor de zes begrippen en de zes grenzen. */
   Object.assign(kern, require('../kern/appstore').maakAppstore({
-    db, save, dir: DATA_DIR, antivirus: kern.antivirus, log: (t) => { try { require('../log').log.warn(t); } catch (e) { console.warn(t); } } }));
+    db, save, dir: DATA_DIR, antivirus: kern.antivirus, pay: kern.pay, findSupplier: kern.findSupplier,
+    log: (t) => { try { require('../log').log.warn(t); } catch (e) { console.warn(t); } } }));
   require('../routes/appstore')(grens('appstore'));
 };

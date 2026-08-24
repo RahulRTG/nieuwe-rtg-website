@@ -28,56 +28,18 @@ const { toonbaar, isMachtiging } = require('./machtigingen');
 const MAX_PER_LID = 60;
 
 function maakWinkel(kern) {
-  const { S, app, versie, uitgever, publiekV, eigen, nu, boek } = kern;
+  const { S, app, versie, uitgever, eigen, nu, geld } = kern;
   const save = kern.save;
-
-  const live = () => Object.values(S().apps).filter(a => a.live && versie(a.live) && versie(a.live).status === 'gepubliceerd');
-
-  /* Wat een lid over een app te zien krijgt VOORDAT hij iets verleent. De
-     uitgever staat er met naam bij: een app zonder aanspreekbare partij erachter
-     hoort niet in een officiele store. */
-  function kaart(a, key) {
-    const v = versie(a.live);
-    const u = uitgever(a.org);
-    const verleend = verleendeVan(key, a.sleutel);
-    return {
-      sleutel: a.sleutel, naam: v.manifest.naam, uitleg: v.manifest.uitleg,
-      categorie: v.manifest.categorie, taal: v.manifest.taal, versie: v.manifest.versie,
-      uitgever: u ? { org: u.org, naam: u.naam } : null,
-      vraagt: toonbaar(v.manifest.machtigingen),
-      gekeurd: v.besluit ? v.besluit.at : v.at,
-      grootte: v.maten ? v.maten.totaal : null,
-      icoon: v.manifest.icoon ? celPad(a.sleutel, v.hash, v.manifest.icoon) : null,
-      bron: 'derden',
-      geinstalleerd: !!verleend,
-      verleend: verleend ? toonbaar(verleend.machtigingen) : []
-    };
-  }
-
-  const celPad = (sleutel, hash, pad) => '/appcel/' + sleutel + '/' + hash + '/' + pad;
-
-  function catalogus({ zoek, categorie, pagina, per } = {}, key) {
-    const q = String(zoek || '').toLowerCase().trim().slice(0, 60);
-    const c = String(categorie || '').trim();
-    let alles = live().map(a => kaart(a, key));
-    if (c) alles = alles.filter(a => a.categorie === c);
-    if (q) alles = alles.filter(a => (a.naam + ' ' + a.uitleg + ' ' + (a.uitgever ? a.uitgever.naam : '')).toLowerCase().includes(q));
-    alles.sort((x, y) => (x.naam.toLowerCase() < y.naam.toLowerCase() ? -1 : 1));
-    const p = Math.max(1, Math.min(1000, Number(pagina) || 1));
-    const n = Math.max(1, Math.min(48, Number(per) || 24));
-    return { items: alles.slice((p - 1) * n, (p - 1) * n + n), totaal: alles.length, pagina: p,
-      paginas: Math.max(1, Math.ceil(alles.length / n)) };
-  }
+  /* De leeskant (bladeren, de kaart, mijn apps) staat in ./etalage.js; dit
+     bestand is de SCHRIJFkant. Die twee uit elkaar houden is hier meer dan
+     opruimen: alles wat hieronder staat verandert iets aan wat een lid heeft
+     verleend of gekocht, en dat is precies de code die je apart wilt kunnen
+     nalezen. */
+  const E = require('./etalage')(kern);
+  const { celPad, catalogus, mijn, prijsVan, heeftGekocht, rijVan, verleendeVan } = E;
 
   /* ------------------------------------------------------ verlenen en intrekken */
 
-  function rijVan(key) {
-    const v = S().verleend;
-    const k = String(key || '');
-    if (!v[k] || typeof v[k] !== 'object') v[k] = {};
-    return v[k];
-  }
-  const verleendeVan = (key, sleutel) => (key ? eigen(rijVan(key), sleutel) : null);
 
   /* Installeren MET de keuze erbij. `machtigingen` is wat het lid aanvinkt; alles
      wat de app niet vroeg valt weg, en alles wat het lid niet aanvinkte ook. Een
@@ -90,6 +52,15 @@ function maakWinkel(kern) {
     const rij = rijVan(key);
     if (!eigen(rij, sleutel) && Object.keys(rij).length >= MAX_PER_LID) {
       return { status: 400, error: 'Je hebt het maximum van ' + MAX_PER_LID + ' apps van derden bereikt; haal er eerst een weg.' };
+    }
+    /* EEN BETAALDE APP GAAT PAS OP HET STARTSCHERM ALS HIJ IS GEKOCHT, en dat
+       wordt HIER gecontroleerd en niet in het scherm. Een winkel die op de
+       knop vertrouwt, is een winkel waar de knop weg te laten is. 402 is de
+       juiste code: dit is geen verbod maar een openstaande betaling, en de
+       prijs gaat mee zodat het scherm de bon kan halen. */
+    if (prijsVan(v) > 0 && !heeftGekocht(key, sleutel)) {
+      return { status: 402, error: 'Deze app kost geld; koop hem eerst in de App Store.',
+        prijsCenten: prijsVan(v), moetKopen: true };
     }
     const gevraagd = v.manifest.machtigingen;
     const lijst = (Array.isArray(gekozen) ? gekozen : []).map(String)
@@ -137,23 +108,6 @@ function maakWinkel(kern) {
     return { status: 200, ok: true };
   }
 
-  /* Mijn apps. Een ingetrokken of geschorste app valt hier VANZELF weg: er wordt
-     niets opgeruimd bij het intrekken, want opruimen is een tweede plek waar de
-     waarheid kan achterlopen (LAT-regel 4). De verlening blijft staan zodat een
-     nieuwe versie van dezelfde app niet opnieuw om alles hoeft te vragen. */
-  function mijn(key) {
-    const rij = rijVan(key);
-    const uit = [];
-    for (const sleutel of Object.keys(rij)) {
-      const a = app(sleutel);
-      if (!a || !a.live) continue;
-      const v = versie(a.live);
-      if (!v || v.status !== 'gepubliceerd') continue;
-      uit.push(kaart(a, key));
-    }
-    return uit.sort((x, y) => (x.naam.toLowerCase() < y.naam.toLowerCase() ? -1 : 1));
-  }
-
   /* Wat de celpagina nodig heeft om een app te openen. Hier en nergens anders
      wordt bepaald WELKE bundel er draait: de celroute leest dit niet uit de URL
      maar controleert hem hiertegen. */
@@ -164,6 +118,12 @@ function maakWinkel(kern) {
     if (!v || v.status !== 'gepubliceerd') return { status: 404, error: 'Deze app is niet (meer) beschikbaar.' };
     const verleend = verleendeVan(key, sleutel);
     if (!verleend) return { status: 403, error: 'Zet deze app eerst in de App Store op je startscherm; dan kies je ook wat hij mag.' };
+    /* En hij blijft dicht als de aanschaf er niet (meer) is. Dat kan: een lid
+       dat een app verwijderde en terugzet, komt langs installeer(); een lid dat
+       hem hield terwijl de prijs van nul naar iets ging, komt hier. */
+    if (prijsVan(v) > 0 && !heeftGekocht(key, sleutel)) {
+      return { status: 402, error: 'Deze app kost geld; koop hem in de App Store.', prijsCenten: prijsVan(v), moetKopen: true };
+    }
     const u = uitgever(a.org);
     return { status: 200, ok: true, sleutel, hash: v.hash, start: celPad(sleutel, v.hash, v.manifest.start),
       naam: v.manifest.naam, versie: v.manifest.versie, taal: v.manifest.taal,

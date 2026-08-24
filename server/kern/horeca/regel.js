@@ -45,6 +45,7 @@ module.exports = ({ schoon, horeca }) => {
 
     const regel = {
       id: id(3),
+      itemId: schoon(b.itemId, 60) || null,
       naam,
       aantal: Math.max(1, Math.min(99, parseInt(b.aantal, 10) || 1)),
       centen: happy ? Math.round(prijs * (100 - happy.procent) / 100) : prijs,
@@ -57,6 +58,10 @@ module.exports = ({ schoon, horeca }) => {
       /* Allergie is een eigen veld en geen notitie. In een vrij notitieveld
          verdwijnt hij tussen "zonder ui" en "extra krokant". */
       allergie: schoon(b.allergie, 120) || null,
+      opties: Array.isArray(b.opties) ? b.opties.slice(0, 40) : [],
+      ingredienten: Array.isArray(b.ingredienten) ? b.ingredienten.slice(0, 60).map(x => schoon(x, 40)).filter(Boolean) : [],
+      allergenen: Array.isArray(b.allergenen) ? b.allergenen.slice(0, 24).map(x => schoon(x, 30)).filter(Boolean) : [],
+      prepMin: b.prepMin == null ? null : Math.max(1, Math.min(180, parseInt(b.prepMin, 10) || 12)),
       gastNr: b.gastNr == null ? null : Math.max(1, Math.min(99, parseInt(b.gastNr, 10) || 1)),
       stand: 'besteld',
       at: nu(),

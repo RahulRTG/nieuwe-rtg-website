@@ -35,7 +35,14 @@
    datum valt er niets te verlopen en hoort de opschoning bij de functie zelf
    (zie kern/zelfzorg/opruimen.js voor de 24-uursregels). */
 
-const { BELEID, DAG } = require('./bewaarbeleid');
+/* Het beleid komt uit TWEE bestanden en wordt hier samengevoegd, niet in de
+   tabel zelf: ./bewaarbeleid.js zat al op 98% van de 10 kB-grens, en de takken
+   met eigen regie zijn bovendien een ander soort regel (een termijn waarvan de
+   klok elders loopt en waar veeg() van afblijft). Ze bij elkaar zetten in de
+   MOTOR is de goede plek -- die kent het verschil al. */
+const { BELEID: GEWONE_TERMIJNEN, DAG } = require('./bewaarbeleid');
+const { EIGEN_REGIE } = require('./bewaarbeleid-eigenregie');
+const BELEID = GEWONE_TERMIJNEN.concat(EIGEN_REGIE);
 
 const msVan = (v) => {
   if (v == null) return NaN;
@@ -57,6 +64,15 @@ function perItem(data, regel, doe) {
     data[regel.tak] = houd;
     return;
   }
+  /* EIGEN REGIE: een map van OBJECTEN (niet van lijsten) waarvan de klok ergens
+     anders woont. Alleen lezen, zodat rapport() hem kan tellen; veeg() komt hier
+     niet eens langs (zie daar). Zou hij dat wel doen, dan wist hij op een
+     aanmaakdatum wat op een opzegdatum hoort te verlopen. */
+  if (regel.vorm === 'eigenRegie') {
+    if (typeof bron !== 'object' || Array.isArray(bron)) return;
+    for (const sleutel of Object.keys(bron)) doe(bron[sleutel]);
+    return;
+  }
   if (regel.vorm === 'mapVanLijsten') {
     if (typeof bron !== 'object') return;
     for (const sleutel of Object.keys(bron)) {
@@ -76,16 +92,21 @@ function rapport(db) {
   for (const r of BELEID) {
     const grens = nu - r.dagen * DAG;
     let totaal = 0, verlopen = 0, oudste = null;
+    const eigen = r.vorm === 'eigenRegie';
     perItem(data, r, (item) => {
       totaal++;
       const t = msVan(item && item[r.datum]);
-      if (!Number.isNaN(t)) { if (oudste == null || t < oudste) oudste = t; if (t < grens) verlopen++; }
+      /* Bij eigen regie NIET tegen de grens leggen: die datum is een
+         aanmaakmoment en geen verloopmoment, en "verlopen: 12" zou hier lezen
+         als twaalf klanten die weg hadden gemoeten. */
+      if (!Number.isNaN(t)) { if (oudste == null || t < oudste) oudste = t; if (!eigen && t < grens) verlopen++; }
       return false; // niets verwijderen
     });
     regels.push({
       tak: r.tak, label: r.label, grond: r.grond, waarom: r.waarom,
       termijn: r.dagen >= 365 ? Math.round(r.dagen / 365) + ' jaar' : r.dagen + ' dagen',
-      totaal, verlopen, oudste: oudste == null ? null : new Date(oudste).toISOString().slice(0, 10)
+      totaal, verlopen: eigen ? null : verlopen, eigenRegie: eigen ? r.regie : null,
+      oudste: oudste == null ? null : new Date(oudste).toISOString().slice(0, 10)
     });
   }
   return { at: new Date().toISOString(), regels, verlopenTotaal: regels.reduce((n, r) => n + r.verlopen, 0) };
@@ -99,6 +120,11 @@ function veeg(db, opties) {
   const nu = Date.now();
   const gedaan = [];
   for (const r of BELEID) {
+    /* De veger komt niet aan een tak met eigen regie. Die klok loopt elders en
+       op een ander veld; hier meekijken zou betekenen dat twee motoren dezelfde
+       gegevens mogen wissen, en de generieke van de twee kent de uitzonderingen
+       niet (een bewaringsplicht, een lopende opzegging). */
+    if (r.vorm === 'eigenRegie') continue;
     const grens = nu - r.dagen * DAG;
     let n = 0;
     perItem(data, r, (item) => {

@@ -658,6 +658,11 @@
   .func-tel{font-size:0.68rem;font-weight:600;color:var(--soft);white-space:nowrap;}
   .func-tel.let{color:var(--amber);}
   .func-body{margin-bottom:1rem;}
+  .eten-werk{margin:1rem 0 1.4rem;background:#121516;border:1px solid #2d3434;border-radius:18px;padding:1rem;color:#eef2ee;box-shadow:0 18px 48px rgba(0,0,0,.2)}
+  .eten-werk h3,.eten-werk h4{color:#fff}.eten-kop{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;flex-wrap:wrap}.eten-kop p{font-size:.72rem;color:#9ba7a2;margin-top:.2rem}.eten-live{display:flex;align-items:center;gap:.35rem;color:#7ee0a3;font-size:.68rem}.eten-live:before{content:'';width:7px;height:7px;border-radius:50%;background:#7ee0a3;box-shadow:0 0 10px rgba(126,224,163,.65)}
+  .eten-rollen,.eten-filters,.eten-samenvatting{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem}.eten-rollen button,.eten-filters button{border:1px solid #3a4442;background:#1c2221;color:#bfc8c4;border-radius:999px;padding:.42rem .7rem;font-size:.68rem}.eten-rollen button.aan,.eten-filters button.aan{background:#e5b75a;color:#211b11;border-color:#e5b75a;font-weight:750}.eten-zoeken{display:flex;gap:.45rem;margin-top:.75rem}.eten-zoeken input{margin:0;background:#0d1010;border-color:#35403d;color:#fff}.eten-zoeken button{white-space:nowrap}.eten-samenvatting span{padding:.3rem .55rem;border:1px solid #303938;border-radius:8px;font-size:.68rem;color:#bac3bf}.eten-samenvatting b{color:#fff}
+  .eten-cap{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.55rem;margin-top:.8rem;padding:.75rem;background:#1a201f;border-radius:12px}.eten-cap label{font-size:.65rem;color:#9ca8a3}.eten-cap input{margin-top:.25rem;background:#0e1211;border-color:#38433f;color:#fff}.eten-cap .eten-breed{grid-column:1/-1}.eten-capadvies{grid-column:1/-1;color:#d4bd86;font-size:.7rem;line-height:1.45}.eten-pauzes{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.35rem}.eten-pauzes label{border:1px solid #38433f;border-radius:999px;padding:.3rem .48rem;color:#c6ceca}.eten-pauzes input{width:auto;margin:0 .25rem 0 0}
+  .eten-orders{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.7rem;margin-top:.8rem}.eten-order{background:#1a1f1e;border:1px solid #303837;border-radius:14px;padding:.8rem;min-width:0}.eten-order.vertraagd{border-color:#a8733b}.eten-orderkop{display:flex;justify-content:space-between;gap:.6rem}.eten-orderkop h4{font-size:1rem}.eten-orderkop p{font-size:.65rem;color:#9ca6a2;margin-top:.2rem}.eten-fase{font-size:.62rem;border-radius:999px;background:#284637;color:#9cf0bc;padding:.3rem .48rem;height:max-content;white-space:nowrap}.eten-product{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.48rem 0;border-bottom:1px solid #2d3433;font-size:.76rem}.eten-product small{display:block;color:#9ca6a2;margin-top:.15rem}.eten-alert{margin-top:.5rem;padding:.45rem;background:#3b2922;color:#ffd9a4;border-radius:8px;font-size:.68rem}.eten-perfect{margin-top:.55rem;color:#c8b27c;font-size:.67rem;line-height:1.45}.eten-meta{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}.eten-meta span{font-size:.62rem;color:#aeb8b3;border:1px solid #34403d;border-radius:999px;padding:.24rem .4rem}.eten-actie{display:flex;justify-content:space-between;align-items:center;gap:.5rem;margin-top:.65rem}.eten-actie strong{font-size:.78rem;color:#fff}.eten-leeg{padding:1rem;color:#9ca6a2;font-size:.75rem;text-align:center}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -738,6 +743,7 @@
         <h2 data-i18n="sup.v.orders">Bestellingen</h2>
         <p class="sub" data-i18n="sup.v.orders.sub">Live van RTG-gasten. Werk de status bij of stort terug.</p>
         <div id="resWrap"></div>
+        <div id="etenWerkblad"></div>
         <div id="orderList"></div>
       </div>
       <div class="view" data-view="rides">

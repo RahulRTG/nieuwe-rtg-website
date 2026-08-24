@@ -85,6 +85,10 @@ module.exports = function hangRoutesOp(kern) {
      binnen, met een eigen levensloop (koppelingen, providers), en het moet ook
      draaien als het auth-domein apart is opgestart. */
   require('../routes/sso')(grens('sso'));
+  /* De SAML-kant van dezelfde poort. Apart bestand omdat het vervoer anders is
+     (een POST met een formulier in plaats van een code in de URL), maar hij komt
+     uit op hetzelfde claimcontract en loopt daarna door sso/binnenkomst.js. */
+  require('../routes/sso-saml')(grens('sso'));
   /* SCIM: de provisioning-deur voor de IdP van een klant. Eigen auth (een sleutel
      per organisatie), dus bewust naast de gewone routes en niet in een domein. */
   require('../routes/scim')(grens('scim'));

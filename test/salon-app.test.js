@@ -63,6 +63,24 @@ test('je eigen post staat altijd in je eigen profiel', async () => {
   assert.ok(p.raster.posts.some(x => x.text === 'Een eerste notitie in De Salon.'));
 });
 
+test('Mooi zet de gewenste stand expliciet en kan die ook weer terugzetten', async () => {
+  const a = await lid();
+  const geplaatst = await json(await raw('/salon/plaats', { tekst: 'Een moment om te bewaren.' }, a.token));
+  const id = geplaatst.post.id;
+
+  const aan = await json(await raw('/like', { postId: id, liked: true }, a.token));
+  assert.equal(aan.likes, 1);
+  let feed = await json(await raw('/salon/feed', {}, a.token));
+  let post = feed.posts.find(p => p.id === id);
+  assert.ok(post && post.liked && post.likes === 1, 'de feed leest dezelfde gekozen stand terug');
+
+  const uit = await json(await raw('/like', { postId: id, liked: false }, a.token));
+  assert.equal(uit.likes, 0);
+  feed = await json(await raw('/salon/feed', {}, a.token));
+  post = feed.posts.find(p => p.id === id);
+  assert.ok(post && !post.liked && post.likes === 0, 'de tweede keuze zet Mooi weer uit');
+});
+
 test('de muur van 60 is weg: paginering loopt er straal doorheen', async () => {
   const a = await lid();
   for (let i = 0; i < 65; i++) await raw('/salon/plaats', { tekst: 'Notitie nummer ' + i + ' #reeks' }, a.token);

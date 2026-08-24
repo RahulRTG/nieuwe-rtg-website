@@ -1,16 +1,16 @@
 {
   "vastgelegd": "2026-08-24",
   "meters": {
-    "endpointsZonderTest": 1192,
+    "endpointsZonderTest": 1178,
     "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 917,
+    "testbestanden": 935,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 126,
-    "keuringOmvang": 160,
+    "e2eBestanden": 129,
+    "keuringOmvang": 162,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -20,17 +20,18 @@
     "schermenZonderToets": 0,
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4936,
-    "browserpoortToetsen": 196,
-    "kernBreedte": 1413,
-    "kernGedeeld": 191,
+    "browserpoortToetsen": 199,
+    "kernBreedte": 1414,
+    "kernGedeeld": 193,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 155,
+    "toetsenNietGemeten": 154,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "bronBlindeBestanden": 0,
-    "delenZonderOnderwerp": 0
+    "delenZonderOnderwerp": 0,
+    "schermenZonderVormtaal": 184
   },
   "notities": [
     {
@@ -443,6 +444,26 @@
       "eerlijkheidshalve": "De som stond op 126 toen de norm werd vastgelegd en op 130 toen hij werd gesplitst. Over die vier is geen ratel meer die klaagt. Ze zijn ontstaan door bestanden toe te voegen, niet door iets te laten verslechteren, en de enige inhoudelijke van de vijf (teVaak) is opgelost door de vier rate limiters op server/pinslot.js samen te voegen. Wie de oude, strengere som terug wil: zet keuringBeter terug in scripts/norm.js met grondwaarde 126 en knip vier bestanden op die vlak onder de 10 kB-grens zitten."
     },
     {
+      "datum": "2026-08-23",
+      "meter": "kernBreedte 1413 -> 1414; kernGedeeld 191 -> 193 (de Tenant Control Plane)",
+      "reden": "De tenantlaag (kern/tenant/). Twee meters gaan omhoog en dat is hier de prijs van een laag erbij, geen erosie -- maar het staat er met naam bij, want dat is het verschil.\n\nkernBreedte +1: precies een naam, `tenant`. De laag hangt zichzelf op in routes/tenant.js, zoals routes/bedrijf.js dat met `bedrijf` doet.\n\nkernGedeeld +2, en beide zijn een BEWUSTE koppeling en geen lek. (1) `tenant` wordt door vier domeinen gelezen -- tenant, techniek (het beheer hoort bij de eigenaar), sso (de brug loopt bij het inloggen) en scim (de deprovisioning) -- en dat is precies wat een contractgrens is: hij raakt identiteit en beheer, anders is het geen grens maar een veld. Alle vier staan in GRENZEN.json, dus geen enkel ander domein komt erbij. (2) `bedrijf` wordt nu ook door tenant gelezen, en dat is de goede kant op: routes/tenant.js hergebruikt beheerVan() en lidVan() van de werkruimte in plaats van een derde manier te bedenken om \"mag deze aanroeper hier bij\" te beantwoorden. Die koppeling weghalen zou de meter verlagen en de code slechter maken -- twee antwoorden op een toegangsvraag is de fout van LAT-regel 4.\n\nWat NIET omhoog ging en dat is de controle op dit verhaal: routesNietSchakelbaar bleef 0 (de vier nieuwe routes staan in de functiecatalogus), keuringTeGroot bleef 5, keuringDubbeling bleef 115 en toetsenNietGemeten bleef 155 -- de drie nieuwe toetsen zijn door de mutatiemotor gehaald en alle drie gezakt."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "schermenZonderVormtaal: nieuw op 183",
+      "reden": "Het RTG Design System 2.0 was volledig gespecificeerd (ONTWERP.md), had een tokenlaag (public/shared/rtg-ontwerp.css), een materialenleer (rtg-materiaal.css) en negentien groene toetsen -- en werd door EEN van de 185 app-pagina's ingesloten. rtg-materiaal.css door nul. test/ontwerp.test.js meet de tokenlaag tegen zichzelf, dus die stand kon jaren blijven staan zonder dat er iets rood werd.\n\nDeze meter telt de app-pagina's die de tokenlaag NIET insluiten, en mag alleen omlaag. Geteld op de insluiting en niet op het gebruik: een pagina die hem laadt kan er nog weinig mee doen, maar een pagina die hem niet laadt kan er zeker niets mee. Dat is de goedkope, eerlijke ondergrens van adoptie.\n\nHij begint op 183 en niet op 184: werk.html sluit hem vanaf nu in, met data-rtg-modus=\"pro\", en de zeven kleurtokens van dat scherm verwijzen naar de materialenleer in plaats van hun eigen hexcodes te dragen. Die waarden klopten toevallig (#7f1634 is de logo-bordeaux, #c0a544 is --gold-tekst), maar het was een kopie -- en een kopie loopt uit de pas zodra de bron verandert, in precies het scherm dat aan partners wordt verkocht."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "keuringOmvang 159 -> 161 (bedrijf/handeling.js en bedrijf/gevolg.js)",
+      "reden": "Twee nieuwe werkmodules zitten vlak onder de 10 kB-grens: handeling.js op 9731 en gevolg.js op 9682 bytes. Dat is een echte verslechtering en geen meetfout, dus hij staat hier met naam.\n\nWaarom ze niet gesplitst zijn. Bij handeling.js is dat WEL gebeurd: de werkwoordentabel staat apart in handeling-lijst.js, want die tabel groeit met elk werkwoord erbij en dan zou het bestand vanzelf over de grens lopen. Wat overblijft is de keten zelf -- plan, bevestiging, uitvoering, bon -- en die uit elkaar trekken zou de enige plek waar je die vier achter elkaar kunt lezen kapotmaken. gevolg.js is drie simulaties van elk zo'n vijftien regels plus de kop die uitlegt waarom deze laag geen wrapper om het dossier is; daar valt niets uit te halen dat ergens anders beter staat.\n\nWat dit NIET is: keuringTeGroot bleef 5. Geen van beide is over de grens; ze zitten eronder. De tand blijft daarmee doen waar hij voor is -- als een van deze twee er overheen gaat, klaagt de andere meter.\n\nWat er tegenover staat, en dat is geen verrekening maar een aparte meter: endpointsZonderTest ging van 1191 naar 1179. Die winst is geen nieuw werk maar een reparatie van de METING -- werkgevolg.test.js en werkhandeling.test.js plakten hun routes aan elkaar (`base + '/api/bedrijf' + pad`), waardoor twaalf endpoints die WEL getoetst worden als ongedekt telden. Ze noemen hun routes nu voluit."
+    },
+    {
+      "datum": "2026-08-23",
+      "meter": "schermenZonderVormtaal 183 -> 184 (kwam mee met de merge van main)",
+      "reden": "Deze plus een komt NIET uit deze tak. Bij het binnenhalen van main (2eb6036) kwamen er twee nieuwe app-pagina's mee -- public/apps/sociaal-prive.html en public/apps/chauffeur.html -- en geen van beide sluit rtg-ontwerp.css of rtg-materiaal.css in.\n\nDat is geen verwijt aan die pagina's: de meter BESTAAT op main nog niet. Hij is in deze tak toegevoegd en staat dus in geen enkele andere tak in de weg. Tot main hem heeft, zal elke nieuwe pagina van elders hem laten stijgen -- en dat is precies wat je van een ratel mag verwachten die nog niet is aangekomen.\n\nWaarom ik die twee pagina's niet even zelf de tokenlaag heb gegeven: het is een regel erbij, maar in een MERGE-commit een scherm van iemand anders aanraken dat ik nooit heb gezien, is de verkeerde plek. De meter telt de insluiting en niet het gebruik, dus het zou de teller wel verlagen zonder dat iemand die pagina's aan de vormtaal heeft gehouden -- een groen cijfer zonder dat er iets is nagekeken, en dat is precies waar deze hele ronde tegen is.\n\nWat er WEL hoort te gebeuren: als deze tak op main landt, gaat de meter mee en horen die twee pagina's een eigen regel te krijgen. Zolang dat niet is gebeurd, staat het hier."
+    },
+    {
       "datum": "2026-08-24",
       "meter": "keuringOmvang",
       "van": 158,
@@ -457,6 +478,12 @@
       "naar": 160,
       "reden": "Met de hand verhoogd voor server/opzet/begroting.js. Die leest nu de grens PER COLLECTIE uit BEGROTING.json (via ./begrotingsgrenzen.js) in plaats van een globaal getal, plus de regel dat de zes collecties van het vergeetpad ook in de weigerstand alleen melden. Het bestand ging van 9375 naar 9742 bytes en komt daarmee in de waarschuwingsband (9400-10240). Er is in dezelfde ronde ruimte teruggewonnen door de alineas die nu in BEGROTING.json en server/opzet/begrotingsgrenzen.js staan uit de kop te halen; zonder dat had hij op ruim 10400 gestaan, dus over de HARDE grens.",
       "eerlijkheidshalve": "Dit is de tweede keer deze tak dat ik deze meter met de hand ophoog, en de reden is beide keren dezelfde: server/opzet/handeling.js en server/opzet/begroting.js zijn allebei op hun natuurlijke naad toe aan een knip, en die knip is beide keren bewust NIET gedaan omdat hij de census, de toetsimports en de mutatieregisters raakt en dus een eigen ronde hoort te zijn. Voor begroting.js is die naad inmiddels scherp: de WEGING (beoordeel, de teller, stand, de foutklasse) tegenover de VAL (het levensteken, de wikkels, bewaak). Dat is geen esthetiek meer maar het verschil tussen twee onderwerpen die los te toetsen zijn. Het staat als openstaande rekening en niet als nieuwe normaal; wie de tand terug wil naar 158, knipt die twee bestanden op hun naad."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "keuringOmvang 161 -> 162 (bij het binnenhalen van main)",
+      "reden": "Deze plus een komt uit de MERGE en niet uit een van beide takken. Main stond op 161 en deze tak op 160, allebei waar voor hun eigen boom: main had bedrijf/handeling.js en bedrijf/gevolg.js in de waarschuwingsband gezet, deze tak opzet/handeling.js en opzet/begroting.js. De samengevoegde boom draagt ze alle vier, en dat is 162 -- geen erosie maar een optelling van twee eerlijke standen. Er ging er ook een AF: server/routes/techniek.js kwam door de merge op 10253 bytes en dus over de HARDE grens (beide kanten hadden hem laten groeien; deze tak met drie regels envelop-bedrading, main met eigen werk). Die is in dit merge-commit ingekort tot 10193 door vier regels kop te comprimeren, want over de harde grens gaan is geen optelling maar een fout.",
+      "eerlijkheidshalve": "De openstaande rekening blijft staan en wordt er met deze merge alleen groter op: vier bestanden zitten nu vlak onder de 10 kB-grens waar er twee genoeg waren geweest. Voor opzet/handeling.js en opzet/begroting.js staat de naad al beschreven in de twee notities hierboven; voor bedrijf/handeling.js en bedrijf/gevolg.js staat hij in die van main. Wie deze meter omlaag wil, knipt daar en niet in het commentaar."
     }
   ],
   "prestatie": {

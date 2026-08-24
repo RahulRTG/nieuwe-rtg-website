@@ -3,8 +3,8 @@
   "hoe": "node scripts/klok.js --top",
   "gemeten": {
     "totaal": 1284,
-    "bestanden": 655,
-    "modulesOpDeKlok": 36
+    "bestanden": 662,
+    "modulesOpDeKlok": 69
   },
   "vrijgesteld": [
     {
@@ -19,5 +19,6 @@
       "bestand": "server/routelog.js",
       "reden": "meetgereedschap; een journaal met een verzette tijdstempel is onbruikbaar"
     }
-  ]
+  ],
+  "reden": "Met de hand gelijkgezet bij het binnenhalen van main (24 augustus). Deze tak droeg al 1284 en main 1283; de merge nam main's getal, terwijl de SAMENGEVOEGDE boom er 1284 telt. Dat is dus geen nieuwe schuld maar een verkeerd opgeloste botsing tussen twee registers die allebei waar waren voor hun eigen boom. Wat er WEL uit main meekomt en beter is: modulesOpDeKlok ging van 36 naar 69 en bestanden van 655 naar 662 -- main heeft in de tussentijd tweeendertig modules op de tijdmachine gezet."
 }

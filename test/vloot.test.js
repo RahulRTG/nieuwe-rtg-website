@@ -9,6 +9,8 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+/* Alleen voor het geduld: zie de kop van geduldFactor() in helper.js. */
+const { geduldFactor } = require('./helper');
 
 const POORT = 4200 + Math.floor(Math.random() * 60);  // de gateway
 const BASIS = POORT + 100;                            // groepspoorten: leden, kantoor, rtf
@@ -43,7 +45,15 @@ async function wachtTot(fn, ms = 20000) {
    terugkomt). Twee getallen voor dezelfde vraag lopen uiteen (LAT-regel 4).
    Een poll kost niets; een vloot die er echt niet komt zakt straks net zo
    hard, alleen later. */
-const OPKOMST = 120000;
+/* EN HET GELDT PER MACHINE, want dat was de tweede helft van dezelfde les.
+   Deze teller is al een keer opgehoogd omdat vier processen niet binnen dertig
+   seconden opkwamen; op een VOLLE machine is ook honderdtwintig te krap. Zo
+   bleef deze toets flaky nadat de drie echte races eruit waren: geen crash,
+   geen foutregel, alleen een groep die er nog niet was. helper.js schaalde het
+   geduld voor een ENKELE server al mee met de belasting -- die formule heeft
+   daar nu een naam, en hier wordt hij gebruikt in plaats van nagemaakt. */
+const { factor: GEDULD, druk: DRUK } = geduldFactor();
+const OPKOMST = 120000 * GEDULD;
 
 test.before(async () => {
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {
@@ -70,7 +80,8 @@ test.before(async () => {
     return a && b && c;
   }, OPKOMST);
   assert.ok(klaar, 'de vloot (3 groepen + poortwachter) komt op binnen ' +
-    Math.round(OPKOMST / 1000) + 's; laatste stand per groep: ' + JSON.stringify(stand));
+    Math.round(OPKOMST / 1000) + 's (belasting ' + DRUK + ' per kern, geduldfactor ' + GEDULD +
+    '); laatste stand per groep: ' + JSON.stringify(stand));
 });
 test.after(() => {
   if (vloot) try { vloot.kill('SIGTERM'); } catch (e) {}

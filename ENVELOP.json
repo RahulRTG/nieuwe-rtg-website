@@ -4,10 +4,10 @@
   "gemeten": {
     "veldenZonderHuis": 3,
     "actorVormen": 7,
-    "routesZonderEnvelop": 360,
-    "routesMetEnvelop": 3346,
-    "routesMetPoortwachter": 3349,
-    "routesTotaal": 3706
+    "routesZonderEnvelop": 373,
+    "routesMetEnvelop": 3366,
+    "routesMetPoortwachter": 3369,
+    "routesTotaal": 3739
   },
   "veldenZonderHuis": [
     {
@@ -139,5 +139,6 @@
       "wat": "Het kantoortoken is anoniem: officeAuth laat in de kantoor-tak niets op het verzoek achter. Bij de documentenuitgifte MET vier-ogenprincipe wordt de ondertekenaar daarom uit de body gelezen (req.body.wie), dus de identiteit onder een handtekening is een tekenreeks die de aanroeper zelf typt.",
       "ernst": "Dit is een gedocumenteerd ONTWERPGEVOLG en geen slordigheid -- de kop van routes/uitgifte.js zegt het zelf. RTG heeft hetzelfde gat elders al herkend en dichtgezet: boardroomAuth weigert het anonieme kantoortoken juist omdat het geen identiteit draagt. SINDS DE ENVELOPRONDE IS HIJ ZICHTBAAR EN NIET OPGELOST: officeAuth zet nu wel een envelop, maar die draagt identiteit 'anoniem' zodra de sessie geen lidKey heeft -- precies wat het is. Wat nog niet gebeurt is dat de vier-ogen-uitgifte daar iets mee DOET; hij leest nog steeds req.body.wie. De reparatie is een besluit en geen code: of het kantoor krijgt een sessie met een persoon (zoals de leverancierskant met req.actor), of de uitgifte weigert een anonieme envelop zoals de boardroom dat doet."
     }
-  ]
+  ],
+  "reden": "routesZonderEnvelop met de hand van 360 naar 373 bij het binnenhalen van main (24 augustus). Die dertien komen NIET uit deze tak: main voegde 33 routes toe, waarvan er twintig via een bestaande poortwachter al een envelop dragen en dertien buiten de elf geregistreerde poortwachters vallen. Ze een envelop geven betekent routes aanraken die in deze tak nooit zijn gezien, en dat hoort niet in een merge-commit -- dezelfde afweging die in NORM.json staat bij schermenZonderVormtaal. De ratel blijft doen waar hij voor is: dit getal mag hierna alleen omlaag, en de dertien horen bij de eerstvolgende ronde over die routes een envelop te krijgen."
 }

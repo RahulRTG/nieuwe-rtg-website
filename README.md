@@ -3031,6 +3031,29 @@ motoren (`server/bedrijf/inzicht.js`):
 | `POST /api/bedrijf/samenhang` | De vorm van het geheel: soorten, randen, en wat niet gemeten mocht worden |
 | `POST /api/bedrijf/wandel` `{type, id, diepte}` | Wat er twee stappen verderop ligt — de klant achter het ticket achter het issue |
 
+**Daarnaast twee routes die géén vraag over een object beantwoorden**, en dat
+onderscheid is precies waarom ze niet in de tabel hierboven staan:
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/bedrijf/handeling/plan` · `/doe` · `/bonnen` | De balk mag ook handelen: bedoeling → plan → geraakte objecten → rechtencontrole → bevestiging door een mens → uitvoering → actiebon |
+| `POST /api/bedrijf/gevolg` `{wijziging}` | Wat blijft er **open** als deze wijziging doorgaat — vooruit kijken in plaats van naar binnen |
+
+De handelkant slaat geen schakel over: **plannen verandert niets** (de toets
+legt de hele werkruimte voor en na naast elkaar), **zonder de bevestigingscode
+gebeurt er niets**, en **het recht wordt bij de uitvoering opnieuw gerekend** —
+anders overleeft een plan een rol die intussen is ingetrokken. De lijst
+werkwoorden is gesloten (`bedrijf/handeling-lijst.js`); er is geen algemene
+uitvoerknop.
+
+De gevolgsimulatie is geen tweede lezing van dezelfde graaf. Het dossier kijkt
+naar **binnen** (wat hoort bij dit object), `gevolg` kijkt **vooruit** (wat
+breekt er als het weg is): een taak van iemand anders die op werk van de
+vertrekker wacht, staat in geen enkel dossier van die vertrekker en valt wel
+stil. Er staat geen `save()` in het bestand, hij volgt dezelfde rechten als de
+rest, en wat hij níét rekent — kosten, contracten, controls, terugdraaien —
+staat met reden in élk antwoord.
+
 **Twee assen van scope, en allebei door weglaten.** De werkruimte: elke soort
 draagt een `lees(db)` die alleen zijn eigen werkruimte opent, dus er bestaat
 geen pad waarlangs een rij van een andere organisatie naar buiten komt. En het
@@ -3474,6 +3497,262 @@ Het ontwerpbesluit dat alles draagt: **de Media OS bezit die vier domeinen niet.
 Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. Dat is een andere stroom (een relay-boom over kijkers, met een betaalde toegangsdeur ervoor) en geen kopie van het clip-protocol; de kaart verwijst daarvoor naar het Podium en zegt waarom. Staat als 4.12 in `TAKEN.md`.
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
+
+### RTG Tenant Control Plane (de klant als ding, en het Werk OS onder zijn eigen naam)
+
+`server/kern/tenant/` + `/api/tenant/...` + `/api/techniek/tenant`. Het
+diepte-document is **`TENANT.md`**; hier staat wat er draait.
+
+Dit huis had **drie codes die alle drie "de klant" leken te betekenen** --
+`org` (de sleutel van `sso_koppelingen` en de SCIM-sleutels), de werkruimtecode
+`W...` van het Werk OS, en de leverancierscode -- zonder een draad ertussen.
+Daardoor kon niemand zeggen welke werkruimtes onder welk contract vielen, droeg
+het Werk OS nergens de naam van zijn eigen klant, en moest een medewerker die
+via de provider van zijn werkgever inlogde daarna alsnog met de hand in de
+werkruimte worden gezet -- inclusief het met de hand weer weghalen, wat bij
+uitdiensttreding de stap is die overslaat.
+
+**`org` is vanaf nu de tenant**: de juridische, beveiligings- en contractgrens.
+Een werkruimtecode is een productinstantie daarbinnen, een leverancierscode is
+een zakelijke relatie en nooit een identiteit, en een RTG-account is een mens.
+Er komt geen vierde identiteitsmodel bij; de bestaande worden verbonden. Een
+tenant kan zonder SSO bestaan -- niet elke klant heeft een provider.
+
+| Endpoint | Doel |
+|---|---|
+| `GET/POST /api/techniek/tenant` | De tenants lezen en zetten (eigenaar) |
+| `POST /api/techniek/tenant/bind` `{org, soort, code}` | Een werkruimte of zaak eraan hangen (eigenaar) |
+| `POST /api/techniek/tenant/merk` `{org, merk}` | Het merk van de tenant (eigenaar) |
+| `POST /api/tenant/bootstrap` | Wie bedient dit scherm: tenant, werkruimte, merk, rollen, rechten |
+| `POST /api/tenant/bootstrap/mijn` | Hetzelfde via de eigen RTG-sessie, voor wie via zijn provider binnenkwam |
+| `POST /api/tenant/groep` · `/groepen` | Een IdP-groep aan een rol koppelen (beheerder van die werkruimte) |
+
+- **Een werkruimte of zaak hoort bij hooguit EEN tenant.** Twee tenants die
+  dezelfde werkruimte opeisen, geven een werkruimte waarvan het merk -- en
+  straks het contract en de export -- afhangt van wie er het laatst schreef.
+- **Drie presentatiemodi, en de derde weigert.** `powered` (klantmerk met
+  zichtbare RTG-schil) en `private` (RTG alleen nog in de herkomst- en
+  juridische regels) bestaan. `sovereign` belooft een eigen domein, eigen
+  sleutels en een eigen runtime, en dit huis heeft geen externe hosting, geen
+  certificaat-machinerie voor domeinen van derden en geen routering op
+  hostnaam -- dus die modus weigert MET de reden en de volgorde uit `TAKEN.md`
+  4.21. Weglaten leest als vergeten; weigeren met een reden leest als een
+  besluit.
+- **Een merkkern in plaats van een vierde huisstijlsysteem.**
+  `kern/tenant/merkkern.js` is de definitie (welke velden, welke waarden, welke
+  standaard, waar het ophoudt), en sinds kort ook echt de **enige**: het huis
+  had het merk-idee vier keer, en die vier waren al uit elkaar gelopen. Het
+  Theater weigerde een foute accentkleur met een melding; `kern/webmerk.js` en
+  `kern/journalistiek.js` negeerden hem **stil** en gaven `ok: true` terug met
+  de oude kleur erin. Voor wie de knop indrukt is dat het verschil tussen weten
+  dat het niet mocht en denken dat het gelukt is. Alle drie lezen nu
+  `leesMerkvelden()`; de opslag blijft per scope waar hij hoort, en de
+  leesstandaard mag verschillen (een krant staat standaard op licht, een
+  werkruimte op donker) -- alleen wat GELDIG is, is overal hetzelfde.
+  `test/merkkern.test.js` bewaakt zowel de waarderegels als de structuur, want
+  zonder dat tweede komt de vijfde kopie er gewoon weer bij.
+
+  Het manifest is **ondertekend en aan de modus gebonden**: klopt het niet met
+  zichzelf, dan komt de standaardstijl naar buiten met de reden erbij -- niet
+  het manifest dat er stond. Het bestuurt alleen de schermen van het Werk OS;
+  e-mail, documenten, facturen, meldingen, het PWA-manifest en de AI-toon
+  dragen het niet.
+- **De herkomstregel is in geen enkele modus uit te zetten.** Ook in `private`
+  blijft in de voet staan wiens software dit is. Wie je personeelsdossier
+  bewaart is geen merkvraag maar een AVG-vraag, en het antwoord mag niet
+  afhangen van een verkoopcontract.
+- **De kleur van een klant geldt binnen zijn eigen blok.** De accentkleur komt
+  op de merkbalk en nergens anders; `test/werkmerk.e2e.js` loopt in een echte
+  browser ELK element daarbuiten na op die kleur.
+- **De identiteitsbrug**: IdP-groep -> tenant -> werkruimte -> tijdgebonden rol
+  -> de 18 werkwoordrechten (`kern/tenant/brug.js`). Vier regels dragen hem:
+  zonder groepsafbeelding komt er niemand binnen (de huisregel "aanmelden is
+  niet binnen zijn" blijft dus staan), een IdP-rol is beheerd en vervalt met de
+  groep terwijl handmatige rollen blijven, een IdP herstelt geen ontslag, en een
+  SCIM-deactivatie sluit de werkplek in élke werkruimte van diezelfde tenant --
+  synchroon binnen het verzoek, en zonder iets van een andere tenant te raken.
+- **De bootstrap noemt wat er niet is.** `entitlements`, `quotas`, `policies`,
+  `trust` en `lifecycle` staan in `nietGebouwd` met een reden per veld, en niet
+  als lege waarde: een leeg quotum leest als "geen verbruik". Het Werk OS zet
+  die lijst ook op het scherm.
+- **Wat er is weggehaald.** `public/shared/enterprise-shell.{js,css}` was dode
+  code -- door geen enkele pagina ingeladen -- die "Enterprise beveiligd · audit
+  gereed · Commercial" beweerde zonder bron. Een enterprisebewering hoort een
+  bron te hebben; tot die er is, staat de bewering er niet.
+
+**De uitgang: weggaan zonder je geschiedenis te verliezen.**
+`kern/tenant/uitgang.js` + `kern/tenant/levensloop.js`. Exit-recht is niet af
+met een knop die JSON teruggeeft; de bewering wordt pas waar als de uitvoer
+WEER IN TE LEZEN is en er hetzelfde uit komt.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/tenant/export` | De hele werkruimte eruit, met catalogus, checksums en het recept (beheer-token) |
+| `POST /api/techniek/tenant/invoer` | Een uitvoer inlezen in een NIEUWE werkruimte (eigenaar) |
+| `POST /api/techniek/tenant/levensloop` | Lezen en zetten: actief, opzegging, bewaring (eigenaar) |
+| `POST /api/techniek/tenant/bewaringsplicht` | Een legal hold aan of uit, met grond (eigenaar) |
+| `POST /api/techniek/tenant/vernietig` | Vernietigen na de termijn, met bewijs (eigenaar) |
+
+- **De uitvoer neemt de hele subboom mee, met een lijst van wat eruit MOET.**
+  Een soort die iemand vergeet toe te voegen ontbreekt anders stilzwijgend in de
+  export van een vertrekkende klant. Eruit gaan `beheerToken`, `token`,
+  `lidToken` en `rtgKey` -- die laatste niet uit geheimhouding maar omdat hij
+  buiten de kluis om een werkruimtelid aan een RTG-account koppelt.
+- **Het recept reist mee, en dat is het bewijs.** Een checksum die alleen de
+  producent kan narekenen bewijst de ontvanger niets. De uitvoer zegt hoe:
+  sha256 over de canonieke JSON per soort, en daarna over de catalogus. De som
+  is ongezouten -- anders dan `lib/vingerafdruk.js`, die per proces zout omdat
+  hij alleen mag tonen DAT er iets veranderde.
+- **Inlezen maakt altijd een nieuwe werkruimte**, nooit over een bestaande heen,
+  en de leden komen terug zonder sleutel: toegang teruggeven is een besluit.
+- **Vier standen en geen zeven.** `voorbereiding`, `proef` en `beperkt` dwongen
+  niets af en staan er dus niet. De bewaring sluit de toegang door de SLEUTELS
+  in te trekken en niet met een vlag die elke route apart moet lezen.
+- **Uitvoer kan in elke stand behalve `vernietigd`**, ook in de bewaring en ook
+  bij een betalingsachterstand: een klant die zijn rekening niet betaalt
+  verliest zijn geld en niet zijn geschiedenis.
+- **Vernietigen kan niet voor de termijn en niet onder een bewaringsplicht**, en
+  levert een bewijs met aantallen en checksums en zonder persoonsgegevens -- een
+  vernietigingsbewijs met namen erin is een kopie van wat vernietigd moest
+  worden.
+- **De generieke veger komt hier niet langs.** `werkruimtes` en `tenants` stonden
+  in de gatenlijst van het bewaarbeleid; ze er met een gewone termijn bij zetten
+  zou erger zijn geweest dan het gat, want hun datumveld is een aanmaakmoment en
+  90 dagen daarop wist elke klant die langer dan negentig dagen bestaat. Vandaar
+  de derde vorm `eigenRegie` in `bewaarbeleid.js`: hij telt mee, verdwijnt uit de
+  gatenlijst, en `veeg()` raakt hem nooit aan.
+
+**Het contract en het quotum.** Drie pakketten (proef, zakelijk, concern) met
+twee grenzen die echt bijten: het aantal werkruimtes onder de tenant en het
+aantal verzoeken per uur. Wat een verkooppraatje verder belooft -- opslag,
+aantal leden, supportvenster, hersteltijd -- staat in `nietAfgedwongen` met de
+reden. Een **verlopen contract is geen noodknop**: het weigert nieuwe
+inrichting en verder niets; wie er werkt blijft werken en de uitvoer blijft
+open. De teller staat per uur in de opslag (een teller die bij elke herstart op
+nul begint is geen quotum maar een suggestie) en wordt geteld op de twee deuren
+van de werkruimte, niet op 104 routes.
+
+**De bewijspoort.** `POST /api/tenant/status`. Zeven beweringen die elk OF een
+bron OF een reden dragen -- versleutelde opslag (staat `RTG_ENC_KEY` gezet),
+auditspoor (het aantal journaalregels), eigen identiteitsprovider (een actieve
+koppeling), lopend contract, dagelijkse back-up, en twee die **altijd nee** zijn:
+eigen domein en SLA. Die laatste is een berekening: vier voorwaarden, waarvan er
+vandaag twee ontbreken. Er staat **geen beschikbaarheidsgetal** in de
+tenantstand -- de meting is platformbreed, en een cijfer dat de meting niet kan
+dragen is preciezer dan de werkelijkheid. Dit is de laag die de weggehaalde
+enterprise-schil onmogelijk maakt: een bewering is nu een object met een bron,
+en een scherm mag alleen tonen wat op `mag: true` staat.
+
+**En dat scherm staat er nu ook** (`apps/werk/status.js`, onder Instellingen in
+het Werk OS). Het is met opzet het tegenovergestelde van een badgemuur: de
+beweringen die vandaag NIET waar zijn staan er ook, met hun reden, en de SLA
+staat er uitgerekend -- vier voorwaarden, met de twee die ontbreken bij naam.
+Er staat geen beschikbaarheidscijfer voor de klant op maar de zin waarom niet:
+de telling gaat per routepatroon en draagt geen tenant.
+
+Eén bewering op die pagina bleek zwakker dan hij eruitzag, en dat is
+gerepareerd: **"Dagelijkse back-up" hing aan een mapNAAM.** Bestond er een map
+die `YYYY-MM-DD` heette, dan stond de bewering op ja -- leeg, half weggeschreven
+of met een `db.json` van nul bytes maakte niet uit. `server/backupstand.js`
+kijkt nu na of elk bestand dat in de levende datamap staat ook in de back-up
+staat en niet leeg is, en of `db.json` opent; de BAK-01-check in de technische
+pagina leest dezelfde functie. Een leeg `-wal` telt daarbij als gezond (dat is
+het na een checkpoint), en een bestand dat hier niet bestaat wordt de back-up
+niet verweten -- allebei omdat een meter die vals alarm geeft, genegeerd wordt.
+Het is een aanwezigheidscontrole met tanden en geen herstelproef: of de inhoud
+klopt weet je pas als je hem terugzet.
+
+Wat er wel staat is de **meting per capability** (`server/meting-capaciteit.js`).
+Dat was het laatste open punt van deze laag, en het is opgelost door twee dingen
+aan elkaar te knopen die er allebei al waren: de meting telt per routepatroon,
+en `functies.functieVoorPad` weet welke functie bij welk pad hoort -- dezelfde
+kaart waarmee een eigenaar een functie uitzet. Daarmee is de oorspronkelijke
+bezwaar weg: een storing in een onderdeel dat u niet gebruikt is nu als zodanig
+te zien in plaats van dat hij in uw cijfer verdwijnt. Onder de vloer van vijftig
+verzoeken komt er **geen** percentage maar de reden (nul fouten op drie
+verzoeken leest groener dan elk echt cijfer), routes zonder functie krijgen een
+eigen regel in plaats van te verdwijnen, en het venster staat erbij: de meting
+zit in het geheugen van dit proces en is dus geen maandcijfer. Op die pagina staat ook de enige regel die een klant zelf waar kan
+maken: een knop **Herstelproef doen** (`kern/tenant/herstelproef.js`). Die
+exporteert de werkruimte, leest de uitvoer terug in een tijdelijke werkruimte,
+legt de inhoud per soort naast het origineel en ruimt die tijdelijke werkruimte
+daarna op -- altijd, ook als er onderweg iets stukloopt. Het resultaat wordt
+vastgelegd met een datum en wordt de bewering "Uitvoer teruggelezen en
+gecontroleerd". Wat het bewijst is het **exit-pad**; wat het NIET bewijst is dat
+onze eigen dagback-up terug te zetten is, en dat is de claim waar een SLA aan
+hangt -- die voorwaarde blijft dus op nee staan, ook na een geslaagde proef.
+
+De stand is zichtbaar voor het
+beheer-token of voor een lid met het recht `werkruimte` (dat draagt alleen
+`directie`) -- die tweede sleutel is er omdat het beheer-token in het Werk OS
+nergens wordt ingetypt, en een pagina die niemand kan openen is hetzelfde als
+een pagina die er niet is.
+
+**SCIM `/Groups`.** Een groepswijziging bij de klant werkte pas door bij de
+volgende inlog; bij een sessie van dertig dagen dus een maand. Nu duwt de IdP
+hem naar ons toe en beweegt de werkruimte mee in hetzelfde verzoek -- ook, en
+juist, voor wie eruit gaat. Een groep draagt een naam en leden en verder niets:
+geen rechten (die staan in de groepsafbeelding, gezet door een mens) en geen
+nesting. Bij het inloggen wordt de unie van de tokenclaim en de SCIM-tabel
+genomen.
+
+**SAML** (`server/sso/saml/`, `POST /api/sso/saml/acs`). Dit stond hier als een
+besluit om het NIET te bouwen: een SAML-SP vraagt XML-canonicalisatie en
+XML-DSig-verificatie, dit huis heeft nul runtime-afhankelijkheden, en de
+faalvorm van zelfbouw is een **stille authenticatie-bypass**. Hij is er nu, en
+wat die reden onschadelijk maakt is niet een belofte maar een aanvalstoets.
+
+Hij komt uit op **hetzelfde claimcontract als OIDC** en loopt daarna door
+dezelfde `sso/binnenkomst.js` -- dezelfde vijf stappen, dezelfde
+identiteitsbrug, hetzelfde overdrachtsbewijs, geen enkele `if (saml)`. Het
+profiel is smal met opzet: precies EEN `Assertion` en EEN `Signature` in het
+document, het ondertekende element moet de OUDER van de handtekening zijn, een
+ID moet naar precies EEN element wijzen, en **de assertie die we lezen moet een
+nazaat zijn van het stuk dat is gecontroleerd** -- dat laatste is de regel waar
+XML Signature Wrapping op stukloopt. Geen SHA-1, geen HMAC, geen XPath- of
+XSLT-transform; de sleutel komt nooit uit `KeyInfo` maar uit de koppeling.
+`InResponseTo` moet bij een verzoek horen dat wij hebben gestuurd (dat sluit de
+ongevraagde, IdP-initiated inlog af), en zowel het verzoek als de assertie werkt
+een keer. Niet gebouwd, met de reden: wij ondertekenen het AuthnRequest niet
+(dat bewijst iets aan de provider en niets over het ANTWOORD, en daar zit de
+aanval), geen versleutelde asserties en geen Single Logout.
+
+**SAML vraagt een geconfigureerd webadres.** De entityID en het antwoordadres
+van een SP zijn identiteit, en dat zijn precies de waarden waartegen de Audience
+en de Recipient van een assertie worden gehouden. Ze komen daarom uit `APP_URL`
+(of `RTG_DOMAINS`) en niet uit de Host- of Origin-kop van het verzoek -- anders
+bepaalt de beller waartegen wij controleren. Staat er geen webadres, dan
+weigeren de drie SAML-routes met die reden in plaats van open te gaan met een
+gegokte naam.
+
+Inrichten doet de eigenaar met `POST /api/techniek/sso/saml` (entityID, SSO-adres
+en het ondertekencertificaat, dat meteen wordt gelezen); wat de klant bij zijn
+provider invult staat op `/api/sso/saml/metadata`. De SAML-velden hangen aan de
+BESTAANDE koppeling en niet aan een tweede tabel -- twee koppelingen zouden twee
+domeinlijsten betekenen die uiteen kunnen lopen, en de domeinlijst is de
+beveiliging.
+
+`test/tenantspine.test.js` (15, de regels), `test/tenant.test.js` (8, over de
+lijn), `test/tenantuitgang.test.js` (7, de uitgang), `test/tenantcontract.test.js`
+(7), `test/tenantbewijs.test.js` (7), `test/scimgroepen.test.js` (5), de
+SAML-toetsen (`samlxsw` 12 -- de aanvallen, `samlc14n` 5 -- libxml2 als
+scheidsrechter, `samlpoort` 6, `samlacs` 4 -- de echte deur) en de schermtoetsen
+`test/werkmerk.e2e.js` en `test/werkcommandbalk.e2e.js` leggen dit
+vast; zesendertig mutaties, alle zesendertig RAAK -- onder andere de botsingscontrole weghalen, `sovereign` toestaan, de
+merkcontrole overslaan, een leeg quotum in de bootstrap zetten, de IdP een
+ontslag laten herstellen, deprovisioning over alle tenants laten lopen en de
+accentkleur op de RTG-kopbalk lekken, de geheimen in de export laten staan, een
+invoer over een bestaande werkruimte heen schrijven, de bewaringsplicht negeren
+en de veger wel aan de eigen regie laten komen. Aan de SAML-kant: de
+nazaat-regel eruit halen, de handtekening van zijn element losmaken, twee
+asserties toestaan, dubbele ID's toestaan, de digestvergelijking altijd goed
+laten zijn, SHA-1 alsnog toelaten, het publiek en het verlopen niet
+controleren, de attributen en de naamruimten niet sorteren (die twee zakken
+tegen libxml2 en niet tegen onszelf), een verzoek niet verwijderen bij gebruik,
+de org-controle op een verzoek weghalen en een assertie zonder ID toelaten. Er
+was ook een mutatie die NIET landde -- de gezochte zin stond ook in het
+commentaar -- en die staat in `scripts/mutatie.js`, want een mutatie die je niet
+hebt zien landen is geen mutatie.
 
 ### RTG Web Platform (de automatische bedrijfssite en de browser die bedrijven begrijpt)
 

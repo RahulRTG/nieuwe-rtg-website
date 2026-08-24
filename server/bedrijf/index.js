@@ -45,13 +45,34 @@ module.exports = (kern) => {
   function ruimteVan(req) {
     return eigenVeld(W(), String((req.body || {}).werkruimte || '').trim().toUpperCase()) || null;
   }
+  /* HET QUOTUM VAN DE TENANT, op de twee deuren en niet op 104 routes.
+
+     Elke route van deze laag komt langs beheerVan() of lidVan(); daar tellen is
+     dus de enige plek waar het volledig is, en de enige plek waar het niet
+     vergeten kan worden bij route 105. De laag zelf weet niets van contracten:
+     hij vraagt het aan kern.tenant als die er is, en werkt gewoon door als die
+     er niet is (een werkruimte zonder tenant heeft geen contractgrens).
+
+     De UITVOER telt nooit mee en wordt nooit geweigerd. Die zet `geenQuotum` op
+     het verzoek (routes/tenant.js), want exit-recht dat op een teller kan
+     stuklopen is geen recht. */
+  function quotumOk(req, res, w) {
+    if (req.geenQuotum || !kern.tenant) return true;
+    const t = kern.tenant.register.vanWerkruimte(w.code);
+    if (!t) return true;
+    const uit = kern.tenant.contract.tel(t.org);
+    if (uit.ok) return true;
+    res.status(429).json({ error: uit.reden, quotum: { gebruikt: uit.gebruikt, grens: uit.grens } });
+    return false;
+  }
+
   function beheerVan(req, res) {
     const w = ruimteVan(req);
     if (!w || w.beheerToken !== String(req.body.beheerToken || '')) {
       res.status(403).json({ error: 'Onbekende werkruimte of verkeerd beheer-token.' });
       return null;
     }
-    return w;
+    return quotumOk(req, res, w) ? w : null;
   }
   function lidVan(req, res) {
     const w = ruimteVan(req);
@@ -59,7 +80,7 @@ module.exports = (kern) => {
     const l = w && tok ? Object.values(w.leden || {}).find(x => x.token === tok) : null;
     if (!l) { res.status(403).json({ error: 'Onbekende werkruimte of verkeerd lid-token.' }); return null; }
     if (l.status !== 'actief') { res.status(403).json({ error: 'Dit lidmaatschap staat op ' + l.status + '.' }); return null; }
-    return { w, l };
+    return quotumOk(req, res, w) ? { w, l } : null;
   }
 
   const sctx = { app, db, save, crypto, schoon, kern, W, nu, rid, dag, ruimteVan, beheerVan, lidVan, eigenVeld };
@@ -145,5 +166,14 @@ module.exports = (kern) => {
   require('./uitval')(sctx);
   // Zoeken, dossier en samenhang: leest de soorten van alle lagen hierboven.
   require('./inzicht')(sctx);
+  /* Handelen via de commandobalk. Als LAATSTE, want hij leunt op de poort van
+     rollen.js, op zetWie() van wieis.js en op de bakken van taak.js en
+     service.js -- en hij schrijft in die bakken en niet in een eigen opslag
+     ernaast. */
+  require('./handeling')(sctx);
+  /* De gevolgsimulatie: wat blijft er open als deze wijziging doorgaat. Leest
+     alle bakken hierboven en schrijft in geen enkele -- er staat niet eens een
+     save() in. */
+  require('./gevolg')(sctx);
   return sctx;
 };

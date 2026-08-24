@@ -103,6 +103,14 @@ module.exports = ({ save, schoon, crypto, horeca, naad }) => {
     return regel;
   }
 
+  /* Alleen kaartvelden die de ordermotor zelf mag vertrouwen gaan over de
+     grens. Een prijs of modifier uit de browser komt hier nooit terecht. */
+  function bestelProduct(m) {
+    return m ? { id:m.id, name:m.naam, price:m.centen / 100, cat:m.cat,
+      station:m.station, alcohol:m.alcohol, opties:m.opties,
+      ingredienten:m.ingredienten, allergenen:m.allergenen, prepMin:m.prepMin } : null;
+  }
+
   /* Wat de gast van zijn lopende en recente bestellingen ziet, over alle zaken
      heen. Bewust alleen de eigen: de sleutel is de codenaam en de lus loopt
      over de zaken, dus hier hoort geen zaakcode-parameter die je kunt raden. */
@@ -125,5 +133,6 @@ module.exports = ({ save, schoon, crypto, horeca, naad }) => {
     return uit.sort((a, b) => String(b.geopendAt).localeCompare(String(a.geopendAt))).slice(0, limiet);
   }
 
-  return { KANALEN_BUITEN, lopende, zetBezorging, zetAfhaal, zetBezorgkosten, mijne };
+  return { KANALEN_BUITEN, lopende, zetBezorging, zetAfhaal, zetBezorgkosten,
+    bestelProduct, mijne };
 };

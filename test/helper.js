@@ -77,6 +77,28 @@ function luisterOpFouten(child) {
   });
 }
 
+/* HOEVEEL GEDULD PAST BIJ DEZE MACHINE?
+
+   Een vaste teller is op een rustige machine ruim en op een volle machine te
+   krap -- en dan zakt een toets op DRUKTE met een melding die over een defect
+   lijkt te gaan. De eerste versie van deze schaling deed Math.round(druk), en
+   dat was te grof: bij een genormaliseerde belasting van 0,7 tot 0,9 -- een
+   machine die bijna vol staat -- rondde dat af op 1 en bleef het geduld
+   ongewijzigd. Zeventig toetsen zakten daarop, allemaal met een LEVEND
+   kindproces. Vandaar 1 + druk: elke bezette kern telt meteen mee in plaats van
+   pas bij een hele.
+
+   HIJ STAAT HIER EN NIET IN startEens(), want er wachten er TWEE op: een enkele
+   server hieronder, en de vier processen van test/vloot.test.js. Die tweede
+   bleef flaky nadat de drie echte races eruit waren -- geen crash, geen
+   foutregel, alleen een groep die er binnen 120 seconden nog niet was. Twee
+   formules voor dezelfde vraag lopen uiteen (LAT.md regel 4). */
+function geduldFactor() {
+  const kernen = Math.max(1, os.cpus().length);
+  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
+  return { factor: Math.min(5, Math.max(1, Math.ceil(1 + druk))), druk: Math.round(druk * 100) / 100 };
+}
+
 async function startEens(opts) {
   const script = opts.script || path.join(__dirname, '..', 'server', 'server.js');
   // Standaard wachten op /api/ready, niet alleen /api/health: sinds de
@@ -100,16 +122,7 @@ async function startEens(opts) {
      lang is er gewacht, en hoe zwaar stond de machine. Een levend kind plus een
      hoge belasting is drukte; een gestopt kind is een echt defect. Dat verschil
      hoort in de melding te staan en niet in het hoofd van wie hem leest. */
-  const kernen = Math.max(1, os.cpus().length);
-  const druk = os.loadavg()[0] / kernen;                       // 1 = precies vol
-  /* De eerste versie van deze schaling deed Math.round(druk), en dat was te
-     grof: bij een genormaliseerde belasting van 0,7 tot 0,9 -- een machine die
-     bijna vol staat -- rondde dat af op 1 en bleef het geduld op 25 seconden.
-     Zeventig toetsen zakten daarop, allemaal met een LEVEND kindproces. Een
-     server die opstart doet echt werk (SQLite, seed, sleutels), dus "bijna vol"
-     is al genoeg om hem over de grens te duwen. Vandaar 1 + druk: elke bezette
-     kern telt meteen mee in plaats van pas bij een hele. */
-  const extra = Math.min(5, Math.max(1, Math.ceil(1 + druk)));
+  const { factor: extra, druk } = geduldFactor();
   const pogingen = opts.pogingen || 250 * extra;
   const gestart = Date.now();
   const port = await vrijePoort();
@@ -457,7 +470,7 @@ async function bankDeur(page, naam, opties) {
   await knop.first().click();
 }
 
-module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind, geduldFactor,
   binnenEenDag, nepMediaArgs, installeerNepMicrofoon, openBank, bankDeur,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

@@ -94,7 +94,14 @@ const MIGRATIES = [
      account. Alles wat VOOR die grens is uitgegeven, geldt niet meer. Zonder dit
      bleef wie eenmaal binnen was dertig dagen binnen -- ook na een volledig
      herstel, en juist dan wil je hem eruit. Zie accounts/tokens.js. */
-  { n: 5, naam: 'sessies-vanaf', op: (db) => voegKolomToe(db, 'users', 'sessies_vanaf', 'INTEGER NOT NULL DEFAULT 0') }
+  { n: 5, naam: 'sessies-vanaf', op: (db) => voegKolomToe(db, 'users', 'sessies_vanaf', 'INTEGER NOT NULL DEFAULT 0') },
+  /* De SAML-kant van de federatiepoort. De velden hangen aan de BESTAANDE
+     koppelingtabel en niet aan een tweede: of een organisatie via OIDC of via
+     SAML binnenkomt, is een eigenschap van die koppeling. Twee tabellen zouden
+     betekenen dat dezelfde organisatie twee keer bestaat, met twee
+     domeinlijsten die uiteen kunnen lopen -- en de domeinlijst IS de
+     beveiliging (zie sso/koppelingen.js). */
+  { n: 6, naam: 'saml-federatiepoort', op: (db) => require('../sso/saml').zorgTabel(db) }
 ];
 
 module.exports = { MIGRATIES, voegKolomToe, accountsBasis };

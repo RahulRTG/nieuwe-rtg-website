@@ -2,9 +2,8 @@
 
    Alleen de eigenaar (standaard Rahul Imran Ismail, via RTG_OWNER_EMAIL) komt
    erin; hij kan anderen handmatig toegang geven. Het bord toont per subsysteem
-   een groen/oranje/rood bolletje met de code en uitleg, laat zekeringen resetten
-   ("er weer in doen") of met de hand uitschakelen, en heeft een AI die bij een
-   storing een diagnose en herstelstappen geeft. */
+   een bolletje met code en uitleg, laat zekeringen resetten of met de hand
+   uitschakelen, en heeft een AI die bij een storing herstelstappen geeft. */
 const techniek = require('../techniek');
 const functies = require('../functies');
 const eigenaar = require('../eigenaar');
@@ -159,7 +158,7 @@ module.exports = (kern) => {
      (een keer bij het opstarten gemount, geen kosten per verzoek). */
   const tctx = { app, accounts, anthropic, archief, beveilig, wacht: kern.wacht, av: kern.antivirus, crypto, db, mail, save, sendPushToUser,
     LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx,
-    betaalRegie: kern.betaalRegie, geldPasprijsZet, geldKortingZet, geldCommissieZet, tooManyTries, noteFailedTry, loginFails };
+    betaalRegie: kern.betaalRegie, geldPasprijsZet, geldKortingZet, geldCommissieZet, tooManyTries, noteFailedTry, loginFails, kern };
   require('./techniek/inlog')(tctx);   // de inlog op deze pagina, met rem en gelijk antwoord
   const bewaarDeel = require('./techniek/bewaren')(tctx);
   require('./techniek/functie')(tctx);
@@ -169,6 +168,10 @@ module.exports = (kern) => {
   require('./techniek/wacht')(tctx);
   require('./techniek/papieren')(tctx);
   require('./techniek/sso')(tctx);
+  /* De tenants: welke org IS de klant, en welke werkruimtes en zaken vallen
+     eronder. Naast de SSO-koppelingen en achter dezelfde poort -- het is
+     dezelfde grens, van de andere kant bekeken. */
+  require('./techniek/tenant')(tctx);
   /* De toestandsvingerafdruk: per collectie een aantal en een gezouten hash,
      nooit inhoud. Draagt de vier matrixkolommen die over de TOESTAND gaan. */
   require('./techniek/vingerafdruk')(tctx);

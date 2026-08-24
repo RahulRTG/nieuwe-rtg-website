@@ -53,6 +53,7 @@
    stand in plaats van een woord uit commentaar.
 
    Draai:  node scripts/mutatie.js               (alles -- lang)
+           node scripts/mutatie.js --verlopen    (alleen wat bewijsvers.js verlopen noemt)
            node scripts/mutatie.js --puur        (alleen A)
            node scripts/mutatie.js --server      (alleen B)
            node scripts/mutatie.js --opruimen    (zet een blijven staan mutatie terug)
@@ -97,6 +98,26 @@ const VOORTGANG = path.join(WORTEL, 'server', 'data', 'mutatie-voortgang.json');
 
    Ze staan hier MET reden en niet stilzwijgend overgeslagen: BEWIJS.md meldt ze
    als 'muteert zelf' en niet als gemeten. */
+/* WELK BESTAND SLAAN WE OVER? Drie regimes, en ze zijn met opzet uit main()
+   gehaald: dit is de enige plek waar besloten wordt of een meting opnieuw wordt
+   gedaan, en een keuzeregel die alleen in een uren durende ronde te zien is,
+   is een keuzeregel die niemand ooit heeft zien werken (LAT.md regel 10).
+   test/bewijsvers.test.js stelt hem los.
+
+     --opnieuw    niets overslaan; alles opnieuw meten
+     --verlopen   alleen doen wat bewijsvers.js verlopen noemt, de rest overslaan
+     (geen vlag)  overslaan wat al een bruikbare uitslag heeft
+
+   Let op de derde: "geen toetsen gedraaid" is GEEN uitslag maar een mislukking,
+   en die hoort opnieuw geprobeerd te worden. */
+function moetOverslaan(naam, opties) {
+  const o = opties || {};
+  if (o.opnieuw) return false;
+  if (o.verlopenNamen) return !o.verlopenNamen.has(naam);
+  const r = o.uitslag && o.uitslag[naam];
+  return !!r && r.staat !== 'geen toetsen gedraaid';
+}
+
 const NIET_MUTEREN = new Map([
   ['meterijk.test.js', 'muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken'],
   ['mutatiewacht.test.js', 'toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets']
@@ -784,7 +805,32 @@ if (require.main === module) {
   };
   const bewaar = () => schrijf(VOORTGANG);      // na elk bestand: buiten de repo
   const vastleggen = () => schrijf(UITSLAG);    // na een fase: in de repo
-  const gedaan = (naam) => !opnieuw && uitslag[naam] && uitslag[naam].staat !== 'geen toetsen gedraaid';
+
+  /* ALLEEN OPNIEUW METEN WAT VERLOPEN IS -- en dat gat was er een van tekst.
+
+     scripts/bewijsvers.js eindigde met "Opnieuw meten: node scripts/mutatie.js
+     (die stempelt de uitslag met de inhoud)". Dat was niet waar: gedaan()
+     hieronder slaat alles over wat al in het register staat, dus die aanroep
+     deed voor de 874 verlopen uitslagen precies niets. Wie het wel wilde had
+     alleen --opnieuw, en dat is de hele suite van voren af aan -- uren voor het
+     serverdeel, waarvan het grootste deel al vers was.
+
+     --verlopen leest dezelfde regel die de METER leest (bewijsvers.meet), en
+     doet over wat daar verlopen heet. Een tweede definitie van "verlopen" hier
+     zou binnen een week uit de pas lopen met de meter, en dan meet de motor iets
+     anders dan de ratel telt (LAT.md regel 4). */
+  let verlopenNamen = null;
+  if (args.includes('--verlopen')) {
+    const u = require('./bewijsvers').meet({ wortel: WORTEL });
+    /* Geen leesbaar register is geen lege lijst maar een kapotte vraag: dan zou
+       --verlopen netjes nul bestanden draaien en klaar melden (LAT.md regel 3). */
+    if (!u) { console.error('Geen leesbare MUTATIES.json; --verlopen weet dan niet wat verlopen is.'); process.exit(1); }
+    verlopenNamen = new Set(u.lijst.map(x => x.naam));
+    console.log('  --verlopen: ' + verlopenNamen.size + ' van de ' + u.metBewijs +
+      ' bewijzen is verlopen; de rest blijft staan.');
+  }
+
+  const gedaan = (naam) => moetOverslaan(naam, { uitslag, opnieuw, verlopenNamen });
 
   /* OM DE VIJFENTWINTIG OOK IN DE REPO, en die regel kostte honderdtachtig
      metingen om te leren. De voortgang stond buiten de repo (server/data/, in
@@ -918,7 +964,7 @@ if (require.main === module) {
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 
-module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
+module.exports = { OPERATOREN, muteer, codemasker, modulesVan, moetOverslaan, UITSLAG, VOORTGANG, NIET_MUTEREN,
   SPOOR, ruimEerderOp, schrijfSpoor, metMutatie,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js

@@ -109,6 +109,7 @@ if (require.main === module) {
   }
   console.log('\n  Verlopen bewijs is niet hetzelfde als een fout: de toets kan nog steeds goed zijn.');
   console.log('  Het betekent dat NIEMAND MEER WEET of hij kan zakken op de code zoals die nu is.');
-  console.log('  Opnieuw meten: node scripts/mutatie.js (die stempelt de uitslag met de inhoud).');
+  console.log('  Opnieuw meten: node scripts/mutatie.js --verlopen  (alleen deze, en met stempel).');
+  console.log('  Zonder --verlopen slaat de motor over wat al in het register staat, ook als het verlopen is.');
   process.exit(0);
 }

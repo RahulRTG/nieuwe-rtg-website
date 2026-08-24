@@ -121,3 +121,73 @@ test('het ECHTE register is te lezen en de meter zegt er een getal over', () => 
      opgeschreven voordat deze regel bestond. De ratel in NORM.json houdt dat
      getal een kant op; hier staat alleen dat het te BEREKENEN is. */
 });
+
+/* ============================================================================
+   EN WIE HANDELT ER OP DIE METING? -- de keuzeregel van de mutatiemotor.
+
+   De meter hierboven zegt hoeveel bewijs verlopen is. Dat getal betekent pas
+   iets als er ook een knop is om het weg te werken, en die was er niet: de
+   motor slaat alles over wat al in het register staat, ook als het verlopen is.
+   scripts/bewijsvers.js eindigde met "Opnieuw meten: node scripts/mutatie.js",
+   en die aanroep deed voor de 874 verlopen uitslagen precies nul werk. Een
+   belofte in tekst hoort een belofte in code te zijn (LAT.md regel 6).
+
+   Nu kiest moetOverslaan() dat, en die keuze staat hier los omdat hij anders
+   alleen in een ronde van uren te zien zou zijn -- een keuzeregel die niemand
+   ooit heeft zien werken (LAT.md regel 10). De drie regimes zijn ECHT
+   verschillend, en dat is wat hieronder wordt vastgelegd: verwissel je er twee,
+   dan doet de motor of veel te veel werk (uren) of stilletjes niets. */
+const motor = require('../scripts/mutatie.js');
+
+test('de motor doet alleen over wat verlopen is -- en slaat zonder die vlag juist het verlopene over', () => {
+  const uitslag = {
+    'vers.test.js': { soort: 'puur', staat: 'gezakt', toetsSha: 'aa', moduleSha: 'bb' },
+    'oud.test.js': { soort: 'puur', staat: 'gezakt' },                    // geen stempel = verlopen
+    'stuk.test.js': { soort: 'puur', staat: 'geen toetsen gedraaid' }     // mislukking, geen uitslag
+  };
+  const verlopenNamen = new Set(['oud.test.js']);
+
+  // 1. zonder vlag: alles overslaan wat een bruikbare uitslag heeft
+  assert.equal(motor.moetOverslaan('vers.test.js', { uitslag }), true);
+  assert.equal(motor.moetOverslaan('oud.test.js', { uitslag }), true,
+    'zonder vlag slaat de motor het verlopen bewijs over -- precies het gat waar --verlopen voor is');
+  assert.equal(motor.moetOverslaan('stuk.test.js', { uitslag }), false,
+    '"geen toetsen gedraaid" is geen uitslag maar een mislukking en hoort opnieuw geprobeerd te worden');
+  assert.equal(motor.moetOverslaan('nieuw.test.js', { uitslag }), false,
+    'wat nog nergens staat, wordt altijd gemeten');
+
+  // 2. --verlopen: precies andersom, en ALLEEN wat de meter verlopen noemt
+  assert.equal(motor.moetOverslaan('oud.test.js', { uitslag, verlopenNamen }), false,
+    'met --verlopen wordt het verlopen bewijs juist wel opnieuw gemeten');
+  assert.equal(motor.moetOverslaan('vers.test.js', { uitslag, verlopenNamen }), true,
+    'en het verse bewijs blijft staan -- anders is --verlopen gewoon --opnieuw met een andere naam');
+  assert.equal(motor.moetOverslaan('nieuw.test.js', { uitslag, verlopenNamen }), true,
+    'ook een onbekend bestand blijft staan: --verlopen gaat over het REGISTER, niet over de map');
+
+  // 3. --opnieuw wint van allebei
+  assert.equal(motor.moetOverslaan('vers.test.js', { uitslag, verlopenNamen, opnieuw: true }), false);
+  assert.equal(motor.moetOverslaan('oud.test.js', { uitslag, opnieuw: true }), false);
+});
+
+test('de lijst waar --verlopen op draait is DEZELFDE lijst die de meter telt', () => {
+  /* Twee definities van "verlopen" zouden binnen een week uiteenlopen, en dan
+     meet de motor iets anders dan de ratel telt (LAT.md regel 4). Deze toets
+     houdt ze op het echte register tegen elkaar: elk bewijs is of verlopen en
+     wordt gedaan, of vers en wordt overgeslagen -- nooit allebei en nooit geen
+     van beide. */
+  const u = bv.meet({ wortel: WORTEL });
+  assert.ok(u && u.metBewijs > 100, 'er hoort een echt register te zijn (' + (u && u.metBewijs) + ')');
+  const verlopenNamen = new Set(u.lijst.map(x => x.naam));
+  assert.equal(verlopenNamen.size, u.verlopen, 'de lijst en het getal gaan over hetzelfde');
+
+  const register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8')).toetsen;
+  let gedaan = 0, overgeslagen = 0;
+  for (const naam of Object.keys(register)) {
+    if (!bv.draagtBewijs(register[naam])) continue;
+    if (motor.moetOverslaan(naam, { uitslag: register, verlopenNamen })) overgeslagen++;
+    else gedaan++;
+  }
+  assert.equal(gedaan, u.verlopen, 'de motor doet precies de verlopen bewijzen over');
+  assert.equal(overgeslagen, u.vers, 'en slaat precies de verse over');
+  assert.ok(gedaan > 0 || overgeslagen > 0, 'en er is echt iets geteld');
+});

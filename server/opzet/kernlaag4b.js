@@ -36,6 +36,13 @@ const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
   clearing: bankregie.bankClearing
 });
 kern.bevoegd = bevoegd;
+/* DE TERUGSTORTING AANSLUITEN OP DE BEVOEGDHEID. Sinds leden hun saldo kunnen
+   terugstorten is walletsaldo elektronisch geld (zie de kop van WALLET_SALDO in
+   kern/bevoegdheid/lijst.js), en die handeling mag alleen als LID_UITBETALING
+   open staat. Zonder deze regel vraagt niemand dat, en dan weigert
+   kern/pay/terug.js elke terugstorting -- dat is de veilige kant, maar het is
+   niet de bedoeling. Late binding, want bevoegdheid wordt na pay gemount. */
+if (kern.pay && kern.pay.koppelBevoegdTerug) kern.pay.koppelBevoegdTerug(id => bevoegd.mag(id));
 /* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter

@@ -35,7 +35,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 const { maakWaarde } = require('../server/kern/waarde');
-const { KLASSEN } = require('../server/kern/waarde/klassen');
+const { KLASSEN, uitbetaalVermogenVan } = require('../server/kern/waarde/klassen');
 
 /* Een minimale db-dubbel: de waardelaag raakt alleen db.data en save(). Bewust
    geen server erbij -- deze laag boekt niets en heeft er niets aan. */
@@ -161,25 +161,77 @@ test('de eigen grens van het lid weigert net zo hard, maar zegt dat het zijn eig
 
 test('een positie zonder registratie krijgt niet stilzwijgend de ruimste rechten', () => {
   const { w } = bouw(klok);
+  /* Een LID-rekening zonder registratie is gewoon persoonlijk saldo -- daar valt
+     niets aan te raden, de wallet van een lid IS dat. */
   const p = w.positie('lid:ONBEKEND');
   assert.equal(p.klasse, 'PERSONAL_FUNDED');
   assert.equal(p.geregistreerd, false);
-  assert.equal(p.spec.uitbetaalbaar, false, 'een onbekende positie is niet uitbetaalbaar');
   assert.ok(Number.isFinite(p.spec.plafondCenten), 'en valt gewoon onder een plafond');
+
+  /* Een UITGEGEVEN positie zonder registratie is een fout, en die valt terug op
+     de strengste klasse. Dit werd belangrijk op het moment dat persoonlijk saldo
+     uitbetaalbaar werd: viel een onbekende positie nog steeds terug op
+     PERSONAL_FUNDED, dan was hij daarmee stilzwijgend uitbetaalbaar geworden --
+     het omgekeerde van wat deze regel bedoelt. */
+  const q = w.positie('waarde:VAL-BESTAATNIET');
+  assert.equal(q.geregistreerd, false);
+  assert.equal(q.spec.uitbetaalbaar, false, 'wat we niet kennen, kan niets');
+  assert.equal(q.spec.overdraagbaar, 'nee');
+  assert.notEqual(q.klasse, 'PERSONAL_FUNDED', 'en valt niet terug op de klasse van een gewone wallet');
   // de extern-rekeningen zijn géén waardepositie: dat is de sluitpost van het dubbel boekhouden
   assert.equal(w.positie('extern:oplaad'), null);
   assert.equal(w.positie('extern:uitbetaald'), null);
 });
 
-test('elke klasse draagt een grond, en alleen het partnersaldo mag het huis verlaten', () => {
+test('elke klasse draagt een grond, en uitbetaalbaarheid hangt aan een bevoegdheid', () => {
+  /* HIER STOND EEN ANDERE EIS, EN DIE IS OP 24 AUGUSTUS 2026 VERVALLEN. Er
+     stond dat alleen PARTNER_SETTLEMENT uitbetaalbaar mocht zijn -- de
+     weerslag van het besluit WALLET_SALDO, dat uitging van een gesloten
+     circuit. Sinds leden hun saldo kunnen terugstorten klopt dat niet meer, en
+     een toets die een vervallen regel bewaakt is erger dan geen toets: hij
+     blokkeert de verandering die wél besloten is en zegt er de reden niet bij.
+
+     Wat ervoor in de plaats komt is strenger op het punt dat er werkelijk toe
+     doet. `uitbetaalbaar: true` is één woord; wie het zet, verlegt de zwaarste
+     grens van deze laag. Daarom moet elke uitbetaalbare klasse NOEMEN waarop
+     dat rust, en moet dat vermogen echt in de bevoegdhedenlijst staan én van
+     een soort zijn die iets kan weigeren. Een `besluit` kan dat niet -- dat
+     staat per definitie altijd open -- dus een uitbetaalbaarheid die op een
+     besluit leunt, is geen grens maar een aanname. */
+  const { VERMOGENS } = require('../server/kern/bevoegdheid/lijst');
   for (const [id, k] of Object.entries(KLASSEN)) {
     assert.ok(k.grond && k.grond.length > 40, id + ' hoort een grond te dragen die uitlegt waarom hij mag bestaan');
     assert.ok(['nee', 'leden', 'vrij'].includes(k.overdraagbaar), id + ' heeft een geldige overdraagbaarheid');
-    if (k.uitbetaalbaar) assert.equal(id, 'PARTNER_SETTLEMENT',
-      'uitbetaalbaar is de uitzondering: alleen het saldo van een zaak verlaat het huis');
+    if (k.uitbetaalbaar) {
+      const v = uitbetaalVermogenVan(id);
+      assert.ok(v, id + ' is uitbetaalbaar en moet zeggen waarop dat rust');
+      assert.ok(VERMOGENS[v], id + ' verwijst naar ' + v + ', en dat vermogen bestaat niet in de bevoegdhedenlijst');
+      assert.notEqual(VERMOGENS[v].soort, 'besluit',
+        id + ' leunt op een besluit, en een besluit kan niets weigeren');
+      assert.ok(VERMOGENS[v].eigenNodig || VERMOGENS[v].nodig,
+        v + ' hoort over de eigen rails een vergunning te vragen');
+    } else {
+      assert.equal(uitbetaalVermogenVan(id), null, id + ' is niet uitbetaalbaar en hoort geen vermogen te noemen');
+    }
     // vrij overdraagbaar EN uitbetaalbaar is geld uitgeven; die combinatie mag hier niet bestaan
     assert.ok(!(k.overdraagbaar === 'vrij' && k.uitbetaalbaar), id + ' zou daarmee een betaalmiddel zijn');
   }
+});
+
+test('walletsaldo is geen besluit meer: het aanhouden ervan hangt aan een rail', () => {
+  /* Het besluit WALLET_SALDO droeg zijn eigen vervalclausule -- verandert de
+     uitbetaalbaarheid, de geslotenheid of het plafond, dan hoort het vermogen
+     van soort te wisselen. Die clausule is ingegaan. Deze toets bewaakt dat de
+     wissel echt is gedaan en niet alleen is opgeschreven. */
+  const { VERMOGENS } = require('../server/kern/bevoegdheid/lijst');
+  assert.equal(VERMOGENS.WALLET_SALDO.soort, 'rail', 'het is geen besluit meer');
+  assert.equal(VERMOGENS.WALLET_SALDO.eigenNodig, 'elektronischgeldinstelling',
+    'klantgeld aanhouden dat inwisselbaar is, vraagt meer dan een betaalinstelling');
+  assert.ok(VERMOGENS.LID_UITBETALING, 'en de terugstorting is een eigen vermogen');
+  assert.equal(VERMOGENS.LID_UITBETALING.eigenNodig, 'elektronischgeldinstelling');
+  /* Apart van elkaar, met opzet: bij een storing op de uitbetaalrail hoort de
+     wallet niet mee te vallen. */
+  assert.notEqual(VERMOGENS.LID_UITBETALING.partnerRail, VERMOGENS.WALLET_SALDO.partnerRail);
 });
 
 

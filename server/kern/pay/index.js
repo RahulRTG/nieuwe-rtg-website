@@ -26,7 +26,7 @@
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
    de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
 
-module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde }) => {
+module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde, accounts }) => {
   const nu = () => Date.now();
   /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
      'partner:', het saldo van een rekening, een nieuw id) -- staat in ./bakken.js. */
@@ -129,7 +129,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     db, save, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
     rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
-    betaaldienstKosten: betaaldienstKosten || (() => 0), waarde,
+    betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
@@ -150,7 +150,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      kent er twee met tijd ertussen. */
   // in de CTX: waar de rest op leunt. Op de API: wat naar buiten gaat.
   for (const naam of ['samen', 'treasury']) Object.assign(ctx, require('./' + naam)(ctx));
-  for (const naam of ['verzoeken', 'kassa', 'vooraf', 'budget', 'graaf', 'bewijs']) Object.assign(api, require('./' + naam)(ctx));
+  for (const naam of ['verzoeken', 'kassa', 'vooraf', 'budget', 'graaf', 'bewijs', 'terug']) Object.assign(api, require('./' + naam)(ctx));
   for (const k of ['treasuryBeleid', 'treasuryZet', 'treasuryStand', 'treasuryVrij', 'treasuryApart']) api[k] = ctx[k];
   return { pay: api };
 };

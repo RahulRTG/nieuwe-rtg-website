@@ -314,26 +314,44 @@ Botst een functie met een grens, dan **vervalt de functie**.
 2. **Er komt geen tweede boekhouding.** De waardelaag boekt niet en houdt geen
    saldo bij. Een reservering is geen boeking. Een geldscherm dat een ander
    getal toont dan de wallet is erger dan geen geldscherm.
-3. **Uitbetaalbaar is de uitzondering, niet de instelling.** Er is één klasse
-   die het huis mag verlaten, en die hangt aan een vergunning. Wordt
-   walletsaldo ooit uitbetaalbaar aan het lid, dan vervalt de grond onder
-   `WALLET_SALDO` en is dit vergunningswerk. Dat is geen schakelaar.
+3. **Uitbetaalbaar hangt altijd aan een bevoegdheid, nooit aan een boolean.**
+   Twee klassen mogen het huis verlaten — `PARTNER_SETTLEMENT` naar de
+   ondernemer en, sinds 24 augustus 2026, `PERSONAL_FUNDED` terug naar het lid.
+   Beide **noemen** het vermogen waarop dat rust (`uitbetaalVermogen` in
+   `kern/waarde/klassen.js`), en dat vermogen moet echt in de
+   bevoegdhedenlijst staan en van een soort zijn die iets kán weigeren. Een
+   `besluit` kan dat niet — dat staat per definitie altijd open — dus een
+   uitbetaalbaarheid die op een besluit leunt is geen grens maar een aanname.
+   `test/waarde.test.js` zakt als een klasse `uitbetaalbaar: true` zet zonder
+   te zeggen waarop.
 
-   **En hier ligt een open vraag die niet stilzwijgend opgelost mag worden.**
-   Het besluit zegt dat walletsaldo "niet wordt uitbetaald aan het lid". Er
-   bestaat echter een keten die daar wel op uitkomt: `/api/bank/van-wallet`
-   brengt walletsaldo naar een eigen RTG-bankrekening
-   (`kern/bank/walletbrug.js`), en `/api/bank/sepa` stuurt vanaf die rekening
-   geld naar buiten. Elke stap is op zichzelf verdedigbaar — de eerste blijft
-   binnen het huis, de tweede hangt aan de bevoegdheid `SEPA_UIT` die de
-   boardroom kan dichtzetten — maar samen zijn ze een uitweg. De poort merkt
-   die keten met zoveel woorden als `huisintern` aan
-   (`kern/waarde/index.js`) zodat de uitzondering een naam en een reden heeft.
-   Er zijn drie uitwegen en het is een keuze welke het wordt: de brug sluiten
-   voor `PERSONAL_FUNDED`, de SEPA-rail structureel dicht houden zolang er geen
-   vergunning ligt, of het besluit herschrijven zodat het beschrijft wat er
-   werkelijk kan. Wat níet mag, is dat het besluit iets anders zegt dan de code
-   doet — dat was precies de fout die dit document heeft blootgelegd.
+   **De open vraag uit de vorige versie van dit document is beslist, en het
+   heeft wat gekost.** Er stond hier dat de keten wallet → RTG Bank → SEPA een
+   uitweg was naast wat het besluit `WALLET_SALDO` beloofde, met drie mogelijke
+   antwoorden. Rahul heeft het derde gekozen én verder getrokken: leden moeten
+   hun saldo gewoon kunnen terugstorten, snel en veilig.
+
+   Daarmee is de tweede voorwaarde onder dat besluit veranderd, en de
+   vervalclausule die het zelf droeg is ingegaan. Niet als formaliteit: **saldo
+   dat op verzoek tegen de nominale waarde wordt terugbetaald aan de houder, ís
+   elektronisch geld.** Een besluit kan dat niet wegschrijven — het gaat over
+   wat de handeling is, niet over hoe we hem noemen.
+
+   `WALLET_SALDO` is daarom van soort gewisseld, precies zoals afgesproken: van
+   `besluit` naar `rail`, met `elektronischgeldinstelling` als eis over de eigen
+   rails. Draait de partnerrail — de partij die het geld aanhoudt en bevoegd is
+   — dan levert RTG het scherm en de administratie. De terugstorting zelf is een
+   apart vermogen (`LID_UITBETALING`), want bij een storing op de uitbetaalrail
+   hoort de wallet niet mee te vallen.
+
+   Dat is niet minder streng dan het besluit, het is anders streng: waar RTG
+   eerst zelf vaststelde dat het mocht, hangt het nu aan iets dat kan weigeren.
+   Dit is exact waarvoor `kern/bevoegdheid` is gebouwd — de hele ervaring kon af
+   zonder te doen alsof er bevoegdheden waren die er niet zijn, en bij een echte
+   vergunning verandert alleen wat er in de boardroom is vastgelegd.
+
+   Wat er van de oorspronkelijke drie voorwaarden over is, is het **plafond** —
+   en dat blijft juist nu staan.
 4. **Het plafond is de grond, niet een instelling.** Zodra het plafond
    losgelaten wordt, is de klasse iets anders geworden en hoort hij van soort
    te wisselen. Verhogen is een besluit met een handtekening.
@@ -379,18 +397,55 @@ Botst een functie met een grens, dan **vervalt de functie**.
 
 ## 11. Wat er nu staat, en wat er open blijft
 
-Alle zeven stappen uit paragraaf 7 zijn gebouwd, met toetsen die door de
-voordeur gaan en met een mutatie per belofte — het plafond weghalen, de laag
+Alle zeven stappen uit paragraaf 7 zijn gebouwd, plus de terugstorting (par.
+9 punt 3). Elke belofte draagt een toets die door de voordeur gaat, en elke
+toets is met een mutatie zien zakken — het plafond weghalen, de laag
 loskoppelen, reserveringen weer uitgeefbaar maken, eigen geld eerst opmaken, de
 genretoets weer fail-open zetten, de grens aan de wallet hangen, de uitbetaling
 het hele saldo laten nemen, interne verplaatsingen als uitgave tellen, de
-afstemming laten doen alsof. Elke mutatie laat toetsen zakken; wat niet zakt, is
-niet vastgelegd.
+afstemming laten doen alsof, de mod-97-toets vervangen door een vormcontrole, de
+wachttijd op een gewijzigde rekening weghalen. Wat niet zakt, is niet vastgelegd.
+
+## 10a. De terugstorting
+
+Het lid vraagt zijn geld terug; het staat meteen van zijn saldo af en gaat de
+opdrachtenrij in. Drie routes: `/api/pay/terugstand` (wat kan er, en wat mist
+er nog — met een reden per blokkade, zodat een scherm nooit een knop zonder
+uitleg hoeft te tonen), `/api/pay/rekening` en `/api/pay/terug`.
+
+**Snel** is de afboeking, niet de SEPA. Die kan het niet zijn, dus zegt het
+antwoord "staat klaar om verstuurd te worden" en nooit "gelukt" — bij een
+timeout van de rail weten we juist niet of hij is aangekomen. De opdrachtenrij
+(`kern/betaalopdracht/`) blijft hem met dezelfde idempotentiesleutel aanbieden.
+
+**Veilig** is vier dingen, en alleen het eerste gaat over tikfouten:
+
+| Grendel | Tegen wat |
+|---|---|
+| mod-97 op het IBAN | een tikfout die een vormcontrole doorlaat |
+| het IBAN in de identiteitskluis | een rekeningnummer naast een codenaam voert die terug naar een echte naam |
+| wachttijd op een **wijziging** | accountovername — de aanvaller zet zijn eigen rekening erin |
+| alleen het **beschikbare** deel | uitbetalen wat al gereserveerd of geoormerkt was |
+
+Die derde is de belangrijkste, en de plaatsing telt: de klok staat op het
+**wijzigen** en niet op het instellen. Een wachttijd op de eerste registratie
+zou alleen eerlijke mensen hinderen — dat account heeft net de paspoortpoort
+gehaald. De aanval is het veranderen van de bestemming op een account dat al
+saldo heeft, en daar kost hij een dag waarin de eigenaar kan ingrijpen.
+Terugzetten naar een eerder IBAN start de klok opnieuw, anders is hij te
+omzeilen door er een dag iets anders in te zetten.
+
+**Efficiënt**: geen kosten erbij, en met opzet geen batch. Een lid dat te horen
+krijgt dat zijn geld morgenochtend in een verzamelrun meegaat, heeft geen snelle
+terugstorting.
 
 **Wat open blijft, en bewust niet stilletjes is opgelost:**
 
-- **De uitweg wallet → RTG Bank → SEPA** (par. 9 punt 3). Nog steeds een keuze
-  tussen drie uitwegen, en nog steeds die van de eigenaar.
+- **De snelle weg om de wachttijd over te slaan.** Bevestigt de betaaldienst bij
+  een oplading welk IBAN er betaalde, dan is dat IBAN bewezen van dit lid en kan
+  de wachttijd vervallen. `ibanBevestigd` staat klaar en werkt; er is alleen nog
+  niets dat hem aanroept, want `server/betaal.js` geeft geen betaler-IBAN terug.
+  Dat staat er als functie mét die uitleg, niet als lege plek.
 - **De afstemming met de betaaldienst.** Het bewijsbord zegt eerlijk dat hij
   nooit is gedaan. Dat oplossen vraagt het echte afschrift ophalen en regel voor
   regel vergelijken — een eigen stuk werk, geen vinkje.

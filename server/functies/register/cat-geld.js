@@ -68,6 +68,19 @@ module.exports = [
      dat was hij niet: de boardroom kon de sepa-rail uitzetten, waarna de bank
      stopte met overboeken terwijl partners gewoon doorbetaald werden. Een rail
      die half uit staat is geen rail die uit staat. */
+  /* DE TERUGSTORTING. Een eigen regel en niet onder 'dom-pay-wallet', want het
+     is een ander vermogen: saldo AANHOUDEN (WALLET_SALDO, de rekeningen-rail)
+     en saldo TERUGBETALEN (LID_UITBETALING, de sepa-rail) horen apart te kunnen
+     sluiten. Valt de uitbetaalrail weg, dan hoort de wallet gewoon te blijven
+     werken -- betalen binnen RTG heeft er niets mee te maken.
+
+     `/rekening` staat erbij: dat verplaatst geen geld, maar het zet wel de
+     bestemming klaar. Een bestemming kunnen wijzigen terwijl er niets heen kan,
+     is een knop die belooft wat hij niet waarmaakt. */
+  { id: 'dom-pay-terug', categorie: 'Geld', naam: 'Saldo terugstorten naar het lid', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Het eigen walletsaldo terugstorten naar de eigen bankrekening.',
+    paden: ['/api/pay/terug', '/api/pay/terugstand', '/api/pay/rekening'],
+    vermogen: 'LID_UITBETALING' },
   /* De pre-autorisatie hangt aan WALLET_SALDO en niet aan de kassa-schakelaar:
      wat hier gebeurt is dat een deel van het WALLETSALDO VAN EEN LID wordt
      vastgezet. Valt de grond onder dat besluit weg, dan hoort dit mee te

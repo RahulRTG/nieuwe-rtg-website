@@ -16,7 +16,7 @@ module.exports = (kern) => {
      naar buiten te lekken. */
   const UITLEG = ['reden', 'opheffbaar', 'eigenGrens', 'klasse', 'plafondCenten', 'ruimte',
     'gereserveerd', 'beschikbaar', 'dagMaxCenten', 'maandMaxCenten', 'besteed', 'venster',
-    'toegestaan', 'vervaltOp', 'tekort', 'kyc'];
+    'toegestaan', 'vervaltOp', 'tekort', 'kyc', 'bruikbaarVanaf', 'vermogen'];
   const stuur = (res, r) => {
     if (!r.error) return res.json(r);
     const uit = { error: r.error };
@@ -131,6 +131,14 @@ module.exports = (kern) => {
     if (!pay.graafVanLid) return res.json({ ok: true, bronnen: [], bestemmingen: [] });
     res.json(pay.graafVanLid(liveCodename(req.session), { dagen: req.body.dagen }));
   });
+
+  /* DE TERUGSTORTING (./pay-terug.js): het saldo van een lid terug naar zijn
+     eigen bankrekening. Afgesplitst omdat dit bestand anders over de
+     keuringsgrens gaat, en het is een eerlijke snede: dit is het enige pad waar
+     geld het huis verlaat richting het LID, en sinds die weg bestaat is
+     walletsaldo elektronisch geld (zie WALLET_SALDO in kern/bevoegdheid). Zo
+     zwaar iets hoort niet tussen de dunne routes hierboven te staan. */
+  require('./pay-terug')(kern, { stuur, geenGast, kyc });
 
   /* De ZAAKKANT (./pay-zaak.js): budget geven, vooraf vastzetten, innen,
      saldo en uitbetalen. Afgesplitst omdat dit bestand anders over de

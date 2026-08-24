@@ -45,13 +45,25 @@ anders die uw geld vasthoudt en die vervalt (`kern/waarde/reserve.js`), een
 (`kern/waarde/oormerk.js`). Verder: budgetten van een werkgever of gemeente als
 eigen positie, slim betalen uit meerdere potjes waarbij het meest beperkte potje
 eerst opgaat, een eigen geldgrens die wél weigert (`kern/geldbeleid/grens.js`),
-treasury voor ondernemers, en een bewijsbord dat drie standen kent en géén groen
+treasury voor ondernemers, een terugstorting naar de eigen bankrekening
+(`kern/pay/terug.js`), en een bewijsbord dat drie standen kent en géén groen
 (`kern/pay/bewijs.js`). Vier grenzen die niet mogen sneuvelen: er komt geen
-tweede boekhouding bij, uitbetaalbaar is de uitzondering en hangt aan een
-vergunning, het plafond is de grond onder het besluit `WALLET_SALDO` en geen
-instelling, en de AI beweegt geen geld. Waarom "voucher" het verkeerde woord
-was, staat in paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar
-het oplaadmoment — en dát is het echte voordeel.
+tweede boekhouding bij, **uitbetaalbaar hangt altijd aan een bevoegdheid en
+nooit aan een boolean** (elke uitbetaalbare klasse noemt haar
+`uitbetaalVermogen`), het plafond per wallet is een grond en geen instelling, en
+de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
+paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
+oplaadmoment — en dát is het echte voordeel.
+
+**Let op de wissel van 24 augustus 2026.** `WALLET_SALDO` wás een *besluit* (RTG
+stelde zelf vast dat een gesloten circuit met plafonds buiten de vergunningplicht
+viel). Sinds leden hun saldo kunnen terugstorten is dat circuit niet gesloten
+meer en is die grond vervallen: saldo dat tegen de nominale waarde inwisselbaar
+is voor de houder, is elektronisch geld. Het vermogen is daarom van soort
+gewisseld naar een *rail* met `elektronischgeldinstelling` over de eigen rails,
+en de terugstorting is een eigen vermogen (`LID_UITBETALING`, sepa-rail) zodat
+een storing op de uitbetaalrail de wallet niet meesleept. Zet dat niet terug
+zonder de terugstorting eerst te sluiten.
 
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht

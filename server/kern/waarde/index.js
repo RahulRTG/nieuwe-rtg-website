@@ -27,7 +27,7 @@
    klasse mag, kan nog steeds op een ontbrekende vergunning stuklopen. */
 'use strict';
 
-const { KLASSEN, SOORTEN, STANDAARD } = require('./klassen');
+const { KLASSEN, SOORTEN, STANDAARD, ONBEKEND } = require('./klassen');
 const { toets } = require('./policy');
 const { maakReserve } = require('./reserve');
 
@@ -41,10 +41,11 @@ function klasseVan(rek) {
   if (r.startsWith('partner:')) return 'PARTNER_SETTLEMENT';
   /* Een uitgegeven positie hoort altijd geregistreerd te zijn -- ./uitgifte.js
      maakt de registratie en de rekening in dezelfde handeling. Staat er toch
-     eentje zonder, dan is dat een fout, en dan valt hij terug op de STRENGSTE
-     klasse en niet op "geen regels". Een positie waarvan we het niet weten,
-     krijgt niet stilzwijgend de ruimste rechten. */
-  if (r.startsWith('waarde:')) return STANDAARD;
+     eentje zonder, dan is dat een fout, en dan valt hij terug op ONBEKEND: de
+     strengste klasse, niet op "geen regels" en ook niet op de klasse van een
+     gewone wallet. Sinds die laatste uitbetaalbaar is, zou dat een onbekende
+     positie stilzwijgend uitbetaalbaar maken. Wat we niet kennen, kan niets. */
+  if (r.startsWith('waarde:')) return ONBEKEND;
   return null;
 }
 

@@ -1,141 +1,138 @@
-/* De tijdlijn (kern/tijdlijn.js). Hij bezit niets: elke regel komt uit een laag
-   die het lid al had.
+/* DE CONFIGURATIETIJDLIJN: acht beweringen, en ze gaan allemaal over de manier
+   waarop een "wat is er veranderd"-scherm normaal gesproken onwaar wordt.
 
-   Wat hier wordt vastgezet:
-   1. GEEN VERBANDEN EN GEEN SCORE. Dingen naast elkaar zetten is iets anders dan
-      zeggen wat ze betekenen; dat laatste is een medische uitspraak.
-   2. ALLEEN WAT GEWEEST IS. Een tijdlijn die de toekomst meeneemt, is een agenda
-      die zich voordoet als geschiedenis.
-   3. ELKE REGEL DRAAGT ZIJN HERKOMST. Het verschil tussen zelf ingevuld en door
-      een behandelaar vastgelegd is bij terugkijken het hele verhaal.
-   4. EEN KAPOTTE LAAG WORDT GEMELD. In een tijdlijn leest een gat als "toen
-      gebeurde er niets", en dat is het ergste wat een gat kan betekenen.
-   Draai los: node --experimental-sqlite --test test/tijdlijn.test.js */
+   1. DRIE BRONNEN OP ÉÉN LIJN, elk met zijn eigen naam erbij. Een regel zonder
+      bron is niet na te trekken.
+   2. HIJ BEWAART NIETS. Wat de bron zegt, staat er; er is geen vierde opslag die
+      op een dag iets anders zegt dan de drie waar zij uit komt.
+   3. VOLGORDE IS GEEN OORZAAK. Elk antwoord van `rondom` draagt die zin, want een
+      tijdlijn zonder die zin wordt binnen een week gelezen als een oorzakenlijst.
+   4. "NIETS GEVONDEN" IS NIET "NIETS GEBEURD". Een leeg venster zegt dat met
+      zoveel woorden.
+   5. WAT DEZE LIJN NIET ZIET, STAAT ERBIJ -- per bron én als aparte lijst.
+   6. EEN AANVRAAG DIE NIETS VERANDERDE, STAAT ER TOCH IN, met de status erbij.
+      Wie zoekt naar wat er veranderde, wil ook zien wat er bijna veranderde.
+   7. DE AFSTAND IS GEMETEN. `secondenVoor` is het enige getal hier, en het is
+      een verschil van twee tijdstempels en geen schatting.
+   8. HET VENSTER IS BEGRENSD. Een venster van een jaar is geen tijdlijn maar een
+      export.
+
+   MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
+   - de `let`-zin uit rondom() gehaald
+     -> "volgorde is geen oorzaak" ZAKT (RAAK)
+   - de lege-venster-tak van die zin weggehaald
+     -> "niets gevonden is niet niets gebeurd" ZAKT (RAAK)
+   - BUITEN_BEELD leeggemaakt
+     -> "wat deze lijn niet ziet, staat erbij" ZAKT (RAAK)
+   - de aanvraagregel (status wacht/geweigerd) niet meer opnemen
+     -> "een aanvraag die niets veranderde, staat er toch in" ZAKT (RAAK)
+   - de bovengrens van 24 uur uit rondom() gehaald
+     -> "het venster is begrensd" ZAKT (RAAK)
+   - grens() terug naar `Number(minuten || 30)`
+     -> "het venster is begrensd" ZAKT (RAAK). Dat was een echte fout, gevonden
+        door deze toets: een gevraagde NUL is falsy, dus wie om een venster van
+        nul minuten vroeg kreeg er stil dertig en dus veel meer regels dan hij
+        vroeg.
+
+   Draai los: node --test test/tijdlijn.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { startServer, stop } = require('./helper');
 
-let srv, base, lid, sup;
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tijdlijn-'));
-const dagVan = d => new Date(d).toISOString().slice(0, 10);
-const overDagen = n => dagVan(new Date(Date.now() + n * 86400000));
+const { maakTijdlijn } = require('../server/kern/command/tijdlijn');
 
-const api = (pad, body, t) => fetch(base + '/api/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
-  body: JSON.stringify(body || {})
-}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+const T = (min) => new Date(Date.parse('2026-08-24T12:00:00.000Z') - min * 60000).toISOString();
+const NU = '2026-08-24T12:00:00.000Z';
 
-test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'KIKUNOI' } });
-  base = srv.base;
-  lid = await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tier: 'rtg' }) }).then(r => r.json()).then(d => d.token);
-  sup = (await api('supplier/login', { username: 'rahul', password: 'Imran' }, '')).body.token;
-  assert.ok(lid && sup);
-});
-test.after(() => {
-  stop(srv && srv.child);
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
-});
+function opstelling() {
+  const db = { data: { techniek: {
+    functieVerzoeken: [
+      { vid: 'a1', label: 'Salon UIT', wijzigingen: [{ id: 'salon', aan: false }],
+        doorNaam: 'Sarah', at: T(9), status: 'akkoord', besluitAt: T(8) },
+      { vid: 'a2', label: 'Betalen UIT', wijzigingen: [{ id: 'betalen', aan: false }],
+        doorNaam: 'Sarah', at: T(6), status: 'geweigerd', besluitAt: T(5) },
+      { vid: 'a3', label: 'Spelen UIT', wijzigingen: [{ id: 'spellen', aan: false }],
+        doorNaam: 'Sarah', at: T(4), status: 'wacht' }
+    ],
+    incidentcontrole: { audit: [{ at: T(3), actie: 'noodstand aan', door: 'de eigenaar', reden: 'proef' }] }
+  } } };
+  const regels = [
+    { at: T(20), actor: 'kantoor', actie: 'beleid zetten', objectType: 'beleid', objectId: 'herstel.autoAan',
+      niveau: 'hand', reden: 'autoherstel uit' },
+    { at: T(2), actor: 'kantoor', actie: 'herstel uitvoeren', objectType: 'runbook', objectId: 'rit-vast',
+      niveau: 'auto', reden: 'ritten hervat' }
+  ];
+  const journaal = { recent: () => regels.slice().reverse() };
+  return { db, tijdlijn: maakTijdlijn({ db, journaal }) };
+}
 
-test('een lege tijdlijn is leeg, en zegt zelf dat hij niets afleidt', async () => {
-  const r = await api('tijdlijn', {}, lid);
-  assert.equal(r.status, 200);
-  assert.equal(r.body.leeg, true);
-  assert.deepEqual(r.body.maanden, []);
-  assert.match(r.body.uitleg, /legt zelf niets vast/i);
-  assert.match(r.body.uitleg, /geen verbanden/i);
-  assert.deepEqual(r.body.storingen, []);
-});
-
-test('een doel verschijnt met zijn begindatum, uit de doelenlaag', async () => {
-  await api('doelen/maak', { titel: '10 kilometer hardlopen', reden: 'ik wil het kunnen',
-    eenheid: 'km', nulmeting: 2, streef: 10, streefOp: overDagen(60) }, lid);
-  const d = (await api('tijdlijn', {}, lid)).body;
-  assert.equal(d.leeg, false);
-  const regels = d.maanden.flatMap(m => m.regels);
-  const doel = regels.find(r => /10 kilometer/.test(r.wat));
-  assert.ok(doel, 'het doel staat op de tijdlijn');
-  assert.equal(doel.soort, 'doel');
-  assert.equal(doel.naam, 'Doelen', 'met de laag waar het vandaan komt');
-  assert.equal(doel.naar, '/apps/doelen.html', 'en de weg ernaartoe');
-  assert.equal(doel.herkomst, 'zelf');
+test('1. drie bronnen op één lijn, elk met zijn naam erbij', () => {
+  const t = opstelling();
+  const d = t.tijdlijn.lijst({ max: 100 });
+  const bronnen = [...new Set(d.regels.map(r => r.bron))].sort();
+  assert.deepEqual(bronnen, ['journaal', 'noodstand', 'schakelaar']);
+  for (const r of d.regels) assert.ok(r.bron && r.at && r.wat, 'een regel zonder bron, tijd of tekst');
+  /* Nieuwste eerst: dat is de volgorde waarin iemand kijkt. */
+  for (let i = 1; i < d.regels.length; i++) {
+    assert.ok(Date.parse(d.regels[i - 1].at) >= Date.parse(d.regels[i].at), 'de lijn loopt niet aflopend');
+  }
 });
 
-test('de regels staan op maand, nieuwste eerst', async () => {
-  const d = (await api('tijdlijn', {}, lid)).body;
-  assert.ok(d.maanden.length >= 1);
-  assert.match(d.maanden[0].label, /[a-z]+ \d{4}/, 'een leesbare maandkop: ' + d.maanden[0].label);
-  const sleutels = d.maanden.map(m => m.maand);
-  assert.deepEqual(sleutels, [...sleutels].sort().reverse(), 'nieuwste maand bovenaan');
+test('2. hij bewaart niets', () => {
+  const t = opstelling();
+  t.tijdlijn.lijst({ max: 100 });
+  t.tijdlijn.rondom(NU, 30);
+  const eigen = Object.keys(t.db.data).filter(k => /tijdlijn/i.test(k));
+  assert.deepEqual(eigen, [], 'de tijdlijn legde een eigen opslag aan: ' + eigen.join(', '));
 });
 
-test('wat nog moet komen staat er NIET in', async () => {
-  /* Een tijdlijn die de toekomst meeneemt is een agenda die zich voordoet als
-     geschiedenis. Dit wordt op de laag zelf nagerekend, want via de API is er
-     geen afspraak in het verleden te maken. */
-  const maak = require('../server/kern/tijdlijn');
-  const nu = new Date('2026-05-10T12:00:00Z');
-  const laag = maak({ kern: {
-    careMijn: () => ({ boekingen: [
-      { datum: '2026-05-01', behandelingNaam: 'Consult', aanbiederNaam: 'Kliniek' },
-      { datum: '2026-05-20', behandelingNaam: 'Nog te gaan', aanbiederNaam: 'Kliniek' }
-    ] }),
-    verzorgingLeden: { mijn: () => ({ afspraken: [] }) },
-    doelenVan: () => ({ doelen: [] }),
-    toestellenVan: () => ({ toestellen: [] }),
-    metingenVan: () => ({ onderwerpen: {} }),
-    metingenHistorie: () => []
-  } });
-  const d = laag.tijdlijnVoor('k', 'CODE', nu);
-  const watten = d.maanden.flatMap(m => m.regels).map(r => r.wat);
-  assert.deepEqual(watten, ['Consult'], 'alleen wat geweest is');
+test('3. volgorde is geen oorzaak, en 7. de afstand is gemeten', () => {
+  const t = opstelling();
+  const r = t.tijdlijn.rondom(NU, 30);
+  assert.ok(r.aantal >= 5, 'er is te weinig gevonden om iets te toetsen: ' + r.aantal);
+  assert.match(r.let, /VOLGORDE en geen oorzaak/);
+  assert.ok(!/veroorzaakt|oorzaak van/i.test(JSON.stringify(r.regels)), 'er staat een oorzaakclaim in de regels');
+  const herstel = r.regels.find(x => x.soort === 'herstel uitvoeren');
+  assert.equal(herstel.secondenVoor, 120, 'de afstand is geen gemeten verschil van twee tijdstempels');
 });
 
-test('wat een behandelaar vastlegde staat erin, met wie het deed', async () => {
-  const maak = require('../server/kern/tijdlijn');
-  const laag = maak({ kern: {
-    careMijn: () => ({ boekingen: [] }),
-    verzorgingLeden: { mijn: () => ({ afspraken: [] }) },
-    doelenVan: () => ({ doelen: [] }),
-    toestellenVan: () => ({ toestellen: [] }),
-    metingenVan: () => ({ onderwerpen: { gewicht: { label: 'Gewicht', eenheid: 'kg' } } }),
-    metingenHistorie: (key, o) => {
-      assert.equal(o.bron, 'behandelaar', 'de tijdlijn vraagt om precies die bron');
-      return [{ onderwerp: 'gewicht', op: '2026-04-02', waarde: 81, bron: 'behandelaar', door: 'Kliniek Noord' }];
-    }
-  } });
-  const r = laag.tijdlijnVoor('k', 'CODE', new Date('2026-05-10T12:00:00Z')).maanden[0].regels[0];
-  assert.equal(r.wat, 'Gewicht');
-  assert.match(r.waar, /81 kg/);
-  assert.match(r.waar, /Kliniek Noord/, 'met wie het vastlegde');
-  assert.equal(r.herkomst, 'behandelaar',
-    'en de herkomst staat erbij: dat verschil is bij terugkijken het hele verhaal');
+test('4. "niets gevonden" is niet "niets gebeurd"', () => {
+  const t = opstelling();
+  const leeg = t.tijdlijn.rondom('2020-01-01T00:00:00.000Z', 30);
+  assert.equal(leeg.aantal, 0);
+  assert.match(leeg.let, /iets anders dan "er is niets veranderd"/);
 });
 
-test('er staat nergens een verband of een score', async () => {
-  const d = (await api('tijdlijn', {}, lid)).body;
-  const data = JSON.stringify(d.maanden);
-  assert.ok(!/doordat|waardoor|omdat|sinds .* slechter|verband|correlat/i.test(data),
-    'geen verbanden: dat is een medische uitspraak');
-  assert.ok(!/score|punten|cijfer|trend|percentiel/i.test(data), 'en geen score over de tijd');
-  assert.deepEqual(Object.keys(d).sort(),
-    ['aantal', 'leeg', 'maanden', 'ok', 'storingen', 'uitleg', 'vandaag'],
-    'en geen veld erbij waar een oordeel in past');
+test('5. wat deze lijn niet ziet, staat erbij', () => {
+  const t = opstelling();
+  for (const d of [t.tijdlijn.lijst({}), t.tijdlijn.rondom(NU, 30)]) {
+    assert.equal(d.bronnen.length, 3);
+    for (const b of d.bronnen) assert.ok(b.zietNiet && b.zietNiet.length > 20, b.id + ' zegt niet wat hij mist');
+    assert.ok(d.buitenBeeld.length >= 3, 'er staat geen lijst met wat er buiten beeld valt');
+    for (const b of d.buitenBeeld) assert.ok(b.waarom && b.waarom.length > 20, b.wat + ' heeft geen reden');
+  }
 });
 
-test('een kapotte laag wordt gemeld en niet als leegte getoond', async () => {
-  const maak = require('../server/kern/tijdlijn');
-  const d = maak({ kern: { careMijn: () => { throw new Error('boem'); } } }).tijdlijnVoor('k', 'CODE');
-  assert.ok(d.storingen.some(s => /Zorg/.test(s) && /fout/i.test(s)));
-  assert.ok(d.storingen.some(s => /Doelen/.test(s) && /niet aangesloten/i.test(s)));
-  assert.equal(d.leeg, true, 'en er wordt niets verzonnen om het gat te vullen');
+test('6. een aanvraag die niets veranderde, staat er toch in', () => {
+  const t = opstelling();
+  const r = t.tijdlijn.rondom(NU, 30);
+  const geweigerd = r.regels.filter(x => x.soort === 'schakelaar geweigerd');
+  const wacht = r.regels.filter(x => x.status === 'wacht');
+  assert.equal(geweigerd.length, 1, 'een geweigerde aanvraag verdween van de lijn');
+  assert.equal(wacht.length, 1, 'een wachtende aanvraag verdween van de lijn');
+  assert.equal(geweigerd[0].veranderdeIets, false);
+  const omgezet = r.regels.find(x => x.soort === 'schakelaar omgezet');
+  assert.equal(omgezet.veranderdeIets, true);
+  /* En het aantal dat WERKELIJK iets veranderde staat apart: anders leest
+     "vijf wijzigingen vlak ervoor" als vijf wijzigingen. */
+  assert.ok(r.veranderdeIets < r.aantal, 'alles telt als een echte wijziging');
 });
 
-test('niemand anders komt bij uw tijdlijn', async () => {
-  assert.equal((await api('tijdlijn', {}, sup)).status, 401);
-  assert.equal((await api('tijdlijn', {}, '')).status, 401);
+test('8. het venster is begrensd', () => {
+  const t = opstelling();
+  const groot = t.tijdlijn.rondom(NU, 60 * 24 * 365);
+  assert.equal(groot.venster.minuten, 24 * 60, 'een venster van een jaar werd gewoon geaccepteerd');
+  const klein = t.tijdlijn.rondom(NU, 0);
+  assert.equal(klein.venster.minuten, 1, 'een venster van nul minuten werd geaccepteerd');
+  const stuk = t.tijdlijn.rondom('geen tijd', 30);
+  assert.equal(stuk.status, 400, 'een onzinnig moment gaf gewoon een lijst terug');
 });

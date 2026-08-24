@@ -99,6 +99,30 @@
   .cniveau.ok{border-color:var(--groen);color:var(--groen);}
   .cniveau.mis{border-color:var(--acc);color:var(--acc);}
   .cniveau.onbekend{border-color:var(--amber);color:var(--amber);}
+  /* De gezondheidskaart (command-17.js). "Niet vast te stellen" krijgt GEEN
+     kleur -- niet groen, niet amber, niet rood. Een vermogen waarover we niets
+     weten hoort visueel stil te zijn; elke kleur die het wel krijgt, wordt
+     binnen een week als een oordeel gelezen. En .cgraad staat naast de stand en
+     niet erin: de vraag "is het gezond" en de vraag "hoe hard weten we dat"
+     zijn twee vragen, en dat verschil is de hele reden dat dit scherm bestaat.
+
+     En de stand heet `geen` en niet `stil`: de UI-kit heeft zelf een `.stil`
+     (body.rtg-stijl .stil, .8rem lopende tekst) en die is SPECIFIEKER dan een
+     `.cniveau.stil` hier. De pil zou dan stil op .8rem gaan staan naast de
+     andere op .62rem -- precies de val waar de opmerking hierboven over de kit
+     voor waarschuwt, en die je alleen op het scherm ziet. */
+  .cniveau.geen{border-color:var(--line);color:var(--soft);}
+  .cgraad{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
+  .cgraad.bewezen{color:var(--groen);}
+  .cgraad.gemeten{color:var(--muted);}
+  .czegt{font-size:.78rem;color:var(--soft);line-height:1.55;border-left:2px solid var(--line);
+    padding-left:.7rem;margin:.35rem 0 .6rem;}
+  /* De hersteltransactie (command-05.js): de droogloop met zijn voorcontrole.
+     Als klasse en niet als style="" -- elk style-attribuut in public/ houdt
+     style-src-attr open in de CSP, en NORM.json telt ze. */
+  .h-droog{margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .h-keten{list-style:none;padding:0;margin:.4rem 0 .2rem;}
+  .h-keten li{padding:.25rem 0;font-size:.8rem;color:var(--muted);line-height:1.5;}
   /* Vier veldbreedtes en een marge, in plaats van een style="" per invoerveld.
      Dat is geen smaak: elk style-attribuut in public/ houdt style-src-attr open
      in de CSP, en NORM.json telt ze (inlineStijlAttributen). Vier klassen zijn

@@ -16,7 +16,7 @@
    alleen ergens mag). Nooit één getal dat doet alsof het allebei is. */
 'use strict';
 
-module.exports = ({ posities, positie, beschikbaar, ruimte, reserve, KLASSEN }) => {
+module.exports = ({ posities, positie, beschikbaar, ruimte, reserve, oormerk, KLASSEN }) => {
 
   /* ALLE posities van een lid, met zijn gewone wallet erbij. Die staat er
      altijd bij, ook als er niets op staat: hij bestaat per definitie en een
@@ -37,12 +37,14 @@ module.exports = ({ posities, positie, beschikbaar, ruimte, reserve, KLASSEN }) 
     const s = Math.round(Number(saldo) || 0);
     if (!p) return { rek, waardepositie: false, saldo: s };
     return { rek, waardepositie: true, klasse: p.klasse, klasseNaam: p.spec.naam,
-      saldo: s, gereserveerd: reserve.vastgezet(rek), beschikbaar: beschikbaar(rek, s),
+      saldo: s, gereserveerd: reserve.vastgezet(rek), apartGezet: oormerk.apart(rek),
+      beschikbaar: beschikbaar(rek, s),
       plafondCenten: p.spec.plafondCenten,
       ruimte: Number.isFinite(p.spec.plafondCenten) ? Math.max(0, ruimte(rek, s)) : null,
       uitbetaalbaar: p.spec.uitbetaalbaar, overdraagbaar: p.spec.overdraagbaar,
       uitgever: p.uitgever, vervaltOp: p.vervaltOp, beleid: p.beleid, grond: p.spec.grond,
-      reserveringen: reserve.open(rek).map(r => ({ id: r.id, centen: r.centen, doel: r.doel, tot: r.tot, door: r.ref })) };
+      reserveringen: reserve.open(rek).map(r => ({ id: r.id, centen: r.centen, doel: r.doel, tot: r.tot, door: r.ref })),
+      oormerken: oormerk.oormerken(rek) };
   }
 
   /* De hele portefeuille van een lid. `saldoVan` komt van de aanroeper (RTG Pay

@@ -65,6 +65,38 @@ module.exports = (kern, { stuur }) => {
     stuur(res, pay.budgettenVan(req.supplier.code));
   });
 
+  /* ---- de waardegraaf van de zaak ----
+     Van klantbetaling naar wat er werkelijk van u is. Let op de vlag `afgeleid`
+     per regel: de kosten staan echt in het grootboek, het btw- en loondeel zijn
+     een percentage uit het eigen beleid. Een schatting die zich voordoet als een
+     afdracht is gevaarlijker dan geen bedrag. */
+  app.post('/api/supplier/pay/graaf', supplierAuth, (req, res) => {
+    stuur(res, pay.graafVanZaak(req.supplier.code, { dagen: req.body.dagen }));
+  });
+
+  /* ---- de treasury van de zaak ----
+     Geld dat binnenkomt is niet hetzelfde als geld dat van u is: er zit btw in
+     en er komt een loonrun aan. De zaak stelt percentages in en bij elke
+     ontvangst gaat dat deel meteen apart. Het heeft tanden omdat `uitbetaal`
+     hieronder BESCHIKBAAR uitbetaalt en niet het saldo -- zonder die helft is
+     een btw-reservering een getal dat de volgende uitbetaling meeneemt.
+     Instellen en vrijgeven zijn geldhandelingen en vragen de manager. */
+  app.post('/api/supplier/pay/treasury', supplierAuth, (req, res) => {
+    stuur(res, pay.treasuryStand(req.supplier.code));
+  });
+  app.post('/api/supplier/pay/treasury/zet', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, pay.treasuryZet(req.supplier.code, req.body || {}));
+  });
+  app.post('/api/supplier/pay/treasury/apart', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, pay.treasuryApart(req.supplier.code, req.body || {}));
+  });
+  app.post('/api/supplier/pay/treasury/vrij', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, pay.treasuryVrij(req.supplier.code, String(req.body.id || '')));
+  });
+
   /* ---- vooraf vastzetten: de pre-autorisatie ----
      Drie handelingen van de ZAAK op een code van het lid: een maximum
      vastzetten, later het werkelijke bedrag vastleggen, of vrijgeven. Het lid

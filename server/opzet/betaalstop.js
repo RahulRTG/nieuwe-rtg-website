@@ -42,6 +42,12 @@ const GELDACTIES = [
      betalen uitstaat: anders blijft het geld van een lid vastzitten precies
      zolang als de storing duurt. */
   /^\/api\/supplier\/pay\/(?:in|uitbetaal|vooraf|vastleg)$/,
+  /* De treasury verplaatst geen geld -- oormerken zijn voornemens -- maar
+     `zet` en `apart` veranderen wel WAT ER UITBETAALD KAN WORDEN. Tijdens een
+     betaalstop is dat sturen aan een knop waarvan de uitkomst stilstaat, en dat
+     leest als werk dat doorloopt. `vrij` blijft open, zoals `vrijgeef`
+     hierboven: geld weer vrijgeven moet altijd kunnen. */
+  /^\/api\/supplier\/pay\/treasury\/(?:zet|apart)$/,
   /\/(?:betaal|pay|afrekenen|refund|uitbetaal|overboeken|verreken|betaald)$/
 ];
 

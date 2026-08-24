@@ -37,9 +37,16 @@ zin: elke euro, elk tegoed en elk budget weet wie het bezit, waarvoor het
 gebruikt mag worden, wie het mag verplaatsen en welk bewijs daarvoor bestaat.
 Lees die vóór je aan saldo, tegoeden, vouchers, budgetten of uitbetalen werkt.
 Zes waardeklassen met elk een **grond** (`kern/waarde/klassen.js`), drie
-beleidslagen van hard naar zacht (`kern/waarde/policy.js`), reserveren dat géén
-boeking is (`kern/waarde/reserve.js`), en één poort waar elke betaling langs
-gaat (`kern/pay/poort.js`). Vier grenzen die niet mogen sneuvelen: er komt geen
+beleidslagen van hard naar zacht (`kern/waarde/policy.js`), en één poort waar
+elke betaling langs gaat (`kern/pay/poort.js`). Twee manieren waarop geld
+vaststaat en ze zijn met opzet niet hetzelfde: een **reservering** is iemand
+anders die uw geld vasthoudt en die vervalt (`kern/waarde/reserve.js`), een
+**oormerk** is u die uw eigen geld apart zet en dat blijft
+(`kern/waarde/oormerk.js`). Verder: budgetten van een werkgever of gemeente als
+eigen positie, slim betalen uit meerdere potjes waarbij het meest beperkte potje
+eerst opgaat, een eigen geldgrens die wél weigert (`kern/geldbeleid/grens.js`),
+treasury voor ondernemers, en een bewijsbord dat drie standen kent en géén groen
+(`kern/pay/bewijs.js`). Vier grenzen die niet mogen sneuvelen: er komt geen
 tweede boekhouding bij, uitbetaalbaar is de uitzondering en hangt aan een
 vergunning, het plafond is de grond onder het besluit `WALLET_SALDO` en geen
 instelling, en de AI beweegt geen geld. Waarom "voucher" het verkeerde woord

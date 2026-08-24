@@ -143,15 +143,14 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);
   // late binding voor de eigen geldgrens van het lid (kern/geldbeleid, na pay gemount)
   api.koppelGrens = waardePoort.koppelGrens;
-  /* De deelbestanden. ./samen gaat als EERSTE in de ctx: kassa en vooraf betalen
-     erlangs, want een betaling kan sinds er budgetten bestaan uit meerdere
-     potjes komen (zonder waardelaag is het er exact een en verandert er niets).
-     ./vooraf staat naast ./kassa en niet erin: kassa kent EEN afrekenmoment,
-     vooraf kent er twee met tijd ertussen. ./budget geeft waarde uit. */
-  Object.assign(ctx, require('./samen')(ctx));
-  Object.assign(api, require('./verzoeken')(ctx));
-  Object.assign(api, require('./kassa')(ctx));
-  Object.assign(api, require('./vooraf')(ctx));
-  Object.assign(api, require('./budget')(ctx));
+  /* De deelbestanden. ./samen en ./treasury gaan EERST in de ctx: kassa en
+     vooraf betalen erlangs (een betaling kan sinds er budgetten bestaan uit
+     meerdere potjes komen) en zetten via ./treasury meteen apart. ./vooraf
+     staat naast ./kassa en niet erin: kassa kent EEN afrekenmoment, vooraf
+     kent er twee met tijd ertussen. */
+  // in de CTX: waar de rest op leunt. Op de API: wat naar buiten gaat.
+  for (const naam of ['samen', 'treasury']) Object.assign(ctx, require('./' + naam)(ctx));
+  for (const naam of ['verzoeken', 'kassa', 'vooraf', 'budget', 'graaf', 'bewijs']) Object.assign(api, require('./' + naam)(ctx));
+  for (const k of ['treasuryBeleid', 'treasuryZet', 'treasuryStand', 'treasuryVrij', 'treasuryApart']) api[k] = ctx[k];
   return { pay: api };
 };

@@ -239,12 +239,37 @@ De volgorde is niet vrij: elke stap leunt op de vorige.
    omzeilen door de grens niet te verhogen maar weg te gooien. Er is géén
    noodknop die de bedenktijd overslaat; die zou hem terugbrengen tot precies wat
    hij niet mocht zijn.
-5. **De waardegraaf.** Volgen waar een euro heen ging, voor het lid en voor de
-   ondernemer. `kern/geldgraaf/` is de plek; de vorm staat daar al vast.
-6. **Treasury voor ondernemers.** Btw-reservering, payroll-reservering,
-   settlementbeleid. Leunt volledig op stap 1: dit ís reserveren, maar dan van
-   een zaak.
-7. **Bewijs per geldfunctie.** Zie hieronder.
+5. ~~**De waardegraaf.**~~ **Gedaan.** `kern/pay/graaf.js`: waar kwam het
+   vandaan en waar ging het heen, voor het lid (`/api/pay/graaf`) en voor de
+   ondernemer (`/api/supplier/pay/graaf`). Alles afgeleid uit het grootboek,
+   niets apart geteld — de toets rekent na dat binnengekomen min uitgegeven
+   precies het saldo is. Verplaatsingen tussen de eigen posities tellen aan geen
+   van beide kanten mee: geld van je wallet naar je eigen budget schuiven is geen
+   uitgave, en zou anders allebei de kanten opblazen.
+
+   Per regel staat of hij **afgeleid** is. De kosten van de betaaldienst zijn
+   echte grootboekregels; het btw- en loondeel is een percentage uit het eigen
+   beleid. Een schatting die zich voordoet als een afdracht is gevaarlijker dan
+   geen bedrag.
+6. ~~**Treasury voor ondernemers.**~~ **Gedaan.** `kern/pay/treasury.js`: de
+   zaak stelt een btw-percentage, een loonpercentage en een bufferbodem in, en
+   bij **elke ontvangst** gaat dat deel meteen apart — niet één keer per dag,
+   want een dagelijkse taak is een taak die kan uitvallen.
+
+   Het heeft tanden omdat `partnerUitbetaal` sinds deze stap **beschikbaar**
+   uitbetaalt en niet het saldo. Zonder die tweede helft is een btw-reservering
+   een getal op een scherm dat de volgende uitbetaling gewoon meeneemt. De
+   klassieke manier waarop een horecazaak omvalt is niet dat er te weinig
+   binnenkwam, maar dat er te veel uitging omdat het saldo eruitzag als winst.
+
+   Dit vroeg een begrip dat er nog niet was: het **oormerk**
+   (`kern/waarde/oormerk.js`), naast de reservering en met opzet niet hetzelfde.
+   Een reservering is iemand anders die uw geld vasthoudt voor een lopende
+   handeling — die **vervalt**, en dat moet ook. Een oormerk is u die uw eigen
+   geld apart zet — dat **vervalt niet**, en dat moet ook niet: een
+   btw-reservering die na een dag vanzelf vrijvalt is geen reservering maar een
+   dagdroom.
+7. ~~**Bewijs per geldfunctie.**~~ **Gedaan.** Zie hieronder.
 
 ## 8. Bewijs boven status
 
@@ -253,11 +278,30 @@ heeft gekeken. Dit huis heeft daar al een antwoord op (`TOEZICHT.md`,
 `BEWIJS.md`, `WETTEN.json`, de ketenronde), en geld is de zwaarste keten die dat
 bewijs moet leveren (`GELDLAT.md`).
 
-Elke kritieke geldfunctie hoort daarom niet groen te zijn maar **bewezen**, met
-de leeftijd van dat bewijs erbij: sluitend grootboek, plafonds zonder
-overtreding, afstemming met de betaalpartner, herstelproef. Een bewijs dat is
-verlopen hoort "niet bewezen" te zeggen en niet groen te blijven staan. Een CFO
-ziet dan niet alleen zijn geld, maar hoe zeker RTG weet dat het klopt.
+Elke kritieke geldfunctie is daarom niet groen maar **bewezen**, met de leeftijd
+van dat bewijs erbij. `kern/pay/bewijs.js` en `/api/office/pay/bewijs`:
+
+| Controle | Hoe |
+|---|---|
+| Het grootboek sluit | live nagerekend: som nul, niemand rood |
+| Plafonds worden nageleefd | live geteld: nul overtredingen |
+| Vastgezet geld bestaat ook | reserveringen plus oormerken ≤ saldo |
+| Elke boeking heeft twee kanten | elke regel op vorm gecontroleerd |
+| Afgestemd met de betaaldienst | **niet-bewezen**, met de reden |
+
+**Drie standen en met opzet geen groen.** `bewezen` (zojuist gemeten, mét het
+getal waaruit het blijkt), `niet-bewezen` (er is niets dat het aantoont — geen
+storing, en ook geen "waarschijnlijk goed"), `gezakt` (gemeten en het klopte
+niet; de enige stand die om iemand vraagt). Het eindoordeel is niet "alles
+groen" maar *niets gezakt én alles gemeten*: zolang er iets niet-bewezen is,
+staat er `deels bewezen`.
+
+De vijfde regel is de belangrijkste van het bord, juist omdat hij niet slaagt.
+Afstemming met het echte afschrift van de betaaldienst is wat een CFO als eerste
+wil zien en wat dit huis nog niet doet. Een vinkje daar zou de gevaarlijkste
+leugen van het hele bord zijn — het zou precies dekken wat niemand anders dekt.
+Dus staat er wat waar is: nooit gedaan, en waarom niet. Een bewijs dat ouder is
+dan achtenveertig uur zakt; een bewijs dat verlopen is, bewijst niets meer.
 
 ## 9. De grenzen
 
@@ -333,7 +377,30 @@ Botst een functie met een grens, dan **vervalt de functie**.
 - **Een tweede rechtenmodel.** Wie wat mag blijft bij de rollen waar ze wonen
   (`CONCERN.md`). Deze laag zegt wat de wáárde mag, niet wat de persoon mag.
 
-## 11. De lat
+## 11. Wat er nu staat, en wat er open blijft
+
+Alle zeven stappen uit paragraaf 7 zijn gebouwd, met toetsen die door de
+voordeur gaan en met een mutatie per belofte — het plafond weghalen, de laag
+loskoppelen, reserveringen weer uitgeefbaar maken, eigen geld eerst opmaken, de
+genretoets weer fail-open zetten, de grens aan de wallet hangen, de uitbetaling
+het hele saldo laten nemen, interne verplaatsingen als uitgave tellen, de
+afstemming laten doen alsof. Elke mutatie laat toetsen zakken; wat niet zakt, is
+niet vastgelegd.
+
+**Wat open blijft, en bewust niet stilletjes is opgelost:**
+
+- **De uitweg wallet → RTG Bank → SEPA** (par. 9 punt 3). Nog steeds een keuze
+  tussen drie uitwegen, en nog steeds die van de eigenaar.
+- **De afstemming met de betaaldienst.** Het bewijsbord zegt eerlijk dat hij
+  nooit is gedaan. Dat oplossen vraagt het echte afschrift ophalen en regel voor
+  regel vergelijken — een eigen stuk werk, geen vinkje.
+- **De noodstanden** (par. 9 punt 8). De betaalstop is nog alles-of-niets.
+- **De schermen.** Alles hierboven is server en API; er is nog geen enkel scherm
+  dat een portefeuille, een treasury-bord of een bewijsbord toont. Dat is met
+  opzet zo gelaten: `ONTWERP.md` beslist hoe die eruitzien, en een scherm bouwen
+  op een laag die nog kon schuiven zou tweemaal werk zijn geweest.
+
+## 12. De lat
 
 Zeven regels. Ze zijn de maatstaf waaraan elke nieuwe geldfunctie hier wordt
 gehouden, en ze zijn opzettelijk zo geschreven dat je kunt zien wanneer je zakt.

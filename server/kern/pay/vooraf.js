@@ -113,9 +113,13 @@ module.exports = (ctx) => {
           soort: 'betaaldienstkosten', oms: 'Betaaldienstkosten, direct verrekend', ref: r.id });
         if (kb.error) kosten = 0;
       }
+      // dezelfde treasury-oormerking als bij een directe inning (./kassa.js)
+      let apart = 0;
+      try { apart = (ctx.bijOntvangst(supplierCode, v.centen - kosten) || {}).apart || 0; } catch (e) { apart = 0; }
       save();
       seintje(codenaam);
-      return { ok: true, centen: v.centen, vrijgevallen: v.vrijgevallen, van: codenaam, kosten, delen: b.delen };
+      return { ok: true, centen: v.centen, vrijgevallen: v.vrijgevallen, van: codenaam, kosten,
+        apartGezet: apart, delen: b.delen };
     });
   }
 

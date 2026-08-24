@@ -4,7 +4,7 @@
    client stuurt bij elke knop een idem-sleutel mee, dubbeltikken kan nooit
    dubbel boeken. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, pay, onboarding, factuurSaldo } = kern;
+  const { app, auth, officeAuth, liveCodename, pay, onboarding, factuurSaldo } = kern;
   /* Bij een weigering krijgt het LID wel te horen waarom. Dat is het spiegelbeeld
      van ./pay-zaak.js, waar een zaak juist een generiek antwoord krijgt: de reden
      is een gegeven over dit lid, dus hij hoort bij hem thuis en nergens anders.
@@ -122,12 +122,35 @@ module.exports = (kern) => {
     res.json(pay.portefeuille(liveCodename(req.session)));
   });
 
+  /* ---- de waardegraaf van het lid ----
+     Niet "wat is er gebeurd" (dat is /overzicht) maar "waar ging mijn geld
+     heen". Alles hier is afgeleid uit het grootboek; er wordt niets apart
+     geteld. */
+  app.post('/api/pay/graaf', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!pay.graafVanLid) return res.json({ ok: true, bronnen: [], bestemmingen: [] });
+    res.json(pay.graafVanLid(liveCodename(req.session), { dagen: req.body.dagen }));
+  });
+
   /* De ZAAKKANT (./pay-zaak.js): budget geven, vooraf vastzetten, innen,
      saldo en uitbetalen. Afgesplitst omdat dit bestand anders over de
      keuringsgrens van 10240 byte gaat, en het is de eerlijke snede: alles
      hierboven hangt aan `auth` (een lid), alles daar aan `supplierAuth` (een
      zaak). Twee poorten, twee bestanden. */
   require('./pay-zaak')(kern, { stuur });
+
+  /* HET BEWIJSBORD. Anders dan /gezond hieronder, dat één ja of nee geeft aan de
+     bewaking: dit is het bord waarop staat WAT er is aangetoond en waaruit dat
+     blijkt. Alleen voor het kantoor, want de tellingen (hoeveel rekeningen,
+     welke staan rood) zijn bedrijfsgegevens.
+
+     Let op de derde stand: niet-bewezen. Dat is geen storing en geen groen --
+     het is de eerlijke stand voor alles wat niet gemeten is, en juist die stand
+     maakt het bord bruikbaar. Zie de kop van kern/pay/bewijs.js. */
+  app.post('/api/office/pay/bewijs', officeAuth, (req, res) => {
+    if (!pay.bewijsbord) return res.status(501).json({ error: 'Het bewijsbord draait hier niet.' });
+    res.json(pay.bewijsbord());
+  });
 
   // de gezondheidsknop voor de bewaking: klopt het grootboek nog op de cent?
   // Geen data naar buiten, alleen ja of nee (en een 500 zodat een alarm afgaat).

@@ -50,6 +50,11 @@ function klasseVan(rek) {
 
 function maakWaarde({ db, save, crypto, nu = () => Date.now() }) {
   const reserve = maakReserve({ db, save, crypto, nu });
+  /* Oormerken (./oormerk.js) zijn de tweede manier waarop geld vaststaat, en
+     met opzet een ander begrip dan een reservering: iemand anders houdt uw geld
+     vast (reservering, vervalt) tegenover u zet uw eigen geld apart (oormerk,
+     blijft). Zie de kop daar voor waarom die twee niet samen mogen vallen. */
+  const oormerk = require('./oormerk').maakOormerk({ db, save, crypto, nu });
 
   function posities() {
     if (!db.data.waardePosities || typeof db.data.waardePosities !== 'object') db.data.waardePosities = {};
@@ -87,7 +92,7 @@ function maakWaarde({ db, save, crypto, nu = () => Date.now() }) {
   /* Beschikbaar is saldo min wat vastgezet staat. Dit is het getal waar een
      bestedingsvraag tegenaan hoort, en niet het saldo -- zie ./reserve.js. */
   function beschikbaar(rek, saldo) {
-    return Math.round(Number(saldo) || 0) - reserve.vastgezet(rek);
+    return Math.round(Number(saldo) || 0) - reserve.vastgezet(rek) - oormerk.apart(rek);
   }
 
   /* Ruimte onder het plafond van de ONTVANGENDE positie. Geen positie of geen
@@ -108,13 +113,15 @@ function maakWaarde({ db, save, crypto, nu = () => Date.now() }) {
      positie staat. Daar komen save noch registreer binnen -- wie er iets
      verandert kan per definitie niets aan een positie wijzigen. Zelfde reden
      als kern/pay/kijken.js. */
-  const kijk = require('./kijken')({ posities, positie, beschikbaar, ruimte, reserve, KLASSEN });
+  const kijk = require('./kijken')({ posities, positie, beschikbaar, ruimte, reserve, oormerk, KLASSEN });
 
   const api = { KLASSEN, SOORTEN, STANDAARD, positie, registreer, beschikbaar, ruimte, poort, toets,
     positiesVan: kijk.positiesVan, overzicht: kijk.overzicht, portefeuille: kijk.portefeuille,
     reserveer: reserve.reserveer, vastleggen: reserve.vastleggen, vrijgeven: reserve.vrijgeven,
     gereserveerd: reserve.vastgezet, reserveringen: reserve.open,
-    reserveringenVan: reserve.voorRef, reservering: reserve.vind };
+    reserveringenVan: reserve.voorRef, reservering: reserve.vind,
+    oormerken: oormerk.oormerken, apart: oormerk.apart,
+    oormerkZet: oormerk.oormerkZet, oormerkVrij: oormerk.oormerkVrij };
   Object.assign(api, require('./uitgifte')({ api, crypto, nu }));
   /* De samenstelling (./samenstellen.js): uit welke potjes komt deze betaling,
      en in welke volgorde. Rekent alleen uit; boeken doet kern/pay/samen.js,

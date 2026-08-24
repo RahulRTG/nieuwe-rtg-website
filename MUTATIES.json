@@ -1761,6 +1761,15 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "gezakte-toetsen.test.js": {
+      "soort": "puur",
+      "staat": "te langzaam",
+      "lekt": true,
+      "reden": "ook met --test-force-exit niet af binnen 360s; de toetsen zelf komen niet klaar, dus dit is traagheid en niet alleen een handle",
+      "module": "scripts/gezakte-toetsen.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
+    },
     "gezelschap.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1952,11 +1961,53 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "horeca-bar.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "horeca-bezorg-club.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "horeca-cadans.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "horeca-dienstmeting.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "horeca-edge.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "horeca-gezelschap.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10,
+      "scherp": "gezakt"
+    },
+    "horeca-host.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "horeca-hotel-event.test.js": {
@@ -1966,11 +2017,39 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "horeca-journey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "horeca-kaart.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "horeca-keuken.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "horeca-pas.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "horeca-rahul.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
       "scherp": "gezakt"
     },
     "horeca-rekening.test.js": {
@@ -1980,11 +2059,47 @@
       "gezakt": 13,
       "scherp": "gezakt"
     },
+    "horeca-samenvoegen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "horeca-stappen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "horeca-verdeling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
     "horeca-vloer.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "horeca-werklijst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/gast/verzoek.js",
+      "operator": "getal+1#4",
+      "gezakt": 2,
+      "geprobeerd": 19
+    },
+    "horeca-wijk.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 20,
       "scherp": "gezakt"
     },
     "horlogewerk.test.js": {
@@ -2237,6 +2352,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "kassa-herhaling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "kassa-modus.test.js": {
       "soort": "server",
@@ -4070,6 +4192,14 @@
     "persistentiestand.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "persoonseis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/persoonseis.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "pestgrens.test.js": {
       "soort": "puur",
@@ -6089,6 +6219,21 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "vakbewijs-kluis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vakbewijs.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "vakbewijs-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10,
+      "scherp": "gezakt"
     },
     "vakken.test.js": {
       "soort": "server",

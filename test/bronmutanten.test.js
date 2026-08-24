@@ -42,6 +42,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const DRAAIER = path.join(WORTEL, 'scripts', 'test-runner.js');
@@ -150,4 +151,80 @@ test('de twee toetsen die deze ronde de fout veroorzaakten, staan er nu in', () 
   for (const naam of ['gezag.test.js', 'envelop.test.js']) {
     assert.equal(geisoleerd.has(naam), true, naam + ' hoort geïsoleerd te draaien');
   }
+});
+
+test('elke suite-opdracht past de isolatielijst ook echt toe', () => {
+  /* DE LIJST BESTOND, DE DRAAIER BESTOND, EN CI GEBRUIKTE ZE ALLEBEI NIET.
+
+     `test:gate` in package.json was een eigen aanroep: `node --test
+     test/*.test.js` met de dekkingsvlaggen erachter. Dat is letterlijk het
+     commando dat de kop van scripts/test-runner.js beschrijft als de reden dat
+     die draaier bestaat -- en het ging langs GEISOLEERD heen. In CI is
+     test:gate de ENIGE suite-run, dus daar zijn de acht bronmuterende toetsen
+     nooit geisoleerd geweest, geen enkele keer.
+
+     Vier toetsen zijn daar aantoonbaar op omgevallen zonder dat er iets mis
+     was: excursie en horeca-host op CI, negenplus en schakelkast-dekking
+     lokaal. Allemaal startten ze een server of scanden ze de bron terwijl
+     envelop.test.js `function gastAuth(` had hernoemd of meterijk.test.js een
+     tijdelijk bestand in public/apps/ had staan.
+
+     De toets hierboven bewaakt WIE er op de lijst hoort. Deze bewaakt DAT de
+     lijst wordt toegepast. Zonder deze tweede was de eerste een lijst die
+     niemand las -- en dat is precies wat er drie maanden lang het geval was. */
+  /* DE ZEEF KIJKT NAAR OPDRACHTEN DIE ALLE test/*.test.js PAKKEN, en naar niets
+     anders. Twee grenzen, allebei met een reden:
+
+       - `.e2e.js` valt erbuiten. De isolatielijst gaat over .test.js; de
+         schermtoetsen zijn een andere verzameling.
+       - `--test-concurrency=1` valt erbuiten. Een seriele run KAN de race niet
+         hebben: er draait nooit een tweede bestand naast het bronmuterende.
+         Die uitzondering staat hier en niet in iemands hoofd, want een zeef die
+         zwijgt zonder te zeggen waarom is een zeef die je een keer verkeerd
+         leest. */
+  const raaktHeleSuite = (t) => /test\/\*\.test\.js|test\/\*\*\/\*\.test\.js/.test(t);
+  const serieel = (t) => /--test-concurrency=1\b/.test(t);
+  const langsDeDraaier = (t) => t.includes('scripts/test-runner.js');
+  const verdacht = (t) => raaktHeleSuite(t) && !serieel(t) && !langsDeDraaier(t);
+
+  const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));
+  const fout = Object.entries(pkg.scripts || {})
+    .filter(([, opdracht]) => verdacht(String(opdracht)))
+    .map(([naam, opdracht]) => naam + ': ' + opdracht);
+  assert.deepEqual(fout, [],
+    'deze opdracht(en) draaien alle test/*.test.js buiten scripts/test-runner.js om, en dus zonder de ' +
+    'isolatielijst; laat ze door de draaier lopen (zie de kop hierboven)');
+
+  /* En de tegenproef, want een zeef die niets kan vinden bewaakt niets
+     (LAT.md regel 9). Dit is het commando dat hier tot 24 augustus 2026 stond. */
+  assert.equal(verdacht('node --experimental-sqlite --experimental-test-coverage --test test/*.test.js'), true,
+    'de zeef herkent het oude test:gate-commando niet meer');
+  assert.equal(verdacht('node scripts/test-runner.js --dekking=78,78,65'), false,
+    'de zeef wijst de draaier zelf aan, en dan is er geen commando dat hem tevredenstelt');
+  assert.equal(verdacht('node --test --test-concurrency=1 test/*.test.js'), false,
+    'een seriele run wordt aangewezen terwijl die de race niet kan hebben');
+  assert.equal(verdacht('node --test test/*.e2e.js'), false,
+    'de schermtoetsen worden aangewezen, terwijl de isolatielijst over .test.js gaat');
+});
+
+test('de draaier past de lijst ook echt toe, en niet alleen op papier', () => {
+  /* DE LAATSTE METER. De toets hierboven bewaakt dat elke suite-opdracht via
+     scripts/test-runner.js loopt. Maar die draaier splitst met een enkele regel
+     -- `bestanden.filter(n => !isGeisoleerd(n))` -- en toen ik die muteerde naar
+     `filter(n => true)` zakte er niets. De lijst bestond, het commando liep er
+     langs, en de splits kon stilletjes verdwijnen.
+
+     Daarom vraagt deze toets de draaier zelf wat hij zou doen (`--toon`), met
+     een gewoon bestand en twee bronmuterende ernaast. De uitslag moet ze
+     scheiden. Muteer de splits weg en deze toets zakt. */
+  const uit = execFileSync(process.execPath,
+    [path.join(WORTEL, 'scripts', 'test-runner.js'), '--toon',
+      '--bestanden=kappen.test.js,gezag.test.js,envelop.test.js'],
+    { cwd: WORTEL, encoding: 'utf8', env: { ...process.env, RTG_AFBOUW_SLOT_ACTIEF: '1' } });
+  const plan = JSON.parse(uit);
+  assert.deepEqual(plan.parallel, ['kappen.test.js'],
+    'een gewone toets hoort in de parallelle groep, en alleen die');
+  assert.deepEqual(plan.geisoleerd.slice().sort(), ['envelop.test.js', 'gezag.test.js'],
+    'de twee bronmuterende toetsen horen apart te draaien; staan ze in de parallelle groep, dan is ' +
+    'de splits in scripts/test-runner.js weg en is de hele isolatielijst een dode letter');
 });

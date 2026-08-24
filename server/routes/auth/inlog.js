@@ -116,6 +116,24 @@ app.post('/api/auth/login', async (req, res) => {
   // eigenaar mag in alle drie de apps; zie de uitleg bij pasAppOk hierboven.
   if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = accounts.issueToken(user.id);
+  /* HOE HARD EN HOE VERS (VERTROUWEN.md laag 2). Een sessie wist tot nu toe DAT
+     hij is ingelogd en niet hoe. Zonder dat kan laag 3 geen step-up onderbouwen,
+     en dan wordt "wij vragen een tweede bevestiging" een regel zonder reden.
+
+     Het apparaat is de useragent plus de taal, en er wordt alleen een HASH van
+     bewaard (kern/vertrouwen/verificatie.js) -- genoeg voor de enige vraag die
+     wordt gesteld, ken ik dit apparaat van u, en te weinig voor een
+     bewegingsbeeld.
+
+     HIER STOND EEN TRY/CATCH, met "de inlog gaat voor" erbij. Dat klonk
+     verstandig en was het niet: de domeingrens hield deze aanroep tegen (auth
+     had de naam `vertrouwen` niet opgeschreven), de catch slikte dat op, en de
+     inlog bleef vrolijk slagen terwijl laag 2 volledig stilstond. Een vangnet
+     om een bedradingsfout heen ziet er precies hetzelfde uit als een vangnet om
+     iets dat werkt. Nu gooit hij, en test/vertrouweninlog.test.js kijkt in de
+     opslag of er echt iets staat. */
+  kern.vertrouwen.verifieer(token, { hoe: 'wachtwoord', account: user.id,
+    apparaat: String(req.get('user-agent') || '') + '|' + String(req.get('accept-language') || '') });
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
   /* Een account voor alles: heeft dit lid een werkplek, dan komt die hier meteen
      mee. Geen tweede inlog en geen pincode -- je bent al wie je bent. Het

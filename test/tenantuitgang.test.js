@@ -225,6 +225,15 @@ test('3d. de uitvoer draagt zijn eigen omvang, en die is geteld', async () => {
   const weer = await api('/api/tenant/export', { werkruimte: ruimte, beheerToken: beheer });
   assert.equal(weer.body.blootstelling.waarnemingen, b.waarnemingen + 1,
     'de vorige uitvoer is uitgevoerd, dus die telt mee');
+
+  /* EN HET OORDEEL REIST MEE (laag 3). Deze werkruimte is klein, dus de uitvoer
+     is licht en er wordt niets gevraagd -- dat is de "invisible when safe" van
+     VERTROUWEN.md en niet een step-up die vergeten is. Een scherm dat alleen de
+     omvang kreeg en niet het oordeel, zou zelf een grens gaan verzinnen. */
+  assert.ok(b.stapop, 'de omvang komt nooit zonder het oordeel erbij');
+  assert.equal(b.zwaarte, 'licht', 'een kleine werkruimte is een lichte uitvoer');
+  assert.equal(b.stapop.nodig, false);
+  assert.equal(b.stapop.onzeker, false, 'gewogen, dus geen onzekerheid');
 });
 
 test('4. de bewaring sluit de toegang -- en de uitgang blijft open', async () => {

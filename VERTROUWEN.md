@@ -54,10 +54,16 @@ Staat: de identiteitskluis met codenamen (`server/accounts.js`, `server/kluis.js
 WebAuthn (`server/webauthn/`), OIDC en SAML met een echte XSW-aanvalstoets
 (`server/sso/saml/`), SCIM met synchrone deprovisioning (`server/scim/`).
 
-Ontbreekt: **de sterkte en de versheid van een verificatie zijn geen gegeven
-van de sessie.** Een sessie weet dat hij is ingelogd, niet hoe hard en hoe lang
-geleden. Zonder dat is "je account is 7 minuten geleden vanaf een nieuw apparaat
-geverifieerd" niet te zeggen, en step-up niet te onderbouwen.
+Sinds laag 2 (`server/kern/vertrouwen/verificatie.js`) draagt een sessie ook
+HOE en WANNEER: de manier (passkey, wachtwoord, sleutelwoorden, pincode, de
+provider van de klant, of een sleutel zonder mens), het tijdstip, en of dit
+apparaat al eerder bij dit account is gezien. Daarvan wordt alleen een hash
+bewaard; de lijst is kort en verdwijnt met het account.
+
+Ontbreekt nog: alleen de wachtwoordinlog schrijft het weg. De passkey-kant, de
+provider-kant (SAML/OIDC) en de pincode doen dat nog niet, en daar levert
+`lees()` dus null -- wat laag 3 als "niet vastgelegd" behandelt en niet als
+"in orde".
 
 ### 2.2 Mag — Authority Fabric
 
@@ -298,6 +304,15 @@ levert het gegeven waar de volgende op staat.
 | 7 | **Simuleer compromittering** — het wauw-moment | het antwoord op "en als" | 8 |
 | 8 | **Trust HUD / Trust State** — uitsluitend uit de bewijspoort | wat de klant ziet | — |
 
+**Stand op 24 augustus 2026.** Laag 1, 2 en 3 staan en zijn aangesloten: de
+tenantuitvoer draagt haar eigen omvang en het step-up-oordeel, en de
+wachtwoordinlog legt de verificatiesterkte vast. Wat daar nog niet gebeurt is
+het *afdwingen*: laag 3 velt het oordeel en niemand houdt op grond daarvan iets
+tegen, omdat er nog geen tweede moment bestaat om naar door te verwijzen. Dat
+is een keuze en geen vergetelheid -- een drempel zonder tweede moment is alleen
+een dichte deur met een getal erbij -- maar zolang het zo is, moet niemand
+beweren dat dit huis step-up HEEFT. Het meet hem.
+
 Daarnaast, los van de keten en klein genoeg om tussendoor te doen:
 
 - de virusscanner die zijn eigen versheid bewijst (clamd wordt vandaag nooit
@@ -306,8 +321,15 @@ Daarnaast, los van de keten en klein genoeg om tussendoor te doen:
 - `cargo audit` op de crates van de Rust-motor (het enige stuk van de
   toeleveringsketen dat nu ongecontroleerd is; de Node-kant heeft nul
   runtime-dependencies en de Actions staan op een volledige SHA);
-- een rem per account naast die per IP (300 verzoeken per minuut per IP houdt
-  credential stuffing over duizend IP's niet tegen).
+HIER STOND "een rem per account naast die per IP", en die klopte niet. Dit huis
+heeft er al drie: IP+account (10 pogingen), de bron alleen (50) en het doel
+alleen (25). En de derde is scherper doordacht dan wat hier stond: het doel
+krijgt geen slot maar een VERTRAGING van twee seconden per mislukte poging,
+want een slot op een account geeft een vreemde de macht om de eigenaar buiten
+te houden -- vijfentwintig gokken verbranden en de rechtmatige eigenaar krijgt
+een 429 op het juiste wachtwoord. Dat is gemeten toen die emmer nog een slot
+was (`server/routes/auth/inlog.js`). Wie hier iets aan verandert, leest die
+uitleg eerst.
 
 ## 7. Het moment waar dit allemaal voor is
 

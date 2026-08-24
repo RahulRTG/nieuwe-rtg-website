@@ -81,12 +81,11 @@ module.exports = (kern) => {
     const uit = tenant.uitgang.exporteer(w.code);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
 
-    /* De blootstelling van deze uitvoer (VERTROUWEN.md laag 1). Meet voor,
-       onthoud na: die volgorde is de beveiliging zelf, en het waarom staat in
-       kern/vertrouwen/gewoonte.js. De actor is hier de WERKRUIMTE en geen mens,
-       want deze deur gaat open op het beheer-token. Laag 1 houdt niets tegen. */
+    /* Blootstelling en step-up (VERTROUWEN.md laag 1-3). Meet voor, onthoud na;
+       het waarom staat in kern/vertrouwen/. Achter deze deur staat geen mens. */
     const wie = 'werkruimte:' + w.code;
-    const bloot = kern.vertrouwen.weegCatalogus(wie, 'tenant.uitvoer', uit.uitvoer.catalogus);
+    const bloot = kern.vertrouwen.weegCatalogus(wie, 'tenant.uitvoer', uit.uitvoer.catalogus,
+      kern.vertrouwen.geenPersoon('een beheer-token'));
     kern.vertrouwen.voltooid(wie, 'tenant.uitvoer', bloot.aantal);
     /* `vorm: 'leesbaar'` geeft een overzicht in Markdown. Platte tekst en geen
        PDF: een archief hoort over tien jaar nog open te gaan zonder een

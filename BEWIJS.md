@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1054 bestanden en 7039 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1056 bestanden en 7051 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1054 |
-| losse beweringen (`test(...)`) | 7039 |
+| toetsbestanden | 1056 |
+| losse beweringen (`test(...)`) | 7051 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 890 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 892 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-925 bestanden, 6816 beweringen.
+927 bestanden, 6828 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -876,7 +876,9 @@ toets omvalt.
 | `verraad.test.js` | 20 | gezakt op `true->false#0` | DE VERRAADSMOTOR (server/lib/verraad.js) -- de wereld laten liegen. WAT HIER OP HET SPEL STAAT. |
 | `verraadtelling.test.js` | 13 | gezakt op `===->!==#0` | DE ZES GETALLEN VAN DE VERRAADRONDE (scripts/lib/verraadtelling.js). WAAROM DEZE APART GETOETST WORDEN. |
 | `vertaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Vertaler: een dunne route op de bestaande vertaalmotor. Zonder AI-sleutel vertaalt het huiswoordenboek (nl<->en) en is de app eerlijk over wat niet lukt (vertaald:false), nooit kapot. |
-| `vertrouwenblootstelling.test.js` | 10 | gezakt op `===->!==#0` | DE BLOOTSTELLINGSMETER -- laag 1 van de Trust Fabric. Zes beweringen die van buiten niet te zien zijn. |
+| `vertrouwenblootstelling.test.js` | 11 | gezakt op `===->!==#0` | DE BLOOTSTELLINGSMETER -- laag 1 van de Trust Fabric. Zes beweringen die van buiten niet te zien zijn. |
+| `vertrouweninlog.test.js` | 3 | gezakt op `liegpoort /api/` | DE VERIFICATIE WORDT BIJ DE INLOG ECHT VASTGELEGD -- laag 2 van de Trust Fabric, aan de kant waar hij aan de server hangt. WAAROM DEZE TOETS BESTAAT, en dat is een les uit deze ronde zelf. |
+| `vertrouwenstapop.test.js` | 8 | gezakt op `===->!==#0` | DE VERIFICATIESTERKTE EN DE STEP-UP -- laag 2 en 3 van de Trust Fabric. Deze toetsen gaan bijna allemaal over NIET vragen, en dat is met opzet. |
 | `verzadiging.test.js` | 12 | gezakt op `&&->||#0` | De verzadigingspoort van scripts/tot-crash.js (scripts/lib/verzadiging.js). Deze poort bestaat omdat het crashharnas urenlang het verkeerde heeft gemeten: het verdubbelde het aantal werkers, de doorvoer stortte in... |
 | `verzoek-intrekken.test.js` | 4 | gezakt op `liegpoort /api/` | EEN BETAALVERZOEK INTREKKEN -- 2 endpoints, aan beide kanten van het huis. De dekkingsmeting wees /api/pay/verzoek/intrek (lid vraagt een vriend) en /api/supplier/betaalverzoek/intrek (zaak vraagt een klant) aan als... |
 | `verzorging-leden.test.js` | 5 | gezakt op `liegpoort /api/` | De LEDENkant van de beauty-salon en barbier (kern/verzorging/beautyleden.js). Knippen, scheren en nagels waren alleen voor de zaak zelf te zien; nu boekt een lid er zelf, op codenaam, in DEZELFDE agenda als de salon. |

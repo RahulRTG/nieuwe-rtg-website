@@ -25,6 +25,8 @@
 const blootstelling = require('./blootstelling');
 const gewoonte = require('./gewoonte');
 const register = require('./register');
+const verificatie = require('./verificatie');
+const stapop = require('./stapop');
 
 module.exports = ({ db, save }) => {
   /* De bak hangt buiten de werkruimtes, en dat is een besluit: een gewoonte is
@@ -42,10 +44,19 @@ module.exports = ({ db, save }) => {
      regel staat hier en niet bij de aanroeper: hoe je een uitvoer TELT is een
      eigenschap van de meter, en twee plekken die dat elk anders doen leveren
      twee verschillende omvangen voor dezelfde handeling (LAT.md regel 4). */
-  function weegCatalogus(actor, soort, catalogus) {
+  function weegCatalogus(actor, soort, catalogus, ver) {
     const n = (catalogus || []).reduce((t, c) => t + (Number(c && c.aantal) || 0), 0);
-    return weeg(actor, soort, n);
+    const b = weeg(actor, soort, n);
+    /* Laag 3 reist mee in hetzelfde antwoord. Dat is geen gemak maar een regel:
+       een scherm dat de omvang toont zonder het oordeel erbij, laat de lezer
+       zelf een grens verzinnen -- en dan staan er twee grenzen in dit huis. */
+    return Object.assign(b, { stapop: stapop.beoordeel(b, ver === undefined ? null : ver) });
   }
+
+  /* De verificatie bij het inloggen, en de leeskant bij een handeling. */
+  function verifieer(sessie, wat) { const r = verificatie.noteer(bak(), sessie, wat); if (r) save(); return r; }
+  function verificatieVan(sessie) { return verificatie.lees(bak(), sessie); }
+  const geenPersoon = (waarom) => verificatie.zonderPersoon(waarom);
 
   function voltooid(actor, soort, aantal) {
     const n = gewoonte.noteer(bak(), actor, soort, aantal);
@@ -53,13 +64,21 @@ module.exports = ({ db, save }) => {
     return n;
   }
 
-  /* Voor het vergeetrecht en de uitgang: een gewoonte hoort te verdwijnen met
-     de actor. Blijft hij staan, dan overleeft het profiel de persoon. */
-  function vergeet(actor) {
-    const weg = gewoonte.vergeet(bak(), actor);
+  /* HET VERGEETRECHT, EN HET IS ER EEN. Hier stond een `vergeet` die alleen de
+     gewoonte wiste; de apparatenlijst en de sessie bleven staan. Dat is precies
+     de fout die de keuring aanwees toen hij meldde dat de naam `vergeet` in drie
+     kernmodules stond: drie plekken met dezelfde naam betekende hier dat er ook
+     drie ANTWOORDEN op dezelfde vraag waren, en de bovenste dekte er maar een.
+     Nu draagt alleen deze functie die naam en wist hij allebei de sporen; de
+     modules eronder heten vergeetActor en vergeetSessie. Wie vergeten wordt,
+     laat niets achter -- anders overleeft het profiel de persoon. */
+  function vergeet(actor, sessie) {
+    let weg = gewoonte.vergeetActor(bak(), actor);
+    weg += verificatie.vergeetSessie(bak(), sessie, actor);
     if (weg) save();
     return weg;
   }
 
-  return { weeg, weegCatalogus, voltooid, vergeet, register, NIET_GEDEKT: gewoonte.NIET_GEDEKT };
+  return { weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, geenPersoon,
+    register, NIET_GEDEKT: gewoonte.NIET_GEDEKT };
 };

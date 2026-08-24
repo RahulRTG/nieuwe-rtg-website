@@ -166,7 +166,30 @@ test('10. wie verdwijnt, laat geen gewoonte achter', () => {
   G.noteer(bak, 'C', 'mens.uitdienst', 2);
   G.noteer(bak, 'C', 'rol.geven', 2);
   G.noteer(bak, 'CD', 'rol.geven', 2);
-  assert.equal(G.vergeet(bak, 'C'), 2, 'beide reeksen van C');
+  assert.equal(G.vergeetActor(bak, 'C'), 2, 'beide reeksen van C');
   assert.equal(G.lees(bak, 'C', 'rol.geven'), null);
   assert.ok(G.lees(bak, 'CD', 'rol.geven'), 'en niet die van een actor wiens id ermee begint');
+});
+
+/* HET VERGEETRECHT IS EEN EN NIET TWEE. Dit is de fout die de keuring aanwees
+   met "de functie vergeet staat in 3 kernmodules": er waren drie antwoorden op
+   dezelfde vraag, en het bovenste -- dat wat een aanroeper gebruikt -- wiste
+   alleen de gewoonte. De apparatenlijst bleef staan, en dan overleeft het
+   profiel de persoon. Deze toets gaat door de fabric heen en niet langs de
+   losse modules, want dat is de weg die een echte aanroeper neemt. */
+test('11. wie vergeten wordt, laat OOK geen apparaat en geen sessie achter', () => {
+  const db = { data: {} };
+  const fabric = require('../server/kern/vertrouwen')({ db, save: () => {} });
+  fabric.verifieer('sessie-van-D', { hoe: 'wachtwoord', account: 'D', apparaat: 'laptop' });
+  fabric.voltooid('D', 'rol.geven', 3);
+
+  const bak = db.data.vertrouwen;
+  assert.ok(Object.keys(bak.gewoonte).length, 'er staat een gewoonte');
+  assert.ok(Object.keys(bak.sessies).length, 'er staat een sessie');
+  assert.ok(Object.keys(bak.apparaten).length, 'en een apparaat');
+
+  fabric.vergeet('D', 'sessie-van-D');
+  assert.equal(G.lees(bak, 'D', 'rol.geven'), null, 'de gewoonte is weg');
+  assert.equal(Object.keys(bak.sessies).length, 0, 'de sessie ook');
+  assert.equal(Object.keys(bak.apparaten).length, 0, 'en de apparatenlijst -- dit was het gat');
 });

@@ -76,7 +76,7 @@ function lees(bak, actor, soort) {
 /* Voor de uitgang en het vergeetrecht: alles van een actor weg. Een gewoonte is
    een gegeven over een mens, dus hij hoort mee te verdwijnen als die mens
    verdwijnt -- anders overleeft het profiel de persoon. */
-function vergeet(bak, actor) {
+function vergeetActor(bak, actor) {
   if (!bak || !bak.gewoonte) return 0;
   const voor = String(actor || '') + '|';
   let weg = 0;
@@ -85,4 +85,4 @@ function vergeet(bak, actor) {
   return weg;
 }
 
-module.exports = { noteer, lees, vergeet, p95Van, VENSTER, NIET_GEDEKT };
+module.exports = { noteer, lees, vergeetActor, p95Van, VENSTER, NIET_GEDEKT };

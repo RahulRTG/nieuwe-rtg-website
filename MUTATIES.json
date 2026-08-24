@@ -6155,6 +6155,21 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "vertrouweninlog.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "overleefd"
+    },
+    "vertrouwenstapop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vertrouwen/blootstelling.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "verzadiging.test.js": {
       "soort": "puur",
       "staat": "gezakt",

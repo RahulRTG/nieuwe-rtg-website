@@ -22,6 +22,24 @@ adres. Zie `server/routes/meting.js` voor waarom dat geen overdrijving is.
 De cijfers bevatten **niets persoonsgebonden**: geen paden met namen erin, geen
 IP's, geen codenamen. Dat is getoetst (`test/meting.test.js`, test 7).
 
+### Wat het histogram kan zien, en wat het lang niet kon
+
+Een percentiel uit een histogram is nooit een punt maar een bovengrens: "p90
+ligt op of onder deze emmer". Hoe fijn die emmers staan, bepaalt dus hoeveel het
+cijfer waard is -- en daar zat tot 24 augustus 2026 een gat dat niemand zag,
+omdat het bord er prima uitzag.
+
+De emmers begonnen op **5 ms**. Onder last viel 99,41% van alle verzoeken in die
+eerste emmer, bij een gemiddelde van 0,46 ms. Doel 2 en 3 hierboven staan op p90
+en p99 van deze reeks, maar het instrument kon 0,3 ms niet van 4,9 ms
+onderscheiden: twee servers waarvan de ene aantoonbaar twee keer zo snel was,
+rapporteerden precies dezelfde p50, p90, p95 en p99. Een route die tien keer
+trager werd bleef onzichtbaar tot hij de 5 ms passeerde.
+
+Er staan nu vijf emmers onder die oude ondergrens (0,1 / 0,25 / 0,5 / 1 en
+2,5 ms). Sindsdien is de werkelijke verdeling wél te zien -- zie `PRESTATIES.md`
+voor de meting en waarom het er vijf werden en geen drie.
+
 ## De doelen
 
 De tabel hieronder is een **afdruk van `SLO.json`** en geen handwerk. Daar staat
@@ -113,6 +131,22 @@ bovengrens voor de kwaliteit.
    omlaag met een reden als dat niet lukt. De meter zegt dat zelf ook: zolang er
    te weinig verkeer of te kort gemeten is, is de uitslag "onvoldoende gemeten"
    en niet "gehaald".
+
+   Sinds 24 augustus 2026 staat hier wel een LABORATORIUMcijfer naast, en dat
+   verandert de aard van dit punt. Onder een kunstmatige last van 5.076
+   verzoeken per seconde over 2.064 echte routes haalt de serverkant p50 0,13 ms,
+   p90 0,23 ms en p99 0,44 ms (`PRESTATIES.md`). Doel 2 vraagt p90 < 250 ms en
+   doel 3 p99 < 1 s: dat is meer dan duizend keer ruimer dan wat het systeem
+   werkelijk doet.
+
+   Dat is nadrukkelijk **geen reden om de doelen nu te verscherpen**, en het is
+   ook geen basislijn. Een belastingsproef op één machine zonder echte
+   gebruikers, zonder netwerk, zonder koude cache en zonder de trage routes die
+   een mens juist aanklikt, is een ondergrens voor de storing en geen voorspelling
+   van de werkelijkheid. Wat het wél doet: het maakt van "wij weten niet waar we
+   staan" een "wij weten waar we staan in het lab, en we wachten op echt
+   verkeer". De meetlat kan het verschil nu tenminste zíen; dat kon hij hiervoor
+   niet.
 4. **Een piket.** Een doel van 99,9% betekent dat iemand 's nachts opneemt. Dat
    is een personeelsafspraak, geen code.
 

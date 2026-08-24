@@ -9,16 +9,47 @@ function prefixLengte(pad, prefix) {
   return (rest === '' || rest[0] === '/') ? prefix.length : 0;
 }
 
-// De meest specifieke functie die dit pad bewaakt (langste prefix wint), of null.
+/* De meest specifieke functie die dit pad bewaakt (langste prefix wint), of null.
+
+   DIT WAS EEN DUBBELE LUS OVER DE HELE REGISTRATIE, per verzoek: 191 functies
+   met samen 329 paden, dus 329 startsWith() voordat er ook maar iets gebeurd
+   was. In het CPU-profiel van 24 augustus 2026 stond deze functie met zijn
+   aanroeper padGeblokkeerd op 3,2% van alle rekentijd.
+
+   Een cache op het pad kan hier NIET, en dat is precies de valkuil: er komt een
+   echt pad binnen (/api/lid/42), geen routepatroon. Een kaart daarop groeit mee
+   met het verkeer in plaats van met de registratie -- dezelfde tarpit waar
+   server/meting.js voor waarschuwt.
+
+   Wat wel kan: de vergelijking omdraaien. prefixLengte() matcht alleen op een
+   SEGMENTGRENS, dus de enige prefixen die kunnen winnen zijn de voorouders van
+   het pad zelf. We bouwen de registratie een keer om tot een kaart pad->functie
+   en lopen bij een verzoek van lang naar kort door de voorouders. Dat is drie
+   tot vijf kaartopzoekingen in plaats van 329 stringvergelijkingen, en omdat we
+   bij de langste beginnen wint de langste prefix vanzelf.
+
+   Bij twee functies op HETZELFDE pad wint de eerst geregistreerde -- de oude lus
+   verving alleen bij `len > besteLen` en dus nooit bij gelijke lengte. Daarom
+   hieronder `if (!kaart.has(p))` en niet simpelweg set(). */
+let padKaart = null;
+function bouwPadKaart() {
+  const kaart = new Map();
+  for (const f of FUNCTIES) for (const p of (f.paden || [])) if (!kaart.has(p)) kaart.set(p, f);
+  padKaart = kaart;
+  return kaart;
+}
 function functieVoorPad(pad) {
-  let beste = null, besteLen = 0;
-  for (const f of FUNCTIES) {
-    for (const p of f.paden) {
-      const len = prefixLengte(pad, p);
-      if (len > besteLen) { besteLen = len; beste = f; }
-    }
+  const kaart = padKaart || bouwPadKaart();
+  if (typeof pad !== 'string' || !pad) return null;
+  /* Van het volledige pad terug naar '/': elke stap kapt een segment af. De
+     eerste treffer is de langste, want we lopen van lang naar kort. */
+  let eind = pad.length;
+  while (eind > 0) {
+    const f = kaart.get(pad.slice(0, eind));
+    if (f) return f;
+    eind = pad.lastIndexOf('/', eind - 1);
   }
-  return beste;
+  return null;
 }
 
 // Staat deze functie GLOBAAL aan volgens de bewaarde stand (of de standaard)?

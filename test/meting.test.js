@@ -39,14 +39,20 @@ test('3. een onbekend pad valt samen op een enkele noemer', () => {
 });
 
 test('4. het histogram klopt: emmers zijn cumulatief', () => {
-  meting.telVerzoek('GET', '/api/x', 200, 0.004);  // valt in alle emmers
+  meting.telVerzoek('GET', '/api/x', 200, 0.004);  // vanaf de emmer van 5 ms
   meting.telVerzoek('GET', '/api/x', 200, 0.7);    // pas vanaf 1s
   meting.telVerzoek('GET', '/api/x', 200, 30);     // in geen enkele emmer, wel in +Inf
+  meting.telVerzoek('GET', '/api/x', 200, 0.0004); // in ALLE emmers, ook de fijnste
   const t = meting.tekst();
-  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="0\.005"\} 1/);
-  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="1"\} 2/);
-  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="\+Inf"\} 3/);
-  assert.match(t, /rtg_duur_seconden_count\{methode="GET",route="\/api\/x"\} 3/);
+  /* De drie fijne emmers onderaan zijn er niet voor de sier: zonder hen vielen
+     0,4 ms en 4 ms in dezelfde emmer en was er geen percentiel onder de 5 ms te
+     maken. Deze regels zakken zodra iemand ze weghaalt. */
+  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="0\.0005"\} 1/);
+  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="0\.0025"\} 1/);
+  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="0\.005"\} 2/);
+  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="1"\} 3/);
+  assert.match(t, /rtg_duur_seconden_bucket\{methode="GET",route="\/api\/x",le="\+Inf"\} 4/);
+  assert.match(t, /rtg_duur_seconden_count\{methode="GET",route="\/api\/x"\} 4/);
 });
 
 test('5. de statusklasse deelt netjes in', () => {

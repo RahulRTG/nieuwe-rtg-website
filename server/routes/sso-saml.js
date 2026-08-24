@@ -58,18 +58,27 @@ module.exports = (kern) => {
   const acsAdres = () => basis() + '/api/sso/saml/acs';
   const onzeId = () => basis() + '/saml/metadata';
 
+  /* 404 EN GEEN 503, sinds de ladder van 25 augustus 2026. Zonder vast webadres
+     bestaat SAML hier niet -- maar 'Service Unavailable' aan een naamloze beller
+     is twee fouten in een: de ladder telt elke 5xx op een tokenloos verzoek als
+     serverfout (een dwaler hoort een nette weigering te krijgen, geen storing),
+     en de fouttekst vertelde een vreemde welke omgevingsvariabelen dit huis mist.
+     Voor wie het aangaat (de beheerder die SAML inricht) staat de volledige
+     uitleg in het logboek; de buitenwereld ziet alleen dat er hier niets is. */
   const zonderBasis = (res) => {
     if (basis()) return false;
-    res.status(503).json({ error: 'SAML staat uit: dit huis heeft geen vast webadres geconfigureerd (APP_URL of RTG_DOMAINS).',
-      waarom: 'De entityID en het antwoordadres van een SP zijn identiteit. Zouden wij ze uit de Host- of Origin-kop van het verzoek afleiden, dan bepaalt de beller waartegen wij de Audience en de Recipient van een assertie houden -- en dan controleert die toets zichzelf.' });
+    log.warn('saml geweigerd: geen vast webadres (APP_URL of RTG_DOMAIN); de entityID en het antwoordadres van een SP zijn identiteit en mogen niet uit de Host-kop komen');
+    res.status(404).json({ error: 'SAML is hier niet ingericht.' });
     return true;
   };
 
   /* ---------- 1. de heenreis ---------- */
   app.get('/api/sso/saml/start', rem({ windowMs: 60000, limit: 30 }), (req, res) => {
-    if (zonderBasis(res)) return;
+    /* Eerst wat de beller STUURT, dan pas wat het huis mist: een dwaler zonder
+       geldige org krijgt 404 en leert niets over de configuratie. */
     const k = saml.samlVan(req.query.org);
     if (!k || !k.actief) return res.status(404).json({ error: 'Onbekende of uitgezette SAML-koppeling.' });
+    if (zonderBasis(res)) return;
     try {
       const { url } = saml.verzoekUrl(k, {
         acs: acsAdres(), entityId: onzeId(), terug: staat.veiligTerug(req.query.terug)
@@ -93,11 +102,11 @@ module.exports = (kern) => {
   };
 
   app.post('/api/sso/saml/acs', rem({ windowMs: 60000, limit: 30 }), formulier, async (req, res) => {
-    if (zonderBasis(res)) return;
     const velden = req.formulier || new URLSearchParams('');
     const relay = String(velden.get('RelayState') || '');
     const rauw = String(velden.get('SAMLResponse') || '');
     if (!rauw) return res.status(400).json({ error: 'Er kwam geen SAML-antwoord mee.' });
+    if (zonderBasis(res)) return;
 
     /* RelayState draagt ONS verzoek-ID en niets anders. De 80-byte grens van de
        specificatie laat geen versleutelde state toe zoals bij OIDC, dus het

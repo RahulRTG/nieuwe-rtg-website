@@ -9,7 +9,7 @@
    met opzet in de LEDEN-routes en niet bij de uitgever: de aanroep gebeurt in de
    sessie van het lid, met wat het lid heeft verleend. */
 module.exports = (kern) => {
-  const { app, auth, appstoreWinkel, appstoreBrug, codenaamVan } = kern;
+  const { app, auth, appstore, appstoreWinkel, appstoreBrug, codenaamVan } = kern;
 
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Apps van derden op je startscherm zetten is voor betalende leden. Bladeren mag je gewoon.' }); return true; }
@@ -62,6 +62,24 @@ module.exports = (kern) => {
       verleend: open.machtigingen, vraagt: (open.vraagt || []).map(m => m.id) });
     antwoord(res, r);
   });
+
+  /* ---- de enterprise-kant, en die staat met opzet bij het LID en niet achter
+     een kantoorpoort. Het inkoopdossier is de transparantie-akte van dit
+     kanaal: wie de leverancier is, wat er draait, wat de app nooit krijgt, waar
+     de gegevens blijven, en -- het belangrijkste -- wat wij NIET kunnen
+     aantonen. Een document dat alleen een inkoper mag lezen, is een
+     verkooppraatje; dit hoort iedereen te kunnen openen die de app overweegt. */
+  app.post('/api/appstore/dossier', auth, (req, res) => antwoord(res, appstore.dossier(String(req.body.sleutel || ''))));
+  // en wat voor het HELE kanaal geldt, los opvraagbaar: dat scheelt het per app lezen
+  app.post('/api/appstore/kanaal', auth, (req, res) => res.json(appstore.kanaal()));
+
+  /* De tijdlijn van het lid: wat gaf ik, wanneer, en wanneer nam ik het terug.
+     Alleen de eigen tijdlijn -- de sleutel komt uit de sessie en nooit uit de
+     body, want dan zou een lid die van een ander kunnen opvragen. */
+  app.post('/api/appstore/tijdlijn', auth, (req, res) => res.json({
+    tijdlijn: appstore.tijdlijn(req.session.key, req.body.sleutel ? String(req.body.sleutel) : null, req.body.n),
+    soorten: appstore.TIJDLIJN_SOORTEN,
+    let: 'Dit is jouw geschiedenis met apps van derden. Hij groeit aan en wordt nooit herschreven -- ook niet als je een app verwijdert, want juist dan is hij het bewijs.' }));
 
   /* Het bakje van een app, gelezen door het lid. Loopt met opzet NIET over de
      brug: een app hoort niet te kunnen zien of zijn bericht is gelezen. */

@@ -77,7 +77,16 @@ en gaat dus door dezelfde keuring, kopen gebeurt in de WINKEL en nooit in de app
 in het land van het LID en wordt nooit geraden, de afdracht van RTG staat op 0%
 tot de eigenaar hem zet en werkt alleen vooruit, en een ingetrokken gekochte app
 laat een teruggaveRECHT achter dat een mens afhandelt — grens 5 blijft absoluut.
-Er komt geen tweede geldstroom: alles loopt over RTG Pay.
+Er komt geen tweede geldstroom: alles loopt over RTG Pay. **De
+verantwoordingskant staat er ook**: het inkoopdossier (wie is de leverancier, wat
+draait er, wat krijgt de app nooit, waar blijven de gegevens, wat vond de poort,
+hoe werkt de uitgang) met per bewering een bron in de code, de tijdlijn van het
+lid (wat gaf ik, wanneer nam ik het terug — groeit aan, wordt nooit herschreven,
+en de sleutel komt uit de sessie), en de controleronde die eruit haalt wat niet
+meer byte voor byte klopt met wat een mens aftekende. Twee dingen daar niet
+wegpoetsen: het dossier staat bij het LID en niet achter een kantoorpoort, en het
+blok "wat dit dossier NIET zegt" staat er even groot bij — een leverancierspak
+dat overal ja zegt is niets waard.
 
 **`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
 een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,

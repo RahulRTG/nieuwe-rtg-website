@@ -17,7 +17,7 @@
    ========================================================================== */
 'use strict';
 
-module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankopen }) {
+module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankopen, noteer }) {
 
   function rechten() { const s = S(); if (!Array.isArray(s.teruggaven)) s.teruggaven = []; return s.teruggaven; }
 
@@ -78,6 +78,7 @@ module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankope
     if (b.error) return { status: b.status || 400, error: b.error };
     r.status = 'terugbetaald'; r.besluit = { door: wie, at: nu(), reden: String(reden || '').trim().slice(0, 400) || null, delen: b.delen };
     boek('teruggave-betaald', r.sleutel, wie, { id: r.id, centen: b.centen });
+    if (noteer) noteer(r.key, 'teruggekregen', r.sleutel, { centen: b.centen, door: wie });
     save();
     return { status: 200, ok: true, recht: r };
   }

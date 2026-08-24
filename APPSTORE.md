@@ -383,6 +383,107 @@ half gebouwd abonnement is erger dan geen abonnement.
 
 ---
 
+## De verantwoordingskant
+
+Een bedrijf dat software van een derde toelaat, stuurt een vragenlijst: waar
+staan de gegevens, wie kan erbij, wat gebeurt er bij opzeggen, wie heeft de code
+gezien. Dat kost aan beide kanten weken, en het antwoord is proza dat niemand kan
+nakijken. Hier staat dat antwoord klaar, met per bewering een bron in de code.
+
+Drie dingen, en ze hangen samen: het **dossier** zegt wat er geldt, de
+**tijdlijn** zegt wat er is gebeurd, en de **controleronde** kijkt na of het
+eerste nog waar is.
+
+### Het inkoopdossier — en het staat bij het LID
+
+`/api/appstore/dossier` (`kern/appstore/dossier.js`) geeft per app zeven blokken:
+wie de leverancier is, wat er draait, wat de app mag, wat hij **nooit** krijgt,
+waar de gegevens blijven, wat de poort vond, en hoe de uitgang werkt. Daarnaast
+geeft `/api/appstore/kanaal` wat voor élke app geldt, zodat een inkoper dat niet
+per app hoeft te lezen.
+
+Het staat achter de LEDEN-poort en niet achter een kantoorpoort. Een document dat
+alleen een inkoper mag lezen is een verkooppraatje; dit hoort iedereen te kunnen
+openen die de app overweegt. Op het scherm staat het dichtgeklapt op de kaart in
+de Mall — naslag, geen reclame — en het wordt pas opgehaald als iemand het opent.
+
+**Elke bewering draagt vier dingen**: wat er wordt beweerd, hóé het is
+vastgesteld, wáár dat staat, en de gemeten waarde. Een bewering zonder die vier
+hoort er niet in — dat is het hele verschil met een ingevulde vragenlijst. De
+bron staat zichtbaar op het scherm en niet in een tooltip: wie het niet gelooft,
+zoekt het bestand op.
+
+### De sterkste claim is een negatieve
+
+> Binnen RTG. De leverancier heeft geen kopie, en kan die ook niet krijgen.
+
+Dat volgt uit grens 1: een app in de cel heeft `connect-src 'none'`. Er is geen
+weg waarlangs een kopie zijn kant op had kunnen gaan. Geen
+verwerkersovereenkomst die het belooft, geen audit die het steekproefsgewijs
+vaststelt — de uitvoering maakt het onmogelijk, en de CSP-kop van élke celrespons
+is het bewijs. `test/appstore-dossier.test.js` toets 3 houdt de claim tegen de
+échte kop; zakt de kop weg, dan zakt de toets.
+
+Hetzelfde maakt de uitgang eenvoudig: er is niets bij de leverancier om te laten
+verwijderen. Wat een app bewaarde stond hier, en wordt hier gewist.
+
+### Wat dit dossier NIET zegt
+
+Vijf dingen, elk met de reden erbij: beschikbaarheid van de leverancier (er is
+geen server van een derde om te meten), penetratietest, SBOM en herleidbare
+build, certificeringen van de leverancier, en aansprakelijkheid en contract.
+
+Dat blok staat met dezelfde opmaak als de rest en niet als kleine letters
+onderaan. Het is geen restpost maar het deel dat de rest geloofwaardig maakt: een
+leverancierspak dat overal ja zegt is niets waard; een dat zegt waar het ophoudt,
+is te vertrouwen op de rest. Een inkoper die dit leest weet precies waar zijn
+eigen onderzoek moet beginnen.
+
+### De tijdlijn van het lid
+
+`kern/appstore/tijdlijn.js` schrijft mee bij elk toestemmingsmoment: installeren,
+verlenen, terugnemen, verwijderen, wissen, kopen, geld terugkrijgen, en een app
+die uit de store wordt gehaald. Acht soorten, een gesloten lijst.
+
+Dit is de tegenhanger van het journaal, en het zijn twee lijsten omdat het twee
+verantwoordingen zijn met twee lezers. Het journaal is van RTG: wie liet een
+uitgever toe, wie tekende een versie af. De tijdlijn is van het LID: wat gaf ik,
+en wanneer nam ik het terug.
+
+Drie regels:
+
+- **Hij groeit aan en wordt nooit herschreven** — ook niet als het lid de app
+  verwijdert. Juist dan niet: "ik heb die app in mei drie dagen gehad en toen
+  verwijderd" is precies het soort zin die een tijdlijn moet kunnen staven.
+- **Dat er is gewist komt erin; wat er stond niet.** De regel dát iets verwijderd
+  is, is zelf geen persoonsgegeven — en zonder die regel is "ik heb dat laten
+  wissen" achteraf niet te staven.
+- **De sleutel komt uit de sessie en nooit uit de body.** Een lid ziet alleen
+  zijn eigen tijdlijn, ook als hij de sleutel van een ander kent.
+
+### De controleronde
+
+`/api/appstore/kantoor/hercontrole` loopt alles na wat live staat en houdt élk
+bestand tegen zijn eigen hash. Klopt een bundel niet meer met wat een mens heeft
+afgetekend, dan gaat de app eruit — en dat is geen afweging maar de enige juiste
+uitkomst. De ronde komt in het journaal, met de naam van wie hem draaide.
+
+Dit is grens 5 in de tijd doorgetrokken. De integriteitscontrole draait al bij
+élke lezing van schijf, dus een aangetast bestand wordt sowieso niet uitgeleverd;
+wat de ronde erbij doet is de app ook uit de winkel halen in plaats van hem daar
+kapot te laten staan.
+
+### Wat er (nog) niet is, en waarom
+
+**Een private catalogus per organisatie** — een klant die zijn eigen apps ziet en
+de rest niet. Niet gebouwd, en niet uit tijdgebrek: dat vraagt te weten welk lid
+bij welke organisatie hoort, en dat antwoord bestaat hier al twee keer (het
+dienstverband in `CONCERN.md`, de SSO-inrichting in `TENANT.md`). Een derde
+lezing erbij is dezelfde waarheid op drie plekken, en dan is "mag deze mens deze
+app zien" op drie manieren te beantwoorden. Zie `DEVELOPERCLOUD.md` par. 4.
+
+---
+
 ## Wat er bewust NIET is
 
 - **Geen sterren, geen ranglijst, geen "populair".** `CLAUDE.md` verbiedt

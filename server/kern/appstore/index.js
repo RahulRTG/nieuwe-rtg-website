@@ -15,19 +15,10 @@
      keuring    de poort: machine (vorm, ./keuring.js) en daarna mens (inhoud).
      machtiging wat een lid werkelijk VERLEENT. Nooit wat het manifest vroeg.
 
-   DE ZES GRENZEN. Ze staan in APPSTORE.md met hun herkomst; hier staan ze omdat
-   dit het bestand is dat ze afdwingt.
-
-     1. Derdencode draait nooit op de RTG-herkomst. Er is geen vlag, geen
-        vertrouwde uitgever en geen uitzondering die dat verandert.
-     2. De machinepoort keurt nooit goed -- hij keurt af of laat door naar een
-        mens. En die mens is nooit de uitgever zelf.
-     3. Een app ziet codenamen. Nooit een naam, een e-mailadres of een nummer.
-     4. Een machtiging die niet is verleend, bestaat niet. De brug kijkt naar wat
-        er is VERLEEND en niet naar wat er is gevraagd.
-     5. Intrekken werkt onmiddellijk en overal. Een ingetrokken versie valt ook
-        weg bij de leden die hem al hadden.
-     6. Wat er niet is, staat er met een reden. Niet als lege waarde.
+   DE ZES GRENZEN staan voluit in APPSTORE.md met hun herkomst, en NIET ook hier:
+   twee plekken die dezelfde regels opschrijven, lopen uit elkaar (LAT-regel 4),
+   en dan is de vraag "wat geldt er nu" op twee manieren te beantwoorden. Waar ze
+   worden AFGEDWONGEN staat wel hier, bij de code die het doet.
 
    Dit bestand is de motor. De winkelkant (bladeren, installeren, verlenen) staat
    in ./winkel.js, de uitvoering van de machtigingen in ./brug.js.
@@ -151,13 +142,19 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier }) {
      wordt intrekken uitgebreid met de teruggaverechten. Apart bestand omdat het
      een NAAD is en geen laag -- het is de enige plek waar de store en het geld
      elkaar raken, en dat hoort een naam te hebben. */
-  const { geld, intrekken } = require('./naad')({
-    S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier, intrekkenKaal });
+  const { geld, intrekken, hercontrole, tijdlijn, noteer, TIJDLIJN_SOORTEN } = require('./naad')({
+    S, save, nu, boek, eigen, norm, uitgever, app, versie, opslag, pay, findSupplier, intrekkenKaal });
 
   const motor = { S, journaal, boek, opslag, nu, save,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,
-    publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER, geld };
+    publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER, geld,
+    tijdlijn, noteer, hercontrole, TIJDLIJN_SOORTEN };
+  /* Het inkoopdossier leest alleen (./dossier.js): wie de leverancier is, wat er
+     draait, wat het mag, wat het nooit krijgt en wat wij NIET kunnen aantonen.
+     Het hangt achteraan omdat het alles hierboven leest en zelf niets zet. */
+  Object.assign(motor, require('./dossier')({ S: motor.S, app: motor.app, versie: motor.versie,
+    uitgever: motor.uitgever, opslag: motor.opslag, journaal: motor.journaal, geld }));
 
   /* De drie lagen komen als EEN geheel naar buiten. Zou de winkel of de brug
      apart moeten worden opgebouwd, dan is er een volgorde die iemand fout kan

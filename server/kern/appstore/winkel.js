@@ -28,7 +28,7 @@ const { toonbaar, isMachtiging } = require('./machtigingen');
 const MAX_PER_LID = 60;
 
 function maakWinkel(kern) {
-  const { S, app, versie, uitgever, eigen, nu, geld } = kern;
+  const { S, app, versie, eigen, nu, geld, noteer } = kern;
   const save = kern.save;
   /* De leeskant (bladeren, de kaart, mijn apps) staat in ./etalage.js; dit
      bestand is de SCHRIJFkant. Die twee uit elkaar houden is hier meer dan
@@ -50,7 +50,8 @@ function maakWinkel(kern) {
     const v = versie(a.live);
     if (!v || v.status !== 'gepubliceerd') return { status: 404, error: 'Deze app staat niet in de App Store.' };
     const rij = rijVan(key);
-    if (!eigen(rij, sleutel) && Object.keys(rij).length >= MAX_PER_LID) {
+    const bestond = !!eigen(rij, sleutel);
+    if (!bestond && Object.keys(rij).length >= MAX_PER_LID) {
       return { status: 400, error: 'Je hebt het maximum van ' + MAX_PER_LID + ' apps van derden bereikt; haal er eerst een weg.' };
     }
     /* EEN BETAALDE APP GAAT PAS OP HET STARTSCHERM ALS HIJ IS GEKOCHT, en dat
@@ -72,8 +73,12 @@ function maakWinkel(kern) {
        vergunningsdiff moet tegenhouden. */
     const gaf = {};
     for (const id of uniek) if ((v.manifest.doelen || {})[id]) gaf[id] = v.manifest.doelen[id];
+    const nieuw = !bestond;
     rij[sleutel] = { machtigingen: uniek, doelen: gaf, at: nu(), versie: v.id };
     save();
+    /* De tijdlijn schrijft mee en beslist niets (./tijdlijn.js). Wat het lid
+       GAF gaat mee, want dat is waar de vraag later over gaat. */
+    noteer(key, nieuw ? 'geinstalleerd' : 'verleend', sleutel, { gaf: uniek, doelen: gaf, versie: v.manifest.versie });
     return { status: 200, ok: true, sleutel, verleend: toonbaar(uniek, gaf), vraagt: toonbaar(gevraagd, v.manifest.doelen),
       let: uniek.length < gevraagd.length
         ? 'Je hebt ' + uniek.length + ' van de ' + gevraagd.length + ' gevraagde machtigingen verleend. De app werkt; wat hij niet mag, krijgt hij niet.'
@@ -97,6 +102,7 @@ function maakWinkel(kern) {
     }
     huidig.machtigingen = uniek; huidig.doelen = gaf; huidig.at = nu();
     save();
+    noteer(key, weg.length ? 'teruggenomen' : 'verleend', sleutel, { gaf: uniek, weg, doelen: gaf });
     return { status: 200, ok: true, verleend: toonbaar(uniek, gaf), ingetrokken: toonbaar(weg, oudeDoelen) };
   }
 
@@ -109,56 +115,31 @@ function maakWinkel(kern) {
     if (!eigen(rij, sleutel)) return { status: 404, error: 'Deze app staat niet op je startscherm.' };
     delete rij[String(sleutel)];
     save();
-    return { status: 200, ok: true, aantal: Object.keys(rij).length };
+    noteer(key, 'verwijderd', sleutel, null);
+    return { status: 200, ok: true, aantal: Object.keys(rij).length,
+      let: 'De app staat niet meer op je startscherm en heeft geen enkele machtiging meer. Wat hij voor jou had opgeslagen staat er nog: dat is jouw inhoud. Wis het als je het echt weg wilt.' };
   }
 
   function wisOpslag(key, sleutel) {
     const bak = eigen(S().opslag, sleutel);
     if (bak && Object.prototype.hasOwnProperty.call(bak, String(key))) { delete bak[String(key)]; save(); }
     const bakjes = eigen(S().bakjes, String(key));
-    if (bakjes && Object.prototype.hasOwnProperty.call(bakjes, String(sleutel))) { delete bakjes[String(sleutel)]; save(); }
-    return { status: 200, ok: true };
+    const hadBerichten = !!(bakjes && Object.prototype.hasOwnProperty.call(bakjes, String(sleutel)));
+    if (hadBerichten) { delete bakjes[String(sleutel)]; save(); }
+    /* Dat er is GEWIST komt wel in de tijdlijn; wat er stond niet. De regel dat
+       iets verwijderd is, is zelf geen persoonsgegeven -- en zonder die regel is
+       "ik heb dat laten wissen" achteraf niet te staven. */
+    noteer(key, 'gewist', sleutel, { sleutels: bak ? Object.keys(bak).length : 0, berichten: hadBerichten });
+    return { status: 200, ok: true,
+      let: 'Weg. Er bestaat geen tweede kopie bij de uitgever: een app in de cel heeft geen netwerk, dus er is nooit iets zijn kant op gegaan.' };
   }
 
-  /* Wat de celpagina nodig heeft om een app te openen. Hier en nergens anders
-     wordt bepaald WELKE bundel er draait: de celroute leest dit niet uit de URL
-     maar controleert hem hiertegen. */
-  function open(key, sleutel) {
-    const a = app(sleutel);
-    if (!a || !a.live) return { status: 404, error: 'Deze app is niet (meer) beschikbaar.' };
-    const v = versie(a.live);
-    if (!v || v.status !== 'gepubliceerd') return { status: 404, error: 'Deze app is niet (meer) beschikbaar.' };
-    const verleend = verleendeVan(key, sleutel);
-    if (!verleend) return { status: 403, error: 'Zet deze app eerst in de App Store op je startscherm; dan kies je ook wat hij mag.' };
-    /* En hij blijft dicht als de aanschaf er niet (meer) is. Dat kan: een lid
-       dat een app verwijderde en terugzet, komt langs installeer(); een lid dat
-       hem hield terwijl de prijs van nul naar iets ging, komt hier. */
-    if (prijsVan(v) > 0 && !heeftGekocht(key, sleutel)) {
-      return { status: 402, error: 'Deze app kost geld; koop hem in de App Store.', prijsCenten: prijsVan(v), moetKopen: true };
-    }
-    const u = uitgever(a.org);
-    return { status: 200, ok: true, sleutel, hash: v.hash, start: celPad(sleutel, v.hash, v.manifest.start),
-      naam: v.manifest.naam, versie: v.manifest.versie, taal: v.manifest.taal,
-      uitgever: u ? { org: u.org, naam: u.naam } : null,
-      verleend: toonbaar(verleend.machtigingen, verleend.doelen), machtigingen: verleend.machtigingen,
-      doelen: verleend.doelen || {}, updateVraagt: E.diff(verleend, v),
-      /* Wat de LIVE versie vraagt gaat ook mee, en alleen daarvoor: een
-         weigering op de brug kan er dan bij zeggen of de app het niet vroeg of
-         het lid het niet gaf. Het bepaalt nooit wat er mag -- dat doet
-         `machtigingen` hierboven, en dat is wat het lid verleende. */
-      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen) };
-  }
-
-  /* De poort van de celroute: mag deze hash van deze app uberhaupt uitgeleverd
-     worden? Alleen de LIVE hash van een gepubliceerde app. Een ingetrokken versie
-     is daarmee op hetzelfde moment onbereikbaar als hij uit de winkel valt -- dat
-     is wat grens 5 in de praktijk betekent. */
-  function magCel(sleutel, hash) {
-    const a = app(sleutel);
-    if (!a || !a.live) return false;
-    const v = versie(a.live);
-    return !!v && v.status === 'gepubliceerd' && v.hash === String(hash || '');
-  }
+  /* Wat er NAAR BUITEN gaat -- open() voor het lid en magCel() voor de
+     celroute -- staat in ./uitgifte.js. Die twee veranderen niets; alles
+     hierboven wel. De etalage gaat daar mee naar binnen in plaats van dat hij er
+     opnieuw wordt gemaakt: twee etalages lezen dezelfde toestand en dat is de
+     tweede plek met dezelfde waarheid die LAT-regel 4 verbiedt. */
+  const { open, magCel } = require('./uitgifte').maakUitgifte(kern, E);
 
   return { catalogus, installeer, verleen, verwijder, wisOpslag, mijn, open, magCel, verleendeVan, celPad, MAX_PER_LID };
 }

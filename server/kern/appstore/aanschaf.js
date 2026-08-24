@@ -19,7 +19,7 @@
    ========================================================================== */
 'use strict';
 
-module.exports = function maakAanschaf({ S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier, bon, afdracht }) {
+module.exports = function maakAanschaf({ S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier, bon, afdracht, noteer }) {
 
   function aankopen(key) {
     const s = S();
@@ -69,6 +69,7 @@ module.exports = function maakAanschaf({ S, save, nu, boek, eigen, norm, uitgeve
       uitgeverCenten: r.uitgeverCenten, zaak: zaak.code, boekingId: b.boekingId, at: nu() };
     aankopen(key)[sleutel] = vast;
     boek('aanschaf', sleutel, null, { brutoCenten: vast.brutoCenten, land: vast.land, boekingId: vast.boekingId });
+    if (noteer) noteer(key, 'gekocht', sleutel, { centen: vast.brutoCenten, land: vast.land, versie: vast.versie });
     save();
     return { status: 200, ok: true, bon: vast, let: 'Betaald. De app staat nu op je startscherm; updates zijn gratis.' };
   }

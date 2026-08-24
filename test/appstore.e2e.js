@@ -198,6 +198,30 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     assert.deepEqual(mijn.body.apps[0].verleend.map(m => m.id), ['opslag.eigen'],
       'het lid gaf er een van de twee, en dat is wat er staat');
 
+    /* ---- DE ENTERPRISE-KANT IN EEN VENSTER. Het inkoopdossier en de tijdlijn
+       zijn API-groen zodra test/appstore-dossier.test.js draait; dat zegt niets
+       over of een mens ze ziet. Deze laag heeft die les al een keer geleerd --
+       de cel antwoordde 200 terwijl er in het venster niets stond -- en het
+       dossier is juist het stuk waarvan de hele waarde is dat iemand het LEEST. */
+    await page.click('#asGrid .asDos');
+    await page.waitForSelector('#asGrid .asDosVak:not([hidden])', { timeout: 15000 });
+    await page.waitForFunction(() => !/wordt opgemaakt/.test(document.querySelector('.asDosVak').textContent),
+      null, { timeout: 15000 });
+    const dos = await page.textContent('#asGrid .asDosVak');
+    assert.match(dos, /geen kopie/, 'de sterkste claim staat er, en die is negatief');
+    assert.match(dos, /bron: /, 'elke bewering draagt zijn bron zichtbaar, niet in een tooltip');
+    assert.match(dos, /Wat dit dossier NIET zegt/, 'en wat wij niet kunnen aantonen staat er als eigen blok');
+    assert.match(dos, /beschikbaarheid van de leverancier/, 'met de reden erbij en niet als kleine letters');
+
+    await page.click('#asGesch');
+    await page.waitForSelector('#asTijd:not([hidden])', { timeout: 15000 });
+    await page.waitForFunction(() => !/Even ophalen/.test(document.getElementById('asTijd').textContent),
+      null, { timeout: 15000 });
+    const gesch = await page.textContent('#asTijd');
+    assert.match(gesch, /op je startscherm gezet/, 'wat het lid net deed, staat in zijn geschiedenis');
+    assert.match(gesch, /opslag\.eigen/, 'met wat hij GAF erbij -- daar gaat de vraag later over');
+    assert.deepEqual(fouten, [], 'dossier en geschiedenis openen zonder onopgevangen fouten');
+
     // ---- het uitgeversbureau ----
     const p2 = await browser.newPage();
     const f2 = letOpFouten(p2, []);
@@ -258,6 +282,17 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     await kp.goto(base + '/apps/appstore-kantoor.html');
     await kp.waitForSelector('[data-v] .pub', { timeout: 20000 });
     assert.deepEqual(kf, [], 'de keuringspagina boot zonder onopgevangen fouten');
+
+    /* DE CONTROLERONDE HEEFT EEN KNOP, en die wordt hier ingedrukt. Hij stond
+       eerst alleen als route: een controle die geen mens kan starten, wordt
+       nooit gedraaid. Op dit moment staat er nog niets live -- de app hieronder
+       moet nog worden afgetekend -- dus het juiste antwoord is nul, en dat is
+       ook een antwoord dat op het scherm hoort te komen. */
+    await kp.click('#hcDoe');
+    await kp.waitForFunction(() => !/Bezig met nalopen/.test(document.getElementById('hcUit').textContent),
+      null, { timeout: 15000 });
+    assert.match(await kp.textContent('#hcUit'), /0 nagelopen/, 'er staat nog niets live, en dat zegt hij ook');
+    assert.match(await kp.textContent('#hcUit'), /byte voor byte/, 'met wat de ronde eigenlijk heeft gedaan erbij');
     assert.match(await kp.textContent('body'), /Bonproef/, 'de inzending staat in de wachtrij');
     assert.match(await kp.textContent('body'), /keurt nooit goed/, 'en de pagina zegt zelf dat de machine niets goedkeurt');
     // zonder naam gaat het niet

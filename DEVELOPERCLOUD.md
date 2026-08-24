@@ -280,13 +280,39 @@ is wat de rest MOGELIJK maakt.
 | **4. De SDK en de CLI** | `rtg new`, `rtg dev`, typings, één foutmodel | pas zinvol als 1 t/m 3 staan; anders codificeert hij het verkeerde |
 | **5. De emulator en synthetische data** | lokaal draaien zonder RTG | de grootste tijdwinst voor een ontwikkelaar, en onmogelijk zonder een vast objectmodel |
 | **6. Event mesh voor derden** | levering, retries, dedup, replay | de bus staat; wat ontbreekt is de belofte eromheen |
-| **7. Enterprise: private catalogus, policy-as-code, deployment** | punten 31 t/m 35, 70 t/m 74 | leunt volledig op `org` uit TENANT.md, die staat |
+| **7. Enterprise** — de verantwoordingskant ✅, de private catalogus ⛔ | punten 31 t/m 35, 70 t/m 74 | leunt volledig op `org` uit TENANT.md, die staat |
 | **8. Serverside extensies** | punt 86/87/88 | eigen document, eigen bewijslast (par. 3.4) |
 
 **Fase 1, 2 en 3 staan.** Fase 1 is gemeten (par. 2), fase 2 en 3 zijn gebouwd
 (zie `APPSTORE.md`: het doel bij een machtiging, en de vergunningsdiff). Fase 4
 is de eerstvolgende, en hij kan nu ook: een SDK die de vier kandidaten uit par. 2
 als eerste types neemt, is gebouwd op een meting in plaats van op een aanname.
+
+**Van fase 7 staat de helft, en dat is met opzet de andere helft dan je zou
+verwachten.** Wat er staat is de VERANTWOORDINGSkant: het inkoopdossier per app
+en per kanaal, de tijdlijn van het lid, en de controleronde. Wat er niet staat is
+de private catalogus met beleid per organisatie — en dat is geen restpost maar
+een besluit met een reden.
+
+*Waarom die reden hier hoort.* Een private catalogus vraagt om te weten welk LID
+bij welke ORGANISATIE hoort. Dat antwoord bestaat in dit huis al twee keer: in
+het dienstverband van `CONCERN.md` (een mens werkt bij een entiteit, met een rol)
+en in de SSO-inrichting van `TENANT.md` (een mens komt binnen via de
+identiteitsvoorziening van een klant). Een derde lezing erbij zetten die zegt
+"maar in de App Store hoort dit lid bij die org" is precies wat LAT-regel 4
+verbiedt: dezelfde waarheid op drie plekken loopt uit elkaar, en dan is de vraag
+"mag deze mens deze app zien" op drie manieren te beantwoorden. De weg vooruit is
+niet een vierde register maar de bestaande twee op elkaar leggen — en dat is werk
+in `CONCERN.md`/`TENANT.md`, niet hier.
+
+*Waarom de verantwoordingskant er wél is, en eerst.* Een private catalogus is
+distributie: hij bepaalt wie iets ziet. Het dossier is de vraag daarvoor: mag dit
+er überhaupt in. Een inkoper, een security officer en een functionaris
+gegevensbescherming krijgen normaal een vragenlijst terug in proza dat niemand
+kan nakijken; hier krijgen ze per bewering een bron in de code, en een blok met
+wat dit dossier NIET zegt. Dat laatste blok is het punt: een leverancierspak dat
+overal ja zegt is niets waard. Wat er staat en waar de bewijslast ligt, staat in
+`APPSTORE.md` onder "De verantwoordingskant".
 
 ---
 

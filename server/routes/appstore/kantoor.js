@@ -34,6 +34,13 @@ module.exports = (kern) => {
   // het journaal: elke beslissing over een derde, aangroeiend en niet te herschrijven
   app.post('/api/appstore/kantoor/journaal', officeAuth, (req, res) => res.json({ journaal: appstore.journaal(req.body.n) }));
 
+  /* DE CONTROLERONDE. Een keuring is geen moment maar een toestand: een app die
+     in maart is afgetekend, zegt niets over vandaag. Deze ronde leest van elke
+     live app de hele bundel terug en houdt hem tegen zijn eigen hash. Klopt hij
+     niet, dan gaat de app er meteen uit -- daar valt niets af te wegen. */
+  app.post('/api/appstore/kantoor/hercontrole', officeAuth, (req, res) =>
+    antwoord(res, appstore.hercontrole({ door: naam(req) || 'RTG-kantoor' })));
+
   /* ---- de betaalde kant ----
      De AFDRACHT geldt voor elke uitgever tegelijk en werkt alleen vooruit: een
      bon die al is geschreven wordt nooit herrekend. Daarom draagt hij een naam

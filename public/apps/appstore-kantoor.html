@@ -130,6 +130,19 @@ function tekenAfdracht(a){
       '<button class="knop" id="afZet" type="button">Vastleggen</button></div></div>';
 }
 
+/* DE CONTROLERONDE. Hij stond er wel als route en nergens als knop, en dat is
+   precies het soort ding dat niemand ooit draait. Wat hij doet is elk bestand
+   van elke live app tegen zijn eigen hash houden; klopt er iets niet meer met
+   wat een mens heeft afgetekend, dan gaat die app eruit. De uitkomst wordt hier
+   getoond en niet alleen gemeld: "3 gekeurd, 3 in orde" is het antwoord op de
+   vraag die een auditor stelt, en "0 gekeurd" is dat ook. */
+function tekenRonde(){
+  return '<div class="kaart"><h2>Controleronde</h2>'+
+    '<p class="sub">Houdt elk bestand van elke live app tegen de hash waarop een mens heeft afgetekend. Wat niet meer klopt gaat eruit &mdash; dat is geen afweging. De ronde komt met je naam in het journaal.</p>'+
+    '<div class="rij"><button class="knop" id="hcDoe" type="button">Nu nalopen</button></div>'+
+    '<div id="hcUit" class="sub" style="margin-top:.5rem;"></div></div>';
+}
+
 function tekenTeruggaven(t){
   if (!t) return '';
   if (!t.open.length) return '<div class="kaart"><h2>Teruggaven</h2><p class="sub">Niets open. '+esc(t.let)+'</p></div>';
@@ -152,7 +165,7 @@ async function laad(){
   catch (e) { $('#main').innerHTML = '<div class="kaart"><h2>Niet beschikbaar</h2><p class="sub">'+esc(e.message)+'</p></div>'; return; }
   try { a = await api('/api/appstore/kantoor/afdracht'); } catch (e) {}
   try { t = await api('/api/appstore/kantoor/teruggaven'); } catch (e) {}
-  $('#main').innerHTML = tekenNaam() + tekenWachtrij(d) + tekenTeruggaven(t) + tekenAfdracht(a) + tekenUitgevers(d);
+  $('#main').innerHTML = tekenNaam() + tekenWachtrij(d) + tekenTeruggaven(t) + tekenRonde() + tekenAfdracht(a) + tekenUitgevers(d);
 
   const wie = () => { const n = $('#wie').value.trim(); if (n) zetNaam(n); return n; };
   const doe = async (pad, body, klaar) => {
@@ -174,6 +187,19 @@ async function laad(){
     const id = el.dataset.tg, reden = () => el.querySelector('.treden').value;
     el.querySelector('.tbet').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'terugbetaald', reden: reden(), door: wie() }, 'Terugbetaald.'));
     el.querySelector('.tafw').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'afgewezen', reden: reden(), door: wie() }, 'Afgewezen.'));
+  });
+  const hc = $('#hcDoe');
+  if (hc) hc.addEventListener('click', async () => {
+    const uit = $('#hcUit');
+    uit.textContent = 'Bezig met nalopen…';
+    try {
+      const r = await api('/api/appstore/kantoor/hercontrole', { door: wie() });
+      uit.innerHTML = '<b>'+r.gekeurd+' nagelopen, '+r.inOrde+' in orde, '+r.uitgezet.length+' eruit'+
+        (r.gemeld.length ? ', '+r.gemeld.length+' gemeld' : '')+'.</b><br>'+esc(r.let)+
+        (r.uitgezet.length ? '<br>'+r.uitgezet.map(u => esc(u.sleutel)+' ('+esc(u.bestanden.join(', '))+')').join('<br>') : '')+
+        (r.gemeld.length ? '<br>'+r.gemeld.map(g => esc(g.sleutel)+': uitgever '+esc(g.uitgever)).join('<br>') : '');
+      if (r.uitgezet.length) laad();
+    } catch (e) { uit.textContent = e.message; }
   });
   const az = $('#afZet');
   if (az) az.addEventListener('click', () => doe('/api/appstore/kantoor/afdracht', { procent: Number(String($('#afProc').value).replace(',', '.')), reden: $('#afReden').value, door: wie() }, 'Vastgelegd.'));

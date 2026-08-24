@@ -597,9 +597,20 @@ async function laadAppstore(){
     '<div class="rij" style="margin-bottom:.7rem;">'+
       '<input id="asZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
       '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
-    '</div><div id="asGrid"></div><div class="rij" id="asBlader" style="justify-content:center;"></div></div>';
+      '<button class="knop stil" id="asGesch" type="button" aria-expanded="false">Mijn geschiedenis</button>'+
+    '</div><div id="asTijd" hidden style="margin-bottom:.7rem;"></div>'+
+    '<div id="asGrid"></div><div class="rij" id="asBlader" style="justify-content:center;"></div></div>';
   let zt; $('#asZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AS.zoek = $('#asZoek').value; AS.pagina = 1; AS.mijn = false; tekenStore(); }, 300); });
   $('#asMijn').addEventListener('click', () => { AS.mijn = !AS.mijn; AS.pagina = 1; tekenStore(); });
+  /* De geschiedenis staat NAAST de winkel en niet erin: hij gaat over het lid en
+     niet over een app. Hij wordt pas opgehaald als iemand hem openklapt. */
+  $('#asGesch').addEventListener('click', () => {
+    const vak = $('#asTijd'), knop = $('#asGesch');
+    vak.hidden = !vak.hidden;
+    knop.setAttribute('aria-expanded', String(!vak.hidden));
+    knop.classList.toggle('aan', !vak.hidden);
+    if (!vak.hidden) tekenTijdlijn();
+  });
   tekenStore();
 }
 function storeKaart(a){
@@ -646,7 +657,17 @@ function storeKaart(a){
         : (a.prijsCenten > 0 && !a.gekocht
             ? '<button class="knop asKoop" type="button">Kopen voor '+euroC(a.prijsCenten)+'</button>'
             : '<button class="knop asZet" type="button">Op mijn startscherm</button>'))+
-    '</div><div class="asBon" hidden style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
+    '</div>'+
+    /* HET INKOOPDOSSIER STAAT OP DE KAART, niet achter een kantoorpoort. Wie
+       een app overweegt hoort te kunnen nalezen wie de leverancier is, wat er
+       precies draait, waar zijn gegevens blijven -- en wat wij NIET kunnen
+       aantonen. Een document dat alleen een inkoper mag lezen is een
+       verkooppraatje. Dichtgeklapt, want het is naslag en geen reclame. */
+    '<div class="rij" style="margin-top:.45rem;">'+
+      '<button class="knop stil asDos" type="button" aria-expanded="false" style="font-size:.72rem;">Inkoopdossier</button>'+
+    '</div>'+
+    '<div class="asDosVak" hidden style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;"></div>'+
+    '<div class="asBon" hidden style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
 }
 async function tekenStore(){
   const grid = $('#asGrid'), blader = $('#asBlader');
@@ -685,11 +706,109 @@ async function tekenStore(){
       vak.hidden = false; vak.innerHTML = '<span class="tag">De bon wordt opgemaakt…</span>';
       await toonBon(kaart.dataset.sleutel, vak, null);
     }));
+    /* HET DOSSIER OPENEN. Hij wordt pas OPGEHAALD als iemand hem opent en niet
+       bij het tekenen van de lijst: een pagina die voor twintig apps een
+       dossier ophaalt om er nul te tonen, is traag zonder dat iemand er iets
+       aan heeft. */
+    grid.querySelectorAll('.asDos').forEach(b => b.addEventListener('click', async () => {
+      const kaart = b.closest('.boutiek'), vak = kaart.querySelector('.asDosVak');
+      if (!vak.hidden) { vak.hidden = true; b.setAttribute('aria-expanded', 'false'); b.textContent = 'Inkoopdossier'; return; }
+      vak.hidden = false; b.setAttribute('aria-expanded', 'true'); b.textContent = 'Inkoopdossier sluiten';
+      vak.innerHTML = '<span class="tag">Het dossier wordt opgemaakt…</span>';
+      try { vak.innerHTML = dossierHtml(await api('/api/appstore/dossier', { sleutel: kaart.dataset.sleutel })); }
+      catch(e){ vak.innerHTML = '<div style="font-size:.76rem;color:var(--soft);">'+esc(e.message)+'</div>'; }
+    }));
     grid.querySelectorAll('.asWeg').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/appstore/weg', { sleutel: b.closest('.boutiek').dataset.sleutel }); meld('Verwijderd.'); tekenStore(); }
       catch(e){ meld(e.message); }
     }));
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+
+/* ============================================================================
+   HET INKOOPDOSSIER OP HET SCHERM.
+
+   DE VOLGORDE IS EEN STANDPUNT. Eerst wat de app NOOIT krijgt en waar de
+   gegevens blijven, dan pas wie de leverancier is en wat er draait. Een
+   leverancierspak begint met de leverancier; dit begint met wat er met u
+   gebeurt. En het sluit met wat wij NIET kunnen aantonen -- niet als kleine
+   letters onderaan maar als een eigen blok met dezelfde opmaak, want dat is het
+   deel dat de rest geloofwaardig maakt.
+
+   ELKE BEWERING DRAAGT ZIJN BRON, en die staat er zichtbaar bij in plaats van
+   in een tooltip. Wie het niet gelooft, kan het bestand opzoeken. Dat is het
+   verschil met een ingevulde vragenlijst. */
+function bewijsHtml(lijst){
+  return (lijst || []).map(b =>
+    '<div style="margin-top:.4rem;padding-left:.6rem;border-left:2px solid var(--line);">'+
+      '<b style="font-size:.76rem;display:block;">'+esc(b.claim)+'</b>'+
+      '<span style="font-size:.73rem;color:var(--muted);line-height:1.5;display:block;">'+esc(b.hoe)+'</span>'+
+      '<span style="font-size:.68rem;color:var(--soft);">bron: '+esc(b.bron)+
+        (b.waarde ? ' &middot; gemeten: '+esc(String(b.waarde)) : '')+'</span>'+
+    '</div>').join('');
+}
+function dosKop(t){
+  return '<div style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-top:.7rem;">'+esc(t)+'</div>';
+}
+function dossierHtml(d){
+  const p = (t) => '<span style="font-size:.76rem;color:var(--txt);line-height:1.55;display:block;margin-top:.2rem;">'+esc(t)+'</span>';
+  return '<div style="font-size:.76rem;color:var(--muted);line-height:1.55;">'+esc(d.let)+'</div>'+
+
+    dosKop('Wat deze app nooit krijgt')+
+    '<ul style="margin:.25rem 0 0 1rem;padding:0;font-size:.76rem;color:var(--txt);line-height:1.6;">'+
+      (d.watHetNooitKrijgt.punten || []).map(x => '<li>'+esc(x)+'</li>').join('')+'</ul>'+
+    bewijsHtml(d.watHetNooitKrijgt.bewijs)+
+
+    dosKop('Waar uw gegevens blijven')+
+    '<b style="font-size:.8rem;color:var(--gold);display:block;margin-top:.2rem;">'+esc(d.waarDeGegevensBlijven.antwoord)+'</b>'+
+    p(d.waarDeGegevensBlijven.toelichting)+bewijsHtml(d.waarDeGegevensBlijven.bewijs)+
+
+    dosKop('Als u stopt')+
+    '<b style="font-size:.8rem;display:block;margin-top:.2rem;">'+esc(d.uitgang.antwoord)+'</b>'+
+    p(d.uitgang.toelichting)+bewijsHtml(d.uitgang.bewijs)+
+
+    dosKop('De leverancier')+
+    p((d.leverancier.naam || 'onbekend')+' ('+d.leverancier.organisatie+')'+
+      (d.leverancier.toegelatenDoor ? ' &mdash; toegelaten door '+d.leverancier.toegelatenDoor : ''))+
+    bewijsHtml(d.leverancier.bewijs)+
+
+    dosKop('Wat er draait')+
+    p('versie '+d.watErDraait.versie+' &middot; '+d.watErDraait.bestanden+' bestanden &middot; hash '+String(d.watErDraait.hash).slice(0, 16)+'…')+
+    bewijsHtml(d.watErDraait.bewijs)+
+
+    dosKop('Wat de poort vond')+
+    p(d.watDePoortVond.blokkerend+' blokkerend, '+d.watDePoortVond.letOp+' let-op'+
+      (d.watDePoortVond.afgetekendDoor ? ' &middot; afgetekend door '+d.watDePoortVond.afgetekendDoor : ''))+
+    bewijsHtml(d.watDePoortVond.bewijs)+
+
+    /* WAT WIJ NIET KUNNEN AANTONEN, met dezelfde opmaak als de rest en niet
+       kleiner. Wie dit weglaat houdt een verkooppraatje over. */
+    dosKop('Wat dit dossier NIET zegt')+
+    Object.keys(d.nietGebouwd || {}).map(k =>
+      '<div style="margin-top:.4rem;"><b style="font-size:.76rem;color:var(--gold);">'+esc(k)+'</b>'+
+      '<span style="font-size:.73rem;color:var(--muted);line-height:1.5;display:block;">'+esc(d.nietGebouwd[k])+'</span></div>').join('');
+}
+
+/* MIJN GESCHIEDENIS: wat gaf ik, wanneer, en wanneer nam ik het terug. Staat
+   naast de winkel en niet erin: hij gaat over het LID en niet over een app.
+   Hij groeit aan en wordt nooit herschreven -- ook niet als het lid een app
+   verwijdert, want juist dan is hij het bewijs. */
+async function tekenTijdlijn(){
+  const vak = $('#asTijd');
+  vak.innerHTML = '<span class="tag">Even ophalen…</span>';
+  try {
+    const t = await api('/api/appstore/tijdlijn', {});
+    vak.innerHTML = '<div style="font-size:.76rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;">'+esc(t.let)+'</div>'+
+      (t.tijdlijn.length
+        ? t.tijdlijn.map(r =>
+            '<div style="display:flex;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.76rem;">'+
+              '<span style="color:var(--soft);flex:0 0 8.5rem;">'+esc(String(r.at).slice(0, 16).replace('T', ' '))+'</span>'+
+              '<span style="flex:1;"><b>'+esc(r.wat)+'</b>'+(r.sleutel ? ' &middot; '+esc(r.sleutel) : '')+
+                ((r.gaf && r.gaf.length) ? '<br><span style="color:var(--muted);">gaf: '+esc(r.gaf.join(', '))+'</span>' : '')+
+                ((r.weg && r.weg.length) ? '<br><span style="color:var(--muted);">nam terug: '+esc(r.weg.join(', '))+'</span>' : '')+
+              '</span></div>').join('')
+        : '<div class="leeg">Je hebt nog niets met een app van derden gedaan.</div>');
+  } catch(e){ vak.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
 }
 
 /* De bon: wat een lid betaalt en waar het heen gaat, VOORDAT hij drukt.

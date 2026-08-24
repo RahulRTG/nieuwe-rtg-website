@@ -47,7 +47,7 @@ const { splitsBruto } = require('../fiscaal/digitaal');
    journaal. */
 const AFDRACHT_MAX = 30;
 
-module.exports = function maakGeld({ S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier }) {
+module.exports = function maakGeld({ S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier, noteer }) {
 
   /* ------------------------------------------------------------- de afdracht */
   function afdracht() {
@@ -109,9 +109,9 @@ module.exports = function maakGeld({ S, save, nu, boek, eigen, norm, uitgever, a
      ./teruggave.js. Ze zijn hiervandaan gesplitst toen dit bestand over de
      10 kB-keuringsgrens ging, en de naad loopt waar hij hoort: hier staat WAT
      iets kost, daar staat wat er GEBEURT als iemand het koopt of terugkrijgt. */
-  const rekenen = { afdracht, bon };
+  const rekenen = { afdracht, bon, noteer };
   const A = require('./aanschaf')(Object.assign({ S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier }, rekenen));
-  const T = require('./teruggave')(Object.assign({ S, save, nu, boek, eigen, pay }, { aankopen: A.aankopen }));
+  const T = require('./teruggave')(Object.assign({ S, save, nu, boek, eigen, pay, noteer }, { aankopen: A.aankopen }));
 
   return Object.assign({ afdracht, afdrachtZet, bon, AFDRACHT_MAX }, A, T);
 };

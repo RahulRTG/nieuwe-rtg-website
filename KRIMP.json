@@ -4,15 +4,15 @@
   "rondes": {
     "grens-0.5": {
       "suite": {
-        "toetsen": 6818,
-        "gezakt": 2,
-        "rood": 2
+        "toetsen": 6825,
+        "gezakt": 0,
+        "rood": 0
       },
       "gemeten": {
         "hervullingen": 38,
         "collecties": 19,
         "grootste": 2,
-        "processenGewaakt": 707,
+        "processenGewaakt": 706,
         "gemetenGrens": 0.5
       },
       "collecties": [

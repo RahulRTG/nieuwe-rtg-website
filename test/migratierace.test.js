@@ -200,3 +200,40 @@ test('overal geldt de wachttijd VOOR het aanzetten van WAL, en niet erna', () =>
     'hier staat de wachttijd NA het aanzetten van WAL, of helemaal niet. Twee processen die ' +
     'tegelijk opstarten botsen dan op "database is locked":\n  ' + fout.join('\n  '));
 });
+
+test('de eigenaarsbootstrap verdraagt een verloren race, en alleen die', () => {
+  /* DE TWEEDE HELFT VAN DEZELFDE FLAKE. Toen het slot in de migratierij zat,
+     zakte test/vloot.test.js nog steeds -- nu op
+
+         UNIQUE constraint failed: users.username
+           at zetEigenaarsAccount (server/server.js)
+
+     Alle drie de groepen kijken of het eigenaarsaccount bestaat, alle drie
+     zien ze van niet, alle drie maken ze het aan. Die functie is IDEMPOTENT
+     bedoeld ("zorg dat de eigenaar bestaat"), dus een botsing op de unieke
+     sleutel betekent dat een ander proces sneller was: opnieuw kijken en
+     doorlopen.
+
+     Waarom dit een BRONtoets is en geen race-toets: de bootstrap draait bij het
+     laden van server.js, dus reproduceren kost drie echte servers en dat is
+     precies de flakiness die we kwijt wilden. test/vloot.test.js is het
+     end-to-end-bewijs; deze bewering houdt de reparatie vast. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'server', 'server.js'), 'utf8');
+  assert.match(bron, /function zetEigenaarsAccountEens\(\)/,
+    'de bootstrap is niet meer opgesplitst; dan is er niets om opnieuw te proberen');
+  assert.match(bron, /UNIQUE constraint failed: users\\\./,
+    'de botsing op de unieke sleutel wordt niet meer herkend als een verloren race');
+  assert.match(bron, /if \(!\/UNIQUE constraint failed: users\\\.\/\.test\(bericht\)\) throw e;/,
+    'elke ANDERE fout hoort te blijven staan; een kale catch maakt van deze reparatie ' +
+    'een doofpot voor fouten die niets met drukte te maken hebben');
+
+  /* EN DE TWEEDE POGING ZELF. Zonder deze bewering blijft de toets groen als
+     iemand de herlezing vervangt door een throw -- dan herkent hij de race nog
+     steeds, en valt hij er alsnog op om. De mutatieproef liet hem daarop
+     AFSLAAN. */
+  const wachter = bron.indexOf('if (!/UNIQUE constraint failed: users');
+  const opnieuw = bron.indexOf('return zetEigenaarsAccountEens();', wachter);
+  assert.ok(wachter > 0 && opnieuw > wachter && opnieuw - wachter < 200,
+    'na het herkennen van de race wordt er niet opnieuw gekeken; herkennen alleen ' +
+    'lost niets op');
+});

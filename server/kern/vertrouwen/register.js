@@ -32,14 +32,19 @@
    ========================================================================== */
 'use strict';
 
-/* De soorten. Elke regel hier hoort bij iets wat in dit huis ECHT bestaat; een
+/* De soorten. `eenheidEen` staat er los bij en wordt niet afgeleid: het
+   Nederlands laat zich niet met een regel ontmeervoudigen (personen -> persoon,
+   niet "personen" min een s), en "1 personen" op een bevestigingsscherm is
+   precies het detail dat een product goedkoop laat lijken.
+
+   Elke regel hier hoort bij iets wat in dit huis ECHT bestaat; een
    soort verzinnen voor de volledigheid maakt de lijst onbetrouwbaar als geheel.
    Groeit de lijst, dan groeit hij met een handeling die er is. */
 const SOORTEN = [
   {
     id: 'tenant.uitvoer',
     naam: 'De volledige uitvoer van een werkruimte',
-    eenheid: 'objecten',
+    eenheid: 'objecten', eenheidEen: 'object',
     omkeerbaar: false,
     waaromNiet: 'De gegevens verlaten het huis. Een uitvoer is niet in te trekken.',
     vast: 2000,
@@ -48,7 +53,7 @@ const SOORTEN = [
   {
     id: 'mens.uitdienst',
     naam: 'Iemand uit dienst zetten',
-    eenheid: 'personen',
+    eenheid: 'personen', eenheidEen: 'persoon',
     omkeerbaar: true,
     vast: 5,
     gevoelig: false
@@ -56,7 +61,7 @@ const SOORTEN = [
   {
     id: 'mens.gevoelig.inzage',
     naam: 'Inzage in bijzondere persoonsgegevens',
-    eenheid: 'personen',
+    eenheid: 'personen', eenheidEen: 'persoon',
     omkeerbaar: false,
     waaromNiet: 'Gezien is gezien. Het journaal legt vast dat het gebeurde, niet dat het ongedaan is.',
     vast: 25,
@@ -65,7 +70,7 @@ const SOORTEN = [
   {
     id: 'rol.geven',
     naam: 'Een rol toekennen',
-    eenheid: 'rollen',
+    eenheid: 'rollen', eenheidEen: 'rol',
     omkeerbaar: true,
     vast: 3,
     gevoelig: false
@@ -73,7 +78,7 @@ const SOORTEN = [
   {
     id: 'werkruimte.sluiten',
     naam: 'Een werkruimte sluiten',
-    eenheid: 'werkruimtes',
+    eenheid: 'werkruimtes', eenheidEen: 'werkruimte',
     omkeerbaar: true,
     vast: 1,
     gevoelig: false
@@ -81,13 +86,27 @@ const SOORTEN = [
   {
     id: 'tenant.vernietig',
     naam: 'Een tenant vernietigen',
-    eenheid: 'tenants',
+    eenheid: 'tenants', eenheidEen: 'tenant',
     omkeerbaar: false,
     waaromNiet: 'Vernietiging is het doel van de handeling; er is per definitie geen weg terug.',
     vast: 1,
-    gevoelig: true
+    gevoelig: true,
+    /* ZWAAR BIJ EEN. De meter meet volume, en dat is voor bijna alles de goede
+       maat -- maar niet voor een handeling die al bij het eerste exemplaar
+       onherstelbaar is. Zonder deze ondergrens komt een tenant vernietigen uit
+       op "licht", want een is niet veel. Dat is precies de vorm van fout waar
+       een risicometer aan doodgaat: hij rekent netjes en het antwoord klopt
+       niet. Wie hier een soort bijzet met `minstens`, zegt: het aantal doet er
+       niet toe, dit is altijd al erg. */
+    minstens: 'uitzonderlijk',
+    waaromMinstens: 'Vernietigen is onherstelbaar, en dat geldt al bij de eerste.'
   }
 ];
+
+/* De banden op volgorde, zodat een ondergrens te vergelijken is met een
+   berekende zwaarte. Staat hier en niet in de meter: het is een eigenschap van
+   de schaal en niet van de berekening. */
+const BANDEN = ['licht', 'zwaar', 'uitzonderlijk'];
 
 /* Wat deze meter NIET meeweegt, met naam. Dezelfde regel als `nietGerekend` in
    bedrijf/gevolg.js: een meting die zwijgt over haar randen leest als een
@@ -104,4 +123,4 @@ const BIJ_ID = new Map(SOORTEN.map(s => [s.id, s]));
    en moet daar iets mee, en dat is de bedoeling. */
 function soort(id) { return BIJ_ID.get(String(id || '')) || null; }
 
-module.exports = { SOORTEN, NIET_GEREKEND, soort };
+module.exports = { SOORTEN, NIET_GEREKEND, BANDEN, soort };

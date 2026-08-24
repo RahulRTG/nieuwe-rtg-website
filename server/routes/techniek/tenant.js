@@ -26,6 +26,9 @@ module.exports = (tctx) => {
     catch (e) { return null; }
   };
   const T = () => kern.tenant;
+  /* De sessiesleutel voor de Trust Fabric: het token dat techAuth al heeft
+     laten verifieren (zie routes/techniek.js). Niet zelf de kop lezen. */
+  const sessieVan = (req) => String(req.techSessie || '');
 
   app.get('/api/techniek/tenant', techAuth, eigenaarAlleen, (req, res) => {
     res.json({ tenants: T().register.lijst(), modi: T().register.MODI,
@@ -104,9 +107,34 @@ module.exports = (tctx) => {
   /* Vernietigen. Onomkeerbaar, dus met de drie deuren ervoor in de kern en
      niet hier: een controle in een route is een controle die de volgende
      aanroeper mist. */
+  /* HET TWEEDE MOMENT (VERTROUWEN.md laag 3). Vernietigen is onherstelbaar en
+     staat daarom in het register als `minstens: 'uitzonderlijk'`: die vragen
+     elke keer een bevestiging die aan deze ene handeling vastzit. */
+  app.post('/api/techniek/tenant/bevestig', techAuth, eigenaarAlleen, async (req, res) => {
+    const b = req.body || {};
+    if (!await accounts.verifyPassword(String(b.wachtwoord || ''), req.techUser.password_hash))
+      return res.status(401).json({ error: 'Dat wachtwoord klopt niet. Er is niets bevestigd.' });
+    const sessie = sessieVan(req);
+    const uit = kern.vertrouwen.losBon(String(b.id || ''), sessie);
+    if (!uit.ok) return res.status(400).json({ error: uit.reden });
+    /* En de sessie is weer VERS: daarom vraagt een ZWARE handeling daarna een
+       kwartier lang niets meer. Zie kern/vertrouwen/tweedemoment.js. */
+    kern.vertrouwen.verifieer(sessie, { hoe: 'wachtwoord', account: 'user-' + req.techUser.id,
+      apparaat: String(req.get('user-agent') || '') + '|' + String(req.get('accept-language') || '') });
+    res.json({ ok: true });
+  });
+
   app.post('/api/techniek/tenant/vernietig', techAuth, eigenaarAlleen, (req, res) => {
     const b = req.body || {};
-    const uit = T().levensloop.vernietig(b.org, { door: b.door || wie(req) });
+    const door = b.door || wie(req);
+    /* EERST DE INHOUDELIJKE WEIGERING, DAN HET TWEEDE MOMENT: een bevestiging
+       vragen voor iets dat toch niet doorgaat, verspeelt hem. */
+    const mag = T().levensloop.magVernietigen(b.org, { door });
+    if (mag.error) return res.status(mag.status || 400).json({ error: mag.error });
+    const poort = kern.vertrouwen.poort({ actor: 'user-' + req.techUser.id, sessie: sessieVan(req),
+      soort: 'tenant.vernietig', aantal: 1, doel: String(b.org || ''), bon: b.bevestiging });
+    if (!poort.door) return res.status(poort.status).json(poort.antwoord);
+    const uit = T().levensloop.vernietig(b.org, { door });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     log.warn('tenant vernietigd', { org: String(b.org || '').toUpperCase(), door: wie(req),
       werkruimtes: uit.bewijs.werkruimtes.length });

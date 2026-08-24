@@ -148,7 +148,9 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
 
   /* Vernietigen. Drie deuren ervoor, en de laatste is het bewijs: wat er niet
      te bewijzen valt, is niet aantoonbaar gebeurd. */
-  function vernietig(org, opdracht) {
+  /* DE VIER WEIGERINGEN APART: de poort moet ze kunnen stellen ZONDER te
+     vernietigen. Geen kopie -- vernietig() roept deze functie zelf aan. */
+  function magVernietigen(org, opdracht) {
     const o = opdracht || {};
     const t = register.haal(org);
     if (!t) return { error: 'Die tenant kennen we niet.', status: 404 };
@@ -157,8 +159,16 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
     if (v.legalHold) return { error: 'Er ligt een bewaringsplicht op deze tenant: ' + (v.legalHoldReden || 'zonder grond genoteerd') + '.', status: 409 };
     if (v.bewaarTot && klokNu() < Date.parse(v.bewaarTot))
       return { error: 'De bewaartermijn loopt tot ' + v.bewaarTot.slice(0, 10) + '. Tot die datum wordt er niets vernietigd.', status: 409 };
+    if (!schoon(o.door, 80)) return { error: 'Wie tekent voor deze vernietiging?', status: 400 };
+    return { ok: true, tenant: t, vak: v };
+  }
+
+  function vernietig(org, opdracht) {
+    const o = opdracht || {};
+    const mag = magVernietigen(org, o);
+    if (mag.error) return mag;
+    const t = mag.tenant, v = mag.vak;
     const door = schoon(o.door, 80);
-    if (!door) return { error: 'Wie tekent voor deze vernietiging?', status: 400 };
 
     /* Het bewijs wordt uit de LAATSTE stand gerekend, vlak voor het weghalen --
        niet uit een eerdere export, want dan bewijst het iets over een moment
@@ -180,5 +190,5 @@ module.exports = ({ db, save, schoon, register, uitgang }) => {
       let: 'Dit bewijs draagt aantallen en checksums en geen persoonsgegevens. Bewaar het: de gegevens waar het over gaat bestaan niet meer.' };
   }
 
-  return { stand, zet, houdVast, vernietig, STANDEN, STANDAARD_BEWAARDAGEN };
+  return { stand, zet, houdVast, magVernietigen, vernietig, STANDEN, STANDAARD_BEWAARDAGEN };
 };

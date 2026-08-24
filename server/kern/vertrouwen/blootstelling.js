@@ -81,7 +81,11 @@ function meet(handeling, eigen) {
      drempel die stilletjes verschuift is niet uit te leggen. */
   const drempel = s.gevoelig ? Math.max(1, g.waarde / 2) : g.waarde;
   const factor = h.aantal / drempel;
-  const zwaarte = factor <= 1 ? 'licht' : (factor <= VEEL ? 'zwaar' : 'uitzonderlijk');
+  const gerekend = factor <= 1 ? 'licht' : (factor <= VEEL ? 'zwaar' : 'uitzonderlijk');
+  /* EN DE ONDERGRENS VAN DE SOORT WINT ALS HIJ HOGER LIGT. Sommige handelingen
+     zijn al bij het eerste exemplaar onherstelbaar; het aantal zegt daar niets
+     over. Zie register.js bij `minstens`. */
+  const zwaarte = R.BANDEN.indexOf(s.minstens) > R.BANDEN.indexOf(gerekend) ? s.minstens : gerekend;
 
   /* `redenen` legt een ONDERBREKING uit, en er is er geen als de handeling licht
      is. Zou hij ook dan vullen, dan krijgt een mens bij elke gewone handeling
@@ -99,6 +103,8 @@ function meet(handeling, eigen) {
     if (g.reden) redenen.push(g.reden);
     if (s.gevoelig) redenen.push('Het gaat om bijzondere persoonsgegevens, dus de grens ligt op de helft.');
     if (!s.omkeerbaar) redenen.push('Deze handeling is niet terug te draaien. ' + (s.waaromNiet || ''));
+    if (zwaarte !== gerekend) redenen.push(s.waaromMinstens ||
+      'Deze soort handeling telt altijd als ' + s.minstens + ', ongeacht het aantal.');
   }
 
   return {
@@ -115,7 +121,7 @@ function meet(handeling, eigen) {
     omkeerbaar: s.omkeerbaar,
     gevoelig: s.gevoelig,
     redenen,
-    zin: zin(s, h.aantal, zwaarte, factor, g),
+    zin: zin(s, h.aantal, zwaarte, factor, g, zwaarte !== gerekend),
     nietGerekend: R.NIET_GEREKEND
   };
 }
@@ -123,12 +129,20 @@ function meet(handeling, eigen) {
 /* EEN zin, en niet een lijst. VERTROUWEN.md par. 3.7: kan een step-up niet in
    een zin worden uitgelegd, dan is het geen step-up maar ruis. Deze zin is wat
    een mens te zien krijgt; `redenen` is wat eronder staat als hij doorklikt. */
-function zin(s, aantal, zwaarte, factor, g) {
-  if (zwaarte === 'licht')
-    return 'Deze handeling raakt ' + aantal + ' ' + s.eenheid + ' en blijft binnen het gewone bereik.';
+const eenheidVan = (s, n) => (n === 1 && s.eenheidEen ? s.eenheidEen : s.eenheid);
+
+function zin(s, aantal, zwaarte, factor, g, doorGrens) {
+  const wat = 'Deze handeling raakt ' + aantal + ' ' + eenheidVan(s, aantal);
+  if (zwaarte === 'licht') return wat + ' en blijft binnen het gewone bereik.';
+
+  /* WIE HET OORDEEL VELDE, ZEGT HET OOK. Besliste de ondergrens van de soort,
+     dan is "zoveel keer meer dan uw normale bereik" onzin -- bij een aantal van
+     een is dat getal een. Dan hoort er te staan waarom dit altijd al erg is. */
+  if (doorGrens) return wat + '. ' + (s.waaromMinstens ||
+    'Deze soort handeling telt altijd als ' + s.minstens + ', ongeacht het aantal.');
+
   const maat = g.soort === 'eigen' ? 'dan u normaal doet' : 'dan de grens voor deze handeling';
-  return 'Deze handeling raakt ' + aantal + ' ' + s.eenheid +
-    (s.gevoelig ? ' en bevat bijzondere persoonsgegevens' : '') + '. Dat is ' +
+  return wat + (s.gevoelig ? ' en bevat bijzondere persoonsgegevens' : '') + '. Dat is ' +
     Math.round(factor) + 'x meer ' + maat +
     (s.omkeerbaar ? '.' : ', en het is niet terug te draaien.');
 }

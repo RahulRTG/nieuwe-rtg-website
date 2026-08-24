@@ -89,9 +89,14 @@ Staat: de gevolgsimulatie (`server/bedrijf/gevolg.js`) beantwoordt precies deze
 vraag voor drie veranderingen, schrijft niets, en noemt in `nietGerekend` bij
 naam wat hij niet meerekent.
 
-Ontbreekt: **de meter zit niet in het pad van de handeling zelf.** Hij is een
-knop die je kunt indrukken, geen getal dat de handeling meedraagt. Zonder dat
-getal is er geen step-up, geen Action Preview en geen bon.
+Sinds laag 1 (`server/kern/vertrouwen/`) draagt een handeling haar omvang mee,
+gemeten tegen het eigen normale bereik van die actor. En sinds het tweede
+moment kent het register ook een ONDERGRENS per soort (`minstens`): de meter
+meet volume, en dat is voor bijna alles de goede maat -- maar niet voor een
+handeling die al bij het eerste exemplaar onherstelbaar is. Zonder die grens
+kwam een tenant vernietigen uit op "licht", want een is niet veel. Dat is
+precies de vorm van fout waar een risicometer aan doodgaat: hij rekent netjes
+en het antwoord klopt niet.
 
 ### 2.4 Hoever — Containment Fabric
 
@@ -304,14 +309,27 @@ levert het gegeven waar de volgende op staat.
 | 7 | **Simuleer compromittering** — het wauw-moment | het antwoord op "en als" | 8 |
 | 8 | **Trust HUD / Trust State** — uitsluitend uit de bewijspoort | wat de klant ziet | — |
 
-**Stand op 24 augustus 2026.** Laag 1, 2 en 3 staan en zijn aangesloten: de
-tenantuitvoer draagt haar eigen omvang en het step-up-oordeel, en de
-wachtwoordinlog legt de verificatiesterkte vast. Wat daar nog niet gebeurt is
-het *afdwingen*: laag 3 velt het oordeel en niemand houdt op grond daarvan iets
-tegen, omdat er nog geen tweede moment bestaat om naar door te verwijzen. Dat
-is een keuze en geen vergetelheid -- een drempel zonder tweede moment is alleen
-een dichte deur met een getal erbij -- maar zolang het zo is, moet niemand
-beweren dat dit huis step-up HEEFT. Het meet hem.
+**Stand op 24 augustus 2026.** Laag 1, 2 en 3 staan, zijn aangesloten, en
+worden op een plek ook AFGEDWONGEN.
+
+De tenantuitvoer draagt haar eigen omvang en het oordeel mee (meten, niet
+tegenhouden -- daar staat geen mens achter de sleutel). De wachtwoordinlog legt
+de verificatiesterkte vast. En het vernietigen van een tenant loopt door de
+poort: dat is de enige handeling hier die per definitie onherstelbaar is, hij
+staat daarom in het register met `minstens: 'uitzonderlijk'`, en hij vraagt
+elke keer een bevestiging die aan die ene tenant vastzit en daarna op is.
+
+Wat er NIET is: de poort hangt aan een handeling en niet aan alle. Zolang dat
+zo is, is de juiste zin "dit huis dwingt step-up af bij het vernietigen van een
+tenant" -- en niet "dit huis heeft step-up". De volgende deuren zijn een keuze
+per handeling, en elke keuze hoort in het register te staan.
+
+**Twee doorlaten, en het verschil is de ontwerpkeuze.** Een ZWARE handeling
+wordt vanzelf doorgelaten zodra de sessie weer vers en hard is geverifieerd --
+wie net bevestigd heeft, werkt daarna een kwartier door. Een UITZONDERLIJKE
+nooit: die vraagt elke keer een bon die aan die ene handeling vastzit. Zonder
+dat verschil koopt een aanvaller met de goedkoopste step-up een vrijbrief voor
+de duurste handeling.
 
 Daarnaast, los van de keten en klein genoeg om tussendoor te doen:
 

@@ -27,6 +27,7 @@ const gewoonte = require('./gewoonte');
 const register = require('./register');
 const verificatie = require('./verificatie');
 const stapop = require('./stapop');
+const tweedemoment = require('./tweedemoment');
 
 module.exports = ({ db, save }) => {
   /* De bak hangt buiten de werkruimtes, en dat is een besluit: een gewoonte is
@@ -64,6 +65,43 @@ module.exports = ({ db, save }) => {
     return n;
   }
 
+  /* DE POORT: de enige plek waar een route hoeft te vragen "mag dit nu door".
+     Hij bundelt laag 1, 2 en 3 en het tweede moment, zodat een deur niet zelf
+     een drempel gaat verzinnen -- dan staan er twee grenzen in dit huis.
+
+     TWEE MANIEREN OM ER DOORHEEN TE KOMEN, en het verschil zit in stapop.js en
+     niet hier: een ZWARE handeling wordt vanzelf doorgelaten zodra de sessie
+     weer vers en hard is geverifieerd (dus na een bevestiging een kwartier
+     lang), en een UITZONDERLIJKE nooit -- die houdt `nodig` altijd waar en
+     vraagt dus elke keer een bon die aan deze ene handeling vastzit.
+
+     428 en niet 403: dit is geen weigering maar een VOORWAARDE. De aanroeper
+     krijgt de zin, de redenen en de bon terug en kan het afmaken. */
+  function poort({ actor, sessie, soort, aantal, doel, bon }) {
+    const b = weeg(actor, soort, aantal);
+    const ver = sessie ? verificatieVan(sessie) : null;
+    const st = stapop.beoordeel(b, ver);
+    b.stapop = st;
+    if (!st.nodig) return { door: true, blootstelling: b };
+    if (!st.mogelijk) return { door: false, status: 403,
+      antwoord: { error: st.zin, waarom: st.waarom, blootstelling: b } };
+
+    const vraagOpnieuw = (fout) => {
+      const vr = tweedemoment.vraag(bak(), { sessie, soort, aantal, doel });
+      save();
+      return { door: false, status: 428, antwoord: { error: fout || st.zin, zin: st.zin,
+        waarom: st.waarom, bevestiging: vr, blootstelling: b } };
+    };
+    if (!bon) return vraagOpnieuw(null);
+    const v = tweedemoment.verzilver(bak(), { sessie, soort, aantal, doel, id: bon });
+    save();
+    return v.ok ? { door: true, blootstelling: b, bevestigd: true } : vraagOpnieuw(v.reden);
+  }
+
+  /* De bon oplossen. De aanroeper (routes/vertrouwen.js) heeft de mens al
+     opnieuw geverifieerd; zie de kop van tweedemoment.js. */
+  function losBon(id, sessie) { const u = tweedemoment.los(bak(), id, sessie); save(); return u; }
+
   /* HET VERGEETRECHT, EN HET IS ER EEN. Hier stond een `vergeet` die alleen de
      gewoonte wiste; de apparatenlijst en de sessie bleven staan. Dat is precies
      de fout die de keuring aanwees toen hij meldde dat de naam `vergeet` in drie
@@ -79,6 +117,6 @@ module.exports = ({ db, save }) => {
     return weg;
   }
 
-  return { weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, geenPersoon,
+  return { weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, geenPersoon, poort, losBon,
     register, NIET_GEDEKT: gewoonte.NIET_GEDEKT };
 };

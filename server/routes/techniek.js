@@ -44,7 +44,11 @@ module.exports = (kern) => {
   function gebruikerUit(req) {
     const auth = req.get('authorization') || '';
     const token = auth.replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
-    return token ? accounts.verifyToken(token) : null;
+    const user = token ? accounts.verifyToken(token) : null;
+    /* Het GEVERIFIEERDE token gaat mee: de Trust Fabric wil een sleutel per
+       sessie, en een route mag de kop niet zelf lezen (LAT.md regel 8). */
+    if (user) req.techSessie = token;
+    return user;
   }
   function techAuth(req, res, next) {
     const user = gebruikerUit(req);

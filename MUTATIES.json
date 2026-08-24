@@ -6162,6 +6162,13 @@
       "gezakt": 3,
       "scherp": "overleefd"
     },
+    "vertrouwenpoort.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "vertrouwenstapop.test.js": {
       "soort": "puur",
       "staat": "gezakt",

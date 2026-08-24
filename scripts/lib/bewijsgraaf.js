@@ -37,7 +37,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { zonderCommentaar } = require('./bron');
+const { zonderCommentaar, codemasker } = require('./bron');
 
 const WORTEL = path.join(__dirname, '..', '..');
 const MAPPEN = ['server', 'scripts', 'public'];
@@ -141,9 +141,31 @@ function requiresVan(bestand) {
      als hij een kale, direct gesloten tekenreeks is. Al het andere -- een som,
      een variabele, een path.join -- is per definitie niet te volgen, tenzij hij
      met de hand in BEREKEND_BEREIK staat. */
+  /* EN ALLEEN WAT ECHT IN CODE STAAT. zonderCommentaar() hierboven haalt de
+     uitleg weg, maar niet de TEKENREEKSEN -- en `const teken = "require('./" +
+     "helper')";` in scripts/mutatie.js is geen require maar wel precies deze
+     vorm. Die ene regel maakte scripts/mutatie.js tot een bestand met een
+     niet-te-volgen require, en daarmee elke toets die hem laadt tot een toets
+     met een onvolledige bewijsruimte: drie stuks in bewijsOnbekend, voor een
+     tekenreeks.
+
+     De richting van die fout was veilig (de planner draaide te veel, niet te
+     weinig) maar hij was wel fout, en hij kostte elke ronde werk. Het masker
+     uit ./bron.js beantwoordt dezelfde vraag als de mutatiemotor, en dat is
+     met opzet dezelfde functie: twee maskers zouden binnen een week uiteen
+     lopen (LAT.md regel 4). */
+  /* Het masker wordt pas gebouwd als er iets te maskeren valt: bijna elk bestand
+     heeft alleen kale requires, en dan hoeft er niets. Dat is hier GOEDKOOP en
+     niet nodig -- de graaf duurt met en zonder masker even lang (twee metingen
+     elk: 13,9 en 13,4 tegen 13,9 en 14,2 seconde) -- maar de vorm blijft staan
+     omdat hij het dure geval koppelt aan het geval dat het nodig maakt. */
+  let masker = null;
   let berekend = false;
   for (const m of bron.matchAll(/require\(([^)]*)\)/g)) {
-    if (!/^\s*(["'])[^"']*\1\s*$/.test(m[1])) { berekend = true; break; }
+    if (/^\s*(["'])[^"']*\1\s*$/.test(m[1])) continue;      // kale tekenreeks: gewoon te volgen
+    if (!masker) masker = codemasker(bron);
+    if (!masker[m.index]) continue;                          // stond in een tekenreeks: geen require
+    berekend = true; break;
   }
   return { paden, berekend, leesbaar: true };
 }

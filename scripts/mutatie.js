@@ -109,13 +109,22 @@ const VOORTGANG = path.join(WORTEL, 'server', 'data', 'mutatie-voortgang.json');
      (geen vlag)  overslaan wat al een bruikbare uitslag heeft
 
    Let op de derde: "geen toetsen gedraaid" is GEEN uitslag maar een mislukking,
-   en die hoort opnieuw geprobeerd te worden. */
+   en die hoort opnieuw geprobeerd te worden. Hetzelfde geldt voor `voorlopig`:
+   een overlever uit de ondiepe ronde waar de A-diepe ronde nog overheen moet.
+   Die twee gelden ook ONDER --verlopen niet als gedaan, want daar gaat het niet
+   om houdbaarheid maar om werk dat nooit af is gekomen. */
 function moetOverslaan(naam, opties) {
   const o = opties || {};
   if (o.opnieuw) return false;
-  if (o.verlopenNamen) return !o.verlopenNamen.has(naam);
+  if (o.verlopenNamen) {
+    const v = o.uitslag && o.uitslag[naam];
+    if (v && (v.voorlopig || v.staat === 'geen toetsen gedraaid')) return false;
+    return !o.verlopenNamen.has(naam);
+  }
   const r = o.uitslag && o.uitslag[naam];
-  return !!r && r.staat !== 'geen toetsen gedraaid';
+  if (!r) return false;
+  if (r.voorlopig) return false;   // ondiepe overlever: de diepe ronde moet er nog overheen
+  return r.staat !== 'geen toetsen gedraaid';
 }
 
 const NIET_MUTEREN = new Map([
@@ -168,26 +177,17 @@ const OPERATOREN = [
 ];
 /* Waar mag een operator toeslaan? Niet in commentaar en niet in een tekenreeks:
    daar verandert hij niets aan het gedrag, en dan meet de proef of de toets
-   tekst leest. We bouwen een masker van de bron en muteren alleen op posities
-   die daarin "code" zijn. */
-function codemasker(bron) {
-  const masker = new Array(bron.length).fill(true);
-  let i = 0;
-  const uit = (a, b) => { for (let k = a; k < b && k < masker.length; k++) masker[k] = false; };
-  while (i < bron.length) {
-    const twee = bron.slice(i, i + 2);
-    if (twee === '/*') { const e = bron.indexOf('*/', i + 2); const z = e < 0 ? bron.length : e + 2; uit(i, z); i = z; continue; }
-    if (twee === '//') { const e = bron.indexOf('\n', i); const z = e < 0 ? bron.length : e; uit(i, z); i = z; continue; }
-    const c = bron[i];
-    if (c === '"' || c === "'" || c === '`') {
-      let j = i + 1;
-      while (j < bron.length && bron[j] !== c) { if (bron[j] === '\\') j++; j++; }
-      uit(i, j + 1); i = j + 1; continue;
-    }
-    i++;
-  }
-  return masker;
-}
+   tekst leest. We muteren alleen op posities die in het masker "code" zijn.
+
+   HET MASKER ZELF WOONT IN ./lib/bron.js, en dat is geen opruiming maar een
+   reparatie. scripts/lib/bewijsgraaf.js had dezelfde vraag ("staat deze
+   require echt in code?") en beantwoordde hem ZONDER masker: een `require(`
+   binnen een tekenreeks telde daar mee. Dit bestand heeft er zelf een op regel
+   666 staan, en daardoor gold scripts/mutatie.js als een bestand met een
+   niet-te-volgen require -- en elke toets die hem laadt als een toets met een
+   onvolledige bewijsruimte. Twee plekken die dezelfde vraag anders
+   beantwoorden is LAT.md regel 4; nu is het er een. */
+const { codemasker } = require('./lib/bron');
 
 /* Een operator toepassen op de n-DE plek die in code staat (n vanaf 0). Geeft de
    nieuwe bron terug, of null als die plek niet bestaat.
@@ -788,7 +788,31 @@ if (require.main === module) {
   /* De vastgelegde uitslag EN de voortgang van een afgebroken ronde. De tweede
      wint bij een botsing: die is later. */
   const laad = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')).toetsen || {}; } catch (e) { return {}; } };
-  const uitslag = Object.assign(laad(UITSLAG), laad(VOORTGANG));
+  const vastgelegd = laad(UITSLAG);
+  const onderweg = laad(VOORTGANG);
+  const uitslag = Object.assign({}, vastgelegd, onderweg);
+  /* EN ZEG HET ALS DE VOORTGANG IETS ANDERS ZEGT DAN HET REGISTER.
+
+     De voortgang staat buiten de repo (server/data/, in .gitignore) en wint bij
+     een botsing, want die is later. Dat klopt -- maar hij deed het STIL, en dat
+     is hoe vandaag vijf uitslagen van "gezakt" naar "overleefd" schoven zonder
+     dat er een regel code veranderd was: een eerdere ronde was afgebroken tussen
+     fase A en A-diep, de ondiepe tussenstand bleef in de voortgang staan, en de
+     eerstvolgende ronde schreef hem als oordeel naar MUTATIES.json.
+
+     De vlag `voorlopig` hierboven voorkomt dat nu bij de bron. Deze regel is het
+     net eronder: wie een ronde start, hoort te ZIEN dat er een oude tussenstand
+     meekomt en wat die verandert (LAT.md regel 5). */
+  const botsingen = Object.keys(onderweg)
+    .filter((k) => vastgelegd[k] && vastgelegd[k].staat !== onderweg[k].staat);
+  if (botsingen.length) {
+    console.log('  LET OP: een openstaande voortgang (server/data/) zegt over ' + botsingen.length +
+      ' toets(en) iets anders dan MUTATIES.json, en die wint:');
+    for (const k of botsingen.slice(0, 10))
+      console.log('    ' + k.padEnd(42) + vastgelegd[k].staat + ' -> ' + onderweg[k].staat +
+        (onderweg[k].voorlopig ? '  (voorlopig: de diepe ronde moet er nog overheen)' : ''));
+    if (botsingen.length > 10) console.log('    ... en nog ' + (botsingen.length - 10));
+  }
   const opnieuw = args.includes('--opnieuw');
   /* Na ELK bestand wegschrijven, en overslaan wat er al in staat. Het serverdeel
      duurt uren; een motor die alleen aan het eind wegschrijft verliest bij een
@@ -880,13 +904,32 @@ if (require.main === module) {
     return uit;
   };
 
+  /* EEN OVERLEVER UIT DE ONDIEPE RONDE IS NOG GEEN OORDEEL.
+
+     Fase A probeert EEN plek per operator. Blijft een toets daar groen, dan
+     heet hij "overleefd" -- maar dat is precies de uitslag waar de A-diepe
+     ronde hieronder overheen gaat, met acht plekken. Van de vijf gevallen die
+     ik vandaag terugvond deed A-diep er vijf van vijf alsnog zakken.
+
+     Zolang die tweede ronde niet is gelopen, is "overleefd" dus een TUSSENSTAND
+     en geen bewering. Hij stond er wel als bewering: de motor schrijft na elk
+     bestand weg (dat moet, een ronde van uren mag niet bij een ctrl-C alles
+     verliezen), en wie tussen fase A en A-diep afbreekt, laat vijf toetsen als
+     ONGEVOELIG in het register achter. Dat getal staat in NORM.json en gaat de
+     verkeerde kant op zonder dat er iets aan de code is veranderd.
+
+     `voorlopig` markeert dat. gedaan() ziet het als niet-gedaan, dus een
+     afgebroken ronde pakt hem de volgende keer weer op, en de A-diepe ronde
+     haalt de vlag weg zodra er echt acht plekken zijn geprobeerd. */
+  const voorlopigMaken = (r) => (r && r.staat === 'overleefd') ? Object.assign({}, r, { voorlopig: true }) : r;
+
   const doe = (lijst, proef) => {
     let n = 0;
     for (const naam of lijst) {
       n++;
       if (gedaan(naam)) { continue; }
       const r = proef(naam);
-      uitslag[naam] = stempel(naam, r);
+      uitslag[naam] = stempel(naam, voorlopigMaken(r));
       bewaar();
       if (++sindsVastleggen >= OM_DE) { vastleggen(); sindsVastleggen = 0; console.log('        (tussenstand vastgelegd in MUTATIES.json)'); }
       console.log('  ' + String(n).padStart(4) + '/' + lijst.length + '  ' + naam.padEnd(42) +
@@ -908,7 +951,8 @@ if (require.main === module) {
       console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, acht plekken per operator ---');
       for (const naam of overlevers) {
         const r = proefPuur(naam, 8);
-        uitslag[naam] = stempel(naam, r);
+        // hier is de diepe ronde WEL gelopen, dus dit is een oordeel en geen tussenstand
+        uitslag[naam] = stempel(naam, Object.assign({}, r, { voorlopig: undefined }));
         bewaar();
         console.log('        ' + naam.padEnd(42) + r.staat +
           (r.operator ? '  [' + r.operator + ' in ' + r.module + ']' : '  (' + (r.geprobeerd || 0) + ' mutaties geprobeerd)'));

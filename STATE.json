@@ -134,17 +134,23 @@
     },
     "server/accounts/state.js#_cache": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Voorbereide SQL-zinnen per query. Hij hangt aan de handle en wordt door zin() geleegd zodra module.exports.db verandert, dus stale wordt hij niet -- maar dat is een AUTOMATISME en geen aanroepbare reset, en het register neemt alleen wat het kan nakijken.",
+      "blokkeert": "Cache die zichzelf leegt bij een nieuwe handle, maar geen reset heeft die te controleren valt."
     },
     "server/accounts/state.js#_cacheDb": {
       "eigenaar": "server/accounts",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "De handle waar de zinnencache aan hangt. Zelfde verhaal als _cache: hij beweegt mee met module.exports.db, maar er is geen aanroep die hem terugzet.",
+      "blokkeert": "Greep op de database-handle van dit proces."
     },
     "server/betaal.js#adyen": {
       "eigenaar": "server",
@@ -155,24 +161,33 @@
     },
     "server/betaal.js#bewaar": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De schrijf-kant van dezelfde opslag. Erger dan de lees-kant: een oude bewaar() schrijft de gegevens van deze toets in de opslag van de vorige.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/betaal.js#geheugen": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "De idempotentie-opslag zelf: wat hierin staat, wordt niet nog een keer uitgevoerd. Dat is precies de bedoeling binnen een rit en precies fout tussen twee toetsen -- de tweede betaling met dezelfde sleutel komt dan als \"al gedaan\" terug zonder dat er iets gebeurd is.",
+      "blokkeert": "Draagt de uitkomst van eerder werk; een gedeelde opslag laat de volgende toets werk overslaan dat hij denkt te doen."
     },
     "server/betaal.js#haalOp": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De lees-kant van de idempotentie-opslag; koppelStore() kan hem vervangen door een persistente store. Blijft daarna wijzen naar de store van de vorige toets.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/betaal.js#mollie": {
       "eigenaar": "server",
@@ -745,38 +760,53 @@
     },
     "server/eigenaar.js#overgedragen": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "WIE de eigenaar is na een overdracht vanuit de boardroom. Blijft staan na de toets die de overdracht deed, dus een volgende toets draait met een andere eigenaar dan hij denkt -- en dit is de wortel waar isEigenaar() op afgaat.",
+      "blokkeert": "Bepaalt wie de hoofdzekering passeert. Een lek hier is geen verkeerd getal maar een verkeerde persoon."
     },
     "server/foundation.js#gctx": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "object",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De gedeelde context van de RTFoundation. Wordt bij het laden gevuld maar krijgt daarna nog late bindingen (bezorgAanGasten, welkomRtf via setAutomatisering); die blijven staan.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/inzagelog.js#DB": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De database-handle waar het inzagejournaal in schrijft, gezet door zet(db, save) bij het opzetten. Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/inzagelog.js#SAVE": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De save-functie van diezelfde opzet. Een oude SAVE schrijft de snapshot van de VORIGE datamap weg -- dat raakt de schijf, niet alleen het geheugen.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/journaalhaak.js#ontvanger": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De ontvanger die elke journaalregel doorkrijgt. Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/kern/appbieb.js#PER_CAT_TELLING": {
       "eigenaar": "server/kern",
@@ -787,17 +817,21 @@
     },
     "server/kern/command/landpakket.js#onthouden": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (het antwoord ligt vast in code of config)",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "afleiding",
+      "toelichting": "Memo van LANDEN.json op een VAST pad, met de mtime van het bestand als sleutel. Verandert het bestand, dan leest laad() opnieuw; verandert het niet, dan is het antwoord hetzelfde als dat van een vers proces. Er is geen pad per toets, dus er valt niets van een vorige toets te erven."
     },
     "server/kern/command/slo.js#onthouden": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (het antwoord ligt vast in code of config)",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "afleiding",
+      "toelichting": "Zelfde vorm als landpakket: memo van een vast configbestand met de mtime als sleutel. Zie de toelichting daar."
     },
     "server/kern/geloofbieb.js#TRADITIES": {
       "eigenaar": "server/kern",
@@ -836,24 +870,33 @@
     },
     "server/kern/magnaat-capabilities-bronnen.js#waarschuwingen": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht",
       "soort": "set",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Onthoudt welke bronwaarschuwing al gegeven is. Zelfde vorm als domeingrens#gelogd: de tweede toets krijgt de waarschuwing niet meer te zien.",
+      "blokkeert": "Onderdrukt herhaling; wat de eerste toets zag, ziet de tweede niet."
     },
     "server/kern/magnaat-dekkingsmatrix.js#BRON_CACHE": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Inhoud van gelezen bronbestanden, gecached per sleutel. Zelfde vorm als TEST_CACHE.",
+      "blokkeert": "Cache van bestandsinhoud zonder aanroep om hem te legen."
     },
     "server/kern/magnaat-dekkingsmatrix.js#TEST_CACHE": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Alle tekenreeksen uit alle test- en e2e-bestanden onder een root, gecached per root. Verandert een toetsbestand terwijl het proces draait, dan blijft de oude verzameling staan.",
+      "blokkeert": "Cache van bestandsinhoud zonder aanroep om hem te legen."
     },
     "server/kern/office/sjablonen.js#SJABLONEN": {
       "eigenaar": "server/kern",
@@ -873,17 +916,23 @@
     },
     "server/kern/rahul.js#geslachtBron": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De functie die het geslacht bij een sleutel opzoekt. Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/kern/rahul.js#profielBron": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De functie die Rahuls profiel levert. Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/kern/rahul/stemming.js#OP_ID": {
       "eigenaar": "server/kern",
@@ -915,10 +964,12 @@
     },
     "server/kern/spellen/magnaat/kaart.js#gebouwd": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (het antwoord ligt vast in code of config)",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "afleiding",
+      "toelichting": "Memo van opgebouwde speelkaarten per sleutel. De kaart wordt uit de code opgebouwd en verandert niet tijdens een partij (zie de uitleg boven de Map); dezelfde sleutel geeft in elk proces dezelfde kaart."
     },
     "server/kern/spellen/quiz-school.js#STOF": {
       "eigenaar": "server/kern",
@@ -929,10 +980,13 @@
     },
     "server/kern/spellen/register.js#bezig": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Herintredevlag van de spelkeuring; keur() zet hem in een finally altijd terug op false, dus tussen twee aanroepen is hij nooit true. Hij staat hier toch procesgebonden omdat er geen AANROEPBARE reset naar te wijzen valt, en het register neemt alleen wat het kan nakijken (LAT.md regel 6). Dit is de goedkoopste van de 43 om te promoveren zodra dat contract er is.",
+      "blokkeert": "Vlag over lopend werk; in de praktijk zelfherstellend, maar niet als contract na te kijken."
     },
     "server/kern/tijdzone.js#FORMATTERS": {
       "eigenaar": "server/kern/tijdzone",
@@ -952,17 +1006,23 @@
     },
     "server/kern/tijdzone.js#landVindReg": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De functie die bij een stad een land zoekt; blijft null zolang niemand hem zet. Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/kern/totp.js#gebruikt": {
       "eigenaar": "server/kern",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "Register van al gebruikte TOTP-codes binnen hun venster, tegen replay. Deelt een proces dit register, dan wordt een code die een vorige toets gebruikte in deze toets geweigerd. Een reset hoort hier NIET bij: een knop die het replay-register leegt, is een knop die replay mogelijk maakt.",
+      "blokkeert": "Teller/register dat echte voortgang draagt en over toetsen heen doorloopt."
     },
     "server/kern/zakenklok/index.js#SOORTEN": {
       "eigenaar": "server/kern/zakenklok",
@@ -981,17 +1041,23 @@
     },
     "server/lib/bronkas.js#tellers": {
       "eigenaar": "server/lib",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang",
       "soort": "object",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "raak/mis/fout/bespaardMs van de bronkas, direct geexporteerd en door test/bronkas.test.js en test/magnaat-eerste-scan.test.js gelezen. Optellen over toetsen heen maakt juist die beweringen onwaar.",
+      "blokkeert": "Teller die over toetsen heen doorloopt en die toetsen ook echt uitlezen."
     },
     "server/lib/bronmanifest.js#manifesten": {
       "eigenaar": "server/lib",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Memo van inhoudsmanifesten per sleutel. Er is een ontsnapping PER SLEUTEL ({vers: true} gooit die ene weg) maar geen manier om het geheel te legen. En dit is de gevaarlijkste spiegel van de drie: hij voedt de sleutels van de bronkas, dus een stale manifest is een kas die op een oude uitslag blijft staan.",
+      "blokkeert": "Cache die cache-SLEUTELS voedt. Stale hier betekent niet een oud getal maar een oude uitslag die als verse wordt aangeboden."
     },
     "server/lib/compilekas.js#uitkomst": {
       "eigenaar": "server/lib",
@@ -1025,10 +1091,13 @@
     },
     "server/lib/verraad.js#geslagen": {
       "eigenaar": "server/lib",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "Hoe vaak elke ingebouwde storing is geslagen; telling() leest hem. Een toets die op een aantal rekent, telt in een gedeeld proces de slagen van de vorige mee.",
+      "blokkeert": "Teller die over toetsen heen doorloopt en daarmee verandert wat de volgende toets meet."
     },
     "server/log.js#foutGroepen": {
       "eigenaar": "server",
@@ -1099,80 +1168,120 @@
     },
     "server/meting.js#staat": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "meting.wis()",
       "soort": "object",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "resetIn": "server/meting.js",
+      "patroon": "voortgang",
+      "bewijs": "test/meting.test.js -- test.beforeEach(() => meting.wis()), dus elke bewering daar staat op een geleegde meter",
+      "toelichting": "Alle verzoek-, duur- en fouttellers van deze server. wis() leegt de drie Maps en zet open en gestart terug.",
+      "gedeeldNaReset": true
     },
     "server/middleware/voordeur.js#paginaHaak": {
       "eigenaar": "server/middleware",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De haak die elke geserveerde pagina meekrijgt (routelog hangt zichzelf hier op). Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/muntbetaal.js#bewaar": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "Zelfde vorm als in betaal.js, voor de muntbetalingen.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/muntbetaal.js#geheugen": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "Zelfde vorm als in betaal.js, voor de muntbetalingen.",
+      "blokkeert": "Draagt de uitkomst van eerder werk; een gedeelde opslag laat de volgende toets werk overslaan dat hij denkt te doen."
     },
     "server/muntbetaal.js#haalOp": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "Zelfde vorm als in betaal.js, voor de muntbetalingen.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/opzet/domeingrens.js#gelogd": {
       "eigenaar": "server/opzet",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht",
       "soort": "set",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "Onthoudt welke grensmelding al een keer gelogd is, zodat een log niet volloopt. In een gedeeld proces ziet de tweede toets die melding dus niet meer.",
+      "blokkeert": "Onderdrukt herhaling; wat de eerste toets zag, ziet de tweede niet."
     },
     "server/opzet/domeingrens.js#gemeld": {
       "eigenaar": "server/opzet",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht",
       "soort": "set",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "De verzameling gemelde domein/naam-paren, en die wordt naar buiten gegeven (gemeld: () => [...gemeld].sort()). Een toets die daarop beweert, telt in een gedeeld proces de meldingen van de vorige mee.",
+      "blokkeert": "Onderdrukt herhaling EN wordt uitgelezen; dubbel lek."
     },
     "server/pg/sync.js#GEDEKT": {
       "eigenaar": "server/pg",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "bootvast",
+      "reset": "niet nodig (het antwoord ligt vast in code of config)",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "afleiding",
+      "toelichting": "De verzameling transactiesoorten die de spiegel dekt, lui afgeleid uit TX_SOORT in db/tx/ledger.js. Die tabel staat in de CODE, dus elk proces komt op dezelfde verzameling uit; lui berekenen verandert het antwoord niet, alleen het moment."
     },
     "server/routelog.js#bestand": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "routelog.begin(pad)",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "resetIn": "server/routelog.js",
+      "patroon": "bedrading",
+      "bewijs": "test/routelog.test.js -- roept begin() vijf keer aan en eist per keer een ander journaal",
+      "toelichting": "Het pad van het routejournaal. begin() zet hem opnieuw EN hangt de drie haken (routing, bestanden, voordeur) er opnieuw aan of haalt ze weg; er blijft dus geen haak van een vorige toets staan.",
+      "gedeeldNaReset": true
     },
     "server/routelog.js#gezien": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "routelog.begin(pad)",
       "soort": "set",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "resetIn": "server/routelog.js",
+      "patroon": "spiegel",
+      "bewijs": "test/routelog.test.js -- na begin() wordt dezelfde route opnieuw genoteerd",
+      "toelichting": "Ontdubbeling per route. begin() leegt hem; zonder dat zou de tweede toets zijn eigen eerste aanroep als \"al gezien\" overslaan en een leeg journaal krijgen.",
+      "gedeeldNaReset": true
     },
     "server/routelog.js#stuk": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "herstelbaar",
+      "reset": "routelog.begin(pad)",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "resetIn": "server/routelog.js",
+      "patroon": "vlucht",
+      "bewijs": "test/routelog.test.js -- na een onschrijfbaar pad schrijft de volgende begin() weer",
+      "toelichting": "Vlag die het journaal na een schrijffout stil legt. begin() zet hem terug op false, dus een kapot journaal van de vorige toets legt de volgende niet ook stil.",
+      "gedeeldNaReset": true
     },
     "server/server.js#anthropic": {
       "eigenaar": "server",
@@ -1197,10 +1306,13 @@
     },
     "server/server.js#loginFails": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- voortgang",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "voortgang",
+      "toelichting": "De emmers van de inlogvertraging per bucket. Een gedeeld proces laat de mislukte inlogpogingen van de ene toets meetellen voor de volgende, die dan buitengesloten raakt zonder ooit iets fout te hebben gedaan. Ook hier geen reset: dat is de rem uitzetten.",
+      "blokkeert": "Teller/register dat echte voortgang draagt en over toetsen heen doorloopt."
     },
     "server/server.js#uiBronnenKas": {
       "eigenaar": "server/server.js",
@@ -1239,17 +1351,23 @@
     },
     "server/translate.js#anthropic": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De AI-client voor vertalen, gezet door setAnthropic(). Blijft na een toets staan, dus een volgende toets die dacht zonder model te draaien praat alsnog met de client van de vorige.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/translate.js#cache": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- spiegel",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "spiegel",
+      "toelichting": "Vertaalcache met een vaste bovengrens (LRU). Leegmaken zou genoeg zijn, maar die aanroep bestaat niet: er is geen exported functie die deze Map raakt.",
+      "blokkeert": "Cache van gegevens die elders wonen; zonder aanroep om hem te legen blijft de vertaling van de vorige toets staan."
     },
     "server/translate/woordenboek/index.js#EN2NL": {
       "eigenaar": "server/translate",
@@ -1274,17 +1392,23 @@
     },
     "server/vloot.js#kinderen": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- verbinding",
       "soort": "map",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "verbinding",
+      "toelichting": "De draaiende kindprocessen van de vloot, met hun backoff. Dit zijn ECHTE processen; een gedeeld proces erft de kinderen van de vorige toets, en die luisteren nog op hun poorten.",
+      "blokkeert": "Greep op processen buiten dit proces; een reset zou ze eerst moeten stoppen."
     },
     "server/vloot.js#stoppen": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- vlucht",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "vlucht",
+      "toelichting": "De vlag die het herstarten van kinderen stillegt. Blijft na een afsluitende toets op true staan, en dan start de volgende toets geen enkel kind meer -- zonder foutmelding.",
+      "blokkeert": "Vlag over lopend werk die na een toets blijft staan."
     },
     "server/vloot.js#upstreams": {
       "eigenaar": "server",
@@ -1295,24 +1419,33 @@
     },
     "server/web/bestanden.js#bestandHaak": {
       "eigenaar": "server/web",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De haak op elk statisch HTML-bestand. Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/web/routing.js#patroonHaak": {
       "eigenaar": "server/web",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De haak op elk gematcht routepatroon. Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     },
     "server/webpush.js#vapid": {
       "eigenaar": "server",
-      "levensduur": "onbekend",
-      "reset": "onbekend",
+      "levensduur": "procesgebonden",
+      "reset": "geen -- bedrading",
       "soort": "binding-let",
-      "bron": "scan"
+      "bron": "hand-na-scan",
+      "patroon": "bedrading",
+      "toelichting": "De VAPID-sleutels waarmee webpush ondertekent, gezet bij het opzetten. Een gedeeld proces ondertekent daarmee met de sleutels van de eerste toets.",
+      "blokkeert": "Blijft na een toets wijzen naar de opzet van die toets. Een volgende toets in hetzelfde proces krijgt daardoor geen fout maar een verkeerd antwoord, en dat is de stilste vorm van lek."
     }
   }
 }

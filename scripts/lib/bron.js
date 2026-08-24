@@ -204,4 +204,47 @@ function zonderCommentaar(bron) {
   return uit;
 }
 
-module.exports = { zonderCommentaar };
+/* WELKE POSITIES IN DEZE BRON ZIJN ECHT CODE?
+
+   Een masker van true/false per teken: false voor alles binnen commentaar of
+   binnen een tekenreeks. Twee aanroepers hebben dezelfde vraag, en ze hoorden
+   hem niet elk apart te beantwoorden (LAT.md regel 4):
+
+     scripts/mutatie.js       muteert alleen op posities die code zijn -- een
+                              operator die in een uitlegregel toeslaat, meet of
+                              een toets tekst leest.
+     scripts/lib/bewijsgraaf.js  telt alleen requires die in code staan. Zonder
+                              masker gold `const teken = "require('./" + ...";`
+                              in mutatie.js als een niet-te-volgen require, en
+                              daarmee elke toets die dat bestand laadt als een
+                              toets met een onvolledige bewijsruimte. Drie
+                              toetsen stonden zo onterecht in bewijsOnbekend.
+
+   Waarom een masker en niet zonderCommentaar(): die geeft een KORTERE tekst
+   terug, en dan kloppen de posities niet meer met de bron waarin gemuteerd
+   wordt. Het masker houdt de posities heel.
+
+   Wat hij NIET is: een parser. Een deling die op een reguliere expressie lijkt
+   (`a /b/ c`) leest hij niet, en een `${}` binnen een sjabloon telt hij als
+   tekenreeks. Beide vallen aan de VEILIGE kant uit: er wordt minder als code
+   geteld, dus een operator slaat er niet toe en een require wordt niet gevolgd. */
+function codemasker(bron) {
+  const masker = new Array(bron.length).fill(true);
+  let i = 0;
+  const uit = (a, b) => { for (let k = a; k < b && k < masker.length; k++) masker[k] = false; };
+  while (i < bron.length) {
+    const twee = bron.slice(i, i + 2);
+    if (twee === '/*') { const e = bron.indexOf('*/', i + 2); const z = e < 0 ? bron.length : e + 2; uit(i, z); i = z; continue; }
+    if (twee === '//') { const e = bron.indexOf('\n', i); const z = e < 0 ? bron.length : e; uit(i, z); i = z; continue; }
+    const c = bron[i];
+    if (c === '"' || c === "'" || c === '`') {
+      let j = i + 1;
+      while (j < bron.length && bron[j] !== c) { if (bron[j] === '\\') j++; j++; }
+      uit(i, j + 1); i = j + 1; continue;
+    }
+    i++;
+  }
+  return masker;
+}
+
+module.exports = { zonderCommentaar, codemasker };

@@ -230,13 +230,13 @@
     },
     "anthropic.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/anthropic.js"
-      ],
-      "geprobeerd": 6,
-      "posities": 1,
-      "toetsSha": "66618d74ac3b"
+      "staat": "gezakt",
+      "module": "server/anthropic.js",
+      "operator": "return-weg#3",
+      "gezakt": 1,
+      "geprobeerd": 21,
+      "toetsSha": "66618d74ac3b",
+      "moduleSha": "4d44772465ad"
     },
     "antivirus.test.js": {
       "soort": "puur",
@@ -295,13 +295,13 @@
     },
     "arrival-security.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/routes/supplier/horeca/invisible-arrival.js"
-      ],
-      "geprobeerd": 6,
-      "posities": 1,
-      "toetsSha": "fa5a5bddb023"
+      "staat": "gezakt",
+      "module": "server/routes/supplier/horeca/invisible-arrival.js",
+      "operator": "===->!==#5",
+      "gezakt": 1,
+      "geprobeerd": 25,
+      "toetsSha": "fa5a5bddb023",
+      "moduleSha": "8c486d9621a9"
     },
     "assets.test.js": {
       "soort": "server",
@@ -539,13 +539,13 @@
     },
     "bestand-binding.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kluis.js"
-      ],
-      "geprobeerd": 4,
-      "posities": 1,
-      "toetsSha": "964707597f2a"
+      "staat": "gezakt",
+      "module": "server/kluis.js",
+      "operator": "+->-#1",
+      "gezakt": 1,
+      "geprobeerd": 5,
+      "toetsSha": "964707597f2a",
+      "moduleSha": "af6dd19610fe"
     },
     "bestanden.test.js": {
       "soort": "server",
@@ -660,14 +660,13 @@
     },
     "bewijsgraaf.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/lib/bewijsgraaf.js",
-        "scripts/plan.js"
-      ],
-      "geprobeerd": 9,
-      "posities": 1,
-      "toetsSha": "ed0e6a6c03a4"
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsgraaf.js",
+      "operator": "return-weg#2",
+      "gezakt": 1,
+      "geprobeerd": 4,
+      "toetsSha": "ed0e6a6c03a4",
+      "moduleSha": "c56dbcf7f7e4"
     },
     "bewijsmatrix.test.js": {
       "soort": "puur",
@@ -1096,7 +1095,9 @@
       "module": "server/kern/comm/werk.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 2
+      "geprobeerd": 3,
+      "toetsSha": "238c90d381d2",
+      "moduleSha": "d137b8c8e936"
     },
     "command-router.test.js": {
       "soort": "puur",
@@ -1122,7 +1123,9 @@
       "module": "server/kern/command/runbooks.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 3
+      "geprobeerd": 4,
+      "toetsSha": "d7e0035b986c",
+      "moduleSha": "0bd4f42007be"
     },
     "commandlagen.test.js": {
       "soort": "server",
@@ -1137,7 +1140,9 @@
       "module": "server/seed/genres.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d7866d963b8c",
+      "moduleSha": "3a26758a20a6"
     },
     "concern.test.js": {
       "soort": "puur",
@@ -1145,7 +1150,9 @@
       "module": "server/kern/concern/index.js",
       "operator": "getal+1#2",
       "gezakt": 1,
-      "geprobeerd": 5
+      "geprobeerd": 5,
+      "toetsSha": "9a7b18968913",
+      "moduleSha": "a62696ef13a7"
     },
     "consent-dekking.test.js": {
       "soort": "puur",
@@ -1202,9 +1209,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/controls.js",
-      "operator": "return-weg#0",
-      "gezakt": 7,
-      "geprobeerd": 4
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "toetsSha": "1d4413ed59db",
+      "moduleSha": "2a83cc243977"
     },
     "creator-portfolio.test.js": {
       "soort": "server",
@@ -1233,7 +1242,9 @@
       "module": "server/db/geheugen.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "161c37fd00cf",
+      "moduleSha": "6e3e2e1f529d"
     },
     "dealkans.test.js": {
       "soort": "server",
@@ -1255,7 +1266,9 @@
       "module": "scripts/deelindex.js",
       "operator": "+->-#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "53b70f0450df",
+      "moduleSha": "a91f089babc8"
     },
     "defensie.test.js": {
       "soort": "server",

@@ -2546,22 +2546,41 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
        een <iframe> in een string tellen: een iframe in een stijlblad
        (`#split iframe{...}`) maakt niets. Een statisch <iframe>-element in de
        markup mag ook zijn eigen allow= dragen -- dat is dezelfde doorgifte,
-       alleen met de hand. */
-    let kaderloos = 0, kaders = 0;
+       alleen met de hand.
+
+       EN ER IS EEN OMGEKEERD BESLUIT, dat sinds de App Store bestaat. Een kader
+       met een LEEG allow geeft bewust NIETS door: geen camera, geen microfoon.
+       Dat is precies wat de cel van een app van derden nodig heeft -- die
+       rechten heeft een lid nooit verleend en de machtigingencatalogus kent ze
+       niet eens (APPSTORE.md, grens 1). Zo'n kader hier laten zakken zou de
+       enige uitweg RTGMedia.kader() maken, en dat is de verkeerde: dan krijgt
+       derdencode juist wel camera en microfoon.
+
+       `maakt` telt in dat ene geval niet mee, en dat is geen slordigheid maar
+       een grens van de heuristiek: in een .html-bestand is "een <iframe> in een
+       string" niet te onderscheiden van gewone markup -- elk aanhalingsteken
+       eerder op de pagina maakt hem waar. createElement telt wel: wie een kader
+       BOUWT, zegt zelf wat het meekrijgt. Gemeten toen deze regel erbij kwam:
+       in de hele public/ draagt precies een bestand een leeg allow. */
+    let kaderloos = 0, kaders = 0, leegBesluit = 0;
     for (const f of bronnen) {
       if (bundelPaden.has(web(f))) continue;
       const s = zonderCommentaar(lees(f));
-      const maakt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s) || /['"`][^'"`]*<iframe\b/.test(s);
+      const bouwt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s);
+      const maakt = bouwt || /['"`][^'"`]*<iframe\b/.test(s);
       const statisch = /^\s*<iframe\b/m.test(s) || />\s*<iframe\b/.test(s);
       if (!maakt && !statisch) continue;
       kaders++;
       if (/RTGMedia\.kader\s*\(/.test(s)) continue;
       // een statisch kader met eigen allow= is ook doorgifte
       if (statisch && !maakt && /<iframe\b[^>]*\ballow=/.test(s)) continue;
+      // en een statisch kader met een LEEG allow is het omgekeerde besluit
+      if (statisch && !bouwt && /<iframe\b[^>]*\ballow=""/.test(s)) { leegBesluit++; continue; }
       kaderloos++;
       fout(web(f) + ' maakt een iframe zonder RTGMedia.kader(); camera en microfoon vallen daarin stil weg');
     }
-    if (!kaderloos) ok(kaders + ' plekken maken een kader, en alle ' + kaders + ' geven het recht door');
+    if (!kaderloos) ok(kaders + ' plekken maken een kader; ' + (kaders - leegBesluit) + ' geven het recht door en ' +
+      leegBesluit + ' geven bewust niets door (leeg allow)');
 
     /* 38c) een pagina die RTGMedia gebruikt, laadt shared/media.js ook. Net als
        regel 37: het gebruik kan in de pagina zelf staan of in een script (of

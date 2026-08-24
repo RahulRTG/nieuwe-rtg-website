@@ -73,6 +73,16 @@ Vier sloten, en ze houden alle vier iets ANDERS tegen:
    geen. De enige weg naar RTG is de brug, en die loopt via het lid.
 4. **De integriteitscontrole** bij elke lezing van schijf.
 
+En één ding dat de cel juist NIET krijgt, hardop: het kader draagt een **leeg
+`allow`**. Overal elders in dit huis geeft een iframe camera en microfoon door
+(anders vallen die er stil weg), en `scripts/check.js` regel 38b bewaakt dat.
+Hier is het omgekeerde de bedoeling: camera en microfoon zijn rechten die een
+lid nooit aan een derde verleent — de machtigingencatalogus kent ze niet eens.
+Die regel is daarom uitgebreid met het omgekeerde besluit, want zonder die
+uitbreiding zou de enige manier om er langs te komen `RTGMedia.kader()` zijn, en
+dan zou derdencode die rechten juist wél krijgen. Een keuring die je naar de
+verkeerde kant duwt, is een keuring die iets kapotmaakt.
+
 Waarom de celroute geen inlog vraagt: een gepubliceerde bundel is publieke
 inhoud, en er staat per definitie niets persoonlijks in — persoonlijke gegevens
 komen alleen over de brug, en die zit wel achter een inlog. Een inlog daar zou

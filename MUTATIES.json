@@ -5493,6 +5493,14 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "spreidingsoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/spreidingsproef.js",
+      "operator": "&&->||#4",
+      "gezakt": 1,
+      "geprobeerd": 33
+    },
     "sso.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5960,6 +5968,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "trio-wees.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 2,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "operator": "liegpoort /api/"
     },
     "trio-werkers.test.js": {
       "soort": "puur",

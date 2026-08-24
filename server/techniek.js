@@ -109,6 +109,11 @@ const CHECKS = [
     }
   },
   {
+    id: 'voordeuren', naam: 'Voordeurprocessen', code: 'TRI-01', categorie: 'Runtime',
+    // Oordeel en meting staan in server/trio-stand.js, waar het onderwerp woont.
+    run: () => require('./trio-stand').voordeurstand()
+  },
+  {
     id: 'backups', naam: 'Back-ups', code: 'BAK-01', categorie: 'Data',
     /* HIJ KEEK NAAR DE NAAM VAN EEN MAP. Bestond er een map die YYYY-MM-DD
        heette, dan stond deze check op groen -- leeg, half weggeschreven of met

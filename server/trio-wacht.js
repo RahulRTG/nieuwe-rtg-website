@@ -27,7 +27,15 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
     const s = servers[i];
     const child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, 'server.js')], {
       env: { ...process.env, PORT: String(s.port), RTG_ROL: 'standby', RTG_SERVER: String(s.nr), RTG_CLUSTER_KEY: SLEUTEL },
-      stdio: ['ignore', 'pipe', 'pipe']
+      /* De vierde stroom is een IPC-lijn en er gaat geen enkel bericht overheen.
+         Hij is er zodat een server MERKT dat de poortwachter weg is. Valt die
+         hard om (kill -9, een crash), dan krijgt een server geen SIGTERM en
+         blijft hij draaien met zijn poort vast -- waarna een herstartende
+         poortwachter zijn eigen servers niet meer kan starten, terwijl
+         /api/health toch 200 geeft omdat de wees antwoordt. Dat is hier echt
+         gebeurd en het zag eruit als een kapotte spreiding. Afgehandeld in
+         server/opzet/luister.js, op 'disconnect'. */
+      stdio: ['ignore', 'pipe', 'pipe', 'ipc']
     });
     s.child = child;
     s.healthy = false;

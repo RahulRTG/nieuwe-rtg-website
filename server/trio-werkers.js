@@ -116,12 +116,27 @@ function maakWerkers({ aantal, servers, actieve, spreidingAan, log, gevallen }) 
    in RTG_POORTWACHTERS; 0 (de standaard) betekent geen, en dan luistert de hoofd
    gewoon zelf zoals altijd. Een werker start er nooit zelf nog eens een. */
 const MAX_VOORDEUREN = 64;
+
+/* RTG_POORTWACHTERS=auto. Een beheerder hoeft geen getal te verzinnen dat van de
+   machine afhangt, en een getal dat op de ene machine goed is, is dat op de
+   andere niet. De keuze: een kern minder dan de machine heeft, want de hoofd
+   bewaakt alleen en de drie servers moeten er ook nog bij; minimaal 2, want met
+   een valt er niets te verdelen en dan kun je de schakelaar net zo goed uitzetten;
+   hoogstens 8, omdat er boven dat aantal op geen enkele machine hier iets gemeten
+   is en een gok geen standaard hoort te zijn. Wie het beter weet, zet een getal.
+   Op een of twee kernen komt er 0 uit: daar is dit hele mechanisme zinloos. */
+function autoAantal(kernen) {
+  if (kernen <= 2) return 0;
+  return Math.max(2, Math.min(8, kernen - 1));
+}
+
 function koppelWerkers({ WERKER, wacht, servers, log, LOKAAL_TLS }) {
   /* Een omgevingsvariabele is tekst en mag alles zijn. Number('nee') is NaN, en
      een NaN die als aantal door de code reist komt uiteindelijk in een melding
      terecht als "RTG_POORTWACHTERS=NaN". Het PLAFOND staat er om een typefout
      (een nul te veel) geen duizend processen te laten forken. */
-  const gevraagd = Number(process.env.RTG_POORTWACHTERS);
+  const rauw = String(process.env.RTG_POORTWACHTERS || '').trim().toLowerCase();
+  const gevraagd = rauw === 'auto' ? autoAantal(require('os').cpus().length) : Number(rauw);
   const VOORDEUREN = WERKER || !Number.isFinite(gevraagd) || gevraagd <= 0
     ? 0 : Math.min(MAX_VOORDEUREN, Math.floor(gevraagd));
   /* Met lokale TLS gaat het NIET, en dat weigeren we hardop in plaats van het
@@ -144,4 +159,4 @@ function koppelWerkers({ WERKER, wacht, servers, log, LOKAAL_TLS }) {
   return { VOORDEUREN, werkers };
 }
 
-module.exports = { maakWerkers, koppelWerkers, staatVan };
+module.exports = { maakWerkers, koppelWerkers, staatVan, autoAantal };

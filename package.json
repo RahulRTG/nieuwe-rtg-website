@@ -83,6 +83,7 @@
     "slo": "node scripts/slo.js --schrijf",
     "sonde": "node scripts/sonde.js",
     "chaos": "node scripts/chaos.js",
+    "spreiding": "node scripts/spreidingsproef.js",
     "grenzen": "node scripts/grenzen.js",
     "leugens": "node --experimental-sqlite scripts/leugendetector.js",
     "mutatie": "node --experimental-sqlite scripts/mutatie.js",

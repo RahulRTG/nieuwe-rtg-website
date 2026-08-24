@@ -15,7 +15,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { koppelWerkers, staatVan } = require('../server/trio-werkers.js');
+const { koppelWerkers, staatVan, autoAantal } = require('../server/trio-werkers.js');
 const { maakSchaduw } = require('../server/trio-schaduw.js');
 const { maakSpreiding } = require('../server/trio-spreiding.js');
 
@@ -232,4 +232,84 @@ test('10. een werker stuurt nooit verkeer naar een server die net omviel', async
   for (const s of schaduw.servers) s.healthy = false;
   assert.equal(schaduw.actieve(), -1);
   assert.equal(await schaduw.wachtOpActieve(120), -1);
+});
+
+test('11. RTG_POORTWACHTERS=auto kiest een getal dat bij de machine past', () => {
+  /* Een getal dat op de ene machine goed is, is dat op de andere niet. `auto`
+     laat een beheerder het niet hoeven verzinnen -- maar dan moet de keuze wel
+     te verdedigen zijn, en niet alleen te bestaan. */
+  assert.equal(autoAantal(1), 0, 'op een kern valt er niets te verdelen');
+  assert.equal(autoAantal(2), 0, 'op twee ook niet: de drie servers moeten er ook nog bij');
+  assert.equal(autoAantal(3), 2, 'minimaal twee, want met een kun je de schakelaar net zo goed uitzetten');
+  assert.equal(autoAantal(4), 3);
+  assert.equal(autoAantal(8), 7, 'een kern minder dan de machine heeft');
+  assert.equal(autoAantal(64), 8, 'en een plafond, want boven de acht is hier niets gemeten');
+  for (let k = 1; k <= 128; k++) {
+    const n = autoAantal(k);
+    assert.ok(Number.isInteger(n) && n >= 0 && n <= 8, k + ' kernen gaf ' + n);
+    assert.notEqual(n, 1, 'nooit precies een: dat is de stand die de meting juist afkeurde (' + k + ' kernen)');
+  }
+});
+
+test('12. het woord auto wordt gelezen, ook met hoofdletters of spaties', () => {
+  const servers = serverlijst(['leider', 'volger', 'volger']);
+  const bouw = (n) => metOmgeving({ RTG_POORTWACHTERS: n }, () =>
+    koppelWerkers({ WERKER: false, wacht: nepWacht(servers, 0, true), servers, log: () => {}, LOKAAL_TLS: false }));
+  const verwacht = autoAantal(require('os').cpus().length);
+  for (const vorm of ['auto', 'AUTO', ' Auto ']) {
+    const r = bouw(vorm);
+    assert.equal(r.VOORDEUREN, verwacht, JSON.stringify(vorm) + ' geeft ' + verwacht);
+    if (r.werkers) r.werkers.stop();
+  }
+  /* En iets dat er alleen op lijkt is geen auto -- dat wordt 0 en niet een gok. */
+  for (const vorm of ['automatisch', 'au to', 'a']) {
+    const r = bouw(vorm);
+    assert.equal(r.VOORDEUREN, 0, JSON.stringify(vorm) + ' is geen getal en geen auto');
+  }
+});
+
+test('13. de techniekcontrole TRI-01 staat op het bord en zegt wat de meting zei', () => {
+  /* Een meting in een markdownbestand helpt niemand die om drie uur 's nachts
+     naar een dashboard kijkt. Deze controle zegt hetzelfde als docs/meerkernig.md,
+     op de plek waar een beheerder toch al kijkt. */
+  const { CHECKS } = require('../server/techniek.js');
+  const c = CHECKS.find(x => x.id === 'voordeuren');
+  assert.ok(c, 'de controle bestaat');
+  assert.equal(c.code, 'TRI-01');
+  assert.equal(c.categorie, 'Runtime');
+  const codes = CHECKS.map(x => x.code);
+  assert.equal(new Set(codes).size, codes.length, 'geen twee controles met dezelfde code');
+
+  const oud = { k: process.env.RTG_CLUSTER_KEY, p: process.env.RTG_POORTWACHTERS,
+    s: process.env.RTG_SPREIDING, r: process.env.REDIS_URL };
+  const zet = (v) => { for (const [k, x] of Object.entries(v)) { if (x == null) delete process.env[k]; else process.env[k] = x; } };
+  try {
+    // los draaiend: geen oordeel, want dan doet een poortwachter hier niets
+    zet({ RTG_CLUSTER_KEY: null, RTG_POORTWACHTERS: null, RTG_SPREIDING: null, REDIS_URL: null });
+    let r = c.run({});
+    assert.equal(r.status, 'ok');
+    assert.match(r.detail, /Losse server/);
+
+    // in een trio, spreiding aan, EEN voordeur: precies de stand die 1,4% gaf
+    zet({ RTG_CLUSTER_KEY: 'x', RTG_SPREIDING: '1', REDIS_URL: 'redis://127.0.0.1:6379', RTG_POORTWACHTERS: null });
+    r = c.run({});
+    if (require('os').cpus().length > 2) {
+      assert.equal(r.status, 'waarschuwing', 'hier hoort een waarschuwing te staan');
+      assert.match(r.detail, /RTG_POORTWACHTERS=/, 'en hij zegt wat je eraan doet');
+      assert.match(r.detail, /npm run spreiding/, 'en hoe je het zelf nameet');
+    }
+
+    // met meerdere voordeuren is het in orde
+    zet({ RTG_POORTWACHTERS: '3' });
+    r = c.run({});
+    assert.equal(r.status, 'ok');
+    assert.match(r.detail, /3 voordeurprocessen/);
+
+    // spreiding uit: dan verandert een tweede voordeur niets aan waar het verkeer heen gaat
+    zet({ RTG_POORTWACHTERS: null, RTG_SPREIDING: null });
+    r = c.run({});
+    assert.equal(r.status, 'ok');
+  } finally {
+    zet({ RTG_CLUSTER_KEY: oud.k, RTG_POORTWACHTERS: oud.p, RTG_SPREIDING: oud.s, REDIS_URL: oud.r });
+  }
 });

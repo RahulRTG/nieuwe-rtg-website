@@ -123,9 +123,15 @@ Object.assign(kern, require('../kern/rampbeeld')({ db, save, findSupplier, anthr
 Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic, findSupplier,
   boekingenVanZaak, ordersVanZaak: require('../db').ordersVanZaak, schoon,
   crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }));
+/* DE WAARDELAAG (kern/waarde): elke positie in het grootboek weet wat hij is --
+   welke klasse, van welke uitgever, met welk beleid, tot wanneer en tot welk
+   plafond. Boekt zelf niets en houdt geen saldo bij (GELD.md par. 1); hij geeft
+   betekenis aan de rekeningen die RTG Pay hieronder gebruikt. VOOR pay gemount,
+   want pay raadpleegt hem bij elke boeking en niet andersom. */
+Object.assign(kern, require('../kern/waarde').maakWaarde({ db, save, crypto }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
-Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten,
+Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten, waarde: kern.waarde,
   // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt
   betaaldienstKosten: c => (kern.betaaldienstKosten ? kern.betaaldienstKosten(c) : 0) }));
 /* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische

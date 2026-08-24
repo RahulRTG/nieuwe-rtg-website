@@ -38,6 +38,20 @@ const VERMOGENS = {
      stond, ontbrak gewoon in de lijst, en dan lijkt "hij staat er niet in" op
      "er is over nagedacht". De reden staat erbij en is daarmee aanvechtbaar --
      dat is het hele punt van hem opschrijven. */
+  /* WAAR DE DRIE VOORWAARDEN WORDEN AFGEDWONGEN, want een besluit dat alleen
+     zichzelf beschrijft is geen besluit maar een voornemen. Dit stond hier
+     jarenlang zonder verwijzing, en toen bleek bij navraag dat het maximum PER
+     WALLET nergens bestond: kern/pay/stand.js kende alleen MAX_CENTEN (per
+     boeking). Het besluit droeg zijn eigen vervalclausule en een van de drie
+     voorwaarden was er nooit geweest. Een besluit heeft geen toezichthouder die
+     het naleest -- dat is het verschil met een vergunning -- dus staat de
+     vindplaats er nu bij en zakt test/waarde.test.js als hij verdwijnt.
+
+       plafond per wallet   kern/waarde/klassen.js  (plafondCenten per klasse)
+       plafond per boeking  kern/pay/stand.js       (MAX_CENTEN)
+       niet uitbetaalbaar   kern/waarde/klassen.js  (uitbetaalbaar: false)
+       alleen binnen RTG    kern/waarde/policy.js   (bestedingsgebied)
+       en de poort erlangs  kern/pay/poort.js       (bij elke boeking) */
   WALLET_SALDO: { soort: 'besluit', naam: 'Walletsaldo van leden aanhouden',
     besluit: 'Een gesloten circuit met harde plafonds: saldo is alleen binnen RTG te besteden, ' +
       'wordt niet uitbetaald aan het lid en kent een maximum per wallet en per boeking. ' +

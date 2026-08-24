@@ -1,0 +1,236 @@
+/* DE WAARDELAAG -- waarde die weet wat hij is.
+
+   WAAROM DEZE TOETS ER IS
+
+   Het besluit onder WALLET_SALDO (server/kern/bevoegdheid/lijst.js) zegt sinds
+   zijn eerste regel dat het gesloten circuit "een maximum per wallet en per
+   boeking" kent, en dat de grond onder het besluit vervalt zodra die plafonds
+   worden losgelaten. Er was alleen nooit een maximum per wallet: kern/pay/
+   stand.js kent MAX_CENTEN (per boeking) en KASCODE_MAX, en verder niets. Het
+   besluit beschreef dus een werkelijkheid die de code niet had -- en juist bij
+   een besluit is dat het gevaarlijkst, want een besluit heeft geen toezichthouder
+   die het narekent. Deze toets is die narekening.
+
+   WAT HIER WORDT NAGETROKKEN
+
+   1. HET PLAFOND BESTAAT ECHT. Boven het maximum van een wallet ketst de
+      boeking af, en het antwoord zegt hoeveel ruimte er nog was.
+   2. GERESERVEERD GELD IS NIET BESCHIKBAAR. Saldo, gereserveerd en beschikbaar
+      zijn drie getallen; een bestedingsvraag hoort tegen het derde.
+   3. VASTLEGGEN KAN NOOIT VOOR MEER DAN GERESERVEERD. Anders was de reservering
+      geen garantie en had de houder het verschil al kunnen uitgeven.
+   4. EEN VERLOPEN RESERVERING ZET NIETS MEER VAST. Geld dat blijft hangen omdat
+      een partner niets terugmeldde, is een lek dat niemand kan uitleggen.
+   5. DE KLASSE WEIGERT WAT DE KLASSE NIET MAG, en het beleid van de uitgever
+      daarbovenop -- op genre en op tijdvenster.
+   6. HET GROOTBOEK BLIJFT SLUITEN. Een reservering is geen boeking; de som van
+      alle saldi hoort er niet door te bewegen.
+
+   Draai los: node --experimental-sqlite --test test/waarde.test.js */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const crypto = require('crypto');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { startServer, stop } = require('./helper');
+const { maakWaarde } = require('../server/kern/waarde');
+const { KLASSEN } = require('../server/kern/waarde/klassen');
+
+/* Een minimale db-dubbel: de waardelaag raakt alleen db.data en save(). Bewust
+   geen server erbij -- deze laag boekt niets en heeft er niets aan. */
+function bouw(klok) {
+  const db = { data: {} };
+  let saves = 0;
+  const w = maakWaarde({ db, save: () => { saves++; }, crypto, nu: klok }).waarde;
+  return { db, w, saves: () => saves };
+}
+let tijd = 1700000000000;
+const klok = () => tijd;
+
+test('het plafond van een wallet bestaat echt, en het antwoord zegt hoeveel ruimte er was', () => {
+  const { w } = bouw(klok);
+  const saldi = { 'lid:ANNA': 490000 };   // 4.900 euro staat er al
+  const saldoVan = r => saldi[r] || 0;
+  const plafond = KLASSEN.PERSONAL_FUNDED.plafondCenten;
+  assert.equal(plafond, 500000, 'het plafond is 5.000 euro per wallet');
+
+  // 100 euro erbij past nog precies
+  assert.equal(w.poort({ van: 'extern:oplaad', naar: 'lid:ANNA', centen: 10000, soort: 'oplaad', saldoVan }), null);
+  // 100,01 euro past niet meer
+  const dicht = w.poort({ van: 'extern:oplaad', naar: 'lid:ANNA', centen: 10001, soort: 'oplaad', saldoVan });
+  assert.ok(dicht, 'boven het plafond ketst het af');
+  assert.equal(dicht.status, 409);
+  assert.equal(dicht.reden, 'plafond');
+  assert.equal(dicht.ruimte, 10000, 'het antwoord zegt hoeveel ruimte er nog was');
+});
+
+test('een zaak heeft géén plafond: een kassa moet een dag lang door kunnen innen', () => {
+  const { w } = bouw(klok);
+  const saldi = { 'partner:KIKUNOI': 9000000 };  // 90.000 euro omzet
+  const saldoVan = r => saldi[r] || 0;
+  assert.equal(KLASSEN.PARTNER_SETTLEMENT.plafondCenten, null);
+  assert.equal(w.poort({ van: 'lid:ANNA', naar: 'partner:KIKUNOI', centen: 5000, soort: 'kassa',
+    saldoVan: r => (r === 'lid:ANNA' ? 100000 : saldoVan(r)) }), null);
+});
+
+test('gereserveerd geld telt niet als beschikbaar, en de weigering zegt dat ook', () => {
+  const { w } = bouw(klok);
+  const saldi = { 'lid:BRAM': 50000 };           // 500 euro
+  const saldoVan = r => saldi[r] || 0;
+  assert.equal(w.beschikbaar('lid:BRAM', 50000), 50000);
+
+  const r = w.reserveer({ rek: 'lid:BRAM', centen: 40000, doel: 'Hotel' });
+  assert.ok(r.ok, 'de reservering staat');
+  assert.equal(w.gereserveerd('lid:BRAM'), 40000);
+  assert.equal(w.beschikbaar('lid:BRAM', 50000), 10000, 'beschikbaar is saldo min gereserveerd');
+  assert.equal(saldi['lid:BRAM'], 50000, 'het SALDO is niet aangeraakt: een reservering is geen boeking');
+
+  const dicht = w.poort({ van: 'lid:BRAM', naar: 'partner:X', centen: 20000, soort: 'kassa', saldoVan });
+  assert.equal(dicht.status, 402);
+  assert.equal(dicht.gereserveerd, 40000);
+  assert.match(dicht.error, /gereserveerd/, 'het lid hoort te lezen WAAROM, niet alleen "onvoldoende"');
+
+  // en binnen het beschikbare deel mag het gewoon
+  assert.equal(w.poort({ van: 'lid:BRAM', naar: 'partner:X', centen: 10000, soort: 'kassa', saldoVan }), null);
+});
+
+test('vastleggen mag voor minder dan gereserveerd, nooit voor meer', () => {
+  const { w } = bouw(klok);
+  const r = w.reserveer({ rek: 'lid:CEES', centen: 4000, doel: 'Taxi, maximale ritprijs' }).reservering;
+
+  assert.equal(w.vastleggen({ id: r.id, centen: 5000 }).status, 409, 'boven de reservering kan niet');
+  const v = w.vastleggen({ id: r.id, centen: 2600 });
+  assert.ok(v.ok);
+  assert.equal(v.centen, 2600, 'de rit was goedkoper dan het maximum');
+  assert.equal(v.vrijgevallen, 1400);
+  assert.equal(w.gereserveerd('lid:CEES'), 0, 'na vastleggen zet de reservering niets meer vast');
+  assert.equal(w.vastleggen({ id: r.id }).status, 409, 'een tweede keer vastleggen kan niet');
+});
+
+test('een verlopen reservering zet niets meer vast, zonder dat er een opruimtaak aan te pas komt', () => {
+  const { w } = bouw(klok);
+  w.reserveer({ rek: 'lid:DIRK', centen: 30000, doel: 'Rekening', msGeldig: 60 * 60 * 1000 });
+  assert.equal(w.gereserveerd('lid:DIRK'), 30000);
+  tijd += 61 * 60 * 1000;                       // een uur en een minuut later
+  assert.equal(w.gereserveerd('lid:DIRK'), 0, 'verlopen is verlopen; het geld is weer van het lid');
+  assert.equal(w.beschikbaar('lid:DIRK', 30000), 30000);
+  tijd = 1700000000000;
+});
+
+test('de klasse weigert wat de klasse niet mag: een werkgeversbudget gaat niet naar een ander lid', () => {
+  const { w } = bouw(klok);
+  w.registreer({ rek: 'lid:EVA', klasse: 'EMPLOYER_BUDGET', uitgever: 'WERKGEVER' });
+  const saldoVan = () => 100000;
+  const dicht = w.poort({ van: 'lid:EVA', naar: 'lid:FRANK', centen: 5000, soort: 'p2p', saldoVan });
+  assert.equal(dicht.status, 403);
+  assert.equal(dicht.reden, 'overdracht');
+  // en persoonlijk saldo mag dat juist wel
+  assert.equal(w.poort({ van: 'lid:GERDA', naar: 'lid:FRANK', centen: 5000, soort: 'p2p', saldoVan }), null);
+});
+
+test('het beleid van de uitgever geldt: op genre en op tijdvenster', () => {
+  const { w } = bouw(klok);
+  w.registreer({ rek: 'lid:HANS', klasse: 'EMPLOYER_BUDGET', uitgever: 'WERKGEVER',
+    beleid: { genres: ['horeca', 'ov'], venster: '06:00-23:00', dagMaxCenten: 4000 } });
+  const saldoVan = () => 100000;
+  const overdag = new Date('2026-08-24T12:00:00');
+  const nacht = new Date('2026-08-24T02:00:00');
+  const { w: w2 } = bouw(() => overdag.getTime());
+  w2.registreer({ rek: 'lid:HANS', klasse: 'EMPLOYER_BUDGET', uitgever: 'WERKGEVER',
+    beleid: { genres: ['horeca', 'ov'], venster: '06:00-23:00', dagMaxCenten: 4000 } });
+  assert.equal(w2.poort({ van: 'lid:HANS', naar: 'partner:Z', centen: 2000, soort: 'kassa', saldoVan, genre: 'horeca' }), null);
+  assert.equal(w2.poort({ van: 'lid:HANS', naar: 'partner:Z', centen: 2000, soort: 'kassa', saldoVan, genre: 'slijterij' }).reden, 'genre');
+  assert.equal(w2.poort({ van: 'lid:HANS', naar: 'partner:Z', centen: 2000, soort: 'kassa', saldoVan, genre: 'horeca', dagBesteed: 3000 }).reden, 'dagmax');
+
+  const { w: w3 } = bouw(() => nacht.getTime());
+  w3.registreer({ rek: 'lid:HANS', klasse: 'EMPLOYER_BUDGET', uitgever: 'WERKGEVER',
+    beleid: { genres: ['horeca'], venster: '06:00-23:00' } });
+  assert.equal(w3.poort({ van: 'lid:HANS', naar: 'partner:Z', centen: 2000, soort: 'kassa', saldoVan, genre: 'horeca' }).reden, 'tijd');
+});
+
+test('de eigen grens van het lid weigert net zo hard, maar zegt dat het zijn eigen grens is', () => {
+  const { w } = bouw(klok);
+  const saldoVan = () => 100000;
+  const dicht = w.poort({ van: 'lid:IRIS', naar: 'partner:Z', centen: 6000, soort: 'kassa', saldoVan,
+    dagBesteed: 0, eigenBeleid: { dagMaxCenten: 5000 } });
+  assert.equal(dicht.status, 403);
+  assert.equal(dicht.reden, 'eigen');
+  assert.equal(dicht.opheffbaar, true, 'dit is de enige weigering die het lid zelf kan opheffen');
+});
+
+test('een positie zonder registratie krijgt niet stilzwijgend de ruimste rechten', () => {
+  const { w } = bouw(klok);
+  const p = w.positie('lid:ONBEKEND');
+  assert.equal(p.klasse, 'PERSONAL_FUNDED');
+  assert.equal(p.geregistreerd, false);
+  assert.equal(p.spec.uitbetaalbaar, false, 'een onbekende positie is niet uitbetaalbaar');
+  assert.ok(Number.isFinite(p.spec.plafondCenten), 'en valt gewoon onder een plafond');
+  // de extern-rekeningen zijn géén waardepositie: dat is de sluitpost van het dubbel boekhouden
+  assert.equal(w.positie('extern:oplaad'), null);
+  assert.equal(w.positie('extern:uitbetaald'), null);
+});
+
+test('elke klasse draagt een grond, en alleen het partnersaldo mag het huis verlaten', () => {
+  for (const [id, k] of Object.entries(KLASSEN)) {
+    assert.ok(k.grond && k.grond.length > 40, id + ' hoort een grond te dragen die uitlegt waarom hij mag bestaan');
+    assert.ok(['nee', 'leden', 'vrij'].includes(k.overdraagbaar), id + ' heeft een geldige overdraagbaarheid');
+    if (k.uitbetaalbaar) assert.equal(id, 'PARTNER_SETTLEMENT',
+      'uitbetaalbaar is de uitzondering: alleen het saldo van een zaak verlaat het huis');
+    // vrij overdraagbaar EN uitbetaalbaar is geld uitgeven; die combinatie mag hier niet bestaan
+    assert.ok(!(k.overdraagbaar === 'vrij' && k.uitbetaalbaar), id + ' zou daarmee een betaalmiddel zijn');
+  }
+});
+
+
+/* ------------------------------------------------------------------------
+   EN DAN DE ENIGE VRAAG DIE ER ECHT TOE DOET: ZIT HET VAST?
+
+   Alles hierboven toetst de waardelaag op zichzelf, en dat is precies de toets
+   die groen blijft als niemand hem aanroept. Een plafond dat in een module
+   bestaat maar niet in de betaalweg zit, is geen plafond -- en het besluit
+   onder WALLET_SALDO gaat over de betaalweg, niet over een module. Deze twee
+   toetsen gaan daarom door de voordeur: over HTTP, langs de echte oplaadroute,
+   met een echte wallet.
+   ------------------------------------------------------------------------ */
+let srv, base, walletLid;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-waarde-'));
+const api = (pad, body, token) => fetch(base + '/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+  body: JSON.stringify(body || {})
+}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+
+test.before(async () => {
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  base = srv.base;
+  const d = await (await fetch(base + '/api/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' }) })).json();
+  const o = await api('pay/overzicht', {}, d.token);
+  walletLid = { token: d.token, codenaam: o.body.codenaam };
+  assert.ok(walletLid.codenaam, 'een lid met een wallet');
+});
+test.after(() => {
+  stop(srv && srv.child);
+  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+});
+
+test('door de voordeur: opladen stopt bij het plafond van de wallet', async () => {
+  // tot precies het plafond mag het (5.000 euro is ook exact MAX_CENTEN per boeking)
+  const vol = await api('pay/oplaad', { centen: 500000, idem: 'plafond-vol' }, walletLid.token);
+  assert.equal(vol.status, 200, 'tot het plafond laadt gewoon');
+  assert.equal(vol.body.saldo, 500000);
+
+  // en er kan geen cent meer bij
+  const over = await api('pay/oplaad', { centen: 100, idem: 'plafond-over' }, walletLid.token);
+  assert.equal(over.status, 409, 'boven het plafond weigert de oplaadroute');
+  assert.match(over.body.error, /maximum/i, 'en zegt waarom');
+
+  const na = await api('pay/overzicht', {}, walletLid.token);
+  assert.equal(na.body.saldo, 500000, 'de geweigerde oplading heeft niets bijgeschreven');
+});
+
+test('door de voordeur: het grootboek sluit nog steeds op nul', async () => {
+  const r = await fetch(base + '/api/pay/gezond');
+  assert.equal(r.status, 200, 'een niet-sluitend grootboek geeft hier een 500');
+  assert.equal((await r.json()).klopt, true, 'de som van alle saldi is exact nul -- de waardelaag boekt niets');
+});

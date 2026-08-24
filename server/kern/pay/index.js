@@ -26,7 +26,7 @@
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
    de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
 
-module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
+module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde }) => {
   const nu = () => Date.now();
   const d = () => db.data;
   /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
@@ -70,6 +70,11 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
     save();
   }
+  /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de
+     oude saldo-regel als bodem, en daarbovenop de klasse, het beleid, de
+     reserveringen en het plafond van de waardelaag. Optioneel: zonder
+     `waarde` is dit exact de regel die hier altijd stond. */
+  const waardePoort = require('./poort')({ saldoVan, waarde });
   // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
   // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
   // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
@@ -82,7 +87,8 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
-    if (!van.startsWith('extern:') && saldoVan(van) < c) return { status: 402, error: 'Onvoldoende saldo.' };
+    const dicht = waardePoort({ van, naar, centen: c, soort });
+    if (dicht) return dicht;
     const rij = { id: id('PB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 120), ref: ref || null, at: nu() };
     pasToe(rij);
     schaduw.spiegel(rij); // schaduw-modus: naar de Rust-motor (no-op als uit)
@@ -97,6 +103,12 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   async function boekAsync({ van, naar, centen, soort, oms, ref }) {
     if (betalingenUit) return uitFout();
     if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref });
+    /* Ook in motor-modus langs de waardepoort, en met opzet HIER in JS: de motor
+       kent de klassen, het beleid en de reserveringen niet -- die wonen in de
+       metadata aan deze kant, precies zoals de bank-guard in kern/bank/grootboek.js
+       om dezelfde reden in JS bleef staan. Eerst toetsen, dan pas de motor. */
+    const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort });
+    if (dicht) return dicht;
     const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
     // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).

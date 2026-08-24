@@ -31,6 +31,21 @@ bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
 de grenzen: een relatie is geen trechter, en er komt geen score op het leven
 tussen mensen.
 
+**`WAARDE.md` is de laag onder het geld** — RTG Value: niet wat één lid met zijn
+geld doet (dat is GELD.md) maar wat waarde binnen RTG zélf is. De kern in één
+zin: elke euro, elk tegoed en elk budget weet wie het bezit, waarvoor het
+gebruikt mag worden, wie het mag verplaatsen en welk bewijs daarvoor bestaat.
+Lees die vóór je aan saldo, tegoeden, vouchers, budgetten of uitbetalen werkt.
+Zes waardeklassen met elk een **grond** (`kern/waarde/klassen.js`), drie
+beleidslagen van hard naar zacht (`kern/waarde/policy.js`), reserveren dat géén
+boeking is (`kern/waarde/reserve.js`), en één poort waar elke betaling langs
+gaat (`kern/pay/poort.js`). Vier grenzen die niet mogen sneuvelen: er komt geen
+tweede boekhouding bij, uitbetaalbaar is de uitzondering en hangt aan een
+vergunning, het plafond is de grond onder het besluit `WALLET_SALDO` en geen
+instelling, en de AI beweegt geen geld. Waarom "voucher" het verkeerde woord
+was, staat in paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar
+het oplaadmoment — en dát is het echte voordeel.
+
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht
 concern, en daarna mensen er moeiteloos in laten werken. Lees vóór je aan

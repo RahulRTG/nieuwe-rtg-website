@@ -3,7 +3,7 @@
    kern/rendezvous.js. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, auth, officeAuth, accounts, leeftijdVan,
-    rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvBlokkeer, rvMeldingen, rvDate } = kern;
+    rvProfielGet, rvProfiel, rvKandidaten, rvKies, rvMatches, rvMeldingen, rvDate } = kern;
 
   function eis(req, res) {
     if (!['lifestyle', 'business'].includes(req.session.tier)) {
@@ -40,10 +40,10 @@ module.exports = (kern) => {
   app.post('/api/member/rendezvous/profiel', auth, doe((k) => rvProfielGet(k)));
   app.post('/api/member/rendezvous/profiel/zet', auth, doe((k, b) => rvProfiel(k, b)));
   app.post('/api/member/rendezvous/kandidaten', auth, doe((k) => rvKandidaten(k)));
-  app.post('/api/member/rendezvous/like', auth, doe((k, b) => rvLike(k, String(b.id || ''))));
-  app.post('/api/member/rendezvous/pas', auth, doe((k, b) => rvPas(k, String(b.id || ''))));
+  app.post('/api/member/rendezvous/like', auth, doe((k, b) => rvKies(k, String(b.id || ''), 'like')));
+  app.post('/api/member/rendezvous/pas', auth, doe((k, b) => rvKies(k, String(b.id || ''), 'pas')));
   app.post('/api/member/rendezvous/matches', auth, doe((k) => rvMatches(k)));
-  app.post('/api/member/rendezvous/blokkeer', auth, doe((k, b) => rvBlokkeer(k, String(b.id || ''), b.meld)));
+  app.post('/api/member/rendezvous/blokkeer', auth, doe((k, b) => rvKies(k, String(b.id || ''), 'blokkeer', b.meld)));
   app.post('/api/office/rendezvous/meldingen', officeAuth, (req, res) => stuur(res, rvMeldingen()));
 
   // de AI-date is async (Rahul de koppelaar), dus een eigen handler

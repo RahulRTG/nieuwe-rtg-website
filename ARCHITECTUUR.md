@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4057 |
-| servermodules (`server/**/*.js`) | 2270 |
+| servermodules (`server/**/*.js`) | 2271 |
 | routebestanden (`server/routes/**`) | 471 |
-| kernmodules (`server/kern/**`) | 1382 |
+| kernmodules (`server/kern/**`) | 1383 |
 | schermen (`public/**/*.html`) | 264 |
 | gedeelde browsermodules (`public/shared/*.js`) | 229 |
 | toetsbestanden (`test/*.test.js`) | 940 |
@@ -103,7 +103,7 @@ zie §5 -- er zijn nog 193 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
-| `member` | 643 | 57 | 10 | 401 |
+| `member` | 643 | 57 | 10 | 399 |
 | `supplier` | 598 | 111 | 10 | 297 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
@@ -125,9 +125,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1418 |
+| kern-namen die routes aanraken | 1416 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 193 |
-| daarvan door precies één domein | 1225 |
+| daarvan door precies één domein | 1223 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

@@ -27,6 +27,9 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     const bl = (b || []).map(x => x.toLowerCase());
     return (a || []).filter(x => bl.includes(x.toLowerCase()));
   }
+  const { rvKies, rvMeldingen } = require('./rendezvous-acties')({
+    R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd
+  });
 
   function rvProfielGet(key) {
     const r = R();
@@ -68,36 +71,6 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     return { status: 200, kandidaten: uit.slice(0, 60), profielAan: !!mij.aan };
   }
 
-  function rvLike(key, targetKey) {
-    const r = R();
-    if (!targetKey || targetKey === key) return { status: 400, error: 'Onbekend lid.' };
-    if (geblokkeerd(r, key, targetKey)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
-    if (!r.profielen[key] || !r.profielen[key].aan) return { status: 400, error: 'Zet eerst uw eigen profiel aan.' };
-    const doel = r.profielen[targetKey];
-    if (!doel || !doel.aan) return { status: 404, error: 'Dit lid is niet (meer) beschikbaar.' };
-    if (!r.likes[key]) r.likes[key] = {};
-    if (r.passes[key]) delete r.passes[key][targetKey];
-    r.likes[key][targetKey] = nu();
-    const match = !!(r.likes[targetKey] && r.likes[targetKey][key]);
-    save();
-    if (match && notify) {
-      const g = gedeeld(r.profielen[key].locaties, doel.locaties);
-      const waar = g.length ? ' Denk aan een date in ' + g[0] + '.' : '';
-      try { notify(key, { title: 'Rendez-vous', body: 'U heeft een match met ' + codenaam(targetKey) + '.' + waar, scope: 'lifestyle' }); } catch (e) {}
-      try { notify(targetKey, { title: 'Rendez-vous', body: 'U heeft een match met ' + codenaam(key) + '.' + waar, scope: 'lifestyle' }); } catch (e) {}
-    }
-    return { status: 200, ok: true, match };
-  }
-  function rvPas(key, targetKey) {
-    const r = R();
-    if (!targetKey) return { status: 400, error: 'Onbekend lid.' };
-    if (!r.passes[key]) r.passes[key] = {};
-    r.passes[key][targetKey] = nu();
-    if (r.likes[key]) delete r.likes[key][targetKey];
-    save();
-    return { status: 200, ok: true };
-  }
-
   function matchesVan(key) {
     const r = R();
     const mijn = r.likes[key] || {};
@@ -113,28 +86,6 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     return uit;
   }
   function rvMatches(key) { return { status: 200, matches: matchesVan(key) }; }
-
-  /* Blokkeren is direct en wederzijds zichtbaar: de connectie en beide likes
-     verdwijnen meteen. Een melding is optioneel en bevat uitsluitend de twee
-     codenamen en de door het lid gekozen reden; echte namen blijven in de kluis. */
-  function rvBlokkeer(key, targetKey, reden) {
-    const r = R();
-    if (!targetKey || targetKey === key || !r.profielen[targetKey])
-      return { status: 400, error: 'Onbekend lid.' };
-    if (!r.blokkades[key]) r.blokkades[key] = {};
-    r.blokkades[key][targetKey] = nu();
-    if (r.likes[key]) delete r.likes[key][targetKey];
-    if (r.likes[targetKey]) delete r.likes[targetKey][key];
-    const melding = schoon(reden, 200);
-    if (melding) {
-      r.meldingen.unshift({ id: 'rvm' + crypto.randomBytes(6).toString('hex'), van: codenaam(key),
-        over: codenaam(targetKey), reden: melding, at: nu(), status: 'open' });
-      r.meldingen = r.meldingen.slice(0, 500);
-    }
-    save();
-    return { status: 200, ok: true, gemeld: !!melding };
-  }
-  function rvMeldingen() { return { status: 200, meldingen: R().meldingen.slice(0, 200) }; }
 
   // Rahul stelt een jetset-date voor bij een match, op een gedeelde/openstaande locatie
   async function rvDate(key, targetKey, vraag) {
@@ -168,5 +119,5 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     return { status: 200, ok: true, demo: true, locatie, opties, antwoord: demo };
   }
 
-  return { rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvBlokkeer, rvMeldingen, rvDate };
+  return { rvProfielGet, rvProfiel, rvKandidaten, rvKies, rvMatches, rvMeldingen, rvDate };
 };

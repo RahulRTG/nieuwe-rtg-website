@@ -150,7 +150,7 @@ test('blokkeren verwijdert de connectie direct; melden gaat op codenaam naar kan
   await rv('like', { id: andersom.id }, b);
   assert.equal((await json(await rv('matches', {}, a))).matches.length, 1);
 
-  const blok = await json(await rv('blokkeer', { id: kandidaat.id, meld: 'Ongepast bericht' }, a));
+  const blok = await json(await raw('/member/rendezvous/blokkeer', { id: kandidaat.id, meld: 'Ongepast bericht' }, a));
   assert.equal(blok.gemeld, true);
   assert.equal((await json(await rv('matches', {}, a))).matches.length, 0, 'de match is direct weg voor A');
   assert.equal((await json(await rv('matches', {}, b))).matches.length, 0, 'de match is direct weg voor B');

@@ -1687,7 +1687,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      route, dan valt zijn 403 buiten het venster en heet de eerste route
      ongepoort. Bij naam noemen is eerlijker dan de code herschikken om een
      tekstafstand te plezieren. */
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie)\s*\(/;
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|beheerderVan|viaBeheerOfDirectie)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
      regel toevoegt schrijft er een reden bij die klopt; kun je dat niet, dan is

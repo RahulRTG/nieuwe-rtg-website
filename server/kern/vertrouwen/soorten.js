@@ -35,6 +35,11 @@
      poort                de route die hem TEGENHOUDT, of afwezig
      waaromGeenPoort      waarom er BEWUST nooit een komt (een besluit)
      waaromNogGeenPoort   waarom er nog geen is (een gat, en het telt mee)
+     tempo                { budget, vensterUren }: hoeveel er in dat venster in
+                          TOTAAL mag, over alle handelingen samen. Verklaard en
+                          niet geleerd -- zie de kop van tempo.js voor waarom
+                          dat bij een reeks omgekeerd werkt.
+     waaromGeenTempo      waarom deze soort geen budget heeft
 
    DIE LAATSTE TWEE ZIJN NIET HETZELFDE, en het verschil is precies waar een
    veiligheidsdashboard aan doodgaat. "Hier komt nooit een poort want dit is het
@@ -52,6 +57,12 @@ const SOORTEN = [
     vast: 2000,
     gevoelig: true,
     waar: 'POST /api/tenant/export',
+    /* WEL EEN BUDGET, EN HET HOUDT NIETS TEGEN. De vierde volledige uitvoer in
+       een etmaal is het luidste exfiltratiesignaal dat er is, en dat hoort in
+       de bon te staan. Blokkeren mag hier niet (zie hieronder), dus wat dit
+       budget doet is de zwaarte en de zin verzwaren -- het antwoord en de
+       Trust Receipt zeggen het, de deur gaat niet dicht. */
+    tempo: { budget: 3, vensterUren: 24 },
     waaromGeenPoort: 'De uitvoer is het exit-recht van de klant en gaat open op zijn eigen beheer-token. Een exit-recht dat op een poort kan stuklopen is geen recht. Deze soort wordt gemeten en meegestuurd, niet tegengehouden.'
   },
   {
@@ -62,17 +73,20 @@ const SOORTEN = [
     vast: 5,
     gevoelig: false,
     waar: 'POST /api/bedrijf/lid/uit-dienst',
-    /* EEN GAT, EN GEEN BESLUIT. Een poort die nooit kan afgaan is een bewering
-       zonder inhoud: deze route zet EEN mens per aanroep uit dienst en de meter
-       meet volume per aanroep, dus een van de vijf komt nooit boven "licht"
-       uit. De grens op een zetten is geen oplossing maar ruis -- dan kost elke
-       gewone uitdiensttreding een bevestiging (VERTROUWEN.md par. 3.7).
+    /* HIER STOND DAT ER GEEN POORT KON KOMEN, en dat klopte zolang deze laag
+       alleen volume per aanroep woog: deze route raakt EEN mens per keer, dus
+       een drempel van vijf ging nooit af. De zuivering die dit huis vreest is
+       geen grote handeling maar een REEKS -- vijf op een dag, elk voor zich
+       licht. Dat is wat het tempobudget hieronder meet, en daarmee is dit geen
+       openstaand punt meer maar een deur.
 
-       Wat een zuivering WEL verraadt is een TEMPO: vijf op een dag. Dat is een
-       andere meting dan deze en hij bestaat hier nog niet. Vandaar
-       `waaromNogGeenPoort` en niet `waaromGeenPoort`: dit telt mee als
-       openstaand punt tot die meting er is. */
-    waaromNogGeenPoort: 'De meter weegt volume per aanroep en deze route raakt een mens per keer, dus een drempel kan hier niet afgaan. Wat een zuivering verraadt is tempo over tijd, en die meting bestaat in deze laag nog niet.'
+       VIJF PER ETMAAL. Ruim boven een gewone week (een vertrek is een
+       gebeurtenis, geen dagtaak) en ver onder wat een reeks nodig heeft. De
+       zesde vraagt een tweede bevestiging, en de zevende weer -- boven het
+       budget is uitzonderlijk en niet zwaar, want anders maakt iemand zijn
+       reeks af in het kwartier na de eerste bevestiging. */
+    tempo: { budget: 5, vensterUren: 24 },
+    poort: 'POST /api/bedrijf/lid/uit-dienst'
   },
   {
     id: 'mens.gevoelig.inzage',
@@ -83,6 +97,7 @@ const SOORTEN = [
     vast: 25,
     gevoelig: true,
     waar: null,
+    waaromGeenTempo: 'Er is geen handeling om te tellen.',
     waaromGeenHandeling: 'Het recht `mens.gevoelig` staat in bedrijf/rollen-register.js en wordt door de HR-rol gedragen, maar GEEN ENKELE route vraagt erom -- werkPoort() wordt met `mens` aangeroepen en nooit met `mens.gevoelig`. Er is dus wel een recht en geen deur. Zolang dat zo is, is dit een besluit dat nog moet worden uitgevoerd en geen pad dat iemand kan lopen.'
   },
   {
@@ -93,6 +108,10 @@ const SOORTEN = [
     vast: 3,
     gevoelig: false,
     waar: 'POST /api/bedrijf/lid/rollen',
+    /* Vijfentwintig rollen per etmaal: een drukke instroomweek haalt dat niet
+       (tien nieuwe collega's met elk twee rollen is twintig), en wie een hele
+       organisatie herverdeelt zit er meteen overheen. */
+    tempo: { budget: 25, vensterUren: 24 },
     poort: 'POST /api/bedrijf/lid/rollen'
   },
   {
@@ -103,6 +122,7 @@ const SOORTEN = [
     vast: 1,
     gevoelig: false,
     waar: null,
+    waaromGeenTempo: 'Er is geen handeling om te tellen.',
     waaromGeenHandeling: 'Er is geen route die een werkruimte sluit. Een werkruimte kan worden aangemaakt en gelezen; sluiten gebeurt vandaag op tenantniveau (kern/tenant/levensloop.js), en dat is een andere handeling met een eigen soort.'
   },
   {
@@ -122,6 +142,7 @@ const SOORTEN = [
        niet toe, dit is altijd al erg. */
     minstens: 'uitzonderlijk',
     waaromMinstens: 'Vernietigen is onherstelbaar, en dat geldt al bij de eerste.',
+    waaromGeenTempo: 'Deze soort staat al op `minstens: uitzonderlijk` en vraagt dus bij ELKE aanroep een eigen bevestiging. Een budget erbovenop verandert daar niets aan en zou alleen een tweede getal zijn dat hetzelfde zegt.',
     waar: 'POST /api/techniek/tenant/vernietig',
     poort: 'POST /api/techniek/tenant/vernietig'
   }

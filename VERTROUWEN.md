@@ -343,7 +343,7 @@ levert het gegeven waar de volgende op staat.
 betekent, per laag, staat hieronder -- en de eerlijkste zin van allemaal is dat
 de poorten er maar op een handeling zijn.
 
-Laag 1, 2 en 3 zijn aangesloten en worden op TWEE plekken ook AFGEDWONGEN.
+Laag 1, 2 en 3 zijn aangesloten en worden op DRIE plekken ook AFGEDWONGEN.
 
 De tenantuitvoer draagt haar eigen omvang en het oordeel mee (meten, niet
 tegenhouden -- daar staat geen mens achter de sleutel). De inlog EN de
@@ -359,6 +359,9 @@ step-up die het niet kan geven. En twee handelingen lopen door de poort:
 - **een rol toekennen** -- gemeten in het AANTAL rollen. Een rol erbij is
   gewoon werk en vraagt niets; vier of meer tegelijk is iemand tot van alles
   maken, en dan komt er een tweede moment.
+- **iemand uit dienst zetten** -- gemeten in TEMPO en niet in omvang, want deze
+  route raakt er een per keer. Zes op een dag vraagt een bevestiging, en de
+  zevende weer.
 
 **En dat tweede vroeg eerst een besluit.** Beheer van een werkruimte ging
 uitsluitend op het beheer-token, en aan een sleutel valt geen bevestiging te
@@ -452,16 +455,54 @@ onderscheid is er bijgekomen omdat het getal anders naar nul viel:
   pad in de simulatie staan, mét de reden: een besluit maakt het gevolg niet
   kleiner, en "wie mijn beheer-token heeft, haalt onomkeerbaar gegevens uit
   het huis" is precies wat een CIO hoort te horen.
-- `waaromNogGeenPoort` -- hier is **nog** geen poort, en dat telt mee. Dat
-  geldt vandaag voor `mens.uitdienst`: die route zet een mens per aanroep uit
-  dienst en deze meter weegt volume per aanroep, dus een drempel van vijf kan
-  daar nooit afgaan. Een poort die niet kan afgaan is een bewering zonder
-  inhoud. Wat een zuivering wél verraadt is TEMPO -- vijf op een dag -- en die
-  meting bestaat in deze laag niet.
+- `waaromNogGeenPoort` -- hier is **nog** geen poort, en dat telt mee. Dit veld
+  stond er voor `mens.uitdienst` en is inmiddels leeg: zie het tempo hieronder.
 
 Toen elke soort een reden kreeg, viel het aantal openstaande punten even op
-nul. Dat is precies de gunstige nul waar par. 3.2 tegen is, en de toets die
-hem vandaag tegenhoudt is er daarna bij gekomen.
+nul. Dat is precies de gunstige nul waar par. 3.2 tegen is. De toets eist
+sindsdien dat een nul VERDIEND is: elke soort met een route valt in precies één
+van de drie standen, en een vergeten veld laat de toets zakken in plaats van het
+bord groen.
+
+### Het tempo: de reeks die geen omvangmeter ziet
+
+`mens.uitdienst` stond hierboven als openstaand punt met de reden dat een poort
+er niet kón afgaan: die route raakt één mens per aanroep, en de meter van laag 1
+weegt de omvang van één handeling. Vijf mensen op een dag uit dienst zetten is
+vijf keer licht — en samen een zuivering. Dezelfde blinde vlek stond al in
+`NIET_GEREKEND` onder *samenloop*.
+
+`server/kern/vertrouwen/tempo.js` is de tweede vraag naast de eerste: niet hoe
+groot is deze handeling, maar hoeveel heeft deze actor er in het venster al
+gedaan. Drie keuzes dragen hem, en ze zijn alle drie het tegenovergestelde van
+wat vanzelf gaat:
+
+1. **Het budget wordt verklaard, niet geleerd.** `gewoonte.js` leert wat voor
+   een mens normaal is. Voor tempo mag dat juist niet, want daar is de reeks
+   zélf de aanval: wie langzaam opvoert, leert een lerende meter dat opvoeren
+   normaal is, en dan staat de drempel precies zo hoog als de aanvaller hem
+   wil. Het budget staat dus in de soortentabel en niet in de opslag.
+2. **Over het budget is `uitzonderlijk` en niet `zwaar`.** Een zware handeling
+   gaat na een bevestiging een kwartier lang vanzelf door — en juist in dat
+   kwartier maakt iemand zijn reeks af. Wie hier "zwaar" invult, bouwt een
+   poort die één keer vraagt en daarna de deur openhoudt voor precies de
+   handeling waarvoor hij bedoeld was. Boven het budget vraagt élke volgende
+   opnieuw.
+3. **Het venster rolt.** Een kalenderdag die om middernacht terugspringt is een
+   cadeau aan wie tot 23:59 wacht.
+
+De budgetten van vandaag: vijf personen per etmaal voor `mens.uitdienst`,
+vijfentwintig rollen voor `rol.geven`, en drie volledige uitvoeren voor
+`tenant.uitvoer` — die laatste **houdt niets tegen** (het exit-recht blijft
+open) maar maakt de zwaarte en de bon luider, want de vierde volledige export in
+een etmaal is het luidste exfiltratiesignaal dat er is.
+
+Dit is de enige reeks in deze laag met **tijdstippen** erin, en die zijn
+gevoeliger dan kale getallen. Er wordt daarom bij elke aanraking geknipt tot het
+venster: wat ouder is bestaat hier niet meer, en een lege reeks laat geen sleutel
+achter. Wat het budget níét ziet staat in `NIET_GEDEKT` — twee actoren die
+samenwerken, de reeks over soorten heen, en het venster dat vanzelf weer ruimte
+geeft.
 
 HIER STOND "een rem per account naast die per IP", en die klopte niet. Dit huis
 heeft er al drie: IP+account (10 pogingen), de bron alleen (50) en het doel

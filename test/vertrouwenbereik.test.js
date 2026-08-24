@@ -167,41 +167,41 @@ test('5. de Trust State telt, en verzint niets -- ook geen gunstige nul', () => 
   assert.equal(bij('gebroken schakels').aantal, 0);
   for (const e of s.eigenschappen) assert.ok(e.bron && e.bron.length > 10, e.wat + ' zonder bron');
 
-  /* HET ONGUNSTIGE GETAL, en dat is de kern van deze toets: er zijn soorten met
-     een route en zonder poort, en dat hoort als getal op de HUD te staan.
+  /* HET ONGUNSTIGE GETAL, en dat is de kern van deze toets: soorten met een
+     route en zonder poort.
 
-     EN HET IS BIJNA NUL GEWORDEN. Toen elke soort een reden kreeg voor zijn
-     ontbrekende poort, viel dit getal op nul -- want "er staat een reden bij"
-     leek genoeg. Dat is precies de gunstige nul waar deze laag tegen is. Een
-     BESLUIT dat er nooit een poort komt (het exit-recht van de klant) is af;
-     een GAT waarvoor de meting nog moet worden gebouwd, telt mee. Die twee
-     staan sindsdien in twee velden en niet in een. */
+     HIJ STOND OP EEN EN IS NU NUL, en juist dat maakt deze toets gevaarlijk.
+     Een nul hoort hier VERDIEND te zijn en niet aangenomen: hij mag alleen op
+     nul staan omdat elke soort met een route ofwel een poort heeft, ofwel een
+     opgeschreven besluit dat er nooit een komt. Zodra iemand een veld vergeet,
+     valt de soort tussen wal en schip en leest het bord groen.
+
+     Eerder viel dit getal al een keer op nul doordat "er staat een reden bij"
+     genoeg leek -- terwijl de helft van die redenen een GAT beschreef en geen
+     besluit. Vandaar dat de drie standen elkaar hieronder uitsluiten. */
   const zonder = bij('niet tegengehouden');
-  assert.ok(zonder.aantal > 0, 'dit huis houdt nog lang niet alles tegen, en dat staat er');
   assert.equal(zonder.aantal, zonder.details.length, 'het getal en de lijst horen hetzelfde te zeggen');
   for (const d of zonder.details) {
-    assert.ok(/: .{40,}/.test(d),
-      'een openstaand punt zonder reden is een getal waar niemand iets mee kan: ' + d);
-    /* EN ELK OPENSTAAND PUNT HOORT EEN DEUR TE HEBBEN. Deze regel ontbrak, en
-       een mutatie liep er dwars doorheen: wie R.METDEUR() hier terugdraait naar
-       R.SOORTEN, telt de twee soorten zonder route mee als ontbrekende poort --
-       een getal dat door geen enkele poort omlaag kan, want er is niets om
-       tegen te houden. Het viel niet op omdat de terugvalreden ("er is geen
-       reden opgeschreven") toevallig lang genoeg was voor de regel hierboven. */
     const id = d.split(':')[0];
+    assert.ok(/: .{40,}/.test(d), 'een openstaand punt zonder reden is een getal waar niemand iets mee kan: ' + d);
     assert.ok(R.soort(id) && R.soort(id).waar,
       id + ' staat als ontbrekende poort op de HUD, maar er is geen route die het doet');
-    assert.ok(R.soort(id).waaromNogGeenPoort,
-      id + ' staat als openstaand punt zonder opgeschreven reden');
+    assert.ok(R.soort(id).waaromNogGeenPoort, id + ' staat als openstaand punt zonder opgeschreven reden');
   }
-  assert.ok(zonder.details.some(d => d.startsWith('mens.uitdienst')),
-    'de uitdienststelling heeft geen poort die kan afgaan, en dat is een gat');
-  assert.equal(zonder.details.some(d => d.startsWith('tenant.vernietig')), false, 'die heeft er wel een');
-  assert.equal(zonder.details.some(d => d.startsWith('tenant.uitvoer')), false,
-    'de uitvoer krijgt met opzet nooit een poort en is dus geen openstaand punt');
 
-  /* Maar hij verdwijnt niet: een besluit hoort leesbaar te blijven, anders
-     bouwt de volgende alsnog de poort die er nooit hoort te komen. */
+  /* DE VERDIENDE NUL: elke soort met een route valt in precies EEN stand. */
+  for (const x of R.METDEUR()) {
+    const standen = [!!x.poort, !!x.waaromGeenPoort, !!x.waaromNogGeenPoort].filter(Boolean).length;
+    assert.equal(standen, 1, x.id + ' hoort in precies een stand te vallen, en valt in ' + standen);
+    if (!x.poort) assert.ok((x.waaromGeenPoort || x.waaromNogGeenPoort).length > 40,
+      x.id + ' heeft geen poort en geen echte reden');
+  }
+  assert.equal(zonder.aantal,
+    R.METDEUR().filter(x => !x.poort && !x.waaromGeenPoort).length,
+    'de teller en het register horen hetzelfde te tellen');
+
+  /* En een besluit verdwijnt niet: blijft het onzichtbaar, dan bouwt de
+     volgende alsnog de poort die er nooit hoort te komen. */
   assert.ok(s.bewustZonderPoort.some(b => b.soort === 'tenant.uitvoer' && /exit-recht/.test(b.reden)),
     'het besluit staat er als besluit, met de reden');
 

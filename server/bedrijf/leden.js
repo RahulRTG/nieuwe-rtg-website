@@ -47,15 +47,26 @@ module.exports = (sctx) => {
      Het IT-deel (apparaten terug, accounts blokkeren) hangt hier later aan;
      de plek waar dat gebeurt is deze, en niet een tweede knop ergens anders. */
   app.post('/api/bedrijf/lid/uit-dienst', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
+    /* Beheer door een MENS mag ook, en hier is dat geen gemak: aan een sleutel
+       valt geen tweede bevestiging te vragen, en dat is precies wat deze deur
+       nodig heeft zodra iemand aan een REEKS bezig is. Zie ./beheerder.js. */
+    const b = sctx.beheerderVan(req, res); if (!b) return;
+    const w = b.w;
     const l = eigenVeld(w.leden, String(req.body.lidId || ''));
     if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
     if (l.status === 'uit dienst') return res.status(409).json({ error: 'Dit lid staat al uit dienst.' });
     const reden = schoon(req.body.reden, 120);
     if (!reden) return res.status(400).json({ error: 'Noteer waarom dit lidmaatschap eindigt; een lege uitstroom is later niet te reconstrueren.' });
+    /* DE POORT PAS NA DE INHOUDELIJKE WEIGERINGEN: een bevestiging vragen voor
+       iets dat toch niet doorgaat, verspeelt hem. Een uitdiensttreding is er
+       EEN, en dus altijd licht -- tot het tempobudget over is. Daar zit de hele
+       waarde van deze poort: niet in deze handeling, maar in de reeks. */
+    const poort = sctx.poortVoor(req, res, b, { soort: 'mens.uitdienst', aantal: 1, doel: l.id });
+    if (!poort) return;
     l.status = 'uit dienst'; l.token = null; l.uitReden = reden; l.uitAt = nu();
     l.laatsteDag = schoon(req.body.laatsteDag, 10) || dag();
     save();
+    sctx.naAfloop(b, poort, { soort: 'mens.uitdienst', aantal: 1, doel: l.id });
     res.json({ ok: true, lid: { id: l.id, naam: l.naam, status: l.status, laatsteDag: l.laatsteDag },
       let: 'De sleutel is per direct ingetrokken. Wat er van deze persoon in de werkruimte staat blijft staan, met zijn naam erbij -- werk uitwissen maakt een dossier onleesbaar.' });
   });

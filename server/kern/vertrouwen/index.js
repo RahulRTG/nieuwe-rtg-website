@@ -24,13 +24,12 @@
 
 const blootstelling = require('./blootstelling');
 const gewoonte = require('./gewoonte');
+const tempo = require('./tempo');
 const register = require('./register');
 const verificatie = require('./verificatie');
 const stapop = require('./stapop');
 const tweedemoment = require('./tweedemoment');
 const bon = require('./bon');
-const bereik = require('./bereik');
-const staat = require('./staat');
 
 module.exports = ({ db, save }) => {
   /* De bak hangt buiten de werkruimtes, en dat is een besluit: een gewoonte is
@@ -40,8 +39,14 @@ module.exports = ({ db, save }) => {
      nooit voor hem bedoeld was. Dezelfde les als bij de herstelproefruimtes. */
   const bak = () => (db.data.vertrouwen = db.data.vertrouwen || { gewoonte: {} });
 
+  /* De tempo-afspraak van een soort; null als hij er geen heeft. Uit het
+     register en niet uit de opslag: een budget dat een aanvaller kan verzetten
+     is geen budget (zie de kop van tempo.js). */
+  const tempoRegel = (soort) => (register.soort(soort) || {}).tempo || null;
+
   function weeg(actor, soort, aantal) {
-    return blootstelling.meet({ soort, aantal }, gewoonte.lees(bak(), actor, soort));
+    return blootstelling.meet({ soort, aantal }, gewoonte.lees(bak(), actor, soort),
+      tempo.meet(bak(), actor, soort, aantal, tempoRegel(soort)));
   }
 
   /* Een catalogus (soort, aantal, checksum) omrekenen naar een omvang. Deze
@@ -64,7 +69,8 @@ module.exports = ({ db, save }) => {
 
   function voltooid(actor, soort, aantal) {
     const n = gewoonte.noteer(bak(), actor, soort, aantal);
-    if (n !== null) save();
+    const t = tempo.noteer(bak(), actor, soort, aantal, tempoRegel(soort));
+    if (n !== null || t !== null) save();
     return n;
   }
 
@@ -129,17 +135,10 @@ module.exports = ({ db, save }) => {
     return schrijfBon(Object.assign({ blootstelling: u.blootstelling, verificatie: u.verificatie,
       stapop: u.blootstelling && u.blootstelling.stapop, bevestigd: !!u.bevestigd }, extra || {}));
   }
-  const bonnen = (hoeveel) => bon.lees(bak(), hoeveel);
-  /* Laag 6, 7 en 8. Ze LEZEN alleen; er staat geen save() achter. */
-  const bereikVan = (actor, opties) => bereik.van(db.data, actor, opties && opties.rechtenVan);
-  const simuleer = (actor, opties) => bereik.simuleer(db.data, actor, opties || {});
-  const trustState = (handelingen, scanner) => staat.staat(bak(), handelingen, scanner);
-  const bonnenKlopt = () => bon.controleer(bak());
-  /* Het anker: de momentopname van de kop, om BUITEN dit huis weg te zetten.
-     Hij wordt hier gemaakt en niet bewaard -- een anker in dezelfde database is
-     geen anker maar een tweede regel om te wijzigen. */
-  const bonAnker = () => bon.ankerPunt(bak());
-  const bonTegenAnker = (a) => bon.tegenAnker(bak(), a);
+  /* De leeskant (laag 6, 7 en 8) staat in ./rapport.js, en dat is geen
+     opdeling om de lengte: daar staat geen save(), en dat is met een oogopslag
+     te zien in plaats van te moeten geloven. */
+  const lees = require('./rapport')({ db, bak });
 
   /* De bon oplossen. De aanroeper (routes/vertrouwen.js) heeft de mens al
      opnieuw geverifieerd; zie de kop van tweedemoment.js. */
@@ -155,12 +154,13 @@ module.exports = ({ db, save }) => {
      laat niets achter -- anders overleeft het profiel de persoon. */
   function vergeet(actor, sessie) {
     let weg = gewoonte.vergeetActor(bak(), actor);
+    weg += tempo.vergeetActor(bak(), actor);
     weg += verificatie.vergeetSessie(bak(), sessie, actor);
     if (weg) save();
     return weg;
   }
 
-  return { weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, geenPersoon, poort, losBon,
-    schrijfBon, bonNaPoort, bonnen, bonnenKlopt, bonAnker, bonTegenAnker, bereikVan, simuleer, trustState,
-    register, NIET_GEDEKT: gewoonte.NIET_GEDEKT };
+  return Object.assign({ weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan,
+    geenPersoon, poort, losBon, schrijfBon, bonNaPoort, register,
+    NIET_GEDEKT: gewoonte.NIET_GEDEKT.concat(tempo.NIET_GEDEKT) }, lees);
 };

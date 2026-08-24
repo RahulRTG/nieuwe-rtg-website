@@ -26,6 +26,13 @@
    4. DEZE MODULE SCHRIJFT NIETS. Pure functies, buffer erin en oordeel eruit,
       zoals kern/antivirus/analyse.js. Meten mag nooit een bijwerking hebben,
       want deze meter draait vlak voor de handeling zelf.
+   5. EN OMVANG IS NIET ALLES. Vijf keer een handeling die er een raakt, is vijf
+      keer licht -- en samen een zuivering. Die tweede vraag wordt hier NIET
+      beantwoord maar meegekregen: `tempo` komt uit kern/vertrouwen/tempo.js en
+      kan de zwaarte optillen. Waarom dat naar `uitzonderlijk` gaat en niet naar
+      `zwaar`, staat in de kop daar; het komt erop neer dat een zware handeling
+      na een bevestiging een kwartier vrij spel heeft, en dat kwartier is
+      precies waar een reeks in past.
    ========================================================================== */
 'use strict';
 
@@ -42,6 +49,7 @@ const WAARNEMINGEN_NODIG = 20;
 const VEEL = 5;
 
 const getal = (n) => (typeof n === 'number' && Number.isFinite(n) && n >= 0);
+const eenheidVan = (s, n) => (n === 1 && s.eenheidEen ? s.eenheidEen : s.eenheid);
 
 /* De grondslag: waar meten we tegen af, en waarom die en niet de andere. */
 function grondslagVan(s, eigen) {
@@ -58,7 +66,7 @@ function grondslagVan(s, eigen) {
 /* De kern. `eigen` is de waargenomen gewoonte van DEZE actor voor DEZE soort,
    of null; hij komt uit gewoonte.js en niet uit dit bestand, zodat de meter
    zelf geen geheugen heeft en met verzonnen invoer te ijken is. */
-function meet(handeling, eigen) {
+function meet(handeling, eigen, tempo) {
   const h = handeling || {};
   const s = R.soort(h.soort);
   if (!s) return {
@@ -85,7 +93,11 @@ function meet(handeling, eigen) {
   /* EN DE ONDERGRENS VAN DE SOORT WINT ALS HIJ HOGER LIGT. Sommige handelingen
      zijn al bij het eerste exemplaar onherstelbaar; het aantal zegt daar niets
      over. Zie register.js bij `minstens`. */
-  const zwaarte = R.BANDEN.indexOf(s.minstens) > R.BANDEN.indexOf(gerekend) ? s.minstens : gerekend;
+  let zwaarte = R.BANDEN.indexOf(s.minstens) > R.BANDEN.indexOf(gerekend) ? s.minstens : gerekend;
+  /* EN HET TEMPO TILT OOK OP. Boven het budget is de handeling uitzonderlijk,
+     hoe klein hij op zichzelf ook is -- dat is het hele punt van een reeks. */
+  const doorTempo = !!(tempo && tempo.over);
+  if (doorTempo) zwaarte = 'uitzonderlijk';
 
   /* `redenen` legt een ONDERBREKING uit, en er is er geen als de handeling licht
      is. Zou hij ook dan vullen, dan krijgt een mens bij elke gewone handeling
@@ -96,14 +108,19 @@ function meet(handeling, eigen) {
      zichtbaar voor wie het narekent. Alleen het praatje blijft weg. */
   const redenen = [];
   if (zwaarte !== 'licht') {
-    redenen.push('Deze handeling raakt ' + h.aantal + ' ' + s.eenheid + ' -- ' +
+    /* WIE HET OORDEEL VELDE, STAAT VOORAAN. Besliste het tempo, dan is "0,2x de
+       vaste grens" de eerste zin die de lezer ziet -- en die leest als een
+       geruststelling terwijl er net een poort dichtging. De omvang blijft er
+       wel bij staan, want hij is waar; hij staat alleen niet meer bovenaan. */
+    if (doorTempo) redenen.push(tempoZin(s, tempo));
+    redenen.push('Deze handeling raakt ' + h.aantal + ' ' + eenheidVan(s, h.aantal) + ' -- ' +
       Math.round(factor * 10) / 10 + 'x ' +
       (g.soort === 'eigen' ? 'uw eigen normale bereik' : 'de vaste grens') + ' van ' +
       Math.round(drempel) + '.');
     if (g.reden) redenen.push(g.reden);
     if (s.gevoelig) redenen.push('Het gaat om bijzondere persoonsgegevens, dus de grens ligt op de helft.');
     if (!s.omkeerbaar) redenen.push('Deze handeling is niet terug te draaien. ' + (s.waaromNiet || ''));
-    if (zwaarte !== gerekend) redenen.push(s.waaromMinstens ||
+    if (!doorTempo && zwaarte !== gerekend) redenen.push(s.waaromMinstens ||
       'Deze soort handeling telt altijd als ' + s.minstens + ', ongeacht het aantal.');
   }
 
@@ -121,7 +138,8 @@ function meet(handeling, eigen) {
     omkeerbaar: s.omkeerbaar,
     gevoelig: s.gevoelig,
     redenen,
-    zin: zin(s, h.aantal, zwaarte, factor, g, zwaarte !== gerekend),
+    tempo: tempo || null,
+    zin: doorTempo ? tempoZin(s, tempo) : zin(s, h.aantal, zwaarte, factor, g, zwaarte !== gerekend),
     nietGerekend: R.NIET_GEREKEND
   };
 }
@@ -129,8 +147,6 @@ function meet(handeling, eigen) {
 /* EEN zin, en niet een lijst. VERTROUWEN.md par. 3.7: kan een step-up niet in
    een zin worden uitgelegd, dan is het geen step-up maar ruis. Deze zin is wat
    een mens te zien krijgt; `redenen` is wat eronder staat als hij doorklikt. */
-const eenheidVan = (s, n) => (n === 1 && s.eenheidEen ? s.eenheidEen : s.eenheid);
-
 function zin(s, aantal, zwaarte, factor, g, doorGrens) {
   const wat = 'Deze handeling raakt ' + aantal + ' ' + eenheidVan(s, aantal);
   if (zwaarte === 'licht') return wat + ' en blijft binnen het gewone bereik.';
@@ -147,4 +163,13 @@ function zin(s, aantal, zwaarte, factor, g, doorGrens) {
     (s.omkeerbaar ? '.' : ', en het is niet terug te draaien.');
 }
 
-module.exports = { meet, WAARNEMINGEN_NODIG, VEEL };
+/* De zin bij een overschreden budget. Hij noemt het TOTAAL en niet deze ene
+   handeling, want dat is precies wat de lezer niet zelf ziet: de handeling voor
+   zich is klein, en dat is de reden dat hij hier voor stond. */
+function tempoZin(s, t) {
+  return 'Dit brengt uw totaal op ' + t.metDeze + ' ' + eenheidVan(s, t.metDeze) +
+    ' in ' + t.vensterUren + ' uur; daarboven ' + (t.budget === 1 ? 'is er' : 'zijn er') + ' ' +
+    t.budget + ' ' + eenheidVan(s, t.budget) + ' afgesproken. Een reeks kleine handelingen is ook een grote.';
+}
+
+module.exports = { meet, tempoZin, WAARNEMINGEN_NODIG, VEEL };

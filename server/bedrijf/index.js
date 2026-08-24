@@ -124,12 +124,11 @@ module.exports = (kern) => {
      over de 10 kB van keuringsregel 13, en de naad is echt: hier staat de
      werkruimte, daar staan de mensen erin. */
 
-  // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest
-  // gebruikt, beheerder mag daarna ook een MENS zijn en leest rollenVan, en
-  // start zet de blokkenregistratie waar de rest zich op meldt)
-  require('./leden')(sctx);
+  // de deellagen; de volgorde is gedrag: rollen zet de poort, beheerder leest
+  // rollenVan, leden gebruikt beide bij het uit dienst zetten.
   Object.assign(sctx, require('./rollen')(sctx));
   Object.assign(sctx, require('./beheerder')(sctx));
+  require('./leden')(sctx);
   require('./start')(sctx);
   Object.assign(sctx, require('./wieis')(sctx));
   Object.assign(sctx, require('./project')(sctx));
@@ -170,8 +169,7 @@ module.exports = (kern) => {
   require('./inzicht')(sctx);
   /* Handelen via de commandobalk. Als LAATSTE, want hij leunt op de poort van
      rollen.js, op zetWie() van wieis.js en op de bakken van taak.js en
-     service.js -- en hij schrijft in die bakken en niet in een eigen opslag
-     ernaast. */
+     service.js -- en schrijft daarin, niet in een eigen opslag ernaast. */
   require('./handeling')(sctx);
   /* De gevolgsimulatie: wat blijft er open als deze wijziging doorgaat. Leest
      alle bakken hierboven en schrijft in geen enkele -- er staat niet eens een

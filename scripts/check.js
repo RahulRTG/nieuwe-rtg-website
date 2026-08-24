@@ -428,12 +428,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        Zo hoort deze lijst te krimpen: niet door de grens te verzetten. */
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
-    /* server/kern/pay/index.js STOND HIER en is er weer af. Twee onderwerpen
+    /* server/kern/pay/index.js STOND HIER en is er weer af. Drie onderwerpen
        eruit: de stand van de laag (de drie schakelaars uit de omgeving en de
-       zes bedragen, ./stand.js) en alles wat eruit komt zonder dat er geld
-       beweegt (./kijken.js). pasToe, boek en boekAsync bleven met opzet staan:
-       WETTEN.json handhaaft de wet geld-conservatie in dit bestand en wijst met
-       zijn sabotagerecept EEN REGEL uit pasToe() aan, met bestandsnaam erbij. */
+       zes bedragen, ./stand.js), alles wat eruit komt zonder dat er geld
+       beweegt (./kijken.js), en sinds 24 augustus ook de drie functies die een
+       cent verplaatsen (./boeken.js).
+       Die laatste bleven twee rondes staan omdat WETTEN.json de wet
+       geld-conservatie hier handhaafde en zijn sabotagerecept EEN REGEL uit
+       pasToe() aanwijst, met bestandsnaam erbij. Bij de knip zijn de
+       bestandsnaam en de handhaverlijst meeverhuisd naar boeken.js en is de
+       regel zelf letterlijk gelijk gebleven -- anders wijst de wet naar een
+       verplaatste regel en toetst ze niets meer. */
     /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
        De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
        comm-deuren, auth, vergeten), de zes van de werkplaats-ronde

@@ -52,7 +52,13 @@ const TOETSEN = [
   'test/grafsteen.pg.test.js',
   'test/pg-wachten.test.js',
   'test/grand-integratie.pg.test.js',
-  'test/sloophamer.pg.test.js'
+  'test/sloophamer.pg.test.js',
+  /* Deze staat er anders in dan de rest: hij is niet HELEMAAL zelf-poortend.
+     Zes van zijn zeven rondes draaien op SQLite en horen bij `npm test`; alleen
+     de zevende vraagt een echte Postgres, want of een `timestamptz` het tijdstip
+     van een pay-regel aanneemt is nergens anders te meten. Hij staat hier zodat
+     die zevende ook echt een keer draait -- precies waar deze lijst voor is. */
+  'test/pay-grootboek.test.js'
 ];
 
 /* NUL TOETSEN IS GEEN GROEN.

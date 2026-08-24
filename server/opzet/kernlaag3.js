@@ -126,6 +126,10 @@ Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
 Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten,
+  /* De weg naar het transactiegrootboek voor de zichtbare boekingshistorie
+     (TAKEN.md 4.39). Zelfde weg als orders, boekingen en de twee
+     directpay-collecties; de reden staat bij pasToe in kern/pay/index.js. */
+  payBoekingenVoegToe: require('../db').payBoekingenVoegToe,
   // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt
   betaaldienstKosten: c => (kern.betaaldienstKosten ? kern.betaaldienstKosten(c) : 0) }));
 /* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische

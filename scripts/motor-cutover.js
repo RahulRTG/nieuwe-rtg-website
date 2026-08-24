@@ -51,6 +51,8 @@ async function motorStatus() {
   };
   const { pay } = require('../server/kern/pay')({
     db, save() {}, crypto, betaal: demoBetaal,
+    // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
+    payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db),
     betaalOpdrachten: maakOpdrachten(db),
     keyVanCodenaam: () => null, sseToCustomer() {},
     schoon: (s, n) => String(s == null ? '' : s).slice(0, n || 120),
@@ -109,6 +111,8 @@ async function motorStatus() {
   const db2 = { data: {} };
   const { pay: pay2 } = require('../server/kern/pay')({
     db: db2, save() {}, crypto, betaal: demoBetaal,
+    // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
+    payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db2),
     betaalOpdrachten: maakOpdrachten(db2),
     keyVanCodenaam: () => null, sseToCustomer() {},
     schoon: (s, n) => String(s == null ? '' : s).slice(0, n || 120),

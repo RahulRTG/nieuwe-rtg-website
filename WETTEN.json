@@ -382,19 +382,19 @@
         "anker": "Een tweede boekhouding"
       },
       "handhaver": [
-        "server/kern/pay/index.js",
+        "server/kern/pay/boeken.js",
         "test/geld-conservatie-last.test.js"
       ],
       "sabotage": {
         "wat": "boek de tik wel BIJ de ontvanger maar niet AF bij de zender -- dan komt er geld bij dat nooit is opgeladen",
-        "bestand": "server/kern/pay/index.js",
+        "bestand": "server/kern/pay/boeken.js",
         "zoek": "    saldi()[rij.van] = saldoVan(rij.van) - rij.centen;",
         "zet": "    saldi()[rij.van] = saldoVan(rij.van);",
         "wachters": [
           "test:test/geld-conservatie-last.test.js"
         ]
       },
-      "kanttekening": "Twee recepten eerder afgeslagen, en die twee zeggen iets. zorgSaldo() laadt automatisch bij, dus de saldocontrole daar weigert bijna nooit; en de ondergrens in het grootboek wordt in deze route nooit geraakt, juist omdat er eerst is bijgeladen. Wat de conservatie werkelijk draagt is pasToe(), en daar zit het recept nu op."
+      "kanttekening": "Twee recepten eerder afgeslagen, en die twee zeggen iets. zorgSaldo() laadt automatisch bij, dus de saldocontrole daar weigert bijna nooit; en de ondergrens in het grootboek wordt in deze route nooit geraakt, juist omdat er eerst is bijgeladen. Wat de conservatie werkelijk draagt is pasToe(), en daar zit het recept nu op. Die functie verhuisde op 24 augustus van kern/pay/index.js naar kern/pay/boeken.js (de schrijvende kant van de laag, tegenover kijken.js als de lezende); de regel waar het recept op zit is letterlijk dezelfde gebleven."
     },
     {
       "id": "geld-geen-autonome-betalingen",

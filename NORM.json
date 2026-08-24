@@ -8,7 +8,7 @@
     "dependencies": 0,
     "testbestanden": 905,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 18,
+    "zelfpoortendeToetsen": 19,
     "e2eBestanden": 126,
     "keuringOmvang": 159,
     "keuringDubbeling": 115,
@@ -466,6 +466,12 @@
       "meter": "keuringBeter -> keuringOmvang / keuringDubbeling / keuringDekkingAdvies",
       "reden": "keuringBeter was een geblende teller van drie onvergelijkbare dingen en kon daardoor niet ratelen: een daling in de ene groep maskeerde een stijging in de andere, en het getal liep sowieso op zodra er een legitiem bestand bij kwam. Precies zo dook de dubbeling van teVaak() (drie kopieen van dezelfde rate limiter, waarvan er geen enkele werd opgeruimd) onder in het totaal. Vervangen door drie losse meters, elk met een eigen richting; verrekenen tussen groepen kan niet meer.",
       "eerlijkheidshalve": "De som stond op 126 toen de norm werd vastgelegd en op 130 toen hij werd gesplitst. Over die vier is geen ratel meer die klaagt. Ze zijn ontstaan door bestanden toe te voegen, niet door iets te laten verslechteren, en de enige inhoudelijke van de vijf (teVaak) is opgelost door de vier rate limiters op server/pinslot.js samen te voegen. Wie de oude, strengere som terug wil: zet keuringBeter terug in scripts/norm.js met grondwaarde 126 en knip vier bestanden op die vlak onder de 10 kB-grens zitten."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "zelfpoortendeToetsen 18 -> 19",
+      "reden": "Met de hand verhoogd, en dat is het verlagen van de lat -- dus met de reden erbij. TAKEN.md 4.39 bracht payBoekingen in het transactiegrootboek. De fout die daaronder zat is alleen in Postgres zichtbaar: een pay-regel draagt `at` als GETAL (Date.now()) terwijl de grootboekkolom een timestamptz is, en beide wegen naar het grootboek slikken de mislukte insert (txLedgerZet vangt hem, de veegronde meldt alleen \"veegronde mislukt\"). Netto geeft /api/pay/stuur 200, klopt het saldo, en staat er geen enkele rij -- gemeten tegen een echte Postgres, met en zonder de reparatie. In SQLite is de kolom TEKST en gaat een getal er gewoon in, dus daar is de fout onzichtbaar. De enige toets die dat kan aantonen vraagt een echte database en poort zichzelf, net als de elf andere pg-toetsen.",
+      "eerlijkheidshalve": "Deze meter bestaat omdat acht pg-toetsbestanden maandenlang meetelden als dekking zonder ooit te draaien. Dat risico is hier gedekt op de manier die daarvoor bedacht is: het bestand staat in scripts/pgtoetsen.js en krijgt daar een eigen wegwerpdatabase, en keuringsregel 25 zakt zodra een zelf-poortende toets NIET in die draaier staat. De ronde is ook echt gedraaid (tegen PostgreSQL 16, met de mutatie op tijdstipVan gezien zakken), en zes van de zeven rondes in datzelfde bestand poorten zichzelf niet en draaien gewoon mee in npm test. Wie de tand terug op 18 wil: dat kan alleen door de pg-ronde te schrappen, en dan is de duurste fout van deze taak weer ongetoetst."
     }
   ],
   "prestatie": {

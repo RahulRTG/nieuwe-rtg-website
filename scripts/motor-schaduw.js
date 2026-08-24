@@ -22,7 +22,9 @@ function maakJsEngine() {
     async maakUitbetaling() { return { status: 'betaald', id: 'uit' + crypto.randomBytes(4).toString('hex') }; },
   };
   const keyVanCodenaam = async (c) => (leden.has(c) ? { key: 'k_' + c } : null);
-  const { pay } = require('../server/kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer: () => {}, schoon, betaaldienstKosten: () => 0 });
+  // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
+  const { pay } = require('../server/kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer: () => {}, schoon, betaaldienstKosten: () => 0,
+    payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db) });
   return { pay, registreer: (c) => leden.add(c), saldi: () => db.data.paySaldi || {} };
 }
 

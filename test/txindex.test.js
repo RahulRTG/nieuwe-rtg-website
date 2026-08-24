@@ -84,3 +84,34 @@ test('boekingen: zelfde semantiek + de 50000-cap knipt zonder kopie per toevoegi
   boekingenVoegToe(dubbel);
   assert.equal(boekingMetRef('RTG-B-7'), dubbel, 'de nieuwste met die ref wint, zoals .find op nieuwste-eerst');
 });
+
+/* ==========================================================================
+   EEN COLLECTIE DIE NOG NIET BESTAAT (TAKEN.md 4.39).
+
+   txBouw begint met `db.data[naam] || []`. Bestaat de collectie nog niet -- een
+   verse database, of een stand waarin nog nooit iets van dit soort is gemaakt --
+   dan was die `[]` een LOSSE array die nergens aan hing. Het item ging er netjes
+   in, txVoegToe gaf geen fout, en bij de volgende lezing bouwde txZorg opnieuw
+   op de nog steeds afwezige collectie. Het item was dan weg, zonder een spoor.
+
+   Elke bestaande aanroeper ontliep dat toevallig: directpay heeft een eigen
+   ensure(), de pay-kern heeft grootboek(), en orders en boekingen bestaan al
+   door de seed. Toevallig is geen bescherming -- de vijfde collectie
+   (payBoekingen) had dat toeval niet, en zo kwam dit boven.
+   ========================================================================== */
+test('een toevoeging aan een collectie die nog niet bestaat, gaat niet verloren', () => {
+  const { payBoekingenVoegToe, payBoekingMetId } = require('../server/db');
+  delete db.data.payBoekingen;
+  assert.equal(db.data.payBoekingen, undefined, 'de collectie bestaat echt niet');
+
+  const rij = { id: 'PB-VERS-1', van: 'lid:a', naar: 'lid:b', centen: 250, soort: 'boeking', at: Date.now() };
+  payBoekingenVoegToe(rij);
+
+  assert.ok(Array.isArray(db.data.payBoekingen), 'de collectie hangt nu aan db.data en niet aan een losse array');
+  assert.deepEqual(db.data.payBoekingen.map(x => x.id), ['PB-VERS-1']);
+  assert.equal(payBoekingMetId('PB-VERS-1'), rij, 'en hij is op zijn sleutel terug te vinden');
+
+  // en na een tweede toevoeging staat de eerste er nog steeds
+  payBoekingenVoegToe({ id: 'PB-VERS-2', van: 'lid:b', naar: 'lid:a', centen: 100, soort: 'boeking', at: Date.now() });
+  assert.deepEqual(db.data.payBoekingen.map(x => x.id), ['PB-VERS-2', 'PB-VERS-1'], 'nieuwste eerst, en niets kwijt');
+});

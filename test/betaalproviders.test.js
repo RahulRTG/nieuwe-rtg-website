@@ -80,7 +80,9 @@ test('ook een interne taak kan het pay-grootboek in de uit-stand niet bewegen', 
     const { pay } = require('../server/kern/pay')({
       db, save() {}, bijeen: async werk => werk(), crypto, betaal: {},
       keyVanCodenaam: () => null, sseToCustomer() {}, schoon: x => String(x || ''),
-      betaaldienstKosten: () => 0, betaalOpdrachten: opdrachten
+      betaaldienstKosten: () => 0, betaalOpdrachten: opdrachten,
+      // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
+      payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db)
     });
     const r = await pay.boekAsync({ van: 'extern:test', naar: 'lid:test', centen: 100 });
     assert.equal(r.status, 503);

@@ -124,6 +124,96 @@ test('een harde SIGKILL midden in de betaalstroom verliest geen bevestigde tik e
   }
 });
 
+/* ==========================================================================
+   HET OVERZICHT OVERLEEFT DE CRASH OOK (TAKEN.md 4.39).
+
+   De twee rondes hierboven en hieronder bewaken de SALDI. Die zijn de waarheid,
+   en ze staan in een eigen sleutel (`paySaldi`) die in Postgres-stand bovendien
+   op de snelle rijstrook rijdt. De zichtbare boekingsHISTORIE deed dat niet: die
+   reed als groeiende blob in de trage flush-laan, en bij een harde crash binnen
+   dat venster klopte het saldo wel en ontbrak de regel in het overzicht van het
+   lid. Geen geldfout -- wel een zichtbare inconsistentie die niemand kan
+   uitleggen: "je saldo is 10 euro lager en er staat niets".
+
+   DEZE RONDE MEET TWEE DINGEN, en de tweede is de eigenlijke.
+
+   (1) Na een gewone SIGKILL staat de bevestigde overdracht in het overzicht. Dat
+       is de eis zoals hij in TAKEN.md staat -- maar in de SQLite-stand haalt hij
+       dat ook zonder deze reparatie, want daar commit save() synchroon. Een
+       toets die je niet hebt zien zakken is geen toets (LAT.md regel 4), dus
+       hier hoort er meer te staan.
+
+   (2) Daarom gaat de kv-regel van `payBoekingen` NA de kill ook nog leeg. Dat is
+       geen kunstje: het IS de trage flush-laan, nagebootst in de opslag die we
+       hier wel kunnen draaien. Postgres schrijft de blob uitgesteld weg, dus na
+       een crash binnen dat venster is precies dit wat de herstart aantreft --
+       de saldi bij, de historie achter. Overleeft de regel dat, dan komt hij uit
+       het transactiegrootboek en niet uit de blob, en dat is exact wat 4.39
+       vraagt.
+
+   Waarom niet gewoon tegen een echte Postgres: die draait hier niet in de suite,
+   en een toets die alleen in een omgeving met een database loopt, loopt in de
+   praktijk nooit. De rijen liggen in beide standen in dezelfde tx_ledger, langs
+   dezelfde ledger.js; alleen de achterkant verschilt.
+   ========================================================================== */
+test('na een crash EN een verloren historie-blob staat de bevestigde overdracht nog in het overzicht', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kill3-'));
+  const geschiedenis = (base, tok) => api(base, 'pay/overzicht', {}, tok).then(r => r.body.geschiedenis || []);
+  let srv = null;
+  try {
+    srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
+    const A = await login(srv.base, 'rtg');
+    const B = await login(srv.base, 'lifestyle');
+    await api(srv.base, 'pay/oplaad', { centen: 50000, idem: 'op-g1' }, A.token);
+
+    const OMS = 'grootboekproef';
+    const r = await api(srv.base, 'pay/stuur', { aan: B.codenaam, centen: 2500, oms: OMS, idem: 'g-1' }, A.token);
+    assert.equal(r.status, 200, 'de overdracht wordt bevestigd');
+    const voor = await geschiedenis(srv.base, A.token);
+    const regel = voor.find(x => x.oms === OMS);
+    assert.ok(regel, 'de bevestigde overdracht staat voor de crash in het overzicht');
+    const saldoVoor = await saldo(srv.base, A.token);
+
+    // ---- de HARDE crash ----
+    stop(srv.child);
+    await new Promise(r2 => setTimeout(r2, 300));
+
+    /* ---- en dan de trage flush-laan: de historie-blob is er niet doorheen ----
+       We zetten de kv-regel op een lege lijst in plaats van hem te verwijderen:
+       een verdwenen sleutel zou de collectie ONBEKEND maken, en dat is een andere
+       situatie dan een achtergebleven schrijf. De saldi en de idem-boeken blijven
+       staan -- die reden in Postgres al op de snelle rijstrook. */
+    const { DatabaseSync } = require('node:sqlite');
+    const kv = new DatabaseSync(path.join(TMP, 'store.db'));
+    const had = kv.prepare('SELECT val FROM kv WHERE key = ?').get('payBoekingen');
+    assert.ok(had && had.val && had.val !== '[]', 'de historie stond echt in de kv-blob (anders meet deze ronde niets)');
+    kv.prepare('UPDATE kv SET val = ? WHERE key = ?').run('[]', 'payBoekingen');
+    kv.close();
+
+    // ---- herstart: het venster wordt uit het grootboek bijgevuld ----
+    srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
+    /* vensterTopUp draait bij het opstarten naast het luisteren, dus even
+       geduld -- begrensd, want een onbegrensde wachtlus is geen toets. */
+    let na = [];
+    for (let i = 0; i < 60 && !na.some(x => x.oms === OMS); i++) {
+      na = await geschiedenis(srv.base, A.token);
+      if (!na.some(x => x.oms === OMS)) await new Promise(r2 => setTimeout(r2, 200));
+    }
+    const terug = na.find(x => x.oms === OMS);
+    assert.ok(terug, 'de bevestigde overdracht is uit het transactiegrootboek teruggekomen in het overzicht');
+    assert.equal(terug.id, regel.id, 'en het is dezelfde regel, niet een nieuwe');
+    assert.equal(terug.centen, regel.centen, 'met hetzelfde bedrag');
+    assert.equal(await saldo(srv.base, A.token), saldoVoor, 'het saldo is onaangeroerd gebleven');
+
+    // de tegenkant ziet hem ook: het overzicht filtert op allebei de rekeningen
+    const bNa = await geschiedenis(srv.base, B.token);
+    assert.ok(bNa.some(x => x.id === regel.id), 'de ontvanger vindt dezelfde regel terug');
+  } finally {
+    try { stop(srv && srv.child); } catch (e) {}
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('conservatie houdt ook als de crash midden in een burst van tikken valt', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kill2-'));
   /* `srv` staat BUITEN de try zodat de finally hem kan stoppen. Zie de finally

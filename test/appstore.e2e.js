@@ -31,6 +31,27 @@ const path = require('path');
    STARTEN in plaats van te laden, loopt alle kandidaten af en slaat pas over als
    er echt geen browser opengaat. Een eigen pad ernaast maakt van "kies een
    browser" weer een vraag met twee antwoorden (LAT-regel 4). */
+/* DE SESSIE WORDT GEZAAID MET addInitScript EN NIET DOOR EERST /apps/app.html TE
+   OPENEN. Dat scheelde niet alleen een paginalading: app.html registreert de
+   service worker, en daarna bedient DIE elke volgende navigatie. De server ziet
+   dan geen `Sec-Fetch-Mode: navigate` meer maar een gewone fetch, en noteert het
+   scherm als NEVENVERZOEK in plaats van als bezoek (server/routelog.js,
+   soortVan). Gevolg: scripts/schermen.js zag alle vier de App Store-schermen als
+   "wel opgehaald, nooit afgelegd" en de schermdekking zakte -- terwijl deze
+   toetsen die schermen wel degelijk doorlopen.
+
+   addInitScript zet de sleutel vóór het eerste script van de pagina waar we
+   werkelijk heen gaan. Geen service worker ertussen, en de navigatie is een
+   navigatie. Dat is ook wat de andere schermtoetsen in dit huis doen.
+
+   DE try/catch ERBIJ IS GEEN SLORDIGHEID MAAR HET BEWIJS. Een init-script draait
+   in ELK frame, dus ook in de cel -- en daar bestaat localStorage niet, want die
+   draait op een naamloze herkomst zonder allow-same-origin. De browser zegt het
+   met zoveel woorden: "The document is sandboxed and lacks the
+   'allow-same-origin' flag." Precies wat grens 1 belooft. Zonder de catch komt
+   die weigering als onopgevangen fout in de lijst en zakt de celtoets op zijn
+   eigen sandbox. Zakt het zetten op de RTG-pagina zelf, dan valt de toets alsnog
+   om op elke bewering die een sessie nodig heeft. */
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
@@ -106,8 +127,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = letOpFouten(page, []);
-    await page.goto(base + '/apps/app.html');
-    await page.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
+    await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, lid);
     await page.goto(base + '/apps/appcel.html?app=cel-proef');
 
     await page.waitForSelector('iframe', { timeout: 15000 });
@@ -184,8 +204,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     // ---- de winkel in de Mall ----
     const page = await browser.newPage();
     const fouten = letOpFouten(page, []);
-    await page.goto(base + '/apps/app.html');
-    await page.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
+    await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, lid);
     await page.goto(base + '/apps/mall.html');
     await page.waitForSelector('#asGrid .boutiek', { timeout: 20000 });
     assert.deepEqual(fouten, [], 'de Mall boot zonder onopgevangen fouten');
@@ -230,8 +249,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     // ---- het uitgeversbureau ----
     const p2 = await browser.newPage();
     const f2 = letOpFouten(p2, []);
-    await p2.goto(base + '/apps/app.html');
-    await p2.evaluate((t) => localStorage.setItem('rtg_sup_token', t), sup);
+    await p2.addInitScript((t) => { try { localStorage.setItem('rtg_sup_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, sup);
     await p2.goto(base + '/apps/appstore-uitgever.html');
     await p2.waitForSelector('#mSleutel', { timeout: 20000 });
     assert.deepEqual(f2, [], 'het uitgeversbureau boot zonder onopgevangen fouten');
@@ -262,8 +280,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
        adres nodig heeft dat hij kan bewaren en doorsturen. ---- */
     const p3 = await browser.newPage();
     const f3 = letOpFouten(p3, []);
-    await p3.goto(base + '/apps/app.html');
-    await p3.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
+    await p3.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, lid);
 
     await p3.goto(base + '/apps/appstore-dossier.html?app=winkel-proef');
     await p3.waitForSelector('main .kaart h2', { timeout: 20000 });
@@ -332,8 +349,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     /* ---- eerst de keuringskant: hier moet een MENS aftekenen ---- */
     const kp = await browser.newPage();
     const kf = letOpFouten(kp, []);
-    await kp.goto(base + '/apps/app.html');
-    await kp.evaluate((t) => localStorage.setItem('rtg_office_token', t), office);
+    await kp.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, office);
     await kp.goto(base + '/apps/appstore-kantoor.html');
     await kp.waitForSelector('[data-v] .pub', { timeout: 20000 });
     assert.deepEqual(kf, [], 'de keuringspagina boot zonder onopgevangen fouten');
@@ -362,8 +378,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     /* ---- en dan de winkel: de bon voordat er wordt betaald ---- */
     const page = await browser.newPage();
     const fouten = letOpFouten(page, []);
-    await page.goto(base + '/apps/app.html');
-    await page.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
+    await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, lid);
     await page.goto(base + '/apps/mall.html');
     await page.waitForSelector('#asGrid .asKoop', { timeout: 20000 });
     assert.deepEqual(fouten, [], 'de Mall boot zonder onopgevangen fouten');

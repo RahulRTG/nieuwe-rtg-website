@@ -35,6 +35,7 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const manifest = require('./bronmanifest');
+const klok = require('./klok');            // sinds()/verstreken(): duur hoort op de monotone klok
 
 /* EEN kasmap, niet een per boom.
 
@@ -94,9 +95,15 @@ function geheugen({ naam, sleutel, bereken, naarTekst, vanTekst }) {
     if (e.code !== 'ENOENT') tellers.fout++;   // stuk of onleesbaar telt apart van "nog niet gezien"
     else tellers.mis++;
   }
-  const begon = Date.now();
+  /* DUUR OP DE MONOTONE KLOK. Dit is het bedrag dat de kas beweert te besparen,
+     en het stond op de wandklok: springt die tijdens een lange berekening (NTP,
+     wintertijd, RTG_KLOK in een toets), dan telt hij er uren bij op of gaat hij
+     negatief. Een teller die een sprong van het besturingssysteem als besparing
+     opschrijft, is geen meter. klok.sinds() begint bij elke start opnieuw bij
+     nul en loopt alleen vooruit -- precies wat een duur nodig heeft. */
+  const begon = klok.sinds();
   const vers = bereken();
-  tellers.bespaardMs += Date.now() - begon;
+  tellers.bespaardMs += klok.verstreken(begon);
   /* Schrijven via een tijdelijk bestand en een rename: twee servers die
      tegelijk starten (en dat zijn er hier vier) mogen elkaar geen halve kas
      laten lezen. Mislukt het schrijven, dan is dat geen fout -- we hebben de

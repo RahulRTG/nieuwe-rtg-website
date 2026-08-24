@@ -62,7 +62,11 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { spawnSync } = require('child_process');
+/* Loopt op per aanroep, zodat twee motoren naast elkaar (en twee aanroepen achter
+   elkaar) elkaars uitslagbestand niet overschrijven. */
+let uitTeller = 0;
 
 const WORTEL = path.join(__dirname, '..');
 const TEST = path.join(WORTEL, 'test');
@@ -358,7 +362,38 @@ for (const sein of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
 process.on('uncaughtException', (e) => { zetTerug(); console.error(e); process.exit(1); });
 process.on('exit', zetTerug);
 
-/* TWEE VERSCHILLENDE WACHTTIJDEN, en het verschil komt uit een vastloper.
+/* DE UITSLAG GAAT NAAR EEN BESTAND EN NIET DOOR EEN PIJP, en dat is geen
+   opruiming maar de reparatie van een vastloper die de motor uren kostte.
+
+   spawnSync met `encoding` geeft het kind een PIJP voor stdout, en hij komt pas
+   terug als die pijp DICHT is. Dicht gaat hij pas als iedereen die hem open
+   heeft klaar is -- en dat is niet alleen het kind. `node --test` draait zijn
+   toetsbestand in een eigen proces, en zo'n toets start hier vaak een server als
+   KLEINKIND. Dat kleinkind erft fd 1. Blijft het draaien nadat de toets zijn
+   uitslag heeft gedrukt, dan staat de motor te wachten op een pijp van een proces
+   waar hij niets meer van wil.
+
+   GEMETEN op een nagebouwd geval: een kind dat in 50 milliseconde klaar is en een
+   kleinkind achterlaat, kost via een pijp de VOLLE time-out -- 2004 ms op een
+   time-out van 2000 -- en komt terug met ETIMEDOUT. Via een bestand: 58 ms, geen
+   fout, dezelfde uitslag. In deze motor staat die time-out op 240 seconde, en
+   `tijdout` betekent in proefPuur() "te langzaam". Een toets die prima draaide en
+   zijn asserties netjes meldde, kan zo vier minuten opgehouden worden en daarna
+   ALS ONMEETBAAR worden weggeschreven.
+
+   Een bestand heeft dat probleem niet: daar is niets te draineren, dus spawnSync
+   wacht alleen op het KIND en de time-out doet wat hij belooft.
+
+   EN WAT DIT NIET IS, want ik dacht eerst van wel. test/lokaal-tls.test.js hield
+   de motor zes minuten bezig, en dat leek dit geval. Het was het niet: die toets
+   draait los in 0,34 seconde, maar de MUTATIE laat hem hangen, en dan betaalt de
+   motor terecht zijn 90 seconde plus de herkansing met --test-force-exit. Dat is
+   geen fout maar de prijs van het onderscheid tussen "hij komt er niet uit" en
+   "geen assertie zag het". De reparatie hieronder haalt die zes minuten dus NIET
+   weg. Wat er wel is waargenomen: een wees van 66 megabyte die vijf en een halve
+   minuut na zijn ouder nog draaide -- daar gaat `detached` over.
+
+   TWEE VERSCHILLENDE WACHTTIJDEN, en het verschil komt uit een vastloper.
 
    test/redis.test.js sluit onder een mutatie in server/redis.js niet meer af: de
    toets houdt een handle open die bij het gewijzigde gedrag nooit wordt
@@ -385,8 +420,15 @@ function draaiToets(bestand, env, wacht, forceer) {
      leunt, meet de standaardinstelling (LAT regel 10). */
   const vlaggen = ['--experimental-sqlite', '--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
-  const r = spawnSync('node', vlaggen.concat([bestand]), {
-    cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
+  const uitPad = path.join(os.tmpdir(), 'rtg-mutatie-' + process.pid + '-' + (uitTeller++) + '.tap');
+  const fd = fs.openSync(uitPad, 'w+');
+  let r;
+  try {
+  r = spawnSync('node', vlaggen.concat([bestand]), {
+    cwd: WORTEL, timeout: wacht || WACHT_NUL,
+    /* stdin dicht (een toets die om invoer vraagt hoort te falen, niet te
+       wachten), stdout en stderr naar hetzelfde bestand -- zie de kop hierboven. */
+    stdio: ['ignore', fd, fd],
     /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
        lek dat ik heb zien ontstaan. Bij een time-out stuurt spawnSync SIGTERM,
        en juist de toetsen die hier vastlopen (test/redis.test.js) blijven hangen
@@ -395,10 +437,25 @@ function draaiToets(bestand, env, wacht, forceer) {
        maar EEN kan hebben: de eerste was een wees van een afgelopen time-out.
        Over een ronde van uren stapelen die zich op, houden ze poorten en geheugen
        vast, en vervuilen ze de metingen die erna komen. */
+    /* Een eigen procesgroep, zodat de opruiming hieronder niet alleen het kind
+       maar ook de kleinkinderen bereikt. Zonder dit gaat SIGKILL naar `node
+       --test` en blijft de server die de toets startte gewoon draaien: over een
+       ronde van uren stapelen die zich op en houden ze poorten en geheugen vast. */
+    detached: true,
     killSignal: 'SIGKILL',
     env: Object.assign({}, process.env, env || {})
   });
-  const uit = String(r.stdout || '');
+  } finally { try { fs.closeSync(fd); } catch (e) {} }
+  /* De hele groep opruimen, ook als spawnSync gewoon klaar was: een toets mag een
+     server achterlaten, deze motor mag dat niet. ESRCH betekent dat de groep al
+     weg is en dat is de normale afloop. Op Windows bestaan procesgroepen zo niet;
+     daar blijft het gedrag als voorheen. */
+  if (r && r.pid && process.platform !== 'win32') {
+    try { process.kill(-r.pid, 'SIGKILL'); } catch (e) { if (e.code !== 'ESRCH') throw e; }
+  }
+  let uit = '';
+  try { uit = fs.readFileSync(uitPad, 'utf8'); } catch (e) { uit = ''; }
+  try { fs.unlinkSync(uitPad); } catch (e) {}
   const gezakt = (uit.match(/^not ok /gm) || []).length;
   const geteld = /^# tests (\d+)/m.exec(uit);
   /* OOK DE OVERGESLAGEN TOETSEN TELLEN, en dat is geen bijzaak. Een bestand dat

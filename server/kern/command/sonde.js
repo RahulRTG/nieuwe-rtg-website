@@ -24,6 +24,7 @@
    bestaat en niet erin: de tellers in meting.js beginnen bij elke herstart op
    nul, en juist een herstart is wat je wilt kunnen zien. */
 'use strict';
+const klok = require('../../lib/klok');   // sinds()/verstreken(): duur hoort op de monotone klok
 
 const MAX_MONSTERS = 3000;
 const STANDAARD_UREN = 24;
@@ -53,7 +54,7 @@ function maakSonde({ db, save, vak, reizen }) {
      verbinding die weigert is precies wat gemeten moet worden, dus vangt hij en
      boekt hij dat als niet gelukt met de reden erbij. */
   async function loop(reis, basis) {
-    const begin = Date.now();
+    const begin = klok.sinds();
     const opties = { method: reis.methode || 'GET', redirect: 'manual', headers: { 'x-rtg-sonde': '1' } };
     if (reis.body) {
       opties.headers['content-type'] = 'application/json';
@@ -68,7 +69,7 @@ function maakSonde({ db, save, vak, reizen }) {
     } catch (e) {
       reden = String((e && e.message) || e).slice(0, 120);
     }
-    const ms = Date.now() - begin;
+    const ms = Math.round(klok.verstreken(begin));
     const verwacht = Array.isArray(reis.verwacht) ? reis.verwacht : [200];
     const gelukt = verwacht.includes(status);
     return {

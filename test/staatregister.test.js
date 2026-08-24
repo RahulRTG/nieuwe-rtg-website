@@ -104,6 +104,66 @@ test('de duurmeter kijkt door een const heen naar wat er in staat', () => {
     'bij een dubbelzinnige naam hoort de meter NIET op te lossen');
 });
 
+test('new Date(x) is een BEWAARD moment en dus geen duur op de verkeerde klok', () => {
+  /* DE VAAKST VOORKOMENDE VORM, EN HIJ WERD ALLEMAAL FOUT GETELD.
+
+     `Date.now() - new Date(o.at)` staat vijftien keer in server/. De meter
+     rekende die alle vijftien mee, en dat kon niet kloppen: de monotone klok
+     begint bij elke start opnieuw bij nul en `o.at` komt uit de database. Er
+     valt daar dus niets te verhuizen -- de wandklok is de enige klok waarop dit
+     antwoord bestaat. Een meter die werk aanwijst dat niemand kan doen, praat
+     zichzelf omhoog en wordt vanzelf genegeerd (LAT.md regel 3 in de andere
+     richting: een getal dat niet naar nul KAN, bewaakt niets).
+
+     De scanner maakt dit onderscheid twintig regels verderop al voor de
+     kloklezingen -- new Date() leest de klok, new Date(x) bouwt er een uit iets
+     bestaands -- en hier ontbrak het. */
+  const tel = (bron) => scanBestand(bron, 'p.js').duurOpWandklok;
+
+  assert.equal(tel('function f(o){ return Date.now() - new Date(o.at); }\n'), 0,
+    'new Date(veld) is hetzelfde als Date.parse(veld): een bewaard moment');
+  assert.equal(tel('function f(b){ return new Date(b.van) - Date.now(); }\n'), 0,
+    'en andersom om de min ook');
+  assert.equal(tel('function f(i){ return Date.now() - new Date(i || 0); }\n'), 0,
+    'met een || 0 eromheen nog steeds');
+  assert.equal(tel('function f(c){ return Date.now() - (c.laatst ? new Date(c.laatst).getTime() : 0); }\n'), 0,
+    'en in een van de twee takken van een ?: -- die vorm staat er ook echt');
+
+  /* DE TEGENPROEF, want een uitzondering die te ruim is haalt de meter leeg.
+     new Date() ZONDER argument leest de klok; daar is niets bewaards aan. */
+  assert.equal(tel('function f(){ const t0 = Date.now(); return Date.now() - t0; }\n'), 1,
+    'een merk uit dit proces telt gewoon mee');
+  assert.equal(tel('function f(m){ return Date.now() - m; }\n'), 1,
+    'en een kaal merk als parameter ook');
+});
+
+test('een afstand op de kalender telt op WAARDE, niet op de spelling van het getal', () => {
+  /* 864e5 is exact 86400000. De tijdseenheden stonden hier als TEKENREEKSEN,
+     dus `Date.now() - DAGEN * 864e5` gold als een duur op de wandklok terwijl
+     het terugtellen op de kalender is -- en `86400e3` net zo. Een meter die van
+     de spelling van een getal afhangt, meet de stijl van de schrijver.
+
+     En de KETEN moest plat: `X * 24 * 3600 * 1000` ontleedt als
+     ((X * 24) * 3600) * 1000, en de oude versie keek alleen naar de twee
+     bovenste operanden. */
+  const tel = (bron) => scanBestand(bron, 'p.js').duurOpWandklok;
+
+  assert.equal(tel('function f(d){ return Date.now() - d * 864e5; }\n'), 0, '864e5');
+  assert.equal(tel('function f(d){ return Date.now() - d * 86400e3; }\n'), 0, '86400e3');
+  assert.equal(tel('function f(d){ return Date.now() - d * 86400000; }\n'), 0, 'voluit');
+  assert.equal(tel('function f(d){ return Date.now() - d * 24 * 3600 * 1000; }\n'), 0,
+    'de hele keten, niet alleen de twee bovenste operanden');
+  assert.equal(tel('function f(d){ return Date.now() - d * 30.44 * 864e5; }\n'), 0,
+    'met een gebroken factor ertussen');
+
+  /* DE TEGENPROEF: vermenigvuldigen met iets dat GEEN tijdseenheid is, maakt van
+     een merk geen kalenderafstand. */
+  assert.equal(tel('function f(m){ return Date.now() - m * 7; }\n'), 1,
+    'maal zeven is geen tijdseenheid');
+  assert.equal(tel('function f(m){ return Date.now() - m * 999; }\n'), 1,
+    'en maal negenhonderdnegenennegentig ook niet');
+});
+
 test('de eigenaar is de map waarin de wortel woont', () => {
   assert.equal(eigenaarVan('server/kern/lid.js'), 'server/kern');
   assert.equal(eigenaarVan('server/db/tx/ledger.js'), 'server/db');

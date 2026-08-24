@@ -5,6 +5,7 @@
 const http = require('http');
 const path = require('path');
 const { spawn } = require('child_process');
+const klok = require('./lib/klok');        // sinds()/verstreken(): duur hoort op de monotone klok
 
 function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
   const servers = [];
@@ -111,10 +112,13 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
 
   function wachtOpActieve(maxMs) {
     return new Promise(resolve => {
-      const t0 = Date.now();
+      /* Een wachtlus hoort op de monotone klok: loopt de wandklok tijdens het
+         wachten terug, dan wacht deze lus met Date.now() ineens veel langer of
+         valt hij meteen af. klok.sinds() kan dat niet. */
+      const t0 = klok.sinds();
       (function kijk() {
         if (activeIdx >= 0 && servers[activeIdx].healthy) return resolve(activeIdx);
-        if (Date.now() - t0 > maxMs || stopping) return resolve(-1);
+        if (klok.verstreken(t0) > maxMs || stopping) return resolve(-1);
         setTimeout(kijk, 200);
       })();
     });

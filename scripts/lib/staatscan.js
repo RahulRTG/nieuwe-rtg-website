@@ -113,13 +113,47 @@ function inFunctie(pad) {
 const isDateNow = (n) => n && n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
   && (n.callee.object || {}).name === 'Date' && (n.callee.property || {}).name === 'now';
 
-const TIJDSEENHEID = new Set(['1000', '60000', '3600000', '86400000', '604800000']);
+/* De tijdseenheden op WAARDE en niet op spelling. Ze stonden hier als
+   tekenreeksen, en daardoor telde `864e5` niet mee terwijl dat exact 86400000
+   is: `Date.now() - PRULLENBAK_DAGEN * 864e5` gold als een duur op de wandklok
+   terwijl het een afstand op de kalender is. Een meter die van de SPELLING van
+   een getal afhangt, meet de stijl van de schrijver en niet de code.
+
+   GEMETEN OVER server/: deze drie reparaties samen (waarde in plaats van
+   spelling, de hele vermenigvuldigingsketen, en new Date(x) hieronder) brengen
+   duurOpWandklok van 29 naar 12. Zeventien plekken vielen weg: vijftien door
+   new Date(x), een door de ?:-tak in veiligheid/codewoord.js, en een door dit
+   getal in kern/bestanden.js. De TWAALF die overblijven zijn echt -- een merk
+   uit dit proces dat op de wandklok wordt afgetrokken -- en die zijn te
+   verhuizen naar klok.sinds(). */
+const TIJDSEENHEID = new Set([1000, 60000, 3600000, 86400000, 604800000]);
+
+/* De waarde van een getalliteraal, of null als het er geen is. Hij accepteert
+   dezelfde vormen als alleenGetallen hieronder (inclusief 1_000 en 864e5) en
+   geeft er een GETAL van terug, zodat vergelijken op waarde kan. */
+function getalVan(n) {
+  if (!n || (n.type !== 'Literal' && n.type !== 'NumericLiteral')) return null;
+  const rauw = String(n.raw === undefined ? n.value : n.raw);
+  if (!/^[\d._]+(e[+-]?\d+)?$/i.test(rauw)) return null;
+  const g = Number(rauw.replace(/_/g, ''));
+  return Number.isFinite(g) ? g : null;
+}
 
 /* Een uitdrukking die een BEWAARD moment terugleest, en dus per definitie op de
    wandklok hoort. Een veld op een object komt uit de opslag; een lokale binding
    is een merk in dit proces en kan wel monotoon. */
 function bewaardMoment(n) {
   if (!n) return false;
+  /* new Date(x) MET een argument is letterlijk hetzelfde als Date.parse(x): een
+     bewaard moment terugbouwen. Dat stond hier niet, en het is de vaakst
+     voorkomende vorm van allemaal -- vijftien plekken, van `Date.now() - new
+     Date(o.at)` tot `new Date(b.van) - Date.now()`. Ze golden allemaal als een
+     duur op de verkeerde klok, terwijl de monotone klok er per definitie niet
+     kan: die begint bij elke start opnieuw bij nul en het andere getal komt uit
+     de database. Dit bestand maakt datzelfde onderscheid twintig regels lager al
+     voor de kloklezingen (new Date() leest, new Date(x) bouwt); hier ontbrak
+     het. */
+  if (n.type === 'NewExpression' && (n.callee || {}).name === 'Date' && (n.arguments || []).length) return true;
   if (n.type === 'MemberExpression') return true;
   if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression') {
     const o = (n.callee.object || {}).name, pr = (n.callee.property || {}).name;
@@ -129,26 +163,36 @@ function bewaardMoment(n) {
   if (n.type === 'BinaryExpression' || n.type === 'LogicalExpression') {
     return bewaardMoment(n.left) || bewaardMoment(n.right);
   }
+  // `c.laatst ? new Date(c.laatst).getTime() : 0` -- allebei de takken tellen
+  if (n.type === 'ConditionalExpression') return bewaardMoment(n.consequent) || bewaardMoment(n.alternate);
   return false;
 }
 
 /* Vermenigvuldigen met een tijdseenheid maakt van een getal een AFSTAND op de
    kalender: `dagen() * 86400000` is geen duur maar hoeveel je terugtelt. */
+function factoren(n, uit) {
+  uit = uit || [];
+  if (n && n.type === 'BinaryExpression' && n.operator === '*') { factoren(n.left, uit); factoren(n.right, uit); }
+  else uit.push(n);
+  return uit;
+}
 function kalenderafstand(n) {
   if (!n || n.type !== 'BinaryExpression' || n.operator !== '*') return false;
-  for (const kant of [n.left, n.right]) {
-    if (!kant) continue;
-    const rauw = String(kant.raw === undefined ? kant.value : kant.raw);
-    if ((kant.type === 'Literal' || kant.type === 'NumericLiteral') && TIJDSEENHEID.has(rauw)) return true;
+  /* De hele KETEN plat, niet alleen de twee bovenste operanden. `12 * 3600 *
+     1000` ontleedt als (12 * 3600) * 1000 -- de oude versie zag links een
+     BinaryExpression en rechts 1000 en kwam er nog uit, maar `X * 24 * 3600 *
+     1000` niet meer: daar staat rechts 1000, dus die ging wel goed, en
+     `PRULLENBAK_DAGEN * 864e5` niet. Nu tellen alle factoren mee, op waarde. */
+  for (const k of factoren(n)) {
+    const g = getalVan(k);
+    if (g !== null && TIJDSEENHEID.has(g)) return true;
   }
   return false;
 }
 
 function alleenGetallen(n) {
   if (!n) return false;
-  if (n.type === 'Literal' || n.type === 'NumericLiteral') {
-    return /^[\d._]+(e[+-]?\d+)?$/i.test(String(n.raw === undefined ? n.value : n.raw));
-  }
+  if (n.type === 'Literal' || n.type === 'NumericLiteral') return getalVan(n) !== null;
   if (n.type === 'BinaryExpression') return alleenGetallen(n.left) && alleenGetallen(n.right);
   if (n.type === 'UnaryExpression') return alleenGetallen(n.argument);
   return false;

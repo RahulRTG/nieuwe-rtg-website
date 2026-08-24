@@ -31,8 +31,8 @@
    terugneemt. Een voorstel, geen wet.
 
    DE TIJDZONE IS GEEN DETAIL. "Vier uur 's nachts" is LOKALE tijd, en twee keer
-   per jaar verschuift die. Daarom Intl.DateTimeFormat met een echte zone en geen
-   getal aan uren: dat laatste klopt precies tot de eerste zomertijd.
+   per jaar verschuift die. De zone komt uit kern/tijdzone.js -- een echte zone en
+   geen getal aan uren, want dat laatste klopt precies tot de eerste zomertijd.
    ========================================================================== */
 'use strict';
 const klok = require('../../lib/klok');
@@ -61,36 +61,30 @@ const soorten = () => [...SOORTEN.values()].map(s => ({
 }));
 const soortVan = (sleutel) => SOORTEN.get(String(sleutel || '')) || null;
 
-/* De zone komt uit het LAND dat de zaak al heeft (supplierdefaults zet het). Een
-   tweede veld "tijdzone" zou dezelfde waarheid op twee plekken zetten
-   (LAT-regel 4). Wie echt afwijkt, zet hem in de klokinstelling; die wint. */
-const ZONE_PER_LAND = { NL: 'Europe/Amsterdam', BE: 'Europe/Brussels', DE: 'Europe/Berlin',
-  ES: 'Europe/Madrid', FR: 'Europe/Paris', PT: 'Europe/Lisbon', IT: 'Europe/Rome', GB: 'Europe/London' };
+/* DE ZONE EN DE LOKALE TIJD KOMEN UIT server/kern/tijdzone.js.
 
-function zoneVan(zaak, instelling) {
-  if (instelling && instelling.tijdzone) return instelling.tijdzone;
-  const land = (zaak && zaak.settings && zaak.settings.land) || 'NL';
-  return ZONE_PER_LAND[land] || 'Europe/Amsterdam';
+   Hier stond een eigen tabel met acht landen en een eigen delenIn(). De keuring
+   wees dat aan: `zoneVan` stond opeens in drie kernmodules. En terecht -- er lag
+   al een tijdzonelaag met veertig landen, een geldigheidscontrole op de zonenaam,
+   een expliciete terugval en een stad-naar-land-opzoeker. Mijn versie was een
+   tweede waarheid en een SLECHTERE (LAT-regel 4). De formatter-kas die ik hier
+   had staan is meeverhuisd naar die laag, waar elke beller er iets aan heeft. */
+const tijdzone = require('../tijdzone');
+
+function zoneVoor(zaak, instelling) {
+  if (instelling && instelling.tijdzone) return tijdzone.zoneVan({ tijdzone: instelling.tijdzone }).zone;
+  const land = (zaak && zaak.settings && zaak.settings.land) || null;
+  return tijdzone.zaakZone(Object.assign({}, zaak, { country: (zaak && zaak.country) || land })).zone;
 }
 
-/* De wandklokdelen van een moment IN een tijdzone. Via Intl, want dat is de
-   enige manier die over zomertijd heen klopt: een vaste offset van +1 of +2 uur
-   is precies twee dagen per jaar fout, en dat zijn de twee dagen waarop iemand
-   het merkt. */
-/* Formatters BEWAREN per zone: er een maken kost veel meer dan hem gebruiken en
-   het dagrapport loopt over duizenden bonnen. 14,5 us per lezing. */
-const FORMATTERS = new Map();
+/* De wandklokdelen van een moment IN een zone, in de vorm die de soorten
+   gebruiken. tijdzone.lokaal() geeft de datum als tekst en de minuten sinds
+   middernacht; hier komen daar de losse jaar/maand/dag bij, want de
+   dagverschuiving rekent op getallen. */
 function delenIn(datum, zone) {
-  let f = FORMATTERS.get(zone);
-  if (!f) {
-    f = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit',
-      day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
-    FORMATTERS.set(zone, f);
-  }
-  const d = {};
-  for (const p of f.formatToParts(datum)) if (p.type !== 'literal') d[p.type] = p.value;
-  return { jaar: Number(d.year), maand: Number(d.month), dag: Number(d.day),
-    uur: Number(d.hour === '24' ? '0' : d.hour), minuut: Number(d.minute) };
+  const l = tijdzone.lokaal(zone, datum instanceof Date ? datum : new Date(datum));
+  const [j, m, d] = l.datum.split('-').map(Number);
+  return { jaar: j, maand: m, dag: d, uur: Math.floor(l.minuten / 60), minuut: l.minuten % 60 };
 }
 
 /* "04:00" -> 240 minuten. Een onleesbare waarde is GEEN nul: dan zou een tikfout
@@ -151,7 +145,7 @@ function periode(zaak, sleutel, moment) {
   const instelling = instellingVan(zaak, sleutel);
   const datum = moment ? new Date(moment) : klok.datum();
   if (isNaN(datum.getTime())) return null;
-  const zone = zoneVan(zaak, instelling);
+  const zone = zoneVoor(zaak, instelling);
   const uit = soort.periodeVan(datum, instelling, { zone, delenIn, naarMinuten, dagPlus, isoDag });
   return uit ? Object.assign({ soort: sleutel, tijdzone: zone }, uit) : null;
 }
@@ -175,7 +169,7 @@ function keuzeVan(zaak, sleutel) {
 
 module.exports = { meld, soorten, soortVan, instellingVan, periode, keuzeVan,
   // gereedschap dat de soorten en de toetsen delen
-  _hulp: { delenIn, naarMinuten, dagPlus, isoDag, zoneVan, ZONE_PER_LAND } };
+  _hulp: { delenIn, naarMinuten, dagPlus, isoDag, zoneVoor } };
 
 /* De vier soorten die er vandaag zijn. Ze staan APART en worden hier alleen
    aangemeld -- met dezelfde meld() die een vijfde soort ook gebruikt. Onderaan,

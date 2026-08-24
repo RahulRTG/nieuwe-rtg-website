@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 915,
+    "testbestanden": 921,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 126,
@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 160,
+    "toetsenNietGemeten": 162,
     "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -36,10 +36,15 @@
     "duurOpWandklok": 29,
     "staatProcesgebonden": 92,
     "datamapVastgeklonken": 11,
-    "bewijsOnbekend": 172,
+    "bewijsOnbekend": 174,
     "bewijsVerlopen": 874
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "testbestanden 915 -> 921, bewijsOnbekend 172 -> 174, toetsenNietGemeten 160 -> 162 (de zakenklok)",
+      "reden": "Zes toetsbestanden erbij vandaag, waarvan de laatste twee bij de zakenklok horen (test/zakenklok.test.js en test/zakenklok-loket.test.js). De andere vier -- gietvorm, toeval, leesspoor, bewijsvers -- zijn hierboven al per stuk verantwoord.\n\nbewijsOnbekend en toetsenNietGemeten gaan met twee omhoog om dezelfde reden als daar: de loket-toets start een echte server (dus de sluiting hangt aan de serverboom en niet aan requires die de graaf kan volgen), en de mutatiemotor is bij geen van beide langs geweest. De kernbewering van elk is wel met de hand gemuteerd en staat als TEGENPROEF in de toets zelf: bij de rekenkant het aanmelden van een verzonnen vijfde soort (zonder die bewering zou een lijst van vier hier net zo groen staan als een register), bij het loket de weigering van een onbruikbare waarde naast de acceptatie van een geldige (zonder dat tweede zou een keurder die alles afkeurt er ook doorheen komen).\n\nWAT ER OOK IS GEBEURD EN GEEN METERWIJZIGING IS: het Z-rapport (server/kern/fiscaal/rapporten.js) telt nu op de BEDRIJFSdag in plaats van de kalenderdag. Voor een zaak die niets heeft ingesteld is dat exact het oude gedrag (omslag 00:00); voor een club die om 05:00 sluit staat de omzet tussen middernacht en sluitingstijd voortaan op de goede dag. De 195 andere plekken in de kern die `toISOString().slice(0, 10)` doen zijn NIET omgezet -- dat is een gemeten schuld en geen omissie, en hij hoort per plek te worden afgewogen zoals dit er een was."
+    },
     {
       "datum": "2026-08-24",
       "meter": "bewijsVerlopen NIEUW op 874; bewijsOnbekend 170 -> 172 en toetsenNietGemeten 158 -> 160",

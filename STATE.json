@@ -934,6 +934,22 @@
       "soort": "binding-let",
       "bron": "scan"
     },
+    "server/kern/tijdzone.js#FORMATTERS": {
+      "eigenaar": "server/kern/tijdzone",
+      "levensduur": "bootvast",
+      "soort": "map",
+      "bron": "hand-na-scan",
+      "toelichting": "Bewaarde Intl.DateTimeFormat-objecten per tijdzone. Puur een versnelling: dezelfde zonenaam geeft altijd dezelfde formatter en dezelfde uitslag, dus de inhoud kan het gedrag niet veranderen. De sleutelruimte is de landenlijst in de bron plus wat zaken zelf instellen, dus hij groeit niet onbeperkt. Terugzetten zou alleen betekenen dat de eerste lezing daarna weer duurder is -- zonder deze twee kostte de zakenklok 2567 ms per 20.000 lezingen in plaats van 315.",
+      "patroon": "afleiding"
+    },
+    "server/kern/tijdzone.js#GEKEURD": {
+      "eigenaar": "server/kern/tijdzone",
+      "levensduur": "bootvast",
+      "soort": "map",
+      "bron": "hand-na-scan",
+      "toelichting": "Onthouden uitslagen van geldigeZone(): bestaat deze zonenaam? Puur een versnelling: dezelfde zonenaam geeft altijd dezelfde formatter en dezelfde uitslag, dus de inhoud kan het gedrag niet veranderen. De sleutelruimte is de landenlijst in de bron plus wat zaken zelf instellen, dus hij groeit niet onbeperkt. Terugzetten zou alleen betekenen dat de eerste lezing daarna weer duurder is -- zonder deze twee kostte de zakenklok 2567 ms per 20.000 lezingen in plaats van 315.",
+      "patroon": "afleiding"
+    },
     "server/kern/tijdzone.js#landVindReg": {
       "eigenaar": "server/kern",
       "levensduur": "onbekend",
@@ -947,14 +963,6 @@
       "reset": "onbekend",
       "soort": "map",
       "bron": "scan"
-    },
-    "server/kern/zakenklok/index.js#FORMATTERS": {
-      "eigenaar": "server/kern/zakenklok",
-      "levensduur": "bootvast",
-      "soort": "map",
-      "bron": "hand-na-scan",
-      "toelichting": "Bewaarde Intl.DateTimeFormat-objecten per tijdzone. Puur een versnelling: dezelfde zone geeft altijd dezelfde formatter, dus de inhoud kan het gedrag niet veranderen. Hij groeit niet onbeperkt -- er is een zone per land en die lijst staat in de bron. Terugzetten zou alleen betekenen dat de eerste lezing daarna weer duurder is.",
-      "patroon": "afleiding"
     },
     "server/kern/zakenklok/index.js#SOORTEN": {
       "eigenaar": "server/kern/zakenklok",

@@ -36,11 +36,22 @@ const LAND_ZONE = {
 };
 const TERUGVAL = 'UTC';
 
-// bestaat deze zonenaam echt? Intl weigert een onbekende zone met een RangeError
+/* Bestaat deze zonenaam echt? Intl weigert een onbekende zone met een
+   RangeError -- maar dat uitproberen betekent een formatter MAKEN, en dat is het
+   dure deel. De uitslag wordt daarom onthouden: een zonenaam is onveranderlijk,
+   dus een antwoord van net is nog steeds waar. Zonder deze kaart kostte de
+   zakenklok 2567 ms per 20.000 lezingen in plaats van 290 -- negen keer, en
+   volledig aan het opnieuw stellen van dezelfde vraag. */
+const GEKEURD = new Map();
 function geldigeZone(naam) {
   if (!naam || typeof naam !== 'string') return false;
-  try { new Intl.DateTimeFormat('en-CA', { timeZone: naam }); return true; }
-  catch (e) { return false; }
+  const bekend = GEKEURD.get(naam);
+  if (bekend !== undefined) return bekend;
+  let goed;
+  try { new Intl.DateTimeFormat('en-CA', { timeZone: naam }); goed = true; }
+  catch (e) { goed = false; }
+  GEKEURD.set(naam, goed);
+  return goed;
 }
 
 /* De zone van een zaak, met waar hij vandaan komt. `aangenomen` is waar zodra
@@ -60,13 +71,28 @@ const DAGEN = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
    zoals Date#getDay) en het aantal minuten sinds middernacht. Alle drie in de
    zone zelf, want een zaak die om 23:00 lokaal nog open is, is dat op een
    andere kalenderdag dan de server denkt. */
+/* De formatters worden BEWAARD per zone. Er een maken kost ordes van grootte
+   meer dan hem gebruiken, en sinds de zakenklok loopt het dagrapport van een
+   zaak hier per bon langs -- dan is een formatter per bon het verschil tussen
+   een rapport en een wachttijd. De sleutelruimte is de zonelijst hierboven plus
+   wat zaken zelf instellen, dus deze kaart groeit niet onbeperkt. */
+const FORMATTERS = new Map();
+function formatterVoor(z) {
+  let f = FORMATTERS.get(z);
+  if (!f) {
+    f = new Intl.DateTimeFormat('en-CA', {
+      timeZone: z, weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    FORMATTERS.set(z, f);
+  }
+  return f;
+}
+
 function lokaal(zone, wanneer) {
   const d = wanneer instanceof Date ? wanneer : new Date();
   const z = geldigeZone(zone) ? zone : TERUGVAL;
-  const delen = new Intl.DateTimeFormat('en-CA', {
-    timeZone: z, weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', hour12: false
-  }).formatToParts(d);
+  const delen = formatterVoor(z).formatToParts(d);
   const op = {};
   for (const p of delen) op[p.type] = p.value;
   const uur = Number(op.hour) === 24 ? 0 : Number(op.hour); // sommige ICU's geven 24:00

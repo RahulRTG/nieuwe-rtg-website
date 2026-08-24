@@ -2,6 +2,8 @@
    ziet een anonieme talentkaart zonder naam of contact. Pas na wederzijdse
    interesse kiest de kandidaat zelf of de gewone sollicitatie en Deal Room
    open mogen. */
+const { datum: klokDatum } = require('../../../lib/klok');
+
 module.exports = (wctx) => {
   const { app, db, save, crypto, rtf, findSupplier, notifySupplier, sseToSupplier } = wctx;
 
@@ -29,7 +31,7 @@ module.exports = (wctx) => {
     const cv = b.cv && typeof b.cv === 'object' ? b.cv : {};
     const entry = {
       id: crypto.randomBytes(5).toString('hex'), supplierCode: zaak.code, vacatureId: vac.id, func: vac.func,
-      rtf: { code, profielId: sess.p.id }, status: 'interesse', at: new Date().toISOString(),
+      rtf: { code, profielId: sess.p.id }, status: 'interesse', at: klokDatum().toISOString(),
       talent: {
         headline: String(cv.headline || '').trim().slice(0, 80),
         skills: (Array.isArray(cv.skills) ? cv.skills : []).slice(0, 12).map(x => String(x).trim().slice(0, 40)).filter(Boolean),

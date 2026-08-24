@@ -2,6 +2,7 @@
    het besluit (met automatische uitnodiging via maakInvite uit de personeels-
    laag) en de sollicitatiechat. Gemount vanuit routes/supplier/werving.js. */
 const { eigenVeld } = require('../../../kern/util');
+const { datum: klokDatum } = require('../../../lib/klok');
 module.exports = (wctx) => {
   const { kern, maakKassacode, invitesVan, findSupplierByName, maakInvite, neemAan, wervingsLink } = wctx;
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
@@ -158,7 +159,7 @@ app.post('/api/supplier/talent/match', supplierAuth, (req, res) => {
   const match = lijst.find(x => x.id === req.body.id && x.supplierCode === req.supplier.code);
   if (!match || match.status !== 'interesse') return res.status(404).json({ error: 'Deze talentmatch is niet meer beschikbaar.' });
   match.status = req.body.action === 'interesse' ? 'wederzijds' : 'afgewezen';
-  match.beslistAt = new Date().toISOString();
+  match.beslistAt = klokDatum().toISOString();
   save();
   logActivity(req.supplier.code, req.actor, (match.status === 'wederzijds' ? 'toonde wederzijdse interesse in ' : 'sloot een talentmatch voor ') + match.func);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });

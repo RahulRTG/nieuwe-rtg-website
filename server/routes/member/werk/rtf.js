@@ -3,6 +3,7 @@
    dedup). Krijgt de gedeelde context een keer bij het opstarten vanuit
    routes/member/werk.js. */
 const { eigenVeld } = require('../../../kern/util'); // veilige objecttoegang (geen prototype-pollution)
+const { datum: klokDatum } = require('../../../lib/klok');
 module.exports = (wctx) => {
   const { app, auth, db, save, crypto, talen, trChat, chatStuur, applyChatVertaald, meldWerkgever,
     rtf, LANDEN, openVacatures, tooManyTries, noteFailedTry, findSupplier, cvReady,
@@ -104,7 +105,7 @@ module.exports = (wctx) => {
     rtf.bewaarSollicitatie(b.code, sess.p.id, { appId: entry.id, supplierCode: s.code, vacatureId: vac.id, func: vac.func, bedrijf: s.name, land: landCode, landNaam: LANDEN[landCode].naam });
     const deckMatch = (Array.isArray(db.data.talentInteresses) ? db.data.talentInteresses : []).find(x =>
       x.vacatureId === vac.id && x.rtf && x.rtf.code === String(b.code).toUpperCase() && x.rtf.profielId === sess.p.id);
-    if (deckMatch) { deckMatch.status = 'traject'; deckMatch.applicationId = entry.id; deckMatch.beslistAt = new Date().toISOString(); }
+    if (deckMatch) { deckMatch.status = 'traject'; deckMatch.applicationId = entry.id; deckMatch.beslistAt = klokDatum().toISOString(); }
     save();
     // De melding aan het bedrijf is identiek aan die van een gewoon RTG-lid: de
     // foundation-herkomst blijft onzichtbaar voor de werkgever.

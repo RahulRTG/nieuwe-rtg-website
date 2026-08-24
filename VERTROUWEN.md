@@ -374,14 +374,35 @@ nooit: die vraagt elke keer een bon die aan die ene handeling vastzit. Zonder
 dat verschil koopt een aanvaller met de goedkoopste step-up een vrijbrief voor
 de duurste handeling.
 
-Daarnaast, los van de keten en klein genoeg om tussendoor te doen:
+Daarnaast, los van de keten — en deze drie zijn gedaan:
 
-- de virusscanner die zijn eigen versheid bewijst (clamd wordt vandaag nooit
-  naar zijn definitiedatum gevraagd — een scanner met oude definities meldt
-  "schoon" precies zoals een verse);
-- `cargo audit` op de crates van de Rust-motor (het enige stuk van de
-  toeleveringsketen dat nu ongecontroleerd is; de Node-kant heeft nul
-  runtime-dependencies en de Actions staan op een volledige SHA);
+- **de virusscanner bewijst zijn eigen versheid.** clamd wordt met `zVERSION`
+  naar zijn definitiedatum gevraagd, en die leeftijd staat als getal op de
+  Trust State: boven vierentwintig uur haalt hij zijn updates niet op. Er zijn
+  twee manieren om die meting te missen en ze zijn NIET hetzelfde — geen clamd
+  in deze opstelling is een feit over de omgeving, clamd die draait maar niets
+  zegt is een echt gat — en geen van beide levert een nul op.
+- **`cargo audit` draait wekelijks** over de crates van de motor, met
+  `--locked` zodat hij precies de versies leest die de bouw ook gebruikt.
+  Wekelijks en niet per push: een advisory verschijnt op zijn eigen moment en
+  niet bij een commit.
+- **de top van de bonketen kan naar buiten.** `server/lib/keten-anker.js` —
+  dezelfde voorziening die het inzagejournaal al gebruikt — maakt een
+  momentopname van de kop. Dat is het enige dat KOPAFKNIPPING kan zien: wie de
+  nieuwste bonnen weggooit, houdt een keten over die van voor naar achter
+  perfect klopt. Het wegzetten blijft mensenwerk en met opzet geen taak van dit
+  huis: een anker in dezelfde database is geen anker maar een tweede regel om
+  te wijzigen.
+
+En wat er daarna nog steeds openstaat, met naam: **vijf van de zes
+handelingssoorten hebben nog geen poort.** Ze worden gemeten en niet
+tegengehouden, en twee ervan (de tenantuitvoer en de gevoelige inzage) zijn
+onomkeerbaar en staan dus als catastrofaal pad in de simulatie. De reden is
+telkens dezelfde en hij is structureel: die deuren gaan open op een
+beheer-token dat geen persoon noemt, en aan een sleutel valt geen tweede
+bevestiging te vragen. Dat oplossen is een besluit over wie een werkruimte mag
+beheren, en geen regel code.
+
 HIER STOND "een rem per account naast die per IP", en die klopte niet. Dit huis
 heeft er al drie: IP+account (10 pogingen), de bron alleen (50) en het doel
 alleen (25). En de derde is scherper doordacht dan wat hier stond: het doel

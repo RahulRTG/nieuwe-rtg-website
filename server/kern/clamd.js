@@ -8,6 +8,19 @@ const net = require('net');
 
 const MAX_ANTWOORD = 8192;
 
+/* "ClamAV 1.5.3/27340/Mon Aug 24 09:00:00 2026" uit elkaar halen. Apart en puur,
+   zodat de vorm te toetsen is zonder een draaiende clamd -- en zodat een
+   antwoord dat NIET aan die vorm voldoet een reden oplevert en geen gok. */
+function leesVersie(tekst) {
+  const d = String(tekst || '').split('/');
+  if (d.length < 3) return { tekst, definitieDatum: null,
+    reden: 'ClamAV gaf "' + String(tekst).slice(0, 80) + '" en daar staat geen definitiedatum in.' };
+  const t = Date.parse(d[2].trim());
+  if (!Number.isFinite(t)) return { tekst, definitieDatum: null,
+    reden: 'De datum in het versieantwoord ("' + d[2].trim().slice(0, 40) + '") is niet te lezen.' };
+  return { tekst, versie: d[0].trim(), definities: d[1].trim(), definitieDatum: new Date(t).toISOString() };
+}
+
 function maakClamd(opties) {
   opties = opties || {};
   const host = String(opties.host || process.env.RTG_CLAMD_HOST || '').trim();
@@ -66,7 +79,37 @@ function maakClamd(opties) {
     });
   }
 
-  return { scanBestand, host, port };
+  /* DE VERSHEID VAN DE DEFINITIES, en dit ontbrak.
+
+     Een scanner met definities van drie maanden oud meldt "schoon" op precies
+     dezelfde manier als een verse. Dat is de stilste faalvorm die er is: alles
+     werkt, niets klaagt, en de bescherming is weg. clamd kent er een commando
+     voor -- zVERSION geeft "ClamAV <versie>/<db-nummer>/<datum>" -- en die
+     datum is het enige dat de vraag beantwoordt.
+
+     WAT HIER NIET WORDT GEDAAN: er wordt geen oordeel geveld over hoe oud te
+     oud is. Deze functie levert de datum en de leeftijd; de grens hoort bij
+     wie de bewering doet (kern/vertrouwen/staat.js), niet bij de client. */
+  function versie() {
+    return new Promise((resolve, reject) => {
+      let klaar = false, antwoord = Buffer.alloc(0);
+      const sok = net.createConnection({ host, port });
+      const stop = (fout, uit) => { if (klaar) return; klaar = true; sok.destroy(); if (fout) reject(fout); else resolve(uit); };
+      sok.setTimeout(timeout, () => stop(new Error('ClamAV antwoordde niet op tijd.')));
+      sok.on('error', e => stop(new Error('ClamAV is niet bereikbaar: ' + e.message)));
+      sok.on('connect', () => sok.write(Buffer.from('zVERSION\0')));
+      sok.on('data', stuk => {
+        antwoord = Buffer.concat([antwoord, stuk]);
+        if (antwoord.length > MAX_ANTWOORD) return stop(new Error('ClamAV gaf een onbegrensd antwoord.'));
+        const eind = antwoord.indexOf(0);
+        if (eind < 0) return;
+        stop(null, leesVersie(antwoord.subarray(0, eind).toString('utf8').trim()));
+      });
+      sok.on('end', () => { if (!klaar) stop(new Error('ClamAV sloot de verbinding zonder versie.')); });
+    });
+  }
+
+  return { scanBestand, versie, host, port };
 }
 
-module.exports = { maakClamd };
+module.exports = { maakClamd, leesVersie };

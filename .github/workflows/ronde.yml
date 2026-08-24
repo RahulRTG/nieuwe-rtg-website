@@ -55,6 +55,21 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
+      # DE TOELEVERINGSKETEN VAN DE RUST-MOTOR, en dat was het laatste stuk dat
+      # nergens werd gecontroleerd. `npm audit` dekt de Node-kant, en dat is
+      # triviaal met nul runtime-dependencies; de crates van motor/ werden tegen
+      # geen enkele advisory-database gehouden. Wekelijks en niet per push: een
+      # advisory verschijnt op zijn eigen moment en niet bij een commit, dus een
+      # ronde die er elke week langsgaat vindt hem sneller dan een poort die
+      # alleen bij een wijziging kijkt.
+      #
+      # `--locked` zodat de audit precies de versies leest die de bouw ook
+      # gebruikt; zonder dat zou hij een opgeloste Cargo.lock beoordelen die
+      # niemand draait.
+      - name: Advisories in de crates van de motor (cargo audit)
+        run: |
+          cargo install cargo-audit --locked --quiet || cargo install cargo-audit --locked
+          cargo audit --file motor/Cargo.lock --deny warnings
       # De beproeving zakt zelf (exitcode 1) zodra een van zijn drempels breekt.
       # `tee` zodat de volledige uitvoer ook bij een zak in het artefact staat:
       # bij een eerdere ronde ging de aanleiding verloren omdat alleen de staart

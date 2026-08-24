@@ -140,6 +140,72 @@ test('5. de Trust State telt, en verzint niets -- ook geen gunstige nul', () => 
     .eigenschappen.find(e => /ongewogen/.test(e.wat)).aantal, 7);
 });
 
+/* ---------- de scanner die zijn eigen versheid meet ----------
+
+   Dit was de stilste faalvorm die dit huis had: een virusscanner met definities
+   van drie maanden oud meldt "schoon" op precies dezelfde manier als een verse.
+   Alles werkt, niets klaagt, en de bescherming is weg. */
+const C = require('../server/kern/clamd');
+
+test('7. de definitiedatum wordt gelezen, en een onleesbaar antwoord levert een reden', () => {
+  const goed = C.leesVersie('ClamAV 1.5.3/27340/Mon Aug 24 09:00:00 2026');
+  assert.equal(goed.definitieDatum, '2026-08-24T09:00:00.000Z');
+  assert.equal(goed.definities, '27340');
+
+  for (const raar of ['ClamAV 1.5.3', 'ClamAV 1.5.3/27340/geen datum', '', null]) {
+    const u = C.leesVersie(raar);
+    assert.equal(u.definitieDatum, null, JSON.stringify(raar) + ' hoort geen datum op te leveren');
+    assert.ok(u.reden && u.reden.length > 20, 'en wel een reden: ' + JSON.stringify(raar));
+  }
+});
+
+test('8. oude definities zijn een getal op de HUD, geen stilte', () => {
+  const dagen = (n) => ({ definitieDatum: new Date(Date.now() - n * 86400000).toISOString() });
+  const bij = (s) => s.eigenschappen.find(e => /verouderde virusdefinities/.test(e.wat));
+
+  const vers = St.staat({ bonnen: [] }, HANDELINGEN, dagen(0));
+  assert.equal(bij(vers).aantal, 0);
+  const oud = St.staat({ bonnen: [] }, HANDELINGEN, dagen(3));
+  assert.equal(bij(oud).aantal, 1, 'drie dagen oud is te oud');
+  assert.match(oud.eigenschappen.find(e => /verouderde/.test(e.wat)).details[0], /uur oud/);
+
+  /* DE TWEE MANIEREN OM HEM TE MISSEN ZIJN NIET DEZELFDE, en geen van beide
+     levert een nul op. "Geen clamd in deze opstelling" is een feit over de
+     omgeving; "clamd draait maar zegt niets" is een echt gat. */
+  const geenClamd = St.staat({ bonnen: [] }, HANDELINGEN, null);
+  assert.equal(bij(geenClamd), undefined, 'geen eigenschap zonder meting');
+  const g1 = geenClamd.nietGemeten.find(n => /virusdefinities/.test(n.wat));
+  assert.match(g1.reden, /geen clamd geconfigureerd/i);
+
+  const stil = St.staat({ bonnen: [] }, HANDELINGEN, { definitieDatum: null, reden: 'gaf niets terug.' });
+  const g2 = stil.nietGemeten.find(n => /virusdefinities/.test(n.wat));
+  assert.match(g2.reden, /draait maar gaf geen leesbare definitiedatum/);
+  assert.match(g2.reden, /precies zoals een verse/, 'met waarom dat erg is');
+});
+
+/* ---------- het anker: het enige dat kopafknipping ziet ---------- */
+const BON = require('../server/kern/vertrouwen/bon');
+
+test('9. de hashketen ziet geen KOPAFKNIPPING -- het anker wel', () => {
+  const bak = {};
+  const gegevens = (doel) => ({ soort: 'tenant.vernietig', doel, aantal: 1, actor: 'user-1',
+    blootstelling: { gemeten: true, aantal: 1, eenheid: 'tenants', zwaarte: 'uitzonderlijk',
+      drempel: 1, grondslag: 'vast' }, stapop: { nodig: true }, bevestigd: true,
+    poort: 'techAuth', uitgevoerd: true });
+  for (const d of ['O-1', 'O-2', 'O-3', 'O-4']) BON.schrijf(bak, gegevens(d));
+
+  const anker = BON.ankerPunt(bak);
+  assert.ok(anker, 'er valt een momentopname van de kop te maken');
+  assert.equal(BON.tegenAnker(bak, anker).ok, true, 'ongeschonden klopt hij');
+
+  /* Iemand knipt de twee nieuwste bonnen eraf. De keten die overblijft is van
+     voor naar achter PERFECT -- dat is precies het punt. */
+  bak.bonnen.splice(0, 2);
+  assert.equal(BON.controleer(bak).ok, true,
+    'de hashketen zelf ziet hier niets: dat is de aanvalsklasse waar hij niet tegen beschermt');
+  assert.equal(BON.tegenAnker(bak, anker).ok, false, 'en het anker ziet het wel');
+});
+
 /* ---------- en de drie deuren, over HTTP ----------
 
    Zonder deze toets zijn het drie endpoints die niemand ooit heeft aangeroepen,
@@ -193,11 +259,28 @@ test('6. de drie deuren doen wat ze beloven, en niet meer', async () => {
   assert.equal(/ongehinderd kan doen/.test(sim.body.oordeel), sim.body.catastrofaal.length > 0,
     'oordeel en lijst horen hetzelfde te zeggen: ' + sim.body.oordeel);
 
+  /* Het anker. Hij MAAKT de momentopname en bewaart hem niet: een anker dat in
+     dezelfde database blijft staan is een tweede regel om te wijzigen, en de
+     deur zegt dat er ook bij. */
+  const a = await api('/api/techniek/vertrouwen/anker', {}, tech);
+  assert.equal(a.status, 200);
+  /* In deze opstelling is er nog geen enkele kritieke handeling geweest, dus is
+     er geen kop om te verankeren. Dat hoort er te staan als REDEN en niet als
+     een leeg anker met "zet dit weg" erbij -- dat zou nergens op slaan. De
+     volledige ankercyclus staat in toets 9. */
+  assert.equal(a.body.anker, null);
+  assert.match(a.body.reden, /nog geen Trust Receipts/);
+
   const st = await api('/api/techniek/vertrouwen/staat', {}, tech);
   assert.equal(st.status, 200);
   assert.ok(st.body.eigenschappen.length >= 5);
   for (const e of st.body.eigenschappen) assert.ok(e.bron, e.wat + ' zonder bron op de HUD');
   assert.ok(st.body.nietGemeten.length, 'en wat niet te meten is staat er als zodanig');
+  /* In deze opstelling draait geen clamd, dus de scanner hoort als NIET GEMETEN
+     te staan met die reden -- en niet als een geruststellende nul. */
+  const scan = st.body.nietGemeten.find(n => /virusdefinities/.test(n.wat));
+  assert.ok(scan, 'zonder clamd hoort de scannerregel bij nietGemeten te staan');
+  assert.match(scan.reden, /RTG_CLAMD_HOST/);
 });
 
 test.after(async () => { await stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });

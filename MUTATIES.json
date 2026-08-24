@@ -6153,7 +6153,8 @@
       "module": "server/kern/vertrouwen/insluiting.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "scherp": "gezakt"
     },
     "vertrouwenblootstelling.test.js": {
       "soort": "puur",

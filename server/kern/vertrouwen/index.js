@@ -129,8 +129,13 @@ module.exports = ({ db, save }) => {
   /* Laag 6, 7 en 8. Ze LEZEN alleen; er staat geen save() achter. */
   const bereikVan = (actor, opties) => bereik.van(db.data, actor, opties && opties.rechtenVan);
   const simuleer = (actor, opties) => bereik.simuleer(db.data, actor, opties || {});
-  const trustState = (handelingen) => staat.staat(bak(), handelingen);
+  const trustState = (handelingen, scanner) => staat.staat(bak(), handelingen, scanner);
   const bonnenKlopt = () => bon.controleer(bak());
+  /* Het anker: de momentopname van de kop, om BUITEN dit huis weg te zetten.
+     Hij wordt hier gemaakt en niet bewaard -- een anker in dezelfde database is
+     geen anker maar een tweede regel om te wijzigen. */
+  const bonAnker = () => bon.ankerPunt(bak());
+  const bonTegenAnker = (a) => bon.tegenAnker(bak(), a);
 
   /* De bon oplossen. De aanroeper (routes/vertrouwen.js) heeft de mens al
      opnieuw geverifieerd; zie de kop van tweedemoment.js. */
@@ -152,6 +157,6 @@ module.exports = ({ db, save }) => {
   }
 
   return { weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, geenPersoon, poort, losBon,
-    schrijfBon, bonNaPoort, bonnen, bonnenKlopt, bereikVan, simuleer, trustState,
+    schrijfBon, bonNaPoort, bonnen, bonnenKlopt, bonAnker, bonTegenAnker, bereikVan, simuleer, trustState,
     register, NIET_GEDEKT: gewoonte.NIET_GEDEKT };
 };

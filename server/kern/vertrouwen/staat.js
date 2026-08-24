@@ -24,15 +24,20 @@
 const R = require('./register');
 const bon = require('./bon');
 const insluiting = require('./insluiting');
+const { nu: klokNu } = require('../../lib/klok');
 
 /* Wat deze staat NIET vaststelt, met de reden. Deze lijst hoort te krimpen. */
 const NIET_GEMETEN = [
   { wat: 'onbegrensde actoren', reden: 'Het bereik van een actor wordt PER actor berekend (kern/vertrouwen/bereik.js), niet over alle accounts tegelijk; dat zou bij elke opvraging de hele ledenadministratie doorrekenen. Vraag het per account op via de simulatie.' },
   { wat: 'verlopen kritieke bewijzen', reden: 'De bewijsstand is per tenant (kern/tenant/bewijs.js) en heeft dus een organisatie nodig. Een platformbreed getal zou de tenants moeten optellen, en die optelling bestaat niet.' },
-  { wat: 'de versheid van de virusdefinities', reden: 'clamd wordt nergens naar zijn definitiedatum gevraagd. Een scanner met oude definities meldt "schoon" precies zoals een verse; zie VERTROUWEN.md par. 6.' }
 ];
 
-function staat(bak, handelingen) {
+/* Hoe oud definities mogen zijn voordat het een openstaand punt is. Een dag:
+   ClamAV publiceert meermaals per dag, dus een scanner die 24 uur niets nieuws
+   heeft gezien, haalt zijn updates niet op. */
+const DEFINITIES_MAX_UREN = 24;
+
+function staat(bak, handelingen, scanner) {
   const b = bak || {};
   const keten = bon.controleer(b);
   const groei = insluiting.keurTabel(handelingen || {});
@@ -56,13 +61,42 @@ function staat(bak, handelingen) {
       { wat: 'soorten die wel worden gemeten maar niet tegengehouden', aantal: gemeten.length,
         bron: 'het handelingenregister: soorten zonder poort',
         details: gemeten.map(s => s.id) }
-    ],
+      ,
+      scannerEigenschap(scanner)
+    ].filter(Boolean),
+    nietGemeten: NIET_GEMETEN.concat(scannerGat(scanner)),
     /* De bonketen kan ook AFGEKAPT zijn -- normaal bij een begrensd journaal --
        en dat is iets anders dan gebroken. Wie die twee op een hoop gooit, krijgt
        een alarm bij normaal gedrag en kijkt er daarna niet meer naar. */
-    ketenAfgekapt: !!keten.afgekapt,
-    nietGemeten: NIET_GEMETEN
+    ketenAfgekapt: !!keten.afgekapt
   };
 }
 
-module.exports = { staat, NIET_GEMETEN };
+/* DE SCANNER, EN DE TWEE MANIEREN WAAROP HIJ HIER KAN ONTBREKEN. Ze zijn niet
+   hetzelfde en mogen dus geen van beide een nul opleveren:
+
+     geen clamd geconfigureerd  -> deze opstelling heeft hem niet (ontwikkelaar,
+                                   toets). Dat is een feit over de omgeving.
+     clamd wel, datum niet      -> hij draait maar zegt niet hoe oud zijn
+                                   definities zijn. Dat is een echt gat.
+
+   En als de datum er WEL is, is het een gewone eigenschap met een getal. */
+function scannerEigenschap(scanner) {
+  if (!scanner || !scanner.definitieDatum) return null;
+  const uren = (klokNu() - Date.parse(scanner.definitieDatum)) / 3600000;
+  return { wat: 'verouderde virusdefinities', aantal: uren > DEFINITIES_MAX_UREN ? 1 : 0,
+    bron: 'clamd zVERSION via kern/clamd.js',
+    details: uren > DEFINITIES_MAX_UREN
+      ? ['de definities zijn ' + Math.round(uren) + ' uur oud; boven ' + DEFINITIES_MAX_UREN + ' uur haalt de scanner zijn updates niet op']
+      : [] };
+}
+
+function scannerGat(scanner) {
+  if (scanner && scanner.definitieDatum) return [];
+  if (!scanner) return [{ wat: 'de versheid van de virusdefinities',
+    reden: 'Deze opstelling heeft geen clamd geconfigureerd (RTG_CLAMD_HOST is leeg), dus er is niets aan te vragen. De eigen scanner van kern/antivirus draait wel.' }];
+  return [{ wat: 'de versheid van de virusdefinities',
+    reden: 'clamd draait maar gaf geen leesbare definitiedatum: ' + (scanner.reden || 'onbekende reden') + ' Een scanner met oude definities meldt "schoon" precies zoals een verse.' }];
+}
+
+module.exports = { staat, scannerEigenschap, scannerGat, NIET_GEMETEN, DEFINITIES_MAX_UREN };

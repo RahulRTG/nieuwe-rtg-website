@@ -33,6 +33,7 @@
 'use strict';
 
 const keten = require('../../lib/keten');
+const anker = require('../../lib/keten-anker');
 const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 
 const MAX = 2000;
@@ -107,8 +108,25 @@ function lees(bak, hoeveel) {
   return l.slice(0, Math.min(Number(hoeveel) || 50, 200));
 }
 
+/* HET ANKER -- het enige dat KOPAFKNIPPING kan zien. keten.verifieer() vraagt
+   of de overgebleven geschiedenis met zichzelf klopt; wie de nieuwste bonnen
+   weggooit, houdt een keten over die perfect klopt. Sporen wissen van wat je
+   zojuist deed, is dus precies waar de hashketen NIET tegen beschermt.
+
+   Daarvoor moet er een getal naar buiten. `anker()` maakt de momentopname; die
+   hoort weggezet te worden buiten deze database -- een gescheiden systeem, een
+   tweede partij, desnoods een uitdraai. Een anker in dezelfde database is geen
+   anker maar een tweede regel om te wijzigen, en dat staat ook zo in
+   server/lib/keten-anker.js. Deze module maakt het en rekent ermee af; het
+   wegzetten is met opzet geen taak van dit huis.
+
+   Dezelfde voorziening die het inzagejournaal al gebruikt -- geen tweede
+   implementatie voor dezelfde vraag. */
+const ankerPunt = (bak) => anker.verankerPunt((bak && bak.bonnen) || []);
+const tegenAnker = (bak, a) => anker.verifieerTegenAnker((bak && bak.bonnen) || [], a);
+
 /* De keten nalopen. Levert wat keten.verifieer() levert, en niets erbij: deze
    module doet geen uitspraak over wat de uitslag BETEKENT. */
 const controleer = (bak) => keten.verifieer((bak && bak.bonnen) || []);
 
-module.exports = { maak, schrijf, lees, controleer, NOOIT_VASTGESTELD, MAX };
+module.exports = { maak, schrijf, lees, controleer, ankerPunt, tegenAnker, NOOIT_VASTGESTELD, MAX };

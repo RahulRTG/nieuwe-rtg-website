@@ -25,6 +25,23 @@ module.exports = (tctx) => {
     res.json({ bonnen: F().bonnen((req.body || {}).hoeveel), keten: F().bonnenKlopt() });
   });
 
+  /* HET ANKER. Zonder dit ziet niemand KOPAFKNIPPING: wie de nieuwste bonnen
+     weggooit, houdt een keten over die van voor naar achter perfect klopt.
+     Deze deur MAAKT de momentopname; wegzetten doet een mens, buiten deze
+     database, want een anker dat hier blijft staan is een tweede regel om te
+     wijzigen. Stuur er later een terug en hij rekent ermee af. */
+  app.post('/api/techniek/vertrouwen/anker', techAuth, eigenaarAlleen, (req, res) => {
+    const eerder = (req.body || {}).anker;
+    if (eerder) return res.json({ tegenAnker: F().bonTegenAnker(eerder) });
+    const punt = F().bonAnker();
+    /* Geen bonnen, geen kop, geen anker. Dat is geen fout maar een stand, en
+       een leeg anker met "zet dit weg" erbij zou nergens op slaan. */
+    if (!punt) return res.json({ anker: null,
+      reden: 'Er zijn nog geen Trust Receipts, dus er is geen kop om te verankeren.' });
+    res.json({ anker: punt,
+      let: 'Zet dit buiten deze database weg. Een anker dat hier blijft staan, bewijst niets.' });
+  });
+
   /* Het bereik van een actor (laag 6). De rollentabel komt als DATA uit
      bedrijf/rollen-register.js -- die wordt daar met zoveel woorden los
      geexporteerd voor lezers buiten die laag, juist zodat niemand hem overtypt
@@ -50,8 +67,16 @@ module.exports = (tctx) => {
 
   /* De Trust State (laag 8). Een handvol absolute eigenschappen die op nul
      horen -- geen score, en geen enkel getal dat iets wegmiddelt. */
-  app.post('/api/techniek/vertrouwen/staat', techAuth, eigenaarAlleen, (req, res) => {
+  app.post('/api/techniek/vertrouwen/staat', techAuth, eigenaarAlleen, async (req, res) => {
     const { HANDELINGEN } = require('../../bedrijf/handeling-lijst');
-    res.json(F().trustState(HANDELINGEN));
+    /* De scanner wordt LIVE gevraagd, want een bewaarde datum is een bewering
+       over gisteren. Is er geen clamd (ontwikkelopstelling), of antwoordt hij
+       niet, dan levert dat een reden op en geen nul -- zie kern/vertrouwen/staat.js. */
+    let scanner = null;
+    try {
+      const c = require('../../kern/clamd').maakClamd();
+      if (c) scanner = await c.versie();
+    } catch (e) { scanner = { definitieDatum: null, reden: String(e && e.message || e).slice(0, 160) }; }
+    res.json(F().trustState(HANDELINGEN, scanner));
   });
 };

@@ -53,5 +53,10 @@ module.exports = {
     ['Vraag eerst een uitgeversplek aan; een mens van RTG laat u toe',
       'Kies de map van uw app en druk op Proefkeuring -- u ziet per bestand en per regel wat er nog niet kan',
       'Zend in wanneer de proef doorkomt; daarna kijkt een mens van RTG naar wat uw app doet'],
-    'De machinepoort keurt nooit goed: hij kan alleen afkeuren of doorlaten naar een mens. Vraag alleen de machtigingen die u echt gebruikt -- elke machtiging is een vinkje dat een lid kan weglaten.')
+    'De machinepoort keurt nooit goed: hij kan alleen afkeuren of doorlaten naar een mens. Vraag alleen de machtigingen die u echt gebruikt -- elke machtiging is een vinkje dat een lid kan weglaten.'),
+  '/apps/appstore-kantoor.html': G('De keuringskant van de App Store: hier tekent een mens van RTG af wat een derde heeft ingezonden.',
+    ['Zet eerst uw naam erbij; elk besluit hieronder draagt hem en gaat het journaal in',
+      'Lees wat de app DOET, niet alleen wat de machinepoort erover zegt -- die keurt nooit goed',
+      'Publiceren of weigeren met een reden; die reden leest de uitgever'],
+    'Een geschorste uitgever verliest zijn apps op hetzelfde moment, ook bij de leden die ze al hadden. Wie voor zo\'n app betaalde, krijgt een teruggaverecht dat u hier afhandelt.')
 };

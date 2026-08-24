@@ -201,6 +201,13 @@ server/kern/appstore/
   scan.js         de virusscanner op een webbundel, met het filter bij naam
   bundel.js       de onveranderlijke bundel: pad, hash, schijf, integriteit
   machtigingen.js de drie machtigingen, en wat er niet is met de reden
+  geld.js         de afdracht en de rekensom (de bon)
+  aanschaf.js     de koop zelf, en de omzet die een uitgever terugziet
+  teruggave.js    het recht dat een ingetrokken, gekochte app achterlaat
+  naad.js         de enige plek waar de store en het geld elkaar raken
+
+server/kern/pay/verkoop.js      een verkoop met inhoudingen, en de teruggave terug
+server/kern/fiscaal/digitaal.js de btw op een digitale dienst: land van de AFNEMER
 
 server/routes/appstore/
   uitgever.js     supplierAuth — een derde zendt in
@@ -210,11 +217,14 @@ server/routes/appstore/
 
 public/apps/
   appcel.html              de RTG-kant van een app van derden
-  appstore-uitgever.html   het uitgeversbureau (kies je map, proefkeuring, inzenden)
+  appstore-uitgever.html   het uitgeversbureau (kies je map, proefkeuring, inzenden, omzet)
+  appstore-kantoor.html    de keuringskant: waar een mens van RTG aftekent
   mall.html                de afdeling "App Store" naast de App-Bibliotheek
 
 test/appstore.test.js      de zes grenzen over de lijn
 test/appstore-cel.test.js  wat je aan de bron zelf kunt zien
+test/appstore-geld.test.js de bon, de aanschaf, de afdracht, de btw, het recht
+test/appstore.e2e.js       de cel, de winkel en de bon in een echte browser
 ```
 
 **Waarom een eigen afdeling in de Mall en geen rij in de App-Bibliotheek.** De
@@ -230,22 +240,118 @@ geen tegel: je komt er alleen via een app die je zelf hebt geïnstalleerd.
 
 ---
 
-## De open beslissing: geld
+## Geld: betaald via RTG Pay, met afdracht
 
-Alles in de App Store is nu **voor leden inbegrepen bij de pas**, precies zoals
-de bestaande App-Bibliotheek (`kern/appbieb.js`, ledenprijs 0). Er staat geen
-prijsveld op nul te wachten, want dat zou lezen als een werkend mechanisme.
+De eigenaar heeft gekozen: een app mag geld kosten, RTG int bij het lid, en er
+gaat een afdracht af. Wat dat betekent staat hieronder; de keuze zelf en wat de
+alternatieven waren, staan onderaan bij *de gemaakte beslissing*.
 
-Wat er te beslissen valt, en wat elke keuze kost:
+### Vijf begrippen erbij, en er komt er geen zesde
 
-| | wat het betekent |
+| begrip | wat het is | waar het woont |
+|---|---|---|
+| **prijs** | staat in het MANIFEST, dus per versie, dus door de keuring | `kern/appstore/manifest.js` |
+| **aanschaf** | een lid koopt EEN keer, voor die app; updates zijn gratis | `kern/appstore/aanschaf.js` |
+| **bon** | wat er precies is betaald — bruto, btw, afdracht, netto — en die is onveranderlijk | `kern/appstore/aanschaf.js` |
+| **afdracht** | het deel dat RTG inhoudt; door de eigenaar gezet, bevroren op de bon | `kern/appstore/geld.js` |
+| **teruggaverecht** | wat ontstaat als een gekochte app wordt ingetrokken | `kern/appstore/teruggave.js` |
+
+### De prijs staat in het manifest
+
+Een prijs die naast de versie zou leven, kan veranderen zonder dat er iemand
+naar heeft gekeken — en dan verkoopt een uitgever morgen voor het tienvoudige
+wat RTG gisteren heeft goedgekeurd. Hier hoort hij bij de bundel, gaat hij door
+dezelfde keuring, en **is een prijswijziging een nieuwe versie met een nieuwe
+handtekening van een mens**.
+
+### Er komt geen tweede geldstroom
+
+De aanschaf loopt over RTG Pay (`kern/pay/verkoop.js`, nieuw: een verkoop met
+inhoudingen, hetzelfde patroon als `kasInt`). De opbrengst landt op de bestaande
+partnerrekening van de zaak van de uitgever, en uitbetalen is de weg die er al
+was — manager-only, naar de bank. `kern/appstore/` boekt zelf niets en telt geen
+saldi; dat zou de dubbele boekhouding zijn die LAT-regel 4 verbiedt.
+
+Het bruto bedrag gaat naar de partner, en wat eraf moet volgt als eigen regel in
+hetzelfde grootboek. Zo ziet de ondernemer in zijn eigen boekingen wat er is
+binnengekomen en wat eraf ging, in plaats van een netto bedrag zonder uitleg.
+
+### De btw hoort in het land van het lid
+
+De plaats van een digitale dienst is waar de **afnemer** woont, en dat is een
+ander antwoord dan `kern/fiscaal/tarief.js` geeft voor een maaltijd of een kamer.
+Daarom `kern/fiscaal/digitaal.js`: dezelfde levende landentabel, maar een andere
+vraag. Wat verschilt is welk land telt, niet het cijfer.
+
+Hij **raadt nooit**. Een land dat niet in de tabel staat levert geen
+standaardtarief maar een weigering met de reden, en een lid van wie het land niet
+bekend is, krijgt geen bon maar een keuzelijst. Een aanschaf met een verzonnen
+btw-tarief is erger dan geen aanschaf: hij ziet er precies zo uit als een goede.
+
+Wat er **niet** is, en dat staat ook in dat bestand: geen OSS-aangifte, geen
+drempelbewaking, geen btw-verlegging bij een zakelijke afnemer, geen controle op
+twee bewijsstukken van de woonplaats. Wat er wel is: elke aanschaf legt land,
+tarief en bedrag vast, zodat een boekhouder het kan aangeven.
+
+### Kopen gebeurt in de winkel, nooit in de app
+
+De brug van de cel kent geen methode die geld beweegt, en die komt er ook niet.
+`GELD.md` par. 3 zegt dat geld het huis nooit vanzelf verlaat en dat alles wat
+een derde raakt maximaal "klaarzetten" is; een aankoopknop ín een app van een
+derde is precies de autonome betaling die daar verboden wordt. Het lid koopt op
+een scherm van RTG, met de bon ervoor: eerst wat het kost en waar het heen gaat,
+dan pas de knop. En dezelfde poort als bij elk ander geld-moment: een echt
+account laat voor RTG Pay eenmalig zijn paspoort zien, ook hier.
+
+### De afdracht werkt alleen vooruit
+
+Hij staat op **0%** tot de eigenaar hem zet — geen slappe standaard maar de
+bestaande belofte van dit huis ("RTG rekent 0% commissie: de partner houdt 100%
+van elke boeking"). Zetten vraagt een naam en een reden, gaat het journaal in, en
+raakt alleen nieuwe bonnen: **een geschreven bon wordt nooit herrekend**. Hij
+wordt gerekend over het netto bedrag en niet over het bruto, want btw is geen
+omzet — een percentage over bruto zou betekenen dat een uitgever in een land met
+een hoger tarief meer afdraagt over hetzelfde werk.
+
+### Intrekken laat een recht achter, geen terugboeking
+
+Hier zat een echte spanning. Grens 5 zegt dat intrekken onmiddellijk werkt en
+overal, ook bij wie de app al had — dat is er voor de veiligheid en mag niet
+zachter. Maar een lid dat ervoor betaalde, is dan zijn aankoop kwijt door een
+besluit van ons.
+
+De uitweg is niet de grens verzachten maar het geld apart regelen. Intrekken
+blijft absoluut; wat het achterlaat is een **recht**, dat wordt klaargezet. Een
+mens van RTG betaalt terug of wijst af met een reden.
+
+En de teruggave loopt exact de weg van de verkoop terug. Dat was de plek waar de
+eerste opzet omviel, en de fout was leerzaam: een lid betaalt bruto, maar de
+uitgever houdt daar maar een deel van over — de btw en de afdracht zijn er
+meteen afgegaan. Het hele brutobedrag van de partnerrekening terugvragen breekt
+met "Onvoldoende saldo", precies zoals het hoort. Elk deel komt nu van de
+rekening waar het destijds heen ging, en kan één van die potjes het niet missen,
+dan gaat er **niets**: half terugbetalen is een tweede probleem bovenop het
+eerste.
+
+### Een uitgever ziet aantallen en bedragen, nooit wie
+
+Ook geen codenaam — een codenaam plus een tijdstip is een spoor, en het
+codenaam-ontwerp van dit huis is er juist om dat onmogelijk te maken.
+
+### De gemaakte beslissing
+
+Er lagen drie wegen; dit is er één van, en waarom de andere twee er niet zijn:
+
+| | |
 |---|---|
-| **inbegrepen bij de pas** (nu) | een derde publiceert om erbij te horen, niet om te verdienen. Geen inning, geen uitbetaling, geen fiscale keten. Trekt vooral partners die al iets met RTG hebben. |
-| **betaald via RTG Pay, met afdracht** | vraagt een bevestiging door het lid (LIFE.md: klaarzetten mag, bevestigen doet de mens), een uitbetaalstroom naar de uitgever, btw per land en een omzetdelingspercentage. Dat is een geldketen en geen veld. |
-| **gratis, met een vergoeding van RTG** | RTG betaalt de uitgever per gebruik of per periode. Geen betaalstroom naar leden, wel een budget en een meting die niet te manipuleren is. |
+| **inbegrepen bij de pas** | wat het was. Geen inning, geen fiscale keten — maar ook geen reden voor een derde om er tijd in te steken. |
+| **betaald via RTG Pay, met afdracht** | **gekozen.** Vraagt precies wat hierboven staat: een bevestiging door het lid, btw per land, een afdracht en een uitbetaalweg. |
+| **gratis, met een vergoeding van RTG** | niet gekozen. Vraagt een gebruiksmeting die een uitgever niet kan opdrijven, en dat is een moeilijker probleem dan het lijkt. |
 
-Zolang die keuze niet is gemaakt, blijft `betalen` staan in
-`machtigingen.NIET_GEBOUWD` met de reden erbij.
+Wat er **niet** bij zit en met een reden in `machtigingen.NIET_GEBOUWD` blijft
+staan: een app die zelf een betaling start. Ook abonnementen en aankopen ín een
+app bestaan niet — dat zijn eigen mechanismen met een eigen opzegweg, en een
+half gebouwd abonnement is erger dan geen abonnement.
 
 ---
 

@@ -70,9 +70,14 @@ draait nooit op de RTG-herkomst (een naamloze cel zonder netwerk, en geen vlag
 die dat uitzet), de machinepoort keurt nooit goed (hij laat alleen door naar een
 mens van RTG, en nooit naar de uitgever zelf), en een machtiging die een lid niet
 heeft VERLEEND bestaat niet — het manifest vraagt, het lid geeft. Er zijn er drie,
-en alle drie worden ze uitgevoerd; wat er niet is, staat er met de reden. Geld is
-daar de open beslissing: alles is nu inbegrepen bij de pas, en `betalen` staat in
-`nietGebouwd` met de reden.
+en alle drie worden ze uitgevoerd; wat er niet is, staat er met de reden. **Een
+app mag geld kosten** (besluit van de eigenaar): de prijs staat in het manifest
+en gaat dus door dezelfde keuring, kopen gebeurt in de WINKEL en nooit in de app
+(GELD.md par. 3: alles wat een derde raakt is maximaal klaarzetten), de btw hoort
+in het land van het LID en wordt nooit geraden, de afdracht van RTG staat op 0%
+tot de eigenaar hem zet en werkt alleen vooruit, en een ingetrokken gekochte app
+laat een teruggaveRECHT achter dat een mens afhandelt — grens 5 blijft absoluut.
+Er komt geen tweede geldstroom: alles loopt over RTG Pay.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

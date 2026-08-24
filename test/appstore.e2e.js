@@ -215,3 +215,90 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* De betaalde kant in een browser: de bon voordat er wordt betaald, en de
+   keuringskant waar een mens aftekent. Ze staan hier en niet in een API-toets
+   omdat de fout die je hier zoekt alleen in een venster bestaat -- een bon die
+   niet optelt op het scherm, een knop die twee keer boekt, een keuringspagina
+   die zonder naam toch doorgaat. */
+test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-geld-e2e-'));
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  const base = srv.base;
+  let browser = null;
+  try {
+    const tech = (await api(base, '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
+    const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
+    const chef = (roster.staff || []).find(x => x.role === 'manager');
+    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    /* Een demosessie als koper: een echt account moet voor RTG Pay eenmalig zijn
+       paspoort laten zien, en die poort geldt hier ook (test/appstore-geld.test.js
+       toets 9). Een demosessie heeft geen account en dus geen paspoortplicht. */
+    const lid = (await api(base, '/api/login', { tier: 'rtg' })).body.token;
+    await api(base, '/api/pay/oplaad', { centen: 5000, idem: 'e2e-oplaad' }, lid);
+
+    await api(base, '/api/techniek/tenant', { org: 'O-BON', naam: 'Bon Uitgeverij' }, tech);
+    await api(base, '/api/techniek/tenant/bind', { org: 'O-BON', soort: 'zaak', code: 'KIKUNOI' }, tech);
+    await api(base, '/api/appstore/uitgever/aanvraag', { naam: 'Bon Uitgeverij', contact: 'dev@bon.nl' }, sup);
+    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-BON', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+    const inz = await api(base, '/api/appstore/uitgever/inzenden', {
+      manifest: { sleutel: 'bon-proef', naam: 'Bonproef', versie: '1.0.0', categorie: 'leven',
+        uitleg: 'Een betaalde proefapp om de bon en de keuringskant te tonen.', machtigingen: [], prijsCenten: 999 },
+      bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
+    assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
+
+    browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+
+    /* ---- eerst de keuringskant: hier moet een MENS aftekenen ---- */
+    const kp = await browser.newPage();
+    const kf = letOpFouten(kp, []);
+    await kp.goto(base + '/apps/app.html');
+    await kp.evaluate((t) => localStorage.setItem('rtg_office_token', t), office);
+    await kp.goto(base + '/apps/appstore-kantoor.html');
+    await kp.waitForSelector('[data-v] .pub', { timeout: 20000 });
+    assert.deepEqual(kf, [], 'de keuringspagina boot zonder onopgevangen fouten');
+    assert.match(await kp.textContent('body'), /Bonproef/, 'de inzending staat in de wachtrij');
+    assert.match(await kp.textContent('body'), /keurt nooit goed/, 'en de pagina zegt zelf dat de machine niets goedkeurt');
+    // zonder naam gaat het niet
+    await kp.click('[data-v] .pub');
+    await kp.waitForTimeout(800);
+    assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'zonder naam is er niets gepubliceerd');
+    await kp.fill('#wie', 'Sam van RTG');
+    await kp.click('[data-v] .pub');
+    await kp.waitForFunction(() => !document.querySelector('[data-v] .pub'), null, { timeout: 15000 });
+    assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 1, 'met een naam wel');
+
+    /* ---- en dan de winkel: de bon voordat er wordt betaald ---- */
+    const page = await browser.newPage();
+    const fouten = letOpFouten(page, []);
+    await page.goto(base + '/apps/app.html');
+    await page.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
+    await page.goto(base + '/apps/mall.html');
+    await page.waitForSelector('#asGrid .asKoop', { timeout: 20000 });
+    assert.deepEqual(fouten, [], 'de Mall boot zonder onopgevangen fouten');
+    assert.match(await page.textContent('#asGrid .boutiek'), /9,99/, 'de prijs staat op de kaart, voordat je iets doet');
+
+    await page.click('#asGrid .asKoop');
+    await page.waitForSelector('#asGrid .bonBetaal, #asGrid .bonLand', { timeout: 15000 });
+    if (await page.locator('#asGrid .bonLand').count()) {
+      await page.selectOption('#asGrid .bonLand', 'NL');
+      await page.waitForSelector('#asGrid .bonBetaal', { timeout: 15000 });
+    }
+    const bon = await page.textContent('#asGrid .asBon');
+    assert.match(bon, /Je betaalt/);
+    assert.match(bon, /btw 21%/, 'de btw van het land van het LID staat erbij');
+
+    const voor = (await api(base, '/api/pay/overzicht', {}, lid)).body.saldo;
+    await page.click('#asGrid .bonBetaal');
+    await page.waitForSelector('#asGrid .asZet', { timeout: 20000 });
+    assert.equal((await api(base, '/api/pay/overzicht', {}, lid)).body.saldo, voor - 999, 'er is precies een keer afgerekend');
+    const gezond = await fetch(base + '/api/pay/gezond').then(async r => r.json());
+    assert.equal(gezond.klopt, true, 'en het grootboek sluit nog steeds');
+    assert.deepEqual(fouten, [], 'ook na het kopen geen onopgevangen fouten');
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+    stop(srv && srv.child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

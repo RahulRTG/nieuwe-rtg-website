@@ -102,6 +102,17 @@ test('2. zonder land geen bon: de btw wordt nooit geraden', async () => {
   assert.ok(b.body.landen.length > 50, 'en geeft de lijst waaruit te kiezen valt');
   assert.match(b.body.waarom, /land waar jij woont/);
   assert.equal((await api('/api/appstore/koop', { sleutel: 'derden-betaald' }, lid)).status, 400, 'kopen zonder land kan niet');
+
+  /* De keuzelijst is los op te vragen, want het scherm heeft hem ook nodig als
+     het lid op "ander land" drukt. Hij komt uit dezelfde landentabel als het
+     tarief: er kan dus geen land in staan waarvoor we geen tarief kennen. */
+  const l = await api('/api/appstore/landen', {}, lid);
+  assert.equal(l.status, 200);
+  assert.ok(l.body.landen.some(x => x.code === 'NL' && x.naam === 'Nederland'));
+  for (const x of l.body.landen.slice(0, 25)) {
+    assert.equal((await api('/api/appstore/bon', { sleutel: 'derden-betaald', land: x.code }, lid)).body.landNodig, undefined,
+      'elk land uit de lijst levert een bon: ' + x.code);
+  }
 });
 
 test('3. de bon rekent EEN keer, en het scherm rekent niet mee', async () => {

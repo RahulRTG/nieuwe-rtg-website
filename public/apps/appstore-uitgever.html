@@ -114,6 +114,10 @@ const manifestUit = () => ({
   sleutel: $('#mSleutel').value.trim().toLowerCase(), naam: $('#mNaam').value.trim(),
   versie: $('#mVersie').value.trim(), uitleg: $('#mUitleg').value.trim(),
   categorie: $('#mCategorie').value, start: $('#mStart').value.trim() || 'index.html',
+  /* De prijs gaat MEE in het manifest en staat niet ergens apart. Daarmee gaat
+     hij door dezelfde keuring als de rest, en is een prijswijziging een nieuwe
+     versie met een nieuwe handtekening van een mens. */
+  prijsCenten: Math.round((Number(String($('#mPrijs').value).replace(',', '.')) || 0) * 100),
   machtigingen: [...document.querySelectorAll('input[data-mach]:checked')].map(i => i.dataset.mach)
 });
 
@@ -171,7 +175,9 @@ function tekenInzenden(){
       '<div><label class="vlak" for="mCategorie">Categorie</label><select class="veld" id="mCategorie" style="width:100%;">'+
         ['sociaal','reizen','eten','media','geld','spelen','leven','veiligheid'].map(c => '<option>'+c+'</option>').join('')+'</select></div>'+
       '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld" id="mStart" style="width:100%;" maxlength="80" placeholder="index.html"></div>'+
+      '<div><label class="vlak" for="mPrijs">Prijs in euro (0 = gratis)</label><input class="veld" id="mPrijs" style="width:100%;" inputmode="decimal" placeholder="0,00"></div>'+
     '</div>'+
+    '<p class="sub" style="margin-top:.5rem;">Een betaalde app wordt in de winkel gekocht, nooit in de app zelf. RTG int bij het lid, draagt de btw af in het land van dat lid, houdt de afdracht in en schrijft de rest bij op de RTG Pay-rekening van je zaak. Wat een lid betaalt, ziet hij als bon voordat hij drukt.</p>'+
     '<div style="margin-top:.6rem;"><label class="vlak" for="mUitleg">Uitleg (20-260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
       '<textarea class="veld" id="mUitleg" style="width:100%;min-height:4.4rem;" maxlength="260"></textarea></div>'+
     '<div style="margin-top:.8rem;"><span class="vlak">Wat je vraagt</span>'+m+'</div>'+
@@ -184,6 +190,26 @@ function tekenInzenden(){
     '<div class="kaart"><h3>Wat je niet kunt vragen, en waarom</h3><p class="sub">Dit is geen routekaart maar het antwoord vooraf: een regel hier verdwijnt pas als de brug hem uitvoert.</p>'+niet+'</div>';
 }
 
+function tekenOmzet(){
+  if (!STAND.omzet) return '';
+  const o = STAND.omzet;
+  if (!o.aantal) return '<div class="kaart"><h2>Verkopen</h2><p class="sub">Nog niets verkocht. Zodra er iets wordt gekocht, staat hier hoeveel en hoeveel er is bijgeschreven - aantallen en bedragen, nooit wie.</p>'+
+    '<p class="sub">De afdracht van RTG staat nu op '+esc(String(o.afdrachtNu.procent))+'%. '+esc(o.afdrachtNu.reden || '')+'</p></div>';
+  const r = (l, c) => '<div style="display:flex;justify-content:space-between;font-size:.82rem;"><span class="sub">'+l+'</span><b>'+eur(c)+'</b></div>';
+  return '<div class="kaart"><h2>Verkopen</h2><p class="sub">'+esc(o.let)+'</p>'+
+    '<div style="margin-top:.6rem;">'+
+      r(o.aantal + ' aanschaffen, bruto', o.brutoCenten)+
+      r('af: btw (door RTG afgedragen)', o.btwCenten)+
+      r('af: afdracht App Store', o.afdrachtCenten)+
+      r('bijgeschreven op je zaak', o.uitgeverCenten)+
+    '</div>'+
+    '<table><tr><th>app</th><th>aantal</th><th>bruto</th><th>bijgeschreven</th></tr>'+
+    o.perApp.map(a => '<tr><td>'+esc(a.naam)+'</td><td>'+a.aantal+'</td><td>'+eur(a.brutoCenten)+'</td><td>'+eur(a.uitgeverCenten)+'</td></tr>').join('')+
+    '</table>'+
+    '<p class="sub" style="margin-top:.5rem;">De afdracht van RTG staat nu op '+esc(String(o.afdrachtNu.procent))+'%. Een bon die al is geschreven, wordt nooit herrekend.</p></div>';
+}
+const eur = c => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(Number(c || 0) / 100);
+
 function tekenApps(){
   if (!STAND.apps.length) return '';
   return '<div class="kaart"><h2>Je apps</h2>'+ STAND.apps.map(a =>
@@ -192,8 +218,8 @@ function tekenApps(){
         (a.live ? '<span class="st live">live · '+esc(a.live.versie)+'</span><button class="knop stil aTrek" data-s="'+esc(a.sleutel)+'">Intrekken</button>'
                 : '<span class="st nee">niet live</span>')+'</div>'+
       (a.ingetrokken ? '<p class="sub">Ingetrokken door '+esc(a.ingetrokken.door)+(a.ingetrokken.reden ? ': '+esc(a.ingetrokken.reden) : '')+'</p>' : '')+
-      '<table><tr><th>versie</th><th>stand</th><th>hash</th><th>ingezonden</th><th>besluit</th></tr>'+
-      a.versies.map(v => '<tr><td>'+esc(v.versie)+'</td><td>'+esc(v.status)+'</td><td><code>'+esc(v.hash.slice(0,12))+'</code></td>'+
+      '<table><tr><th>versie</th><th>prijs</th><th>stand</th><th>hash</th><th>ingezonden</th><th>besluit</th></tr>'+
+      a.versies.map(v => '<tr><td>'+esc(v.versie)+'</td><td>'+(v.prijsCenten ? eur(v.prijsCenten) : 'gratis')+'</td><td>'+esc(v.status)+'</td><td><code>'+esc(v.hash.slice(0,12))+'</code></td>'+
         '<td>'+esc(String(v.at).slice(0,16).replace('T',' '))+'</td>'+
         '<td>'+(v.besluit ? esc(v.besluit.door)+(v.besluit.reden ? ' - '+esc(v.besluit.reden) : '') : '-')+'</td></tr>').join('')+
       '</table></div>').join('')+'</div>';
@@ -206,10 +232,14 @@ async function laad(){
   catch (e) { $('#main').innerHTML = '<div class="kaart"><h2>Nog geen uitgever</h2><p class="sub">'+esc(e.message)+'</p></div>'; return; }
   STAND = d;
   const toegelaten = d.uitgever && d.uitgever.status === 'toegelaten';
+  /* De omzet komt apart binnen en mag ontbreken: draait dit proces zonder
+     RTG Pay, dan is er geen betaalde kant en zegt de pagina dat door het blok
+     gewoon weg te laten in plaats van een nul te tonen die niets betekent. */
+  if (toegelaten) { try { const o = await api('/api/appstore/uitgever/omzet'); if (o.aantal != null) STAND.omzet = o; } catch (e) {} }
   $('#main').innerHTML =
     '<div class="kaart"><h2>'+esc(d.organisatie || d.org)+'</h2>'+
       '<p class="sub">Organisatie <code>'+esc(d.org)+'</code> · '+(d.uitgever ? 'uitgeversplek: '+esc(d.uitgever.status) : 'nog geen uitgeversplek')+'</p></div>'+
-    (toegelaten ? '' : tekenAanvraag()) + (toegelaten ? tekenInzenden() : '') + tekenApps();
+    (toegelaten ? '' : tekenAanvraag()) + (toegelaten ? tekenInzenden() : '') + tekenApps() + tekenOmzet();
 
   const vraag = $('#uVraag');
   if (vraag) vraag.addEventListener('click', async () => {

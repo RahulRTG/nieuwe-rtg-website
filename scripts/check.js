@@ -774,6 +774,22 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
     ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    /* Een app kopen in de App Store. Er STAAT een derde tegenover -- de uitgever
+       -- en toch hoort deze route niet langs de gegevenspoort, en dat is een
+       besluit met een reden.
+
+       De poort bestaat zodat een derde je kan BEREIKEN als er iets misgaat met
+       je tafel of je bestelling. Hier is er niets om over te bellen: er komt
+       niemand langs, er wordt niets bezorgd, en de uitgever krijgt van deze
+       aanschaf niet meer te zien dan een aantal en een bedrag -- APPSTORE.md
+       grens 3 verbiedt hem zelfs de codenaam. Een telefoonnummer eisen zou dus
+       een gegeven vragen dat NIEMAND leest, en dat is precies de drempel die
+       kern/gegevenspoort.js in zijn kop verbiedt.
+
+       Wat deze route WEL vraagt staat er trouwens vlak boven: het land van het
+       lid (voor de btw) en, bij een echt account, de paspoortpoort van RTG Pay.
+       Er wordt hier dus niet minder gevraagd, er wordt iets ANDERS gevraagd. */
+    ['/api/appstore/koop', 'de uitgever krijgt geen naam, geen nummer en zelfs geen codenaam; er is niets om over te bereiken. Wat hier wel wordt gevraagd -- het land voor de btw en de paspoortpoort van RTG Pay -- staat in routes/appstore/kopen.js'],
     /* Een pot is een OORMERK binnen het eigen tegoed en geen reservering bij
        iemand: er beweegt geen geld en er staat geen partij tegenover (GELD.md
        par. 3). Het woord "reserveer" is hier de valse vriend. Deze route werd

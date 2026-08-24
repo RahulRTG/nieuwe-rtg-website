@@ -15,7 +15,7 @@
 const { landcodeUit, landkeuze } = require('../../kern/fiscaal/digitaal');
 
 module.exports = (kern) => {
-  const { app, auth, appstore, appstoreWinkel, liveCodename, onboarding } = kern;
+  const { app, auth, appstore, liveCodename, onboarding } = kern;
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
   const geld = () => appstore.geld;
   const geenGeld = (res) => res.status(503).json({ error: 'De betaallaag draait niet mee; betaalde apps zijn nu niet te kopen.', nietGebouwd: 'RTG Pay is in dit proces niet gemount.' });

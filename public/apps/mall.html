@@ -201,6 +201,10 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const euro = n => (n==null) ? '' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+/* Centen, en met de centen erbij. euro() rondt af op hele euro's -- prima voor
+   een hotelkamer, fout voor een bon waarop btw en afdracht moeten optellen tot
+   precies het bedrag dat je betaalt. */
+const euroC = c => (c==null) ? '' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(c)/100);
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2400); }
 const api = (pad, body, herkans) => fetch(pad, {
@@ -619,13 +623,18 @@ function storeKaart(a){
       '<span style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Wat je geeft</span>'+
       vinkjes+'</div>'+
     '<div class="rij" style="margin-top:.6rem;gap:.4rem;align-items:center;">'+
-      '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b><span class="h-flex1"></span>'+
+      (a.prijsCenten > 0
+        ? '<b style="color:var(--gold);font-size:.8rem;">'+euroC(a.prijsCenten)+(a.gekocht?' &middot; gekocht':'')+'</b>'
+        : '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>')+
+      '<span class="h-flex1"></span>'+
       (a.geinstalleerd
         ? '<a class="knop stil" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'" style="text-decoration:none;">Openen</a>'+
           '<button class="knop stil asZet" type="button">Bijwerken</button>'+
           '<button class="knop stil asWeg" type="button">Verwijderen</button>'
-        : '<button class="knop asZet" type="button">Op mijn startscherm</button>')+
-    '</div></div>';
+        : (a.prijsCenten > 0 && !a.gekocht
+            ? '<button class="knop asKoop" type="button">Kopen voor '+euroC(a.prijsCenten)+'</button>'
+            : '<button class="knop asZet" type="button">Op mijn startscherm</button>'))+
+    '</div><div class="asBon" hidden style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
 }
 async function tekenStore(){
   const grid = $('#asGrid'), blader = $('#asBlader');
@@ -655,11 +664,74 @@ async function tekenStore(){
         meld(r.let || 'Bijgewerkt.'); tekenStore();
       } catch(e){ meld(e.message); }
     }));
+    /* KOPEN IS TWEE STAPPEN, EN DAT IS GEEN TRAAGHEID MAAR DE REGEL. Eerst de
+       BON -- wat betaal ik, hoeveel daarvan is btw, wat gaat er naar de
+       uitgever -- en dan pas de knop die afrekent. GELD.md par. 3: alles wat een
+       derde raakt is maximaal "klaarzetten"; bevestigen doet de mens. */
+    grid.querySelectorAll('.asKoop').forEach(b => b.addEventListener('click', async () => {
+      const kaart = b.closest('.boutiek'), vak = kaart.querySelector('.asBon');
+      vak.hidden = false; vak.innerHTML = '<span class="tag">De bon wordt opgemaakt…</span>';
+      await toonBon(kaart.dataset.sleutel, vak, null);
+    }));
     grid.querySelectorAll('.asWeg').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/appstore/weg', { sleutel: b.closest('.boutiek').dataset.sleutel }); meld('Verwijderd.'); tekenStore(); }
       catch(e){ meld(e.message); }
     }));
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+
+/* De bon: wat een lid betaalt en waar het heen gaat, VOORDAT hij drukt.
+   Het land staat erbij en is te wijzigen: de btw op een digitale aankoop hoort
+   in het land waar het lid woont, en dat is de wet en niet onze keuze. Wij
+   rekenen hier niets zelf uit -- alles komt van /api/appstore/bon, zodat wat op
+   het scherm staat en wat er wordt geboekt niet uit elkaar kunnen lopen. */
+async function toonBon(sleutel, vak, land){
+  let d;
+  try { d = await api('/api/appstore/bon', { sleutel, land }); }
+  catch(e){ vak.innerHTML = '<span class="tag">'+esc(e.message)+'</span>'; return; }
+  if (d.landNodig) {
+    vak.innerHTML = '<span class="tag">'+esc(d.waarom)+'</span>'+
+      '<div class="rij" style="margin-top:.5rem;"><select class="veld bonLand" style="max-width:16rem;">'+
+      '<option value="">Kies je land…</option>'+
+      d.landen.map(l => '<option value="'+esc(l.code)+'">'+esc(l.naam)+'</option>').join('')+'</select></div>';
+    vak.querySelector('.bonLand').addEventListener('change', (e) => { if (e.target.value) toonBon(sleutel, vak, e.target.value); });
+    return;
+  }
+  const r = (label, c) => '<div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);"><span>'+label+'</span><b style="color:var(--txt);">'+euroC(c)+'</b></div>';
+  vak.innerHTML =
+    '<div style="display:flex;justify-content:space-between;font-size:.9rem;"><b>Je betaalt</b><b style="color:var(--gold);">'+euroC(d.brutoCenten)+'</b></div>'+
+    '<div style="margin-top:.35rem;">'+
+      r('waarvan btw '+d.btwProcent+'% ('+esc(d.landNaam)+')', d.btwCenten)+
+      (d.afdrachtCenten ? r('afdracht RTG '+d.afdrachtProcent+'%', d.afdrachtCenten) : '')+
+      r('naar '+esc(d.uitgever ? d.uitgever.naam : 'de uitgever'), d.uitgeverCenten)+
+    '</div>'+
+    '<div class="rij" style="margin-top:.55rem;align-items:center;">'+
+      '<span class="tag" style="font-size:.74rem;">btw-land: <b>'+esc(d.landNaam)+'</b></span>'+
+      '<button class="knop stil bonAnder" type="button">Ander land</button>'+
+      '<span class="h-flex1"></span><button class="knop bonBetaal" type="button">Betalen</button>'+
+    '</div><div class="bonKies" hidden style="margin-top:.45rem;"></div>';
+  /* "Ander land" haalt de lijst op en laat het lid kiezen. Hij stuurt met opzet
+     geen onzinwaarde naar de bon om de keuzelijst uit te lokken: dan zou de
+     server moeten raden wat een lid bedoelt, en dat is precies wat hij bij een
+     btw-land niet mag doen. */
+  vak.querySelector('.bonAnder').addEventListener('click', async () => {
+    const kies = vak.querySelector('.bonKies');
+    kies.hidden = false; kies.innerHTML = '<span class="tag">Even de landen ophalen…</span>';
+    try {
+      const l = await api('/api/appstore/landen');
+      kies.innerHTML = '<select class="veld bonLand" style="max-width:16rem;" aria-label="Kies je land">'+
+        '<option value="">Kies je land…</option>'+
+        l.landen.map(x => '<option value="'+esc(x.code)+'"'+(x.code===d.land?' selected':'')+'>'+esc(x.naam)+'</option>').join('')+'</select>';
+      kies.querySelector('.bonLand').addEventListener('change', (e) => { if (e.target.value) toonBon(sleutel, vak, e.target.value); });
+    } catch(e){ kies.innerHTML = '<span class="tag">'+esc(e.message)+'</span>'; }
+  });
+  vak.querySelector('.bonBetaal').addEventListener('click', async (e) => {
+    e.target.disabled = true; e.target.textContent = 'Bezig…';
+    try {
+      const k = await api('/api/appstore/koop', { sleutel, land: d.land, idem: 'koop-' + sleutel + '-' + d.brutoCenten });
+      meld(k.let || 'Betaald.'); tekenStore();
+    } catch(err){ meld(err.message); e.target.disabled = false; e.target.textContent = 'Betalen'; }
+  });
 }
 
 /* ---------- De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen ----------

@@ -1,0 +1,193 @@
+/* Private Introductions · de gedeelde werklaag van Vonk en Rendez-vous.
+   De Social OS-kop blijft ceremonieel; hieronder begint onmiddellijk het werk.
+   Pearl, onyx, goud en bordeaux volgen MATERIAAL.md. Geen score, streak of
+   oneindige feed: een kleine selectie en een menselijk akkoord per stap. */
+body[data-rtg-dating]{
+  --dating-paper:var(--pearl-basis,#f4f0e9);
+  --dating-paper-deep:var(--pearl-diep,#e8e2d7);
+  --dating-ink:var(--onyx-basis,#0c0c0b);
+  --dating-gold:var(--gold-basis,#857007);
+  --dating-gold-text:var(--gold-tekst,#c0a544);
+  --dating-wine:var(--bordeaux-basis,#7f1634);
+  --dating-line:rgba(64,55,39,.18);
+  --dating-muted:#706b61;
+  background:var(--dating-paper)!important;
+}
+body[data-rtg-dating] .rtg-suitehero.rtg-intel-host{box-sizing:border-box;min-height:300px;padding-block:2.4rem;}
+body[data-rtg-dating] .rtg-suitehero.rtg-intel-host .rtg-suitehero-copy>p{max-width:35%;}
+body[data-rtg-dating] .rtg-intel-host>.rtg-reality-graph{width:min(41vw,520px);min-width:390px;}
+body[data-rtg-dating] .rtg-intel-strip{--rtg-intel-height:68px;}
+
+body[data-rtg-dating] main#main,
+body[data-rtg-dating] main#inhoud{
+  box-sizing:border-box;display:block!important;width:min(1180px,100%)!important;max-width:none!important;
+  margin:0 auto 7rem!important;padding:clamp(1.3rem,3vw,2.35rem) clamp(1rem,3vw,2.4rem)!important;
+  color:#1a1814;background:transparent!important;
+}
+body[data-rtg-dating] main#main{min-height:440px;}
+body[data-rtg-dating] .dating-tabs{
+  box-sizing:border-box;position:sticky;z-index:28;top:var(--suite-stack,116px);display:flex;width:min(1180px,100%);margin:0 auto;
+  padding:0 clamp(1rem,3vw,2.4rem);overflow-x:auto;background:rgba(244,240,233,.96);border-bottom:1px solid var(--dating-line);backdrop-filter:blur(14px);
+}
+body[data-rtg-dating] .dating-tabs button{position:relative;min-height:54px;padding:0 1rem;border:0;color:#706b61;background:transparent;font:700 .66rem/1 Inter,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
+body[data-rtg-dating] .dating-tabs button::after{content:"";position:absolute;right:1rem;bottom:0;left:1rem;height:2px;background:transparent;}
+body[data-rtg-dating] .dating-tabs button[aria-selected="true"]{color:#211f1a;}
+body[data-rtg-dating] .dating-tabs button[aria-selected="true"]::after{background:var(--dating-gold);}
+body[data-rtg-dating] .dating-command{
+  display:grid;grid-template-columns:minmax(210px,1.2fr) repeat(3,minmax(150px,.55fr));
+  margin-bottom:1px;color:#f4f0e9;border:1px solid var(--onyx-rand,rgba(255,255,255,.09));
+  background:var(--onyx-glans,linear-gradient(168deg,#171614,#0c0c0b));
+}
+.dating-command-main,.dating-command-cell{min-height:76px;display:flex;flex-direction:column;justify-content:center;padding:1rem 1.25rem;}
+.dating-command.dating-payment-grid{grid-template-columns:repeat(3,1fr);margin-bottom:0;}
+.dating-command.dating-payment-grid .dating-command-cell{border-left:1px solid rgba(255,255,255,.1);}
+.dating-command.dating-payment-grid .dating-command-cell:first-child{border-left:0;}
+.dating-command-cell{border-left:1px solid rgba(255,255,255,.1);}
+.dating-command span,.dating-eyebrow{font:600 .62rem/1.25 Inter,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;}
+.dating-command span{color:rgba(244,240,233,.42);}
+.dating-command strong{margin-top:.38rem;color:#f4f0e9;font:600 .8rem/1.3 Inter,system-ui,sans-serif;}
+.dating-command-main strong{color:var(--dating-gold-text);font:500 1.15rem/1.1 "Bodoni Moda",Georgia,serif;}
+.dating-command-cell[data-state="safe"] strong::before{content:"";display:inline-block;width:6px;height:6px;margin-right:.5rem;background:#6fa889;}
+
+.dating-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:1px;background:var(--dating-line);border:1px solid var(--dating-line);}
+.dating-work,.dating-context{background:rgba(248,245,238,.84);}
+.dating-work{min-width:0;padding:clamp(1.2rem,3vw,2.2rem);}
+.dating-context{padding:1.6rem 1.35rem;background:linear-gradient(160deg,#e8e2d7,#f4f0e9 58%,#eee8dc);}
+.dating-context h2,.dating-section-head h2,.dating-gate h2{margin:0;color:#211f1a;font:500 clamp(1.55rem,3vw,2.25rem)/1 "Bodoni Moda",Georgia,serif;letter-spacing:-.02em;text-transform:none;}
+.dating-context p,.dating-copy{margin:.75rem 0 0;color:var(--dating-muted);font-size:.82rem;line-height:1.7;}
+.dating-context dl{margin:1.5rem 0 0;}
+.dating-context dl div{padding:.78rem 0;border-top:1px solid var(--dating-line);}
+.dating-context dt{color:var(--dating-muted);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;}
+.dating-context dd{margin:.3rem 0 0;color:#2a271f;font:500 .86rem/1.35 Inter,system-ui,sans-serif;}
+.dating-context a{display:inline-flex;min-height:44px;align-items:center;margin-top:1.25rem;color:#4f4312;font-size:.72rem;font-weight:650;letter-spacing:.07em;text-decoration:none;text-transform:uppercase;border-bottom:1px solid var(--dating-gold);}
+
+.dating-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--dating-line);}
+.dating-section-head>div>span{display:block;margin-bottom:.55rem;color:var(--dating-gold);}
+.dating-section-head p{max-width:46ch;margin:0;color:var(--dating-muted);font-size:.76rem;line-height:1.55;text-align:right;}
+.dating-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.05rem 1.25rem;}
+.dating-field{min-width:0;}
+.dating-field.wide{grid-column:1/-1;}
+.dating-field label,.dating-legend{display:block;margin:0 0 .42rem;color:#49453d;font-size:.68rem;font-weight:650;letter-spacing:.08em;text-transform:uppercase;}
+.dating-help{display:block;margin-top:.4rem;color:var(--dating-muted);font-size:.69rem;line-height:1.45;}
+body[data-rtg-dating] input.dating-input,
+body[data-rtg-dating] textarea.dating-input,
+body[data-rtg-dating] select.dating-input{
+  width:100%;min-height:48px;padding:.76rem .85rem;color:#1d1b17;background:rgba(255,255,255,.48);
+  border:1px solid rgba(64,55,39,.24);border-radius:0;font:500 .88rem/1.45 Inter,system-ui,sans-serif;
+}
+body[data-rtg-dating] textarea.dating-input{min-height:108px;resize:vertical;}
+body[data-rtg-dating] .dating-input:focus{border-color:var(--dating-gold);outline:2px solid rgba(133,112,7,.13)!important;outline-offset:0!important;}
+.dating-fieldset{min-width:0;margin:0;padding:0;border:0;}
+.dating-segments{display:flex;flex-wrap:wrap;gap:1px;background:var(--dating-line);border:1px solid var(--dating-line);}
+.dating-segments label{position:relative;min-width:92px;flex:1;margin:0;}
+.dating-segments input{position:absolute;opacity:0;pointer-events:none;}
+.dating-segments span{min-height:46px;display:flex;align-items:center;justify-content:center;padding:.6rem .75rem;color:#5d584e;background:#f4f0e9;font-size:.72rem;font-weight:650;letter-spacing:.06em;text-align:center;text-transform:uppercase;cursor:pointer;}
+.dating-segments input:checked+span{color:#f7f1e4;background:var(--dating-ink);box-shadow:inset 0 -2px var(--dating-gold-text);}
+.dating-segments input:focus-visible+span{outline:2px solid var(--dating-gold);outline-offset:-3px;}
+.dating-range{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:.65rem;}
+.dating-range>span{padding-bottom:.9rem;color:var(--dating-muted);font-size:.72rem;}
+.dating-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;margin-top:1.45rem;padding-top:1.25rem;border-top:1px solid var(--dating-line);}
+.dating-button{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:.7rem 1.05rem;border:1px solid rgba(42,37,26,.25);border-radius:0;color:#26231d;background:transparent;font:650 .72rem/1 Inter,system-ui,sans-serif;letter-spacing:.075em;text-decoration:none;text-transform:uppercase;cursor:pointer;}
+.dating-button.primary{border-color:var(--dating-gold);color:var(--op-gold,#171308);background:var(--gold-glans,linear-gradient(145deg,#c0a544,#857007));}
+.dating-button.wine{border-color:var(--bordeaux-rand,rgba(158,28,64,.45));color:#fff;background:var(--bordeaux-glans,linear-gradient(155deg,#9e1c40,#7f1634));}
+.dating-button.quiet{border-color:transparent;color:#5f594e;}
+.dating-button.danger{border-color:rgba(127,22,52,.28);color:#7f1634;}
+.dating-button:disabled{cursor:not-allowed;opacity:.5;}
+.dating-save-status{color:#5d584e;font-size:.73rem;}
+
+.dating-visibility{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1.25rem;margin-bottom:1.35rem;padding:1rem 1.1rem;color:#f4f0e9;background:var(--onyx-glans,linear-gradient(168deg,#171614,#0c0c0b));border:1px solid var(--onyx-rand,rgba(255,255,255,.09));}
+.dating-visibility strong{display:block;font:500 1.05rem/1.2 "Bodoni Moda",Georgia,serif;}
+.dating-visibility small{display:block;margin-top:.3rem;color:rgba(244,240,233,.48);font-size:.7rem;line-height:1.45;}
+.dating-switch{position:relative;width:54px;height:30px;}
+.dating-switch input{position:absolute;opacity:0;}
+.dating-switch span{display:block;width:54px;height:30px;border:1px solid rgba(255,255,255,.22);background:#25241f;cursor:pointer;}
+.dating-switch span::after{content:"";position:absolute;top:5px;left:5px;width:20px;height:20px;background:#777168;transition:transform 120ms ease,background 120ms ease;}
+.dating-switch input:checked+span::after{transform:translateX(24px);background:var(--dating-gold-text);}
+.dating-switch input:focus-visible+span{outline:2px solid var(--dating-gold-text);outline-offset:3px;}
+
+.dating-list{border-top:1px solid var(--dating-line);}
+.dating-person{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1.25rem;padding:1.35rem 0;border-bottom:1px solid var(--dating-line);}
+.dating-person-main{min-width:0;}
+.dating-person-mark{display:flex;align-items:center;gap:.65rem;margin-bottom:.6rem;color:var(--dating-gold);font-size:.59rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.dating-person-mark::before{content:"";width:24px;height:1px;background:var(--dating-gold);}
+.dating-person h3{margin:0;color:#211f1a;font:500 clamp(1.35rem,2.4vw,1.8rem)/1.05 "Bodoni Moda",Georgia,serif;}
+.dating-person .dating-meta{margin:.45rem 0 0;color:var(--dating-muted);font-size:.7rem;letter-spacing:.04em;}
+.dating-person .dating-bio{max-width:62ch;margin:.75rem 0 0;color:#4f4a41;font-size:.84rem;line-height:1.65;}
+.dating-person-actions{min-width:158px;display:flex;flex-direction:column;justify-content:flex-end;gap:.45rem;}
+.dating-person-actions .dating-button{width:100%;}
+.dating-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.8rem;}
+.dating-chip{display:inline-flex;min-height:26px;align-items:center;padding:.25rem .55rem;border:1px solid var(--dating-line);color:#696359;background:rgba(255,255,255,.28);font-size:.66rem;}
+.dating-chip.shared{border-color:rgba(133,112,7,.5);color:#665705;background:rgba(192,165,68,.09);}
+.dating-empty{padding:2.2rem 1rem;text-align:center;border-block:1px solid var(--dating-line);}
+.dating-empty strong{display:block;color:#2b2822;font:500 1.35rem/1.15 "Bodoni Moda",Georgia,serif;}
+.dating-empty p{max-width:48ch;margin:.6rem auto 0;color:var(--dating-muted);font-size:.79rem;line-height:1.6;}
+.dating-date{margin-top:1rem;padding:1rem 1.1rem;border-left:2px solid var(--dating-gold);color:#49443a;background:rgba(192,165,68,.08);font-size:.82rem;line-height:1.65;}
+.dating-chat{max-height:250px;overflow:auto;margin-top:1rem;padding:.85rem 0;border-block:1px solid var(--dating-line);font-size:.8rem;line-height:1.65;}
+.dating-chat-line+.dating-chat-line{margin-top:.35rem;}
+.dating-chat-who{color:#685a13;font-weight:700;}
+.dating-message{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem;margin-top:.75rem;}
+
+.dating-gate{padding:clamp(2rem,6vw,5rem);text-align:center;border:1px solid var(--dating-line);background:linear-gradient(160deg,#eee8dc,#f7f3eb);}
+.dating-gate .dating-seal{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 1.25rem;color:var(--dating-gold-text);border:1px solid var(--gold-rand,rgba(192,165,68,.52));background:var(--onyx-glans,linear-gradient(168deg,#171614,#0c0c0b));font:500 1.25rem/1 "Bodoni Moda",Georgia,serif;}
+.dating-gate p{max-width:52ch;margin:.85rem auto 0;color:var(--dating-muted);font-size:.84rem;line-height:1.7;}
+.dating-gate .dating-actions{justify-content:center;border-top:0;}
+
+body[data-rtg-dating] dialog.dating-dialog{width:min(520px,calc(100% - 2rem));max-height:calc(100dvh - 2rem);padding:0;color:#211f1a;border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:0;background:var(--pearl-glans,linear-gradient(160deg,#fbf8f3,#e8e2d7));box-shadow:0 30px 90px rgba(0,0,0,.34);}
+body[data-rtg-dating] dialog.dating-dialog::backdrop{background:rgba(5,5,5,.72);backdrop-filter:blur(8px);}
+.dating-dialog-head{padding:1.4rem 1.45rem;color:#f4f0e9;background:var(--onyx-glans,linear-gradient(168deg,#171614,#0c0c0b));}
+.dating-dialog-head span{color:var(--dating-gold-text);}
+.dating-dialog-head h2{margin:.55rem 0 0;color:#f4f0e9;font:500 1.85rem/1 "Bodoni Moda",Georgia,serif;}
+.dating-dialog-body{padding:1.35rem 1.45rem;}
+.dating-dialog-body p{margin:0 0 1rem;color:var(--dating-muted);font-size:.8rem;line-height:1.65;}
+.dating-dialog-body .dating-actions{margin-bottom:0;}
+
+body[data-rtg-dating] .melding{z-index:100001;max-width:min(520px,calc(100% - 2rem));padding:.75rem 1rem;color:#f4f0e9;background:#161613;border:1px solid rgba(192,165,68,.35);border-radius:0;font-size:.8rem;text-align:center;}
+body[data-rtg-dating] .skip{position:fixed;z-index:100002;top:.5rem;left:.5rem;transform:translateY(-160%);padding:.7rem 1rem;color:#111;background:#fff;}
+body[data-rtg-dating] .skip:focus{transform:none;}
+
+@media(max-width:900px){
+  body[data-rtg-dating] .rtg-suitehero.rtg-intel-host{min-height:335px;padding:2rem 1.15rem 150px;align-items:flex-start;}
+  body[data-rtg-dating] .rtg-suitehero.rtg-intel-host .rtg-suitehero-copy>p{max-width:100%;}
+  body[data-rtg-dating] .rtg-intel-host>.rtg-reality-graph{right:1rem;bottom:1rem;width:calc(100% - 2rem);min-width:0;padding:.6rem .75rem;}
+  body[data-rtg-dating] .rtg-reality-graph svg{height:92px;}
+  .dating-command{grid-template-columns:repeat(3,1fr)!important;}
+  body[data-rtg-dating] .dating-tabs{position:relative;top:auto;}
+  .dating-command-main{grid-column:1/-1;min-height:66px;border-bottom:1px solid rgba(255,255,255,.1);}
+  .dating-command-cell{min-height:62px;padding:.8rem;border-left:1px solid rgba(255,255,255,.1);}
+  .dating-layout{grid-template-columns:1fr;}
+  .dating-context{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1.1rem 1.2rem;}
+  .dating-context p,.dating-context a{margin-top:.6rem;}
+  .dating-context dl{display:none;}
+}
+@media(max-width:620px){
+  body[data-rtg-dating] .rtg-suitehero.rtg-intel-host{min-height:280px;padding-bottom:126px;}
+  body[data-rtg-dating] .rtg-suitehero h1{font-size:2.75rem;}
+  body[data-rtg-dating] .rtg-reality-graph svg{height:78px;}
+  body[data-rtg-dating] main#main,body[data-rtg-dating] main#inhoud{padding:1rem!important;margin-bottom:4rem!important;}
+  .dating-command-main{min-height:60px;}
+  .dating-command-cell{min-height:58px;padding:.7rem .55rem;}
+  .dating-command span{font-size:.53rem;letter-spacing:.08em;}
+  .dating-command strong{font-size:.68rem;}
+  .dating-command-main strong{font-size:1rem;}
+  .dating-context{display:block;}
+  .dating-context>div+div{margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--dating-line);}
+  .dating-section-head{display:block;}
+  .dating-section-head p{margin-top:.65rem;text-align:left;}
+  .dating-work{padding:1.1rem;}
+  .dating-form-grid{grid-template-columns:1fr;}
+  .dating-field.wide{grid-column:auto;}
+  .dating-person{display:block;}
+  .dating-person-actions{min-width:0;display:grid;grid-template-columns:1fr 1fr;margin-top:1rem;}
+  .dating-person-actions>:only-child{grid-column:1/-1;}
+  .dating-visibility{grid-template-columns:1fr auto;}
+  .dating-message{grid-template-columns:1fr;}
+  .dating-message .dating-button{width:100%;}
+  .dating-actions .dating-button{flex:1;}
+  .dating-gate{padding:1.35rem 1rem;}
+  .dating-gate .dating-seal{width:44px;height:44px;margin-bottom:.9rem;}
+  .dating-gate .dating-actions{margin-top:1rem;padding-top:0;}
+}
+@media(prefers-reduced-motion:reduce){
+  .dating-switch span::after{transition:none;}
+  body[data-rtg-dating] dialog.dating-dialog::backdrop{backdrop-filter:none;}
+}

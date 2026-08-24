@@ -13,12 +13,15 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
   const lijstUit = (v, max, elk) => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => schoon(x, elk || 40)).filter(Boolean).slice(0, max || 12);
 
   function R() {
-    if (!db.data.rendezvous || typeof db.data.rendezvous !== 'object') db.data.rendezvous = { profielen: {}, likes: {}, passes: {} };
+    if (!db.data.rendezvous || typeof db.data.rendezvous !== 'object')
+      db.data.rendezvous = { profielen: {}, likes: {}, passes: {}, blokkades: {}, meldingen: [] };
     const r = db.data.rendezvous;
-    for (const v of ['profielen', 'likes', 'passes']) if (!r[v] || typeof r[v] !== 'object') r[v] = {};
+    for (const v of ['profielen', 'likes', 'passes', 'blokkades']) if (!r[v] || typeof r[v] !== 'object') r[v] = {};
+    if (!Array.isArray(r.meldingen)) r.meldingen = [];
     return r;
   }
   const codenaam = key => (liveCodename ? liveCodename(key) : '') || 'Een lid';
+  const geblokkeerd = (r, a, b) => !!((r.blokkades[a] && r.blokkades[a][b]) || (r.blokkades[b] && r.blokkades[b][a]));
   // overlap van twee locatielijsten, hoofdletterongevoelig, met de oorspronkelijke schrijfwijze
   function gedeeld(a, b) {
     const bl = (b || []).map(x => x.toLowerCase());
@@ -52,7 +55,7 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     const uit = [];
     for (const [k, p] of Object.entries(r.profielen)) {
       if (k === key || !p.aan) continue;
-      if (mijnPasses[k]) continue;
+      if (mijnPasses[k] || geblokkeerd(r, key, k)) continue;
       const zijLikenMij = !!(r.likes[k] && r.likes[k][key]);
       const ikLikeHen = !!mijnLikes[k];
       uit.push({ id: k, codenaam: codenaam(k), over: p.over || '', zoekt: p.zoekt || '',
@@ -68,6 +71,7 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
   function rvLike(key, targetKey) {
     const r = R();
     if (!targetKey || targetKey === key) return { status: 400, error: 'Onbekend lid.' };
+    if (geblokkeerd(r, key, targetKey)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
     if (!r.profielen[key] || !r.profielen[key].aan) return { status: 400, error: 'Zet eerst uw eigen profiel aan.' };
     const doel = r.profielen[targetKey];
     if (!doel || !doel.aan) return { status: 404, error: 'Dit lid is niet (meer) beschikbaar.' };
@@ -100,7 +104,7 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     const mij = r.profielen[key] || { locaties: [] };
     const uit = [];
     for (const t of Object.keys(mijn)) {
-      if (r.likes[t] && r.likes[t][key] && r.profielen[t]) {
+      if (!geblokkeerd(r, key, t) && r.likes[t] && r.likes[t][key] && r.profielen[t]) {
         const g = gedeeld(mij.locaties, r.profielen[t].locaties);
         uit.push({ id: t, codenaam: codenaam(t), gedeeldeLocaties: g, voorstel: g[0] || null, sinds: mijn[t] });
       }
@@ -109,6 +113,28 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     return uit;
   }
   function rvMatches(key) { return { status: 200, matches: matchesVan(key) }; }
+
+  /* Blokkeren is direct en wederzijds zichtbaar: de connectie en beide likes
+     verdwijnen meteen. Een melding is optioneel en bevat uitsluitend de twee
+     codenamen en de door het lid gekozen reden; echte namen blijven in de kluis. */
+  function rvBlokkeer(key, targetKey, reden) {
+    const r = R();
+    if (!targetKey || targetKey === key || !r.profielen[targetKey])
+      return { status: 400, error: 'Onbekend lid.' };
+    if (!r.blokkades[key]) r.blokkades[key] = {};
+    r.blokkades[key][targetKey] = nu();
+    if (r.likes[key]) delete r.likes[key][targetKey];
+    if (r.likes[targetKey]) delete r.likes[targetKey][key];
+    const melding = schoon(reden, 200);
+    if (melding) {
+      r.meldingen.unshift({ id: 'rvm' + crypto.randomBytes(6).toString('hex'), van: codenaam(key),
+        over: codenaam(targetKey), reden: melding, at: nu(), status: 'open' });
+      r.meldingen = r.meldingen.slice(0, 500);
+    }
+    save();
+    return { status: 200, ok: true, gemeld: !!melding };
+  }
+  function rvMeldingen() { return { status: 200, meldingen: R().meldingen.slice(0, 200) }; }
 
   // Rahul stelt een jetset-date voor bij een match, op een gedeelde/openstaande locatie
   async function rvDate(key, targetKey, vraag) {
@@ -142,5 +168,5 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, notify }) => {
     return { status: 200, ok: true, demo: true, locatie, opties, antwoord: demo };
   }
 
-  return { rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvDate };
+  return { rvProfielGet, rvProfiel, rvKandidaten, rvLike, rvPas, rvMatches, rvBlokkeer, rvMeldingen, rvDate };
 };

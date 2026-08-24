@@ -25,11 +25,30 @@
    in. Er wordt dus nooit gegokt: er is een bewezen deelverzameling en een rest
    die altijd meedoet.
 
-   WAT DIT NIET IS. Dit is geen vervanging van de volledige ronde. Voor een
-   commit naar de hoofdtak hoort alles te draaien. Dit is voor de honderd keer
-   per dag dat iemand een regel verandert en wil weten of hij iets heeft gebroken
-   -- en dan is het verschil tussen 1150 seconden en een fractie daarvan het
-   verschil tussen wel en niet toetsen.
+   WAT DIT NIET IS, EN DAT IS EEN BESLUIT MET EEN REDEN.
+
+   Deze planner draait LOKAAL en kiest daar; CI draait ALTIJD alles. Dat is geen
+   voorzichtigheid maar een rekensom over wat een misser kost.
+
+   De graaf is gemeten en niet compleet. Honderdzeventig toetsen staan op
+   `onbekend` en draaien daarom altijd, en het leesspoor (LEESSPOOR.json) is per
+   definitie een ondergrens: het weet wat er tijdens een ronde IS gelezen, niet
+   wat er gelezen KAN worden. De kans dat de planner iets ten onrechte weglaat is
+   dus klein maar niet nul.
+
+   Lokaal kost zo'n misser een rondje extra: je merkt het bij de volgende volle
+   ronde, voordat er iets de deur uit is. In CI kost dezelfde misser een groene
+   vinkje op een tak die stuk is, en dat is de laatste poort voor de hoofdtak. De
+   prijs van "alles draaien" is daar bovendien het laagst: CI heeft de tijd, een
+   mens die op een uitslag zit te wachten niet.
+
+   Dat staat niet alleen hier: .github/workflows/ci.yml draait `npm test`, en dat
+   is scripts/test-runner.js over alle bestanden. Er is geen enkele CI-stap die
+   deze planner aanroept, en die hoort er ook niet te komen.
+
+   Dit is dus voor de honderd keer per dag dat iemand een regel verandert en wil
+   weten of hij iets heeft gebroken -- en dan is het verschil tussen 1150
+   seconden en een fractie daarvan het verschil tussen wel en niet toetsen.
 
    Draai:
      node scripts/plan.js                    tegen de laatste commit

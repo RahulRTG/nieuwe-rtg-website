@@ -104,7 +104,16 @@ const lengteVan = v => Array.isArray(v) ? v.length : (v && typeof v === 'object'
    vallen sowieso al af op exactNodig() hierboven, dat vóór deze regel wordt
    gesteld -- maar de lijst blijft met opzet met de hand geschreven en kort. Een
    collectie hoort hier alleen in als haar EIGEN module haar duurzaamheid al
-   regelt en dat ook opschrijft. */
+   regelt en dat ook opschrijft.
+
+   NAWOORD, dezelfde dag. `doorgeefjournaal` is inmiddels helemaal uit de
+   database gehaald: het staat in een append-only bestand (kern/journaalbestand.js),
+   want een tijdvenster maakte het goedkoper maar niet goedkoop -- er bleef eens
+   per twee seconden een volle serialisatie van 3,6 MB over. De naam blijft hier
+   staan om twee redenen, en geen ervan is nostalgie: een installatie die nog
+   niet is bijgewerkt draagt de oude collectie tot de verhuizing draait, en de
+   regel zelf is algemeen en getoetst (test/opslag-voorcheck.test.js) zodat een
+   volgend logboek er meteen gebruik van kan maken. */
 const LOGBOEK = new Set(['doorgeefjournaal']);
 
 /* Mag de dure stringify van deze collectie worden overgeslagen? */

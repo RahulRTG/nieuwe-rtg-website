@@ -36,6 +36,11 @@ const BACKUP_BESTANDEN = ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.
 
    'uploads' draagt ook de identiteitsscans, dus deze mappen staan met dezelfde
    rechten (0700/0600) in de backup als daarbuiten -- zie kopieerMap. */
-const BACKUP_MAPPEN = ['archief', 'uploads', 'media', 'bestanden', 'outbox'];
+/* 'journaal' hoort hier sinds het doorgeefjournaal uit de database is gehaald
+   (24 augustus 2026). Zolang het een collectie was, ging het vanzelf mee in
+   store.db; als bestand doet het dat niet. Dit is letterlijk de fout die
+   hierboven beschreven staat bij grootboek.db en papieren.json -- iets verhuist
+   naar buiten de database en valt daarmee stilzwijgend uit de backup. */
+const BACKUP_MAPPEN = ['archief', 'uploads', 'media', 'bestanden', 'outbox', 'journaal'];
 
 module.exports = { BACKUP_BESTANDEN, BACKUP_MAPPEN };

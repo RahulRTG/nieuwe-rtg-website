@@ -87,10 +87,43 @@ function bestemmingVorm(naar) {
   return s.slice(0, 40) || 'onbekend';
 }
 
-function maakDoorgeefjournaal({ db, save, nu }) {
+function maakDoorgeefjournaal({ db, save, nu, bestand }) {
   const klok = nu || (() => new Date().toISOString());
   const venster = [];
 
+  /* HET BEWAARDE DEEL WOONT IN EEN BESTAND, NIET IN EEN COLLECTIE.
+
+     Het stond in db.data.doorgeefjournaal: een array van 20.000 regels, dus een
+     blob in een rij van de opslag. Elke save() ergens in de applicatie
+     serialiseerde die hele lijst opnieuw om er een regel bij te zetten -- 3,6 MB
+     werk voor 200 byte nieuwe gegevens. Gemeten kostte dat gemiddeld 32,9 ms per
+     save met een piek van 101 ms, synchroon op de event-loop. Zie de kop van
+     kern/journaalbestand.js voor de hele meting.
+
+     Een logboek is geen toestand: er wordt alleen achteraan bij geschreven en
+     vooraan afgesneden. Dat hoort in een bestand. */
+  const boek = bestand || null;
+
+  /* De verhuizing gebeurt EEN keer, bij het aanmaken, en alleen als er nog een
+     oude collectie ligt. Zonder dit zou een bestaande installatie zijn
+     geschiedenis kwijtraken op het moment van bijwerken -- stil, want niemand
+     kijkt elke dag in het journaal. */
+  function verhuisOude() {
+    if (!boek) return 0;
+    const oud = db.data && db.data.doorgeefjournaal;
+    if (!Array.isArray(oud) || !oud.length) return 0;
+    let n = 0;
+    for (const r of oud) if (boek.voegToe(r)) n++;
+    boek.spoelNu();
+    delete db.data.doorgeefjournaal;
+    try { save(); } catch (e) {}
+    console.log('[journaal] ' + n + ' bewaarde regels verhuisd van de database naar ' + boek.stand().map);
+    return n;
+  }
+  try { verhuisOude(); } catch (e) { console.warn('[journaal] verhuizen mislukt:', e.message); }
+
+  /* Zonder bestand (een toets die er geen meegeeft) blijft het oude gedrag
+     bestaan, zodat deze module ook los te gebruiken is. */
   const rij = () => {
     if (!Array.isArray(db.data.doorgeefjournaal)) db.data.doorgeefjournaal = [];
     return db.data.doorgeefjournaal;
@@ -133,6 +166,12 @@ function maakDoorgeefjournaal({ db, save, nu }) {
     venster.push(regel);
     snoei(venster, VENSTER, VENSTER_BLOK);
     if (bewaarWaard(regel)) {
+      if (boek) {
+        /* Naar het bestand: een push op een stapel die later gespoeld wordt.
+           Geen snoeien, geen save() -- het bestand roteert zichzelf. */
+        boek.voegToe(regel);
+        return regel;
+      }
       const lijst = rij();
       lijst.push(regel);
       snoei(lijst, BEWAARD_MAX, BEWAARD_BLOK);
@@ -171,13 +210,16 @@ function maakDoorgeefjournaal({ db, save, nu }) {
      voor "wat gebeurde er gisteren". Standaard het venster, want dat is waar
      iemand naar kijkt als hij het scherm opent. */
   function lees({ bron, richting, alleenMislukt, zoek, max } = {}) {
-    const uit = (bron === 'bewaard' ? rij() : venster).slice();
+    const grens = Math.min(Math.max(Number(max) || 200, 1), 1000);
+    /* Uit het bestand halen we ruim: er wordt hieronder nog gefilterd, en wie
+       op 'mislukt' zoekt wil niet dat de filter pas na de afkapping komt. */
+    const bewaard = () => (boek ? boek.lees(grens * 20) : rij());
+    const uit = (bron === 'bewaard' ? bewaard() : venster).slice();
     const f = uit.filter(r =>
       (!richting || r.richting === richting) &&
       (!alleenMislukt || r.mislukt) &&
       (!zoek || (r.wat + ' ' + (r.wie || '')).toLowerCase().includes(String(zoek).toLowerCase())));
-    const n = Math.min(Math.max(Number(max) || 200, 1), 1000);
-    return { ok: true, bron: bron === 'bewaard' ? 'bewaard' : 'venster', totaal: f.length, regels: f.slice(-n).reverse() };
+    return { ok: true, bron: bron === 'bewaard' ? 'bewaard' : 'venster', totaal: f.length, regels: f.slice(-grens).reverse() };
   }
 
   /* Een samenvatting waar je in een oogopslag aan ziet of er iets speelt: hoeveel
@@ -188,7 +230,7 @@ function maakDoorgeefjournaal({ db, save, nu }) {
     return {
       ok: true,
       venster: venster.length,
-      bewaard: rij().length,
+      bewaard: boek ? boek.aantal() : rij().length,
       in: tel(r => r.richting === 'in'),
       uit: tel(r => r.richting === 'uit'),
       mislukt: tel(r => r.mislukt),

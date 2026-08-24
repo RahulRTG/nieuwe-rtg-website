@@ -58,14 +58,15 @@ belangrijk -- dezelfde meetlat aan beide kanten.
 | **p90** | 0,42 ms | 0,15 ms | **64%** |
 | **p99** | 0,825 ms | 0,385 ms | **53%** |
 | Event-loop p99 | 29,4 ms | 22,7 ms | 23% |
-| Event-loop max | 124,5 ms | 151,4 ms | **slechter** |
+| Event-loop max | 124,5 ms | 42,1 ms | **66%** |
 
-Die laatste regel hoort erbij te staan. De hoogst gemeten uitschieter ging
-omhoog, en dat is geen meetfout: er is nog altijd één moment waarop het volle
-journaal wordt weggeschreven (hooguit eens per twee seconden, zie hieronder), en
-bij tweeënhalf keer zoveel verzoeken zijn er ook tweeënhalf keer zoveel kansen om
-dat moment te raken. Een max is één waarneming en geen percentiel -- maar hij
-staat de goede kant op te gaan en dat is hij niet.
+Die laatste regel stond hier een ronde lang andersom, en dat is het vermelden
+waard. De hoogst gemeten uitschieter ging eerst OMHOOG (124,5 -> 151,4 ms), want
+er bleef één moment over waarop het volle journaal werd weggeschreven, en bij
+tweeënhalf keer zoveel verzoeken zijn er ook tweeënhalf keer zoveel kansen om
+dat moment te raken. Dat is daarna opgelost door het journaal helemaal uit de
+database te halen (zie onder); de max staat nu op 42,1 ms en dus ruim onder de
+basislijn.
 
 Wat er in die twee en een half keer zit, per onderdeel:
 
@@ -244,6 +245,61 @@ seconden geschiedenis. Het plafond belooft "terugkijken wat er vannacht misging"
 en dat doet het bij dit verkeer niet meer. Dat is een productbesluit -- minder of
 juist anders bewaren -- en geen prestatiekwestie, dus het staat hier alleen
 opgeschreven en is niet stilletjes veranderd.
+
+## En daarna helemaal uit de database: het journaal is een bestand geworden
+
+Het tijdvenster hierboven maakte het goedkoper, niet goedkoop. Er bleef eens per
+twee seconden een volle serialisatie van 3,6 MB over, en bij rustig verkeer viel
+die precies op het verzoek van een lid: ~33 ms extra wachten omdat het journaal
+toevallig aan de beurt was, honderd keer de duur van het verzoek zelf.
+
+Het probleem was nooit de omvang maar de VORM. Verandering opsporen in de
+opslaglaag gebeurt door te serialiseren en te vergelijken; voor een lijst die
+alleen maar aangroeit is dat elke keer hetzelfde werk voor dezelfde 19.999
+regels. Een logboek is geen toestand. Het staat nu in een append-only bestand
+(`server/kern/journaalbestand.js`), gebatcht en asynchroon weggeschreven,
+geroteerd en begrensd.
+
+| Meter | In de database | Met tijdvenster | In een bestand |
+|---|---:|---:|---:|
+| saveSqlite, totaal geblokkeerd | 3.981 ms | 516 ms | **133 ms** |
+| saveSqlite, gemiddeld | 32,90 ms | 3,46 ms | **1,10 ms** |
+| saveSqlite, max | 101,1 ms | 88,0 ms | **8,5 ms** |
+| Event-loop p99 | 66,0 ms | 26,5 ms | **17,4 ms** |
+| Event-loop max | 111,2 ms | 117,7 ms | **42,1 ms** |
+| Bewaarde journaalregels | 19.469 | 19.315 | **72.473** |
+
+Twee dingen aan die tabel zijn belangrijker dan de snelheid. De max van
+`saveSqlite` valt van 101 naar 8,5 ms: de uitschieter is niet kleiner geworden
+maar wég. En er wordt ruim drie en een half keer zoveel geschiedenis bewaard,
+want vijf bestanden van 2 MB is meer dan één blob van 20.000 regels -- terwijl
+het bewaren nu minder kost in plaats van meer.
+
+### Wat daarbij is nagelopen
+
+Het journaal verhuist naar buiten de database, en dat is precies de beweging
+waardoor `grootboek.db` en `papieren.json` ooit stilzwijgend uit de back-up
+vielen (zie de kop van `server/opzet/backup-lijst.js`). De journaalmap staat
+daarom in `BACKUP_MAPPEN`, met een toets die het bewaakt.
+
+`test/journaalbestand.test.js` legt tien dingen vast: volgorde, rotatie, dat een
+geroteerd bestand leesbaar BLIJFT (rotatie is geen weggooien), dat de schijf
+begrensd is, dat een verminkte regel wordt overgeslagen in plaats van het hele
+journaal onleesbaar te maken, dat er met een sleutel cijfertekst op schijf staat,
+dat de rechten besloten zijn op BEIDE schrijfwegen, dat een bestaande installatie
+zijn geschiedenis niet kwijtraakt, dat het in de back-uplijst staat, en dat een
+journaal dat niet kan schrijven het verzoek niet raakt.
+
+Zes moedwillige mutaties zijn erop losgelaten. Vijf werden meteen rood; de zesde
+-- de rechten van 0600 naar 0644 op de ASYNCHRONE schrijfweg -- kwam er
+ongemerkt doorheen, omdat de rechtentoets alleen de synchrone weg raakte. Dat is
+de zeldzame weg (alleen bij afsluiten) terwijl de asynchrone in bedrijf élke
+regel schrijft. De toets dekt nu allebei en pakt de mutatie wel.
+
+De rotatietoets vond bovendien een echte fout in de nieuwe module: de geroteerde
+bestandsnaam was `Date.now()`, dus twee rotaties binnen dezelfde milliseconde
+schreven stilzwijgend over elkaar heen -- een heel journaalbestand weg zonder
+foutmelding. De stempel loopt nu altijd door.
 
 ## Meer kernen benutten: onderzocht, en het antwoord is niet "meer processen"
 

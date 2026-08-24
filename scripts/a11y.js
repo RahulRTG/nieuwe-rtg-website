@@ -93,14 +93,16 @@ function startEchteServer() {
         const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-a11y-'));
         const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(ROOT, 'server', 'server.js')], {
           cwd: ROOT, stdio: 'ignore',
-          /* RTG_DEMO: de demozaken (en dus de zaak-inlog van de derde ronde)
-             worden alleen in demostand gezaaid -- test/helper.js doet hetzelfde.
-             Zonder die vlag kende deze wegwerpserver geen enkele leverancier en
+          /* RTG_MAGNAAT_TEST: de synthetische zaken (en dus de zaak-inlog van de
+             derde ronde) worden alleen in de geisoleerde testomgeving gezaaid --
+             test/helper.js doet hetzelfde. Zonder die vlag kende deze
+             wegwerpserver geen enkele leverancier en
              viel de zaakronde om op "Deze leverancierscode kennen we niet".
              Het is bovendien de betere stand om a11y in te meten: de schermen
-             hebben er echte inhoud in plaats van lege lijsten. */
+             hebben er echte inhoud in plaats van lege lijsten. RTG_DEMO blijft
+             hier uit: de oude vlag mag buiten een testsuite niets meer openen. */
           env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
-            STUN_UIT: '1', RTG_DEMO: '1' }
+            STUN_UIT: '1', NODE_ENV: 'test', RTG_DEMO: '', RTG_MAGNAAT_TEST: '1' }
         });
         const basis = 'http://127.0.0.1:' + poort;
         const stop = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };

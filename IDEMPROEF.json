@@ -2,14 +2,15 @@
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Zegt het antwoord niets, dan kijkt de proef naar het TWEEDE MEETPUNT: de lengte per collectie in de opslag (`bron: \"opslag\"`, server/staatlog.js). Wat daar groeide en in IDEMBESLUIT.json onder `vastlegging` staat, is de aantekening van de handeling en niet het werk -- dat telt niet mee; zie `gemeten.vastlegging`, met per collectie onder hoeveel routefamilies hij groeide (een die er maar EEN heeft, is domeinwerk in een vastleggingslijst en staat onder `vastleggingVerdacht`). Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
  "gemeten": {
   "routesMetRol": 3100,
-  "beoordeeld": 139,
-  "beschermd": 40,
-  "onbeschermd": 99,
-  "ongemeten": 2961,
+  "beoordeeld": 242,
+  "beschermd": 131,
+  "onbeschermd": 111,
+  "ongemeten": 2858,
   "oproepen": 9324,
   "tokensHernieuwd": 24,
-  "uitOpslag": 7,
+  "uitOpslag": 107,
   "ruisGeijkt": [
+   "rtgai",
    "doorgeefjournaal"
   ],
   "vastlegging": [
@@ -24,6 +25,10 @@
    {
     "collectie": "securityLog",
     "families": 6
+   },
+   {
+    "collectie": "supplierActivity",
+    "families": 14
    }
   ],
   "blindeRondes": 0,
@@ -35,11 +40,14 @@
    "naarCodenaam",
    "code"
   ],
-  "geldroutesMetEigenLijf": 18,
-  "onbeschermdMetBesluit": 99
+  "geldroutesMetEigenLijf": 20,
+  "onbeschermdMetBesluit": 111
  },
  "zonderBesluit": [],
- "tegenspraken": [],
+ "tegenspraken": [
+  "POST /api/supplier/horeca/venue/publiceer",
+  "POST /api/supplier/magnaat/studio/importeer"
+ ],
  "vastleggingVerdacht": [],
  "perRoute": [
   {
@@ -284,15 +292,18 @@
    "methode": "POST",
    "pad": "/api/agenda/ai",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in agendas en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "agendas": 1
+    },
     "b": {},
     "c": {}
    }
@@ -411,9 +422,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "agendas": "gewijzigd"
+    },
+    "b": {
+     "agendas": "gewijzigd"
+    },
+    "c": {
+     "agendas": "gewijzigd"
+    }
    }
   },
   {
@@ -975,11 +992,17 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": 1,
+     "bankBoekingen": 1,
+     "bankIdem": 2,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1081,13 +1104,21 @@
    ],
    "opslag": {
     "a": {
+     "bankSaldi": 1,
      "bankBoekingen": 1,
-     "payBoekingen": 1
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
+     "payBoekingen": 1,
+     "paySaldi": 2
     },
     "b": {},
     "c": {
+     "bankSaldi": "gewijzigd",
      "payBoekingen": 1,
-     "bankBoekingen": 1
+     "paySaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1104,11 +1135,17 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1142,11 +1179,19 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": 1,
+     "bankBoekingen": 1,
+     "bankPassen": "gewijzigd",
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankPassen": "gewijzigd",
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1154,15 +1199,18 @@
    "methode": "POST",
    "pad": "/api/bank/pas/bevries",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankPassen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankPassen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -1171,15 +1219,18 @@
    "methode": "POST",
    "pad": "/api/bank/pas/limiet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankPassen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankPassen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -1196,7 +1247,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankPassen": -1
+    },
     "b": {},
     "c": {}
    }
@@ -1213,9 +1266,17 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
+     "bankPassen": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "bankPassen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
+    }
    }
   },
   {
@@ -1264,9 +1325,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "bankRekeningen": 1
+    },
+    "b": {
+     "bankRekeningen": 1
+    },
+    "c": {
+     "bankRekeningen": 1
+    }
    }
   },
   {
@@ -1299,11 +1366,17 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1320,12 +1393,20 @@
    ],
    "opslag": {
     "a": {
+     "betaalIdem": 1,
+     "bankSaldi": 1,
      "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
      "betaalOpdrachten": 1
     },
     "b": {},
     "c": {
+     "betaalIdem": 1,
+     "bankSaldi": "gewijzigd",
      "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
      "betaalOpdrachten": 1
     }
    }
@@ -1334,15 +1415,18 @@
    "methode": "POST",
    "pad": "/api/bank/spaardoel",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankRekeningen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankRekeningen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -1360,11 +1444,19 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "betaalIdem": 1,
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "betaalIdem": 1,
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1389,15 +1481,18 @@
    "methode": "POST",
    "pad": "/api/bank/terugkerend/stop",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankTerugkerend en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankTerugkerend": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -1415,11 +1510,15 @@
    ],
    "opslag": {
     "a": {
-     "bankTerugkerend": 1
+     "bankTerugkerend": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankTerugkerend": 1
+     "bankTerugkerend": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1436,13 +1535,21 @@
    ],
    "opslag": {
     "a": {
+     "bankSaldi": "gewijzigd",
      "payBoekingen": 1,
-     "bankBoekingen": 1
+     "paySaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
+     "bankSaldi": "gewijzigd",
      "payBoekingen": 1,
-     "bankBoekingen": 1
+     "paySaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -1594,7 +1701,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bestanden": 1
+    },
     "b": {},
     "c": {}
    }
@@ -2045,15 +2154,18 @@
    "methode": "POST",
    "pad": "/api/bijles/gesprek",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in bijles en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bijles": 1
+    },
     "b": {},
     "c": {}
    }
@@ -2062,17 +2174,25 @@
    "methode": "POST",
    "pad": "/api/bijles/vraag",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf een wijziging in bijles, +1 in onderwijs en de herhaling opnieuw een wijziging in bijles",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "bijles": "gewijzigd",
+     "onderwijs": 1
+    },
+    "b": {
+     "bijles": "gewijzigd"
+    },
+    "c": {
+     "bijles": "gewijzigd"
+    }
    }
   },
   {
@@ -2130,15 +2250,18 @@
    "methode": "POST",
    "pad": "/api/boeken/voortgang",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in boeken en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "boeken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -2223,7 +2346,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenSites": 2
+    },
     "b": {},
     "c": {}
    }
@@ -3154,16 +3279,19 @@
    "methode": "POST",
    "pad": "/api/command/agent/hervat",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in commandAgents, +9 in commandBeleid en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag-zonder-vastlegging",
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAgents": 1,
+     "commandBeleid": 9
+    },
     "b": {},
     "c": {}
    }
@@ -3173,7 +3301,7 @@
    "pad": "/api/command/agent/rechten",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
@@ -3190,16 +3318,18 @@
    "methode": "POST",
    "pad": "/api/command/agent/stop",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in commandAgents en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag-zonder-vastlegging",
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAgents": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -3250,7 +3380,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": 1,
+     "commandAlarmen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -3259,15 +3392,18 @@
    "methode": "POST",
    "pad": "/api/command/apipoort",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +2 in apiPoort en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "apiPoort": 2
+    },
     "b": {},
     "c": {}
    }
@@ -3988,7 +4124,10 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "techniek": 1,
+     "wacht": 6
+    },
     "c": {}
    }
   },
@@ -4299,7 +4438,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -4407,7 +4548,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zandbakken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -4441,7 +4584,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zandbakken": -1
+    },
     "b": {},
     "c": {}
    }
@@ -4509,7 +4654,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -4662,9 +4809,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "concern": 1
+    },
+    "b": {
+     "concern": "gewijzigd"
+    },
+    "c": {
+     "concern": "gewijzigd"
+    }
    }
   },
   {
@@ -4841,15 +4994,18 @@
    "methode": "POST",
    "pad": "/api/concern/impact",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +2 in concern en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 2
+    },
     "b": {},
     "c": {}
    }
@@ -5019,9 +5175,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "concern": 1
+    },
+    "b": {
+     "concern": "gewijzigd"
+    },
+    "c": {
+     "concern": "gewijzigd"
+    }
    }
   },
   {
@@ -5053,7 +5215,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -5070,9 +5234,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "concern": "gewijzigd"
+    },
+    "b": {
+     "concern": "gewijzigd"
+    },
+    "c": {
+     "concern": "gewijzigd"
+    }
    }
   },
   {
@@ -5155,7 +5325,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -5512,7 +5684,12 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "medicatie": 1,
+     "beauty": 1,
+     "dagmetingen": 1,
+     "gemoed": 1
+    },
     "b": {},
     "c": {}
    }
@@ -5910,7 +6087,10 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 1,
+     "rahulRespect": 1
+    },
     "b": {},
     "c": {}
    }
@@ -5919,15 +6099,18 @@
    "methode": "POST",
    "pad": "/api/fluister/focus",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in fluister en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": 1
+    },
     "b": {},
     "c": {}
    }
@@ -5936,15 +6119,18 @@
    "methode": "POST",
    "pad": "/api/fluister/onthoud",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in fluister en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -5953,15 +6139,18 @@
    "methode": "POST",
    "pad": "/api/fluister/profiel",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in fluister en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -6012,7 +6201,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -6029,7 +6220,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "galerij": 1
+    },
     "b": {},
     "c": {}
    }
@@ -6301,7 +6494,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": 6
+    },
     "b": {},
     "c": {}
    }
@@ -6486,15 +6681,18 @@
    "methode": "POST",
    "pad": "/api/geld/actielog",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in geldbeleid en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "geldbeleid": 1
+    },
     "b": {},
     "c": {}
    }
@@ -6528,7 +6726,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "geldbeleid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -6554,15 +6754,19 @@
    "methode": "POST",
    "pad": "/api/geld/cockpit",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in accountRollen, +3 in labFonds en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "accountRollen": 1,
+     "labFonds": 3
+    },
     "b": {},
     "c": {}
    }
@@ -6855,7 +7059,9 @@
    ],
    "opslag": {
     "a": {
-     "gemeenteMeldingen": 1
+     "gemeenteMeldingen": 1,
+     "supplierNotifications": 1,
+     "weefsel": 4
     },
     "b": {},
     "c": {}
@@ -7094,7 +7300,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "genootschap": 3
+    },
     "b": {},
     "c": {}
    }
@@ -7451,9 +7659,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "genootschap": "gewijzigd"
+    },
+    "b": {
+     "genootschap": "gewijzigd"
+    },
+    "c": {
+     "genootschap": "gewijzigd"
+    }
    }
   },
   {
@@ -7738,15 +7952,18 @@
    "methode": "POST",
    "pad": "/api/groothandel/mijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -7780,7 +7997,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "homekit": 1
+    },
     "b": {},
     "c": {}
    }
@@ -8131,15 +8350,18 @@
    "methode": "POST",
    "pad": "/api/instant-reality",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in instantReality en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "instantReality": 1
+    },
     "b": {},
     "c": {}
    }
@@ -8148,15 +8370,18 @@
    "methode": "POST",
    "pad": "/api/kantoor/wereld",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in notities en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "notities": 1
+    },
     "b": {},
     "c": {}
    }
@@ -8233,15 +8458,18 @@
    "methode": "POST",
    "pad": "/api/klets",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +2 in klets en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "klets": 2
+    },
     "b": {},
     "c": {}
    }
@@ -8301,15 +8529,18 @@
    "methode": "POST",
    "pad": "/api/klok/mijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in klok en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "klok": 1
+    },
     "b": {},
     "c": {}
    }
@@ -9763,15 +9994,18 @@
    "methode": "POST",
    "pad": "/api/labfonds/locatie/maak",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in labFonds en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "labFonds": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -9958,7 +10192,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "levensbanden": 2
+    },
     "b": {},
     "c": {}
    }
@@ -10035,15 +10271,18 @@
    "methode": "POST",
    "pad": "/api/leven/beleid/zet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in levensbeleid en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "levensbeleid": 1
+    },
     "b": {},
     "c": {}
    }
@@ -10077,7 +10316,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "metier": 5,
+     "lifestyle": 1
+    },
     "b": {},
     "c": {}
    }
@@ -10179,7 +10421,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 1
+    },
     "b": {},
     "c": {}
    }
@@ -10213,9 +10457,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "live": 1
+    },
+    "b": {
+     "live": "gewijzigd"
+    },
+    "c": {
+     "live": "gewijzigd"
+    }
    }
   },
   {
@@ -10239,15 +10489,18 @@
    "methode": "POST",
    "pad": "/api/live/stop",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in live en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "live": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -10324,15 +10577,18 @@
    "methode": "POST",
    "pad": "/api/logout",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf -1 in sessions en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "sessions": -1
+    },
     "b": {},
     "c": {}
    }
@@ -10707,7 +10963,8 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": 3
+     "suppliers": 3,
+     "sessions": 1
     },
     "b": {},
     "c": {}
@@ -10819,15 +11076,18 @@
    "methode": "POST",
    "pad": "/api/mall/apps/mijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in appInstallaties en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "appInstallaties": 1
+    },
     "b": {},
     "c": {}
    }
@@ -10895,7 +11155,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mallLijsten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11014,7 +11276,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -11065,9 +11329,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "mallLijsten": "gewijzigd"
+    },
+    "b": {
+     "mallLijsten": "gewijzigd"
+    },
+    "c": {
+     "mallLijsten": "gewijzigd"
+    }
    }
   },
   {
@@ -11244,15 +11514,18 @@
    "methode": "POST",
    "pad": "/api/mall/reis/mijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in reisInstallaties en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "reisInstallaties": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11329,15 +11602,18 @@
    "methode": "POST",
    "pad": "/api/mall/rtf/mijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in rtfAppInstallaties en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfAppInstallaties": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11431,15 +11707,18 @@
    "methode": "POST",
    "pad": "/api/mediaos/bieb",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in mediaBieb en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaBieb": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11473,7 +11752,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaLijsten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11507,9 +11788,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "mediaLijsten": "gewijzigd"
+    },
+    "b": {
+     "mediaLijsten": "gewijzigd"
+    },
+    "c": {
+     "mediaLijsten": "gewijzigd"
+    }
    }
   },
   {
@@ -11584,15 +11871,18 @@
    "methode": "POST",
    "pad": "/api/mediaos/meldingen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in mediaMeldingen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaMeldingen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11660,9 +11950,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "mediaKamers": 1
+    },
+    "b": {
+     "mediaKamers": "gewijzigd"
+    },
+    "c": {
+     "mediaKamers": "gewijzigd"
+    }
    }
   },
   {
@@ -12100,15 +12396,18 @@
    "methode": "POST",
    "pad": "/api/member/berichten",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in rtmail en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmail": 1
+    },
     "b": {},
     "c": {}
    }
@@ -12253,15 +12552,18 @@
    "methode": "POST",
    "pad": "/api/member/boardroom/logboek",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in ledenBoard en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenBoard": 1
+    },
     "b": {},
     "c": {}
    }
@@ -13732,15 +14034,18 @@
    "methode": "POST",
    "pad": "/api/member/leren/herhaal",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +4 in leren en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "leren": 4
+    },
     "b": {},
     "c": {}
    }
@@ -13944,9 +14249,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "leren": "gewijzigd"
+    },
+    "b": {
+     "leren": "gewijzigd"
+    },
+    "c": {
+     "leren": "gewijzigd"
+    }
    }
   },
   {
@@ -14021,17 +14332,24 @@
    "methode": "POST",
    "pad": "/api/member/leren/schrijf-bewaar",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf een wijziging in leren en de herhaling opnieuw een wijziging in leren",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "leren": "gewijzigd"
+    },
+    "b": {
+     "leren": "gewijzigd"
+    },
+    "c": {
+     "leren": "gewijzigd"
+    }
    }
   },
   {
@@ -14505,7 +14823,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -14573,7 +14893,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": 1
+    },
     "b": {},
     "c": {}
    }
@@ -14607,7 +14929,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -14675,7 +14999,11 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": "gewijzigd",
+     "magnaatPartnerstudio": 4,
+     "magnaatTrainingslobbies": 2
+    },
     "b": {},
     "c": {}
    }
@@ -14956,15 +15284,18 @@
    "methode": "POST",
    "pad": "/api/member/nieuws",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +3 in redactie en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "redactie": 3
+    },
     "b": {},
     "c": {}
    }
@@ -15007,15 +15338,18 @@
    "methode": "POST",
    "pad": "/api/member/pin",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in contactPins en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "contactPins": 1
+    },
     "b": {},
     "c": {}
    }
@@ -15100,24 +15434,33 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "contactPins": "gewijzigd"
+    },
+    "b": {
+     "contactPins": "gewijzigd"
+    },
+    "c": {
+     "contactPins": "gewijzigd"
+    }
    }
   },
   {
    "methode": "POST",
    "pad": "/api/member/pin/uit",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in contactPins en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "contactPins": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -15151,7 +15494,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "pulse": 4
+    },
     "b": {},
     "c": {}
    }
@@ -15253,7 +15598,10 @@
     429
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "pulse": "gewijzigd",
+     "wauw": 1
+    },
     "b": {},
     "c": {}
    }
@@ -16428,7 +16776,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -16766,7 +17116,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailTeams": 1
+    },
     "b": {},
     "c": {}
    }
@@ -16868,7 +17220,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailTeams": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -17523,15 +17877,18 @@
    "methode": "POST",
    "pad": "/api/member/vooruit/post/negeer",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in postdatums en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "postdatums": 1
+    },
     "b": {},
     "c": {}
    }
@@ -17752,9 +18109,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "metier": "gewijzigd"
+    },
+    "b": {
+     "metier": "gewijzigd"
+    },
+    "c": {
+     "metier": "gewijzigd"
+    }
    }
   },
   {
@@ -18109,7 +18472,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mobFavorieten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -18872,15 +19237,18 @@
    "methode": "POST",
    "pad": "/api/noodkaart/zet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in noodkaarten en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "noodkaarten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -19050,7 +19418,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kantoorTaken": 25
+    },
     "b": {},
     "c": {}
    }
@@ -19118,7 +19488,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "architect": 3
+    },
     "b": {},
     "c": {}
    }
@@ -19169,9 +19541,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "architect": "gewijzigd"
+    },
+    "b": {
+     "architect": "gewijzigd"
+    },
+    "c": {
+     "architect": "gewijzigd"
+    }
    }
   },
   {
@@ -19203,9 +19581,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "architect": "gewijzigd"
+    },
+    "b": {
+     "architect": "gewijzigd"
+    },
+    "c": {
+     "architect": "gewijzigd"
+    }
    }
   },
   {
@@ -19339,9 +19723,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "atelier": 3
+    },
+    "b": {
+     "atelier": "gewijzigd"
+    },
+    "c": {
+     "atelier": "gewijzigd"
+    }
    }
   },
   {
@@ -19390,9 +19780,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "atelier": "gewijzigd"
+    },
+    "b": {
+     "atelier": "gewijzigd"
+    },
+    "c": {
+     "atelier": "gewijzigd"
+    }
    }
   },
   {
@@ -19458,9 +19854,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "atelierSites": 2
+    },
+    "b": {
+     "atelierSites": "gewijzigd"
+    },
+    "c": {
+     "atelierSites": "gewijzigd"
+    }
    }
   },
   {
@@ -19774,7 +20176,7 @@
    "pad": "/api/office/bank/herstel",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
@@ -19809,7 +20211,7 @@
    "pad": "/api/office/bank/instellingen",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
@@ -19860,16 +20262,18 @@
    "methode": "POST",
    "pad": "/api/office/bank/leden",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankregie en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag-zonder-vastlegging",
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankregie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -19886,9 +20290,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankregie": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "bankregie": "gewijzigd"
+    }
    }
   },
   {
@@ -19903,9 +20311,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "bankregie": "gewijzigd"
+    },
+    "b": {
+     "bankregie": "gewijzigd"
+    },
+    "c": {
+     "bankregie": "gewijzigd"
+    }
    }
   },
   {
@@ -19946,18 +20360,24 @@
    "methode": "POST",
    "pad": "/api/office/bank/opdrachten/ronde",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf een wijziging in betaalOpdrachten en de herhaling opnieuw een wijziging in betaalOpdrachten",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag-zonder-vastlegging",
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "betaalOpdrachten": "gewijzigd"
+    },
+    "b": {
+     "betaalOpdrachten": "gewijzigd"
+    },
+    "c": {
+     "betaalOpdrachten": "gewijzigd"
+    }
    }
   },
   {
@@ -19998,17 +20418,24 @@
    "methode": "POST",
    "pad": "/api/office/bank/regels/check",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf +2 in fiscaalRegels en de herhaling opnieuw een wijziging in fiscaalRegels",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "fiscaalRegels": 2
+    },
+    "b": {
+     "fiscaalRegels": "gewijzigd"
+    },
+    "c": {
+     "fiscaalRegels": "gewijzigd"
+    }
    }
   },
   {
@@ -20033,7 +20460,7 @@
    "pad": "/api/office/bank/rekening/bevries",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
@@ -20160,7 +20587,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalRegie": 2
+    },
     "b": {},
     "c": {}
    }
@@ -20466,7 +20895,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hardware": 3
+    },
     "b": {},
     "c": {}
    }
@@ -20500,9 +20931,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "hardware": "gewijzigd"
+    },
+    "b": {
+     "hardware": "gewijzigd"
+    },
+    "c": {
+     "hardware": "gewijzigd"
+    }
    }
   },
   {
@@ -20534,9 +20971,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "hardware": "gewijzigd"
+    },
+    "b": {
+     "hardware": "gewijzigd"
+    },
+    "c": {
+     "hardware": "gewijzigd"
+    }
    }
   },
   {
@@ -20653,9 +21096,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "ideeen": 2
+    },
+    "b": {
+     "ideeen": "gewijzigd"
+    },
+    "c": {
+     "ideeen": "gewijzigd"
+    }
    }
   },
   {
@@ -20866,17 +21315,24 @@
    "methode": "POST",
    "pad": "/api/office/kamer/taak",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf +1 in kantoorTaken en de herhaling opnieuw een wijziging in kantoorTaken",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "kantoorTaken": 1
+    },
+    "b": {
+     "kantoorTaken": "gewijzigd"
+    },
+    "c": {
+     "kantoorTaken": "gewijzigd"
+    }
    }
   },
   {
@@ -20891,7 +21347,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kantoorTaken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21061,9 +21519,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "officeDocs": 1
+    },
+    "b": {
+     "officeDocs": 1
+    },
+    "c": {
+     "officeDocs": 1
+    }
    }
   },
   {
@@ -21265,7 +21729,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mailQ": 2
+    },
     "b": {},
     "c": {}
    }
@@ -21282,7 +21748,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mailIn": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21410,15 +21878,18 @@
    "methode": "POST",
    "pad": "/api/office/mall/kansen",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in mallVraag en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "mallVraag": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21469,7 +21940,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "webMerken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21486,9 +21959,16 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "webMerken": "gewijzigd"
+    },
+    "b": {
+     "webMerken": "gewijzigd"
+    },
+    "c": {
+     "wacht": "gewijzigd",
+     "webMerken": "gewijzigd"
+    }
    }
   },
   {
@@ -21707,7 +22187,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ondernemersregie": 3
+    },
     "b": {},
     "c": {}
    }
@@ -21733,15 +22215,18 @@
    "methode": "POST",
    "pad": "/api/office/onderzoeker",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +5 in onderzoeker en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "onderzoeker": 5
+    },
     "b": {},
     "c": {}
    }
@@ -21775,9 +22260,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "onderzoeker": "gewijzigd"
+    },
+    "b": {
+     "onderzoeker": "gewijzigd"
+    },
+    "c": {
+     "onderzoeker": "gewijzigd"
+    }
    }
   },
   {
@@ -22183,7 +22674,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "payrollComponenten": 12
+    },
     "b": {},
     "c": {}
    }
@@ -22209,15 +22702,18 @@
    "methode": "POST",
    "pad": "/api/office/payroll/dekking/land",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in payrollRegels en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "payrollRegels": 1
+    },
     "b": {},
     "c": {}
    }
@@ -22590,7 +23086,7 @@
    "pad": "/api/office/rampbeeld/ai",
    "rol": "office",
    "idempotentie": "beschermd",
-   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +35 in stadMetingen en de herhaling niets",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in weefsel, +9 in stadNodes, +35 in stadMetingen, +2 in stadRegie en de herhaling niets",
    "statussen": [
     200,
     200,
@@ -22599,7 +23095,10 @@
    "bron": "opslag",
    "opslag": {
     "a": {
-     "stadMetingen": 35
+     "weefsel": 1,
+     "stadNodes": 9,
+     "stadMetingen": 35,
+     "stadRegie": 2
     },
     "b": {},
     "c": {}
@@ -22668,9 +23167,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "rechtsvormRegels": 2
+    },
+    "b": {
+     "rechtsvormRegels": "gewijzigd"
+    },
+    "c": {
+     "rechtsvormRegels": "gewijzigd"
+    }
    }
   },
   {
@@ -22753,9 +23258,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "redactie": "gewijzigd"
+    },
+    "b": {
+     "redactie": "gewijzigd"
+    },
+    "c": {
+     "redactie": "gewijzigd"
+    }
    }
   },
   {
@@ -23093,7 +23604,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": 1
+    },
     "b": {},
     "c": {}
    }
@@ -23374,15 +23887,18 @@
    "methode": "POST",
    "pad": "/api/office/stad/werk",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +9 in stadPaspoort en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "stadPaspoort": 9
+    },
     "b": {},
     "c": {}
    }
@@ -23425,8 +23941,8 @@
    "methode": "POST",
    "pad": "/api/office/stats",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "de herhaling gaf een ander antwoord: hij deed het opnieuw",
    "statussen": [
     200,
     200,
@@ -23467,9 +23983,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "studio": 3
+    },
+    "b": {
+     "studio": "gewijzigd"
+    },
+    "c": {
+     "studio": "gewijzigd"
+    }
    }
   },
   {
@@ -23535,9 +24057,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "studio": "gewijzigd"
+    },
+    "b": {
+     "studio": "gewijzigd"
+    },
+    "c": {
+     "studio": "gewijzigd"
+    }
    }
   },
   {
@@ -23867,15 +24395,18 @@
    "methode": "POST",
    "pad": "/api/office/vonk/meldingen",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +4 in vonk en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "vonk": 4
+    },
     "b": {},
     "c": {}
    }
@@ -23943,7 +24474,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselKenmerk": 6
+    },
     "b": {},
     "c": {}
    }
@@ -24303,7 +24836,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselPanden": 2
+    },
     "b": {},
     "c": {}
    }
@@ -24422,7 +24957,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselTerugval": 6
+    },
     "b": {},
     "c": {}
    }
@@ -24789,7 +25326,7 @@
    "pad": "/api/office/weefsel/reeks/veeg",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog) -- de aantekening van de handeling en niet het werk zelf",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
@@ -25069,7 +25606,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselZorg": 2
+    },
     "b": {},
     "c": {}
    }
@@ -25296,7 +25835,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "werkplaats": 2
+    },
     "b": {},
     "c": {}
    }
@@ -25330,9 +25871,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "werkplaats": "gewijzigd"
+    },
+    "b": {
+     "werkplaats": "gewijzigd"
+    },
+    "c": {
+     "werkplaats": "gewijzigd"
+    }
    }
   },
   {
@@ -25407,15 +25954,18 @@
    "methode": "POST",
    "pad": "/api/office/zelfzorg",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +2 in zelfzorg en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "zelfzorg": 2
+    },
     "b": {},
     "c": {}
    }
@@ -25432,9 +25982,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "zelfzorg": "gewijzigd"
+    },
+    "b": {
+     "zelfzorg": "gewijzigd"
+    },
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -25449,9 +26005,16 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "techniek": 1,
+     "zelfzorg": "gewijzigd"
+    },
+    "b": {
+     "zelfzorg": "gewijzigd"
+    },
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -25466,9 +26029,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "zelfzorg": "gewijzigd"
+    },
+    "b": {
+     "zelfzorg": "gewijzigd"
+    },
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -25483,9 +26052,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "zelfzorg": "gewijzigd"
+    },
+    "b": {
+     "zelfzorg": "gewijzigd"
+    },
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -25560,17 +26135,24 @@
    "methode": "POST",
    "pad": "/api/onboarding/paspoort",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf een wijziging in onboarding en de herhaling opnieuw een wijziging in onboarding",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "onboarding": "gewijzigd"
+    },
+    "b": {
+     "onboarding": "gewijzigd"
+    },
+    "c": {
+     "onboarding": "gewijzigd"
+    }
    }
   },
   {
@@ -25619,7 +26201,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onboarding": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -25891,7 +26475,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26764,7 +27350,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ovRegie": 1
+    },
     "b": {},
     "c": {}
    }
@@ -27902,7 +28490,7 @@
    "pad": "/api/overheid/rijbewijs/verleng",
    "rol": "member",
    "idempotentie": "onbeschermd",
-   "reden": "gezien aan de opslag: de eerste oproep gaf +1 in rijkBerichten en de herhaling opnieuw +1 in rijkBerichten",
+   "reden": "gezien aan de opslag: de eerste oproep gaf +1 in rijkBerichten, een wijziging in rijkRijbewijzen en de herhaling opnieuw +1 in rijkBerichten, een wijziging in rijkRijbewijzen",
    "statussen": [
     200,
     200,
@@ -27911,13 +28499,16 @@
    "bron": "opslag",
    "opslag": {
     "a": {
-     "rijkBerichten": 1
+     "rijkBerichten": 1,
+     "rijkRijbewijzen": "gewijzigd"
     },
     "b": {
-     "rijkBerichten": 1
+     "rijkBerichten": 1,
+     "rijkRijbewijzen": "gewijzigd"
     },
     "c": {
-     "rijkBerichten": 1
+     "rijkBerichten": 1,
+     "rijkRijbewijzen": "gewijzigd"
     }
    }
   },
@@ -28642,11 +29233,20 @@
    ],
    "opslag": {
     "a": {
-     "payBoekingen": 1
+     "betaalIdem": 1,
+     "onboarding": "gewijzigd",
+     "payBoekingen": 1,
+     "paySaldi": 1,
+     "payIdem": 2,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "payBoekingen": 1
+     "betaalIdem": 1,
+     "payBoekingen": 1,
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     }
    }
   },
@@ -28671,15 +29271,23 @@
    "methode": "POST",
    "pad": "/api/pay/saldo",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de herhaling werd geweigerd (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    409,
+    409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "invoices": "gewijzigd",
+     "betaalIdem": 1,
+     "payBoekingen": 2,
+     "paySaldi": 1,
+     "payIdem": 2,
+     "payIdemAfdruk": 2,
+     "fondsAfdrachten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -28697,11 +29305,17 @@
    ],
    "opslag": {
     "a": {
-     "payBoekingen": 1
+     "payBoekingen": 1,
+     "paySaldi": 1,
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "payBoekingen": 1
+     "payBoekingen": 1,
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     }
    }
   },
@@ -28709,17 +29323,28 @@
    "methode": "POST",
    "pad": "/api/pay/tik",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "payBoekingen": 1,
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "betaalIdem": 1,
+     "payBoekingen": 2,
+     "paySaldi": "gewijzigd",
+     "payIdem": 2,
+     "payIdemAfdruk": 2
+    }
    }
   },
   {
@@ -28775,11 +29400,15 @@
    ],
    "opslag": {
     "a": {
-     "payVerzoeken": 1
+     "payVerzoeken": 1,
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "payVerzoeken": 1
+     "payVerzoeken": 1,
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     }
    }
   },
@@ -28796,7 +29425,11 @@
    ],
    "opslag": {
     "a": {
-     "payBoekingen": 2
+     "payBoekingen": 1,
+     "payVerzoeken": "gewijzigd",
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {}
@@ -28814,7 +29447,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "payVerzoeken": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -29180,15 +29815,31 @@
    "methode": "POST",
    "pad": "/api/privacy/delete",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf -1 in accountRollen, -1 in sessions, een wijziging in supplierNotifications, -1 in live, -1 in contactPins, -1 in memberDir, -1 in ledenBoard, -1 in bestanden, -1 in rahulRespect, -1 in fluister, -1 in lifestyle, -1 in appInstallaties, -1 in reisInstallaties, +2 in spellen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "accountRollen": -1,
+     "sessions": -1,
+     "supplierNotifications": "gewijzigd",
+     "live": -1,
+     "contactPins": -1,
+     "memberDir": -1,
+     "ledenBoard": -1,
+     "bestanden": -1,
+     "rahulRespect": -1,
+     "fluister": -1,
+     "lifestyle": -1,
+     "appInstallaties": -1,
+     "reisInstallaties": -1,
+     "spellen": 2
+    },
     "b": {},
     "c": {}
    }
@@ -29214,15 +29865,19 @@
    "methode": "POST",
    "pad": "/api/privacy/inzage",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in sessions, +1 in memberDir en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "sessions": 1,
+     "memberDir": 1
+    },
     "b": {},
     "c": {}
    }
@@ -29231,15 +29886,18 @@
    "methode": "POST",
    "pad": "/api/punten",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in punten en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "punten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -29316,15 +29974,18 @@
    "methode": "POST",
    "pad": "/api/rahul/stemming",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +5 in rahulStemming en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "rahulStemming": 5
+    },
     "b": {},
     "c": {}
    }
@@ -29562,7 +30223,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": 3
+    },
     "b": {},
     "c": {}
    }
@@ -29571,34 +30234,48 @@
    "methode": "POST",
    "pad": "/api/residentie/betreed",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf +1 in residentie en de herhaling opnieuw een wijziging in residentie",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "residentie": 1
+    },
+    "b": {
+     "residentie": "gewijzigd"
+    },
+    "c": {
+     "residentie": "gewijzigd"
+    }
    }
   },
   {
    "methode": "POST",
    "pad": "/api/residentie/emote",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf een wijziging in residentie en de herhaling opnieuw een wijziging in residentie",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "residentie": "gewijzigd"
+    },
+    "b": {
+     "residentie": "gewijzigd"
+    },
+    "c": {
+     "residentie": "gewijzigd"
+    }
    }
   },
   {
@@ -29622,15 +30299,18 @@
    "methode": "POST",
    "pad": "/api/residentie/huis",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in residentie en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -29647,7 +30327,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -29681,7 +30363,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": 1
+    },
     "b": {},
     "c": {}
    }
@@ -29724,17 +30408,24 @@
    "methode": "POST",
    "pad": "/api/residentie/pols",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf een wijziging in residentie en de herhaling opnieuw een wijziging in residentie",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "residentie": "gewijzigd"
+    },
+    "b": {
+     "residentie": "gewijzigd"
+    },
+    "c": {
+     "residentie": "gewijzigd"
+    }
    }
   },
   {
@@ -29749,7 +30440,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": 1
+    },
     "b": {},
     "c": {}
    }
@@ -29843,15 +30536,18 @@
    "methode": "POST",
    "pad": "/api/residentie/suite/zet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in residentie en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -29877,15 +30573,18 @@
    "methode": "POST",
    "pad": "/api/residentie/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in residentie en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -30106,7 +30805,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": 2
+    },
     "b": {},
     "c": {}
    }
@@ -30124,7 +30825,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    }
   },
@@ -30387,15 +31090,18 @@
    "methode": "POST",
    "pad": "/api/rtfkantoor/advies",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +16 in rtfKantoorTaken en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfKantoorTaken": 16
+    },
     "b": {},
     "c": {}
    }
@@ -30565,7 +31271,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -30616,7 +31324,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfKantoorTaken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -30659,15 +31369,18 @@
    "methode": "POST",
    "pad": "/api/rtfkantoor/stadsraad",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +2 in stadsraad en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "stadsraad": 2
+    },
     "b": {},
     "c": {}
    }
@@ -30786,7 +31499,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": 25
+    },
     "b": {},
     "c": {}
    }
@@ -31160,9 +31875,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -31296,9 +32017,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -31349,7 +32076,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -31602,9 +32331,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -31789,9 +32524,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -31806,9 +32547,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -31891,9 +32638,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -33149,7 +33902,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgid": 4
+    },
     "b": {},
     "c": {}
    }
@@ -33158,17 +33913,24 @@
    "methode": "POST",
    "pad": "/api/rtgid/intrek",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf een wijziging in rtgid en de herhaling opnieuw een wijziging in rtgid",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "rtgid": "gewijzigd"
+    },
+    "b": {
+     "rtgid": "gewijzigd"
+    },
+    "c": {
+     "rtgid": "gewijzigd"
+    }
    }
   },
   {
@@ -33268,7 +34030,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgOne": 9
+    },
     "b": {},
     "c": {}
    }
@@ -33336,9 +34100,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "rtgOne": "gewijzigd"
+    },
+    "b": {
+     "rtgOne": "gewijzigd"
+    },
+    "c": {
+     "rtgOne": "gewijzigd"
+    }
    }
   },
   {
@@ -33523,7 +34293,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "salon": 4
+    },
     "b": {},
     "c": {}
    }
@@ -33591,9 +34363,16 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "salon": "gewijzigd"
+    },
+    "b": {
+     "salon": "gewijzigd"
+    },
+    "c": {
+     "wacht": "gewijzigd",
+     "salon": "gewijzigd"
+    }
    }
   },
   {
@@ -33954,9 +34733,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "samenKamers": 1
+    },
+    "b": {
+     "samenKamers": 1
+    },
+    "c": {
+     "samenKamers": 1
+    }
    }
   },
   {
@@ -34073,9 +34858,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "ledenSites": 1
+    },
+    "b": {
+     "ledenSites": "gewijzigd"
+    },
+    "c": {
+     "ledenSites": "gewijzigd"
+    }
    }
   },
   {
@@ -34277,7 +35068,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenSites": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -34481,7 +35274,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "socialebeleid": 1
+    },
     "b": {},
     "c": {}
    }
@@ -34490,15 +35285,19 @@
    "methode": "POST",
    "pad": "/api/sociaal/command",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in genootschap, +3 in rendezvous en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "genootschap": "gewijzigd",
+     "rendezvous": 3
+    },
     "b": {},
     "c": {}
    }
@@ -34609,15 +35408,18 @@
    "methode": "POST",
    "pad": "/api/spar/lijst",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in fluister en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": 1
+    },
     "b": {},
     "c": {}
    }
@@ -34626,15 +35428,18 @@
    "methode": "POST",
    "pad": "/api/spar/parkeer",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in fluister en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -36003,15 +36808,18 @@
    "methode": "POST",
    "pad": "/api/supplier/aanwezig",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in aanwezig en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "aanwezig": 1
+    },
     "b": {},
     "c": {}
    }
@@ -36028,9 +36836,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "aanwezig": "gewijzigd"
+    },
+    "b": {
+     "aanwezig": "gewijzigd"
+    },
+    "c": {
+     "aanwezig": "gewijzigd"
+    }
    }
   },
   {
@@ -36113,7 +36927,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -36122,15 +36938,18 @@
    "methode": "POST",
    "pad": "/api/supplier/agenda/ai",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in agendas en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "agendas": 1
+    },
     "b": {},
     "c": {}
    }
@@ -36164,9 +36983,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "agendas": "gewijzigd"
+    },
+    "b": {
+     "agendas": "gewijzigd"
+    },
+    "c": {
+     "agendas": "gewijzigd"
+    }
    }
   },
   {
@@ -36207,15 +37032,18 @@
    "methode": "POST",
    "pad": "/api/supplier/agent",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -36547,15 +37375,18 @@
    "methode": "POST",
    "pad": "/api/supplier/backoffice",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in zaakCommand en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "zaakCommand": 1
+    },
     "b": {},
     "c": {}
    }
@@ -36607,11 +37438,15 @@
    ],
    "opslag": {
     "a": {
-     "betaalVerzoeken": 1
+     "betaalVerzoeken": 1,
+     "dpIdem": 2,
+     "dpIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "betaalVerzoeken": 1
+     "betaalVerzoeken": 1,
+     "dpIdem": 1,
+     "dpIdemAfdruk": 1
     }
    }
   },
@@ -36815,7 +37650,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    }
   },
@@ -37164,12 +38001,13 @@
    "pad": "/api/supplier/bezorg/terug",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag-zonder-vastlegging",
    "opslag": {
     "a": {},
     "b": {},
@@ -37477,7 +38315,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "borden": 1
+    },
     "b": {},
     "c": {}
    }
@@ -38064,15 +38904,18 @@
    "methode": "POST",
    "pad": "/api/supplier/command/journaal",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in zaakCommand en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "zaakCommand": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -38140,9 +38983,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "zaakCommand": "gewijzigd"
+    },
+    "b": {
+     "zaakCommand": "gewijzigd"
+    },
+    "c": {
+     "zaakCommand": "gewijzigd"
+    }
    }
   },
   {
@@ -38191,7 +39040,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zaakCommand": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -38973,7 +39824,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -39050,15 +39903,18 @@
    "methode": "POST",
    "pad": "/api/supplier/eten/capaciteit",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -39075,7 +39931,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -39314,7 +40172,11 @@
    ],
    "opslag": {
     "a": {
-     "facturen": 1
+     "notifications": "gewijzigd",
+     "rtmail": "gewijzigd",
+     "facturen": 1,
+     "rtmailRegels": 1,
+     "rtmailSchrijf": 2
     },
     "b": {},
     "c": {}
@@ -39350,7 +40212,9 @@
    ],
    "opslag": {
     "a": {
-     "facturen": 2
+     "notifications": "gewijzigd",
+     "facturen": 2,
+     "rtmail": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -39402,7 +40266,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -39674,9 +40540,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "gebouwPand": 1
+    },
+    "b": {
+     "gebouwPand": "gewijzigd"
+    },
+    "c": {
+     "gebouwPand": "gewijzigd"
+    }
    }
   },
   {
@@ -39793,7 +40665,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "gebouwPlus": 1
+    },
     "b": {},
     "c": {}
    }
@@ -39844,9 +40718,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "gebouwPlus": "gewijzigd"
+    },
+    "b": {
+     "gebouwPlus": "gewijzigd"
+    },
+    "c": {
+     "gebouwPlus": "gewijzigd"
+    }
    }
   },
   {
@@ -39981,11 +40861,15 @@
    ],
    "opslag": {
     "a": {
-     "giftcards": 1
+     "giftcards": 1,
+     "kassaIdem": 2,
+     "kassaIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "giftcards": 1
+     "giftcards": 1,
+     "kassaIdem": 1,
+     "kassaIdemAfdruk": 1
     }
    }
   },
@@ -40290,7 +41174,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40316,15 +41202,19 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/autopilot",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers, een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd",
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40358,7 +41248,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40418,15 +41310,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/bezorg/sloten",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in wacht en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40477,9 +41372,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "horeca": "gewijzigd"
+    },
+    "b": {
+     "horeca": "gewijzigd"
+    },
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -40494,7 +41395,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40537,15 +41440,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/club/deur",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40698,7 +41604,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40809,15 +41717,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/folio",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40878,12 +41789,13 @@
    "pad": "/api/supplier/horeca/folio/nacht",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag-zonder-vastlegging",
    "opslag": {
     "a": {},
     "b": {},
@@ -40936,7 +41848,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -40979,15 +41893,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/gast",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41038,7 +41955,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41055,7 +41974,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41106,7 +42027,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41387,15 +42310,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/keuken/tijden",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41438,15 +42364,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/missions",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in horecaMissies en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horecaMissies": 1
+    },
     "b": {},
     "c": {}
    }
@@ -41540,15 +42469,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/pols",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41582,7 +42514,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41633,9 +42567,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "horeca": "gewijzigd"
+    },
+    "b": {
+     "horeca": "gewijzigd"
+    },
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -41769,9 +42709,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "magnaatBrug": 1
+    },
+    "b": {
+     "magnaatBrug": 1
+    },
+    "c": {
+     "magnaatBrug": 1
+    }
    }
   },
   {
@@ -41820,9 +42766,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "horeca": "gewijzigd"
+    },
+    "b": {
+     "horeca": "gewijzigd"
+    },
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -41838,23 +42790,30 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "horeca": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "tegenspraak": "de herhaling werd geweigerd, maar de opslag veranderde toch: een wijziging in horeca",
+   "grond": "geweigerd"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/verzoeken",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in horeca en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41939,7 +42898,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "certificaten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -41965,15 +42926,18 @@
    "methode": "POST",
    "pad": "/api/supplier/hr/gesprekken",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in groeigesprekken en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "groeigesprekken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -41990,7 +42954,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "inwerk": 1
+    },
     "b": {},
     "c": {}
    }
@@ -42636,9 +43602,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "officeDocs": 1
+    },
+    "b": {
+     "officeDocs": 1
+    },
+    "c": {
+     "officeDocs": 1
+    }
    }
   },
   {
@@ -42823,7 +43795,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -42959,7 +43933,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kassaWachtbonnen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -42976,7 +43952,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hulp": 1
+    },
     "b": {},
     "c": {}
    }
@@ -43452,7 +44430,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatPartnerstudio": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -43487,9 +44467,13 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "magnaatPartnerstudio": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "tegenspraak": "de herhaling werd geweigerd, maar de opslag veranderde toch: een wijziging in magnaatPartnerstudio",
+   "grond": "geweigerd"
   },
   {
    "methode": "POST",
@@ -43505,7 +44489,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -43724,9 +44710,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "suppliers": "gewijzigd"
+    },
+    "b": {
+     "suppliers": "gewijzigd"
+    },
+    "c": {
+     "suppliers": "gewijzigd"
+    }
    }
   },
   {
@@ -43911,7 +44903,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "markt": 4
+    },
     "b": {},
     "c": {}
    }
@@ -44183,7 +45177,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -44200,9 +45196,15 @@
     403
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "metier": "gewijzigd"
+    },
+    "b": {
+     "metier": "gewijzigd"
+    },
+    "c": {
+     "metier": "gewijzigd"
+    }
    }
   },
   {
@@ -44770,15 +45772,18 @@
    "methode": "POST",
    "pad": "/api/supplier/mode/bezorg/overzicht",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -44991,15 +45996,19 @@
    "methode": "POST",
    "pad": "/api/supplier/ontvangsten",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in onboarding, +1 in directOntvangsten en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "onboarding": "gewijzigd",
+     "directOntvangsten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -45239,7 +46248,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -45647,7 +46658,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -45664,7 +46677,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "posSales": 1
+    },
     "b": {},
     "c": {}
    }
@@ -45724,15 +46739,18 @@
    "methode": "POST",
    "pad": "/api/supplier/pr/overzicht",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in campagnes en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "campagnes": 1
+    },
     "b": {},
     "c": {}
    }
@@ -46362,7 +47380,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    }
   },
@@ -46642,15 +47662,18 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/assist",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -46779,12 +47802,13 @@
    "pad": "/api/supplier/salon/bio",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag-zonder-vastlegging",
    "opslag": {
     "a": {},
     "b": {},
@@ -47098,9 +48122,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "supplierNotifications": 1
+    },
+    "b": {
+     "supplierNotifications": "gewijzigd"
+    },
+    "c": {
+     "supplierNotifications": "gewijzigd"
+    }
    }
   },
   {
@@ -47115,7 +48145,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -47183,9 +48215,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "ledenSites": "gewijzigd"
+    },
+    "b": {
+     "ledenSites": "gewijzigd"
+    },
+    "c": {
+     "ledenSites": "gewijzigd"
+    }
    }
   },
   {
@@ -47455,9 +48493,17 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wervingIdem": 2,
+     "wervingIdemAfdruk": 1,
+     "staffInvites": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "wervingIdem": 1,
+     "wervingIdemAfdruk": 1,
+     "staffInvites": "gewijzigd"
+    }
    }
   },
   {
@@ -47720,12 +48766,13 @@
    "pad": "/api/supplier/team/buzz",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag-zonder-vastlegging",
    "opslag": {
     "a": {},
     "b": {},
@@ -48067,7 +49114,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "training": 1
+    },
     "b": {},
     "c": {}
    }
@@ -48101,7 +49150,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "training": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -48484,15 +49535,18 @@
    "methode": "POST",
    "pad": "/api/supplier/veiligheid/aankomsten",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in veilig en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 1
+    },
     "b": {},
     "c": {}
    }
@@ -48637,15 +49691,18 @@
    "methode": "POST",
    "pad": "/api/supplier/verkoop/overzicht",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -48807,15 +49864,18 @@
    "methode": "POST",
    "pad": "/api/supplier/vooruit/post/negeer",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in postdatums en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "postdatums": 1
+    },
     "b": {},
     "c": {}
    }
@@ -48885,7 +49945,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -48943,15 +50005,18 @@
    "methode": "POST",
    "pad": "/api/supplier/wensen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in bedrijfsWensen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bedrijfsWensen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -49036,7 +50101,10 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "werkbeleid": 1,
+     "werkmail": 2
+    },
     "b": {},
     "c": {}
    }
@@ -49096,15 +50164,18 @@
    "methode": "POST",
    "pad": "/api/supplier/werkmail/overzicht",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in werkmail en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "werkmail": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49147,15 +50218,18 @@
    "methode": "POST",
    "pad": "/api/supplier/werkvenster",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49164,15 +50238,18 @@
    "methode": "POST",
    "pad": "/api/supplier/werkvormen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in betaalOpdrachten en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49250,12 +50327,13 @@
    "pad": "/api/supplier/zegel/check",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een vastlegging (kantoorAudit, commandJournaal, securityLog, supplierActivity) -- de aantekening van de handeling en niet het werk zelf",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag-zonder-vastlegging",
    "opslag": {
     "a": {},
     "b": {},
@@ -49291,7 +50369,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hulp": 4
+    },
     "b": {},
     "c": {}
    }
@@ -49376,7 +50456,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hulp": 1
+    },
     "b": {},
     "c": {}
    }
@@ -49822,7 +50904,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -50430,15 +51514,18 @@
    "methode": "POST",
    "pad": "/api/training",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in training en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "training": 1
+    },
     "b": {},
     "c": {}
    }
@@ -50549,15 +51636,18 @@
    "methode": "POST",
    "pad": "/api/uitgaan/mijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in suppliers en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50863,7 +51953,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 5
+    },
     "b": {},
     "c": {}
    }
@@ -51545,7 +52637,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -51613,7 +52707,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -51681,7 +52777,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "voeding": 1
+    },
     "b": {},
     "c": {}
    }
@@ -51877,15 +52975,18 @@
    "methode": "POST",
    "pad": "/api/wallet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in wallet en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "wallet": 1
+    },
     "b": {},
     "c": {}
    }
@@ -51936,9 +53037,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "wallet": "gewijzigd"
+    },
+    "b": {
+     "wallet": "gewijzigd"
+    },
+    "c": {
+     "wallet": "gewijzigd"
+    }
    }
   },
   {
@@ -52208,7 +53315,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wereld": 1
+    },
     "b": {},
     "c": {}
    }
@@ -52285,15 +53394,18 @@
    "methode": "POST",
    "pad": "/api/wereld/profiel",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in wereld en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "wereld": 1
+    },
     "b": {},
     "c": {}
    }
@@ -52302,17 +53414,24 @@
    "methode": "POST",
    "pad": "/api/wereld/profiel/van",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "onbeschermd",
+   "reden": "gezien aan de opslag: de eerste oproep gaf +1 in wereld en de herhaling opnieuw een wijziging in wereld",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "wereld": 1
+    },
+    "b": {
+     "wereld": "gewijzigd"
+    },
+    "c": {
+     "wereld": "gewijzigd"
+    }
    }
   },
   {
@@ -52395,7 +53514,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "tafelWensen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -52429,7 +53550,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "checklijsten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -52948,15 +54071,18 @@
    "methode": "POST",
    "pad": "/api/zorgprofiel/zet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf +1 in zorgProfielen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "zorgProfielen": 1
+    },
     "b": {},
     "c": {}
    }

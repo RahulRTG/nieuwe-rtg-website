@@ -91,6 +91,23 @@ async function zetWereldKlaar({ post, tokens, login }) {
   const kas = await stil('/api/pay/kascode', { centen: 100 }, tokens.member);
   w.code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
 
+  /* 9. EEN TIKCODE VAN DE ANDER. `pay/tik` betaalt naar de eigenaar van de code,
+        dus die moet van het TWEEDE lid komen -- je eigen tik weigert de kern
+        terecht ("Dit is je eigen tik"). Dit is een andere codesoort dan de
+        kascode hierboven; met die ene meegestuurd bleef pay/tik op 404 staan. */
+  if (w.anderToken) {
+    const tik = await stil('/api/pay/tikcode', {}, w.anderToken);
+    w.tikcode = (tik.data && tik.data.code) || null;
+  }
+
+  /* 10. EEN OPENSTAANDE FACTUUR van het lid zelf, voor `pay/saldo`. Die maken we
+         niet: de demostand heeft er een, en we zoeken hem op. Een factuur
+         verzinnen zou de proef een eigen boekhouding geven. */
+  const staat = await stil('/api/state', {}, tokens.member);
+  const facturen = (staat.data && staat.data.state && staat.data.state.invoices) || [];
+  const open = facturen.find(f => f && f.status === 'open');
+  w.factuurId = (open && open.id) || null;
+
   return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w) };
 }
 
@@ -128,7 +145,9 @@ function geldLijf(w) {
     '/api/bank/terugkerend/stop': { id: w.terugkerendId },
     '/api/pay/verzoek': { aan: [w.cn2], totaalCenten: 500, oms: 'proefklompje' },
     '/api/pay/verzoek/betaal': { id: w.verzoekAanMij },
-    '/api/pay/verzoek/intrek': { id: w.verzoekVanMij }
+    '/api/pay/verzoek/intrek': { id: w.verzoekVanMij },
+    '/api/pay/tik': { code: w.tikcode, centen: 100, oms: 'prooftik' },
+    '/api/pay/saldo': { invoiceId: w.factuurId }
   };
   /* Een route waarvan de wereld het benodigde stuk NIET heeft opgeleverd, krijgt
      hier niets. Anders zou hij een lijf met `id: null` krijgen en op een andere

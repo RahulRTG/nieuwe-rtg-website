@@ -3,7 +3,8 @@
  "vastlegging": {
   "kantoorAudit": "Het kantoorjournaal: wie deed wat aan het kantoor, en wanneer. Elke handeling van een medewerker schrijft er een regel bij -- ook de tweede keer dat iemand dezelfde schakelaar op AAN zet, en dat HOORT zo: de aantekening is er om de handeling terug te vinden, niet om de eindstand te bewaren. Groeit dus bij een herhaling mee zonder dat er iets tweede keer is gedaan. Gemeten onder office/bank, office/weefsel en office/zelfzorg.",
   "commandJournaal": "Het journaal van RTG Command: welke opdracht is er aan de cockpit gegeven. Zelfde vorm als kantoorAudit -- een agent twee keer stoppen levert twee regels en een gestopte agent. Gemeten onder command/agent, command/alarm, command/sonde en command/zaak.",
-  "securityLog": "Het beveiligingsjournaal van RTFOS. Legt vast DAT er iets is aangeraakt, niet WAT eruit kwam; groeit bij elke aanraking, ook bij een herhaalde. Gemeten onder zes verschillende rtfos-families."
+  "securityLog": "Het beveiligingsjournaal van RTFOS. Legt vast DAT er iets is aangeraakt, niet WAT eruit kwam; groeit bij elke aanraking, ook bij een herhaalde. Gemeten onder zes verschillende rtfos-families.",
+  "supplierActivity": "Het activiteitenspoor van een zaak: wie deed wat aan deze onderneming. Gevonden op 24 augustus toen het tweede meetpunt ook naar de INHOUD ging kijken (staatlog stand 2): vijf supplier-routes leken opeens onbeschermd terwijl het enige dat bewoog dit spoor was. Gemeten onder VEERTIEN verschillende routefamilies -- aanwezig, betaalverzoek, bezorg, gebouwpand, giftcard, horeca, mep en meer -- en dat is precies het patroon van een doorlopende vastlegging tegenover domeinwerk, dat onder zijn eigen handvol routes blijft. Het haalde ook een valse TEGENSPRAAK weg: supplier/betaalverzoek meldt terecht `herhaald: true` (die loopt sinds 4.55 door dpIdem) en groeide daarnaast alleen nog in dit spoor."
  },
  "vastleggingUitleg": "Collecties die de AANTEKENING van een handeling zijn en niet de handeling zelf. Het tweede meetpunt van de idemproef telt lengtes, en kan die twee niet uit elkaar houden: een auditregel bij de eerste EN bij de herhaalde oproep ziet er precies zo uit als twee keer echt werk. Dat onderscheid is een BESLUIT en staat daarom hier, met de reden erbij, en niet in een heuristiek -- een drempel die kantoorAudit vangt, vangt payBoekingen mee, en dan verdwijnt bewijs over geld achter een slimmigheid. De lijst veroudert de VEILIGE kant op: komt er een journaal bij dat hier niet staat, dan meldt de proef die route onbeschermd (te veel melden, niet te weinig). En de lijst wordt gecontroleerd: de proef telt per collectie onder hoeveel verschillende routefamilies hij groeide, en zegt het hardop als er een maar EEN familie heeft -- dat is domeinwerk in een vastleggingslijst.",
  "klassen": {
@@ -12,14 +13,16 @@
   "berekening": "Een POST die rekent of opzoekt en niets blijvends aanmaakt. Een tweede oproep hoort een VERSE uitkomst te geven; dat de proef verschil ziet, is precies goed.",
   "instelling": "Een waarde zetten of bewaren. Twee keer dezelfde waarde zetten geeft dezelfde eindstand -- effectief idempotent. Dat de proef verschil ziet, komt van een tijdstempel of een volgnummer in het antwoord, niet van een tweede effect.",
   "tebeslissen": "HIER IS NOG GEEN BESLUIT OVER GENOMEN. Staat met naam in deze lijst zodat het niet als \"afgehandeld\" meetelt.",
-  "beschermd": "Liep hier onbeschermd en dat kostte iets wat niet mocht: geld, of dubbel werk bij een behandelaar, of een open deur. Sinds de reparatie is de herhaling afgevangen; ze blijven in dit register staan zodat de geschiedenis zichtbaar is."
+  "beschermd": "Liep hier onbeschermd en dat kostte iets wat niet mocht: geld, of dubbel werk bij een behandelaar, of een open deur. Sinds de reparatie is de herhaling afgevangen; ze blijven in dit register staan zodat de geschiedenis zichtbaar is.",
+  "teller": "Een teller die telt. Een tweede oproep hoort hem op te hogen -- zou hij dat niet doen, dan klopt de telling niet. Anders dan een code-maker levert hij niets NIEUWS op; anders dan een instelling is de eindstand na twee oproepen wel degelijk anders, en dat is precies de bedoeling."
  },
  "telling": {
-  "creatie": 42,
-  "berekening": 39,
-  "instelling": 14,
+  "creatie": 45,
+  "berekening": 42,
+  "instelling": 19,
   "beschermd": 15,
-  "code-maker": 4
+  "code-maker": 4,
+  "teller": 1
  },
  "routes": {
   "/api/agenda/toevoegen": {
@@ -387,6 +390,54 @@
   "/api/bank/rekening/open": {
    "klasse": "creatie",
    "reden": "Nog een rekening openen. Een dubbeltik geeft een tweede, lege rekening op naam van hetzelfde lid: hinderlijk in de lijst, en er gaat geen geld mee weg. Gevonden in dezelfde ronde als de negen hierboven, en met opzet NIET bij ze in gezet -- dat verschil is de hele reden dat dit register bestaat."
+  },
+  "/api/bijles/vraag": {
+   "klasse": "creatie",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een vraag aan de bijlesbegeleider. Elke oproep is een nieuwe beurt in hetzelfde gesprek; twee keer vragen is twee keer vragen."
+  },
+  "/api/member/leren/schrijf-bewaar": {
+   "klasse": "creatie",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Bewaart een schrijfsel: kern/leren/schrijven.js zet er een voor in de lijst en kapt af op twintig. Een tweede keer bewaren geeft een tweede versie, en dat is bij schrijfwerk gewenst."
+  },
+  "/api/office/bank/opdrachten/ronde": {
+   "klasse": "berekening",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De herkansingsronde van de betaalopdrachten: alles wat AAN DE BEURT is opnieuw indienen. Een tweede ronde doet weer wat aan de beurt is -- dat is de hele functie. Dubbel indienen wordt niet door deze knop tegengehouden maar door `volgendeAt` (een net ingediende opdracht is voorlopig niet aan de beurt) en door een `bezig`-vlag die twee rondes over elkaar heen verhindert; zie de kop van kern/betaalopdracht/rij.js."
+  },
+  "/api/office/bank/regels/check": {
+   "klasse": "berekening",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De regelwacht loopt de fiscale regels na en schrijft de bevindingen weg. Een tweede check is een verse beoordeling van dezelfde stand -- een controle die de tweede keer niets meer zou zien, is geen controle."
+  },
+  "/api/office/kamer/taak": {
+   "klasse": "creatie",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Zet een taak op het bord van een afdeling (kern/afdelingen/boardroom). Twee keer op Toevoegen drukken geeft twee taken: hinderlijk, en het raakt geen geld."
+  },
+  "/api/office/stats": {
+   "klasse": "berekening",
+   "reden": "Platformcijfers opvragen: een POST die telt en niets aanmaakt. Dat de tweede oproep andere getallen geeft, is precies goed. Kwam als enige van deze groep uit het ANTWOORD en niet uit de opslag."
+  },
+  "/api/onboarding/paspoort": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Bewaart de paspoortvelden op het onboarding-profiel en in het ledendossier. Dezelfde gegevens twee keer opsturen geeft dezelfde eindstand; wat er bij een herhaling nog beweegt is het tijdstempel `at` waarop we ze het laatst zagen."
+  },
+  "/api/residentie/betreed": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een kamer binnenlopen. De eerste keer krijg je een zitplek, daarna wordt alleen ververst wanneer je voor het laatst gezien bent (`leden[key].at`). Twee keer binnenlopen maakt je niet twee keer aanwezig."
+  },
+  "/api/residentie/emote": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een gebaar maken in de kamer. Het gebaar zelf gaat als sein naar de anderen en wordt nergens bewaard; het enige dat in de opslag beweegt is het aanwezigheidsstempel. Twee keer zwaaien mag, en hoort ook twee keer gezien te worden."
+  },
+  "/api/residentie/pols": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. De hartslag van de kamer: het scherm vraagt hoe de zaal ervoor staat en meldt daarmee dat je er nog bent. Herhaald aanroepen is hier niet een neveneffect maar de FUNCTIE; het enige dat verandert is het aanwezigheidsstempel."
+  },
+  "/api/rtgid/intrek": {
+   "klasse": "instelling",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Toegang van een dienst intrekken. De intrekking zelf is idempotent -- de tweede oproep vindt geen niet-ingetrokken sessies meer en meldt `ingetrokken: 0`. Wat er dan nog beweegt is het INZAGEJOURNAAL, dat elke poging vastlegt. Dat hoort er te zijn: een tweede intrekpoging is iets wat het lid later terug moet kunnen zien."
+  },
+  "/api/wereld/profiel/van": {
+   "klasse": "teller",
+   "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een profiel bekijken. De eerste keer komt er een bezoekregel bij, daarna gaat `keer` omhoog en schuift `at` mee (kern/wereld/bezoek.js). Dat is geen neveneffect maar de belofte: er is geen sluipstand, en dat staat ook in het antwoord zodat het scherm het niet kan verzwijgen. Zou een tweede blik NIET meetellen, dan klopte de telling niet meer."
   }
  }
 }

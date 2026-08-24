@@ -69,20 +69,43 @@ const isOk = (st) => st && st.status >= 200 && st.status < 300;
 
    Een route die bij elke oproep hetzelfde antwoord geeft, verraadt van buitenaf
    niet of hij twee keer heeft gewerkt -- en dat gold voor 768 routes. Maar de
-   OPSLAG verraadt het wel. Met RTG_STAATLOG=1 draagt elk antwoord een kop met
-   de lengte per collectie (server/staatlog.js); `staat` is het VERSCHIL dat elk
-   van de drie oproepen achterliet, met de ruis er al uit geijkt.
+   OPSLAG verraadt het wel. Met RTG_STAATLOG draagt elk antwoord een kop met de
+   stand per collectie (server/staatlog.js): stand 1 de lengte, stand 2 ook een
+   inhoudsafdruk, zodat ook een wijziging OP ZIJN PLAATS te zien is. `staat` is
+   het VERSCHIL dat elk van de drie oproepen achterliet, met de ruis er al uit
+   geijkt.
 
    Drie uitkomsten, en de derde is een weigering:
      - de eerste oproep veranderde niets -> null. Dan is er geen tweede effect om
-       te zien: een leesroute, of een die alleen op zijn plaats bijwerkt. Dit
-       meetpunt kan die twee niet uit elkaar houden en doet dus geen uitspraak.
-     - de eerste voegde iets toe en de herhaling niets -> beschermd.
-     - allebei voegden iets toe -> onbeschermd. */
+       te zien: een leesroute, of een die zijn verandering meteen terugdraait.
+       Daar doet dit meetpunt geen uitspraak over.
+     - de eerste veranderde iets en de herhaling niets -> beschermd.
+     - allebei veranderden iets -> onbeschermd. */
+
+/* Een getal is een verandering in de LENGTE; 'gewijzigd' is een verandering in
+   de inhoud bij gelijke lengte (server/staatlog.js stand 2). Die twee lezen
+   anders en horen anders te klinken -- "+1 in orders" tegenover "een wijziging
+   in bankPassen" -- want alleen het eerste is iets dat erbij is gekomen. */
 function beschrijfDelta(d) {
-  return Object.entries(d).map(([k, n]) => (n > 0 ? '+' : '') + n + ' in ' + k).join(', ');
+  return Object.entries(d).map(([k, n]) => typeof n === 'number'
+    ? (n > 0 ? '+' : '') + n + ' in ' + k
+    : 'een wijziging in ' + k).join(', ');
 }
-const TEGENSPRAAK = 'het antwoord meldt een herkende herhaling, maar de opslag groeide: ';
+/* WAAROM DIT PER GROND VERSCHILT, en niet een zin voor alles.
+
+   Hier stond een vaste tekst: "het antwoord meldt een herkende herhaling, maar
+   de opslag groeide". Over de eerste echte ronde met inhoudsafdrukken kwamen er
+   drie tegenspraken uit, en bij ALLE DRIE was de grond niet dat de server de
+   herhaling merkte maar dat hij hem WEIGERDE (409, 404). De melding beweerde dus
+   iets wat de proef niet had gemeten -- precies wat deze proef bij anderen komt
+   vinden. Vandaar een tekst per grond, uit `o.grond` en niet uit een aanname. */
+const TEGENSPRAAK = {
+  gemerkt: 'het antwoord meldt een herkende herhaling, maar de opslag veranderde toch: ',
+  geweigerd: 'de herhaling werd geweigerd, maar de opslag veranderde toch: ',
+  gelijk: 'de herhaling gaf hetzelfde antwoord, maar de opslag veranderde toch: ',
+  onbekend: 'de herhaling zou niets gedaan hebben, maar de opslag veranderde toch: '
+};
+const tegenspraakTekst = (grond, d) => (TEGENSPRAAK[grond] || TEGENSPRAAK.onbekend) + beschrijfDelta(d);
 function staatOordeel(staat) {
   if (!staat || !staat.a || !staat.b) return null;
   if (!Object.keys(staat.a).length) return null;
@@ -108,12 +131,12 @@ function weegHerhaling(a, b, c, staat) {
      maar een mededeling van de server zelf, en dus het sterkste bewijs dat er
      is -- sterker dan welke vergelijking ook. */
   if (b && b.data && b.data.herhaald === true) {
-    return { stand: 'beschermd', reden: 'de server merkte de herhaling zelf (herhaald: true)' };
+    return { stand: 'beschermd', grond: 'gemerkt', reden: 'de server merkte de herhaling zelf (herhaald: true)' };
   }
   if (!isOk(b)) {
     /* Een herhaling die wordt GEWEIGERD is ook geen tweede effect. Maar het is
        een ander mechanisme dan herkennen, en dat verschil hoort zichtbaar. */
-    return { stand: 'beschermd', reden: 'de herhaling werd geweigerd (status ' + b.status + ')' };
+    return { stand: 'beschermd', grond: 'geweigerd', reden: 'de herhaling werd geweigerd (status ' + b.status + ')' };
   }
   if (!isOk(c)) {
     return { stand: 'ongemeten', reden: 'de ijkoproep met een verse sleutel kwam niet door; ' +
@@ -130,7 +153,7 @@ function weegHerhaling(a, b, c, staat) {
       : 'het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn' };
   }
   if (gelijk(a.data, b.data)) {
-    return { stand: 'beschermd', reden: 'de herhaling gaf hetzelfde antwoord terwijl een verse sleutel ' +
+    return { stand: 'beschermd', grond: 'gelijk', reden: 'de herhaling gaf hetzelfde antwoord terwijl een verse sleutel ' +
       'een ander gaf' };
   }
   return { stand: 'onbeschermd', reden: 'de herhaling gaf een ander antwoord: hij deed het opnieuw' };
@@ -182,7 +205,8 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
        antwoord zou halen. Het maakt de proef niet rood -- het is een bevinding
        en geen blindheid -- maar het staat bij naam in het register. */
     if (staat && o.stand === 'beschermd' && dB && Object.keys(dB).length) {
-      rij.tegenspraak = TEGENSPRAAK + beschrijfDelta(dB);
+      rij.tegenspraak = tegenspraakTekst(o.grond, dB);
+      rij.grond = o.grond || 'onbekend';
       tegenspraken.push(r.method + ' ' + r.pad);
     }
     perRoute[r.method + ' ' + r.pad] = rij;
@@ -243,8 +267,8 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
          terwijl alleen het auditlog groeide, spreekt zichzelf niet tegen. */
       if (rij.tegenspraak) {
         const i = tegenspraken.indexOf(rij.methode + ' ' + rij.pad);
-        if (Object.keys(opnieuw.b).length) rij.tegenspraak = TEGENSPRAAK + beschrijfDelta(opnieuw.b);
-        else { delete rij.tegenspraak; if (i >= 0) tegenspraken.splice(i, 1); }
+        if (Object.keys(opnieuw.b).length) rij.tegenspraak = tegenspraakTekst(rij.grond, opnieuw.b);
+        else { delete rij.tegenspraak; delete rij.grond; if (i >= 0) tegenspraken.splice(i, 1); }
       }
       if (rij.bron !== 'opslag') continue;   // alleen een opslag-oordeel kan kantelen
       tel[rij.idempotentie]--; uitOpslag--;

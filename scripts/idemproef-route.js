@@ -67,8 +67,13 @@ async function wacht(basis, ms) {
     cwd: WORTEL, stdio: 'ignore',
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
       RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF',
-      // het tweede meetpunt: elk antwoord draagt de lengte per collectie
-      RTG_STAATLOG: '1' }
+      /* Het tweede meetpunt, stand 2: elk antwoord draagt per collectie de
+         lengte EN een inhoudsafdruk. Stand 1 (alleen lengtes) is goedkoper maar
+         is blind voor een wijziging op zijn plaats en voor collecties die een
+         object zijn -- en juist daar zat de groep die na de vorige ronde nog
+         ongemeten stond. De extra kosten zijn gemeten: 0,29 ms per verzoek, een
+         seconde of zes over de hele ronde. */
+      RTG_STAATLOG: '2' }
   });
 
   const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
@@ -134,10 +139,12 @@ async function wacht(basis, ms) {
   /* ============================================================================
      HET TWEEDE MEETPUNT IJKEN.
 
-     Elk antwoord draagt met RTG_STAATLOG=1 de lengte per collectie. Maar
-     sommige collecties groeien bij ELK verzoek -- `doorgeefjournaal` schrijft
-     een regel per verzoek, ook bij lezen. Zonder die ruis eruit zou elke oproep
-     "werk gedaan" lijken en was dit meetpunt meteen blind.
+     Elk antwoord draagt de stand per collectie. Maar sommige collecties
+     veranderen bij ELK verzoek -- `doorgeefjournaal` schrijft een regel per
+     verzoek, ook bij lezen. Zonder die ruis eruit zou elke oproep "werk gedaan"
+     lijken en was dit meetpunt meteen blind. In stand 2 weegt dit zwaarder dan
+     in stand 1: een inhoudsafdruk ziet ook de tellers en tijdstempels die bij
+     elk verzoek een tik krijgen, dus er is MEER te ijken en niet minder.
 
      Wie de ruis is, staat daarom nergens als lijst: we METEN het. Een handvol
      oproepen die niets doen (een leesroute), kijken wat er dan toch groeit, en

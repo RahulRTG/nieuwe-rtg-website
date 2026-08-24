@@ -39,7 +39,9 @@ const VOLLEDIG = {
   '/api/bank/pas/uitgeven': { pas: { id: 'PAS1' } },
   '/api/bank/terugkerend/zet': { terugkerend: { id: 'TK1' } },
   '/api/pay/verzoek': (l, tok) => ({ verzoeken: [{ id: tok === 'ander' ? 'VZAANMIJ' : 'VZVANMIJ' }] }),
-  '/api/pay/kascode': { code: 'ABC123' }
+  '/api/pay/kascode': { code: 'ABC123' },
+  '/api/pay/tikcode': { code: 'TIK999' },
+  '/api/state': { state: { invoices: [{ id: 'RTG-2026-0001', status: 'paid' }, { id: 'RTG-2026-0002', status: 'open' }] } }
 };
 
 test('de keten levert alle stukken op die de geldroutes nodig hebben', async () => {
@@ -50,9 +52,26 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
   assert.equal(wereld.spaarIban, 'NL00SPAAR');
   assert.equal(wereld.pasId, 'PAS1');
   assert.equal(wereld.terugkerendId, 'TK1');
-  assert.equal(Object.keys(perRoute).length, 18, 'achttien geldroutes krijgen een eigen lijf');
+  assert.equal(wereld.tikcode, 'TIK999');
+  assert.equal(wereld.factuurId, 'RTG-2026-0002', 'de OPENSTAANDE factuur, niet de eerste de beste');
+  assert.equal(Object.keys(perRoute).length, 20, 'twintig geldroutes krijgen een eigen lijf');
   assert.deepEqual(extra, { iban: 'NL00EEN', aan: 'Gouden Ibis', codenaam: 'Gouden Ibis',
     naarCodenaam: 'Gouden Ibis', code: 'ABC123' });
+});
+
+test('de tikcode komt van de ANDER, want je eigen tik weigert de kern', () => {
+  /* `pay/tik` betaalt naar de eigenaar van de code. Met een eigen tikcode geeft
+     de kern terecht "Dit is je eigen tik", en met de KASCODE (een andere
+     codesoort) een 404 -- zo bleef die route staan op ongemeten. */
+  const journaal = [];
+  const nep = nepPost(VOLLEDIG, journaal);
+  return zetWereldKlaar({ post: nep, tokens: { member: 'lid', office: 'kantoor' } }).then(({ perRoute }) => {
+    const tik = journaal.find(x => x.pad === '/api/pay/tikcode');
+    assert.ok(tik, 'er wordt een tikcode gehaald');
+    assert.equal(tik.tok, 'ander', 'en wel bij het tweede lid');
+    assert.equal(perRoute['/api/pay/tik'].code, 'TIK999');
+    assert.notEqual(perRoute['/api/pay/tik'].code, 'ABC123', 'niet de kascode');
+  });
 });
 
 test('TWEE klompjes, want betalen en intrekken vragen tegengestelde kanten', () => {

@@ -144,9 +144,10 @@ test('opslag: allebei voegden toe -- dan deed de herhaling het gewoon opnieuw', 
 });
 
 test('opslag: als de EERSTE oproep niets veranderde, doet dit meetpunt geen uitspraak', () => {
-  /* Een leesroute, of een die alleen op zijn plaats bijwerkt. Dit meetpunt kan
-     die twee niet uit elkaar houden -- het telt lengtes, geen inhoud -- en een
-     meter die dat verschil niet ziet, hoort er ook geen oordeel over te vellen. */
+  /* Een leesroute, of een die zijn verandering meteen weer terugdraait. In
+     stand 2 ziet dit meetpunt ook een wijziging op zijn plaats, dus de groep die
+     hier overblijft is kleiner geworden -- maar niet leeg, en een meter die het
+     verschil niet ziet hoort er ook geen oordeel over te vellen. */
   const zelfde = { ok: true };
   const o = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde), { a: {}, b: {}, c: {} });
   assert.equal(o.stand, 'ongemeten', 'geen tweede effect om te zien');
@@ -161,6 +162,23 @@ test('opslag: het ANTWOORD blijft voorgaan waar het wel iets kan zeggen', () => 
     { a: { x: 1 }, b: { x: 1 }, c: { x: 1 } });
   assert.equal(o.stand, 'beschermd');
   assert.match(o.reden, /herhaald: true/, 'het antwoord wint, niet de opslag');
+});
+
+test('opslag: een WIJZIGING op zijn plaats leest anders dan een toevoeging', () => {
+  /* Stand 2 van server/staatlog.js levert 'gewijzigd' in plaats van een getal:
+     de lengte bleef gelijk, de inhoud niet. Dat is een ander feit dan "er is er
+     een bij gekomen" en hoort ook anders te klinken -- anders leest een
+     bevinding als "+undefined in bankPassen". */
+  const zelfde = { ok: true };
+  const o = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde),
+    { a: { bankPassen: 'gewijzigd' }, b: {}, c: { bankPassen: 'gewijzigd' } });
+  assert.equal(o.stand, 'beschermd');
+  assert.match(o.reden, /een wijziging in bankPassen/);
+  assert.doesNotMatch(o.reden, /undefined|NaN/, 'en niet met een kapot getal erin');
+
+  const twee = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde),
+    { a: { bankPassen: 'gewijzigd' }, b: { bankPassen: 'gewijzigd' }, c: {} });
+  assert.equal(twee.stand, 'onbeschermd', 'twee keer bijwerken is twee keer werk');
 });
 
 test('opslag: zonder meetpunt werkt de proef als vanouds', () => {
@@ -289,4 +307,36 @@ test('HET REGISTER ZELF: elke vastlegging draagt een reden, en de proef leest he
   }
   const bron = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'idemproef-route.js'), 'utf8');
   assert.match(bron, /vastlegging:\s*register\.vastlegging/, 'de ronde geeft het register mee aan de proef');
+});
+
+/* ---------------------------------------------------------------------------
+   DE TEGENSPRAAK NOEMT DE JUISTE GROND
+
+   De melding stond hier als EEN vaste zin: "het antwoord meldt een herkende
+   herhaling, maar de opslag groeide". Over de eerste echte ronde met
+   inhoudsafdrukken kwamen er drie tegenspraken uit, en bij alle drie was de
+   grond niet dat de server de herhaling MERKTE maar dat hij hem WEIGERDE (twee
+   keer 409, een keer 404). De melding beweerde dus iets wat de proef niet had
+   gemeten -- precies het soort bewering waar deze proef bij anderen op jaagt.
+   --------------------------------------------------------------------------- */
+test('tegenspraak: geweigerd is niet hetzelfde als gemerkt', async () => {
+  const geweigerd = await ronde([{ pad: '/api/x/weiger', a: { spul: 1 }, b: { spul: 'gewijzigd' }, c: {},
+    antwoorden: [ok({ id: 1 }), { status: 409, data: { error: 'al gebruikt' } }, ok({ id: 2 })] }]);
+  const r = geweigerd.perRoute['POST /api/x/weiger'];
+  assert.equal(r.idempotentie, 'beschermd');
+  assert.equal(r.grond, 'geweigerd');
+  assert.match(r.tegenspraak, /^de herhaling werd geweigerd/);
+  assert.doesNotMatch(r.tegenspraak, /herkende herhaling/, 'en beweert niet dat de server hem merkte');
+
+  const gemerkt = await ronde([{ pad: '/api/x/merk', a: { spul: 1 }, b: { spul: 'gewijzigd' }, c: {},
+    antwoorden: [ok({ id: 1 }), ok({ id: 1, herhaald: true }), ok({ id: 2 })] }]);
+  const m = gemerkt.perRoute['POST /api/x/merk'];
+  assert.equal(m.grond, 'gemerkt');
+  assert.match(m.tegenspraak, /^het antwoord meldt een herkende herhaling/);
+
+  const gelijkAntwoord = await ronde([{ pad: '/api/x/gelijk', a: { spul: 1 }, b: { spul: 'gewijzigd' }, c: {},
+    antwoorden: [ok({ id: 1 }), ok({ id: 1 }), ok({ id: 2 })] }]);
+  const g = gelijkAntwoord.perRoute['POST /api/x/gelijk'];
+  assert.equal(g.grond, 'gelijk');
+  assert.match(g.tegenspraak, /^de herhaling gaf hetzelfde antwoord/);
 });

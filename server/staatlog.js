@@ -36,60 +36,106 @@
    en die uitsluiten. Een handgeschreven lijst zou stil verouderen zodra er een
    teller bij komt; een ijking niet.
 
-   WAT DIT NIET ZIET, en dat hoort er hardop bij te staan:
+   TWEE STANDEN, EN DE TWEEDE IS ER GEKOMEN DOORDAT DE EERSTE TE SMAL BLEEK.
 
-     - een WIJZIGING OP ZIJN PLAATS. Een status van 'open' naar 'betaald' zetten
-       verandert geen enkele lengte. Een tweede oproep die alleen een veld
-       overschrijft, blijft hier dus onzichtbaar. Voor de creatie-routes waar
-       4.30 over gaat is dat geen bezwaar -- daar is bijkomen de vorm -- maar
-       een route die alleen bijwerkt, komt met dit meetpunt niet verder dan
-       "geen verschil gezien".
-     - collecties die OBJECTEN zijn in plaats van arrays. `Object.keys()` daarop
-       is O(n) en dat is per verzoek te duur; die tellen als 1. Bij de proef gaat
-       het om arrays (orders, meldingen, kaarten), dus dat kost daar niets.
+     RTG_STAATLOG=1  alleen de LENGTE per array. O(1) per collectie, dus zo goed
+                     als gratis. Ziet een toevoeging en een verwijdering.
+     RTG_STAATLOG=2  de lengte EN een korte inhoudsafdruk per collectie, arrays
+                     en objecten allebei. Ziet daarmee ook een wijziging op zijn
+                     plaats.
 
-   Die twee grenzen maken dit meetpunt smaller dan het klinkt. Het is er om
-   ONGEMETEN kleiner te maken, niet om groen te kunnen zeggen. */
+   Stand 1 was blind voor twee dingen, en die twee stonden hier eerst als grens
+   opgeschreven: een status van 'open' naar 'betaald' zetten verandert geen
+   enkele lengte, en collecties die OBJECTEN zijn (bankPassen, bankIdem) hebben
+   er helemaal geen. Dat laatste bleek geen randgeval: `bank/pas/uitgeven` maakte
+   een pas in een OBJECT, dus die route was met stand 1 onzichtbaar.
+
+   Stand 2 kost een JSON.stringify plus een sha1 per collectie per verzoek. Dat
+   klinkt duur en is het niet: gemeten op een geseede proefdatabase 0,29 ms voor
+   de hele stand, ofwel een seconde of zes over een volledige ronde van 9.324
+   oproepen. Daarom is het een tweede stand en geen apart gereedschap -- maar wel
+   opt-in, want in productie hoort geen van beide.
+
+   WAT OOK STAND 2 NIET ZIET:
+
+     - een verandering die zichzelf terugdraait binnen een verzoek.
+     - een verschuiving in de SLEUTELVOLGORDE van een object telt als een
+       wijziging, ook al betekent hij niets. In de praktijk herordent deze code
+       geen objecten, dus dat blijft theorie -- maar het staat er.
+     - het verschil tussen "de handeling" en "de aantekening van de handeling"
+       BINNEN een collectie. Een rij die bij elke oproep een tijdstempel bijwerkt,
+       ziet er hier uit als werk. Per collectie vangt IDEMBESLUIT.json dat af
+       (`vastlegging`); binnen een rij niet.
+
+   Dit meetpunt is er om ONGEMETEN kleiner te maken, niet om groen te kunnen
+   zeggen. */
 'use strict';
 
+const crypto = require('crypto');
 const state = require('./db/state');
 
-let aan = false;
+let aan = false, diep = false;
 
-/* De stand: alleen `.length` van arrays -- dat is O(1) -- en alleen wat gevuld
-   is, zodat de kop niet volloopt met honderd nullen. */
+/* Een korte afdruk van de inhoud. Acht hex-tekens: een botsing zou hier een
+   gemiste bevinding zijn en geen fout antwoord, en de kop moet klein blijven.
+   Gaat stringify stuk (een cyclus), dan geeft hij '?' terug -- dat verschilt
+   nooit van zichzelf, dus zo'n collectie telt als onveranderd in plaats van als
+   voortdurend gewijzigd. Stil ruis toevoegen is erger dan niets zien. */
+function afdruk(v) {
+  try { return crypto.createHash('sha1').update(JSON.stringify(v)).digest('hex').slice(0, 8); }
+  catch (e) { return '?'; }
+}
+
+/* De stand. In stand 1 alleen `.length` van arrays (O(1)); in stand 2 ook het
+   aantal sleutels van objecten en van allebei een inhoudsafdruk. Alleen wat
+   gevuld is, zodat de kop niet volloopt met honderd nullen. */
 function stand() {
   const data = state.db && state.db.data;
   if (!data || typeof data !== 'object') return '';
   const uit = [];
   for (const k of Object.keys(data)) {
     const v = data[k];
-    if (Array.isArray(v) && v.length) uit.push(k + '=' + v.length);
+    if (!v || typeof v !== 'object') continue;
+    if (!diep) { if (Array.isArray(v) && v.length) uit.push(k + '=' + v.length); continue; }
+    const n = Array.isArray(v) ? v.length : Object.keys(v).length;
+    if (n) uit.push(k + '=' + n + ':' + afdruk(v));
   }
   return uit.join(',');
 }
 
-/* De stand als map, voor wie hem wil vergelijken (de proef, en de toets). */
+/* De stand als map, voor wie hem wil vergelijken (de proef, en de toets).
+   `{ n, h }` per collectie; `h` is null in stand 1. */
 function lees(kop) {
   const uit = {};
   for (const deel of String(kop || '').split(',')) {
     if (!deel) continue;
     const i = deel.lastIndexOf('=');
-    if (i > 0) uit[deel.slice(0, i)] = Number(deel.slice(i + 1)) || 0;
+    if (i <= 0) continue;
+    const waarde = deel.slice(i + 1);
+    const j = waarde.indexOf(':');
+    uit[deel.slice(0, i)] = j < 0
+      ? { n: Number(waarde) || 0, h: null }
+      : { n: Number(waarde.slice(0, j)) || 0, h: waarde.slice(j + 1) };
   }
   return uit;
 }
 
-/* Welke collecties zijn er tussen twee standen bij gekomen of afgegaan?
-   `negeer` is de ruis die de ijking heeft gevonden. */
+const LEEG = { n: 0, h: null };
+
+/* Wat is er tussen twee standen veranderd? Een getal als de LENGTE veranderde
+   (met de richting erin), en 'gewijzigd' als de lengte gelijk bleef maar de
+   inhoud niet -- dat laatste kan alleen in stand 2. `negeer` is de ruis die de
+   ijking heeft gevonden. */
 function verschil(voor, na, negeer) {
   const a = typeof voor === 'string' ? lees(voor) : (voor || {});
   const b = typeof na === 'string' ? lees(na) : (na || {});
   const uit = {};
   for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) {
     if (negeer && negeer.has(k)) continue;
-    const d = (b[k] || 0) - (a[k] || 0);
+    const x = a[k] || LEEG, y = b[k] || LEEG;
+    const d = y.n - x.n;
     if (d) uit[k] = d;
+    else if (x.h && y.h && x.h !== y.h) uit[k] = 'gewijzigd';
   }
   return uit;
 }
@@ -111,8 +157,13 @@ function haak(app) {
   return true;
 }
 
-function begin(vlag) { aan = String(vlag || '') === '1'; return aan; }
+function begin(vlag) {
+  const v = String(vlag || '');
+  diep = v === '2';
+  aan = v === '1' || diep;
+  return aan;
+}
 
 begin(process.env.RTG_STAATLOG);
 
-module.exports = { haak, stand, lees, verschil, begin, get aan() { return aan; } };
+module.exports = { haak, stand, lees, verschil, afdruk, begin, get aan() { return aan; }, get diep() { return diep; } };

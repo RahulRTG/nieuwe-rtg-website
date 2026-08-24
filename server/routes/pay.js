@@ -95,6 +95,32 @@ module.exports = (kern) => {
     res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));
   });
 
+  /* ---- vooraf vastzetten: de pre-autorisatie ----
+     Drie handelingen van de ZAAK op een code van het lid: een maximum
+     vastzetten, later het werkelijke bedrag vastleggen, of vrijgeven. Het lid
+     heeft er geen eigen knop voor -- hij toont dezelfde kassacode als altijd en
+     ziet het vastgezette bedrag terug in zijn overzicht. Dat is met opzet: een
+     borg vastzetten is iets wat een zaak vraagt, en een tweede soort code zou
+     het lid laten kiezen tussen twee dingen die voor hem hetzelfde zijn. */
+  app.post('/api/supplier/pay/vooraf', supplierAuth, async (req, res) => {
+    const r = await pay.kasVooraf({ supplierCode: req.supplier.code, code: req.body.code,
+      maxCenten: req.body.maxCenten, oms: req.body.oms, idem: req.body.idem, urenGeldig: req.body.urenGeldig });
+    if (r.ok) sseToOffice('sync', { scope: 'pay' });
+    stuur(res, r);
+  });
+  app.post('/api/supplier/pay/vastleg', supplierAuth, async (req, res) => {
+    const r = await pay.kasVastleg({ supplierCode: req.supplier.code, reservering: req.body.reservering,
+      centen: req.body.centen, oms: req.body.oms, idem: req.body.idem });
+    if (r.ok) sseToOffice('sync', { scope: 'pay' });
+    stuur(res, r);
+  });
+  app.post('/api/supplier/pay/vrijgeef', supplierAuth, (req, res) => {
+    stuur(res, pay.kasVrijgeef({ supplierCode: req.supplier.code, reservering: req.body.reservering }));
+  });
+  app.post('/api/supplier/pay/vooraf/lijst', supplierAuth, (req, res) => {
+    stuur(res, pay.voorafVanZaak(req.supplier.code));
+  });
+
   // de partnerkant: code innen aan de kassa, saldo zien, uitbetalen
   app.post('/api/supplier/pay/in', supplierAuth, async (req, res) => {
     const r = await pay.kasInt({ supplierCode: req.supplier.code, code: req.body.code, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem });

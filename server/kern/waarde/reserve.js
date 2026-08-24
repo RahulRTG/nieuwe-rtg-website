@@ -46,6 +46,18 @@ function maakReserve({ db, save, crypto, nu = () => Date.now() }) {
   function open(rek) { return bak().filter(r => r.rek === rek && geldig(r)); }
   function vastgezet(rek) { return open(rek).reduce((s, r) => s + r.centen, 0); }
 
+  /* Dezelfde lijst, maar vanuit de andere kant bekeken: wat heeft DEZE partij
+     vastgezet? Een ondernemer die een borg vraagt, wil weten wat hij mag
+     verwachten -- dat is een ander getal dan zijn saldo en het hoort niet door
+     elkaar te lopen. `ref` is wie de reservering liet zetten. */
+  function voorRef(ref) { return bak().filter(r => r.ref === ref && geldig(r)); }
+
+  /* Een reservering op id, ongeacht status. Wie hem afhandelt moet zelf de ref
+     nakijken -- zonder die toets kan iedereen die een id kent het vastgezette
+     bedrag van een ander innen, en een id afkijken is makkelijker dan het
+     lijkt. */
+  function vind(id) { return bak().find(r => r.id === String(id || '')) || null; }
+
   function reserveer({ rek, centen, doel, ref, msGeldig }) {
     const c = Math.round(Number(centen));
     if (!rek) return { status: 400, error: 'Op welke rekening?' };
@@ -96,7 +108,7 @@ function maakReserve({ db, save, crypto, nu = () => Date.now() }) {
     return { ok: true, vrijgevallen: r.centen };
   }
 
-  return { open, vastgezet, reserveer, vastleggen, vrijgeven, MAX_MS, STANDAARD_MS };
+  return { open, vastgezet, voorRef, vind, reserveer, vastleggen, vrijgeven, MAX_MS, STANDAARD_MS };
 }
 
 module.exports = { maakReserve, MAX_PER_REKENING, MAX_MS };

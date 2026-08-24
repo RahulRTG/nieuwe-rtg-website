@@ -164,7 +164,8 @@ function maakWaarde({ db, save, crypto, nu = () => Date.now() }) {
 
   return { waarde: { KLASSEN, SOORTEN, STANDAARD, positie, registreer, beschikbaar, ruimte, poort, overzicht, toets,
     reserveer: reserve.reserveer, vastleggen: reserve.vastleggen, vrijgeven: reserve.vrijgeven,
-    gereserveerd: reserve.vastgezet, reserveringen: reserve.open } };
+    gereserveerd: reserve.vastgezet, reserveringen: reserve.open,
+    reserveringenVan: reserve.voorRef, reservering: reserve.vind } };
 }
 
 module.exports = { maakWaarde, klasseVan };

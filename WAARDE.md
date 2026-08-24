@@ -165,8 +165,8 @@ Bij elke overgang hoort te worden vastgelegd wie opdracht gaf, op grond van
 welke bevoegdheid, welk beleid gold en in welke versie, welke grootboekregels
 ontstonden, welke rail is gebruikt, en of de afstemming klopt.
 
-Gebouwd zijn de eerste vier (uitgegeven, gereserveerd, besteed, en autorisatie
-via de poort). Verrekend en afgestemd bestaan al voor de externe kant in
+Gebouwd zijn de eerste vier: uitgegeven, gereserveerd en geautoriseerd
+(`kern/pay/vooraf.js` doorloopt ze alle drie in de kassa), en besteed. Verrekend en afgestemd bestaan al voor de externe kant in
 `kern/settlement.js` en `kern/betaalopdracht/`, maar nog niet als toestand van
 de waarde zelf. **Bewezen** is er nog niet; zie paragraaf 8.
 
@@ -174,9 +174,17 @@ de waarde zelf. **Bewezen** is er nog niet; zie paragraaf 8.
 
 De volgorde is niet vrij: elke stap leunt op de vorige.
 
-1. **Reserveren in de betaalwegen.** De motor staat er; hotels, taxi's en open
-   rekeningen moeten hem gaan gebruiken. Zonder dit blijft "beschikbaar" een
-   getal dat niemand raadpleegt.
+1. ~~**Reserveren in de betaalwegen.**~~ **Gedaan.** Een zaak zet een maximum
+   vast op de kassacode van een lid, legt later het werkelijke bedrag vast, of
+   geeft vrij (`kern/pay/vooraf.js`, `/api/supplier/pay/vooraf|vastleg|vrijgeef`).
+   De garantie is echt: bij het vastzetten laadt de wallet zo nodig bij, want wie
+   een maximum vastzet op een wallet die het niet heeft, heeft niets vastgezet.
+   Het lid ziet in zijn overzicht saldo, gereserveerd én beschikbaar, met wie het
+   vastzette en tot wanneer.
+
+   Het lid krijgt hier bewust **geen eigen knop** voor. Hij toont dezelfde
+   kassacode als altijd; vastzetten is iets wat een zaak vraagt. Een tweede soort
+   code zou het lid laten kiezen tussen twee dingen die voor hem hetzelfde zijn.
 2. **Meerdere posities per lid.** Nu is `lid:<codenaam>` één wallet. Een
    werkgeversbudget wordt een eigen positie in hetzelfde grootboek — geen tweede
    boekhouding, wel een tweede rekening.

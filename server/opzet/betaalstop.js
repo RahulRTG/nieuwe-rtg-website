@@ -31,7 +31,17 @@ const GELDACTIES = [
   /^\/api\/supplier\/giftcard\/(?:sell|redeem)$/,
   /^\/api\/wallet\/munt\/(?:koop|wissel)$/,
   /^\/api\/supplier\/betaalverzoek(?:\/|$)/,
-  /^\/api\/supplier\/pay\/(?:in|uitbetaal)$/,
+  /* `vooraf` en `vastleg` staan hier omdat ze geld bewegen: vooraf laat de
+     wallet zo nodig bijladen via de kaart-naad, en vastleg boekt het werkelijke
+     bedrag naar de zaak. Zonder deze twee regels zou de pre-autorisatie tijdens
+     een betaalstop gewoon doorlopen -- de catch-all hieronder kijkt naar het
+     LAATSTE padstuk en "vooraf" noch "vastleg" staat in die lijst.
+
+     `vrijgeef` staat er met opzet NIET bij. Die beweegt geen geld maar geeft
+     een vastgezet bedrag terug aan het lid, en dat moet juist kunnen als
+     betalen uitstaat: anders blijft het geld van een lid vastzitten precies
+     zolang als de storing duurt. */
+  /^\/api\/supplier\/pay\/(?:in|uitbetaal|vooraf|vastleg)$/,
   /\/(?:betaal|pay|afrekenen|refund|uitbetaal|overboeken|verreken|betaald)$/
 ];
 

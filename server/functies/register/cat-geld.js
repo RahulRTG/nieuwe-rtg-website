@@ -68,6 +68,15 @@ module.exports = [
      dat was hij niet: de boardroom kon de sepa-rail uitzetten, waarna de bank
      stopte met overboeken terwijl partners gewoon doorbetaald werden. Een rail
      die half uit staat is geen rail die uit staat. */
+  /* De pre-autorisatie hangt aan WALLET_SALDO en niet aan de kassa-schakelaar:
+     wat hier gebeurt is dat een deel van het WALLETSALDO VAN EEN LID wordt
+     vastgezet. Valt de grond onder dat besluit weg, dan hoort dit mee te
+     vallen -- vastzetten is dan net zo goed klantgeld aanhouden als saldo
+     aanhouden, alleen met een zaak die erop wacht. */
+  { id: 'dom-pay-vooraf', categorie: 'Geld', naam: 'Vooraf vastzetten aan de kassa', standaard: true, doelgroepen: ['leverancier'],
+    uitleg: 'Een zaak zet een maximum vast op de code van een lid (borg, open rekening, ritprijs) en legt later het werkelijke bedrag vast.',
+    paden: ['/api/supplier/pay/vooraf', '/api/supplier/pay/vastleg', '/api/supplier/pay/vrijgeef'],
+    vermogen: 'WALLET_SALDO' },
   { id: 'dom-partner-uitbetaling', categorie: 'Geld', naam: 'Partnersaldo uitbetalen', standaard: true, doelgroepen: ['leverancier'],
     uitleg: 'Het RTG Pay-saldo van een zaak naar zijn bankrekening sturen.', paden: ['/api/supplier/pay/uitbetaal'],
     vermogen: 'PARTNER_UITBETALING' }

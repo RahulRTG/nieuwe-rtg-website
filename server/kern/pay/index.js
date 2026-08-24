@@ -138,7 +138,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     db, save, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
     rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
-    betaaldienstKosten: betaaldienstKosten || (() => 0),
+    betaaldienstKosten: betaaldienstKosten || (() => 0), waarde,
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
@@ -150,5 +150,10 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   api.schaduw = schaduwStand;
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
+  /* De pre-autorisatie (./vooraf.js): vastzetten, vastleggen, vrijgeven. Staat
+     naast ./kassa.js en niet erin, omdat kassa.js anders over de keuringsgrens
+     gaat -- en omdat het een ander moment beschrijft: kassa kent EEN moment,
+     vooraf kent er twee met tijd ertussen. */
+  Object.assign(api, require('./vooraf')(ctx));
   return { pay: api };
 };

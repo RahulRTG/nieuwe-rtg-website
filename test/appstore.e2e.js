@@ -231,8 +231,58 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     await p2.waitForSelector('#mSleutel', { timeout: 20000 });
     assert.deepEqual(f2, [], 'het uitgeversbureau boot zonder onopgevangen fouten');
     assert.equal(await p2.locator('input[data-mach]').count(), 3, 'alle drie de machtigingen staan er om te vragen');
+
+    /* DE UITGEVER LEEST WAT DE KLANT LEEST. Deze knop bestaat omdat een
+       leverancier die pas bij het inkoopgesprek ontdekt wat er over hem staat,
+       er niet meer op kan reageren. Hij kan er niets aan veranderen -- en juist
+       daarom hoort hij het te kunnen zien. */
+    await p2.click('.aDos');
+    await p2.waitForFunction(() => {
+      const v = document.querySelector('.uDos'); return v && !v.hidden && !/Bezig/.test(v.textContent);
+    }, null, { timeout: 15000 });
+    const uDos = await p2.textContent('.uDos');
+    assert.match(uDos, /geen kopie/, 'de claim waar hij op wordt afgerekend staat er');
+    assert.match(uDos, /van je concurrent/, 'met de mededeling dat het NIET-blok bij elke app hetzelfde is');
+    /* En dat blok staat er ook echt. Alleen op die mededeling toetsen liet het
+       blok zelf ongemerkt van de pagina vallen: dan staat er "bij elke app
+       hetzelfde" zonder dat er iets volgt. */
+    assert.match(uDos, /penetratietest/, 'met wat er over zijn app NIET wordt beweerd, bij naam');
+    assert.match(uDos, /SBOM/);
     assert.ok(await p2.locator('#bProef').count(), 'en de proefkeuring staat er');
     assert.match(await p2.textContent('body'), /Winkelproef/, 'de eigen app staat in de lijst');
+
+    /* ---- DE EIGEN DOSSIERPAGINA, in twee standen. Hij bestaat naast het
+       uitklapblok in de Mall voor de TWEEDE lezer: een inkoper die er niet
+       toevallig langs komt maar er specifiek naartoe wordt gestuurd, en die een
+       adres nodig heeft dat hij kan bewaren en doorsturen. ---- */
+    const p3 = await browser.newPage();
+    const f3 = letOpFouten(p3, []);
+    await p3.goto(base + '/apps/app.html');
+    await p3.evaluate((t) => localStorage.setItem('rtg_member_token', t), lid);
+
+    await p3.goto(base + '/apps/appstore-dossier.html?app=winkel-proef');
+    await p3.waitForSelector('main .kaart h2', { timeout: 20000 });
+    const perApp = await p3.textContent('main');
+    assert.match(perApp, /Waar de gegevens blijven/, 'de app-stand toont het dossier van die app');
+    assert.match(perApp, /Winkel Uitgeverij/, 'met de leverancier erbij');
+    assert.match(perApp, /Wat dit dossier NIET zegt/, 'en met wat er niet wordt beweerd');
+
+    /* De stand ZONDER app is de belangrijkste: "kan zo'n app ooit bij onze
+       betaalgegevens?" is een vraag per platform en niet per app. */
+    await p3.goto(base + '/apps/appstore-dossier.html');
+    await p3.waitForSelector('main .kaart h2', { timeout: 20000 });
+    const kanaal = await p3.textContent('main');
+    assert.match(kanaal, /Wat geen enkele app kan vragen/, 'het kanaaldossier begint bij wat er NIET kan');
+    /* En die kop moet ook GEVULD zijn. Hier stond eerst alleen de kop, en toen
+       bleef deze toets groen terwijl de lijst eronder leeg werd gemaakt -- een
+       kop zonder inhoud leest als "er is niets dat een app niet kan", precies
+       het tegenovergestelde van wat er hoort te staan. */
+    assert.match(kanaal, /betalen/, 'met de machtigingen die er NIET zijn, bij naam');
+    assert.match(kanaal, /locatie/);
+    assert.match(kanaal, /RTG Pay/, 'en met de reden waarom ze er niet zijn');
+    assert.match(kanaal, /profiel\.basis/, 'en daarna pas wat er wel te vragen valt');
+    assert.ok(!/Winkel Uitgeverij/.test(kanaal), 'en het gaat over het platform, niet over een leverancier');
+    assert.deepEqual(f3, [], 'de dossierpagina boot in beide standen zonder onopgevangen fouten');
   } finally {
     if (browser) await browser.close().catch(() => {});
     stop(srv && srv.child);

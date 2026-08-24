@@ -86,7 +86,13 @@ en de sleutel komt uit de sessie), en de controleronde die eruit haalt wat niet
 meer byte voor byte klopt met wat een mens aftekende. Twee dingen daar niet
 wegpoetsen: het dossier staat bij het LID en niet achter een kantoorpoort, en het
 blok "wat dit dossier NIET zegt" staat er even groot bij — een leverancierspak
-dat overal ja zegt is niets waard.
+dat overal ja zegt is niets waard. Het dossier heeft drie lezers en dus drie
+ingangen (kaart in de Mall, `/apps/appstore-dossier.html` als adres dat je
+doorstuurt, en "wat de klant leest" op het uitgeversbureau) maar blijft één
+bron. Diezelfde pagina zonder app is het **kanaaldossier**: wat voor élke app
+hier geldt, met de zes machtigingen die met opzet niet bestaan — die vraag stelt
+een inkoper maar één keer, en dat kan alleen omdat elke app op dezelfde cel
+draait.
 
 **`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
 een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,

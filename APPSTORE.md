@@ -473,6 +473,44 @@ Dit is grens 5 in de tijd doorgetrokken. De integriteitscontrole draait al bij
 wat de ronde erbij doet is de app ook uit de winkel halen in plaats van hem daar
 kapot te laten staan.
 
+### Drie lezers, drie ingangen
+
+Het dossier is één bron met drie plekken waar hij wordt gelezen, en dat is geen
+dubbeling maar drie verschillende momenten:
+
+| wie | waar | waarom daar |
+|---|---|---|
+| **het lid dat kiest** | uitklapblok op de winkelkaart in de Mall | hij staat op het moment van de keuze, dichtgeklapt: naslag, geen reclame |
+| **de inkoper, de FG, de security officer** | `/apps/appstore-dossier.html?app=…` | die komt er niet toevallig langs maar wordt ernaartoe gestuurd, en heeft een adres nodig dat hij bewaart en doorstuurt |
+| **de uitgever zelf** | "Wat de klant leest" op het uitgeversbureau | wie pas bij het inkoopgesprek ontdekt wat er over hem staat, kan er niet meer op reageren |
+
+De uitgever kan er niets aan veranderen — alles erin komt uit een meting op zijn
+eigen bundel of uit een besluit van RTG — en juist daarom hoort hij het te
+kunnen zien. De poort staat op de UITGEVERSingang en niet in de kern: welke app
+van wie is, is een vraag van de poort en geen eigenschap van het dossier. Een
+app van een ander geeft daar 404 en geen 403, want het bestaan van andermans app
+is zelf al informatie. Als LID mag diezelfde persoon er wel gewoon bij; het
+dossier is openbaar binnen dit huis.
+
+### Het kanaaldossier: de vraag die je maar één keer stelt
+
+`/apps/appstore-dossier.html` zonder app toont wat voor **elke** app hier geldt.
+Dat is de vorm waarin een inkoper zijn vraag eigenlijk stelt: "kan zo'n app ooit
+bij onze betaalgegevens?" is geen vraag per app maar per platform.
+
+De volgorde is een standpunt: eerst wat géén enkele app kan vragen (betalen,
+agenda, bestanden, locatie, contacten, push — zes, elk met de reden), dan pas de
+drie machtigingen die er wél zijn. Een catalogus die begint met wat er mogelijk
+is, leest als een menukaart, en dit is geen menukaart.
+
+Wat er níét in staat is één app of één leverancier. Dat is precies wat het tot
+een kanaaldossier maakt, en `test/appstore-dossier.test.js` toets 8 houdt dat
+vast.
+
+De pagina is niet openbaar: dit huis heeft geen publieke pagina's, dus wie hem
+doorstuurt stuurt hem door naar iemand met een RTG-inlog. Dat staat op de pagina
+zelf — een adres dat de ontvanger niet kan openen is erger dan geen adres.
+
 ### Wat er (nog) niet is, en waarom
 
 **Een private catalogus per organisatie** — een klant die zijn eigen apps ziet en

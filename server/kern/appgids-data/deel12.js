@@ -58,5 +58,10 @@ module.exports = {
     ['Zet eerst uw naam erbij; elk besluit hieronder draagt hem en gaat het journaal in',
       'Lees wat de app DOET, niet alleen wat de machinepoort erover zegt -- die keurt nooit goed',
       'Publiceren of weigeren met een reden; die reden leest de uitgever'],
-    'Een geschorste uitgever verliest zijn apps op hetzelfde moment, ook bij de leden die ze al hadden. Wie voor zo\'n app betaalde, krijgt een teruggaverecht dat u hier afhandelt.')
+    'Een geschorste uitgever verliest zijn apps op hetzelfde moment, ook bij de leden die ze al hadden. Wie voor zo\'n app betaalde, krijgt een teruggaverecht dat u hier afhandelt.'),
+  '/apps/appstore-dossier.html': G('Het inkoopdossier: wat er over een app van derden bekend is, en wat wij er juist NIET over beweren.',
+    ['Lees eerst wat de app nooit krijgt en waar uw gegevens blijven',
+      'Kijk bij elke bewering naar de bron ernaast; die wijst een bestand aan dat na te lezen is',
+      'Sluit af met "Wat dit dossier NIET zegt" -- daar begint uw eigen onderzoek'],
+    'Zonder app in het adres toont deze pagina het kanaaldossier: wat voor ELKE app van derden hier geldt, en welke machtigingen er met opzet niet bestaan. Die vraag hoeft u maar een keer te stellen.')
 };

@@ -220,3 +220,79 @@ test('7. de controleronde haalt eruit wat niet meer klopt met wat is afgetekend'
   const j = (await api('/api/appstore/kantoor/journaal', {}, office)).body.journaal;
   assert.ok(j.some(x => x.wat === 'hercontrole' && x.wie === 'Sam van RTG'), 'de ronde staat in het journaal');
 });
+
+/* ---------------------------------------------------------------------------
+   DE TWEEDE LEZER. Het dossier in de Mall is voor wie KIEST; deze drie punten
+   gaan over wie ernaartoe wordt gestuurd -- een inkoper, een security officer --
+   en over de uitgever, die hoort te weten waarop hij wordt afgerekend. */
+
+test('8. het kanaaldossier gaat over het platform en niet over een leverancier', async () => {
+  const k = (await api('/api/appstore/kanaal', {}, lid)).body;
+  /* Dit is de vraag die een inkoper echt stelt: "kan zo'n app ooit bij onze
+     betaalgegevens?" Dat is geen vraag per app maar per platform, en het
+     antwoord hoort een keer gelezen te worden in plaats van twintig keer. */
+  assert.ok(Object.keys(k.nietGebouwd || {}).length >= 3, 'wat GEEN enkele app kan vragen, staat er');
+  for (const kk of Object.keys(k.nietGebouwd)) {
+    assert.ok(k.nietGebouwd[kk].length > 30, '"' + kk + '" draagt een reden en niet alleen een nee');
+  }
+  assert.ok(k.machtigingen.length, 'en wat er wel te vragen valt ook');
+  for (const m of k.machtigingen) {
+    assert.ok(m.geeft && m.nooit, m.id + ' zegt wat hij geeft EN wat hij nooit geeft');
+  }
+  /* En het kanaaldossier hangt van geen enkele app af -- dat is precies waarom
+     het apart bestaat. Zakt deze regel, dan is het een tweede app-dossier
+     geworden en kan een inkoper het niet meer een keer lezen. */
+  const plat = JSON.stringify(k);
+  assert.ok(!plat.includes('dossier-app'), 'er staat geen enkele app in');
+  assert.ok(!plat.includes('Dossier Uitgeverij'), 'en geen enkele leverancier');
+});
+
+test('9. een uitgever leest wat de klant leest -- en alleen over zijn eigen app', async () => {
+  /* Een EIGEN app, want toets 7 heeft de eerste er zojuist uitgehaald. Dat is
+     geen omweg maar precies goed: van een app die niet live staat, bestaat er
+     ook voor de uitgever geen dossier. */
+  await publiceer({ sleutel: 'dossier-app-2', naam: 'Dossierapp twee' });
+  const eigen = await api('/api/appstore/uitgever/dossier', { sleutel: 'dossier-app-2' }, sup);
+  assert.equal(eigen.status, 200, JSON.stringify(eigen.body));
+  assert.equal(eigen.body.waarDeGegevensBlijven.antwoord,
+    (await api('/api/appstore/dossier', { sleutel: 'dossier-app-2' }, lid)).body.waarDeGegevensBlijven.antwoord,
+    'woord voor woord hetzelfde als wat het lid leest; twee versies van een dossier is er een te veel');
+  assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'dossier-app' }, sup)).status, 409,
+    'en van een app die eruit is gehaald, bestaat ook voor de uitgever geen dossier');
+  assert.ok(eigen.body.kanaal, 'met het kanaaldossier erbij, want daar wordt hij ook op afgerekend');
+  assert.match(eigen.body.let, /van je concurrent/, 'en hij leest dat het NIET-blok bij elke app hetzelfde is');
+
+  /* De poort staat bij de ROUTE en niet in de kern: welke app van wie is, is een
+     vraag van de poort. Een app die niet van deze uitgever is, bestaat hier
+     niet -- en dat is een 404 en geen 403, want anders is het bestaan van een
+     app van een ander al informatie. */
+  assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'bestaat-niet' }, sup)).status, 404);
+  assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'dossier-app-2' })).status, 401,
+    'en zonder inlog helemaal niets');
+
+  /* EN NU DE ECHTE PROEF: een app van een ANDERE uitgever, die wel bestaat en
+     wel live staat. Zonder die app bewees dit niets -- "bestaat-niet" geeft ook
+     404 als de org-controle eruit valt, en een app die niet live staat geeft
+     409 om een heel andere reden. Hier is de enige reden voor een 404 dat hij
+     van iemand anders is. */
+  const ORG2 = 'O-DOSSIER-2';
+  const roster2 = (await api('/api/supplier/roster', { code: 'SAKURA' })).body;
+  const chef2 = (roster2.staff || []).find(x => x.role === 'manager');
+  const sup2 = (await api('/api/supplier/login', { code: 'SAKURA', staffId: chef2.id, pin: '1234' })).body.token;
+  await api('/api/techniek/tenant', { org: ORG2, naam: 'Andere Uitgeverij' }, tech);
+  await api('/api/techniek/tenant/bind', { org: ORG2, soort: 'zaak', code: 'SAKURA' }, tech);
+  await api('/api/appstore/uitgever/aanvraag', { naam: 'Andere Uitgeverij', contact: 'dev@ander.nl' }, sup2);
+  await api('/api/appstore/kantoor/uitgever', { org: ORG2, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  const ander = await api('/api/appstore/uitgever/inzenden',
+    { manifest: manifest({ sleutel: 'andermans-app', naam: 'Andermans app' }), bestanden: bundel() }, sup2);
+  assert.equal(ander.status, 200, JSON.stringify(ander.body.fouten || ander.body.bevindingen || ander.body.error || ''));
+  await api('/api/appstore/kantoor/besluit', { versieId: ander.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+
+  assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'andermans-app' }, sup2)).status, 200,
+    'de eigenaar leest hem wel');
+  assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'andermans-app' }, sup)).status, 404,
+    'en een andere uitgever niet -- een 404 en geen 403, want het bestaan van andermans app is zelf al informatie');
+  /* Als LID mag hij er gewoon bij: het dossier is openbaar binnen dit huis. Dat
+     verschil is het punt van de poort -- hij zit op de UITGEVERSingang. */
+  assert.equal((await api('/api/appstore/dossier', { sleutel: 'andermans-app' }, lid)).status, 200);
+});

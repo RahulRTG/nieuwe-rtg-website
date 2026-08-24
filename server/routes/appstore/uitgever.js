@@ -66,6 +66,26 @@ module.exports = (kern) => {
     return Object.assign({ status: 200 }, appstore.geld.omzet(o.org));
   }));
 
+  /* HET INKOOPDOSSIER VAN MIJN EIGEN APP, precies zoals een klant het leest.
+
+     Waarom een uitgever dit mag zien: het dossier is het stuk waarop hij wordt
+     afgerekend bij een inkoopgesprek, en hij kan er niets aan veranderen -- alles
+     erin komt uit een meting of uit een besluit van RTG. Een leverancier die pas
+     bij de klant ontdekt wat er over hem staat, kan er niet op reageren; een die
+     het vooraf leest, kan zijn bundel aanpassen.
+
+     ALLEEN DE EIGEN APP, en die controle staat hier en niet in de kern: welke
+     apps van wie zijn is een vraag van de POORT en geen eigenschap van het
+     dossier. Precies dezelfde regel als bij /voorbeeld hieronder. */
+  app.post('/api/appstore/uitgever/dossier', supplierAuth, metOrg((req, o) => {
+    const a = appstore.app(req.body.sleutel);
+    if (!a || a.org !== o.org) return { status: 404, error: 'Deze app is niet van jou.' };
+    const d = appstore.dossier(a.sleutel);
+    if (d.error) return d;
+    return Object.assign({}, d, { kanaal: appstore.kanaal(),
+      let: 'Dit is woord voor woord wat een klant leest. Je kunt er niets aan veranderen: elk gegeven komt uit een meting op je bundel of uit een besluit van RTG. Wat er onder nietGebouwd staat, staat er bij elke app -- ook bij die van je concurrent.' });
+  }));
+
   // wat een lid straks te zien krijgt bij een van mijn apps
   app.post('/api/appstore/uitgever/voorbeeld', supplierAuth, metOrg((req, o) => {
     const a = appstore.app(req.body.sleutel);

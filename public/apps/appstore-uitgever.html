@@ -226,8 +226,11 @@ function tekenApps(){
   return '<div class="kaart"><h2>Je apps</h2>'+ STAND.apps.map(a =>
     '<div style="border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;">'+
       '<div class="rij" style="margin-top:0;"><h3 style="flex:1;">'+esc(a.naam)+'</h3>'+
-        (a.live ? '<span class="st live">live · '+esc(a.live.versie)+'</span><button class="knop stil aTrek" data-s="'+esc(a.sleutel)+'">Intrekken</button>'
+        (a.live ? '<span class="st live">live · '+esc(a.live.versie)+'</span>'+
+                  '<button class="knop stil aDos" data-s="'+esc(a.sleutel)+'" aria-expanded="false">Wat de klant leest</button>'+
+                  '<button class="knop stil aTrek" data-s="'+esc(a.sleutel)+'">Intrekken</button>'
                 : '<span class="st nee">niet live</span>')+'</div>'+
+      '<div class="uDos" data-s="'+esc(a.sleutel)+'" hidden style="margin-top:.5rem;"></div>'+
       (a.ingetrokken ? '<p class="sub">Ingetrokken door '+esc(a.ingetrokken.door)+(a.ingetrokken.reden ? ': '+esc(a.ingetrokken.reden) : '')+'</p>' : '')+
       '<table><tr><th>versie</th><th>prijs</th><th>stand</th><th>hash</th><th>ingezonden</th><th>besluit</th></tr>'+
       a.versies.map(v => '<tr><td>'+esc(v.versie)+'</td><td>'+(v.prijsCenten ? eur(v.prijsCenten) : 'gratis')+'</td><td>'+esc(v.status)+'</td><td><code>'+esc(v.hash.slice(0,12))+'</code></td>'+
@@ -261,6 +264,29 @@ async function laad(){
   if (map) map.addEventListener('change', () => kiesMap(map).catch(e => meld(e.message)));
   if ($('#bProef')) $('#bProef').addEventListener('click', proef);
   if ($('#bIn')) $('#bIn').addEventListener('click', inzenden);
+  /* WAT DE KLANT LEEST, hier en niet pas bij het inkoopgesprek.
+
+     Een uitgever kan hier niets aan veranderen -- alles erin komt uit een meting
+     op zijn eigen bundel of uit een besluit van RTG. Juist daarom hoort hij het
+     te kunnen zien: wie pas bij de klant ontdekt wat er over hem staat, kan er
+     niet meer op reageren; wie het vooraf leest, kan zijn bundel aanpassen. */
+  document.querySelectorAll('.aDos').forEach(b => b.addEventListener('click', async () => {
+    const vak = document.querySelector('.uDos[data-s="'+b.dataset.s.replace(/"/g,'')+'"]');
+    if (!vak) return;
+    if (!vak.hidden) { vak.hidden = true; b.setAttribute('aria-expanded','false'); return; }
+    vak.hidden = false; b.setAttribute('aria-expanded','true');
+    vak.innerHTML = '<p class="sub">Bezig…</p>';
+    try {
+      const d = await api('/api/appstore/uitgever/dossier', { sleutel: b.dataset.s });
+      vak.innerHTML = '<p class="sub">'+esc(d.let)+'</p>'+
+        '<p class="sub" style="margin-top:.4rem;"><b>Waar de gegevens blijven:</b> '+esc(d.waarDeGegevensBlijven.antwoord)+'</p>'+
+        '<p class="sub"><b>Wat de poort vond:</b> '+d.watDePoortVond.blokkerend+' blokkerend, '+d.watDePoortVond.letOp+
+          ' let-op'+(d.watDePoortVond.afgetekendDoor ? ', afgetekend door '+esc(d.watDePoortVond.afgetekendDoor) : '')+'.</p>'+
+        '<p class="sub" style="margin-top:.4rem;"><b>Wat er ook bij jouw app NIET wordt beweerd</b> &mdash; bij elke app hetzelfde, ook bij die van je concurrent:</p>'+
+        Object.keys(d.nietGebouwd||{}).map(k => '<p class="sub">· <b>'+esc(k)+'</b> &mdash; '+esc(d.nietGebouwd[k])+'</p>').join('')+
+        '<p style="margin-top:.6rem;"><a class="knop stil" style="text-decoration:none;" href="/apps/appstore-dossier.html?app='+encodeURIComponent(b.dataset.s)+'">Het hele dossier zoals een klant het opent →</a></p>';
+    } catch (e) { vak.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; }
+  }));
   document.querySelectorAll('.aTrek').forEach(b => b.addEventListener('click', async () => {
     try { await api('/api/appstore/uitgever/intrekken', { sleutel: b.dataset.s, reden: 'ingetrokken door de uitgever' }); meld('Ingetrokken - ook bij de leden die hem al hadden.'); laad(); }
     catch (e) { meld(e.message); }

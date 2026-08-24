@@ -598,6 +598,7 @@ async function laadAppstore(){
       '<input id="asZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
       '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
       '<button class="knop stil" id="asGesch" type="button" aria-expanded="false">Mijn geschiedenis</button>'+
+      '<a class="knop stil" href="/apps/appstore-dossier.html" style="text-decoration:none;">Wat geen app kan vragen</a>'+
     '</div><div id="asTijd" hidden style="margin-bottom:.7rem;"></div>'+
     '<div id="asGrid"></div><div class="rij" id="asBlader" style="justify-content:center;"></div></div>';
   let zt; $('#asZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AS.zoek = $('#asZoek').value; AS.pagina = 1; AS.mijn = false; tekenStore(); }, 300); });
@@ -663,8 +664,13 @@ function storeKaart(a){
        precies draait, waar zijn gegevens blijven -- en wat wij NIET kunnen
        aantonen. Een document dat alleen een inkoper mag lezen is een
        verkooppraatje. Dichtgeklapt, want het is naslag en geen reclame. */
+    /* Twee ingangen naar hetzelfde dossier, en dat is geen dubbeling maar een
+       tweede lezer: hier klap je uit terwijl je kiest, de eigen pagina is een
+       ADRES dat je bewaart en doorstuurt naar een inkoper of een security
+       officer. Die laatste komt hier niet toevallig langs. */
     '<div class="rij" style="margin-top:.45rem;">'+
       '<button class="knop stil asDos" type="button" aria-expanded="false" style="font-size:.72rem;">Inkoopdossier</button>'+
+      '<a class="knop stil" href="/apps/appstore-dossier.html?app='+encodeURIComponent(a.sleutel)+'" style="font-size:.72rem;text-decoration:none;">Op eigen pagina &rarr;</a>'+
     '</div>'+
     '<div class="asDosVak" hidden style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;"></div>'+
     '<div class="asBon" hidden style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';

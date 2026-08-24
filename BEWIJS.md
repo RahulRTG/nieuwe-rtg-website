@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1060 bestanden en 7089 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1060 bestanden en 7091 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1060 |
-| losse beweringen (`test(...)`) | 7089 |
+| losse beweringen (`test(...)`) | 7091 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 889 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-930 bestanden, 6863 beweringen.
+930 bestanden, 6865 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -71,7 +71,7 @@ toets omvalt.
 | `appbieb.test.js` | 5 | gezakt op `liegpoort /api/` | De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je startscherm. |
 | `appstore-cel.test.js` | 11 | -- | DE CEL EN DE POORT, zonder server: de invarianten die je aan de code zelf kunt zien. Ze staan apart van test/appstore.test.js omdat ze in milliseconden draaien en omdat ze iets ANDERS bewaken: daar gaat het om wat er... |
 | `appstore-doel.test.js` | 8 | -- | HET DOEL BIJ EEN MACHTIGING, EN DE VERGUNNINGSDIFF. Een machtiging zegt WAT een app krijgt; het doel zegt WAARVOOR. |
-| `appstore-dossier.test.js` | 7 | -- | HET INKOOPDOSSIER, DE TIJDLIJN EN DE CONTROLERONDE -- de enterprise-kant. Wat deze toets vastlegt, en waarom elk punt er staat: 1. |
+| `appstore-dossier.test.js` | 9 | -- | HET INKOOPDOSSIER, DE TIJDLIJN EN DE CONTROLERONDE -- de enterprise-kant. Wat deze toets vastlegt, en waarom elk punt er staat: 1. |
 | `appstore-geld.test.js` | 9 | -- | DE BETAALDE KANT VAN DE APP STORE -- de bon, de aanschaf, de afdracht, de btw en het teruggaverecht. Wat deze toets vastlegt, en waarom elk punt er staat: 1. |
 | `appstore.test.js` | 15 | -- | DE RTG APP STORE -- het derdenkanaal, van aanvraag tot cel. Deze toets legt de zes grenzen uit kern/appstore/index.js vast. |
 | `archief.test.js` | 5 | gezakt op `liegpoort /api/` | De archiefkast: afgeronde tickets ouder dan een afgesloten kwartaal verhuizen naar append-only maandbestanden. De levende kast blijft klein, maar niets raakt zoek: de backoffice-totalen tellen het archief mee en de... |

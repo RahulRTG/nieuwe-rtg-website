@@ -314,6 +314,14 @@ wat dit dossier NIET zegt. Dat laatste blok is het punt: een leverancierspak dat
 overal ja zegt is niets waard. Wat er staat en waar de bewijslast ligt, staat in
 `APPSTORE.md` onder "De verantwoordingskant".
 
+Er staat één ding bij dat in geen enkele andere App Store bestaat, en het is
+geen functie maar een gevolg: **het kanaaldossier**. Omdat elke app hier op
+dezelfde uitvoering draait — een naamloze cel zonder netwerk — is "waar blijven
+mijn gegevens" geen vraag per leverancier maar per platform. Elders moet een
+inkoper twintig leveranciers apart onderzoeken; hier leest hij het antwoord één
+keer, met de zes machtigingen die met opzet niet bestaan erbij. Dat is precies
+punt 31 t/m 35 zonder dat er een private catalogus voor nodig was.
+
 ---
 
 ## 5. Wat dit document niet is

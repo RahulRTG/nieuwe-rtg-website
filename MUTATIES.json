@@ -6484,6 +6484,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "wezen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wezen.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "wiring-contract.test.js": {
       "soort": "puur",
       "staat": "overleefd",

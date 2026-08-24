@@ -70,44 +70,11 @@ const { pak } = require('./afbouw-slot');
 const WORTEL = path.join(__dirname, '..');
 const geefAfbouwSlotVrij = pak('volledige Node-tests');
 
-/* WELKE SERVERS ZIJN ER BLIJVEN STAAN?
-
-   Op 24 augustus stond er tijdens een ronde een server/server.js met PPID 1:
-   geen ouder meer, dus achtergebleven uit een toetskind dat wel afsloot en zijn
-   server niet meenam. Hij draaide de HELE ronde mee op 2% CPU en at een van de
-   vier kernen aan. Niemand merkte het: de ronde was gewoon groen, alleen trager,
-   en "trager" leest als een drukke machine.
-
-   Dat is precies de stille vorm van LAT-regel 5 -- niets faalt zichtbaar, het
-   antwoord wordt alleen langzamer en de metingen erboven onvergelijkbaar. Een
-   lek dat je alleen ziet als je toevallig ps draait, bestaat in de praktijk niet.
-
-   Dus telt de ronde ze, voor en na. Wat er vooraf al stond is niet van ons (een
-   ontwikkelserver mag gewoon draaien); wat er tijdens de ronde bijkomt en na
-   afloop nog leeft, is een lek. De ronde noemt het met PID en al.
-
-   Bewust GEEN kill: dit gereedschap ruimt niet op wat het niet heeft gemaakt.
-   Een runner die stilletjes processen afschiet, verbergt hetzelfde probleem op
-   een andere manier -- en op een ontwikkelmachine schiet hij dan de server af
-   waar iemand in staat te werken. */
-function draaiendeServers() {
-  try {
-    const uit = spawnSync('ps', ['-eo', 'pid,ppid,cmd'], { encoding: 'utf8' });
-    if (uit.status !== 0 || !uit.stdout) return null;         // geen ps: dan weten we niets
-    const wezen = new Map();
-    for (const regel of uit.stdout.split('\n')) {
-      const m = regel.trim().match(/^(\d+)\s+(\d+)\s+(.*)$/);
-      if (!m) continue;
-      if (m[2] !== '1') continue;                             // alleen wat geen ouder meer heeft
-      if (!m[3].includes(path.join(WORTEL, 'server', 'server.js'))) continue;
-      wezen.set(m[1], m[3].slice(0, 120));
-    }
-    return wezen;
-  } catch (e) { return null; }
-}
-/* `null` betekent "niet kunnen kijken" en niet "niets gevonden" -- die twee uit
-   elkaar houden is het hele punt van LAT-regel 3. */
-const wezenVooraf = draaiendeServers();
+/* Welke servers zijn er tijdens deze ronde blijven staan? De teller staat in
+   scripts/lib/wezen.js zodat hij te toetsen is (test/wezen.test.js); de kop daar
+   vertelt waarom hij bestaat. */
+const { ouderlozeServers, nieuweWezen } = require('./lib/wezen');
+const wezenVooraf = ouderlozeServers(WORTEL);
 const TESTMAP = path.join(WORTEL, 'test');
 const TIJDEN = path.join(WORTEL, '.testtijden.json');
 const TIJDEN_RUW = path.join(WORTEL, '.testtijden.ruw');
@@ -282,18 +249,17 @@ if (gemeten) {
 
 /* En de tegenmeting: welke servers zijn er tijdens deze ronde ouderloos
    geworden en nog steeds in leven? */
-const wezenNa = draaiendeServers();
-if (wezenVooraf && wezenNa) {
-  const nieuw = [...wezenNa].filter(([pid]) => !wezenVooraf.has(pid));
-  if (nieuw.length) {
-    console.error('\n[tests] LEK: ' + nieuw.length + ' server(s) uit deze ronde draaien nog en hebben geen ouder meer.');
-    for (const [pid, cmd] of nieuw) console.error('        PID ' + pid + '  ' + cmd);
+const gelekt = nieuweWezen(wezenVooraf, ouderlozeServers(WORTEL));
+if (gelekt) {
+  if (gelekt.length) {
+    console.error('\n[tests] LEK: ' + gelekt.length + ' server(s) uit deze ronde draaien nog en hebben geen ouder meer.');
+    for (const { pid, cmd } of gelekt) console.error('        PID ' + pid + '  ' + cmd);
     console.error('        Een toets start een server en neemt hem niet mee bij het afsluiten.');
     console.error('        Hij eet een kern op zolang hij leeft, en maakt elke meting hierboven onvergelijkbaar.');
     console.error('        Opruimen doet deze runner niet: hij schiet niet af wat hij niet heeft gemaakt.');
     if (!code) code = 1;
   }
-} else if (!wezenNa) {
+} else {
   console.log('[tests] (kon niet nakijken of er servers zijn blijven staan: ps gaf niets)');
 }
 

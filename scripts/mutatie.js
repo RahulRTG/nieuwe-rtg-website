@@ -469,6 +469,14 @@ const EIGEN_MODULE = new Map([
   /* De rekenmotor van RTG Office draait in de BROWSER; de toets laadt de
      bestanden los in met een uitgerekend pad, dus zonder require-regel. */
   ['office-blad.test.js', ['public/shared/rekenmotor.js', 'public/shared/rekenfuncties.js']],
+  /* Het randenstelsel wordt als browsercode en tekstuele ontwerpcontracten
+     geladen. De require-scanner kan die productbronnen daarom niet zelf zien;
+     deze drie modules dragen de wereldcatalogus, bediening en functiebibliotheek. */
+  ['edge-system.test.js', [
+    'public/shared/rtg-edge-worlds.js',
+    'public/shared/rtg-edge-system.js',
+    'public/shared/rtg-edge-library.js'
+  ]],
   /* De blinde vlek zoekt structuurfouten in de PAGINA'S en niet in een module.
      Hij staat er met een kandidaat en niet met een reden, omdat ik niet ga
      beweren dat het onmeetbaar is voordat de motor het heeft geprobeerd:
@@ -757,7 +765,10 @@ if (require.main === module) {
   /* De vastgelegde uitslag EN de voortgang van een afgebroken ronde. De tweede
      wint bij een botsing: die is later. */
   const laad = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')).toetsen || {}; } catch (e) { return {}; } };
-  const uitslag = Object.assign(laad(UITSLAG), laad(VOORTGANG));
+  /* Een gerichte herproef mag geen half afgemaakte VOLLEDIGE ronde uit de
+     voortgangscache mee vastleggen. Bij losse bestanden is MUTATIES.json daarom
+     de basis; de uitkomst van die losse proef ververst daarna de cache vanzelf. */
+  const uitslag = Object.assign(laad(UITSLAG), losse.length ? {} : laad(VOORTGANG));
   const opnieuw = args.includes('--opnieuw');
   /* Na ELK bestand wegschrijven, en overslaan wat er al in staat. Het serverdeel
      duurt uren; een motor die alleen aan het eind wegschrijft verliest bij een

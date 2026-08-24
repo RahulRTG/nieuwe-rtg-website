@@ -1,3 +1,8 @@
+/* Het gedeelde interactieve randenstelsel van WorkOS, TravelOS, LivingOS en
+   RTFoundation. Deze toets bewaakt de dunne geometrie, eigen wereldpaletten,
+   volledige functieroutes, echte bediening en de maximaal vier actieve
+   schermen op desktop en tablet. Ook legt hij vast dat gesloten randpanelen
+   nooit de onderliggende applicatiebediening afvangen. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const lees=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');

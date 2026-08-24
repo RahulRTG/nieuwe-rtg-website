@@ -61,6 +61,19 @@ waarde. Dezelfde regel geldt in het klein overal in deze laag: `nietAfgedwongen`
 in het contract, `nietGerekend` in een gevolgsimulatie, en een geweigerde modus
 die zegt waarom.
 
+**`HORECA.md` is het diepte-document van de horecakant** — RTG Service
+Choreography OS. In één zin: **een kassa registreert wat besteld is; RTG
+regisseert wat er nú moet gebeuren om de hele tafel op het juiste moment een
+goede ervaring te geven.** Eén servicestroom met zes werkstanden (TAFEL, PDA
+SERVICE, VLOER, VUUR, BAR, REGIE) op één gedeelde werkelijkheid — en de PDA is
+daarvan de belangrijkste, niet de kleinste. Lees vóór je aan een horecascherm of
+de keukenlaag werkt vooral de paragraaf *De grenzen*: generatieve AI bepaalt
+nooit of iets veilig is om te eten, een gast is een codenaam (geen labels als
+"grote spender"), er komt geen ranglijst op medewerkers, het systeem vinkt niets
+zelf af, en wat niet gemeten is wordt niet als getal getoond. Daar staat ook wat
+er al staat en dus NIET opnieuw gebouwd moet worden — de rekening is al één
+waarheid over alle kanalen, en het ontbrekende scharnier is de **stoel**.
+
 **`APPSTORE.md` is het derdenkanaal** — hoe een app van BUITEN dit huis
 binnenkomt. Lees die vóór je aan de App Store, aan een uitgever of aan de cel
 werkt. De kern in één zin: **een App Store is geen etalage maar een poort met een

@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-24",
   "gemeten": {
-    "bestanden": 1446,
-    "vormen": 1141,
-    "velden": 1661,
-    "modules": 582,
+    "bestanden": 1468,
+    "vormen": 1150,
+    "velden": 1672,
+    "modules": 587,
     "domeinen": 216,
     "envelopDrempel": 13,
     "envelop": 35,
-    "veldenDomeineigen": 1179,
+    "veldenDomeineigen": 1184,
     "veldenGedeeldVanafVier": 155,
     "gelijkendeVormparen": 16
   },
@@ -196,6 +196,18 @@
       ]
     },
     {
+      "veld": "waarom",
+      "domeinen": 10,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/concern",
+        "kern/gewoonten",
+        "kern/horeca",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "niveau",
       "domeinen": 10,
       "waar": [
@@ -301,18 +313,6 @@
         "kern/gemeente",
         "kern/mall",
         "kern/overheid"
-      ]
-    },
-    {
-      "veld": "waarom",
-      "domeinen": 9,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/concern",
-        "kern/gewoonten",
-        "kern/livinglab",
-        "kern/onderneming"
       ]
     },
     {
@@ -424,6 +424,18 @@
       ]
     },
     {
+      "veld": "bewijs",
+      "domeinen": 8,
+      "waar": [
+        "kern/betaalwaarheid",
+        "kern/horeca",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties",
+        "kern/magnaatwereld"
+      ]
+    },
+    {
       "veld": "rol",
       "domeinen": 8,
       "waar": [
@@ -517,18 +529,6 @@
         "kern/assets",
         "kern/bureau",
         "kern/hoteldorp"
-      ]
-    },
-    {
-      "veld": "regels",
-      "domeinen": 7,
-      "waar": [
-        "kern/agent",
-        "kern/facturatie",
-        "kern/gast",
-        "kern/magnaat-economie",
-        "kern/mall",
-        "kern/vakwerk"
       ]
     }
   ],

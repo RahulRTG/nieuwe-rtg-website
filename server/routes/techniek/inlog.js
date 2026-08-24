@@ -24,7 +24,7 @@
 
    Afgesplitst uit routes/techniek.js toen die de 10 KB passeerde. */
 module.exports = (tctx) => {
-  const { app, accounts, beveilig, magInzien, isEigenaar, tooManyTries, noteFailedTry, loginFails } = tctx;
+  const { app, accounts, beveilig, magInzien, isEigenaar, tooManyTries, noteFailedTry, loginFails, kern } = tctx;
 
   app.post('/api/techniek/inloggen', async (req, res) => {
     const login = String(req.body.login || '').toLowerCase().slice(0, 60);
@@ -53,6 +53,13 @@ module.exports = (tctx) => {
       return zelfde();
     }
     loginFails.delete(bucket);
-    res.json({ token: accounts.issueToken(user.id, 1), eigenaar: isEigenaar(user), naam: accounts.realNameOf(user) });
+    const token = accounts.issueToken(user.id, 1);
+    /* DEZE SESSIE DRAAGT DE ZWAARSTE DEUR VAN HET HUIS -- een tenant
+       vernietigen loopt erlangs. Tot nu toe kreeg hij pas een gemeten
+       verificatie NA een bevestiging, nooit bij het inloggen zelf, en tot dat
+       moment las laag 3 "niet vastgelegd". Dat werkte, maar het is iets anders
+       dan weten waarmee er is ingelogd. */
+    kern.vertrouwen.noteerInlog(req, token, user.id, 'wachtwoord');
+    res.json({ token, eigenaar: isEigenaar(user), naam: accounts.realNameOf(user) });
   });
 };

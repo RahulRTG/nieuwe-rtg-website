@@ -5,7 +5,7 @@
    opstarten vanuit routes/auth.js. */
 module.exports = (actx) => {
   const { app, appUrl, auth, accounts, crypto, stateFor, pasAppOk, PAS_FOUT, isBaas, tooManyTries, noteFailedTry, loginFails,
-    webauthnRegOpties, webauthnRegMaak, webauthnLoginOpties, webauthnLoginMaak, webauthnLijst, webauthnWeg } = actx;
+    webauthnRegOpties, webauthnRegMaak, webauthnLoginOpties, webauthnLoginMaak, webauthnLijst, webauthnWeg, kern } = actx;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const eisAccount = (req, res) => {
     if (!req.session.account) { res.status(403).json({ error: 'Passkeys horen bij een eigen RTG-account.' }); return null; }
@@ -60,6 +60,11 @@ module.exports = (actx) => {
     if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
     if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
     const token = accounts.issueToken(user.id);
+    /* DE HARDSTE MANIER DIE DIT HUIS KENT, en juist die schreef tot nu toe
+       NIETS weg. Laag 3 las dan "van deze sessie is niet vastgelegd hoe hij is
+       geverifieerd" en vroeg bij elke zware handeling een tweede bevestiging --
+       precies de wrijving die een passkey hoort weg te nemen. */
+    kern.vertrouwen.noteerInlog(req, token, user.id, 'passkey');
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
     res.json({ token, state: stateFor(sess, req.body.lang) });
   });

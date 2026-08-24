@@ -62,8 +62,11 @@ module.exports = ({ db, save }) => {
     return Object.assign(b, { stapop: stapop.beoordeel(b, ver === undefined ? null : ver) });
   }
 
-  /* De verificatie bij het inloggen, en de leeskant bij een handeling. */
+  /* De verificatie: bij het inloggen (zes deuren, EEN regel -- anders krijgt
+     juist de passkey de meeste wrijving) en de leeskant bij een handeling. */
   function verifieer(sessie, wat) { const r = verificatie.noteer(bak(), sessie, wat); if (r) save(); return r; }
+  const noteerInlog = (req, token, userId, hoe) => verifieer(token,
+    { hoe, account: 'user-' + userId, apparaat: verificatie.apparaatUit(req) });
   function verificatieVan(sessie) { return verificatie.lees(bak(), sessie); }
   const geenPersoon = (waarom) => verificatie.zonderPersoon(waarom);
 
@@ -160,7 +163,7 @@ module.exports = ({ db, save }) => {
     return weg;
   }
 
-  return Object.assign({ weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan,
+  return Object.assign({ weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, noteerInlog,
     geenPersoon, poort, losBon, schrijfBon, bonNaPoort, register,
     NIET_GEDEKT: gewoonte.NIET_GEDEKT.concat(tempo.NIET_GEDEKT) }, lees);
 };

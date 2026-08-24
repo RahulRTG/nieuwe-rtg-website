@@ -4,7 +4,8 @@
     "aanmeldgesprek": [
       "intakeStart",
       "intakeZeg",
-      "stateFor"
+      "stateFor",
+      "vertrouwen"
     ],
     "aanmeldingen": [
       "aanmeldingen"
@@ -1523,7 +1524,8 @@
       "appUrl",
       "logInlog",
       "stateFor",
-      "tenant"
+      "tenant",
+      "vertrouwen"
     ],
     "stad": [
       "stad",

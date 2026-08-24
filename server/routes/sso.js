@@ -126,6 +126,13 @@ module.exports = (kern) => {
     // meteen intrekken: een bewijs is voor een keer, niet voor zestig seconden
     accounts.trekInActie(bewijs, OVERDRACHT);
     const token = accounts.issueToken(user.id);
+    /* `provider` en niet `wachtwoord`, en dat is geen slordigheid maar het
+       ontbreken van een bron: de klant heeft geverifieerd en HOE HARD dat was,
+       weten wij niet. Die band heet daarom `overgenomen` (verificatie.js), en
+       laag 3 vraagt bij een zware handeling zelf een moment erbij. Dat is geen
+       wantrouwen tegen die klant; doen alsof wij zijn sterkte kennen zou een
+       bewering zonder bron zijn. */
+    kern.vertrouwen.noteerInlog(req, token, user.id, 'provider');
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
     res.json({ token, state: stateFor(sess, req.body.lang) });
   });

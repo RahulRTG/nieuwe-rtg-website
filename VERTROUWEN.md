@@ -60,10 +60,40 @@ provider van de klant, of een sleutel zonder mens), het tijdstip, en of dit
 apparaat al eerder bij dit account is gezien. Daarvan wordt alleen een hash
 bewaard; de lijst is kort en verdwijnt met het account.
 
-Ontbreekt nog: alleen de wachtwoordinlog schrijft het weg. De passkey-kant, de
-provider-kant (SAML/OIDC) en de pincode doen dat nog niet, en daar levert
-`lees()` dus null -- wat laag 3 als "niet vastgelegd" behandelt en niet als
-"in orde".
+**Alle zes de deuren schrijven het weg**, en dat is sinds kort zo. Hier stond
+dat alleen de wachtwoordinlog het deed, en die stand was schever dan hij
+eruitzag: voor een PASSKEY-sessie las laag 3 "van deze sessie is niet
+vastgelegd hoe hij is geverifieerd" en vroeg bij elke zware handeling een
+tweede bevestiging. De hardste manier die dit huis kent kreeg daarmee de
+*meeste* wrijving, en de zachtste de minste. Een beveiliging die precies
+verkeerd om beloont, wordt uitgezet.
+
+De zes: inloggen en registreren (`wachtwoord`), de passkey (`passkey`), de
+identiteitsprovider van de klant (`provider`), de sleutelwoorden-intake
+(`sleutelwoorden`) en de technische pagina (`wachtwoord`) — die laatste draagt
+de zwaarste deur van het huis, want een tenant vernietigen loopt erlangs. Ze
+gaan alle zes langs één regel (`kern.vertrouwen.noteerInlog`), want zes plekken
+die hetzelfde moeten samenstellen doen dat na verloop van tijd verschillend, en
+dan is hetzelfde apparaat bij de ene deur bekend en bij de andere nieuw.
+
+`test/vertrouweninlog.test.js` toets 5 kijkt daarvoor naar de BRON: wie
+`accounts.issueToken(` aanroept, hoort in datzelfde bestand `noteerInlog(` aan
+te roepen. De scheve stand hierboven ontstond namelijk niet door een fout maar
+door een toevoeging — er kwam een deur bij en die vergat te noteren. Zo'n deur
+laat de toets nu zakken op de dag dat hij wordt geschreven.
+
+Diezelfde toets legt vast WELKE manier bij welke deur hoort, en dat is de
+gevaarlijkste regel van de laag: zet in `routes/sso.js` `wachtwoord` in plaats
+van `provider`, en een sessie die de identiteitsprovider van de klant heeft
+geverifieerd gaat door voor een verificatie die wij deden. Eén woord, geen
+foutmelding, en de step-up staat uit voor elke SSO-klant.
+
+Ontbreekt nog: de pincode van medewerkers en leveranciers loopt langs een
+eigen sessiesysteem (`supplierAuth`) dat deze laag helemaal niet raakt — daar
+staat dus geen poort van laag 3 achter, en dat is een andere reparatie dan
+deze. En een SSO-sessie heeft in dit huis geen wachtwoord: hij kan een tweede
+moment dus wel krijgen maar niet GEVEN, want beide bevestigingsdeuren vragen om
+iets dat hij niet heeft. Zie par. 6.
 
 ### 2.2 Mag — Authority Fabric
 
@@ -457,6 +487,24 @@ onderscheid is er bijgekomen omdat het getal anders naar nul viel:
   het huis" is precies wat een CIO hoort te horen.
 - `waaromNogGeenPoort` -- hier is **nog** geen poort, en dat telt mee. Dit veld
   stond er voor `mens.uitdienst` en is inmiddels leeg: zie het tempo hieronder.
+
+**En een SSO-sessie kan nog geen tweede moment GEVEN.** Sinds alle zes deuren
+hun manier wegschrijven, draagt een sessie van de identiteitsprovider de band
+`overgenomen` — en die staat in `TE_ZACHT`, dus laag 3 vraagt bij elke zware
+handeling een bevestiging. Terecht: wij weten niet hoe hard die provider heeft
+geverifieerd. Alleen kán zo'n mens hem niet geven. Beide bevestigingsdeuren
+vragen om iets dat een SSO-account niet heeft: `/api/techniek/tenant/bevestig`
+vraagt een wachtwoord, en `/api/bedrijf/bevestig` weigert een RTG-sessie die
+zelf te zacht is. Dat is dezelfde "nodig, maar onmogelijk" één laag hoger, en
+het is niet met een uitzondering op te lossen — een deur die zachter wordt
+zodra iemand er niet doorheen komt, is geen deur.
+
+Wat het wél oplost is een **passkey als tweede moment**. WebAuthn staat er al
+volledig (`server/webauthn/`, `routes/auth/webauthn.js`), en een passkey is de
+enige manier in dit huis met de band `sterk`. Wie via zijn provider binnenkomt
+en een passkey heeft, kan zich daarmee opnieuw bewijzen — onafhankelijk van hoe
+hij is ingelogd, wat precies is wat een step-up hoort te zijn. Dat is de
+volgende stap en hij staat hier als openstaand punt tot hij er is.
 
 Toen elke soort een reden kreeg, viel het aantal openstaande punten even op
 nul. Dat is precies de gunstige nul waar par. 3.2 tegen is. De toets eist

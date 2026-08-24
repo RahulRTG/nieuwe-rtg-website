@@ -102,7 +102,7 @@ zie §5 -- er zijn nog 194 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 19 | 6 | 8 | 48 |
+| `auth` | 19 | 6 | 8 | 47 |
 | `member` | 641 | 57 | 10 | 398 |
 | `supplier` | 566 | 103 | 10 | 295 |
 | `office` | 40 | 7 | 5 | 64 |
@@ -125,9 +125,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1416 |
+| kern-namen die routes aanraken | 1415 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 194 |
-| daarvan door precies één domein | 1222 |
+| daarvan door precies één domein | 1221 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -144,8 +144,8 @@ accounts(23) schoon(21) managerOnly(16) save(15) rtf(15) codenaamVan(15)
 boardroomWie(11) crypto(11) findSupplier(11) anthropic(11) tooManyTries(10) geenGast(10)
 rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8)
 logActivity(8) noteFailedTry(7) stuur(7) sseToOffice(7) mail(6) sseToSupplier(6)
-notifySupplier(6) boardroomAuth(6) talen(6) appUrl(5) loginFails(5) logInlog(5)
-overheid(5) sseToCustomer(5)
+notifySupplier(6) boardroomAuth(6) talen(6) vertrouwen(5) appUrl(5) loginFails(5)
+logInlog(5) overheid(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:
@@ -158,8 +158,8 @@ overheid(5) sseToCustomer(5)
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 40 | `server/routes/member/voertuigen.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
-| 37 | `server/routes/auth.js` |
 | 36 | `server/routes/auth/account.js` |
+| 36 | `server/routes/auth.js` |
 | 36 | `server/routes/staff.js` |
 | 34 | `server/routes/auth/herstel.js` |
 

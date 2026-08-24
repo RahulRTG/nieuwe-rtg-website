@@ -115,6 +115,29 @@ function zonderPersoon(deur) {
   };
 }
 
+/* ============================================================================
+   WAT HIER "EEN APPARAAT" IS, en waarom die regel op EEN plek staat.
+
+   De useragent plus de taal, en er wordt alleen een hash van bewaard. Dat is
+   genoeg voor de enige vraag die wordt gesteld -- ken ik dit apparaat van u --
+   en te weinig voor een bewegingsbeeld. Wie hier een IP-adres of een tijdstip
+   bij zou zetten, maakt er alsnog een volgsysteem van.
+
+   HIJ STAAT HIER OMDAT ER ZES DEUREN ZIJN DIE EEN SESSIE UITGEVEN: inloggen,
+   registreren, een passkey, de identiteitsprovider van de klant, de
+   sleutelwoorden-intake en de technische pagina. Zes plekken die hetzelfde
+   moeten samenstellen, stellen het na verloop van tijd verschillend samen
+   (LAT.md regel 4) -- en dan is hetzelfde apparaat bij de ene deur bekend en
+   bij de andere nieuw, waarna de step-up bij die tweede deur altijd vraagt.
+   Dat is geen theorie: precies die fout is hier al een keer gemaakt met de
+   SPELLING van een account (`42` tegenover `user-42`), en het gevolg was een
+   apparatenlijst die zich splitste.
+   ========================================================================== */
+function apparaatUit(req) {
+  const kop = (n) => String((req && req.get && req.get(n)) || '');
+  return kop('user-agent') + '|' + kop('accept-language');
+}
+
 function vergeetSessie(bak, sessie, account) {
   let weg = 0;
   if (bak && bak.sessies && sessie) { if (delete bak.sessies[hash('sessie:' + sessie)]) weg += 1; }
@@ -122,4 +145,4 @@ function vergeetSessie(bak, sessie, account) {
   return weg;
 }
 
-module.exports = { noteer, lees, zonderPersoon, vergeetSessie, MANIEREN, VERS_MS, APPARATEN };
+module.exports = { noteer, lees, zonderPersoon, apparaatUit, vergeetSessie, MANIEREN, VERS_MS, APPARATEN };

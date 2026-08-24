@@ -4,7 +4,7 @@
 const eigenaar = require('../../eigenaar'); // een bron van waarheid over wie de eigenaar is
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern, noteerSessie } = actx;
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern } = actx;
 app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
   // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
@@ -134,10 +134,10 @@ app.post('/api/auth/register', async (req, res) => {
     return res.status(503).json({ error: 'Registreren lukte even niet. Probeer het zo opnieuw.' });
   }
   /* Laag 2 noteert dat deze sessie met een wachtwoord is ontstaan -- dezelfde
-     regel als bij de inlog, en daarom dezelfde functie (routes/auth.js). BUITEN
-     de try: een bedradingsfout hoort te schreeuwen en niet als "Registreren
-     lukte even niet" te lezen. */
-  noteerSessie(req, antwoord.token, user.id);
+     regel als bij de inlog, en daarom dezelfde functie. BUITEN de try: een
+     bedradingsfout hoort te schreeuwen en niet als "Registreren lukte even
+     niet" te lezen. */
+  kern.vertrouwen.noteerInlog(req, antwoord.token, user.id, 'wachtwoord');
   res.json(antwoord);
 });
 };

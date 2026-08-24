@@ -73,6 +73,9 @@ module.exports = (kern) => {
       const user = accounts.getUserById(r.inlog.userId);
       if (!user) return res.status(401).json({ error: await naarTaal('Inloggen lukte net niet; probeer het opnieuw.', lang) });
       const token = accounts.issueToken(user.id);
+      // laag 2: deze sessie is met sleutelwoorden ontstaan, en dat weegt anders
+      // dan een passkey zodra er iets zwaars gebeurt (kern/vertrouwen/)
+      kern.vertrouwen.noteerInlog(req, token, user.id, 'sleutelwoorden');
       const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
       return res.json({ tekst: await naarTaal(r.tekst, lang), ingelogd: true, token, state: stateFor(sess, lang) });
     }

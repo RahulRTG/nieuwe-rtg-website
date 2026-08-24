@@ -136,6 +136,20 @@ const VOORTGANG = path.join(WORTEL, 'server', 'data', 'mutatie-voortgang.json');
    zakte er niets (LAT.md regel 10). Nu houdt test/bewijsvers.test.js hem vast,
    samen met moetOverslaan() hieronder -- die twee zijn een keten en alleen
    samen het gedrag. */
+/* EEN AFGEBROKEN PROBE IS GEEN OVERLEVER. Losse functie op moduleniveau, want
+   binnen de lus was hij niet te stellen -- en een regel die alleen tijdens een
+   ronde van uren zichtbaar wordt, is een regel die niemand ooit heeft zien werken
+   (LAT.md regel 10). test/bewijsvers.test.js houdt hem vast. */
+function naAfbreking(diag, waar) {
+  if (!diag || diag.staat !== 'overleefd') return diag;
+  const uit = Object.assign({}, diag);
+  uit.staat = 'niet uitgemeten';
+  uit.reden = (diag.reden ? diag.reden + '. ' : '') +
+    'De probe is hier afgebroken na operator ' + waar +
+    ', dus of de OVERIGE operatoren gezien zouden worden is niet vastgesteld.';
+  return uit;
+}
+
 function voorlopigMaken(r) {
   return (r && r.staat === 'overleefd') ? Object.assign({}, r, { voorlopig: true }) : r;
 }
@@ -686,9 +700,31 @@ function proefPuur(naam, posities) {
           /* NA EEN TIME-OUT NOG EEN KEER MET --test-force-exit, want "hij komt er
              niet uit" en "geen assertie zag het" zijn twee verschillende dingen en
              de eerste mag de tweede niet verbergen. Zie tijdoutMaarMeetbaar(). */
-          if (na.tijdout) return Object.assign(
-            tijdoutMaarMeetbaar(bestand, null, 'puur'),
-            { module: rel, operator: op.naam + '#' + i, geprobeerd });
+          if (na.tijdout) {
+            const diag = Object.assign(tijdoutMaarMeetbaar(bestand, null, 'puur'),
+              { module: rel, operator: op.naam + '#' + i, geprobeerd });
+            /* EN "OVERLEEFD" MAG HIER NIET STAAN, want deze lus wordt hier
+               AFGEBROKEN. `overleefd` betekent in dit register een ding: elke
+               operator is geprobeerd en geen enkele werd gezien. Een probe die na
+               operator een stopt omdat die traag was, heeft dat niet vastgesteld
+               -- er stonden er nog tien te wachten.
+
+               Het stond er wel zo, en het is een RATELTAND: toetsenOngevoeligPct
+               in NORM.json. test/rahul-mens.test.js kwam zo binnen met
+               "geprobeerd: 1" en de reden "deze toets is TRAAG, hij lekt niets",
+               en werd geteld als een toets die zijn eigen gedrag niet vastlegt.
+               Dat is een aanklacht op grond van een meting die is afgebroken.
+
+               De uitleg drie regels hierboven belooft ook precies het
+               tegenovergestelde van wat de code deed: "hij krijgt zijn eigen
+               uitslag en telt bij niet gemeten, niet bij gezakt" (LAT.md regel 6).
+               `niet uitgemeten` valt in norm.js vanzelf in de bak nietGemeten,
+               want die telt alles wat niet letterlijk overleefd of gezakt heet.
+
+               Een GEZAKT blijft staan: dat is wel vastgesteld, ook als het traag
+               ging. Een bewijs verlies je niet door de klok. */
+            return naAfbreking(diag, op.naam + '#' + i);
+          }
           return na.gezakt > 0 ? { soort: 'puur', staat: 'gezakt', module: rel,
             operator: op.naam + '#' + i, gezakt: na.gezakt, geprobeerd } : null;
         });
@@ -1069,7 +1105,7 @@ if (require.main === module) {
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 
-module.exports = { OPERATOREN, muteer, codemasker, modulesVan, moetOverslaan, voorlopigMaken, UITSLAG, VOORTGANG, NIET_MUTEREN,
+module.exports = { OPERATOREN, muteer, codemasker, modulesVan, moetOverslaan, voorlopigMaken, naAfbreking, UITSLAG, VOORTGANG, NIET_MUTEREN,
   SPOOR, ruimEerderOp, schrijfSpoor, metMutatie,
   /* De opruimwacht naar buiten, want een wacht die je niet kunt AANROEPEN kun je
      ook niet toetsen -- en dan is hij een belofte. test/mutatiewacht.test.js

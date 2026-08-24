@@ -213,6 +213,47 @@ test('een ondiepe overlever is een tussenstand en geen oordeel, in alle regimes'
   assert.equal(motor.moetOverslaan('ondiep.test.js', { uitslag, opnieuw: true }), false);
 });
 
+test('een probe die is AFGEBROKEN heet niet overleefd, want dat is hij niet', () => {
+  /* "overleefd" betekent in dit register precies een ding: elke operator is
+     geprobeerd en geen enkele werd door een assertie gezien. Dat is een
+     aanklacht tegen de toets, en hij voedt een RATELTAND (toetsenOngevoeligPct
+     in NORM.json).
+
+     proefPuur brak zijn lus af zodra EEN mutatie door de time-out ging -- de
+     diagnose kost 90 seconde plus een herkansing van 360, dus dat afbreken is
+     terecht -- maar schreef daarna wel "overleefd" op. test/rahul-mens.test.js
+     kwam zo binnen met "geprobeerd: 1" en de reden "deze toets is TRAAG, hij
+     lekt niets": een toets die na EEN trage operator werd weggezet als een
+     toets die zijn eigen gedrag niet vastlegt, terwijl er nog tien operatoren
+     ongeprobeerd stonden.
+
+     De uitleg in proefPuur beloofde toen al het tegenovergestelde van wat de
+     code deed ("telt bij niet gemeten, niet bij gezakt") -- LAT.md regel 6. */
+  const traag = { soort: 'puur', staat: 'overleefd', gezakt: 0, traag: true,
+    reden: 'deze toets is TRAAG, hij lekt niets' };
+  const uit = motor.naAfbreking(traag, '!==->===#0');
+  assert.equal(uit.staat, 'niet uitgemeten',
+    'een afgebroken probe stelt geen ongevoeligheid vast en mag er dus ook niet van beschuldigen');
+  assert.match(uit.reden, /afgebroken na operator !==->===#0/,
+    'en de uitslag zegt WAAR hij is afgebroken, anders is het cijfer niet na te lopen');
+  assert.match(uit.reden, /TRAAG/, 'de oorspronkelijke diagnose blijft staan');
+  assert.equal(traag.staat, 'overleefd', 'de invoer wordt niet stiekem aangepast');
+
+  /* EEN GEZAKT VERLIES JE NIET DOOR DE KLOK. Dat is wel vastgesteld -- een
+     assertie heeft het gezien -- en traagheid maakt dat niet minder waar. */
+  const gezakt = { soort: 'puur', staat: 'gezakt', gezakt: 2, traag: true };
+  assert.equal(motor.naAfbreking(gezakt, 'x#0').staat, 'gezakt',
+    'bewijs blijft bewijs, ook als het traag ging');
+
+  /* En de bak waarin het valt: norm.js telt alles wat niet letterlijk
+     "overleefd" of "gezakt" heet als niet-gemeten. Dat is precies waar een
+     afgebroken probe hoort. */
+  for (const staat of ['niet uitgemeten', 'te langzaam', 'al rood']) {
+    assert.ok(staat !== 'overleefd' && staat !== 'gezakt',
+      staat + ' valt in norm.js vanzelf in de bak nietGemeten');
+  }
+});
+
 test('het echte register houdt geen enkele ondiepe overlever meer vast', () => {
   /* De vlag hierboven werkt alleen als er ook echt niets meer met die vlag in
      MUTATIES.json staat. Blijft er een staan, dan is er een ronde afgebroken

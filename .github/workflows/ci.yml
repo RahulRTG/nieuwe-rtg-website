@@ -164,8 +164,15 @@ jobs:
       # hij bewaakte de voorraad en niemand bewaakte wat erbij kwam. Deze stap
       # draait de routekaart hier en in een worktree van main, en eist een toets
       # voor het verschil. De fetch van de stap hierboven maakt FETCH_HEAD.
+      # Sinds 24 augustus leest deze poort het ROUTEJOURNAAL dat de teststap
+      # hierboven zelf schreef, in plaats van te zoeken naar routenamen in de
+      # tekst van de toetsen. Die zoektocht is een benadering die er naar de
+      # kant naast zit waar hij TE VAAK zakt, en een poort die je regelmatig moet
+      # omzeilen houdt op een poort te zijn. Wat in het journaal staat is echt
+      # aangeroepen. Ontbreekt het bestand, dan zakt de stap in plaats van stil
+      # terug te vallen op de zwakkere zeef.
       - name: Nieuwe routes komen met een toets
-        run: node --experimental-sqlite scripts/nieuweroutes.js --tegen FETCH_HEAD
+        run: node --experimental-sqlite scripts/nieuweroutes.js --tegen FETCH_HEAD --journaal "$GITHUB_WORKSPACE/routejournaal.log"
       # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
       # van de tests: te laag voor suites die een hulpje gebruiken, en op te
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de

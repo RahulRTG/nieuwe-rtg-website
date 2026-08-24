@@ -210,14 +210,28 @@ test('opslag: zonder meetpunt werkt de proef als vanouds', () => {
    --------------------------------------------------------------------------- */
 const stilAntwoord = [ok({ stil: true }), ok({ stil: true }), ok({ stil: true })];
 const AUDIT = { kantoorAudit: 'het kantoorjournaal' };
+/* Per route: het opslagverschil van oproep A, B en C -- en van de VIERDE, die
+   de proef alleen doet als hij een tegenspraak vermoedt (zie de uitleg daar).
+   `d` staat standaard gelijk aan `b`: een route die bij een herhaling echt
+   schrijft, schrijft bij de volgende herhaling ook. Wie het vermoeden wil zien
+   VERVALLEN, zet `d: {}` -- dan bewoog er bij B iets wat niet van deze route
+   kwam. Dezelfde vorm voor de antwoorden: het vierde is standaard het tweede. */
 function ronde(specs, vastlegging) {
-  // per route: het opslagverschil van oproep A, B en C, en optioneel de antwoorden
   const routes = specs.map((s, i) => ({ method: 'POST', pad: s.pad || ('/api/proef/r' + i), rol: 'member' }));
-  const deltas = specs.flatMap(s => [s.a || {}, s.b || {}, s.c || {}]);
-  const antw = specs.flatMap(s => s.antwoorden || stilAntwoord);
-  let i = 0, j = 0;
-  return draaiIdemproef({ post: async () => antw[j++], routes, tokenVoor: () => 't',
-    lijfVoor: () => ({}), staatVan: () => deltas[i++], vastlegging });
+  const deltas = {}, antw = {};
+  specs.forEach((s, i) => {
+    const pad = routes[i].pad;
+    deltas[pad] = [s.a || {}, s.b || {}, s.c || {}, s.d !== undefined ? s.d : (s.b || {})];
+    const drie = s.antwoorden || stilAntwoord;
+    antw[pad] = drie.concat([drie[1]]);
+  });
+  const beurt = {};
+  let laatstePad = null;
+  return draaiIdemproef({
+    post: async (pad) => { laatstePad = pad; const n = beurt[pad] = (beurt[pad] || 0); beurt[pad] = n + 1; return antw[pad][Math.min(n, 3)]; },
+    routes, tokenVoor: () => 't', lijfVoor: () => ({}),
+    staatVan: () => { const n = (beurt[laatstePad] || 1) - 1; return deltas[laatstePad][Math.min(n, 3)]; },
+    vastlegging });
 }
 // drie verschillende routefamilies, zoals een echte doorlopende vastlegging
 const auditRoutes = ['/api/office/bank/a', '/api/office/weefsel/b', '/api/office/zelfzorg/c']
@@ -339,4 +353,52 @@ test('tegenspraak: geweigerd is niet hetzelfde als gemerkt', async () => {
   const g = gelijkAntwoord.perRoute['POST /api/x/gelijk'];
   assert.equal(g.grond, 'gelijk');
   assert.match(g.tegenspraak, /^de herhaling gaf hetzelfde antwoord/);
+});
+
+/* ---------------------------------------------------------------------------
+   EEN VERMOEDEN WORDT NAGETROKKEN, NIET GEMELD
+
+   De toewijzing per oproep is een aanname: wat aan B wordt toegeschreven is
+   alles wat er tussen het antwoord van A en dat van B veranderde. Dit huis heeft
+   achtergrondwerk, dus die aanname kan slippen -- gemeten op 24 augustus, toen
+   een route waarvan de herhaling met 404 werd geweigerd (en die op dat pad
+   aantoonbaar niets schrijft) toch een verschil kreeg toegewezen: er landde een
+   seed-ronde die negenendertig collecties tegelijk vulde.
+
+   Vandaar een vierde oproep met dezelfde sleutel. Beweegt de opslag dan wéér op
+   DEZELFDE collectie, dan is het van deze route. Zo niet, dan vervalt het
+   vermoeden -- en dat vervallen staat in het register, want een vermoeden dat
+   spoorloos verdwijnt is iets anders dan een vermoeden dat er nooit was.
+   --------------------------------------------------------------------------- */
+test('een vermoeden dat niet herhaalbaar is, wordt geen tegenspraak', async () => {
+  const uit = await ronde([{ pad: '/api/x/toevallig',
+    a: { spul: 1 }, b: { andereboel: 39 }, c: {}, d: {},   // de vierde doet het NIET opnieuw
+    antwoorden: [ok({ id: 1 }), ok({ id: 1, herhaald: true }), ok({ id: 2 })] }]);
+  const r = uit.perRoute['POST /api/x/toevallig'];
+  assert.deepEqual(uit.tegenspraken, [], 'niets te melden');
+  assert.equal(r.tegenspraak, undefined);
+  assert.match(r.vermoedenVerworpen, /niet van deze route/, 'maar het verval staat er wel');
+  assert.equal(uit.vermoedensVerworpen, 1);
+  assert.equal(r.idempotentie, 'beschermd', 'het oordeel zelf blijft staan');
+});
+
+test('een vermoeden dat WEL herhaalbaar is, blijft een tegenspraak', async () => {
+  const uit = await ronde([{ pad: '/api/x/echt',
+    a: { orders: 1 }, b: { orders: 1 }, c: {}, d: { orders: 1 },
+    antwoorden: [ok({ id: 1 }), ok({ id: 1, herhaald: true }), ok({ id: 2 })] }]);
+  assert.deepEqual(uit.tegenspraken, ['POST /api/x/echt']);
+  assert.equal(uit.perRoute['POST /api/x/echt'].nagetrokken, true);
+  assert.equal(uit.vermoedensVerworpen, 0);
+});
+
+test('alleen de collectie die het OPNIEUW deed telt mee', async () => {
+  /* Bewoog er bij B van alles maar bij de vierde oproep nog maar een ding, dan
+     hoort de melding dat ene ding te noemen en niet de hele stapel -- anders
+     draagt hij bewijs mee dat hij net heeft weerlegd. */
+  const uit = await ronde([{ pad: '/api/x/mengsel',
+    a: { orders: 1 }, b: { orders: 1, ruisje: 5, seed: 39 }, c: {}, d: { orders: 1 },
+    antwoorden: [ok({ id: 1 }), ok({ id: 1, herhaald: true }), ok({ id: 2 })] }]);
+  const t = uit.perRoute['POST /api/x/mengsel'].tegenspraak;
+  assert.match(t, /\+1 in orders/);
+  assert.doesNotMatch(t, /ruisje|seed/, 'de rest was niet herhaalbaar en hoort er niet in');
 });

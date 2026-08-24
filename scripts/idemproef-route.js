@@ -227,8 +227,12 @@ async function wacht(basis, ms) {
       'geen doorlopende vastlegging. Haal hem uit IDEMBESLUIT.json of onderbouw hem opnieuw.');
   }
   if (uit.tegenspraken && uit.tegenspraken.length) {
-    console.log('  TEGENSPRAAK antwoord vs opslag       : ' + uit.tegenspraken.length);
+    console.log('  TEGENSPRAAK antwoord vs opslag       : ' + uit.tegenspraken.length + '   (elk nagetrokken met een vierde oproep)');
     for (const p of uit.tegenspraken.slice(0, 10)) console.log('      ' + p);
+  }
+  if (uit.vermoedensVerworpen) {
+    console.log('  vermoedens die niet herhaalbaar waren: ' + uit.vermoedensVerworpen +
+      '   <- bij B bewoog er iets dat bij een vierde oproep niet terugkwam');
   }
 
   /* ============================================================================
@@ -270,6 +274,7 @@ async function wacht(basis, ms) {
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
       onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length },
     zonderBesluit, tegenspraken: uit.tegenspraken || [], vastleggingVerdacht: uit.vastleggingVerdacht || [],
+    vermoedensVerworpen: uit.vermoedensVerworpen || 0,
     perRoute: Object.values(uit.perRoute)
   }, null, 1) + '\n');
   console.log('\n  weggeschreven in IDEMPROEF.json');

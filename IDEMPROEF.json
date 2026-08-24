@@ -2,13 +2,13 @@
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Zegt het antwoord niets, dan kijkt de proef naar het TWEEDE MEETPUNT: de lengte per collectie in de opslag (`bron: \"opslag\"`, server/staatlog.js). Wat daar groeide en in IDEMBESLUIT.json onder `vastlegging` staat, is de aantekening van de handeling en niet het werk -- dat telt niet mee; zie `gemeten.vastlegging`, met per collectie onder hoeveel routefamilies hij groeide (een die er maar EEN heeft, is domeinwerk in een vastleggingslijst en staat onder `vastleggingVerdacht`). Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
  "gemeten": {
   "routesMetRol": 3100,
-  "beoordeeld": 242,
-  "beschermd": 131,
+  "beoordeeld": 241,
+  "beschermd": 130,
   "onbeschermd": 111,
-  "ongemeten": 2858,
-  "oproepen": 9324,
+  "ongemeten": 2859,
+  "oproepen": 9327,
   "tokensHernieuwd": 24,
-  "uitOpslag": 107,
+  "uitOpslag": 106,
   "ruisGeijkt": [
    "rtgai",
    "doorgeefjournaal"
@@ -44,11 +44,9 @@
   "onbeschermdMetBesluit": 111
  },
  "zonderBesluit": [],
- "tegenspraken": [
-  "POST /api/supplier/horeca/venue/publiceer",
-  "POST /api/supplier/magnaat/studio/importeer"
- ],
+ "tegenspraken": [],
  "vastleggingVerdacht": [],
+ "vermoedensVerworpen": 2,
  "perRoute": [
   {
    "methode": "POST",
@@ -3237,7 +3235,10 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "techniek": 1,
+     "wacht": 6
+    },
     "c": {}
    }
   },
@@ -4124,10 +4125,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "techniek": 1,
-     "wacht": 6
-    },
+    "b": {},
     "c": {}
    }
   },
@@ -10228,7 +10226,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -11276,9 +11276,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -16026,7 +16024,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -16776,9 +16776,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -21047,7 +21045,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -21966,7 +21966,6 @@
      "webMerken": "gewijzigd"
     },
     "c": {
-     "wacht": "gewijzigd",
      "webMerken": "gewijzigd"
     }
    }
@@ -25282,7 +25281,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26475,9 +26476,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -29192,7 +29191,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -29500,7 +29501,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -30444,7 +30447,9 @@
      "residentie": 1
     },
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -30825,9 +30830,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    }
   },
@@ -31271,9 +31274,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -32076,9 +32077,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -32642,7 +32641,8 @@
      "sessions": 1
     },
     "b": {
-     "sessions": 1
+     "sessions": 1,
+     "wacht": "gewijzigd"
     },
     "c": {
      "sessions": 1
@@ -34370,7 +34370,6 @@
      "salon": "gewijzigd"
     },
     "c": {
-     "wacht": "gewijzigd",
      "salon": "gewijzigd"
     }
    }
@@ -36000,7 +35999,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -36999,11 +37000,11 @@
    "pad": "/api/supplier/agenda/verwijder",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "de ijkoproep met een verse sleutel kwam niet door; zonder die vergelijking zegt een gelijk antwoord niets",
    "statussen": [
     200,
     200,
-    200
+    503
    ],
    "opslag": {
     "a": {},
@@ -37448,7 +37449,8 @@
      "dpIdem": 1,
      "dpIdemAfdruk": 1
     }
-   }
+   },
+   "nagetrokken": true
   },
   {
    "methode": "POST",
@@ -37650,9 +37652,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    }
   },
@@ -39204,15 +39204,18 @@
    "methode": "POST",
    "pad": "/api/supplier/command/zaken",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in wacht en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41310,18 +41313,15 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/bezorg/sloten",
    "rol": "supplier",
-   "idempotentie": "beschermd",
-   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in wacht en de herhaling niets",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -42217,7 +42217,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    }
   },
@@ -42795,8 +42797,7 @@
     },
     "c": {}
    },
-   "tegenspraak": "de herhaling werd geweigerd, maar de opslag veranderde toch: een wijziging in horeca",
-   "grond": "geweigerd"
+   "vermoedenVerworpen": "bij B bewoog een wijziging in horeca, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -44472,8 +44473,7 @@
     },
     "c": {}
    },
-   "tegenspraak": "de herhaling werd geweigerd, maar de opslag veranderde toch: een wijziging in magnaatPartnerstudio",
-   "grond": "geweigerd"
+   "vermoedenVerworpen": "bij B bewoog een wijziging in magnaatPartnerstudio, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -44489,9 +44489,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -45007,7 +45005,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -47380,9 +47380,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    }
   },
@@ -47569,7 +47567,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    }
   },
@@ -47827,7 +47827,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -48325,7 +48327,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -49945,9 +49949,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -49979,7 +49981,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50238,18 +50242,15 @@
    "methode": "POST",
    "pad": "/api/supplier/werkvormen",
    "rol": "supplier",
-   "idempotentie": "beschermd",
-   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in betaalOpdrachten en de herhaling niets",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag",
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -50904,9 +50905,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -52641,7 +52640,9 @@
      "suppliers": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -52707,9 +52708,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }

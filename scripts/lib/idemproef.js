@@ -161,7 +161,7 @@ function weegHerhaling(a, b, c, staat) {
 
 async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, maxRoutes, staatVan, vastlegging }) {
   const perRoute = {};
-  let gedaan = 0, hernieuwd = 0, uitOpslag = 0;
+  let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
   const tegenspraken = [];
 
@@ -198,16 +198,43 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     if (o.bron) rij.bron = o.bron;
     if (staat) rij.opslag = { a: dA, b: dB, c: dC };
 
-    /* DE TEGENSPRAAK. Het antwoord kan zeggen dat de herhaling is herkend
-       terwijl de opslag laat zien dat er tóch iets bij kwam. Dat is een sterker
-       signaal dan beide meetpunten apart: een route die "herhaald: true" meldt
-       en ondertussen doorwerkt, is precies het geval dat je nooit uit een
-       antwoord zou halen. Het maakt de proef niet rood -- het is een bevinding
-       en geen blindheid -- maar het staat bij naam in het register. */
+    /* DE TEGENSPRAAK, EN WAAROM ER EEN VIERDE OPROEP BIJ HOORT.
+
+       Het antwoord kan zeggen dat de herhaling niets deed terwijl de opslag laat
+       zien dat er tóch iets veranderde. Dat is een sterker signaal dan beide
+       meetpunten apart: een route die "herhaald: true" meldt en ondertussen
+       doorwerkt, haal je nooit uit een antwoord alleen.
+
+       MAAR DE TOEWIJZING PER OPROEP IS EEN AANNAME. Het verschil dat aan B wordt
+       toegeschreven is alles wat er tussen het antwoord van A en dat van B is
+       veranderd -- en dit huis heeft achtergrondwerk. Gemeten op 24 augustus:
+       een route waarvan de herhaling met 404 werd geweigerd en die op dat pad
+       aantoonbaar NIETS schrijft, kreeg toch een verschil toegewezen; er landde
+       op dat moment een seed-ronde die negenendertig collecties tegelijk vulde.
+       De melding klopte niet, en dat is precies het soort onnagetrokken
+       bewering waar deze proef bij anderen op jaagt.
+
+       Dus wordt een vermoeden nu NAGETROKKEN in plaats van gemeld: nog een keer
+       dezelfde sleutel, en alleen als de opslag dan wéér beweegt is het van deze
+       route. Dat kost een oproep per vermoeden en er zijn er een handvol. */
     if (staat && o.stand === 'beschermd' && dB && Object.keys(dB).length) {
-      rij.tegenspraak = tegenspraakTekst(o.grond, dB);
-      rij.grond = o.grond || 'onbekend';
-      tegenspraken.push(r.method + ' ' + r.pad);
+      const nog = await doe(k1);
+      const dD = staatVan(nog);
+      const samen = {};
+      for (const k of Object.keys(dB)) if (dD && dD[k] !== undefined) samen[k] = dD[k];
+      if (Object.keys(samen).length) {
+        rij.tegenspraak = tegenspraakTekst(o.grond, samen);
+        rij.grond = o.grond || 'onbekend';
+        rij.nagetrokken = true;
+        tegenspraken.push(r.method + ' ' + r.pad);
+      } else {
+        /* Niet herhaalbaar: wat er bij B bewoog kwam ergens anders vandaan. Dat
+           hoort in het register te staan, want een vermoeden dat spoorloos
+           verdwijnt is niet hetzelfde als een vermoeden dat er nooit was. */
+        rij.vermoedenVerworpen = 'bij B bewoog ' + beschrijfDelta(dB) +
+          ', maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route';
+        verworpen++;
+      }
     }
     perRoute[r.method + ' ' + r.pad] = rij;
   }
@@ -289,7 +316,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     : null;
 
   return { perRoute, telling: tel, oproepen: gedaan, hernieuwd, meterStuk, uitOpslag, tegenspraken,
-    vastleggingGemeten, vastleggingVerdacht };
+    vermoedensVerworpen: verworpen, vastleggingGemeten, vastleggingVerdacht };
 }
 
 const CONTROL = {

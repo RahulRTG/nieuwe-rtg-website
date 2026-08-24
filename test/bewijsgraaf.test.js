@@ -81,6 +81,48 @@ test('de domeinlijst in de graaf klopt met die in de bron', () => {
 });
 
 /* DE KRUISPROEF. Alles hierboven gaat over de graaf; dit gaat over het BESLUIT. */
+test('een lijst-uit-de-bron die niets oplevert is ONBEKEND en niet leeg', (t) => {
+  /* Twee regels in BEREKEND_BEREIK lezen hun lijst uit de bron in plaats van
+     hem te herhalen (LAT.md regel 4): de negen routedomeinen, en de BRONNEN van
+     scripts/controls.js. Dat is goed, maar het schuift wel een risico door.
+
+     Lukt dat lezen niet -- de module hernoemd, de export weg, een fout bij het
+     laden -- dan is het bereik ONBEKEND. Zou berekendBereik() dan een lege lijst
+     teruggeven, dan leest de aanroeper dat als "verantwoord, en het voegt niets
+     toe" en verklaart hij de sluiting COMPLEET. Een gat dat zichzelf compleet
+     verklaart is precies waar deze graaf tegen is gebouwd (LAT.md regel 3), en
+     het zou stil gebeuren: geen fout, alleen een planner die minder kiest.
+
+     Deze toets zet die vier vormen naast elkaar op een wegwerpregel. */
+  const BB = bg.BEREKEND_BEREIK;
+  const sleutel = 'proef/verzonnen-bron.js';
+  t.after(() => { delete BB[sleutel]; });
+
+  BB[sleutel] = { uitBron: () => { throw new Error('module weg'); } };
+  assert.equal(bg.berekendBereik(sleutel, WORTEL), null,
+    'gooit de bron een fout, dan is het bereik onbekend -- niet leeg');
+
+  BB[sleutel] = { uitBron: () => [] };
+  assert.equal(bg.berekendBereik(sleutel, WORTEL), null,
+    'een LEGE lijst is geen antwoord: de bron bestaat kennelijk niet meer zoals verwacht');
+
+  BB[sleutel] = { uitBron: () => 'server/db/index.js' };
+  assert.equal(bg.berekendBereik(sleutel, WORTEL), null,
+    'en iets dat geen lijst is telt ook niet als antwoord');
+
+  /* DE TEGENPROEF, want een regel die altijd null geeft bewaakt ook niets. */
+  BB[sleutel] = { uitBron: () => ['server/db/index.js'] };
+  const goed = bg.berekendBereik(sleutel, WORTEL);
+  assert.ok(Array.isArray(goed) && goed.length === 1, 'een echte lijst levert wel een bereik');
+  assert.match(goed[0], /server\/db\/index\.js$/, 'en dat bereik wijst naar het echte bestand');
+
+  /* En de regel die er ECHT staat doet het ook, anders toetst dit een verzonnen
+     geval: scripts/controls.js leest zijn BRONNEN uit de bron. */
+  const echt = bg.berekendBereik('scripts/controls.js', WORTEL);
+  assert.ok(Array.isArray(echt) && echt.length > 5,
+    'scripts/controls.js hoort zijn BRONNEN uit de bron te halen (' + (echt && echt.length) + ')');
+});
+
 test('de planner slaat geen enkele bewezen gevoelige toets over', () => {
   const mut = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8')).toetsen;
   let gecontroleerd = 0;

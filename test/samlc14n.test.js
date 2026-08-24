@@ -19,7 +19,14 @@
    die reden. Dat is een bewuste afwijking van de huisregel voor ontbrekende
    diensten (Postgres, Redis): daar is de toets nutteloos zonder de dienst, hier
    is de toets een VEILIGHEIDSMETING waarvan de afwezigheid niet mag lijken op
-   een groen vinkje. libxml2-utils staat op elke ubuntu-runner.
+   een groen vinkje.
+
+   HIER STOND DAT LIBXML2-UTILS OP ELKE UBUNTU-RUNNER STAAT. Dat was niet waar:
+   de image van ubuntu-latest draagt xmllint niet, en de eerste volledige suite
+   die deze toets in CI bereikte zakte drie keer op ENOENT. De toets deed precies
+   wat hij hoort te doen -- de zin eronder was fout. CI installeert het pakket nu
+   met een eigen stap (.github/workflows/ci.yml); ontbreekt het toch, dan zakt
+   deze toets nog steeds, en dat blijft de bedoeling.
 
    Draai los: node --test test/samlc14n.test.js */
 const test = require('node:test');

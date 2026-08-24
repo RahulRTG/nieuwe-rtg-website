@@ -20,6 +20,7 @@
    die op stadsniveau al samen tot een zaak (zie kern/gemeente/meldingen.js).
    En geen blokkade: wie na een minuut nog eens meldt, meldt gewoon opnieuw. */
 'use strict';
+const rtgKlok = require('../lib/klok');
 
 const VENSTER_MS = 60000;
 
@@ -32,7 +33,12 @@ const VENSTER_MS = 60000;
    want dat is hoe ze zijn opgeslagen. */
 function zelfdeMeldingKortGeleden(lijst, nieuw, velden, nu) {
   if (!Array.isArray(lijst) || !lijst.length) return null;
-  const grens = (typeof nu === 'number' ? nu : Date.now()) - VENSTER_MS;
+  /* De tijd komt van de RTG-klok en niet van het besturingssysteem. Dit venster
+     IS een tijdsvraag -- "is deze melding kort geleden nog eens gedaan?" -- en
+     wie dat aan het OS vraagt, doet niet mee aan RTG_KLOK en is dus niet te
+     beproeven op een klokverschuiving. Zie server/lib/klok.js; scripts/klok.js
+     telt wat er nog buiten staat. */
+  const grens = (typeof nu === 'number' ? nu : rtgKlok.nu()) - VENSTER_MS;
   for (const m of lijst) {
     const at = new Date(m.at || 0).getTime();
     if (!(at >= grens)) break;                       // nieuwste-eerst: verder is alleen ouder

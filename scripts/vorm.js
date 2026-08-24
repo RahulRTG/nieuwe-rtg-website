@@ -131,14 +131,20 @@ function erIsEenVorm(p) { return !!merkVan(p); }
    NAKIJKEN of zijn eigen omgeving dezelfde is, in plaats van het te geloven.
    Een merk dat niet te lezen is telt als "klopt niet": bij twijfel zaait de
    server zelf, dat kost een halve seconde en geen zekerheid. */
-let onthoudenMerk = null;
+/* HET MERK WORDT ELKE KEER GELEZEN, EN DAT IS EEN BESLUIT.
+
+   Hier heeft een onthoudlaag gestaan, "want drie lezingen per serverstart". Dat
+   was de verkeerde plek: van de 106 ms die zo'n lezing kostte zat 106 ms in
+   sleutel() (een hash over de hele serverboom) en vrijwel niets in het lezen van
+   dit kleine JSON-bestand. De onthoudlaag leverde dus niets op en kostte wel
+   iets: test/gietvorm.test.js haalt het merk weg om te bewijzen dat een half
+   gekopieerde vorm nooit wordt gebruikt, en die toets zag daarna zijn eigen
+   verwijdering niet meer. Hij is er dus in geslaagd waar hij voor staat, op de
+   dag dat hij geschreven werd. Het onthouden zit nu waar het hoort: op de
+   sleutel, in vormPad(). */
 function merkVan(p) {
-  const pad = p || vormPad();
-  if (!p && onthoudenMerk && onthoudenMerk.pad === pad) return onthoudenMerk.merk;
-  let merk = null;
-  try { merk = JSON.parse(fs.readFileSync(path.join(pad, MERK), 'utf8')); } catch (e) { merk = null; }
-  if (!p) onthoudenMerk = { pad, merk };
-  return merk;
+  try { return JSON.parse(fs.readFileSync(path.join(p || vormPad(), MERK), 'utf8')); }
+  catch (e) { return null; }
 }
 function omgevingKlopt(env) {
   const merk = merkVan();
@@ -232,7 +238,6 @@ async function maakVorm(opties) {
     try { fs.rmSync(werk, { recursive: true, force: true }); } catch (e2) {}
     throw e;
   }
-  onthoudenMerk = null;   // dit proces heeft er net een gemaakt; de oude lezing is dood
   ruimOudeVormenOp(s);
   return doel;
 }

@@ -117,6 +117,46 @@ test('de brokkenopslag en de sleutel volgen de map ook', () => {
   });
 });
 
+/* DE SLEUTELS WEGEN HET ZWAARST. Een gedeelde server die de vault van de vorige
+   toets vasthoudt terwijl de rtg.db van de volgende openstaat, ontsleutelt niets
+   meer -- of erger, ontsleutelt de verkeerde identiteiten. Sleutel en database
+   horen uit DEZELFDE map te komen, en dat is precies wat een lezing per aanroep
+   garandeert en een constante niet. */
+test('de identiteitskluis wijst naar de map van dit moment', () => {
+  metTweeMappen((A, B) => {
+    process.env.RTG_DATA_DIR = A;
+    const accounts = require(path.join(WORTEL, 'server/accounts'));
+    assert.equal(accounts.RING_FILE, path.join(A, 'vault.ring'));
+    assert.equal(accounts.ringBestand(), path.join(A, 'vault.ring'), 'de functie zegt hetzelfde als de eigenschap');
+
+    process.env.RTG_DATA_DIR = B;
+    assert.equal(accounts.RING_FILE, path.join(B, 'vault.ring'),
+      'de sleutelring hoort mee te bewegen; blijft hij staan, dan leest een gedeelde server ' +
+      'de kluissleutels van de VORIGE toets bij de database van de volgende');
+  });
+});
+
+test('de postbus en de papieren volgen de map ook', () => {
+  metTweeMappen((A, B) => {
+    process.env.RTG_DATA_DIR = A;
+    const papieren = require(path.join(WORTEL, 'server/papieren/opslag'));
+    assert.equal(papieren.BESTAND, path.join(A, 'papieren.json'));
+    process.env.RTG_DATA_DIR = B;
+    assert.equal(papieren.BESTAND, path.join(B, 'papieren.json'));
+
+    /* GEEN `if` OM DEZE BEWERING HEEN. Hier stond `if (maakOutbox) { ... }`, en
+       een bewering achter een voorwaarde die stil onwaar kan zijn is geen
+       bewering (LAT-regel 9). server/mail-outbox.js exporteert een fabriek; dat
+       is een eigenschap om VAST te leggen, niet om omheen te werken. */
+    const maakOutbox = require(path.join(WORTEL, 'server/mail-outbox'));
+    assert.equal(typeof maakOutbox, 'function', 'mail-outbox hoort een fabriek te exporteren');
+    const o = maakOutbox({ FROM: 'proef@rtg.test' });
+    assert.equal(o.OUTBOX, path.join(B, 'outbox'));
+    process.env.RTG_DATA_DIR = A;
+    assert.equal(o.OUTBOX, path.join(A, 'outbox'), 'de postbus hoort mee te bewegen');
+  });
+});
+
 /* WAT ER NOG NIET MEEBEWEEGT, en dat hoort hier te staan zolang het waar is.
    Anders leest een volgende lezer "de datamap is instelbaar" en bouwt daarop. */
 test('STORE beweegt NIET mee, en dat is een bewuste keuze', () => {

@@ -19,8 +19,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const DIR = process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
-const BESTAND = path.join(DIR, 'papieren.json');
+// Lezingen en geen constanten: de paden volgen de datamap van dit moment.
+// Zie de kop van server/db/opslag.js voor waarom dat uitmaakt.
+const dataMap = () => process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
+const bestandPad = () => path.join(dataMap(), 'papieren.json');
 const LEEG = () => ({ antwoorden: {}, bijgewerkt: null });
 
 /* Lezen faalt nooit hard: geen bestand betekent "nog niets uitgevraagd", en dat
@@ -28,7 +30,7 @@ const LEEG = () => ({ antwoorden: {}, bijgewerkt: null });
    bestand behandelen we net zo -- niet stilzwijgend "af" verklaren. */
 function laad() {
   try {
-    const s = JSON.parse(fs.readFileSync(BESTAND, 'utf8'));
+    const s = JSON.parse(fs.readFileSync(bestandPad(), 'utf8'));
     if (!s || typeof s !== 'object' || typeof s.antwoorden !== 'object' || !s.antwoorden) return LEEG();
     return s;
   } catch (e) { return LEEG(); }
@@ -38,12 +40,14 @@ function laad() {
    midden in het schrijven, dan is het oude bestand nog heel. Half papierwerk is
    erger dan oud papierwerk. */
 function bewaar(staat) {
-  try { fs.mkdirSync(DIR, { recursive: true }); } catch (e) {}
-  const tmp = BESTAND + '.tmp';
+  try { fs.mkdirSync(dataMap(), { recursive: true }); } catch (e) {}
+  const tmp = bestandPad() + '.tmp';
   fs.writeFileSync(tmp, JSON.stringify(staat, null, 2), { mode: 0o600 });
-  fs.renameSync(tmp, BESTAND);
-  try { fs.chmodSync(BESTAND, 0o600); } catch (e) {}
+  fs.renameSync(tmp, bestandPad());
+  try { fs.chmodSync(bestandPad(), 0o600); } catch (e) {}
   return staat;
 }
 
-module.exports = { laad, bewaar, BESTAND };
+module.exports = { laad, bewaar, bestandPad };
+// BESTAND blijft als levende eigenschap bestaan voor wie hem leest.
+Object.defineProperty(module.exports, 'BESTAND', { enumerable: true, get: bestandPad });

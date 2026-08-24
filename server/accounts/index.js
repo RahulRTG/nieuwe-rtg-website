@@ -32,12 +32,27 @@ const mirror = require('./mirror');
 const users = require('./users');
 const staff = require('./staff');
 
-// Zelfde datamap als db.js: instelbaar met RTG_DATA_DIR (tests + productie).
-const DATA_DIR = process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
-const DB_FILE = path.join(DATA_DIR, 'rtg.db');
-const SECRET_FILE = path.join(DATA_DIR, 'secret.key');   // ondertekent sessietokens
-const VAULT_FILE = path.join(DATA_DIR, 'vault.key');     // versleutelt de identiteitskluis
-const RING_FILE = path.join(DATA_DIR, 'vault.ring');     // extra kluissleutels na een rotatie
+/* Zelfde datamap als db.js, en net als daar een LEZING en geen constante.
+
+   Deze vijf stonden hier als `const ... = path.join(DATA_DIR, ...)`, dus vast op
+   het moment dat deze module laadde. Dat is de regel die 647 toetsen dwingt een
+   eigen server te starten: ze willen een eigen schijf, en de schijf lag vast bij
+   het laden. Zie de kop van server/db/opslag.js voor het hele verhaal en
+   test/datamap-beweegt.test.js voor het bewijs.
+
+   Hier weegt het zwaarder dan bij de opslag, want dit zijn de SLEUTELS. Een
+   gedeelde server die de vault van de vorige toets vasthoudt terwijl de rtg.db
+   van de volgende openstaat, ontsleutelt niets meer -- of erger, ontsleutelt de
+   verkeerde identiteiten. Sleutel en database horen uit DEZELFDE map te komen,
+   en dat is precies wat een lezing per aanroep garandeert en een constante niet.
+
+   RING_FILE gaat als functie naar buiten (ringBestand); de oude naam blijft
+   bestaan als levende eigenschap, zie onderaan. */
+const dataMap = () => process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
+const dbBestand = () => path.join(dataMap(), 'rtg.db');
+const secretBestand = () => path.join(dataMap(), 'secret.key');   // ondertekent sessietokens
+const vaultBestand = () => path.join(dataMap(), 'vault.key');     // versleutelt de identiteitskluis
+const ringBestand = () => path.join(dataMap(), 'vault.ring');     // extra kluissleutels na een rotatie
 
 /* Sleutels laden. Bij meerdere instances MOETEN de identiteitskluis (VAULT) en
    de token-ondertekening (SECRET) op elke instance gelijk zijn, anders kan de ene
@@ -75,8 +90,8 @@ function loadRing(file, vault) {
 }
 
 function init() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const db = new DatabaseSync(DB_FILE);
+  fs.mkdirSync(dataMap(), { recursive: true });
+  const db = new DatabaseSync(dbBestand());
   S.db = db;
   /* WAL + busy_timeout: lezers en schrijvers blokkeren elkaar niet meer, en
      als twee processen dezelfde accountsdatabase raken (failover-trio, een
@@ -96,9 +111,9 @@ function init() {
      je wilt weten. */
   migraties.draai(db);
 
-  S.SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
-  S.VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');
-  S.RING = loadRing(RING_FILE, S.VAULT);
+  S.SECRET = loadKey(secretBestand(), 'RTG_SECRET_KEY');
+  S.VAULT = loadKey(vaultBestand(), 'RTG_VAULT_KEY');
+  S.RING = loadRing(ringBestand(), S.VAULT);
 }
 
 /* De WAL van rtg.db leegdrukken in het hoofdbestand.
@@ -122,15 +137,15 @@ function checkpoint() {
    kent. */
 function schrijfKluisRing(ring) {
   const tekst = ring.map(k => Buffer.from(k).toString('hex')).join('\n') + '\n';
-  const tmp = RING_FILE + '.tmp';
+  const tmp = ringBestand() + '.tmp';
   const fd = fs.openSync(tmp, 'w', 0o600);
   try { fs.writeFileSync(fd, tekst); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
-  fs.renameSync(tmp, RING_FILE);
-  try { fs.chmodSync(RING_FILE, 0o600); } catch (e) {}
+  fs.renameSync(tmp, ringBestand());
+  try { fs.chmodSync(ringBestand(), 0o600); } catch (e) {}
 }
 
 module.exports = {
-  init, checkpoint, schrijfKluisRing, RING_FILE,
+  init, checkpoint, schrijfKluisRing, ringBestand,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   /* Het seedvenster: open tijdens de demostart, dicht vlak voor app.listen.
@@ -140,3 +155,9 @@ module.exports = {
   ...users,
   ...staff
 };
+/* RING_FILE blijft bestaan als LEVENDE eigenschap: scripts/kluisbeheer.js en
+   test/kluis-rotatie.test.js lezen hem, en die horen het pad van dit moment te
+   krijgen en niet dat van het laadmoment. Wie hem bij het laden destructureert
+   houdt nog steeds een momentopname vast -- scripts/lib/staatscan.js telt die
+   vorm, zodat er geen nieuwe bijkomen. */
+Object.defineProperty(module.exports, 'RING_FILE', { enumerable: true, get: ringBestand });

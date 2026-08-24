@@ -26,7 +26,9 @@ const fs = require('fs');
 const path = require('path');
 const rtgKlok = require('./lib/klok');
 
-const OUTBOX = path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'outbox');
+// Een LEZING en geen constante: het pad hoort de datamap van dit moment te
+// volgen, niet die van het laadmoment. Zie de kop van server/db/opslag.js.
+const outboxMap = () => path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'outbox');
 
 module.exports = ({ FROM }) => {
   /* De outbox is niet alleen de ontwikkelstand: hij vangt ook mail op als een
@@ -37,8 +39,8 @@ module.exports = ({ FROM }) => {
      (.txt) zodat lokaal ontwikkelen niet omslachtig wordt. Terugkijken kan met
      `npm run outbox`. */
   function toOutbox(to, subject, text) {
-    fs.mkdirSync(OUTBOX, { recursive: true, mode: 0o700 });
-    try { fs.chmodSync(OUTBOX, 0o700); } catch (e) {}
+    fs.mkdirSync(outboxMap(), { recursive: true, mode: 0o700 });
+    try { fs.chmodSync(outboxMap(), 0o700); } catch (e) {}
     /* De naam draagt de tijd EN een willekeurig staartje. Zonder dat staartje
        schrijven twee berichten in dezelfde milliseconde over elkaar heen -- en dat
        is geen zeldzaam geval: een herstelaanvraag stuurt de LINK en de CODE vlak
@@ -50,10 +52,13 @@ module.exports = ({ FROM }) => {
     const bericht = `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
     const kluis = require('./kluis');
     const naam = stamp + '-' + staart + (kluis.AAN ? '.eml.enc' : '.txt');
-    fs.writeFileSync(path.join(OUTBOX, naam), kluis.versleutel(bericht), { mode: 0o600 });
+    fs.writeFileSync(path.join(outboxMap(), naam), kluis.versleutel(bericht), { mode: 0o600 });
     // het adres zelf hoort niet in het logboek als de inhoud wel beschermd is
     console.log(`[mail] (outbox) ${kluis.AAN ? 'versleuteld opgeslagen' : 'naar ' + to}: ${subject}`);
   }
 
-  return { toOutbox, OUTBOX };
+  /* OUTBOX blijft als levende eigenschap bestaan voor wie hem leest. */
+  const uit = { toOutbox, outboxMap };
+  Object.defineProperty(uit, 'OUTBOX', { enumerable: true, get: outboxMap });
+  return uit;
 };

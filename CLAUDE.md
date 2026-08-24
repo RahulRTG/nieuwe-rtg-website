@@ -42,6 +42,25 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`TENANT.md` is de buitenkant van de bedrijvenkant** — hoe een partner het
+Werk OS onder zijn eigen naam gebruikt zonder dat er een tweede platform
+ontstaat. Lees die vóór je aan white-label, SSO-inrichting of "enterprise"
+werkt. De kern in vier regels: **`org` IS de klant** (de juridische,
+beveiligings- en contractgrens), een werkruimtecode is een productinstantie
+daarbinnen, een leverancierscode is een relatie en nooit een identiteit, en er
+komt geen vijfde begrip bij. Drie grenzen die niet mogen sneuvelen: het merk
+van een klant geldt binnen zijn eigen blok (de RTG-schil verft niet mee), de
+herkomstregel is in geen enkele modus uit te zetten (wiens software je
+personeelsdossier bewaart is een AVG-vraag, geen merkvraag), en een
+enterprisebewering op een scherm heeft een bron — daarom weigert de modus
+`sovereign` mét de reden in plaats van te bestaan als knop. Levenscyclus,
+uitgang, contract, quota, bewijspoort, de commandobalk met een actiebon, de
+gevolgsimulatie en SAML staan er inmiddels; wat er nog steeds níét is, staat in
+het antwoord van de server als `nietGebouwd` mét de reden en niet als lege
+waarde. Dezelfde regel geldt in het klein overal in deze laag: `nietAfgedwongen`
+in het contract, `nietGerekend` in een gevolgsimulatie, en een geweigerde modus
+die zegt waarom.
+
 **`HORECA.md` is het diepte-document van de horecakant** — RTG Service
 Choreography OS. In één zin: **een kassa registreert wat besteld is; RTG
 regisseert wat er nú moet gebeuren om de hele tafel op het juiste moment een

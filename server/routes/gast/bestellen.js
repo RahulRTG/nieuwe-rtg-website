@@ -29,7 +29,9 @@ module.exports = (kern) => {
     const uit = orderlaag.bestel(zaakcode, rekening, deelnemer, {
       items: b.items, allergie: schoon(b.allergie, 120) || null,
       idem: b.idem, apparaat: schoon(b.apparaat, 40) || null,
-      kaartVan: (id) => { const m = kaartVan(id); return m ? { id: m.id, name: m.naam, price: m.centen / 100, cat: m.cat, station: m.station, alcohol: m.alcohol } : null; }
+      kaartVan: (id) => { const m = kaartVan(id); return m ? { id: m.id, name: m.naam, price: m.centen / 100,
+        cat: m.cat, station: m.station, alcohol: m.alcohol, opties:m.opties, ingredienten:m.ingredienten,
+        allergenen:m.allergenen, prepMin:m.prepMin } : null; }
     });
     stuur(res, uit);
   });

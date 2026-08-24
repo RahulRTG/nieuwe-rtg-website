@@ -41,13 +41,38 @@ test('De Salon: plaatsen, je eigen raster, reageren en een eerlijk einde aan de 
     for (let i = 0; i < 25; i++) await api(base, '/api/salon/plaats', { tekst: 'Notitie ' + i + ' #reeks' }, a);
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const page = await browser.newPage();
     const fouten = [];
-    letOpFouten(page, fouten);
-    await page.addInitScript((tok) => {
+    const zetSessie = (page) => page.addInitScript((tok) => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, a);
+
+    // Een eigen context voorkomt dat de sociale serviceworker dit scherm of de
+    // Salon uit zijn cache levert: beide blijven zo aantoonbare navigaties.
+    const priveContext = await browser.newContext();
+    const privePage = await priveContext.newPage();
+    letOpFouten(privePage, fouten);
+    await zetSessie(privePage);
+    await privePage.goto(base + '/apps/sociaal-prive.html', { waitUntil: 'load' });
+    await privePage.waitForSelector('#privateRooms', { timeout: 10000 });
+    const prive = await privePage.evaluate(() => ({
+      pad: location.pathname,
+      titel: document.querySelector('#privateTitle')?.textContent || '',
+      kamers: [...document.querySelectorAll('#privateRooms .private-room')].map((a) => a.getAttribute('href')),
+      tekst: document.body.textContent || ''
+    }));
+    assert.equal(prive.pad, '/apps/sociaal-prive.html');
+    assert.match(prive.titel, /Ruimte voor wat niet openbaar hoeft/);
+    assert.deepEqual(prive.kamers, [
+      '/apps/meet.html', '/apps/vonk.html', '/apps/rendezvous.html',
+      '/apps/cercle.html', '/apps/entourage.html', '/apps/attenties.html'
+    ]);
+    assert.match(prive.tekst, /pas na uw bevestiging/);
+    await priveContext.close();
+
+    const page = await browser.newPage();
+    letOpFouten(page, fouten);
+    await zetSessie(page);
     await page.goto(base + '/apps/salon.html', { waitUntil: 'load' });
 
     // 1. de feed komt op en houdt op bij de eerste bladzijde, met een knop

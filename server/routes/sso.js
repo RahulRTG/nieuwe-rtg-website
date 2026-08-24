@@ -20,14 +20,18 @@
    het nog een halve minuut geldig was. Een tweede poging krijgt niets.
    ========================================================================== */
 const rem = require('../rem');
-const sso = require('../sso');
 const koppelingen = require('../sso/koppelingen');
 const oidc = require('../sso/oidc');
 const staat = require('../sso/staat');
+const binnenkomst = require('../sso/binnenkomst');
 const { log } = require('../log');
 
-const OVERDRACHT = 'sso-overdracht';
-const OVERDRACHT_MS = 60000;
+/* Geen destructurering, en dat is geen stijl. scripts/grenzen.js telt elk
+   `{ naam } = iets;` in een routebestand als een naam die uit de KERN wordt
+   gepakt -- `const { OVERDRACHT } = binnenkomst;` liet kernBreedte met een
+   stijgen voor een constante die niets met de kern te maken heeft. Een meter
+   met een blinde vlek voed je niet met ruis. */
+const OVERDRACHT = binnenkomst.OVERDRACHT;
 
 module.exports = (kern) => {
   const { app, accounts, appUrl, stateFor, logInlog } = kern;
@@ -97,17 +101,12 @@ module.exports = (kern) => {
         redirectUri: terugAdres(req), code: req.query.code, verifier: s.verifier
       }, { nonce: s.nonce });
 
-      const { user, nieuw, gekoppeld } = await sso.aanmelden(accounts, k, claims);
-      /* Wat er WEL in het logboek komt: dat er is ingelogd, via welke koppeling,
-         en of het een nieuw account was. Niet het e-mailadres, niet de naam --
-         het codenaam-ontwerp geldt ook voor onze eigen logregels. */
-      log.info('sso.inlog', { org: k.org, codenaam: user.codename, nieuw, gekoppeld });
-      if (typeof logInlog === 'function') logInlog('sso', true, k.org, req);
-
-      const bewijs = accounts.issueActionToken(user.id, OVERDRACHT, OVERDRACHT_MS);
-      const pas = user.tier === 'lifestyle' || user.tier === 'business' ? user.tier : 'rtg';
-      res.redirect(302, '/apps/app.html?pas=' + pas + '&sso=' + encodeURIComponent(bewijs) +
-        '&terug=' + encodeURIComponent(s.terug));
+      /* Alles wat hierna gebeurt -- aanmelden, loggen, de identiteitsbrug, het
+         overdrachtsbewijs, de terugreis -- staat in sso/binnenkomst.js, omdat
+         de SAML-deur er precies dezelfde vijf dingen moet doen. Twee kopieen
+         lopen uiteen, en dan hangt iemands rol af van welke knop hij gebruikte
+         (LAT-regel 4). */
+      await binnenkomst.binnen(kern, k, claims, req, res, s.terug, 'oidc');
     } catch (e) {
       /* De reden gaat het logboek in, niet het antwoord: "dit adres valt buiten
          de domeinen van deze koppeling" vertelt een buitenstaander meer over

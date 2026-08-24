@@ -17,9 +17,15 @@
    - `alcohol` volgt uit de categorie, een vlaggetje of de naam. De leeftijdsregel
      in kern/gast/beleid.js hangt eraan, dus raden mag hier niet stil gebeuren --
      wie het raadt, doet het hier, één keer, zichtbaar.
-   - `uitverkocht` komt uit de zaakinstelling. Hij wordt hier NIET weggefilterd:
-     de gastdeur laat zulke items niet kiezen, de bediening hoort te kunnen zien
-     dat iets op is. Wegfilteren zou van "op" een geheim maken.
+   - `uitverkocht` komt uit de zaakinstelling OF uit de keukencapaciteit. Hij
+     wordt hier NIET weggefilterd: de gastdeur laat zulke items niet kiezen, de
+     bediening hoort te kunnen zien dat iets op is. Wegfilteren zou van "op" een
+     geheim maken.
+   - `tijdelijkGepauzeerd` staat er apart naast, want het is een ANDER soort nee:
+     "op" is op, "gepauzeerd" is de keuken die de belofte eerlijk houdt en straks
+     weer aanzet. kern/gast/beleid.js zegt daarom ook een andere zin. Ze op één
+     hoop gooien zou de bediening een gast laten vertellen dat iets op is
+     terwijl het over tien minuten weer kan.
    - `twin` is de gepubliceerde chefversie, als die er is. Een concept hoort er
      niet in: dat is nog niemands waarheid. */
 'use strict';
@@ -32,14 +38,21 @@ module.exports = ({ findSupplier, horeca }) => {
     const menu = (s && Array.isArray(s.menu)) ? s.menu : [];
     const h = horeca.H(zaakcode);
     const uit = (h.instel && h.instel.uitverkocht) || {};
+    const capaciteitPauze = new Set(((h.etenCapaciteit || {}).gepauzeerdeItems || []).map(String));
     const twins = h.dishTwins || {};
     return menu.map((m) => ({
       id: m.id, naam: m.name, uitleg: m.desc || null, cat: m.cat || 'Overig',
       foto: m.foto || m.photo || m.image || null,
       centen: Math.round(Number(m.price) * 100), allergenen: Array.isArray(m.allergens) ? m.allergens : [],
+      ingredienten: Array.isArray(m.ingredienten) ? m.ingredienten : [],
+      dieet: Array.isArray(m.dieet) ? m.dieet : [],
+      opties: Array.isArray(m.opties) ? m.opties : [],
       station: m.station || null,
+      prepMin: m.prepMin || null,
       alcohol: !!m.alcohol || ALCOHOL.test(String(m.name || '')),
-      uitverkocht: !!uit[m.id], sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
+      uitverkocht: !!uit[m.id] || capaciteitPauze.has(String(m.id)),
+      tijdelijkGepauzeerd: capaciteitPauze.has(String(m.id)),
+      sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
       twin: twins[m.id] && twins[m.id].publicatie ? { versie: twins[m.id].publicatie.versie,
         presentatie: twins[m.id].publicatie.presentatie || null, service: twins[m.id].publicatie.service || null,
         pairing: twins[m.id].publicatie.pairing || null } : null

@@ -43,6 +43,20 @@ const REGELS = [
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],
   [/\/techniek|\/wacht|\/incident|\/storing/, 'techniek', 'Techniek & De Wacht'],
+  /* DE TENANT CONTROL PLANE, en met opzet TWEE regels en niet een. Deze routes
+     doen twee verschillende dingen, en dan hoort er niet een blanket-regel
+     overheen: wie het exportverzoek van een vertrekkende klant behandelt, is
+     niet wie een groep aan een rol hangt.
+
+     Het exit-recht, de bewaring en de bewijsstand zijn een AVG- en
+     contractzaak en liggen bij Juridisch. De bootstrap en de groepsafbeelding
+     zijn toegangsbeheer en liggen bij Intern & IT. */
+  [/\/api\/tenant\/(?:export|herstelproef|status)/, 'juridisch', 'Juridisch'],
+  /* Zonder afsluitende slash ook: de functiecatalogus draagt het PREFIX
+     `/api/tenant` als codepunt ("Tenant Control Plane"), en die viel met een
+     verplichte slash net buiten de regel. Een regel die de routes wel pakt en
+     de functie niet, dekt de helft en meldt zich niet. */
+  [/\/api\/tenant(?:\/|$)/, 'intern', 'Intern & IT'],
 
   /* Geld, handel en groei. */
   [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen/, 'financien', 'Financiën'],

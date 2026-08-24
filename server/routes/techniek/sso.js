@@ -19,6 +19,7 @@ const koppelingen = require('../../sso/koppelingen');
 const oidc = require('../../sso/oidc');
 const jwks = require('../../sso/jwks');
 const scim = require('../../scim');
+const saml = require('../../sso/saml');
 const { log } = require('../../log');
 
 const { veiligeFout } = require('../../kern/util');
@@ -104,6 +105,27 @@ module.exports = (tctx) => {
     if (!scim.sleutels.weg(req.params.org)) return res.status(404).json({ error: 'Deze organisatie heeft geen SCIM-sleutel.' });
     log.warn('scim.sleutel ingetrokken', { org: String(req.params.org).toLowerCase(), door: wie(req) });
     res.json({ ok: true });
+  });
+
+  /* ---------- de SAML-kant van dezelfde koppeling ----------
+
+     Geen tweede koppeling maar drie velden erbij op de bestaande: of een
+     organisatie via OIDC of via SAML binnenkomt, is een eigenschap van die
+     koppeling. Twee koppelingen zouden twee domeinlijsten betekenen die uiteen
+     kunnen lopen -- en de domeinlijst IS de beveiliging.
+
+     Het certificaat wordt hier meteen gelezen. Een certificaat dat pas bij de
+     eerste inlog onleesbaar blijkt, is een storing op het slechtste moment. */
+  app.post('/api/techniek/sso/saml', techAuth, eigenaarAlleen, (req, res) => {
+    const b = req.body || {};
+    try {
+      const uit = saml.zetSaml({ org: b.org, entityId: b.entityId, ssoUrl: b.ssoUrl, certificaat: b.certificaat });
+      log.info('sso.saml gezet', { org: uit.org, door: wie(req) });
+      res.json({ ok: true, saml: { org: uit.org, samlEntityId: uit.samlEntityId, samlSsoUrl: uit.samlSsoUrl },
+        let_op: 'Vul bij uw provider ons antwoordadres /api/sso/saml/acs in. Onze metadata staat op /api/sso/saml/metadata.' });
+    } catch (e) {
+      res.status(400).json({ error: veiligeFout(e) });
+    }
   });
 
   /* De proef op de som: bereikt de server de provider, en klopt zijn discovery?

@@ -25,6 +25,7 @@ const DINER = ['18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '2
    middernacht een tijdslot van gisteren of morgen opleverde. De zone komt uit
    kern/tijdzone.js, dezelfde die de vakwerk-agenda en de Mall gebruiken. */
 const { nuBijZaak } = require('./tijdzone');
+const etenCapaciteit = require('./eten/capaciteit');
 const naarMinuten = (t) => Number(String(t).slice(0, 2)) * 60 + Number(String(t).slice(3, 5));
 
 function maakFoodcourt({ db, save, crypto }) {
@@ -65,7 +66,9 @@ function maakFoodcourt({ db, save, crypto }) {
     const fc = s.foodcourt || {};
     const menu = Array.isArray(s.menu) ? s.menu : [];
     const rs = (db.data.reviewStats || {})[s.code];
-    const bezorg = db.data.horeca && db.data.horeca[s.code] && db.data.horeca[s.code].bezorg;
+    const horecaDoos = db.data.horeca && db.data.horeca[s.code];
+    const bezorg = horecaDoos && horecaDoos.bezorg;
+    const etenCap = etenCapaciteit.bereken(horecaDoos || {});
     const zones = bezorg && Array.isArray(bezorg.zones) ? bezorg.zones : [];
     const minimum = (veld) => {
       const waarden = zones.map(z => Number(z && z[veld])).filter(n => Number.isFinite(n) && n > 0);
@@ -80,7 +83,7 @@ function maakFoodcourt({ db, save, crypto }) {
       deal: fc.deal || null,
       bio: s.salon && s.salon.bio ? String(s.salon.bio).slice(0, 200) : null,
       fotos,
-      open: !(s.settings && s.settings.ordersOpen === false),
+      open: !(s.settings && s.settings.ordersOpen === false) && etenCap.open,
       reserverenOpen: !(s.settings && s.settings.reservationsOpen === false),
       capaciteit: capaciteit(s),
       rating: rs && rs.aantal ? { score: Math.round((rs.som / rs.aantal) * 10) / 10, aantal: rs.aantal } : null,
@@ -88,11 +91,13 @@ function maakFoodcourt({ db, save, crypto }) {
       categorieen: [...new Set(menu.map(m => m && m.cat).filter(Boolean))].slice(0, 12),
       vanafCenten: minimumMenuPrijs(menu),
       bezorgen: zones.length > 0,
-      bezorgOpen: zones.length > 0 && bezorg.open !== false,
-      bezorgMinuten: minimum('minuten'),
+      bezorgOpen: zones.length > 0 && bezorg.open !== false && etenCap.open,
+      bezorgMinuten: (minimum('minuten') || 0) + etenCap.extraMinuten || null,
       bezorgkostenVanaf: minimum('kostenCenten') || (zones.some(z => Number(z && z.kostenCenten) === 0) ? 0 : null),
       minimumVanaf: minimum('minimumCenten'),
-      gratisVanaf: minimum('gratisVanafCenten')
+      gratisVanaf: minimum('gratisVanafCenten'),
+      afhalenPromoten:etenCap.afhalenPromoten,
+      capaciteitStand:etenCap.open ? etenCap.stand : 'gepauzeerd'
     };
   }
 

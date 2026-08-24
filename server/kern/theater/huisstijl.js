@@ -27,8 +27,17 @@
    Krijgt de gedeelde ctx van kern/theater/index.js. */
 'use strict';
 
-const STANDAARD_ACCENT = '#7F1634';        // de bordeaux van RTG, tot een zaak iets anders kiest
-const MAX_LOGO = 60000;                    // een klein beeld; dit is geen mediabibliotheek
+/* WAT EEN GELDIG MERK IS, STAAT NIET MEER HIER. Dit bestand had zijn eigen
+   kopie van "een accentkleur is een hexcode" en "een thema is licht of donker",
+   en zo ook kern/webmerk.js en kern/journalistiek.js. Vier kopieen van dezelfde
+   regel, en ze waren al uit elkaar gelopen: hier gaf een foute kleur een 400,
+   daar werd hij STIL genegeerd -- dus dezelfde invoer gaf op de ene plek een
+   melding en op de andere de stille indruk dat het gelukt was. Nu leest deze
+   module de definitie (kern/tenant/merkkern.js) en bewaart hij zelf. */
+const merkkern = require('../tenant/merkkern');
+
+const STANDAARD_ACCENT = merkkern.STANDAARD_ACCENT;
+const MAX_LOGO = merkkern.MAX_LOGO;
 
 module.exports = (ctx) => {
   const { save, zakenVan } = ctx;
@@ -59,25 +68,9 @@ module.exports = (ctx) => {
     const k = ctx.zaak.kanaalVanZaak(code);
     if (!k) return { status: 404, error: 'Deze zaak heeft nog geen interne bibliotheek.' };
     const zaak = zakenVan(key).find(z => z.code === code);
-    k.huisstijl = k.huisstijl || {};
-    if (o.naam != null) k.huisstijl.naam = ctx.schoon(o.naam, 60);
-    if (o.payoff != null) k.huisstijl.payoff = ctx.schoon(o.payoff, 100);
-    if (o.accent != null) {
-      if (!/^#[0-9a-fA-F]{6}$/.test(String(o.accent)))
-        return { status: 400, error: 'Een accentkleur is een hexcode, bijvoorbeeld #7F1634.' };
-      k.huisstijl.accent = String(o.accent).toUpperCase();
-    }
-    if (o.thema != null) {
-      if (!['licht', 'donker'].includes(o.thema)) return { status: 400, error: 'Een thema is licht of donker.' };
-      k.huisstijl.thema = o.thema;
-    }
-    if (o.logo != null) {
-      const s = String(o.logo);
-      if (s === '') delete k.huisstijl.logo;
-      else if (!/^data:image\/(png|jpeg|webp);base64,/.test(s) || s.length > MAX_LOGO)
-        return { status: 400, error: 'Een logo is een klein png-, jpeg- of webp-beeld (tot 60 kB).' };
-      else k.huisstijl.logo = s;
-    }
+    const uit = merkkern.leesMerkvelden(o, k.huisstijl || {}, ctx.schoon);
+    if (uit.error) return { status: uit.status || 400, error: uit.error };
+    k.huisstijl = uit.merk;
     save();
     return { status: 200, ok: true, huisstijl: van(k, zaak && zaak.naam) };
   }

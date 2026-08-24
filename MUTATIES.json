@@ -6155,6 +6155,13 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "vertrouwenbon.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "vertrouweninlog.test.js": {
       "soort": "server",
       "staat": "gezakt",

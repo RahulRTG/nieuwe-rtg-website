@@ -28,6 +28,7 @@ const register = require('./register');
 const verificatie = require('./verificatie');
 const stapop = require('./stapop');
 const tweedemoment = require('./tweedemoment');
+const bon = require('./bon');
 
 module.exports = ({ db, save }) => {
   /* De bak hangt buiten de werkruimtes, en dat is een besluit: een gewoonte is
@@ -82,7 +83,7 @@ module.exports = ({ db, save }) => {
     const ver = sessie ? verificatieVan(sessie) : null;
     const st = stapop.beoordeel(b, ver);
     b.stapop = st;
-    if (!st.nodig) return { door: true, blootstelling: b };
+    if (!st.nodig) return { door: true, blootstelling: b, verificatie: ver };
     if (!st.mogelijk) return { door: false, status: 403,
       antwoord: { error: st.zin, waarom: st.waarom, blootstelling: b } };
 
@@ -95,8 +96,29 @@ module.exports = ({ db, save }) => {
     if (!bon) return vraagOpnieuw(null);
     const v = tweedemoment.verzilver(bak(), { sessie, soort, aantal, doel, id: bon });
     save();
-    return v.ok ? { door: true, blootstelling: b, bevestigd: true } : vraagOpnieuw(v.reden);
+    return v.ok ? { door: true, blootstelling: b, verificatie: ver, bevestigd: true } : vraagOpnieuw(v.reden);
   }
+
+  /* DE BON SCHRIJVEN, na afloop. Apart van poort() en met opzet: de poort weet
+     nog niet of de handeling is gelukt, en een bon die "uitgevoerd" beweert
+     voordat dat vaststaat, is precies de bewering zonder bron waar deze hele
+     laag tegen is. De aanroeper roept dit dus NA de handeling aan, met de
+     uitslag erbij. */
+  function schrijfBon(gegevens) {
+    const b = bon.schrijf(bak(), gegevens);
+    save();
+    return b;
+  }
+  /* De bon uit een poortuitslag plus de afloop. Zo hoeft een deur de vier
+     metingen niet zelf weer bij elkaar te zoeken -- en kan hij ze ook niet per
+     ongeluk anders samenstellen dan de poort ze heeft gedaan. */
+  function bonNaPoort(uitslag, extra) {
+    const u = uitslag || {};
+    return schrijfBon(Object.assign({ blootstelling: u.blootstelling, verificatie: u.verificatie,
+      stapop: u.blootstelling && u.blootstelling.stapop, bevestigd: !!u.bevestigd }, extra || {}));
+  }
+  const bonnen = (hoeveel) => bon.lees(bak(), hoeveel);
+  const bonnenKlopt = () => bon.controleer(bak());
 
   /* De bon oplossen. De aanroeper (routes/vertrouwen.js) heeft de mens al
      opnieuw geverifieerd; zie de kop van tweedemoment.js. */
@@ -118,5 +140,6 @@ module.exports = ({ db, save }) => {
   }
 
   return { weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, geenPersoon, poort, losBon,
+    schrijfBon, bonNaPoort, bonnen, bonnenKlopt,
     register, NIET_GEDEKT: gewoonte.NIET_GEDEKT };
 };

@@ -26,8 +26,7 @@ module.exports = (tctx) => {
     catch (e) { return null; }
   };
   const T = () => kern.tenant;
-  /* De sessiesleutel voor de Trust Fabric: het token dat techAuth al heeft
-     laten verifieren (zie routes/techniek.js). Niet zelf de kop lezen. */
+  /* De sessiesleutel: het token dat techAuth al liet verifieren. */
   const sessieVan = (req) => String(req.techSessie || '');
 
   app.get('/api/techniek/tenant', techAuth, eigenaarAlleen, (req, res) => {
@@ -107,9 +106,8 @@ module.exports = (tctx) => {
   /* Vernietigen. Onomkeerbaar, dus met de drie deuren ervoor in de kern en
      niet hier: een controle in een route is een controle die de volgende
      aanroeper mist. */
-  /* HET TWEEDE MOMENT (VERTROUWEN.md laag 3). Vernietigen is onherstelbaar en
-     staat daarom in het register als `minstens: 'uitzonderlijk'`: die vragen
-     elke keer een bevestiging die aan deze ene handeling vastzit. */
+  /* HET TWEEDE MOMENT (VERTROUWEN.md laag 3). Vernietigen staat in het register
+     als `minstens: 'uitzonderlijk'`: die vraagt elke keer een gebonden bon. */
   app.post('/api/techniek/tenant/bevestig', techAuth, eigenaarAlleen, async (req, res) => {
     const b = req.body || {};
     if (!await accounts.verifyPassword(String(b.wachtwoord || ''), req.techUser.password_hash))
@@ -117,11 +115,16 @@ module.exports = (tctx) => {
     const sessie = sessieVan(req);
     const uit = kern.vertrouwen.losBon(String(b.id || ''), sessie);
     if (!uit.ok) return res.status(400).json({ error: uit.reden });
-    /* En de sessie is weer VERS: daarom vraagt een ZWARE handeling daarna een
-       kwartier lang niets meer. Zie kern/vertrouwen/tweedemoment.js. */
+    /* En de sessie is weer VERS -- zie kern/vertrouwen/tweedemoment.js. */
     kern.vertrouwen.verifieer(sessie, { hoe: 'wachtwoord', account: 'user-' + req.techUser.id,
       apparaat: String(req.get('user-agent') || '') + '|' + String(req.get('accept-language') || '') });
     res.json({ ok: true });
+  });
+
+  /* De bonnen teruglezen, met de ketencontrole. Staat hier omdat de enige poort
+     die bonnen schrijft de vernietiging is; bij een tweede verhuist hij mee. */
+  app.post('/api/techniek/vertrouwen/bonnen', techAuth, eigenaarAlleen, (req, res) => {
+    res.json({ bonnen: kern.vertrouwen.bonnen((req.body || {}).hoeveel), keten: kern.vertrouwen.bonnenKlopt() });
   });
 
   app.post('/api/techniek/tenant/vernietig', techAuth, eigenaarAlleen, (req, res) => {
@@ -136,6 +139,9 @@ module.exports = (tctx) => {
     if (!poort.door) return res.status(poort.status).json(poort.antwoord);
     const uit = T().levensloop.vernietig(b.org, { door });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    /* De Trust Receipt (laag 5), NA afloop -- zie kern/vertrouwen/bon.js. */
+    kern.vertrouwen.bonNaPoort(poort, { soort: 'tenant.vernietig', doel: String(b.org || ''),
+      aantal: 1, actor: 'user-' + req.techUser.id, poort: 'techAuth + eigenaarAlleen', uitgevoerd: true });
     log.warn('tenant vernietigd', { org: String(b.org || '').toUpperCase(), door: wie(req),
       werkruimtes: uit.bewijs.werkruimtes.length });
     res.json(uit);

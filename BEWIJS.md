@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1057 bestanden en 7058 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1058 bestanden en 7064 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1057 |
-| losse beweringen (`test(...)`) | 7058 |
+| toetsbestanden | 1058 |
+| losse beweringen (`test(...)`) | 7064 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 893 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 894 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-928 bestanden, 6835 beweringen.
+929 bestanden, 6841 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -877,6 +877,7 @@ toets omvalt.
 | `verraadtelling.test.js` | 13 | gezakt op `===->!==#0` | DE ZES GETALLEN VAN DE VERRAADRONDE (scripts/lib/verraadtelling.js). WAAROM DEZE APART GETOETST WORDEN. |
 | `vertaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Vertaler: een dunne route op de bestaande vertaalmotor. Zonder AI-sleutel vertaalt het huiswoordenboek (nl<->en) en is de app eerlijk over wat niet lukt (vertaald:false), nooit kapot. |
 | `vertrouwenblootstelling.test.js` | 11 | gezakt op `===->!==#0` | DE BLOOTSTELLINGSMETER -- laag 1 van de Trust Fabric. Zes beweringen die van buiten niet te zien zijn. |
+| `vertrouwenbon.test.js` | 6 | gezakt op `liegpoort /api/` | DE TRUST RECEIPT -- laag 5 van de Trust Fabric. Een bon zegt waarom een handeling MOCHT. |
 | `vertrouweninlog.test.js` | 3 | gezakt op `liegpoort /api/` | DE VERIFICATIE WORDT BIJ DE INLOG ECHT VASTGELEGD -- laag 2 van de Trust Fabric, aan de kant waar hij aan de server hangt. WAAROM DEZE TOETS BESTAAT, en dat is een les uit deze ronde zelf. |
 | `vertrouwenpoort.test.js` | 7 | gezakt op `liegpoort /api/` | HET TWEEDE MOMENT -- de step-up die echt gevraagd en echt gegeven wordt. Laag 3 velde het oordeel; dit is het moment zelf. |
 | `vertrouwenstapop.test.js` | 8 | gezakt op `===->!==#0` | DE VERIFICATIESTERKTE EN DE STEP-UP -- laag 2 en 3 van de Trust Fabric. Deze toetsen gaan bijna allemaal over NIET vragen, en dat is met opzet. |

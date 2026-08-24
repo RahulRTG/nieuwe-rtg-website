@@ -139,9 +139,19 @@ handhaver echt uitzet (`scripts/wetten.js`, `sabotage.js`), de mutatiemotor.
 Dit is het sterkste dat dit huis heeft, en het is de reden dat de rest hierboven
 te bouwen valt. Elke bewering van de Trust Fabric hangt hieraan.
 
-Ontbreekt: **de bewijzen zijn niet per handeling.** De poort bewijst
-eigenschappen van een tenant, niet van een besluit dat vanmiddag om 14:07 is
-genomen.
+Sinds laag 5 is er ook een bewijs PER HANDELING: de Trust Receipt
+(`server/kern/vertrouwen/bon.js`). Een bon zegt niet wat er gebeurde -- dat doen
+het inzagejournaal en het tenantjournaal al -- maar op grond waarvan het mocht,
+als een rijtje beweringen die elk hun bron dragen. Wat niet gemeten is, staat
+erin als `nietVastgesteld` MET de reden, en niet als een regel die ontbreekt:
+een ontbrekende regel leest als "niet van toepassing", en dat is iets anders
+dan "wij weten het niet". De bonnen hangen aan de hashketen van
+`server/lib/keten.js`, dezelfde die het inzagejournaal gebruikt.
+
+Ontbreekt nog: er wordt alleen een bon geschreven waar een poort staat, en dat
+is vandaag een handeling. En de keten betrapt stille wijziging, niet een
+vastberaden beheerder die hem opnieuw uitrekent -- daarvoor moet de top naar
+buiten, en dat gebeurt hier nog niet.
 
 ## 3. De grenzen — dit is de belangrijkste paragraaf
 

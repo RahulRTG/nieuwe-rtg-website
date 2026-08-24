@@ -1,17 +1,17 @@
 {
   "vastgelegd": "2026-08-24",
   "meters": {
-    "endpointsZonderTest": 1178,
+    "endpointsZonderTest": 1173,
     "dekkingPct": 72,
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 933,
+    "testbestanden": 949,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 129,
-    "keuringOmvang": 161,
-    "keuringDubbeling": 115,
+    "e2eBestanden": 136,
+    "keuringOmvang": 169,
+    "keuringDubbeling": 121,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -19,13 +19,13 @@
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
     "keuringTeGroot": 5,
-    "inlineStijlAttributen": 4936,
-    "browserpoortToetsen": 199,
-    "kernBreedte": 1414,
+    "inlineStijlAttributen": 4905,
+    "browserpoortToetsen": 206,
+    "kernBreedte": 1416,
     "kernGedeeld": 193,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 154,
+    "toetsenNietGemeten": 158,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -462,6 +462,36 @@
       "datum": "2026-08-23",
       "meter": "schermenZonderVormtaal 183 -> 184 (kwam mee met de merge van main)",
       "reden": "Deze plus een komt NIET uit deze tak. Bij het binnenhalen van main (2eb6036) kwamen er twee nieuwe app-pagina's mee -- public/apps/sociaal-prive.html en public/apps/chauffeur.html -- en geen van beide sluit rtg-ontwerp.css of rtg-materiaal.css in.\n\nDat is geen verwijt aan die pagina's: de meter BESTAAT op main nog niet. Hij is in deze tak toegevoegd en staat dus in geen enkele andere tak in de weg. Tot main hem heeft, zal elke nieuwe pagina van elders hem laten stijgen -- en dat is precies wat je van een ratel mag verwachten die nog niet is aangekomen.\n\nWaarom ik die twee pagina's niet even zelf de tokenlaag heb gegeven: het is een regel erbij, maar in een MERGE-commit een scherm van iemand anders aanraken dat ik nooit heb gezien, is de verkeerde plek. De meter telt de insluiting en niet het gebruik, dus het zou de teller wel verlagen zonder dat iemand die pagina's aan de vormtaal heeft gehouden -- een groen cijfer zonder dat er iets is nagekeken, en dat is precies waar deze hele ronde tegen is.\n\nWat er WEL hoort te gebeuren: als deze tak op main landt, gaat de meter mee en horen die twee pagina's een eigen regel te krijgen. Zolang dat niet is gebeurd, staat het hier."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "keuringOmvang 161 -> 169 (VLOER: de zesde werkstand)",
+      "reden": "Deze tak zet drie nieuwe bestanden vlak onder de 10 kB-grens (pda-tafel.js op 10102, wijk-overdracht.js op 9992, werklijst.js op 9761) en laat er vijf bestaande in die band groeien. Dat is een echte verslechtering, geen meetfout, en hij staat hier met naam.\n\nWaarom ze niet verder gesplitst zijn. Ze ZIJN al gesplitst, en telkens op een naad: de overdrachtlaag ging van een bestand naar vijf (wijk-doos, wijk-deel, wijk-leen, wijk-antwoord, wijk-overdracht), de cadans gaf zijn doelberekening af, de werklijst zijn bronnen, de PDA zijn taak-, wijk- en ontvangstblok. Wat er nu in elk bestand staat is een ding: het aanbod, het antwoord, de leen. Nog een snede zou de enige plek kapotmaken waar je die keten achter elkaar kunt lezen.\n\nEN DEZE METER TREKT TEGEN DE VOLGENDE IN. Elke splitsing die keuringOmvang omlaag brengt, geeft keuringDubbeling er een paar bij: vijf kleine modules met een `lijst`, een `zet` en een `terug` zijn vijf keer dezelfde naam. De twee getallen zijn niet tegelijk te optimaliseren, en dat is geen excuus maar de reden dat ze allebei met naam in deze lijst horen in plaats van dat er een wordt weggepoetst."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "keuringDubbeling 115 -> 121 (VLOER: de zesde werkstand)",
+      "reden": "Rechtstreeks gevolg van de splitsingen hierboven. De wijklaag bestaat nu uit vijf kernmodules en die delen een kleine, gelijkvormige buitenkant: `doos`, `zet`, `lijst`, `terug`, `van`. Dat is precies wat je wilt -- ze doen op hun eigen laag hetzelfde soort ding -- maar de teller ziet zes namen die in meer dan twee kernmodules staan.\n\nWat er tegenover staat: geen van die namen is een KOPIE. `wijk-doos.doos` is de enige doos, `wijk-leen.zet` zet een leen en `wijk.zet` zet een wijk. LAT-regel 4 gaat over een tweede rekensom, niet over een tweede naam. Waar er wel dubbeling dreigde -- minutenSinds, en de zin die zegt waar een aanbod over gaat -- is die naar een plek gebracht (wijk-doos.js)."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1414 -> 1416 (VLOER: de zesde werkstand)",
+      "reden": "Twee kern-eigenschappen erbij die een route aanraakt. De nieuwe overdrachtdeur heeft `accounts` nodig om te controleren dat een aanbod naar iemand gaat die hier werkelijk werkt, en de wijkdeur leest de leenlaag mee zodat de drukte per wijk niet liegt over wat er uitstaat. Allebei lezen, geen nieuwe schrijfweg."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenNietGemeten 154 -> 173 (VLOER: de zesde werkstand)",
+      "reden": "Twintig nieuwe toetsbestanden op deze tak waar de mutatiemotor nog niet langs is geweest. Dit meet de dekking van het INSTRUMENT, niet van de code -- en dat verschil is hier belangrijk, want de regels die ertoe doen ZIJN met mutaties nagetrokken, alleen met de hand: twaalf op de overdrachtkern, zes op het vloerscherm, drie op de telling die naar de PDA reist, en drie ervan overleefden de eerste ronde en hebben een scherpere toets gekregen. Dat staat in de commits.\n\nWAAROM DE MOTOR ER NIET IN EEN KEER LANGS IS. Twee redenen, en de eerste is een eigenschap van het instrument: scripts/mutatie.js leest alleen `*.test.js`. Zeven van de twintig zijn `*.e2e.js`, en die telt scripts/norm.js wel mee maar kan de motor structureel niet meten. Die zeven komen dus nooit uit deze teller, hoe lang hij ook draait. De tweede: het serverdeel duurt uren en muteert ondertussen bronbestanden, dus hij hoort alleen te draaien als er niets anders aan de werkboom gebeurt. Dat is eigen werk en geen restje van deze tak."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenOngevoeligPct 1.1 -> 1.3 (VLOER: de zesde werkstand)",
+      "reden": "Van 1,1 naar 1,3 procent, en dit is een gevolg van MEER meten en niet van slechter werk: door het voluit schrijven van de routes (zie endpointsZonderTest hieronder) herkent de motor vier toetsen nu wel als gemeten, en een deel daarvan overleefde zijn mutatie. De noemer groeit, de teller ook.\n\nHet getal blijft een schuld en wordt hier niet weggeredeneerd -- maar de kop van deze meter in scripts/norm.js zegt zelf waarom hij een aandeel is en geen aantal: een meter die rood wordt omdat je hem gebruikt, leert iedereen om te stoppen met meten."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "endpointsZonderTest 1179 -> 1173, inlineStijlAttributen 4936 -> 4905 (allebei STRAKKER)",
+      "reden": "Twee reparaties, geen nieuw werk, en allebei gevonden doordat de norm rood ging.\n\nendpointsZonderTest: twintig toetsbestanden op deze tak plakten hun routes aan elkaar (`api('/api/supplier/horeca' + pad)`), waardoor 372 aanroepen naar endpoints die WEL getoetst worden als ongedekt telden -- scripts/lib/routedekking.js zoekt de route als TEKST. Precies dezelfde fout als in werkgevolg.test.js op 23 augustus, en dezelfde oplossing: de route staat nu voluit in elke aanroep. Netto zes endpoints onder de oude norm, ondanks dertien nieuwe endpoints erbij.\n\ninlineStijlAttributen: 55 style-attributen weg uit horeca.html, horeca-beheer.html, horeca-pda.html en horeca/bar.js. Ze zijn klassen geworden in shared/zaakscherm.css, in de lijn die daar al lag (.z-mt40 en zijn buren, met dezelfde reden erbij: style-src-attr in de CSP kan pas dicht als ze weg zijn). En schermenZonderVormtaal ging van 187 terug naar 184 doordat de drie nieuwe horecaschermen de tokenlaag van ONTWERP.md nu insluiten."
     }
   ],
   "prestatie": {

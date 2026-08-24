@@ -25,6 +25,8 @@
 
 module.exports = ({ db, save, crypto, schoon, horeca }) => {
   const { H, nu, id } = horeca;
+  // wie er aan een rekening zit is één rekensom; zie de opmerking bij schuifAan
+  const gezelschap = require('../horeca/gezelschap')({ horeca, schoon });
 
   const afdruk = (t) => crypto.createHash('sha256').update(String(t || '')).digest('hex');
 
@@ -129,7 +131,12 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
     if (!Array.isArray(r.deelnemers)) r.deelnemers = [];
     if (r.deelnemers.length >= 40) return { status: 409, error: 'Er zitten al veertig mensen op deze rekening.' };
     const sleutel = crypto.randomBytes(16).toString('hex');
-    const nr = r.deelnemers.reduce((m, d) => Math.max(m, d.nr), 0) + 1;
+    /* Het nummer komt uit kern/horeca/gezelschap.js en wordt hier niet zelf
+       gerekend. Dat was wel zo (`max(nr) + 1`), en dat hergebruikt een nummer
+       zodra er iemand is opgestaan -- terwijl de bedieningsdeur op dezelfde
+       rekening dat juist niet doet. Twee gedragingen op één model is precies
+       wat er niet moet gebeuren (LAT-regel 4). */
+    const nr = gezelschap.volgendNummer(r);
     const deelnemer = {
       nr,
       handle: schoon(codenaam, 40) || schoon(naam, 40) || ('Gast ' + nr),

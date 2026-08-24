@@ -21,13 +21,18 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+/* DE BROWSER KOMT UIT ./browser.js EN NIET UIT EEN EIGEN KOPIE. Hier stond een
+   eigen laadPlaywright() plus een hardgecodeerd executablePath naar
+   /opt/pw-browsers/chromium -- het pad van de ontwikkelcontainer waarin dit is
+   geschreven. Dat pad bestaat niet op een GitHub-runner, dus deze drie toetsen
+   vielen daar om met "Executable doesn't exist" terwijl ze hier groen stonden.
+
+   Dat is precies de fout waarvoor ./browser.js is gemaakt: die probeert te
+   STARTEN in plaats van te laden, loopt alle kandidaten af en slaat pas over als
+   er echt geen browser opengaat. Een eigen pad ernaast maakt van "kies een
+   browser" weer een vraag met twee antwoorden (LAT-regel 4). */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 async function api(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -98,7 +103,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
       { sleutel: 'cel-proef', machtigingen: ['opslag.eigen'] }, lid)).status, 200);
 
     // ---- de browser ----
-    browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = letOpFouten(page, []);
     await page.goto(base + '/apps/app.html');
@@ -174,7 +179,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
     await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
 
-    browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
 
     // ---- de winkel in de Mall ----
     const page = await browser.newPage();
@@ -322,7 +327,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
 
-    browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
 
     /* ---- eerst de keuringskant: hier moet een MENS aftekenen ---- */
     const kp = await browser.newPage();

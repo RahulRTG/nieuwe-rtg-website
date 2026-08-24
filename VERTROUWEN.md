@@ -92,8 +92,9 @@ Ontbreekt nog: de pincode van medewerkers en leveranciers loopt langs een
 eigen sessiesysteem (`supplierAuth`) dat deze laag helemaal niet raakt — daar
 staat dus geen poort van laag 3 achter, en dat is een andere reparatie dan
 deze. En een SSO-sessie heeft in dit huis geen wachtwoord: hij kan een tweede
-moment dus wel krijgen maar niet GEVEN, want beide bevestigingsdeuren vragen om
-iets dat hij niet heeft. Zie par. 6.
+moment krijgen EN geven, maar alleen met een passkey -- beide
+bevestigingsdeuren vragen verder om iets wat een SSO-account niet heeft. Zie
+par. 6.
 
 ### 2.2 Mag — Authority Fabric
 
@@ -499,12 +500,39 @@ zelf te zacht is. Dat is dezelfde "nodig, maar onmogelijk" één laag hoger, en
 het is niet met een uitzondering op te lossen — een deur die zachter wordt
 zodra iemand er niet doorheen komt, is geen deur.
 
-Wat het wél oplost is een **passkey als tweede moment**. WebAuthn staat er al
-volledig (`server/webauthn/`, `routes/auth/webauthn.js`), en een passkey is de
-enige manier in dit huis met de band `sterk`. Wie via zijn provider binnenkomt
-en een passkey heeft, kan zich daarmee opnieuw bewijzen — onafhankelijk van hoe
-hij is ingelogd, wat precies is wat een step-up hoort te zijn. Dat is de
-volgende stap en hij staat hier als openstaand punt tot hij er is.
+**En dat is opgelost met een passkey als tweede moment.** Een passkey erft
+niets: hij is de enige manier hier met de band `sterk`, hij zit aan een
+apparaat in plaats van aan een herhaalbaar geheim, en hij staat volledig los
+van de manier waarop de sessie ontstond. Dat is precies wat een tweede
+bewijsvoering hoort te zijn — en niet dezelfde sleutel nog een keer.
+
+Beide bevestigingsdeuren nemen hem aan (`kern/vertrouwen/passkeystap.js`):
+
+- `POST /api/bedrijf/bevestig` — met een passkey vervallen de eisen aan de
+  RTG-inlog; de passkey ís dat verse harde moment. Het lid-token, de koppeling
+  en het account moeten alle drie nog steeds kloppen.
+- `POST /api/techniek/tenant/bevestig` — een wachtwoord óf een passkey. Wie
+  geen wachtwoord heeft leest dat ook in de weigering, in plaats van een 403
+  waar niets uit valt op te maken.
+
+Drie dingen die deze weg met opzet níét doet. Hij **munt geen sessie** —
+`/api/webauthn/login` doet dat wel en is daarom niet hergebruikt; een step-up
+die een tweede sleutel oplevert vergroot de blast radius in plaats van hem te
+begrenzen. Hij eist dat de passkey **van deze mens** is, twee keer: de ceremonie
+is al aan het account gebonden en de uitkomst wordt er nog een keer naast
+gelegd (dat die twee elkaar dekken is nagemeten, niet aangenomen). En de
+**grens waarbinnen een passkey geldt komt uit onze eigen configuratie**, nooit
+uit een kop van het verzoek — wie de Host-kop mag verzinnen, verzint anders het
+domein waartegen zijn eigen handtekening wordt gecontroleerd.
+
+Wat het niet oplost: wie geen passkey heeft, heeft deze weg niet. Voor een
+SSO-account zonder passkey blijft de stand zoals hij was, en de deur zegt dat
+met zoveel woorden.
+
+Het tweede moment van de techniekkant is bij die verbouwing verhuisd van
+`routes/techniek/tenant.js` naar `routes/techniek/vertrouwen.js`: een bon
+oplossen is een handeling van de fabric en niet van een tenant, en de twee
+manieren om hem te geven horen naast elkaar te staan.
 
 Toen elke soort een reden kreeg, viel het aantal openstaande punten even op
 nul. Dat is precies de gunstige nul waar par. 3.2 tegen is. De toets eist

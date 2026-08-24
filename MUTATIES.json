@@ -6185,6 +6185,13 @@
       "gezakt": 3,
       "scherp": "overleefd"
     },
+    "vertrouwenpasskey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "vertrouwenpoort.test.js": {
       "soort": "server",
       "staat": "gezakt",

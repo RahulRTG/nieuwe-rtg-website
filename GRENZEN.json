@@ -104,6 +104,7 @@
     ],
     "bedrijf": [
       "agenda",
+      "appUrl",
       "assetBeeld",
       "assetMet",
       "bedrijf",
@@ -114,6 +115,8 @@
       "rtmailVak",
       "tenant",
       "vertrouwen",
+      "webauthnLoginMaak",
+      "webauthnLoginOpties",
       "werkplekken"
     ],
     "bestanden": [
@@ -1877,6 +1880,7 @@
     "techniek": [
       "LANDEN",
       "antivirus",
+      "appUrl",
       "archief",
       "av",
       "bank",
@@ -1914,6 +1918,8 @@
       "tenant",
       "vertrouwen",
       "wacht",
+      "webauthnLoginMaak",
+      "webauthnLoginOpties",
       "zekeringMag"
     ],
     "tenant": [

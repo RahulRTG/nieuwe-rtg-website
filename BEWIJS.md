@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1061 bestanden en 7091 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1062 bestanden en 7095 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1061 |
-| losse beweringen (`test(...)`) | 7091 |
+| toetsbestanden | 1062 |
+| losse beweringen (`test(...)`) | 7095 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 897 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 898 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-932 bestanden, 6868 beweringen.
+933 bestanden, 6872 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -881,6 +881,7 @@ toets omvalt.
 | `vertrouwenblootstelling.test.js` | 11 | gezakt op `===->!==#0` | DE BLOOTSTELLINGSMETER -- laag 1 van de Trust Fabric. Zes beweringen die van buiten niet te zien zijn. |
 | `vertrouwenbon.test.js` | 6 | gezakt op `liegpoort /api/` | DE TRUST RECEIPT -- laag 5 van de Trust Fabric. Een bon zegt waarom een handeling MOCHT. |
 | `vertrouweninlog.test.js` | 5 | gezakt op `liegpoort /api/` | DE VERIFICATIE WORDT BIJ DE INLOG ECHT VASTGELEGD -- laag 2 van de Trust Fabric, aan de kant waar hij aan de server hangt. WAAROM DEZE TOETS BESTAAT, en dat is een les uit deze ronde zelf. |
+| `vertrouwenpasskey.test.js` | 4 | gezakt op `liegpoort /api/` | EEN PASSKEY ALS TWEEDE MOMENT -- de step-up die niets erft van hoe je binnenkwam. HET GAT DAT DIT DICHT IS DOOR DEZE LAAG ZELF GEMAAKT, en dat maakt hem het waard om apart te toetsen. |
 | `vertrouwenpoort.test.js` | 7 | gezakt op `liegpoort /api/` | HET TWEEDE MOMENT -- de step-up die echt gevraagd en echt gegeven wordt. Laag 3 velde het oordeel; dit is het moment zelf. |
 | `vertrouwenstapop.test.js` | 8 | gezakt op `===->!==#0` | DE VERIFICATIESTERKTE EN DE STEP-UP -- laag 2 en 3 van de Trust Fabric. Deze toetsen gaan bijna allemaal over NIET vragen, en dat is met opzet. |
 | `vertrouwentempo.test.js` | 8 | gezakt op `liegpoort /api/` | HET TEMPO -- de reeks die geen enkele omvangmeter ziet. HET GAT DAT DIT DICHT, en het stond met naam in het register als openstaand punt. |

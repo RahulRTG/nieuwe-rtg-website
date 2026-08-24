@@ -106,21 +106,10 @@ module.exports = (tctx) => {
   /* Vernietigen. Onomkeerbaar, dus met de drie deuren ervoor in de kern en
      niet hier: een controle in een route is een controle die de volgende
      aanroeper mist. */
-  /* HET TWEEDE MOMENT (VERTROUWEN.md laag 3). Vernietigen staat in het register
-     als `minstens: 'uitzonderlijk'`: die vraagt elke keer een gebonden bon. */
-  app.post('/api/techniek/tenant/bevestig', techAuth, eigenaarAlleen, async (req, res) => {
-    const b = req.body || {};
-    if (!await accounts.verifyPassword(String(b.wachtwoord || ''), req.techUser.password_hash))
-      return res.status(401).json({ error: 'Dat wachtwoord klopt niet. Er is niets bevestigd.' });
-    const sessie = sessieVan(req);
-    const uit = kern.vertrouwen.losBon(String(b.id || ''), sessie);
-    if (!uit.ok) return res.status(400).json({ error: uit.reden });
-    /* En de sessie is weer VERS -- zie kern/vertrouwen/tweedemoment.js. */
-    kern.vertrouwen.verifieer(sessie, { hoe: 'wachtwoord', account: 'user-' + req.techUser.id,
-      apparaat: String(req.get('user-agent') || '') + '|' + String(req.get('accept-language') || '') });
-    res.json({ ok: true });
-  });
-
+  /* HET TWEEDE MOMENT (VERTROUWEN.md laag 3) staat in ./vertrouwen.js: het
+     oplossen van een bon is een fabric-handeling en geen tenant-handeling, en
+     daar staan de twee manieren om hem te geven (wachtwoord, passkey) bij
+     elkaar in plaats van hier los. */
   app.post('/api/techniek/tenant/vernietig', techAuth, eigenaarAlleen, (req, res) => {
     const b = req.body || {};
     const door = b.door || wie(req);

@@ -2,6 +2,8 @@
    het besluit (met automatische uitnodiging via maakInvite uit de personeels-
    laag) en de sollicitatiechat. Gemount vanuit routes/supplier/werving.js. */
 const { eigenVeld } = require('../../../kern/util');
+const { datum: klokDatum } = require('../../../lib/klok');
+const { vulVacature } = require('./vacature');
 module.exports = (wctx) => {
   const { kern, maakKassacode, invitesVan, findSupplierByName, maakInvite, neemAan, wervingsLink } = wctx;
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
@@ -102,25 +104,14 @@ app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
 app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const b = req.body || {};
-  const func = String(b.func || '').trim().slice(0, 60);
-  if (!func) return res.status(400).json({ error: 'Geef de functie een naam.' });
-  let minLeeftijd = parseInt(b.minLeeftijd, 10);
-  if (!Number.isFinite(minLeeftijd) || minLeeftijd < 16) minLeeftijd = 16; // solliciteren mag vanaf 16
-  if (minLeeftijd > 99) minLeeftijd = 99;
-  const soort = VAC_SOORTEN.includes(b.soort) ? b.soort : 'bijbaan';
   const list = db.data.vacatures[req.supplier.code] = (db.data.vacatures[req.supplier.code] || []);
   const bestaand = b.id ? list.find(v => v.id === b.id) : null;
   const vac = bestaand || { id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString() };
-  vac.func = func;
-  vac.omschrijving = String(b.omschrijving || '').trim().slice(0, 500);
-  vac.plaats = String(b.plaats || '').trim().slice(0, 60);
-  vac.uren = String(b.uren || '').trim().slice(0, 40);
-  vac.soort = soort;
-  vac.minLeeftijd = minLeeftijd;
-  vac.open = b.open !== false;
+  const ingevuld = vulVacature(vac, b, VAC_SOORTEN);
+  if (ingevuld.error) return res.status(400).json({ error: ingevuld.error });
   if (!bestaand) { list.unshift(vac); db.data.vacatures[req.supplier.code] = list.slice(0, 40); }
   save();
-  logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + func);
+  logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + ingevuld.func);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
   res.json({ ok: true, vacatures: (db.data.vacatures[req.supplier.code] || []).slice(0, 40) });
 });
@@ -136,5 +127,18 @@ app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
   res.json({ ok: true, vacatures: list.slice(0, 40) });
+});
+
+app.post('/api/supplier/talent/match', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const lijst = Array.isArray(db.data.talentInteresses) ? db.data.talentInteresses : [];
+  const match = lijst.find(x => x.id === req.body.id && x.supplierCode === req.supplier.code);
+  if (!match || match.status !== 'interesse') return res.status(404).json({ error: 'Deze talentmatch is niet meer beschikbaar.' });
+  match.status = req.body.action === 'interesse' ? 'wederzijds' : 'afgewezen';
+  match.beslistAt = klokDatum().toISOString();
+  save();
+  logActivity(req.supplier.code, req.actor, (match.status === 'wederzijds' ? 'toonde wederzijdse interesse in ' : 'sloot een talentmatch voor ') + match.func);
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  res.json({ ok: true, status: match.status });
 });
 };

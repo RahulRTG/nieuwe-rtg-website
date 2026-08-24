@@ -747,7 +747,9 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   const login = await json(await raw('/supplier/login', { username: 'rahul', password: 'Imran' }));
   assert.ok(login.token, 'supplier-login geeft een token');
   const supCode = login.state.supplier.code;
-  const vac = await json(await raw('/supplier/vacature', { func: 'Afwasser', soort: 'bijbaan', minLeeftijd: 16, plaats: 'Amsterdam', uren: '8u/week', omschrijving: 'Meehelpen in de keuken.' }, login.token));
+  const vac = await json(await raw('/supplier/vacature', { func: 'Afwasser', soort: 'bijbaan', minLeeftijd: 16, plaats: 'Amsterdam', uren: '8u/week', omschrijving: 'Meehelpen in de keuken.',
+    salarisMin: 2100, salarisMax: 2450, valuta: 'EUR', werkvorm: 'op-locatie',
+    vaardigheden: ['samenwerken', 'netjes'], voordelen: ['maaltijd tijdens dienst'] }, login.token));
   assert.ok(vac.ok && vac.vacatures.length >= 1);
   const vacId = vac.vacatures[0].id;
 
@@ -756,6 +758,10 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   const gevonden = lijst.vacatures.find(v => v.id === vacId);
   assert.ok(gevonden, 'vacature verschijnt in de RTFoundation');
   assert.equal(gevonden.bedrijf, login.state.supplier.name);
+  assert.equal(gevonden.salarisMin, 2100);
+  assert.equal(gevonden.salarisMax, 2450);
+  assert.equal(gevonden.werkvorm, 'op-locatie');
+  assert.deepEqual(gevonden.vaardigheden, ['samenwerken', 'netjes']);
   // internationaal: elke vacature draagt een land, en er is een landenlijst om
   // in het buitenland te zoeken
   assert.ok(gevonden.land && gevonden.landNaam, 'de vacature draagt een land');
@@ -787,6 +793,22 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   const geenCv = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam' } });
   assert.equal(geenCv.status, 409);
 
+  // Opportunity Deck: interesse is eerst anoniem en wordt pas na een keuze van
+  // beide kanten een uitnodiging om de gewone, veilige sollicitatie te openen.
+  const dek = await json(await raw('/rtf/talent/interesse', { code: g.code, token: g.token, vacatureId: vacId,
+    cv: { headline: 'Leergierig', skills: ['samenwerken', 'netjes'], experience: ['Vrijwilliger buurthuis'] } }));
+  assert.ok(dek.ok && dek.interesse.id);
+  const talentState = await json(await raw('/supplier/state', {}, login.token));
+  const talent = talentState.state.talentMatches.find(x => x.id === dek.interesse.id);
+  assert.ok(talent && talent.skills.includes('samenwerken'), 'werkgever ziet de anonieme talentkaart');
+  assert.equal(talent.name, undefined, 'naam blijft dicht voor de wederzijdse match');
+  assert.equal(talent.contact, undefined, 'contact blijft dicht voor de wederzijdse match');
+  assert.equal(talent.rtf, undefined, 'gezinsverwijzing lekt niet naar de werkgever');
+  const wederzijds = await json(await raw('/supplier/talent/match', { id: talent.id, action: 'interesse' }, login.token));
+  assert.equal(wederzijds.status, 'wederzijds');
+  const mijnMatches = await json(await raw('/rtf/talent/mijn', { code: g.code, token: g.token }));
+  assert.ok(mijnMatches.matches.some(x => x.id === talent.id && x.status === 'wederzijds'), 'kandidaat ziet de wederzijdse interesse');
+
   // met cv lukt het en de partner ziet de sollicitatie met cv
   const ok = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam de Jong', contact: 'sam@v.test', headline: 'Leergierig', experience: ['Vrijwilliger buurthuis'], skills: ['samenwerken', 'netjes'], about: 'Ik leer snel.' } });
   assert.equal(ok.status, 200);
@@ -800,6 +822,8 @@ test('vacatures: partner plaatst, RTF toont en lid solliciteert met cv (vanaf 16
   assert.equal(soll.viaRTG, true, 'de sollicitant lijkt op een gewoon RTG-lid');
   assert.equal(soll.key, undefined, 'interne sessiesleutel lekt niet naar de werkgever');
   assert.ok(soll.cv && soll.cv.skills.includes('samenwerken'), 'het cv reist mee');
+  const naOpenen = await json(await raw('/rtf/talent/mijn', { code: g.code, token: g.token }));
+  assert.ok(naOpenen.matches.some(x => x.id === talent.id && x.status === 'traject'), 'na toestemming is de match een gewoon sollicitatietraject');
 
   // dubbel solliciteren op dezelfde vacature wordt geweerd
   const dubbel = await raw('/rtf/solliciteer', { code: g.code, token: g.token, supplierCode: supCode, vacatureId: vacId, leeftijd: 17, cv: { name: 'Sam de Jong', contact: 'sam@v.test', skills: ['samenwerken'] } });

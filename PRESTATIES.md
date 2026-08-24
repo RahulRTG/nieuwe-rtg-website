@@ -149,6 +149,30 @@ besluit met een foutbudget eraan vast; dat hoort in `SLO.md` en niet in een
 emmerlijst. Het verschil is dat het nu een keuze is en geen gok.
 
 
+## Meer kernen benutten: onderzocht, en het antwoord is niet "meer processen"
+
+Na het bovenstaande draait een proces op ~5.000 verzoeken per seconde en staan
+er in het failover-trio twee servers standby niets te doen. De volgende stap
+lijkt dus verkeer verdelen. Dat is onderzocht en gemeten, en de uitkomst staat
+in `docs/meerkernig.md`. Kort:
+
+- **Wat al werkt:** drie schrijvende processen delen probleemloos één
+  SQLite-store (nul lock-fouten), en een sessie van proces A is meteen geldig op
+  proces B (12 van 12, 0 ms) — de Redis-bus in `kern/sessies.js` doet zijn werk.
+- **Wat breekt:** read-your-writes. Een lid dat een notitie opslaat op proces A
+  ziet hem op proces B pas na de kruisprocespoll: 0 van 10 meteen zichtbaar,
+  mediaan 733 ms.
+- **En de winst is er niet:** twee processen op een GEDEELDE store halen
+  8.589/s met een p99 van 122,8 ms; diezelfde twee processen op een EIGEN store
+  halen 11.379/s met een p99 van 49,2 ms. Niet de kernen begrenzen de schaal
+  maar het gedeelde schrijfpad -- en dat is logisch bij 8.113 POST-routes die
+  allemaal via één `BEGIN IMMEDIATE` gaan.
+
+De volgorde is dus eerst een opslag die echt gelijktijdig schrijft (Postgres,
+bestaat al) en sticky routing op de sessie, en pas daarna verkeer verdelen. Die
+laatste stap is op een machine met vier kernen en een meedraaiende
+belastingsgenerator sowieso niet eerlijk te meten.
+
 ## Browserstart
 
 `app-main.js` (circa 584 KB) en `leverancier.js` (circa 788 KB) blokkeerden het

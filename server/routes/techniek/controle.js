@@ -10,15 +10,24 @@ const maakInventaris = require('../../kern/code-inventaris');
 const maakIncident = require('../../kern/incidentcontrole');
 
 module.exports = function mountControle(c) {
-  const { app, db, save, beveilig, av, techAuth, eigenaarAlleen } = c;
+  const { app, db, save, beveilig, av, techAuth, eigenaarAlleen, journaal } = c;
   const root = path.join(__dirname, '../../..');
   const integriteit = maakIntegriteit({ root });
   const inventaris = maakInventaris({ app, functies, integriteit });
   const incident = maakIncidentcontrole();
   let inventarisCache = null;
 
+  /* Het journaal gaat mee voor het ZEGEL van de beschermstand: bij het omzetten
+     wordt de hashketen nagelopen en de uitslag bewaard. LUI, want kern.command
+     bestaat bij het monteren nog niet -- hier de waarde lezen zou het zegel
+     voorgoed op "geen journaal" zetten. Er komt hier dus een FUNCTIE binnen en
+     geen journaal; zegelVan() in ../../kern/incidentcontrole-bescherm.js kent
+     allebei de vormen. Ontbreekt de laag echt (een opstelling
+     zonder Command), dan zegt het zegel dat met zoveel woorden in plaats van
+     een getal te verzinnen. */
   function maakIncidentcontrole() {
-    return maakIncident({ db, save, functies, beveilig });
+    return maakIncident({ db, save, functies, beveilig,
+      journaal });
   }
 
   function dreiging() {
@@ -69,6 +78,12 @@ module.exports = function mountControle(c) {
       let uit;
       if (body.actie === 'waakzaam') uit = incident.waakzaam(body.reden, req.techUser);
       else if (body.actie === 'beperk') uit = incident.beperk(body, req.techUser);
+      /* GEEN bevestigingszin voor de beschermstand, en dat is geen slordigheid.
+         `isoleer` en `herstel` vragen er een omdat ze onomkeerbaar veel omzetten;
+         deze stand zet niets om en is met dezelfde knop weer weg. Een drempel
+         opwerpen voor de veilige keuze is precies hoe je mensen naar de
+         onveilige duwt (grens 6.10). */
+      else if (body.actie === 'bescherm') uit = incident.bescherm(body.reden, req.techUser);
       else if (body.actie === 'isoleer') {
         if (body.bevestiging !== 'ISOLEER RTG')
           return res.status(400).json({ error: 'Typ exact ISOLEER RTG om de hele app veilig af te sluiten.' });
@@ -77,7 +92,7 @@ module.exports = function mountControle(c) {
         if (body.bevestiging !== 'HERSTEL RTG')
           return res.status(400).json({ error: 'Typ exact HERSTEL RTG om de bewaarde standen terug te zetten.' });
         uit = incident.herstel(body.reden, req.techUser);
-      } else return res.status(400).json({ error: 'Actie moet waakzaam, beperk, isoleer of herstel zijn.' });
+      } else return res.status(400).json({ error: 'Actie moet waakzaam, beperk, bescherm, isoleer of herstel zijn.' });
       res.json({ ok: true, incident: uit });
     } catch (e) { res.status(e.status || 500).json({ error: e.status ? e.message : 'Incidenthandeling mislukte.' }); }
   });

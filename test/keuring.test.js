@@ -113,12 +113,12 @@ test('de gewogen uitzonderingen leven nog allemaal', () => {
 test('een bestand dat tijdens het meten verdwijnt, sloopt de Keuring niet', () => {
   /* DIT IS EEN ECHTE STORING GEWEEST, en niet in de theorie.
 
-     test/meterijk.test.js zet server/routes/zz-ijk-tijdelijk.js tijdelijk neer
-     om te bewijzen dat de metertjes werkelijk bewegen, en ruimt hem daarna op.
-     test/keuring.test.js start ondertussen scripts/keuring.js. De toetsen
-     draaien met --test-concurrency=4, dus die twee lopen tegelijk: het bestand
-     stond nog in de bestandslijst en was bij de stat al weg. De hele Keuring
-     stierf met ENOENT, en dus lag de CI rood om een bestand dat niemand miste.
+     test/meterijk.test.js zet een tijdelijk routebestand neer om te bewijzen dat
+     de metertjes werkelijk bewegen, en ruimt het daarna op. Dit bestand start
+     ondertussen scripts/keuring.js. De toetsen draaien met
+     --test-concurrency=4, dus die twee lopen tegelijk: het bestand stond nog in
+     de bestandslijst en was bij de stat al weg. De hele Keuring stierf met
+     ENOENT, en dus lag de CI rood om een bestand dat niemand miste.
 
      Een kapotte symlink geeft precies dezelfde ENOENT op statSync als een
      bestand dat net verdwenen is, maar dan bepaalbaar in plaats van op een
@@ -143,8 +143,14 @@ test('een bestand dat tijdens het meten verdwijnt, sloopt de Keuring niet', () =
     const oordeel = JSON.parse(uit);
     assert.ok(Array.isArray(oordeel.bevindingen),
       'de Keuring velt gewoon een oordeel, ook met een onbereikbaar bestand in de lijst');
-    assert.ok(oordeel.cijfers.dekking.routes > 500,
-      'en ze is niet halverwege gestopt: de routetabel is er nog steeds');
+    /* En ze is niet halverwege gestopt: de omvangmeting is PRECIES de lus die
+       op de kapotte symlink stuk ging, dus die moet zijn afgelopen. Hier stond
+       eerst een bewering over dekking.routes, en die zakte onder een volle
+       parallelle toetsronde -- niet omdat de Keuring omviel, maar omdat de
+       routekaart daarvoor een hele server start en die het onder die drukte niet
+       haalde. Dan meet je iets anders dan je denkt. */
+    assert.ok(oordeel.cijfers.uitschieters.bijnaTeGroot > 0,
+      'de omvanglus is afgelopen en heeft geteld: ' + JSON.stringify(oordeel.cijfers.uitschieters));
   } finally {
     try { fs.unlinkSync(kapot); } catch (e) {}
   }

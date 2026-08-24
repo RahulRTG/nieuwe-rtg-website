@@ -137,32 +137,10 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, terugstorting, nu
     return { mag: true, vermogen: id, via, vergunning: v.soort };
   }
 
-  /* De matrix voor de boardroom: per handeling wat hij vraagt, wat er ligt en of
-     hij nu open staat. Dit is het bord waarop je in een oogopslag ziet waar de
-     grens tussen "gebouwd" en "toegestaan" loopt -- en dat die twee niet
-     hetzelfde zijn is precies het punt. */
-  function matrix({ land } = {}) {
-    const v = vergunningStand();
-    return {
-      status: 200,
-      rail: railVan(),
-      vergunning: v.er ? { soort: v.soort, nummer: v.nummer, entiteit: v.entiteit, landen: v.landen, tot: v.tot, verlopen: v.verlopen } : null,
-      partnerRails: partnerRails() || {},
-      /* De matrix toont het GELDENDE gezicht, niet de kale lijstregel. Bij een
-         afhankelijk vermogen staat er dus 'besluit' of 'rail' naar gelang de
-         stand, met 'hangtAf' erbij zodat een bestuurder ziet WAAROM het dat nu
-         is. Zou hier de rauwe regel staan, dan las het bord 'afhankelijk' --
-         een woord dat niets zegt over wat er op dit moment geldt. */
-      terugstorting: stand(),
-      regels: Object.keys(VERMOGENS).map(id => {
-        const f = vermogen(id);
-        const r = mag(id, { land });
-        return { id, naam: f.naam, soort: f.soort, nodig: f.eigenNodig || f.nodig || null,
-          partnerRail: f.partnerRail || null, mag: r.mag, reden: r.reden || null, via: r.via || null,
-          besluit: f.besluit || null, hangtAf: f.hangtAf || null };
-      })
-    };
-  }
+  /* Het bord voor de boardroom staat in ./bord.js: dat tekent een BEELD van de
+     hele lijst, terwijl `mag()` hierboven een OORDEEL velt over een handeling
+     die iemand nu wil doen. Twee onderwerpen, twee bestanden. */
+  const matrix = require('./bord')({ vergunningStand, railVan, partnerRails, stand, vermogen, mag });
 
   /* Telt het land mee? Alleen als we op eigen rails draaien EN de vergunning
      zich tot bepaalde landen beperkt. De middleware vraagt dit vooraf, zodat hij

@@ -1915,6 +1915,7 @@
     ],
     "tenant": [
       "bedrijf",
+      "bijstand",
       "findSupplier",
       "tenant"
     ],

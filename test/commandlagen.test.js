@@ -18,6 +18,12 @@
      -> "elke laag heeft een ingang die antwoordt" ZAKT (RAAK)
    - officeAuth van de alarmroute gehaald
      -> "geen enkele ingang staat open zonder kantoorsessie" ZAKT (RAAK)
+   - de gezondheidsroutes uit routes/command/meten.js gehaald
+     -> "elke laag heeft een ingang die antwoordt" ZAKT (RAAK)
+   - officeAuth van de incidentroutes gehaald
+     -> "geen enkele ingang staat open zonder kantoorsessie" ZAKT (RAAK)
+   - de bijstand- en vlootroutes uit routes/command/toezicht.js gehaald
+     -> "elke laag heeft een ingang die antwoordt" ZAKT (RAAK)
 
    Draai: npm test */
 const test = require('node:test');
@@ -54,7 +60,8 @@ test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: tru
 test('elke laag heeft een ingang die antwoordt', async () => {
   for (const pad of ['command/canary', 'command/zandbak', 'command/mdm', 'command/overname',
     'command/apipoort', 'command/land', 'command/stad', 'command/alarm', 'command/herkomst',
-    'command/kwaliteit', 'command/graaf', 'command/slo', 'command/sonde']) {
+    'command/kwaliteit', 'command/graaf', 'command/slo', 'command/sonde', 'command/gezondheid',
+    'command/incidenten', 'command/tijdlijn', 'command/bijstand', 'command/vloot']) {
     const r = await api(pad);
     assert.equal(r.status, 200, pad + ' antwoordt niet: ' + JSON.stringify(r.body).slice(0, 120));
   }
@@ -64,9 +71,32 @@ test('geen enkele ingang staat open zonder kantoorsessie', async () => {
   for (const pad of ['command/canary', 'command/canary/start', 'command/zandbak', 'command/zandbak/maak',
     'command/mdm', 'command/mdm/samen', 'command/overname', 'command/overname/lees',
     'command/apipoort', 'command/apipoort/sleutel', 'command/land', 'command/land/activeer',
-    'command/stad', 'command/stad/start', 'command/alarm', 'command/alarm/stil']) {
+    'command/stad', 'command/stad/start', 'command/alarm', 'command/alarm/stil',
+    'command/gezondheid', 'command/gezondheid/vermogen', 'command/gezondheid/controleer',
+    'command/incidenten', 'command/incident', 'command/incident/weeg', 'command/incident/open',
+    'command/incident/neem', 'command/incident/maatregel', 'command/incident/sluit',
+    'command/tijdlijn', 'command/tijdlijn/rondom',
+    'command/bijstand', 'command/bijstand/sessie', 'command/bijstand/betreed', 'command/bijstand/kijk',
+    'command/bijstand/voorstel', 'command/bijstand/uitvoeren', 'command/bijstand/inhoud',
+    'command/bijstand/sluit', 'command/vloot', 'command/vloot/organisatie']) {
     assert.equal(await zonder(pad), 401, pad + ' staat open zonder sessie');
   }
+});
+
+test('de tijdlijn beantwoordt "wat is er vlak daarvoor veranderd", zonder oorzaakclaim', async () => {
+  /* De bedradingsvraag plus de ene zin die dit scherm eerlijk houdt. Een
+     tijdlijn zonder die zin wordt binnen een week gelezen als een
+     oorzakenlijst, en dat is op de server te bewaken en niet in de opmaak. */
+  const r = await api('command/tijdlijn/rondom', { moment: new Date().toISOString(), minuten: 60 });
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
+  assert.ok(Array.isArray(r.body.regels), 'er komt geen lijn terug');
+  assert.equal(r.body.bronnen.length, 3, 'de tijdlijn noemt niet welke bronnen hij leest');
+  assert.ok(r.body.buitenBeeld.length >= 3, 'er staat niet bij wat er buiten beeld valt');
+  assert.match(r.body.let, /VOLGORDE en geen oorzaak|niets veranderd/,
+    'het antwoord draagt geen zin over wat het wel en niet betekent');
+
+  const stuk = await api('command/tijdlijn/rondom', { moment: 'geen tijd' });
+  assert.equal(stuk.status, 400, 'een onzinnig moment gaf gewoon een lijst terug');
 });
 
 test('de zandbak draait een recept en de productie blijft ongemoeid', async () => {

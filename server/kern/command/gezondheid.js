@@ -30,6 +30,8 @@
    controleronde in ./gezondheid-proef.js. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const { VERMOGENS, OP_ID, ketenVan, vermogenVanAlarm } = require('./vermogens');
 const { maakBronnen } = require('./gezondheid-bronnen');
 const { draaiProef, PROEVEN, vanProef } = require('./gezondheid-proef');
@@ -127,7 +129,7 @@ function maakGezondheid(o) {
       : [];
 
     return {
-      at: new Date().toISOString(),
+      at: klok.datum().toISOString(),
       oordeel: storing.length ? 'storing' : letOp.length ? 'let op'
         : niet.length === rijen.length ? NIET : 'in orde',
       tel: { vermogens: rijen.length, storing: storing.length, letOp: letOp.length,
@@ -158,7 +160,7 @@ function maakGezondheid(o) {
     const v = OP_ID[id];
     if (!v) return { error: 'Dat vermogen kennen we niet.', status: 404 };
     const uit = await draaiProef(v, { sonde, journaal, kwaliteit, backup, dataDir });
-    const rij = { id: v.id, at: new Date().toISOString(), door: door || 'onbekend',
+    const rij = { id: v.id, at: klok.datum().toISOString(), door: door || 'onbekend',
       gedaan: uit.gedaan, nietGedaan: uit.nietGedaan, bevindingen: uit.bevindingen,
       bewijzend: uit.bewijzend, uitslag: uit.uitslag };
     vak()[v.id] = rij;

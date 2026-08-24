@@ -21,12 +21,14 @@
    de hand was. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const { impactVan } = require('./incident-impact');
 
 const DICHT = 'gesloten';
 
 function maakVerslag({ rij, vind, save, journaal, kaart, vermogenUit, levend }) {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
 
   function kort(i) {
     return { id: i.id, status: i.status, vermogen: i.vermogen, naam: i.naam, wat: i.wat,

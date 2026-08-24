@@ -13,7 +13,9 @@
    en dat is de hele reden dat het veld bestaat. */
 'use strict';
 
-const nuIso = () => new Date().toISOString();
+const klok = require('../../lib/klok');
+
+const nuIso = () => klok.datum().toISOString();
 
 /* DE SONDE. Buiten en binnen worden nooit opgeteld, en alleen buiten telt als
    BEWEZEN: een ronde vanaf de machine zelf bewijst dat de HTTP-laag antwoordt

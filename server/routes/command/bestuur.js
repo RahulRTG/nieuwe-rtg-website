@@ -6,6 +6,8 @@
    volgorde niet af -- dat zou betekenen dat je zonder simulatie geen spoedfix
    meer kunt doen -- maar het scherm zet ze wel in die volgorde, en de simulatie
    raakt gegarandeerd niets aan omdat hij met een schaduw-beleid rekent. */
+const klok = require('../../lib/klok');
+
 module.exports = ({ app, officeAuth, veilig, wie, command }) => {
 
   app.post('/api/command/beleid', officeAuth, (req, res) => veilig(res, () => ({
@@ -82,5 +84,5 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/tijdlijn', officeAuth, (req, res) => veilig(res, () =>
     command.tijdlijn.lijst({ bron: req.body.bron, vanaf: req.body.vanaf, tot: req.body.tot, max: req.body.max })));
   app.post('/api/command/tijdlijn/rondom', officeAuth, (req, res) => veilig(res, () =>
-    command.tijdlijn.rondom(String(req.body.moment || new Date().toISOString()), req.body.minuten)));
+    command.tijdlijn.rondom(String(req.body.moment || klok.datum().toISOString()), req.body.minuten)));
 };

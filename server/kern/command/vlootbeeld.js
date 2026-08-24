@@ -28,6 +28,8 @@
    -- want dat is precies het getal dat niemand hier kan tellen. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 /* Wat dit beeld structureel niet kan, met de reden. Zelfde soort blok als
    `nietGemeten` bij een incident, en om dezelfde reden: een lijst die alleen
    toont wat hij heeft, leest als een volledige lijst. */
@@ -82,7 +84,7 @@ function maakVlootbeeld({ tenant, incident, bijstand, gezondheid }) {
     const actief = orgs.lijst.filter(o => o.actief);
     const metSessie = orgs.lijst.filter(o => o.bijstand);
     return {
-      at: new Date().toISOString(),
+      at: klok.datum().toISOString(),
       tel: { organisaties: n, actief: actief.length, stil: n - actief.length,
         werkruimtes: orgs.lijst.reduce((s, o) => s + o.werkruimtes, 0),
         metBijstand: metSessie.length,

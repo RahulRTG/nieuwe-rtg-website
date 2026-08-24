@@ -30,11 +30,13 @@
    uitzondering. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const niveaus = require('./bijstand-niveaus');
 const melden = require('./bijstand-melden');
 
 function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   /* De tenantlaag komt LUI binnen. Zij wordt in server/opzet/routes-dwars.js
      opgehangen en dat gebeurt vóór de aanbouw -- maar een laag die van die
      volgorde afhangt, breekt zodra iemand hem verzet. Zelfde haak als bij het
@@ -49,7 +51,7 @@ function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
 
   function stand(s) {
     if (s.status === 'gesloten' || s.status === 'ingetrokken') return s.status;
-    return Date.parse(s.tot) <= Date.now() ? 'verlopen' : s.status;
+    return Date.parse(s.tot) <= klok.nu() ? 'verlopen' : s.status;
   }
   const levend = (s) => stand(s) === 'open' || stand(s) === 'bezig';
 

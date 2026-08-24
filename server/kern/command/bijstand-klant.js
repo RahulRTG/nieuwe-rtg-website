@@ -16,6 +16,8 @@
    kunt terugnemen, is geen uitnodiging. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const niveaus = require('./bijstand-niveaus');
 
 function maakKlantkant(C) {
@@ -47,7 +49,7 @@ function maakKlantkant(C) {
       org: t.org, orgNaam: t.naam, werkruimte: String(opt.werkruimte || ''),
       onderwerp: onderwerp.slice(0, 200), niveau, minuten,
       gevraagdDoor: String(opt.door || 'de werkruimte'), at: nu(),
-      tot: new Date(Date.now() + minuten * 60000).toISOString(),
+      tot: new Date(klok.nu() + minuten * 60000).toISOString(),
       status: 'open', medewerker: null, betredenAt: null,
       voorafAkkoord: !!N.vooraf, voorafReden: N.vooraf ? reden.slice(0, 500) : null,
       inhoud: { open: false, verzoek: null },

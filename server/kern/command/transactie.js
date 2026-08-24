@@ -29,6 +29,8 @@
    BESTUUR.md en niet als stille aanname dat het overal geldt. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const poorten = require('./transactie-poorten');
 
 /* Zonder certificaat draait een recept gewoon, maar dan zonder bovengrens en
@@ -89,7 +91,7 @@ function maakTransactie({ db, runbooks, register, journaal, gezondheid }) {
        is morgen weg -- en dan staat er in de historie een ronde zonder bewijs
        dat er ooit is nagekeken. */
     runbooks.noteerVerificatie(r.run.id, { goed: ver.goed, waarom: ver.waarom,
-      nietVanToepassing: !!ver.nietVanToepassing, at: new Date().toISOString() });
+      nietVanToepassing: !!ver.nietVanToepassing, at: klok.datum().toISOString() });
 
     journaal.noteer({ actor: o.door || 'transactie', actie: 'herstel verifiëren',
       objectType: 'runbook', objectId: rb.id, niveau: 'assist',

@@ -49,21 +49,23 @@
    Deze module beantwoordt "wie merkte dit", niet "hoe goed was het voor u". */
 'use strict';
 
+const klok = require('./lib/klok');
+
 const functies = require('./functies');
 
 const VENSTER_MS = 3600000;   // een uur
 const MAX_ORGS = 200;
 
-const staat = { sinds: Date.now(), functies: new Map(), nietToegewezen: 0, zonderFunctie: 0 };
+const staat = { sinds: klok.nu(), functies: new Map(), nietToegewezen: 0, zonderFunctie: 0 };
 
 function rol() {
-  staat.sinds = Date.now();
+  staat.sinds = klok.nu();
   staat.functies = new Map();
   staat.nietToegewezen = 0;
   staat.zonderFunctie = 0;
 }
 function versGenoeg() {
-  if (Date.now() - staat.sinds > VENSTER_MS) rol();
+  if (klok.nu() - staat.sinds > VENSTER_MS) rol();
 }
 
 function vak(id) {

@@ -29,6 +29,8 @@
    doen. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const fundament = require('./gezondheid-fundament');
 
 /* De drempels staan hier en niet in een configuratiebestand. Dezelfde knip als
@@ -43,7 +45,7 @@ const D = {
   budgetKrap: 0.25                     // deel foutbudget over waaronder het krap heet
 };
 
-const nuIso = () => new Date().toISOString();
+const nuIso = () => klok.datum().toISOString();
 const pct = (deel, van) => van ? Number((deel / van * 100).toFixed(3)) : null;
 
 /* Een bron die niet te lezen was. Met de reden, want "onbekend" zonder reden is

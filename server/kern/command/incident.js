@@ -30,12 +30,14 @@
    ze daar apart staan. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const { impactVan, aanleidingen } = require('./incident-impact');
 
 const OPEN = 'open', BEZIG = 'in behandeling', HERSTELD = 'hersteld', DICHT = 'gesloten';
 
 function maakIncidenten({ db, save, journaal, gezondheid }) {
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
 
   function rij() {
     if (!Array.isArray(db.data.commandIncidenten)) db.data.commandIncidenten = [];

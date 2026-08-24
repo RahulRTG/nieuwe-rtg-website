@@ -20,6 +20,8 @@
    en de derde kon niet draaien". */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 /* Per bron: is er iets te DOEN, en bewijst dat wat? `bewijst: false` betekent
    niet "onbelangrijk" maar "dit verandert de bewijsgraad niet". */
 const PROEVEN = {
@@ -102,7 +104,7 @@ async function draaiProef(v, { sonde, journaal, kwaliteit, backup, dataDir }) {
    en dat is iets anders dan een storing. */
 function vanProef(v, p) {
   if (!p) return null;
-  const uren = (Date.now() - Date.parse(p.at)) / 3600000;
+  const uren = (klok.nu() - Date.parse(p.at)) / 3600000;
   if (uren > v.proefHoudbaarUren) {
     return { bron: 'proef', graad: 'onbekend', oordeel: null, at: p.at, moetOpnieuw: true,
       vervallen: { was: p.bewijzend ? 'bewezen' : 'gemeten', urenOud: Math.round(uren),

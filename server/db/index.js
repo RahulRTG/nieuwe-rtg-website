@@ -124,7 +124,9 @@ tx.wire(save);
 function onExternalChange(cb) { state.setExternCb(cb); }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, persistentieStand, CONTROL: CONTROL_DUURZAAM, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  // EEN LEZING, GEEN KOPIE. Waarom: NORM.json, datamapVastgeklonken.
+  get DATA_DIR() { return opslag.DATA_DIR; },
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,

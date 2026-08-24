@@ -35,10 +35,15 @@
     "staatOnbekend": 43,
     "duurOpWandklok": 29,
     "staatProcesgebonden": 92,
-    "datamapVastgeklonken": 3,
+    "datamapVastgeklonken": 4,
     "bewijsOnbekend": 167
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "datamapVastgeklonken 3 -> 4 (de METER is gerepareerd, de code is niet slechter geworden)",
+      "reden": "Deze teller stond op 3 en had er 6 moeten melden. Twee blinde vlekken dekten elkaar precies af.\n\nEEN: hij telde alleen `const`-bindingen. server/db/index.js zette de map als OBJECTEIGENSCHAP in zijn module.exports -- `DATA_DIR: opslag.DATA_DIR` -- en dat roept de levende getter van de opslaglaag EEN keer aan, bij het laden, en deelt daarna de dode uitkomst uit aan iedereen die require('./db') doet. Dat is het knooppunt: de reparatie in opslag.js hield op bij de eerste bocht, en de teller zag dat niet.\n\nTWEE: bij `require('./db')` plakte hij '.js' achter de naam, zocht naar server/db.js, vond niets en zweeg. Dat is een MAPverwijzing en die wijst naar server/db/index.js. Precies de weg die server.js loopt, en dus precies de overname die het meest voorstelt.\n\nGerepareerd: de scanner kent nu vier soorten schakels (recht, afgeleid, overgenomen, bevroren-uitgifte) en lost mapverwijzingen op. De ijking in test/meterijk.test.js zet ze alle vijf in EEN proefbestand (vijf, want overgenomen komt er in twee vormen in voor: direct en via een map) met twee tegenproeven die juist NIET mogen meetellen -- een pijlfunctie in een eigenschap en een gewone luie lezer. Zonder die tegenproeven zou de oplossing de ratel omhoog duwen.\n\nEN TOEN LIEP IK ER ZELF IN. De eerste reparatie van db/index.js (defineProperty met een getter) liet de teller van 6 naar 3 zakken, terwijl server.js de map nog even hard vasthield: de scanner kende alleen getters die een LOKALE luie lezer noemen, niet een die de map uit een ANDERE module doorgeeft. De reparatie had de meter blind gemaakt in plaats van de code beter. Dat is de vorm waar LAT-regel 9 over gaat en het duurde tien minuten om hem zelf te maken. De scanner kent die doorgifte nu als een schakel die geen klem is maar wel een bron.\n\nWAT ER ECHT IS GEREPAREERD, en dat is de reden dat het 4 is en geen 6: server/db/index.js deelt DATA_DIR nu levend uit, en server/foundation/basis.js leest hem per lezing in plaats van bij het laden. Blijven staan: de drie STORE-wortels (die horen bij een verificatiecontext, niet bij een proces -- dat stond er al) en server/server.js#DATA_DIR.\n\nDie laatste is met OPZET niet gerepareerd. server.js gebruikt de map bij het laden om UPLOAD_DIR te bouwen en om acht subsystemen te bedraden. Hem daar levend maken betekent al die afgeleiden ook levend maken, en dat is een ingreep in de bedrading van het hele huis om een teller met een te verlagen. Erger nog: de destructurering een niveau lager schuiven (naar de bedradingsaanroepen) zou de teller WEL laten zakken zonder dat er iets aan de bevriezing verandert -- dat is de meter bespelen en niet de code repareren. Hij staat er dus als wat hij is: een echte klem, geteld."
+    },
     {
       "datum": "2026-08-23",
       "meter": "keuringOmvang 159 -> 160 (server/db/geheugen.js van 9091 naar 9773 bytes)",

@@ -8,7 +8,11 @@ const express = require('../web');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const { db, save, DATA_DIR } = require('./../db');
+/* De datamap per LEZING, niet bij het laden: `const { DATA_DIR } =
+   require('../db')` haalt de levende getter een keer over en houdt de uitkomst
+   vast. db en save mogen wel binden; die leven zelf. */
+const dbLaag = require('./../db');
+const { db, save } = dbLaag;
 const { eigenVeld } = require('./../kern/util'); // veilige objecttoegang (geen prototype-pollution)
 
 module.exports = function maakBasis() {
@@ -19,10 +23,10 @@ module.exports = function maakBasis() {
      de database. Waarden krijgen een "enc:"-prefix; oude platte waarden blijven
      leesbaar (zachte migratie). */
   function laadSleutel() {
-    const f = path.join(DATA_DIR, 'foundation.key');
+    const f = path.join(dbLaag.DATA_DIR, 'foundation.key');
     try { if (fs.existsSync(f)) return fs.readFileSync(f); } catch (e) {}
     const k = crypto.randomBytes(32);
-    try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(f, k, { mode: 0o600 }); } catch (e) {}
+    try { fs.mkdirSync(dbLaag.DATA_DIR, { recursive: true }); fs.writeFileSync(f, k, { mode: 0o600 }); } catch (e) {}
     return k;
   }
   const SLEUTEL = laadSleutel();
@@ -151,7 +155,7 @@ module.exports = function maakBasis() {
   /* De context: alles wat de submodules delen. kiesBuddy/leeftijdInstr worden
      later door de gezinslaag op dit object gezet (aanroep gebeurt pas per
      aanvraag, dus die late binding is veilig). */
-  return { db, save, DATA_DIR, eigenVeld, crypto,
+  return { db, save, DATA_DIR: dbLaag.DATA_DIR, eigenVeld, crypto,
     encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
     router, F, nu, rid, schoon, LETTERS, SYSTEM, DEMO, TIPS };
 };

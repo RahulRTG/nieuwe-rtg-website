@@ -510,6 +510,49 @@ function datamapUitgifte(bron, boom, klemmen) {
   return uit;
 }
 
+/* WELK BESTAND BEDOELT require('./iets')?
+
+   Hier stond twee keer `if (!/\.js$/.test(vanaf)) vanaf += '.js';`, en dat is
+   fout op een manier die precies de belangrijkste overname liet lopen:
+   `require('./db')` wijst niet naar server/db.js maar naar server/db/index.js.
+   Server.js haalt DATA_DIR daar vandaan -- de waarde die de HELE bedrading
+   daarna doorgeeft -- en de teller zag die niet, want hij zocht naar een
+   bestand dat niet bestaat. Een teller die de grootste vindplaats overslaat en
+   toch een getal noemt, is erger dan geen teller (LAT-regel 9). */
+function bestandVoor(wortel, relPad, doel) {
+  if (!doel || !doel.startsWith('.')) return null;
+  let v = path.posix.normalize(path.posix.join(path.posix.dirname(relPad), doel));
+  if (/\.js$/.test(v)) return v;
+  try { if (fs.existsSync(path.join(wortel, v + '.js'))) return v + '.js'; } catch (e) {}
+  return v + '/index.js';
+}
+
+/* De tekenreeks uit een knoop: de eigen parser zet hem in `raw` MET
+   aanhalingstekens en laat `value` leeg. */
+function reeksVan(n) {
+  if (!n) return null;
+  const rauw = n.raw !== undefined ? String(n.raw) : (n.value !== undefined ? String(n.value) : null);
+  return rauw === null ? null : rauw.replace(/^['"`]|['"`]$/g, '');
+}
+
+/* { aliasnaam -> bestandspad } voor elke `const X = require('./y')` op
+   moduleniveau. Nodig om `opslag.DATA_DIR` in een objecteigenschap te kunnen
+   thuisbrengen. */
+function requireAliassen(wortel, relPad, boom) {
+  const uit = new Map();
+  for (const k of boom.body) {
+    if (k.type !== 'VariableDeclaration') continue;
+    for (const d of k.declarations || []) {
+      if (!d.id || d.id.type !== 'Identifier' || !d.init) continue;
+      if (d.init.type !== 'CallExpression' || (d.init.callee || {}).name !== 'require') continue;
+      const doel = reeksVan((d.init.arguments || [])[0]);
+      const bestand = bestandVoor(wortel, relPad, doel);
+      if (bestand) uit.set(d.id.name, bestand);
+    }
+  }
+  return uit;
+}
+
 function datamapBindingen(bron, relPad, boomIn) {
   const boom = boomIn || parse(bron);
   const uit = [];
@@ -581,6 +624,7 @@ function datamapVast(opties = {}) {
 function datamapVastEcht(wortel, mappen) {
   const bronnen = new Map();
   const uit = [];
+  const gezien = new Set();
   const bestanden = [];
   for (const map of mappen) {
     for (const p of bestandenOnder(path.join(wortel, map)).sort()) {
@@ -592,7 +636,7 @@ function datamapVastEcht(wortel, mappen) {
       bestanden.push({ rel, boom });
       let deel;
       try { deel = datamapBindingen(bron, rel, boom); } catch (e) { continue; }
-      for (const x of deel) uit.push(x);
+      for (const x of deel) { uit.push(x); gezien.add(x.id); }
       /* Ook de namen die dit bestand als LEVENDE eigenschap uitdeelt tellen als
          bron: wie ze destructureert klemt de map alsnog vast. */
       try {
@@ -601,28 +645,136 @@ function datamapVastEcht(wortel, mappen) {
       } catch (e) { for (const x of deel) bronnen.set(rel + '#' + x.naam, x); }
     }
   }
-  /* Tweede ronde: wie neemt zo'n naam bij het laden over? */
+  /* DE OVERNAME IS EEN KETTING, GEEN ENKELE STAP.
+
+     Hier stond een tweede ronde: wie destructureert er een bron. Een ronde is
+     genoeg zolang een overname geen NIEUWE bron maakt -- en dat doet ze wel.
+     server/db/index.js zette `DATA_DIR: opslag.DATA_DIR` in zijn module.exports:
+     die eigenschap roept de levende getter EEN keer aan, bij het laden, en deelt
+     daarna een dode waarde uit aan iedereen die `require('./db')` doet. Dat is
+     server.js, en dat is de waarde die de hele bedrading verder doorgeeft.
+
+     Drie soorten schakels dus, en herhalen tot er niets meer bijkomt:
+
+       module.exports = { DATA_DIR: opslag.DATA_DIR }        bevroren-uitgifte
+       const { DATA_DIR } = require('./db')                  overgenomen
+       defineProperty(exports,'DATA_DIR',{get:()=>o.DATA_DIR}) levende doorgifte
+
+     De derde is zelf GEEN klem -- er wordt niets bevroren -- maar hij maakt de
+     naam wel tot bron voor wie hem daarna wel bevriest. Zonder die schakel zakte
+     deze teller van zes naar drie zodra db/index.js netjes werd gemaakt, terwijl
+     server.js de map nog even hard vasthield: de reparatie had de METER blind
+     gemaakt in plaats van de code beter (LAT-regel 9), en ik liep er zelf in
+     binnen tien minuten.
+
+     De grens is scherp: alleen wat BUITEN een functie staat klemt. `{ dir: () =>
+     opslag.DATA_DIR }` leest pas bij de aanroep en is juist de oplossing.
+
+     EERST ALLE SCHAKELS ZOEKEN, DAAR PAS DE LUS OVER. De eerste versie liep de
+     bomen opnieuw af in elke ronde: 186 ms werd 12,3 seconde. De bomen leveren
+     nu EEN keer hun schakels op; de lus die daarna de ketting uitrekent raakt
+     geen AST meer aan en kost niets. */
+  const schakels = [];       // { id, bestand, naam, soort, vanaf, lijn }
+  const doorgiften = [];     // { id, bestand, naam, vanaf: [ids] }
+  for (const { rel, boom } of bestanden) {
+    const alias = requireAliassen(wortel, rel, boom);
+    if (!alias.size) continue;
+    /* (a) een objecteigenschap BUITEN een functie die een naam uit een andere
+           module overneemt: die roept een eventuele getter een keer aan. */
+    loop(boom, (n, pad) => {
+      if (n.type !== 'Property' && n.type !== 'ObjectProperty') return;
+      for (const ouder of pad) if (/Function/.test(ouder.type || '')) return;
+      const v = n.value;
+      if (!v || v.type !== 'MemberExpression' || !v.object || v.object.type !== 'Identifier') return;
+      const vanaf = alias.get(v.object.name);
+      const veld = (v.property || {}).name;
+      if (!vanaf || !veld) return;
+      const sleutel = (n.key && n.key.name) || reeksVan(n.key);
+      if (!sleutel) return;
+      schakels.push({ id: rel + '#' + sleutel, bestand: rel, naam: sleutel, soort: 'bevroren-uitgifte',
+        vanaf: vanaf + '#' + veld, lijn: n.lijn || v.lijn || 0 });
+    });
+    /* (b1) een GETTER in de module.exports die de map levend doorgeeft. Zelfde
+            zaak als (b), andere schrijfwijze -- en db/index.js gebruikt deze,
+            want defineProperty eronder kostte net de bytes die dat bestand over
+            de omvangsgrens duwden. Alleen op het object dat ECHT de export is:
+            een getter op een prive-object zegt niets over wat dit bestand
+            uitdeelt. */
+    for (const k of boom.body) {
+      const uitdr = k.type === 'ExpressionStatement' ? k.expression : null;
+      if (!uitdr || uitdr.type !== 'AssignmentExpression') continue;
+      const links = uitdr.left;
+      const isExport = links && links.type === 'MemberExpression'
+        && (links.object || {}).name === 'module' && (links.property || {}).name === 'exports';
+      if (!isExport || !uitdr.right || uitdr.right.type !== 'ObjectExpression') continue;
+      for (const pr of uitdr.right.properties || []) {
+        if (pr.kind !== 'get' || !pr.value) continue;
+        const sleutel = (pr.key && pr.key.name) || reeksVan(pr.key);
+        if (!sleutel) continue;
+        const bereikt = [];
+        loop(pr.value, (x) => {
+          if (x.type !== 'MemberExpression' || !x.object || x.object.type !== 'Identifier') return;
+          const vanaf = alias.get(x.object.name);
+          const veld = (x.property || {}).name;
+          if (vanaf && veld) bereikt.push(vanaf + '#' + veld);
+        });
+        if (bereikt.length) doorgiften.push({ id: rel + '#' + sleutel, bestand: rel, naam: sleutel, vanaf: bereikt });
+      }
+    }
+    /* (b) een defineProperty die de map LEVEND doorgeeft uit een andere module. */
+    loop(boom, (n) => {
+      if (n.type !== 'CallExpression' || !n.callee || n.callee.type !== 'MemberExpression') return;
+      if ((n.callee.object || {}).name !== 'Object' || (n.callee.property || {}).name !== 'defineProperty') return;
+      const [doel, naam, beschrijving] = n.arguments || [];
+      const isExport = doel && ((doel.type === 'MemberExpression' && (doel.object || {}).name === 'module'
+        && (doel.property || {}).name === 'exports') || (doel || {}).name === 'exports');
+      const sleutel = naam && (naam.name || reeksVan(naam));
+      if (!isExport || !sleutel || !beschrijving) return;
+      const bereikt = [];
+      loop(beschrijving, (k) => {
+        if (k.type !== 'MemberExpression' || !k.object || k.object.type !== 'Identifier') return;
+        const vanaf = alias.get(k.object.name);
+        const veld = (k.property || {}).name;
+        if (vanaf && veld) bereikt.push(vanaf + '#' + veld);
+      });
+      if (bereikt.length) doorgiften.push({ id: rel + '#' + sleutel, bestand: rel, naam: sleutel, vanaf: bereikt });
+    });
+  }
+  /* (c) wie destructureert er bij het laden een naam uit een ander bestand? */
   for (const { rel, boom } of bestanden) {
     for (const k of boom.body) {
       if (k.type !== 'VariableDeclaration') continue;
       for (const d of k.declarations || []) {
         if (!d.id || d.id.type !== 'ObjectPattern' || !d.init) continue;
         if (d.init.type !== 'CallExpression' || (d.init.callee || {}).name !== 'require') continue;
-        /* De eigen parser zet een tekenreeks in `raw`, MET aanhalingstekens, en
-           laat `value` leeg. Daar liep deze telling eerst op stuk: hij vond nul
-           overnames terwijl db/sqlite.js er letterlijk een heeft. */
-        const arg = (d.init.arguments || [])[0];
-        const rauw = arg && (arg.raw !== undefined ? String(arg.raw) : (arg.value !== undefined ? String(arg.value) : null));
-        const doel = rauw && rauw.replace(/^['"`]|['"`]$/g, '');
-        if (!doel || !doel.startsWith('.')) continue;
-        let vanaf = path.posix.normalize(path.posix.join(path.posix.dirname(rel), doel));
-        if (!/\.js$/.test(vanaf)) vanaf += '.js';
+        const vanaf = bestandVoor(wortel, rel, reeksVan((d.init.arguments || [])[0]));
+        if (!vanaf) continue;
         for (const pr of d.id.properties || []) {
           const naam = (pr.key || {}).name || (pr.value || {}).name;
-          if (!naam || !bronnen.has(vanaf + '#' + naam)) continue;
-          uit.push({ id: rel + '#' + naam, bestand: rel, naam, soort: 'overgenomen', vanaf, lijn: d.lijn || k.lijn || 0 });
+          if (!naam) continue;
+          schakels.push({ id: rel + '#' + naam, bestand: rel, naam, soort: 'overgenomen',
+            vanaf: vanaf + '#' + naam, lijn: d.lijn || k.lijn || 0 });
         }
       }
+    }
+  }
+  /* De ketting uitrekenen: alleen nog verzamelingen, geen bomen. */
+  let gegroeid = true;
+  while (gegroeid) {
+    gegroeid = false;
+    for (const dg of doorgiften) {
+      if (bronnen.has(dg.id)) continue;
+      if (!dg.vanaf.some(v => bronnen.has(v))) continue;
+      bronnen.set(dg.id, { naam: dg.naam, bestand: dg.bestand });
+      gegroeid = true;
+    }
+    for (const sch of schakels) {
+      if (gezien.has(sch.id) || !bronnen.has(sch.vanaf)) continue;
+      gezien.add(sch.id);
+      uit.push({ id: sch.id, bestand: sch.bestand, naam: sch.naam, soort: sch.soort,
+        vanaf: sch.soort === 'overgenomen' ? sch.vanaf.split('#')[0] : sch.vanaf, lijn: sch.lijn });
+      if (!bronnen.has(sch.id)) { bronnen.set(sch.id, { naam: sch.naam, bestand: sch.bestand }); }
+      gegroeid = true;
     }
   }
   return uit;

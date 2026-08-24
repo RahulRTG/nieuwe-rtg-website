@@ -253,7 +253,7 @@ const METERS = [
 
      Een functie die de env pas BIJ DE AANROEP leest telt niet mee -- dat is de
      vorm waar we naartoe werken. */
-  { sleutel: 'datamapVastgeklonken', richting: 'omlaag', wat: 'bindingen die de datamap bij het LADEN vastleggen; dit getal blokkeert het delen van een server' },
+  { sleutel: 'datamapVastgeklonken', richting: 'omlaag', wat: 'bindingen die de datamap bij het LADEN vastleggen -- recht, afgeleid, overgenomen of als bevroren objecteigenschap' },
   /* DE BEWIJSGRAAF. Fase D en E van de verificatie-runtime: weten welk bewijs bij
      welke code hoort, en op grond daarvan de kleinste voldoende verzameling
      kiezen.

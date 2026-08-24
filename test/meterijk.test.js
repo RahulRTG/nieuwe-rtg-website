@@ -692,27 +692,47 @@ const IJKINGEN = {
       })
   },
   datamapVastgeklonken: {
-    /* Drie soorten in EEN proefbestand, want de meter moet ze alledrie zien en
-       niet alleen de makkelijkste:
-         recht      leest process.env.RTG_DATA_DIR bij het laden
-         afgeleid   op moduleniveau uit die binding gerekend
-         overgenomen bij het laden overgenomen uit een module die hem al vast heeft
-       De vierde regel is de vorm waar we juist NAARTOE werken -- een functie die
-       de env pas bij de aanroep leest -- en die hoort NIET mee te tellen. Zonder
-       die regel zou een meter die simpelweg naar de tekst RTG_DATA_DIR zoekt hier
-       groen staan terwijl hij het verkeerde telt. */
+    /* VIJF vormen in EEN proefbestand, en twee tegenproeven. De meter moet ze
+       alle vijf zien; hij zag er lang maar drie, en de twee die hij miste waren
+       net de twee die er het meest toe deden.
+
+         recht              leest process.env.RTG_DATA_DIR bij het laden
+         afgeleid           op moduleniveau uit die binding gerekend
+         overgenomen        bij het laden overgenomen uit een module die hem
+                            al vast heeft
+         bevroren-uitgifte  een objecteigenschap die de LEVENDE getter van een
+                            andere module een keer aanroept en de dode uitkomst
+                            uitdeelt -- dit is wat server/db/index.js deed met
+                            `DATA_DIR: opslag.DATA_DIR`, en daarmee kreeg de
+                            hele bedrading een bevroren map zonder dat de meter
+                            iets zag
+         overgenomen (map)  hetzelfde, maar via `require('../db')` -- een
+                            MAPverwijzing. De teller plakte er '.js' achter,
+                            zocht naar server/db.js, vond niets en zweeg. Dat is
+                            precies de weg die server.js loopt.
+
+       De laatste twee regels zijn de vorm waar we juist NAARTOE werken: een
+       functie (of een pijl in een eigenschap) die de map pas bij de aanroep
+       leest. Die horen NIET mee te tellen. Zonder die tegenproeven zou een meter
+       die simpelweg naar de tekst RTG_DATA_DIR zoekt hier groen staan terwijl
+       hij het verkeerde telt -- en zou de OPLOSSING de ratel omhoog duwen. */
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       "const path = require('path');\n" +
+      "const opslag = require('../db/opslag');\n" +
       "const MAP = process.env.RTG_DATA_DIR || '/tmp';\n" +
       "const BESTAND = path.join(MAP, 'x.json');\n" +
-      "const { DATA_DIR } = require('../db/opslag');\n" +
+      "const { DB_FILE } = require('../db/opslag');\n" +
+      "const { DATA_DIR } = require('../db');\n" +
       "const laatLezen = () => process.env.RTG_DATA_DIR || '/tmp';\n" +
-      "module.exports = { MAP, BESTAND, DATA_DIR, laatLezen };\n",
+      "module.exports = { MAP, BESTAND, DB_FILE, DATA_DIR, KLEM: opslag.DB_FILE,\n" +
+      "  laatLezen, laat: () => opslag.DATA_DIR };\n",
       () => {
         const verschil = meet({ alleen: ['datamapVastgeklonken'] }).datamapVastgeklonken - voor.datamapVastgeklonken;
-        assert.equal(verschil, 3,
-          'er staan drie vastgeklonken bindingen in het proefbestand (recht, afgeleid, overgenomen) ' +
-          'en een functie die pas bij de aanroep leest; telt de meter er vier, dan telt hij de oplossing mee als probleem');
+        assert.equal(verschil, 5,
+          'er staan vijf vastgeklonken bindingen in het proefbestand (recht, afgeleid, overgenomen, ' +
+          'bevroren-uitgifte en overgenomen via een mapverwijzing) en twee lezingen die pas bij de ' +
+          'aanroep gebeuren; telt de meter er meer, dan telt hij de oplossing mee als probleem, ' +
+          'telt hij er minder, dan mist hij precies de vorm waarmee de map de bedrading in lekt');
         return verschil;
       })
   },

@@ -141,16 +141,13 @@ test('set/get gaan over de eigen client', { skip: !HEEFT_REDIS }, async () => {
     assert.strictEqual(await metDeadline(c.set('rtg:test', 'hallo'), 8000, 'set'), 'OK');
     assert.strictEqual(await metDeadline(c.get('rtg:test'), 8000, 'get'), 'hallo');
     assert.strictEqual(await metDeadline(c.get('rtg:bestaat-niet'), 8000, 'get van niets'), null);
-  } finally { await c.quit().catch(() => c.disconnect()); }
-});
 
-test('EVAL maakt een clusterbrede teller plus verval atomair', { skip: !HEEFT_REDIS }, async () => {
-  const c = eigen.createClient({ url: URL }); c.on('error', () => {});
-  const lua = "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('PEXPIRE',KEYS[1],ARGV[1]); end; return n";
-  const claim = "if redis.call('EXISTS',KEYS[1])==1 then return 0 end; redis.call('PSETEX',KEYS[1],ARGV[1],'1'); return 1";
-  const basis = 'rtg:test:eval:' + Date.now();
-  try {
-    await metDeadline(c.connect(), 8000, 'eval connect');
+    /* EVAL hoort bij dezelfde echte-clientproef. Een apart test() met dezelfde
+       Redis-poort vergroot alleen het aantal zelf-overslaande toetsen; het
+       levert geen extra omgeving of isolatie op. */
+    const lua = "local n=redis.call('INCR',KEYS[1]); if n==1 then redis.call('PEXPIRE',KEYS[1],ARGV[1]); end; return n";
+    const claim = "if redis.call('EXISTS',KEYS[1])==1 then return 0 end; redis.call('PSETEX',KEYS[1],ARGV[1],'1'); return 1";
+    const basis = 'rtg:test:eval:' + Date.now();
     assert.strictEqual(await metDeadline(c.eval(lua, [basis + ':teller'], [5000]), 8000, 'eval een'), 1);
     assert.strictEqual(await metDeadline(c.eval(lua, [basis + ':teller'], [5000]), 8000, 'eval twee'), 2);
     assert.strictEqual(await metDeadline(c.eval(claim, [basis + ':claim'], [5000]), 8000, 'claim een'), 1);

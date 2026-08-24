@@ -13,6 +13,7 @@
    onbereikbaar is, faalt alleen de PIN-opzoekdeur dicht. Contacten, login en
    bestaande relaties blijven werken. */
 'use strict';
+const { normaliseer } = require('./pin-formaat');
 
 module.exports = ({ crypto }) => {
   const url = process.env.REDIS_URL;
@@ -59,5 +60,9 @@ module.exports = ({ crypto }) => {
     try { await tel(await redis(), 'rtg:pin:missers', 60 * 1000); return { ok: true }; }
     catch (e) { return { ok: false, status: 503, error: 'De gedeelde PIN-beveiliging is tijdelijk niet beschikbaar.' }; }
   }
-  return { voor, misser };
+  // De ouderroute moet weten of dezelfde invoer een PIN of een codenaam is,
+  // zodat alleen PIN-missers in het clusterbudget belanden. Dit gebruikt
+  // bewust exact dezelfde pure lezer als de kern en geen tweede route-regex.
+  const isPin = invoer => !!normaliseer(invoer);
+  return { voor, misser, isPin };
 };

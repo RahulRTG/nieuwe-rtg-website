@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4085 |
-| servermodules (`server/**/*.js`) | 2308 |
+| servermodules (`server/**/*.js`) | 2311 |
 | routebestanden (`server/routes/**`) | 474 |
-| kernmodules (`server/kern/**`) | 1413 |
+| kernmodules (`server/kern/**`) | 1416 |
 | schermen (`public/**/*.html`) | 264 |
 | gedeelde browsermodules (`public/shared/*.js`) | 229 |
 | toetsbestanden (`test/*.test.js`) | 950 |
@@ -102,12 +102,12 @@ zie §5 -- er zijn nog 194 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 19 | 5 | 8 | 46 |
+| `auth` | 19 | 5 | 8 | 41 |
 | `member` | 641 | 57 | 10 | 398 |
 | `supplier` | 598 | 111 | 10 | 297 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
-| `social` | 72 | 9 | 39 | 66 |
+| `social` | 72 | 9 | 39 | 63 |
 | `techniek` | 67 | 15 | 1 | 55 |
 | `zakelijk` | 13 | 2 | 0 | 25 |
 | `wereld` | 15 | 3 | 0 | 0 |
@@ -125,9 +125,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1422 |
+| kern-namen die routes aanraken | 1414 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 194 |
-| daarvan door precies één domein | 1228 |
+| daarvan door precies één domein | 1220 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -158,10 +158,10 @@ sseToCustomer(5)
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 40 | `server/routes/member/voertuigen.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
-| 36 | `server/routes/auth.js` |
 | 36 | `server/routes/staff.js` |
 | 35 | `server/routes/auth/account.js` |
 | 34 | `server/routes/auth/herstel.js` |
+| 34 | `server/routes/member/handel/uitjes.js` |
 
 ## 6. Waar de waarheid staat
 

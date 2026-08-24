@@ -3,7 +3,7 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, db, rtf, webpush } = kern;
+  const { app, db, rtf, webpush, pinBeveiliging } = kern;
 
   // Hoort dit kind-handle echt bij het gezin van deze beheerder? (voogd-check)
   const isKindVanGezin = (gezinCode, kindHandle) =>
@@ -25,7 +25,7 @@ function rtfSociaal(req, res) {
   /* De leden- en gezinnenlaag draaien als submodules op de gedeelde kern
      plus de sessie-helpers, een keer gemount bij het opstarten. */
   const pinClusterRem = require('../kern/sociaal/pin-clusterrem')({ crypto: kern.crypto });
-  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, pinClusterRem };
+  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, pinClusterRem, pinBeveiliging };
   require('./social/leden')(sctx);
   require('./social/pin')(sctx);
   require('./social/snaps')(sctx);

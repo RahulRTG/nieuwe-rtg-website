@@ -2,11 +2,11 @@
    (met ouderakkoord), dm, snaps en verhalen. Gemount vanuit
    routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, pinClusterRem } = sctx;
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
+  const pinClusterRem = sctx.pinClusterRem;
   const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
           socialDm, socialDmSend, socialGoedkeur, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
-          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart,
-          pinNormaliseer } = kern;
+          verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;
 /* Verplichte onboarding + contract voor RTF-leden: dezelfde platform-scope 'rtg',
    maar met de RTF-handle als sleutel. RTF vraagt standaard de contactgegevens + het
    contract (geen paspoort; dat is voor de reispas). */
@@ -45,7 +45,7 @@ app.post('/api/rtf/social/oudervoeg', async (req, res) => {
   if (!s.beheerder) return res.status(403).json({ error: 'Alleen een ouder/beheerder voegt contacten toe voor een kind.' });
   const kindHandle = String(req.body.kindHandle || '');
   const invoer = String(req.body.pin || req.body.codenaam || '');
-  const isPin = !!pinNormaliseer(invoer);
+  const isPin = pinClusterRem.isPin(invoer);
   if (isPin) {
     const deur = await pinClusterRem.voor({ actor: kindHandle, bron: req.ip });
     if (!deur.ok) return res.status(deur.status).json({ error: deur.error });

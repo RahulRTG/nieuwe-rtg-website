@@ -37,6 +37,7 @@
    die daarbij hoort. Het OPZOEKEN staat in ./pin-deur.js (de twee remmen en de
    gelijke antwoorden), en de LEVENDE code in ./pin-live.js. */
 const klok = require('../../lib/klok');
+const { ALFABET, NIEUWE_LENGTE, OUDE_LENGTE, normaliseer, toonbaar } = require('./pin-formaat');
 
 module.exports = (ctx) => {
 const { db, save, crypto, codenaamVan, soortVan, isBeschermdHandle, isGeblokkeerd,
@@ -44,35 +45,12 @@ const { db, save, crypto, codenaamVan, soortVan, isBeschermdHandle, isGeblokkeer
   pinTrekIn, pinBeveiligingNoteer, pinBeveiligingBeeld, pinBevries,
   pinIntentTrekInVoor } = ctx;
 
-/* Crockford base32: geen I, L, O en U. 256 is precies 8 x 32, dus `byte % 32`
-   is zuiver uniform -- er hoeft geen enkele trekking verworpen te worden. */
-const ALFABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-const NIEUWE_LENGTE = 10;
-const OUDE_LENGTE = 8;
 const UUR = 60 * 60 * 1000;
 
 const rij = () => {
   if (!db.data.contactPins || typeof db.data.contactPins !== 'object') db.data.contactPins = {};
   return db.data.contactPins;
 };
-
-/* Van wat een mens intypt naar de pin zoals hij bewaard staat, of null.
-   De omzetting O->0 en I/L->1 is de Crockford-lezing: wie "IBAN" hoort
-   voorlezen weet niet of het een i of een 1 is, en de pin hoort dat niet uit
-   te maken. U->V om dezelfde reden. Streepjes, spaties en punten mogen: het
-   v2-scherm toont 'A1B2C-D3E4F' en dat plakt iemand terug zoals het er staat;
-   bestaande v1-pins blijven als 'A1B2-C3D4' geldig tot vernieuwing. */
-function normaliseer(ruw) {
-  const s = String(ruw == null ? '' : ruw).toUpperCase().replace(/[^0-9A-Z]/g, '')
-    .replace(/O/g, '0').replace(/[IL]/g, '1').replace(/U/g, 'V');
-  if (s.length !== OUDE_LENGTE && s.length !== NIEUWE_LENGTE) return null;
-  for (const teken of s) if (!ALFABET.includes(teken)) return null;
-  return s;
-}
-// v1 blijft 4-4; de nieuwe v2-pin leest als twee even grote groepen van vijf
-const toonbaar = pin => pin ? (pin.length === OUDE_LENGTE
-  ? pin.slice(0, 4) + '-' + pin.slice(4)
-  : pin.slice(0, 5) + '-' + pin.slice(5)) : null;
 
 /* De hint van pin naar lid staat in ./pin-index.js -- een eigen bestand, want
    de uitleg waarom een index hier GEEN tweede waarheid is, is langer dan de

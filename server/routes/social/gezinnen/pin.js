@@ -14,7 +14,8 @@
 
    Gemount vanuit routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, rtfSociaal, pinClusterRem } = sctx;
+  const { kern, rtfSociaal } = sctx;
+  const pinClusterRem = sctx.pinClusterRem;
   const { app, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
           liveMaak, liveKijk, liveVerbind } = kern;
 

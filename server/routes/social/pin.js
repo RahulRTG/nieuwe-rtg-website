@@ -10,10 +10,11 @@
 
    Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
-  const { kern, pinClusterRem } = sctx;
+  const { kern } = sctx;
+  const pinClusterRem = sctx.pinClusterRem;
+  const pinBeveiliging = sctx.pinBeveiliging;
   const { app, auth, geenGast, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
-          liveMaak, liveKijk, liveVerbind, appUrl,
-          webauthnActieOpties, webauthnActieMaak } = kern;
+          liveMaak, liveKijk, liveVerbind, appUrl } = kern;
   const PIN_ACTIES = new Set(['rtg-pin-vernieuw', 'rtg-pin-noodslot-uit', 'rtg-pin-vast-aan']);
   const oorsprong = req => { try { return new URL(appUrl(req)).origin; } catch (e) { return ''; } };
   const gastheer = req => { try { return new URL(oorsprong(req)).hostname; } catch (e) { return req.hostname; } };
@@ -23,7 +24,7 @@ module.exports = (sctx) => {
     // echt account mét passkey moet hem altijd opnieuw tonen; de kern beslist
     // dit op basis van de opgeslagen credentials, niet op basis van clientdata.
     if (!req.session.account) return { status: 200, ok: true, nodig: false };
-    return webauthnActieMaak(req.session.account, actie, binding(req, actie),
+    return pinBeveiliging.maak(req.session.account, actie, binding(req, actie),
       req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
   }
 
@@ -35,7 +36,7 @@ app.post('/api/member/pin/actie/opties', auth, async (req, res) => {
   const actie = String(req.body.actie || '');
   if (!PIN_ACTIES.has(actie)) return res.status(400).json({ error: 'Onbekende PIN-veiligheidshandeling.' });
   if (!req.session.account) return res.json({ nodig: false });
-  const r = await webauthnActieOpties(req.session.account, actie, binding(req, actie), gastheer(req));
+  const r = await pinBeveiliging.opties(req.session.account, actie, binding(req, actie), gastheer(req));
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });

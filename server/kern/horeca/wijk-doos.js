@@ -9,6 +9,11 @@
    opzet verschilt. Zes regels, en ze staan een keer (LAT-regel 4). */
 'use strict';
 
+/* DEZELFDE KLOK ALS DE REST VAN DE HORECA, en niet de OS-tijd. De cadans en de
+   werklijst rekenen met server/lib/klok; een aanbod dat zijn minuten ergens
+   anders vandaan haalt, telt onder RTG_KLOK anders dan het scherm ernaast. */
+const klok = require('../../lib/klok');
+
 const MAXOPEN = 24;      // hoeveel aanbiedingen er tegelijk uit mogen staan
 const MAXBEWAAR = 200;   // hoeveel er in de geschiedenis blijven staan
 
@@ -19,7 +24,7 @@ function doos(h) {
 
 const open = (h) => doos(h).filter((o) => o.stand === 'aangeboden');
 
-const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
+const minutenSinds = (at) => at ? Math.max(0, Math.round((klok.nu() - Date.parse(at)) / 60000)) : 0;
 
 /* De open aanbiedingen, met hoe lang ze staan. Geen grens en geen kleur: een
    aanbod dat lang staat is een feit waar een maître op mag handelen, en er is

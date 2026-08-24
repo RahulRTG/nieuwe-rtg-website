@@ -33,7 +33,9 @@ const { zetStand } = require('./keukenlaag');
 module.exports = ({ horeca, schoon }) => {
   const { nu } = horeca;
   const gezelschap = require('./gezelschap')({ horeca, schoon });
-  const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
+  // dezelfde klok als de cadans die deze pas plant; niet de OS-tijd
+  const klok = require('../../lib/klok');
+  const minutenSinds = (at) => at ? Math.max(0, Math.round((klok.nu() - Date.parse(at)) / 60000)) : 0;
 
   /* De claims wonen op de rekening, per gang. Niet op de regel: de taak is de
      GANG (vier borden voor tafel 8), en een claim per bord zou precies de

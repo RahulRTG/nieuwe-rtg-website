@@ -27,6 +27,8 @@ module.exports = (kern) => {
   const { schoon, horeca, keuken } = kern;
   const { nu, id, centen } = horeca;
   const cadans = require('../../../kern/horeca/cadans');
+  // dezelfde klok als de cadans hierboven; niet de OS-tijd
+  const klok = require('../../../lib/klok');
   const werklijstlaag = require('../../../kern/horeca/werklijst')(
     { horeca, schoon, verzoeklaag: kern.verzoeklaag });
 
@@ -117,7 +119,7 @@ module.exports = (kern) => {
         }
       }
       if (!beste) return { let: 'Er staat geen gang te wachten op vrijgave.' };
-      const min = Math.max(0, Math.round((Date.now() - beste.t) / 60000));
+      const min = Math.max(0, Math.round((klok.nu() - beste.t) / 60000));
       return { let: 'Gang ' + beste.gang + ' op ' + beste.tafel + ' staat ' + min +
         ' min klaar om vrijgegeven te worden. Vrijgeven blijft een tik van de zaal.' };
     }

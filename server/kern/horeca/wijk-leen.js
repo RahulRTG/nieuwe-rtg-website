@@ -28,6 +28,9 @@
    uitleende (ik kan weer), en een manager (opruimen). */
 'use strict';
 
+// dezelfde klok als de cadans en de werklijst; zie ./wijk-doos.js
+const klok = require('../../lib/klok');
+
 const MAXLEEN = 60;
 
 function doos(h) {
@@ -83,7 +86,7 @@ module.exports = ({ horeca, schoon }) => {
      een getal maken dat niemand gemeten heeft (HORECA.md, grens 7). */
   function lijst(h) {
     return alle(h)
-      .map((l) => Object.assign({}, l, { staat: Math.max(0, Math.round((Date.now() - Date.parse(l.at)) / 60000)) }))
+      .map((l) => Object.assign({}, l, { staat: Math.max(0, Math.round((klok.nu() - Date.parse(l.at)) / 60000)) }))
       .sort((a, b) => b.staat - a.staat);
   }
 

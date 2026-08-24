@@ -1,5 +1,11 @@
 {
  "uitleg": "Per route waarom een HERHAALDE oproep daar wel of niet iets nieuws mag doen. IDEMPROEF.json telt welke routes onbeschermd zijn; dit bestand zegt of dat besloten is of alleen maar zo gegroeid. Een route die daar onbeschermd uitkomt en hier ontbreekt, staat in IDEMPROEF.json onder \"zonderBesluit\" -- dat getal hoort niet te groeien. \"onbeschermd\" is geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
+ "vastlegging": {
+  "kantoorAudit": "Het kantoorjournaal: wie deed wat aan het kantoor, en wanneer. Elke handeling van een medewerker schrijft er een regel bij -- ook de tweede keer dat iemand dezelfde schakelaar op AAN zet, en dat HOORT zo: de aantekening is er om de handeling terug te vinden, niet om de eindstand te bewaren. Groeit dus bij een herhaling mee zonder dat er iets tweede keer is gedaan. Gemeten onder office/bank, office/weefsel en office/zelfzorg.",
+  "commandJournaal": "Het journaal van RTG Command: welke opdracht is er aan de cockpit gegeven. Zelfde vorm als kantoorAudit -- een agent twee keer stoppen levert twee regels en een gestopte agent. Gemeten onder command/agent, command/alarm, command/sonde en command/zaak.",
+  "securityLog": "Het beveiligingsjournaal van RTFOS. Legt vast DAT er iets is aangeraakt, niet WAT eruit kwam; groeit bij elke aanraking, ook bij een herhaalde. Gemeten onder zes verschillende rtfos-families."
+ },
+ "vastleggingUitleg": "Collecties die de AANTEKENING van een handeling zijn en niet de handeling zelf. Het tweede meetpunt van de idemproef telt lengtes, en kan die twee niet uit elkaar houden: een auditregel bij de eerste EN bij de herhaalde oproep ziet er precies zo uit als twee keer echt werk. Dat onderscheid is een BESLUIT en staat daarom hier, met de reden erbij, en niet in een heuristiek -- een drempel die kantoorAudit vangt, vangt payBoekingen mee, en dan verdwijnt bewijs over geld achter een slimmigheid. De lijst veroudert de VEILIGE kant op: komt er een journaal bij dat hier niet staat, dan meldt de proef die route onbeschermd (te veel melden, niet te weinig). En de lijst wordt gecontroleerd: de proef telt per collectie onder hoeveel verschillende routefamilies hij groeide, en zegt het hardop als er een maar EEN familie heeft -- dat is domeinwerk in een vastleggingslijst.",
  "klassen": {
   "code-maker": "Elke oproep hoort iets NIEUWS te geven -- een code die twee keer hetzelfde is, is stuk. Onbeschermd is hier de bedoeling en geen tekort.",
   "creatie": "Een tweede oproep maakt een tweede item. Hinderlijk bij een dubbeltik, maar het raakt geen geld en het is soms juist gewenst (twee keer dezelfde notitie mag). Besloten: acceptabel zonder idem-sleutel.",
@@ -9,11 +15,12 @@
   "beschermd": "Liep hier onbeschermd en dat kostte iets wat niet mocht: geld, of dubbel werk bij een behandelaar, of een open deur. Sinds de reparatie is de herhaling afgevangen; ze blijven in dit register staan zodat de geschiedenis zichtbaar is."
  },
  "telling": {
-  "creatie": 40,
+  "creatie": 42,
   "berekening": 39,
-  "instelling": 13,
+  "instelling": 14,
   "beschermd": 6,
-  "code-maker": 4
+  "code-maker": 4,
+  "tebeslissen": 9
  },
  "routes": {
   "/api/agenda/toevoegen": {
@@ -333,6 +340,54 @@
   },
   "/api/wallet/voeg": {
    "klasse": "creatie"
+  },
+  "/api/drm/report": {
+   "klasse": "creatie",
+   "reden": "Lichte telemetrie: welke sleutelsystemen de speler van dit lid meldt, met een tijdstempel. Elke oproep is een WAARNEMING van een moment, dus twee oproepen horen twee regels te geven -- dat is wat een meetlog is. De lijst is afgekapt op 5.000 en raakt geen geld, geen toegang en geen persoonsgegevens buiten de codenaam. Gevonden door het tweede meetpunt (het antwoord is altijd {ok:true}); zie server/kern/drm.js."
+  },
+  "/api/overheid/rijbewijs/verleng": {
+   "klasse": "instelling",
+   "reden": "Verlengen zet geldigTot op VANDAAG + 10 jaar, absoluut en niet opgeteld bij de vorige datum -- twee keer verlengen geeft dus dezelfde einddatum en niet twintig jaar rijbewijs. Vastgehouden in test/overheid.test.js 3, en met een mutatie (optellen in plaats van absoluut) gezien zakken. Wat er bij een herhaling WEL twee keer gebeurt, en dat hoort hier te staan in plaats van weggestreept: de inwoner krijgt een tweede bericht dat zijn rijbewijs is verlengd. Een dubbele brief is hinderlijk; het rijbewijs zelf schuift niet twee keer op. Berichten aan een mens gaan daarom NIET in de vastleggingslijst -- een tweede brief is iets dat iemand ziet."
+  },
+  "/api/bank/overboek": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een interne overboeking gaat door boekAsync zonder idem-sleutel; een herhaling na een timeout boekt het bedrag nog een keer naar de tegenrekening. De kop van kern/bank/overboeken.js belooft idempotentie op de CLEARENDE paden (storten, sepa) en die twee zijn ook echt beschermd -- een interne overboeking valt daar niet onder, en dat verschil was tot nu toe niet gemeten. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/bulk": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een batchbetaling aan meerdere begunstigden, zonder sleutel. Een herhaling betaalt de hele batch nog een keer. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/salaris": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. De salarisrun, zonder sleutel. Een herhaling betaalt alle lonen nog een keer -- van de tien is dit het bedrag dat het hardst kan oplopen. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/pas/betaal": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een paskaartbetaling, zonder sleutel. Een herhaling schrijft het bedrag nog een keer af en telt nog een keer mee voor de daglimiet. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/naar-wallet": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. De brug van de bankrekening naar de wallet, zonder sleutel. Anders dan de vier hierboven blijft het geld bij hetzelfde lid -- het staat alleen op de verkeerde plek. Hinderlijk, geen verlies. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/van-wallet": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. De brug terug, zonder sleutel. Zelfde afweging als naar-wallet: binnen hetzelfde lid. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/terugkerend/zet": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een vaste betaling zetten, zonder sleutel. Een dubbele vaste betaling betaalt niet een keer te veel maar ELKE MAAND -- de enige van de tien waar de fout zich blijft herhalen tot iemand hem opmerkt. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/pas/uitgeven": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Twee klikken geven twee geldige passen op dezelfde rekening. Zelfde vorm als de dubbele kassacode uit 4.56: een vergeten tweede pas is een open deur, hier naar het saldo. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/pay/verzoek": {
+   "klasse": "tebeslissen",
+   "reden": "Gevonden op 24 augustus door de wereld klaar te zetten (TAKEN.md 4.30): deze route deed eerder geen werk en stond op ongemeten. Nu hij werk doet, blijkt de herhaling het gewoon opnieuw te doen. Een klompje vragen, zonder sleutel. Twee verzoeken van hetzelfde bedrag kunnen ALLEBEI door de vriend worden betaald -- precies het geval dat in 4.55 voor supplier/betaalverzoek is gerepareerd, aan de ledenkant. Staat als open punt in TAKEN.md 4.57; niet in deze meetronde gerepareerd, want een geldpad repareren hoort niet als bijvangst van een meting."
+  },
+  "/api/bank/rekening/open": {
+   "klasse": "creatie",
+   "reden": "Nog een rekening openen. Een dubbeltik geeft een tweede, lege rekening op naam van hetzelfde lid: hinderlijk in de lijst, en er gaat geen geld mee weg. Gevonden in dezelfde ronde als de negen hierboven, en met opzet NIET bij ze in gezet -- dat verschil is de hele reden dat dit register bestaat."
   }
  }
 }

@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 158,
+    "toetsenNietGemeten": 160,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -33,6 +33,11 @@
     "delenZonderOnderwerp": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenNietGemeten 158 -> 160 (test/staatlog.test.js, test/idemwereld.test.js)",
+      "reden": "Twee toetsbestanden erbij bij het tweede meetpunt van de idemproef (TAKEN.md 4.30): server/staatlog.js meet of een verzoek de OPSLAG veranderde, en dat is de meter die 768 routes uit \"ongemeten\" moest halen. De mutatiemotor is er nog niet langs geweest -- het bestand bestaat pas sinds vandaag -- en dat is de hele +2. Prijs van toetsen erbij, geen erosie.\n\nHandmatig zijn er zes mutaties gedraaid en gezien zakken op de laag eromheen (scripts/lib/idemproef.js): de vastleggingslijst negeren, de controle op die lijst uitzetten, ook nul families verdacht noemen, de routefamilie op een segment in plaats van twee, de tegenspraak niet opnieuw wegen, en de tellers niet terugdraaien. Op staatlog.js zelf zit de poort in de toets zelf: zonder RTG_STAATLOG haakt hij niet, en dat is te zien in plaats van te geloven.\n\nDeze +2 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen.\n\nHet tweede bestand is test/idemwereld.test.js, bij de wereld die de proef klaarzet zodat de geldroutes echt werk doen. Zes mutaties daarop gezien zakken: de halve-lijf-regel eruit, heel() niet laten doorzoeken in lijsten en posten, een kredietroute in de lijst zetten, een gedeelde soort in het gedeelde lijf, een klompje voor betalen en intrekken in plaats van twee, en de bank niet live zetten. Een zevende mutatie kwam er ongestraft doorheen (de lijstcontrole in heel() weghalen) en dat bleek terecht: Object.values dekt een lijst al, en de extra lengtecontrole bewaakte een geval dat deze kaart niet kan maken. Die tak is daarom weg in plaats van met een toets afgedekt."
+    },
     {
       "datum": "2026-08-24",
       "meter": "toetsenNietGemeten 156 -> 158 (test/banknood-idem.test.js, test/dubbelemelding.test.js)",

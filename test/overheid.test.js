@@ -91,6 +91,16 @@ test('3. RDW: voertuig registreren, dubbel geweigerd, en rijbewijs verlengen', a
   const verl = await api(base, '/api/overheid/rijbewijs/verleng', {}, lid);
   assert.equal(verl.status, 200);
   assert.ok(verl.body.rijbewijs.geldigTot > rb.body.rijbewijs.geldigTot, 'verlengen schuift de datum op');
+  /* TWEE KEER VERLENGEN VERLENGT NIET TWEE KEER (het besluit in IDEMBESLUIT.json).
+     De idemproef zag deze route aan de OPSLAG als onbeschermd -- er kwam bij
+     beide oproepen een bericht bij. Waar het om gaat is of het RIJBEWIJS twee
+     keer opschuift, en dat is de vraag die dit register beantwoordt: `geldigTot`
+     wordt absoluut berekend (vandaag + 10 jaar) en niet opgeteld bij de vorige
+     datum. Zou iemand dat naar `geldigTot + 10 jaar` veranderen, dan geeft een
+     dubbeltik twintig jaar rijbewijs, en dan zakt deze regel. */
+  const nog = await api(base, '/api/overheid/rijbewijs/verleng', {}, lid);
+  assert.equal(nog.body.rijbewijs.geldigTot, verl.body.rijbewijs.geldigTot,
+    'een tweede verlenging geeft dezelfde einddatum: de eindstand is idempotent');
 });
 
 test('4. KVK ondernemersloket: een lid schrijft een eenmanszaak in en vraagt zijn uittreksel op', async () => {

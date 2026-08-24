@@ -7,7 +7,7 @@
      1. foutisolatie per verzoek  -- een bug in EEN route mag het proces niet raken
      2. proxy-vertrouwen          -- wiens X-Forwarded-For geloven we eigenlijk
      3. logboek + meting          -- correlatie-id, verzoeklog, responstijden
-     4. https + HSTS (productie)  -- met de interne kanalen uitgezonderd
+     4. https + HSTS             -- ./httpspoort.js, interne kanalen vrij
      5. het schild en De Wacht    -- ./schildwacht.js
      6. security-headers          -- ./koppen.js, inclusief de terugval-CSP
      7. de AI-meelezer            -- telt mee, doet niets
@@ -23,7 +23,6 @@
    een schild dat nog niets weet.
    ========================================================================== */
 'use strict';
-const { lokaalAdres } = require('../lib/lokaaladres');
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
@@ -74,64 +73,12 @@ module.exports = function verzoekketen(deps) {
      (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
      een tekstzoektocht door de tests -- zie server/routelog.js. */
   require('../routelog');   // zet de haak in de router (alleen met RTG_ROUTELOG)
+  require('../staatlog').haak(app);  // idem: het tweede meetpunt van de idemproef
 
-  // In productie: alles naar https, en HSTS zodat browsers het onthouden.
-  // (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het
-  // gedeelde headerblok -- daar gelden ze voor elk antwoord, ook lokaal.)
-  app.use((req, res, next) => {
-    if (PRODUCTION) {
-      /* De gezondheidsprikken gaan hier NIET doorheen. De poortwachter
-         (server/trio.js) controleert zijn drie servers op /api/health over
-         gewone http op de loopback -- daar hoort geen TLS bij, en er komt dus
-         ook geen X-Forwarded-Proto mee. Kreeg die prik een 301, dan zag de
-         poortwachter nooit een 200, concludeerde hij dat geen enkele server
-         leefde, en gaf de site 503 terwijl alle drie de servers kerngezond
-         stonden te draaien. De failover-opstelling kon in productie dus nooit
-         gezond worden. Dat gebeurde op de eerste echte productiemachine, en het
-         is van buitenaf niet te zien: lsof laat drie luisterende servers zien
-         en de browser krijgt "alle servers zijn tijdelijk onbereikbaar".
-         Hetzelfde geldt voor /api/ready en voor de healthcheck in de Dockerfile. */
-      /* Hetzelfde geldt voor het hele /api/cluster-kanaal. Dat is het interne
-         gesprek tussen poortwachter en servers: promote (word actief), de
-         hartslag, het doorgeven van wie de baas is. Ook http, ook loopback.
-         Alleen /api/health vrijstellen was half werk: de prik lukte daarna wel,
-         maar promote kreeg nog een 301, er werd dus nooit iemand actief, en de
-         site bleef 503 geven. Dit kanaal is niet van buiten te misbruiken: het
-         eist de gedeelde x-rtg-cluster-sleutel en luistert alleen op 127.0.0.1
-         (zie de HOST-keuze in ./luister.js). */
-      const intern = req.path === '/api/health' || req.path === '/api/ready' ||
-        req.path.indexOf('/api/cluster/') === 0;
-      if (!req.secure && !intern) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
-      if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    }
-    /* EN OOK ZONDER DIE VLAG, als de bezoeker van een ECHT DOMEIN komt.
-
-       Dit hing alleen aan PRODUCTION, en die vlag was op de echte server nooit
-       gezet. Van buiten gemeten: http://app.rahultravelgroup.com/apps/app.html
-       gaf gewoon 200 met de hele app, geen 301, en op https ontbrak HSTS. Elk
-       sessietoken, elk wachtwoord en de backoffice-code gingen daarmee leesbaar
-       over de lijn voor wie op http binnenkwam.
-
-       Een slot dat opengaat als iemand een vlag vergeet, is geen slot -- dat is
-       vandaag de vierde keer dat diezelfde vorm bovenkomt. Daarom hangt het nu
-       aan iets wat niet te vergeten valt: KOMT DIT VAN EEN ECHT DOMEIN? Wie op
-       localhost of een adres in het eigen netwerk ontwikkelt, merkt niets (daar
-       is ook geen certificaat); wie via een domeinnaam binnenkomt, wordt
-       doorgestuurd en krijgt HSTS mee -- ook als NODE_ENV nergens staat. */
-    if (!PRODUCTION) {
-      /* Welke adressen tellen als lokaal, en waarom, staat in
-         ../lib/lokaaladres.js. Kort: adressen waarvoor niemand een certificaat
-         kan krijgen -- doorsturen naar https is daar doorsturen naar niets. */
-      const lokaal = lokaalAdres(req.get('host'));
-      if (!lokaal) {
-        const intern2 = req.path === '/api/health' || req.path === '/api/ready' ||
-          req.path.indexOf('/api/cluster/') === 0;
-        if (!req.secure && !intern2) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
-        if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-      }
-    }
-    next();
-  });
+  /* Alles naar https, met HSTS, en de interne kanalen (health, ready, cluster)
+     vrij -- ./httpspoort.js. Die laag hing ooit alleen aan PRODUCTION, en die
+     vlag was op de echte server nooit gezet; wat dat kostte staat daar. */
+  require('./httpspoort')({ app, PRODUCTION });
 
   // Het schild en De Wacht staan in ./schildwacht.js: twee lagen die een
   // verzoek kunnen weigeren voordat er een route naar kijkt.

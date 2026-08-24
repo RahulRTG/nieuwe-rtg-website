@@ -215,9 +215,30 @@ De volgorde is niet vrij: elke stap leunt op de vorige.
    hij zijn eigen geld heeft uitgegeven aan precies datgene waar dat budget voor
    was. Dat is met geen enkele foutmelding zichtbaar; alleen een toets op de
    volgorde vangt het.
-4. **De persoonlijke geldgrens.** `kern/geldbeleid/` kent al regels; de poort
-   kent al `eigenBeleid`. Ze moeten aan elkaar. Een eigen grens is dan een
-   weigering en geen waarschuwing — anders is het geen grens.
+4. ~~**De persoonlijke geldgrens.**~~ **Gedaan.** `kern/geldbeleid/grens.js`:
+   het lid stelt een dag- of maandgrens over zijn eigen uitgaven, eventueel per
+   genre of binnen een tijdvenster, en die **weigert** in de waardepoort. De vier
+   bestaande regelsoorten in `kern/geldbeleid/regels.js` waarschuwen, en dat is
+   voor die vier goed; deze is de enige die de deur dichtdoet. Een waarschuwing
+   die je kunt wegklikken op het moment dat je hem het hardst nodig hebt, is geen
+   grens maar een geheugensteun.
+
+   De grens hangt aan de **persoon**, niet aan een potje: hij telt over alle
+   posities samen. Anders is hij te omzeilen door uit een budget te betalen.
+
+   **De spanning, en die is niet weg te ontwerpen.** Een grens die je meteen kunt
+   uitzetten is een drempel — hij onderbreekt een impuls, meer niet. Een grens
+   die je níet meteen kunt uitzetten is een echte belofte aan jezelf, en zet
+   iemand die in het buitenland strandt met een daglimiet van honderd euro voor
+   een hotel van vierhonderd voor een gesloten deur. De keuze: **strenger werkt
+   meteen, soepeler kan wachten, en de bedenktijd is opt-in.** Standaard geen
+   bedenktijd — dat is met opzet de zwakkere stand, want RTG is geen
+   kansspelaanbieder en een betaalgrens die iemand laat stranden is erger dan een
+   impulsaankoop. Wie de sterkere versie wil, kiest hem, en dan houdt hij ook
+   echt: weggooien loopt langs dezelfde bedenktijd als verhogen, anders is hij te
+   omzeilen door de grens niet te verhogen maar weg te gooien. Er is géén
+   noodknop die de bedenktijd overslaat; die zou hem terugbrengen tot precies wat
+   hij niet mocht zijn.
 5. **De waardegraaf.** Volgen waar een euro heen ging, voor het lid en voor de
    ondernemer. `kern/geldgraaf/` is de plek; de vorm staat daar al vast.
 6. **Treasury voor ondernemers.** Btw-reservering, payroll-reservering,
@@ -279,7 +300,15 @@ Botst een functie met een grens, dan **vervalt de functie**.
 6. **Loon loopt via de loonaangifte.** Een werkgeversbudget dat overdraagbaar of
    uitbetaalbaar wordt, is loon. Dan hoort het via `kern/payroll` te lopen met
    loonheffing eromheen, niet hierlangs.
-7. **Een storing legt de economie niet stil.** De noodstop is er al
+7. **Een weigering is een gegeven over het lid, niet over de betaling.** De
+   reden waarom de poort nee zei — een zelf gestelde daglimiet, een wallet tegen
+   het plafond, een borg van een andere zaak, een budget dat hier niet geldt — is
+   privé. Een zaak krijgt een generiek antwoord; alleen "onvoldoende saldo"
+   blijft staan, want dat is wat een betaalterminal ook meldt en het verandert
+   wat de kassa nu doet. Zelfs daar gaan de bedragen eraf. Het lid krijgt de
+   volledige reden, in zijn eigen app. Een pinautomaat vertelt de winkelier ook
+   niet waarom de bank nee zei.
+8. **Een storing legt de economie niet stil.** De noodstop is er al
    (`RTG_BETALEN_UIT=1`), maar hij is alles-of-niets. Er horen tussenstanden te
    komen: externe uitbetalingen gepauzeerd terwijl interne betalingen
    doorlopen, of geen nieuwe opladingen terwijl bestaand saldo bruikbaar blijft.

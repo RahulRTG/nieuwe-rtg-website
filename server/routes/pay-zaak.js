@@ -21,6 +21,30 @@
 module.exports = (kern, { stuur }) => {
   const { app, supplierAuth, managerOnly, pay, sseToOffice } = kern;
 
+  /* WAT EEN ZAAK TE HOREN KRIJGT BIJ EEN WEIGERING, en waarom dat minder is dan
+     wat er gebeurde.
+
+     De waardepoort weigert met een reden, en die reden is vaak een privégegeven
+     van het LID: dat hij zichzelf een daglimiet heeft opgelegd, dat zijn wallet
+     tegen het plafond zit, dat een andere zaak een borg heeft vastgezet, of dat
+     hij een werkgeversbudget heeft dat hier niet geldt. Dat gaat een kassa niets
+     aan. Een pinautomaat vertelt de winkelier ook niet waarom de bank nee zei.
+
+     Dus: alles wat een zaak bereikt is generiek, met ÉÉN uitzondering.
+     "Onvoldoende saldo" blijft staan, want dat is precies wat een betaalterminal
+     wel meldt en het verandert wat de zaak nu doet -- om een andere betaalwijze
+     vragen. Maar zelfs daar gaat het bedrag eraf: hoeveel er tekort is, en
+     hoeveel er vastgezet staat, is niet aan de kassa.
+
+     Het LID krijgt de volledige reden wel, via zijn eigen app (./pay.js). */
+  const stuurZaak = (res, r) => {
+    if (!r || !r.error) return stuur(res, r);
+    const status = r.status || 400;
+    if (status === 402) return res.status(402).json({ error: 'Onvoldoende saldo.' });
+    if (r.reden) return res.status(status).json({ error: 'Deze betaling is geweigerd.' });
+    return stuur(res, r);
+  };
+
   /* ---- een budget geven ----
      De uitgever boekt uit ZIJN EIGEN pot; er is geen manier om een andere pot
      op te geven. Zo kan een werkgever nooit uitdelen uit het saldo van een
@@ -52,13 +76,13 @@ module.exports = (kern, { stuur }) => {
     const r = await pay.kasVooraf({ supplierCode: req.supplier.code, code: req.body.code,
       maxCenten: req.body.maxCenten, oms: req.body.oms, idem: req.body.idem, urenGeldig: req.body.urenGeldig });
     if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuur(res, r);
+    stuurZaak(res, r);
   });
   app.post('/api/supplier/pay/vastleg', supplierAuth, async (req, res) => {
     const r = await pay.kasVastleg({ supplierCode: req.supplier.code, reservering: req.body.reservering,
       centen: req.body.centen, oms: req.body.oms, idem: req.body.idem, genre: req.supplier.type });
     if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuur(res, r);
+    stuurZaak(res, r);
   });
   app.post('/api/supplier/pay/vrijgeef', supplierAuth, (req, res) => {
     stuur(res, pay.kasVrijgeef({ supplierCode: req.supplier.code, reservering: req.body.reservering }));
@@ -76,7 +100,7 @@ module.exports = (kern, { stuur }) => {
     const r = await pay.kasInt({ supplierCode: req.supplier.code, code: req.body.code,
       centen: req.body.centen, oms: req.body.oms, idem: req.body.idem, genre: req.supplier.type });
     if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuur(res, r);
+    stuurZaak(res, r);
   });
   app.post('/api/supplier/pay/overzicht', supplierAuth, (req, res) => {
     res.json(pay.partnerOverzicht(req.supplier.code));

@@ -97,7 +97,16 @@ test('vastgezet geld is niet uitgeefbaar -- dat is de hele belofte van een borg'
   const code2 = await nieuweCode(5000);
   const poging = await api('supplier/pay/in', { code: code2, centen: 2000, idem: 'i2' }, sup.token);
   assert.equal(poging.status, 402, 'dat kan niet: het geld staat vast');
-  assert.match(poging.body.error, /gereserveerd/, 'en het antwoord zegt waarom, niet alleen "onvoldoende"');
+  /* De KASSA hoort alleen "onvoldoende saldo" -- net als een betaalterminal. Dat
+     er een borg van een andere zaak op staat, en hoe hoog die is, gaat deze zaak
+     niets aan; zie de kop van server/routes/pay-zaak.js. */
+  assert.equal(poging.body.error, 'Onvoldoende saldo.', 'de kassa krijgt geen bedragen te zien');
+  assert.equal(poging.body.gereserveerd, undefined, 'en al helemaal niet hoeveel er vastzit');
+
+  // het LID ziet het wél, in zijn eigen overzicht
+  const o = await overzicht();
+  assert.ok(o.gereserveerd > 0, 'bij het lid staat wel wat er vastzit');
+  assert.equal(o.beschikbaar, o.saldo - o.gereserveerd);
 
   await api('supplier/pay/vrijgeef', { reservering: vast.body.reservering }, sup.token);
 });

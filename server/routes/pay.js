@@ -5,7 +5,24 @@
    dubbel boeken. */
 module.exports = (kern) => {
   const { app, auth, liveCodename, pay, onboarding, factuurSaldo } = kern;
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  /* Bij een weigering krijgt het LID wel te horen waarom. Dat is het spiegelbeeld
+     van ./pay-zaak.js, waar een zaak juist een generiek antwoord krijgt: de reden
+     is een gegeven over dit lid, dus hij hoort bij hem thuis en nergens anders.
+     Een lid dat "geweigerd" leest zonder te weten dat het zijn eigen daglimiet
+     was, belt de helpdesk over een storing die er niet is.
+
+     Een witte lijst en geen kale doorgifte: wat de poort teruggeeft groeit mee
+     met de laag eronder, en een veld dat er ooit bijkomt hoort niet automatisch
+     naar buiten te lekken. */
+  const UITLEG = ['reden', 'opheffbaar', 'eigenGrens', 'klasse', 'plafondCenten', 'ruimte',
+    'gereserveerd', 'beschikbaar', 'dagMaxCenten', 'maandMaxCenten', 'besteed', 'venster',
+    'toegestaan', 'vervaltOp', 'tekort', 'kyc'];
+  const stuur = (res, r) => {
+    if (!r.error) return res.json(r);
+    const uit = { error: r.error };
+    for (const k of UITLEG) if (r[k] !== undefined) uit[k] = r[k];
+    return res.status(r.status || 400).json(uit);
+  };
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Pay is voor leden.' }); return true; }
     return false;

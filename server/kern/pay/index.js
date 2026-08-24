@@ -65,7 +65,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
      saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
      Optioneel: zonder `waarde` is dit exact de regel die hier altijd stond. */
-  const waardePoort = require('./poort')({ saldoVan, waarde });
+  const waardePoort = require('./poort')({ saldoVan, grootboek, waarde });
   // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
   // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
   // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
@@ -141,6 +141,8 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   api.schaduw = schaduwStand;
   // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
   if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);
+  // late binding voor de eigen geldgrens van het lid (kern/geldbeleid, na pay gemount)
+  api.koppelGrens = waardePoort.koppelGrens;
   /* De deelbestanden. ./samen gaat als EERSTE in de ctx: kassa en vooraf betalen
      erlangs, want een betaling kan sinds er budgetten bestaan uit meerdere
      potjes komen (zonder waardelaag is het er exact een en verandert er niets).

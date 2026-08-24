@@ -94,11 +94,22 @@ function toets(positie, handeling, eigenBeleid) {
      Bewust ALS LAATSTE en met een eigen reden: dit is de enige weigering die
      het lid zelf kan opheffen, en dan hoort het antwoord dat te zeggen in
      plaats van te klinken als een regel van RTG. */
+  /* De grens van het lid telt over ALLES wat hij heeft, niet over dit ene
+     potje. Vandaar `dagBestedTotaal` en niet `dagBesteed`: die eerste is een
+     eigenschap van de persoon, de tweede van een positie. Ze op één veld laten
+     samenvallen zou een persoonlijke maandgrens van 500 euro veranderen in
+     "500 euro per potje", en dat is precies geen grens. */
   const e = eigenBeleid || {};
-  if (Number.isFinite(e.dagMaxCenten) && Math.round(Number(h.dagBesteed) || 0) + centen > e.dagMaxCenten)
-    return { mag: false, reden: 'eigen', uitleg: zinnen.eigen, eigenGrens: 'dagmaximum', dagMaxCenten: e.dagMaxCenten, opheffbaar: true };
+  const dagTot = Math.round(Number(h.dagBestedTotaal) || 0);
+  const maandTot = Math.round(Number(h.maandBestedTotaal) || 0);
+  const eigen = (grens, extra) => ({ mag: false, reden: 'eigen', uitleg: zinnen.eigen,
+    eigenGrens: grens, opheffbaar: true, ...extra });
+  if (Number.isFinite(e.dagMaxCenten) && dagTot + centen > e.dagMaxCenten)
+    return eigen('dagmaximum', { dagMaxCenten: e.dagMaxCenten, besteed: dagTot });
+  if (Number.isFinite(e.maandMaxCenten) && maandTot + centen > e.maandMaxCenten)
+    return eigen('maandmaximum', { maandMaxCenten: e.maandMaxCenten, besteed: maandTot });
   if (e.venster && !binnenVenster(e.venster, nu))
-    return { mag: false, reden: 'eigen', uitleg: zinnen.eigen, eigenGrens: 'tijdvenster', venster: e.venster, opheffbaar: true };
+    return eigen('tijdvenster', { venster: e.venster });
 
   return { mag: true, klasse: p.klasse || STANDAARD };
 }

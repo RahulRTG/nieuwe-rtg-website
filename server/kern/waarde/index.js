@@ -99,62 +99,10 @@ function maakWaarde({ db, save, crypto, nu = () => Date.now() }) {
     return p.spec.plafondCenten - Math.round(Number(saldo) || 0);
   }
 
-  /* DE POORT. Geeft `null` als de boeking door mag, en anders exact het
-     foutobject dat RTG Pay teruggeeft -- zelfde vorm als de rest van die laag
-     ({ status, error }), zodat de aanroeper niets hoeft te vertalen. */
-  function poort({ van, naar, centen, soort, saldoVan, genre, dagBesteed, eigenBeleid }) {
-    const c = Math.round(Number(centen) || 0);
-    const saldo = r => Math.round(Number(saldoVan ? saldoVan(r) : 0) || 0);
-
-    // 1 + 2: de betalende kant, maar alleen als dat een waardepositie is
-    const bron = positie(van);
-    if (bron) {
-      const vrij = beschikbaar(van, saldo(van));
-      if (vrij < c) {
-        const vast = reserve.vastgezet(van);
-        return vast > 0
-          ? { status: 402, error: 'Onvoldoende beschikbaar saldo: er staat ' + (vast / 100).toFixed(2) + ' euro gereserveerd.', beschikbaar: vrij, gereserveerd: vast }
-          : { status: 402, error: 'Onvoldoende saldo.', beschikbaar: vrij };
-      }
-      /* DE AARD VAN DE HANDELING, en dit is de enige plek waar die wordt
-         bepaald -- dus ook de plek waar een stilzwijgende uitzondering hoort op
-         te vallen in plaats van weg te zakken.
-
-         `extern:bank` telt hier met OPZET niet als uitbetalen. Dat is de brug
-         naar de eigen RTG Bank (kern/bank/walletbrug.js) en het geld blijft
-         binnen het huis: aan de andere kant staat een RTG-rekening, geen derde.
-         Pas de SEPA daarna verlaat het stelsel, en die hangt aan een eigen
-         bevoegdheid (SEPA_UIT in kern/bevoegdheid/lijst.js) die de boardroom
-         kan dichtzetten.
-
-         Daarmee is de keten wallet -> bank -> SEPA wel degelijk een weg waarlangs
-         walletsaldo bij het lid terecht kan komen, terwijl het besluit
-         WALLET_SALDO zegt dat het "niet wordt uitbetaald aan het lid". Die twee
-         staan op gespannen voet. Het dichtzetten van die keten is een besluit
-         over het product en niet een reparatie, dus het gebeurt hier niet
-         stilletjes; het staat als open vraag in WAARDE.md par. 9. Wat hier wel
-         gebeurt: de uitzondering heeft een naam en een reden, zodat de volgende
-         die hem leest ziet dat er over is nagedacht. */
-      const HUISINTERN = ['extern:bank', 'extern:treasury'];
-      const aard = soort === 'uitbetaling' ? 'uitbetalen'
-        : String(naar || '').startsWith('lid:') ? 'overdragen'
-        : HUISINTERN.includes(String(naar || '')) ? 'huisintern'
-        : 'besteden';
-      const o = toets(bron, { centen: c, genre, soort: aard, dagBesteed,
-        ontvanger: String(naar || '').replace(/^partner:/, ''), nu: nu() }, eigenBeleid);
-      if (!o.mag) return { status: 403, error: o.uitleg, reden: o.reden, klasse: bron.klasse, ...(o.opheffbaar ? { opheffbaar: true } : {}) };
-    }
-
-    // 3: het plafond van de ontvangende kant
-    const doel = positie(naar);
-    if (doel && Number.isFinite(doel.spec.plafondCenten)) {
-      const over = ruimte(naar, saldo(naar));
-      if (c > over) return { status: 409,
-        error: 'Dit past niet meer binnen het maximum van ' + (doel.spec.plafondCenten / 100).toFixed(0) + ' euro voor ' + doel.spec.naam.toLowerCase() + '.',
-        reden: 'plafond', plafondCenten: doel.spec.plafondCenten, ruimte: Math.max(0, over) };
-    }
-    return null;
-  }
+  /* DE POORT staat in ./beslis.js -- drie vragen (beschikbaar, mag het, past het
+     binnen het plafond) en dat is het stuk met de meeste redenering per regel.
+     Hier houden we de opbouw: registratie, saldi-rekenwerk en de deelmodules. */
+  const poort = require('./beslis')({ positie, beschikbaar, ruimte, reserve, toets, nu });
 
   /* De alleen-lezen kant (./kijken.js): wat een lid heeft en wat er op een
      positie staat. Daar komen save noch registreer binnen -- wie er iets

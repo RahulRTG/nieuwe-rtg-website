@@ -53,6 +53,13 @@ Object.assign(kern, { postdatum: require('../kern/postdatum')({ db, save, rtmail
    de graaf krijgt deze laag als argument mee -- een thunk zou die echte
    afhankelijkheid alleen maar verstoppen. */
 Object.assign(kern, require('../kern/geldbeleid').maakGeldbeleid({ db, save }));
+/* DE EIGEN GELDGRENS AANSLUITEN OP DE BETAALWEG. Zonder deze regel bestaat
+   `grensVoor` wel en vraagt niemand hem, en dan is een grens die het lid stelt
+   een instelling die nergens bijt -- precies de fout die het besluit
+   WALLET_SALDO maakte met zijn plafond (zie WAARDE.md par. 3). Late binding,
+   want geldbeleid wordt na pay gemount en pay hoeft niets van geldbeleid te
+   weten om te bestaan. */
+if (kern.pay && kern.pay.koppelGrens) kern.pay.koppelGrens(kern.geldbeleid.grensVoor);
 /* De geldgraaf (kern/geldgraaf/): de alleen-lezen projectielaag over de
    gelddomeinen, met de vooruitblik (GELD.md par. 1). Leest de kern LAAT zoals
    kern/geldwereld.js, zodat de mountvolgorde van de bronnen er niet toe doet;

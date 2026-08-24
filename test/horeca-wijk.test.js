@@ -429,6 +429,14 @@ test('16. een tafel staat hoogstens bij een iemand uit', async () => {
   assert.equal(vreemd.body.code, 'niet-uit-deze-wijk');
   assert.match(vreemd.body.error, /V1/, vreemd.body.error);
 
+  /* EN AAN IEMAND DIE HIER WERKT. Dit veld was als enige niet nagekeken: een
+     aanbod aan een verzonnen staffId bleef staan tot iemand het introk, want
+     aanvaarden kon niemand het. */
+  const spook = await A('/wijk/bied', { wijkId: z.id, naarId: '99999', naarNaam: 'Spook', tafels: ['Z3'] });
+  assert.equal(spook.status, 404, 'een aanbod aan iemand die hier niet werkt gaat niet door');
+  assert.equal(spook.body.code, 'onbekende-collega');
+  assert.equal((await wijken(A)).overdrachten.length, 0, 'en er staat niets open');
+
   const weer = await A('/wijk/bied', { wijkId: z.id, naarId: idN, naarNaam: naamN, tafels: ['Z1'] });
   assert.equal(weer.status, 409, 'een uitgeleende tafel bied je niet nog eens aan');
   assert.equal(weer.body.code, 'uitgeleend');

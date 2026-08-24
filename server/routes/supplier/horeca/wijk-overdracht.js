@@ -43,9 +43,20 @@ module.exports = (kern) => {
   const doos = require('../../../kern/horeca/wijk-doos');
   const wat = (o) => o.tafels ? doos.wat(o) + ' uit wijk "' + o.wijkNaam + '"' : 'wijk "' + o.wijkNaam + '"';
 
+  /* De ploeg van deze zaak, zodat een aanbod niet bij een verzonnen staffId kan
+     landen. Hier en niet in de kern: wie er bestaat is een vraag voor de
+     identiteitslaag. Faalt die, dan komt er een lege lijst uit en gaat het
+     aanbod niet door -- zie de kop van bied() voor waarom dat de veilige kant
+     is. */
+  const ploegVan = (code) => {
+    try { return (kern.accounts.listStaff(code) || []).map((x) => String(x.id)); }
+    catch (e) { return []; }
+  };
+
   app.post('/api/supplier/horeca/wijk/bied', supplierAuth, deur(
     (h, req, ik) => over.bied(h, { wijkId: req.body.wijkId, naarId: req.body.naarId,
-      naarNaam: req.body.naarNaam, tafels: req.body.tafels }, ik),
+      naarNaam: req.body.naarNaam, tafels: req.body.tafels,
+      ploeg: ploegVan(req.supplier.code) }, ik),
     (u) => 'bood ' + wat(u.overdracht) + ' aan ' + (u.overdracht.naarNaam || 'een collega')));
 
   app.post('/api/supplier/horeca/wijk/aanvaard', supplierAuth, deur(

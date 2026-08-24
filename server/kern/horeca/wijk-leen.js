@@ -59,6 +59,20 @@ module.exports = ({ horeca, schoon }) => {
     return d[t];
   }
 
+  /* EEN HALF AANBOD AANVAARDEN. Staat hier en niet bij de overdracht, want dit
+     IS de leen: de overdracht bepaalt alleen wie er iets mag, en wat er dan
+     gebeurt is een zaak van deze laag. Alles of niets is het NIET -- wat er
+     binnen de grens past gaat mee, en de aanroeper krijgt te horen wat. */
+  function neemOver(h, tafels, wie, uit) {
+    const gedaan = [];
+    for (const t of (Array.isArray(tafels) ? tafels : [])) if (zet(h, t, wie, uit)) gedaan.push(t);
+    if (!gedaan.length) return { status: 409, error: 'Er staan te veel tafels uitgeleend.' };
+    return { ok: true, tafels: gedaan,
+      let: gedaan.join(', ') + ' ' + (gedaan.length === 1 ? 'is' : 'zijn') + ' nu van u; ' +
+        ((uit && uit.vanNaam) || 'uw collega') + ' houdt de rest van ' +
+        ((uit && uit.wijkNaam) || 'de wijk') + '.' };
+  }
+
   function terug(h, tafel, wie) {
     const t = tafelNaam(tafel);
     const l = doos(h)[t];
@@ -90,5 +104,5 @@ module.exports = ({ horeca, schoon }) => {
       .sort((a, b) => b.staat - a.staat);
   }
 
-  return { van, zet, terug, lijst, naarMij, vanMij, MAXLEEN };
+  return { van, zet, neemOver, terug, lijst, naarMij, vanMij, MAXLEEN };
 };

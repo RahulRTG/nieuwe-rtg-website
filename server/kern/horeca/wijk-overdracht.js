@@ -27,15 +27,12 @@
       zijn wijk, een half aanbod alleen die van hemzelf. Twee halve aanbiedingen
       op verschillende tafels mogen dus wel -- vier tafels aan Sanne en drie aan
       Bram is een normale avond, geen uitzondering.
-   6. WEIGEREN DOET DE GEVRAAGDE, EN ALLEEN DIE. Een aanbod dat je niet kunt
-      aannemen hoort te kunnen worden beantwoord; anders blijft het staan tot de
-      aanbieder het zelf intrekt, en dan ligt de handeling bij de verkeerde
-      mens. Een manager weigert NIET namens iemand -- dan zegt het journaal iets
-      wat die persoon nooit gezegd heeft; opruimen doet hij met intrekken.
-   7. EEN NEE KOMT AAN. Een weigering die alleen een stand in de data is, is
-      geen antwoord: hij staat op het scherm van de aanbieder tot die hem heeft
-      gezien. Niet een tijdje, maar tot hij hem heeft gezien -- wie op dat
-      moment met borden liep, mist hem anders.
+   6. WEIGEREN DOET DE GEVRAAGDE, EN ALLEEN DIE.
+   7. EEN NEE KOMT AAN: hij blijft staan tot de aanbieder hem heeft gezien.
+
+   Regel 6 en 7 wonen in ./wijk-antwoord.js -- daar staat ook waarom een manager
+   niet namens iemand weigert, en waarom een bericht dat zichzelf opruimt geen
+   antwoord is.
 
    EN EEN HALF AANBOD VERHUIST GEEN TAFELS. Drie tafels aan een collega geven
    verandert de plattegrond niet; ze worden UITGELEEND (./wijk-leen.js) en de
@@ -60,7 +57,7 @@ module.exports = ({ horeca, schoon }) => {
 
   /* Aanbieden. De wijk blijft van de aanbieder tot de ander hem aanvaardt
      (regel 2) -- er is dus geen moment waarop hij van niemand is. */
-  function bied(h, { wijkId, naarId, naarNaam, tafels }, wie) {
+  function bied(h, { wijkId, naarId, naarNaam, tafels, ploeg }, wie) {
     const w = wijklaag.lijst(h).find((x) => x.id === String(wijkId || ''));
     if (!w) return { status: 404, error: 'Deze wijk kennen we niet.' };
     if (!w.van) return { status: 409, error: 'Niemand draagt deze wijk; hij is al van iedereen.' };
@@ -68,9 +65,21 @@ module.exports = ({ horeca, schoon }) => {
       return { status: 409, code: 'niet-van-jou',
         error: w.van.naam + ' draagt deze wijk; alleen hij biedt hem aan.' };
     }
-    if (!naarId) return { status: 400, error: 'Aan wie wordt deze wijk aangeboden?' };
-    if (String(naarId) === String(wie.staffId)) {
+    /* AAN EEN ECHTE COLLEGA. Dit veld was als enige niet begrensd en niet
+       nagekeken: een onbegrensde tekenreeks de opslag in, en een aanbod aan een
+       staffId die niet bestaat -- dat blijft staan tot iemand het intrekt, want
+       aanvaarden kan niemand het. Wie er BESTAAT komt van de aanroeper; dat is
+       een vraag voor de identiteitslaag. Is die lijst leeg, dan gaat het aanbod
+       niet door: dan blijft de wijk bij wie hem draagt, en dat is precies de
+       eigenschap die dit ontwerp bewaakt. */
+    const naar = schoon(naarId, 40).trim();
+    if (!naar) return { status: 400, error: 'Aan wie wordt deze wijk aangeboden?' };
+    if (naar === String(wie.staffId)) {
       return { status: 400, error: 'Een wijk aan jezelf aanbieden verandert niets.' };
+    }
+    if (!(Array.isArray(ploeg) ? ploeg : []).map(String).includes(naar)) {
+      return { status: 404, code: 'onbekende-collega',
+        error: 'Deze collega werkt niet bij deze zaak.' };
     }
     const keuze = deellaag.kies(w, tafels);
     if (keuze.error) return keuze;
@@ -100,7 +109,7 @@ module.exports = ({ horeca, schoon }) => {
     }
     const o = { id: id(4), wijkId: w.id, wijkNaam: w.naam, tafels: deel,
       vanId: String(wie.staffId), vanNaam: wie.naam,
-      naarId: String(naarId), naarNaam: schoon(naarNaam, 60) || null,
+      naarId: naar, naarNaam: schoon(naarNaam, 60) || null,
       stand: 'aangeboden', at: nu() };
     doos(h).unshift(o);
     if (doos(h).length > MAXBEWAAR) doos(h).length = MAXBEWAAR;
@@ -123,17 +132,12 @@ module.exports = ({ horeca, schoon }) => {
        wijk blijft van wie hem droeg -- anders zou "neem tafel 6 even over" de
        plattegrond hertekenen voor de rest van de dienst (./wijk-leen.js). */
     if (o.tafels && o.tafels.length) {
-      const gedaan = [];
-      for (const t of o.tafels) {
-        if (wijklaag.leen.zet(h, t, wie, { vanId: o.vanId, vanNaam: o.vanNaam,
-          wijkId: o.wijkId, wijkNaam: o.wijkNaam })) gedaan.push(t);
-      }
-      if (!gedaan.length) return { status: 409, error: 'Er staan te veel tafels uitgeleend.' };
+      const uit = wijklaag.leen.neemOver(h, o.tafels, wie, { vanId: o.vanId,
+        vanNaam: o.vanNaam, wijkId: o.wijkId, wijkNaam: o.wijkNaam });
+      if (uit.error) return uit;
       o.stand = 'aanvaard';
       o.aanvaardAt = nu();
-      return { ok: true, overdracht: o, wijk: o.wijkNaam, tafels: gedaan,
-        let: gedaan.join(', ') + ' ' + (gedaan.length === 1 ? 'is' : 'zijn') + ' nu van u; ' +
-          o.vanNaam + ' houdt de rest van ' + o.wijkNaam + '.' };
+      return { ok: true, overdracht: o, wijk: o.wijkNaam, tafels: uit.tafels, let: uit.let };
     }
     /* De dienst overschrijven en niet eerst loslaten: tussen loslaten en
        oppakken zou de wijk van niemand zijn, en dat is precies het gat. */

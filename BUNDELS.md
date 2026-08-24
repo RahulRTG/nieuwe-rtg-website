@@ -148,6 +148,8 @@ omlaag.
 | `command-16.js` | RTG Command, deel 16: de steden en het alarm |
 | `command-17.js` | RTG Command, deel 17: de gezondheidskaart -- de stand en de bewijsgraad naast elkaar |
 | `command-18.js` | RTG Command, deel 18: de incidenten -- de machine opent, een mens sluit |
+| `command-19.js` | RTG Command, deel 19: bijstand -- de klant nodigt uit, RTG niet |
+| `command-20.js` | RTG Command, deel 20: de vloot -- alle organisaties, tot waar de uitnodiging begint |
 
 ## `apps/defensie.js`
 

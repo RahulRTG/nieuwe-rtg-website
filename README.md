@@ -4334,6 +4334,36 @@ Bij een storing stelt iedereen dezelfde vraag als eerste, en die was hier niet t
 
 De lijn staat op de werkplek **Journaal** en in het dossier van elk incident, achter de knop *"Wat veranderde er vlak hiervoor?"*. Getoetst in `test/tijdlijn.test.js` (acht beweringen, zes mutaties); één ervan legde een echte fout bloot die er al in zat: `Number(minuten || 30)` maakte van een gevraagd venster van **nul** minuten er stil dertig.
 
+### RTG Bijstand: support die binnenkomt zonder de sleutel te krijgen
+
+Een leverancier die zijn klanten wil helpen, geeft zijn supportafdeling meestal een beheerdersaccount op alles. Dat werkt, en het is de reden dat *"onze engineer heeft even in uw omgeving gekeken"* een zin is die niemand kan controleren: er was geen begin, geen einde, geen onderwerp en geen spoor.
+
+**Toegang is hier een uitnodiging en geen recht, en dat is de vorm en niet een instelling.** Er is geen route aan de kantoorkant die een sessie aanmaakt. De klantkant staat in `server/kern/command/bijstand-klant.js`, de RTG-kant in `bijstand-rtg.js`, en wie dat wil veranderen moet aan de klantkant bijbouwen -- dat valt op. Er staat zelfs een fail-fast op een naam die aan beide kanten voorkomt: `Object.assign` laat de RTG-kant winnen, dus een functie die daar `vraag` gaat heten zou de klantkant stilzwijgend vervangen terwijl het andere bestand nog steeds de enige plek *lijkt* waar een sessie ontstaat.
+
+Vier niveaus, elk met een eigen maximale looptijd: **kijken** (alleen de diagnose, 60 min), **meedenken** (mag voorstellen, 120 min), **herstellen** (uitvoeren ná goedkeuring per handeling, 60 min) en **nood** (30 min).
+
+**Waarom `nood` geen uitzondering is op de eerste regel.** De verleiding is een stand waarin RTG bij een ernstig incident zelf naar binnen kan; die komt er niet. Wat `nood` doet is de goedkeuring **vooraf** geven in plaats van per handeling -- omdat een klant die om half drie 's nachts belt niet naast het scherm gaat zitten om vinkjes te zetten. Dat is zijn besluit, met een verplichte reden, voor een half uur, en elke handeling verschijnt onmiddellijk in het spoor dat hij live meeleest. Op de handeling staat dan letterlijk `besluitDoor: 'vooraf, bij het openen van de noodsessie'`; in het verslag moet leesbaar zijn wie wanneer ja zei.
+
+**Verlopen is een toestand en geen opruimactie.** `stand()` rekent hem bij elke lezing uit de klok -- een sessie die pas dichtgaat als er een schoonmaker langskomt, staat tussendoor open, en dan hangt "verloopt vanzelf" van een cron af. **En de klant kan de uitnodiging terugnemen, zonder uit te leggen waarom**: `trekIn()` zet de sessie op `ingetrokken`, en daarmee staat RTG buiten -- niet met een 403 die zegt "mag niet meer", maar omdat de sessie niet meer loopt. De route vraagt met opzet geen reden; een uitnodiging die je niet zonder uitleg kunt terugnemen is een recht met een wachttijd. **Een gedeelde kantoorcode betreedt geen klantomgeving**: die naam kan niet in een verslag staan als degene die het deed, dus hij komt er niet in.
+
+**Inhoud is dicht.** De diagnose geeft structuur, tellingen en toestanden, plus de platformstand met de zin erbij dat die over ons gaat en niet over deze klant. De *namen* van werkruimtes en groepen zitten achter een apart, gemotiveerd verzoek dat de klant goedkeurt. En er is een derde laag die niet bestaat: de identiteitskluis, persoonsgegevens en de inhoud van berichten en bestanden. Dat is geen strengheid maar bouw -- `server/accounts.js` heeft zijn eigen poort met een verplichte reden, een regel in het inzagejournaal en bericht aan de betrokkene, en die deur loopt niet door deze laag. Elk antwoord draagt die `nooit`-lijst met een reden per post.
+
+**En deze laag voert zelf niets uit.** `voerUit()` bewaakt de toestemming en schrijft de uitslag op; wat er werkelijk aan gegevens verandert loopt door de hersteltransactie. Een tweede schrijfpad zou wijzigingen opleveren die de voorcontrole en de verificatie overslaan.
+
+Kern: `server/kern/command/bijstand.js` (de vorm), `bijstand-klant.js` (uitnodigen, goedkeuren, intrekken), `bijstand-rtg.js` (betreden, kijken, voorstellen, uitvoeren, afsluiten), `bijstand-niveaus.js` en `bijstand-diagnose.js`. Klantroutes `/api/tenant/bijstand/*` (achter dezelfde poort als de rest van de tenantlaag, `server/routes/tenant/poort.js`), RTG-routes `/api/command/bijstand/*`. Schermen: werkplek **Bijstand** in RTG Command en een kaart in het Werk OS (`public/apps/werk/bijstand.js`). Getoetst in `test/bijstand.test.js` (twaalf beweringen, negen mutaties), `test/bijstandketen.test.js` (negen toetsen over de echte routes: de keten, de twee grenzen die alleen over de lijn te zien zijn, en het intrekken) en `test/bijstandscherm.e2e.js`.
+
+De **domeingrens** geeft de tenantkant daarbij precies deze ene laag: `kern.bijstand` hangt los aan de kern, zodat `GRENZEN.json` niet heel RTG Command hoeft open te zetten voor een klantroute.
+
+### Het vlootbeeld: alle organisaties, tot waar de uitnodiging begint
+
+Twee dingen moeten hier tegelijk waar zijn en ze trekken tegengesteld. Support moet van alle organisaties naar één werkruimte kunnen zakken zonder van gereedschap te wisselen -- anders wordt één externe storing bij achthonderd klanten achthonderd keer hetzelfde uitzoekwerk. En tegelijk mag "ik kan tot op werkruimteniveau kijken" niet betekenen "ik mag alles lezen".
+
+Vandaar de regel die `server/kern/command/vlootbeeld.js` zijn vorm geeft: **het vlootbeeld toont wat RTG zonder uitnodiging mag zien, en houdt op waar de uitnodiging begint.** De afdaling eindigt met `dieper.mag: false`, de reden erbij en hoe je dan wél verder komt. Een lege diepte leest als "er is niets"; dit zegt "hier mag ik niet zonder toestemming".
+
+**Eén hoofdincident is één incident.** De incidenten hangen aan een *vermogen* en niet aan een klant. Er staat dus bij hoeveel organisaties er **bestaan**, en er staat `geraakteOrganisaties: null` -- want dat getal kan hier niemand tellen. Zou het er wel staan, dan wordt "812 organisaties" binnen een week gelezen als "812 klanten hadden hier last van". Om dezelfde reden staat er **geen beschikbaarheidscijfer per klant**: `server/meting.js` telt per routepatroon en kent geen tenant, `kern/tenant/bewijs.js` weigert dat cijfer al aan de klant, en het intern wél gebruiken zou betekenen dat wij een getal hanteren dat wij extern onwaar noemen.
+
+Werkplek **De vloot** in RTG Command; getoetst in `test/vlootbeeld.test.js` (zeven beweringen, zes mutaties).
+
 ## De Regie van de zaak: dezelfde logica, maar alleen over de eigen zaak
 
 RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het niet zien -- hij heeft dezelfde soort laag nodig over **zijn eigen zaak**. Die staat in `server/kern/zaakcommand/` en hangt als werkgebied **Regie** in de zaak-app (`/apps/leverancier.html`) en als tegel **Regie** in de personeels-PDA (`/apps/personeel.html`).

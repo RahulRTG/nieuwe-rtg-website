@@ -74,8 +74,9 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
      sonde, de servicedoelen, het alarm, de kaart die ze naast elkaar legt en
      het incident dat onthoudt. De volgorde waarin ze elkaar nodig hebben staat
      daar; wat ze delen is dat geen van vijven iets twee keer meet. */
-  const { sonde, slo, alarm, gezondheid, incident } = require('./meetlagen').maakMeetlagen({
-    db, save, journaal, kwaliteit, canary, sseToOffice });
+  const { sonde, slo, alarm, gezondheid, incident, bijstand, vlootbeeld } =
+    require('./meetlagen').maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice,
+      tenant: () => kern && kern.tenant });
 
   /* HERSTEL ALS TRANSACTIE: het enige pad waarlangs de routes een recept
      draaien. Na de kaart: zijn voorcontrole leest die. */
@@ -112,54 +113,14 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   const bereik = () => zoeklaag.bereik(register);
   const dossier = (type, id) => objectlaag.dossier(register, db, type, id, { journaal, actiesVoor });
 
-  /* Het beginscherm van de app in één aanroep: de puls, de open uitzonderingen,
-     wat er te herstellen valt en waar het handwerk zit. Eén verzoek, omdat vier
-     verzoeken op een beginscherm vier momenten zijn waarop het scherm halfvol
-     kan blijven staan. */
-  function start() {
-    const b = puls.beeld();
-    return {
-      puls: b,
-      zaken: zaken.lijst({ status: 'open', max: 12 }),
-      runbooks: runbooks.lijst(),
-      werk: werkbesparing.bord(30),
-      rechten: toegang.graaf(),
-      plannen: operator.recent(5),
-      runs: runbooks.runs(8),
-      kwaliteit: kwaliteit.meet().tel,
-      /* De SLO-stand hoort op het beginscherm omdat een foutbudget dat je moet
-         opzoeken geen rem is. Hij staat hier wel INGEPAKT: ontbreekt SLO.json,
-         dan hoort dat één luide tegel te zijn en niet een leeg beginscherm. */
-      slo: sloKort(),
-      /* De lopende uitrollen, want een canary die niemand meer bekijkt is
-         precies het geval waarvoor de terugroldrempel bestaat. */
-      canary: canary.stand().tel,
-      /* De alarmen op het beginscherm, want een alarm dat je moet opzoeken is
-         geen alarm. En de gezondheid ernaast: de puls zegt hoe de GEGEVENS
-         ervoor staan, niet of de diensten het doen. */
-      alarm: alarm.stand().tel,
-      gezondheid: gezondheidKort(),
-      /* Een incident dat je moet opzoeken, is er een waar niemand aan werkt. */
-      incidenten: incident.tel()
-    };
-  }
-
-  function gezondheidKort() {
-    try { const g = gezondheid.stand(); return { oordeel: g.oordeel, tel: g.tel }; }
-    catch (e) { return { fout: String(e.message).slice(0, 200) }; }
-  }
-
-  function sloKort() {
-    try {
-      const st = slo.stand();
-      return { tel: st.tel, uitrol: st.uitrol };
-    } catch (e) {
-      return { fout: String(e.message).slice(0, 200) };
-    }
-  }
+  /* Het beginscherm in één aanroep staat in ./beginscherm.js: dit bestand hangt
+     de lagen op, dat leest ze uit. */
+  const start = require('./beginscherm').maakBeginscherm({
+    puls, zaken, runbooks, werkbesparing, toegang, operator, kwaliteit, slo, canary, alarm,
+    gezondheid, incident, bijstand }).start;
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm, gezondheid, transactie, incident, tijdlijn,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm, gezondheid, transactie, incident, tijdlijn, bijstand, vlootbeeld,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

@@ -52,8 +52,12 @@ Dit huis was sterk op **waarnemen**, **besturen** en **bewijzen** en zwak op
 (par. 5) zegt wat er aan de hand is en hoe hard dat bewijs is, de
 hersteltransactie (par. 5b) maakt van repareren een keten die zichzelf nakijkt,
 het incident (par. 5c) onthoudt het, en de configuratietijdlijn (par. 5d)
-beantwoordt de vraag die er meteen achteraan komt. Wat er dan nog ontbreekt gaat
-niet meer over dit platform maar over wie erbij mag: par. 7.4 en 7.5.
+beantwoordt de vraag die er meteen achteraan komt. En de vraag *wie erbij mag*
+is daarna ook gesloten: RTG Bijstand (par. 5e) laat een klant ons binnen op zijn
+uitnodiging, en het vlootbeeld (par. 5f) toont alle organisaties tot precies
+daar waar die uitnodiging begint. Wat er nog openstaat is par. 7.6, de veilige
+noodstand — en dat is geen laag maar een vorm die de bestaande incidentcontrole
+nog mist.
 
 ---
 
@@ -150,8 +154,8 @@ tweede besturingsvlak op.**
 | **incident als eersteklas object** | **nieuw, zie par. 5c** | `kern/command/incident*.js` |
 | **herstel als transactie met verificatie** | **nieuw, zie par. 5b** | `kern/command/transactie*.js` |
 | **configuratietijdlijn** | **nieuw, zie par. 5d** | `kern/command/tijdlijn.js` |
-| RTG Bijstand (toegang van support tot een klant) | **ontbreekt** | par. 7.4 |
-| vlootbeeld over alle klanten, één hoofdincident | **ontbreekt** | par. 7.5 |
+| **RTG Bijstand** (toegang van support tot een klant) | **nieuw, zie par. 5e** | `kern/command/bijstand*.js` |
+| **vlootbeeld over alle klanten, één hoofdincident** | **nieuw, zie par. 5f** | `kern/command/vlootbeeld.js` |
 | veilige noodstand (beschermen ≠ platleggen) | **deels** | `kern/incidentcontrole.js` en `server/nood.js` — par. 7.6 |
 
 Wat opvalt is niet hoeveel er ontbreekt maar hoe weinig. Het besturingsvlak in
@@ -402,6 +406,113 @@ stil dertig, en gaf dus veel meer regels terug dan er was gevraagd.
 
 ---
 
+## 5e. RTG Bijstand — gebouwd
+
+`kern/command/bijstand.js` met `bijstand-klant.js`, `bijstand-rtg.js`,
+`bijstand-niveaus.js` en `bijstand-diagnose.js`. Werkplek **Bijstand** in RTG
+Command; de klantkant staat als kaart in het Werk OS
+(`public/apps/werk/bijstand.js`).
+
+**Toegang is een uitnodiging en geen recht, en dat is de vorm en niet een
+instelling.** Er is geen route aan de kantoorkant die een sessie aanmaakt. De
+functie staat in `bijstand-klant.js`, de RTG-kant staat in `bijstand-rtg.js`, en
+wie dat wil veranderen moet aan de klantkant bijbouwen — dat valt op. Er staat
+zelfs een fail-fast op een naam die aan beide kanten voorkomt: `Object.assign`
+laat de RTG-kant winnen, dus een functie die daar `vraag` gaat heten zou de
+klantkant stilzwijgend vervangen terwijl het andere bestand nog steeds de enige
+plek *lijkt* waar een sessie ontstaat.
+
+**Vier niveaus**, met per niveau een eigen maximale looptijd:
+
+| niveau | wat het mag | hooguit |
+|---|---|---|
+| **kijken** | alleen de diagnose lezen | 60 min |
+| **meedenken** | handelingen voorstellen, niet uitvoeren | 120 min |
+| **herstellen** | uitvoeren ná goedkeuring per handeling | 60 min |
+| **nood** | handelen zonder per handeling te wachten | 30 min |
+
+**Waarom `nood` geen uitzondering op de eerste regel is.** De verleiding is een
+stand waarin RTG bij een ernstig incident zelf naar binnen kan. Die komt er niet.
+Wat `nood` doet is de goedkeuring **vooraf** geven in plaats van per handeling —
+omdat een klant die om half drie 's nachts belt niet naast het scherm gaat zitten
+om vinkjes te zetten. Dat is zijn besluit, met een verplichte reden, voor een
+half uur, en elke handeling verschijnt onmiddellijk in het spoor. De goedkeuring
+is dus niet weg; hij is één keer gegeven, met een reden, voor een venster met een
+einde. Op de handeling staat dan `besluitDoor: 'vooraf, bij het openen van de
+noodsessie'` — niet stil overgeslagen, want in het verslag moet leesbaar zijn wie
+wanneer ja zei.
+
+**Verlopen is een toestand en geen opruimactie.** `stand()` rekent hem bij elke
+lezing uit de klok. Een sessie die pas dichtgaat als er een schoonmaker langskomt
+staat tussendoor open — en dan hangt "verloopt vanzelf" van een cron af.
+
+**En de klant kan hem terugnemen, zonder uit te leggen waarom.** Verlopen is de
+zachte uitgang; intrekken is de harde. `trekIn()` zet de sessie op `ingetrokken`
+en daarmee is RTG er buiten — niet met een 403 die zegt "mag niet meer", maar
+omdat de sessie niet meer loopt. De route vraagt met opzet **geen reden**: een
+uitnodiging die je niet zonder uitleg kunt terugnemen is een recht met een
+wachttijd. Het intrekken staat wel in het spoor, want de klant moet later kunnen
+zien wanneer hij de deur dichtdeed.
+
+**Een gedeelde kantoorcode betreedt geen klantomgeving.** Wie zo binnenkomt heet
+in het journaal `kantoor (gedeelde code)`, één naam voor iedereen. Zo'n naam kan
+niet in een verslag staan als degene die het deed, dus hij komt er niet in.
+Dezelfde grendel als bij de vier-ogen-goedkeuring.
+
+**Inhoud is dicht.** De diagnose geeft structuur, tellingen en toestanden, plus
+de platformstand — met de zin erbij dat die over ons gaat en niet over deze
+klant. De *namen* van werkruimtes en groepen zitten achter een apart, gemotiveerd
+verzoek dat de klant goedkeurt. En er is een derde laag die niet bestaat: de
+identiteitskluis, persoonsgegevens en de inhoud van berichten en bestanden. Dat
+is geen strengheid maar bouw — `server/accounts.js` heeft zijn eigen poort met
+een verplichte reden, een regel in het inzagejournaal en bericht aan de
+betrokkene, en die deur loopt niet door deze laag. Elk antwoord draagt die
+`nooit`-lijst met een reden per post.
+
+**Deze laag voert zelf niets uit.** `voerUit()` bewaakt de toestemming en
+schrijft de uitslag op; wat er werkelijk aan gegevens verandert, loopt door de
+hersteltransactie (par. 5b). Een tweede schrijfpad zou wijzigingen opleveren die
+de voorcontrole en de verificatie overslaan.
+
+Getoetst in `test/bijstand.test.js` (twaalf beweringen, negen mutaties),
+`test/bijstandketen.test.js` (negen toetsen over de echte routes: de hele keten,
+de twee grenzen die alleen daar te zien zijn, en het intrekken) en
+`test/bijstandscherm.e2e.js`.
+
+---
+
+## 5f. Het vlootbeeld — gebouwd
+
+`kern/command/vlootbeeld.js`, werkplek **De vloot**.
+
+**Twee dingen moeten tegelijk waar zijn, en ze trekken tegengesteld.** Support
+moet van alle organisaties naar één werkruimte kunnen zakken zonder van
+gereedschap te wisselen — anders wordt één externe storing bij achthonderd
+klanten achthonderd tickets. En tegelijk mag "ik kan tot op werkruimteniveau
+kijken" niet betekenen "ik mag alles lezen".
+
+Vandaar de regel die dit beeld zijn vorm geeft: **het vlootbeeld toont wat RTG
+zonder uitnodiging mag zien, en houdt op waar de uitnodiging begint.** De
+afdaling eindigt met `dieper.mag: false` en de reden erbij, plus hoe je dan wél
+verder komt. Een lege diepte leest als "er is niets"; dit zegt "hier mag ik niet
+zonder toestemming".
+
+**Eén hoofdincident is één incident.** De incidenten hangen aan een *vermogen* en
+niet aan een klant. Er staat dus bij hoeveel organisaties er **bestaan**, en er
+staat `geraakteOrganisaties: null` — want dat getal kan hier niemand tellen. Zou
+het er wel staan, dan wordt "812 organisaties" binnen een week gelezen als "812
+klanten hadden hier last van".
+
+**En er staat geen beschikbaarheidscijfer per klant.** Niet uit voorzichtigheid
+maar omdat de meting het niet draagt: `server/meting.js` telt per routepatroon en
+kent geen tenant. `kern/tenant/bewijs.js` weigert dat cijfer al aan de klant; het
+intern wél gebruiken zou betekenen dat wij een getal hanteren dat wij extern
+onwaar noemen.
+
+Getoetst in `test/vlootbeeld.test.js` (zeven beweringen, zes mutaties).
+
+---
+
 ## 6. De grenzen
 
 Dit is de belangrijkste paragraaf van dit bestand. Waar een functie hieronder
@@ -506,9 +617,15 @@ wijziging op de machine en een schrijfactie buiten Command staan er niet in, en
 dat is een gat in de BRONNEN. Zolang dat zo is, staat het als `buitenBeeld` in
 elk antwoord in plaats van als een lijn die volledig lijkt.
 
-### 7.4 RTG Bijstand — support die binnenkomt zonder de sleutel te krijgen
+### 7.4 RTG Bijstand — GEBOUWD, zie par. 5e
 
-Dit is de tweede helft van de visie en het grootste ontbrekende stuk.
+Wat werkvoorraad blijft: de diagnose geeft vandaag de organisatiestand, de
+inrichting en de platformstand. Wie een concrete koppeling wil zien haperen,
+heeft daar meer aan dan aan een teller — maar elke bron die erbij komt, komt
+door dezelfde redactieregel of hij komt er niet. En de klant krijgt nu geen
+bericht als er een sessie loopt; hij ziet het als hij kijkt.
+
+<details><summary>Het oorspronkelijke ontwerp, ter vergelijking</summary>
 
 De klant vraagt hulp en kiest waarmee. Daarop ontstaat een **sessie** en geen
 account: één organisatie, één onderwerp, één doel, een looptijd, en een niveau.
@@ -527,29 +644,17 @@ niets blijft staan. Achteraf krijgt de klant een **verslag**: wat er mis was,
 wat er is gedaan, wat het resultaat was, hoeveel er is gewijzigd en of er iets
 verloren ging.
 
-*Waar dit op leunt:* `kern/command/toegang.js` heeft de vervaldatum en de
-nooddeur al; `kern/tenant/register.js` heeft de organisatie als grens; het
-journaal heeft de keten. Wat ontbreekt is de sessie zelf, de scoping op één
-organisatie, en het redigeren van inhoud.
-
 *De grens, en hij is hard:* de sessie is een **uitnodiging van de klant**. Er
-komt geen stand waarin RTG zichzelf toegang geeft omdat het handiger is. Als er
-ooit een nooddeur bij komt die zonder de klant open kan, dan met een reden, een
-maximum van een uur, een melding aan de klant op het moment zelf, en een regel
-in zijn eigen journaal — precies zoals break-glass hier nu al werkt.
+komt geen stand waarin RTG zichzelf toegang geeft omdat het handiger is.
+</details>
 
-### 7.5 Het vlootbeeld
+### 7.5 Het vlootbeeld — GEBOUWD, zie par. 5f
 
-Eén externe storing bij 800 klanten is één hoofdincident en geen 800 tickets.
-Support hoort van *alle organisaties* naar *één terminal in één vestiging* te
-kunnen zakken zonder van gereedschap te wisselen.
-
-*De grens:* dat je op terminalniveau kunt diagnosticeren, betekent niet dat je
-alles mag lezen (grens 6.6 en 6.7). En zolang de meting geen organisatie draagt
-— vandaag telt `server/meting.js` per routepatroon en niet per tenant — is er
-**geen beschikbaarheidscijfer per klant**, en hoort er ook geen te staan. Dat
-staat al zo in `kern/tenant/bewijs.js` en het blijft zo tot de meting het
-werkelijk kan.
+Wat werkvoorraad blijft is de diepte: de afdaling eindigt bij de werkruimte en
+niet bij een terminal, omdat er onder die laag geen bron is die RTG zonder
+uitnodiging mag lezen. En het beschikbaarheidscijfer per klant blijft weg tot de
+meting een tenant draagt — dat is geen achterstand van dit scherm maar van
+`server/meting.js`.
 
 ### 7.6 De veilige noodstand
 
@@ -581,19 +686,27 @@ BESCHERMT in plaats van uitzet, met per onderdeel wat er wel en niet doorloopt.
 
 ---
 
-## 9. De open beslissing
+## 9. Wat er nu open is
 
-De volgorde in paragraaf 7 is een voorstel en geen besluit. Er zijn twee
-verdedigbare wegen en ze sluiten elkaar niet uit, maar wel voor de eerstvolgende
-maanden:
+De beslissing die hier stond — eerst de diepte of eerst de breedte — is genomen
+en allebei gebouwd. Wat er overblijft is kleiner en concreter, en het staat
+hier zodat niemand het voor vergeten aanziet:
 
-1. **De diepte in:** incident-als-object, herstel-als-transactie, de
-   configuratietijdlijn. Dat maakt van RTG Command een besturingsvlak dat een
-   storing van begin tot bewijs draagt.
-2. **De breedte in:** RTG Bijstand en het vlootbeeld. Dat maakt van RTG een
-   leverancier die een klant kan helpen zonder ooit zijn sleutels te krijgen —
-   en dat is de propositie die een enterprise-inkoper begrijpt.
+1. **De veilige noodstand** (par. 7.6): één handeling die BESCHERMT in plaats van
+   uitzet. De incidentcontrole kan al dichtzetten en exact terugzetten; wat
+   ontbreekt is de vorm uit grens 6.10.
+2. **De zaak-kant door de hersteltransactie** (par. 7.2): `kern/zaakcommand/`
+   draait dezelfde recepten en roept `runbooks.js` rechtstreeks aan. De module is
+   erop voorbereid; de bedrading ligt er niet.
+3. **De meting die een tenant draagt** (par. 7.5): zolang `server/meting.js` per
+   routepatroon telt, blijft "hoeveel klanten merkten dit" onbeantwoordbaar. Dat
+   is geen achterstand van een scherm maar van de meting eronder, en drie lagen
+   hierboven schrijven dat nu op dezelfde manier op.
+4. **Een bericht aan de klant bij een lopende bijstandssessie** (par. 7.4). Hij
+   ziet het als hij kijkt; hij krijgt geen seintje. Dat is een kanaalbesluit met
+   dezelfde prijs als bij het alarm in `SLO.md`, en het hoort niet stilzwijgend
+   ingebouwd te worden.
 
-Wat er ook wordt gekozen: het hoort hier te staan voordat het wordt gebouwd, met
-de grens erbij. Een besturingsvlak dat zijn eigen grenzen niet opschrijft,
-bestuurt op den duur zichzelf.
+Wat er ook bij komt: het hoort hier te staan voordat het wordt gebouwd, met de
+grens erbij. Een besturingsvlak dat zijn eigen grenzen niet opschrijft, bestuurt
+op den duur zichzelf.

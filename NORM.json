@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-08-23",
+  "vastgelegd": "2026-08-24",
   "meters": {
     "endpointsZonderTest": 1179,
     "dekkingPct": 72,
@@ -21,7 +21,7 @@
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4936,
     "browserpoortToetsen": 199,
-    "kernBreedte": 1414,
+    "kernBreedte": 1415,
     "kernGedeeld": 193,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -34,6 +34,12 @@
     "schermenZonderVormtaal": 184
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1414 -> 1415 (RTG Bijstand en het vlootbeeld)",
+      "reden": "Een kern-naam erbij: `bijstand`. Dat is de hele verslechtering, en het is de prijs van een laag erbij en geen erosie -- maar hij staat er met naam bij, want dat is het verschil.\n\nWAAROM DIE NAAM ER MOEST KOMEN. De bijstandslaag woont in kern/command/ (bijstand.js met -niveaus, -klant, -rtg en -diagnose ernaast), maar de KLANT praat er ook mee: hij is degene die uitnodigt, goedkeurt en intrekt. Zijn routes staan in routes/tenant/bijstand.js, en het domein `tenant` mag van GRENZEN.json niet aan `command`. Er waren dus twee wegen: `command` opzetten in de tenantgrens, of een smallere deur maken. Het eerste zet de HELE bestuurslaag open voor de klantkant om een sessie te kunnen aanvragen -- vijftien namen erbij in plaats van een, en precies de soort opening die de domeingrens moet tegenhouden. Het tweede kost een naam. Die naam wijst naar hetzelfde object (`kern.command.bijstand`), dus er is geen tweede bijstandslaag: het is een deur en geen kopie.\n\nWAT NIET OMHOOG GING, en dat is de controle op dit verhaal. kernGedeeld bleef 193: `bijstand` wordt door precies EEN domein aangeraakt. Het RTG-kantoor leest de laag niet via de kern maar via routes/command/toezicht.js, dat al in het commanddomein zit. keuringTeGroot bleef 5, keuringOmvang bleef 161 en keuringDubbeling bleef 115 -- de nieuwe modules zijn geknipt op naden die er waren (het niveautabelletje, de klantkant, de RTG-kant en de diagnose staan los), en routes/tenant.js is er zelfs KLEINER van geworden doordat de poort naar tenant/poort.js verhuisde. routesNietSchakelbaar bleef 0.",
+      "eerlijkheidshalve": "Drie meters stonden na deze ronde OOK rood en zijn gerepareerd in plaats van opgerekt. Dat is geen verrekening tegen de kernBreedte hierboven -- het is wat er verder gebeurd is.\n\n(1) endpointsZonderTest stond op 1183. Vijf tenantroutes voor bijstand telden als ongedekt omdat test/bijstandketen.test.js zijn paden aan elkaar plakte (`api('/api/tenant/bijstand' + pad)`) -- exact dezelfde fout als in de notitie van 23 augustus over werkgevolg en werkhandeling, twee dagen eerder. De toets noemt zijn routes nu voluit. Een van de zes, /api/tenant/bijstand/intrekken, werd daarmee zichtbaar als echt ongetoetst en heeft nu een eigen toets (toets 9: de klant neemt de uitnodiging midden in de sessie terug). De meter staat op 1178, onder de norm.\n\n(2) keuringDekkingAdvies 57 -> 56 volgt daaruit: het tenantdomein had gaten door diezelfde vijf.\n\n(3) toetsenNietGemeten stond op 155 door test/bijstandscherm.e2e.js. Ik heb die meter NIET verhoogd maar de mutatiemotor er met de hand overheen gedraaid -- hij leest vanzelf alleen *.test.js, maar hij neemt een bestandsnaam aan als argument. Dat legde meteen een echte fout bloot: de toets stond op \"al rood\", oftewel hij zakte zonder dat er iets gemuteerd was. Er stond een eigen kopie van de playwright-zoeker in, en die kiest de eerste die te REQUIREN valt terwijl de bijbehorende Chromium er niet hoeft te staan -- de fout waarvoor test/browser.js precies bestaat en die daar in de kop beschreven staat. De toets gebruikt nu laadBrowser() en draait echt. Zonder deze meting had er een groene schermtoets in de repo gestaan die in werkelijkheid nooit een scherm heeft gezien.\n\n(4) Diezelfde kapotte kopie stond ook in test/command.e2e.js, en die is NIET van deze ronde -- hij staat er al op HEAD en zakte daar dus ook. Omdat dat bestand de schermen dekt die deze ronde uitbreidt (de werkplekken Bijstand en De vloot), is hij hier meteen omgezet naar laadBrowser() en met de motor gemeten; hij zakt op de liegpoort, ook in de scherpe ronde. Daardoor leest toetsenNietGemeten nu 153 tegen een norm van 154. Ik zet die norm NIET op 153: dat is de winst van een reparatie in een bestand dat ik niet gebouwd heb, en de volgende ronde hoort hem niet als mijn lat te erven.\n\nWAT HIER BLIJFT LIGGEN: er staan nog 29 andere e2e-bestanden met dezelfde kapotte kopie van de playwright-zoeker (te vinden met `grep -l \"function laadPlaywright\" test/*.js`), tegenover 97 die de gedeelde laadBrowser() gebruiken. Die 29 zijn in deze omgeving stil rood: ze zakken op \"Executable doesn't exist\" in plaats van over te slaan of te draaien. Dat is een eigen veegronde en geen onderdeel van deze functie, dus hij zit niet in deze commit -- maar hij staat hier zodat niemand hem opnieuw hoeft te ontdekken.\n\nWat ik NIET heb gedaan is --vastleggen draaien. Vijf meters lezen beter dan hun norm (endpointsZonderTest 1178, testbestanden 930, browserpoortToetsen 200, e2eBestanden 130, inlineStijlAttributen 4935); die winst is deels van deze ronde en deels van eerder, en hem in een keer op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
+    },
     {
       "datum": "2026-08-18",
       "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",

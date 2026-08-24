@@ -14,6 +14,8 @@
      alarm       piept als een van beide een drempel passeert
      gezondheid  legt alles naast elkaar, met de bewijsgraad erbij
      incident    onthoudt wat er stuk was, en wacht op een conclusie
+     bijstand    laat een klant RTG binnen -- op zijn uitnodiging, met een einde
+     vlootbeeld  alle organisaties in één beeld, tot waar de uitnodiging begint
 
    Die laatste hoort in deze rij en niet bij de uitzonderingenrij: het alarm
    piept, de kaart oordeelt, en het incident is het enige van de vijf dat er nog
@@ -27,7 +29,7 @@
    dan gelooft niemand meer welk van de twee. */
 'use strict';
 
-function maakMeetlagen({ db, save, journaal, kwaliteit, canary, sseToOffice }) {
+function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice, tenant }) {
   /* De sonde levert de metingen van BUITENAF en de SLO-meter houdt het
      foutbudget bij; ze staan in deze volgorde omdat de meter de sonde erbij zet
      en niet andersom. De reizen komen uit dezelfde SLO.json als de doelen, via
@@ -57,7 +59,20 @@ function maakMeetlagen({ db, save, journaal, kwaliteit, canary, sseToOffice }) {
      zichzelf sluit, laat een storing achter zonder conclusie. */
   const incident = require('./incident').maakIncidenten({ db, save, journaal, gezondheid });
 
-  return { sonde, slo, alarm, gezondheid, incident, slolaag };
+  /* BIJSTAND EN HET VLOOTBEELD. Ze staan hier omdat ze allebei op de
+     gezondheidskaart en het incident leunen, en niet omgekeerd. De tenantlaag
+     komt LUI binnen (kern.tenant hangt in routes-dwars.js); een laag die van
+     die volgorde afhangt breekt zodra iemand hem verzet.
+
+     DE DIAGNOSE GAAT ALS PARAMETER IN BIJSTAND, en dat is de grendel: wat een
+     supportsessie te zien geeft, is één module met één redactieregel. Zou
+     bijstand.js zelf mogen lezen, dan zou elke nieuwe knop daar zijn eigen
+     leespad kunnen maken. */
+  const diagnose = require('./bijstand-diagnose').maakDiagnose({ tenant, gezondheid, incident });
+  const bijstand = require('./bijstand').maakBijstand({ db, save, crypto, journaal, tenant, diagnose });
+  const vlootbeeld = require('./vlootbeeld').maakVlootbeeld({ tenant, incident, bijstand, gezondheid });
+
+  return { sonde, slo, alarm, gezondheid, incident, bijstand, vlootbeeld, diagnose, slolaag };
 }
 
 module.exports = { maakMeetlagen };

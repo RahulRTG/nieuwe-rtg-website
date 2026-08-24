@@ -636,6 +636,28 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "bijstand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/bijstand.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "bijstandketen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "bijstandscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "blindevlek.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -983,6 +1005,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "command.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "command.test.js": {
@@ -6228,6 +6257,14 @@
       "module": "server/vloot.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "vlootbeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/vlootbeeld.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
       "geprobeerd": 1
     },
     "voeding.test.js": {

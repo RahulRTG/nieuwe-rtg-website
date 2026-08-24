@@ -22,6 +22,8 @@
      -> "elke laag heeft een ingang die antwoordt" ZAKT (RAAK)
    - officeAuth van de incidentroutes gehaald
      -> "geen enkele ingang staat open zonder kantoorsessie" ZAKT (RAAK)
+   - de bijstand- en vlootroutes uit routes/command/toezicht.js gehaald
+     -> "elke laag heeft een ingang die antwoordt" ZAKT (RAAK)
 
    Draai: npm test */
 const test = require('node:test');
@@ -59,7 +61,7 @@ test('elke laag heeft een ingang die antwoordt', async () => {
   for (const pad of ['command/canary', 'command/zandbak', 'command/mdm', 'command/overname',
     'command/apipoort', 'command/land', 'command/stad', 'command/alarm', 'command/herkomst',
     'command/kwaliteit', 'command/graaf', 'command/slo', 'command/sonde', 'command/gezondheid',
-    'command/incidenten', 'command/tijdlijn']) {
+    'command/incidenten', 'command/tijdlijn', 'command/bijstand', 'command/vloot']) {
     const r = await api(pad);
     assert.equal(r.status, 200, pad + ' antwoordt niet: ' + JSON.stringify(r.body).slice(0, 120));
   }
@@ -73,7 +75,10 @@ test('geen enkele ingang staat open zonder kantoorsessie', async () => {
     'command/gezondheid', 'command/gezondheid/vermogen', 'command/gezondheid/controleer',
     'command/incidenten', 'command/incident', 'command/incident/weeg', 'command/incident/open',
     'command/incident/neem', 'command/incident/maatregel', 'command/incident/sluit',
-    'command/tijdlijn', 'command/tijdlijn/rondom']) {
+    'command/tijdlijn', 'command/tijdlijn/rondom',
+    'command/bijstand', 'command/bijstand/sessie', 'command/bijstand/betreed', 'command/bijstand/kijk',
+    'command/bijstand/voorstel', 'command/bijstand/uitvoeren', 'command/bijstand/inhoud',
+    'command/bijstand/sluit', 'command/vloot', 'command/vloot/organisatie']) {
     assert.equal(await zonder(pad), 401, pad + ' staat open zonder sessie');
   }
 });

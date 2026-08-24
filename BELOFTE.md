@@ -8,7 +8,7 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 72 | elk bewijsstuk bestaat |
+| gedekt | 75 | elk bewijsstuk bestaat |
 | open | 0 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
@@ -54,6 +54,9 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Cross-domain search: één balk over alles | gedekt | `server/kern/command/zoek.js`<br>`/api/command/zoek` |
 | Universal Object Control: ieder object openen | gedekt | `server/kern/command/object.js`<br>`/api/command/object` |
 | Event timeline per object | gedekt | `server/kern/command/object.js` |
+| Support komt binnen op uitnodiging van de klant, met een niveau, een einde en een spoor | gedekt | `server/kern/command/bijstand.js`<br>`server/kern/command/bijstand-klant.js`<br>`server/kern/command/bijstand-rtg.js`<br>`/api/tenant/bijstand/vraag`<br>`/api/command/bijstand/betreed`<br>`public/apps/werk/bijstand.js` |
+| Een supportsessie ziet structuur en geen inhoud, en zegt wat zij nooit toont | gedekt | `server/kern/command/bijstand-diagnose.js` |
+| Alle organisaties in een beeld, met een hoofdincident en zonder cijfer per klant | gedekt | `server/kern/command/vlootbeeld.js`<br>`/api/command/vloot`<br>`public/apps/command/command-20.js` |
 | AI Operator: opdracht in gewone taal | gedekt | `server/kern/command/operator.js`<br>`/api/command/operator/plan` |
 | Root-cause: de oorzaak wordt gemeten, niet geraden | gedekt | `server/kern/command/oorzaak.js` |
 | AI Supervisor: budgetten, botsingen, stoppen | gedekt | `server/kern/command/toezicht.js`<br>`/api/command/agents` |

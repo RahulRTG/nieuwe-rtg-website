@@ -53,7 +53,11 @@ module.exports = [
        lijst hier onderdeel van het afhandelen en niet van het kijken. */
     paden: ['/api/command/operator', '/api/command/runbook', '/api/command/runbooks', '/api/command/runs',
       '/api/command/zaak', '/api/command/zaken', '/api/command/werk',
-      '/api/command/incident', '/api/command/incidenten'] },
+      '/api/command/incident', '/api/command/incidenten',
+      /* Bijstand en de vloot bij DOEN: een sessie betreden en een handeling
+         uitvoeren is geen kijken, en de vlootlijst hoort bij dezelfde knop --
+         wie support dichtzet, hoort niet nog een half beeld over te houden. */
+      '/api/command/bijstand', '/api/command/vloot'] },
   { id: 'command-besturen', categorie: 'RTG-Backoffice', naam: 'RTG Command: besturen', standaard: true, doelgroepen: ['intern'],
     uitleg: 'Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.',
     paden: ['/api/command/beleid', '/api/command/simulatie', '/api/command/agent', '/api/command/agents',

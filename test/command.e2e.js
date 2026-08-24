@@ -18,14 +18,15 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-const pw = laadPlaywright();
+/* De gedeelde zoeker uit test/browser.js, en niet de kopie die hier stond. Die
+   kopie koos de eerste playwright die te REQUIREN viel, terwijl het pakket er
+   kan zijn zonder de bijbehorende Chromium -- dan lukt de require, zakt de
+   launch met "Executable doesn't exist", en zegt deze toets iets over de
+   omgeving in plaats van over RTG Command. Zo stond hij hier ook echt: rood,
+   niet overgeslagen. laadBrowser() probeert te STARTEN en loopt de kandidaten
+   af, dus hij slaat alleen over als er werkelijk geen browser is. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 test('RTG Command: het Command Center, de operator en een objectdossier komen op',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
@@ -69,7 +70,8 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
        stoppen. */
     for (const w of ['zoek', 'operator', 'zaken', 'herstel', 'beleid', 'simulatie', 'toezicht', 'werk',
       'journaal', 'werkplek', 'kwaliteit', 'graaf', 'herkomst', 'mdm', 'slo', 'sonde', 'alarm',
-      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad', 'gezondheid', 'incidenten']) {
+      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad', 'gezondheid', 'incidenten',
+      'bijstand', 'vloot']) {
       await page.click('#rail button[data-w="' + w + '"]');
       await page.waitForFunction(() => {
         /* De app-titel is de <h1> in de kop (die de iOS-laag tot navigatiebalk
@@ -152,6 +154,30 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
       null, { timeout: 10000 });
     assert.match(await page.textContent('main'), /VOLGORDE en geen oorzaak/,
       'de tijdlijn toont wijzigingen zonder de zin dat volgorde geen oorzaak is');
+
+    /* DE VLOOT houdt op waar de uitnodiging begint, en dat hoort op het scherm
+       te staan en niet alleen in de kern. Een leeg blok leest als "er is niets"
+       en dat is iets anders dan "hier mag ik niet zonder toestemming". */
+    await page.click('#rail button[data-w="vloot"]');
+    await page.waitForFunction(() => /Wat dit beeld niet kan zien/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    assert.match(await page.textContent('main'), /beschikbaarheidscijfer per organisatie/,
+      'de vloot legt niet uit waarom er geen cijfer per klant staat');
+
+    /* EN BIJSTAND HEEFT GEEN KNOP OM ZELF EEN SESSIE TE OPENEN. Dat is de
+       belofte in zijn zichtbaarste vorm; een knop die er tóch komt, valt hier
+       om. */
+    await page.click('#rail button[data-w="bijstand"]');
+    await page.waitForFunction(() => /De vier niveaus/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    const bjKnoppen = await page.evaluate(() =>
+      [...document.querySelectorAll('#bjUit button')].map(b => b.textContent.trim()));
+    for (const verboden of ['Bijstand vragen', 'Sessie openen', 'Nieuwe sessie']) {
+      assert.ok(!bjKnoppen.includes(verboden),
+        'de kantoorkant heeft een knop die zelf een sessie opent: ' + verboden);
+    }
+    assert.match(await page.textContent('main'), /Permanente toegang/,
+      'de teller die op nul hoort te staan, staat er niet');
 
     // De operator: een vraag stellen en een gemeten antwoord terugkrijgen.
     await page.click('#rail button[data-w="operator"]');

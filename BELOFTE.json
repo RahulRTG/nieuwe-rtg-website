@@ -310,6 +310,37 @@
       ]
     },
     {
+      "id": "cmd-bijstand",
+      "wat": "Support komt binnen op uitnodiging van de klant, met een niveau, een einde en een spoor",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/bijstand.js",
+        "server/kern/command/bijstand-klant.js",
+        "server/kern/command/bijstand-rtg.js",
+        "/api/tenant/bijstand/vraag",
+        "/api/command/bijstand/betreed",
+        "public/apps/werk/bijstand.js"
+      ]
+    },
+    {
+      "id": "cmd-bijstand-inhoud",
+      "wat": "Een supportsessie ziet structuur en geen inhoud, en zegt wat zij nooit toont",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/bijstand-diagnose.js"
+      ]
+    },
+    {
+      "id": "cmd-vloot",
+      "wat": "Alle organisaties in een beeld, met een hoofdincident en zonder cijfer per klant",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/vlootbeeld.js",
+        "/api/command/vloot",
+        "public/apps/command/command-20.js"
+      ]
+    },
+    {
       "id": "cmd-operator",
       "wat": "AI Operator: opdracht in gewone taal",
       "groep": "Command: zien, besturen, automatiseren",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1056 bestanden en 7062 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1061 bestanden en 7091 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1056 |
-| losse beweringen (`test(...)`) | 7062 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 892 |
+| toetsbestanden | 1061 |
+| losse beweringen (`test(...)`) | 7091 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 49 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 897 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
-| alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 95 |
+| alleen in de kop *genoemd*, nog niet gemeten | 21 |
+| niets van beide | 96 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-927 bestanden, 6839 beweringen.
+931 bestanden, 6867 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -126,6 +126,8 @@ toets omvalt.
 | `bezorgvolgen.test.js` | 7 | gezakt op `liegpoort /api/` | HET VOLGSCHERM VAN DE KLANT -- waar is mijn bestelling, en hoe lang nog? WAAROM DIT ER IS Tussen "betaald" en "onderweg" zit de keuken, en dat is precies de tijd waarin iemand zich afvraagt of zijn bestelling wel is... |
 | `bibliotheek.test.js` | 3 | gezakt op `liegpoort /api/` | De echte RTG Bibliotheek: de RTF-afdeling in de Mall (open voor iedereen, ook de gast) en de bibliothecaris die in beide werelden alleen echte apps aanraadt. Draai los: node --experimental-sqlite --test... |
 | `bijles.test.js` | 2 | gezakt op `liegpoort /api/` | Rahul Bijles: iedereen een eigen, geduldige bijles-AI die op niveau werkt en positief laat leren. Twee werelden, een motor: het RTG-lid (niveau uit het leerpaspoort) en het schoolkind (niveau uit de klas, doelen uit... |
+| `bijstand.test.js` | 12 | gezakt op `===->!==#0` | RTG BIJSTAND: twaalf beweringen, en ze gaan allemaal over de manier waarop "onze engineer heeft even in uw omgeving gekeken" een oncontroleerbare zin wordt. 1. |
+| `bijstandketen.test.js` | 9 | gezakt op `liegpoort /api/` | RTG BIJSTAND OVER DE LIJN -- de hele keten, en de grens eromheen. De rekenregels staan in test/bijstand.test.js. |
 | `blindevlek.test.js` | 9 | gezakt op `!==->===#0` | DE BLINDE VLEK. Dit bestand toetst geen functie. |
 | `boardroom-poort.test.js` | 7 | gezakt op `liegpoort /api/` | De boardroom-poort: de boardroom is de kamer van de eigenaar (Rahul Imran Ismail). De anonieme kantoorcode heeft geen identiteit en komt er nooit in; de eigenaar komt binnen met zijn eigen account (direct, of als... |
 | `boardroom.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Boardroom: de complete schakelkast. Elke functie heeft een stoplicht-status (aan/uit/storing), de eigenaar schakelt direct, kan een storing melden, alles resetten en de AI om een voorstel vragen. |
@@ -887,6 +889,7 @@ toets omvalt.
 | `vingerafdruk.test.js` | 14 | gezakt op `!==->===#0` | DE TOESTANDSVINGERAFDRUK: ziet hij een wijziging, en draagt hij geen inhoud? Twee vragen, en de tweede is de zwaarste. |
 | `vloerwerk.test.js` | 6 | gezakt op `liegpoort /api/` | DE WERKVLOER VAN EEN ZAAK -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: table/add, table/remove, table/status, minibar/count, minibar/item/add,... |
 | `vloot.test.js` | 2 | gezakt op `===->!==#0` | Integratietests voor de foutisolatie: elke app draait als eigen proces in de vloot (server/vloot.js) achter de poortwachter. Een bug in een route raakt alleen die ene aanvraag; een crash van een groep raakt alleen... |
+| `vlootbeeld.test.js` | 6 | gezakt op `===->!==#0` | HET VLOOTBEELD: zeven beweringen, en ze gaan allemaal over de manier waarop een leverancierdashboard meer belooft dan het weet. 1. |
 | `voeding.test.js` | 8 | gezakt op `liegpoort /api/` | De voedingslaag (kern/voeding.js). Wat hier wordt vastgezet is vooral wat er NIET gebeurt, want dat is de hele keuze: 1. |
 | `vonk.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Vonk: dating op codenaam met de Salon-veiligheidslat. 18+ met een geverifieerd paspoort, een eindige dagselectie die wederzijds bij de wensen past, wederzijdse like = match + chatlijn + automatisch een tafel rond... |
 | `voorspel.test.js` | 12 | gezakt op `liegpoort /api/` | De voorspeller: RTG leert het ritme van leden en zaken uit het Pay-grootboek en voorspelt eerlijk (bij te weinig data: zeggen dat het nog niet kan). Draai los: node --experimental-sqlite --test test/voorspel.test.js |
@@ -964,10 +967,11 @@ toets omvalt.
 | `zorgniveau.test.js` | 9 | gezakt op `liegpoort /api/` | De grens (kern/zorgniveau.js) en de dagcheck-in die erop staat (kern/gemoed.js). Wat hier bewezen wordt is bijna allemaal een NEGATIEF: dat er GEEN tip komt, GEEN geruststelling en GEEN oefening zodra de grens aanslaat. |
 | `zorgwallet.test.js` | 7 | gezakt op `liegpoort /api/` | De zorgpas en de RTG Wallet: Segur (de verzekeraar) schrijft een lid in op codenaam en de zorgpas ligt direct in de wallet van het lid; de declaratieketen (een mens beslist, afwijzen alleen met reden); de... |
 | `zware-bundels.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `zz-ijk-tijdelijk.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-129 bestanden, 223 beweringen.
+130 bestanden, 224 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -978,6 +982,7 @@ toets omvalt.
 | `bankscherm.e2e.js` | 3 | -- | Scherm-toets op de bank: legt een toets de weg van deze app werkelijk af? WAAROM JUIST DEZE APP EERST scripts/schermen.js telde 105 van de 188 schermen waar geen enkele toets de weg aflegt -- ze worden wel geopend... |
 | `berichten.e2e.js` | 1 | -- | Scherm-test voor de communicatie-app. De unit-toetsen (test/berichten.test.js, test/comm-dm.test.js) bewijzen de server-kant; deze bewijst dat de APP het ook echt doet in een browser: de lijst komt op, een gesprek... |
 | `bestanden.e2e.js` | 1 | -- | Scherm-test voor RTG Bestanden: uploaden via de kiezer, het paneel met voorvertoning, delen op codenaam, de nieuwe versie van de andere kant, en de prullenbak met herstel. Draait alleen waar een browser is. |
+| `bijstandscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERMTOETS VOOR RTG BIJSTAND, DE KLANTKANT -- de kaart in het Werk OS waarmee een organisatie ons binnenlaat en er weer uitzet. WAAROM DIT EEN SCHERMTOETS NODIG HEEFT. |
 | `boeken.e2e.js` | 1 | -- | Scherm-test voor RTG Boeken: de plank (huisbibliotheek + een .txt uit de kluis), lezen in de eigen lezer, en de leesplek die na scrollen bewaard is en bij heropenen terugkomt. Draait alleen waar een browser is. |
 | `browserpoort.e2e.js` | 1 | -- | DE BROWSERPOORT -- de enige schermtoets die ZICHZELF niet mag overslaan. Elke andere e2e in deze map begint met dezelfde regel: { skip: pw ? |
 | `btw-aansluiting-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor de Aansluiting in het Belastingkantoor. De tegenhanger van test/btw-scherm.e2e.js: daar maakt de ondernemer zijn aangifte op, hier legt de inspecteur hem naast het factuurregister. |
@@ -989,7 +994,7 @@ toets omvalt.
 | `clips-studio.e2e.js` | 1 | -- | Scherm-test voor de Clips-studio: knippen, geluid en ondertitels, en het toegangsfilter in de kop. test/clips.test.js bewijst de server-kant; deze bewijst dat de studio op het scherm werkt en dat de feed de standen... |
 | `comm-zaak.e2e.js` | 3 | -- | De zakelijke deur van het communicatieplatform (routes/supplier/comm.js). comm-actor.test.js toetst het MODEL: de sleutels, de naamruimtes, de poort. |
 | `comm.e2e.js` | 5 | genoemd | Het communicatieplatform (server/kern/comm + apps/comm.html). WAT HIER BEWAAKT WORDT, en waarom juist dit. |
-| `command.e2e.js` | 1 | genoemd | Schermtoets voor RTG Command: de app komt beveiligd op met een kantoortoken, tekent het Command Center, laat de operator een plan maken en opent een objectdossier -- alles zonder onopgevangen JS-fouten. WAAROM DIT... |
+| `command.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor RTG Command: de app komt beveiligd op met een kantoortoken, tekent het Command Center, laat de operator een plan maken en opent een objectdossier -- alles zonder onopgevangen JS-fouten. WAAROM DIT... |
 | `concern-routes.e2e.js` | 3 | -- | RTG CONCERN: DE DEUR. test/concern.test.js toetst de kern zonder server. |
 | `contactpin.e2e.js` | 3 | -- | DE CONTACTPIN OP HET SCHERM (apps/app.html, sociale balk in De Salon). test/contactpin.test.js bewijst dat de kern en de routes kloppen. |
 | `csp.e2e.js` | 1 | -- | DE CSP ZOALS EEN BROWSER HEM ERVAART. Een Content-Security-Policy is de enige beveiliging in dit huis die je niet kunt aantonen door de code te lezen. |

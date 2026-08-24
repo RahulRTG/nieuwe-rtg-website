@@ -443,6 +443,116 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* DE TENANTLAAG: twee toetsen die de server als kindproces starten en dus
+     geen require van hun module dragen. Beide regels zijn met een mutatie
+     nagetrokken en niet gegokt.
+
+     tenant.test.js -> kern/tenant/index.js: de merkcontrole eruit halen
+     (`if (t.merk) return t.merk`) laat toets 4 zakken, en de groepsafbeelding
+     zonder tenant toestaan laat toets 5 zakken. -> kern/tenant/bootstrap.js:
+     een lege `quotas: {}` in het antwoord zetten laat toets 6 zakken.
+
+     werkmerk.e2e.js -> public/apps/werk/merk.js: de herkomstregel uit de voet
+     laten laat hem zakken. De grenscontrole zelf (de kleur die buiten de
+     merkbalk lekt) zit in de CSS en niet in een module -- die mutatie is met
+     de hand gedaan en staat in TENANT.md, niet hier. */
+  ['tenant.test.js', ['server/kern/tenant/index.js', 'server/kern/tenant/bootstrap.js']],
+  ['werkmerk.e2e.js', ['public/apps/werk/merk.js']],
+  /* tenantuitgang.test.js start de server als kindproces. Nagetrokken: de
+     GEHEIM-lijst leegmaken laat toets 1 zakken, de invoer over een bestaande
+     werkruimte laten schrijven laat toets 3 zakken, en de bewaringsplicht
+     negeren laat toets 6 zakken. */
+  ['tenantuitgang.test.js', ['server/kern/tenant/uitgang.js', 'server/kern/tenant/levensloop.js']],
+  /* tenantcontract.test.js start de server EN draait daarnaast de teller los.
+     Nagetrokken: de grens op het aantal werkruimtes weghalen laat toets 1
+     zakken, en de teller niet laten bijten laat toets 5 zakken. */
+  ['tenantcontract.test.js', ['server/kern/tenant/contract.js']],
+  /* tenantbewijs.test.js: nagetrokken met drie mutaties -- de SLA zonder zijn
+     voorwaarden op ja, het auditspoor als vast vinkje, en een bron die blijft
+     staan als de bewering vervalt. Alle drie raak. */
+  ['tenantbewijs.test.js', ['server/kern/tenant/bewijs.js']],
+  /* scimgroepen.test.js praat SCIM tegen de kindserver. Nagetrokken: de
+     nesting-weigering weghalen laat toets 2 zakken, en de org-grens in
+     groepen.js weghalen laat toets 3 zakken. */
+  ['scimgroepen.test.js', ['server/scim/groepen.js']],
+  /* werkcommandbalk.e2e.js draait in een browser tegen de kindserver.
+     Nagetrokken: de rechtenscheiding in public/apps/werk/kern.js weghalen (elke
+     403 weer als "uw sleutel deugt niet" lezen) laat hem zakken. */
+  ['werkcommandbalk.e2e.js', ['public/apps/werk/kern.js', 'public/apps/werk/command.js']],
+  /* werkhandeling.test.js: nagetrokken met drie mutaties -- de
+     bevestigingscontrole weghalen, het recht niet opnieuw rekenen bij de
+     uitvoering, en een plan van een ander uitvoerbaar maken. Alle drie raak. */
+  ['werkhandeling.test.js', ['server/bedrijf/handeling.js']],
+  /* werkgevolg.test.js: nagetrokken met vijf mutaties, alle vijf raak -- de
+     wachtende taken van anderen weglaten (toets 2), het rechtenhek op de
+     servicekant weghalen (toets 3), een bijwerking in de simulatie zetten
+     (toets 1, en dan vallen er vijf om), de taken BUITEN een gestopt project
+     niet meer tellen (toets 4), en nietGerekend leegmaken (toets 5). */
+  ['werkgevolg.test.js', ['server/bedrijf/gevolg.js']],
+  /* DE SAML-DEUR. Dertien mutaties met de hand geprobeerd, dertien raak -- en
+     een veertiende die NIET raak was omdat hij niet muteerde: de zin
+     `if (!X.isNazaatVan(assertie, gecontroleerd))` staat ook in de KOP van
+     antwoord.js, dus de eerste vervanging trof het commentaar en de code bleef
+     staan. Dat zag eruit als een overlevende toets terwijl er niets was
+     veranderd. Vandaar dat deze motor op de code-regel muteert en niet op een
+     losse zin, en vandaar dat het hier staat: een mutatie die je niet hebt zien
+     landen, is geen mutatie.
+
+     samlxsw -> antwoord.js: de isNazaatVan-regel eruit (toets 3), het publiek
+     niet controleren (8), het verlopen niet controleren (7), meer dan een
+     assertie toestaan (2). -> handtekening.js: de ouder-koppeling eruit (4),
+     dubbele IDs toestaan (10), de digestvergelijking altijd goed (6), sha1
+     alsnog toestaan (11).
+     samlc14n -> c14n.js: de attributen niet sorteren, de naamruimten niet
+     sorteren. Beide zakken tegen libxml2 en niet tegen onszelf.
+     samlpoort -> sso/saml/index.js: een verzoek niet verwijderen bij gebruik,
+     de org-controle op een verzoek eruit, een assertie zonder ID toelaten. */
+  ['samlxsw.test.js', ['server/sso/saml/antwoord.js', 'server/sso/saml/handtekening.js']],
+  ['samlc14n.test.js', ['server/sso/saml/c14n.js', 'server/sso/saml/xml.js']],
+  ['samlpoort.test.js', ['server/sso/saml/index.js']],
+  /* DE MERKKERN als enige bron. Zes mutaties, zes raak -- maar niet allemaal
+     tegen dezelfde toets, en dat is met opzet. merkkern.test.js kent de
+     WAARDEREGELS en de STRUCTUUR (de drie consumenten lezen de definitie en
+     dragen er geen kopie meer van); dat de drie er ook echt doorheen LOPEN, is
+     alleen te zien aan hun eigen servertoetsen. De rechtencontrole van webmerk
+     uitzetten laat merkkern.test.js dus groen -- en webplatform.test.js zakken.
+     Zo hoort het: een structuurtoets die runtime-gedrag claimt, claimt te veel.
+
+     merkkern -> tenant/merkkern.js: de hexcontrole eruit, de themalijst eruit,
+     `huidig` muteren in plaats van kopieren. Alle drie raak.
+     webplatform -> kern/webmerk.js, huisstijl -> kern/theater/huisstijl.js,
+     journalistiek-redactie -> kern/journalistiek.js: elk de weigering
+     overslaan, en elk raak. */
+  ['merkkern.test.js', ['server/kern/tenant/merkkern.js']],
+  /* DE ORGANISATIESTAND OP HET SCHERM. Vijf mutaties, vijf raak: alleen de
+     groene vinkjes tonen (dan is het weer een badgemuur), de rechtencontrole
+     op /api/tenant/status weghalen, een beschikbaarheidscijfer in het
+     platformblok zetten, de extra weergaven niet sluiten bij een tabwissel, en
+     Ververs weer laten gokken welk scherm er open staat. */
+  ['werkstatus.e2e.js', ['public/apps/werk/status.js', 'public/apps/werk/app.js']],
+  /* DE METING PER CAPABILITY. Vier mutaties, vier raak: de vloer eruit (dan
+     krijgt drie verzoeken een geruststellende 0,0%), routes zonder functie
+     weglaten (dan klopt het totaal terwijl er iets ontbreekt), een 4xx als
+     storing meetellen (dan telt elke verkeerde inlog als downtime), en een
+     gooiende functiekaart laten doorslaan (dan is een fout in de CATALOGUS een
+     storing in de METING). */
+  ['metingcapaciteit.test.js', ['server/meting-capaciteit.js']],
+  /* DE HERSTELPROEF. Vijf mutaties, vijf raak -- maar DRIE ervan overleefden
+     eerst, en dat was terecht: ze gaan over dingen die via de API niet waar te
+     nemen zijn. De tijdelijke werkruimte laten staan is onzichtbaar zolang er
+     geen leespad naar de werkruimtebak is; `gelukt: true` hardcoderen valt niet
+     op zolang elke echte proef slaagt; en een proef die nooit verloopt merk je
+     pas over een halfjaar. Met een nagemaakte uitgang (toets 8, 9 en 10) zijn
+     ze alle drie wel te zien. Een toets die alleen kijkt waar het licht is,
+     dekt niet wat hij lijkt te dekken. Vijfde: een mislukte proef alsnog als
+     bewijs tellen. */
+  ['tenantherstelproef.test.js', ['server/kern/tenant/herstelproef.js', 'server/kern/tenant/bewijs-sla.js']],
+  /* DE BACK-UPSTAND. Vijf mutaties, vijf raak: alles compleet noemen (dat IS de
+     oude toestand -- de bewering hing aan een mapnaam), de leegtecontrole eruit,
+     db.json niet openen, een leeg -wal toch als fout tellen (het valse alarm dat
+     de meter waardeloos maakt), en de oudste in plaats van de nieuwste back-up
+     pakken. */
+  ['backupstand.test.js', ['server/backupstand.js']],
   /* Nagemeten: RTG_DOMAINS negeren laat hem zakken op de 404 van supplier, en
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */

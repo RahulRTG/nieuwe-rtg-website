@@ -58,6 +58,10 @@
 'use strict';
 
 const ZIN = {
+  /* De veilige noodstand (main, beschermstand): lezen gaat door, muteren even
+     niet. Deze zin woont hier omdat ZIN maar op EEN plek mag bestaan --
+     beide takken hadden hem uitgeplaatst, elk naar een eigen module. */
+  bescherming: 'Het platform staat tijdelijk in de veilige noodstand: lezen gaat door, maar nieuwe rechten, betalingen en wijzigingen van buitenaf worden even niet aangenomen.',
   globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
   pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
   land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',

@@ -41,6 +41,10 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, ca
     if (!Array.isArray(v.commandRuns)) v.commandRuns = [];
     return v.commandRuns;
   }
+  /* TerugLEZEN is een andere handeling dan uitvoeren, en staat sinds de
+     verificatie erbij kwam in ./runbooks-historie.js. */
+  const { samenvatting, runs, run, noteerVerificatie } =
+    require('./runbooks-historie').maakHistorie({ draaien, save });
 
   /* Welke objecten past dit runbook nu? Begrensd, en het echte aantal staat
      erbij -- een herstelronde die "39 gevallen" zegt terwijl er 400 zijn, is
@@ -165,18 +169,7 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, ca
     return { teruggezet: terug, overgeslagen, run: samenvatting(run) };
   }
 
-  function samenvatting(run) {
-    return { id: run.id, at: run.at, runbook: run.runbook, naam: run.naam, droog: run.droog,
-      door: run.door, reden: run.reden, niveau: run.niveau, score: run.oordeel ? run.oordeel.score : null,
-      geraakt: run.geraakt.length, totaalKandidaten: run.totaalKandidaten,
-      teruggedraaid: run.teruggedraaid, terugDoor: run.terugDoor || null,
-      voorbeelden: run.geraakt.slice(0, 8) };
-  }
-
-  const runs = (n) => draaien().slice().reverse().slice(0, n || 25).map(samenvatting);
-  const run = (id) => { const r = draaien().find(x => x.id === String(id)); return r ? Object.assign(samenvatting(r), { geraaktVolledig: r.geraakt }) : null; };
-
-  return { lijst, voer, draaiTerug, runs, run, kandidaten, RUNBOOKS: BOEKEN, OP_ID: OPID, BEVROREN };
+  return { lijst, voer, draaiTerug, runs, run, kandidaten, noteerVerificatie, RUNBOOKS: BOEKEN, OP_ID: OPID, BEVROREN };
 }
 
 module.exports = { maakRunbooks, RUNBOOKS, BEVROREN };

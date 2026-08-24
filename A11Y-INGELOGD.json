@@ -32,7 +32,18 @@
    "muziek.html en camera.html laadden shared/spraak.js met defer terwijl het inline script eronder tijdens het parsen `if (window.Spraak)` doet. Die voorwaarde was dus altijd onwaar en de microfoonknop is nooit gekoppeld geweest -- hij stond er als lege knop van 0x0, onzichtbaar en onraakbaar, met de naam \"Spraaksturing: zeg wat u wilt horen\" in de tabvolgorde. defer eraf, en spraak.js zet het rusticoon nu meteen in plaats van pas bij de eerste klik."
   ],
   "de meetfout die deze ronde zelf maakte": "zorgbalie.html meldde een pil van precies 24 pixels als te klein. De pil klopte; de PAGINA stond 600ms na load nog midden in een schaal-animatie op 99,827%, en dan meet 24 er 23,96. Eerste reparatie was wachten tot document.getAnimations() leeg was, en die was fout om een andere reden: op de meeste schermen loopt er ALTIJD iets (de wereldklok tikt), dus liep bijna elke pagina tegen de tijdgrens aan en werd de ronde drie keer zo traag. Nu meet hij een keer, en alleen waar hij iets vindt nog een tweede keer na het uitlopen. Dat kost niets op een schoon scherm, en een scherm dat PERMANENT geschaald is meldt zich in die tweede meting gewoon weer -- terecht, want dan is de knop ook echt te klein.",
-  "wat de ronde vond dat niemand zocht": "De navigatielinks op geld.html bleven na de reparatie 20px hoog. De oorzaak was niet de regel maar een DEEL dat niemand laadde: ik had de stijl van het Overzicht-paneel naar overzicht-a.js verplaatst (het bestand liep tegen de 10 KB-maat aan) en public/apps/geld/ blijkt geen bundelmap maar een reeks losse <script src>. Het nieuwe deel stond dus in geen enkele pagina, stijl() viel stil terug op een lege string en het hele paneel tekende ongestyled door. Contrast en structuur bleven groen; alleen de raakvlakronde zag het, en die noemde het een te kleine knop. Twee dingen gerepareerd: het script staat nu in geld.html, en die stille terugval is weg -- een ontbrekend deel schreeuwt nu in de console in plaats van door te tekenen."
+  "wat de ronde vond dat niemand zocht": "De navigatielinks op geld.html bleven na de reparatie 20px hoog. De oorzaak was niet de regel maar een DEEL dat niemand laadde: ik had de stijl van het Overzicht-paneel naar overzicht-a.js verplaatst (het bestand liep tegen de 10 KB-maat aan) en public/apps/geld/ blijkt geen bundelmap maar een reeks losse <script src>. Het nieuwe deel stond dus in geen enkele pagina, stijl() viel stil terug op een lege string en het hele paneel tekende ongestyled door. Contrast en structuur bleven groen; alleen de raakvlakronde zag het, en die noemde het een te kleine knop. Twee dingen gerepareerd: het script staat nu in geld.html, en die stille terugval is weg -- een ontbrekend deel schreeuwt nu in de console in plaats van door te tekenen.",
+  "wat de zaakronde erbij bracht, en wat ervan is gerepareerd": {
+   "stand bij het openen": "27 raakvlakken: 22 in de zaakstaat over vijftien schermen, en 5 op salon.html in de lidstaat -- die laatste kwamen pas in beeld doordat de scan nu in demostand draait, want een leeg scherm meet per definitie schoon",
+   "vijf oorzaken, geen zevenentwintig losse gevallen": [
+    "kale aanvinkvakjes van 13x13 (bezorging, clubdeur, kassa): de regel stond al in veiligheid.css maar gescoped op .mini. Verhuisd naar rtg-ui.css, waar de rest van de raakvlakmaten staat -- een componentregel op een plek komt op de volgende plek terug als bevinding (LAT-regel 4)",
+    "de link van de inlog-terugval (\"Log eerst in ... Naar de app\"), 20px hoog op twaalf schermen. Eerst als `.inlog a` gerepareerd; toen bleef er precies een scherm over dat diezelfde kaart met een andere klassenaam schrijft (rtgschool.html), en dat was het moment om de regel op te schrijven zoals hij werkelijk luidt: een link die in zijn eentje een alinea vult is geen link IN een zin, en krijgt de knopmaat",
+    "de auteursknoppen in De Salon: 23px, een pixel te kort",
+    "de bel in de leveranciers-app mat 0x34 -- hij had wel width:34px maar werd door zijn flexouder platgedrukt; flex:0 0 auto erbij",
+    "de navigatieknoppen van de partnerstudio waren op telefoonformaat LEEG: bij <=1050px verbergt een regel het label en bij <=680px verbergt een tweede regel het nummer, en onder de 680 gelden ze allebei. Vier knoppen van 20x20 zonder tekst. Dat is geen maatprobleem maar een defect, en het stond er alleen omdat niemand dat scherm ooit op telefoonformaat in die staat had gemeten"
+   ],
+   "en toen stond hij weer op nul": "0 van 262 schermen, in beide sessies"
+  }
  },
  "hoe het nul werd": {
   "stand bij het openen van de ingelogde ronde": "0 structureel, 25 contrast -- negen unieke plekken, want de scan noemt hoogstens drie voorbeelden per soort",
@@ -150,5 +161,17 @@
   "waarom deze ronde bestaat": "ADAPTIEF.md kent telefoon (<640), tablet (640-999) en bureau (>=1000), en de band ertussen was tot 19 augustus 2026 NOOIT door een browser getekend. Dat is geen detail: een gebrek kan precies daar zitten en nergens anders. Twee voorbeelden kwamen meteen boven. Op /apps/rtg.html is een dossierregel een link naar een betaalpagina: op 390 breekt hij af en meet 74 hoog, op 700 en 834 past hij op een regel en meet 20. Op /apps/salon.html geldt hetzelfde voor de naam boven een post (23). Allebei onzichtbaar voor de raakvlakronde, want die meet 390 -- waar het toevallig goed gaat.",
   "een breedte en niet twee": "De eerste meting draaide 700 en 834 naast elkaar en gaf op allebei exact dezelfde twee vondsten. Een tweede venster kost dan een ronde en levert niets. 700 blijft wel het interessante getal voor een MENS: daar geldt volgens ADAPTIEF.md de tabletvorm terwijl de duimregels van rtg-ui.css nog tot 760 lopen.",
   "wat hier NIET gemeten wordt": "leegte en duimbereik. Die twee gaan over een hand aan een telefoon (GRAMMATICA.md); een tablet ligt op tafel. Breedte en raakvlak gaan wel over elk toestel dat je aanraakt."
+ },
+ "zaak": {
+  "structureel": 0,
+  "contrast": 0,
+  "waar": "de derde staat: ingelogd met rtg_sup_token, de zaak-inlog van een manager",
+  "waarom deze ronde er is": "De scan logde in met rtg_member_token. Alles achter een ZAAK-inlog -- de horecaschermen, de kassa, het personeelsscherm, de leveranciers-app -- draagt rtg_sup_token, en kreeg dus de DEUR te zien: een lege schil met een inlogkaart, die netjes nul oplevert. \"Nul over alle schermen\" was waar voor de staat die gemeten werd en onwaar voor de staat waarin het personeel werkt.",
+  "wat de eerste meting vond": "Met de hand gemeten over negen horecaschermen op 23 augustus 2026: zonder zaak-sessie 0 structureel en 0 contrast, met zaak-sessie 1 structureel en 15 contrast. Precies dezelfde schermen.",
+  "en wat daarvan is gerepareerd": [
+   "de structurele: twee naamloze velden in de kassa (het vraagveld van de dialoog en de tafelkeuze) -- aria-labelledby op de kop die de vraag al draagt, en een aria-label op de select",
+   "de vijftien contrastfouten: tien grijstinten in horeca-command.css en een in horeca-enterprise-modules.css stonden tussen 2,48:1 en 4,55:1. Opgehoogd tot minstens 4,6:1 -- en gerekend tegen #111, de LICHTSTE ondoorzichtige grond in de schil. De eerste poging rekende tegen #080808 (de donkerste) en liet er zes staan op 4,36.",
+   "de merkkleur is niet aangeraakt: --burgundy-on-dark (#C23A5E) draagt hier alleen een rand en geen tekst"
+  ]
  }
 }

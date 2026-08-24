@@ -235,6 +235,15 @@ const METERS = [
      Wat NIET meetelt: el.style.kleur = '...' en andere CSSOM-schrijfacties. Die
      gaan buiten de ontleder om en worden door CSP niet gecontroleerd -- ze zijn
      dus geen schuld maar juist de uitweg. */
+  /* DE VORMTAAL IS GESPECIFICEERD EN WORDT NIET GEDRAGEN, en dat was tot deze
+     meter nergens te zien. ONTWERP.md legt het RTG Design System 2.0 vast,
+     public/shared/rtg-ontwerp.css is de tokenlaag en test/ontwerp.test.js houdt
+     hem streng -- maar die toets meet de tokenlaag TEGEN ZICHZELF. Van de
+     app-pagina's laadde er precies EEN hem, en rtg-materiaal.css laadde er nul.
+     Een ontwerpsysteem dat nergens wordt ingesloten is geen systeem maar een
+     document, en zonder teller kan dat jaren zo blijven zonder dat er iets rood
+     wordt. Deze meter mag dus alleen omlaag. */
+  { sleutel: 'schermenZonderVormtaal', richting: 'omlaag', wat: 'app-pagina\'s die de tokenlaag van ONTWERP.md niet insluiten' },
   { sleutel: 'inlineStijlAttributen', richting: 'omlaag', wat: 'style="..."-attributen in public/ (houden style-src-attr open)' },
   /* DE TWEE METERS DIE OVER DE RATEL ZELF GAAN.
 
@@ -543,6 +552,15 @@ function meet(bronnen) {
   const testbestanden = inMap.filter(f => f.endsWith('.test.js')).length;
   const e2eBestanden = inMap.filter(f => f.endsWith('.e2e.js')).length;
 
+  /* Hoeveel app-pagina's dragen de vormtaal nog niet? Geteld op de INSLUITING
+     en niet op het gebruik: een pagina die rtg-ontwerp.css laadt kan er nog
+     weinig mee doen, maar een pagina die hem niet laadt kan er zeker niets mee.
+     Dit is de goedkope, eerlijke ondergrens van adoptie. */
+  const appMap = path.join(WORTEL, 'public', 'apps');
+  const appPaginas = fs.readdirSync(appMap).filter(f => f.endsWith('.html'));
+  const schermenZonderVormtaal = appPaginas.filter(f =>
+    !fs.readFileSync(path.join(appMap, f), 'utf8').includes('rtg-ontwerp.css')).length;
+
   /* Tel de toetsen die zichzelf kunnen overslaan. We tellen de AANROEP, niet
      het bestand: een bestand met acht toetsen achter een poort is acht toetsen
      die niet draaien. Zowel `{ skip: X }` als `{ skip: X ? .. : .. }` telt mee,
@@ -773,6 +791,7 @@ function meet(bronnen) {
     toetsenNietGemeten: mutaties.nietGemeten,
     beweringenZonderVulcontrole: tandeloos,
     dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
+    schermenZonderVormtaal,
     inlineStijlAttributen,
     ratelTanden, metingenZonderRatel
   };

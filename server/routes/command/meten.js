@@ -123,6 +123,26 @@ module.exports = (ctx) => {
   app.post('/api/command/mdm/terug', officeAuth, (req, res) => veilig(res, () =>
     command.mdm.terug(req.body.verliezers, wie(req))));
 
+  /* DE GEZONDHEIDSKAART. `stand` is lezen; `controleer` DOET iets (een
+     sonderonde, een hashketen narekenen, een back-up openmaken) en is daarom
+     een POST die schrijft: de uitslag blijft liggen als bewijsstuk met een
+     datum, en gaat het journaal in met de naam van wie hem draaide. Hij is
+     async om dezelfde reden als /sonde/draai -- de sonde klopt echt aan. */
+  app.post('/api/command/gezondheid', officeAuth, (req, res) => veilig(res, () =>
+    command.gezondheid.stand()));
+  app.post('/api/command/gezondheid/vermogen', officeAuth, (req, res) => veilig(res, () =>
+    command.gezondheid.vermogen(String(req.body.id || ''))));
+  app.post('/api/command/gezondheid/controleer', officeAuth, async (req, res) => {
+    try {
+      const r = await command.gezondheid.controleer(String(req.body.id || ''), wie(req));
+      if (r && r.error) return res.status(r.status || 400).json({ error: r.error });
+      res.json(r);
+    } catch (e) {
+      console.error('[command/gezondheid]', e);
+      res.status(500).json({ error: 'Deze controleronde kon niet draaien.' });
+    }
+  });
+
   /* Het alarm. Piept op verandering en niet elke ronde; stilzetten kan, met een
      einde eraan en een reden in het journaal. */
   app.post('/api/command/alarm', officeAuth, (req, res) => veilig(res, () => command.alarm.stand()));

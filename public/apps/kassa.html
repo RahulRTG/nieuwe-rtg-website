@@ -40,13 +40,11 @@
   dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:0;padding:1rem;max-width:20rem;width:92vw;margin:auto;}
   dialog::backdrop{background:rgba(0,0,0,.6);}
   .hint{font-size:.74rem;color:var(--soft);line-height:1.5;}
-  /* De vaste vorm van een invoerdialoog: uitleg, een veld dat de rij vult, en
-     een knoppenrij eronder. Stond als los stijl-attribuut op elk element; drie
-     attributen erbij tikte meteen door in de meter inlineStijlAttributen
-     (npm run norm), en die houdt style-src-attr in de CSP open. */
-  dialog .hint{margin-bottom:.5rem;}
-  dialog .veld{flex:1;}
-  dialog .rij + .rij{margin-top:.6rem;}
+  /* DE WACHTROOK IS OPZETTELIJK LUID. Een bon die nog niet bij de server is,
+     is geld dat nog nergens staat; die mededeling hoort niet in een hoekje. */
+  #wachtStrook{padding:.55rem 1rem;border-bottom:1px solid var(--line);font-size:.82rem;display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;background:rgba(194,58,94,.12);color:var(--txt);}
+  #wachtStrook b{font-weight:600;}
+  #wachtStrook button{font:inherit;min-height:44px;padding:.2rem .7rem;background:transparent;color:var(--txt);border:1px solid var(--line);border-radius:0;cursor:pointer;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -58,6 +56,7 @@
   <button class="pil" id="schermKnop" style="cursor:pointer;background:transparent;font:inherit;">Kassa benoemen</button>
   <button class="knop stil" id="modusKnop">Modus wisselen</button>
 </header>
+<div id="wachtStrook" hidden></div>
 <main>
   <section class="kaart">
     <div class="band" id="leeftijdBand" hidden>18+: controleer de leeftijd met het Zegel voor u alcohol aanslaat.</div>
@@ -76,7 +75,7 @@
     <div id="bon"><div class="leeg">Nog leeg; tik links een artikel aan.</div></div>
     <div class="tot"><span>Totaal</span><span id="totaal">€ 0,00</span></div>
     <div class="rij" id="badgeRij" hidden><input class="veld h-flex1" id="badgeNaam" placeholder="Naam van de collega (interne verrekening)"></div>
-    <div class="rij" id="tafelRij" hidden><select class="veld h-flex1" id="tafelKies"></select></div>
+    <div class="rij" id="tafelRij" hidden><select class="veld h-flex1" id="tafelKies" aria-label="Tafel voor deze bon"></select></div>
     <div class="rij h-mt55">
       <button class="knop" id="payContant">Contant</button>
       <button class="knop" id="payRtg">RTG Pay-code</button>
@@ -119,7 +118,7 @@
 <dialog id="dlgVraag">
   <div class="sec" id="vraagKop"></div>
   <p class="hint" id="vraagUitleg" style="margin-bottom:.5rem;"></p>
-  <div class="rij"><input class="veld h-flex1" id="vraagVeld" autocomplete="off"></div>
+  <div class="rij"><input class="veld h-flex1" id="vraagVeld" autocomplete="off" aria-labelledby="vraagKop" aria-describedby="vraagUitleg"></div>
   <div class="rij h-mt60"><button class="knop" id="vraagOk">Akkoord</button><button class="knop stil" id="vraagWeg">Annuleer</button></div>
 </dialog>
 <dialog id="dlgInfo">
@@ -148,6 +147,8 @@
 </dialog>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/wachtrij.js"></script>
+<script src="/apps/kassa/wachtrij.js"></script>
 <script src="/shared/deur.js"></script>
 <script>
 const $ = s => document.querySelector(s);
@@ -196,6 +197,8 @@ async function laad(zet){
   catch (e) { $('#artGrid').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; return; }
   const m = modus();
   $('#zaakNaam').textContent = INSTEL.naam;
+  // regel 6 van de wachtrij: een bon hoort bij de zaak waar hij is opgesteld
+  if (window.RTGKassaWachtrij) RTGKassaWachtrij.zaak(INSTEL.naam);
   $('#modusNaam').textContent = m.naam;
   $('#schermKnop').textContent = INSTEL.scherm ? INSTEL.scherm.naam : 'Kassa benoemen';
   // dit toestel kent zijn scherm niet (meer), maar de zaak heeft er wel: kies er een
@@ -258,22 +261,61 @@ function vraag(kop, uitleg, standaard){
 }
 function info(kop, html){ $('#infoKop').textContent = kop; $('#infoIn').innerHTML = html; $('#dlgInfo').showModal(); }
 const bonItems = () => BON.map(x => ({ name: x.naam, qty: x.qty, price: x.prijs }));
+/* DE SLEUTEL WORDT HIER GEMAAKT EN NERGENS ANDERS MEER. Hij hoort bij DEZE
+   bon, niet bij deze poging: gaat de bon de wachtrij in, dan reist dezelfde
+   sleutel mee en herkent de server de herhaling (kern/kassa/herhaling.js).
+   Wie hem bij het opnieuw versturen ververst, heeft geen vangnet maar een
+   omzetverdubbelaar. */
 async function rekenAf(method, extra){
   if (!BON.length) return;
   const badge = $('#badgeNaam').value.trim();
+  const body = Object.assign({
+    total: bonTotaal(), method, items: bonItems(),
+    kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined,
+    korting: KORTING || undefined,
+    desc: 'De Kassa (' + modus().naam + ')' + (badge ? ' · ' + badge : ''),
+    codenaam: badge || undefined, idem: RTGIdem('kassa')
+  }, extra || {});
   try {
-    const r = await api('pos/sale', Object.assign({
-      total: bonTotaal(), method, items: bonItems(),
-      kassa: INSTEL.scherm ? INSTEL.scherm.naam : undefined,
-      korting: KORTING || undefined,
-      desc: 'De Kassa (' + modus().naam + ')' + (badge ? ' · ' + badge : ''),
-      codenaam: badge || undefined, idem: RTGIdem('kassa')
-    }, extra || {}));
-    LAATSTE = r.sale;
-    $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + (r.sale.kassa ? ' op ' + r.sale.kassa : '') + '.';
+    const r = await RTGKassaWachtrij.verstuur(body);
+    if (r.gewacht) {
+      /* De bon is NIET afgerekend bij de server, maar wel geregistreerd op dit
+         toestel. Dat verschil staat er met zoveel woorden: contant geld ligt in
+         de la, en de boeking volgt zodra de lijn terug is. */
+      $('#uitkomst').textContent = 'Geen verbinding. ' + eur(body.total) + ' staat in de wachtrij van deze kassa en gaat vanzelf weg zodra de lijn terug is.';
+    } else {
+      LAATSTE = r.sale;
+      $('#uitkomst').textContent = 'Afgerekend: ' + eur(r.sale.total) + ' (' + method + (r.betaler ? ', ' + r.betaler : '') + '), bon ' + r.sale.bon + (r.sale.kassa ? ' op ' + r.sale.kassa : '') + '.';
+    }
     BON = []; KORTING = null; $('#badgeNaam').value = ''; bonToon();
   } catch (e) { $('#uitkomst').textContent = e.message; }
 }
+
+/* De strook boven het werkvlak: hoeveel bonnen wachten er, en hoeveel zijn er
+   vastgelopen. Vastgelopen bonnen krijgen hun reden te zien -- ze verdwijnen
+   niet vanzelf, want dan verdwijnt de omzet met ze mee. */
+function toonWachtrij(stand){
+  const el = $('#wachtStrook');
+  if (!el) return;
+  if (!stand.wacht && !stand.vast && !stand.vreemd) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  let h = '';
+  if (stand.wacht) h += '<span><b>' + stand.wacht + '</b> bon' + (stand.wacht === 1 ? '' : 'nen') + ' wacht' + (stand.wacht === 1 ? '' : 'en') + ' op verbinding.</span><button id="wachtNu">Nu proberen</button>';
+  if (stand.vast) h += '<span><b>' + stand.vast + '</b> vastgelopen.</span><button id="wachtVast">Bekijken</button>';
+  if (stand.vreemd) h += '<span><b>' + stand.vreemd + '</b> bon' + (stand.vreemd === 1 ? '' : 'nen') + ' hoort bij ' +
+    esc(stand.vreemdeZaak) + '; log daar in om ze te versturen.</span>';
+  el.innerHTML = h;
+  const nu = $('#wachtNu'); if (nu) nu.addEventListener('click', () => RTGKassaWachtrij.leeg());
+  const vt = $('#wachtVast'); if (vt) vt.addEventListener('click', toonVastgelopen);
+}
+function toonVastgelopen(){
+  const v = RTGKassaWachtrij.vastgelopen();
+  info('Vastgelopen bonnen', v.map(x =>
+    '<p class="hint"><b>' + eur(x.body.total) + '</b> · ' + esc(x.body.method) + ' · ' + esc(String(x.opgesteld).slice(11, 16)) +
+    '<br>' + esc(x.reden) + '</p>').join('') ||
+    '<p class="hint">Geen.</p>');
+}
+if (TOKEN && window.RTGKassaWachtrij) RTGKassaWachtrij.zet(TOKEN, toonWachtrij);
 $('#payContant').addEventListener('click', () => rekenAf('contant'));
 $('#payRtg').addEventListener('click', () => { if (BON.length) { $('#payCode').value = ''; $('#dlgPay').showModal(); $('#payCode').focus(); } });
 $('#payOk').addEventListener('click', () => { $('#dlgPay').close(); rekenAf('rtgpay', { payCode: $('#payCode').value.trim() }); });

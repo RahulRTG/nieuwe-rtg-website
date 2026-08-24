@@ -18,7 +18,15 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const pw = laadPlaywright();
+/* De gedeelde zoeker uit test/browser.js, en niet de kopie die hier stond. Die
+   kopie koos de eerste playwright die te REQUIREN viel, terwijl het pakket er
+   kan zijn zonder de bijbehorende Chromium -- dan lukt de require, zakt de
+   launch met "Executable doesn't exist", en zegt deze toets iets over de
+   omgeving in plaats van over RTG Command. Zo stond hij hier ook echt: rood,
+   niet overgeslagen. laadBrowser() probeert te STARTEN en loopt de kandidaten
+   af, dus hij slaat alleen over als er werkelijk geen browser is. */
+const { laadBrowser } = require('./browser');
+const pw = laadBrowser();
 
 test('RTG Command: het Command Center, de operator en een objectdossier komen op',
   { skip: geenBrowser(pw) }, async () => {
@@ -66,7 +74,8 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
        stoppen. */
     for (const w of ['zoek', 'operator', 'zaken', 'herstel', 'beleid', 'simulatie', 'toezicht', 'werk',
       'journaal', 'werkplek', 'kwaliteit', 'graaf', 'herkomst', 'mdm', 'slo', 'sonde', 'alarm',
-      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad']) {
+      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad', 'gezondheid', 'incidenten',
+      'bijstand', 'vloot']) {
       await page.click('#rail button[data-w="' + w + '"]');
       await page.waitForFunction(() => {
         /* De app-titel is de <h1> in de kop (die de iOS-laag tot navigatiebalk
@@ -84,7 +93,7 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
          eerste versie van deze toets. */
       await page.waitForFunction(() => {
         const m = document.querySelector('main');
-        return m && !/Ophalen…|Meten…/.test(m.textContent);
+        return m && !/Ophalen…|Meten…|Lezen…/.test(m.textContent);
       }, null, { timeout: 12000 });
 
       /* EN DAN DE TEKST ZELF NAKIJKEN, want de kop alleen is niet genoeg. Elke
@@ -99,6 +108,80 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
           'werkplek ' + w + ' toont een JS-fout als melding: ' + tekst.slice(0, 200));
       }
     }
+
+    /* DE GEZONDHEIDSKAART: de vierde laag moet er echt uit te klappen zijn.
+       Dat is de laag die je niet kunt verzinnen -- per bron wat hij NIET
+       aantoont -- en een knop die hem niet opent, maakt van dit scherm alsnog
+       een dashboard met een uitklapje dat leeg is. */
+    await page.click('#rail button[data-w="gezondheid"]');
+    await page.waitForSelector('[data-open]', { timeout: 10000 });
+    /* ZICHTBAARHEID en niet textContent: het bewijs staat wel degelijk in de
+       DOM, alleen achter `hidden`. Wie hier op tekst toetst, toetst niets --
+       en dat is precies hoe deze toets de eerste keer slaagde zonder te kijken. */
+    const bewijsId = await page.getAttribute('[data-open]', 'data-open');
+    assert.equal(await page.isVisible('#' + bewijsId), false, 'het bewijs staat open voordat iemand klikte');
+    await page.click('[data-open]');
+    await page.waitForFunction((id) => {
+      const k = document.getElementById(id);
+      return k && !k.hasAttribute('hidden') && /Wat dit niet aantoont/.test(k.textContent);
+    }, bewijsId, { timeout: 8000 });
+    assert.match(await page.textContent('main'), /bewijs: (onbekend|vermoed|gemeten|bewezen)/,
+      'de bewijsgraad staat niet naast de stand');
+
+    /* HET INCIDENT EN DE TIJDLIJN, en daarvoor is een ECHTE storing nodig: een
+       scherm voor storingen dat nooit een storing heeft gezien, is niet
+       getoetst. De back-upmap weghalen is de goedkoopste echte: de
+       gezondheidskaart leest de schijf live, dus "bewaren" komt daarmee op
+       storing en de incidentwerkplek heeft iets om te openen. */
+    fs.rmSync(path.join(TMP, 'backups'), { recursive: true, force: true });
+    await page.click('#rail button[data-w="incidenten"]');
+    await page.waitForSelector('#inWeeg', { timeout: 10000 });
+    await page.click('#inWeeg');
+    await page.waitForSelector('[data-dos]', { timeout: 20000 });
+    assert.match(await page.textContent('main'), /RTG-\d{4}/, 'het incident heeft geen nummer');
+
+    await page.click('[data-dos]');
+    /* Het blok dat er per se bij hoort: wat er NIET gemeten is. Zonder deze
+       assertie kan het incidentscherm stil een schone nul gaan tonen. */
+    await page.waitForFunction(() => /Wat hierover niet gemeten is/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    const dosTekst = await page.textContent('main');
+    for (const zin of ['verloren', 'dubbel']) {
+      assert.ok(dosTekst.includes(zin), 'het dossier zwijgt over wat er niet gemeten is: ' + zin);
+    }
+
+    /* En de tijdlijn: de knop staat IN het dossier en wordt dus na het tekenen
+       gebonden. Precies daar was hij een keer stil dood -- bind() draaide voor
+       dat blok bestond. */
+    await page.click('[data-tl]');
+    await page.waitForFunction(() => /Vlak hiervoor veranderd/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    assert.match(await page.textContent('main'), /VOLGORDE en geen oorzaak/,
+      'de tijdlijn toont wijzigingen zonder de zin dat volgorde geen oorzaak is');
+
+    /* DE VLOOT houdt op waar de uitnodiging begint, en dat hoort op het scherm
+       te staan en niet alleen in de kern. Een leeg blok leest als "er is niets"
+       en dat is iets anders dan "hier mag ik niet zonder toestemming". */
+    await page.click('#rail button[data-w="vloot"]');
+    await page.waitForFunction(() => /Wat dit beeld niet kan zien/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    assert.match(await page.textContent('main'), /beschikbaarheidscijfer per organisatie/,
+      'de vloot legt niet uit waarom er geen cijfer per klant staat');
+
+    /* EN BIJSTAND HEEFT GEEN KNOP OM ZELF EEN SESSIE TE OPENEN. Dat is de
+       belofte in zijn zichtbaarste vorm; een knop die er tóch komt, valt hier
+       om. */
+    await page.click('#rail button[data-w="bijstand"]');
+    await page.waitForFunction(() => /De vier niveaus/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    const bjKnoppen = await page.evaluate(() =>
+      [...document.querySelectorAll('#bjUit button')].map(b => b.textContent.trim()));
+    for (const verboden of ['Bijstand vragen', 'Sessie openen', 'Nieuwe sessie']) {
+      assert.ok(!bjKnoppen.includes(verboden),
+        'de kantoorkant heeft een knop die zelf een sessie opent: ' + verboden);
+    }
+    assert.match(await page.textContent('main'), /Permanente toegang/,
+      'de teller die op nul hoort te staan, staat er niet');
 
     // De operator: een vraag stellen en een gemeten antwoord terugkrijgen.
     await page.click('#rail button[data-w="operator"]');

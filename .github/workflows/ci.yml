@@ -193,6 +193,18 @@ jobs:
           node-version: '26'
           cache: 'npm'
       - run: npm ci
+      # LIBXML2 IS DE SCHEIDSRECHTER van test/samlc14n.test.js. Onze eigen
+      # canonicalisatie wordt daar naast die van een vreemde implementatie
+      # gelegd, en die toets slaat zichzelf bewust NIET over als xmllint
+      # ontbreekt: een veiligheidsmeting die niet heeft gedraaid mag er niet
+      # uitzien als een groen vinkje.
+      #
+      # In die toets stond dat xmllint "op elke ubuntu-runner" staat. Dat was
+      # niet waar -- de image van ubuntu-latest draagt hem niet, en de eerste
+      # volledige suite die hem bereikte zakte met drie keer ENOENT. Een
+      # aanname over de omgeving is geen omgeving; daarom staat hij hier.
+      - name: libxml2 (de scheidsrechter van de c14n-toets)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
       - name: Codeafspraken (check.js)
         run: npm run check
       # DE DELTAPOORT. De norm hieronder is een som over de hele codebase, en een

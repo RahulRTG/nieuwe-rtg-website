@@ -437,9 +437,17 @@
   function tekenRekening() {
     if (!REK) return;
     var h = '';
-    var sc = REK.service || { stap:'Uw bezoek', volgende:'Wij houden u hier op de hoogte.', voortgang:10 };
-    $('#serviceKompas').innerHTML = '<span>UW SERVICE COMPASS</span><div><b>'+esc(sc.stap)+'</b><strong>'+sc.voortgang+'%</strong></div><i><u></u></i><p>'+esc(sc.volgende)+'</p>';
-    $('#serviceKompas').querySelector('u').style.width = sc.voortgang+'%';
+    var sc = REK.service || { stap:'Uw bezoek', volgende:'Wij houden u hier op de hoogte.' };
+    /* De balk komt uit een BREUK en niet uit een percentage dat bij een label
+       hoort: hoeveel van uw gerechten staan er al. Is er nog niets besteld, dan
+       staat er geen balk -- een balk op tien procent zou iets beweren wat
+       niemand heeft gemeten. */
+    var g = sc.geserveerd || { uitgegeven:0, besteld:0 };
+    var deel = g.besteld ? Math.round(g.uitgegeven / g.besteld * 100) : 0;
+    $('#serviceKompas').innerHTML = '<span>UW SERVICE COMPASS</span><div><b>'+esc(sc.stap)+'</b>'+
+      (g.besteld ? '<strong>'+g.uitgegeven+' van '+g.besteld+'</strong>' : '')+'</div>'+
+      (g.besteld ? '<i><u></u></i>' : '')+'<p>'+esc(sc.volgende)+'</p>';
+    if (g.besteld) $('#serviceKompas').querySelector('u').style.width = deel+'%';
     REK.regels.forEach(function (r) {
       h += '<div class="item"><div><span class="nm">' + r.aantal + ' × ' + esc(r.naam) + '</span>' +
         '<div class="ds">' + (r.doorHandle ? esc(r.doorHandle) : 'tafel') +

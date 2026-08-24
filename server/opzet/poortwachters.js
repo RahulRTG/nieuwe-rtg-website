@@ -58,10 +58,17 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
     sseToOffice: (ev, data) => sseToOffice(ev, data)
   });
   functiewachter.start();
+  /* De beschermstand wordt HIER gemaakt en niet in de middleware zelf: hij valt
+     bij het laden om als een categorie niet is ingedeeld of een uitzondering
+     niet meer bestaat (kern/beschermstand.js), en dat hoort te gebeuren bij het
+     starten van de server -- niet bij het eerste verzoek dat binnenkomt terwijl
+     er een incident loopt. */
+  const beschermstand = require('../kern/beschermstand').maakBeschermstand({ functies });
   app.use(schakelaars({ db, accounts, functies,
     sessionFor: t => sessionFor(t),
     findSupplier: c => findSupplier(c),
     bevoegdVan: deps.bevoegdVan,
+    beschermstand,
     wachter: functiewachter }));
   app.use(jsonGzip());
 

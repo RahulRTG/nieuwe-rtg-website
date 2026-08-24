@@ -90,6 +90,12 @@ module.exports = function hangDwarseRoutersOp(grens) {
      Staat naast werkplek.js en niet erin: dat is het beeld van RTG en RTF zelf,
      dit is een werkruimte die ook aan een andere organisatie te geven is. */
   require('../routes/bedrijf')(grens('bedrijf'));
+  /* De Tenant Control Plane (kern/tenant/): welke org IS de klant, welk merk
+     draagt zij, en hoe komt een groep van haar identiteitsprovider terecht bij
+     een rol in haar werkruimte. Staat NA bedrijf, want de runtime-routes
+     hergebruiken de twee poorten die de werkruimte al had (beheer-token en
+     lid-token) in plaats van er een derde bij te bedenken. */
+  require('../routes/tenant')(grens('tenant'));
   require('../routes/labfonds')(grens('labfonds'));
   require('../routes/aanmeldingen')(grens('aanmeldingen'));
   require('../routes/ledenregister')(grens('ledenregister'));

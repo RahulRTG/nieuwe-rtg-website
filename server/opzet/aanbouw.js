@@ -81,6 +81,12 @@ module.exports = function bouwKernAan(kern, grens) {
      leest verder alleen db.data, dus hij hoeft niet op een motor te wachten. */
   Object.assign(kern, { command: require('../kern/command').maakCommand({ db, save, crypto, anthropic, kern,
     sseToOffice: (ev, data) => kern.sseToOffice && kern.sseToOffice(ev, data) }) });
+  /* BIJSTAND HANGT OOK LOS AAN DE KERN, en dat is geen tweede waarheid maar een
+     smallere deur: de klantkant (routes/tenant/bijstand.js) heeft precies deze
+     ene laag nodig en niet heel RTG Command. Via `command` zou de domeingrens
+     de tenantkant toegang geven tot de operator, de recepten en het beleid --
+     en dat is een uitnodiging aan de verkeerde kant van dit huis. */
+  Object.assign(kern, { bijstand: kern.command.bijstand });
   require('../routes/command')(grens('command'));
   /* Zaak Command (kern/zaakcommand/): dezelfde logica als hierboven, maar dan
      van EEN zaak en uitsluitend over die zaak -- voor de leverancier-app en de

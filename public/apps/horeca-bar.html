@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca: bar</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/zaakscherm.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<style>
+  /* BAR. Een scherm achter een toog: natte handen, gedempt licht, en iemand die
+     er schuin op kijkt terwijl hij schenkt. Grote letters, grote raakvlakken
+     (48px, net als VUUR), en geen enkel getal zonder wat het betekent. */
+  :root{--b-lijn:var(--rtg-line);--b-kaart:var(--rtg-card);--b-txt:var(--rtg-txt);
+        --b-stil:var(--rtg-soft);--b-accent:#C23A5E;}
+  .b-tel{display:flex;gap:.6rem;flex-wrap:wrap;margin:.8rem 0;}
+  .b-tel div{flex:1 1 8rem;border:1px solid var(--b-lijn);border-radius:0;padding:.7rem .8rem;}
+  .b-tel b{display:block;font:600 26px Inter,system-ui;}
+  .b-tel span{font-size:13px;color:var(--b-stil);}
+  .b-kop{font:600 13px Inter,system-ui;letter-spacing:.16em;text-transform:uppercase;
+         color:var(--b-stil);margin:1.2rem 0 .5rem;}
+  .b-stapel{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .b-stapel div{border:1px solid var(--b-lijn);border-radius:0;padding:.55rem .8rem;min-height:48px;
+                display:flex;flex-direction:column;justify-content:center;}
+  .b-stapel b{font:600 18px Inter,system-ui;}
+  .b-stapel small{font-size:13px;color:var(--b-stil);}
+  .b-golf{border:1px solid var(--b-lijn);border-radius:0;background:var(--b-kaart);
+          padding:.85rem .9rem;margin-bottom:.6rem;}
+  .b-golf.wacht{border-left:3px solid var(--b-accent);}
+  .b-golfkop{display:flex;align-items:baseline;gap:.6rem;}
+  .b-tafel{font:600 19px Inter,system-ui;}
+  .b-min{margin-left:auto;font:600 17px Inter,system-ui;white-space:nowrap;}
+  .b-regels{margin:.5rem 0 0;padding:0;list-style:none;}
+  .b-regels li{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;font-size:16px;
+               border-top:1px solid var(--b-lijn);}
+  .b-regels li:first-child{border-top:0;}
+  .b-regels em{font-style:normal;font-size:14px;color:var(--b-stil);}
+  .b-regels button{min-height:48px;min-width:48px;padding:0 .9rem;border:1px solid var(--b-lijn);
+                   border-radius:0;background:transparent;color:var(--b-txt);
+                   font:500 15px Inter,system-ui;cursor:pointer;}
+  .b-regels button.p{border-color:var(--b-accent);background:rgba(194,58,94,.14);}
+  .b-allergie{display:inline-block;border:1px solid var(--b-accent);border-radius:0;
+              padding:.1rem .55rem;font-size:14px;}
+  .b-leeg{border:1px dashed var(--b-lijn);border-radius:0;padding:1.1rem;
+          font-size:15px;line-height:1.6;color:var(--b-stil);}
+  .b-voet{margin-top:1.4rem;font-size:14px;line-height:1.6;color:var(--b-stil);}
+  /* Opzettelijk luid: een handeling die nog niet bij de server is, is werk dat
+     nergens staat. */
+  #bEdgeStrook{margin:.6rem 0;padding:.6rem .8rem;border:1px solid var(--b-accent);
+               border-radius:0;background:rgba(194,58,94,.12);font-size:15px;line-height:1.5;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>Bar</h1></span>
+  <span class="h-flex1"></span>
+  <button class="knop" id="bVerversNu" type="button">Ververs</button>
+</header>
+<main id="main">
+  <div id="bEdgeStrook" hidden></div>
+  <div class="b-tel">
+    <div><b id="bOpen">-</b><span>glazen te maken</span></div>
+    <div><b id="bStaat">-</b><span>ronden waarvan het eerste glas wacht</span></div>
+    <div><b id="bGolven">-</b><span>open ronden</span></div>
+  </div>
+
+  <div class="b-kop">Samen te maken</div>
+  <div class="b-stapel" id="bStapel"></div>
+
+  <div class="b-kop">Ronden, oudste eerst</div>
+  <div id="bGolvenLijst"></div>
+
+  <p class="b-voet" id="bUitleg"></p>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/shared/id.js"></script>
+<script src="/shared/wachtrij.js"></script>
+<script src="/apps/horeca/edge.js"></script>
+<script src="/apps/horeca/bar.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

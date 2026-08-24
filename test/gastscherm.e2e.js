@@ -37,7 +37,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -131,3 +131,32 @@ test('de gast scant de QR, schuift aan en ziet zijn rekening; zonder token ziet 
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* EN DE PUBLIEKE INGANG APART (main, 23 augustus): wie ZONDER code binnenkomt
+   krijgt de volgende stap uitgelegd -- geen leeg scherm, geen leden- of
+   leveranciersdeur. De QR-stroom hierboven bewijst de route met code; deze
+   bewijst de route zonder. */
+test('de publieke gastingang legt zonder QR-code de volgende stap uit',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+    const page = await ctx.newPage();
+    const fouten = letOpFouten(page, []);
+
+    await page.goto(base + '/apps/gast.html', { waitUntil: 'load' });
+    await page.waitForSelector('#melding:not([hidden])', { timeout: 10000 });
+
+    assert.match(await page.locator('#zaakNaam').textContent(), /Aan tafel/);
+    assert.match(await page.locator('#melding').textContent(), /Scan de QR-code op je tafel of op je kamer/);
+    assert.equal(await page.locator('#vAanschuif').isVisible(), false,
+      'zonder geldige QR vraagt het scherm nog geen persoonsgegevens');
+    assert.deepEqual(fouten, [], 'het gastscherm opent zonder browserfouten');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+  }
+});
+

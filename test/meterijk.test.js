@@ -199,6 +199,25 @@ const IJKINGEN = {
       "const test = require('node:test');\ntest('ijk', () => {});\n",
       () => norm.meet().testbestanden - voor.testbestanden)
   },
+  schermenZonderVormtaal: {
+    /* TWEE KANTEN, want een meter die maar EEN kant beweegt zegt de helft. Een
+       pagina ZONDER de tokenlaag hoort de teller te laten stijgen, en dezelfde
+       pagina MET de tokenlaag hoort hem te laten staan. Zonder die tweede helft
+       zou een meter die simpelweg alle html-bestanden telt, ook slagen -- en
+       dan meet hij het bestaan van pagina's in plaats van de adoptie. */
+    proef: (voor) => {
+      const zonder = metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
+        '<!doctype html><html lang="nl"><head><title>ijk</title></head><body></body></html>\n',
+        () => norm.meet().schermenZonderVormtaal - voor.schermenZonderVormtaal);
+      assert.equal(zonder, 1, 'een pagina zonder de tokenlaag telt mee als gat');
+      const met = metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
+        '<!doctype html><html lang="nl"><head><link href="/shared/rtg-ontwerp.css" rel="stylesheet">' +
+        '</head><body></body></html>\n',
+        () => norm.meet().schermenZonderVormtaal - voor.schermenZonderVormtaal);
+      assert.equal(met, 0, 'dezelfde pagina MET de tokenlaag telt niet mee');
+      return zonder;
+    }
+  },
   e2eBestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.e2e.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",

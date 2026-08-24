@@ -73,17 +73,29 @@ test('1. de redactie staat klaar: huisstijl, rubrieken en lege tellers; zonder i
   assert.equal((await red('staat', {}, null)).status, 401, 'zonder zaak-inlog geen redactie');
 });
 
-test('2. de huisstijl: wat geldig is wordt bewaard, de rest wordt genegeerd', async () => {
+test('2. de huisstijl: wat geldig is wordt bewaard, de rest wordt GEWEIGERD', async () => {
   const goed = await red('huisstijl', { naam: 'De Ibiza Bode', payoff: 'Onafhankelijk sinds 1998', accent: '#7F1634', thema: 'licht' }, bode);
   assert.equal(goed.status, 200);
   assert.equal(goed.body.huisstijl.payoff, 'Onafhankelijk sinds 1998');
   assert.equal(goed.body.huisstijl.thema, 'licht');
-  /* Een accent dat geen kleurcode is en een thema dat niet bestaat worden
-     niet bewaard EN laten de bestaande waarde staan. Half toepassen zou een
-     krant met een kapotte huisstijl opleveren zonder dat iemand het merkt. */
-  const fout = await red('huisstijl', { accent: 'bordeaux', thema: 'neon' }, bode);
-  assert.equal(fout.body.huisstijl.accent, '#7F1634', 'een ongeldige kleur verandert niets');
-  assert.equal(fout.body.huisstijl.thema, 'licht', 'een onbekend thema verandert niets');
+
+  /* HIER STOND: "een ongeldige kleur verandert niets", met status 200 en de
+     oude waarde terug. Dat is precies de stille variant, en hij was ook nog
+     eens ANDERS dan wat het Theater met dezelfde invoer deed (400). Sinds de
+     merkkern de enige bron is (kern/tenant/merkkern.js) strandt dezelfde
+     invoer overal hetzelfde: met een melding. Voor wie de knop indrukt is dat
+     het verschil tussen weten dat het niet mocht en denken dat het gelukt is. */
+  const fout = await red('huisstijl', { accent: 'bordeaux' }, bode);
+  assert.equal(fout.status, 400);
+  assert.match(fout.body.error, /hexcode/);
+  const themaFout = await red('huisstijl', { thema: 'neon' }, bode);
+  assert.equal(themaFout.status, 400);
+  assert.match(themaFout.body.error, /licht of donker/);
+
+  /* En er is niets half toegepast: de stand van na de geldige bewaring staat er nog. */
+  const na = await red('staat', {}, bode);
+  assert.equal(na.body.huisstijl.accent, '#7F1634');
+  assert.equal(na.body.huisstijl.thema, 'licht');
 });
 
 test('3. rubrieken: een nieuwe komt vooraan, een lege naam wordt geweigerd', async () => {

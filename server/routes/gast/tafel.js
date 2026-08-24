@@ -31,43 +31,11 @@ module.exports = (kern) => {
     return false;
   };
 
-  /* De kaart van een zaak, in de vorm die de gast leest.
-
-     `alcohol` komt van het ITEM en wordt hier niet meer geraden. Hier stond een
-     tweede gok overheen -- een regex op de naam (wijn|bier|gin|...) -- en die
-     kan het besluit van kern/supplierdefaults.js alleen maar de verkeerde kant
-     op overschrijven: "Virgin Colada (0%)" bevat de letters g-i-n, dus het ene
-     item dat zichzelf uitdrukkelijk alcoholvrij noemt werd hier weer drank.
-     supplierdefaults zet m.alcohol op ELKE kaart (bij het opstarten en bij elke
-     nieuwe partner): wat de zaak opgeeft wint, een zelfverklaard alcoholvrij
-     item is vrij, en een onbekend bar-item telt streng als alcohol. Twee
-     plekken die dezelfde vraag beantwoorden lopen uiteen (LAT-regel 4) -- en
-     deze twee waren al uiteengelopen. */
-  function kaartVanZaak(zaakcode) {
-    const s = findSupplier(zaakcode);
-    const menu = (s && Array.isArray(s.menu)) ? s.menu : [];
-    const h = kern.horeca.H(zaakcode);
-    const uit = (h.instel && h.instel.uitverkocht) || {};
-    const capaciteitPauze = new Set(((h.etenCapaciteit || {}).gepauzeerdeItems || []).map(String));
-    const twins = h.dishTwins || {};
-    return menu.map(m => ({
-      id: m.id, naam: m.name, uitleg: m.desc || null, cat: m.cat || 'Overig',
-      foto: m.foto || m.photo || m.image || null,
-      centen: Math.round(Number(m.price) * 100), allergenen: Array.isArray(m.allergens) ? m.allergens : [],
-      ingredienten: Array.isArray(m.ingredienten) ? m.ingredienten : [],
-      dieet: Array.isArray(m.dieet) ? m.dieet : [],
-      opties: Array.isArray(m.opties) ? m.opties : [],
-      station: m.station || null,
-      prepMin: m.prepMin || null,
-      alcohol: !!m.alcohol || /wijn|bier|cava|cocktail|gin|whisk|rum|vodka|borrel/i.test(String(m.name || '')),
-      uitverkocht: !!uit[m.id] || capaciteitPauze.has(String(m.id)),
-      tijdelijkGepauzeerd: capaciteitPauze.has(String(m.id)),
-      sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,
-      twin: twins[m.id] && twins[m.id].publicatie ? { versie:twins[m.id].publicatie.versie,
-        presentatie:twins[m.id].publicatie.presentatie||null, service:twins[m.id].publicatie.service||null,
-        pairing:twins[m.id].publicatie.pairing||null } : null
-    }));
-  }
+  /* De kaart van een zaak. De opbouw staat sinds 23 augustus 2026 in
+     kern/horeca/kaart.js en niet meer hier: de bediening leest op de PDA
+     dezelfde kaart, en die staat aan de andere kant van de domeingrens. Een
+     kaart is een eigenschap van de ZAAK; deze deur is een lezer. */
+  const { kaartVanZaak } = require('../../kern/horeca/kaart')({ findSupplier, horeca: kern.horeca });
   kern.gastKaartVanZaak = kaartVanZaak;
 
   /* ---------- de QR scannen ----------

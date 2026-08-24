@@ -52,7 +52,17 @@ const PAGINAS = alleSchermen().concat(['/site/404.html']);
    stond: deze scan meldde zich dus af met "geen browser" terwijl er een was --
    en dan staat er in TOEGANKELIJK.md een nul die niemand gemeten heeft. Zie de
    kop van die module voor de hele vindwijze. */
-const { laadScherm: laadPlaywright, herkomst: browserHerkomst } = require('./lib/scherm');
+/* DE BROWSERKEUZE KOMT SINDS 23 AUGUSTUS UIT test/browser.js (main): die
+   probeert te STARTEN in plaats van te laden en loopt de kandidaten af tot er
+   een echt opent. Dat is de sterkere reparatie van dezelfde valse "geen
+   browser" die scripts/lib/scherm.js eerder ving: een require die slaagt
+   terwijl de Chromium erachter ontbreekt. herkomst() blijft uit lib/scherm
+   komen -- test/browser.js heeft die functie niet. */
+function laadPlaywright() {
+  try { return require('../test/browser').laadBrowser(); }
+  catch (e) { try { return require('./lib/scherm').laadScherm(); } catch (e2) { return null; } }
+}
+const { herkomst: browserHerkomst } = require('./lib/scherm');
 
 /* DE ECHTE SERVER, NIET EEN STATISCHE MAP.
 

@@ -20,6 +20,10 @@ jobs:
           node-version: "26"
           cache: npm
       - run: npm ci
+      # xmllint is de scheidsrechter van test/samlc14n.test.js en die toets slaat
+      # zichzelf niet over; ubuntu-latest draagt hem niet. Zie ci.yml voor waarom.
+      - name: libxml2 (de scheidsrechter van de c14n-toets)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
       - name: Releasepoort
         run: npm run check
       - name: Server- en integratietoetsen

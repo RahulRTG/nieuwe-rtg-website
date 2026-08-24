@@ -19,6 +19,7 @@
 'use strict';
 
 const SCHEMA_USER = 'urn:ietf:params:scim:schemas:core:2.0:User';
+const SCHEMA_GROUP = 'urn:ietf:params:scim:schemas:core:2.0:Group';
 const SCHEMA_LIJST = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
 const SCHEMA_FOUT = 'urn:ietf:params:scim:api:messages:2.0:Error';
 const SCHEMA_PATCH = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
@@ -38,6 +39,19 @@ function gebruiker(u, email, basis) {
       created: u.created_at,
       location: (basis || '') + '/Users/' + u.id
     }
+  };
+}
+
+/* Een groep in SCIM-vorm. `members` draagt de RTG-account-id's; een naam of
+   e-mailadres hoort hier niet, want die verandert en `id` niet. */
+function groep(g, basis) {
+  return {
+    schemas: [SCHEMA_GROUP],
+    id: String(g.id),
+    displayName: g.naam,
+    externalId: g.externeId || undefined,
+    members: (g.leden || []).map(v => ({ value: String(v), type: 'User' })),
+    meta: { resourceType: 'Group', location: (basis || '') + '/Groups/' + g.id, created: g.bij }
   };
 }
 
@@ -87,7 +101,11 @@ function resourceTypes(basis) {
     schemas: ['urn:ietf:params:scim:schemas:core:2.0:ResourceType'],
     id: 'User', name: 'User', endpoint: '/Users', schema: SCHEMA_USER,
     meta: { resourceType: 'ResourceType', location: (basis || '') + '/ResourceTypes/User' }
-  }], { start: 1, aantal: 1, totaal: 1 });
+  }, {
+    schemas: ['urn:ietf:params:scim:schemas:core:2.0:ResourceType'],
+    id: 'Group', name: 'Group', endpoint: '/Groups', schema: SCHEMA_GROUP,
+    meta: { resourceType: 'ResourceType', location: (basis || '') + '/ResourceTypes/Group' }
+  }], { start: 1, aantal: 2, totaal: 2 });
 }
 
 /* Alleen de attributen die we echt ondersteunen. */
@@ -100,8 +118,15 @@ function schemas(basis) {
       { name: 'emails', type: 'complex', multiValued: true, required: false, mutability: 'readWrite' }
     ],
     meta: { resourceType: 'Schema', location: (basis || '') + '/Schemas/' + SCHEMA_USER }
-  }], { start: 1, aantal: 1, totaal: 1 });
+  }, {
+    id: SCHEMA_GROUP, name: 'Group', description: 'Een groep bij de klant; hij draagt leden en verder niets',
+    attributes: [
+      { name: 'displayName', type: 'string', required: true, uniqueness: 'server', mutability: 'readWrite' },
+      { name: 'members', type: 'complex', multiValued: true, required: false, mutability: 'readWrite' }
+    ],
+    meta: { resourceType: 'Schema', location: (basis || '') + '/Schemas/' + SCHEMA_GROUP }
+  }], { start: 1, aantal: 2, totaal: 2 });
 }
 
-module.exports = { gebruiker, lijst, fout, providerConfig, resourceTypes, schemas,
-  SCHEMA_USER, SCHEMA_LIJST, SCHEMA_FOUT, SCHEMA_PATCH };
+module.exports = { gebruiker, groep, lijst, fout, providerConfig, resourceTypes, schemas,
+  SCHEMA_USER, SCHEMA_GROUP, SCHEMA_LIJST, SCHEMA_FOUT, SCHEMA_PATCH };

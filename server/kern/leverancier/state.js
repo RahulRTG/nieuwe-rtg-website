@@ -9,6 +9,7 @@ module.exports = (ctx) => {
     ordersVanZaak, boekingenVanZaak, publicTrip, commGastVan } = ctx;
   const { deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen, ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor, makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor } = ctx;
   const { modulesVoor: pdaModules } = require('../pda/modules');
+  const talentMatches = require('./talent')(db);
   function supplierState(s, actor) {
     const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     const vandaag = new Date().toISOString().slice(0, 10);
@@ -133,6 +134,7 @@ module.exports = (ctx) => {
       notifications: db.data.supplierNotifications[s.code] || [],
       staff: accounts.listStaff(s.code).map(accounts.publicStaff),
       applications: (db.data.applications[s.code] || []).slice(0, 30).map(werkgeverSollicitatie),
+      talentMatches: talentMatches(s.code),
       vacatures: (db.data.vacatures[s.code] || []).slice(0, 40),
       events: s.events || null,
       dailyMeps: (() => {

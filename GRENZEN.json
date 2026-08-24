@@ -119,6 +119,7 @@
    "findSupplier",
    "rtmailTeam",
    "rtmailVak",
+   "tenant",
    "werkplekken"
   ],
   "bestanden": [
@@ -1469,7 +1470,10 @@
   "samen": [
    "samen"
   ],
-  "scim": [],
+  "scim": [
+   "accounts",
+   "tenant"
+  ],
   "sleutelwoorden": [
    "swInfo",
    "swWeg",
@@ -1624,9 +1628,11 @@
    "sport"
   ],
   "sso": [
+   "accounts",
    "appUrl",
    "logInlog",
-   "stateFor"
+   "stateFor",
+   "tenant"
   ],
   "stad": [
    "stad",
@@ -2020,6 +2026,7 @@
    "staat",
    "stad",
    "techniek",
+   "tenant",
    "wacht",
    "zekeringMag"
   ],
@@ -2290,6 +2297,12 @@
    "status",
    "wallet",
    "zorgpolis"
+  ],
+  "tenant": [
+   "bedrijf",
+   "bijstand",
+   "findSupplier",
+   "tenant"
   ]
  }
 }

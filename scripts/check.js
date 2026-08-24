@@ -465,6 +465,23 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/lib/idem-poort.js',
     'server/kern/command/uitrolregie.js',
     'server/functies/register/index.js',
+    /* VIER UIT DE SAMENVOEGING VAN 24 AUGUSTUS (main +80 commits): alle vier
+       groeiden ze van TWEE kanten tegelijk -- main's idempotentie-, tenant- en
+       beschermstandrondes plus onze afsplitsingen -- en bij alle vier is de naad
+       aan te wijzen, dus NOG en niet MAG.
+
+         server/kern/leverancier/state.js       10,3 KB
+           naad: de sectorvelden (per type zaak) los van de gedeelde staat.
+         server/middleware/functieschakelaars.js 10,3 KB
+           naad: de beschermstand-tak los van de gewone schakelweg; de zinnen
+           wonen al in ./schakelaar-antwoord.js.
+         server/opzet/poortwachters.js           10,4 KB
+           naad: het eigen-domeinblok (dom-eigendomein) los van de wachters
+           zelf; het is een functie, geen poort.
+         (verkoop.js stond hier ook en is al geknipt: ./inwissel.js) */
+    'server/kern/leverancier/state.js',
+    'server/middleware/functieschakelaars.js',
+    'server/opzet/poortwachters.js',
     /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
        ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
        (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
@@ -1755,7 +1772,14 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
     'ledenAuth', 'rtfPoort']);
   POORT_MW.add('arrivalPassAuth'); // bezit van de tijdelijke, gehashte Arrival Pass
-  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
+  /* `viaBeheerOfDirectie` (routes/tenant.js) is geen derde poort maar een keuze
+     tussen de twee die er al zijn: het beheer-token, of een lid met het recht
+     `werkruimte`. Hij belandde hier omdat deze regel 800 tekens vooruitkijkt en
+     bij de volgende route stopt -- staat de helperfunctie achter een tweede
+     route, dan valt zijn 403 buiten het venster en heet de eerste route
+     ongepoort. Bij naam noemen is eerlijker dan de code herschikken om een
+     tekstafstand te plezieren. */
+  const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan|viaBeheerOfDirectie)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
      regel toevoegt schrijft er een reden bij die klopt; kun je dat niet, dan is
@@ -1823,6 +1847,9 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/rtgid/start', 'de identiteitsstroom begint voordat er een sessie is'],
     ['/api/sso/waarheen', 'de SSO-heenweg draagt zijn eigen ondertekende staat'],
     ['/api/sso/start', 'idem; 404 op een onbekende of uitgezette koppeling'],
+    ['/api/sso/saml/start', 'de SAML-heenweg; hetzelfde als /api/sso/start, met een verzoek-ID dat we bewaren om het antwoord tegen te houden'],
+    ['/api/sso/saml/acs', 'de provider POST de assertie hierheen -- een sessie bestaat op dat moment nog niet; de POORT is de handtekening plus het eigen verzoek-ID (test/samlxsw.test.js)'],
+    ['/api/sso/saml/metadata', 'wat een klant bij zijn provider invult: onze eigen entityID en antwoordadres, geen gegevens'],
     ['/api/kantoor/gesprek/start', 'het kantoorgesprek begint voor er een account is'],
     ['/api/kantoor/gesprek/zeg', 'loopt verder op het gespreks-id dat bij de start is uitgegeven'],
     ['/api/bedrijf/werkruimte/maak', 'een organisatie die nog geen werkruimte heeft, heeft ook nog geen sleutel; de maker krijgt het beheer-token'],

@@ -9,8 +9,13 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/runbooks', officeAuth, (req, res) => veilig(res, () =>
     ({ runbooks: command.runbooks.lijst() })));
 
+  /* HET ENIGE PAD NAAR EEN RECEPT LOOPT DOOR DE TRANSACTIE, en niet meer
+     rechtstreeks langs runbooks.voer(). Dat is geen laagje eromheen: de
+     voorcontrole kan hier weigeren, en na afloop wordt er POSITIEF nagekeken
+     of het werkelijk is gelukt -- mislukt dat, dan draait hij zichzelf terug.
+     Een tweede ingang die dat overslaat, zou de belofte meteen leeg maken. */
   app.post('/api/command/runbook/voer', officeAuth, (req, res) => veilig(res, () =>
-    command.runbooks.voer(String(req.body.id || ''), {
+    command.transactie.draai(String(req.body.id || ''), {
       droog: req.body.droog !== false,
       door: wie(req),
       reden: req.body.reden,
@@ -28,6 +33,30 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/runs', officeAuth, (req, res) => veilig(res, () =>
     req.body.id ? ({ run: command.runbooks.run(String(req.body.id)) })
       : ({ runs: command.runbooks.runs(Number(req.body.n || 25)) })));
+
+  /* HET INCIDENT. `weeg` is de enige die OPENT (de machine ziet een storing);
+     `sluit` is de enige die afsluit, en dat is mensenwerk met een verslag. Dat
+     die twee niet dezelfde kant op werken, is met opzet: een incident dat
+     zichzelf sluit, laat een storing achter zonder conclusie. */
+  app.post('/api/command/incidenten', officeAuth, (req, res) => veilig(res, () => ({
+    incidenten: command.incident.lijst({ status: req.body.status, vermogen: req.body.vermogen,
+      alles: !!req.body.alles, max: req.body.max }),
+    tel: command.incident.tel()
+  })));
+  app.post('/api/command/incident', officeAuth, (req, res) => veilig(res, () =>
+    command.incident.dossier(String(req.body.id || ''))));
+  app.post('/api/command/incident/weeg', officeAuth, (req, res) => veilig(res, () =>
+    command.incident.weeg(wie(req))));
+  app.post('/api/command/incident/open', officeAuth, (req, res) => veilig(res, () =>
+    command.incident.opdeHand(String(req.body.vermogen || ''), wie(req), req.body.wat, req.body.reden)));
+  app.post('/api/command/incident/neem', officeAuth, (req, res) => veilig(res, () =>
+    command.incident.neem(String(req.body.id || ''), wie(req))));
+  app.post('/api/command/incident/maatregel', officeAuth, (req, res) => veilig(res, () =>
+    command.incident.maatregel(String(req.body.id || ''),
+      { wat: req.body.wat, soort: req.body.soort, verwijzing: req.body.verwijzing, door: wie(req) })));
+  app.post('/api/command/incident/sluit', officeAuth, (req, res) => veilig(res, () =>
+    command.incident.sluit(String(req.body.id || ''),
+      { verslag: req.body.verslag, door: wie(req), toch: !!req.body.toch, reden: req.body.reden })));
 
   /* De uitzonderingenrij: alleen wat de automatisering écht niet zelf kon. */
   app.post('/api/command/zaken', officeAuth, (req, res) => veilig(res, () => ({

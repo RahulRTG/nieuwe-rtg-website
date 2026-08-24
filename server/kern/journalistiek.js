@@ -32,13 +32,15 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
      schoonmakers zelf staan in ./journalistiek-blokken.js ---- */
   const { schoonBlok, schoonVolgorde } = require('./journalistiek-blokken').maakBlokSchoon({ scho, id, TYPES, VERSIES });
 
-  /* ---- huisstijl ---- */
+  /* ---- huisstijl ----
+     Was de vierde kopie van de merkvalidatie en negeerde een foute kleur STIL:
+     `ok: true` met de oude kleur erin. Leest nu kern/tenant/merkkern.js. */
   function huisstijlBewaar(code, d) {
-    const r = ruimte(code); d = d || {};
-    if (d.naam != null) r.huisstijl.naam = scho(d.naam, 60) || 'Mijn krant';
-    if (d.payoff != null) r.huisstijl.payoff = scho(d.payoff, 100);
-    if (d.accent != null && /^#[0-9a-fA-F]{6}$/.test(String(d.accent))) r.huisstijl.accent = d.accent;
-    if (d.thema != null && ['licht', 'donker'].includes(d.thema)) r.huisstijl.thema = d.thema;
+    const r = ruimte(code);
+    const uit = require('./tenant/merkkern').leesMerkvelden(d || {}, r.huisstijl, scho);
+    if (uit.error) return { error: uit.error, status: uit.status || 400 };
+    if (!uit.merk.naam) uit.merk.naam = 'Mijn krant';   // een krant heeft een kop
+    r.huisstijl = uit.merk;
     save(); return { ok: true, huisstijl: r.huisstijl };
   }
 

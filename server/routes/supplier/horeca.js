@@ -25,11 +25,19 @@ module.exports = (kern) => {
   const verzoeklaag = require('../../kern/gast/verzoek')({ save: kern.save, schoon: kern.schoon, horeca });
   const ctx = Object.assign({}, kern, { horeca, polslaag, clublaag, verzoeklaag });
   require('./horeca/rekening')(ctx);   // openen, regels, gangen, lijst
+  require('./horeca/gezelschap')(ctx); // wie zit er aan tafel, en wat staat op wiens naam
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
+  require('./horeca/verdeling')(ctx);  // wie betaalt welk deel -- één rekening, geen knip
   require('./horeca/betalen')(ctx);    // korting, fooi, betalen, oninbaar
   require('./horeca/bonnen')(ctx);     // cadeaubon en tegoed, offline-sync, happy hour
   require('./horeca/keuken')(ctx);     // het keukenscherm: stations en standen
   require('./horeca/keuken-regie')(ctx); // het regiescherm van de chef en de drukterem
+  require('./horeca/pas')(ctx);        // de werklijst van de pas: oppakken, overnemen, uitgeven
+  require('./horeca/werklijst')(ctx);  // PDA SERVICE: wat is mijn eerstvolgende handeling
+  require('./horeca/wijk')(ctx);       // welke tafels zijn van wie, en wanneer
+  require('./horeca/wijk-overdracht')(ctx); // een wijk (of een paar tafels) overdragen aan een collega
+  require('./horeca/bar')(ctx);        // BAR: drankgolven per tafel en de stapel per drank
+  require('./horeca/rahul')(ctx);      // wat Rahul mag, en de actiebon die er altijd bij hoort
   require('./horeca/journey')(ctx);     // één gastreis en gangsynchronisatie voor alle schermen
   require('./horeca/dish-twin')(ctx);   // gerechtbrein, chefversies, stations en mise-en-place
   require('./horeca/spatial-command')(ctx); // venue twin, veilige golven, overdracht en herstel

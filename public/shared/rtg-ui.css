@@ -132,6 +132,31 @@
   min-height:24px;min-width:24px;}
 .rtg-terug:hover{text-decoration:underline;}
 
+/* ------------------------------------------------- het kale aanvinkvakje ---
+   Een browser tekent <input type=checkbox> standaard op 13x13, en dat is elf
+   pixels onder WCAG 2.5.8. Het LABEL eromheen klikt meestal wel mee, maar het
+   vakje zelf is het ding waar iemand naar mikt.
+
+   Deze regel stond al in veiligheid.css, maar gescoped op `.mini` -- dus alleen
+   daar. De raakvlakronde vond hem daarna opnieuw op de bezorging, de clubdeur
+   en de kassa, en dat is precies de vorm waar LAT-regel 4 voor waarschuwt: een
+   component-regel die op één plek staat, komt op de volgende plek terug als
+   bevinding. Hij hoort in de kit, bij de rest van de raakvlakmaten. */
+body.rtg-stijl input[type=checkbox],body.rtg-stijl input[type=radio]{
+  width:24px;height:24px;flex:0 0 auto;accent-color:var(--rtg-acc);}
+
+/* ------------------------------------ een link die alleen in een alinea staat ---
+   WCAG 2.5.8 maakt een uitzondering voor een link IN een zin -- daar is het doel
+   de tekstregel zelf. Een link die in zijn eentje een alinea vult is dat niet:
+   dat is een knop met een andere jas aan, en 20 pixels hoog is te weinig.
+
+   Dit begon als een regel voor `.inlog a` -- de terugvalkaart die zevenentwintig
+   schermen tonen zonder sessie ("Log eerst in ... Naar de app →"). Toen bleef er
+   precies één scherm over dat diezelfde kaart met een andere klassenaam
+   opschrijft, en dat is het moment om te kiezen: nog een uitzondering erbij, of
+   de regel opschrijven zoals hij werkelijk luidt. Dit is de tweede. */
+body.rtg-stijl p>a:only-child{display:inline-flex;align-items:center;min-height:24px;}
+
 /* ------------------------------------------------------- de sectiekaart ---*/
 .rtg-groep{
   background:var(--rtg-card);border:1px solid var(--rtg-line);

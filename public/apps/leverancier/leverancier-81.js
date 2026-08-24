@@ -84,7 +84,11 @@
       try {
         await API.call('/supplier/vacature', {
           func, soort: $('#vacSoort').value, minLeeftijd: Number($('#vacLft').value),
-          plaats: $('#vacPlaats').value.trim(), uren: $('#vacUren').value.trim(), omschrijving: $('#vacOms').value.trim()
+          plaats: $('#vacPlaats').value.trim(), uren: $('#vacUren').value.trim(), omschrijving: $('#vacOms').value.trim(),
+          werkvorm: $('#vacWerkvorm').value, salarisMin: Number($('#vacSalMin').value)||null,
+          salarisMax: Number($('#vacSalMax').value)||null, valuta: 'EUR',
+          vaardigheden: $('#vacSkills').value.split(',').map(x=>x.trim()).filter(Boolean),
+          voordelen: $('#vacBenefits').value.split(',').map(x=>x.trim()).filter(Boolean)
         });
         toast(''+T('vac.geplaatst','Vacature geplaatst en zichtbaar in de RTFoundation.'));
         await refresh(); openTab('team');
@@ -95,6 +99,12 @@
     }));
     document.querySelectorAll('[data-vacdel]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/vacature/verwijder', { id: b.dataset.vacdel }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-talentyes]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/talent/match', { id:b.dataset.talentyes, action:'interesse' }); toast('Wederzijdse interesse. De kandidaat beslist nu of de Deal Room opengaat.'); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
+    }));
+    document.querySelectorAll('[data-talentno]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/talent/match', { id:b.dataset.talentno, action:'niet' }); await refresh(); openTab('team'); } catch(e){ toast(e.message); }
     }));
     const addBtn = $('#ttAdd'); if (addBtn) addBtn.addEventListener('click', addStaff);
     const send = $('#ttSend'); if (send) send.addEventListener('click', sendTeam);

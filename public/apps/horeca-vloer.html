@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Horeca: vloer</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/zaakscherm.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<style>
+  /* VLOER. Het scherm van de maitre, en het enige van de zes dat niet vraagt
+     "wat moet ik nu doen" maar "wie heeft ons nu nodig, en hoe verdelen we
+     dat". Het staat bij de gastenbalie of op een tablet onder de arm, dus:
+     leesbaar op anderhalve meter, raakvlakken van 48px, en de drukte per wijk
+     in een getal dat ergens vandaan komt.
+
+     UITZONDERINGSGESTUURD (ONTWERP.md): een wijk die niemand draagt en een wijk
+     met werk over een grens komen naar voren. De rest blijft rustig staan. */
+  :root{--v-lijn:var(--rtg-line);--v-kaart:var(--rtg-card);--v-txt:var(--rtg-txt);
+        --v-stil:var(--rtg-soft);--v-accent:#C23A5E;}
+  .v-tel{display:flex;gap:.6rem;flex-wrap:wrap;margin:.8rem 0;}
+  .v-tel div{flex:1 1 9rem;border:1px solid var(--v-lijn);border-radius:0;padding:.7rem .8rem;}
+  .v-tel b{display:block;font:600 26px Inter,system-ui;}
+  .v-tel span{font-size:13px;color:var(--v-stil);}
+  .v-kop{font:600 13px Inter,system-ui;letter-spacing:.16em;text-transform:uppercase;
+         color:var(--v-stil);margin:1.4rem 0 .5rem;}
+  .v-wijk{border:1px solid var(--v-lijn);border-radius:0;background:var(--v-kaart);
+          padding:.85rem .9rem;margin-bottom:.6rem;}
+  .v-wijk.los{border-left:3px solid var(--v-accent);}
+  .v-wijk.over{border-left:3px solid var(--v-accent);}
+  .v-wijkkop{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;}
+  .v-naam{font:600 19px Inter,system-ui;}
+  .v-druk{margin-left:auto;font:600 17px Inter,system-ui;white-space:nowrap;}
+  .v-som{margin:.35rem 0 0;font-size:15px;line-height:1.55;}
+  .v-tafels{margin:.3rem 0 0;font-size:14px;color:var(--v-stil);}
+  .v-acties{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .v-acties button,.v-acties select{min-height:48px;padding:0 .9rem;border:1px solid var(--v-lijn);
+        border-radius:0;background:transparent;color:var(--v-txt);font:500 15px Inter,system-ui;cursor:pointer;}
+  .v-acties button.p{border-color:var(--v-accent);background:rgba(194,58,94,.14);}
+  .v-bod{border:1px solid var(--v-accent);border-radius:0;background:rgba(194,58,94,.10);
+         padding:.85rem .9rem;margin-bottom:.6rem;}
+  .v-bod p{margin:0 0 .5rem;font-size:16px;line-height:1.55;}
+  .v-bod input[type=text]{flex:1 1 10rem;min-height:48px;padding:0 .7rem;border:1px solid var(--v-lijn);
+        border-radius:0;background:transparent;color:var(--v-txt);font:500 15px Inter,system-ui;}
+  /* Een antwoord op mijn aanbod is een BERICHT en geen alarm: de rand is stil,
+     want er is niets stuk -- er is alleen iets niet gelukt. */
+  .v-antwoord{border:1px solid var(--v-lijn);border-radius:0;padding:.85rem .9rem;margin-bottom:.6rem;}
+  .v-antwoord p{margin:0 0 .5rem;font-size:16px;line-height:1.55;}
+  .v-leen{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;border:1px solid var(--v-lijn);
+          border-radius:0;padding:.6rem .8rem;margin-bottom:.5rem;}
+  .v-leen b{font:600 17px Inter,system-ui;}
+  .v-leen small{font-size:14px;color:var(--v-stil);}
+  .v-leeg{border:1px dashed var(--v-lijn);border-radius:0;padding:1.1rem;
+          font-size:15px;line-height:1.6;color:var(--v-stil);}
+  .v-voet{margin-top:1.4rem;font-size:14px;line-height:1.6;color:var(--v-stil);}
+  /* Indelen: alleen bij wie er iets mee kan; het recht blijft op de server. */
+  #vIndeel{margin-top:1.4rem;border-top:1px solid var(--v-lijn);padding-top:.4rem;}
+  #vVorm,#vBiedVorm{border:1px solid var(--v-lijn);border-radius:0;padding:.85rem .9rem;margin-bottom:.6rem;}
+  #vVorm input[type=text],#vBiedVorm select{width:100%;min-height:48px;padding:0 .7rem;border:1px solid var(--v-lijn);
+        border-radius:0;background:transparent;color:var(--v-txt);font:500 16px Inter,system-ui;}
+  #vBiedVorm p{margin:0 0 .6rem;font-size:15px;line-height:1.55;color:var(--v-stil);}
+  .v-vakjes{display:flex;flex-wrap:wrap;gap:.4rem;margin:.7rem 0 0;}
+  .v-vakjes label{display:inline-flex;align-items:center;gap:.4rem;min-height:48px;padding:0 .7rem;
+        border:1px solid var(--v-lijn);border-radius:0;font-size:15px;cursor:pointer;}
+  /* 24px is de ondergrens van WCAG 2.5.8; het label eromheen is 48px hoog,
+     maar de keuring meet het vinkje zelf. */
+  .v-vakjes input{width:24px;height:24px;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/horeca.html" aria-label="Terug naar zaal en keuken">&#8592;</a>
+  <span><span class="ey">RTG Horeca</span><h1>Vloer</h1></span>
+  <span class="h-flex1"></span>
+  <button class="knop" id="vVerversNu" type="button">Ververs</button>
+</header>
+<main id="main">
+  <!-- Wat aan MIJ is aangeboden staat bovenaan: een wijk die op mijn antwoord
+       wacht, is de enige zin op dit scherm die niet kan wachten. Daaronder de
+       antwoorden op wat IK aanbood -- een nee die niemand leest, is geen nee. -->
+  <div id="vVoorMij"></div>
+  <div id="vAntwoord"></div>
+
+  <div class="v-tel">
+    <div><b id="vOpen">-</b><span>open taken in de zaak</span></div>
+    <div><b id="vLos">-</b><span>wijken die niemand draagt</span></div>
+    <div><b id="vBoden">-</b><span>aanbiedingen die openstaan</span></div>
+    <div><b id="vUit">-</b><span>tafels die bij iemand anders staan</span></div>
+  </div>
+
+  <div class="v-kop">De verdeling</div>
+  <div id="vBiedVorm" hidden></div>
+  <div id="vWijken"></div>
+
+  <div class="v-kop">Tafels die uitstaan</div>
+  <div id="vGeleend"></div>
+
+  <div class="v-kop">Aanbiedingen die openstaan</div>
+  <div id="vAanbod"></div>
+
+  <section id="vIndeel" hidden>
+    <div class="v-kop">Indelen</div>
+    <div id="vVorm" hidden></div>
+    <div id="vIndeelLijst"></div>
+    <div class="v-acties"><button class="knop" id="vNieuw" type="button">Nieuwe wijk</button></div>
+    <p class="v-voet">Indelen is een besluit van de leiding; nemen en loslaten doet de
+      bediening zelf. Een tafel hoort bij hoogstens één wijk, dus wie hem hier aanvinkt,
+      haalt hem zichtbaar bij een andere weg.</p>
+  </section>
+
+  <p class="v-voet" id="vUitleg"></p>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/horeca/kern.js"></script>
+<script src="/apps/horeca/vloer.js"></script>
+<script src="/apps/horeca/vloer-aanbod.js"></script>
+<script src="/apps/horeca/vloer-indelen.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

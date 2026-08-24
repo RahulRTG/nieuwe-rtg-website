@@ -9,6 +9,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
@@ -35,6 +36,20 @@
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
     border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
   code{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;color:var(--gold);}
+  /* Uit de inline stijlattributen gehaald. Die houden style-src-attr in de CSP
+     open en de norm telt ze (scripts/norm.js, inlineStijlAttributen); ze stonden
+     hier bovendien vijftien keer met drie verschillende waarden voor hetzelfde
+     ding. Een naam is hier goedkoper dan een herhaling. */
+  .breed{flex:1;min-width:12rem;}
+  .breed-s{flex:1;min-width:10rem;}
+  .groei{flex:1;}
+  .scheiding{border-top:1px solid var(--line);padding-top:.7rem;margin-top:.7rem;}
+  .scheiding-s{border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;}
+  .mt-xs{margin-top:.4rem;}
+  .mt-s{margin-top:.5rem;}
+  .smal{max-width:7rem;}
+  .knoplink{text-decoration:none;display:inline-flex;align-items:center;}
+  .rij.strak{margin-top:0;}
 </style>
 </head>
 <body>
@@ -74,15 +89,15 @@ function zetNaam(n){ try { localStorage.setItem('rtg_office_naam', n); } catch (
 function tekenNaam(){
   return '<div class="kaart"><h2>Wie tekent er</h2>'+
     '<p class="sub">Elk besluit hieronder draagt jouw naam en gaat het journaal in. Een besluit zonder naam is een besluit dat niemand heeft genomen; de server neemt het dan ook niet aan.</p>'+
-    '<div class="rij"><input class="veld" id="wie" style="flex:1;min-width:12rem;" maxlength="80" placeholder="Voor- en achternaam" value="'+esc(naam())+'"></div></div>';
+    '<div class="rij"><input class="veld" id="wie" class="breed" maxlength="80" placeholder="Voor- en achternaam" value="'+esc(naam())+'"></div></div>';
 }
 
 function tekenWachtrij(d){
   if (!d.inzendingen.length) return '<div class="kaart"><h2>Wachtrij</h2><p class="sub">Niets in de wachtrij. '+esc(d.let)+'</p></div>';
   return '<div class="kaart"><h2>Wachtrij</h2><p class="sub">'+esc(d.let)+'</p>'+
     d.inzendingen.map(v =>
-      '<div style="border-top:1px solid var(--line);padding-top:.7rem;margin-top:.7rem;" data-v="'+esc(v.id)+'">'+
-        '<div class="rij" style="margin-top:0;"><b style="flex:1;">'+esc(v.naam)+' '+esc(v.versie)+'</b>'+
+      '<div class="scheiding" data-v="'+esc(v.id)+'">'+
+        '<div class="rij strak"><b class="groei">'+esc(v.naam)+' '+esc(v.versie)+'</b>'+
           '<span class="st">'+esc(v.org)+'</span>'+(v.prijsCenten ? '<span class="st">'+eur(v.prijsCenten)+'</span>' : '')+'</div>'+
         '<p class="sub">'+esc(v.uitleg)+'</p>'+
         '<p class="sub"><code>'+esc(v.hash.slice(0,16))+'</code> &middot; '+Math.round((v.maten?v.maten.totaal:0)/1024)+' kB in '+(v.maten?v.maten.bestanden:0)+' bestanden</p>'+
@@ -101,7 +116,7 @@ function tekenWachtrij(d){
             '</div>'
           : '<div class="bev letop"><b>Eerste versie van deze app</b><br>Er is niets om mee te vergelijken; lees het manifest als geheel.</div>')+
         v.bevindingen.map(b => '<div class="bev'+(b.ernst==='let-op'?' letop':'')+'"><b>'+esc(b.wat)+'</b>'+(b.bestand?' &middot; '+esc(b.bestand):'')+'<br>'+esc(b.hoe)+'</div>').join('')+
-        '<div class="rij"><input class="veld reden" style="flex:1;min-width:12rem;" maxlength="600" placeholder="Reden (verplicht bij weigeren)">'+
+        '<div class="rij"><input class="veld reden breed" maxlength="600" placeholder="Reden (verplicht bij weigeren)">'+
           '<button class="knop pub" type="button">Publiceren</button>'+
           '<button class="knop stil wei" type="button">Weigeren</button></div>'+
       '</div>').join('')+'</div>';
@@ -110,10 +125,10 @@ function tekenWachtrij(d){
 function tekenUitgevers(d){
   return '<div class="kaart"><h2>Uitgevers</h2><p class="sub">Een uitgever toelaten is geen formaliteit: vanaf dat moment staat er een aanspreekbare rechtspersoon achter elke app die hij publiceert. Schorsen haalt zijn apps op hetzelfde moment uit de winkel, ook bij de leden die ze al hadden.</p>'+
     (d.uitgevers.length ? d.uitgevers.map(u =>
-      '<div style="border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;" data-org="'+esc(u.org)+'">'+
-        '<div class="rij" style="margin-top:0;"><b style="flex:1;">'+esc(u.naam)+'</b><span class="st">'+esc(u.status)+'</span></div>'+
+      '<div class="scheiding-s" data-org="'+esc(u.org)+'">'+
+        '<div class="rij strak"><b class="groei">'+esc(u.naam)+'</b><span class="st">'+esc(u.status)+'</span></div>'+
         '<p class="sub"><code>'+esc(u.org)+'</code> &middot; '+esc(u.contact)+(u.reden?' &middot; '+esc(u.reden):'')+'</p>'+
-        '<div class="rij"><input class="veld ureden" style="flex:1;min-width:10rem;" maxlength="400" placeholder="Reden (bij weigeren of schorsen)">'+
+        '<div class="rij"><input class="veld ureden breed-s" maxlength="400" placeholder="Reden (bij weigeren of schorsen)">'+
           '<button class="knop utoe" type="button">Toelaten</button>'+
           '<button class="knop stil uwei" type="button">Weigeren</button>'+
           '<button class="knop stil usch" type="button">Schorsen</button></div>'+
@@ -124,9 +139,9 @@ function tekenAfdracht(a){
   if (!a) return '<div class="kaart"><h2>Afdracht</h2><p class="sub">De betaallaag draait niet mee in dit proces; er valt hier niets in te stellen.</p></div>';
   return '<div class="kaart"><h2>Afdracht</h2>'+
     '<p class="sub">Wat RTG inhoudt op het bedrag dat een uitgever overhoudt, na btw. Dit werkt alleen VOORUIT: een bon die al is geschreven wordt nooit herrekend. Elke uitgever leest de reden die je hier opschrijft.</p>'+
-    '<p class="sub" style="margin-top:.4rem;">Nu: <b>'+esc(String(a.afdracht.procent))+'%</b> sinds '+esc(String(a.afdracht.sinds).slice(0,10))+', door '+esc(a.afdracht.door)+'. '+esc(a.afdracht.reden||'')+'</p>'+
-    '<div class="rij"><input class="veld" id="afProc" style="max-width:7rem;" inputmode="decimal" placeholder="0" value="'+esc(String(a.afdracht.procent))+'">'+
-      '<input class="veld" id="afReden" style="flex:1;min-width:12rem;" maxlength="400" placeholder="Waarom dit percentage">'+
+    '<p class="sub mt-xs">Nu: <b>'+esc(String(a.afdracht.procent))+'%</b> sinds '+esc(String(a.afdracht.sinds).slice(0,10))+', door '+esc(a.afdracht.door)+'. '+esc(a.afdracht.reden||'')+'</p>'+
+    '<div class="rij"><input class="veld" id="afProc" class="smal" inputmode="decimal" placeholder="0" value="'+esc(String(a.afdracht.procent))+'">'+
+      '<input class="veld" id="afReden" class="breed" maxlength="400" placeholder="Waarom dit percentage">'+
       '<button class="knop" id="afZet" type="button">Vastleggen</button></div></div>';
 }
 
@@ -140,8 +155,8 @@ function tekenRonde(){
   return '<div class="kaart"><h2>Controleronde</h2>'+
     '<p class="sub">Houdt elk bestand van elke live app tegen de hash waarop een mens heeft afgetekend. Wat niet meer klopt gaat eruit &mdash; dat is geen afweging. De ronde komt met je naam in het journaal.</p>'+
     '<div class="rij"><button class="knop" id="hcDoe" type="button">Nu nalopen</button>'+
-      '<a class="knop stil" href="/apps/appstore-dossier.html" style="text-decoration:none;display:inline-flex;align-items:center;">Het kanaaldossier &rarr;</a></div>'+
-    '<div id="hcUit" class="sub" style="margin-top:.5rem;"></div></div>';
+      '<a class="knop stil" href="/apps/appstore-dossier.html" class="knoplink">Het kanaaldossier &rarr;</a></div>'+
+    '<div id="hcUit" class="sub mt-s"></div></div>';
 }
 
 function tekenTeruggaven(t){
@@ -149,11 +164,11 @@ function tekenTeruggaven(t){
   if (!t.open.length) return '<div class="kaart"><h2>Teruggaven</h2><p class="sub">Niets open. '+esc(t.let)+'</p></div>';
   return '<div class="kaart"><h2>Teruggaven</h2><p class="sub">'+esc(t.let)+'</p>'+
     t.open.map(r =>
-      '<div style="border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;" data-tg="'+esc(r.id)+'">'+
-        '<div class="rij" style="margin-top:0;"><b style="flex:1;">'+esc(r.naam)+'</b><span class="st">'+eur(r.centen)+'</span></div>'+
+      '<div class="scheiding-s" data-tg="'+esc(r.id)+'">'+
+        '<div class="rij strak"><b class="groei">'+esc(r.naam)+'</b><span class="st">'+eur(r.centen)+'</span></div>'+
         '<p class="sub">Gekocht op '+esc(String(r.gekochtOp).slice(0,10))+', ingetrokken door '+esc(r.ingetrokkenDoor||'onbekend')+(r.reden?': '+esc(r.reden):'')+'.</p>'+
         '<p class="sub">Terug uit: uitgever '+eur(r.uitgeverCenten)+', btw '+eur(r.btwCenten)+', afdracht '+eur(r.afdrachtCenten)+'.</p>'+
-        '<div class="rij"><input class="veld treden" style="flex:1;min-width:10rem;" maxlength="400" placeholder="Reden (verplicht bij afwijzen)">'+
+        '<div class="rij"><input class="veld treden breed-s" maxlength="400" placeholder="Reden (verplicht bij afwijzen)">'+
           '<button class="knop tbet" type="button">Terugbetalen</button>'+
           '<button class="knop stil tafw" type="button">Afwijzen</button></div>'+
       '</div>').join('')+'</div>';

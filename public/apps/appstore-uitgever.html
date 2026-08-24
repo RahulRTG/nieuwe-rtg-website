@@ -9,6 +9,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
@@ -48,6 +49,33 @@
     border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
   .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem;}
   code{font-family:ui-monospace,Menlo,monospace;font-size:.8rem;color:var(--gold);}
+  /* Uit de inline stijlattributen gehaald. Die houden style-src-attr in de CSP
+     open en de norm telt ze (scripts/norm.js, inlineStijlAttributen). Het
+     opruimen legde meteen de herhaling bloot: negen keer dezelfde volle breedte
+     en zeven marges met zes verschillende waarden voor hetzelfde bedoelde gat. */
+  .vol{width:100%;}
+  .vol-tekst{width:100%;min-height:4.4rem;}
+  .breed{flex:1;min-width:12rem;}
+  .groei{flex:1;}
+  .scheiding-s{border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;}
+  .mt-0{margin-top:0;}
+  .mt-xxs{margin-top:.3rem;}
+  .mt-xs{margin-top:.4rem;}
+  .mt-s{margin-top:.5rem;}
+  .mt-m{margin-top:.6rem;}
+  .mt-l{margin-top:.8rem;}
+  .mb-s{margin-bottom:.5rem;}
+  .klein{font-size:.78rem;line-height:1.5;}
+  .blok{display:block;}
+  .zacht{color:var(--soft);}
+  .gedempt{color:var(--muted);}
+  .goud{color:var(--gold);}
+  .bordeaux{color:var(--burgundy);}
+  .knoplink{text-decoration:none;}
+  .tweekolom{display:flex;justify-content:space-between;font-size:.82rem;}
+  .machtiging{display:flex;gap:.5rem;align-items:flex-start;cursor:pointer;}
+  .machtiging input{margin-top:.22rem;width:1rem;height:1rem;accent-color:#C23A5E;}
+  .doeluitleg{margin-top:.3rem;margin-left:1.5rem;max-width:22rem;}
 </style>
 </head>
 <body>
@@ -130,8 +158,8 @@ function toonFouten(d){
       '<b>'+esc(b.wat)+'</b>'+
       (b.bestand ? '<span class="waar">'+esc(b.bestand)+(b.regel ? ' · regel ' + b.regel : '')+'</span>' : '')+
       '<span class="hoe">'+esc(b.hoe)+'</span></div>').join('');
-  $('#uitslag').innerHTML = (d.let ? '<p class="sub" style="margin-bottom:.5rem;">'+esc(d.let)+'</p>' : '')+
-    (d.error ? '<p class="sub" style="color:var(--burgundy);">'+esc(d.error)+'</p>' : '')+ fouten + bev ||
+  $('#uitslag').innerHTML = (d.let ? '<p class="sub mb-s">'+esc(d.let)+'</p>' : '')+
+    (d.error ? '<p class="sub bordeaux">'+esc(d.error)+'</p>' : '')+ fouten + bev ||
     '<p class="sub">Geen bevindingen.</p>';
 }
 
@@ -150,10 +178,10 @@ async function inzenden(){
 function tekenAanvraag(){
   return '<div class="kaart"><h2>Word uitgever</h2>'+
     '<p class="sub">Je zaak hangt onder een organisatie; die organisatie wordt de uitgever. Een mens van RTG laat je toe - dat is geen formaliteit, want vanaf dat moment staat er een aanspreekbare partij achter elke app die je publiceert.</p>'+
-    '<div class="rij"><div style="flex:1;min-width:12rem;"><label class="vlak" for="uNaam">Naam waaronder je publiceert</label>'+
-      '<input class="veld" id="uNaam" style="width:100%;" maxlength="120" value="'+esc((STAND.uitgever && STAND.uitgever.naam) || STAND.organisatie || '')+'"></div>'+
-      '<div style="flex:1;min-width:12rem;"><label class="vlak" for="uContact">Contact voor RTG</label>'+
-      '<input class="veld" id="uContact" style="width:100%;" maxlength="160" placeholder="ontwikkelaars@jouwbedrijf.nl" value="'+esc((STAND.uitgever && STAND.uitgever.contact) || '')+'"></div></div>'+
+    '<div class="rij"><div class="breed"><label class="vlak" for="uNaam">Naam waaronder je publiceert</label>'+
+      '<input class="veld" id="uNaam" class="vol" maxlength="120" value="'+esc((STAND.uitgever && STAND.uitgever.naam) || STAND.organisatie || '')+'"></div>'+
+      '<div class="breed"><label class="vlak" for="uContact">Contact voor RTG</label>'+
+      '<input class="veld" id="uContact" class="vol" maxlength="160" placeholder="ontwikkelaars@jouwbedrijf.nl" value="'+esc((STAND.uitgever && STAND.uitgever.contact) || '')+'"></div></div>'+
     '<div class="rij"><button class="knop" id="uVraag">'+(STAND.uitgever ? 'Bijwerken' : 'Uitgeversplek aanvragen')+'</button>'+
       (STAND.uitgever ? '<span class="st wacht">'+esc(STAND.uitgever.status)+'</span>' : '')+
       (STAND.uitgever && STAND.uitgever.reden ? '<span class="sub">'+esc(STAND.uitgever.reden)+'</span>' : '')+'</div></div>';
@@ -164,13 +192,13 @@ function tekenInzenden(){
      beslist niet op wat je krijgt maar op waarvoor; een vast woord maakt dat
      vergelijkbaar tussen apps en maakt een update te diffen. */
   const m = STAND.machtigingen.map(x =>
-    '<div style="margin-top:.5rem;">'+
-      '<label style="display:flex;gap:.5rem;align-items:flex-start;cursor:pointer;">'+
-        '<input type="checkbox" data-mach="'+esc(x.id)+'" style="margin-top:.22rem;width:1rem;height:1rem;accent-color:#C23A5E;">'+
-        '<span style="font-size:.78rem;line-height:1.5;"><b style="display:block;">'+esc(x.id)+'</b>'+
-        '<span style="color:var(--muted);">'+esc(x.geeft)+'</span><br>'+
-        '<span style="color:var(--soft);"><b style="color:var(--gold);">Nooit:</b> '+esc(x.nooit)+'</span></span></label>'+
-      '<select class="veld" data-doel="'+esc(x.id)+'" style="margin-top:.3rem;margin-left:1.5rem;max-width:22rem;" aria-label="Waarvoor '+esc(x.id)+'">'+
+    '<div class="mt-s">'+
+      '<label class="machtiging">'+
+        '<input type="checkbox" data-mach="'+esc(x.id)+'">'+
+        '<span class="klein"><b class="blok">'+esc(x.id)+'</b>'+
+        '<span class="gedempt">'+esc(x.geeft)+'</span><br>'+
+        '<span class="zacht"><b class="goud">Nooit:</b> '+esc(x.nooit)+'</span></span></label>'+
+      '<select class="veld" data-doel="'+esc(x.id)+'" class="doeluitleg" aria-label="Waarvoor '+esc(x.id)+'">'+
         x.doelen.map(d => '<option value="'+esc(d.id)+'">'+esc(d.id)+' &mdash; '+esc(d.uitleg)+'</option>').join('')+
       '</select>'+
     '</div>').join('');
@@ -179,25 +207,25 @@ function tekenInzenden(){
   const b = STAND.budget;
   return '<div class="kaart"><h2>Een versie inzenden</h2>'+
     '<p class="sub">Alles wat je app nodig heeft zit in je eigen map: geen CDN, geen externe fonts, geen netwerk. In de cel heeft je app geen verbinding; wat je van RTG nodig hebt, vraag je met <code>RTG.roep(...)</code>. Dat script wordt er automatisch in gezet.</p>'+
-    '<div class="grid2" style="margin-top:.8rem;">'+
-      '<div><label class="vlak" for="mSleutel">Sleutel (vast)</label><input class="veld" id="mSleutel" style="width:100%;" maxlength="40" placeholder="mijn-app"></div>'+
-      '<div><label class="vlak" for="mNaam">Naam</label><input class="veld" id="mNaam" style="width:100%;" maxlength="60"></div>'+
-      '<div><label class="vlak" for="mVersie">Versie</label><input class="veld" id="mVersie" style="width:100%;" maxlength="14" placeholder="1.0.0"></div>'+
-      '<div><label class="vlak" for="mCategorie">Categorie</label><select class="veld" id="mCategorie" style="width:100%;">'+
+    '<div class="grid2 mt-l">'+
+      '<div><label class="vlak" for="mSleutel">Sleutel (vast)</label><input class="veld" id="mSleutel" class="vol" maxlength="40" placeholder="mijn-app"></div>'+
+      '<div><label class="vlak" for="mNaam">Naam</label><input class="veld" id="mNaam" class="vol" maxlength="60"></div>'+
+      '<div><label class="vlak" for="mVersie">Versie</label><input class="veld" id="mVersie" class="vol" maxlength="14" placeholder="1.0.0"></div>'+
+      '<div><label class="vlak" for="mCategorie">Categorie</label><select class="veld" id="mCategorie" class="vol">'+
         ['sociaal','reizen','eten','media','geld','spelen','leven','veiligheid'].map(c => '<option>'+c+'</option>').join('')+'</select></div>'+
-      '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld" id="mStart" style="width:100%;" maxlength="80" placeholder="index.html"></div>'+
-      '<div><label class="vlak" for="mPrijs">Prijs in euro (0 = gratis)</label><input class="veld" id="mPrijs" style="width:100%;" inputmode="decimal" placeholder="0,00"></div>'+
+      '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld" id="mStart" class="vol" maxlength="80" placeholder="index.html"></div>'+
+      '<div><label class="vlak" for="mPrijs">Prijs in euro (0 = gratis)</label><input class="veld" id="mPrijs" class="vol" inputmode="decimal" placeholder="0,00"></div>'+
     '</div>'+
-    '<p class="sub" style="margin-top:.5rem;">Een betaalde app wordt in de winkel gekocht, nooit in de app zelf. RTG int bij het lid, draagt de btw af in het land van dat lid, houdt de afdracht in en schrijft de rest bij op de RTG Pay-rekening van je zaak. Wat een lid betaalt, ziet hij als bon voordat hij drukt.</p>'+
-    '<div style="margin-top:.6rem;"><label class="vlak" for="mUitleg">Uitleg (20-260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
-      '<textarea class="veld" id="mUitleg" style="width:100%;min-height:4.4rem;" maxlength="260"></textarea></div>'+
-    '<div style="margin-top:.8rem;"><span class="vlak">Wat je vraagt</span>'+m+'</div>'+
-    '<div style="margin-top:.9rem;"><label class="vlak" for="mMap">Je bundel (kies de map van je app)</label>'+
-      '<input class="veld" type="file" id="mMap" webkitdirectory directory multiple style="width:100%;">'+
-      '<p class="sub" id="bundelStand" style="margin-top:.35rem;">Nog geen map gekozen.</p>'+
+    '<p class="sub mt-s">Een betaalde app wordt in de winkel gekocht, nooit in de app zelf. RTG int bij het lid, draagt de btw af in het land van dat lid, houdt de afdracht in en schrijft de rest bij op de RTG Pay-rekening van je zaak. Wat een lid betaalt, ziet hij als bon voordat hij drukt.</p>'+
+    '<div class="mt-m"><label class="vlak" for="mUitleg">Uitleg (20-260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
+      '<textarea class="veld" id="mUitleg" class="vol-tekst" maxlength="260"></textarea></div>'+
+    '<div class="mt-l"><span class="vlak">Wat je vraagt</span>'+m+'</div>'+
+    '<div class="mt-l"><label class="vlak" for="mMap">Je bundel (kies de map van je app)</label>'+
+      '<input class="veld" type="file" id="mMap" webkitdirectory directory multiple class="vol">'+
+      '<p class="sub" id="bundelStand" class="mt-xs">Nog geen map gekozen.</p>'+
       '<p class="sub">Budget: '+b.bestanden+' bestanden, '+Math.round(b.totaal/1024)+' kB totaal, '+Math.round(b.script/1024)+' kB scriptcode, '+Math.round(b.stijl/1024)+' kB stijl. Het budget is een poort en geen meter achteraf: te zwaar komt er niet in.</p></div>'+
     '<div class="rij"><button class="knop stil" id="bProef">Proefkeuring</button><button class="knop" id="bIn">Inzenden</button></div>'+
-    '<div id="uitslag" style="margin-top:.7rem;"></div></div>'+
+    '<div id="uitslag" class="mt-m"></div></div>'+
     '<div class="kaart"><h3>Wat je niet kunt vragen, en waarom</h3><p class="sub">Dit is geen routekaart maar het antwoord vooraf: een regel hier verdwijnt pas als de brug hem uitvoert.</p>'+niet+'</div>';
 }
 
@@ -206,9 +234,9 @@ function tekenOmzet(){
   const o = STAND.omzet;
   if (!o.aantal) return '<div class="kaart"><h2>Verkopen</h2><p class="sub">Nog niets verkocht. Zodra er iets wordt gekocht, staat hier hoeveel en hoeveel er is bijgeschreven - aantallen en bedragen, nooit wie.</p>'+
     '<p class="sub">De afdracht van RTG staat nu op '+esc(String(o.afdrachtNu.procent))+'%. '+esc(o.afdrachtNu.reden || '')+'</p></div>';
-  const r = (l, c) => '<div style="display:flex;justify-content:space-between;font-size:.82rem;"><span class="sub">'+l+'</span><b>'+eur(c)+'</b></div>';
+  const r = (l, c) => '<div class="tweekolom"><span class="sub">'+l+'</span><b>'+eur(c)+'</b></div>';
   return '<div class="kaart"><h2>Verkopen</h2><p class="sub">'+esc(o.let)+'</p>'+
-    '<div style="margin-top:.6rem;">'+
+    '<div class="mt-m">'+
       r(o.aantal + ' aanschaffen, bruto', o.brutoCenten)+
       r('af: btw (door RTG afgedragen)', o.btwCenten)+
       r('af: afdracht App Store', o.afdrachtCenten)+
@@ -217,20 +245,20 @@ function tekenOmzet(){
     '<table><tr><th>app</th><th>aantal</th><th>bruto</th><th>bijgeschreven</th></tr>'+
     o.perApp.map(a => '<tr><td>'+esc(a.naam)+'</td><td>'+a.aantal+'</td><td>'+eur(a.brutoCenten)+'</td><td>'+eur(a.uitgeverCenten)+'</td></tr>').join('')+
     '</table>'+
-    '<p class="sub" style="margin-top:.5rem;">De afdracht van RTG staat nu op '+esc(String(o.afdrachtNu.procent))+'%. Een bon die al is geschreven, wordt nooit herrekend.</p></div>';
+    '<p class="sub mt-s">De afdracht van RTG staat nu op '+esc(String(o.afdrachtNu.procent))+'%. Een bon die al is geschreven, wordt nooit herrekend.</p></div>';
 }
 const eur = c => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(Number(c || 0) / 100);
 
 function tekenApps(){
   if (!STAND.apps.length) return '';
   return '<div class="kaart"><h2>Je apps</h2>'+ STAND.apps.map(a =>
-    '<div style="border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;">'+
-      '<div class="rij" style="margin-top:0;"><h3 style="flex:1;">'+esc(a.naam)+'</h3>'+
+    '<div class="scheiding-s">'+
+      '<div class="rij mt-0"><h3 class="groei">'+esc(a.naam)+'</h3>'+
         (a.live ? '<span class="st live">live · '+esc(a.live.versie)+'</span>'+
                   '<button class="knop stil aDos" data-s="'+esc(a.sleutel)+'" aria-expanded="false">Wat de klant leest</button>'+
                   '<button class="knop stil aTrek" data-s="'+esc(a.sleutel)+'">Intrekken</button>'
                 : '<span class="st nee">niet live</span>')+'</div>'+
-      '<div class="uDos" data-s="'+esc(a.sleutel)+'" hidden style="margin-top:.5rem;"></div>'+
+      '<div class="uDos" data-s="'+esc(a.sleutel)+'" hidden class="mt-s"></div>'+
       (a.ingetrokken ? '<p class="sub">Ingetrokken door '+esc(a.ingetrokken.door)+(a.ingetrokken.reden ? ': '+esc(a.ingetrokken.reden) : '')+'</p>' : '')+
       '<table><tr><th>versie</th><th>prijs</th><th>stand</th><th>hash</th><th>ingezonden</th><th>besluit</th></tr>'+
       a.versies.map(v => '<tr><td>'+esc(v.versie)+'</td><td>'+(v.prijsCenten ? eur(v.prijsCenten) : 'gratis')+'</td><td>'+esc(v.status)+'</td><td><code>'+esc(v.hash.slice(0,12))+'</code></td>'+
@@ -279,12 +307,12 @@ async function laad(){
     try {
       const d = await api('/api/appstore/uitgever/dossier', { sleutel: b.dataset.s });
       vak.innerHTML = '<p class="sub">'+esc(d.let)+'</p>'+
-        '<p class="sub" style="margin-top:.4rem;"><b>Waar de gegevens blijven:</b> '+esc(d.waarDeGegevensBlijven.antwoord)+'</p>'+
+        '<p class="sub mt-xs"><b>Waar de gegevens blijven:</b> '+esc(d.waarDeGegevensBlijven.antwoord)+'</p>'+
         '<p class="sub"><b>Wat de poort vond:</b> '+d.watDePoortVond.blokkerend+' blokkerend, '+d.watDePoortVond.letOp+
           ' let-op'+(d.watDePoortVond.afgetekendDoor ? ', afgetekend door '+esc(d.watDePoortVond.afgetekendDoor) : '')+'.</p>'+
-        '<p class="sub" style="margin-top:.4rem;"><b>Wat er ook bij jouw app NIET wordt beweerd</b> &mdash; bij elke app hetzelfde, ook bij die van je concurrent:</p>'+
+        '<p class="sub mt-xs"><b>Wat er ook bij jouw app NIET wordt beweerd</b> &mdash; bij elke app hetzelfde, ook bij die van je concurrent:</p>'+
         Object.keys(d.nietGebouwd||{}).map(k => '<p class="sub">· <b>'+esc(k)+'</b> &mdash; '+esc(d.nietGebouwd[k])+'</p>').join('')+
-        '<p style="margin-top:.6rem;"><a class="knop stil" style="text-decoration:none;" href="/apps/appstore-dossier.html?app='+encodeURIComponent(b.dataset.s)+'">Het hele dossier zoals een klant het opent →</a></p>';
+        '<p class="mt-m"><a class="knop stil knoplink" href="/apps/appstore-dossier.html?app='+encodeURIComponent(b.dataset.s)+'">Het hele dossier zoals een klant het opent →</a></p>';
     } catch (e) { vak.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; }
   }));
   document.querySelectorAll('.aTrek').forEach(b => b.addEventListener('click', async () => {

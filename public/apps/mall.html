@@ -115,6 +115,64 @@
   .bladtel{font-size:.78rem;color:var(--muted);}
   .reisnoot{color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;}
   .goudlink{color:var(--gold);}
+  /* ---- de App Store-sectie. Uit de inline stijlattributen gehaald: die houden
+     style-src-attr in de CSP open en de norm telt ze (scripts/norm.js,
+     inlineStijlAttributen). Dat opruimen hoort JUIST bij deze sectie -- dit is
+     de winkel voor code van een derde, en een pagina die zijn eigen CSP oprekt
+     terwijl hij een sandbox verkoopt, spreekt zichzelf tegen. ---- */
+  .as-update{margin-top:.5rem;border-left:3px solid var(--gold);background:rgba(169,143,28,.09);border-radius:0 10px 10px 0;padding:.5rem .7rem;}
+  .as-vink{margin-top:.22rem;width:1rem;height:1rem;flex:0 0 auto;accent-color:#C23A5E;}
+  .as-vinkrij{display:flex;gap:.5rem;align-items:flex-start;margin-top:.4rem;cursor:pointer;}
+  .as-tijdrij{display:flex;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.76rem;}
+  .as-bonregel{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);}
+  .as-bontotaal{display:flex;justify-content:space-between;font-size:.9rem;}
+  .as-lijst{margin:.25rem 0 0 1rem;padding:0;font-size:.76rem;color:var(--txt);line-height:1.6;}
+  .as-bewijs{margin-top:.4rem;padding-left:.6rem;border-left:2px solid var(--line);}
+  .as-kop{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-top:.7rem;}
+  .as-kop-plat{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
+  .as-alinea{font-size:.76rem;color:var(--txt);line-height:1.55;display:block;margin-top:.2rem;}
+  .as-inleiding{font-size:.76rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;}
+  .as-uitleg{font-size:.76rem;color:var(--muted);line-height:1.55;}
+  .as-uitleg-blok{font-size:.76rem;color:var(--muted);line-height:1.5;display:block;}
+  .as-uitleg-mt{font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:.25rem;}
+  .as-hoe{font-size:.73rem;color:var(--muted);line-height:1.5;display:block;}
+  .as-voetnoot{font-size:.74rem;color:var(--soft);margin-top:.35rem;}
+  .as-leeg{font-size:.76rem;color:var(--soft);margin-top:.4rem;}
+  .as-antwoord{font-size:.8rem;color:var(--gold);display:block;margin-top:.2rem;}
+  .as-antwoord-plat{font-size:.8rem;display:block;margin-top:.2rem;}
+  .as-tijdstip{color:var(--soft);flex:0 0 8.5rem;}
+  .as-prijs{color:var(--gold);font-size:.8rem;}
+  .as-scheiding-m{margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .as-scheiding-s{margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .as-scheiding-xs{margin-top:.5rem;border-top:1px solid var(--line);padding-top:.4rem;}
+  .as-knoprij{margin-top:.6rem;gap:.4rem;align-items:center;}
+  .as-landrij{margin-top:.55rem;align-items:center;}
+  .as-kleinlink{font-size:.72rem;text-decoration:none;}
+  .as-klein-blok{font-size:.76rem;display:block;}
+  .as-klein{font-size:.76rem;line-height:1.5;}
+  .as-klein-goud{font-size:.76rem;color:var(--gold);}
+  .as-klein-zacht{font-size:.76rem;color:var(--soft);}
+  .as-bron{font-size:.68rem;color:var(--soft);}
+  .as-naam{display:block;margin:.15rem 0;}
+  .as-breed{flex:1;min-width:10rem;}
+  .as-smal{max-width:16rem;}
+  .as-mb{margin-bottom:.7rem;}
+  .as-mt-xs{margin-top:.45rem;}
+  .as-mt-xxs{margin-top:.35rem;}
+  .as-mt-s{margin-top:.4rem;}
+  .as-mt-m{margin-top:.5rem;}
+  .as-midden{justify-content:center;}
+  .as-stil{cursor:default;}
+  .as-link{text-decoration:none;}
+  .as-goud{color:var(--gold);}
+  .as-gedempt{color:var(--muted);}
+  .as-zacht{color:var(--soft);}
+  .as-tekst{color:var(--txt);}
+  .as-blok{display:block;}
+  .as-p8{font-size:.8rem;}
+  .as-p74{font-size:.74rem;}
+  .as-p72{font-size:.72rem;}
+  .as-groei{flex:1;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/adresvoorstel.js"></script>
@@ -594,13 +652,13 @@ async function laadAppstore(){
   $('#appstore').innerHTML =
     '<div class="etage" id="appstoreEtage"><div class="etage-kop"><h2>App Store</h2>'+
     '<span class="n">apps van derden · gekeurd door een mens van RTG · jij bepaalt wat ze mogen</span></div>'+
-    '<div class="rij" style="margin-bottom:.7rem;">'+
-      '<input id="asZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
+    '<div class="rij as-mb">'+
+      '<input id="asZoek" class="veld as-breed" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
       '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
       '<button class="knop stil" id="asGesch" type="button" aria-expanded="false">Mijn geschiedenis</button>'+
-      '<a class="knop stil" href="/apps/appstore-dossier.html" style="text-decoration:none;">Wat geen app kan vragen</a>'+
-    '</div><div id="asTijd" hidden style="margin-bottom:.7rem;"></div>'+
-    '<div id="asGrid"></div><div class="rij" id="asBlader" style="justify-content:center;"></div></div>';
+      '<a class="knop stil" href="/apps/appstore-dossier.html" class="as-link">Wat geen app kan vragen</a>'+
+    '</div><div id="asTijd" hidden class="as-mb"></div>'+
+    '<div id="asGrid"></div><div class="rij" id="asBlader" class="as-midden"></div></div>';
   let zt; $('#asZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AS.zoek = $('#asZoek').value; AS.pagina = 1; AS.mijn = false; tekenStore(); }, 300); });
   $('#asMijn').addEventListener('click', () => { AS.mijn = !AS.mijn; AS.pagina = 1; tekenStore(); });
   /* De geschiedenis staat NAAST de winkel en niet erin: hij gaat over het lid en
@@ -620,39 +678,39 @@ function storeKaart(a){
      app NOOIT krijgt staat er even groot bij; een scherm dat alleen zegt wat er
      wel gebeurt, is een verkooppraatje. */
   const vinkjes = a.vraagt.map(m =>
-    '<label class="asm" style="display:flex;gap:.5rem;align-items:flex-start;margin-top:.4rem;cursor:pointer;">'+
+    '<label class="asm as-vinkrij">'+
       '<input type="checkbox" data-m="'+esc(m.id)+'"'+(a.geinstalleerd ? (a.verleend.some(v => v.id === m.id) ? ' checked' : '') : ' checked')+
-        ' style="margin-top:.22rem;width:1rem;height:1rem;flex:0 0 auto;accent-color:#C23A5E;">'+
-      '<span style="font-size:.76rem;line-height:1.5;"><b style="display:block;">'+esc(m.label)+'</b>'+
-        (m.waarvoor ? '<span style="color:var(--txt);">Waarvoor: '+esc(m.waarvoor)+'</span><br>' : '')+
-        '<span style="color:var(--muted);">Geeft: '+esc(m.geeft)+'</span><br>'+
-        '<span style="color:var(--soft);"><b style="color:var(--gold);">Nooit:</b> '+esc(m.nooit)+'</span></span></label>').join('')
-    || '<div style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">Deze app vraagt niets van je.</div>';
-  return '<div class="boutiek" style="cursor:default;" data-sleutel="'+esc(a.sleutel)+'">'+
+        ' class="as-vink">'+
+      '<span class="as-klein"><b class="as-blok">'+esc(m.label)+'</b>'+
+        (m.waarvoor ? '<span class="as-tekst">Waarvoor: '+esc(m.waarvoor)+'</span><br>' : '')+
+        '<span class="as-gedempt">Geeft: '+esc(m.geeft)+'</span><br>'+
+        '<span class="as-zacht"><b class="as-goud">Nooit:</b> '+esc(m.nooit)+'</span></span></label>').join('')
+    || '<div class="as-leeg">Deze app vraagt niets van je.</div>';
+  return '<div class="boutiek as-stil" data-sleutel="'+esc(a.sleutel)+'">'+
     '<span class="stad">van '+esc(a.uitgever ? a.uitgever.naam : 'een derde partij')+'</span>'+
-    '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
-    '<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>'+
+    '<b class="as-naam">'+esc(a.naam)+'</b>'+
+    '<span class="as-uitleg-blok">'+esc(a.uitleg)+'</span>'+
     /* WAT EEN UPDATE MEER VRAAGT, boven de vinkjes en niet eronder. Een app die
        zijn manifest uitbreidt krijgt daarmee niets extra's -- hij vraagt alleen
        opnieuw -- en dat hoort een lid te zien voordat hij ergens op drukt. */
     ((a.updateVraagt && a.updateVraagt.length)
-      ? '<div style="margin-top:.5rem;border-left:3px solid var(--gold);background:rgba(169,143,28,.09);border-radius:0 10px 10px 0;padding:.5rem .7rem;">'+
-        '<b style="font-size:.8rem;">Deze update vraagt meer</b>'+
-        a.updateVraagt.map(m => '<div style="font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:.25rem;">'+
+      ? '<div class="as-update">'+
+        '<b class="as-p8">Deze update vraagt meer</b>'+
+        a.updateVraagt.map(m => '<div class="as-uitleg-mt">'+
           esc(m.label)+(m.soort === 'ander-doel' ? ' &mdash; nu voor: ' : ' &mdash; voor: ')+esc(m.waarvoor || m.doel || '')+
           (m.soort === 'ander-doel' ? ' (was: '+esc(m.eerderDoel)+')' : '')+'</div>').join('')+
-        '<div style="font-size:.74rem;color:var(--soft);margin-top:.35rem;">Zolang je niets doet, krijgt de app dit niet. De app blijft gewoon werken met wat je hem al gaf.</div>'+
+        '<div class="as-voetnoot">Zolang je niets doet, krijgt de app dit niet. De app blijft gewoon werken met wat je hem al gaf.</div>'+
         '</div>' : '')+
-    '<div style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.4rem;">'+
-      '<span style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Wat je geeft</span>'+
+    '<div class="as-scheiding-xs">'+
+      '<span class="as-kop-plat">Wat je geeft</span>'+
       vinkjes+'</div>'+
-    '<div class="rij" style="margin-top:.6rem;gap:.4rem;align-items:center;">'+
+    '<div class="rij as-knoprij">'+
       (a.prijsCenten > 0
-        ? '<b style="color:var(--gold);font-size:.8rem;">'+euroC(a.prijsCenten)+(a.gekocht?' &middot; gekocht':'')+'</b>'
-        : '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b>')+
+        ? '<b class="as-prijs">'+euroC(a.prijsCenten)+(a.gekocht?' &middot; gekocht':'')+'</b>'
+        : '<b class="as-prijs">Inbegrepen</b>')+
       '<span class="h-flex1"></span>'+
       (a.geinstalleerd
-        ? '<a class="knop stil" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'" style="text-decoration:none;">Openen</a>'+
+        ? '<a class="knop stil" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'" class="as-link">Openen</a>'+
           '<button class="knop stil asZet" type="button">Bijwerken</button>'+
           '<button class="knop stil asWeg" type="button">Verwijderen</button>'
         : (a.prijsCenten > 0 && !a.gekocht
@@ -668,12 +726,12 @@ function storeKaart(a){
        tweede lezer: hier klap je uit terwijl je kiest, de eigen pagina is een
        ADRES dat je bewaart en doorstuurt naar een inkoper of een security
        officer. Die laatste komt hier niet toevallig langs. */
-    '<div class="rij" style="margin-top:.45rem;">'+
-      '<button class="knop stil asDos" type="button" aria-expanded="false" style="font-size:.72rem;">Inkoopdossier</button>'+
-      '<a class="knop stil" href="/apps/appstore-dossier.html?app='+encodeURIComponent(a.sleutel)+'" style="font-size:.72rem;text-decoration:none;">Op eigen pagina &rarr;</a>'+
+    '<div class="rij as-mt-xs">'+
+      '<button class="knop stil asDos" type="button" aria-expanded="false" class="as-p72">Inkoopdossier</button>'+
+      '<a class="knop stil" href="/apps/appstore-dossier.html?app='+encodeURIComponent(a.sleutel)+'" class="as-kleinlink">Op eigen pagina &rarr;</a>'+
     '</div>'+
-    '<div class="asDosVak" hidden style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;"></div>'+
-    '<div class="asBon" hidden style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;"></div></div>';
+    '<div class="asDosVak" hidden class="as-scheiding-s"></div>'+
+    '<div class="asBon" hidden class="as-scheiding-m"></div></div>';
 }
 async function tekenStore(){
   const grid = $('#asGrid'), blader = $('#asBlader');
@@ -722,7 +780,7 @@ async function tekenStore(){
       vak.hidden = false; b.setAttribute('aria-expanded', 'true'); b.textContent = 'Inkoopdossier sluiten';
       vak.innerHTML = '<span class="tag">Het dossier wordt opgemaakt…</span>';
       try { vak.innerHTML = dossierHtml(await api('/api/appstore/dossier', { sleutel: kaart.dataset.sleutel })); }
-      catch(e){ vak.innerHTML = '<div style="font-size:.76rem;color:var(--soft);">'+esc(e.message)+'</div>'; }
+      catch(e){ vak.innerHTML = '<div class="as-klein-zacht">'+esc(e.message)+'</div>'; }
     }));
     grid.querySelectorAll('.asWeg').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/appstore/weg', { sleutel: b.closest('.boutiek').dataset.sleutel }); meld('Verwijderd.'); tekenStore(); }
@@ -746,31 +804,31 @@ async function tekenStore(){
    verschil met een ingevulde vragenlijst. */
 function bewijsHtml(lijst){
   return (lijst || []).map(b =>
-    '<div style="margin-top:.4rem;padding-left:.6rem;border-left:2px solid var(--line);">'+
-      '<b style="font-size:.76rem;display:block;">'+esc(b.claim)+'</b>'+
-      '<span style="font-size:.73rem;color:var(--muted);line-height:1.5;display:block;">'+esc(b.hoe)+'</span>'+
-      '<span style="font-size:.68rem;color:var(--soft);">bron: '+esc(b.bron)+
+    '<div class="as-bewijs">'+
+      '<b class="as-klein-blok">'+esc(b.claim)+'</b>'+
+      '<span class="as-hoe">'+esc(b.hoe)+'</span>'+
+      '<span class="as-bron">bron: '+esc(b.bron)+
         (b.waarde ? ' &middot; gemeten: '+esc(String(b.waarde)) : '')+'</span>'+
     '</div>').join('');
 }
 function dosKop(t){
-  return '<div style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-top:.7rem;">'+esc(t)+'</div>';
+  return '<div class="as-kop">'+esc(t)+'</div>';
 }
 function dossierHtml(d){
-  const p = (t) => '<span style="font-size:.76rem;color:var(--txt);line-height:1.55;display:block;margin-top:.2rem;">'+esc(t)+'</span>';
-  return '<div style="font-size:.76rem;color:var(--muted);line-height:1.55;">'+esc(d.let)+'</div>'+
+  const p = (t) => '<span class="as-alinea">'+esc(t)+'</span>';
+  return '<div class="as-uitleg">'+esc(d.let)+'</div>'+
 
     dosKop('Wat deze app nooit krijgt')+
-    '<ul style="margin:.25rem 0 0 1rem;padding:0;font-size:.76rem;color:var(--txt);line-height:1.6;">'+
+    '<ul class="as-lijst">'+
       (d.watHetNooitKrijgt.punten || []).map(x => '<li>'+esc(x)+'</li>').join('')+'</ul>'+
     bewijsHtml(d.watHetNooitKrijgt.bewijs)+
 
     dosKop('Waar uw gegevens blijven')+
-    '<b style="font-size:.8rem;color:var(--gold);display:block;margin-top:.2rem;">'+esc(d.waarDeGegevensBlijven.antwoord)+'</b>'+
+    '<b class="as-antwoord">'+esc(d.waarDeGegevensBlijven.antwoord)+'</b>'+
     p(d.waarDeGegevensBlijven.toelichting)+bewijsHtml(d.waarDeGegevensBlijven.bewijs)+
 
     dosKop('Als u stopt')+
-    '<b style="font-size:.8rem;display:block;margin-top:.2rem;">'+esc(d.uitgang.antwoord)+'</b>'+
+    '<b class="as-antwoord-plat">'+esc(d.uitgang.antwoord)+'</b>'+
     p(d.uitgang.toelichting)+bewijsHtml(d.uitgang.bewijs)+
 
     dosKop('De leverancier')+
@@ -791,8 +849,8 @@ function dossierHtml(d){
        kleiner. Wie dit weglaat houdt een verkooppraatje over. */
     dosKop('Wat dit dossier NIET zegt')+
     Object.keys(d.nietGebouwd || {}).map(k =>
-      '<div style="margin-top:.4rem;"><b style="font-size:.76rem;color:var(--gold);">'+esc(k)+'</b>'+
-      '<span style="font-size:.73rem;color:var(--muted);line-height:1.5;display:block;">'+esc(d.nietGebouwd[k])+'</span></div>').join('');
+      '<div class="as-mt-s"><b class="as-klein-goud">'+esc(k)+'</b>'+
+      '<span class="as-hoe">'+esc(d.nietGebouwd[k])+'</span></div>').join('');
 }
 
 /* MIJN GESCHIEDENIS: wat gaf ik, wanneer, en wanneer nam ik het terug. Staat
@@ -804,14 +862,14 @@ async function tekenTijdlijn(){
   vak.innerHTML = '<span class="tag">Even ophalen…</span>';
   try {
     const t = await api('/api/appstore/tijdlijn', {});
-    vak.innerHTML = '<div style="font-size:.76rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;">'+esc(t.let)+'</div>'+
+    vak.innerHTML = '<div class="as-inleiding">'+esc(t.let)+'</div>'+
       (t.tijdlijn.length
         ? t.tijdlijn.map(r =>
-            '<div style="display:flex;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.76rem;">'+
-              '<span style="color:var(--soft);flex:0 0 8.5rem;">'+esc(String(r.at).slice(0, 16).replace('T', ' '))+'</span>'+
-              '<span style="flex:1;"><b>'+esc(r.wat)+'</b>'+(r.sleutel ? ' &middot; '+esc(r.sleutel) : '')+
-                ((r.gaf && r.gaf.length) ? '<br><span style="color:var(--muted);">gaf: '+esc(r.gaf.join(', '))+'</span>' : '')+
-                ((r.weg && r.weg.length) ? '<br><span style="color:var(--muted);">nam terug: '+esc(r.weg.join(', '))+'</span>' : '')+
+            '<div class="as-tijdrij">'+
+              '<span class="as-tijdstip">'+esc(String(r.at).slice(0, 16).replace('T', ' '))+'</span>'+
+              '<span class="as-groei"><b>'+esc(r.wat)+'</b>'+(r.sleutel ? ' &middot; '+esc(r.sleutel) : '')+
+                ((r.gaf && r.gaf.length) ? '<br><span class="as-gedempt">gaf: '+esc(r.gaf.join(', '))+'</span>' : '')+
+                ((r.weg && r.weg.length) ? '<br><span class="as-gedempt">nam terug: '+esc(r.weg.join(', '))+'</span>' : '')+
               '</span></div>').join('')
         : '<div class="leeg">Je hebt nog niets met een app van derden gedaan.</div>');
   } catch(e){ vak.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
@@ -828,25 +886,25 @@ async function toonBon(sleutel, vak, land){
   catch(e){ vak.innerHTML = '<span class="tag">'+esc(e.message)+'</span>'; return; }
   if (d.landNodig) {
     vak.innerHTML = '<span class="tag">'+esc(d.waarom)+'</span>'+
-      '<div class="rij" style="margin-top:.5rem;"><select class="veld bonLand" style="max-width:16rem;">'+
+      '<div class="rij as-mt-m"><select class="veld bonLand as-smal">'+
       '<option value="">Kies je land…</option>'+
       d.landen.map(l => '<option value="'+esc(l.code)+'">'+esc(l.naam)+'</option>').join('')+'</select></div>';
     vak.querySelector('.bonLand').addEventListener('change', (e) => { if (e.target.value) toonBon(sleutel, vak, e.target.value); });
     return;
   }
-  const r = (label, c) => '<div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);"><span>'+label+'</span><b style="color:var(--txt);">'+euroC(c)+'</b></div>';
+  const r = (label, c) => '<div class="as-bonregel"><span>'+label+'</span><b class="as-tekst">'+euroC(c)+'</b></div>';
   vak.innerHTML =
-    '<div style="display:flex;justify-content:space-between;font-size:.9rem;"><b>Je betaalt</b><b style="color:var(--gold);">'+euroC(d.brutoCenten)+'</b></div>'+
-    '<div style="margin-top:.35rem;">'+
+    '<div class="as-bontotaal"><b>Je betaalt</b><b class="as-goud">'+euroC(d.brutoCenten)+'</b></div>'+
+    '<div class="as-mt-xxs">'+
       r('waarvan btw '+d.btwProcent+'% ('+esc(d.landNaam)+')', d.btwCenten)+
       (d.afdrachtCenten ? r('afdracht RTG '+d.afdrachtProcent+'%', d.afdrachtCenten) : '')+
       r('naar '+esc(d.uitgever ? d.uitgever.naam : 'de uitgever'), d.uitgeverCenten)+
     '</div>'+
-    '<div class="rij" style="margin-top:.55rem;align-items:center;">'+
-      '<span class="tag" style="font-size:.74rem;">btw-land: <b>'+esc(d.landNaam)+'</b></span>'+
+    '<div class="rij as-landrij">'+
+      '<span class="tag as-p74">btw-land: <b>'+esc(d.landNaam)+'</b></span>'+
       '<button class="knop stil bonAnder" type="button">Ander land</button>'+
       '<span class="h-flex1"></span><button class="knop bonBetaal" type="button">Betalen</button>'+
-    '</div><div class="bonKies" hidden style="margin-top:.45rem;"></div>';
+    '</div><div class="bonKies" hidden class="as-mt-xs"></div>';
   /* "Ander land" haalt de lijst op en laat het lid kiezen. Hij stuurt met opzet
      geen onzinwaarde naar de bon om de keuzelijst uit te lokken: dan zou de
      server moeten raden wat een lid bedoelt, en dat is precies wat hij bij een
@@ -856,7 +914,7 @@ async function toonBon(sleutel, vak, land){
     kies.hidden = false; kies.innerHTML = '<span class="tag">Even de landen ophalen…</span>';
     try {
       const l = await api('/api/appstore/landen');
-      kies.innerHTML = '<select class="veld bonLand" style="max-width:16rem;" aria-label="Kies je land">'+
+      kies.innerHTML = '<select class="veld bonLand as-smal" aria-label="Kies je land">'+
         '<option value="">Kies je land…</option>'+
         l.landen.map(x => '<option value="'+esc(x.code)+'"'+(x.code===d.land?' selected':'')+'>'+esc(x.naam)+'</option>').join('')+'</select>';
       kies.querySelector('.bonLand').addEventListener('change', (e) => { if (e.target.value) toonBon(sleutel, vak, e.target.value); });

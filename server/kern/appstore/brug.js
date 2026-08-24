@@ -158,26 +158,10 @@ function maakBrug(kern) {
     return { status: 200, ok: true, uit };
   }
 
-  /* Het bakje van EEN app, gelezen door het lid zelf. Dit loopt met opzet niet
-     over de brug: het is de kant van het lid, en een app hoort niet te kunnen
-     zien of zijn bericht is gelezen. */
-  function bakje(key, sleutel) { return bak('bakjes', key, sleutel).slice(0, GRENS.bakGrootte); }
-  function bakjeGelezen(key, sleutel) {
-    const b = bak('bakjes', key, sleutel);
-    let n = 0;
-    for (const x of b) if (!x.gelezen) { x.gelezen = true; n++; }
-    if (n) save();
-    return { ok: true, gelezen: n };
-  }
-  function bakjes(key) {
-    const r = eigen(S().bakjes, String(key)) || {};
-    const uit = {};
-    for (const s of Object.keys(r)) {
-      const ongelezen = (r[s] || []).filter(x => !x.gelezen).length;
-      if (ongelezen) uit[s] = ongelezen;
-    }
-    return uit;
-  }
+  /* De LEES-kant van de bakjes staat in ./bakjes.js. Dat is de naad die hier al
+     als alinea stond: een app SCHRIJFT een bericht via de brug, maar mag nooit
+     zien of het gelezen is -- anders is een bericht een baken. */
+  const { bakje, bakjeGelezen, bakjes } = require('./bakjes')({ S, save, eigen, bak, GRENS });
 
   return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, GRENS, boek };
 }

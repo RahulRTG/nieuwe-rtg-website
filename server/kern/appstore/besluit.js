@@ -90,7 +90,15 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
   /* GRENS 5: intrekken werkt onmiddellijk en overal. Zowel RTG als de uitgever
      zelf kan hem overhalen -- een uitgever die een fout in zijn eigen app ziet,
      hoort niet te moeten wachten op een kantoor. */
-  function intrekken({ sleutel, reden, door, doorOrg }) {
+  /* HEET HIER intrekkenKaal EN NIET intrekken, en dat is geen smaak. Er zit een
+     tweede intrekken om deze heen: ./naad.js hangt er de teruggaverechten en de
+     tijdlijn van het lid aan, en DAT is de versie die de rest van het huis
+     aanroept. Twee functies met dezelfde naam in hetzelfde subsysteem betekent
+     dat de verkeerde aanroepen een stille half-uitgevoerde intrekking is -- code
+     eruit, maar geen teruggaverecht en geen regel in de tijdlijn.
+     De keuring telt namen die in meer dan twee kernmodules staan; deze stond er
+     vier keer en dat was de aanleiding om hem te lezen. */
+  function intrekkenKaal({ sleutel, reden, door, doorOrg }) {
     const a = app(sleutel);
     if (!a) return { status: 404, error: 'Deze app bestaat niet.' };
     if (doorOrg && norm(doorOrg) !== a.org) return { status: 403, error: 'Deze app is niet van jou.' };
@@ -125,5 +133,5 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
       nietGebouwd: NIET_GEBOUWD };
   }
 
-  return { wachtrij, besluit, intrekken, mijnUitgeverij, tovLive };
+  return { wachtrij, besluit, intrekkenKaal, mijnUitgeverij, tovLive };
 };

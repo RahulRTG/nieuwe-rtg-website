@@ -9,6 +9,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
@@ -46,6 +47,13 @@
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
     border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
   .leeg{color:var(--soft);font-size:.85rem;line-height:1.6;padding:2rem 1.2rem;text-align:center;}
+  /* Uit de inline stijlattributen gehaald: die houden style-src-attr in
+     de CSP open, en de norm telt ze (scripts/norm.js, inlineStijlAttributen).
+     Op juist DEZE pagina telt dat dubbel -- dit is de schil om code van een
+     derde, en de CSP eromheen zo strak mogelijk houden is het hele punt. */
+  .vul{height:100%;}
+  .knoprij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;}
+  .leegregel{color:var(--soft);font-size:.85rem;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -61,7 +69,7 @@
 </header>
 
 <main class="cel" id="cel">
-  <div id="frameWrap" style="height:100%;">
+  <div id="frameWrap" class="vul">
     <!-- HET KADER STAAT HIER EN NIET IN EEN SCRIPT, EN allow IS LEEG.
 
          Overal elders in dit huis geeft de mediapoort (/shared/media.js) een
@@ -83,7 +91,7 @@
       <h2>Wat mag deze app?</h2>
       <p class="sub" id="paneelSub"></p>
       <div id="lijst"></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;">
+      <div class="knoprij">
         <button class="knop aan" id="bewaar" type="button">Bewaren</button>
         <button class="knop" id="sluit" type="button">Sluiten</button>
         <button class="knop" id="weg" type="button">App verwijderen</button>
@@ -183,7 +191,7 @@ function tekenPaneel(){
     (m.waarvoor ? '<span class="geeft">Waarvoor: '+esc(m.waarvoor)+'</span>' : '')+
     '<span class="geeft">Geeft: '+esc(m.geeft)+'</span>'+
     '<span class="nooit"><b>Nooit:</b> '+esc(m.nooit)+'</span></span></label></div>').join('')
-    || '<div class="m" style="color:var(--soft);font-size:.85rem;line-height:1.6;">Niets verleend.</div>';
+    || '<div class="m leegregel">Niets verleend.</div>';
 }
 $('#watMag').addEventListener('click', () => {
   const p = $('#paneel'), aan = p.getAttribute('data-open') === '1';

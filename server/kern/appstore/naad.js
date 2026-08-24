@@ -36,7 +36,18 @@ module.exports = function maakNaad({ S, save, nu, boek, eigen, norm, uitgever, a
     ? require('./geld')({ S, save, nu, boek, eigen, norm, uitgever, app, versie, pay, findSupplier, noteer: T.noteer })
     : null;
 
-  function intrekken(a) {
+  /* HEET intrekkenMetGevolgen EN NIET intrekken, als tegenhanger van
+     intrekkenKaal in ./besluit.js. Die twee namen samen zeggen precies wat het
+     verschil is: kaal haalt de code eruit, met-gevolgen doet dat EN zet de
+     teruggaverechten klaar EN schrijft in de tijdlijn van iedereen die de app
+     had. Naar buiten heet hij gewoon `intrekken` -- dat is wat de rest van het
+     huis aanroept, en dat hoort de volledige te zijn.
+
+     De keuring wees hierop: `intrekken` stond in drie kernmodules, en zijn
+     advies is "geef ze een eigen naam zodat de gelijkenis niet misleidt". Hier
+     was die gelijkenis ook echt misleidend -- twee functies met dezelfde naam
+     waarvan er een de helft doet. */
+  function intrekkenMetGevolgen(a) {
     const r = intrekkenKaal(a);
     if (r.ok) {
       /* Iedereen die deze app had staan, krijgt er een regel over. Wie hem nooit
@@ -91,7 +102,7 @@ module.exports = function maakNaad({ S, save, nu, boek, eigen, norm, uitgever, a
       const kapot = !index ? ['de bundelindex zelf is weg']
         : Object.keys(index).filter(pad => !opslag.lees(a.sleutel, v.hash, pad, false));
       if (kapot.length) {
-        intrekken({ sleutel: a.sleutel, door: wie,
+        intrekkenMetGevolgen({ sleutel: a.sleutel, door: wie,
           reden: 'de bundel komt niet meer overeen met wat is goedgekeurd (' + kapot.slice(0, 3).join(', ') + ')' });
         uit.uitgezet.push({ sleutel: a.sleutel, bestanden: kapot.slice(0, 5) });
         continue;
@@ -108,5 +119,5 @@ module.exports = function maakNaad({ S, save, nu, boek, eigen, norm, uitgever, a
         : 'Alles wat live staat, komt byte voor byte overeen met wat een mens heeft afgetekend.' });
   }
 
-  return { geld, intrekken, hercontrole, tijdlijn: T.tijdlijn, noteer: T.noteer, TIJDLIJN_SOORTEN: T.TIJDLIJN_SOORTEN };
+  return { geld, intrekken: intrekkenMetGevolgen, hercontrole, tijdlijn: T.tijdlijn, noteer: T.noteer, TIJDLIJN_SOORTEN: T.TIJDLIJN_SOORTEN };
 };

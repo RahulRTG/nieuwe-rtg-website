@@ -61,6 +61,19 @@ waarde. Dezelfde regel geldt in het klein overal in deze laag: `nietAfgedwongen`
 in het contract, `nietGerekend` in een gevolgsimulatie, en een geweigerde modus
 die zegt waarom.
 
+**`VERTROUWEN.md` is de veiligheidsdoctrine** -- de RTG Verified Trust Fabric.
+`SECURITY.md` zegt hoe je een kwetsbaarheid meldt; dit zegt waarom een geslaagde
+aanval binnen aantoonbaar veilige grenzen blijft, en hoe een klant dat zelf kan
+zien. Zes vragen (wie, mag, raakt, hoever, terug, bewijs) waar de bestaande WAF,
+virusscanner, CSP, SSRF-afweer, remmen en rechten de sensoren van worden. Lees
+vooral paragraaf 3, de grenzen: geen bewering zonder bron (de Trust HUD is de
+gevaarlijkste tegel en wordt daarom als laatste gebouwd), geen securityscore,
+de autopilot mag insnoeren en nooit teruggeven, simuleren verandert niets, een
+lokmiddel is nooit een mens, en een berekend bereik zegt wat het MODEL weet en
+niet wat de aanvaller kan -- vandaar `nietGemodelleerd` naast `nietGerekend`.
+Paragraaf 6 draagt de bouwvolgorde, en die is een afhankelijkheidsketen en geen
+prioriteitenlijst.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

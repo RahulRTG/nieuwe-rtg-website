@@ -25,6 +25,10 @@ module.exports = (kern) => {
     db: kern.db, save: kern.save, schoon: kern.schoon,
     findSupplier: kern.findSupplier, bedrijf: () => kern.bedrijf
   });
+  /* De Trust Fabric, laag 1. Hij hangt hier en niet in kern/tenant, want hij
+     gaat over HANDELINGEN en niet over klanten -- de volgende lagen hangen er
+     handelingen aan die met tenants niets te maken hebben. */
+  kern.vertrouwen = require('../kern/vertrouwen')({ db: kern.db, save: kern.save });
   const { app, auth, tenant, bedrijf } = kern;
 
   /* ---------- de bootstrap via het lid-token ----------
@@ -76,13 +80,21 @@ module.exports = (kern) => {
     const w = bedrijf.beheerVan(req, res); if (!w) return;
     const uit = tenant.uitgang.exporteer(w.code);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+
+    /* De blootstelling van deze uitvoer (VERTROUWEN.md laag 1). Meet voor,
+       onthoud na: die volgorde is de beveiliging zelf, en het waarom staat in
+       kern/vertrouwen/gewoonte.js. De actor is hier de WERKRUIMTE en geen mens,
+       want deze deur gaat open op het beheer-token. Laag 1 houdt niets tegen. */
+    const wie = 'werkruimte:' + w.code;
+    const bloot = kern.vertrouwen.weegCatalogus(wie, 'tenant.uitvoer', uit.uitvoer.catalogus);
+    kern.vertrouwen.voltooid(wie, 'tenant.uitvoer', bloot.aantal);
     /* `vorm: 'leesbaar'` geeft een overzicht in Markdown. Platte tekst en geen
        PDF: een archief hoort over tien jaar nog open te gaan zonder een
        bibliotheek die tegen die tijd niet meer bestaat. */
     if (String((req.body || {}).vorm) === 'leesbaar') {
       return res.type('text/markdown; charset=utf-8').send(tenant.uitgang.leesbaar(uit.uitvoer));
     }
-    res.json({ ok: true, ...uit.uitvoer });
+    res.json({ ok: true, blootstelling: bloot, ...uit.uitvoer });
   });
 
   /* HIER STOND EEN DEUR OM DE UITVOER TE LATEN NAREKENEN, en die is er weer uit.

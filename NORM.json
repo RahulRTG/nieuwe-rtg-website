@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 129,
-    "keuringOmvang": 161,
+    "keuringOmvang": 162,
     "keuringDubbeling": 115,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -21,7 +21,7 @@
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4936,
     "browserpoortToetsen": 199,
-    "kernBreedte": 1414,
+    "kernBreedte": 1415,
     "kernGedeeld": 193,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -462,6 +462,11 @@
       "datum": "2026-08-23",
       "meter": "schermenZonderVormtaal 183 -> 184 (kwam mee met de merge van main)",
       "reden": "Deze plus een komt NIET uit deze tak. Bij het binnenhalen van main (2eb6036) kwamen er twee nieuwe app-pagina's mee -- public/apps/sociaal-prive.html en public/apps/chauffeur.html -- en geen van beide sluit rtg-ontwerp.css of rtg-materiaal.css in.\n\nDat is geen verwijt aan die pagina's: de meter BESTAAT op main nog niet. Hij is in deze tak toegevoegd en staat dus in geen enkele andere tak in de weg. Tot main hem heeft, zal elke nieuwe pagina van elders hem laten stijgen -- en dat is precies wat je van een ratel mag verwachten die nog niet is aangekomen.\n\nWaarom ik die twee pagina's niet even zelf de tokenlaag heb gegeven: het is een regel erbij, maar in een MERGE-commit een scherm van iemand anders aanraken dat ik nooit heb gezien, is de verkeerde plek. De meter telt de insluiting en niet het gebruik, dus het zou de teller wel verlagen zonder dat iemand die pagina's aan de vormtaal heeft gehouden -- een groen cijfer zonder dat er iets is nagekeken, en dat is precies waar deze hele ronde tegen is.\n\nWat er WEL hoort te gebeuren: als deze tak op main landt, gaat de meter mee en horen die twee pagina's een eigen regel te krijgen. Zolang dat niet is gebeurd, staat het hier."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "keuringOmvang 161 -> 162 en kernBreedte 1414 -> 1415 (de Trust Fabric, laag 1)",
+      "reden": "Twee meters een omhoog, allebei door dezelfde toevoeging: de blootstellingsmeter uit VERTROUWEN.md laag 1 is aangesloten op de tenantuitvoer.\n\nkeuringOmvang. server/routes/tenant.js stond op 9329 bytes -- eenenzeventig bytes onder de adviesband van 9400. Elke functie erbij duwt hem er dus overheen, hoe kort het commentaar ook is; mijn toevoeging is drie regels code en vier regels uitleg. Ik heb de telling er wel uitgehaald: hoe je een catalogus omrekent naar een omvang staat nu in kern/vertrouwen/index.js, waar hij hoort, want twee plekken die dat elk anders doen leveren twee verschillende omvangen voor dezelfde handeling.\n\nWaarom het bestand niet gesplitst is. Dat is het huisantwoord ('knip hem op') en hier zou het de code slechter maken. Er staan drie routegroepen in die elkaar nodig hebben om te begrijpen -- de bootstrap via het lid-token, de uitvoer, en de status met de bewijsstand -- en ze delen de kop die uitlegt waarom deze laag geen nieuwe poort bedenkt. Drie bestanden van elk drie kilobyte zetten die redenering uit elkaar om 778 bytes te winnen.\n\nWaarom de meter niet ontweken is met een andere plek. De uitvoer is met opzet de EERSTE aansluiting: het is de zwaarste handeling in dit huis, want daar verlaat alles het pand, en 'hoeveel ging er de deur uit' is precies de vraag die deze meter beantwoordt. Een lichtere handeling kiezen omdat dat bestand nog ruimte had, is optimaliseren voor de teller in plaats van voor het product.\n\nkeuringTeGroot bleef 5: het bestand is 10177 en dus onder de harde grens van 10240. Die tand blijft dus doen waar hij voor is.\n\nkernBreedte. Een kern-eigenschap erbij (kern.vertrouwen), en dat is er EEN voor een hele laag en niet een per module -- register, blootstelling en gewoonte hangen er allemaal achter. De volgende lagen van VERTROUWEN.md hangen aan diezelfde naam en horen deze meter dus niet verder te laten stijgen. Doet een van hen dat wel, dan is dat een nieuwe regel hier."
     }
   ],
   "prestatie": {

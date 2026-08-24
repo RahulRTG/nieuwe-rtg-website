@@ -199,6 +199,34 @@ test('3c. een naam kan geen eigen kolom in het overzicht openen', () => {
   assert.equal(cellen[1], gemeen, 'en de naam komt er ongeschonden weer uit');
 });
 
+/* DE BLOOTSTELLING REIST MEE (VERTROUWEN.md laag 1). Zonder deze toets is de
+   meter een module die niemand aanroept -- en dat is precies wat de keuring
+   "scheef" noemt. Hij legt twee dingen vast: het getal komt uit de catalogus
+   en is dus geteld en niet geschat, en de gewoonte groeit pas NA een uitvoer
+   die echt is gelukt. */
+test('3d. de uitvoer draagt zijn eigen omvang, en die is geteld', async () => {
+  const r = await api('/api/tenant/export', { werkruimte: ruimte, beheerToken: beheer });
+  assert.equal(r.status, 200);
+  const b = r.body.blootstelling;
+  assert.ok(b, 'de uitvoer draagt een blootstelling');
+  assert.equal(b.gemeten, true);
+  assert.equal(b.soort, 'tenant.uitvoer');
+
+  const uitCatalogus = r.body.catalogus.reduce((n, c) => n + c.aantal, 0);
+  assert.equal(b.aantal, uitCatalogus, 'geteld uit de catalogus, niet geschat');
+  assert.equal(b.omkeerbaar, false, 'een uitvoer verlaat het huis');
+  assert.ok(Array.isArray(b.nietGerekend) && b.nietGerekend.length,
+    'en hij noemt waar hij niet over gaat');
+
+  /* De eerste keer is er geen eigen grondslag, en dat staat er met het aantal
+     waarnemingen in plaats van als stilte. */
+  assert.equal(b.grondslag, 'vast');
+
+  const weer = await api('/api/tenant/export', { werkruimte: ruimte, beheerToken: beheer });
+  assert.equal(weer.body.blootstelling.waarnemingen, b.waarnemingen + 1,
+    'de vorige uitvoer is uitgevoerd, dus die telt mee');
+});
+
 test('4. de bewaring sluit de toegang -- en de uitgang blijft open', async () => {
   const zonderReden = await api('/api/techniek/tenant/levensloop', { org: ORG, naar: 'opzegging' }, tech);
   assert.equal(zonderReden.status, 400, 'een levensloop zonder reden is later niet te reconstrueren');

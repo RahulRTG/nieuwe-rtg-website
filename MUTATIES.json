@@ -6147,6 +6147,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "vertrouwenblootstelling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vertrouwen/blootstelling.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "verzadiging.test.js": {
       "soort": "puur",
       "staat": "gezakt",

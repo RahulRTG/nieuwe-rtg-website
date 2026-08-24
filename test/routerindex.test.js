@@ -219,3 +219,70 @@ test('6. onbekende paden laten de kandidaatcache niet groeien (geen tarpit)', ()
   assert.ok(process.memoryUsage().heapUsed - na < 40 * 1024 * 1024,
     'de cache hoort begrensd te zijn door de routekaart, niet door het verkeer');
 });
+
+/* ---------------------------------------------------------------------------
+   DE VANGRAIL: de index MOET meetbaar sneller zijn dan de scan.
+
+   De toetsen hierboven bewaken dat het gedrag gelijk blijft. Dat is de helft:
+   een index die zich precies zo gedraagt als de scan én precies zo traag is,
+   haalt ze allemaal. Dan is de winst weg zonder dat er iets rood wordt -- en
+   dat is nou juist de vorm van erosie waar scripts/norm.js voor bestaat.
+
+   Deze proef meet daarom BEIDE implementaties in dezelfde run, op dezelfde
+   routetabel, achter elkaar. Dat is met opzet geen absolute drempel in
+   milliseconden: die zegt op een drukke bouwmachine niets en levert een toets
+   op die willekeurig knippert. Een VERHOUDING tussen twee implementaties in
+   hetzelfde proces valt weg tegen hoe snel de machine toevallig is.
+
+   De marge is ruim. Losgemeten op de echte routeverdeling was de index 111x
+   sneller in het midden van de tabel en 199x achteraan; hier staat 15x. We
+   zakken dus pas als de winst grotendeels weg is, niet als hij een beetje
+   schommelt -- dezelfde afweging als bij de voorcheck-vangrail in
+   test/opslag-voorcheck.test.js.
+   ------------------------------------------------------------------------ */
+test('7. VANGRAIL: de index blijft meetbaar sneller dan de lineaire scan', () => {
+  /* Dezelfde vorm als de echte routekaart, gemeten 24 augustus 2026: 8.004
+     lagen, waarvan 7.939 een vast pad, 41 met een :param, 23 mounts. */
+  const STATISCH = 7939, PARAM = 41, MOUNTS = 23;
+  const groepen = ['supplier', 'office', 'member', 'rtf', 'rtfos', 'overheid', 'techniek', 'werkplek', 'lab2', 'command'];
+  function bouw(maker) {
+    const app = maker();
+    for (let i = 0; i < MOUNTS; i++) app.use((rq, rs, nx) => nx());
+    const paden = [];
+    for (let i = 0; i < STATISCH; i++) {
+      const p = '/api/' + groepen[i % groepen.length] + '/route' + i;
+      paden.push(p);
+      app.get(p, (rq, rs) => rs.end());
+    }
+    for (let i = 0; i < PARAM; i++) app.get('/api/ding' + i + '/:id', (rq, rs) => rs.end());
+    return { app, paden };
+  }
+  const traag = bouw(traagRouter);
+  const snel = bouw(maakRouter);
+
+  const res = { ended: false, end() {}, on() {}, statusCode: 200 };
+  function meet(app, url) {
+    for (let i = 0; i < 2000; i++) app._handle({ method: 'GET', url, params: {} }, res, () => {});  // opwarmen
+    const t0 = process.hrtime.bigint();
+    for (let i = 0; i < 8000; i++) app._handle({ method: 'GET', url, params: {} }, res, () => {});
+    return Number(process.hrtime.bigint() - t0) / 1e6;
+  }
+  // een route in het MIDDEN van de tabel: daar deed de scan gemiddeld werk
+  const url = traag.paden[Math.floor(STATISCH / 2)];
+  const msTraag = meet(traag.app, url);
+  const msSnel = meet(snel.app, url);
+  const factor = msTraag / msSnel;
+  assert.ok(factor >= 15,
+    'de index hoort minstens 15x sneller te zijn dan de scan; gemeten ' + factor.toFixed(1) + 'x ' +
+    '(scan ' + msTraag.toFixed(1) + ' ms, index ' + msSnel.toFixed(1) + ' ms). ' +
+    'Zakt dit, dan is de dispatch-index stuk of omzeild.');
+
+  /* En de tweede belofte: de kosten zijn VLAK. Een route achteraan mag niet
+     duurder zijn dan een route vooraan, want anders wordt de router alsnog
+     trager naarmate de app groeit -- precies wat de index moest oplossen. */
+  const vroeg = meet(snel.app, traag.paden[10]);
+  const laat = meet(snel.app, traag.paden[STATISCH - 10]);
+  assert.ok(laat < vroeg * 4,
+    'de dispatch hoort vlak te zijn: achteraan ' + laat.toFixed(1) + ' ms tegen vooraan ' +
+    vroeg.toFixed(1) + ' ms. Loopt dit uiteen, dan scant hij weer.');
+});

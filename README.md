@@ -4286,6 +4286,54 @@ Een bord dat "Betalen: OK" toont, zegt niet waarom het dat weet. Dat kan zijn om
 
 Werkplek **Gezondheid** onder *Zien*; kern in `server/kern/command/gezondheid.js` (met `vermogens.js`, `gezondheid-bronnen.js`, `gezondheid-fundament.js`, `gezondheid-proef.js`, `gezondheid-taal.js`), routes `/api/command/gezondheid*`, scherm `public/apps/command/command-17.js`. Getoetst in `test/gezondheidskaart.test.js` (veertien beweringen, acht mutaties). De richting waar deze laag in past, en de grenzen die daarbij horen, staan in **`BESTUUR.md`**.
 
+### Herstel als transactie: de twee stappen die een herstelknop normaal niet heeft
+
+De runbooks hadden de helft hiervan al. Elke wijziging heeft dezelfde vorm -- één veld op één object van een bekende soort -- en draagt de oude waarde per object mee, dus terugdraaien is geen extra code maar hetzelfde mechanisme omgekeerd. Dat is meteen de momentopname: een tweede kopie ernaast zou op een dag iets anders zeggen dan de eerste. Wat ontbrak zijn de twee stappen eromheen, en dat zijn precies de twee die op elk ander beheerscherm ontbreken. De keten is nu **voorcontrole → momentopname → uitvoeren → verificatie → vastleggen**, en bij een mislukte verificatie automatisch **terug**. `POST /api/command/runbook/voer` is het enige pad ernaartoe; rechtstreeks langs `runbooks.voer()` gaat niet meer, want een tweede ingang die de keten overslaat maakt de belofte meteen leeg.
+
+**De voorcontrole** is vier genoemde voorwaarden, elk met een eigen uitslag en reden: het veld staat niet op de bevroren lijst, de weg terug bestaat werkelijk als het certificaat er een belooft, het aantal gevallen blijft binnen de bovengrens van het certificaat, en het fundament (bereikbaar, de gegevens, de sporen) staat niet op storing -- gegevens rechtzetten terwijl dat wankelt is hoe je er een tweede storing bij maakt. Een echte ronde wordt door een weigering tegengehouden; **een droogloop niet**, want droog draaien is juist hoe je erachter komt dat de voorcontrole niet houdt.
+
+**Een voorwaarde die niet te controleren is, slaagt niet.** De zaak-kant draait dezelfde recepten zonder gezondheidskaart; die controle komt daar in de keten met `gecontroleerd: false` en de reden erbij, en blokkeert niets. Dat staat er dan ook zo, in plaats van stil voor geslaagd door te gaan.
+
+**Het certificaat** staat bij het recept (`runbookcatalogus.js`): hoe groot het mag worden, hoe de weg terug loopt, waaraan achteraf wordt nagekeken, en een versie. `maxObjecten` is iets anders dan de rondegrens uit het beleid -- die zegt hoeveel er per keer mag, dit zegt op hoeveel gevallen dit recept ooit is beproefd. Een recept **zonder** certificaat draait gewoon door, maar de uitslag meldt dat erbij: geen bovengrens afgesproken, en de weg terug is alleen wat `terugDraaibaar` zegt. Een standaardcertificaat verzinnen zou een ongecertificeerd recept laten lezen als een gecertificeerd recept.
+
+**De verificatie kijkt positief na**, en dat is de kern: niet "er ging niets mis" maar staat het veld werkelijk op de bedoelde waarde, en is de aanleiding werkelijk weg. Raakte de ronde nul objecten, dan is de uitslag `niet van toepassing` en uitdrukkelijk niet "geslaagd" -- een herstelknop die stil niets doet en groen meldt, is erger dan een knop die niets doet. Mislukt de verificatie, dan draait de ronde zichzelf terug, maar alleen als het certificaat die weg belooft: een automatische terugdraaiing op een recept dat daar niet voor staat, zou een tweede ongeplande wijziging zijn bovenop de eerste.
+
+De uitslag gaat terug **op de ronde zelf** en in het journaal. Een verificatie die alleen in het antwoord van dat ene verzoek bestaat, is morgen weg -- en dan staat er in de historie een ronde zonder enig bewijs dat er ooit is nagekeken. In de rondelijst staat `niet nagekeken` daarom als uitslag en niet als leegte.
+
+Kern: `server/kern/command/transactie.js` (de keten) en `transactie-poorten.js` (de voorcontrole en de verificatie); het teruglezen van rondes verhuisde naar `runbooks-historie.js` toen `runbooks.js` door zijn omvangsgrens ging, op de naad die er al lag. Getoetst in `test/hersteltransactie.test.js` (negen beweringen, zes mutaties) op de echte receptenmotor met een rij die zijn schrijfactie **weigert** -- zo ziet de transactie precies wat zij in het echt zou zien als een wijziging niet plakt. De bedrading in `test/command-routes-herstel.test.js`. De richting en de grenzen staan in **`BESTUUR.md`**.
+
+### Het incident als object: de machine opent, een mens sluit
+
+Zonder dit is een storing een alarm plus een journaalregel, en die twee verdwijnen allebei in een lijst: het alarm zwijgt zodra de drempel terugloopt, en de journaalregel staat tussen tienduizend andere. `server/kern/command/incident.js` maakt er een object van met een nummer waar je naar kunt verwijzen, een begin, een gemeten omvang, de maatregelen, een status en een verslag.
+
+**Dit is geen tweede uitzonderingenrij.** `zaken.js` gaat over één geval dat de machine niet zelf kon afhandelen, met een eigenaar, een termijn en een besluit. Een incident gaat over een **vermogen** dat het niet doet -- andere gegevens, andere werkstroom, andere levensduur. Dat is de toetsvraag uit `PLATFORM.md`, en hij valt hier op "zelfstandige capability".
+
+**De machine opent, een mens sluit.** `weeg()` leest de gezondheidskaart en opent een incident voor elk vermogen dat op storing komt; een storing die niemand vastlegt is een storing waar niemand van leert. Sluiten doet hij niet, want dan zou er een incident in de historie staan zonder conclusie: herstelt de bron zich, dan wordt het incident `hersteld` gemarkeerd en wacht het op een verslag. Dat is werkvoorraad van een eigen soort en wordt apart geteld -- de storing is weg en de les is nooit getrokken.
+
+**Sluiten kan niet terwijl het nog stuk is.** Een gesloten incident boven een lopende storing is een leugen in de historie, en het is de makkelijkste om te vertellen: het scherm wordt er rustiger van. Het kan wel met `toch` en een reden, en dan staat dat in het verslag -- een besluit in plaats van een vergissing. Een grendel zonder uitweg wordt omzeild in plaats van gebruikt.
+
+**De impact is gemeten, en wat niet te meten is staat erbij.** Dit is de gevaarlijkste tekst op een incidentscherm: *"23 facturen vertraagd, 0 verloren, 0 dubbel verwerkt"* is precies wat een eigenaar wil lezen en precies wat je niet mag schrijven zonder iets dat die drie kan tellen. Elk getal komt uit een bevinding van de gezondheidskaart; drie dingen staan er standaard als **niet gemeten** met de reden erbij, en dat zijn feiten over deze code: hoeveel leden of organisaties het raakte (`server/meting.js` telt per routepatroon en draagt geen tenant), of er iets verloren ging en of er iets dubbel is verwerkt (het transactie-grootboek dekt de collecties in `server/db/tx/collecties.js`, niet het hele platform). Dat blok staat op het scherm als eigen kop en niet in een voetnoot.
+
+**De oorzaak is een aanleiding en geen feit.** Er is geen veld `oorzaak` met een zin erin maar een lijst aanleidingen met per stuk de bron en de hardheid. Leunt het vermogen op iets dat óók stuk is, dan is dat de sterkere kandidaat -- met de zin erbij dat gelijktijdigheid geen oorzaak bewijst. Vindt hij niets, dan staat er "geen aanleiding gevonden", en dat is een uitslag en geen reden om er een te verzinnen.
+
+En de **momentopname bij het ontstaan blijft staan**, naast de stand van nu: alleen de eerste tonen laat een opgelost incident als lopend lezen, alleen de tweede maakt onzichtbaar wat er toen aan de hand was.
+
+Kern: `server/kern/command/incident.js` (de levensloop), `incident-impact.js` (de omvang en de aanleidingen) en `incident-verslag.js` (afsluiten en teruglezen); routes `/api/command/incident*` achter `command-doen`; scherm `public/apps/command/command-18.js`. Getoetst in `test/incident.test.js` (tien beweringen, zes mutaties).
+
+### De configuratietijdlijn: wat is er vlak daarvoor veranderd?
+
+Bij een storing stelt iedereen dezelfde vraag als eerste, en die was hier niet te beantwoorden -- niet omdat het nergens stond maar omdat het op drie plekken stond in drie vormen: het journaal van RTG Command, de aanvragen aan de schakelkast (`techniek.functieVerzoeken`) en het auditspoor van de incidentcontrole. `server/kern/command/tijdlijn.js` legt ze op één lijn.
+
+**Het is een samenvoeging en geen vierde opslag.** Er wordt niets bewaard; elke regel komt uit een bron die er al was en draagt de naam van die bron. Een eigen kopie zou op een dag iets anders zeggen dan het scherm waar zij vandaan kwam, en dan is de tijdlijn het minst betrouwbare bewijsstuk van de drie.
+
+**Volgorde is geen oorzaak**, en die zin komt van de server en niet van het scherm. `rondom(moment, minuten)` zegt dat er zevenendertig seconden eerder iets is gewijzigd; hij zegt niet dat dat het veroorzaakte. Een tijdlijn zonder die zin wordt binnen een week gelezen als een oorzakenlijst.
+
+**En "niets gevonden" is niet "niets gebeurd".** Een leeg venster antwoordt met zoveel woorden dat er in déze drie bronnen niets staat -- een uitrol, een wijziging op de machine of een schrijfactie buiten Command zou er ook niet in staan. Wat elke bron mist staat per bron; wat geen van drieën ziet staat als aparte lijst. Dat is precies de verwarring waarmee iemand een oorzaak uitsluit die er wel degelijk was.
+
+**Een aanvraag die niets veranderde staat er toch in**, met de status erbij: wie zoekt naar wat er veranderde, wil ook zien wat er bíjna veranderde. Het aantal regels en het aantal dat werkelijk iets veranderde staan apart, anders leest "vijf wijzigingen vlak ervoor" als vijf wijzigingen.
+
+De lijn staat op de werkplek **Journaal** en in het dossier van elk incident, achter de knop *"Wat veranderde er vlak hiervoor?"*. Getoetst in `test/tijdlijn.test.js` (acht beweringen, zes mutaties); één ervan legde een echte fout bloot die er al in zat: `Number(minuten || 30)` maakte van een gevraagd venster van **nul** minuten er stil dertig.
+
 ## De Regie van de zaak: dezelfde logica, maar alleen over de eigen zaak
 
 RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het niet zien -- hij heeft dezelfde soort laag nodig over **zijn eigen zaak**. Die staat in `server/kern/zaakcommand/` en hangt als werkgebied **Regie** in de zaak-app (`/apps/leverancier.html`) en als tegel **Regie** in de personeels-PDA (`/apps/personeel.html`).

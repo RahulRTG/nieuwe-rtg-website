@@ -69,7 +69,7 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
        stoppen. */
     for (const w of ['zoek', 'operator', 'zaken', 'herstel', 'beleid', 'simulatie', 'toezicht', 'werk',
       'journaal', 'werkplek', 'kwaliteit', 'graaf', 'herkomst', 'mdm', 'slo', 'sonde', 'alarm',
-      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad', 'gezondheid']) {
+      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad', 'gezondheid', 'incidenten']) {
       await page.click('#rail button[data-w="' + w + '"]');
       await page.waitForFunction(() => {
         /* De app-titel is de <h1> in de kop (die de iOS-laag tot navigatiebalk
@@ -121,6 +121,37 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
     }, bewijsId, { timeout: 8000 });
     assert.match(await page.textContent('main'), /bewijs: (onbekend|vermoed|gemeten|bewezen)/,
       'de bewijsgraad staat niet naast de stand');
+
+    /* HET INCIDENT EN DE TIJDLIJN, en daarvoor is een ECHTE storing nodig: een
+       scherm voor storingen dat nooit een storing heeft gezien, is niet
+       getoetst. De back-upmap weghalen is de goedkoopste echte: de
+       gezondheidskaart leest de schijf live, dus "bewaren" komt daarmee op
+       storing en de incidentwerkplek heeft iets om te openen. */
+    fs.rmSync(path.join(TMP, 'backups'), { recursive: true, force: true });
+    await page.click('#rail button[data-w="incidenten"]');
+    await page.waitForSelector('#inWeeg', { timeout: 10000 });
+    await page.click('#inWeeg');
+    await page.waitForSelector('[data-dos]', { timeout: 20000 });
+    assert.match(await page.textContent('main'), /RTG-\d{4}/, 'het incident heeft geen nummer');
+
+    await page.click('[data-dos]');
+    /* Het blok dat er per se bij hoort: wat er NIET gemeten is. Zonder deze
+       assertie kan het incidentscherm stil een schone nul gaan tonen. */
+    await page.waitForFunction(() => /Wat hierover niet gemeten is/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    const dosTekst = await page.textContent('main');
+    for (const zin of ['verloren', 'dubbel']) {
+      assert.ok(dosTekst.includes(zin), 'het dossier zwijgt over wat er niet gemeten is: ' + zin);
+    }
+
+    /* En de tijdlijn: de knop staat IN het dossier en wordt dus na het tekenen
+       gebonden. Precies daar was hij een keer stil dood -- bind() draaide voor
+       dat blok bestond. */
+    await page.click('[data-tl]');
+    await page.waitForFunction(() => /Vlak hiervoor veranderd/.test(document.querySelector('main').textContent),
+      null, { timeout: 10000 });
+    assert.match(await page.textContent('main'), /VOLGORDE en geen oorzaak/,
+      'de tijdlijn toont wijzigingen zonder de zin dat volgorde geen oorzaak is');
 
     // De operator: een vraag stellen en een gemeten antwoord terugkrijgen.
     await page.click('#rail button[data-w="operator"]');

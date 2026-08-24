@@ -1,6 +1,6 @@
 /* RTG Command, deel 1: de schil.
 
-   ÉÉN APP, TWAALF WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
+   ÉÉN APP, DERTIEN WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
    gedeelde kantoorgesprek, niet een eigen codeveld), de rail, het schakelen
    tussen werkplekken en de gedeelde hulpjes die de andere delen gebruiken.
 
@@ -74,6 +74,11 @@
       return g.tel.storing + g.tel.moetOpnieuw; } },
     { id: 'zoek', naam: 'Zoek alles', sec: 'Zien' },
     { id: 'operator', naam: 'Operator', sec: 'Doen' },
+    /* Incidenten staan VOOR de uitzonderingen: een uitzondering is één geval
+       dat een mens moet beslissen, een incident is een vermogen dat het niet
+       doet. Dat tweede gaat voor. */
+    { id: 'incidenten', naam: 'Incidenten', sec: 'Doen', teller: function (s) {
+      var g = s.start && s.start.incidenten; return g ? g.open + g.bezig + g.wachtOpVerslag : 0; } },
     { id: 'zaken', naam: 'Uitzonderingen', sec: 'Doen', teller: function (s) { return s.puls ? s.puls.zaken.open : 0; } },
     { id: 'herstel', naam: 'Herstel', sec: 'Doen', teller: function (s) { return s.puls ? s.puls.herstel.kandidaten : 0; } },
     { id: 'beleid', naam: 'Beleid', sec: 'Besturen', teller: function (s) { return s.puls ? s.puls.beleid.voorstellenOpen : 0; } },
@@ -620,6 +625,14 @@
    gebeuren, dan pas doen. Een runbook waarvan niemand ooit de droogloop heeft
    gelezen, is een knop waarvan niemand weet wat hij doet.
 
+   EN SINDS DE TRANSACTIE STAAT DE KETEN OP HET SCHERM. Een ronde loopt
+   voorcontrole -> momentopname -> uitvoeren -> verificatie -> vastleggen, en
+   bij een mislukte verificatie automatisch terug. De droogloop toont de
+   voorcontrole (ook als die zou weigeren -- daar is hij voor), en elke ronde in
+   de lijst draagt zijn verificatie. "Niet nagekeken" staat er als uitslag en
+   niet als leegte: een oude ronde van vóór de transactie hoort niet te lezen
+   als een ronde die is nagekeken.
+
    ELKE RONDE IS TERUG TE DRAAIEN ZOLANG NIEMAND ANDERS ERAAN ZAT. De kern zet
    alleen terug wat nog de waarde heeft die de ronde erin zette; wat sindsdien
    door iemand anders is gewijzigd, blijft staan en wordt geteld als
@@ -671,6 +684,7 @@
         '<p class="meta">' + (r.droog ? 'droogloop' : 'uitgevoerd') + ' door ' + esc(r.door) + ' · ' +
         r.geraakt + ' van ' + r.totaalKandidaten + ' · ' + C.niveau(r.niveau) + ' · risico ' + C.getal(r.score) +
         (r.reden ? ' · ' + esc(r.reden) : '') + '</p>' +
+        (r.droog ? '' : '<p class="meta">' + verificatie(r.verificatie) + '</p>') +
         (r.voorbeelden && r.voorbeelden.length ? '<div class="meta h-mt40">' +
           r.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') +
           (r.geraakt > r.voorbeelden.length ? '<br>… en nog ' + (r.geraakt - r.voorbeelden.length) : '') + '</div>' : '') +
@@ -682,15 +696,45 @@
     return u;
   }
 
+  /* De uitslag van de verificatie in één regel. `null` is hier een UITSLAG:
+     deze ronde is niet langs een verificatie gekomen, en dat is iets anders dan
+     een geslaagde. */
+  function verificatie(v) {
+    if (!v) return '<span class="cniveau geen">niet nagekeken</span> Deze ronde liep niet langs een verificatie.';
+    if (v.nietVanToepassing) return '<span class="cniveau geen">niets te verifiëren</span> ' + esc(v.waarom);
+    return '<span class="cniveau ' + (v.goed ? 'ok' : 'mis') + '">verificatie ' +
+      (v.goed ? 'geslaagd' : 'mislukt') + '</span> ' + esc(v.waarom);
+  }
+
+  /* De voorcontrole bij een droogloop. Hij toont ook wat er NIET gecontroleerd
+     kon worden -- dat is precies het soort voorwaarde dat je anders voor
+     geslaagd aanziet. */
+  function voorcontrole(v, cert) {
+    if (!v) return '';
+    var u = '<div class="h-mt50"><b>Voorcontrole:</b> ' +
+      (v.mag ? 'alle gecontroleerde voorwaarden houden.' : 'dit zou een echte ronde tegenhouden.') + '</div>';
+    u += '<ul class="h-keten">' + v.stappen.map(function (s) {
+      var merk = !s.gecontroleerd ? '<span class="cniveau geen">niet gecontroleerd</span>'
+        : '<span class="cniveau ' + (s.goed ? 'ok' : 'mis') + '">' + (s.goed ? 'houdt' : 'weigert') + '</span>';
+      return '<li>' + merk + ' <b>' + esc(s.naam) + '</b> · ' + esc(s.waarom) + '</li>';
+    }).join('') + '</ul>';
+    if (cert && cert.ongecertificeerd) u += '<div class="meta">' + esc(cert.waarom) + '</div>';
+    else if (cert) u += '<div class="meta">Certificaat v' + cert.versie + ' · ten hoogste ' +
+      (cert.maxObjecten == null ? 'geen grens' : cert.maxObjecten + ' objecten') + ' · weg terug: ' +
+      esc(cert.terugweg) + ' · nagekeken op: ' + esc((cert.verificaties || []).join(', ')) + '</div>';
+    return u;
+  }
+
   function bind() {
     document.querySelectorAll('[data-droog]').forEach(function (b) {
       b.onclick = function () {
         api('runbook/voer', { id: b.dataset.droog, droog: true }).then(function (r) {
           var vak = document.querySelector('#droog-' + b.dataset.droog);
-          vak.innerHTML = '<div style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;">' +
+          vak.innerHTML = '<div class="h-droog">' +
             '<b>Droogloop:</b> ' + r.run.geraakt + ' van ' + r.run.totaalKandidaten + ' geval(len) zouden veranderen.<br>' +
             r.run.voorbeelden.map(function (v) { return esc(v.titel) + ': ' + esc(v.van) + ' → ' + esc(v.naar); }).join('<br>') +
-            (r.overgeslagen ? '<br>' + r.overgeslagen + ' vallen buiten deze ronde.' : '') + '</div>';
+            (r.overgeslagen ? '<br>' + r.overgeslagen + ' vallen buiten deze ronde.' : '') +
+            voorcontrole(r.voorcontrole, r.certificaat) + '</div>';
         }).catch(function (e) { if (!e.stil) C.meld(e.message); });
       };
     });
@@ -699,7 +743,19 @@
         var reden = prompt('Waarom voert u dit herstel uit? (komt in het journaal)');
         if (!reden) return;
         api('runbook/voer', { id: b.dataset.voer, droog: false, reden: reden, menselijkAkkoord: true })
-          .then(function (r) { C.meld(r.run.geraakt + ' geval(len) hersteld.'); return C.ververs(); })
+          .then(function (r) {
+            /* De melding zegt de UITSLAG en niet alleen het aantal. Een ronde
+               die zichzelf heeft teruggedraaid en "12 hersteld" meldt, is de
+               ergste melding die dit scherm kan geven. */
+            C.meld(r.teruggedraaid
+              ? 'De verificatie mislukte; de ronde is teruggedraaid (' + r.teruggedraaid.teruggezet + ' teruggezet).'
+              : r.verificatie && r.verificatie.goed === false
+                ? 'De verificatie mislukte en terugdraaien lukte niet: ' + (r.terugMislukt || r.verificatie.waarom)
+                : r.verificatie && r.verificatie.nietVanToepassing
+                  ? 'Er veranderde niets, dus er viel niets te verifiëren.'
+                  : r.run.geraakt + ' geval(len) hersteld en nagekeken.');
+            return C.ververs();
+          })
           .then(laad).catch(function (e) { if (!e.stil) C.meld(e.message); });
       };
     });
@@ -1051,16 +1107,51 @@
     return u;
   }
 
-  /* ---- het journaal ---- */
+  /* ---- het journaal, met de configuratietijdlijn erboven ----
+     De tijdlijn staat hier omdat hij dezelfde vraag beantwoordt, een stap
+     breder: het journaal ziet wat er via Command ging, de tijdlijn voegt de
+     schakelkast en de noodstand toe. Wat geen van beide ziet, staat erbij. */
   C.TEKENAARS.journaal = function (el) {
     el.innerHTML = '<h2 class="ckop">Journaal</h2>' +
       '<p class="lead">Iedere menselijke én automatische handeling, met de oude en de nieuwe toestand, de actor, ' +
       'de reden en de gebruikte regel. Elke regel draagt de hash van de vorige; wie er middenin iets wijzigt, ' +
       'breekt de keten en dat is hieronder te zien.</p>' +
+      '<div class="crij"><button class="knop" id="jrTl">Wat is er het laatste uur veranderd?</button>' +
+      '<span class="meta">Journaal, schakelkast en noodstand op één lijn.</span></div>' +
+      '<div id="jrtl"></div>' +
       '<div id="jruit"><div class="leeg">Laden…</div></div>';
+    document.querySelector('#jrTl').onclick = function () {
+      var vak = document.querySelector('#jrtl');
+      if (vak.innerHTML) { vak.innerHTML = ''; return; }
+      vak.innerHTML = '<div class="leeg">Lezen…</div>';
+      api('tijdlijn/rondom', { moment: new Date().toISOString(), minuten: 60 })
+        .then(function (d) { vak.innerHTML = C.tijdlijnBlok(d); })
+        .catch(function (e) { if (!e.stil) vak.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+    };
     api('journaal', { n: 80 }).then(function (d) {
       document.querySelector('#jruit').innerHTML = jrTeken(d);
     }).catch(function (e) { if (!e.stil) document.querySelector('#jruit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+  };
+
+  /* Gedeeld met de incidentwerkplek, die dezelfde vraag stelt over het moment
+     waarop een storing begon. De zin over volgorde en oorzaak komt van de
+     SERVER en wordt hier niet nagetypt; anders lopen de twee uiteen. */
+  C.tijdlijnBlok = function (d) {
+    var u = '<div class="kaart"><h3>Vlak hiervoor veranderd</h3>' +
+      '<p class="meta">' + d.aantal + ' regel(s) in ' + d.venster.minuten + ' minuten voor ' +
+      esc(C.tijd(d.moment)) + ', waarvan ' + d.veranderdeIets + ' werkelijk iets veranderde.</p>';
+    u += '<ul class="h-keten">' + (d.regels.length ? d.regels.map(function (r) {
+      return '<li><span class="cniveau geen">' + esc(r.bron) + '</span> ' +
+        '<b>' + r.secondenVoor + ' s eerder</b> · ' + esc(r.wat) +
+        ' <span class="meta">' + esc(r.wie || '') +
+        (r.status ? ' · ' + esc(r.status) : '') +
+        (r.veranderdeIets === false ? ' · veranderde niets' : '') + '</span></li>';
+    }).join('') : '<li class="meta">Niets in dit venster.</li>') + '</ul>';
+    u += '<div class="czegt">' + esc(d.let) + '</div>';
+    u += '<p class="meta"><b>Buiten beeld:</b></p><ul class="h-keten">' + d.buitenBeeld.map(function (b) {
+      return '<li>' + esc(b.wat) + '<div class="czegt">' + esc(b.waarom) + '</div></li>';
+    }).join('') + '</ul></div>';
+    return u;
   };
 
   function jrTeken(d) {
@@ -2261,5 +2352,185 @@
   function tegel(l, v, k, u) {
     return '<div class="tegel"><div class="l">' + esc(l) + '</div><div class="v ' + (k || '') + '">' + v + '</div>' +
       (u ? '<div class="u">' + esc(u) + '</div>' : '') + '</div>';
+  }
+})();
+/* RTG Command, deel 18: de incidenten -- wat er stuk was, wat eraan is gedaan,
+   en wat we nog steeds niet weten.
+
+   DE MACHINE OPENT, EEN MENS SLUIT. "Nakijken" laat de gezondheidskaart een
+   ronde wegen; sluiten kan alleen met een verslag, en niet zolang het vermogen
+   nog op storing staat -- dan vraagt het scherm om een reden. Een gesloten
+   incident boven een lopende storing is een leugen in de historie, en de
+   makkelijkste om te vertellen: het scherm wordt er rustiger van.
+
+   EN "WAT NIET GEMETEN IS" STAAT ER GROOT BIJ, als eigen kop en niet in een
+   voetnoot. Iedereen wil lezen dat er niets verloren ging, en niemand kan dat
+   hier tellen. */
+(function () {
+  'use strict';
+  var C = window.RTGCommand, esc = C.esc, api = C.api;
+
+  var KLEUR = { 'open': 'mis', 'in behandeling': 'onbekend', 'hersteld': 'ok', 'gesloten': 'geen' };
+
+  C.TEKENAARS.incidenten = function (el) {
+    el.innerHTML = '<h2 class="ckop">Incidenten</h2>' +
+      '<p class="lead">Een storing met een nummer, een begin, een gemeten omvang en een conclusie. ' +
+      'De gezondheidskaart opent ze; sluiten doet u, met een verslag. Een incident dat zichzelf sluit, ' +
+      'laat een storing achter waar niemand iets van heeft geleerd.</p>' +
+      '<div id="inUit"><div class="leeg">Laden…</div></div>';
+    laad();
+  };
+
+  function laad() {
+    api('incidenten', { alles: true, max: 40 }).then(function (d) {
+      var u = '<div class="rooster">' +
+        tegel('Open', d.tel.open + d.tel.bezig, (d.tel.open + d.tel.bezig) ? 'acc' : '', 'lopend, met of zonder eigenaar') +
+        tegel('Wacht op verslag', d.tel.wachtOpVerslag, d.tel.wachtOpVerslag ? 'gold' : '', 'de storing is weg, de les nog niet getrokken') +
+        tegel('Zonder eigenaar', d.tel.zonderEigenaar, d.tel.zonderEigenaar ? 'gold' : '', 'niemand kijkt hiernaar') +
+        tegel('Gesloten', d.tel.gesloten, '', 'met een verslag afgerond') +
+        '</div>' +
+        '<div class="crij"><button class="knop vol" id="inWeeg">Nakijken op nieuwe storingen</button>' +
+        '<span class="meta">Leest de gezondheidskaart en opent wat er nog geen incident heeft.</span></div>';
+      if (!d.incidenten.length) u += '<div class="leeg h-mt60">Er is nog geen incident vastgelegd.</div>';
+      for (var i = 0; i < d.incidenten.length; i++) u += rij(d.incidenten[i]);
+      C.$('#inUit').innerHTML = u;
+      bind();
+    }).catch(function (e) {
+      if (!e.stil) C.$('#inUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+    });
+  }
+
+  function rij(i) {
+    var u = '<div class="kaart"><h3>' + esc(i.id) + ' · ' + esc(i.naam) + ' ' +
+      '<span class="cniveau ' + (KLEUR[i.status] || 'geen') + '">' + esc(i.status) + '</span></h3>' +
+      '<p>' + esc(i.wat) + '</p>' +
+      '<p class="meta">Begonnen ' + esc(C.tijd(i.begonnen)) +
+      (i.hersteldAt ? ' · hersteld ' + esc(C.tijd(i.hersteldAt)) : '') +
+      (i.geslotenAt ? ' · gesloten ' + esc(C.tijd(i.geslotenAt)) : '') +
+      ' · geopend door ' + esc(i.bron === 'hand' ? 'een mens' : 'de gezondheidskaart') +
+      ' · ' + (i.eigenaar ? 'eigenaar ' + esc(i.eigenaar) : 'geen eigenaar') +
+      ' · ' + i.maatregelen + ' maatregel(en) · ' + i.aanleidingen + ' aanleiding(en)</p>' +
+      '<div class="crij"><button class="knop" data-dos="' + esc(i.id) + '">Dossier</button>';
+    if (i.status !== 'gesloten') {
+      if (!i.eigenaar) u += '<button class="knop" data-neem="' + esc(i.id) + '">Overnemen</button>';
+      u += '<button class="knop" data-maat="' + esc(i.id) + '">Maatregel noteren</button>' +
+        '<button class="knop" data-sluit="' + esc(i.id) + '">Sluiten met verslag</button>';
+    }
+    return u + '</div><div id="dos-' + esc(i.id) + '"></div></div>';
+  }
+
+  function dossier(d) {
+    var aan = d.bijAanvang.aanleidingen;
+    var u = '<div class="h-droog"><b>Bij het ontstaan</b><div class="meta">' +
+      esc(d.bijAanvang.impact.let ||
+        d.bijAanvang.impact.gemeten.map(function (g) { return g.bron + ': ' + g.zin; }).join(' · ')) + '</div>';
+    u += '<div class="h-mt50"><b>Aanleidingen</b> <span class="meta">' + esc(aan.zekerheid) + '</span></div>';
+    u += '<ul class="h-keten">' + (aan.lijst.length ? aan.lijst.map(function (a) {
+      return '<li><span class="cniveau geen">' + esc(a.soort) + '</span> <b>' + esc(a.bron) + '</b> · ' +
+        esc(a.wat) + (a.zegtNiet ? '<div class="czegt">' + esc(a.zegtNiet) + '</div>' : '') + '</li>';
+    }).join('') : '<li class="meta">Geen.</li>') + '</ul>' +
+      '<div class="czegt">' + esc(aan.let) + '</div>';
+
+    u += '<div class="h-mt50"><b>Wat hierover niet gemeten is</b></div><ul class="h-keten">' +
+      d.bijAanvang.impact.nietGemeten.map(function (n) {
+        return '<li><b>' + esc(n.wat) + '</b><div class="czegt">' + esc(n.waarom) + '</div></li>';
+      }).join('') + '</ul>';
+
+    if (d.maatregelen.length) u += '<div class="h-mt50"><b>Maatregelen</b></div>' + d.maatregelen.map(function (m) {
+      return '<div class="lijn">' + esc(C.tijd(m.at)) + ' · ' + esc(m.door) + ' · ' + esc(m.wat) +
+        (m.verwijzing ? ' <span class="meta">(' + esc(m.soort) + ' ' + esc(m.verwijzing) + ')</span>' : '') + '</div>';
+    }).join('');
+    if (d.verslag) {
+      u += '<div class="h-mt50"><b>Verslag</b> <span class="meta">door ' + esc(d.verslag.door) + ' · ' +
+        d.verslag.duurMinuten + ' min open' +
+        (d.verslag.hersteldNaMinuten != null ? ', hersteld na ' + d.verslag.hersteldNaMinuten + ' min' : '') +
+        '</span></div><p>' + esc(d.verslag.tekst) + '</p>' +
+        (d.verslag.geslotenBovenEenStoring
+          ? '<div class="czegt">Gesloten terwijl het vermogen nog op storing stond. Reden: ' +
+            esc(d.verslag.reden || '(geen opgegeven)') + '</div>' : '');
+    }
+    u += '<div class="h-mt50"><b>Nu</b> <span class="meta">' +
+      esc(d.nu.mens || d.nu.nietTeLezen || '') + '</span></div>';
+    /* De vraag die iedereen bij een storing als eerste stelt. */
+    u += '<div class="crij h-mt50"><button class="knop" data-tl="' + esc(d.id) + '" ' +
+      'data-moment="' + esc(d.begonnen) + '">Wat veranderde er vlak hiervoor?</button></div>' +
+      '<div id="tl-' + esc(d.id) + '"></div>';
+    return u + '</div>';
+  }
+
+  function tegel(l, v, k, u) {
+    return '<div class="tegel"><div class="l">' + esc(l) + '</div><div class="v ' + (k || '') + '">' + v +
+      '</div>' + (u ? '<div class="u">' + esc(u) + '</div>' : '') + '</div>';
+  }
+
+  function tijdlijnKnop(waarin) {
+    waarin.querySelectorAll('[data-tl]').forEach(function (b) {
+      b.onclick = function () {
+        var vak = waarin.querySelector('#tl-' + b.dataset.tl);
+        if (vak.innerHTML) { vak.innerHTML = ''; return; }
+        vak.innerHTML = '<div class="leeg">Lezen…</div>';
+        api('tijdlijn/rondom', { moment: b.dataset.moment, minuten: 60 })
+          .then(function (d) { vak.innerHTML = C.tijdlijnBlok(d); })
+          .catch(function (e) { if (!e.stil) vak.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+      };
+    });
+  }
+
+  function bind() {
+    C.$('#inWeeg').onclick = function () {
+      this.disabled = true;
+      api('incident/weeg').then(function (r) {
+        C.meld(r.nieuw.length + ' nieuw, ' + r.hersteld.length + ' hersteld.');
+        return C.ververs();
+      }).then(laad).catch(function (e) { if (!e.stil) C.meld(e.message); });
+    };
+    C.$('#inUit').querySelectorAll('[data-dos]').forEach(function (b) {
+      b.onclick = function () {
+        var vak = C.$('#dos-' + b.dataset.dos);
+        if (vak.innerHTML) { vak.innerHTML = ''; return; }
+        api('incident', { id: b.dataset.dos }).then(function (d) {
+          vak.innerHTML = dossier(d);
+          /* De knoppen IN het dossier krijgen hier hun handler en niet in
+             bind(): dat draait vóór dit blok bestaat, dus daar is er niets te
+             vinden. Een knop zonder handler doet niets en zegt niets -- dat is
+             hoe deze knop de eerste keer stil dood was. */
+          tijdlijnKnop(vak);
+        }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+      };
+    });
+    C.$('#inUit').querySelectorAll('[data-neem]').forEach(function (b) {
+      b.onclick = function () {
+        api('incident/neem', { id: b.dataset.neem }).then(function () { return C.ververs(); })
+          .then(laad).catch(function (e) { if (!e.stil) C.meld(e.message); });
+      };
+    });
+    C.$('#inUit').querySelectorAll('[data-maat]').forEach(function (b) {
+      b.onclick = function () {
+        var wat = prompt('Wat is er gedaan? (verwijs naar een ronde of een controle)');
+        if (!wat) return;
+        api('incident/maatregel', { id: b.dataset.maat, wat: wat, soort: 'notitie' })
+          .then(laad).catch(function (e) { if (!e.stil) C.meld(e.message); });
+      };
+    });
+    C.$('#inUit').querySelectorAll('[data-sluit]').forEach(function (b) {
+      b.onclick = function () {
+        var verslag = prompt('Verslag: wat was er, wat is er gedaan, wat was de uitkomst?');
+        if (!verslag) return;
+        api('incident/sluit', { id: b.dataset.sluit, verslag: verslag }).then(function () {
+          C.meld('Gesloten.'); return C.ververs();
+        }).then(laad).catch(function (e) {
+          if (e.stil) return;
+          /* De weigering is geen fout maar een vraag: het vermogen staat nog op
+             storing. Sluiten kan dan wel, maar met een reden -- en die reden
+             komt in het verslag te staan. */
+          if (e.status !== 409) { C.meld(e.message); return; }
+          var reden = prompt(e.message + '\n\nWaarom sluit u hem toch?');
+          if (!reden) return;
+          api('incident/sluit', { id: b.dataset.sluit, verslag: verslag, toch: true, reden: reden })
+            .then(function () { C.meld('Gesloten, met de reden erbij.'); return C.ververs(); })
+            .then(laad).catch(function (e2) { if (!e2.stil) C.meld(e2.message); });
+        });
+      };
+    });
   }
 })();

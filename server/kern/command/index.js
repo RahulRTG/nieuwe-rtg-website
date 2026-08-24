@@ -70,12 +70,19 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register, kern });
   const { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart } = lagen;
 
-  /* DE MEETKANT VAN NIVEAU 5, en sinds de gezondheidskaart erbij kwam een eigen
-     bestand: de sonde, de servicedoelen, het alarm en de kaart die ze naast
-     elkaar legt. De volgorde waarin ze elkaar nodig hebben staat daar; wat ze
-     delen is dat geen van vieren iets twee keer meet. */
-  const { sonde, slo, alarm, gezondheid } = require('./meetlagen').maakMeetlagen({
+  /* DE MEETKANT VAN NIVEAU 5, sinds de gezondheidskaart een eigen bestand: de
+     sonde, de servicedoelen, het alarm, de kaart die ze naast elkaar legt en
+     het incident dat onthoudt. De volgorde waarin ze elkaar nodig hebben staat
+     daar; wat ze delen is dat geen van vijven iets twee keer meet. */
+  const { sonde, slo, alarm, gezondheid, incident } = require('./meetlagen').maakMeetlagen({
     db, save, journaal, kwaliteit, canary, sseToOffice });
+
+  /* HERSTEL ALS TRANSACTIE: het enige pad waarlangs de routes een recept
+     draaien. Na de kaart: zijn voorcontrole leest die. */
+  const transactie = require('./transactie').maakTransactie({ db, runbooks, register, journaal, gezondheid });
+
+  /* DE CONFIGURATIETIJDLIJN: drie bestaande bronnen op één lijn, niets eigens. */
+  const tijdlijn = require('./tijdlijn').maakTijdlijn({ db, journaal });
 
   const zoeklaag = require('./zoek');
   const objectlaag = require('./object');
@@ -128,10 +135,12 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
          precies het geval waarvoor de terugroldrempel bestaat. */
       canary: canary.stand().tel,
       /* De alarmen op het beginscherm, want een alarm dat je moet opzoeken is
-         geen alarm. En de gezondheid ernaast: de puls hierboven zegt hoe de
-         GEGEVENS ervoor staan, niet of de diensten het doen. */
+         geen alarm. En de gezondheid ernaast: de puls zegt hoe de GEGEVENS
+         ervoor staan, niet of de diensten het doen. */
       alarm: alarm.stand().tel,
-      gezondheid: gezondheidKort()
+      gezondheid: gezondheidKort(),
+      /* Een incident dat je moet opzoeken, is er een waar niemand aan werkt. */
+      incidenten: incident.tel()
     };
   }
 
@@ -150,7 +159,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm, gezondheid,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm, gezondheid, transactie, incident, tijdlijn,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

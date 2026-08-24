@@ -8,7 +8,7 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 67 | elk bewijsstuk bestaat |
+| gedekt | 72 | elk bewijsstuk bestaat |
 | open | 0 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
@@ -70,6 +70,11 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | RTG Command als één app | gedekt | `public/apps/command.html`<br>`public/apps/command` |
 | Gezondheid per vermogen, met de bewijsgraad ernaast | gedekt | `server/kern/command/gezondheid.js`<br>`server/kern/command/vermogens.js`<br>`/api/command/gezondheid`<br>`public/apps/command/command-17.js` |
 | Controleer: een ronde die echt iets uitvoert, of eerlijk zegt dat er niets uit te voeren viel | gedekt | `server/kern/command/gezondheid-proef.js`<br>`/api/command/gezondheid/controleer` |
+| Herstel als transactie: voorcontrole, verificatie en terug bij mislukking | gedekt | `server/kern/command/transactie.js`<br>`server/kern/command/transactie-poorten.js`<br>`/api/command/runbook/voer` |
+| Elk herstelrecept draagt een certificaat: bovengrens, weg terug, verificatie, versie | gedekt | `server/kern/command/runbookcatalogus.js` |
+| Het incident als object: nummer, gemeten omvang, maatregelen, verslag | gedekt | `server/kern/command/incident.js`<br>`server/kern/command/incident-verslag.js`<br>`/api/command/incidenten`<br>`public/apps/command/command-18.js` |
+| Wat van een storing niet te meten is, staat er met de reden bij | gedekt | `server/kern/command/incident-impact.js` |
+| Wat is er vlak daarvoor veranderd: drie bronnen op een lijn, zonder oorzaakclaim | gedekt | `server/kern/command/tijdlijn.js`<br>`/api/command/tijdlijn` |
 | Knowledge graph over personen, bedrijven, contracten en gebeurtenissen<br><sub>De randen worden gemeten uit de gegevens, niet uit een schema; de wandeling zegt het als hij tegen zijn grens loopt.</sub> | gedekt | `server/kern/command/graaf.js`<br>`/api/command/graaf`<br>`test/kwaliteit.test.js` |
 | Data lineage: waar komt een gegeven vandaan en wie hangt ervan af<br><sub>Elk antwoord draagt zijn aard: gemeten, aangegeven of afgeleid. De blinde vlek staat in de uitslag -- het journaal ziet alleen wat via Command ging, dus 'geen schrijver' betekent hier niet 'hier schrijft niemand in'.</sub> | gedekt | `server/kern/command/herkomst.js`<br>`/api/command/herkomst`<br>`/api/supplier/command/herkomst`<br>`public/apps/command/command-11.js` |
 | Master data management: één authoritative record per klant/bedrijf<br><sub>kern/eenaccount doet dit voor het lid; deze laag doet bedrijven en locaties. Er wordt nooit vanzelf samengevoegd -- twee bedrijven met dezelfde naam in dezelfde stad kunnen twee bedrijven zijn, en dat verschil zit niet in de gegevens. Samenvoegen wist niets: de verliezers houden een verwijzing, dus terugdraaien is dezelfde handeling omgekeerd.</sub> | gedekt | `server/kern/command/mdm.js`<br>`server/kern/command/mdmsamen.js`<br>`/api/command/mdm` |

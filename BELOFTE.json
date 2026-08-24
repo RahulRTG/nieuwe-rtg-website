@@ -452,6 +452,52 @@
       ]
     },
     {
+      "id": "cmd-transactie",
+      "wat": "Herstel als transactie: voorcontrole, verificatie en terug bij mislukking",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/transactie.js",
+        "server/kern/command/transactie-poorten.js",
+        "/api/command/runbook/voer"
+      ]
+    },
+    {
+      "id": "cmd-certificaat",
+      "wat": "Elk herstelrecept draagt een certificaat: bovengrens, weg terug, verificatie, versie",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/runbookcatalogus.js"
+      ]
+    },
+    {
+      "id": "cmd-incident",
+      "wat": "Het incident als object: nummer, gemeten omvang, maatregelen, verslag",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/incident.js",
+        "server/kern/command/incident-verslag.js",
+        "/api/command/incidenten",
+        "public/apps/command/command-18.js"
+      ]
+    },
+    {
+      "id": "cmd-nietgemeten",
+      "wat": "Wat van een storing niet te meten is, staat er met de reden bij",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/incident-impact.js"
+      ]
+    },
+    {
+      "id": "cmd-tijdlijn",
+      "wat": "Wat is er vlak daarvoor veranderd: drie bronnen op een lijn, zonder oorzaakclaim",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/tijdlijn.js",
+        "/api/command/tijdlijn"
+      ]
+    },
+    {
       "id": "zaak-register",
       "wat": "Objectregister van één zaak, zonder de buurman",
       "groep": "De zaak: dezelfde regie, eigen scope",

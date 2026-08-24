@@ -117,6 +117,12 @@
   .cgraad.gemeten{color:var(--muted);}
   .czegt{font-size:.78rem;color:var(--soft);line-height:1.55;border-left:2px solid var(--line);
     padding-left:.7rem;margin:.35rem 0 .6rem;}
+  /* De hersteltransactie (command-05.js): de droogloop met zijn voorcontrole.
+     Als klasse en niet als style="" -- elk style-attribuut in public/ houdt
+     style-src-attr open in de CSP, en NORM.json telt ze. */
+  .h-droog{margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .h-keten{list-style:none;padding:0;margin:.4rem 0 .2rem;}
+  .h-keten li{padding:.25rem 0;font-size:.8rem;color:var(--muted);line-height:1.5;}
   /* Vier veldbreedtes en een marge, in plaats van een style="" per invoerveld.
      Dat is geen smaak: elk style-attribuut in public/ houdt style-src-attr open
      in de CSP, en NORM.json telt ze (inlineStijlAttributen). Vier klassen zijn

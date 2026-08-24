@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1054 bestanden en 7042 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1056 bestanden en 7062 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1054 |
-| losse beweringen (`test(...)`) | 7042 |
+| toetsbestanden | 1056 |
+| losse beweringen (`test(...)`) | 7062 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 890 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 892 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-925 bestanden, 6819 beweringen.
+927 bestanden, 6839 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -170,9 +170,9 @@ toets omvalt.
 | `comm-werk.test.js` | 8 | gezakt op `===->!==#0` | De verhuizing van de sollicitatiechat naar de communicatiekern (server/kern/comm/werk.js). DE VIERDE EN LAATSTE GROTE VOORRAAD. |
 | `command-router.test.js` | 2 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `command-routes-bestuur.test.js` | 10 | gezakt op `liegpoort /api/` | DE BESTUURSROUTES VAN RTG COMMAND -- beleid, simulatie, journaal, toezicht. WAAROM DIT BESTAND ER IS. |
-| `command-routes-herstel.test.js` | 7 | gezakt op `liegpoort /api/` | DE HERSTELROUTES VAN RTG COMMAND -- runbooks, zaken, de operator, de zandbak en de eerste stap van een overname. De tegenhanger van test/command-routes-bestuur.test.js: daar staat wat er BESLOTEN wordt, hier wat er... |
+| `command-routes-herstel.test.js` | 8 | gezakt op `liegpoort /api/` | DE HERSTELROUTES VAN RTG COMMAND -- runbooks, zaken, de operator, de zandbak en de eerste stap van een overname. De tegenhanger van test/command-routes-bestuur.test.js: daar staat wat er BESLOTEN wordt, hier wat er... |
 | `command.test.js` | 19 | gezakt op `===->!==#0` | RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor bewijst hier zijn zes harde beloftes. Zoeken vindt over domeinen heen; het objectdossier meet zijn afhankelijkheden in plaats van ze op te... |
-| `commandlagen.test.js` | 10 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
+| `commandlagen.test.js` | 11 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
 | `concern-voorstel.test.js` | 5 | gezakt op `===->!==#0` | STAP 9: WAT UIT EEN DOCUMENT KOMT IS EEN VOORSTEL, NOOIT EEN FEIT. WAAROM DIT BESTAAT Document Intelligence is het deel dat het meest indrukwekkend oogt en het makkelijkst fout gaat: een patroonherkenner die zijn... |
 | `concern.test.js` | 14 | gezakt op `getal+1#2` | RTG CONCERN: HET BEDRIJF BOVEN DE ZAAK. WAAROM DIT BESTAAT Een bedrijf was hier een rij in `suppliers`: een code, een naam en een genre. |
 | `consent-dekking.test.js` | 3 | overleefd | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
@@ -297,6 +297,7 @@ toets omvalt.
 | `herstel2fa.test.js` | 3 | gezakt op `liegpoort /api/` | Integratietests voor wachtwoordherstel met tweestapsverificatie (link per e-mail + code op de telefoon) en wachtwoord wijzigen vanuit de eigen backoffice. Zonder SMTP geeft de server dev-velden terug zodat de flow... |
 | `herstelgat.test.js` | 2 | gezakt op `liegpoort /api/` | Het gat in de herstelroute: dev-velden aan een vreemde. WAT ER MIS WAS. |
 | `herstelproef.test.js` | 3 | gezakt op `liegpoort /api/` | HERSTELPROEF -- werkt de backup echt, of nemen we dat aan? Een backup die je nooit hebt teruggezet is geen backup maar een aanname. |
+| `hersteltransactie.test.js` | 9 | gezakt op `!==->===#0` | HERSTEL ALS TRANSACTIE: negen beweringen over de twee stappen die een herstelknop normaal gesproken NIET heeft. 1. |
 | `herstelzondertelefoon.test.js` | 2 | gezakt op `liegpoort /api/` | HERSTELLEN MOET KUNNEN, OOK ZONDER TELEFOONNUMMER. WAT ER MISGING. |
 | `homekit.test.js` | 5 | gezakt op `liegpoort /api/` | De RTG Home Kit: alle elektronica op een plek, scenes met AI-hulp, en de vaste veiligheidsregel dat sloten nooit via een scene of de AI gaan. |
 | `horeca-bezorg-club.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 3: de eigen bezorgdienst en de club. Wat hier bewezen wordt: - een adres buiten de zone krijgt een REDEN, geen kale weigering; - de capaciteitsrem telt in keukenminuten en noemt het eerstvolgende... |
@@ -321,6 +322,7 @@ toets omvalt.
 | `idemproef.test.js` | 12 | gezakt op `===->!==#0` | HET OORDEEL VAN DE IDEMPOTENTIEPROEF, los van een server. De ronde zelf (scripts/idemproef-route.js) heeft een echte server nodig en muteert onderweg; het oordeel is puur en hoort hier. |
 | `identiteit-opvraag.test.js` | 6 | gezakt op `===->!==#0` | De identiteit van een medewerker: ja/nee voor de werkgever, en opvragen in twee zwaartes. DE AFSPRAAK die hier wordt bewaakt: een werkgever ziet standaard alleen of de identiteit is vastgesteld -- geen... |
 | `imap.test.js` | 10 | gezakt op `!==->===` | IMAP: een externe mailclient die meeleest met een RTG-postvak. DEZE TOETS PRAAT HET PROTOCOL, ZONDER SOCKET. |
+| `incident.test.js` | 10 | gezakt op `===->!==#0` | HET INCIDENT ALS OBJECT: tien beweringen, en ze gaan allemaal over de manier waarop een incidentenlijst normaal gesproken onwaar wordt. 1. |
 | `incidentcontrole-route.test.js` | 3 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `incidentcontrole.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `inkoopketen.test.js` | 5 | gezakt op `liegpoort /api/` | DE KETEN VAN BESTELLEN NAAR KEUKEN -- 5 endpoints uit de supplier-groep. groothandel/product, groothandel/voorraad, inkoop/annuleer, inkoop/ai-bevestig en mep/daily/done stonden als nooit aangeroepen in de... |
@@ -832,7 +834,7 @@ toets omvalt.
 | `thuis.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Thuis: thuisverhuur van lid aan lid -- ons antwoord op Airbnb, met de premium functies gratis. Getest: huis live zetten (validatie), zoeken met filters, de transparante prijsopbouw met 0% servicekosten en... |
 | `thuiszakelijk.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Thuis, de commerciele tak + de plek in de Mall. Getest: een zaak zet haar huis commercieel (een prive-lid mag dat niet), de logies-btw komt uit de landtabel en staat apart in de prijsopbouw, langverblijf rekent... |
 | `tiener.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor de tiener-tools: de toetsplanner (leerplan gespreid over de dagen, stappen afvinken, opruimen), het zakgeldpotje (boeken, saldo-bewaking, spaardoelen met inleg en teruggave), de gast-poort en de... |
-| `tijdlijn.test.js` | 8 | gezakt op `liegpoort /api/` | De tijdlijn (kern/tijdlijn.js). Hij bezit niets: elke regel komt uit een laag die het lid al had. |
+| `tijdlijn.test.js` | 7 | gezakt op `liegpoort /api/` | DE CONFIGURATIETIJDLIJN: acht beweringen, en ze gaan allemaal over de manier waarop een "wat is er veranderd"-scherm normaal gesproken onwaar wordt. 1. |
 | `tls-acme-boot.test.js` | 2 | gezakt op `===->!==#0` | Bewijst de boot-lijm (server/lib/tls-acme.js): de ACME-accountsleutel en het opgehaalde certificaat persisteren, en -- het echte werk -- dat startAcme een vers uitgegeven certificaat LIVE in een draaiende native... |
 | `tls-acme.test.js` | 3 | gezakt op `===->!==#0` | Bewijst de JOSE/JWS-laag en de VOLLEDIGE ACME-toestandsmachine offline: een nep-CA (een injecteerbare transport) speelt Let's Encrypt na en VERIFIEERT elke JWS-handtekening met de accountsleutel, en "valideert" de... |
 | `tls-boot.test.js` | 3 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

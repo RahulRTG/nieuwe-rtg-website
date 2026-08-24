@@ -1,6 +1,6 @@
 /* RTG Command, deel 1: de schil.
 
-   ÉÉN APP, TWAALF WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
+   ÉÉN APP, DERTIEN WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
    gedeelde kantoorgesprek, niet een eigen codeveld), de rail, het schakelen
    tussen werkplekken en de gedeelde hulpjes die de andere delen gebruiken.
 
@@ -74,6 +74,11 @@
       return g.tel.storing + g.tel.moetOpnieuw; } },
     { id: 'zoek', naam: 'Zoek alles', sec: 'Zien' },
     { id: 'operator', naam: 'Operator', sec: 'Doen' },
+    /* Incidenten staan VOOR de uitzonderingen: een uitzondering is één geval
+       dat een mens moet beslissen, een incident is een vermogen dat het niet
+       doet. Dat tweede gaat voor. */
+    { id: 'incidenten', naam: 'Incidenten', sec: 'Doen', teller: function (s) {
+      var g = s.start && s.start.incidenten; return g ? g.open + g.bezig + g.wachtOpVerslag : 0; } },
     { id: 'zaken', naam: 'Uitzonderingen', sec: 'Doen', teller: function (s) { return s.puls ? s.puls.zaken.open : 0; } },
     { id: 'herstel', naam: 'Herstel', sec: 'Doen', teller: function (s) { return s.puls ? s.puls.herstel.kandidaten : 0; } },
     { id: 'beleid', naam: 'Beleid', sec: 'Besturen', teller: function (s) { return s.puls ? s.puls.beleid.voorstellenOpen : 0; } },

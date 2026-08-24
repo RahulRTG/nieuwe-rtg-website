@@ -48,8 +48,12 @@ security, support, audit, recovery) met een eigen scherm en een eigen waarheid.
 | **bewijzen** | achteraf hard maken wat er gebeurde | "onze engineer heeft even gekeken" |
 
 Dit huis was sterk op **waarnemen**, **besturen** en **bewijzen** en zwak op
-**begrijpen**. De gezondheidskaart (paragraaf 5) is die derde stap. De vierde,
-herstellen als transactie, staat in paragraaf 7 en is nog niet gebouwd.
+**begrijpen** en **herstellen**. Die twee zijn nu gesloten: de gezondheidskaart
+(par. 5) zegt wat er aan de hand is en hoe hard dat bewijs is, de
+hersteltransactie (par. 5b) maakt van repareren een keten die zichzelf nakijkt,
+het incident (par. 5c) onthoudt het, en de configuratietijdlijn (par. 5d)
+beantwoordt de vraag die er meteen achteraan komt. Wat er dan nog ontbreekt gaat
+niet meer over dit platform maar over wie erbij mag: par. 7.4 en 7.5.
 
 ---
 
@@ -143,9 +147,9 @@ tweede besturingsvlak op.**
 | maintenance per functie, per doelgroep, per land | **staat** | `server/functies/` — 191 schakelaars |
 | meter die dit hele bouwwerk kan tegenspreken | **staat** | `kern/command/werkbesparing.js` — handminuten per duizend handelingen |
 | **gezondheid per vermogen, met bewijsgraad** | **nieuw, zie par. 5** | `kern/command/gezondheid*.js` |
-| incident als eersteklas object | **ontbreekt** | par. 7.1 |
-| herstel als transactie met verificatie | **ontbreekt** | par. 7.2 |
-| configuratietijdlijn | **deels** | het journaal draagt het, er is geen tijdlijnbeeld — par. 7.3 |
+| **incident als eersteklas object** | **nieuw, zie par. 5c** | `kern/command/incident*.js` |
+| **herstel als transactie met verificatie** | **nieuw, zie par. 5b** | `kern/command/transactie*.js` |
+| **configuratietijdlijn** | **nieuw, zie par. 5d** | `kern/command/tijdlijn.js` |
 | RTG Bijstand (toegang van support tot een klant) | **ontbreekt** | par. 7.4 |
 | vlootbeeld over alle klanten, één hoofdincident | **ontbreekt** | par. 7.5 |
 | veilige noodstand (beschermen ≠ platleggen) | **deels** | `kern/incidentcontrole.js` en `server/nood.js` — par. 7.6 |
@@ -234,6 +238,170 @@ waarvan zeven RAAK en één AFGESLAGEN mét wat daaraan is gedaan), de bedrading
 
 ---
 
+## 5b. Herstel als transactie — gebouwd
+
+`kern/command/transactie.js` met `transactie-poorten.js`. Elke herstelronde in
+RTG Command loopt sindsdien door deze keten, en `POST /api/command/runbook/voer`
+is er het enige pad naartoe.
+
+**De helft stond er al.** `runbooks.js` schrijft alleen via één vorm — één veld
+op één object van een bekende soort — en draagt de oude waarde per object mee.
+Terugdraaien is daar geen extra code maar hetzelfde mechanisme omgekeerd, en dat
+is meteen de momentopname: een tweede kopie ernaast zou op een dag iets anders
+zeggen dan de eerste. Wat ontbrak zijn de twee stappen eromheen, en dat zijn
+precies de twee die een herstelknop normaal niet heeft.
+
+**De voorcontrole.** Vier genoemde voorwaarden, elk met hun eigen uitslag en
+reden: het veld staat niet op de bevroren lijst; de weg terug bestaat werkelijk
+als het certificaat er een belooft; het aantal gevallen blijft binnen de
+bovengrens van het certificaat; en het fundament (bereikbaar, de gegevens, de
+sporen) staat niet op storing — gegevens rechtzetten terwijl dat wankelt, is hoe
+je er een tweede storing bij maakt. Een echte ronde wordt door een weigering
+tegengehouden; **een droogloop niet**, want droog draaien is juist hoe je
+erachter komt dat de voorcontrole niet houdt.
+
+**Het certificaat.** Per recept: hoe groot het mag worden, hoe de weg terug
+loopt, waaraan achteraf wordt nagekeken, en een versie. `maxObjecten` is iets
+anders dan de rondegrens uit het beleid: die zegt hoeveel er per keer mag, dit
+zegt op hoeveel gevallen dit recept ooit is beproefd. Een recept dat op vijftig
+is bekeken en er ineens vierduizend raakt, is geen herstel maar een migratie.
+
+Een recept **zonder** certificaat draait gewoon door, maar de transactie meldt
+dat erbij: geen bovengrens afgesproken, en de weg terug is alleen wat
+`terugDraaibaar` zegt. Een standaardcertificaat verzinnen zou een
+ongecertificeerd recept laten lezen als een gecertificeerd recept.
+
+**De verificatie, en waarom zij positief is.** Er wordt niet gekeken of er iets
+misging maar of het bedoelde werkelijk is gebeurd: staat het veld op de bedoelde
+waarde, en is de aanleiding weg. Raakte de ronde nul objecten, dan is de uitslag
+`niet van toepassing` en uitdrukkelijk **niet** "geslaagd" — een herstelknop die
+stil niets doet en groen meldt, is erger dan een knop die niets doet.
+
+**Terug bij een mislukte verificatie**, automatisch, en alleen als het
+certificaat die weg belooft. De uitslag gaat terug op de ronde zelf én in het
+journaal; een verificatie die alleen in het antwoord van dat ene verzoek
+bestaat, is morgen weg. In de rondelijst staat `niet nagekeken` daarom als
+uitslag en niet als leegte: een oude ronde van vóór de transactie hoort niet te
+lezen als een ronde die is nagekeken.
+
+**Wat er nog niet doorheen loopt:** de zaak-kant. `kern/zaakcommand/` draait
+dezelfde recepten op zijn eigen register en roept `runbooks.js` rechtstreeks
+aan. De module is erop voorbereid — register, db en gezondheid gaan er als
+parameter in — maar de bedrading ligt er niet, en dat staat hier en niet als
+stille aanname dat het overal geldt.
+
+Getoetst in `test/hersteltransactie.test.js` (negen beweringen, zes mutaties,
+alle zes RAAK) op de echte receptenmotor met een rij die zijn schrijfactie
+weigert — zo ziet de transactie precies wat zij in het echt zou zien als een
+wijziging niet plakt. De bedrading in `test/command-routes-herstel.test.js`.
+
+---
+
+## 5c. Het incident als object — gebouwd
+
+`kern/command/incident.js` met `incident-impact.js` en `incident-verslag.js`.
+Werkplek **Incidenten** onder *Doen*.
+
+**Zonder dit is een storing een alarm plus een journaalregel.** Die twee
+verdwijnen allebei in een lijst: het alarm zwijgt zodra de drempel terugloopt,
+en de journaalregel staat tussen tienduizend andere. Wat er dan ontbreekt is
+precies wat een mens nodig heeft: waar begon het, wat is eraan gedaan, wat was
+de uitkomst, en wat weten we nog steeds niet.
+
+**Dit is geen tweede uitzonderingenrij.** `zaken.js` gaat over één geval dat de
+machine niet zelf kon afhandelen, met een eigenaar, een termijn en een besluit.
+Een incident gaat over een *vermogen* dat het niet doet. Andere gegevens, andere
+werkstroom, andere levensduur — dat is de toetsvraag uit `PLATFORM.md`
+(zelfstandige capability of tweede ingang naar dezelfde), en hier valt hij op de
+eerste.
+
+**De machine opent, een mens sluit.** `weeg()` leest de gezondheidskaart en
+opent een incident voor elk vermogen dat op storing komt: een storing die
+niemand vastlegt, is een storing waar niemand van leert. Sluiten doet hij niet
+— dan zou er een incident in de historie staan zonder conclusie. Herstelt de
+bron zich, dan wordt het incident `hersteld` gemarkeerd en wacht het op een
+verslag. Die asymmetrie is met opzet en `tel()` telt hem apart: *wacht op
+verslag* is werkvoorraad van een eigen soort — de storing is weg en de les is
+nooit getrokken.
+
+**En sluiten kan niet terwijl het nog stuk is.** Een gesloten incident boven een
+lopende storing is een leugen in de historie, en het is de makkelijkste om te
+vertellen: het scherm wordt er rustiger van. Het kan wel met `toch` en een
+reden, en dan staat dat in het verslag als `geslotenBovenEenStoring` — een
+besluit in plaats van een vergissing. Een grendel zonder uitweg wordt omzeild
+in plaats van gebruikt.
+
+**De impact is gemeten, en wat niet te meten is staat erbij.** Dit is de
+gevaarlijkste tekst op een incidentscherm: *"23 facturen vertraagd, 0 verloren,
+0 dubbel verwerkt"* is precies wat een eigenaar wil lezen, en precies wat je
+niet mag schrijven zonder iets dat die drie kan tellen. Elk getal komt daarom
+uit een bevinding van de gezondheidskaart. Drie dingen staan er standaard als
+**niet gemeten**, met de reden erbij, en dat zijn feiten over deze code:
+
+- *hoeveel leden of organisaties dit raakte* — `server/meting.js` telt per
+  routepatroon en draagt geen lid en geen tenant;
+- *of er iets verloren ging* — er is geen teller die verlies meet; het
+  transactie-grootboek dekt de collecties in `server/db/tx/collecties.js`, niet
+  het hele platform;
+- *of er iets dubbel is verwerkt* — om dezelfde reden.
+
+**De oorzaak is een aanleiding en geen feit.** Er is geen veld `oorzaak` met een
+zin erin, maar een lijst aanleidingen met per stuk de bron en de hardheid. Leunt
+het vermogen op iets dat óók stuk is, dan is dat de sterkere kandidaat — met de
+zin erbij dat gelijktijdigheid geen oorzaak bewijst. Vindt hij niets, dan staat
+er *geen aanleiding gevonden*, en dat is een uitslag en geen reden om er een te
+verzinnen. Dezelfde regel als in `oorzaak.js`, waar de operator zijn gevallen
+*meet* in plaats van een tabel "wat verklaart wat" te raadplegen.
+
+**De momentopname bij het ontstaan blijft staan**, naast de stand van nu. Alleen
+de eerste tonen laat een opgelost incident als lopend lezen; alleen de tweede
+maakt onzichtbaar wat er toen aan de hand was.
+
+Getoetst in `test/incident.test.js` (tien beweringen, zes mutaties, alle zes
+RAAK), de bedrading in `test/commandlagen.test.js`.
+
+---
+
+## 5d. De configuratietijdlijn — gebouwd
+
+`kern/command/tijdlijn.js`. Zichtbaar op de werkplek **Journaal** en in het
+dossier van elk incident, achter de knop *"Wat veranderde er vlak hiervoor?"*.
+
+**De vraag die iedereen bij een storing als eerste stelt** was hier niet te
+beantwoorden — niet omdat het nergens stond, maar omdat het op drie plekken
+stond in drie vormen: het journaal van RTG Command, de aanvragen aan de
+schakelkast (`techniek.functieVerzoeken`) en het auditspoor van de
+incidentcontrole.
+
+**Dit is een samenvoeging en geen vierde opslag.** Er wordt niets bewaard; elke
+regel komt uit een bron die er al was en draagt de naam van die bron. Een eigen
+kopie zou op een dag iets anders zeggen dan het scherm waar zij vandaan kwam —
+en dan is de tijdlijn het minst betrouwbare bewijsstuk van de drie.
+
+**Volgorde is geen oorzaak**, en die zin zit in het antwoord van de server en
+niet in het scherm. `rondom(moment, minuten)` zegt dat er zevenendertig seconden
+eerder iets is gewijzigd; hij zegt niet dat dat het veroorzaakte. Een tijdlijn
+zonder die zin wordt binnen een week gelezen als een oorzakenlijst.
+
+**En "niets gevonden" is niet "niets gebeurd".** Een leeg venster antwoordt met
+zoveel woorden dat er in *deze drie bronnen* niets staat — want een uitrol, een
+wijziging op de machine of een schrijfactie buiten Command zou er ook niet in
+staan. Dat is precies de verwarring waarmee iemand een oorzaak uitsluit die er
+wel degelijk was. Wat elke bron mist staat per bron, en wat geen van drieën ziet
+staat als aparte lijst `buitenBeeld`.
+
+**Een aanvraag die niets veranderde staat er toch in**, met de status erbij: wie
+zoekt naar wat er veranderde, wil ook zien wat er bíjna veranderde. Het aantal
+regels en het aantal dat werkelijk iets veranderde staan daarom apart — anders
+leest "vijf wijzigingen vlak ervoor" als vijf wijzigingen.
+
+Getoetst in `test/tijdlijn.test.js` (acht beweringen, zes mutaties, alle zes
+RAAK). Eén van die mutaties legde een echte fout bloot die er al in zat:
+`Number(minuten || 30)` maakte van een gevraagd venster van **nul** minuten er
+stil dertig, en gaf dus veel meer regels terug dan er was gevraagd.
+
+---
+
 ## 6. De grenzen
 
 Dit is de belangrijkste paragraaf van dit bestand. Waar een functie hieronder
@@ -316,38 +484,27 @@ Alles hieronder is ontwerp en geen code. Het staat hier opgeschreven zodat
 niemand het later voor vergeten aanziet (LAT.md regel 6), en met de grens erbij
 zodat het niet als iets makkelijkers wordt gebouwd dan het is.
 
-### 7.1 Het incident als object
+### 7.1 Het incident als object — GEBOUWD, zie par. 5c
 
-Vandaag is een storing een alarm plus een journaalregel. Een incident hoort een
-object te zijn met een identiteit, een begin, een oorzaak, een gemeten impact
-(hoeveel gevallen, hoeveel verloren, hoeveel dubbel), de genomen maatregelen,
-een status en een einde. Dan kun je ernaar verwijzen, hem afsluiten, en hem
-achteraf teruglezen.
+Wat er van deze paragraaf werkvoorraad blijft: een maatregel is nu een notitie
+met een verwijzing, en er is nog geen knop die vanuit een incident een
+herstelronde start en die ronde er automatisch aan hangt. En de drie
+niet-gemeten posten blijven niet-gemeten tot er tellers zijn die ze kunnen
+dragen — dat is geen achterstand van dit scherm maar van de meting eronder.
 
-*De grens:* de impact wordt **gemeten en niet geschat**. "23 facturen vertraagd,
-0 verloren, 0 dubbel verwerkt" is alleen te schrijven als er iets is dat die
-drie getallen kan tellen. Kan het niet, dan staat er wat er niet gemeten is.
+### 7.2 Herstel als transactie — GEBOUWD, zie par. 5b
 
-### 7.2 Herstel als transactie
+Wat er van deze paragraaf overblijft als werkvoorraad: de zaak-kant loopt er nog
+niet doorheen, en er is nog geen recept dat iets anders verifieert dan het veld
+dat het zelf schrijft. Dat tweede gaat pas knellen bij een recept waarvan de
+aanleiding in een ánder veld staat; het certificaat kan dat al dragen.
 
-De keten uit grens 6.5, met per recept een certificaat: voorwaarden, maximale
-impact, terugweg, verplichte verificatie, versie. Daarmee wordt repareren zelf
-een gecontroleerd softwaresysteem in plaats van een verzameling knoppen.
+### 7.3 De configuratietijdlijn — GEBOUWD, zie par. 5d
 
-*De grens:* geen enkel recept mag autonoom draaien zonder verificatiestap, en
-geen enkele verificatie mag "geen fout gezien" als "geslaagd" tellen.
-
-### 7.3 De configuratietijdlijn
-
-Alles wat verandert op één lijn: wie zette welke grens om, welke appversie ging
-erin, welke sleutel is vervangen, welk beleid herlaadde. Bij een storing
-antwoordt die lijn de vraag die iedereen als eerste stelt: *wat is er vlak
-daarvoor veranderd?*
-
-*De grens:* een correlatie is geen oorzaak. Het scherm mag "begon 37 seconden na
-X" tonen; het mag niet "veroorzaakt door X" schrijven zonder dat iets dat kan
-dragen. En het journaal ziet alleen wat via RTG Command is gegaan — die zin
-staat al bovenaan het herkomstscherm en hoort hier net zo goed.
+Wat er werkvoorraad blijft, is de dekking en niet de lijn zelf: een uitrol, een
+wijziging op de machine en een schrijfactie buiten Command staan er niet in, en
+dat is een gat in de BRONNEN. Zolang dat zo is, staat het als `buitenBeeld` in
+elk antwoord in plaats van als een lijn die volledig lijkt.
 
 ### 7.4 RTG Bijstand — support die binnenkomt zonder de sleutel te krijgen
 

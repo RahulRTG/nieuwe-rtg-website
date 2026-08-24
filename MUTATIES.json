@@ -1883,6 +1883,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "hersteltransactie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/runbooks.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
     "herstelzondertelefoon.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2057,6 +2065,14 @@
       "module": "server/kern/mailsleutel.js",
       "operator": "!==->===",
       "gezakt": 9
+    },
+    "incident.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/incident.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
     },
     "incidentcontrole-route.test.js": {
       "soort": "server",

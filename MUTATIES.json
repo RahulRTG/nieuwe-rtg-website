@@ -15,6 +15,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "a8266bf856ec",
       "scherp": "gezakt"
     },
     "aanmeldgesprek.test.js": {
@@ -22,6 +23,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "3b2b292c6c2e",
       "scherp": "gezakt"
     },
     "aanmeldingen.test.js": {
@@ -39,6 +41,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "18417a905829",
       "scherp": "gezakt"
     },
     "accounts-os.test.js": {
@@ -66,6 +69,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "a6a624b7ffba",
       "scherp": "gezakt"
     },
     "administratie.test.js": {
@@ -73,6 +77,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "f79075422048",
       "scherp": "gezakt"
     },
     "adresopzoek.test.js": {
@@ -80,6 +85,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 19,
+      "toetsSha": "fda19c27b33b",
       "scherp": "gezakt"
     },
     "adyen-config.test.js": {
@@ -107,6 +113,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "49ce7888ada8",
       "scherp": "gezakt"
     },
     "agenda.test.js": {
@@ -114,6 +121,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "482a65a93947",
       "scherp": "gezakt"
     },
     "agent.test.js": {
@@ -121,6 +129,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "14f88e1c7bc0",
       "scherp": "gezakt"
     },
     "ai-cache.test.js": {
@@ -158,6 +167,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "0d783c02609e",
       "scherp": "gezakt"
     },
     "ai-uitwijk.test.js": {
@@ -175,6 +185,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "e9eed1c868ea",
       "scherp": "gezakt"
     },
     "aipoort.test.js": {
@@ -212,6 +223,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "1f4d46aae306",
       "scherp": "gezakt"
     },
     "allergie.test.js": {
@@ -219,6 +231,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "bff70533f601",
       "scherp": "gezakt"
     },
     "alpine.test.js": {
@@ -226,6 +239,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "437d6a98fc18",
       "scherp": "gezakt"
     },
     "anthropic.test.js": {
@@ -253,6 +267,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "9956b2f8e0a2",
       "scherp": "gezakt"
     },
     "apipoort.test.js": {
@@ -270,6 +285,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "208d3a9b2b9c",
       "scherp": "gezakt"
     },
     "archief.test.js": {
@@ -277,6 +293,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "f80bc3c6bb27",
       "scherp": "gezakt"
     },
     "architect.test.js": {
@@ -284,13 +301,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "ef032aa4532f",
       "scherp": "gezakt"
     },
     "arena.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4,
+      "gezakt": 6,
+      "toetsSha": "d728130ecc83",
       "scherp": "gezakt"
     },
     "arrival-security.test.js": {
@@ -308,6 +327,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "c5ce37287257",
       "scherp": "gezakt"
     },
     "ast-grens.test.js": {
@@ -335,6 +355,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "b956326776d2",
       "scherp": "gezakt"
     },
     "auth-rol.test.js": {
@@ -342,6 +363,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "46788fb7776d",
       "scherp": "gezakt"
     },
     "automatisering.test.js": {
@@ -359,6 +381,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "645f31439684",
       "scherp": "gezakt"
     },
     "avond.test.js": {
@@ -366,6 +389,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 18,
+      "toetsSha": "10de68e75f3d",
       "scherp": "gezakt"
     },
     "baby.test.js": {
@@ -373,6 +397,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "0c80b7a446a5",
       "scherp": "gezakt"
     },
     "backupvolledig.test.js": {
@@ -384,6 +409,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "55287e6fb47a",
       "scherp": "gezakt"
     },
     "bank-beheer.test.js": {
@@ -391,13 +417,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "ced2d80a50ba",
       "scherp": "gezakt"
     },
     "bank.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 21,
+      "gezakt": 22,
+      "toetsSha": "f9d9fe68b2a8",
       "scherp": "gezakt"
     },
     "bankbeveiliging.test.js": {
@@ -405,6 +433,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "44f64be1e01e",
       "scherp": "gezakt"
     },
     "bankdeuren.test.js": {
@@ -412,6 +441,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "88a9f14d7d27",
       "scherp": "gezakt"
     },
     "bankhart.test.js": {
@@ -419,6 +449,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "4012b2ccfeb7",
       "scherp": "gezakt"
     },
     "bankkamer.e2e.js": {
@@ -433,6 +464,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "a61501138d99",
       "scherp": "gezakt"
     },
     "bedrijfbouw.test.js": {
@@ -440,6 +472,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "cc2c9f3012d2",
       "scherp": "gezakt"
     },
     "bedrijfeigenaar.test.js": {
@@ -447,6 +480,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "07cb91603868",
       "scherp": "gezakt"
     },
     "bedrijfkern.test.js": {
@@ -454,6 +488,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "083d85e20f42",
       "scherp": "gezakt"
     },
     "bedrijfklant.test.js": {
@@ -461,6 +496,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "c17dd74539c1",
       "scherp": "gezakt"
     },
     "bedrijfrecht.test.js": {
@@ -468,6 +504,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "7388088959af",
       "scherp": "gezakt"
     },
     "bedrijfsintake.test.js": {
@@ -475,6 +512,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "064204a8c2df",
       "scherp": "gezakt"
     },
     "bedrijfwerk.test.js": {
@@ -482,6 +520,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "7a2c9592542d",
       "scherp": "gezakt"
     },
     "beginscherm.test.js": {
@@ -493,13 +532,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "ebbdbeaed518",
       "scherp": "gezakt"
     },
     "belastingkantoor.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6,
+      "gezakt": 10,
+      "toetsSha": "7b009686b94a",
       "scherp": "gezakt"
     },
     "belofte.test.js": {
@@ -521,6 +562,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "79917542f8ed",
       "scherp": "gezakt"
     },
     "beroepenbieb.test.js": {
@@ -528,6 +570,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "a749fa7cbe88",
       "scherp": "gezakt"
     },
     "beschermd.test.js": {
@@ -535,6 +578,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "73d9004ad34a",
       "scherp": "gezakt"
     },
     "bestand-binding.test.js": {
@@ -552,6 +596,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "0fa67440af2e",
       "scherp": "gezakt"
     },
     "betaaldienst.test.js": {
@@ -559,6 +604,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "7424729f853c",
       "scherp": "gezakt"
     },
     "betaalopdracht.test.js": {
@@ -626,6 +672,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "b2e48a59dc35",
       "scherp": "gezakt"
     },
     "bewaartermijnen.test.js": {
@@ -683,6 +730,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "498f6e418e5d",
       "scherp": "gezakt"
     },
     "bezorging.test.js": {
@@ -690,6 +738,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "147f27731a81",
       "scherp": "gezakt"
     },
     "bezorgketen.test.js": {
@@ -697,13 +746,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "6faaa2492300",
       "scherp": "gezakt"
     },
     "bezorgvolgen.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1,
+      "gezakt": 2,
+      "toetsSha": "7a9bc6ad309c",
       "scherp": "gezakt"
     },
     "bibliotheek.test.js": {
@@ -711,6 +762,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "1a01608f6989",
       "scherp": "gezakt"
     },
     "bijles.test.js": {
@@ -718,6 +770,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "ddb56fb06ead",
       "scherp": "gezakt"
     },
     "blindevlek.test.js": {
@@ -735,6 +788,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "bc68a9dbd956",
       "scherp": "gezakt"
     },
     "boardroom.test.js": {
@@ -742,6 +796,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "866d2fe7f68f",
       "scherp": "gezakt"
     },
     "boeken.test.js": {
@@ -749,6 +804,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "61011e8921cb",
       "scherp": "gezakt"
     },
     "boekhoud.test.js": {
@@ -756,6 +812,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "dde090dd24d3",
       "scherp": "gezakt"
     },
     "boerderij.test.js": {
@@ -763,6 +820,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "b8558d61b18b",
       "scherp": "gezakt"
     },
     "boot-smoke.test.js": {
@@ -775,6 +833,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "176a99370b93",
       "scherp": "gezakt"
     },
     "bouw.test.js": {
@@ -782,6 +841,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "c767473638ce",
       "scherp": "gezakt"
     },
     "bron.test.js": {
@@ -819,6 +879,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "4fd5447ea17c",
       "scherp": "gezakt"
     },
     "btw-aansluiting-scherm.e2e.js": {
@@ -832,7 +893,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1,
+      "gezakt": 2,
+      "toetsSha": "eb4dbcd2bf8e",
       "scherp": "gezakt"
     },
     "btw-naheffing-scherm.e2e.js": {
@@ -873,7 +935,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 28,
+      "gezakt": 29,
+      "toetsSha": "d9a895b2eaa7",
       "scherp": "gezakt"
     },
     "bundeldelen.test.js": {
@@ -890,7 +953,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 16,
+      "gezakt": 28,
+      "toetsSha": "b29bcce9ddca",
       "scherp": "gezakt"
     },
     "ca.test.js": {
@@ -940,6 +1004,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "c4db25605548",
       "scherp": "gezakt"
     },
     "cdt.test.js": {
@@ -947,6 +1012,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "588a65094bca",
       "scherp": "gezakt"
     },
     "chaos.pg.test.js": {
@@ -969,6 +1035,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "349fcb1db677",
       "scherp": "gezakt"
     },
     "ci-keten.test.js": {
@@ -990,6 +1057,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "2f50f4e26eb4",
       "scherp": "gezakt"
     },
     "clubdorp.test.js": {
@@ -997,6 +1065,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "a288d2e0d86a",
       "scherp": "gezakt"
     },
     "clubs.test.js": {
@@ -1004,6 +1073,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "b88d1935820b",
       "scherp": "gezakt"
     },
     "collectie-transactie-sqlite.test.js": {
@@ -1021,6 +1091,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "08ae48cb640e",
       "scherp": "gezakt"
     },
     "collegachat.test.js": {
@@ -1028,6 +1099,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "62be6bf7736f",
       "scherp": "gezakt"
     },
     "comm-actor.test.js": {
@@ -1109,6 +1181,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "e516c89c8063",
       "scherp": "gezakt"
     },
     "command-routes-herstel.test.js": {
@@ -1116,6 +1189,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "6e1c477aa955",
       "scherp": "gezakt"
     },
     "command.test.js": {
@@ -1132,7 +1206,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8,
+      "gezakt": 10,
+      "toetsSha": "cdf46a453e1f",
       "scherp": "gezakt"
     },
     "concern-voorstel.test.js": {
@@ -1170,6 +1245,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "6516378d20ce",
       "scherp": "gezakt"
     },
     "contact.test.js": {
@@ -1177,6 +1253,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "c839c45fa14d",
       "scherp": "gezakt"
     },
     "contactpin.test.js": {
@@ -1184,6 +1261,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "03e2c2e009cb",
       "scherp": "gezakt"
     },
     "context-lijn.test.js": {
@@ -1191,6 +1269,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "eebfb7ec358b",
       "scherp": "gezakt"
     },
     "contract.test.js": {
@@ -1198,6 +1277,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "08c202c8be24",
       "scherp": "gezakt"
     },
     "controlekamer.test.js": {
@@ -1205,6 +1285,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "3d7b2c5d7921",
       "scherp": "gezakt"
     },
     "controls.test.js": {
@@ -1222,6 +1303,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "52ffa9d0531c",
       "scherp": "gezakt"
     },
     "creator.test.js": {
@@ -1229,13 +1311,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
-      "scherp": "vastgelopen"
+      "toetsSha": "b96e1ac72c73",
+      "scherp": "gezakt"
     },
     "dagcoach.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "b35aa40cb4f8",
       "scherp": "gezakt"
     },
     "datamap-beweegt.test.js": {
@@ -1253,6 +1337,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "9ee17dcbb8cd",
       "scherp": "gezakt"
     },
     "deavond.test.js": {
@@ -1260,6 +1345,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "f876464bcff0",
       "scherp": "gezakt"
     },
     "deelindex.test.js": {
@@ -1277,6 +1363,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "82b5553bbe4f",
       "scherp": "gezakt"
     },
     "demostand.test.js": {
@@ -1284,6 +1371,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "13a89f14ff7c",
       "scherp": "overleefd"
     },
     "demozaken.test.js": {
@@ -1291,6 +1379,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "f63f9a26be25",
       "scherp": "gezakt"
     },
     "deur.e2e.js": {
@@ -1305,6 +1394,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "2f941ef37c91",
       "scherp": "gezakt"
     },
     "doelen.test.js": {
@@ -1312,6 +1402,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "c005f14aa5a6",
       "scherp": "gezakt"
     },
     "domeinalleen.test.js": {
@@ -1339,6 +1430,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "f48172be0e64",
       "scherp": "gezakt"
     },
     "doos-journaal.test.js": {
@@ -1356,6 +1448,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "9d1f55825164",
       "scherp": "gezakt"
     },
     "drie.test.js": {
@@ -1373,6 +1466,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "a3644b746192",
       "scherp": "gezakt"
     },
     "duels2.test.js": {
@@ -1380,6 +1474,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "600f50585a7f",
       "scherp": "gezakt"
     },
     "duurzaamheid-kill.test.js": {
@@ -1387,6 +1482,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "024173837ec7",
       "scherp": "gezakt"
     },
     "duurzaamheid-pg.test.js": {
@@ -1409,6 +1505,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "f322ae46ae95",
       "scherp": "gezakt"
     },
     "dyncode.test.js": {
@@ -1426,13 +1523,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "bea74552255b",
       "scherp": "gezakt"
     },
     "eenaccount.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8,
+      "gezakt": 9,
+      "toetsSha": "34c37accf5f1",
       "scherp": "gezakt"
     },
     "eigen-website.test.js": {
@@ -1440,6 +1539,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "abc954733646",
       "scherp": "gezakt"
     },
     "eigenaar.test.js": {
@@ -1447,6 +1547,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "0e7168f32c28",
       "scherp": "gezakt"
     },
     "eigenaarschap.test.js": {
@@ -1454,6 +1555,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "25c07c7d6b9e",
       "scherp": "gezakt"
     },
     "eigenaarwerkplek.test.js": {
@@ -1461,6 +1563,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "69ec60b48cb5",
       "scherp": "gezakt"
     },
     "eigenip.test.js": {
@@ -1468,6 +1571,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "f50d1c95cd57",
       "scherp": "overleefd"
     },
     "ervaring.test.js": {
@@ -1475,6 +1579,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "f4f531fb9d13",
       "scherp": "gezakt"
     },
     "eu-naleving.test.js": {
@@ -1487,6 +1592,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "99a4bf45beb0",
       "scherp": "gezakt"
     },
     "eventloop.test.js": {
@@ -1505,13 +1611,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "84306847a276",
       "scherp": "gezakt"
     },
     "facturatie.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5,
+      "gezakt": 6,
+      "toetsSha": "083812069b1c",
       "scherp": "gezakt"
     },
     "factuur.test.js": {
@@ -1519,6 +1627,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "2f94302833be",
       "scherp": "gezakt"
     },
     "factuursaldo.test.js": {
@@ -1526,6 +1635,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "68449796db60",
       "scherp": "gezakt"
     },
     "fases.test.js": {
@@ -1533,6 +1643,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "ce43fb3ba067",
       "scherp": "gezakt"
     },
     "flits.test.js": {
@@ -1540,6 +1651,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "3d5ff7cb6200",
       "scherp": "gezakt"
     },
     "fluister.test.js": {
@@ -1547,6 +1659,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 19,
+      "toetsSha": "8451c13fded5",
       "scherp": "gezakt"
     },
     "fonds.test.js": {
@@ -1554,6 +1667,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "3b1d0b8d8f2e",
       "scherp": "gezakt"
     },
     "foodcourt.test.js": {
@@ -1561,6 +1675,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "16121c7e14c2",
       "scherp": "gezakt"
     },
     "foundation-markt.test.js": {
@@ -1568,6 +1683,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "2f9dc4984bc5",
       "scherp": "gezakt"
     },
     "foundation-rest.test.js": {
@@ -1575,6 +1691,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "0a38cf0f0260",
       "scherp": "gezakt"
     },
     "foundation.test.js": {
@@ -1582,6 +1699,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 28,
+      "toetsSha": "45e1e3e8a148",
       "scherp": "gezakt"
     },
     "foundationschil.test.js": {
@@ -1603,6 +1721,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "ba0046f8a334",
       "scherp": "gezakt"
     },
     "fout-client.test.js": {
@@ -1610,6 +1729,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "9304bc7e9f9a",
       "scherp": "gezakt"
     },
     "foutmelder.test.js": {
@@ -1627,6 +1747,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "b50d02d7592c",
       "scherp": "gezakt"
     },
     "functies.test.js": {
@@ -1642,13 +1763,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "a1d31b103ca8",
       "scherp": "gezakt"
     },
     "gastbezorging.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8,
+      "gezakt": 11,
+      "toetsSha": "40cbe6715acd",
       "scherp": "gezakt"
     },
     "gastfoodcourt.test.js": {
@@ -1656,6 +1779,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "7d6f9616e2d2",
       "scherp": "gezakt"
     },
     "gastorder.test.js": {
@@ -1663,6 +1787,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "8e39341641af",
       "scherp": "gezakt"
     },
     "gastregels.test.js": {
@@ -1670,6 +1795,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "75afbed13433",
       "scherp": "gezakt"
     },
     "gastroomservice.test.js": {
@@ -1677,6 +1803,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "26058fd50769",
       "scherp": "gezakt"
     },
     "gastverzoek.test.js": {
@@ -1684,6 +1811,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "8ddb3380e608",
       "scherp": "gezakt"
     },
     "gastzorg.test.js": {
@@ -1691,6 +1819,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "739b49b24989",
       "scherp": "gezakt"
     },
     "gebouw.test.js": {
@@ -1698,6 +1827,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "4c98103baa48",
       "scherp": "gezakt"
     },
     "gebouwplus.test.js": {
@@ -1705,6 +1835,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "14b079bb3137",
       "scherp": "gezakt"
     },
     "gedachten.test.js": {
@@ -1712,6 +1843,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "ac9580805441",
       "scherp": "gezakt"
     },
     "geenlek.test.js": {
@@ -1729,6 +1861,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "b3860271b17a",
       "scherp": "gezakt"
     },
     "geheugen.test.js": {
@@ -1746,6 +1879,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "d69b569b88c2",
       "scherp": "gezakt"
     },
     "geldbeleid.test.js": {
@@ -1753,6 +1887,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "785f62edac3c",
       "scherp": "gezakt"
     },
     "geldgraaf.test.js": {
@@ -1760,6 +1895,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "5c3db052af5f",
       "scherp": "gezakt"
     },
     "geldregie.test.js": {
@@ -1767,6 +1903,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "0af4c6481844",
       "scherp": "gezakt"
     },
     "geldveilig.test.js": {
@@ -1794,6 +1931,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "b9abd8b9353c",
       "scherp": "gezakt"
     },
     "gemeente.test.js": {
@@ -1801,6 +1939,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "87c2428ed405",
       "scherp": "gezakt"
     },
     "genootschap-beheer.test.js": {
@@ -1808,6 +1947,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "2aa44f6c450b",
       "scherp": "gezakt"
     },
     "genootschap.test.js": {
@@ -1815,6 +1955,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 14,
+      "toetsSha": "17959d774faa",
       "scherp": "gezakt"
     },
     "genredekking.test.js": {
@@ -1832,6 +1973,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "01125d7960b9",
       "scherp": "gezakt"
     },
     "genrepuls.test.js": {
@@ -1839,6 +1981,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "532980b846fe",
       "scherp": "gezakt"
     },
     "genreregister.test.js": {
@@ -1866,6 +2009,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "0613672d49a5",
       "scherp": "gezakt"
     },
     "gereedschap.test.js": {
@@ -1883,6 +2027,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "5df53c79e5b7",
       "scherp": "gezakt"
     },
     "gewoonten.test.js": {
@@ -1890,6 +2035,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "b3ce745711b4",
       "scherp": "gezakt"
     },
     "gezelschap.test.js": {
@@ -1897,6 +2043,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "14b027771d52",
       "scherp": "gezakt"
     },
     "gezin-weghalen.test.js": {
@@ -1904,6 +2051,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "d260221bbcbc",
       "scherp": "gezakt"
     },
     "gezinenleren.test.js": {
@@ -1911,6 +2059,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "d1c619dc5555",
       "scherp": "gezakt"
     },
     "gezinhuishouden.test.js": {
@@ -1918,6 +2067,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "cc31383e29f4",
       "scherp": "gezakt"
     },
     "gezinleven.test.js": {
@@ -1925,6 +2075,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "b333f1404daa",
       "scherp": "gezakt"
     },
     "gezinskeuken.test.js": {
@@ -1932,6 +2083,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "3804e5aa326d",
       "scherp": "gezakt"
     },
     "gezinzorg.test.js": {
@@ -1939,6 +2091,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "55018385e402",
       "scherp": "gezakt"
     },
     "gezondheid.test.js": {
@@ -1946,6 +2099,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "02e61ff5b0bc",
       "scherp": "gezakt"
     },
     "ghost.test.js": {
@@ -1953,6 +2107,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "cfb67a6c1929",
       "scherp": "gezakt"
     },
     "gidswacht.test.js": {
@@ -1985,13 +2140,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
-      "scherp": "gezakt"
+      "toetsSha": "97a30e3ff812",
+      "scherp": "overleefd"
     },
     "groothandel.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "5f7ddd1eddd2",
       "scherp": "gezakt"
     },
     "hack.test.js": {
@@ -1999,6 +2156,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "d9f3f81396b8",
       "scherp": "gezakt"
     },
     "handelsketen.test.js": {
@@ -2006,6 +2164,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "be8b348f2dc2",
       "scherp": "gezakt"
     },
     "handenvrij.test.js": {
@@ -2023,6 +2182,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "70b0073fba97",
       "scherp": "gezakt"
     },
     "helikopter.test.js": {
@@ -2030,6 +2190,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "3cb557e69c61",
       "scherp": "gezakt"
     },
     "herkomst.test.js": {
@@ -2047,6 +2208,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "033d658303f7",
       "scherp": "overleefd"
     },
     "herstel2fa.test.js": {
@@ -2054,6 +2216,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "6d931914c7ad",
       "scherp": "gezakt"
     },
     "herstelgat.test.js": {
@@ -2061,6 +2224,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "4e92fbd76c02",
       "scherp": "overleefd"
     },
     "herstelproef.test.js": {
@@ -2068,6 +2232,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "f0b51c7e973e",
       "scherp": "gezakt"
     },
     "herstelzondertelefoon.test.js": {
@@ -2075,6 +2240,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "183f17840692",
       "scherp": "overleefd"
     },
     "homekit.test.js": {
@@ -2082,13 +2248,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "7cf355c733d8",
       "scherp": "gezakt"
     },
     "horeca-bezorg-club.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7,
+      "gezakt": 10,
+      "toetsSha": "3658db5c565c",
       "scherp": "gezakt"
     },
     "horeca-hotel-event.test.js": {
@@ -2096,6 +2264,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "a3f548156ecc",
       "scherp": "gezakt"
     },
     "horeca-keuken.test.js": {
@@ -2103,6 +2272,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "da8adeeb4e2c",
       "scherp": "gezakt"
     },
     "horeca-rekening.test.js": {
@@ -2110,6 +2280,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "59d2d57a4fd1",
       "scherp": "gezakt"
     },
     "horeca-vloer.test.js": {
@@ -2117,6 +2288,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "2979b833f42d",
       "scherp": "gezakt"
     },
     "horlogewerk.test.js": {
@@ -2144,6 +2316,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "61af4d983399",
       "scherp": "gezakt"
     },
     "hrplus.test.js": {
@@ -2151,6 +2324,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "9dbad793199d",
       "scherp": "gezakt"
     },
     "http1.test.js": {
@@ -2178,6 +2352,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "96af100ba66b",
       "scherp": "gezakt"
     },
     "huisstijl.test.js": {
@@ -2185,6 +2360,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "6133cd4b3f06",
       "scherp": "gezakt"
     },
     "hulpdienst.test.js": {
@@ -2192,6 +2368,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "a1fa968dd468",
       "scherp": "gezakt"
     },
     "hulpdiensten-bord.test.js": {
@@ -2199,6 +2376,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "fc322e361130",
       "scherp": "gezakt"
     },
     "hulpklassen.test.js": {
@@ -2236,6 +2414,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "95c035487cc2",
       "scherp": "gezakt"
     },
     "idemproef.test.js": {
@@ -2273,6 +2452,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "48aa0f598f1c",
       "scherp": "gezakt"
     },
     "incidentcontrole.test.js": {
@@ -2290,6 +2470,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "152c099fb775",
       "scherp": "gezakt"
     },
     "inlogrem.test.js": {
@@ -2297,6 +2478,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "c6e5c950b191",
       "scherp": "overleefd"
     },
     "instant-reality.test.js": {
@@ -2342,6 +2524,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "9c0ec5a525ae",
       "scherp": "gezakt"
     },
     "kaart.test.js": {
@@ -2359,6 +2542,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "a61974e9d79e",
       "scherp": "gezakt"
     },
     "kantoorgesprek.test.js": {
@@ -2366,6 +2550,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "be9e64b599e5",
       "scherp": "gezakt"
     },
     "kantoorpakket-alle.test.js": {
@@ -2373,6 +2558,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "68aed116dbe8",
       "scherp": "gezakt"
     },
     "kantoorwereld.test.js": {
@@ -2390,13 +2576,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "9df12ad4e12a",
       "scherp": "gezakt"
     },
     "kantoren.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 10,
+      "gezakt": 12,
+      "toetsSha": "58b649d69681",
       "scherp": "gezakt"
     },
     "kassa-modus.test.js": {
@@ -2404,6 +2592,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "920847e16004",
       "scherp": "gezakt"
     },
     "kassa-premium.test.js": {
@@ -2411,6 +2600,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "ea63015a5830",
       "scherp": "gezakt"
     },
     "kern-afgeleid.test.js": {
@@ -2476,6 +2666,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "78e26f996643",
       "scherp": "gezakt"
     },
     "ketenproef.test.js": {
@@ -2493,6 +2684,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 17,
+      "toetsSha": "344cdbe59b4c",
       "scherp": "gezakt"
     },
     "keuring.test.js": {
@@ -2520,6 +2712,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "9e7c0d82149d",
       "scherp": "gezakt"
     },
     "klantnaad.test.js": {
@@ -2537,6 +2730,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "3658ddc11ad1",
       "scherp": "gezakt"
     },
     "klets.test.js": {
@@ -2584,6 +2778,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "a91a3f7a414a",
       "scherp": "gezakt"
     },
     "kruisscan.test.js": {
@@ -2611,6 +2806,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "6850b3655bcf",
       "scherp": "gezakt"
     },
     "laatste-twee-endpoints.test.js": {
@@ -2618,6 +2814,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "7b021a09f9f4",
       "scherp": "gezakt"
     },
     "lab-geheim.test.js": {
@@ -2635,6 +2832,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "e9c1e3daafff",
       "scherp": "gezakt"
     },
     "lab2-werk.test.js": {
@@ -2642,6 +2840,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 14,
+      "toetsSha": "532bf7881d57",
       "scherp": "gezakt"
     },
     "labfonds.test.js": {
@@ -2674,6 +2873,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "cdc310cd8a88",
       "scherp": "gezakt"
     },
     "ledenaflopen.test.js": {
@@ -2681,6 +2881,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "85be4d02c828",
       "scherp": "gezakt"
     },
     "ledenbalie.test.js": {
@@ -2688,6 +2889,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "9ab1b8aa963e",
       "scherp": "gezakt"
     },
     "ledengids-race.test.js": {
@@ -2705,6 +2907,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "4fc31ce4b2f5",
       "scherp": "gezakt"
     },
     "ledenregister.test.js": {
@@ -2722,6 +2925,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "622c0d891667",
       "scherp": "gezakt"
     },
     "leerstofbreed.test.js": {
@@ -2739,6 +2943,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "b7e47b0cf397",
       "scherp": "gezakt"
     },
     "leren-leden.test.js": {
@@ -2746,6 +2951,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "c58396c39142",
       "scherp": "gezakt"
     },
     "leren.test.js": {
@@ -2753,6 +2959,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "e65721403b8b",
       "scherp": "gezakt"
     },
     "levenbandroutes.test.js": {
@@ -2760,6 +2967,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "d867a257f86c",
       "scherp": "gezakt"
     },
     "levensband.test.js": {
@@ -2807,6 +3015,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "168899a5e914",
       "scherp": "gezakt"
     },
     "leverancierpoort.test.js": {
@@ -2834,6 +3043,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 19,
+      "toetsSha": "0a1f790eee1a",
       "scherp": "gezakt"
     },
     "lidfactuur.test.js": {
@@ -2841,6 +3051,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "42ad652ede48",
       "scherp": "gezakt"
     },
     "liegpoort.test.js": {
@@ -2858,6 +3069,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "1a53893e759b",
       "scherp": "gezakt"
     },
     "life.test.js": {
@@ -2865,6 +3077,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "0f66b027371c",
       "scherp": "gezakt"
     },
     "lifestyle.test.js": {
@@ -2872,6 +3085,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "3b88178e0ee9",
       "scherp": "gezakt"
     },
     "livegang-pakket.test.js": {
@@ -2889,6 +3103,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "46d4a0e0cc8a",
       "scherp": "gezakt"
     },
     "livinglab-routes.test.js": {
@@ -2896,6 +3111,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "ebc8a7c24f65",
       "scherp": "gezakt"
     },
     "livinglab.test.js": {
@@ -2903,6 +3119,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 20,
+      "toetsSha": "76ac79087d34",
       "scherp": "gezakt"
     },
     "loghygiene.test.js": {
@@ -2962,6 +3179,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "1062bb323079",
       "scherp": "gezakt"
     },
     "luchthaven-vip.test.js": {
@@ -2969,6 +3187,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "2b569d0054e8",
       "scherp": "gezakt"
     },
     "luchthaven.test.js": {
@@ -2976,6 +3195,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "53916328a721",
       "scherp": "gezakt"
     },
     "luchtzijde-taal.test.js": {
@@ -2983,6 +3203,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "32f06f38a92d",
       "scherp": "gezakt"
     },
     "magnaat-capabilities.test.js": {
@@ -3059,6 +3280,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "f5ed1e1f2108",
       "scherp": "gezakt"
     },
     "magnaat-partnerstudio.e2e.js": {
@@ -3153,6 +3375,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "97a820626450",
       "scherp": "gezakt"
     },
     "maildns.test.js": {
@@ -3170,6 +3393,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "f95d2a59fc08",
       "scherp": "gezakt"
     },
     "mailpost.test.js": {
@@ -3177,6 +3401,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "993589f666a7",
       "scherp": "gezakt"
     },
     "mall-bestellingen.test.js": {
@@ -3184,6 +3409,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "e7b31bb30060",
       "scherp": "gezakt"
     },
     "mall-bewaard.test.js": {
@@ -3191,13 +3417,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "ad291b7e624e",
       "scherp": "gezakt"
     },
     "mall-collecties.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 11,
+      "gezakt": 12,
+      "toetsSha": "99a6987a6106",
       "scherp": "gezakt"
     },
     "mall-concierge.test.js": {
@@ -3205,6 +3433,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "cd421013b0f6",
       "scherp": "gezakt"
     },
     "mall-context.test.js": {
@@ -3212,6 +3441,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "690bf3100f61",
       "scherp": "gezakt"
     },
     "mall-extern.test.js": {
@@ -3219,6 +3449,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "650761824c26",
       "scherp": "gezakt"
     },
     "mall-kaart.test.js": {
@@ -3226,6 +3457,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "eceed5d04c20",
       "scherp": "gezakt"
     },
     "mall-lijsten.test.js": {
@@ -3233,6 +3465,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "8acfec016201",
       "scherp": "gezakt"
     },
     "mall-supplieros.test.js": {
@@ -3240,6 +3473,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "4c11285fa004",
       "scherp": "gezakt"
     },
     "mall-vestigingen.test.js": {
@@ -3247,6 +3481,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "2f9a9f62a301",
       "scherp": "gezakt"
     },
     "mall-vindlaag.test.js": {
@@ -3254,6 +3489,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 17,
+      "toetsSha": "fcb8a768d28d",
       "scherp": "gezakt"
     },
     "mall-vraagbeeld.test.js": {
@@ -3261,6 +3497,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "8ef9a9af6d02",
       "scherp": "gezakt"
     },
     "mall.test.js": {
@@ -3268,6 +3505,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "5f806264da64",
       "scherp": "gezakt"
     },
     "malwarescan-dicht.test.js": {
@@ -3285,6 +3523,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "fcf2119dd6f8",
       "scherp": "gezakt"
     },
     "marina.test.js": {
@@ -3292,6 +3531,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "eb4e711ee583",
       "scherp": "gezakt"
     },
     "markt-zaak.test.js": {
@@ -3299,6 +3539,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "a241186c5175",
       "scherp": "gezakt"
     },
     "markt.test.js": {
@@ -3306,6 +3547,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "e785a9f68a6c",
       "scherp": "gezakt"
     },
     "materiaal.test.js": {
@@ -3327,6 +3569,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "e753cdf9576a",
       "scherp": "gezakt"
     },
     "mediadelen.test.js": {
@@ -3334,6 +3577,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "98e95cb0fb74",
       "scherp": "gezakt"
     },
     "medialijstdelen.test.js": {
@@ -3341,6 +3585,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "065a0481efa8",
       "scherp": "gezakt"
     },
     "medialijsten.test.js": {
@@ -3348,6 +3593,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "26f05321eac6",
       "scherp": "gezakt"
     },
     "mediaos.test.js": {
@@ -3355,6 +3601,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 19,
+      "toetsSha": "2fca0f655a4e",
       "scherp": "gezakt"
     },
     "mediasamen.test.js": {
@@ -3362,6 +3609,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "047cf4ba4ac3",
       "scherp": "gezakt"
     },
     "mediazaak.test.js": {
@@ -3369,6 +3617,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "2966cada0ee4",
       "scherp": "gezakt"
     },
     "medicatie.test.js": {
@@ -3376,6 +3625,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "994963bb80c7",
       "scherp": "gezakt"
     },
     "meet.test.js": {
@@ -3383,6 +3633,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "b7a8762b04cc",
       "scherp": "gezakt"
     },
     "memo.test.js": {
@@ -3390,6 +3641,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "078afe178518",
       "scherp": "gezakt"
     },
     "menselijkebanen.test.js": {
@@ -3397,6 +3649,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "539a0c5183ab",
       "scherp": "gezakt"
     },
     "menselijkverkeer.test.js": {
@@ -3404,6 +3657,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "5dfaf2c50ddb",
       "scherp": "gezakt"
     },
     "merge3.property.test.js": {
@@ -3426,6 +3680,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "1812e2667216",
       "scherp": "gezakt"
     },
     "meting.test.js": {
@@ -3443,6 +3698,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "cbba4d712924",
       "scherp": "gezakt"
     },
     "metingpoort.test.js": {
@@ -3450,6 +3706,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "3a2f5c8613c3",
       "scherp": "gezakt"
     },
     "middleware.test.js": {
@@ -3487,6 +3744,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "a89cafebdead",
       "scherp": "gezakt"
     },
     "mobiliteit.test.js": {
@@ -3494,6 +3752,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 16,
+      "toetsSha": "5adc55db99dc",
       "scherp": "gezakt"
     },
     "modebezorg.test.js": {
@@ -3501,6 +3760,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "9413bcae0f74",
       "scherp": "gezakt"
     },
     "moedertaal.test.js": {
@@ -3508,6 +3768,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "e36b19eb2810",
       "scherp": "gezakt"
     },
     "mollie-config.test.js": {
@@ -3565,6 +3826,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "a3d18c9d02bc",
       "scherp": "gezakt"
     },
     "munten.test.js": {
@@ -3572,6 +3834,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "6c676ddcdbf4",
       "scherp": "gezakt"
     },
     "mutatiewacht.test.js": {
@@ -3584,6 +3847,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "2ab843dd2237",
       "scherp": "gezakt"
     },
     "muziek-uitgave.test.js": {
@@ -3591,6 +3855,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "707898b7fceb",
       "scherp": "gezakt"
     },
     "muziek.test.js": {
@@ -3598,6 +3863,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "f5f82fda6166",
       "scherp": "gezakt"
     },
     "naamlaag.test.js": {
@@ -3605,6 +3871,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "7f588090150b",
       "scherp": "gezakt"
     },
     "naarkassa.test.js": {
@@ -3612,6 +3879,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "9462c1ceda00",
       "scherp": "gezakt"
     },
     "navigatie.test.js": {
@@ -3629,6 +3897,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "81d06c072389",
       "scherp": "gezakt"
     },
     "nieuweroutes.test.js": {
@@ -3646,6 +3915,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "005c866b31ca",
       "scherp": "gezakt"
     },
     "normbasis.test.js": {
@@ -3683,6 +3953,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "25e84ceff543",
       "scherp": "gezakt"
     },
     "notitiesduurzaam.test.js": {
@@ -3690,6 +3961,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "64b9d5b8c43e",
       "scherp": "gezakt"
     },
     "objectlaag.test.js": {
@@ -3707,6 +3979,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "d75107c37f32",
       "scherp": "gezakt"
     },
     "ochtend.test.js": {
@@ -3714,6 +3987,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "68addb916f3d",
       "scherp": "gezakt"
     },
     "office-bank.test.js": {
@@ -3721,6 +3995,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "b62ab9e40c82",
       "scherp": "gezakt"
     },
     "office-blad.test.js": {
@@ -3738,6 +4013,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "e588cfe13ae8",
       "scherp": "gezakt"
     },
     "office-payroll-dekking.test.js": {
@@ -3745,6 +4021,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "3821e502bbbc",
       "scherp": "gezakt"
     },
     "office-tweede-helft.test.js": {
@@ -3752,6 +4029,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "d30e054b96aa",
       "scherp": "gezakt"
     },
     "office.test.js": {
@@ -3759,6 +4037,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "c64dce2fba7e",
       "scherp": "gezakt"
     },
     "officebord.test.js": {
@@ -3766,6 +4045,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "12a124dcb9fe",
       "scherp": "gezakt"
     },
     "onboarding.test.js": {
@@ -3773,6 +4053,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "946c4420cdb0",
       "scherp": "gezakt"
     },
     "onderhoud.test.js": {
@@ -3790,6 +4071,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "b7611ebb6a63",
       "scherp": "gezakt"
     },
     "ondernemerpoort.test.js": {
@@ -3937,6 +4219,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "1bbf4883386e",
       "scherp": "gezakt"
     },
     "onderneming-pijplijn.test.js": {
@@ -3983,7 +4266,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2,
+      "gezakt": 3,
+      "toetsSha": "ccf810316c0e",
       "scherp": "gezakt"
     },
     "onderneming-toegang.test.js": {
@@ -4031,6 +4315,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "e19e65d03abe",
       "scherp": "gezakt"
     },
     "ondertitels.test.js": {
@@ -4048,6 +4333,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "b423fa69a5b7",
       "scherp": "gezakt"
     },
     "onderwijsstuur.test.js": {
@@ -4055,6 +4341,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "8312d14c2867",
       "scherp": "gezakt"
     },
     "onderzoeker.test.js": {
@@ -4062,6 +4349,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "5abe279aac3d",
       "scherp": "gezakt"
     },
     "onderzoekslab.test.js": {
@@ -4069,6 +4357,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "8d701bf23577",
       "scherp": "gezakt"
     },
     "onnozel.test.js": {
@@ -4076,6 +4365,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "3251813e17f9",
       "scherp": "gezakt"
     },
     "ontmoeting-leeg.test.js": {
@@ -4083,6 +4373,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "2275fda2ce87",
       "scherp": "gezakt"
     },
     "ontmoeting.test.js": {
@@ -4090,6 +4381,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "a5af5ce999ac",
       "scherp": "gezakt"
     },
     "ontwerp.test.js": {
@@ -4101,6 +4393,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "5517a5d2bae7",
       "scherp": "gezakt"
     },
     "oplaadgat.test.js": {
@@ -4167,7 +4460,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7,
+      "gezakt": 8,
+      "toetsSha": "2ce615777a72",
       "scherp": "gezakt"
     },
     "overheid.test.js": {
@@ -4175,6 +4469,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 18,
+      "toetsSha": "702f1113b770",
       "scherp": "gezakt"
     },
     "overname.test.js": {
@@ -4192,6 +4487,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "ea7f7d492049",
       "scherp": "gezakt"
     },
     "paginascripts.test.js": {
@@ -4213,6 +4509,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "d7e339e850dd",
       "scherp": "gezakt"
     },
     "papieren.test.js": {
@@ -4220,6 +4517,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "54ec12599c1a",
       "scherp": "gezakt"
     },
     "partner.test.js": {
@@ -4227,13 +4525,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "babde80bb504",
       "scherp": "gezakt"
     },
     "partnerpas.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2,
+      "gezakt": 3,
+      "toetsSha": "97c56bc67673",
       "scherp": "gezakt"
     },
     "pas-apps.test.js": {
@@ -4241,6 +4541,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "6d1e9e64aae3",
       "scherp": "gezakt"
     },
     "pas-escalatie.test.js": {
@@ -4248,13 +4549,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "45a1790199c2",
       "scherp": "gezakt"
     },
     "paspoort.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9,
+      "gezakt": 11,
+      "toetsSha": "0902bbea8494",
       "scherp": "gezakt"
     },
     "pasprijs.test.js": {
@@ -4271,7 +4574,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 10,
+      "gezakt": 13,
+      "toetsSha": "ab966430731d",
       "scherp": "gezakt"
     },
     "payroll-aangifte.test.js": {
@@ -4349,6 +4653,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "41a67c677cf7",
       "scherp": "gezakt"
     },
     "payroll-run.test.js": {
@@ -4396,6 +4701,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "c4e86ac147cf",
       "scherp": "gezakt"
     },
     "payrollkeur.e2e.js": {
@@ -4410,6 +4716,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "b9fa0f7df9c0",
       "scherp": "gezakt"
     },
     "pda-netwerk.test.js": {
@@ -4417,6 +4724,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "2583fee4a0ed",
       "scherp": "gezakt"
     },
     "pdamodules.test.js": {
@@ -4424,6 +4732,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "045220993aba",
       "scherp": "gezakt"
     },
     "pdf.test.js": {
@@ -4431,6 +4740,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "1ea98e01cf43",
       "scherp": "gezakt"
     },
     "persistentiestand.test.js": {
@@ -4492,6 +4802,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "a00fcc808372",
       "scherp": "gezakt"
     },
     "planners.test.js": {
@@ -4499,6 +4810,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "f7c8012c632d",
       "scherp": "gezakt"
     },
     "podium.test.js": {
@@ -4506,6 +4818,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "206c926f648d",
       "scherp": "gezakt"
     },
     "podiumhandel.test.js": {
@@ -4513,6 +4826,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "40a1d3726370",
       "scherp": "gezakt"
     },
     "podiumzaak.test.js": {
@@ -4520,6 +4834,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "bfdb55b1ed7a",
       "scherp": "gezakt"
     },
     "podiumzones.test.js": {
@@ -4527,6 +4842,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "a00348b05a4f",
       "scherp": "gezakt"
     },
     "pols.test.js": {
@@ -4534,6 +4850,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 15,
+      "toetsSha": "3aee38db6300",
       "scherp": "gezakt"
     },
     "poortrace.test.js": {
@@ -4556,6 +4873,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "47e308b3ea36",
       "scherp": "gezakt"
     },
     "postdatum.test.js": {
@@ -4563,6 +4881,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "c4255c883d4f",
       "scherp": "gezakt"
     },
     "productie-installatie.test.js": {
@@ -4620,6 +4939,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "3f4cad524503",
       "scherp": "gezakt"
     },
     "publieke-rand.test.js": {
@@ -4627,6 +4947,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "b489358cb38d",
       "scherp": "gezakt"
     },
     "pulse.test.js": {
@@ -4634,6 +4955,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "62caa0ad62cf",
       "scherp": "gezakt"
     },
     "qr.test.js": {
@@ -4712,6 +5034,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "0aa0808de9e8",
       "scherp": "gezakt"
     },
     "rahul-reis.test.js": {
@@ -4719,6 +5042,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "04aaa2c4a872",
       "scherp": "gezakt"
     },
     "rampbeeld.test.js": {
@@ -4726,6 +5050,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "c8f1267a1b6e",
       "scherp": "gezakt"
     },
     "randen.test.js": {
@@ -4738,6 +5063,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "2eb1ee6504fd",
       "scherp": "gezakt"
     },
     "rechterhand-huis.test.js": {
@@ -4745,6 +5071,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "11d374e04317",
       "scherp": "gezakt"
     },
     "rechterhand-reis.test.js": {
@@ -4752,6 +5079,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "3cd24679e0b9",
       "scherp": "gezakt"
     },
     "rechterhand-wissen.test.js": {
@@ -4759,6 +5087,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "7bb54ee4bcd4",
       "scherp": "gezakt"
     },
     "rechterhand.test.js": {
@@ -4766,6 +5095,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 18,
+      "toetsSha": "12216917aee1",
       "scherp": "gezakt"
     },
     "redactie.test.js": {
@@ -4773,6 +5103,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "3dc8269c4d9d",
       "scherp": "gezakt"
     },
     "redis.test.js": {
@@ -4800,6 +5131,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "8859caffa49e",
       "scherp": "gezakt"
     },
     "reisagenda.test.js": {
@@ -4807,6 +5139,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "4b68173f0181",
       "scherp": "gezakt"
     },
     "reisbieb.test.js": {
@@ -4814,6 +5147,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "e5b894156119",
       "scherp": "gezakt"
     },
     "reisbureau.test.js": {
@@ -4821,6 +5155,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "15ab5fbf30b5",
       "scherp": "gezakt"
     },
     "reisplan.test.js": {
@@ -4828,6 +5163,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "ec28851679d5",
       "scherp": "gezakt"
     },
     "reiswereld.test.js": {
@@ -4845,6 +5181,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "9afdaf773940",
       "scherp": "gezakt"
     },
     "rekening.test.js": {
@@ -4852,6 +5189,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "6d50455958b6",
       "scherp": "gezakt"
     },
     "rekenmotor.test.js": {
@@ -4899,6 +5237,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "8aa7b7196ae5",
       "scherp": "gezakt"
     },
     "reservering-beleid.test.js": {
@@ -4936,6 +5275,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "77c40e47b513",
       "scherp": "gezakt"
     },
     "residentie2.test.js": {
@@ -4943,6 +5283,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "9b2002cbe920",
       "scherp": "gezakt"
     },
     "residentie3.test.js": {
@@ -4950,6 +5291,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "94bdfe6a4579",
       "scherp": "gezakt"
     },
     "residentie4.test.js": {
@@ -4967,6 +5309,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "2f0694c51ca8",
       "scherp": "gezakt"
     },
     "rijksles.test.js": {
@@ -4974,6 +5317,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "19be6a48b55a",
       "scherp": "gezakt"
     },
     "rollenmatrix.test.js": {
@@ -4981,6 +5325,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "f12d0afe8ace",
       "scherp": "gezakt"
     },
     "rolproef.test.js": {
@@ -4998,6 +5343,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "66de36734e4b",
       "scherp": "gezakt"
     },
     "rtf-veilig.test.js": {
@@ -5005,6 +5351,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "d7cd85e4fac2",
       "scherp": "gezakt"
     },
     "rtfagenda.test.js": {
@@ -5012,6 +5359,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "281d95921779",
       "scherp": "gezakt"
     },
     "rtfalbum.test.js": {
@@ -5019,6 +5367,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "974da8f532df",
       "scherp": "gezakt"
     },
     "rtfbieb.test.js": {
@@ -5026,6 +5375,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "111159f19d10",
       "scherp": "gezakt"
     },
     "rtfcampus.test.js": {
@@ -5043,6 +5393,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "ae6635fb9254",
       "scherp": "gezakt"
     },
     "rtfcurve.test.js": {
@@ -5050,6 +5401,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "5fc5c8a74dc5",
       "scherp": "gezakt"
     },
     "rtfgeld.test.js": {
@@ -5057,6 +5409,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "53b1f3e8b1d0",
       "scherp": "gezakt"
     },
     "rtfkantoor.test.js": {
@@ -5064,6 +5417,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "6bc57ebb7e13",
       "scherp": "gezakt"
     },
     "rtfleerlingtoegang.test.js": {
@@ -5071,6 +5425,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "732da16ba84b",
       "scherp": "gezakt"
     },
     "rtfos-afmaak.test.js": {
@@ -5078,6 +5433,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "bc9abe91afd5",
       "scherp": "gezakt"
     },
     "rtfos-bestuur.test.js": {
@@ -5085,6 +5441,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "015fb51a1675",
       "scherp": "gezakt"
     },
     "rtfos-doelgroepen.test.js": {
@@ -5092,6 +5449,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "c6474a38f2e8",
       "scherp": "gezakt"
     },
     "rtfos-governance.test.js": {
@@ -5099,6 +5457,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "b95c8fccd687",
       "scherp": "gezakt"
     },
     "rtfos-netwerk.test.js": {
@@ -5106,6 +5465,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "da414c1d0be5",
       "scherp": "gezakt"
     },
     "rtfos-portalen.test.js": {
@@ -5113,6 +5473,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "7510db699113",
       "scherp": "gezakt"
     },
     "rtfos-uitvoering.test.js": {
@@ -5120,6 +5481,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "b03d8952f071",
       "scherp": "gezakt"
     },
     "rtfos.test.js": {
@@ -5127,6 +5489,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "8bc149cc2690",
       "scherp": "gezakt"
     },
     "rtfschool.test.js": {
@@ -5134,6 +5497,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "2ee7d87ec313",
       "scherp": "gezakt"
     },
     "rtfschool2.test.js": {
@@ -5141,6 +5505,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "3c471a8bef2e",
       "scherp": "gezakt"
     },
     "rtfwelzijn.test.js": {
@@ -5148,6 +5513,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "3a55968df040",
       "scherp": "gezakt"
     },
     "rtfwelzijn2.test.js": {
@@ -5155,6 +5521,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "29277bb9c163",
       "scherp": "gezakt"
     },
     "rtgai.test.js": {
@@ -5162,6 +5529,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "f6ebe82cb07a",
       "scherp": "gezakt"
     },
     "rtgcode.test.js": {
@@ -5189,6 +5557,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "0683aa226a5f",
       "scherp": "gezakt"
     },
     "rtgjson.test.js": {
@@ -5196,6 +5565,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "20617e50f0b6",
       "scherp": "gezakt"
     },
     "rtgone.test.js": {
@@ -5203,6 +5573,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "70c4d33bc2dd",
       "scherp": "gezakt"
     },
     "rtmail-ai.test.js": {
@@ -5210,6 +5581,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "d961a4533151",
       "scherp": "gezakt"
     },
     "rtmail-bestuur.test.js": {
@@ -5217,13 +5589,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "356f502dc46d",
       "scherp": "gezakt"
     },
     "rtmail-lid.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5,
+      "gezakt": 7,
+      "toetsSha": "290e89c8966b",
       "scherp": "gezakt"
     },
     "rtmail-schrijf.test.js": {
@@ -5231,6 +5605,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "1bb8cb7e77d8",
       "scherp": "gezakt"
     },
     "rtmail-team.test.js": {
@@ -5238,6 +5613,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "9dfeeabe4994",
       "scherp": "gezakt"
     },
     "rtmail-vak.test.js": {
@@ -5245,6 +5621,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "5f3827081a18",
       "scherp": "gezakt"
     },
     "rtmail-werk.test.js": {
@@ -5252,6 +5629,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "94be512b7cf3",
       "scherp": "gezakt"
     },
     "rtmail-zaak.test.js": {
@@ -5259,6 +5637,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "b201add80137",
       "scherp": "gezakt"
     },
     "rtmail.test.js": {
@@ -5296,6 +5675,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "0be78806d467",
       "scherp": "gezakt"
     },
     "salon-app.test.js": {
@@ -5303,6 +5683,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 14,
+      "toetsSha": "ce8a84bd7262",
       "scherp": "gezakt"
     },
     "salon-curatie.test.js": {
@@ -5310,6 +5691,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "d20ba6d388fd",
       "scherp": "gezakt"
     },
     "salon-verplicht.test.js": {
@@ -5317,6 +5699,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "64574cf04258",
       "scherp": "gezakt"
     },
     "salonbeeld.test.js": {
@@ -5334,6 +5717,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "35a756a0d182",
       "scherp": "gezakt"
     },
     "salonviraal.test.js": {
@@ -5351,6 +5735,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "ac14514aa618",
       "scherp": "gezakt"
     },
     "samendelen.test.js": {
@@ -5358,6 +5743,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "ee536f965eca",
       "scherp": "gezakt"
     },
     "samenwerking.test.js": {
@@ -5365,6 +5751,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "1f309cfbb02f",
       "scherp": "gezakt"
     },
     "satelliet.test.js": {
@@ -5372,6 +5759,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "c097f312ec68",
       "scherp": "gezakt"
     },
     "saveduurzaam.test.js": {
@@ -5403,6 +5791,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "65152e6e8de6",
       "scherp": "gezakt"
     },
     "scheiding.test.js": {
@@ -5410,6 +5799,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "29fccedd7315",
       "scherp": "gezakt"
     },
     "schermleugen.test.js": {
@@ -5427,6 +5817,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "2ce3515330a6",
       "scherp": "gezakt"
     },
     "school.test.js": {
@@ -5434,6 +5825,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "ef4d004b5187",
       "scherp": "gezakt"
     },
     "schoolaanwezig.test.js": {
@@ -5441,6 +5833,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "fa684b462c97",
       "scherp": "gezakt"
     },
     "schoolbeeld.test.js": {
@@ -5448,6 +5841,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "60d1f835eb3f",
       "scherp": "gezakt"
     },
     "schoolbel.test.js": {
@@ -5455,6 +5849,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "37ffb3d4a759",
       "scherp": "gezakt"
     },
     "schooldirectie.test.js": {
@@ -5462,6 +5857,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "4c25c6e5fc90",
       "scherp": "gezakt"
     },
     "schoolenterprise.test.js": {
@@ -5469,6 +5865,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "6d51eb974e91",
       "scherp": "gezakt"
     },
     "schoolexcursie.test.js": {
@@ -5476,6 +5873,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "10a2fb32d7d5",
       "scherp": "gezakt"
     },
     "schoolgeld.test.js": {
@@ -5483,6 +5881,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "ff1b0b15c3c3",
       "scherp": "gezakt"
     },
     "schoolhulplijn.test.js": {
@@ -5490,6 +5889,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "b7b26a1b91a3",
       "scherp": "gezakt"
     },
     "schoolkoppel.test.js": {
@@ -5497,6 +5897,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "5c1370dbf4ae",
       "scherp": "gezakt"
     },
     "schoolniveau.test.js": {
@@ -5504,6 +5905,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "1b62d16e7d32",
       "scherp": "gezakt"
     },
     "schoolrest.test.js": {
@@ -5511,6 +5913,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "1d1f66bf8858",
       "scherp": "gezakt"
     },
     "schoolschermen.test.js": {
@@ -5522,6 +5925,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "50b67cb8ddbc",
       "scherp": "gezakt"
     },
     "schooltoets.test.js": {
@@ -5529,6 +5933,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "69dcd6b0f2e7",
       "scherp": "gezakt"
     },
     "schoolverbonden.test.js": {
@@ -5536,6 +5941,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "f7c085bc1fa6",
       "scherp": "gezakt"
     },
     "scim.test.js": {
@@ -5563,6 +5969,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "5ea573cb1fba",
       "scherp": "overleefd"
     },
     "selfhost.test.js": {
@@ -5590,6 +5997,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "658ae2330ade",
       "scherp": "gezakt"
     },
     "sessie-herstart.test.js": {
@@ -5597,6 +6005,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "e364b1e5745d",
       "scherp": "gezakt"
     },
     "sessiegrens.test.js": {
@@ -5604,6 +6013,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "952308e70d09",
       "scherp": "overleefd"
     },
     "sessies.test.js": {
@@ -5635,6 +6045,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "26624120a2a9",
       "scherp": "gezakt"
     },
     "slo.test.js": {
@@ -5656,7 +6067,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 15,
+      "gezakt": 16,
+      "toetsSha": "3ba11031db5e",
       "scherp": "gezakt"
     },
     "smtp.test.js": {
@@ -5734,6 +6146,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "ab6d99970935",
       "scherp": "gezakt"
     },
     "sparren.test.js": {
@@ -5741,6 +6154,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "433bff2be131",
       "scherp": "gezakt"
     },
     "spelaandeel.test.js": {
@@ -5778,6 +6192,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "72e23578c9e6",
       "scherp": "gezakt"
     },
     "spelhandel.test.js": {
@@ -5814,7 +6229,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 19,
+      "gezakt": 31,
+      "toetsSha": "83a913cfab1d",
       "scherp": "gezakt"
     },
     "spelmaatje.test.js": {
@@ -5822,6 +6238,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "7369af285ac8",
       "scherp": "gezakt"
     },
     "spelmagnaat.test.js": {
@@ -5859,6 +6276,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "d71a9e9309cc",
       "scherp": "gezakt"
     },
     "spelpraat.e2e.js": {
@@ -5873,6 +6291,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "84e9a65a7d66",
       "scherp": "gezakt"
     },
     "spelpresence.test.js": {
@@ -5956,7 +6375,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9,
+      "gezakt": 10,
+      "toetsSha": "661b89252aa9",
       "scherp": "gezakt"
     },
     "spelteams.e2e.js": {
@@ -5970,7 +6390,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3,
+      "gezakt": 4,
+      "toetsSha": "503ca0babd89",
       "scherp": "gezakt"
     },
     "speltelling.test.js": {
@@ -5978,6 +6399,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "9adfb416e325",
       "scherp": "gezakt"
     },
     "speltoernooi.test.js": {
@@ -6035,6 +6457,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "d6202c561a61",
       "scherp": "gezakt"
     },
     "sso.test.js": {
@@ -6082,6 +6505,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "49c2fdf434be",
       "scherp": "gezakt"
     },
     "stadsbesluit.test.js": {
@@ -6089,6 +6513,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "d9cb55bba896",
       "scherp": "gezakt"
     },
     "stadsbestuur.test.js": {
@@ -6096,6 +6521,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "5b315e815bb6",
       "scherp": "gezakt"
     },
     "stadshardware.test.js": {
@@ -6103,6 +6529,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "ab05b02b200c",
       "scherp": "gezakt"
     },
     "stadskansen.test.js": {
@@ -6110,6 +6537,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "45f01d11f324",
       "scherp": "gezakt"
     },
     "stadsraad.test.js": {
@@ -6117,6 +6545,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "c8683ecc2725",
       "scherp": "gezakt"
     },
     "stadstart.test.js": {
@@ -6144,6 +6573,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "4257d8fd6f37",
       "scherp": "gezakt"
     },
     "staff-inzet-mob.test.js": {
@@ -6151,6 +6581,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "7d5a8f3f787c",
       "scherp": "gezakt"
     },
     "staffinvite.test.js": {
@@ -6158,6 +6589,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "325ba95bd464",
       "scherp": "gezakt"
     },
     "stijlbundel.test.js": {
@@ -6175,6 +6607,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "988ece21d044",
       "scherp": "gezakt"
     },
     "stillepost.test.js": {
@@ -6192,6 +6625,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "dbb7b78d3494",
       "scherp": "gezakt"
     },
     "strenge-poort.test.js": {
@@ -6219,6 +6653,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "6b23a924bb50",
       "scherp": "gezakt"
     },
     "stun.test.js": {
@@ -6246,6 +6681,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "e8c9263cf508",
       "scherp": "gezakt"
     },
     "supplier-comm-mob-payroll.test.js": {
@@ -6253,6 +6689,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "e7d5e18a46bb",
       "scherp": "gezakt"
     },
     "supplier-comm-routes.test.js": {
@@ -6260,6 +6697,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "013af2c337aa",
       "scherp": "gezakt"
     },
     "supplier-post-drive.test.js": {
@@ -6267,6 +6705,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "f67d562c5564",
       "scherp": "gezakt"
     },
     "svgpaden.test.js": {
@@ -6284,6 +6723,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "49191f29fb56",
       "scherp": "gezakt"
     },
     "tafeldek.test.js": {
@@ -6291,6 +6731,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "61de310a790f",
       "scherp": "gezakt"
     },
     "tafelticket.test.js": {
@@ -6298,6 +6739,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "3c2027cc4a40",
       "scherp": "gezakt"
     },
     "takenlijst.test.js": {
@@ -6315,13 +6757,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "2cdd71457b67",
       "scherp": "gezakt"
     },
     "talen114.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5,
+      "gezakt": 6,
+      "toetsSha": "3b0c61929739",
       "scherp": "gezakt"
     },
     "techniek-functies.test.js": {
@@ -6329,6 +6773,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "3b3edbb66e58",
       "scherp": "gezakt"
     },
     "techniek-sso-scim.test.js": {
@@ -6336,6 +6781,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "7c76a4304c19",
       "scherp": "gezakt"
     },
     "techniek.test.js": {
@@ -6353,6 +6799,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "0fa61ee8a595",
       "scherp": "gezakt"
     },
     "theater-thuis.test.js": {
@@ -6360,13 +6807,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "afb881e1f5ce",
       "scherp": "gezakt"
     },
     "theater.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5,
+      "gezakt": 6,
+      "toetsSha": "3be3fc49b5d7",
       "scherp": "gezakt"
     },
     "thuis-zaak.test.js": {
@@ -6374,6 +6823,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "e4bf63a925a7",
       "scherp": "gezakt"
     },
     "thuis.test.js": {
@@ -6381,6 +6831,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "9a1b1337bd7f",
       "scherp": "gezakt"
     },
     "thuiszakelijk.test.js": {
@@ -6388,6 +6839,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "2835792531ef",
       "scherp": "gezakt"
     },
     "tiener.test.js": {
@@ -6395,6 +6847,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "ef2f39b8eebe",
       "scherp": "gezakt"
     },
     "tijdlijn.test.js": {
@@ -6402,6 +6855,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "1893c7afe869",
       "scherp": "gezakt"
     },
     "tls-acme-boot.test.js": {
@@ -6458,7 +6912,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5,
+      "gezakt": 6,
+      "toetsSha": "f330629435c3",
       "scherp": "gezakt"
     },
     "toestellen.test.js": {
@@ -6466,6 +6921,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "b180827b8ba6",
       "scherp": "gezakt"
     },
     "training.test.js": {
@@ -6473,6 +6929,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "22a652ea041d",
       "scherp": "gezakt"
     },
     "trainingsschema.test.js": {
@@ -6480,6 +6937,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "27aea2a3f341",
       "scherp": "gezakt"
     },
     "transfer.test.js": {
@@ -6487,6 +6945,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "a54842442663",
       "scherp": "gezakt"
     },
     "txgeld.test.js": {
@@ -6539,6 +6998,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "e53c92b4b05f",
       "scherp": "gezakt"
     },
     "uitgifte.test.js": {
@@ -6546,6 +7006,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "c8cd9384fb36",
       "scherp": "gezakt"
     },
     "uitloggen.test.js": {
@@ -6553,6 +7014,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "6de008b84ca7",
       "scherp": "gezakt"
     },
     "uitrol.test.js": {
@@ -6580,6 +7042,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "20ca08fb7766",
       "scherp": "gezakt"
     },
     "uploadquarantaine.test.js": {
@@ -6597,6 +7060,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "3b13460decfa",
       "scherp": "gezakt"
     },
     "vakpro.test.js": {
@@ -6604,6 +7068,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "5d341986eb64",
       "scherp": "gezakt"
     },
     "vakpro2.test.js": {
@@ -6611,6 +7076,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "e7e5506b9bce",
       "scherp": "gezakt"
     },
     "vakwerk-pro.test.js": {
@@ -6618,6 +7084,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "21936f2e167e",
       "scherp": "gezakt"
     },
     "vakwerk.test.js": {
@@ -6625,6 +7092,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "6b346e64f2d4",
       "scherp": "gezakt"
     },
     "vastgoed.test.js": {
@@ -6632,6 +7100,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "1568f2e71fce",
       "scherp": "gezakt"
     },
     "vastleggen.test.js": {
@@ -6639,6 +7108,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "9bdc1cac50a1",
       "scherp": "gezakt"
     },
     "veelzoek.test.js": {
@@ -6666,6 +7136,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "0f82a63d46d3",
       "scherp": "gezakt"
     },
     "veiligheid-moment.test.js": {
@@ -6683,6 +7154,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "fb8aa4846b84",
       "scherp": "gezakt"
     },
     "verblijf.test.js": {
@@ -6690,6 +7162,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "c1ecdd2f8f8a",
       "scherp": "gezakt"
     },
     "vergeten-gezelschap.test.js": {
@@ -6697,6 +7170,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "22d287389213",
       "scherp": "gezakt"
     },
     "vergeten.test.js": {
@@ -6704,6 +7178,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "d2c04620d5d9",
       "scherp": "gezakt"
     },
     "verhuur.test.js": {
@@ -6711,6 +7186,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "23a40a6076b6",
       "scherp": "gezakt"
     },
     "verjaardagen.test.js": {
@@ -6718,6 +7194,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "931edfcd5920",
       "scherp": "gezakt"
     },
     "verkoop-etalage.test.js": {
@@ -6725,6 +7202,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "f2ddecaf7c08",
       "scherp": "gezakt"
     },
     "verraad.test.js": {
@@ -6752,6 +7230,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "53677630d2ff",
       "scherp": "gezakt"
     },
     "verzadiging.test.js": {
@@ -6769,6 +7248,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "3e2198405f24",
       "scherp": "gezakt"
     },
     "verzorging-leden.test.js": {
@@ -6776,6 +7256,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "b2426b2166b8",
       "scherp": "gezakt"
     },
     "verzorging.test.js": {
@@ -6783,6 +7264,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "bac8e0c2c6b1",
       "scherp": "gezakt"
     },
     "villa.test.js": {
@@ -6790,6 +7272,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "e712328b4928",
       "scherp": "gezakt"
     },
     "vingerafdruk.test.js": {
@@ -6807,6 +7290,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "e1d1265a8ac7",
       "scherp": "gezakt"
     },
     "vloot.test.js": {
@@ -6826,6 +7310,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "5df4fc5eb6ce",
       "scherp": "gezakt"
     },
     "voertuigscherm.e2e.js": {
@@ -6838,6 +7323,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "341f28891fa2",
       "scherp": "gezakt"
     },
     "voorspel.test.js": {
@@ -6845,6 +7331,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "6eb8c29438cc",
       "scherp": "gezakt"
     },
     "vracht.test.js": {
@@ -6852,6 +7339,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "544fd2e5d950",
       "scherp": "gezakt"
     },
     "vrijenamen.test.js": {
@@ -6887,6 +7375,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "fb0ecaa5c27e",
       "scherp": "gezakt"
     },
     "wachter.test.js": {
@@ -6904,6 +7393,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "87ee5484689e",
       "scherp": "gezakt"
     },
     "wauw.test.js": {
@@ -6911,6 +7401,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "fd11ecd96b2c",
       "scherp": "gezakt"
     },
     "wbw.test.js": {
@@ -6918,6 +7409,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "cc7db86052ee",
       "scherp": "gezakt"
     },
     "web.test.js": {
@@ -6935,6 +7427,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "3efb7ce0b29a",
       "scherp": "overleefd"
     },
     "webauthn-eigen.test.js": {
@@ -6951,7 +7444,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5,
+      "gezakt": 7,
+      "toetsSha": "ae36c99dfa98",
       "scherp": "overleefd"
     },
     "webplatform.test.js": {
@@ -6959,6 +7453,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 28,
+      "toetsSha": "f8056fb98126",
       "scherp": "gezakt"
     },
     "webpush.test.js": {
@@ -6976,6 +7471,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "da55ecf89fe6",
       "scherp": "gezakt"
     },
     "wereldkern.test.js": {
@@ -7000,6 +7496,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "7edb4eef065d",
       "scherp": "gezakt"
     },
     "wereldprofiel.test.js": {
@@ -7007,6 +7504,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "ccc11a93dbeb",
       "scherp": "gezakt"
     },
     "wereldregels.test.js": {
@@ -7014,6 +7512,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "58a5adcc6592",
       "scherp": "gezakt"
     },
     "wereldroutes.test.js": {
@@ -7021,6 +7520,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "67eb28b1cda9",
       "scherp": "gezakt"
     },
     "wereldtaal.test.js": {
@@ -7040,6 +7540,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "toetsSha": "29dd4c6b04e2",
       "scherp": "gezakt"
     },
     "werk-bij-inloggen.test.js": {
@@ -7047,6 +7548,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "01fc28b074de",
       "scherp": "gezakt"
     },
     "werkbeleid-dienst.test.js": {
@@ -7054,6 +7556,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "6290b23c99ba",
       "scherp": "gezakt"
     },
     "werkgebeurtenis.test.js": {
@@ -7071,6 +7574,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "cd2d03919170",
       "scherp": "gezakt"
     },
     "werkgezondheid.test.js": {
@@ -7078,13 +7582,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "0b6c9a02e494",
       "scherp": "gezakt"
     },
     "werkgrens.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9,
+      "gezakt": 15,
+      "toetsSha": "88bf900c2404",
       "scherp": "gezakt"
     },
     "werkindienst.test.js": {
@@ -7092,6 +7598,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "dce1d33c7793",
       "scherp": "gezakt"
     },
     "werkmail.test.js": {
@@ -7099,6 +7606,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "002067ae7a18",
       "scherp": "gezakt"
     },
     "werkplaats-uitgifte.test.js": {
@@ -7106,6 +7614,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "7e4ceeed1ac8",
       "scherp": "gezakt"
     },
     "werkplek-wijzigen.test.js": {
@@ -7113,6 +7622,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 10,
+      "toetsSha": "124bcb56c100",
       "scherp": "gezakt"
     },
     "werkplek.test.js": {
@@ -7120,13 +7630,15 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 13,
+      "toetsSha": "132678dedacc",
       "scherp": "gezakt"
     },
     "werkregels.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9,
+      "gezakt": 11,
+      "toetsSha": "553f55102602",
       "scherp": "gezakt"
     },
     "werkregister.test.js": {
@@ -7134,6 +7646,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "7f90712459ad",
       "scherp": "gezakt"
     },
     "werkruimte-kantoor.test.js": {
@@ -7145,6 +7658,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "0f327cedd62e",
       "scherp": "gezakt"
     },
     "werkvenster.test.js": {
@@ -7152,6 +7666,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "toetsSha": "5e7d0806b3ac",
       "scherp": "gezakt"
     },
     "werkvloer.test.js": {
@@ -7159,6 +7674,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "0e193aaf5f63",
       "scherp": "gezakt"
     },
     "werkvormen.test.js": {
@@ -7166,6 +7682,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "toetsSha": "7e1ae4bf6e41",
       "scherp": "gezakt"
     },
     "werkwaarom.test.js": {
@@ -7173,6 +7690,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "61cfd6a94af7",
       "scherp": "gezakt"
     },
     "werving-link.test.js": {
@@ -7180,6 +7698,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "3fc9955d1850",
       "scherp": "gezakt"
     },
     "wetten.test.js": {
@@ -7217,6 +7736,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "68f5d5a007a7",
       "scherp": "gezakt"
     },
     "woonplaats-poort.test.js": {
@@ -7234,6 +7754,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "ed266f7774e2",
       "scherp": "gezakt"
     },
     "zaak-en-mensen.test.js": {
@@ -7241,6 +7762,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "c6d88c072788",
       "scherp": "gezakt"
     },
     "zaak-export.test.js": {
@@ -7248,6 +7770,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "6f48fdc584ce",
       "scherp": "gezakt"
     },
     "zaak-inrichting.test.js": {
@@ -7255,6 +7778,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "b2248ccd9d1b",
       "scherp": "gezakt"
     },
     "zaak-kantoor.test.js": {
@@ -7262,6 +7786,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "fe4324fc8f30",
       "scherp": "gezakt"
     },
     "zaak-loket-en-dossier.test.js": {
@@ -7269,6 +7794,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "a307124c1f25",
       "scherp": "gezakt"
     },
     "zaak-vloot-en-facturen.test.js": {
@@ -7276,6 +7802,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "toetsSha": "de98f07240a1",
       "scherp": "gezakt"
     },
     "zaak.test.js": {
@@ -7283,6 +7810,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "toetsSha": "8430fa488f1e",
       "scherp": "gezakt"
     },
     "zaakcommand-routes.test.js": {
@@ -7290,6 +7818,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "toetsSha": "a58cc0889317",
       "scherp": "gezakt"
     },
     "zaakcommand.test.js": {
@@ -7309,6 +7838,7 @@
       "traag": true,
       "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
       "operator": "liegpoort /api/",
+      "toetsSha": "dc8a67d9a247",
       "scherp": "gezakt"
     },
     "zaaktools.test.js": {
@@ -7316,6 +7846,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "toetsSha": "4a66166582f1",
       "scherp": "gezakt"
     },
     "zakelijk.test.js": {
@@ -7323,6 +7854,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "58550815f42b",
       "scherp": "gezakt"
     },
     "zakelijkvervoer.test.js": {
@@ -7330,6 +7862,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 14,
+      "toetsSha": "29863b554d68",
       "scherp": "gezakt"
     },
     "zandbak.test.js": {
@@ -7367,6 +7900,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "toetsSha": "f5867a48c343",
       "scherp": "gezakt"
     },
     "zelfzorg.test.js": {
@@ -7374,6 +7908,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "5662d8c4b6ce",
       "scherp": "gezakt"
     },
     "ziekmelding-privacy.test.js": {
@@ -7383,6 +7918,7 @@
       "lekt": true,
       "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
       "operator": "liegpoort /api/",
+      "toetsSha": "83bab2e2ceae",
       "scherp": "gezakt"
     },
     "zinnencache.test.js": {
@@ -7400,6 +7936,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "toetsSha": "9fc9d1033da1",
       "scherp": "gezakt"
     },
     "zorgniveau.test.js": {
@@ -7407,6 +7944,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "toetsSha": "f0be2209be8e",
       "scherp": "gezakt"
     },
     "zorgwallet.test.js": {
@@ -7414,6 +7952,7 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "toetsSha": "e842aba1c60b",
       "scherp": "gezakt"
     },
     "zware-bundels.test.js": {

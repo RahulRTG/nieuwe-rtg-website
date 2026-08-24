@@ -4,7 +4,7 @@
 
    Dit is de orkestrator: de config (categorieen, doelgroepen) staat in
    ./doelgroepen en de catalogus is per categoriegroep opgeknipt in ./cat-leden,
-   ./cat-apps, ./cat-life en ./cat-partners. Hier worden ze samengevoegd (in de
+   ./cat-apps, ./cat-life, ./cat-partners en ./cat-command. Hier worden ze samengevoegd (in de
    oorspronkelijke volgorde) en volgen de fail-fast-controles op dubbele id's,
    de tegenhangers (KOPPELS) en de uitrolfases (FASES). */
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF } = require('./doelgroepen');
@@ -17,6 +17,11 @@ const FUNCTIES = [].concat(
   require('./cat-apps2'),
   require('./cat-life'),
   require('./cat-partners'),
+  /* De drie Command-schakelaars staan sinds cat-partners.js door zijn
+     omvangsgrens ging in een eigen bestand, op precies deze plek zodat de
+     volgorde van FUNCTIES onveranderd blijft: bij twee functies met hetzelfde
+     pad wint de eerste, en dat gebeurt vier keer in deze catalogus. */
+  require('./cat-command'),
   require('./cat-partners2'),
   require('./cat-zaakregie'),
   require('./cat-domeinen'),

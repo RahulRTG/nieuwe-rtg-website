@@ -136,19 +136,9 @@ module.exports = (kern) => {
     res.json(uit);
   });
 
-  /* Het beheer-token OF een lid met het recht `werkruimte`. Er wordt geen derde
-     manier bedacht om "mag deze aanroeper hier bij" te beantwoorden: allebei de
-     takken vragen het aan bedrijf/index.js, net als de rest van dit bestand. */
-  function viaBeheerOfDirectie(req, res) {
-    if (req.body && req.body.beheerToken) return bedrijf.beheerVan(req, res);
-    const s = bedrijf.lidVan(req, res); if (!s) return null;
-    const rechten = bedrijf.rechtenVan ? bedrijf.rechtenVan(s.l) : [];
-    if (!rechten.includes('werkruimte')) {
-      res.status(403).json({ error: 'Daar heeft u het recht "werkruimte" voor nodig, of het beheer-token.', recht: 'werkruimte' });
-      return null;
-    }
-    return s.w;
-  }
+  /* De poort staat in ./tenant/poort.js sinds ./tenant/bijstand.js hem ook
+     nodig heeft: twee kopieën van een deur lopen uiteen. */
+  const viaBeheerOfDirectie = require('./tenant/poort')({ bedrijf });
 
   app.post('/api/tenant/groepen', (req, res) => {
     const w = bedrijf.beheerVan(req, res); if (!w) return;
@@ -159,4 +149,6 @@ module.exports = (kern) => {
       groepen: t.groepen.filter(g => g.werkruimte === w.code),
       merk: tenant.merkVan(t.org) });
   });
+
+  require('./tenant/bijstand')({ app, tenant, bijstand: () => kern.bijstand, viaBeheerOfDirectie });
 };

@@ -63,16 +63,51 @@
     return u;
   }
 
-  /* ---- het journaal ---- */
+  /* ---- het journaal, met de configuratietijdlijn erboven ----
+     De tijdlijn staat hier omdat hij dezelfde vraag beantwoordt, een stap
+     breder: het journaal ziet wat er via Command ging, de tijdlijn voegt de
+     schakelkast en de noodstand toe. Wat geen van beide ziet, staat erbij. */
   C.TEKENAARS.journaal = function (el) {
     el.innerHTML = '<h2 class="ckop">Journaal</h2>' +
       '<p class="lead">Iedere menselijke én automatische handeling, met de oude en de nieuwe toestand, de actor, ' +
       'de reden en de gebruikte regel. Elke regel draagt de hash van de vorige; wie er middenin iets wijzigt, ' +
       'breekt de keten en dat is hieronder te zien.</p>' +
+      '<div class="crij"><button class="knop" id="jrTl">Wat is er het laatste uur veranderd?</button>' +
+      '<span class="meta">Journaal, schakelkast en noodstand op één lijn.</span></div>' +
+      '<div id="jrtl"></div>' +
       '<div id="jruit"><div class="leeg">Laden…</div></div>';
+    document.querySelector('#jrTl').onclick = function () {
+      var vak = document.querySelector('#jrtl');
+      if (vak.innerHTML) { vak.innerHTML = ''; return; }
+      vak.innerHTML = '<div class="leeg">Lezen…</div>';
+      api('tijdlijn/rondom', { moment: new Date().toISOString(), minuten: 60 })
+        .then(function (d) { vak.innerHTML = C.tijdlijnBlok(d); })
+        .catch(function (e) { if (!e.stil) vak.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+    };
     api('journaal', { n: 80 }).then(function (d) {
       document.querySelector('#jruit').innerHTML = jrTeken(d);
     }).catch(function (e) { if (!e.stil) document.querySelector('#jruit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+  };
+
+  /* Gedeeld met de incidentwerkplek, die dezelfde vraag stelt over het moment
+     waarop een storing begon. De zin over volgorde en oorzaak komt van de
+     SERVER en wordt hier niet nagetypt; anders lopen de twee uiteen. */
+  C.tijdlijnBlok = function (d) {
+    var u = '<div class="kaart"><h3>Vlak hiervoor veranderd</h3>' +
+      '<p class="meta">' + d.aantal + ' regel(s) in ' + d.venster.minuten + ' minuten voor ' +
+      esc(C.tijd(d.moment)) + ', waarvan ' + d.veranderdeIets + ' werkelijk iets veranderde.</p>';
+    u += '<ul class="h-keten">' + (d.regels.length ? d.regels.map(function (r) {
+      return '<li><span class="cniveau geen">' + esc(r.bron) + '</span> ' +
+        '<b>' + r.secondenVoor + ' s eerder</b> · ' + esc(r.wat) +
+        ' <span class="meta">' + esc(r.wie || '') +
+        (r.status ? ' · ' + esc(r.status) : '') +
+        (r.veranderdeIets === false ? ' · veranderde niets' : '') + '</span></li>';
+    }).join('') : '<li class="meta">Niets in dit venster.</li>') + '</ul>';
+    u += '<div class="czegt">' + esc(d.let) + '</div>';
+    u += '<p class="meta"><b>Buiten beeld:</b></p><ul class="h-keten">' + d.buitenBeeld.map(function (b) {
+      return '<li>' + esc(b.wat) + '<div class="czegt">' + esc(b.waarom) + '</div></li>';
+    }).join('') + '</ul></div>';
+    return u;
   };
 
   function jrTeken(d) {

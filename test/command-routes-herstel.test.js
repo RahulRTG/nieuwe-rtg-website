@@ -11,7 +11,10 @@
      - een zaak loopt open -> in behandeling -> afgehandeld en niet andersom;
      - de operator VERWOORDT een plan maar bedenkt het niet, dus een plan zonder
        kandidaten blijft leeg in plaats van iets te verzinnen;
-     - de zandbak draait op zijn eigen kopie en raakt de productie niet.
+     - de zandbak draait op zijn eigen kopie en raakt de productie niet;
+     - en sinds de hersteltransactie: de route LOOPT door die transactie. Dat is
+       hier de bedradingsvraag en niet de rekenvraag -- die staat in
+       test/hersteltransactie.test.js met zijn eigen mutaties.
 
    MUTATIES die zijn gedraaid en welke bewering erop zakte (LAT.md regel 2):
    - `droog: req.body.droog !== false` omgezet naar `!!req.body.droog`
@@ -20,6 +23,8 @@
      -> "een teruggedraaide run zegt dat zelf" ZAKT (RAAK)
    - de statuscontrole uit zaken.besluit() gehaald
      -> "een zaak loopt open, in behandeling, afgehandeld" ZAKT (RAAK)
+   - de route weer rechtstreeks op command.runbooks.voer() gezet
+     -> "de herstelroute loopt door de transactie" ZAKT (RAAK)
    - dezelfde controle uit zaken.neem() gehaald
      -> zakt NU ook, maar bleef eerst groen: die regel staat twee keer in
         kern/command/zaken.js en de toets raakte er maar een van. Dat is precies
@@ -84,6 +89,33 @@ test('2. wie droog vergeet, verandert niets', async () => {
     menselijkAkkoord: true }, 'nat draaien');
   assert.equal(nat.run.droog, false, 'nu pas gaat hij echt');
   assert.equal(typeof nat.run.geraakt, 'number', 'en zegt hoeveel objecten hij raakte');
+});
+
+test('2b. de herstelroute loopt door de transactie', async () => {
+  /* De bedradingsvraag: komen de vier stukken van de transactie werkelijk uit
+     deze route? Een route die stilletjes weer rechtstreeks op runbooks.voer()
+     zit, rekent nog steeds netjes -- en kijkt niets meer na. */
+  const l = await moet('runbooks', {}, 'de lijst');
+  const rb = l.runbooks[0];
+  const droog = await moet('runbook/voer', { id: rb.id, droog: true }, 'droog draaien');
+  assert.ok(droog.certificaat, 'de uitslag draagt geen certificaat');
+  assert.ok(Array.isArray(droog.voorcontrole.stappen) && droog.voorcontrole.stappen.length >= 3,
+    'de voorcontrole is niet gelopen');
+  assert.deepEqual(droog.keten, ['voorcontrole', 'droogloop']);
+  assert.equal(droog.verificatie.nietVanToepassing, true, 'een droogloop meldt een verificatie');
+
+  /* En de voorcontrole draagt wat hij NIET kon controleren, in plaats van dat
+     stil voor geslaagd te laten doorgaan. */
+  const namen = droog.voorcontrole.stappen.map(s => s.naam);
+  for (const n of ['veld-niet-bevroren', 'terugweg-bestaat', 'binnen-max-impact', 'fundament-gezond']) {
+    assert.ok(namen.includes(n), 'de voorwaarde ' + n + ' staat niet in de keten');
+  }
+
+  const nat = await moet('runbook/voer', { id: rb.id, droog: false, reden: 'de routetoets',
+    menselijkAkkoord: true }, 'nat draaien');
+  assert.equal(nat.keten[0], 'voorcontrole');
+  assert.equal(nat.keten[3], 'verificatie');
+  assert.ok(nat.verificatie, 'een echte ronde kwam zonder verificatie terug');
 });
 
 test('3. een teruggedraaide run zegt dat zelf, en staat zo in de runlijst', async () => {

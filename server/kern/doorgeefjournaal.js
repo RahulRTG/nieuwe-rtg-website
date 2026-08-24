@@ -114,10 +114,28 @@ function maakDoorgeefjournaal({ db, save, nu, bestand }) {
     if (!Array.isArray(oud) || !oud.length) return 0;
     let n = 0;
     for (const r of oud) if (boek.voegToe(r)) n++;
-    boek.spoelNu();
+    /* EERST BEWIJZEN DAT HET GESCHREVEN IS, DAN PAS WEGGOOIEN.
+
+       Hier stond `boek.spoelNu(); delete db.data.doorgeefjournaal;` -- zonder
+       naar de uitkomst te kijken. Een volle schijf of een onschrijfbare map
+       maakte daarmee van een verhuizing een verwijdering: weg uit de database,
+       nooit in het bestand, en niets dat erover klaagde. Precies de storing waar
+       dit journaal juist voor bestaat.
+
+       Nu blijft de oude collectie gewoon staan als de spoeling niet compleet
+       lukte. Dan is er hooguit dubbel werk bij de volgende start; het alternatief
+       is de geschiedenis kwijt. */
+    const weg = boek.spoelNu();
+    const stand = boek.stand();
+    if (stand.stuk || weg < n) {
+      console.warn('[journaal] verhuizing NIET voltooid (' + weg + ' van ' + n +
+        ' regels geschreven' + (stand.stuk ? ', reden: ' + stand.stuk : '') +
+        '). De oude collectie blijft staan; er gaat niets verloren.');
+      return 0;
+    }
     delete db.data.doorgeefjournaal;
     try { save(); } catch (e) {}
-    console.log('[journaal] ' + n + ' bewaarde regels verhuisd van de database naar ' + boek.stand().map);
+    console.log('[journaal] ' + n + ' bewaarde regels verhuisd van de database naar ' + stand.map);
     return n;
   }
   try { verhuisOude(); } catch (e) { console.warn('[journaal] verhuizen mislukt:', e.message); }

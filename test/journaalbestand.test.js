@@ -193,3 +193,19 @@ test('10. een journaal dat niet kan schrijven raakt het verzoek niet', () => {
   assert.doesNotThrow(() => b.lees(10), 'lezen ook niet');
   assert.deepEqual(b.lees(10), [], 'en het levert gewoon niets op');
 });
+
+test('11. een MISLUKTE verhuizing gooit de oude collectie NIET weg', () => {
+  /* De verhuizing schreef eerst weg en verwijderde daarna, zonder naar de
+     uitkomst te kijken. Een volle schijf of een onschrijfbare map maakte er
+     daarmee een VERWIJDERING van: weg uit de database, nooit in het bestand, en
+     niets dat erover klaagde. Precies de storing waar dit journaal voor bestaat.
+
+     De regel is: eerst bewijzen dat het geschreven is, dan pas weggooien. Dubbel
+     werk bij de volgende start is niet erg; de geschiedenis kwijt wel. */
+  const boek = maakJournaalbestand({ dir: '/dev/null/onmogelijk' });
+  const db = { data: { doorgeefjournaal: [regel(1), regel(2), regel(3)] } };
+  const { maakDoorgeefjournaal } = require('../server/kern/doorgeefjournaal.js');
+  maakDoorgeefjournaal({ db, save: () => {}, bestand: boek });
+  assert.ok(Array.isArray(db.data.doorgeefjournaal), 'de oude collectie staat er nog');
+  assert.equal(db.data.doorgeefjournaal.length, 3, 'compleet, met alle drie de regels');
+});

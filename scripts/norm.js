@@ -388,12 +388,21 @@ const PRESTATIEMETERS = [
    grondwaarde, dus de ratel meldt het als een verbetering en dan hoort iemand
    te kijken of dat klopt of dat de groep gewoon verdwenen is. */
 function telPerGroep(k) {
-  const uit = { keuringOmvang: 0, keuringDubbeling: 0, keuringDekkingAdvies: 0 };
+  /* Een analyse die niet gedraaid heeft levert GEEN nul maar niets. Deze drie
+     tellen bevindingen per groep, en zonder de bijbehorende analyse staat die
+     teller op nul terwijl er niet gekeken is -- dat is precies het verschil
+     tussen "in orde" en "ik heb niet gekeken" (LAT-regel 3). */
+  const draaide = (naam) => !k.cijfers || k.cijfers[naam] !== undefined;
+  const uit = {
+    keuringOmvang: draaide('uitschieters') ? 0 : undefined,
+    keuringDubbeling: draaide('dubbelingen') ? 0 : undefined,
+    keuringDekkingAdvies: draaide('dekking') ? 0 : undefined
+  };
   const naar = { omvang: 'keuringOmvang', dubbeling: 'keuringDubbeling' };
   for (const b of (k.bevindingen || [])) {
     if (b.soort !== 'beter') continue;
     const sleutel = naar[b.groep];
-    if (sleutel) uit[sleutel]++;
+    if (sleutel && uit[sleutel] !== undefined) uit[sleutel]++;
   }
   /* DE DEKKINGSMETER LEEST EEN GETAL EN GEEN MELDINGEN, en dat is de reparatie.
 
@@ -407,9 +416,11 @@ function telPerGroep(k) {
      domeinen, niet de eerste acht. Ontbreekt dat getal (een oudere keuring), dan
      vallen we terug op de oude telling en niet op nul -- nul zou als de beste
      score ooit gelden en de ratel zou dat vastleggen (LAT.md regel 3). */
-  const echt = k.cijfers && k.cijfers.dekking && k.cijfers.dekking.domeinenMetGaten;
-  if (typeof echt === 'number') uit.keuringDekkingAdvies = echt;
-  else uit.keuringDekkingAdvies = (k.bevindingen || []).filter(b => b.soort === 'beter' && b.groep === 'dekking').length;
+  if (uit.keuringDekkingAdvies !== undefined) {
+    const echt = k.cijfers && k.cijfers.dekking && k.cijfers.dekking.domeinenMetGaten;
+    if (typeof echt === 'number') uit.keuringDekkingAdvies = echt;
+    else uit.keuringDekkingAdvies = (k.bevindingen || []).filter(b => b.soort === 'beter' && b.groep === 'dekking').length;
+  }
   return uit;
 }
 
@@ -526,6 +537,27 @@ const METERBRONNEN = {
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
 
+/* WELKE ANALYSE VAN DE KEURING HEEFT WELKE METER NODIG?
+
+   De keuring doet acht analyses en twee daarvan zijn 99,2% van de rekentijd
+   (dekking 40,08 s en ongebruikt 11,49 s; de andere zes samen 0,44 s). Elke
+   meter hieronder leest er EEN getal uit, dus wie de hele keuring start voor
+   keuringTeGroot betaalt 52 seconden voor een analyse van 0,01 seconde. Gemeten
+   in test/meterijk.test.js: zes ijkingen van 45 tot 51 seconde, samen 290 van de
+   374 seconden van die lus.
+
+   STUK EN SCHEEF STAAN ER MET OPZET NIET IN, en dat is de veiligheidsklep. Die
+   tellen bevindingen over ALLE analyses heen; een deelronde geeft daar een
+   kleiner getal, en kleiner zou als een betere score gelden. Een meter die hier
+   ontbreekt dwingt daarom de VOLLE ronde af -- dus wie later een keuringmeter
+   toevoegt en deze tabel vergeet, wordt langzaam en niet stil verkeerd.
+   test/normsubset.test.js houdt vast dat de tabel klopt. */
+const KEURING_ANALYSES = {
+  endpointsZonderTest: ['dekking'], dekkingPct: ['dekking'], keuringDekkingAdvies: ['dekking'],
+  keuringTeGroot: ['uitschieters'], keuringOmvang: ['uitschieters'],
+  keuringDubbeling: ['dubbelingen']
+};
+
 /* MEET EEN BOOM, NIET PER SE DEZE BOOM.
 
    `bronnen.wortel` zegt WELKE werkboom gemeten wordt; zonder die optie is dat
@@ -569,10 +601,22 @@ function meet(bronnen) {
      teruggeeft is geslaagd; een keuring die niets teruggeeft (of onleesbaars)
      is een echte storing en die gooit alsnog, met de eerste regels van zijn
      eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
+  /* Alleen de analyses die de gevraagde meters nodig hebben; zie KEURING_ANALYSES. */
+  const keuringAnalyses = () => {
+    if (!alleen) return null;                                   // alles gevraagd: volledige ronde
+    // `alleen` is een Set (zie hierboven), geen array.
+    const gevraagd = (METERBRONNEN.keuring || []).filter(m => alleen.has(m));
+    if (gevraagd.some(m => !KEURING_ANALYSES[m])) return null;  // stuk/scheef: volledige ronde
+    const uit = new Set();
+    for (const m of gevraagd) for (const a of KEURING_ANALYSES[m]) uit.add(a);
+    return uit.size ? [...uit] : null;
+  };
+
   let k = null;
   if (nodig('keuring')) {
+  const deel = keuringAnalyses();
   const r = spawnSync(process.execPath,
-    ['--experimental-sqlite', path.join(SCRIPTS, 'keuring.js'), '--json'],
+    ['--experimental-sqlite', path.join(SCRIPTS, 'keuring.js'), '--json'].concat(deel ? ['--alleen', deel.join(',')] : []),
     { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
   try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
   if (!k || !k.cijfers) {
@@ -782,7 +826,10 @@ function meet(bronnen) {
   /* Alleen als de keuring ook echt gedraaid heeft. Zonder `k` is deze meting
      niet mislukt maar niet GEVRAAGD -- dat is een ander ding, en hier hard
      zakken zou elke deelmeting zonder keuringmeter omgooien. */
-  if (k && (!k.cijfers.dekking || !k.cijfers.dekking.routes)) {
+  /* En alleen als de DEKKINGSanalyse ook echt gedraaid heeft: bij een deelronde
+     zonder dekking is er geen routekaart, en dat is geen storing maar een niet
+     gestelde vraag. */
+  if (k && k.cijfers.dekking !== undefined && (!k.cijfers.dekking || !k.cijfers.dekking.routes)) {
     throw new Error('de routekaart gaf geen routes; dan zijn endpointsZonderTest en dekkingPct niet gemeten ' +
       '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
   }
@@ -793,7 +840,15 @@ function meet(bronnen) {
   if (nodig('staat')) {
     const { scan, datamapVast } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
     const census = scan({ wortel: WORTEL });
-    datamapVastgeklonken = datamapVast({ wortel: WORTEL }).length;
+    /* ALLEEN ALS ERNAAR GEVRAAGD IS. Deze teller loopt met een eigen ontleding
+       over server/ en kost koud 6,5 seconde; hij stond hier onvoorwaardelijk, dus
+       een meting die alleen naar staatOnbekend vroeg betaalde hem toch. In de
+       ijklus liep dat op tot 9 a 19 seconde per toestandsijking. `nodig()` werkt
+       per BRON en is hier te grof -- de vier andere toestandsmeters komen uit
+       dezelfde census en delen die wel. */
+    if (!alleen || alleen.has('datamapVastgeklonken')) {
+      datamapVastgeklonken = datamapVast({ wortel: WORTEL }).length;
+    }
     duurOpWandklok = census.duurOpWandklok;
     let register = null;
     try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'STATE.json'), 'utf8')); } catch (e) { register = null; }
@@ -824,10 +879,14 @@ function meet(bronnen) {
   const alles = {
     metersOngeijkt,
     routesNietSchakelbaar,
-    endpointsZonderTest: k ? (k.cijfers.dekking.ongedekt || []).length : undefined,
-    dekkingPct: k ? (k.cijfers.dekking.pct || 0) : undefined,
+    /* `k.cijfers.X === undefined` betekent: die analyse is niet gevraagd. Dan
+       hoort de meter er NIET te zijn (undefined), en niet op 0 te staan -- nul
+       zou als de beste score ooit gelden en de ratel zou dat vastleggen
+       (LAT-regel 3). Zie de tabel KEURING_ANALYSES hierboven. */
+    endpointsZonderTest: k && k.cijfers.dekking ? (k.cijfers.dekking.ongedekt || []).length : undefined,
+    dekkingPct: k && k.cijfers.dekking ? (k.cijfers.dekking.pct || 0) : undefined,
     keuringStuk: k ? k.stuk : undefined, keuringScheef: k ? k.scheef : undefined,
-    keuringTeGroot: k ? ((k.cijfers.uitschieters || {}).teGroot || 0) : undefined,
+    keuringTeGroot: k && k.cijfers.uitschieters ? (k.cijfers.uitschieters.teGroot || 0) : undefined,
     ...(k ? telPerGroep(k) : {}),
     kernBreedte: grenzen.kernBreedte, kernGedeeld: grenzen.kernGedeeld,
     kernBreedsteBestand: grenzen.kernBreedsteBestand,
@@ -1046,4 +1105,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, METERBRONNEN, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };
+module.exports = { meet, KEURING_ANALYSES, METERBRONNEN, leesNorm, METERS, oordeel, PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips };

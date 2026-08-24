@@ -113,3 +113,87 @@ test('de besparing bestaat: een meting zonder de keuring is veel sneller dan een
     'een meter zonder de keuring (' + goedkoop + ' ms) hoort veel goedkoper te zijn dan een meter mét (' +
     duur + ' ms); staat nodig() nog wel aan?');
 });
+
+/* ============================================================================
+   EN NU EEN LAAG DIEPER: DE KEURING ZELF IS OPDEELBAAR.
+
+   De toetsen hierboven bewaken dat een deelverzameling BRONNEN hetzelfde zegt
+   als alles. Maar de duurste bron -- de keuring -- was zelf nog ondeelbaar: acht
+   meters, en voor elk ervan startte er een volledige keuring over de codebase.
+
+   Gemeten, los, op deze codebase:
+
+     dekking       40,08 s     <- start de routekaart, dus een echte server
+     ongebruikt    11,49 s
+     beloftes       0,32 s
+     dubbelingen    0,08 s
+     i18n / privacy / uitschieters / pariteit samen 0,04 s
+
+   Twee analyses zijn 99,2% van de tijd. De ijking van keuringTeGroot betaalde
+   dus 46 seconden voor een analyse van 0,01 seconde -- zes van die ijkingen
+   waren samen 290 van de 374 seconden van de ijklus.
+
+   scripts/keuring.js neemt nu `--alleen <analyses>`, en norm.js leidt uit
+   KEURING_ANALYSES af welke hij nodig heeft. Dat is dezelfde scherpe rand als
+   hierboven, een verdieping lager: staat een meter bij de verkeerde analyse,
+   dan komt zijn getal uit een ronde die niet naar zijn onderwerp heeft gekeken.
+   ========================================================================== */
+test('de keuringtabel is volledig, en wie erin ontbreekt wordt LANGZAAM en niet stil verkeerd', () => {
+  const tabel = norm.KEURING_ANALYSES;
+  assert.ok(tabel && Object.keys(tabel).length, 'de tabel bestaat');
+  /* stuk en scheef tellen bevindingen over ALLE analyses heen; die horen er
+     juist NIET in te staan, want dan zou een deelronde ze te laag zetten en
+     zou een kleiner getal als een betere score gelden. */
+  for (const m of ['keuringStuk', 'keuringScheef']) {
+    assert.equal(tabel[m], undefined,
+      m + ' hoort NIET in de tabel: hij telt over alle analyses heen, dus een deelronde geeft een te laag getal');
+  }
+  /* En elke meter die er wel in staat, noemt bestaande analyses. */
+  const bekend = new Set(require('../scripts/keuring.js').ALLE_ANALYSES);
+  for (const [meter, analyses] of Object.entries(tabel)) {
+    assert.ok(BRONNEN.keuring.includes(meter), meter + ' staat in de keuringtabel maar is geen keuringmeter');
+    for (const a of analyses) assert.ok(bekend.has(a), meter + ' vraagt om onbekende analyse "' + a + '"');
+  }
+});
+
+test('een deelronde van de keuring geeft exact hetzelfde getal als de volle ronde', () => {
+  /* ELKE METER APART, en dat is niet uit netheid maar omdat het anders niets
+     bewijst. Eerst stonden keuringTeGroot en keuringOmvang hier samen in een
+     groep. Toen ik keuringTeGroot bij de VERKEERDE analyse zette, bleef deze
+     toets groen: de groep vroeg samen om allebei de analyses, dus de verkeerd
+     ingedeelde meter kreeg zijn getal alsnog van de analyse van zijn buurman
+     (AFGESLAGEN). Een groepsmeting kan een verkeerde indeling per definitie niet
+     zien.
+
+     Apart meten kost hier niets -- 0,11 s, 0,11 s en 0,18 s -- want dat is nou
+     juist wat deze reparatie mogelijk maakt. De dekkingstrio staat er niet bij:
+     die drie kosten 37 s samen en worden al gedekt door de bron-toets hierboven,
+     die de volle keuring draait. */
+  for (const groep of [['keuringTeGroot'], ['keuringOmvang'], ['keuringDubbeling']]) {
+    const deel = norm.meet({ alleen: groep });
+    for (const m of groep) {
+      assert.equal(typeof deel[m], 'number',
+        m + ' kwam niet als getal terug uit de deelronde (' + JSON.stringify(deel[m]) + '); ' +
+        'een analyse die niet gedraaid heeft hoort undefined te geven en geen nul, maar hier HOORT hij te draaien');
+      assert.equal(deel[m], volledig[m],
+        m + ' zegt in een deelronde ' + deel[m] + ' en in de volle ronde ' + volledig[m] +
+        '; dan komt zijn getal uit een ronde die niet naar zijn onderwerp heeft gekeken');
+    }
+  }
+});
+
+test('een deelronde levert GEEN stuk/scheef, en dat is opzet en geen omissie', () => {
+  /* Rechtstreeks op de keuring, want norm.js vraagt bij die twee meters juist de
+     volle ronde aan. De eigenschap die hier vastligt is die van keuring.js zelf:
+     een deelronde weet niet hoeveel bevindingen er in het geheel zijn, en zegt
+     dat met null in plaats van met een te laag getal (LAT-regel 3). */
+  const { keur } = require('../scripts/keuring.js');
+  const deel = keur(['uitschieters']);
+  assert.equal(deel.volledig, false);
+  assert.deepEqual(deel.analyses, ['uitschieters']);
+  assert.equal(deel.stuk, null, 'stuk hoort null te zijn bij een deelronde, niet 0');
+  assert.equal(deel.scheef, null, 'scheef ook');
+  assert.equal(deel.beter, null, 'beter ook');
+  assert.equal(typeof deel.cijfers.uitschieters.teGroot, 'number', 'wat er WEL gevraagd is, staat er gewoon');
+  assert.equal(deel.cijfers.dekking, undefined, 'en wat niet gevraagd is, ontbreekt in plaats van nul te zijn');
+});

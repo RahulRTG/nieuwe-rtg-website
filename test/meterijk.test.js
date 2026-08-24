@@ -68,6 +68,18 @@ const uitBoom = (rel) => require(path.join(WORTEL, 'scripts', rel));
 const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';
 const meld = (tekst) => { if (VERBOSE) process.stderr.write('[meterijk] ' + tekst + '\n'); };
 
+/* WAT ELKE IJKING KOST, en waarom dat hier moet staan.
+
+   Dit bestand was met 504 s van de 3244 s opgetelde toetstijd het duurste van de
+   hele ronde, en bij 920 s wandklok zet het in zijn eentje meer dan de helft van
+   het kritieke pad. Zolang het er zo staat kan de ronde niet onder de ~500 s
+   komen, hoeveel parallellisme je er ook tegenaan gooit.
+
+   Zonder deze meting is elke versnelling hier een gok, en dit huis meet liever.
+   Monotone klok, want dit is een DUUR en geen moment (server/lib/klok.js). */
+const KOSTEN = [];
+const kostenLijst = () => KOSTEN.slice().sort((a, b) => b.ms - a.ms);
+
 /* Een proef doet drie dingen: iets kapots neerzetten, meten, opruimen. Het
    opruimen staat in een finally, want een ijking die rommel achterlaat is
    erger dan geen ijking.
@@ -1000,11 +1012,25 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
 
   for (const sleutel of geijkt) {
     meld('start ' + sleutel);
+    const t0 = performance.now();
     const verschil = IJKINGEN[sleutel].proef(voor);
-    meld('klaar ' + sleutel + ': verschil ' + verschil);
+    const ms = performance.now() - t0;
+    KOSTEN.push({ sleutel, ms });
+    meld('klaar ' + sleutel + ': verschil ' + verschil + ', ' + (ms / 1000).toFixed(1) + ' s');
     assert.ok(verschil > 0,
       'meter "' + sleutel + '" zag de bekend-foute invoer NIET (verschil ' + verschil + '). ' +
       'Een meter die niet uitslaat op iets wat fout is, meet niets.');
+  }
+  if (VERBOSE) {
+    const lijst = kostenLijst();
+    const som = lijst.reduce((t, r) => t + r.ms, 0);
+    meld('--- kosten per ijking, samen ' + (som / 1000).toFixed(0) + ' s over ' + lijst.length + ' meters');
+    for (const r of lijst.slice(0, 15)) meld('    ' + (r.ms / 1000).toFixed(1).padStart(7) + ' s  ' + r.sleutel);
+    /* En naar een BESTAND, want de toetsloper zet een `# ` voor elke stderr-regel
+       van een toets en dan is de uitvoer niet meer te filteren. Een meting die je
+       alleen met de juiste grep terugvindt, doe je een keer en dan nooit meer. */
+    const uit = process.env.RTG_METERIJK_KOSTEN;
+    if (uit) { try { fs.writeFileSync(uit, JSON.stringify(lijst, null, 1) + '\n'); } catch (e) {} }
   }
 });
 

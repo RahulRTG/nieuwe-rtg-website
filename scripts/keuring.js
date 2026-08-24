@@ -477,19 +477,61 @@ function uitschieters() {
 }
 
 /* ---------- alles keuren ---------- */
-function keur() {
-  const cijfers = {
-    dekking: dekking(), beloftes: beloftes(), privacy: privacy(), pariteit: pariteit(),
-    dubbelingen: dubbelingen(), ongebruikt: ongebruikt(), i18n: i18n(), uitschieters: uitschieters()
+/* DE ACHT ANALYSES, EN WAAROM JE ZE APART MOET KUNNEN VRAGEN.
+
+   Gemeten, los, op deze codebase:
+
+     dekking       40,08 s     <- start de routekaart, dus een echte server
+     ongebruikt    11,49 s
+     beloftes       0,32 s
+     dubbelingen    0,08 s
+     i18n           0,02 s
+     privacy        0,01 s
+     uitschieters   0,01 s
+     pariteit       0,00 s
+
+   Twee analyses zijn 99,2% van de rekentijd; de andere zes samen zijn een halve
+   seconde. En dat botst met hoe deze keuring wordt GEBRUIKT: test/meterijk.test.js
+   ijkt acht metertjes die elk uit deze uitslag EEN getal lezen, en startte
+   daarvoor acht keer de hele keuring. De ijking van keuringTeGroot betaalde 52
+   seconden voor een analyse die 0,01 seconde kost.
+
+   Vandaar `alleen`. Wie zegt welke analyses hij nodig heeft, krijgt alleen die.
+   De volledige uitslag blijft de standaard: zonder argument verandert er niets.
+
+   WAT ER DAN NIET MEER MAG. `stuk`, `scheef` en `beter` tellen bevindingen over
+   ALLE analyses heen. Bij een deelronde zijn dat andere getallen, en een kleiner
+   getal zou als een BETERE score gelden -- precies de stille versoepeling waar
+   LAT-regel 3 over gaat. Ze komen daarom als `null` terug zodra de ronde niet
+   volledig is, en `volledig: false` staat erbij. Een afnemer die ze toch leest
+   krijgt null en geen nul, en valt om in plaats van tevreden te zijn. */
+const ANALYSES = {
+  dekking, beloftes, privacy, pariteit, dubbelingen, ongebruikt, i18n, uitschieters
+};
+const ALLE_ANALYSES = Object.keys(ANALYSES);
+
+function keur(alleen) {
+  const gevraagd = (alleen && alleen.length) ? alleen.filter(n => ANALYSES[n]) : ALLE_ANALYSES;
+  if (alleen && alleen.length && !gevraagd.length) {
+    throw new Error('geen bekende analyse in --alleen "' + alleen.join(',') + '"; kies uit: ' + ALLE_ANALYSES.join(', '));
+  }
+  const volledig = gevraagd.length === ALLE_ANALYSES.length;
+  const cijfers = {};
+  for (const naam of gevraagd) cijfers[naam] = ANALYSES[naam]();
+  const tel = (soort) => bevindingen.filter(b => b.soort === soort).length;
+  return {
+    cijfers, bevindingen, volledig, analyses: gevraagd,
+    stuk: volledig ? tel('stuk') : null,
+    scheef: volledig ? tel('scheef') : null,
+    beter: volledig ? tel('beter') : null
   };
-  const stuk = bevindingen.filter(b => b.soort === 'stuk');
-  const scheef = bevindingen.filter(b => b.soort === 'scheef');
-  const beter = bevindingen.filter(b => b.soort === 'beter');
-  return { cijfers, bevindingen, stuk: stuk.length, scheef: scheef.length, beter: beter.length };
 }
 
 if (require.main === module) {
-  const r = keur();
+  const arg = process.argv.find(a => a.startsWith('--alleen'));
+  const alleen = arg ? String(arg.split('=')[1] || process.argv[process.argv.indexOf(arg) + 1] || '')
+    .split(',').map(x => x.trim()).filter(Boolean) : null;
+  const r = keur(alleen);
   /* De JSON door EEN write met een callback, en pas in die callback stoppen.
      console.log + process.exit() is een race: naar een pijp schrijft Node
      asynchroon, en process.exit() gooit weg wat er nog in de wachtrij staat.
@@ -517,4 +559,4 @@ if (require.main === module) {
   process.exit(r.stuk ? 1 : 0);
 }
 
-module.exports = { keur };
+module.exports = { keur, ALLE_ANALYSES };

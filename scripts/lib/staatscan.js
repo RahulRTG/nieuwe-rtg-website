@@ -478,8 +478,8 @@ function datamapUitgifte(bron, boom, klemmen) {
   return uit;
 }
 
-function datamapBindingen(bron, relPad) {
-  const boom = parse(bron);
+function datamapBindingen(bron, relPad, boomIn) {
+  const boom = boomIn || parse(bron);
   const uit = [];
   const vast = new Set(luieLezers(boom));
   const luie = new Set(vast);
@@ -511,9 +511,42 @@ function datamapBindingen(bron, relPad) {
    Daarom een derde soort: `overgenomen`. Hij wordt alleen geteld als de naam die
    wordt overgenomen ECHT een datamapbinding is in het bestand waar hij vandaan
    komt -- geen gok op de naam, maar een opzoeking. */
-function datamapVast({ wortel, mappen } = {}) {
-  wortel = wortel || path.join(__dirname, '..', '..');
-  mappen = mappen || ['server'];
+/* EEN ONTLEDING PER BESTAND, EN DAARNA UIT DE KAS.
+
+   Hier stond drie keer `parse(bron)` voor hetzelfde bestand: een keer in
+   datamapBindingen, een keer voor datamapUitgifte en een keer in de tweede
+   ronde. Dat kostte 9,4 seconde per aanroep -- en omdat norm.js deze teller bij
+   ELKE toestandsmeting draaide, betaalde ook een meting die alleen naar
+   staatOnbekend vroeg die 9,4 seconde. In de ijklus van test/meterijk.test.js
+   liep dat op tot 9 a 19 seconde per toestandsijking waar er 3 hoorden te staan.
+   Zelf gemaakt, vandaag, en zichtbaar geworden zodra ik de kosten per ijking
+   ging meten in plaats van ze te vermoeden.
+
+   De boom gaat nu een keer rond, en de uitslag door dezelfde bronkas als de
+   census hiernaast: dezelfde sleutel (sha over de inhoud van elk gescand bestand
+   plus over deze scanner), dus een gewijzigde byte rekent opnieuw en een
+   onveranderde boom kost niets. `vers: true` om dezelfde reden als daar -- de
+   meterijking verandert de bron met opzet en meet daarna opnieuw in HETZELFDE
+   proces. */
+function datamapVast(opties = {}) {
+  const wortel = opties.wortel || path.join(__dirname, '..', '..');
+  const mappen = opties.mappen || ['server'];
+  let kas = null;
+  try { kas = require('../../server/lib/bronkas'); } catch (e) { kas = null; }
+  if (!kas) return datamapVastEcht(wortel, mappen);
+  const delen = mappen.map(m => kas.manifestVan(path.join(wortel, m), (p) => p.endsWith('.js'), 'datamap', { vers: true }));
+  delen.push(kas.leesVersie([__filename]), mappen.join('|'));
+  return kas.geheugen({
+    naam: 'datamapvast', sleutel: kas.sleutelUit(delen),
+    bereken: () => datamapVastEcht(wortel, mappen),
+    naarTekst: (u) => JSON.stringify(u),
+    /* Een lijst is hier een geldige uitslag, ook een lege -- maar geen JSON die
+       niet eens een array is. Die rekent liever opnieuw (LAT-regel 3). */
+    vanTekst: (t) => { const u = JSON.parse(t); return Array.isArray(u) ? u : null; }
+  });
+}
+
+function datamapVastEcht(wortel, mappen) {
   const bronnen = new Map();
   const uit = [];
   const bestanden = [];
@@ -522,22 +555,22 @@ function datamapVast({ wortel, mappen } = {}) {
       const rel = path.relative(wortel, p).split(path.sep).join('/');
       let bron;
       try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
-      bestanden.push({ rel, p, bron });
+      let boom;
+      try { boom = parse(bron); } catch (e) { continue; }
+      bestanden.push({ rel, boom });
       let deel;
-      try { deel = datamapBindingen(bron, rel); } catch (e) { continue; }
+      try { deel = datamapBindingen(bron, rel, boom); } catch (e) { continue; }
       for (const x of deel) uit.push(x);
       /* Ook de namen die dit bestand als LEVENDE eigenschap uitdeelt tellen als
          bron: wie ze destructureert klemt de map alsnog vast. */
       try {
-        const namen = datamapUitgifte(bron, parse(bron), deel.map(x => x.naam));
+        const namen = datamapUitgifte(bron, boom, deel.map(x => x.naam));
         for (const naam of namen) bronnen.set(rel + '#' + naam, { naam, bestand: rel });
       } catch (e) { for (const x of deel) bronnen.set(rel + '#' + x.naam, x); }
     }
   }
   /* Tweede ronde: wie neemt zo'n naam bij het laden over? */
-  for (const { rel, bron } of bestanden) {
-    let boom;
-    try { boom = parse(bron); } catch (e) { continue; }
+  for (const { rel, boom } of bestanden) {
     for (const k of boom.body) {
       if (k.type !== 'VariableDeclaration') continue;
       for (const d of k.declarations || []) {

@@ -46,6 +46,30 @@ module.exports = (kern) => {
     "connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; " +
     "frame-ancestors " + o + "; sandbox allow-scripts";
 
+  /* DE ENE KOP DIE HIER OMGEZET MOET WORDEN, EN WAAROM DAT GEEN VERZWAKKING IS.
+
+     opzet/koppen.js zet op elk antwoord `Cross-Origin-Resource-Policy:
+     same-origin`, en dat is goed: onze bestanden zijn geen bouwsteen voor de
+     site van iemand anders. Maar de cel draait op een NAAMLOZE herkomst, en een
+     naamloze herkomst is voor de browser per definitie een andere herkomst. Met
+     same-origin blokkeert Chromium daarom de eigen app.js van de app EN de
+     brugklant -- met ERR_BLOCKED_BY_RESPONSE.NotSameOrigin, in de cel, waar
+     niemand het ziet. De naamloosheid die de veiligheid maakt, zou de app dus
+     onbruikbaar maken.
+
+     `cross-origin` is hier de juiste waarde en niet de zwakkere: deze bytes zijn
+     PUBLIEKE inhoud (een gepubliceerde app-bundel, die elk lid mag lezen) en er
+     staat per definitie niets persoonlijks in -- persoonlijke gegevens komen
+     alleen over de brug, en die zit achter een inlog. Wat CORP hier zou
+     beschermen, bestaat niet. Wat een andere site NIET kan, blijft staan:
+     frame-ancestors laat alleen ons eigen scherm dit document insluiten. */
+  const CEL_KOPPEN = (req, res) => {
+    res.set('Content-Security-Policy', CEL_CSP(herkomst(req)));
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set('X-Content-Type-Options', 'nosniff');
+    res.set('Referrer-Policy', 'no-referrer');
+  };
+
   /* De brugklant: het ENIGE stuk code in de cel dat van RTG is. Hij wordt in elk
      celdocument gezet (zie hieronder), zodat een app hem niet kan vergeten en
      niet kan vervangen: een app die zelf naar `parent` reikt, is bij de keuring
@@ -90,8 +114,7 @@ window.RTG={ roep:roep, versie:1,
     const rest = String(req.url || '/').split('?')[0];
 
     if (rest === '/brug.js') {
-      res.set('Content-Security-Policy', CEL_CSP(herkomst(req)));
-      res.set('X-Content-Type-Options', 'nosniff');
+      CEL_KOPPEN(req, res);
       res.set('Cache-Control', 'public, max-age=3600');
       return res.type('text/javascript').send(BRUGKLANT);
     }
@@ -112,9 +135,7 @@ window.RTG={ roep:roep, versie:1,
     const b = appstore.opslag.lees(sleutel, hash, pad, !html && wilGz);
     if (!b) return res.status(404).type('text/plain').send('Dit bestand zit niet in deze versie.');
 
-    res.set('Content-Security-Policy', CEL_CSP(herkomst(req)));
-    res.set('X-Content-Type-Options', 'nosniff');
-    res.set('Referrer-Policy', 'no-referrer');
+    CEL_KOPPEN(req, res);
     /* De hash staat in het pad, dus deze bytes veranderen nooit meer. Dit is de
        hele snelheidsbelofte: een tweede opening van een app is nul verzoeken. */
     res.set('Cache-Control', 'public, max-age=31536000, immutable');

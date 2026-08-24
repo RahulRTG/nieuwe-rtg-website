@@ -231,6 +231,14 @@ test('8. GRENS 1: de cel draait op een naamloze herkomst, zonder netwerk', async
   assert.match(csp, /form-action 'none'/);
   assert.match(csp, /object-src 'none'/);
   assert.equal(r.kop.get('x-content-type-options'), 'nosniff');
+  /* En de kop die opzet/koppen.js hier moet loslaten. Een naamloze herkomst is
+     voor de browser een ANDERE herkomst, dus met de standaard
+     `same-origin` blokkeert Chromium de eigen app.js van de app -- in de cel,
+     waar niemand het ziet. Dit is precies de fout die geen enkele toets over de
+     lijn vond en die pas in een echte browser bovenkwam
+     (test/appstore.e2e.js). */
+  assert.equal(r.kop.get('cross-origin-resource-policy'), 'cross-origin',
+    'anders blokkeert de browser de bundel voor de cel die hem juist veilig maakt');
   assert.match(r.kop.get('cache-control'), /immutable/, 'de hash staat in het pad, dus dit mag voorgoed bewaard');
   assert.ok(r.tekst.includes('<script src="/appcel/brug.js"></script>'), 'de brugklant staat erin, en de app kan hem niet vergeten');
   assert.ok(r.tekst.indexOf('/appcel/brug.js') < r.tekst.indexOf('app.js'), 'en staat voor de eigen code van de app');

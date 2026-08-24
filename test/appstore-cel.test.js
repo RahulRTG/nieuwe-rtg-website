@@ -39,6 +39,8 @@ test('2. de cel-CSP zet alles dicht en doet er stuk voor stuk iets bij', () => {
   }
   assert.ok(!/script-src[^;]*unsafe-inline/.test(s), 'scripts krijgen nooit unsafe-inline in de cel');
   assert.ok(/immutable/.test(s), 'de hash staat in het pad, dus de bundel is voorgoed te bewaren -- dat is de snelheidsbelofte');
+  assert.ok(/Cross-Origin-Resource-Policy', 'cross-origin'/.test(s),
+    'de cel moet de CORP van opzet/koppen.js loslaten: een naamloze herkomst is voor de browser een andere herkomst, en same-origin blokkeert dan de eigen bundel van de app');
 });
 
 test('3. de brug raakt de identiteitskluis niet, ook niet met een omweg', () => {

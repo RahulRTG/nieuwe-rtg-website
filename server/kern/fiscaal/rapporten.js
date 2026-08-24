@@ -7,9 +7,22 @@ module.exports = (ctx) => {
   const ordersVoor = typeof ctx.ordersVanZaak === 'function'
     ? ctx.ordersVanZaak
     : code => (db.data.orders || []).filter(o => o.supplierCode === code);
+  /* DE DAG VAN DIT RAPPORT IS DE BEDRIJFSDAG, NIET DE KALENDERDAG.
+
+     Hier stond `String(iso).slice(0, 10) === dag`: een kale kalendervergelijking.
+     Voor een strandclub die om 05:00 sluit staat daarmee ALLES tussen middernacht
+     en sluitingstijd op het Z-rapport van de verkeerde dag -- en dat is precies de
+     omzet waar de kassa op wordt afgesloten. De zaak stelt zijn omslaguur zelf in
+     (server/kern/zakenklok/); een zaak die niets instelde krijgt 00:00 en dus
+     exact het oude gedrag. */
+  const zakenklok = require('../zakenklok');
   function dagrapport(s, datum) {
-    const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum || '')) ? String(datum) : new Date().toISOString().slice(0, 10);
-    const opDag = iso => String(iso || '').slice(0, 10) === dag;
+    const bedrijfsdag = iso => {
+      const p = zakenklok.periode(s, 'horecadag', iso);
+      return p ? p.sleutel : String(iso || '').slice(0, 10);
+    };
+    const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum || '')) ? String(datum) : bedrijfsdag(new Date().toISOString());
+    const opDag = iso => bedrijfsdag(iso) === dag;
     const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
     const L = LANDEN[landCode];
     const caps = db.capsVan(s);

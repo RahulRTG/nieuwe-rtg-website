@@ -149,4 +149,9 @@ app.post('/api/supplier/roster', (req, res) => {
 
 // de zaakinstellingen (manager) staan apart, in ./toegang-settings.js
 require('./toegang-settings')(kern);
+/* En de zakenklok in ./klok.js: wanneer begint hier een dag, een boekhoud- en
+   loonperiode. Een eigen loket omdat de soorten uit een REGISTER komen en er een
+   bij kan komen zonder dat de kern verandert; een lijstje velden in de
+   settings-route zou daar telkens achteraan lopen. */
+require('./klok')(kern);
 };

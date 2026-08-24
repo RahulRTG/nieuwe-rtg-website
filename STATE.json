@@ -948,6 +948,22 @@
       "soort": "map",
       "bron": "scan"
     },
+    "server/kern/zakenklok/index.js#FORMATTERS": {
+      "eigenaar": "server/kern/zakenklok",
+      "levensduur": "bootvast",
+      "soort": "map",
+      "bron": "hand-na-scan",
+      "toelichting": "Bewaarde Intl.DateTimeFormat-objecten per tijdzone. Puur een versnelling: dezelfde zone geeft altijd dezelfde formatter, dus de inhoud kan het gedrag niet veranderen. Hij groeit niet onbeperkt -- er is een zone per land en die lijst staat in de bron. Terugzetten zou alleen betekenen dat de eerste lezing daarna weer duurder is.",
+      "patroon": "afleiding"
+    },
+    "server/kern/zakenklok/index.js#SOORTEN": {
+      "eigenaar": "server/kern/zakenklok",
+      "levensduur": "bootvast",
+      "soort": "map",
+      "bron": "hand-na-scan",
+      "toelichting": "Het register van periodesoorten. Wordt bij het laden gevuld door ./soorten.js en daarna alleen nog gelezen -- meld() weigert een sleutel die al bestaat, dus een soort kan niet stilletjes worden vervangen. Een toets die een eigen soort aanmeldt voegt er een toe die er daarna blijft; dat is geen lek maar hetzelfde wat een vijfde ingebouwde soort zou doen, en de aanmelding is per definitie idempotent-vrij (een tweede keer gooit).",
+      "patroon": "merk"
+    },
     "server/kluis.js#KEY": {
       "eigenaar": "server",
       "levensduur": "bootvast",

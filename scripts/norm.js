@@ -269,6 +269,12 @@ const METERS = [
      getal hangt aan de wijziging en niet aan de codebase, en een meter die
      meebeweegt met wat je toevallig aanraakt bewaakt niets. */
   { sleutel: 'bewijsOnbekend', richting: 'omlaag', wat: 'toetsen waarvan de afhankelijkheden niet vaststaan; die moet de planner altijd draaien' },
+  /* VERLOPEN BEWIJS. MUTATIES.json zegt "toets X zakte toen we regel Y in module
+     Z veranderden" -- de enige meting die aantoont dat een toets kan zakken. Als
+     module Z daarna verandert, gaat dat bewijs over code die er niet meer is. De
+     houdbaarheid hangt aan de INHOUD en niet aan een klok; zie
+     scripts/bewijsvers.js voor de regel per soort. */
+  { sleutel: 'bewijsVerlopen', richting: 'omlaag', wat: 'mutatiebewijzen die gaan over code die sindsdien is veranderd (of die geen stempel dragen)' },
   /* Een DUUR op de wandklok. Niet hetzelfde als de klokschuld in KLOK.json:
      die telt hoeveel code de tijd aan het OS vraagt (beproefbaarheid), deze
      hoeveel code een verstreken tijd op de verkeerde klok uitrekent. Dat
@@ -549,6 +555,7 @@ const METERBRONNEN = {
   ijkregister: ['metersOngeijkt'],
   staat: ['staatOngeregistreerd', 'staatOnbekend', 'staatProcesgebonden', 'datamapVastgeklonken', 'duurOpWandklok'],
   bewijsgraaf: ['bewijsOnbekend'],
+  bewijsvers: ['bewijsVerlopen'],
   // goedkoop genoeg om altijd te doen: een readdir en een package.json
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
@@ -913,6 +920,16 @@ function meet(bronnen) {
     bewijsOnbekend = bg.onbekendeAfhankelijkheden(g);
   }
 
+  /* De houdbaarheid van het mutatiebewijs. Kost een sha over de gemuteerde
+     modules en de toetsbestanden: goedkoop, maar niet gratis, dus op verzoek. */
+  let bewijsVerlopen;
+  if (nodig('bewijsvers')) {
+    const bv = require(path.join(SCRIPTS, 'bewijsvers.js'));
+    const u = bv.meet({ wortel: WORTEL });
+    if (!u) throw new Error('MUTATIES.json is niet te lezen; dan valt er niets over de houdbaarheid te zeggen');
+    bewijsVerlopen = u.verlopen;
+  }
+
   /* Bij `alleen` komen ALLEEN de gevraagde sleutels terug. Niet de rest op
      undefined laten staan: dan zou `na.X - voor.X` voor een meter die je niet
      hebt gevraagd stilletjes NaN worden en de proef om de verkeerde reden
@@ -939,7 +956,7 @@ function meet(bronnen) {
     bronBlindeBestanden,
     delenZonderOnderwerp,
     staatOngeregistreerd, staatOnbekend, staatProcesgebonden, datamapVastgeklonken, duurOpWandklok,
-    bewijsOnbekend
+    bewijsOnbekend, bewijsVerlopen
   };
   if (!alleen) return alles;
   const uit = {};

@@ -799,13 +799,48 @@ if (require.main === module) {
   const OM_DE = 25;
   let sindsVastleggen = 0;
 
+  /* WANNEER IS EEN MUTATIEBEWIJS NOG WAAR?
+
+     MUTATIES.json zegt: "toets X zakte toen we regel Y in module Z veranderden".
+     Dat is het sterkste bewijs dat er in dit huis bestaat -- het is de enige
+     meting die aantoont dat een toets kan zakken (LAT-regel 9). En het stond
+     zonder enige houdbaarheid opgeschreven: 924 uitslagen zonder een spoor van
+     WAAROVER ze gingen. Verandert module Z daarna, dan gaat het bewijs over code
+     die er niet meer is, en niets merkt dat.
+
+     Een houdbaarheidsdatum op de KLOK zou hier fout zijn. Een module die een jaar
+     niet is aangeraakt, is nog even bewezen als gisteren; een module die een uur
+     geleden veranderde, niet meer. De regel hangt dus aan de INHOUD:
+
+       een pure meting  verloopt zodra de gemuteerde module OF het toetsbestand
+                        van inhoud verandert
+       een servermeting verloopt zodra het toetsbestand verandert -- daar wordt
+                        geen bron gemuteerd maar het ANTWOORD van een route
+                        (liegpoort), en wat die meting aantoont is dat DEZE toets
+                        het merkt
+
+     scripts/bewijsvers.js rekent dat na en telt wat er verlopen is. Uitslagen van
+     voor deze regel hebben geen stempel en tellen daarom als verlopen: we weten
+     het niet, en dat is precies wat de meter hoort te zeggen. */
+  const sha = (p) => {
+    try { return require('crypto').createHash('sha256').update(fs.readFileSync(p)).digest('hex').slice(0, 12); }
+    catch (e) { return null; }
+  };
+  const stempel = (naam, r) => {
+    if (!r || typeof r !== 'object') return r;
+    const uit = Object.assign({}, r);
+    uit.toetsSha = sha(path.join(TEST, naam));
+    if (r.module) uit.moduleSha = sha(path.join(WORTEL, r.module));
+    return uit;
+  };
+
   const doe = (lijst, proef) => {
     let n = 0;
     for (const naam of lijst) {
       n++;
       if (gedaan(naam)) { continue; }
       const r = proef(naam);
-      uitslag[naam] = r;
+      uitslag[naam] = stempel(naam, r);
       bewaar();
       if (++sindsVastleggen >= OM_DE) { vastleggen(); sindsVastleggen = 0; console.log('        (tussenstand vastgelegd in MUTATIES.json)'); }
       console.log('  ' + String(n).padStart(4) + '/' + lijst.length + '  ' + naam.padEnd(42) +
@@ -827,7 +862,7 @@ if (require.main === module) {
       console.log('\n  --- A-diep: ' + overlevers.length + ' overlevers, acht plekken per operator ---');
       for (const naam of overlevers) {
         const r = proefPuur(naam, 8);
-        uitslag[naam] = r;
+        uitslag[naam] = stempel(naam, r);
         bewaar();
         console.log('        ' + naam.padEnd(42) + r.staat +
           (r.operator ? '  [' + r.operator + ' in ' + r.module + ']' : '  (' + (r.geprobeerd || 0) + ' mutaties geprobeerd)'));
@@ -859,7 +894,7 @@ if (require.main === module) {
       let m = 0;
       for (const naam of scherpKandidaten) {
         const r = proefServerScherp(naam);
-        uitslag[naam] = Object.assign({}, uitslag[naam], { scherp: r.staat });
+        uitslag[naam] = stempel(naam, Object.assign({}, uitslag[naam], { scherp: r.staat }));
         bewaar();
         if (++m % OM_DE === 0) vastleggen();
         console.log('  ' + String(m).padStart(4) + '/' + scherpKandidaten.length + '  ' +

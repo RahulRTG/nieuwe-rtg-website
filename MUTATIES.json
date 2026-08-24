@@ -4,8 +4,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/a11ykeuring.js",
-      "operator": "true->false",
-      "gezakt": 1
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "toetsSha": "5b79d1ab07e3",
+      "moduleSha": "84b32d6685f0"
     },
     "aanmeldbesluit.test.js": {
       "soort": "server",

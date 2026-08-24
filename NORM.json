@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 158,
+    "toetsenNietGemeten": 160,
     "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -36,9 +36,15 @@
     "duurOpWandklok": 29,
     "staatProcesgebonden": 92,
     "datamapVastgeklonken": 11,
-    "bewijsOnbekend": 170
+    "bewijsOnbekend": 172,
+    "bewijsVerlopen": 874
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "bewijsVerlopen NIEUW op 874; bewijsOnbekend 170 -> 172 en toetsenNietGemeten 158 -> 160",
+      "reden": "MUTATIES.json is het sterkste bewijs in dit huis: niet 'de toets staat groen' maar 'we hebben hem zien ZAKKEN toen we regel Y in module Z veranderden'. 875 toetsen leunen erop, en test/bewijsgraaf.test.js gebruikt datzelfde register als ORAKEL om te bewijzen dat de planner geen gevoelige toets overslaat. En het stond zonder enige houdbaarheid opgeschreven: verandert module Z daarna, dan gaat het bewijs over code die er niet meer is en merkt niemand dat.\n\nDe houdbaarheid hangt aan de INHOUD en niet aan de klok, en dat is de kern. Een module die een jaar niet is aangeraakt is nog even bewezen als gisteren; een module die een uur geleden veranderde niet meer. Een termijn in dagen zou het eerste ten onrechte afkeuren en het tweede ten onrechte goedkeuren -- twee fouten voor de prijs van een. Per soort een eigen regel: een PURE meting verloopt op de gemuteerde module of op het toetsbestand, een SERVERmeting (liegpoort) alleen op het toetsbestand, want daar wordt geen bron gemuteerd maar het antwoord van een route.\n\n874 VAN DE 875 IS GEEN VERSLECHTERING MAAR EEN LEZING. Ze dragen geen stempel omdat ze zijn opgeschreven voordat deze regel bestond, en 'geen stempel' telt als verlopen: we weten het niet, en een meter die 'onbekend' als 'in orde' telt bewaakt niets. De motor stempelt vanaf nu elke uitslag met de sha van de gemuteerde module en van het toetsbestand; een toets opnieuw meten kost `node scripts/mutatie.js --opnieuw <toets>` en dat is per bestand een kwestie van seconden. Het getal kan dus alleen omlaag totdat iemand echt gaat hermeten -- daarna gaat hij omhoog zodra je een bewezen module aanraakt, en dat is precies wat hij hoort te doen.\n\nDe twee andere meters gaan met twee omhoog voor twee nieuwe toetsbestanden: test/bewijsvers.test.js (de houdbaarheidsregel per soort, met een wegwerpregister zodat de beweringen niet afhangen van wat er toevallig in het echte staat) en test/leesspoor.test.js was al geteld -- dit is er nog een: test/gietvorm.test.js en test/toeval.test.js zijn al eerder verantwoord."
+    },
     {
       "datum": "2026-08-24",
       "meter": "bewijsOnbekend 169 -> 170 en toetsenNietGemeten 157 -> 158 (test/leesspoor.test.js)",

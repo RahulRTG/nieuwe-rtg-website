@@ -743,6 +743,35 @@ const IJKINGEN = {
         return verschil;
       })
   },
+  bewijsVerlopen: {
+    /* VERLOPEN BEWIJS is een houdbaarheid op de INHOUD en niet op de klok.
+       MUTATIES.json zegt "toets X zakte toen we regel Y in module Z veranderden";
+       verandert module Z daarna, dan ging dat bewijs over code die er niet meer
+       is. De proef doet precies dat: een GESTEMPELDE uitslag opzoeken en de
+       module waar hij over gaat een byte veranderen.
+
+       Wordt hier NIET geprobeerd: de klok verzetten. Dat hoort ook geen verschil
+       te maken, en een ijking die dat zou meten, zou de verkeerde regel
+       vastleggen. */
+    proef: (voor) => {
+      const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8')).toetsen || {};
+      const paar = Object.entries(reg).find(([, r]) => r && r.staat === 'gezakt' && r.module && r.moduleSha);
+      /* Geen enkele gestempelde uitslag? Dan kan deze meter niet uitslaan en
+         hoort dat GEZEGD te worden in plaats van stil groen te geven -- precies
+         waar LAT-regel 3 over gaat. */
+      assert.ok(paar, 'er hoort minstens EEN gestempelde mutatie-uitslag te zijn; zonder die kan ' +
+        'deze meter niet uitslaan en meet de ijking niets');
+      return metAanbouw(paar[1].module, '\n// tijdelijke wijziging voor de ijking van bewijsVerlopen\n', () => {
+        const verschil = meet({ alleen: ['bewijsVerlopen'] }).bewijsVerlopen - voor.bewijsVerlopen;
+        assert.equal(verschil, 1,
+          'een gewijzigde module hoort PRECIES EEN bewijs te laten verlopen (dat van ' + paar[0] + '). ' +
+          'Nul betekent dat de houdbaarheid niet aan de inhoud hangt en het bewijs stil blijft staan ' +
+          'over code die er niet meer is; meer dan een betekent dat de meter te breed telt en zijn ' +
+          'nul nooit kan halen.');
+        return verschil;
+      });
+    }
+  },
   bewijsOnbekend: {
     /* Een toetsbestand zonder ENIGE te volgen afhankelijkheid: geen require naar
        de bron, geen serverstart. Dat is precies de vorm die de planner nooit mag

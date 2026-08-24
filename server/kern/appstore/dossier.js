@@ -30,6 +30,12 @@
 
 const { toonbaar } = require('./machtigingen');
 const { BUDGET } = require('./keuring');
+/* De tijd komt uit de tijdmachine en niet rechtstreeks uit het
+   besturingssysteem (scripts/klok.js telt dat, en de schuld mag alleen omlaag).
+   Hier is dat meer dan boekhouding: de datum op een inkoopdossier is een
+   bewering, en een bewering hoort dezelfde klok te lezen als de rest van het
+   huis -- anders draagt een dossier een ander uur dan het journaal ernaast. */
+const { datum } = require('../../lib/klok');
 /* Wat voor ELKE app in dit kanaal geldt -- wat hij nooit krijgt, waar de
    gegevens blijven, hoe de uitgang werkt, en wat dit dossier niet kan zeggen --
    staat in ./dossier-grenzen.js. Dat is geen opdeling om de omvang maar een
@@ -58,7 +64,7 @@ module.exports = function maakDossier({ S, app, versie, uitgever, opslag, journa
     const letop = (v.bevindingen || []).filter(x => x.ernst === 'let-op');
 
     return { status: 200, ok: true,
-      opgemaakt: new Date().toISOString(),
+      opgemaakt: datum().toISOString(),
       let: 'Elk gegeven hieronder komt uit een meting of uit een vastgelegd besluit, met de bron erbij. Wat wij niet kunnen aantonen, staat onderaan in nietGebouwd met de reden.',
 
       leverancier: {

@@ -27,7 +27,15 @@
    de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
 
 module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde, accounts }) => {
-  const nu = () => Date.now();
+  /* DE TIJD VAN DE HELE PAYLAAG, uit de huisklok en niet uit het
+     besturingssysteem. Elk deelbestand hieronder leest `nu` uit deze ctx, dus
+     deze ene regel bepaalt of vervaldatums, aflopende reserveringen, de
+     wachttijd op een gewijzigd IBAN en dag- en maandgrenzen met RTG_KLOK
+     meebewegen. Stond hier Date.now(), dan zaten de deelbestanden formeel op
+     een gedeelde klok en in werkelijkheid nog steeds aan het OS -- de teller
+     tevreden, de tijdmachine niet. Zonder RTG_KLOK geeft klok.nu() exact
+     Date.now(); in productie weigert een verzette klok bij het laden. */
+  const nu = require('../../lib/klok').nu;
   /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
      'partner:', het saldo van een rekening, een nieuw id) -- staat in ./bakken.js. */
   const { d, saldi, grootboek, klompjes, kascodes, tikcodes, rekLid, rekPartner, saldoVan, id } =

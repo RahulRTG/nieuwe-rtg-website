@@ -36,7 +36,15 @@ module.exports = (ctx) => {
      een bewijs dat zijn eigen ouderdom aan het OS vraagt, is met een verzette
      klok (RTG_KLOK) niet te beproeven -- en verlopen bewijs is juist wat deze
      laag moet kunnen zien. */
-  const { d, saldi, grootboek, saldoVan, waarde, nu } = ctx;
+  const { d, saldi, grootboek, saldoVan, waarde } = ctx;
+  /* De klok komt uit de ctx van de paylaag, met de huisklok als terugval. Die
+     terugval is er niet voor de sier: een kapot grootboek is via de voordeur
+     niet te maken (de poort houdt dat tegen), dus test/waardegraaf.test.js
+     bouwt met opzet een MINIMALE ctx om de zakkende kant te kunnen zien. Een
+     module die dan omvalt op een ontbrekend veld, maakt juist die helft
+     ontoetsbaar -- en een controle waarvan alleen de slagende kant ooit is
+     gezien, is geen controle. */
+  const nu = ctx.nu || require('../../lib/klok').nu;
 
   const bewezen = (id, wat, bewijs) => ({ id, wat, staat: 'bewezen', bewijs, gemetenOp: nu() });
   const gezakt = (id, wat, uitleg, bewijs) => ({ id, wat, staat: 'gezakt', uitleg, bewijs, gemetenOp: nu() });

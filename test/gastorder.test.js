@@ -302,3 +302,47 @@ test('de tijdlijn van de gast volgt de keuken, zonder een tweede administratie',
   assert.ok(watten.includes('Klaar in de keuken'));
   assert.ok(log.body.logboek.some(a => a.wat === 'regel-erop'), 'de audit legt de bestelling vast');
 });
+
+/* ---- HORECA.md grens 7, op de kant waar het het meest telt ----------------
+   De servicebalk op de telefoon van de gast liep op vaste percentages
+   (10 / 28 / 34 / 50 / 68 / 82 / 100) die uit een toestandslabel kwamen. Een
+   gast kijkt naar die balk om te weten hoe ver zijn avond is, en hij zei niets.
+   Nu draagt de stap een BREUK die de gast kan natellen aan zijn eigen tafel. */
+test('de servicebalk van de gast draagt een breuk, geen verzonnen percentage', async () => {
+  const { zaak, token } = await opstelling();
+  const zicht = await post('/api/gast/tafel', { token });
+  const item = zicht.body.kaart.find(k => !k.alcohol && !k.uitverkocht);
+  const { body: aan } = await post('/api/gast/aanschuiven', { token, naam: 'Kim' });
+
+  // nog niets besteld: geen breuk, en dus geen balk
+  const leeg = await post('/api/gast/rekening', { sleutel: aan.sleutel });
+  assert.equal(leeg.body.rekening.service.voortgang, undefined, 'geen percentage meer');
+  assert.deepEqual(leeg.body.rekening.service.geserveerd, { uitgegeven: 0, besteld: 0 },
+      'nul van nul: het scherm hoort hier geen balk te tekenen');
+
+  const best = await post('/api/gast/bestel', { sleutel: aan.sleutel, items: [{ itemId: item.id, aantal: 2 }] });
+  const rekId = best.body.rekening.rekeningId;
+  const regelId = best.body.rekening.regels[0].id;
+
+  const besteld = await post('/api/gast/rekening', { sleutel: aan.sleutel });
+  assert.equal(besteld.body.rekening.service.geserveerd.besteld, 1, 'een regel op de rekening');
+  assert.equal(besteld.body.rekening.service.geserveerd.uitgegeven, 0, 'en er staat nog niets');
+
+  await post('/api/supplier/horeca/gang/vrij', { rekeningId: rekId, gang: 0 }, zaak);
+  await post('/api/supplier/horeca/keuken/stand', { rekeningId: rekId, regelId, stand: 'klaar' }, zaak);
+  await post('/api/supplier/horeca/keuken/stand', { rekeningId: rekId, regelId, stand: 'uitgegeven' }, zaak);
+
+  const na = await post('/api/gast/rekening', { sleutel: aan.sleutel });
+  assert.deepEqual(na.body.rekening.service.geserveerd, { uitgegeven: 1, besteld: 1 },
+      'wat op tafel staat is te tellen, en het klopt met de keuken');
+  assert.equal(na.body.rekening.service.stap, 'Genieten');
+
+  /* En de harde vorm: nergens in het gastbeeld staat nog een getal waarvan de
+     naam een schaal van nul tot honderd belooft. */
+  const verdacht = [];
+  (function loop(x, pad) {
+    if (x && typeof x === 'object') { for (const k of Object.keys(x)) loop(x[k], pad + '.' + k); return; }
+    if (typeof x === 'number' && /score|procent|percent|voortgang/i.test(pad)) verdacht.push(pad + ' = ' + x);
+  })(na.body.rekening, 'rekening');
+  assert.deepEqual(verdacht, [], 'score-achtig getal in het gastbeeld: ' + verdacht.join(', '));
+});

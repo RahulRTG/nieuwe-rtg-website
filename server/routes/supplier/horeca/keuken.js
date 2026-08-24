@@ -31,6 +31,22 @@ module.exports = (kern) => {
      niet hier: de polslaag toont dezelfde wachttijd aan een gast, en die kan
      niet bij een functie die in een leveranciersroute wordt gemaakt. */
   const { bereidingsMinuten } = require('../../../kern/horeca/keukenlaag');
+  /* De cadans rekent TERUG vanaf het serveermoment; het bord hieronder rekent
+     vooruit vanaf de vrijgave. Allebei nodig, en allebei op dezelfde regels:
+     `loopt`/`norm` zeggen wat er al mis is, `startOm`/`baan` zeggen wat er nu
+     moet gebeuren. Zie kern/horeca/cadans.js en HORECA.md. */
+  const cadanslaag = require('../../../kern/horeca/cadans');
+  const stappenlaag = require('../../../kern/horeca/stappen');
+  /* De stoel hoort op de bon. Een gang komt samen de deur uit (punt 3
+     hieronder), maar bij de tafel moet elk bord bij de juiste persoon staan --
+     en dan is "gastNr 3" een nummer waar een runner niets aan heeft. De naam
+     erbij komt uit kern/horeca/gezelschap.js, want daar staat wie er zit. */
+  const gezelschap = require('../../../kern/horeca/gezelschap')({ horeca, schoon });
+  const paslaag = require('../../../kern/horeca/pas')({ horeca, schoon });
+  /* De stempels bij een standwissel staan in keukenlaag.js en niet hier: de pas
+     geeft een hele gang in een tik uit, en twee plekken die `stand` zetten,
+     zetten op een dag niet meer dezelfde tijdstempels erbij (LAT-regel 4). */
+  const { zetStand } = require('../../../kern/horeca/keukenlaag');
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
 
   /* Een regel zoals de keuken hem ziet. `loopt` telt vanaf de vrijgave door de
@@ -43,7 +59,8 @@ module.exports = (kern) => {
       rekeningId: rek.id, regelId: regel.id, tafel: rek.tafel, kanaal: rek.kanaal,
       gast: rek.naam, gasten: rek.gasten, kamer: rek.kamer || null,
       naam: regel.naam, aantal: regel.aantal, gang: regel.gang, station: regel.station || 'warm',
-      allergie: regel.allergie || null, notitie: regel.notitie || null, gastNr: regel.gastNr,
+      allergie: regel.allergie || null, notitie: regel.notitie || null,
+      gastNr: regel.gastNr, stoel: gezelschap.handleVan(rek, regel.gastNr),
       stand: regel.stand, besteldAt: regel.at, vrijAt: regel.vrijAt || null, serveerOm: regel.serveerOm || null,
       loopt: minuten, norm, over: Math.max(0, minuten - norm),
       urgentie: minuten > norm + 5 ? 'te laat' : minuten > norm ? 'let op' : 'op tijd'
@@ -67,18 +84,58 @@ module.exports = (kern) => {
            allergie gaat eerst langs een medewerker" is anders alleen een
            melding op een scherm en geen grendel. */
         if (regel.bevestiging === 'wacht') continue;
-        if (station && String(regel.station || 'warm') !== station) continue;
-        rijen.push(bord(h, rek, regel));
+        /* WELK STATION ZIET DIT GERECHT. Met bereidingsstappen is dat elk
+           station dat eraan werkt en niet alleen dat van de regel -- een
+           tournedos met een grill-stap die op het warme bord staat, is precies
+           de fout die de stappen moesten oplossen. Zonder stappen verandert er
+           niets (kern/horeca/stappen.js). */
+        const mijne = stappenlaag.stationsVanRegel(h, regel);
+        if (station && !mijne.includes(String(station).toLowerCase())) continue;
+        const rij = bord(h, rek, regel);
+        /* WIE MAG DE STAND ZETTEN: het LAATSTE station, want daar verlaat het
+           gerecht de keuken richting de pas. Zou de grill "klaar" mogen melden
+           terwijl de saus nog moet, dan staat er een bord bij de pas dat niet af
+           is. Elk ander station ziet zijn eigen stap en kijkt verder mee. */
+        rij.eigenaarStation = stappenlaag.eigenaarStation(h, regel);
+        rij.magZetten = !station || String(station).toLowerCase() === rij.eigenaarStation;
+        rij.mijnStap = station ? stappenlaag.stapVoorStation(h, regel, station) : null;
+        rijen.push(rij);
       }
     }
-    /* Volgorde: de gewenste serveertijd eerst (die is een afspraak met de gast),
-       daarna wie het langst loopt. Bewust NIET op wie het duurst is. */
-    rijen.sort((a, b) => String(a.serveerOm || '~').localeCompare(String(b.serveerOm || '~')) || b.loopt - a.loopt);
+    /* De cadans erbij, per regel. Additief: geen bestaand veld verandert, dus
+       een scherm dat hem nog niet kent, blijft precies werken zoals het deed. */
+    const cadans = new Map(cadanslaag.cadansVanZaak(h).map(r => [r.regelId, r]));
+    for (const r of rijen) {
+      const c = cadans.get(r.regelId);
+      if (!c) continue;
+      r.baan = c.baan; r.startOm = c.startOm; r.startOver = c.startOver;
+      r.doelOm = c.doelOm; r.doelOver = c.doelOver; r.passOm = c.passOm;
+      r.gangCompleet = c.gangCompleet; r.samenMet = c.samenMet; r.cadans = c.rekensom;
+      /* De bereidingsstappen, elk met hun eigen startmoment (kern/horeca/stappen.js).
+         `null` als de zaak er geen heeft vastgelegd -- en dan is er niets
+         veranderd aan wat dit bord altijd al toonde. */
+      r.stappen = c.stappen; r.stations = c.stations;
+    }
+    /* Volgorde: wat het eerst AAN moet, staat bovenaan. Waar geen cadans is
+       (een regel zonder vrijgave haalt het bord niet, maar wees voorzichtig),
+       valt hij terug op de oude volgorde: afgesproken serveertijd, dan wie het
+       langst loopt. Bewust NIET op wie het duurst is. */
+    rijen.sort((a, b) =>
+      (a.startOm && b.startOm ? Date.parse(a.startOm) - Date.parse(b.startOm) : 0) ||
+      String(a.serveerOm || '~').localeCompare(String(b.serveerOm || '~')) || b.loopt - a.loopt);
+    /* `perStation` telt op WELKE BORDEN een gerecht staat, en dat is met
+       stappen meer dan een. Op het station van de REGEL tellen zou hier het
+       verkeerde getal geven: de grill ziet dan nul terwijl er acht minuten
+       grillwerk op zijn bord staat. */
     const stations = {};
-    for (const r of rijen) stations[r.station] = (stations[r.station] || 0) + 1;
+    for (const r of rijen) {
+      for (const st of stappenlaag.stationsVanRegel(h, { naam: r.naam, station: r.station })) {
+        stations[st] = (stations[st] || 0) + 1;
+      }
+    }
     res.json({ ok: true, station: station || 'alle', aantal: rijen.length, bonnen: rijen.slice(0, 200),
       perStation: stations, teLaat: rijen.filter(r => r.urgentie === 'te laat').length,
-      standen: REGELSTANDEN });
+      banen: cadanslaag.banen(rijen), standen: REGELSTANDEN });
   });
 
   /* ---------- een regel doorzetten ---------- */
@@ -93,10 +150,10 @@ module.exports = (kern) => {
     const vooruit = REGELSTANDEN.indexOf(naar) > REGELSTANDEN.indexOf(van);
     if (!vooruit && !schoon(req.body.reden, 120))
       return res.status(400).json({ error: 'Terugzetten van "' + van + '" naar "' + naar + '" kan, maar noteer waarom; dat blijft op de bon staan.' });
-    regel.stand = naar;
-    if (naar === 'gestart' && !regel.startAt) regel.startAt = nu();
-    if (naar === 'klaar') regel.klaarAt = nu();
-    if (naar === 'uitgegeven') regel.uitAt = nu();
+    zetStand(regel, naar, nu());
+    /* Ging de laatste regel van een gang de deur uit, dan hoort de claim van de
+       pas niet te blijven staan. */
+    if (naar === 'uitgegeven') paslaag.ruimOp(rek);
     if (!vooruit) regel.correcties = (regel.correcties || []).concat([{ van, naar, reden: schoon(req.body.reden, 120), at: nu(), door: req.actor.name }]).slice(-10);
     save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'keuken' });

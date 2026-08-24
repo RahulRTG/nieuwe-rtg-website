@@ -148,10 +148,13 @@ iets bouwt dat er al is:
   hieronder voor wat er wel en niet in zit.
 - **De wijk bestaat** (`kern/horeca/wijk.js`): welke tafels van wie zijn, met
   als harde regel dat een wijk werk verdeelt en nooit verbergt.
+- **De vloer heeft een eigen scherm** (`/apps/horeca-vloer.html`,
+  `kern/horeca/wijk-overdracht.js`): de verdeling met de drukte per wijk, en het
+  overdragen van een wijk midden in een dienst. Zie punt 7 hieronder.
 
 ## Wat er nieuw moet, in volgorde
 
-*Stand op 23 augustus 2026: punt 0 tot en met 6 zijn af. Wat er nog ligt, staat
+*Stand op 24 augustus 2026: punt 0 tot en met 7 zijn af. Wat er nog ligt, staat
 niet meer als los punt in deze lijst maar in **Wat er hierna ligt** onderaan —
 telkens met de reden waarom het een eigen snede is en niet een restje van iets
 hierboven.*
@@ -664,6 +667,51 @@ maar een logregel; "ongemerkt" gaat over wat een mens ziet. Ze staan daarom op
 goedkeurt, want dat is precies hoe een bevestiging een formaliteit wordt
 (`test/horeca-rahul.test.js`, `test/horeca-rahul.e2e.js`).
 
+**7. VLOER als eigen werkstand — af.** De zesde en laatste werkstand, en de enige
+die een andere vraag stelt dan de vijf ernaast. TAFEL, PDA SERVICE, VUUR en BAR
+vragen *wat moet ik nu doen*; REGIE vraagt *loopt de avond*. VLOER vraagt **wie
+heeft ons nú nodig, en hoe verdelen we dat** — en dat antwoord is geen takenlijst
+maar een verdeling.
+
+De halve vraag stond er al: het wijkbeeld telt per wijk hoeveel er open staat en
+wie hem draagt. Wat niet kon, was **herverdelen**, en dat is nou juist het moment
+waarop een maître iets nodig heeft: iemand gaat pauzeren, iemand raakt achterop,
+er komt een groep binnen.
+
+**Het gevaar zit in het gat.** Een wijk loslaten en hopen dat een collega hem
+oppakt, is een tafel die tussen twee mensen door valt — en dat merkt niemand tot
+de gast het zegt. Een overdracht is daarom geen *loslaten* maar een **aanbod**,
+met vijf regels (`server/kern/horeca/wijk-overdracht.js`):
+
+1. **Alleen wie hem draagt, biedt hem aan.** Een collega trekt een wijk niet naar
+   zichzelf toe; dat zou de claim zijn die de wijk juist oplost.
+2. **Tijdens het aanbod draagt de aanbieder hem nog.** Pas de aanvaarding
+   verhuist de verantwoordelijkheid. Zo bestaat er geen moment waarop een wijk
+   van niemand is — en dat is de hele reden dat het een aanbod is.
+3. **Alleen de gevraagde aanvaardt.** Een aanbod aan Sanne is geen aanbod aan de
+   hele ploeg; anders is het alsnog een wedstrijdje wie het eerst drukt.
+4. **Intrekken kan, door de aanbieder of door een manager** — ook door een
+   aanbieder die geen manager is. Een aanbod dat blijft hangen omdat de gevraagde
+   naar huis is, hoort geen grendel te worden.
+5. **Een wijk heeft hoogstens één open aanbod.** Twee aanbiedingen op dezelfde
+   wijk geven twee antwoorden op *van wie wordt dit*, en dan gaan er twee of geen.
+
+Het scherm (`/apps/horeca-vloer.html`) toont de verdeling met de drukte per wijk,
+wat aan míj is aangeboden bovenaan, de open aanbiedingen, en — bij wie er iets
+mee kan — het indelen zelf. Drie dingen die daar zichtbaar blijven: het getal
+hoort bij de **wijk** en niet bij de mens (grens 5), er staat **geen grens** op
+hoe lang een aanbod mag staan want die is nergens gemeten (grens 7), en wat van
+iedereen is — tafels zonder wijk, wijken zonder drager — komt náár voren in
+plaats van weg te vallen.
+
+De drukte per wijk komt uit de werklijst en wordt niet tweede keer geteld: het is
+dezelfde som die de PDA toont (LAT-regel 4), in één antwoord en dus op één moment
+— uit twee aanroepen samengesteld kan een wijk in de ene helft van het scherm van
+Sanne zijn en in de andere van Ayla, precies op het moment dat iemand hem
+overdraagt. `test/horeca-wijk.test.js` legt de vijf regels vast,
+`test/horeca-vloer.e2e.js` bewijst de overdracht tussen twee echte schermen —
+inclusief dat de wijk tijdens het aanbod op naam van de aanbieder blijft staan.
+
 ## De grenzen
 
 *Zoals in elk diepte-document van dit huis: waar een functie botst met een
@@ -795,9 +843,10 @@ tegen.
 *De vier punten die hier op 23 augustus 2026 stonden zijn alle vier af: het
 stationsbord per stap, de wijk, de uitvoerders achter de rechtenlaag, Venue Edge
 (voor de PDA als wachtrij, voor de zaal en de bar als samenvoeging) en de
-rolmodus host. Wat er nu ligt staat hieronder — en de eerlijkste zin van dit
-document staat nog steeds onderaan de meetlat: dit is pas waar wanneer er een
-meting van een echte dienst naast staat.*
+rolmodus host. Op 24 augustus 2026 kwamen daar de dienstmeting en VLOER bij; alle
+zes de werkstanden hebben nu een eigen scherm. Wat er nu ligt staat hieronder —
+en de eerlijkste zin van dit document staat nog steeds onderaan de meetlat: dit
+is pas waar wanneer er een meting van een echte dienst naast staat.*
 
 **Een dienst draaien.** Het instrument staat er (zie de meetlat hierboven); wat
 ontbreekt is een avond om er doorheen te halen. Alles in dit document is met
@@ -806,11 +855,15 @@ en hij vraagt een zaak, een avond en iemand die meekijkt. Zolang die er niet is
 geweest, staat er bij acht van de twaalf meetpunten "niet gemeten" — en dat is de
 eerlijkste zin die dit document over zichzelf kan zeggen.
 
-**De vloer (VLOER) heeft geen eigen scherm.** Vijf van de zes werkstanden staan
-er: TAFEL, PDA SERVICE, VUUR, BAR en REGIE. De maître ziet de zaak nu via het
-wijkbeeld op de PDA, en dat beantwoordt de halve vraag — *wie draagt wat*. De
-andere helft, *hoe verdelen we dat opnieuw*, vraagt iets wat er niet is: een
-manier om een wijk over te dragen terwijl er gasten aan tafel zitten.
+**Wat de vloer nog niet kan.** Het scherm staat er (punt 7 hierboven), maar twee
+dingen zijn bewust niet gebouwd en horen genoemd te worden. Een aanbod kan nu
+alleen worden aanvaard of ingetrokken — **weigeren kan niet**: wie een wijk
+aangeboden krijgt en hem niet wil, laat hem staan en de aanbieder trekt hem in.
+Dat werkt, maar het legt de handeling bij de verkeerde persoon. En een overdracht
+draagt de **hele** wijk over; een halve wijk — drie van de acht tafels — kan
+alleen door hem opnieuw in te delen, en dat is manager-werk. Beide zijn een eigen
+snede: weigeren vraagt een vierde stand in de overdracht, half overdragen vraagt
+een tweede soort overdracht.
 
 ## De echte wauw
 

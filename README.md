@@ -1319,11 +1319,14 @@ bedoeling (LAT-regel 4).
 Schermen: `/apps/horeca.html` is de dienst zelf -- de zaal (rekening openen,
 bestellen met de allergie in een eigen veld, een gang vrijgeven, splitsen,
 afrekenen) en de keuken (het stationsbord met looptijd naast de norm, de standen
-en het regiescherm). Daarnaast staan er zeven werkschermen, bereikbaar vanaf die
+en het regiescherm). Daarnaast staan er tien werkschermen, bereikbaar vanaf die
 pagina:
 
 | Scherm | Waarvoor |
 | --- | --- |
+| `/apps/horeca-pda.html` | PDA SERVICE: wat is mijn eerstvolgende handeling, geordend op minuten over een grens die het huis zelf al had vastgelegd -- met een wijklens die zegt hoeveel hij niet toont |
+| `/apps/horeca-vloer.html` | VLOER: de verdeling met de drukte per wijk en wie hem draagt, een wijk overdragen als aanbod aan een collega, en het indelen zelf (manager) |
+| `/apps/horeca-bar.html` | BAR: de ronden op wachttijd naast de stapel (dezelfde drank over meerdere tafels is een handeling), met de stoel en de allergie op het glas |
 | `/apps/horeca-expeditie.html` | de pas: per tafel en gang wat er klaar is en hoe lang het eerste bord al koud staat, uitgeven met de hand, en de drukterem met zijn rekensom |
 | `/apps/horeca-bezorg.html` | zones, adrescheck, tijdsloten in keukenminuten, de ritvolgorde, en de rit zelf van inpakken tot afleverbewijs |
 | `/apps/horeca-hotel.html` | de gastrekening (folio), de nachtrun, de borg, en roomservice die op de kamer wordt geboekt |

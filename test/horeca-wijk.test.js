@@ -173,3 +173,121 @@ test('6. een wijk weghalen laat de tafels bij iedereen, niet in een gat', async 
     assert.ok(!mijn.mijnWijken.includes('Terras'), 'en de wijk zelf is weg bij ' + wie);
   }
 });
+
+/* ---------- EEN WIJK OVERDRAGEN midden in een dienst ----------
+
+   De vraag van VLOER is niet "wat moet ik nu doen" maar "wie heeft ons nú
+   nodig, en hoe verdelen we dat". Het eerste deel stond er al (het wijkbeeld);
+   het tweede kon niet -- en dat is precies het moment waarop een maître iets
+   nodig heeft: iemand gaat pauzeren, iemand raakt achterop.
+
+   HET GEVAAR ZIT IN HET GAT. Een wijk loslaten en hopen dat een collega hem
+   oppakt, is een tafel die tussen twee mensen door valt. Dus is een overdracht
+   geen "loslaten" maar een AANBOD, en tijdens dat aanbod draagt de aanbieder
+   hem nog. */
+
+const wijken = async (deur) => (await deur('/wijken', {})).body;
+const wijkMet = async (deur, naam) => (await wijken(deur)).wijken.find(x => x.naam === naam);
+
+test('7. tijdens een aanbod draagt de aanbieder de wijk nog', async () => {
+  const w = await M('/wijk/zet', { naam: 'Serre', tafels: ['V1', 'V2'] });
+  await A('/wijk/neem', { wijkId: w.body.wijk.id });
+
+  const ploeg = (await wijken(A)).ploeg;
+  const ander = ploeg.find(x => x.naam === naamM);
+  assert.ok(ander, 'de ploeg staat erbij zodat een aanbod een naam kan krijgen');
+
+  const bod = await A('/wijk/bied', { wijkId: w.body.wijk.id, naarId: ander.id, naarNaam: ander.naam });
+  assert.equal(bod.status, 200);
+  assert.equal(bod.body.overdracht.stand, 'aangeboden');
+  assert.match(bod.body.let, /draagt deze wijk nog/i, bod.body.let);
+
+  /* DIT IS DE HELE POINTE: het aanbod verandert niets aan wie verantwoordelijk
+     is. Er bestaat geen moment waarop de wijk van niemand is. */
+  const nu = await wijkMet(A, 'Serre');
+  assert.equal(nu.van.naam, naamA, 'de aanbieder draagt hem nog steeds');
+  assert.equal(nu.vanMij, true);
+});
+
+test('8. alleen de gevraagde aanvaardt, en pas dan verhuist de wijk', async () => {
+  const o = (await wijken(A)).overdrachten.find(x => x.wijkNaam === 'Serre');
+  assert.ok(o, 'het aanbod staat er');
+
+  const zelf = await A('/wijk/aanvaard', { overdrachtId: o.id });
+  assert.equal(zelf.status, 409, 'de aanbieder aanvaardt zijn eigen aanbod niet');
+  assert.equal(zelf.body.code, 'niet-voor-jou');
+
+  const ja = await M('/wijk/aanvaard', { overdrachtId: o.id });
+  assert.equal(ja.status, 200);
+  assert.match(ja.body.let, /overgenomen van/i, ja.body.let);
+
+  const na = await wijkMet(M, 'Serre');
+  assert.equal(na.van.naam, naamM, 'nu pas is hij van de ander');
+  assert.equal(na.van.overgenomenVan, naamA, 'met de naam van wie hem overdroeg');
+  assert.equal((await wijken(M)).overdrachten.length, 0, 'en het aanbod staat niet meer open');
+});
+
+test('9. een collega trekt een wijk niet naar zich toe', async () => {
+  const w = await wijkMet(M, 'Serre');
+  const nee = await A('/wijk/bied', { wijkId: w.id, naarId: '999', naarNaam: 'iemand' });
+  assert.equal(nee.status, 409, 'wie hem niet draagt, biedt hem niet aan');
+  assert.equal(nee.body.code, 'niet-van-jou');
+  assert.match(nee.body.error, new RegExp(naamM), 'met de naam van wie hem wel draagt: ' + nee.body.error);
+});
+
+test('10. een wijk heeft hoogstens een open aanbod, en intrekken kan', async () => {
+  const w = await wijkMet(M, 'Serre');
+  const ploeg = (await wijken(M)).ploeg;
+  const naarA = ploeg.find(x => x.naam === naamA);
+
+  const een = await M('/wijk/bied', { wijkId: w.id, naarId: naarA.id, naarNaam: naarA.naam });
+  assert.equal(een.status, 200);
+  const twee = await M('/wijk/bied', { wijkId: w.id, naarId: naarA.id, naarNaam: naarA.naam });
+  assert.equal(twee.status, 409, 'twee aanbiedingen op dezelfde wijk geven twee antwoorden');
+  assert.equal(twee.body.code, 'al-aangeboden');
+
+  /* Intrekken is van de AANBIEDER (of van een manager die moet opruimen), en
+     niet van de gevraagde: wie een wijk aangeboden krijgt, aanvaardt hem of
+     laat hem staan -- maar haalt het aanbod niet weg onder degene die hem
+     nog draagt. */
+  const nietVanJou = await A('/wijk/trek-in', { overdrachtId: een.body.overdracht.id });
+  assert.equal(nietVanJou.status, 409, 'de gevraagde trekt het aanbod van een ander niet in');
+  assert.match(nietVanJou.body.error, new RegExp(naamM), nietVanJou.body.error);
+  assert.equal((await wijken(M)).overdrachten.length, 1, 'en het aanbod staat er nog');
+
+  const weg = await M('/wijk/trek-in', { overdrachtId: een.body.overdracht.id });
+  assert.equal(weg.status, 200);
+  assert.match(weg.body.let, /draagt de wijk nog steeds/i, weg.body.let);
+  assert.equal((await wijkMet(M, 'Serre')).van.naam, naamM, 'en er is niets verhuisd');
+
+  // en daarna kan er weer een nieuw aanbod uit
+  const opnieuw = await M('/wijk/bied', { wijkId: w.id, naarId: naarA.id, naarNaam: naarA.naam });
+  assert.equal(opnieuw.status, 200, 'na intrekken kan het weer');
+  await M('/wijk/trek-in', { overdrachtId: opnieuw.body.overdracht.id });
+
+  /* De andere helft van dezelfde regel: de AANBIEDER trekt zijn eigen aanbod
+     in, ook als hij geen manager is. Een bediening die zich bedenkt hoeft
+     niemand te roepen -- anders is de manager een grendel op een handeling
+     van een halve seconde. */
+  const eigen = await M('/wijk/zet', { naam: 'Loge', tafels: ['V7'] });
+  await A('/wijk/neem', { wijkId: eigen.body.wijk.id });
+  const naarM = ploeg.find(x => x.naam === naamM);
+  const bod = await A('/wijk/bied', { wijkId: eigen.body.wijk.id, naarId: naarM.id, naarNaam: naarM.naam });
+  assert.equal(bod.status, 200);
+  const zelfWeg = await A('/wijk/trek-in', { overdrachtId: bod.body.overdracht.id });
+  assert.equal(zelfWeg.status, 200, 'de aanbieder trekt zijn eigen aanbod in, zonder manager te zijn');
+  assert.equal((await wijkMet(A, 'Loge')).vanMij, true, 'en houdt de wijk gewoon');
+});
+
+test('11. de werklijst volgt de overdracht: het werk verhuist mee', async () => {
+  await tafelMetVerzoek('V1');   // V1 zit in Serre, en die is nu van de manager
+
+  const vanA = await lijst(A, { wijk: 'mijn' });
+  assert.ok(!taken(vanA).map(t => t.tafel).includes('V1'),
+    'de aanbieder ziet de tafel niet meer, want de wijk is overgedragen');
+
+  const vanM = await lijst(M, { wijk: 'mijn' });
+  assert.ok(taken(vanM).map(t => t.tafel).includes('V1'),
+    'en wie hem overnam, ziet hem wel');
+  assert.ok(vanM.mijnWijken.includes('Serre'));
+});

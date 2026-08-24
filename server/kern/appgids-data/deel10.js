@@ -1,4 +1,4 @@
-/* App-gids data, deel10: de zeven werkschermen van het Horeca OS naast
+/* App-gids data, deel10: de acht werkschermen van het Horeca OS naast
    /apps/horeca.html (dat in deel8 staat). Zie ../appgids.js voor de uitleg. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
@@ -13,6 +13,11 @@ module.exports = Object.assign({
       'Werk de ronden af, oudste eerst; een ronde landt samen op tafel',
       'Zet aan en meld klaar -- dezelfde deur als de keuken, dus nooit twee wegen naar dezelfde stand'],
     'Er staat geen grens op hoe lang een drankje mag staan: die is nergens vastgelegd. Wel hoeveel minuten het eerste glas al op de rest wacht.'),
+  '/apps/horeca-vloer.html': G('Vloer: wie heeft ons nu nodig, en hoe verdelen we dat.',
+    ['Lees de verdeling: per wijk hoeveel werk er open staat en wie hem draagt',
+      'Neem een wijk die niemand draagt; wat van iedereen is, verdwijnt het makkelijkst',
+      'Draag over als iemand achterop raakt -- dat is een aanbod aan een collega, geen knop'],
+    'Tijdens een aanbod draagt de aanbieder de wijk nog. Zo bestaat er geen moment waarop een wijk van niemand is, en valt er geen tafel tussen twee mensen door.'),
   '/apps/horeca-expeditie.html': G('Expeditie en keukenregie: de pas, waar een tafel compleet de deur uit gaat.',
     ['Zie per tafel en gang hoeveel borden klaar zijn en hoe lang het eerste al koud staat',
       'Geef zelf uit; er wordt niets automatisch afgevinkt',

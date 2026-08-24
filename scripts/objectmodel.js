@@ -64,7 +64,15 @@ const BRONNEN = ['server/kern', 'server/bedrijf', 'server/school', 'server/papie
    niets over gedeelde types; het meet alleen dat iemand een demo-rij twee keer
    heeft neergezet. Een domeinvorm wordt GEBOUWD (met een id, een klok, een
    berekening), een catalogusrij wordt OPGESCHREVEN. */
-const GEEN = [/\/initdata\//, /\/seed\//, /-data\.js$/, /-rijen\//, /demoantwoorden/, /\/data\//];
+const GEEN = [/\/initdata\//, /\/seed\//, /-data\.js$/, /-rijen\//, /demoantwoorden/, /\/data\//,
+  /* zz- is in dit huis het voorvoegsel van een PROEFBESTAND: test/meterijk.test.js
+     zet er echte bestanden voor neer in server/kern en ruimt ze daarna op. Deze
+     meter leest de levende boom en niet de git-index, dus zag hij ze staan --
+     en in een volle suite draait dat naast elkaar. Uitkomst: de meting gaf 1499
+     waar het vastgelegde bestand 1498 zegt, en de toets zakte op iets wat na
+     afloop niet meer bestond. Een meter die per ronde een ander getal geeft,
+     meet de suite en niet de code. */
+  /\/zz-[^/]*\.js$/];
 
 const MIN_VELDEN = 4;          // minder is geen bewaard ding maar een optiezak
 /* De envelop wordt gemeten over MODULES en niet over vormen. Over vormen gemeten

@@ -196,3 +196,31 @@ test('een grens met een punt erin wordt als 0,5 gelezen en niet als 0', () => {
   assert.match(r.uit, /grenzen die zij meldden\s*:\s*0\.5/,
     'de ronde leest een gebroken grens niet terug');
 });
+
+test('per collectie staat erbij of er een KAP op zit, en dat is gescand', () => {
+  /* De catalogus zegt wat er krimpt; dit zegt of een grens op die collectie
+     veilig te handhaven is. Ruim zestig plekken doen "push, dan afkappen"
+     (db.data.X = X.slice(0, N)). In rust is dat een rij per verzoek, maar staat
+     de collectie ooit ver boven zijn kap, dan wil hij er duizenden weghalen --
+     en een weigering daarop houdt zichzelf in stand: de collectie blijft te
+     groot, dus het volgende verzoek wordt opnieuw geweigerd.
+
+     Gescand op de BRON en niet op de meting: een kap die geen enkele toets
+     uitlokt is precies de kap die je later verrast. */
+  const teken = echteLevensteken(1)[0];
+  const meld = (collectie) => '2026-08-24T00:00:00.000Z WARN  begroting: zou zijn geweigerd ' +
+    '{"id":"x","p":"/api/proef","collectie":"' + collectie + '","rijen":9,"grens":1}';
+
+  const met = draai([teken, meld('clipsMeldingen')].join('\n') + '\n');
+  assert.equal(met.code, 0, met.uit);
+  assert.match(met.uit, /KAP\s+server\/kern\/clips\.js/,
+    'de kap op clipsMeldingen wordt niet gevonden -- dan staat de gevaarlijkste soort ' +
+    'collectie zonder waarschuwing in de catalogus');
+
+  /* DE TEGENPROEF. Zonder haar zou "KAP" overal kunnen staan en zou de eerste
+     bewering ook groen zijn als de scan altijd ja zegt. */
+  const zonder = draai([teken, meld('muziek')].join('\n') + '\n');
+  assert.equal(zonder.code, 0, zonder.uit);
+  assert.doesNotMatch(zonder.uit, /KAP/,
+    'muziek heeft geen kap in de bron; de scan ziet er ten onrechte een');
+});

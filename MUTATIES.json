@@ -3160,6 +3160,14 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "migratierace.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/migraties/lijst.js",
+      "operator": "getal+1#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "migraties.test.js": {
       "soort": "puur",
       "staat": "gezakt",

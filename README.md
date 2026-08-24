@@ -1012,6 +1012,23 @@ van dit huis — één rij per keer, `db.data.X = X.filter(r => r.id !== id)`.
 (de suite doet wat de toetsen doen, niet wat gebruikers doen), en hij is **geen
 oordeel** — welke grens bij een collectie hoort, is een besluit van een mens.
 
+**En per collectie staat erbij of er een KAP op zit**, gescand op de bron. Ruim
+zestig plekken in dit huis doen push-dan-afkappen (`db.data.X = X.slice(0, N)`).
+In rust haalt zo'n kap één rij per verzoek weg. Maar staat de collectie ooit ver
+boven zijn kap — na een bulkimport, of omdat iemand het getal verlaagt — dan wil
+hij er in één keer duizenden weghalen, en een weigering daarop **houdt zichzelf
+in stand**: de collectie blijft te groot, dus het volgende verzoek wordt opnieuw
+geweigerd. Drie van de negentien hebben er een: `clipsMeldingen`, `snaps`,
+`stories`.
+
+Dat is de eerste van de twee vragen die een grens per collectie mogelijk maken.
+De tweede — *begrenst de vorm van de route hoeveel er weg kan?* — staat niet in
+de code en is dus een leesbesluit. Voor de meeste is het antwoord ja (een clip,
+een video, een zetel: één rij per handeling). Voor `/api/privacy/delete` is het
+**nee**, en dat is het belangrijkste geval: dat haalt alles van één lid weg, en
+dat kan legitiem honderden rijen zijn. Een grens daarop breekt het recht om
+vergeten te worden. Zie TAKEN.md 4.62.
+
 **En de suite-stand staat er per ronde bij.** Deze ronde was rood op twee
 toetsen (`test/vloot.test.js`), dus de ronde eindigt met uitgang 3 en de
 catalogus draagt `"suite": {"toetsen": 6818, "gezakt": 2}`. Wat erin staat is

@@ -106,6 +106,56 @@ const WAAKT = /begroting: waakt/;
    Een halve rij is precies de stand waarin je de enkele krimpen ziet. */
 const WAAKT_G = /"grens":([0-9.]+)/;
 
+/* WORDT DEZE COLLECTIE OOK GEKAPT? En waarom dat de vraag is die de catalogus
+   nog miste.
+
+   De ronde zegt WAT er krimpt en via welke route. Wat hij niet zei, is of een
+   grens op die collectie veilig te handhaven is -- en daar hangt een concreet
+   gevaar aan. Ruim zestig plekken in dit huis doen "push, dan afkappen":
+
+       db.data.gemeenteMeldingen = db.data.gemeenteMeldingen.slice(0, 20000);
+
+   In rust haalt zo'n kap een rij per verzoek weg en valt hij onder elke grens.
+   Maar staat de collectie ooit ver boven zijn kap -- na een bulkimport, of
+   omdat iemand het getal verlaagt -- dan wil hij er in EEN keer duizenden
+   wegnemen. Wordt dat geweigerd, dan blijft de collectie te groot en wordt het
+   VOLGENDE verzoek op dezelfde plek opnieuw geweigerd. Dat is geen weigering
+   maar een storing die zichzelf in stand houdt.
+
+   Daarom staat er per collectie bij of er een kap op zit. Dat is geen oordeel:
+   het is de eerste van de twee vragen die een mens moet beantwoorden voordat
+   een grens gehandhaafd kan worden. De tweede -- begrenst de VORM van de route
+   hoeveel er weg kan? -- staat niet in de code en kan hier dus niet gemeten
+   worden; die hoort met de hand in TAKEN.md 4.62.
+
+   Gescand op de bron en niet op de meting, want een kap die geen enkele toets
+   uitlokt is precies de kap die je later verrast. */
+const KAP = /db\.data\.([A-Za-z0-9_]+)\s*=\s*[^;\n]*\.slice\(/g;
+
+function kappen() {
+  const wortel = path.join(WORTEL, 'server');
+  const uit = new Map();
+  (function loop(d) {
+    let namen;
+    try { namen = fs.readdirSync(d); } catch (e) { return; }
+    for (const n of namen) {
+      if (n === 'node_modules' || n === 'data') continue;
+      const p = path.join(d, n);
+      let st; try { st = fs.statSync(p); } catch (e) { continue; }
+      if (st.isDirectory()) { loop(p); continue; }
+      if (!n.endsWith('.js')) continue;
+      const bron = fs.readFileSync(p, 'utf8');
+      for (const m of bron.matchAll(KAP)) {
+        const waar = path.relative(WORTEL, p).replace(/\\/g, '/');
+        if (!uit.has(m[1])) uit.set(m[1], []);
+        const lijst = uit.get(m[1]);
+        if (!lijst.includes(waar)) lijst.push(waar);
+      }
+    }
+  })(wortel);
+  return uit;
+}
+
 function suiteStand(tekst) {
   const t = String(tekst);
   const som = (re) => {
@@ -150,9 +200,13 @@ function ontleed(tekst) {
     c.paden.set(pad, Math.max(c.paden.get(pad) || 0, rijen));
     perCollectie.set(collectie, c);
   }
+  const kap = kappen();
   const uit = [...perCollectie.values()]
     .map(c => ({ collectie: c.collectie, keer: c.keer, grootste: c.grootste,
       gemiddeld: Math.round(c.totaal / c.keer),
+      /* De eerste van de twee vragen die een grens per collectie mogelijk maken;
+         zie de kop bij kappen(). Leeg betekent: geen kap gevonden. */
+      kap: kap.get(c.collectie) || [],
       paden: [...c.paden.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5)
         .map(([pad, rijen]) => ({ pad, rijen })) }))
     .sort((a, b) => b.grootste - a.grootste);
@@ -215,6 +269,7 @@ if (!uit.collecties.length) {
   for (const c of uit.collecties) {
     console.log('  ' + String(c.grootste).padStart(7) + String(c.keer).padStart(6) + '  ' + c.collectie);
     for (const p of c.paden) console.log('                 ' + String(p.rijen).padStart(6) + '  ' + p.pad);
+    if (c.kap && c.kap.length) console.log('                    KAP  ' + c.kap.slice(0, 2).join(', '));
   }
   console.log();
 }
@@ -253,8 +308,8 @@ const stand = {
     'TAKEN.md 4.62 nodig heeft voordat RTG_BEGROTING=weigeren aan kan. ' +
     'PER GEMETEN GRENS EEN RONDE, want dat zijn twee vragen: op 1 staat er welke collecties GROOT ' +
     'krimpen (de begroting vergelijkt met krimp <= grens, dus een verwijdering van EEN rij komt er ' +
-    'ongemeld doorheen), op 0,5 staat er welke er UBERHAUPT krimpen en waar. De tweede omvat de eerste. ' +
-    'VIJF DINGEN DIE ERBIJ HOREN. ' +
+    'ongemeld doorheen), op 0,5 staat er welke er uberhaupt krimpen en waar. De tweede omvat de eerste. ' +
+    'ZES DINGEN DIE ERBIJ HOREN. ' +
     '(1) DE EERSTE RONDE TELDE NIETS, EN DAT WAS EEN DEFECT. Hij gaf nul over 6806 toetsen, en dat leek ' +
     'een uitslag. Het was er geen: de handelingscontext van server/opzet/handeling.js overleeft het ' +
     'LEZEN VAN DE BODY niet (server/web/body.js leest met req.on(end), en die luisteraar hangt aan een ' +
@@ -267,9 +322,16 @@ const stand = {
     'een catalogus die er precies zo uitziet als elke andere: wat erin staat is echt, maar wat een ' +
     'omgevallen toets niet meer deed kon ook niet krimpen. Zo een ronde is ONVOLLEDIG en de ronde ' +
     'eindigt dan met uitgang 3. ' +
-    '(4) WAT DE VAL SOWIESO NIET ZIET: een splice, een wijziging binnen een rij, en routes die de body ' +
+    '(4) PER COLLECTIE STAAT ER OF ER EEN KAP OP ZIT ("kap"), gescand op de bron. Ruim zestig plekken ' +
+    'doen push-dan-afkappen (db.data.X = X.slice(0, N)). In rust is dat een rij per verzoek, maar staat ' +
+    'de collectie ooit ver boven zijn kap, dan wil hij er duizenden weghalen -- en een weigering daarop ' +
+    'houdt zichzelf in stand: de collectie blijft te groot, dus het volgende verzoek wordt opnieuw ' +
+    'geweigerd. Dat is de eerste van de twee vragen die een grens per collectie mogelijk maken; de ' +
+    'tweede (begrenst de VORM van de route hoeveel er weg kan?) staat niet in de code en hoort met de ' +
+    'hand in TAKEN.md 4.62. ' +
+    '(5) WAT DE VAL SOWIESO NIET ZIET: een splice, een wijziging binnen een rij, en routes die de body ' +
     'zelf rauw lezen (de twee betaal-webhooks en de theater-upload). ' +
-    '(5) GEEN OORDEEL: welke grens bij een collectie hoort, is een besluit van een mens.',
+    '(6) GEEN OORDEEL: welke grens bij een collectie hoort, is een besluit van een mens.',
   hoe: 'node scripts/krimpronde.js  (RTG_BEGROTING_KRIMP zet de grens)',
   rondes: rondes
 };

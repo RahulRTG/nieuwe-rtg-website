@@ -301,6 +301,48 @@ bestandsnaam was `Date.now()`, dus twee rotaties binnen dezelfde milliseconde
 schreven stilzwijgend over elkaar heen -- een heel journaalbestand weg zonder
 foutmelding. De stempel loopt nu altijd door.
 
+## Wat de winst vasthoudt
+
+Een prestatiewinst die alleen in dit document staat, is een winst die over een
+half jaar weg is zonder dat iemand een besluit heeft genomen -- precies waar
+`scripts/norm.js` voor bestaat. De ratel daar kijkt echter naar statische meters
+(dekking, keuring, dependencies) en niet naar snelheid, en De Beproeving die dat
+wel doet draait een kwartier en is dus geen poort bij elke wijziging.
+
+Daarom staan er nu twee VANGRAILS in de suite, op dezelfde leest als de
+bestaande vangrail in `test/opslag-voorcheck.test.js`:
+
+| Vangrail | Waar | Eist | Gemeten |
+|---|---|---|---:|
+| Dispatch-index tegen de lineaire scan | `test/routerindex.test.js` (7) | >= 15x | 111x |
+| Vlakke dispatch: achteraan niet duurder dan vooraan | idem | < 4x verschil | vlak |
+| Prefixkaart tegen de dubbele lus | `test/toegangprefix.test.js` (4) | >= 8x | 63x |
+
+Ze meten een VERHOUDING tussen twee implementaties in dezelfde run, en met opzet
+geen absolute drempel in milliseconden: die zegt op een drukke bouwmachine niets
+en levert een toets op die willekeurig knippert. Een verhouding valt weg tegen
+hoe snel de machine toevallig is. De marges zijn ruim, dus ze zakken pas als de
+winst grotendeels weg is en niet als hij schommelt.
+
+De reden dat dit nodig is: de gedragstoetsen bewaken dat de index zich hetzelfde
+GEDRAAGT als de scan. Een index die zich precies zo gedraagt en precies zo traag
+is, haalt ze allemaal.
+
+### Waar het werk terechtkwam
+
+De keuring meldt elke servermodule boven 10.240 byte en `NORM.json` ratelt daarop.
+Dit werk duwde er zes overheen en is daarom langs zijn naden geknipt -- niet door
+de uitleg weg te halen, want die is het duurst verworven deel:
+
+| Bestand | Wat erin zit |
+|---|---|
+| `server/web/routeindex.js` | de dispatch-index van de router |
+| `server/functies/toegangpad.js` | welke functie bewaakt dit pad (toegangscode) |
+| `server/kern/journaalbestand.js` | het append-only journaal: verzamelen en spoelen |
+| `server/kern/journaalrotatie.js` | wegschuiven en de schijf begrenzen |
+| `server/kern/journaalvorm.js` | `padVorm`/`bestemmingVorm`, ook los gebruikt door `log.js` |
+| `server/kern/journaalverhuizing.js` | de eenmalige verhuizing uit de database |
+
 ## Meer kernen benutten: onderzocht, en het antwoord is niet "meer processen"
 
 Na het bovenstaande draait een proces op ~5.000 verzoeken per seconde en staan

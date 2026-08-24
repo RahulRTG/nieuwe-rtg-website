@@ -8,7 +8,10 @@ const path = require('path');
 const kluis = require('../kluis');
 const state = require('./state');
 const { merge3 } = require('./merge');
-const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
+/* De datamap NIET destructureren: dat legt hem vast op het laadmoment, en dat
+   is precies wat er is weggehaald (zie de kop van ./opslag.js). dataMap() leest
+   hem wanneer hij nodig is. STORE mag wel: die wordt met opzet een keer beslist. */
+const { dataMap, STORE, besloten, beslotenMap } = require('./opslag');
 // De goedkope veranderingsdetectie op GROTE collecties; daar staat ook waarom
 // hij veilig is en waarom geld er nooit door gaat.
 const voorcheck = require('./voorcheck');
@@ -26,8 +29,8 @@ const naarStore = j => kluis.versleutel(j);      // leesbare JSON -> op te slaan
 function sqliteInit() {
   if (kvdb) return;
   const { DatabaseSync } = require('node:sqlite');
-  beslotenMap(DATA_DIR);
-  const bestand = path.join(DATA_DIR, 'store.db');
+  beslotenMap(dataMap());
+  const bestand = path.join(dataMap(), 'store.db');
   kvdb = new DatabaseSync(bestand);
   stmt = null; // verse verbinding: de voorbereide statements horen bij de oude
   besloten(bestand);

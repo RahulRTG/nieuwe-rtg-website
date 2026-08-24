@@ -146,8 +146,79 @@ test('de vijf vormen staan echt in deze bron (anders toetst dit een verzonnen ge
   bestaat('public/apps/app.html', 'accept="image/*"');
   bestaat('server/opzet/kaartwebhooks.js', "type: '*/*'");
   bestaat('scripts/samenhang.js', 'server/**/*.js');
-  bestaat('scripts/check.js', "startsWith('/*')");
+  /* Deze stond op scripts/check.js en is daar weggegaan: keuring 7 raadde per
+     regel of iets commentaar was, en dat is vervangen door zonderCommentaar()
+     zelf. De VORM staat nog gewoon in huis -- keuring.js en lib/bundeldeel.js
+     dragen hem allebei -- dus hij verhuist mee in plaats van te verdwijnen. */
+  bestaat('scripts/keuring.js', "startsWith('/*')");
   bestaat('server/kern/antivirus/analyse.js', 'image/*');
+  /* De ZESDE vorm, gevonden op 23 augustus: een regexliteraal met quotes erin.
+     Zie de kop bij de regexstand in lib/bron.js. */
+  bestaat('scripts/lib/staatscan.js', "replace(/^['\"`]|['\"`]$/g");
+  bestaat('server/foundation/buddy.js', 'replace(/^Je bent');
+});
+
+/* DE ZESDE VORM: EEN REGEXLITERAAL IS GEEN STRING EN GEEN DELING.
+
+   De spiegel van 17 augustus. Toen at deze functie CODE op; hier liet hij
+   COMMENTAAR staan. Een regex met een quote erin -- en dit huis heeft er
+   honderden -- werd gelezen als een string die begint. Bij een apostrof blijft
+   de schade binnen een regel, maar een BACKTICK in een tekenklasse loopt met
+   opzet over regels en at hier een heel commentaarblok op. Gevolg: keuring 7 las
+   de zin "wie `const { DATA_DIR } = require('./opslag')` schrijft" als code en
+   meldde een kapot pad dat nergens wordt aangeroepen.
+
+   De kruisproef in lib/bronblind.js bewaakt alleen de andere richting (elke
+   token van de lexer hoort in de uitvoer te staan), dus deze kant kwam er
+   ongemerkt doorheen -- precies zoals de kop van bron.js waarschuwt dat een
+   zesde vorm dat zou doen. */
+test('een regexliteraal met quotes erin opent geen string', () => {
+  /* DE TWEEDE BACKTICK IS HET HELE GEVAL, en die stond er eerst niet in.
+
+     Zonder een backtick VERDEROP loopt de foutieve stringstand tot het einde van
+     het bestand en vindt hij geen sluiter, en dan valt bron.js netjes terug op
+     "dit was geen string". De toets was dan groen met en zonder de regexstand
+     (nagemeten: AFGESLAGEN). Pas met een tweede backtick sluit de valse string
+     en wordt alles ertussen -- inclusief het commentaarteken -- als tekst
+     ingeslikt. Precies de vorm van scripts/lib/staatscan.js, waar verderop
+     gewoon backticks in het commentaar staan. */
+  const bron = [
+    "const r = x.replace(/^['\"`]|['\"`]$/g, '');",
+    '/* dit commentaar hoort WEG te gaan, met een `backtick` erin */',
+    'const na = 1;'
+  ].join('\n');
+  const uit = zonderCommentaar(bron);
+  assert.match(uit, /replace\(/, 'de regex zelf hoort te blijven staan, hij is code');
+  assert.doesNotMatch(uit, /dit commentaar/,
+    'het commentaar erna hoort weg; bleef het staan, dan liep de backtick in de tekenklasse door');
+  assert.match(uit, /const na = 1;/, 'en de code erna staat er nog');
+});
+
+test('een schuine streep binnen een tekenklasse sluit de regex niet af', () => {
+  /* De streep staat ONGEESCAPED in de klasse, en dat is het hele punt. Met een
+     backslash ervoor slaat de escape-regel hem toch al over en zegt deze toets
+     niets over de klassenstand -- zo stond hij hier eerst, en de mutatie die de
+     klassenstand uitzette bleef groen (AFGESLAGEN). Nu hangt hij alleen aan de
+     klasse: wie hem niet meetelt sluit de regex te vroeg af, leest de rest als
+     code, en opent daar alsnog een string op de backtick. */
+  const bron = [
+    "const p = s.replace(/[a-z/`]+/g, '-');",
+    '/* dit commentaar hoort WEG, met een `backtick` erin */',
+    'EINDE'
+  ].join('\n');
+  const uit = zonderCommentaar(bron);
+  assert.doesNotMatch(uit, /dit commentaar/, 'de tekenklasse hoort meegeteld te worden');
+  assert.match(uit, /EINDE/);
+});
+
+test('een deling blijft een deling, ook vlak na een sluiter', () => {
+  /* De andere kant van dezelfde gok. Wie ALLES na een `/` als regex leest,
+     verandert `(a + b) / 2` in onzin en eet de rest van de regel op. */
+  const uit = zonderCommentaar('const d = (a + b) / 2;  /* weg */\nconst e = tel / 3;\nEINDE\n');
+  assert.match(uit, /\(a \+ b\) \/ 2;/, 'een deling na een haakje blijft ongemoeid');
+  assert.match(uit, /tel \/ 3;/, 'en een deling na een naam ook');
+  assert.doesNotMatch(uit, /weg/);
+  assert.match(uit, /EINDE/);
 });
 
 test('over de hele bron haalt hij nooit MEER weg dan de oude regex deed', () => {

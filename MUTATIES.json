@@ -695,7 +695,7 @@
       "staat": "gezakt",
       "module": "scripts/lib/bron.js",
       "operator": "===->!==#0",
-      "gezakt": 5,
+      "gezakt": 10,
       "geprobeerd": 1
     },
     "bronblind.test.js": {
@@ -1095,6 +1095,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "datamap-beweegt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/geheugen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 4
     },
     "dealkans.test.js": {
       "soort": "server",

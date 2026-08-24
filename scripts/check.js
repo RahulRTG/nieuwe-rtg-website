@@ -183,9 +183,16 @@ let reqFout = 0;
 for (const map of ['server', 'scripts']) {
   loop(path.join(ROOT, map), /\.js$/, f => {
     const maker = require('module').createRequire(f);
-    for (const regel of fs.readFileSync(f, 'utf8').split('\n')) {
-      const t = regel.trim();
-      if (t.startsWith('//') || t.startsWith('*') || t.startsWith('/*')) continue; // commentaar overslaan
+    /* COMMENTAAR ECHT WEGHALEN, en niet per regel raden. Hier stond een
+       heuristiek: sla een regel over die met //, * of /* begint. Die kent de
+       schrijfstijl van dit huis niet -- een blokcommentaar loopt hier door
+       zonder ster aan het begin van elke regel, dus een uitleg die een require
+       CITEERT ("wie `const { DATA_DIR } = require('./opslag')` schrijft...")
+       werd als code gelezen en gaf een kapotte-require-melding voor een pad dat
+       nergens wordt aangeroepen. Dat overkwam scripts/norm.js en
+       scripts/lib/staatscan.js allebei toen ik daar de datamap uitlegde.
+       zonderCommentaar() staat bovenaan dit bestand en doet het wel goed. */
+    for (const regel of zonderCommentaar(fs.readFileSync(f, 'utf8')).split('\n')) {
       const re = /require\((["'])(\.[^"']*)\1\)/g; let m;
       while ((m = re.exec(regel))) {
         try { maker.resolve(m[2]); }

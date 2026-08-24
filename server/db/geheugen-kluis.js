@@ -12,19 +12,20 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { DATA_DIR, beslotenMap, besloten } = require('./opslag');
+// De datamap als LEZING, niet als momentopname bij het laden -- zie ./opslag.js.
+const { dataMap, beslotenMap, besloten } = require('./opslag');
 
 const MAGIC = Buffer.from('RTGMEM1');
 
 function laadSleutel() {
   const ruw = process.env.RTG_ENC_KEY || '';
   if (ruw) return /^[0-9a-fA-F]{64}$/.test(ruw) ? Buffer.from(ruw, 'hex') : crypto.createHash('sha256').update(ruw).digest();
-  const kf = path.join(DATA_DIR, 'geheugen.key');
+  const kf = path.join(dataMap(), 'geheugen.key');
   try {
     if (fs.existsSync(kf)) { const b = Buffer.from(fs.readFileSync(kf, 'utf8').trim(), 'hex'); if (b.length === 32) return b; }
   } catch (e) {}
   const nieuw = crypto.randomBytes(32);
-  try { beslotenMap(DATA_DIR); fs.writeFileSync(kf, nieuw.toString('hex'), { mode: 0o600 }); besloten(kf); }
+  try { beslotenMap(dataMap()); fs.writeFileSync(kf, nieuw.toString('hex'), { mode: 0o600 }); besloten(kf); }
   catch (e) { console.warn('[geheugen] kon de sleutel niet bewaren (' + e.message + '); draai door met een sessiesleutel.'); }
   return nieuw;
 }

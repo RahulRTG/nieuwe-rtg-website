@@ -115,6 +115,65 @@ function zonderCommentaar(bron) {
         continue;
       }
     }
+    /* EEN REGEXLITERAAL IS EEN VIERDE STAND, en hij ontbrak.
+
+       Deze functie kende code, string en commentaar. Een regex is geen van
+       drieen, en er staan er honderden in dit huis met QUOTES erin:
+
+           .replace(/^['\"`]|['\"`]$/g, '')      in scripts/lib/staatscan.js
+           .replace(/^Je bent \"[^\"]+\"/, ...)    in server/foundation/buddy.js
+
+       Zonder deze stand las hij die quotes als een string die begint. De
+       apostrof-grens houdt de schade dan nog binnen een regel -- maar een
+       BACKTICK in een tekenklasse loopt met opzet over regels, en die at hier
+       een heel commentaarblok op. Gevolg: het commentaar bleef STAAN in de
+       uitvoer, en keuring 7 las de zin "wie `const { DATA_DIR } =
+       require('./opslag')` schrijft" als code en meldde een kapot pad dat
+       nergens wordt aangeroepen.
+
+       Dat is de spiegel van 17 augustus. Toen verdween er code; nu bleef er
+       commentaar staan. De kruisproef in ./bronblind.js bewaakt alleen die
+       eerste richting (elke token van de lexer hoort in de uitvoer te staan),
+       dus deze kant kwam er ongemerkt doorheen -- precies zoals de kop hierboven
+       waarschuwt dat een zesde vorm dat zou doen.
+
+       De vraag "regex of deling" beantwoordt een lexer met het vorige token.
+       Hier volstaat het laatste betekenisvolle teken: staat er een naam, een
+       cijfer, of een sluiter (`)`, `]`) voor, dan is het een DELING; in alle
+       andere gevallen (na `=`, `(`, `,`, `:`, `!`, `&&`, `return`) begint een
+       regex. Net als een quote loopt hij tot het einde van de regel en niet
+       verder, zodat een verkeerde gok hoogstens EEN regel kan verstoren en nooit
+       het bestand. De tekenklasse telt mee: een `/` binnen [...] sluit niet af. */
+    if (c === '/') {
+      let k = uit.length - 1;
+      while (k >= 0 && /\s/.test(uit[k])) k--;
+      const vorige = k >= 0 ? uit[k] : '';
+      const isDeling = /[\w$)\]]/.test(vorige);
+      if (!isDeling) {
+        let j = i + 1, inKlasse = false, dicht = -1;
+        while (j < n && s[j] !== '\n') {
+          const d = s[j];
+          if (d === '\\') { j += 2; continue; }
+          if (d === '[') inKlasse = true;
+          else if (d === ']') inKlasse = false;
+          else if (d === '/' && !inKlasse) { dicht = j; break; }
+          j++;
+        }
+        /* `dicht > i + 1` en niet `> i`: `//` zou anders een lege regex zijn.
+           NIET GETOETST, en dat staat er liever dan een toets die niet kan
+           zakken (LAT-regel 9): ik heb geen bereikbaar geval kunnen bouwen --
+           de regelcommentaar-tak hierboven vangt `//` al af, en de gevallen die
+           daar doorheen komen (`http://`) staan altijd in een string, die weer
+           eerder wordt afgehandeld. Het is een vangrail, geen gedrag. */
+        if (dicht > i + 1) {
+          let e = dicht + 1;
+          while (e < n && /[a-z]/.test(s[e])) e++;  // de vlaggen: g, i, m, s, u, y
+          uit += s.slice(i, e);
+          i = e;
+          continue;
+        }
+      }
+    }
     /* Een string blijft staan, maar wordt wel OVERGESLAGEN: wat er binnenin
        staat is geen commentaar. Sluit hij niet op dezelfde regel, dan is het
        vermoedelijk geen string maar een apostrof in proza; dan gaat alleen dit

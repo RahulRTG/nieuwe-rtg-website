@@ -32,15 +32,16 @@ const rtgjson = require('../lib/rtgjson');
 const path = require('path');
 const crypto = require('crypto');
 const state = require('./state');
-const { DATA_DIR, beslotenMap, schrijfDuurzaam } = require('./opslag');
+// De datamap als LEZING en niet als momentopname bij het laden -- zie ./opslag.js.
+const { dataMap, beslotenMap, schrijfDuurzaam } = require('./opslag');
 const { versleutel, ontsleutel } = require('./geheugen-kluis');
 
 const db = state.db;
-const GDIR = path.join(DATA_DIR, 'geheugen');
-const MANIFEST = path.join(GDIR, 'manifest.rtgm');
+const gMap = () => path.join(dataMap(), 'geheugen');
+const manifestPad = () => path.join(gMap(), 'manifest.rtgm');
 
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
-const brokBestand = key => path.join(GDIR, 'k-' + crypto.createHash('sha1').update(String(key)).digest('hex').slice(0, 20) + '.rtgm');
+const brokBestand = key => path.join(gMap(), 'k-' + crypto.createHash('sha1').update(String(key)).digest('hex').slice(0, 20) + '.rtgm');
 
 // het sha-geheugen van de laatst weggeschreven brokken: zo weet save() wat er
 // veranderd is zonder een tweede kopie van de data te bewaren (zuinig).
@@ -75,13 +76,13 @@ function assembleer(man) {
    onderbroken schrijfactie (hernoemd, nog niet herschreven) en dan is
    terugrollen het antwoord -- niet seeden. Zie test/geheugen.test.js. */
 function laadGeheugen() {
-  const heeftMan = fs.existsSync(MANIFEST);
-  const heeftBak = fs.existsSync(MANIFEST + '.bak');
+  const heeftMan = fs.existsSync(manifestPad());
+  const heeftBak = fs.existsSync(manifestPad() + '.bak');
   if (!heeftMan && !heeftBak) return null;       // echt een verse installatie
-  const man = heeftMan ? leesManifest(MANIFEST) : null;
+  const man = heeftMan ? leesManifest(manifestPad()) : null;
   if (man) { const d = assembleer(man); if (d) { generatie = man.generatie || 0; herbouwSha(man, d); return d; } }
   if (!heeftMan) console.warn('[geheugen] het manifest ontbreekt (onderbroken schrijfactie); ik val terug op de vorige generatie.');
-  const bak = leesManifest(MANIFEST + '.bak');
+  const bak = leesManifest(manifestPad() + '.bak');
   if (bak) { const d = assembleer(bak); if (d) { console.warn('[geheugen] nieuwste generatie onvolledig; teruggerold naar de vorige.'); generatie = bak.generatie || 0; herbouwSha(bak, d); return d; } }
   console.warn('[geheugen] geen leesbare generatie gevonden; de opslag start opnieuw op.');
   return null;
@@ -98,7 +99,7 @@ function schrijfBrokAtomisch(key, tekst) {
 // dan het manifest als commit-punt. Geeft het aantal geschreven brokken terug.
 function schrijfGeheugenNu() {
   saveVuil = false;
-  beslotenMap(GDIR);
+  beslotenMap(gMap());
   const nieuweKeys = Object.keys(db.data);
   const manKeys = {};
   let geschreven = 0;
@@ -126,9 +127,9 @@ function schrijfGeheugenNu() {
     }
   }
   // het manifest als LAATSTE (commit-punt); de vorige blijft als .bak voor rollback
-  try { if (fs.existsSync(MANIFEST)) fs.renameSync(MANIFEST, MANIFEST + '.bak'); } catch (e) {}
+  try { const m = manifestPad(); if (fs.existsSync(m)) fs.renameSync(m, m + '.bak'); } catch (e) {}
   generatie++;
-  schrijfDuurzaam(MANIFEST, versleutel(rtgjson.stringify({ v: 1, generatie, at: Date.now(), keys: manKeys })), 0o600);
+  schrijfDuurzaam(manifestPad(), versleutel(rtgjson.stringify({ v: 1, generatie, at: Date.now(), keys: manKeys })), 0o600);
   saveDuur = saveT0 ? verstreken(saveT0) : 0;
   saveKlaar = sinds();
   return geschreven;
@@ -172,4 +173,7 @@ function terugNaarVers() {
   saveVuil = false; saveDuur = 0; saveKlaar = -Infinity; saveT0 = 0;
 }
 
-module.exports = { laadGeheugen, saveGeheugen, flushGeheugen, schrijfGeheugenNu, terugNaarVers, GDIR };
+module.exports = { laadGeheugen, saveGeheugen, flushGeheugen, schrijfGeheugenNu, terugNaarVers, gMap };
+// GDIR blijft bestaan als LEVENDE eigenschap: de toetsen lezen hem en horen de
+// map van dit moment te krijgen, niet die van het laadmoment.
+Object.defineProperty(module.exports, 'GDIR', { enumerable: true, get: gMap });

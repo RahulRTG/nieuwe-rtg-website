@@ -399,6 +399,9 @@ const EIGEN_MODULE = new Map([
      krijgen. De regex hierboven zoekt naar een letterlijke require en vindt dan
      niets; zonder deze regels zouden ze als "geen module gevonden" tellen
      terwijl ze juist scherp meten. Beide met de hand nagetrokken en raak. */
+  /* Ook deze laadt zijn modules met een berekend pad (verse modulecache per
+     scenario), dus de regex vindt er geen require voor. */
+  ['datamap-beweegt.test.js', ['server/db/opslag.js', 'server/db/geheugen.js']],
   ['resetcontract-voorcheck.test.js', ['server/db/voorcheck.js']],
   ['resetcontract-schrijfpad.test.js', ['server/db/snapshot.js', 'server/db/geheugen.js']],
   /* VIER TOETSEN DIE DE LIEGPOORT OVERLEEFDEN OMDAT HIJ ZE NIET RAAKT, en dat

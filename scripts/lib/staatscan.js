@@ -445,6 +445,39 @@ function luieLezers(boom) {
   return uit;
 }
 
+/* WELKE NAMEN GEEFT DIT BESTAND NAAR BUITEN DIE DE MAP OPLEVEREN?
+
+   Twee soorten, en de tweede kostte me bijna een blinde vlek. Een gewone
+   vastgeklonken binding die geexporteerd wordt is er een. Maar sinds
+   db/opslag.js zijn DATA_DIR als LEVENDE eigenschap uitdeelt --
+
+       Object.defineProperty(module.exports, 'DATA_DIR', { get: dataMap });
+
+   -- is die naam geen binding meer, en zag de teller de vijf bestanden die hem
+   DESTRUCTUREREN opeens niet meer. Terwijl `const { DATA_DIR } = require(...)`
+   die getter EEN keer aanroept en de uitkomst vasthoudt: net zo vastgeklonken
+   als eerst, alleen onzichtbaar geworden. De ratel zou dus gezakt zijn door de
+   reparatie half te doen. De ijking in test/meterijk.test.js zag het (2 waar er
+   3 hoorden te staan), niet ik. */
+function datamapUitgifte(bron, boom, klemmen) {
+  const uit = new Set(klemmen);
+  const luie = luieLezers(boom);
+  loop(boom, (n) => {
+    if (n.type !== 'CallExpression' || !n.callee || n.callee.type !== 'MemberExpression') return;
+    if ((n.callee.object || {}).name !== 'Object' || (n.callee.property || {}).name !== 'defineProperty') return;
+    const [doel, naam, beschrijving] = n.arguments || [];
+    const isExport = doel && ((doel.type === 'MemberExpression' && (doel.object || {}).name === 'module'
+      && (doel.property || {}).name === 'exports') || doel.name === 'exports');
+    if (!isExport || !naam) return;
+    const sleutel = String(naam.raw !== undefined ? naam.raw : naam.value || '').replace(/^['"`]|['"`]$/g, '');
+    if (!sleutel || !beschrijving) return;
+    let geeftMap = false;
+    loop(beschrijving, (k) => { if (k.type === 'Identifier' && luie.has(k.name)) geeftMap = true; });
+    if (geeftMap) uit.add(sleutel);
+  });
+  return uit;
+}
+
 function datamapBindingen(bron, relPad) {
   const boom = parse(bron);
   const uit = [];
@@ -492,7 +525,13 @@ function datamapVast({ wortel, mappen } = {}) {
       bestanden.push({ rel, p, bron });
       let deel;
       try { deel = datamapBindingen(bron, rel); } catch (e) { continue; }
-      for (const x of deel) { uit.push(x); bronnen.set(rel + '#' + x.naam, x); }
+      for (const x of deel) uit.push(x);
+      /* Ook de namen die dit bestand als LEVENDE eigenschap uitdeelt tellen als
+         bron: wie ze destructureert klemt de map alsnog vast. */
+      try {
+        const namen = datamapUitgifte(bron, parse(bron), deel.map(x => x.naam));
+        for (const naam of namen) bronnen.set(rel + '#' + naam, { naam, bestand: rel });
+      } catch (e) { for (const x of deel) bronnen.set(rel + '#' + x.naam, x); }
     }
   }
   /* Tweede ronde: wie neemt zo'n naam bij het laden over? */

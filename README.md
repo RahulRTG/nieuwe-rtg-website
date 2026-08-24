@@ -734,6 +734,31 @@ pas-poort niet meer via registratie; `test/helper.js` heeft daarvoor
 `elevateTier()`, dat de geldige weg loopt (registreren als RTG → aanvraag →
 kantoor accepteert).
 
+### De verificatie-runtime: sneller draaien zonder minder te weten
+
+Een ronde over 915 bestanden duurt op vier kernen ruim een kwartier, en 833
+serverstarts zijn daar het grootste deel van. Vier lagen halen daar tijd uit
+zonder ook maar iets aan zekerheid in te leveren, en twee lagen maken juist
+zichtbaar wat er nog NIET zeker is.
+
+| Wat | Waar | Gemeten |
+|---|---|---|
+| **De gietvorm** — een verse datamap wordt een keer gezaaid en in elke toets gegoten die er recht op heeft (468 van de 673). Elke toets houdt zijn EIGEN map en EIGEN proces; alleen de moeite wordt gedeeld, dus er kan niets lekken. | `scripts/vorm.js`, `npm run vorm` | zaaien kost 566 ms per start |
+| **De compilatiekas** — Node bewaart de compilatie van de ~1500 modules, gesleuteld op hun inhoud. Staat ook in productie aan. | `server/lib/compilekas.js` | 209 ms per start |
+| **De bronkas op dure toetsen** — `test/ast-grens.test.js` vergelijkt twee implementaties van een beveiligingsregel over alle routes. De uitslag hangt aan drie dingen; veranderen die niet, dan hoeft hij niet opnieuw. | `server/lib/bronkas.js` | 226 s koud, 3,7 s warm |
+| samen, per serverstart | | **2699 ms → 1828 ms** (afwisselend gemeten, vier paren) |
+| **Het leesspoor** — de bewijsgraaf leidde afhankelijkheden af uit requires en was blind voor wat er wordt GELEZEN. Nu wordt het gemeten. | `scripts/leesspoor.js`, `npm run leesspoor` | `ast-grens` had 4 afhankelijkheden en leest er 505; `public/apps/app.html` selecteerde 0 toetsen en selecteert er 541 |
+| **Verlopen bewijs** — MUTATIES.json zegt "deze toets zakte toen we regel Y in module Z veranderden". Verandert Z daarna, dan gaat dat bewijs over code die er niet meer is. | `scripts/bewijsvers.js` | 874 van de 875 dragen (nog) geen stempel |
+| **Het zaad** — RTG_ZAAD maakt keuzes die op toeval leunen herhaalbaar, zodat een sporadische uitslag te ONDERZOEKEN is. Weigert in productie. | `server/lib/toeval.js`, `npm run toeval` | `TOEVAL.json` staat op 0 |
+| **De planner** — welke toetsen moet je draaien voor deze wijziging? Lokaal; CI draait altijd alles. | `scripts/plan.js`, `npm run plan` | een scriptwijziging selecteert 16%, een serverwijziging ~70% |
+
+Twee dingen die hier bewust NIET gebeuren. Er wordt geen serverPROCES gedeeld
+tussen toetsen: dat vraagt een bewijs per toets dat er geen toestand overloopt,
+en dat bewijs is er nog niet (`STATE.json` telt 92 wortels die het tegenhouden).
+En het leesspoor voegt alleen KANTEN TOE aan de graaf en haalt er nooit een weg
+— een waarneming is een ondergrens, dus de planner kiest er meer van en nooit
+minder.
+
 ### De Postgres-toetsen (`npm run test:pg`)
 
 Zeven toetsen bewijzen de meerdere-instances-kant: de gedeelde store, de

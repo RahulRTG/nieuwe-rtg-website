@@ -8,7 +8,7 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 75 | elk bewijsstuk bestaat |
+| gedekt | 79 | elk bewijsstuk bestaat |
 | open | 0 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
@@ -91,6 +91,9 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Acquisition mode: een overgenomen bedrijf importeren en migreren<br><sub>Vier stappen waarvan de volgorde de veiligheid is: inlezen, afbeelden, droogloop, uitvoeren. Uitvoeren kan alleen met het zegel van precies de bekeken droogloop, er wordt nooit iets overschreven (een bestaande sleutel is een botsing), en elke ingevoerde rij draagt zijn partij zodat terugdraaien exact die rijen weghaalt.</sub> | gedekt | `server/kern/command/overname.js`<br>`server/kern/command/overnamevoorstel.js`<br>`/api/command/overname` |
 | Enterprise API gateway met scopes, quota en contractregels<br><sub>De poort hangt op /api/extern/ en de toelating begint LEEG: er staat niets achter tot iemand er een pad in zet. Dat is een besluit en geen omissie -- een poort die bij oplevering al half het platform ontsluit is een gat met een naam. Het geheim van een sleutel wordt nergens bewaard, het quotum staat in de opslag (dus een herstart wist hem niet) en een uitfasering wordt aangekondigd voordat hij bijt.</sub> | gedekt | `server/kern/command/apipoort.js`<br>`server/middleware/apipoort.js`<br>`/api/command/apipoort` |
 | Sandbox-omgevingen om processen te testen zonder productiedata<br><sub>De inhoud komt uit de zaaiset en nooit uit db.data; de motoren zien een DB-venster op het vak van de zandbak, dus er is geen pad naar een productiecollectie. Wat het NIET is: een tweede installatie -- alleen de motoren van Command draaien erop, niet de gewone app-routes.</sub> | gedekt | `server/kern/command/zandbak.js`<br>`/api/command/zandbak` |
+| Een veilige noodstand die beschermt in plaats van uitzet<br><sub>Zes van de zestien functiecategorieën bevriezen, tien werken door, en vier functies lopen met naam door omdat stilzetten meer kost dan de storing (inloggen, hulpdiensten, grensdiensten, de storingsmelder). Deze stand zet GEEN enkele schakelaar om, dus opheffen is geen herstelactie. Wat hij NIET doet: sleutels roteren -- dat staat in het antwoord als nietAfgedwongen met de reden, want er is geen rotatiemechanisme voor secret.key en vault.key.</sub> | gedekt | `server/kern/beschermstand.js`<br>`server/kern/beschermstand-lijst.js`<br>`server/kern/incidentcontrole-bescherm.js`<br>`/api/techniek/controle/incident` |
+| Hoeveel organisaties een storing raakte, als ondergrens<br><sub>Een ONDERGRENS en geen aantal: geteld wordt bij de twee deuren van de werkruimte, dus ledenverkeer, zaakverkeer en verkeer van buiten staan onder nietToegewezen. Gaat nooit mee naar Prometheus (geen tekst()-functie) en de org-codes verlaten de module niet. Wat het NIET is en niet wordt: een beschikbaarheidscijfer per klant.</sub> | gedekt | `server/meting-tenant.js`<br>`server/bedrijf/deuren.js` |
+| De klant krijgt bericht als er een bijstandssessie loopt<br><sub>In zijn eigen werkruimtejournaal: een kanaal dat hij al leest en dat een gesloten tabblad overleeft. Een regel op de vier momenten dat RTG handelt, met het sessie-id en zonder de codenaam van de medewerker. Wat er bewust NIET bij komt is mail of een telefoonmelding -- dat is een kanaalbesluit dat een klant hoort in te stellen.</sub> | gedekt | `server/kern/command/bijstand-melden.js` |
 
 ## De zaak: dezelfde regie, eigen scope
 
@@ -101,4 +104,10 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Recepten die administratie rechtzetten, geen werkelijkheid verzinnen | gedekt | `server/kern/zaakcommand/runbooks.js` |
 | Rolscope: verlof en sollicitaties alleen voor de leiding | gedekt | `server/kern/zaakcommand/register.js`<br>`test/zaakcommand.test.js` |
 | Regie in de zaak-app en op de PDA, één scherm | gedekt | `public/shared/zaakcommand`<br>`public/apps/leverancier.html`<br>`public/apps/personeel.html` |
+
+## De zaak: regie over de eigen onderneming
+
+| belofte | stand | waar het staat |
+| --- | --- | --- |
+| Ook een zaak repareert door de hersteltransactie, niet erlangs<br><sub>Voorcontrole, momentopname, uitvoeren, verificatie, vastleggen -- met certificaten die LAGER staan dan aan de RTG-kant, want de schaal van een zaak is de schaal van één onderneming. De gezondheidskaart gaat er bewust niet in en dat staat als `fundament-gezond: gecontroleerd false` met de reden in het antwoord.</sub> | gedekt | `server/kern/zaakcommand/runbooks.js`<br>`/api/supplier/command/runbook/voer` |
 

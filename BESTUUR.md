@@ -605,10 +605,26 @@ dragen — dat is geen achterstand van dit scherm maar van de meting eronder.
 
 ### 7.2 Herstel als transactie — GEBOUWD, zie par. 5b
 
-Wat er van deze paragraaf overblijft als werkvoorraad: de zaak-kant loopt er nog
-niet doorheen, en er is nog geen recept dat iets anders verifieert dan het veld
-dat het zelf schrijft. Dat tweede gaat pas knellen bij een recept waarvan de
-aanleiding in een ánder veld staat; het certificaat kan dat al dragen.
+**De zaak-kant loopt er sinds 24 augustus doorheen.** `kern/zaakcommand/` riep
+`runbooks.js` rechtstreeks aan: wel een momentopname, geen voorcontrole en geen
+verificatie. Een ondernemer die op "rechtzetten" drukte kreeg dus dezelfde groene
+ronde of het gelukt was of stil niets had gedaan. Alle vier de zaak-recepten
+dragen nu een certificaat met een bovengrens (25 of 50, lager dan aan de
+RTG-kant: de schaal van een zaak is de schaal van één onderneming) en beide
+verificaties, `veld-staat-op-doel` én `oorzaak-weg`.
+
+**De gezondheidskaart gaat er bewust NIET in**, en dat is geen vergeten
+parameter. Zij gaat over het platform; een ondernemer heeft daar geen
+zeggenschap over en zou haar ook niet kunnen lezen. `transactie-poorten.js` kende
+dat geval al: zonder kaart komt `fundament-gezond` terug als
+`gecontroleerd: false` mét de reden, en houdt hij niets tegen. Zo staat er in het
+antwoord van een zaak wélke controle daar niet bestaat, in plaats van een
+controle die er stilzwijgend niet is.
+
+Wat er van deze paragraaf overblijft als werkvoorraad: er is nog geen recept dat
+iets anders verifieert dan het veld dat het zelf schrijft. Dat gaat pas knellen
+bij een recept waarvan de aanleiding in een ánder veld staat; het certificaat kan
+dat al dragen.
 
 ### 7.3 De configuratietijdlijn — GEBOUWD, zie par. 5d
 
@@ -619,11 +635,32 @@ elk antwoord in plaats van als een lijn die volledig lijkt.
 
 ### 7.4 RTG Bijstand — GEBOUWD, zie par. 5e
 
+**De klant krijgt sinds 24 augustus een bericht** (`kern/command/bijstand-melden.js`).
+Wat er mis was, was subtiel: hij kón alles zien — het spoor loopt live mee, het
+dossier staat open, de kaart in het Werk OS toont de sessie — maar alleen *als
+hij keek*. "Toegang is een uitnodiging" wordt dun als de uitgenodigde binnenkomt
+op een moment dat de gastheer niet naar de deur kijkt.
+
+**Het kanaal is zijn eigen werkruimtejournaal**, en dat is een besluit met een
+reden: het bestaat al, hij leest het al, het overleeft een gesloten tabblad, en
+het is auditeerbaar — wie later vraagt "wist ik hiervan", ziet de regel met
+tijdstip staan. Er komt een regel bij op de vier momenten dat RTG handelt:
+binnenkomen, een goedgekeurde handeling uitvoeren, om namen vragen, en afsluiten.
+De afzender is `RTG Bijstand` en niet de codenaam van de medewerker — die zegt de
+klant niets en geeft ons een naam in zijn dossier die er niet hoort; het
+sessie-id staat er wel bij, zodat hij het kan terugvinden. En het landt in de
+werkruimte die de uitnodiging deed, niet in de eerste de beste van dezelfde
+organisatie.
+
+**Wat er bewust niet bij komt is een mail of een telefoonmelding** — zie par. 8.
+Dat is hetzelfde kanaalbesluit als bij het alarm in `SLO.md`, en het hoort een
+klant in te stellen in plaats van stilzwijgend te krijgen. Getoetst in
+`test/bijstandbericht.test.js` (vier toetsen, drie mutaties).
+
 Wat werkvoorraad blijft: de diagnose geeft vandaag de organisatiestand, de
 inrichting en de platformstand. Wie een concrete koppeling wil zien haperen,
 heeft daar meer aan dan aan een teller — maar elke bron die erbij komt, komt
-door dezelfde redactieregel of hij komt er niet. En de klant krijgt nu geen
-bericht als er een sessie loopt; hij ziet het als hij kijkt.
+door dezelfde redactieregel of hij komt er niet.
 
 <details><summary>Het oorspronkelijke ontwerp, ter vergelijking</summary>
 
@@ -650,17 +687,92 @@ komt geen stand waarin RTG zichzelf toegang geeft omdat het handiger is.
 
 ### 7.5 Het vlootbeeld — GEBOUWD, zie par. 5f
 
+**De meting draagt sinds 24 augustus een tenant — als ondergrens en niet als
+aantal.** `server/meting-tenant.js` telt per FUNCTIE hoeveel organisaties eraan
+kwamen en hoeveel er een serverfout zagen. Waarom dat niet gewoon in de metrics
+kon: `meting.js` telt met opzet per routepatroon (een tijdreeks per klant is een
+miljoen tijdreeksen) en houdt met opzet persoonsgegevens uit een eindpunt dat
+gescrapet wordt door een systeem dat doorgaans minder streng bewaakt is dan de
+database. Een `tenant`-label breekt allebei die regels. Dit register staat er dus
+**naast** en gaat nooit mee naar Prometheus: er is geen `tekst()`-functie, en de
+codes verlaten de module niet — het antwoord is een aantal.
+
+**Het staat op de functie en niet op het routepatroon**, dezelfde keuze die
+`vermogens.js` maakt: een routepatroon verandert bij elke verbouwing, een
+functie-id is een productafspraak. Een vermogen kent zijn categorieën, een
+functie kent zijn categorie — zo sluit "welke organisaties raakte dit vermogen"
+aan op wat er geteld is. Over meerdere functies telt de **unie** en niet de som:
+één klant die twee functies van hetzelfde vermogen raakt, is één klant.
+
+**Geteld wordt waar het compleet kan.** Bij de twee deuren van de werkruimte
+(`server/bedrijf/deuren.js`, `beheerVan` en `lidVan`) — daar komt elke route van
+die laag langs en is de tenant toch al opgezocht voor het quotum. Ledenverkeer,
+zaakverkeer en verkeer van buiten dragen geen organisatie en worden geteld als
+`nietToegewezen`. Wie hier "vijf organisaties" leest, weet dus: **minstens vijf,
+en er is een deel waarvan we het niet weten** — en dat deel staat erbij. Harde
+bovengrens van 200 organisaties per functie, met `afgekapt: true` in plaats van
+een getal dat te laag is zonder het te zeggen, en een venster van een uur.
+
+**En het blijft géén beschikbaarheidscijfer per organisatie.** Daarvoor heb je
+alle verzoeken van een klant over een hele periode nodig, niet de organisaties
+die in een uur een fout zagen. Par. 8 blijft daarmee onveranderd staan. Getoetst
+in `test/metingtenant.test.js` (vijf toetsen, drie mutaties).
+
 Wat werkvoorraad blijft is de diepte: de afdaling eindigt bij de werkruimte en
 niet bij een terminal, omdat er onder die laag geen bron is die RTG zonder
-uitnodiging mag lezen. En het beschikbaarheidscijfer per klant blijft weg tot de
-meting een tenant draagt — dat is geen achterstand van dit scherm maar van
-`server/meting.js`.
+uitnodiging mag lezen.
 
-### 7.6 De veilige noodstand
+### 7.6 De veilige noodstand — GEBOUWD
 
-`kern/incidentcontrole.js` kan al functies dichtzetten en exact terugzetten wat
-zij heeft geraakt. Wat ontbreekt is de vorm uit grens 6.10: één handeling die
-BESCHERMT in plaats van uitzet, met per onderdeel wat er wel en niet doorloopt.
+`kern/beschermstand.js` met `beschermstand-lijst.js`, aangezet via
+`kern/incidentcontrole-bescherm.js` als vijfde modus `beschermd`. Handhaving in
+`middleware/functieschakelaars.js`, met één aanroep — er komt geen tweede poort
+naast de schakelkast.
+
+**De methode is hier het verkeerde signaal, en dat is gemeten.** De eerste vorm
+was "elke niet-GET wordt tegengehouden, lezen loopt door". In dit huis staan
+**3728 POST-routes tegenover 35 GET-routes**: het lezen gaat hier grotendeels óók
+per POST. Die regel zou dus alles hebben tegengehouden — isolatie met een
+vriendelijkere naam, exact de knop die volgens 6.10 niet gebruikt wordt.
+
+**Dus: per categorie bevriezen, met een gesloten lijst uitzonderingen.** Zes van
+de zestien categorieën dragen wat 6.10 bedoelt met nieuwe bevoorrechte
+handelingen en mutaties van derden (identiteit, rechten, de twee geldcategorieën,
+partners, integraties); de andere tien werken door, RTG-Backoffice voorop — dat
+is de hand die repareert en de hand die deze stand weer opheft. Binnen een
+bevroren categorie loopt een GET altijd door, en lopen **vier met naam genoemde
+functies** door: `tg-inlog` (wie dit bevriest zet ook het lezen stil),
+`dom-veiligheid` en `dom-kmar` (een hulpdienst stilzetten om een incident in te
+dammen is de ruil die 6.10 verbiedt) en `dom-foutmelder` (het kanaal waarlangs
+we hóren dat er iets mis is).
+
+**Drie fail-fasts bij het laden**, niet bij het eerste incident: elke categorie
+staat in precies één emmer (een nieuwe categorie laat de server niet starten in
+plaats van stilzwijgend te blijven schrijven), elke uitzondering bestaat nog, en
+elke uitzondering zit in een categorie die werkelijk bevriest.
+
+**Deze stand zet geen enkele schakelaar om.** `beperk` en `isoleer` schrijven
+standen weg die je daarna exact moet terugzetten; dit is een vlag. Opheffen is
+dus geen herstelactie met een eigen risico — en een noodstand die je durft aan te
+zetten omdat je hem durft uit te zetten, is de noodstand die gebruikt wordt. Om
+dezelfde reden vraagt hij geen bevestigingszin: een drempel opwerpen voor de
+veilige keuze duwt mensen naar de onveilige.
+
+**Vier van de vijf onderdelen uit 6.10 zijn afgedwongen, het vijfde niet — en dat
+staat in het antwoord van de server.** Lezen loopt door, mutaties van derden
+bevriezen, nieuwe bevoorrechte handelingen worden tegengehouden, en het bewijs
+wordt bij het omzetten vastgezet: de hashketen van het journaal wordt nagelopen
+en de uitslag komt als zegel in het audit, zodat wat er daarna aan de historie
+verandert daartegen breekt. **Sleutels roteren gebeurt niet**, met de reden
+erbij: er is geen rotatiemechanisme voor `secret.key` en `vault.key`, en die
+roteren betekent alles opnieuw versleutelen — een migratie, geen noodhandeling.
+Dat staat er als `nietAfgedwongen` en niet als lege waarde.
+
+Twee dingen die het zegel eerlijk houden: het **zet** het bewijs vast en
+**kopieert** het niet naar buiten (wie de schijf heeft, heeft ook het zegel), en
+"er is geen keten" en "de keten is niet te lezen" komen als twee verschillende
+antwoorden terug. Getoetst in `test/beschermstand.test.js` (zes toetsen, vier
+mutaties).
 
 ---
 
@@ -675,9 +787,18 @@ BESCHERMT in plaats van uitzet, met per onderdeel wat er wel en niet doorloopt.
 - **Geen "repareer alles"-knop.** Voor kleine, beproefde gevallen mag herstel
   autonoom; alles daarboven toont een plan met impact, terugweg en risico.
 - **Geen god-mode, ook niet voor ons.** Zie grens 6.6.
-- **Geen beschikbaarheidscijfer per organisatie** zolang de meting geen tenant
-  draagt. Een platformcijfer als "uw beschikbaarheid" presenteren is preciezer
-  dan de meting en dus onwaar.
+- **Geen beschikbaarheidscijfer per organisatie**, en dat verandert niet nu de
+  meting wél een tenant draagt (par. 7.5). Die telt hoeveel organisaties er in een
+  uur een fout zagen — een ondergrens op impact. Een beschikbaarheidspercentage
+  vraagt álle verzoeken van een klant over een hele periode. Een platformcijfer
+  als "uw beschikbaarheid" presenteren is preciezer dan de meting en dus onwaar.
+- **Geen mail of telefoonmelding bij een lopende bijstandssessie.** De klant
+  krijgt sinds 24 augustus wél een bericht — in zijn eigen werkruimtejournaal,
+  het kanaal dat hij al leest en dat een gesloten tabblad overleeft (par. 7.4).
+  Een kanaal naar buiten dat niemand heeft afgesproken, komt op het verkeerde
+  moment bij de verkeerde persoon aan: 's nachts, op een oud adres, of bij iemand
+  die er niets mee kan. Dat hoort een klant in te stellen. Zelfde kanaalbesluit
+  als bij het alarm hierboven, met dezelfde prijs.
 - **Geen mail of telefoonmelding vanuit het alarm** zonder dat er een piket aan
   vastzit. Dat is een kanaalbesluit en hoort niet stilzwijgend ingebouwd te
   worden — het staat om die reden ook in `SLO.md`.
@@ -688,24 +809,30 @@ BESCHERMT in plaats van uitzet, met per onderdeel wat er wel en niet doorloopt.
 
 ## 9. Wat er nu open is
 
-De beslissing die hier stond — eerst de diepte of eerst de breedte — is genomen
-en allebei gebouwd. Wat er overblijft is kleiner en concreter, en het staat
-hier zodat niemand het voor vergeten aanziet:
+De vier punten die hier op 24 augustus stonden zijn alle vier gebouwd: de veilige
+noodstand (par. 7.6), de zaak-kant door de hersteltransactie (par. 7.2), de
+meting die een tenant draagt (par. 7.5) en het bericht aan de klant bij een
+lopende bijstandssessie (par. 7.4). Wat daarvan overblijft is geen restpost maar
+de grens die er bij het bouwen bij hoorde, en die staat hier zodat niemand hem
+voor vergeten aanziet:
 
-1. **De veilige noodstand** (par. 7.6): één handeling die BESCHERMT in plaats van
-   uitzet. De incidentcontrole kan al dichtzetten en exact terugzetten; wat
-   ontbreekt is de vorm uit grens 6.10.
-2. **De zaak-kant door de hersteltransactie** (par. 7.2): `kern/zaakcommand/`
-   draait dezelfde recepten en roept `runbooks.js` rechtstreeks aan. De module is
-   erop voorbereid; de bedrading ligt er niet.
-3. **De meting die een tenant draagt** (par. 7.5): zolang `server/meting.js` per
-   routepatroon telt, blijft "hoeveel klanten merkten dit" onbeantwoordbaar. Dat
-   is geen achterstand van een scherm maar van de meting eronder, en drie lagen
-   hierboven schrijven dat nu op dezelfde manier op.
-4. **Een bericht aan de klant bij een lopende bijstandssessie** (par. 7.4). Hij
-   ziet het als hij kijkt; hij krijgt geen seintje. Dat is een kanaalbesluit met
-   dezelfde prijs als bij het alarm in `SLO.md`, en het hoort niet stilzwijgend
-   ingebouwd te worden.
+1. **Sleutelrotatie bestaat niet** (par. 7.6). Grens 6.10 noemt het als vijfde
+   onderdeel van de veilige noodstand; er is geen rotatiemechanisme voor
+   `secret.key` en `vault.key`, en die roteren betekent alles opnieuw
+   versleutelen. Dat is een migratie en geen noodhandeling. Het staat in het
+   antwoord van de server als `nietAfgedwongen` mét die reden, en niet als knop.
+2. **Het bewijszegel wordt vastgezet, niet weggezet** (par. 7.6). Wie de schijf
+   heeft, heeft ook het zegel. Een tweede bewaarplaats buiten dit huis is een
+   eigen besluit met een eigen prijs.
+3. **De ondergrens op impact is een ondergrens** (par. 7.5). Alleen verkeer dat
+   langs een werkruimtedeur komt draagt een organisatie; ledenverkeer,
+   zaakverkeer en verkeer van buiten staan onder `nietToegewezen`. Voor LEDEN is
+   er nog steeds geen register, en dat staat zo in `nietGemeten`.
+4. **Geen recept dat iets anders verifieert dan het veld dat het zelf schrijft**
+   (par. 7.2). Dat gaat pas knellen bij een recept waarvan de aanleiding in een
+   ánder veld staat; het certificaat kan dat al dragen.
+5. **Een kanaal naar buiten bij bijstand blijft weg** (par. 7.4 en 8). Niet
+   omdat het moeilijk is, maar omdat het een afspraak met een klant vraagt.
 
 Wat er ook bij komt: het hoort hier te staan voordat het wordt gebouwd, met de
 grens erbij. Een besturingsvlak dat zijn eigen grenzen niet opschrijft, bestuurt

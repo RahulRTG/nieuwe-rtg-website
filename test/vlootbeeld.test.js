@@ -19,8 +19,11 @@
       de klant.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
-   - `geraakteOrganisaties: null` vervangen door het aantal organisaties
-     -> "hoeveel organisaties er iets van merkten, staat er niet" ZAKT (RAAK)
+   - `geraakteOrganisaties` vervangen door een kaal aantal (`orgs.length`)
+     -> "het geraakte aantal is een ondergrens" ZAKT (RAAK). Dit veld stond tot
+        24 augustus op `null` omdat de meting geen tenant droeg; sindsdien draagt
+        server/meting-tenant.js een ondergrens, en de toets bewaakt nu dat het een
+        ondergrens BLIJFT en geen kaal getal wordt.
    - NIET_TE_ZIEN leeggemaakt
      -> "wat dit beeld niet kan zien, staat erin" ZAKT (RAAK)
    - `dieper.mag` op true gezet
@@ -83,9 +86,23 @@ test('1. een hoofdincident, geen N meldingen, en 2. het geraakte aantal staat er
   assert.equal(v.tel.hoofdincidenten, 1);
   const h = v.hoofdincidenten[0];
   assert.equal(h.organisatiesInDeVloot, 3, 'het aantal organisaties in de vloot klopt niet');
-  assert.equal(h.geraakteOrganisaties, null, 'er staat een geteld ogend aantal geraakte organisaties');
+  /* `geraakteOrganisaties` is een ONDERGRENS en nooit een kaal getal. Het veld
+     heet `organisatiesMinstens`, draagt zijn eigen `let` mee, en zegt `gemeten:
+     false` met een reden als er niets is toegewezen. Een kaal `aantal` hier zou
+     op een vlootscherm binnen een week gelezen worden als het aantal klanten
+     dat belde. */
+  const g = h.geraakteOrganisaties;
+  assert.ok(g && typeof g === 'object', 'het geraakte aantal is geen object met zijn grens erbij');
+  assert.equal(g.aantal, undefined, 'er staat een kaal "aantal" waar een ondergrens hoort');
+  assert.equal(typeof g.gemeten, 'boolean');
+  if (g.gemeten) {
+    assert.equal(typeof g.organisatiesMinstens, 'number');
+    assert.match(g.let, /ONDERGRENS/, g.let);
+  } else {
+    assert.ok(g.waarom && g.waarom.length > 20, 'niet gemeten zonder reden: ' + JSON.stringify(g));
+  }
   assert.match(h.let, /ÉÉN incident en geen 3 meldingen/);
-  assert.match(h.let, /niet gemeten/);
+  assert.match(h.let, /ONDERGRENS en geen aantal/);
 });
 
 test('3. er staat geen beschikbaarheidscijfer per organisatie', () => {

@@ -11,23 +11,64 @@
    NIET kunnen tellen, staat met naam en reden in `nietGemeten`, en dat blok
    hoort op het scherm te staan en niet in een voetnoot.
 
-   De drie die er altijd in staan zijn geen bescheidenheid maar een feit over
-   deze code: server/meting.js telt per ROUTEPATROON en draagt geen lid en geen
-   organisatie, en het transactie-grootboek (server/db/tx/) dekt de collecties
-   die daar zijn aangemeld en niet het hele platform. Zolang dat zo is, kan
-   niemand hier zeggen hoeveel mensen het merkten of dat er niets verloren ging. */
+   WAT ER SINDS VANDAAG WEL TE ZEGGEN IS, en met welke grens. Er staat nu een
+   register naast de meting (server/meting-tenant.js) dat per FUNCTIE telt
+   HOEVEEL ORGANISATIES eraan kwamen en hoeveel er een serverfout zagen. Dat is
+   een ONDERGRENS en geen aantal: er wordt geteld waar een verzoek al aan een
+   organisatie is toegewezen -- bij de twee deuren van de werkruimte -- en
+   ledenverkeer, zaakverkeer en verkeer van buiten dragen die toewijzing niet.
+   Het staat daarom in `gemetenOndergrens` en niet bij de gewone getallen, met
+   het niet-toegewezen deel ernaast.
+
+   Over LEDEN blijft de oude zin staan: die dragen geen organisatie en er is
+   geen tweede register voor. Over verlies en dubbele verwerking ook: het
+   transactie-grootboek (server/db/tx/) dekt de collecties die daar zijn
+   aangemeld en niet het hele platform. Een nul die niemand heeft geteld, is
+   nog steeds geen nul. */
 'use strict';
 
+const metingTenant = require('../../meting-tenant');
+const functies = require('../../functies');
+
 const NIET_TE_METEN = [
-  { wat: 'hoeveel leden of organisaties dit heeft geraakt',
-    waarom: 'de meting telt per routepatroon (server/meting.js) en draagt geen lid en geen tenant. Een getal ' +
-      'hierover zou verzonnen zijn.' },
+  { wat: 'hoeveel LEDEN dit heeft geraakt',
+    waarom: 'de meting telt per routepatroon (server/meting.js) en draagt geen lid. Voor organisaties is er ' +
+      'sinds kort wel een ondergrens (zie gemetenOndergrens); voor leden bestaat dat register niet.' },
   { wat: 'of er gegevens verloren zijn gegaan',
     waarom: 'er is geen teller die verlies meet. Het transactie-grootboek (server/db/tx/collecties.js) dekt ' +
       'de collecties die daar zijn aangemeld, niet het hele platform.' },
   { wat: 'of er iets dubbel is verwerkt',
     waarom: 'om dezelfde reden als hierboven: er is geen dubbeltelling over alle collecties heen.' }
 ];
+
+/* De organisaties die dit vermogen in het huidige venster raakten -- een
+   ONDERGRENS, met het niet-toegewezen deel erbij zodat niemand hem voor een
+   totaal aanziet.
+
+   Hij loopt van CATEGORIE naar functie naar teller, en niet van routepatroon
+   naar teller: een vermogen kent zijn categorieën (./vermogens.js) en het
+   register telt per functie. Zo verandert er niets aan deze rekensom als er
+   een route bij komt, en landt een nieuwe functie vanzelf bij het goede
+   vermogen -- dezelfde reden waarom vermogens.js per categorie groepeert.
+
+   Een vermogen zonder categorieën (de vier fundamenten) krijgt `gemeten: false`
+   en geen nul: nul organisaties en "niet gemeten" zijn twee verschillende
+   dingen, en dat verschil is het halve punt van dit bestand. */
+function ondergrens(v) {
+  const cats = v.categorieen || [];
+  if (!cats.length) {
+    return { gemeten: false, waarom: 'dit vermogen hangt niet aan functiecategorieën (het is een ' +
+      'fundament), dus er valt niets aan een organisatie toe te wijzen' };
+  }
+  const ids = (functies.FUNCTIES || []).filter(f => cats.includes(f.categorie)).map(f => f.id);
+  const g = metingTenant.geraaktVan(ids);
+  if (!g.gemeten) return { gemeten: false, waarom: g.waarom };
+  const st = metingTenant.stand();
+  return { gemeten: true, organisatiesMinstens: g.organisaties, metFoutMinstens: g.metFout,
+    afgekapt: g.afgekapt, venster: st.venster, nietToegewezen: st.nietToegewezen,
+    let: 'een ONDERGRENS: alleen verkeer dat langs een werkruimtedeur kwam draagt een organisatie. ' +
+      'Dit is geen beschikbaarheidscijfer per klant en wordt er ook geen.' };
+}
 
 /* De impact van EEN vermogen, uit zijn eigen bevindingen. Alleen bevindingen
    met een oordeel tellen mee -- de schakelkast zegt iets nuttigs zonder iets
@@ -45,6 +86,11 @@ function impactVan(v) {
     /* Leunt dit vermogen op iets dat ook stuk is, dan hoort dat bij de impact:
        de storing is dan misschien niet HIER ontstaan. */
     geraaktDoor: v.geraakt || [],
+    /* De ondergrens staat APART van `gemeten` en dat is geen ordelijkheid maar
+       de hele voorzichtigheid van dit bestand: hij komt uit een ander soort
+       bron (een venster van een uur, alleen werkruimteverkeer) en zou tussen de
+       gezondheidscijfers als een even hard getal lezen. */
+    gemetenOndergrens: ondergrens(v),
     nietGemeten: NIET_TE_METEN,
     let: gemeten.length ? null
       : 'geen enkele bron levert een getal over dit vermogen, dus de omvang van deze storing is niet gemeten'

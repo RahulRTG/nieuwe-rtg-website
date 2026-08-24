@@ -714,6 +714,47 @@
         "/api/command/zandbak"
       ],
       "let": "De inhoud komt uit de zaaiset en nooit uit db.data; de motoren zien een DB-venster op het vak van de zandbak, dus er is geen pad naar een productiecollectie. Wat het NIET is: een tweede installatie -- alleen de motoren van Command draaien erop, niet de gewone app-routes."
+    },
+    {
+      "id": "beschermstand",
+      "wat": "Een veilige noodstand die beschermt in plaats van uitzet",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/beschermstand.js",
+        "server/kern/beschermstand-lijst.js",
+        "server/kern/incidentcontrole-bescherm.js",
+        "/api/techniek/controle/incident"
+      ],
+      "let": "Zes van de zestien functiecategorieën bevriezen, tien werken door, en vier functies lopen met naam door omdat stilzetten meer kost dan de storing (inloggen, hulpdiensten, grensdiensten, de storingsmelder). Deze stand zet GEEN enkele schakelaar om, dus opheffen is geen herstelactie. Wat hij NIET doet: sleutels roteren -- dat staat in het antwoord als nietAfgedwongen met de reden, want er is geen rotatiemechanisme voor secret.key en vault.key."
+    },
+    {
+      "id": "meting-tenant",
+      "wat": "Hoeveel organisaties een storing raakte, als ondergrens",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/meting-tenant.js",
+        "server/bedrijf/deuren.js"
+      ],
+      "let": "Een ONDERGRENS en geen aantal: geteld wordt bij de twee deuren van de werkruimte, dus ledenverkeer, zaakverkeer en verkeer van buiten staan onder nietToegewezen. Gaat nooit mee naar Prometheus (geen tekst()-functie) en de org-codes verlaten de module niet. Wat het NIET is en niet wordt: een beschikbaarheidscijfer per klant."
+    },
+    {
+      "id": "bijstand-bericht",
+      "wat": "De klant krijgt bericht als er een bijstandssessie loopt",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/bijstand-melden.js"
+      ],
+      "let": "In zijn eigen werkruimtejournaal: een kanaal dat hij al leest en dat een gesloten tabblad overleeft. Een regel op de vier momenten dat RTG handelt, met het sessie-id en zonder de codenaam van de medewerker. Wat er bewust NIET bij komt is mail of een telefoonmelding -- dat is een kanaalbesluit dat een klant hoort in te stellen."
+    },
+    {
+      "id": "zaak-hersteltransactie",
+      "wat": "Ook een zaak repareert door de hersteltransactie, niet erlangs",
+      "groep": "De zaak: regie over de eigen onderneming",
+      "dekking": [
+        "server/kern/zaakcommand/runbooks.js",
+        "/api/supplier/command/runbook/voer"
+      ],
+      "let": "Voorcontrole, momentopname, uitvoeren, verificatie, vastleggen -- met certificaten die LAGER staan dan aan de RTG-kant, want de schaal van een zaak is de schaal van één onderneming. De gezondheidskaart gaat er bewust niet in en dat staat als `fundament-gezond: gecontroleerd false` met de reden in het antwoord."
     }
   ]
 }

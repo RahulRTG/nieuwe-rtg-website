@@ -20,6 +20,7 @@
      ./bijstand-rtg.js     betreden, kijken, voorstellen, uitvoeren, afsluiten
      ./bijstand-niveaus.js wat elk niveau werkelijk mag
      ./bijstand-diagnose.js wat een sessie te ZIEN geeft, en wat dicht blijft
+     ./bijstand-melden.js  het bericht aan de klant, in zijn eigen journaal
 
    VERLOPEN IS EEN TOESTAND EN GEEN OPRUIMACTIE. `stand()` rekent hem bij elke
    lezing opnieuw uit de klok. Een sessie die pas dichtgaat als er een
@@ -30,6 +31,7 @@
 'use strict';
 
 const niveaus = require('./bijstand-niveaus');
+const melden = require('./bijstand-melden');
 
 function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
   const nu = () => new Date().toISOString();
@@ -59,6 +61,11 @@ function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
     journaal.noteer({ actor, actie, objectType: 'bijstand', objectId: s.id, niveau: 'hand',
       reden: String(reden || ''), na: { org: s.org, niveau: s.niveau } });
   }
+
+  /* HET BERICHT AAN DE KLANT. Het journaal hierboven is van RTG; dit schrijft in
+     het journaal van de KLANT, dat hij zelf al leest. Zie ./bijstand-melden.js
+     voor waarom dat kanaal en geen ander. */
+  const meld = (s, wat, reden) => melden.meld({ db, save }, s, wat, reden);
 
   function kort(s) {
     return { id: s.id, org: s.org, orgNaam: s.orgNaam, onderwerp: s.onderwerp, niveau: s.niveau,
@@ -113,7 +120,7 @@ function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
       permanenteToegang: 0 };
   }
 
-  const C = { rij, vind, stand, levend, kort, dossier, spoor, noteer, nu, save, crypto, tenantNu, diagnose };
+  const C = { rij, vind, stand, levend, kort, dossier, spoor, noteer, meld, nu, save, crypto, tenantNu, diagnose };
   const klant = require('./bijstand-klant').maakKlantkant(C);
   const rtg = require('./bijstand-rtg').maakRtgkant(C);
 

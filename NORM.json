@@ -21,8 +21,8 @@
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4936,
     "browserpoortToetsen": 199,
-    "kernBreedte": 1415,
-    "kernGedeeld": 193,
+    "kernBreedte": 1416,
+    "kernGedeeld": 194,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 154,
@@ -34,6 +34,12 @@
     "schermenZonderVormtaal": 184
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1415 -> 1416; kernGedeeld 193 -> 194 (het zegel van de veilige noodstand)",
+      "reden": "Eén kern-naam erbij en één die nu door een tweede domein wordt gelezen, en het is allebei dezelfde koppeling: `command`, gelezen vanuit het domein `techniek`.\n\nWAAROM DIE KOPPELING ER MOEST KOMEN. De veilige noodstand (BESTUUR.md par. 7.6, grens 6.10) moet bij het omzetten het BEWIJS veiligstellen. Het enige bewijs in dit huis dat kán breken als er achteraf iets aan de historie verandert, is de hashketen van het journaal van RTG Command. Die wordt bij het aanzetten nagelopen en de uitslag komt als zegel in het audit van de incidentcontrole; vanaf dat punt is aantoonbaar of er nog aan is gerommeld.\n\nDe incidentcontrole woont in `routes/techniek/`, het journaal in `kern/command/`. Er waren dus twee wegen: de keten daar lezen (één gedeelde naam), of een tweede keten voor de techniekkant bouwen. Het tweede spaart de teller en dupliceert de regel -- precies de ruil die LAT.md regel 4 verbiedt, en bij BEWIJS is hij het duurst: twee ketens die iets anders zeggen over dezelfde dag maken allebei waardeloos. De koppeling gaat bovendien maar één kant op en is LUI (`() => kern.command && kern.command.journaal`), want kern.command bestaat op montagetijd nog niet.\n\nWAT NIET OMHOOG GING, en dat is de controle op dit verhaal. keuringOmvang ging van 161 naar 159 -- twee bestanden minder in de waarschuwingsband, want elk bestand dat door dit werk in de band kwam is op een naad geknipt (`bedrijf/deuren.js`, `beschermstand-lijst.js`, `incidentcontrole-bescherm.js`, `vlootbeeld-incidenten.js`, `functieschakelaars-tekst.js`, `routes/techniek/knoppen.js`). keuringTeGroot bleef 5, routesNietSchakelbaar bleef 0, en toetsenNietGemeten ging van 154 naar 153.",
+      "eerlijkheidshalve": "Twee meters stonden na deze ronde OOK rood en zijn GEREPAREERD in plaats van opgerekt.\n\n(1) keuringDubbeling kwam op 116 door een functie `zegelVan` in kern/incidentcontrole-bescherm.js, die daarmee de derde in de kern werd naast kern/command/overname.js en kern/tafelticket.js -- drie functies met dezelfde naam die niets met elkaar te maken hebben. Precies waar die meter voor bestaat, en het advies erbij ('geef ze een eigen naam zodat de gelijkenis niet misleidt') was hier het juiste: hij heet nu `bewijszegel`, wat hij ook is. De meter staat weer op 115.\n\n(2) Er stond even een tweede nieuwe naam in het techniekdomein doordat ik mijn eigen parameter `journaal` noemde -- die telt mee als kern-greep terwijl het een doorgegeven functie is. Dat is geen meetfout die je omzeilt maar een naam die verwarrend was; de kop legt nu uit dat er een functie binnenkomt en geen journaal.\n\nWat ik NIET heb gedaan is --vastleggen draaien. Zeven meters lezen beter dan hun norm (endpointsZonderTest 1177, keuringOmvang 159, testbestanden 934, toetsenNietGemeten 153, browserpoortToetsen 200, e2eBestanden 130, inlineStijlAttributen 4935); een deel van die winst is van deze ronde en een deel van eerder, en hem in één keer op mijn naam vastzetten zou andermans werk als mijn ratel opschrijven."
+    },
     {
       "datum": "2026-08-24",
       "meter": "kernBreedte 1414 -> 1415 (RTG Bijstand en het vlootbeeld)",

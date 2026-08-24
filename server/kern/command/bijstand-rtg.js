@@ -23,7 +23,7 @@ const niveaus = require('./bijstand-niveaus');
 const GEDEELD = /gedeelde code/i;
 
 function maakRtgkant(C) {
-  const { vind, levend, stand, kort, dossier, spoor, noteer, nu, save, diagnose } = C;
+  const { vind, levend, stand, kort, dossier, spoor, noteer, meld, nu, save, diagnose } = C;
 
   /* Elke handeling hieronder stelt dezelfde drie vragen. Ze staan hier één keer,
      want drie kopieën lopen uiteen zodra er een vierde handeling bij komt. */
@@ -54,6 +54,11 @@ function maakRtgkant(C) {
     s.medewerker = wie; s.status = 'bezig'; s.betredenAt = s.betredenAt || nu();
     noteer(s, wie, 'bijstand betreden', 'niveau ' + s.niveau + ' bij ' + s.org);
     spoor(s, wie + ' van RTG is verbonden.');
+    /* HET SEINTJE. Dit is het moment waarop de klant het moet weten: er zit
+       nu iemand van RTG in zijn omgeving. Het gaat in ZIJN journaal en niet
+       in het onze -- zie ./bijstand-melden.js. */
+    meld(s, 'RTG is uw omgeving binnengekomen voor bijstand',
+      'niveau ' + s.niveau + ', onderwerp: ' + s.onderwerp);
     save();
     return { sessie: dossier(s.id) };
   }
@@ -104,6 +109,7 @@ function maakRtgkant(C) {
     h.uitslag = String(uitslag || '').slice(0, 500) || 'geen uitslag opgegeven';
     noteer(s, String(medewerker), 'bijstand uitgevoerd', h.wat + ' -- ' + h.uitslag);
     spoor(s, String(medewerker) + ' voerde uit: ' + h.wat);
+    meld(s, 'RTG voerde een goedgekeurde handeling uit', h.wat);
     save();
     return { sessie: dossier(s.id) };
   }
@@ -118,6 +124,7 @@ function maakRtgkant(C) {
     s.inhoud.besluitAt = null; s.inhoud.besluitDoor = null;
     noteer(s, String(medewerker), 'bijstand inhoud gevraagd', r);
     spoor(s, String(medewerker) + ' vraagt toegang tot inhoud: ' + r);
+    meld(s, 'RTG vraagt toegang tot namen van werkruimtes en groepen', r);
     save();
     return { sessie: dossier(s.id) };
   }
@@ -146,6 +153,7 @@ function maakRtgkant(C) {
       duurMinuten: Math.round((Date.parse(dicht) - Date.parse(s.at)) / 60000) };
     noteer(s, s.verslag.door, 'bijstand afgesloten', t.slice(0, 200));
     spoor(s, 'De sessie is afgesloten met een verslag.');
+    meld(s, 'RTG heeft de bijstandssessie afgesloten', 'er is een verslag; het staat in uw dossier');
     save();
     return { sessie: dossier(s.id) };
   }

@@ -148,8 +148,26 @@ test('7. de impact is gemeten, en wat niet te meten is staat erbij', () => {
   const namen = im.nietGemeten.map(n => n.wat);
   assert.ok(namen.some(n => /verloren/.test(n)), 'verlies staat niet als niet-gemeten');
   assert.ok(namen.some(n => /dubbel/.test(n)), 'dubbele verwerking staat niet als niet-gemeten');
-  assert.ok(namen.some(n => /leden|organisaties/.test(n)), 'de geraakte mensen staan niet als niet-gemeten');
+  /* LEDEN blijven niet-gemeten: de meting draagt geen lid en er is geen tweede
+     register voor. ORGANISATIES zijn dat sinds 24 augustus niet meer -- daar
+     staat een ONDERGRENS (server/meting-tenant.js). Die twee horen niet meer
+     onder dezelfde noemer te staan, want ze zijn niet meer hetzelfde. */
+  assert.ok(namen.some(n => /LEDEN/i.test(n)), 'de geraakte leden staan niet als niet-gemeten');
+  assert.equal(namen.some(n => /^hoeveel leden of organisaties/i.test(n)), false,
+    'leden en organisaties staan nog onder één noemer terwijl er voor organisaties wel iets gemeten wordt');
   for (const n of im.nietGemeten) assert.ok(n.waarom && n.waarom.length > 30, n.wat + ' heeft geen reden');
+
+  /* En de ondergrens staat APART van de gewone getallen, met zijn grens erbij.
+     Tussen de gezondheidscijfers zou hij als een even hard getal lezen. */
+  const og = im.gemetenOndergrens;
+  assert.ok(og && typeof og.gemeten === 'boolean', 'er staat geen ondergrens: ' + JSON.stringify(og));
+  if (og.gemeten) {
+    assert.equal(typeof og.organisatiesMinstens, 'number');
+    assert.match(og.let, /ONDERGRENS/);
+    assert.match(og.let, /geen beschikbaarheidscijfer/);
+  } else {
+    assert.ok(og.waarom && og.waarom.length > 20, 'niet gemeten zonder reden: ' + JSON.stringify(og));
+  }
   /* En er staat nergens een nul die niemand heeft geteld. */
   const tekst = JSON.stringify(im);
   assert.ok(!/"verloren"|"dubbel"\s*:\s*0/.test(tekst), 'er staat een geteld ogende nul in de impact');

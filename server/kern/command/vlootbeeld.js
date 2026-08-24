@@ -33,11 +33,15 @@
    toont wat hij heeft, leest als een volledige lijst. */
 const NIET_TE_ZIEN = [
   { wat: 'hoeveel organisaties een storing werkelijk hebben gemerkt',
-    waarom: 'de meting telt per routepatroon (server/meting.js) en draagt geen tenant. Het aantal ' +
-      'organisaties hieronder is wat er BESTAAT, niet wat er geraakt is.' },
+    waarom: 'hier staat sinds kort een ONDERGRENS en geen aantal (server/meting-tenant.js): geteld wordt ' +
+      'waar een verzoek al aan een organisatie is toegewezen -- bij de twee deuren van de werkruimte. ' +
+      'Ledenverkeer, zaakverkeer en verkeer van buiten dragen die toewijzing niet en staan onder ' +
+      'nietToegewezen. Het aantal organisaties hieronder blijft wat er BESTAAT.' },
   { wat: 'een beschikbaarheidscijfer per organisatie',
-    waarom: 'om dezelfde reden. kern/tenant/bewijs.js weigert dat cijfer al aan de klant; het hier wel ' +
-      'tonen zou betekenen dat wij intern een getal gebruiken dat wij extern onwaar noemen.' },
+    waarom: 'en dat verandert NIET door de ondergrens hierboven. Voor een beschikbaarheidspercentage heb ' +
+      'je alle verzoeken van een klant over een hele periode nodig, niet de organisaties die in een uur ' +
+      'een fout zagen. kern/tenant/bewijs.js weigert dat cijfer al aan de klant; het hier wel tonen zou ' +
+      'betekenen dat wij intern een getal gebruiken dat wij extern onwaar noemen.' },
   { wat: 'wat er binnen een werkruimte gebeurt',
     waarom: 'dat begint bij een uitnodiging van de klant (kern/command/bijstand.js). Dit beeld toont wat RTG ' +
       'zonder die uitnodiging mag zien, en houdt daar op.' }
@@ -66,22 +70,9 @@ function maakVlootbeeld({ tenant, incident, bijstand, gezondheid }) {
     })) };
   }
 
-  /* HET HOOFDINCIDENT. Eén regel per lopend incident, met het aantal
-     organisaties dat BESTAAT -- en de zin erbij dat dat niet het aantal geraakte
-     is. Zonder die zin wordt "812 organisaties" binnen een week gelezen als
-     "812 klanten hadden hier last van". */
-  function hoofdincidenten(aantalOrgs) {
-    const open = veilig(() => incident.lijst({ max: 50 }), 'de incidenten zijn niet te lezen');
-    if (open.nietTeLezen) return { fout: open.nietTeLezen, lijst: [] };
-    return { lijst: open.map(i => ({
-      id: i.id, vermogen: i.vermogen, naam: i.naam, wat: i.wat, status: i.status,
-      begonnen: i.begonnen, eigenaar: i.eigenaar,
-      organisatiesInDeVloot: aantalOrgs,
-      geraakteOrganisaties: null,
-      let: 'Dit is ÉÉN incident en geen ' + aantalOrgs + ' meldingen. Hoeveel organisaties er werkelijk ' +
-        'iets van merkten, is niet gemeten -- zie "niet te zien".'
-    })) };
-  }
+  /* Het hoofdincident en de ondergrens staan in ./vlootbeeld-incidenten.js:
+     dat is het enige stuk van dit beeld dat een getal over klanten produceert. */
+  const { hoofdincidenten } = require('./vlootbeeld-incidenten')({ incident, gezondheid, veilig });
 
   function beeld() {
     const orgs = organisaties();

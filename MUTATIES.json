@@ -490,6 +490,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "beschermstand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/beschermstand.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "bestand-binding.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -642,6 +650,14 @@
       "module": "server/kern/command/bijstand.js",
       "operator": "===->!==#0",
       "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "bijstandbericht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/bijstand.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "bijstandketen.test.js": {
@@ -3177,6 +3193,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "metingtenant.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/meting-tenant.js",
+      "operator": ">=->>#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "middleware.test.js": {
       "soort": "puur",
@@ -6769,6 +6793,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "zaaktransactie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakcommand/runbooks.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 7
     },
     "zakelijk.test.js": {
       "soort": "server",

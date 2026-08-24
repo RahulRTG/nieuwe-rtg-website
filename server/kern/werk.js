@@ -118,6 +118,10 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
           id: v.id, supplierCode: code, bedrijf: s.name, soort: v.soort,
           type: s.type || null, typeLabel: t.label || null, icon: t.icon || 'gebouw',
           func: v.func, omschrijving: v.omschrijving, plaats: v.plaats, uren: v.uren,
+          salarisMin: v.salarisMin || null, salarisMax: v.salarisMax || null,
+          valuta: v.valuta || 'EUR', werkvorm: v.werkvorm || null,
+          vaardigheden: Array.isArray(v.vaardigheden) ? v.vaardigheden.slice(0, 12) : [],
+          voordelen: Array.isArray(v.voordelen) ? v.voordelen.slice(0, 10) : [],
           minLeeftijd: v.minLeeftijd, at: v.at,
           // land van het bedrijf: RTG is internationaal, dus je solliciteert ook
           // gerust in het buitenland

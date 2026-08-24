@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 398 delen, 0 zonder onderwerp.**
+**51 bundels, 402 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -186,7 +186,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 105 delen, 9021 regels in de delen
+`public/apps/leverancier/` -- 109 delen, 9057 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -270,7 +270,8 @@ omlaag.
 | `leverancier-58.js` | alles opnieuw tekenen, en het actieve tabblad zichtbaar maken |
 | `leverancier-59.js` | een bestelkaart opbouwen |
 | `leverancier-60.js` | een tafel afrekenen |
-| `leverancier-61.js` | een gerecht aan de menukaart toevoegen |
+| `leverancier-61.js` | Een gerecht met ingrediënten, dieetlabels en keuzes aan de menukaart toevoegen |
+| `leverancier-61a.js` | Menukaart, dynamische prijzen, locatie en de sectorgebonden kassa |
 | `leverancier-62.js` | de shift-samenvatting: het avondbriefingmoment |
 | `leverancier-63.js` | afrekenen, of op de kamer laten schrijven |
 | `leverancier-64.js` | de bon van de kassa naar een bestelling |
@@ -295,6 +296,9 @@ omlaag.
 | `leverancier-82.js` | het alarmvenster |
 | `leverancier-83.js` | de recepten en hun marges |
 | `leverancier-84.js` | de meldingenlijst van de zaak |
+| `leverancier-84a.js` | RTG Eten: gedeelde toestand en de rolgerichte orderkaart |
+| `leverancier-84b.js` | Opbouw en bediening van het werkblad; de kaart zelf staat in 84a |
+| `leverancier-84c.js` | Live synchronisatie, meldingen en het opstarten van het partnerwerkblad |
 
 ## `apps/meldkamer.js`
 

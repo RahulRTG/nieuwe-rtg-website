@@ -12,6 +12,12 @@
     var start = welke === 'start';
     $('vStart').hidden = !start;
     $('vModules').hidden = start;
+    /* De twee weergaven die NIET aan deze tabs hangen, gaan hier ook dicht.
+       Zonder deze twee regels bleef Personeel of de organisatiestand gewoon
+       staan als je bovenin op een tab klikte -- twee schermen over elkaar, en
+       de bovenste won. De bank deed het al; de tabbalk niet. */
+    var extra = [$('vPeople'), $('vStatus')];
+    for (var i = 0; i < extra.length; i++) if (extra[i]) extra[i].hidden = true;
     $('tabStart').setAttribute('aria-selected', start ? 'true' : 'false');
     $('tabModules').setAttribute('aria-selected', start ? 'false' : 'true');
     if (!K.poort()) return;
@@ -38,7 +44,16 @@
   $('tabModules').addEventListener('click', function () { toon('modules'); });
   $('mKeuze').addEventListener('change', function () { window.RTGWerkModules.laad(); });
   $('mZoekGa').addEventListener('click', function () { window.RTGWerkModules.laad(); });
-  $('ververs').addEventListener('click', function () { toon($('vStart').hidden ? 'modules' : 'start'); });
+  /* VERVERSEN HOORT TE VERVERSEN WAT ER OPEN STAAT. Hier stond
+     `toon(vStart.hidden ? 'modules' : 'start')` -- een gok die klopte toen er
+     twee weergaven waren en fout werd bij de derde: vanuit Personeel of de
+     organisatiestand sprong Ververs naar Modules, een scherm waar de gebruiker
+     niet was. */
+  $('ververs').addEventListener('click', function () {
+    if (!$('vStatus').hidden) return window.RTGWerkStatus && window.RTGWerkStatus.laad();
+    if (!$('vPeople').hidden) return;              // Personeel laadt zijn lijst eenmalig
+    toon($('vStart').hidden ? 'modules' : 'start');
+  });
 
   /* Eerst kijken of er al een weg naar binnen is via het ledenaccount; pas
      als die er niet is, komt de inlogkaart in beeld. */

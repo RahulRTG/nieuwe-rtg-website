@@ -99,7 +99,14 @@ test('elke termijn heeft een grond en een uitleg', () => {
      "waarom een jaar?" hoort daar een antwoord op te staan, niet een schouderophalen. */
   for (const r of bt.BELEID) {
     assert.ok(r.dagen > 0, r.tak + ' heeft een termijn');
-    assert.ok(['wettelijk', 'audit', 'nodig'].includes(r.grond), r.tak + ' heeft een geldige grond');
+    /* Vier gronden, en de lijst is met opzet gesloten: wie er een verzint,
+       kan elke termijn goedpraten. 'contract' is er op 23 augustus 2026
+       bijgekomen voor de werkruimtes van klanten -- die bewaren wij niet omdat
+       de wet het eist en niet omdat wij ze nodig hebben, maar omdat de
+       klantovereenkomst een uitlooptijd geeft waarin de klant zijn uitvoer nog
+       kan ophalen. Dat is een andere reden met een ander eindpunt, en hem
+       onder 'nodig' schuiven zou dat verschil wegpoetsen. */
+    assert.ok(['wettelijk', 'audit', 'nodig', 'contract'].includes(r.grond), r.tak + ' heeft een geldige grond');
     assert.ok(r.waarom && r.waarom.length > 15, r.tak + ' legt uit waarom');
     assert.ok(r.label, r.tak + ' heeft een leesbare naam');
   }
@@ -183,4 +190,39 @@ test('een gesprek dat twee jaar stil is, verloopt met zijn berichten mee', () =>
     'het oude gesprek staat er nog');
   assert.equal(db.data.commBerichten.oud.length, 0, 'de oude berichten staan er nog');
   assert.equal(db.data.commBerichten.nu.length, 1, 'een gesprek van gisteren is meegeveegd');
+});
+
+test('een tak met EIGEN REGIE wordt geteld en nooit geveegd', () => {
+  /* DIT IS DE GEVAARLIJKSTE REGEL VAN DIT BESTAND, en hij bestaat om een fout
+     die makkelijk te maken was. De werkruimtes van klanten stonden nergens in
+     het beleid en dus in de gatenlijst. Ze er met een gewone termijn bij zetten
+     lijkt de oplossing, maar hun datumveld is een AANMAAKmoment: `dagen: 90` op
+     `at` laat de veger elke klant wissen die langer dan negentig dagen bestaat.
+     De klok hoort pas bij de opzegging te beginnen, kan onder een
+     bewaringsplicht stilstaan en eindigt met een bewijs -- dat is een
+     levensloop (kern/tenant/levensloop.js) en geen termijn. */
+  const db = { data: {
+    werkruimtes: {
+      W1: { code: 'W1', naam: 'Al drie jaar klant', at: geleden(3 * 365) },
+      W2: { code: 'W2', naam: 'Nieuw', at: geleden(2) }
+    },
+    tenants: { 'O-A': { org: 'O-A', naam: 'Klant', bij: geleden(3 * 365) } }
+  } };
+
+  const r = bt.rapport(db);
+  const w = r.regels.find(x => x.tak === 'werkruimtes');
+  assert.ok(w, 'de tak staat in het beleid en dus niet meer in de gatenlijst');
+  assert.equal(w.totaal, 2, 'hij wordt geteld');
+  assert.equal(w.verlopen, null, 'maar er is niets "verlopen" -- die datum is geen verloopmoment');
+  assert.match(w.eigenRegie, /levensloop/, 'en het rapport wijst aan waar de klok dan wel woont');
+
+  const gaten = bt.zonderBeleid(db).map(x => x.tak);
+  assert.ok(!gaten.includes('werkruimtes'), 'werkruimtes staat niet meer in de gatenlijst');
+  assert.ok(!gaten.includes('tenants'), 'en tenants ook niet');
+
+  const veeg = bt.veeg(db, { echt: true });
+  assert.ok(db.data.werkruimtes.W1, 'de klant van drie jaar staat er NA de veeg gewoon nog');
+  assert.ok(db.data.tenants['O-A'], 'en zijn tenant ook');
+  assert.ok(!veeg.gedaan.some(g => g.tak === 'werkruimtes' || g.tak === 'tenants'),
+    'de veger meldt ze niet eens: hij komt er niet langs');
 });

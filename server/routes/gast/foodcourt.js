@@ -31,7 +31,8 @@ module.exports = (kern) => {
       if (!code) return res.status(400).json({ error: 'Bij welk loket hoort dit gerecht?', code: 'zaak-leeg' });
       if (!findSupplier(code)) return res.status(404).json({ error: 'Loket ' + code + ' kennen we niet.', code: 'zaak-onbekend' });
       if (!perZaak.has(code)) perZaak.set(code, []);
-      perZaak.get(code).push({ itemId: it.itemId, aantal: it.aantal, notitie: it.notitie });
+      perZaak.get(code).push({ itemId: it.itemId, aantal: it.aantal,
+        keuzes:Array.isArray(it.keuzes) ? it.keuzes.slice(0, 30) : [], notitie: it.notitie });
     }
     if (perZaak.size > 8) return res.status(400).json({ error: 'Een mandje gaat over hooguit acht loketten.', code: 'te-veel-loketten' });
 
@@ -39,7 +40,8 @@ module.exports = (kern) => {
       const kaart = kern.gastKaartVanZaak(zaakcode);
       return { zaakcode, items: zaakItems,
         kaartVan: (id) => { const m = kaart.find(x => x.id === id); return m
-          ? { id: m.id, name: m.naam, price: m.centen / 100, cat: m.cat, station: m.station, alcohol: m.alcohol } : null; } };
+          ? { id: m.id, name: m.naam, price: m.centen / 100, cat: m.cat, station: m.station, alcohol: m.alcohol,
+            opties:m.opties, ingredienten:m.ingredienten, allergenen:m.allergenen, prepMin:m.prepMin } : null; } };
     });
 
     const uit = foodcourtlaag.bestel(schoon(b.mandjeId, 40) || null, handleVan(req), opdracht, {

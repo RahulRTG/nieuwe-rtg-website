@@ -186,7 +186,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 109 delen, 9058 regels in de delen
+`public/apps/leverancier/` -- 109 delen, 9062 regels in de delen
 
 | deel | onderwerp |
 |---|---|

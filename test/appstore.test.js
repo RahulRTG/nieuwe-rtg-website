@@ -315,7 +315,56 @@ test('12. elke machtiging in de catalogus wordt door de brug uitgevoerd', () => 
   }
 });
 
-test('13. zonder inlog en zonder pas blijft alles dicht', async () => {
+test('13. de uitgever heeft zijn eigen noodrem, en het lid zijn eigen gum', async () => {
+  /* Een uitgever die een fout in zijn eigen app ziet, hoort niet op een kantoor
+     te hoeven wachten. En een lid dat een app weghaalt, houdt wat hij erin had
+     staan -- dat is zijn inhoud en niet die van de app -- tenzij hij het zelf
+     weggooit. Beide wegen staan hier, want beide bestonden alleen in de code. */
+  const her = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  assert.equal(her.status, 200, 'de schorsing uit toets 11 wordt weer opgeheven');
+  const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifest({ versie: '1.1.0' }),
+    bestanden: bundel([{ pad: 'extra.txt', inhoud: 'versie 1.1.0' }]) }, sup);
+  assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.error || ''));
+  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
+
+  // de uitgever ziet wat een lid straks ziet
+  const vb = await api('/api/appstore/uitgever/voorbeeld', { sleutel: 'derden-teller' }, sup);
+  assert.equal(vb.status, 200);
+  assert.equal(vb.body.kaart.uitgever.org, ORG);
+  assert.equal((await api('/api/appstore/uitgever/voorbeeld', { sleutel: 'niet-van-mij' }, sup)).status, 404,
+    'en niet die van een ander');
+
+  // het lid installeert opnieuw; wat de app eerder opsloeg, staat er nog
+  await api('/api/appstore/installeer', { sleutel: 'derden-teller', machtigingen: ['opslag.eigen', 'bericht.klaarzetten'] }, lid);
+  assert.equal((await api('/api/appstore/brug', { sleutel: 'derden-teller', methode: 'opslag.lees', args: { sleutel: 'stand' } }, lid)).body.uit.waarde, '7',
+    'wat het lid in deze app had staan, is er nog -- dat is zijn inhoud');
+
+  // het bakje: het lid leest, de app kan niet zien dat hij gelezen is
+  assert.equal((await api('/api/appstore/mijn', {}, lid)).body.berichten['derden-teller'], 1, 'een ongelezen bericht telt mee');
+  const gl = await api('/api/appstore/berichten/gelezen', { sleutel: 'derden-teller' }, lid);
+  assert.equal(gl.body.gelezen, 1);
+  assert.equal((await api('/api/appstore/mijn', {}, lid)).body.berichten['derden-teller'], undefined, 'daarna niet meer');
+
+  // de eigen gum van het lid: pas hiermee is het echt weg
+  assert.equal((await api('/api/appstore/wis-opslag', { sleutel: 'derden-teller' }, lid)).status, 200);
+  assert.equal((await api('/api/appstore/brug', { sleutel: 'derden-teller', methode: 'opslag.lees', args: { sleutel: 'stand' } }, lid)).body.uit.waarde, null);
+  assert.equal((await api('/api/appstore/berichten', { sleutel: 'derden-teller' }, lid)).body.berichten.length, 0);
+
+  // van het startscherm af
+  assert.equal((await api('/api/appstore/weg', { sleutel: 'derden-teller' }, lid)).status, 200);
+  assert.equal((await api('/api/appstore/mijn', {}, lid)).body.apps.length, 0);
+  assert.equal((await api('/api/appstore/weg', { sleutel: 'derden-teller' }, lid)).status, 404, 'twee keer weghalen is niet stil');
+
+  // en de uitgever trekt zijn eigen app terug, zonder kantoor
+  const t = await api('/api/appstore/uitgever/intrekken', { sleutel: 'derden-teller', reden: 'fout in 1.1.0' }, sup);
+  assert.equal(t.status, 200);
+  assert.match(t.body.let, /meteen weg/);
+  assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 0);
+  assert.equal((await api('/api/appstore/uitgever/intrekken', { sleutel: 'derden-teller', reden: 'nog eens' }, sup)).status, 409,
+    'wat al weg is, gaat niet nog een keer weg');
+});
+
+test('14. zonder inlog en zonder pas blijft alles dicht', async () => {
   assert.equal((await api('/api/appstore/catalogus', {})).status, 401);
   assert.equal((await api('/api/appstore/brug', { sleutel: 'derden-teller', methode: 'opslag.lijst' })).status, 401);
   assert.equal((await api('/api/appstore/uitgever/inzenden', { manifest: manifest(), bestanden: bundel() })).status, 401);

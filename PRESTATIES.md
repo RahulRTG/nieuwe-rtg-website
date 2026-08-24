@@ -43,6 +43,41 @@ bedrijven; niet om een onmeetbare rekensom mooier te laten lijken. De benchmark
 houdt dit verschil zichtbaar zodat een toekomstige wijziging aantoonbaar beter
 moet zijn.
 
+## Waar het staat, alles bij elkaar
+
+De ronde van 24 augustus 2026 in één tabel: de stand van commit `3244afd` tegen
+de stand van nu, twee rondes elk, dezelfde machine, dezelfde last (2.064 echte
+routes, drie clientprocessen, 24 gelijktijdige verzoeken elk, 20 seconden) en --
+belangrijk -- dezelfde meetlat aan beide kanten.
+
+| Meter (serverkant) | Basislijn | Nu | Winst |
+|---|---:|---:|---:|
+| Doorvoer | 3.170/s | 7.885/s | **2,5x** |
+| Gemiddelde duur | 0,606 ms | 0,334 ms | 45% |
+| **p50** | 0,205 ms | 0,060 ms | **71%** |
+| **p90** | 0,42 ms | 0,15 ms | **64%** |
+| **p99** | 0,825 ms | 0,385 ms | **53%** |
+| Event-loop p99 | 29,4 ms | 22,7 ms | 23% |
+| Event-loop max | 124,5 ms | 151,4 ms | **slechter** |
+
+Die laatste regel hoort erbij te staan. De hoogst gemeten uitschieter ging
+omhoog, en dat is geen meetfout: er is nog altijd één moment waarop het volle
+journaal wordt weggeschreven (hooguit eens per twee seconden, zie hieronder), en
+bij tweeënhalf keer zoveel verzoeken zijn er ook tweeënhalf keer zoveel kansen om
+dat moment te raken. Een max is één waarneming en geen percentiel -- maar hij
+staat de goede kant op te gaan en dat is hij niet.
+
+Wat er in die twee en een half keer zit, per onderdeel:
+
+1. de lineaire scan van de router (hieronder);
+2. twee arrays die per verzoek helemaal verschoven;
+3. twee `require()`-aanroepen per verzoek die stat-syscalls deden;
+4. een dubbele lus over 329 paden per verzoek;
+5. het journaal dat bij elke schrijfactie opnieuw werd geserialiseerd.
+
+En, los daarvan maar minstens zo belangrijk: de meetlat die het verschil eerst
+niet eens kon zien.
+
 ## De verzoekketen: p50 en p99 gehalveerd, doorvoer bijna verdubbeld
 
 Gemeten op 24 augustus 2026, Linux, Node v22.22.2, met **twee servers naast

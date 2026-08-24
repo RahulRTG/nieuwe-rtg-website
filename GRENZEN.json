@@ -34,6 +34,13 @@
       "alpine",
       "status"
     ],
+    "appstore": [
+      "appstore",
+      "appstoreBrug",
+      "appstoreWinkel",
+      "codenaamVan",
+      "tenant"
+    ],
     "atelierweb": [
       "antivirus",
       "atelierweb",

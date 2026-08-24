@@ -61,6 +61,19 @@ waarde. Dezelfde regel geldt in het klein overal in deze laag: `nietAfgedwongen`
 in het contract, `nietGerekend` in een gevolgsimulatie, en een geweigerde modus
 die zegt waarom.
 
+**`APPSTORE.md` is het derdenkanaal** — hoe een app van BUITEN dit huis
+binnenkomt. Lees die vóór je aan de App Store, aan een uitgever of aan de cel
+werkt. De kern in één zin: **een App Store is geen etalage maar een poort met een
+cel erachter.** Zes begrippen (uitgever, app, versie, manifest, keuring,
+machtiging) en zes grenzen, waarvan er drie niet mogen sneuvelen: derdencode
+draait nooit op de RTG-herkomst (een naamloze cel zonder netwerk, en geen vlag
+die dat uitzet), de machinepoort keurt nooit goed (hij laat alleen door naar een
+mens van RTG, en nooit naar de uitgever zelf), en een machtiging die een lid niet
+heeft VERLEEND bestaat niet — het manifest vraagt, het lid geeft. Er zijn er drie,
+en alle drie worden ze uitgevoerd; wat er niet is, staat er met de reden. Geld is
+daar de open beslissing: alles is nu inbegrepen bij de pas, en `betalen` staat in
+`nietGebouwd` met de reden.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

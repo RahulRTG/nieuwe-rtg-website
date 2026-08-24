@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>App Store · uitgever</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; --groen:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);
+    padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.3rem;margin-top:.05rem;}
+  main{padding:1.1rem;max-width:900px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kaart h2{font-size:1.1rem;margin-bottom:.15rem;}
+  .kaart h3{font-size:.98rem;}
+  .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
+  label.vlak{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .knop:disabled{opacity:.5;cursor:default;}
+  .bev{border-left:3px solid var(--burgundy);padding:.5rem .7rem;margin-top:.45rem;background:rgba(194,58,94,.07);border-radius:0 10px 10px 0;}
+  .bev.letop{border-left-color:var(--gold);background:rgba(169,143,28,.08);}
+  .bev b{font-size:.85rem;display:block;}
+  .bev .waar{font-size:.72rem;color:var(--gold);font-variant-numeric:tabular-nums;}
+  .bev .hoe{font-size:.79rem;color:var(--muted);line-height:1.55;display:block;margin-top:.2rem;}
+  .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:7px;border:1px solid var(--line);color:var(--soft);}
+  .st.live{color:var(--groen);border-color:var(--groen);}
+  .st.wacht{color:var(--gold);border-color:var(--gold);}
+  .st.nee{color:var(--burgundy);border-color:var(--burgundy);}
+  table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:.5rem;}
+  td,th{text-align:left;padding:.35rem .3rem;border-bottom:1px solid var(--line);}
+  th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);font-weight:400;}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.6rem;}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.8rem;color:var(--gold);}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="knop stil" href="/apps/leverancier.html">← Werkplek</a>
+  <div><div class="ey">RTG App Store</div><h1>Uitgeven</h1></div>
+</header>
+
+<main id="main"><div class="kaart"><p class="sub">Bezig met laden…</p></div></main>
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+/* ============================================================================
+   DE UITGEVERSKANT -- inzenden zonder gereedschap te hoeven installeren.
+
+   Waarom deze pagina bestaat en niet alleen een API: de poort is streng, en een
+   strenge poort zonder snelle terugkoppeling is een trage poort. Hier kies je
+   je map, drukt op PROEFKEURING, en ziet per bestand en per REGEL wat er aan de
+   hand is en hoe het wel kan -- zonder dat er iets is ingezonden en zonder dat
+   de rem van twaalf inzendingen per uur eraan gaat.
+
+   Wat deze pagina met opzet NIET doet: goedkeuren. De machinepoort kan alleen
+   afkeuren of doorlaten naar een mens van RTG. Dat staat ook zo op het scherm,
+   want een groen vinkje dat "geslaagd" suggereert zou de belangrijkste stap
+   onzichtbaar maken. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3200); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { const e = new Error(d.error || 'Er ging iets mis.'); e.d = d; throw e; } return d; });
+
+const TEKST = /\.(html|js|css|json|svg|txt)$/i;
+let BUNDEL = [];   // [{ pad, inhoud, codering, bytes }]
+let STAND = null;
+
+/* De bundel uit een gekozen MAP. webkitRelativePath geeft het pad binnen die
+   map; de bovenste maplaag valt eraf, want die heet bij iedereen anders. */
+function leesBestand(f, pad){
+  return new Promise((ja, nee) => {
+    const r = new FileReader();
+    r.onerror = () => nee(new Error('Kon ' + pad + ' niet lezen.'));
+    if (TEKST.test(pad)) { r.onload = () => ja({ pad, inhoud: String(r.result), codering: 'tekst', bytes: f.size }); r.readAsText(f); }
+    else { r.onload = () => ja({ pad, inhoud: String(r.result).split(',')[1] || '', codering: 'base64', bytes: f.size }); r.readAsDataURL(f); }
+  });
+}
+async function kiesMap(input){
+  const uit = [];
+  for (const f of [...input.files]) {
+    const rel = (f.webkitRelativePath || f.name).split('/').slice(1).join('/') || f.name;
+    if (/(^|\/)\./.test(rel)) continue;                    // verborgen bestanden gaan niet mee
+    uit.push(await leesBestand(f, rel.toLowerCase()));
+  }
+  BUNDEL = uit;
+  $('#bundelStand').textContent = uit.length
+    ? uit.length + ' bestanden · ' + Math.round(uit.reduce((n, x) => n + x.bytes, 0) / 1024) + ' kB — ' + uit.map(x => x.pad).slice(0, 6).join(', ') + (uit.length > 6 ? ' …' : '')
+    : 'Nog geen map gekozen.';
+}
+
+const manifestUit = () => ({
+  sleutel: $('#mSleutel').value.trim().toLowerCase(), naam: $('#mNaam').value.trim(),
+  versie: $('#mVersie').value.trim(), uitleg: $('#mUitleg').value.trim(),
+  categorie: $('#mCategorie').value, start: $('#mStart').value.trim() || 'index.html',
+  machtigingen: [...document.querySelectorAll('input[data-mach]:checked')].map(i => i.dataset.mach)
+});
+
+function toonFouten(d){
+  const fouten = (d.fouten || []).map(f => '<div class="bev"><b>'+esc(f.veld || f.pad || 'manifest')+'</b><span class="hoe">'+esc(f.wat)+'</span></div>').join('');
+  const bev = (d.bevindingen || []).map(b => '<div class="bev'+(b.ernst === 'let-op' ? ' letop' : '')+'">'+
+      '<b>'+esc(b.wat)+'</b>'+
+      (b.bestand ? '<span class="waar">'+esc(b.bestand)+(b.regel ? ' · regel ' + b.regel : '')+'</span>' : '')+
+      '<span class="hoe">'+esc(b.hoe)+'</span></div>').join('');
+  $('#uitslag').innerHTML = (d.let ? '<p class="sub" style="margin-bottom:.5rem;">'+esc(d.let)+'</p>' : '')+
+    (d.error ? '<p class="sub" style="color:var(--burgundy);">'+esc(d.error)+'</p>' : '')+ fouten + bev ||
+    '<p class="sub">Geen bevindingen.</p>';
+}
+
+async function proef(){
+  $('#uitslag').innerHTML = '<p class="sub">De poort leest je bundel…</p>';
+  try { toonFouten(await api('/api/appstore/uitgever/proef', { manifest: manifestUit(), bestanden: BUNDEL })); }
+  catch (e) { toonFouten(e.d || { error: e.message }); }
+}
+async function inzenden(){
+  try {
+    const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifestUit(), bestanden: BUNDEL });
+    toonFouten(r); meld('Ingezonden. Een mens van RTG kijkt ernaar.'); laad();
+  } catch (e) { toonFouten(e.d || { error: e.message }); meld(e.message); }
+}
+
+function tekenAanvraag(){
+  return '<div class="kaart"><h2>Word uitgever</h2>'+
+    '<p class="sub">Je zaak hangt onder een organisatie; die organisatie wordt de uitgever. Een mens van RTG laat je toe — dat is geen formaliteit, want vanaf dat moment staat er een aanspreekbare partij achter elke app die je publiceert.</p>'+
+    '<div class="rij"><div style="flex:1;min-width:12rem;"><label class="vlak" for="uNaam">Naam waaronder je publiceert</label>'+
+      '<input class="veld" id="uNaam" style="width:100%;" maxlength="120" value="'+esc((STAND.uitgever && STAND.uitgever.naam) || STAND.organisatie || '')+'"></div>'+
+      '<div style="flex:1;min-width:12rem;"><label class="vlak" for="uContact">Contact voor RTG</label>'+
+      '<input class="veld" id="uContact" style="width:100%;" maxlength="160" placeholder="ontwikkelaars@jouwbedrijf.nl" value="'+esc((STAND.uitgever && STAND.uitgever.contact) || '')+'"></div></div>'+
+    '<div class="rij"><button class="knop" id="uVraag">'+(STAND.uitgever ? 'Bijwerken' : 'Uitgeversplek aanvragen')+'</button>'+
+      (STAND.uitgever ? '<span class="st wacht">'+esc(STAND.uitgever.status)+'</span>' : '')+
+      (STAND.uitgever && STAND.uitgever.reden ? '<span class="sub">'+esc(STAND.uitgever.reden)+'</span>' : '')+'</div></div>';
+}
+
+function tekenInzenden(){
+  const m = STAND.machtigingen.map(x =>
+    '<label style="display:flex;gap:.5rem;align-items:flex-start;margin-top:.4rem;cursor:pointer;">'+
+      '<input type="checkbox" data-mach="'+esc(x.id)+'" style="margin-top:.22rem;width:1rem;height:1rem;accent-color:#C23A5E;">'+
+      '<span style="font-size:.78rem;line-height:1.5;"><b style="display:block;">'+esc(x.id)+'</b>'+
+      '<span style="color:var(--muted);">'+esc(x.geeft)+'</span><br>'+
+      '<span style="color:var(--soft);"><b style="color:var(--gold);">Nooit:</b> '+esc(x.nooit)+'</span></span></label>').join('');
+  const niet = Object.entries(STAND.nietGebouwd).map(([k, v]) =>
+    '<div class="bev letop"><b>'+esc(k)+'</b><span class="hoe">'+esc(v)+'</span></div>').join('');
+  const b = STAND.budget;
+  return '<div class="kaart"><h2>Een versie inzenden</h2>'+
+    '<p class="sub">Alles wat je app nodig heeft zit in je eigen map: geen CDN, geen externe fonts, geen netwerk. In de cel heeft je app geen verbinding; wat je van RTG nodig hebt, vraag je met <code>RTG.roep(...)</code>. Dat script wordt er automatisch in gezet.</p>'+
+    '<div class="grid2" style="margin-top:.8rem;">'+
+      '<div><label class="vlak" for="mSleutel">Sleutel (vast)</label><input class="veld" id="mSleutel" style="width:100%;" maxlength="40" placeholder="mijn-app"></div>'+
+      '<div><label class="vlak" for="mNaam">Naam</label><input class="veld" id="mNaam" style="width:100%;" maxlength="60"></div>'+
+      '<div><label class="vlak" for="mVersie">Versie</label><input class="veld" id="mVersie" style="width:100%;" maxlength="14" placeholder="1.0.0"></div>'+
+      '<div><label class="vlak" for="mCategorie">Categorie</label><select class="veld" id="mCategorie" style="width:100%;">'+
+        ['sociaal','reizen','eten','media','geld','spelen','leven','veiligheid'].map(c => '<option>'+c+'</option>').join('')+'</select></div>'+
+      '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld" id="mStart" style="width:100%;" maxlength="80" placeholder="index.html"></div>'+
+    '</div>'+
+    '<div style="margin-top:.6rem;"><label class="vlak" for="mUitleg">Uitleg (20–260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
+      '<textarea class="veld" id="mUitleg" style="width:100%;min-height:4.4rem;" maxlength="260"></textarea></div>'+
+    '<div style="margin-top:.8rem;"><span class="vlak">Wat je vraagt</span>'+m+'</div>'+
+    '<div style="margin-top:.9rem;"><label class="vlak" for="mMap">Je bundel (kies de map van je app)</label>'+
+      '<input class="veld" type="file" id="mMap" webkitdirectory directory multiple style="width:100%;">'+
+      '<p class="sub" id="bundelStand" style="margin-top:.35rem;">Nog geen map gekozen.</p>'+
+      '<p class="sub">Budget: '+b.bestanden+' bestanden, '+Math.round(b.totaal/1024)+' kB totaal, '+Math.round(b.script/1024)+' kB scriptcode, '+Math.round(b.stijl/1024)+' kB stijl. Het budget is een poort en geen meter achteraf: te zwaar komt er niet in.</p></div>'+
+    '<div class="rij"><button class="knop stil" id="bProef">Proefkeuring</button><button class="knop" id="bIn">Inzenden</button></div>'+
+    '<div id="uitslag" style="margin-top:.7rem;"></div></div>'+
+    '<div class="kaart"><h3>Wat je niet kunt vragen, en waarom</h3><p class="sub">Dit is geen routekaart maar het antwoord vooraf: een regel hier verdwijnt pas als de brug hem uitvoert.</p>'+niet+'</div>';
+}
+
+function tekenApps(){
+  if (!STAND.apps.length) return '';
+  return '<div class="kaart"><h2>Je apps</h2>'+ STAND.apps.map(a =>
+    '<div style="border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;">'+
+      '<div class="rij" style="margin-top:0;"><h3 style="flex:1;">'+esc(a.naam)+'</h3>'+
+        (a.live ? '<span class="st live">live · '+esc(a.live.versie)+'</span><button class="knop stil aTrek" data-s="'+esc(a.sleutel)+'">Intrekken</button>'
+                : '<span class="st nee">niet live</span>')+'</div>'+
+      (a.ingetrokken ? '<p class="sub">Ingetrokken door '+esc(a.ingetrokken.door)+(a.ingetrokken.reden ? ': '+esc(a.ingetrokken.reden) : '')+'</p>' : '')+
+      '<table><tr><th>versie</th><th>stand</th><th>hash</th><th>ingezonden</th><th>besluit</th></tr>'+
+      a.versies.map(v => '<tr><td>'+esc(v.versie)+'</td><td>'+esc(v.status)+'</td><td><code>'+esc(v.hash.slice(0,12))+'</code></td>'+
+        '<td>'+esc(String(v.at).slice(0,16).replace('T',' '))+'</td>'+
+        '<td>'+(v.besluit ? esc(v.besluit.door)+(v.besluit.reden ? ' — '+esc(v.besluit.reden) : '') : '—')+'</td></tr>').join('')+
+      '</table></div>').join('')+'</div>';
+}
+
+async function laad(){
+  if (!TOKEN) { $('#main').innerHTML = '<div class="kaart"><h2>Log eerst in</h2><p class="sub">Deze pagina hoort bij je RTG-werkplek. <a href="/apps/leverancier.html">Naar de werkplek →</a></p></div>'; return; }
+  let d;
+  try { d = await api('/api/appstore/uitgever'); }
+  catch (e) { $('#main').innerHTML = '<div class="kaart"><h2>Nog geen uitgever</h2><p class="sub">'+esc(e.message)+'</p></div>'; return; }
+  STAND = d;
+  const toegelaten = d.uitgever && d.uitgever.status === 'toegelaten';
+  $('#main').innerHTML =
+    '<div class="kaart"><h2>'+esc(d.organisatie || d.org)+'</h2>'+
+      '<p class="sub">Organisatie <code>'+esc(d.org)+'</code> · '+(d.uitgever ? 'uitgeversplek: '+esc(d.uitgever.status) : 'nog geen uitgeversplek')+'</p></div>'+
+    (toegelaten ? '' : tekenAanvraag()) + (toegelaten ? tekenInzenden() : '') + tekenApps();
+
+  const vraag = $('#uVraag');
+  if (vraag) vraag.addEventListener('click', async () => {
+    try { await api('/api/appstore/uitgever/aanvraag', { naam: $('#uNaam').value, contact: $('#uContact').value }); meld('Aangevraagd. Een mens van RTG kijkt ernaar.'); laad(); }
+    catch (e) { meld(e.message); }
+  });
+  const map = $('#mMap');
+  if (map) map.addEventListener('change', () => kiesMap(map).catch(e => meld(e.message)));
+  if ($('#bProef')) $('#bProef').addEventListener('click', proef);
+  if ($('#bIn')) $('#bIn').addEventListener('click', inzenden);
+  document.querySelectorAll('.aTrek').forEach(b => b.addEventListener('click', async () => {
+    try { await api('/api/appstore/uitgever/intrekken', { sleutel: b.dataset.s, reden: 'ingetrokken door de uitgever' }); meld('Ingetrokken — ook bij de leden die hem al hadden.'); laad(); }
+    catch (e) { meld(e.message); }
+  }));
+}
+laad();
+</script>
+</body>
+</html>

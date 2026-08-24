@@ -44,5 +44,14 @@ module.exports = {
   '/apps/vandaag.html': G('Vandaag: uw korte dagbriefing en de snelste ingang naar de software die nu nodig is.',
     ['Lees de briefing van Rahul', 'Open een voorstel of vraag in gewone taal om een andere app',
       'Zet een tweede werkblad ernaast wanneer twee onderwerpen bij dezelfde beslissing horen'],
-    'Vandaag is een regiescherm: de bronapp blijft de plek waar gegevens worden gewijzigd of een handeling definitief wordt uitgevoerd.')
+    'Vandaag is een regiescherm: de bronapp blijft de plek waar gegevens worden gewijzigd of een handeling definitief wordt uitgevoerd.'),
+  '/apps/appcel.html': G('Een app van een andere partij, die draait in een afgeschermde cel binnen RTG.',
+    ['Lees bovenaan van wie deze app is', 'Druk op "Wat mag deze app?" om te zien wat je hem hebt gegeven',
+      'Neem een machtiging terug wanneer je wilt; de app blijft werken met wat er overblijft'],
+    'Deze app heeft geen verbinding met de buitenwereld en ziet nooit je echte naam of je e-mailadres -- alleen je codenaam, en alleen als je dat hebt verleend.'),
+  '/apps/appstore-uitgever.html': G('Het uitgeversbureau: hier zendt uw organisatie een eigen app in voor de RTG App Store.',
+    ['Vraag eerst een uitgeversplek aan; een mens van RTG laat u toe',
+      'Kies de map van uw app en druk op Proefkeuring -- u ziet per bestand en per regel wat er nog niet kan',
+      'Zend in wanneer de proef doorkomt; daarna kijkt een mens van RTG naar wat uw app doet'],
+    'De machinepoort keurt nooit goed: hij kan alleen afkeuren of doorlaten naar een mens. Vraag alleen de machtigingen die u echt gebruikt -- elke machtiging is een vinkje dat een lid kan weglaten.')
 };

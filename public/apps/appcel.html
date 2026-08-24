@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>App Store · cel</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{flex:0 0 auto;background:var(--bg);border-bottom:1px solid var(--line);
+    padding:calc(env(safe-area-inset-top) + .8rem) 1.1rem .7rem;display:flex;align-items:center;gap:.8rem;}
+  header .wie{min-width:0;flex:1;}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.1rem;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  header .van{font-size:.72rem;color:var(--soft);margin-top:.1rem;}
+  .knop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;
+    padding:.42rem .75rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;white-space:nowrap;min-height:2.5rem;
+    display:inline-flex;align-items:center;justify-content:center;}
+  .knop.aan{background:var(--txt);color:#000;border-color:var(--txt);font-weight:600;}
+  .cel{flex:1 1 auto;min-height:0;position:relative;background:var(--bg);}
+  .cel iframe{width:100%;height:100%;border:0;display:block;background:#fff;}
+  .paneel{position:absolute;inset:0;background:rgba(12,12,11,.94);backdrop-filter:blur(6px);overflow:auto;
+    padding:1.2rem;display:none;}
+  .paneel[data-open="1"]{display:block;}
+  .paneel .binnen{max-width:640px;margin:0 auto;}
+  .paneel h2{font-size:1.2rem;margin-bottom:.2rem;}
+  .paneel .sub{font-size:.8rem;color:var(--soft);line-height:1.6;margin-bottom:1rem;}
+  .m{border:1px solid var(--line);border-radius:14px;padding:.85rem 1rem;margin-bottom:.6rem;background:var(--card);}
+  .m label{display:flex;gap:.7rem;align-items:flex-start;cursor:pointer;}
+  .m input{margin-top:.25rem;width:1.1rem;height:1.1rem;flex:0 0 auto;accent-color:#C23A5E;}
+  .m b{display:block;font-size:.92rem;}
+  .m .geeft{font-size:.78rem;color:var(--muted);line-height:1.55;display:block;margin-top:.2rem;}
+  .m .nooit{font-size:.76rem;color:var(--soft);line-height:1.55;display:block;margin-top:.3rem;}
+  .m .nooit b{display:inline;color:var(--gold);font-weight:600;}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
+  .leeg{color:var(--soft);font-size:.85rem;line-height:1.6;padding:2rem 1.2rem;text-align:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="knop" href="/apps/mall.html#appstore" id="terug">← Store</a>
+  <div class="wie">
+    <div class="ey">App Store · van derden</div>
+    <h1 id="naam">Bezig met openen…</h1>
+    <div class="van" id="van"></div>
+  </div>
+  <button class="knop" id="watMag" type="button" aria-expanded="false">Wat mag deze app?</button>
+</header>
+
+<div class="cel">
+  <div id="frameWrap" style="height:100%;"></div>
+  <div class="paneel" id="paneel" role="dialog" aria-label="Wat mag deze app">
+    <div class="binnen">
+      <h2>Wat mag deze app?</h2>
+      <p class="sub" id="paneelSub"></p>
+      <div id="lijst"></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;">
+        <button class="knop aan" id="bewaar" type="button">Bewaren</button>
+        <button class="knop" id="sluit" type="button">Sluiten</button>
+        <button class="knop" id="weg" type="button">App verwijderen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+/* ============================================================================
+   DE CELPAGINA -- de RTG-kant van een app van derden.
+
+   Deze pagina doet precies twee dingen, en met opzet niet meer:
+
+     1. Hij hangt de app in een IFRAME met sandbox="allow-scripts", en met
+        NIETS ERBIJ. Zonder de vlag die dezelfde herkomst teruggeeft, krijgt dat
+        document een NAAMLOZE herkomst: geen cookies, geen localStorage van RTG,
+        geen document van deze pagina, geen sessie. Dat is geen afscherming van
+        ons maar een oordeel van de browser, en daarom is het het sterkste slot
+        dat er is.
+     2. Hij is de BRUG. Een bericht uit de cel wordt hier een gewone,
+        ingelogde API-aanroep -- en de server kijkt daarbij naar wat het lid
+        heeft VERLEEND, niet naar wat de app vroeg.
+
+   Waarom er met targetOrigin '*' wordt teruggepraat: een naamloze herkomst
+   HEEFT geen naam om op te richten. De echtheidscontrole zit daarom aan de
+   andere kant van de gelijkheid -- e.source moet het venster zijn dat wij zelf
+   hebben gemaakt -- en er gaat niets naartoe wat niet uit een aanroep van die
+   cel zelf voortkomt. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const SLEUTEL = (() => { try { return new URLSearchParams(location.search).get('app') || ''; } catch (e) { return ''; } })();
+let frame = null, STAND = null;
+
+function toon(t, sub){ $('#frameWrap').innerHTML = '<div class="leeg">'+esc(t)+(sub?'<br><br>'+esc(sub):'')+'</div>'; }
+
+async function open(){
+  if (!TOKEN) return toon('Log eerst in.', 'Deze app hoort bij je RTG-account; open de app en log in.');
+  if (!SLEUTEL) return toon('Er is geen app gekozen.', 'Ga terug naar de App Store en kies er een.');
+  let d;
+  try { d = await api('/api/appstore/open', { sleutel: SLEUTEL }); }
+  catch (e) { $('#naam').textContent = 'Niet beschikbaar'; return toon(e.message); }
+  STAND = d;
+  $('#naam').textContent = d.naam;
+  $('#van').textContent = 'versie ' + d.versie + (d.uitgever ? ' · van ' + d.uitgever.naam : '');
+  document.title = d.naam + ' · App Store';
+
+  /* De iframe wordt met createElement gemaakt en niet met innerHTML: zo staat
+     de sandbox-lijst hier als EEN waarde op EEN regel, en niet als een stuk
+     tekst dat iemand later per ongeluk aanvult. Er hoort maar een vlag in te
+     staan; elke vlag erbij geeft de cel iets terug wat hij niet hoort te
+     hebben, en test/appstore-cel.test.js zakt daarop. */
+  const f = document.createElement('iframe');
+  f.setAttribute('sandbox', 'allow-scripts');
+  f.setAttribute('referrerpolicy', 'no-referrer');
+  f.setAttribute('title', d.naam + ' — een app van ' + (d.uitgever ? d.uitgever.naam : 'een derde partij'));
+  f.src = d.start;
+  $('#frameWrap').innerHTML = '';
+  $('#frameWrap').appendChild(f);
+  frame = f;
+}
+
+/* De brug. Alles wat hier binnenkomt komt uit de cel; alles wat eruit gaat is
+   het antwoord van de server op precies die aanroep. */
+window.addEventListener('message', async (e) => {
+  if (!frame || e.source !== frame.contentWindow) return;
+  const d = e.data;
+  if (!d || d.rtgcel !== 1 || typeof d.nr !== 'number') return;
+  const stuur = (uit) => { try { frame.contentWindow.postMessage(Object.assign({ rtgcel: 1, nr: d.nr }, uit), '*'); } catch (x) {} };
+  try {
+    const r = await api('/api/appstore/brug', { sleutel: SLEUTEL, methode: d.methode, args: d.args, taal: document.documentElement.lang || 'nl' });
+    stuur({ uit: r.uit });
+  } catch (err) { stuur({ error: err.message }); }
+}, false);
+
+/* ---------- wat mag deze app: zien, bijstellen, intrekken ---------- */
+function tekenPaneel(){
+  const alles = STAND ? STAND.verleend : [];
+  $('#paneelSub').textContent = alles.length
+    ? 'Dit heb je deze app gegeven. Vink uit wat je terugneemt; de app blijft gewoon werken met wat er overblijft.'
+    : 'Je hebt deze app niets gegeven. Hij werkt, maar hij ziet niets van jou.';
+  $('#lijst').innerHTML = (STAND && STAND.verleend.length ? STAND.verleend : []).map(m =>
+    '<div class="m"><label><input type="checkbox" checked value="'+esc(m.id)+'">'+
+    '<span><b>'+esc(m.label)+'</b>'+
+    '<span class="geeft">Geeft: '+esc(m.geeft)+'</span>'+
+    '<span class="nooit"><b>Nooit:</b> '+esc(m.nooit)+'</span></span></label></div>').join('')
+    || '<div class="m" style="color:var(--soft);font-size:.85rem;line-height:1.6;">Niets verleend.</div>';
+}
+$('#watMag').addEventListener('click', () => {
+  const p = $('#paneel'), aan = p.getAttribute('data-open') === '1';
+  p.setAttribute('data-open', aan ? '0' : '1');
+  $('#watMag').setAttribute('aria-expanded', aan ? 'false' : 'true');
+  if (!aan) tekenPaneel();
+});
+$('#sluit').addEventListener('click', () => { $('#paneel').setAttribute('data-open','0'); $('#watMag').setAttribute('aria-expanded','false'); });
+$('#bewaar').addEventListener('click', async () => {
+  const houd = [...$('#lijst').querySelectorAll('input:checked')].map(i => i.value);
+  try {
+    const r = await api('/api/appstore/verleen', { sleutel: SLEUTEL, machtigingen: houd });
+    STAND.verleend = r.verleend;
+    meld(r.ingetrokken.length ? r.ingetrokken.length + ' ingetrokken. De app merkt dat meteen.' : 'Bewaard.');
+    $('#paneel').setAttribute('data-open','0'); $('#watMag').setAttribute('aria-expanded','false');
+  } catch (e) { meld(e.message); }
+});
+$('#weg').addEventListener('click', async () => {
+  try { await api('/api/appstore/weg', { sleutel: SLEUTEL }); location.href = '/apps/mall.html#appstore'; }
+  catch (e) { meld(e.message); }
+});
+
+open();
+</script>
+</body>
+</html>

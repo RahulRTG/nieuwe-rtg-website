@@ -173,6 +173,7 @@
   <div class="deel">Ontdekken</div>
   <div id="biebKop"></div>
   <div id="appbieb"></div>
+  <div id="appstore"></div>
   <div id="reisbieb"></div>
   <div id="rtfbieb"></div>
 </div>
@@ -216,7 +217,7 @@ if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
-} else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadReisbieb(); laadRtfbieb(); }
+} else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadAppstore(); laadReisbieb(); laadRtfbieb(); }
 
 /* ---------- De vindlaag: locatie en intentie eerst ----------
    De Mall is de commerciele voorkant van heel RTG: reizen, verblijven, eten,
@@ -558,6 +559,93 @@ async function tekenApps(){
     }));
     grid.querySelectorAll('.abweg').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/mall/apps/weg', { id: b.dataset.id }); meld('Verwijderd.'); tekenApps(); }
+      catch(e){ meld(e.message); }
+    }));
+  } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+
+/* ---------- De App Store: apps van DERDEN ----------
+   Een eigen afdeling en niet een rijtje in de App-Bibliotheek erboven, en dat
+   is een besluit en geen indeling. De Bibliotheek is van RTG: elke tegel opent
+   een pagina die wij hebben gebouwd. Dit is van iemand anders, en dat hoort een
+   lid te zien VOORDAT hij iets verleent -- niet erna in een detailscherm.
+
+   Installeren is hier ook iets anders. Bij de Bibliotheek zet je een app op je
+   startscherm; hier GEEF je iets weg, per machtiging, met een vinkje. Daarom
+   staat wat een app krijgt EN wat hij nooit krijgt op de kaart zelf.
+   Zie APPSTORE.md. */
+const AS = { zoek: '', pagina: 1, mijn: false };
+async function laadAppstore(){
+  $('#appstore').innerHTML =
+    '<div class="etage" id="appstoreEtage"><div class="etage-kop"><h2>App Store</h2>'+
+    '<span class="n">apps van derden · gekeurd door een mens van RTG · jij bepaalt wat ze mogen</span></div>'+
+    '<div class="rij" style="margin-bottom:.7rem;">'+
+      '<input id="asZoek" class="veld" style="flex:1;min-width:10rem;" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
+      '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
+    '</div><div id="asGrid"></div><div class="rij" id="asBlader" style="justify-content:center;"></div></div>';
+  let zt; $('#asZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AS.zoek = $('#asZoek').value; AS.pagina = 1; AS.mijn = false; tekenStore(); }, 300); });
+  $('#asMijn').addEventListener('click', () => { AS.mijn = !AS.mijn; AS.pagina = 1; tekenStore(); });
+  tekenStore();
+}
+function storeKaart(a){
+  /* De vinkjes staan op de kaart en niet achter een tweede scherm: een
+     toestemming die je pas ziet nadat je hebt gedrukt, is geen keuze. Wat de
+     app NOOIT krijgt staat er even groot bij; een scherm dat alleen zegt wat er
+     wel gebeurt, is een verkooppraatje. */
+  const vinkjes = a.vraagt.map(m =>
+    '<label class="asm" style="display:flex;gap:.5rem;align-items:flex-start;margin-top:.4rem;cursor:pointer;">'+
+      '<input type="checkbox" data-m="'+esc(m.id)+'"'+(a.geinstalleerd ? (a.verleend.some(v => v.id === m.id) ? ' checked' : '') : ' checked')+
+        ' style="margin-top:.22rem;width:1rem;height:1rem;flex:0 0 auto;accent-color:#C23A5E;">'+
+      '<span style="font-size:.76rem;line-height:1.5;"><b style="display:block;">'+esc(m.label)+'</b>'+
+        '<span style="color:var(--muted);">Geeft: '+esc(m.geeft)+'</span><br>'+
+        '<span style="color:var(--soft);"><b style="color:var(--gold);">Nooit:</b> '+esc(m.nooit)+'</span></span></label>').join('')
+    || '<div style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">Deze app vraagt niets van je.</div>';
+  return '<div class="boutiek" style="cursor:default;" data-sleutel="'+esc(a.sleutel)+'">'+
+    '<span class="stad">van '+esc(a.uitgever ? a.uitgever.naam : 'een derde partij')+'</span>'+
+    '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
+    '<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>'+
+    '<div style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.4rem;">'+
+      '<span style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Wat je geeft</span>'+
+      vinkjes+'</div>'+
+    '<div class="rij" style="margin-top:.6rem;gap:.4rem;align-items:center;">'+
+      '<b style="color:var(--gold);font-size:.8rem;">Inbegrepen</b><span class="h-flex1"></span>'+
+      (a.geinstalleerd
+        ? '<a class="knop stil" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'" style="text-decoration:none;">Openen</a>'+
+          '<button class="knop stil asZet" type="button">Bijwerken</button>'+
+          '<button class="knop stil asWeg" type="button">Verwijderen</button>'
+        : '<button class="knop asZet" type="button">Op mijn startscherm</button>')+
+    '</div></div>';
+}
+async function tekenStore(){
+  const grid = $('#asGrid'), blader = $('#asBlader');
+  $('#asMijn').classList.toggle('aan', AS.mijn);
+  try {
+    let items = [], d = null;
+    if (AS.mijn) { items = (await api('/api/appstore/mijn')).apps; blader.innerHTML = ''; }
+    else { d = await api('/api/appstore/catalogus', { zoek: AS.zoek, pagina: AS.pagina }); items = d.items; }
+    grid.innerHTML = items.length ? '<div class="boutieks">'+items.map(storeKaart).join('')+'</div>'
+      : '<div class="leeg">'+(AS.mijn
+          ? 'Je hebt nog geen apps van derden. Blader hierboven en kies zelf wat je een app geeft.'
+          : 'Er staat nog geen app van een derde in de store. Elke app hier is door een mens van RTG bekeken voordat hij verschijnt; zolang er geen doorheen is, blijft dit leeg.')+'</div>';
+    if (d && d.paginas > 1) {
+      blader.innerHTML = '<button class="knop stil" id="asVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        '<span class="bladtel">pagina '+d.pagina+' van '+d.paginas+' · '+d.totaal+' apps</span>'+
+        '<button class="knop stil" id="asVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>';
+      const v = $('#asVorig'), n = $('#asVolgend');
+      if (v) v.addEventListener('click', () => { AS.pagina--; tekenStore(); });
+      if (n) n.addEventListener('click', () => { AS.pagina++; tekenStore(); });
+    } else if (d) blader.innerHTML = '';
+    grid.querySelectorAll('.asZet').forEach(b => b.addEventListener('click', async () => {
+      const kaart = b.closest('.boutiek'), sleutel = kaart.dataset.sleutel;
+      const gekozen = [...kaart.querySelectorAll('input[data-m]:checked')].map(i => i.dataset.m);
+      const nieuw = b.textContent.indexOf('startscherm') !== -1;
+      try {
+        const r = await api(nieuw ? '/api/appstore/installeer' : '/api/appstore/verleen', { sleutel, machtigingen: gekozen });
+        meld(r.let || 'Bijgewerkt.'); tekenStore();
+      } catch(e){ meld(e.message); }
+    }));
+    grid.querySelectorAll('.asWeg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/appstore/weg', { sleutel: b.closest('.boutiek').dataset.sleutel }); meld('Verwijderd.'); tekenStore(); }
       catch(e){ meld(e.message); }
     }));
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }

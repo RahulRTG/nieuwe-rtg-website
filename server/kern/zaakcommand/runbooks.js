@@ -35,6 +35,28 @@ const s = (v) => (v == null ? '' : String(v));
    deze twee paren blijven kloppen met de bron. */
 const RIT_OUD = { rijdt: 'aan-boord', gearriveerd: 'afgerond' };
 
+/* HET CERTIFICAAT VAN EEN ZAAK-RECEPT, en waarom de getallen hier LAGER staan
+   dan aan de RTG-kant. `maxObjecten` zegt hoe groot een recept ooit beproefd
+   is, en de schaal van een zaak is de schaal van EEN onderneming: honderd
+   bestellingen ineens rechtzetten is bij RTG een ronde over de hele vloot en
+   bij een restaurant een halve maand omzet. Wie het getal wil verhogen, hoort
+   dat te doen nadat hij het op die schaal heeft zien draaien -- niet omdat de
+   voorcontrole in de weg zat.
+
+   Alle vier krijgen `oorzaak-weg` erbij en niet alleen `veld-staat-op-doel`.
+   Bij administratieve drift is dat juist de scherpe controle: staat het veld op
+   de bedoelde waarde maar geldt de aanleiding nog steeds, dan was de afwijking
+   geen drift maar iets wat zichzelf opnieuw maakt -- en dan zet dit recept elke
+   ronde hetzelfde weer recht zonder dat iemand de oorzaak ziet.
+
+   `terugweg: 'automatisch'` mag hier omdat alle vier terugDraaibaar zijn en
+   alle vier alleen een STATUSVELD raken. Bij een recept dat een bedrag of een
+   recht zou aanraken hoort dit niet -- maar die bestaan hier niet en mogen hier
+   ook niet komen: command/runbooks.js/BEVROREN houdt dat tegen, en deze
+   catalogus draait door diezelfde motor. */
+const CERT = (max) => ({ versie: 1, maxObjecten: max, terugweg: 'automatisch',
+  verificaties: ['veld-staat-op-doel', 'oorzaak-weg'] });
+
 const RUNBOOKS = [
   { id: 'bestelling-stations-klaar', naam: 'Bestelling afronden die al klaar is',
     wat: 'Alle stations melden "klaar", maar de bestelling zelf staat nog op "nieuw" of "in bereiding". De status loopt achter op wat de keuken al heeft gedaan.',
@@ -48,7 +70,7 @@ const RUNBOOKS = [
       return namen.every(n => s(st[n]) === 'klaar');
     },
     actie: 'melding sluiten', oorzaak: 'status loopt achter op de stations',
-    terugDraaibaar: true, klantImpact: false },
+    terugDraaibaar: true, klantImpact: false, certificaat: CERT(25) },
 
   { id: 'rit-oude-statusnaam', naam: 'Oude ritstatus omzetten',
     wat: 'Een rit draagt nog een statusnaam van vóór de huidige keten ("rijdt", "gearriveerd"). Hij wordt omgezet naar de naam die de keten nu gebruikt; er verandert niets aan de rit zelf.',
@@ -56,7 +78,9 @@ const RUNBOOKS = [
     naarVoor: r => RIT_OUD[s(r.status)] || null,
     past: r => !!RIT_OUD[s(r && r.status)],
     actie: 'melding sluiten', oorzaak: 'statusnaam van vóór de huidige keten',
-    terugDraaibaar: true, klantImpact: false },
+    /* 50 en niet meer: een oude statusnaam over honderden ritten omzetten is
+       geen herstel maar een migratie, en die hoort een mens te plannen. */
+    terugDraaibaar: true, klantImpact: false, certificaat: CERT(50) },
 
   { id: 'boeking-verlopen-afronden', naam: 'Verlopen boeking afronden',
     wat: 'Een bevestigde boeking waarvan de datum meer dan een dag voorbij is, staat nog open. Hij wordt afgerond zodat de lijst de werkelijkheid volgt.',
@@ -69,14 +93,14 @@ const RUNBOOKS = [
       return Number.isFinite(t) && t < Date.now() - 86400000;
     },
     actie: 'melding sluiten', oorzaak: 'boeking is verlopen maar nog open',
-    terugDraaibaar: true, klantImpact: false },
+    terugDraaibaar: true, klantImpact: false, certificaat: CERT(50) },
 
   { id: 'klus-opgelost-sluiten', naam: 'Opgeloste klus sluiten',
     wat: 'Een klus die als opgelost is gemarkeerd maar nog niet is afgesloten.',
     type: 'klus', veld: 'status', naar: 'klaar',
     past: r => ['opgelost', 'afgehandeld', 'gereed'].includes(s(r && r.status)),
     actie: 'melding sluiten', oorzaak: 'klus is opgelost maar staat nog open',
-    terugDraaibaar: true, klantImpact: false }
+    terugDraaibaar: true, klantImpact: false, certificaat: CERT(50) }
 ];
 
 const OP_ID = new Map(RUNBOOKS.map(r => [r.id, r]));

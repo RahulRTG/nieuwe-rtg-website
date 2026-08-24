@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-24",
   "gemeten": {
-    "bestanden": 1470,
-    "vormen": 1150,
-    "velden": 1672,
-    "modules": 587,
+    "bestanden": 1497,
+    "vormen": 1159,
+    "velden": 1696,
+    "modules": 594,
     "domeinen": 216,
     "envelopDrempel": 13,
     "envelop": 35,
-    "veldenDomeineigen": 1184,
-    "veldenGedeeldVanafVier": 155,
+    "veldenDomeineigen": 1202,
+    "veldenGedeeldVanafVier": 156,
     "gelijkendeVormparen": 16
   },
   "envelop": [
@@ -208,6 +208,18 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/mailwachtrij",
+        "kern/postdatum",
+        "kern/rtfos",
+        "kern/rtmail"
+      ]
+    },
+    {
       "veld": "niveau",
       "domeinen": 10,
       "waar": [
@@ -349,18 +361,6 @@
         "kern/mailsleutel",
         "kern/mailwachtrij",
         "kern/ontmoeting"
-      ]
-    },
-    {
-      "veld": "onderwerp",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/mailwachtrij",
-        "kern/postdatum",
-        "kern/rtfos",
-        "kern/rtmail",
-        "kern/rtmail-bewaar"
       ]
     },
     {
@@ -541,6 +541,7 @@
       "domeinB": "kern/zaakcommand",
       "gedeeld": [
         "actie",
+        "certificaat",
         "klantImpact",
         "oorzaak",
         "past",
@@ -589,13 +590,14 @@
       ]
     },
     {
-      "gelijkenis": 0.86,
+      "gelijkenis": 0.88,
       "a": "server/kern/command/runbookcatalogus.js",
       "b": "server/kern/zaakcommand/runbooks.js",
       "domeinA": "kern/command",
       "domeinB": "kern/zaakcommand",
       "gedeeld": [
         "actie",
+        "certificaat",
         "klantImpact",
         "oorzaak",
         "past",

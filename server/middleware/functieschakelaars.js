@@ -15,35 +15,9 @@
    staan. Anders zou elk verzoek een opzoeking kosten voor een regel die er
    niet is. */
 
-/* Landcode van een lid voor de "per land"-regels: het bij registratie gekozen
-   land wint, anders leiden we het af uit de nationaliteit op het geverifieerde
-   paspoort (bijvoorbeeld "Duitse" -> DE). */
-function natieNaarLand(nat) {
-  const s = String(nat || '').toLowerCase();
-  if (!s) return null;
-  if (/nederland|dutch|holland/.test(s)) return 'NL';
-  if (/belg/.test(s)) return 'BE';
-  if (/duits|german|deutsch/.test(s)) return 'DE';
-  if (/frans|french|franc/.test(s)) return 'FR';
-  if (/spaan|spanish|espa/.test(s)) return 'ES';
-  if (/japan/.test(s)) return 'JP';
-  return null;
-}
+const { natieNaarLand, ZIN } = require('./functieschakelaars-tekst');
 
-const ZIN = {
-  globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
-  pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
-  land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
-  plaats: 'Deze functie is in jouw woonplaats uitgeschakeld door de beheerder.',
-  persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
-  genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.',
-  /* De canary is geen storing en geen straf: de functie wordt uitgerold en is
-     nog niet aan iedereen toe. Dat hoort er ook zo te staan -- "uitgeschakeld
-     door de beheerder" zou een supportvraag opleveren die nergens over gaat. */
-  canary: 'Deze functie wordt stap voor stap uitgerold en staat nog niet voor iedereen open.'
-};
-
-function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter, bevoegdVan }) {
+function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter, bevoegdVan, beschermstand }) {
   return (req, res, next) => {
     const p = req.path;
     if (!p.startsWith('/api/')) return next();
@@ -106,6 +80,21 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
             });
           }
         }
+      }
+    }
+
+    /* DE VEILIGE NOODSTAND (kern/beschermstand.js). Hij staat BOVEN de snelle
+       uitgang hieronder, want die slaat alles over zolang er nog nooit iets
+       geschakeld is -- en juist dan hoort een noodstand te werken. Hij hangt
+       ook niet aan een schakelaarstand: deze stand zet met opzet geen enkele
+       functie om, zodat opheffen geen herstelactie is maar het wegnemen van een
+       vlag. Zie kern/incidentcontrole-bescherm.js. */
+    const ic = db.data && db.data.techniek && db.data.techniek.incidentcontrole;
+    if (beschermstand && ic && ic.modus === 'beschermd') {
+      const houd = beschermstand.houdtTegen(p, req.method);
+      if (houd) {
+        return res.status(503).json({ error: ZIN.bescherming, functie: houd.functie, naam: houd.naam,
+          reden: 'bescherming', categorie: houd.categorie, waarom: houd.waarom });
       }
     }
 

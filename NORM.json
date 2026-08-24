@@ -32,12 +32,12 @@
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
     "staatOngeregistreerd": 0,
-    "staatOnbekend": 43,
+    "staatOnbekend": 0,
     "duurOpWandklok": 29,
-    "staatProcesgebonden": 92,
+    "staatProcesgebonden": 84,
     "datamapVastgeklonken": 11,
-    "bewijsOnbekend": 171,
-    "bewijsVerlopen": 874
+    "bewijsOnbekend": 156,
+    "bewijsVerlopen": 820
   },
   "notities": [
     {

@@ -666,7 +666,7 @@
       "gezakt": 1,
       "geprobeerd": 4,
       "toetsSha": "ed0e6a6c03a4",
-      "moduleSha": "c56dbcf7f7e4"
+      "moduleSha": "9f96278694ce"
     },
     "bewijsmatrix.test.js": {
       "soort": "puur",
@@ -792,7 +792,7 @@
       "gezakt": 10,
       "geprobeerd": 1,
       "toetsSha": "2b05255a7b34",
-      "moduleSha": "e2a09a438fb5"
+      "moduleSha": "ed7e61b411e5"
     },
     "bronblind.test.js": {
       "soort": "puur",
@@ -1057,7 +1057,8 @@
         "server/kern/comm/index.js"
       ],
       "geprobeerd": 5,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "9559f22d5d8d"
     },
     "comm-dm.test.js": {
       "soort": "puur",
@@ -1161,7 +1162,8 @@
         "server/kern/consent.js"
       ],
       "geprobeerd": 23,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "9e501c8a5d62"
     },
     "consent.test.js": {
       "soort": "server",
@@ -1318,7 +1320,9 @@
       "module": "server/opzet/routes.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "5833041ee25a",
+      "moduleSha": "71eb64942616"
     },
     "domeingrens.test.js": {
       "soort": "puur",
@@ -1326,7 +1330,9 @@
       "module": "server/opzet/domeingrens.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "a3a31ce14090",
+      "moduleSha": "b1960d4b50f6"
     },
     "doorgeefjournaal.test.js": {
       "soort": "server",
@@ -1339,8 +1345,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/zaakdoos/index.js",
-      "operator": "true->false",
-      "gezakt": 2
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "toetsSha": "db93a0e547f0",
+      "moduleSha": "9ad6a004af49"
     },
     "doos-regie.test.js": {
       "soort": "server",
@@ -1353,8 +1362,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/drie.js",
-      "operator": "!==->===",
-      "gezakt": 9
+      "operator": "!==->===#0",
+      "gezakt": 9,
+      "geprobeerd": 1,
+      "toetsSha": "5327427352f7",
+      "moduleSha": "3b9884a9c9bf"
     },
     "drm.test.js": {
       "soort": "server",
@@ -1388,7 +1400,9 @@
       "module": "scripts/duurzaamheidskosten.js",
       "operator": "return-weg#0",
       "gezakt": 1,
-      "geprobeerd": 6
+      "geprobeerd": 6,
+      "toetsSha": "83962b688024",
+      "moduleSha": "df3425cd9a66"
     },
     "dyncode-e2e.test.js": {
       "soort": "server",
@@ -1401,8 +1415,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/dyncode.js",
-      "operator": "!==->===",
-      "gezakt": 2
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "toetsSha": "bfb12abb31b8",
+      "moduleSha": "c22ae0b52c51"
     },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",
@@ -1480,7 +1497,8 @@
         "server/meting-lus.js"
       ],
       "geprobeerd": 18,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "d8305d1ca886"
     },
     "excursie.test.js": {
       "soort": "server",
@@ -1574,8 +1592,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/log.js",
-      "operator": "&&->||",
-      "gezakt": 2
+      "operator": "&&->||#0",
+      "gezakt": 3,
+      "geprobeerd": 3,
+      "toetsSha": "3f69bf8cba13",
+      "moduleSha": "49dda79cc003"
     },
     "fout-client-route.test.js": {
       "soort": "server",
@@ -1595,8 +1616,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/foutmelder.js",
-      "operator": "===->!==",
-      "gezakt": 3
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "toetsSha": "3aff924ea93e",
+      "moduleSha": "bd03689439ca"
     },
     "functieplaats.test.js": {
       "soort": "server",
@@ -1696,7 +1720,9 @@
       "module": "scripts/lib/geenlek.js",
       "operator": "getal+1#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "935299290d78",
+      "moduleSha": "2ee77afd4957"
     },
     "gegevenspoort.test.js": {
       "soort": "server",
@@ -1709,8 +1735,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/db/geheugen.js",
-      "operator": "===->!==",
-      "gezakt": 6
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 2,
+      "toetsSha": "9a5d370daa1a",
+      "moduleSha": "6e3e2e1f529d"
     },
     "geld-conservatie-last.test.js": {
       "soort": "server",
@@ -1746,7 +1775,9 @@
       "module": "server/kern/directpay/index.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "a533dd612b9f",
+      "moduleSha": "449b422aad1a"
     },
     "geldwereld.test.js": {
       "soort": "puur",
@@ -1754,7 +1785,9 @@
       "module": "server/kern/geldwereld.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "c01cc4f8bdf5",
+      "moduleSha": "e040acec76a5"
     },
     "geloofbieb.test.js": {
       "soort": "server",
@@ -1790,7 +1823,9 @@
       "module": "server/seed/genres.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "dd5fa49cad1a",
+      "moduleSha": "3a26758a20a6"
     },
     "genreplan.test.js": {
       "soort": "server",
@@ -1812,7 +1847,9 @@
       "module": "server/seed/genres.js",
       "operator": "&&->||#0",
       "gezakt": 2,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "f486cab73133",
+      "moduleSha": "3a26758a20a6"
     },
     "genretoegang.test.js": {
       "soort": "puur",
@@ -1820,7 +1857,9 @@
       "module": "server/kern/aanmeldingen/bedrijf.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "92e8af8bac8f",
+      "moduleSha": "0a87663c091a"
     },
     "gerechtkennis.test.js": {
       "soort": "server",
@@ -1833,8 +1872,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/rekenkern.js",
-      "operator": "===->!==",
-      "gezakt": 1
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "toetsSha": "221d4d80917d",
+      "moduleSha": "3b22cbc3141b"
     },
     "gesprekdraad.test.js": {
       "soort": "server",
@@ -1919,7 +1961,9 @@
       "module": "server/db/ledengids.js",
       "operator": "return-weg#2",
       "gezakt": 1,
-      "geprobeerd": 8
+      "geprobeerd": 7,
+      "toetsSha": "2ee6d7bfed60",
+      "moduleSha": "3bb04cdb828d"
     },
     "golive.test.js": {
       "soort": "puur",
@@ -1927,7 +1971,9 @@
       "module": "server/routes/auth/account.js",
       "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "ff7ab7012c24",
+      "moduleSha": "b38a92e4cedc"
     },
     "grand-integratie.pg.test.js": {
       "soort": "server",
@@ -1966,8 +2012,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/handenvrij.js",
-      "operator": "false->true",
-      "gezakt": 1
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "toetsSha": "d5d4d6d629e7",
+      "moduleSha": "978682779dc8"
     },
     "hardware.test.js": {
       "soort": "server",
@@ -1989,7 +2038,9 @@
       "module": "server/kern/command/register.js",
       "operator": "===->!==#0",
       "gezakt": 7,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "f0249f13f0ce",
+      "moduleSha": "0b0c7afc834a"
     },
     "herstel-sandbox.test.js": {
       "soort": "server",
@@ -2072,8 +2123,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/horlogewerk.js",
-      "operator": "!==->===",
-      "gezakt": 11
+      "operator": "!==->===#0",
+      "gezakt": 11,
+      "geprobeerd": 1,
+      "toetsSha": "a3fd54eba61a",
+      "moduleSha": "d7fb6b993a7f"
     },
     "hospitality-universe.test.js": {
       "soort": "puur",
@@ -2081,7 +2135,9 @@
       "module": "server/kern/hospitality-universe/world-model.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "70345203f057",
+      "moduleSha": "70861edcf33d"
     },
     "housekeeping.test.js": {
       "soort": "server",
@@ -2101,15 +2157,21 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/lib/http1.js",
-      "operator": "===->!==",
-      "gezakt": 1
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "toetsSha": "c26c86ed7f7f",
+      "moduleSha": "f3080baf7922"
     },
     "http2.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/web/index.js",
-      "operator": "&&->||",
-      "gezakt": 1
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2,
+      "toetsSha": "076e07038fac",
+      "moduleSha": "f76b4a8e29dc"
     },
     "huis.test.js": {
       "soort": "server",
@@ -2142,10 +2204,12 @@
     "hulpklassen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "scripts/lib/hulpcss.js",
-      "operator": "true->false#0",
-      "gezakt": 1,
-      "geprobeerd": 5
+      "module": "scripts/hulpklassen-omzet.js",
+      "operator": "getal+1#0",
+      "gezakt": 5,
+      "geprobeerd": 5,
+      "toetsSha": "b73b8e9819a1",
+      "moduleSha": "442ee3726470"
     },
     "human-reality.test.js": {
       "soort": "puur",
@@ -2153,7 +2217,9 @@
       "module": "server/kern/hospitality-universe/human-reality.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "a8f953640923",
+      "moduleSha": "dd71cbd0af50"
     },
     "i18n-auto.test.js": {
       "soort": "puur",
@@ -2162,7 +2228,8 @@
         "server/lib/ui-bronnen.js"
       ],
       "geprobeerd": 11,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "f61469d20234"
     },
     "ideeen.test.js": {
       "soort": "server",
@@ -2177,7 +2244,9 @@
       "module": "scripts/lib/idemproef.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "694556093a2d",
+      "moduleSha": "791f4b564d39"
     },
     "identiteit-opvraag.test.js": {
       "soort": "puur",
@@ -2185,14 +2254,19 @@
       "module": "server/kern/payroll/identiteit.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "20f9f956f43b",
+      "moduleSha": "f71c817fbc78"
     },
     "imap.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/mailsleutel.js",
-      "operator": "!==->===",
-      "gezakt": 9
+      "operator": "!==->===#0",
+      "gezakt": 9,
+      "geprobeerd": 2,
+      "toetsSha": "7787af5edc93",
+      "moduleSha": "c9b24e9ceb63"
     },
     "incidentcontrole-route.test.js": {
       "soort": "server",
@@ -2207,7 +2281,9 @@
       "module": "server/kern/incidentcontrole.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "a17751ec7d42",
+      "moduleSha": "b9000266c635"
     },
     "inkoopketen.test.js": {
       "soort": "server",
@@ -2229,7 +2305,9 @@
       "module": "server/kern/instant-reality.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "83878e9c070c",
+      "moduleSha": "dc8fc345ff73"
     },
     "invoerproef.test.js": {
       "soort": "puur",
@@ -2243,8 +2321,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/inzagelog.js",
-      "operator": "===->!==",
-      "gezakt": 8
+      "operator": "===->!==#0",
+      "gezakt": 8,
+      "geprobeerd": 1,
+      "toetsSha": "ec14ba1ce99e",
+      "moduleSha": "063dbc661277"
     },
     "journaalschrijf.test.js": {
       "soort": "puur",
@@ -2252,7 +2333,9 @@
       "module": "server/kern/doorgeefjournaal.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "80702f42fa0c",
+      "moduleSha": "f944acf01a33"
     },
     "journalistiek-redactie.test.js": {
       "soort": "server",
@@ -2265,8 +2348,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/kaart.js",
-      "operator": "===->!==",
-      "gezakt": 2
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "toetsSha": "11780adabd81",
+      "moduleSha": "86d396ab242f"
     },
     "kantoordienst.test.js": {
       "soort": "server",
@@ -2295,7 +2381,9 @@
       "module": "server/kern/kantoorwereld.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "37981ffe0f31",
+      "moduleSha": "b978949b986b"
     },
     "kantoren-uitbreiding.test.js": {
       "soort": "server",
@@ -2329,8 +2417,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/afgeleid.js",
-      "operator": "===->!==",
-      "gezakt": 1
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "toetsSha": "c8f5df6a9261",
+      "moduleSha": "22c25b2d8c6f"
     },
     "kern-events.test.js": {
       "soort": "puur",
@@ -2344,30 +2435,41 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/fiscaal/index.js",
-      "operator": "===->!==",
-      "gezakt": 1
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1,
+      "toetsSha": "3b694eb6ed3c",
+      "moduleSha": "563c9151c624"
     },
     "kern-live.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/live.js",
-      "operator": "===->!==",
-      "gezakt": 1
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 5,
+      "toetsSha": "8fe46ac4cb01",
+      "moduleSha": "41b52a3d7540"
     },
     "kern-util.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/util.js",
-      "operator": "!==->===",
-      "gezakt": 1
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2,
+      "toetsSha": "e37aa8b3b398",
+      "moduleSha": "0eb21f415677"
     },
     "keten.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/lib/keten.js",
       "operator": "===->!==#0",
-      "gezakt": 10,
-      "geprobeerd": 1
+      "gezakt": 14,
+      "geprobeerd": 1,
+      "toetsSha": "2e29b41a7ab6",
+      "moduleSha": "3042e8f4c9c1"
     },
     "ketenchat.test.js": {
       "soort": "server",
@@ -2381,8 +2483,10 @@
       "staat": "gezakt",
       "module": "scripts/lib/ketenproef.js",
       "operator": "===->!==#0",
-      "gezakt": 9,
-      "geprobeerd": 1
+      "gezakt": 10,
+      "geprobeerd": 1,
+      "toetsSha": "3f48142574c0",
+      "moduleSha": "4ed6e07ae80c"
     },
     "keuken.test.js": {
       "soort": "server",
@@ -2394,10 +2498,12 @@
     "keuring.test.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "scripts/keuring.js",
-      "operator": "===->!==#0",
+      "module": "scripts/lib/ephemere-boom.js",
+      "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "0976939e383d",
+      "moduleSha": "29e558553157"
     },
     "kijken.test.js": {
       "soort": "puur",
@@ -2405,7 +2511,9 @@
       "module": "server/kern/kijken.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e57061ad512e",
+      "moduleSha": "e9dbe1f0f0e6"
     },
     "kijkplicht.test.js": {
       "soort": "server",
@@ -2420,7 +2528,9 @@
       "module": "server/kern/gast/naad.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "370645c1fc4f",
+      "moduleSha": "4e3573a0c483"
     },
     "kleine-grendels.test.js": {
       "soort": "server",
@@ -2435,15 +2545,19 @@
       "module": "server/kern/kletspraat/namen.js",
       "operator": "return-weg#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "a8984ba6bcb8",
+      "moduleSha": "b34b014158a4"
     },
     "klok.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/lib/klok.js",
       "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 1
+      "gezakt": 5,
+      "geprobeerd": 1,
+      "toetsSha": "7df806aaf2c5",
+      "moduleSha": "7ff85f20db87"
     },
     "kluis-binding.test.js": {
       "soort": "puur",
@@ -2451,7 +2565,9 @@
       "module": "server/accounts/index.js",
       "operator": "return-weg#0",
       "gezakt": 8,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "a866cb74130e",
+      "moduleSha": "86e690603c4f"
     },
     "kluis-rotatie.test.js": {
       "soort": "puur",
@@ -2459,7 +2575,9 @@
       "module": "server/accounts/index.js",
       "operator": "return-weg#0",
       "gezakt": 6,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "fadf327abe63",
+      "moduleSha": "86e690603c4f"
     },
     "koppels.test.js": {
       "soort": "server",
@@ -2472,9 +2590,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/kruisscan.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 2
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "toetsSha": "117fcc48a35d",
+      "moduleSha": "7ddd1ec5507f"
     },
     "kwaliteit.test.js": {
       "soort": "puur",
@@ -2482,7 +2602,9 @@
       "module": "server/kern/command/register.js",
       "operator": "===->!==#0",
       "gezakt": 6,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "f415d89b7b9f",
+      "moduleSha": "0b0c7afc834a"
     },
     "laatste-negen.test.js": {
       "soort": "server",
@@ -2504,7 +2626,9 @@
       "module": "server/kern/onderzoekslab.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "5cae338b8c1a",
+      "moduleSha": "0ed4239a6e0a"
     },
     "lab2-bewoner.test.js": {
       "soort": "server",
@@ -2526,7 +2650,9 @@
       "module": "server/kern/labfonds.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c073826d9474",
+      "moduleSha": "4545af47d996"
     },
     "landpakket.test.js": {
       "soort": "puur",
@@ -2534,7 +2660,9 @@
       "module": "server/kern/command/landpakket.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "8b194ec7cc19",
+      "moduleSha": "d403c4f425cf"
     },
     "leden-gids-pg.test.js": {
       "soort": "server",
@@ -2569,7 +2697,8 @@
         "server/db/gidsen.js"
       ],
       "geprobeerd": 1,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "6de65d57b5e9"
     },
     "ledenladder.test.js": {
       "soort": "server",
@@ -2584,7 +2713,9 @@
       "module": "server/kern/ledenregister.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "1195ade0d151",
+      "moduleSha": "aec49046a5a8"
     },
     "leerstof.test.js": {
       "soort": "server",
@@ -2599,7 +2730,9 @@
       "module": "server/kern/leerstof-gen.js",
       "operator": "+->-#0",
       "gezakt": 1,
-      "geprobeerd": 8
+      "geprobeerd": 9,
+      "toetsSha": "bc1aa5996661",
+      "moduleSha": "6c53fd12048f"
     },
     "leerstofvo.test.js": {
       "soort": "server",
@@ -2635,7 +2768,9 @@
       "module": "server/kern/levensband/index.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "95183c30038e",
+      "moduleSha": "7abd5ec5ca8a"
     },
     "levensbeleid.test.js": {
       "soort": "puur",
@@ -2643,7 +2778,9 @@
       "module": "server/kern/levensbeleid/index.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "7075fd09eb2e",
+      "moduleSha": "00173289ac17"
     },
     "levensgraafleven.test.js": {
       "soort": "puur",
@@ -2651,7 +2788,9 @@
       "module": "server/kern/levensgraaf/graaf.js",
       "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e82801d2f5c5",
+      "moduleSha": "2a5fe48dc46d"
     },
     "levenslijn.test.js": {
       "soort": "puur",
@@ -2659,7 +2798,9 @@
       "module": "server/kern/levenslijn/index.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "6691da348b7e",
+      "moduleSha": "27620679f50a"
     },
     "levensloop.test.js": {
       "soort": "server",
@@ -2674,7 +2815,9 @@
       "module": "server/opzet/leverancierpoort.js",
       "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "7c0b593c9cb4",
+      "moduleSha": "ebb2dda5363c"
     },
     "lib.test.js": {
       "soort": "puur",
@@ -2682,7 +2825,9 @@
       "module": "server/lib/geo.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "7bd11c314923",
+      "moduleSha": "3949508ef7ed"
     },
     "lidboard.test.js": {
       "soort": "server",
@@ -2704,7 +2849,9 @@
       "module": "server/opzet/liegpoort.js",
       "operator": "false->true#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "a1397e68aff6",
+      "moduleSha": "4722f2b69662"
     },
     "life-schakelbaar.test.js": {
       "soort": "server",
@@ -2733,7 +2880,9 @@
       "module": "scripts/eigenaar-claim.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "58a8fdc63388",
+      "moduleSha": "8b17bfb49fd9"
     },
     "livegang.test.js": {
       "soort": "server",
@@ -2762,7 +2911,9 @@
       "module": "server/log.js",
       "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "f6cd429a8a70",
+      "moduleSha": "49dda79cc003"
     },
     "lokaal-eerst.test.js": {
       "soort": "puur",
@@ -2770,15 +2921,21 @@
       "module": "server/kern/agenda.js",
       "operator": "return-weg#0",
       "gezakt": 2,
-      "geprobeerd": 7
+      "geprobeerd": 7,
+      "toetsSha": "aea78f856847",
+      "moduleSha": "b79388588fe9"
     },
     "lokaal-tls.test.js": {
       "soort": "puur",
       "staat": "gezakt",
+      "gezakt": 2,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
       "module": "server/lokaal-tls.js",
       "operator": "true->false#0",
-      "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "a360ad21c249",
+      "moduleSha": "b2545f0521eb"
     },
     "lokaaladres.test.js": {
       "soort": "puur",
@@ -2786,7 +2943,9 @@
       "module": "server/lib/lokaaladres.js",
       "operator": "true->false#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e239346d52c7",
+      "moduleSha": "5a602ebca02e"
     },
     "lokale-taal.test.js": {
       "soort": "puur",
@@ -2794,7 +2953,9 @@
       "module": "server/lib/lokale-taal.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "7f3caff1c5ca",
+      "moduleSha": "eee7e2219825"
     },
     "loonstrook-portaal.test.js": {
       "soort": "server",
@@ -2838,8 +2999,10 @@
       "staat": "gezakt",
       "module": "server/kern/magnaat-controle.js",
       "operator": "!==->===#0",
-      "gezakt": 8,
-      "geprobeerd": 4
+      "gezakt": 9,
+      "geprobeerd": 10,
+      "toetsSha": "d3310dd066c0",
+      "moduleSha": "10de90847418"
     },
     "magnaat-economenlab.test.js": {
       "soort": "puur",
@@ -2847,15 +3010,19 @@
       "module": "server/kern/magnaat-economie.js",
       "operator": "!==->===#0",
       "gezakt": 6,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "dc133cf3a032",
+      "moduleSha": "de6081386bc4"
     },
     "magnaat-economie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/magnaat-economie.js",
       "operator": "!==->===#0",
-      "gezakt": 7,
-      "geprobeerd": 2
+      "gezakt": 11,
+      "geprobeerd": 2,
+      "toetsSha": "6fdb229eb467",
+      "moduleSha": "de6081386bc4"
     },
     "magnaat-hospitality.test.js": {
       "soort": "puur",
@@ -2863,7 +3030,9 @@
       "module": "server/kern/spellen/magnaat/hospitality.js",
       "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "f08eb2e9c184",
+      "moduleSha": "1f48dea3796b"
     },
     "magnaat-leerkring.test.js": {
       "soort": "puur",
@@ -2871,7 +3040,9 @@
       "module": "server/kern/spellen/magnaat/leerkring.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 5
+      "geprobeerd": 6,
+      "toetsSha": "a9b2325a1cd9",
+      "moduleSha": "c088d543b705"
     },
     "magnaat-motorklant.test.js": {
       "soort": "puur",
@@ -2879,7 +3050,9 @@
       "module": "server/kern/magnaat-motorklant.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "0e8037706b12",
+      "moduleSha": "e28e556c31e8"
     },
     "magnaat-partnerstudio-routes.test.js": {
       "soort": "server",
@@ -2901,7 +3074,9 @@
       "module": "server/kern/magnaat-partnerstudio-basis.js",
       "operator": "!==->===#0",
       "gezakt": 6,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "6a794f9bf158",
+      "moduleSha": "a58ce7896063"
     },
     "magnaat-rust-integratie.test.js": {
       "soort": "puur",
@@ -2909,7 +3084,9 @@
       "module": "server/kern/magnaat-economie.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "92e3d0102384",
+      "moduleSha": "de6081386bc4"
     },
     "magnaat-teamkamer-productie.test.js": {
       "soort": "puur",
@@ -2917,7 +3094,9 @@
       "module": "server/kern/magnaat-trainingslobby.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "421d6d705be4",
+      "moduleSha": "db944e587377"
     },
     "magnaat-trainingslobby.test.js": {
       "soort": "puur",
@@ -2925,7 +3104,9 @@
       "module": "server/kern/magnaat-trainingslobby.js",
       "operator": "!==->===#0",
       "gezakt": 4,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "a3ed5d5b974f",
+      "moduleSha": "db944e587377"
     },
     "magnaat-werkroutefabriek.test.js": {
       "soort": "puur",
@@ -2933,11 +3114,19 @@
       "module": "server/kern/magnaat-capabilities.js",
       "operator": ">=->>#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "94909605c58d",
+      "moduleSha": "967375e4c7a9"
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
-      "staat": "geen toetsen gedraaid"
+      "staat": "gezakt",
+      "module": "server/kern/magnaatwereld.js",
+      "operator": "!==->===#0",
+      "gezakt": 12,
+      "geprobeerd": 4,
+      "toetsSha": "e24d3565b2ee",
+      "moduleSha": "62424fec5977"
     },
     "mail-eigen.test.js": {
       "soort": "puur",
@@ -2945,7 +3134,9 @@
       "module": "server/dkim.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "5f02a8682b7f",
+      "moduleSha": "e1ca8f9e922c"
     },
     "mailauth.test.js": {
       "soort": "puur",
@@ -2953,7 +3144,9 @@
       "module": "server/kern/mailauth.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "010d5eaa411d",
+      "moduleSha": "65fcaf559011"
     },
     "mailbijlage.test.js": {
       "soort": "server",
@@ -2968,7 +3161,9 @@
       "module": "server/maildns.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "0c8c7b7f5204",
+      "moduleSha": "32eba4f4f9f5"
     },
     "mailpost-kantoor.test.js": {
       "soort": "server",
@@ -3081,7 +3276,9 @@
       "module": "server/middleware/malwarescan.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "5ba3bfa09916",
+      "moduleSha": "4e8a6820f984"
     },
     "marechaussee.test.js": {
       "soort": "server",
@@ -3121,7 +3318,9 @@
       "module": "server/kern/command/mdm.js",
       "operator": "<=-><#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "6f35db14f7f8",
+      "moduleSha": "cd25a69fb755"
     },
     "media.test.js": {
       "soort": "server",
@@ -3213,7 +3412,9 @@
       "module": "server/db/merge.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "f77bdd3099cf",
+      "moduleSha": "88bbeef6abc0"
     },
     "meterijk.test.js": {
       "soort": "puur",
@@ -3233,7 +3434,9 @@
       "module": "server/meting.js",
       "operator": ">=->>#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "729f744904b3",
+      "moduleSha": "052d13a9f043"
     },
     "metingen.test.js": {
       "soort": "server",
@@ -3254,8 +3457,10 @@
       "staat": "gezakt",
       "module": "server/middleware/voordeur.js",
       "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 2
+      "gezakt": 2,
+      "geprobeerd": 2,
+      "toetsSha": "ef239812aa7d",
+      "moduleSha": "026a86465059"
     },
     "migraties.test.js": {
       "soort": "puur",
@@ -3263,7 +3468,9 @@
       "module": "server/migraties/index.js",
       "operator": "&&->||#0",
       "gezakt": 7,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c24f53e2bb0f",
+      "moduleSha": "b0673fbf75bb"
     },
     "minify.test.js": {
       "soort": "puur",
@@ -3271,7 +3478,9 @@
       "module": "scripts/ast/parser.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "16dd01aecffe",
+      "moduleSha": "81a436284fe5"
     },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",
@@ -3307,7 +3516,9 @@
       "module": "server/config.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "eb55d1d18635",
+      "moduleSha": "c5a1c2274061"
     },
     "mollie-eigen.test.js": {
       "soort": "puur",
@@ -3315,7 +3526,9 @@
       "module": "server/mollie.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "ccc22e3146a2",
+      "moduleSha": "328329ca91d7"
     },
     "mond.test.js": {
       "soort": "puur",
@@ -3323,7 +3536,9 @@
       "module": "public/shared/mond.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "4e7337ba83b3",
+      "moduleSha": "275f329299ae"
     },
     "motor-vingerafdruk.test.js": {
       "soort": "puur",
@@ -3331,7 +3546,9 @@
       "module": "server/kern/pay/vingerafdruk.js",
       "operator": "!==->===#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "9d5def10df9c",
+      "moduleSha": "999f1a0b82ca"
     },
     "mrz.test.js": {
       "soort": "puur",
@@ -3339,7 +3556,9 @@
       "module": "public/shared/mrz.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "3427008f47a8",
+      "moduleSha": "5274cebdb18d"
     },
     "multi-instance-sqlite.test.js": {
       "soort": "server",
@@ -3401,7 +3620,9 @@
       "module": "server/lib/geo.js",
       "operator": "+->-#0",
       "gezakt": 4,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "bdb2398d7f17",
+      "moduleSha": "3949508ef7ed"
     },
     "negenplus.test.js": {
       "soort": "server",
@@ -3415,8 +3636,10 @@
       "staat": "gezakt",
       "module": "scripts/lib/routedekking.js",
       "operator": "true->false#0",
-      "gezakt": 1,
-      "geprobeerd": 3
+      "gezakt": 3,
+      "geprobeerd": 4,
+      "toetsSha": "8c9df0b0b9ce",
+      "moduleSha": "6b33584ee3be"
     },
     "noodkaart.test.js": {
       "soort": "server",
@@ -3431,25 +3654,29 @@
       "module": "scripts/normbasis.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "b4cedb93e0a5",
+      "moduleSha": "dd3b9e653627"
     },
     "normprestatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/norm.js",
-      "operator": "return-weg#1",
-      "gezakt": 1,
-      "geprobeerd": 10
+      "operator": "!==->===#3",
+      "gezakt": 2,
+      "geprobeerd": 22,
+      "toetsSha": "d8a1c777f829",
+      "moduleSha": "786dd27189f3"
     },
     "normsubset.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "gezakt": 0,
-      "traag": true,
-      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "staat": "gezakt",
       "module": "scripts/norm.js",
-      "operator": "===->!==#0",
-      "geprobeerd": 1
+      "operator": "&&->||#0",
+      "gezakt": 20,
+      "geprobeerd": 3,
+      "toetsSha": "6ab50ae06562",
+      "moduleSha": "786dd27189f3"
     },
     "notities.test.js": {
       "soort": "server",
@@ -3471,7 +3698,9 @@
       "module": "server/kern/objectlaag/index.js",
       "operator": "return-weg#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "41537bc8ecd1",
+      "moduleSha": "76ba562a0208"
     },
     "objectlaagroutes.test.js": {
       "soort": "server",
@@ -3500,7 +3729,9 @@
       "module": "public/shared/rekenmotor.js",
       "operator": "true->false#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d1d27645158a",
+      "moduleSha": "1bc51dbcbf8e"
     },
     "office-enterprise.test.js": {
       "soort": "server",
@@ -3550,7 +3781,9 @@
       "module": "server/opzet/onderhoud.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "8c8e58751d52",
+      "moduleSha": "746865d23fa3"
     },
     "ondernemerpoort-e2e.test.js": {
       "soort": "server",
@@ -3565,7 +3798,9 @@
       "module": "server/kern/ondernemerpoort.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "dddd62672c31",
+      "moduleSha": "4a2f0e03b58e"
     },
     "onderneming-belasting.test.js": {
       "soort": "puur",
@@ -3573,7 +3808,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 15,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "167d455fbbd3",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-bestuur.test.js": {
       "soort": "puur",
@@ -3581,7 +3818,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 18,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c532c627d5ad",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-capaciteit.test.js": {
       "soort": "puur",
@@ -3589,7 +3828,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 13,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "a3dbedf54f02",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-contracten.test.js": {
       "soort": "puur",
@@ -3597,7 +3838,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 11,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "4762106a8ca6",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-crediteuren.test.js": {
       "soort": "puur",
@@ -3605,7 +3848,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 10,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "eb125bed9f01",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-dagbeeld.test.js": {
       "soort": "puur",
@@ -3613,7 +3858,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 9,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "31de137b2e6f",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-debiteuren.test.js": {
       "soort": "puur",
@@ -3621,7 +3868,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 9,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "9dcbc112ef27",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-eersteklant.test.js": {
       "soort": "puur",
@@ -3629,15 +3878,19 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 15,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "6e76c6b205f4",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-kas.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
-      "gezakt": 13,
-      "geprobeerd": 1
+      "gezakt": 14,
+      "geprobeerd": 1,
+      "toetsSha": "c422b987278d",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-klussen.test.js": {
       "soort": "puur",
@@ -3645,7 +3898,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 13,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "65b2d6b79197",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-mallprofiel.test.js": {
       "soort": "puur",
@@ -3653,7 +3908,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 9,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "155e39a2f30f",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-offertebouw.test.js": {
       "soort": "puur",
@@ -3661,7 +3918,9 @@
       "module": "server/kern/onderneming/offertebouw.js",
       "operator": "===->!==#0",
       "gezakt": 6,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "28d7be77cc28",
+      "moduleSha": "320e02bdd46a"
     },
     "onderneming-ontwerper.test.js": {
       "soort": "puur",
@@ -3669,7 +3928,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 11,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "7686969dab04",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-oprichting.test.js": {
       "soort": "server",
@@ -3684,7 +3945,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 14,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "1a776eb074ca",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-rechtsvormen.test.js": {
       "soort": "puur",
@@ -3692,7 +3955,9 @@
       "module": "server/kern/onderneming/rechtsvorm.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "dbc6d13bdef4",
+      "moduleSha": "207d90b71432"
     },
     "onderneming-regie.test.js": {
       "soort": "puur",
@@ -3700,7 +3965,9 @@
       "module": "server/kern/onderneming/regie.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 4
+      "geprobeerd": 5,
+      "toetsSha": "f074c799abdf",
+      "moduleSha": "bd93e6ac7054"
     },
     "onderneming-relaties.test.js": {
       "soort": "puur",
@@ -3708,7 +3975,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 10,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "bc4925f85cc4",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-routes.test.js": {
       "soort": "server",
@@ -3723,7 +3992,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 11,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "ec26fa0fdf6c",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-verkenning.test.js": {
       "soort": "puur",
@@ -3731,7 +4002,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 16,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "aa38de9d165b",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-voorraad.test.js": {
       "soort": "puur",
@@ -3739,7 +4012,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 12,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d258bcff0cc0",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming-werving.test.js": {
       "soort": "puur",
@@ -3747,7 +4022,9 @@
       "module": "server/kern/onderneming/index.js",
       "operator": "===->!==#0",
       "gezakt": 14,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "251346283853",
+      "moduleSha": "a415cbbcde08"
     },
     "onderneming.test.js": {
       "soort": "server",
@@ -3762,7 +4039,9 @@
       "module": "server/kern/ondertitels.js",
       "operator": "<=-><#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "19b53bbbf5d4",
+      "moduleSha": "157ed1f66bd0"
     },
     "onderwijs.test.js": {
       "soort": "server",
@@ -3830,7 +4109,9 @@
       "module": "server/kern/settlement.js",
       "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "257979840cb8",
+      "moduleSha": "131edb630b53"
     },
     "opslag-voorcheck.test.js": {
       "soort": "puur",
@@ -3838,7 +4119,9 @@
       "module": "server/db/sqlite.js",
       "operator": "!==->===#0",
       "gezakt": 6,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "7acdf7fe8f69",
+      "moduleSha": "1b996ac55d80"
     },
     "opslagblokkade.test.js": {
       "soort": "puur",
@@ -3846,7 +4129,9 @@
       "module": "server/db/keuze.js",
       "operator": "true->false#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "249d5cf076a0",
+      "moduleSha": "ffef7f65363b"
     },
     "opslagpoort.test.js": {
       "soort": "puur",
@@ -3854,7 +4139,9 @@
       "module": "server/db/keuze.js",
       "operator": "true->false#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "4eabb4fedb70",
+      "moduleSha": "ffef7f65363b"
     },
     "ov-operatie.test.js": {
       "soort": "puur",
@@ -3862,7 +4149,9 @@
       "module": "server/kern/ov/operatie.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "4e7bc37a7343",
+      "moduleSha": "7df4bcf9e0d3"
     },
     "ov-regie.test.js": {
       "soort": "puur",
@@ -3870,7 +4159,9 @@
       "module": "server/kern/ov/regie.js",
       "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "3f07b66e3eb0",
+      "moduleSha": "152602e32b84"
     },
     "ov.test.js": {
       "soort": "server",
@@ -3892,7 +4183,9 @@
       "module": "server/kern/command/register.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "4374919932a2",
+      "moduleSha": "0b0c7afc834a"
     },
     "ovkaart.test.js": {
       "soort": "server",
@@ -3911,7 +4204,9 @@
       "module": "server/kern/pakketten.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "11a94f7bf67d",
+      "moduleSha": "7395e83c8be6"
     },
     "papieren-boardroom.test.js": {
       "soort": "server",
@@ -3968,7 +4263,9 @@
       "module": "server/kern/pasprijs.js",
       "operator": "===->!==#0",
       "gezakt": 6,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c1a418ea0421",
+      "moduleSha": "f7e015a122ec"
     },
     "pay.test.js": {
       "soort": "server",
@@ -3983,7 +4280,9 @@
       "module": "server/kern/payroll/regelpakket.js",
       "operator": "!==->===#0",
       "gezakt": 10,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "18ae3c094b14",
+      "moduleSha": "2ebe69c7cfc5"
     },
     "payroll-dekking.test.js": {
       "soort": "puur",
@@ -3991,7 +4290,9 @@
       "module": "server/kern/payroll/regelpakket.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e438c0f308cb",
+      "moduleSha": "2ebe69c7cfc5"
     },
     "payroll-dossier.test.js": {
       "soort": "puur",
@@ -3999,7 +4300,9 @@
       "module": "server/kern/payroll/regelpakket.js",
       "operator": "!==->===#0",
       "gezakt": 9,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "e209f2fc027b",
+      "moduleSha": "2ebe69c7cfc5"
     },
     "payroll-journaal.test.js": {
       "soort": "puur",
@@ -4007,7 +4310,9 @@
       "module": "server/kern/payroll/regelpakket.js",
       "operator": "!==->===#0",
       "gezakt": 8,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "2f4ac7b8bf54",
+      "moduleSha": "2ebe69c7cfc5"
     },
     "payroll-loonheffing.test.js": {
       "soort": "puur",
@@ -4015,7 +4320,9 @@
       "module": "server/kern/payroll/loonheffing.js",
       "operator": "+->-#0",
       "gezakt": 1,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "edb96fcf100e",
+      "moduleSha": "81d63905f6af"
     },
     "payroll-motor.test.js": {
       "soort": "puur",
@@ -4023,7 +4330,9 @@
       "module": "server/kern/payroll/regelpakket.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c6831997a3b1",
+      "moduleSha": "2ebe69c7cfc5"
     },
     "payroll-register-verzuim.test.js": {
       "soort": "puur",
@@ -4031,7 +4340,9 @@
       "module": "server/kern/payroll/componenten.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c79aecc7ac45",
+      "moduleSha": "49904147da81"
     },
     "payroll-routes.test.js": {
       "soort": "server",
@@ -4046,7 +4357,9 @@
       "module": "server/kern/payroll/regelpakket.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "bb4bf6b71dfd",
+      "moduleSha": "2ebe69c7cfc5"
     },
     "payroll-samenstellen.test.js": {
       "soort": "puur",
@@ -4054,7 +4367,9 @@
       "module": "server/kern/payroll/samenstellen.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "3f84c595d2a0",
+      "moduleSha": "76202e0e9589"
     },
     "payroll-uren-controles.test.js": {
       "soort": "puur",
@@ -4062,7 +4377,9 @@
       "module": "server/kern/payroll/uren.js",
       "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "6a8798a8c6f7",
+      "moduleSha": "f5beb07d2696"
     },
     "payroll-valuta.test.js": {
       "soort": "puur",
@@ -4070,7 +4387,9 @@
       "module": "server/kern/payroll/valuta.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "34af2a6f545e",
+      "moduleSha": "53e12e52160d"
     },
     "payroll.test.js": {
       "soort": "server",
@@ -4124,7 +4443,9 @@
       "module": "server/kern/pestgrens.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d208c9e5b37e",
+      "moduleSha": "922dff235a6a"
     },
     "pg-snapshot.test.js": {
       "soort": "server",
@@ -4152,7 +4473,9 @@
       "module": "server/pg/sync.js",
       "operator": "!==->===#0",
       "gezakt": 4,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "a7402d7cde81",
+      "moduleSha": "f39b0bad2ca7"
     },
     "pgwire.test.js": {
       "soort": "puur",
@@ -4160,7 +4483,9 @@
       "module": "server/pgwire/scram.js",
       "operator": "+->-#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "7f1bc6356fa1",
+      "moduleSha": "78ffc50392ca"
     },
     "pinvergeten.test.js": {
       "soort": "server",
@@ -4222,7 +4547,9 @@
       "module": "server/config.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "ed24ecb26da7",
+      "moduleSha": "c5a1c2274061"
     },
     "portemonnee.test.js": {
       "soort": "server",
@@ -4244,7 +4571,9 @@
       "module": "scripts/productie-installatie.js",
       "operator": "+->-#0",
       "gezakt": 1,
-      "geprobeerd": 7
+      "geprobeerd": 7,
+      "toetsSha": "cecdae3ab497",
+      "moduleSha": "df50bd28ccdc"
     },
     "productie-motor.test.js": {
       "soort": "puur",
@@ -4252,15 +4581,19 @@
       "module": "server/config/productie-motor.js",
       "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "d65998e9d81a",
+      "moduleSha": "75c646bc1bfd"
     },
     "productie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/config.js",
       "operator": "===->!==#0",
-      "gezakt": 5,
-      "geprobeerd": 1
+      "gezakt": 9,
+      "geprobeerd": 1,
+      "toetsSha": "b785ed20c8a5",
+      "moduleSha": "c5a1c2274061"
     },
     "provider-sandbox.test.js": {
       "soort": "puur",
@@ -4268,7 +4601,9 @@
       "module": "server/sms-sandbox.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c430c3210e38",
+      "moduleSha": "2a89edba9cd8"
     },
     "proxykop.test.js": {
       "soort": "puur",
@@ -4276,7 +4611,9 @@
       "module": "server/web/verrijk.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "29a41350bc41",
+      "moduleSha": "45cf92ddfdec"
     },
     "prplus.test.js": {
       "soort": "server",
@@ -4305,7 +4642,9 @@
       "module": "public/shared/qr.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "b8cc758e2e68",
+      "moduleSha": "b4f92fed106c"
     },
     "qrscan.test.js": {
       "soort": "puur",
@@ -4313,7 +4652,9 @@
       "module": "public/shared/qr.js",
       "operator": ">=->>#0",
       "gezakt": 2,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "08dbcb85f8e4",
+      "moduleSha": "b4f92fed106c"
     },
     "raakvlak.test.js": {
       "soort": "puur",
@@ -4321,7 +4662,9 @@
       "module": "scripts/raakvlakkeuring.js",
       "operator": "true->false#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e9f7b4dc2786",
+      "moduleSha": "d1b4a17e382a"
     },
     "rahul-eerlijk.test.js": {
       "soort": "puur",
@@ -4329,7 +4672,9 @@
       "module": "server/kern/rahul.js",
       "operator": "+->-#1",
       "gezakt": 5,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "f85b3df54ba2",
+      "moduleSha": "f8e9f48c0214"
     },
     "rahul-hart.test.js": {
       "soort": "puur",
@@ -4338,15 +4683,20 @@
         "server/kern/rahul.js"
       ],
       "geprobeerd": 4,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "fb671706d405"
     },
     "rahul-mens.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
+      "staat": "overleefd",
+      "gezakt": 0,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
       "module": "server/kern/rahul/taal.js",
-      "operator": "return-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 3
+      "operator": "!==->===#0",
+      "geprobeerd": 1,
+      "toetsSha": "bca9321e30d7",
+      "moduleSha": "6947e243801b"
     },
     "rahul-omgang.test.js": {
       "soort": "puur",
@@ -4354,7 +4704,9 @@
       "module": "server/kern/rahul.js",
       "operator": "&&->||#1",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "424081d4d062",
+      "moduleSha": "f8e9f48c0214"
     },
     "rahul-regie.test.js": {
       "soort": "server",
@@ -4430,7 +4782,9 @@
       "module": "server/redis.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "9b4cd670a653",
+      "moduleSha": "343c5248956f"
     },
     "regexmutatie.test.js": {
       "soort": "puur",
@@ -4438,7 +4792,9 @@
       "module": "scripts/lib/regexmutatie.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e4ee71dc5052",
+      "moduleSha": "51c9913ca882"
     },
     "regie.test.js": {
       "soort": "server",
@@ -4481,7 +4837,9 @@
       "module": "server/kern/reiswereld.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "1e066f75b0b5",
+      "moduleSha": "08c85f8b792e"
     },
     "reiswijzer.test.js": {
       "soort": "server",
@@ -4503,7 +4861,9 @@
       "module": "public/shared/rekenmotor.js",
       "operator": "true->false#0",
       "gezakt": 6,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d74d083005f2",
+      "moduleSha": "1bc51dbcbf8e"
     },
     "rekenschuif.test.js": {
       "soort": "puur",
@@ -4511,7 +4871,9 @@
       "module": "public/shared/rekenschuif.js",
       "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "2cbfec98ed66",
+      "moduleSha": "cdcd907f058e"
     },
     "release-bewijs.test.js": {
       "soort": "puur",
@@ -4519,7 +4881,9 @@
       "module": "scripts/release-bewijs.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "4f773bb764f2",
+      "moduleSha": "d264e7ea51e0"
     },
     "rem.test.js": {
       "soort": "puur",
@@ -4527,7 +4891,9 @@
       "module": "server/rem.js",
       "operator": "&&->||#0",
       "gezakt": 6,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "dd452ffca29b",
+      "moduleSha": "4954b14515ef"
     },
     "rendezvous.test.js": {
       "soort": "server",
@@ -4542,7 +4908,9 @@
       "module": "server/kern/reservering/beleid.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d4a0cac4a22d",
+      "moduleSha": "45efd289bdad"
     },
     "resetcontract-schrijfpad.test.js": {
       "soort": "puur",
@@ -4550,7 +4918,9 @@
       "module": "server/db/geheugen.js",
       "operator": "&&->||#2",
       "gezakt": 1,
-      "geprobeerd": 20
+      "geprobeerd": 20,
+      "toetsSha": "84478a68b80f",
+      "moduleSha": "6e3e2e1f529d"
     },
     "resetcontract-voorcheck.test.js": {
       "soort": "puur",
@@ -4558,7 +4928,9 @@
       "module": "server/db/voorcheck.js",
       "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "b40090c88386",
+      "moduleSha": "bc6a66308efb"
     },
     "residentie.test.js": {
       "soort": "server",
@@ -4587,7 +4959,9 @@
       "module": "server/kern/residentie/vragen.js",
       "operator": "return-weg#0",
       "gezakt": 1,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "dd19abbeffbd",
+      "moduleSha": "0731bab918b8"
     },
     "retail.test.js": {
       "soort": "server",
@@ -4616,7 +4990,9 @@
       "module": "scripts/lib/rolproef.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "8cfa9ad03b32",
+      "moduleSha": "02f0c10cc55f"
     },
     "routelog.test.js": {
       "soort": "server",
@@ -4660,7 +5036,8 @@
         "server/kern/rtfbieb.js"
       ],
       "geprobeerd": 11,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "8a7bab81a889"
     },
     "rtfcoderem.test.js": {
       "soort": "server",
@@ -4793,8 +5170,10 @@
       "staat": "gezakt",
       "module": "public/shared/rtgcode.js",
       "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
+      "gezakt": 4,
+      "geprobeerd": 1,
+      "toetsSha": "1ba2e696d9d1",
+      "moduleSha": "e161cca36e3d"
     },
     "rtghorloge.test.js": {
       "soort": "puur",
@@ -4802,7 +5181,9 @@
       "module": "public/shared/rtghorloge.js",
       "operator": "!==->===#0",
       "gezakt": 5,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "1f97b0714614",
+      "moduleSha": "db3fea9d1d98"
     },
     "rtgid.test.js": {
       "soort": "server",
@@ -4887,7 +5268,9 @@
       "module": "server/kern/rtmail.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "6d3baa1127ad",
+      "moduleSha": "898466679085"
     },
     "rust-migraties.test.js": {
       "soort": "puur",
@@ -4895,7 +5278,9 @@
       "module": "scripts/rust-migraties.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "5557a7c56a89",
+      "moduleSha": "6251fdd681a7"
     },
     "rust-noodstop.test.js": {
       "soort": "puur",
@@ -4903,7 +5288,9 @@
       "module": "server/kern/magnaat-motorklant.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "9256de8ce70c",
+      "moduleSha": "e28e556c31e8"
     },
     "rust.test.js": {
       "soort": "server",
@@ -4939,7 +5326,9 @@
       "module": "server/kern/mediaopruim.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "cc9e1e65016b",
+      "moduleSha": "8dd1ecf753ca"
     },
     "salonbron-fotobank.test.js": {
       "soort": "server",
@@ -4954,7 +5343,9 @@
       "module": "server/kern/salonviraal.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "488ee4c069b9",
+      "moduleSha": "c859b44bbbdf"
     },
     "samen.test.js": {
       "soort": "server",
@@ -4994,7 +5385,9 @@
       "module": "public/shared/qr.js",
       "operator": ">=->>#0",
       "gezakt": 2,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "d4ac5fd84c15",
+      "moduleSha": "b4f92fed106c"
     },
     "scannerpdf.test.js": {
       "soort": "puur",
@@ -5002,7 +5395,9 @@
       "module": "public/apps/scanner/pdfje.js",
       "operator": "<=-><#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "36510cfcdf8f",
+      "moduleSha": "244c5fe559ed"
     },
     "schakelkast-dekking.test.js": {
       "soort": "server",
@@ -5024,7 +5419,9 @@
       "module": "scripts/lib/schermleugen.js",
       "operator": "&&->||#0",
       "gezakt": 10,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c741a35ae0c0",
+      "moduleSha": "c59248304fe3"
     },
     "schild.test.js": {
       "soort": "server",
@@ -5148,7 +5545,9 @@
       "module": "server/accounts/index.js",
       "operator": "return-weg#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "2fb2dcf3fa8c",
+      "moduleSha": "86e690603c4f"
     },
     "scriptbundel.test.js": {
       "soort": "puur",
@@ -5157,7 +5556,8 @@
         "server/middleware/scriptbundel.js"
       ],
       "geprobeerd": 15,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "1bcf3dbde994"
     },
     "seedvenster.test.js": {
       "soort": "server",
@@ -5172,7 +5572,9 @@
       "module": "scripts/docker/start.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "8e1737a76392",
+      "moduleSha": "20d7d01dea68"
     },
     "sentinel.test.js": {
       "soort": "puur",
@@ -5180,7 +5582,9 @@
       "module": "scripts/release-bewijs.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "4422ad36ee1c",
+      "moduleSha": "d264e7ea51e0"
     },
     "server.test.js": {
       "soort": "server",
@@ -5207,9 +5611,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/sessies.js",
-      "operator": "return-weg#2",
+      "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "c9c7dd8e92e3",
+      "moduleSha": "c3c2f2911777"
     },
     "skipwacht.test.js": {
       "soort": "puur",
@@ -5221,7 +5627,9 @@
       "module": "server/kern/sleutelwoorden.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "104ce5c54131",
+      "moduleSha": "209358b17a41"
     },
     "slo-routes.test.js": {
       "soort": "server",
@@ -5236,7 +5644,9 @@
       "module": "server/kern/command/slo.js",
       "operator": "true->false#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "a2c17ee75194",
+      "moduleSha": "810a302f1ecb"
     },
     "sloophamer.pg.test.js": {
       "soort": "server",
@@ -5256,7 +5666,9 @@
       "module": "server/smtp.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "5427c368448a",
+      "moduleSha": "4c9edcd18748"
     },
     "sociaal-index.test.js": {
       "soort": "puur",
@@ -5264,7 +5676,9 @@
       "module": "server/kern/sociaal.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "209982f6daee",
+      "moduleSha": "9bd64952542e"
     },
     "socialebeleid.test.js": {
       "soort": "puur",
@@ -5272,7 +5686,9 @@
       "module": "server/kern/socialebeleid/index.js",
       "operator": "false->true#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "4e50408682f5",
+      "moduleSha": "6b4d6a65cd8e"
     },
     "socialecommand.test.js": {
       "soort": "puur",
@@ -5280,7 +5696,9 @@
       "module": "server/kern/socialecommand/index.js",
       "operator": "return-weg#0",
       "gezakt": 3,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "21fbdf9126c1",
+      "moduleSha": "c7c29cd688ca"
     },
     "socialegraaf.test.js": {
       "soort": "puur",
@@ -5288,7 +5706,9 @@
       "module": "server/kern/socialegraaf/index.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "9fe617d0cd1e",
+      "moduleSha": "b5f0439fd4d7"
     },
     "socialelijn.test.js": {
       "soort": "puur",
@@ -5296,7 +5716,9 @@
       "module": "server/kern/socialegraaf/lijn.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e1d130b3b2cd",
+      "moduleSha": "b62e46635c26"
     },
     "socialewereld.test.js": {
       "soort": "puur",
@@ -5304,7 +5726,9 @@
       "module": "server/kern/socialewereld.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "81d9e11e30d4",
+      "moduleSha": "c4d28818318d"
     },
     "societeit.test.js": {
       "soort": "server",
@@ -5326,7 +5750,9 @@
       "module": "server/kern/spellen/magnaat/kaart.js",
       "operator": "===->!==#0",
       "gezakt": 12,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "655298f2c2c7",
+      "moduleSha": "0389ac6887d7"
     },
     "spelbank.test.js": {
       "soort": "puur",
@@ -5334,7 +5760,9 @@
       "module": "server/kern/spellen/magnaat/kaart.js",
       "operator": "===->!==#0",
       "gezakt": 19,
-      "geprobeerd": 3
+      "geprobeerd": 4,
+      "toetsSha": "f3b46ef1f835",
+      "moduleSha": "0389ac6887d7"
     },
     "spelbeleid.test.js": {
       "soort": "puur",
@@ -5342,7 +5770,9 @@
       "module": "server/kern/spellen.js",
       "operator": "return-weg#0",
       "gezakt": 8,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "581509c62a72",
+      "moduleSha": "290ce0b17089"
     },
     "speldag.test.js": {
       "soort": "server",
@@ -5357,15 +5787,19 @@
       "module": "server/kern/spellen/magnaat/handel.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "995c84edfabe",
+      "moduleSha": "89d35f89b6c1"
     },
     "spelkijken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/spellen.js",
       "operator": "return-weg#0",
-      "gezakt": 7,
-      "geprobeerd": 3
+      "gezakt": 8,
+      "geprobeerd": 4,
+      "toetsSha": "72e49c94701b",
+      "moduleSha": "290ce0b17089"
     },
     "spelklok.test.js": {
       "soort": "puur",
@@ -5373,7 +5807,9 @@
       "module": "server/kern/spellen.js",
       "operator": "false->true#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "973d5f4be3df",
+      "moduleSha": "290ce0b17089"
     },
     "spellen.test.js": {
       "soort": "server",
@@ -5395,7 +5831,9 @@
       "module": "server/kern/spellen/magnaat/index.js",
       "operator": "===->!==#0",
       "gezakt": 18,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "6fdf507ffda1",
+      "moduleSha": "a2476b3994b9"
     },
     "spelnabespreking.test.js": {
       "soort": "puur",
@@ -5403,7 +5841,9 @@
       "module": "server/kern/spellen.js",
       "operator": "return-weg#0",
       "gezakt": 8,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "5802ab0821e7",
+      "moduleSha": "290ce0b17089"
     },
     "spelnaspelen.test.js": {
       "soort": "puur",
@@ -5411,7 +5851,9 @@
       "module": "server/kern/spellen.js",
       "operator": "return-weg#0",
       "gezakt": 4,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "4b0de75cc829",
+      "moduleSha": "290ce0b17089"
     },
     "spelpoort.test.js": {
       "soort": "server",
@@ -5440,7 +5882,9 @@
       "module": "server/kern/spellen/presence.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "3507c5f05eb0",
+      "moduleSha": "445a314748c8"
     },
     "spelprestaties.test.js": {
       "soort": "puur",
@@ -5448,7 +5892,9 @@
       "module": "server/kern/spellen/uitslagen.js",
       "operator": "!==->===#0",
       "gezakt": 5,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "a3b829d851cd",
+      "moduleSha": "9d59ee48dacd"
     },
     "spelprojectie.test.js": {
       "soort": "puur",
@@ -5456,7 +5902,9 @@
       "module": "server/kern/spellen.js",
       "operator": "return-weg#0",
       "gezakt": 12,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "cf2da5316cfd",
+      "moduleSha": "290ce0b17089"
     },
     "spelquiz.test.js": {
       "soort": "puur",
@@ -5464,7 +5912,9 @@
       "module": "server/kern/spellen/quiz-school.js",
       "operator": "&&->||#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "dd856f2e6344",
+      "moduleSha": "8f3da7ef9c3b"
     },
     "spelregels-drift.test.js": {
       "soort": "puur",
@@ -5472,15 +5922,19 @@
       "module": "server/kern/spellen/register.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 26
+      "geprobeerd": 11,
+      "toetsSha": "e653908c25ec",
+      "moduleSha": "ab180568882b"
     },
     "spelregister.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/spellen/register.js",
       "operator": "===->!==#0",
-      "gezakt": 20,
-      "geprobeerd": 1
+      "gezakt": 26,
+      "geprobeerd": 1,
+      "toetsSha": "9555320bffcd",
+      "moduleSha": "ab180568882b"
     },
     "spelreplay.test.js": {
       "soort": "puur",
@@ -5488,7 +5942,9 @@
       "module": "server/kern/spellen.js",
       "operator": "return-weg#0",
       "gezakt": 6,
-      "geprobeerd": 3
+      "geprobeerd": 4,
+      "toetsSha": "e17cacba49ee",
+      "moduleSha": "290ce0b17089"
     },
     "spelsudoku.e2e.js": {
       "soort": "server",
@@ -5531,7 +5987,9 @@
       "module": "server/kern/spellen.js",
       "operator": "return-weg#0",
       "gezakt": 5,
-      "geprobeerd": 3
+      "geprobeerd": 4,
+      "toetsSha": "7bf4c55cda5b",
+      "moduleSha": "290ce0b17089"
     },
     "speluitslagen.test.js": {
       "soort": "puur",
@@ -5539,7 +5997,9 @@
       "module": "server/kern/spellen/uitslagen.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "7ddbd34b7794",
+      "moduleSha": "9d59ee48dacd"
     },
     "spelvariant.test.js": {
       "soort": "puur",
@@ -5547,7 +6007,9 @@
       "module": "server/kern/spellen/variant.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "7d9c993d98f8",
+      "moduleSha": "c6c23f4e5e98"
     },
     "spelveiling.test.js": {
       "soort": "puur",
@@ -5555,7 +6017,9 @@
       "module": "server/kern/spellen/magnaat/kaart.js",
       "operator": "===->!==#0",
       "gezakt": 14,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "504713841c4d",
+      "moduleSha": "0389ac6887d7"
     },
     "spelverzekering.test.js": {
       "soort": "puur",
@@ -5563,7 +6027,9 @@
       "module": "server/kern/spellen/magnaat/risico.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "eb3fd4ddb55f",
+      "moduleSha": "2220f7eab674"
     },
     "sportclub.test.js": {
       "soort": "server",
@@ -5578,7 +6044,9 @@
       "module": "server/accounts/index.js",
       "operator": "return-weg#0",
       "gezakt": 12,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "d8787f18bb05",
+      "moduleSha": "86e690603c4f"
     },
     "ssrf.test.js": {
       "soort": "puur",
@@ -5586,7 +6054,9 @@
       "module": "server/kern/ssrf.js",
       "operator": "true->false#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "1fd427879364",
+      "moduleSha": "8c2a128b21ed"
     },
     "staatproef.test.js": {
       "soort": "puur",
@@ -5594,7 +6064,9 @@
       "module": "scripts/lib/staatproef.js",
       "operator": ">=->>#0",
       "gezakt": 5,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "4ebdc9ef6b35",
+      "moduleSha": "e9d6724adb5e"
     },
     "staatregister.test.js": {
       "soort": "puur",
@@ -5602,7 +6074,9 @@
       "module": "scripts/lib/staatscan.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 3,
+      "toetsSha": "94ca5cf5c95e",
+      "moduleSha": "2573bd610334"
     },
     "stad.test.js": {
       "soort": "server",
@@ -5652,7 +6126,9 @@
       "module": "server/kern/command/stadstart.js",
       "operator": "===->!==#0",
       "gezakt": 5,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "a5468f0e4396",
+      "moduleSha": "adfc6c478231"
     },
     "stadsweefsel-steden.test.js": {
       "soort": "puur",
@@ -5660,7 +6136,9 @@
       "module": "server/kern/stadsweefsel/index.js",
       "operator": "!==->===#0",
       "gezakt": 7,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "7676dc5ab16b",
+      "moduleSha": "12e3d1f05654"
     },
     "stadsweefsel.test.js": {
       "soort": "server",
@@ -5689,7 +6167,9 @@
       "module": "server/middleware/stijlbundel.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "9a4e69a50d8d",
+      "moduleSha": "bbfc57fe6934"
     },
     "stilalarm.test.js": {
       "soort": "server",
@@ -5700,11 +6180,13 @@
     },
     "stillepost.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/mail.js",
-      "operator": "&&->||#6",
-      "gezakt": 1,
-      "geprobeerd": 16
+      "staat": "overleefd",
+      "modules": [
+        "server/mail.js"
+      ],
+      "geprobeerd": 16,
+      "posities": 8,
+      "toetsSha": "5834b53d9c1d"
     },
     "streng-poorten.test.js": {
       "soort": "server",
@@ -5719,15 +6201,19 @@
       "module": "test/helper.js",
       "operator": "regex-alternatief-weg#0",
       "gezakt": 1,
-      "geprobeerd": 6
+      "geprobeerd": 7,
+      "toetsSha": "eeafe7b9bdfc",
+      "moduleSha": "db86f9537dee"
     },
     "stripe-eigen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/stripe.js",
       "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
+      "gezakt": 3,
+      "geprobeerd": 1,
+      "toetsSha": "f8a5a3cce79f",
+      "moduleSha": "85ecd23e5de6"
     },
     "studio.test.js": {
       "soort": "server",
@@ -5742,7 +6228,9 @@
       "module": "server/stun.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "c6e36386fec1",
+      "moduleSha": "f70a1e306570"
     },
     "stuur-aanval.test.js": {
       "soort": "puur",
@@ -5750,7 +6238,9 @@
       "module": "server/kern/stuur/beleid.js",
       "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 6
+      "geprobeerd": 6,
+      "toetsSha": "70787b93d6e1",
+      "moduleSha": "f61ae4415ef8"
     },
     "stuur.test.js": {
       "soort": "server",
@@ -5786,7 +6276,9 @@
       "module": "scripts/svgpaden.js",
       "operator": "===->!==#0",
       "gezakt": 7,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "d37fc2962c59",
+      "moduleSha": "bb769da10b5a"
     },
     "synergie.test.js": {
       "soort": "server",
@@ -5815,7 +6307,9 @@
       "module": "scripts/lib/takenlijst.js",
       "operator": "&&->||#0",
       "gezakt": 5,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "095ddd2192ab",
+      "moduleSha": "f93ae0ac71dc"
     },
     "talen.test.js": {
       "soort": "server",
@@ -5851,7 +6345,9 @@
       "module": "server/techniek.js",
       "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "58be9ec8501a",
+      "moduleSha": "c773838a4747"
     },
     "terrein-en-panden.test.js": {
       "soort": "server",
@@ -5915,7 +6411,9 @@
       "module": "server/lib/jws.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "cd15043d9ff4",
+      "moduleSha": "af7058b73d15"
     },
     "tls-acme.test.js": {
       "soort": "puur",
@@ -5923,7 +6421,9 @@
       "module": "server/lib/jws.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "3be057a2aff7",
+      "moduleSha": "af7058b73d15"
     },
     "tls-boot.test.js": {
       "soort": "puur",
@@ -5931,7 +6431,9 @@
       "module": "server/web/index.js",
       "operator": "&&->||#0",
       "gezakt": 3,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "99dd3ffbebe7",
+      "moduleSha": "f76b4a8e29dc"
     },
     "tls-native.test.js": {
       "soort": "puur",
@@ -5939,7 +6441,9 @@
       "module": "server/lib/tls.js",
       "operator": "true->false#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "066dff3ce5bd",
+      "moduleSha": "c5ef47f7e029"
     },
     "tls-x509.test.js": {
       "soort": "puur",
@@ -5947,7 +6451,9 @@
       "module": "server/lib/x509.js",
       "operator": "return-weg#0",
       "gezakt": 2,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "1aecc7345de3",
+      "moduleSha": "55cc5477de1c"
     },
     "toegankelijk.test.js": {
       "soort": "server",
@@ -5990,7 +6496,9 @@
       "module": "server/db/tx/index.js",
       "operator": "true->false#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "cd6a65b67d62",
+      "moduleSha": "955e8add6bd5"
     },
     "txindex.test.js": {
       "soort": "puur",
@@ -5998,7 +6506,9 @@
       "module": "server/db/tx/index.js",
       "operator": "return-weg#0",
       "gezakt": 2,
-      "geprobeerd": 5
+      "geprobeerd": 5,
+      "toetsSha": "03ac796d684b",
+      "moduleSha": "955e8add6bd5"
     },
     "txkap.test.js": {
       "soort": "puur",
@@ -6006,7 +6516,9 @@
       "module": "server/db/tx/index.js",
       "operator": "true->false#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "bea9a0c58ba1",
+      "moduleSha": "955e8add6bd5"
     },
     "txledger-sqlite.test.js": {
       "soort": "puur",
@@ -6014,7 +6526,9 @@
       "module": "server/db/tx/index.js",
       "operator": "return-weg#0",
       "gezakt": 2,
-      "geprobeerd": 5
+      "geprobeerd": 5,
+      "toetsSha": "20115aa73185",
+      "moduleSha": "955e8add6bd5"
     },
     "txledger.pg.test.js": {
       "soort": "puur",
@@ -6048,7 +6562,9 @@
       "module": "scripts/uitrol.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "709285dee639",
+      "moduleSha": "6fde9f8afec5"
     },
     "uitvoerproef.test.js": {
       "soort": "puur",
@@ -6056,7 +6572,9 @@
       "module": "scripts/lib/uitvoerproef.js",
       "operator": "true->false#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "9bb85e3c04c5",
+      "moduleSha": "2e8f365d2bf5"
     },
     "upload-poort.test.js": {
       "soort": "server",
@@ -6071,7 +6589,9 @@
       "module": "server/kern/uploadquarantaine.js",
       "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "81cd4aa8f22b",
+      "moduleSha": "7130a7854629"
     },
     "vakken.test.js": {
       "soort": "server",
@@ -6130,7 +6650,7 @@
       "gezakt": 1,
       "geprobeerd": 6,
       "toetsSha": "c50e899f9115",
-      "moduleSha": "e2a09a438fb5"
+      "moduleSha": "ed7e61b411e5"
     },
     "veiligadres.test.js": {
       "soort": "puur",
@@ -6138,7 +6658,9 @@
       "module": "server/opzet/veiligadres.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e6aed989e887",
+      "moduleSha": "65b7b1a3bea8"
     },
     "veiligheid-kring-rust.test.js": {
       "soort": "server",
@@ -6153,7 +6675,9 @@
       "module": "server/kern/veiligheid/moment.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "f8532b794a23",
+      "moduleSha": "d2ebed1863dc"
     },
     "veiligheid.test.js": {
       "soort": "server",
@@ -6210,7 +6734,9 @@
       "module": "server/lib/verraad.js",
       "operator": "true->false#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "88ac044cc4e1",
+      "moduleSha": "7aa31f83690f"
     },
     "verraadtelling.test.js": {
       "soort": "puur",
@@ -6218,7 +6744,9 @@
       "module": "scripts/lib/verraadtelling.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "6ea71ee536cd",
+      "moduleSha": "5ac4895ea6fe"
     },
     "vertaal.test.js": {
       "soort": "server",
@@ -6233,7 +6761,9 @@
       "module": "scripts/lib/verzadiging.js",
       "operator": "&&->||#0",
       "gezakt": 3,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "654d46d2458d",
+      "moduleSha": "324c1fc71477"
     },
     "verzoek-intrekken.test.js": {
       "soort": "server",
@@ -6269,7 +6799,9 @@
       "module": "server/lib/vingerafdruk.js",
       "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "646aeeface2d",
+      "moduleSha": "e87c5c7e9c81"
     },
     "vloerwerk.test.js": {
       "soort": "server",
@@ -6281,10 +6813,14 @@
     "vloot.test.js": {
       "soort": "puur",
       "staat": "gezakt",
+      "gezakt": 2,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
       "module": "server/vloot.js",
       "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "71d0cc7b6b5e",
+      "moduleSha": "32f66cc87dc5"
     },
     "voeding.test.js": {
       "soort": "server",
@@ -6325,7 +6861,9 @@
       "module": "scripts/lib/vrijenamen.js",
       "operator": "true->false#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "ecdad5bd0542",
+      "moduleSha": "23bffeb6403f"
     },
     "vuurplan.test.js": {
       "soort": "puur",
@@ -6341,7 +6879,9 @@
       "module": "server/kern/wacht/index.js",
       "operator": "return-weg#0",
       "gezakt": 2,
-      "geprobeerd": 4
+      "geprobeerd": 4,
+      "toetsSha": "d5f13c56f85a",
+      "moduleSha": "60307f9d6b8c"
     },
     "wachtdeur.test.js": {
       "soort": "server",
@@ -6356,7 +6896,9 @@
       "module": "server/functies/wachter.js",
       "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "17422e63f975",
+      "moduleSha": "6de9fe7b32a4"
     },
     "wachtlijst.test.js": {
       "soort": "server",
@@ -6385,7 +6927,9 @@
       "module": "server/web/index.js",
       "operator": "&&->||#0",
       "gezakt": 2,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "ea5518016a72",
+      "moduleSha": "f76b4a8e29dc"
     },
     "webauthn-ceremonie.test.js": {
       "soort": "server",
@@ -6398,9 +6942,11 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/webauthn/index.js",
-      "operator": "!==->===#0",
+      "operator": "===->!==#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "b622bcdfb3d9",
+      "moduleSha": "20bb14777dbc"
     },
     "webauthn.test.js": {
       "soort": "server",
@@ -6422,7 +6968,9 @@
       "module": "server/webpush.js",
       "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "4cd400335cf5",
+      "moduleSha": "d633b045af61"
     },
     "wereld.test.js": {
       "soort": "server",
@@ -6437,7 +6985,9 @@
       "module": "server/kern/wereldkern.js",
       "operator": "===->!==#0",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d02b882ee45e",
+      "moduleSha": "628a59f3c0a3"
     },
     "wereldlaag.e2e.js": {
       "soort": "server",
@@ -6483,7 +7033,8 @@
         "server/translate.js"
       ],
       "geprobeerd": 13,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "01c120a7664f"
     },
     "wereldvermogens.test.js": {
       "soort": "server",
@@ -6512,7 +7063,9 @@
       "module": "server/bedrijf/gebeurtenis.js",
       "operator": "===->!==#0",
       "gezakt": 6,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "2db89bbb970e",
+      "moduleSha": "b05f5ea8304b"
     },
     "werkgeheugen.test.js": {
       "soort": "server",
@@ -6636,7 +7189,9 @@
       "module": "scripts/lib/wetboek.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "ca8b08201c89",
+      "moduleSha": "3bc6d78b843c"
     },
     "wezen.test.js": {
       "soort": "puur",
@@ -6644,7 +7199,9 @@
       "module": "scripts/lib/wezen.js",
       "operator": "!==->===#0",
       "gezakt": 4,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "d6957f8ac4de",
+      "moduleSha": "fc7880365d97"
     },
     "wiring-contract.test.js": {
       "soort": "puur",
@@ -6653,7 +7210,8 @@
         "server/accounts/index.js"
       ],
       "geprobeerd": 13,
-      "posities": 8
+      "posities": 8,
+      "toetsSha": "12dfd311d24f"
     },
     "wisselen-en-historie.test.js": {
       "soort": "server",
@@ -6668,7 +7226,9 @@
       "module": "server/kern/onboarding.js",
       "operator": "&&->||#0",
       "gezakt": 6,
-      "geprobeerd": 2
+      "geprobeerd": 2,
+      "toetsSha": "b986cab787f4",
+      "moduleSha": "018f22d137c0"
     },
     "zaak-balie.test.js": {
       "soort": "server",
@@ -6739,7 +7299,9 @@
       "module": "server/kern/zaakcommand/index.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "80b429e4c9c4",
+      "moduleSha": "a730d4d4d8d0"
     },
     "zaakdoos.test.js": {
       "soort": "server",
@@ -6777,7 +7339,9 @@
       "module": "server/kern/command/register.js",
       "operator": "===->!==#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "50b7c24a2858",
+      "moduleSha": "0b0c7afc834a"
     },
     "zegel.test.js": {
       "soort": "puur",
@@ -6785,7 +7349,9 @@
       "module": "server/lib/zegel.js",
       "operator": "&&->||#0",
       "gezakt": 3,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "3cf4dac9137b",
+      "moduleSha": "f4a422a01bc2"
     },
     "zegelcheck.test.js": {
       "soort": "puur",
@@ -6793,7 +7359,9 @@
       "module": "public/shared/zegelcheck.js",
       "operator": "!==->===#0",
       "gezakt": 2,
-      "geprobeerd": 3
+      "geprobeerd": 4,
+      "toetsSha": "1b0e14badb09",
+      "moduleSha": "8ff7ee304913"
     },
     "zegelroute.test.js": {
       "soort": "server",
@@ -6824,7 +7392,9 @@
       "module": "server/accounts/index.js",
       "operator": "return-weg#0",
       "gezakt": 3,
-      "geprobeerd": 3
+      "geprobeerd": 3,
+      "toetsSha": "b77f4882c200",
+      "moduleSha": "86e690603c4f"
     },
     "zorgketen.test.js": {
       "soort": "server",
@@ -6853,7 +7423,9 @@
       "module": "scripts/bundel.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "toetsSha": "e2d7763856f4",
+      "moduleSha": "e999dd9e2585"
     }
   }
 }

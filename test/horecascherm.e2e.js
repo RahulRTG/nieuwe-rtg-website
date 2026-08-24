@@ -149,6 +149,59 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     await page.waitForTimeout(700);
     keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(keuken, /Tournedos/, 'na vrijgave staat de bon op het keukenscherm');
+    /* EN DE VRIJGAVE LIEP VIA DE OFFLINE-LAAG, ook nu er gewoon verbinding is.
+       Een PDA in een dode hoek van de kelder is geen storing van de zaak: de
+       keuken kan online staan terwijl het toestel dat niet is.
+
+       Dat de gang hierboven op het keukenscherm staat bewijst dat de weg WERKT,
+       maar niet dat hij LANGS de offline-laag loopt -- rechtstreeks vrijgeven
+       geeft precies hetzelfde beeld. Dus wordt de lijn hieronder er echt
+       uitgetrokken; alleen dan is het verschil zichtbaar. */
+    assert.equal(await page.evaluate(() => window.RTGHorecaEdge.handRij().length), 0,
+      'de gang is aangekomen, dus er wacht niets op dit toestel');
+    assert.equal(await page.evaluate(() => !!document.getElementById('zEdgeStrook').hidden), true,
+      'en de strook is stil, want er staat niets te wachten');
+
+    /* ---- de zaal zonder lijn ---- */
+    await page.click('#tabZaal');
+    await page.waitForTimeout(400);
+    await page.fill('#zNaam', 'Kaasplank');
+    await page.fill('#zPrijs', '18');
+    await page.fill('#zAantal', '1');
+    await page.fill('#zGang', '3');
+    await page.fill('#zStation', 'koud');
+    await page.fill('#zAllergie', '');
+    await page.click('#zRegel');
+    await page.waitForTimeout(600);
+
+    let lijnDicht = true;
+    await page.route('**/api/supplier/horeca/offline/handelingen', async (route) => {
+      if (lijnDicht) return route.abort('failed');
+      return route.continue();
+    });
+    await page.fill('#zVrijGang', '3');
+    await page.fill('#zServeerOm', '');
+    await page.click('#zVrij');
+    await page.waitForTimeout(800);
+    assert.equal(await page.evaluate(() => window.RTGHorecaEdge.handRij().length), 1,
+      'zonder lijn staat de gang op dit toestel');
+    assert.equal(await page.evaluate(() => !!document.getElementById('zEdgeStrook').hidden), false,
+      'en dat staat op het scherm');
+    await page.click('#tabKeuken');
+    await page.waitForTimeout(600);
+    keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
+    assert.ok(!/Kaasplank/.test(keuken), 'de keuken heeft hem nog niet');
+
+    lijnDicht = false;
+    await page.evaluate(() => window.RTGHorecaEdge.handLeeg());
+    await page.waitForTimeout(1000);
+    assert.equal(await page.evaluate(() => window.RTGHorecaEdge.handRij().length), 0, 'de rij is leeg');
+    await page.click('#tabZaal');
+    await page.waitForTimeout(300);
+    await page.click('#tabKeuken');
+    await page.waitForTimeout(800);
+    keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
+    assert.match(keuken, /Kaasplank/, 'en zodra de lijn terug is, staat de gang alsnog bij de keuken');
     assert.match(keuken, /Allergie: noten/, 'met de allergie in een eigen label');
     assert.match(keuken, /serveren 19:42/i, 'en met de gewenste serveertijd');
     assert.match(keuken, /van \d+ min/, 'de looptijd staat naast de norm, niet alleen een kleur');

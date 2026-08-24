@@ -479,8 +479,9 @@ hoort een gang op tafel, en in welke baan valt een gerecht) naast `cadans.js` (d
 projectie daarvan over de rekeningen), en `keuken-bon.js` (hoe een bon eruitziet)
 naast `keuken.js` (hoe het bord zich gedraagt).
 
-**5. Venue Edge** — *af, en met opzet niet compleet.* De serverkant lag er al;
-de kassa was de eerste client (5a), de PDA de tweede (5b).
+**5. Venue Edge** — *af.* De serverkant lag er al; de kassa was de eerste client
+(5a), de PDA de tweede (5b), en de zaal en de bar volgden met iets anders dan
+een wachtrij (5c).
 
 **5b. De PDA zonder lijn — af, en de keuze is het interessante deel.**
 
@@ -518,6 +519,47 @@ nodig had waren er twee mogelijkheden: een tweede rij schrijven, of erkennen dat
 "werk dat niet weg kon" overal hetzelfde probleem is. Twee rijen lopen uiteen op
 de dag dat iemand er één repareert. De kassa draait sindsdien op dezelfde
 mechaniek, en beide browsertoetsen bewaken hem.
+
+**5c. De zaal en de bar: samenvoegen in plaats van herhalen.**
+
+De kassa en de PDA sturen een **pakket** opnieuw: een bon, een opgenomen
+bestelling. Dat werkt omdat zo'n pakket iets **nieuws** is — het bestond nog
+niet, dus het kan niet botsen. De zaal en de bar doen iets anders: daar wordt
+niet opgenomen maar **bewerkt** — een gang vrijgeven, een glas op klaar zetten.
+Tussen het moment van de handeling en het moment van aankomen kan een collega
+hetzelfde bord al verder hebben gezet, en een pakket dat blind wordt afgespeeld
+zet dat dan terug.
+
+Dus is de regel niet *herhaal* maar *voeg samen*, en er is precies één regel die
+dat veilig maakt (`kern/horeca/samenvoegen.js`):
+
+> **Een stand gaat nooit achteruit.**
+
+De standen vormen een ketting — besteld, gestart, bereid, klaar, uitgegeven — en
+die loopt maar één kant op. Een bord dat is uitgeserveerd kan niet weer "klaar"
+worden. Komt er een offline-handeling binnen die terug zou zetten, dan gebeurt er
+niets **én dat wordt gemeld**: het toestel hoort te weten dat zijn plaatselijke
+werkelijkheid het heeft verloren. Stil laten vallen zou betekenen dat een
+medewerker denkt iets te hebben gedaan wat nooit is gebeurd — precies de fout
+waarvoor een offline-laag bestaat.
+
+Twee handelingen gaan langs deze weg, en beide **altijd**, ook als er gewoon
+verbinding is:
+
+- **een glas aanzetten of klaar melden** (bar) — een barman kan niet eerst
+  uitzoeken of het netwerk het doet, en een glas dat "klaar" is gemeld maar nooit
+  aankwam, is een glas dat niemand komt halen;
+- **een gang vrijgeven** (zaal) — een PDA in een dode hoek van de kelder is geen
+  storing van de zaak: de keuken kan online staan terwijl het toestel dat niet
+  is, en dan hoort de gang aan te komen zodra de bediening weer in bereik loopt.
+  Vrijgeven is idempotent: wat al vrij is blijft vrij, en dat is "al-gedaan" en
+  geen fout.
+
+Wat er met opzet **niet** in zit: **geld** (korting, fooi, splitsen, betalen) —
+niet omdat het moeilijk is, maar omdat een tweede weg waarlangs geld beweegt een
+besluit is en geen bijvangst. En **een regel van de rekening halen**: dat mag
+alleen zolang de keuken er niet aan begonnen is, en juist dát is wat een offline
+toestel niet kan weten — zijn beeld is per definitie oud.
 
 **5a. De kassa zonder lijn — af.** Een bon die niet weg kon ging verloren; nu
 staat hij in de wachtrij van dat toestel, zichtbaar in een strook boven het
@@ -717,17 +759,25 @@ meting naast staat, en tot die tijd is het een plan.
 
 ## Wat er hierna ligt
 
-*De vier punten die hier op 23 augustus 2026 stonden zijn er twee geworden: het
-stationsbord per stap, de wijk en de uitvoerders achter de rechtenlaag zijn af,
-en Venue Edge is af voor de PDA. Wat overblijft staat hieronder, elk met de
-reden waarom het een eigen snede is en niet een restje van iets hierboven.*
+*De vier punten die hier op 23 augustus 2026 stonden zijn alle vier af: het
+stationsbord per stap, de wijk, de uitvoerders achter de rechtenlaag, Venue Edge
+(voor de PDA als wachtrij, voor de zaal en de bar als samenvoeging) en de
+rolmodus host. Wat er nu ligt staat hieronder — en de eerlijkste zin van dit
+document staat nog steeds onderaan de meetlat: dit is pas waar wanneer er een
+meting van een echte dienst naast staat.*
 
-**Venue Edge voor de zaal en de bar.** De PDA kan nu zonder lijn een bestelling
-opnemen (punt 5b), en dat is bewust het enige. Het zaalscherm en het barscherm
-hebben die rij niet: daar wordt niet opgenomen maar bewérkt — een gang vrijgeven,
-een stand zetten, splitsen — en dat vraagt een lokale werkelijkheid die wordt
-samengevoegd, geen rij die opnieuw verstuurt. Een andere klasse probleem, en hij
-verdient een eigen ontwerp.
+**Een dienst meten.** Alles hierboven is met toetsen bewezen en met geen enkele
+avond. De meetlat onderaan dit document noemt de getallen die ertoe doen —
+spreiding binnen een gang, beloofde versus werkelijke gereedtijd, dubbel
+geclaimde uitgiftes — en er staat nog nergens een gemeten waarde naast. Dat is
+geen bouwwerk maar een proef, en hij vraagt een zaak, een avond en iemand die
+meekijkt.
+
+**De vloer (VLOER) heeft geen eigen scherm.** Vijf van de zes werkstanden staan
+er: TAFEL, PDA SERVICE, VUUR, BAR en REGIE. De maître ziet de zaak nu via het
+wijkbeeld op de PDA, en dat beantwoordt de halve vraag — *wie draagt wat*. De
+andere helft, *hoe verdelen we dat opnieuw*, vraagt iets wat er niet is: een
+manier om een wijk over te dragen terwijl er gasten aan tafel zitten.
 
 ## De echte wauw
 

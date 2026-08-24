@@ -76,10 +76,30 @@
         '</article>';
     }).join('') : '<p class="b-leeg">Geen open ronden. Wat de zaal niet heeft vrijgegeven, staat hier niet.</p>';
 
+    /* AANZETTEN EN KLAAR MELDEN GAAN VIA DE OFFLINE-LAAG, ook als er gewoon
+       verbinding is. Dat is geen omweg maar de enige manier waarop het achter de
+       toog betrouwbaar is: een barman kan niet eerst uitzoeken of het netwerk
+       het doet, en een glas dat "klaar" is gemeld maar nooit aankwam, is een
+       glas dat niemand komt halen.
+
+       De serverkant VOEGT SAMEN in plaats van te herhalen, met één regel: een
+       stand gaat nooit achteruit. Wat geweigerd wordt komt met de reden terug --
+       en die zetten we hier op het scherm, want het scherm hoort te weten dat
+       zijn beeld het heeft verloren (kern/horeca/samenvoegen.js). */
     K.bind($('bGolvenLijst'), 'zet', function (b) {
-      api('/keuken/stand', { rekeningId: b.getAttribute('data-rek'),
-        regelId: b.getAttribute('data-zet'), stand: b.getAttribute('data-naar') })
-        .then(function (r) { if (r.body.error) meld(r.body.error); haal(); });
+      window.RTGHorecaEdge.handel({
+        clientId: (window.RTGId ? RTGId('bar') : 'bar-' + Date.now()),
+        soort: 'stand', rekeningId: b.getAttribute('data-rek'),
+        regelId: b.getAttribute('data-zet'), naar: b.getAttribute('data-naar')
+      }).then(function (r) {
+        if (r && r.gewacht) {
+          meld('Geen lijn. Dit staat op de tap en gaat weg zodra de verbinding terug is.');
+        } else {
+          var u = (r && r.uitkomsten && r.uitkomsten[0]) || {};
+          if (u.stand === 'geweigerd') meld(u.reden || 'Dat kon niet meer.');
+        }
+        haal();
+      }, function (e) { meld(e.message || 'Er ging iets mis.'); });
     });
   }
 
@@ -89,6 +109,21 @@
       teken(r.body);
     });
   }
+
+  /* De strook die zegt hoeveel handelingen er op dit toestel staan. Zonder die
+     strook is een wachtrij een geheim, en dan gaat iemand ervan uit dat het
+     verstuurd is. */
+  function toonEdge(stand) {
+    var el = $('bEdgeStrook');
+    if (!el) return;
+    if (!stand.wacht && !stand.vast) { el.hidden = true; el.textContent = ''; return; }
+    el.hidden = false;
+    var t = [];
+    if (stand.wacht) t.push(stand.wacht + ' handeling(en) staan op dit toestel en gaan weg zodra er verbinding is.');
+    if (stand.vast) t.push(stand.vast + ' liep vast; de server wilde ze niet.');
+    el.textContent = t.join(' ');
+  }
+  if (window.RTGHorecaEdge) RTGHorecaEdge.zetHandeling(K.token, toonEdge);
 
   $('bVerversNu').addEventListener('click', haal);
   // dezelfde duwstroom als de keuken: een gang die de zaal vrijgeeft hoort hier

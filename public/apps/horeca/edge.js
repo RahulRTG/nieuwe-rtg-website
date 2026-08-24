@@ -40,7 +40,7 @@
 (function () {
   'use strict';
   var K = window.RTGHoreca;
-  var W = null;
+  var W = null, HAND = null;
 
   window.RTGHorecaEdge = {
     zet: function (token, bijWijziging) {
@@ -67,6 +67,40 @@
        elke poging anders zijn (regel 3). */
     neemOp: function (bestelling) {
       return W.verstuur({ bonnen: [Object.assign({ soort: 'opgenomen' }, bestelling)] });
+    },
+
+    /* ---- DE TWEEDE RIJ: HANDELINGEN, EN DIE IS ANDERS ----
+
+       Een bestelling is iets NIEUWS: hij bestond nog niet, dus hij kan niet
+       botsen. Een handeling BEWERKT iets dat er al is, en tussen het moment van
+       de handeling en het moment van aankomen kan een collega hetzelfde bord al
+       verder hebben gezet. Blind afspelen zet dat dan terug.
+
+       De serverkant voegt daarom samen in plaats van te herhalen, met één regel
+       die het veilig maakt: een stand gaat nooit achteruit
+       (kern/horeca/samenvoegen.js). Wat geweigerd wordt komt MET de reden
+       terug -- het scherm hoort te weten dat zijn plaatselijke beeld het heeft
+       verloren.
+
+       Twee rijen en geen een, want ze mogen elkaar niet ophouden: een
+       bestelling die vastloopt hoort een klaar gemeld glas niet tegen te
+       houden, en andersom. */
+    zetHandeling: function (token, bijWijziging) {
+      HAND = window.RTGWachtrij.maak({
+        naam: 'rtg_horeca_hand', pad: '/api/supplier/horeca/offline/handelingen', token: token,
+        vol: 'De handelingen van dit toestel stapelen zich op. Herstel eerst de verbinding.'
+      });
+      HAND.start(bijWijziging);
+    },
+    handStand: function () {
+      return HAND ? HAND.stand() : { wacht: 0, vast: 0, vreemd: 0, vreemdeZaak: null };
+    },
+    handRij: function () { return HAND ? HAND.rij() : []; },
+    handLeeg: function () { return HAND ? HAND.leeg() : Promise.resolve(); },
+    /* `clientId` komt van de aanroeper, precies zoals bij neemOp: hij hoort bij
+       DEZE handeling en niet bij deze poging. */
+    handel: function (handeling) {
+      return HAND.verstuur({ handelingen: [handeling] });
     }
   };
 })();

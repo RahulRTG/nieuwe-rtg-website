@@ -13,6 +13,10 @@
       gemaakt te worden.
    5. DE STOEL EN DE ALLERGIE STAAN OP HET GLAS. Vier glazen op een blad zonder
       te weten welk glas waarheen gaat, is raden.
+   6. HET WERKT ZONDER LIJN. Een barman kan niet eerst uitzoeken of het netwerk
+      het doet; een glas dat "klaar" is gemeld maar nooit aankwam, is een glas
+      dat niemand komt halen. En als een collega intussen sneller was, hoort het
+      scherm dat te horen -- niet stil zijn eigen beeld te herstellen.
 
    Draait alleen waar een browser is.
    ========================================================================== */
@@ -45,6 +49,8 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     await page.evaluate(() => {
       localStorage.setItem('rtg_cookieinfo_v1', '1');
       localStorage.removeItem('rtg_sup_token');
+      localStorage.removeItem('rtg_horeca_hand');
+      localStorage.removeItem('rtg_horeca_hand-vast');
     });
     await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'load' });
     await page.waitForTimeout(900);
@@ -117,6 +123,58 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     const rek = (await H('/rekening', { rekeningId: t1.id })).body.rekening;
     assert.equal(rek.regels.find(x => x.id === welke).stand, 'klaar',
       'en de stand staat op de rekening zelf, via dezelfde deur als de keuken');
+
+    /* ---- 6. de lijn eruit ---- */
+    const t3 = await tafel('BAR-C', [{ naam: 'Negroni', aantal: 1 }]);
+    let lijnDicht = true;
+    await page.route('**/api/supplier/horeca/offline/handelingen', async (route) => {
+      if (lijnDicht) return route.abort('failed');
+      return route.continue();
+    });
+    await page.click('#bVerversNu');
+    await page.waitForTimeout(800);
+
+    const aanC = await page.$('.b-golf:has-text("BAR-C") [data-naar="gestart"]');
+    assert.ok(aanC, 'de negroni staat op het bord');
+    await aanC.click();
+    await page.waitForTimeout(800);
+    assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 1,
+      'zonder lijn staat de handeling op het toestel');
+    const strook = await page.evaluate(() => ({
+      verborgen: !!document.getElementById('bEdgeStrook').hidden,
+      tekst: document.getElementById('bEdgeStrook').textContent }));
+    assert.equal(strook.verborgen, false, 'en dat staat op het scherm');
+    assert.match(strook.tekst, /op dit toestel/, strook.tekst);
+    const tussenC = (await H('/rekening', { rekeningId: t3.id })).body.rekening;
+    assert.equal(tussenC.regels[0].stand, 'besteld', 'bij de server is er nog niets gebeurd');
+
+    lijnDicht = false;
+    await page.evaluate(() => RTGHorecaEdge.handLeeg());
+    await page.waitForTimeout(1000);
+    assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 0, 'de rij is leeg');
+    const naC = (await H('/rekening', { rekeningId: t3.id })).body.rekening;
+    assert.equal(naC.regels[0].stand, 'gestart', 'en de handeling is alsnog aangekomen');
+
+    /* EEN COLLEGA DIE SNELLER WAS. Het glas gaat online de deur uit terwijl dit
+       toestel offline "klaar" meldt. De samenvoeging weigert dat -- een stand
+       gaat nooit achteruit -- en het scherm hoort de reden te horen. */
+    lijnDicht = true;
+    const klaarC = await page.$('.b-golf:has-text("BAR-C") [data-naar="klaar"]');
+    assert.ok(klaarC, 'er staat een knop om hem klaar te melden');
+    await klaarC.click();
+    await page.waitForTimeout(800);
+    assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 1, 'hij wacht');
+
+    await H('/keuken/stand', { rekeningId: t3.id, regelId: t3.regels[0], stand: 'uitgegeven' });
+
+    lijnDicht = false;
+    await page.evaluate(() => RTGHorecaEdge.handLeeg());
+    await page.waitForTimeout(1000);
+    const eindC = (await H('/rekening', { rekeningId: t3.id })).body.rekening;
+    assert.equal(eindC.regels[0].stand, 'uitgegeven',
+      'de offline-melding zet het bord niet terug naar klaar');
+    assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 0,
+      'en de handeling is afgehandeld, niet blijven hangen');
 
     assert.deepEqual(fouten, [], 'geen scriptfouten op het barscherm');
   } finally {

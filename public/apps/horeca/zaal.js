@@ -149,13 +149,31 @@
         laad();
       });
     });
+    /* EEN GANG VRIJGEVEN GAAT VIA DE OFFLINE-LAAG, ook als er gewoon verbinding
+       is. Een PDA in een dode hoek van de kelder is geen storing van de zaak:
+       de keuken kan online staan terwijl dit toestel dat niet is, en dan hoort
+       de gang aan te komen zodra de bediening weer in bereik loopt.
+
+       De serverkant VOEGT SAMEN in plaats van te herhalen: wat al vrij is
+       blijft vrij (kern/horeca/samenvoegen.js). Een tweede tik verandert dus
+       niets en is geen fout. */
     $('zVrij').addEventListener('click', function () {
       if (!huidig) return meld('Open eerst een rekening.');
-      api('/gang/vrij', { rekeningId: huidig, gang: Number($('zVrijGang').value) || 0,
-        serveerOm: $('zServeerOm').value.trim() }).then(function (r) {
-        meld(r.body.error || (r.body.vrijgegeven + ' regel(s) naar de keuken.'));
-        if (!r.body.error) laad();
-      });
+      window.RTGHorecaEdge.handel({
+        clientId: (window.RTGId ? RTGId('vrij') : 'vrij-' + Date.now()),
+        soort: 'gangvrij', rekeningId: huidig, gang: Number($('zVrijGang').value) || 0,
+        serveerOm: $('zServeerOm').value.trim()
+      }).then(function (r) {
+        if (r && r.gewacht) {
+          meld('Geen lijn. De gang staat op dit toestel en gaat naar de keuken zodra er verbinding is.');
+          return;
+        }
+        var u = (r && r.uitkomsten && r.uitkomsten[0]) || {};
+        if (u.stand === 'geweigerd') meld(u.reden || 'Dat kon niet.');
+        else if (u.stand === 'al-gedaan') meld(u.reden || 'Stond al bij de keuken.');
+        else meld((u.vrijgegeven || 0) + ' regel(s) naar de keuken.');
+        laad();
+      }, function (e) { meld(e.message || 'Er ging iets mis.'); });
     });
     /* De zaal luistert mee op dezelfde stroom als de keuken: schuift er een
        gast aan met de QR, dan staat hij hier zonder dat iemand ververst. */
@@ -163,6 +181,21 @@
       if (!document.hidden && huidig) toon(huidig, true);
     });
   }
+
+  /* De strook die zegt hoeveel gangen er op dit toestel staan. Zonder die strook
+     is een wachtrij een geheim, en dan gaat iemand ervan uit dat de keuken het
+     heeft. */
+  function toonEdge(stand) {
+    var el = $('zEdgeStrook');
+    if (!el) return;
+    if (!stand.wacht && !stand.vast) { el.hidden = true; el.textContent = ''; return; }
+    el.hidden = false;
+    var t = [];
+    if (stand.wacht) t.push(stand.wacht + ' handeling(en) staan op dit toestel en gaan weg zodra er verbinding is.');
+    if (stand.vast) t.push(stand.vast + ' liep vast; de server wilde ze niet.');
+    el.textContent = t.join(' ');
+  }
+  if (window.RTGHorecaEdge) RTGHorecaEdge.zetHandeling(window.RTGHoreca.token, toonEdge);
 
   window.RTGHorecaZaal = { bind: bind, laad: laad };
 })();

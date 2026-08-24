@@ -48,6 +48,10 @@
   .b-leeg{border:1px dashed var(--b-lijn);border-radius:14px;padding:1.1rem;
           font-size:15px;line-height:1.6;color:var(--b-stil);}
   .b-voet{margin-top:1.4rem;font-size:14px;line-height:1.6;color:var(--b-stil);}
+  /* Opzettelijk luid: een handeling die nog niet bij de server is, is werk dat
+     nergens staat. */
+  #bEdgeStrook{margin:.6rem 0;padding:.6rem .8rem;border:1px solid var(--b-accent);
+               border-radius:10px;background:rgba(194,58,94,.12);font-size:15px;line-height:1.5;}
 </style>
 </head>
 <body class="rtg-stijl">
@@ -58,6 +62,7 @@
   <button class="knop" id="bVerversNu" type="button">Ververs</button>
 </header>
 <main id="main">
+  <div id="bEdgeStrook" hidden></div>
   <div class="b-tel">
     <div><b id="bOpen">-</b><span>glazen te maken</span></div>
     <div><b id="bStaat">-</b><span>ronden waarvan het eerste glas wacht</span></div>
@@ -75,6 +80,9 @@
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
+<script src="/shared/id.js"></script>
+<script src="/shared/wachtrij.js"></script>
+<script src="/apps/horeca/edge.js"></script>
 <script src="/apps/horeca/bar.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

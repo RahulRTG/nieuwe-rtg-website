@@ -8,7 +8,10 @@
    tweede keer wordt GETELD in het antwoord, niet stil genegeerd: een kassa die
    denkt te hebben verkocht wat er niet staat, is erger dan een foutmelding. */
 module.exports = (kern) => {
-  const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
+  const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
+  /* Samenvoegen is iets anders dan herhalen; zie de kop van dit bestand bij
+     /offline/handelingen en kern/horeca/samenvoegen.js. */
+  const samenvoegen = require('../../../kern/horeca/samenvoegen')({ horeca, schoon });
   const { H, nu, id, centen, uitEuro, totaal, bonMaak } = horeca;
   const WIJZEN = ['contant', 'pin', 'online', 'rekening', 'kamer', 'bon', 'tegoed', 'munt'];
 
@@ -107,6 +110,38 @@ module.exports = (kern) => {
       let: (dubbel ? dubbel + ' bon(nen) waren al binnen en zijn niet opnieuw geboekt. ' : '') +
         'Opgenomen bestellingen staan op "besteld" en zijn NIET vrijgegeven: ' +
         'de zaal beslist zelf wanneer de keuken eraan begint.' });
+  });
+
+  /* ---------- offline HANDELINGEN ----------
+
+     Bonnen zijn iets NIEUWS: ze bestonden nog niet, dus ze kunnen niet botsen.
+     Een handeling is iets anders -- daar wordt BEWERKT, en tussen het moment
+     van de handeling en het moment van aankomen kan een collega hetzelfde bord
+     al verder hebben gezet. Blind afspelen zet dat dan terug.
+
+     Dus geen herhaling maar een SAMENVOEGING, met één regel die het veilig
+     maakt: een stand gaat nooit achteruit. Zie kern/horeca/samenvoegen.js voor
+     die regel en voor wat er met opzet niet in zit (geld, en een regel van de
+     rekening halen).
+
+     Een geweigerde samenvoeging komt MET de reden terug. Het toestel hoort te
+     weten dat zijn plaatselijke werkelijkheid het heeft verloren; stil laten
+     vallen zou betekenen dat een medewerker denkt iets te hebben gedaan wat
+     nooit is gebeurd. */
+  app.post('/api/supplier/horeca/offline/handelingen', supplierAuth, (req, res) => {
+    const h = H(req.supplier.code);
+    const lijst = Array.isArray(req.body.handelingen) ? req.body.handelingen : [];
+    if (!lijst.length) return res.status(400).json({ error: 'Er zaten geen handelingen in dit pakket.' });
+    const uit = samenvoegen.verwerk(h, lijst, req.actor.name);
+    save();
+    if (uit.gedaan) {
+      logActivity(req.supplier.code, req.actor, 'voegde ' + uit.gedaan + ' offline handeling(en) samen');
+      sseToSupplier(req.supplier.code, 'sync', { scope: 'keuken' });
+    }
+    res.json(Object.assign({ ok: true }, uit, {
+      let: 'Een stand gaat nooit achteruit. Wat geweigerd is, staat er met de reden bij: ' +
+        'een toestel hoort te weten dat zijn plaatselijke beeld het heeft verloren.'
+    }));
   });
 
   /* ---------- happy hour en arrangementen instellen ---------- */

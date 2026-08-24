@@ -93,8 +93,33 @@ const REGEL_R = /"rijen":(\d+)/;
 const REGEL_P = /"p":"([^"]*)"/;
 /* Het levensteken. Alleen server/opzet/begroting.js schrijft deze woorden, en
    hij schrijft de grens erbij. */
+/* HOE DE SUITE ZELF ERVOOR STOND. Deze ronde draait de hele suite, en tot nu
+   toe gooide hij die uitvoer weg op de begrotingsregels na. Dat is dezelfde
+   blinde vlek als hierboven, een niveau hoger: een ronde waarin driehonderd
+   toetsen omvielen levert een catalogus die eruitziet als elke andere. De
+   gebeurtenissen die erin staan zijn dan nog steeds echt, maar de catalogus is
+   INCOMPLEET -- en dat hoort op het scherm en in het register te staan, niet in
+   het hoofd van wie hem draaide. */
 const WAAKT = /begroting: waakt/;
-const WAAKT_G = /"grens":(\d+)/;
+/* MET DE PUNT EROP. Dit stond op \d+ en las "grens":0.5 dus als 0 -- de ronde
+   legde zichzelf vast onder "grens-0" en meldde een grens die niet bestond.
+   Een halve rij is precies de stand waarin je de enkele krimpen ziet. */
+const WAAKT_G = /"grens":([0-9.]+)/;
+
+function suiteStand(tekst) {
+  const t = String(tekst);
+  const som = (re) => {
+    const m = t.match(re);
+    return m ? m.reduce((n, r) => n + Number(String(r).replace(/\D+/g, '')), 0) : null;
+  };
+  return {
+    toetsen: som(/^# tests \d+$/gm),
+    gezakt: som(/^# fail \d+$/gm),
+    /* Los geteld, want de twee kunnen uiteenlopen: een deelproces dat omvalt
+       voordat het zijn totaal schrijft, laat wel "not ok" achter en geen "# fail". */
+    rood: (t.match(/^not ok /gm) || []).length
+  };
+}
 
 function ontleed(tekst) {
   const perCollectie = new Map();
@@ -160,6 +185,10 @@ if (!uit.gewaakt) {
   process.exit(2);
 }
 
+const suite = suiteStand(tekst);
+console.log('  de suite zelf               : ' +
+  (suite.toetsen == null ? 'onbekend (geen TAP-totalen in dit log)'
+    : suite.toetsen + ' toetsen, ' + (suite.gezakt == null ? suite.rood : suite.gezakt) + ' rood'));
 console.log('  processen met de val aan    : ' + uit.gewaakt);
 console.log('  grenzen die zij meldden     : ' +
   uit.grenzen.map(([g, n]) => g + ' (' + n + 'x)').join(', '));
@@ -190,32 +219,75 @@ if (!uit.collecties.length) {
   console.log();
 }
 
-const stand = {
-  uitleg: 'Welke collecties krimpen tijdens de TOETSEN, en hoeveel. Bouwt de catalogus die ' +
-    'TAKEN.md 4.62 nodig heeft voordat RTG_BEGROTING=weigeren aan kan. VIER DINGEN DIE ERBIJ HOREN. ' +
-    '(1) DE EERSTE RONDE TELDE NIETS, EN DAT WAS EEN DEFECT. Hij gaf nul over 6806 toetsen, en dat ' +
-    'leek een uitslag. Het was er geen: de handelingscontext van server/opzet/handeling.js overleeft ' +
-    'het LEZEN VAN DE BODY niet (server/web/body.js leest met req.on(end), en die luisteraar hangt ' +
-    'aan een async-bron van voor context.run), dus stapte de begroting op elke POST met een body ' +
-    'meteen uit -- en dat is elke mutatie. server/opzet/handeling.js hervat() zet de keten na de ' +
-    'lijfpoort terug; test/begrotingroute.test.js vond het en houdt het tegen. Alles hieronder komt ' +
-    'uit de eerste ronde NA die reparatie. ' +
-    '(2) ONDERGRENS: de suite doet wat de toetsen doen, niet wat gebruikers doen -- een legitieme ' +
-    'grote krimp die geen toets uitlokt, staat hier niet in. ' +
-    '(3) EEN GRENS VAN 1 LAAT EEN RIJ DOOR. Een hervulling die precies een rij wegneemt komt er ' +
-    'ongemeld doorheen, en dat is de vorm van bijna elke verwijdering in dit huis: ' +
-    'db.data.X = X.filter(r => r.id !== id). Wat hieronder staat zijn dus de krimpen van TWEE rijen ' +
-    'of meer; wie ook de enkele wil zien, draait met RTG_BEGROTING_KRIMP=0.5. ' +
-    '(4) GEEN OORDEEL: welke grens bij een collectie hoort, is een besluit van een mens.',
-  hoe: 'node scripts/krimpronde.js',
+/* TWEE RONDES ZIJN TWEE VRAGEN, en ze horen niet over elkaar heen geschreven.
+
+   Op grens 1 staat er "welke collecties krimpen met meer dan een rij" -- de
+   grote krimpen, waar de tand op komt. Op 0,5 staat er "welke collecties
+   krimpen uberhaupt, en via welke route" -- de invoer om per collectie een
+   grens te KIEZEN. Een uitslag die de andere overschrijft, maakt van dit
+   register een momentopname in plaats van een catalogus.
+
+   Dus per gemeten grens een eigen sleutel, en de rest blijft staan. */
+const bestaand = (() => {
+  try { return JSON.parse(fs.readFileSync(UITSLAG, 'utf8')); } catch (e) { return null; }
+})();
+const rondes = (bestaand && bestaand.rondes && typeof bestaand.rondes === 'object')
+  ? bestaand.rondes : {};
+/* De oude, platte vorm (een enkele ronde in `gemeten` + `collecties`) komt hier
+   binnen als een gewone ronde in plaats van te verdwijnen. Een register dat bij
+   een vormwijziging stilletjes zijn geschiedenis weggooit, is geen register. */
+if (bestaand && bestaand.gemeten && !bestaand.rondes) {
+  rondes['grens-' + bestaand.gemeten.gemetenGrens] =
+    { gemeten: bestaand.gemeten, collecties: bestaand.collecties || [] };
+}
+rondes['grens-' + laagste] = {
+  suite: suite,
   gemeten: { hervullingen: uit.regels, collecties: uit.collecties.length,
     grootste: uit.collecties.length ? uit.collecties[0].grootste : 0,
     processenGewaakt: uit.gewaakt, gemetenGrens: laagste },
   collecties: uit.collecties
 };
 
+const stand = {
+  uitleg: 'Welke collecties krimpen tijdens de TOETSEN, en via welke route. Bouwt de catalogus die ' +
+    'TAKEN.md 4.62 nodig heeft voordat RTG_BEGROTING=weigeren aan kan. ' +
+    'PER GEMETEN GRENS EEN RONDE, want dat zijn twee vragen: op 1 staat er welke collecties GROOT ' +
+    'krimpen (de begroting vergelijkt met krimp <= grens, dus een verwijdering van EEN rij komt er ' +
+    'ongemeld doorheen), op 0,5 staat er welke er UBERHAUPT krimpen en waar. De tweede omvat de eerste. ' +
+    'VIJF DINGEN DIE ERBIJ HOREN. ' +
+    '(1) DE EERSTE RONDE TELDE NIETS, EN DAT WAS EEN DEFECT. Hij gaf nul over 6806 toetsen, en dat leek ' +
+    'een uitslag. Het was er geen: de handelingscontext van server/opzet/handeling.js overleeft het ' +
+    'LEZEN VAN DE BODY niet (server/web/body.js leest met req.on(end), en die luisteraar hangt aan een ' +
+    'async-bron van voor context.run), dus stapte de begroting op elke POST met een body meteen uit -- ' +
+    'en dat is elke mutatie. hervat() zet de keten na de lijfpoort terug; test/begrotingroute.test.js ' +
+    'vond het en houdt het tegen. Alles hieronder komt uit een ronde NA die reparatie. ' +
+    '(2) ONDERGRENS: de suite doet wat de toetsen doen, niet wat gebruikers doen -- een legitieme grote ' +
+    'krimp die geen toets uitlokt, staat hier niet in. ' +
+    '(3) DE SUITE-STAND STAAT ERBIJ, per ronde, onder "suite". Een ronde waarin toetsen omvielen levert ' +
+    'een catalogus die er precies zo uitziet als elke andere: wat erin staat is echt, maar wat een ' +
+    'omgevallen toets niet meer deed kon ook niet krimpen. Zo een ronde is ONVOLLEDIG en de ronde ' +
+    'eindigt dan met uitgang 3. ' +
+    '(4) WAT DE VAL SOWIESO NIET ZIET: een splice, een wijziging binnen een rij, en routes die de body ' +
+    'zelf rauw lezen (de twee betaal-webhooks en de theater-upload). ' +
+    '(5) GEEN OORDEEL: welke grens bij een collectie hoort, is een besluit van een mens.',
+  hoe: 'node scripts/krimpronde.js  (RTG_BEGROTING_KRIMP zet de grens)',
+  rondes: rondes
+};
+
 if (VASTLEGGEN) {
   fs.writeFileSync(UITSLAG, JSON.stringify(stand, null, 2) + '\n');
-  console.log('  vastgelegd in KRIMP.json\n');
+  console.log('  vastgelegd in KRIMP.json onder "grens-' + laagste + '" (' +
+    Object.keys(rondes).length + ' ronde(s) bewaard)\n');
+}
+/* EEN RODE SUITE MAAKT DE CATALOGUS NIET FOUT, MAAR WEL ONVOLLEDIG: wat er
+   staat is echt gebeurd, wat er niet staat kan best door een omgevallen toets
+   zijn gemist. Hij wordt dus WEL vastgelegd (met de suite-stand erbij) en de
+   uitgang is niet nul, zodat niemand hem voor een schone ronde aanziet. */
+if (suite.rood > 0 || (suite.gezakt != null && suite.gezakt > 0)) {
+  console.log('  LET OP: de suite was ROOD tijdens deze ronde (' +
+    (suite.gezakt != null ? suite.gezakt : suite.rood) + ' toets(en)).');
+  console.log('  De catalogus hierboven is echt maar ONVOLLEDIG: wat een omgevallen toets niet');
+  console.log('  meer deed, kon ook niet krimpen. Repareer de suite en draai opnieuw.\n');
+  process.exit(3);
 }
 process.exit(0);

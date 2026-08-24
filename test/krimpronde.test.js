@@ -130,7 +130,11 @@ test('in de GEWONE stand blijft het levensteken van stdout af', () => {
      Vandaar: warn (stderr) zodra de stand afwijkt, en debug in de gewone stand
      -- onder de standaarddrempel, dus hij komt er niet eens uit. */
   const stil = [];
-  requireVers().bewaak({ a: [] }, { log: (niveau) => stil.push(niveau) });
+  /* De grens staat er EXPLICIET bij, om dezelfde reden als in
+     test/begroting.test.js: zonder haar erft dit de module-constante, en in de
+     meetstand van de krimpronde (0,5) is dat niet de GEWONE stand. */
+  requireVers().bewaak({ a: [] },
+    { grens: BEGROTING.STANDAARDGRENS, log: (niveau) => stil.push(niveau) });
   assert.deepEqual(stil, ['debug'],
     'de gewone stand hoort DEBUG te zijn: info en hoger komen op stdout terecht, ' +
     'en daar staat de JSON van scripts/routekaart.js');
@@ -156,4 +160,39 @@ test('de meldingen zelf worden in BEIDE logvormen gelezen, plat en JSON', () => 
   assert.match(r.uit, /boekingen/, 'de JSON-logvorm wordt niet gelezen');
   assert.match(r.uit, /\/api\/x/, 'de route komt niet in de catalogus');
   assert.match(r.uit, /collecties die krimpen\s*:\s*2/);
+});
+
+test('een RODE suite geeft geen schone ronde', () => {
+  /* De ronde draait de HELE suite en gooide die uitvoer weg op de
+     begrotingsregels na. Vielen er driehonderd toetsen om, dan zag de catalogus
+     eruit als elke andere. Wat erin staat is dan nog steeds echt -- wat er NIET
+     in staat kan door een omgevallen toets zijn gemist, en dat is precies het
+     verschil tussen onvolledig en schoon. */
+  const teken = echteLevensteken(1)[0];
+  const r = draai([teken, 'not ok 12 - iets viel om', '# tests 3', '# fail 1'].join('\n') + '\n');
+  assert.equal(r.code, 3, 'een ronde over een rode suite hoort niet als schoon te eindigen');
+  assert.match(r.uit, /de suite was ROOD/);
+  assert.match(r.uit, /3 toetsen, 1 rood/);
+});
+
+test('zonder TAP-totalen zegt hij ONBEKEND en niet nul', () => {
+  /* Een log waarin de totalen ontbreken is geen log van een groene suite.
+     "0 rood" opschrijven zou daar een uitslag van maken (LAT.md regel 3). */
+  const teken = echteLevensteken(1)[0];
+  const r = draai(teken + '\n');
+  assert.equal(r.code, 0);
+  assert.match(r.uit, /de suite zelf\s*:\s*onbekend/);
+});
+
+test('een grens met een punt erin wordt als 0,5 gelezen en niet als 0', () => {
+  /* De ronde las de grens met /"grens":(\d+)/ en maakte van 0,5 dus een 0: hij
+     legde zichzelf vast onder "grens-0" en meldde een grens die niet bestaat.
+     Juist die halve rij is de stand waarin ook de enkele krimpen zichtbaar
+     worden, dus het is de stand die het vaakst gedraaid gaat worden. */
+  const regels = echteLevensteken(0.5);
+  assert.match(regels[0], /"grens":0\.5/, 'de begroting schrijft zijn grens niet meer voluit');
+  const r = draai(regels[0] + '\n');
+  assert.equal(r.code, 0, r.uit);
+  assert.match(r.uit, /grenzen die zij meldden\s*:\s*0\.5/,
+    'de ronde leest een gebroken grens niet terug');
 });

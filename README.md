@@ -982,27 +982,44 @@ elke mutatie.** Gerepareerd met `hervat()` in `server/opzet/handeling.js`,
 opgehangen ná de lijfpoort (bewust `context.run()` en niet `enterWith()`: die
 tweede kan op een keep-alive-verbinding doorlekken naar het volgende verzoek).
 
-De ronde daarna vond wél iets:
+De ronde daarna vond wél iets. En omdat een grens van 1 een verwijdering van
+één rij nog doorlaat (`krimp <= grens`) — en dat is de vorm van bijna alles hier
+— staat de catalogus nu op **een halve rij**, zodat élke krimp telt:
 
 ```
-processen met de val aan    : 708
-grenzen die zij meldden     : 1 (708x)
-hervullingen boven de grens : 2
+de suite zelf               : 6818 toetsen, 2 rood
+processen met de val aan    : 707
+grenzen die zij meldden     : 0.5 (707x)
+hervullingen boven de grens : 38
+collecties die krimpen      : 19
 
   rijen  keer  collectie
-      2     1  posts        /api/privacy/delete
-      2     1  contacts     /api/privacy/delete
+      2     4  posts             /api/privacy/delete
+      2     1  contacts          /api/privacy/delete
+      1     6  clips             /api/clips/weg, /api/office/clips/verwijder
+      1     4  blocks            /api/member/unblock, /api/rtf/social/unblock
+      1     3  connections       /api/member/block, /api/rtf/social/block
+      1     3  theaterVideos     /api/theater/verwijder
+      1     3  ovVoertuigen      /api/staff/ov/dienst
+      … 12 collecties meer
 ```
 
-Dat is precies een legitieme grote krimp: een lid dat zijn eigen gegevens
-weghaalt. **De catalogus is nog te dun om de tand erin te zetten** — een grens
-van 1 laat elke verwijdering van één rij door, en dat is de vorm van bijna alles
-hier (`db.data.X = X.filter(r => r.id !== id)`). Wie ook die wil zien, draait met
-`RTG_BEGROTING_KRIMP=0.5`.
+De twee grootste zijn precies wat een legitieme grote krimp is: een lid dat via
+`/api/privacy/delete` zijn eigen gegevens weghaalt. De rest is de gewone vorm
+van dit huis — één rij per keer, `db.data.X = X.filter(r => r.id !== id)`.
 
-Twee dingen die `KRIMP.json` zelf zegt: de catalogus is een **ondergrens** (de
-suite doet wat de toetsen doen, niet wat gebruikers doen), en hij is **geen
+**Twee dingen die `KRIMP.json` zelf zegt.** De catalogus is een **ondergrens**
+(de suite doet wat de toetsen doen, niet wat gebruikers doen), en hij is **geen
 oordeel** — welke grens bij een collectie hoort, is een besluit van een mens.
+
+**En de suite-stand staat er per ronde bij.** Deze ronde was rood op twee
+toetsen (`test/vloot.test.js`), dus de ronde eindigt met uitgang 3 en de
+catalogus draagt `"suite": {"toetsen": 6818, "gezakt": 2}`. Wat erin staat is
+echt; wat een omgevallen toets niet meer deed, kon ook niet krimpen. Die twee
+zijn een **bestaande flakiness** en niet van deze laag: drie groepen die
+tegelijk tegen dezelfde SQLite-map opstarten, met `UNIQUE constraint failed:
+schema_versie.n` als gevolg. Twee keer gedraaid met exact dezelfde omgeving,
+één keer rood en één keer groen.
 
 En de ronde viel eerst zelf in de val die hij moest afdekken: om "er kromp niets"
 te scheiden van "de val stond niet aan" zocht hij het woord `begroting:` in het

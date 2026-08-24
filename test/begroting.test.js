@@ -78,8 +78,13 @@ test('WEIGEREN: de oude collectie staat er NA de poging nog, onaangeroerd', () =
 }, { concurrency: false });
 
 test('WEIGEREN: een krimp binnen de grens gaat gewoon door', () => {
+  /* De grens staat er EXPLICIET bij. Zonder haar erfde deze toets de
+     module-constante, en die hangt aan RTG_BEGROTING_KRIMP -- draai de suite in
+     de meetstand van de krimpronde (0,5) en dan zakt hij, terwijl er niets mis
+     is. Een toets die van betekenis verandert door een omgevingsvariabele,
+     toetst niet wat zijn naam belooft. */
   const data = { boekingen: new Array(100).fill(0) };
-  const bewaakt = begroting.bewaak(data, { log: () => {}, modus: 'weigeren' });
+  const bewaakt = begroting.bewaak(data, { log: () => {}, modus: 'weigeren', grens: 50 });
   inVerzoek(() => { bewaakt.boekingen = new Array(99).fill(0); }, { data });
   assert.equal(data.boekingen.length, 99, 'een normale handeling mag niet geraakt worden');
 });
@@ -178,8 +183,13 @@ test('de stand is af te lezen en telt wat er is gebeurd', () => {
   assert.equal(typeof voor.gezien, 'number');
   assert.equal(voor.modus, begroting.MODUS);
   assert.equal(voor.grens, begroting.KRIMPGRENS);
-  const data = { x: new Array(begroting.KRIMPGRENS + 5).fill(0) };
-  const bewaakt = begroting.bewaak(data, { log: () => {} });
+  /* De lengte komt NIET meer uit KRIMPGRENS. Die kan uit de omgeving komen, en
+     new Array(5.5) werpt "Invalid array length" -- zo zakte deze toets in de
+     meetronde op 0,5 met een fout die niets met de begroting te maken had.
+     De bewering hierboven (stand() meldt de module-constante) blijft staan; de
+     PROEF hieronder zet zijn eigen grens. */
+  const data = { x: new Array(20).fill(0) };
+  const bewaakt = begroting.bewaak(data, { log: () => {}, grens: 10 });
   inVerzoek(() => { bewaakt.x = []; }, { data });
   const na = begroting.stand();
   assert.ok(na.overschreden > voor.overschreden, 'een overschrijding hoort geteld te worden');

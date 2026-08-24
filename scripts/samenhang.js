@@ -345,11 +345,16 @@ function tabel() {
          ECHTE regel in plaats van aan een nagetypte. */
       soort: 'krimpcatalogus (welke grote krimpen zijn legitiem)',
       bewaker: ['scripts/krimpronde.js', 'test/krimpronde.test.js'],
-      wat: 'de suite draait met de grens op 1; wat er dan zou zijn geweigerd, staat in KRIMP.json',
+      wat: 'de suite draait met een verlaagde grens; wat er dan zou zijn geweigerd, staat in KRIMP.json',
       dingen: () => {
-        try { return [JSON.parse(lees('KRIMP.json')).gemeten].map(g =>
-          'gewaakt=' + g.processenGewaakt + ' grens=' + g.gemetenGrens + ' krimpen=' + g.hervullingen); }
-        catch (e) { return null; }
+        /* Per gemeten grens een ronde: 1 zegt welke collecties GROOT krimpen,
+           0,5 zegt welke er uberhaupt krimpen en waar. Twee vragen, twee
+           uitslagen -- ze horen niet over elkaar heen geschreven te worden. */
+        try {
+          const r = JSON.parse(lees('KRIMP.json')).rondes || {};
+          return Object.keys(r).sort().map(k => k + ': gewaakt=' + r[k].gemeten.processenGewaakt +
+            ' krimpen=' + r[k].gemeten.hervullingen + ' collecties=' + r[k].gemeten.collecties);
+        } catch (e) { return null; }
       },
       bewaakt: () => {
         const laag = lees('server/opzet/begroting.js');

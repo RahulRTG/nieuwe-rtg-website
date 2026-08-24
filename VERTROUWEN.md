@@ -343,24 +343,54 @@ levert het gegeven waar de volgende op staat.
 betekent, per laag, staat hieronder -- en de eerlijkste zin van allemaal is dat
 de poorten er maar op een handeling zijn.
 
-Laag 1, 2 en 3 zijn aangesloten en worden op een plek ook AFGEDWONGEN.
+Laag 1, 2 en 3 zijn aangesloten en worden op TWEE plekken ook AFGEDWONGEN.
 
 De tenantuitvoer draagt haar eigen omvang en het oordeel mee (meten, niet
-tegenhouden -- daar staat geen mens achter de sleutel). De wachtwoordinlog legt
-de verificatiesterkte vast. En het vernietigen van een tenant loopt door de
-poort: dat is de enige handeling hier die per definitie onherstelbaar is, hij
-staat daarom in het register met `minstens: 'uitzonderlijk'`, en hij vraagt
-elke keer een bevestiging die aan die ene tenant vastzit en daarna op is.
+tegenhouden -- daar staat geen mens achter de sleutel). De inlog EN de
+registratie leggen de verificatiesterkte vast, met dezelfde functie
+(`routes/auth.js`, `noteerSessie`): twee deuren die een sessie uitgeven horen
+hem hetzelfde te noteren, en zonder dat loopt een vers account dood op een
+step-up die het niet kan geven. En twee handelingen lopen door de poort:
 
-Wat er NIET is: de poort hangt aan een handeling en niet aan alle. Zolang dat
-zo is, is de juiste zin "dit huis dwingt step-up af bij het vernietigen van een
-tenant" -- en niet "dit huis heeft step-up". De volgende deuren zijn een keuze
-per handeling, en elke keuze hoort in het register te staan.
+- **een tenant vernietigen** -- de enige handeling hier die per definitie
+  onherstelbaar is, dus in het register met `minstens: 'uitzonderlijk'`. Hij
+  vraagt elke keer een bevestiging die aan die ene tenant vastzit en daarna op
+  is.
+- **een rol toekennen** -- gemeten in het AANTAL rollen. Een rol erbij is
+  gewoon werk en vraagt niets; vier of meer tegelijk is iemand tot van alles
+  maken, en dan komt er een tweede moment.
+
+**En dat tweede vroeg eerst een besluit.** Beheer van een werkruimte ging
+uitsluitend op het beheer-token, en aan een sleutel valt geen bevestiging te
+vragen -- daar liep elke poort op stuk. Sinds vandaag mag een LID met de
+directie-rol ook beheren (`server/bedrijf/beheerder.js`), en pas daarmee is er
+iemand om iets aan te vragen. De sleutel blijft werken en houdt alle rechten,
+maar draagt nu het label `viaSleutel`, zodat de poort eerlijk kan zeggen dat
+hier geen mens staat in plaats van te zwijgen.
+
+Twee regels houden die nieuwe deur dicht:
+
+1. **Wie als persoon beheert, kan nooit meer weggeven dan hij zelf heeft.**
+   Directie draagt zestien van de achttien rechten -- niet `mens.gevoelig` en
+   niet `it.beveiliging`. Zonder deze regel kent een directielid zichzelf die
+   twee toe via de HR-rol en heft daarmee de rolgrens op: bevoegdheid die
+   groeit door delegatie, precies wat laag 4 verbiedt. Het is dan ook dezelfde
+   functie die het tegenhoudt (`insluiting.groeit`).
+2. **De bevestiging vraagt BEIDE sleutels van dezelfde mens.** Een
+   werkruimtelid heeft geen wachtwoord maar een lid-token; wat het wel heeft
+   als het gekoppeld is, is een RTG-account met een eigen, al gemeten inlog. De
+   deur (`server/bedrijf/bevestig.js`) vraagt allebei, en de tweede sleutel
+   ERFT zijn sterkte van die inlog in plaats van er een te verzinnen: is die
+   inlog zacht of verlopen, dan wordt de bevestiging geweigerd met de reden.
+
+Wat er NIET is: de poort hangt aan twee handelingen en niet aan alle. De
+volgende deuren zijn een keuze per handeling, en elke keuze hoort in het
+register te staan.
 
 **Laag 4 tot en met 8.** De insluitingscontrole draait bij het opstarten en
 gooit. Het bereik en de simulatie zijn berekend uit dezelfde meter als de
 poort, en dragen `nietGemodelleerd` mee. De Trust State telt vijf absolute
-eigenschappen -- en drie ervan staan vandaag NIET op nul, want vijf van de zes
+eigenschappen -- en enkele staan vandaag NIET op nul, want VIER van de zes
 handelingssoorten worden wel gemeten en niet tegengehouden. Dat getal hoort
 naar nul door poorten te bouwen, niet door de meter bij te stellen. De deuren
 staan in `server/routes/techniek/vertrouwen.js`, achter de eigenaar: een blast
@@ -394,14 +424,21 @@ Daarnaast, los van de keten — en deze drie zijn gedaan:
   huis: een anker in dezelfde database is geen anker maar een tweede regel om
   te wijzigen.
 
-En wat er daarna nog steeds openstaat, met naam: **vijf van de zes
-handelingssoorten hebben nog geen poort.** Ze worden gemeten en niet
-tegengehouden, en twee ervan (de tenantuitvoer en de gevoelige inzage) zijn
-onomkeerbaar en staan dus als catastrofaal pad in de simulatie. De reden is
-telkens dezelfde en hij is structureel: die deuren gaan open op een
-beheer-token dat geen persoon noemt, en aan een sleutel valt geen tweede
-bevestiging te vragen. Dat oplossen is een besluit over wie een werkruimte mag
-beheren, en geen regel code.
+En wat er daarna nog steeds openstaat, met naam: **vier van de zes
+handelingssoorten hebben nog geen poort** -- `tenant.uitvoer`,
+`mens.uitdienst`, `werkruimte.sluiten` en `mens.gevoelig.inzage`. Ze worden
+gemeten en niet tegengehouden, en twee ervan (de tenantuitvoer en de gevoelige
+inzage) zijn onomkeerbaar en staan dus als catastrofaal pad in de simulatie.
+
+De structurele reden is weg: er is nu een mens die kan bevestigen. Wat rest is
+per deur werk, en het is per deur ook echt iets anders. `mens.uitdienst` en
+`werkruimte.sluiten` hangen aan `beheerVan` en kunnen langs dezelfde poort als
+de rollen. `mens.gevoelig.inzage` hangt aan `werkPoort` met een reden erbij, en
+daar moet eerst worden geteld WAT er wordt ingezien -- een omvang die niemand
+telt, is geen omvang. En `tenant.uitvoer` is de moeilijkste: die gaat open op
+het beheer-token van de klant, en dat is met opzet zo (exit-recht dat op een
+mens kan stuklopen is geen recht). Daar hoort de poort dus NIET te blokkeren
+maar te meten en te melden, en dat doet hij vandaag al.
 
 HIER STOND "een rem per account naast die per IP", en die klopte niet. Dit huis
 heeft er al drie: IP+account (10 pogingen), de bron alleen (50) en het doel

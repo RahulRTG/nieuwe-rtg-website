@@ -80,10 +80,14 @@ module.exports = ({ db, save }) => {
 
      428 en niet 403: dit is geen weigering maar een VOORWAARDE. De aanroeper
      krijgt de zin, de redenen en de bon terug en kan het afmaken. */
-  function poort({ actor, sessie, soort, aantal, doel, bon }) {
+  function poort({ actor, sessie, soort, aantal, doel, bon, ver }) {
     const b = weeg(actor, soort, aantal);
-    const ver = sessie ? verificatieVan(sessie) : null;
-    const st = stapop.beoordeel(b, ver);
+    /* DE OPSLAG WEET HET, TENZIJ DE DEUR HET BETER WEET. Een sleuteldeur heeft
+       geen sessie, en een lege opzoeking levert null: "niet vastgelegd". Daar
+       staat aantoonbaar geen mens, en dat verschil beslist alles in stapop.js.
+       Alleen de deur zelf weet het, dus mag hij het meegeven (geenPersoon). */
+    const gezien = ver !== undefined && ver !== null ? ver : (sessie ? verificatieVan(sessie) : null);
+    const st = stapop.beoordeel(b, gezien);
     b.stapop = st;
     /* EEN ONGEWOGEN HANDELING IS GEEN STILTE MAAR EEN GETAL. stapop.js laat hem
        door -- anders vraagt het systeem bij elke onbekende handeling -- maar de
@@ -91,7 +95,7 @@ module.exports = ({ db, save }) => {
        register te zetten. Zonder deze teller zou de onzekerheid nergens meer
        opduiken zodra het verzoek voorbij is. */
     if (st.onzeker) { const k = bak(); k.ongewogen = (Number(k.ongewogen) || 0) + 1; save(); }
-    if (!st.nodig) return { door: true, blootstelling: b, verificatie: ver };
+    if (!st.nodig) return { door: true, blootstelling: b, verificatie: gezien };
     if (!st.mogelijk) return { door: false, status: 403,
       antwoord: { error: st.zin, waarom: st.waarom, blootstelling: b } };
 
@@ -104,7 +108,7 @@ module.exports = ({ db, save }) => {
     if (!bon) return vraagOpnieuw(null);
     const v = tweedemoment.verzilver(bak(), { sessie, soort, aantal, doel, id: bon });
     save();
-    return v.ok ? { door: true, blootstelling: b, verificatie: ver, bevestigd: true } : vraagOpnieuw(v.reden);
+    return v.ok ? { door: true, blootstelling: b, verificatie: gezien, bevestigd: true } : vraagOpnieuw(v.reden);
   }
 
   /* DE BON SCHRIJVEN, na afloop. Apart van poort() en met opzet: de poort weet

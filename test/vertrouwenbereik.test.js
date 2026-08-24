@@ -264,12 +264,21 @@ test('6. de drie deuren doen wat ze beloven, en niet meer', async () => {
      deur zegt dat er ook bij. */
   const a = await api('/api/techniek/vertrouwen/anker', {}, tech);
   assert.equal(a.status, 200);
-  /* In deze opstelling is er nog geen enkele kritieke handeling geweest, dus is
-     er geen kop om te verankeren. Dat hoort er te staan als REDEN en niet als
-     een leeg anker met "zet dit weg" erbij -- dat zou nergens op slaan. De
-     volledige ankercyclus staat in toets 9. */
-  assert.equal(a.body.anker, null);
-  assert.match(a.body.reden, /nog geen Trust Receipts/);
+  /* HIER STOND DAT ER NOG GEEN BON WAS, en dat klopte tot de rolroute een poort
+     kreeg: een rol toekennen schrijft sindsdien zelf een Trust Receipt, dus de
+     opstelling hierboven heeft er al een. Dat de toets daarop viel is precies
+     wat hij hoort te doen -- de bewering was verouderd, niet de code.
+
+     Wat er WEL hoort te staan: een echt anker MET de opdracht hem buiten deze
+     database weg te zetten. De volledige ankercyclus staat in toets 9. */
+  assert.ok(a.body.anker && a.body.anker.hash, 'er is een kop om te verankeren: ' + JSON.stringify(a.body).slice(0, 160));
+  assert.match(a.body.let, /buiten deze database/);
+
+  /* En de lege stand, want die tak bestaat nog steeds. Rechtstreeks op de pure
+     functie: een server zonder enige bon is in een e2e niet meer te maken zodra
+     de opstelling er zelf een schrijft. */
+  const Bon = require('../server/kern/vertrouwen/bon');
+  assert.equal(Bon.ankerPunt({}), null, 'geen bonnen, geen kop, geen anker');
 
   const st = await api('/api/techniek/vertrouwen/staat', {}, tech);
   assert.equal(st.status, 200);

@@ -128,6 +128,13 @@ function auth(req, res, next) {
   // crashen op een ontbrekende codenaam.
   if (!sess.account && !PERSONAS[sess.tier]) return res.status(401).json({ error: 'Niet ingelogd als lid.' });
   req.session = sess;
+  /* HET TOKEN ZELF ERBIJ, en niet omdat het handig is. De Trust Fabric meet per
+     SESSIE hoe hard en hoe vers er is geverifieerd (kern/vertrouwen/), en dat
+     staat onder dit token. Een route die dat wil nalezen zou anders zelf de
+     Authorization-kop moeten uitpluizen -- precies de vorm van "authenticatie"
+     die LAT.md regel 8 en keuringsregel 29 verbieden. Hier is hij al door
+     resolveSession heen, dus dit is een uitkomst en geen kopvergelijk. */
+  req.sessieToken = token;
   // Handhaving van de eigen boardroom: heeft het lid (of, via de kind-sleutel,
   // de ouder) deze functie uitgezet, dan gaat de API ook echt dicht. Alles staat
   // standaard aan, dus dit raakt pas iets zodra iemand bewust iets omzet.

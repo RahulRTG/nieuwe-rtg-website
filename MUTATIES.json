@@ -6147,6 +6147,13 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "vertrouwenbeheer.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "vertrouwenbereik.test.js": {
       "soort": "puur",
       "staat": "gezakt",

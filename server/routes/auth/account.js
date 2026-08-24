@@ -4,7 +4,7 @@
 const eigenaar = require('../../eigenaar'); // een bron van waarheid over wie de eigenaar is
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern } = actx;
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern, noteerSessie } = actx;
 app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
   // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
@@ -89,7 +89,7 @@ app.post('/api/auth/register', async (req, res) => {
      blijft gewoon geweigerd. */
   const pasAppKeuze = (betaald && pasApp === gevraagd) ? 'rtg' : pasApp;
   if (!pasAppOk(pasAppKeuze, tier)) return res.status(403).json({ error: PAS_FOUT });
-  let user;
+  let user, antwoord;
   try {
     user = await accounts.createUser({ email, username: req.body.username || null, password, tier, realName: name, phone: telefoon });
   } catch (e) {
@@ -128,26 +128,16 @@ app.post('/api/auth/register', async (req, res) => {
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
     if (email === eigenaar.eigenaarEmail()) delete process.env.RTG_OWNER_BOOTSTRAP;
-    res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true,
-      ...(werk ? { werk } : {}), ...(DEV_VELDEN(req) ? { devVerifyUrl: verifyUrl } : {}) });
+    antwoord = { token, state: stateFor(sess, req.body.lang), needsEmailVerify: true,
+      ...(werk ? { werk } : {}), ...(DEV_VELDEN(req) ? { devVerifyUrl: verifyUrl } : {}) };
   } catch (e) {
     return res.status(503).json({ error: 'Registreren lukte even niet. Probeer het zo opnieuw.' });
   }
-});
-
-app.post('/api/auth/verify-email', (req, res) => {
-  const u = accounts.verifyActionToken(req.body.token, 'verify-email');
-  if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen bevestigingslink.' });
-  accounts.setEmailVerified(u.id);
-  res.json({ ok: true });
-});
-
-app.post('/api/auth/resend', auth, (req, res) => {
-  if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
-  const u = req.session.account;
-  const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
-  const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&verify=' + vtok;
-  mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
-  res.json({ ok: true, ...(DEV_VELDEN(req) ? { devVerifyUrl: url } : {}) });
+  /* Laag 2 noteert dat deze sessie met een wachtwoord is ontstaan -- dezelfde
+     regel als bij de inlog, en daarom dezelfde functie (routes/auth.js). BUITEN
+     de try: een bedradingsfout hoort te schreeuwen en niet als "Registreren
+     lukte even niet" te lezen. */
+  noteerSessie(req, antwoord.token, user.id);
+  res.json(antwoord);
 });
 };

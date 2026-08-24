@@ -73,7 +73,8 @@ const SOORTEN = [
     eenheid: 'rollen', eenheidEen: 'rol',
     omkeerbaar: true,
     vast: 3,
-    gevoelig: false
+    gevoelig: false,
+    poort: 'POST /api/bedrijf/lid/rollen'
   },
   {
     id: 'werkruimte.sluiten',

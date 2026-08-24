@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1059 bestanden en 7073 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1060 bestanden en 7080 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1059 |
-| losse beweringen (`test(...)`) | 7073 |
+| toetsbestanden | 1060 |
+| losse beweringen (`test(...)`) | 7080 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 895 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 896 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 37 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-930 bestanden, 6850 beweringen.
+931 bestanden, 6857 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -876,6 +876,7 @@ toets omvalt.
 | `verraad.test.js` | 20 | gezakt op `true->false#0` | DE VERRAADSMOTOR (server/lib/verraad.js) -- de wereld laten liegen. WAT HIER OP HET SPEL STAAT. |
 | `verraadtelling.test.js` | 13 | gezakt op `===->!==#0` | DE ZES GETALLEN VAN DE VERRAADRONDE (scripts/lib/verraadtelling.js). WAAROM DEZE APART GETOETST WORDEN. |
 | `vertaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Vertaler: een dunne route op de bestaande vertaalmotor. Zonder AI-sleutel vertaalt het huiswoordenboek (nl<->en) en is de app eerlijk over wat niet lukt (vertaald:false), nooit kapot. |
+| `vertrouwenbeheer.test.js` | 7 | gezakt op `liegpoort /api/` | BEHEER ACHTER EEN MENS -- en daarmee een poort die er echt een is. HET GAT DAT DIT DICHT. |
 | `vertrouwenbereik.test.js` | 9 | gezakt op `===->!==#0` | LAAG 4, 6, 7 EN 8 VAN DE TRUST FABRIC -- insluiting, bereik, simulatie, staat. De rode draad van deze vier is dezelfde: ze mogen niet mooier zijn dan de metingen eronder. |
 | `vertrouwenblootstelling.test.js` | 11 | gezakt op `===->!==#0` | DE BLOOTSTELLINGSMETER -- laag 1 van de Trust Fabric. Zes beweringen die van buiten niet te zien zijn. |
 | `vertrouwenbon.test.js` | 6 | gezakt op `liegpoort /api/` | DE TRUST RECEIPT -- laag 5 van de Trust Fabric. Een bon zegt waarom een handeling MOCHT. |

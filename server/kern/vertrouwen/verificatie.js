@@ -40,6 +40,14 @@ const MANIEREN = {
   wachtwoord: { sterkte: 'gewoon', naam: 'een wachtwoord' },
   sleutelwoorden: { sterkte: 'gewoon', naam: 'sleutelwoorden' },
   pincode: { sterkte: 'zwak', naam: 'een pincode' },
+  /* TWEE SLEUTELS VAN DEZELFDE MENS. Een werkruimtelid heeft geen wachtwoord --
+     het heeft een lid-token. Wat het WEL heeft als het gekoppeld is, is een
+     RTG-account met een eigen, hier al gemeten inlog. Wie beide toont, heeft
+     twee onafhankelijke sleutels van dezelfde persoon, en dat is precies wat
+     een tweede factor hoort te doen. De sterkte is NIET hoger dan die van de
+     RTG-inlog eronder: bedrijf/bevestig.js weigert een zachte of verlopen
+     RTG-inlog, dus deze band is een uitkomst en geen aanname. */
+  tweesleutels: { sterkte: 'gewoon', naam: 'uw RTG-inlog naast uw lid-token' },
   /* De provider van de klant doet de verificatie; hoe hard die was, weten wij
      niet tenzij de assertie het zegt. Dat is een eigen band en geen 'gewoon':
      doen alsof wij die sterkte kennen, is precies een bewering zonder bron. */

@@ -57,7 +57,14 @@ function ruimtes(bak, actor) {
   const geldig = (r) => (!r.van || r.van <= vandaag) && (!r.tot || r.tot >= vandaag);
   const uit = [];
   for (const [code, w] of Object.entries((bak && bak.werkruimtes) || {})) {
-    const l = Object.values(w.leden || {}).find(x => x && (x.id === actor || x.rtgKey === actor));
+    /* DRIE NAMEN VOOR DEZELFDE MENS, en ze horen alle drie hier thuis. Een
+       gekoppeld lid heet naar zijn RTG-sleutel; een ongekoppeld lid heeft alleen
+       zijn lid-id, en die is per werkruimte uniek en niet daarbuiten -- vandaar
+       ook de vorm met de code ervoor (bedrijf/beheerder.js actorVan). Wie die
+       laatste hier zou vergeten, krijgt voor precies de ongekoppelde leden een
+       LEEG bereik terug, en dat leest als "deze actor kan nergens bij". */
+    const l = Object.values(w.leden || {}).find(x => x &&
+      (x.id === actor || x.rtgKey === actor || code + ':' + x.id === actor));
     if (!l) continue;
     const alle = l.rollen || [];
     uit.push({ code, naam: w.naam || code, lidId: l.id, status: l.status || 'actief',

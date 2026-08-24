@@ -83,12 +83,25 @@ module.exports = (sctx) => {
   });
 
   app.post('/api/bedrijf/lid/rollen', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
+    /* Beheer door een MENS mag ook (zie ./beheerder.js). Dat is wat het tweede
+       moment van VERTROUWEN.md laag 3 hier mogelijk maakt -- aan een sleutel
+       valt niets te vragen. En daarom geldt hier de insluitingsregel: wie als
+       persoon beheert, kan nooit meer weggeven dan hij zelf heeft. */
+    const b = sctx.beheerderVan(req, res); if (!b) return;
+    const w = b.w;
     const l = eigenVeld(w.leden, String(req.body.lidId || ''));
     if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
     const gevraagd = Array.isArray(req.body.rollen) ? req.body.rollen : [];
     const onbekend = gevraagd.filter(r => !ROLLEN.some(x => x.id === String(r && r.id ? r.id : r)));
     if (onbekend.length) return res.status(400).json({ error: 'Onbekende rol: ' + onbekend.map(String).join(', ') + '.' });
+    const mag = sctx.magGeven(b, gevraagd, ROLLEN);
+    if (!mag.ok) return res.status(403).json({ error: mag.reden, erbij: mag.erbij });
+    /* EN DAN PAS DE POORT VAN LAAG 3, want een tweede bevestiging vragen voor
+       iets dat toch niet doorgaat, verspeelt hem. De omvang is het AANTAL
+       rollen: een rol erbij is gewoon werk, zes tegelijk is iemand tot van
+       alles maken. De drempel staat in het handelingenregister en niet hier. */
+    const poort = sctx.poortVoor(req, res, b, { soort: 'rol.geven', aantal: gevraagd.length, doel: l.id });
+    if (!poort) return;
     const tot = schoon(req.body.tot, 10) || null;
     const van = schoon(req.body.van, 10) || null;
     const had = new Set((l.rollen || []).map(r => r.id));
@@ -115,6 +128,8 @@ module.exports = (sctx) => {
     if (!gm.ok) return res.status(gm.status).json(gm);
     log(w, null, 'rollen-gezet', l.id, l.rollen.map(r => r.id + (r.tot ? ' tot ' + r.tot : '')).join(', '));
     save();
+    // de Trust Receipt en de grondslag, NA afloop -- zie ./beheerder.js
+    sctx.naAfloop(b, poort, { soort: 'rol.geven', aantal: gevraagd.length, doel: l.id });
     res.json({ ok: true, lid: { id: l.id, naam: l.naam, rollen: l.rollen, rechten: rechtenVan(l) },
       let: tot ? 'Tijdelijke toegang vervalt vanzelf op ' + tot + '. Een tijdelijk recht dat je zelf moet intrekken, is een permanent recht.' : null });
   });

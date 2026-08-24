@@ -21,7 +21,7 @@
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4936,
     "browserpoortToetsen": 199,
-    "kernBreedte": 1415,
+    "kernBreedte": 1416,
     "kernGedeeld": 194,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -34,6 +34,11 @@
     "schermenZonderVormtaal": 184
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1415 -> 1416 (de gedeelde noteerSessie van laag 2)",
+      "reden": "EEN naam erbij, en hij bestaat juist om een tweede KOPIE te voorkomen.\n\nEr zijn in dit huis twee deuren die een sessie uitgeven: /api/auth/login en /api/auth/register. Allebei moeten ze noteren hoe hard en hoe vers die sessie is ontstaan (VERTROUWEN.md laag 2), en tot vandaag deed alleen de eerste dat -- waardoor een VERS ACCOUNT doodliep: laag 3 vroeg bij de eerste zware handeling een tweede bevestiging, en de bevestigingsdeur weigerde die omdat er geen gemeten inlog onder lag. Uitloggen en opnieuw inloggen was de enige uitweg.\n\nDe reparatie kon op twee manieren. Het blok uit inlog.js kopieren naar account.js kost nul op deze meter en zet precies de fout klaar die LAT.md regel 4 beschrijft -- en dat is geen theorie: bij het bouwen liepen de twee spellingen van een account (`42` tegenover `user-42`) al uiteen, waardoor de apparatenlijst zich splitste en elk apparaat bij de tweede deur eeuwig \"nieuw\" was. Een step-up die altijd vraagt, is een step-up die niemand nog leest.\n\nDe andere manier is EEN functie in routes/auth.js (`noteerSessie`), door beide deuren aangeroepen. Die telt hier als een naam erbij. Hij blijft binnen het domein `auth` -- kernGedeeld staat dan ook onveranderd op 194 -- en er gaat geen enkel ander domein bij kunnen.\n\nWAT IK NIET HEB OPGEHOOGD, en dat is de eerlijke helft. keuringOmvang stond eerst op 163 doordat server/bedrijf/index.js door twee mount-commentaren over de 9,4 kB kwam; die is TERUGGEBRACHT door bevestig.js door beheerder.js te laten monteren in plaats van door index.js -- een naad die er toch al lag, want beheerderVan woont daar. En toetsenNietGemeten stond op 155 door test/vertrouwenbeheer.test.js; daar is de mutatiemotor overheen gedraaid (gezakt op de liegpoort en op de scherpe ronde), dus die meter staat weer op 154. Naast die motor zijn er negen mutaties met de hand gedraaid, negen keer raak; ze staan met naam in de kop van dat toetsbestand."
+    },
     {
       "datum": "2026-08-18",
       "meter": "keuringOmvang 158 -> 159; kernBreedte 1405 -> 1413; toetsenNietGemeten 154 -> 155 (de contactpin, gemeten NA het tweede samengaan met main)",

@@ -64,12 +64,46 @@ module.exports = (kern) => {
      zet hem niet, en dan is er niets te vergeten. */
   const DEV_VELDEN = () => process.env.RTG_DEV_LINKS === '1';
 
+  /* HOE HARD EN HOE VERS EEN SESSIE IS ONTSTAAN (VERTROUWEN.md laag 2), en het
+     staat hier omdat er TWEE deuren zijn die een sessie uitgeven: inloggen en
+     registreren. Twee plekken die hetzelfde moeten noteren, noteren het na
+     verloop van tijd verschillend (LAT.md regel 4), en dan meet laag 3 de ene
+     helft van de mensen anders dan de andere.
+
+     ZONDER DIT LOOPT EEN VERS ACCOUNT DOOD. Van een sessie die alleen uit de
+     registratie komt is niets vastgelegd; laag 3 vraagt dan bij de eerste zware
+     handeling een tweede bevestiging, en de bevestigingsdeur weigert die omdat
+     er geen gemeten inlog onder ligt. De mens zit klem tot hij uitlogt en
+     opnieuw inlogt -- terwijl hij zojuist een wachtwoord heeft gezet.
+
+     HET APPARAAT IS DE USERAGENT PLUS DE TAAL, en er wordt alleen een HASH van
+     bewaard (kern/vertrouwen/verificatie.js): genoeg voor de enige vraag die
+     wordt gesteld -- ken ik dit apparaat van u -- en te weinig voor een
+     bewegingsbeeld.
+
+     EN ER STAAT GEEN TRY OMHEEN. Hier stond er ooit een, met "de inlog gaat
+     voor" erbij. Dat klonk verstandig en was het niet: de domeingrens hield de
+     aanroep tegen, de catch slikte dat op, en de inlog bleef vrolijk slagen
+     terwijl laag 2 volledig stilstond. Een vangnet om een bedradingsfout heen
+     ziet er precies hetzelfde uit als een vangnet om iets dat werkt.
+
+     EEN ACCOUNT HEEFT EEN SPELLING, en dat is `user-<id>`. De apparatenlijst
+     hangt aan die naam, en dezelfde mens komt in dit huis langs meer dan een
+     deur: de RTG-inlog kent hem als id, de werkruimte kent hem als `rtgKey`, de
+     techniekdeur als `user-<id>`. Twee spellingen zouden twee apparatenlijsten
+     opleveren, en dan is elk apparaat bij de tweede deur eeuwig "nieuw" -- een
+     step-up die altijd vraagt, precies de vorm van ruis waar niemand nog naar
+     kijkt. De prefix staat dus HIER en niet bij de aanroeper. */
+  const noteerSessie = (req, token, userId, hoe) =>
+    kern.vertrouwen.verifieer(token, { hoe: hoe || 'wachtwoord', account: 'user-' + userId,
+      apparaat: String(req.get('user-agent') || '') + '|' + String(req.get('accept-language') || '') });
+
   /* Inloggen en uitloggen staan in ./auth/inlog.js -- hier aangeroepen en niet
      verderop, want dit zijn de eerste vier routes van het domein en de volgorde
      van registreren is in dit huis de volgorde van afhandelen. */
   require('./auth/inlog')({ PERSONAS, accounts, app, auth, checkCred, crypto, forgetSession, hasCred,
     loginFails, noteFailedTry, rememberSession, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, isBaas, kern });
+    DEMO, pasAppOk, PAS_FOUT, isBaas, kern, noteerSessie });
 
   /* De registratie-, herstel- en verificatieroutes draaien als submodules
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
@@ -83,8 +117,12 @@ module.exports = (kern) => {
        gemount, en dat gebeurt na deze module -- dus uitpakken bij het opstarten
        zou een undefined opleveren. Via het kern-object leest de registratie ze
        op het moment dat er iemand registreert, en dan staan ze er. */
-    kern };
+    kern, noteerSessie };
   require('./auth/account')(actx);
+  /* Het bevestigen van het e-mailadres staat los van het registreren: dat is een
+     ander moment, met een andere sleutel, vaak dagen later en op een ander
+     apparaat. Zie ./auth/emailbevestiging.js. */
+  require('./auth/emailbevestiging')(actx);
   require('./auth/herstel')(actx);
   /* De herstelstroom komt uit die submodule (startHerstel) en de LEDENBALIE
      roept hem aan: een lid dat belt dat hij niet meer inlogt, krijgt dezelfde

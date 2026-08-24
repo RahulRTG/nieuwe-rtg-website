@@ -125,9 +125,11 @@ module.exports = (kern) => {
      werkruimte, daar staan de mensen erin. */
 
   // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest
-  // gebruikt, en start zet de blokkenregistratie waar de rest zich op meldt)
+  // gebruikt, beheerder mag daarna ook een MENS zijn en leest rollenVan, en
+  // start zet de blokkenregistratie waar de rest zich op meldt)
   require('./leden')(sctx);
   Object.assign(sctx, require('./rollen')(sctx));
+  Object.assign(sctx, require('./beheerder')(sctx));
   require('./start')(sctx);
   Object.assign(sctx, require('./wieis')(sctx));
   Object.assign(sctx, require('./project')(sctx));

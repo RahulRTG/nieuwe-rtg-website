@@ -364,7 +364,33 @@ test('13. de uitgever heeft zijn eigen noodrem, en het lid zijn eigen gum', asyn
     'wat al weg is, gaat niet nog een keer weg');
 });
 
-test('14. zonder inlog en zonder pas blijft alles dicht', async () => {
+test('14. een geweigerde versie laat geen bytes achter, wel het bewijs', async () => {
+  const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifest({ sleutel: 'derden-afkeur', versie: '0.1.0' }),
+    bestanden: bundel([{ pad: 'niks.txt', inhoud: 'een versie die wordt afgewezen' }]) }, sup);
+  assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.error || ''));
+  const map = path.join(TMP, 'appstore', 'derden-afkeur', r.body.versie.hash);
+  assert.equal(fs.existsSync(map), true, 'de bundel staat er zolang hij op een mens wacht');
+
+  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'geweigerd' }, office)).status, 400,
+    'een weigering zonder naam wordt niet aangenomen');
+  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'geweigerd', reden: 'kort', door: 'Sam van RTG' }, office)).status, 400,
+    'en een weigering zonder deugdelijke reden ook niet');
+
+  const w = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'geweigerd',
+    reden: 'de app doet niet wat hij in zijn uitleg belooft', door: 'Sam van RTG' }, office);
+  assert.equal(w.status, 200);
+  assert.equal(fs.existsSync(map), false, 'daarna liggen de bytes er niet meer: niets kan ze nog uitleveren');
+  /* Wat het bewijs draagt blijft wel staan -- anders is een weigering achteraf
+     niet na te trekken en is de hele keuring een gebaar. */
+  const mijn = await api('/api/appstore/uitgever', {}, sup);
+  const afgekeurd = mijn.body.apps.find(a => a.sleutel === 'derden-afkeur').versies[0];
+  assert.equal(afgekeurd.status, 'geweigerd');
+  assert.equal(afgekeurd.hash, r.body.versie.hash);
+  assert.equal(afgekeurd.besluit.door, 'Sam van RTG');
+  assert.match(afgekeurd.besluit.reden, /niet wat hij in zijn uitleg belooft/);
+});
+
+test('15. zonder inlog en zonder pas blijft alles dicht', async () => {
   assert.equal((await api('/api/appstore/catalogus', {})).status, 401);
   assert.equal((await api('/api/appstore/brug', { sleutel: 'derden-teller', methode: 'opslag.lijst' })).status, 401);
   assert.equal((await api('/api/appstore/uitgever/inzenden', { manifest: manifest(), bestanden: bundel() })).status, 401);

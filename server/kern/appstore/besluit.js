@@ -17,7 +17,7 @@
 const { MACHTIGINGEN, NIET_GEBOUWD } = require('./machtigingen');
 const { BUDGET } = require('./keuring');
 
-module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever, publiekU, app, versie, publiekV }) {
+module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV }) {
   /* -------------------------------------------------------------- het aftekenen */
 
   const wachtrij = () => Object.values(S().versies).filter(v => v.status === 'wacht-op-mens')
@@ -49,6 +49,17 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
       if (a.live && a.live !== v.id) { const oud = versie(a.live); if (oud) oud.status = 'ingetrokken'; }
       a.live = v.id; a.naam = v.manifest.naam; a.categorie = v.manifest.categorie; a.ingetrokken = null;
     }
+    /* Een door een mens GEWEIGERDE versie kan nooit meer worden uitgeleverd:
+       publiceren vraagt de stand 'wacht-op-mens', en de celroute vraagt de LIVE
+       hash. De bytes op schijf hebben daarmee geen enkele lezer meer, en dan
+       horen ze er niet te liggen. Wat het bewijs draagt blijft wel staan: de
+       hash, de bevindingen, de reden en de naam van wie tekende, in de versie
+       zelf en in het journaal. Zendt de uitgever dezelfde bundel opnieuw in, dan
+       wordt hij gewoon opnieuw weggeschreven.
+
+       Een INGETROKKEN versie blijft wel liggen: die heeft gedraaid, en "wat
+       draaide er vorige week" hoort beantwoordbaar te blijven. */
+    if (keuze === 'geweigerd') opslag.weg(v.sleutel, v.hash);
     boek('versie-' + keuze, v.sleutel, wie, { versie: v.manifest.versie, hash: v.hash, reden: v.besluit.reden });
     save();
     return { status: 200, ok: true, versie: publiekV(v) };

@@ -145,7 +145,7 @@ function maakAppstore({ db, save, dir, antivirus, log }) {
      versie live gaat, en die scheiding is de reden dat grens 2 na te lezen is
      zonder de hele motor door te moeten. */
   const { wachtrij, besluit, intrekken, mijnUitgeverij } =
-    require('./besluit')({ S, save, nu, boek, eigen, norm, uitgever, publiekU, app, versie, publiekV });
+    require('./besluit')({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV });
 
   const motor = { S, journaal, boek, opslag, nu, save,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,

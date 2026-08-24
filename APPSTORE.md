@@ -161,6 +161,14 @@ Wat een lid in een app heeft opgeslagen blijft staan: dat is zijn inhoud en niet
 die van de app. Komt er een nieuwe versie, dan is het er weer; wie het echt weg
 wil, gooit het weg als eigen handeling.
 
+Een door een mens GEWEIGERDE versie laat geen bytes achter: publiceren vraagt de
+stand `wacht-op-mens` en de celroute vraagt de LIVE hash, dus die bundel heeft
+geen enkele lezer meer. Wat het bewijs draagt blijft wel staan — de hash, de
+bevindingen, de reden en de naam van wie tekende — want anders is een weigering
+achteraf niet na te trekken en is de hele keuring een gebaar. Een INGETROKKEN
+versie blijft wel liggen: die heeft gedraaid, en "wat draaide er vorige week"
+hoort beantwoordbaar te blijven.
+
 ### 6. Wat er niet is, staat er met een reden
 
 Dezelfde regel als in `TENANT.md`: een leeg veld leest als "nog niet opgehaald",

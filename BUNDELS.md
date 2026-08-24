@@ -146,6 +146,7 @@ omlaag.
 | `command-14.js` | RTG Command, deel 14: de overname |
 | `command-15.js` | RTG Command, deel 15: koppelingen en landen |
 | `command-16.js` | RTG Command, deel 16: de steden en het alarm |
+| `command-17.js` | RTG Command, deel 17: de gezondheidskaart -- de stand en de bewijsgraad naast elkaar |
 
 ## `apps/defensie.js`
 

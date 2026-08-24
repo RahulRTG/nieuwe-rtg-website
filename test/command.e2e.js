@@ -69,7 +69,7 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
        stoppen. */
     for (const w of ['zoek', 'operator', 'zaken', 'herstel', 'beleid', 'simulatie', 'toezicht', 'werk',
       'journaal', 'werkplek', 'kwaliteit', 'graaf', 'herkomst', 'mdm', 'slo', 'sonde', 'alarm',
-      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad']) {
+      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad', 'gezondheid']) {
       await page.click('#rail button[data-w="' + w + '"]');
       await page.waitForFunction(() => {
         /* De app-titel is de <h1> in de kop (die de iOS-laag tot navigatiebalk
@@ -87,7 +87,7 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
          eerste versie van deze toets. */
       await page.waitForFunction(() => {
         const m = document.querySelector('main');
-        return m && !/Ophalen…|Meten…/.test(m.textContent);
+        return m && !/Ophalen…|Meten…|Lezen…/.test(m.textContent);
       }, null, { timeout: 12000 });
 
       /* EN DAN DE TEKST ZELF NAKIJKEN, want de kop alleen is niet genoeg. Elke
@@ -102,6 +102,25 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
           'werkplek ' + w + ' toont een JS-fout als melding: ' + tekst.slice(0, 200));
       }
     }
+
+    /* DE GEZONDHEIDSKAART: de vierde laag moet er echt uit te klappen zijn.
+       Dat is de laag die je niet kunt verzinnen -- per bron wat hij NIET
+       aantoont -- en een knop die hem niet opent, maakt van dit scherm alsnog
+       een dashboard met een uitklapje dat leeg is. */
+    await page.click('#rail button[data-w="gezondheid"]');
+    await page.waitForSelector('[data-open]', { timeout: 10000 });
+    /* ZICHTBAARHEID en niet textContent: het bewijs staat wel degelijk in de
+       DOM, alleen achter `hidden`. Wie hier op tekst toetst, toetst niets --
+       en dat is precies hoe deze toets de eerste keer slaagde zonder te kijken. */
+    const bewijsId = await page.getAttribute('[data-open]', 'data-open');
+    assert.equal(await page.isVisible('#' + bewijsId), false, 'het bewijs staat open voordat iemand klikte');
+    await page.click('[data-open]');
+    await page.waitForFunction((id) => {
+      const k = document.getElementById(id);
+      return k && !k.hasAttribute('hidden') && /Wat dit niet aantoont/.test(k.textContent);
+    }, bewijsId, { timeout: 8000 });
+    assert.match(await page.textContent('main'), /bewijs: (onbekend|vermoed|gemeten|bewezen)/,
+      'de bewijsgraad staat niet naast de stand');
 
     // De operator: een vraag stellen en een gemeten antwoord terugkrijgen.
     await page.click('#rail button[data-w="operator"]');

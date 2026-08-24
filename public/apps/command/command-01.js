@@ -1,6 +1,6 @@
 /* RTG Command, deel 1: de schil.
 
-   ÉÉN APP, TIEN WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
+   ÉÉN APP, TWAALF WERKPLEKKEN, ÉÉN OBJECTMODEL. Dit deel doet de inlog (via het
    gedeelde kantoorgesprek, niet een eigen codeveld), de rail, het schakelen
    tussen werkplekken en de gedeelde hulpjes die de andere delen gebruiken.
 
@@ -65,6 +65,13 @@
      daarna besturen. De laatste twee (werk, journaal) zijn de spiegels. */
   var WERKPLEKKEN = [
     { id: 'puls', naam: 'Command Center', sec: 'Zien', teller: function (s) { return s.puls ? s.puls.domeinen.filter(function (d) { return d.stand !== 'in orde' && d.stand !== 'leeg'; }).length : 0; } },
+    /* De teller telt storingen EN wat opnieuw moet worden vastgesteld, en niet
+       wat "niet vast te stellen" is. Dat laatste is op een verse installatie
+       bijna alles, en een rail die dan permanent op elf staat, wordt genegeerd
+       -- terwijl vervallen bewijs juist iets is dat iemand kan wegwerken. */
+    { id: 'gezondheid', naam: 'Gezondheid', sec: 'Zien', teller: function (s) {
+      var g = s.start && s.start.gezondheid; if (!g || !g.tel) return 0;
+      return g.tel.storing + g.tel.moetOpnieuw; } },
     { id: 'zoek', naam: 'Zoek alles', sec: 'Zien' },
     { id: 'operator', naam: 'Operator', sec: 'Doen' },
     { id: 'zaken', naam: 'Uitzonderingen', sec: 'Doen', teller: function (s) { return s.puls ? s.puls.zaken.open : 0; } },

@@ -4268,6 +4268,24 @@ De werkplek-tab opent de bestaande apps (Office, RTMail, Agenda, Meet, Bestanden
 
 Kern: `server/kern/command/` (register, zoek, object, oorzaak, operator, risico, runbooks, beleid, journaal, zaken, toezicht, toegang, puls, simulatie, werkbesparing), routes `/api/command/*` in `server/routes/command/`, frontend `public/apps/command/` (gebundeld naar `public/apps/command.js`), getoetst in `test/command.test.js`.
 
+### De gezondheidskaart: doen de vermogens het, en hoe hard weten we dat
+
+De puls hierboven zegt hoe de **gegevens** ervoor staan: hoeveel objecten, wat staat er open, waar verloopt een termijn. Dat is een goede vraag en het is niet dezelfde vraag als *doet betalen het?*. Een domein kan brandschoon zijn terwijl de dienst eronder plat ligt, en andersom. `server/kern/command/gezondheid.js` beantwoordt die tweede vraag, en het verschil met elk ander statusbord zit in één veld: **de bewijsgraad**.
+
+Een bord dat "Betalen: OK" toont, zegt niet waarom het dat weet. Dat kan zijn omdat er 4.812 verzoeken zonder fout langskwamen, omdat er zojuist een proef is gedraaid die het werkelijk heeft gedaan, omdat er geen klachten binnenkwamen, of omdat er niemand heeft gekeken. Vier graden dus -- **onbekend, vermoed, gemeten, bewezen** -- en daarnaast de uitslag **niet vast te stellen**, die geen storing is en geen groen. Zonder die laatste is de rest waardeloos: dan is het bord het groenst op de dag dat er nog niets draait.
+
+**Twaalf vermogens en geen 191 schakelaars.** De kaart (`kern/command/vermogens.js`) groepeert de functiecatalogus per CATEGORIE: acht diensten (binnenkomen, betalen, de ledenkant, het sociale, de eigen apps, de zakenkant, de RTFoundation, het kantoor) en vier fundamenten die geen verkeer hebben en toch stuk kunnen zijn (bereikbaar, de gegevens, de sporen, het bewaren). Per categorie is grover en het veroudert niet: een nieuwe schakelaar landt vanzelf bij het goede vermogen. Bij het opstarten faalt de kaart als een categorie in geen enkel vermogen valt -- die schakelaars zouden anders stil van het bord verdwijnen, en dan staat er groen omdat er niets staat.
+
+**Hij meet niets zelf**, en dat is dezelfde regel als in het alarm en om dezelfde reden. Elk getal komt uit een laag die er al was: de meting per capability, de servicedoelen, de sonde, het alarm, de gegevenskwaliteit, de hashketen van het journaal, de back-upstand. Een kaart met een eigen meting zegt op een dag iets anders dan het scherm waar hij over gaat.
+
+**Elke bron draagt wat hij NIET aantoont**, op het scherm en niet in een voetnoot. De scherpste is de back-up: `server/backupstand.js` kijkt na of de bestanden er zijn en of db.json opent, en dat is geen terugzetproef -- die bestaat platformbreed niet. Dat vermogen heeft daarom een **plafond** en komt nooit hoger dan "gemeten", ook niet na een geslaagde controleronde. Elk ander bord zet hier "Backup: OK" neer.
+
+**De doorwerking kleurt niets rood.** Een vermogen dat zelf klopt maar leunt op iets met een storing, blijft in orde staan met de zin erbij: *"De zakenkant werkt. Wat hier via betalen loopt, wacht."* Alles rood kleuren omdat er ergens iets stuk is, maakt van een kaart een alarmklok.
+
+**En de knop Controleer weigert waar hij moet.** Een ronde voert echt iets uit -- de sonde loopt zijn reizen, de hashketen wordt nagerekend, de gegevens worden gescand, de back-up wordt opengemaakt. Maar voor de meeste diensten bestaat zo'n proef niet: betalen bewijzen betekent betalen, en dat doet dit huis niet met het geld van een lid om een scherm groen te krijgen. Zo'n ronde meldt "niets gecontroleerd", blijft staan als gebeurtenis met een datum en een naam, en geeft **geen oordeel**. Dat laatste is er na een echte fout: in de eerste ronde tegen een draaiende server zette een controle op *betalen* -- die niets kon doen -- dat vermogen van "niet vast te stellen" op "in orde". Een knop die groen maakt door hem in te drukken.
+
+Werkplek **Gezondheid** onder *Zien*; kern in `server/kern/command/gezondheid.js` (met `vermogens.js`, `gezondheid-bronnen.js`, `gezondheid-fundament.js`, `gezondheid-proef.js`, `gezondheid-taal.js`), routes `/api/command/gezondheid*`, scherm `public/apps/command/command-17.js`. Getoetst in `test/gezondheidskaart.test.js` (veertien beweringen, acht mutaties). De richting waar deze laag in past, en de grenzen die daarbij horen, staan in **`BESTUUR.md`**.
+
 ## De Regie van de zaak: dezelfde logica, maar alleen over de eigen zaak
 
 RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het niet zien -- hij heeft dezelfde soort laag nodig over **zijn eigen zaak**. Die staat in `server/kern/zaakcommand/` en hangt als werkgebied **Regie** in de zaak-app (`/apps/leverancier.html`) en als tegel **Regie** in de personeels-PDA (`/apps/personeel.html`).

@@ -12,7 +12,8 @@
      2 Control    aanpassen      ./runbooks.js, ./beleid.js
      3 Automate   zelf laten doen ./operator.js, ./risico.js (auto-route)
      4 Predict    aan zien komen  ./simulatie.js
-     5 Prevent    vóór zijn      ./risico.js + ./toezicht.js (grenzen, budgetten)
+     5 Prevent    vóór zijn      ./gezondheid.js (doet het het, en hoe hard)
+                                 ./risico.js + ./toezicht.js (grenzen, budgetten)
                                  ./slo.js + ./sonde.js (foutbudget, van buitenaf)
                                  ./canary.js (uitrollen met een terugroldrempel)
                                  ./zandbak.js (proeven zonder productiegegevens)
@@ -69,23 +70,13 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register, kern });
   const { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart } = lagen;
 
-  /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de
-     SLO-meter houdt het foutbudget bij; ze staan in deze volgorde omdat de
-     meter de sonde erbij zet en niet andersom. De reizen komen uit dezelfde
-     SLO.json als de doelen, via slo.laadNorm() -- dus één bestand met de norm,
-     en geen tweede lijstje reizen dat langzaam iets anders gaat toetsen. */
-  const slolaag = require('./slo');
-  const sonde = require('./sonde').maakSonde({ db, save,
-    reizen: () => slolaag.laadNorm().reizen || [] });
-  const slo = slolaag.maakSlo({ meting: require('../../meting'), sonde });
-  /* HET ALARM. Hij meet niets zelf: elke controle leest een laag die er al is.
-     Een alarm met een eigen meting zegt op een dag iets anders dan het scherm
-     waar het over gaat. De drempels komen uit SLO.json, de controles staan in
-     de module -- een regeltaal in een configuratiebestand is een tweede
-     implementatie die je niet kunt toetsen. */
-  const alarm = require('./alarm').maakAlarm({ db, save, journaal, slo, sonde, canary, kwaliteit,
-    norm: () => slolaag.laadNorm(), sein: sseToOffice });
-  alarm.tikker();
+  /* DE MEETKANT VAN NIVEAU 5, en sinds de gezondheidskaart erbij kwam een eigen
+     bestand: de sonde, de servicedoelen, het alarm en de kaart die ze naast
+     elkaar legt. De volgorde waarin ze elkaar nodig hebben staat daar; wat ze
+     delen is dat geen van vieren iets twee keer meet. */
+  const { sonde, slo, alarm, gezondheid } = require('./meetlagen').maakMeetlagen({
+    db, save, journaal, kwaliteit, canary, sseToOffice });
+
   const zoeklaag = require('./zoek');
   const objectlaag = require('./object');
 
@@ -137,9 +128,16 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
          precies het geval waarvoor de terugroldrempel bestaat. */
       canary: canary.stand().tel,
       /* De alarmen op het beginscherm, want een alarm dat je moet opzoeken is
-         geen alarm. */
-      alarm: alarm.stand().tel
+         geen alarm. En de gezondheid ernaast: de puls hierboven zegt hoe de
+         GEGEVENS ervoor staan, niet of de diensten het doen. */
+      alarm: alarm.stand().tel,
+      gezondheid: gezondheidKort()
     };
+  }
+
+  function gezondheidKort() {
+    try { const g = gezondheid.stand(); return { oordeel: g.oordeel, tel: g.tel }; }
+    catch (e) { return { fout: String(e.message).slice(0, 200) }; }
   }
 
   function sloKort() {
@@ -152,7 +150,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm, gezondheid,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

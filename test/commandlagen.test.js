@@ -18,6 +18,8 @@
      -> "elke laag heeft een ingang die antwoordt" ZAKT (RAAK)
    - officeAuth van de alarmroute gehaald
      -> "geen enkele ingang staat open zonder kantoorsessie" ZAKT (RAAK)
+   - de gezondheidsroutes uit routes/command/meten.js gehaald
+     -> "elke laag heeft een ingang die antwoordt" ZAKT (RAAK)
 
    Draai: npm test */
 const test = require('node:test');
@@ -54,7 +56,7 @@ test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: tru
 test('elke laag heeft een ingang die antwoordt', async () => {
   for (const pad of ['command/canary', 'command/zandbak', 'command/mdm', 'command/overname',
     'command/apipoort', 'command/land', 'command/stad', 'command/alarm', 'command/herkomst',
-    'command/kwaliteit', 'command/graaf', 'command/slo', 'command/sonde']) {
+    'command/kwaliteit', 'command/graaf', 'command/slo', 'command/sonde', 'command/gezondheid']) {
     const r = await api(pad);
     assert.equal(r.status, 200, pad + ' antwoordt niet: ' + JSON.stringify(r.body).slice(0, 120));
   }
@@ -64,7 +66,8 @@ test('geen enkele ingang staat open zonder kantoorsessie', async () => {
   for (const pad of ['command/canary', 'command/canary/start', 'command/zandbak', 'command/zandbak/maak',
     'command/mdm', 'command/mdm/samen', 'command/overname', 'command/overname/lees',
     'command/apipoort', 'command/apipoort/sleutel', 'command/land', 'command/land/activeer',
-    'command/stad', 'command/stad/start', 'command/alarm', 'command/alarm/stil']) {
+    'command/stad', 'command/stad/start', 'command/alarm', 'command/alarm/stil',
+    'command/gezondheid', 'command/gezondheid/vermogen', 'command/gezondheid/controleer']) {
     assert.equal(await zonder(pad), 401, pad + ' staat open zonder sessie');
   }
 });

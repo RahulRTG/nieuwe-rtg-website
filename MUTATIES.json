@@ -1762,6 +1762,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "gezondheidskaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/gezondheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "ghost.test.js": {
       "soort": "server",
       "staat": "gezakt",

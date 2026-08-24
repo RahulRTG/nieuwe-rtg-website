@@ -97,9 +97,14 @@ Vijf, en er komt er geen zesde bij zonder dat dit document verandert.
 **Waarde** is wat er op een positie staat. Rauw in centen; het scherm maakt er
 één keer euro's van.
 
-**Positie** is één rekening in het grootboek. `lid:<codenaam>` en
-`partner:<code>` zijn posities; de `extern:`-rekeningen zijn dat níet — dat is
-de sluitpost van het dubbel boekhouden en die mag juist negatief staan.
+**Positie** is één rekening in het grootboek. `lid:<codenaam>`,
+`partner:<code>` en `waarde:<id>` (een uitgegeven budget) zijn posities; de
+`extern:`-rekeningen zijn dat níet — dat is de sluitpost van het dubbel
+boekhouden en die mag juist negatief staan. Een lid heeft altijd zijn wallet en
+kan daarnaast budgetten hebben; ze staan náást elkaar en worden nooit tot één
+getal opgeteld. `vrijBesteedbaar` en `gebonden` zijn twee totalen, en er is met
+opzet geen derde dat ze optelt — dat leest als "dit kan ik uitgeven", en dat is
+gebonden waarde niet.
 
 **Klasse** is wat voor soort waarde het is (`kern/waarde/klassen.js`). Zes
 stuks, elk met zes velden en een **grond**: uitgever, bestedingsgebied,
@@ -122,7 +127,13 @@ tegelijk is geld uitgeven; die combinatie bestaat hier niet, en een toets zakt
 als iemand hem toch maakt.
 
 **Beleid** is wat de uitgever of de houder er bovenop zet: genres, tijdvenster,
-dagmaximum. Drie lagen, van hard naar zacht (`kern/waarde/policy.js`): de klasse
+dagmaximum. Het toetst **fail-closed**: een genrebeperking geldt ook als het
+genre onbekend is, want dan weten we juist niet dat deze zaak eronder valt. De
+eerste versie had daar `h.genre &&` staan en glipte dus langs elke beperking
+zodra de aanroeper vergat te zeggen wáár — een beleidslaag die bij twijfel
+goedkeurt is geen beleidslaag. Het genre komt daarom ook uit het
+partnerregister en nooit uit het verzoek: een zaak die haar eigen genre opgeeft,
+vult de bestedingsbeperking van een werkgever zelf in. Drie lagen, van hard naar zacht (`kern/waarde/policy.js`): de klasse
 staat niet ter beschikking van een instelling, het beleid van de uitgever wel,
 en het beleid van de houder is de enige weigering die de houder zelf kan
 opheffen — het antwoord zegt dat dan ook (`opheffbaar: true`).
@@ -185,12 +196,25 @@ De volgorde is niet vrij: elke stap leunt op de vorige.
    Het lid krijgt hier bewust **geen eigen knop** voor. Hij toont dezelfde
    kassacode als altijd; vastzetten is iets wat een zaak vraagt. Een tweede soort
    code zou het lid laten kiezen tussen twee dingen die voor hem hetzelfde zijn.
-2. **Meerdere posities per lid.** Nu is `lid:<codenaam>` één wallet. Een
-   werkgeversbudget wordt een eigen positie in hetzelfde grootboek — geen tweede
-   boekhouding, wel een tweede rekening.
-3. **Slim betalen uit meerdere potjes.** € 72 wordt € 25 maaltijdbudget,
-   € 12 loyaliteit, € 35 eigen saldo. Het lid ziet "€ 72 betaald"; de
-   samenstelling staat onder Details. Kan pas na stap 2.
+2. ~~**Meerdere posities per lid.**~~ **Gedaan.** Een budget is een eigen
+   rekening `waarde:<id>` in hetzelfde grootboek — geen tweede boekhouding, wel
+   een tweede rekening. Een uitgever (werkgever, gemeente, RTG) geeft het uit
+   met `/api/supplier/pay/budget`, en het kost hem precies dat bedrag: geld
+   ontstaat niet uit het niets, dus `kern/waarde/uitgifte.js` maakt alleen de
+   positie en `kern/pay/budget.js` boekt de euro's van de uitgever ernaartoe.
+   Het lid ziet zijn posities naast elkaar op `/api/pay/portefeuille`.
+3. ~~**Slim betalen uit meerdere potjes.**~~ **Gedaan.** € 72 wordt € 25
+   maaltijdbudget en € 47 eigen saldo, in één tik
+   (`kern/waarde/samenstellen.js`, uitgevoerd door `kern/pay/samen.js`).
+
+   De volgorde is de hele inhoud, en hij is omgekeerd aan wat een systeem uit
+   zichzelf doet: **het meest beperkte potje eerst.** Wat het snelst vervalt vóór
+   wat later vervalt, gebonden vóór vrij, de eigen wallet altijd als laatste —
+   die is de opvangbak en als enige bij te laden. Pakt het systeem het vrije geld
+   eerst, dan ziet het lid aan het eind van de maand zijn budget verlopen terwijl
+   hij zijn eigen geld heeft uitgegeven aan precies datgene waar dat budget voor
+   was. Dat is met geen enkele foutmelding zichtbaar; alleen een toets op de
+   volgorde vangt het.
 4. **De persoonlijke geldgrens.** `kern/geldbeleid/` kent al regels; de poort
    kent al `eigenBeleid`. Ze moeten aan elkaar. Een eigen grens is dan een
    weigering en geen waarschuwing — anders is het geen grens.

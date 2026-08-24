@@ -78,8 +78,14 @@ function toets(positie, handeling, eigenBeleid) {
 
   // -- laag 2: het beleid van de uitgever. --
   const b = p.beleid || {};
-  if (Array.isArray(b.genres) && b.genres.length && h.genre && !b.genres.includes(h.genre))
-    return nee('genre', { toegestaan: b.genres });
+  /* FAIL-CLOSED, en dit was de eerste versie niet. Er stond `h.genre &&` in de
+     voorwaarde, waardoor een betaling zonder bekend genre langs elke
+     genrebeperking glipte: een maaltijdbudget was dan overal te besteden zolang
+     de aanroeper vergat te zeggen wáár. Een beleidslaag die bij twijfel
+     goedkeurt, is geen beleidslaag. Weten we het genre niet, dan weten we ook
+     niet dat deze zaak eronder valt, en dan geldt het tegoed hier niet. */
+  if (Array.isArray(b.genres) && b.genres.length && !b.genres.includes(h.genre))
+    return nee('genre', { toegestaan: b.genres, gevraagd: h.genre || null });
   if (b.venster && !binnenVenster(b.venster, nu)) return nee('tijd', { venster: b.venster });
   if (Number.isFinite(b.dagMaxCenten) && Math.round(Number(h.dagBesteed) || 0) + centen > b.dagMaxCenten)
     return nee('dagmax', { dagMaxCenten: b.dagMaxCenten, dagBesteed: Math.round(Number(h.dagBesteed) || 0) });

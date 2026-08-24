@@ -4,7 +4,7 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
-    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, opdrachten,
+    metIdem, boekAsync, betaalUit, seintje, betaaldienstKosten, opdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
 
   /* De teruggang van de partneruitbetaling: alleen deze kant weet dat het
@@ -28,7 +28,7 @@ module.exports = (ctx) => {
     save();
     return { ok: true, code, maxCenten: max, geldigTot: nu() + KASCODE_MS };
   }
-  async function kasInt({ supplierCode, code, centen, oms, idem }) {
+  async function kasInt({ supplierCode, code, centen, oms, idem, genre }) {
     const k = kascodes().find(x => x.code === String(code || '').toUpperCase().trim());
     if (!k || k.gebruikt || k.geldigTot < nu()) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
     const c = Math.round(Number(centen));
@@ -47,9 +47,13 @@ module.exports = (ctx) => {
       if (k.gebruikt || k.geldigTot < nu()) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
       k.gebruikt = true; save();
       const terug = (r) => { k.gebruikt = false; save(); return r; };
-      const z = await zorgSaldo({ codenaam: k.codenaam, centen: c, idem });
-      if (z.error) return terug(z);
-      const b = await boekAsync({ van: rekLid(k.codenaam), naar: rekPartner(supplierCode), centen: c, soort: 'kassa', oms: oms || 'Kassa', ref: k.code });
+      /* Betalen loopt sinds de waardelaag langs ./samen.js: heeft dit lid een
+         maaltijdbudget of een gemeentetegoed dat hier geldt, dan gaat dat er
+         eerst op en pas daarna zijn eigen geld. Het bijladen zit daarbinnen.
+         Heeft hij alleen een wallet -- verreweg het meest -- dan is dit exact
+         één boeking, precies zoals het was. */
+      const b = await betaalUit({ codenaam: k.codenaam, naar: rekPartner(supplierCode), centen: c,
+        genre: genre, oms: oms || 'Kassa', ref: k.code, idem, soort: 'kassa' });
       if (b.error) return terug(b);
       /* De kosten van de betaaldienst gaan DIRECT naar de ondernemer: per
          transactie meteen verrekend op de partnerrekening, als eigen regel in
@@ -64,7 +68,7 @@ module.exports = (ctx) => {
       }
       save();
       seintje(k.codenaam);
-      return { ok: true, centen: c, van: k.codenaam, kosten };
+      return { ok: true, centen: c, van: k.codenaam, kosten, delen: b.delen, bijgeladen: b.bijgeladen || 0 };
     });
   }
 

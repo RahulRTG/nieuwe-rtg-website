@@ -36,8 +36,8 @@
 
    Krijgt de gedeelde ctx van kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { save, nu, kascodes, rekLid, rekPartner, saldoVan, schoon,
-    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, waarde,
+  const { save, nu, kascodes, rekLid, rekPartner, schoon,
+    metIdem, boekAsync, zorgSaldo, betaalUit, seintje, betaaldienstKosten, waarde,
     MIN_CENTEN, MAX_CENTEN } = ctx;
 
   const uit = () => ({ status: 501, error: 'Vooraf vastzetten is hier niet ingeschakeld.' });
@@ -88,7 +88,7 @@ module.exports = (ctx) => {
   }
 
   /* ---------- 2. vastleggen: het werkelijke bedrag ---------- */
-  async function kasVastleg({ supplierCode, reservering, centen, oms, idem }) {
+  async function kasVastleg({ supplierCode, reservering, centen, oms, idem, genre }) {
     if (!waarde) return uit();
     const r = reserveringVanZaak(String(reservering || ''), supplierCode);
     if (!r) return { status: 404, error: 'Deze reservering staat niet op uw naam.' };
@@ -98,8 +98,13 @@ module.exports = (ctx) => {
       // eerst sluiten (anders blokkeert de reservering zijn eigen boeking), dan boeken
       const v = waarde.vastleggen({ id: r.id, centen });
       if (v.error) return v;
-      const b = await boekAsync({ van: rekLid(codenaam), naar: rekPartner(supplierCode), centen: v.centen,
-        soort: 'kassa', oms: schoon(oms, 120) || 'Kassa, vooraf vastgezet', ref: r.id });
+      /* Ook hier langs ./samen.js: is er een budget dat bij deze zaak geldt,
+         dan gaat dat er eerst op. De reservering stond op de eigen wallet (daar
+         zette de zaak hem vast), maar het is de samensteller die bepaalt waar
+         het werkelijke bedrag vandaan komt -- en gebonden geld dat vervalt
+         hoort vóór eigen geld op te gaan. */
+      const b = await betaalUit({ codenaam, naar: rekPartner(supplierCode), centen: v.centen, genre,
+        oms: schoon(oms, 120) || 'Kassa, vooraf vastgezet', ref: r.id, idem, soort: 'kassa' });
       if (b.error) return b;
       let kosten = 0;
       try { kosten = Math.max(0, Math.round(betaaldienstKosten(v.centen) || 0)); } catch (e) { kosten = 0; }
@@ -110,7 +115,7 @@ module.exports = (ctx) => {
       }
       save();
       seintje(codenaam);
-      return { ok: true, centen: v.centen, vrijgevallen: v.vrijgevallen, van: codenaam, kosten };
+      return { ok: true, centen: v.centen, vrijgevallen: v.vrijgevallen, van: codenaam, kosten, delen: b.delen };
     });
   }
 

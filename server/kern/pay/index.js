@@ -28,23 +28,15 @@
 
 module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde }) => {
   const nu = () => Date.now();
-  const d = () => db.data;
+  /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
+     'partner:', het saldo van een rekening, een nieuw id) -- staat in ./bakken.js. */
+  const { d, saldi, grootboek, klompjes, kascodes, tikcodes, rekLid, rekPartner, saldoVan, id } =
+    require('./bakken')({ db, crypto });
   /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
      bedragen -- staat in ./stand.js. Een keer bepaald bij het opstarten, en
      daarna onveranderlijk; alles hieronder werkt per boeking. */
   const { betalingenUit, uitFout, schaduw, motorklant, geldModus,
     MIN_CENTEN, MAX_CENTEN, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
-
-  function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
-  function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
-  function klompjes() { if (!Array.isArray(d().payVerzoeken)) d().payVerzoeken = []; return d().payVerzoeken; }
-  function kascodes() { if (!Array.isArray(d().payCodes)) d().payCodes = []; return d().payCodes; }
-  function tikcodes() { if (!Array.isArray(d().payTikCodes)) d().payTikCodes = []; return d().payTikCodes; }
-
-  const rekLid = c => 'lid:' + c;
-  const rekPartner = c => 'partner:' + c;
-  const saldoVan = rek => Math.round(saldi()[rek] || 0);
-  const id = p => (p || 'P') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
   /* Idempotentie die een herstart overleeft: dezelfde knop twee keer indrukken
      (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
@@ -70,15 +62,14 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
     save();
   }
-  /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de
-     oude saldo-regel als bodem, en daarbovenop de klasse, het beleid, de
-     reserveringen en het plafond van de waardelaag. Optioneel: zonder
-     `waarde` is dit exact de regel die hier altijd stond. */
+  /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
+     saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
+     Optioneel: zonder `waarde` is dit exact de regel die hier altijd stond. */
   const waardePoort = require('./poort')({ saldoVan, waarde });
   // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
   // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
   // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
-  function boek({ van, naar, centen, soort, oms, ref }) {
+  function boek({ van, naar, centen, soort, oms, ref, genre, dagBesteed }) {
     if (betalingenUit) return uitFout();
     if (geldModus === 'motor') {
       const bron = (new Error().stack || '').split('\n')[2] || '';
@@ -87,7 +78,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
-    const dicht = waardePoort({ van, naar, centen: c, soort });
+    const dicht = waardePoort({ van, naar, centen: c, soort, genre, dagBesteed });
     if (dicht) return dicht;
     const rij = { id: id('PB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 120), ref: ref || null, at: nu() };
     pasToe(rij);
@@ -100,14 +91,14 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      die hem bevestigt, spiegelt de JS-engine dezelfde regel. Weigert de motor
      (onvoldoende saldo) of is hij onbereikbaar, dan verandert er NIETS aan de
      JS-saldi -- de fout gaat netjes terug naar de caller. */
-  async function boekAsync({ van, naar, centen, soort, oms, ref }) {
+  async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed }) {
     if (betalingenUit) return uitFout();
-    if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref });
+    if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref, genre, dagBesteed });
     /* Ook in motor-modus langs de waardepoort, en met opzet HIER in JS: de motor
        kent de klassen, het beleid en de reserveringen niet -- die wonen in de
        metadata aan deze kant, precies zoals de bank-guard in kern/bank/grootboek.js
        om dezelfde reden in JS bleef staan. Eerst toetsen, dan pas de motor. */
-    const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort });
+    const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
     if (dicht) return dicht;
     const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
@@ -148,12 +139,17 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      op dag een al drie keer bijna fout gegaan. */
   const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
   api.schaduw = schaduwStand;
+  // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
+  if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);
+  /* De deelbestanden. ./samen gaat als EERSTE in de ctx: kassa en vooraf betalen
+     erlangs, want een betaling kan sinds er budgetten bestaan uit meerdere
+     potjes komen (zonder waardelaag is het er exact een en verandert er niets).
+     ./vooraf staat naast ./kassa en niet erin: kassa kent EEN afrekenmoment,
+     vooraf kent er twee met tijd ertussen. ./budget geeft waarde uit. */
+  Object.assign(ctx, require('./samen')(ctx));
   Object.assign(api, require('./verzoeken')(ctx));
   Object.assign(api, require('./kassa')(ctx));
-  /* De pre-autorisatie (./vooraf.js): vastzetten, vastleggen, vrijgeven. Staat
-     naast ./kassa.js en niet erin, omdat kassa.js anders over de keuringsgrens
-     gaat -- en omdat het een ander moment beschrijft: kassa kent EEN moment,
-     vooraf kent er twee met tijd ertussen. */
   Object.assign(api, require('./vooraf')(ctx));
+  Object.assign(api, require('./budget')(ctx));
   return { pay: api };
 };

@@ -23,9 +23,19 @@
 'use strict';
 
 module.exports = ({ saldoVan, waarde }) => {
-  return function waardePoort({ van, naar, centen, soort }) {
+  /* `genre` en `dagBesteed` reizen mee met de boeking en worden hier
+     doorgegeven, want zonder die twee kan de poort een beleidsregel niet
+     toetsen -- en een poort die de helft van het beleid niet kent, keurt de
+     andere helft ten onrechte goed.
+
+     Dat is geen theorie: de samensteller (kern/waarde/samenstellen.js) koos een
+     maaltijdbudget omdat hij WEL wist bij wat voor zaak er betaald werd, en de
+     poort weigerde dezelfde boeking omdat hij het niet wist. Twee lagen die
+     hetzelfde beleid toetsen op verschillende gegevens, geven verschillende
+     antwoorden -- en de strengste wint, dus de betaling ketste af. */
+  return function waardePoort({ van, naar, centen, soort, genre, dagBesteed }) {
     if (!van.startsWith('extern:') && saldoVan(van) < centen) return { status: 402, error: 'Onvoldoende saldo.' };
     if (!waarde) return null;
-    return waarde.poort({ van, naar, centen, soort, saldoVan });
+    return waarde.poort({ van, naar, centen, soort, genre, dagBesteed, saldoVan });
   };
 };

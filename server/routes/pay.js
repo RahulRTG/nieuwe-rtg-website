@@ -4,7 +4,7 @@
    client stuurt bij elke knop een idem-sleutel mee, dubbeltikken kan nooit
    dubbel boeken. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, managerOnly, liveCodename, pay, onboarding, sseToOffice, factuurSaldo } = kern;
+  const { app, auth, liveCodename, pay, onboarding, factuurSaldo } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Pay is voor leden.' }); return true; }
@@ -95,57 +95,22 @@ module.exports = (kern) => {
     res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));
   });
 
-  /* ---- vooraf vastzetten: de pre-autorisatie ----
-     Drie handelingen van de ZAAK op een code van het lid: een maximum
-     vastzetten, later het werkelijke bedrag vastleggen, of vrijgeven. Het lid
-     heeft er geen eigen knop voor -- hij toont dezelfde kassacode als altijd en
-     ziet het vastgezette bedrag terug in zijn overzicht. Dat is met opzet: een
-     borg vastzetten is iets wat een zaak vraagt, en een tweede soort code zou
-     het lid laten kiezen tussen twee dingen die voor hem hetzelfde zijn. */
-  app.post('/api/supplier/pay/vooraf', supplierAuth, async (req, res) => {
-    const r = await pay.kasVooraf({ supplierCode: req.supplier.code, code: req.body.code,
-      maxCenten: req.body.maxCenten, oms: req.body.oms, idem: req.body.idem, urenGeldig: req.body.urenGeldig });
-    if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuur(res, r);
-  });
-  app.post('/api/supplier/pay/vastleg', supplierAuth, async (req, res) => {
-    const r = await pay.kasVastleg({ supplierCode: req.supplier.code, reservering: req.body.reservering,
-      centen: req.body.centen, oms: req.body.oms, idem: req.body.idem });
-    if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuur(res, r);
-  });
-  app.post('/api/supplier/pay/vrijgeef', supplierAuth, (req, res) => {
-    stuur(res, pay.kasVrijgeef({ supplierCode: req.supplier.code, reservering: req.body.reservering }));
-  });
-  app.post('/api/supplier/pay/vooraf/lijst', supplierAuth, (req, res) => {
-    stuur(res, pay.voorafVanZaak(req.supplier.code));
+  /* ---- de portefeuille van het lid ----
+     Niet hetzelfde als /overzicht: dat gaat over zijn wallet, dit over ALLES
+     wat hij heeft. Sinds een lid een maaltijdbudget of een gemeentetegoed kan
+     hebben, is "wat heb ik" een lijst met regels erbij en geen getal. */
+  app.post('/api/pay/portefeuille', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!pay.portefeuille) return res.json({ ok: true, posities: [], vrijBesteedbaar: 0, gebonden: 0 });
+    res.json(pay.portefeuille(liveCodename(req.session)));
   });
 
-  // de partnerkant: code innen aan de kassa, saldo zien, uitbetalen
-  app.post('/api/supplier/pay/in', supplierAuth, async (req, res) => {
-    const r = await pay.kasInt({ supplierCode: req.supplier.code, code: req.body.code, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem });
-    if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuur(res, r);
-  });
-  app.post('/api/supplier/pay/overzicht', supplierAuth, (req, res) => {
-    res.json(pay.partnerOverzicht(req.supplier.code));
-  });
-  /* UITBETALEN IS GEEN WERKHANDELING MAAR EEN GELDHANDELING.
-
-     Deze route stuurt het hele RTG Pay-saldo van de zaak naar de bank en roept
-     daarvoor de echte betaaldienst aan. Hij stond op supplierAuth, en dat is
-     ELKE ingelogde medewerker: de afwasser met een pincode kon het saldo van de
-     zaak leegtrekken. Dat het geld naar de rekening van de zaak zelf gaat maakt
-     het niet ongevaarlijk -- het is onomkeerbaar, het haalt geld uit de kas op
-     een moment dat de eigenaar niet koos, en het is een prima manier om een
-     zaak op een druk moment plat te leggen.
-
-     Innen (pay/in) en het saldo bekijken (pay/overzicht) blijven voor iedereen:
-     dat is het werk. Weghalen is van de manager. */
-  app.post('/api/supplier/pay/uitbetaal', supplierAuth, async (req, res) => {
-    if (!managerOnly(req, res)) return;
-    stuur(res, await pay.partnerUitbetaal({ supplierCode: req.supplier.code, idem: req.body.idem }));
-  });
+  /* De ZAAKKANT (./pay-zaak.js): budget geven, vooraf vastzetten, innen,
+     saldo en uitbetalen. Afgesplitst omdat dit bestand anders over de
+     keuringsgrens van 10240 byte gaat, en het is de eerlijke snede: alles
+     hierboven hangt aan `auth` (een lid), alles daar aan `supplierAuth` (een
+     zaak). Twee poorten, twee bestanden. */
+  require('./pay-zaak')(kern, { stuur });
 
   // de gezondheidsknop voor de bewaking: klopt het grootboek nog op de cent?
   // Geen data naar buiten, alleen ja of nee (en een 500 zodat een alarm afgaat).

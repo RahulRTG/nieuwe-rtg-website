@@ -507,17 +507,13 @@
     },
     {
       "datum": "2026-08-24",
-      "meter": "keuringOmvang",
-      "van": 158,
-      "naar": 159,
+      "meter": "keuringOmvang 158 -> 159 (handeling.js kreeg hervat())",
       "reden": "Met de hand verhoogd voor server/opzet/handeling.js. Die kreeg hervat() erbij -- de herstelpoort die de handelingscontext na het lezen van de body terugzet -- plus de uitleg waarom dat nodig is. Het bestand ging van 8830 naar 9928 bytes en komt daarmee in de waarschuwingsband (9400-10240). Netto over deze ronde staat de meter weer op waar hij begon: begroting.js ging er in dezelfde tak UIT (159 -> 158) doordat de telling per hervullingsvorm die daar in commentaar stond ook al in README.md staat, en dat was een dubbeling (LAT.md regel 4).",
       "eerlijkheidshalve": "Dit is precies het gedrag dat deze meter aan de kaak stelt, en ik heb het overwogen en toch gedaan. De alternatieven waren (a) doorgaan met knippen tot het bestand er net onder zat -- dat is schrijven naar de limiet, en de notitie van cfaad07 zegt met zoveel woorden dat dat het probleem IS en niet de oplossing; (b) handeling.js splitsen op zijn echte naad (de telling: tel/verschil/sluit, tegenover de context: middleware/hervat/huidige). Die splitsing is de goede, en hij is bewust NIET in deze ronde gedaan: hij raakt de imports van test/handeling.test.js en de census, en dat vlak voor de verificatieronde erbij nemen is de risicovolle volgorde. Hij staat als openstaande rekening en niet als nieuwe normaal. Wat er WEL is gebeurd: het verhaal van de vondst staat nu op een plek (test/begrotingroute.test.js en README.md), en handeling.js draagt alleen nog wat je moet weten om de code te lezen -- dat scheelde 340 bytes en het is de betere plek."
     },
     {
       "datum": "2026-08-24",
-      "meter": "keuringOmvang",
-      "van": 159,
-      "naar": 160,
+      "meter": "keuringOmvang 159 -> 160 (begroting.js leest de grens per collectie)",
       "reden": "Met de hand verhoogd voor server/opzet/begroting.js. Die leest nu de grens PER COLLECTIE uit BEGROTING.json (via ./begrotingsgrenzen.js) in plaats van een globaal getal, plus de regel dat de zes collecties van het vergeetpad ook in de weigerstand alleen melden. Het bestand ging van 9375 naar 9742 bytes en komt daarmee in de waarschuwingsband (9400-10240). Er is in dezelfde ronde ruimte teruggewonnen door de alineas die nu in BEGROTING.json en server/opzet/begrotingsgrenzen.js staan uit de kop te halen; zonder dat had hij op ruim 10400 gestaan, dus over de HARDE grens.",
       "eerlijkheidshalve": "Dit is de tweede keer deze tak dat ik deze meter met de hand ophoog, en de reden is beide keren dezelfde: server/opzet/handeling.js en server/opzet/begroting.js zijn allebei op hun natuurlijke naad toe aan een knip, en die knip is beide keren bewust NIET gedaan omdat hij de census, de toetsimports en de mutatieregisters raakt en dus een eigen ronde hoort te zijn. Voor begroting.js is die naad inmiddels scherp: de WEGING (beoordeel, de teller, stand, de foutklasse) tegenover de VAL (het levensteken, de wikkels, bewaak). Dat is geen esthetiek meer maar het verschil tussen twee onderwerpen die los te toetsen zijn. Het staat als openstaande rekening en niet als nieuwe normaal; wie de tand terug wil naar 158, knipt die twee bestanden op hun naad."
     },
@@ -529,10 +525,8 @@
     },
     {
       "datum": "2026-08-24",
-      "meter": "keuringOmvang",
-      "van": 169,
-      "naar": 170,
-      "reden": "Met de hand verhoogd na het binnenhalen van main. De meters komen bij een samenvoeging van main (dat is de nieuwere van de twee), en dat getal kent de twee modules van deze tak niet. De rekening van deze tak is nagelopen en klopt op een: server/opzet/handeling.js (9928) en server/opzet/begroting.js (9742) komen er BIJ, en server/opzet/verzoekketen.js gaat eruit -- die is in deze tak zelf gesplitst, van 10219 naar 7498 bytes. Twee erbij, een afbetaald. De knip van handeling.js en begroting.js op hun natuurlijke naad staat nog open en is bewust niet in deze tak gedaan: dat is een verbouwing van de laag zelf, en die hoort niet in dezelfde tak als de laag die hem nodig had."
+      "meter": "keuringOmvang 169 -> 170 (bij het binnenhalen van main)",
+      "reden": "Met de hand verhoogd na het binnenhalen van main. De meters komen bij een samenvoeging van main (dat is de nieuwere van de twee), en dat getal kent de twee modules van deze tak niet. De rekening van deze tak is nagelopen en klopt op een: server/opzet/handeling.js (9928) en server/opzet/begroting.js (9742) komen er BIJ, en server/opzet/verzoekketen.js gaat eruit -- die is in deze tak zelf gesplitst, van 10219 naar 7498 bytes. Twee erbij, een afbetaald. De knip van handeling.js en begroting.js op hun natuurlijke naad staat nog open en is bewust niet in deze tak gedaan: dat is een verbouwing van de laag zelf, en die hoort niet in dezelfde tak als de laag die hem nodig had. NOG IETS, en dat is de eigenlijke les van deze regel: de reden stond er de eerste keer WEL, maar in een vorm die de keuring niet kan lezen. Ik had de verplaatsing in eigen velden `van` en `naar` gezet en in `meter` alleen de naam. scripts/normbasis.js leest het veld `meter` en eist daar de naam EN de nieuwe waarde als los getal -- en terecht, want anders dekt een notitie van vorige week elke verlaging van vandaag. Drieentwintig van de drieentwintig andere notities in dit register doen het al zo; deze drie waren de enige met een zelfverzonnen vorm, en ze waren daarmee alle drie onzichtbaar voor de poort die ze hoorde te overtuigen. Ze staan nu in de huisvorm, en `van`/`naar` zijn eruit: twee plekken die dezelfde verplaatsing vasthouden is precies waar LAT.md regel 4 over gaat, en hier liep de ene plek stil leeg."
     }
   ],
   "prestatie": {

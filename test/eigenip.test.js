@@ -4,7 +4,7 @@
    adres van de aanroeper. De server leidt dat zorgvuldig af in
    server/web/verrijk.js: uit x-forwarded-for van RECHTS, en alleen bij een
    vertrouwde proxy. Van rechts, omdat de client links zijn eigen waarden kan
-   bijplakken; server/trio.js zet het echte adres er daarom rechts achter.
+   bijplakken; server/trio-proxy.js zet het echte adres er daarom rechts achter.
 
    WAT ER MISGING. Twee plekken lazen die kop zelf, en allebei van LINKS:
    server/foundation/basis.js (de rem op het RADEN van een gezinscode) en
@@ -31,10 +31,17 @@ const WORTEL = path.join(__dirname, '..', 'server');
 
 /* De twee plekken die de kop WEL mogen lezen, met de reden erbij:
    - web/verrijk.js leidt req.ip af (van rechts, alleen bij een vertrouwde proxy)
-   - trio.js is de gateway zelf en plakt het echte adres rechts aan de keten */
+   - trio-proxy.js is de gateway zelf en plakt het echte adres rechts aan de keten
+
+   HIER STOND trio.js, en die staat er nu NIET meer: het doorsturen is naar
+   trio-proxy.js verhuisd en trio.js noemt de kop sindsdien nergens meer. Een
+   vrijstelling laten staan voor een bestand dat hem niet meer nodig heeft, is
+   precies hoe zo'n lijst stilletjes een gat wordt -- dan is de deur open voor de
+   volgende regel die er ooit bijkomt. De vrijstelling verhuist mee, hij groeit
+   niet. */
 const MAG = new Set([
   path.join(WORTEL, 'web', 'verrijk.js'),
-  path.join(WORTEL, 'trio.js')
+  path.join(WORTEL, 'trio-proxy.js')
 ]);
 
 function alleJs(map) {

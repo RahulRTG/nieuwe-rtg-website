@@ -19,6 +19,7 @@
    er is VASTGELEGD over wat RTG mag in ./vergunning.
    maakBankregie(state) volgt het vaste kern-patroon. */
 
+const crypto = require('crypto');   // id's uit de systeembron, niet uit Math.random
 const BEV = require('../bevoegdheid');
 
 const MODI = ['partner', 'hybride', 'eigen'];
@@ -55,7 +56,8 @@ function maakBankregie({ db, save }) {
   const roodLimietStandaard = () => d().roodLimietCenten;
   const ibanParams = () => ({ ...d().iban });
   const tarief = naam => Math.max(0, Math.round(Number(d().tarieven[naam]) || 0));
-  const kenmerk = () => 'AUT' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  // Een betaalkenmerk hoort niet te raden te zijn; uit de systeembron dus.
+  const kenmerk = () => 'AUT' + Date.now().toString(36) + crypto.randomBytes(4).toString('hex');
   const ledenAan = () => d().ledenAan === true;
 
   // de INGESTELDE clearing (los van nood): wat de gekozen stand zou doen

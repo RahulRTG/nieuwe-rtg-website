@@ -2,6 +2,7 @@
    wie kookt) en de gedeelde boodschappenlijst waar iedereen realtime op afvinkt.
    Gedeeld per gezin (s.g), dicht voor gasten (oppas/familie): dit zijn de eigen
    huishoud-zaken. Gemount vanuit foundation/gasten.js op de gedeelde context. */
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 module.exports = (ctx) => {
   const { router, nu, save, rid, schoon, familieVan } = ctx;
 
@@ -52,7 +53,7 @@ module.exports = (ctx) => {
     const opMenu = new Set(Object.values(k.menu).map(m => m.gerecht));
     const vrij = IDEEEN.filter(i => !opMenu.has(i));
     const bron = vrij.length ? vrij : IDEEEN;
-    res.json({ ok: true, idee: bron[Math.floor(Math.random() * bron.length)] });
+    res.json({ ok: true, idee: toeval.kies(bron) });
   });
 
   /* ---------- de gedeelde boodschappenlijst ---------- */

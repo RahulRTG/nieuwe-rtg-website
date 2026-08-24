@@ -16,7 +16,7 @@ module.exports = (kern) => {
 
   function publiceer(s, c) {
     const post = {
-      id: Date.now() + Math.floor(Math.random() * 999),
+      id: Date.now() + crypto.randomInt(0, 999),
       author: s.name, tier: 'partner', partner: true, partnerCode: s.code,
       place: s.city, visual: null,
       photo: (Number.isInteger(c.photoIndex) && s.photos && s.photos[c.photoIndex]) || null,

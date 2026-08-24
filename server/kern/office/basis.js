@@ -72,10 +72,10 @@ function maakBasis({ db, crypto, codenaamVan }) {
       const BORDLABELS = ['geen', 'bordeaux', 'goud', 'grijs'];
       const bron = Array.isArray(inhoud.lijsten) ? inhoud.lijsten : [];
       const lijsten = bron.slice(0, 12).map(l => ({
-        id: String((l && l.id) || '').slice(0, 12) || Math.random().toString(36).slice(2, 9),
+        id: String((l && l.id) || '').slice(0, 12) || crypto.randomBytes(4).toString('hex'),
         titel: String((l && l.titel) || 'Lijst').slice(0, 60),
         kaarten: (Array.isArray(l && l.kaarten) ? l.kaarten : []).slice(0, 100).map(k => ({
-          id: String((k && k.id) || '').slice(0, 12) || Math.random().toString(36).slice(2, 9),
+          id: String((k && k.id) || '').slice(0, 12) || crypto.randomBytes(4).toString('hex'),
           titel: String((k && k.titel) || '').slice(0, 120),
           notitie: String((k && k.notitie) || '').slice(0, 600),
           label: BORDLABELS.includes(k && k.label) ? k.label : 'geen',

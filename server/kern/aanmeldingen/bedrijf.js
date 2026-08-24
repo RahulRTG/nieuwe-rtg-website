@@ -25,6 +25,7 @@
 
    Nu leest dit bestand de toegangsstand uit het register. Wie een genre
    openzet, doet dat op één plek en deze lijst verandert mee. */
+const crypto = require('crypto');   // de eigenaars-PIN moet uit de systeembron komen, zie provisioneer()
 const register = require('../../seed/genres');
 const GENRES = register.aanvraagbareGenres();
 
@@ -102,8 +103,23 @@ module.exports = Object.assign((ctx) => {
     const code = codeVoor(a.bedrijf.naam);
     db.data.suppliers.push({ code, name: a.bedrijf.naam, type: a.bedrijf.type,
       city: a.bedrijf.plaats || '', loc: null, rate: 0, menu: [], photos: [] });
-    // de eigenaar krijgt een beheer-inlog met een eigen, eenmalig getoonde PIN
-    const pin = String(Math.floor(1000 + Math.random() * 9000));
+    /* DE EIGENAAR KRIJGT EEN BEHEER-INLOG MET EEN EENMALIG GETOONDE PIN, EN DIE
+       KOMT UIT CRYPTO EN NIET UIT Math.random.
+
+       Hier stond `Math.floor(1000 + Math.random() * 9000)`. Math.random is geen
+       cryptografische bron: de toestand van die generator is af te leiden uit
+       een handvol eerdere trekkingen, en dit proces deelt diezelfde generator
+       met alles wat er nog meer een getal uit trekt. Wie genoeg van die andere
+       uitkomsten ziet, kent de volgende pincode voordat de eigenaar hem heeft
+       gelezen. Vier cijfers zijn al weinig; vier VOORSPELBARE cijfers zijn geen
+       inlog maar een formaliteit.
+
+       randomInt trekt uniform uit de systeembron -- geen restvertekening zoals
+       een modulo op ruwe bytes, en niet af te leiden uit wat de server verder
+       doet. Gevonden bij het invoeren van RTG_ZAAD (server/lib/toeval.js): bij
+       het langslopen van alle Math.random-aanroepen bleek deze ene geen keuze
+       te maken maar een sleutel. */
+    const pin = String(crypto.randomInt(1000, 10000));
     let staffId = null;
     try {
       const st = accounts.createStaffSync({ supplierCode: code, name: kap(a.naam, 60) || 'Eigenaar',

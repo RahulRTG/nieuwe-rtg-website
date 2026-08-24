@@ -48,7 +48,13 @@ const { spawn } = require('child_process');
 const net = require('net');
 
 const WORTEL = path.join(__dirname, '..');
-const kas = require(path.join(WORTEL, 'server', 'lib', 'bronkas'));
+/* Een LETTERLIJK pad, geen samengesteld pad. `require(path.join(...))` is voor
+   scripts/lib/bewijsgraaf.js een berekende require, en die maakt de
+   afhankelijkheidssluiting van dit bestand ONVOLLEDIG. test/helper.js hangt aan
+   deze module, en honderden toetsen hangen aan die helper -- dus zou de planner
+   ze voortaan allemaal als "onbekend" moeten draaien. De kruisproef in
+   test/bewijsgraaf.test.js zag dat binnen een ronde. */
+const kas = require('../server/lib/bronkas');
 
 /* De omgeving waarin de vorm wordt gegoten. Wie hier iets bij zet, verandert wat
    er in de vorm zit, en dus ook wie hem mag gebruiken: de witte lijst in

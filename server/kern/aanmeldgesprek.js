@@ -20,6 +20,7 @@
    het inlog-pad in ./aanmeldgesprek-inlog.js; hier staan de gespreksstaat en
    het doel-onderscheid. */
 
+const crypto = require('crypto');   // de gespreks-id is een sleutel, zie intakeStart()
 const maakHulp = require('./aanmeldgesprek-hulp');
 const aanmeldStap = require('./aanmeldgesprek-aanmeld');
 const maakInlog = require('./aanmeldgesprek-inlog');
@@ -43,7 +44,18 @@ function maakAanmeldgesprek({ db, schoon, leeftijdVan, swStart, swZeg }) {
 
   function intakeStart() {
     opruimen();
-    const id = 'ag' + nu().toString(36) + Math.random().toString(36).slice(2, 8);
+    /* DE ID VAN EEN INTAKEGESPREK IS EEN SLEUTEL, GEEN NUMMER.
+
+       intakeZeg() zoekt het gesprek op deze id op en verder op niets: er is nog
+       geen sessie, want dit is het gesprek VOOR de aanmelding. Wie de id raadt,
+       praat verder in andermans intake -- en daar staan naam, woonplaats,
+       werkgever en pasinteresse in.
+
+       Er stond `Math.random().toString(36).slice(2, 8)`: zes tekens uit een
+       generator die niet voor dit doel is gemaakt en waarvan de toestand uit
+       eerdere trekkingen valt af te leiden. Nu twaalf hexadecimale tekens uit de
+       systeembron. Gevonden bij het invoeren van RTG_ZAAD. */
+    const id = 'ag' + nu().toString(36) + crypto.randomBytes(6).toString('hex');
     const g = { stap: 'doel', velden: {}, warmte: 0, beurten: 0, at: nu(), werkgever: null };
     gesprekken.set(id, g);
     return { id, tekst: 'Ik ben Rahul. Aanmelden, inloggen, of eerst uitleg?' };

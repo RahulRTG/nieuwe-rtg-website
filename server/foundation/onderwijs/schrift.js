@@ -2,6 +2,7 @@
    opgaven maken en inleveren, de agenda, de AI-bijleshulp met demo-terugval,
    de dagtip en de reis-aanvraag/voordracht. Krijgt de gedeelde context een
    keer bij het opstarten vanuit foundation/onderwijs.js. */
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 module.exports = (octx) => {
   const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
     nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek } = octx;
@@ -89,16 +90,16 @@ module.exports = (octx) => {
       .map(m => ({ role: m.role, content: m.content.slice(0, 1500) })).slice(-10);
     while (clean.length && clean[0].role !== 'user') clean.shift();
     if (!clean.length) return res.json({ text: 'Stel je vraag maar, dan denk ik met je mee.' });
-    if (!anthropic) return res.json({ text: DEMO[Math.floor(Math.random() * DEMO.length)], demo: true });
+    if (!anthropic) return res.json({ text: toeval.kies(DEMO), demo: true });
     try {
       const bb = octx.kiesBuddy(req.body.buddy);
       const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 400, system: 'Je heet ' + bb.naam + ' en bent ' + bb.wie + '. ' + SYSTEM + octx.leeftijdInstr(req.body.groep), messages: clean });
       res.json({ text: (r.content || []).map(b => b.text || '').join('').trim() || DEMO[0] });
-    } catch (e) { res.json({ text: DEMO[Math.floor(Math.random() * DEMO.length)], demo: true }); }
+    } catch (e) { res.json({ text: toeval.kies(DEMO), demo: true }); }
   });
   router.get('/tip', (req, res) => {
     const dag = Math.floor(Date.now() / 86400000);
-    res.json({ tip: TIPS[dag % TIPS.length], nog: TIPS[Math.floor(Math.random() * TIPS.length)] });
+    res.json({ tip: TIPS[dag % TIPS.length], nog: toeval.kies(TIPS) });
   });
 
   /* ---------- op reis met de foundation: aanvraag of voordracht ---------- */

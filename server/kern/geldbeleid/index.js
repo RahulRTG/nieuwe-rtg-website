@@ -27,6 +27,7 @@
    check.js kwamen; de grenzen liggen op de onderwerpen: ./actielog.js,
    ./potten.js, ./regels.js, ./evalueer.js. */
 
+const crypto = require('crypto');   // id's uit de systeembron, niet uit Math.random
 const MAX_CENTEN = 100000000; // 1 miljoen euro: grens op het doel (LAT.md regel 7), tegen tikfouten en overloop
 
 function maakGeldbeleid({ db, save, klok }) {
@@ -48,7 +49,8 @@ function maakGeldbeleid({ db, save, klok }) {
     for (const v of ['regels', 'potten', 'log']) if (!Array.isArray(r[v])) r[v] = [];
     return r;
   }
-  const maakId = v => v + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  // Uit de systeembron: geldbeleid-id's wijzen naar beslissingen over geld.
+  const maakId = v => v + '-' + Date.now().toString(36) + crypto.randomBytes(4).toString('hex');
   /* Alles wat geen eindig heel getal binnen de grens is, is geen bedrag.
      Ontbreken is uitdrukkelijk GEEN nul: Number(null) is 0, en een vergeten
      drempel die stil 0 wordt is een regel die stil iets anders doet dan het

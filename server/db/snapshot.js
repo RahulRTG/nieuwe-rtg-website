@@ -19,7 +19,16 @@ const state = require('./state');
 const opslag = require('./opslag');
 const redis = require('./redis');
 const db = state.db;
-const { DATA_DIR, DB_FILE, STORE, besloten, beslotenMap, schrijfDuurzaam } = opslag;
+/* DE MAP EN HET BESTAND PER LEZING, de rest gewoon gebonden.
+
+   `const { DATA_DIR, DB_FILE } = opslag` roept de LEVENDE getters van de
+   opslaglaag een keer aan -- bij het laden -- en houdt de uitkomst vast. Dat is
+   precies zo bevroren als het rechtstreeks uit de env lezen, alleen zag de
+   teller in scripts/lib/staatscan.js het niet: die kende `const {X} =
+   require(...)` en niet `const {X} = alias`. De functies eronder (besloten,
+   beslotenMap, schrijfDuurzaam, en STORE als keuze per proces) mogen wel
+   binden. */
+const { STORE, besloten, beslotenMap, schrijfDuurzaam } = opslag;
 
 const SAVE_MS = Number(process.env.RTG_SAVE_MS || 250);
 // Duur, geen moment: monotone klok. Waarom en de -Infinity: sinds() in lib/klok.js.
@@ -37,11 +46,11 @@ function schrijfSnapshotNu() {
   if (snapshotVol && verstreken(snapshotWaarschuwing) < 60000) { saveKlaar = sinds(); return; }
   const t0 = sinds();
   try {
-    beslotenMap(DATA_DIR);
+    beslotenMap(opslag.DATA_DIR);
     // compact (geen pretty-print): bij grote data scheelt dat ~40% tijd en ruimte
     const uit = kluis.AAN ? kluis.versleutel(rtgjson.stringify(db.data)) : rtgjson.stringify(db.data);
-    schrijfDuurzaam(DB_FILE, uit, 0o600);
-    besloten(DB_FILE);
+    schrijfDuurzaam(opslag.DB_FILE, uit, 0o600);
+    besloten(opslag.DB_FILE);
     if (STORE !== 'postgres') redis.spiegelNaarRedis(); // alleen de JSON-opslag deelt via Redis
     snapshotVol = false;
   } catch (e) {

@@ -4,6 +4,7 @@
    vaste protocol) en de lounges (binnen op de boarding pass; de Koninklijke
    Vleugel alleen met een lopend vip-protocol). Krijgt de gedeelde ctx van
    ./index.js. */
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 module.exports = (ctx) => {
   const { save, crypto, nu, id, schoon, vandaag, L, seed, vluchten, vind, actief,
     plekkenVoor, vipVan, vipRond, publiek, _vluchtMaak, passCheck,
@@ -42,7 +43,7 @@ module.exports = (ctx) => {
     const plekken = plekkenVoor(ch.soort);
     const plek = plekken.find(p => !vluchten().some(v => actief(v) && v.gate === p && v.datum === ch.datum && v.tijd === ch.tijd));
     if (!plek) return { status: 409, error: 'Geen vrije ' + (ch.soort === 'helikopter' ? 'helipad' : 'stand') + ' op dat moment; stel een andere tijd voor.' };
-    const v = _vluchtMaak({ nummer: (ch.soort === 'helikopter' ? 'RH' : 'RJ') + Math.floor(100 + Math.random() * 900),
+    const v = _vluchtMaak({ nummer: (ch.soort === 'helikopter' ? 'RH' : 'RJ') + toeval.geheel(100, 999),
       soort: 'vertrek', categorie: ch.soort, bestemming: ch.bestemming, datum: ch.datum, tijd: ch.tijd, gate: plek,
       toestel: ch.soort === 'helikopter' ? 'RTG-H1' : 'RTG-J1' });
     v.status = 'inchecken';

@@ -969,6 +969,36 @@
       "soort": "map",
       "bron": "scan"
     },
+    "server/lib/compilekas.js#uitkomst": {
+      "eigenaar": "server/lib",
+      "levensduur": "bootvast",
+      "soort": "binding-let",
+      "bron": "hand-na-scan",
+      "toelichting": "De uitkomst van het aanzetten van de V8-compilatiekas: aan, stond al aan, uitgezet of mislukt. Dat is een eigenschap van DIT proces en van de node waarop het draait -- hij wordt bij de eerste aanroep gezet en kan daarna niet meer anders worden. Een reset zou de kas opnieuw laten aanzetten en dat is precies wat node zelf weigert (status \"stond al aan\"). Vandaar bootvast en geen naad.",
+      "patroon": "afleiding"
+    },
+    "server/lib/toeval.js#getrokken": {
+      "eigenaar": "server/lib",
+      "levensduur": "herstelbaar",
+      "reset": "toeval.terugNaarVers()",
+      "soort": "binding-let",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/toeval.test.js -- na terugNaarVers() geeft dezelfde reeks opnieuw dezelfde getallen",
+      "toelichting": "Alleen een teller voor de zin in uitleg(); hij bepaalt geen gedrag. De reset zet WEL iets terug dat er toe doet: de gezaaide stroom zelf. Een tweede toets op dezelfde server zou anders de trekkingen krijgen die de eerste had overgelaten, en dan staat het zaad vast terwijl de uitkomst alsnog verschilt.",
+      "patroon": "voortgang"
+    },
+    "server/lib/toeval.js#volgende": {
+      "eigenaar": "server/lib",
+      "levensduur": "herstelbaar",
+      "reset": "toeval.terugNaarVers()",
+      "soort": "binding-let",
+      "bron": "hand-na-scan",
+      "gedeeldNaReset": true,
+      "bewijs": "test/toeval.test.js -- na terugNaarVers() geeft dezelfde reeks opnieuw dezelfde getallen",
+      "toelichting": "De LEVENDE gezaaide stroom. Hij staat los van STROOM (die alleen zegt DAT er een zaad is) zodat de reset hem kan vervangen zonder dat de vraag \"is er uberhaupt een zaad\" mee verandert. Zonder zaad is hij null en valt er niets terug te zetten. Dit is de wortel die er werkelijk toe doet: een tweede toets op dezelfde server zou anders verder trekken waar de eerste stopte, en dan staat het zaad vast terwijl de uitkomst alsnog verschilt.",
+      "patroon": "voortgang"
+    },
     "server/lib/verraad.js#geslagen": {
       "eigenaar": "server/lib",
       "levensduur": "onbekend",

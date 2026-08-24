@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 155,
+    "toetsenNietGemeten": 157,
     "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -35,10 +35,20 @@
     "staatOnbekend": 43,
     "duurOpWandklok": 29,
     "staatProcesgebonden": 92,
-    "datamapVastgeklonken": 4,
-    "bewijsOnbekend": 167
+    "datamapVastgeklonken": 11,
+    "bewijsOnbekend": 169
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "bewijsOnbekend 167 -> 169 en toetsenNietGemeten 155 -> 157 (twee toetsbestanden erbij)",
+      "reden": "Twee nieuwe toetsbestanden: test/gietvorm.test.js (bewijst dat een gegoten datamap collectie voor collectie gelijk is aan een zelfgezaaide) en test/toeval.test.js (bewijst dat RTG_ZAAD een ronde herhaalbaar maakt en dat de module in productie weigert).\n\nBeide meters gaan met precies twee omhoog, en dat is de prijs van een toets erbij, geen erosie:\n\nbewijsOnbekend telt toetsen waarvan de afhankelijkheden niet vaststaan. Allebei de nieuwe bestanden starten een kindproces met `-e` en een broncodestring, en daar kan geen enkele statische graaf doorheen kijken. Dat is precies de reden dat ze zo geschreven zijn -- toeval.test.js MOET een vers proces hebben, want RTG_ZAAD wordt bij het laden gelezen -- dus dit is geen gat maar de veilige stand: de planner draait ze altijd.\n\ntoetsenNietGemeten telt toetsen waar de mutatiemotor nog niet langs is geweest. Allebei zijn ze WEL met de hand gemuteerd, en dat staat in de commitboodschappen: bij de gietvorm zijn drie mutaties gedraaid (gieten in een niet-lege map, OFFICE_CODE door de poort laten, de sweep in initdata terugdraaien) en alle drie sloegen aan; bij het toeval staat de tegenproef in de toets zelf (een module die ALTIJD gooit zou de productieweigering ook halen, dus staat er een bewering naast dat hij buiten productie gewoon laadt).\n\nWat er in ruil GEDAALD is en niet is vastgelegd om het niet als winst op te schrijven: datamapVastgeklonken staat op 11 na drie meterreparaties, TOEVAL.json staat op 0, en er zijn twee beveiligingsfouten weg (een eigenaars-PIN en een intake-gespreks-id die allebei uit Math.random kwamen)."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "datamapVastgeklonken 4 -> 11 (derde meterreparatie op een dag; de code is opnieuw BETER geworden, niet slechter)",
+      "reden": "Vanochtend ging deze teller van 3 naar 4 omdat hij twee schrijfwijzen niet kende. Vanmiddag bleek er een derde te zijn, en de vondst kwam uit een rode toets die er niets mee te maken leek te hebben: test/kruisscan.test.js meldde `db/index.js -> DATA_DIR (uit db/snapshot.js)`. Dat bracht me bij server/db/snapshot.js regel 22:\n\n    const opslag = require('./opslag');\n    const { DATA_DIR, DB_FILE, STORE, ... } = opslag;\n\nEen destructurering van een ALIAS in plaats van rechtstreeks van een require. Even bevroren -- de levende getter wordt een keer aangeroepen -- en de teller eiste een require op de rechterkant. Drie blinde vlekken in een dag, en alle drie dezelfde vorm: de teller kende EEN schrijfwijze van iets waar er meer van zijn. De ijking in test/meterijk.test.js zet nu alle zes vormen in EEN proefbestand, met twee tegenproeven die juist niet mogen meetellen.\n\nGEREPAREERD IN DE CODE, en daardoor is het 11 en geen 14: server/db/snapshot.js leest DATA_DIR en DB_FILE nu per lezing, en server/db/starten.js DB_FILE.\n\nWAT ER BLIJFT STAAN, en waarom dat geen erosie is. Tien van de elf zijn STORE -- de opslagkeuze (json, sqlite, postgres). Die wordt EEN keer beslist, en dat staat sinds de eerste omzetting met zoveel woorden in server/db/opslag.js: hem bij elke lezing opnieuw stellen zou de opslagvorm midden in een rit kunnen laten omslaan, en dat is een veel erger kwaad dan een vaste map. STORE hoort bij een verificatiecontext en niet bij een proces. De elfde is server/server.js#DATA_DIR, om de reden die vanochtend al is opgeschreven: hem levend maken betekent UPLOAD_DIR en acht bedradingsaanroepen meeverbouwen, en de destructurering een niveau lager schuiven zou de teller laten zakken zonder dat er iets aan de bevriezing verandert.\n\nEN DE PREMISSE VAN DEZE METER IS VANDAAG VERANDERD. De omschrijving zei: 'dit getal blokkeert het delen van een server'. Dat gold voor het ontwerp waarin een draaiende server naar een ANDERE map zou worden gewezen. Dat ontwerp is niet gekozen. De winst die er vandaag is (scripts/vorm.js) komt van het delen van de ZAAI-ARBEID, waarbij elke toets zijn eigen verse map en zijn eigen verse proces houdt -- en dan mag de map bij het laden vastliggen. Deze meter bewaakt dus niet langer een blokkade, maar dat een module niet stiekem een momentopname van de omgeving gaat rondgeven. Dat is nog steeds de moeite waard, en de omschrijving in scripts/norm.js zegt dat nu ook."
+    },
     {
       "datum": "2026-08-24",
       "meter": "datamapVastgeklonken 3 -> 4 (de METER is gerepareerd, de code is niet slechter geworden)",

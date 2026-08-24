@@ -10,6 +10,7 @@
    hardware gaat: sleutels, poorten, buffers en kalibratie. Die twee door elkaar
    laten lopen is hoe een demo per ongeluk productiegedrag krijgt.
    Krijgt de gedeelde ctx plus de helpers van nodes.js. */
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 module.exports = (ctx, H) => {
   const { save, crypto, nu, nodes, metingen, MAX_METINGEN } = ctx;
   const { BEREIK, zorgPlaats, boekReeks } = H;
@@ -55,7 +56,7 @@ module.exports = (ctx, H) => {
       for (const s of n.sensoren) {
         const [lo, hi] = BEREIK[s];
         const stap = (hi - lo) * 0.04;
-        const v = Math.min(hi, Math.max(lo, (n.waarden[s] || lo) + (Math.random() * 2 - 1) * stap));
+        const v = Math.min(hi, Math.max(lo, (n.waarden[s] || lo) + (toeval.kans() * 2 - 1) * stap));
         n.waarden[s] = Math.round(v * 10) / 10;
         metingen().unshift({ node: n.serial, zone: n.zone, sens: s, waarde: n.waarden[s], at: nu() });
         boekReeks(n, s, n.waarden[s], nu());

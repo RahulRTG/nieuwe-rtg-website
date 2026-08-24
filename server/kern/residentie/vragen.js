@@ -5,6 +5,7 @@
    soms zakelijk en door en door. totaal() telt de combinaties; de test
    bewaakt de ondergrens van 10.000. */
 
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 const G = {
   luchtig: {
     twee: ['Wat kiest u voor altijd: {A} of {B}?',
@@ -108,12 +109,12 @@ const G = {
 
 const STAARTEN = ['', ' En waarom?', ' Vertel het eens echt.', ' Neem er de tijd voor.'];
 const GENRES = Object.keys(G);
-const kies = a => a[Math.floor(Math.random() * a.length)];
+const kies = a => toeval.kies(a);
 
 function genereer(genre) {
   const g = G[genre] || G[kies(GENRES)];
   genre = G[genre] ? genre : GENRES.find(n => G[n] === g);
-  const tweeKans = g.twee.length && Math.random() < g.twee.length / (g.twee.length + g.een.length);
+  const tweeKans = g.twee.length && toeval.kans() < g.twee.length / (g.twee.length + g.een.length);
   let tekst;
   if (tweeKans) {
     const a = kies(g.sub); let b = kies(g.sub);

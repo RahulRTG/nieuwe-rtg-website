@@ -180,7 +180,23 @@ function topDecls(s) {
   return namen;
 }
 
-const gebruikt = (s, naam) => new RegExp('(?<![.\\w$])' + naam + '(?![\\w$])(?!\\s*:)').test(s);
+/* IS DEZE NAAM ECHT EEN VERWIJZING, OF DEFINIEERT HIJ IETS?
+
+   Drie uitsluitingen, en de derde is er later bij gekomen:
+
+     foo.NAAM     een eigenschap van iets anders  -> de lookbehind op [.\w$]
+     NAAM:        een sleutel in een objectliteraal -> de lookahead op \s*:
+     get NAAM()   een getter in een objectliteraal -> de lookbehind op get/set
+
+   Die derde ontbrak, en dat kostte een rode ronde: server/db/index.js deelt de
+   datamap uit als `get DATA_DIR() { return opslag.DATA_DIR; }` en db/snapshot.js
+   heeft een top-level naam DATA_DIR. De scan las die getter als een KALE
+   verwijzing naar de naam van een zuster-slice -- precies wat hij hoort te
+   melden, alleen was het er geen. Een getter is een definitie, net zo goed als
+   `NAAM:` dat is; alleen staat er een haakje achter in plaats van een dubbele
+   punt. */
+const gebruikt = (s, naam) => new RegExp(
+  '(?<![.\\w$])(?<!\\bget\\s)(?<!\\bset\\s)' + naam + '(?![\\w$])(?!\\s*:)').test(s);
 
 /* Doorzoek de hele boom onder `root`. Retourneert een lijst bevindingen:
    { bestand, naam, zuster } -- allemaal repo-relatieve paden. */

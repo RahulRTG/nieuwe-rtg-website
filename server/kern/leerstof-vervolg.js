@@ -5,6 +5,7 @@
       het eind, met per vraag het juiste antwoord om van te leren.
    2. Het NIVEAU-ADVIES is en blijft een advies: over echte overgangen en
       examens beslissen mensen en de officiele instellingen, nooit wij. */
+const toeval = require('../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 const { DOELEN, PER_FASE } = require('./leerstof');
 const { opgave } = require('./leerstof-gen');
 const { FASEN } = require('./onderwijs-ladder');
@@ -28,7 +29,7 @@ function maakVervolg({ db, save, onderwijs }) {
     if (!ids || !ids.length) return { status: 400, error: 'Voor deze fase is er (nog) geen examentraining. Kies een fase uit het voortgezet of vervolgonderwijs.' };
     const vragen = [];
     for (let i = 0; i < EXAMEN_VRAGEN; i++) {
-      const id = ids[Math.floor(Math.random() * ids.length)];
+      const id = toeval.kies(ids);
       const o = opgave(DOELEN[id].gen);
       vragen.push({ doel: id, v: o.v, a: o.a, opties: o.opties || null, antwoord: null });
     }

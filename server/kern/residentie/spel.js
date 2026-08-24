@@ -5,6 +5,7 @@
    een potje is een gesprek met een bal erbij. Het vragenspel aan tafel
    stelt de vragen die een eerste date makkelijker maken. */
 
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 const { SPELLEN, plaats } = require('./spellen');
 const rahul = require('./rahul');
 const vragen = require('./vragen');
@@ -120,7 +121,7 @@ module.exports = (ctx) => {
     k.vraagTeller = (k.vraagTeller || 0) + 1;
     const maat = partnerVan && partnerVan(key);
     const prive = id.startsWith('suite:') && maat && k.leden[maat] && Object.keys(k.leden).length === 2;
-    const pak = a => a[Math.floor(Math.random() * a.length)];
+    const pak = a => toeval.kies(a);
     let uit;
     if (prive) {
       // de directeur als gastheer: gewaagd (eigen dek) afgewisseld met de

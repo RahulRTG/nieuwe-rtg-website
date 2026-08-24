@@ -36,6 +36,7 @@
    Deze module heeft WEL eigen opslag (db.data.levensbanden): een band is een
    nieuw gegeven dat nergens anders bestaat. De graaf en de lijn blijven
    alleen-lezen; die raken hier niets aan. */
+const crypto = require('crypto');   // id's uit de systeembron, niet uit Math.random
 'use strict';
 
 const MAX_BANDEN = 40;   // meer is geen kring meer maar een adresboek
@@ -71,7 +72,10 @@ module.exports = ({ db, save, klok, beleid }) => {
     };
   }
 
-  const id = (voor) => voor + '-' + Math.random().toString(36).slice(2, 10);
+  /* Een band-id uit de systeembron. Math.random deelt zijn toestand met alles
+     wat er in dit proces nog meer uit trekt, en een band verbindt twee mensen:
+     wie de id raadt, kijkt mee in een relatie. */
+  const id = (voor) => voor + '-' + crypto.randomBytes(5).toString('hex');
 
   /* Een band heeft twee kanten en die zijn GELIJKWAARDIG. Er is geen eigenaar
      en geen aanvrager met meer recht: allebei kunnen bevestigen (de ander),

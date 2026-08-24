@@ -710,6 +710,10 @@ const IJKINGEN = {
                             MAPverwijzing. De teller plakte er '.js' achter,
                             zocht naar server/db.js, vond niets en zweeg. Dat is
                             precies de weg die server.js loopt.
+         overgenomen (alias) `const { STORE } = opslag`, waar opslag een regel
+                            eerder werd gerequired. Even bevroren, en de teller
+                            eiste een require op de rechterkant. Dit staat
+                            letterlijk in server/db/snapshot.js.
 
        De laatste twee regels zijn de vorm waar we juist NAARTOE werken: een
        functie (of een pijl in een eigenschap) die de map pas bij de aanroep
@@ -719,20 +723,23 @@ const IJKINGEN = {
     proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
       "const path = require('path');\n" +
       "const opslag = require('../db/opslag');\n" +
+      "const snap = require('../db/snapshot');\n" +
       "const MAP = process.env.RTG_DATA_DIR || '/tmp';\n" +
       "const BESTAND = path.join(MAP, 'x.json');\n" +
       "const { DB_FILE } = require('../db/opslag');\n" +
       "const { DATA_DIR } = require('../db');\n" +
+      "const { STORE } = opslag;\n" +
       "const laatLezen = () => process.env.RTG_DATA_DIR || '/tmp';\n" +
-      "module.exports = { MAP, BESTAND, DB_FILE, DATA_DIR, KLEM: opslag.DB_FILE,\n" +
-      "  laatLezen, laat: () => opslag.DATA_DIR };\n",
+      "module.exports = { MAP, BESTAND, DB_FILE, DATA_DIR, STORE, KLEM: opslag.DB_FILE,\n" +
+      "  laatLezen, laat: () => opslag.DATA_DIR, snap };\n",
       () => {
         const verschil = meet({ alleen: ['datamapVastgeklonken'] }).datamapVastgeklonken - voor.datamapVastgeklonken;
-        assert.equal(verschil, 5,
-          'er staan vijf vastgeklonken bindingen in het proefbestand (recht, afgeleid, overgenomen, ' +
-          'bevroren-uitgifte en overgenomen via een mapverwijzing) en twee lezingen die pas bij de ' +
-          'aanroep gebeuren; telt de meter er meer, dan telt hij de oplossing mee als probleem, ' +
-          'telt hij er minder, dan mist hij precies de vorm waarmee de map de bedrading in lekt');
+        assert.equal(verschil, 6,
+          'er staan zes vastgeklonken bindingen in het proefbestand (recht, afgeleid, overgenomen, ' +
+          'bevroren-uitgifte, overgenomen via een mapverwijzing en overgenomen via een alias) en ' +
+          'twee lezingen die pas bij de aanroep gebeuren; telt de meter er meer, dan telt hij de ' +
+          'oplossing mee als probleem, telt hij er minder, dan mist hij precies de vorm waarmee de ' +
+          'map de bedrading in lekt');
         return verschil;
       })
   },

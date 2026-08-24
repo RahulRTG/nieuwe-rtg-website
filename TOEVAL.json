@@ -1,0 +1,16 @@
+{
+  "uitleg": "Directe Math.random-aanroepen in server/. MAG ALLEEN KRIMPEN -- zie test/toeval.test.js. Wie zijn eigen munt opgooit doet niet mee aan RTG_ZAAD, en een ronde die je overdoet verloopt dan alsnog anders. crypto.randomBytes telt hier met opzet NIET mee: dat hoort onvoorspelbaar te zijn, ook met een zaad.",
+  "hoe": "node scripts/toeval.js --top",
+  "gemeten": {
+    "totaal": 0,
+    "bestanden": 0,
+    "modulesOpHetZaad": 11,
+    "bestandenMetCryptoToeval": 370
+  },
+  "vrijgesteld": [
+    {
+      "bestand": "server/lib/toeval.js",
+      "reden": "DIT IS het toeval; hij moet ergens een echte munt opgooien"
+    }
+  ]
+}

@@ -5,6 +5,7 @@
    het spel, de stand (wiens beurt) en jouw vraag mee, niet het bord of de handen.
    Met een echte sleutel praat Rahul; zonder sleutel geeft dezelfde motor een
    vaste, uitlegbare tip (demo). Gedeelde context vanuit kern/spellen.js. */
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 module.exports = (ctx) => {
   const { S, SOORTEN, codenaamVan, anthropic } = ctx;
   const { rahulLeadVoor } = require('../rahul');
@@ -73,7 +74,7 @@ module.exports = (ctx) => {
         if (tekst) return { status: 200, ok: true, antwoord: tekst, stand };
       } catch (e) { /* val terug op de vaste tip */ }
     }
-    const tip = kennis.tips.length ? kennis.tips[Math.floor(Math.random() * kennis.tips.length)] : kennis.uitleg;
+    const tip = kennis.tips.length ? toeval.kies(kennis.tips) : kennis.uitleg;
     return { status: 200, ok: true, antwoord: tip, stand, demo: true };
   }
 

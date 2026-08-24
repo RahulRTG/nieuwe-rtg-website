@@ -13,6 +13,7 @@
 
    De opslag hangt aan het fluister-profiel van het lid (p.spar), dus het is
    privacy-by-design van de gebruiker zelf en wist mee met "vergeet alles". */
+const crypto = require('crypto');   // id's uit de systeembron, niet uit Math.random
 module.exports = (ctx) => {
   const { db, save, schoon, notify, van, nu } = ctx;
   const MAX = 40;
@@ -38,7 +39,7 @@ module.exports = (ctx) => {
     if (arr.some(t => t.status === 'open' && t.tekst.toLowerCase() === tekst.toLowerCase()))
       return { ok: true, spar: openLijst(key) };
     arr.unshift({
-      id: 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      id: 's' + Date.now().toString(36) + crypto.randomBytes(3).toString('hex'),
       tekst, bron: schoon(bron, 40) || 'gesprek', status: 'open', at: nu(), laatst: null, getoond: 0
     });
     while (arr.length > MAX) arr.pop();

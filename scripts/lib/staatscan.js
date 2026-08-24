@@ -740,14 +740,31 @@ function datamapVastEcht(wortel, mappen) {
       if (bereikt.length) doorgiften.push({ id: rel + '#' + sleutel, bestand: rel, naam: sleutel, vanaf: bereikt });
     });
   }
-  /* (c) wie destructureert er bij het laden een naam uit een ander bestand? */
+  /* (c) wie destructureert er bij het laden een naam uit een ander bestand?
+
+     TWEE VORMEN, en de tweede is er later bij gekomen omdat hij de meter een
+     derde keer voor de gek hield:
+
+         const { DATA_DIR } = require('./opslag');    rechtstreeks
+         const opslag = require('./opslag');
+         const { DATA_DIR } = opslag;                 via een alias
+
+     De tweede staat letterlijk in server/db/snapshot.js. Hij is precies even
+     bevroren als de eerste -- een destructurering roept de levende getter EEN
+     keer aan -- en de teller zag hem niet, want hij eiste een require op de
+     rechterkant. Dat is de derde blinde vlek in deze meter binnen een dag, en ze
+     hadden alle drie dezelfde vorm: de teller kende EEN schrijfwijze van iets
+     waar er meer van zijn. */
   for (const { rel, boom } of bestanden) {
+    const aliasHier = requireAliassen(wortel, rel, boom);
     for (const k of boom.body) {
       if (k.type !== 'VariableDeclaration') continue;
       for (const d of k.declarations || []) {
         if (!d.id || d.id.type !== 'ObjectPattern' || !d.init) continue;
-        if (d.init.type !== 'CallExpression' || (d.init.callee || {}).name !== 'require') continue;
-        const vanaf = bestandVoor(wortel, rel, reeksVan((d.init.arguments || [])[0]));
+        const viaRequire = d.init.type === 'CallExpression' && (d.init.callee || {}).name === 'require'
+          ? bestandVoor(wortel, rel, reeksVan((d.init.arguments || [])[0])) : null;
+        const viaAlias = d.init.type === 'Identifier' ? aliasHier.get(d.init.name) : null;
+        const vanaf = viaRequire || viaAlias;
         if (!vanaf) continue;
         for (const pr of d.id.properties || []) {
           const naam = (pr.key || {}).name || (pr.value || {}).name;

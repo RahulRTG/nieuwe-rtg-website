@@ -6,6 +6,7 @@
    Smaakvol geformuleerd, nooit expliciet; en altijd een vraag, nooit een
    opdracht: wie niet wil antwoorden, schenkt gewoon nog eens in. */
 
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 const EERLIJK = [
   'Waarom is uw laatste relatie echt uitgegaan? Het echte verhaal graag.',
   'Hoeveel relaties heeft u gehad, en welke telt u stiekem niet mee?',
@@ -43,8 +44,7 @@ const INTRO = [
 
 function kies(niveau) {
   const dek = niveau === 'gewaagd' ? GEWAAGD : EERLIJK;
-  return { intro: INTRO[Math.floor(Math.random() * INTRO.length)],
-    tekst: dek[Math.floor(Math.random() * dek.length)] };
+  return { intro: toeval.kies(INTRO), tekst: toeval.kies(dek) };
 }
 
 module.exports = { kies };

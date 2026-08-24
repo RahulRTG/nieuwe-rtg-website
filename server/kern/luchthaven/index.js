@@ -16,6 +16,7 @@
                   Vleugel (vips onder protocolnaam) en de lounges
    Vast patroon: maakLuchthaven(state) -> { lucht: api }. */
 
+const toeval = require('../../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 const GATES = ['A1', 'A2', 'A3', 'B1', 'B2', 'C1'];
 const STANDS = ['P1', 'P2', 'P3'];          // general aviation: de privejets
 const HELIPADS = ['H1', 'H2'];              // de helikopters landen en vertrekken hier
@@ -113,7 +114,7 @@ function maakLuchthaven({ db, save, crypto, anthropic, visumtaakVan }) {
   function _vluchtMaak(data) {
     const categorie = CATEGORIEEN[data.categorie] ? data.categorie : 'lijn';
     const plekken = plekkenVoor(categorie);
-    const v = { id: id('vl'), nummer: schoon(data.nummer, 8).toUpperCase() || 'RT' + Math.floor(100 + Math.random() * 900),
+    const v = { id: id('vl'), nummer: schoon(data.nummer, 8).toUpperCase() || 'RT' + toeval.geheel(100, 999),
       soort: data.soort === 'aankomst' ? 'aankomst' : 'vertrek', categorie,
       bestemming: schoon(data.bestemming, 60) || 'Onbekend', datum: /^\d{4}-\d{2}-\d{2}$/.test(String(data.datum || '')) ? data.datum : vandaag(),
       tijd: /^\d{2}:\d{2}$/.test(String(data.tijd || '')) ? data.tijd : '12:00',

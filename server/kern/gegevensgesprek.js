@@ -26,6 +26,7 @@
    functie waarmee de intake dat deed (onboarding.slaOp), zodat er maar een
    schrijver is. */
 
+const crypto = require('crypto');   // de gespreks-id is een sleutel, zie gegevensStart()
 const TTL_MS = 20 * 60 * 1000;
 const MAX_GESPREKKEN = 500;
 const MAX_BEURTEN = 30;
@@ -80,7 +81,11 @@ function maakGegevensgesprek({ accounts, gegevenspoort, saveMemberState, getMemb
     const mist = gegevenspoort.ontbreekt(sessie, String(soort || ''));
     if (!mist.length) return { status: 200, klaar: true, tekst: 'Ik heb alles al; ga je gang.' };
     opruimen();
-    const id = 'gg' + nu().toString(36) + Math.random().toString(36).slice(2, 8);
+    // Dezelfde reden als bij aanmeldgesprek.js: een gespreks-id is een sleutel.
+    // Hier staat er WEL een sessiecheck naast (g.key !== sessie.key), dus dit is
+    // een tweede slot en geen enige -- maar het kost hetzelfde en het haalt deze
+    // trekking uit dezelfde generator als de rest.
+    const id = 'gg' + nu().toString(36) + crypto.randomBytes(6).toString('hex');
     gesprekken.set(id, {
       key: sessie.key, userId: sessie.account ? sessie.account.id : null,
       soort: String(soort || ''), wachtrij: mist, at: nu(), beurten: 0

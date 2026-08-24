@@ -26,7 +26,9 @@ const sqlite = require('./sqlite');
 const geheugen = require('./geheugen');
 const postgres = require('./postgres');
 const tx = require('./tx');
-const { DB_FILE, STORE, laadUitBackup, leesLokaleSnapshot } = opslag;
+// DB_FILE per lezing (opslag.DB_FILE): een destructurering hier bevriest de map
+// bij het laden. Zie de kop van server/db/snapshot.js.
+const { STORE, laadUitBackup, leesLokaleSnapshot } = opslag;
 
 const dbLog = { warn: (m) => console.warn('[db]', m) };
 
@@ -55,8 +57,8 @@ module.exports = ({ save }) => {
         db.data = oud || seed();
         save();
       }
-    } else if (fs.existsSync(DB_FILE)) {
-      const ruw = fs.readFileSync(DB_FILE, 'utf8');
+    } else if (fs.existsSync(opslag.DB_FILE)) {
+      const ruw = fs.readFileSync(opslag.DB_FILE, 'utf8');
       let tekst;
       try { tekst = kluis.ontsleutel(ruw); }
       catch (e) { throw new Error('db.json kan niet ontsleuteld worden; klopt RTG_ENC_KEY? (' + e.message + ')'); }

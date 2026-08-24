@@ -30,9 +30,25 @@ const MAX_OPEN = 500;           // zoveel lopende uitdagingen houden we bij
 function maakUitdaging({ crypto, accounts, rij, herken, teVaak, fout, slotGoed, doel }) {
   const uitdagingen = new Map();   // id -> { userId, volgorde, stap, at, n, openOk }
 
+  /* DEZE SCHUDBEURT BLIJFT OP CRYPTO, EN DAT IS EEN BESLUIT.
+
+     Bij het invoeren van RTG_ZAAD (server/lib/toeval.js) ging deze eerst mee naar
+     het zaad, met als redenering: welke woorden iemand kent is de beveiliging, de
+     volgorde is presentatie. Dat klopte niet. kiesDrie() schudt VIER posities en
+     neemt er DRIE -- de schudbeurt bepaalt dus ook wie er buiten valt. Wie de
+     uitkomst kan voorspellen, hoeft maar drie van de vier sleutelwoorden te
+     kennen. Dat is geen presentatie maar een kwart van de deur.
+
+     Math.random stond hier eerder en was al fout om dezelfde reden, alleen
+     stiller. Nu uit de systeembron, met randomInt zodat er geen restvertekening
+     in zit: modulo op ruwe bytes maakt de lage waarden net iets waarschijnlijker,
+     en bij vier posities is dat meetbaar. */
   function kiesDrie() {
     const p = [0, 1, 2, 3];
-    for (let i = p.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+    for (let i = p.length - 1; i > 0; i--) {
+      const j = crypto.randomInt(0, i + 1);
+      [p[i], p[j]] = [p[j], p[i]];
+    }
     return p.slice(0, PER_KEER);
   }
 

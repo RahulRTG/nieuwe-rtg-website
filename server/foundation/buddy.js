@@ -3,6 +3,7 @@
    gesprekskaarten. kiesBuddy/leeftijdInstr gaan op de context, zodat de
    les-AI (onderwijs.js) dezelfde buddy en leeftijdslaag gebruikt.
    Gemount vanuit foundation.js op de gedeelde context. */
+const toeval = require('../lib/toeval');   // keuzes op toeval: herhaalbaar met RTG_ZAAD
 module.exports = (ctx) => {
   const { router, F, db, anthropic, familieVan } = ctx;
 
@@ -41,7 +42,7 @@ router.post('/hulp/ai', async (req, res) => {
 
 router.get('/bespaartip', (req, res) => {
   const dag = Math.floor(Date.now() / 86400000);
-  res.json({ tip: BESPAARTIPS[dag % BESPAARTIPS.length], nog: BESPAARTIPS[Math.floor(Math.random() * BESPAARTIPS.length)] });
+  res.json({ tip: BESPAARTIPS[dag % BESPAARTIPS.length], nog: toeval.kies(BESPAARTIPS) });
 });
 
 /* Wat de bijdragen dóén: een warme, geaggregeerde momentopname voor de gezinnen.
@@ -61,7 +62,7 @@ router.get('/impact', (req, res) => {
   });
 });
 
-router.get('/gesprekskaart', (req, res) => res.json({ kaart: GESPREKSKAARTEN[Math.floor(Math.random() * GESPREKSKAARTEN.length)] }));
+router.get('/gesprekskaart', (req, res) => res.json({ kaart: toeval.kies(GESPREKSKAARTEN) }));
 
   // de les-AI van de onderwijslaag gebruikt dezelfde buddy en leeftijdslaag
   ctx.kiesBuddy = kiesBuddy;

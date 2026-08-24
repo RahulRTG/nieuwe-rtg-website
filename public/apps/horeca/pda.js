@@ -91,7 +91,7 @@
     $('pOpen').innerHTML = d.open.length ? d.open.map(function (t) { return kaart(t, false); }).join('')
       : '<p class="pda-leeg">Niets open.</p>';
     $('pUitleg').textContent = d.let || '';
-    window.RTGPdaWijk.teken(d.wijkbeeld || [], d.mijnWijken || [], na);
+    window.RTGPdaWijk.teken(d.wijkbeeld || [], d.mijnWijken || [], na, d.voorMij);
 
     K.bind($('main'), 'vz', function (b) {
       api('/verzoeken/zet', { verzoek: b.dataset.vz, stand: b.dataset.stand }).then(na);

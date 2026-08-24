@@ -18,6 +18,10 @@
       geven twee antwoorden op "van wie is dit", en dan gaat er niemand of gaan
       er twee. Bij het opslaan wordt hij daarom uit elke andere wijk gehaald,
       zichtbaar en met een melding -- niet stil.
+   3b. EEN UITGELEENDE TAFEL IS VAN EEN MENS EN NIET VAN EEN WIJK. Een halve
+      wijk overdragen mag de kaart niet hertekenen (zie ./wijk-leen.js), dus
+      staat die ene tafel als LEEN boven de wijk -- en dan geldt regel 3 nog
+      steeds: er is nog altijd maar een antwoord.
 
    EN DE VIERDE, DIE OP HET SCHERM STAAT EN NIET HIER: een lijst die filtert,
    zegt hoeveel hij daarmee NIET toont. Een filter dat zwijgt over wat het
@@ -45,6 +49,11 @@ function doosDienst(h) {
 
 module.exports = ({ horeca, schoon }) => {
   const { nu, id } = horeca;
+  /* De uitgeleende tafel is een DERDE laag boven de kaart en de wijkdienst; hij
+     woont in ./wijk-leen.js omdat hij een andere levensduur heeft, maar hij
+     wordt hier beantwoord -- want dit is de plek waar "is deze tafel van mij"
+     wordt uitgerekend, en dat blijft een plek (LAT-regel 4). */
+  const leen = require('./wijk-leen')({ horeca, schoon });
 
   const tafelNaam = (t) => schoon(t, 30).trim();
 
@@ -137,6 +146,12 @@ module.exports = ({ horeca, schoon }) => {
   function vanMij(h, tafel, staffId) {
     const t = tafelNaam(tafel);
     if (!t) return true;
+    /* EEN UITGELEENDE TAFEL IS VAN WIE HEM DRAAGT, en van niemand anders -- ook
+       niet van wie de wijk draagt. Dat is de hele betekenis van "neem tafel 6
+       even over": staat hij bij allebei, dan lopen er twee mensen heen of geen.
+       Deze regel gaat daarom VOOR de wijk, en niet ernaast. */
+    const geleend = leen.van(h, t);
+    if (geleend) return String(geleend.staffId) === String(staffId);
     const dienst = doosDienst(h);
     for (const w of doosWijken(h)) {
       if (!w.tafels.includes(t)) continue;
@@ -153,5 +168,5 @@ module.exports = ({ horeca, schoon }) => {
     return doosWijken(h).filter((w) => dienst[w.id] && String(dienst[w.id].staffId) === String(staffId));
   }
 
-  return { lijst, zet, weg, neem, laat, vanMij, mijne, MAXWIJKEN, MAXTAFELS };
+  return { lijst, zet, weg, neem, laat, vanMij, mijne, leen, MAXWIJKEN, MAXTAFELS };
 };

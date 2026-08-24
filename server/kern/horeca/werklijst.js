@@ -98,13 +98,20 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
   function wijkbeeldVan(h, taken) {
     const wijken = wijklaag.lijst(h);
     const beeld = wijken.map((w) => ({ id: w.id, naam: w.naam, tafels: w.tafels.length,
-      van: w.van ? w.van.naam : null, taken: 0, nu: 0 }));
-    const zonder = { id: null, naam: 'Zonder wijk', tafels: null, van: null, taken: 0, nu: 0 };
+      van: w.van ? w.van.naam : null, taken: 0, nu: 0, uit: 0 }));
+    const zonder = { id: null, naam: 'Zonder wijk', tafels: null, van: null, taken: 0, nu: 0, uit: 0 };
     for (const t of taken) {
-      const w = wijken.find((x) => x.tafels.includes(String(t.tafel || '')));
+      const tafel = String(t.tafel || '');
+      const w = wijken.find((x) => x.tafels.includes(tafel));
       const vak = w ? beeld.find((b) => b.id === w.id) : zonder;
       vak.taken++;
       if (typeof t.over === 'number' && t.over > 0) vak.nu++;
+      /* HOEVEEL VAN DIT WERK OP EEN UITGELEENDE TAFEL STAAT. Zonder dit getal
+         liegt de drukte: "Serre, 12 open, Ayla draagt hem" terwijl drie van die
+         tafels bij Sanne staan, is precies de mening die eruitziet als een
+         meting (grens 7). De kaart verandert niet door een leen, dus de taak
+         telt bij zijn eigen wijk -- met erbij hoeveel er uit is. */
+      if (wijklaag.leen.van(h, tafel)) vak.uit++;
     }
     if (zonder.taken) beeld.push(zonder);
     return beeld.sort((a, b) => b.nu - a.nu || b.taken - a.taken);

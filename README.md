@@ -1325,7 +1325,7 @@ pagina:
 | Scherm | Waarvoor |
 | --- | --- |
 | `/apps/horeca-pda.html` | PDA SERVICE: wat is mijn eerstvolgende handeling, geordend op minuten over een grens die het huis zelf al had vastgelegd -- met een wijklens die zegt hoeveel hij niet toont |
-| `/apps/horeca-vloer.html` | VLOER: de verdeling met de drukte per wijk en wie hem draagt, een wijk overdragen als aanbod aan een collega, en het indelen zelf (manager) |
+| `/apps/horeca-vloer.html` | VLOER: de verdeling met de drukte per wijk en wie hem draagt, een wijk (of een paar tafels) overdragen als aanbod aan een collega, nee zeggen met een reden, uitgeleende tafels teruggeven, en het indelen zelf (manager) |
 | `/apps/horeca-bar.html` | BAR: de ronden op wachttijd naast de stapel (dezelfde drank over meerdere tafels is een handeling), met de stoel en de allergie op het glas |
 | `/apps/horeca-expeditie.html` | de pas: per tafel en gang wat er klaar is en hoe lang het eerste bord al koud staat, uitgeven met de hand, en de drukterem met zijn rekensom |
 | `/apps/horeca-bezorg.html` | zones, adrescheck, tijdsloten in keukenminuten, de ritvolgorde, en de rit zelf van inpakken tot afleverbewijs |

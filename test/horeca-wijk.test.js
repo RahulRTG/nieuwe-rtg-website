@@ -28,7 +28,7 @@ const { startServer } = require('./helper');
    precies genoeg voor wat hier bewezen moet worden -- een collega is een collega,
    ook als hij toevallig de baas is. Waar het om gaat is: draagt IEMAND ANDERS
    deze wijk. */
-let BASE, child, tokM, tokA, naamM, naamA;
+let BASE, child, tokM, tokA, tokB, tokN, naamM, naamA, naamB, naamN, idB, idN;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wijk-'));
 const api = (pad, body, token) => fetch(BASE + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
@@ -36,10 +36,17 @@ const api = (pad, body, token) => fetch(BASE + pad, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const M = (pad, body) => api('/api/supplier/horeca' + pad, body, tokM);
 const A = (pad, body) => api('/api/supplier/horeca' + pad, body, tokA);
+/* Twee mensen zijn genoeg voor "draagt iemand anders dit", maar niet voor
+   "mag een DERDE hier iets mee". Weigeren, een antwoord wegklikken en een
+   uitgeleende tafel teruggeven zijn alle drie handelingen van een bepaalde
+   mens -- en die regel is pas een regel als iemand anders hem ziet weigeren.
+   Bram en Nadia komen er in demomodus bij (RTG_DEMO). */
+const B = (pad, body) => api('/api/supplier/horeca' + pad, body, tokB);
+const N = (pad, body) => api('/api/supplier/horeca' + pad, body, tokN);
 
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_DEMO: '1' } }));
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const mgr = roster.staff.find(x => x.role === 'manager') || roster.staff[0];
   const vloer = roster.staff.find(x => x.id !== mgr.id);
@@ -48,6 +55,16 @@ test.before(async () => {
   tokM = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: mgr.id, pin: '1234' })).body.token;
   tokA = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: vloer.id, pin: '5678' })).body.token;
   assert.ok(tokM && tokA, 'beide inlogs');
+
+  for (const naam of ['Bram', 'Nadia']) {
+    const nieuw = (await api('/api/supplier/staff/add', { name: naam }, tokM)).body;
+    assert.ok(nieuw.staff && nieuw.pin, 'er komt iemand bij: ' + JSON.stringify(nieuw));
+    const tok = (await api('/api/supplier/login',
+      { code: 'KIKUNOI', staffId: nieuw.staff.id, pin: nieuw.pin })).body.token;
+    assert.ok(tok, naam + ' kan inloggen');
+    if (naam === 'Bram') { tokB = tok; naamB = nieuw.staff.name; idB = String(nieuw.staff.id); }
+    else { tokN = tok; naamN = nieuw.staff.name; idN = String(nieuw.staff.id); }
+  }
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -257,7 +274,7 @@ test('10. een wijk heeft hoogstens een open aanbod, en intrekken kan', async () 
 
   const weg = await M('/wijk/trek-in', { overdrachtId: een.body.overdracht.id });
   assert.equal(weg.status, 200);
-  assert.match(weg.body.let, /draagt de wijk nog steeds/i, weg.body.let);
+  assert.match(weg.body.let, /draagt Serre nog steeds/i, weg.body.let);
   assert.equal((await wijkMet(M, 'Serre')).van.naam, naamM, 'en er is niets verhuisd');
 
   // en daarna kan er weer een nieuw aanbod uit
@@ -290,4 +307,207 @@ test('11. de werklijst volgt de overdracht: het werk verhuist mee', async () => 
   assert.ok(taken(vanM).map(t => t.tafel).includes('V1'),
     'en wie hem overnam, ziet hem wel');
   assert.ok(vanM.mijnWijken.includes('Serre'));
+});
+
+/* ==========================================================================
+   NEE ZEGGEN, EN EEN HALVE WIJK
+
+   Tot hier kon een aanbod maar een kant op: aanvaarden of niets doen. Dat legt
+   de handeling bij de verkeerde mens -- wie NIET kan, weet dat als enige. En
+   een overdracht was altijd de HELE wijk, terwijl "neem tafel 6 even van me
+   over" de gewone vorm is op een drukke avond.
+
+   Wat hieronder bewezen wordt gaat over allebei, en over de plek waar ze
+   elkaar raken: een uitgeleende tafel is van de LENER, ook al staat hij op de
+   kaart nog in de wijk van een ander. */
+
+test('12. weigeren doet de gevraagde, en alleen die', async () => {
+  const w = await wijkMet(M, 'Serre');           // die draagt de manager sinds toets 8
+  const ploeg = (await wijken(M)).ploeg;
+  const naarA = ploeg.find(x => x.naam === naamA);
+  const bod = await M('/wijk/bied', { wijkId: w.id, naarId: naarA.id, naarNaam: naarA.naam });
+  assert.equal(bod.status, 200);
+  const oid = bod.body.overdracht.id;
+
+  const zelf = await M('/wijk/weiger', { overdrachtId: oid });
+  assert.equal(zelf.status, 409, 'de aanbieder weigert zijn eigen aanbod niet; die trekt in');
+  assert.match(zelf.body.error, /intrekken/i, zelf.body.error);
+
+  /* EN OOK EEN MANAGER NIET. Dat is de regel die het meest telt: een manager
+     die namens iemand weigert, laat het journaal iets zeggen wat die persoon
+     nooit gezegd heeft. Nadia is hier de derde mens die er niets mee te maken
+     heeft; de manager staat hierboven al. */
+  const derde = await N('/wijk/weiger', { overdrachtId: oid });
+  assert.equal(derde.status, 409, 'een collega weigert een aanbod aan een ander niet');
+  assert.equal(derde.body.code, 'niet-voor-jou');
+
+  const nee = await A('/wijk/weiger', { overdrachtId: oid, reden: 'ik zit zelf vol' });
+  assert.equal(nee.status, 200);
+  assert.match(nee.body.let, /draagt Serre nog steeds/i, nee.body.let);
+
+  assert.equal((await wijkMet(M, 'Serre')).van.naam, naamM, 'de wijk is niet verhuisd');
+  assert.equal((await wijken(M)).overdrachten.length, 0, 'en het aanbod staat niet meer open');
+});
+
+test('13. een nee komt aan, en verdwijnt niet vanzelf', async () => {
+  const mijne = (await wijken(M)).antwoorden;
+  assert.equal(mijne.length, 1, 'de aanbieder krijgt het antwoord te zien');
+  assert.equal(mijne[0].reden, 'ik zit zelf vol', 'met de reden erbij');
+  assert.equal(mijne[0].wijkNaam, 'Serre');
+
+  assert.equal((await wijken(A)).antwoorden.length, 0, 'wie weigerde krijgt zijn eigen nee niet terug');
+  assert.equal((await wijken(N)).antwoorden.length, 0, 'en een collega evenmin');
+
+  const derde = await N('/wijk/gezien', { overdrachtId: mijne[0].id });
+  assert.equal(derde.status, 409, 'een ander klikt het antwoord niet weg');
+
+  const weg = await M('/wijk/gezien', { overdrachtId: mijne[0].id });
+  assert.equal(weg.status, 200);
+  assert.equal((await wijken(M)).antwoorden.length, 0, 'gezien is weg');
+});
+
+test('14. een half aanbod verhuist geen tafels', async () => {
+  const z = (await M('/wijk/zet', { naam: 'Zaal', tafels: ['Z1', 'Z2', 'Z3', 'Z4'] })).body.wijk;
+  await A('/wijk/neem', { wijkId: z.id });
+
+  const bod = await A('/wijk/bied', { wijkId: z.id, naarId: idB, naarNaam: naamB, tafels: ['Z1', 'Z2'] });
+  assert.equal(bod.status, 200, JSON.stringify(bod.body));
+  assert.deepEqual(bod.body.overdracht.tafels, ['Z1', 'Z2'], 'het aanbod draagt twee tafels');
+  assert.equal((await wijkMet(A, 'Zaal')).vanMij, true, 'en tijdens het aanbod houdt de aanbieder alles');
+
+  const ja = await B('/wijk/aanvaard', { overdrachtId: bod.body.overdracht.id });
+  assert.equal(ja.status, 200);
+  assert.match(ja.body.let, /houdt de rest van Zaal/i, ja.body.let);
+
+  /* DIT IS DE POINTE: de kaart is niet hertekend en de wijk is niet verhuisd.
+     Alleen die twee tafels worden nu door iemand anders gedragen. */
+  const na = await wijkMet(A, 'Zaal');
+  assert.deepEqual(na.tafels, ['Z1', 'Z2', 'Z3', 'Z4'], 'de plattegrond staat er nog precies zo');
+  assert.equal(na.van.naam, naamA, 'en Zaal is nog steeds van wie hem droeg');
+
+  const leen = (await wijken(A)).leningen;
+  assert.deepEqual(leen.map(l => l.tafel).sort(), ['Z1', 'Z2'], 'twee tafels staan uit');
+  assert.equal(leen[0].naam, naamB, 'op naam van wie ze draagt');
+  assert.equal(leen[0].vanNaam, naamA, 'met wie ze uitleende erbij');
+  assert.equal(leen[0].wijkNaam, 'Zaal', 'en uit welke wijk ze komen');
+  assert.equal(na.uitgeleend.length, 2, 'de wijk zelf zegt hoeveel er van hem uitstaat');
+});
+
+test('15. de werklijst volgt de leen: een uitgeleende tafel is van de lener', async () => {
+  await tafelMetVerzoek('Z1');   // uitgeleend aan Bram
+  await tafelMetVerzoek('Z3');   // nog gewoon van Ayla
+
+  const vanA = taken(await lijst(A, { wijk: 'mijn' })).map(t => t.tafel);
+  assert.ok(vanA.includes('Z3'), 'wie de wijk draagt houdt de rest');
+  assert.ok(!vanA.includes('Z1'), 'maar niet de tafel die hij heeft uitgeleend');
+
+  const vanB = taken(await lijst(B, { wijk: 'mijn' })).map(t => t.tafel);
+  assert.ok(vanB.includes('Z1'), 'die staat bij wie hem draagt');
+  assert.ok(!vanB.includes('Z3'), 'en de rest van die wijk niet');
+
+  /* HET GETAL MAG NIET LIEGEN. "Zaal, vier open" terwijl er twee bij Bram
+     staan, is een mening die eruitziet als een meting (grens 7). Geteld uit de
+     lijst zelf en niet uit een verwacht getal: hoeveel taken een pas gezette
+     tafel oplevert, is een som van elders. */
+  const alles = taken(await lijst(M, {}));
+  const opZ1 = alles.filter(t => t.tafel === 'Z1').length;
+  const opZaal = alles.filter(t => ['Z1', 'Z2', 'Z3', 'Z4'].includes(t.tafel)).length;
+  assert.ok(opZ1 > 0 && opZ1 < opZaal, 'er staat werk op de uitgeleende tafel en op de rest');
+
+  const zaal = (await wijken(A)).wijken.find(x => x.naam === 'Zaal');
+  assert.equal(zaal.taken, opZaal, 'de drukte telt al het werk op de kaart van deze wijk');
+  assert.equal(zaal.uit, opZ1, 'met erbij hoeveel daarvan op een uitgeleende tafel staat');
+});
+
+test('16. een tafel staat hoogstens bij een iemand uit', async () => {
+  const z = await wijkMet(A, 'Zaal');
+
+  /* EN JE GEEFT ALLEEN WEG WAT IN JE EIGEN WIJK ZIT. V1 zit in Serre; zonder
+     deze grens zou een aanbod de tafel van een collega kunnen uitlenen. */
+  const vreemd = await A('/wijk/bied', { wijkId: z.id, naarId: idN, naarNaam: naamN, tafels: ['Z3', 'V1'] });
+  assert.equal(vreemd.status, 400, 'een tafel uit een andere wijk gaat niet mee');
+  assert.equal(vreemd.body.code, 'niet-uit-deze-wijk');
+  assert.match(vreemd.body.error, /V1/, vreemd.body.error);
+
+  const weer = await A('/wijk/bied', { wijkId: z.id, naarId: idN, naarNaam: naamN, tafels: ['Z1'] });
+  assert.equal(weer.status, 409, 'een uitgeleende tafel bied je niet nog eens aan');
+  assert.equal(weer.body.code, 'uitgeleend');
+  assert.match(weer.body.error, new RegExp(naamB), weer.body.error);
+
+  const heel = await A('/wijk/bied', { wijkId: z.id, naarId: idN, naarNaam: naamN });
+  assert.equal(heel.status, 409, 'en de hele wijk ook niet, zolang er een stuk van uit is');
+  assert.equal(heel.body.code, 'uitgeleend');
+
+  const een = await A('/wijk/bied', { wijkId: z.id, naarId: idN, naarNaam: naamN, tafels: ['Z3'] });
+  assert.equal(een.status, 200, 'een vrije tafel mag wel: ' + JSON.stringify(een.body));
+
+  const zelfde = await A('/wijk/bied', { wijkId: z.id, naarId: idB, naarNaam: naamB, tafels: ['Z3', 'Z4'] });
+  assert.equal(zelfde.status, 409, 'een tafel die al uitstaat, staat niet twee keer uit');
+  assert.equal(zelfde.body.code, 'al-aangeboden');
+
+  /* MAAR TWEE HALVE AANBIEDINGEN OP VERSCHILLENDE TAFELS MOGEN WEL. Vier tafels
+     aan Bram en drie aan Nadia is een normale avond, geen uitzondering. */
+  const naast = await A('/wijk/bied', { wijkId: z.id, naarId: idB, naarNaam: naamB, tafels: ['Z4'] });
+  assert.equal(naast.status, 200, 'naast elkaar mag: ' + JSON.stringify(naast.body));
+
+  await A('/wijk/trek-in', { overdrachtId: een.body.overdracht.id });
+  await A('/wijk/trek-in', { overdrachtId: naast.body.overdracht.id });
+});
+
+test('17. teruggeven doet de lener, de uitlener of een manager -- en niemand anders', async () => {
+  const nee = await N('/wijk/tafel-terug', { tafel: 'Z1' });
+  assert.equal(nee.status, 409, 'een collega geeft andermans tafel niet terug');
+  assert.match(nee.body.error, new RegExp(naamB), nee.body.error);
+
+  const doorLener = await B('/wijk/tafel-terug', { tafel: 'Z1' });
+  assert.equal(doorLener.status, 200, 'wie hem draagt geeft hem terug: klaar');
+  assert.match(doorLener.body.let, /Zaal/, doorLener.body.let);
+
+  const doorUitlener = await A('/wijk/tafel-terug', { tafel: 'Z2' });
+  assert.equal(doorUitlener.status, 200, 'en wie hem uitleende ook: ik kan weer');
+
+  assert.equal((await wijken(A)).leningen.length, 0, 'er staat niets meer uit');
+  const terug = taken(await lijst(A, { wijk: 'mijn' })).map(t => t.tafel);
+  assert.ok(terug.includes('Z1'), 'en het werk staat weer bij de wijk waar de tafel op de kaart staat');
+
+  // en een manager kan opruimen wat niemand meer terugvraagt
+  const z = await wijkMet(A, 'Zaal');
+  const bod = await A('/wijk/bied', { wijkId: z.id, naarId: idB, naarNaam: naamB, tafels: ['Z2'] });
+  await B('/wijk/aanvaard', { overdrachtId: bod.body.overdracht.id });
+  const doorManager = await M('/wijk/tafel-terug', { tafel: 'Z2' });
+  assert.equal(doorManager.status, 200, 'een manager ruimt op');
+});
+
+test('18. alles aanvinken is de hele wijk, en niet zeven losse tafels', async () => {
+  const z = await wijkMet(A, 'Zaal');
+  const bod = await A('/wijk/bied', { wijkId: z.id, naarId: idB, naarNaam: naamB, tafels: z.tafels });
+  assert.equal(bod.status, 200, JSON.stringify(bod.body));
+  assert.equal(bod.body.overdracht.tafels, null,
+    'alle tafels aanvinken IS de hele wijk aanbieden -- anders levert het hetzelfde werk op ' +
+    'met vier keer teruggeven erachteraan');
+
+  const ja = await B('/wijk/aanvaard', { overdrachtId: bod.body.overdracht.id });
+  assert.equal(ja.status, 200);
+  assert.equal((await wijkMet(B, 'Zaal')).van.naam, naamB, 'dus verhuist de wijk zelf');
+  assert.equal((await wijken(B)).leningen.length, 0, 'en staat er geen enkele tafel uitgeleend');
+});
+
+test('19. een aanbod reist mee naar de PDA, want daar staat de mens', async () => {
+  /* Overdragen gebeurt op de vloer, waar de hele verdeling erbij staat. Maar
+     wie een aanbod krijgt, loopt op dat moment met een PDA -- en zolang hij niet
+     antwoordt, draagt zijn collega het nog. Dus reist het AANTAL mee in de
+     werklijst, geteld uit dezelfde lijst en niet uit een tweede. */
+  const z = await wijkMet(B, 'Zaal');   // die draagt Bram sinds toets 18
+  assert.equal((await lijst(A, {})).voorMij, 0, 'er ligt nog niets');
+
+  const bod = await B('/wijk/bied', { wijkId: z.id, naarId: (await wijken(B)).ploeg
+    .find(x => x.naam === naamA).id, naarNaam: naamA, tafels: ['Z1'] });
+  assert.equal(bod.status, 200, JSON.stringify(bod.body));
+
+  assert.equal((await lijst(A, {})).voorMij, 1, 'de gevraagde ziet het op zijn eigen lijst');
+  assert.equal((await lijst(B, {})).voorMij, 0, 'de aanbieder telt zijn eigen aanbod niet mee');
+  assert.equal((await lijst(N, {})).voorMij, 0, 'en een collega evenmin');
+
+  await B('/wijk/trek-in', { overdrachtId: bod.body.overdracht.id });
+  assert.equal((await lijst(A, {})).voorMij, 0, 'ingetrokken telt niet meer mee');
 });

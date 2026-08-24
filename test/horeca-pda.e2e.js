@@ -263,6 +263,31 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.match(beeldW.nu + beeldW.open, /PDA-DRAAG/,
       'een wijk die niemand draagt is van iedereen; de tafel verdwijnt niet');
 
+    /* ---- 7b. een aanbod komt aan bij wie LOOPT ----
+       Overdragen zelf gebeurt op de vloer, waar de hele verdeling erbij staat.
+       Maar wie een wijk aangeboden krijgt, staat op dat moment met dit toestel
+       in zijn hand -- en zolang hij niet antwoordt, draagt zijn collega het nog.
+       Dus hoort het AANTAL hier te staan, met de weg ernaartoe. */
+    const bram = (await post(base, '/api/supplier/staff/add', { name: 'Bram' }, tok)).body;
+    const tokB = (await post(base, '/api/supplier/login',
+      { code: 'KIKUNOI', staffId: bram.staff.id, pin: bram.pin })).body.token;
+    const eigen = (await post(base, '/api/supplier/horeca/wijk/zet',
+      { naam: 'Serre', tafels: ['PDA-BOD'] }, tok)).body.wijk;
+    await post(base, '/api/supplier/horeca/wijk/neem', { wijkId: eigen.id }, tokB);
+    const bod = await post(base, '/api/supplier/horeca/wijk/bied',
+      { wijkId: eigen.id, naarId: String(mgr.id), naarNaam: mgr.name }, tokB);
+    assert.equal(bod.status, 200, JSON.stringify(bod.body));
+
+    await page.click('#pVerversNu').catch(() => {});
+    await page.waitForTimeout(900);
+    const metBod = await page.evaluate(() => document.getElementById('pWijken').innerText.replace(/\s+/g, ' '));
+    assert.match(metBod, /Er ligt een aanbod voor u/, 'het aanbod staat op de PDA: ' + metBod);
+    assert.match(metBod, /draagt uw collega het nog/, 'met wat er tot dan geldt');
+    assert.ok(await page.$('a[href="/apps/horeca-vloer.html"]'), 'met de weg naar de vloer erbij');
+
+    await post(base, '/api/supplier/horeca/wijk/trek-in',
+      { overdrachtId: bod.body.overdracht.id }, tokB);
+
     await page.click('[data-wijklens="alles"]');
     await page.waitForTimeout(600);
 

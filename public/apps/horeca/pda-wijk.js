@@ -29,7 +29,7 @@
      Het getal hoort bij de WIJK en niet bij de mens: er komt geen ranglijst op
      medewerkers (HORECA.md, grens 5). De naam staat erbij zodat je weet wie je
      moet aanspreken, en niet om te vergelijken. */
-  function tekenWijken(beeld, mijne, na) {
+  function tekenWijken(beeld, mijne, na, voorMij) {
     $('pWijken').innerHTML = !beeld.length
       ? '<p class="pda-leeg">Er zijn nog geen wijken. Zolang die er niet ' +
         'zijn is elke tafel van iedereen, en dat is precies wat u hierboven ziet.</p>'
@@ -59,9 +59,18 @@
        collega met een antwoord terug (kern/horeca/wijk-overdracht.js), en dat
        hoort op een scherm dat de hele verdeling toont -- niet als vierde knopje
        onder een takenlijst. Wel de weg ernaartoe, want wie zijn wijk kwijt wil
-       staat op dit moment met een PDA in zijn hand en niet achter een bureau. */
+       staat op dit moment met een PDA in zijn hand en niet achter een bureau.
+
+       EN WAT AAN MIJ IS AANGEBODEN, STAAT ERBIJ. Een aanbod dat alleen op een
+       vast scherm te zien is, komt niet aan bij iemand die loopt -- en zolang
+       hij niet antwoordt, draagt een collega het nog. Alleen het AANTAL: de
+       handeling blijft op de vloer, want daar staat de hele verdeling erbij. */
+    var n = Number(voorMij) || 0;
     $('pWijken').insertAdjacentHTML('beforeend',
-      '<div class="pda-acties"><a class="knop" href="/apps/horeca-vloer.html">Overdragen en herverdelen: Vloer</a></div>');
+      (n ? '<p class="pda-som"><b>Er ' + (n === 1 ? 'ligt een aanbod' : 'liggen ' + n + ' aanbiedingen') +
+        ' voor u.</b> Tot u antwoordt, draagt uw collega het nog.</p>' : '') +
+      '<div class="pda-acties"><a class="knop' + (n ? ' p' : '') + '" href="/apps/horeca-vloer.html">' +
+      (n ? 'Bekijk het aanbod: Vloer' : 'Overdragen en herverdelen: Vloer') + '</a></div>');
   }
 
   window.RTGPdaWijk = { teken: tekenWijken };

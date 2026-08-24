@@ -44,14 +44,25 @@
   .v-bod{border:1px solid var(--v-accent);border-radius:14px;background:rgba(194,58,94,.10);
          padding:.85rem .9rem;margin-bottom:.6rem;}
   .v-bod p{margin:0 0 .5rem;font-size:16px;line-height:1.55;}
+  .v-bod input[type=text]{flex:1 1 10rem;min-height:48px;padding:0 .7rem;border:1px solid var(--v-lijn);
+        border-radius:10px;background:transparent;color:var(--v-txt);font:500 15px Inter,system-ui;}
+  /* Een antwoord op mijn aanbod is een BERICHT en geen alarm: de rand is stil,
+     want er is niets stuk -- er is alleen iets niet gelukt. */
+  .v-antwoord{border:1px solid var(--v-lijn);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;}
+  .v-antwoord p{margin:0 0 .5rem;font-size:16px;line-height:1.55;}
+  .v-leen{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;border:1px solid var(--v-lijn);
+          border-radius:12px;padding:.6rem .8rem;margin-bottom:.5rem;}
+  .v-leen b{font:600 17px Inter,system-ui;}
+  .v-leen small{font-size:14px;color:var(--v-stil);}
   .v-leeg{border:1px dashed var(--v-lijn);border-radius:14px;padding:1.1rem;
           font-size:15px;line-height:1.6;color:var(--v-stil);}
   .v-voet{margin-top:1.4rem;font-size:14px;line-height:1.6;color:var(--v-stil);}
   /* Indelen: alleen bij wie er iets mee kan; het recht blijft op de server. */
   #vIndeel{margin-top:1.4rem;border-top:1px solid var(--v-lijn);padding-top:.4rem;}
-  #vVorm{border:1px solid var(--v-lijn);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;}
-  #vVorm input[type=text]{width:100%;min-height:48px;padding:0 .7rem;border:1px solid var(--v-lijn);
+  #vVorm,#vBiedVorm{border:1px solid var(--v-lijn);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;}
+  #vVorm input[type=text],#vBiedVorm select{width:100%;min-height:48px;padding:0 .7rem;border:1px solid var(--v-lijn);
         border-radius:10px;background:transparent;color:var(--v-txt);font:500 16px Inter,system-ui;}
+  #vBiedVorm p{margin:0 0 .6rem;font-size:15px;line-height:1.55;color:var(--v-stil);}
   .v-vakjes{display:flex;flex-wrap:wrap;gap:.4rem;margin:.7rem 0 0;}
   .v-vakjes label{display:inline-flex;align-items:center;gap:.4rem;min-height:48px;padding:0 .7rem;
         border:1px solid var(--v-lijn);border-radius:10px;font-size:15px;cursor:pointer;}
@@ -69,17 +80,24 @@
 </header>
 <main id="main">
   <!-- Wat aan MIJ is aangeboden staat bovenaan: een wijk die op mijn antwoord
-       wacht, is de enige zin op dit scherm die niet kan wachten. -->
+       wacht, is de enige zin op dit scherm die niet kan wachten. Daaronder de
+       antwoorden op wat IK aanbood -- een nee die niemand leest, is geen nee. -->
   <div id="vVoorMij"></div>
+  <div id="vAntwoord"></div>
 
   <div class="v-tel">
     <div><b id="vOpen">-</b><span>open taken in de zaak</span></div>
     <div><b id="vLos">-</b><span>wijken die niemand draagt</span></div>
     <div><b id="vBoden">-</b><span>aanbiedingen die openstaan</span></div>
+    <div><b id="vUit">-</b><span>tafels die bij iemand anders staan</span></div>
   </div>
 
   <div class="v-kop">De verdeling</div>
+  <div id="vBiedVorm" hidden></div>
   <div id="vWijken"></div>
+
+  <div class="v-kop">Tafels die uitstaan</div>
+  <div id="vGeleend"></div>
 
   <div class="v-kop">Aanbiedingen die openstaan</div>
   <div id="vAanbod"></div>
@@ -100,6 +118,7 @@
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/vloer.js"></script>
+<script src="/apps/horeca/vloer-aanbod.js"></script>
 <script src="/apps/horeca/vloer-indelen.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

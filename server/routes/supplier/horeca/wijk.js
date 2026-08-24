@@ -20,9 +20,10 @@ module.exports = (kern) => {
      wordt hier niet nog eens geteld: dat is dezelfde som die de PDA toont, en
      twee tellingen van hetzelfde lopen gegarandeerd uiteen (LAT-regel 4). */
   const werk = require('../../../kern/horeca/werklijst')({ horeca, schoon, verzoeklaag: kern.verzoeklaag });
-  /* Een wijk overdragen midden in een dienst is iets anders dan hem nemen of
-     loslaten: het mag geen moment opleveren waarop de wijk van niemand is. Zie
-     kern/horeca/wijk-overdracht.js. */
+  /* Overdragen is iets anders dan nemen of loslaten: het mag geen moment
+     opleveren waarop de wijk van niemand is. De HANDELINGEN staan naast dit
+     bestand (./wijk-overdracht.js); hier wordt alleen de STAND gelezen, want
+     die hoort in hetzelfde antwoord als de verdeling zelf. */
   const over = require('../../../kern/horeca/wijk-overdracht')({ horeca, schoon });
 
   const wieVan = (req) => ({ staffId: req.actor.staffId == null ? null : String(req.actor.staffId),
@@ -39,18 +40,32 @@ module.exports = (kern) => {
        wordt. */
     const beeld = werk.werklijst(h, req.supplier.code, { modus: 'alles', staffId: ik.staffId }).wijkbeeld;
     const drukte = (id) => beeld.find((b) => b.id === id) || { taken: 0, nu: 0 };
+    /* De uitgeleende tafels van deze wijk staan bij de wijk zelf: wie leest
+       "Serre, 12 open" moet erbij zien dat er drie bij Sanne staan, anders is
+       dat getal geen drukte maar een mening (grens 7). */
+    const uitVan = (wijkId) => wijk.leen.lijst(h).filter((l) => l.wijkId === wijkId);
     const rijen = wijk.lijst(h).map((w) => Object.assign({}, w,
       { vanMij: !!(w.van && String(w.van.staffId) === String(ik.staffId)),
-        taken: drukte(w.id).taken, nu: drukte(w.id).nu }));
+        taken: drukte(w.id).taken, nu: drukte(w.id).nu, uit: drukte(w.id).uit,
+        uitgeleend: uitVan(w.id).map((l) => ({ tafel: l.tafel, naam: l.naam, staat: l.staat })) }));
     const inWijk = new Set(rijen.reduce((a, w) => a.concat(w.tafels), []));
     const aanbiedingen = over.lijst(h).map((o) => Object.assign({}, o, {
       vanMij: String(o.vanId) === String(ik.staffId),
       voorMij: String(o.naarId) === String(ik.staffId)
     }));
+    const leningen = wijk.leen.lijst(h).map((l) => Object.assign({}, l, {
+      vanMij: !!(l.vanId != null && String(l.vanId) === String(ik.staffId)),
+      naarMij: String(l.staffId) === String(ik.staffId)
+    }));
     res.json({ ok: true, wijken: rijen,
       mijne: rijen.filter((w) => w.vanMij).map((w) => w.naam),
       overdrachten: aanbiedingen,
       voorMij: aanbiedingen.filter((o) => o.voorMij).length,
+      /* Weigeringen die aan MIJ gericht zijn en die ik nog niet heb gezien. Ze
+         verdwijnen niet vanzelf na een tijd: wie op dat moment met borden liep,
+         mist een bericht dat zichzelf opruimt (wijk-antwoord.js regel 2). */
+      antwoorden: over.antwoorden(h, ik.staffId),
+      leningen,
       /* De ploeg, zodat een aanbod een naam kan krijgen. Geen rollen en geen
          telling per mens -- alleen wie er is (grens 5). */
       ploeg: (function () {
@@ -109,37 +124,6 @@ module.exports = (kern) => {
     }
     res.json(uit);
   });
-
-  /* ---------- overdragen: bieden, aanvaarden, intrekken ----------
-
-     Drie deuren met dezelfde romp: een persoonlijke inlog, de handeling, en het
-     journaal. De romp staat een keer; de PADEN staan voluit, want een pad dat
-     wordt opgebouwd (`'.../wijk/' + pad`) is voor de schakelkast onzichtbaar en
-     telt dus nergens mee (keuringsregel 45). */
-  const overdragen = (doen, zin) => (req, res) => {
-    const ik = wieVan(req);
-    if (ik.staffId == null) return res.status(403).json({ error: 'Alleen vanaf een persoonlijke inlog.' });
-    const h = H(req.supplier.code);
-    const uit = doen(h, req, ik);
-    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error, code: uit.code || null });
-    save();
-    logActivity(req.supplier.code, req.actor, zin(uit.overdracht));
-    duw(req.supplier.code);
-    res.json(uit);
-  };
-
-  app.post('/api/supplier/horeca/wijk/bied', supplierAuth, overdragen(
-    (h, req, ik) => over.bied(h, { wijkId: req.body.wijkId, naarId: req.body.naarId,
-      naarNaam: req.body.naarNaam }, ik),
-    (o) => 'bood wijk "' + o.wijkNaam + '" aan ' + (o.naarNaam || 'een collega')));
-
-  app.post('/api/supplier/horeca/wijk/aanvaard', supplierAuth, overdragen(
-    (h, req, ik) => over.aanvaard(h, req.body.overdrachtId, ik),
-    (o) => 'nam wijk "' + o.wijkNaam + '" over van ' + o.vanNaam));
-
-  app.post('/api/supplier/horeca/wijk/trek-in', supplierAuth, overdragen(
-    (h, req, ik) => over.trekIn(h, req.body.overdrachtId, ik),
-    (o) => 'trok het aanbod van wijk "' + o.wijkNaam + '" in'));
 
   app.post('/api/supplier/horeca/wijk/laat', supplierAuth, (req, res) => {
     const h = H(req.supplier.code);

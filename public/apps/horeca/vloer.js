@@ -17,6 +17,10 @@
    TIJDENS het aanbod, en verhuist er pas iets als de ander aanvaardt. De regels
    staan in kern/horeca/wijk-overdracht.js; dit scherm is er de deur van.
 
+   HET HERVERDELEN ZELF STAAT IN ./vloer-aanbod.js -- aanbieden, aannemen, nee
+   zeggen en teruggeven zijn een gesprek tussen twee mensen, en dit bestand gaat
+   over de verdeling zoals hij NU is. Twee vragen, twee bestanden.
+
    VIER DINGEN DIE HIER ZICHTBAAR BLIJVEN:
 
    1. HET GETAL HOORT BIJ DE WIJK EN NIET BIJ DE MENS. "12 open" staat naast een
@@ -46,26 +50,24 @@
     return 'Niemand draagt deze wijk, dus hij is van iedereen.';
   }
 
-  /* De keuze aan wie een wijk wordt aangeboden. Alleen namen -- geen rollen,
-     geen telling per mens, en mezelf niet: een wijk aan jezelf aanbieden
-     verandert niets. */
-  function ploegKeuze(w) {
-    var anderen = (D.ploeg || []).filter(function (p) { return !p.ik; });
-    if (!anderen.length) return '';
-    return '<select data-naar="' + esc(w.id) + '" aria-label="Aan wie biedt u ' + esc(w.naam) + ' aan">' +
-      anderen.map(function (p) {
-        return '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>';
-      }).join('') + '</select>' +
-      K.knop('Bied aan', { bied: w.id });
+  /* De uitgeleende tafels van deze wijk, in woorden. Zonder deze zin liegt het
+     getal ernaast: "Zaal, twaalf open" terwijl er drie bij Bram staan, is een
+     mening die eruitziet als een meting (grens 7). */
+  function watUitstaat(w) {
+    var uit = w.uitgeleend || [];
+    if (!uit.length) return '';
+    var wie = [];
+    uit.forEach(function (l) { if (wie.indexOf(l.naam) < 0) wie.push(l.naam); });
+    return ' ' + esc(uit.map(function (l) { return l.tafel; }).join(', ')) +
+      ' ' + (uit.length === 1 ? 'staat' : 'staan') + ' bij ' + esc(wie.join(' en ')) +
+      (w.uit ? ' (' + w.uit + ' van die taken).' : '.');
   }
 
   function wijkKaart(w) {
     var bod = (D.overdrachten || []).filter(function (o) { return o.wijkId === w.id; })[0];
     var acties = '';
-    if (bod) {
-      acties = (bod.vanMij || D.magIndelen) ? K.knop('Trek het aanbod in', { trek: bod.id }) : '';
-    } else if (w.vanMij) {
-      acties = K.knop('Loslaten', { laat: w.id }) + ploegKeuze(w);
+    if (w.vanMij) {
+      acties = K.knop('Loslaten', { laat: w.id }) + K.knop('Overdragen', { bied: w.id });
     } else if (!w.van) {
       acties = K.knop('Ik neem hem', { neem: w.id }, true);
     }
@@ -73,8 +75,9 @@
       '<div class="v-wijkkop"><span class="v-naam">' + esc(w.naam) + '</span>' +
       '<span class="v-druk">' + w.taken + ' open</span></div>' +
       '<p class="v-som">' + (w.nu ? '<b>' + w.nu + ' daarvan staan over een grens.</b> ' : '') +
-      draagt(w) +
-      (bod ? ' Aangeboden aan ' + esc(bod.naarNaam || 'een collega') + '; staat ' + bod.staat + ' min.' : '') +
+      draagt(w) + watUitstaat(w) +
+      (bod ? ' ' + (bod.tafels ? esc(bod.tafels.join(', ')) : 'De hele wijk') + ' aangeboden aan ' +
+        esc(bod.naarNaam || 'een collega') + '; staat ' + bod.staat + ' min.' : '') +
       '</p>' +
       '<p class="v-tafels">' + (w.tafels.length
         ? w.tafels.length + ' tafel(s): ' + esc(w.tafels.join(', '))
@@ -104,45 +107,17 @@
     $('vBoden').textContent = (d.overdrachten || []).length;
     $('vUitleg').textContent = d.let || '';
 
-    /* Wat aan MIJ is aangeboden staat bovenaan. Een wijk die op mijn antwoord
-       wacht is het enige op dit scherm dat niet kan wachten -- zolang ik niet
-       antwoord, draagt een collega hem nog. */
-    var voor = (d.overdrachten || []).filter(function (o) { return o.voorMij; });
-    $('vVoorMij').innerHTML = voor.map(function (o) {
-      return '<article class="v-bod"><p><b>' + esc(o.vanNaam) + '</b> biedt u ' +
-        esc(o.wijkNaam) + ' aan; het aanbod staat ' + o.staat + ' min. ' +
-        'Tot u hem aanvaardt, draagt ' + esc(o.vanNaam) + ' hem nog.</p>' +
-        '<div class="v-acties">' + K.knop('Ik neem hem over', { pak: o.id }, true) + '</div></article>';
-    }).join('');
-
     $('vWijken').innerHTML = (wijken.map(wijkKaart).join('') + zonderKaart(d.zonderWijk)) ||
       '<p class="v-leeg">Er zijn nog geen wijken. Zolang die er niet zijn is elke tafel ' +
       'van iedereen -- dat werkt, maar op een drukke avond weet dan niemand wie waar heen loopt.</p>';
 
-    var open = (d.overdrachten || []);
-    $('vAanbod').innerHTML = open.length ? open.map(function (o) {
-      return '<article class="v-wijk"><div class="v-wijkkop">' +
-        '<span class="v-naam">' + esc(o.wijkNaam) + '</span>' +
-        '<span class="v-druk">' + o.staat + ' min</span></div>' +
-        '<p class="v-som">' + esc(o.vanNaam) + ' biedt hem aan ' + esc(o.naarNaam || 'een collega') +
-        ' en draagt hem tot dan zelf.</p>' +
-        ((o.vanMij || d.magIndelen)
-          ? '<div class="v-acties">' + K.knop('Trek in', { trek: o.id }) + '</div>' : '') +
-        '</article>';
-    }).join('') : '<p class="v-leeg">Geen open aanbiedingen. Een wijk overdragen doet u hierboven, ' +
-      'bij de wijk die u zelf draagt.</p>';
-
     K.bind($('main'), 'neem', function (b) { doe('/wijk/neem', { wijkId: b.dataset.neem }); });
     K.bind($('main'), 'laat', function (b) { doe('/wijk/laat', { wijkId: b.dataset.laat }); });
-    K.bind($('main'), 'pak', function (b) { doe('/wijk/aanvaard', { overdrachtId: b.dataset.pak }); });
-    K.bind($('main'), 'trek', function (b) { doe('/wijk/trek-in', { overdrachtId: b.dataset.trek }); });
-    K.bind($('main'), 'bied', function (b) {
-      var kies = $('main').querySelector('select[data-naar="' + b.dataset.bied + '"]');
-      if (!kies || !kies.value) return meld('Aan wie wordt deze wijk aangeboden?');
-      doe('/wijk/bied', { wijkId: b.dataset.bied, naarId: kies.value,
-        naarNaam: kies.options[kies.selectedIndex].text });
-    });
 
+    /* De OVERDRACHT (aanbieden, aannemen, weigeren, teruggeven) staat in
+       ./vloer-aanbod.js en het INDELEN in ./vloer-indelen.js. Ze tekenen na dit
+       blok, want ze hangen hun knoppen aan #main -- en die moet dan al staan. */
+    if (window.RTGVloerAanbod) RTGVloerAanbod.teken(d, haal);
     if (window.RTGVloerIndeel) RTGVloerIndeel.teken(d, haal);
   }
 

@@ -150,7 +150,11 @@ iets bouwt dat er al is:
   als harde regel dat een wijk werk verdeelt en nooit verbergt.
 - **De vloer heeft een eigen scherm** (`/apps/horeca-vloer.html`,
   `kern/horeca/wijk-overdracht.js`): de verdeling met de drukte per wijk, en het
-  overdragen van een wijk midden in een dienst. Zie punt 7 hieronder.
+  overdragen van een wijk — of een paar tafels — midden in een dienst, als aanbod
+  met een antwoord terug. Zie punt 7 hieronder.
+- **Een tafel kan uitgeleend zijn** (`kern/horeca/wijk-leen.js`): een derde laag
+  boven de kaart en de wijkdienst, zodat een halve wijk overdragen de
+  plattegrond niet hertekent.
 
 ## Wat er nieuw moet, in volgorde
 
@@ -693,12 +697,54 @@ met vijf regels (`server/kern/horeca/wijk-overdracht.js`):
 4. **Intrekken kan, door de aanbieder of door een manager** — ook door een
    aanbieder die geen manager is. Een aanbod dat blijft hangen omdat de gevraagde
    naar huis is, hoort geen grendel te worden.
-5. **Een wijk heeft hoogstens één open aanbod.** Twee aanbiedingen op dezelfde
-   wijk geven twee antwoorden op *van wie wordt dit*, en dan gaan er twee of geen.
+5. **Een tafel staat hoogstens bij één iemand uit.** Twee aanbiedingen op
+   dezelfde tafel geven twee antwoorden op *van wie wordt dit*, en dan gaan er
+   twee of geen. Twee halve aanbiedingen op *verschillende* tafels mogen dus wel
+   — vier tafels aan Sanne en drie aan Bram is een normale avond.
+6. **Weigeren doet de gevraagde, en alleen die.** Niet de aanbieder (die trekt
+   in) en niet een manager: wie namens iemand weigert, laat het journaal iets
+   zeggen wat die persoon nooit gezegd heeft.
+7. **Een nee komt aan.** Een weigering die alleen een stand in de data is, is
+   geen antwoord: hij staat op het scherm van de aanbieder tot die hem heeft
+   gezien — niet een tijdje, want wie op dat moment met borden liep, mist een
+   bericht dat zichzelf opruimt.
+
+**Een halve wijk overdragen hertekent de plattegrond niet.** *"Neem tafel 6 even
+van me over"* is de gewone vorm op een drukke avond, geen uitzondering — maar wie
+welke tafels heeft is een besluit van de leiding dat de hele dienst vaststaat.
+Drie tafels weggeven door ze naar de wijk van een collega te verhuizen, zou een
+handeling van een halve seconde de kaart laten veranderen, en die verandering
+staat er morgen nog terwijl de reden ervoor allang weg is. Er is daarom een
+**derde laag** (`server/kern/horeca/wijk-leen.js`):
+
+| laag | wat het zegt | van wie, hoe lang |
+|---|---|---|
+| kaart | welke tafels bij welke wijk horen | de leiding, hele dienst |
+| wijkdienst | wie draagt welke wijk nu | de mens, halve seconde |
+| leen | wie draagt déze ene tafel nu | de mens, halve seconde |
+
+De leen wint van de andere twee, en dat is geen voorrangsspelletje maar precies
+wat *"neem tafel 6 even over"* betekent: staat hij bij allebei, dan lopen er twee
+mensen heen of geen. De voorrang staat op de ene plek waar *is deze tafel van
+mij* wordt uitgerekend (`vanMij` in `wijk.js`, LAT-regel 4), dus volgen de
+werklijst, de wijklens en het wijkbeeld hem vanzelf. Een leen eindigt doordat
+iemand hem **teruggeeft** — niet vanzelf en niet na een tijd, want een tafel die
+stilletjes terugspringt naar iemand die er niet meer op rekent, is dezelfde fout
+als een tafel die tussen twee mensen door valt, alleen later op de avond.
+Teruggeven kan door alle drie de mensen die er iets mee te maken hebben: wie hem
+leende (*klaar*), wie hem uitleende (*ik kan weer*), en een manager (*opruimen*).
+
+En het getal mag daar niet door gaan liegen: een wijk toont naast zijn drukte
+hoeveel daarvan op een uitgeleende tafel staat. *"Serre, twaalf open, Ayla draagt
+hem"* terwijl er drie bij Sanne staan, is precies de mening die eruitziet als een
+meting (grens 7).
 
 Het scherm (`/apps/horeca-vloer.html`) toont de verdeling met de drukte per wijk,
-wat aan míj is aangeboden bovenaan, de open aanbiedingen, en — bij wie er iets
-mee kan — het indelen zelf. Drie dingen die daar zichtbaar blijven: het getal
+wat aan míj is aangeboden bovenaan, de antwoorden op wat ík aanbood, de tafels
+die uitstaan, de open aanbiedingen, en — bij wie er iets mee kan — het indelen
+zelf. Aanbieden gaat via één vorm: aan wie, en welke tafels; niets aanvinken is
+de hele wijk, en alles aanvinken óók (alle tafels los uitlenen levert hetzelfde
+werk op met zeven keer teruggeven erachteraan). Drie dingen die daar zichtbaar blijven: het getal
 hoort bij de **wijk** en niet bij de mens (grens 5), er staat **geen grens** op
 hoe lang een aanbod mag staan want die is nergens gemeten (grens 7), en wat van
 iedereen is — tafels zonder wijk, wijken zonder drager — komt náár voren in
@@ -708,9 +754,18 @@ De drukte per wijk komt uit de werklijst en wordt niet tweede keer geteld: het i
 dezelfde som die de PDA toont (LAT-regel 4), in één antwoord en dus op één moment
 — uit twee aanroepen samengesteld kan een wijk in de ene helft van het scherm van
 Sanne zijn en in de andere van Ayla, precies op het moment dat iemand hem
-overdraagt. `test/horeca-wijk.test.js` legt de vijf regels vast,
-`test/horeca-vloer.e2e.js` bewijst de overdracht tussen twee echte schermen —
-inclusief dat de wijk tijdens het aanbod op naam van de aanbieder blijft staan.
+overdraagt. `test/horeca-wijk.test.js` legt de zeven regels vast,
+`test/horeca-vloer.e2e.js` bewijst het hele gesprek tussen twee echte schermen —
+aanbieden, nee zeggen met een reden, dat antwoord zien en wegklikken, een halve
+wijk overdragen en teruggeven — inclusief dat de wijk tijdens het aanbod op naam
+van de aanbieder blijft staan.
+
+**En een aanbod komt aan bij wie loopt.** Wie een wijk aangeboden krijgt, staat
+op dat moment met een PDA in zijn hand en niet achter een bureau; een aanbod dat
+alleen op een vast scherm staat, komt dus niet aan. Het *aantal* reist daarom mee
+in de werklijst en staat op het wijkblok van de PDA, met de weg naar de vloer
+erbij. Alleen het aantal: de handeling blijft waar de hele verdeling erbij staat
+(`test/horeca-pda.e2e.js`).
 
 ## De grenzen
 
@@ -855,15 +910,14 @@ en hij vraagt een zaak, een avond en iemand die meekijkt. Zolang die er niet is
 geweest, staat er bij acht van de twaalf meetpunten "niet gemeten" — en dat is de
 eerlijkste zin die dit document over zichzelf kan zeggen.
 
-**Wat de vloer nog niet kan.** Het scherm staat er (punt 7 hierboven), maar twee
-dingen zijn bewust niet gebouwd en horen genoemd te worden. Een aanbod kan nu
-alleen worden aanvaard of ingetrokken — **weigeren kan niet**: wie een wijk
-aangeboden krijgt en hem niet wil, laat hem staan en de aanbieder trekt hem in.
-Dat werkt, maar het legt de handeling bij de verkeerde persoon. En een overdracht
-draagt de **hele** wijk over; een halve wijk — drie van de acht tafels — kan
-alleen door hem opnieuw in te delen, en dat is manager-werk. Beide zijn een eigen
-snede: weigeren vraagt een vierde stand in de overdracht, half overdragen vraagt
-een tweede soort overdracht.
+**Wat de vloer nog niet kan.** De twee dingen die hier op 24 augustus 2026
+stonden — weigeren, en een halve wijk overdragen — zijn allebei af (punt 7
+hierboven). Wat er nu nog ligt is kleiner en van een andere soort: een leen kent
+**geen einde van de dienst**. Wie een tafel geleend heeft en naar huis gaat
+zonder hem terug te geven, laat hem op zijn naam staan; hij staat wel zichtbaar
+in *tafels die uitstaan* en een manager geeft hem in één druk terug, maar niemand
+wordt eraan herinnerd. Dat vraagt een begrip dat hier nog nergens bestaat — het
+einde van een dienst — en dat is een eigen snede, geen restje van deze.
 
 ## De echte wauw
 

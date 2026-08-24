@@ -42,7 +42,7 @@ const MAX = 2000;
    voor heeft; hij hoort te krimpen naarmate er wel metingen bij komen. */
 const NOOIT_VASTGESTELD = [
   { wat: 'resultaat gereconcilieerd', reden: 'Er is geen verzoening tussen wat er gevraagd werd en wat er in de opslag terechtkwam. Deze bon zegt dat de handeling is uitgevoerd, niet dat het resultaat is nagerekend.' },
-  { wat: 'de bevoegdheidsketen boven de aanroeper', reden: 'Wij zien de poort die deze aanroep doorliet, niet wie die persoon zijn recht heeft gegeven en op grond waarvan. Dat is laag 4 van VERTROUWEN.md en die bestaat nog niet.' }
+  { wat: 'de bevoegdheidsketen boven de aanroeper', reden: 'Wij zien de poort die deze aanroep doorliet, niet wie die persoon zijn recht heeft gegeven en op grond waarvan. Laag 4 controleert wel dat bevoegdheid niet GROEIT (kern/vertrouwen/insluiting.js, over de werkwoordentabel), maar dat is iets anders dan de keten omhoog kunnen laten zien.' }
 ];
 
 /* Een bewering met zijn bron, of niets. Ontbreekt de meting, dan komt de

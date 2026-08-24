@@ -99,7 +99,8 @@ const SOORTEN = [
        niet. Wie hier een soort bijzet met `minstens`, zegt: het aantal doet er
        niet toe, dit is altijd al erg. */
     minstens: 'uitzonderlijk',
-    waaromMinstens: 'Vernietigen is onherstelbaar, en dat geldt al bij de eerste.'
+    waaromMinstens: 'Vernietigen is onherstelbaar, en dat geldt al bij de eerste.',
+    poort: 'POST /api/techniek/tenant/vernietig'
   }
 ];
 
@@ -107,6 +108,15 @@ const SOORTEN = [
    berekende zwaarte. Staat hier en niet in de meter: het is een eigenschap van
    de schaal en niet van de berekening. */
 const BANDEN = ['licht', 'zwaar', 'uitzonderlijk'];
+
+/* WELKE SOORT HEEFT EEN POORT, en welke niet. `poort` noemt de deur die de
+   handeling werkelijk tegenhoudt; ontbreekt hij, dan wordt deze soort wel
+   GEMETEN maar niet TEGENGEHOUDEN. Dat verschil hoort zichtbaar te zijn en niet
+   te verdwijnen in een groen vinkje: de Trust State telt de kritieke soorten
+   zonder poort, en dat getal hoort naar nul.
+
+   Voor de meeste soorten hierboven staat er dus niets, en dat is de waarheid
+   van vandaag en geen vergetelheid. */
 
 /* Wat deze meter NIET meeweegt, met naam. Dezelfde regel als `nietGerekend` in
    bedrijf/gevolg.js: een meting die zwijgt over haar randen leest als een

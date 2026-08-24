@@ -49,6 +49,12 @@ const MAX_BONNEN = 5000;
 const { HANDELINGEN } = require('./handeling-lijst');
 
 module.exports = (sctx) => {
+  /* BEVOEGDHEID GROEIT NOOIT (VERTROUWEN.md laag 4): loopt het gedeclareerde
+     recht uit de pas met wat een werkwoord RAAKT, dan controleert de
+     rechtencontrole hieronder keurig het verkeerde recht. Constante tabel, dus
+     bij het opstarten -- en hij gooit. Zie kern/vertrouwen/insluiting.js. */
+  require('../kern/vertrouwen/insluiting').eisTabel(HANDELINGEN);
+
   const { app, save, schoon, nu, rid, crypto, werkPoort, eigenVeld } = sctx;
 
   const P = (w) => { if (!w.handelplannen) w.handelplannen = {}; return w.handelplannen; };

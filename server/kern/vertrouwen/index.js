@@ -29,6 +29,8 @@ const verificatie = require('./verificatie');
 const stapop = require('./stapop');
 const tweedemoment = require('./tweedemoment');
 const bon = require('./bon');
+const bereik = require('./bereik');
+const staat = require('./staat');
 
 module.exports = ({ db, save }) => {
   /* De bak hangt buiten de werkruimtes, en dat is een besluit: een gewoonte is
@@ -83,6 +85,12 @@ module.exports = ({ db, save }) => {
     const ver = sessie ? verificatieVan(sessie) : null;
     const st = stapop.beoordeel(b, ver);
     b.stapop = st;
+    /* EEN ONGEWOGEN HANDELING IS GEEN STILTE MAAR EEN GETAL. stapop.js laat hem
+       door -- anders vraagt het systeem bij elke onbekende handeling -- maar de
+       Trust State telt hem, en dat getal hoort naar nul door soorten in het
+       register te zetten. Zonder deze teller zou de onzekerheid nergens meer
+       opduiken zodra het verzoek voorbij is. */
+    if (st.onzeker) { const k = bak(); k.ongewogen = (Number(k.ongewogen) || 0) + 1; save(); }
     if (!st.nodig) return { door: true, blootstelling: b, verificatie: ver };
     if (!st.mogelijk) return { door: false, status: 403,
       antwoord: { error: st.zin, waarom: st.waarom, blootstelling: b } };
@@ -118,6 +126,10 @@ module.exports = ({ db, save }) => {
       stapop: u.blootstelling && u.blootstelling.stapop, bevestigd: !!u.bevestigd }, extra || {}));
   }
   const bonnen = (hoeveel) => bon.lees(bak(), hoeveel);
+  /* Laag 6, 7 en 8. Ze LEZEN alleen; er staat geen save() achter. */
+  const bereikVan = (actor, opties) => bereik.van(db.data, actor, opties && opties.rechtenVan);
+  const simuleer = (actor, opties) => bereik.simuleer(db.data, actor, opties || {});
+  const trustState = (handelingen) => staat.staat(bak(), handelingen);
   const bonnenKlopt = () => bon.controleer(bak());
 
   /* De bon oplossen. De aanroeper (routes/vertrouwen.js) heeft de mens al
@@ -140,6 +152,6 @@ module.exports = ({ db, save }) => {
   }
 
   return { weeg, weegCatalogus, voltooid, vergeet, verifieer, verificatieVan, geenPersoon, poort, losBon,
-    schrijfBon, bonNaPoort, bonnen, bonnenKlopt,
+    schrijfBon, bonNaPoort, bonnen, bonnenKlopt, bereikVan, simuleer, trustState,
     register, NIET_GEDEKT: gewoonte.NIET_GEDEKT };
 };

@@ -6147,6 +6147,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "vertrouwenbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vertrouwen/insluiting.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "vertrouwenblootstelling.test.js": {
       "soort": "puur",
       "staat": "gezakt",

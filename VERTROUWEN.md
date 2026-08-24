@@ -74,12 +74,23 @@ Staat: achttien rechten als werkwoorden en veertien rollen met een van/tot-venst
 identiteitsprovider (`server/kern/tenant/brug.js`), de reden-verplichte inzage
 (`REDEN_NODIG`), het inzagejournaal (`server/inzagelog.js`).
 
-Ontbreekt: **bevoegdheid wordt nergens formeel begrensd bij doorgifte.** Dat een
-gedelegeerde nooit meer mag dan zijn delegator, dat een AI-agent nooit meer mag
-dan wie hem stuurt, en dat een dienst die een andere dienst aanroept onderweg
-geen recht kan winnen, is waar in de code maar nergens *afgedwongen als
-eigenschap*. Zolang niets dat controleert, is een amplificatiepad een bug die
-niemand ziet aankomen.
+Sinds laag 4 (`server/kern/vertrouwen/insluiting.js`) wordt op EEN plek
+afgedwongen dat bevoegdheid niet groeit, en dat is de plek waar het in dit huis
+werkelijk kan sneuvelen: de werkwoordentabel van de commandobalk. Elk werkwoord
+noemt een recht en zegt welke soorten het aanraakt; lopen die twee uit elkaar,
+dan controleert de rechtencontrole keurig het VERKEERDE recht. De controle
+draait bij het opstarten en gooit -- een server die met een amplificatiepad
+start is erger dan een server die niet start.
+
+Waarom alleen daar: rollen uitdelen kan enkel met het beheer-token, en dat
+heeft alle rechten, dus een kind kan zijn ouder niet overtreffen. De
+identiteitsbrug wijst alleen naar rollen die al bestaan.
+
+Ontbreekt nog: dit controleert de TABEL en niet de UITVOERDER. Een werkwoord
+dat het juiste recht noemt en in zijn uitvoering iets anders aanraakt dan
+`raakt()` zegt, komt hier niet uit -- daarvoor is statische analyse van de code
+nodig en geen tabelvergelijk. En de keten OMHOOG (wie gaf deze persoon zijn
+recht, en op grond waarvan) is niet te tonen; dat staat zo in elke bon.
 
 ### 2.3 Raakt — Exposure Fabric
 
@@ -107,10 +118,19 @@ Staat: de WAF en de DDoS-rem (`server/kern/schild.js`), de drie remmen
 aanhoudende brute force (`server/beveiliging.js`), de tenantgrens
 (`server/kern/tenant/register.js`).
 
-Ontbreekt: **de blast radius bestaat nergens als berekend ding.** Een beheerder
-ziet rechten, geen bereik. "Wat kan een aanvaller met dit account maximaal
-raken" is vandaag een vraag die een mens met de hand uitrekent, en dus niet
-uitrekent.
+Sinds laag 6 en 7 (`server/kern/vertrouwen/bereik.js`) is het bereik BEREKEND:
+per actor de werkruimtes waar hij vandaag een geldige rol heeft, de rechten die
+daaruit volgen, en per handelingssoort hoe groot hij mag worden voordat de
+poort hem tegenhoudt. Dat laatste getal komt uit dezelfde meter als de poort --
+niet uit een tweede berekening -- en verschuift dus mee met de gewoonte van die
+actor. `simuleer()` stelt dezelfde graaf de omgekeerde vraag: wat kan iemand
+die deze sessie heeft, en vooral wat kan hij NIET.
+
+En het antwoord van vandaag is ongemakkelijk, dus het staat er: er zijn
+catastrofale paden. Een uitvoer tot duizend objecten en een gevoelige inzage
+tot twaalf personen zijn allebei onomkeerbaar en gaan ongehinderd door, omdat
+er voor die soorten nog geen poort is. Dat getal hoort naar nul door poorten te
+bouwen, niet door de meter bij te stellen.
 
 ### 2.5 Terug — Recovery Fabric
 
@@ -319,8 +339,11 @@ levert het gegeven waar de volgende op staat.
 | 7 | **Simuleer compromittering** — het wauw-moment | het antwoord op "en als" | 8 |
 | 8 | **Trust HUD / Trust State** — uitsluitend uit de bewijspoort | wat de klant ziet | — |
 
-**Stand op 24 augustus 2026.** Laag 1, 2 en 3 staan, zijn aangesloten, en
-worden op een plek ook AFGEDWONGEN.
+**Stand op 24 augustus 2026.** Laag 1 tot en met 8 staan. Wat dat WEL en NIET
+betekent, per laag, staat hieronder -- en de eerlijkste zin van allemaal is dat
+de poorten er maar op een handeling zijn.
+
+Laag 1, 2 en 3 zijn aangesloten en worden op een plek ook AFGEDWONGEN.
 
 De tenantuitvoer draagt haar eigen omvang en het oordeel mee (meten, niet
 tegenhouden -- daar staat geen mens achter de sleutel). De wachtwoordinlog legt
@@ -333,6 +356,16 @@ Wat er NIET is: de poort hangt aan een handeling en niet aan alle. Zolang dat
 zo is, is de juiste zin "dit huis dwingt step-up af bij het vernietigen van een
 tenant" -- en niet "dit huis heeft step-up". De volgende deuren zijn een keuze
 per handeling, en elke keuze hoort in het register te staan.
+
+**Laag 4 tot en met 8.** De insluitingscontrole draait bij het opstarten en
+gooit. Het bereik en de simulatie zijn berekend uit dezelfde meter als de
+poort, en dragen `nietGemodelleerd` mee. De Trust State telt vijf absolute
+eigenschappen -- en drie ervan staan vandaag NIET op nul, want vijf van de zes
+handelingssoorten worden wel gemeten en niet tegengehouden. Dat getal hoort
+naar nul door poorten te bouwen, niet door de meter bij te stellen. De deuren
+staan in `server/routes/techniek/vertrouwen.js`, achter de eigenaar: een blast
+radius is een kaart van de zwakke plekken, en dat is precies wat een aanvaller
+wil weten.
 
 **Twee doorlaten, en het verschil is de ontwerpkeuze.** Een ZWARE handeling
 wordt vanzelf doorgelaten zodra de sessie weer vers en hard is geverifieerd --

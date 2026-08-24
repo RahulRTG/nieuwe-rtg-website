@@ -121,12 +121,6 @@ module.exports = (tctx) => {
     res.json({ ok: true });
   });
 
-  /* De bonnen teruglezen, met de ketencontrole. Staat hier omdat de enige poort
-     die bonnen schrijft de vernietiging is; bij een tweede verhuist hij mee. */
-  app.post('/api/techniek/vertrouwen/bonnen', techAuth, eigenaarAlleen, (req, res) => {
-    res.json({ bonnen: kern.vertrouwen.bonnen((req.body || {}).hoeveel), keten: kern.vertrouwen.bonnenKlopt() });
-  });
-
   app.post('/api/techniek/tenant/vernietig', techAuth, eigenaarAlleen, (req, res) => {
     const b = req.body || {};
     const door = b.door || wie(req);

@@ -45,8 +45,7 @@ module.exports = (kern) => {
     const auth = req.get('authorization') || '';
     const token = auth.replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
     const user = token ? accounts.verifyToken(token) : null;
-    /* Het GEVERIFIEERDE token gaat mee: de Trust Fabric wil een sleutel per
-       sessie, en een route mag de kop niet zelf lezen (LAT.md regel 8). */
+    /* Het GEVERIFIEERDE token gaat mee (LAT.md regel 8). */
     if (user) req.techSessie = token;
     return user;
   }
@@ -174,6 +173,7 @@ module.exports = (kern) => {
      eronder. Naast de SSO-koppelingen en achter dezelfde poort -- het is
      dezelfde grens, van de andere kant bekeken. */
   require('./techniek/tenant')(tctx);
+  require('./techniek/vertrouwen')(tctx);
   /* De toestandsvingerafdruk: per collectie een aantal en een gezouten hash,
      nooit inhoud. Draagt de vier matrixkolommen die over de TOESTAND gaan. */
   require('./techniek/vingerafdruk')(tctx);

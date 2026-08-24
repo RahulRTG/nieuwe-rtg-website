@@ -28,7 +28,16 @@
   stijl.textContent =
     '#rtg-cookie{position:fixed;left:50%;bottom:max(0.6rem,env(safe-area-inset-bottom));transform:translateX(-50%);' +
       'z-index:9999;width:max-content;max-width:min(92vw,34rem);display:flex;align-items:baseline;justify-content:center;' +
-      'gap:0.5rem;flex-wrap:wrap;background:none;border:0;box-shadow:none;padding:0.3rem 0.6rem;' +
+      /* EEN EIGEN VLAK, en dat is een besluit van 24 augustus 2026. Hier stond
+         background:none, en daardoor was haar grond onvoorspelbaar: op salon en
+         sociaal ligt er een lichte balk achter een bijna zwarte pagina, en geen
+         enkele inktkleur haalt beide. Vier meetpogingen liepen daarop stuk. Een
+         mededeling die de wet vraagt, hoort niet af te hangen van wat er
+         toevallig achter ligt. Het vlak is dekkend en volgt het materiaal (zie
+         kiesInkt in deel 02); een dunne bovenlijn geeft hem zijn rand, en verder
+         niets -- geen hoek, geen schaduw, geen knopvorm om de twee woorden. */
+      'gap:0.5rem;flex-wrap:wrap;border:0;border-top:1px solid var(--rtg-cookie-lijn);' +
+      'background:var(--rtg-cookie-vlak);box-shadow:none;padding:0.55rem 0.9rem;' +
       'font-family:var(--rtg-interface,Inter,system-ui,sans-serif);font-size:0.7rem;line-height:1.4;' +
       'letter-spacing:0.01em;text-align:center;}' +
     /* DE MELDING DRAAGT background:none EN ERFT DUS DE PAGINAGROND, en daarom

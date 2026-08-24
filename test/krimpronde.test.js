@@ -211,11 +211,22 @@ test('per collectie staat erbij of er een KAP op zit, en dat is gescand', () => 
   const meld = (collectie) => '2026-08-24T00:00:00.000Z WARN  begroting: zou zijn geweigerd ' +
     '{"id":"x","p":"/api/proef","collectie":"' + collectie + '","rijen":9,"grens":1}';
 
-  const met = draai([teken, meld('clipsMeldingen')].join('\n') + '\n');
-  assert.equal(met.code, 0, met.uit);
-  assert.match(met.uit, /KAP\s+server\/kern\/clips\.js/,
-    'de kap op clipsMeldingen wordt niet gevonden -- dan staat de gevaarlijkste soort ' +
-    'collectie zonder waarschuwing in de catalogus');
+  /* clipsMeldingen is VERHUISD naar het onderhoud (kern/kappen.js), dus hij
+     hoort als ongevaarlijk gemeld te worden -- en niet meer als kap in het
+     verzoek. */
+  const onderhoud = draai([teken, meld('clipsMeldingen')].join('\n') + '\n');
+  assert.equal(onderhoud.code, 0, onderhoud.uit);
+  assert.match(onderhoud.uit, /kap \(onderhoud\)/,
+    'de kap op clipsMeldingen wordt niet meer gevonden sinds hij in kern/kappen.js staat');
+  assert.doesNotMatch(onderhoud.uit, /KAP IN VERZOEK/,
+    'een kap die in het onderhoud draait, hoort niet als kap in het verzoek te gelden');
+
+  /* EN EEN DIE ER NOG WEL IN ZIT. Dit is de gevaarlijke soort en die hoort er
+     luid uit te komen -- gemeenteMeldingen kapt nog in zijn eigen schrijfpad. */
+  const inVerzoek = draai([teken, meld('gemeenteMeldingen')].join('\n') + '\n');
+  assert.equal(inVerzoek.code, 0, inVerzoek.uit);
+  assert.match(inVerzoek.uit, /KAP IN VERZOEK\s+server\/kern\/gemeente/,
+    'een kap die nog in een schrijfroute staat, wordt niet meer gevonden');
 
   /* DE TEGENPROEF. Zonder haar zou "KAP" overal kunnen staan en zou de eerste
      bewering ook groen zijn als de scan altijd ja zegt. */

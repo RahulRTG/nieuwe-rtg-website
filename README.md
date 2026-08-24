@@ -1021,13 +1021,22 @@ in stand**: de collectie blijft te groot, dus het volgende verzoek wordt opnieuw
 geweigerd. Drie van de negentien hebben er een: `clipsMeldingen`, `snaps`,
 `stories`.
 
-Dat is de eerste van de twee vragen die een grens per collectie mogelijk maken.
-De tweede — *begrenst de vorm van de route hoeveel er weg kan?* — staat niet in
-de code en is dus een leesbesluit. Voor de meeste is het antwoord ja (een clip,
-een video, een zetel: één rij per handeling). Voor `/api/privacy/delete` is het
-**nee**, en dat is het belangrijkste geval: dat haalt alles van één lid weg, en
-dat kan legitiem honderden rijen zijn. Een grens daarop breekt het recht om
-vergeten te worden. Zie TAKEN.md 4.62.
+Dat wás de eerste van de twee vragen die een grens per collectie mogelijk maken, en
+allebei zijn ze nu beantwoord.
+
+**(a) De kappen zijn verhuisd.** `server/kern/kappen.js` past ze toe in de
+onderhoudsronde, buiten elk verzoek — een verhuizing en geen uitzondering, want
+afkappen is huishouden en geen handeling van een lid. **(b) De vorm van de
+route** begrenst voor bijna alles hoeveel er weg kan (een clip, een video, een
+zetel: één rij per handeling) — behalve voor de zes collecties van het
+vergeetpad, waar één handeling alles van één lid weghaalt.
+
+Het besluit staat in **`BEGROTING.json`**: grens 100 waar de routevorm het
+aantal begrenst, `handhaaf: false` met een reden voor `contacts`, `posts`,
+`snaps`, `spelUitslagen`, `stories` en `vakbewijzen`, en de noodrem van 1000
+voor alles waarover niets is gemeten. Die uitzonderingslijst ligt tegen de bron
+aan: `test/begrotingsgrenzen.test.js` leest `server/kern/vergeten/` en zakt
+zodra de twee uiteenlopen.
 
 **En de suite-stand staat er per ronde bij.** Deze ronde was rood op twee
 toetsen (`test/vloot.test.js`), dus de ronde eindigt met uitgang 3 en de

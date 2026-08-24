@@ -135,6 +135,16 @@ const KAP = /db\.data\.([A-Za-z0-9_]+)\s*=\s*[^;\n]*\.slice\(/g;
 function kappen() {
   const wortel = path.join(WORTEL, 'server');
   const uit = new Map();
+  /* Eerst de kappen die naar het ONDERHOUD zijn verhuisd. Die staan in
+     server/kern/kappen.js met de collectienaam in een variabele, dus de scan
+     hieronder ziet ze niet -- en dat verschil is precies wat telt: een kap in
+     het onderhoud draait buiten elk verzoek en is ongevaarlijk, een kap in een
+     schrijfroute is het geval waarop een grens zichzelf vastdraait. */
+  try {
+    for (const k of require(path.join(WORTEL, 'server', 'kern', 'kappen')).KAPPEN) {
+      uit.set(k.collectie, { onderhoud: true, verzoek: [] });
+    }
+  } catch (e) { /* module weg of stuk: dan alleen de scan hieronder */ }
   (function loop(d) {
     let namen;
     try { namen = fs.readdirSync(d); } catch (e) { return; }
@@ -147,9 +157,9 @@ function kappen() {
       const bron = fs.readFileSync(p, 'utf8');
       for (const m of bron.matchAll(KAP)) {
         const waar = path.relative(WORTEL, p).replace(/\\/g, '/');
-        if (!uit.has(m[1])) uit.set(m[1], []);
-        const lijst = uit.get(m[1]);
-        if (!lijst.includes(waar)) lijst.push(waar);
+        if (!uit.has(m[1])) uit.set(m[1], { onderhoud: false, verzoek: [] });
+        const c = uit.get(m[1]);
+        if (!c.verzoek.includes(waar)) c.verzoek.push(waar);
       }
     }
   })(wortel);
@@ -206,7 +216,7 @@ function ontleed(tekst) {
       gemiddeld: Math.round(c.totaal / c.keer),
       /* De eerste van de twee vragen die een grens per collectie mogelijk maken;
          zie de kop bij kappen(). Leeg betekent: geen kap gevonden. */
-      kap: kap.get(c.collectie) || [],
+      kap: kap.get(c.collectie) || { onderhoud: false, verzoek: [] },
       paden: [...c.paden.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5)
         .map(([pad, rijen]) => ({ pad, rijen })) }))
     .sort((a, b) => b.grootste - a.grootste);
@@ -269,7 +279,11 @@ if (!uit.collecties.length) {
   for (const c of uit.collecties) {
     console.log('  ' + String(c.grootste).padStart(7) + String(c.keer).padStart(6) + '  ' + c.collectie);
     for (const p of c.paden) console.log('                 ' + String(p.rijen).padStart(6) + '  ' + p.pad);
-    if (c.kap && c.kap.length) console.log('                    KAP  ' + c.kap.slice(0, 2).join(', '));
+    if (c.kap && c.kap.verzoek.length) {
+      console.log('       KAP IN VERZOEK  ' + c.kap.verzoek.slice(0, 2).join(', '));
+    } else if (c.kap && c.kap.onderhoud) {
+      console.log('        kap (onderhoud)');
+    }
   }
   console.log();
 }

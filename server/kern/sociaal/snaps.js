@@ -76,8 +76,8 @@ async function snapSturen(van, naar, foto, tekst) {
   if (!ref) return { status: 400, error: 'De foto kon niet worden opgeslagen.' };
   const snap = { id: crypto.randomBytes(5).toString('hex'), van, naar, foto: ref, tekst: String(tekst || '').replace(/[<>]/g, '').slice(0, 120), at: new Date().toISOString(), bekeken: false };
   db.data.snaps.push(snap);
-  // over de bovengrens? de oudste (weggeknipte) snaps ook van schijf halen
-  if (db.data.snaps.length > 2000) { db.data.snaps.slice(0, db.data.snaps.length - 2000).forEach(wisFoto); db.data.snaps = db.data.snaps.slice(-2000); }
+  // de bovengrens (en het opruimen van de bestanden eronder) staat in
+  // kern/kappen.js en draait in de onderhoudsronde, buiten dit verzoek
   save();
   sseToCustomer(naar, 'social', { kind: 'snap', from: codenaamVan(van) });
   return { status: 200, ok: true };
@@ -108,7 +108,7 @@ async function verhaalPlaatsen(van, foto, tekst, metOpdracht) {
   // meedoen met de dag-opdracht: het verhaal draagt de opdracht van vandaag als badge
   const opdracht = metOpdracht === true ? dagOpdracht() : null;
   db.data.stories.push({ id: crypto.randomBytes(5).toString('hex'), van, foto: ref, tekst: String(tekst || '').slice(0, 120), at: new Date().toISOString(), kijkers: [], opdracht: opdracht ? opdracht.emoji + ' ' + opdracht.tekst : null });
-  if (db.data.stories.length > 1000) { db.data.stories.slice(0, db.data.stories.length - 1000).forEach(wisFoto); db.data.stories = db.data.stories.slice(-1000); }
+  // bovengrens: zie kern/kappen.js (onderhoudsronde)
   save();
   return { status: 200, ok: true };
 }

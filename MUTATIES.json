@@ -450,6 +450,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "begrotingsgrenzen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/begrotingsgrenzen.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "belasting-groothandels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2205,6 +2213,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 10,
       "scherp": "gezakt"
+    },
+    "kappen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kappen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "kassa-modus.test.js": {
       "soort": "server",

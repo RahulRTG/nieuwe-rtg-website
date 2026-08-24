@@ -2065,7 +2065,10 @@ const { server, backupData } = require('./opzet/start')({
   log, db, accounts, save, eigenaar, webpush, kern,
   checkpointSqlite, checkpointGrootboek,
   initRealtime, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten,
-  DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer
+  DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer,
+  // voor de kappen in de onderhoudsronde: een weggeknipte snap heeft ook een
+  // bestand op schijf (zie kern/kappen.js)
+  media
 });
 
 /* Naar buiten toe is dit een startscript, geen module: niets require't

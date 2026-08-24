@@ -38,15 +38,10 @@
    Proxy, 294 ms met -- 0,02 microseconde per lees, 59 nanoseconde per schrijf.
    Op een p50 van 13 ms is dat niet te zien.
 
-   EN DE BELANGRIJKSTE KEUZE: HIJ STAAT STANDAARD OP MELDEN.
-
-   Een weigering die vandaag aangaat over 3706 routes is het soort wijziging
-   waarvan je pas in productie merkt wat er stuk ging. Er zijn LEGITIEME grote
-   krimpen -- de bewaarveger, het archiveren, de kappen als `slice(0, 60000)`.
-   KRIMP.json is de catalogus daarvan, en scripts/krimpronde.js zegt erbij wat
-   hij NIET dekt. Met RTG_BEGROTING=weigeren gaat de tand erin. Meten, ratelen,
-   dan handhaven: het mechanisme staat er, getoetst en bewezen weigerend, met de
-   trekker nog niet overgehaald.
+   EN DE BELANGRIJKSTE KEUZE: HIJ STAAT STANDAARD OP MELDEN. Meten, ratelen, dan
+   handhaven; met RTG_BEGROTING=weigeren gaat de tand erin. Wat er gemeten is
+   staat in KRIMP.json, wat er per collectie besloten is in BEGROTING.json --
+   inclusief waar een grens NIET mag staan, en waarom.
 
    BUITEN EEN VERZOEK GEBEURT ER NIETS. Een cronjob, de veger, een migratie en de
    seed hebben geen handelingscontext en horen nooit geweigerd te worden: dat is
@@ -56,15 +51,17 @@
 
 const handeling = require('./handeling');
 
-/* De grens: hoeveel rijen mag EEN hervulling in EEN verzoek wegnemen. Bewust een
-   getal en geen tabel per actor: zo'n tabel zou verzonnen zijn, en een verzonnen
-   risicoklasse is gevaarlijker dan geen. Welke actor een eigen grens nodig
-   heeft, moet uit de meting komen. */
+/* De grens. Hier stond dat een tabel per collectie verzonnen zou zijn en uit de
+   meting moest komen; dat is precies wat er gebeurde. KRIMP.json meet,
+   BEGROTING.json besluit, ./begrotingsgrenzen.js leest. Hier blijft de
+   STANDAARD -- de noodrem voor alles waarover niets besloten is. */
 const STANDAARDGRENS = 1000;
-const KRIMPGRENS = (() => {
+const grenzen = require('./begrotingsgrenzen');
+const GRENS_OMGEVING = (() => {
   const n = Number(process.env.RTG_BEGROTING_KRIMP);
-  return Number.isFinite(n) && n > 0 ? n : STANDAARDGRENS;
+  return Number.isFinite(n) && n > 0 ? n : null;
 })();
+const KRIMPGRENS = GRENS_OMGEVING != null ? GRENS_OMGEVING : STANDAARDGRENS;
 
 const MODUS = process.env.RTG_BEGROTING === 'weigeren' ? 'weigeren' : 'melden';
 
@@ -112,7 +109,11 @@ class BegrotingOverschreden extends Error {
    en is wat een toets ijkt hetzelfde als wat er echt gebeurt (LAT.md regel 10). */
 function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
   const o = opties || {};
-  const grens = Number.isFinite(o.grens) ? o.grens : KRIMPGRENS;
+  /* Rangorde: een expliciete grens wint van een meetronde, en die van het
+     register -- anders meet een ronde op een halve rij niets meer zodra er een
+     tabel bestaat. */
+  const grens = Number.isFinite(o.grens) ? o.grens
+    : (GRENS_OMGEVING != null ? GRENS_OMGEVING : grenzen.grensVoor(collectie));
   const modus = o.modus || MODUS;
   const krimp = oudeLengte - nieuweLengte;
   if (!(krimp > 0)) return { oordeel: 'door', krimp: krimp };
@@ -121,7 +122,12 @@ function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
   teller.overschreden++;
   const rij = { collectie, krimp, grens, modus, pad: o.pad || null, correlatie: o.correlatie || null };
   onthoud(rij);
-  if (modus === 'weigeren') { teller.geweigerd++; return { oordeel: 'weiger', krimp, grens, rij }; }
+  /* WEIGEREN IS NIET OVERAL VEILIG: de zes collecties van het vergeetpad melden
+     ook in de weigerstand, want daar haalt een handeling alles van een lid weg
+     en is de omvang per ontwerp onbegrensd. Zie BEGROTING.json. */
+  if (modus === 'weigeren' && grenzen.handhaaft(collectie)) {
+    teller.geweigerd++; return { oordeel: 'weiger', krimp, grens, rij };
+  }
   return { oordeel: 'meld', krimp, grens, rij };
 }
 

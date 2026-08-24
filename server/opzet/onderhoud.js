@@ -51,12 +51,19 @@ function ruimRemmen(fails, nu, stilteMs) {
 
 /* De hele ronde in een aanroep. Elk onderdeel is los weg te laten, zodat een
    toets er een kan bekijken zonder de andere twee op te tuigen. */
-function onderhoudsronde({ loginFails, pinSlot, ruimBuffer, nu } = {}) {
+function onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen, nu } = {}) {
   const tijd = nu || Date.now();
-  const uit = { remmen: 0 };
+  const uit = { remmen: 0, gekapt: 0 };
   if (loginFails) uit.remmen = ruimRemmen(loginFails, tijd);
   if (pinSlot && typeof pinSlot.opruimen === 'function') pinSlot.opruimen();
   if (typeof ruimBuffer === 'function') ruimBuffer();
+  /* DE KAPPEN. Collecties met een bovengrens werden afgekapt in de schrijfroute
+     zelf; dat staat nu in kern/kappen.js en draait hier. De reden is niet
+     netheid maar de begroting: een kap die in een verzoek duizenden rijen wil
+     weghalen, botst op een grens die dat weigert -- en dan blijft de collectie
+     te groot en loopt het volgende verzoek tegen dezelfde weigering aan. Buiten
+     een verzoek bestaat dat probleem niet. Zie kern/kappen.js en KRIMP.json. */
+  if (kappen && typeof kappen.ronde === 'function') uit.gekapt = kappen.ronde().totaal;
   return uit;
 }
 

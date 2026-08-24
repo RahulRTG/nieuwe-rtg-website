@@ -330,8 +330,55 @@ function tabel() {
         return !!laag && /begroting'\)\.bewaak/.test(staat) && /onaangeroerd/.test(toets) &&
           /TEGENPROEF/.test(route);
       },
-      kanttekening: 'staat standaard op MELDEN; RTG_BEGROTING=weigeren zet de tand erin, ' +
-        'en dat kan pas als de catalogus van legitieme grote krimpen er is (KRIMP.json, TAKEN.md 4.62)'
+      kanttekening: 'staat standaard op MELDEN; met RTG_BEGROTING=weigeren bijten de grenzen uit ' +
+        'BEGROTING.json -- behalve de zes collecties van het vergeetpad, die daar uitgezonderd staan'
+    },
+    {
+      /* DE GRENS PER COLLECTIE, EN VOORAL WAAR HIJ NIET MAG STAAN. De laag kon
+         alleen een globaal getal; nu staat er per collectie een grens met de
+         reden ernaast. Het gevaarlijke deel zijn de UITZONDERINGEN: zes
+         collecties worden door het vergeetpad herschreven, waar een handeling
+         alles van een lid weghaalt. BEWAAKT betekent hier dat die lijst tegen de
+         BRON aan ligt -- komt er morgen een collectie bij in server/kern/
+         vergeten/, dan zakt de toets en niet de belofte. */
+      soort: 'grens per collectie (en waar er geen mag staan)',
+      bewaker: ['BEGROTING.json', 'server/opzet/begrotingsgrenzen.js', 'test/begrotingsgrenzen.test.js'],
+      wat: 'elke gemeten collectie heeft een grens met een reden; het vergeetpad is uitgezonderd',
+      dingen: () => {
+        try {
+          const r = JSON.parse(lees('BEGROTING.json'));
+          const namen = Object.keys(r.collecties || {});
+          return namen.map(n => n + (r.collecties[n].handhaaf === false ? ' (uitgezonderd)' : ': ' + r.collecties[n].grens));
+        } catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const laag = lees('server/opzet/begroting.js');
+        const leest = lees('server/opzet/begrotingsgrenzen.js');
+        return bestaat('BEGROTING.json') && /grenzen\.handhaaft\(collectie\)/.test(laag) &&
+          /grenzen\.grensVoor\(collectie\)/.test(laag) && /handhaaf === false/.test(leest) &&
+          bestaat('test/begrotingsgrenzen.test.js');
+      },
+      kanttekening: 'een collectie die de meting niet heeft gezien staat er NIET in en valt op de ' +
+        'standaardgrens van 1000 -- dat is een noodrem en geen fijnregeling'
+    },
+    {
+      /* AFKAPPEN IS HUISHOUDEN. Een kap in een schrijfroute kan in een keer
+         duizenden rijen willen weghalen; een grens die dat weigert, houdt
+         zichzelf in stand. De drie die KRIMP.json aanwees, draaien nu in de
+         onderhoudsronde. */
+      soort: 'kappen (bovengrenzen, buiten het verzoek)',
+      bewaker: ['server/kern/kappen.js', 'test/kappen.test.js'],
+      wat: 'de bovengrens van een collectie wordt in de onderhoudsronde toegepast, niet in de route',
+      dingen: () => {
+        try { return require('../server/kern/kappen').KAPPEN.map(k => k.collectie + ': ' + k.houd); }
+        catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const ronde = lees('server/opzet/onderhoud.js');
+        return /kappen\.ronde\(\)/.test(ronde) && bestaat('test/kappen.test.js');
+      },
+      kanttekening: 'dit zijn de drie kappen die KRIMP.json aanwees, niet alle kappen van dit huis ' +
+        '(een scan telt er ruim zestig); de rest staat nog in zijn eigen schrijfpad'
     },
     {
       /* DE CATALOGUS, EN VOORAL: HET BEWIJS DAT ER GEMETEN IS. De ronde draait

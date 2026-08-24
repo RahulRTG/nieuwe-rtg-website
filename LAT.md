@@ -367,6 +367,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | wat een verzoek werkelijk verandert (rijen per collectie, voor en na) | `server/opzet/handeling.js` + `test/handeling.test.js` |
 | een massaverwijdering tegengehouden VOORDAT hij landt (standaard: melden) | `server/opzet/begroting.js` + `server/db/state.js` |
 | die laag ook echt geraakt vanaf een ECHTE route (bewezen weigerend is niet bewezen bereikbaar) | `test/begrotingroute.test.js` |
+| de grens per collectie, en waar er geen mag staan (het vergeetpad) | `BEGROTING.json` + `server/opzet/begrotingsgrenzen.js` |
+| een bovengrens draait in het onderhoud en niet in een schrijfroute | `server/kern/kappen.js` + `test/kappen.test.js` |
 | welke grote krimpen de toetsen echt uitlokken -- met bewijs dat de val aanstond | `KRIMP.json` + `scripts/krimpronde.js` + `test/krimpronde.test.js` |
 | een bronmuterende toets draait alleen, niet naast een server die diezelfde bron leest | `scripts/lib/geisoleerd.js` + `test/bronmutanten.test.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |

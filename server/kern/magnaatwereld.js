@@ -214,8 +214,28 @@ module.exports = ({
     functies, volledigeWerkprocessen: KANTOORWERKPROCESSEN,
     werkrouteFabriek: werkrouteFabriek.bouw
   });
-  let capabilityGraph = capabilityScanner.scan();
-  let alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
+  /* DE CAPABILITY-GRAAF WORDT PAS GEBOUWD ALS IEMAND ERNAAR VRAAGT.
+
+     Hier stond `capabilityScanner.scan()` kaal op moduleniveau, dus bij ELKE
+     serverstart. Uit de kas komt hij nog steeds -- niemand scant de boom
+     opnieuw -- maar het UITPAKKEN van die kas is het dure deel: het is een
+     JSON-blob van rond de twaalf megabyte, en een CPU-profiel van een boot wees
+     450 van de 1828 milliseconde aan bij vanTekst() van deze ene kas.
+
+     Van de ruim negenhonderd toetsbestanden raakt bijna geen enkele de
+     magnaatwereld aan. Die betaalden alle 450 ms voor een graaf die ze nooit
+     lezen. Nu betaalt alleen wie hem vraagt -- en die zou hem toch al hebben
+     betaald, alleen eerder.
+
+     Alle lezers zaten al IN een functie (getGraph is zelfs al een pijl), dus dit
+     is geen herschrijving maar een haakje ervoor. De verversing verderop wist
+     allebei de kassen; zou hij alleen de graaf wissen, dan bleven de
+     werkprocessen op de oude scan staan en dat is precies de stille soort fout. */
+  let capabilityGraph = null;
+  let werkprocessenKas = null;
+  const graaf = () => capabilityGraph || (capabilityGraph = capabilityScanner.scan());
+  const alleWerkprocessen = () => werkprocessenKas
+    || (werkprocessenKas = KANTOORWERKPROCESSEN.concat(graaf().automatischeWerkprocessen || []));
 
   function state() {
     if (!db.data.magnaatWereld || typeof db.data.magnaatWereld !== 'object') {
@@ -320,7 +340,7 @@ module.exports = ({
   }
 
   const controle = require('./magnaat-controle')({
-    wereldState: state, getGraph: () => capabilityGraph, save, crypto, nu
+    wereldState: state, getGraph: () => graaf(), save, crypto, nu
   });
 
   function lidControleContext(key) {
@@ -337,6 +357,7 @@ module.exports = ({
   }
 
   function publiekeCapabilityGraph() {
+    const capabilityGraph = graaf();
     return {
       versie: capabilityGraph.versie,
       gescand: capabilityGraph.gescand,
@@ -404,7 +425,7 @@ module.exports = ({
     const s = state();
     const vorig = s.capabilitySnapshot;
     capabilityGraph = capabilityScanner.scan();
-    alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
+    werkprocessenKas = null;                       // anders blijven de werkprocessen op de vorige scan staan
     const vorigeIds = new Set(vorig && Array.isArray(vorig.workflowIds) ? vorig.workflowIds : []);
     const toegevoegd = vorig ? capabilityGraph.workflows.filter(w => !vorigeIds.has(w.id)) : [];
     const kandidaten = (vorig ? toegevoegd : capabilityGraph.workflows.filter(w => !w.geregistreerd && w.actieAantal >= 2))
@@ -615,7 +636,7 @@ module.exports = ({
   }
 
   function kiesKantoor(key, kantoorId, rol) {
-    const kantoor = capabilityGraph.kantoren.find(k => k.id === tekst(kantoorId, 80));
+    const kantoor = graaf().kantoren.find(k => k.id === tekst(kantoorId, 80));
     if (!kantoor) return { status: 404, error: 'Deze RTG-werkruimte staat niet in de actuele codescan.' };
     const rollen = [kantoor.naam + '-medewerker', kantoor.naam + '-coördinator', 'Trainee'];
     rol = tekst(rol, 80) || rollen[0];
@@ -628,7 +649,7 @@ module.exports = ({
   }
 
   function werkprocesStart(key, workflowId, apparaat) {
-    const workflow = alleWerkprocessen.find(w => w.id === tekst(workflowId, 100));
+    const workflow = alleWerkprocessen().find(w => w.id === tekst(workflowId, 100));
     if (!workflow) return { status: 404, error: 'Dit volledige werkproces bestaat nog niet.' };
     if (!controle.beschikbaar('api', 'POST /api/member/magnaat/werkproces/start')) {
       return { status: 423, error: 'Volledige werkprocessen staan in de Magnaat-trainingsomgeving tijdelijk uit.' };
@@ -829,7 +850,7 @@ module.exports = ({
     if (!geforceerd && s.laatsteScan && nu() - s.laatsteScan < DAG) {
       const codeScan = {
         gewijzigd: false, toegevoegd: 0, voorstellen: 0,
-        cijfers: capabilityGraph.cijfers, gatenplan: null
+        cijfers: graaf().cijfers, gatenplan: null
       };
       return { ok: true, nieuw: codeScan.voorstellen, overgeslagen: true, codeScan, capabilityGraph: publiekeCapabilityGraph(), voorstellen: s.voorstellen.map(voorstelPubliek) };
     }
@@ -958,11 +979,11 @@ module.exports = ({
       cijfers: {
         rtgFuncties: alleFuncties.length,
         speelbaar: catalogus.length,
-        appsGevonden: capabilityGraph.cijfers.apps,
-        apiActies: capabilityGraph.cijfers.apiActies,
-        werkprocessen: capabilityGraph.cijfers.werkprocessen,
-        kantoren: capabilityGraph.cijfers.kantoren,
-        ongedekt: capabilityGraph.cijfers.ongedekteApiActies,
+        appsGevonden: graaf().cijfers.apps,
+        apiActies: graaf().cijfers.apiActies,
+        werkprocessen: graaf().cijfers.werkprocessen,
+        kantoren: graaf().cijfers.kantoren,
+        ongedekt: graaf().cijfers.ongedekteApiActies,
         spelers: spelers.length,
         opdrachtenVoltooid: afgerond,
         voorstellenOpen: s.voorstellen.filter(v => v.status === 'voorstel').length,
@@ -982,9 +1003,29 @@ module.exports = ({
     };
   }
 
-  // De eerste scan gebeurt vanzelf bij het starten van de applicatie. Dedupe op
-  // sleutel maakt dit herstartveilig en voorkomt telkens nieuwe voorstellen.
-  scan('Future Engine', !state().laatsteScan);
+  /* DE EERSTE SCAN GEBEURT VANZELF BIJ HET STARTEN -- en alleen de EERSTE.
+
+     Hier stond `scan('Future Engine', !state().laatsteScan)` onvoorwaardelijk.
+     Het tweede argument zegt "forceren", en dat stond al goed: een installatie
+     die al eens gescand heeft, scant niet opnieuw. Maar de AANROEP zelf gebeurde
+     wel, en die loopt binnen de daggrens door publiekeCapabilityGraph() -- en
+     dus door de capability-kas. Gemeten met een CPU-profiel is dat 463 ms van
+     een boot van 1794: het uitpakken van een JSON-blob van rond de twaalf
+     megabyte, bij elke start, voor een overzicht dat op dat moment niemand
+     opvraagt.
+
+     Nu draait hij alleen als deze installatie nog NOOIT heeft gescand. Dat is
+     precies wat de zin erboven belooft, en het is wat er in productie gebeurt:
+     een verse installatie scant een keer, een herstart niet meer. In de
+     toetssuite is het verschil groter dan het klinkt -- 468 van de 673
+     serverstartende toetsbestanden krijgen een gegoten datamap, en daarin heeft
+     de scan al plaatsgevonden.
+
+     Wat NIET verandert: een installatie zonder eerdere scan doet hem nog steeds
+     bij de start, de dagelijkse verversing loopt zoals hij liep, en de boardroom
+     kan nog altijd geforceerd scannen. Dedupe op sleutel maakt dit
+     herstartveilig en voorkomt telkens nieuwe voorstellen. */
+  if (!state().laatsteScan) scan('Future Engine', true);
 
   return { magnaatWereld: {
     partnerstudio,

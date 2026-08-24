@@ -1180,7 +1180,14 @@ app.post('/api/supplier/aanwezig/leeg', supplierAuth, (req, res) => {
    echte batches in plaats van één modelaanroep per knop te doen. */
 const uiVertaalPerIp = require('./rem')({ windowMs: 60000, limit: 30 });
 const uiVertaalGlobaal = require('./rem')({ windowMs: 60000, limit: 180, key: () => 'alle-ui' });
-const uiBronnen = require('./lib/ui-bronnen').maakUiBronnen(PUBLIC_DIR, [path.join(PUBLIC_DIR, '..', 'index.html')]);
+/* PAS BOUWEN ALS ER IEMAND VERTAALT. maakUiBronnen loopt public/ af om te weten
+   welke teksten aantoonbaar RTG-interface zijn -- 162 ms van een boot van 1828,
+   gemeten met een CPU-profiel -- en de enige lezer is de route hieronder. Van de
+   ruim negenhonderd toetsen vraagt bijna geen enkele een UI-vertaling, dus die
+   betaalden allemaal voor een lijst die ze nooit lezen. */
+let uiBronnenKas = null;
+const uiBronnen = () => uiBronnenKas
+  || (uiBronnenKas = require('./lib/ui-bronnen').maakUiBronnen(PUBLIC_DIR, [path.join(PUBLIC_DIR, '..', 'index.html')]));
 app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {
   try {
     const naar = talen.taalVan(req.body && req.body.naar);
@@ -1188,7 +1195,7 @@ app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) =
     const teksten = (Array.isArray(req.body && req.body.teksten) ? req.body.teksten : []).slice(0, 400)
       .map(t => String(t == null ? '' : t).slice(0, 300))
       .filter(t => { totaal += t.length; return totaal <= 24000; });
-    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen.toegestaan });
+    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen().toegestaan });
     const uit = regels.map(r => r.text);
     res.json({ ok: true, naar, teksten: uit });
   } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }

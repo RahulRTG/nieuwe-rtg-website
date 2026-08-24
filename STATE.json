@@ -1202,6 +1202,14 @@
       "soort": "map",
       "bron": "scan"
     },
+    "server/server.js#uiBronnenKas": {
+      "eigenaar": "server/server.js",
+      "levensduur": "bootvast",
+      "soort": "binding-let",
+      "bron": "hand-na-scan",
+      "toelichting": "De onthouden UI-tekstenlijst uit lib/ui-bronnen.js: welke teksten aantoonbaar RTG-interface zijn. Wordt bij de eerste UI-vertaling gebouwd uit public/ en daarna alleen gelezen. De inhoud is een functie van de broncode en niet van de rit -- dezelfde public-map geeft altijd dezelfde lijst -- dus er valt niets terug te zetten. Hij staat lui omdat 162 ms van een boot van 1839 aan die lijst opging terwijl bijna geen enkele toets ooit een UI-vertaling vraagt.",
+      "patroon": "afleiding"
+    },
     "server/server.js#webmerk": {
       "eigenaar": "server",
       "levensduur": "bootvast",

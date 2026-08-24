@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 921,
+    "testbestanden": 922,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 126,
@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 162,
+    "toetsenNietGemeten": 163,
     "toetsenOngevoeligPct": 1.2,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -36,10 +36,15 @@
     "duurOpWandklok": 29,
     "staatProcesgebonden": 92,
     "datamapVastgeklonken": 11,
-    "bewijsOnbekend": 174,
+    "bewijsOnbekend": 175,
     "bewijsVerlopen": 874
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "testbestanden 921 -> 922, bewijsOnbekend 174 -> 175, toetsenNietGemeten 162 -> 163 (de eerste scan)",
+      "reden": "test/magnaat-eerste-scan.test.js erbij. Hij houdt vast dat de capability-scan bij het opstarten alleen op een NOOIT-gescande installatie draait, dat een tweede start hem niet herhaalt, en -- de gevaarlijke derde -- dat het overzicht daarna gewoon opent. Zonder die derde bewering zou 'niet meer scannen' ook groen staan als de graaf helemaal niet meer te krijgen was, en dan is het geen versnelling maar een kapot scherm.\n\nHij start twee servers achter elkaar op dezelfde map en leest de schijf ertussen, dus hij hangt aan de serverboom en de mutatiemotor is er nog niet langs; vandaar de andere twee meters. De kernbewering is met de hand gemuteerd: de onvoorwaardelijke scan terugzetten laat toets 1 zakken."
+    },
     {
       "datum": "2026-08-24",
       "meter": "testbestanden 915 -> 921, bewijsOnbekend 172 -> 174, toetsenNietGemeten 160 -> 162 (de zakenklok)",

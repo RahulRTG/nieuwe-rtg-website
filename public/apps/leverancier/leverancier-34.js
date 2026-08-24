@@ -3,12 +3,12 @@
       // CREATOR: leveranciers vinden + open oproepen
       html += '<div class="card"><div class="tt-h">'+T('sw.vind','Vind een leverancier om mee samen te werken')+'</div>'+
         ((swLijst&&swLijst.leveranciers)||[]).slice(0,40).map(l => '<div class="mitem"><div class="r1"><span class="nm">'+(window.RTGGlyf?RTGGlyf.svgHTML(l.icon,{klasse:'gl-inline'}):'')+' '+esc(l.name)+'</span><span class="pr" style="font-size:0.72rem;color:var(--soft);">'+esc(l.typeLabel||'')+'</span></div>'+
-          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+l.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+l.code+'">'+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
+          (canEdit?'<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+l.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+l.code+'">'+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
       const oproepen = (sw.openOproepen||[]).filter(op => !op.ikReageerde);
       html += '<div class="card"><div class="tt-h">'+T('sw.oproepen','Open oproepen van leveranciers')+' ('+oproepen.length+')</div>'+
         (oproepen.length ? oproepen.map(op => '<div class="mitem"><div class="r1"><span class="nm">'+esc(op.titel)+'</span><span class="pr">'+(op.budget?'€ '+op.budget:'')+'</span></div>'+
           '<div class="ds">'+(op.van?esc(op.van.name)+' · ':'')+esc(op.omschrijving||'')+(op.soort?' · '+esc(op.soort):'')+'</div>'+
-          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.reactie','Jouw reactie...')+'" data-swreactie="'+op.id+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swreageer="'+op.id+'">'+T('sw.reageer','Reageer')+'</button></div>':'')+'</div>').join('')
+          (canEdit?'<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.reactie','Jouw reactie...')+'" data-swreactie="'+op.id+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swreageer="'+op.id+'">'+T('sw.reageer','Reageer')+'</button></div>':'')+'</div>').join('')
           : '<div class="ds h-mt50">'+T('sw.geenoproep','Nu geen open oproepen.')+'</div>')+'</div>';
     } else {
       // LEVERANCIER: creators oproepen + reacties + creators direct benaderen
@@ -17,7 +17,7 @@
       // mijn oproepen met reacties
       (sw.mijnOproepen||[]).forEach(op => {
         html += '<div class="card"><div class="tt-h">'+esc(op.titel)+' '+(op.open?'<span style="font-size:0.68rem;color:#7EE0A3;">'+T('sw.open','open')+'</span>':'<span style="font-size:0.68rem;color:var(--soft);">'+T('sw.dicht','gesloten')+'</span>')+'</div>'+
-          '<div class="ds" style="margin-bottom:0.4rem;">'+esc(op.omschrijving||'')+(op.budget?' · € '+op.budget:'')+'</div>'+
+          '<div class="ds" style="margin-bottom:0.5rem;">'+esc(op.omschrijving||'')+(op.budget?' · € '+op.budget:'')+'</div>'+
           ((op.reacties||[]).length ? (op.reacties||[]).map(r => '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.creator.name)+(r.creator.bereik?' · '+kortN(r.creator.bereik):'')+'</span>'+(r.status==='gekozen'?'<span class="pr" style="color:#7EE0A3;">'+T('sw.gekozen','gekozen')+'</span>':'')+'</div>'+
             (r.bericht?'<div class="ds">'+esc(r.bericht)+'</div>':'')+
             (canEdit&&r.status!=='gekozen'&&op.open?'<div class="h-mt35"><button class="obtn primary" data-swkies="'+op.id+'" data-creator="'+r.creatorCode+'">'+T('sw.kiesdeze','Kies deze creator')+'</button></div>':'')+'</div>').join('')
@@ -27,7 +27,7 @@
       // creators direct benaderen
       html += '<div class="card"><div class="tt-h">'+T('sw.vindcreator','Benader een creator direct')+'</div>'+
         ((swLijst&&swLijst.creators)||[]).slice(0,40).map(c => '<div class="mitem"><div class="r1"><span class="nm">'+esc(c.name)+(c.niche?' · '+esc(c.niche):'')+'</span><span class="pr">'+kortN(c.bereik||0)+'</span></div>'+
-          (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+c.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+c.code+'">'+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
+          (canEdit?'<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;"><input placeholder="'+T('sw.pitch','Korte pitch...')+'" data-swpitch="'+c.code+'" '+st+' style="flex:1;min-width:8rem;"><button class="obtn primary" data-swvoorstel="'+c.code+'">'+T('sw.werksamen','Werk samen')+'</button></div>':'')+'</div>').join('')+'</div>';
     }
     el.innerHTML = html;
     // wiring

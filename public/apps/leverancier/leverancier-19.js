@@ -68,7 +68,7 @@
             '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
             '<b style="color:var(--gold);">'+(r.quote?eur(r.quote):'')+'</b></div>'
           ).join('') : '<div class="tkc-who">'+(histQ ? T('kt.nietsgevonden','Niets gevonden voor deze zoekopdracht.') : T('kt.geenhistorie','Nog geen afgeronde ritten.'))+'</div>')+
-          (h.pages > 1 ? '<div style="display:flex;align-items:center;justify-content:center;gap:0.9rem;margin-top:0.6rem;">'+
+          (h.pages > 1 ? '<div style="display:flex;align-items:center;justify-content:center;gap:0.9rem;margin-top:0.5rem;">'+
             '<button class="obtn" data-khist="-1"'+(h.page<=1?' disabled':'')+'>‹</button>'+
             '<span class="tkc-who" style="margin:0;">'+T('kt.pagina','Pagina')+' '+h.page+' / '+h.pages+'</span>'+
             '<button class="obtn" data-khist="1"'+(h.page>=h.pages?' disabled':'')+'>›</button></div>' : '')+

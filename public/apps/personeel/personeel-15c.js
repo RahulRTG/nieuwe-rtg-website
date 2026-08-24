@@ -73,7 +73,7 @@
   function tekenvlakOpen(id, titel){
     wvPdaTekent = id; wvPdaPaden = [];
     $('#wvVak').innerHTML = '<div class="h-mt60"><b>' + esc(titel) + '</b>' +
-      '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.4rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
+      '<canvas id="wvCanvas" width="600" height="200" style="width:100%;height:120px;border:1px solid var(--line);border-radius:12px;display:block;margin:0.5rem 0;touch-action:none;background:rgba(255,255,255,0.03);"></canvas>' +
       '<div class="row">' +
       '<button class="abtn" id="wvWis">' + T('pd.wv.wis','Wissen') + '</button>' +
       '<button class="abtn" id="wvKlaar" style="border-color:var(--gold);color:var(--gold);">' + T('pd.wv.zetklaar','Zet mijn handtekening') + '</button></div>' +
@@ -119,9 +119,9 @@
     document.querySelectorAll('[data-wvcode]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/werkvloer/koppel/code', { id: b.dataset.wvcode });
-        $('#wvVak').innerHTML = '<div style="margin-top:0.6rem;text-align:center;">' +
+        $('#wvVak').innerHTML = '<div style="margin-top:0.5rem;text-align:center;">' +
           '<div style="font-size:0.8rem;color:var(--muted);">' + esc(d.tonen) + '</div>' +
-          '<div id="wvQr" style="display:flex;justify-content:center;margin:0.6rem 0;"></div>' +
+          '<div id="wvQr" style="display:flex;justify-content:center;margin:0.5rem 0;"></div>' +
           '<b>' + eur(d.bedrag) + '</b></div>';
         /* De RTG-code als beeld: dezelfde tekenaar als de kassa gebruikt.
            Staat die niet klaar, dan tonen we de code als tekst -- de klant

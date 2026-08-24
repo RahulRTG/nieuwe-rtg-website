@@ -12,8 +12,8 @@
         '<div class="st-row'+(r.it.done?'" style="opacity:0.5;':'"')+'">'+
         '<span>'+
         '<span style="display:inline-block;min-width:5.4rem;margin-right:0.5rem;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:'+(r.due===today?'var(--burgundy)':'var(--soft)')+';">'+dueLabel(r.due, r.it.daysBefore)+'</span>'+
-        '<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.6rem;">'+r.it.time+'</b>'+
-        (station==='party'?'<span style="margin-right:0.4rem;">'+(RUN_ICON[r.it.station]||'')+'</span>':'')+
+        '<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.5rem;">'+r.it.time+'</b>'+
+        (station==='party'?'<span style="margin-right:0.5rem;">'+(RUN_ICON[r.it.station]||'')+'</span>':'')+
         (r.it.done?'<s>'+r.it.text+'</s>':r.it.text)+
         '<span class="sub">'+r.e.name+' \u00b7 '+r.e.date+(r.it.done&&r.it.doneBy?' \u00b7 \u2713 '+r.it.doneBy:'')+'</span></span>'+
         '<button class="obtn'+(r.it.done?' primary':'')+'" data-rundone="'+r.e.id+'" data-item="'+r.it.id+'">'+(r.it.done?'\u2713':T('rs.doit','Gedaan'))+'</button></div>'

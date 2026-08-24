@@ -3,10 +3,10 @@
       html += '<div class="card"><b>'+esc(p.name)+'</b> <span class="soft-sm">\u00B7 '+esc(p.city||'')+'</span>';
       for (const a of p.autos){
         const open = vhOpen === p.code + ':' + a.id;
-        html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
+        html += '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
           '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div style="font-size:0.88rem;">'+(a.icoon||'\uD83D\uDE97')+' '+esc(a.name)+'</div>'+
           '<span style="color:var(--gold);font-size:0.82rem;white-space:nowrap;">'+eur(a.dagprijs)+'/'+T('vh.dag','dag')+'</span></div>'+
-          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.2rem;">'+esc(a.categorie||'')+' \u00B7 '+(a.transmissie==='automaat'?T('vh.aut','automaat'):T('vh.hand','handgesch.'))+' \u00B7 '+esc(a.brandstof||'')+' \u00B7 \uD83D\uDC65'+(a.stoelen||'-')+' \u00B7 \uD83E\uDDF3'+(a.bagage||0)+(a.airco?' \u00B7 \u2744\uFE0F':'')+
+          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.25rem;">'+esc(a.categorie||'')+' \u00B7 '+(a.transmissie==='automaat'?T('vh.aut','automaat'):T('vh.hand','handgesch.'))+' \u00B7 '+esc(a.brandstof||'')+' \u00B7 \uD83D\uDC65'+(a.stoelen||'-')+' \u00B7 \uD83E\uDDF3'+(a.bagage||0)+(a.airco?' \u00B7 \u2744\uFE0F':'')+
           ' \u00B7 '+(a.kmPerDag?a.kmPerDag+' km/'+T('vh.dag','dag'):T('vh.onbeperkt','onbeperkt km'))+' \u00B7 '+T('vh.borg','borg')+' '+eur(a.borg||0)+'</div>'+
           (a.apk && a.apk.bekend ? '<div style="font-size:0.68rem;margin-top:0.25rem;color:'+(a.apk.geldig?'var(--green)':'var(--gold)')+';">\uD83D\uDEE1\uFE0F RDW '+(a.apk.geldig?T('vh.apkok','APK geldig'):T('vh.apkuit','APK verloopt'))+' \u00B7 '+T('vh.apktot','tot')+' '+esc(a.apk.apkTot)+'</div>' : '');
         if (open){
@@ -54,12 +54,12 @@
     if (el) el.innerHTML = mijn.filter(c => c.status !== 'afgerond' || c.tot >= new Date().toISOString().slice(0, 10)).map(c =>
       '<div class="card" style="border-color:rgba(91,185,140,0.35);">'+
       '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);">'+T('ch.m.kop','Charter')+' · '+esc(c.supplierName)+'</div>'+
-      '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(c.boot)+'</b> ('+esc(c.type)+') · '+c.van+' → '+c.tot+' · '+eur(c.prijs)+'</div>'+
+      '<div style="margin-top:0.25rem;font-size:0.92rem;"><b>'+esc(c.boot)+'</b> ('+esc(c.type)+') · '+c.van+' → '+c.tot+' · '+eur(c.prijs)+'</div>'+
       (c.spec ? '<div style="margin-top:0.25rem;font-size:0.72rem;color:var(--soft);">'+(c.spec.lengte||0)+'m · '+(c.spec.gasten||'-')+(c.spec.hutten?' · '+c.spec.hutten:'')+' · '+(c.spec.snelheidKn||0)+' kn · '+esc(c.spec.ligplaats||'')+(c.borg?' · '+T('ch.borg','borg')+' '+eur(c.borg):'')+'</div>' : '')+
-      '<div style="margin-top:0.3rem;font-size:0.78rem;color:var(--muted);">'+(c.metSkipper?''+T('ch.m.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.m.bareboat','bareboat'))+' · '+(CH_ST[c.status]||c.status)+' ·  '+c.fotosVoor+'/'+c.fotosNa+'</div>'+
+      '<div style="margin-top:0.25rem;font-size:0.78rem;color:var(--muted);">'+(c.metSkipper?''+T('ch.m.metskipper','met schipper')+(c.skipperNaam?' ('+esc(c.skipperNaam)+')':''):T('ch.m.bareboat','bareboat'))+' · '+(CH_ST[c.status]||c.status)+' ·  '+c.fotosVoor+'/'+c.fotosNa+'</div>'+
       (c.teruggave ? '<div style="margin-top:0.25rem;font-size:0.78rem;color:'+(c.teruggave.meerkosten>0?'var(--gold)':'var(--green)')+';">'+(c.teruggave.meerkosten>0 ? T('ch.m.meer','Meerkosten')+': '+eur(c.teruggave.meerkosten) : '✓ '+T('ch.m.geenmeer','geen meerkosten, borg vrij'))+'</div>' : '')+
       (c.status !== 'afgerond' ?
-        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.55rem;">'+
+        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         (c.status === 'aangevraagd' ? '<button class="bz-btn" data-chf="'+c.ref+'" data-fase="voor">'+T('ch.m.fotovoor','Staat vastleggen (voor)')+'</button>' : '')+
         (c.status === 'lopend' ? '<button class="bz-btn" data-chf="'+c.ref+'" data-fase="na">'+T('ch.m.fotona','Staat vastleggen (na)')+'</button>'+
           '<button class="bz-btn'+(c.locatieAan?' on':'')+'" data-chloc="'+c.ref+'" data-aan="'+(c.locatieAan?'0':'1')+'">'+(c.locatieAan?T('ch.m.locuit','Positie delen uit'):T('ch.m.locaan','Deel live positie'))+'</button>' : '')+

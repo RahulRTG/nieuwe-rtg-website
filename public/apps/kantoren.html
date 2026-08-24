@@ -249,13 +249,13 @@
     <div id="kLijsten"></div>
     <div class="kaart" id="kBetaal" hidden>
       <div class="betaal-kop">
-        <div><h4 style="margin:0 0 .25rem;">Betaalproviders · één controlecentrum</h4>
+        <div><h4 style="margin:0 0 0.25rem;">Betaalproviders · één controlecentrum</h4>
           <div class="stil" id="kBetaalSub" style="font-size:.78rem;color:var(--soft);">Stripe, Mollie en Adyen met één financiële waarheid.</div></div>
         <a class="knop stil" id="kBetaalIt" href="/apps/techniek.html" style="text-decoration:none;">Naar IT-controle →</a>
       </div>
       <div class="kpis h-mt80" id="kBetaalKpis"></div>
       <div class="betaal-providers" id="kBetaalProviders"></div>
-      <div id="kBetaalProblemen" style="margin-top:.75rem;"></div>
+      <div id="kBetaalProblemen" style="margin-top:0.75rem;"></div>
     </div>
     <h3 class="sec">De werklijst van deze kamer</h3>
     <div class="kaart lijst">
@@ -266,26 +266,26 @@
       </div>
     </div>
     <div class="kaart" id="kRahul">
-      <h4 style="margin:0 0 .4rem;">Rahul denkt mee</h4>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Rahul kijkt naar de echte cijfers van deze kamer -- de KPI's, de werklijsten, de open taken en de signalen uit de dagronde -- en zegt waar hij als eerste naar zou kijken. Hij adviseert; u beslist. Stel gerust een eigen vraag.</p>
+      <h4 style="margin:0 0 0.5rem;">Rahul denkt mee</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">Rahul kijkt naar de echte cijfers van deze kamer -- de KPI's, de werklijsten, de open taken en de signalen uit de dagronde -- en zegt waar hij als eerste naar zou kijken. Hij adviseert; u beslist. Stel gerust een eigen vraag.</p>
       <div class="taakrij">
         <input class="veld h-flex1" id="kRahulVraag" placeholder="Bijv. waar liggen vandaag de risico's in deze kamer?" maxlength="300">
         <button class="knop" id="kRahulVraagKnop" type="button">Vraag Rahul</button>
       </div>
-      <div class="stil" id="kRahulUit" style="font-size:.84rem;line-height:1.65;margin-top:.7rem;" aria-live="polite"></div>
+      <div class="stil" id="kRahulUit" style="font-size:.84rem;line-height:1.65;margin-top:0.75rem;" aria-live="polite"></div>
     </div>
     <div class="kaart" id="kKluis" hidden>
-      <h4 style="margin:0 0 .4rem;">De identiteitskluis</h4>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer mag de echte naam bij een codenaam opvragen, omdat het werk erom vraagt. Elke opvraging komt in het auditlog van de boardroom, ook zonder treffer.</p>
+      <h4 style="margin:0 0 0.5rem;">De identiteitskluis</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">Deze kamer mag de echte naam bij een codenaam opvragen, omdat het werk erom vraagt. Elke opvraging komt in het auditlog van de boardroom, ook zonder treffer.</p>
       <div class="taakrij">
         <input class="veld h-flex1" id="kKluisCode" placeholder="Codenaam van het lid" maxlength="60">
         <button class="knop stil" id="kKluisZoek" type="button">Zoek op</button>
       </div>
-      <div class="stil" id="kKluisUit" style="font-size:.82rem;margin-top:.5rem;" aria-live="polite"></div>
+      <div class="stil" id="kKluisUit" style="font-size:.82rem;margin-top:0.5rem;" aria-live="polite"></div>
     </div>
     <div class="kaart" id="kKantine" hidden>
-      <h4 style="margin:0 0 .4rem;">De kaart van vandaag</h4>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Een gerecht per regel; opslaan vervangt de kaart van vandaag en iedereen ziet hem meteen.</p>
+      <h4 style="margin:0 0 0.5rem;">De kaart van vandaag</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">Een gerecht per regel; opslaan vervangt de kaart van vandaag en iedereen ziet hem meteen.</p>
       <textarea id="kKantineMenu" rows="4" maxlength="1000" placeholder="Bijv. dagsoep, nasi van gisteren maar beter, vega wrap" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div class="taakrij h-mt50">
         <input class="veld" id="kKantineNaam" style="max-width:10rem;" placeholder="Wie zet de kaart?" maxlength="30">
@@ -294,52 +294,52 @@
       </div>
     </div>
     <div class="kaart" id="kZelfzorg" hidden>
-      <h4 style="margin:0 0 .4rem;">De zelfzorg van het platform</h4>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Deze kamer bewaakt het huis zelf: opruimen, beschermen, repareren en upgraden. Dezelfde knoppen staan in de boardroom.</p>
+      <h4 style="margin:0 0 0.5rem;">De zelfzorg van het platform</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">Deze kamer bewaakt het huis zelf: opruimen, beschermen, repareren en upgraden. Dezelfde knoppen staan in de boardroom.</p>
       <div id="kZelfzorgVak"><div class="leeg">Laden...</div></div>
     </div>
     <!-- het Regeringskantoor: alleen in de kamer 'regering' -->
     <div class="kaart" id="kRegering" hidden>
-      <h4 style="margin:0 0 .4rem;">De ochtendbriefing</h4>
+      <h4 style="margin:0 0 0.5rem;">De ochtendbriefing</h4>
       <div id="kRegBriefing"><div class="leeg">Laden...</div></div>
-      <h4 style="margin:1rem 0 .4rem;">Kabinetsbesluiten (twee handtekeningen)</h4>
+      <h4 style="margin:1.25rem 0 0.5rem;">Kabinetsbesluiten (twee handtekeningen)</h4>
       <div id="kRegBesluiten"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
-        <span><label for="kRegNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Wie bent u?</label><input id="kRegNaam" placeholder="minister-president" style="width:11rem;"></span>
-        <span><label for="kRegPort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Portefeuille</label><select id="kRegPort"></select></span>
-        <span style="flex:1;min-width:14rem;"><label for="kRegTitel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Besluit</label><input id="kRegTitel" placeholder="Bijv. 500 extra opvangplekken vrijmaken" style="width:100%;"></span>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
+        <span><label for="kRegNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Wie bent u?</label><input id="kRegNaam" placeholder="minister-president" style="width:11rem;"></span>
+        <span><label for="kRegPort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Portefeuille</label><select id="kRegPort"></select></span>
+        <span style="flex:1;min-width:14rem;"><label for="kRegTitel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Besluit</label><input id="kRegTitel" placeholder="Bijv. 500 extra opvangplekken vrijmaken" style="width:100%;"></span>
         <button class="knop" id="kRegNieuw" type="button">Voorgenomen besluit</button>
       </div>
     </div>
     <!-- de Opvang-afdeling (AZC/COA): alleen in de kamer 'opvang' -->
     <div class="kaart" id="kOpvang" hidden>
-      <h4 style="margin:0 0 .4rem;">Locaties en bezetting</h4>
+      <h4 style="margin:0 0 0.5rem;">Locaties en bezetting</h4>
       <div id="kOpvLocaties"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
-        <span><label for="kOpvNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe locatie</label><input id="kOpvNaam" placeholder="Naam" style="width:11rem;"></span>
-        <span><label for="kOpvPlaats" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Plaats</label><input id="kOpvPlaats" placeholder="Plaats" style="width:9rem;"></span>
-        <span><label for="kOpvSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Soort</label><select id="kOpvSoort"></select></span>
-        <span><label for="kOpvCap" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Plekken</label><input id="kOpvCap" type="number" min="0" value="200" style="width:6rem;"></span>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
+        <span><label for="kOpvNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Nieuwe locatie</label><input id="kOpvNaam" placeholder="Naam" style="width:11rem;"></span>
+        <span><label for="kOpvPlaats" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Plaats</label><input id="kOpvPlaats" placeholder="Plaats" style="width:9rem;"></span>
+        <span><label for="kOpvSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Soort</label><select id="kOpvSoort"></select></span>
+        <span><label for="kOpvCap" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Plekken</label><input id="kOpvCap" type="number" min="0" value="200" style="width:6rem;"></span>
         <button class="knop stil" id="kOpvZet" type="button">Open locatie</button>
       </div>
-      <h4 style="margin:1rem 0 .4rem;">Dossiers (op nummer, nooit op naam)</h4>
+      <h4 style="margin:1.25rem 0 0.5rem;">Dossiers (op nummer, nooit op naam)</h4>
       <div id="kOpvDossiers"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
-        <span><label for="kOpvDosLoc" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Locatie</label><select id="kOpvDosLoc"></select></span>
-        <span><label for="kOpvPers" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Personen</label><input id="kOpvPers" type="number" min="1" max="12" value="1" style="width:5.5rem;"></span>
-        <span><label for="kOpvKind" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Kinderen</label><input id="kOpvKind" type="number" min="0" max="10" value="0" style="width:5.5rem;"></span>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
+        <span><label for="kOpvDosLoc" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Locatie</label><select id="kOpvDosLoc"></select></span>
+        <span><label for="kOpvPers" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Personen</label><input id="kOpvPers" type="number" min="1" max="12" value="1" style="width:5.5rem;"></span>
+        <span><label for="kOpvKind" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Kinderen</label><input id="kOpvKind" type="number" min="0" max="10" value="0" style="width:5.5rem;"></span>
         <button class="knop stil" id="kOpvDos" type="button">Meld aan</button>
       </div>
     </div>
     <!-- elke afdeling heeft haar eigen huis: het afdelingshotel -->
     <div class="kaart" id="kHotel" hidden>
-      <h4 style="margin:0 0 .4rem;" id="kHotelNaam">Het huis van deze afdeling</h4>
+      <h4 style="margin:0 0 0.5rem;" id="kHotelNaam">Het huis van deze afdeling</h4>
       <div id="kHotelVak"><div class="leeg">Laden...</div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">
-        <span><label for="kHotSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Kamertype</label><select id="kHotSoort"></select></span>
-        <span><label for="kHotVoor" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Voor (codenaam)</label><input id="kHotVoor" placeholder="codenaam" style="width:9rem;"></span>
-        <span><label for="kHotVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Van</label><input id="kHotVan" type="date"></span>
-        <span><label for="kHotTot" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Tot</label><input id="kHotTot" type="date"></span>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
+        <span><label for="kHotSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Kamertype</label><select id="kHotSoort"></select></span>
+        <span><label for="kHotVoor" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Voor (codenaam)</label><input id="kHotVoor" placeholder="codenaam" style="width:9rem;"></span>
+        <span><label for="kHotVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Van</label><input id="kHotVan" type="date"></span>
+        <span><label for="kHotTot" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Tot</label><input id="kHotTot" type="date"></span>
         <button class="knop stil" id="kHotBoek" type="button">Reserveer</button>
       </div>
     </div>
@@ -378,20 +378,20 @@
     <!-- de deur: de boardroom is de kamer van de eigenaar -->
     <div id="bDicht" hidden>
       <div class="kaart" style="border-color:var(--burgundy);max-width:34rem;">
-        <h4 style="margin:0 0 .5rem;">De deur is dicht</h4>
+        <h4 style="margin:0 0 0.5rem;">De deur is dicht</h4>
         <p class="stil" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin:0;" id="bDichtTekst">De boardroom is de kamer van de eigenaar.</p>
-        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:.6rem 0 0;">Ben jij de eigenaar? Log dan in met je eigen RTG-account (via de personeels-app, knop "Verder met uw RTG-account"); de anonieme kantoorcode opent deze kamer niet.</p>
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0.5rem 0 0;">Ben jij de eigenaar? Log dan in met je eigen RTG-account (via de personeels-app, knop "Verder met uw RTG-account"); de anonieme kantoorcode opent deze kamer niet.</p>
       </div>
     </div>
 
     <h3 class="sec" id="bToegangKop" hidden>De sleutel van de kamer</h3>
     <div class="kaart" id="bToegang" hidden>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">De boardroom is van jou alleen. Hier geef je iemand anders de sleutel (op codenaam) en trek je hem ook weer in; elke wijziging komt in het logboek.</p>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">De boardroom is van jou alleen. Hier geef je iemand anders de sleutel (op codenaam) en trek je hem ook weer in; elke wijziging komt in het logboek.</p>
       <div class="taakrij">
         <input class="veld h-flex1" id="bToegangCode" placeholder="Codenaam van het lid" maxlength="60">
         <button class="knop stil" id="bToegangGeef" type="button">Geef toegang</button>
       </div>
-      <div id="bToegangLijst" style="margin-top:.6rem;font-size:.82rem;"></div>
+      <div id="bToegangLijst" style="margin-top:0.5rem;font-size:.82rem;"></div>
     </div>
 
     <!-- Het papierwerk: de achttien dingen die alleen een mens kan invullen.
@@ -399,19 +399,19 @@
          van de jurist en de afspraak wie er 's nachts gebeld wordt. -->
     <h3 class="sec" id="bPapKop" hidden>Het papierwerk</h3>
     <div class="kaart" id="bPapieren" hidden>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;line-height:1.6;">
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;line-height:1.6;">
         Achttien dingen die geen enkel systeem kan verzinnen: onder welke naam RTG draait, wie het privacy-aanspreekpunt is,
         hoe lang een paspoortscan bewaard blijft, en wie er bij een datalek om drie uur 's nachts gebeld wordt.
         Vul in, wijzig later gerust, en weet je iets nog niet, park het dan; dan blijft het zichtbaar openstaan
         in plaats van weg te vallen.</p>
-      <div id="bPapStand" style="font-size:.82rem;margin:0 0 .8rem;"></div>
+      <div id="bPapStand" style="font-size:.82rem;margin:0 0 0.75rem;"></div>
       <div id="bPapLijst"></div>
-      <h4 style="margin:1.2rem 0 .4rem;font-size:.9rem;">De documenten</h4>
-      <p class="stil" style="font-size:.76rem;color:var(--soft);margin:0 0 .5rem;">Het ingevulde papier om te lezen of af te drukken. Wat nog openstaat blijft er zichtbaar in staan: een register dat zijn eigen gaten verbergt is gevaarlijker dan een register met gaten.</p>
+      <h4 style="margin:1.25rem 0 0.5rem;font-size:.9rem;">De documenten</h4>
+      <p class="stil" style="font-size:.76rem;color:var(--soft);margin:0 0 0.5rem;">Het ingevulde papier om te lezen of af te drukken. Wat nog openstaat blijft er zichtbaar in staan: een register dat zijn eigen gaten verbergt is gevaarlijker dan een register met gaten.</p>
       <div id="bPapDocs" class="taakrij" style="flex-wrap:wrap;gap:.5rem;"></div>
-      <pre id="bPapDoc" hidden style="white-space:pre-wrap;font-size:.78rem;line-height:1.55;background:var(--paneel,#111);padding:1rem;overflow-x:auto;margin:.8rem 0 0;"></pre>
-      <h4 style="margin:1.2rem 0 .4rem;font-size:.9rem;">Wat er is gewijzigd</h4>
-      <p class="stil" style="font-size:.76rem;color:var(--soft);margin:0 0 .5rem;">Wie en wanneer, bewust zonder de oude waarde, want dit dossier bevat prive-nummers, en een historie zou die verdubbelen.</p>
+      <pre id="bPapDoc" hidden style="white-space:pre-wrap;font-size:.78rem;line-height:1.55;background:var(--paneel,#111);padding:1rem;overflow-x:auto;margin:0.75rem 0 0;"></pre>
+      <h4 style="margin:1.25rem 0 0.5rem;font-size:.9rem;">Wat er is gewijzigd</h4>
+      <p class="stil" style="font-size:.76rem;color:var(--soft);margin:0 0 0.5rem;">Wie en wanneer, bewust zonder de oude waarde, want dit dossier bevat prive-nummers, en een historie zou die verdubbelen.</p>
       <div id="bPapSpoor" style="font-size:.8rem;"></div>
     </div>
 
@@ -431,29 +431,29 @@
     <h3 class="sec">Uit de paniekkamer</h3>
     <div class="kaart lijst" id="bPaniek"><div class="leeg">Geen open voorstellen.</div></div>
 
-    <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.6rem;">Loop nu een ronde</button></h3>
+    <h3 class="sec">De verbeterkamer <button class="knop stil" id="bVernieuw" style="padding:.25rem .8rem;font-size:.75rem;margin-left:0.5rem;">Loop nu een ronde</button></h3>
     <div class="kaart lijst" id="bVoorstellen"></div>
 
     <h3 class="sec">Magnaat Product Lab</h3>
     <div class="kaart lijst">
-      <p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;margin:0 0 .7rem;">Magnaat herkent uitsluitend anonieme patronen in spelkeuzes en maakt daar controleerbare verbeterproeven van. Het spel wijzigt nooit zelf code, rechten, prijzen of productie. De boardroom beslist wat naar een test mag.</p>
+      <p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;margin:0 0 0.75rem;">Magnaat herkent uitsluitend anonieme patronen in spelkeuzes en maakt daar controleerbare verbeterproeven van. Het spel wijzigt nooit zelf code, rechten, prijzen of productie. De boardroom beslist wat naar een test mag.</p>
       <div id="bMagnaatLeren"><div class="leeg">Verbeterpatronen laden…</div></div>
     </div>
 
     <div class="kaart h-mt80" id="bRahulHuis">
-      <h4 style="margin:0 0 .4rem;">Rahul kijkt over het huis</h4>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Rahul leest de verbeterkamer-signalen en de drukte per kamer, en zegt waar de boardroom vandaag de aandacht zou leggen. Hij adviseert; u beslist.</p>
+      <h4 style="margin:0 0 0.5rem;">Rahul kijkt over het huis</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">Rahul leest de verbeterkamer-signalen en de drukte per kamer, en zegt waar de boardroom vandaag de aandacht zou leggen. Hij adviseert; u beslist.</p>
       <div class="taakrij">
         <input class="veld h-flex1" id="bRahulVraag" placeholder="Bijv. welke kamer voelt vandaag de meeste druk?" maxlength="300">
         <button class="knop" id="bRahulKnop" type="button">Vraag Rahul</button>
       </div>
-      <div class="stil" id="bRahulUit" style="font-size:.84rem;line-height:1.65;margin-top:.7rem;" aria-live="polite"></div>
+      <div class="stil" id="bRahulUit" style="font-size:.84rem;line-height:1.65;margin-top:0.75rem;" aria-live="polite"></div>
     </div>
 
     <h3 class="sec">De Salon-curatie: wat is maatschappelijk belangrijk?</h3>
     <div class="kaart" id="bSalonBelang">
       <p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;margin:0;">De Salon laat alleen door wat viraal gaat of maatschappelijk belangrijk is. Viraliteit rekent zichzelf uit; belang niet. Rahul leest de posts die nog geen oordeel hebben en zet er ja of nee bij. Dit gebeurt nooit automatisch en nooit tijdens het lezen van de feed: u geeft de opdracht, per ronde, en ziet wat het opleverde. Zonder oordeel blijft de vaste woordencheck gelden.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:0.75rem;">
         <button class="knop" id="bSalonKnop" type="button">Beoordeel deze ronde</button>
         <span class="stil" id="bSalonStand" style="font-size:.78rem;color:var(--soft);">Laden…</span>
       </div>
@@ -465,7 +465,7 @@
     <h3 class="sec">De eigen-AI-dataset: alle logs voor het trainen van een eigen model</h3>
     <div class="kaart" id="bAidata">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Eén knop bewaart alles wat RTG nodig heeft om later een eigen AI te trainen: de Rahul-gesprekken, de ballotage-intakes, het auditlog, de transacties en de kantoorchat, als JSONL-bestand. Alles op codenamen; de identiteitskluis blijft dicht.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:0.75rem;">
         <button class="knop" id="bAidataKnop" type="button">Bewaar de AI-dataset</button>
         <span class="stil" id="bAidataStand" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
@@ -475,35 +475,35 @@
     <div class="kaart" id="bGeld">
       <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">
         <span style="flex:1;min-width:11rem;">
-          <label for="gPasKeuze" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Pasprijs per maand (ex btw); de gratis app blijft gratis, Business is op maat</label>
+          <label for="gPasKeuze" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Pasprijs per maand (ex btw); de gratis app blijft gratis, Business is op maat</label>
           <select id="gPasKeuze"><option value="rtg">RTG Pass</option><option value="lifestyle">Lifestyle Pass</option></select>
         </span>
-        <span><label for="gPasEuro" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Bedrag (€)</label>
+        <span><label for="gPasEuro" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Bedrag (€)</label>
           <input id="gPasEuro" type="number" min="0" step="0.01" style="width:8rem;"></span>
         <button class="knop stil" id="gPasZet" type="button">Zet de pasprijs</button>
         <span class="stil" id="gPasNu" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
-      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
+      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
         <span style="flex:1;min-width:11rem;">
-          <label for="gComGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Partnervergoeding (interne afspraak RTG en zaak; raakt het lid nooit)</label>
+          <label for="gComGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Partnervergoeding (interne afspraak RTG en zaak; raakt het lid nooit)</label>
           <select id="gComGenre"></select>
         </span>
-        <span><label for="gComZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Of een zaak (code)</label>
+        <span><label for="gComZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Of een zaak (code)</label>
           <input id="gComZaak" maxlength="12" placeholder="bijv. TRANSIT" style="width:8rem;text-transform:uppercase;"></span>
-        <span><label for="gComPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">%</label>
+        <span><label for="gComPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">%</label>
           <input id="gComPct" type="number" min="0" max="30" step="0.1" style="width:5.5rem;"></span>
         <button class="knop stil" id="gComZet" type="button">Zet de vergoeding</button>
       </div>
-      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
+      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">
         <span style="flex:1;min-width:11rem;">
-          <label for="gKorGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Ledenvoordeel per genre (RTG legt bij; de zaak houdt het volle bedrag)</label>
+          <label for="gKorGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Ledenvoordeel per genre (RTG legt bij; de zaak houdt het volle bedrag)</label>
           <select id="gKorGenre"></select>
         </span>
-        <span><label for="gKorPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">%</label>
+        <span><label for="gKorPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">%</label>
           <input id="gKorPct" type="number" min="0" max="50" step="0.5" style="width:5.5rem;"></span>
         <button class="knop stil" id="gKorZet" type="button">Zet het voordeel</button>
       </div>
-      <div id="gStand" class="stil" style="margin-top:.8rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
+      <div id="gStand" class="stil" style="margin-top:0.75rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
     </div>
 
     <h3 class="sec">Het Lab-fonds: wat de leden samen inzamelen voor het Onderzoekslab</h3>
@@ -515,7 +515,7 @@
     <h3 class="sec">Het ledenregister: alle leden per stad, land, geslacht en pas</h3>
     <div class="kaart" id="bLeden">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Alle leden op codenaam (de echte naam blijft in de kluis), gesplitst per pas, geslacht, land en stad. Van elke maandbijdrage gaat 30% naar de RTFoundation: 20% blijft lokaal, 10% naar de foundation zelf. Cijfers zijn een rapportage, geen verwerkte betaling.</p>
-      <div class="rijveld" style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0;">
+      <div class="rijveld" style="display:flex;gap:.5rem;flex-wrap:wrap;margin:0.75rem 0;">
         <select id="lrPas" class="veld" style="max-width:12rem;"><option value="">Alle passen</option></select>
         <select id="lrGeslacht" class="veld" style="max-width:9rem;"><option value="">m/v/x</option><option value="v">Vrouw</option><option value="m">Man</option><option value="x">X</option></select>
         <select id="lrLand" class="veld" style="max-width:10rem;"><option value="">Alle landen</option></select>
@@ -534,29 +534,29 @@
     <h3 class="sec">De leveranciers-regie: welke werk-apps per genre zaken</h3>
     <div class="kaart" id="bGenreRegie">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Standaard staat elke werk-app open voor elk genre; hier sluit u een functie gericht voor een genre (bijv. RTG Eye niet voor horeca). De vaste vak-poorten (OV-functies alleen voor OV-zaken) blijven altijd gelden.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.6rem;">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.5rem;">
         <span style="flex:1;min-width:12rem;">
-          <label for="lrFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Functie</label>
+          <label for="lrFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Functie</label>
           <select id="lrFunctie"></select>
         </span>
         <span style="flex:1;min-width:10rem;">
-          <label for="lrGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Genre</label>
+          <label for="lrGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Genre</label>
           <select id="lrGenre"></select>
         </span>
         <button class="knop stil" id="lrUit" type="button" style="border-color:var(--burgundy);">Sluit voor dit genre</button>
         <button class="knop stil" id="lrAan" type="button">Open weer</button>
       </div>
-      <div id="lrRegels" class="stil" style="margin-top:.7rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
+      <div id="lrRegels" class="stil" style="margin-top:0.75rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
     </div>
 
     <h3 class="sec">De AI-regie: het karakter en verhaal van Rahul</h3>
     <div class="kaart" id="bRahul">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">De vaste kern van Rahuls karakter en levensverhaal ligt vast in de code en wordt door tests bewaakt. Hier vult de boardroom hem aan of stuurt hem bij; de aanvulling komt live mee in elke assistent (leden, zaken, personeel, boardroom). Leeg laten = alleen de vaste kern.</p>
-      <label for="rKarakter" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het karakter (max 2000 tekens)</label>
+      <label for="rKarakter" style="display:block;font-size:.72rem;color:var(--soft);margin:0.75rem 0 0.25rem;">Aanvulling op het karakter (max 2000 tekens)</label>
       <textarea id="rKarakter" rows="3" maxlength="2000" placeholder="Bijv. extra eigenschappen, voorkeuren of omgangsregels" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
-      <label for="rVerhaal" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het verhaal (max 2000 tekens)</label>
+      <label for="rVerhaal" style="display:block;font-size:.72rem;color:var(--soft);margin:0.75rem 0 0.25rem;">Aanvulling op het verhaal (max 2000 tekens)</label>
       <textarea id="rVerhaal" rows="4" maxlength="2000" placeholder="Bijv. nieuwe hoofdstukken of details van het levensverhaal" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
-      <div style="display:flex;gap:.6rem;align-items:center;margin-top:.7rem;flex-wrap:wrap;">
+      <div style="display:flex;gap:.6rem;align-items:center;margin-top:0.75rem;flex-wrap:wrap;">
         <button class="knop stil" id="rBewaar" type="button">Bewaar de aanvulling</button>
         <span class="stil" id="rStand" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
@@ -564,17 +564,17 @@
 
     <h3 class="sec">De identiteitskluis</h3>
     <div class="kaart">
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">De boardroom mag de echte naam bij een codenaam opvragen. Elke opvraging komt in het auditlog hierboven, ook zonder treffer.</p>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">De boardroom mag de echte naam bij een codenaam opvragen. Elke opvraging komt in het auditlog hierboven, ook zonder treffer.</p>
       <div class="taakrij">
         <input class="veld h-flex1" id="bKluisCode" placeholder="Codenaam van het lid" maxlength="60">
         <button class="knop stil" id="bKluisZoek" type="button">Zoek op</button>
       </div>
-      <div class="stil" id="bKluisUit" style="font-size:.82rem;margin-top:.5rem;" aria-live="polite"></div>
+      <div class="stil" id="bKluisUit" style="font-size:.82rem;margin-top:0.5rem;" aria-live="polite"></div>
     </div>
 
     <h3 class="sec">De doos-regie: de vloot op afstand beheren</h3>
     <div class="kaart">
-      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">De doos belt altijd zelf naar buiten; het kantoor duwt nooit iets naar binnen. Zet u hier een doelversie, dan krijgt elke doos op een oudere versie bij zijn eigen melding de update-opdracht mee. Per doos kiest u ook de netwerkrol: naast zaakserver kan het kastje accesspoint of wifi-versterker zijn, met los gastwifi.</p>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 0.5rem;">De doos belt altijd zelf naar buiten; het kantoor duwt nooit iets naar binnen. Zet u hier een doelversie, dan krijgt elke doos op een oudere versie bij zijn eigen melding de update-opdracht mee. Per doos kiest u ook de netwerkrol: naast zaakserver kan het kastje accesspoint of wifi-versterker zijn, met los gastwifi.</p>
       <div class="taakrij">
         <input class="veld" id="dVersie" style="max-width:8rem;" placeholder="Doelversie" maxlength="20">
         <input class="veld h-flex1" id="dNotities" placeholder="Notities bij deze versie (optioneel)" maxlength="300">
@@ -591,20 +591,20 @@
         <label class="stil" style="font-size:.78rem;display:flex;align-items:center;gap:.3rem;"><input type="checkbox" id="dGast"> gastwifi</label>
         <button class="knop stil" id="dNetwerkZet" type="button">Zet de netwerkrol</button>
       </div>
-      <div class="stil" id="dStand" style="font-size:.78rem;color:var(--soft);margin-top:.5rem;" aria-live="polite"></div>
-      <div class="stil" id="dStatussen" style="font-size:.78rem;margin-top:.5rem;line-height:1.6;"></div>
+      <div class="stil" id="dStand" style="font-size:.78rem;color:var(--soft);margin-top:0.5rem;" aria-live="polite"></div>
+      <div class="stil" id="dStatussen" style="font-size:.78rem;margin-top:0.5rem;line-height:1.6;"></div>
     </div>
 
     <h3 class="sec">Gericht schakelen: per stad of dorp, land of persoon</h3>
     <div class="kaart" id="bFijn">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Een functie gericht sluiten voor één plaats (stad of dorp), één land of één persoon, of die beperking weer weghalen. De plaats is de woonplaats van het lid; een persoon mag u op codenaam of e-mail intikken. Wat hier dicht staat ziet u als chips onder de functie op het schakelbord.</p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.6rem;">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.5rem;">
         <span style="flex:1.4;min-width:12rem;">
-          <label for="fjFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Functie</label>
+          <label for="fjFunctie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Functie</label>
           <select id="fjFunctie"></select>
         </span>
         <span style="min-width:8rem;">
-          <label for="fjAs" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">As</label>
+          <label for="fjAs" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">As</label>
           <select id="fjAs">
             <option value="plaats">Plaats (stad/dorp)</option>
             <option value="land">Land (2 letters)</option>
@@ -612,19 +612,19 @@
           </select>
         </span>
         <span style="flex:1;min-width:10rem;">
-          <label for="fjSleutel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Plaats, landcode of codenaam</label>
+          <label for="fjSleutel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Plaats, landcode of codenaam</label>
           <input class="veld" id="fjSleutel" maxlength="60" placeholder="bijv. Zaandam, ES of een codenaam">
         </span>
         <button class="knop stil" id="fjUit" type="button" style="border-color:var(--burgundy);">Sluit gericht</button>
         <button class="knop stil" id="fjAan" type="button">Haal beperking weg</button>
       </div>
-      <div id="fjRegels" class="stil" style="margin-top:.7rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
+      <div id="fjRegels" class="stil" style="margin-top:0.75rem;font-size:.78rem;color:var(--soft);line-height:1.6;"></div>
     </div>
 
     <h3 class="sec">De storingswachter: de automaat van de kast</h3>
     <div class="kaart" id="bWachter">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">Gaat een functie echt stuk (een golf serverfouten), dan gooit de wachter hem vanzelf dicht en probeert hij hem na een pauze weer op proef te openen, steeds geduldiger als het blijft misgaan. Uw hand wint altijd: wat u zelf schakelt laat de automaat met rust. Hieronder elke greep die hij deed.</p>
-      <div id="bWachterLog" class="stil" style="margin-top:.7rem;font-size:.78rem;line-height:1.7;"><div class="leeg">Nog geen enkele greep, zo hoort het.</div></div>
+      <div id="bWachterLog" class="stil" style="margin-top:0.75rem;font-size:.78rem;line-height:1.7;"><div class="leeg">Nog geen enkele greep, zo hoort het.</div></div>
     </div>
 
     <h3 class="sec">Het schakelbord: elke functie van het platform <span id="bTelling" style="text-transform:none;letter-spacing:0;"></span></h3>
@@ -646,7 +646,7 @@
       <h1>RTG Atelier</h1>
     </div>
     <p class="deck">Het besloten ontwerpbureau van de kantoren voor mode en alles wat je aan het lijf draagt: couture, tassen, horloges, schoenen, hoeden, haute joaillerie, eyewear en kleinlederwaren. Geef een brief, de AI tekent het concept uit met silhouet, materialen, een gedempt palet en een verhaal, levert een tech pack en de blik van de creatief directeur. <a href="/apps/websitestudio.html" style="color:var(--gold);">Bouw met de muis een eigen website-sjabloon in de Website-studio →</a></p>
-    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
+    <p style="margin:0.25rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="aKpi"></div>
     <div class="kaart" id="atelier3dKaart">
       <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;justify-content:space-between;">
@@ -657,8 +657,8 @@
           <select class="veld" id="atelier3dKies" style="max-width:16rem;font-size:.78rem;padding:.3rem .5rem;" aria-label="Kies een ontwerp voor het podium"></select>
         </div>
       </div>
-      <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
-      <p style="font-size:.72rem;color:var(--muted);margin:.4rem 0 0;" id="atelier3dUitleg"></p>
+      <canvas id="atelier3d" style="display:block;width:100%;margin-top:0.5rem;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
+      <p style="font-size:.72rem;color:var(--muted);margin:0.5rem 0 0;" id="atelier3dUitleg"></p>
     </div>
     <h3 class="sec">Nieuw ontwerp briefen</h3>
     <div class="kaart">
@@ -667,10 +667,10 @@
         <input class="veld" id="aNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Bordeaux Top-Handle No.2" maxlength="100">
         <input class="veld" id="aHuis" style="max-width:11rem;" placeholder="Huis / maison (optioneel)" maxlength="80">
       </div>
-      <textarea id="aBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gelegenheid, materiaal of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="aBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gelegenheid, materiaal of inspiratie" style="width:100%;margin-top:0.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="aMaak">Ontwerp aanmaken</button>
     </div>
-    <h3 class="sec">Het atelier <span id="aFilters" style="margin-left:.4rem;"></span></h3>
+    <h3 class="sec">Het atelier <span id="aFilters" style="margin-left:0.5rem;"></span></h3>
     <div id="aLijst"><div class="leeg">Nog geen ontwerpen.</div></div>
   </section>
 
@@ -696,11 +696,11 @@
         </select>
         <input class="veld" id="wpDoel" style="flex:1;min-width:11rem;" placeholder="Welk onderdeel? bijv. RTG Pay" maxlength="120" hidden>
       </div>
-      <input class="veld" id="wpNaam" style="width:100%;margin-top:.5rem;" placeholder="Naam van de opdracht" maxlength="120">
-      <textarea id="wpBrief" rows="2" maxlength="900" placeholder="De brief: wat moet het worden of beter kunnen?" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <input class="veld" id="wpNaam" style="width:100%;margin-top:0.5rem;" placeholder="Naam van de opdracht" maxlength="120">
+      <textarea id="wpBrief" rows="2" maxlength="900" placeholder="De brief: wat moet het worden of beter kunnen?" style="width:100%;margin-top:0.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="wpMaak">Opdracht aanmaken + laten uitwerken</button>
     </div>
-    <h3 class="sec">De werkbank <span id="wpFilters" style="margin-left:.4rem;"></span></h3>
+    <h3 class="sec">De werkbank <span id="wpFilters" style="margin-left:0.5rem;"></span></h3>
     <div id="wpLijst"><div class="leeg">Nog geen opdrachten.</div></div>
   </section>
 
@@ -711,7 +711,7 @@
       <h1>RTG Ontwerpstudio</h1>
     </div>
     <p class="deck">Het ontwerpbureau van de kantoren voor alles wat je beweegt: automotive (hypercars, GT's, limousines), jachten & boten, luchtvaart en helikopters. Geef een brief, de AI tekent het concept uit met silhouet, aandrijving, materialen, een gedempt palet en een verhaal, levert een specsheet en de blik van de chef-ontwerper. <a href="/apps/studio-pda.html" style="color:var(--gold);">Onderweg? Open de RTG Studio PDA →</a></p>
-    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
+    <p style="margin:0.25rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="sKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
@@ -720,7 +720,7 @@
         <input class="veld" id="sNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Meridiaan GT" maxlength="100">
         <input class="veld" id="sHuis" style="max-width:11rem;" placeholder="Huis / programma (optioneel)" maxlength="80">
       </div>
-      <textarea id="sBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gebruik, aandrijving of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="sBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gebruik, aandrijving of inspiratie" style="width:100%;margin-top:0.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="sMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Programma's <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een lookbook</span></h3>
@@ -732,7 +732,7 @@
       </div>
       <div class="h-mt60" id="sProg"></div>
     </div>
-    <h3 class="sec">De studio <span id="sFilters" style="margin-left:.4rem;"></span></h3>
+    <h3 class="sec">De studio <span id="sFilters" style="margin-left:0.5rem;"></span></h3>
     <div id="sLijst"><div class="leeg">Nog geen concepten.</div></div>
   </section>
 
@@ -743,7 +743,7 @@
       <h1>RTG Hardwarelab</h1>
     </div>
     <p class="deck">Het ontwerpbureau van de kantoren voor de eigen apparaten: PDA's en tablets, schermen en panelen, sensoren en IoT, de zaakdoos-familie (edge & servers) en accessoires. Geef een brief, de AI tekent het concept uit met behuizing, chip, materialen, een gedempt palet, poorten en een verhaal, levert een stuklijst en de blik van de chef-engineer. <a href="/apps/hardware-pda.html" style="color:var(--gold);">Onderweg? Open de RTG Hardware PDA →</a></p>
-    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
+    <p style="margin:0.25rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="hKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
@@ -752,7 +752,7 @@
         <input class="veld" id="hNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. RTG PDA One" maxlength="100">
         <input class="veld" id="hHuis" style="max-width:11rem;" placeholder="Huis / serie (optioneel)" maxlength="80">
       </div>
-      <textarea id="hBrief" rows="2" maxlength="600" placeholder="De brief: gebruik, formaat, aansluitingen of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="hBrief" rows="2" maxlength="600" placeholder="De brief: gebruik, formaat, aansluitingen of inspiratie" style="width:100%;margin-top:0.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="hMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Series <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een productblad</span></h3>
@@ -764,7 +764,7 @@
       </div>
       <div class="h-mt60" id="hSerie"></div>
     </div>
-    <h3 class="sec">Het lab <span id="hFilters" style="margin-left:.4rem;"></span></h3>
+    <h3 class="sec">Het lab <span id="hFilters" style="margin-left:0.5rem;"></span></h3>
     <div id="hLijst"><div class="leeg">Nog geen concepten.</div></div>
   </section>
 
@@ -775,7 +775,7 @@
       <h1>RTG Architectenbureau</h1>
     </div>
     <p class="deck">Het ontwerpbureau van de kantoren voor het gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. Geef een brief, de AI tekent het concept uit met typologie, constructie, materialen, een gedempt palet, voorzieningen en een verhaal, levert een bouwstaat en de blik van de chef-architect. <a href="/apps/architect-pda.html" style="color:var(--gold);">Onderweg? Open de RTG Architect PDA →</a></p>
-    <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
+    <p style="margin:0.25rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="gKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
     <div class="kaart">
@@ -784,7 +784,7 @@
         <input class="veld" id="gNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Villa Meridiaan" maxlength="100">
         <input class="veld" id="gHuis" style="max-width:11rem;" placeholder="Huis / project (optioneel)" maxlength="80">
       </div>
-      <textarea id="gBrief" rows="2" maxlength="600" placeholder="De brief: ligging, sfeer, gebruik of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="gBrief" rows="2" maxlength="600" placeholder="De brief: ligging, sfeer, gebruik of inspiratie" style="width:100%;margin-top:0.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="gMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Projecten <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een portfolio</span></h3>
@@ -796,7 +796,7 @@
       </div>
       <div class="h-mt60" id="gProj"></div>
     </div>
-    <h3 class="sec">Het bureau <span id="gFilters" style="margin-left:.4rem;"></span></h3>
+    <h3 class="sec">Het bureau <span id="gFilters" style="margin-left:0.5rem;"></span></h3>
     <div id="gLijst"><div class="leeg">Nog geen concepten.</div></div>
   </section>
 
@@ -810,8 +810,8 @@
     <h3 class="sec">Nieuw idee</h3>
     <div class="kaart">
       <input class="veld" id="iTitel" style="width:100%;" placeholder="Titel, bijv. Reislijn Meridiaan" maxlength="100">
-      <textarea id="iBrief" rows="2" maxlength="800" placeholder="Waar gaat het over? De gedachte, de sfeer, het gebruik." style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
-      <div id="iBureaus" class="rij" style="margin-top:.5rem;gap:.5rem;"></div>
+      <textarea id="iBrief" rows="2" maxlength="800" placeholder="Waar gaat het over? De gedachte, de sfeer, het gebruik." style="width:100%;margin-top:0.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <div id="iBureaus" class="rij" style="margin-top:0.5rem;gap:.5rem;"></div>
       <button class="knop h-mt50" id="iMaak">Idee toevoegen</button>
     </div>
     <h3 class="sec">De ideeën</h3>
@@ -853,7 +853,7 @@
     <h3 class="sec">Salarisrun uit de klokuren</h3>
     <div class="kaart" id="bankSalaris"></div>
 
-    <h3 class="sec">Rekeningen <button class="knop stil" id="bankRenteBtn" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.4rem;">Renteronde nu</button> <button class="knop stil" id="bankIncassoBtn" style="padding:.25rem .8rem;font-size:.75rem;">Incassoronde nu</button></h3>
+    <h3 class="sec">Rekeningen <button class="knop stil" id="bankRenteBtn" style="padding:.25rem .8rem;font-size:.75rem;margin-left:0.5rem;">Renteronde nu</button> <button class="knop stil" id="bankIncassoBtn" style="padding:.25rem .8rem;font-size:.75rem;">Incassoronde nu</button></h3>
     <div class="kaart" id="bankRekOpen"></div>
     <div class="kaart lijst" id="bankRek"><div class="leeg">Nog geen rekeningen.</div></div>
   </section>
@@ -874,7 +874,7 @@
     <h3 class="sec">De AI-stadsregisseur (adviseert, beslist niet)</h3>
     <div class="kaart" id="stadAi"></div>
 
-    <h3 class="sec">De Stadsdoos-vloot (eigen hardware) <a class="knop stil" href="/apps/stadsdoos.html" style="padding:.25rem .8rem;font-size:.75rem;margin-left:.4rem;text-decoration:none;">Veld-app voor buiten</a></h3>
+    <h3 class="sec">De Stadsdoos-vloot (eigen hardware) <a class="knop stil" href="/apps/stadsdoos.html" style="padding:.25rem .8rem;font-size:.75rem;margin-left:0.5rem;text-decoration:none;">Veld-app voor buiten</a></h3>
     <div class="kaart" id="stadNodeAan"></div>
     <div class="kaart lijst" id="stadNodes"><div class="leeg">Nog geen Stadsdozen.</div></div>
   </section>
@@ -892,7 +892,7 @@
     <h3 class="sec">De Rust-motor - draait hij mee, klopt de drift?</h3>
     <div class="kaart" id="techMotor"><div class="leeg">Laden…</div></div>
 
-    <h3 class="sec">De Wacht - het immuunsysteem <span id="techWachtStand" class="kpi" style="margin-left:.4rem;"></span></h3>
+    <h3 class="sec">De Wacht - het immuunsysteem <span id="techWachtStand" class="kpi" style="margin-left:0.5rem;"></span></h3>
     <div class="kpis" id="techWachtMeters"></div>
     <div class="kaart h-mt60" id="techLastafworp"></div>
     <div class="kaart lijst h-mt60" id="techRaad"><div class="leeg">Geen open voorstellen.</div></div>
@@ -937,14 +937,14 @@
     </div>
     <p class="deck">Hier helpt u een lid met zijn abonnement, zijn wachtwoord of een klacht. De balie werkt op codenaam: een naam, een e-mailadres, een telefoonnummer of een document komt hier niet in beeld. Elke raadpleging gaat met uw reden het inzagelog in.</p>
 
-    <div class="kaart" id="balDicht" hidden style="padding:1.1rem 1.2rem;margin-top:1rem;">
+    <div class="kaart" id="balDicht" hidden style="padding:1.1rem 1.2rem;margin-top:1.25rem;">
       <p class="stil" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin:0;" id="balDichtTekst"></p>
     </div>
 
     <div id="balWerk">
       <h3 class="sec">Zoeken op codenaam of steuncode</h3>
       <div class="kaart" style="padding:1.1rem 1.2rem;">
-        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">Het lid noemt zijn codenaam of leest de steuncode voor uit de app. Zonder een van beide zoekt de balie niet: door het ledenbestand bladeren is geen hulpvraag.</p>
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 0.25rem;">Het lid noemt zijn codenaam of leest de steuncode voor uit de app. Zonder een van beide zoekt de balie niet: door het ledenbestand bladeren is geen hulpvraag.</p>
         <div class="taakrij">
           <input class="veld h-flex1" id="balCode" placeholder="Codenaam" maxlength="60" autocomplete="off">
           <input class="veld" id="balSteun" style="max-width:11rem;" placeholder="Steuncode" maxlength="24" autocomplete="off">
@@ -955,7 +955,7 @@
 
       <h3 class="sec" id="balDossierKop" hidden>Het dossier</h3>
       <div class="kaart" id="balDossierKaart" hidden style="padding:1.1rem 1.2rem;">
-        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">U opent het dossier van <b id="balGekozen" style="color:var(--txt);"></b>. Noteer eerst waarvoor: die reden gaat mee het inzagelog in, en zonder reden blijft het dossier dicht.</p>
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 0.25rem;">U opent het dossier van <b id="balGekozen" style="color:var(--txt);"></b>. Noteer eerst waarvoor: die reden gaat mee het inzagelog in, en zonder reden blijft het dossier dicht.</p>
         <div class="taakrij">
           <input class="veld h-flex1" id="balReden" placeholder="Waarvoor opent u dit dossier? Bijv. lid belt over een dubbele afschrijving" maxlength="200">
           <button class="knop" id="balOpenen" type="button">Open het dossier</button>
@@ -966,12 +966,12 @@
       <div id="balActies" hidden>
         <h3 class="sec">Wachtwoordherstel</h3>
         <div class="kaart" style="padding:1.1rem 1.2rem;">
-          <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">De herstellink gaat naar het adres van het lid zelf. U krijgt dat adres niet te zien, u zet geen wachtwoord en u leest er nooit een voor. Het lid kiest via de link zijn eigen nieuwe wachtwoord.</p>
+          <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 0.25rem;">De herstellink gaat naar het adres van het lid zelf. U krijgt dat adres niet te zien, u zet geen wachtwoord en u leest er nooit een voor. Het lid kiest via de link zijn eigen nieuwe wachtwoord.</p>
           <div class="taakrij">
             <input class="veld h-flex1" id="balHerstelReden" placeholder="Waarom stuurt u de herstellink?" maxlength="200">
             <button class="knop stil" id="balHerstelKnop" type="button">Verstuur wachtwoordherstel</button>
           </div>
-          <div class="stil" id="balHerstelUit" style="font-size:.8rem;color:var(--soft);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>
+          <div class="stil" id="balHerstelUit" style="font-size:.8rem;color:var(--soft);line-height:1.6;margin-top:0.5rem;" aria-live="polite"></div>
         </div>
 
         <h3 class="sec">Klachten</h3>
@@ -992,7 +992,7 @@
 
         <h3 class="sec">Een abonnementswijziging voorstellen</h3>
         <div class="kaart" style="padding:1.1rem 1.2rem;">
-          <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">Lifestyle en Business worden uitsluitend na een menselijk besluit toegekend. Wat u hier vastlegt is een voorstel: het gaat naar diezelfde goedkeuring en verleent zelf niets. Beloof het lid dus geen toegang, ook niet als het voorstel voor de hand ligt.</p>
+          <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 0.25rem;">Lifestyle en Business worden uitsluitend na een menselijk besluit toegekend. Wat u hier vastlegt is een voorstel: het gaat naar diezelfde goedkeuring en verleent zelf niets. Beloof het lid dus geen toegang, ook niet als het voorstel voor de hand ligt.</p>
           <div class="taakrij">
             <select class="veld" id="balAboPas" style="max-width:12rem;" aria-label="Voorgestelde pas">
               <option value="gratis">De gratis app</option>
@@ -1003,7 +1003,7 @@
             <input class="veld h-flex1" id="balAboReden" placeholder="Waarom deze wijziging?" maxlength="200">
             <button class="knop stil" id="balAboKnop" type="button">Leg het voorstel vast</button>
           </div>
-          <div class="stil" id="balAboUit" style="font-size:.8rem;color:var(--soft);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>
+          <div class="stil" id="balAboUit" style="font-size:.8rem;color:var(--soft);line-height:1.6;margin-top:0.5rem;" aria-live="polite"></div>
         </div>
       </div>
     </div>
@@ -1206,9 +1206,9 @@ async function laadRegering(){
   try {
     const b = await api('regering/briefing');
     $('#kRegBriefing').innerHTML = b.regels.map(r => '<div style="font-size:.86rem;padding:.25rem 0;">' + esc(r) + '</div>').join('') +
-      b.aandacht.map(a => '<div style="font-size:.86rem;padding:.3rem .5rem;margin-top:.3rem;border-left:2px solid ' + (a.urgent ? 'var(--burgundy)' : 'var(--gold)') + ';">' +
+      b.aandacht.map(a => '<div style="font-size:.86rem;padding:.3rem .5rem;margin-top:0.25rem;border-left:2px solid ' + (a.urgent ? 'var(--burgundy)' : 'var(--gold)') + ';">' +
         '<strong>' + esc(a.portefeuille) + '</strong> · ' + esc(a.tekst) + '</div>').join('') +
-      '<div style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">' + esc(b.slot) + '</div>';
+      '<div style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">' + esc(b.slot) + '</div>';
   } catch (e) { $('#kRegBriefing').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
   try {
     const d = await api('regering/besluiten');
@@ -1243,7 +1243,7 @@ async function laadOpvang(){
       $('#kOpvSoort').innerHTML = Object.entries(d.soorten).map(([k, v]) => '<option value="' + esc(k) + '">' + esc(v) + '</option>').join('');
     $('#kOpvDosLoc').innerHTML = d.locaties.map(l => '<option value="' + esc(l.id) + '">' + esc(l.naam) + ' (' + l.vrij + ' vrij)</option>').join('');
     $('#kOpvLocaties').innerHTML =
-      '<div style="font-size:.84rem;color:var(--gold);margin-bottom:.3rem;">' + d.totaal.bezet + ' van ' + d.totaal.capaciteit + ' plekken bezet (' + d.totaal.bezettingPct + '%) · ' + d.totaal.vrij + ' vrij</div>' +
+      '<div style="font-size:.84rem;color:var(--gold);margin-bottom:0.25rem;">' + d.totaal.bezet + ' van ' + d.totaal.capaciteit + ' plekken bezet (' + d.totaal.bezettingPct + '%) · ' + d.totaal.vrij + ' vrij</div>' +
       (d.locaties.length ? d.locaties.map(l =>
         '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.84rem;">' +
         '<strong style="min-width:11rem;">' + esc(l.naam) + '</strong>' +
@@ -1282,13 +1282,13 @@ async function laadAfdHotel(kamerId, kamerNaam){
     $('#kHotelNaam').textContent = d.hotel.naam;
     $('#kHotSoort').innerHTML = d.kamers.map(k => '<option value="' + esc(k.soort) + '">' + esc(k.naam) + ' (' + k.vrij + ' vrij)</option>').join('');
     $('#kHotelVak').innerHTML =
-      '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + esc(d.hotel.motto) + '</div>' +
+      '<div style="color:var(--soft);font-size:.8rem;margin-bottom:0.5rem;">' + esc(d.hotel.motto) + '</div>' +
       '<div style="font-size:.84rem;">' + d.eenheden + ' kamers · vannacht ' + d.vannacht + ' bezet (' + d.bezettingPct + '%)</div>' +
       d.kamers.map(k => '<div style="display:flex;gap:.6rem;font-size:.82rem;padding:.2rem 0;"><span style="min-width:9rem;">' + esc(k.naam) + '</span>' +
         '<span style="color:var(--soft);">' + esc(k.beschrijving) + '</span><span style="margin-left:auto;">' + k.vrij + '/' + k.aantal + '</span></div>').join('') +
-      (d.komend.length ? '<div style="margin-top:.5rem;font-size:.82rem;">' + d.komend.slice(0, 6).map(b =>
+      (d.komend.length ? '<div style="margin-top:0.5rem;font-size:.82rem;">' + d.komend.slice(0, 6).map(b =>
         '<div style="color:var(--soft);">' + esc(b.van) + ' → ' + esc(b.tot) + ' · ' + esc(b.soortNaam) + ' · ' + esc(b.voor) + '</div>').join('') + '</div>' : '') +
-      '<div style="color:var(--soft);font-size:.76rem;margin-top:.4rem;">' + esc(d.verrekening) + '</div>';
+      '<div style="color:var(--soft);font-size:.76rem;margin-top:0.5rem;">' + esc(d.verrekening) + '</div>';
   } catch (e) { $('#kHotelVak').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
   const boek = $('#kHotBoek');
   if (boek && !boek._b) { boek._b = 1; boek.addEventListener('click', async () => {
@@ -1305,7 +1305,7 @@ async function laadAfdHotel(kamerId, kamerNaam){
 const zzTijd = t => new Date(t).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 function zelfzorgHtml(s){
   const l = s.laatste || {};
-  return '<p class="stil" style="font-size:.82rem;color:var(--soft);margin:0 0 .6rem;">Versie '+esc(s.versie)+' · datakast op schema v'+s.schema+
+  return '<p class="stil" style="font-size:.82rem;color:var(--soft);margin:0 0 0.5rem;">Versie '+esc(s.versie)+' · datakast op schema v'+s.schema+
     (s.wachtend.length ? ' · <b style="color:var(--gold);">upgrade naar v'+s.doelSchema+' staat klaar</b>' : ' (bij)')+
     ' · automaat: '+(s.automaat.aan ? 'elke '+s.automaat.elkeUren+' uur een stille opruim- en beschermronde' : 'uit')+'.</p>'+
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;">'+
@@ -1314,9 +1314,9 @@ function zelfzorgHtml(s){
       '<button class="knop stil" data-zz="herstel" type="button">Repareer</button>'+
       '<button class="knop stil" data-zz="upgrade" type="button"'+(s.wachtend.length ? ' style="border-color:var(--gold);"' : '')+'>⬆ Upgrade'+(s.wachtend.length ? ' naar v'+s.doelSchema : '')+'</button>'+
     '</div>'+
-    (s.wachtend.length ? '<div class="stil" style="font-size:.78rem;color:var(--soft);margin-top:.5rem;">Klaarstaand: '+s.wachtend.map(w => 'v'+w.v+' · '+esc(w.uitleg)).join('<br>')+'</div>' : '')+
-    '<div class="stil" data-zz-uit style="font-size:.82rem;margin-top:.6rem;" aria-live="polite"></div>'+
-    '<div style="margin-top:.6rem;font-size:.78rem;color:var(--soft);line-height:1.7;">'+
+    (s.wachtend.length ? '<div class="stil" style="font-size:.78rem;color:var(--soft);margin-top:0.5rem;">Klaarstaand: '+s.wachtend.map(w => 'v'+w.v+' · '+esc(w.uitleg)).join('<br>')+'</div>' : '')+
+    '<div class="stil" data-zz-uit style="font-size:.82rem;margin-top:0.5rem;" aria-live="polite"></div>'+
+    '<div style="margin-top:0.5rem;font-size:.78rem;color:var(--soft);line-height:1.7;">'+
       (s.journaal.length ? s.journaal.map(r =>
         '<div>'+zzTijd(r.at)+' · <b>'+esc(r.soort)+'</b> door '+esc(r.door)+
         (r.acties.length ? ' · '+r.acties.map(a => esc(a.wat)+(a.aantal > 1 ? ' ('+a.aantal+')' : '')).join('; ') : ' · niets te doen')+
@@ -1383,7 +1383,7 @@ async function vraagRahulKamer(){
   try {
     const r = await api('kamer/ai', { id: KAMER, q: $('#kRahulVraag').value });
     let html = '<div style="white-space:pre-wrap;">'+esc(r.antwoord)+'</div>';
-    if (r.punten && r.punten.length) html += '<div style="margin-top:.6rem;color:var(--soft);font-size:.78rem;line-height:1.6;"><b>Uit de cijfers:</b><br>'+r.punten.map(esc).join('<br>')+'</div>';
+    if (r.punten && r.punten.length) html += '<div style="margin-top:0.5rem;color:var(--soft);font-size:.78rem;line-height:1.6;"><b>Uit de cijfers:</b><br>'+r.punten.map(esc).join('<br>')+'</div>';
     uit.innerHTML = html;
   } catch (e) { uit.textContent = e.message; }
   knop.disabled = false;
@@ -1406,9 +1406,9 @@ async function openAtelier(){
   renderAtelier();
 }
 function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+g+';border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;">'+esc(s)+'</span>'; }
-function swatches(kleuren){ return '<div style="display:flex;gap:.3rem;margin:.4rem 0;">'+(kleuren||[]).map(k =>
+function swatches(kleuren){ return '<div style="display:flex;gap:.3rem;margin:0.5rem 0;">'+(kleuren||[]).map(k =>
   '<span title="'+esc(k.naam)+'" style="width:1.5rem;height:1.5rem;border-radius:6px;border:1px solid var(--line);background:'+esc(k.hex)+';"></span>').join('')+
-  '<span style="align-self:center;font-size:.7rem;color:var(--muted);margin-left:.3rem;">'+(kleuren||[]).map(k => esc(k.naam)).join(' · ')+'</span></div>'; }
+  '<span style="align-self:center;font-size:.7rem;color:var(--muted);margin-left:0.25rem;">'+(kleuren||[]).map(k => esc(k.naam)).join(' · ')+'</span></div>'; }
 function renderAtelier(){
   const d = ATELIER; if (!d) return;
   $('#aKpi').innerHTML = [
@@ -1417,7 +1417,7 @@ function renderAtelier(){
   ].map(x => '<div class="kaart kpi-tegel"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('');
   $('#aFilters').innerHTML = '<button class="knop stil aFilterKnop'+(aFilter===''?' aan':'')+'" data-f="" style="padding:.15rem .6rem;font-size:.7rem;">Alle</button> ' +
     d.categorieen.filter(c => c.aantal).map(c => '<button class="knop stil aFilterKnop'+(aFilter===c.id?' aan':'')+'" data-f="'+c.id+'" style="padding:.15rem .6rem;font-size:.7rem;">'+ico(c.icon)+' '+esc(c.label)+' ('+c.aantal+')</button>').join(' ') +
-    ' <span style="color:var(--line);margin:0 .2rem;">|</span> ' +
+    ' <span style="color:var(--line);margin:0 0.25rem;">|</span> ' +
     ['', ...d.statussen].map(s => '<button class="knop stil aStatusKnop'+(aStatus===s?' aan':'')+'" data-s="'+s+'" style="padding:.15rem .6rem;font-size:.7rem;">'+(s || 'elke status')+'</button>').join(' ');
   $('#aFilters').querySelectorAll('.aFilterKnop').forEach(b => b.addEventListener('click', () => { aFilter = b.dataset.f; renderAtelier(); }));
   $('#aFilters').querySelectorAll('.aStatusKnop').forEach(b => b.addEventListener('click', () => { aStatus = b.dataset.s; renderAtelier(); }));
@@ -1425,22 +1425,22 @@ function renderAtelier(){
   const opts = d.statussen.map(s => '<option value="'+s+'">'+s+'</option>').join('');
   $('#aLijst').innerHTML = lijst.length ? lijst.map(o => {
     const c = o.concept;
-    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+    return '<div class="kaart" style="margin-bottom:0.75rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
         '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.categorieLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld aStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
       '</div>'+
-      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
+      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:0.5rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
       (c ? '<div class="h-mt50">'+swatches(c.kleuren)+
         '<div style="font-size:.82rem;line-height:1.6;"><b>'+esc(c.silhouet)+'</b> in '+esc((c.materialen||[]).join(', '))+'. '+
         '<span style="color:var(--muted);">'+esc((c.details||[]).join(' · '))+(c.afwerking?' · '+esc(c.afwerking):'')+'</span></div>'+
-        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
-        : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
+        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:0.5rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
+        : '<p style="font-size:.78rem;color:var(--muted);margin-top:0.5rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.techpack ? techpackHtml(o.techpack) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Creatief directeur:</b> '+esc(o.kritiek)+'</div>' : '')+
-      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
+      (o.kritiek ? '<div style="margin-top:0.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Creatief directeur:</b> '+esc(o.kritiek)+'</div>' : '')+
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         '<button class="knop aConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil aTech" data-o="'+o.id+'">Tech pack</button>'+
         '<button class="knop stil aKritiek" data-o="'+o.id+'">Kritiek</button>'+
@@ -1452,10 +1452,10 @@ function renderAtelier(){
   bindAtelier();
 }
 function techpackHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
-    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Tech pack</div>'+
+  return '<div style="margin-top:0.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.25rem;">Tech pack</div>'+
     (p.onderdelen||[]).map(o => '<div style="font-size:.8rem;"><b>'+esc(o.naam)+'</b> · '+esc(o.materiaal)+' <span style="color:var(--muted);">('+esc(o.spec)+')</span></div>').join('')+
-    '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.constructie)+' · '+esc(p.maten)+'</div>'+
+    '<div style="font-size:.75rem;color:var(--muted);margin-top:0.25rem;">'+esc(p.constructie)+' · '+esc(p.maten)+'</div>'+
     '<div style="font-size:.72rem;color:var(--muted);">Controle: '+esc((p.controle||[]).join(', '))+'</div></div>';
 }
 function bindAtelier(){
@@ -1507,15 +1507,15 @@ async function openWerkplaats(){
   try { WP = await api('werkplaats'); } catch(e){ meld(e.message); return; }
   zetKamerUrl('werkplaats'); toon('vWerkplaats'); renderWerkplaats();
 }
-function wpLijstje(t, a){ return (a && a.length) ? '<div class="h-mt40"><b style="color:var(--gold);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;">'+t+'</b><ul style="margin:.2rem 0 0 1rem;padding:0;font-size:.83rem;line-height:1.5;">'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>' : ''; }
+function wpLijstje(t, a){ return (a && a.length) ? '<div class="h-mt40"><b style="color:var(--gold);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;">'+t+'</b><ul style="margin:0.25rem 0 0 1.25rem;padding:0;font-size:.83rem;line-height:1.5;">'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>' : ''; }
 function wpPlan(p){
   if(!p) return '';
-  let b = '<div class="kaart" style="margin-top:.5rem;background:var(--bg);">';
+  let b = '<div class="kaart" style="margin-top:0.5rem;background:var(--bg);">';
   if(p.soort==='nieuw'){
     if(p.doel) b += '<p style="margin:0;">'+esc(p.doel)+'</p>';
-    if(p.doelgroep) b += '<p class="stil" style="font-size:.78rem;color:var(--soft);margin:.3rem 0 0;">Voor: '+esc(p.doelgroep)+'</p>';
+    if(p.doelgroep) b += '<p class="stil" style="font-size:.78rem;color:var(--soft);margin:0.25rem 0 0;">Voor: '+esc(p.doelgroep)+'</p>';
     b += wpLijstje('Schermen',p.schermen)+wpLijstje('Functies',p.functies);
-    if(p.huisstijl) b += '<div class="h-mt40"><b style="color:var(--gold);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;">Huisstijl</b><p style="margin:.15rem 0 0;font-size:.83rem;">'+esc(p.huisstijl)+'</p></div>';
+    if(p.huisstijl) b += '<div class="h-mt40"><b style="color:var(--gold);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;">Huisstijl</b><p style="margin:0.25rem 0 0;font-size:.83rem;">'+esc(p.huisstijl)+'</p></div>';
     b += wpLijstje('Eerste stappen',p.eersteStappen);
   } else {
     if(p.analyse) b += '<p style="margin:0;">'+esc(p.analyse)+'</p>';
@@ -1531,15 +1531,15 @@ function renderWerkplaats(){
   const it = WP.items || [];
   if(!it.length){ $('#wpLijst').innerHTML = '<div class="leeg">Nog geen opdrachten.</div>'; return; }
   const opts = o => (WP.statussen||[]).map(s=>'<option value="'+s+'"'+(s===o.status?' selected':'')+'>'+esc(s)+'</option>').join('');
-  $('#wpLijst').innerHTML = it.map(o => '<div class="kaart" style="margin-bottom:.6rem;">'+
+  $('#wpLijst').innerHTML = it.map(o => '<div class="kaart" style="margin-bottom:0.5rem;">'+
     '<div class="rij" style="justify-content:space-between;gap:.5rem;align-items:baseline;flex-wrap:wrap;">'+
       '<h3 style="margin:0;font-size:1rem;">'+esc(o.naam)+'</h3>'+
       '<span class="stil" style="font-size:.72rem;color:var(--gold);">'+esc(o.soortLabel)+(o.doelSoortLabel?' · '+esc(o.doelSoortLabel):'')+(o.doel?' · '+esc(o.doel):'')+'</span></div>'+
-    (o.brief?'<p class="stil" style="font-size:.82rem;color:var(--soft);margin:.3rem 0 0;">'+esc(o.brief)+'</p>':'')+
+    (o.brief?'<p class="stil" style="font-size:.82rem;color:var(--soft);margin:0.25rem 0 0;">'+esc(o.brief)+'</p>':'')+
     wpPlan(o.plan)+
-    (o.kritiek?'<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.83rem;font-style:italic;">'+esc(o.kritiek)+'</div>':'')+
-    (o.uitgifte?'<div class="rij" style="gap:.4rem;margin-top:.5rem;align-items:center;font-size:.78rem;color:var(--gold);"><span class="ic" style="width:1rem;height:1rem;">'+ico('sitemaker')+'</span>Live in de '+esc(o.uitgifte.plankLabel||'winkel')+' · zichtbaar in de Mall</div>':'')+
-    '<div class="rij" style="gap:.4rem;margin-top:.6rem;flex-wrap:wrap;align-items:center;">'+
+    (o.kritiek?'<div style="margin-top:0.5rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.83rem;font-style:italic;">'+esc(o.kritiek)+'</div>':'')+
+    (o.uitgifte?'<div class="rij" style="gap:.4rem;margin-top:0.5rem;align-items:center;font-size:.78rem;color:var(--gold);"><span class="ic" style="width:1rem;height:1rem;">'+ico('sitemaker')+'</span>Live in de '+esc(o.uitgifte.plankLabel||'winkel')+' · zichtbaar in de Mall</div>':'')+
+    '<div class="rij" style="gap:.4rem;margin-top:0.5rem;flex-wrap:wrap;align-items:center;">'+
       '<button class="knop stil" data-wp-uit="'+o.id+'" style="font-size:.78rem;">'+(o.plan?'Opnieuw uitwerken':'AI werkt het uit')+'</button>'+
       (o.plan?'<button class="knop stil" data-wp-kri="'+o.id+'" style="font-size:.78rem;">Scherpe blik</button>':'')+
       (o.plan?(o.uitgifte
@@ -1607,21 +1607,21 @@ function renderStudio(){
   const progOpts = '<option value="">Geen programma</option>' + d.collecties.map(c => '<option value="'+esc(c.naam)+'">'+esc(c.naam)+'</option>').join('');
   $('#sLijst').innerHTML = lijst.length ? lijst.map(o => {
     const c = o.concept;
-    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+    return '<div class="kaart" style="margin-bottom:0.75rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
         '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld sStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
       '</div>'+
-      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
+      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:0.5rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
       (c ? '<div class="h-mt50">'+swatches(c.kleuren)+
         '<div style="font-size:.82rem;line-height:1.6;"><b>'+esc(c.silhouet)+'</b> · '+esc(c.aandrijving)+'<br>'+esc((c.materialen||[]).join(', '))+' <span style="color:var(--muted);">'+esc((c.uitrusting||[]).join(' · '))+'</span></div>'+
-        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
-        : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
+        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:0.5rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
+        : '<p style="font-size:.78rem;color:var(--muted);margin-top:0.5rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.specsheet ? specsheetHtml(o.specsheet) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-ontwerper:</b> '+esc(o.kritiek)+'</div>' : '')+
-      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
+      (o.kritiek ? '<div style="margin-top:0.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-ontwerper:</b> '+esc(o.kritiek)+'</div>' : '')+
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         '<button class="knop sConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil sSpec" data-o="'+o.id+'">Specsheet</button>'+
         '<button class="knop stil sKritiek" data-o="'+o.id+'">Kritiek</button>'+
@@ -1632,10 +1632,10 @@ function renderStudio(){
   bindStudio();
 }
 function specsheetHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
-    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Specsheet</div>'+
+  return '<div style="margin-top:0.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.25rem;">Specsheet</div>'+
     (p.modules||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
-    '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.prestaties)+' · '+esc(p.afmetingen)+'</div>'+
+    '<div style="font-size:.75rem;color:var(--muted);margin-top:0.25rem;">'+esc(p.prestaties)+' · '+esc(p.afmetingen)+'</div>'+
     '<div style="font-size:.72rem;color:var(--muted);">Controle: '+esc((p.controle||[]).join(', '))+'</div></div>';
 }
 function bindStudio(){
@@ -1780,28 +1780,28 @@ function renderHardware(){
   const serieOpts = '<option value="">Geen serie</option>' + d.collecties.map(c => '<option value="'+esc(c.naam)+'">'+esc(c.naam)+'</option>').join('');
   $('#hLijst').innerHTML = lijst.length ? lijst.map(o => {
     const c = o.concept;
-    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+    return '<div class="kaart" style="margin-bottom:0.75rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
         '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld hStatus" data-o="'+o.id+'" style="max-width:8.5rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
       '</div>'+
-      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
+      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:0.5rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
       (c ? '<div class="h-mt50">'+swatches(c.kleuren)+
         '<div style="font-size:.82rem;line-height:1.6;"><b>'+esc(c.behuizing)+'</b> · '+esc(c.chip)+'<br>'+esc((c.materialen||[]).join(', '))+' <span style="color:var(--muted);">'+esc((c.poorten||[]).join(' · '))+'</span></div>'+
-        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
-        : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
+        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:0.5rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
+        : '<p style="font-size:.78rem;color:var(--muted);margin-top:0.5rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.stuklijst ? stuklijstHtml(o.stuklijst) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-engineer:</b> '+esc(o.kritiek)+'</div>' : '')+
-      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
+      (o.kritiek ? '<div style="margin-top:0.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-engineer:</b> '+esc(o.kritiek)+'</div>' : '')+
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         '<button class="knop hConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil hStuk" data-o="'+o.id+'">Stuklijst</button>'+
         '<button class="knop stil hKritiek" data-o="'+o.id+'">Kritiek</button>'+
         '<select class="veld hSerieSel" data-o="'+o.id+'" title="Toewijzen aan serie" style="max-width:11rem;font-size:.75rem;padding:.25rem .4rem;">'+(o.collectie?serieOpts.replace('value="'+esc(o.collectie)+'"','value="'+esc(o.collectie)+'" selected'):serieOpts)+'</select>'+
         '<button class="knop stil hDel" data-o="'+o.id+'" style="margin-left:auto;color:var(--burgundy);">Verwijder</button>'+
       '</div>'+
-      '<div style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;">'+(o.winkel ?
+      '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:.5rem;">'+(o.winkel ?
         '<div class="rij" style="gap:.5rem;align-items:center;font-size:.8rem;"><span style="color:var(--gold);">In de winkel · EUR '+o.winkel.eenmalig+' eenmalig'+(o.winkel.perMaand?' · EUR '+o.winkel.perMaand+' p/m':'')+' · '+esc(o.winkel.eenheid)+'</span>'+
           '<button class="knop stil hWinkelUit" data-o="'+o.id+'" style="margin-left:auto;font-size:.75rem;padding:.25rem .5rem;">Terughalen</button></div>'
         :
@@ -1815,10 +1815,10 @@ function renderHardware(){
   bindHardware();
 }
 function stuklijstHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
-    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Stuklijst</div>'+
+  return '<div style="margin-top:0.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.25rem;">Stuklijst</div>'+
     (p.onderdelen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
-    '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.verbruik)+' · '+esc(p.afmetingen)+'</div>'+
+    '<div style="font-size:.75rem;color:var(--muted);margin-top:0.25rem;">'+esc(p.verbruik)+' · '+esc(p.afmetingen)+'</div>'+
     '<div style="font-size:.72rem;color:var(--muted);">Controle: '+esc((p.controle||[]).join(', '))+'</div></div>';
 }
 function bindHardware(){
@@ -1972,21 +1972,21 @@ function renderArchitect(){
   const projOpts = '<option value="">Geen project</option>' + d.collecties.map(c => '<option value="'+esc(c.naam)+'">'+esc(c.naam)+'</option>').join('');
   $('#gLijst').innerHTML = lijst.length ? lijst.map(o => {
     const c = o.concept;
-    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+    return '<div class="kaart" style="margin-bottom:0.75rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
         '<div><h2 style="font-size:1.05rem;margin:0;">'+ico(o.icon)+' '+esc(o.naam)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+(o.collectie?' · '+esc(o.collectie):'')+'</span></div>'+
         '<div style="display:flex;gap:.4rem;align-items:center;">'+statusPil(o.status)+
         '<select class="veld gStatus" data-o="'+o.id+'" style="max-width:9rem;font-size:.75rem;padding:.25rem .4rem;">'+opts.replace('value="'+o.status+'"','value="'+o.status+'" selected')+'</select></div>'+
       '</div>'+
-      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:.4rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
+      (o.brief?'<p style="font-size:.8rem;color:var(--muted);margin:0.5rem 0 0;">"'+esc(o.brief)+'"</p>':'')+
       (c ? '<div class="h-mt50">'+swatches(c.kleuren)+
         '<div style="font-size:.82rem;line-height:1.6;"><b>'+esc(c.typologie)+'</b> · '+esc(c.constructie)+'<br>'+esc((c.materialen||[]).join(', '))+' <span style="color:var(--muted);">'+esc((c.voorzieningen||[]).join(' · '))+'</span></div>'+
-        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
-        : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
+        (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:0.5rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
+        : '<p style="font-size:.78rem;color:var(--muted);margin-top:0.5rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.bouwstaat ? bouwstaatHtml(o.bouwstaat) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-architect:</b> '+esc(o.kritiek)+'</div>' : '')+
-      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
+      (o.kritiek ? '<div style="margin-top:0.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-architect:</b> '+esc(o.kritiek)+'</div>' : '')+
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         '<button class="knop gConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil gBouw" data-o="'+o.id+'">Bouwstaat</button>'+
         '<button class="knop stil gKritiek" data-o="'+o.id+'">Kritiek</button>'+
@@ -1997,10 +1997,10 @@ function renderArchitect(){
   bindArchitect();
 }
 function bouwstaatHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
-    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Bouwstaat</div>'+
+  return '<div style="margin-top:0.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+    '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.25rem;">Bouwstaat</div>'+
     (p.delen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
-    '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.oppervlak)+' · '+esc(p.kavel)+'</div>'+
+    '<div style="font-size:.75rem;color:var(--muted);margin-top:0.25rem;">'+esc(p.oppervlak)+' · '+esc(p.kavel)+'</div>'+
     '<div style="font-size:.72rem;color:var(--muted);">Controle: '+esc((p.controle||[]).join(', '))+'</div></div>';
 }
 function bindArchitect(){
@@ -2144,24 +2144,24 @@ function renderIdeeen(){
   const bureauOpts = d.bureaus;
   $('#iLijst').innerHTML = d.ideeen.length ? d.ideeen.map(o => {
     const spinKnoppen = bureauOpts.map(b => '<button class="knop stil iSpin" data-o="'+o.id+'" data-b="'+b.id+'" style="font-size:.72rem;padding:.2rem .5rem;">'+RTGGlyf.tekst(b.icon)+' → '+esc(b.label.replace('RTG ',''))+'</button>').join(' ');
-    return '<div class="kaart" style="margin-bottom:.7rem;" data-o="'+o.id+'">'+
+    return '<div class="kaart" style="margin-bottom:0.75rem;" data-o="'+o.id+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.6rem;flex-wrap:wrap;">'+
         '<div><h2 style="font-size:1.05rem;margin:0;">'+esc(o.titel)+'</h2>'+
         '<span style="font-size:.72rem;color:var(--muted);">'+o.bureaus.map(b => b.icon+' '+esc(b.label.replace('RTG ',''))).join(' · ')+(o.door?' · '+esc(o.door):'')+'</span></div>'+
         statusPil(o.status)+'</div>'+
-      (o.brief?'<p style="font-size:.82rem;color:var(--muted);line-height:1.6;margin:.4rem 0 0;">'+esc(o.brief)+'</p>':'')+
-      (o.uitwerking ? '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
-        '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Brief per bureau</div>'+
-        Object.keys(o.uitwerking).map(k => { const b = bureauOpts.find(x => x.id === k) || { icon:'•', label:k }; return '<div style="font-size:.8rem;line-height:1.55;margin-bottom:.2rem;"><b>'+ico(b.icon)+' '+esc(b.label.replace('RTG ',''))+':</b> '+esc(o.uitwerking[k])+'</div>'; }).join('')+'</div>' : '')+
-      (o.spinoffs && o.spinoffs.length ? '<div style="font-size:.76rem;color:var(--gold);margin-top:.45rem;">Als concept: '+o.spinoffs.map(s => esc(s.bureauLabel.replace('RTG ',''))).join(', ')+'</div>' : '')+
-      (o.reacties && o.reacties.length ? '<div style="margin-top:.5rem;border-left:2px solid var(--line);padding-left:.7rem;">'+o.reacties.slice(-4).map(r => '<div style="font-size:.8rem;line-height:1.5;"><b>'+esc(r.door)+':</b> '+esc(r.tekst)+'</div>').join('')+'</div>' : '')+
-      '<div class="rij" style="margin-top:.55rem;gap:.4rem;">'+
+      (o.brief?'<p style="font-size:.82rem;color:var(--muted);line-height:1.6;margin:0.5rem 0 0;">'+esc(o.brief)+'</p>':'')+
+      (o.uitwerking ? '<div style="margin-top:0.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+        '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.25rem;">Brief per bureau</div>'+
+        Object.keys(o.uitwerking).map(k => { const b = bureauOpts.find(x => x.id === k) || { icon:'•', label:k }; return '<div style="font-size:.8rem;line-height:1.55;margin-bottom:0.25rem;"><b>'+ico(b.icon)+' '+esc(b.label.replace('RTG ',''))+':</b> '+esc(o.uitwerking[k])+'</div>'; }).join('')+'</div>' : '')+
+      (o.spinoffs && o.spinoffs.length ? '<div style="font-size:.76rem;color:var(--gold);margin-top:0.5rem;">Als concept: '+o.spinoffs.map(s => esc(s.bureauLabel.replace('RTG ',''))).join(', ')+'</div>' : '')+
+      (o.reacties && o.reacties.length ? '<div style="margin-top:0.5rem;border-left:2px solid var(--line);padding-left:.7rem;">'+o.reacties.slice(-4).map(r => '<div style="font-size:.8rem;line-height:1.5;"><b>'+esc(r.door)+':</b> '+esc(r.tekst)+'</div>').join('')+'</div>' : '')+
+      '<div class="rij" style="margin-top:0.5rem;gap:.4rem;">'+
         '<input class="veld iReactieIn" data-o="'+o.id+'" placeholder="Reageer..." maxlength="500" style="flex:1;min-width:9rem;font-size:.78rem;padding:.3rem .5rem;">'+
         '<button class="knop stil iReactie" data-o="'+o.id+'" style="font-size:.74rem;padding:.3rem .55rem;">Plaats</button>'+
         '<button class="knop iUitwerk" data-o="'+o.id+'" style="font-size:.74rem;padding:.3rem .55rem;">✶ AI werkt uit</button>'+
         '<button class="knop stil iDel" data-o="'+o.id+'" style="margin-left:auto;font-size:.74rem;padding:.3rem .55rem;color:var(--burgundy);">Verwijder</button>'+
       '</div>'+
-      '<div class="rij" style="margin-top:.4rem;gap:.35rem;"><span style="font-size:.72rem;color:var(--soft);align-self:center;">Als concept naar:</span>'+spinKnoppen+'</div>'+
+      '<div class="rij" style="margin-top:0.5rem;gap:.35rem;"><span style="font-size:.72rem;color:var(--soft);align-self:center;">Als concept naar:</span>'+spinKnoppen+'</div>'+
     '</div>';
   }).join('') : '<div class="leeg">Nog geen ideeën. Begin er een.</div>';
   bindIdeeen();
@@ -2198,7 +2198,7 @@ $('#iMaak').addEventListener('click', async () => {
 
 /* ---------- platform-statistieken, chat & snap, onboarding ---------- */
 function statsHtml(d){
-  return d.stats.map(g => '<div class="kaart lijst" style="grid-column:1/-1;"><h4>'+esc(g.groep)+'</h4><div class="kpis" style="margin:.5rem 0 0;">'+
+  return d.stats.map(g => '<div class="kaart lijst" style="grid-column:1/-1;"><h4>'+esc(g.groep)+'</h4><div class="kpis" style="margin:0.5rem 0 0;">'+
     g.items.map(i => '<div class="kaart kpi-tegel"><b>'+esc(String(i[1]))+'</b><span>'+esc(i[0])+'</span></div>').join('')+'</div></div>').join('');
 }
 let mijnNaam = '';
@@ -2219,7 +2219,7 @@ function chatWidget(el, kamerId){
       box.innerHTML = d.berichten.length ? d.berichten.map(m =>
         '<div style="padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.88rem;"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+
         '<span style="color:var(--soft);font-size:.7rem;">'+new Date(m.at).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span><br>'+
-        (m.foto ? '<img src="'+m.foto+'" alt="Snap van '+esc(m.naam)+'" style="max-width:12rem;border-radius:10px;margin:.2rem 0;">' : '')+esc(m.tekst||'')+'</div>').join('')
+        (m.foto ? '<img src="'+m.foto+'" alt="Snap van '+esc(m.naam)+'" style="max-width:12rem;border-radius:10px;margin:0.25rem 0;">' : '')+esc(m.tekst||'')+'</div>').join('')
         : '<div class="leeg">Nog stil hier; zeg eens hallo.</div>';
       box.scrollTop = box.scrollHeight;
     } catch (e) {}
@@ -2440,19 +2440,19 @@ async function bankSchakel(pad, body){
 function bankRenderKnop(r){
   const seg = r.modi.map(m => '<button class="knop' + (m === r.modus ? '' : ' stil') + '" data-modus="' + m + '" style="padding:.45rem 1rem;">' + esc(BK_MODUS[m]) + '</button>').join(' ');
   const nood = r.nood && r.nood.actief
-    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:8px;color:var(--burgundy-on-dark,#C23A5E);"><strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
+    ? '<div style="margin:0.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:8px;color:var(--burgundy-on-dark,#C23A5E);"><strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:0.5rem;">Herstel</button></div>'
     : '';
   const a = r.autorisatie;
   const aut = a
-    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
+    ? '<div style="margin:0.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:0.5rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
     : '';
   $('#bankKnop').innerHTML =
-    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.6rem;">' +
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.5rem;">' +
       '<span style="font-size:.72rem;color:var(--soft);">Schakelen gebeurt op je eigen RTG-account.<br>Opschalen vraagt een <strong>tweede</strong> ingelogd account.</span>' +
       '<label style="font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankLeden"' + (r.ledenAan ? ' checked' : '') + '> Live voor leden</label>' +
       '<button class="knop stil" id="bankNood" style="margin-left:auto;border-color:var(--burgundy);">Noodstop</button>' +
     '</div>' + nood + aut +
-    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen rekeninglaag is operationeel.' : 'De eigen rekeninglaag staat nog uit.') + ' Opschalen vraagt een tweede persoon; afschalen (terug naar partner) mag direct.</p>' +
+    '<p style="margin:0.25rem 0 0.5rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen rekeninglaag is operationeel.' : 'De eigen rekeninglaag staat nog uit.') + ' Opschalen vraagt een tweede persoon; afschalen (terug naar partner) mag direct.</p>' +
     '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">' + seg +
       ' <button class="knop" id="bankDraai" style="padding:.45rem 1rem;">Eén slag verder →</button>' +
       '<label style="margin-left:auto;font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankOper"' + (r.operationeel ? ' checked' : '') + '> Bank operationeel</label>' +
@@ -2469,7 +2469,7 @@ function bankRenderKnop(r){
 function bankRenderGezond(g){
   const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen huis)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Naar de foundation', bkEuro(g.foundationCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];
   $('#bankGezond').innerHTML = tegels.map(([l, v], i) =>
-    '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--gold);margin-top:.25rem;">' + esc(v) + '</div></div>').join('');
+    '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--gold);margin-top:0.25rem;">' + esc(v) + '</div></div>').join('');
 }
 /* DE RAIL-RECONCILIATIE. Bewust NAAST de sluitcontrole en niet ertussen: die
    twee meten verschillende dingen, en dat verschil is precies waarom een gat
@@ -2594,17 +2594,17 @@ function bankRenderRegels(s){
     '<strong style="min-width:11rem;">' + esc(l.naam) + ' (' + esc(l.code) + ')' + (l.bijgewerkt ? ' <span style="color:var(--gold);font-size:.7rem;">· bijgewerkt</span>' : '') + '</strong>' +
     '<span style="color:var(--soft);">' + esc(l.regio) + ' · btw ' + l.standaardBtw + '% · minimumloon € ' + l.uurloonMin + '/u · lasten ' + Math.round(l.lasten * 100) + '% · vakantiegeld ' + Math.round(l.vakantiegeld * 100) + '%</span></div>').join('');
   $('#bankRegels').innerHTML =
-    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;"><strong style="color:var(--gold);">' + (s.totaal || (s.landen || []).length) + ' landen</strong> -- de hele wereld, elke rekenplek rekent hiermee. Basis: ingebouwd peiljaar <strong>' + esc(String(s.peiljaar)) + '</strong>' +
+    '<p style="margin:0.25rem 0 0.5rem;color:var(--soft);font-size:.85rem;"><strong style="color:var(--gold);">' + (s.totaal || (s.landen || []).length) + ' landen</strong> -- de hele wereld, elke rekenplek rekent hiermee. Basis: ingebouwd peiljaar <strong>' + esc(String(s.peiljaar)) + '</strong>' +
       (s.versie ? ' · bronversie <strong>' + esc(String(s.versie)) + '</strong>' : '') +
       ((s.landenMetUpdates || []).length ? ' · ' + s.landenMetUpdates.length + ' land(en) bijgewerkt' : '') +
       (s.laatsteCheck ? ' · laatste controle ' + esc(new Date(s.laatsteCheck).toLocaleString('nl-NL')) : '') +
       (s.checkUitslag ? '<br>' + esc(s.checkUitslag) : '') + '</p>' +
-    '<input id="rwZoek" placeholder="Zoek een land of regio (bijv. Japan, Afrika, BR)…" style="width:100%;margin-bottom:.4rem;">' +
+    '<input id="rwZoek" placeholder="Zoek een land of regio (bijv. Japan, Afrika, BR)…" style="width:100%;margin-bottom:0.5rem;">' +
     '<div id="rwRijen" style="max-height:340px;overflow-y:auto;">' + rijen + '</div>' +
-    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.7rem;">' +
-      '<span><label for="rwLand" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Land</label><select id="rwLand" style="max-width:14rem;">' + (s.landen || []).map(l => '<option value="' + esc(l.code) + '">' + esc(l.naam) + '</option>').join('') + '</select></span>' +
-      '<span><label for="rwVeld" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Regel</label><select id="rwVeld"><option value="uurloonMin">Minimumloon (€/u)</option><option value="lasten">Werkgeverslasten (0-0,6)</option><option value="vakantiegeld">Vakantiegeld (0-0,25)</option><option value="alcoholLeeftijd">Alcoholleeftijd</option></select></span>' +
-      '<span><label for="rwWaarde" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe waarde</label><input id="rwWaarde" type="number" step="0.01" style="width:7rem;"></span>' +
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:0.75rem;">' +
+      '<span><label for="rwLand" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Land</label><select id="rwLand" style="max-width:14rem;">' + (s.landen || []).map(l => '<option value="' + esc(l.code) + '">' + esc(l.naam) + '</option>').join('') + '</select></span>' +
+      '<span><label for="rwVeld" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Regel</label><select id="rwVeld"><option value="uurloonMin">Minimumloon (€/u)</option><option value="lasten">Werkgeverslasten (0-0,6)</option><option value="vakantiegeld">Vakantiegeld (0-0,25)</option><option value="alcoholLeeftijd">Alcoholleeftijd</option></select></span>' +
+      '<span><label for="rwWaarde" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Nieuwe waarde</label><input id="rwWaarde" type="number" step="0.01" style="width:7rem;"></span>' +
       '<button class="knop stil" id="rwZet" type="button">Voer door</button>' +
       '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>';
   $('#rwZoek').addEventListener('input', () => {
@@ -2660,20 +2660,20 @@ function bankRenderSalaris(reks){
     doos.innerHTML =
       '<p class="bk-uitleg">De <strong>raming</strong> rekent de geklokte maanduren om naar brutoloon plus werkgeverslasten &mdash; om mee te plannen, niet om mee te betalen. <strong>Uitbetalen</strong> gaat via een definitieve loonrun uit de Payroll OS: die houdt loonheffing in, is door twee mensen getekend en levert het nettobedrag per medewerker.</p>' +
       '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
-      '<span><label for="bankSalZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Zaak (code)</label><input id="bankSalZaak" placeholder="bijv. TOREN" style="width:9rem;"></span>' +
-      '<span><label for="bankSalVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Betaal vanaf</label><select id="bankSalVan" style="min-width:14rem;"></select></span>' +
+      '<span><label for="bankSalZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Zaak (code)</label><input id="bankSalZaak" placeholder="bijv. TOREN" style="width:9rem;"></span>' +
+      '<span><label for="bankSalVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Betaal vanaf</label><select id="bankSalVan" style="min-width:14rem;"></select></span>' +
       '<button class="knop stil" id="bankSalMaak" type="button">Maak raming</button>' +
       '<span id="bankSalRunWrap" hidden><label for="bankSalRunId" class="bk-lab">Definitieve loonrun</label><select id="bankSalRunId" class="bk-w15"></select></span>' +
       '<button class="knop" id="bankSalRun" type="button" hidden>Betaal deze loonrun uit</button></div>' +
-      '<div id="bankSalUit" style="margin-top:.6rem;font-size:.85rem;"></div>';
+      '<div id="bankSalUit" style="margin-top:0.5rem;font-size:.85rem;"></div>';
     $('#bankSalMaak').addEventListener('click', async () => {
       try {
         const v = await api('bank/salaris/voorstel', { zaak: $('#bankSalZaak').value });
         $('#bankSalUit').innerHTML =
-          '<div style="color:var(--soft);margin-bottom:.35rem;">' + esc(v.zaakNaam) + ' · maand ' + esc(v.maand) + ' · uurloon € ' + v.uurloon + '</div>' +
+          '<div style="color:var(--soft);margin-bottom:0.25rem;">' + esc(v.zaakNaam) + ' · maand ' + esc(v.maand) + ' · uurloon € ' + v.uurloon + '</div>' +
           v.regels.map(r => '<div style="padding:.3rem 0;' + bkLijn + '">' + esc(r.naam) + ' · ' + r.uren + ' uur · <strong>' + bkEuro(r.brutoCenten) + '</strong> ' +
             (r.iban ? '<span style="font-size:.75rem;color:var(--soft);">→ ' + esc(r.iban) + '</span>' : '<span style="color:var(--burgundy-on-dark,#C23A5E);font-size:.78rem;">geen rekening</span>') + '</div>').join('') +
-          (v.zonderRekening.length ? '<div style="margin-top:.35rem;color:var(--soft);">Nog niet uitbetaalbaar: ' + v.zonderRekening.map(z => esc(z.naam) + ' (' + esc(z.reden) + ')').join(' · ') + '</div>' : '') +
+          (v.zonderRekening.length ? '<div style="margin-top:0.25rem;color:var(--soft);">Nog niet uitbetaalbaar: ' + v.zonderRekening.map(z => esc(z.naam) + ' (' + esc(z.reden) + ')').join(' · ') + '</div>' : '') +
           '<div class="h-mt45">Uitbetaalbaar: <strong style="color:var(--gold);">' + bkEuro(v.totaalCenten) + '</strong> van ' + bkEuro(v.brutoCenten) + ' bruto · daarbovenop ~' + v.lastenPct + '% werkgeverslasten (' + bkEuro(v.lastenCenten) + ') en vakantiegeldreserve ' + bkEuro(v.vakantiegeldCenten) + '</div>';
         /* Geen knop aan de raming. Het antwoord zegt zelf uitbetaalbaar:false,
            en dat hoort het scherm te volgen in plaats van er een postenlijst
@@ -2719,8 +2719,8 @@ function bankRenderSalaris(reks){
 function bankRenderRekOpen(){
   $('#bankRekOpen').innerHTML =
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
-    '<span><label for="bankOpenCode" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Rekening openen voor codenaam</label><input id="bankOpenCode" placeholder="codenaam" style="width:11rem;"></span>' +
-    '<span><label for="bankOpenSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Soort</label><select id="bankOpenSoort"><option value="betaal">Betaalrekening</option><option value="spaar">Spaarrekening</option><option value="zakelijk">Zakelijke rekening</option></select></span>' +
+    '<span><label for="bankOpenCode" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Rekening openen voor codenaam</label><input id="bankOpenCode" placeholder="codenaam" style="width:11rem;"></span>' +
+    '<span><label for="bankOpenSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Soort</label><select id="bankOpenSoort"><option value="betaal">Betaalrekening</option><option value="spaar">Spaarrekening</option><option value="zakelijk">Zakelijke rekening</option></select></span>' +
     '<button class="knop stil" id="bankOpenZet" type="button">Open rekening</button></div>';
   $('#bankOpenZet').addEventListener('click', async () => {
     try { const d = await api('bank/rekening/open', { codenaam: $('#bankOpenCode').value, soort: $('#bankOpenSoort').value }); meld('Geopend: ' + d.rekening.iban); $('#bankOpenCode').value = ''; bankVervers(); } catch (e) { meld(e.message); }
@@ -2773,7 +2773,7 @@ async function techVervers(){
       return '<div style="flex:1;min-width:12rem;"><b>'+naam+'</b> '+techPill(gelijk, 'in lockstep ✓', 'DRIFT!')+
         '<br><span class="leeg" style="display:inline;font-size:.72rem;">JS '+esc(String(s.jsVingerafdruk||'-'))+' · motor '+esc(String(s.motorVingerafdruk||'-'))+'</span></div>';
     };
-    $('#techMotor').innerHTML = '<p style="margin:0 0 .5rem;">De motor is het autoritatieve grootboek; de JS-engine spiegelt en de drift-detector vergelijkt beide vingerafdrukken (modus <code>'+esc(m.modus)+'</code>).</p>'+
+    $('#techMotor').innerHTML = '<p style="margin:0 0 0.5rem;">De motor is het autoritatieve grootboek; de JS-engine spiegelt en de drift-detector vergelijkt beide vingerafdrukken (modus <code>'+esc(m.modus)+'</code>).</p>'+
       '<div style="display:flex;gap:1rem;flex-wrap:wrap;">'+stand('RTG Pay', m.pay)+stand('RTG Rekening', m.bank)+'</div>';
   }
   // --- De Wacht ---
@@ -3025,7 +3025,7 @@ function balieTekenDossier(){
     rij('Open klachten', klachten.length) +
     (voorstellen.length ? rij('Lopende voorstellen', voorstellen.map(v =>
       balPas(v.naarPas) + ' (' + v.status + ', ' + balDatum(v.at) + ')').join(' · ')) : '') +
-    '<p class="stil" style="color:var(--soft);font-size:.74rem;line-height:1.6;margin:.6rem 0 0;">Meer staat hier niet, en dat is geen instelling die aanstaat: de kern stuurt geen naam, e-mailadres, telefoonnummer of document mee. Wie die wel nodig heeft, is bij de balie aan het verkeerde loket. De steuncode wijst een lid aan, maar bewijst niemand.</p>';
+    '<p class="stil" style="color:var(--soft);font-size:.74rem;line-height:1.6;margin:0.5rem 0 0;">Meer staat hier niet, en dat is geen instelling die aanstaat: de kern stuurt geen naam, e-mailadres, telefoonnummer of document mee. Wie die wel nodig heeft, is bij de balie aan het verkeerde loket. De steuncode wijst een lid aan, maar bewijst niemand.</p>';
   $('#balActies').hidden = false;
   balieTekenKlachten();
 }
@@ -3129,12 +3129,12 @@ function stadRenderScenario(){
   const seg = b.scenarios.map(s => '<button class="knop' + (s.naam === b.scenario ? '' : ' stil') + '" data-scenario="' + s.naam + '" title="' + esc(s.uitleg) + '" style="padding:.45rem .9rem;">' + esc(s.label) + '</button>').join(' ');
   const actief = b.scenarios.find(s => s.naam === b.scenario);
   $('#stadScenario').innerHTML =
-    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.6rem;">' +
-      '<span><label for="stadWie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Wie schakelt? (voor het auditlog)</label><input id="stadWie" placeholder="je naam" value="' + esc(stadWie) + '" style="width:11rem;"></span>' +
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.5rem;">' +
+      '<span><label for="stadWie" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Wie schakelt? (voor het auditlog)</label><input id="stadWie" placeholder="je naam" value="' + esc(stadWie) + '" style="width:11rem;"></span>' +
     '</div>' +
     '<div style="display:flex;gap:.5rem;flex-wrap:wrap;">' + seg + '</div>' +
-    (actief ? '<p style="margin:.6rem 0 0;color:var(--soft);font-size:.85rem;">' + esc(actief.uitleg) + '</p>' : '') +
-    (b.alerts.length ? '<div style="margin-top:.6rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;font-size:.85rem;">' + b.alerts.map(a => '⚠ ' + esc(a.tekst)).join('<br>') + '</div>' : '');
+    (actief ? '<p style="margin:0.5rem 0 0;color:var(--soft);font-size:.85rem;">' + esc(actief.uitleg) + '</p>' : '') +
+    (b.alerts.length ? '<div style="margin-top:0.5rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;font-size:.85rem;">' + b.alerts.map(a => '⚠ ' + esc(a.tekst)).join('<br>') + '</div>' : '');
   $('#stadWie').addEventListener('input', e => { stadWie = e.target.value; });
   $('#stadScenario').querySelectorAll('[data-scenario]').forEach(k => k.addEventListener('click', async () => {
     try { const r = await api('stad/scenario', { scenario: k.dataset.scenario, naam: stadWie });
@@ -3146,10 +3146,10 @@ function stadRenderDomeinen(){
   $('#stadDomeinen').innerHTML = STAD.domeinen.map(x =>
     '<div class="kaart" style="padding:.9rem .7rem;">' +
       '<div style="font-size:.72rem;color:var(--soft);">' + esc(x.label) + '</div>' +
-      '<div style="font-size:1.05rem;margin:.25rem 0;color:' + (stKleur[x.stand] || '#fff') + ';">' +
+      '<div style="font-size:1.05rem;margin:0.25rem 0;color:' + (stKleur[x.stand] || '#fff') + ';">' +
         (x.waarde == null ? 'geen data' : esc(String(x.waarde)) + ' <span style="font-size:.7rem;color:var(--soft);">' + esc(x.eenheid) + '</span>') +
         ' · ' + esc(x.stand) + '</div>' +
-      (x.ovOnderweg != null ? '<div style="font-size:.72rem;color:var(--soft);margin-bottom:.25rem;">' + x.ovOnderweg + ' OV-voertuig(en) onderweg</div>' : '') +
+      (x.ovOnderweg != null ? '<div style="font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">' + x.ovOnderweg + ' OV-voertuig(en) onderweg</div>' : '') +
       '<select data-regime="' + x.id + '" style="width:100%;font-size:.78rem;">' +
         x.regimes.map(r => '<option value="' + r + '"' + (r === x.regime ? ' selected' : '') + '>regime: ' + r + '</option>').join('') +
       '</select></div>').join('');
@@ -3166,11 +3166,11 @@ function stadRenderNodeAan(){
   doos.dataset.gewired = '1';
   doos.innerHTML =
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
-    '<span><label for="stadDoosNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe Stadsdoos</label><input id="stadDoosNaam" placeholder="bijv. Stadsdoos Brug" style="width:11rem;"></span>' +
-    '<span><label for="stadZoneSel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Zone</label><select id="stadZoneSel">' + STAD.zones.map(z => '<option>' + esc(z) + '</option>').join('') + '</select></span>' +
-    '<span><label for="stadSens" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Sensoren (komma)</label><input id="stadSens" placeholder="verkeer, lucht, licht" style="width:13rem;"></span>' +
+    '<span><label for="stadDoosNaam" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Nieuwe Stadsdoos</label><input id="stadDoosNaam" placeholder="bijv. Stadsdoos Brug" style="width:11rem;"></span>' +
+    '<span><label for="stadZoneSel" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Zone</label><select id="stadZoneSel">' + STAD.zones.map(z => '<option>' + esc(z) + '</option>').join('') + '</select></span>' +
+    '<span><label for="stadSens" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:0.25rem;">Sensoren (komma)</label><input id="stadSens" placeholder="verkeer, lucht, licht" style="width:13rem;"></span>' +
     '<button class="knop stil" id="stadDoosMeld" type="button">Meld aan</button></div>' +
-    '<div id="stadSleutel" style="margin-top:.6rem;font-size:.85rem;"></div>';
+    '<div id="stadSleutel" style="margin-top:0.5rem;font-size:.85rem;"></div>';
   $('#stadDoosMeld').addEventListener('click', async () => {
     try {
       const r = await api('stad/node/aanmeld', { doosNaam: $('#stadDoosNaam').value, zone: $('#stadZoneSel').value,
@@ -3184,7 +3184,7 @@ function stadRenderNodeAan(){
 function stadRenderNodes(){
   const rij = STAD.nodes;
   if (!rij.length){ $('#stadNodes').innerHTML = '<div class="leeg">Nog geen Stadsdozen.</div>'; return; }
-  $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:.4rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online · ' + STADWERK + ' klus(sen) open op de veld-lijst</div>' + rij.map(n =>
+  $('#stadNodes').innerHTML = '<div style="color:var(--soft);font-size:.8rem;margin-bottom:0.5rem;">' + STAD.vloot.online + ' van ' + STAD.vloot.totaal + ' online · ' + STADWERK + ' klus(sen) open op de veld-lijst</div>' + rij.map(n =>
     '<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;' + bkLijn + '">' +
     '<span style="width:.6rem;height:.6rem;border-radius:50%;background:' + (n.online ? 'var(--gold)' : 'var(--soft)') + ';"></span>' +
     '<span style="flex:1;min-width:13rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +
@@ -3198,8 +3198,8 @@ async function stadAi(vraag){
   const doos = $('#stadAi');
   if (!doos.dataset.gewired){
     doos.dataset.gewired = '1';
-    doos.innerHTML = '<div id="stadAiWe" style="font-size:.9rem;line-height:1.55;">Even kijken…</div><ul id="stadAiTips" style="margin:.5rem 0 0 1.1rem;font-size:.85rem;color:var(--soft);line-height:1.6;"></ul>' +
-      '<div style="display:flex;gap:.5rem;margin-top:.6rem;"><input class="h-flex1" id="stadAiV" placeholder="Vraag de stadsregisseur iets…"><button class="knop" id="stadAiB" type="button">Vraag</button></div>';
+    doos.innerHTML = '<div id="stadAiWe" style="font-size:.9rem;line-height:1.55;">Even kijken…</div><ul id="stadAiTips" style="margin:0.5rem 0 0 1.25rem;font-size:.85rem;color:var(--soft);line-height:1.6;"></ul>' +
+      '<div style="display:flex;gap:.5rem;margin-top:0.5rem;"><input class="h-flex1" id="stadAiV" placeholder="Vraag de stadsregisseur iets…"><button class="knop" id="stadAiB" type="button">Vraag</button></div>';
     $('#stadAiB').addEventListener('click', () => { const q = $('#stadAiV').value.trim(); if (q) { stadAi(q); $('#stadAiV').value = ''; } });
     $('#stadAiV').addEventListener('keydown', e => { if (e.key === 'Enter') $('#stadAiB').click(); });
   }
@@ -3326,15 +3326,15 @@ async function laadPapieren(baas){
   const kleur = st => st === 'ingevuld' ? 'var(--gold)' : (st === 'geparkeerd' ? 'var(--soft)' : 'var(--burgundy-on-dark,#C23A5E)');
   const label = st => st === 'ingevuld' ? 'ingevuld' : (st === 'geparkeerd' ? 'geparkeerd' : 'open');
   $('#bPapLijst').innerHTML = groepen.map(g =>
-    '<h4 style="margin:1rem 0 .4rem;font-size:.88rem;">' + esc(g.naam) + '</h4>' +
+    '<h4 style="margin:1.25rem 0 0.5rem;font-size:.88rem;">' + esc(g.naam) + '</h4>' +
     g.regels.map(r =>
-      '<div class="kaart" style="margin:0 0 .5rem;padding:.7rem .8rem;">' +
+      '<div class="kaart" style="margin:0 0 0.5rem;padding:.7rem .8rem;">' +
         '<div style="display:flex;gap:.6rem;align-items:baseline;">' +
           '<span style="flex:1;font-size:.84rem;">' + esc(r.vraag) + '</span>' +
           '<span style="font-size:.72rem;color:' + kleur(r.status) + ';">' + label(r.status) + '</span>' +
         '</div>' +
-        (r.waarde ? '<div style="font-size:.8rem;margin:.35rem 0 0;">' + esc(r.waarde) + '</div>' : '') +
-        (r.at ? '<div style="font-size:.7rem;color:var(--soft);margin:.2rem 0 0;">' + (r.door ? esc(r.door) + ' · ' : '') +
+        (r.waarde ? '<div style="font-size:.8rem;margin:0.25rem 0 0;">' + esc(r.waarde) + '</div>' : '') +
+        (r.at ? '<div style="font-size:.7rem;color:var(--soft);margin:0.25rem 0 0;">' + (r.door ? esc(r.door) + ' · ' : '') +
           new Date(r.at).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + '</div>' : '') +
         '<div class="taakrij h-mt45">' +
           '<input class="veld" data-papveld="' + esc(r.id) + '" style="flex:1;" maxlength="400" placeholder="' +
@@ -3509,22 +3509,22 @@ async function laadMagnaatLeren(){
   const doos=$('#bMagnaatLeren');
   try{
     const d=await api('boardroom/magnaat/leren'),ks=d.kandidaten||[];
-    const kop='<div class="stil" style="font-size:.76rem;color:var(--soft);margin-bottom:.65rem;">'+
+    const kop='<div class="stil" style="font-size:.76rem;color:var(--soft);margin-bottom:0.75rem;">'+
       esc(String(d.runs||0))+' afgeronde runs · '+esc(String(d.patronen||0))+' patronen · menselijk akkoord verplicht</div>';
     if(!ks.length){doos.innerHTML=kop+'<div class="leeg">Nog geen sterk genoeg patroon. Magnaat blijft veilig leren tijdens afgeronde runs.</div>';return;}
     doos.innerHTML=kop+ks.map(k=>{
       const b=k.bewijs||{},t=k.test||{},routes=Object.entries(b.routes||{}).map(([naam,aantal])=>naam+' '+aantal+'×').join(' · ');
       const bewijs=[b.waarnemingen!=null?b.waarnemingen+' waarneming(en)':'',b.pogingen!=null?b.pogingen+' pogingen':'',b.foutpercentage!=null?b.foutpercentage+'% frictie':'',routes].filter(Boolean).join(' · ');
-      const knoppen=k.status==='afgewezen'?'' : '<div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.65rem;">'+
+      const knoppen=k.status==='afgewezen'?'' : '<div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:0.75rem;">'+
         '<button class="knop" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="naar-test">Naar veilige test</button>'+
         '<button class="knop stil" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="terug-naar-ontwerp">Terug naar ontwerp</button>'+
         '<button class="knop stil" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="afwijzen">Afwijzen</button></div>';
-      return '<div class="voorstel" style="display:block;margin-bottom:.65rem;">'+
+      return '<div class="voorstel" style="display:block;margin-bottom:0.75rem;">'+
         '<div style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;"><span class="kamerlabel">'+esc(k.soort||'patroon')+'</span><span class="stil" style="font-size:.7rem;color:var(--gold);">'+esc(k.status||'kandidaat')+'</span></div>'+
-        '<b style="display:block;margin:.45rem 0 .25rem;">'+esc(k.titel||k.id)+'</b>'+
+        '<b style="display:block;margin:0.5rem 0 0.25rem;">'+esc(k.titel||k.id)+'</b>'+
         (bewijs?'<div class="stil" style="font-size:.76rem;color:var(--soft);">Bewijs: '+esc(bewijs)+'</div>':'')+
-        (t.gegeven?'<div style="font-size:.8rem;line-height:1.55;margin-top:.45rem;"><b>Proef:</b> '+esc(t.gegeven)+' → '+esc(t.dan||'controleer de uitkomst')+'</div>':'')+
-        '<div class="stil" style="font-size:.72rem;color:var(--soft);margin-top:.35rem;">Nooit productie-write · geen persoonsgegevens · mens beslist</div>'+knoppen+'</div>';
+        (t.gegeven?'<div style="font-size:.8rem;line-height:1.55;margin-top:0.5rem;"><b>Proef:</b> '+esc(t.gegeven)+' → '+esc(t.dan||'controleer de uitkomst')+'</div>':'')+
+        '<div class="stil" style="font-size:.72rem;color:var(--soft);margin-top:0.25rem;">Nooit productie-write · geen persoonsgegevens · mens beslist</div>'+knoppen+'</div>';
     }).join('');
     doos.querySelectorAll('[data-ml-id]').forEach(b=>b.addEventListener('click',async()=>{
       try{const r=await api('boardroom/magnaat/besluit',{id:b.dataset.mlId,keuze:b.dataset.mlKeuze});meld(r.let||'Boardroombesluit bewaard.');laadMagnaatLeren();}
@@ -3546,7 +3546,7 @@ async function vraagRahulHuis(){
   try {
     const r = await api('boardroom/ai', { q: $('#bRahulVraag').value });
     let html = '<div style="white-space:pre-wrap;">'+esc(r.antwoord)+'</div>';
-    if (r.punten && r.punten.length) html += '<div style="margin-top:.6rem;color:var(--soft);font-size:.78rem;line-height:1.6;"><b>Uit de dagronde:</b><br>'+r.punten.map(esc).join('<br>')+'</div>';
+    if (r.punten && r.punten.length) html += '<div style="margin-top:0.5rem;color:var(--soft);font-size:.78rem;line-height:1.6;"><b>Uit de dagronde:</b><br>'+r.punten.map(esc).join('<br>')+'</div>';
     uit.innerHTML = html;
   } catch (e) { uit.textContent = e.message; }
   knop.disabled = false;
@@ -3683,8 +3683,8 @@ async function laadFonds(){
         (v.scheids && v.scheids.oordeel ? ' · scheidsrechter: '+esc(v.scheids.oordeel) : '')+'</div>'+
     '</div>';
   }).join('') || '<div class="leeg">Nog geen voorstellen.</div>';
-  box.innerHTML = '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.2rem 0 .4rem;">Locaties</div>' + locs +
-    '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.8rem 0 .4rem;">Voorstellen ('+(d.bijdragen||0)+' bijdragen totaal)</div>' + vs;
+  box.innerHTML = '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0.25rem 0 0.5rem;">Locaties</div>' + locs +
+    '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.5rem;">Voorstellen ('+(d.bijdragen||0)+' bijdragen totaal)</div>' + vs;
 }
 
 /* het ledenregister vanuit de boardroom: alle leden op codenaam, gesplitst per
@@ -3702,7 +3702,7 @@ async function laadLedenregister(){
     d = await r.json(); if (!r.ok) throw new Error(d.error || 'Kon het register niet laden.');
   } catch (e) { box.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; $('#bLedenLijst').innerHTML=''; return; }
   const eur = c => '€ ' + (Math.round(Number(c)*100)/100).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  const kop = t => '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .35rem;">'+t+'</div>';
+  const kop = t => '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.25rem;">'+t+'</div>';
   const tegels = arr => '<div style="display:flex;flex-wrap:wrap;gap:.5rem;">'+arr.map(x =>
     '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:10px;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--gold);">'+x.aantal+'</span></span>').join('')+'</div>';
   // de omzet + 30%-split
@@ -3716,7 +3716,7 @@ async function laadLedenregister(){
     kop('Per land (top)') + tegels((d.perLand||[]).slice(0,12)) +
     kop('Per stad (top)') + tegels((d.perStad||[]).slice(0,12)) +
     kop('Omzet per pas') + omzetRijen +
-    '<div style="margin-top:.6rem;background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;line-height:1.7;font-size:.86rem;">'+
+    '<div style="margin-top:0.5rem;background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;line-height:1.7;font-size:.86rem;">'+
       'Maandomzet (bekende prijzen): <b>'+eur(s.totaalOmzet)+'</b><br>'+
       '30% naar de RTFoundation: <b style="color:var(--gold);">'+eur(s.foundation30)+'</b><br>'+
       '&nbsp;&nbsp;20% lokaal: <b>'+eur(s.lokaal20)+'</b> · 10% RTFoundation: <b>'+eur(s.rtf10)+'</b>'+

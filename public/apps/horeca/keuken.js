@@ -28,7 +28,7 @@
           (b.serveerOm ? ' <span class="tag">serveren ' + esc(b.serveerOm) + '</span>' : '') +
           ' <span class="tag ' + kleur + '">' + b.loopt + ' van ' + b.norm + ' min</span>' +
           (b.allergie ? '<div><span class="allergie">Allergie: ' + esc(b.allergie) + '</span></div>' : '') +
-          '<div style="margin:.3rem 0;">' + b.aantal + '× ' + esc(b.naam) +
+          '<div style="margin:0.25rem 0;">' + b.aantal + '× ' + esc(b.naam) +
           (b.notitie ? ' <span class="stil">· ' + esc(b.notitie) + '</span>' : '') + '</div>' +
           '<div class="rij">' + ['gestart', 'bereid', 'klaar', 'uitgegeven'].map(function (s) {
             return '<button class="knop' + (b.stand === s ? ' p' : '') + '" data-stand="' + s +

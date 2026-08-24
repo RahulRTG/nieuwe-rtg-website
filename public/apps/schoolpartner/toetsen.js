@@ -15,7 +15,7 @@ window.SPart.toetslijst = function () {
             : '<span class="tag">' + (l.bezig ? 'bezig' : 'nog niet gemaakt') + '</span>';
           return '<div class="item"><span>' + esc(l.naam) + (l.uitslag ? ' <span class="stil">' + l.uitslag.goed + '/' + l.uitslag.totaal + '</span>' : '') + '</span>' + st + '</div>';
         }).join('');
-        return '<div style="margin-bottom:.7rem;"><div class="rij"><b>' + esc(t.naam) + '</b><span class="tag">' + esc(t.soort.toUpperCase()) + '</span>' +
+        return '<div style="margin-bottom:0.75rem;"><div class="rij"><b>' + esc(t.naam) + '</b><span class="tag">' + esc(t.soort.toUpperCase()) + '</span>' +
           '<span class="stil">' + t.doelen.map(function (d) { return esc(d.naam); }).join(' · ') + '</span></div>' + rijen + '</div>';
       }).join('') || '<p class="stil">Nog geen toetsen. Vink hierboven leerdoelen aan en zet er een klaar.</p>';
       Array.prototype.forEach.call(document.querySelectorAll('[data-cijfer]'), function (b) {

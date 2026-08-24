@@ -163,7 +163,7 @@ async function api(pad, body){
   const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;
 }
 async function laadInbox(){
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Open de RTG-app en log in; daarna staat je post hier.</p></div>'; return; }
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:0.5rem;font-size:.9rem;">Open de RTG-app en log in; daarna staat je post hier.</p></div>'; return; }
   let d; try{ d = ZOEK ? await api('zoek',{vraag:ZOEK}) : await api('vak',{map:MAP}); }
   catch(e){ $('#main').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   LIJST=d.berichten||[];
@@ -186,7 +186,7 @@ async function laadInbox(){
      rahultravelfoundation.rtg, partner.rtg of gouvernement.rtg). Het linkerdeel
      is je codenaam -- je echte naam blijft in de kluis. */
   const kaart = d.adres
-    ? '<div class="noot" style="margin:0 0 .8rem;"><b style="color:var(--txt);font-size:.95rem;">' + esc(d.adres) + '</b><br>' +
+    ? '<div class="noot" style="margin:0 0 0.75rem;"><b style="color:var(--txt);font-size:.95rem;">' + esc(d.adres) + '</b><br>' +
       'Dit is je RTMAIL-adres. Het volgt je lidmaatschap: verandert je pas, dan verandert het domein mee, en post aan je vorige adres komt gewoon aan.</div>'
     : '';
   /* De mappenbalk. Sluimerende post staat met een eigen teller apart: hij is
@@ -199,7 +199,7 @@ async function laadInbox(){
     '</div>'+
     '<div class="zoekrij"><input class="vld" id="zoekVeld" placeholder="Zoek in je eigen postvak" maxlength="120" value="'+esc(ZOEK)+'">'+
     '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+'</div>'+
-    (ZOEK?'<div class="noot" style="margin:0 0 .8rem;text-align:left;">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
+    (ZOEK?'<div class="noot" style="margin:0 0 0.75rem;text-align:left;">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
   $('#main').innerHTML = kaart + balk + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
     LIJST.map((m,i)=>
@@ -228,7 +228,7 @@ async function teamsErbij(){
       '<button class="rij" data-team="'+esc(t.id)+'"><span class="ic">'+esc((t.naam||'?').slice(0,1).toUpperCase())+'</span>'+
       '<span class="b"><span class="nm">'+esc(t.naam)+'</span><span class="lt adr">'+esc(t.adres)+'</span></span>'+
       '<span class="tijd">'+t.aantalLeden+(t.aantalLeden===1?' persoon':' mensen')+'</span></button>').join('')
-      || '<div class="noot" style="margin:0 0 .6rem;text-align:left;">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
+      || '<div class="noot" style="margin:0 0 0.5rem;text-align:left;">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
     '<button class="ai-knop" id="tNieuw" style="margin-bottom:0;">Team oprichten</button>';
   $('#main').appendChild(wrap);
   wrap.querySelectorAll('[data-team]').forEach(b=>b.addEventListener('click',()=>openTeam(b.dataset.team)));

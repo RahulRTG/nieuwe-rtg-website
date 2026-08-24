@@ -2,7 +2,7 @@
     html += '<div class="card"><div class="tt-h">'+T('vg.panden','Panden')+' ('+(vg.panden||[]).length+')</div>'+
       (vg.panden||[]).map(p => '<div class="mitem"><div class="r1"><span class="nm">'+esc(p.titel)+'</span><span class="pr">'+geld(p.prijs)+(p.transactie==='huur'?'/mnd':'')+'</span></div>'+
         '<div class="ds">'+esc(p.soort)+' \u00B7 '+esc(p.plaats||'')+' \u00B7 \uD83D\uDECF\uFE0F'+(p.slaapkamers||0)+' \u00B7 \uD83D\uDEC1'+(p.badkamers||0)+' \u00B7 '+(p.oppervlakte||0)+'m\u00B2'+(p.keyless?' \u00B7 \uD83D\uDD13 keyless':'')+' \u00B7 '+T('vg.st.'+p.status, PAND_ST[p.status]||p.status)+' \u00B7 \uD83D\uDCF7'+((p.fotos||[]).length)+'</div>'+
-        (canEdit?'<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        (canEdit?'<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
           '<button class="obtn primary" data-vgaanbod="'+p.id+'" data-titel="'+escAttr(p.titel)+'">'+T('vg.aanbieden','Aanbieden')+'</button>'+
           '<button class="obtn" data-vgfoto="'+p.id+'">\uD83D\uDCF7 '+T('vg.foto','Foto')+'</button>'+
           '<button class="obtn" data-vgcontract="'+p.id+'" data-titel="'+escAttr(p.titel)+'">\uD83D\uDCDD '+T('vg.contract','Contract')+'</button>'+

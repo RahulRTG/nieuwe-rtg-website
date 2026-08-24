@@ -79,7 +79,7 @@
         '<div class="field" style="margin:0;"><label>'+T('pn.minleeftijd','Leeftijdseis (optioneel)')+'</label><input id="pnLeeftijd" type="number" placeholder="18" inputmode="numeric"></div>'+
         '<div class="field" style="margin:0;"><label>'+T('pn.reden','Reden (optioneel)')+'</label><input id="pnReden" placeholder="'+T('pn.redenph','Bijv. leeftijdscontrole')+'"></div>'+
       '</div>'+
-      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.8rem;">'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.75rem;">'+
         '<button class="obtn primary" data-pnvraag="bevestiging">'+T('pn.jaNee','Ja/nee-check')+'</button>'+
         '<button class="obtn" data-pnvraag="idkaart">'+T('pn.idkaart','ID-kaart vragen')+'</button>'+
         '<button class="obtn" data-pnvraag="paspoort">'+T('pn.paspoort','Paspoort vragen')+'</button>'+

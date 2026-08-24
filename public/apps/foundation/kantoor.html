@@ -64,13 +64,13 @@
   <div id="kamer" class="rtgdeel-vast" hidden>
     <div class="kaart">
       <div class="rij" style="justify-content:space-between;"><h2 id="kNaam" style="font-size:1.1rem;"></h2><button class="knop stil" id="terug">← Alle kamers</button></div>
-      <div class="kpi" id="kMissie" style="margin:.3rem 0 .6rem;"></div>
+      <div class="kpi" id="kMissie" style="margin:0.25rem 0 0.5rem;"></div>
       <div class="rij" id="kKpis"></div>
     </div>
     <div class="kaart h-mt70"><div class="sec">Werklijsten</div><div id="kLijsten"></div></div>
     <div class="kaart h-mt70">
       <div class="sec">Rahul denkt mee in deze kamer</div>
-      <div class="rij" style="margin-bottom:.5rem;">
+      <div class="rij" style="margin-bottom:0.5rem;">
         <input class="veld" id="aVraag" placeholder="Stel een vraag, of laat leeg" maxlength="300" aria-label="Vraag aan Rahul">
         <button class="knop" id="aVraag2">Vraag</button>
       </div>
@@ -78,7 +78,7 @@
     </div>
     <div class="kaart h-mt70">
       <div class="sec">Taken van deze kamer</div>
-      <div class="rij" style="margin-bottom:.5rem;"><input class="veld" id="tTekst" placeholder="Nieuwe taak" maxlength="200"><button class="knop" id="tMaak">+</button></div>
+      <div class="rij" style="margin-bottom:0.5rem;"><input class="veld" id="tTekst" placeholder="Nieuwe taak" maxlength="200"><button class="knop" id="tMaak">+</button></div>
       <div id="kTaken"></div>
     </div>
   </div>
@@ -190,7 +190,7 @@ async function raadLaad(){
   }).join('') || '<div class="leeg">Nog geen besluiten.</div>';
   $('#raadIn').innerHTML =
     '<div class="sec h-mt40">Stadspartners (een per stad)</div>' + partners +
-    '<div class="rij" style="margin:.5rem 0 .2rem;"><input class="veld" id="pStad" placeholder="Stad"><input class="veld" id="pNaam" placeholder="Naam van de foundation of club"><select class="veld" id="pSoort" style="flex:0 0 8rem;"><option value="foundation">foundation</option><option value="club">club</option><option value="instelling">instelling</option></select><button class="knop" id="pMaak">Partner toevoegen</button></div>' +
+    '<div class="rij" style="margin:0.5rem 0 0.25rem;"><input class="veld" id="pStad" placeholder="Stad"><input class="veld" id="pNaam" placeholder="Naam van de foundation of club"><select class="veld" id="pSoort" style="flex:0 0 8rem;"><option value="foundation">foundation</option><option value="club">club</option><option value="instelling">instelling</option></select><button class="knop" id="pMaak">Partner toevoegen</button></div>' +
     '<div class="sec h-mt60">Lab-uitslagen op de raadstafel</div>' + uitslagen +
     '<div class="sec h-mt60">Besluiten</div>' + besluiten;
   $('#pMaak').addEventListener('click', async () => {

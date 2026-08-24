@@ -11,7 +11,7 @@
       '<button id="wdMaak" style="flex:1;'+PL_GOUD+'">'+T('wd.aannemen','Neem aan')+'</button></div>';
 
     // de draaiboeken zelf
-    h += d.events.map(e=>'<div style="border:1px solid '+(e.status==='gedraaid'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.6rem;">'+
+    h += d.events.map(e=>'<div style="border:1px solid '+(e.status==='gedraaid'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.9rem;">'+esc(e.klant)+' · '+esc(e.soort)+'</b><span class="sub">'+esc(e.status)+'</span></div>'+
       '<div class="sub">'+esc(e.datum)+' · '+esc(e.locatie)+' · '+e.gasten+' '+T('wd.gasten','gasten')+(e.budget?' · '+eur(e.budget):'')+'</div>'+
       (e.taken.length?e.taken.map(t=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.3rem 0;">'+
@@ -19,7 +19,7 @@
         (t.status==='open'?plKnop('data-wdtk', e.id+':'+t.id, T('wd.klaar','Klaar'), true):'<span class="sub">'+T('wd.klaar','Klaar').toLowerCase()+'</span>')+'</div>').join(''):'')+
       (e.status!=='gedraaid'?'<div class="row-gap h-mt45"><input data-wdtt="'+e.id+'" class="st-in" placeholder="'+T('wd.taak','Nieuwe taak')+'" maxlength="160" style="flex:3;">'+
         '<select data-wdtp="'+e.id+'" class="st-in h-flex2">'+d.keten.map(p=>'<option value="'+escAttr(p)+'">'+esc(p)+'</option>').join('')+'</select>'+plKnop('data-wdta', e.id, T('wd.voeg','Voeg toe'), true)+'</div>'+
-        '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+(e.status==='intake'?plKnop('data-wdsp', e.id, T('wd.plan','Zet op gepland'), true):'')+plKnop('data-wdsg', e.id, T('wd.draai','Dag gedraaid'))+'</div>':'')+'</div>').join('');
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+(e.status==='intake'?plKnop('data-wdsp', e.id, T('wd.plan','Zet op gepland'), true):'')+plKnop('data-wdsg', e.id, T('wd.draai','Dag gedraaid'))+'</div>':'')+'</div>').join('');
     el.innerHTML = h;
 
     const doe = (sel, pad, body) => el.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {

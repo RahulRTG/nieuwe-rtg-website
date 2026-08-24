@@ -60,7 +60,7 @@
     h += (d.jetset||[]).map(j=>'<div style="border:1px solid '+(j.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+GB_JET[j.soort]+' · '+esc(j.voorWie)+'</b><span class="sub">'+esc(j.status)+'</span></div>'+
       '<div class="sub">'+esc(j.wens)+' · '+esc(j.moment)+(j.notitie?' · '+esc(j.notitie):'')+'</div>'+
-      (j.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
+      (j.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
         (j.status==='aangevraagd'?gbKnop('data-gbjb', j.id, T('gb.j.bevestig','Bevestig'), true):'')+gbKnop('data-gbja', j.id, T('gb.j.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
     h += '<p class="sub h-mt50">'+T('gb.j.regel','Een jet-transfer is een dienstverzoek aan RTG Aviation; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;

@@ -72,7 +72,7 @@
       const namen = (k.leden||[]).map(id => { const m = team.find(t=>t.id===id); return m ? m.name : null; }).filter(Boolean);
       return '<div class="bd-kaart'+(k.klaar?' klaar':'')+'">'+
         '<b>'+esc(k.titel)+'</b>'+
-        (k.notitie ? '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.2rem;white-space:pre-wrap;">'+esc(k.notitie)+'</div>' : '')+
+        (k.notitie ? '<div style="font-size:0.72rem;color:var(--soft);margin-top:0.25rem;white-space:pre-wrap;">'+esc(k.notitie)+'</div>' : '')+
         '<div class="mt">'+
           (k.due ? '<span class="bd-due'+(laat?' laat':'')+'">'+esc(k.due)+(laat?' · '+T('bd.laat','te laat'):'')+'</span>' : '')+
           namen.map(n => '<span class="bd-av" title="'+esc(n)+'">'+esc(init(n))+'</span>').join('')+
@@ -109,7 +109,7 @@
           '<div class="bd-kolom"><button class="bd-add" data-lijst>＋ '+T('bd.lijst','Lijst')+'</button></div>'+
         '</div>';
       } else {
-        html += '<div style="margin-top:1rem;font-size:0.84rem;color:var(--soft);">'+T('bd.leeg','Nog geen borden. Maak het eerste bord voor uw team of project.')+'</div>';
+        html += '<div style="margin-top:1.25rem;font-size:0.84rem;color:var(--soft);">'+T('bd.leeg','Nog geen borden. Maak het eerste bord voor uw team of project.')+'</div>';
       }
       el.innerHTML = html;
       bind(b);

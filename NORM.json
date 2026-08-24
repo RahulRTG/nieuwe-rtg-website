@@ -25,7 +25,7 @@
     "kernGedeeld": 191,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 161,
+    "toetsenNietGemeten": 162,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -33,6 +33,11 @@
     "delenZonderOnderwerp": 0
   },
   "notities": [
+    {
+      "datum": "2026-08-24",
+      "meter": "toetsenNietGemeten 161 -> 162 (test/margeschaal.test.js)",
+      "reden": "Een toetsbestand erbij bij de ruimteschaal (TAKEN.md 4.51, ONTWERP.md 2b). De mutatiemotor is er nog niet langs geweest -- het bestand bestaat pas sinds vandaag -- en dat is de hele +1.\n\nHandmatig zijn er vijf mutaties gedraaid en gezien zakken: bij gelijke afstand naar de KRAPPERE stap in plaats van de ruimere, ook boven 2rem snappen, negatieve marges meepakken, het enkele quote altijd dubbel maken (dat breekt de JS-string eromheen), en padding en gap meenemen. Daarnaast is de keuring zelf nagemeten: zet er een marge van 0.62rem in en check.js regel 51 zakt erop.\n\nDeze +1 hoort bij de volgende volledige mutatieronde vanzelf te verdwijnen."
+    },
     {
       "datum": "2026-08-24",
       "meter": "toetsenNietGemeten 160 -> 161 (test/meelezen.test.js)",

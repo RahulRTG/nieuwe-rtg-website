@@ -37,7 +37,7 @@
           [[T('mk.volgers','Volgers'), mk.volgers], [T('mk.posts','Berichten'), mk.posts], ['Likes', mk.likes], [T('mk.reacties','Reacties'), mk.reacties]]
           .map(x => '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;text-align:center;">'+
             '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.25rem;color:var(--gold);">'+x[1]+'</div>'+
-            '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.1rem;">'+x[0]+'</div></div>').join('')+'</div>'+
+            '<div style="font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);margin-top:0.25rem;">'+x[0]+'</div></div>').join('')+'</div>'+
           '<div class="st-form"><textarea class="st-in" id="mkBio" placeholder="'+T('mk.bioph','Uw bio op De Salon, bijv. aan zee sinds 1998, drie generaties.')+'" style="min-height:52px;resize:vertical;">'+(mk.bio||'')+'</textarea>'+
           '<button class="obtn primary" id="mkBioSave" style="align-self:flex-start;">'+T('mk.biosave','Bio opslaan')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('mk.deal','Exclusieve aanbieding')+'</h3>'+
@@ -48,7 +48,7 @@
           '<button class="bigbtn" id="mkDealGo">'+T('mk.dealgo','Zet op De Salon')+'</button></div>'+
           (mk.deals.length ? mk.deals.map(d2 =>
             '<div class="st-row"><span>'+d2.titel+'<span class="sub">'+(d2.geldigTot?'t/m '+d2.geldigTot+' · ':'')+d2.claims+' '+T('mk.claims','geclaimd')+' · '+d2.verzilverd+' '+T('mk.verzilverd','verzilverd')+'</span></span></div>').join('') : '')+
-          '<div style="display:flex;gap:0.5rem;margin-top:0.4rem;"><input class="st-in" id="mkCode" placeholder="RTG-D-XXXXXX" class="h-flex1">'+
+          '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><input class="st-in" id="mkCode" placeholder="RTG-D-XXXXXX" class="h-flex1">'+
           '<button class="obtn" id="mkRedeem">'+T('mk.innen','Verzilver')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('mk.poll','Vraag het uw leden (poll)')+'</h3>'+
           '<div class="tkc-who">'+T('mk.poll.s','Marketinginzicht: laat leden kiezen en zie live de uitslag.')+'</div>'+

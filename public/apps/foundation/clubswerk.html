@@ -100,18 +100,18 @@ async function laad(){
 }
 function kaart(c){
   const stat = D.statussen.map(s => '<option value="' + s + '"' + (c.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
-  return '<div class="kaart" style="margin-bottom:.7rem;" data-club="' + c.id + '">' +
+  return '<div class="kaart" style="margin-bottom:0.75rem;" data-club="' + c.id + '">' +
     '<div class="rij" style="justify-content:space-between;"><h2 style="font-size:1.02rem;">' + esc(c.naam) + ' <span class="pil' + (c.status === 'actief' ? ' actief' : '') + '">' + esc(c.status) + '</span></h2>' +
     '<span class="code">' + esc(c.code) + '</span></div>' +
     '<div class="leeg">' + esc(c.sport) + (c.contact ? ' · contact: ' + esc(c.contact) : '') + '</div>' +
-    '<div class="rij" style="margin:.35rem 0;"><select class="veld" data-status style="max-width:9rem;">' + stat + '</select>' +
+    '<div class="rij" style="margin:0.25rem 0;"><select class="veld" data-status style="max-width:9rem;">' + stat + '</select>' +
     '<input class="veld" data-team value="' + esc((c.team || []).join(', ')) + '" placeholder="RTF-team (namen, met komma)"></div>' +
     '<div class="sec">Programma\'s</div>' +
     (c.programmas.length ? c.programmas.map(p => '<label class="item' + (p.af ? ' af' : '') + '"><input type="checkbox" data-prog="' + p.id + '"' + (p.af ? ' checked' : '') + '><span>' + esc(p.naam) + (p.doel ? ' · ' + esc(p.doel) : '') + '</span></label>').join('') : '<div class="leeg">Nog geen programma\'s.</div>') +
-    '<div class="rij" style="margin:.35rem 0;"><input class="veld" data-pnaam placeholder="Nieuw programma (bijv. ' + esc(D.ideeen[0]) + ')" list="ideeen"><button class="knop stil" data-pmaak>+</button></div>' +
+    '<div class="rij" style="margin:0.25rem 0;"><input class="veld" data-pnaam placeholder="Nieuw programma (bijv. ' + esc(D.ideeen[0]) + ')" list="ideeen"><button class="knop stil" data-pmaak>+</button></div>' +
     '<div class="sec">Afspraken</div>' +
     (c.afspraken.length ? c.afspraken.map(a => '<label class="item' + (a.af ? ' af' : '') + '"><input type="checkbox" data-afs="' + a.id + '"' + (a.af ? ' checked' : '') + '><span>' + esc(a.tekst) + '</span></label>').join('') : '<div class="leeg">Nog geen afspraken.</div>') +
-    '<div class="rij" style="margin:.35rem 0;"><input class="veld" data-anaam placeholder="Nieuwe afspraak"><button class="knop stil" data-amaak>+</button></div>' +
+    '<div class="rij" style="margin:0.25rem 0;"><input class="veld" data-anaam placeholder="Nieuwe afspraak"><button class="knop stil" data-amaak>+</button></div>' +
     '<div class="sec">Samenwerkingslog (club + RTF schrijven samen)</div>' +
     ((c.log || []).slice(0, 6).map(m => '<div class="log ' + esc(m.wie) + '"><b>' + esc(m.naam) + '</b>: ' + esc(m.tekst) + '</div>').join('') || '<div class="leeg">Nog stil hier.</div>') +
     '<div class="rij h-mt35"><input class="veld" data-bericht placeholder="Bericht aan de club"><button class="knop stil" data-stuur>Stuur</button></div>' +

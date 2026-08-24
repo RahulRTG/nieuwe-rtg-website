@@ -43,19 +43,19 @@
     if (canEdit){
       html += '<div class="card"><div class="tt-h">'+T('mkt.plaats','Plaats een advertentie')+'</div>'+
         '<input id="mktTitel" placeholder="'+T('mkt.titel','Titel, bijv. Etalagepop tweedehands')+'" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);margin-top:0.5rem;">'+
-        '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;">'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">'+
           '<select id="mktCat" style="flex:1;min-width:8rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+rtfmCats.map(c=>'<option value="'+c+'">'+rtfmCatNaam(c)+'</option>').join('')+'</select>'+
           '<select id="mktStaat" style="flex:1;min-width:8rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);"><option value="gebruikt">Gebruikt</option><option value="zgan">Zo goed als nieuw</option><option value="nieuw">Nieuw</option></select>'+
           '<input id="mktPrijs" type="number" inputmode="numeric" placeholder="€" style="width:5.5rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+
         '</div>'+
-        '<textarea id="mktOms" placeholder="'+T('mkt.oms','Omschrijving')+'" style="width:100%;min-height:4rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);margin-top:0.4rem;"></textarea>'+
-        '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;">'+
+        '<textarea id="mktOms" placeholder="'+T('mkt.oms','Omschrijving')+'" style="width:100%;min-height:4rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.6rem 0.7rem;color:var(--txt);margin-top:0.5rem;"></textarea>'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;">'+
           '<input id="mktPlaats" placeholder="'+T('mkt.plaatsnaam','Plaats')+'" style="flex:1;min-width:6rem;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);">'+
           '<button class="obtn" id="mktAiOms">'+T('mkt.aioms','AI-omschrijving')+'</button>'+
           '<button class="obtn" id="mktAiPrijs">'+T('mkt.aiprijs','AI-prijs')+'</button>'+
         '</div>'+
-        '<div id="mktAiUit" class="sub" style="margin-top:0.35rem;color:var(--gold);"></div>'+
-        '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.6rem 0;"><input type="checkbox" id="mktAkkoord" class="h-mt20"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
+        '<div id="mktAiUit" class="sub" style="margin-top:0.25rem;color:var(--gold);"></div>'+
+        '<label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.8rem;color:var(--soft);margin:0.5rem 0;"><input type="checkbox" id="mktAkkoord" class="h-mt20"><span>'+T('mkt.akkoord','Ik bied alleen toegestane waar aan en houd het netjes en respectvol.')+'</span></label>'+
         '<button class="obtn primary" id="mktPlaatsBtn" style="width:100%;">'+T('mkt.plaatsbtn','Zet in De Salon')+'</button>'+
         '<div id="mktMelding" class="sub h-mt40"></div></div>';
     }

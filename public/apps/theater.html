@@ -450,7 +450,7 @@
       '<input type="file" id="vBestand" accept="video/webm,video/mp4" style="position:absolute;left:-999px;" tabindex="-1" aria-label="Videobestand kiezen"></div>' +
       '<p class="stil h-mt50" id="vStatus">De camera neemt op tot 4K met hoge bitrate; het bestand gaat exact zo naar de kijker.</p>' +
       '<div class="voortgang" id="vVoortgang"><i></i></div>' +
-      '<video id="vVoorbeeld" style="width:100%;border-radius:10px;margin-top:0.6rem;display:none;" muted playsinline></video>';
+      '<video id="vVoorbeeld" style="width:100%;border-radius:10px;margin-top:0.5rem;display:none;" muted playsinline></video>';
     kaart.querySelector('#vKies').addEventListener('click', () => kaart.querySelector('#vBestand').click());
     kaart.querySelector('#vBestand').addEventListener('change', e => { const f = e.target.files[0]; if (f) stuurBlob(f, f.name); });
     kaart.querySelector('#vOpname').addEventListener('click', opnameSchakel);

@@ -6,7 +6,7 @@
       if (!box) return;
       if (!v.regels.length){ box.innerHTML = '<p class="sub">'+esc(v.uitleg)+'</p>'; return; }
       box.innerHTML = '<div style="border:1px solid var(--gold);border-radius:10px;padding:0.6rem;margin:0.5rem 0;">'+
-        '<div class="sub" style="margin-bottom:0.35rem;">'+esc(v.uitleg)+'</div>'+
+        '<div class="sub" style="margin-bottom:0.25rem;">'+esc(v.uitleg)+'</div>'+
         v.regels.map(r=>'<div class="sub">'+r.aantal+'× '+esc(r.naam)+' · '+eur(r.prijs)+' <span style="opacity:0.7;">('+esc(r.reden)+')</span></div>').join('')+
         '<button class="js-inkaiok" data-code="'+code+'" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('ink.aibevestig','Bijbestelling plaatsen')+'</button></div>';
       box.querySelector('.js-inkaiok').addEventListener('click', async () => {
@@ -22,7 +22,7 @@
     let d; try { d = await API.call('/supplier/mode/bezorg/overzicht'); } catch(e){ el.innerHTML=''; return; }
     const ins = d.instellingen || { aan:false };
     let h = '<div class="st-sec h-mt140">'+T('mb.h','Veilige bezorgdienst')+'</div>';
-    h += '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;margin-bottom:0.8rem;">'+
+    h += '<div style="border:1px solid var(--line);border-radius:12px;padding:0.8rem;margin-bottom:0.75rem;">'+
       '<label style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;"><input type="checkbox" id="mbAan"'+(ins.aan?' checked':'')+'> '+T('mb.aan','Bezorgen aan (met bezorgcode, foto-bewijs en live volgen)')+'</label>'+
       '<div class="row-gap h-mt50"><input id="mbKosten" class="st-in" type="number" step="0.5" placeholder="'+T('mb.kosten','Kosten €')+'" value="'+(ins.kosten!=null?ins.kosten:'')+'" class="h-flex1"><input id="mbGratis" class="st-in" type="number" placeholder="'+T('mb.gratis','Gratis vanaf €')+'" value="'+(ins.gratisVanaf!=null?ins.gratisVanaf:'')+'" class="h-flex1"><input id="mbId" class="st-in" type="number" placeholder="'+T('mb.idgrens','ID vanaf €')+'" value="'+(ins.waardegrensId!=null?ins.waardegrensId:'')+'" class="h-flex1"></div>'+
       '<button id="mbSave" style="width:100%;margin-top:0.5rem;background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.5rem;font-weight:600;font-family:inherit;">'+T('mb.opslaan','Opslaan')+'</button></div>';
@@ -60,7 +60,7 @@
     const el = $('#verkoopWrap'); if (!el) return;
     if (!has('huur')){ el.innerHTML = ''; return; }
     let d; try { d = await API.call('/supplier/verkoop/overzicht'); } catch(e){ el.innerHTML=''; return; }
-    let h = '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-bottom:0.9rem;"><label style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;"><input type="checkbox" id="vkAan"'+(d.aan?' checked':'')+'> '+T('vk.aan','Autoverkoop aan (exclusieve showroom voor leden)')+'</label></div>';
+    let h = '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-bottom:0.75rem;"><label style="display:flex;align-items:center;gap:0.6rem;font-size:0.85rem;"><input type="checkbox" id="vkAan"'+(d.aan?' checked':'')+'> '+T('vk.aan','Autoverkoop aan (exclusieve showroom voor leden)')+'</label></div>';
     // open aanvragen
     h += '<div class="st-sec">'+T('vk.aanvragen','Aanvragen')+'</div>';
     h += (d.open||[]).length ? (d.open||[]).map(vkDeal).join('') : '<p class="sub">'+T('vk.geen','Geen open aanvragen.')+'</p>';

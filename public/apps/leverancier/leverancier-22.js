@@ -57,7 +57,7 @@
       box.innerHTML = '<div class="tkc-who h-mt60">' + T('fn.advbezig', 'Ik kijk naar uw cijfers…') + '</div>';
       try {
         const d = await API.call('/supplier/accountant/adviezen', {});
-        box.innerHTML = (d.intro ? '<div style="font-size:0.82rem;margin:0.6rem 0;line-height:1.6;">' + esc(d.intro) + '</div>' : '') +
-          (d.adviezen || []).map(a => '<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;"><b style="color:var(--gold);font-size:0.8rem;">' + esc(a.titel) + '</b><div style="font-size:0.8rem;color:var(--soft);margin-top:0.2rem;line-height:1.5;">' + esc(a.tekst) + '</div></div>').join('');
+        box.innerHTML = (d.intro ? '<div style="font-size:0.82rem;margin:0.5rem 0;line-height:1.6;">' + esc(d.intro) + '</div>' : '') +
+          (d.adviezen || []).map(a => '<div style="border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;"><b style="color:var(--gold);font-size:0.8rem;">' + esc(a.titel) + '</b><div style="font-size:0.8rem;color:var(--soft);margin-top:0.25rem;line-height:1.5;">' + esc(a.tekst) + '</div></div>').join('');
       } catch(e){ box.innerHTML = '<div class="tkc-who">' + esc(e.message) + '</div>'; }
     });

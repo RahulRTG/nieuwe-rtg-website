@@ -24,7 +24,7 @@
   function ghForm(cats){
     const el = $('#ghForm'); if (!el) return; const p = ghEdit || {};
     el.innerHTML = '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.8rem;margin-top:0.5rem;">'+
-      '<input id="ghNaam" class="st-in" placeholder="'+T('gh.f.naam','Productnaam')+'" value="'+esc(p.naam||'')+'" style="width:100%;margin-bottom:0.4rem;">'+
+      '<input id="ghNaam" class="st-in" placeholder="'+T('gh.f.naam','Productnaam')+'" value="'+esc(p.naam||'')+'" style="width:100%;margin-bottom:0.5rem;">'+
       '<div class="row-gap"><select id="ghCat" class="st-in h-flex1">'+cats.map(c=>'<option'+(p.categorie===c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'+
       '<input id="ghEen" class="st-in" placeholder="'+T('gh.f.eenheid','Eenheid')+'" value="'+esc(p.eenheid||'stuk')+'" class="h-flex1"></div>'+
       '<div class="row-gap"><input id="ghIn" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.inkoop','Inkoopprijs')+'" value="'+(p.inkoopPrijs!=null?p.inkoopPrijs:'')+'" class="h-flex1"><input id="ghCon" class="st-in" type="number" step="0.01" placeholder="'+T('gh.f.consument','Consumentprijs')+'" value="'+(p.consumentPrijs!=null?p.consumentPrijs:'')+'" class="h-flex1"></div>'+
@@ -48,7 +48,7 @@
     try { markt = await API.call('/supplier/inkoop/markt'); mijn = await API.call('/supplier/inkoop/mijn'); } catch(e){ return; }
     let h = '';
     for (const g of (markt.groothandels||[])){
-      h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.8rem;">'+
+      h += '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem;margin-bottom:0.75rem;">'+
         '<div style="display:flex;gap:0.5rem;align-items:center;"><b class="h-flex1">'+esc(g.naam)+'</b>'+
         '<button class="js-inkai" data-code="'+g.code+'" style="background:var(--card2);border:1px solid var(--gold);border-radius:8px;padding:0.3rem 0.6rem;color:var(--gold);font-size:0.72rem;font-weight:600;font-family:inherit;">'+T('ink.ai','AI-bijbestellen')+'</button></div>'+
         '<div id="inkai-'+g.code+'"></div>'+
@@ -61,7 +61,7 @@
     // mijn bestellingen
     if ((mijn.bestellingen||[]).length){
       h += '<div class="st-sec">'+T('ink.mijn','Mijn inkooporders')+'</div>';
-      h += mijn.bestellingen.slice(0,20).map(o => '<div style="border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.75rem;margin-bottom:0.4rem;"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">'+esc(o.groothandelNaam)+' · '+eur(o.subtotaal)+'</b><span class="sub">'+esc(o.status)+(o.bron==='ai'?' · AI':'')+'</span></div><div class="sub">'+o.regels.map(r=>r.aantal+'× '+esc(r.naam)).join(', ')+'</div></div>').join('');
+      h += mijn.bestellingen.slice(0,20).map(o => '<div style="border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.75rem;margin-bottom:0.5rem;"><div style="display:flex;gap:0.5rem;"><b style="flex:1;font-size:0.82rem;">'+esc(o.groothandelNaam)+' · '+eur(o.subtotaal)+'</b><span class="sub">'+esc(o.status)+(o.bron==='ai'?' · AI':'')+'</span></div><div class="sub">'+o.regels.map(r=>r.aantal+'× '+esc(r.naam)).join(', ')+'</div></div>').join('');
     }
     el.innerHTML = h;
     el.querySelectorAll('.js-inkbestel').forEach(b => b.addEventListener('click', () => inkBestel(b.dataset.code, false)));

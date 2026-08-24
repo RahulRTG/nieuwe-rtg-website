@@ -398,7 +398,7 @@
       el.innerHTML = d.ads.map(a =>
         '<div class="paneel" style="padding:.8rem 1rem;">' +
         '<div class="mijnkop"><b>' + esc(a.titel) + '</b><span class="statuspil ' + a.status + '">' + a.status + '</span></div>' +
-        '<div style="color:var(--zacht);font-size:.85rem;margin:.2rem 0 .5rem;">' + eur(a.prijs) + (a.meldingen ? ' · ' + a.meldingen + ' melding(en)' : '') + '</div>' +
+        '<div style="color:var(--zacht);font-size:.85rem;margin:0.25rem 0 0.5rem;">' + eur(a.prijs) + (a.meldingen ? ' · ' + a.meldingen + ' melding(en)' : '') + '</div>' +
         '<div class="acties">' +
         (a.status !== 'verkocht' ? '<button type="button" class="knop grijs klein" data-res="' + a.id + '">Gereserveerd</button><button type="button" class="knop groen klein" data-verk="' + a.id + '">Verkocht</button>' : '<button type="button" class="knop grijs klein" data-heropen="' + a.id + '">Opnieuw te koop</button>') +
         '<button type="button" class="knop rood klein" data-del="' + a.id + '">Verwijder</button></div></div>'
@@ -436,32 +436,32 @@
     if (!d) {
       // nog geen deal: prijs afspreken
       return '<div class="paneel" style="border-color:var(--goud);"><b>Veilig samen betalen</b>' +
-        '<div class="zacht" style="font-size:.83rem;line-height:1.5;margin:.3rem 0 .5rem;">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
+        '<div class="zacht" style="font-size:.83rem;line-height:1.5;margin:0.25rem 0 0.5rem;">Spreek een prijs af. Betalen kan pas als jullie samen zijn (locaties bij elkaar). Dan komt de factuur en betaal je via je account met Apple Pay.</div>' +
         '<div class="rijveld"><input class="veld" id="dBedrag" type="number" inputmode="numeric" placeholder="€ prijs"><button type="button" class="knop" id="dAfspreek">Spreek prijs af</button></div></div>';
     }
     let h = '<div class="paneel" style="border-color:var(--goud);"><b>Deal: € ' + d.bedrag + '</b>';
     if (d.betaald) {
       return '<div class="paneel" style="border-color:var(--groen);"><b>Betaald: € ' + d.bedrag + '</b>' +
-        '<div class="zacht" style="font-size:.83rem;margin-top:.3rem;">Via ' + (d.methode === 'apple-pay' ? 'Apple Pay' : d.methode) + '. Factuur ' + esc(d.factuur ? d.factuur.nummer : '') + '.</div></div>';
+        '<div class="zacht" style="font-size:.83rem;margin-top:0.25rem;">Via ' + (d.methode === 'apple-pay' ? 'Apple Pay' : d.methode) + '. Factuur ' + esc(d.factuur ? d.factuur.nummer : '') + '.</div></div>';
     }
     // status voor het samenkomen
-    h += '<div style="display:flex;gap:.6rem;margin:.5rem 0;font-size:.8rem;">' +
+    h += '<div style="display:flex;gap:.6rem;margin:0.5rem 0;font-size:.8rem;">' +
       '<span class="' + (d.ikGedeeld ? '' : 'zacht') + '">' + (d.ikGedeeld ? 'jij bent er' : '○ jij: nog niet') + '</span>' +
       '<span class="' + (d.anderGedeeld ? '' : 'zacht') + '">' + (d.anderGedeeld ? 'de ander is er' : '○ de ander: nog niet') + '</span></div>';
     if (!d.samen) {
-      h += '<div class="zacht" style="font-size:.82rem;line-height:1.5;margin-bottom:.5rem;">Zijn jullie samen bij de overhandiging? Deel je locatie. Zodra beide locaties dichtbij zijn, komt de factuur vrij.' +
+      h += '<div class="zacht" style="font-size:.82rem;line-height:1.5;margin-bottom:0.5rem;">Zijn jullie samen bij de overhandiging? Deel je locatie. Zodra beide locaties dichtbij zijn, komt de factuur vrij.' +
         (d.ikGedeeld && d.anderGedeeld && d.afstand != null ? ' (nu ~' + d.afstand + ' m uit elkaar)' : '') + '</div>' +
         '<button type="button" class="knop" id="dHier" style="width:100%;">Ik ben hier (deel locatie)</button>';
-      if (verkoper) h += '<div class="zacht" style="font-size:.78rem;margin-top:.4rem;">De koper betaalt zodra jullie samen zijn.</div>';
+      if (verkoper) h += '<div class="zacht" style="font-size:.78rem;margin-top:0.5rem;">De koper betaalt zodra jullie samen zijn.</div>';
     } else {
       // samen: factuur + betalen
-      h += '<div class="paneel" style="margin:.5rem 0;padding:.7rem .85rem;background:var(--paneel2);">' +
+      h += '<div class="paneel" style="margin:0.5rem 0;padding:.7rem .85rem;background:var(--paneel2);">' +
         '<div style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--zacht);">Factuur</div>' +
-        '<div style="display:flex;justify-content:space-between;margin-top:.2rem;"><span>' + esc(d.factuur ? d.factuur.nummer : '') + '</span><b>€ ' + d.bedrag + '</b></div>' +
-        '<div class="zacht" style="font-size:.8rem;margin-top:.2rem;">' + esc(c.adTitel || '') + '</div></div>';
+        '<div style="display:flex;justify-content:space-between;margin-top:0.25rem;"><span>' + esc(d.factuur ? d.factuur.nummer : '') + '</span><b>€ ' + d.bedrag + '</b></div>' +
+        '<div class="zacht" style="font-size:.8rem;margin-top:0.25rem;">' + esc(c.adTitel || '') + '</div></div>';
       if (d.magBetalen) {
         h += '<button type="button" class="knop" id="dPay" style="width:100%;background:#000;color:#fff;"> Apple Pay · € ' + d.bedrag + '</button>' +
-          '<div class="zacht" style="font-size:.76rem;margin-top:.35rem;">Je betaalt rechtstreeks via je account aan de verkoper.</div>';
+          '<div class="zacht" style="font-size:.76rem;margin-top:0.25rem;">Je betaalt rechtstreeks via je account aan de verkoper.</div>';
       } else {
         h += '<div class="zacht" style="font-size:.83rem;">Jullie zijn samen. De koper kan nu via Apple Pay betalen.</div>';
       }
@@ -473,8 +473,8 @@
     function render(c) {
       $('#vChat').innerHTML =
         '<button type="button" class="terug" id="cTerug">← Terug naar berichten</button>' +
-        '<div class="paneel"><h2 style="font-family:var(--serif);font-weight:500;font-size:1.2rem;margin:0 0 .1rem;">' + esc(c.adTitel || '') + '</h2>' +
-        '<div style="color:var(--zacht);font-size:.85rem;margin-bottom:.6rem;">met ' + esc(c.metNaam || '') + '</div>' +
+        '<div class="paneel"><h2 style="font-family:var(--serif);font-weight:500;font-size:1.2rem;margin:0 0 0.25rem;">' + esc(c.adTitel || '') + '</h2>' +
+        '<div style="color:var(--zacht);font-size:.85rem;margin-bottom:0.5rem;">met ' + esc(c.metNaam || '') + '</div>' +
         '<div class="chat" id="cBerichten">' + (c.berichten || []).map(b =>
           '<div class="b ' + (b.mijn ? 'ik' : 'ai') + '"' + (b.systeem ? ' style="align-self:center;background:var(--paneel2);border:1px solid var(--goud);color:var(--goud2);font-size:.82rem;"' : '') + '>' + esc(b.tekst) + (b.let ? '<br><span style="font-size:.72rem;opacity:.8;">let op: nooit vooruit betalen</span>' : '') + '</div>'
         ).join('') + '</div>' +

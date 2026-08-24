@@ -172,7 +172,7 @@ async function wmLaad(){
   MAP='werkmail'; LIJST=[]; $('#tel').hidden=true;   // het adressenscherm is geen postvak
   let d; try{ d=await apiW('overzicht'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   $('#main').innerHTML = schakelBalk()+
-    '<div class="kaart" style="margin-bottom:.8rem;"><h2>'+esc(d.domein)+'</h2>'+
+    '<div class="kaart" style="margin-bottom:0.75rem;"><h2>'+esc(d.domein)+'</h2>'+
     '<div class="meta">Het eigen domein van de zaak. Extern mailen kan (via de '+(d.echteBuitenpost?'buitenpost':'outbox, er is nog geen SMTP-sleutel')+'); alles wat van buiten binnenkomt is onbetrouwbaar: links op slot, bijlagen bestaan niet.</div></div>'+
     d.adressen.map((a,i)=>'<button class="rij'+(a.ongelezen?' ongelezen':'')+'" data-wa="'+esc(a.adres)+'"'+(a.actief?'':' style="opacity:.55"')+'>'+
       '<span class="ic">'+esc(a.adres.slice(0,2).toUpperCase())+'</span>'+
@@ -206,7 +206,7 @@ async function wmInbox(adres){
   const lijst=d.berichten||[];
   LIJST=lijst;
   $('#main').innerHTML='<button class="terug" id="terug">← alle adressen</button>'+
-    '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--gold);cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
+    '<div class="noot" style="text-align:left;margin:0 0 0.75rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--gold);cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
     (lijst.length?lijst.map((m,i)=>'<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+esc((m.van||'@').slice(0,4).toUpperCase())+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
     :'<div class="leeg">Dit postvak is nog leeg.</div>');
   $('#terug').addEventListener('click', wmLaad);
@@ -250,7 +250,7 @@ function wmOpstellen(van, voor){
   });
 }
 async function laad(){
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;font-size:.9rem;">Open de leverancier-app en log in met uw zaak; daarna staat het postvak hier.</p></div>'; return; }
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:0.5rem;font-size:.9rem;">Open de leverancier-app en log in met uw zaak; daarna staat het postvak hier.</p></div>'; return; }
   let d; try{ d=await api(MAP==='verzonden'?'verzonden':'inbox'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   LIJST=d.berichten||[]; if(d.adres) ADRES=d.adres;
   if(MAP==='inbox' && d.ongelezen){ $('#tel').textContent=d.ongelezen; $('#tel').hidden=false; } else $('#tel').hidden=true;
@@ -305,7 +305,7 @@ function opstellen(voor){
     '<label class="lab">Onderwerp</label><input class="veld" id="vOnd" value="'+esc(voor.onderwerp||'')+'">'+
     '<label class="lab">Bericht</label><textarea class="veld" id="vTxt" placeholder="Uw bericht…">'+esc(voor.tekst||'')+'</textarea>'+
     '<div class="fout" id="vFout" hidden></div>'+
-    (voor.tekst?'<div class="noot" style="text-align:left;margin:.5rem 0 0;">Voorstel van Rahul - lees het na en pas aan voordat u verstuurt.</div>':'')+
+    (voor.tekst?'<div class="noot" style="text-align:left;margin:0.5rem 0 0;">Voorstel van Rahul - lees het na en pas aan voordat u verstuurt.</div>':'')+
     '<button class="knop" id="verstuur">Versturen</button></div>';
   $('#terug').addEventListener('click', laad);
   $('#verstuur').addEventListener('click', verstuur);

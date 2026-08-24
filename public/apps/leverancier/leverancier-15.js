@@ -21,7 +21,7 @@
           '<div class="st-row"><span>'+T('fn.minloon','Loonkosten')+'</span><b style="color:var(--burgundy);">- '+eur(loonTot)+'</b></div>'+
           '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.overhoudt','Blijft over (indicatie)')+'</b></span><b style="color:var(--gold);font-size:1.05rem;">'+eur(nettoOver)+'</b></div>'+
           '<div class="tkc-who">'+T('fn.netto.s','Indicatie vóór inkoop, huur en overige kosten. Uw omzet is volledig van u; RTG houdt niets in.')+'</div>'+
-          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
           '<button class="obtn" id="fnPdf">⤓ '+T('fn.exportpdf','Overzicht (PDF)')+'</button>'+
           '<button class="obtn" id="fnCsv">⤓ '+T('fn.exportcsv','Boekhouding (CSV)')+'</button></div></div>';
         html += '<div class="tkc h-volbreed"><h3>'+T('fn.land','Land & uurloon')+'</h3>'+
@@ -47,10 +47,10 @@
           '<div class="st-row"><span>'+T('fn.gcverkocht','Verkocht deze maand')+'<span class="sub">'+T('fn.gcv.s','nog geen omzet, geen btw')+'</span></span><b>'+eur(f.giftcards.verkocht)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcin','Ingewisseld deze maand')+'<span class="sub">'+T('fn.gci.s','omzet + btw-moment')+'</span></span><b>'+eur(f.giftcards.ingewisseld)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.gcopen','Openstaand saldo')+'<span class="sub">'+T('fn.gco.s','verplichting op de balans')+' · '+f.giftcards.aantal+' '+T('fn.kaarten','kaart(en)')+'</span></span><b style="color:var(--gold);">'+eur(f.giftcards.open)+'</b></div>'+
-          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.4rem;">'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
           '<input class="st-in" id="gcBedrag" type="number" placeholder="€ 50" style="flex:1;min-width:80px;">'+
           '<button class="obtn primary" id="gcSell">'+T('fn.gcsell','Verkoop kaart')+'</button></div>'+
-          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem;">'+
+          '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.25rem;">'+
           '<input class="st-in" id="gcCode" placeholder="RTG-GC-XXXXXX" style="flex:2;min-width:130px;">'+
           '<input class="st-in" id="gcInBedrag" type="number" placeholder="€" style="flex:1;min-width:70px;">'+
           '<button class="obtn" id="gcRedeem">'+T('fn.gcredeem','In te wisselen')+'</button></div></div>';

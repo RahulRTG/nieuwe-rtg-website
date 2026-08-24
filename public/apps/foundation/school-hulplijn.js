@@ -35,7 +35,7 @@
       if (!t.length) return;
       uit += kaart('Aankomende toetsen · ' + esc(x.kind.naam),
         t.map(function (toets) {
-          return '<div style="margin:.3rem 0;"><b>' + esc(toets.naam) + '</b> <span class="mini">' + esc(String(toets.soort).toUpperCase()) +
+          return '<div style="margin:0.25rem 0;"><b>' + esc(toets.naam) + '</b> <span class="mini">' + esc(String(toets.soort).toUpperCase()) +
             (toets.vak ? ' · ' + esc(toets.vak) : '') + (toets.bezig ? ' · al begonnen' : '') + '</span>' +
             '<div class="mini">Leerdoelen: ' + (toets.doelen || []).map(esc).join(', ') + '. Oefen ze rustig met Rahul Bijles hieronder.</div></div>';
         }).join(''));
@@ -54,15 +54,15 @@
     var m = await gezinApi('/school/hulplijn/mijn', { klasCode: kc }).catch(function () { return null; });
     if (!m || !m.ok) return '';
     var lijst = (m.meldingen || []).map(function (x) {
-      return '<div class="mini" style="margin:.25rem 0;">' + esc(String(x.at).slice(0, 10)) + ' · ' + esc(x.naam) + ': ' + esc(x.tekst) +
+      return '<div class="mini" style="margin:0.25rem 0;">' + esc(String(x.at).slice(0, 10)) + ' · ' + esc(x.naam) + ': ' + esc(x.tekst) +
         (x.vertrouwelijk ? ' <b>(vertrouwelijk: alleen de mentor)</b>' : '') +
         ' · <span style="color:var(--goud,#A98F1C);">' + (x.status === 'opgepakt' ? 'je mentor heeft het gezien' : 'staat klaar voor je mentor') + '</span></div>';
     }).join('') || '<div class="mini">' + (ouder ? 'Geen meldingen die jij mag zien; vertrouwelijke meldingen blijven tussen kind en mentor.' : 'Nog geen meldingen. De knop is er altijd, ook voor iets kleins.') + '</div>';
     var knop = ouder ? '<div class="mini h-mt40">De hulplijn-knop is van het kind zelf; die staat op het scherm van je kind.</div>'
       : '<div class="h-mt50">' +
         '<textarea class="veld" data-hulp-tekst="' + esc(kc) + '" rows="2" maxlength="500" placeholder="Wil je even praten? Schrijf hier wat er is; kort mag ook." style="width:100%;"></textarea>' +
-        '<label class="mini" style="display:block;margin:.3rem 0;"><input type="checkbox" data-hulp-vertrouwelijk="' + esc(kc) + '"> Vertrouwelijk: alleen mijn mentor mag dit zien (mijn ouders niet)</label>' +
-        '<label class="mini" style="display:block;margin:.3rem 0;"><input type="checkbox" data-hulp-acuut="' + esc(kc) + '"> Ik voel me nu niet veilig</label>' +
+        '<label class="mini" style="display:block;margin:0.25rem 0;"><input type="checkbox" data-hulp-vertrouwelijk="' + esc(kc) + '"> Vertrouwelijk: alleen mijn mentor mag dit zien (mijn ouders niet)</label>' +
+        '<label class="mini" style="display:block;margin:0.25rem 0;"><input type="checkbox" data-hulp-acuut="' + esc(kc) + '"> Ik voel me nu niet veilig</label>' +
         '<button class="knop mini" data-doe="hulplijn" data-klas="' + esc(kc) + '">Stuur naar mijn mentor</button>' +
         '<div class="mini h-mt30" data-hulp-uit="' + esc(kc) + '"></div></div>';
     return kaart('De hulplijn · klas ' + esc(kc),

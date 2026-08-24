@@ -103,7 +103,7 @@
     <div id="koppelBlok" hidden>
       <div class="sec" id="kopTitel">Kind uitnodigen voor een klas</div>
       <div class="kaart blok">
-        <div class="mini" id="kopUitleg" style="margin-bottom:.5rem;"></div>
+        <div class="mini" id="kopUitleg" style="margin-bottom:0.5rem;"></div>
         <input class="veld" id="kopCode" placeholder="Klascode (van de leraar)" maxlength="8" autocapitalize="characters">
         <select class="veld" id="kopKind" aria-label="Welk kind nodig je uit"></select>
         <button class="knop" id="kopDoe">Uitnodigen</button>
@@ -124,13 +124,13 @@
     <div class="sec">Aanmelden en toegang</div>
     <div class="kaart blok" id="lrInlog">
       <b>1. School aanmelden</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">De school gaat voorop: de directie meldt de school aan en krijgt de schoolcode (voor het personeel) en het beheer-token.</div>
+      <div class="mini" style="margin:0.25rem 0 0.5rem;">De school gaat voorop: de directie meldt de school aan en krijgt de schoolcode (voor het personeel) en het beheer-token.</div>
       <input class="veld" id="scNaam" placeholder="Naam van de school" maxlength="80">
       <input class="veld" id="scPlaats" placeholder="Plaats" maxlength="60">
       <button class="knop" id="scMaak">School aanmelden</button>
-      <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
+      <div style="border-top:1px solid var(--lijn);margin:0.75rem 0;"></div>
       <b>2. Werken bij een school</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">Leraar of ondersteuning? Meld je aan met de schoolcode; de directie keurt je aanmelding goed.</div>
+      <div class="mini" style="margin:0.25rem 0 0.5rem;">Leraar of ondersteuning? Meld je aan met de schoolcode; de directie keurt je aanmelding goed.</div>
       <input class="veld" id="psCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters">
       <input class="veld" id="psNaam" placeholder="Jouw naam (bijv. Juf Anke)" maxlength="60">
       <select class="veld" id="psRol" aria-label="Jouw rol op school">
@@ -138,9 +138,9 @@
         <option value="ondersteuning">Ondersteuning (conciërge, IB, administratie)</option>
       </select>
       <button class="knop" id="psMeld">Aanmelden bij de school</button>
-      <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
+      <div style="border-top:1px solid var(--lijn);margin:0.75rem 0;"></div>
       <b>Inloggen</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">Met je schoolcode en je token (beheer of personeel).</div>
+      <div class="mini" style="margin:0.25rem 0 0.5rem;">Met je schoolcode en je token (beheer of personeel).</div>
       <input class="veld" id="inCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters" autocomplete="organization" spellcheck="false">
       <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false">
       <button class="knop grijs" id="inDoe">Veilig inloggen</button>

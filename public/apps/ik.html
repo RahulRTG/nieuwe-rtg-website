@@ -233,7 +233,7 @@
         const v = velden[veld];
         return '<div class="h-mt100">' +
           '<b style="display:block;">' + Veilig.esc(v.label) + '</b>' +
-          '<span class="stil" style="display:block;margin:.15rem 0 .3rem;">' + Veilig.esc(v.uitleg) + '</span>' +
+          '<span class="stil" style="display:block;margin:0.25rem 0 0.25rem;">' + Veilig.esc(v.uitleg) + '</span>' +
           v.opties.map(o => '<button class="keus" data-tgveld="' + veld + '" data-tgwaarde="' + o.id + '"' +
             ' aria-pressed="' + ((nu[veld] || 'normaal') === o.id) + '">' +
             '<b>' + Veilig.esc(o.naam) + '</b>' +

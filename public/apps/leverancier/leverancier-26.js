@@ -13,7 +13,7 @@
     // inlogmoment vergeleken en nooit opgeslagen.
     const plek = wv.plek || null;
     const veldStijl = 'background:var(--card2,#1B1817);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:0.25rem 0.4rem;font-size:0.72rem;';
-    const plekBlok = '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
+    const plekBlok = '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
       '<b style="font-size:0.78rem;">'+T('wv.plekh','Werkplek-zone')+'</b>'+
       '<div class="tkc-who">'+T('wv.pleks','Alleen op de werkplek inloggen: het toestel deelt bij het inloggen eenmalig zijn positie, de server vergelijkt die met deze zone en bewaart er niets van. Thuiswerk-toestemming per persoon heft de zone op.')+'</div>'+
       '<div class="st-row" style="gap:0.5rem;flex-wrap:wrap;">'+
@@ -36,7 +36,7 @@
         '<input type="time" class="wvps-tot" value="'+(p.tot||'')+'" aria-label="'+T('wv.tot','Tot')+' '+esc(m.name)+'"'+(stand==='eigen'?'':' hidden')+' style="'+veldStijl+'">'+
         '<button class="obtn'+(p.thuiswerk?' primary':'')+'" data-wvthuis="'+(p.thuiswerk?'1':'0')+'">'+(p.thuiswerk?T('wv.thuisaan','Thuiswerk aan'):T('wv.thuisuit','Thuiswerk uit'))+'</button></div>';
     }).join('');
-    const psBlok = psRows ? '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
+    const psBlok = psRows ? '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.55rem;">'+
       '<b style="font-size:0.78rem;">'+T('wv.persh','Per persoon')+'</b>'+
       '<div class="tkc-who">'+T('wv.perss','Wanneer de PDA en de werkpagina voor wie beschikbaar zijn: volgens het venster van de zaak, altijd, nooit, of eigen tijden. Thuiswerk aan = deze persoon kan ook buiten de werkplek-zone aan het werk.')+'</div>'+
       psRows+'</div>' : '';

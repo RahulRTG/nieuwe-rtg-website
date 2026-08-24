@@ -45,7 +45,7 @@
     <input class="veld" id="cCode" maxlength="6" autocomplete="off" placeholder="KLASCODE" aria-label="Klascode">
     <input class="veld" id="cNaam" maxlength="24" autocomplete="off" placeholder="Je voornaam" aria-label="Je voornaam" style="text-transform:none;letter-spacing:normal;text-align:left;font-family:inherit;">
     <button class="knop" id="cGo">Doe mee!</button>
-    <p class="stil" id="cFout" role="alert" style="color:#E39AA2;margin-top:.6rem;"></p>
+    <p class="stil" id="cFout" role="alert" style="color:#E39AA2;margin-top:0.5rem;"></p>
   </section>
 
   <!-- de les -->
@@ -93,8 +93,8 @@ function teken(){
   }
   if (LES.fase === 'klaar'){
     inhoud.innerHTML = '<div class="groot">✓</div><h1 style="font-size:1.25rem;text-align:center;">De les is klaar!</h1>'+
-      '<p class="stil" style="text-align:center;margin-top:.4rem;">Je had <b style="color:var(--goud);">'+LES.score+'</b> vragen goed. Kijk vooral welke stap je nu beter begrijpt.</p>'+
-      '<p class="stil" style="text-align:center;margin-top:.7rem;">Er is bewust geen podium: leren is geen wedstrijd.</p>';
+      '<p class="stil" style="text-align:center;margin-top:0.5rem;">Je had <b style="color:var(--goud);">'+LES.score+'</b> vragen goed. Kijk vooral welke stap je nu beter begrijpt.</p>'+
+      '<p class="stil" style="text-align:center;margin-top:0.75rem;">Er is bewust geen podium: leren is geen wedstrijd.</p>';
     opties.innerHTML = ''; return;
   }
   if (LES.fase === 'vraag' && LES.vraag){
@@ -105,7 +105,7 @@ function teken(){
       opties.innerHTML = ''; return;
     }
     inhoud.innerHTML = '<span class="stil">Vraag '+(LES.vraagIx+1)+' van '+LES.totaalVragen+'</span>'+
-      '<h1 style="font-size:1.2rem;margin-top:.4rem;">'+esc(LES.vraag.v)+'</h1>';
+      '<h1 style="font-size:1.2rem;margin-top:0.5rem;">'+esc(LES.vraag.v)+'</h1>';
     opties.innerHTML = LES.vraag.opties.map((o,i) =>
       '<button class="optie" data-k="'+i+'"><span class="ltr">'+'ABCD'[i]+'</span>'+esc(o)+'</button>').join('');
     opties.querySelectorAll('.optie').forEach(b => b.addEventListener('click', async () => {

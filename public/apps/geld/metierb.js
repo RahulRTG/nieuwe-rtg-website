@@ -29,7 +29,7 @@
     return '<div class="kaart"><h2>' + esc(p.codenaam) + '</h2>' +
       '<p class="stil">' + esc(p.kop || 'geen beroepskop') + (p.plaats ? ' · ' + esc(p.plaats) : '') + '</p>' +
       (p.open ? '<div class="h-mt40"><span class="badge mt-zg" style="margin-left:0;">Open voor werk</span></div>' : '') +
-      (p.over ? '<p style="margin-top:.6rem;font-size:.88rem;line-height:1.55;">' + esc(p.over) + '</p>' : '') +
+      (p.over ? '<p style="margin-top:0.5rem;font-size:.88rem;line-height:1.55;">' + esc(p.over) + '</p>' : '') +
       '<div class="mt-knoppen"><button class="knop" id="mtBterug" type="button">Terug naar het register</button></div></div>' +
       '<div class="kaart"><h2>Werk</h2>' + (alle.length ? alle.map(M.rolRij).join('') : '<p class="stil">Niets opgegeven.</p>') + '</div>' +
       '<div class="kaart"><h2>Vaardigheden</h2>' +

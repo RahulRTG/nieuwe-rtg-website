@@ -102,7 +102,7 @@
           '</div>' +
         '</div>' +
         '<div class="vak"><h3>De ontwerptak</h3>' +
-          '<p class="leeg" style="margin-bottom:.9rem;">Zes bureaus, elk met het werk van dit huis. Wat hier gemaakt wordt, staat niet in het andere huis.</p>' +
+          '<p class="leeg" style="margin-bottom:0.75rem;">Zes bureaus, elk met het werk van dit huis. Wat hier gemaakt wordt, staat niet in het andere huis.</p>' +
           '<div id="bureaus"></div>' +
         '</div>';
       if (window.RTGWerkplekBureaus) RTGWerkplekBureaus.tegels($('#bureaus'), code);

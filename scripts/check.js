@@ -3487,5 +3487,44 @@ console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet
   }
 }
 
+/* ============================================================================
+   51) ELKE REM-MARGE LIGT OP DE RUIMTESCHAAL VAN ONTWERP.MD
+
+   Er stonden zeventien willekeurige stappen (.3, .35, .4, .45, .5, .55, .6 ...),
+   door elkaar geschreven als `.5rem` en `0.5rem`. Niemand had die gekozen; ze
+   zijn ontstaan, een halve pixel per keer. Het verschil tussen 0.55rem en
+   0.6rem is 0,8 pixel: dat is geen ontwerpbeslissing maar ruis.
+
+   ONTWERP.md 2b brengt ze terug tot vijf, en drie daarvan stonden er al: het
+   zijn de basisruimtes van World (20px), Pro (12px) en Command (8px) uit de
+   modi-tabel. Deze regel houdt vast dat er geen achttiende bij komt.
+
+   Waarom een poort en niet een ratel: een ratel telt een voorraad en laat er een
+   bij komen zolang het totaal maar niet stijgt. Hier is de voorraad NUL, en dan
+   is een poort eenvoudiger en strenger tegelijk. Het oordeel zelf staat in
+   scripts/margeschaal.js, met dezelfde functie die de omzetting doet -- twee
+   zeven die hetzelfde moeten vinden, lopen uiteen (LAT.md regel 4). */
+console.log('\n51) elke rem-marge in een style-attribuut ligt op de ruimteschaal');
+{
+  const { ernaast } = require('./margeschaal');
+  const naast = [];
+  let gekeken = 0;
+  loop(path.join(ROOT, 'public'), /\.(html|js)$/, (f) => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.includes('/dist/')) return;
+    let bron; try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return; }
+    gekeken++;
+    const lijst = ernaast(bron);
+    if (lijst.length) naast.push(rel + ': ' + lijst.slice(0, 3).join(', '));
+  });
+  if (naast.length) {
+    for (const n of naast.slice(0, 10)) fout('marge naast de ruimteschaal -- ' + n);
+    if (naast.length > 10) fout('... en nog ' + (naast.length - 10) + ' bestanden');
+    fout('de schaal staat in ONTWERP.md 2b; zet ze om met: node scripts/margeschaal.js');
+  } else {
+    ok(gekeken + ' bestanden: elke rem-marge ligt op een van de vijf stappen (0.25 / 0.5 / 0.75 / 1.25 / 2rem)');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

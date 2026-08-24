@@ -38,7 +38,7 @@
     h += (d.concierge||[]).map(c=>'<div style="border:1px solid '+(c.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+MR_CON[c.soort]+' · '+esc(c.voorWie)+'</b><span class="sub">'+esc(c.status)+'</span></div>'+
       '<div class="sub">'+esc(c.wens)+' · '+esc(c.moment)+(c.notitie?' · '+esc(c.notitie):'')+'</div>'+
-      (c.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
+      (c.status!=='afgerond'?'<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
         (c.status==='aangevraagd'?knop('data-mrcb', c.id, T('mr.bevestig','Bevestig'), true):'')+knop('data-mrca', c.id, T('mr.afgerond','Afgerond'))+'</div>':'')+'</div>').join('');
     h += '<p class="sub h-mt50">'+T('mr.regel','Een charter-transfer is een dienstverzoek aan RTG Charter; de concierge bevestigt pas na overleg, nooit vanzelf.')+'</p>';
     el.innerHTML = h;

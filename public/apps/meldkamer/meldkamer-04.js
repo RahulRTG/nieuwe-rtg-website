@@ -45,7 +45,7 @@
       (m.gemAfhandelMin != null ? ' Gem. afhandeltijd ' + m.gemAfhandelMin + ' min' + (m.langsteAfhandelMin != null ? ' (langste ' + m.langsteAfhandelMin + ' min)' : '') + '.' : '') + '</div>' +
       '<div class="melding" style="padding:0.5rem 0;"><b>Evacuaties</b>: ' + e.totaal +
       (e.totaal ? ' (' + Object.entries(e.perTriage).map(function(t){return t[1]+' '+t[0];}).join(', ') + ')' : '') + '.</div>' +
-      '<div class="melding" style="padding:0.5rem 0;"><b>Knelpunten</b><ul style="margin:0.3rem 0 0 1rem;">' + ev.knelpunten.map(function(k){return '<li>'+esc(k)+'</li>';}).join('') + '</ul></div>';
+      '<div class="melding" style="padding:0.5rem 0;"><b>Knelpunten</b><ul style="margin:0.25rem 0 0 1.25rem;">' + ev.knelpunten.map(function(k){return '<li>'+esc(k)+'</li>';}).join('') + '</ul></div>';
   }
   $('#rapportKnop').addEventListener('click', async () => {
     $('#rapportUit').textContent = 'Rapport opstellen…';

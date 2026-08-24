@@ -1,7 +1,7 @@
 /* het contactenblok op het beginscherm, met de lege staat */
     if (!conns.length && !reqs.length){
       html += '<div class="big" style="font-size:1.02rem;">Nog geen contacten</div>'+
-        '<div class="meta" style="margin:.2rem 0 .7rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
+        '<div class="meta" style="margin:0.25rem 0 0.75rem;">Voeg iemand toe in De Salon; daarna bericht of (video)bel je elkaar met één tik, zonder telefoonnummer.</div>'+
         '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">'+
         '<button class="go" data-goto="salon">Iemand toevoegen →</button>'+
         '<button class="rahul-leeg-knop" data-rahul-leeg="Zoek in De Salon iemand die bij me past en help me die toe te voegen als connectie">Laat Rahul iemand voorstellen</button>'+
@@ -18,7 +18,7 @@
         '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-snap="'+escT(c.key)+'" data-cn="'+escT(nm)+'" title="Snap">'+RTGGlyf.svgHTML('camera')+'</button>'+
         '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-bel="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('bellen')+'</button>'+
         '<button class="go" style="background:transparent;padding:.2rem .35rem;" data-vid="'+escT(c.key)+'" data-cn="'+escT(nm)+'">'+RTGGlyf.svgHTML('videobellen')+'</button></div>'); }
-      ).join('') + '<button class="go" style="margin-top:.7rem;background:transparent;color:var(--muted);" data-goto="salon">+ Iemand toevoegen</button>';
+      ).join('') + '<button class="go" style="margin-top:0.75rem;background:transparent;color:var(--muted);" data-goto="salon">+ Iemand toevoegen</button>';
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-dm]').forEach(b => b.addEventListener('click', () => openDm(b.dataset.dm, b.dataset.cn)));

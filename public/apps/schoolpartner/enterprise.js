@@ -68,7 +68,7 @@
       ].map(function (x) { return '<div class="kpi"><b>' + x[1] + '</b><span>' + x[0] + '</span></div>'; }).join('') + '</div>';
 
       h += kaart('Waarschuwingen', (dash.waarschuwingen || []).length
-        ? dash.waarschuwingen.map(function (w) { return '<p class="stil" style="margin:.3rem 0;">◆ ' + esc(w.tekst) + '</p>'; }).join('')
+        ? dash.waarschuwingen.map(function (w) { return '<p class="stil" style="margin:0.25rem 0;">◆ ' + esc(w.tekst) + '</p>'; }).join('')
         : '<p class="stil">Geen waarschuwingen.</p>',
       'Elk signaal noemt zijn eigen rekensom. Tevredenheid staat hier niet: dat meten we nergens, dus verzinnen we het ook niet.');
 

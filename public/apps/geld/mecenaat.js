@@ -83,7 +83,7 @@
         '</div>' +
         /* De twee vinkjes van de pagina zijn hier chips die goud oplichten:
            dezelfde keuze, maar in de vormtaal die dit scherm al heeft. */
-        '<div class="chips" style="margin:.7rem 0 0;">' +
+        '<div class="chips" style="margin:0.75rem 0 0;">' +
           '<button type="button" id="mcGBet" aria-pressed="false">al betaald</button>' +
           '<button type="button" id="mcGFound" aria-pressed="false">via RTFoundation</button>' +
         '</div>' +

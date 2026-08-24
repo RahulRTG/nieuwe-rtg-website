@@ -13,7 +13,7 @@
         s.rooms.map(r => '<div class="ms-room"><div class="rt"><b>' + r.name + '</b>' + (r.desc ? '<span>' + r.desc + '</span>' : '') + '</div>' +
           '<div class="rp" style="display:flex;align-items:center;gap:0.5rem;">' + eur(r.price) + ' <span style="font-size:0.62rem;color:var(--soft);">' + T('app.ms.pernight','p.n.') + '</span>' +
           '<button class="vbtn" data-vbboek="' + r.id + '">' + T('vb.boek','Boek') + '</button></div></div>').join('') +
-        '<div style="margin:0.5rem 0 0.6rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote2','Tegen nettoprijs; het huis bevestigt uw verblijf en de rekening loopt op de kamer.') + '</div>' +
+        '<div style="margin:0.5rem 0 0.5rem;font-size:0.74rem;color:var(--soft);">' + T('app.ms.roomnote2','Tegen nettoprijs; het huis bevestigt uw verblijf en de rekening loopt op de kamer.') + '</div>' +
         // keyless: tijdens een ingecheckt verblijf is de telefoon de sleutel
         '<div style="display:flex;gap:0.5rem;padding-bottom:0.8rem;">' +
         '<button class="vbtn h-flex1" id="vbDeurKamer">' + T('vb.deurkamer','Open mijn kamerdeur') + '</button>' +
@@ -30,10 +30,10 @@
     const evs = s.events || [];
     const eventsBlock = evs.length
       ? '<div class="ms-cat">\uD83C\uDF9F ' + T('ev.h','Events') + '</div>' + evs.map(e =>
-          '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin-bottom:0.6rem;">' +
+          '<div style="border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin-bottom:0.5rem;">' +
           '<div style="display:flex;justify-content:space-between;gap:0.6rem;align-items:baseline;"><b style="font-size:0.92rem;">' + e.name + '</b><span style="font-size:0.7rem;color:var(--soft);flex-shrink:0;">' + e.date + (e.time ? ' \u00b7 ' + e.time : '') + '</span></div>' +
           (e.desc ? '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">' + e.desc + '</div>' : '') +
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;gap:0.6rem;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;gap:0.6rem;">' +
           '<span style="font-size:0.72rem;color:' + (e.spotsLeft > 0 ? 'var(--soft)' : 'var(--burgundy)') + ';">' + (e.spotsLeft > 0 ? e.spotsLeft + ' ' + T('ev.spots','plekken vrij') : T('ev.full','Vol')) + (e.price ? ' \u00b7 ' + eur(e.price) + ' p.p.' : ' \u00b7 ' + T('ev.free','gratis')) + '</span>' +
           (e.spotsLeft > 0 ? '<button class="vbtn" data-rsvp="' + e.id + '">' + T('ev.join','Zet mij op de lijst') + '</button>'
             : '<button class="vbtn" data-wl="' + e.id + '">' + T('erv.wachtlijst','Wachtlijst') + '</button>') +

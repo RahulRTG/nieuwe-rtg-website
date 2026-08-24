@@ -137,7 +137,7 @@
 <div class="lint" id="versienoot" hidden></div>
 <main id="hoofd">
   <div style="width:100%;max-width:1080px;">
-    <div class="tip" id="tip" style="margin-bottom:1rem;"><b>Begin hier.</b> Bouw je bedrijfssite met blokken: klik in de tekst om te typen, kies een accentkleur en beeld. Klaar? Klik op <b>Ga online</b> - dan krijgt je site een RTG-adres (bijv. jouwzaak.rtg) en staat hij in de RTG-browser, voor alle leden te bezoeken.</div>
+    <div class="tip" id="tip" style="margin-bottom:1.25rem;"><b>Begin hier.</b> Bouw je bedrijfssite met blokken: klik in de tekst om te typen, kies een accentkleur en beeld. Klaar? Klik op <b>Ga online</b> - dan krijgt je site een RTG-adres (bijv. jouwzaak.rtg) en staat hij in de RTG-browser, voor alle leden te bezoeken.</div>
     <div class="doek" id="doek" data-thema="donker"></div>
   </div>
 </main>
@@ -148,7 +148,7 @@
 </div></div>
 <div class="sheet" id="beeldSheet"><div class="box">
   <h2>Kies beeld</h2><div class="sub">Kies een eigen RTG-campagnebeeld of upload je eigen foto (na een virusscan).</div>
-  <div class="rij" style="gap:.5rem;margin:.2rem 0 .8rem;align-items:center;">
+  <div class="rij" style="gap:.5rem;margin:0.25rem 0 0.75rem;align-items:center;">
     <button class="knop prim" id="uploadKnop" type="button">Upload eigen foto</button>
     <input type="file" id="fotoIn" accept="image/*" hidden>
     <span class="sub" id="uploadStatus" style="margin:0;"></span>
@@ -174,11 +174,11 @@
 <div class="sheet" id="onlineSheet"><div class="box">
   <h2>Ga online</h2><div class="sub">Kies het RTG-adres waarop bezoekers je site vinden. Alleen letters, cijfers en koppeltekens.</div>
   <div class="adresrij"><input class="adresin" id="adresIn" maxlength="30" placeholder="jouwzaak" aria-label="Adres"><span class="suf">.rtg</span></div>
-  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;">
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.5rem;">
     <button class="knop online" id="publiceerKnop">Zet online</button>
     <button class="knop" id="offlineKnop" hidden>Uit de lucht halen</button>
   </div>
-  <div id="onlineNoot" style="font-size:.8rem;color:var(--soft);margin-top:.7rem;"></div>
+  <div id="onlineNoot" style="font-size:.8rem;color:var(--soft);margin-top:0.75rem;"></div>
 </div></div>
 
 <div class="melding" id="melding" role="status"></div>
@@ -603,7 +603,7 @@ async function offline(){
   catch(e){ meld(e.message); }
 }
 
-if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Website-maker hoort bij je RTG-lidmaatschap. Open de leden-app en log in; kom dan hierheen terug.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; $('#lint').hidden=true; }
+if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De Website-maker hoort bij je RTG-lidmaatschap. Open de leden-app en log in; kom dan hierheen terug.</p><p class="h-mt100"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; $('#lint').hidden=true; }
 else {
   bouwSwatches(); bouwBlokkies(); bouwBeeldgrid();
   laadMijnFotos().then(bouwBeeldgrid);

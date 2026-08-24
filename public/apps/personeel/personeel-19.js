@@ -3,7 +3,7 @@
       ap.map(r => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.artikelNaam)+' · '+esc(r.maat)+'</b><span>'+esc(r.codenaam||r.key)+' · '+T('pd.w.tot','tot')+' '+esc(r.tot)+'</span></div></div>').join('')+'</div>';
     // klant erbij pakken
     html += '<div class="card"><div class="k">'+T('pd.w.klant','Klant erbij pakken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+winkelInput('wKlantKey', T('pd.w.klantph','Codenaam of sleutel van het lid'))+'<button class="abtn" id="wKlantBtn">'+T('pd.w.open','Open')+'</button></div>'+
       '<div class="h-mt50" id="wKlantUit">'+(winkelKlant?winkelKlantKaart(winkelKlant):'')+'</div></div>';
     wrap.innerHTML = html;
     winkelBind(wrap);
@@ -12,9 +12,9 @@
     const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
     return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;">'+
       '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
-      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
-      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
-      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;color:var(--txt);margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">'+k.aankopen+' '+T('pd.w.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
+      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.25rem;">'+esc(k.voorkeuren)+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;color:var(--txt);margin-top:0.25rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
       '</div>';
   }
   function winkelBind(wrap){

@@ -39,7 +39,7 @@
     const me = mij() || {};
     el.innerHTML = messages.length ? messages.map(m =>
       '<div class="cc-msg' + (m.van === me.staffId ? ' mijn' : '') + '">' + esc(m.text) + '<time>' + tijd(m.at) + '</time></div>'
-    ).join('') : '<div style="font-size:0.8rem;opacity:0.6;text-align:center;margin-top:1rem;">' + T('cc.leeg', 'Nog geen berichten. Zeg hallo.') + '</div>';
+    ).join('') : '<div style="font-size:0.8rem;opacity:0.6;text-align:center;margin-top:1.25rem;">' + T('cc.leeg', 'Nog geen berichten. Zeg hallo.') + '</div>';
     el.scrollTop = el.scrollHeight;
   }
   function sluit(){

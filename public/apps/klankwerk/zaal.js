@@ -50,7 +50,7 @@
 
   if (!TOKEN) {
     $('#zaal').innerHTML = '<div class="kaart"><h2>Log eerst in</h2>' +
-      '<p class="stil" style="margin-top:.5rem;">Open de RTG-app en log in; daarna hoort u wat er staat.</p></div>';
+      '<p class="stil" style="margin-top:0.5rem;">Open de RTG-app en log in; daarna hoort u wat er staat.</p></div>';
     return;
   }
 

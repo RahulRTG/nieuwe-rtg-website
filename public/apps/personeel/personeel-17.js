@@ -7,7 +7,7 @@
       opDePas.forEach(o => { if (o.table) (tafels[o.table] = tafels[o.table] || []).push(o); });
       const compleet = Object.keys(tafels).filter(t => !bezig.some(o => (o.table||'') === t));
       if (compleet.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">'+T('pas.compleet','Tafel compleet')+'</div>'+
-        compleet.map(t => '<div style="margin-top:0.35rem;font-size:0.85rem;"><b>'+esc(t)+'</b> · '+tafels[t].map(o=>o.pickup).join(', ')+' · '+T('pas.samen','stuur samen uit')+'</div>').join('')+'</div>';
+        compleet.map(t => '<div style="margin-top:0.25rem;font-size:0.85rem;"><b>'+esc(t)+'</b> · '+tafels[t].map(o=>o.pickup).join(', ')+' · '+T('pas.samen','stuur samen uit')+'</div>').join('')+'</div>';
       if (pkOverLijst().length) html += '<div class="card"><div class="k">'+T('over.h','Op de pas over')+'</div>'+
         pkOverLijst().map(x=>'<div class="task"><div class="t"><b>'+x.qty+'× '+esc(x.name)+'</b><span>'+esc(x.door||'')+'</span></div><button class="abtn" data-pkover="'+x.id+'">'+T('over.gebruikt','Gebruikt')+'</button></div>').join('')+'</div>';
       html += '<div class="card"><div class="k">'+T('ks.pas.klaar','Op de pas, samenstellen en doorgeven')+' ('+opDePas.length+')</div>'+
@@ -34,7 +34,7 @@
         const items = (o.items||[]).filter(pkBarItem);
         return '<div class="card" style="border-left:4px solid '+(a>=8?'#E5484D':a>=4?'#C99A2E':'#2E7D5B')+';">'+
           '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=8?'#FF8589':a>=4?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
-          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
+          '<div style="margin:0.25rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (fase==='bezig'?'<div style="font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;">'+T('vp.bezig','bezig')+'</div>':'')+
           '<div style="display:flex;gap:0.5rem;">'+(!fase?'<button class="abtn ghost h-flex1" data-pkbar="'+o.ref+'" data-phase="bezig">'+T('st.start','Start')+'</button>':'')+
           '<button class="abtn h-flex1" data-pkbar="'+o.ref+'" data-phase="klaar">'+T('st.ready','Klaar')+'</button></div></div>';
@@ -68,9 +68,9 @@
       pkMinOver(nuPer);
       const nuRows = Object.entries(nuPer).sort((a,b)=>b[1]-a[1]).slice(0,6);
       if (nuRows.length) html += '<div class="card" style="border-left:4px solid #2E7D5B;"><div class="k">'+T('lijn.maaknu','Maak nu, in een keer')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.9rem;">'+nuRows.map(r=>'<b style="color:var(--gold);">'+r[1]+'×</b> '+esc(r[0])).join(' · ')+'</div></div>';
+        '<div style="margin-top:0.5rem;font-size:0.9rem;">'+nuRows.map(r=>'<b style="color:var(--gold);">'+r[1]+'×</b> '+esc(r[0])).join(' · ')+'</div></div>';
       if (pkOverLijst().length) html += '<div class="card"><div class="k">'+T('over.h','Op de pas over')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.85rem;">'+pkOverLijst().map(x=>'<b style="color:var(--gold);">'+x.qty+'×</b> '+esc(x.name)).join(' · ')+' · <span style="color:var(--soft);">'+T('over.eerst','gebruik eerst wat er ligt')+'</span></div></div>';
+        '<div style="margin-top:0.5rem;font-size:0.85rem;">'+pkOverLijst().map(x=>'<b style="color:var(--gold);">'+x.qty+'×</b> '+esc(x.name)).join(' · ')+' · <span style="color:var(--soft);">'+T('over.eerst','gebruik eerst wat er ligt')+'</span></div></div>';
       html += mijn.length ? mijn.map(o => {
         const a = pkAge(o.at);
         const p = pkPlan(o).plan[sec];
@@ -79,7 +79,7 @@
         const items = (o.items||[]).filter(it => pkSectieOf(it) === sec);
         return '<div class="card" style="border-left:4px solid '+(a>=12?'#E5484D':a>=6?'#C99A2E':'#2E7D5B')+';">'+
           '<div style="display:flex;justify-content:space-between;align-items:baseline;"><b style="font-size:1.05rem;color:var(--gold);">'+o.pickup+(o.table?' · '+esc(o.table):'')+'</b><span style="font-size:0.78rem;font-weight:700;color:'+(a>=12?'#FF8589':a>=6?'#E2B93B':'#7BC79B')+';">'+a+' min</span></div>'+
-          '<div style="margin:0.35rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
+          '<div style="margin:0.25rem 0 0.5rem;font-size:0.92rem;">'+items.map(it => '<div data-pkdish="'+it.id+'" style="padding:0.15rem 0;">'+((o.spoed && (!o.spoed.itemId || o.spoed.itemId === it.id))?'':'')+'<b style="color:var(--gold);">'+it.qty+'×</b> '+esc(it.name)+'</div>').join('')+'</div>'+
           (o.allergyNote?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+esc(o.allergyNote)+'</div>':'')+
           (o.zorg?'<div style="font-size:0.76rem;color:#FF8589;border:1px solid rgba(229,72,77,0.4);border-radius:8px;padding:0.35rem 0.5rem;margin-bottom:0.5rem;">'+T('pd.zorgp','Zorgprofiel gast')+': '+esc(pkZorg(o.zorg))+'</div>':'')+
           pkGast(o)+

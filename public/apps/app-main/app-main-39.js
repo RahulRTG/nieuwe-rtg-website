@@ -1,9 +1,9 @@
 /* de cv-kaart: klaar of nog niet */
     el.innerHTML = '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('cv.card.k','Werken via RTG')+'</div>'+
       (myCvReady
-        ? '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">✓ '+T('cv.card.ready','Uw cv staat klaar. Solliciteer bij elke RTG-partner in een tik, via Ter plaatse.')+'</div>'
-        : '<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--muted);">'+T('cv.card.build','Maak eenmalig uw cv met de cv-builder en solliciteer daarna bij elke RTG-partner op dezelfde manier.')+'</div>')+
-      (myApps.length ? '<div style="margin-top:0.9rem;display:flex;flex-direction:column;gap:0.45rem;">'+myApps.map(a => {
+        ? '<div style="margin-top:0.5rem;font-size:0.85rem;color:var(--muted);">✓ '+T('cv.card.ready','Uw cv staat klaar. Solliciteer bij elke RTG-partner in een tik, via Ter plaatse.')+'</div>'
+        : '<div style="margin-top:0.5rem;font-size:0.85rem;color:var(--muted);">'+T('cv.card.build','Maak eenmalig uw cv met de cv-builder en solliciteer daarna bij elke RTG-partner op dezelfde manier.')+'</div>')+
+      (myApps.length ? '<div style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.45rem;">'+myApps.map(a => {
         const kleur = a.status==='aangenomen' ? '#4CAF7D' : a.status==='afgewezen' ? 'var(--burgundy)' : a.status==='uitgenodigd' ? '#4CAF7D' : 'var(--gold)';
         const label = a.status==='aangenomen' ? T('cv.st.hired','aangenomen') : a.status==='afgewezen' ? T('cv.st.rejected','afgewezen') : a.status==='uitgenodigd' ? T('cv.st.invited','uitgenodigd') : T('cv.st.new','in behandeling');
         return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
@@ -81,21 +81,21 @@
       '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('vac.k','Werk en vacatures')+'</div>'+
       '<select id="vacLand" style="background:var(--card2);color:var(--txt,#fff);border:1px solid var(--line);border-radius:999px;padding:0.3rem 0.6rem;font-size:0.72rem;">'+landOpts+'</select></div>';
     if (!rij.length){
-      h += '<div style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);">'+T('vac.leeg','Nu geen open vacatures die bij u passen. Kijk gerust later nog eens.')+'</div>'+
+      h += '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);">'+T('vac.leeg','Nu geen open vacatures die bij u passen. Kijk gerust later nog eens.')+'</div>'+
         '<button class="rahul-leeg-knop h-mt50" data-rahul-leeg="Zoek werk dat bij mijn profiel past en help me solliciteren">'+T('vac.leegdoe','Laat Rahul werk zoeken dat past')+'</button>';
     } else {
-      h += '<div style="margin-top:0.7rem;display:flex;flex-direction:column;gap:0.6rem;">'+ rij.slice(0,20).map(({v,km})=>{
+      h += '<div style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.6rem;">'+ rij.slice(0,20).map(({v,km})=>{
         const al = isApplied(v);
         const meta = [ VACSOORT[v.soort]||v.soort, (VLAG[v.land]||'')+' '+(v.landNaam||''), v.plaats||v.stad, km!=null?(''+Geo.tekst(km)):'' ].filter(x=>x&&x.trim()).join(' · ');
         return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.85rem;">'+
           '<div style="display:flex;align-items:flex-start;gap:0.5rem;justify-content:space-between;">'+
           '<div style="min-width:0;"><b style="font-size:0.9rem;">'+esc(v.func)+'</b>'+
           '<div style="font-size:0.74rem;color:var(--gold);font-weight:600;">'+esc(v.bedrijf)+'</div>'+
-          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.15rem;">'+esc(meta)+'</div></div>'+
+          '<div style="font-size:0.7rem;color:var(--soft);margin-top:0.25rem;">'+esc(meta)+'</div></div>'+
           (al ? '<span style="flex-shrink:0;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;color:#4CAF7D;border:1px solid #4CAF7D;border-radius:999px;padding:0.15rem 0.5rem;">'+T('vac.verstuurd','verstuurd')+'</span>'
                : '<button class="vbtn" style="flex-shrink:0;width:auto;padding:0.4rem 0.8rem;font-size:0.74rem;" data-vac="'+v.id+'" data-sup="'+v.supplierCode+'">'+T('vac.sol','Solliciteer')+'</button>')+
           '</div>'+
-          (v.omschrijving?'<div style="font-size:0.74rem;color:var(--muted);margin-top:0.4rem;line-height:1.4;">'+esc(v.omschrijving)+'</div>':'')+
+          (v.omschrijving?'<div style="font-size:0.74rem;color:var(--muted);margin-top:0.5rem;line-height:1.4;">'+esc(v.omschrijving)+'</div>':'')+
           '</div>';
       }).join('')+'</div>';
     }

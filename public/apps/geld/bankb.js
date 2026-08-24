@@ -22,7 +22,7 @@
         '<div class="bk-rij h-mt70">' +
           '<input id="bkAiV" placeholder="Vraag de AI-bankier iets…" style="flex:1;min-width:10rem;">' +
           '<button class="knop hoofd" id="bkAiB">Vraag</button></div>' +
-        '<ul id="bkAiTips" class="stil" style="margin:.5rem 0 0 1.1rem;line-height:1.6;font-size:.8rem;"></ul>' +
+        '<ul id="bkAiTips" class="stil" style="margin:0.5rem 0 0 1.25rem;line-height:1.6;font-size:.8rem;"></ul>' +
       '</div>' +
       '<h2>Mijn rekeningen · totaal ' + Geld.euro(ov.totaalCenten) + '</h2>' +
       '<div class="kaart">' + (reks.length ? reks.map(B.rekHtml).join('') : '<p class="stil">Nog geen rekeningen.</p>') + '</div>' +

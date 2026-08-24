@@ -84,20 +84,20 @@
   <section class="paneel" id="p-melden">
     <div class="kaart">
       <h3>Melding openbare ruimte</h3>
-      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:.3rem;">Iets kapot of vies in de buurt? Meld het; de gemeente wijst het toe aan de juiste ploeg en je volgt de status.</p>
+      <p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:0.25rem;">Iets kapot of vies in de buurt? Meld het; de gemeente wijst het toe aan de juiste ploeg en je volgt de status.</p>
       <div class="lbl">Categorie</div>
       <div class="chips" id="meldCats"></div>
       <div class="lbl">Wat is er aan de hand?</div>
       <textarea class="veld" id="meldTekst" maxlength="500" placeholder="Bijv. de lantaarn bij de haven doet het niet"></textarea>
       <div class="lbl">Locatie (optioneel)</div>
       <input class="veld" id="meldLoc" maxlength="120" placeholder="Straat of plek">
-      <div style="margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+      <div style="margin-top:0.5rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
         <button class="knop stil" id="meldGps" type="button" style="width:auto;">Gebruik mijn locatie</button>
         <span id="meldGpsUit" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
       <button class="knop h-mt80" id="meldGo">Melding versturen</button>
     </div>
-    <h3 style="margin:1.2rem 0 .6rem;">Mijn meldingen</h3>
+    <h3 style="margin:1.25rem 0 0.5rem;">Mijn meldingen</h3>
     <div id="meldMijn"><div class="leeg">Nog geen meldingen.</div></div>
   </section>
 
@@ -119,7 +119,7 @@
       <input class="veld" id="vhDatum" type="date">
       <button class="knop h-mt80" id="vhGo">Verhuizing doorgeven</button>
     </div>
-    <h3 style="margin:1.2rem 0 .6rem;">Mijn afspraken</h3>
+    <h3 style="margin:1.25rem 0 0.5rem;">Mijn afspraken</h3>
     <div id="bzMijn"><div class="leeg">Nog geen afspraken.</div></div>
   </section>
 
@@ -134,7 +134,7 @@
       <input class="veld" id="vgLoc" maxlength="160" placeholder="Adres of plek">
       <button class="knop h-mt80" id="vgGo">Aanvraag indienen</button>
     </div>
-    <h3 style="margin:1.2rem 0 .6rem;">Mijn aanvragen</h3>
+    <h3 style="margin:1.25rem 0 0.5rem;">Mijn aanvragen</h3>
     <div id="vgMijn"><div class="leeg">Nog geen aanvragen.</div></div>
   </section>
 
@@ -146,7 +146,7 @@
       <div class="kal h-mt80" id="afKal"></div>
       <div class="lbl">Grofvuil op afspraak</div>
       <input class="veld" id="gvWat" maxlength="300" placeholder="Wat moet opgehaald worden?">
-      <button class="knop stil" id="gvGo" style="margin-top:.6rem;width:auto;">Grofvuil aanvragen</button>
+      <button class="knop stil" id="gvGo" style="margin-top:0.5rem;width:auto;">Grofvuil aanvragen</button>
     </div>
     <div class="kaart">
       <h3>Mijn aanslagen</h3>
@@ -363,7 +363,7 @@ async function laadBekend(){
    gemeenteloket helemaal niets. Onderaan is alles er. */
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het gemeenteloket is er voor inwoners met een RTG-account. Open de app en log in.</p>'+
+    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Het gemeenteloket is er voor inwoners met een RTG-account. Open de app en log in.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { start(); }
 </script>

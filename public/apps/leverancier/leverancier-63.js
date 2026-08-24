@@ -128,7 +128,7 @@
       await refresh(); openTab('kassa');
       $('#posRedeemResult').innerHTML = box.innerHTML;
     } catch(e){
-      box.innerHTML = '<div class="enroute" style="margin-top:0.8rem;border-color:rgba(194,58,94,0.4);color:var(--burgundy);">'+e.message+'</div>';
+      box.innerHTML = '<div class="enroute" style="margin-top:0.75rem;border-color:rgba(194,58,94,0.4);color:var(--burgundy);">'+e.message+'</div>';
       toast(e.message);
     }
   }

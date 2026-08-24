@@ -75,7 +75,7 @@
       return '<button class="mb-room' + (mbRoom === r ? ' on' : '') + '" data-mbroom="' + r.replace(/"/g,'&quot;') + '">' + (done ? '✓ ' : '') + r + '</button>';
     }).join('') + '</div>';
     if (mbRoom){
-      html += '<div style="margin-top:0.8rem;font-size:0.74rem;color:var(--soft);">' + T('mb.howmany','Hoeveel is er gebruikt uit') + ' ' + mbRoom + '?</div>';
+      html += '<div style="margin-top:0.75rem;font-size:0.74rem;color:var(--soft);">' + T('mb.howmany','Hoeveel is er gebruikt uit') + ' ' + mbRoom + '?</div>';
       html += mb.catalog.map(m => {
         const q = mbQty[m.id] || 0;
         return '<div class="mb-item"><div class="mi"><b>' + m.name + '</b><span>' + eur(m.price) + '</span></div>' +

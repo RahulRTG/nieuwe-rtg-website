@@ -13,7 +13,7 @@
     }
     const locTxt = d.loc ? (d.label ? d.label + ' · ' : '') + d.loc.lat.toFixed(4) + ', ' + d.loc.lng.toFixed(4) : T('pd.noloc','locatie onbekend');
     el.innerHTML = '<div class="bz"><div class="bz-ic"></div><b>'+esc(d.from)+'</b><span>'+(d.note?esc(d.note):T('pd.needs','heeft direct assistentie nodig'))+'</span>'+
-      '<span style="margin-top:0.6rem;font-size:0.8rem;">'+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
+      '<span style="margin-top:0.5rem;font-size:0.8rem;">'+esc(locTxt)+'</span><i>'+T('pd.buzzclose','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
   }
 

@@ -65,11 +65,11 @@
 </header>
 <main id="main">
   <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Reizen die wij voor je samenstellen, tegen de nettoprijs zonder opslag. Je vraagt een reis aan; een RTG-reisadviseur bevestigt de datum en regelt de rest.</p>
-  <div style="display:flex;gap:.5rem;margin:1rem 0 .3rem;max-width:560px;">
+  <div style="display:flex;gap:.5rem;margin:1.25rem 0 0.25rem;max-width:560px;">
     <input class="veld h-flex1" id="adviesIn" maxlength="200" placeholder="Waar heb je zin in? Bijv. zon, strand, rust" aria-label="Waar heb je zin in">
     <button class="knop" id="adviesGo" type="button" style="width:auto;margin:0;padding:.55rem 1rem;">Adviseer</button>
   </div>
-  <div id="adviesUit" style="font-size:.86rem;color:var(--muted);margin-bottom:.4rem;"></div>
+  <div id="adviesUit" style="font-size:.86rem;color:var(--muted);margin-bottom:0.5rem;"></div>
   <div class="lijst" id="lijst"></div>
   <div id="mijnWrap"></div>
 </main>
@@ -91,7 +91,7 @@
       <div><div class="lbl">Reizigers</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
     </div>
     <div class="h-mt80"><div class="lbl">Wensen (optioneel)</div><input class="veld" id="rNotitie" type="text" maxlength="300" placeholder="Bijzondere wensen voor je reisadviseur"></div>
-    <div id="rTotaal" style="margin-top:.8rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums;"></div>
+    <div id="rTotaal" style="margin-top:0.75rem;font-size:.86rem;color:var(--gold);font-variant-numeric:tabular-nums;"></div>
     <button class="knop" id="rBoek">Reis aanvragen</button>
   </div>
 </section>
@@ -116,7 +116,7 @@ const api = (pad, body, herkans) => fetch(pad, {
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het reisbureau is er voor leden. Open de app en log in met je RTG-account.</p>'+
+    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Het reisbureau is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
@@ -149,7 +149,7 @@ async function laadMijn(){
   let d; try { d = await api('/api/reisbureau/mijn'); } catch(e){ return; }
   const open = (d.aanvragen||[]).filter(a => a.status === 'aangevraagd');
   if (!open.length){ $('#mijnWrap').innerHTML = ''; return; }
-  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn aanvragen</h2>'+
+  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 0.75rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn aanvragen</h2>'+
     open.map(a => '<div class="reis" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
       '<div><h3 style="font-size:1rem;">'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+a.personen+' pers · aangevraagd</span></div>'+
       '<button class="knop" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Annuleer</button>'+
@@ -168,7 +168,7 @@ $('#adviesGo').addEventListener('click', async () => {
   $('#adviesUit').textContent = 'Rahul denkt mee...';
   try {
     const d = await api('/api/reisbureau/advies', { wens });
-    if (d.reis){ $('#adviesUit').innerHTML = '<b style="color:var(--gold);">'+esc(d.reis.titel)+'</b> · '+esc(d.reden)+' <button class="knop" id="adviesOpen" style="width:auto;margin-left:.4rem;padding:.3rem .7rem;font-size:.78rem;">Bekijk</button>';
+    if (d.reis){ $('#adviesUit').innerHTML = '<b style="color:var(--gold);">'+esc(d.reis.titel)+'</b> · '+esc(d.reden)+' <button class="knop" id="adviesOpen" style="width:auto;margin-left:0.5rem;padding:.3rem .7rem;font-size:.78rem;">Bekijk</button>';
       const ob = $('#adviesOpen'); if (ob) ob.addEventListener('click', () => openReis(d.reis.id)); }
     else $('#adviesUit').textContent = 'Ik vond geen passende reis.';
   } catch(e){ $('#adviesUit').textContent = e.message; }
@@ -198,7 +198,7 @@ async function laadRegels(bestemming){
     const w = await api('/api/reis/wijzer', { bestemming });
     const rij = (k, v) => '<div style="display:flex;gap:.6rem;"><span style="min-width:7.5rem;color:var(--soft);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding-top:.15rem;">'+k+'</span><span>'+v+'</span></div>';
     el.innerHTML =
-      '<div style="color:var(--gold);margin-bottom:.35rem;"><b>'+esc(w.naam)+'</b> · '+esc(w.regio)+'</div>' +
+      '<div style="color:var(--gold);margin-bottom:0.25rem;"><b>'+esc(w.naam)+'</b> · '+esc(w.regio)+'</div>' +
       rij('Visum', esc(w.visum.tekst)) +
       rij('Paspoort', esc(w.paspoort)) +
       rij('Verkeer', 'Er wordt '+esc(w.rijden)+' gereden') +
@@ -208,7 +208,7 @@ async function laadRegels(bestemming){
       rij('Alcohol', 'Vanaf '+w.alcoholLeeftijd+' jaar') +
       rij('Btw', w.btwStandaard+'% standaardtarief') +
       (w.letOp ? rij('Let op', '<span style="color:var(--burgundy);">'+esc(w.letOp)+'</span>') : '') +
-      '<div style="color:var(--soft);font-size:.76rem;margin-top:.4rem;">'+esc(w.basis)+'</div>';
+      '<div style="color:var(--soft);font-size:.76rem;margin-top:0.5rem;">'+esc(w.basis)+'</div>';
   } catch(e){ el.textContent = e.message; }
 }
 function herbereken(){ $('#rTotaal').textContent = HUIDIG ? ('Richtprijs: € ' + (HUIDIG.prijs * AANTAL) + ' voor ' + AANTAL + ' reiziger' + (AANTAL>1?'s':'')) : ''; }

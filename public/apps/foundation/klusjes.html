@@ -55,14 +55,14 @@
 
   <div class="kaart blok" id="geldBlok" style="display:none;border-color:var(--goud);">
     <h2>De geldschool</h2>
-    <div class="intro" id="geldUitleg" style="margin-bottom:.6rem;font-size:.88rem;"></div>
+    <div class="intro" id="geldUitleg" style="margin-bottom:0.5rem;font-size:.88rem;"></div>
     <div class="ranglijst" id="geldKinderen"></div>
     <div class="fout" id="geldFout"></div>
   </div>
 
   <div class="kaart blok" id="maakBlok" style="display:none;">
     <h2>Nieuw klusje klaarzetten</h2>
-    <input class="veld" id="kTitel" placeholder="Welk klusje? (bijv. tafel dekken)" maxlength="80" style="margin-bottom:.5rem;">
+    <input class="veld" id="kTitel" placeholder="Welk klusje? (bijv. tafel dekken)" maxlength="80" style="margin-bottom:0.5rem;">
     <div class="rijveld">
       <select class="veld" id="kVoor"><option value="iedereen">Voor iedereen</option></select>
       <select class="veld" id="kSterren"></select>
@@ -157,7 +157,7 @@ async function laadGeld(){
     const week = k.weekgeldCenten ? euro(k.weekgeldCenten).replace('€ ','€ ')+' p/w' : 'geen weekgeld';
     let beheer='';
     if (d.magBeheren) beheer =
-      '<div class="rijveld" style="margin:.5rem 0 0;width:100%;">'+
+      '<div class="rijveld" style="margin:0.5rem 0 0;width:100%;">'+
       '<input class="veld" data-wg="'+k.id+'" inputmode="decimal" placeholder="Weekgeld (bijv. 2,50)">'+
       '<button class="knop grijs klein" data-wgzet="'+k.id+'">Zet</button>'+
       (k.beschikbaar>0

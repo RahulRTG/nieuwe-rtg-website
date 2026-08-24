@@ -87,13 +87,13 @@
     html += '<div class="card"><div class="k" style="display:flex;justify-content:space-between;align-items:center;">'+T('pd.w.kassa','Mobiele kassa')+
       (winkelKlant?'<span style="color:var(--gold);font-size:0.66rem;">'+esc(winkelKlant.codenaam||winkelKlant.key)+'</span>':'')+'</div>'+
       (winkelCart.length ? '<div class="h-mt50">'+winkelCart.map((r,i) => '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(r.naam)+'</b><span>'+esc(r.kleur)+' · '+esc(r.maat)+' · '+eur(r.price)+' × '+r.aantal+'</span></div><button class="abtn ghost" data-wcartdel="'+i+'">✕</button></div>').join('')+
-        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;font-size:1rem;"><span>'+T('pd.w.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
-        '<div style="display:flex;gap:0.5rem;margin-top:0.6rem;"><button class="abtn h-flex1" data-wbetaal="rtgpay">RTG Pay</button><button class="abtn" data-wbetaal="contant" style="flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.w.contant','Contant')+'</button></div>'+
+        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.5rem;font-size:1rem;"><span>'+T('pd.w.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
+        '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><button class="abtn h-flex1" data-wbetaal="rtgpay">RTG Pay</button><button class="abtn" data-wbetaal="contant" style="flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);">'+T('pd.w.contant','Contant')+'</button></div>'+
         '<button class="abtn ghost" id="wCartLeeg" style="margin-top:0.5rem;width:100%;">'+T('pd.w.leeg','Bon leegmaken')+'</button></div>'
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.w.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
     // voorraad opzoeken
     html += '<div class="card"><div class="k">'+T('pd.w.zoek','Voorraad opzoeken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+winkelInput('wZoek', T('pd.w.zoekph','Naam, kleur of maat…'))+'<button class="abtn" id="wZoekBtn">'+T('pd.w.zoekbtn','Zoek')+'</button></div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+winkelInput('wZoek', T('pd.w.zoekph','Naam, kleur of maat…'))+'<button class="abtn" id="wZoekBtn">'+T('pd.w.zoekbtn','Zoek')+'</button></div>'+
       '<div class="h-mt50" id="wZoekUit"></div></div>';
     // paskamerverzoeken
     const pk = pdRetail.paskamer || [];

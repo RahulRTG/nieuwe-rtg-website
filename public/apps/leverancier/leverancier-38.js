@@ -1,6 +1,6 @@
 /* clienteling: het klantdossier van een retailzaak */
     let html = '<div class="card"><div class="tt-h">'+T('rt.klantdossier','Clienteling')+' ('+kl.length+')</div>'+
-      '<p class="ds" style="margin:0.4rem 0 0.2rem;">'+T('rt.clienteltip','Het geheime wapen van elk modehuis: maten, verlanglijst, aankoophistorie en stylist-notities per klant.')+'</p>'+
+      '<p class="ds" style="margin:0.5rem 0 0.25rem;">'+T('rt.clienteltip','Het geheime wapen van elk modehuis: maten, verlanglijst, aankoophistorie en stylist-notities per klant.')+'</p>'+
       (kl.length ? '<div style="margin-top:0.5rem;display:grid;gap:0.4rem;">'+kl.map(k => '<button class="mitem" data-rklant="'+esc(k.key)+'" style="text-align:left;width:100%;background:var(--card);border:1px solid var(--line);cursor:pointer;"><div class="r1"><span class="nm">'+esc(k.codenaam||k.key)+'</span><span class="pr">'+geld(k.besteedTotaal)+'</span></div><div class="ds">'+k.aankopen+' '+T('rt.aankopen','aankopen')+' · '+(k.wishlist?k.wishlist.length:0)+' '+T('rt.opverlang','op verlanglijst')+'</div></button>').join('')+'</div>'
         : '<div class="empty">'+T('rt.geenklant','Nog geen klantdossiers. Ze ontstaan zodra u een klant erbij pakt op de vloer (PDA) of een verkoop op naam boekt.')+'</div>')+'</div>';
     return html;
@@ -8,7 +8,7 @@
   function retailKlantDossier(canEdit){
     const k = retailKlant;
     const maten = retailData.maten || [];
-    let html = '<div style="margin-bottom:0.6rem;"><button class="obtn" id="rKlantTerug">← '+T('rt.terug','Terug')+'</button></div>';
+    let html = '<div style="margin-bottom:0.5rem;"><button class="obtn" id="rKlantTerug">← '+T('rt.terug','Terug')+'</button></div>';
     html += '<div class="card"><div class="r1"><span class="nm" style="font-size:1rem;">'+esc(k.codenaam||k.key)+'</span><span class="pr">'+geld(k.besteedTotaal)+'</span></div>'+
       '<div class="ds">'+k.aankopen+' '+T('rt.aankopen','aankopen')+(k.sinds?' · '+T('rt.klantsinds','klant sinds')+' '+esc(String(k.sinds).slice(0,10)):'')+'</div></div>';
     // maten + voorkeuren
@@ -31,8 +31,8 @@
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="rNotitie" placeholder="'+T('rt.notitieph','Nieuwe notitie…')+'" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.6rem 0.7rem;font-size:0.85rem;color:var(--txt);outline:none;"><button class="obtn primary" id="rNotitieAdd">'+T('rt.voegtoe','Voeg toe')+'</button></div></div>';
     // stylingvoorstel sturen
     html += '<div class="card"><div class="tt-h">'+T('rt.styling','Stylingvoorstel sturen')+'</div>'+
-      '<p class="ds" style="margin:0.3rem 0;">'+T('rt.stylingtip','Kies artikelen; ze verschijnen als voorstel in de app van de klant.')+'</p>'+
-      '<div style="max-height:180px;overflow-y:auto;display:grid;gap:0.3rem;margin-top:0.4rem;">'+(retailData.artikelen||[]).map(a => '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;"><input type="checkbox" class="rStylPick" value="'+a.id+'"> '+esc(a.naam)+' · '+geld(a.price)+'</label>').join('')+'</div>'+
+      '<p class="ds" style="margin:0.25rem 0;">'+T('rt.stylingtip','Kies artikelen; ze verschijnen als voorstel in de app van de klant.')+'</p>'+
+      '<div style="max-height:180px;overflow-y:auto;display:grid;gap:0.3rem;margin-top:0.5rem;">'+(retailData.artikelen||[]).map(a => '<label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;"><input type="checkbox" class="rStylPick" value="'+a.id+'"> '+esc(a.naam)+' · '+geld(a.price)+'</label>').join('')+'</div>'+
       '<div class="field"><label>'+T('rt.stylingtitel','Titel')+'</label><input id="rStylTitel" value="'+T('rt.stylingtiteldef','Een selectie voor u')+'"></div>'+
       '<div class="field"><label>'+T('rt.stylingbericht','Bericht')+'</label><input id="rStylBericht" placeholder="'+T('rt.stylingberichtph','Optioneel persoonlijk bericht')+'"></div>'+
       '<button class="obtn primary" id="rStylStuur">'+T('rt.stuurstyling','Stuur voorstel')+'</button></div>';

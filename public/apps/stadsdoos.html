@@ -68,20 +68,20 @@
   <div class="deel">Aanmelden</div>
   <div class="kaart">
     <div class="sec">Ter plekke: nieuwe Stadsdoos aanmelden</div>
-    <div class="rij" style="margin-bottom:.5rem;">
+    <div class="rij" style="margin-bottom:0.5rem;">
       <input class="veld" id="aNaam" placeholder="bijv. Stadsdoos Brug" maxlength="60" style="flex:1;min-width:9rem;">
       <select class="veld" id="aZone" style="flex:1;min-width:8rem;" aria-label="Zone"></select>
     </div>
-    <input class="veld" id="aSens" placeholder="sensoren, komma (verkeer, lucht, licht)" style="margin-bottom:.5rem;">
+    <input class="veld" id="aSens" placeholder="sensoren, komma (verkeer, lucht, licht)" style="margin-bottom:0.5rem;">
     <button class="knop" id="aMeld" style="width:100%;">Meld aan · sleutel verschijnt één keer</button>
-    <div id="aUit" style="margin-top:.5rem;font-size:.85rem;"></div>
+    <div id="aUit" style="margin-top:0.5rem;font-size:.85rem;"></div>
   </div>
 
   <div class="deel">Verbindingstest</div>
   <div class="kaart">
     <div class="sec">Verbindingstest · praat de doos met de stad?</div>
-    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem;">Vul het serienummer en de apparaat-sleutel van de doos in; de test stuurt een echte hartslag over de hardware-poort.</p>
-    <div class="rij" style="margin-bottom:.5rem;">
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:0.5rem;">Vul het serienummer en de apparaat-sleutel van de doos in; de test stuurt een echte hartslag over de hardware-poort.</p>
+    <div class="rij" style="margin-bottom:0.5rem;">
       <input class="veld" id="tSerial" placeholder="SD-XXXXXX" style="flex:1;min-width:8rem;">
       <input class="veld" id="tSleutel" placeholder="apparaat-sleutel" style="flex:2;min-width:11rem;">
     </div>
@@ -168,8 +168,8 @@ async function laad(){
     }));
     // de vloot, offline eerst (daar ligt het werk)
     const rij = b.nodes.slice().sort((a, z) => (a.online === z.online) ? 0 : a.online ? 1 : -1);
-    $('#vLijst').innerHTML = '<div style="font-size:.78rem;color:var(--soft);margin-bottom:.35rem;">' + b.vloot.online + ' van ' + b.vloot.totaal + ' online · scenario "' + esc(b.scenario) + '"</div>' +
-      rij.map(n => '<div class="klus"><span class="dot" style="background:' + (n.online ? 'var(--green)' : 'var(--burgundy)') + ';margin-top:.35rem;"></span>' +
+    $('#vLijst').innerHTML = '<div style="font-size:.78rem;color:var(--soft);margin-bottom:0.25rem;">' + b.vloot.online + ' van ' + b.vloot.totaal + ' online · scenario "' + esc(b.scenario) + '"</div>' +
+      rij.map(n => '<div class="klus"><span class="dot" style="background:' + (n.online ? 'var(--green)' : 'var(--burgundy)') + ';margin-top:0.25rem;"></span>' +
         '<span style="flex:1;font-size:.84rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +
         '<br><span style="color:var(--soft);font-size:.74rem;">' + esc(n.serial) + ' · ' + n.sensoren.map(esc).join(', ') + (n.laatsteContact ? ' · ' + tijd(n.laatsteContact) : ' · nooit gezien') + '</span></span></div>').join('');
     const sel = $('#aZone');

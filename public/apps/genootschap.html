@@ -131,7 +131,7 @@
     if ((d.uitnodigingen||[]).length) {
       html += '<div class="kaart"><h2>Uitnodigingen</h2>'+
         d.uitnodigingen.map(function(g){ return groepRij(g, '<button class="mini" data-binnen="'+g.id+'">binnentreden</button>'); }).join('')+
-        '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Een uitnodiging is nog geen lidmaatschap: je zegt zelf ja.</p></div>';
+        '<p style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Een uitnodiging is nog geen lidmaatschap: je zegt zelf ja.</p></div>';
     }
     html += '<div class="kaart"><h2>Mijn genootschappen</h2>'+
       ((d.groepen||[]).length ? d.groepen.map(function(g){ return groepRij(g, '<button class="mini" data-open="'+g.id+'">openen</button>'); }).join('')
@@ -143,8 +143,8 @@
     var g = d.groep, b = d.berichten||[];
     var html = '<div class="kaart"><h2>'+esc(g.naam)+'</h2>'+
       '<small style="color:var(--soft);">'+esc(SOORT[g.soort]||g.soort)+' · '+g.leden+' leden'+(g.mijnRol?' · jij bent '+esc(g.mijnRol):'')+'</small>'+
-      (g.over?'<p style="margin-top:.5rem;font-size:.88rem;line-height:1.55;color:var(--muted);">'+esc(g.over)+'</p>':'')+
-      (g.regels?'<p style="margin-top:.5rem;font-size:.82rem;line-height:1.5;color:var(--soft);"><b>Huisregels:</b> '+esc(g.regels)+'</p>':'')+
+      (g.over?'<p style="margin-top:0.5rem;font-size:.88rem;line-height:1.55;color:var(--muted);">'+esc(g.over)+'</p>':'')+
+      (g.regels?'<p style="margin-top:0.5rem;font-size:.82rem;line-height:1.5;color:var(--soft);"><b>Huisregels:</b> '+esc(g.regels)+'</p>':'')+
       '<div class="knoppen"><button class="knop stil" id="bterug" type="button">Terug</button>'+
       '<button class="knop stil" id="bleden" type="button">Leden</button>'+
       '<button class="knop stil" id="bmee" type="button">Neem mijn inbreng mee</button>'+
@@ -167,11 +167,11 @@
           '<div class="knoppen">'+['ja','misschien','nee'].map(function(w){
             return '<button class="knop'+(x.mijnAntwoord===w?'':' stil')+'" data-antw="'+x.id+'" data-w="'+w+'">'+w+'</button>';
           }).join('')+
-          (x.vanMij?'<button class="mini" data-afgelast="'+x.id+'" style="margin-left:.4rem;">afgelasten</button>':'')+
+          (x.vanMij?'<button class="mini" data-afgelast="'+x.id+'" style="margin-left:0.5rem;">afgelasten</button>':'')+
           '</div></div></div>';
       }).join('') : '<div class="leeg">Nog niets gepland.</div>')+
       '<label for="bwat">Roep een bijeenkomst uit</label><input id="bwat" maxlength="90" placeholder="Waarvoor komen jullie samen?">'+
-      '<div style="display:flex;gap:.4rem;margin-top:.4rem;"><input id="bdatum" type="date" aria-label="Datum"><input id="btijd" type="time" aria-label="Tijd"></div>'+
+      '<div style="display:flex;gap:.4rem;margin-top:0.5rem;"><input id="bdatum" type="date" aria-label="Datum"><input id="btijd" type="time" aria-label="Tijd"></div>'+
       '<input class="h-mt40" id="bwaar" maxlength="120" placeholder="Waar?">'+
       '<input class="h-mt40" id="bplaatsen" inputmode="numeric" placeholder="Aantal plaatsen (mag leeg)" aria-label="Aantal plaatsen">'+
       '<div class="knoppen"><button class="knop" id="broep" type="button">Uitnodigen</button>'+
@@ -242,9 +242,9 @@
         ((d.nieuw||d.nieuweReacties) ? '<p style="font-size:.88rem;line-height:1.55;">'+
           (d.nieuw?d.nieuw+' nieuwe berichten':'')+(d.nieuw&&d.nieuweReacties?' · ':'')+
           (d.nieuweReacties?d.nieuweReacties+' nieuwe reacties':'')+'</p>' : '')+
-        ((d.peilingen||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:.4rem;">Nog niet gestemd: '+
+        ((d.peilingen||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:0.5rem;">Nog niet gestemd: '+
           d.peilingen.map(function(p){ return esc(p.tekst); }).join(' · ')+'</p>' : '')+
-        ((d.bijeenkomsten||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:.4rem;">Nog niet beantwoord: '+
+        ((d.bijeenkomsten||[]).length ? '<p style="font-size:.84rem;color:var(--muted);margin-top:0.5rem;">Nog niet beantwoord: '+
           d.bijeenkomsten.map(function(b){ return esc(b.wat)+' ('+esc(b.datum)+')'; }).join(' · ')+'</p>' : '')+
         '<div class="knoppen"><button class="knop stil" id="bgezien" type="button">Gezien</button></div>';
     });
@@ -307,7 +307,7 @@
       toon('<div class="kaart"><label for="zveld">Zoek een genootschap</label>'+
         '<input id="zveld" type="search" placeholder="Op naam of onderwerp">'+
         '<div class="knoppen"><button class="knop" id="bzoek" type="button">Zoeken</button></div>'+
-        '<p style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Geheime genootschappen staan hier niet in. Die vind je alleen met een uitnodiging.</p></div>'+
+        '<p style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Geheime genootschappen staan hier niet in. Die vind je alleen met een uitnodiging.</p></div>'+
         '<div class="kaart" id="zuit"><div class="leeg">Zoek op een naam of een onderwerp.</div></div>');
       return;
     }

@@ -2,9 +2,9 @@
     for (const d of (s.dates || [])){
       const metNaam = escT(d.met);
       if (d.status === 'wacht-op-tekenen'){
-        blokken += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
+        blokken += '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
           '<b style="font-size:0.82rem;">' +RTGGlyf.tekst(d.icon)+ ' ' + escT(d.activiteitLabel) + ' ' + T('ont.met','met') + ' ' + metNaam + '</b>' +
-          '<div style="font-size:0.66rem;color:var(--muted);margin:0.3rem 0;">' + T('ont.tekenuitleg','Teken het veiligheidscontract om te starten. RTG-kantoor kijkt dan mee voor jullie veiligheid.') + '</div>' +
+          '<div style="font-size:0.66rem;color:var(--muted);margin:0.25rem 0;">' + T('ont.tekenuitleg','Teken het veiligheidscontract om te starten. RTG-kantoor kijkt dan mee voor jullie veiligheid.') + '</div>' +
           '<pre style="white-space:pre-wrap;font-family:inherit;font-size:0.64rem;color:var(--soft);background:rgba(0,0,0,0.15);border-radius:10px;padding:0.6rem;max-height:8rem;overflow:auto;">' + escT(d.contract) + '</pre>' +
           '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">' +
           (d.ikTekende
@@ -14,10 +14,10 @@
           '</div></div>';
       } else if (d.status === 'actief' || d.status === 'noodgeval'){
         const nood = d.status === 'noodgeval';
-        blokken += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;' + (nood ? 'background:rgba(220,40,40,0.08);border-radius:10px;padding:0.7rem;' : '') + '">' +
+        blokken += '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.7rem;' + (nood ? 'background:rgba(220,40,40,0.08);border-radius:10px;padding:0.7rem;' : '') + '">' +
           '<b style="font-size:0.82rem;">' +RTGGlyf.tekst(d.icon)+ ' ' + escT(d.activiteitLabel) + ' ' + T('ont.met','met') + ' ' + metNaam + '</b>' +
           '<div style="font-size:0.64rem;color:var(--muted);margin:0.25rem 0 0.5rem;">' + T('ont.kijktmee','RTG-kantoor kijkt live mee voor jullie veiligheid, tot jullie afronden.') + '</div>' +
-          (nood ? '<div style="font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.4rem;">' + T('ont.noodloopt','Noodsignaal actief. Kantoor kijkt mee via je camera.') + '</div>' : '') +
+          (nood ? '<div style="font-size:0.72rem;color:#ff8a8a;font-weight:600;margin-bottom:0.5rem;">' + T('ont.noodloopt','Noodsignaal actief. Kantoor kijkt mee via je camera.') + '</div>' : '') +
           '<div style="display:flex;gap:0.5rem;">' +
           '<button class="js-osos" data-d="' + d.id + '" style="flex:1;background:#c62828;color:#fff;border:none;border-radius:999px;padding:0.6rem;font-weight:700;font-family:inherit;cursor:pointer;">' + T('ont.sos','SOS') + '</button>' +
           '<button class="js-ostop" data-d="' + d.id + '" style="background:none;border:1px solid var(--line);border-radius:999px;padding:0.6rem 0.8rem;color:var(--soft);font-family:inherit;cursor:pointer;">' + T('ont.afronden','Afronden') + '</button>' +
@@ -28,18 +28,18 @@
     let voors = '';
     for (const v of (s.voorstellen || [])){
       const metNaam = escT(v.met);
-      voors += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
+      voors += '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.7rem;">' +
         '<b style="font-size:0.82rem;">' + metNaam + ' ' + T('ont.indebuurt','is in de buurt') + '</b>';
       if (v.mijnKeuze){
-        voors += '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.35rem;">✓ ' + T('ont.jijkoos','Jij koos') + ' ' + escT((s.activiteiten.find(a => a.id === v.mijnKeuze) || {}).label || v.mijnKeuze) + '. ' + T('ont.wachtkeuze','Wachten op de keuze van ') + metNaam + '.</div>';
+        voors += '<div style="font-size:0.72rem;color:var(--gold);margin-top:0.25rem;">✓ ' + T('ont.jijkoos','Jij koos') + ' ' + escT((s.activiteiten.find(a => a.id === v.mijnKeuze) || {}).label || v.mijnKeuze) + '. ' + T('ont.wachtkeuze','Wachten op de keuze van ') + metNaam + '.</div>';
       } else {
-        voors += '<div style="font-size:0.66rem;color:var(--muted);margin:0.3rem 0;">' + T('ont.kiessamen','Kies samen. Niets doen betekent afwijzen.') + '</div>' +
+        voors += '<div style="font-size:0.66rem;color:var(--muted);margin:0.25rem 0;">' + T('ont.kiessamen','Kies samen. Niets doen betekent afwijzen.') + '</div>' +
           '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">' + ontmoetActBtns(v.id) + '</div>' +
-          '<button class="js-oweiger" data-v="' + v.id + '" style="margin-top:0.4rem;background:none;border:none;color:var(--soft);font-size:0.68rem;font-family:inherit;cursor:pointer;text-decoration:underline;">' + T('ont.nietnu','Niet nu') + '</button>';
+          '<button class="js-oweiger" data-v="' + v.id + '" style="margin-top:0.5rem;background:none;border:none;color:var(--soft);font-size:0.68rem;font-family:inherit;cursor:pointer;text-decoration:underline;">' + T('ont.nietnu','Niet nu') + '</button>';
       }
       voors += '</div>';
     }
-    if (!blokken && !voors) h += '<div style="margin-top:0.6rem;font-size:0.68rem;color:var(--muted);border-top:1px solid var(--line);padding-top:0.6rem;">' + T('ont.aanuitleg','Staat aan. Zodra een connectie vlakbij is, verschijnt hier een voorstel.') + '</div>';
+    if (!blokken && !voors) h += '<div style="margin-top:0.5rem;font-size:0.68rem;color:var(--muted);border-top:1px solid var(--line);padding-top:0.6rem;">' + T('ont.aanuitleg','Staat aan. Zodra een connectie vlakbij is, verschijnt hier een voorstel.') + '</div>';
     el.innerHTML = kaart(h + blokken + voors);
     bindOntmoet();
   }

@@ -16,7 +16,7 @@
       (act.length ? act.map(e=>'<div class="act"><b>'+esc(e.who)+'</b><span>'+esc(e.text)+'</span><time>'+timeAgo(e.at)+'</time></div>').join('') : '<div style="font-size:0.8rem;color:var(--soft);padding:0.4rem 0;">'+T('pd.noact','Nog geen activiteit.')+'</div>')+'</div>'+
       // Aparte ruimte: het personeelsnetwerk met andere zaken (met toestemming).
       '<div class="card"><div class="k">'+T('pd.net','Netwerk met andere zaken')+'</div>'+
-      '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.4rem;">'+T('pd.net.sub','Aparte ruimte. Alleen zaken die uw manager heeft verbonden.')+'</div>'+
+      '<div style="font-size:0.72rem;color:var(--soft);margin-bottom:0.5rem;">'+T('pd.net.sub','Aparte ruimte. Alleen zaken die uw manager heeft verbonden.')+'</div>'+
       (netwerk.length ? netwerk.map(v => {
         if (v.status==='akkoord') return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.open','tik om te chatten')+'</span></div><button class="abtn ghost" data-netopen="'+v.code+'"></button></div>';
         if (v.inkomend) return '<div class="task"><span class="ic"></span><div class="t"><b>'+esc(v.naam)+'</b><span>'+T('pd.net.inc','wil verbinden')+'</span></div>'+(me.role==='manager'?'<button class="abtn" data-netja="'+v.code+'">'+T('pd.accept','Akkoord')+'</button>':'<span style="font-size:0.7rem;color:var(--soft);">'+T('pd.net.mgr','manager beslist')+'</span>')+'</div>';

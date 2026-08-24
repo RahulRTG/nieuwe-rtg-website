@@ -1,6 +1,6 @@
     // incident melden
     html += '<div class="card"><div class="tt-h">'+T('pn.incident','Incident: identiteit opeisen')+'</div>'+
-      '<p class="ds" style="margin:0.3rem 0;">'+T('pn.incidenttip','Alleen bij een echt incident. RTG-kantoor beoordeelt het verzoek en geeft de identiteit pas daarna vrij. Alles wordt gelogd.')+'</p>'+
+      '<p class="ds" style="margin:0.25rem 0;">'+T('pn.incidenttip','Alleen bij een echt incident. RTG-kantoor beoordeelt het verzoek en geeft de identiteit pas daarna vrij. Alles wordt gelogd.')+'</p>'+
       '<div class="field"><label>'+T('pn.codenaam','Codenaam van de gast')+'</label><input id="pnIncCode" placeholder="'+T('pn.codeph','Bijv. Zilveren Valk 12')+'" autocomplete="off"></div>'+
       '<div class="field"><label>'+T('pn.incReden','Wat is er gebeurd?')+'</label><textarea id="pnIncReden" rows="2" '+sel+' placeholder="'+T('pn.incRedenph','Beschrijf het incident (min. 10 tekens)')+'"></textarea></div>'+
       '<div class="field"><label>'+T('pn.incNiveau','Gevraagd niveau')+'</label><select id="pnIncNiveau" '+sel+'><option value="idkaart">'+T('pn.niveau.idkaart','ID-kaart')+'</option><option value="paspoort">'+T('pn.niveau.paspoort','Paspoort')+'</option></select></div>'+
@@ -22,8 +22,8 @@
         (inh.foto?'<img src="'+esc(inh.foto)+'" alt="'+T('pn.pasfoto','Pasfoto')+'" style="width:80px;height:100px;object-fit:cover;border-radius:10px;flex-shrink:0;">':'')+
         '<div><div style="font-weight:700;font-size:0.95rem;">'+esc(inh.naam||'')+'</div>'+
         '<div class="ds">'+(inh.nationaliteit?esc(inh.nationaliteit)+' · ':'')+(inh.geboortedatum?esc(inh.geboortedatum):'')+(inh.leeftijd!=null?' ('+inh.leeftijd+')':'')+'</div>'+
-        '<div class="ds" style="margin-top:0.3rem;color:var(--green);">'+(inh.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):'')+(inh.gezichtGecontroleerd?' · '+T('pn.gezicht','gezicht gecontroleerd'):'')+'</div></div></div>'+
-        (inh.scan?'<div class="h-mt60"><div class="tt-h">'+T('pn.scan','Paspoortscan')+'</div><img src="'+esc(inh.scan)+'" alt="'+T('pn.scan','Paspoortscan')+'" style="width:100%;border-radius:10px;margin-top:0.4rem;"></div>':'');
+        '<div class="ds" style="margin-top:0.25rem;color:var(--green);">'+(inh.geverifieerd?''+T('pn.geverifieerd','RTG-geverifieerd'):'')+(inh.gezichtGecontroleerd?' · '+T('pn.gezicht','gezicht gecontroleerd'):'')+'</div></div></div>'+
+        (inh.scan?'<div class="h-mt60"><div class="tt-h">'+T('pn.scan','Paspoortscan')+'</div><img src="'+esc(inh.scan)+'" alt="'+T('pn.scan','Paspoortscan')+'" style="width:100%;border-radius:10px;margin-top:0.5rem;"></div>':'');
     }
     return '<div class="card" style="border-color:var(--gold);"><div class="tt-h" style="color:var(--gold);">'+T('pn.inzage','Inzage')+' · '+T('pn.niveau.'+inh.niveau, inh.niveau)+'</div><div class="h-mt50">'+body+'</div>'+
       '<button class="obtn h-mt70" id="pnSluit">'+T('pn.sluit','Sluiten')+'</button></div>';

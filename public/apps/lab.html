@@ -157,12 +157,12 @@ function render(){
   $('#lijst').innerHTML = lijst.length ? lijst.map(p => {
     const v = p.veiligheid || {};
     const fasen = D.fasen; const ix = fasen.indexOf(p.fase); const nx = ix >= 0 && ix < fasen.length - 1 ? fasen[ix + 1] : null;
-    return '<div class="kaart" style="margin-bottom:.7rem;" data-p="' + p.id + '">' +
+    return '<div class="kaart" style="margin-bottom:0.75rem;" data-p="' + p.id + '">' +
       '<div class="rij" style="justify-content:space-between;"><h2 style="font-size:1.02rem;">' + esc(p.titel) + '</h2>' +
       '<span class="pil">' + esc(p.fase) + '</span></div>' +
       '<div class="leeg">' + esc(p.veldNaam) + ' · voor ' + esc(p.voorWie) + (p.doel ? ' · ' + esc(p.doel) : '') + '</div>' +
       (window.LabPro ? LabPro.strook(D.fasen, p.fase) : '') +
-      '<div class="rij" style="margin:.35rem 0;">' +
+      '<div class="rij" style="margin:0.25rem 0;">' +
         '<span class="pil ' + (v.status === 'akkoord' ? 'ok' : (v.status === 'open' ? 'wacht' : '')) + '">toets: ' + esc(v.status) + (v.door ? ' door ' + esc(v.door) : '') + '</span>' +
         (v.status !== 'akkoord' ? '<input class="veld" data-door placeholder="Uw naam (mens tekent)" style="max-width:11rem;"><button class="knop stil" data-toets>Toets akkoord</button>' : '') +
         (nx ? '<button class="knop" data-fase="' + nx + '" style="margin-left:auto;">→ ' + nx + '</button>' : '') + '</div>' +

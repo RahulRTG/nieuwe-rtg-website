@@ -88,9 +88,9 @@
     const maten = Object.entries(k.maten||{}).map(([a,b]) => esc(a)+': '+esc(b)).join(' · ');
     return '<div style="border-top:1px solid var(--line);padding-top:0.6rem;margin-top:0.5rem;">'+
       '<div style="display:flex;justify-content:space-between;"><b>'+esc(k.codenaam||k.key)+'</b><span style="color:var(--gold);">'+eur(k.besteedTotaal)+'</span></div>'+
-      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">'+k.aankopen+' '+T('wv.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
-      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.2rem;">'+esc(k.voorkeuren)+'</div>':'')+
-      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;margin-top:0.35rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
+      '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">'+k.aankopen+' '+T('wv.aankopen','aankopen')+(maten?' · '+maten:'')+'</div>'+
+      (k.voorkeuren?'<div style="font-size:0.78rem;color:var(--soft);margin-top:0.25rem;">'+esc(k.voorkeuren)+'</div>':'')+
+      ((k.wishlist&&k.wishlist.length)?'<div style="font-size:0.78rem;margin-top:0.25rem;">'+k.wishlist.map(w=>esc(w.naam)).join(', ')+'</div>':'')+
       '</div>';
   }
   function renderWinkelvloer(){
@@ -104,11 +104,11 @@
       (wvCart.length ? '<div class="h-mt50">'+wvCart.map((r,i) =>
         '<div class="mitem"><div class="r1"><span class="nm">'+esc(r.naam)+' · '+esc(r.kleur)+' · '+esc(r.maat)+'</span><span class="pr">'+eur(r.price)+' × '+r.aantal+'</span></div>'+
         '<button class="obtn" data-wvdel="'+i+'" class="h-mt30">✕ '+T('wv.weg','Weg')+'</button></div>').join('')+
-        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.6rem;"><span>'+T('wv.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
-        '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;"><button class="obtn primary" data-wvbetaal="rtgpay">RTG Pay</button>'+
+        '<div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.5rem;"><span>'+T('wv.totaal','Totaal')+'</span><span>'+eur(cartTot)+'</span></div>'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;"><button class="obtn primary" data-wvbetaal="rtgpay">RTG Pay</button>'+
         '<button class="obtn" data-wvbetaal="contant">'+T('wv.contant','Contant')+'</button>'+
         '<button class="obtn" id="wvLeeg">'+T('wv.leeg','Bon leegmaken')+'</button></div>'
         : '<div class="empty">'+T('wv.leegbon','Zoek een artikel en tik + om het op de bon te zetten.')+'</div>')+'</div>';
     html += '<div class="card"><div class="tt-h">'+T('wv.zoek','Voorraad opzoeken')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+wvInput('wvZoek', T('wv.zoekph','Naam, kleur of maat…'))+'<button class="obtn primary" id="wvZoekBtn">'+T('wv.zoekbtn','Zoek')+'</button></div>'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+wvInput('wvZoek', T('wv.zoekph','Naam, kleur of maat…'))+'<button class="obtn primary" id="wvZoekBtn">'+T('wv.zoekbtn','Zoek')+'</button></div>'+
       '<div id="wvZoekUit" class="h-mt50"></div></div>';

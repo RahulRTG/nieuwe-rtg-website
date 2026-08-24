@@ -73,7 +73,7 @@
       (inpakLijst.length ? inpakLijst.map(o =>
         '<div class="task" style="flex-direction:column;align-items:stretch;gap:0.25rem;" data-inpak="'+o.ref+'">'+
         '<b>'+esc(o.customerCodename)+' · '+T('pd.bz.bonnr','bon')+' '+o.ref+'</b>'+
-        o.items.map(i=>'<label style="display:block;font-size:0.82rem;cursor:pointer;"><input type="checkbox" class="ipItem" value="'+esc(i.id)+'" style="accent-color:var(--gold);margin-right:0.35rem;">'+i.qty+'x '+esc(i.name)+'</label>').join('')+
+        o.items.map(i=>'<label style="display:block;font-size:0.82rem;cursor:pointer;"><input type="checkbox" class="ipItem" value="'+esc(i.id)+'" style="accent-color:var(--gold);margin-right:0.25rem;">'+i.qty+'x '+esc(i.name)+'</label>').join('')+
         '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">'+
         '<input class="ipTas" placeholder="'+T('pd.bz.tas','Welke tas? (bv. tas 2)')+'" style="flex:1;min-width:6rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
         '<input class="ipBon" placeholder="'+T('pd.bz.bon','Typ het bonnummer')+'" style="flex:1;min-width:7rem;background:transparent;border:1px solid var(--line);border-radius:8px;color:inherit;font:inherit;font-size:0.82rem;padding:0.35rem 0.5rem;">'+
@@ -83,16 +83,16 @@
       (mijn.length ? mijn.map(o => rij(o,
           o.status==='onderweg' ? '<button class="abtn" data-pdbz="'+o.ref+'" data-st="bezorgd">'+T('pd.bz.bezorgd','Bezorgd')+'</button>' : ''
         )).join('') +
-        '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.55rem;">'+
+        '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         VOERTUIGEN.map(v => '<button class="abtn" data-vt="'+v[0]+'"'+(voertuig()===v[0]?' style="border-color:var(--gold);color:var(--gold);"':'')+'>'+T('pd.bz.vt.'+v[0], v[1])+'</button>').join('')+'</div>'+
         (tePakken.length ? '<button class="abtn h-mt50" id="pdPakcheck">'+T('pd.bz.pakcheck','Ik heb alles gepakt')+' ('+tePakken.length+')</button>' : '')+
         (teVertrekken.length ? '<button class="abtn h-mt50" id="pdVertrek">'+T('pd.bz.vertrek','Ik ga rijden')+' ('+teVertrekken.length+')</button>' : '')+
-        (rt && rt.stops ? '<div style="margin-top:0.55rem;font-size:0.82rem;"><b>'+T('pd.bz.route','Beste route')+' ('+T('pd.bz.vt.'+rt.voertuig, rt.voertuig)+' · '+rt.totaal.minuten+' min)</b>'+
+        (rt && rt.stops ? '<div style="margin-top:0.5rem;font-size:0.82rem;"><b>'+T('pd.bz.route','Beste route')+' ('+T('pd.bz.vt.'+rt.voertuig, rt.voertuig)+' · '+rt.totaal.minuten+' min)</b>'+
           rt.stops.map((s2,i2) => '<div>'+(i2+1)+'. '+esc(s2.adres||s2.ref)+' · '+s2.minuten+' min · <a href="'+s2.nav+'" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">'+T('pd.bz.nav','Navigeer')+'</a></div>').join('')+'</div>' : '')
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenmijn','Geen rit op uw naam. Neem hieronder leveringen aan.')+'</div>')+'</div>'+
       '<div class="card"><div class="k">'+T('pd.bz.vrij','Klaar om mee te nemen')+' ('+vrij.length+')</div>'+
       (vrij.length ? vrij.map(o =>
-        '<label class="task" style="cursor:pointer;"><input type="checkbox" class="pdbzkies" value="'+o.ref+'" style="margin-right:0.4rem;accent-color:var(--gold);">'+
+        '<label class="task" style="cursor:pointer;"><input type="checkbox" class="pdbzkies" value="'+o.ref+'" style="margin-right:0.5rem;accent-color:var(--gold);">'+
         '<div class="t"><b>'+esc(o.customerCodename)+' · '+esc(o.status)+(o.inpak?' · ✓ '+T('pd.bz.tasje','tas')+' '+esc(o.inpak.tas):'')+'</b><span>'+o.items.map(i=>i.qty+'x '+esc(i.name)).join(', ')+' · '+esc(o.adres||'')+'</span></div></label>'
       ).join('') + '<button class="abtn h-mt60" id="pdNeem">'+T('pd.bz.neem','Neem geselecteerde ritten (op uw naam)')+'</button>'
         : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.bz.geenvrij','Niets klaar om mee te nemen. Nieuwe leveringen verschijnen hier live.')+'</div>')+'</div>'+
@@ -103,4 +103,4 @@
        [T('pd.bz.ai3','Ik heb vertraging'),'Ik heb vertraging met de bezorging, wat doe ik?'],
        [T('pd.bz.ai4','Bestelling beschadigd'),'De bestelling is onderweg beschadigd, wat doe ik?']]
       .map(c => '<button class="abtn" data-pdbzai="'+esc(c[1])+'">'+c[0]+'</button>').join('')+'</div>'+
-      '<div id="pdBzAiUit" style="margin-top:0.6rem;font-size:0.82rem;color:var(--muted);"></div></div>';
+      '<div id="pdBzAiUit" style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);"></div></div>';

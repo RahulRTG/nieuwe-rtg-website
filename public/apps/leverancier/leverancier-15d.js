@@ -74,7 +74,7 @@
                 '<span class="sub">'+(t.telling.length ? t.telling.map(function(r){ return escT(r.wat)+' '+r.aantal+'x'; }).join(' · ') : T('wv.geenbijz','geen bijzonderheden'))+'</span></span>'+
                 '<button class="obtn" data-wvkaart="'+escT(t.id)+'">'+T('wv.kaart','Bedieningskaart')+'</button></div>';
             }).join('')+
-            '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
+            '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
             '<input class="st-in" id="wvTafel" placeholder="'+T('wv.tafelnr','Tafel')+'" style="flex:1;min-width:80px;">'+
             '<input class="st-in" id="wvEvent" placeholder="'+T('wv.event','Event (optioneel)')+'" style="flex:1;min-width:130px;">'+
             '<input class="st-in" id="wvGasten" type="number" min="1" max="30" value="4" style="flex:1;min-width:80px;" placeholder="'+T('wv.aantal','Personen')+'">'+
@@ -99,7 +99,7 @@
                     (i.klaar?T('wv.terug','Terug'):T('wv.vink','Afvinken'))+'</button></div>';
                 }).join('');
             }).join('') : '<div class="tkc-who">'+T('wv.geenchk','Nog geen checklijsten.')+'</div>')+
-            '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.6rem;">'+
+            '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">'+
             '<input class="st-in" id="wvChkTitel" placeholder="'+T('wv.chktitel','Titel van de lijst')+'" style="flex:2;min-width:150px;">'+
             '<input class="st-in" id="wvChkEvent" placeholder="'+T('wv.event','Event (optioneel)')+'" style="flex:1;min-width:120px;">'+
             '<input class="st-in" id="wvChkItems" placeholder="'+T('wv.chkitems','Punten, gescheiden door een komma')+'" style="flex:2;min-width:180px;">'+

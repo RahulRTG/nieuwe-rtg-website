@@ -29,7 +29,7 @@
         const r = await API.call('/supplier/ticket/deurverkoop', body);
         // de code blijft staan als het programma zich ververst
         pdVkLaatst = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+' \u00B7 \u20AC '+r.ticket.total+'</b>'+
-          '<div style="margin-top:0.35rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--gold);">'+esc(r.ticket.code)+'</div>'+
+          '<div style="margin-top:0.25rem;font-size:1.3rem;letter-spacing:0.22em;font-weight:700;color:var(--gold);">'+esc(r.ticket.code)+'</div>'+
           '<div style="font-size:0.72rem;color:var(--soft);">'+T('pd.e.geefcode','Geef deze entreecode aan de gast.')+'</div>';
         uit.innerHTML = pdVkLaatst;
         laadEntree();
@@ -66,9 +66,9 @@
           (Number.isFinite(c.sos[0].lat)?' · <a style="color:var(--gold,#C99A2E);" target="_blank" rel="noopener" href="geo:'+c.sos[0].lat+','+c.sos[0].lng+'?q='+c.sos[0].lat+','+c.sos[0].lng+'">'+T('pd.va.kaart','kaart')+'</a>':'')+
           ' <button class="abtn" data-cvsosok="'+c.ref+'" style="padding:0.15rem 0.7rem;">'+T('pd.va.sosok','Afgehandeld')+'</button></div>':'')+
         '<div class="k">'+esc(c.boot)+' · '+esc(c.type)+'</div>'+
-        '<div style="font-size:0.85rem;margin-top:0.3rem;">'+esc(c.codename)+' · '+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('pd.va.gasten','gasten')+' · ':'')+(c.metSkipper?''+T('pd.va.metskipper','met schipper'):T('pd.va.bareboat','bareboat'))+' · '+T('pd.va.st.'+c.status, VAART_ST[c.status]||c.status)+'</div>'+
-        (c.teruggave ? '<div style="font-size:0.8rem;margin-top:0.2rem;color:'+(c.teruggave.meerkosten>0?'var(--amber,#C99A2E)':'var(--green,#4C9A75)')+';">'+(c.teruggave.meerkosten>0?T('pd.va.meer','Meerkosten')+' '+eur(c.teruggave.meerkosten):'✓ '+T('pd.va.geenmeer','geen meerkosten'))+'</div>':'')+
-        (knop?'<div style="margin-top:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+knop+'</div>':'')+
+        '<div style="font-size:0.85rem;margin-top:0.25rem;">'+esc(c.codename)+' · '+c.van+' → '+c.tot+' · '+(c.gasten?c.gasten+' '+T('pd.va.gasten','gasten')+' · ':'')+(c.metSkipper?''+T('pd.va.metskipper','met schipper'):T('pd.va.bareboat','bareboat'))+' · '+T('pd.va.st.'+c.status, VAART_ST[c.status]||c.status)+'</div>'+
+        (c.teruggave ? '<div style="font-size:0.8rem;margin-top:0.25rem;color:'+(c.teruggave.meerkosten>0?'var(--amber,#C99A2E)':'var(--green,#4C9A75)')+';">'+(c.teruggave.meerkosten>0?T('pd.va.meer','Meerkosten')+' '+eur(c.teruggave.meerkosten):'✓ '+T('pd.va.geenmeer','geen meerkosten'))+'</div>':'')+
+        (knop?'<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+knop+'</div>':'')+
         '</div>';
     }).join('') : '<div class="card" style="text-align:center;color:var(--soft);font-size:0.85rem;">'+T('pd.va.geen','Geen charters vandaag.')+'</div>';
     wrap.querySelectorAll('[data-cvst]').forEach(b => b.addEventListener('click', async () => {

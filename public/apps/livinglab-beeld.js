@@ -36,7 +36,7 @@
   function tekenLijst(STUDIES, FILTER) {
     var lijst = STUDIES.filter(function (s) { return !FILTER || s.soort === FILTER; });
     $('#lijst').innerHTML = lijst.length ? lijst.map(function (s) {
-      return '<div class="kaart" style="margin-bottom:.7rem;" data-s="' + esc(s.id) + '">' +
+      return '<div class="kaart" style="margin-bottom:0.75rem;" data-s="' + esc(s.id) + '">' +
         '<div class="rij" style="justify-content:space-between;align-items:start;">' +
           '<h2 style="font-size:1.05rem;">' + esc(s.titel) + '</h2>' +
           '<span class="pil' + (s.gescheiden ? ' let' : '') + '">' + esc(s.klasse) + '</span></div>' +

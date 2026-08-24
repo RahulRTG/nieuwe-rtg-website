@@ -96,6 +96,48 @@ die modus stuk gaat), en zodra een modus een kleur- of fonttoken overschrijft.
 
 ---
 
+## 2b. De ruimteschaal
+
+Vijf stappen, en verder niets:
+
+| | | |
+|---|---|---|
+| `0.25rem` | 4px | de haarbreedte: twee dingen die bij elkaar horen |
+| `0.5rem` | 8px | de basisruimte van **Command** |
+| `0.75rem` | 12px | de basisruimte van **Pro** |
+| `1.25rem` | 20px | de basisruimte van **World** |
+| `2rem` | 32px | de sectiebreuk: hier houdt iets op en begint iets anders |
+
+**Waarom precies deze vijf.** Ze zijn niet bedacht maar opgeraapt: drie ervan
+staan al in de tabel hierboven als de basisruimte van World, Pro en Command. Een
+schaal die daar niet op staat zou een tweede ruimtetaal zijn naast de bestaande,
+en dan hebben we er twee. De vierde is een halve Command-stap voor wat tegen
+elkaar aan hoort, de vijfde het dubbele van World voor waar iets ophoudt.
+
+**Wat er stond.** Zeventien willekeurige stappen: .3, .35, .4, .45, .5, .55, .6,
+.65, .7, .8, .9, 1, 1.1, 1.2, 1.4 en 1.5rem, door elkaar geschreven als `.5rem`
+en `0.5rem`. Niemand koos daar iets; ze zijn ontstaan. Het verschil tussen
+0.55rem en 0.6rem is 0,8 pixel — dat is geen ontwerpbeslissing maar ruis, en het
+maakt elke hulpklasse onmogelijk omdat er voor elke ruisstap een eigen klasse
+zou moeten komen.
+
+**Bij gelijke afstand naar de RUIMERE stap.** 1rem ligt precies tussen 0.75 en
+1.25; die wordt 1.25. Dat is geen willekeur maar CLAUDE.md: *bij twijfel meer
+ruimte.*
+
+**Wat er buiten valt.** `0`, `auto`, en alles boven 2rem. Een marge van 3 of
+4rem is geen ruisstap maar een bewuste grote sprong, en die snapt nergens
+netjes heen. Ook `px`- en `%`-marges blijven staan: die zitten meestal in een
+berekening waar een rem-stap niets te zoeken heeft.
+
+*Handhaving:* `node scripts/margeschaal.js --controle` zakt op elke rem-marge in
+een `style="..."` die niet op de schaal ligt, en `npm run check` regel 51 draait
+hem mee. De omzetting zelf staat in hetzelfde script en is met `--proef` droog
+te draaien. Gemeten bij het invoeren: 1.372 declaraties verschoven, gemiddeld
+1,4 pixel, grootste sprong 5,6px (1.6rem → 1.25rem).
+
+---
+
 ## 3. Uitzonderingsgestuurd
 
 Software moet niet roepen *"kijk hoeveel data ik heb"*, maar *"dit gaat goed,

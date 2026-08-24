@@ -106,7 +106,7 @@
       var k = document.getElementById('lesKaart');
       k.hidden = false;
       document.getElementById('lesInhoud').innerHTML = '<b>' + esc(d.doel.naam) + '</b> (' + esc(d.doel.vak) + ')' +
-        '<p style="margin-top:.4rem;line-height:1.7;">' + esc(d.doel.les) + '</p>';
+        '<p style="margin-top:0.5rem;line-height:1.7;">' + esc(d.doel.les) + '</p>';
       k.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (e) { meld(e.message); }
   }

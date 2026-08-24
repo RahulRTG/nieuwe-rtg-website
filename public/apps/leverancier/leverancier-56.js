@@ -40,14 +40,14 @@
     try { roo = await API.call('/supplier/beveiliging/rooster', { van: bevDatum, dagen: 1 }); } catch(e){ roo = { dagen: [] }; }
     const b = cmd.budget || {};
     // 1) momentopname
-    let h = '<div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.8rem;">'+
+    let h = '<div class="stats" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">'+
       zbCel(cmd.opDienst.length, T('bev.opdienst','Op dienst'))+
       zbCel(cmd.team, T('bev.team','Bewakers'))+
       zbCel(cmd.posten, T('bev.posten','Posten'))+
       zbCel(cmd.openVandaag, T('bev.openvandaag','Open vandaag'), cmd.openVandaag)+
       zbCel(cmd.openAanvragen, T('bev.aanvragen','Aanvragen'), cmd.openAanvragen)+
       zbCel(cmd.incidentenOpen, T('bev.incidenten','Incidenten'), cmd.incidentenOpen)+'</div>';
-    if (cmd.sosActief) h += '<div class="card" style="border:1px solid var(--rood);background:#3a1420;color:#F4B8C6;margin-bottom:0.8rem;font-weight:600;">'+T('bev.sos','Actieve SOS! Een bewaker heeft de noodknop ingedrukt. Bekijk het incident en stuur bijstand.')+'</div>';
+    if (cmd.sosActief) h += '<div class="card" style="border:1px solid var(--rood);background:#3a1420;color:#F4B8C6;margin-bottom:0.75rem;font-weight:600;">'+T('bev.sos','Actieve SOS! Een bewaker heeft de noodknop ingedrukt. Bekijk het incident en stuur bijstand.')+'</div>';
     // 2) functies aan/uit
     const bevChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
       (cmd.functies||[]).map(f => '<button class="js-bevf" data-id="'+f.id+'" data-aan="'+f.aan+'" style="border:1px solid '+(f.aan?'#1f5637':'var(--rood)')+';background:'+(f.aan?'#12321f':'#3a1420')+';color:'+(f.aan?'#7EE0A3':'#F4B8C6')+';border-radius:999px;padding:0.34rem 0.75rem;font-size:0.74rem;font-weight:600;font-family:inherit;">'+(f.aan?'● ':'○ ')+esc(f.naam)+'</button>').join('')+'</div>';
@@ -56,24 +56,24 @@
     if (b.budgetUren){
       const kleur = b.overschrijding ? 'var(--rood)' : (b.pct>=85?'#E0A93A':'#7EE0A3');
       h += '<div class="st-sec">'+T('bev.budget','Budget & uren')+'</div>'+
-        '<div class="card" style="margin-bottom:1rem;">'+
-        '<div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;"><span>'+b.urenGepland+' / '+b.budgetUren+' '+T('bev.uur','uur')+' ('+b.maand+')</span><b>€ '+b.bestedBedrag+' / € '+b.budgetBedrag+'</b></div>'+
+        '<div class="card" style="margin-bottom:1.25rem;">'+
+        '<div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.25rem;"><span>'+b.urenGepland+' / '+b.budgetUren+' '+T('bev.uur','uur')+' ('+b.maand+')</span><b>€ '+b.bestedBedrag+' / € '+b.budgetBedrag+'</b></div>'+
         '<div style="height:8px;border-radius:99px;background:var(--card2);overflow:hidden;"><div style="height:100%;width:'+Math.min(100,b.pct)+'%;background:'+kleur+';"></div></div>'+
         '<div class="sub h-mt40">'+esc(b.advies)+'</div>'+
         (b.perPost&&b.perPost.length? '<div class="sub h-mt40">'+b.perPost.map(p=>esc(p.naam)+': '+p.uren+' u (€ '+p.bedrag+')').join(' · ')+'</div>':'')+
-        '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;flex-wrap:wrap;"><input id="bevBudUren" type="number" min="0" placeholder="'+T('bev.buduren','budget-uren/mnd')+'" value="'+b.budgetUren+'" style="width:9rem;">'+
+        '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap;"><input id="bevBudUren" type="number" min="0" placeholder="'+T('bev.buduren','budget-uren/mnd')+'" value="'+b.budgetUren+'" style="width:9rem;">'+
         '<input id="bevBudTarief" type="number" min="0" placeholder="'+T('bev.tarief','tarief/uur')+'" value="'+b.tariefUur+'" style="width:8rem;">'+
         '<button class="abtn" id="bevBudSave">'+T('bev.opslaan','Opslaan')+'</button></div>'+
         '</div>';
     }
     // 4) rooster met AI-overname
     h += '<div class="st-sec">'+T('bev.rooster','Rooster')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.6rem;flex-wrap:wrap;">'+
+      '<div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;">'+
       '<input id="bevDag" type="date" value="'+bevDatum+'" style="width:11rem;">'+
       '<button class="abtn" id="bevAI">'+T('bev.ai','AI neemt het over')+'</button></div>';
     const dag = roo.dagen && roo.dagen[0];
     if (dag){
-      h += '<div class="card" style="margin-bottom:1rem;">'+ (dag.posten.length? dag.posten.map(p =>
+      h += '<div class="card" style="margin-bottom:1.25rem;">'+ (dag.posten.length? dag.posten.map(p =>
         '<div style="border-bottom:1px solid var(--line);padding:0.5rem 0;">'+
           '<div style="display:flex;justify-content:space-between;"><b>'+esc(p.post)+'</b>'+(p.open?'<span style="color:var(--rood);font-size:0.72rem;">'+p.open+' '+T('bev.open','open')+'</span>':'<span style="color:#7EE0A3;font-size:0.72rem;">'+T('bev.gedekt','gedekt')+'</span>')+'</div>'+
           p.shifts.map(sl => '<div class="sub h-mt20">'+esc(sl.shift)+': '+
@@ -86,7 +86,7 @@
     // 5) inzetaanvragen
     h += '<div class="st-sec">'+T('bev.inzet','Inzetaanvragen')+'</div>';
     const open = (cmd.functies||[]).find(f=>f.id==='aanvragen' && f.aan);
-    h += '<div class="card" style="margin-bottom:1rem;"><div id="bevAvLijst"></div>'+
+    h += '<div class="card" style="margin-bottom:1.25rem;"><div id="bevAvLijst"></div>'+
       (open? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">'+
         '<input id="bevAvKlant" placeholder="'+T('bev.klant','klant')+'" style="width:8rem;">'+
         '<input id="bevAvObject" placeholder="'+T('bev.object','object/locatie')+'" style="width:9rem;">'+
@@ -97,7 +97,7 @@
     // 6) posten beheren
     const posten = cmd.postenLijst || [];
     h += '<div class="st-sec">'+T('bev.postbeheer','Posten & objecten')+'</div>'+
-      '<div class="card" style="margin-bottom:1rem;">'+
+      '<div class="card" style="margin-bottom:1.25rem;">'+
       (posten.length? posten.map(p => '<div style="border-bottom:1px solid var(--line);padding:0.35rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
         '<span><b>'+esc(p.naam)+'</b>'+(p.klant?' · '+esc(p.klant):'')+' · '+(p.minMan||1)+' '+T('bev.man','man')+(p.orders?'<br><span class="sub">'+esc(p.orders)+'</span>':'')+'</span>'+
         '<button class="abtn ghost" data-postweg="'+p.id+'">✕</button></div>').join('') : '<div class="softline">'+T('bev.geenpost2','Nog geen posten.')+'</div>')+

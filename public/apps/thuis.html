@@ -127,7 +127,7 @@
         <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="nKeyless" checked> Keyless deurcode</label>
         <button class="knop" id="nZet">Zet live</button>
       </div>
-      <div style="font-size:.76rem;color:var(--soft);margin-top:.5rem;">RTG houdt 0% in; de uitbetaling staat gepland naar je RTG Rekening. Host en gast kennen elkaar als codenaam.</div>
+      <div style="font-size:.76rem;color:var(--soft);margin-top:0.5rem;">RTG houdt 0% in; de uitbetaling staat gepland naar je RTG Rekening. Host en gast kennen elkaar als codenaam.</div>
     </div>
   </section>
 </main>
@@ -222,7 +222,7 @@ async function openHuis(id){
     const w = HUIDIG.reiswijzer;
     $('#bInhoud').innerHTML =
       '<div class="beeld v'+(HUIDIG.visual||0)+'" style="border-radius:14px;height:150px;"></div>'+
-      '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:.8rem;">'+esc(HUIDIG.beschrijving||'')+'</p>'+
+      '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:0.75rem;">'+esc(HUIDIG.beschrijving||'')+'</p>'+
       '<div class="h-mt40">'+(HUIDIG.voorzieningen||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join('')+
         '<span class="chip">'+HUIDIG.slaapkamers+' slaapkamers</span><span class="chip">'+HUIDIG.bedden+' bedden</span><span class="chip">'+HUIDIG.badkamers+' badkamers</span>'+
         (HUIDIG.keyless?'<span class="chip" style="color:var(--gold);border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
@@ -234,11 +234,11 @@ async function openHuis(id){
           (p.zakelijk && p.btw ? '<div class="r"><span class="k">Logies-btw ('+p.btwPct+'%)</span><span>'+euro(p.btw)+'</span></div>' : '')+
           '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--gold);">'+euro(p.totaal)+'</b></div>'+
           (p.borg ? '<div class="r"><span class="k">Borg (apart, terug na verblijf)</span><span>'+euro(p.borg)+'</span></div>' : '')+
-          '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(p.serviceTekst)+
+          '<div style="font-size:.76rem;color:var(--soft);margin-top:0.25rem;">'+esc(p.serviceTekst)+
             (p.langverblijf ? ' ' + esc(p.langverblijf.tekst) : '')+
             (p.zakelijk ? ' ' + esc(p.btwTekst || '') + (p.opFactuur ? ' Deze zaak kan op factuur werken; geef bij het boeken een kostenplaats mee.' : '') : '')+'</div>'
         : '<div class="leeg">Kies eerst datums in de zoekbalk voor de volledige prijsopbouw.</div>')+
-        '<div style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">'+esc(HUIDIG.annuleringTekst||'')+'</div></div>'+
+        '<div style="font-size:.78rem;color:var(--muted);margin-top:0.5rem;">'+esc(HUIDIG.annuleringTekst||'')+'</div></div>'+
       (w ? '<div class="kaart"><h3 style="font-size:1rem;">Alle regels van '+esc(w.naam)+'</h3>'+
         '<div class="r"><span class="k">Visum</span><span>'+esc(w.visum.tekst)+'</span></div>'+
         '<div class="r"><span class="k">Verkeer</span><span>'+esc(w.rijden)+' rijden · alarm '+esc(w.alarm)+'</span></div>'+
@@ -251,7 +251,7 @@ async function openHuis(id){
         '<div class="kaart"><h3 style="font-size:1rem;">Zakelijk boeken</h3>'+
         '<p style="font-size:.82rem;color:var(--muted);line-height:1.6;">Deze zaak verhuurt beroepsmatig en kan op factuur werken. Geef een kostenplaats mee, dan staat die op de boeking en op de factuur.</p>'+
         '<input class="veld" id="bKost" placeholder="Kostenplaats of projectcode (optioneel)" maxlength="40" style="width:100%;"></div>' : '')+
-      '<button class="knop" id="bBoek" style="width:100%;margin-top:1rem;">'+(HUIDIG.instant?'Boek direct':'Vraag aan bij de host')+'</button>';
+      '<button class="knop" id="bBoek" style="width:100%;margin-top:1.25rem;">'+(HUIDIG.instant?'Boek direct':'Vraag aan bij de host')+'</button>';
     $('#blad').classList.add('open');
     $('#bBoek').addEventListener('click', boek);
     laadReviews(HUIDIG.id);
@@ -289,7 +289,7 @@ async function laadReizen(){
     $('#rUit').innerHTML = d.reizen.length ? d.reizen.map(b =>
       '<div class="boeking"><div class="st">'+esc(b.status)+'</div><b>'+esc(b.titel)+'</b> · '+esc(b.plaats)+'<br>'+
       '<span style="color:var(--soft);">'+esc(b.van)+' tot '+esc(b.tot)+' · '+b.gasten+' gasten · '+euro(b.prijsopbouw.totaal)+' · host '+esc(b.host)+'</span>'+
-      (b.deurcode ? '<div style="margin:.4rem 0;">Deurcode: <span class="deur">'+esc(b.deurcode)+'</span></div>' : '')+
+      (b.deurcode ? '<div style="margin:0.5rem 0;">Deurcode: <span class="deur">'+esc(b.deurcode)+'</span></div>' : '')+
       '<div class="rij h-mt40">'+
         (b.status==='bevestigd' ? '<button class="knop stil" data-doe="checkin" data-ref="'+esc(b.ref)+'">Check-in</button>' : '')+
         (b.status==='ingecheckt' ? '<button class="knop stil" data-doe="checkuit" data-ref="'+esc(b.ref)+'">Check-uit</button>' : '')+
@@ -333,7 +333,7 @@ async function laadBord(){
       '<div class="r"><span class="k">Inkomsten (afgerond)</span><b style="color:var(--gold);">'+euro(d.inkomstenTotaal)+'</b></div>'+
       '<div class="r"><span class="k">Bezetting komende 30 dagen</span><span>'+d.bezettingPct+'%</span></div>'+
       '<div class="r"><span class="k">Superhost</span><span>'+(d.superhost?'★ ja':'nog niet (3 verblijven, gemiddeld 4,8+)')+'</span></div>'+
-      '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(d.uitbetaling)+'</div>'+
+      '<div style="font-size:.76rem;color:var(--soft);margin-top:0.25rem;">'+esc(d.uitbetaling)+'</div>'+
       (d.aanvragen.length ? '<div class="sec">Aanvragen</div>'+d.aanvragen.map(a =>
         '<div class="boeking"><b>'+esc(a.titel)+'</b> · '+esc(a.van)+' tot '+esc(a.tot)+' · gast '+esc(a.gast)+(a.gastRating?' (★ '+a.gastRating+')':'')+
         '<div class="rij h-mt40"><button class="knop" data-ok="'+esc(a.ref)+'">Accepteer</button><button class="knop stil" data-nee="'+esc(a.ref)+'">Wijs af</button></div></div>').join('') : '');
@@ -351,7 +351,7 @@ async function laadHuizen(){
       '<button class="knop stil" data-advies="'+esc(h.id)+'">AI-prijsadvies</button>'+
       '<button class="knop stil" data-blok="'+esc(h.id)+'">Blokkeer datums</button>'+
       '<button class="knop stil" data-cohost="'+esc(h.id)+'">Co-host</button></div>'+
-      '<div style="font-size:.78rem;color:var(--soft);margin-top:.3rem;" data-uit="'+esc(h.id)+'"></div></div>').join('') : '<div class="leeg">Nog geen huizen. Zet er hieronder een live.</div>';
+      '<div style="font-size:.78rem;color:var(--soft);margin-top:0.25rem;" data-uit="'+esc(h.id)+'"></div></div>').join('') : '<div class="leeg">Nog geen huizen. Zet er hieronder een live.</div>';
     $('#hHuizen').querySelectorAll('[data-advies]').forEach(b => b.addEventListener('click', async () => {
       try { const d2 = await api('prijsadvies', { id: b.dataset.advies });
         document.querySelector('[data-uit="'+b.dataset.advies+'"]').textContent = 'Advies: ' + euro(d2.advies) + '/nacht (nu ' + euro(d2.huidig) + ', bezetting ' + d2.bezettingPct + '%). ' + d2.uitleg;

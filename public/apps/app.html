@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="215e6043">
+<meta name="rtg-bouw" content="c3f9c563">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -1758,7 +1758,7 @@
         <button class="notif-push" id="notifPush" data-i18n="app.pushenable">Push aanzetten</button>
       </div>
       <div class="notif-list" id="notifList"></div>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.6rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin:0.5rem 1.25rem calc(env(safe-area-inset-bottom,0px) + 0.9rem);">
         <button id="logoutBtn" style="background:none;border:1px solid var(--line);border-radius:12px;padding:0.7rem;font-size:0.8rem;color:var(--soft);" data-i18n="app.logout">Uitloggen</button>
         <div style="display:flex;gap:0.5rem;">
           <button id="privExport" style="flex:1;background:none;border:1px solid var(--line);border-radius:12px;padding:0.6rem;font-size:0.68rem;color:var(--soft);" data-i18n="app.priv.export">Download mijn gegevens</button>
@@ -2208,7 +2208,7 @@
         </label>
       </div>
       <input id="rideNote" class="ms-note" placeholder="Bijv. kinderzitje, voor de zij-ingang" data-i18n-ph="ride.noteph">
-      <div style="font-size:0.66rem;color:var(--soft);margin:0.35rem 0;" data-i18n="ride.los">Je boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en je betaling gaat rechtstreeks naar de vervoerder.</div>
+      <div style="font-size:0.66rem;color:var(--soft);margin:0.25rem 0;" data-i18n="ride.los">Je boekt rechtstreeks bij deze vervoerder: een losse overeenkomst, en je betaling gaat rechtstreeks naar de vervoerder.</div>
       <button class="ms-order" id="rideGo" data-i18n="ride.go">Vraag de rit aan</button>
     </div>
   </div>
@@ -2281,7 +2281,7 @@
     <div class="gc-inner">
       <div class="gc-sup" id="gcSup"></div>
       <div class="gc-code" id="gcCode"></div>
-      <div id="gcQr" style="background:#fff;padding:12px;border-radius:14px;margin:0.9rem auto 0.4rem;display:none;"></div>
+      <div id="gcQr" style="background:#fff;padding:12px;border-radius:14px;margin:0.75rem auto 0.5rem;display:none;"></div>
       <div class="gc-hint" data-i18n="app.gc.hint">Laat dit scherm zien bij het ophalen</div>
       <div class="gc-close" data-i18n="app.gc.close">Tik om te sluiten</div>
     </div>

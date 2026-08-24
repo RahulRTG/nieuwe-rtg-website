@@ -91,7 +91,7 @@
   </div>
   <div class="paneel">
     <div id="bladDeal"></div>
-    <div class="rij" style="margin-top:.8rem;gap:1rem;align-items:flex-end;">
+    <div class="rij" style="margin-top:0.75rem;gap:1rem;align-items:flex-end;">
       <div><div class="lbl">Datum</div><input class="veld" id="rDatum" type="date"></div>
       <div><div class="lbl">Gezelschap</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
     </div>
@@ -119,7 +119,7 @@ const api = (pad, body, herkans) => fetch(pad, {
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Food Court is er voor leden. Open de app en log in met je RTG-account.</p>'+
+    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">De Food Court is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 

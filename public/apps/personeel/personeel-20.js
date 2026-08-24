@@ -33,7 +33,7 @@
     const totVerkocht = slots.reduce((n, x) => n + x.verkocht, 0);
     wrap.innerHTML =
       '<div class="card"><div class="k">'+T('pd.e.check','Entree-check')+'</div>'+
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;">'+
+      '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'+
       '<input id="pdCode" placeholder="'+T('pd.e.codeph','Code, bijv. K7M2PX')+'" autocapitalize="characters" style="flex:1;background:var(--card2,#191715);border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.9rem;font-size:1.05rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt);outline:none;font-family:inherit;">'+
       '<button class="abtn" id="pdCheck">'+T('pd.e.binnen','Binnen')+'</button></div>'+
       '<div id="pdCheckUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);"></div></div>'+
@@ -44,7 +44,7 @@
         slots.map((x,i) => '<option value="'+i+'">'+x.tijd+' \u00B7 '+esc(x.naam)+' ('+(x.capaciteit-x.verkocht)+' '+T('pd.e.vrij','vrij')+')</option>').join('')+'</select>'+
       '<input id="pdVkPers" type="number" min="1" max="20" value="1" style="width:64px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;" aria-label="personen">'+
       '<select id="pdVkSoort" style="flex:1;min-width:90px;background:var(--card2,#191715);border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.6rem;color:var(--txt);font-family:inherit;"><option value="std">'+T('pd.e.std','Standaard')+'</option><option value="vip">\u2B50 VIP</option></select></div>'+
-      '<div style="display:flex;gap:0.4rem;margin-top:0.45rem;">'+
+      '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+
       '<button class="abtn h-flex1" data-pdvk="contant">\uD83D\uDCB6 '+T('pd.e.contant','Contant')+'</button>'+
       '<button class="abtn h-flex1" data-pdvk="rtgpay">RTG Pay</button></div>'+
       '<div id="pdVkUit" style="margin-top:0.5rem;font-size:0.84rem;color:var(--muted);">'+(pdVkLaatst||'')+'</div></div>' : '')+
@@ -59,7 +59,7 @@
       try {
         const r = await API.call('/supplier/ticket/checkin', { code: $('#pdCode').value });
         uit.innerHTML = '<b style="color:var(--green);">\u2705 '+(r.ticket.vip?'\u2B50 VIP \u00B7 ':'')+esc(r.ticket.codename)+' \u00B7 '+r.ticket.personen+'p \u00B7 '+esc(r.ticket.naam)+'</b>'+
-          (r.ticket.zorg?'<div style="margin-top:0.3rem;color:#E2B93B;">\u26A0 '+esc(pkZorg(r.ticket.zorg))+'</div>':'');
+          (r.ticket.zorg?'<div style="margin-top:0.25rem;color:#E2B93B;">\u26A0 '+esc(pkZorg(r.ticket.zorg))+'</div>':'');
         $('#pdCode').value = '';
         laadEntree();
       } catch(e){ uit.innerHTML = '<b style="color:#E36385;">\u26D4 '+esc(e.message)+'</b>'; }

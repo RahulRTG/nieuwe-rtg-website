@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1040 bestanden en 6990 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1041 bestanden en 7000 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1040 |
-| losse beweringen (`test(...)`) | 6990 |
+| toetsbestanden | 1041 |
+| losse beweringen (`test(...)`) | 7000 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 869 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 23 |
-| niets van beide | 100 |
+| niets van beide | 101 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-914 bestanden, 6770 beweringen.
+915 bestanden, 6780 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -443,6 +443,7 @@ toets omvalt.
 | `mall.test.js` | 8 | gezakt op `liegpoort /api/` | De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app. De mall stelt zich samen uit de retail-partners, verdeeld over etages; de demo-boutieks vullen de etages, en elke boutique opent haar catalogus. |
 | `malwarescan-dicht.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `marechaussee.test.js` | 5 | gezakt op `liegpoort /api/` | De Brigade RTG Airport (kern/marechaussee.js): de grensbalie op de echte luchthavendata (passagierslijst op codenaam, besluit per reiziger), patrouilles door de zones, incidenten en het grens-signaal in de cockpit. |
+| `margeschaal.test.js` | 10 | -- | DE RUIMTESCHAAL (ONTWERP.md 2b, TAKEN.md 4.51). Zeventien willekeurige margestappen zijn er vijf geworden, en drie daarvan stonden al in ONTWERP.md als de basisruimte van World, Pro en Command. |
 | `marina.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Marina: het jachthaven-systeem (demo Marina Portell). Bewaakt de toewijzing van ligplaatsen aan passanten (eerste passende plaats, vol is vol), de bescherming van vaste liggers, de brandstofsteiger, service met... |
 | `markt-zaak.test.js` | 7 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VANAF DE ZAAK -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: status, verwijder, antwoord, chat, deal/voorstel, deal/hier,... |
 | `markt.test.js` | 11 | gezakt op `liegpoort /api/` | Marktplaats in de RTFoundation-app: gezinnen kopen en verkopen, leveranciers kunnen er ook op verkopen. Met de vier pijlers: veiligheid (kinderen kijken alleen, oplichting wordt gemarkeerd, melden/blokkeren), respect... |

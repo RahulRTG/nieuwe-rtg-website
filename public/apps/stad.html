@@ -95,15 +95,15 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
 function render(){
   $('#app').innerHTML =
     '<div class="kaart"><h2 style="font-size:1.1rem;">' + esc(B.scenario.label) + '</h2>' +
-      '<p style="color:var(--muted);font-size:.85rem;margin-top:.3rem;line-height:1.55;">' + esc(B.scenario.uitleg) + '</p>' +
-      (B.alerts.length ? '<div style="margin-top:.7rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;font-size:.83rem;line-height:1.55;">' + B.alerts.map(a => '' + esc(a.tekst)).join('<br>') + '</div>' : '') +
+      '<p style="color:var(--muted);font-size:.85rem;margin-top:0.25rem;line-height:1.55;">' + esc(B.scenario.uitleg) + '</p>' +
+      (B.alerts.length ? '<div style="margin-top:0.75rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;font-size:.83rem;line-height:1.55;">' + B.alerts.map(a => '' + esc(a.tekst)).join('<br>') + '</div>' : '') +
     '</div>' +
     '<div class="sec">Hoe de stad er nu bij staat</div>' +
     '<div class="grid">' + B.domeinen.map(d =>
       '<div class="dom"><div class="l">' + esc(d.label) + '</div>' +
       '<div class="w" style="color:' + (STAND[d.stand] || '#F4F1EC') + ';">' +
         (d.waarde == null ? 'stil' : esc(String(d.waarde)) + ' <span style="font-size:.65rem;color:var(--soft);">' + esc(d.eenheid) + '</span>') + '</div>' +
-      '<div style="font-size:.72rem;color:var(--soft);margin-top:.15rem;">' + esc(d.stand) +
+      '<div style="font-size:.72rem;color:var(--soft);margin-top:0.25rem;">' + esc(d.stand) +
         (d.ovOnderweg != null ? ' ·  ' + d.ovOnderweg + ' OV onderweg' : '') + '</div></div>').join('') + '</div>' +
     '<div class="sec">Iets kapot of vol gezien? Meld het</div>' +
     '<div class="kaart"><div class="rij">' +
@@ -111,7 +111,7 @@ function render(){
       '<span><label for="mSoort">Wat</label><select id="mSoort">' + Object.entries(B.soorten).map(([k, v]) => '<option value="' + k + '">' + esc(v) + '</option>').join('') + '</select></span>' +
       '<span style="flex:1;min-width:12rem;"><label for="mTekst">Korte omschrijving</label><input id="mTekst" maxlength="200" placeholder="bijv. lantaarn bij de brug doet het niet" style="width:100%;"></span>' +
       '<button class="knop" id="mDoe">Meld</button></div>' +
-    '<p style="font-size:.75rem;color:var(--soft);margin-top:.6rem;line-height:1.5;">' + esc(B.privacy) + '</p></div>' +
+    '<p style="font-size:.75rem;color:var(--soft);margin-top:0.5rem;line-height:1.5;">' + esc(B.privacy) + '</p></div>' +
     '<div class="sec">Mijn meldingen</div>' +
     '<div class="kaart" id="mijnM">' + (B.mijnMeldingen.length ? B.mijnMeldingen.map(m =>
       '<div class="melding-rij">' + esc(m.tekst) +

@@ -98,14 +98,21 @@ test('4. VANGRAIL: de kaart blijft meetbaar sneller dan de dubbele lus', () => {
      marge is ruim -- losgemeten was het 63x, hier staat 8x -- dus we zakken pas
      als de winst grotendeels weg is en niet als hij schommelt. */
   const monster = alleGeregistreerd.slice(0, 200).map(p => p + '/42');
-  const meet = (fn) => {
-    for (let i = 0; i < 5000; i++) fn(monster[i % monster.length]);      // opwarmen
+  const ronde = (fn) => {
     const t0 = process.hrtime.bigint();
     for (let i = 0; i < 40000; i++) fn(monster[i % monster.length]);
     return Number(process.hrtime.bigint() - t0) / 1e6;
   };
-  const msOud = meet(oudFunctieVoorPad);
-  const msNieuw = meet(functieVoorPad);
+  for (let i = 0; i < 5000; i++) { oudFunctieVoorPad(monster[i % monster.length]); functieVoorPad(monster[i % monster.length]); }
+  /* Het MINIMUM van afwisselende rondes: de suite draait vier bestanden tegelijk,
+     en ruis telt alleen opwaarts. Twee losse metingen die niet dezelfde drukte
+     zien, geven geen verhouding maar een lot -- zie de uitleg bij de vangrail in
+     test/routerindex.test.js, waar precies dat een keer misging. */
+  let msOud = Infinity, msNieuw = Infinity;
+  for (let r = 0; r < 3; r++) {
+    msOud = Math.min(msOud, ronde(oudFunctieVoorPad));
+    msNieuw = Math.min(msNieuw, ronde(functieVoorPad));
+  }
   const factor = msOud / msNieuw;
   assert.ok(factor >= 8,
     'de prefixkaart hoort minstens 8x sneller te zijn dan de dubbele lus; gemeten ' +

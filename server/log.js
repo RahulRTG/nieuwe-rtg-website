@@ -107,22 +107,14 @@ const log = {
    /api/lid/:id. Zo tellen honderd verzoeken naar honderd leden als een regel, en
    belandt er geen nummer in het journaal dat naar een persoon leidt. Uit het
    journaal zelf gehaald, want twee regexen die hetzelfde bedoelen lopen uiteen. */
-/* EEN LATE require() IS NIET GRATIS, en dat werd hier per verzoek betaald.
-
-   Allebei de modules hieronder werden LAAT binnengehaald: doorgeefjournaal om
-   de kringverwijzing met dit bestand te breken, journaalhaak omdat hij pas
-   later gevuld wordt. Dat is allebei terecht. Wat niet klopte, is dat de
-   require IN de verzoekafhandeling stond: Node houdt de module dan wel in zijn
-   cache, maar de RESOLUTIE ervoor niet. Elke aanroep liep opnieuw door
-   trySelf -> getNearestParentPackageJSON -> internalModuleStat, en dat zijn
-   stat-aanroepen op de schijf. Per verzoek. In het CPU-profiel van 24 augustus
-   2026 stond die module-resolutie op 5,3% van alle rekentijd -- puur om iets op
-   te zoeken wat we de vorige keer al gevonden hadden.
-
-   Het blijft dus laat, maar hooguit EEN keer laat: de eerste geslaagde aanroep
-   onthoudt de module, de rest leest een variabele. Mislukt hij, dan wordt het
-   de volgende keer gewoon opnieuw geprobeerd -- een module die er tijdens de
-   opstart nog niet was, mag later alsnog opduiken. */
+/* EEN LATE require() IS NIET GRATIS. Allebei de modules hieronder worden LAAT
+   binnengehaald -- doorgeefjournaal om de kringverwijzing met dit bestand te
+   breken, journaalhaak omdat hij pas later gevuld wordt -- en dat is terecht.
+   Wat niet klopte: de require stond IN de verzoekafhandeling. Node cachet de
+   module wel, maar de RESOLUTIE ervoor niet, dus elke aanroep liep opnieuw langs
+   internalModuleStat: stat-aanroepen op schijf, per verzoek, goed voor 5,3% van
+   alle rekentijd (PRESTATIES.md). Het blijft laat, maar hooguit EEN keer laat;
+   mislukt het, dan mag het de volgende keer opnieuw. */
 let _journaal = null, _haak = null;
 const journaalMod = () => _journaal || (_journaal = require('./kern/doorgeefjournaal'));
 const haakMod = () => _haak || (_haak = require('./journaalhaak'));

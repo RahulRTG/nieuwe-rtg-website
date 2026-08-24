@@ -261,16 +261,39 @@ test('7. VANGRAIL: de index blijft meetbaar sneller dan de lineaire scan', () =>
   const snel = bouw(maakRouter);
 
   const res = { ended: false, end() {}, on() {}, statusCode: 200 };
+  function ronde(app, url, n) {
+    const t0 = process.hrtime.bigint();
+    for (let i = 0; i < n; i++) app._handle({ method: 'GET', url, params: {} }, res, () => {});
+    return Number(process.hrtime.bigint() - t0) / 1e6;
+  }
+  /* HET MINIMUM VAN AFWISSELENDE RONDES, en dat is geen verfijning maar de enige
+     maat die hier werkt.
+
+     De suite draait vier toetsbestanden tegelijk, dus er is altijd iemand anders
+     op de CPU. Ruis telt alleen OPWAARTS: een ronde kan wel langer duren dan het
+     echte werk, nooit korter. Het minimum over een paar rondes is daarmee de
+     beste schatting van de werkelijke kosten.
+
+     Eén meting per kant was niet genoeg, en dat is hier echt misgegaan: los
+     gedraaid stond deze proef op 111x, maar in de volle suite mat hij 8,3x en
+     zakte hij. Niet omdat de index traag was -- de scan kost daar 2.400 ms en
+     overstemt de ruis, terwijl de index van 12 ms er volledig in verdrinkt. Twee
+     metingen die niet dezelfde ruis zien, geven geen verhouding maar een lot. */
   function meet(app, url) {
     for (let i = 0; i < 2000; i++) app._handle({ method: 'GET', url, params: {} }, res, () => {});  // opwarmen
-    const t0 = process.hrtime.bigint();
-    for (let i = 0; i < 8000; i++) app._handle({ method: 'GET', url, params: {} }, res, () => {});
-    return Number(process.hrtime.bigint() - t0) / 1e6;
+    let best = Infinity;
+    for (let r = 0; r < 5; r++) best = Math.min(best, ronde(app, url, 8000));
+    return best;
   }
   // een route in het MIDDEN van de tabel: daar deed de scan gemiddeld werk
   const url = traag.paden[Math.floor(STATISCH / 2)];
-  const msTraag = meet(traag.app, url);
-  const msSnel = meet(snel.app, url);
+  /* Afwisselend, zodat een piek in de belasting van de machine niet toevallig
+     helemaal op een van de twee kanten valt. */
+  let msTraag = Infinity, msSnel = Infinity;
+  for (let r = 0; r < 3; r++) {
+    msTraag = Math.min(msTraag, ronde(traag.app, url, 8000));
+    msSnel = Math.min(msSnel, ronde(snel.app, url, 8000));
+  }
   const factor = msTraag / msSnel;
   assert.ok(factor >= 15,
     'de index hoort minstens 15x sneller te zijn dan de scan; gemeten ' + factor.toFixed(1) + 'x ' +

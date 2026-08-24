@@ -51,7 +51,7 @@ const regel = (i) => ({ t: '2026-08-24T00:00:00.000Z', richting: 'in', wat: '/ap
 test('1. wat erin gaat komt er in dezelfde volgorde weer uit', () => {
   const map = verseMap();
   const b = maakJournaalbestand({ dir: map });
-  for (let i = 0; i < 50; i++) b.voegToe(regel(i));
+  for (let i = 0; i < 50; i++) b.noteerRegel(regel(i));
   b.spoelNu();
   const uit = b.lees(1000);
   assert.equal(uit.length, 50);
@@ -62,7 +62,7 @@ test('1. wat erin gaat komt er in dezelfde volgorde weer uit', () => {
 test('2. de laatste N regels, ook als er meer staan', () => {
   const map = verseMap();
   const b = maakJournaalbestand({ dir: map });
-  for (let i = 0; i < 200; i++) b.voegToe(regel(i));
+  for (let i = 0; i < 200; i++) b.noteerRegel(regel(i));
   b.spoelNu();
   const uit = b.lees(5);
   assert.deepEqual(uit.map(r => r.nr), [195, 196, 197, 198, 199], 'de NIEUWSTE vijf, oudste eerst');
@@ -74,7 +74,7 @@ test('3. het bestand roteert, en een geroteerd bestand blijft leesbaar', () => {
      weggooien". Het snoeien tot een begrensd aantal is een andere belofte en
      staat in de volgende toets; ze in een proef mengen maakt allebei onduidelijk. */
   const b = maakJournaalbestand({ dir: map, maxBytes: 1500, maxBestanden: 100 });
-  for (let i = 0; i < 200; i++) { b.voegToe(regel(i)); b.spoelNu(); }
+  for (let i = 0; i < 200; i++) { b.noteerRegel(regel(i)); b.spoelNu(); }
   const geroteerd = fs.readdirSync(map).filter(n => /^\d{13}\.log$/.test(n));
   assert.ok(geroteerd.length >= 1, 'er is geroteerd (' + geroteerd.length + ' bestanden)');
   /* De kern van deze toets: rotatie mag geen weggooien zijn. De oudste regel
@@ -87,7 +87,7 @@ test('3. het bestand roteert, en een geroteerd bestand blijft leesbaar', () => {
 test('4. de schijf blijft begrensd: nooit meer dan het afgesproken aantal bestanden', () => {
   const map = verseMap();
   const b = maakJournaalbestand({ dir: map, maxBytes: 800, maxBestanden: 3 });
-  for (let i = 0; i < 400; i++) { b.voegToe(regel(i)); b.spoelNu(); }
+  for (let i = 0; i < 400; i++) { b.noteerRegel(regel(i)); b.spoelNu(); }
   const geroteerd = fs.readdirSync(map).filter(n => /^\d{13}\.log$/.test(n));
   assert.ok(geroteerd.length <= 3, 'hooguit 3 geroteerde bestanden, gevonden: ' + geroteerd.length);
   assert.ok(b.lees(10).length > 0, 'en er is nog steeds iets te lezen');
@@ -99,7 +99,7 @@ test('5. een VERMINKTE regel wordt overgeslagen, niet gegooid', () => {
      het moment dat je het nodig hebt. */
   const map = verseMap();
   const b = maakJournaalbestand({ dir: map });
-  b.voegToe(regel(1)); b.voegToe(regel(2));
+  b.noteerRegel(regel(1)); b.noteerRegel(regel(2));
   b.spoelNu();
   fs.appendFileSync(path.join(map, 'huidig.log'), '{"t":"halve reg');   // afgekapt
   const b2 = maakJournaalbestand({ dir: map });
@@ -112,12 +112,19 @@ test('6. met een sleutel staat er cijfertekst op schijf, en is het toch te lezen
   const map = verseMap();
   const oud = process.env.RTG_ENC_KEY;
   process.env.RTG_ENC_KEY = 'a'.repeat(64);
-  for (const k of Object.keys(require.cache)) if (k.includes(path.join('server', 'kluis'))) delete require.cache[k];
-  delete require.cache[require.resolve('../server/kern/journaalbestand.js')];
+  /* De HELE journaalgroep uit de cache, niet alleen het hoofdbestand: de kluis
+     wordt ook door ./journaallezen.js vastgehouden, en een lezer die nog de oude
+     (sleutelloze) kluis draagt kan niet ontsleutelen wat de schrijver versleutelde.
+     Dat brak deze toets precies op het moment dat lezen een eigen module werd. */
+  const versKern = () => {
+    for (const k of Object.keys(require.cache))
+      if (/server[\/\\](kluis|kern[\/\\]journaal)/.test(k)) delete require.cache[k];
+  };
+  versKern();
   try {
     const mod = require('../server/kern/journaalbestand.js');
     const b = mod.maakJournaalbestand({ dir: map });
-    b.voegToe({ wat: '/api/geheim', wie: 'codenaam-42' });
+    b.noteerRegel({ wat: '/api/geheim', wie: 'codenaam-42' });
     b.spoelNu();
     const rauw = fs.readFileSync(path.join(map, 'huidig.log'), 'utf8');
     assert.ok(!rauw.includes('/api/geheim'), 'het pad staat NIET leesbaar op schijf');
@@ -126,8 +133,7 @@ test('6. met een sleutel staat er cijfertekst op schijf, en is het toch te lezen
     assert.equal(b.lees(10)[0].wat, '/api/geheim', 'en het is gewoon terug te lezen');
   } finally {
     if (oud === undefined) delete process.env.RTG_ENC_KEY; else process.env.RTG_ENC_KEY = oud;
-    for (const k of Object.keys(require.cache)) if (k.includes(path.join('server', 'kluis'))) delete require.cache[k];
-    delete require.cache[require.resolve('../server/kern/journaalbestand.js')];
+    versKern();
   }
 });
 
@@ -143,14 +149,14 @@ test('7. de rechten zijn besloten: map 0700, bestand 0600 -- op BEIDE schrijfweg
      verkeerde ding. */
   const sync = verseMap();
   const a = maakJournaalbestand({ dir: sync });
-  a.voegToe(regel(1)); a.spoelNu();
+  a.noteerRegel(regel(1)); a.spoelNu();
   assert.equal(fs.statSync(sync).mode & 0o777, 0o700, 'de map is alleen voor de eigenaar');
   assert.equal(fs.statSync(path.join(sync, 'huidig.log')).mode & 0o777, 0o600,
     'bestand via de synchrone spoeling (afsluiten)');
 
   const asyncMap = verseMap();
   const b = maakJournaalbestand({ dir: asyncMap, vensterMs: 10 });
-  b.voegToe(regel(1));
+  b.noteerRegel(regel(1));
   const pad = path.join(asyncMap, 'huidig.log');
   for (let i = 0; i < 100 && !fs.existsSync(pad); i++) await new Promise(r => setTimeout(r, 20));
   assert.ok(fs.existsSync(pad), 'de asynchrone spoeling heeft geschreven');
@@ -189,7 +195,7 @@ test('10. een journaal dat niet kan schrijven raakt het verzoek niet', () => {
      ENOTDIR. (Een pad onder /proc leek logischer maar laat mkdirSync in deze
      omgeving zelf hangen -- een onbruikbare proef, geen strengere.) */
   const b = maakJournaalbestand({ dir: '/dev/null/onmogelijk' });
-  assert.doesNotThrow(() => { b.voegToe(regel(1)); b.spoelNu(); }, 'schrijven gooit nooit');
+  assert.doesNotThrow(() => { b.noteerRegel(regel(1)); b.spoelNu(); }, 'schrijven gooit nooit');
   assert.doesNotThrow(() => b.lees(10), 'lezen ook niet');
   assert.deepEqual(b.lees(10), [], 'en het levert gewoon niets op');
 });

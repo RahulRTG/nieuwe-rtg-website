@@ -36,19 +36,14 @@
 const VENSTER = 4000;          // regels in het geheugen; genoeg voor een werkdag kijken
 const BEWAARD_MAX = 20000;     // harde bovengrens op schijf, los van de termijn
 
-/* IN BLOKKEN SNOEIEN, NIET PER REGEL -- en dat is geen detail.
-
-   Beide lijsten hierboven werden bijgehouden met `splice(0, 1)` zodra ze een
-   regel te lang waren. Een splice vooraan verschuift de HELE array: 4.000
-   verplaatsingen per verzoek op het venster, 20.000 op het bewaarde deel, om
-   EEN regel weg te halen. In het CPU-profiel van 24 augustus 2026 was dit
-   daarmee de duurste functie van de hele applicatie (zie PRESTATIES.md).
-
-   De grens blijft precies wat hij was -- de lijst gaat NOOIT over het maximum
-   heen. Het verschil is dat we bij overschrijding een BLOK ineens weghalen en
-   dus onder het maximum uitkomen, in plaats van er telkens exact op te gaan
-   zitten. Het venster houdt daardoor tussen de 3.800 en 4.000 regels; het scherm
-   leest er `slice(-n)` uit met een n die daar ver onder ligt. */
+/* IN BLOKKEN SNOEIEN, NIET PER REGEL. Het venster werd bijgehouden met
+   `splice(0, 1)` zodra het een regel te lang was, en een splice vooraan
+   verschuift de HELE array: 4.000 verplaatsingen per verzoek om er een weg te
+   halen. In het CPU-profiel was dit de duurste functie van de applicatie
+   (PRESTATIES.md). De grens blijft wat hij was -- de lijst gaat nooit over het
+   maximum -- maar bij overschrijding gaat er een BLOK ineens af, zodat het
+   snoeien geamortiseerd niets kost. Het venster houdt daardoor tussen de 3.800
+   en 4.000 regels; het scherm leest er `slice(-n)` uit met een veel kleinere n. */
 const BLOK = (max) => Math.max(1, Math.floor(max * 0.05));
 const VENSTER_BLOK = BLOK(VENSTER);
 const BEWAARD_BLOK = BLOK(BEWAARD_MAX);
@@ -132,18 +127,17 @@ function maakDoorgeefjournaal({ db, save, nu, bestand }) {
       if (boek) {
         /* Naar het bestand: een push op een stapel die later gespoeld wordt.
            Geen snoeien, geen save() -- het bestand roteert zichzelf. */
-        boek.voegToe(regel);
+        boek.noteerRegel(regel);
         return regel;
       }
       const lijst = rij();
       lijst.push(regel);
       snoei(lijst, BEWAARD_MAX, BEWAARD_BLOK);
-      /* Dit is het TERUGVALPAD: zonder bestand blijft het journaal een collectie.
-         Dan geldt nog steeds: niet bij elke regel save(), want het journaal is
-         dan een blob in een rij en elke save serialiseert de hele lijst opnieuw.
-         Erger dan traag was dat een willekeurige bezoeker met een GET naar een
-         onbekend pad een schijfschrijving kon afdwingen -- de enige plek in het
-         huis waar dat kon. Vandaar hooguit een spoeling per seconde. */
+      /* TERUGVALPAD: zonder bestand blijft het journaal een collectie. Dan
+         geldt nog steeds niet-bij-elke-regel-save(), want dan serialiseert elke
+         save de hele lijst opnieuw -- en kon een vreemde met een GET naar een
+         onbekend pad een schijfschrijving afdwingen. Vandaar de rem van een
+         seconde. */
       if (regel.mislukt) plan();
     }
     return regel;

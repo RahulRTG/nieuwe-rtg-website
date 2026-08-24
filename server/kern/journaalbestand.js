@@ -4,41 +4,28 @@
    WAAROM DIT ER IS. Het doorgeefjournaal woonde in db.data.doorgeefjournaal:
    een array van 20.000 regels, dus een blob in een rij van de opslag. Elke save()
    ergens in de applicatie serialiseerde die hele lijst opnieuw om er een regel
-   bij te zetten -- 3,6 MB voor 200 byte nieuwe gegevens, gemiddeld 32,9 ms met
-   een piek van 101 ms, synchroon op de event-loop. De meting staat voluit in
-   PRESTATIES.md.
+   bij te zetten -- gemiddeld 32,9 ms met een piek van 101 ms, synchroon op de
+   event-loop. De meting staat in PRESTATIES.md.
 
-   Het probleem is niet de omvang maar de VORM. Verandering opsporen in de
-   opslaglaag gebeurt door te serialiseren en te vergelijken; voor een lijst die
-   alleen aangroeit is dat elke keer hetzelfde werk voor dezelfde 19.999 regels.
-   Een logboek hoort niet in een toestandscollectie maar in een bestand waar je
-   achteraan schrijft -- en dat levert bovendien MEER geschiedenis op (vijf
-   bestanden van 2 MB tegen een blob van 20.000 regels), voor minder kosten.
+   Het probleem is niet de omvang maar de VORM. Verandering opsporen gebeurt door
+   te serialiseren en te vergelijken; voor een lijst die alleen aangroeit is dat
+   elke keer hetzelfde werk voor dezelfde 19.999 regels. Een logboek hoort in een
+   bestand waar je achteraan schrijft -- en dat geeft bovendien MEER geschiedenis
+   (vijf bestanden van 2 MB tegen een blob van 20.000 regels) voor minder kosten.
 
    VIJF KEUZES DIE ERTOE DOEN
 
-   1. NOOIT SYNCHROON SCHRIJVEN OP HET VERZOEKPAD. server/routelog.js mag
-      appendFileSync gebruiken: die draait alleen in een testrun, hooguit eens
-      per routepatroon. Hier komt er een regel per verzoek, dus een synchrone
-      schrijfactie zou het middel erger maken dan de kwaal. Regels worden
-      verzameld en asynchroon gespoeld.
-
-   2. EEN KAPOT JOURNAAL MAG NOOIT EEN VERZOEK RAKEN. Elke fout wordt opgevangen
-      en een keer gemeld. Een logboek dat de server omtrekt is zelf de storing.
-
-   3. GEROTEERD EN BEGRENSD. Over MAX_BYTES schuift het actieve bestand weg;
-      er blijven hooguit MAX_BESTANDEN staan. Zo is de schijf begrensd zonder een
-      tweede opruimmechanisme naast server/bewaarveger.js.
-
-   4. VERSLEUTELD PER REGEL. Met RTG_ENC_KEY apart per regel (kluis.versleutel
-      levert "RTGENC1:<base64>", dus zonder nieuwe regels) -- niet per bestand,
-      want dan kun je er niet meer achteraan schrijven zonder het geheel opnieuw
-      te versleutelen, en dan ben je terug bij het probleem hierboven.
-
-   5. EEN VERMINKTE REGEL IS GEEN RAMP. Een halve regel na een stroomstoring
-      wordt bij het lezen overgeslagen en geteld, niet gegooid. Meerdere
-      processen mogen in hetzelfde bestand schrijven (O_APPEND), dezelfde
-      afweging als in server/routelog.js.
+   1. NOOIT SYNCHROON OP HET VERZOEKPAD. server/routelog.js mag appendFileSync
+      gebruiken (alleen in een testrun, eens per routepatroon); hier komt er een
+      regel per verzoek. Regels worden verzameld en asynchroon gespoeld.
+   2. EEN KAPOT JOURNAAL RAAKT NOOIT EEN VERZOEK. Elke fout wordt opgevangen en
+      een keer gemeld. Een logboek dat de server omtrekt is zelf de storing.
+   3. GEROTEERD EN BEGRENSD (./journaalrotatie.js), zodat de schijf begrensd is
+      zonder een tweede opruimmechanisme naast server/bewaarveger.js.
+   4. VERSLEUTELD PER REGEL, niet per bestand -- anders kun je er niet meer
+      achteraan schrijven zonder het geheel opnieuw te versleutelen.
+   5. EEN VERMINKTE REGEL WORDT OVERGESLAGEN EN GETELD, niet gegooid. Meerdere
+      processen mogen in hetzelfde bestand schrijven (O_APPEND).
 
    WAT HIER NIET IN STAAT: hetzelfde als in het journaal zelf -- geen naam, geen
    e-mailadres, geen telefoonnummer, geen token. Wie er iets deed staat op
@@ -119,8 +106,11 @@ function maakJournaalbestand({ dir, nu, maxBytes, maxBestanden, vensterMs, stape
     if (spoelt.unref) spoelt.unref();
   }
 
-  /* Een regel toevoegen. Kost een push; de schijf komt later. */
-  function voegToe(regel) {
+  /* Een regel noteren: een push, de schijf komt later. Hij heette voegToe(), en
+     die naam staat ook in kern/mall/lijsten.js en kern/wereld/lijsten.js -- drie
+     keer dezelfde naam voor iets anders is waar de keuringsregel over dubbeling
+     voor waarschuwt. Een journaal NOTEERT; een lijst voegt toe. */
+  function noteerRegel(regel) {
     if (stuk) return false;
     stapel.push(regel);
     if (stapel.length >= STAPEL) spoel(); else plan();
@@ -142,57 +132,13 @@ function maakJournaalbestand({ dir, nu, maxBytes, maxBestanden, vensterMs, stape
     } catch (e) { meldEens(e); return 0; }
   }
 
-  /* Regels uit één bestand. Een regel die niet te lezen is (halve schrijfactie
-     bij stroomuitval, of een sleutel die niet past) wordt overgeslagen en
-     geteld -- niet gegooid. */
-  function uitBestand(naam) {
-    let tekst;
-    try { tekst = fs.readFileSync(pad(naam), 'utf8'); } catch (e) { return []; }
-    const uit = [];
-    for (const regel of tekst.split('\n')) {
-      if (!regel) continue;
-      try { uit.push(JSON.parse(kluis.ontsleutel(regel))); }
-      catch (e) { overgeslagen++; }
-    }
-    return uit;
-  }
-
-  /* De laatste `max` regels, oudste eerst -- dezelfde volgorde als de array die
-     hier vroeger stond, zodat het leespad erboven niet hoeft te weten dat dit
-     veranderd is. Er wordt van nieuw naar oud gelezen en gestopt zodra er
-     genoeg is, dus een vol journaal kost niet meer dan een leeg. */
-  function lees(max) {
-    const grens = Math.max(1, Number(max) || 1000);
-    let uit = stapel.slice();                       // wat nog niet gespoeld is
-    if (uit.length < grens) {
-      const bestanden = [HUIDIG].concat(oudeBestanden());
-      for (const n of bestanden) {
-        uit = uitBestand(n).concat(uit);
-        if (uit.length >= grens) break;
-      }
-    }
-    return uit.slice(-grens);
-  }
-
-  /* Hoeveel regels staan er? Nieuwe regels tellen kost een leesronde, dus het
-     antwoord wordt kort vastgehouden: dit voedt een scherm, geen beslissing. */
-  let telWaarde = null, telTijd = 0;
-  function aantal() {
-    if (telWaarde !== null && klok() - telTijd < 10000) return telWaarde + stapel.length;
-    let n = 0;
-    for (const naam of [HUIDIG].concat(oudeBestanden())) {
-      try {
-        const t = fs.readFileSync(pad(naam), 'utf8');
-        for (let i = 0; i < t.length; i++) if (t.charCodeAt(i) === 10) n++;
-      } catch (e) { /* weg is nul */ }
-    }
-    telWaarde = n; telTijd = klok();
-    return n + stapel.length;
-  }
+  const { lees, aantal } = require('./journaallezen').maakLezer({
+    pad, huidig: HUIDIG, oudeBestanden, klok,
+    stapel: () => stapel, telOvergeslagen: () => { overgeslagen++; } });
 
   const stand = () => ({ geschreven, overgeslagen, wachtend: stapel.length, stuk, map });
 
-  return { voegToe, lees, aantal, spoelNu, stand, maxBytes: GRENS_BYTES, maxBestanden: GRENS_BESTANDEN };
+  return { noteerRegel, lees, aantal, spoelNu, stand, maxBytes: GRENS_BYTES, maxBestanden: GRENS_BESTANDEN };
 }
 
 /* HET STANDAARDJOURNAAL. Staat hier en niet bij de aanroeper, om twee redenen:

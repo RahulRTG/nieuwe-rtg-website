@@ -19,7 +19,7 @@ function verhuisOude({ db, save, boek }) {
   const oud = db.data && db.data.doorgeefjournaal;
   if (!Array.isArray(oud) || !oud.length) return 0;
   let n = 0;
-  for (const r of oud) if (boek.voegToe(r)) n++;
+  for (const r of oud) if (boek.noteerRegel(r)) n++;
   /* EERST BEWIJZEN DAT HET GESCHREVEN IS, DAN PAS WEGGOOIEN. Hier stond
      `spoelNu(); delete ...` zonder naar de uitkomst te kijken: een volle
      schijf maakte daarmee van een verhuizing een VERWIJDERING, en niets dat

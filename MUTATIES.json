@@ -2102,6 +2102,14 @@
       "operator": "===->!==",
       "gezakt": 8
     },
+    "journaalbestand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/journaalbestand.js",
+      "operator": "getal+1#7",
+      "gezakt": 1,
+      "geprobeerd": 17
+    },
     "journaalschrijf.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2617,6 +2625,14 @@
       "staat": "gezakt",
       "module": "server/log.js",
       "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "logstroom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/techniek.js",
+      "operator": "<=-><#0",
       "gezakt": 1,
       "geprobeerd": 3
     },
@@ -4475,6 +4491,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "routerindex.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/routing.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "rtf-veilig.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5878,6 +5902,14 @@
       "operator": "return-weg#0",
       "gezakt": 2,
       "geprobeerd": 4
+    },
+    "toegangprefix.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/register/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "toegankelijk.test.js": {
       "soort": "server",

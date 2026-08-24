@@ -3,6 +3,7 @@
    laag) en de sollicitatiechat. Gemount vanuit routes/supplier/werving.js. */
 const { eigenVeld } = require('../../../kern/util');
 const { datum: klokDatum } = require('../../../lib/klok');
+const { vulVacature } = require('./vacature');
 module.exports = (wctx) => {
   const { kern, maakKassacode, invitesVan, findSupplierByName, maakInvite, neemAan, wervingsLink } = wctx;
   const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
@@ -103,39 +104,14 @@ app.post('/api/supplier/apply/chat/send', supplierAuth, (req, res) => {
 app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const b = req.body || {};
-  const func = String(b.func || '').trim().slice(0, 60);
-  if (!func) return res.status(400).json({ error: 'Geef de functie een naam.' });
-  let minLeeftijd = parseInt(b.minLeeftijd, 10);
-  if (!Number.isFinite(minLeeftijd) || minLeeftijd < 16) minLeeftijd = 16; // solliciteren mag vanaf 16
-  if (minLeeftijd > 99) minLeeftijd = 99;
-  const soort = VAC_SOORTEN.includes(b.soort) ? b.soort : 'bijbaan';
   const list = db.data.vacatures[req.supplier.code] = (db.data.vacatures[req.supplier.code] || []);
   const bestaand = b.id ? list.find(v => v.id === b.id) : null;
   const vac = bestaand || { id: crypto.randomBytes(4).toString('hex'), at: new Date().toISOString() };
-  vac.func = func;
-  vac.omschrijving = String(b.omschrijving || '').trim().slice(0, 500);
-  vac.plaats = String(b.plaats || '').trim().slice(0, 60);
-  vac.uren = String(b.uren || '').trim().slice(0, 40);
-  const salarisMin = Number(b.salarisMin);
-  const salarisMax = Number(b.salarisMax);
-  const nieuwSalarisMin = Number.isFinite(salarisMin) && salarisMin > 0 ? Math.min(1000000, Math.round(salarisMin)) : null;
-  const nieuwSalarisMax = Number.isFinite(salarisMax) && salarisMax > 0 ? Math.min(1000000, Math.round(salarisMax)) : null;
-  if (nieuwSalarisMin && nieuwSalarisMax && nieuwSalarisMax < nieuwSalarisMin)
-    return res.status(400).json({ error: 'Het maximale salaris moet gelijk aan of hoger dan het minimum zijn.' });
-  vac.salarisMin = nieuwSalarisMin;
-  vac.salarisMax = nieuwSalarisMax;
-  vac.valuta = ['EUR','GBP','USD','JPY'].includes(String(b.valuta||'').toUpperCase()) ? String(b.valuta).toUpperCase() : 'EUR';
-  vac.werkvorm = ['op-locatie','hybride','op-afstand','flexibel'].includes(b.werkvorm) ? b.werkvorm : null;
-  vac.vaardigheden = (Array.isArray(b.vaardigheden) ? b.vaardigheden : String(b.vaardigheden||'').split(','))
-    .map(x => String(x||'').trim().slice(0,40)).filter(Boolean).slice(0,12);
-  vac.voordelen = (Array.isArray(b.voordelen) ? b.voordelen : String(b.voordelen||'').split(','))
-    .map(x => String(x||'').trim().slice(0,60)).filter(Boolean).slice(0,10);
-  vac.soort = soort;
-  vac.minLeeftijd = minLeeftijd;
-  vac.open = b.open !== false;
+  const ingevuld = vulVacature(vac, b, VAC_SOORTEN);
+  if (ingevuld.error) return res.status(400).json({ error: ingevuld.error });
   if (!bestaand) { list.unshift(vac); db.data.vacatures[req.supplier.code] = list.slice(0, 40); }
   save();
-  logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + func);
+  logActivity(req.supplier.code, req.actor, (bestaand ? 'wijzigde de vacature ' : 'plaatste een vacature ') + ingevuld.func);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
   res.json({ ok: true, vacatures: (db.data.vacatures[req.supplier.code] || []).slice(0, 40) });
 });

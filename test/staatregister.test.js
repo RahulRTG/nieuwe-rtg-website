@@ -70,6 +70,40 @@ test('new Date(x) is geen kloklezing, new Date() wel', () => {
   assert.notEqual(k.datumLezing, k.datumLezing + k.datumBouw, 'de twee horen apart geteld te worden');
 });
 
+/* EEN NAAM DIE EEN GETAL VASTHOUDT, IS EEN GETAL.
+
+   De duurmeter telde `Date.now() - OUD_MS` als een duurmeting op de wandklok,
+   terwijl OUD_MS in datzelfde bestand `7 * 864e5` is -- kalenderrekenen, dat
+   juist WEL op de wandklok hoort. Hetzelfde bij `Date.now() - basis` waar basis
+   een regel eerder `new Date(m.at).getTime()` kreeg: de leeftijd van een bewaard
+   moment, en die kan per definitie niet monotoon zijn.
+
+   Zeven van de zesendertig getelde plekken waren zulke gevallen. Dat is geen
+   detail: een meter die te veel telt kan zijn nul nooit halen, en een meter die
+   zijn nul niet kan halen wordt op een dag uitgezet -- en dan bewaakt hij niets
+   meer. Eerst waar maken, dan pas omlaag brengen. */
+test('de duurmeter kijkt door een const heen naar wat er in staat', () => {
+  const tel = (bron) => scanBestand(bron, 'p.js').duurOpWandklok;
+
+  assert.equal(tel('const OUD = 7 * 864e5;\nconst g = Date.now() - OUD;\n'), 0,
+    'een naam die een getallenberekening vasthoudt is kalenderrekenen en hoort op de wandklok');
+  assert.equal(tel('function f(m){ const basis = new Date(m.at).getTime(); return Date.now() - basis; }\n'), 0,
+    'een naam die een BEWAARD moment vasthoudt kan niet monotoon; die hoort niet geteld te worden');
+
+  /* En de andere kant, want een meter die niets meer telt is ook stuk. */
+  assert.equal(tel('const t0 = Date.now();\nfunction d(){ return Date.now() - t0; }\n'), 1,
+    'een naam die een MERK in dit proces vasthoudt is wel degelijk een duurmeting');
+  assert.equal(tel('function d(m){ return Date.now() - m; }\n'), 1,
+    'een los merk als parameter telt gewoon mee');
+
+  /* Twee consts met dezelfde naam in verschillende functies: dan weten we niet
+     welke bedoeld is. Liever een keer te veel geteld dan een keer ten onrechte
+     weggestreept -- een meter mag zichzelf niet mooier maken dan hij is. */
+  assert.equal(tel('function a(){ const x = 5; return Date.now() - x; }\n' +
+                   'function b(m){ const x = m.at; return Date.now() - x; }\n'), 2,
+    'bij een dubbelzinnige naam hoort de meter NIET op te lossen');
+});
+
 test('de eigenaar is de map waarin de wortel woont', () => {
   assert.equal(eigenaarVan('server/kern/lid.js'), 'server/kern');
   assert.equal(eigenaarVan('server/db/tx/ledger.js'), 'server/db');

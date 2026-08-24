@@ -182,6 +182,38 @@ function scanBestand(bron, relPad) {
      Zulke wortels zijn `bootvast`: ze kosten geen serverstart, want er valt niets
      te herstellen. Wordt er ook binnen een functie geschreven, dan kan het na de
      boot nog bewegen en moet een mens zeggen wat dat betekent. */
+  /* EEN NAAM DIE EEN GETAL VASTHOUDT, IS EEN GETAL.
+
+     Deze meter telde `Date.now() - OUD_MS` als een duurmeting op de wandklok,
+     terwijl OUD_MS in datzelfde bestand `7 * 864e5` is -- kalenderrekenen dus,
+     dat juist WEL op de wandklok hoort. Hetzelfde bij `Date.now() - basis` waar
+     basis een regel eerder `new Date(m.at).getTime()` kreeg: de leeftijd van een
+     bewaard moment, en die kan per definitie niet monotoon.
+
+     De controles hieronder keken naar de UITDRUKKING en niet naar wat een naam
+     vasthoudt, dus die twee vormen telden mee. Een meter die te veel telt kan
+     zijn nul nooit halen, en een meter die zijn nul niet kan halen wordt
+     uitgezet -- dan bewaakt hij niets meer. Vandaar deze opzoeking: een
+     identifier die in DIT bestand aan een const hangt, wordt een niveau diep
+     vervangen door zijn beginwaarde.
+
+     Alleen bij een EENDUIDIGE naam. Staan er twee consts met dezelfde naam in
+     verschillende functies, dan weten we niet welke bedoeld is en laten we hem
+     staan -- liever een keer te veel geteld dan een keer ten onrechte
+     weggestreept. */
+  const constWaarde = new Map();
+  const dubbel = new Set();
+  loop(boom, (k) => {
+    if (k.type !== 'VariableDeclaration' || k.kind !== 'const') return;
+    for (const d of k.declarations || []) {
+      if (!d.id || d.id.type !== 'Identifier' || !d.init) continue;
+      if (constWaarde.has(d.id.name)) dubbel.add(d.id.name);
+      else constWaarde.set(d.id.name, d.init);
+    }
+  });
+  const losOp = (k) => (k && k.type === 'Identifier' && constWaarde.has(k.name) && !dubbel.has(k.name))
+    ? constWaarde.get(k.name) : k;
+
   const gemuteerd = new Set();
   const gemuteerdNaLaden = new Set();
   const klok = { datumLezing: 0, datumBouw: 0, dateNow: 0, hrtime: 0, perf: 0 };
@@ -241,7 +273,7 @@ function scanBestand(bron, relPad) {
       if ((n.arguments || []).length) klok.datumBouw++; else klok.datumLezing++;
     }
     if (n.type === 'BinaryExpression' && n.operator === '-' && (isDateNow(n.left) || isDateNow(n.right))) {
-      const ander = isDateNow(n.left) ? n.right : n.left;
+      const ander = losOp(isDateNow(n.left) ? n.right : n.left);
       // alleen wat ECHT naar de monotone klok kan: geen kalenderrekenen, en niet
       // de leeftijd van een moment dat in de opslag staat
       if (!alleenGetallen(ander) && !kalenderafstand(ander) && !bewaardMoment(ander)) duurOpWandklok++;

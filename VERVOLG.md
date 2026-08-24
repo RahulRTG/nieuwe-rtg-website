@@ -260,14 +260,17 @@ Er staan nu vijf emmers onder de oude ondergrens.
 **Meer kernen benutten.** Onderzocht en gemeten, niet gebouwd — zie
 `docs/meerkernig.md`. Kort: drie schrijvende processen delen probleemloos één
 SQLite-store, en een sessie van proces A is meteen geldig op proces B (12 van 12,
-0 ms, dankzij de Redis-bus). Maar read-your-writes breekt: een lid ziet zijn eigen
-zojuist opgeslagen notitie op het andere proces pas na 733 ms (mediaan). En de
-winst is er niet: twee processen op een GEDEELDE store halen 8.589/s, dezelfde
-twee op een EIGEN store 11.379/s. Niet de kernen begrenzen de schaal maar het
-gedeelde schrijfpad. Volgorde die eruit volgt: eerst een opslag die echt
-gelijktijdig schrijft (`STORE=postgres` bestaat al), dan sticky routing op de
-sessie, en pas dan verkeer verdelen — op een machine met meer kernen dan het
-experiment processen heeft.
+0 ms, dankzij de Redis-bus). Twee processen op een gedeelde store schalen sinds
+de journaalverhuizing 1,5x (8.586 → 12.894/s) zonder dat de staart eronder lijdt;
+vóór die verhuizing was dat 7.386 → 8.589/s met een p99 die van 51 naar 123 ms
+ging. De rem zat dus niet in SQLite maar in de blob die er per verzoek in werd
+geschreven. Postgres levert daar bovenop +7% doorvoer en −21% p99 (13.760/s, p99
+18,1 ms), maar is geen voorwaarde meer. Wat wél breekt is read-your-writes: een
+lid ziet zijn eigen zojuist opgeslagen notitie op het andere proces pas na 733 ms
+(mediaan) op SQLite, en na 140 ms op Postgres — kleiner, niet nul. Volgorde die
+eruit volgt: eerst sticky routing op de sessie, dan verkeer verdelen (op een
+machine met meer kernen dan het experiment processen heeft), en de opslagkeuze
+als inrichtingsbeslissing daarnaast.
 
 **De streefwaarden in `SLO.md`.** Die staan er nog zoals ze gekozen zijn (p90 <
 250 ms, p99 < 1 s) en zijn nu aantoonbaar meer dan duizend keer ruimer dan wat

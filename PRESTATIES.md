@@ -397,29 +397,37 @@ de uitleg weg te halen, want die is het duurst verworven deel:
 | `server/kern/journaalvorm.js` | `padVorm`/`bestemmingVorm`, ook los gebruikt door `log.js` |
 | `server/kern/journaalverhuizing.js` | de eenmalige verhuizing uit de database |
 
-## Meer kernen benutten: onderzocht, en het antwoord is niet "meer processen"
+## Meer kernen benutten: onderzocht, en de volgorde is anders dan gedacht
 
 Na het bovenstaande draait een proces op ~5.000 verzoeken per seconde en staan
 er in het failover-trio twee servers standby niets te doen. De volgende stap
 lijkt dus verkeer verdelen. Dat is onderzocht en gemeten, en de uitkomst staat
-in `docs/meerkernig.md`. Kort:
+in `docs/meerkernig.md` -- inclusief de nameting die de eerste conclusie van dat
+document onderuit haalde. Kort:
 
 - **Wat al werkt:** drie schrijvende processen delen probleemloos één
   SQLite-store (nul lock-fouten), en een sessie van proces A is meteen geldig op
   proces B (12 van 12, 0 ms) — de Redis-bus in `kern/sessies.js` doet zijn werk.
-- **Wat breekt:** read-your-writes. Een lid dat een notitie opslaat op proces A
-  ziet hem op proces B pas na de kruisprocespoll: 0 van 10 meteen zichtbaar,
-  mediaan 733 ms.
-- **En de winst is er niet:** twee processen op een GEDEELDE store halen
-  8.589/s met een p99 van 122,8 ms; diezelfde twee processen op een EIGEN store
-  halen 11.379/s met een p99 van 49,2 ms. Niet de kernen begrenzen de schaal
-  maar het gedeelde schrijfpad -- en dat is logisch bij 8.113 POST-routes die
-  allemaal via één `BEGIN IMMEDIATE` gaan.
+- **Twee processen schalen nu wél, en dat was eerder niet zo.** Vóórdat het
+  journaal naar een eigen bestand ging, haalden twee processen op een GEDEELDE
+  store 8.589/s met een p99 van 122,8 ms -- nauwelijks winst en een staart die
+  tweeënhalf keer slechter werd. Ná die verhuizing is het 12.894/s met een p99
+  van 23,0 ms: 1,5x op twee processen, met een staart die niet verslechtert. De
+  rem zat niet in SQLite maar in de blob die wij er per verzoek in schreven.
+- **Postgres is daarmee geen voorwaarde meer, wel een verbetering:** op twee
+  processen 13.760/s met een p99 van 18,1 ms (+7% doorvoer, −21% p99 tegenover
+  gedeelde SQLite), plus gedeelde accounts via `server/pgaccounts.js`. Op één
+  proces is het juist iets langzamer (−9%): daar betaal je alleen de socket.
+- **Wat blijft breken:** read-your-writes. Een lid dat een notitie opslaat op
+  proces A ziet hem op proces B pas na de kruisprocespoll: 0 van 10 meteen
+  zichtbaar, mediaan 733 ms op SQLite. Op Postgres is dat venster vijf keer
+  kleiner (mediaan 139-141 ms) maar nog steeds niet nul, want de
+  write-behind-cache blijft in het geheugen staan.
 
-De volgorde is dus eerst een opslag die echt gelijktijdig schrijft (Postgres,
-bestaat al) en sticky routing op de sessie, en pas daarna verkeer verdelen. Die
-laatste stap is op een machine met vier kernen en een meedraaiende
-belastingsgenerator sowieso niet eerlijk te meten.
+De volgorde is dus: eerst sticky routing op de sessie -- het enige dat
+read-your-writes echt sluit -- dan verkeer verdelen, en de opslagkeuze als
+inrichtingsbeslissing daarnaast. Die middelste stap is op een machine met vier
+kernen en een meedraaiende belastingsgenerator sowieso niet eerlijk te meten.
 
 ## Browserstart
 

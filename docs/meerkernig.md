@@ -9,8 +9,10 @@ gebruikt er één voor JavaScript, en het failover-trio (`server/trio.js`) zet t
 van de drie servers als **standby** — die staan dus niets te doen. De voor de hand
 liggende volgende stap is: verdeel het verkeer, gebruik alle kernen.
 
-**Die stap levert op deze codebase geen winst zolang de processen dezelfde
-opslag delen.** Dat is de kern van dit document.
+**Die stap leverde op deze codebase geen winst zolang de processen dezelfde
+opslag deelden.** Dat wás de kern van dit document — en later diezelfde dag klopte
+het niet meer. De metingen staan hieronder in de volgorde waarin ze gedaan zijn;
+lees de nameting verderop erbij vóór je er een besluit op baseert.
 
 ## Wat er al wél is, en dat is meer dan verwacht
 
@@ -91,29 +93,96 @@ processen geven N keer zoveel" is op deze machine **niet te meten**, in geen van
 beide richtingen. Daar is een machine voor nodig met meer kernen dan het
 experiment processen heeft, en een belastingsgenerator die er niet op meedraait.
 
+En hij bleek nóg minder te zeggen dan dat: lees de volgende paragraaf voordat je
+op deze conclusie afgaat.
+
+## Nagemeten, later op dezelfde dag — en de conclusie hierboven klopt niet meer
+
+De metingen hierboven zijn gedaan vóórdat het journaal naar een eigen bestand ging
+(`server/kern/journaalbestand.js`). Dat is precies de blob die de gedeelde store
+op slot hield: elk verzoek schreef een regel in `db.data.doorgeefjournaal`, dus
+elk verzoek nam met `BEGIN IMMEDIATE` de exclusieve schrijflock. Sinds die regel
+naar een append-only bestand gaat, schrijft een gewoon verzoek helemaal niet meer
+in de gedeelde store.
+
+Dezelfde last, dezelfde machine, vier opstellingen achter elkaar (2 clientprocessen,
+2.064 echte routes, 24 gelijktijdige verzoeken per client, 20 seconden):
+
+| Opstelling | Doorvoer | p50 | p99 |
+|---|---:|---:|---:|
+| 1 proces, SQLite | 8.586/s | 4,07 ms | 22,2 ms |
+| 1 proces, Postgres | 7.851/s | 4,55 ms | 23,5 ms |
+| 2 processen, **gedeelde** SQLite | 12.894/s | 2,22 ms | 23,0 ms |
+| 2 processen, **gedeelde** Postgres | 13.760/s | 2,23 ms | **18,1 ms** |
+
+Daar staan twee dingen tegelijk in.
+
+**Gedeelde SQLite schaalt nu wél.** 8.586 → 12.894/s is 1,5x op twee processen,
+en de staart wordt niet slechter maar iets beter. In de tabel hierboven was dat
+7.386 → 8.589/s met een staart die van 51 naar 123 ms ging. De rem zat niet in
+SQLite maar in wat wij erin schreven.
+
+**Postgres is daarmee geen voorwaarde meer, maar een verbetering.** Op één proces
+is Postgres iets langzamer dan SQLite (−9% doorvoer; er gaat een socket en een
+wire-protocol tussen). Op twee processen draait dat om: +7% doorvoer en −21% op
+de p99 ten opzichte van gedeelde SQLite. Dat is precies het patroon dat je
+verwacht van een opslag die niet op één bestandslock serialiseert — alleen is het
+verschil nu een marge en geen orde van grootte.
+
+### En read-your-writes op Postgres
+
+Dezelfde proef als hierboven, twee keer gedraaid, op een schone opstelling:
+
+| | SQLite | Postgres |
+|---|---:|---:|
+| Sessie geldig op het andere proces | 0 ms | 0 ms |
+| Meteen zichtbaar | 0 van 10 | 0 van 10 |
+| Mediaan | 733 ms | **139–141 ms** |
+| Maximum | 787 ms | 169–200 ms |
+
+Vijf keer kleiner venster, maar **niet nul**. Postgres heeft `LISTEN/NOTIFY`, dus
+het andere proces hoort er meteen van; wat overblijft is de write-behind-cache in
+het geheugen plus de tijd om de melding te verwerken. Dat was de open vraag in de
+oude stap 1 hieronder, en het antwoord is: nee, die cache verdwijnt er niet mee.
+Een lid dat op proces A bewaart en binnen ~140 ms op proces B leest, ziet zijn
+eigen notitie nog steeds niet staan.
+
+**Sticky routing blijft dus nodig** — niet als optimalisatie, maar als de enige
+van de drie stappen die read-your-writes echt sluit.
+
+### Een valkuil die twee metingen kostte
+
+`RTG_DEMO=1` met twee instanties op één database is geen geldige opstelling: het
+opstarten van de tweede zet het wachtwoord van de eigenaar opnieuw, en het eerste
+proces heeft dat dan nog in zijn cache staan — waarna inloggen op het ene proces
+lukt en op het andere 401 geeft. Twee metingen zijn daarop gesneuveld voordat het
+opviel. De demo-zaaier hoort niet in een meeropstelling thuis.
+
 ## De volgorde die hieruit volgt
+
+_Bijgesteld na de nameting hierboven: stap 1 en stap 3 zijn van plaats gewisseld._
 
 Niet "verdeel het verkeer". Wel, op deze volgorde:
 
-1. **Een opslag die echt gelijktijdig schrijft.** `STORE=postgres` bestaat al in
-   deze codebase (`server/db/postgres.js`, write-behind met `DATABASE_URL`).
-   Postgres serialiseert niet op één schrijflock per bestand. Dit is de
-   voorwaarde, niet een optimalisatie achteraf: zonder dit levert stap 3 niets.
-   Let op dat de write-behind-cache in het geheugen blijft bestaan, dus punt 2
-   verdwijnt hier niet vanzelf mee — dat moet apart nagemeten worden.
-2. **Sticky routing op de sessie.** Het trio proxyt al per verzoek
-   (`server/trio.js`), dus een lid consequent naar hetzelfde proces sturen is
-   een kleine ingreep op een bestaande laag. Dat lost read-your-writes op zonder
-   dat er ook maar iets aan de opslag hoeft te veranderen, en het valt netjes
-   terug op een ander proces als er een omvalt — de sessie blijft immers geldig
-   (de bus doet zijn werk, zie boven).
-3. **Pas dan verkeer verdelen**, en meten op een machine waar het te meten valt.
+1. **Sticky routing op de sessie.** Nu de eerste stap, want dit is het enige dat
+   read-your-writes echt sluit — op SQLite (733 ms) én op Postgres (140 ms). Het
+   trio proxyt al per verzoek (`server/trio.js`), dus een lid consequent naar
+   hetzelfde proces sturen is een kleine ingreep op een bestaande laag, en het
+   valt netjes terug op een ander proces als er een omvalt: de sessie blijft
+   immers geldig (de bus doet zijn werk, zie boven).
+2. **Verkeer verdelen**, en meten op een machine waar het te meten valt. Dit mag
+   nu vóór de opslagkeuze: gedeelde SQLite schaalt 1,5x op twee processen zonder
+   dat de staart eronder lijdt.
+3. **Een opslag die echt gelijktijdig schrijft.** Geen voorwaarde meer, wel een
+   verbetering. `STORE=postgres` bestaat al in deze codebase
+   (`server/db/postgres.js`, write-behind met `DATABASE_URL`) en levert op twee
+   processen +7% doorvoer en −21% p99, plus gedeelde accounts via
+   `server/pgaccounts.js` (LISTEN/NOTIFY). Daar staat het beheer van een Postgres
+   tegenover. Een inrichtingsbeslissing dus, geen blokkade.
 
-Stap 2 is los van stap 1 en 3 nuttig en klein. Stap 1 is een
-inrichtingsbeslissing met kosten (een Postgres om te beheren). Stap 3 zonder
-stap 1 en 2 is aantoonbaar schadelijk: minder doorvoer dan nu, een staart die
-tweeënhalf keer slechter is, en een read-your-writes-bug die niemand kan
-reproduceren.
+Stap 2 zonder stap 1 kost geen doorvoer meer, maar levert nog steeds de
+read-your-writes-bug op die willekeurig lijkt en onmogelijk te reproduceren is,
+want of je hem ziet hangt af van welk proces je verzoek ving.
 
 ## De proeven overdoen
 
@@ -127,6 +196,19 @@ RTG_DATA_DIR=/tmp/gedeeld RTG_STORE=sqlite REDIS_URL=redis://127.0.0.1:6399 PORT
 RTG_DATA_DIR=/tmp/gedeeld RTG_STORE=sqlite REDIS_URL=redis://127.0.0.1:6399 PORT=3302 npm start
 ```
 
+Voor de Postgres-opstelling dezelfde twee processen, maar met `DATABASE_URL` in
+plaats van `RTG_STORE` — en **elk een eigen `RTG_DATA_DIR`**, want de gedeelde
+toestand zit dan in Postgres en niet meer op schijf:
+
+```bash
+DATABASE_URL=postgresql://rtg@127.0.0.1:5433/rtgproef RTG_DATA_DIR=/tmp/p1 PORT=3301 npm start
+DATABASE_URL=postgresql://rtg@127.0.0.1:5433/rtgproef RTG_DATA_DIR=/tmp/p2 PORT=3302 npm start
+```
+
+Zonder `RTG_DEMO`, om de reden die hierboven bij de valkuil staat.
+
 De sessieproef: inloggen op 3301, het token meteen op 3302 gebruiken. De
 read-your-writes-proef: `POST /api/notities/bewaar` op 3301, daarna
-`POST /api/notities/mijn` op 3302 tot de notitie er staat, en de tijd meten.
+`POST /api/notities/mijn` op 3302 tot de notitie er staat, en de tijd meten. Log
+één keer in en gebruik dat ene token: twaalf inlogpogingen achter elkaar laten de
+inlogrem terecht 429 geven, en dan meet je de rem.

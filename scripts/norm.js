@@ -229,6 +229,31 @@ const METERS = [
   { sleutel: 'staatOngeregistreerd', richting: 'omlaag', wat: 'muteerbare toestand in server/ die niet in STATE.json staat' },
   { sleutel: 'staatOnbekend', richting: 'omlaag', wat: 'geregistreerde toestandswortels zonder levensduurklasse (tellen als procesgebonden)' },
   { sleutel: 'staatProcesgebonden', richting: 'omlaag', wat: 'wortels die een VERS proces afdwingen (onbekend + procesgebonden); dit getal blokkeert serverhergebruik' },
+  /* DE DATAMAP, EN WAAROM DIE EEN EIGEN METER KREEG.
+
+     Het classificeren van de toestandswortels bracht iets aan het licht dat
+     groter is dan de wortels zelf. 647 toetsbestanden starten een eigen server
+     EN zetten een eigen RTG_DATA_DIR -- precies de 647 serverstarts waar dit
+     programma om begon. Een toets start geen eigen server omdat hij bang is voor
+     een singleton; hij start er een omdat hij een eigen SCHIJF wil. En de schijf
+     ligt vast zodra de modules laden:
+
+         const DATA_DIR = process.env.RTG_DATA_DIR || path.join(...)
+
+     Zolang die regel er zo staat kan geen van die 647 ooit een server delen, hoe
+     netjes elke module ook terug naar vers kan. staatProcesgebonden is dus een
+     echte voorwaarde maar niet de BINDENDE; deze meter is dat wel.
+
+     Hij telt drie soorten en die zijn even bindend: een binding die de env zelf
+     bij het laden leest, een die daar op moduleniveau uit gerekend is
+     (DB_FILE = path.join(DATA_DIR, ...)), en een die de naam bij het laden
+     overneemt uit een andere module. Die laatste is er niet voor de sier: van
+     opslag.DATA_DIR een levende lezing maken doet niets voor een bestand dat
+     `const { DATA_DIR } = require('./opslag')` schrijft.
+
+     Een functie die de env pas BIJ DE AANROEP leest telt niet mee -- dat is de
+     vorm waar we naartoe werken. */
+  { sleutel: 'datamapVastgeklonken', richting: 'omlaag', wat: 'bindingen die de datamap bij het LADEN vastleggen; dit getal blokkeert het delen van een server' },
   /* Een DUUR op de wandklok. Niet hetzelfde als de klokschuld in KLOK.json:
      die telt hoeveel code de tijd aan het OS vraagt (beproefbaarheid), deze
      hoeveel code een verstreken tijd op de verkeerde klok uitrekent. Dat
@@ -496,7 +521,7 @@ const METERBRONNEN = {
   mutaties: ['toetsenOngevoeligPct', 'toetsenNietGemeten'],
   skips: ['zelfpoortendeToetsen', 'browserpoortToetsen'],
   ijkregister: ['metersOngeijkt'],
-  staat: ['staatOngeregistreerd', 'staatOnbekend', 'staatProcesgebonden', 'duurOpWandklok'],
+  staat: ['staatOngeregistreerd', 'staatOnbekend', 'staatProcesgebonden', 'datamapVastgeklonken', 'duurOpWandklok'],
   // goedkoop genoeg om altijd te doen: een readdir en een package.json
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
@@ -764,10 +789,11 @@ function meet(bronnen) {
 
   /* De toestandscensus. Draait alleen als er een toestandsmeter gevraagd is:
      hij ontleedt ruim tweeduizend bestanden en kost drie seconden. */
-  let staatOngeregistreerd, staatOnbekend, staatProcesgebonden, duurOpWandklok;
+  let staatOngeregistreerd, staatOnbekend, staatProcesgebonden, datamapVastgeklonken, duurOpWandklok;
   if (nodig('staat')) {
-    const { scan } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
+    const { scan, datamapVast } = require(path.join(SCRIPTS, 'lib', 'staatscan.js'));
     const census = scan({ wortel: WORTEL });
+    datamapVastgeklonken = datamapVast({ wortel: WORTEL }).length;
     duurOpWandklok = census.duurOpWandklok;
     let register = null;
     try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'STATE.json'), 'utf8')); } catch (e) { register = null; }
@@ -812,7 +838,7 @@ function meet(bronnen) {
     inlineStijlAttributen,
     bronBlindeBestanden,
     delenZonderOnderwerp,
-    staatOngeregistreerd, staatOnbekend, staatProcesgebonden, duurOpWandklok
+    staatOngeregistreerd, staatOnbekend, staatProcesgebonden, datamapVastgeklonken, duurOpWandklok
   };
   if (!alleen) return alles;
   const uit = {};

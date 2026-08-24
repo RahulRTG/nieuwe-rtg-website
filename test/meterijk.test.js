@@ -679,6 +679,31 @@ const IJKINGEN = {
         } finally { fs.writeFileSync(regPad, oudTekst); }
       })
   },
+  datamapVastgeklonken: {
+    /* Drie soorten in EEN proefbestand, want de meter moet ze alledrie zien en
+       niet alleen de makkelijkste:
+         recht      leest process.env.RTG_DATA_DIR bij het laden
+         afgeleid   op moduleniveau uit die binding gerekend
+         overgenomen bij het laden overgenomen uit een module die hem al vast heeft
+       De vierde regel is de vorm waar we juist NAARTOE werken -- een functie die
+       de env pas bij de aanroep leest -- en die hoort NIET mee te tellen. Zonder
+       die regel zou een meter die simpelweg naar de tekst RTG_DATA_DIR zoekt hier
+       groen staan terwijl hij het verkeerde telt. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      "const path = require('path');\n" +
+      "const MAP = process.env.RTG_DATA_DIR || '/tmp';\n" +
+      "const BESTAND = path.join(MAP, 'x.json');\n" +
+      "const { DATA_DIR } = require('../db/opslag');\n" +
+      "const laatLezen = () => process.env.RTG_DATA_DIR || '/tmp';\n" +
+      "module.exports = { MAP, BESTAND, DATA_DIR, laatLezen };\n",
+      () => {
+        const verschil = meet({ alleen: ['datamapVastgeklonken'] }).datamapVastgeklonken - voor.datamapVastgeklonken;
+        assert.equal(verschil, 3,
+          'er staan drie vastgeklonken bindingen in het proefbestand (recht, afgeleid, overgenomen) ' +
+          'en een functie die pas bij de aanroep leest; telt de meter er vier, dan telt hij de oplossing mee als probleem');
+        return verschil;
+      })
+  },
   duurOpWandklok: {
     /* Twee duurmetingen erbij, en een DATUMberekening die NIET mee hoort te
        tellen -- "zeven dagen geleden" hoort juist op de wandklok, want dat gaat

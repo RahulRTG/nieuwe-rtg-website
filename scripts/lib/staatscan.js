@@ -324,6 +324,206 @@ function omsluitendeFuncties(pad) {
   return uit;
 }
 
+/* WAAR STAAT DE DATAMAP VAST, EN HOE DIEP ZIT HIJ ERIN?
+
+   Dit is de bevinding die het classificeren opleverde en die het werk van
+   volgorde deed wisselen. 647 toetsbestanden starten een eigen server EN zetten
+   een eigen RTG_DATA_DIR; dat zijn precies de 647 serverstarts waar dit
+   programma om begon. Een toets start geen eigen server omdat hij bang is voor
+   een singleton -- hij start er een omdat hij een eigen SCHIJF wil, en de schijf
+   ligt vast op het moment dat de modules laden:
+
+       const DATA_DIR = process.env.RTG_DATA_DIR || path.join(...)
+
+   Zolang die regel er zo staat, kan geen enkele van die 647 ooit een server
+   delen, hoe netjes elke module ook terug naar vers kan.
+
+   Deze teller vindt zulke regels. Twee soorten, want ze zijn allebei even
+   bindend:
+
+     recht     de binding leest zelf process.env.RTG_DATA_DIR
+     afgeleid  de binding is op moduleniveau uit zo'n binding gerekend, zoals
+               `const DB_FILE = path.join(DATA_DIR, 'db.json')`. Die is net zo
+               vast: hem later omzetten helpt niet als DB_FILE al berekend is.
+
+   Wat er NIET in meetelt: een functie die de env pas bij de aanroep leest, en
+   een module die de map als parameter binnenkrijgt. Dat is juist de vorm waar we
+   naartoe werken, en het grootste deel van server/ doet dat al -- kernlaag,
+   routes en de opzetlagen krijgen DATA_DIR gewoon doorgegeven. Het probleem zit
+   niet in de doorgifte maar in de BRON. */
+const DATAMAP_ENV = 'RTG_DATA_DIR';
+
+/* NIET IN EEN FUNCTIE KIJKEN, en dat is de hele scherpte van deze teller.
+
+     const MAP = process.env.RTG_DATA_DIR || '/tmp';        <- vast bij het laden
+     const map = () => process.env.RTG_DATA_DIR || '/tmp';  <- pas bij de aanroep
+
+   De tweede vorm is precies waar dit werk naartoe gaat. Een teller die de hele
+   uitdrukking afloopt ziet in allebei dezelfde tekst staan en telt de OPLOSSING
+   mee als probleem -- en dan kan de ratel per definitie niet zakken. Dat is geen
+   bedachte val: de ijking in test/meterijk.test.js zette die vierde regel er met
+   opzet bij, en de eerste versie van deze functie telde er vier waar er drie
+   zijn. Vandaar deze eigen wandeling die bij elke functiegrens stopt. */
+function zoekBuitenFuncties(n, raak) {
+  if (!n || typeof n !== 'object') return false;
+  if (Array.isArray(n)) { for (const x of n) if (zoekBuitenFuncties(x, raak)) return true; return false; }
+  if (typeof n.type === 'string') {
+    if (/Function/.test(n.type)) return false;          // hier houdt het laden op
+    if (raak(n)) return true;
+  }
+  for (const sleutel in n) {
+    if (sleutel === 'start' || sleutel === 'end' || sleutel === 'lijn') continue;
+    const v = n[sleutel];
+    if (v && typeof v === 'object' && zoekBuitenFuncties(v, raak)) return true;
+  }
+  return false;
+}
+
+function leestDatamapEnv(n) {
+  return zoekBuitenFuncties(n, (k) => k.type === 'MemberExpression'
+    && (k.property || {}).name === DATAMAP_ENV
+    && k.object && k.object.type === 'MemberExpression'
+    && (k.object.object || {}).name === 'process' && (k.object.property || {}).name === 'env');
+}
+
+/* Verwijst deze uitdrukking naar een van de namen die de map al vasthouden --
+   en dan ook weer alleen buiten een functie om? */
+function noemt(n, namen) {
+  return zoekBuitenFuncties(n, (k) => k.type === 'Identifier' && namen.has(k.name));
+}
+
+/* De namen van functies die de map PAS BIJ DE AANROEP lezen. Die zijn geen
+   probleem -- ze zijn de oplossing -- maar wie er op moduleniveau een AANROEPT
+   klemt de map alsnog vast:
+
+       function dataMap() { return process.env.RTG_DATA_DIR || ...; }   <- goed
+       const STORE = kiesStore(process.env, fs.existsSync(dbBestand()));  <- vast
+
+   Zonder deze stap zou het omzetten van opslag.js de meter laten zakken terwijl
+   STORE nog net zo hard aan de map van het laadmoment hangt: de teller zou de
+   verhuizing belonen in plaats van de reparatie. */
+function luieLezers(boom) {
+  const uit = new Set();
+  const leest = (fn) => {
+    let raak = false;
+    loop(fn, (k) => {
+      if (k.type === 'MemberExpression' && (k.property || {}).name === DATAMAP_ENV
+        && k.object && k.object.type === 'MemberExpression'
+        && (k.object.object || {}).name === 'process' && (k.object.property || {}).name === 'env') raak = true;
+    });
+    return raak;
+  };
+  /* De functies op moduleniveau, met hun lichaam, zodat we kunnen doorrekenen. */
+  const lichamen = new Map();
+  for (const k of boom.body) {
+    if (k.type === 'FunctionDeclaration' && k.id) lichamen.set(k.id.name, k);
+    if (k.type !== 'VariableDeclaration') continue;
+    for (const d of k.declarations || []) {
+      if (d.id && d.id.type === 'Identifier' && d.init && /Function/.test(d.init.type || '')) lichamen.set(d.id.name, d.init);
+    }
+  }
+  for (const [naam, fn] of lichamen) if (leest(fn)) uit.add(naam);
+  /* EN DOORREKENEN, want een lezer roept meestal een lezer aan:
+       function dataMap()   { return process.env.RTG_DATA_DIR || ...; }
+       function dbBestand() { return path.join(dataMap(), 'db.json'); }
+     dbBestand leest de env niet zelf en is toch net zo lui -- en wie HEM op
+     moduleniveau aanroept klemt de map alsnog vast. Zonder deze ronde zag de
+     teller precies dat geval over het hoofd, en dat is nou net de vorm die dit
+     werk oplevert. Herhalen tot er niets meer bijkomt; de lijst is eindig. */
+  let gegroeid = true;
+  while (gegroeid) {
+    gegroeid = false;
+    for (const [naam, fn] of lichamen) {
+      if (uit.has(naam)) continue;
+      let roept = false;
+      loop(fn, (k) => {
+        if (k.type === 'CallExpression' && k.callee && k.callee.type === 'Identifier' && uit.has(k.callee.name)) roept = true;
+      });
+      if (roept) { uit.add(naam); gegroeid = true; }
+    }
+  }
+  return uit;
+}
+
+function datamapBindingen(bron, relPad) {
+  const boom = parse(bron);
+  const uit = [];
+  const vast = new Set(luieLezers(boom));
+  const luie = new Set(vast);
+  for (const k of boom.body) {
+    if (k.type !== 'VariableDeclaration') continue;
+    for (const d of k.declarations || []) {
+      if (!d.id || d.id.type !== 'Identifier' || !d.init) continue;
+      if (luie.has(d.id.name)) continue;              // de lezer zelf is geen klem
+      if (leestDatamapEnv(d.init)) {
+        vast.add(d.id.name);
+        uit.push({ id: relPad + '#' + d.id.name, bestand: relPad, naam: d.id.name, soort: 'recht', lijn: d.lijn || k.lijn || 0 });
+      } else if (vast.size && noemt(d.init, vast)) {
+        vast.add(d.id.name);
+        uit.push({ id: relPad + '#' + d.id.name, bestand: relPad, naam: d.id.name, soort: 'afgeleid', lijn: d.lijn || k.lijn || 0 });
+      }
+    }
+  }
+  return uit;
+}
+
+/* DE HELE BOOM, inclusief de laag die de map OVERNEEMT.
+
+   Een module die zelf de env niet leest maar de map bij het laden uit een andere
+   module trekt -- `const { DATA_DIR } = require('./opslag')` -- ligt net zo vast.
+   Van opslag.DATA_DIR een levende lezing maken helpt daar niets: die
+   destructurering heeft de waarde van dat moment al in handen. Dat is geen
+   theorie maar precies wat er in db/sqlite.js en db/geheugen-kluis.js staat.
+
+   Daarom een derde soort: `overgenomen`. Hij wordt alleen geteld als de naam die
+   wordt overgenomen ECHT een datamapbinding is in het bestand waar hij vandaan
+   komt -- geen gok op de naam, maar een opzoeking. */
+function datamapVast({ wortel, mappen } = {}) {
+  wortel = wortel || path.join(__dirname, '..', '..');
+  mappen = mappen || ['server'];
+  const bronnen = new Map();
+  const uit = [];
+  const bestanden = [];
+  for (const map of mappen) {
+    for (const p of bestandenOnder(path.join(wortel, map)).sort()) {
+      const rel = path.relative(wortel, p).split(path.sep).join('/');
+      let bron;
+      try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
+      bestanden.push({ rel, p, bron });
+      let deel;
+      try { deel = datamapBindingen(bron, rel); } catch (e) { continue; }
+      for (const x of deel) { uit.push(x); bronnen.set(rel + '#' + x.naam, x); }
+    }
+  }
+  /* Tweede ronde: wie neemt zo'n naam bij het laden over? */
+  for (const { rel, bron } of bestanden) {
+    let boom;
+    try { boom = parse(bron); } catch (e) { continue; }
+    for (const k of boom.body) {
+      if (k.type !== 'VariableDeclaration') continue;
+      for (const d of k.declarations || []) {
+        if (!d.id || d.id.type !== 'ObjectPattern' || !d.init) continue;
+        if (d.init.type !== 'CallExpression' || (d.init.callee || {}).name !== 'require') continue;
+        /* De eigen parser zet een tekenreeks in `raw`, MET aanhalingstekens, en
+           laat `value` leeg. Daar liep deze telling eerst op stuk: hij vond nul
+           overnames terwijl db/sqlite.js er letterlijk een heeft. */
+        const arg = (d.init.arguments || [])[0];
+        const rauw = arg && (arg.raw !== undefined ? String(arg.raw) : (arg.value !== undefined ? String(arg.value) : null));
+        const doel = rauw && rauw.replace(/^['"`]|['"`]$/g, '');
+        if (!doel || !doel.startsWith('.')) continue;
+        let vanaf = path.posix.normalize(path.posix.join(path.posix.dirname(rel), doel));
+        if (!/\.js$/.test(vanaf)) vanaf += '.js';
+        for (const pr of d.id.properties || []) {
+          const naam = (pr.key || {}).name || (pr.value || {}).name;
+          if (!naam || !bronnen.has(vanaf + '#' + naam)) continue;
+          uit.push({ id: rel + '#' + naam, bestand: rel, naam, soort: 'overgenomen', vanaf, lijn: d.lijn || k.lijn || 0 });
+        }
+      }
+    }
+  }
+  return uit;
+}
+
 /* { wortelnaam -> Set(functienamen die erin schrijven) }, plus de functienamen
    die het bestand uberhaupt kent. Dat tweede is nodig om onderscheid te maken
    tussen "de reset raakt de wortel niet aan" en "de reset bestaat hier niet",
@@ -465,4 +665,4 @@ function eigenaarVan(relPad) {
   return delen.slice(0, Math.min(2, delen.length - 1)).join('/') || 'server';
 }
 
-module.exports = { scan, scanBestand, schrijversIn, bestandenOnder, eigenaarVan, MUTMETHODE };
+module.exports = { scan, scanBestand, schrijversIn, datamapBindingen, datamapVast, bestandenOnder, eigenaarVan, MUTMETHODE };

@@ -73,6 +73,24 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
     const operator = require('../command/operator').maakOperator({
       db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, vak });
     const werkbesparing = require('../command/werkbesparing').maakWerkbesparing({ journaal, zaken, runbooks });
+
+    /* DE HERSTELTRANSACTIE, en die stond hier tot nu toe NIET. De zaak-kant
+       draaide dezelfde recepten via runbooks.voer() rechtstreeks: wel een
+       momentopname (elke wijziging draagt zijn oude waarde), geen voorcontrole
+       en geen verificatie. Dat is precies de helft van een reparatie die je
+       niet mist tot ze misgaat -- de ronde valt niet om, dus hij ziet eruit
+       alsof hij gelukt is.
+
+       GEZONDHEID GAAT ER BEWUST NIET IN, en dat is geen vergeten parameter. De
+       gezondheidskaart gaat over het PLATFORM (is de opslag heel, lopen de
+       sporen door); een ondernemer heeft daar geen zeggenschap over en zou hem
+       ook niet kunnen lezen. transactie-poorten.js kent dat geval al: zonder
+       kaart komt `fundament-gezond` terug als `gecontroleerd: false` met de
+       reden, en houdt hij niets tegen. Zo staat er in het antwoord van een zaak
+       WELKE controle daar niet bestaat, in plaats van een controle die er
+       stilzwijgend niet is. */
+    const transactie = require('../command/transactie').maakTransactie({
+      db, runbooks, register, journaal, gezondheid: null });
     const signalen = require('./signalen').maakSignalen({ db, beleid, commGast });
     /* Dezelfde twee lagen als aan de RTG-kant, maar op het register van DEZE
        zaak. Ze erven de scope daarmee volledig: de graaf loopt juist wél door
@@ -117,7 +135,8 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
     }
 
     return { code, leiding, register, kwaliteit, graaf, herkomst, journaal, beleid, risico, zaken, runbooks,
-      operator, werkbesparing, signalen, puls, signaalOppakken, zoek, bereik, dossier, actiesVoor, start };
+      transactie, operator, werkbesparing, signalen, puls, signaalOppakken, zoek, bereik, dossier,
+      actiesVoor, start };
   }
 
   return { voor, ZAAK_BELEID };

@@ -8,7 +8,7 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 65 | elk bewijsstuk bestaat |
+| gedekt | 79 | elk bewijsstuk bestaat |
 | open | 0 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
@@ -54,6 +54,9 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Cross-domain search: één balk over alles | gedekt | `server/kern/command/zoek.js`<br>`/api/command/zoek` |
 | Universal Object Control: ieder object openen | gedekt | `server/kern/command/object.js`<br>`/api/command/object` |
 | Event timeline per object | gedekt | `server/kern/command/object.js` |
+| Support komt binnen op uitnodiging van de klant, met een niveau, een einde en een spoor | gedekt | `server/kern/command/bijstand.js`<br>`server/kern/command/bijstand-klant.js`<br>`server/kern/command/bijstand-rtg.js`<br>`/api/tenant/bijstand/vraag`<br>`/api/command/bijstand/betreed`<br>`public/apps/werk/bijstand.js` |
+| Een supportsessie ziet structuur en geen inhoud, en zegt wat zij nooit toont | gedekt | `server/kern/command/bijstand-diagnose.js` |
+| Alle organisaties in een beeld, met een hoofdincident en zonder cijfer per klant | gedekt | `server/kern/command/vlootbeeld.js`<br>`/api/command/vloot`<br>`public/apps/command/command-20.js` |
 | AI Operator: opdracht in gewone taal | gedekt | `server/kern/command/operator.js`<br>`/api/command/operator/plan` |
 | Root-cause: de oorzaak wordt gemeten, niet geraden | gedekt | `server/kern/command/oorzaak.js` |
 | AI Supervisor: budgetten, botsingen, stoppen | gedekt | `server/kern/command/toezicht.js`<br>`/api/command/agents` |
@@ -68,6 +71,13 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Workforce minimization: handminuten per 1.000 | gedekt | `server/kern/command/werkbesparing.js`<br>`/api/command/werk` |
 | Just-in-time privilege, break-glass en mandaat | gedekt | `server/kern/command/toegang.js`<br>`/api/command/recht/nood` |
 | RTG Command als één app | gedekt | `public/apps/command.html`<br>`public/apps/command` |
+| Gezondheid per vermogen, met de bewijsgraad ernaast | gedekt | `server/kern/command/gezondheid.js`<br>`server/kern/command/vermogens.js`<br>`/api/command/gezondheid`<br>`public/apps/command/command-17.js` |
+| Controleer: een ronde die echt iets uitvoert, of eerlijk zegt dat er niets uit te voeren viel | gedekt | `server/kern/command/gezondheid-proef.js`<br>`/api/command/gezondheid/controleer` |
+| Herstel als transactie: voorcontrole, verificatie en terug bij mislukking | gedekt | `server/kern/command/transactie.js`<br>`server/kern/command/transactie-poorten.js`<br>`/api/command/runbook/voer` |
+| Elk herstelrecept draagt een certificaat: bovengrens, weg terug, verificatie, versie | gedekt | `server/kern/command/runbookcatalogus.js` |
+| Het incident als object: nummer, gemeten omvang, maatregelen, verslag | gedekt | `server/kern/command/incident.js`<br>`server/kern/command/incident-verslag.js`<br>`/api/command/incidenten`<br>`public/apps/command/command-18.js` |
+| Wat van een storing niet te meten is, staat er met de reden bij | gedekt | `server/kern/command/incident-impact.js` |
+| Wat is er vlak daarvoor veranderd: drie bronnen op een lijn, zonder oorzaakclaim | gedekt | `server/kern/command/tijdlijn.js`<br>`/api/command/tijdlijn` |
 | Knowledge graph over personen, bedrijven, contracten en gebeurtenissen<br><sub>De randen worden gemeten uit de gegevens, niet uit een schema; de wandeling zegt het als hij tegen zijn grens loopt.</sub> | gedekt | `server/kern/command/graaf.js`<br>`/api/command/graaf`<br>`test/kwaliteit.test.js` |
 | Data lineage: waar komt een gegeven vandaan en wie hangt ervan af<br><sub>Elk antwoord draagt zijn aard: gemeten, aangegeven of afgeleid. De blinde vlek staat in de uitslag -- het journaal ziet alleen wat via Command ging, dus 'geen schrijver' betekent hier niet 'hier schrijft niemand in'.</sub> | gedekt | `server/kern/command/herkomst.js`<br>`/api/command/herkomst`<br>`/api/supplier/command/herkomst`<br>`public/apps/command/command-11.js` |
 | Master data management: één authoritative record per klant/bedrijf<br><sub>kern/eenaccount doet dit voor het lid; deze laag doet bedrijven en locaties. Er wordt nooit vanzelf samengevoegd -- twee bedrijven met dezelfde naam in dezelfde stad kunnen twee bedrijven zijn, en dat verschil zit niet in de gegevens. Samenvoegen wist niets: de verliezers houden een verwijzing, dus terugdraaien is dezelfde handeling omgekeerd.</sub> | gedekt | `server/kern/command/mdm.js`<br>`server/kern/command/mdmsamen.js`<br>`/api/command/mdm` |
@@ -81,6 +91,9 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Acquisition mode: een overgenomen bedrijf importeren en migreren<br><sub>Vier stappen waarvan de volgorde de veiligheid is: inlezen, afbeelden, droogloop, uitvoeren. Uitvoeren kan alleen met het zegel van precies de bekeken droogloop, er wordt nooit iets overschreven (een bestaande sleutel is een botsing), en elke ingevoerde rij draagt zijn partij zodat terugdraaien exact die rijen weghaalt.</sub> | gedekt | `server/kern/command/overname.js`<br>`server/kern/command/overnamevoorstel.js`<br>`/api/command/overname` |
 | Enterprise API gateway met scopes, quota en contractregels<br><sub>De poort hangt op /api/extern/ en de toelating begint LEEG: er staat niets achter tot iemand er een pad in zet. Dat is een besluit en geen omissie -- een poort die bij oplevering al half het platform ontsluit is een gat met een naam. Het geheim van een sleutel wordt nergens bewaard, het quotum staat in de opslag (dus een herstart wist hem niet) en een uitfasering wordt aangekondigd voordat hij bijt.</sub> | gedekt | `server/kern/command/apipoort.js`<br>`server/middleware/apipoort.js`<br>`/api/command/apipoort` |
 | Sandbox-omgevingen om processen te testen zonder productiedata<br><sub>De inhoud komt uit de zaaiset en nooit uit db.data; de motoren zien een DB-venster op het vak van de zandbak, dus er is geen pad naar een productiecollectie. Wat het NIET is: een tweede installatie -- alleen de motoren van Command draaien erop, niet de gewone app-routes.</sub> | gedekt | `server/kern/command/zandbak.js`<br>`/api/command/zandbak` |
+| Een veilige noodstand die beschermt in plaats van uitzet<br><sub>Zes van de zestien functiecategorieën bevriezen, tien werken door, en vier functies lopen met naam door omdat stilzetten meer kost dan de storing (inloggen, hulpdiensten, grensdiensten, de storingsmelder). Deze stand zet GEEN enkele schakelaar om, dus opheffen is geen herstelactie. Wat hij NIET doet: sleutels roteren -- dat staat in het antwoord als nietAfgedwongen met de reden, want er is geen rotatiemechanisme voor secret.key en vault.key.</sub> | gedekt | `server/kern/beschermstand.js`<br>`server/kern/beschermstand-lijst.js`<br>`server/kern/incidentcontrole-bescherm.js`<br>`/api/techniek/controle/incident` |
+| Hoeveel organisaties een storing raakte, als ondergrens<br><sub>Een ONDERGRENS en geen aantal: geteld wordt bij de twee deuren van de werkruimte, dus ledenverkeer, zaakverkeer en verkeer van buiten staan onder nietToegewezen. Gaat nooit mee naar Prometheus (geen tekst()-functie) en de org-codes verlaten de module niet. Wat het NIET is en niet wordt: een beschikbaarheidscijfer per klant.</sub> | gedekt | `server/meting-tenant.js`<br>`server/bedrijf/deuren.js` |
+| De klant krijgt bericht als er een bijstandssessie loopt<br><sub>In zijn eigen werkruimtejournaal: een kanaal dat hij al leest en dat een gesloten tabblad overleeft. Een regel op de vier momenten dat RTG handelt, met het sessie-id en zonder de codenaam van de medewerker. Wat er bewust NIET bij komt is mail of een telefoonmelding -- dat is een kanaalbesluit dat een klant hoort in te stellen.</sub> | gedekt | `server/kern/command/bijstand-melden.js` |
 
 ## De zaak: dezelfde regie, eigen scope
 
@@ -91,4 +104,10 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Recepten die administratie rechtzetten, geen werkelijkheid verzinnen | gedekt | `server/kern/zaakcommand/runbooks.js` |
 | Rolscope: verlof en sollicitaties alleen voor de leiding | gedekt | `server/kern/zaakcommand/register.js`<br>`test/zaakcommand.test.js` |
 | Regie in de zaak-app en op de PDA, één scherm | gedekt | `public/shared/zaakcommand`<br>`public/apps/leverancier.html`<br>`public/apps/personeel.html` |
+
+## De zaak: regie over de eigen onderneming
+
+| belofte | stand | waar het staat |
+| --- | --- | --- |
+| Ook een zaak repareert door de hersteltransactie, niet erlangs<br><sub>Voorcontrole, momentopname, uitvoeren, verificatie, vastleggen -- met certificaten die LAGER staan dan aan de RTG-kant, want de schaal van een zaak is de schaal van één onderneming. De gezondheidskaart gaat er bewust niet in en dat staat als `fundament-gezond: gecontroleerd false` met de reden in het antwoord.</sub> | gedekt | `server/kern/zaakcommand/runbooks.js`<br>`/api/supplier/command/runbook/voer` |
 

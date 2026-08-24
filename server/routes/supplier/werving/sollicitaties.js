@@ -115,6 +115,20 @@ app.post('/api/supplier/vacature', supplierAuth, (req, res) => {
   vac.omschrijving = String(b.omschrijving || '').trim().slice(0, 500);
   vac.plaats = String(b.plaats || '').trim().slice(0, 60);
   vac.uren = String(b.uren || '').trim().slice(0, 40);
+  const salarisMin = Number(b.salarisMin);
+  const salarisMax = Number(b.salarisMax);
+  const nieuwSalarisMin = Number.isFinite(salarisMin) && salarisMin > 0 ? Math.min(1000000, Math.round(salarisMin)) : null;
+  const nieuwSalarisMax = Number.isFinite(salarisMax) && salarisMax > 0 ? Math.min(1000000, Math.round(salarisMax)) : null;
+  if (nieuwSalarisMin && nieuwSalarisMax && nieuwSalarisMax < nieuwSalarisMin)
+    return res.status(400).json({ error: 'Het maximale salaris moet gelijk aan of hoger dan het minimum zijn.' });
+  vac.salarisMin = nieuwSalarisMin;
+  vac.salarisMax = nieuwSalarisMax;
+  vac.valuta = ['EUR','GBP','USD','JPY'].includes(String(b.valuta||'').toUpperCase()) ? String(b.valuta).toUpperCase() : 'EUR';
+  vac.werkvorm = ['op-locatie','hybride','op-afstand','flexibel'].includes(b.werkvorm) ? b.werkvorm : null;
+  vac.vaardigheden = (Array.isArray(b.vaardigheden) ? b.vaardigheden : String(b.vaardigheden||'').split(','))
+    .map(x => String(x||'').trim().slice(0,40)).filter(Boolean).slice(0,12);
+  vac.voordelen = (Array.isArray(b.voordelen) ? b.voordelen : String(b.voordelen||'').split(','))
+    .map(x => String(x||'').trim().slice(0,60)).filter(Boolean).slice(0,10);
   vac.soort = soort;
   vac.minLeeftijd = minLeeftijd;
   vac.open = b.open !== false;
@@ -136,5 +150,18 @@ app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
   save();
   sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
   res.json({ ok: true, vacatures: list.slice(0, 40) });
+});
+
+app.post('/api/supplier/talent/match', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const lijst = Array.isArray(db.data.talentInteresses) ? db.data.talentInteresses : [];
+  const match = lijst.find(x => x.id === req.body.id && x.supplierCode === req.supplier.code);
+  if (!match || match.status !== 'interesse') return res.status(404).json({ error: 'Deze talentmatch is niet meer beschikbaar.' });
+  match.status = req.body.action === 'interesse' ? 'wederzijds' : 'afgewezen';
+  match.beslistAt = new Date().toISOString();
+  save();
+  logActivity(req.supplier.code, req.actor, (match.status === 'wederzijds' ? 'toonde wederzijdse interesse in ' : 'sloot een talentmatch voor ') + match.func);
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  res.json({ ok: true, status: match.status });
 });
 };

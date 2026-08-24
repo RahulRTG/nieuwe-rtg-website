@@ -149,6 +149,67 @@ besluit met een foutbudget eraan vast; dat hoort in `SLO.md` en niet in een
 emmerlijst. Het verschil is dat het nu een keuze is en geen gok.
 
 
+## De staart daarna: saveSqlite serialiseerde het journaal bij elke schrijfactie
+
+Na het bovenstaande stond de event-loop-p99 nog op tientallen milliseconden,
+terwijl een verzoek zelf 0,44 ms duurt. Die wanverhouding is een aanwijzing: een
+verzoek is niet traag, er staat iets ANDERS de lus stil te zetten.
+
+Gemeten met een wikkel om `saveSqlite` heen, onder 25 seconden last:
+
+```
+saveSqlite  n=121  totaal geblokkeerd 3.981 ms  gemiddeld 32,9 ms  max 101,1 ms
+event-loop  p99 66,0 ms   max 111,2 ms
+journaal    19.469 regels
+```
+
+Die getallen liggen boven op elkaar: de gemeten event-loop-piek van 111 ms en de
+langste `saveSqlite` van 101 ms zijn hetzelfde moment. Over die 25 seconden stond
+de lus **3,98 seconden** stil in deze ene functie -- 16% van de wandkloktijd.
+
+De oorzaak zit in de voorcheck van `server/db/voorcheck.js`. Die mag een dure
+collectie overslaan zolang het AANTAL items gelijk blijft. Voor gewone toestand
+klopt dat precies. Voor een LOGBOEK is groeien juist de normale toestand -- er
+komt per verzoek een regel bij -- en dus greep de overslaan-regel daar nooit.
+`doorgeefjournaal` groeit naar zijn plafond van 20.000 regels (3,6 MB JSON), en
+werd dus bij **elke** schrijfactie ergens in de applicatie opnieuw geserialiseerd,
+versleuteld en weggeschreven.
+
+Er staat nu een korte, met de hand geschreven lijst logboeken waarvoor alleen het
+TIJDvenster telt en niet de lengte. Gemeten op dezelfde last:
+
+| Meter | Voor | Na | Winst |
+|---|---:|---:|---:|
+| saveSqlite, totaal geblokkeerd | 3.981 ms | 516 ms | **87%** |
+| saveSqlite, gemiddeld | 32,90 ms | 3,46 ms | **89%** |
+| **Event-loop p99** | 66,0 ms | 26,5 ms | **60%** |
+| Doorvoer | 7.128/s | 9.779/s | **+37%** |
+| Serverkant p99 | 0,39 ms | 0,33 ms | 15% |
+| Journaalregels bewaard | 19.469 | 19.315 | gelijk |
+
+Die laatste regel is de belangrijkste van de tabel: er gaat geen historie
+verloren. Wat verandert is niet de garantie maar het MEELIFTEN.
+`kern/doorgeefjournaal.js` regelt zijn eigen duurzaamheid al -- het zegt met
+zoveel woorden "NIET bij elke regel save()" en plant zijn eigen spoeling met een
+rem van een seconde. Dat andere schrijfacties het journaal onderweg meenamen was
+toeval, geen belofte. Nagemeten op schijf na een ronde: 3,22 MB, 19.559 regels,
+de nieuwste regel van het einde van de last.
+
+Drie toetsen in `test/opslag-voorcheck.test.js` leggen de grenzen vast: een
+groeiend logboek MAG binnen het venster worden overgeslagen, het blijft daarna
+NIET hangen (overslaan mag uitstellen, nooit weglaten), en geld wint altijd --
+`exactNodig()` staat vóór de logboekregel, ook als iemand een geldcollectie op de
+lijst zet. Alle drie worden rood van hun eigen mutatie. De duurzaamheidssuite
+(38 toetsen, inclusief de SIGKILL-proef op een bevestigde betaling) blijft groen.
+
+### Wat hieruit volgt en niet is gedaan
+
+Bij 7.000 verzoeken per seconde is een plafond van 20.000 regels nog geen drie
+seconden geschiedenis. Het plafond belooft "terugkijken wat er vannacht misging"
+en dat doet het bij dit verkeer niet meer. Dat is een productbesluit -- minder of
+juist anders bewaren -- en geen prestatiekwestie, dus het staat hier alleen
+opgeschreven en is niet stilletjes veranderd.
+
 ## Meer kernen benutten: onderzocht, en het antwoord is niet "meer processen"
 
 Na het bovenstaande draait een proces op ~5.000 verzoeken per seconde en staan

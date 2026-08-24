@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1040 bestanden en 6948 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1041 bestanden en 6956 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1040 |
-| losse beweringen (`test(...)`) | 6948 |
+| toetsbestanden | 1041 |
+| losse beweringen (`test(...)`) | 6956 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 46 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 874 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 875 |
 | **overleefd**: geen mutatie kreeg hem rood | 11 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-914 bestanden, 6728 beweringen.
+915 bestanden, 6736 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -118,6 +118,7 @@ toets omvalt.
 | `bewaartermijnen.test.js` | 10 | gezakt op `false->true` | BEWAARTERMIJNEN -- houden we niet langer dan mag, en niet korter dan moet? Twee kanten die allebei fout kunnen gaan, en die elkaars tegenpool zijn: te LANG bewaren -> overtreding van opslagbeperking (AVG art. |
 | `bewaarveger.test.js` | 11 | gezakt op `+->-` | De bewaarveger: de wisregels uit het papierwerkregister als code (server/bewaarveger.js). Elke regel heeft een eigen toets en is met een mutatie geverifieerd; de klok is geinjecteerd, dus niets slaapt echt. |
 | `bewaarwacht.test.js` | 7 | gezakt op `===->!==` | DE BEWAARWACHT -- kijkt vanzelf, en houdt zich in. Een bewaarbeleid faalt op twee manieren die allebei stil zijn: niemand kijkt ooit -> de termijn staat op papier en nergens anders de wacht wist zelf -> data... |
+| `bewijsgraaf.test.js` | 7 | gezakt op `return-weg#2` | DE BEWIJSGRAAF EN DE PLANNER -- fase D en E van de verificatie-runtime. De opdracht luidde: "RTG moet de kleinste aantoonbaar voldoende verificatie kunnen uitvoeren voor iedere verandering -- terwijl de volledige... |
 | `bewijsmatrix.test.js` | 17 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
 | `bezorg.test.js` | 5 | gezakt op `liegpoort /api/` | De ophaal/bezorgdienst, van assortiment tot bezorgd: de zaak zet producten en de dienst aan; het lid bestelt (ophalen of bezorgen) en betaalt vooraf; de bezorger neemt meerdere leveringen op eigen naam, deelt GPS... |
 | `bezorging.test.js` | 1 | gezakt op `liegpoort /api/` | DE BEZORGING -- van assortiment tot voordeur, met GPS. WAAROM DIT ER IS De bezorgketen raakt vier mensen achter elkaar: de manager richt de dienst in, een lid bestelt en betaalt, een bezorger neemt de rit aan, en de... |
@@ -458,7 +459,7 @@ toets omvalt.
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkverkeer.test.js` | 5 | gezakt op `liegpoort /api/` | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
 | `merge3.property.test.js` | 5 | gezakt op `===->!==#0` | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |
-| `meterijk.test.js` | 9 | muteert zelf | De ijking van de meters: regel 10 van LAT.md, met een handhaver. "Een meter die je niet hebt zien uitslaan, meet niets." Dat stond opgeschreven, en op een dag bleken zeven meters te liegen -- geen van allen in de... |
+| `meterijk.test.js` | 10 | muteert zelf | De ijking van de meters: regel 10 van LAT.md, met een handhaver. "Een meter die je niet hebt zien uitslaan, meet niets." Dat stond opgeschreven, en op een dag bleken zeven meters te liegen -- geen van allen in de... |
 | `metier.test.js` | 13 | gezakt op `liegpoort /api/` | Métier (kern/metier/*, routes/member/metier.js): de beroepsapp. Het zwaartepunt van deze toetsen ligt op het ontwerp dat Métier anders maakt dan een gewoon netwerk: - een profiel toont NOOIT een echte naam, alleen... |
 | `meting.test.js` | 10 | gezakt op `>=->>#0` | De meting: tellen zonder de monitoring om te leggen en zonder iets over een persoon vast te leggen. |
 | `metingen.test.js` | 9 | gezakt op `liegpoort /api/` | De dagmetingen (kern/metingen.js): slaap, beweging en water, zelf ingevuld. Wat hier bewezen wordt: een dag heeft EEN waarde en geen stapel, het beeld zegt over hoeveel dagen het gaat (een gemiddelde over een enkele... |

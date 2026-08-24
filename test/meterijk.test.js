@@ -716,6 +716,24 @@ const IJKINGEN = {
         return verschil;
       })
   },
+  bewijsOnbekend: {
+    /* Een toetsbestand zonder ENIGE te volgen afhankelijkheid: geen require naar
+       de bron, geen serverstart. Dat is precies de vorm die de planner nooit mag
+       overslaan, dus hij hoort de teller met een te verhogen.
+
+       PRECIES EEN, en niet "meer dan nul". Telt hij er twee, dan telt hij ook
+       iets mee wat er niet bij hoort, en een meter die te veel telt kan zijn nul
+       nooit halen -- dan wordt hij uitgezet en bewaakt hij niets meer. */
+    proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
+      "const test = require('node:test');\n" +
+      "test('een toets zonder enige te volgen afhankelijkheid', () => {});\n",
+      () => {
+        const verschil = meet({ alleen: ['bewijsOnbekend'] }).bewijsOnbekend - voor.bewijsOnbekend;
+        assert.equal(verschil, 1,
+          'een toets zonder te volgen afhankelijkheden hoort de teller met precies een te verhogen');
+        return verschil;
+      })
+  },
   duurOpWandklok: {
     /* Twee duurmetingen erbij, en een DATUMberekening die NIET mee hoort te
        tellen -- "zeven dagen geleden" hoort juist op de wandklok, want dat gaat

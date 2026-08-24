@@ -578,6 +578,14 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "bewijsgraaf.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsgraaf.js",
+      "operator": "return-weg#2",
+      "gezakt": 2,
+      "geprobeerd": 4
+    },
     "bewijsmatrix.test.js": {
       "soort": "puur",
       "staat": "gezakt",

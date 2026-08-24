@@ -254,6 +254,21 @@ const METERS = [
      Een functie die de env pas BIJ DE AANROEP leest telt niet mee -- dat is de
      vorm waar we naartoe werken. */
   { sleutel: 'datamapVastgeklonken', richting: 'omlaag', wat: 'bindingen die de datamap bij het LADEN vastleggen; dit getal blokkeert het delen van een server' },
+  /* DE BEWIJSGRAAF. Fase D en E van de verificatie-runtime: weten welk bewijs bij
+     welke code hoort, en op grond daarvan de kleinste voldoende verzameling
+     kiezen.
+
+     `bewijsOnbekend` telt de toetsen waarvan de afhankelijkheden NIET vaststaan.
+     Die draait de planner altijd -- weet je het niet, dan draai je hem. Elke
+     toets in dit getal maakt de kleinste voldoende verificatie dus groter, en
+     het is de enige knop die hem kleiner maakt. Nul zou betekenen dat elke toets
+     te plaatsen is; dat gaat nooit helemaal lukken (een toets die bestanden op
+     naam leest is niet te volgen), maar de richting is omlaag.
+
+     Dit is met opzet GEEN meter op "hoeveel procent slaat de planner over": dat
+     getal hangt aan de wijziging en niet aan de codebase, en een meter die
+     meebeweegt met wat je toevallig aanraakt bewaakt niets. */
+  { sleutel: 'bewijsOnbekend', richting: 'omlaag', wat: 'toetsen waarvan de afhankelijkheden niet vaststaan; die moet de planner altijd draaien' },
   /* Een DUUR op de wandklok. Niet hetzelfde als de klokschuld in KLOK.json:
      die telt hoeveel code de tijd aan het OS vraagt (beproefbaarheid), deze
      hoeveel code een verstreken tijd op de verkeerde klok uitrekent. Dat
@@ -533,6 +548,7 @@ const METERBRONNEN = {
   skips: ['zelfpoortendeToetsen', 'browserpoortToetsen'],
   ijkregister: ['metersOngeijkt'],
   staat: ['staatOngeregistreerd', 'staatOnbekend', 'staatProcesgebonden', 'datamapVastgeklonken', 'duurOpWandklok'],
+  bewijsgraaf: ['bewijsOnbekend'],
   // goedkoop genoeg om altijd te doen: een readdir en een package.json
   altijd: ['dependencies', 'devPakketten', 'testbestanden', 'e2eBestanden']
 };
@@ -887,6 +903,16 @@ function meet(bronnen) {
       .filter(([id, r]) => telt([id, r]) && (!r.levensduur || r.levensduur === 'onbekend' || r.levensduur === 'procesgebonden')).length;
   }
 
+  /* De bewijsgraaf. Draait alleen als ernaar gevraagd is: hij volgt de
+     require-ketens van ruim duizend toetsbestanden en kost acht seconden. */
+  let bewijsOnbekend;
+  if (nodig('bewijsgraaf')) {
+    const bg = require(path.join(SCRIPTS, 'lib', 'bewijsgraaf.js'));
+    const g = bg.graaf({ wortel: WORTEL });
+    if (!g) throw new Error('de bewijsgraaf kon niet worden opgebouwd; dan is er geen deelverzameling te verantwoorden');
+    bewijsOnbekend = bg.onbekendeAfhankelijkheden(g);
+  }
+
   /* Bij `alleen` komen ALLEEN de gevraagde sleutels terug. Niet de rest op
      undefined laten staan: dan zou `na.X - voor.X` voor een meter die je niet
      hebt gevraagd stilletjes NaN worden en de proef om de verkeerde reden
@@ -912,7 +938,8 @@ function meet(bronnen) {
     inlineStijlAttributen,
     bronBlindeBestanden,
     delenZonderOnderwerp,
-    staatOngeregistreerd, staatOnbekend, staatProcesgebonden, datamapVastgeklonken, duurOpWandklok
+    staatOngeregistreerd, staatOnbekend, staatProcesgebonden, datamapVastgeklonken, duurOpWandklok,
+    bewijsOnbekend
   };
   if (!alleen) return alles;
   const uit = {};

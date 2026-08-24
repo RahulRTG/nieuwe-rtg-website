@@ -4688,10 +4688,9 @@
     },
     "rahul-mens.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "gezakt": 0,
-      "traag": true,
-      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "staat": "te langzaam",
+      "lekt": true,
+      "reden": "ook met --test-force-exit niet af binnen 360s; de toetsen zelf komen niet klaar, dus dit is traagheid en niet alleen een handle",
       "module": "server/kern/rahul/taal.js",
       "operator": "!==->===#0",
       "geprobeerd": 1,

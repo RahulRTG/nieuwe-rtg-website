@@ -32,6 +32,25 @@ module.exports = function maakEtalage(kern) {
   const prijsVan = (v) => (geld ? Number(v.manifest.prijsCenten || 0) : 0);
   const heeftGekocht = (key, sleutel) => !!(geld && key && geld.gekocht(key, sleutel));
 
+  /* Wat een nieuwe versie MEER vraagt dan dit lid heeft verleend: een machtiging
+     die hij niet gaf, of dezelfde machtiging voor een ANDER doel. Dat tweede is
+     precies waarom een doel een gesloten lijst is -- anders is er niets te
+     vergelijken. */
+  function diff(verleend, v) {
+    const had = Array.isArray(verleend.machtigingen) ? verleend.machtigingen : [];
+    const hadDoel = verleend.doelen || {};
+    const wil = v.manifest.machtigingen || [];
+    const wilDoel = v.manifest.doelen || {};
+    const uit = [];
+    for (const id of wil) {
+      if (!had.includes(id)) { uit.push({ id, doel: wilDoel[id] || null, soort: 'nieuw' }); continue; }
+      if (hadDoel[id] && wilDoel[id] && hadDoel[id] !== wilDoel[id]) {
+        uit.push({ id, doel: wilDoel[id], eerderDoel: hadDoel[id], soort: 'ander-doel' });
+      }
+    }
+    return toonbaar(uit.map(x => x.id), wilDoel).map((m, i) => Object.assign(m, { soort: uit[i].soort, eerderDoel: uit[i].eerderDoel || null }));
+  }
+
   /* De verleningen van een lid. Ze worden hier GELEZEN en in ./winkel.js
      geschreven; dat die twee uit elkaar staan is de hele reden dat dit bestand
      bestaat. */
@@ -56,7 +75,7 @@ module.exports = function maakEtalage(kern) {
       sleutel: a.sleutel, naam: v.manifest.naam, uitleg: v.manifest.uitleg,
       categorie: v.manifest.categorie, taal: v.manifest.taal, versie: v.manifest.versie,
       uitgever: u ? { org: u.org, naam: u.naam } : null,
-      vraagt: toonbaar(v.manifest.machtigingen),
+      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen),
       gekeurd: v.besluit ? v.besluit.at : v.at,
       grootte: v.maten ? v.maten.totaal : null,
       icoon: v.manifest.icoon ? celPad(a.sleutel, v.hash, v.manifest.icoon) : null,
@@ -64,7 +83,13 @@ module.exports = function maakEtalage(kern) {
       prijsCenten: prijsVan(v),
       gekocht: prijsVan(v) > 0 ? heeftGekocht(key, a.sleutel) : true,
       geinstalleerd: !!verleend,
-      verleend: verleend ? toonbaar(verleend.machtigingen) : []
+      verleend: verleend ? toonbaar(verleend.machtigingen, verleend.doelen) : [],
+      /* WAT DEZE UPDATE MEER VRAAGT DAN JE HEBT GEGEVEN. Zonder dit kan een app
+         stilletjes groeien in bevoegdheden: een nieuwe versie zet een machtiging
+         in zijn manifest en niemand die het ziet. Hij wordt hier UITGEREKEND en
+         niet bewaard -- een opgeslagen diff loopt achter zodra er een versie
+         bijkomt (LAT-regel 4). */
+      updateVraagt: verleend ? diff(verleend, v) : []
     };
   }
 
@@ -100,5 +125,5 @@ module.exports = function maakEtalage(kern) {
     return uit.sort((x, y) => (x.naam.toLowerCase() < y.naam.toLowerCase() ? -1 : 1));
   }
 
-  return { live, kaart, celPad, catalogus, mijn, prijsVan, heeftGekocht, rijVan, verleendeVan };
+  return { live, kaart, celPad, catalogus, mijn, prijsVan, heeftGekocht, rijVan, verleendeVan, diff };
 };

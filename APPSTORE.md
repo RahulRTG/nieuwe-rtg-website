@@ -142,6 +142,33 @@ brug leest alleen de tweede. Een app die drie machtigingen vroeg en er één kre
 werkt met één. Een lid kan een machtiging intrekken zonder de app te verwijderen,
 en de app merkt dat bij de volgende aanroep.
 
+**En elke machtiging draagt een DOEL.** Een machtiging zegt wat een app krijgt;
+het doel zegt waarvoor. Dat tweede is waar een lid werkelijk op beslist —
+"onthouden wat je doet" is geen vraag, "onthouden waar je gebleven was" wel. De
+doelen zijn een **gesloten lijst** (`machtigingen.DOELEN`), en dat is het hele
+punt: vrije tekst levert "om u beter van dienst te zijn" op, en dat is niet te
+vergelijken tussen apps, niet te doorzoeken voor het kantoor, en niet te diffen
+bij een update.
+
+**Een update die méér vraagt, krijgt het niet vanzelf.** Dit was een echt gat:
+tot deze laag er was, kon een nieuwe versie een machtiging in zijn manifest
+zetten zonder dat iemand het zag. Nu wordt bij elke opening uitgerekend wat de
+live versie méér vraagt dan dit lid heeft verleend — een machtiging die hij niet
+gaf, óf dezelfde machtiging voor een ánder doel — en dat staat op de kaart
+voordat hij ergens op drukt. Zolang hij niets doet, krijgt de app het niet; de
+app blijft wel gewoon werken met wat hij al had. Een update mag niet stilletjes
+meer krijgen, en ook niet stilletjes stukgaan.
+
+De mens die aftekent ziet dezelfde vergelijking (`tovLive` in de wachtrij): wat
+erbij komt, wat er een ander doel krijgt, wat eraf gaat, en of de prijs verandert.
+Zonder dat zou hij twee manifesten naast elkaar moeten leggen, en dat doet
+niemand bij de twintigste.
+
+**Een weigering legt uit welke van de twee ontbrak.** "403 Forbidden" laat een
+uitgever raden tussen vier oorzaken die elk een andere oplossing hebben. De brug
+zegt daarom of de app het niet vróég (los het op in je volgende versie) of het
+lid het niet gáf (daar kun je niets aan doen, en dat hoort er dan ook te staan).
+
 Er zijn er **drie**, en alle drie worden ze uitgevoerd:
 
 | machtiging | geeft | nooit |
@@ -224,6 +251,7 @@ public/apps/
 test/appstore.test.js      de zes grenzen over de lijn
 test/appstore-cel.test.js  wat je aan de bron zelf kunt zien
 test/appstore-geld.test.js de bon, de aanschaf, de afdracht, de btw, het recht
+test/appstore-doel.test.js het doel bij een machtiging, en de vergunningsdiff
 test/appstore.e2e.js       de cel, de winkel en de bon in een echte browser
 ```
 

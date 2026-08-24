@@ -55,7 +55,11 @@ module.exports = (kern) => {
     const r = appstoreBrug.roep({
       key: req.session.key, sleutel, methode: req.body.methode, args: req.body.args,
       codenaam: codenaamVan(req.session.key), taal: req.body.taal || 'nl', pas: req.session.tier,
-      verleend: open.machtigingen });
+      /* Wat het lid VERLEENDE bepaalt of het mag; wat het manifest VRAAGT gaat
+         alleen mee zodat een weigering kan uitleggen welke van de twee ontbrak.
+         Dat onderscheid is de hele reden dat een weigering hier bruikbaar is
+         (kern/appstore/brug.js). */
+      verleend: open.machtigingen, vraagt: (open.vraagt || []).map(m => m.id) });
     antwoord(res, r);
   });
 

@@ -612,6 +612,7 @@ function storeKaart(a){
       '<input type="checkbox" data-m="'+esc(m.id)+'"'+(a.geinstalleerd ? (a.verleend.some(v => v.id === m.id) ? ' checked' : '') : ' checked')+
         ' style="margin-top:.22rem;width:1rem;height:1rem;flex:0 0 auto;accent-color:#C23A5E;">'+
       '<span style="font-size:.76rem;line-height:1.5;"><b style="display:block;">'+esc(m.label)+'</b>'+
+        (m.waarvoor ? '<span style="color:var(--txt);">Waarvoor: '+esc(m.waarvoor)+'</span><br>' : '')+
         '<span style="color:var(--muted);">Geeft: '+esc(m.geeft)+'</span><br>'+
         '<span style="color:var(--soft);"><b style="color:var(--gold);">Nooit:</b> '+esc(m.nooit)+'</span></span></label>').join('')
     || '<div style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">Deze app vraagt niets van je.</div>';
@@ -619,6 +620,17 @@ function storeKaart(a){
     '<span class="stad">van '+esc(a.uitgever ? a.uitgever.naam : 'een derde partij')+'</span>'+
     '<b style="display:block;margin:.15rem 0;">'+esc(a.naam)+'</b>'+
     '<span style="font-size:.76rem;color:var(--muted);line-height:1.5;display:block;">'+esc(a.uitleg)+'</span>'+
+    /* WAT EEN UPDATE MEER VRAAGT, boven de vinkjes en niet eronder. Een app die
+       zijn manifest uitbreidt krijgt daarmee niets extra's -- hij vraagt alleen
+       opnieuw -- en dat hoort een lid te zien voordat hij ergens op drukt. */
+    ((a.updateVraagt && a.updateVraagt.length)
+      ? '<div style="margin-top:.5rem;border-left:3px solid var(--gold);background:rgba(169,143,28,.09);border-radius:0 10px 10px 0;padding:.5rem .7rem;">'+
+        '<b style="font-size:.8rem;">Deze update vraagt meer</b>'+
+        a.updateVraagt.map(m => '<div style="font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:.25rem;">'+
+          esc(m.label)+(m.soort === 'ander-doel' ? ' &mdash; nu voor: ' : ' &mdash; voor: ')+esc(m.waarvoor || m.doel || '')+
+          (m.soort === 'ander-doel' ? ' (was: '+esc(m.eerderDoel)+')' : '')+'</div>').join('')+
+        '<div style="font-size:.74rem;color:var(--soft);margin-top:.35rem;">Zolang je niets doet, krijgt de app dit niet. De app blijft gewoon werken met wat je hem al gaf.</div>'+
+        '</div>' : '')+
     '<div style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.4rem;">'+
       '<span style="font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);">Wat je geeft</span>'+
       vinkjes+'</div>'+

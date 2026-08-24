@@ -86,7 +86,20 @@ function tekenWachtrij(d){
           '<span class="st">'+esc(v.org)+'</span>'+(v.prijsCenten ? '<span class="st">'+eur(v.prijsCenten)+'</span>' : '')+'</div>'+
         '<p class="sub">'+esc(v.uitleg)+'</p>'+
         '<p class="sub"><code>'+esc(v.hash.slice(0,16))+'</code> &middot; '+Math.round((v.maten?v.maten.totaal:0)/1024)+' kB in '+(v.maten?v.maten.bestanden:0)+' bestanden</p>'+
-        (v.vraagt.length ? '<p class="sub">Vraagt: '+v.vraagt.map(m => esc(m.label)).join(', ')+'</p>' : '<p class="sub">Vraagt niets van het lid.</p>')+
+        (v.vraagt.length ? '<p class="sub">Vraagt: '+v.vraagt.map(m => esc(m.label)+' (voor: '+esc(m.waarvoor || m.doel || '?')+')').join(', ')+'</p>' : '<p class="sub">Vraagt niets van het lid.</p>')+
+        /* WAT ER VERANDERT TEN OPZICHTE VAN WAT LIVE STAAT. Zonder dit moet wie
+           aftekent twee manifesten naast elkaar leggen om te zien of een update
+           stiekem is gegroeid, en dat doet niemand bij de twintigste. */
+        (v.tovLive && !v.tovLive.eersteVersie
+          ? '<div class="bev letop"><b>Ten opzichte van wat nu live staat</b><br>'+
+            (v.tovLive.erbij.length ? 'Erbij: '+v.tovLive.erbij.map(x => esc(x.id)+' ('+esc(x.doel||'?')+')').join(', ')+'<br>' : '')+
+            (v.tovLive.anderDoel.length ? 'Ander doel: '+v.tovLive.anderDoel.map(x => esc(x.id)+': '+esc(x.van)+' &rarr; '+esc(x.naar)).join(', ')+'<br>' : '')+
+            (v.tovLive.eraf.length ? 'Eraf: '+v.tovLive.eraf.map(x => esc(x.id)).join(', ')+'<br>' : '')+
+            (v.tovLive.prijsVan !== v.tovLive.prijsNaar ? 'Prijs: '+eur(v.tovLive.prijsVan)+' &rarr; '+eur(v.tovLive.prijsNaar)+'<br>' : '')+
+            (!v.tovLive.erbij.length && !v.tovLive.anderDoel.length && !v.tovLive.eraf.length && v.tovLive.prijsVan === v.tovLive.prijsNaar
+              ? 'Niets: dezelfde machtigingen, dezelfde doelen, dezelfde prijs.' : '')+
+            '</div>'
+          : '<div class="bev letop"><b>Eerste versie van deze app</b><br>Er is niets om mee te vergelijken; lees het manifest als geheel.</div>')+
         v.bevindingen.map(b => '<div class="bev'+(b.ernst==='let-op'?' letop':'')+'"><b>'+esc(b.wat)+'</b>'+(b.bestand?' &middot; '+esc(b.bestand):'')+'<br>'+esc(b.hoe)+'</div>').join('')+
         '<div class="rij"><input class="veld reden" style="flex:1;min-width:12rem;" maxlength="600" placeholder="Reden (verplicht bij weigeren)">'+
           '<button class="knop pub" type="button">Publiceren</button>'+

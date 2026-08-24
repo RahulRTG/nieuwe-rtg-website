@@ -120,14 +120,33 @@ function maakBrug(kern) {
   /* De aanroep zelf. `ctx` komt van de route en niet van de app: de app noemt
      alleen een methode en argumenten. Wie hij is, welke app dit is en wat er is
      verleend, wordt hier bepaald uit de sessie. */
-  function roep({ key, sleutel, methode, args, codenaam, taal, pas, verleend }) {
+  function roep({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt }) {
     const naam = String(methode || '');
     const m = Object.prototype.hasOwnProperty.call(METHODES, naam) ? METHODES[naam] : null;
     if (!m) return { status: 400, error: 'De methode "' + naam + '" bestaat niet. Er zijn er ' + namen.length + ': ' + namen.join(', ') + '.' };
     const heeft = Array.isArray(verleend) ? verleend : [];
     if (!heeft.includes(m.machtiging)) {
-      return { status: 403, error: 'Hiervoor is de machtiging "' + m.machtiging + '" nodig, en die heeft dit lid je niet verleend.',
-        machtiging: m.machtiging, verleend: heeft };
+      /* EEN WEIGERING DIE UITLEGT, en dat is geen vriendelijkheid maar
+         gereedschap. "403 Forbidden" laat een uitgever raden tussen vier
+         oorzaken: vroeg ik het verkeerde, vroeg ik het niet, gaf het lid het
+         niet, of trok hij het terug? Elk van die vier heeft een andere
+         oplossing, en drie ervan zijn niets waar hij iets aan kan doen.
+
+         Daarom staat er wat er nodig was, wat dit lid WEL heeft gegeven, en waar
+         hij het kan veranderen. Dat laatste is het belangrijkste: het lid, niet
+         de uitgever, en niet RTG. */
+      const gevraagdMaarNietGegeven = Array.isArray(vraagt) && vraagt.includes(m.machtiging);
+      return { status: 403,
+        error: 'De methode "' + naam + '" vraagt de machtiging "' + m.machtiging + '". '
+          + (gevraagdMaarNietGegeven
+              ? 'Je app vraagt hem in zijn manifest, maar dit lid heeft hem niet verleend of weer ingetrokken.'
+              : 'Je app vraagt hem niet in zijn manifest, dus het lid heeft hem ook nooit kunnen geven.'),
+        machtiging: m.machtiging,
+        verleend: heeft,
+        gevraagd: Array.isArray(vraagt) ? vraagt : null,
+        hoe: gevraagdMaarNietGegeven
+          ? 'Alleen het lid kan dit aanzetten, in de App Store onder "wat mag deze app". Vraag het niet nog eens via de brug; werk zonder deze machtiging verder.'
+          : 'Zet hem in het manifest van een volgende versie, met een doel. Die versie gaat opnieuw langs de keuring, en het lid beslist opnieuw.' };
     }
     if (rem('roep:' + sleutel + ':' + key, GRENS.roepenPerMinuut, 60000)) {
       return { status: 429, error: 'Meer dan ' + GRENS.roepenPerMinuut + ' aanroepen per minuut houdt de brug tegen.' };

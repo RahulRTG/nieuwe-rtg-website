@@ -66,9 +66,15 @@ function maakWinkel(kern) {
     const lijst = (Array.isArray(gekozen) ? gekozen : []).map(String)
       .filter(m => isMachtiging(m) && gevraagd.includes(m));
     const uniek = [...new Set(lijst)];
-    rij[sleutel] = { machtigingen: uniek, at: nu(), versie: v.id };
+    /* Het DOEL wordt meegeschreven en niet later opgezocht. Zou het bij de
+       versie blijven staan, dan verandert waar een lid ja op zei zodra er een
+       nieuwe versie komt -- en dat is precies het stille groeien dat de
+       vergunningsdiff moet tegenhouden. */
+    const gaf = {};
+    for (const id of uniek) if ((v.manifest.doelen || {})[id]) gaf[id] = v.manifest.doelen[id];
+    rij[sleutel] = { machtigingen: uniek, doelen: gaf, at: nu(), versie: v.id };
     save();
-    return { status: 200, ok: true, sleutel, verleend: toonbaar(uniek), vraagt: toonbaar(gevraagd),
+    return { status: 200, ok: true, sleutel, verleend: toonbaar(uniek, gaf), vraagt: toonbaar(gevraagd, v.manifest.doelen),
       let: uniek.length < gevraagd.length
         ? 'Je hebt ' + uniek.length + ' van de ' + gevraagd.length + ' gevraagde machtigingen verleend. De app werkt; wat hij niet mag, krijgt hij niet.'
         : 'De app heeft wat hij vroeg. Je kunt elke machtiging later los intrekken zonder de app te verwijderen.' };
@@ -83,9 +89,15 @@ function maakWinkel(kern) {
     const gevraagd = v ? v.manifest.machtigingen : huidig.machtigingen;
     const uniek = [...new Set((Array.isArray(gekozen) ? gekozen : []).map(String).filter(m => isMachtiging(m) && gevraagd.includes(m)))];
     const weg = huidig.machtigingen.filter(m => !uniek.includes(m));
-    huidig.machtigingen = uniek; huidig.at = nu();
+    const oudeDoelen = huidig.doelen || {};
+    const gaf = {};
+    for (const id of uniek) {
+      const d = (v && v.manifest.doelen ? v.manifest.doelen[id] : null) || oudeDoelen[id];
+      if (d) gaf[id] = d;
+    }
+    huidig.machtigingen = uniek; huidig.doelen = gaf; huidig.at = nu();
     save();
-    return { status: 200, ok: true, verleend: toonbaar(uniek), ingetrokken: toonbaar(weg) };
+    return { status: 200, ok: true, verleend: toonbaar(uniek, gaf), ingetrokken: toonbaar(weg, oudeDoelen) };
   }
 
   /* Verwijderen haalt de app van je startscherm EN haalt elke machtiging weg. Wat
@@ -128,7 +140,13 @@ function maakWinkel(kern) {
     return { status: 200, ok: true, sleutel, hash: v.hash, start: celPad(sleutel, v.hash, v.manifest.start),
       naam: v.manifest.naam, versie: v.manifest.versie, taal: v.manifest.taal,
       uitgever: u ? { org: u.org, naam: u.naam } : null,
-      verleend: toonbaar(verleend.machtigingen), machtigingen: verleend.machtigingen };
+      verleend: toonbaar(verleend.machtigingen, verleend.doelen), machtigingen: verleend.machtigingen,
+      doelen: verleend.doelen || {}, updateVraagt: E.diff(verleend, v),
+      /* Wat de LIVE versie vraagt gaat ook mee, en alleen daarvoor: een
+         weigering op de brug kan er dan bij zeggen of de app het niet vroeg of
+         het lid het niet gaf. Het bepaalt nooit wat er mag -- dat doet
+         `machtigingen` hierboven, en dat is wat het lid verleende. */
+      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen) };
   }
 
   /* De poort van de celroute: mag deze hash van deze app uberhaupt uitgeleverd

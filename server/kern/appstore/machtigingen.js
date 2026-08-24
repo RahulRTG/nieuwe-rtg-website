@@ -23,26 +23,57 @@
    ========================================================================== */
 'use strict';
 
-const M = (id, label, geeft, nooit, risico) => ({ id, label, geeft, nooit, risico });
+const M = (id, label, geeft, nooit, risico, doelen) => ({ id, label, geeft, nooit, risico, doelen: doelen || [] });
+
+/* ----------------------------------------------------------------------------
+   DE DOELEN, EN WAAROM HET EEN GESLOTEN LIJST IS.
+
+   Een machtiging zegt WAT een app krijgt. Een doel zegt WAARVOOR. Dat tweede is
+   waar een lid werkelijk op beslist: "deze app mag onthouden wat je doet" is
+   geen vraag, "deze app mag onthouden waar je gebleven was" wel.
+
+   Het is een gesloten lijst en geen vrij tekstveld, en dat is het hele punt.
+   Vrije tekst levert "om u beter van dienst te zijn" op -- niet te vergelijken,
+   niet te doorzoeken, niet te toetsen, en niet te diffen bij een update. Met
+   een vaste lijst kan een lid twee apps naast elkaar leggen, kan het kantoor
+   zoeken op wie er voor een bepaald doel leest, en kan de vergunningsdiff
+   hieronder zien dat een update hetzelfde vraagt VOOR IETS ANDERS.
+
+   Een doel erbij is een besluit, geen invulveld: het hoort hier te staan met een
+   uitleg die een lid begrijpt zonder dit bestand te openen. */
 
 /* De drie. Elk van hen heeft een uitvoering in ./brug.js; test/appstore.test.js
    zakt op een machtiging die hier staat en daar niet. */
+const DOELEN = {
+  'voortgang-onthouden': 'onthouden waar je gebleven was',
+  'voorkeuren-onthouden': 'je instellingen in deze app onthouden',
+  'werk-bewaren': 'bewaren wat je in deze app hebt gemaakt',
+  'aanspreken': 'je aanspreken met de juiste naam en in de juiste taal',
+  'taal-kiezen': 'de app in jouw taal tonen',
+  'pas-tonen': 'tonen wat er bij jouw pas hoort',
+  'herinneren': 'je herinneren aan iets wat jij zelf hebt gezet',
+  'klaar-melden': 'melden dat iets waar je op wachtte klaar is'
+};
+
 const MACHTIGINGEN = [
   M('profiel.basis',
     'Wie je bent, op codenaam',
     'je codenaam, je taal en welke pas je hebt',
     'je echte naam, je e-mailadres, je telefoonnummer, je adres of je geboortedatum',
-    'laag'),
+    'laag',
+    ['aanspreken', 'taal-kiezen', 'pas-tonen']),
   M('opslag.eigen',
     'Onthouden wat jij in deze app doet',
     'een eigen kladblok van deze app, alleen voor jou en alleen voor deze app',
     'inzage in wat je in een andere app hebt staan, of in de rest van je RTG-gegevens',
-    'laag'),
+    'laag',
+    ['voortgang-onthouden', 'voorkeuren-onthouden', 'werk-bewaren']),
   M('bericht.klaarzetten',
     'Een bericht voor je klaarzetten in de App Store',
     'hooguit een handvol berichten per dag, die je zelf ophaalt in de App Store',
     'een pushbericht, een e-mail, een sms, of iets dat je onderbreekt',
-    'midden')
+    'midden',
+    ['herinneren', 'klaar-melden'])
 ];
 
 const OP_ID = new Map(MACHTIGINGEN.map(m => [m.id, m]));
@@ -66,16 +97,26 @@ const NIET_GEBOUWD = {
    een mens van RTG met eigen ogen moet zien; niet om iets tegen te houden. */
 const RISICO = ['laag', 'midden', 'hoog'];
 
+const doelUitleg = (d) => (Object.prototype.hasOwnProperty.call(DOELEN, String(d || '')) ? DOELEN[String(d)] : null);
+const doelMag = (id, doel) => { const m = machtiging(id); return !!(m && m.doelen.includes(String(doel || ''))); };
+
 /* Wat een lid krijgt te zien bij het installeren. Alles staat er, ook wat de
    app NIET krijgt -- een toestemmingsscherm dat alleen zegt wat er wel gebeurt,
-   is een verkooppraatje. */
-function toonbaar(ids) {
+   is een verkooppraatje. En het DOEL staat erbij, want dat is waar een lid
+   werkelijk op beslist.
+
+   `doelen` is een map van machtiging naar doel; ontbreekt hij, dan staat er
+   `waarvoor: null` en niet een verzonnen reden. */
+function toonbaar(ids, doelen) {
   const uit = [];
   for (const id of (Array.isArray(ids) ? ids : [])) {
     const m = machtiging(id);
-    if (m) uit.push({ id: m.id, label: m.label, geeft: m.geeft, nooit: m.nooit, risico: m.risico });
+    if (!m) continue;
+    const d = doelen && Object.prototype.hasOwnProperty.call(doelen, id) ? doelen[id] : null;
+    uit.push({ id: m.id, label: m.label, geeft: m.geeft, nooit: m.nooit, risico: m.risico,
+      doel: d || null, waarvoor: doelUitleg(d) });
   }
   return uit;
 }
 
-module.exports = { MACHTIGINGEN, machtiging, isMachtiging, toonbaar, NIET_GEBOUWD, RISICO };
+module.exports = { MACHTIGINGEN, DOELEN, machtiging, isMachtiging, toonbaar, doelUitleg, doelMag, NIET_GEBOUWD, RISICO };

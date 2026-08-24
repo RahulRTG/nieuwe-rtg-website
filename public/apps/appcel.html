@@ -180,6 +180,7 @@ function tekenPaneel(){
   $('#lijst').innerHTML = (STAND && STAND.verleend.length ? STAND.verleend : []).map(m =>
     '<div class="m"><label><input type="checkbox" checked value="'+esc(m.id)+'">'+
     '<span><b>'+esc(m.label)+'</b>'+
+    (m.waarvoor ? '<span class="geeft">Waarvoor: '+esc(m.waarvoor)+'</span>' : '')+
     '<span class="geeft">Geeft: '+esc(m.geeft)+'</span>'+
     '<span class="nooit"><b>Nooit:</b> '+esc(m.nooit)+'</span></span></label></div>').join('')
     || '<div class="m" style="color:var(--soft);font-size:.85rem;line-height:1.6;">Niets verleend.</div>';

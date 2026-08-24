@@ -106,7 +106,7 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
     return { id: v.id, sleutel: v.sleutel, org: v.org, naam: v.manifest.naam, versie: v.manifest.versie,
       uitleg: v.manifest.uitleg, categorie: v.manifest.categorie, taal: v.manifest.taal,
       prijsCenten: Number(v.manifest.prijsCenten || 0),
-      vraagt: toonbaar(v.manifest.machtigingen), hash: v.hash, maten: v.maten,
+      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen), hash: v.hash, maten: v.maten,
       bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit || null };
   }
 

@@ -14,14 +14,36 @@
    ========================================================================== */
 'use strict';
 
-const { MACHTIGINGEN, NIET_GEBOUWD } = require('./machtigingen');
+const { MACHTIGINGEN, DOELEN, NIET_GEBOUWD } = require('./machtigingen');
 const { BUDGET } = require('./keuring');
 
 module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV }) {
   /* -------------------------------------------------------------- het aftekenen */
 
+  /* Wat deze inzending MEER vraagt dan de versie die nu live staat. Zonder dit
+     moet de mens die aftekent twee manifesten naast elkaar leggen om te zien of
+     een update stiekem is gegroeid -- en dat doet niemand bij de twintigste. Het
+     wordt uitgerekend en niet bewaard: een opgeslagen diff loopt achter zodra er
+     een versie bijkomt (LAT-regel 4). */
+  function tovLive(v) {
+    const a = app(v.sleutel);
+    const oud = a && a.live ? versie(a.live) : null;
+    if (!oud) return { eersteVersie: true, erbij: [], anderDoel: [], eraf: [] };
+    const oudM = oud.manifest.machtigingen || [], oudD = oud.manifest.doelen || {};
+    const nieuwM = v.manifest.machtigingen || [], nieuwD = v.manifest.doelen || {};
+    return {
+      eersteVersie: false,
+      erbij: nieuwM.filter(id => !oudM.includes(id)).map(id => ({ id, doel: nieuwD[id] || null })),
+      anderDoel: nieuwM.filter(id => oudM.includes(id) && oudD[id] && nieuwD[id] && oudD[id] !== nieuwD[id])
+        .map(id => ({ id, van: oudD[id], naar: nieuwD[id] })),
+      eraf: oudM.filter(id => !nieuwM.includes(id)).map(id => ({ id, doel: oudD[id] || null })),
+      prijsVan: Number(oud.manifest.prijsCenten || 0), prijsNaar: Number(v.manifest.prijsCenten || 0)
+    };
+  }
+
   const wachtrij = () => Object.values(S().versies).filter(v => v.status === 'wacht-op-mens')
-    .sort((a, b) => (a.at < b.at ? -1 : 1)).map(publiekV);
+    .sort((a, b) => (a.at < b.at ? -1 : 1))
+    .map(v => Object.assign(publiekV(v), { tovLive: tovLive(v) }));
 
   /* GRENS 2, EN DIT IS DE PLEK WAAR HIJ WORDT AFGEDWONGEN. Een besluit draagt een
      mens (`door`) en een organisatie (`doorOrg`, als die er is). Is die
@@ -95,9 +117,13 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
       versies: Object.values(S().versies).filter(v => v.sleutel === a.sleutel).sort((x, y) => (x.at < y.at ? 1 : -1)).map(publiekV)
     }));
     return { uitgever: u ? publiekU(u) : null, apps, budget: BUDGET,
-      machtigingen: MACHTIGINGEN.map(m => ({ id: m.id, label: m.label, geeft: m.geeft, nooit: m.nooit, risico: m.risico })),
+      /* De doelen gaan mee, want een uitgever moet ze kunnen KIEZEN en niet
+         opzoeken. Een gesloten lijst die je pas leert kennen door een afkeuring,
+         is een gesloten lijst die vier inzendingen kost. */
+      machtigingen: MACHTIGINGEN.map(m => ({ id: m.id, label: m.label, geeft: m.geeft, nooit: m.nooit, risico: m.risico,
+        doelen: m.doelen.map(d => ({ id: d, uitleg: DOELEN[d] })) })),
       nietGebouwd: NIET_GEBOUWD };
   }
 
-  return { wachtrij, besluit, intrekken, mijnUitgeverij };
+  return { wachtrij, besluit, intrekken, mijnUitgeverij, tovLive };
 };

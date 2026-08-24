@@ -25,7 +25,7 @@
    ========================================================================== */
 'use strict';
 
-const { isMachtiging, MACHTIGINGEN, NIET_GEBOUWD } = require('./machtigingen');
+const { isMachtiging, machtiging, MACHTIGINGEN, DOELEN, NIET_GEBOUWD } = require('./machtigingen');
 
 const SLEUTELS = ['sleutel', 'naam', 'versie', 'uitleg', 'categorie', 'start', 'icoon', 'machtigingen', 'taal', 'prijsCenten'];
 const CATEGORIEEN = ['sociaal', 'reizen', 'eten', 'media', 'geld', 'spelen', 'leven', 'veiligheid'];
@@ -79,23 +79,52 @@ function lees(ruw) {
   const taal = tekst(ruw.taal).toLowerCase() || 'nl';
   if (!TALEN.includes(taal)) fout('taal', 'De taal is nl of en.');
 
+  /* ELKE MACHTIGING DRAAGT EEN DOEL, EN DAT IS GEEN VERSIERING.
+
+     Een machtiging zegt wat een app krijgt; het doel zegt waarvoor. Dat tweede
+     is waar een lid werkelijk op beslist, en het is ook het enige waarop een
+     UPDATE te vergelijken valt: dezelfde machtiging voor een ander doel is een
+     andere vraag, en hoort opnieuw gesteld te worden (zie ./besluit.js, de
+     vergunningsdiff).
+
+     Een entry is daarom `{ id, doel }`. Een kale tekenreeks wordt geweigerd MET
+     de lijst doelen die bij die machtiging horen erbij -- een uitgever hoort niet
+     te hoeven raden welke woorden mogen. */
   const gevraagd = [];
+  const doelen = {};
   const rauwM = ruw.machtigingen == null ? [] : ruw.machtigingen;
+  const doelenVan = (id) => (machtiging(id) || { doelen: [] }).doelen
+    .map(d => d + ' (' + DOELEN[d] + ')').join('; ');
   if (!Array.isArray(rauwM)) {
     fout('machtigingen', 'Machtigingen is een lijst. Laat hem leeg als je app niets van het lid nodig heeft; dat is de snelste weg door de poort.');
   } else if (rauwM.length > MACHTIGINGEN.length) {
     fout('machtigingen', 'Er zijn er maar ' + MACHTIGINGEN.length + '; je vraagt er meer.');
   } else {
     for (const m of rauwM) {
-      const id = tekst(m);
-      if (isMachtiging(id)) { if (!gevraagd.includes(id)) gevraagd.push(id); continue; }
-      /* De reden en niet alleen de afwijzing: een uitgever die "betalen" vraagt
-         hoort te lezen waarom dat er niet is, niet dat hij iets fout typte. */
-      const soort = id.split('.')[0];
-      const reden = NIET_GEBOUWD[soort] || NIET_GEBOUWD[id];
-      fout('machtigingen', reden
-        ? '"' + id + '" bestaat niet. ' + reden
-        : '"' + id + '" bestaat niet. Er zijn er drie: ' + MACHTIGINGEN.map(x => x.id).join(', ') + '.');
+      const isObj = m && typeof m === 'object' && !Array.isArray(m);
+      const id = tekst(isObj ? m.id : m);
+      if (!isMachtiging(id)) {
+        /* De reden en niet alleen de afwijzing: een uitgever die "betalen" vraagt
+           hoort te lezen waarom dat er niet is, niet dat hij iets fout typte. */
+        const soort = id.split('.')[0];
+        const reden = NIET_GEBOUWD[soort] || NIET_GEBOUWD[id];
+        fout('machtigingen', reden
+          ? '"' + id + '" bestaat niet. ' + reden
+          : '"' + id + '" bestaat niet. Er zijn er drie: ' + MACHTIGINGEN.map(x => x.id).join(', ') + '.');
+        continue;
+      }
+      if (gevraagd.includes(id)) { fout('machtigingen', '"' + id + '" staat er twee keer in; vraag hem een keer, met een doel.'); continue; }
+      const doel = tekst(isObj ? m.doel : '');
+      if (!doel) {
+        fout('machtigingen', '"' + id + '" heeft een doel nodig: schrijf { "id": "' + id + '", "doel": "..." }. Een lid beslist niet op wat je krijgt maar op waarvoor. Mogelijke doelen: ' + doelenVan(id) + '.');
+        continue;
+      }
+      if (!(machtiging(id).doelen.includes(doel))) {
+        fout('machtigingen', 'Het doel "' + doel + '" hoort niet bij "' + id + '". De doelen zijn een gesloten lijst zodat een lid twee apps kan vergelijken en een update te diffen is. Mogelijke doelen: ' + doelenVan(id) + '.');
+        continue;
+      }
+      gevraagd.push(id);
+      doelen[id] = doel;
     }
   }
 
@@ -121,7 +150,7 @@ function lees(ruw) {
   }
 
   if (fouten.length) return { ok: false, manifest: null, fouten };
-  return { ok: true, fouten: [], manifest: { sleutel, naam, versie, uitleg, categorie, start, icoon: icoon || null, machtigingen: gevraagd, taal, prijsCenten: prijs } };
+  return { ok: true, fouten: [], manifest: { sleutel, naam, versie, uitleg, categorie, start, icoon: icoon || null, machtigingen: gevraagd, doelen, taal, prijsCenten: prijs } };
 }
 
 module.exports = { lees, SLEUTELS, CATEGORIEEN, TALEN, PAD_VORM, VERSIE_VORM, SLEUTEL_VORM };

@@ -79,6 +79,17 @@ tot de eigenaar hem zet en werkt alleen vooruit, en een ingetrokken gekochte app
 laat een teruggaveRECHT achter dat een mens afhandelt — grens 5 blijft absoluut.
 Er komt geen tweede geldstroom: alles loopt over RTG Pay.
 
+**`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
+een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,
+billing, compliance, hosting, permissies, observability en enterprise-controls
+niet zelf hoeft te bouwen. Lees die vóór je aan een SDK, een objectmodel of een
+ontwikkelaarsvoorziening begint. Het is een richtingsdocument zoals PLATFORM.md:
+per onderdeel staat er of het **staat**, **een stap weg** is, **een besluit
+vraagt** of **jaren weg** is — zodat niemand die vier voor elkaar aanziet. De
+belangrijkste zin staat in paragraaf 2: **een universeel objectmodel moet worden
+GEVONDEN in de domeinen, niet eroverheen verklaard** — dat is precies de fout die
+de oude super-app-regel al een keer heeft voorkomen.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

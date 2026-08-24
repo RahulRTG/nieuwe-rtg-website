@@ -85,7 +85,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     const inz = await api(base, '/api/appstore/uitgever/inzenden', {
       manifest: { sleutel: 'cel-proef', naam: 'Celproef', versie: '1.0.0', categorie: 'leven',
         uitleg: 'Een proefapp die laat zien wat er wel en niet door de brug komt.',
-        machtigingen: ['opslag.eigen', 'profiel.basis'] },
+        machtigingen: [{ id: 'opslag.eigen', doel: 'voortgang-onthouden' }, { id: 'profiel.basis', doel: 'aanspreken' }] },
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }]
     }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
@@ -169,7 +169,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     const inz = await api(base, '/api/appstore/uitgever/inzenden', {
       manifest: { sleutel: 'winkel-proef', naam: 'Winkelproef', versie: '1.0.0', categorie: 'leven',
         uitleg: 'Een proefapp om de winkelkant van de App Store te tonen.',
-        machtigingen: ['opslag.eigen', 'profiel.basis'] },
+        machtigingen: [{ id: 'opslag.eigen', doel: 'voortgang-onthouden' }, { id: 'profiel.basis', doel: 'aanspreken' }] },
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
     await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);

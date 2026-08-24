@@ -118,7 +118,10 @@ const manifestUit = () => ({
      hij door dezelfde keuring als de rest, en is een prijswijziging een nieuwe
      versie met een nieuwe handtekening van een mens. */
   prijsCenten: Math.round((Number(String($('#mPrijs').value).replace(',', '.')) || 0) * 100),
-  machtigingen: [...document.querySelectorAll('input[data-mach]:checked')].map(i => i.dataset.mach)
+  machtigingen: [...document.querySelectorAll('input[data-mach]:checked')].map(i => {
+    const sel = document.querySelector('select[data-doel="' + i.dataset.mach + '"]');
+    return { id: i.dataset.mach, doel: sel ? sel.value : '' };
+  })
 });
 
 function toonFouten(d){
@@ -157,12 +160,20 @@ function tekenAanvraag(){
 }
 
 function tekenInzenden(){
+  /* Per machtiging een DOEL, en het is een keuzelijst en geen tekstvak. Een lid
+     beslist niet op wat je krijgt maar op waarvoor; een vast woord maakt dat
+     vergelijkbaar tussen apps en maakt een update te diffen. */
   const m = STAND.machtigingen.map(x =>
-    '<label style="display:flex;gap:.5rem;align-items:flex-start;margin-top:.4rem;cursor:pointer;">'+
-      '<input type="checkbox" data-mach="'+esc(x.id)+'" style="margin-top:.22rem;width:1rem;height:1rem;accent-color:#C23A5E;">'+
-      '<span style="font-size:.78rem;line-height:1.5;"><b style="display:block;">'+esc(x.id)+'</b>'+
-      '<span style="color:var(--muted);">'+esc(x.geeft)+'</span><br>'+
-      '<span style="color:var(--soft);"><b style="color:var(--gold);">Nooit:</b> '+esc(x.nooit)+'</span></span></label>').join('');
+    '<div style="margin-top:.5rem;">'+
+      '<label style="display:flex;gap:.5rem;align-items:flex-start;cursor:pointer;">'+
+        '<input type="checkbox" data-mach="'+esc(x.id)+'" style="margin-top:.22rem;width:1rem;height:1rem;accent-color:#C23A5E;">'+
+        '<span style="font-size:.78rem;line-height:1.5;"><b style="display:block;">'+esc(x.id)+'</b>'+
+        '<span style="color:var(--muted);">'+esc(x.geeft)+'</span><br>'+
+        '<span style="color:var(--soft);"><b style="color:var(--gold);">Nooit:</b> '+esc(x.nooit)+'</span></span></label>'+
+      '<select class="veld" data-doel="'+esc(x.id)+'" style="margin-top:.3rem;margin-left:1.5rem;max-width:22rem;" aria-label="Waarvoor '+esc(x.id)+'">'+
+        x.doelen.map(d => '<option value="'+esc(d.id)+'">'+esc(d.id)+' &mdash; '+esc(d.uitleg)+'</option>').join('')+
+      '</select>'+
+    '</div>').join('');
   const niet = Object.entries(STAND.nietGebouwd).map(([k, v]) =>
     '<div class="bev letop"><b>'+esc(k)+'</b><span class="hoe">'+esc(v)+'</span></div>').join('');
   const b = STAND.budget;

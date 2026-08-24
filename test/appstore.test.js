@@ -60,7 +60,10 @@ const bundel = (extra) => [
 const manifest = (over) => Object.assign({
   sleutel: 'derden-teller', naam: 'Teller van Derden', versie: '1.0.0',
   uitleg: 'Een eenvoudige teller die onthoudt hoe ver je was, ook als je de app sluit.',
-  categorie: 'leven', machtigingen: ['opslag.eigen', 'profiel.basis', 'bericht.klaarzetten']
+  categorie: 'leven', machtigingen: [
+    { id: 'opslag.eigen', doel: 'voortgang-onthouden' },
+    { id: 'profiel.basis', doel: 'aanspreken' },
+    { id: 'bericht.klaarzetten', doel: 'herinneren' }]
 }, over || {});
 
 let versieId = null, hash = null;

@@ -169,6 +169,51 @@ test('de motor doet alleen over wat verlopen is -- en slaat zonder die vlag juis
   assert.equal(motor.moetOverslaan('oud.test.js', { uitslag, opnieuw: true }), false);
 });
 
+test('een ondiepe overlever is een tussenstand en geen oordeel, in alle regimes', () => {
+  /* WAAR DIT UIT KOMT, EN HET IS ECHT GEBEURD.
+
+     Fase A van de motor probeert EEN plek per operator. Blijft een toets daar
+     groen, dan schrijft hij "overleefd" -- en pas de A-diepe ronde erna, met
+     acht plekken, gaat daaroverheen. Op de vijf gevallen die ik vandaag terug
+     moest halen deed die tweede ronde ze alle vijf alsnog zakken.
+
+     Tussen die twee rondes in afbreken (ctrl-C, een time-out, een gesneuvelde
+     container) laat die vijf dus als ONGEVOELIG in MUTATIES.json achter. En
+     omdat de voortgang buiten de repo staat en bij een botsing wint, draagt de
+     eerstvolgende ronde dat gewoon door: toetsenOngevoeligPct in NORM.json ging
+     van 1,2 naar 1,7 zonder dat er een regel code was veranderd. Een ratel die
+     de verkeerde kant op gaat door een afgebroken meting bewaakt niets meer.
+
+     Een ondiepe overlever heet daarom `voorlopig`, en dat is geen etiket maar
+     een keuze: hij telt in GEEN van de drie regimes als gedaan, ook niet onder
+     --verlopen. Daar gaat het om houdbaarheid; hier om werk dat nooit af kwam. */
+  const uitslag = {
+    'ondiep.test.js': { soort: 'puur', staat: 'overleefd', voorlopig: true, toetsSha: 'aa' },
+    'diep.test.js': { soort: 'puur', staat: 'overleefd', toetsSha: 'aa' }
+  };
+  assert.equal(motor.moetOverslaan('ondiep.test.js', { uitslag }), false,
+    'zonder vlag: een ondiepe overlever hoort de diepe ronde alsnog te krijgen');
+  assert.equal(motor.moetOverslaan('ondiep.test.js', { uitslag, verlopenNamen: new Set() }), false,
+    'ook onder --verlopen, en die staat hier nadrukkelijk NIET in de verlopen-lijst -- ' +
+    'een overlever draagt geen bewijs, dus bewijsvers ziet hem niet en zou hem overslaan');
+  assert.equal(motor.moetOverslaan('diep.test.js', { uitslag }), true,
+    'een overlever DOOR de diepe ronde is wel een oordeel en blijft staan');
+  assert.equal(motor.moetOverslaan('ondiep.test.js', { uitslag, opnieuw: true }), false);
+});
+
+test('het echte register houdt geen enkele ondiepe overlever meer vast', () => {
+  /* De vlag hierboven werkt alleen als er ook echt niets meer met die vlag in
+     MUTATIES.json staat. Blijft er een staan, dan is er een ronde afgebroken
+     tussen fase A en A-diep en is dat cijfer nog geen oordeel. */
+  const register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIES.json'), 'utf8')).toetsen;
+  const open = Object.entries(register).filter(([, r]) => r && r.voorlopig).map(([k]) => k);
+  assert.deepEqual(open, [],
+    open.length + ' toets(en) staan als ondiepe overlever in het register; draai ' +
+    'node scripts/mutatie.js --puur af, dan gaat de diepe ronde er alsnog overheen:\n  ' +
+    open.slice(0, 10).join('\n  '));
+  assert.ok(Object.keys(register).length > 100, 'en er hoort een echt register te zijn');
+});
+
 test('de lijst waar --verlopen op draait is DEZELFDE lijst die de meter telt', () => {
   /* Twee definities van "verlopen" zouden binnen een week uiteenlopen, en dan
      meet de motor iets anders dan de ratel telt (LAT.md regel 4). Deze toets

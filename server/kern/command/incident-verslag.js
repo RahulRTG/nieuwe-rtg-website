@@ -24,6 +24,7 @@
 const klok = require('../../lib/klok');
 
 const { impactVan } = require('./incident-impact');
+const { NIVEAUS } = require('./risico');
 
 const DICHT = 'gesloten';
 
@@ -67,7 +68,7 @@ function maakVerslag({ rij, vind, save, journaal, kaart, vermogenUit, levend }) 
         ? Math.round((Date.parse(i.hersteldAt) - Date.parse(i.begonnen)) / 60000) : null };
     if (save) save();
     journaal.noteer({ actor: i.verslag.door, actie: 'incident sluiten', objectType: 'incident', objectId: i.id,
-      niveau: 'hand', reden: verslag.slice(0, 200),
+      niveau: NIVEAUS.hand, reden: verslag.slice(0, 200),
       na: { duurMinuten: i.verslag.duurMinuten, bovenEenStoring: nogStuk } });
     return { incident: dossier(i.id) };
   }

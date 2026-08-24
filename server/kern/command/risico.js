@@ -24,6 +24,24 @@
    passen" niet waar zijn. */
 'use strict';
 
+/* DE DRIE TREDEN, EEN KEER OPGESCHREVEN.
+
+   Dit bestand REKENT het niveau uit, maar het is niet de enige plek waar de
+   namen staan: elke plek die noteert wat er gebeurd is (een journaalregel, een
+   runbook, een incident) schrijft er ook een. Zolang dat losse tekenreeksen
+   zijn, houden tientallen bestanden dezelfde waarheid vast -- LAT.md regel 4 --
+   en een tikfout in een van hen valt nergens op: 'assit' is gewoon een string.
+
+   scripts/gezag.js telt die losse namen daarom, en hangt er een ratel aan. Wie
+   een trede nodig heeft, importeert hem hier vandaan.
+
+   DE NAMEN BLIJVEN LETTERLIJK IN DIT BESTAAND STAAN, en dat is geen slordigheid:
+   scripts/gezag.js ijkt zichzelf door te controleren dat elke geregistreerde
+   schaal terug te vinden is in het bestand waar hij hoort te wonen (LAT.md regel
+   3). Een schaal die alleen nog als variabele bestaat, zou die zelfijking laten
+   zakken -- en dan meet de ratel niets meer. */
+const NIVEAUS = Object.freeze({ hand: 'hand', assist: 'assist', auto: 'auto' });
+
 /* De grondrisico's per soort handeling. Dit is een tabel en geen berekening:
    het verschil tussen "een notitie zetten" en "een identiteit wijzigen" is een
    afspraak, geen formule. De namen zijn de acties die Command kent. */
@@ -85,10 +103,10 @@ function maakRisico({ beleid }) {
     const herstelAan = beleid.waarde('herstel.autoAan', true) !== false;
 
     let niveau, waarom;
-    if (score >= mensGrens) { niveau = 'hand'; waarom = 'score ' + score + ' ligt op of boven de mensgrens ' + mensGrens; }
-    else if (score <= autoGrens && herstelAan) { niveau = 'auto'; waarom = 'score ' + score + ' ligt op of onder de autogrens ' + autoGrens; }
-    else if (score <= autoGrens && !herstelAan) { niveau = 'assist'; waarom = 'binnen de autogrens, maar automatisch herstel staat uit in het beleid'; }
-    else { niveau = 'assist'; waarom = 'score ' + score + ' ligt tussen de grenzen ' + autoGrens + ' en ' + mensGrens; }
+    if (score >= mensGrens) { niveau = NIVEAUS.hand; waarom = 'score ' + score + ' ligt op of boven de mensgrens ' + mensGrens; }
+    else if (score <= autoGrens && herstelAan) { niveau = NIVEAUS.auto; waarom = 'score ' + score + ' ligt op of onder de autogrens ' + autoGrens; }
+    else if (score <= autoGrens && !herstelAan) { niveau = NIVEAUS.assist; waarom = 'binnen de autogrens, maar automatisch herstel staat uit in het beleid'; }
+    else { niveau = NIVEAUS.assist; waarom = 'score ' + score + ' ligt tussen de grenzen ' + autoGrens + ' en ' + mensGrens; }
 
     const vierOgen = score >= mensGrens || naam === 'massamutatie' || naam === 'identiteit wijzigen' ||
       naam === 'toegang verlenen' || Number((ctx || {}).centen || 0) >= beleid.getal('risico.geldGrensCenten', 2500000);
@@ -126,4 +144,4 @@ function maakRisico({ beleid }) {
   return { beoordeel, routeer, GRONDSLAG };
 }
 
-module.exports = { maakRisico, GRONDSLAG };
+module.exports = { maakRisico, GRONDSLAG, NIVEAUS };

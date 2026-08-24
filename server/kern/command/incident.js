@@ -33,6 +33,7 @@
 const klok = require('../../lib/klok');
 
 const { impactVan, aanleidingen } = require('./incident-impact');
+const { NIVEAUS } = require('./risico');
 
 const OPEN = 'open', BEZIG = 'in behandeling', HERSTELD = 'hersteld', DICHT = 'gesloten';
 
@@ -101,7 +102,7 @@ function maakIncidenten({ db, save, journaal, gezondheid }) {
         lopend.status = HERSTELD; lopend.hersteldAt = nu();
         hersteld.push(lopend.id);
         journaal.noteer({ actor: 'de gezondheidskaart', actie: 'incident hersteld', objectType: 'incident',
-          objectId: lopend.id, niveau: 'auto',
+          objectId: lopend.id, niveau: NIVEAUS.auto,
           reden: 'de bron meldt geen storing meer; dit incident wacht op een verslag' });
       }
     }
@@ -130,7 +131,7 @@ function maakIncidenten({ db, save, journaal, gezondheid }) {
     i.eigenaar = String(wie); if (i.status === OPEN) i.status = BEZIG;
     if (save) save();
     journaal.noteer({ actor: String(wie), actie: 'incident overnemen', objectType: 'incident', objectId: i.id,
-      niveau: 'hand', reden: 'eigenaar' });
+      niveau: NIVEAUS.hand, reden: 'eigenaar' });
     return { incident: kort(i) };
   }
 
@@ -148,7 +149,7 @@ function maakIncidenten({ db, save, journaal, gezondheid }) {
     i.maatregelen.push(r);
     if (save) save();
     journaal.noteer({ actor: r.door, actie: 'incident maatregel', objectType: 'incident', objectId: i.id,
-      niveau: 'hand', reden: r.wat, na: { soort: r.soort, verwijzing: r.verwijzing } });
+      niveau: NIVEAUS.hand, reden: r.wat, na: { soort: r.soort, verwijzing: r.verwijzing } });
     return { incident: kort(i) };
   }
 

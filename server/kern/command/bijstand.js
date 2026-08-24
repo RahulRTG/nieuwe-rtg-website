@@ -33,6 +33,7 @@
 const klok = require('../../lib/klok');
 
 const niveaus = require('./bijstand-niveaus');
+const { NIVEAUS } = require('./risico');
 const melden = require('./bijstand-melden');
 
 function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
@@ -60,7 +61,7 @@ function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
     if (s.spoor.length > 200) s.spoor.splice(0, s.spoor.length - 200);
   }
   function noteer(s, actor, actie, reden) {
-    journaal.noteer({ actor, actie, objectType: 'bijstand', objectId: s.id, niveau: 'hand',
+    journaal.noteer({ actor, actie, objectType: 'bijstand', objectId: s.id, niveau: NIVEAUS.hand,
       reden: String(reden || ''), na: { org: s.org, niveau: s.niveau } });
   }
 

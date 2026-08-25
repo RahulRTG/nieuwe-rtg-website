@@ -229,6 +229,26 @@ test('de testdraaier gooit een meegegeven RTG_ROUTELOG niet weg', () => {
 
   const zonder = { ...process.env };
   delete zonder.RTG_ROUTELOG;
+  /* EN --toon RAAKT HET JOURNAAL NIET AAN. Deze toets vraagt de draaier wat hij
+     zou doen, en dat gebeurt MIDDEN IN DE SUITE -- deze toets draait zelf mee.
+     Wiste die aanroep het journaal, dan gooide hij het bewijs weg van alles wat
+     de suite tot dan toe had aangeroepen, en meldde `scripts/dekking.js --lees`
+     daarna endpoints als "nooit aangeraakt" die wel degelijk geraakt waren.
+
+     Zo is het ook echt gegaan: CI telde er 493 tegen een norm van 0, terwijl
+     main op 4292 van 4292 stond. Niet omdat er minder werd aangeroepen, maar
+     omdat het logboek halverwege leeg was gemaakt. */
+  const bestaand = path.join(TMP, 'journaal-blijft-staan.log');
+  fs.writeFileSync(bestaand, 'GET /api/vooraf\n');
+  execFileSync(process.execPath, [draaier, '--toon', '--bestanden=kappen.test.js'],
+    { cwd: path.join(__dirname, '..'), encoding: 'utf8',
+      env: { ...process.env, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_ROUTELOG: bestaand } });
+  assert.equal(fs.existsSync(bestaand), true,
+    'de draaier gooit het journaal weg terwijl hij alleen zijn plan afdrukt; midden in de suite ' +
+    'wist dat het bewijs van alles wat er tot dan toe is aangeroepen');
+  assert.match(fs.readFileSync(bestaand, 'utf8'), /vooraf/,
+    'het journaal is leeggemaakt in plaats van met rust gelaten');
+
   const terugval = JSON.parse(execFileSync(process.execPath,
     [draaier, '--toon', '--bestanden=kappen.test.js'],
     { cwd: path.join(__dirname, '..'), encoding: 'utf8',

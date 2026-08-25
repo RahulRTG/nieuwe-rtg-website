@@ -90,8 +90,25 @@ if (!bestanden.length) {
    van een goede vraag een verwarrende. Dus: het meegegeven pad wint, en de
    eigen keuze is alleen de terugval. */
 const journaal = process.env.RTG_ROUTELOG || path.join(WORTEL, '.routejournaal');
-try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1' };
+
+/* HET JOURNAAL LEEGGOOIEN DOET ALLEEN WIE OOK ECHT GAAT DRAAIEN, en die regel
+   is duur geleerd. De unlink stond hier onvoorwaardelijk, boven de --toon-poort
+   verderop. Twee toetsen van deze tak roepen de draaier aan met --toon om te
+   controleren dat de isolatielijst wordt toegepast; die aanroep draait niets,
+   maar wiste wel het journaal -- MIDDEN IN DE SUITE, want die toetsen draaien
+   zelf mee.
+
+   Wat CI daarvan zag: `scripts/dekking.js --lees` telde 493 endpoints als
+   "nooit aangeraakt" terwijl main op 4292 van 4292 stond. Niet omdat er iets
+   minder werd aangeroepen, maar omdat het bewijs ervan halverwege was
+   weggegooid. Een meter die het goede meet aan een leeggemaakt logboek, meldt
+   een gat dat er niet is.
+
+   `leegMaken()` staat daarom bij de plek waar er echt gedraaid wordt. */
+function leegMaken() {
+  try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+}
 
 function draai(namen, parallel, metVloer) {
   if (!namen.length) return 0;
@@ -134,6 +151,7 @@ if (argv.includes('--toon')) {
   geefAfbouwSlotVrij();
   process.exit(0);
 }
+leegMaken();
 console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk' +
   (dekking.length ? ' (met dekkingsvloer ' + dekking.join('/') + ')' : ''));
 let code = draai(gewoon, concurrency, true);

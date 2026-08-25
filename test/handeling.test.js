@@ -281,14 +281,35 @@ test('IN EEN ECHTE SERVER: de laag haalt db.data op en meldt een handeling', asy
     }
     assert.ok(op, 'server kwam niet op:\n' + log.slice(-1500));
 
-    /* Een registratie maakt een lid aan: gegarandeerd minstens een rij erbij.
-       Lukt de registratie niet, dan is deze toets nog steeds geldig zolang er
-       IETS muteert -- daarom eisen we hieronder de melding en niet de 200. */
-    const uniek = Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
-    await post(port, '/api/register', {
-      name: 'Proef ' + uniek, email: 'proef-' + uniek + '@voorbeeld.nl',
-      password: 'Geheim' + uniek + '!', phone: '0612345678'
-    });
+    /* EEN AANROEP DIE ECHT SCHRIJFT, en die eis is duurder geleerd dan hij
+       lijkt. Hier stond een POST naar /api/register met de opmerking "een
+       registratie maakt een lid aan: gegarandeerd minstens een rij erbij".
+
+       Dat eindpunt heeft NOOIT bestaan -- niet op main, en ook niet op de basis
+       van deze tak. De aanroep gaf gewoon 404. En toch stond deze toets een week
+       lang groen, want elk verzoek deed toevallig ook een schrijfactie, en DAT
+       was wat er gemeten werd. Toen main die vaste heffing per verzoek
+       weghaalde (een terechte versnelling: p50 en p99 gehalveerd) viel de toets
+       om -- niet omdat de laag stuk was, maar omdat de mutatie die hij dacht te
+       maken er nooit was geweest.
+
+       Een toets die iets anders meet dan zijn naam zegt, is precies het soort
+       dat groen blijft tot het ertoe doet. Daarom nu een aanroep die BESTAAT en
+       waarvan de schrijfactie met naam in de melding terugkomt: het kantoorlogin
+       zet een regel in securityLog, en de meting noteert `"waar":"securityLog+1"`.
+       Verdwijnt die route, dan zakt de statuscontrole hieronder meteen in plaats
+       van dat deze toets stilletjes iets anders gaat meten.
+
+       WAT DEZE TOETS NIET BEWIJST, en dat hoort erbij. Hij bewaakt NIET dat
+       hervat() de handelingscontext na het lezen van de body terugzet: met
+       hervat() weggemuteerd blijft deze toets groen, want /api/office/login
+       verliest die context niet. Die garantie staat in
+       test/begrotingroute.test.js, en daar zakken er twee van de drie zodra
+       hervat() eruit gaat. Deze toets bewijst het andere stuk: dat de laag in
+       een ECHTE server bij db.data komt en niet altijd nul meet. */
+    const r = await post(port, '/api/office/login', { code: 'RTG-OFFICE' });
+    assert.equal(r.status, 200, 'het kantoorlogin bestaat niet meer, dus deze toets meet niets: ' +
+      JSON.stringify(r).slice(0, 200));
     // res.finish loopt na het antwoord; even ademruimte voor het log
     await new Promise(r => setTimeout(r, 600));
 

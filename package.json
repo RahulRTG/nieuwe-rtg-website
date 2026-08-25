@@ -157,7 +157,9 @@
     "meetronde": "node scripts/meetronde.js",
     "meetronde:snel": "node scripts/meetronde.js --snel",
     "versheid": "node scripts/versheid.js",
-    "waarom": "node scripts/waarom.js"
+    "waarom": "node scripts/waarom.js",
+    "swcache": "node scripts/swcache.js",
+    "swcache:vast": "node scripts/swcache.js --schrijf"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

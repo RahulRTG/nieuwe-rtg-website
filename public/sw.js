@@ -2,7 +2,19 @@
    is en offline opent. API-verkeer gaat altijd naar het netwerk.
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
-const CACHE = 'rtg-app-bd32ac44';
+/* DE CACHENAAM IS DE VINGERAFDRUK VAN DE SCHIL, en dat is hij nu ook echt:
+   sha256 over de zes bestanden hieronder, eerste acht tekens. Draai
+   `npm run swcache` na een wijziging aan de schil; keuringsregel controleert
+   of hij nog klopt.
+
+   WAAROM DIT ERTOE DOET. Een geinstalleerde app ruimt oude caches alleen op
+   bij `activate`, en dan alleen die met een ANDERE naam. Blijft de naam
+   staan terwijl de schil verandert, dan houdt een toestel zijn oude schil --
+   en dat is precies wat er kan gebeuren zijn bij het toestel dat de app
+   installeerde in de periode dat de `cache: 'no-cache'` hieronder was
+   gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
+   niet vergeten worden. */
+const CACHE = 'rtg-app-182e1355';
 const SHELL = ['/apps/app.html', '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {

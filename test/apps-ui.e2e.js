@@ -379,6 +379,24 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
     await page.fill('#osZoekInput', 'iets vragen');
+    /* WACHT TOT DE RIJ ER STAAT, en dat is geen nettigheid.
+
+       zoek() in app-main.js hangt aan het input-event van #osZoekInput en zet
+       "Laat Rahul dit doen" pas bovenaan zodra er iets getypt IS. page.fill()
+       zet de waarde en vuurt dat event, maar tussen "gevuld" en "getekend" zit
+       de event-lus van de pagina. Hier stond alleen een evaluate die de rij
+       opzocht en aanklikte, zonder te controleren dat hij er was: op een drukke
+       runner werd dat `b.click()` op undefined, met de melding "Cannot read
+       properties of undefined (reading 'click')" -- een fout die niets zegt
+       over wat deze toets meet.
+
+       Wat er GEMETEN wordt verandert hier niet: #chat mag de payload hieronder
+       nog steeds nooit uitvoeren. Alleen de weg ernaartoe wacht nu tot hij
+       begaanbaar is. */
+    await page.waitForFunction(
+      () => [...document.querySelectorAll('#osZoekLijst button')]
+        .some((x) => /Laat Rahul dit doen/i.test(x.textContent)),
+      null, { timeout: 10000 });
     await page.evaluate(() => {
       const b = [...document.querySelectorAll('#osZoekLijst button')]
         .find((x) => /Laat Rahul dit doen/i.test(x.textContent));

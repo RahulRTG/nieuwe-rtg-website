@@ -133,11 +133,12 @@ Object.assign(kern, require('../kern/studio').maakStudio({ db, save, crypto, ant
 Object.assign(kern, require('../kern/hardwarelab').maakHardwarelab({ db, save, crypto, anthropic, schoon }));
 
 /* Het doorgeefjournaal (kern/doorgeefjournaal.js): een leesbare regel per
-   binnenkomend verzoek en per uitgaand bericht. Vroeg in de rij, want de haak
-   waar de lagen eronder aan melden (server/journaalhaak.js) moet vanaf het
-   eerste verzoek bezet zijn -- anders mist het journaal juist de opstartfase,
-   en dat is precies waar vannacht de storingen zaten. */
-Object.assign(kern, require('../kern/doorgeefjournaal').maakDoorgeefjournaal({ db, save }));
+   binnenkomend verzoek en per uitgaand bericht. Vroeg in de rij: de haak waar
+   de lagen eronder aan melden (server/journaalhaak.js) moet vanaf het
+   eerste verzoek bezet zijn -- anders mist het journaal de opstartfase, en daar
+   zaten de storingen. Het bewaarde deel gaat naar een BESTAND en niet naar een
+   collectie; zie kern/journaalbestand.js. */
+Object.assign(kern, require('../kern/journaalbestand').metBestand({ db, save }));
 
 /* Het stadsweefsel (kern/stadsweefsel/): de ondergrond onder de stad --
    geografie, objecten, indicatoren, begroting, besluitvorming en het

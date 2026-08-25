@@ -81,9 +81,15 @@ function leesLagen(lagen, voorvoegsel) {
 let patroonHaak = null;
 function opPatroon(fn) { patroonHaak = typeof fn === 'function' ? fn : null; }
 
+/* De dispatch-index staat in ./routeindex.js -- waarom hij er is, en de drie
+   dingen die er mis mee kunnen gaan, staan in de kop van dat bestand. */
+const { maakDispatchIndex } = require('./routeindex');
+
 /* ---------- een router (ook de app is er een) ---------- */
 function maakRouter() {
   const lagen = [];
+  const ix = maakDispatchIndex(lagen);
+  const indexWeg = ix.weg, kandidaten = ix.kandidaten, eersteNa = ix.eersteNa;
 
   function voegToe(method, pat, fns) {
     const c = compilePad(pat);
@@ -91,12 +97,16 @@ function maakRouter() {
       if (typeof fn !== 'function') continue;
       lagen.push({ method, pad: pat, str: c.str, rx: c.rx, keys: c.keys || [], fn, fout: fn.length === 4, mount: false });
     }
+    indexWeg();
   }
 
   function handle(req, res, klaar) {
-    let i = 0;
     const startUrl = req.url;
     const buitenParams = req.params || {};
+    /* De kandidatenlijst hoort bij ÉÉN url. kandUrl bewaart bij welke; zodra
+       req.url verandert (voordeur.js, werving.js) wordt de lijst opnieuw
+       gemaakt en teruggezet op de eerstvolgende laag ná de huidige. */
+    let kand = null, kandUrl = null, pn = '', k = 0, vorige = -1;
     /* HET OVERSLAAN IS EEN LUS, HET AANROEPEN BLIJFT RECURSIE.
 
        Elke laag die niet past werd overgeslagen met `return next(err)` -- een
@@ -113,15 +123,20 @@ function maakRouter() {
        lagen dat echt matcht -- een handvol, geen paar duizend. */
     function next(err) {
       for (;;) {
-      if (i >= lagen.length) { req.url = startUrl; return klaar(err); }
-      const laag = lagen[i++];
+      if (kandUrl !== req.url) {
+        kandUrl = req.url;
+        pn = padNaar(kandUrl);
+        kand = kandidaten(req.method, pn);
+        k = eersteNa(kand, vorige);
+      }
+      if (k >= kand.length) { req.url = startUrl; return klaar(err); }
+      const laag = lagen[vorige = kand[k++]];
       // fout-middleware draait alleen bij een fout; gewone middleware alleen zonder.
       if (err && !laag.fout) continue;
       if (!err && laag.fout) continue;
       const methodeOk = !laag.method || laag.method === req.method ||
         (laag.method === 'GET' && req.method === 'HEAD');
       if (laag.method && !methodeOk) continue;
-      const pn = padNaar(req.url);
 
       if (laag.mount) {
         const mm = mountMatch(laag.prefix, pn);
@@ -185,6 +200,7 @@ function maakRouter() {
         lagen.push({ method: null, mount: true, prefix: '/', fn, fout: fn.length === 4 });
       }
     }
+    indexWeg();
     return router;
   };
   for (const m of ['get', 'post', 'put', 'delete', 'patch', 'all', 'head', 'options']) {

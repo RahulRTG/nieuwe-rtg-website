@@ -7692,6 +7692,77 @@
    "operator": "===->!==#0",
    "gezakt": 2,
    "geprobeerd": 7
+  },
+  "journaalbestand.test.js": {
+   "soort": "puur",
+   "staat": "gezakt",
+   "module": "server/kern/journaalbestand.js",
+   "operator": "getal+1#7",
+   "gezakt": 1,
+   "geprobeerd": 17
+  },
+  "kleef-readyourwrites.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 1,
+   "scherp": "gezakt"
+  },
+  "logstroom.test.js": {
+   "soort": "puur",
+   "staat": "gezakt",
+   "module": "server/techniek.js",
+   "operator": "<=-><#0",
+   "gezakt": 1,
+   "geprobeerd": 3
+  },
+  "routerindex.test.js": {
+   "soort": "puur",
+   "staat": "gezakt",
+   "module": "server/web/routing.js",
+   "operator": "===->!==#0",
+   "gezakt": 5,
+   "geprobeerd": 1
+  },
+  "spreidingsoordeel.test.js": {
+   "soort": "puur",
+   "staat": "gezakt",
+   "module": "scripts/spreidingsproef.js",
+   "operator": "&&->||#4",
+   "gezakt": 1,
+   "geprobeerd": 33
+  },
+  "toegangprefix.test.js": {
+   "soort": "puur",
+   "staat": "gezakt",
+   "module": "server/functies/register/index.js",
+   "operator": "!==->===#0",
+   "gezakt": 1,
+   "geprobeerd": 1
+  },
+  "trio-kleef.test.js": {
+   "soort": "puur",
+   "staat": "gezakt",
+   "module": "server/trio-kleef.js",
+   "operator": "===->!==#0",
+   "gezakt": 1,
+   "geprobeerd": 1
+  },
+  "trio-wees.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "gezakt": 2,
+   "traag": true,
+   "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+   "operator": "liegpoort /api/"
+  },
+  "trio-werkers.test.js": {
+   "soort": "puur",
+   "staat": "gezakt",
+   "module": "server/trio-schaduw.js",
+   "operator": "!==->===#0",
+   "gezakt": 6,
+   "geprobeerd": 6
   }
  }
 }

@@ -158,5 +158,10 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   Object.assign(api, require('./kassa')(ctx));
   Object.assign(api, require('./tegoed')(ctx));
   Object.assign(api, require('./zaakbetaling')(ctx));
+  /* De verkoop met inhoudingen (./verkoop.js): een lid koopt van een partner en
+     wat er af moet -- btw, een afdracht -- volgt als eigen regel in hetzelfde
+     grootboek. Staat na ./kassa omdat het hetzelfde patroon is, en apart omdat
+     de teruggang erin zit en kassa.js daar met opzet anders mee omgaat. */
+  Object.assign(api, require('./verkoop')(ctx));
   return { pay: api };
 };

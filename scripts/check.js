@@ -482,6 +482,24 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/kern/leverancier/state.js',
     'server/middleware/functieschakelaars.js',
     'server/opzet/poortwachters.js',
+    /* TWEE UIT DE SAMENVOEGING VAN 25 AUGUSTUS (main +50). Zelfde patroon als de
+       vier hierboven: main breidde ze uit terwijl wij er aan de andere kant bij
+       kwamen, en bij allebei is de naad te benoemen -- dus NOG en niet MAG.
+
+         server/kern/pay/index.js   10,3 KB
+           naad: de KERN van het grootboek (pasToe, boek, boekAsync -- wat een
+           boeking DOET met de saldi) los van de BEDRADING (welke deelmodule er
+           aan de api wordt geschroefd: verzoeken, kassa, tegoed, zaakbetaling,
+           verkoop). Ze delen een bestand omdat het grootboek er ooit het enige
+           was; de regels van dubbel boekhouden in de kop horen met de kern mee
+           te verhuizen, niet bij de bedrading achter te blijven.
+         server/web/routing.js      10,3 KB
+           naad: de DISPATCH-INDEX (welke lagen kunnen dit pad raken --
+           maakDispatchIndex, kandidaten, eersteNa) los van het AFHANDELEN
+           (handle: de keten aflopen, fouten doorgeven, next). Het eerste is een
+           gegevensstructuur met een eigen bewijslast, het tweede is gedrag. */
+    'server/kern/pay/index.js',
+    'server/web/routing.js',
     /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
        ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
        (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
@@ -857,6 +875,22 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
     ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    /* Een app kopen in de App Store. Er STAAT een derde tegenover -- de uitgever
+       -- en toch hoort deze route niet langs de gegevenspoort, en dat is een
+       besluit met een reden.
+
+       De poort bestaat zodat een derde je kan BEREIKEN als er iets misgaat met
+       je tafel of je bestelling. Hier is er niets om over te bellen: er komt
+       niemand langs, er wordt niets bezorgd, en de uitgever krijgt van deze
+       aanschaf niet meer te zien dan een aantal en een bedrag -- APPSTORE.md
+       grens 3 verbiedt hem zelfs de codenaam. Een telefoonnummer eisen zou dus
+       een gegeven vragen dat NIEMAND leest, en dat is precies de drempel die
+       kern/gegevenspoort.js in zijn kop verbiedt.
+
+       Wat deze route WEL vraagt staat er trouwens vlak boven: het land van het
+       lid (voor de btw) en, bij een echt account, de paspoortpoort van RTG Pay.
+       Er wordt hier dus niet minder gevraagd, er wordt iets ANDERS gevraagd. */
+    ['/api/appstore/koop', 'de uitgever krijgt geen naam, geen nummer en zelfs geen codenaam; er is niets om over te bereiken. Wat hier wel wordt gevraagd -- het land voor de btw en de paspoortpoort van RTG Pay -- staat in routes/appstore/kopen.js'],
     /* Een pot is een OORMERK binnen het eigen tegoed en geen reservering bij
        iemand: er beweegt geen geld en er staat geen partij tegenover (GELD.md
        par. 3). Het woord "reserveer" is hier de valse vriend. Deze route werd
@@ -2182,7 +2216,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     ["server/middleware/idempotentie.js|const wie = (req.get('authorization') || '') + '|' + String(req.ip || '');",
       'de kop is hier alleen ONDOORZICHTIG sleutelmateriaal: hij gaat een sha256 in zodat twee afzenders ' +
       'met dezelfde idempotentiesleutel nooit elkaars antwoord krijgen. Er wordt niets uit gelezen en niets ' +
-      'besloten -- een fout token betekent hoogstens een eigen kasvakje, en de poort van de route oordeelt zelf.']
+      'besloten -- een fout token betekent hoogstens een eigen kasvakje, en de poort van de route oordeelt zelf.'],
+    ["server/trio-kleef.js|const kop = (req && req.headers && req.headers.authorization) || '';",
+      'de poortwachter gebruikt het token als ROUTELABEL en niets anders: het gaat rechtstreeks een hash in en de uitkomst is een servernummer. ' +
+      'Er wordt niets verleend -- de gekozen server draait de volledige stapel en verifieert zelf, dus een verzonnen Bearer levert daar gewoon een 401 op. ' +
+      'Zou hier ooit iets aan een tokenwaarde worden opgehangen (een quotum per proces, een tarief per proces), dan vervalt deze reden.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
@@ -2702,22 +2740,41 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
        een <iframe> in een string tellen: een iframe in een stijlblad
        (`#split iframe{...}`) maakt niets. Een statisch <iframe>-element in de
        markup mag ook zijn eigen allow= dragen -- dat is dezelfde doorgifte,
-       alleen met de hand. */
-    let kaderloos = 0, kaders = 0;
+       alleen met de hand.
+
+       EN ER IS EEN OMGEKEERD BESLUIT, dat sinds de App Store bestaat. Een kader
+       met een LEEG allow geeft bewust NIETS door: geen camera, geen microfoon.
+       Dat is precies wat de cel van een app van derden nodig heeft -- die
+       rechten heeft een lid nooit verleend en de machtigingencatalogus kent ze
+       niet eens (APPSTORE.md, grens 1). Zo'n kader hier laten zakken zou de
+       enige uitweg RTGMedia.kader() maken, en dat is de verkeerde: dan krijgt
+       derdencode juist wel camera en microfoon.
+
+       `maakt` telt in dat ene geval niet mee, en dat is geen slordigheid maar
+       een grens van de heuristiek: in een .html-bestand is "een <iframe> in een
+       string" niet te onderscheiden van gewone markup -- elk aanhalingsteken
+       eerder op de pagina maakt hem waar. createElement telt wel: wie een kader
+       BOUWT, zegt zelf wat het meekrijgt. Gemeten toen deze regel erbij kwam:
+       in de hele public/ draagt precies een bestand een leeg allow. */
+    let kaderloos = 0, kaders = 0, leegBesluit = 0;
     for (const f of bronnen) {
       if (bundelPaden.has(web(f))) continue;
       const s = zonderCommentaar(lees(f));
-      const maakt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s) || /['"`][^'"`]*<iframe\b/.test(s);
+      const bouwt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s);
+      const maakt = bouwt || /['"`][^'"`]*<iframe\b/.test(s);
       const statisch = /^\s*<iframe\b/m.test(s) || />\s*<iframe\b/.test(s);
       if (!maakt && !statisch) continue;
       kaders++;
       if (/RTGMedia\.kader\s*\(/.test(s)) continue;
       // een statisch kader met eigen allow= is ook doorgifte
       if (statisch && !maakt && /<iframe\b[^>]*\ballow=/.test(s)) continue;
+      // en een statisch kader met een LEEG allow is het omgekeerde besluit
+      if (statisch && !bouwt && /<iframe\b[^>]*\ballow=""/.test(s)) { leegBesluit++; continue; }
       kaderloos++;
       fout(web(f) + ' maakt een iframe zonder RTGMedia.kader(); camera en microfoon vallen daarin stil weg');
     }
-    if (!kaderloos) ok(kaders + ' plekken maken een kader, en alle ' + kaders + ' geven het recht door');
+    if (!kaderloos) ok(kaders + ' plekken maken een kader; ' + (kaders - leegBesluit) + ' geven het recht door en ' +
+      leegBesluit + ' geven bewust niets door (leeg allow)');
 
     /* 38c) een pagina die RTGMedia gebruikt, laadt shared/media.js ook. Net als
        regel 37: het gebruik kan in de pagina zelf staan of in een script (of
@@ -3716,7 +3773,108 @@ console.log('\n51) geen enkel bestand plukt een naam uit een bereik dat het niet
   }
 }
 
-/* 52) DE WERELDLIJST LOOPT NIET ACHTER OP HET REGISTER.
+/* ============================================================================
+   51) EEN AFDRUK LOOPT NIET ACHTER OP DE METING ERONDER.
+
+   DE FOUT DIE DIT VANGT is hier gemaakt en kostte een volle bouwronde van
+   tachtig minuten. Er kwamen vijf modules onder server/kern bij, en
+   OBJECTMODEL.json -- de afdruk van scripts/objectmodel.js -- stond nog op 1498
+   bestanden terwijl de meting er 1503 telde. Er was niets kapot: de UITKOMST van
+   de meting (de envelop, de gedeelde velden, de gelijkende vormparen) was byte
+   voor byte gelijk. Alleen het getal liep achter, en dat is precies de scheur
+   waardoor een afdruk een verhaal wordt.
+
+   WAAROM HIER EN NIET ALLEEN IN DE SUITE. Vier afdrukken stonden al in deze
+   keuring -- regel 40 (ARCHITECTUUR.md), 41 (BEWIJS.md), 41b (BELOFTE.md) en 46
+   (SLO.md) -- en twee niet: OBJECTMODEL.json en BUNDELS.md werden alleen door
+   hun eigen toets bewaakt. Die toetsen zijn goed, maar ze draaien in een suite
+   van tachtig minuten, dus je hoort het pas ver na de commit van de bouwstraat
+   in plaats van in de halve seconde die het kost. Dat is geen andere norm maar
+   een andere PLEK, en de plek was hier de fout. De toetsen blijven staan: deze
+   regel is de vroege waarschuwing, niet de vervanging.
+
+   WAT HIER MET OPZET NIET IN STAAT. Een meter die een deel van zijn invoer
+   overslaat zonder het te zeggen, zegt niet "in orde" maar "ik heb niet
+   gekeken" (regel 10 van LAT.md), dus staat het hier:
+
+     GRENZEN.json  is GEEN afdruk. scripts/grenslijst.js noemt hem zelf "een
+                   vertrekpunt en geen waarheid": vier plekken rekenen hun
+                   kernnaam uit, de scanner ziet die niet, en ze komen MET DE
+                   HAND op de lijst zodra de grens knelt. Een gelijkheidstoets
+                   zou eisen dat die aanvullingen weer verdwijnen -- dus die komt
+                   er niet.
+     LEUGENS.json  is het rapport van EEN ronde, draagt een tijdstempel en staat
+                   niet in de repo. Er is niets om achter te lopen.
+   ========================================================================== */
+console.log('\n51) elke afdruk is gelijk aan de meting eronder');
+{
+  /* BUNDELS.md is tekst en wordt in zijn geheel vergeleken -- dezelfde
+     vergelijking als test/deelindex.test.js maakt. */
+  try {
+    const deel = require('./deelindex');
+    const opSchijf = fs.existsSync(deel.DOEL) ? fs.readFileSync(deel.DOEL, 'utf8') : null;
+    if (opSchijf === null) fout('BUNDELS.md bestaat niet -- draai: npm run deelindex');
+    else if (opSchijf !== deel.bouw()) fout('BUNDELS.md loopt achter op de bundeldelen -- draai: npm run deelindex');
+    else ok('BUNDELS.md is gelijk aan wat de bundeldelen nu zeggen');
+  } catch (e) {
+    fout('de deelindex kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+
+  /* OBJECTMODEL.json draagt de DATUM waarop hij is vastgelegd, en die hoort te
+     verschillen zodra iemand hem opnieuw schrijft; die en de vaste uitleg gaan
+     er dus af. Wat overblijft is ALLES wat gemeten is, en dat is ruimer dan
+     test/objectmodel.test.js vergelijkt: die kijkt naar `gemeten` en `envelop`,
+     en laat `gedeeld` en `paren` staan. Juist die twee dragen de conclusie van
+     DEVELOPERCLOUD.md par. 2 -- welke velden vier of meer domeinen delen, en
+     welke vormparen echt op elkaar lijken. Nagemeten: een afgekapte `paren` en
+     `gedeeld` laat die toets groen en deze regel rood.
+
+     De melding NOEMT WAT ER VERSCHILT en niet alleen dat er iets verschilt. Een
+     keuring die "loopt achter" zegt over een afdruk met tien blokken, stuurt je
+     zelf op zoek; dat is precies het half uur dat deze regel hoort te schelen. */
+  try {
+    const doel = path.join(ROOT, 'OBJECTMODEL.json');
+    const model = require('./objectmodel');
+    const opSchijf = fs.existsSync(doel) ? JSON.parse(fs.readFileSync(doel, 'utf8')) : null;
+    const vers = model.meet();
+    /* De datum en de vaste uitleg horen NIET tot de meting; al het andere wel,
+       ook een blok dat er morgen bij komt. Vandaar de vereniging van beide
+       sleutelverzamelingen: een blok dat wel op schijf staat en niet meer in de
+       meting is net zo goed achterstand. */
+    const blokken = [...new Set([...Object.keys(opSchijf || {}), ...Object.keys(vers)])]
+      .filter(k => k !== 'uitleg' && k !== 'vastgelegd');
+    const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
+    if (opSchijf === null) fout('OBJECTMODEL.json bestaat niet -- draai: npm run objectmodel:vast');
+    else {
+      const verschil = [];
+      for (const k of blokken) {
+        if (!anders(opSchijf[k], vers[k])) continue;
+        if (k !== 'gemeten') { verschil.push(k + ' wijkt af'); continue; }
+        /* Ook hier de VERENIGING van beide sleutelverzamelingen, en niet
+           alleen die van de verse meting. Anders zou een afdruk met een getal
+           dat de meting niet meer kent hierboven wel "wijkt af" heten en
+           hieronder geen enkel verschil opleveren -- en dan meldt de regel
+           doodleuk dat alles in orde is. */
+        const was = opSchijf.gemeten || {};
+        for (const m of new Set([...Object.keys(was), ...Object.keys(vers.gemeten)])) {
+          if (was[m] !== vers.gemeten[m]) verschil.push('gemeten.' + m + ': ' + was[m] + ' -> ' + vers.gemeten[m]);
+        }
+      }
+      if (verschil.length) {
+        fout('OBJECTMODEL.json loopt achter op de meting (' + verschil.join('; ') +
+          ') -- draai: npm run objectmodel:vast');
+      } else {
+        ok(vers.gemeten.vormen + ' bewaarde vormen in ' + vers.gemeten.bestanden +
+          ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan');
+      }
+    }
+  } catch (e) {
+    fout('het objectmodel kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
+
+/* 53) DE WERELDLIJST LOOPT NIET ACHTER OP HET REGISTER.
 
    Zelfde vorm als regel 40 (de kaart) en 46 (de SLO-tabel): WERELDLIJST.md wordt
    uit `MAPPEN` gegenereerd, dus hoort hij gelijk te zijn aan wat de code nu
@@ -3727,7 +3885,7 @@ console.log('\n51) geen enkel bestand plukt een naam uit een bereik dat het niet
    Waarom dit ernaast moet en test/wereldregister.test.js niet volstaat: die
    toets meet dat elk item ergens OP UITKOMT. Hij zegt niets over de vraag of het
    document dat mensen lezen nog dezelfde inhoud beschrijft. */
-console.log('\n52) WERELDLIJST.md loopt niet achter op het wereldregister');
+console.log('\n53) WERELDLIJST.md loopt niet achter op het wereldregister');
 {
   try {
     const wl = require('./wereldlijst');

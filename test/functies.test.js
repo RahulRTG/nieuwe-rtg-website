@@ -77,6 +77,33 @@ test('functies: prefix past alleen op een segmentgrens', () => {
   assert.ok(functies.padGeblokkeerd('/api/supplier/order', { supplier: { aan: false } }));
 });
 
+/* HET DERDENKANAAL HEEFT TWEE SCHAKELAARS, en de hele reden dat het er twee
+   zijn is dat ze los van elkaar moeten kunnen. Dat staat als belofte in
+   server/functies/register/cat-domeinen2.js; hier staat hij als code, want
+   anders is het een zin in een commentaar (LAT-regel 6).
+
+   De verwachting per stand is precies wat daar wordt beloofd: winkel dicht laat
+   de uitgever doorwerken (er staat dan iets klaar als de deur weer open gaat),
+   en uitgever dicht laat de winkel doorlopen (wat al is toegelaten blijft het
+   gewoon doen). Dat is dezelfde langste-prefix-regel als supplier/supplier-pos
+   hierboven, nu op de enige laag in dit huis waar de code niet van ons is. */
+test('App Store: de winkel dicht laat de uitgever open, en andersom', () => {
+  const winkelUit = { 'dom-appstore': { aan: false } };
+  const dicht = functies.padGeblokkeerd('/api/appstore/catalogus', winkelUit);
+  assert.ok(dicht && dicht.id === 'dom-appstore', 'een lid kan geen app van derden meer openen');
+  assert.equal(functies.padGeblokkeerd('/api/appstore/uitgever/inzenden', winkelUit), null,
+    'maar een uitgever kan blijven inzenden en RTG blijven keuren');
+
+  const uitgeverUit = { 'dom-appstore-uitgever': { aan: false } };
+  const dicht2 = functies.padGeblokkeerd('/api/appstore/uitgever/inzenden', uitgeverUit);
+  assert.ok(dicht2 && dicht2.id === 'dom-appstore-uitgever', 'er komt niets nieuws meer binnen');
+  assert.equal(functies.padGeblokkeerd('/api/appstore/catalogus', uitgeverUit), null,
+    'terwijl alles wat al is toegelaten gewoon blijft werken');
+
+  assert.equal(functies.padGeblokkeerd('/api/appstorex/iets', winkelUit), null,
+    'en de prefix past alleen op een segmentgrens');
+});
+
 test('functies: catalogus geeft categorieën met de juiste aan/uit-stand', () => {
   const cat = functies.catalogus({ betalen: { aan: false } });
   assert.ok(cat.length >= 1);

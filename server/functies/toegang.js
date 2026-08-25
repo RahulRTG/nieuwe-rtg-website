@@ -3,26 +3,7 @@
    nette blokkadereden voor de gebruiker. */
 const { inCanary } = require('./canaryas');
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS } = require('./register');
-/* Met een GRENS: '/api/bank' eist niet ook '/api/bankzaken' op, en '/' niet
-   alles. Geexporteerd omdat kern/platformregister dezelfde vraag stelt; daar
-   stond een lossere kopie, en die maakte een toets onzakbaar (LAT.md regel 4). */
-function prefixLengte(pad, prefix) {
-  if (!pad.startsWith(prefix)) return 0;
-  const rest = pad.slice(prefix.length);
-  return (rest === '' || rest[0] === '/') ? prefix.length : 0;
-}
-
-// De meest specifieke functie die dit pad bewaakt (langste prefix wint), of null.
-function functieVoorPad(pad) {
-  let beste = null, besteLen = 0;
-  for (const f of FUNCTIES) {
-    for (const p of f.paden) {
-      const len = prefixLengte(pad, p);
-      if (len > besteLen) { besteLen = len; beste = f; }
-    }
-  }
-  return beste;
-}
+const { prefixLengte, functieVoorPad } = require('./toegangpad');
 
 // Staat deze functie GLOBAAL aan volgens de bewaarde stand (of de standaard)?
 function functieAan(id, staat) {

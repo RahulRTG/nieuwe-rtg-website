@@ -231,6 +231,103 @@ besluit is genomen, staan ze als GEZAKT in de AUTH-kolom. Twee mogelijke
 uitkomsten: op de lijst met een reden, of een poort ervoor. Beide zijn goed;
 stilletjes zo laten is dat niet. Ze staan in `POORTWACHT.json` met `oordeel: open`.
 
+## De ronde van 24 augustus 2026 — prestaties
+
+Deze ronde ging over p50/p99 en staat voluit in `PRESTATIES.md`; hier alleen de
+stand en wat er nog ligt. Basislijn was commit `3244afd`.
+
+```
+DOORVOER      3.170 -> 7.885 per seconde   (2,5x)
+p50           0,205 -> 0,060 ms            (71%)
+p90           0,42  -> 0,15  ms            (64%)
+p99           0,825 -> 0,385 ms            (53%)
+EVENT-LOOP    p99 29,4 -> 22,7 ms · max 124,5 -> 42,1 ms
+```
+
+Vijf oorzaken, alle vijf een VASTE HEFFING op elk verzoek en geen trage route:
+een lineaire scan over 8.004 routelagen, twee arrays die per verzoek helemaal
+verschoven, twee `require()`-aanroepen per verzoek die stat-syscalls deden, een
+dubbele lus over 329 paden, en het doorgeefjournaal dat bij elke schrijfactie
+opnieuw werd geserialiseerd.
+
+**En de meetlat zelf, wat het belangrijkste was.** De emmers van `server/meting.js`
+begonnen op 5 ms terwijl 99,41% van alle verzoeken daaronder viel. Twee servers
+waarvan de ene aantoonbaar twee keer zo snel was, rapporteerden precies dezelfde
+p50, p90, p95 en p99 — terwijl `SLO.md` zijn doelen op juist die reeks vastlegt.
+Er staan nu vijf emmers onder de oude ondergrens.
+
+### Wat NIET is gedaan, en waarom
+
+**Meer kernen benutten.** Onderzocht en gemeten; stap 1 (de kleefroutering) is
+inmiddels wél gebouwd, zie hieronder en `docs/meerkernig.md`. Kort: drie schrijvende processen delen probleemloos één
+SQLite-store, en een sessie van proces A is meteen geldig op proces B (12 van 12,
+0 ms, dankzij de Redis-bus). Twee processen op een gedeelde store schalen sinds
+de journaalverhuizing 1,5x (8.586 → 12.894/s) zonder dat de staart eronder lijdt;
+vóór die verhuizing was dat 7.386 → 8.589/s met een p99 die van 51 naar 123 ms
+ging. De rem zat dus niet in SQLite maar in de blob die er per verzoek in werd
+geschreven. Postgres levert daar bovenop +7% doorvoer en −21% p99 (13.760/s, p99
+18,1 ms), maar is geen voorwaarde meer. Wat wél breekt is read-your-writes: een
+lid ziet zijn eigen zojuist opgeslagen notitie op het andere proces pas na 733 ms
+(mediaan) op SQLite, en na 140 ms op Postgres — kleiner, niet nul. Volgorde die
+eruit volgt: eerst kleefroutering op de sessie, dan verkeer verdelen (op een
+machine met meer kernen dan het experiment processen heeft), en de opslagkeuze
+als inrichtingsbeslissing daarnaast.
+
+**En die eerste stap staat er nu.** `server/trio-kleef.js` stuurt een lid steeds
+naar hetzelfde proces (op zijn token, met rendezvous-hashing zodat bij een uitval
+alleen de leden van díé server verhuizen), `server/trio-spreiding.js` laat alle
+gezonde servers verkeer aannemen, en `db.leider` staat los van `db.writable`
+zodat backup, zelfzorgautomaat en het roerwerk van de RTG-AI bij één server
+blijven. Aan te zetten met `RTG_SPREIDING=1`; zonder `REDIS_URL` weigert de
+poortwachter dat mét de reden, want zonder bus deelt geen enkel proces zijn
+sessies. `test/kleef-readyourwrites.test.js` bewijst het op twee echte servers:
+zonder kleven 0 van de 6 zichtbaar, met kleven 6 van de 6.
+
+**Stap 2 leverde een plafond op dat niemand had verwacht.** Met spreiding aan
+namen alle drie de servers verkeer aan en bewoog de doorvoer 1,4%. De rekentijd
+per proces wees de dader aan: de poortwachter zelf, op 90% van één kern, terwijl
+de servers op de helft stonden en de machine 2,33 van vier kernen gebruikte.
+`RTG_POORTWACHTERS=N` splitst de voordeur in een hoofd die alleen bewaakt en N
+werkers op dezelfde poort (`SO_REUSEPORT`): 7.282 → 9.399/s met twee (+29%), p50
+van 8,62 naar 6,18 ms. `server/trio-werkers.js`, `server/trio-schaduw.js`,
+`server/trio-proxy.js`, `test/trio-werkers.test.js`.
+
+**Wat er nu nog openstaat.** Meten op een machine waar het te meten valt — vier
+kernen met de belastingsgenerator erop is dat niet, en boven de twee voordeuren
+is er niets meer te zien. En de opslagkeuze: Postgres gaf door de klemmende
+poortwachter heen geen verschil (6.864 tegen 6.877, ruis), wat ook logisch is,
+want er was geen ruimte om verschil te maken. Zodra de voordeur niet meer klemt
+is dat opnieuw te meten; op twee kale processen was het eerder +7% doorvoer en
+−21% p99. Beide zijn meetwerk op andere hardware, geen code.
+
+**De streefwaarden in `SLO.md`.** Die staan er nog zoals ze gekozen zijn (p90 <
+250 ms, p99 < 1 s) en zijn nu aantoonbaar meer dan duizend keer ruimer dan wat
+het systeem doet. Bijstellen is een besluit met een foutbudget eraan vast en
+hoort bij de directie, niet in een emmerlijst.
+
+**Het plafond van het journaal.** Bij hoog verkeer is een vaste regelgrens weinig
+geschiedenis. Het staat nu op vijf bestanden van 2 MB (ruwweg 55.000 regels, ruim
+drie keer meer dan voorheen) en kost minder dan het oude plafond. Hoeveel
+geschiedenis er nodig is, blijft een productbesluit.
+
+**`BEPROEVING.json` is niet opnieuw gedraaid.** Die staat nog op de meting van
+10 augustus (darwin, 8 kernen, postgres). De prestatieratel in `scripts/norm.js`
+vergelijkt alleen binnen dezelfde machine én modus, dus hij zegt hier terecht
+"niet vergeleken". Wie de lat op deze cijfers wil zetten, moet De Beproeving op
+de doelmachine draaien.
+
+### Wat de winst vasthoudt
+
+Drie vangrails in de suite meten een VERHOUDING tussen twee implementaties in
+dezelfde run — geen absolute drempel in milliseconden, want die knippert op een
+drukke machine. Ze staan met hun eis in `PRESTATIES.md`.
+
+Let op één les die dat kostte: één meting per kant is niet genoeg. Los gedraaid
+stond de routervangrail op 111x, maar in de VOLLE suite (vier bestanden tegelijk)
+mat hij 8,3x en zakte hij — niet omdat de index traag was, maar omdat de scan de
+ruis overstemt terwijl de index erin verdrinkt. Ze nemen nu het MINIMUM van
+afwisselende rondes; ruis telt alleen opwaarts.
+
 ## Valkuilen die al een keer geld hebben gekost
 
 Deze staan hier omdat ik erin ben gelopen. Ze zien er allemaal uit als een goed

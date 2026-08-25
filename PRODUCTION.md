@@ -277,6 +277,40 @@ om te herstellen -- meestal het langste deel van de keten. Zie `SLO.md`.
 meting: bij een dagelijkse back-up is dat tot 24 uur. Wil je daaronder, dan is
 er vaker back-uppen nodig, of Postgres met point-in-time recovery.
 
+### Laat de log door een PIJP lopen, niet naar een bestand
+
+Node kiest zijn stdout-stroom op wat eraan hangt, en dat bepaalt of het loggen de
+server ophoudt:
+
+```
+node server.js | logger        ->  Socket           asynchroon   (systemd, docker)
+node server.js > /var/log/rtg  ->  SyncWriteStream  SYNCHROON
+```
+
+Met `LOG_LEVEL=info` — de standaard — schrijft **elk verzoek** een regel. Op een
+bestand is dat dus per verzoek een synchrone schrijfactie, midden op de
+event-loop, terwijl er een verzoek wordt afgehandeld.
+
+Gemeten op 24 augustus 2026, dezelfde last, alleen de bestemming van stdout
+verschilt (zie `PRESTATIES.md` voor de opstelling):
+
+| Meter | naar een bestand | door een pijp |
+|---|---:|---:|
+| Event-loop p99 | 26,7 ms | **19,8 ms** |
+| Event-loop max | 114,3 ms | **68,0 ms** |
+
+Draai je onder **systemd of Docker**, dan zit je goed: die hangen er allebei een
+pijp aan en je hoeft niets te doen. Alleen wie zelf `> bestand` schrijft — of dat
+in een start-script heeft staan — betaalt de prijs. Twee uitwegen:
+
+- laat de uitvoer door een pijp lopen (`| logger`, `| rotatelogs`, een
+  logverzamelaar), of
+- zet `LOG_LEVEL=warn`, dan verdwijnt de regel per verzoek en blijft alleen wat
+  misgaat.
+
+Techniekcontrole **LOG-01** op het backoffice-statusbord kijkt hiernaar en zegt in
+welke stand je staat, dus je hoeft het niet te onthouden.
+
 ### Zet een proxy ervoor? Strip dan `token` uit zijn access log
 
 De live-verbindingen (SSE) kunnen geen `Authorization`-header meesturen —
@@ -457,17 +491,42 @@ achter de poortwachter, met Postgres en Redis overal aan.**
    warme cache houdt veelgevraagde foto's snel. De `/media`-route mag achter een
    CDN (de responses zijn `immutable`). Zonder S3 op meerdere instances ziet
    alleen de instance die de foto ontving hem — de config-check waarschuwt hiervoor.
-4. **Zet er meer instances achter een load balancer.** De app is stateless
-   tussen requests (sessie zit in Postgres, niet in procesgeheugen), dus je kunt
-   naar believen instances bijzetten. TLS-termination vóór de app (reverse proxy
-   met `trust proxy`) **of** native in de app (`RTG_TLS=1`, zie §3). Sticky sessions zijn niet nodig; alleen voor de
-   SSE-verbinding is een langlevende connectie handig, maar de Redis-bus levert
-   events naar de juiste instance ongeacht waar de gebruiker hangt.
+4. **Zet er meer instances achter een load balancer, en laat een gebruiker aan
+   één instance kleven.** De app is stateless tussen requests (de sessie staat in
+   de gedeelde opslag en de Redis-bus houdt alle instances in de pas), dus je
+   kunt naar believen instances bijzetten. TLS-termination vóór de app (reverse
+   proxy met `trust proxy`) **of** native in de app (`RTG_TLS=1`, zie §3).
+
+   **Hier stond dat sticky sessions niet nodig zijn. Dat is nagemeten en het
+   klopt niet.** De sessie loopt inderdaad over de bus — die is meteen geldig op
+   elke instance, 0 ms — maar de DATA loopt over de kruisprocespoll. Een lid dat
+   een notitie opslaat op instance A en zijn lijst opvraagt bij instance B, ziet
+   zijn eigen notitie niet staan: mediaan 733 ms op SQLite, 139–141 ms op
+   Postgres, en in beide gevallen 0 van de 10 meteen zichtbaar. De meting staat
+   in `docs/meerkernig.md`. Een bug die willekeurig lijkt en niet te reproduceren
+   is, want of je hem ziet hangt af van welke instance je verzoek ving.
+
+   Kleef dus op de sessie. Bij een externe load balancer: op de
+   `Authorization`-kop of een cookie, met consistent hashing en niet met
+   round-robin. Draait u het trio, dan zit het er al in — zie punt 5.
 5. **Kies de procesindeling die past.**
    - **Vloot-modus** (`npm run vloot`, §2): één machine, per domein een proces,
      foutisolatie + herstart per groep. Goede eerste stap.
    - **Trio/failover** (`server/trio.js`, §4): drie servers met poortwachter en
-     automatische overname voor beschikbaarheid.
+     automatische overname voor beschikbaarheid. Standaard neemt één van de drie
+     verkeer aan; met `RTG_SPREIDING=1` (plus `REDIS_URL`, anders weigert hij mét
+     de reden) nemen ze alle drie verkeer aan en stuurt de poortwachter een lid
+     steeds naar hetzelfde proces — kleefroutering op het token, met
+     rendezvous-hashing zodat bij een uitval alleen de leden van díé server
+     verhuizen. De backup, de zelfzorgautomaat en het roerwerk van de RTG-AI
+     blijven bij één server (`db.leider`, zichtbaar in `/api/health`).
+
+     **Zet er dan ook `RTG_POORTWACHTERS=N` bij.** De poortwachter is zelf één
+     Node-proces en was gemeten het plafond: 90% van één kern terwijl de servers
+     op de helft stonden. Met N voordeurprocessen op dezelfde poort
+     (`SO_REUSEPORT`) ging de doorvoer 29% omhoog en de p50 28% omlaag. Zonder
+     deze schakelaar levert spreiding vrijwel niets op — 1,4% gemeten. Werkt niet
+     samen met `RTG_LOKAAL_TLS`; zet TLS er dan vóór.
    - **Kubernetes/containers**: het Docker-image (§1) draait ongewijzigd;
      schaal per domein-deployment met de Redis-bus en Postgres als gedeelde laag.
 

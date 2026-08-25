@@ -51,16 +51,26 @@ test.after(() => {
 /* Een aanvraagcode heeft de vorm <id>.<geheim>; de poort ontleedt hem en kent
    verder geen register (zie routes/supplier/horeca/arrival-toegang.js). */
 const code = (n) => 'arrivaltest' + n + 'abcdefghijkl.' + 'geheimgeheimgeheim' + n + 'abcdef';
-const overUur = (u) => {
+/* Datum EN tijd komen uit HETZELFDE moment. Nemen we de tijd van de klok (die
+   over middernacht rolt) en de datum van vandaag (die dat niet doet), dan wijst
+   dat paar na tienen 's avonds 22 uur TERUG: de route laat dat door -- die
+   keurt alleen `datum < vandaag()` -- zet vervaltAt op aankomst + 12 uur, en
+   dan gooit de werklijst de aankomst weg omdat hij verlopen is. Deze toetsen
+   zakten daardoor elke avond na 22:00 en niemand die dat overdag zag. */
+const over = (u) => {
   const d = new Date(Date.now() + u * 3600000);
-  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  const p2 = (n) => String(n).padStart(2, '0');
+  return {
+    datum: d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()),
+    tijd: p2(d.getHours()) + ':' + p2(d.getMinutes())
+  };
 };
-const vandaag = () => new Date().toISOString().slice(0, 10);
 
 async function aanvraag(n, opties) {
+  const m = over(2);
   const r = await api('/api/arrival/request', Object.assign({
     requestToken: code(n), supplierCode: 'KIKUNOI', naam: 'Gast ' + n,
-    datum: vandaag(), tijd: overUur(2), personen: 2
+    datum: m.datum, tijd: m.tijd, personen: 2
   }, opties || {}));
   assert.equal(r.status, 200, 'de aanvraag lukt: ' + JSON.stringify(r.body).slice(0, 160));
   return r.body.pass;

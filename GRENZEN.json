@@ -2303,6 +2303,14 @@
    "bijstand",
    "findSupplier",
    "tenant"
+  ],
+  "appstore": [
+   "appstore",
+   "appstoreBrug",
+   "appstoreWinkel",
+   "codenaamVan",
+   "onboarding",
+   "tenant"
   ]
  }
 }

@@ -45,12 +45,44 @@ const { gedektIn } = require('./lib/routedekking');
 const WORTEL = path.join(__dirname, '..');
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', grijs: '\x1b[2m', reset: '\x1b[0m' };
 
+/* DE POORT KAN BEZET ZIJN, EN DAN IS DAT GEEN UITSLAG.
+
+   scripts/routekaart.js zet de app op een willekeurige hoge poort omdat de
+   configuratiecontrole poort 0 (de nette "geef me maar wat") afkeurt; het
+   commentaar daar noemt hem "vrijwel zeker vrij". Dat "vrijwel" is een keer
+   omgevallen in CI: EADDRINUSE op 35488, nadat de teststap ervoor een server
+   had achtergelaten. Deze stap draait NA een suite van drie kwartier, dus die
+   ene botsing kostte de hele ronde -- en hij zei niets over de routes.
+
+   Een bezette poort is geen bevinding maar ruis, dus wordt hij opnieuw
+   geprobeerd met een andere. Drie pogingen: bij een botsingskans van ongeveer
+   een op twintigduizend is drie keer achter elkaar mis geen toeval meer maar
+   iets anders, en dan hoort de fout gewoon naar buiten te komen. Elke andere
+   fout gaat meteen door -- alleen EADDRINUSE is hier ruis, en de omkering is
+   met opzet streng: niet "probeer alles opnieuw", maar "alleen dit". */
+const BEZET = /EADDRINUSE|is al in gebruik/;
+
 function routesVan(boom) {
-  const uit = execFileSync(process.execPath,
-    [path.join(boom, 'scripts/routekaart.js'), '--json'],
-    { cwd: boom, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024 });
-  const d = JSON.parse(uit);
-  return (d.routes || d || []).map(r => (typeof r === 'string' ? r : r.pad || r.path)).filter(Boolean);
+  let laatste = null;
+  for (let poging = 0; poging < 3; poging++) {
+    try {
+      const uit = execFileSync(process.execPath,
+        [path.join(boom, 'scripts/routekaart.js'), '--json'],
+        { cwd: boom, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024,
+          /* Een eigen poort per poging, en niet die van de vorige. Zonder dit
+             zou routekaart.js zelf opnieuw loten en kon hij dezelfde weer
+             trekken. */
+          env: Object.assign({}, process.env, { PORT: String(28000 + Math.floor(Math.random() * 20000)) }) });
+      const d = JSON.parse(uit);
+      return (d.routes || d || []).map(r => (typeof r === 'string' ? r : r.pad || r.path)).filter(Boolean);
+    } catch (e) {
+      laatste = e;
+      const tekst = [e && e.message, e && e.stderr, e && e.stdout].join(' ');
+      if (!BEZET.test(tekst)) throw e;
+      console.error('  poort bezet, nieuwe poging (' + (poging + 1) + '/3)');
+    }
+  }
+  throw laatste;
 }
 
 function testTekstVan(boom) {

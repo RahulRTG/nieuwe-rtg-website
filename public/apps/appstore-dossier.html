@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>App Store &middot; inkoopdossier</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);
+    padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.3rem;margin-top:.05rem;}
+  main{padding:1.1rem;max-width:820px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kaart h2{font-size:1.05rem;margin-bottom:.15rem;}
+  .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
+  .lead{font-size:.85rem;color:var(--muted);line-height:1.65;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;text-decoration:none;display:inline-flex;align-items:center;}
+  .bw{margin-top:.45rem;padding-left:.7rem;border-left:2px solid var(--line);}
+  .bw b{font-size:.8rem;display:block;}
+  .bw .hoe{font-size:.78rem;color:var(--muted);line-height:1.55;display:block;}
+  .bw .bron{font-size:.7rem;color:var(--soft);}
+  .antw{font-size:.95rem;color:var(--gold);display:block;margin:.2rem 0 .1rem;}
+  ul{margin:.3rem 0 0 1.05rem;font-size:.82rem;line-height:1.65;}
+  .niet{margin-top:.5rem;}
+  .niet b{font-size:.8rem;color:var(--gold);display:block;}
+  .niet span{font-size:.78rem;color:var(--muted);line-height:1.55;display:block;}
+  .goud{color:var(--gold);}
+  .mt-s{margin-top:.5rem;}
+  .mt-m{margin-top:.6rem;}
+  .mt-l{margin-top:.7rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="knop stil" href="/apps/mall.html">&larr; Mall</a>
+  <div><div class="ey">RTG App Store</div><h1>Inkoopdossier</h1></div>
+</header>
+
+<main id="main"><div class="kaart"><p class="sub">Bezig met laden&hellip;</p></div></main>
+
+<script>
+/* ============================================================================
+   HET INKOOPDOSSIER OP EEN EIGEN PAGINA.
+
+   WAAROM DIT NAAST het uitklapblok in de Mall staat en het niet vervangt. In de
+   Mall staat het dossier bij de KEUZE: je overweegt een app en klapt uit wat
+   erover bekend is. Deze pagina is er voor de tweede lezer -- een inkoper, een
+   security officer, een functionaris gegevensbescherming -- die er niet
+   toevallig langs komt maar er specifiek naartoe wordt gestuurd. Die heeft een
+   ADRES nodig dat hij kan bewaren en doorsturen, en een pagina die alleen dit
+   ene ding doet.
+
+   TWEE STANDEN, EN DE TWEEDE IS DE BELANGRIJKSTE:
+     ?app=<sleutel>   het dossier van een app
+     zonder parameter het dossier van het KANAAL -- wat voor elke app hier geldt
+
+   Die tweede stand is wat een inkoper echt zoekt. "Kan zo'n app ooit bij onze
+   betaalgegevens?" is geen vraag per app maar per platform, en het antwoord
+   hoort een keer gelezen te worden in plaats van twintig keer.
+
+   WAT DEZE PAGINA NIET IS: openbaar. Hij hangt achter dezelfde ledenpoort als de
+   rest; dit huis heeft geen publieke pagina's (CLAUDE.md). Wie hem doorstuurt,
+   stuurt hem door naar iemand met een RTG-inlog. Dat staat er ook op, want een
+   adres dat de ontvanger niet kan openen is erger dan geen adres. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const SLEUTEL = new URLSearchParams(location.search).get('app') || '';
+
+function bewijs(lijst){
+  return (lijst || []).map(b =>
+    '<div class="bw"><b>'+esc(b.claim)+'</b>'+
+      '<span class="hoe">'+esc(b.hoe)+'</span>'+
+      '<span class="bron">bron: '+esc(b.bron)+(b.waarde ? ' &middot; gemeten: '+esc(String(b.waarde)) : '')+'</span></div>').join('');
+}
+function nietBlok(niet, kop, uitleg){
+  return '<div class="kaart"><h2>'+esc(kop)+'</h2><p class="sub">'+esc(uitleg)+'</p>'+
+    Object.keys(niet || {}).map(k =>
+      '<div class="niet"><b>'+esc(k)+'</b><span>'+esc(niet[k])+'</span></div>').join('')+'</div>';
+}
+
+/* HET KANAALDOSSIER. Wat hier staat geldt voor ELKE app in dit kanaal, en het
+   staat er in deze volgorde met opzet: eerst wat GEEN enkele app kan vragen, dan
+   pas wat er te vragen valt. Een catalogus die begint met wat er mogelijk is,
+   leest als een menukaart; deze vraag is geen menukaart. */
+function kanaalHtml(k){
+  return '<div class="kaart"><h2>Wat geen enkele app kan vragen</h2>'+
+      '<p class="sub">Deze machtigingen bestaan niet in dit kanaal. Niet "ze worden zelden gegeven" &mdash; ze zijn er niet, dus er is ook geen uitzondering voor te maken.</p>'+
+      Object.keys(k.nietGebouwd || {}).map(kk =>
+        '<div class="niet"><b>'+esc(kk)+'</b><span>'+esc(k.nietGebouwd[kk])+'</span></div>').join('')+'</div>'+
+    '<div class="kaart"><h2>Wat een app w&eacute;l kan vragen</h2>'+
+      '<p class="sub">Alle machtigingen die er zijn, met wat ze geven en wat ze nooit geven. Een app vraagt hieruit; een lid geeft, per stuk, en kan later een enkele terugnemen.</p>'+
+      (k.machtigingen || []).map(m =>
+        '<div class="bw"><b>'+esc(m.label)+' <span class="bron">('+esc(m.id)+')</span></b>'+
+          '<span class="hoe">Geeft: '+esc(m.geeft)+'</span>'+
+          '<span class="hoe goud">Nooit: '+esc(m.nooit)+'</span>'+
+          (m.risico ? '<span class="bron">risico: '+esc(m.risico)+'</span>' : '')+'</div>').join('')+'</div>'+
+    '<div class="kaart"><p class="sub">'+esc(k.let)+'</p></div>';
+}
+
+function dossierHtml(d){
+  const kaart = (kop, binnen) => '<div class="kaart"><h2>'+esc(kop)+'</h2>'+binnen+'</div>';
+  return '<div class="kaart"><p class="lead">'+esc(d.let)+'</p>'+
+      '<p class="sub mt-s">Opgemaakt '+esc(String(d.opgemaakt).slice(0,16).replace('T',' '))+
+      '. Deze pagina is te bewaren en door te sturen; de ontvanger heeft wel een RTG-inlog nodig.</p></div>'+
+
+    kaart('Wat deze app nooit krijgt',
+      '<ul>'+(d.watHetNooitKrijgt.punten||[]).map(x => '<li>'+esc(x)+'</li>').join('')+'</ul>'+
+      bewijs(d.watHetNooitKrijgt.bewijs))+
+
+    kaart('Waar de gegevens blijven',
+      '<b class="antw">'+esc(d.waarDeGegevensBlijven.antwoord)+'</b>'+
+      '<p class="lead">'+esc(d.waarDeGegevensBlijven.toelichting)+'</p>'+
+      bewijs(d.waarDeGegevensBlijven.bewijs))+
+
+    kaart('Als u stopt',
+      '<b class="antw">'+esc(d.uitgang.antwoord)+'</b>'+
+      '<p class="lead">'+esc(d.uitgang.toelichting)+'</p>'+bewijs(d.uitgang.bewijs))+
+
+    kaart('De leverancier',
+      '<p class="lead">'+esc(d.leverancier.naam || 'onbekend')+' ('+esc(d.leverancier.organisatie)+')'+
+        (d.leverancier.contact ? ' &middot; '+esc(d.leverancier.contact) : '')+
+        (d.leverancier.toegelatenDoor ? '<br>Toegelaten door '+esc(d.leverancier.toegelatenDoor)+
+          (d.leverancier.toegelatenOp ? ' op '+esc(String(d.leverancier.toegelatenOp).slice(0,10)) : '') : '')+'</p>'+
+      bewijs(d.leverancier.bewijs))+
+
+    kaart('Wat er draait',
+      '<p class="lead">Versie '+esc(d.watErDraait.versie)+' &middot; '+d.watErDraait.bestanden+' bestanden'+
+        (d.watErDraait.bytes ? ' &middot; '+Math.round(d.watErDraait.bytes/1024)+' kB' : '')+
+        '<br>hash '+esc(String(d.watErDraait.hash))+'</p>'+
+      bewijs(d.watErDraait.bewijs))+
+
+    kaart('Wat het mag',
+      '<ul>'+(d.watHetMag.machtigingen||[]).map(m => '<li>'+esc(m.label)+
+        (m.waarvoor ? ' &mdash; waarvoor: '+esc(m.waarvoor) : '')+'</li>').join('')+'</ul>'+
+      bewijs(d.watHetMag.bewijs))+
+
+    kaart('Wat de poort vond',
+      '<p class="lead">'+d.watDePoortVond.blokkerend+' blokkerend, '+d.watDePoortVond.letOp+' let-op'+
+        (d.watDePoortVond.afgetekendDoor ? '<br>Afgetekend door '+esc(d.watDePoortVond.afgetekendDoor)+
+          (d.watDePoortVond.afgetekendOp ? ' op '+esc(String(d.watDePoortVond.afgetekendOp).slice(0,10)) : '') : '')+'</p>'+
+      (d.watDePoortVond.bevindingen||[]).map(b => '<div class="bw"><b>'+esc(b.wat)+'</b>'+
+        '<span class="hoe">'+esc(b.bestand||'')+(b.hoe ? ' &mdash; '+esc(b.hoe) : '')+'</span></div>').join('')+
+      bewijs(d.watDePoortVond.bewijs))+
+
+    /* HET LAATSTE BLOK IS HET BELANGRIJKSTE en staat daarom in dezelfde opmaak
+       als de rest en niet kleiner. Een leverancierspak dat overal ja zegt is
+       niets waard; een dat zegt waar het ophoudt, is te vertrouwen op de rest. */
+    nietBlok(d.nietGebouwd, 'Wat dit dossier NIET zegt',
+      'Geen restpost maar het deel dat de rest geloofwaardig maakt: hier begint uw eigen onderzoek.')+
+
+    '<div class="kaart"><h2>En wat voor elke app hier geldt</h2>'+
+      '<p class="sub">Het kanaaldossier gaat over het platform en niet over deze leverancier. Dat hoeft u maar &eacute;&eacute;n keer te lezen.</p>'+
+      '<p class="mt-m"><a class="knop stil" href="/apps/appstore-dossier.html">Het kanaaldossier &rarr;</a></p></div>';
+}
+
+async function laad(){
+  const main = $('#main');
+  if (!TOKEN) {
+    main.innerHTML = '<div class="kaart"><h2>Log eerst in</h2><p class="sub">Dit dossier hoort bij de RTG App Store. <a href="/apps/app.html">Naar RTG &rarr;</a></p></div>';
+    return;
+  }
+  try {
+    if (!SLEUTEL) {
+      const k = await api('/api/appstore/kanaal', {});
+      main.innerHTML = '<div class="kaart"><p class="lead">Wat hieronder staat geldt voor <b>elke</b> app van derden in dit huis, ongeacht wie hem heeft gemaakt. Voor een dossier over &eacute;&eacute;n app opent u die app in de Mall.</p></div>'+
+        kanaalHtml(k);
+      return;
+    }
+    main.innerHTML = dossierHtml(await api('/api/appstore/dossier', { sleutel: SLEUTEL }));
+  } catch (e) {
+    main.innerHTML = '<div class="kaart"><h2>Geen dossier</h2><p class="sub">'+esc(e.message)+'</p>'+
+      '<p class="mt-l"><a class="knop stil" href="/apps/appstore-dossier.html">Wel het kanaaldossier &rarr;</a></p></div>';
+  }
+}
+laad();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

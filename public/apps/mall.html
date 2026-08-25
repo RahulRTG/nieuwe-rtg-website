@@ -115,6 +115,64 @@
   .bladtel{font-size:.78rem;color:var(--muted);}
   .reisnoot{color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;}
   .goudlink{color:var(--rtg-leesgoud,var(--gold));}
+  /* ---- de App Store-sectie. Uit de inline stijlattributen gehaald: die houden
+     style-src-attr in de CSP open en de norm telt ze (scripts/norm.js,
+     inlineStijlAttributen). Dat opruimen hoort JUIST bij deze sectie -- dit is
+     de winkel voor code van een derde, en een pagina die zijn eigen CSP oprekt
+     terwijl hij een sandbox verkoopt, spreekt zichzelf tegen. ---- */
+  .as-update{margin-top:.5rem;border-left:3px solid var(--gold);background:rgba(169,143,28,.09);border-radius:0;padding:.5rem .7rem;}
+  .as-vink{margin-top:.22rem;width:1rem;height:1rem;flex:0 0 auto;accent-color:#C23A5E;}
+  .as-vinkrij{display:flex;gap:.5rem;align-items:flex-start;margin-top:.4rem;cursor:pointer;}
+  .as-tijdrij{display:flex;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.76rem;}
+  .as-bonregel{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);}
+  .as-bontotaal{display:flex;justify-content:space-between;font-size:.9rem;}
+  .as-lijst{margin:.25rem 0 0 1rem;padding:0;font-size:.76rem;color:var(--txt);line-height:1.6;}
+  .as-bewijs{margin-top:.4rem;padding-left:.6rem;border-left:2px solid var(--line);}
+  .as-kop{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-top:.7rem;}
+  .as-kop-plat{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
+  .as-alinea{font-size:.76rem;color:var(--txt);line-height:1.55;display:block;margin-top:.2rem;}
+  .as-inleiding{font-size:.76rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;}
+  .as-uitleg{font-size:.76rem;color:var(--muted);line-height:1.55;}
+  .as-uitleg-blok{font-size:.76rem;color:var(--muted);line-height:1.5;display:block;}
+  .as-uitleg-mt{font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:.25rem;}
+  .as-hoe{font-size:.73rem;color:var(--muted);line-height:1.5;display:block;}
+  .as-voetnoot{font-size:.74rem;color:var(--soft);margin-top:.35rem;}
+  .as-leeg{font-size:.76rem;color:var(--soft);margin-top:.4rem;}
+  .as-antwoord{font-size:.8rem;color:var(--rtg-leesgoud,var(--gold));display:block;margin-top:.2rem;}
+  .as-antwoord-plat{font-size:.8rem;display:block;margin-top:.2rem;}
+  .as-tijdstip{color:var(--soft);flex:0 0 8.5rem;}
+  .as-prijs{color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;}
+  .as-scheiding-m{margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .as-scheiding-s{margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .as-scheiding-xs{margin-top:.5rem;border-top:1px solid var(--line);padding-top:.4rem;}
+  .as-knoprij{margin-top:.6rem;gap:.4rem;align-items:center;}
+  .as-landrij{margin-top:.55rem;align-items:center;}
+  .as-kleinlink{font-size:.72rem;text-decoration:none;}
+  .as-klein-blok{font-size:.76rem;display:block;}
+  .as-klein{font-size:.76rem;line-height:1.5;}
+  .as-klein-goud{font-size:.76rem;color:var(--rtg-leesgoud,var(--gold));}
+  .as-klein-zacht{font-size:.76rem;color:var(--soft);}
+  .as-bron{font-size:.68rem;color:var(--soft);}
+  .as-naam{display:block;margin:.15rem 0;}
+  .as-breed{flex:1;min-width:10rem;}
+  .as-smal{max-width:16rem;}
+  .as-mb{margin-bottom:.7rem;}
+  .as-mt-xs{margin-top:.45rem;}
+  .as-mt-xxs{margin-top:.35rem;}
+  .as-mt-s{margin-top:.4rem;}
+  .as-mt-m{margin-top:.5rem;}
+  .as-midden{justify-content:center;}
+  .as-stil{cursor:default;}
+  .as-link{text-decoration:none;}
+  .as-goud{color:var(--rtg-leesgoud,var(--gold));}
+  .as-gedempt{color:var(--muted);}
+  .as-zacht{color:var(--soft);}
+  .as-tekst{color:var(--txt);}
+  .as-blok{display:block;}
+  .as-p8{font-size:.8rem;}
+  .as-p74{font-size:.74rem;}
+  .as-p72{font-size:.72rem;}
+  .as-groei{flex:1;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/adresvoorstel.js"></script>
@@ -173,6 +231,7 @@
   <div class="deel">Ontdekken</div>
   <div id="biebKop"></div>
   <div id="appbieb"></div>
+  <div id="appstore"></div>
   <div id="reisbieb"></div>
   <div id="rtfbieb"></div>
 </div>
@@ -200,6 +259,10 @@
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const euro = n => (n==null) ? '' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+/* Centen, en met de centen erbij. euro() rondt af op hele euro's -- prima voor
+   een hotelkamer, fout voor een bon waarop btw en afdracht moeten optellen tot
+   precies het bedrag dat je betaalt. */
+const euroC = c => (c==null) ? '' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(c)/100);
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2400); }
 const api = (pad, body, herkans) => fetch(pad, {
@@ -212,11 +275,22 @@ const api = (pad, body, herkans) => fetch(pad, {
   if (p) return p;
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
+/* De stand van de App Store staat HIER en niet bij zijn eigen blok verderop.
+
+   Reden, en het is geen smaak: de startregel hieronder roept laadAppstore() aan
+   terwijl het script nog wordt doorlopen, en tekenStore() leest AS.mijn VOOR
+   zijn eerste await. Een `const` die verderop staat, zit op dat moment nog in
+   zijn dode zone -- en dan valt de hele App Store-afdeling stil met
+   "Cannot access 'AS' before initialization", zonder dat er iets op het scherm
+   verandert. De afdelingen erboven ontkomen daaraan omdat ze toevallig eerst
+   iets ophalen; toeval is een slechte reden om ergens op te vertrouwen. */
+const AS = { zoek: '', pagina: 1, mijn: false };
+
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
-} else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadReisbieb(); laadRtfbieb(); }
+} else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadAppstore(); laadReisbieb(); laadRtfbieb(); }
 
 /* ---------- De vindlaag: locatie en intentie eerst ----------
    De Mall is de commerciele voorkant van heel RTG: reizen, verblijven, eten,
@@ -561,6 +635,298 @@ async function tekenApps(){
       catch(e){ meld(e.message); }
     }));
   } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+
+/* ---------- De App Store: apps van DERDEN ----------
+   Een eigen afdeling en niet een rijtje in de App-Bibliotheek erboven, en dat
+   is een besluit en geen indeling. De Bibliotheek is van RTG: elke tegel opent
+   een pagina die wij hebben gebouwd. Dit is van iemand anders, en dat hoort een
+   lid te zien VOORDAT hij iets verleent -- niet erna in een detailscherm.
+
+   Installeren is hier ook iets anders. Bij de Bibliotheek zet je een app op je
+   startscherm; hier GEEF je iets weg, per machtiging, met een vinkje. Daarom
+   staat wat een app krijgt EN wat hij nooit krijgt op de kaart zelf.
+   Zie APPSTORE.md. De stand (AS) staat bovenaan bij de startregel; waarom staat
+   daar. */
+async function laadAppstore(){
+  $('#appstore').innerHTML =
+    '<div class="etage" id="appstoreEtage"><div class="etage-kop"><h2>App Store</h2>'+
+    '<span class="n">apps van derden · gekeurd door een mens van RTG · jij bepaalt wat ze mogen</span></div>'+
+    '<div class="rij as-mb">'+
+      '<input id="asZoek" class="veld as-breed" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
+      '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
+      '<button class="knop stil" id="asGesch" type="button" aria-expanded="false">Mijn geschiedenis</button>'+
+      '<a class="knop stil" href="/apps/appstore-dossier.html" class="as-link">Wat geen app kan vragen</a>'+
+    '</div><div id="asTijd" hidden class="as-mb"></div>'+
+    '<div id="asGrid"></div><div class="rij" id="asBlader" class="as-midden"></div></div>';
+  let zt; $('#asZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AS.zoek = $('#asZoek').value; AS.pagina = 1; AS.mijn = false; tekenStore(); }, 300); });
+  $('#asMijn').addEventListener('click', () => { AS.mijn = !AS.mijn; AS.pagina = 1; tekenStore(); });
+  /* De geschiedenis staat NAAST de winkel en niet erin: hij gaat over het lid en
+     niet over een app. Hij wordt pas opgehaald als iemand hem openklapt. */
+  $('#asGesch').addEventListener('click', () => {
+    const vak = $('#asTijd'), knop = $('#asGesch');
+    vak.hidden = !vak.hidden;
+    knop.setAttribute('aria-expanded', String(!vak.hidden));
+    knop.classList.toggle('aan', !vak.hidden);
+    if (!vak.hidden) tekenTijdlijn();
+  });
+  tekenStore();
+}
+function storeKaart(a){
+  /* De vinkjes staan op de kaart en niet achter een tweede scherm: een
+     toestemming die je pas ziet nadat je hebt gedrukt, is geen keuze. Wat de
+     app NOOIT krijgt staat er even groot bij; een scherm dat alleen zegt wat er
+     wel gebeurt, is een verkooppraatje. */
+  const vinkjes = a.vraagt.map(m =>
+    '<label class="asm as-vinkrij">'+
+      '<input type="checkbox" data-m="'+esc(m.id)+'"'+(a.geinstalleerd ? (a.verleend.some(v => v.id === m.id) ? ' checked' : '') : ' checked')+
+        ' class="as-vink">'+
+      '<span class="as-klein"><b class="as-blok">'+esc(m.label)+'</b>'+
+        (m.waarvoor ? '<span class="as-tekst">Waarvoor: '+esc(m.waarvoor)+'</span><br>' : '')+
+        '<span class="as-gedempt">Geeft: '+esc(m.geeft)+'</span><br>'+
+        '<span class="as-zacht"><b class="as-goud">Nooit:</b> '+esc(m.nooit)+'</span></span></label>').join('')
+    || '<div class="as-leeg">Deze app vraagt niets van je.</div>';
+  return '<div class="boutiek as-stil" data-sleutel="'+esc(a.sleutel)+'">'+
+    '<span class="stad">van '+esc(a.uitgever ? a.uitgever.naam : 'een derde partij')+'</span>'+
+    '<b class="as-naam">'+esc(a.naam)+'</b>'+
+    '<span class="as-uitleg-blok">'+esc(a.uitleg)+'</span>'+
+    /* WAT EEN UPDATE MEER VRAAGT, boven de vinkjes en niet eronder. Een app die
+       zijn manifest uitbreidt krijgt daarmee niets extra's -- hij vraagt alleen
+       opnieuw -- en dat hoort een lid te zien voordat hij ergens op drukt. */
+    ((a.updateVraagt && a.updateVraagt.length)
+      ? '<div class="as-update">'+
+        '<b class="as-p8">Deze update vraagt meer</b>'+
+        a.updateVraagt.map(m => '<div class="as-uitleg-mt">'+
+          esc(m.label)+(m.soort === 'ander-doel' ? ' &mdash; nu voor: ' : ' &mdash; voor: ')+esc(m.waarvoor || m.doel || '')+
+          (m.soort === 'ander-doel' ? ' (was: '+esc(m.eerderDoel)+')' : '')+'</div>').join('')+
+        '<div class="as-voetnoot">Zolang je niets doet, krijgt de app dit niet. De app blijft gewoon werken met wat je hem al gaf.</div>'+
+        '</div>' : '')+
+    '<div class="as-scheiding-xs">'+
+      '<span class="as-kop-plat">Wat je geeft</span>'+
+      vinkjes+'</div>'+
+    '<div class="rij as-knoprij">'+
+      (a.prijsCenten > 0
+        ? '<b class="as-prijs">'+euroC(a.prijsCenten)+(a.gekocht?' &middot; gekocht':'')+'</b>'
+        : '<b class="as-prijs">Inbegrepen</b>')+
+      '<span class="h-flex1"></span>'+
+      (a.geinstalleerd
+        ? '<a class="knop stil" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'" class="as-link">Openen</a>'+
+          '<button class="knop stil asZet" type="button">Bijwerken</button>'+
+          '<button class="knop stil asWeg" type="button">Verwijderen</button>'
+        : (a.prijsCenten > 0 && !a.gekocht
+            ? '<button class="knop asKoop" type="button">Kopen voor '+euroC(a.prijsCenten)+'</button>'
+            : '<button class="knop asZet" type="button">Op mijn startscherm</button>'))+
+    '</div>'+
+    /* HET INKOOPDOSSIER STAAT OP DE KAART, niet achter een kantoorpoort. Wie
+       een app overweegt hoort te kunnen nalezen wie de leverancier is, wat er
+       precies draait, waar zijn gegevens blijven -- en wat wij NIET kunnen
+       aantonen. Een document dat alleen een inkoper mag lezen is een
+       verkooppraatje. Dichtgeklapt, want het is naslag en geen reclame. */
+    /* Twee ingangen naar hetzelfde dossier, en dat is geen dubbeling maar een
+       tweede lezer: hier klap je uit terwijl je kiest, de eigen pagina is een
+       ADRES dat je bewaart en doorstuurt naar een inkoper of een security
+       officer. Die laatste komt hier niet toevallig langs. */
+    '<div class="rij as-mt-xs">'+
+      '<button class="knop stil asDos" type="button" aria-expanded="false" class="as-p72">Inkoopdossier</button>'+
+      '<a class="knop stil" href="/apps/appstore-dossier.html?app='+encodeURIComponent(a.sleutel)+'" class="as-kleinlink">Op eigen pagina &rarr;</a>'+
+    '</div>'+
+    '<div class="asDosVak" hidden class="as-scheiding-s"></div>'+
+    '<div class="asBon" hidden class="as-scheiding-m"></div></div>';
+}
+async function tekenStore(){
+  const grid = $('#asGrid'), blader = $('#asBlader');
+  $('#asMijn').classList.toggle('aan', AS.mijn);
+  try {
+    let items = [], d = null;
+    if (AS.mijn) { items = (await api('/api/appstore/mijn')).apps; blader.innerHTML = ''; }
+    else { d = await api('/api/appstore/catalogus', { zoek: AS.zoek, pagina: AS.pagina }); items = d.items; }
+    grid.innerHTML = items.length ? '<div class="boutieks">'+items.map(storeKaart).join('')+'</div>'
+      : '<div class="leeg">'+(AS.mijn
+          ? 'Je hebt nog geen apps van derden. Blader hierboven en kies zelf wat je een app geeft.'
+          : 'Er staat nog geen app van een derde in de store. Elke app hier is door een mens van RTG bekeken voordat hij verschijnt; zolang er geen doorheen is, blijft dit leeg.')+'</div>';
+    if (d && d.paginas > 1) {
+      blader.innerHTML = '<button class="knop stil" id="asVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+        '<span class="bladtel">pagina '+d.pagina+' van '+d.paginas+' · '+d.totaal+' apps</span>'+
+        '<button class="knop stil" id="asVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>';
+      const v = $('#asVorig'), n = $('#asVolgend');
+      if (v) v.addEventListener('click', () => { AS.pagina--; tekenStore(); });
+      if (n) n.addEventListener('click', () => { AS.pagina++; tekenStore(); });
+    } else if (d) blader.innerHTML = '';
+    grid.querySelectorAll('.asZet').forEach(b => b.addEventListener('click', async () => {
+      const kaart = b.closest('.boutiek'), sleutel = kaart.dataset.sleutel;
+      const gekozen = [...kaart.querySelectorAll('input[data-m]:checked')].map(i => i.dataset.m);
+      const nieuw = b.textContent.indexOf('startscherm') !== -1;
+      try {
+        const r = await api(nieuw ? '/api/appstore/installeer' : '/api/appstore/verleen', { sleutel, machtigingen: gekozen });
+        meld(r.let || 'Bijgewerkt.'); tekenStore();
+      } catch(e){ meld(e.message); }
+    }));
+    /* KOPEN IS TWEE STAPPEN, EN DAT IS GEEN TRAAGHEID MAAR DE REGEL. Eerst de
+       BON -- wat betaal ik, hoeveel daarvan is btw, wat gaat er naar de
+       uitgever -- en dan pas de knop die afrekent. GELD.md par. 3: alles wat een
+       derde raakt is maximaal "klaarzetten"; bevestigen doet de mens. */
+    grid.querySelectorAll('.asKoop').forEach(b => b.addEventListener('click', async () => {
+      const kaart = b.closest('.boutiek'), vak = kaart.querySelector('.asBon');
+      vak.hidden = false; vak.innerHTML = '<span class="tag">De bon wordt opgemaakt…</span>';
+      await toonBon(kaart.dataset.sleutel, vak, null);
+    }));
+    /* HET DOSSIER OPENEN. Hij wordt pas OPGEHAALD als iemand hem opent en niet
+       bij het tekenen van de lijst: een pagina die voor twintig apps een
+       dossier ophaalt om er nul te tonen, is traag zonder dat iemand er iets
+       aan heeft. */
+    grid.querySelectorAll('.asDos').forEach(b => b.addEventListener('click', async () => {
+      const kaart = b.closest('.boutiek'), vak = kaart.querySelector('.asDosVak');
+      if (!vak.hidden) { vak.hidden = true; b.setAttribute('aria-expanded', 'false'); b.textContent = 'Inkoopdossier'; return; }
+      vak.hidden = false; b.setAttribute('aria-expanded', 'true'); b.textContent = 'Inkoopdossier sluiten';
+      vak.innerHTML = '<span class="tag">Het dossier wordt opgemaakt…</span>';
+      try { vak.innerHTML = dossierHtml(await api('/api/appstore/dossier', { sleutel: kaart.dataset.sleutel })); }
+      catch(e){ vak.innerHTML = '<div class="as-klein-zacht">'+esc(e.message)+'</div>'; }
+    }));
+    grid.querySelectorAll('.asWeg').forEach(b => b.addEventListener('click', async () => {
+      try { await api('/api/appstore/weg', { sleutel: b.closest('.boutiek').dataset.sleutel }); meld('Verwijderd.'); tekenStore(); }
+      catch(e){ meld(e.message); }
+    }));
+  } catch(e){ grid.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+
+/* ============================================================================
+   HET INKOOPDOSSIER OP HET SCHERM.
+
+   DE VOLGORDE IS EEN STANDPUNT. Eerst wat de app NOOIT krijgt en waar de
+   gegevens blijven, dan pas wie de leverancier is en wat er draait. Een
+   leverancierspak begint met de leverancier; dit begint met wat er met u
+   gebeurt. En het sluit met wat wij NIET kunnen aantonen -- niet als kleine
+   letters onderaan maar als een eigen blok met dezelfde opmaak, want dat is het
+   deel dat de rest geloofwaardig maakt.
+
+   ELKE BEWERING DRAAGT ZIJN BRON, en die staat er zichtbaar bij in plaats van
+   in een tooltip. Wie het niet gelooft, kan het bestand opzoeken. Dat is het
+   verschil met een ingevulde vragenlijst. */
+function bewijsHtml(lijst){
+  return (lijst || []).map(b =>
+    '<div class="as-bewijs">'+
+      '<b class="as-klein-blok">'+esc(b.claim)+'</b>'+
+      '<span class="as-hoe">'+esc(b.hoe)+'</span>'+
+      '<span class="as-bron">bron: '+esc(b.bron)+
+        (b.waarde ? ' &middot; gemeten: '+esc(String(b.waarde)) : '')+'</span>'+
+    '</div>').join('');
+}
+function dosKop(t){
+  return '<div class="as-kop">'+esc(t)+'</div>';
+}
+function dossierHtml(d){
+  const p = (t) => '<span class="as-alinea">'+esc(t)+'</span>';
+  return '<div class="as-uitleg">'+esc(d.let)+'</div>'+
+
+    dosKop('Wat deze app nooit krijgt')+
+    '<ul class="as-lijst">'+
+      (d.watHetNooitKrijgt.punten || []).map(x => '<li>'+esc(x)+'</li>').join('')+'</ul>'+
+    bewijsHtml(d.watHetNooitKrijgt.bewijs)+
+
+    dosKop('Waar uw gegevens blijven')+
+    '<b class="as-antwoord">'+esc(d.waarDeGegevensBlijven.antwoord)+'</b>'+
+    p(d.waarDeGegevensBlijven.toelichting)+bewijsHtml(d.waarDeGegevensBlijven.bewijs)+
+
+    dosKop('Als u stopt')+
+    '<b class="as-antwoord-plat">'+esc(d.uitgang.antwoord)+'</b>'+
+    p(d.uitgang.toelichting)+bewijsHtml(d.uitgang.bewijs)+
+
+    dosKop('De leverancier')+
+    p((d.leverancier.naam || 'onbekend')+' ('+d.leverancier.organisatie+')'+
+      (d.leverancier.toegelatenDoor ? ' &mdash; toegelaten door '+d.leverancier.toegelatenDoor : ''))+
+    bewijsHtml(d.leverancier.bewijs)+
+
+    dosKop('Wat er draait')+
+    p('versie '+d.watErDraait.versie+' &middot; '+d.watErDraait.bestanden+' bestanden &middot; hash '+String(d.watErDraait.hash).slice(0, 16)+'…')+
+    bewijsHtml(d.watErDraait.bewijs)+
+
+    dosKop('Wat de poort vond')+
+    p(d.watDePoortVond.blokkerend+' blokkerend, '+d.watDePoortVond.letOp+' let-op'+
+      (d.watDePoortVond.afgetekendDoor ? ' &middot; afgetekend door '+d.watDePoortVond.afgetekendDoor : ''))+
+    bewijsHtml(d.watDePoortVond.bewijs)+
+
+    /* WAT WIJ NIET KUNNEN AANTONEN, met dezelfde opmaak als de rest en niet
+       kleiner. Wie dit weglaat houdt een verkooppraatje over. */
+    dosKop('Wat dit dossier NIET zegt')+
+    Object.keys(d.nietGebouwd || {}).map(k =>
+      '<div class="as-mt-s"><b class="as-klein-goud">'+esc(k)+'</b>'+
+      '<span class="as-hoe">'+esc(d.nietGebouwd[k])+'</span></div>').join('');
+}
+
+/* MIJN GESCHIEDENIS: wat gaf ik, wanneer, en wanneer nam ik het terug. Staat
+   naast de winkel en niet erin: hij gaat over het LID en niet over een app.
+   Hij groeit aan en wordt nooit herschreven -- ook niet als het lid een app
+   verwijdert, want juist dan is hij het bewijs. */
+async function tekenTijdlijn(){
+  const vak = $('#asTijd');
+  vak.innerHTML = '<span class="tag">Even ophalen…</span>';
+  try {
+    const t = await api('/api/appstore/tijdlijn', {});
+    vak.innerHTML = '<div class="as-inleiding">'+esc(t.let)+'</div>'+
+      (t.tijdlijn.length
+        ? t.tijdlijn.map(r =>
+            '<div class="as-tijdrij">'+
+              '<span class="as-tijdstip">'+esc(String(r.at).slice(0, 16).replace('T', ' '))+'</span>'+
+              '<span class="as-groei"><b>'+esc(r.wat)+'</b>'+(r.sleutel ? ' &middot; '+esc(r.sleutel) : '')+
+                ((r.gaf && r.gaf.length) ? '<br><span class="as-gedempt">gaf: '+esc(r.gaf.join(', '))+'</span>' : '')+
+                ((r.weg && r.weg.length) ? '<br><span class="as-gedempt">nam terug: '+esc(r.weg.join(', '))+'</span>' : '')+
+              '</span></div>').join('')
+        : '<div class="leeg">Je hebt nog niets met een app van derden gedaan.</div>');
+  } catch(e){ vak.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+}
+
+/* De bon: wat een lid betaalt en waar het heen gaat, VOORDAT hij drukt.
+   Het land staat erbij en is te wijzigen: de btw op een digitale aankoop hoort
+   in het land waar het lid woont, en dat is de wet en niet onze keuze. Wij
+   rekenen hier niets zelf uit -- alles komt van /api/appstore/bon, zodat wat op
+   het scherm staat en wat er wordt geboekt niet uit elkaar kunnen lopen. */
+async function toonBon(sleutel, vak, land){
+  let d;
+  try { d = await api('/api/appstore/bon', { sleutel, land }); }
+  catch(e){ vak.innerHTML = '<span class="tag">'+esc(e.message)+'</span>'; return; }
+  if (d.landNodig) {
+    vak.innerHTML = '<span class="tag">'+esc(d.waarom)+'</span>'+
+      '<div class="rij as-mt-m"><select class="veld bonLand as-smal">'+
+      '<option value="">Kies je land…</option>'+
+      d.landen.map(l => '<option value="'+esc(l.code)+'">'+esc(l.naam)+'</option>').join('')+'</select></div>';
+    vak.querySelector('.bonLand').addEventListener('change', (e) => { if (e.target.value) toonBon(sleutel, vak, e.target.value); });
+    return;
+  }
+  const r = (label, c) => '<div class="as-bonregel"><span>'+label+'</span><b class="as-tekst">'+euroC(c)+'</b></div>';
+  vak.innerHTML =
+    '<div class="as-bontotaal"><b>Je betaalt</b><b class="as-goud">'+euroC(d.brutoCenten)+'</b></div>'+
+    '<div class="as-mt-xxs">'+
+      r('waarvan btw '+d.btwProcent+'% ('+esc(d.landNaam)+')', d.btwCenten)+
+      (d.afdrachtCenten ? r('afdracht RTG '+d.afdrachtProcent+'%', d.afdrachtCenten) : '')+
+      r('naar '+esc(d.uitgever ? d.uitgever.naam : 'de uitgever'), d.uitgeverCenten)+
+    '</div>'+
+    '<div class="rij as-landrij">'+
+      '<span class="tag as-p74">btw-land: <b>'+esc(d.landNaam)+'</b></span>'+
+      '<button class="knop stil bonAnder" type="button">Ander land</button>'+
+      '<span class="h-flex1"></span><button class="knop bonBetaal" type="button">Betalen</button>'+
+    '</div><div class="bonKies" hidden class="as-mt-xs"></div>';
+  /* "Ander land" haalt de lijst op en laat het lid kiezen. Hij stuurt met opzet
+     geen onzinwaarde naar de bon om de keuzelijst uit te lokken: dan zou de
+     server moeten raden wat een lid bedoelt, en dat is precies wat hij bij een
+     btw-land niet mag doen. */
+  vak.querySelector('.bonAnder').addEventListener('click', async () => {
+    const kies = vak.querySelector('.bonKies');
+    kies.hidden = false; kies.innerHTML = '<span class="tag">Even de landen ophalen…</span>';
+    try {
+      const l = await api('/api/appstore/landen');
+      kies.innerHTML = '<select class="veld bonLand as-smal" aria-label="Kies je land">'+
+        '<option value="">Kies je land…</option>'+
+        l.landen.map(x => '<option value="'+esc(x.code)+'"'+(x.code===d.land?' selected':'')+'>'+esc(x.naam)+'</option>').join('')+'</select>';
+      kies.querySelector('.bonLand').addEventListener('change', (e) => { if (e.target.value) toonBon(sleutel, vak, e.target.value); });
+    } catch(e){ kies.innerHTML = '<span class="tag">'+esc(e.message)+'</span>'; }
+  });
+  vak.querySelector('.bonBetaal').addEventListener('click', async (e) => {
+    e.target.disabled = true; e.target.textContent = 'Bezig…';
+    try {
+      const k = await api('/api/appstore/koop', { sleutel, land: d.land, idem: 'koop-' + sleutel + '-' + d.brutoCenten });
+      meld(k.let || 'Betaald.'); tekenStore();
+    } catch(err){ meld(err.message); e.target.disabled = false; e.target.textContent = 'Betalen'; }
+  });
 }
 
 /* ---------- De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen ----------

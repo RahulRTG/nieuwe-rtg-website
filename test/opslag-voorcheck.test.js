@@ -156,3 +156,73 @@ test('de voorcheck maakt saven meetbaar goedkoper zonder geld los te laten', asy
   // op deze last was ~5x; we falen pas als de winst helemaal weg is.
   assert.ok(nieuw.ms < oud.ms, 'de voorcheck is sneller (oud ' + oud.ms.toFixed(0) + ' ms, nieuw ' + nieuw.ms.toFixed(0) + ' ms)');
 });
+
+/* ---------------------------------------------------------------------------
+   DE LOGBOEKEN (24 augustus 2026).
+
+   De regel hierboven laat een grote collectie alleen overslaan als het AANTAL
+   items gelijk bleef. Voor een append-only logboek is groeien juist de normale
+   toestand, dus greep de overslaan-regel daar nooit -- en `doorgeefjournaal`
+   groeit naar 20.000 regels (3,6 MB). Gemeten onder last kostte saveSqlite
+   daardoor gemiddeld 32,9 ms met een piek van 101 ms, synchroon op de
+   event-loop: 16% van de wandkloktijd stond de lus in deze ene functie stil.
+
+   Deze drie toetsen leggen vast wat er wél en niet mag veranderen. Het gaat om
+   MEELIFTEN, niet om de garantie: het journaal regelt zijn eigen spoeling al
+   (kern/doorgeefjournaal.js, rem van een seconde), en een overgeslagen ronde
+   wordt altijd ingehaald.
+   ------------------------------------------------------------------------ */
+
+// Een logboek dat zeker boven RTG_SQLITE_GROOT_BYTES uitkomt (een ARRAY, want
+// zo bewaart kern/doorgeefjournaal.js zijn regels).
+function grootLogboek(n) {
+  const uit = [];
+  for (let i = 0; i < n; i++) uit.push({ t: '2026-08-24T00:00:00.000Z', wat: '/api/x', nr: i, vul: 'x'.repeat(200) });
+  return uit;
+}
+
+test('een GROEIEND logboek mag binnen het venster worden overgeslagen', async () => {
+  const o = verseOpslag({ RTG_SQLITE_GROOT_MS: 60000 });
+  try {
+    o.db.data.doorgeefjournaal = grootLogboek(4000);
+    o.dbmod.save();
+    const opSchijfVoor = o.opSchijf('doorgeefjournaal').length;
+    assert.equal(opSchijfVoor, 4000, 'de eerste save legt het logboek gewoon vast');
+    // een regel erbij: bij een gewone collectie zou dit MOETEN landen
+    o.db.data.doorgeefjournaal.push({ t: 'nieuw', wat: '/api/y', nr: 4000, vul: 'x' });
+    o.dbmod.save();
+    assert.equal(o.opSchijf('doorgeefjournaal').length, 4000,
+      'binnen het venster blijft de nieuwe regel nog even in het geheugen -- dat is precies de winst');
+  } finally { o.op(); }
+});
+
+test('maar een logboek blijft NIET hangen: na het venster staat alles op schijf', async () => {
+  /* Dit is de tegenhanger van de vorige toets, en de belangrijkste van de drie:
+     overslaan mag alleen UITSTELLEN, nooit weglaten. */
+  const o = verseOpslag({ RTG_SQLITE_GROOT_MS: 150 });
+  try {
+    o.db.data.doorgeefjournaal = grootLogboek(4000);
+    o.dbmod.save();
+    o.db.data.doorgeefjournaal.push({ t: 'nieuw', wat: '/api/y', nr: 4000, vul: 'x' });
+    o.dbmod.save();
+    await wacht(400);                       // venster voorbij + naronde
+    const opSchijf = o.opSchijf('doorgeefjournaal');
+    assert.equal(opSchijf.length, 4001, 'na het venster staat de nieuwe regel er wel degelijk');
+    assert.equal(opSchijf[4000].t, 'nieuw', 'en het is de regel die we schreven');
+  } finally { o.op(); }
+});
+
+test('geld blijft geld: een logboeknaam met centen erin wordt nooit overgeslagen', async () => {
+  /* exactNodig() wordt VOOR de logboekregel gesteld, dus zelfs als iemand een
+     geldcollectie op de logboeklijst zet, wint geld. Deze toets bewaakt die
+     volgorde -- niet de lijst, want een lijst verandert. */
+  const voorcheck = require(path.join(WORTEL, 'server/db/voorcheck.js'));
+  voorcheck.LOGBOEK.add('payTikken');       // moedwillig fout ingesteld
+  try {
+    assert.equal(voorcheck.exactNodig('payTikken'), true, 'payTikken is geld');
+    const nu = Date.now();
+    voorcheck.onthoud('payTikken', 10 * 1024 * 1024, [1, 2, 3], nu);
+    assert.equal(voorcheck.magOverslaan('payTikken', [1, 2, 3, 4], false, nu),
+      false, 'geld wordt nooit overgeslagen, ook niet als het als logboek te boek staat');
+  } finally { voorcheck.LOGBOEK.delete('payTikken'); }
+});

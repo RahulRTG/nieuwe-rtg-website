@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>App Store &middot; keuring</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; --groen:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);
+    padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.3rem;margin-top:.05rem;}
+  main{padding:1.1rem;max-width:940px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kaart h2{font-size:1.1rem;margin-bottom:.15rem;}
+  .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .bev{border-left:3px solid var(--burgundy);padding:.45rem .7rem;margin-top:.4rem;background:rgba(194,58,94,.07);border-radius:0;font-size:.8rem;line-height:1.5;}
+  .bev.letop{border-left-color:var(--gold);background:rgba(169,143,28,.08);}
+  .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:0;border:1px solid var(--gold);color:var(--gold);}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
+    border-radius:0;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;color:var(--gold);}
+  /* Uit de inline stijlattributen gehaald. Die houden style-src-attr in de CSP
+     open en de norm telt ze (scripts/norm.js, inlineStijlAttributen); ze stonden
+     hier bovendien vijftien keer met drie verschillende waarden voor hetzelfde
+     ding. Een naam is hier goedkoper dan een herhaling. */
+  .breed{flex:1;min-width:12rem;}
+  .breed-s{flex:1;min-width:10rem;}
+  .groei{flex:1;}
+  .scheiding{border-top:1px solid var(--line);padding-top:.7rem;margin-top:.7rem;}
+  .scheiding-s{border-top:1px solid var(--line);padding-top:.6rem;margin-top:.6rem;}
+  .mt-xs{margin-top:.4rem;}
+  .mt-s{margin-top:.5rem;}
+  .smal{max-width:7rem;}
+  .knoplink{text-decoration:none;display:inline-flex;align-items:center;}
+  .rij.strak{margin-top:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="knop stil" href="/apps/kantoor.html">&larr; Kantoor</a>
+  <div><div class="ey">RTG App Store</div><h1>Keuring &amp; afdracht</h1></div>
+</header>
+
+<main id="main"><div class="kaart"><p class="sub">Bezig met laden&hellip;</p></div></main>
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+/* ============================================================================
+   DE KEURINGSKANT -- hier tekent een MENS van RTG af.
+
+   Dit scherm bestaat omdat grens 2 van de App Store anders alleen op papier
+   staat: de machinepoort kan afkeuren of doorlaten NAAR een mens, en zonder
+   plek waar die mens kijkt, is "een mens keurt" een belofte zonder code
+   (LAT-regel 6).
+
+   Elke handeling hier vraagt een NAAM. Een kantoorsessie is een code en geen
+   mens; zonder naam is er straks een besluit waar niemand bij hoorde. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = c => new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(c||0)/100);
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3200); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+const naam = () => { let n = ''; try { n = localStorage.getItem('rtg_office_naam') || ''; } catch (e) {} return n; };
+function zetNaam(n){ try { localStorage.setItem('rtg_office_naam', n); } catch (e) {} }
+
+function tekenNaam(){
+  return '<div class="kaart"><h2>Wie tekent er</h2>'+
+    '<p class="sub">Elk besluit hieronder draagt jouw naam en gaat het journaal in. Een besluit zonder naam is een besluit dat niemand heeft genomen; de server neemt het dan ook niet aan.</p>'+
+    '<div class="rij"><input class="veld" id="wie" class="breed" maxlength="80" placeholder="Voor- en achternaam" value="'+esc(naam())+'"></div></div>';
+}
+
+function tekenWachtrij(d){
+  if (!d.inzendingen.length) return '<div class="kaart"><h2>Wachtrij</h2><p class="sub">Niets in de wachtrij. '+esc(d.let)+'</p></div>';
+  return '<div class="kaart"><h2>Wachtrij</h2><p class="sub">'+esc(d.let)+'</p>'+
+    d.inzendingen.map(v =>
+      '<div class="scheiding" data-v="'+esc(v.id)+'">'+
+        '<div class="rij strak"><b class="groei">'+esc(v.naam)+' '+esc(v.versie)+'</b>'+
+          '<span class="st">'+esc(v.org)+'</span>'+(v.prijsCenten ? '<span class="st">'+eur(v.prijsCenten)+'</span>' : '')+'</div>'+
+        '<p class="sub">'+esc(v.uitleg)+'</p>'+
+        '<p class="sub"><code>'+esc(v.hash.slice(0,16))+'</code> &middot; '+Math.round((v.maten?v.maten.totaal:0)/1024)+' kB in '+(v.maten?v.maten.bestanden:0)+' bestanden</p>'+
+        (v.vraagt.length ? '<p class="sub">Vraagt: '+v.vraagt.map(m => esc(m.label)+' (voor: '+esc(m.waarvoor || m.doel || '?')+')').join(', ')+'</p>' : '<p class="sub">Vraagt niets van het lid.</p>')+
+        /* WAT ER VERANDERT TEN OPZICHTE VAN WAT LIVE STAAT. Zonder dit moet wie
+           aftekent twee manifesten naast elkaar leggen om te zien of een update
+           stiekem is gegroeid, en dat doet niemand bij de twintigste. */
+        (v.tovLive && !v.tovLive.eersteVersie
+          ? '<div class="bev letop"><b>Ten opzichte van wat nu live staat</b><br>'+
+            (v.tovLive.erbij.length ? 'Erbij: '+v.tovLive.erbij.map(x => esc(x.id)+' ('+esc(x.doel||'?')+')').join(', ')+'<br>' : '')+
+            (v.tovLive.anderDoel.length ? 'Ander doel: '+v.tovLive.anderDoel.map(x => esc(x.id)+': '+esc(x.van)+' &rarr; '+esc(x.naar)).join(', ')+'<br>' : '')+
+            (v.tovLive.eraf.length ? 'Eraf: '+v.tovLive.eraf.map(x => esc(x.id)).join(', ')+'<br>' : '')+
+            (v.tovLive.prijsVan !== v.tovLive.prijsNaar ? 'Prijs: '+eur(v.tovLive.prijsVan)+' &rarr; '+eur(v.tovLive.prijsNaar)+'<br>' : '')+
+            (!v.tovLive.erbij.length && !v.tovLive.anderDoel.length && !v.tovLive.eraf.length && v.tovLive.prijsVan === v.tovLive.prijsNaar
+              ? 'Niets: dezelfde machtigingen, dezelfde doelen, dezelfde prijs.' : '')+
+            '</div>'
+          : '<div class="bev letop"><b>Eerste versie van deze app</b><br>Er is niets om mee te vergelijken; lees het manifest als geheel.</div>')+
+        v.bevindingen.map(b => '<div class="bev'+(b.ernst==='let-op'?' letop':'')+'"><b>'+esc(b.wat)+'</b>'+(b.bestand?' &middot; '+esc(b.bestand):'')+'<br>'+esc(b.hoe)+'</div>').join('')+
+        '<div class="rij"><input class="veld reden breed" maxlength="600" placeholder="Reden (verplicht bij weigeren)">'+
+          '<button class="knop pub" type="button">Publiceren</button>'+
+          '<button class="knop stil wei" type="button">Weigeren</button></div>'+
+      '</div>').join('')+'</div>';
+}
+
+function tekenUitgevers(d){
+  return '<div class="kaart"><h2>Uitgevers</h2><p class="sub">Een uitgever toelaten is geen formaliteit: vanaf dat moment staat er een aanspreekbare rechtspersoon achter elke app die hij publiceert. Schorsen haalt zijn apps op hetzelfde moment uit de winkel, ook bij de leden die ze al hadden.</p>'+
+    (d.uitgevers.length ? d.uitgevers.map(u =>
+      '<div class="scheiding-s" data-org="'+esc(u.org)+'">'+
+        '<div class="rij strak"><b class="groei">'+esc(u.naam)+'</b><span class="st">'+esc(u.status)+'</span></div>'+
+        '<p class="sub"><code>'+esc(u.org)+'</code> &middot; '+esc(u.contact)+(u.reden?' &middot; '+esc(u.reden):'')+'</p>'+
+        '<div class="rij"><input class="veld ureden breed-s" maxlength="400" placeholder="Reden (bij weigeren of schorsen)">'+
+          '<button class="knop utoe" type="button">Toelaten</button>'+
+          '<button class="knop stil uwei" type="button">Weigeren</button>'+
+          '<button class="knop stil usch" type="button">Schorsen</button></div>'+
+      '</div>').join('') : '<p class="sub">Nog geen aanvragen.</p>')+'</div>';
+}
+
+function tekenAfdracht(a){
+  if (!a) return '<div class="kaart"><h2>Afdracht</h2><p class="sub">De betaallaag draait niet mee in dit proces; er valt hier niets in te stellen.</p></div>';
+  return '<div class="kaart"><h2>Afdracht</h2>'+
+    '<p class="sub">Wat RTG inhoudt op het bedrag dat een uitgever overhoudt, na btw. Dit werkt alleen VOORUIT: een bon die al is geschreven wordt nooit herrekend. Elke uitgever leest de reden die je hier opschrijft.</p>'+
+    '<p class="sub mt-xs">Nu: <b>'+esc(String(a.afdracht.procent))+'%</b> sinds '+esc(String(a.afdracht.sinds).slice(0,10))+', door '+esc(a.afdracht.door)+'. '+esc(a.afdracht.reden||'')+'</p>'+
+    '<div class="rij"><input class="veld" id="afProc" class="smal" inputmode="decimal" placeholder="0" value="'+esc(String(a.afdracht.procent))+'">'+
+      '<input class="veld" id="afReden" class="breed" maxlength="400" placeholder="Waarom dit percentage">'+
+      '<button class="knop" id="afZet" type="button">Vastleggen</button></div></div>';
+}
+
+/* DE CONTROLERONDE. Hij stond er wel als route en nergens als knop, en dat is
+   precies het soort ding dat niemand ooit draait. Wat hij doet is elk bestand
+   van elke live app tegen zijn eigen hash houden; klopt er iets niet meer met
+   wat een mens heeft afgetekend, dan gaat die app eruit. De uitkomst wordt hier
+   getoond en niet alleen gemeld: "3 gekeurd, 3 in orde" is het antwoord op de
+   vraag die een auditor stelt, en "0 gekeurd" is dat ook. */
+function tekenRonde(){
+  return '<div class="kaart"><h2>Controleronde</h2>'+
+    '<p class="sub">Houdt elk bestand van elke live app tegen de hash waarop een mens heeft afgetekend. Wat niet meer klopt gaat eruit &mdash; dat is geen afweging. De ronde komt met je naam in het journaal.</p>'+
+    '<div class="rij"><button class="knop" id="hcDoe" type="button">Nu nalopen</button>'+
+      '<a class="knop stil" href="/apps/appstore-dossier.html" class="knoplink">Het kanaaldossier &rarr;</a></div>'+
+    '<div id="hcUit" class="sub mt-s"></div></div>';
+}
+
+function tekenTeruggaven(t){
+  if (!t) return '';
+  if (!t.open.length) return '<div class="kaart"><h2>Teruggaven</h2><p class="sub">Niets open. '+esc(t.let)+'</p></div>';
+  return '<div class="kaart"><h2>Teruggaven</h2><p class="sub">'+esc(t.let)+'</p>'+
+    t.open.map(r =>
+      '<div class="scheiding-s" data-tg="'+esc(r.id)+'">'+
+        '<div class="rij strak"><b class="groei">'+esc(r.naam)+'</b><span class="st">'+eur(r.centen)+'</span></div>'+
+        '<p class="sub">Gekocht op '+esc(String(r.gekochtOp).slice(0,10))+', ingetrokken door '+esc(r.ingetrokkenDoor||'onbekend')+(r.reden?': '+esc(r.reden):'')+'.</p>'+
+        '<p class="sub">Terug uit: uitgever '+eur(r.uitgeverCenten)+', btw '+eur(r.btwCenten)+', afdracht '+eur(r.afdrachtCenten)+'.</p>'+
+        '<div class="rij"><input class="veld treden breed-s" maxlength="400" placeholder="Reden (verplicht bij afwijzen)">'+
+          '<button class="knop tbet" type="button">Terugbetalen</button>'+
+          '<button class="knop stil tafw" type="button">Afwijzen</button></div>'+
+      '</div>').join('')+'</div>';
+}
+
+async function laad(){
+  if (!TOKEN) { $('#main').innerHTML = '<div class="kaart"><h2>Log eerst in</h2><p class="sub">Deze pagina hoort bij de backoffice. <a href="/apps/kantoor.html">Naar het kantoor &rarr;</a></p></div>'; return; }
+  let d, a = null, t = null;
+  try { d = await api('/api/appstore/kantoor/wachtrij'); }
+  catch (e) { $('#main').innerHTML = '<div class="kaart"><h2>Niet beschikbaar</h2><p class="sub">'+esc(e.message)+'</p></div>'; return; }
+  try { a = await api('/api/appstore/kantoor/afdracht'); } catch (e) {}
+  try { t = await api('/api/appstore/kantoor/teruggaven'); } catch (e) {}
+  $('#main').innerHTML = tekenNaam() + tekenWachtrij(d) + tekenTeruggaven(t) + tekenRonde() + tekenAfdracht(a) + tekenUitgevers(d);
+
+  const wie = () => { const n = $('#wie').value.trim(); if (n) zetNaam(n); return n; };
+  const doe = async (pad, body, klaar) => {
+    try { const r = await api(pad, body); meld(r.let || klaar || 'Gedaan.'); laad(); }
+    catch (e) { meld(e.message); }
+  };
+  document.querySelectorAll('[data-v]').forEach(el => {
+    const id = el.dataset.v, reden = () => el.querySelector('.reden').value;
+    el.querySelector('.pub').addEventListener('click', () => doe('/api/appstore/kantoor/besluit', { versieId: id, besluit: 'gepubliceerd', reden: reden(), door: wie() }, 'Gepubliceerd.'));
+    el.querySelector('.wei').addEventListener('click', () => doe('/api/appstore/kantoor/besluit', { versieId: id, besluit: 'geweigerd', reden: reden(), door: wie() }, 'Geweigerd.'));
+  });
+  document.querySelectorAll('[data-org]').forEach(el => {
+    const org = el.dataset.org, reden = () => el.querySelector('.ureden').value;
+    el.querySelector('.utoe').addEventListener('click', () => doe('/api/appstore/kantoor/uitgever', { org, besluit: 'toegelaten', door: wie() }, 'Toegelaten.'));
+    el.querySelector('.uwei').addEventListener('click', () => doe('/api/appstore/kantoor/uitgever', { org, besluit: 'geweigerd', reden: reden(), door: wie() }, 'Geweigerd.'));
+    el.querySelector('.usch').addEventListener('click', () => doe('/api/appstore/kantoor/uitgever', { org, besluit: 'geschorst', reden: reden(), door: wie() }, 'Geschorst.'));
+  });
+  document.querySelectorAll('[data-tg]').forEach(el => {
+    const id = el.dataset.tg, reden = () => el.querySelector('.treden').value;
+    el.querySelector('.tbet').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'terugbetaald', reden: reden(), door: wie() }, 'Terugbetaald.'));
+    el.querySelector('.tafw').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'afgewezen', reden: reden(), door: wie() }, 'Afgewezen.'));
+  });
+  const hc = $('#hcDoe');
+  if (hc) hc.addEventListener('click', async () => {
+    const uit = $('#hcUit');
+    uit.textContent = 'Bezig met nalopen…';
+    try {
+      const r = await api('/api/appstore/kantoor/hercontrole', { door: wie() });
+      uit.innerHTML = '<b>'+r.gekeurd+' nagelopen, '+r.inOrde+' in orde, '+r.uitgezet.length+' eruit'+
+        (r.gemeld.length ? ', '+r.gemeld.length+' gemeld' : '')+'.</b><br>'+esc(r.let)+
+        (r.uitgezet.length ? '<br>'+r.uitgezet.map(u => esc(u.sleutel)+' ('+esc(u.bestanden.join(', '))+')').join('<br>') : '')+
+        (r.gemeld.length ? '<br>'+r.gemeld.map(g => esc(g.sleutel)+': uitgever '+esc(g.uitgever)).join('<br>') : '');
+      if (r.uitgezet.length) laad();
+    } catch (e) { uit.textContent = e.message; }
+  });
+  const az = $('#afZet');
+  if (az) az.addEventListener('click', () => doe('/api/appstore/kantoor/afdracht', { procent: Number(String($('#afProc').value).replace(',', '.')), reden: $('#afReden').value, door: wie() }, 'Vastgelegd.'));
+}
+laad();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

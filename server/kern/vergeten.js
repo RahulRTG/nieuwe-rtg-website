@@ -54,12 +54,21 @@ module.exports = function maakVergeten(kern) {
      anders meldt het scherm "verwijderd" terwijl de foto's nog gaan. */
   async function wisLid(sessie) {
     const key = sessie.key;
+    /* DE CODENAAM WORDT HIER GEPAKT, VOOR DE EERSTE VEEG. In de idempotentiering
+       van betalen staat niet de sleutel maar de CODENAAM, en zodra de ledengids
+       weg is (gidsWeg, verderop) is hij nergens meer op te halen. liveCodename
+       neemt een SESSIE en geen sleutel -- dat is de tweede lijn onder
+       sessie.codename, voor een sessie die hem niet zelf draagt. */
+    let codenaam = sessie.codename || null;
+    if (!codenaam && typeof liveCodename === 'function') {
+      try { codenaam = liveCodename(sessie) || null; } catch (e) { codenaam = null; }
+    }
     const teWissen = new Set();
     /* DE EERSTE SOORT: alles wat alleen over dit lid gaat -- zijn voorkeuren,
        zijn spullen, zijn geheugen, zijn eigen Salon-posts. De lijst met takken
        staat in ./vergeten/eigen.js; daar is de LIJST het onderwerp, en hier zou
        hij het bestand overheersen. */
-    eigen.wisEigen(key, bytes.noteerPostBeelden, teWissen);
+    eigen.wisEigen(key, bytes.noteerPostBeelden, teWissen, codenaam);
     /* De gesprekken van de communicatiekern. De regel staat apart (./vergeten/
        gesprekken.js) omdat hij binnen deze functie niet los te toetsen was --
        en precies daardoor stond hij er eerst helemaal niet: de bezem liep groen

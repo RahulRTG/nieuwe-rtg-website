@@ -26,8 +26,17 @@ module.exports = [
     uitleg: 'De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten. Uit betekent dat niemand meer binnenkomt; de eigenaar houdt het techniekbord.', paden: ['/api/auth', '/api/login', '/api/logout'] },
   { id: 'tg-account', categorie: 'Toegang en identiteit', naam: 'Account en profiel', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het eigen account: rollen, koppelingen en het cv van een lid.', paden: ['/api/account', '/api/cv'] },
-  { id: 'tg-sso', categorie: 'Toegang en identiteit', naam: 'Inloggen via een andere partij (SSO)', standaard: true, doelgroepen: ALLE,
-    uitleg: 'De terugkeer van een identiteitsprovider, met de ondertekende state als poort.', paden: ['/api/sso'] },
+  /* SSO EN SCIM ZIJN DE TWEE HELFTEN VAN DEZELFDE DEUR: de identiteitsprovider
+     van een klant meldt WIE er binnenkomt (sso) en WIE er bestaat (scim -- de
+     enige plek waar een buitenstaand systeem accounts aanmaakt en uitzet zonder
+     mens ertussen). SCIM kwam met main mee en hing aan geen enkele functie; dan
+     is hij door niemand uit te zetten en telt hij als platformbediening, wat hij
+     niet is -- hij is een klantcapability met de sleutel bij de klant.
+     Ze delen een schakelaar omdat ze niet los te denken zijn: provisioning
+     aanlaten terwijl de inlog uit staat levert accounts op die niemand kan
+     gebruiken, en andersom mensen die niet meer uit dienst gaan. */
+  { id: 'tg-sso', categorie: 'Toegang en identiteit', naam: 'Inloggen via een andere partij (SSO en SCIM)', standaard: true, doelgroepen: ALLE,
+    uitleg: 'De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.', paden: ['/api/sso', '/api/scim'] },
   { id: 'tg-pin', categorie: 'Toegang en identiteit', naam: 'Pincode en sleutelwoorden', standaard: true, doelgroepen: ALLE,
     uitleg: 'De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.', paden: ['/api/pin', '/api/sleutelwoorden'] },
   { id: 'tg-zegel', categorie: 'Toegang en identiteit', naam: 'Zegel, codes en rechtenbeheer', standaard: true, doelgroepen: ALLE,

@@ -297,8 +297,49 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
      dezelfde uitslag als voorheen, alleen niet meer afhankelijk van hoe druk de
      machine was. */
   const bestand = path.join(TMP, 'db.json');
-  await totdat('de sleutel van het lid uit db.json verdwenen was',
-    () => fs.existsSync(bestand) && !fs.readFileSync(bestand, 'utf8').includes(sleutel));
+  /* WACHTEN OP DE TAKKEN DIE DE BEZEM WEL VEEGT, en niet op het hele bestand.
+     Hier stond `!inhoud.includes(sleutel)` over db.json als geheel, en dat kan
+     sinds het handelingsspoor bestaat NOOIT waar worden: die tak bewaart de
+     sleutel met opzet (zie AUDITTAK hieronder, met zijn drie grondslagen). De
+     wacht liep dus altijd zijn vijftien seconden vol en zakte met een reden die
+     niets met de bezem te maken had -- een toets die alleen nog kan slagen als
+     er toevallig niets is gelogd. Nu wacht hij op `users`, de tak waar de bezem
+     als eerste doorheen gaat; wat daarna nog ergens staat, is precies wat de
+     controle hieronder per tak beoordeelt. */
+  /* HET GROOTBOEK VAN RTG PAY HOUDT ZIJN CODENAAM, en dat is een besluit met een
+     grond en een grens -- geen vrijstelling omdat het lastig was.
+
+     DE GROND. paySaldi en payBoekingen zijn de financiele administratie van het
+     gesloten circuit (TOKEN.md, GELD.md). Een saldo en zijn boekingen zijn geld:
+     art. 52 AWR vraagt zeven jaar bewaring van de administratie, en AVG art. 17
+     lid 3 onder b laat daar de ruimte voor. Een boeking uit een grootboek halen
+     is bovendien niet wissen maar VALSEN -- een grootboek dat niet meer sluit,
+     bewijst niets meer, ook niet ten gunste van het lid zelf.
+
+     DE GRENS, EN DIE IS DE HELE REDEN DAT DIT MAG. Wat er blijft staan is een
+     CODENAAM, en na deze bezem leidt die nergens meer naartoe: de gids is de
+     laatste plek waar de sleutel aan de codenaam vastzit (zie de toelichting bij
+     gidsWeg in server/kern/gids.js) en die wordt geveegd. Wat overblijft is dus
+     een pseudoniem zonder sleutel -- voor iedereen zonder de kluis, en de kluisrij
+     van dit lid is vernietigd. Zou die afbeelding ergens ANDERS blijven bestaan,
+     dan valt deze grond weg en hoort dit weer te zakken; daarom staat hier alleen
+     'codenaam' vrij en niet 'sleutel' of 'NAAM/E-MAIL'.
+
+     Zet iemand hier later een echte naam of de sleutel in, dan zakt deze toets
+     gewoon. Dat is precies de bedoeling van een vrijstelling per SOORT in plaats
+     van per tak. */
+  const AUDITTAK = new Map([
+    ['handelingLog', ['sleutel']],
+    ['paySaldi', ['codenaam']],
+    ['payBoekingen', ['codenaam']]
+  ]);
+  await totdat('de sleutel van het lid overal weg was behalve uit het auditspoor',
+    () => {
+      if (!fs.existsSync(bestand)) return false;
+      let d; try { d = JSON.parse(fs.readFileSync(bestand, 'utf8')); } catch (e) { return false; }
+      return !Object.entries(d).some(([tak, waarde]) =>
+        !AUDITTAK.has(tak) && JSON.stringify(waarde == null ? null : waarde).includes(sleutel));
+    });
   const data = JSON.parse(fs.readFileSync(bestand, 'utf8'));
 
   /* Per tak kijken, zodat de fout zegt WAAR het lid nog staat. Een tak die het
@@ -338,7 +379,6 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
      meer iets. Zet iemand hier later een naam of een codenaam in -- door de
      body alsnog mee te loggen bijvoorbeeld -- dan hoort dat gewoon te zakken.
      Alleen de sleutel valt weg, de rest niet. */
-  const AUDITTAK = new Map([['handelingLog', ['sleutel']]]);
 
   const raak = [];
   for (const [tak, waarde] of Object.entries(data)) {

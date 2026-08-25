@@ -75,7 +75,21 @@ if (!bestanden.length) {
   process.exit(2);
 }
 
-const journaal = path.join(WORTEL, '.routejournaal');
+/* WIE HET JOURNAAL VRAAGT, KRIJGT HET WAAR HIJ HET VRAAGT.
+
+   Hier stond onvoorwaardelijk `RTG_ROUTELOG: <wortel>/.routejournaal`, en dat
+   overschreef de keuze van de aanroeper zonder iets te zeggen. De keuring zet
+   die variabele zelf (RTG_ROUTELOG: $GITHUB_WORKSPACE/routejournaal.log) omdat
+   een latere stap -- scripts/dekking.js --lees -- er een waargenomen
+   dekkingscijfer uit haalt. Zolang test:gate een kaal `node --test` was, ging
+   die variabele gewoon door; sinds hij via deze draaier loopt niet meer, en de
+   stap erna zakte met "Het routejournaal bestaat niet. Draaide de suite met
+   RTG_ROUTELOG gezet?" -- een vraag waarop het antwoord ja was.
+
+   Een draaier die een meegegeven pad stil vervangt door zijn eigen pad, maakt
+   van een goede vraag een verwarrende. Dus: het meegegeven pad wint, en de
+   eigen keuze is alleen de terugval. */
+const journaal = process.env.RTG_ROUTELOG || path.join(WORTEL, '.routejournaal');
 try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1' };
 
@@ -116,7 +130,7 @@ const geïsoleerd = bestanden.filter(n => isGeisoleerd(n));
    bewering van een regel. Zo kost het niets, en een mens die zich afvraagt wat
    er straks apart draait, krijgt hetzelfde antwoord. */
 if (argv.includes('--toon')) {
-  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency, dekking }, null, 2));
+  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency, dekking, journaal }, null, 2));
   geefAfbouwSlotVrij();
   process.exit(0);
 }

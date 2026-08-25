@@ -1,9 +1,9 @@
 {
  "uitleg": "Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).",
  "gemeten": {
-  "schrijfroutes": 4432,
+  "schrijfroutes": 4530,
   "verklaard": 85,
-  "schuld": 4347,
+  "schuld": 4445,
   "weesverklaringen": 0
  },
  "weesverklaringen": [],
@@ -4316,5 +4316,5 @@
   "POST /api/zorgprofiel/zet",
   "PUT /api/scim/v2/Users/:id"
  ],
- "groei": "Van 4307 naar 4347 op 22 augustus 2026, bij het samenvoegen van #99, #100, #101, #103 en #104. Veertig schrijfroutes erbij zonder idem-verklaring: de registratiebalie van de Foundation, de schoolpersoneelsregistratie, de ondernemersregie en de rechtsvormwacht. In absolute zin groei, in verhouding gelijk: het aandeel verklaarde routes blijft 1,9%. De goedkoopste krimp zit nog steeds bij de LEZERS -- routes die niets veranderen hebben geen idem-sleutel nodig en horen als {leest} te worden verklaard, niet als schuld te blijven staan."
+ "groei": "Van 4307 naar 4347 op 22 augustus 2026, bij het samenvoegen van #99, #100, #101, #103 en #104. Veertig schrijfroutes erbij zonder idem-verklaring: de registratiebalie van de Foundation, de schoolpersoneelsregistratie, de ondernemersregie en de rechtsvormwacht. In absolute zin groei, in verhouding gelijk: het aandeel verklaarde routes blijft 1,9%. De goedkoopste krimp zit nog steeds bij de LEZERS -- routes die niets veranderen hebben geen idem-sleutel nodig en horen als {leest} te worden verklaard, niet als schuld te blijven staan.\n\nVan 4347 naar 4445 op 25 augustus 2026, bij het binnenhalen van main (tachtig commits, PR #105/#113/#115). Achtennegentig schrijfroutes erbij zonder idem-verklaring, en ze komen uit drie nieuwe domeinen tegelijk: de Opportunity OS-bedrijfsregie (/api/bedrijf/handeling/*), de bijstands- en gezondheidslagen van RTG Command (/api/command/bijstand/*, /api/command/gezondheid/*) en de Tenant Control Plane. Dit register bestaat niet op main, dus die takken konden er ook niet in boeken -- de schuld komt hier binnen op het moment van samenvoegen. Dat is groei die niet van dit werk komt, en zij hoort daarom MET naam opgeschreven te worden en niet stil meegeboekt. Het aandeel verklaarde routes blijft 1,9%. De sluitweg is onveranderd: de lezers eruit halen ({leest} verklaren), want die hebben geen idem-sleutel nodig en dragen nu de meeste schuld."
 }

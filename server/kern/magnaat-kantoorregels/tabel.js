@@ -57,6 +57,19 @@ const REGELS = [
      kloppen: dit is geen personeelsbeheer maar een controle die juist NIET bij
      de werkgever hoort te liggen. */
   [/office\/(?:bewaarverzoek|uitgifte|verifications|vakbewijs)|\/vakbewijs|\/persoonseis|\/onboarding|\/zegel|\/codewoord/, 'juridisch', 'Juridisch'],
+  /* DE TENANT CONTROL PLANE, van main overgenomen op 25 augustus 2026. Deze twee
+     regels stonden alleen in main's kopie van deze tabel; bij de samenvoeging is
+     onze kopie gehouden (identieke inhoud, betere vorm) en vielen ze weg. Zeven
+     werkprocessen kwamen daardoor op 'terugval' te staan -- 22 dekkingsgaten,
+     en test/kantoren.test.js zag het.
+     Het exit-recht, de bewaring en de bewijsstand zijn een AVG- en contractzaak
+     en liggen bij Juridisch. De bootstrap en de groepsafbeelding zijn
+     toegangsbeheer en liggen bij Intern & IT. De tweede regel sluit ZONDER
+     afsluitende slash af, want de functiecatalogus draagt het prefix
+     `/api/tenant` als codepunt: een regel die de routes wel pakt en de functie
+     niet, dekt de helft en meldt zich niet. */
+  [/\/api\/tenant\/(?:export|herstelproef|status)/, 'juridisch', 'Juridisch'],
+  [/\/api\/tenant(?:\/|$)/, 'intern', 'Intern & IT'],
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],

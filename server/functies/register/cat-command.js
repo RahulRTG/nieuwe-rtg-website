@@ -28,7 +28,7 @@ module.exports = [
      knop en raakt het zien en het herstellen niet. */
   { id: 'command-zien', categorie: 'RTG-Backoffice', naam: 'RTG Command: zien', standaard: true, doelgroepen: ['intern'],
     uitleg: 'De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.',
-    paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal',
+    paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal', '/api/command/apispoor',
       '/api/command/kwaliteit', '/api/command/graaf', '/api/command/herkomst', '/api/command/alarm',
       '/api/command/slo', '/api/command/sonde',
       /* De gezondheidskaart hoort bij het ZIEN, ook al DOET /gezondheid/controleer
@@ -62,6 +62,14 @@ module.exports = [
     uitleg: 'Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.',
     paden: ['/api/command/beleid', '/api/command/simulatie', '/api/command/agent', '/api/command/agents',
       '/api/command/recht', '/api/command/rechten', '/api/command/mandaat',
-      '/api/command/canary', '/api/command/zandbak', '/api/command/mdm',
+      '/api/command/canary',
+      /* DE UITROLREGIE, en het API-SPOOR hierboven, kwamen met de andere tak mee
+         en stonden daar in cat-partners.js. Bij de samenvoeging van 24 augustus is
+         dat blok terecht verdwenen (main had deze drie schakelaars al verplaatst
+         EN verrijkt), maar deze zeven paden stonden alleen in de oude kopie -- en
+         een route die geen enkele functie claimt, is door niemand uit te zetten.
+         test/platformregister.test.js ving het. */
+      '/api/command/uitrol', '/api/command/uitrol/zet', '/api/command/uitrol/klim',
+      '/api/command/uitrol/pauze', '/api/command/uitrol/bevestig', '/api/command/zandbak', '/api/command/mdm',
       '/api/command/overname', '/api/command/apipoort', '/api/command/land', '/api/command/stad'] }
 ];

@@ -136,6 +136,11 @@ const KAART = new Map([
 
   // ---- geenBewaker: helemaal geen deur ----
   ['mw', ['geenBewaker', null, 'de snelheidsrem (server/rem.js) of de cachelaag (server/lib/cache.js)']],
+  /* `formulier` staat op /api/sso/saml/acs (main's SAML-federatiepoort) en leest
+     het POST-lichaam als URL-geencodeerd formulier -- een SAML-provider stuurt
+     zijn antwoord zo. Het is een LEZER en geen deur: wie erdoor komt is nog
+     niemand. De echte weigering zit in de handtekeningcontrole erna. */
+  ['formulier', ['geenBewaker', null, 'leest het formulierlichaam van een SAML-antwoord (server/routes/sso-saml.js)']],
 
   // ---- omgeving: de opstelling beslist, niet de bezoeker ----
   ['meetpoort', ['omgeving', null, 'RTG_METRICS_TOKEN en het interne net beslissen; zie scripts/poortwacht.js']]

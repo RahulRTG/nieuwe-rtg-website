@@ -19,7 +19,20 @@
       envelop.test.js stonden er niet in, en test/excursie.test.js kreeg de
       schuld van "gastAuth is not defined".
    2. HIJ IS ZO ZWAAR dat parallel draaien de machine of de poorten opeet
-      (boot-smoke, grens-sweep, zaakdoos).
+      (boot-smoke, grens-sweep, zaakdoos, vloot).
+
+      VLOOT KWAM ER OP 25 AUGUSTUS 2026 BIJ, en de reden dat hij er niet stond
+      is leerzaam: er werd geteld hoe vaak een toets startServer() aanroept, en
+      daar zijn er tweeentwintig met drie of meer. Maar die starten er een NA de
+      ander. vloot.test.js zegt op regel 37 wat hem anders maakt -- "Deze toets
+      start er VIER tegelijk" -- en dat is de eigenschap die telt: hoeveel
+      servers er GELIJKTIJDIG leven, niet hoe vaak er een wordt gestart.
+
+      Hij zakte in de dekkingsronde twee keer op "komt op binnen 360s; laatste
+      stand per groep: {leden:502, kantoor:200, rtf:200}" -- twee groepen op, de
+      derde niet -- en slaagde daarna los in een keer. Dat verschil IS de
+      diagnose: contentie, geen defect. Boot-smoke stond er al op omdat hij EEN
+      hele server start; vier plus een poortwachter hoort daar dan zeker bij.
 
    test/bronmutanten.test.js houdt tegen dat er een van soort 1 bijkomt die hier
    niet staat. Soort 2 blijft mensenwerk. */
@@ -30,6 +43,7 @@ const GEISOLEERD = [
   'grens-sweep.test.js',   // loopt alle endpoints af; parallel is dat een storm
   'klok.test.js',          // verzet de klok in subprocessen
   'zaakdoos.test.js',      // zwaar, met een eigen datamap
+  'vloot.test.js',         // start VIER servers tegelijk (poortwachter + drie groepen)
   'keuring.test.js',       // scant de hele bron; ziet andermans tijdelijke bestanden
   'meterijk.test.js',      // muteert bron EN registers om elke meter te ijken
   'gezag.test.js',         // hernoemt een trede in geldbeleid/regels.js en ainiveau.js

@@ -119,8 +119,31 @@ jobs:
       # De vloeren staan bewust een paar punten onder de gemeten basislijn zodat
       # normale ruis niet flaket, maar echte terugval hard opvalt.
       #
-      # GEMETEN OP 17 AUGUSTUS 2026, volledige suite (6520 toetsen):
-      #   regels 80,63  takken 80,60  functies 67,73   -> vloer 78 / 78 / 65
+      # GEMETEN OP 25 AUGUSTUS 2026, parallelle groep (953 van 962 bestanden):
+      #   regels 81,22  takken 80,64  functies 68,63   -> vloer 78 / 78 / 65
+      # (daarvoor, 17 augustus 2026, hele suite van 6520 toetsen:
+      #   regels 80,63  takken 80,60  functies 67,73)
+      #
+      # DE VLOER MEET DE SUITE MINUS DE GEISOLEERDE BESTANDEN, en dat is sinds
+      # 25 augustus 2026 zo. test:gate was tot dan een eigen aanroep --
+      # `node --test test/*.test.js` -- en ging daarmee langs
+      # scripts/test-runner.js heen, en dus langs de isolatielijst in
+      # scripts/lib/geisoleerd.js. Omdat dit de ENIGE suite-run in deze keuring
+      # is, zijn de bronmuterende toetsen hier nooit geisoleerd geweest: vier
+      # toetsen zijn erop omgevallen zonder dat er iets mis was (excursie en
+      # horeca-host hier, negenplus en schakelkast-dekking lokaal), telkens
+      # doordat een server bootte terwijl envelop.test.js `function gastAuth(`
+      # had hernoemd of meterijk.test.js een tijdelijk bestand had staan.
+      #
+      # De negen geisoleerde bestanden draaien nu ERNA, een voor een, ZONDER
+      # vloer. Node meet dekking per proces, dus een los bestand haalt nooit
+      # 78% van de hele boom; een vloer daarop zou alleen nog meten hoe groot
+      # dat ene bestand is. Ze draaien wel en ze zakken ook gewoon -- ze tellen
+      # alleen niet mee in het dekkingscijfer.
+      #
+      # Dat het cijfer daardoor niet KELDERDE is gemeten en niet gehoopt: de
+      # nieuwe indeling staat op 81,22 / 80,64 / 68,63, boven de oude meting
+      # over alles. De vloer kon dus blijven staan waar hij stond.
       #
       # Daarvoor stonden de vloeren op 58/74/47 terwijl deze opmerking 63/80/51
       # als basislijn noemde: twee getallen die geen van beide meer klopten, en

@@ -1,5 +1,21 @@
 # De takenlijst
 
+## Gevonden door de objectmodelmeting (24 augustus 2026)
+
+`scripts/objectmodel.js` zocht naar gedeelde vormen tussen domeinen en vond
+onderweg een dubbeling die niemand had gemeld:
+
+**`kern/command` en `kern/zaakcommand` bouwen hetzelfde ding twee keer.** Twee
+vormparen met gelijkenis **1,00**:
+
+- `actie klantImpact oorzaak past terugDraaibaar veld` — `command/runbookcatalogus.js` naast `zaakcommand/runbooks.js`
+- `niveau score vierOgen waarom waaromNiet` — `command/index.js` naast `zaakcommand/beeld.js`
+
+Dat is geen gedeeld objecttype maar dezelfde runbook- en oordeelsvorm op twee
+plekken, en dus twee plekken die uit elkaar kunnen lopen (LAT-regel 4). Wie hier
+aan werkt: eerst nagaan of de BETEKENIS ook gelijk is — een gedeelde naam is dat
+niet — en pas daarna samenvoegen. De meting wijst aan, een mens beslist.
+
 `LAT.md` verwijst hier op drie plekken naar ("die lijst staat in de
 takenlijst, niet in iemands hoofd", en pleisters staan "met naam in de
 takenlijst met de oorzaak erbij") -- maar het bestand bestond niet. Dat is

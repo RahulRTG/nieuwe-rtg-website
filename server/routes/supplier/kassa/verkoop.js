@@ -68,7 +68,14 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   if (method === 'cadeaukaart') {
     const k = verzilverKaart(db, req.supplier.code, req.body.giftcardCode || req.body.payCode,
       total, req.actor.name, bonId);
-    if (k.error) return res.status(k.status).json({ error: k.error });
+    /* EEN OBJECT EN GEEN res.status(), net als elke andere uitgang hierboven.
+       Deze tak is ouder dan de idempotentiewikkel van main: binnen eenmalig()
+       verstuurde hij zelf het antwoord EN gaf hij `res` terug, waarna de wikkel
+       er `res.json(antwoord)` achteraan deed -- een tweede antwoord op hetzelfde
+       verzoek. Erger nog: eenmalig() bewaart wat de callback teruggeeft als HET
+       antwoord voor die sleutel, dus een herhaling van dezelfde bon kreeg dat
+       res-object terug in plaats van de fout. */
+    if (k.error) return { status: k.status, error: k.error };
     kaartCode = k.kaart.code;
   }
   const sale = {

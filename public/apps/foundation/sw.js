@@ -26,7 +26,7 @@ const SHELL = [
      kent, geeft offline een wit scherm -- en dat is erger dan geen tegel, want
      de gebruiker denkt dat de app stuk is. test/foundationschil.test.js meet dit. */
   '/apps/foundation/mail.html', '/apps/foundation/registreren.html',
-  '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
+  '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/werk-premium.css', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
   /* club en klas kwamen op de hub te staan toen elk scherm een klikroute
      kreeg; zonder deze twee regels geeft de app ze offline als wit scherm.
      test/foundationschil.js ving dat meteen -- de eerste keer dat die toets

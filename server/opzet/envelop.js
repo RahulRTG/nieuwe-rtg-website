@@ -117,14 +117,24 @@ function context(req, fouten) {
     pad: leesVeilig(() => tekst(req && req.path, 300), 'pad', f),
     methode: leesVeilig(() => tekst(req && req.method, 10), 'methode', f),
     // de tijd via de klok van dit huis, zodat een tijdproef hem ook echt verzet
-    tijd: nu()
+    tijd: klok.nu()
   };
 }
 
-function nu() {
-  try { return require('../lib/klok').nu(); }
-  catch (e) { return Date.now(); }
-}
+/* GEEN TERUGVAL OP Date.now(), en dat is het hele punt van deze regel.
+
+   Hier stond `try { klok.nu() } catch { Date.now() }`. Dat leek voorzichtig
+   maar deed precies het tegenovergestelde van wat de regel erboven belooft:
+   kon de klokmodule niet laden, dan pakte de envelop stilletjes de ECHTE tijd
+   en zou een tijdproef groen staan terwijl hij iets anders mat dan hij dacht.
+   Een terugval die een garantie ondermijnt is geen vangnet.
+
+   scripts/klok.js telde die Date.now() dan ook gewoon mee -- terecht -- en dat
+   is hoe hij gevonden is. server/lib/klok.js importeert zelf niets, dus er is
+   geen kringloop en geen laadvolgorde die een luie require rechtvaardigt.
+   Ontbreekt hij, dan hoort de server luid om te vallen en niet zachtjes een
+   andere klok te lezen. */
+const klok = require('../lib/klok');
 
 function maak(req, g) {
   g = g || {};

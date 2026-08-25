@@ -694,7 +694,12 @@ app.get('/api/health', (req, res) => {
   res.json({
     ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
     betalen: betaal.AANBIEDER,
-    server: Number(process.env.RTG_SERVER || 1), active: db.writable,
+    /* `active` is "schrijft dit proces?", `leider` is "doet dit proces het werk
+       dat per installatie een keer hoort te gebeuren?". In spreidingsmodus
+       (RTG_SPREIDING=1) staat `active` op alle drie de servers op true en is
+       `leider` de enige manier om van buitenaf te zien wie de backup maakt.
+       Zonder die modus zijn ze altijd gelijk. */
+    server: Number(process.env.RTG_SERVER || 1), active: db.writable, leider: !!db.leider,
     domeinen: process.env.RTG_DOMAINS || 'alle',
     pid: process.pid, up: Math.round(process.uptime())
   });
@@ -750,26 +755,36 @@ app.post('/api/cluster/:actie', (req, res) => {
   if (!CLUSTER_KEY || !veiligGelijk(String(req.get('x-rtg-cluster') || ''), CLUSTER_KEY)) return res.status(404).json({ error: 'Onbekend.' });
   const nr = process.env.RTG_SERVER || '1';
   if (req.params.actie === 'promote') {
+    /* `promote` maakt schrijvend EN leider; `promote?leider=0` maakt alleen
+       schrijvend. Dat tweede is de spreidingsmodus (server/trio-spreiding.js):
+       daar nemen alle gezonde servers verkeer aan, maar de klussen die per
+       installatie een keer horen te gebeuren blijven bij een. Zonder de
+       queryparameter verandert er niets aan wat de poortwachter altijd al deed. */
+    const wordtLeider = String(req.query && req.query.leider) !== '0';
     // Eerst schrijfrecht, dan de verse data van schijf laden (bestaat er nog
     // geen database, dan wordt de seed nu ook echt bewaard) en tot slot de
     // realtime-tabellen (sessies, notificaties) opnieuw opbouwen.
     db.writable = true;
+    db.leider = wordtLeider;
     try { load(); initRealtime(); } catch (e) {
       db.writable = false;
+      db.leider = false;
       return res.status(500).json({ error: 'Data laden mislukte: ' + e.message });
     }
-    console.log('[cluster] server ' + nr + ' neemt over en is nu actief');
-    /* En meteen een backup. backupData() slaat standby-servers over (die maken
-       er terecht geen), en draait verder alleen op de dagteller. In de
+    console.log('[cluster] server ' + nr + (wordtLeider ? ' neemt over en is nu actief' : ' loopt mee en neemt verkeer aan'));
+    /* En meteen een backup. backupData() slaat alles over wat geen leider is
+       (die maken er terecht geen), en draait verder alleen op de dagteller. In de
        trio-opstelling start ELKE server als standby, dus tot deze regel was er
        na een overname tot 24 uur lang geen verse backup -- juist in het uur
-       waarin er net iets is omgevallen. */
+       waarin er net iets is omgevallen. Een meelopende server valt hier vanzelf
+       doorheen: die is wel schrijvend maar geen leider. */
     try { backupData(); } catch (e) { console.warn('[cluster] backup na overname mislukt:', e.message); }
   } else if (req.params.actie === 'demote') {
     db.writable = false;
+    db.leider = false;
     console.log('[cluster] server ' + nr + ' gaat terug naar standby');
   } else return res.status(400).json({ error: 'Onbekende actie.' });
-  res.json({ ok: true, active: db.writable });
+  res.json({ ok: true, active: db.writable, leider: !!db.leider });
 });
 
 

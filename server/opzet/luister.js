@@ -118,10 +118,27 @@ module.exports = function luister(deps) {
     }
   }
 
+  /* STERF MET DE POORTWACHTER -- alleen als het trio ons startte (clustersleutel
+     EN IPC-lijn); wie met de hand start heeft geen ouder om mee te sterven.
+     Zonder dit blijft een server na een harde dood van de poortwachter draaien
+     met zijn poort vast, en krijgt de herstartende poortwachter zijn eigen
+     servers niet aan de praat terwijl /api/health 200 geeft: de wees antwoordt.
+     Via SIGTERM, zodat de data langs precies dezelfde afsluiter landt. */
+  if (process.channel && process.env.RTG_CLUSTER_KEY) {
+    process.on('disconnect', () => {
+      console.log('[stop] de poortwachter is weg, deze server sluit');
+      process.emit('SIGTERM');
+    });
+  }
+
   // Netjes afsluiten: data wegschrijven, verbindingen sluiten, dan pas stoppen.
   for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
     console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
     try { save(); } catch (e) {}
+    /* Het doorgeefjournaal spoelt per venster; wat nu nog in die stapel staat,
+       staat nog nergens. Synchroon, want een asynchrone spoeling haalt
+       process.exit() niet meer. */
+    try { require('../kern/journaalbestand').spoelAlle(); } catch (e) {}
     // Bij Postgres: nog een laatste flush zodat niets in de write-behind hangt.
     Promise.allSettled([Promise.resolve(flushBijAfsluiten()), Promise.resolve(accounts.flushBijAfsluiten())]).finally(() => {
       server.close(() => process.exit(0));

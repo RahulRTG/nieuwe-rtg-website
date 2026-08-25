@@ -116,7 +116,7 @@ test('POORT: elke route die de server registreert staat in DEKKING.json als aang
     (bewijs.aangeraakt || []).length + ')');
 
   const kaart = JSON.parse(execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } }));
   assert.ok((kaart.routes || []).length > 1000, 'de routekaart geeft routes (' + (kaart.routes || []).length + ')');

@@ -111,6 +111,64 @@ test('RTG Controleregister bewijst 100% en maakt geen spookwerk', async () => {
   assert.match(plan.body.waarschuwing, /trainingsomgeving/i);
 });
 
+/* De gatenplanner van het Controleregister. De toets hierboven belooft een huis
+   ZONDER werkprocesgaten en houdt op zodra dat niet klopt -- dan is de route
+   /api/office/magnaat/controle/gaten/plan nooit aangeroepen en staat hij als gat
+   in het routejournaal. Deze toets belooft niets over het aantal gaten maar over
+   het GEDRAG van de planner, en houdt daarom in beide werelden stand: hij kijkt
+   naar precies de gaten die het register toont, hij houdt zich aan de limiet uit
+   het lijf, en hij legt hetzelfde gat nooit twee keer op de stapel. */
+test('de gatenplanner kijkt naar dezelfde gaten als het register en legt er nooit dubbel werk op', async () => {
+  const dicht = await fetch(base + '/api/office/magnaat/controle/gaten/plan', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+  });
+  assert.equal(dicht.status, 401, 'de gatenplanner zit achter de kantoorpoort');
+
+  const register = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
+  assert.equal(register.status, 200);
+
+  const plan = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 5 });
+  assert.equal(plan.status, 200);
+  assert.equal(plan.body.ok, true);
+  assert.equal(plan.body.bekeken, register.body.paginering.totaal,
+    'de planner weegt precies de werkprocesgaten die het register laat zien');
+  assert.equal(plan.body.aangemaakt, plan.body.taken.length,
+    'het getal is de lijst zelf en geen losse schatting ernaast');
+  assert.ok(plan.body.aangemaakt <= 5, 'de limiet uit het lijf begrenst de werkvoorraad echt');
+  assert.match(plan.body.waarschuwing, /trainingsomgeving/i,
+    'een gatentaak belooft geen enkele productiebevoegdheid');
+  for (const taak of plan.body.taken) {
+    assert.equal(taak.autoDekking, true, 'een geplande taak is herkenbaar als automatisch');
+    assert.equal(taak.status, 'open');
+    assert.match(taak.titel, /^Dekkingsgat · /);
+    assert.ok(taak.kantoor && taak.kantoor.id, 'elk gat krijgt een kantoor dat het oppakt');
+  }
+
+  const staat = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
+  const open = staat.body.taken.find(t => t.autoDekking && t.status !== 'klaar');
+  if (!open) {
+    // geen enkel werkprocesgat: dan hoort de planner ook niets te verzinnen
+    assert.equal(plan.body.aangemaakt, 0, 'zonder gat maakt de planner geen spookwerk');
+    assert.equal(plan.body.bekeken, 0);
+    return;
+  }
+
+  const af = await api('magnaat/controle/taak/zet',
+    { taakId: open.id, status: 'klaar', bewijs: 'contracttest gatenplanner' });
+  assert.equal(af.status, 200);
+  assert.equal(af.body.taak.status, 'klaar', 'de dekkingstaak is afgerond en laat het gat weer vrij');
+
+  const opnieuw = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 50 });
+  assert.equal(opnieuw.status, 200);
+  assert.ok(opnieuw.body.taken.some(t => t.puntId === open.puntId),
+    'het vrijgekomen gat staat meteen weer als werkvoorraad klaar');
+
+  const derde = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 50 });
+  assert.equal(derde.status, 200);
+  assert.ok(derde.body.taken.every(t => t.puntId !== open.puntId),
+    'een gat met een openstaande taak krijgt er geen tweede bij');
+});
+
 test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
   const m = await api('kamer/taak', { id: 'sales', tekst: 'Beachclub Sol nabellen over de Zaakdoos' });
   assert.equal(m.status, 200);

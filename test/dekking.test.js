@@ -39,7 +39,7 @@ function vulling(n) {
    goed gedrag; het cijfer op stdout is er gewoon. Vandaar de vangst -- zonder
    die zou deze toets meten dat de ratel werkt in plaats van dat de unie werkt. */
 function meet(journalen) {
-  const args = ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'dekking.js'), '--json'];
+  const args = [path.join(WORTEL, 'scripts', 'dekking.js'), '--json'];
   for (const j of journalen) { args.push('--lees'); args.push(j); }
   const opties = { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
     timeout: 600000, maxBuffer: 64 * 1024 * 1024 };

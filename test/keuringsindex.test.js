@@ -94,7 +94,7 @@ test('3. EN OP DE ECHTE ROUTEKAART TEGEN DE ECHTE TOETSEN, route voor route', ()
      bedacht; de echte 4000+ routes tegen de echte toetstekst dekken af wat ik
      niet heb bedacht. */
   const uit = execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
+    [path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 180000, maxBuffer: 32 * 1024 * 1024 });
   const routes = (JSON.parse(uit).routes || [])
     .map(r => (typeof r === 'string' ? r : r.pad || r.path)).filter(Boolean)

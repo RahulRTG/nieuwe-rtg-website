@@ -29,7 +29,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, wachtOpWaarde } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cmdbestuur-'));
 const CODE = 'KANTOOR-CMDBESTUUR-1';
@@ -211,4 +211,87 @@ test('10. het agent-toezicht: stoppen, grenzen zetten en hervatten', async () =>
 
   const hervat = await moet('agent/hervat', { naam, reden: 'de routetoets zet hem weer aan' }, 'hervatten');
   assert.equal(hervat.gestopt, false, 'de agent loopt weer');
+});
+
+/* HET API-SPOOR OVER HTTP. Er stonden al toetsen op de LAAG die het spoor
+   schrijft (test/auditspoor.test.js), maar die zetten hun eigen servertje op
+   rond de middleware; de LEESROUTE zelf werd door de hele suite geen enkele
+   keer aangeroepen. Dat is precies het gat dat scripts/dekking.js aanwijst en
+   waar test/routedekking.test.js op zakt.
+
+   En het is geen aanraaktoets: het antwoord van deze route draagt vier dingen
+   die alle vier stuk kunnen (de begrensde lijst, de onafhankelijke teller, het
+   venster en de ketencontrole), plus twee eigenschappen die de bedrading in
+   server.js waarmaakt -- dat dit een ANDER vak is dan het besluitjournaal, en
+   dat het lezen van het spoor niet in het spoor terechtkomt. */
+test('11. het API-spoor: eigen keten, begrensde lijst met een eerlijke teller, en zonder sessie geen deur', async () => {
+  const zonder = await fetch(base + '/api/command/apispoor', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+  });
+  assert.equal(zonder.status, 401, 'zonder kantoorsessie gaat deze deur niet open');
+
+  /* Peilen tot de schrijfhandelingen van de toetsen hierboven genoteerd zijn:
+     het spoor wordt op res.finish geschreven, dus NA het antwoord. */
+  const spoor = await wachtOpWaarde(async () => {
+    const s = await moet('apispoor', { n: 200 }, 'het API-spoor');
+    return (Array.isArray(s.regels) && s.regels.some(r => r.actie === 'POST /api/command/beleid/zet')) ? s : false;
+  }, { wat: 'de schrijfhandelingen van deze toetsen in het API-spoor' });
+
+  assert.ok(spoor.aantal > 0, 'er staat iets in');
+  assert.equal(spoor.keten.heel, true, 'de ketencontrole gaat op: ' + JSON.stringify(spoor.keten));
+  assert.equal(typeof spoor.venster, 'number', 'het venster staat erbij als getal');
+  assert.ok(spoor.regels.length <= spoor.venster, 'de lijst past binnen het venster');
+  assert.ok(spoor.venster <= spoor.aantal, 'het venster is nooit groter dan het echte totaal');
+
+  /* Wat er in een regel staat -- en vooral wat niet. */
+  for (const r of spoor.regels) {
+    assert.equal(r.niveau, 'api', 'dit vak draagt alleen handelingen: ' + r.actie);
+    assert.match(r.actie, /^(POST|PUT|PATCH|DELETE) \//, 'alleen schrijfhandelingen: ' + r.actie);
+    assert.match(String(r.uitslag), /^2\d\d$/, 'alleen geslaagde handelingen: ' + r.actie + ' -> ' + r.uitslag);
+    assert.ok(r.actor && r.actor.length, 'elke regel heeft een actor');
+  }
+  const zet = spoor.regels.find(r => r.actie === 'POST /api/command/beleid/zet');
+  assert.equal(zet.actor, 'kantoor-gedeelde-code',
+    'de actor komt uit de sessie; de gedeelde code is geen mens en heet hier ook zo');
+  assert.ok(!JSON.stringify(spoor.regels).includes('de routetoets'),
+    'het verzoeklijf gaat er niet in -- een auditlog met alle lijven is zelf het datalek');
+
+  /* De begrenzing knipt de LIJST af en niet de TELLER. Zonder dat onderscheid
+     ziet een scherm een venster voor het geheel aan. */
+  assert.ok(spoor.aantal > 1, 'er zijn meer handelingen dan één');
+  const een = await moet('apispoor', { n: 1 }, 'het spoor met n=1');
+  assert.equal(een.regels.length, 1, 'n begrenst de lijst');
+  assert.ok(een.aantal >= spoor.aantal, 'maar de teller telt onafhankelijk door: ' + een.aantal);
+  assert.ok(een.venster > 1, 'en het venster is groter dan de opgevraagde lijst');
+
+  /* De filters van de route zelf. */
+  const gefilterd = await moet('apispoor', { n: 200, actie: '/api/command/beleid/' }, 'het spoor op actie');
+  assert.ok(gefilterd.regels.length >= 1, 'de filter vindt de beleidshandelingen');
+  assert.ok(gefilterd.regels.every(r => r.actie.includes('/api/command/beleid/')),
+    'en laat er niets anders in');
+  const opActor = await moet('apispoor', { n: 200, actor: 'bestaat-niet' }, 'het spoor op een onbekende actor');
+  assert.equal(opActor.regels.length, 0, 'een onbekende actor levert een lege lijst');
+  assert.ok(opActor.aantal > 0, 'en de teller staat er ook dan bij: leeg is een uitslag, geen stilte');
+
+  /* DE LEESROUTE MEET ZICHZELF NIET, en die bewering hoort HIER en niet bij de
+     eerste lezing. Daar stond hij, en daar kon hij niet zakken: het spoor wordt
+     geschreven in res.on('finish'), dus NA het opbouwen van het antwoord -- de
+     eerste lezing kan zichzelf per definitie niet bevatten, of de route nu wel
+     of niet in OVERSLAAN staat. Nagemeten door de nalezer met een mutatie: de
+     regel uit server/opzet/auditspoor.js halen liet deze toets gewoon groen.
+     Inmiddels zijn er vijf lezingen geweest, dus een spoor dat zichzelf wel
+     bijhoudt verraadt zich nu. Wie in het spoor kijkt hoort in het
+     inzagejournaal, niet in het spoor zelf. */
+  const naLezen = await moet('apispoor', { n: 300 }, 'het spoor na vijf lezingen');
+  assert.equal(naLezen.regels.filter(r => r.actie === 'POST /api/command/apispoor').length, 0,
+    'de leesroute meet zichzelf niet: wie in het spoor kijkt hoort in het inzagejournaal');
+
+  /* TWEE KETENS, NIET EEN. Het besluitjournaal en het API-spoor delen dezelfde
+     module maar niet hetzelfde vak; als dat ooit één lijst wordt, is de
+     boardroom-tijdlijn binnen een dag vol met ruis. */
+  const besluiten = await moet('journaal', { n: 200 }, 'het besluitjournaal');
+  assert.ok(besluiten.regels.every(r => r.niveau !== 'api'),
+    'er staat geen enkele API-handeling in het besluitjournaal');
+  const ids = new Set(besluiten.regels.map(r => r.id));
+  assert.ok(spoor.regels.every(r => !ids.has(r.id)), 'de twee vakken delen geen enkele regel');
 });

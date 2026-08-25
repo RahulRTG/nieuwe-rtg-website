@@ -101,6 +101,25 @@ jobs:
           node-version: '26'
           cache: 'npm'
       - run: npm ci
+      # DE RUST-MOTOR, want zonder hem is de pariteitstoets een belofte zonder
+      # dekking. test/magnaat-capabilities.test.js eist `motor.bron === 'rust'`:
+      # de Capability Graph wordt door twee onafhankelijke motoren gescand en de
+      # toets legt hun uitkomst byte voor byte naast elkaar. Ontbreekt de binary,
+      # dan valt de scanner veilig terug op JavaScript -- en dan MEET die toets
+      # niets meer, maar zakt hij wel. Zo stond het: de binary staat niet in git,
+      # werd door geen enkele werkstroom gebouwd, en die twee beweringen zakten
+      # overal waar scherf 4 toevallig afliep. Nagemeten op 25 augustus 2026 in
+      # een losse werkboom van origin/main: daar zakken ze precies zo, dus het
+      # was geen regressie van deze tak maar een gat dat al die tijd door
+      # afgebroken scherven werd gemaskeerd.
+      #
+      # De bouw is goedkoop: motor/Cargo.toml heeft NUL afhankelijkheden (alleen
+      # de standaardbibliotheek, ook voor de AEAD), dus er wordt niets van een
+      # registry gehaald. `working-directory: motor` staat er omdat rustup de
+      # toolchain uit de WERKMAP leest, en motor/rust-toolchain.toml pint 1.97.1.
+      - name: De Rust-motor bouwen (de pariteitstoetsen hebben hem nodig)
+        working-directory: motor
+        run: cargo build --release --locked
       - name: Deze scherf, met dekking als lcov
         run: |
           set -o pipefail

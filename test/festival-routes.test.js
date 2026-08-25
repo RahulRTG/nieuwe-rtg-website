@@ -55,6 +55,8 @@
   27. De voorspelling neemt dag en klok van de server.
   28. Afsluiten draagt de naam uit de sessie en gebeurt niet twee keer stil.
   29. Het geheugen blijft bij de manager en vergelijkt niet met niets.
+  30. Een control zetten is managerwerk en loopt langs eigendom; wie een
+      kritieke control afzwakt komt uit de SESSIE en niet uit het lichaam.
 
    DE MUTATIES staan aan het slot.
    Draai: node --experimental-sqlite --test test/festival-routes.test.js
@@ -564,6 +566,65 @@ test('29. het geheugen blijft bij de manager en vergelijkt niet met niets', asyn
   assert.equal(g.nu.dagen.length, 1);
 });
 
+test('30. de control is managerwerk, en wie afzwakt komt uit de sessie', async () => {
+  /* POST /api/festival/control is de enige schrijfweg naar de controllijst
+     waar de gereedheid uit gerekend wordt, en hij droeg tot nu toe geen enkele
+     toets. Drie dingen staan op de ROUTE en kunnen dus alleen hier zakken:
+     managerOnly, mijn() en -- de scherpste -- dat `door` NA de body wordt
+     gezet. Zou de body dat veld houden, dan tekent het spoor van een
+     afzwakking een naam die de afzwakker zelf verzon, en dan is de enige weg
+     naar groen zonder bewijs ook nog anoniem. */
+  const eigen = await post('/api/festival/nieuw', { naam: 'Derde' }, manager);
+  const f3 = eigen.festival.id;
+  const e3 = (await post('/api/festival/editie', { festival: f3, jaar: 2029 }, manager)).editie.id;
+
+  const veld = { festival: f3, editie: e3, groep: 'veiligheid',
+    naam: 'Eigen constructiekeuring', eis: 'het rapport van de constructeur', kritiek: true };
+
+  assert.equal((await api('/api/festival/control', veld, deur)).status, 403,
+    'de vloer stelt niet vast waar dit festival op nagekeken wordt');
+
+  const vreemd = await api('/api/festival/control', veld, andere);
+  assert.equal(vreemd.status, 404, 'en een andere zaak schrijft niet in andermans lijst');
+  assert.match((await vreemd.json()).error, /niet op naam van uw zaak/);
+
+  const gezet = await post('/api/festival/control', veld, manager);
+  assert.equal(gezet.ok, true);
+  assert.equal(gezet.control.groep, 'veiligheid');
+  assert.equal(gezet.control.kritiek, true);
+  assert.equal(gezet.control.bewijs, null, 'een nieuwe control begint zonder bewijs');
+
+  const nieuw = await post('/api/festival/gereed', { festival: f3, editie: e3 }, manager);
+  assert.equal(nieuw.totaal, 1);
+  assert.equal(nieuw.stand, 'niet-gereed', 'een open kritieke control houdt het terrein dicht');
+
+  /* Afzwakken zonder reden komt er niet door -- dat is de kern, maar hij is
+     alleen via deze route te bereiken. */
+  const zonderReden = await api('/api/festival/control',
+    { ...veld, id: gezet.control.id, kritiek: false }, manager);
+  assert.equal(zonderReden.status, 400);
+  assert.match((await zonderReden.json()).error, /reden/);
+
+  /* En nu met een reden, maar met een VREEMDE naam in het lichaam. Die naam
+     bestaat in dit huis niet; wordt hij toch overgenomen, dan draagt het spoor
+     een verzinsel. */
+  const af = await post('/api/festival/control', { ...veld, id: gezet.control.id, kritiek: false,
+    reden: 'valt onder de gemeentelijke keuring', door: 'Iemand Die Niet Bestaat' }, manager);
+  assert.equal(af.ok, true);
+  assert.equal(af.control.kritiek, false);
+
+  const roster = await post('/api/supplier/roster', { code: 'ESVEDRA' });
+  const managerNaam = roster.staff.find(x => x.role === 'manager').name;
+
+  const stand = await post('/api/festival/gereed', { festival: f3, editie: e3 }, manager);
+  assert.equal(stand.afgezwakt.length, 1, 'de uitslag zwijgt niet over de enige weg naar groen zonder bewijs');
+  assert.equal(stand.afgezwakt[0].control, 'Eigen constructiekeuring');
+  assert.equal(stand.afgezwakt[0].reden, 'valt onder de gemeentelijke keuring');
+  assert.equal(stand.afgezwakt[0].door, managerNaam, 'het spoor draagt de naam uit de sessie');
+  assert.notEqual(stand.afgezwakt[0].door, 'Iemand Die Niet Bestaat');
+  assert.match(stand.zin, /afgezwakt/);
+});
+
 /* ============================================================================
    DE MUTATIES, EN WAT ERVAN ZAKTE (LAT-regel 2)
 
@@ -684,4 +745,22 @@ test('29. het geheugen blijft bij de manager en vergelijkt niet met niets', asyn
   21. In routes/festival/vooruit.js managerOnly weghalen bij /api/festival/norm,
       /api/festival/dag/sluiten en /api/festival/geheugen.
       -> toetsen 26, 28 en 29 zakten.
+
+  22. In routes/festival/gereed.js bij /api/festival/control `door: wie(req)`
+      VOOR de body gezet, zodat het lichaam hem overschrijft.
+      -> toets 30 zakte: de afzwakking van een kritieke control kwam op naam van
+         'Iemand Die Niet Bestaat'. Zelfde fout als mutatie 3, 7, 15, 16 en 20,
+         en hier weegt hij eigen: dit is de ENIGE weg naar groen die geen bewijs
+         vraagt, dus de naam eronder is het hele spoor dat ervan overblijft.
+
+  23. In routes/festival/gereed.js managerOnly weggehaald bij
+      /api/festival/control.
+      -> toets 30 zakte: de vloer stelde vast waar dit festival op nagekeken
+         wordt, en kon dus zelf een kritieke control afzwakken.
+
+  24. In routes/festival/gereed.js mijn() bij /api/festival/control vervangen
+      door een kale festivalVind() zonder eigendomscontrole.
+      -> toets 30 zakte: MACE schreef in de controllijst van ESVEDRA. Zelfde
+         fout als mutatie 1, en de reden dat elke schrijfweg hier apart wordt
+         nagelopen: mijn() staat per route en niet in een middleware.
    ========================================================================== */

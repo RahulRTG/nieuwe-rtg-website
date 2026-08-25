@@ -113,7 +113,7 @@ function routes() {
   /* Aan de LEVENDE router vragen, want dat is de hele reden dat deze toets kan
      bestaan. Een broncode-scan ziet de helft van de bewakers niet. */
   const kaart = JSON.parse(execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } }));
   _routes = routedekking.inventaris(kaart.routes).routes;

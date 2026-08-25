@@ -177,15 +177,25 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    die vorm. Dat is te repareren -- de mount-prefix per router afleiden -- maar
    het raakt de pariteit met de Rust-tweelingbroer hierboven, en dat is het
    besluit dat hier expres niet wordt genomen.
+
+   EN VAN 546 NAAR 576 OP 25 AUGUSTUS 2026, bij het samenvoegen van main (+50
+   commits: de App Store, SCIM, de tenant- en beschermstandrondes). Weer dezelfde
+   blinde vlek en geen nieuwe: ik heb de 576 geteld en gegroepeerd, en ze vallen
+   in zeven families die ALLEMAAL relatief registreren op een gemounte router --
+   foundation 341, supplier 85, member 80, rtf 43, scim 15, office 6, techniek 6.
+   Geen enkele daarvan schrijft zijn volledige adres in de bron, dus geen enkele
+   is voor deze scanner te zien. Wie dit getal ooit weer ziet stijgen zonder dat
+   die groepering klopt, kijkt naar iets anders en hoort niet dit getal te
+   verzetten maar de oorzaak te zoeken.
    ========================================================================== */
-const GEMIST_MAX = 546;   // routes die de router heeft en de bronscanner niet
+const GEMIST_MAX = 576;   // routes die de router heeft en de bronscanner niet
 const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {
   const routedekking = require('../server/kern/routedekking');
   const { execFileSync } = require('child_process');
   const kaart = JSON.parse(execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(root, 'scripts', 'routekaart.js'), '--json'],
+    [path.join(root, 'scripts', 'routekaart.js'), '--json'],
     { cwd: root, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } }));
   const echt = new Set(routedekking.inventaris(kaart.routes).routes

@@ -60,6 +60,16 @@ const BREED = [
   // als horeca hieronder. De gastenkant staat hierboven bij Klantenservice.
   [/\/festival/, 'verkoop', 'Verkoop'],
   [/\/horeca|\/mijnmall|\/review|\/splits/, 'verkoop', 'Verkoop'],
+  /* DE APP STORE, en hij staat bij Verkoop om dezelfde reden als de Mall
+     hierboven: het is een MARKTPLAATS die RTG zelf voert -- uitgeven, keuren,
+     kopen, installeren en de bon erbij. Hij kwam met main mee (+50 commits) en
+     raakte geen enkele regel, waardoor zestien werkprocessen op de terugval
+     vielen en de capability-matrix op 99,9% bleef steken met 52 gaten die
+     allemaal DEZELFDE dimensie misten: kantoor. Precies het patroon van de
+     chauffeurs-PDA hierboven, maar dan zestien keer -- en dat is de reden dat
+     die matrix bestaat: een heel domein dat binnenkomt zonder eigenaar valt
+     nergens anders op. */
+  [/\/appstore|\/appcel/, 'verkoop', 'Verkoop'],
   [/\/zaakweb|\/leverancier\.html/, 'support', 'Support team'],
   [/\/marechaussee|\/meldkamer/, 'paniekkamer', 'De Paniekkamer'],
   [/\/toestel/, 'hardware', 'RTG Hardwarelab'],

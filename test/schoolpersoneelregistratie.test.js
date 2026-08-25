@@ -151,6 +151,50 @@ test('ieder actief personeelslid krijgt een eigen afgeschermd RTG-postvak', asyn
   assert.equal(eigen.body.bericht.tekst, 'Alleen voor jouw schoolpostvak.');
 });
 
+/* DE MAP VERZONDEN, en waarom die een eigen toets krijgt.
+
+   Deze route werd door de hele suite nooit aangeraakt: scripts/dekking.js
+   telde /school/personeel/mail/verzonden als nooit aangeroepen, terwijl de
+   buurroutes (overzicht, inbox, lees, stuur) hierboven wel worden nagelopen.
+   Een route zonder toets kan precies de fout maken die hier het zwaarst weegt:
+   per ongeluk het postvak IN teruggeven in plaats van de eigen uitgaande post.
+   Bij persoonlijke schoolpost is dat verschil het hele punt -- dan zou een
+   medewerker onder het kopje "verzonden" de post zien die AAN hem gericht is.
+
+   De toets legt daarom beide kanten vast (bij de afzender staat het bericht er
+   wel in, bij de ontvanger niet) en controleert dat dezelfde personeelspoort
+   ervoor staat als bij de inbox. */
+test('de map verzonden toont de eigen uitgaande post en nooit het postvak in', async () => {
+  const mijn=await api('/school/personeel/mail/verzonden', {
+    schoolCode:D.schoolCode, personeelToken:FATIMA.token
+  });
+  assert.equal(mijn.status, 200);
+  assert.equal(mijn.body.ok, true);
+  assert.equal(mijn.body.adres, FATIMA.adres);
+  assert.ok(Array.isArray(mijn.body.berichten), 'verzonden levert een lijst berichten');
+  const overleg=mijn.body.berichten.find(m => m.onderwerp === 'Veilig overleg');
+  assert.ok(overleg, 'het zojuist verstuurde bericht staat in de eigen map verzonden');
+  assert.equal(overleg.van, FATIMA.adres);
+  assert.equal(overleg.naar, KARIM.adres);
+  assert.equal(overleg.tekst, 'Alleen voor jouw schoolpostvak.');
+  assert.ok(mijn.body.berichten.every(m => m.van === FATIMA.adres),
+    'de map verzonden bevat uitsluitend post die dit adres zelf verstuurde');
+
+  const vanKarim=await api('/school/personeel/mail/verzonden', {
+    schoolCode:D.schoolCode, personeelToken:KARIM.token
+  });
+  assert.equal(vanKarim.status, 200);
+  assert.equal(vanKarim.body.adres, KARIM.adres);
+  assert.equal(vanKarim.body.berichten.some(m => m.id === overleg.id), false,
+    'ontvangen post hoort niet in de map verzonden van de ontvanger -- dit is niet het postvak in');
+
+  const nep=await api('/school/personeel/mail/verzonden', {
+    schoolCode:D.schoolCode, personeelToken:'geen-geldig-token'
+  });
+  assert.equal(nep.status, 403, 'zonder geldig personeel-token gaat de map verzonden niet open');
+  assert.equal(nep.body.berichten, undefined, 'een geweigerde aanvraag lekt geen post');
+});
+
 test('latere inlog is neutraal, kort houdbaar en eenmalig', async () => {
   const onbekend=await api('/school/personeel/inloglink', { schoolCode:D.schoolCode, email:'niemand@veiligeschool.nl' });
   const bekend=await api('/school/personeel/inloglink', { schoolCode:D.schoolCode, email:'fatima@veiligeschool.nl' });
@@ -184,4 +228,47 @@ test('directie kan een nog ongebruikte uitnodiging intrekken', async () => {
   const sleutel=await wachtOpSleutel('uitnodiging');
   assert.equal((await api('/school/personeel/uitnodiging/intrek', Object.assign({ uitnodigingId:r.body.uitnodiging.id }, D))).status, 200);
   assert.equal((await api('/school/personeel/uitnodiging/accepteer', { uitnodiging:sleutel })).status, 404);
+});
+
+/* De lijst zelf was nooit beproefd: elke toets hierboven maakt uitnodigingen en
+   niemand vroeg ze ooit terug op. Juist die lijst is het scherm waarop de
+   directie ziet wie er binnen mag -- en hij staat achter dezelfde deur, toont
+   het volledige werkadres (dat is het punt: de directie mag dat weten) en
+   draagt nooit het activatiegeheim. */
+test('de uitnodigingenlijst staat achter de directiedeur en volgt de levensloop', async () => {
+  assert.equal((await api('/school/personeel/uitnodigingen', { schoolCode:D.schoolCode })).status, 403,
+    'zonder beheer-token blijft de lijst dicht');
+  const verkeerd=await api('/school/personeel/uitnodigingen', { schoolCode:D.schoolCode, beheerToken:'niet-het-token' });
+  assert.equal(verkeerd.status, 403);
+  assert.match(verkeerd.body.error, /beheer-token/, 'de weigering zegt waarop hij weigert');
+
+  const voor=await api('/school/personeel/uitnodigingen', D);
+  assert.equal(voor.status, 200);
+  assert.equal(voor.body.ok, true);
+  assert.ok(Array.isArray(voor.body.uitnodigingen));
+
+  const gemaakt=await api('/school/personeel/uitnodig', Object.assign({
+    naam:'Nora Zorgcoordinator', email:'nora@veiligeschool.nl', rollen:['zorg']
+  }, D));
+  assert.equal(gemaakt.status, 200);
+
+  const na=await api('/school/personeel/uitnodigingen', D);
+  assert.equal(na.status, 200);
+  assert.equal(na.body.uitnodigingen.length, voor.body.uitnodigingen.length + 1,
+    'de nieuwe uitnodiging staat er echt bij');
+  const nora=na.body.uitnodigingen[0];
+  assert.equal(nora.id, gemaakt.body.uitnodiging.id, 'de nieuwste staat bovenaan');
+  assert.equal(nora.naam, 'Nora Zorgcoordinator');
+  assert.equal(nora.email, 'nora@veiligeschool.nl', 'de directie ziet het volledige werkadres, niet de maskering');
+  assert.deepEqual(nora.rollen, ['zorg']);
+  assert.equal(nora.status, 'open');
+  assert.ok(Date.parse(nora.verlooptAt) > Date.now(), 'een open uitnodiging draagt een vervaldatum in de toekomst');
+  assert.equal(nora.school.code, D.schoolCode);
+  assert.doesNotMatch(JSON.stringify(na.body), /[a-f0-9]{48}/i, 'de lijst draagt geen activatiegeheim');
+
+  assert.equal((await api('/school/personeel/uitnodiging/intrek',
+    Object.assign({ uitnodigingId:nora.id }, D))).status, 200);
+  const daarna=await api('/school/personeel/uitnodigingen', D);
+  assert.equal(daarna.body.uitnodigingen.find(x => x.id === nora.id).status, 'ingetrokken',
+    'de lijst toont de toestand van nu en niet die van het moment van uitnodigen');
 });

@@ -126,7 +126,7 @@ test('5. de poortwacht overleeft een pipe zonder afgekapt te worden', () => {
      niets luistert -- alle routes onbereikbaar, uitslag volledig, en dat is
      precies genoeg om de afkapping te betrappen. */
   const r = spawnSync(process.execPath,
-    ['--experimental-sqlite', 'scripts/poortwacht.js', '--json', '--per-route', 'http://127.0.0.1:1'],
+    ['scripts/poortwacht.js', '--json', '--per-route', 'http://127.0.0.1:1'],
     { cwd: WORTEL, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, timeout: 300000 });
   const uit = r.stdout || '';
   assert.ok(uit.length > 200000, 'de uitslag is groot genoeg om af te kappen (' + uit.length + ')');

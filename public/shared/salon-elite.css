@@ -1,9 +1,9 @@
 /* De Salon als besloten member journal, niet als hotelbrochure of eindeloze feed. */
 .salon-socialnav{position:fixed;z-index:51;top:var(--rtg-social-top);right:0;left:0;height:52px;display:flex;justify-content:center;background:rgba(248,247,243,.96);border-bottom:1px solid rgba(24,24,23,.12);backdrop-filter:blur(18px);}
-.salon-socialnav a{position:relative;display:flex;align-items:center;gap:.65rem;min-width:132px;padding:0 1.4rem;color:#625f57;text-decoration:none;font:600 .65rem/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
+.salon-socialnav a{position:relative;display:flex;align-items:center;gap:.65rem;min-width:132px;padding:0 1.4rem;color:var(--rtg-soft);text-decoration:none;font:600 .65rem/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
 .salon-socialnav a::after{content:"";position:absolute;right:1.4rem;bottom:-1px;left:1.4rem;height:2px;background:transparent;}
 .salon-socialnav a[aria-current="page"]{color:#191917;}.salon-socialnav a[aria-current="page"]::after{background:#9a7f3f;}
-.salon-socialnav small{color:#625f57;font-size:.46rem;letter-spacing:.04em;text-transform:none;}
+.salon-socialnav small{color:var(--rtg-soft);font-size:.46rem;letter-spacing:.04em;text-transform:none;}
 .rtg-salon-elite .salon-werkveld{min-height:100vh;padding-top:calc(var(--rtg-social-top) + 52px);background:#e9e7e1;color:#191917;}
 .rtg-salon-elite .salon-werkveld>header{position:relative;z-index:31;min-height:236px;padding:0 clamp(1.3rem,4vw,4.2rem);overflow:hidden;border:0;border-bottom:1px solid rgba(24,24,23,.12);background:linear-gradient(90deg,#ece9e2 0%,#ece9e2 67%,#1a1b19 67%,#1a1b19 100%);}
 .rtg-salon-elite .salon-werkveld>header::before{content:"";position:absolute;z-index:0;top:-132px;right:5vw;width:330px;height:330px;border:1px solid rgba(188,166,108,.26);border-radius:50%;box-shadow:0 0 0 50px rgba(188,166,108,.035),0 0 0 100px rgba(255,255,255,.018);}
@@ -149,7 +149,7 @@ body.rtg-stijl.rtg-salon-elite .knop,body.rtg-stijl.rtg-salon-elite .meer,body.r
 .rtg-salon-elite .kop .ey{color:#691f32;font-size:.51rem;letter-spacing:.23em;}
 .rtg-salon-elite .kop h1{margin-top:.65rem;color:#171712;font-size:clamp(3.7rem,5.8vw,6.2rem);line-height:.86;}
 .rtg-salon-elite .salon-belofte{
-  max-width:43ch;margin-top:1.15rem;color:#625f57;font-family:Inter,system-ui,sans-serif;
+  max-width:43ch;margin-top:1.15rem;color:var(--rtg-soft);font-family:Inter,system-ui,sans-serif;
   font-size:.82rem;line-height:1.72;
 }
 .rtg-salon-elite .salon-terug{display:none;}
@@ -160,7 +160,7 @@ body.rtg-stijl.rtg-salon-elite .knop,body.rtg-stijl.rtg-salon-elite .meer,body.r
 .rtg-salon-elite .tabs>button{
   min-height:72px;padding:0 clamp(.8rem,1.5vw,1.35rem)!important;
   border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;
-  color:#625f57!important;font-size:.55rem!important;letter-spacing:.14em;
+  color:var(--rtg-soft)!important;font-size:.55rem!important;letter-spacing:.14em;
 }
 .rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
 .rtg-salon-elite .tabs>button:hover{color:#171712!important;background:transparent!important;}
@@ -191,7 +191,7 @@ body[data-salon-tab="feed"].rtg-salon-elite main{display:block;background:transp
   border-radius:50%;background:transparent;color:#691f32;font-size:.61rem;
 }
 .rtg-salon-elite .post .naam{color:#171712!important;font-size:.75rem;letter-spacing:.02em;}
-.rtg-salon-elite .post .plek{color:#625f57;font-size:.59rem;}
+.rtg-salon-elite .post .plek{color:var(--rtg-soft);font-size:.59rem;}
 .rtg-salon-elite .post .merk{
   padding:.28rem 0;border:0;border-bottom:1px solid rgba(105,31,50,.38);
   border-radius:0;color:#691f32;font-size:.48rem;letter-spacing:.16em;
@@ -232,7 +232,7 @@ body[data-salon-tab="feed"].rtg-salon-elite main{display:block;background:transp
 .salon-briefing>p{color:#6c685f;font-size:.72rem;line-height:1.75;}
 .salon-briefing dl{margin-top:1.8rem;}
 .salon-briefing dl div{border-top-color:rgba(23,23,18,.13);}
-.salon-briefing dt{color:#625f57;font-size:.48rem;}.salon-briefing dd{color:#171712;font-size:.64rem;}
+.salon-briefing dt{color:var(--rtg-soft);font-size:.48rem;}.salon-briefing dd{color:#171712;font-size:.64rem;}
 .salon-briefingacties{border-block-color:rgba(23,23,18,.14);}
 .salon-briefingacties button{border-bottom-color:rgba(23,23,18,.12);color:#171712;font-size:.64rem;}
 .salon-briefingacties button span{color:#691f32;}
@@ -262,7 +262,7 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
     top:auto;bottom:0;height:64px;padding:0 0 env(safe-area-inset-bottom);justify-content:stretch;
     border-top:1px solid rgba(23,23,18,.13);border-bottom:0;background:rgba(244,241,234,.98);
   }
-  .salon-socialnav a{flex:1;justify-content:center;padding:0 .15rem;color:#625f57;font-size:.48rem;letter-spacing:.08em;}
+  .salon-socialnav a{flex:1;justify-content:center;padding:0 .15rem;color:var(--rtg-soft);font-size:.48rem;letter-spacing:.08em;}
   .salon-socialnav a:first-child{padding-left:.15rem;}
   .salon-socialnav a::after{top:0;right:27%;bottom:auto;left:27%;}
   .salon-socialnav a:first-child::after{left:27%;}
@@ -279,7 +279,7 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
   .rtg-salon-elite .kop{min-height:184px;align-items:center;}
   .rtg-salon-elite .kop>div{max-width:calc(100% - 48px);}
   .rtg-salon-elite .kop h1{color:#171712;font-size:3.2rem;}
-  .rtg-salon-elite .salon-belofte{max-width:30ch;color:#625f57;font-size:.72rem;line-height:1.6;}
+  .rtg-salon-elite .salon-belofte{max-width:30ch;color:var(--rtg-soft);font-size:.72rem;line-height:1.6;}
   .rtg-salon-elite .tabs{width:calc(100% - 42px);max-width:none;}
   .rtg-salon-elite .tabs>button{min-height:70px;padding:.2rem .85rem!important;font-size:.5rem!important;}
   .rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
@@ -373,9 +373,9 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
 .rtg-salon-elite .salon-werkveld>header::before{display:block;top:0;right:0;width:34%;height:100%;border:0;border-radius:0;box-shadow:none;background:linear-gradient(90deg,#f1eee7,rgba(241,238,231,.18) 28%,rgba(18,17,13,.08)),url('/campagne/kyoto-suite.jpg') center/cover no-repeat;}
 .rtg-salon-elite .kop .ey{color:#691f32;}
 .rtg-salon-elite .kop h1{color:#171712;font-size:clamp(4rem,5.4vw,5.4rem)!important;line-height:.88;letter-spacing:-.045em;}
-.rtg-salon-elite .salon-belofte{color:#625f57;font-family:Inter,system-ui,sans-serif;font-size:.82rem;line-height:1.72;}
+.rtg-salon-elite .salon-belofte{color:var(--rtg-soft);font-family:Inter,system-ui,sans-serif;font-size:.82rem;line-height:1.72;}
 .rtg-salon-elite .tabs{width:66%;max-width:none;border:0!important;background:transparent;}
-.rtg-salon-elite .tabs>button{width:auto!important;border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:#625f57!important;box-shadow:none!important;}
+.rtg-salon-elite .tabs>button{width:auto!important;border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:var(--rtg-soft)!important;box-shadow:none!important;}
 .rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
 .rtg-salon-elite .tabs>button:hover{background:transparent!important;color:#171712!important;}
 .rtg-salon-elite .tabs>button[aria-pressed="true"]{border-bottom-color:#691f32!important;background:transparent!important;color:#171712!important;}
@@ -385,11 +385,11 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
    licht (de tabs op #625f57, de koppen op #171712), dus dit is een kleur die is
    blijven staan toen de rest omdraaide. Hij krijgt nu dezelfde rusttint als de
    tabs waar hij naast hangt: 5,5:1. */
-.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:#625f57!important;}
+.rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:0!important;border-bottom:1px solid transparent!important;background:transparent!important;color:var(--rtg-soft)!important;}
 .rtg-salon-elite .post{padding:0;overflow:visible;border:0;background:transparent;}
 .rtg-salon-elite .post .top{min-height:62px;padding:0 0 1rem;border-bottom-color:rgba(23,23,18,.14);background:transparent;color:#171712;}
 .rtg-salon-elite .post .naam{color:#171712!important;}
-.rtg-salon-elite .post .plek{color:#625f57;}
+.rtg-salon-elite .post .plek{color:var(--rtg-soft);}
 .rtg-salon-elite .post .merk{border-color:rgba(105,31,50,.38);color:#691f32;}
 .rtg-salon-elite .post .tekst,.rtg-salon-elite main>.post:first-of-type .tekst{padding-inline:0;background:transparent;}
 .rtg-salon-elite .post .onderw{padding-inline:0;}
@@ -399,7 +399,7 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
 .rtg-salon-elite .salon-briefing h2{color:#171712;}
 .rtg-salon-elite .salon-briefing>p{color:#6c685f;}
 .rtg-salon-elite .salon-briefing dl div{border-top-color:rgba(23,23,18,.13);}
-.rtg-salon-elite .salon-briefing dt{color:#625f57;}
+.rtg-salon-elite .salon-briefing dt{color:var(--rtg-soft);}
 .rtg-salon-elite .salon-briefing dd{color:#171712;}
 .rtg-salon-elite .salon-briefingacties{border-block-color:rgba(23,23,18,.14);}
 .rtg-salon-elite .salon-briefingacties button{border-bottom-color:rgba(23,23,18,.12);color:#171712;}
@@ -409,11 +409,11 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
 @media(max-width:760px){
   .rtg-salon-elite .rtg-social-commandbar{background:rgba(244,241,234,.98);}
   .rtg-salon-elite .salon-socialnav{background:rgba(244,241,234,.98);border-top-color:rgba(23,23,18,.13);}
-  .rtg-salon-elite .salon-socialnav a{color:#625f57;}.rtg-salon-elite .salon-socialnav a[aria-current="page"]{color:#171712;}
+  .rtg-salon-elite .salon-socialnav a{color:var(--rtg-soft);}.rtg-salon-elite .salon-socialnav a[aria-current="page"]{color:#171712;}
   .rtg-salon-elite .salon-werkveld>header{min-height:255px;background:#f1eee7;}
   .rtg-salon-elite .salon-werkveld>header::before{display:block;width:92px;opacity:.62;}
   .rtg-salon-elite .kop h1{color:#171712;font-size:3.2rem!important;}
-  .rtg-salon-elite .salon-belofte{color:#625f57;font-size:.72rem;}
+  .rtg-salon-elite .salon-belofte{color:var(--rtg-soft);font-size:.72rem;}
   .rtg-salon-elite .tabs{width:calc(100% - 42px);max-width:none;}
   .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{border:1px solid rgba(23,23,18,.18)!important;background:transparent!important;}
   .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop::before{color:#171712;}

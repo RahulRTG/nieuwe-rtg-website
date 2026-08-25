@@ -38,6 +38,11 @@ const STRICT = process.env.A11Y_STRICT === '1';
    EERSTE render bekeken, uitgelogd, en alles wat achter de inlog opengaat blijft
    ongemeten. Dat is de volgende stap en geen eigenschap van deze lijst. */
 const { alleSchermen } = require('./schermen');
+/* WIE IETS VINDT, MEET NOG EEN KEER -- zie scripts/a11y-hermeet.js. Kwam met
+   main mee (7bb6a6e8) en was bij de samenvoeging van 24 augustus stil verdwenen:
+   de module bleef staan, haar aanroepers niet. Twee volle scans op dezelfde code
+   gaven toen twee verschillende uitkomsten. */
+const hermeet = require('./a11y-hermeet');
 /* alleSchermen() loopt public/apps af. Het 404-scherm staat in public/site en
    viel daarmee buiten de keuring -- terwijl het juist een scherm is dat een
    bezoeker onverwacht krijgt. Er is geen derde plek: dit zijn alle .html onder
@@ -90,12 +95,22 @@ function startEchteServer() {
         const datamap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-a11y-'));
         const kind = spawn(process.execPath, [path.join(ROOT, 'server', 'server.js')], {
           cwd: ROOT, stdio: 'ignore',
-          env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1' }
+          /* RTG_DEMO: de demozaken (en dus de zaak-inlog van de derde ronde)
+             worden alleen in demostand gezaaid -- test/helper.js doet hetzelfde.
+             Zonder die vlag kent deze wegwerpserver geen enkele leverancier en
+             valt de zaakronde om op "Deze leverancierscode kennen we niet". Het
+             is bovendien de betere stand om a11y in te meten: de schermen hebben
+             er echte inhoud in plaats van lege lijsten. */
+          env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
+            STUN_UIT: '1', RTG_DEMO: '1' }
         });
         const basis = 'http://127.0.0.1:' + poort;
         const stop = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
         for (let i = 0; i < 300; i++) {
-          try { if ((await fetch(basis + '/api/health')).ok) return klaar({ basis, stop }); } catch (e) { /* nog niet op */ }
+          /* WACHTEN OP /api/ready EN NIET OP /api/health: health is op zodra de
+             poort luistert, maar de opslagpoortwachter geeft daarna nog 503 op
+             ELKE API tot de opslag echt geladen is. */
+          try { if ((await fetch(basis + '/api/ready')).ok) return klaar({ basis, stop }); } catch (e) { /* nog niet op */ }
           await new Promise(r => setTimeout(r, 200));
         }
         stop(); mis(new Error('de server kwam niet op'));
@@ -171,6 +186,36 @@ function startEchteServer() {
   }).then(r => r.json()).catch(() => ({}));
   if (!lid || !lid.token) {
     console.error('[a11y] MISLUKT: geen proeflid, dus de ingelogde ronde zou stil worden overgeslagen.');
+    await browser.close(); server.stop(); process.exit(1);
+  }
+
+  /* EN EEN ZAAK-SESSIE, WANT DAAR WERKT HET PERSONEEL.
+
+     Teruggezet op 25 augustus 2026. Deze ronde kwam met main mee (f330a015) en
+     is bij de samenvoeging van 24 augustus stil verdwenen: die nam onze versie
+     van dit bestand wholesale over om de tablet- en tweehandige rondes te
+     behouden, en gooide daarmee de derde staat weg zonder dat iemand het zag.
+     Het register wist het nog wel -- A11Y-INGELOGD.json draagt nog steeds het
+     `zaak`-blok met zijn nullen -- dus stond er een grens die niets meer mat.
+     Precies de fout die dit blok kwam opheffen, in omgekeerde richting.
+
+     Gemeten op 23 augustus 2026, met de hand, over negen horecaschermen: zonder
+     zaak-sessie 0 structureel en 0 contrast, met zaak-sessie 1 structureel en 15
+     contrast. Precies dezelfde schermen. Dat verschil hoort in de poort te
+     zitten en niet in het hoofd van wie het toevallig een keer heeft nagemeten. */
+  const roster = await fetch(basis + '/api/supplier/roster', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'KIKUNOI' })
+  }).then(r => r.json()).catch(() => ({}));
+  const baas = ((roster || {}).staff || []).find(x => x.role === 'manager') || ((roster || {}).staff || [])[0];
+  const zaak = baas ? await fetch(basis + '/api/supplier/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: 'KIKUNOI', staffId: baas.id, pin: '1234' })
+  }).then(r => r.json()).catch(() => ({})) : {};
+  if (!zaak || !zaak.token) {
+    console.error('[a11y] MISLUKT: geen zaak-sessie, dus de zaakronde zou stil worden overgeslagen.');
+    console.error('        roster: ' + JSON.stringify(roster).slice(0, 200));
+    console.error('        inlog:  ' + JSON.stringify(zaak).slice(0, 200));
     await browser.close(); server.stop(); process.exit(1);
   }
 
@@ -277,12 +322,22 @@ function startEchteServer() {
   const dekking = { gemeten: 0, url: 0, onzichtbaar: 0, alfanul: 0 };
   const telDekking = (d) => { if (d) for (const k of Object.keys(dekking)) dekking[k] += d[k] || 0; };
 
-  for (const ronde of [{ naam: 'uitgelogd', token: null }, { naam: 'ingelogd', token: lid.token }]) {
+  /* Drie staten, en elke staat zet zijn EIGEN sleutels. Niet allebei de tokens
+     tegelijk: een scherm dat zowel een lid als een zaak herkent, kiest dan zelf
+     welke het toont, en dan meet de scan iets wat in het echt zelden voorkomt. */
+  for (const ronde of [
+    { naam: 'uitgelogd', sleutels: null },
+    { naam: 'ingelogd', sleutels: { rtg_member_token: lid.token } },
+    { naam: 'zaak', sleutels: { rtg_sup_token: zaak.token } }
+  ]) {
     const context = await browser.newContext({ serviceWorkers: 'block' });
-    if (ronde.token) {
-      await context.addInitScript((t) => {
-        try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-      }, ronde.token);
+    if (ronde.sleutels) {
+      await context.addInitScript((s) => {
+        try {
+          for (const k of Object.keys(s)) localStorage.setItem(k, s[k]);
+          localStorage.setItem('rtg_cookieinfo_v1', '1');
+        } catch (e) {}
+      }, ronde.sleutels);
     }
     const page = await context.newPage();
     let struct = 0, contr = 0;
@@ -292,7 +347,7 @@ function startEchteServer() {
       await page.goto(basis + pad, { waitUntil: 'load' });
       await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen
       let res;
-      try { res = await page.evaluate(KEUR); }
+      try { res = await hermeet(page, KEUR, (r) => r.overtredingen.length || r.contrast.length); }
       catch (e) {
         console.error(`[a11y] ${pad} (${ronde.naam}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
         struct += 1; continue;
@@ -446,32 +501,12 @@ function startEchteServer() {
     }
     if (hand !== 'rechts') continue;   // het raakvlak hangt niet van de hand af
     let res;
-    try { res = await tel.evaluate(RAAK); }
+    try { res = await hermeet(tel, RAAK, (r) => r.klein.length); }
     catch (e) {
       console.error(`[a11y] ${pad} (raakvlak): de meting kon niet draaien -- ${e.message.split('\n')[0]}`);
       continue;
     }
-    /* WIE IETS VINDT, MEET NOG EEN KEER. Een scherm dat binnenkomt met een
-       schaal-animatie staat 600ms na load op 99,827%, en dan meet een knop van
-       precies 24 pixels er 23,96 -- dat is een moment en geen maat. Zo meldde
-       zorgbalie.html een pil die klopte.
-
-       Wachten tot ALLE animaties uit zijn was de eerste poging, en die kostte te
-       veel: op de meeste schermen loopt er altijd iets (de wereldklok tikt), dus
-       liep bijna elke pagina tegen de tijdgrens aan en werd de ronde drie keer zo
-       traag. Een tweede meting kost alleen iets op de schermen die iets vinden,
-       en dat zijn er hopelijk nul. Een scherm dat PERMANENT geschaald is, meldt
-       zich in die tweede meting gewoon weer -- en terecht, want dan is de knop
-       ook echt te klein. */
-    if (res.klein.length) {
-      try {
-        await tel.waitForFunction(
-          () => !document.getAnimations || document.getAnimations().every(a => a.playState !== 'running'),
-          null, { timeout: 1500 });
-      } catch (e) { /* een scherm dat blijft bewegen meten we zoals het staat */ }
-      await tel.waitForTimeout(300);
-      try { res = await tel.evaluate(RAAK); } catch (e) { /* de eerste meting blijft staan */ }
-    }
+    /* De tweede meting zit in hermeet() hierboven; hier stond een eigen kopie. */
     if (res.klein.length) {
       raakTotaal += res.klein.length;
       console.log(`\n[a11y] ${pad} (raakvlak): ${res.klein.length} onder ${raakvlak.GRENS}x${raakvlak.GRENS}`);
@@ -596,7 +631,7 @@ function startEchteServer() {
       await pg.goto(basis + pad, { waitUntil: 'load' });
       await pg.waitForTimeout(600);
       let res;
-      try { res = await pg.evaluate(KEUR); }
+      try { res = await hermeet(pg, KEUR, (r) => r.overtredingen.length || r.contrast.length); }
       catch (e) {
         console.error(`[a11y] ${pad} (${thema}): de keuring kon niet draaien -- ${e.message.split('\n')[0]}`);
         struct += 1; continue;
@@ -652,10 +687,16 @@ function startEchteServer() {
   const grens = JSON.parse(fs.readFileSync(path.join(ROOT, 'A11Y-INGELOGD.json'), 'utf8'));
   const uitgelogd = perRonde.find(r => r.naam === 'uitgelogd') || { struct: 0, contr: 0 };
   const ingelogd = perRonde.find(r => r.naam === 'ingelogd') || { struct: 0, contr: 0 };
+  const zaakronde = perRonde.find(r => r.naam === 'zaak') || { struct: 0, contr: 0 };
   const fouten = [];
   if (totaal > 0) fouten.push(`${totaal} structurele overtreding(en) -- die zijn in beide staten hard nul`);
   if (uitgelogd.contr > grens.uitgelogd.contrast)
     fouten.push(`${uitgelogd.contr} contrastfouten uitgelogd, de grens is ${grens.uitgelogd.contrast}`);
+  /* De zaakronde weegt APART en wordt niet bij de ingelogde opgeteld: als twee
+     staten in een getal worden opgeteld, kan een reparatie aan de ene kant een
+     verslechtering aan de andere maskeren. */
+  if (zaakronde.contr > ((grens.zaak || {}).contrast || 0))
+    fouten.push(`${zaakronde.contr} contrastfouten in de zaakronde, de grens is ${(grens.zaak || {}).contrast} -- er is er een BIJGEKOMEN`);
   if (ingelogd.contr > grens.ingelogd.contrast)
     fouten.push(`${ingelogd.contr} contrastfouten ingelogd, de grens is ${grens.ingelogd.contrast} -- er is er een BIJGEKOMEN`);
   /* Het raakvlak leest zijn grens uit hetzelfde register, en zijn oordeel staat

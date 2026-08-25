@@ -33,7 +33,10 @@
   .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop:focus-visible,input:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-  .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+  /* 4,82:1 op de lichtste notitiekaart (rgb(186,185,182)); var(--soft) haalde
+     daar 3,86 -- een notitiekleur die de gebruiker kiest is geen materiaal
+     waar de huistoon tegen is uitgerekend. */
+  .stil{color:#464644;font-size:.82rem;line-height:1.55;}
   .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
   .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}

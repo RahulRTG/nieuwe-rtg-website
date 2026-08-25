@@ -116,6 +116,18 @@ function zichtbaar(el) {
   if (s.display === 'none' || s.visibility === 'hidden' || s.visibility === 'collapse') return false;
   if (parseFloat(s.opacity) === 0) return false;
   if (!el.getClientRects().length) return false;
+  /* EEN SCHERMLEZER-ELEMENT IS GEEN ZICHTBARE TEKST. De vaste vorm daarvoor is
+     een blokje van een pixel dat helemaal wordt weggeknipt (clip-path:inset(50%)
+     of het oude clip:rect(0 0 0 0)); shared/gebaar.js zet er zo een neer met de
+     uitleg dat een regel acties draagt. Het HEEFT een rechthoek, dus het kwam
+     hier langs en werd op contrast gewogen -- terwijl geen oog het ooit ziet.
+     Nauw gehouden: alleen als het element ook werkelijk tot niets is gekrompen.
+     Wie tekst met clip-path verbergt en hem toch groot laat, komt er niet mee weg. */
+  const knip = s.clipPath && s.clipPath !== 'none' ? s.clipPath : (s.clip && s.clip !== 'auto' ? s.clip : '');
+  if (knip) {
+    const r = el.getBoundingClientRect();
+    if (r.width <= 2 && r.height <= 2) return false;
+  }
   let p = el;
   while (p) { if (p.getAttribute && p.getAttribute('aria-hidden') === 'true') return false; p = p.parentElement; }
   return true;

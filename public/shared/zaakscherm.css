@@ -35,7 +35,12 @@ header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
 main{padding:1rem 1.1rem;max-width:920px;margin:0 auto;}
 .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
 .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0 0 .5rem;}
-.stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+/* 4,85:1 EN NIET var(--soft). Deze regel draagt op een zaakscherm de bedragen
+   en de toelichting ernaast, en stond op de kaartgrond (rgb(42,40,39)) op
+   4,14:1 -- 41 van de 43 bevindingen van de zaakronde kwamen hieruit. De
+   gedempte huistoon is berekend tegen de ERGSTE grond van het materiaal, en
+   een kaart is lichter dan die grond; daar houdt de garantie op. */
+.stil{color:#9B938C;font-size:.82rem;line-height:1.55;}
 .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
 .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
   font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}

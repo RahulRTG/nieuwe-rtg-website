@@ -26,6 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { wachtOpBestand } = require('./helper');
 const { maakDoorgeefjournaal } = require('../server/kern/doorgeefjournaal');
 const { maakJournaalbestand } = require('../server/kern/journaalbestand');
 
@@ -58,9 +59,17 @@ test('honderd mislukkingen kosten geen honderd schrijfacties', () => {
 
 test('na de wachttijd wordt er precies EEN keer gespoeld', async () => {
   let schrijfacties = 0;
-  const j = maakDoorgeefjournaal({ db: { data: {} }, bestand: null, save: () => { schrijfacties++; } });
+  /* De SPOELING zelf geeft het sein, en dat is beter dan wachten tot de klok
+     1300 zegt: die tijd was een gok die of te vroeg valt of de toets vertraagt.
+     Hier is er een positief signaal om op te wachten -- save() wordt aangeroepen
+     -- dus wacht de toets daarop. (De twee wachten verderop bewijzen juist een
+     AFWEZIGHEID; daar is de tijd zelf de meting en blijven ze staan.) */
+  let gespoeld;
+  const eersteSpoeling = new Promise((r) => { gespoeld = r; });
+  const j = maakDoorgeefjournaal({ db: { data: {} }, bestand: null,
+    save: () => { schrijfacties++; gespoeld(); } });
   for (let i = 0; i < 50; i++) j.journaalBinnen({ wat: '/api/weg', methode: 'GET', status: 500, mislukt: true });
-  await new Promise(r => setTimeout(r, 1300));
+  await eersteSpoeling;
   assert.equal(schrijfacties, 1,
     'vijftig mislukkingen binnen een seconde horen samen EEN schrijfactie te kosten, niet vijftig');
 });
@@ -98,13 +107,14 @@ test('bestandsweg: na de wachttijd staat alles er, in EEN spoeling', async () =>
   /* Wachten op de INHOUD en niet op "er staat iets in de map": dat laatste is
      waar tussen het aanmaken van het bestand en het wegschrijven van de regels,
      en dan knippert de toets. Een toets die soms zakt is erger dan geen toets. */
-  let inhoud = '';
   const regels = (t) => t.split('\n').filter(Boolean).length;
-  for (let i = 0; i < 120; i++) {
-    try { inhoud = fs.readFileSync(path.join(map, 'huidig.log'), 'utf8'); } catch (e) { inhoud = ''; }
-    if (regels(inhoud) >= 50) break;
-    await new Promise(r => setTimeout(r, 25));
-  }
+  /* wachtOpBestand en geen eigen pollus met een slaapje erin. De lus deed het
+     goede -- hij brak op de INHOUD -- maar de wachtschuldmeter kan dat niet zien
+     en telde het slaapje als wachten op de klok. De helper doet hetzelfde en
+     zegt het in een regel. */
+  await wachtOpBestand(map, (naam, lees) => naam === 'huidig.log' && regels(lees()) >= 50,
+    { tijdgrens: 3000 });
+  const inhoud = fs.readFileSync(path.join(map, 'huidig.log'), 'utf8');
   assert.equal(regels(inhoud), 50, 'alle vijftig regels staan erin');
   assert.equal(fs.readdirSync(map).length, 1,
     'en het is EEN logbestand: vijftig mislukkingen kosten samen een spoeling, geen vijftig');

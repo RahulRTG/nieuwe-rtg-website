@@ -16,7 +16,8 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtOpTekst } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -372,7 +373,15 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     assert.match(await kp.textContent('body'), /keurt nooit goed/, 'en de pagina zegt zelf dat de machine niets goedkeurt');
     // zonder naam gaat het niet
     await kp.click('[data-v] .pub');
-    await kp.waitForTimeout(800);
+    /* WAAROM OP DE WEIGERING EN NIET OP RUST. Dit is een NEGATIEVE bewering: er
+       hoort niets gepubliceerd te zijn. Een wacht op stilte valt hier meteen
+       door -- vlak na de klik is het scherm stil omdat het verzoek nog niet eens
+       op gang is -- en dan bewijst de regel eronder niets: hij zou ook groen
+       staan als de server nog aan het antwoorden was. De server weigert met
+       "Zet je naam erbij: een keuring hoort een mens te hebben gedaan.", en
+       appstore-kantoor.html zet die tekst via meld() in #melding. Die tekst is
+       dus het bewijs dat de heenreis ECHT is gemaakt en ECHT is afgewezen. */
+    await wachtOpTekst(kp, /Zet je naam erbij/, { in: '#melding' });
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'zonder naam is er niets gepubliceerd');
     await kp.fill('#wie', 'Sam van RTG');
     await kp.click('[data-v] .pub');

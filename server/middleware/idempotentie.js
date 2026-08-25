@@ -104,7 +104,17 @@ const EIGEN = [
      losse routes en geen mappen, dus ze staan hier voluit. */
   '/api/festival/verkoop/rond',  // de festivalkassa rondt af via de wallet
   '/api/giftcard/buy',           // een cadeaukaart kopen; de sleutel gaat mee naar de wallet
-  '/api/supplier/betaalverzoek'  // directpay geeft bij dezelfde sleutel het BESTAANDE verzoek terug
+  '/api/supplier/betaalverzoek',  // directpay geeft bij dezelfde sleutel het BESTAANDE verzoek terug
+
+  /* En deze twee kwamen met de App Store van main mee, op de DERDE ronde van
+     dezelfde toets. Zelfde soort als de drie hierboven: allebei lezen ze hun
+     `idem` uit het lijf en geven hem door aan de wallet, dus de centrale kas
+     zou hun eigen antwoord overstemmen met een bewaard eerste antwoord. Bij
+     een teruggave is dat het gevaarlijkst: het antwoord hangt af van de stand
+     NA de eerste aanroep, en een bewaard antwoord zou een tweede teruggave als
+     geslaagd melden terwijl er niets is gebeurd. */
+  '/api/appstore/koop',            // een app kopen; de sleutel gaat mee naar de wallet
+  '/api/appstore/kantoor/teruggave' // terugbetalen na intrekking, via dezelfde weg terug
 ];
 const doetHetZelf = (pad) => EIGEN.some(p => pad.startsWith(p));
 

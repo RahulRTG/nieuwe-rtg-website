@@ -5,6 +5,8 @@
 'use strict';
 
 module.exports = [
+  '/apps/appcel.html',
+  '/apps/appstore-dossier.html',
   '/apps/arrival.html',
   '/apps/attenties.html',
   '/apps/avond.html',

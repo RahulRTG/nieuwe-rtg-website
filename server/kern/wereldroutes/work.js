@@ -5,6 +5,8 @@
 
 module.exports = [
   '/apps/agenda.html',
+  '/apps/appstore-kantoor.html',
+  '/apps/appstore-uitgever.html',
   '/apps/architect-pda.html',
   '/apps/backoffice.html',
   '/apps/belastingkantoor.html',

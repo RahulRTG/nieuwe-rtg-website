@@ -25,7 +25,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar } = require('./helper');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-barscherm-'));
 
@@ -52,7 +53,14 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
       localStorage.removeItem('rtg_horeca_hand-vast');
     });
     await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'load' });
-    await page.waitForTimeout(900);
+    /* De deur komt niet uit het HTML maar wordt na het laden getekend
+       (RTGHoreca.poort() doet dat in een setTimeout). We wachten dus tot hij er
+       staat -- OF tot de pagina alsnog ergens anders heen ging, want juist dat
+       tweede moet de bewering hieronder kunnen afkeuren in plaats van dat de
+       wacht hem voor is. */
+    await wachtTot(page, () => !!document.querySelector('.rtgdeur') ||
+      location.pathname !== '/apps/horeca-bar.html', null,
+      { wat: 'de deur op het barscherm (of een omleiding weg van dit scherm)' });
     const uit = await page.evaluate(() => ({ pad: location.pathname,
       deur: !!document.querySelector('.rtgdeur'), tekst: document.body.innerText.replace(/\s+/g, ' ') }));
     assert.equal(uit.pad, '/apps/horeca-bar.html', 'de pagina stuurt niemand weg');
@@ -84,7 +92,13 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
 
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, tok);
     await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'load' });
-    await page.waitForTimeout(900);
+    /* De tellers staan in het HTML op "-" en krijgen pas een waarde als teken()
+       heeft gedraaid, en dat gebeurt alleen NA het antwoord van /bar. Een teller
+       die niet meer "-" is, betekent dus: het bord is een keer met echte
+       servergegevens getekend. Bewust niet op "3x Gin-tonic" wachten -- dat is
+       precies wat de beweringen hieronder moeten kunnen afkeuren. */
+    await wachtTot(page, () => document.getElementById('bOpen').textContent !== '-', null,
+      { wat: 'een bord dat met servergegevens is getekend (bOpen niet meer "-")' });
 
     const lees = () => page.evaluate(() => ({
       stapel: document.getElementById('bStapel').innerText.replace(/\s+/g, ' '),
@@ -108,12 +122,22 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     const aan = await page.$('[data-naar="gestart"]');
     assert.ok(aan, 'er staat een knop om aan te zetten');
     await aan.click();
-    await page.waitForTimeout(700);
+    /* Aanzetten loopt via de offline-laag en daarna tekent haal() het bord
+       opnieuw; dan pas verandert de knop van "Aanzetten" in "Klaar". Op die knop
+       wachten is precies waar de volgende regel om vraagt. */
+    await wachtOpZichtbaar(page, '[data-naar="klaar"]');
     const klaar = await page.$('[data-naar="klaar"]');
     assert.ok(klaar, 'daarna kan hij klaar gemeld worden');
     const welke = await klaar.evaluate(el => el.getAttribute('data-zet'));
     await klaar.click();
-    await page.waitForTimeout(700);
+    /* Een glas dat klaar staat heeft geen vervolgstap meer, dus verdwijnt zijn
+       knop uit het bord. Die knop verdwijnt pas bij de hertekening NA het
+       antwoord van de server -- en dat is precies de toestand die de vragen aan
+       de server hieronder nodig hebben. Geen selector met de id erin: een id met
+       een vreemd teken zou dan stil niets matchen. */
+    await wachtTot(page, (id) => [...document.querySelectorAll('[data-zet]')]
+      .every((b) => b.getAttribute('data-zet') !== id), welke,
+      { wat: 'het glas ' + welke + ' zonder vervolgknop (klaar gemeld)' });
 
     beeld = await lees();
     const bord = (await H('/api/supplier/horeca/bar', {})).body;
@@ -131,12 +155,19 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
       return route.continue();
     });
     await page.click('#bVerversNu');
-    await page.waitForTimeout(800);
+    /* Ververs haalt het bord opnieuw op; de nieuwe ronde is binnen zodra BAR-C
+       in de ronderlijst staat. De knop eronder komt in dezelfde hertekening mee,
+       want teken() zet de hele lijst in een keer neer. */
+    await wachtOpTekst(page, 'BAR-C', { in: '#bGolvenLijst' });
 
     const aanC = await page.$('.b-golf:has-text("BAR-C") [data-naar="gestart"]');
     assert.ok(aanC, 'de negroni staat op het bord');
     await aanC.click();
-    await page.waitForTimeout(800);
+    /* Zonder lijn ketst de fetch af, komt de handeling op het toestel te staan
+       en meldt de wachtrij dat aan het scherm: de strook gaat aan. Dat is het
+       eerste zichtbare teken dat de handeling geland is -- eerder heeft vragen
+       naar de rij geen zin. */
+    await wachtOpZichtbaar(page, '#bEdgeStrook');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 1,
       'zonder lijn staat de handeling op het toestel');
     const strook = await page.evaluate(() => ({
@@ -149,7 +180,11 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
 
     lijnDicht = false;
     await page.evaluate(() => RTGHorecaEdge.handLeeg());
-    await page.waitForTimeout(1000);
+    /* De rij is leeggelopen zodra de strook weer uit gaat: die staat aan zolang
+       er iets wacht OF iets is vastgelopen, en gaat pas uit als beide nul zijn.
+       Dat is strenger dan alleen naar de rij kijken -- een handeling die de
+       server weigerde zou blijven staan als "vast". */
+    await wachtOpZichtbaar(page, '#bEdgeStrook', { weg: true });
     assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 0, 'de rij is leeg');
     const naC = (await H('/api/supplier/horeca/rekening', { rekeningId: t3.id })).body.rekening;
     assert.equal(naC.regels[0].stand, 'gestart', 'en de handeling is alsnog aangekomen');
@@ -158,17 +193,29 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
        toestel offline "klaar" meldt. De samenvoeging weigert dat -- een stand
        gaat nooit achteruit -- en het scherm hoort de reden te horen. */
     lijnDicht = true;
+    /* Wachten tot het BORD de nieuwe stand toont, en niet alleen tot de rij leeg
+       is. Dat zijn twee dingen: de rij loopt leeg zodra het antwoord binnen is,
+       maar de knop van BAR-C verandert pas van "aanzetten" in "klaar" als het
+       bord opnieuw is getekend. Zonder deze wacht pakt de zoeker hieronder soms
+       de oude knop, en dan toetst de rest van deze bewering niets. */
+    await wachtOpZichtbaar(page, '.b-golf:has-text("BAR-C") [data-naar="klaar"]');
     const klaarC = await page.$('.b-golf:has-text("BAR-C") [data-naar="klaar"]');
     assert.ok(klaarC, 'er staat een knop om hem klaar te melden');
     await klaarC.click();
-    await page.waitForTimeout(800);
+    // de lijn is weer dicht: de strook hoort opnieuw aan te gaan, en pas dan
+    // staat de klaarmelding werkelijk op het toestel
+    await wachtOpZichtbaar(page, '#bEdgeStrook');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.handRij().length), 1, 'hij wacht');
 
     await H('/api/supplier/horeca/keuken/stand', { rekeningId: t3.id, regelId: t3.regels[0], stand: 'uitgegeven' });
 
     lijnDicht = false;
     await page.evaluate(() => RTGHorecaEdge.handLeeg());
-    await page.waitForTimeout(1000);
+    /* Ook een GEWEIGERDE samenvoeging is een antwoord van de server: het pakket
+       gaat dan gewoon uit de rij en niet naar de vastgelopen hoek. De strook uit
+       betekent hier dus "afgehandeld", en niet "gelukt" -- wat er van de weigering
+       terechtkwam, beweren de regels hieronder. */
+    await wachtOpZichtbaar(page, '#bEdgeStrook', { weg: true });
     const eindC = (await H('/api/supplier/horeca/rekening', { rekeningId: t3.id })).body.rekening;
     assert.equal(eindC.regels[0].stand, 'uitgegeven',
       'de offline-melding zet het bord niet terug naar klaar');

@@ -25,7 +25,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, klikEnWacht, tekstVan } = require('./helper');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-edge-e2e-'));
 
@@ -61,17 +62,34 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     /* ---- 1. eerst één keer mét lijn, zodat de kaart bewaard wordt ---- */
     const rek = (await H('/api/supplier/horeca/rekening/open', { kanaal: 'tafel', tafel: 'EDGE-WARM', gasten: 2 })).body.rekening;
     await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
-    await page.waitForTimeout(900);
+    /* De werkstandknoppen komen uit het antwoord van /werklijst. Staan ze er, dan
+       is die eerste tekening klaar -- en pas dan is #pNu veilig: de open tafels
+       komen straks op diezelfde plek, en een werklijst die later binnenkomt zou
+       ze eroverheen schrijven. */
+    await wachtOpZichtbaar(page, '#pModi button');
     await page.click('#pTafels');
-    await page.waitForTimeout(700);
+    /* NIET op [data-tafel] wachten: de werklijst zet zelf ook zo'n knop neer
+       (een tafel waar nog niets besteld is), dus die wacht valt meteen door en
+       de tik gaat naar de oude lijst. "Open tafels" is de kop die alleen DEZE
+       lijst schrijft, en dus het teken dat /rekeningen geantwoord heeft. */
+    await wachtOpTekst(page, /Open tafels/, { in: '#pNu' });
     await page.click('[data-tafel]');
-    await page.waitForTimeout(900);
+    /* Het tafelvenster haalt eerst de kaart op en bewaart hem in diezelfde stap
+       op het toestel. Staat hij in het geheugen, dan is de bewering hieronder
+       een echte bewering over wat er in localStorage terechtkwam. */
+    await wachtTot(page, () => {
+      var k = window.RTGPdaTafel && window.RTGPdaTafel.kaart();
+      return !!(k && k.length);
+    }, null, { wat: 'de kaart van de zaak, opgehaald door het tafelvenster' });
     assert.ok(await page.evaluate(() => {
       try { return (JSON.parse(localStorage.getItem('rtg_pda_kaart') || 'null') || []).length > 0; }
       catch (e) { return false; }
     }), 'de kaart is op het toestel bewaard');
-    await page.click('#tTerug');
-    await page.waitForTimeout(600);
+    /* Terug naar de werklijst is niet af als het venster wisselt: terug() haalt
+       de werklijst opnieuw op. Wachten op DAT antwoord houdt die aanroep binnen
+       dit blok, in plaats van hem straks midden in het offline-deel te laten
+       landen. */
+    await klikEnWacht(page, '#tTerug', '/werklijst');
 
     /* ---- 2. nu de lijn eruit, en toch opnemen ---- */
     let lijnDicht = true;
@@ -81,7 +99,9 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     });
 
     await page.click('#pLokaal');
-    await page.waitForTimeout(600);
+    /* Het offline-scherm tekent de BEWAARDE kaart; de knop hieronder is het
+       enige teken dat die kaart er werkelijk stond. */
+    await wachtOpZichtbaar(page, '#lKaart [data-litem]');
     const kaartKnop = await page.$('#lKaart [data-litem]');
     assert.ok(kaartKnop, 'de bewaarde kaart staat op het offline-scherm');
 
@@ -90,12 +110,15 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     await page.fill('#lAllergie', 'schaaldieren');
     await page.selectOption('#lGang', '2');
     await kaartKnop.click();
-    await page.waitForTimeout(400);
+    await wachtOpTekst(page, /schaaldieren/, { in: '#lLijst' });
     assert.match(await page.evaluate(() => document.getElementById('lLijst').innerText),
       /schaaldieren/, 'de allergie staat bij de opgenomen regel');
 
     await page.click('#lOpnemen');
-    await page.waitForTimeout(900);
+    /* De strook is het teken dat de rij het pakket heeft AANGENOMEN: shared/
+       wachtrij.js meldt de wijziging pas nadat de bestelling is weggeschreven.
+       Staat die zin er, dan is rij() hieronder een gedane zaak. */
+    await wachtOpTekst(page, /op dit toestel/, { in: '#pEdgeStrook' });
     assert.equal(await page.evaluate(() => RTGHorecaEdge.rij().length), 1,
       'de bestelling staat op het toestel');
     const strook = await page.evaluate(() => ({
@@ -113,7 +136,11 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
        Zonder dat onderscheid gooit een storing van tien seconden het werk van
        een hele avond op de vastgelopen-stapel. */
     await page.evaluate(() => RTGHorecaEdge.leeg());
-    await page.waitForTimeout(800);
+    /* Hier mag er juist NIETS veranderen, dus is er ook geen verandering om op te
+       wachten: leeg() geeft een belofte die pas nakomt als de poging voorbij is,
+       en page.evaluate wacht die zelf af. Wat wel moet gelden is dat de strook is
+       blijven staan -- de bestelling staat nog op het toestel. */
+    await wachtOpZichtbaar(page, '#pEdgeStrook');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.rij().length), 1,
       'hij staat er nog steeds');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.vastgelopen().length), 0,
@@ -122,7 +149,10 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     /* ---- 3. de lijn terug ---- */
     lijnDicht = false;
     await page.evaluate(() => RTGHorecaEdge.leeg());
-    await page.waitForTimeout(1200);
+    /* De rij haalt een pakket er pas uit als de SERVER het bevestigt en tekent de
+       strook daarna opnieuw. Strook weg betekent dus: niets wacht meer en niets
+       liep vast -- precies de twee beweringen hieronder. */
+    await wachtOpZichtbaar(page, '#pEdgeStrook', { weg: true });
     assert.equal(await page.evaluate(() => RTGHorecaEdge.rij().length), 0, 'de rij is leeg');
     assert.equal(await page.evaluate(() => RTGHorecaEdge.vastgelopen().length), 0, 'en niets liep vast');
 
@@ -150,14 +180,21 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
     });
 
     await page.click('#pLokaal');
-    await page.waitForTimeout(500);
+    await wachtOpZichtbaar(page, '#lKaart [data-litem]');
     await page.fill('#lTafel', 'EDGE-LOST');
     await page.fill('#lGasten', '2');
     const knop2 = await page.$('#lKaart [data-litem]');
+    /* Welk gerecht de eerste kaartknop is, weet deze toets niet -- dus wachten we
+       niet op een naam maar op het moment dat de opgenomen lijst iets anders
+       zegt dan zonet ("Nog niets opgenomen"). */
+    const voorLijst = await tekstVan(page, '#lLijst');
     await knop2.click();
-    await page.waitForTimeout(300);
+    await wachtOpVerandering(page, '#lLijst', voorLijst);
     await page.click('#lOpnemen');
-    await page.waitForTimeout(900);
+    /* Het verzoek gaat er echt doorheen en pas daarna ziet de PDA een
+       netwerkfout; de strook verschijnt dus nadat de server hem verwerkt heeft,
+       en dat is wat de telling hieronder wil weten. */
+    await wachtOpTekst(page, /op dit toestel/, { in: '#pEdgeStrook' });
     assert.equal(await page.evaluate(() => RTGHorecaEdge.rij().length), 1,
       'de PDA denkt dat het misging en zet hem in de rij');
     const naVerlies = (await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen
@@ -166,7 +203,8 @@ test('de PDA neemt een bestelling op zonder lijn, en hij komt er alsnog',
 
     slikAntwoord = false;
     await page.evaluate(() => RTGHorecaEdge.leeg());
-    await page.waitForTimeout(1200);
+    // strook weg = de server heeft de herhaling bevestigd en de rij is leeg
+    await wachtOpZichtbaar(page, '#pEdgeStrook', { weg: true });
     assert.equal((await H('/api/supplier/horeca/rekeningen', { status: 'open' })).body.rekeningen
       .filter(x => x.tafel === 'EDGE-LOST').length, 1,
       'de herhaling levert GEEN tweede bestelling op');

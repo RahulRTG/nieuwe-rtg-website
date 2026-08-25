@@ -512,6 +512,30 @@ async function korteStand(page) {
    er ECHT is, en zegt bij een time-out wat het zocht en wat het wel vond.
 
    Bewust geen Playwright: dit is de schijf en niet een pagina. */
+/* WACHT TOT EEN WAARDE KLOPT, zonder pagina en zonder schijf. De tegenhanger van
+   wachtTot() voor een servertoets: een lus die peilt tot fn() waar is, met een
+   tijdgrens die luid faalt in plaats van stil door te lopen.
+
+   WAAROM HIJ HIER WOONT EN NIET IN DE TOETS. Elke toets die zelf een
+   `const wacht = ms => new Promise(r => setTimeout(r, ms))` neerzet, telt in de
+   wachtschuld (scripts/klokwacht.js) -- terecht, want die meter kan niet zien of
+   dat slaapje een GOK is of het hartslagje van een voorwaardelus. Door het hier
+   te zetten staat het slaapje op EEN plek, in de gedeelde gereedschapskist, en
+   heet het wat het is: peilen tot iets waar is. */
+async function wachtOpWaarde(fn, opties) {
+  const ms = (opties && opties.ms) || 5000;
+  const stap = (opties && opties.stap) || 25;
+  const wat = (opties && opties.wat) || 'de verwachte waarde';
+  const tot = Date.now() + ms;
+  for (;;) {
+    let uit;
+    try { uit = await fn(); } catch (e) { uit = false; }
+    if (uit) return uit;
+    if (Date.now() >= tot) throw new Error('wachtOpWaarde: ' + wat + ' kwam niet binnen ' + ms + 'ms');
+    await new Promise((r) => setTimeout(r, stap));
+  }
+}
+
 async function wachtOpBestand(map, past, opties) {
   const fs = require('fs');
   const ms = (opties && opties.ms) || 8000;
@@ -1096,7 +1120,7 @@ async function bankDeur(page, naam, opties) {
   }, naam);
 }
 
-module.exports = { bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser,
+module.exports = { bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

@@ -25,7 +25,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpVerandering, wachtOpZichtbaar } = require('./helper');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rahulscherm-'));
 
@@ -62,7 +63,13 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
       localStorage.setItem('rtg_sup_token', t);
     }, tok);
     await page.goto(base + '/apps/horeca-beheer.html', { waitUntil: 'load' });
-    await page.waitForTimeout(1200);
+    /* De kaart tekent zich in TWEE stappen, en lees() hieronder leest ze allebei:
+       /rahul/bonnen zet de bonnenlijst neer, en pas dáárna vult /rahul/register de
+       zin over de grens. Wachten op alleen de bonnen treft die zin dus nog leeg
+       aan -- vandaar allebei. Twee items = het wachtende voorstel en de weigering. */
+    await wachtTot(page, () => document.querySelectorAll('#mRahulBonnen .item').length >= 2,
+      null, { wat: 'de twee actiebonnen van Rahul (het voorstel en de weigering)' });
+    await wachtOpVerandering(page, '#mRahulGrensUit', '');
 
     const lees = () => page.evaluate(() => ({
       bonnen: document.getElementById('mRahulBonnen').innerText.replace(/\s+/g, ' '),
@@ -89,7 +96,13 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
     const knoppen = await page.$$('[data-bevestig]');
     assert.equal(knoppen.length, 1, 'alleen het wachtende voorstel heeft een knop, de geweigerde niet');
     await knoppen[0].click();
-    await page.waitForTimeout(900);
+    /* De knop verdwijnt pas als het scherm zich HERTEKENT met de verse bonnen, en
+       dat gebeurt na het antwoord op /rahul/bevestig: de stand is dan geen 'wacht'
+       meer, dus rendert bon() er geen knop meer bij. Zijn verdwijning is dus het
+       teken dat de server het werk deed én dat het scherm het toont -- precies wat
+       de drie beweringen hieronder nodig hebben. Vlak na de klik staat hij er nog,
+       dus dit valt niet meteen door. */
+    await wachtOpZichtbaar(page, '[data-bevestig]', { weg: true });
 
     const na = (await H('/api/supplier/horeca/rekening', { rekeningId: rek.id })).body.rekening;
     assert.equal(na.totalen.korting, 3000, 'na de tik staat de korting erop');
@@ -99,6 +112,12 @@ test('de manager ziet wat Rahul deed en wat wacht, en bevestigt met zijn naam er
     assert.equal((await page.$$('[data-bevestig]')).length, 0, 'er valt niets meer te bevestigen');
 
     /* ---- 5. de meetlat ---- */
+    /* De meetlat haalt zijn eigen /dienstmeting op en stond onder dezelfde vaste
+       wachttijd als de bonnen hierboven; nu die weg is, wacht hij op zijn eigen
+       teken. Dat is een REGEL in de lijst en niet de kop erboven: die kop staat er
+       met een streepje al vóór de meting binnen is. */
+    await wachtTot(page, () => document.querySelectorAll('#mMeetlat .item').length > 0,
+      null, { wat: 'de regels van de meetlat' });
     const meet = await page.evaluate(() => ({
       telling: document.getElementById('mMeetTelling').textContent,
       lat: document.getElementById('mMeetlat').innerText.replace(/\s+/g, ' ')

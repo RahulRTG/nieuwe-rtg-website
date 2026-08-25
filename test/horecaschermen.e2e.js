@@ -134,7 +134,10 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
     const pakknop = await page.$('#ePas [data-pak]');
     assert.ok(pakknop, 'een complete gang krijgt een oppakknop');
     await pakknop.click();
-    await page.waitForTimeout(900);
+    /* Oppakken zet een CLAIM en het scherm haalt de paslijst daarna opnieuw op.
+       Wachten op "jij hebt hem" in #ePas is wachten op precies de bewering
+       hieronder: vlak na de klik staat de kaart er nog met "nog van niemand". */
+    await wachtOpTekst(page, /jij hebt hem/, { in: '#ePas' });
     tekst = await lees(page);
     assert.match(tekst, /jij hebt hem/, 'na oppakken staat er wie hem heeft');
 
@@ -144,8 +147,16 @@ test('de pas geeft uit, en de bezorgdispatch noemt bij elk nee zijn getal',
 
     const gangUit = await page.$('#ePas [data-gangUit], #ePas [data-ganguit]');
     assert.ok(gangUit, 'en de hele gang kan in een tik de deur uit');
+    const voorGangUit = await tekstVan(page, '#eRegie');
     await gangUit.click();
-    await page.waitForTimeout(1200);
+    /* Twee panelen moeten hertekend zijn, en ze komen uit twee LOSSE verzoeken.
+       De teller boven de paslijst gaat van 1 naar 0 -- dat is de bewering
+       hieronder. En #eRegie verliest tafel 9 (uitgegeven regels vallen uit
+       /keuken/regie), en pas daarna is de uitgeefknop die de toets hierna
+       oppakt werkelijk die van tafel 7 en geen losgeraakt handvat uit de
+       vorige hertekening. */
+    await wachtOpTekst(page, /klaar om te dragen \(0/i);
+    await wachtOpVerandering(page, '#eRegie', voorGangUit);
     tekst = await lees(page);
     assert.match(tekst, /klaar om te dragen \(0/i, 'daarna staat de gang niet meer op de draaglijst');
     const naGang = (await api('/rekening', { rekeningId: rek2.rekening.id })).rekening.regels;

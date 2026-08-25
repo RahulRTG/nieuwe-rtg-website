@@ -26,7 +26,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, tekstVan } = require('./helper');
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kassawachtrij-'));
 
@@ -72,13 +73,17 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
       return route.continue();
     });
     await page.goto(base + '/apps/kassa.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(900);
+    /* laad() haalt kassa/instel op en tekent daarna pas de artikelknoppen; diezelfde
+       ronde zet ook RTGKassaWachtrij.zaak() op de eigen zaak. Een zichtbare .art is
+       dus het teken dat het scherm er helemaal staat -- en het is precies wat de
+       volgende regel oppakt. */
+    await wachtOpZichtbaar(page, '.art');
 
     const knop = await page.$('.art');
     assert.ok(knop, 'er staan artikelknoppen op de kassa');
     await knop.click();
     await page.click('#payContant');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /1 bon wacht/, { in: '#wachtStrook' });
 
     let strook = await page.evaluate(() => {
       const el = document.getElementById('wachtStrook');
@@ -100,8 +105,13 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     await knopB.click();
     await page.click('#payRtg');
     await page.fill('#payCode', 'ABC123');
+    /* NIET op /verbinding/ wachten: die tekst STAAT er al van de contante bon
+       hierboven ("Geen verbinding. ... staat in de wachtrij"), dus zo'n wacht valt
+       meteen door en de toets leest de oude uitkomst. De RTG Pay-bon gaat niet de
+       rij in, dus het enige wat er verandert is de zin in #uitkomst zelf. */
+    const voorRtg = await tekstVan(page, '#uitkomst');
     await page.click('#payOk');
-    await page.waitForTimeout(600);
+    await wachtOpVerandering(page, '#uitkomst', voorRtg);
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1,
       'de RTG Pay-bon komt NIET in de wachtrij; er staat er nog steeds maar een');
     const rtgUit = await page.evaluate(() => document.getElementById('uitkomst').innerText);
@@ -113,7 +123,10 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     /* ---- 2. de lijn is terug ---- */
     lijnDicht = false;
     await page.click('#wachtNu');
-    await page.waitForTimeout(900);
+    /* De rij haalt de bon er pas uit als de SERVER hem bevestigt, en tekent de
+       strook daarna opnieuw. Rij leeg en niets vastgelopen betekent hier dus:
+       strook weg -- en dat is meteen de bewering van de regels hieronder. */
+    await wachtOpZichtbaar(page, '#wachtStrook', { weg: true });
     strook = await page.evaluate(() => ({ verborgen: !!document.getElementById('wachtStrook').hidden,
       rij: RTGKassaWachtrij.rij().length, vast: RTGKassaWachtrij.vastgelopen().length }));
     assert.equal(strook.rij, 0, 'de wachtrij is leeg');
@@ -136,7 +149,10 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     const knop2 = await page.$('.art');
     await knop2.click();
     await page.click('#payContant');
-    await page.waitForTimeout(700);
+    /* route.fetch() laat de server hem echt verwerken en pas daarna ziet de kassa
+       een netwerkfout; de bon in de strook is dus het teken dat BEIDE gebeurd zijn
+       -- de server telt hem (bonnen 2) en de kassa zet hem in de rij. */
+    await wachtOpTekst(page, /1 bon wacht/, { in: '#wachtStrook' });
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1,
       'de kassa denkt dat het misging en zet de bon in de wachtrij');
     const tussen = await rapport();
@@ -144,7 +160,7 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
 
     slikAntwoord = false;
     await page.click('#wachtNu');
-    await page.waitForTimeout(900);
+    await wachtOpZichtbaar(page, '#wachtStrook', { weg: true });
     const eind = await rapport();
     assert.equal(eind.bonnen, 2, 'de herhaling levert GEEN derde bon op');
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 0, 'en de wachtrij is leeg');
@@ -172,7 +188,10 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     const knopW = await page.$('.art');
     await knopW.click();
     await page.click('#payContant');
-    await page.waitForTimeout(500);
+    /* Een weigering komt NIET in de strook (hij gaat de rij niet in), dus het enige
+       teken is de reden van de server in #uitkomst -- precies wat de assertie
+       hieronder leest. #bonLeeg heeft dat veld daarvoor leeggemaakt. */
+    await wachtOpTekst(page, /afgesloten voor vandaag/, { in: '#uitkomst' });
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 0,
       'een geweigerde bon komt niet in de wachtrij terecht');
     const weigerUit = await page.evaluate(() => document.getElementById('uitkomst').innerText);
@@ -185,14 +204,14 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     const knopP = await page.$('.art');
     await knopP.click();
     await page.click('#payContant');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /1 bon wacht/, { in: '#wachtStrook' });
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1,
       'een 503 van de poort laat de bon wachten');
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.vastgelopen().length), 0,
       'en loopt hem niet vast');
     stand = 'door';
     await page.click('#wachtNu');
-    await page.waitForTimeout(900);
+    await wachtOpZichtbaar(page, '#wachtStrook', { weg: true });
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 0, 'na de poort gaat hij alsnog weg');
     assert.equal((await rapport()).bonnen, 3, 'en telt dan als EEN bon');
 
@@ -200,12 +219,15 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     const knop3 = await page.$('.art');
     await knop3.click();
     await page.click('#payContant');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /1 bon wacht/, { in: '#wachtStrook' });
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1, 'de bon wacht weer');
 
     stand = 'weiger';
     await page.click('#wachtNu');
-    await page.waitForTimeout(900);
+    /* Hier wordt de strook NIET leeg: de bon verhuist van de rij naar de
+       vastgelopen bonnen, en dat is juist de bewering. Dus wachten op de tekst die
+       daarbij hoort en niet op het verdwijnen van de strook. */
+    await wachtOpTekst(page, /1 vastgelopen/, { in: '#wachtStrook' });
     const eindstand = await page.evaluate(() => ({
       rij: RTGKassaWachtrij.rij().length, vast: RTGKassaWachtrij.vastgelopen().length,
       strook: document.getElementById('wachtStrook').innerText
@@ -214,7 +236,7 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
     assert.equal(eindstand.vast, 1, 'maar staat apart als vastgelopen');
     assert.match(eindstand.strook, /1 vastgelopen/, 'en dat staat op het scherm: ' + eindstand.strook);
     await page.click('#wachtVast');
-    await page.waitForTimeout(300);
+    await wachtOpTekst(page, /afgesloten voor vandaag/, { in: '#infoIn' });
     const reden = await page.evaluate(() => document.getElementById('infoIn').innerText);
     assert.match(reden, /afgesloten voor vandaag/, 'met de reden van de server erbij: ' + reden);
     const naWeigering = await rapport();
@@ -226,12 +248,14 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
        boeken van die andere zaak landen. Hier wordt dat nagebootst door de zaak
        op het scherm te verzetten terwijl er nog een bon in de rij staat. */
     await page.click('#infoDicht');   // de dialoog van hierboven staat nog open
-    await page.waitForTimeout(200);
+    /* Een modale dialoog vangt alle kliks af, dus de volgende .art-klik landt pas
+       als hij echt dicht is. Daarop wachten, niet op een geschat aantal ms. */
+    await wachtOpZichtbaar(page, '#dlgInfo', { weg: true });
     stand = 'af';
     const knop5 = await page.$('.art');
     await knop5.click();
     await page.click('#payContant');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /1 bon wacht/, { in: '#wachtStrook' });
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1, 'de bon wacht');
 
     /* De lijn is hier gewoon OPEN (stand 'door'): het enige dat deze bon
@@ -239,7 +263,10 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
        proberen" meer, want er valt niets te proberen -- dat is het punt. */
     stand = 'door';
     await page.evaluate(() => RTGKassaWachtrij.zaak('Een heel andere zaak'));
-    await page.waitForTimeout(900);
+    /* zaak() hertekent de strook: de bon telt niet meer als "wachtend" (dus geen
+       #wachtNu meer) maar als "hoort bij Sal de Mar". Die zin is het bewijs dat de
+       hertekening geweest is; de strook zelf blijft staan om de vastgelopen bon. */
+    await wachtOpTekst(page, /hoort bij Sal de Mar/, { in: '#wachtStrook' });
     assert.equal(await page.$('#wachtNu'), null, 'geen knop om het toch te proberen');
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 1,
       'de bon gaat NIET mee naar de boeken van een andere zaak');
@@ -249,7 +276,13 @@ test('de kassa verliest geen bon zonder lijn en verdubbelt er geen bij het herst
 
     /* En terug bij de eigen zaak gaat hij gewoon alsnog weg. */
     await page.evaluate(() => RTGKassaWachtrij.zaak('Sal de Mar'));
-    await page.waitForTimeout(900);
+    /* Hier helpt de strook niet als teken. zaak() hertekent hem eerst SYNCHROON (de
+       bon telt weer als "wachtend"), dus een wacht op een veranderde strooktekst
+       valt door voordat er iets verstuurd is -- en de strook blijft daarna staan om
+       de vastgelopen bon. De rij zelf is wel eerlijk: de wachtrij haalt een bon er
+       pas uit als de server hem bevestigd heeft. */
+    await wachtTot(page, () => window.RTGKassaWachtrij.rij().length === 0, null,
+      { wat: 'de wachtrij leeg nadat de eigen zaak weer is ingesteld' });
     assert.equal(await page.evaluate(() => RTGKassaWachtrij.rij().length), 0, 'bij de eigen zaak gaat hij alsnog weg');
     assert.equal((await rapport()).bonnen, 4, 'en telt dan als EEN bon');
 

@@ -1634,6 +1634,13 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "geldgrens.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "geldregie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4065,6 +4072,13 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "paybudget.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "payroll-aangifte.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4172,6 +4186,20 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "payterug.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
+    "payvooraf.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "pda-aanmelden.test.js": {
@@ -6036,6 +6064,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "terugstortstand.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "theater-thuis.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6166,6 +6201,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "treasury.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
       "scherp": "gezakt"
     },
     "trio-kleef.test.js": {
@@ -6555,6 +6597,20 @@
         "server/kern/events.js"
       ],
       "posities": 1
+    },
+    "waarde.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 14,
+      "scherp": "gezakt"
+    },
+    "waardegraaf.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "wacht.test.js": {
       "soort": "puur",

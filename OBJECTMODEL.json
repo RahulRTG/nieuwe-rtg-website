@@ -2,23 +2,21 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-25",
   "gemeten": {
-    "bestanden": 1503,
-    "vormen": 1160,
-    "velden": 1700,
-    "modules": 595,
-    "domeinen": 216,
-    "envelopDrempel": 13,
-    "envelop": 35,
-    "veldenDomeineigen": 1206,
-    "veldenGedeeldVanafVier": 157,
-    "gelijkendeVormparen": 16
+    "bestanden": 1525,
+    "vormen": 1169,
+    "velden": 1704,
+    "modules": 602,
+    "domeinen": 217,
+    "envelopDrempel": 14,
+    "envelop": 31,
+    "veldenDomeineigen": 1208,
+    "veldenGedeeldVanafVier": 161,
+    "gelijkendeVormparen": 17
   },
   "envelop": [
     "aantal",
     "at",
-    "bedrag",
     "bron",
-    "categorie",
     "centen",
     "code",
     "codenaam",
@@ -39,18 +37,76 @@
     "sinds",
     "soort",
     "status",
-    "supplierCode",
     "tekst",
     "tijd",
     "titel",
     "tot",
-    "type",
     "uitleg",
     "van",
     "wat",
     "wie"
   ],
   "gedeeld": [
+    {
+      "veld": "type",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/antivirus",
+        "kern/command",
+        "kern/instant-reality",
+        "kern/magnaat-werkroutefabriek",
+        "kern/magnaatwereld"
+      ]
+    },
+    {
+      "veld": "categorie",
+      "domeinen": 13,
+      "waar": [
+        "kern/appbieb",
+        "kern/appstore",
+        "kern/command",
+        "kern/geloofbieb",
+        "kern/groothandel",
+        "kern/magnaat-partnerstudio-bedrijf"
+      ]
+    },
+    {
+      "veld": "supplierCode",
+      "domeinen": 13,
+      "waar": [
+        "kern/autoverkoop",
+        "kern/beveiliging",
+        "kern/comm",
+        "kern/ervaring",
+        "kern/gastzorg",
+        "kern/gemeente"
+      ]
+    },
+    {
+      "veld": "bedrag",
+      "domeinen": 13,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/gemeente",
+        "kern/koppel",
+        "kern/labfonds",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "doel",
+      "domeinen": 12,
+      "waar": [
+        "kern/appstore",
+        "kern/defensie",
+        "kern/labfonds",
+        "kern/magnaat-trainingslobby",
+        "kern/pay",
+        "kern/rtfclubs"
+      ]
+    },
     {
       "veld": "stand",
       "domeinen": 12,
@@ -145,18 +201,6 @@
         "kern/leren",
         "kern/livinglab",
         "kern/rtfclubs"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 10,
-      "waar": [
-        "kern/appstore",
-        "kern/defensie",
-        "kern/labfonds",
-        "kern/magnaat-trainingslobby",
-        "kern/rtfclubs",
-        "kern/rtfos"
       ]
     },
     {
@@ -256,6 +300,18 @@
       ]
     },
     {
+      "veld": "ok",
+      "domeinen": 10,
+      "waar": [
+        "kern/koppel",
+        "kern/leren",
+        "kern/mailaanname",
+        "kern/mailsleutel",
+        "kern/mailwachtrij",
+        "kern/ontmoeting"
+      ]
+    },
+    {
       "veld": "vervalt",
       "domeinen": 9,
       "waar": [
@@ -349,18 +405,6 @@
         "kern/livinglab",
         "kern/office",
         "kern/overheid"
-      ]
-    },
-    {
-      "veld": "ok",
-      "domeinen": 9,
-      "waar": [
-        "kern/koppel",
-        "kern/leren",
-        "kern/mailaanname",
-        "kern/mailsleutel",
-        "kern/mailwachtrij",
-        "kern/ontmoeting"
       ]
     },
     {
@@ -482,54 +526,6 @@
         "kern/stadsweefsel",
         "kern/thuis"
       ]
-    },
-    {
-      "veld": "plek",
-      "domeinen": 7,
-      "waar": [
-        "kern/afdelingen",
-        "kern/agenda-pro",
-        "kern/hulpdienst",
-        "kern/mall",
-        "kern/rtfos",
-        "kern/veiligheid"
-      ]
-    },
-    {
-      "veld": "detail",
-      "domeinen": 7,
-      "waar": [
-        "kern/afdelingen",
-        "kern/bureau",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-partnerstudio-basis",
-        "kern/magnaat-trainingslobby"
-      ]
-    },
-    {
-      "veld": "kamer",
-      "domeinen": 7,
-      "waar": [
-        "kern/afdelingen",
-        "kern/bureau",
-        "kern/gast",
-        "kern/homemerken",
-        "kern/levensgraaf",
-        "kern/magnaat-trainingslobby-regie"
-      ]
-    },
-    {
-      "veld": "waar",
-      "domeinen": 7,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/antivirus",
-        "kern/assets",
-        "kern/bureau",
-        "kern/hoteldorp"
-      ]
     }
   ],
   "paren": [
@@ -546,6 +542,7 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
+        "type",
         "veld"
       ]
     },
@@ -573,6 +570,7 @@
         "max",
         "min",
         "placeholder",
+        "type",
         "verplicht"
       ]
     },
@@ -586,11 +584,12 @@
         "lk",
         "lt",
         "rk",
-        "rt"
+        "rt",
+        "type"
       ]
     },
     {
-      "gelijkenis": 0.88,
+      "gelijkenis": 0.89,
       "a": "server/kern/command/runbookcatalogus.js",
       "b": "server/kern/zaakcommand/runbooks.js",
       "domeinA": "kern/command",
@@ -602,7 +601,22 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
+        "type",
         "veld"
+      ]
+    },
+    {
+      "gelijkenis": 0.83,
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
+      "gedeeld": [
+        "max",
+        "min",
+        "placeholder",
+        "type",
+        "verplicht"
       ]
     },
     {
@@ -621,24 +635,12 @@
     },
     {
       "gelijkenis": 0.8,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
-      "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "verplicht"
-      ]
-    },
-    {
-      "gelijkenis": 0.78,
       "a": "server/kern/mall/demozaken.js",
       "b": "server/kern/retail/vloer.js",
       "domeinA": "kern/mall",
       "domeinB": "kern/retail",
       "gedeeld": [
+        "categorie",
         "drop",
         "foto",
         "materiaal",
@@ -768,6 +770,20 @@
         "lijstprijs",
         "opties",
         "stand"
+      ]
+    },
+    {
+      "gelijkenis": 0.63,
+      "a": "server/kern/geloofbieb.js",
+      "b": "server/kern/reisbieb/index.js",
+      "domeinA": "kern/geloofbieb",
+      "domeinB": "kern/reisbieb",
+      "gedeeld": [
+        "categorie",
+        "categorieLabel",
+        "gratis",
+        "nr",
+        "prijsCenten"
       ]
     }
   ]

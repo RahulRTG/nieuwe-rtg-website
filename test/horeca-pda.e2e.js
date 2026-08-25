@@ -172,11 +172,31 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
        Een belofte die op een persoonlijke controle wacht, staat met naam en al
        op de kaart -- een host die eerst een ander scherm moet openen om te zien
        WELKE belofte wacht, heeft geen werklijst maar een verwijzing. */
+    /* DE DATUM KOMT UIT DEZELFDE KLOK ALS DE TIJD, en dat is geen netheid.
+
+       Hier stond `datum: new Date().toISOString().slice(0, 10)` -- de datum van
+       NU -- naast een tijd van twee uur later. Draait deze toets na tienen 's
+       avonds, dan wijst die tijd naar de volgende dag terwijl de datum op
+       vandaag blijft staan: de aankomst wordt tweeentwintig uur in het VERLEDEN
+       geboekt en staat dus terecht niet op de lijst van de host. De toets zakte
+       dan met "de aankomst staat op de lijst van de host", een melding die naar
+       de hostkaart wijst terwijl er niets mis is met de hostkaart.
+
+       Zo is hij op 24 augustus 2026 om 23:1x op CI gezakt; de runs van 19:00 en
+       20:00 diezelfde avond waren groen. Een toets die tussen tien uur en
+       middernacht altijd zakt en de rest van de dag nooit, is geen flake maar
+       een klok (LAT.md regel 1: repareer de oorzaak).
+
+       Beide waarden komen nu uit `tijd`, en allebei uit de LOKALE tijd -- niet
+       toISOString(), want die is UTC en zou in een tijdzone met een offset
+       precies dezelfde scheefheid terugbrengen die we hier weghalen. */
     const tijd = new Date(Date.now() + 2 * 3600000);
-    const hh = String(tijd.getHours()).padStart(2, '0') + ':' + String(tijd.getMinutes()).padStart(2, '0');
+    const tweeCijfers = (n) => String(n).padStart(2, '0');
+    const hh = tweeCijfers(tijd.getHours()) + ':' + tweeCijfers(tijd.getMinutes());
+    const datum = tijd.getFullYear() + '-' + tweeCijfers(tijd.getMonth() + 1) + '-' + tweeCijfers(tijd.getDate());
     const pass = (await post(base, '/api/arrival/request', {
       requestToken: 'pdahostaanvraagcode1234.geheimgeheimgeheim1234ab',
-      supplierCode: 'KIKUNOI', naam: 'Aankomst', datum: new Date().toISOString().slice(0, 10),
+      supplierCode: 'KIKUNOI', naam: 'Aankomst', datum,
       tijd: hh, personen: 2, allergie: true })).body.pass;
     assert.ok(pass, 'de aankomst is aangevraagd');
 

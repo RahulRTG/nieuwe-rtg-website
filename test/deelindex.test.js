@@ -19,7 +19,7 @@ const WORTEL = path.join(__dirname, '..');
 test('BUNDELS.md is gelijk aan wat de delen vandaag zeggen', () => {
   const opSchijf = fs.readFileSync(path.join(WORTEL, 'BUNDELS.md'), 'utf8');
   assert.equal(opSchijf, bouw(),
-    'BUNDELS.md loopt achter op de delen -- draai: node scripts/deelindex.js');
+    'BUNDELS.md loopt achter op de delen -- draai: npm run deelindex');
 });
 
 test('de index noemt elk deel van elke bundel', () => {

@@ -172,25 +172,19 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
        Een belofte die op een persoonlijke controle wacht, staat met naam en al
        op de kaart -- een host die eerst een ander scherm moet openen om te zien
        WELKE belofte wacht, heeft geen werklijst maar een verwijzing. */
-    /* DE DATUM KOMT UIT HETZELFDE MOMENT ALS DE TIJD, en dat is geen netheid.
-       Hier stond `datum: new Date().toISOString().slice(0, 10)` naast een tijd van
-       nu PLUS TWEE UUR. Draait deze toets na 22:00, dan wijst die tijd naar morgen
-       terwijl de datum vandaag blijft: de aankomst wordt dan aangevraagd voor
-       vandaag om 00:51, bijna een dag in het verleden, en staat dus niet op de
-       lijst van de host. Geen flakiness maar een val die elke dag twee uur lang
-       openstaat -- op 24 augustus 22:51 UTC ging hij af op de CI, en om 22:53 was
-       hij lokaal precies zo na te spelen.
-
-       Ook getHours() en toISOString() liepen niet gelijk: de eerste is lokale
-       tijd, de tweede UTC. Op een runner in UTC valt dat samen en elders niet.
-       Eén moment, en beide velden daaruit. */
+    /* Datum EN tijd komen uit hetzelfde moment. Nemen we de tijd van de klok
+       (die over middernacht rolt) en de datum van vandaag (die dat niet doet),
+       dan wijst dat paar tussen 22:00 en 24:00 uur 22 uur TERUG -- de route
+       laat dat door (alleen `datum < vandaag()` wordt gekeurd), zet vervaltAt
+       op aankomst + 12 uur, en dan gooit de werklijst de aankomst weg omdat
+       hij verlopen is. Deze toets zakte daardoor elke avond na tienen. */
     const tijd = new Date(Date.now() + 2 * 3600000);
-    const twee = (n) => String(n).padStart(2, '0');
-    const hh = twee(tijd.getHours()) + ':' + twee(tijd.getMinutes());
-    const datum = tijd.getFullYear() + '-' + twee(tijd.getMonth() + 1) + '-' + twee(tijd.getDate());
+    const hh = String(tijd.getHours()).padStart(2, '0') + ':' + String(tijd.getMinutes()).padStart(2, '0');
+    const dag = tijd.getFullYear() + '-' + String(tijd.getMonth() + 1).padStart(2, '0') +
+      '-' + String(tijd.getDate()).padStart(2, '0');
     const pass = (await post(base, '/api/arrival/request', {
       requestToken: 'pdahostaanvraagcode1234.geheimgeheimgeheim1234ab',
-      supplierCode: 'KIKUNOI', naam: 'Aankomst', datum,
+      supplierCode: 'KIKUNOI', naam: 'Aankomst', datum: dag,
       tijd: hh, personen: 2, allergie: true })).body.pass;
     assert.ok(pass, 'de aankomst is aangevraagd');
 

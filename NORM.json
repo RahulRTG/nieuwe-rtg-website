@@ -21,11 +21,11 @@
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4905,
     "browserpoortToetsen": 206,
-    "kernBreedte": 1418,
+    "kernBreedte": 1421,
     "kernGedeeld": 194,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 158,
+    "toetsenNietGemeten": 165,
     "toetsenOngevoeligPct": 1.1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -34,6 +34,18 @@
     "schermenZonderVormtaal": 184
   },
   "notities": [
+    {
+      "datum": "2026-08-25",
+      "meter": "toetsenNietGemeten 158 -> 165 (de zes App Store-toetsen van main, gemeten NA het vierde samengaan)",
+      "reden": "Zes toetsbestanden waar de mutatiemotor nog niet langs is: appstore.test.js, appstore-cel, appstore-doel, appstore-dossier, appstore-geld en objectmodel.test.js. Alle zes komen van main (PR #114, het derdenkanaal); geen ervan is van deze tak. Nagekeken per bestand: elk staat op origin/main en geen enkele staat in de diff van deze branch.\n\nDe vijf toetsbestanden die deze tak WEL toevoegde (trio-kleef, trio-werkers, spreidingsoordeel, trio-wees, kleef-readyourwrites) zijn stuk voor stuk door de motor gehaald en staan als bewezen gevoelig in MUTATIES.json.",
+      "eerlijkheidshalve": "MAIN ZELF HEEFT DEZE METER OP 173 STAAN, en is daarmee groen. Deze tak had hem op 158 gezet -- strenger dan main -- en de merge nam die strengste waarde over. Op de samengevoegde boom meet hij 165: hoger dan mijn 158 en lager dan main's 173.\n\nIk zet hem op de GEMETEN waarde, 165, en niet op main's 173. Dat is de waarheid van deze boom en blijft acht punten strenger dan wat main hanteert. De alternatieve route -- de motor over die zes bestanden halen -- is uren werk aan andermans toetsen en hoort bij de ronde die ze bouwde, niet bij deze.\n\nWat ik NIET heb gedaan is --vastleggen draaien voor de meters die beter lezen dan hun norm. Die winst komt deels van deze tak en deels van main; hem in een keer op mijn naam wegschrijven zou andermans werk als mijn ratel opschrijven. Dezelfde afweging staat in de notities van main zelf."
+    },
+    {
+      "datum": "2026-08-24",
+      "meter": "kernBreedte 1418 -> 1421 (de App Store, OPNIEUW GEMETEN na het tweede samengaan met main)",
+      "reden": "Het derdenkanaal (kern/appstore/) is een nieuw domein, en een domein met routes kan niet zonder kern-namen bestaan. Het zijn er precies drie -- appstore, appstoreWinkel en appstoreBrug -- en alle drie staan ze in GRENZEN.json onder \"appstore\" en nergens anders, dus geen enkel ander domein kan erbij.\n\nMinder dan drie kan wel, maar niet zonder iets te verliezen. De motor, de winkel en de brug komen als EEN geheel naar buiten omdat de opbouwvolgorde anders fout te doen is (kern/appstore/index.js), en ze onder een naam hangen zou de domeingrens vervagen: de brug is de enige laag die code van een derde aanraakt, en die hoort apart benoembaar te blijven. Twee namen inleveren om een teller te sparen is precies de ruil die deze meter juist moet voorkomen.\n\nOPNIEUW GEMETEN. Deze notitie rekende eerst tegen 1416; main verzette de basislijn intussen naar 1418 (het zegel van de veilige noodstand, de notitie hieronder). Van de 1421 zijn er dus drie van deze tak, en dat blijven dezelfde drie namen. Mijn eerdere getal is vervallen; dit is het enige dat telt.",
+      "eerlijkheidshalve": "VIER van de vijf rode meters zijn GEREPAREERD en niet opgerekt; alleen deze is opgehoogd.\n\ninlineStijlAttributen stond op 5035 tegen een norm van 4905: 129 inline stijlattributen uit mijn eigen App Store-schermen. Die zijn klassen geworden (mall.html 63, appstore-uitgever.html 41, appstore-kantoor.html 18, appcel.html 3, appstore-dossier.html 4) plus een pil-link in backoffice.html. De meter staat weer exact op 4905. Dat opruimen hoort juist hier: een pagina die zijn eigen CSP oprekt terwijl hij een sandbox verkoopt, spreekt zichzelf tegen.\n\nschermenZonderVormtaal stond op 188 tegen 184: mijn vier nieuwe app-pagina's sloten rtg-ontwerp.css niet in. Nu wel, dus terug op 184.\n\nkeuringOmvang stond op 172 tegen 169: drie bestanden in de 9,4-10,24 kB-band. Alle drie zijn ze langs een echte naad gesplitst en niet om een getal. kern/appstore/index.js (10099 bytes, 141 van de harde grens) gaf de uitgeverskant af aan kern/appstore/uitgevers.js -- \"wie mag hier publiceren\" is een andere vraag dan \"welke versie draait er\". kern/appstore/brug.js (9851) gaf de LEES-kant van de bakjes af aan kern/appstore/bakjes.js, langs de naad die daar al als alinea stond: een app schrijft een bericht via de brug maar mag nooit zien of het gelezen is. En kern/magnaat-kantoorregels.js (9757) is niet gesplitst maar had een te lange toelichting van mij; die is ingekort tot 9298.\n\nkeuringDubbeling stond op 122 tegen 121, door de naam \"intrekken\" in drie kernmodules. Het advies van de keuring zelf is \"geef ze een eigen naam zodat de gelijkenis niet misleidt\", en dat was hier geen formaliteit: er stonden twee functies \"intrekken\" in hetzelfde subsysteem waarvan er een de helft doet. Ze heten nu intrekkenKaal (haalt de code eruit) en intrekkenMetGevolgen (doet dat EN zet de teruggaverechten klaar EN schrijft in de tijdlijn van iedereen die de app had). Naar buiten heet de tweede gewoon `intrekken`. Het hernoemen legde meteen een echte fout bloot: hercontrole() riep de oude naam aan.\n\nNa het tweede samengaan met main is dit opnieuw gemeten: van de vijf rode meters is alleen kernBreedte nog rood, dus alle vier de reparaties houden stand op de samengevoegde boom.\n\nEr is bewust geen --vastleggen gedraaid. Vier meters staan beter dan hun norm (dekkingPct 73, testbestanden 946, browserpoortToetsen 209, e2eBestanden 137) en die winst komt deels van main; hem nu op naam van deze tak vastzetten zou andermans werk als mijn ratel opschrijven."
+    },
     {
       "datum": "2026-08-24",
       "meter": "kernBreedte 1416 -> 1418; kernGedeeld 193 -> 194 (het zegel van de veilige noodstand, OPNIEUW GEMETEN na het samengaan met main)",

@@ -774,6 +774,22 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
     ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    /* Een app kopen in de App Store. Er STAAT een derde tegenover -- de uitgever
+       -- en toch hoort deze route niet langs de gegevenspoort, en dat is een
+       besluit met een reden.
+
+       De poort bestaat zodat een derde je kan BEREIKEN als er iets misgaat met
+       je tafel of je bestelling. Hier is er niets om over te bellen: er komt
+       niemand langs, er wordt niets bezorgd, en de uitgever krijgt van deze
+       aanschaf niet meer te zien dan een aantal en een bedrag -- APPSTORE.md
+       grens 3 verbiedt hem zelfs de codenaam. Een telefoonnummer eisen zou dus
+       een gegeven vragen dat NIEMAND leest, en dat is precies de drempel die
+       kern/gegevenspoort.js in zijn kop verbiedt.
+
+       Wat deze route WEL vraagt staat er trouwens vlak boven: het land van het
+       lid (voor de btw) en, bij een echt account, de paspoortpoort van RTG Pay.
+       Er wordt hier dus niet minder gevraagd, er wordt iets ANDERS gevraagd. */
+    ['/api/appstore/koop', 'de uitgever krijgt geen naam, geen nummer en zelfs geen codenaam; er is niets om over te bereiken. Wat hier wel wordt gevraagd -- het land voor de btw en de paspoortpoort van RTG Pay -- staat in routes/appstore/kopen.js'],
     /* Een pot is een OORMERK binnen het eigen tegoed en geen reservering bij
        iemand: er beweegt geen geld en er staat geen partij tegenover (GELD.md
        par. 3). Het woord "reserveer" is hier de valse vriend. Deze route werd
@@ -2550,22 +2566,41 @@ console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door
        een <iframe> in een string tellen: een iframe in een stijlblad
        (`#split iframe{...}`) maakt niets. Een statisch <iframe>-element in de
        markup mag ook zijn eigen allow= dragen -- dat is dezelfde doorgifte,
-       alleen met de hand. */
-    let kaderloos = 0, kaders = 0;
+       alleen met de hand.
+
+       EN ER IS EEN OMGEKEERD BESLUIT, dat sinds de App Store bestaat. Een kader
+       met een LEEG allow geeft bewust NIETS door: geen camera, geen microfoon.
+       Dat is precies wat de cel van een app van derden nodig heeft -- die
+       rechten heeft een lid nooit verleend en de machtigingencatalogus kent ze
+       niet eens (APPSTORE.md, grens 1). Zo'n kader hier laten zakken zou de
+       enige uitweg RTGMedia.kader() maken, en dat is de verkeerde: dan krijgt
+       derdencode juist wel camera en microfoon.
+
+       `maakt` telt in dat ene geval niet mee, en dat is geen slordigheid maar
+       een grens van de heuristiek: in een .html-bestand is "een <iframe> in een
+       string" niet te onderscheiden van gewone markup -- elk aanhalingsteken
+       eerder op de pagina maakt hem waar. createElement telt wel: wie een kader
+       BOUWT, zegt zelf wat het meekrijgt. Gemeten toen deze regel erbij kwam:
+       in de hele public/ draagt precies een bestand een leeg allow. */
+    let kaderloos = 0, kaders = 0, leegBesluit = 0;
     for (const f of bronnen) {
       if (bundelPaden.has(web(f))) continue;
       const s = zonderCommentaar(lees(f));
-      const maakt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s) || /['"`][^'"`]*<iframe\b/.test(s);
+      const bouwt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s);
+      const maakt = bouwt || /['"`][^'"`]*<iframe\b/.test(s);
       const statisch = /^\s*<iframe\b/m.test(s) || />\s*<iframe\b/.test(s);
       if (!maakt && !statisch) continue;
       kaders++;
       if (/RTGMedia\.kader\s*\(/.test(s)) continue;
       // een statisch kader met eigen allow= is ook doorgifte
       if (statisch && !maakt && /<iframe\b[^>]*\ballow=/.test(s)) continue;
+      // en een statisch kader met een LEEG allow is het omgekeerde besluit
+      if (statisch && !bouwt && /<iframe\b[^>]*\ballow=""/.test(s)) { leegBesluit++; continue; }
       kaderloos++;
       fout(web(f) + ' maakt een iframe zonder RTGMedia.kader(); camera en microfoon vallen daarin stil weg');
     }
-    if (!kaderloos) ok(kaders + ' plekken maken een kader, en alle ' + kaders + ' geven het recht door');
+    if (!kaderloos) ok(kaders + ' plekken maken een kader; ' + (kaders - leegBesluit) + ' geven het recht door en ' +
+      leegBesluit + ' geven bewust niets door (leeg allow)');
 
     /* 38c) een pagina die RTGMedia gebruikt, laadt shared/media.js ook. Net als
        regel 37: het gebruik kan in de pagina zelf staan of in een script (of

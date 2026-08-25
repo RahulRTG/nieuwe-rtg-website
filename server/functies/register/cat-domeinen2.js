@@ -43,6 +43,26 @@ module.exports = [
   // ---------- winkel, media en opslag ----------
   { id: 'dom-mall', categorie: 'Winkel en media', naam: 'De Mall', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'De etages en de gids met alle partners.', paden: ['/api/mall'] },
+  /* HET DERDENKANAAL STAAT ALS TWEE SCHAKELAARS IN DE KAST, om dezelfde reden
+     als het Living Lab hierboven: de winkelkant en de uitgeverskant zijn echt
+     verschillende deuren, met verschillende mensen erachter.
+
+     Gaat de WINKEL dicht, dan kan een lid geen app van derden meer openen,
+     kopen of machtigen -- maar een uitgever kan wel blijven inzenden en RTG kan
+     blijven keuren, zodat er iets klaarstaat als de deur weer open gaat. Gaat
+     de UITGEVERSKANT dicht, dan komt er niets meer binnen terwijl alles wat al
+     is toegelaten gewoon blijft werken. Een schakelaar over allebei had die
+     keuze onmogelijk gemaakt, en juist bij code van een DERDE wil je hem
+     hebben: dit is de enige laag in dit huis waar de code niet van ons is.
+
+     Ze staan hier en niet alleen in de aanbouw omdat dit een besluit van de
+     boardroom hoort te zijn en geen wijziging in een bestand. Een geldstroom
+     zonder noodknop is precies wat het Controleregister eruit hoort te halen --
+     en dat deed het ook: deze twee vullen het laatste economie-gat. */
+  { id: 'dom-appstore', categorie: 'Winkel en media', naam: 'App Store (apps van derden)', standaard: true, doelgroepen: LEDEN_GAST,
+    uitleg: 'De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel. Zet dit uit en er draait geen enkele app van een derde meer; wat al is toegelaten blijft staan.', paden: ['/api/appstore'] },
+  { id: 'dom-appstore-uitgever', categorie: 'Winkel en media', naam: 'App Store: inzenden door uitgevers', standaard: true, doelgroepen: ALLE,
+    uitleg: 'De uitgeverskant: een organisatie vraagt een uitgeversplek aan en zendt een app in. Zet dit uit en er komt niets nieuws binnen, terwijl de winkel gewoon doorloopt.', paden: ['/api/appstore/uitgever'] },
   { id: 'dom-bestanden', categorie: 'Winkel en media', naam: 'Bestanden (kluis)', standaard: true, doelgroepen: LEDEN_RTF,
     uitleg: 'De persoonlijke bestandenkluis.', paden: ['/api/bestanden'] },
   { id: 'dom-notities', categorie: 'Winkel en media', naam: 'Notities', standaard: true, doelgroepen: LEDEN_RTF,

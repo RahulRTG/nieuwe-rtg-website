@@ -843,6 +843,76 @@ Standaard staan database, sleutels en uploads in `server/data`. Met
 op productie los van de app-schijf te zetten (bijvoorbeeld op een aparte
 volume of secrets-mount) en om tests te isoleren.
 
+## Spreiding: het trio laten meewerken (RTG_SPREIDING)
+
+Standaard neemt precies één van de drie servers verkeer aan en staan de andere
+twee stand-by. Dat is een failover-opstelling, geen schaalopstelling. Met
+`RTG_SPREIDING=1` nemen alle gezonde servers verkeer aan:
+
+```bash
+RTG_SPREIDING=1 REDIS_URL=redis://127.0.0.1:6379 npm start
+```
+
+Elke server heeft dan een **rol**: `leider` (schrijft, neemt verkeer aan, en doet
+het werk dat per installatie één keer hoort te gebeuren — de backup, de
+zelfzorgautomaat, het routinewerk van de RTG-AI), `volger` (schrijft en neemt
+verkeer aan, verder niets) of `uit` (stand-by). Zonder de schakelaar bestaat
+`volger` niet en is alles precies zoals het was.
+
+**Kleefroutering.** Een lid gaat steeds naar hetzelfde proces, gekozen op zijn
+token (`server/trio-kleef.js`). Dat is geen optimalisatie maar de voorwaarde:
+zonder kleven bewaart een lid een notitie op proces A, vraagt zijn lijst op bij
+proces B en ziet zijn eigen notitie niet staan — gemeten mediaan 733 ms op
+SQLite en 139–141 ms op Postgres (`docs/meerkernig.md`). De keuze gebruikt
+rendezvous-hashing en geen modulo, zodat bij het wegvallen van een server alleen
+de leden van díé server verhuizen en de rest blijft staan.
+
+**`REDIS_URL` is verplicht.** Sessies wonen in een `Map` per proces en worden
+over de bus gedeeld; zonder Redis is die bus in-proces. Het inloggen heeft nog
+geen token en gaat naar de leider, het volgende verzoek kleeft aan een ander
+proces dat de sessie niet kent — 401, voor iedereen. Vraagt u spreiding zonder
+`REDIS_URL`, dan zet de poortwachter hem **niet** aan en zegt in het logboek
+waarom.
+
+De failover verandert niet: valt een server weg, dan gaat zijn verkeer naar de
+overgebleven servers en neemt zo nodig een ander het leiderschap over.
+
+## Meer voordeurprocessen (RTG_POORTWACHTERS)
+
+Met spreiding aan namen alle drie de servers verkeer aan, maar de doorvoer bewoog
+1,4%. De rekentijd per proces zei waarom: de poortwachter zat op 90% van één kern
+terwijl de servers op ongeveer de helft stonden en de machine 2,33 van vier
+kernen gebruikte. Niet de opslag, niet de servers, niet de machine — de voordeur
+zelf, want die buffert per verzoek het lichaam, kopieert de koppen en opent een
+tweede socket, allemaal op één event-loop.
+
+```bash
+RTG_POORTWACHTERS=2 RTG_SPREIDING=1 REDIS_URL=redis://127.0.0.1:6379 npm start
+```
+
+Dit proces wordt dan de **hoofd**: het start en bewaakt de drie servers, kiest de
+leider en de meelopers, en neemt zélf geen verkeer meer aan — waardoor zijn
+event-loop juist vrij blijft voor de hartslag. Daarnaast komen er N **werkers**
+die op dezelfde poort luisteren met `SO_REUSEPORT`; de kernel verdeelt de
+verbindingen. Elke werker doet de kleefkeuze zelf: die is puur en heeft geen
+overleg nodig, dus drie voordeuren sturen hetzelfde lid naar dezelfde server
+zonder iets af te stemmen.
+
+Gemeten met drie clients: 7.282/s met één voordeur, **9.399/s met twee** (+29%,
+p50 van 8,62 naar 6,18 ms), 9.596/s met drie. Boven de twee is deze machine op —
+tien processen op vier kernen.
+
+**Wat een werker niet mag:** rollen zetten. Promoveren, degraderen en het kiezen
+van een leider blijft bij de hoofd; twee processen die dat allebei mogen, doen
+het ooit tegelijk en dan maken er twee de backup. Ziet een werker een server
+omvallen, dan meldt hij dat en kiest hij lokaal meteen een andere.
+
+**Met `RTG_LOKAAL_TLS` gaat het niet**, en dat zegt de poortwachter ook: elk
+proces geeft bij het starten zijn eigen certificaat uit, dus een telefoon zou per
+verbinding een ander certificaat van dezelfde site zien. Zet TLS er dan vóór
+(reverse proxy). Zonder `RTG_POORTWACHTERS` verandert er niets: de voordeur
+luistert zelf, precies zoals altijd.
+
 ## Noodserver (tweede adres, andere machine)
 
 Naast de drie hoofdservers met poortwachter (`npm start`) is er een losse

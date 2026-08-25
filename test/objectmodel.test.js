@@ -137,7 +137,7 @@ test('7. OBJECTMODEL.json is een AFDRUK van de meting en geen los verhaal', () =
   const vast = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'OBJECTMODEL.json'), 'utf8'));
   const vers = O.meet();
   assert.deepEqual(vast.gemeten, vers.gemeten,
-    'OBJECTMODEL.json loopt achter op de code -- draai: node scripts/objectmodel.js --vastleggen');
+    'OBJECTMODEL.json loopt achter op de code -- draai: npm run objectmodel:vast');
   assert.deepEqual(vast.envelop, vers.envelop);
 });
 

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1096 bestanden en 7322 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1103 bestanden en 7386 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1096 |
-| losse beweringen (`test(...)`) | 7322 |
+| toetsbestanden | 1103 |
+| losse beweringen (`test(...)`) | 7386 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 920 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 18 |
-| niets van beide | 110 |
+| niets van beide | 117 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-958 bestanden, 7090 beweringen.
+964 bestanden, 7151 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -69,6 +69,11 @@ toets omvalt.
 | `api-contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracttests: leggen de VORM (velden + types) van de belangrijkste API- antwoorden vast, los van de flow-tests. Zo kan een refactor of herindeling niet stilletjes een veld weglaten waar een van de apps op leunt (bijv. |
 | `apipoort.test.js` | 9 | gezakt op `===->!==#0` | De API-poort (kern/command/apipoort.js): sleutels, scopes, quota en contractregels voor koppelingen. WAT DEZE TOETS VOORAL BEWAAKT zijn vier dingen die allemaal onzichtbaar kapot kunnen gaan: 1. |
 | `appbieb.test.js` | 5 | gezakt op `liegpoort /api/` | De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je startscherm. |
+| `appstore-cel.test.js` | 11 | -- | DE CEL EN DE POORT, zonder server: de invarianten die je aan de code zelf kunt zien. Ze staan apart van test/appstore.test.js omdat ze in milliseconden draaien en omdat ze iets ANDERS bewaken: daar gaat het om wat er... |
+| `appstore-doel.test.js` | 8 | -- | HET DOEL BIJ EEN MACHTIGING, EN DE VERGUNNINGSDIFF. Een machtiging zegt WAT een app krijgt; het doel zegt WAARVOOR. |
+| `appstore-dossier.test.js` | 9 | -- | HET INKOOPDOSSIER, DE TIJDLIJN EN DE CONTROLERONDE -- de enterprise-kant. Wat deze toets vastlegt, en waarom elk punt er staat: 1. |
+| `appstore-geld.test.js` | 9 | -- | DE BETAALDE KANT VAN DE APP STORE -- de bon, de aanschaf, de afdracht, de btw en het teruggaverecht. Wat deze toets vastlegt, en waarom elk punt er staat: 1. |
+| `appstore.test.js` | 15 | -- | DE RTG APP STORE -- het derdenkanaal, van aanvraag tot cel. Deze toets legt de zes grenzen uit kern/appstore/index.js vast. |
 | `archief.test.js` | 5 | gezakt op `liegpoort /api/` | De archiefkast: afgeronde tickets ouder dan een afgesloten kwartaal verhuizen naar append-only maandbestanden. De levende kast blijft klein, maar niets raakt zoek: de backoffice-totalen tellen het archief mee en de... |
 | `architect.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Architectenbureau: het huizen-ontwerpbureau van de kantoren (villa's, penthouses, landgoederen, chalets, paviljoens). Een AI tekent het concept uit (typologie, constructie, materialen, gedempt palet,... |
 | `arena.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietests voor De Arena (tieners): het klasgenoten-uitnodigingspad (beschermde tieners zijn onvindbaar via de zoeker, de klas is de bevestigde kring), het Flitsduel (tien dezelfde sommen, buiten de beurt,... |
@@ -241,7 +246,7 @@ toets omvalt.
 | `fout-client.test.js` | 9 | gezakt op `liegpoort /api/` | DE INGANG VOOR BROWSERFOUTEN: POST /api/fout/client WAAROM DEZE TOETS BESTAAT. Dit is het enige spoor van een storing die alleen op het toestel van een gebruiker gebeurt (server/routes/fout.js, gevoed door... |
 | `foutmelder.test.js` | 4 | gezakt op `===->!==` | Eigen externe fout-melder (server/foutmelder.js), die @sentry/node verving. We draaien tegen een lokale nep-webhook en controleren: er gaat een nette JSON-POST uit met de fout + context, dezelfde fout wordt binnen... |
 | `functieplaats.test.js` | 4 | gezakt op `liegpoort /api/` | De plaats-as van de schakelkast: een functie per STAD of DORP dicht. Fijner dan het land, grover dan de persoon. |
-| `functies.test.js` | 13 | geen bruikbare mutatie | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard en de catalogus. Zuiver, geen server nodig. |
+| `functies.test.js` | 14 | geen bruikbare mutatie | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard en de catalogus. Zuiver, geen server nodig. |
 | `galerij.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Galerij: de tijdlijn leest De Salon en RTG Bestanden (geen dubbele opslag), albums zijn verwijzingen en favorieten blijven van het lid. |
 | `gastbezorging.test.js` | 13 | gezakt op `liegpoort /api/` | HET GUEST OS BUITEN DE DEUR: bezorgen en afhalen. Dit is de TWEEDE naad op dezelfde motor, en dat is precies wat dit bestand bewaakt. |
 | `gastfoodcourt.test.js` | 4 | gezakt op `liegpoort /api/` | DE FOODCOURT: één mandje, meer keukens. De vijfde en laatste naad, en de enige die niet over TOEGANG gaat maar over VERDELING. |
@@ -520,6 +525,7 @@ toets omvalt.
 | `notitiesduurzaam.test.js` | 11 | gezakt op `liegpoort /api/` | HET BORD BEVESTIGT NIET WAT DE OPSLAG NOG NIET HEEFT. De ketenronde weerlegde een belofte die niemand had opgeschreven: een notitie werd met 200 bevestigd en was na een herstart weg (KETENS.json, keten NOTITIE,... |
 | `objectlaag.test.js` | 24 | gezakt op `return-weg#0` | De objectlaag (LIFE.md fase 2): niet apps maar objecten -- persoon, groep, event, elk met de caps die er ECHT bij horen. De vier beloften die deze toetsen bewaken: 1. |
 | `objectlaagroutes.test.js` | 12 | gezakt op `liegpoort /api/` | De objectlaag over de echte route en de echte domeinen (LIFE.md fase 2). WAAROM DEZE TOETS NAAST test/objectlaag.test.js STAAT. |
+| `objectmodel.test.js` | 8 | -- | DE METING VAN HET OBJECTMODEL -- en of hij werkelijk iets onderscheidt. scripts/objectmodel.js beantwoordt de vraag uit DEVELOPERCLOUD.md par. |
 | `ochtend.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietests voor het Ochtendritme (RTFoundation-gezin): een persoonlijk ochtendlijstje dat elke dag reset, de zachte weektelling bij een afgeronde ochtend (bewust geen reeks en geen record -- een ketting die je... |
 | `office-bank.test.js` | 8 | gezakt op `liegpoort /api/` | DE BANK VANUIT DE BOARDROOM -- de zwaarste knoppen die er zijn. Tien endpoints die de waargenomen dekkingsmeting als nooit aangeroepen aanwees. |
 | `office-blad.test.js` | 6 | gezakt op `true->false#0` | De rekenmotor van RTG Office. Deze draait in de browser, dus we laden het bestand hier los in en rekenen erop -- zonder server, zonder scherm. |
@@ -998,7 +1004,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-138 bestanden, 232 beweringen.
+139 bestanden, 235 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1006,6 +1012,7 @@ toets omvalt.
 | `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
 | `appmenu.e2e.js` | 6 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 12 | genoemd | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
+| `appstore.e2e.js` | 3 | -- | DE CEL IN EEN ECHTE BROWSER -- het enige bewijs dat telt voor deze laag. test/appstore.test.js bewijst wat de SERVER doet. |
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |
 | `bankscherm.e2e.js` | 3 | -- | Scherm-toets op de bank: legt een toets de weg van deze app werkelijk af? WAAROM JUIST DEZE APP EERST scripts/schermen.js telde 105 van de 188 schermen waar geen enkele toets de weg aflegt -- ze worden wel geopend... |
 | `berichten.e2e.js` | 1 | -- | Scherm-test voor de communicatie-app. De unit-toetsen (test/berichten.test.js, test/comm-dm.test.js) bewijzen de server-kant; deze bewijst dat de APP het ook echt doet in een browser: de lijst komt op, een gesprek... |
@@ -1035,7 +1042,7 @@ toets omvalt.
 | `galerij.e2e.js` | 1 | -- | Scherm-test voor RTG Galerij: de tijdlijn met beelden uit twee bronnen (De Salon en RTG Bestanden), de kijker met favoriet, en een album bouwen. Draait alleen waar een browser beschikbaar is. |
 | `gastscherm.e2e.js` | 1 | -- | Het gastscherm is de publieke QR-ingang aan tafel en op de kamer. Zonder code hoort het niet leeg of technisch te ogen: het legt uit wat iemand moet doen, zonder alsnog een leden- of leveranciersdeur te tonen. |
 | `gedachten-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/gedachten.html. Het punt dat hier op het scherm zelf moet kloppen: bij een zin waar de crisisregel op aanslaat blijft de notitie STAAN en komt de hulp ernaast. |
-| `geld.e2e.js` | 1 | -- | Scherm-test voor RTG Geld als ECHTE app: tien standen in een schil (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
+| `geld.e2e.js` | 1 | -- | Scherm-test voor RTG Geld als ECHTE app: elf standen in een schil (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
 | `genootschap.e2e.js` | 1 | -- | Scherm-test voor Genootschap. De unit-toetsen (test/genootschap.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: oprichten, een bijeenkomst uitroepen en beantwoorden, en een peiling waarvan de... |
 | `gereedschap.e2e.js` | 1 | -- | Scherm-test voor RTG Gereedschap: rekenen met de toetsen (btw erbij), een wekker en een timer zetten (de server telt), en het alarmscherm dat op het SSE-seintje opent. Draait alleen waar een browser is. |
 | `gpsschakelaar.e2e.js` | 1 | -- | Scherm-test voor de GPS-schakelaar van het OS-menu (rtg_os_gps). De schakelaar bestond, maar geen enkele locatie-aanroep las hem: wie hem op "uit" zette werd alsnog om de twintig seconden om een positie gevraagd (de... |

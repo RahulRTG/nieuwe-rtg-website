@@ -109,10 +109,15 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      vooraf betalen erlangs (een betaling kan sinds er budgetten bestaan uit
      meerdere potjes komen) en zetten via ./treasury meteen apart. ./vooraf
      staat naast ./kassa en niet erin: kassa kent EEN afrekenmoment, vooraf
-     kent er twee met tijd ertussen. */
+     kent er twee met tijd ertussen.
+
+     ./verkoop staat NA ./kassa en dat is de volgorde van main: een lid koopt
+     van een partner en wat eraf moet -- btw, een afdracht -- volgt als eigen
+     regel in hetzelfde grootboek. Apart van kassa omdat de teruggang erin zit
+     en kassa.js daar met opzet anders mee omgaat. */
   // in de CTX: waar de rest op leunt. Op de API: wat naar buiten gaat.
   for (const naam of ['samen', 'treasury']) Object.assign(ctx, require('./' + naam)(ctx));
-  for (const naam of ['verzoeken', 'kassa', 'vooraf', 'budget', 'graaf', 'bewijs', 'terug']) Object.assign(api, require('./' + naam)(ctx));
+  for (const naam of ['verzoeken', 'kassa', 'verkoop', 'vooraf', 'budget', 'graaf', 'bewijs', 'terug']) Object.assign(api, require('./' + naam)(ctx));
   for (const k of ['treasuryBeleid', 'treasuryZet', 'treasuryStand', 'treasuryVrij', 'treasuryApart']) api[k] = ctx[k];
   return { pay: api };
 };

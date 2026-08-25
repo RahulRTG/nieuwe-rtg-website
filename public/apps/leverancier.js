@@ -7706,6 +7706,10 @@
       '<div class="card"><div class="tt-h">'+T('bh.more','Verder beheren')+'</div>'+
       '<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--muted);line-height:1.7;">'+T('bh.tips','Menukaart bewerken doet u onder Menu. Tafels onder Tafels. Kamers en prijzen onder Kamers. Personeel en pincodes onder Team.')+'</div></div>'+
       '<div class="card"><div class="tt-h">Magnaat Partnerstudio</div><div class="note-soft">Bouw een veilige digitale tweeling van uw echte bedrijf en train personeel zonder echt geld, klantdata of productieacties.</div><div class="tt-add"><a class="obtn primary" href="/apps/magnaat-partnerstudio.html">Open Partnerstudio</a></div></div>'+
+      /* De App Store, uitgeverskant (APPSTORE.md). Hij staat hier en niet in een
+         eigen tab: uitgeven is iets wat een zaak af en toe doet, en het is geen
+         dagelijkse handeling die een plek in de tabbalk verdient. */
+      '<div class="card"><div class="tt-h">App Store &middot; uitgeven</div><div class="note-soft">Publiceer uw eigen app in de officiele RTG App Store. Uw app draait bij een lid in een afgeschermde cel zonder netwerk; wat hij van het lid mag, kiest het lid zelf. Een mens van RTG keurt elke versie voordat hij verschijnt.</div><div class="tt-add"><a class="obtn primary" href="/apps/appstore-uitgever.html">Open het uitgeversbureau</a></div></div>'+
       '<div class="card"><div class="tt-h">'+T('ug.h','Officiele documentatie overschrijven')+'</div>'+
       '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">'+T('ug.sub','Met een druk op de knop naar uw oude apparatuur of een harde schijf, altijd achter het vier- of zes-ogenprincipe: 4 ogen = twee collega\'s tekenen, 6 ogen = drie. De bundel komt een keer vrij; daarna start u een nieuwe uitgifte.')+'</div>'+
       '<div class="tt-add h-wrap"><select id="ugBron" style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:0 0.7rem;font-size:0.8rem;color:var(--txt);outline:none;"></select>'+

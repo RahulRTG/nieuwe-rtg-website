@@ -16,7 +16,7 @@
 'use strict';
 
 module.exports = function bouwKernAanDrie(kern, grens) {
-  const { db, save, crypto, schoon } = kern;
+  const { db, save, crypto, schoon, DATA_DIR } = kern;
   /* De doelenmotor (kern/doelen.js): waar u begon, waar u heen wilt, wanneer
      en waarom. De mijlpalen worden afgeleid en niet bewaard, zodat een gemiste
      week geen mislukking is maar gewoon een ander pad. */
@@ -105,4 +105,17 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      de bouw dan wat hij leest, en een kopie zou undefined bevriezen. */
   Object.assign(kern, require('../kern/life')({ kern }));
   require('../routes/life')(grens('life'));
+  /* De RTG App Store (kern/appstore/): het kanaal waarlangs een DERDE een app in
+     dit huis krijgt. Hij hangt HIER, onderaan, om twee redenen die allebei
+     gedrag zijn: de virusscanner (kern/antivirus) staat dan zeker op de kern --
+     en zonder scanner gaat de poort dicht in plaats van open -- en het
+     tenantregister is dan gemount, zodat een uitgever aan een echte organisatie
+     hangt in plaats van aan een code die hij zelf meestuurt.
+
+     De drie lagen komen als een geheel binnen: motor, winkel en brug. Zie
+     APPSTORE.md voor de zes begrippen en de zes grenzen. */
+  Object.assign(kern, require('../kern/appstore').maakAppstore({
+    db, save, dir: DATA_DIR, antivirus: kern.antivirus, pay: kern.pay, findSupplier: kern.findSupplier,
+    log: (t) => { try { require('../log').log.warn(t); } catch (e) { console.warn(t); } } }));
+  require('../routes/appstore')(grens('appstore'));
 };

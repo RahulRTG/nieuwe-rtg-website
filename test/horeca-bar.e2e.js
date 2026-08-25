@@ -119,17 +119,19 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     assert.match(beeld.golven, /kinine/, 'en de allergie ook');
 
     /* 4: aanzetten en klaar melden */
-    const aan = await page.$('[data-naar="gestart"]');
-    assert.ok(aan, 'er staat een knop om aan te zetten');
-    await aan.click();
+    const aan = page.locator('[data-naar="gestart"]');   // locator en geen vaste handle: het bord hertekent
+    await aan.first().waitFor({ state: 'visible' });
+    assert.ok(await aan.count() > 0, 'er staat een knop om aan te zetten');
+    await aan.first().click();
     /* Aanzetten loopt via de offline-laag en daarna tekent haal() het bord
        opnieuw; dan pas verandert de knop van "Aanzetten" in "Klaar". Op die knop
        wachten is precies waar de volgende regel om vraagt. */
     await wachtOpZichtbaar(page, '[data-naar="klaar"]');
-    const klaar = await page.$('[data-naar="klaar"]');
-    assert.ok(klaar, 'daarna kan hij klaar gemeld worden');
+    const klaar = page.locator('[data-naar="klaar"]');   // locator en geen vaste handle: het bord hertekent
+    await klaar.first().waitFor({ state: 'visible' });
+    assert.ok(await klaar.count() > 0, 'daarna kan hij klaar gemeld worden');
     const welke = await klaar.evaluate(el => el.getAttribute('data-zet'));
-    await klaar.click();
+    await klaar.first().click();
     /* Een glas dat klaar staat heeft geen vervolgstap meer, dus verdwijnt zijn
        knop uit het bord. Die knop verdwijnt pas bij de hertekening NA het
        antwoord van de server -- en dat is precies de toestand die de vragen aan
@@ -160,9 +162,10 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
        want teken() zet de hele lijst in een keer neer. */
     await wachtOpTekst(page, 'BAR-C', { in: '#bGolvenLijst' });
 
-    const aanC = await page.$('.b-golf:has-text("BAR-C") [data-naar="gestart"]');
-    assert.ok(aanC, 'de negroni staat op het bord');
-    await aanC.click();
+    const aanC = page.locator('.b-golf:has-text("BAR-C") [data-naar="gestart"]');   // locator en geen vaste handle: het bord hertekent
+    await aanC.first().waitFor({ state: 'visible' });
+    assert.ok(await aanC.count() > 0, 'de negroni staat op het bord');
+    await aanC.first().click();
     /* Zonder lijn ketst de fetch af, komt de handeling op het toestel te staan
        en meldt de wachtrij dat aan het scherm: de strook gaat aan. Dat is het
        eerste zichtbare teken dat de handeling geland is -- eerder heeft vragen
@@ -192,16 +195,21 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     /* EEN COLLEGA DIE SNELLER WAS. Het glas gaat online de deur uit terwijl dit
        toestel offline "klaar" meldt. De samenvoeging weigert dat -- een stand
        gaat nooit achteruit -- en het scherm hoort de reden te horen. */
+    /* EERST WACHTEN TOT HET BORD DE NIEUWE STAND TOONT, EN PAS DAARNA DE LIJN
+       DICHT. Twee dingen die niet samenvallen: de rij loopt leeg zodra het
+       antwoord binnen is, maar de knop van BAR-C verandert pas van "aanzetten"
+       in "klaar" als het bord opnieuw is getekend -- en dat hertekenen HAALT
+       eerst de stand op. Zet je de lijn eerder dicht, dan ketst juist die fetch
+       af en komt de knop er nooit; dat is deze toets een keer overkomen.
+
+       En de wacht loopt via de LOCATOR en niet via wachtOpZichtbaar: die laatste
+       voert querySelector uit IN de pagina, en `:has-text()` is een selector van
+       Playwright en geen CSS -- de browser gooit er een SyntaxError op. */
+    const klaarC = page.locator('.b-golf:has-text("BAR-C") [data-naar="klaar"]');
+    await klaarC.first().waitFor({ state: 'visible' });
     lijnDicht = true;
-    /* Wachten tot het BORD de nieuwe stand toont, en niet alleen tot de rij leeg
-       is. Dat zijn twee dingen: de rij loopt leeg zodra het antwoord binnen is,
-       maar de knop van BAR-C verandert pas van "aanzetten" in "klaar" als het
-       bord opnieuw is getekend. Zonder deze wacht pakt de zoeker hieronder soms
-       de oude knop, en dan toetst de rest van deze bewering niets. */
-    await wachtOpZichtbaar(page, '.b-golf:has-text("BAR-C") [data-naar="klaar"]');
-    const klaarC = await page.$('.b-golf:has-text("BAR-C") [data-naar="klaar"]');
-    assert.ok(klaarC, 'er staat een knop om hem klaar te melden');
-    await klaarC.click();
+    assert.ok(await klaarC.count() > 0, 'er staat een knop om hem klaar te melden');
+    await klaarC.first().click();
     // de lijn is weer dicht: de strook hoort opnieuw aan te gaan, en pas dan
     // staat de klaarmelding werkelijk op het toestel
     await wachtOpZichtbaar(page, '#bEdgeStrook');

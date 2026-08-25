@@ -36,31 +36,52 @@
 const VENSTER = 4000;          // regels in het geheugen; genoeg voor een werkdag kijken
 const BEWAARD_MAX = 20000;     // harde bovengrens op schijf, los van de termijn
 
-/* Een pad zonder de veranderlijke stukken: /api/lid/42/pas wordt /api/lid/:id/pas.
-   Zo tellen honderd verzoeken naar honderd leden als EEN regel in een overzicht,
-   en staat er bovendien geen id in het journaal dat naar een persoon leidt. */
-function padVorm(p) {
-  return String(p || '')
-    .replace(/\/[0-9a-f]{16,}/gi, '/:sleutel')
-    .replace(/\/\d+/g, '/:id')
-    .slice(0, 120);
+/* IN BLOKKEN SNOEIEN, NIET PER REGEL. Het venster werd bijgehouden met
+   `splice(0, 1)` zodra het een regel te lang was, en een splice vooraan
+   verschuift de HELE array: 4.000 verplaatsingen per verzoek om er een weg te
+   halen. In het CPU-profiel was dit de duurste functie van de applicatie
+   (PRESTATIES.md). De grens blijft wat hij was -- de lijst gaat nooit over het
+   maximum -- maar bij overschrijding gaat er een BLOK ineens af, zodat het
+   snoeien geamortiseerd niets kost. Het venster houdt daardoor tussen de 3.800
+   en 4.000 regels; het scherm leest er `slice(-n)` uit met een veel kleinere n. */
+const BLOK = (max) => Math.max(1, Math.floor(max * 0.05));
+const VENSTER_BLOK = BLOK(VENSTER);
+const BEWAARD_BLOK = BLOK(BEWAARD_MAX);
+/* Snoei `lijst` terug tot ten hoogste `max`, en haal er een blok extra af zodat
+   de volgende snoeibeurt pas over BLOK regels nodig is. */
+function snoei(lijst, max, blok) {
+  if (lijst.length <= max) return;
+  lijst.splice(0, lijst.length - max + blok);
 }
 
-/* Een bestemming zonder de persoon erin: 'sms:+31612345678' wordt 'sms', en een
-   e-mailadres wordt het domein. Het journaal moet laten zien DAT er post uitging
-   en of het lukte, niet aan wie. */
-function bestemmingVorm(naar) {
-  const s = String(naar || '');
-  if (s.startsWith('sms:')) return 'sms';
-  const at = s.indexOf('@');
-  if (at > 0) return 'mail:' + s.slice(at + 1).slice(0, 40);
-  return s.slice(0, 40) || 'onbekend';
-}
+const { padVorm, bestemmingVorm } = require('./journaalvorm');
 
-function maakDoorgeefjournaal({ db, save, nu }) {
+function maakDoorgeefjournaal({ db, save, nu, bestand }) {
   const klok = nu || (() => new Date().toISOString());
   const venster = [];
 
+  /* HET BEWAARDE DEEL WOONT IN EEN BESTAND, NIET IN EEN COLLECTIE.
+
+     Het stond in db.data.doorgeefjournaal: een array van 20.000 regels, dus een
+     blob in een rij van de opslag. Elke save() ergens in de applicatie
+     serialiseerde die hele lijst opnieuw om er een regel bij te zetten. Een
+     logboek is geen toestand -- er wordt alleen achteraan bij geschreven en
+     vooraan afgesneden -- en hoort dus in een bestand. Zie de kop van
+     kern/journaalbestand.js voor de meting en de afwegingen. */
+  /* Het bestand wordt MEEGEGEVEN en niet hier gepakt. Even stond hier een
+     standaardboek als er niets was meegegeven; dat scheelde een regel bij de
+     aanroeper en leverde verborgen gedeelde staat op -- toetsen die geen bestand
+     meegaven schreven allemaal in dezelfde map en zagen elkaars regels. Zonder
+     bestand blijft het oude terugvalpad (een collectie) gelden. */
+  const boek = bestand || null;
+
+  /* De eenmalige verhuizing van een oude collectie naar het bestand staat in
+     ./journaalverhuizing.js -- hij draait een keer per installatie. */
+  try { require('./journaalverhuizing').verhuisOude({ db, save, boek }); }
+  catch (e) { console.warn('[journaal] verhuizen mislukt:', e.message); }
+
+  /* Zonder bestand (een toets die er geen meegeeft) blijft het oude gedrag
+     bestaan, zodat deze module ook los te gebruiken is. */
   const rij = () => {
     if (!Array.isArray(db.data.doorgeefjournaal)) db.data.doorgeefjournaal = [];
     return db.data.doorgeefjournaal;
@@ -101,34 +122,22 @@ function maakDoorgeefjournaal({ db, save, nu }) {
       reden: r.reden ? String(r.reden).slice(0, 140) : null
     };
     venster.push(regel);
-    if (venster.length > VENSTER) venster.splice(0, venster.length - VENSTER);
+    snoei(venster, VENSTER, VENSTER_BLOK);
     if (bewaarWaard(regel)) {
+      if (boek) {
+        /* Naar het bestand: een push op een stapel die later gespoeld wordt.
+           Geen snoeien, geen save() -- het bestand roteert zichzelf. */
+        boek.noteerRegel(regel);
+        return regel;
+      }
       const lijst = rij();
       lijst.push(regel);
-      if (lijst.length > BEWAARD_MAX) lijst.splice(0, lijst.length - BEWAARD_MAX);
-      /* NIET bij elke regel save(): dat zou van elk verzoek een schrijfactie
-         maken.
-
-         EN BIJ EEN MISLUKKING OOK NIET METEEN, en dat is een correctie op wat
-         hier stond. De gedachte was goed -- juist die regel wil je terugvinden
-         als de server daarna omvalt -- maar de prijs was fout: het journaal is
-         EEN blob in EEN rij, dus elke save() serialiseert en versleutelt de hele
-         lijst opnieuw. Nagemeten op een verse installatie: 500 verzoeken naar
-         een onbekend pad gaven 1002 schrijfacties en lieten de WAL met 4,18 MB
-         groeien (13,9 kB per verzoek), en de prijs LIEP OP met de lijst: 0,72 ms
-         bij 159 kB journaal, 3,63 ms bij 1114 kB. Bij de eigen bovengrens van
-         20.000 regels is dat ~10 ms geblokkeerde lus per mislukt verzoek, en het
-         zakt daarna nooit meer.
-
-         Erger dan traag: een willekeurige bezoeker kon met een GET naar een
-         niet-bestaand pad een schijfschrijving afdwingen. Dat is de enige plek
-         in het huis waar dat kon.
-
-         Nu: hooguit EEN keer per seconde spoelen. Een mislukking is daarmee
-         hooguit een seconde later op schijf -- en een server die precies in dat
-         venster omvalt, laat een regel liggen die in het VENSTER wel stond. Die
-         ruil is de goede kant op: een journaal dat de server traag maakt, is
-         zelf de storing geworden. */
+      snoei(lijst, BEWAARD_MAX, BEWAARD_BLOK);
+      /* TERUGVALPAD: zonder bestand blijft het journaal een collectie. Dan
+         geldt nog steeds niet-bij-elke-regel-save(), want dan serialiseert elke
+         save de hele lijst opnieuw -- en kon een vreemde met een GET naar een
+         onbekend pad een schijfschrijving afdwingen. Vandaar de rem van een
+         seconde. */
       if (regel.mislukt) plan();
     }
     return regel;
@@ -141,13 +150,16 @@ function maakDoorgeefjournaal({ db, save, nu }) {
      voor "wat gebeurde er gisteren". Standaard het venster, want dat is waar
      iemand naar kijkt als hij het scherm opent. */
   function lees({ bron, richting, alleenMislukt, zoek, max } = {}) {
-    const uit = (bron === 'bewaard' ? rij() : venster).slice();
+    const grens = Math.min(Math.max(Number(max) || 200, 1), 1000);
+    /* Uit het bestand halen we ruim: er wordt hieronder nog gefilterd, en wie
+       op 'mislukt' zoekt wil niet dat de filter pas na de afkapping komt. */
+    const bewaard = () => (boek ? boek.lees(grens * 20) : rij());
+    const uit = (bron === 'bewaard' ? bewaard() : venster).slice();
     const f = uit.filter(r =>
       (!richting || r.richting === richting) &&
       (!alleenMislukt || r.mislukt) &&
       (!zoek || (r.wat + ' ' + (r.wie || '')).toLowerCase().includes(String(zoek).toLowerCase())));
-    const n = Math.min(Math.max(Number(max) || 200, 1), 1000);
-    return { ok: true, bron: bron === 'bewaard' ? 'bewaard' : 'venster', totaal: f.length, regels: f.slice(-n).reverse() };
+    return { ok: true, bron: bron === 'bewaard' ? 'bewaard' : 'venster', totaal: f.length, regels: f.slice(-grens).reverse() };
   }
 
   /* Een samenvatting waar je in een oogopslag aan ziet of er iets speelt: hoeveel
@@ -158,7 +170,7 @@ function maakDoorgeefjournaal({ db, save, nu }) {
     return {
       ok: true,
       venster: venster.length,
-      bewaard: rij().length,
+      bewaard: boek ? boek.aantal() : rij().length,
       in: tel(r => r.richting === 'in'),
       uit: tel(r => r.richting === 'uit'),
       mislukt: tel(r => r.mislukt),

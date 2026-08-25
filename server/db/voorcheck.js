@@ -76,11 +76,51 @@ const laatsteCheck = new Map();   // collectie -> wanneer we hem volledig nakeke
 // "Aantal items": bij een array de lengte, bij een object het aantal sleutels.
 const lengteVan = v => Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0);
 
+/* DE LOGBOEKEN: collecties waar een GEGROEIDE lengte normaal is.
+
+   De regel hieronder slaat een dure collectie alleen over als het AANTAL items
+   gelijk bleef. Voor gewone toestand klopt dat: een item erbij of eraf is een
+   echte wijziging die je meteen wilt vastleggen. Voor een LOGBOEK is groeien
+   juist de normale toestand -- er komt per verzoek een regel bij -- en dus
+   greep de overslaan-regel daar nooit.
+
+   Gemeten op 24 augustus 2026 onder last: `doorgeefjournaal` groeit naar zijn
+   plafond van 20.000 regels (3,6 MB JSON), en saveSqlite kostte daardoor
+   gemiddeld 32,9 ms en piekte op 101,1 ms -- synchroon, op de event-loop. Over
+   een ronde van 25 seconden stond de lus 3,98 seconden stil in deze ene functie:
+   16% van de wandkloktijd. De gemeten event-loop-piek van 111 ms viel er vrijwel
+   samen mee.
+
+   Waarom overslaan hier veilig is en bij gewone toestand niet: het journaal
+   regelt zijn eigen duurzaamheid al. kern/doorgeefjournaal.js zegt met zoveel
+   woorden "NIET bij elke regel save()" en plant zijn eigen spoeling met een rem
+   van een seconde. Dat andere schrijfacties het journaal onderweg meenamen was
+   toeval, geen belofte. Wat hier verandert is dus niet de garantie maar het
+   meeliften: het journaal wordt nog steeds binnen zijn eigen venster geschreven,
+   en planNaronde() zorgt dat een overgeslagen ronde altijd wordt ingehaald --
+   ook als er daarna geen enkel verzoek meer komt.
+
+   Wat er NIET in mag: alles waar een verloren regel geld of toegang kost. Die
+   vallen sowieso al af op exactNodig() hierboven, dat vóór deze regel wordt
+   gesteld -- maar de lijst blijft met opzet met de hand geschreven en kort. Een
+   collectie hoort hier alleen in als haar EIGEN module haar duurzaamheid al
+   regelt en dat ook opschrijft.
+
+   NAWOORD, dezelfde dag. `doorgeefjournaal` is inmiddels helemaal uit de
+   database gehaald: het staat in een append-only bestand (kern/journaalbestand.js),
+   want een tijdvenster maakte het goedkoper maar niet goedkoop -- er bleef eens
+   per twee seconden een volle serialisatie van 3,6 MB over. De naam blijft hier
+   staan om twee redenen, en geen ervan is nostalgie: een installatie die nog
+   niet is bijgewerkt draagt de oude collectie tot de verhuizing draait, en de
+   regel zelf is algemeen en getoetst (test/opslag-voorcheck.test.js) zodat een
+   volgend logboek er meteen gebruik van kan maken. */
+const LOGBOEK = new Set(['doorgeefjournaal']);
+
 /* Mag de dure stringify van deze collectie worden overgeslagen? */
 function magOverslaan(k, waarde, force, nu) {
   if (force || exactNodig(k)) return false;
   if ((laatsteGrootte.get(k) || 0) <= GROOT_BYTES) return false;
-  if (lengteVan(waarde) !== laatsteLengte.get(k)) return false;
+  if (!LOGBOEK.has(k) && lengteVan(waarde) !== laatsteLengte.get(k)) return false;
   return nu - (laatsteCheck.get(k) || 0) < GROOT_MS;
 }
 
@@ -106,4 +146,4 @@ function planNaronde(save) {
   if (naTimer.unref) naTimer.unref();
 }
 
-module.exports = { magOverslaan, onthoud, vergeet, planNaronde, lengteVan, exactNodig, GROOT_BYTES, GROOT_MS };
+module.exports = { magOverslaan, onthoud, vergeet, planNaronde, lengteVan, exactNodig, LOGBOEK, GROOT_BYTES, GROOT_MS };

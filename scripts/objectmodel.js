@@ -48,7 +48,7 @@
 
    Draai: node scripts/objectmodel.js            (leesbaar)
           node scripts/objectmodel.js --json     (voor de ratel)
-          node scripts/objectmodel.js --vastleggen  (schrijft OBJECTMODEL.json)
+          npm run objectmodel:vast               (schrijft OBJECTMODEL.json)
    ========================================================================== */
 'use strict';
 const fs = require('fs');

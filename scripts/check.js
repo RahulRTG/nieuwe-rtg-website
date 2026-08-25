@@ -2042,7 +2042,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     ["server/foundation/basis.js|const h = ((req.get && req.get('authorization')) || '');",
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
-      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
+      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
+    ["server/trio-kleef.js|const kop = (req && req.headers && req.headers.authorization) || '';",
+      'de poortwachter gebruikt het token als ROUTELABEL en niets anders: het gaat rechtstreeks een hash in en de uitkomst is een servernummer. ' +
+      'Er wordt niets verleend -- de gekozen server draait de volledige stapel en verifieert zelf, dus een verzonnen Bearer levert daar gewoon een 401 op. ' +
+      'Zou hier ooit iets aan een tokenwaarde worden opgehangen (een quotum per proces, een tarief per proces), dan vervalt deze reden.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
@@ -3514,6 +3518,106 @@ console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet
   } else {
     ok(gekeken + ' bestanden nagelopen, geen enkele vrije naam' +
       (stuk ? ' (' + stuk + ' niet te lezen voor de eigen parser; zie regel 5)' : ''));
+  }
+}
+
+/* ============================================================================
+   51) EEN AFDRUK LOOPT NIET ACHTER OP DE METING ERONDER.
+
+   DE FOUT DIE DIT VANGT is hier gemaakt en kostte een volle bouwronde van
+   tachtig minuten. Er kwamen vijf modules onder server/kern bij, en
+   OBJECTMODEL.json -- de afdruk van scripts/objectmodel.js -- stond nog op 1498
+   bestanden terwijl de meting er 1503 telde. Er was niets kapot: de UITKOMST van
+   de meting (de envelop, de gedeelde velden, de gelijkende vormparen) was byte
+   voor byte gelijk. Alleen het getal liep achter, en dat is precies de scheur
+   waardoor een afdruk een verhaal wordt.
+
+   WAAROM HIER EN NIET ALLEEN IN DE SUITE. Vier afdrukken stonden al in deze
+   keuring -- regel 40 (ARCHITECTUUR.md), 41 (BEWIJS.md), 41b (BELOFTE.md) en 46
+   (SLO.md) -- en twee niet: OBJECTMODEL.json en BUNDELS.md werden alleen door
+   hun eigen toets bewaakt. Die toetsen zijn goed, maar ze draaien in een suite
+   van tachtig minuten, dus je hoort het pas ver na de commit van de bouwstraat
+   in plaats van in de halve seconde die het kost. Dat is geen andere norm maar
+   een andere PLEK, en de plek was hier de fout. De toetsen blijven staan: deze
+   regel is de vroege waarschuwing, niet de vervanging.
+
+   WAT HIER MET OPZET NIET IN STAAT. Een meter die een deel van zijn invoer
+   overslaat zonder het te zeggen, zegt niet "in orde" maar "ik heb niet
+   gekeken" (regel 10 van LAT.md), dus staat het hier:
+
+     GRENZEN.json  is GEEN afdruk. scripts/grenslijst.js noemt hem zelf "een
+                   vertrekpunt en geen waarheid": vier plekken rekenen hun
+                   kernnaam uit, de scanner ziet die niet, en ze komen MET DE
+                   HAND op de lijst zodra de grens knelt. Een gelijkheidstoets
+                   zou eisen dat die aanvullingen weer verdwijnen -- dus die komt
+                   er niet.
+     LEUGENS.json  is het rapport van EEN ronde, draagt een tijdstempel en staat
+                   niet in de repo. Er is niets om achter te lopen.
+   ========================================================================== */
+console.log('\n51) elke afdruk is gelijk aan de meting eronder');
+{
+  /* BUNDELS.md is tekst en wordt in zijn geheel vergeleken -- dezelfde
+     vergelijking als test/deelindex.test.js maakt. */
+  try {
+    const deel = require('./deelindex');
+    const opSchijf = fs.existsSync(deel.DOEL) ? fs.readFileSync(deel.DOEL, 'utf8') : null;
+    if (opSchijf === null) fout('BUNDELS.md bestaat niet -- draai: npm run deelindex');
+    else if (opSchijf !== deel.bouw()) fout('BUNDELS.md loopt achter op de bundeldelen -- draai: npm run deelindex');
+    else ok('BUNDELS.md is gelijk aan wat de bundeldelen nu zeggen');
+  } catch (e) {
+    fout('de deelindex kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+
+  /* OBJECTMODEL.json draagt de DATUM waarop hij is vastgelegd, en die hoort te
+     verschillen zodra iemand hem opnieuw schrijft; die en de vaste uitleg gaan
+     er dus af. Wat overblijft is ALLES wat gemeten is, en dat is ruimer dan
+     test/objectmodel.test.js vergelijkt: die kijkt naar `gemeten` en `envelop`,
+     en laat `gedeeld` en `paren` staan. Juist die twee dragen de conclusie van
+     DEVELOPERCLOUD.md par. 2 -- welke velden vier of meer domeinen delen, en
+     welke vormparen echt op elkaar lijken. Nagemeten: een afgekapte `paren` en
+     `gedeeld` laat die toets groen en deze regel rood.
+
+     De melding NOEMT WAT ER VERSCHILT en niet alleen dat er iets verschilt. Een
+     keuring die "loopt achter" zegt over een afdruk met tien blokken, stuurt je
+     zelf op zoek; dat is precies het half uur dat deze regel hoort te schelen. */
+  try {
+    const doel = path.join(ROOT, 'OBJECTMODEL.json');
+    const model = require('./objectmodel');
+    const opSchijf = fs.existsSync(doel) ? JSON.parse(fs.readFileSync(doel, 'utf8')) : null;
+    const vers = model.meet();
+    /* De datum en de vaste uitleg horen NIET tot de meting; al het andere wel,
+       ook een blok dat er morgen bij komt. Vandaar de vereniging van beide
+       sleutelverzamelingen: een blok dat wel op schijf staat en niet meer in de
+       meting is net zo goed achterstand. */
+    const blokken = [...new Set([...Object.keys(opSchijf || {}), ...Object.keys(vers)])]
+      .filter(k => k !== 'uitleg' && k !== 'vastgelegd');
+    const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
+    if (opSchijf === null) fout('OBJECTMODEL.json bestaat niet -- draai: npm run objectmodel:vast');
+    else {
+      const verschil = [];
+      for (const k of blokken) {
+        if (!anders(opSchijf[k], vers[k])) continue;
+        if (k !== 'gemeten') { verschil.push(k + ' wijkt af'); continue; }
+        /* Ook hier de VERENIGING van beide sleutelverzamelingen, en niet
+           alleen die van de verse meting. Anders zou een afdruk met een getal
+           dat de meting niet meer kent hierboven wel "wijkt af" heten en
+           hieronder geen enkel verschil opleveren -- en dan meldt de regel
+           doodleuk dat alles in orde is. */
+        const was = opSchijf.gemeten || {};
+        for (const m of new Set([...Object.keys(was), ...Object.keys(vers.gemeten)])) {
+          if (was[m] !== vers.gemeten[m]) verschil.push('gemeten.' + m + ': ' + was[m] + ' -> ' + vers.gemeten[m]);
+        }
+      }
+      if (verschil.length) {
+        fout('OBJECTMODEL.json loopt achter op de meting (' + verschil.join('; ') +
+          ') -- draai: npm run objectmodel:vast');
+      } else {
+        ok(vers.gemeten.vormen + ' bewaarde vormen in ' + vers.gemeten.bestanden +
+          ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan');
+      }
+    }
+  } catch (e) {
+    fout('het objectmodel kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
   }
 }
 

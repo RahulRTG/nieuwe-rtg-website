@@ -100,5 +100,5 @@ function main() {
   return 0;
 }
 
-module.exports = { bouw, delenVan, tabelveilig };
+module.exports = { bouw, delenVan, tabelveilig, DOEL };
 if (require.main === module) process.exit(main());

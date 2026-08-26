@@ -87,13 +87,13 @@ module.exports = (ctx) => {
       /* PER WERELD, en dat is sinds de economielaag de eerste indeling en niet
          een extra kolom. Een totaal over vier economieën heen telt de kosten van
          twee rechtspersonen bij elkaar op, en dat getal betekent niets. */
-      werelden: economie ? economie.WERELDEN.map(w => {
+      werelden: economie.WERELDEN.map(w => {
         const inWereld = rijen.filter(r => economie.wereldVan(r.drager) === w.id);
         return { wereld: w.id, naam: w.naam, factureerbaar: w.factureerbaar,
           gebruikers: inWereld.length,
           kostenCenten: inWereld.reduce((a, r) => a + r.kostenCenten, 0),
           bijdragenCenten: inWereld.filter(r => r.bijdrageCenten != null).reduce((a, r) => a + r.bijdrageCenten, 0) };
-      }) : [],
+      }),
       rtfoundation: {
         gezinnen: gezinnen.length, kostenCenten: gezinnen.reduce((a, r) => a + r.kostenCenten, 0),
         wieBetaalt: 'De RTFoundation, uit haar eigen begroting (kern/rtfos/geld.js). Een gezin krijgt hiervoor nooit een rekening.',
@@ -115,7 +115,7 @@ module.exports = (ctx) => {
      niets: twee plekken die dit bedrag uitrekenen zouden op een dag uiteenlopen,
      en dan is de vraag welke van de twee de stichting moet betalen. */
   function infraNaarFoundation(periode) {
-    if (!toerekening || !economie) return null;
+    if (!toerekening) return null;
     const posten = (toerekening.verdeling(periode).wereldposten || [])
       .filter(x => x.wereld === 'rtfoundation');
     if (!posten.length) return null;

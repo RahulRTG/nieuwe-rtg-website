@@ -39,7 +39,7 @@
    het huis. Zie ECONOMIE.md voor wat er nog niet is en waarom. */
 'use strict';
 
-const { ontleed } = require('../kosten/haak');
+const { ontleed, SOORTEN_DRAGER } = require('../kosten/haak');
 
 const WERELDEN = [
   { id: 'consument', naam: 'Consumer Economy', dragers: ['lid'],
@@ -61,15 +61,33 @@ const OP_ID = new Map(WERELDEN.map(w => [w.id, w]));
    tweede lijstje ingetikt: twee plekken die hetzelfde bedoelen lopen uiteen, en
    dan zegt de firewall iets anders dan het overzicht over dezelfde gebruiker. */
 const OP_DRAGER = new Map();
-for (const w of WERELDEN) for (const d of w.dragers) OP_DRAGER.set(d, w.id);
-
-/* De wereld van een drager. Een onbekende drager valt op 'rtg-intern' terug en
-   niet op de wereld van de vorige vraag: onbekend verbruik is van het huis, en
-   het huis factureert niemand. Bij twijfel dus de wereld die niets kan sturen. */
-function wereldVan(drager) {
-  const w = ontleed(drager);
-  return OP_DRAGER.get(w.soort) || 'rtg-intern';
+for (const w of WERELDEN) for (const d of w.dragers) {
+  if (OP_DRAGER.has(d)) throw new Error('economie: dragersoort "' + d + '" hoort bij twee werelden; dan is er geen grens.');
+  OP_DRAGER.set(d, w.id);
 }
+
+/* ELKE DRAGERSOORT HOORT BIJ PRECIES EEN WERELD, en dat wordt hier bij het laden
+   nagerekend in plaats van bij het gebruiken opgevangen.
+
+   Hier stond een terugval: een onbekende soort viel op 'rtg-intern' terug, de
+   wereld die niets kan factureren. Verdedigbaar, en onbereikbaar -- ./haak.js
+   normaliseert onbekende soorten zelf al naar 'huis'. Een mutatie liet zien wat
+   dat betekent: die regel op 'consument' zetten (de wereld die WEL factureert)
+   veranderde niets en zakte nergens op. Een veiligheidsregel waarvan de zakkende
+   kant niet bestaat, is geen veiligheid maar een geruststelling.
+
+   Wat wel echt mis kan gaan is dat er ooit een dragersoort bijkomt (een
+   vestiging, een voertuig, een agent) zonder dat iemand hem een wereld geeft.
+   Dan valt hij stil buiten de firewall. Deze controle vangt precies dat, op het
+   moment dat het gebeurt: bij het opstarten, met de naam erbij. */
+for (const soort of SOORTEN_DRAGER) {
+  if (!OP_DRAGER.has(soort)) {
+    throw new Error('economie: dragersoort "' + soort + '" heeft geen economische wereld. ' +
+      'Zet hem in kern/economie/werelden.js; zonder wereld valt hij buiten de firewall.');
+  }
+}
+
+function wereldVan(drager) { return OP_DRAGER.get(ontleed(drager).soort); }
 
 const wereld = id => OP_ID.get(String(id || '')) || null;
 const alle = () => WERELDEN.map(w => Object.assign({}, w));

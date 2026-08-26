@@ -53,6 +53,18 @@ const haak = require('./haak');
 const soorten = require('./soorten');
 
 function maakKosten({ db, save, accounts, geldPasprijzen, fonds, economie, klok }) {
+  /* ZONDER ECONOMIELAAG BESTAAT DEZE LAAG NIET, en dat is met opzet een fout bij
+     het OPBOUWEN en geen nette terugval bij het rekenen. Hier stonden drie
+     takken die "als de economielaag ontbreekt, dan..." afhandelden -- in de
+     verdeling, in de doorbelasting en in de factuurregel. Alle drie waren ze
+     verdedigbaar en samen maakten ze een gat: een opzet die de firewall vergeet
+     te mounten, draait gewoon door en de weigering is nergens te zien. Dat is
+     precies wat kern/aipoort.js doet met resolveSession, en om dezelfde reden.
+
+     Een firewall die wegvalt als hij ontbreekt, is geen firewall. */
+  if (!economie || typeof economie.magBelasten !== 'function') {
+    throw new Error('kosten: de economielaag ontbreekt; zonder firewall is er geen grens tussen de vier economieen (ECONOMIE.md par. 3).');
+  }
   const nu = () => (typeof klok === 'function' ? klok() : new Date()).toISOString();
 
   function d() {

@@ -61,6 +61,18 @@ test('vier werelden, en een gebruiker hoort bij precies een', async () => {
   assert.deepEqual(rtf.dragers, ['gezin']);
   const intern = r.body.werelden.find(w => (w.id || w.wereld) === 'rtg-intern');
   assert.equal(intern.factureerbaar, false);
+
+  /* EN ELKE DRAGERSOORT HOORT BIJ PRECIES EEN WERELD -- niet bij nul en niet bij
+     twee. Dat is de invariant waar de hele firewall op rust: een soort zonder
+     wereld valt er stil buiten. Hier stond eerst een terugval in de code die dat
+     moest opvangen, en die bleek onbereikbaar en dus onbeproefbaar; deze
+     bewering vervangt hem. */
+  const { SOORTEN_DRAGER } = require('../server/kern/kosten/haak');
+  const gedekt = [];
+  for (const w of r.body.werelden) for (const d of w.dragers) gedekt.push(d);
+  assert.deepEqual(gedekt.slice().sort(), SOORTEN_DRAGER.slice().sort(),
+    'de werelden dekken niet exact de dragersoorten: een soort zonder wereld valt buiten de firewall');
+  assert.equal(new Set(gedekt).size, gedekt.length, 'een dragersoort hoort bij twee werelden');
 });
 
 /* MUTATIE: in firewall.js de tak `if (!r)` weggehaald zodat een ontbrekende
@@ -291,4 +303,26 @@ test('de poort voor de factuurregel weigert een andere wereld, ook buiten de rou
   const goed = boekDoorbelasting({ drager: 'lid:user-9', periode: '2026-08', centen: 5000, wereld: 'consument' });
   assert.ok(!goed.error, 'de gewone doorbelasting werd ook geweigerd: ' + goed.error);
   assert.match(goed.id, /VERBRUIK/);
+});
+
+/* MUTATIE: in kern/kosten/index.js de constructiecontrole weggehaald -- deze
+   toets zakt dan, want dan bouwt de kostprijslaag zonder firewall en draait een
+   opzet die hem vergeet gewoon door.
+
+   Waarom dit een toets waard is: hier stonden DRIE takken die elk netjes
+   afhandelden wat er moet gebeuren als de economielaag ontbreekt (in de
+   verdeling, in de doorbelasting, in de factuurregel). Alle drie verdedigbaar,
+   en samen een gat -- want dan is er geen enkel moment waarop iemand het merkt.
+   Nu is het een fout bij het opbouwen, en die valt niet te missen. */
+test('de kostprijslaag komt niet tot stand zonder firewall', () => {
+  const db = { data: {} };
+  const maakKosten = require('../server/kern/kosten');
+  assert.throws(() => maakKosten({ db, save: () => {}, accounts: {} }),
+    /economielaag ontbreekt/i,
+    'de kostprijslaag liet zich bouwen zonder economielaag; dan is de firewall optioneel');
+
+  // en met de laag erbij bouwt hij gewoon, anders toetst het bovenstaande niets
+  const economie = require('../server/kern/economie')({ db, save: () => {} }).economie;
+  const k = maakKosten({ db, save: () => {}, accounts: {}, economie });
+  assert.ok(k.kosten && typeof k.kosten.voorstel === 'function');
 });

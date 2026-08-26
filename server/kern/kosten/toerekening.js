@@ -30,9 +30,10 @@
    ook geen nul: het bedrag blijft dan gewoon bij RTG, en dat staat erbij. De
    familie ziet nog steeds wat zij kost -- alleen niet als iets dat zij betaalt.
 
-   Zonder economielaag (een ctx die hem niet meekrijgt) doet deze module
-   NIETS in plaats van terug te vallen op de oude gedeelde pot. Een firewall die
-   wegvalt als hij ontbreekt, is geen firewall. */
+   Zonder economielaag komt deze module niet eens tot stand: kern/kosten/index.js
+   weigert te bouwen. Hier stond een terugval ("dan doet hij niets"), en die is
+   eruit -- drie van zulke takken samen maakten een gat waarin een opzet die de
+   firewall vergeet gewoon doordraait. */
 'use strict';
 
 const { toegerekend, plafond } = require('./soorten');
@@ -86,7 +87,6 @@ module.exports = (ctx) => {
   }
 
   function verdeling(periode) {
-    if (!economie) return { periode, regels: [], perDrager: {}, wereldposten: [], sleutelSom: 0 };
     const groepen = perWereld(periode);
     const wereldIds = economie.WERELDEN.map(w => w.id);
     const somAlles = wereldIds.reduce((a, id) => a + groepen[id].gewicht, 0);

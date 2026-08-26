@@ -31,10 +31,9 @@ module.exports = (ctx) => {
      gebeuren; de firewall zegt of er tussen twee rechtspersonen een grondslag
      ligt om iets te leveren. Beide moeten ja zeggen.
 
-     Zonder economielaag gaat er niets door. Een firewall die wegvalt als hij
-     ontbreekt, is geen firewall (kern/economie/firewall.js). */
+     De laag is er altijd: ./index.js weigert te bouwen zonder. Een firewall die
+     wegvalt als hij ontbreekt, is geen firewall. */
   function wegOpen(drager) {
-    if (!economie) return { ok: false, code: 'geen-economielaag', uitleg: 'De economielaag is niet gemount; zonder firewall wordt er niets doorbelast.' };
     const naar = economie.wereldVan(drager);
     if (naar === economie.INFRA_WERELD) {
       return { ok: false, code: 'eigen-wereld', uitleg: 'Dit is verbruik van RTG zelf; wij sturen onszelf geen rekening.' };
@@ -71,7 +70,7 @@ module.exports = (ctx) => {
     const teLaag = stand === 'doorbelasten' && centen < DREMPEL_CENTEN;
     const fw = wegOpen(drager);
     return { drager, wie: o.wie, pas, stand, uitleg: b.uitleg, centen, graad: o.totaal.graad,
-      wereld: economie ? economie.wereldVan(drager) : null,
+      wereld: economie.wereldVan(drager),
       firewall: { ok: !!fw.ok, code: fw.code, uitleg: fw.uitleg, hoeWel: fw.hoeWel || null },
       factureren: stand === 'doorbelasten' && !teLaag && !!fw.ok,
       waaromNiet: stand !== 'doorbelasten' ? b.uitleg
@@ -100,13 +99,11 @@ module.exports = (ctx) => {
        lijst, want wie er dan afvalt hangt af van de sorteervolgorde en niet van
        de afspraak. */
     const plafondBlok = {};
-    if (economie) {
-      const perWereld = {};
-      for (const r of rijen) if (r.factureren) perWereld[r.wereld] = (perWereld[r.wereld] || 0) + r.centen;
-      for (const w of Object.keys(perWereld)) {
-        const uit = economie.magBelasten({ van: economie.INFRA_WERELD, naar: w, centen: perWereld[w] });
-        if (!uit.ok) plafondBlok[w] = uit;
-      }
+    const perWereld = {};
+    for (const r of rijen) if (r.factureren) perWereld[r.wereld] = (perWereld[r.wereld] || 0) + r.centen;
+    for (const w of Object.keys(perWereld)) {
+      const uit = economie.magBelasten({ van: economie.INFRA_WERELD, naar: w, centen: perWereld[w] });
+      if (!uit.ok) plafondBlok[w] = uit;
     }
     if (Object.keys(plafondBlok).length) {
       rijen = rijen.map(r => plafondBlok[r.wereld] && r.factureren
@@ -116,10 +113,10 @@ module.exports = (ctx) => {
     }
     const som = (f) => rijen.filter(f).reduce((a, r) => a + r.centen, 0);
     return { periode: p, rijen, plafondBlok,
-      werelden: economie ? economie.WERELDEN.map(w => ({ wereld: w.id, naam: w.naam,
+      werelden: economie.WERELDEN.map(w => ({ wereld: w.id, naam: w.naam,
         centen: rijen.filter(r => r.wereld === w.id).reduce((a, r) => a + r.centen, 0),
         gebruikers: rijen.filter(r => r.wereld === w.id).length,
-        teFactureren: rijen.filter(r => r.wereld === w.id && r.factureren).reduce((a, r) => a + r.centen, 0) })) : [],
+        teFactureren: rijen.filter(r => r.wereld === w.id && r.factureren).reduce((a, r) => a + r.centen, 0) })),
       totalen: { alles: som(() => true), teFactureren: som(r => r.factureren),
         inbegrepen: som(r => r.stand === 'inbegrepen'), rtfoundation: som(r => r.stand === 'rtfoundation'),
         huis: som(r => r.stand === 'huis') },

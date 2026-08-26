@@ -68,7 +68,12 @@
   .eis{border-left:2px solid var(--gold);padding:.18rem 0 .18rem .5rem;margin-top:.25rem;}
   .eis.ok{border-color:var(--green);}
   .eis.af{border-color:#df6b7d;}
-  .eis .sub b{color:var(--text);} /* --text is nergens gezet en erft dus; zo stond het ook inline */
+  /* Hier stond color:var(--text) -- een variabele die NERGENS wordt gezet, dus
+     de browser gooide de regel stil weg en de <b> erfde gewoon. Dat was al zo
+     toen hij inline stond; de verhuizing naar dit blad maakte de dooie regel
+     alleen zichtbaar voor de poort. De bedoeling was de gewone tekstkleur, en
+     die heet hier --txt. */
+  .eis .sub b{color:var(--txt);}
   .zacht{color:var(--soft);font-weight:400;}
   .knoprij{display:flex;gap:.3rem;align-items:flex-start;}
   .eisknoppen{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem;}

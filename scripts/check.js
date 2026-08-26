@@ -465,23 +465,13 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/lib/idem-poort.js',
     'server/kern/command/uitrolregie.js',
     'server/functies/register/index.js',
-    /* VIER UIT DE SAMENVOEGING VAN 24 AUGUSTUS (main +80 commits): alle vier
-       groeiden ze van TWEE kanten tegelijk -- main's idempotentie-, tenant- en
-       beschermstandrondes plus onze afsplitsingen -- en bij alle vier is de naad
-       aan te wijzen, dus NOG en niet MAG.
-
-         server/kern/leverancier/state.js       10,3 KB
-           naad: de sectorvelden (per type zaak) los van de gedeelde staat.
-         server/middleware/functieschakelaars.js 10,3 KB
-           naad: de beschermstand-tak los van de gewone schakelweg; de zinnen
-           wonen al in ./schakelaar-antwoord.js.
-         server/opzet/poortwachters.js           10,4 KB
-           naad: het eigen-domeinblok (dom-eigendomein) los van de wachters
-           zelf; het is een functie, geen poort.
-         (verkoop.js stond hier ook en is al geknipt: ./inwissel.js) */
-    'server/kern/leverancier/state.js',
-    'server/middleware/functieschakelaars.js',
-    'server/opzet/poortwachters.js',
+    /* Drie van de vier NOG-gevallen uit de samenvoeging van 24 augustus
+       (state.js, functieschakelaars.js, poortwachters.js) staan er niet meer:
+       op 26 augustus zijn ze onder de grens teruggebracht door het proza in te
+       dichten zonder een redenering te schrappen -- de groei zat in toelichting,
+       niet in code. De naden die hier beschreven stonden blijven de juiste
+       knipplekken zodra ze WEL weer groeien.
+       (verkoop.js stond hier ook en is al geknipt: ./inwissel.js) */
     /* TWEE UIT DE SAMENVOEGING VAN 25 AUGUSTUS (main +50). Zelfde patroon als de
        vier hierboven: main breidde ze uit terwijl wij er aan de andere kant bij
        kwamen, en bij allebei is de naad te benoemen -- dus NOG en niet MAG.
@@ -493,12 +483,9 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
            verkoop). Ze delen een bestand omdat het grootboek er ooit het enige
            was; de regels van dubbel boekhouden in de kop horen met de kern mee
            te verhuizen, niet bij de bedrading achter te blijven.
-         server/web/routing.js      10,3 KB
-           naad: de DISPATCH-INDEX (welke lagen kunnen dit pad raken --
-           maakDispatchIndex, kandidaten, eersteNa) los van het AFHANDELEN
-           (handle: de keten aflopen, fouten doorgeven, next). Het eerste is een
-           gegevensstructuur met een eigen bewijslast, het tweede is gedrag. */
-    'server/web/routing.js',
+         (server/web/routing.js stond hier ook en is op 26 augustus onder de
+          grens teruggebracht via het proza; de naad -- dispatch-index los van
+          afhandelen -- blijft de knipplek zodra hij weer groeit.) */
     /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
        ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
        (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar

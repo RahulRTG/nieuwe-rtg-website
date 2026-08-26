@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 406 delen, 0 zonder onderwerp.**
+**51 bundels, 408 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -190,7 +190,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 109 delen, 9058 regels in de delen
+`public/apps/leverancier/` -- 111 delen, 9191 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -224,10 +224,11 @@ omlaag.
 | `leverancier-17.js` | de menukaart per station (keuken of bar) |
 | `leverancier-18.js` | de events van de zaak |
 | `leverancier-19.js` | de minibar-catalogus |
+| `leverancier-19b.js` | TREASURY: geld dat binnenkomt is niet hetzelfde als geld dat van u is |
 | `leverancier-20.js` | het tarief van de zaak |
-| `leverancier-20b.js` | Vakwerk Pro op het vandaag-bord: de functies waar vakbedrijven elders per maand voor betalen -- offertes, werkbonnen,... |
 | `leverancier-20c.js` | Vakwerk Pro, tweede laag: vaste afspraken, wachtlijst, beoordelingen en de team-capaciteit -- ook dit elders betaalde... |
 | `leverancier-21.js` | een prijs doorgeven aan RTG |
+| `leverancier-21b.js` | De handelingen van het treasury-bord (leverancier-19b.js): apart zetten, vrijgeven en de automatische regels |
 | `leverancier-22.js` | de instellingen van de zaak opslaan |
 | `leverancier-22a.js` | schakelaars van de zaak: elke functie aan of uit, direct doorgevoerd |
 | `leverancier-22b.js` | binds van het THUIS-KANTOOR (sectie 'thuis' in het Kantoor) |
@@ -296,6 +297,7 @@ omlaag.
 | `leverancier-78.js` | de stijl van het zegelvenster |
 | `leverancier-79.js` | de aanwezigheidsteller op nul zetten |
 | `leverancier-80.js` | de AI-draad van de zaak |
+| `leverancier-80a.js` | Talent Exchange: alleen anonieme, expliciete interesse |
 | `leverancier-81.js` | het cv van een sollicitant die via RTG kwam |
 | `leverancier-82.js` | het alarmvenster |
 | `leverancier-83.js` | de recepten en hun marges |

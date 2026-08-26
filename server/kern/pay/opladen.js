@@ -10,7 +10,7 @@ function maakOpladen(basis) {
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
 
   /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
-  async function laadOp({ codenaam, centen, idem, oms }) {
+  async function laadOp({ codenaam, centen, idem, oms, userId }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < OPLAAD_MIN || c > MAX_CENTEN) return { status: 400, error: 'Opladen kan van 1 tot 5000 euro.' };
     return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, 'oplaad|' + codenaam + '|' + c, async () => {
@@ -41,7 +41,11 @@ function maakOpladen(basis) {
            derde partij, ook niet als pseudoniem. */
         try {
           d().kaartWachtend = d().kaartWachtend && typeof d().kaartWachtend === 'object' ? d().kaartWachtend : {};
-          d().kaartWachtend[betaling.id] = { soort: 'oplaad', codenaam, centen: c, oms: oms || 'Opladen', at: Date.now() };
+          /* userId gaat mee zodat de webhook straks het BETALER-IBAN kan
+             bevestigen bij de juiste persoon (kern/settlement.js). Het IBAN zelf
+             komt nooit hier terecht -- dat woont in de identiteitskluis en niet
+             in db.data, waar deze rij staat. */
+          d().kaartWachtend[betaling.id] = { soort: 'oplaad', codenaam, userId: userId || null, centen: c, oms: oms || 'Opladen', at: Date.now() };
           // hetzelfde plafond als bij de facturen, zodat afgebroken betalingen dit niet laten groeien
           const sleutels = Object.keys(d().kaartWachtend);
           if (sleutels.length > 20000) for (const k of sleutels.slice(0, sleutels.length - 20000)) delete d().kaartWachtend[k];

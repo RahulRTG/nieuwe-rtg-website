@@ -107,7 +107,18 @@ const log = {
    /api/lid/:id. Zo tellen honderd verzoeken naar honderd leden als een regel, en
    belandt er geen nummer in het journaal dat naar een persoon leidt. Uit het
    journaal zelf gehaald, want twee regexen die hetzelfde bedoelen lopen uiteen. */
-const journaalPad = (p) => { try { return require('./kern/doorgeefjournaal').padVorm(p); } catch (e) { return String(p || ''); } };
+/* EEN LATE require() IS NIET GRATIS. Allebei de modules hieronder worden LAAT
+   binnengehaald -- doorgeefjournaal om de kringverwijzing met dit bestand te
+   breken, journaalhaak omdat hij pas later gevuld wordt -- en dat is terecht.
+   Wat niet klopte: de require stond IN de verzoekafhandeling. Node cachet de
+   module wel, maar de RESOLUTIE ervoor niet, dus elke aanroep liep opnieuw langs
+   internalModuleStat: stat-aanroepen op schijf, per verzoek, goed voor 5,3% van
+   alle rekentijd (PRESTATIES.md). Het blijft laat, maar hooguit EEN keer laat;
+   mislukt het, dan mag het de volgende keer opnieuw. */
+let _journaal = null, _haak = null;
+const journaalMod = () => _journaal || (_journaal = require('./kern/doorgeefjournaal'));
+const haakMod = () => _haak || (_haak = require('./journaalhaak'));
+const journaalPad = (p) => { try { return journaalMod().padVorm(p); } catch (e) { return String(p || ''); } };
 let journaalStuk = false;   // een kapot journaal meldt zich een keer, niet bij elk verzoek
 
 function middleware() {
@@ -128,7 +139,7 @@ function middleware() {
          als een regel, en er belandt geen id in het journaal dat naar een
          persoon leidt. Zie kern/doorgeefjournaal.js. */
       try {
-        const haak = require('./journaalhaak');
+        const haak = haakMod();
         haak.meld({ richting: 'in', wat: journaalPad(req.path), methode: req.method,
           status: res.statusCode, ms: Math.round(ms), mislukt: res.statusCode >= 400 });
       } catch (e) {
@@ -154,4 +165,6 @@ function foutMiddleware() {
   };
 }
 
-module.exports = { log, middleware, foutMiddleware };
+/* De drempel naar buiten, zodat de techniekcontrole LOG-01 kan zien OF er per
+   verzoek gelogd wordt in plaats van dat te raden uit de omgeving. */
+module.exports = { log, middleware, foutMiddleware, NIVEAU_WAARDE: DREMPEL };

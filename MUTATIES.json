@@ -1634,6 +1634,13 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "geldgrens.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "geldregie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2286,6 +2293,14 @@
       "operator": "===->!==",
       "gezakt": 8
     },
+    "journaalbestand.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/journaalbestand.js",
+      "operator": "getal+1#7",
+      "gezakt": 1,
+      "geprobeerd": 17
+    },
     "journaalschrijf.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2468,6 +2483,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "kleef-readyourwrites.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "kleine-grendels.test.js": {
       "soort": "server",
@@ -2808,6 +2830,14 @@
       "staat": "gezakt",
       "module": "server/log.js",
       "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "logstroom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/techniek.js",
+      "operator": "<=-><#0",
       "gezakt": 1,
       "geprobeerd": 3
     },
@@ -4042,6 +4072,13 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "paybudget.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "payroll-aangifte.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4149,6 +4186,20 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "payterug.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
+    "payvooraf.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "pda-aanmelden.test.js": {
@@ -4681,6 +4732,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "routerindex.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/routing.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "rtf-veilig.test.js": {
       "soort": "server",
@@ -5669,6 +5728,14 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "spreidingsoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/spreidingsproef.js",
+      "operator": "&&->||#4",
+      "gezakt": 1,
+      "geprobeerd": 33
+    },
     "sso.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5997,6 +6064,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "terugstortstand.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "theater-thuis.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6086,6 +6160,14 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "toegangprefix.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/register/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "toegankelijk.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6120,6 +6202,37 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "treasury.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "trio-kleef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/trio-kleef.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "trio-wees.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 2,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "operator": "liegpoort /api/"
+    },
+    "trio-werkers.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/trio-schaduw.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 6
     },
     "txgeld.test.js": {
       "soort": "puur",
@@ -6484,6 +6597,20 @@
         "server/kern/events.js"
       ],
       "posities": 1
+    },
+    "waarde.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 14,
+      "scherp": "gezakt"
+    },
+    "waardegraaf.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "wacht.test.js": {
       "soort": "puur",

@@ -60,15 +60,16 @@ module.exports = (deps) => {
   };
 
   /* De stille automaat: de veilige pijlers (opruimen + de bescherm-scan)
-     draaien vanzelf. Alleen op de schrijver, uit te zetten met
-     RTG_ZELFZORG_MS=0; upgrades en reparaties blijven altijd een knop. */
+     draaien vanzelf. Alleen op de LEIDER (db.leider, niet db.writable: in
+     spreidingsmodus schrijven alle servers en zou dit drie keer draaien), uit te
+     zetten met RTG_ZELFZORG_MS=0; upgrades en reparaties blijven altijd een knop. */
   const AUTO_MS = Number(process.env.RTG_ZELFZORG_MS || 6 * 3600000);
   api.automaatAan = () => AUTO_MS > 0;
   api.automaatUren = () => Math.round(AUTO_MS / 3600000 * 10) / 10;
   api.autoStart = () => {
     if (!AUTO_MS) return null;
     const t = setInterval(() => {
-      if (!db.writable) return;
+      if (!db.leider) return;
       try { api.opruim('automaat'); api.bescherm('automaat'); } catch (e) { /* nooit de server omtrekken */ }
     }, AUTO_MS);
     if (t.unref) t.unref();

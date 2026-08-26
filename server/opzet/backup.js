@@ -15,8 +15,10 @@
    lokale kopie en een keer voor RTG_BACKUP_DIR -- en er ontbraken drie dingen
    in de tweede. Die uitleg staat hieronder waar hij hoort.
 
-   Standby-servers slaan de backup over (db.writable): anders trekken drie
-   servers tegelijk aan dezelfde bestanden.
+   Alleen de LEIDER maakt de backup (db.leider): anders trekken drie servers
+   tegelijk aan dezelfde bestanden. Dat was db.writable, en dat viel samen zolang
+   er precies een schrijvende server was; in spreidingsmodus schrijven ze
+   allemaal en is de leider een aparte vlag (server/db/state.js).
    ========================================================================== */
 'use strict';
 
@@ -105,7 +107,7 @@ module.exports = function maakBackup(deps) {
   }
 
   function backupData() {
-    if (!db.writable) return; // standby-servers maken geen backups, dat doet de actieve
+    if (!db.leider) return; // alleen de leider maakt backups; standby en meelopende servers niet
     try {
       /* EERST de WAL leegdrukken, dan pas kopieren.
 

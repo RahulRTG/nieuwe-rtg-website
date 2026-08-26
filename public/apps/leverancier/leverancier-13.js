@@ -14,6 +14,11 @@
       ['diensten','\uD83D\uDDC2\uFE0F',T('kt.diensten','Aanbod')]
     );
     secs.push(['marketing','\uD83D\uDCE3','Marketing']);
+    /* TREASURY voor elke zaak, ongeacht genre. Geld dat binnenkomt is niet
+       hetzelfde als geld dat van u is: er zit btw in en er komt een loonrun aan.
+       Dat geldt voor een taxibedrijf net zo hard als voor een restaurant, dus
+       deze sectie hangt niet aan een genre. */
+    secs.push(['treasury','\u25C8',T('kt.treasury','Treasury')]);
     if (!secs.some(s2 => s2[0] === kantoorSec)) kantoorSec = 'bo';
     let html = '<div class="st-chips">'+secs.map(s2 =>
       '<button data-ksec="'+s2[0]+'"'+(kantoorSec===s2[0]?' class="on"':'')+'>'+s2[1]+' '+s2[2]+'</button>').join('')+'</div>';

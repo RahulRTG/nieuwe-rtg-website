@@ -4,8 +4,25 @@
    client stuurt bij elke knop een idem-sleutel mee, dubbeltikken kan nooit
    dubbel boeken. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, managerOnly, liveCodename, pay, onboarding, sseToOffice, factuurSaldo } = kern;
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  const { app, auth, officeAuth, liveCodename, pay, onboarding, factuurSaldo } = kern;
+  /* Bij een weigering krijgt het LID wel te horen waarom. Dat is het spiegelbeeld
+     van ./pay-zaak.js, waar een zaak juist een generiek antwoord krijgt: de reden
+     is een gegeven over dit lid, dus hij hoort bij hem thuis en nergens anders.
+     Een lid dat "geweigerd" leest zonder te weten dat het zijn eigen daglimiet
+     was, belt de helpdesk over een storing die er niet is.
+
+     Een witte lijst en geen kale doorgifte: wat de poort teruggeeft groeit mee
+     met de laag eronder, en een veld dat er ooit bijkomt hoort niet automatisch
+     naar buiten te lekken. */
+  const UITLEG = ['reden', 'opheffbaar', 'eigenGrens', 'klasse', 'plafondCenten', 'ruimte',
+    'gereserveerd', 'beschikbaar', 'dagMaxCenten', 'maandMaxCenten', 'besteed', 'venster',
+    'toegestaan', 'vervaltOp', 'tekort', 'kyc', 'bruikbaarVanaf', 'vermogen'];
+  const stuur = (res, r) => {
+    if (!r.error) return res.json(r);
+    const uit = { error: r.error };
+    for (const k of UITLEG) if (r[k] !== undefined) uit[k] = r[k];
+    return res.status(r.status || 400).json(uit);
+  };
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Pay is voor leden.' }); return true; }
     return false;
@@ -36,7 +53,9 @@ module.exports = (kern) => {
   app.post('/api/pay/oplaad', auth, async (req, res) => {
     if (geenEchtAccount(req, res)) return;
     if (kyc(req, res)) return;
-    stuur(res, await pay.laadOp({ codenaam: liveCodename(req.session), centen: req.body.centen, idem: req.body.idem }));
+    stuur(res, await pay.laadOp({ codenaam: liveCodename(req.session), centen: req.body.centen, idem: req.body.idem,
+      // voor het bevestigen van het betaler-IBAN als de aanbieder dat meestuurt
+      userId: (req.session.account && req.session.account.id) || null }));
   });
   // geld sturen naar een codenaam: EEN knop, autolaad inbegrepen
   app.post('/api/pay/stuur', auth, async (req, res) => {
@@ -95,30 +114,52 @@ module.exports = (kern) => {
     res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));
   });
 
-  // de partnerkant: code innen aan de kassa, saldo zien, uitbetalen
-  app.post('/api/supplier/pay/in', supplierAuth, async (req, res) => {
-    const r = await pay.kasInt({ supplierCode: req.supplier.code, code: req.body.code, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem });
-    if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuur(res, r);
+  /* ---- de portefeuille van het lid ----
+     Niet hetzelfde als /overzicht: dat gaat over zijn wallet, dit over ALLES
+     wat hij heeft. Sinds een lid een maaltijdbudget of een gemeentetegoed kan
+     hebben, is "wat heb ik" een lijst met regels erbij en geen getal. */
+  app.post('/api/pay/portefeuille', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!pay.portefeuille) return res.json({ ok: true, posities: [], vrijBesteedbaar: 0, gebonden: 0 });
+    res.json(pay.portefeuille(liveCodename(req.session)));
   });
-  app.post('/api/supplier/pay/overzicht', supplierAuth, (req, res) => {
-    res.json(pay.partnerOverzicht(req.supplier.code));
+
+  /* ---- de waardegraaf van het lid ----
+     Niet "wat is er gebeurd" (dat is /overzicht) maar "waar ging mijn geld
+     heen". Alles hier is afgeleid uit het grootboek; er wordt niets apart
+     geteld. */
+  app.post('/api/pay/graaf', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!pay.graafVanLid) return res.json({ ok: true, bronnen: [], bestemmingen: [] });
+    res.json(pay.graafVanLid(liveCodename(req.session), { dagen: req.body.dagen }));
   });
-  /* UITBETALEN IS GEEN WERKHANDELING MAAR EEN GELDHANDELING.
 
-     Deze route stuurt het hele RTG Pay-saldo van de zaak naar de bank en roept
-     daarvoor de echte betaaldienst aan. Hij stond op supplierAuth, en dat is
-     ELKE ingelogde medewerker: de afwasser met een pincode kon het saldo van de
-     zaak leegtrekken. Dat het geld naar de rekening van de zaak zelf gaat maakt
-     het niet ongevaarlijk -- het is onomkeerbaar, het haalt geld uit de kas op
-     een moment dat de eigenaar niet koos, en het is een prima manier om een
-     zaak op een druk moment plat te leggen.
+  /* DE TERUGSTORTING (./pay-terug.js): het saldo van een lid terug naar zijn
+     eigen bankrekening. Afgesplitst omdat dit bestand anders over de
+     keuringsgrens gaat, en het is een eerlijke snede: dit is het enige pad waar
+     geld het huis verlaat richting het LID, en sinds die weg bestaat is
+     walletsaldo elektronisch geld (zie WALLET_SALDO in kern/bevoegdheid). Zo
+     zwaar iets hoort niet tussen de dunne routes hierboven te staan. */
+  require('./pay-terug')(kern, { stuur, geenGast, kyc });
 
-     Innen (pay/in) en het saldo bekijken (pay/overzicht) blijven voor iedereen:
-     dat is het werk. Weghalen is van de manager. */
-  app.post('/api/supplier/pay/uitbetaal', supplierAuth, async (req, res) => {
-    if (!managerOnly(req, res)) return;
-    stuur(res, await pay.partnerUitbetaal({ supplierCode: req.supplier.code, idem: req.body.idem }));
+  /* De ZAAKKANT (./pay-zaak.js): budget geven, vooraf vastzetten, innen,
+     saldo en uitbetalen. Afgesplitst omdat dit bestand anders over de
+     keuringsgrens van 10240 byte gaat, en het is de eerlijke snede: alles
+     hierboven hangt aan `auth` (een lid), alles daar aan `supplierAuth` (een
+     zaak). Twee poorten, twee bestanden. */
+  require('./pay-zaak')(kern, { stuur });
+
+  /* HET BEWIJSBORD. Anders dan /gezond hieronder, dat één ja of nee geeft aan de
+     bewaking: dit is het bord waarop staat WAT er is aangetoond en waaruit dat
+     blijkt. Alleen voor het kantoor, want de tellingen (hoeveel rekeningen,
+     welke staan rood) zijn bedrijfsgegevens.
+
+     Let op de derde stand: niet-bewezen. Dat is geen storing en geen groen --
+     het is de eerlijke stand voor alles wat niet gemeten is, en juist die stand
+     maakt het bord bruikbaar. Zie de kop van kern/pay/bewijs.js. */
+  app.post('/api/office/pay/bewijs', officeAuth, (req, res) => {
+    if (!pay.bewijsbord) return res.status(501).json({ error: 'Het bewijsbord draait hier niet.' });
+    res.json(pay.bewijsbord());
   });
 
   // de gezondheidsknop voor de bewaking: klopt het grootboek nog op de cent?

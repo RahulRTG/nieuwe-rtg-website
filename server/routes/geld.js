@@ -102,6 +102,16 @@ module.exports = (kern) => {
   app.post('/api/geld/pot/weg', auth, doe((c, b) => kern.geldbeleid.potWeg(c, String(b.id || ''))));
   app.post('/api/geld/actielog', auth, doe((c) => ({ status: 200, ok: true, log: kern.geldbeleid.log(c) })));
 
+  /* DE EIGEN GELDGRENS. Apart van /beleid hierboven, en dat is geen ordening
+     maar een verschil in aard: die regels WAARSCHUWEN, deze WEIGERT. Ze op één
+     lijst zetten zou het lid laten denken dat het allemaal hetzelfde soort
+     afspraak is, terwijl het verschil tussen een melding en een gesloten deur
+     nou juist is waar hij voor kiest. Zie kern/geldbeleid/grens.js voor de
+     bedenktijd, en waarom die opt-in is. */
+  app.post('/api/geld/grens', auth, doe((c) => ({ status: 200, ok: true, grenzen: kern.geldbeleid.grenzen(c) })));
+  app.post('/api/geld/grens/zet', auth, doe((c, b) => kern.geldbeleid.grensZet(c, b)));
+  app.post('/api/geld/grens/weg', auth, doe((c, b) => kern.geldbeleid.grensWeg(c, String(b.id || ''))));
+
   /* De gegronde Rahul staat in een eigen bestand: antwoorden (AI plus het
      rekenende terugvalpad) is meer dan vertalen, en dat hoort niet tussen de
      dunne routes hierboven te groeien. */

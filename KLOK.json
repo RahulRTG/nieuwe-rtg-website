@@ -2,9 +2,9 @@
   "uitleg": "Directe tijdsaanroepen (new Date() / Date.now() zonder argument) in server/. MAG ALLEEN KRIMPEN -- zie test/klok.test.js. Wie de tijd aan het OS vraagt, doet niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd of een verlopen mandaat.",
   "hoe": "node scripts/klok.js --top",
   "gemeten": {
-    "totaal": 1283,
-    "bestanden": 661,
-    "modulesOpDeKlok": 64
+    "totaal": 1282,
+    "bestanden": 660,
+    "modulesOpDeKlok": 71
   },
   "vrijgesteld": [
     {

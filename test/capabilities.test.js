@@ -158,7 +158,12 @@ test('8. de echte meting draait, en klopt met wat er is vastgelegd', () => {
   const pad = path.join(WORTEL, 'CAPABILITEIT.json');
   assert.ok(fs.existsSync(pad), 'CAPABILITEIT.json bestaat -- draai: npm run capabilities:vast');
   const vast = JSON.parse(fs.readFileSync(pad, 'utf8'));
-  for (const sleutel of ['woordenlijsten', 'leden', 'ledenInEen', 'ledenInEenPct', 'maxGelijkenis']) {
+  /* ALLE getallen uit de afdruk, en niet een handvol. Hier stonden er vijf, en
+     daardoor kon een verouderde afdruk erdoor: het toevoegen van een enkele
+     kernmodule verschoof `bekeken` en `kandidaten` zonder dat iets klaagde. Een
+     afdruk die maar half wordt vergeleken, is een afdruk die half achterloopt. */
+  for (const sleutel of ['woordenlijsten', 'leden', 'ledenInEen', 'ledenInEenPct',
+    'maxGelijkenis', 'bekeken', 'kandidaten', 'gelijkendeParen']) {
     assert.equal(r[sleutel], vast[sleutel],
       'CAPABILITEIT.json loopt achter op "' + sleutel + '" (' + vast[sleutel] + ' vastgelegd, ' +
       r[sleutel] + ' gemeten) -- draai: npm run capabilities:vast');

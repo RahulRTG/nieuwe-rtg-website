@@ -5,7 +5,7 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan,
-    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, KASCODE_MS } = ctx;
+    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde, MIN_CENTEN, MAX_CENTEN, KASCODE_MS } = ctx;
 
   /* ---------- geld sturen en Klompjes ---------- */
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
@@ -138,7 +138,18 @@ module.exports = (ctx) => {
       tegen: (r.naar === rek ? r.van : r.naar).replace(/^lid:/, '').replace(/^partner:/, 'zaak ').replace(/^extern:oplaad$/, 'opgeladen').replace(/^extern:uitbetaald$/, 'bank')
     }));
     const v = verzoekenVoor(codenaam);
-    return { ok: true, codenaam, saldo: saldoVan(rek), geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
+    /* Saldo, gereserveerd en beschikbaar staan hier alle drie, en dat is geen
+       uitgebreidheid maar een noodzaak: zonder het tweede getal ziet een lid
+       saldo dat hij niet kan uitgeven en kan niemand hem uitleggen waarom. Een
+       zaak die een borg vastzet, moet zichtbaar zijn op het scherm van degene
+       bij wie hij vastzit. Zonder waardelaag zijn saldo en beschikbaar gewoon
+       hetzelfde getal en staat er geen reservering. */
+    const vast = waarde ? waarde.gereserveerd(rek) : 0;
+    return { ok: true, codenaam, saldo: saldoVan(rek),
+      gereserveerd: vast, beschikbaar: saldoVan(rek) - vast,
+      reserveringen: waarde ? waarde.reserveringen(rek).map(r => ({
+        id: r.id, centen: r.centen, doel: r.doel, tot: r.tot, door: r.ref })) : [],
+      geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
   }
 
   return { stuur, huisIn, huisUit, verzoekMaak, verzoekenVoor, verzoekBetaal, verzoekIntrek, tikCode, tikBetaal, tikFeed, overzicht };

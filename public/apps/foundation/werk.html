@@ -48,30 +48,99 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="werk-premium.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl rtg-werk-os">
 <div id="balk"></div>
-<div class="wrap" role="main">
-  <h1>Werk en vacatures</h1>
-
+<main class="werk-shell" role="main">
   <div id="teJong" class="jong" hidden></div>
 
   <div id="werkkant" hidden>
-    <div class="balkje">
-      <label for="lft">Jouw leeftijd</label>
-      <input class="veld" id="lft" type="number" inputmode="numeric" min="16" max="99" value="16">
-      <label for="land">Land</label>
-      <select class="veld" id="land" style="max-width:11rem;"><option value="">Overal</option></select>
-      <button class="knop grijs klein" id="gpsBtn" type="button" style="padding:.4rem .7rem;">Toon afstand</button>
+    <div class="werk-eyebrow">Opportunity OS · transparant en persoonlijk</div>
+    <header class="werk-head">
+      <div>
+        <h1>Werk dat bij je leven past.</h1>
+        <p>Ontdek, vergelijk en bespreek kansen in één veilige werkruimte. Geen eindeloze feed en geen verborgen matchscore.</p>
+      </div>
+      <div class="werk-mode" role="tablist" aria-label="Manier van werk zoeken">
+        <button type="button" role="tab" id="modeDesk" aria-selected="true" aria-controls="deskPane">Desk<span>gericht kiezen</span></button>
+        <button type="button" role="tab" id="modeDeck" aria-selected="false" aria-controls="deckPane">Deck<span>kansen ontdekken</span></button>
+      </div>
+    </header>
+
+    <section class="werk-command" aria-label="Vacatures zoeken en filteren">
+      <label><span>Zoek</span><input id="werkZoek" type="search" autocomplete="off" placeholder="Functie, bedrijf, vaardigheid of plaats"></label>
+      <label><span>Land</span><select id="land"><option value="">Overal</option></select></label>
+      <label><span>Type</span><select id="werkSoort"><option value="">Alles</option><option value="fulltime">Fulltime</option><option value="parttime">Parttime</option><option value="stage">Stage</option><option value="bijbaan">Bijbaan</option><option value="vakantiewerk">Vakantiewerk</option><option value="vrijwilliger">Vrijwilliger</option></select></label>
+      <button class="werk-gps" id="gpsBtn" type="button">Dicht bij mij</button>
+      <input id="lft" type="hidden" value="16">
+    </section>
+    <div class="werk-cv">
       <span id="cvStatus" class="cvstatus"></span>
+      <span class="werk-summary"><span><b id="werkAantal">0</b> passende kansen</span><span><b id="werkBewaardAantal">0</b> bewaard</span></span>
     </div>
-    <div id="mijnBlok" hidden>
-      <h2 style="font-family:var(--serif);font-weight:500;font-size:1.15rem;margin:.4rem 0 .6rem;">Mijn sollicitaties</h2>
+
+    <section id="deskPane" role="tabpanel" aria-labelledby="modeDesk">
+      <div class="werk-desk">
+        <aside class="werk-rail" aria-label="Opportunity Desk">
+          <h2>Jouw desk</h2>
+          <nav class="werk-rail-nav">
+            <button class="actief" type="button" data-weergave="kansen">Beste kansen <b id="railKansen">0</b></button>
+            <button type="button" data-weergave="bewaard">Bewaard <b id="railBewaard">0</b></button>
+            <button type="button" data-weergave="trajecten">Trajecten <b id="railTrajecten">0</b></button>
+          </nav>
+          <h2>Beslis met feiten</h2>
+          <div class="werk-principle"><strong>Jij houdt de regie.</strong>Een score is nooit een besluit. RTG toont waarom iets past, wat onbekend is en welke gegevens je deelt.</div>
+        </aside>
+        <section class="werk-results" aria-label="Passende vacatures">
+          <header class="werk-results-head"><h2 id="lijstTitel">Beste volgende kansen</h2><span id="lijstSub">Uitlegbaar gesorteerd</span></header>
+          <div class="werk-list" id="lijst"><div class="werk-empty"><div><b>Vacatures laden…</b><p>We bouwen je persoonlijke Opportunity Desk.</p></div></div></div>
+        </section>
+        <article class="werk-detail" id="werkDetail" aria-live="polite"></article>
+      </div>
+    </section>
+
+    <section id="deckPane" role="tabpanel" aria-labelledby="modeDeck" hidden>
+      <div class="werk-deck">
+        <div>
+          <div class="deck-stage" id="deckStage"></div>
+          <div class="deck-controls" aria-label="Kans beoordelen">
+            <button class="deck-control" id="deckUndo" type="button" title="Herstel laatste keuze" aria-label="Herstel laatste keuze">↶</button>
+            <button class="deck-control" id="deckNo" type="button" title="Niet passend" aria-label="Niet passend">×</button>
+            <button class="deck-control" id="deckSave" type="button" title="Bewaren" aria-label="Bewaren">◇</button>
+            <button class="deck-control primary" id="deckYes" type="button" title="Interesse" aria-label="Interesse">♥</button>
+            <button class="deck-control" id="deckQuestion" type="button" title="Volledige kans bekijken" aria-label="Volledige kans bekijken">?</button>
+          </div>
+        </div>
+        <aside class="deck-info">
+          <div class="werk-eyebrow">Ronde van maximaal tien</div>
+          <h2>Ontdek zonder eindeloos te scrollen.</h2>
+          <p>Alleen je expliciete keuzes verbeteren de volgende ronde. Kijktijd en twijfel worden niet als gedrag opgeslagen.</p>
+          <div class="deck-progress" id="deckProgress" aria-label="Voortgang in deze ronde"></div>
+          <div class="deck-shortcuts"><span>Niet passend <kbd>←</kbd></span><span>Interesse <kbd>→</kbd></span><span>Bewaren <kbd>↑</kbd></span><span>Volledige kans <kbd>Enter</kbd></span></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="werk-mutual" id="matchBlok" hidden>
+      <div class="werk-trajecten-head"><div><div class="werk-eyebrow">Wederzijdse interesse</div><h2>Jullie willen allebei kennismaken.</h2><p>Jij beslist of je cv en identiteit nu naar de werkgever gaan.</p></div></div>
+      <div class="mijn" id="mutualMatches"></div>
+    </section>
+
+    <section class="werk-trajecten" id="mijnBlok" hidden>
+      <div class="werk-trajecten-head"><div><h2>Actieve trajecten</h2><p>Van eerste interesse tot gesprek en indiensttreding in één ruimte.</p></div></div>
       <div class="mijn" id="mijn"></div>
-    </div>
-    <h2 id="alleKop" style="font-family:var(--serif);font-weight:500;font-size:1.15rem;margin:1.2rem 0 .6rem;" hidden>Alle vacatures</h2>
-    <div class="lijst" id="lijst"><div class="leeg">Vacatures laden...</div></div>
+    </section>
+    <h2 id="alleKop" hidden>Alle vacatures</h2>
   </div>
+</main>
+
+<div class="werk-compare" id="werkCompare" aria-live="polite"><span><b id="vergelijkAantal">0</b> kansen geselecteerd</span><button type="button" id="vergelijkOpen">Vergelijk</button></div>
+<div class="werk-compare-panel" id="vergelijkPanel" hidden>
+  <section class="werk-compare-sheet" role="dialog" aria-modal="true" aria-labelledby="vergelijkTitel">
+    <header class="werk-compare-head"><h2 id="vergelijkTitel">Kansen naast elkaar</h2><button class="werk-secondary" id="vergelijkSluit" type="button">Sluiten</button></header>
+    <div class="werk-compare-grid" id="vergelijkGrid"></div>
+  </section>
 </div>
 
 <script src="sessie.js"></script>
@@ -134,6 +203,71 @@ function toonCvStatus(){
 
 let vacatures = [];
 let mijnPlek = Geo.laatste(); // {lat,lng} of null
+let geselecteerdId = null;
+let werkWeergave = 'kansen';
+let deckRij = [];
+let deckPos = 0;
+let deckGeschiedenis = [];
+const WERK_STATE_KEY = 'rtf_opportunity_os_v1';
+function werkStateLees(){
+  try { return Object.assign({ bewaard:[], vergelijk:[], overgeslagen:[], interesse:[] }, JSON.parse(localStorage.getItem(WERK_STATE_KEY)||'{}')); }
+  catch(e){ return { bewaard:[], vergelijk:[], overgeslagen:[], interesse:[] }; }
+}
+let werkState = werkStateLees();
+function werkStateBewaar(){ localStorage.setItem(WERK_STATE_KEY, JSON.stringify(werkState)); werkTellers(); }
+function wisselIn(lijst, id, max){
+  const i = lijst.indexOf(id);
+  if (i >= 0) lijst.splice(i,1); else { lijst.push(id); if(max && lijst.length>max) lijst.shift(); }
+  return i < 0;
+}
+function zoekWoorden(t){ return String(t||'').toLowerCase().split(/[^a-z0-9à-ž]+/i).filter(x=>x.length>2); }
+function salaris(v){
+  if (!(v.salarisMin || v.salarisMax)) return 'Nog niet gepubliceerd';
+  const euro = n => new Intl.NumberFormat('nl-NL',{style:'currency',currency:v.valuta||'EUR',maximumFractionDigits:0}).format(n);
+  return v.salarisMin && v.salarisMax ? euro(v.salarisMin)+' tot '+euro(v.salarisMax) : 'vanaf '+euro(v.salarisMin||v.salarisMax);
+}
+function matchVan(v){
+  const cv = bouwCv() || { skills:[], experience:[], headline:'', about:'' };
+  const profiel = zoekWoorden([cv.headline,(cv.skills||[]).join(' '),(cv.experience||[]).join(' '),cv.about].join(' '));
+  const baan = zoekWoorden([v.func,v.omschrijving,(v.vaardigheden||[]).join(' '),v.typeLabel].join(' '));
+  const raak = [...new Set(profiel.filter(x=>baan.some(y=>y.includes(x)||x.includes(y))))];
+  let score = 72 + Math.min(12, raak.length*3);
+  if (v.salarisMin || v.salarisMax) score += 3;
+  if (v.uren) score += 2;
+  if (v.werkvorm) score += 2;
+  if (mijnPlek && v.loc) score += 3;
+  score = Math.max(68,Math.min(96,score));
+  const sterk = [];
+  if (raak.length) sterk.push('Sluit aan op '+raak.slice(0,2).join(' en ')+' in je profiel');
+  else sterk.push('Past bij je gekozen leeftijd, land en type werk');
+  if (v.uren) sterk.push('De uren zijn vooraf gepubliceerd');
+  if (v.salarisMin || v.salarisMax) sterk.push('De salarisband is transparant');
+  if (mijnPlek && v.loc) sterk.push('Reisafstand kan direct worden vergeleken');
+  const aandacht = [];
+  if (!(v.salarisMin || v.salarisMax)) aandacht.push('Salaris is nog niet gepubliceerd');
+  if (!v.werkvorm) aandacht.push('Werkvorm is nog niet bevestigd');
+  return { score, sterk:sterk.slice(0,3), aandacht:aandacht.slice(0,2) };
+}
+function kmVan(v){ return mijnPlek && v.loc ? Geo.afstandKm(mijnPlek,v.loc) : null; }
+function plaatsVan(v){ return [v.plaats||v.stad,v.landNaam].filter(Boolean).join(', ') || 'Locatie volgt'; }
+function werkTellers(){
+  const zichtbaar = gefilterdeVacatures();
+  $('#werkAantal').textContent = zichtbaar.length;
+  $('#werkBewaardAantal').textContent = werkState.bewaard.length;
+  $('#railKansen').textContent = vacatures.length;
+  $('#railBewaard').textContent = werkState.bewaard.length;
+  $('#vergelijkAantal').textContent = werkState.vergelijk.length;
+  $('#werkCompare').classList.toggle('zichtbaar',werkState.vergelijk.length>1);
+}
+function gefilterdeVacatures(){
+  const q = ($('#werkZoek') && $('#werkZoek').value || '').trim().toLowerCase();
+  const soort = ($('#werkSoort') && $('#werkSoort').value) || '';
+  let rij = vacatures.filter(v => !soort || v.soort===soort).filter(v => !q || [v.func,v.bedrijf,v.omschrijving,v.plaats,v.stad,v.typeLabel,(v.vaardigheden||[]).join(' ')].join(' ').toLowerCase().includes(q));
+  if (werkWeergave === 'bewaard') rij = rij.filter(v=>werkState.bewaard.includes(v.id));
+  rij = rij.map(v=>({v,m:matchVan(v),km:kmVan(v)}));
+  rij.sort((a,b)=> mijnPlek ? ((a.km==null?1e9:a.km)-(b.km==null?1e9:b.km)) : b.m.score-a.m.score || String(b.v.at||'').localeCompare(String(a.v.at||'')));
+  return rij;
+}
 
 /* Meenemen (shared/uitvoer.js): de vacatures die nu voor deze leeftijd en dit
    land open staan, met de velden die op de kaart staan -- en of dit toestel er
@@ -173,14 +307,15 @@ async function laadMijn(){
   try {
     const d = await api('/gezin/sollicitaties', { code: s.code, token: s.token });
     const lijst = d.sollicitaties || [];
+    $('#railTrajecten').textContent = lijst.length;
     if (!lijst.length){ $('#mijnBlok').hidden = true; $('#alleKop').hidden = true; return; }
     $('#mijnBlok').hidden = false; $('#alleKop').hidden = false;
     $('#mijn').innerHTML = lijst.map(x=>{
       const st = STATUS[x.status] || STATUS.onbekend;
       const waar = [x.bedrijf, x.landNaam].filter(Boolean).join(' · ');
       return '<div class="msoll"><div class="mt"><b>'+esc(x.func)+'</b><span>'+esc(waar)+'</span></div>'+
-        (x.chatId ? '<button class="knop grijs klein" style="padding:.35rem .7rem;" data-chat="'+esc(x.chatId)+'" data-bedrijf="'+esc(x.bedrijf)+'">Chat</button>' : '')+
-        '<span class="pil '+st[1]+'">'+esc(st[0])+'</span></div>';
+        '<span class="pil '+st[1]+'">'+esc(st[0])+'</span>'+
+        (x.chatId ? '<button class="werk-icon-btn" data-chat="'+esc(x.chatId)+'" data-bedrijf="'+esc(x.bedrijf)+'">Open Deal Room</button>' : '')+'</div>';
     }).join('');
     $('#mijn').querySelectorAll('[data-chat]').forEach(b=> b.addEventListener('click', ()=> openChat(b.dataset.chat, b.dataset.bedrijf)));
   } catch(e){ $('#mijnBlok').hidden = true; $('#alleKop').hidden = true; }
@@ -225,33 +360,144 @@ async function stuurChat(){ const inp=document.getElementById('rcIn'); const t=(
 // de chat-endpoints hebben het gezin-token nodig
 function rtfApi2(pad, body){ return rtfApi(pad, Object.assign({ code: s.code, token: s.token }, body||{})); }
 
-function teken(){
-  const verz = verzonden();
-  if (!vacatures.length){
-    const land = $('#land').value;
-    $('#lijst').innerHTML = '<div class="leeg">'+(land
-      ? 'Er staan nu geen passende vacatures open in dit land. Kies "Overal" of een ander land, of kijk later nog eens.'
-      : 'Er staan nu geen vacatures open die bij jouw leeftijd passen. Kijk gerust later nog eens; partners plaatsen doorlopend nieuwe kansen.')+'</div>';
-    return;
-  }
-  // afstand berekenen en op afstand sorteren wanneer we de locatie weten
-  const rij = vacatures.map(v => ({ v, km: mijnPlek && v.loc ? Geo.afstandKm(mijnPlek, v.loc) : null }));
-  if (mijnPlek) rij.sort((a,b) => (a.km==null?1e9:a.km) - (b.km==null?1e9:b.km));
-  $('#lijst').innerHTML = rij.map(({v, km})=>{
-    const al = verz.includes(v.id);
-    const afst = km!=null ? ''+Geo.tekst(km)+' van jou' : '';
-    const landChip = v.landNaam ? vlag(v.land)+' '+v.landNaam : '';
-    const meta = [ SOORT[v.soort]||v.soort, 'vanaf '+v.minLeeftijd+' jaar', landChip, v.plaats||v.stad, v.uren, afst ].filter(Boolean).map(x=>'<span>'+esc(x)+'</span>').join('');
-    return '<div class="kaart vac">'+
-      '<div class="kop"><span class="ic">'+esc(v.icon||'')+'</span><div><h2>'+esc(v.func)+'</h2><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div><div class="meta">'+meta+'</div></div></div>'+
-      (v.omschrijving?'<div class="oms">'+esc(v.omschrijving)+'</div>':'<div class="oms" style="opacity:.7;">Solliciteer met je cv; het bedrijf neemt daarna contact met je op.</div>')+
-      '<div class="acties">'+
-      (al ? '<span class="verstuurd">Sollicitatie verstuurd</span>'
-          : '<button class="knop" data-sol="'+esc(v.id)+'" data-code="'+esc(v.supplierCode)+'">Solliciteer met mijn cv</button>')+
-      '</div></div>';
-  }).join('');
-  document.querySelectorAll('[data-sol]').forEach(b=> b.addEventListener('click', ()=> solliciteer(b)));
+function metaVan(v, km){
+  return [SOORT[v.soort]||v.soort,v.werkvorm ? v.werkvorm.replace('-',' ') : '',plaatsVan(v),v.uren,km!=null?Geo.tekst(km)+' van jou':''].filter(Boolean);
 }
+function vacatureKaart(x){
+  const v=x.v,m=x.m, actief=v.id===geselecteerdId, bewaard=werkState.bewaard.includes(v.id), vergelijk=werkState.vergelijk.includes(v.id);
+  return '<article class="werk-card '+(actief?'actief':'')+'" data-open="'+esc(v.id)+'" tabindex="0" aria-label="Open '+esc(v.func)+' bij '+esc(v.bedrijf)+'">'+
+    '<div class="werk-card-top"><div><h3>'+esc(v.func)+'</h3><div class="bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div></div><span class="werk-score">'+m.score+'%</span></div>'+
+    '<div class="werk-card-meta">'+metaVan(v,x.km).slice(0,4).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>'+
+    '<p class="werk-card-reason">'+esc(m.sterk[0])+'</p>'+
+    '<div class="werk-card-actions"><button class="werk-icon-btn '+(bewaard?'aan':'')+'" type="button" data-bewaar="'+esc(v.id)+'">'+(bewaard?'Bewaard':'Bewaar')+'</button><button class="werk-icon-btn '+(vergelijk?'aan':'')+'" type="button" data-vergelijk="'+esc(v.id)+'">Vergelijk</button></div></article>';
+}
+function detailTeken(v){
+  const el=$('#werkDetail');
+  if(!v){ el.innerHTML='<div class="werk-empty"><div><b>Kies een kans</b><p>Je ziet hier de matchuitleg, voorwaarden en wat nog onbekend is.</p></div></div>'; return; }
+  const m=matchVan(v), km=kmVan(v), al=verzonden().includes(v.id), bewaard=werkState.bewaard.includes(v.id);
+  const facts=[['Salaris',salaris(v)],['Werkvorm',v.werkvorm?v.werkvorm.replace('-',' '):'Nog niet bevestigd'],['Locatie',plaatsVan(v)],['Tijd',v.uren||'In overleg'],['Dienstverband',SOORT[v.soort]||v.soort],['Afstand',km!=null?Geo.tekst(km):'Toon je afstand']];
+  el.innerHTML='<div class="werk-detail-inner"><button class="werk-icon-btn" id="detailTerug" type="button">← Terug naar kansen</button><div class="werk-detail-kicker">'+m.score+'% praktische match · uitlegbaar</div><h2>'+esc(v.func)+'</h2><div class="werk-detail-bedrijf">'+esc(v.bedrijf)+(v.typeLabel?' · '+esc(v.typeLabel):'')+'</div>'+
+    '<div class="werk-detail-actions">'+(al?'<span class="verstuurd">Sollicitatie verstuurd</span>':'<button class="werk-primary" type="button" data-sol="'+esc(v.id)+'" data-code="'+esc(v.supplierCode)+'">Start een kennismaking</button>')+'<button class="werk-secondary" type="button" data-bewaar="'+esc(v.id)+'">'+(bewaard?'Verwijder uit bewaard':'Bewaar kans')+'</button><button class="werk-secondary" type="button" data-vergelijk="'+esc(v.id)+'">Vergelijk</button></div>'+
+    '<div class="werk-facts">'+facts.map(f=>'<div class="werk-fact"><small>'+esc(f[0])+'</small><b>'+esc(f[1])+'</b></div>').join('')+'</div>'+
+    '<section class="werk-section"><h3>Waarom dit bij je kan passen</h3><div class="werk-reasons">'+m.sterk.map(t=>'<div class="werk-reason"><i>✓</i><span>'+esc(t)+'</span></div>').join('')+m.aandacht.map(t=>'<div class="werk-reason aandacht"><i>!</i><span>'+esc(t)+'</span></div>').join('')+'</div></section>'+
+    '<section class="werk-section"><h3>Het werk</h3><p>'+esc(v.omschrijving||'De werkgever heeft nog geen uitgebreide functieomschrijving gepubliceerd. Je kunt wel interesse tonen en dit direct in de kennismaking vragen.')+'</p></section>'+
+    ((v.vaardigheden||[]).length?'<section class="werk-section"><h3>Vaardigheden</h3><div class="werk-card-meta">'+v.vaardigheden.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></section>':'')+
+    '<aside class="werk-transparency"><strong>Transparantie vóór je solliciteert</strong><p>RTG laat zien wat de werkgever wel en niet heeft gepubliceerd. Je profiel blijft van jou; pas bij een kennismaking bepaal je welke gegevens meegaan.</p></aside></div>';
+  const terug=$('#detailTerug'); if(terug) terug.addEventListener('click',()=>el.classList.remove('open'));
+}
+function teken(){
+  const rij=gefilterdeVacatures();
+  werkTellers();
+  if(!rij.length){
+    $('#lijst').innerHTML='<div class="werk-empty"><div><b>'+ (werkWeergave==='bewaard'?'Nog niets bewaard':'Geen passende kansen') +'</b><p>'+ (werkWeergave==='bewaard'?'Bewaar interessante kansen vanuit je Desk of Deck.':'Verbreed je zoekopdracht of kies een ander land. Nieuwe vacatures verschijnen automatisch op je Desk.') +'</p></div></div>';
+    detailTeken(null); deckVoorbereiden(); return;
+  }
+  if(!geselecteerdId || !rij.some(x=>x.v.id===geselecteerdId)) geselecteerdId=rij[0].v.id;
+  $('#lijst').innerHTML=rij.map(vacatureKaart).join('');
+  detailTeken(vacatures.find(v=>v.id===geselecteerdId));
+  deckVoorbereiden();
+}
+
+function selecteerVacature(id){
+  geselecteerdId=id; teken();
+  const d=$('#werkDetail'); if(innerWidth<=820) d.classList.add('open');
+}
+function deckVoorbereiden(){
+  deckRij=gefilterdeVacatures().filter(x=>!werkState.overgeslagen.includes(x.v.id)).slice(0,10);
+  if(deckPos>=deckRij.length) deckPos=0;
+  deckTeken();
+}
+function deckTeken(){
+  const stage=$('#deckStage'); if(!stage)return;
+  $('#deckProgress').innerHTML=Array.from({length:Math.max(1,deckRij.length)},(_,i)=>'<i class="'+(i<deckPos?'gezien':'')+'"></i>').join('');
+  const x=deckRij[deckPos];
+  if(!x){ stage.innerHTML='<div class="werk-empty"><div><b>Ronde voltooid</b><p>Je hebt deze zorgvuldig gekozen kansen bekeken. Open je Desk om te vergelijken of herstel een keuze.</p></div></div>'; return; }
+  const v=x.v,m=x.m;
+  stage.innerHTML='<article class="deck-card" id="deckCard" tabindex="0"><span class="deck-mark nee">Niet passend</span><span class="deck-mark ja">Interesse</span><div class="deck-score"><b>'+m.score+'%</b><span>praktische match</span></div><h2>'+esc(v.func)+'</h2><div class="deck-company">'+esc(v.bedrijf)+' · '+esc(plaatsVan(v))+'</div><div class="deck-meta">'+metaVan(v,x.km).slice(0,4).map(t=>'<span>'+esc(t)+'</span>').join('')+'<span>'+esc(salaris(v))+'</span></div><div class="deck-why">'+m.sterk.slice(0,2).map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></article>';
+  const card=$('#deckCard'); let start=0,delta=0;
+  card.addEventListener('pointerdown',e=>{start=e.clientX;delta=0;card.setPointerCapture(e.pointerId)});
+  card.addEventListener('pointermove',e=>{if(!start)return;delta=e.clientX-start;card.style.transform='translateX('+delta+'px) rotate('+(delta/28)+'deg)';card.querySelector('.ja').style.opacity=Math.max(0,delta/90);card.querySelector('.nee').style.opacity=Math.max(0,-delta/90)});
+  card.addEventListener('pointerup',()=>{if(Math.abs(delta)>85) deckActie(delta>0?'interesse':'niet'); else {card.style.transform='';card.querySelectorAll('.deck-mark').forEach(x=>x.style.opacity=0)}start=0});
+}
+function deckActie(actie){
+  const x=deckRij[deckPos]; if(!x)return;
+  deckGeschiedenis.push({ state:JSON.stringify(werkState), id:x.v.id, actie });
+  if(actie==='niet' && !werkState.overgeslagen.includes(x.v.id)) werkState.overgeslagen.push(x.v.id);
+  if(actie==='interesse') {
+    if(!werkState.interesse.includes(x.v.id)) werkState.interesse.push(x.v.id);
+    if(!werkState.bewaard.includes(x.v.id)) werkState.bewaard.push(x.v.id);
+    rtfApi('/talent/interesse',{code:s.code,token:s.token,vacatureId:x.v.id,cv:bouwCv()||{}}).then(laadMatches).catch(()=>{});
+  }
+  if(actie==='bewaar' && !werkState.bewaard.includes(x.v.id)) werkState.bewaard.push(x.v.id);
+  werkStateBewaar(); deckPos++; deckTeken();
+}
+function deckHerstel(){
+  const vorig=deckGeschiedenis.pop(); if(!vorig)return;
+  werkState=JSON.parse(vorig.state); deckPos=Math.max(0,deckPos-1); werkStateBewaar(); deckTeken();
+  if(vorig.actie==='interesse') rtfApi('/talent/interesse',{code:s.code,token:s.token,vacatureId:vorig.id,actief:false}).then(laadMatches).catch(()=>{});
+}
+
+async function laadMatches(){
+  try{
+    const d=await rtfApi('/talent/mijn',{code:s.code,token:s.token});
+    const wederzijds=(d.matches||[]).filter(x=>x.status==='wederzijds');
+    $('#matchBlok').hidden=!wederzijds.length;
+    $('#mutualMatches').innerHTML=wederzijds.map(x=>'<article class="werk-mutual-card"><span class="pil aangenomen">Wederzijds</span><h3>'+esc(x.func)+'</h3><p>'+esc(x.bedrijf)+' wil ook kennismaken. Je naam en cv zijn nog niet gedeeld.</p><button class="werk-primary" type="button" data-sol="'+esc(x.vacatureId)+'" data-code="'+esc(x.supplierCode)+'">Open veilig een Deal Room</button></article>').join('');
+    $('#mutualMatches').querySelectorAll('[data-sol]').forEach(b=>b.addEventListener('click',()=>solliciteer(b)));
+  }catch(e){ $('#matchBlok').hidden=true; }
+}
+function vergelijkTeken(){
+  const jobs=werkState.vergelijk.map(id=>vacatures.find(v=>v.id===id)).filter(Boolean);
+  const grid=$('#vergelijkGrid'); grid.style.setProperty('--vergelijk-aantal',jobs.length);
+  const rijen=[['Kans',v=>'<strong>'+esc(v.func)+'</strong><br><span>'+esc(v.bedrijf)+'</span>'],['Match',v=>matchVan(v).score+'%'],['Salaris',v=>esc(salaris(v))],['Locatie',v=>esc(plaatsVan(v))],['Werkvorm',v=>esc(v.werkvorm?v.werkvorm.replace('-',' '):'Onbekend')],['Uren',v=>esc(v.uren||'In overleg')],['Aandacht',v=>esc(matchVan(v).aandacht[0]||'Geen harde blokkade gevonden')]];
+  grid.innerHTML=rijen.map(r=>'<b>'+r[0]+'</b>'+jobs.map(r[1]).map(x=>'<div>'+x+'</div>').join('')).join('');
+  $('#vergelijkPanel').hidden=false;
+}
+
+function zetModus(modus){
+  const deck=modus==='deck';
+  $('#werkkant').classList.toggle('werk-deck-actief',deck);
+  $('#modeDesk').setAttribute('aria-selected',String(!deck));
+  $('#modeDeck').setAttribute('aria-selected',String(deck));
+  $('#deskPane').hidden=deck; $('#deckPane').hidden=!deck;
+  if(deck){ deckPos=0; deckVoorbereiden(); setTimeout(()=>$('#deckCard')&&$('#deckCard').focus({preventScroll:true}),0); }
+}
+$('#modeDesk').addEventListener('click',()=>zetModus('desk'));
+$('#modeDeck').addEventListener('click',()=>zetModus('deck'));
+$('#werkZoek').addEventListener('input',()=>teken());
+$('#werkSoort').addEventListener('change',()=>teken());
+$('#lijst').addEventListener('click',e=>{
+  const bewaar=e.target.closest('[data-bewaar]'), vergelijk=e.target.closest('[data-vergelijk]'), open=e.target.closest('[data-open]');
+  if(bewaar){ e.stopPropagation(); wisselIn(werkState.bewaard,bewaar.dataset.bewaar); werkStateBewaar(); teken(); return; }
+  if(vergelijk){ e.stopPropagation(); wisselIn(werkState.vergelijk,vergelijk.dataset.vergelijk,3); werkStateBewaar(); teken(); return; }
+  if(open) selecteerVacature(open.dataset.open);
+});
+$('#lijst').addEventListener('keydown',e=>{ const open=e.target.closest('[data-open]'); if(open&&(e.key==='Enter'||e.key===' ')){e.preventDefault();selecteerVacature(open.dataset.open)} });
+$('#werkDetail').addEventListener('click',e=>{
+  const sol=e.target.closest('[data-sol]'),bewaar=e.target.closest('[data-bewaar]'),vergelijk=e.target.closest('[data-vergelijk]');
+  if(sol) solliciteer(sol);
+  if(bewaar){wisselIn(werkState.bewaard,bewaar.dataset.bewaar);werkStateBewaar();teken()}
+  if(vergelijk){wisselIn(werkState.vergelijk,vergelijk.dataset.vergelijk,3);werkStateBewaar();teken()}
+});
+document.querySelectorAll('[data-weergave]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-weergave]').forEach(x=>x.classList.toggle('actief',x===b));
+  werkWeergave=b.dataset.weergave;
+  if(werkWeergave==='trajecten'){ $('#mijnBlok').scrollIntoView({behavior:'smooth'}); werkWeergave='kansen'; return; }
+  $('#lijstTitel').textContent=werkWeergave==='bewaard'?'Bewaarde kansen':'Beste volgende kansen'; teken();
+}));
+$('#deckNo').addEventListener('click',()=>deckActie('niet'));
+$('#deckYes').addEventListener('click',()=>deckActie('interesse'));
+$('#deckSave').addEventListener('click',()=>deckActie('bewaar'));
+$('#deckUndo').addEventListener('click',deckHerstel);
+$('#deckQuestion').addEventListener('click',()=>{const x=deckRij[deckPos];if(x){zetModus('desk');selecteerVacature(x.v.id)}});
+document.addEventListener('keydown',e=>{
+  if($('#deckPane').hidden || e.target.matches('input,select,textarea'))return;
+  if(e.key==='ArrowLeft')deckActie('niet'); if(e.key==='ArrowRight')deckActie('interesse'); if(e.key==='ArrowUp'){e.preventDefault();deckActie('bewaar')}
+  if(e.key==='Enter')$('#deckQuestion').click();
+});
+$('#vergelijkOpen').addEventListener('click',vergelijkTeken);
+$('#vergelijkSluit').addEventListener('click',()=>$('#vergelijkPanel').hidden=true);
+$('#vergelijkPanel').addEventListener('click',e=>{if(e.target===$('#vergelijkPanel'))$('#vergelijkPanel').hidden=true});
 
 async function solliciteer(btn){
   const cv = bouwCv();
@@ -266,6 +512,7 @@ async function solliciteer(btn){
     markeerVerzonden(btn.dataset.sol);
     teken();
     laadMijn();
+    laadMatches();
   } catch(e){
     btn.disabled = false; btn.textContent = 'Solliciteer met mijn cv';
     if (e && e.needCv) { if (confirm('Maak eerst je cv af. Nu naar de cv-maker?')) location.href='cv.html'; }
@@ -304,6 +551,7 @@ Sessie.ophalen().then(d=>{
   if (Geo.heeft()){ Geo.positie().then(p=>{ if(p){ mijnPlek = p; $('#gpsBtn').textContent = 'Dichtstbij eerst'; teken(); } }); }
   laad();
   laadMijn();
+  laadMatches();
 });
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});

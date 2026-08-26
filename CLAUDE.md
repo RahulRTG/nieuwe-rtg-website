@@ -31,6 +31,48 @@ bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
 de grenzen: een relatie is geen trechter, en er komt geen score op het leven
 tussen mensen.
 
+**`WAARDE.md` is de laag onder het geld** — RTG Value: niet wat één lid met zijn
+geld doet (dat is GELD.md) maar wat waarde binnen RTG zélf is. De kern in één
+zin: elke euro, elk tegoed en elk budget weet wie het bezit, waarvoor het
+gebruikt mag worden, wie het mag verplaatsen en welk bewijs daarvoor bestaat.
+Lees die vóór je aan saldo, tegoeden, vouchers, budgetten of uitbetalen werkt.
+Zes waardeklassen met elk een **grond** (`kern/waarde/klassen.js`), drie
+beleidslagen van hard naar zacht (`kern/waarde/policy.js`), en één poort waar
+elke betaling langs gaat (`kern/pay/poort.js`). Twee manieren waarop geld
+vaststaat en ze zijn met opzet niet hetzelfde: een **reservering** is iemand
+anders die uw geld vasthoudt en die vervalt (`kern/waarde/reserve.js`), een
+**oormerk** is u die uw eigen geld apart zet en dat blijft
+(`kern/waarde/oormerk.js`). Verder: budgetten van een werkgever of gemeente als
+eigen positie, slim betalen uit meerdere potjes waarbij het meest beperkte potje
+eerst opgaat, een eigen geldgrens die wél weigert (`kern/geldbeleid/grens.js`),
+treasury voor ondernemers, een terugstorting naar de eigen bankrekening
+(`kern/pay/terug.js`), en een bewijsbord dat drie standen kent en géén groen
+(`kern/pay/bewijs.js`). Vier grenzen die niet mogen sneuvelen: er komt geen
+tweede boekhouding bij, **uitbetaalbaar hangt altijd aan een bevoegdheid en
+nooit aan een boolean** (elke uitbetaalbare klasse noemt haar
+`uitbetaalVermogen`), het plafond per wallet is een grond en geen instelling, en
+de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
+paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
+oplaadmoment — en dát is het echte voordeel.
+
+**Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
+is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
+schakelaar *ís* de juridische positie — geen twee dingen die toevallig
+samenhangen. `WALLET_SALDO` is daarom geen vaste soort maar **afhankelijk**, met
+twee uitgeschreven gezichten in `kern/bevoegdheid/lijst.js`:
+
+| Stand | `WALLET_SALDO` | `LID_UITBETALING` | Wat RTG dan is |
+|---|---|---|---|
+| `gesloten` | besluit, met grond | bestaat niet | beperkt netwerk, geen vergunning |
+| `open` (standaard) | rail, e-geldinstelling | rail, sepa | uitgever van elektronisch geld |
+
+Saldo dat tegen de nominale waarde inwisselbaar is voor de houder ís elektronisch
+geld; dat valt niet weg te schrijven. Bouw hier dus nooit een pad omheen dat de
+belofte aan leden verandert zonder dat de bevoegdheidsvraag meebeweegt — dan is
+de knop een manier om om de vergunningplicht heen te komen. Ontbreekt de stand,
+dan geldt per vermogen het strengste gezicht, en dat is niet voor allebei
+hetzelfde.
+
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht
 concern, en daarna mensen er moeiteloos in laten werken. Lees vóór je aan
@@ -88,6 +130,56 @@ omgeving van een klant is een **uitnodiging en geen recht** — geen permanent
 `admin = true`, ook niet voor ons eigen kantoor. Wat er wel en niet staat, staat
 er gemeten bij; wat er nog niet is, staat er mét de grens waarbinnen het gebouwd
 moet worden.
+
+**`APPSTORE.md` is het derdenkanaal** — hoe een app van BUITEN dit huis
+binnenkomt. Lees die vóór je aan de App Store, aan een uitgever of aan de cel
+werkt. De kern in één zin: **een App Store is geen etalage maar een poort met een
+cel erachter.** Zes begrippen (uitgever, app, versie, manifest, keuring,
+machtiging) en zes grenzen, waarvan er drie niet mogen sneuvelen: derdencode
+draait nooit op de RTG-herkomst (een naamloze cel zonder netwerk, en geen vlag
+die dat uitzet), de machinepoort keurt nooit goed (hij laat alleen door naar een
+mens van RTG, en nooit naar de uitgever zelf), en een machtiging die een lid niet
+heeft VERLEEND bestaat niet — het manifest vraagt, het lid geeft. Er zijn er drie,
+en alle drie worden ze uitgevoerd; wat er niet is, staat er met de reden. **Een
+app mag geld kosten** (besluit van de eigenaar): de prijs staat in het manifest
+en gaat dus door dezelfde keuring, kopen gebeurt in de WINKEL en nooit in de app
+(GELD.md par. 3: alles wat een derde raakt is maximaal klaarzetten), de btw hoort
+in het land van het LID en wordt nooit geraden, de afdracht van RTG staat op 0%
+tot de eigenaar hem zet en werkt alleen vooruit, en een ingetrokken gekochte app
+laat een teruggaveRECHT achter dat een mens afhandelt — grens 5 blijft absoluut.
+Er komt geen tweede geldstroom: alles loopt over RTG Pay. **De
+verantwoordingskant staat er ook**: het inkoopdossier (wie is de leverancier, wat
+draait er, wat krijgt de app nooit, waar blijven de gegevens, wat vond de poort,
+hoe werkt de uitgang) met per bewering een bron in de code, de tijdlijn van het
+lid (wat gaf ik, wanneer nam ik het terug — groeit aan, wordt nooit herschreven,
+en de sleutel komt uit de sessie), en de controleronde die eruit haalt wat niet
+meer byte voor byte klopt met wat een mens aftekende. Twee dingen daar niet
+wegpoetsen: het dossier staat bij het LID en niet achter een kantoorpoort, en het
+blok "wat dit dossier NIET zegt" staat er even groot bij — een leverancierspak
+dat overal ja zegt is niets waard. Het dossier heeft drie lezers en dus drie
+ingangen (kaart in de Mall, `/apps/appstore-dossier.html` als adres dat je
+doorstuurt, en "wat de klant leest" op het uitgeversbureau) maar blijft één
+bron. Diezelfde pagina zonder app is het **kanaaldossier**: wat voor élke app
+hier geldt, met de zes machtigingen die met opzet niet bestaan — die vraag stelt
+een inkoper maar één keer, en dat kan alleen omdat elke app op dezelfde cel
+draait.
+
+**`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
+een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,
+billing, compliance, hosting, permissies, observability en enterprise-controls
+niet zelf hoeft te bouwen. Lees die vóór je aan een SDK, een objectmodel of een
+ontwikkelaarsvoorziening begint. Het is een richtingsdocument zoals PLATFORM.md:
+per onderdeel staat er of het **staat**, **een stap weg** is, **een besluit
+vraagt** of **jaren weg** is — zodat niemand die vier voor elkaar aanziet. De
+belangrijkste zin staat in paragraaf 2: **een universeel objectmodel moet worden
+GEVONDEN in de domeinen, niet eroverheen verklaard** — dat is precies de fout die
+de oude super-app-regel al een keer heeft voorkomen. **Die meting is gedaan**
+(`scripts/objectmodel.js`, `OBJECTMODEL.json`) en de uitkomst is streng: 71% van
+de velden hoort bij precies één domein, en **`Asset` bestaat niet** — tafel,
+kamer, podium en leaseauto delen niets buiten hun verpakking. Wat er wél uitkwam
+zijn vier kandidaten, waarvan er één de drempel haalt: een **ontwerpopdracht**,
+gedeeld door architect, atelier, hardwarelab en studio. Voeg geen type toe dat
+niet uit die meting komt.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

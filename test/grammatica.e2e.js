@@ -137,6 +137,20 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        worden. */
     await metLid(async (page) => {
       await zetProef(page, 'zwaar');
+      /* EERST STILSTAND, DAN PAS METEN. De rail schuift in beeld; wie tijdens
+         die beweging meet, vangt hem halverwege -- onder runnerbelasting stond
+         hij op het meetmoment op 824 terwijl het dock op 796 begint, en zakte
+         deze bewering over een rail die een tel later gewoon goed stond. De
+         wacht is op STILSTAND (twee gelijke metingen na elkaar), niet op de
+         bewering zelf: een rail die blijvend onder het dock hangt, zakt nog
+         steeds. */
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#rtgCommand .cmd-rail');
+        if (!el) return false;
+        const y = el.getBoundingClientRect().y;
+        if (window.__railVorig === y) return true;
+        window.__railVorig = y; return false;
+      }, null, { timeout: 8000, polling: 250 });
       const rail = await page.locator('#rtgCommand .cmd-rail').boundingBox();
       const dock = await page.locator('#rtgCommand .cmd-balk').boundingBox();
       assert.ok(rail && dock, 'rail en dock horen allebei te staan');

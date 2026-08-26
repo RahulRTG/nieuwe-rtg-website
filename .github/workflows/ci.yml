@@ -146,18 +146,29 @@ jobs:
           # minuten is ruim boven de traagste echte toets (de meterijking, 6,7
           # minuten); wat daaroverheen gaat is geen trage toets maar een hanger,
           # en die hoort te zakken met zijn naam erbij.
+          #
+          # EN --test-force-exit VOOR DE TWEEDE SOORT HANGER. De tijdslimiet
+          # doodt een toets die niet afkomt -- maar de ronde erna hing scherf 1
+          # ALSNOG, op precies hetzelfde punt, met alle toetsen van het kind
+          # allang groen. Een kindproces dat na afloop een handvat vasthoudt
+          # (een keep-alive-socket, een interval) sluit nooit af, en daar geldt
+          # geen toets-tijdslimiet voor: er draait geen toets meer. De reporter
+          # drukt bestanden in volgorde af, dus alles na zo'n kind bleef ook nog
+          # onzichtbaar. force-exit zegt: de toetsen zijn klaar en gemeld, het
+          # proces eindigt -- een gelekt handvat is dan een hygiënepunt en geen
+          # verstopping van de hele band.
           solo=$(node scripts/scherf.js --van ${{ matrix.scherf }} --totaal 4 --solo)
           if [ -n "$solo" ]; then
             node --experimental-test-coverage \
                  --test-reporter=lcov --test-reporter-destination=dekking/solo.info \
                  --test-reporter=spec --test-reporter-destination=stdout \
-                 --test --test-concurrency=1 --test-timeout=600000 $solo 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
+                 --test --test-concurrency=1 --test-timeout=600000 --test-force-exit $solo 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
           fi
           mijn=$(node scripts/scherf.js --van ${{ matrix.scherf }} --totaal 4)
           node --experimental-test-coverage \
                --test-reporter=lcov --test-reporter-destination=dekking/scherf.info \
                --test-reporter=spec --test-reporter-destination=stdout \
-               --test --test-concurrency=${RTG_GATE_CONCURRENCY:-6} --test-timeout=600000 $mijn 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
+               --test --test-concurrency=${RTG_GATE_CONCURRENCY:-6} --test-timeout=600000 --test-force-exit $mijn 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
           if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/scherf.log; fi
           exit "$uitslag"
         env:

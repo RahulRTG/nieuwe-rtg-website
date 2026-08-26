@@ -118,7 +118,14 @@ test('5. het loketje geeft de CA en stuurt de rest naar de beveiligde site', asy
   const poort = loket.address().port;
 
   const haal = pad => new Promise(klaar => {
-    http.get({ host: '127.0.0.1', port: poort, path: pad }, r => {
+    /* agent:false, en dat is de reparatie van de CI-hanger. Sinds Node 19 is
+       de standaardagent keep-alive: de socket blijft na het antwoord open in de
+       pool, en server.close() hieronder wacht daarop. Lokaal redt de
+       keepAliveTimeout van de server dat na vijf seconden; op de runner bleef
+       het kindproces ermee leven -- alle toetsen groen, nooit afgesloten, en
+       scherf 1 wachtte er twee keer honderd minuten op. Een eigen socket per
+       verzoek sluit bij het einde van het antwoord. */
+    http.get({ host: '127.0.0.1', port: poort, path: pad, agent: false }, r => {
       const d = []; r.on('data', x => d.push(x));
       r.on('end', () => klaar({ status: r.statusCode, kop: r.headers, body: Buffer.concat(d).toString() }));
     });
@@ -195,7 +202,7 @@ test('8. het loket hangt ook aan de beveiligde kant, voor telefoons die http wei
   const poort = server.address().port;
 
   const haal = pad => new Promise((klaar, stuk) => {
-    https.get({ host: '127.0.0.1', port: poort, path: pad, servername: 'localhost', ca: c.caPem }, r => {
+    https.get({ host: '127.0.0.1', port: poort, path: pad, servername: 'localhost', ca: c.caPem, agent: false }, r => {
       const d = []; r.on('data', x => d.push(x));
       r.on('end', () => klaar({ status: r.statusCode, body: Buffer.concat(d).toString() }));
     }).on('error', stuk);

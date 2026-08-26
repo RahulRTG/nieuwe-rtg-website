@@ -88,8 +88,8 @@
         const t = a.toelating || {};
         const controleTekst = t.status === 'klaar_voor_besluit' ? 'controles klaar' : (t.open || 0) + ' controle(s) open';
         return '<div class="status-row"><b>' + veilig(a.company) + '</b><span>' + veilig(a.city) + ' · ' + veilig(controleTekst) + '</span><span class="pill">' + veilig(a.status) + (a.code ? ' · ' + veilig(a.code) : '') + '</span></div>';
-      }).join('') : '<p class="lead" style="font-size:.76rem">Nog geen aanvragen met dit account.</p>';
-    }).catch(err => { lijst.innerHTML = '<p class="lead" style="font-size:.76rem">' + veilig(err.message) + '</p>'; });
+      }).join('') : '<p class="lead klein">Nog geen aanvragen met dit account.</p>';
+    }).catch(err => { lijst.innerHTML = '<p class="lead klein">' + veilig(err.message) + '</p>'; });
   };
 
   form.addEventListener('submit', async event => {

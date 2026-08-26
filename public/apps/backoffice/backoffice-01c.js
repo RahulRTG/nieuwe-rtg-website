@@ -25,12 +25,12 @@
       '<div class="sub">'+timeAgo(g.at)+' · '+g.aanvragen+' bedrijfs-, '+(g.foundationAanvragen||0)+' FOUNDATION- en '+g.leveranciers+' partnercontrole(s) heropend</div></div>'+
       '<button class="vbtn ok" data-regelbevestig="'+g.id+'">Beoordeling vastleggen</button></div></div>').join('');
     const getroffen = (d.getroffenLeveranciers || []).map(s =>
-      '<div class="row"><div><div class="nm">Hercontrole · '+escHtml(s.naam)+' <span style="color:var(--soft);font-weight:400">· '+escHtml(s.land)+'</span></div>'+
-      '<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem">'+s.eisen.map(e =>
+      '<div class="row"><div><div class="nm">Hercontrole · '+escHtml(s.naam)+' <span class="zacht">· '+escHtml(s.land)+'</span></div>'+
+      '<div class="eisknoppen">'+s.eisen.map(e =>
         '<button class="vbtn" data-regelcode="'+escHtml(s.code)+'" data-regeleis="'+escHtml(e.id)+'">'+escHtml(e.label)+'</button>').join('')+'</div></div></div>').join('');
     el.innerHTML = '<div class="row"><div class="r1"><div><div class="nm">Automatische officiële regelwacht</div><div class="sub">'+
       (d.automatisch?'Actief, iedere '+Math.round(d.intervalMs/3600000)+' uur':'Uitgeschakeld')+' · '+open.length+' open wijziging(en) · '+fouten.length+' bronfout(en)</div></div>'+
-      '<button class="vbtn" id="regelCheckNu">Nu controleren</button></div><details style="margin-top:.55rem"><summary class="sub">'+(d.bronnen||[]).length+' officiële bronnen</summary>'+bronnen+'</details></div>'+
+      '<button class="vbtn" id="regelCheckNu">Nu controleren</button></div><details class="bronlijst"><summary class="sub">'+(d.bronnen||[]).length+' officiële bronnen</summary>'+bronnen+'</details></div>'+
       gebeurtenissen+getroffen;
     document.getElementById('regelCheckNu').addEventListener('click', async () => {
       try { await call('/office/partner/regels/check', {}); await loadHandelsRegels(); }

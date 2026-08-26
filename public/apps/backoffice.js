@@ -211,10 +211,10 @@
       const eisen=(a.toelating&&a.toelating.eisen)||[];
       const klaar=e=>['geverifieerd','niet_van_toepassing'].includes(e.status)&&!(e.gecontroleerd&&e.gecontroleerd.geldigTot&&Date.parse(e.gecontroleerd.geldigTot)<Date.now());
       const open=eisen.filter(e=>!klaar(e));
-      const controles=eisen.map(e=>'<div style="border-left:2px solid '+(klaar(e)?'var(--green)':e.status==='afgekeurd'?'#df6b7d':'var(--gold)')+';padding:.18rem 0 .18rem .5rem;margin-top:.25rem"><div class="sub"><b style="color:var(--text)">'+(klaar(e)?'✓ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+'</div>'+
+      const controles=eisen.map(e=>'<div class="eis'+(klaar(e)?' ok':e.status==='afgekeurd'?' af':'')+'"><div class="sub"><b>'+(klaar(e)?'✓ ':'○ ')+escHtml(e.label)+'</b> · '+escHtml(e.status)+'</div>'+
         (a.status==='nieuw'&&!klaar(e)?'<button class="vbtn ok" data-frcheck="'+a.id+'" data-freis="'+e.id+'">Controleren</button> '+(e.magNietVanToepassing?'<button class="vbtn" data-frnvt="'+a.id+'" data-freis="'+e.id+'">N.v.t.</button>':''):'')+'</div>').join('');
-      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(a.naam)+' <span style="color:var(--soft);font-weight:400">· '+escHtml(a.typeLabel)+' · '+escHtml(a.plaats)+'</span></div><div class="sub">'+escHtml(a.contactNaam)+' · '+escHtml(a.email)+(a.brin?' · BRIN '+escHtml(a.brin):'')+(a.registratieNummer?' · registratie '+escHtml(a.registratieNummer):'')+' · '+timeAgo(a.at)+'</div>'+controles+'</div>'+
-        (a.status==='nieuw'?'<div style="display:flex;gap:.3rem;align-items:flex-start">'+(open.length?'<span class="pill nieuw">'+open.length+' open</span>':'<button class="vbtn ok" data-frok="'+a.id+'">Goedkeuren</button>')+'<button class="vbtn" data-frno="'+a.id+'">Afwijzen</button></div>':'<span class="pill '+(a.status==='goedgekeurd'?'klaar':'bereiding')+'">'+escHtml(a.status)+'</span>')+'</div></div>';
+      return '<div class="row"><div class="r1"><div><div class="nm">'+escHtml(a.naam)+' <span class="zacht">· '+escHtml(a.typeLabel)+' · '+escHtml(a.plaats)+'</span></div><div class="sub">'+escHtml(a.contactNaam)+' · '+escHtml(a.email)+(a.brin?' · BRIN '+escHtml(a.brin):'')+(a.registratieNummer?' · registratie '+escHtml(a.registratieNummer):'')+' · '+timeAgo(a.at)+'</div>'+controles+'</div>'+
+        (a.status==='nieuw'?'<div class="knoprij">'+(open.length?'<span class="pill nieuw">'+open.length+' open</span>':'<button class="vbtn ok" data-frok="'+a.id+'">Goedkeuren</button>')+'<button class="vbtn" data-frno="'+a.id+'">Afwijzen</button></div>':'<span class="pill '+(a.status==='goedgekeurd'?'klaar':'bereiding')+'">'+escHtml(a.status)+'</span>')+'</div></div>';
     }).join(''):'<div class="empty">Geen registraties.</div>';
     el.querySelectorAll('[data-frcheck],[data-frnvt]').forEach(b=>b.addEventListener('click',async()=>{const nvt=b.hasAttribute('data-frnvt');const ref=prompt(nvt?'Waarom is dit aantoonbaar niet van toepassing?':'Welke officiële bron en uitkomst zijn gecontroleerd?');if(!ref||ref.trim().length<3)return;try{await call('/office/foundation/registratie/controle',{id:b.dataset.frcheck||b.dataset.frnvt,onderdeel:b.dataset.freis,uitkomst:nvt?'niet_van_toepassing':'geverifieerd',referentie:ref});loadFoundationRegistraties();}catch(e){alert(e.message);}}));
     el.querySelectorAll('[data-frok]').forEach(b=>b.addEventListener('click',async()=>{try{const r=await call('/office/foundation/registratie/besluit',{id:b.dataset.frok,action:'goedkeuren'});alert('Goedgekeurd'+(r.toegang?' · toegang is veilig per e-mail verstrekt.':'.'));loadFoundationRegistraties();}catch(e){alert(e.message);}}));
@@ -247,12 +247,12 @@
       '<div class="sub">'+timeAgo(g.at)+' · '+g.aanvragen+' bedrijfs-, '+(g.foundationAanvragen||0)+' FOUNDATION- en '+g.leveranciers+' partnercontrole(s) heropend</div></div>'+
       '<button class="vbtn ok" data-regelbevestig="'+g.id+'">Beoordeling vastleggen</button></div></div>').join('');
     const getroffen = (d.getroffenLeveranciers || []).map(s =>
-      '<div class="row"><div><div class="nm">Hercontrole · '+escHtml(s.naam)+' <span style="color:var(--soft);font-weight:400">· '+escHtml(s.land)+'</span></div>'+
-      '<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem">'+s.eisen.map(e =>
+      '<div class="row"><div><div class="nm">Hercontrole · '+escHtml(s.naam)+' <span class="zacht">· '+escHtml(s.land)+'</span></div>'+
+      '<div class="eisknoppen">'+s.eisen.map(e =>
         '<button class="vbtn" data-regelcode="'+escHtml(s.code)+'" data-regeleis="'+escHtml(e.id)+'">'+escHtml(e.label)+'</button>').join('')+'</div></div></div>').join('');
     el.innerHTML = '<div class="row"><div class="r1"><div><div class="nm">Automatische officiële regelwacht</div><div class="sub">'+
       (d.automatisch?'Actief, iedere '+Math.round(d.intervalMs/3600000)+' uur':'Uitgeschakeld')+' · '+open.length+' open wijziging(en) · '+fouten.length+' bronfout(en)</div></div>'+
-      '<button class="vbtn" id="regelCheckNu">Nu controleren</button></div><details style="margin-top:.55rem"><summary class="sub">'+(d.bronnen||[]).length+' officiële bronnen</summary>'+bronnen+'</details></div>'+
+      '<button class="vbtn" id="regelCheckNu">Nu controleren</button></div><details class="bronlijst"><summary class="sub">'+(d.bronnen||[]).length+' officiële bronnen</summary>'+bronnen+'</details></div>'+
       gebeurtenissen+getroffen;
     document.getElementById('regelCheckNu').addEventListener('click', async () => {
       try { await call('/office/partner/regels/check', {}); await loadHandelsRegels(); }

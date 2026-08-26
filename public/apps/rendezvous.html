@@ -150,7 +150,7 @@
      laag kleedt velden en knoppen, maar dit scherm heeft geen eigen stijlblok
      meer. */
   function rijHtml(v) {
-    return '<div class="per" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:.5rem;align-items:end;margin-top:.6rem;">'
+    return '<div class="per dating-perrij">'
       +'<div class="dating-field"><label>Stad</label><input class="dating-input" data-stad maxlength="40" value="'+esc(v.stad||'')+'" placeholder="Parijs" aria-label="Stad"></div>'
       +'<div class="dating-field"><label>Van</label><input class="dating-input" data-van type="date" value="'+esc(v.van||'')+'" aria-label="Van welke dag"></div>'
       +'<div class="dating-field"><label>Tot</label><input class="dating-input" data-tot type="date" value="'+esc(v.tot||'')+'" aria-label="Tot en met welke dag"></div>'
@@ -162,7 +162,7 @@
      segmenten per dag -- zelfde data-slot-ids, zelfde bewaarknop. */
   function roosterHtml(R, mijn) {
     const aan = new Set(mijn || []);
-    return '<div class="dating-form-grid" style="margin-top:1rem">'+R.dagen.map(d =>
+    return '<div class="dating-form-grid dating-boven">'+R.dagen.map(d =>
       '<fieldset class="dating-fieldset"><legend class="dating-legend">'+esc(d.label)+'</legend><div class="dating-segments">'
       +R.delen.map(pd => {
         const s = R.slots.find(x => x.id === d.id+'-'+pd.id);
@@ -182,7 +182,7 @@
       '<div class="dating-section-head"><div><span class="dating-eyebrow">Uw signatuur</span><h2>Een profiel met intentie</h2></div><p>Kort, specifiek en oprecht werkt beter dan veel tekst.</p></div>'+
       '<div class="dating-form-grid"><div class="dating-field wide"><label for="over">Over u</label><textarea class="dating-input" id="over" maxlength="600" placeholder="Wat typeert een avond of reis met u?">'+esc(p.over)+'</textarea></div>'+
       '<div class="dating-field wide"><label for="zoekt">Wat u zoekt</label><input class="dating-input" id="zoekt" maxlength="300" value="'+esc(p.zoekt)+'" placeholder="Bijvoorbeeld: iemand met humor, nieuwsgierigheid en liefde voor kunst."></div>'+
-      '<fieldset class="dating-fieldset wide"><legend class="dating-legend">Interesses</legend><div class="dating-segments">'+checks+'</div><div class="dating-field" style="margin-top:.75rem"><label for="extraWensen">Aanvullend</label><input class="dating-input" id="extraWensen" value="'+esc(buiten.join(', '))+'" placeholder="Andere interesses, gescheiden met komma’s"><small class="dating-help">Maximaal twaalf; alleen gedeelde interesses worden benadrukt.</small></div></fieldset>'+
+      '<fieldset class="dating-fieldset wide"><legend class="dating-legend">Interesses</legend><div class="dating-segments">'+checks+'</div><div class="dating-field dating-bovenm"><label for="extraWensen">Aanvullend</label><input class="dating-input" id="extraWensen" value="'+esc(buiten.join(', '))+'" placeholder="Andere interesses, gescheiden met komma’s"><small class="dating-help">Maximaal twaalf; alleen gedeelde interesses worden benadrukt.</small></div></fieldset>'+
       '<div class="dating-field wide"><label for="locInput">Plekken waar u openstaat voor een ontmoeting</label><div class="dating-message"><input class="dating-input" id="locInput" maxlength="40" placeholder="Bijvoorbeeld Ibiza of Gstaad"><button class="dating-button" type="button" id="addLoc">Plek toevoegen</button></div><div class="dating-chips" id="locaties"></div><small class="dating-help">Voeg alleen stad of regio toe, nooit een adres.</small></div></div>'+
       '<div class="dating-actions"><button class="dating-button primary" type="button" id="bewaar">Profiel bewaren</button><span class="dating-save-status" id="saveStatus">Codenaam: '+esc(data.codenaam)+'</span></div>';
 
@@ -190,13 +190,13 @@
        van de premium-ronde. Alleen wat u zelf intikt: Rendez-vous leest uw
        reizen niet mee, en een periode is een stad en dagen -- geen adres, geen
        tijdstip. */
-    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Presence</span><h2>Waar u bent</h2></div><p>Andere leden zien hier niets van, behalve wanneer u tegelijk ergens bent. Uw woonplaats wordt nooit los getoond.</p></div>'+
+    werk += '<div class="dating-section-head dating-ruim" ><div><span class="dating-eyebrow">Presence</span><h2>Waar u bent</h2></div><p>Andere leden zien hier niets van, behalve wanneer u tegelijk ergens bent. Uw woonplaats wordt nooit los getoond.</p></div>'+
       '<div class="dating-form-grid"><div class="dating-field wide"><label for="thuis">Waar u woont</label><input class="dating-input" id="thuis" maxlength="40" value="'+esc(p.thuis||'')+'" placeholder="Amsterdam"></div></div>'+
-      '<fieldset class="dating-fieldset" style="margin-top:1rem"><legend class="dating-legend">Periodes dat u ergens anders bent</legend><div id="periodes">'+((p.aanwezig||[]).map(rijHtml).join(''))+'</div><div class="dating-actions" style="border-top:0;padding-top:0;margin-top:.7rem"><button class="dating-button" type="button" id="plus">Periode toevoegen</button></div></fieldset>'+
+      '<fieldset class="dating-fieldset dating-boven"><legend class="dating-legend">Periodes dat u ergens anders bent</legend><div id="periodes">'+((p.aanwezig||[]).map(rijHtml).join(''))+'</div><div class="dating-actions los"><button class="dating-button" type="button" id="plus">Periode toevoegen</button></div></fieldset>'+
       '<div class="dating-actions"><button class="dating-button primary" type="button" id="bewaarWaar">Bewaren</button><button class="dating-button quiet" type="button" id="wis">Alles wissen</button></div>';
 
     /* WANNEER U KUNT -- het rooster in dagdelen uit de ONTMOETEN.md-ronde. */
-    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Ritme</span><h2>Wanneer u kunt</h2></div><p>Geen agenda, geen datum, geen tijdstip -- en niemand ziet uw vinkjes.</p></div>'+
+    werk += '<div class="dating-section-head dating-ruim" ><div><span class="dating-eyebrow">Ritme</span><h2>Wanneer u kunt</h2></div><p>Geen agenda, geen datum, geen tijdstip -- en niemand ziet uw vinkjes.</p></div>'+
       '<p class="dating-copy">Kruis aan wanneer u meestal kunt. Bij een wederzijdse match krijgt u allebei één dagdeel te zien dat u beiden aankruiste.</p>'+
       roosterHtml(data.rooster, p.beschikbaar)+
       '<div class="dating-actions"><button class="dating-button primary" type="button" id="bewaarWanneer">Bewaren</button></div>';
@@ -274,7 +274,7 @@
           ? 'U bent er allebei uit. De Rechterhand regelt de reservering en bevestigt bij u; er staat nog niets vast.'
           : v.ikAkkoord ? 'U bent akkoord. Zodra de ander dat ook is, gaat het naar De Rechterhand.'
           : 'Bekijk het en geef akkoord als het u schikt.')+'</div>'
-        +(v.bijRechterhand ? '' : '<div class="dating-actions" style="border-top:0;padding-top:.7rem;margin-top:.4rem">'
+        +(v.bijRechterhand ? '' : '<div class="dating-actions strak">'
           +(r.settings||[]).map(x => '<button class="dating-button" type="button" data-setting="'+esc(id)+'" data-s="'+esc(x.id)+'"'+(x.id===v.setting?' disabled':'')+'>'+esc(x.label)+'</button>').join('')
           +'<button class="dating-button primary" type="button" data-akkoord="'+esc(id)+'" data-ja="'+(v.ikAkkoord?'0':'1')+'">'+(v.ikAkkoord?'Akkoord intrekken':'Akkoord')+'</button></div>')
         +'</div>';
@@ -316,7 +316,7 @@
         ? '<p class="dating-copy">U bent samen met '+esc(sm.met)+'. Er komen geen introducties meer.</p><div class="dating-actions"><button class="dating-button" type="button" id="losser">Dit klopt niet meer</button></div>'
         : '<p class="dating-copy">Bent u samen met iemand die u hier heeft ontmoet? Dan zegt u dat allebei, en stoppen de introducties. U vindt de knop bij de match.</p>');
 
-    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">The Table</span><h2>Uitnodigingen</h2></div><p>Wie er komen, hoort u aan tafel.</p></div>'
+    werk += '<div class="dating-section-head dating-ruim" ><div><span class="dating-eyebrow">The Table</span><h2>Uitnodigingen</h2></div><p>Wie er komen, hoort u aan tafel.</p></div>'
       +((t.tafels||[]).length ? '<div class="dating-list">'+t.tafels.map(x =>
         '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Tafel</div><h3>'+esc(x.naam)+'</h3>'
         +'<div class="dating-meta">'+esc([x.stad,x.datum,x.tijd].filter(Boolean).join(' · '))+'</div>'
@@ -327,7 +327,7 @@
           : '<span class="dating-meta">U heeft '+(x.mijnStatus==='ja'?'toegezegd':'afgezegd')+'.</span>')+'</div></article>').join('')+'</div>'
       : '<p class="dating-copy">Geen uitnodigingen op dit moment.</p>');
 
-    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Introducties</span><h2>Voorgesteld worden</h2></div><p>U hoort het pas als het wederzijds is. Een nee blijft stil.</p></div>'
+    werk += '<div class="dating-section-head dating-ruim" ><div><span class="dating-eyebrow">Introducties</span><h2>Voorgesteld worden</h2></div><p>U hoort het pas als het wederzijds is. Een nee blijft stil.</p></div>'
       +((i.introducties||[]).length ? '<div class="dating-list">'+i.introducties.map(x =>
         '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Introductie</div><h3>'+esc(x.codenaam)+'</h3>'
         +(x.aanleiding?'<p class="dating-bio">'+esc(x.aanleiding)+'</p>':'')
@@ -337,9 +337,9 @@
           : '<span class="dating-meta">'+(x.ikAntwoordde?'U heeft ja gezegd. U hoort het als het wederzijds is.':'U heeft dit afgeslagen.')+'</span>')+'</div></article>').join('')+'</div>'
       : '<p class="dating-copy">Geen vragen die openstaan.</p>');
 
-    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Encounter</span><h2>Iemand ontmoet?</h2></div><p>Wissel geen nummers uit.</p></div>'
+    werk += '<div class="dating-section-head dating-ruim" ><div><span class="dating-eyebrow">Encounter</span><h2>Iemand ontmoet?</h2></div><p>Wissel geen nummers uit.</p></div>'
       +'<p class="dating-copy">Voer de pin in die u van elkaar kreeg -- van beide kanten. Daarna krijgt u ieder afzonderlijk de vraag of u aan de ander voorgesteld wilt worden.</p>'
-      +'<div class="dating-field" style="margin-top:.9rem"><label for="pin">Pin</label><div class="dating-message"><input class="dating-input" id="pin" maxlength="12" placeholder="ABC-123"><button class="dating-button primary" type="button" id="pinOk">Ik heb deze persoon ontmoet</button></div></div>';
+      +'<div class="dating-field dating-bovenk"><label for="pin">Pin</label><div class="dating-message"><input class="dating-input" id="pin" maxlength="12" placeholder="ABC-123"><button class="dating-button primary" type="button" id="pinOk">Ik heb deze persoon ontmoet</button></div></div>';
 
     $('#main').innerHTML = shell(werk, trust('De kring is besloten','Een tafel toont nooit de gastenlijst en een introductie verklapt nooit wie er al ja zei. Alles blijft op codenaam.'), 'Uw kring', sm.samen ? 'Samen' : 'Open voor introducties');
     document.querySelectorAll('[data-tafel]').forEach(b => b.onclick = async () => {

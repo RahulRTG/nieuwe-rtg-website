@@ -200,9 +200,9 @@
     w=w||{eisen:[],budget:'egaal',soorten:[]};
     return '<fieldset class="dating-fieldset"><legend class="dating-legend">De plek moet</legend><div class="dating-segments">'+
       KAART.eisen.map(e=>'<label><input type="checkbox" data-eis="'+esc(e.id)+'"'+((w.eisen||[]).includes(e.id)?' checked':'')+'><span>'+esc(e.label)+'</span></label>').join('')+'</div></fieldset>'+
-      '<fieldset class="dating-fieldset" style="margin-top:.9rem"><legend class="dating-legend">Ik hou van</legend><div class="dating-segments">'+
+      '<fieldset class="dating-fieldset dating-bovenk"><legend class="dating-legend">Ik hou van</legend><div class="dating-segments">'+
       KAART.soorten.map(x=>'<label><input type="checkbox" data-soort="'+esc(x.id)+'"'+((w.soorten||[]).includes(x.id)?' checked':'')+'><span>'+esc(x.label)+'</span></label>').join('')+'</div></fieldset>'+
-      '<div class="dating-field" style="margin-top:.9rem"><label for="dBudget">Prijsklasse</label><select class="dating-input" id="dBudget">'+
+      '<div class="dating-field dating-bovenk"><label for="dBudget">Prijsklasse</label><select class="dating-input" id="dBudget">'+
       KAART.budgetten.map(b=>'<option value="'+esc(b)+'"'+(b===w.budget?' selected':'')+'>'+esc(BUDGETLABEL[b]||b)+'</option>').join('')+'</select></div>';
   }
 
@@ -247,7 +247,7 @@
       '<div class="dating-field"><span class="dating-legend">Afstand bepalen</span><button class="dating-button" type="button" id="geoButton">'+(p.afstandActief?'Afstand opnieuw bepalen':'Gebruik apparaatlocatie')+'</button><small class="dating-help" id="geoStatus">'+(p.afstandActief?'Afstand is ingesteld; coördinaten blijven verborgen.':'Optioneel, voor afstand en een tafel rond het midden.')+'</small></div>'+
       '<div class="dating-field"><span class="dating-legend">Gewenste leeftijd</span><div class="dating-range"><div><label for="pMin">Van</label><input class="dating-input" id="pMin" inputmode="numeric" value="'+esc(p.leeftijdMin||18)+'"></div><span>tot</span><div><label for="pMax">Tot</label><input class="dating-input" id="pMax" inputmode="numeric" value="'+esc(p.leeftijdMax||99)+'"></div></div></div>'+
       '<div class="dating-field"><label for="pKm">Maximale afstand</label><select class="dating-input" id="pKm">'+[25,50,100,250,500].map(n=>'<option value="'+n+'"'+(Number(p.maxKm)===n?' selected':'')+'>'+n+' km</option>').join('')+'</select></div>'+
-      '<fieldset class="dating-fieldset wide"><legend class="dating-legend">Interesses</legend><div class="dating-segments">'+belang+'</div><div class="dating-field" style="margin-top:.75rem"><label for="pExtra">Aanvullend</label><input class="dating-input" id="pExtra" value="'+esc(extra.join(', '))+'" placeholder="Andere interesses, gescheiden met komma’s"></div></fieldset></div>'+
+      '<fieldset class="dating-fieldset wide"><legend class="dating-legend">Interesses</legend><div class="dating-segments">'+belang+'</div><div class="dating-field dating-bovenm"><label for="pExtra">Aanvullend</label><input class="dating-input" id="pExtra" value="'+esc(extra.join(', '))+'" placeholder="Andere interesses, gescheiden met komma’s"></div></fieldset></div>'+
       '<div class="dating-actions"><button class="dating-button primary" type="button" id="pBewaar" data-hoofdactie>Profiel veilig bewaren</button><span class="dating-save-status" id="pStatus">'+(p.codenaam?'Codenaam: '+esc(p.codenaam):'Nog niet gepubliceerd')+'</span></div>'+
       /* Drie blokken uit de ONTMOETEN.md-ronde. Ze bewaren elk hun eigen deel
          via hetzelfde /profiel-endpoint; zonder profiel is er nog geen tabel

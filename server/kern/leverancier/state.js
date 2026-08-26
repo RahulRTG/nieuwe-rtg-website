@@ -24,11 +24,10 @@ module.exports = (ctx) => {
     const alleBoekingen = boekingenVanZaak(s.code).filter(b => b.status !== 'wacht-op-betaling');
     const zichtBoekingen = alleBoekingen.filter(b => !BOEK_KLAAR[b.status] || String(b.finishedAt || b.at).slice(0, 10) === vandaag).slice(0, 80);
     return {
-      /* modules: welke eigen PDA-tabs deze zaak aanzet. Die afbeelding stond in
-         de browser (caps.includes('marina') en zo, verspreid over de delen van
-         personeel.js) en dus wist de client hetzelfde als de server -- zie
-         kern/pda/modules.js voor waarom dat hier hoort. industry is de sector
-         uit het genre-register. */
+      /* modules: welke PDA-tabs deze zaak aanzet. Dat stond in de browser
+         verspreid (caps.includes over de delen van personeel.js), dus wist de
+         client hetzelfde als de server -- zie kern/pda/modules.js. industry is
+         de sector uit het genre-register. */
       supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city,
         caps: t.caps || [], industry: t.industry || null, modules: pdaModules(s, t.caps || []),
         loc: s.loc, rate: s.rate, vak: s.vak || null,

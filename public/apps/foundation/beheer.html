@@ -34,6 +34,8 @@
   .veld{margin-bottom:.7rem;}
   select.veld{appearance:none;}
   .rijknop{display:flex;gap:.6rem;flex-wrap:wrap;}
+  .rijknop.los{margin-top:1rem;}
+  .h.los{margin-top:.7rem;}
   .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .ok{color:var(--groen);font-size:.85rem;min-height:1.1rem;}
   .naarkeuze{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem;}
@@ -66,7 +68,7 @@
     <h2>Profielen</h2>
     <div class="h">Een kind krijgt hier een beschermd profiel met geboortedatum en eigen pincode. Volwassenen en gasten accepteren eerst zelf een persoonlijke uitnodiging.</div>
     <div class="plist" id="plist"></div>
-    <div class="rijknop" style="margin-top:1rem;"><button class="knop" id="bNieuw">+ Kindprofiel</button><button class="knop grijs" id="bNodig">Volwassene uitnodigen</button></div>
+    <div class="rijknop los"><button class="knop" id="bNieuw">+ Kindprofiel</button><button class="knop grijs" id="bNodig">Volwassene uitnodigen</button></div>
   </div>
 
   <div class="kaart blok">
@@ -133,7 +135,7 @@
   <select class="veld" id="iRol"><option value="ouder">Ouder of verzorger</option><option value="gezinslid">Gezinslid</option><option value="gast">Oppas of familie · beperkte toegang</option></select>
   <label class="rolhint" id="iGezagBlok"><input id="iGezag" type="checkbox"> Ik bevestig dat deze persoon als ouder of verzorger toegang mag krijgen. Dit is geen officiële gezagscontrole.</label>
   <div class="rolhint">Een ouder of gezinslid krijgt toegang tot de gezamenlijke gezinsfuncties. Een gast ziet alleen het noodzakelijke voor helpen, contact en veiligheid.</div>
-  <div id="iResultaat" hidden><b>Deel deze persoonlijke link:</b><div class="deelcode" id="iLink"></div><button class="knop grijs klein" id="iKopieer" type="button">Link kopiëren</button><div class="h" style="margin-top:.7rem;">Gebruikt de ontvanger de RTG-app als oppas? Dan kan die deze volledige link daar plakken.</div></div>
+  <div id="iResultaat" hidden><b>Deel deze persoonlijke link:</b><div class="deelcode" id="iLink"></div><button class="knop grijs klein" id="iKopieer" type="button">Link kopiëren</button><div class="h los">Gebruikt de ontvanger de RTG-app als oppas? Dan kan die deze volledige link daar plakken.</div></div>
   <div class="fout" id="iFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Sluiten</button><button class="knop" id="iDoe">Uitnodiging maken</button></div>
 </div></dialog>

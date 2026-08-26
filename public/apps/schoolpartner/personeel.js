@@ -24,8 +24,8 @@
         wortel.innerHTML='<div class="kpis"><div class="kpi"><b>' + (recht.rollen || []).length + '</b><span>rollen</span></div>' +
           '<div class="kpi"><b>' + rechten.length + '</b><span>bevoegdheden</span></div><div class="kpi"><b>' + (uren.totaal || 0) + '</b><span>uren deze maand</span></div></div>' +
           '<div class="enterprise-start"><div class="kaart"><div class="kop">Mijn toegang</div>' +
-          (rechten.length ? rechten.map(function (x) { return '<span class="tag aan" style="margin:.2rem;">' + esc(UITLEG[x] || x) + '</span>'; }).join('') : '<p class="stil">Geen inhoudelijke bevoegdheden toegewezen.</p>') +
-          '<p class="stil" style="margin-top:.6rem;">Mist iets? Alleen de directie kan een rol toevoegen.</p></div>' +
+          (rechten.length ? rechten.map(function (x) { return '<span class="tag aan ruim">' + esc(UITLEG[x] || x) + '</span>'; }).join('') : '<p class="stil">Geen inhoudelijke bevoegdheden toegewezen.</p>') +
+          '<p class="stil boven6">Mist iets? Alleen de directie kan een rol toevoegen.</p></div>' +
           '<div class="kaart"><div class="kop">Mijn personeelsdossier</div>' +
           '<div class="item"><span>Functie</span><span class="stil">' + esc(c.functie || 'Nog niet ingevuld') + '</span></div>' +
           '<div class="item"><span>Contract</span><span class="stil">' + esc(c.soort || 'Nog niet ingevuld') + (c.uren ? ' · ' + c.uren + ' uur' : '') + '</span></div>' +

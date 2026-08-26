@@ -110,6 +110,10 @@
   .modal{width:min(92vw,26rem);padding:1.6rem;}
   .modal h3{font-size:1.25rem;margin-bottom:.4rem;font-family:var(--serif);font-weight:500;}
   .modal .sub{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
+  /* de twee verklaringen met vinkje in de koppelmodal */
+  .sub.vink{display:flex;gap:.5rem;align-items:flex-start;margin:.6rem 0;}
+  .vink input{margin-top:.2rem;}
+  .knop.kaal{text-decoration:none;}
   .modal .veld{margin-bottom:.8rem;}
   .avkies{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem;}
   .avkies button{width:2.4rem;height:2.4rem;border-radius:0;background:var(--paneel2);font-size:1.3rem;border:2px solid transparent;}
@@ -201,7 +205,7 @@
     <div class="knoprij rtg-duimbalk">
       <button class="knop hoofd" id="bMaak" data-hoofdactie>Maak een gezin aan</button>
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
-      <a class="knop grijs" href="registreren.html" style="text-decoration:none;">School, vrijwilliger of stichting</a>
+      <a class="knop grijs kaal" href="registreren.html">School, vrijwilliger of stichting</a>
     </div>
     <!-- MIJN LEVEN HOORT HIER, op het welkomscherm en niet tussen de tegels.
          De tegels zitten achter een gezinslogin; dit beeld hangt juist aan uw
@@ -534,8 +538,8 @@
   <div class="avkies" id="mAv"></div>
   <div class="klkies" id="mKl"></div>
   <input class="veld" id="mPin" placeholder="Kies een pincode (4 tot 6 cijfers)" inputmode="numeric" maxlength="6">
-  <label class="sub" style="display:flex;gap:.5rem;align-items:flex-start;margin:.6rem 0;"><input id="mBevoegd" type="checkbox" style="margin-top:.2rem;"> <span>Ik ben 18 jaar of ouder en mag deze gezinsruimte aanmaken.</span></label>
-  <label class="sub" style="display:flex;gap:.5rem;align-items:flex-start;margin:.6rem 0;"><input id="mPrivacy" type="checkbox" style="margin-top:.2rem;"> <span>Ik begrijp dat een app-koppeling geen officieel bewijs van familieband of ouderlijk gezag is.</span></label>
+  <label class="sub vink"><input id="mBevoegd" type="checkbox"> <span>Ik ben 18 jaar of ouder en mag deze gezinsruimte aanmaken.</span></label>
+  <label class="sub vink"><input id="mPrivacy" type="checkbox"> <span>Ik begrijp dat een app-koppeling geen officieel bewijs van familieband of ouderlijk gezag is.</span></label>
   <div class="fout" id="mFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="mDoe">Gezin aanmaken</button></div>
 </div></dialog>

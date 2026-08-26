@@ -72,28 +72,23 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
     wachter: functiewachter }));
   app.use(jsonGzip());
 
-  /* DE DUBBELTIK, en hij staat hier om een reden die ik eerst fout had.
+  /* DE DUBBELTIK, en zijn plek was eerst fout. Hij moet NA express.json()
+     (de sleutel mag in het lijf) en VOOR elke route (een herhaling die de route
+     bereikte heeft het werk al gedaan). De eerste versie stond in lijfpoort.js,
+     achter de body-parser -- toetsen groen, maar de meting liet negentien
+     routes onbeschermd, precies die met een GROOT antwoord.
 
-     Hij moet twee dingen tegelijk: NA express.json() staan (de sleutel mag in
-     het lijf zitten) en VOOR elke route (een herhaling die de route al heeft
-     bereikt, heeft het werk al gedaan). Mijn eerste versie stond daarom in
-     lijfpoort.js, meteen achter de body-parser. Dat leek te kloppen en deed het
-     in de toetsen ook -- maar in de meting bleven negentien routes onbeschermd,
-     en dat waren precies de routes met een GROOT antwoord.
+     Oorzaak: jsonGzip() vervangt res.json OOK, en NA de dubbeltik; boven de
+     kilobyte stuurt hij via res.send, buiten de res.json waar de dubbeltik aan
+     hing. Die zag zo'n antwoord dus nooit en liet de herhaling het werk opnieuw
+     doen. Nergens zichtbaar: klein werd keurig herhaald, en curl (zonder
+     compressie) deed het altijd goed.
 
-     De oorzaak staat een regel hierboven. jsonGzip() vervangt res.json OOK, en
-     hij doet dat NA de dubbeltik; bij een antwoord boven de kilobyte stuurt hij
-     het via res.send in plaats van via de res.json waar de dubbeltik aan hing.
-     De dubbeltik zag dat antwoord dus nooit, bewaarde niets, en liet de
-     herhaling gewoon opnieuw het werk doen. Zichtbaar was dat nergens: kleine
-     antwoorden werden keurig herhaald, en met curl (dat standaard geen
-     compressie vraagt) deed hij het altijd goed.
-
-     Wie het laatst om res.json heen gaat, ziet het antwoord het eerst. De
-     dubbeltik hoort dus de BUITENSTE wikkel te zijn, en dat is hier: na de
-     compressie en voor alle routers. test/dubbeltikgzip.test.js zet die twee in
-     deze volgorde en eist een herhaling op een antwoord van boven de kilobyte.
-     En mist hij er tocht een, dan zegt hij dat nu hardop (zie dubbeltik.js). */
+     Wie het laatst om res.json heen gaat, ziet het antwoord het eerst -- de
+     dubbeltik hoort de BUITENSTE wikkel te zijn: na de compressie, voor alle
+     routers. test/dubbeltikgzip.test.js eist die volgorde met een herhaling op
+     een antwoord boven de kilobyte; mist hij er een, dan zegt hij dat hardop
+     (zie dubbeltik.js). */
   /* WELKE WEGEN OM DE DUBBELTIK HEEN GAAN staat in ./geldwegen.js, met het
      verhaal erbij: de geldwegen hebben een sterkere, duurzame laag
      (server/lib/idem.js) en twee wegen onder /api/pay verplaatsen geen geld en

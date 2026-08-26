@@ -64,6 +64,15 @@
   .row .r1{display:flex;justify-content:space-between;gap:0.8rem;align-items:baseline;}
   .row .nm{font-weight:600;font-size:0.88rem;}
   .row .sub{font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
+  /* uit backoffice-01b/01c.js gehaald: eis-strepen, knoprijen en de bronnenlijst */
+  .eis{border-left:2px solid var(--gold);padding:.18rem 0 .18rem .5rem;margin-top:.25rem;}
+  .eis.ok{border-color:var(--green);}
+  .eis.af{border-color:#df6b7d;}
+  .eis .sub b{color:var(--text);} /* --text is nergens gezet en erft dus; zo stond het ook inline */
+  .zacht{color:var(--soft);font-weight:400;}
+  .knoprij{display:flex;gap:.3rem;align-items:flex-start;}
+  .eisknoppen{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.35rem;}
+  .bronlijst{margin-top:.55rem;}
   .row .amt{font-family:'Bodoni Moda',serif;font-size:1.05rem;white-space:nowrap;}
   .row .amt.g{color:var(--rtg-leesgoud,var(--gold));}
   .pill{font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;font-weight:600;padding:0.22rem 0.55rem;border-radius:0;border:1px solid var(--line);}
@@ -121,6 +130,7 @@
   /* Drie vormen die als style="..." op tientallen plekken stonden. Als klasse
      staan ze een keer, en houden ze style-src-attr in de CSP dicht. */
   .panel > .sub{margin:0 1.25rem;}   /* alleen de uitleg onder een kop, niet de .sub in de rijen */
+  .panel > .sub.onder{margin-bottom:.5rem;}
   .uitgifte{display:none;margin:0.9rem 1.25rem 0;padding:0.8rem 1rem;border:1px solid var(--gold);border-radius:0;font-size:0.8rem;line-height:1.6;}
   .hbtn{border:1px solid var(--line);background:transparent;color:var(--txt);border-radius:0;padding:0.35rem 0.85rem;font-size:0.7rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
   .hbtn:hover{background:rgba(255,255,255,0.05);}
@@ -298,7 +308,7 @@
     <div class="cols h-mt150">
       <div class="panel">
         <h2>FOUNDATION-registraties</h2>
-        <p class="sub" style="margin:0 1.25rem .5rem;">Scholen, vrijwilligers en partnerstichtingen. Toegang ontstaat pas na alle Boardroom-controles.</p>
+        <p class="sub onder">Scholen, vrijwilligers en partnerstichtingen. Toegang ontstaat pas na alle Boardroom-controles.</p>
         <div class="rows" id="foundationRegistraties"><div class="empty">Registraties laden…</div></div>
       </div>
       <div class="panel">

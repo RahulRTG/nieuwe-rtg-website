@@ -11,7 +11,7 @@
     };
     function berichtRij(m) {
       var veilig = m.veiligheid && m.veiligheid.integriteit;
-      return '<button class="item knop" type="button" data-mail-id="' + esc(m.id) + '" style="width:100%;text-align:left;">' +
+      return '<button class="item knop mail-item" type="button" data-mail-id="' + esc(m.id) + '">' +
         '<span><b>' + esc(m.onderwerp || '(geen onderwerp)') + '</b><br><span class="stil">Van ' + esc(m.van) + '</span></span>' +
         '<span class="tag' + (veilig === 'ongeschonden' ? ' aan' : '') + '">' + esc(veilig === 'ongeschonden' ? 'integriteit geldig' : (veilig || 'oud bericht')) + '</span></button>';
     }
@@ -25,9 +25,9 @@
             api('/school/personeel/mail/lees', auth({ id:b.dataset.mailId })).then(function (rr) {
               if (rr.body.error) return meld(rr.body.error);
               var m=rr.body.bericht;
-              root.querySelector('[data-mail-open]').innerHTML = '<div class="kaart" style="margin-top:.7rem;">' +
+              root.querySelector('[data-mail-open]').innerHTML = '<div class="kaart boven7">' +
                 '<div class="kop">' + esc(m.onderwerp || '(geen onderwerp)') + '</div><p class="stil">Van ' + esc(m.van) + ' · naar ' + esc(m.naar) + '</p>' +
-                '<p style="white-space:pre-wrap;margin-top:.7rem;">' + esc(m.tekst || '') + '</p></div>';
+                '<p class="mail-tekst">' + esc(m.tekst || '') + '</p></div>';
             });
           });
         });
@@ -41,12 +41,12 @@
         '<div class="item"><span><b>' + esc(hoofdAdres) + '</b><br><span class="stil">' + esc(adresNoot) + ' · ' + esc(r.body.ongelezen) + ' ongelezen</span></span>' +
         '<button class="knop" type="button" data-mail-inbox>Open inbox</button></div>' +
         '<p class="stil">' + esc(r.body.uitleg) + '</p>' +
-        '<details style="margin-top:.7rem;"><summary class="knop">Nieuw bericht</summary><div class="rij" style="margin-top:.7rem;">' +
+        '<details class="boven7"><summary class="knop">Nieuw bericht</summary><div class="rij boven7">' +
         '<input class="veld" data-mail-naar type="email" placeholder="Ontvanger" aria-label="Ontvanger">' +
         '<input class="veld" data-mail-onderwerp placeholder="Onderwerp" aria-label="Onderwerp"></div>' +
-        '<textarea class="veld" data-mail-tekst rows="4" placeholder="Bericht" aria-label="Bericht" style="width:100%;margin-top:.5rem;"></textarea>' +
-        '<button class="knop p" type="button" data-mail-stuur style="margin-top:.5rem;">Veilig versturen</button></details>' +
-        '<div data-mail-lijst style="margin-top:.7rem;"></div><div data-mail-open></div></section>';
+        '<textarea class="veld vol boven5" data-mail-tekst rows="4" placeholder="Bericht" aria-label="Bericht"></textarea>' +
+        '<button class="knop p boven5" type="button" data-mail-stuur>Veilig versturen</button></details>' +
+        '<div data-mail-lijst class="boven7"></div><div data-mail-open></div></section>';
       root.querySelector('[data-mail-inbox]').addEventListener('click', laadInbox);
       root.querySelector('[data-mail-stuur]').addEventListener('click', function () {
         var naar=root.querySelector('[data-mail-naar]').value;

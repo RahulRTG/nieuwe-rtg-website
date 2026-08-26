@@ -82,12 +82,12 @@
     const lijst = s.geschiktLijst || [], aan = s.geschikt || [];
     if (!lijst.length) return '';
     return '<div class="card"><div class="tt-h">'+T('gs.h','Wat uw zaak kan')+'</div>'+
-      '<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);line-height:1.6;">'+
+      '<div class="gs-sub">'+
       T('gs.sub','Uw eigen opgave; RTG controleert dit niet. Wat u niet aankruist, geldt nergens als toegezegd: leden met die eis krijgen uw zaak dan niet voorgesteld.')+'</div>'+
-      lijst.map(e => '<label style="display:flex;gap:0.5rem;align-items:flex-start;padding:0.55rem 0;min-height:2.75rem;cursor:pointer;">'+
-        '<input type="checkbox" data-geschikt="'+e.id+'"'+(aan.indexOf(e.id) >= 0 ? ' checked' : '')+' style="margin-top:0.25rem;">'+
-        '<span><b style="font-size:0.84rem;">'+esc(e.label)+'</b>'+
-        '<span style="display:block;font-size:0.76rem;color:var(--muted);">'+esc(e.uitleg||'')+'</span></span></label>').join('')+
+      lijst.map(e => '<label class="gs-rij">'+
+        '<input type="checkbox" data-geschikt="'+e.id+'"'+(aan.indexOf(e.id) >= 0 ? ' checked' : '')+' class="gs-vink">'+
+        '<span><b class="gs-naam">'+esc(e.label)+'</b>'+
+        '<span class="gs-uitleg">'+esc(e.uitleg||'')+'</span></span></label>').join('')+
       '<div class="tt-add"><button id="gsZet">'+T('gs.zet','Opslaan')+'</button></div></div>';
   }
   function koppelGeschikt(el, klaar){

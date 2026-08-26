@@ -2,10 +2,10 @@
    vanaf de technische pagina en de Boardroom. Staat een functie uit, dan geeft
    zijn API 503 met een zin die uitlegt waarom, niet een kale foutcode.
 
-   Een functie kan op vijf manieren dicht staan, en het antwoord vertelt welke:
-   globaal, per pas, per land, per persoon, of per genre zaken. Dat onderscheid
-   is belangrijk voor wie het leest: "uitgeschakeld door de beheerder" en "in
-   jouw land uitgeschakeld" zijn voor een gebruiker twee heel andere dingen.
+   Een functie kan op vijf manieren dicht staan en het antwoord vertelt welke:
+   globaal, per pas, per land, per persoon of per genre zaken. Dat verschil doet
+   ertoe: "uitgeschakeld door de beheerder" en "in jouw land uitgeschakeld" zijn
+   voor een gebruiker twee heel andere dingen.
 
    De technische pagina en de health-checks blijven altijd bereikbaar, anders
    kan de eigenaar niets meer aanzetten zodra hij iets heeft uitgezet.
@@ -65,10 +65,9 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
         const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
         let gebruiker = null, tier = null, sessie = null;
         try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
-        /* De sessie hoort er ALTIJD bij te worden gehaald en niet alleen als het
-           accounttoken faalt: op de werkpaden van WorkOS leest
-           doelgroepVanVerzoek de relatie tot de organisatie uit de sessie, en
-           een medewerker die met zijn RTG-account binnenkwam heeft ALLEBEI. */
+        /* De sessie ALTIJD ophalen, niet alleen als het accounttoken faalt:
+           doelgroepVanVerzoek leest op de WorkOS-werkpaden de organisatierelatie
+           uit de sessie, en wie met zijn RTG-account binnenkwam heeft ALLEBEI. */
         if (tok) { try { sessie = sessionFor(tok); } catch (e) {} }
         if (tok && !gebruiker && sessie && sessie.tier) tier = sessie.tier;
         const doel = functies.doelgroepVanVerzoek(p, gebruiker, sessie) ||

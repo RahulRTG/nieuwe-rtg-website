@@ -37,25 +37,17 @@ function mountMatch(prefix, pn) {
    Deze functie loopt de mounts wel na en geeft elk ECHT pad terug met zijn
    methode. Ze leest alleen; er verandert niets aan het routeren zelf.
 
-   EN MET DE NAAM VAN DE FUNCTIE OP DIE LAAG (`laagNaam`).
-
-   Waarom dat een eigen veld is en geen bijzaak: een route is hier EEN laag per
-   middleware, alle met hetzelfde pad en dezelfde methode, in de volgorde waarin
-   ze zijn opgehangen. De laatste is de handler, alles daarvoor is een bewaker.
-   Met de naam erbij is dus uit de ROUTER te lezen wie een route beschermt --
-   `officeAuth`, `supplierAuth`, `techAuth` -- en hoeft niemand dat meer uit de
-   brontekst te raden.
-
-   Dat raden was echt duur. scripts/lib/routes.js deed het met een regex over
-   server/**.js, en een regex ziet niet wat via app.use('/api/foundation', router)
-   of een voorvoegsel-hulpje hangt. De vier bewijsproeven (rol, idempotentie,
-   invoer, staat) leunen op die bewakersnaam om te weten welke rol de JUISTE is,
-   en misten daardoor alle vier exact dezelfde 1257 routes.
-
-   `laagNaam` is leeg als de functie anoniem is; dat is bij de meeste handlers zo
-   (een arrow zonder naam) en dat hoort ook: alleen de bewakers zijn hier
-   benoemd. De wikkel in opzet/verzoekketen.js geeft zijn naam door, anders was
-   dit veld op het topniveau altijd leeg. */
+   EN MET DE NAAM VAN DE FUNCTIE OP DIE LAAG (`laagNaam`). Een route is hier EEN
+   laag per middleware, zelfde pad en methode, in ophangvolgorde: de laatste is
+   de handler, alles ervoor een bewaker. Met de naam erbij is uit de ROUTER te
+   lezen wie een route beschermt (officeAuth, supplierAuth, techAuth) in plaats
+   van dat uit brontekst te raden -- en dat raden was duur: de regex van
+   scripts/lib/routes.js ziet niet wat via app.use('/api/foundation', router) of
+   een voorvoegsel-hulpje hangt, en de vier bewijsproeven (rol, idempotentie,
+   invoer, staat) misten daardoor alle vier exact dezelfde 1257 routes.
+   `laagNaam` is leeg bij een anonieme functie -- de meeste handlers, en dat
+   hoort: alleen de bewakers zijn benoemd. De wikkel in opzet/verzoekketen.js
+   geeft zijn naam door, anders was dit veld op het topniveau altijd leeg. */
 function leesLagen(lagen, voorvoegsel) {
   const uit = [];
   for (const l of lagen) {

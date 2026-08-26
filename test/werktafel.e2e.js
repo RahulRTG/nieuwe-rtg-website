@@ -519,19 +519,44 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'load', timeout: 45000 });
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
 
-    const geland = await page.evaluate(() => ({
-      tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),
-      bladen: document.querySelectorAll('.cmd-pane').length,
-      gateVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
-      appActief: document.getElementById('app').classList.contains('active'),
-      balk: Math.round(document.querySelector('.cmd-balk').getBoundingClientRect().height),
-      uitnodiging: getComputedStyle(document.querySelector('.cmd-balkbladen'), '::after').content,
-    }));
+    /* METEN NADAT HET SCHERM STIL STAAT. De hoogte hieronder is een LAYOUT en
+       geen waarde uit de code: wie hem meet terwijl de letters nog binnenkomen
+       of het beeld nog een frame moet tekenen, meet het moment en niet het
+       ontwerp. Vandaar fonts.ready plus twee frames; hier gemeten kost dat
+       niets, want de balk staat dan al op zijn plek. */
+    const geland = await page.evaluate(async () => {
+      await document.fonts.ready;
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      return {
+        tekst: document.querySelector('.cmd-leeg')?.textContent.trim(),
+        bladen: document.querySelectorAll('.cmd-pane').length,
+        gateVerborgen: getComputedStyle(document.getElementById('gate')).display === 'none',
+        appActief: document.getElementById('app').classList.contains('active'),
+        balk: Math.round(document.querySelector('.cmd-balk').getBoundingClientRect().height),
+        balkRuw: document.querySelector('.cmd-balk').getBoundingClientRect().height,
+        balkStijl: getComputedStyle(document.querySelector('.cmd-balk')).height,
+        uitnodiging: getComputedStyle(document.querySelector('.cmd-balkbladen'), '::after').content,
+      };
+    });
     assert.equal(geland.appActief, true, 'voorwaarde: de sessie is werkelijk hersteld');
     assert.equal(geland.gateVerborgen, true, 'de inlogpoort hoort na de sessie weg te zijn');
     assert.equal(geland.bladen, 0, 'de inlog mag geen wereld of activiteit vooraf openen');
     assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
-    assert.equal(geland.balk, 48, 'onderaan hoort alleen de wereldbalk te staan');
+    /* WAT DEZE REGEL BEWAAKT is dat er ONDERAAN NIETS ANDERS STAAT: een tweede
+       rij, een tabbalk of een teruggekeerd springboard maakt deze strook meteen
+       ~96px of meer. De balk zelf is CSS-vast op 48px (shared/command.css).
+
+       Waarom het geen `equal(48)` meer is: op 26 augustus 2026 zakte deze toets
+       in de CI op "47 !== 48" -- een verschil van een pixel in een gemeten
+       layout, dat hier in twintig herhalingen niet te reproduceren viel (altijd
+       48, ook vóór fonts.ready). Een toets die op een pixel afgaat, meet op zo'n
+       moment de browser en niet dit huis. De MINIMUMMAAT van een raakvlak is
+       bovendien niet de taak van deze toets: die staat in scripts/raakvlakkeuring.js
+       en wordt over elk scherm gemeten. Zakt hij toch nog, dan zegt de melding
+       nu ook WAT er stond. */
+    assert.ok(geland.balk >= 47 && geland.balk <= 49,
+      'onderaan hoort alleen de wereldbalk te staan (48px), gemeten: ' + geland.balk +
+      ' (ruw ' + geland.balkRuw + ', computed ' + geland.balkStijl + ')');
     assert.match(geland.uitnodiging, /Kies een wereld/);
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {

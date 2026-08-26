@@ -47,6 +47,9 @@
   th{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
   td.getal,th.getal{text-align:right;white-space:nowrap;}
   .schuif{overflow-x:auto;}
+  /* Uit een inline stijlattribuut gehaald: die houden style-src-attr in de CSP
+     open en scripts/norm.js telt ze. */
+  .kop3{font-size:.9rem;color:var(--soft);margin-top:1rem;font-weight:500;}
   code{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:var(--gold);}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
     border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
@@ -166,7 +169,7 @@ function tekenNota(posten, ontbreekt, afstemming, soorten){
     '<input class="veld" id="nBedrag" type="number" min="0" step="1" placeholder="centen" aria-label="Bedrag in centen">'+
     '<input class="veld breed" id="nBron" maxlength="300" placeholder="Welke nota? (leverancier, factuurnummer)" aria-label="Bron van de nota">'+
     '<button class="knop" id="nZet" type="button">Nota vastleggen</button></div>'+
-    '<h3 class="sub" style="margin-top:1rem">Klopt onze optelsom?</h3>'+
+    '<h3 class="kop3">Klopt onze optelsom?</h3>'+
     '<div class="schuif"><table><thead><tr><th>Soort</th><th class="getal">Gerekend</th><th class="getal">Nota</th><th class="getal">Verschil</th></tr></thead><tbody>'+
     afstemming.map(a => '<tr><td>'+esc(a.naam)+(a.waarom ? '<br><span class="sub">'+esc(a.waarom)+'</span>' : '')+'</td>'+
       '<td class="getal">'+eur(a.gerekendCenten)+'</td><td class="getal">'+eur(a.notaCenten)+'</td>'+

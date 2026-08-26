@@ -30,6 +30,13 @@
 const { SOORTEN, soort, gemeten, plafond, GRAAD } = require('./soorten');
 const { ontleed } = require('./haak');
 
+/* Het einde van een maand als ISO-achtige string. De 31e bestaat niet in elke
+   maand, en dat mag hier: deze waarde wordt alleen VERGELEKEN met een echte
+   tijdstempel, nooit als datum gelezen. '2026-02-31T23:59:59.999Z' ligt netjes
+   na elke tijdstempel in februari en voor elke in maart, en dat is precies wat
+   "het tarief zoals het toen gold" nodig heeft. Wie hier een echte datum van
+   maakt, moet ook weten hoeveel dagen de maand had -- voor een vergelijking
+   die dat niet nodig heeft. */
 const eindeVan = (periode) => String(periode) + '-31T23:59:59.999Z';
 
 module.exports = (ctx) => {

@@ -199,6 +199,14 @@ De drager van een zaak is de **zaakcode en niet de medewerker**: de rekening gaa
 naar het bedrijf, en een teller per medewerker zou een productiviteitscijfer per
 mens zijn. HORECA.md is daar niet vaag over.
 
+**Wat de async-context wel en niet weet.** Alles wat tijdens een verzoek gebeurt
+krijgt die gebruiker als eigenaar, ook werk dat na het antwoord doorloopt. Dat is
+meestal juist -- hij veroorzaakte het -- maar het klopt niet als een verzoek een
+taak start die voor iedereen werkt (een cache die opnieuw wordt gevuld, een ronde
+die toevallig door hem werd getriggerd). Die kosten landen dan bij hem in plaats
+van bij het huis. Wie zo'n taak schrijft, hoort hem los te trekken van de context;
+tot dat ergens knelt is dit een bekende scheefheid en geen opgelost probleem.
+
 **Wat er nog NIET is aangesloten**, en dus als reden in het overzicht staat in
 plaats van als nul: `opslag`, `bericht`, `transactie` en `transactiewaarde`. De
 soorten en tarieven staan er; er is nog geen teller die ze per gebruiker optelt.

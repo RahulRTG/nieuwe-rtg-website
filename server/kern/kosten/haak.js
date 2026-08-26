@@ -85,4 +85,24 @@ function meld(soortId, aantal, opties) {
   catch (e) { return false; }
 }
 
-module.exports = { binnen, wieNu, drager, ontleed, zetMeter, meterStaat, meld, HUIS, SOORTEN_DRAGER };
+/* DE GRENSWACHT -- de enige plek waar deze haak NEE kan zeggen.
+
+   meld() is achteraf: er is al iets uitgegeven. Dit is ervoor. server/ai.js
+   vraagt het vlak voordat hij een model aanroept, want dat is waar het geld
+   gaat. Zelfde late binding als de meter: zolang de kern niet wakker is, mag
+   alles -- een AI-weg die dichtvalt omdat de boekhouding nog niet is opgestart,
+   is een storing en geen grens.
+
+   HET ANTWOORD IS ALTIJD EEN OBJECT MET `ok`, ook bij een fout in de wacht zelf.
+   Een grenswacht die gooit, sluit de AI-weg van het hele huis op een fout in de
+   boekhouding; dat is precies het omgekeerde van wat hij moet doen. */
+let wacht = null;
+function zetGrenswacht(fn) { wacht = typeof fn === 'function' ? fn : null; }
+function magUitgeven(d) {
+  if (!wacht) return { ok: true };
+  try { return wacht(d || wieNu()) || { ok: true }; }
+  catch (e) { return { ok: true }; }
+}
+
+module.exports = { binnen, wieNu, drager, ontleed, zetMeter, meterStaat, meld,
+  zetGrenswacht, magUitgeven, HUIS, SOORTEN_DRAGER };

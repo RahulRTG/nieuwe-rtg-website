@@ -96,7 +96,21 @@ vier standen, met **RTG Lite en Business Lite er al in en `bestaatNog: false`
 erbij**, en met `gezin` en `huis` als beloften die géén schakelaar zijn -- de
 RTFoundation blijft gratis voor elk gezin, dat gezin ziet alleen wát het kost
 (`/api/foundation/kosten`, alleen de beheerder, en het antwoord opent met de
-belofte en niet met het bedrag).
+belofte en niet met het bedrag). **Alle negen soorten hebben nu een teller of een
+verdeling**: AI en verzoeken via de poorten, berichten via mail én sms (twee
+choke points, want er komt een aanroeper rechtstreeks langs `sendSms`), opslag als
+STAND die je peilt in plaats van optelt (`kern/kosten/meterstand.js` -- wie een
+stand als stroom telt, laat de rekening van wie niets doet het hardst groeien), en
+transactiekosten op het oplaadmoment. Daarbovenop: de herkomstketen tot de
+leveranciersfactuur (`kern/kosten/herkomst.js`, en die eindigt eerlijk bij "zo is
+hij overgenomen door een mens"), de maandafsluiting waarin een maand pas dichtgaat
+als elk verschil een verklaring draagt en een maand **in onderzoek** nooit naar een
+rekening gaat (`kern/kosten/periode.js`), een vooruitblik waarvan de bandbreedte
+pas verschijnt als de trefzekerheid over drie afgesloten maanden GEMETEN is
+(`kern/kosten/vooruitblik.js`), en een verbruiksgrens die de AI-weg werkelijk
+dichtzet terwijl de rest van de app in de regelgestuurde werkmodus doorloopt
+(`kern/kosten/grens.js`; twee sloten, de strengste wint, en `geen-grens` is een
+andere stand dan `ruim`).
 
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die

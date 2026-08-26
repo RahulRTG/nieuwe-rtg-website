@@ -59,7 +59,9 @@ module.exports = function start(deps) {
      `setInterval` van vijf minuten kan geen enkele toets erbij -- en juist deze
      veger heeft twee keer de inlogrem gelost. Hier blijft alleen de klok. */
   const { onderhoudsronde, RONDE_MS } = require('./onderhoud');
-  setInterval(() => onderhoudsronde({ loginFails, pinSlot, ruimBuffer }), RONDE_MS).unref();
+  setInterval(() => onderhoudsronde({ loginFails, pinSlot, ruimBuffer,
+    peilOpslag: () => (kern.kosten ? kern.kosten.peilOpslag() : null),
+    legVoorspellingVast: () => (kern.kosten ? kern.kosten.vooruitblikVastleggen() : null) }), RONDE_MS).unref();
 
   backupData();
   setInterval(backupData, 24 * 60 * 60 * 1000);

@@ -139,8 +139,13 @@ Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, gel
    kostenhaak aan, die tot hier leeg was. */
 Object.assign(kern, require('../kern/economie')({ db, save }));
 Object.assign(kern, require('../kern/kosten')({ db, save, accounts, economie: kern.economie,
+  keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
   fonds: () => kern.fonds }));
+/* De betaallaag meldt zijn transactiekosten op het OPLAADMOMENT (WAARDE.md par.
+   1). Late binding: pay wordt eerder gebouwd en hoeft niets van de kosten te
+   weten -- zelfde draadje als koppelGrens in kernlaag3b. */
+if (kern.pay && kern.pay.koppelKosten) kern.pay.koppelKosten(kern.kosten.meldTransactie);
 // En de RTFoundation-kant: zonder dit ziet een gezin nooit wat de RTFoundation
 // voor hem betaalt. Late binding; die router bestaat al.
 if (kern.rtf && kern.rtf.setKostenHook) kern.rtf.setKostenHook(() => kern.kosten);

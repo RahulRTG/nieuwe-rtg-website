@@ -56,13 +56,13 @@ const SOORTEN = [
   { id: 'verzoek', naam: 'Serververzoeken', eenheid: '1.000 verzoeken', ruw: 'verzoeken', stap: 1000, meetweg: 'gemeten',
     grond: 'Elk afgehandeld API-verzoek van een ingelogde gebruiker telt er één. Rekenkracht schaalt hiermee mee.' },
   { id: 'opslag', naam: 'Opslag', eenheid: 'GB-maand', ruw: 'GB-maand', stap: 1, meetweg: 'gemeten',
-    grond: 'Bestanden, media en back-up van deze gebruiker. Er is nog geen teller die dit per gebruiker optelt.' },
+    grond: 'De ledenkluis van deze gebruiker (kern/bestanden.js), gepeild en gemiddeld over de maand. De media van zaken, de back-ups en de bijlagen van RTmail zitten er NIET in; die staan elders en worden hier niet meegeteld.' },
   { id: 'bericht', naam: 'Bericht (mail of sms)', eenheid: '1 bericht', ruw: 'berichten', stap: 1, meetweg: 'gemeten',
-    grond: 'Elk bericht dat het huis namens deze gebruiker naar buiten stuurt.' },
+    grond: 'Elk bericht dat het huis aanneemt om te versturen, mail of sms, welk kanaal het ook draagt.' },
   { id: 'transactie', naam: 'Transactie, vast deel', eenheid: '1 transactie', ruw: 'transacties', stap: 1, meetweg: 'gemeten',
-    grond: 'Het vaste bedrag dat de betaalpartner per geslaagde betaling rekent.' },
+    grond: 'Het vaste bedrag dat de betaalpartner rekent, geteld op het oplaadmoment: daar komt het geld van buiten binnen (WAARDE.md par. 1).' },
   { id: 'transactiewaarde', naam: 'Transactie, deel van het bedrag', eenheid: '1 euro omzet', ruw: 'euro', stap: 1, meetweg: 'gemeten',
-    grond: 'Het deel van het betaalde bedrag dat de betaalpartner inhoudt.' },
+    grond: 'Het deel van het opgeladen bedrag dat de betaalpartner inhoudt, in euro\'s, op datzelfde oplaadmoment.' },
   { id: 'stroom', naam: 'Elektriciteit', eenheid: 'toegerekend', meetweg: 'toegerekend',
     grond: 'RTG meet geen stroom per gebruiker en zal dat nooit kunnen. De rekening van de hoster wordt verdeeld; zie ./toerekening.js.' },
   { id: 'hosting', naam: 'Serverhuur en netwerk', eenheid: 'toegerekend', meetweg: 'toegerekend',
@@ -76,6 +76,21 @@ const SOORTEN = [
    een teller die zichzelf natelt bewijst niets. */
 const PLAFOND = { gemeten: 'gemeten', toegerekend: 'vermoed' };
 for (const s of SOORTEN) s.graadPlafond = PLAFOND[s.meetweg];
+
+/* STROOM OF STAND, en dat is geen woordspel maar het verschil tussen optellen
+   en meten.
+
+   Zes van de zeven meetbare soorten zijn een STROOM: tokens, verzoeken,
+   berichten en transacties gebeuren, en je telt ze op. Opslag is een STAND: er
+   staan op enig moment zoveel gigabytes, en die tel je niet op maar peil je.
+   Wie een stand als stroom telt, rekent een lid dat een maand lang niets doet
+   elke peiling opnieuw zijn hele kluis aan -- en dan groeit de rekening van
+   iemand die niets doet het hardst.
+
+   Alleen `opslag` is een stand; de rest is stroom. Het staat hier afgeleid en
+   niet per regel, om dezelfde reden als het plafond hierboven. */
+for (const s of SOORTEN) s.aard = s.id === 'opslag' ? 'stand' : 'stroom';
+const standSoorten = () => SOORTEN.filter(s => s.aard === 'stand');
 
 const OP_ID = new Map(SOORTEN.map(s => [s.id, s]));
 const soort = id => OP_ID.get(String(id || '')) || null;
@@ -95,4 +110,4 @@ function plafond(soortId, graad) {
   return GRAAD.indexOf(g) > GRAAD.indexOf(s.graadPlafond) ? s.graadPlafond : g;
 }
 
-module.exports = { SOORTEN, soort, gemeten, toegerekend, GRAAD, plafond };
+module.exports = { SOORTEN, soort, gemeten, toegerekend, standSoorten, GRAAD, plafond };

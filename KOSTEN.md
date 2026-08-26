@@ -54,7 +54,7 @@ de doorbelasting kan hem niet op een factuur zetten.
 | `ai-invoer` | 1.000 tokens | gemeten | gemeten |
 | `ai-uitvoer` | 1.000 tokens | gemeten | gemeten |
 | `verzoek` | 1.000 verzoeken | gemeten | gemeten |
-| `opslag` | GB-maand | gemeten | gemeten |
+| `opslag` | GB-maand | gemeten (**stand**) | gemeten |
 | `bericht` | 1 bericht | gemeten | gemeten |
 | `transactie` | 1 transactie | gemeten | gemeten |
 | `transactiewaarde` | 1 euro omzet | gemeten | gemeten |
@@ -67,6 +67,15 @@ waarom dat fout was. Het plafond van `stroom` op `gemeten` zetten veranderde
 niets, want `toerekening.js` schreef zijn eigen `vermoed` op. Twee plekken die
 hetzelfde bedoelen, en geen van beide die de ander tegenhield. Nu is er één plek
 en die bijt -- `test/kosten.test.js` is er tegen gemuteerd.
+
+**Stroom of stand, en dat is geen woordspel.** Zes van de zeven meetbare soorten
+zijn een **stroom**: tokens, verzoeken, berichten en transacties gebeuren, en je
+telt ze op. Opslag is een **stand**: er staat op enig moment zoveel, en die peil
+je. Wie een stand als stroom telt, rekent een lid dat een maand lang niets doet
+bij elke peiling opnieuw zijn hele kluis aan -- en dan groeit de rekening van wie
+niets doet het hardst. Het peilen woont daarom in `meterstand.js`, apart van de
+tellers, en houdt het **gemiddelde** over de peilingen van de maand: een GB-maand
+is een oppervlakte en geen momentopname.
 
 **Waarom AI in twee soorten valt:** invoer- en uitvoertokens kosten bij elke
 aanbieder een ander bedrag. Eén soort zou een gemiddelde nodig hebben, en een
@@ -218,9 +227,20 @@ die toevallig door hem werd getriggerd). Die kosten landen dan bij hem in plaats
 van bij het huis. Wie zo'n taak schrijft, hoort hem los te trekken van de context;
 tot dat ergens knelt is dit een bekende scheefheid en geen opgelost probleem.
 
-**Wat er nog NIET is aangesloten**, en dus als reden in het overzicht staat in
-plaats van als nul: `opslag`, `bericht`, `transactie` en `transactiewaarde`. De
-soorten en tarieven staan er; er is nog geen teller die ze per gebruiker optelt.
+**Alle negen soorten zijn nu aangesloten.** Waar ze hangen:
+
+| soort | waar | hoe |
+|---|---|---|
+| `ai-invoer` / `ai-uitvoer` | `server/ai.js` | uit `usage`, bij elke aanbieder |
+| `verzoek` | de drie poorten | een per afgehandeld verzoek |
+| `bericht` | `server/mail.js` (mail) en `server/mail-lokaal.js` (sms) | elk bericht dat het huis aanneemt te versturen; twee choke points, want er is een aanroeper die rechtstreeks langs `sendSms` komt |
+| `opslag` | `kern/kosten/peiling.js` via de onderhoudsronde | de ledenkluis, gepeild en gemiddeld, hooguit een keer per uur |
+| `transactie` / `transactiewaarde` | `kern/pay/opladen.js` | op het **oplaadmoment**: daar komt geld van buiten binnen (WAARDE.md par. 1). Wat een lid daarna met zijn saldo doet, kost de betaalpartner niets meer |
+| `stroom` / `hosting` | `kern/kosten/toerekening.js` | verdeeld uit de echte nota, per wereld |
+
+De opslagmeter dekt de **ledenkluis**, niet alle bytes van het huis: de media van
+zaken, de back-ups en de bijlagen van RTmail staan elders en tellen niet mee. De
+soort zegt dat zelf in zijn grond.
 
 ---
 
@@ -249,3 +269,109 @@ vertelt je niet dat het misschien de helft mist.
 - **Geen automatische afschrijving.** Vrijgeven zet een factuurregel klaar; het
   innen loopt langs de wegen die er al zijn.
 - **Geen naam bij een codenaam.** Ook niet voor het kantoor.
+
+
+---
+
+## 9. De herkomstketen: waarom betaal ik dit?
+
+`kern/kosten/herkomst.js`. Elk bedrag is terug te lopen:
+
+```
+bedrag -> aantal x tarief -> de bron van dat tarief -> de leveranciersfactuur
+       -> ingevoerd door een mens, op een dag
+```
+
+Voor een toegerekende regel loopt hij anders en dat staat er ook: bedrag ->
+verdeelsleutel -> nota -> factuur.
+
+**De keten eindigt bij een mens en niet bij een provider**, en dat is de laatste
+schakel die er zelf bij staat. Er wordt geen PDF ingelezen en niets bij de
+leverancier geverifieerd; wat in `kern/kosten/providerfactuur.js` staat is wat
+iemand heeft overgenomen. Een keten die zich voordoet als bewijs tot aan de bron,
+is erger dan een keten die zegt waar hij ophoudt.
+
+Een leveranciersfactuur heeft een leverancier, een nummer en een bedrag, en
+bestaat maar één keer per nummer. Een tarief of een nota kan ernaar verwijzen, en
+dan wordt de bron **afgeleid** in plaats van ingetikt -- twee keer dezelfde
+herkomst intikken levert twee teksten op die uiteenlopen.
+
+Routes: `/api/kosten/herkomst` (eigen regel; de drager komt uit de sessie en er
+is geen parameter om die van een ander te vragen) en
+`/api/office/kosten/herkomst`.
+
+---
+
+## 10. Een maand sluiten: no unexplained cost
+
+`kern/kosten/periode.js`. Drie standen, en de middelste heeft tanden:
+
+| stand | wat het betekent |
+|---|---|
+| `open` | er is nog niet naar gekeken. De grondstand. |
+| `in-onderzoek` | er is een verschil gevonden dat nog niet klopt. **In deze stand gaat er niets naar de rekening van een lid.** |
+| `gesloten` | elk verschil is verklaard. De nota's van die maand zijn niet meer te veranderen. |
+
+**Twee soorten verschil, en ze zijn niet hetzelfde.** *Afstemming*: onze optelsom
+tegenover de echte nota -- loopt dat uiteen, dan klopt het tarief niet of mist de
+meter verbruik. *Onverdeeld*: een nota voor stroom in een maand waarin niemand
+iets verbruikte. Dat is geld dat het huis heeft uitgegeven zonder dat er iemand
+tegenover staat, en precies het soort post dat anders in "overige kosten"
+verdwijnt.
+
+**Een verklaring is tekst en geen vinkje.** Er wordt niet gecontroleerd of hij
+waar is -- dat kan software niet -- maar wel dat er iets staat, met een naam en
+een datum eronder. Over een jaar is dat het enige antwoord dat er nog is.
+
+**Een maand die nog loopt gaat niet dicht**, en heropenen vraagt een reden: op een
+gesloten maand kunnen facturen zijn gebaseerd. Alles staat in een journaal dat
+aangroeit.
+
+---
+
+## 11. De vooruitblik, en waarom er meestal geen bandbreedte staat
+
+`kern/kosten/vooruitblik.js`. De projectie is eenvoudig: verbruik tot nu toe,
+gedeeld door de dagen die voorbij zijn, maal de dagen van de maand -- gerekend in
+millicenten en één keer afgerond, want op hele centen valt een klein lid stil.
+
+De zin eronder is het moeilijke deel. **Een bandbreedte is een belofte.**
+"Verwacht 284,20, marge 279-289, betrouwbaarheid 99,1%" is een verzinsel met een
+decimaal zolang niemand die 99,1% heeft nagemeten. Dus:
+
+- de projectie staat er altijd, met de graad van de cijfers eronder;
+- de **band staat er alleen** als er ten minste drie afgesloten maanden zijn met
+  een opgeschreven voorspelling om hem op te baseren;
+- en zolang dat niet zo is, staat er **waarom niet**.
+
+De meting werkt doordat de onderhoudsronde elke dag de projectie van de lopende
+maand vastlegt. Is die maand voorbij, dan staat de werkelijke uitkomst ernaast.
+De trefzekerheid wordt gemeten op het **huistotaal** en niet per gebruiker; dat
+scheelt een snapshot per lid per dag (een gedragslogboek in vermomming), en het
+antwoord zegt zelf dat het over het geheel gaat.
+
+---
+
+## 12. Verbruiksgrenzen die echt weigeren
+
+`kern/kosten/grens.js`. Twee dingen die van elkaar verschillen:
+
+- **waarschuwen** -- erboven staat er een melding bij het verbruik; er verandert
+  niets aan wat er kan;
+- **een plafond** -- erboven gaat de **AI-weg dicht** voor die gebruiker. Niet de
+  hele app: alles blijft werken in de regelgestuurde werkmodus die dit huis toch
+  al heeft voor als er geen model is. Dat is het verschil tussen een grens en een
+  storing.
+
+**Twee sloten, en de strengste wint.** Een lid zet er een voor zichzelf; het
+kantoor zet er een voor een gebruiker (fair use). Een lid dat de kantoorgrens zou
+kunnen ophogen, heeft geen kantoorgrens.
+
+**Standaard is er geen grens**, en `geen-grens` is een andere stand dan `ruim`.
+Een ingebouwd plafond dat niemand heeft gekozen, gaat op de dag dat het bijt over
+voor een storing.
+
+De grens hangt aan `kern/kosten/haak.js` en wordt gevraagd in `server/ai.js`,
+vlak voordat er een model wordt aangeroepen. Een **kapotte** grenswacht sluit de
+AI-weg niet: hij geeft dan groen. Het omgekeerde zou betekenen dat een fout in de
+boekhouding de AI van het hele huis stilzet.

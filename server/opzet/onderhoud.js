@@ -51,12 +51,31 @@ function ruimRemmen(fails, nu, stilteMs) {
 
 /* De hele ronde in een aanroep. Elk onderdeel is los weg te laten, zodat een
    toets er een kan bekijken zonder de andere twee op te tuigen. */
-function onderhoudsronde({ loginFails, pinSlot, ruimBuffer, nu } = {}) {
+function onderhoudsronde({ loginFails, pinSlot, ruimBuffer, peilOpslag, legVoorspellingVast, nu } = {}) {
   const tijd = nu || Date.now();
   const uit = { remmen: 0 };
   if (loginFails) uit.remmen = ruimRemmen(loginFails, tijd);
   if (pinSlot && typeof pinSlot.opruimen === 'function') pinSlot.opruimen();
   if (typeof ruimBuffer === 'function') ruimBuffer();
+  /* DE OPSLAGPEILING (KOSTEN.md). Opslag is de enige kostensoort die je niet
+     kunt optellen: er STAAT op enig moment zoveel, en dat meet je. Deze ronde is
+     de enige klok die dit huis al had, dus hangt de peiling eraan.
+
+     De REM zit niet hier maar in kern/kosten/peiling.js: die slaat een peiling
+     binnen het uur over. Zo hoeft deze ronde niet te weten hoe vaak te vaak is,
+     en is dat op een plek te veranderen. Slikt zijn eigen fouten: een
+     onderhoudsronde die omvalt op een boekhouding laat de inlogrem staan, en dat
+     is een beveiligingsprobleem in plaats van een kostenprobleem. */
+  if (typeof peilOpslag === 'function') {
+    try { uit.peiling = peilOpslag(); } catch (e) { uit.peiling = { ok: false, waarom: e.message }; }
+  }
+  /* En de voorspelling van vandaag vastleggen (hooguit een keer per dag; de rem
+     zit in kern/kosten/vooruitblik.js). Zonder opgeschreven voorspelling valt er
+     later niets na te rekenen, en dan is elke bewering over trefzekerheid een
+     herinnering in plaats van een meting. */
+  if (typeof legVoorspellingVast === 'function') {
+    try { uit.voorspelling = legVoorspellingVast(); } catch (e) { uit.voorspelling = { ok: false, waarom: e.message }; }
+  }
   return uit;
 }
 

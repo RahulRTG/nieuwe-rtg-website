@@ -27,6 +27,18 @@ const { HUIS } = require('./haak');
 /* Hoeveel maanden blijven staan. Vierentwintig: genoeg voor een jaarvergelijking
    en voor een correctie op een oude factuur, en niet meer dan dat. */
 const MAANDEN = 24;
+/* AFRONDEN ZONDER TE LIEGEN. Drie decimalen is prima voor tokens, en fataal voor
+   opslag: die staat in gigabytes, dus drie decimalen is een megabyte, en dan
+   leest de kluis van een lid met een paar bestanden als NUL. Onder de duizendste
+   dus drie SIGNIFICANTE cijfers. Een getal dat op nul afrondt terwijl het niet
+   nul is, is een leugen met een decimaalteken. */
+function afrond(n) {
+  const v = Number(n) || 0;
+  if (v === 0) return 0;
+  if (Math.abs(v) >= 0.001) return Math.round(v * 1000) / 1000;
+  return Number(v.toPrecision(3));
+}
+
 const MAX_AANTAL = 1e12;   // een grens op het doel: één melding kan de maand niet omgooien
 const BUFFER_MAX = 500;    // hoeveel gebruiker-maandrijen er in het geheugen mogen wachten
 const SPOEL_MS = 5000;     // en hoe lang, als niemand kijkt
@@ -114,6 +126,10 @@ module.exports = (ctx) => {
   function meet({ drager, soort: soortId, aantal, tijd, pas }) {
     const s = soort(soortId);
     if (!s || s.meetweg !== 'gemeten') return false;
+    /* Een STAND komt niet via deze deur binnen. Zou hij dat wel doen, dan telt
+       een peiling op bij de vorige en groeit de opslag van een lid dat niets
+       doet vanzelf. Zie peil() hierboven. */
+    if (s.aard === 'stand') return false;
     const n = Number(aantal);
     if (!Number.isFinite(n) || n <= 0 || n > MAX_AANTAL) return false;
     const sleutel = periodeVan(tijd) + '\u0000' + String(drager || HUIS);
@@ -143,5 +159,9 @@ module.exports = (ctx) => {
      opslag; sorteren doet het overzicht, want dat weet waarop. */
   function dragers(periode) { return Object.keys(kijkPeriode(periode)); }
 
-  return { meet, spoel, kijk, kijkPeriode, dragers, perioden, periodeVan, MAANDEN };
+  /* De STAND-kant (opslag peilen) woont in ./meterstand.js: een ander mechanisme
+     op dezelfde opslag. Zie de kop daar voor waarom dat geen dubbeling is. */
+  const { peil } = require('./meterstand')({ pak, spoel, snoei, save, nu, periodeVan, MAX_AANTAL });
+
+  return { meet, peil, spoel, kijk, kijkPeriode, dragers, perioden, periodeVan, afrond, MAANDEN };
 };

@@ -50,7 +50,7 @@ module.exports = (ctx) => {
       .filter(s => s && Number.isFinite(s.perEenheid) && s.bron && String(s.gezetOp || '') <= grens)
       .sort((a, b) => String(b.gezetOp).localeCompare(String(a.gezetOp)));
     const g = standen[0];
-    return g ? { perEenheid: g.perEenheid, bron: g.bron, gezetOp: g.gezetOp } : null;
+    return g ? { perEenheid: g.perEenheid, bron: g.bron, factuurId: g.factuurId || null, gezetOp: g.gezetOp } : null;
   }
 
   const zicht = (id) => {
@@ -58,7 +58,8 @@ module.exports = (ctx) => {
     const s = soort(id);
     return { soort: id, naam: s ? s.naam : id, eenheid: s ? s.eenheid : null,
       perEenheid: r && Number.isFinite(r.perEenheid) ? r.perEenheid : null,
-      bron: (r && r.bron) || null, gezetOp: (r && r.gezetOp) || null, gezetDoor: (r && r.gezetDoor) || null,
+      bron: (r && r.bron) || null, factuurId: (r && r.factuurId) || null,
+      gezetOp: (r && r.gezetOp) || null, gezetDoor: (r && r.gezetDoor) || null,
       ontbreekt: !(r && Number.isFinite(r.perEenheid) && r.bron) };
   };
 
@@ -72,17 +73,27 @@ module.exports = (ctx) => {
   /* Zetten. `bron` is verplicht en wordt niet gecontroleerd op waarheid -- dat
      kan software niet -- maar wel op aanwezigheid. Wie hem leeg laat krijgt een
      weigering met de reden, en niet stil een tarief zonder herkomst. */
-  function tariefZet(soortId, perEenheid, bron, wie) {
+  /* `factuurId` werkt hier hetzelfde als bij een nota (./huisrekening.js): staat
+     er een leveranciersfactuur tegenover, dan wordt de bron daaruit afgeleid en
+     niet ingetikt. Een prijslijst hoort bij een factuur; twee keer dezelfde
+     herkomst intikken levert twee teksten op die uiteenlopen. */
+  function tariefZet(soortId, perEenheid, bron, wie, factuurId) {
     const s = soort(soortId);
     if (!s) return { status: 400, error: 'Onbekende kostensoort.' };
     if (s.meetweg !== 'gemeten') return { status: 400, error: 'Deze soort heeft geen tarief per eenheid; hij wordt toegerekend uit de huisrekening.' };
     const n = Math.round(Number(perEenheid));
     if (!Number.isFinite(n) || n < 0 || n > MAX_MILLICENT) return { status: 400, error: 'Geen geldig bedrag in millicenten.' };
-    const b = String(bron == null ? '' : bron).trim().slice(0, 300);
+    let fid = String(factuurId == null ? '' : factuurId).trim() || null;
+    let b = String(bron == null ? '' : bron).trim().slice(0, 300);
+    if (fid) {
+      const uit = ctx.providerfactuur && ctx.providerfactuur.bronVan(fid);
+      if (!uit) return { status: 404, error: 'Die leveranciersfactuur bestaat niet.' };
+      b = uit;
+    }
     if (b.length < 4) return { status: 400, error: 'Een tarief zonder bron bestaat niet; noem het contract, de prijslijst of de factuur waar dit bedrag vandaan komt.' };
     const k = kaart();
     const oud = k[s.id];
-    const stand = { perEenheid: n, bron: b, gezetOp: nu(), gezetDoor: String(wie || 'kantoor').slice(0, 80) };
+    const stand = { perEenheid: n, bron: b, factuurId: fid, gezetOp: nu(), gezetDoor: String(wie || 'kantoor').slice(0, 80) };
     const historie = oud ? [{ perEenheid: oud.perEenheid, bron: oud.bron, gezetOp: oud.gezetOp, gezetDoor: oud.gezetDoor }]
       .concat(Array.isArray(oud.historie) ? oud.historie : []).slice(0, HISTORIE_MAX) : [];
     k[s.id] = Object.assign(stand, { historie });

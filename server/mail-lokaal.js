@@ -24,6 +24,8 @@
 'use strict';
 const smsSandbox = require('./sms-sandbox');
 
+const kostenhaak = require('./kern/kosten/haak'); // KOSTEN.md par. 6
+
 module.exports = ({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox }) => {
   /* De lokale sandboxes krijgen bovenop hun startconfiguratie een runtime-
      zekering. De Integratiekamer kan ze UIT zetten zonder procesherstart; AAN kan
@@ -36,6 +38,12 @@ module.exports = ({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox }) => {
      in de (waar mogelijk versleutelde) outbox. Zonder sandbox blijft de outbox
      het zichtbare lokale vangnet. */
   function sendSms(to, subject, text) {
+    /* DE KOSTENMETER (kern/kosten/haak.js). Hier en niet alleen in mail.js, want
+       er is een aanroeper die rechtstreeks hierlangs komt (het sms-herstel in
+       routes/auth/herstel.js) -- die zou anders gratis zijn. mail.js telt om
+       diezelfde reden alleen de mail; twee tellingen op een bericht is erger dan
+       geen, want dan klopt de factuur precies twee keer zo hard niet. */
+    kostenhaak.meld('bericht', 1, { bron: 'sms' });
     const journaal = (gelukt, hoe, reden) => {
       try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: 'sms:' + to, mislukt: !gelukt, reden }); } catch (e) {}
     };

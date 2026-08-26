@@ -14,7 +14,8 @@
         hele reden dat het percentage erboven mag staan;
      3. een tarief zetten VIA HET SCHERM komt echt aan en staat er daarna;
      4. de vier economieen en de firewall staan op ditzelfde scherm;
-     5. wat het scherm niet weet, staat er ook echt.
+     5. de vooruitblik staat er ZONDER bandbreedte zolang die niet gemeten is;
+     6. wat het scherm niet weet, staat er ook echt.
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
@@ -55,6 +56,14 @@ test('het kostenbord: laadt, toont het voorbehoud, en zet een tarief',
        zoeken, zoek je pas op als er al iets is misgegaan. */
     assert.match(tekst, /De vier economieen/);
     assert.match(tekst, /geen enkele relatie vastgelegd|Economische relaties/);
+    /* De vooruitblik en de maandstand horen op hetzelfde bord: een voorspelling
+       die je elders moet zoeken en een maand die je elders sluit, zijn twee
+       schermen die op een dag iets anders zeggen over dezelfde maand. */
+    assert.match(tekst, /Wat wordt het deze maand/);
+    assert.match(tekst, /Er staat geen bandbreedte/,
+      'het bord toont een bandbreedte terwijl de trefzekerheid nog niet gemeten is');
+    assert.match(tekst, /De maand \d{4}-\d{2}/);
+    assert.match(tekst, /Facturen van onze leveranciers/);
 
     // een tarief zetten via het scherm, en het moet er daarna echt staan
     await page.selectOption('#tSoort', 'ai-uitvoer');

@@ -46,6 +46,11 @@ module.exports = function hangDwarseRoutersOp(grens) {
      Naast de facturatie, want het eindigt op dezelfde factuur en niet op een
      tweede geldstroom. */
   require('../routes/kosten')(grens('kosten'));
+  /* De kantoorkant van dezelfde laag, in een eigen bestand omdat het samen door
+     de omvangsgrens ging; de naad ligt op de LEZER (een gebruiker ziet zichzelf,
+     het kantoor ziet iedereen en beslist). Zelfde domeingrens: een tweede lezer
+     van dezelfde kern is geen tweede domein. */
+  require('../routes/kosten-kantoor')(grens('kosten'));
   /* De economielaag eronder (kern/economie/, ECONOMIE.md): de vier werelden en
      de firewall ertussen. Na de kosten, want de werelden-route toont de
      verdeling van de nota's die daar wordt gerekend. */

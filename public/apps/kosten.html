@@ -120,6 +120,54 @@ function tekenDekking(d){
     '</div>';
 }
 
+/* WAT WORDT HET DEZE MAAND, en waarom er geen bandbreedte staat.
+
+   De projectie staat er altijd; de band alleen als de trefzekerheid GEMETEN is
+   over afgesloten maanden. Zolang dat niet zo is, staat er waarom niet -- en
+   niet een percentage dat niemand heeft nagerekend. */
+function tekenVooruitblik(v){
+  const tz = v.trefzekerheid || {};
+  return '<div class="kaart"><h2>Wat wordt het deze maand</h2>'+
+    '<div class="rij"><div class="groei"><div class="groot">'+eur(v.verwachtCenten)+'</div>'+
+    '<p class="sub">Nu ' + eur(v.totNuCenten) + ' na ' + v.dagenVoorbij + ' van de ' + v.dagenInMaand + ' dagen. '+
+    esc(v.zegtNiet || '')+'</p></div></div>'+
+    (v.band
+      ? '<div class="bev rust"><b>Bandbreedte '+eur(v.band.vanCenten)+' tot '+eur(v.band.totCenten)+'.</b> '+
+        'Op basis van '+esc(v.band.opBasisVan)+'. '+esc(v.band.zegtNiet)+'</div>'
+      : '<div class="bev letop"><b>Er staat geen bandbreedte.</b> '+esc(tz.waarom || 'De trefzekerheid is nog niet gemeten.')+'</div>')+
+    (tz.gemeten
+      ? '<p class="sub">Gemiddelde afwijking over '+tz.maanden+' afgesloten maanden: '+tz.gemiddeldeAfwijkingPct+'%.</p>'
+      : '')+
+    '</div>';
+}
+
+/* DE MAAND SLUITEN. Elk verschil krijgt een eigen regel met een tekstveld: een
+   verklaring is tekst en geen vinkje, want over een jaar is dit het enige
+   antwoord dat er nog is. */
+function tekenPeriode(pr){
+  const knop = pr.stand === 'gesloten'
+    ? '<div class="rij"><input class="veld breed" id="pReden" maxlength="300" placeholder="Waarom moet deze maand open?" aria-label="Reden voor heropenen">'+
+      '<button class="knop stil" id="pHeropen" type="button">Heropenen</button></div>'
+    : pr.kanSluiten
+      ? '<div class="rij"><button class="knop" id="pSluit" type="button">Maand sluiten</button></div>'
+      : '<p class="sub">'+esc(pr.waarom || '')+'</p>';
+  return '<div class="kaart"><h2>De maand '+esc(pr.periode)+'</h2>'+
+    '<div class="rij strak"><span class="st '+(pr.stand === 'gesloten' ? 'gemeten' : pr.stand === 'in-onderzoek' ? 'onbekend' : 'vermoed')+'">'+esc(pr.stand)+'</span>'+
+    (pr.geslotenOp ? '<span class="sub">gesloten op '+esc(pr.geslotenOp)+' door <code>'+esc(pr.geslotenDoor || '')+'</code></span>' : '')+'</div>'+
+    '<p class="sub">Een maand gaat pas dicht als elk verschil een verklaring draagt. Een maand in onderzoek gaat niet naar de rekening van een lid.</p>'+
+    (pr.verschillen.length
+      ? pr.verschillen.map(v => '<div class="scheiding"><div class="rij strak"><b class="groei">'+esc(v.naam)+'</b>'+
+          '<span class="st">'+eur(v.verschilCenten)+'</span></div>'+
+          '<p class="sub">'+esc(v.wat)+'</p>'+
+          (v.verklaring
+            ? '<div class="bev rust">'+esc(v.verklaring.tekst)+'<br><span class="sub">'+esc(v.verklaring.door)+' &middot; '+esc(v.verklaring.op)+'</span></div>'
+            : '<div class="rij"><input class="veld breed vk" data-sleutel="'+esc(v.sleutel)+'" maxlength="500" placeholder="Wat verklaart dit verschil?" aria-label="Verklaring">'+
+              '<button class="knop stil vkZet" data-sleutel="'+esc(v.sleutel)+'" type="button">Verklaren</button></div>')+
+          '</div>').join('')
+      : '<div class="bev rust">Geen verschillen in deze maand.</div>')+
+    knop + '</div>';
+}
+
 function tekenGebruikers(rijen){
   if (!rijen.length) return '<div class="kaart"><h2>Gebruikers</h2><p class="sub">In deze maand is er nog niets gemeten.</p></div>';
   return '<div class="kaart"><h2>Gebruikers</h2>'+
@@ -156,7 +204,7 @@ function tekenTarieven(t, ontbreekt){
 
 /* De nota's die RTG zelf betaalde. Stroom en serverhuur worden hieruit verdeeld;
    voor de gemeten soorten dient het om de eigen optelsom na te rekenen. */
-function tekenNota(posten, ontbreekt, afstemming, soorten){
+function tekenNota(posten, ontbreekt, afstemming, soorten, facturen){
   return '<div class="kaart"><h2>Onze eigen nota&#39;s</h2>'+
     (ontbreekt.length
       ? '<div class="bev"><b>Geen nota voor: '+ontbreekt.map(esc).join(', ')+'.</b> Zonder nota wordt er niets verdeeld. Dat is geen nul euro stroom; het is een ontbrekende nota.</div>' : '')+
@@ -169,6 +217,17 @@ function tekenNota(posten, ontbreekt, afstemming, soorten){
     '<input class="veld" id="nBedrag" type="number" min="0" step="1" placeholder="centen" aria-label="Bedrag in centen">'+
     '<input class="veld breed" id="nBron" maxlength="300" placeholder="Welke nota? (leverancier, factuurnummer)" aria-label="Bron van de nota">'+
     '<button class="knop" id="nZet" type="button">Nota vastleggen</button></div>'+
+    '<h3 class="kop3">Facturen van onze leveranciers</h3>'+
+    (facturen.length
+      ? '<div class="schuif"><table><thead><tr><th>Leverancier</th><th>Nummer</th><th class="getal">Bedrag</th><th>Ingevoerd door</th></tr></thead><tbody>'+
+        facturen.map(f => '<tr><td>'+esc(f.leverancier)+'</td><td><code>'+esc(f.nummer)+'</code></td>'+
+          '<td class="getal">'+eur(f.centen)+'</td><td class="sub">'+esc(f.door)+'</td></tr>').join('')+
+        '</tbody></table></div>'
+      : '<p class="sub">Nog geen leveranciersfacturen voor deze maand. Zonder factuur eindigt de herkomst van een bedrag bij een ingetikte zin.</p>')+
+    '<div class="rij"><input class="veld" id="fLev" maxlength="120" placeholder="leverancier" aria-label="Leverancier">'+
+    '<input class="veld" id="fNr" maxlength="80" placeholder="factuurnummer" aria-label="Factuurnummer">'+
+    '<input class="veld" id="fBedrag" type="number" min="1" step="1" placeholder="centen" aria-label="Bedrag in centen">'+
+    '<button class="knop stil" id="fZet" type="button">Factuur vastleggen</button></div>'+
     '<h3 class="kop3">Klopt onze optelsom?</h3>'+
     '<div class="schuif"><table><thead><tr><th>Soort</th><th class="getal">Gerekend</th><th class="getal">Nota</th><th class="getal">Verschil</th></tr></thead><tbody>'+
     afstemming.map(a => '<tr><td>'+esc(a.naam)+(a.waarom ? '<br><span class="sub">'+esc(a.waarom)+'</span>' : '')+'</td>'+
@@ -270,14 +329,20 @@ async function laden(){
       api('/api/office/kosten/nota', { periode: p }),
       api('/api/office/kosten/beleid')
     ]);
-    const w = await api('/api/office/economie/werelden', { periode: o.periode });
+    const [w, pr, vb, lf] = await Promise.all([
+      api('/api/office/economie/werelden', { periode: o.periode }),
+      api('/api/office/kosten/periode', { periode: o.periode }),
+      api('/api/office/kosten/vooruitblik', { periode: o.periode }),
+      api('/api/office/kosten/leveranciersfacturen', { periode: o.periode })
+    ]);
     const v = await api('/api/office/kosten/voorstel', { periode: o.periode });
     SOORTEN = t.soorten;
     if (!$('#maand').value) $('#maand').value = o.periode;
-    $('#main').innerHTML = tekenDekking(o.dekking) + tekenVoorstel(v, b.beleid) +
+    $('#main').innerHTML = tekenDekking(o.dekking) + tekenVooruitblik(vb) +
+      tekenVoorstel(v, b.beleid) + tekenPeriode(pr) +
       tekenWerelden(w, w.wereldposten || []) +
       tekenGebruikers(o.gebruikers) + tekenTarieven(t.tarieven, o.ontbreekt.tarieven) +
-      tekenNota(n.posten, n.ontbreekt, o.afstemming, SOORTEN) + tekenGaten(o.nietGemeten);
+      tekenNota(n.posten, n.ontbreekt, o.afstemming, SOORTEN, lf.facturen || []) + tekenGaten(o.nietGemeten);
   } catch (e) {
     $('#main').innerHTML = '<div class="kaart"><h2>Dat lukte niet</h2><p class="sub">'+esc(e.message)+
       ' Dit scherm hoort achter de boardroom; log in via de boardroom en probeer het opnieuw.</p></div>';
@@ -299,6 +364,21 @@ document.addEventListener('click', async (ev) => {
       await api('/api/office/economie/relatie/zet', { van: $('#rVan').value, naar: $('#rNaar').value,
         plafondCenten: Number($('#rPlafond').value), grondslag: $('#rGrond').value });
       meld('Relatie vastgelegd.'); laden();
+    } else if (el.id === 'fZet') {
+      await api('/api/office/kosten/leveranciersfactuur/zet', { periode: $('#maand').value,
+        leverancier: $('#fLev').value, nummer: $('#fNr').value, centen: Number($('#fBedrag').value) });
+      meld('Factuur vastgelegd.'); laden();
+    } else if (el.classList && el.classList.contains('vkZet')) {
+      const sleutel = el.getAttribute('data-sleutel');
+      const veld = document.querySelector('.vk[data-sleutel="' + sleutel + '"]');
+      await api('/api/office/kosten/periode/verklaar', { periode: $('#maand').value, sleutel, tekst: veld.value });
+      meld('Verklaard.'); laden();
+    } else if (el.id === 'pSluit') {
+      await api('/api/office/kosten/periode/sluit', { periode: $('#maand').value });
+      meld('Maand gesloten.'); laden();
+    } else if (el.id === 'pHeropen') {
+      await api('/api/office/kosten/periode/heropen', { periode: $('#maand').value, reden: $('#pReden').value });
+      meld('Maand heropend.'); laden();
     } else if (el.id === 'vrij') {
       const r = await api('/api/office/kosten/vrijgeven', { periode: $('#maand').value });
       meld(r.geboekt + ' regels geboekt, samen ' + eur(r.totaalCenten) + '.'); laden();

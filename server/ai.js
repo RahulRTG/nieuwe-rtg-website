@@ -52,6 +52,16 @@ function maakAI(opts) {
     routes(params) { return ketting.filter(a => typeof a.kan !== 'function' || a.kan(params)).map(a => a.naam); },
     messages: {
       async create(params) {
+        /* DE VERBRUIKSGRENS (kern/kosten/grens.js), vlak voor het geld. Dicht:
+           dan geen aanroep, en valt de app terug op de regelgestuurde werkmodus
+           die er toch al is voor als er geen model is -- het verschil tussen een
+           grens en een storing. Zonder grens kost dit een kaartopzoeking. */
+        const grens = kostenhaak.magUitgeven();
+        if (grens && grens.ok === false) {
+          const fout = new Error(grens.uitleg || 'De verbruiksgrens voor deze gebruiker is bereikt.');
+          fout.code = 'KOSTENGRENS';
+          throw fout;
+        }
         let laatste = null;
         for (const aanbieder of ketting) {
           if (typeof aanbieder.kan === 'function' && !aanbieder.kan(params)) continue;

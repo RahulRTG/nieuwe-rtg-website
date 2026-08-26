@@ -46,6 +46,7 @@ module.exports = (ctx) => {
     return Object.keys(r).map(id => {
       const s = soort(id);
       return { soort: id, naam: s ? s.naam : id, centen: r[id].centen, bron: r[id].bron,
+        factuurId: r[id].factuurId || null,
         gezetOp: r[id].gezetOp, gezetDoor: r[id].gezetDoor || null };
     }).sort((a, b) => b.centen - a.centen);
   }
@@ -54,21 +55,33 @@ module.exports = (ctx) => {
      stroomnota wordt gecorrigeerd, niet opgeteld. De vorige stand blijft wel
      staan als `vorige`, zodat te zien is dat er iets veranderd is nadat er
      mogelijk al iets op is gebaseerd. */
-  function postZet(periode, soortId, centen, bron, wie) {
+  /* `factuurId` verwijst naar een echte leveranciersfactuur
+     (./providerfactuur.js). Is die er, dan wordt de BRON daaruit AFGELEID en
+     niet ingetikt: zo staat de herkomst op een plek en loopt de keten door tot
+     iets wat je naast een bankafschrift kunt leggen. Zonder factuur mag een vrij
+     ingetikte bron ook nog -- niet elke kostenpost heeft er een, en een systeem
+     dat dan niets aanneemt, krijgt een lege maand in plaats van een eerlijke. */
+  function postZet(periode, soortId, centen, bron, wie, factuurId) {
     const s = soort(soortId);
     if (!s) return { status: 400, error: 'Onbekende kostensoort.' };
     const p = periodeVan(periode);
     if (!/^\d{4}-\d{2}$/.test(p)) return { status: 400, error: 'Geen geldige maand (JJJJ-MM).' };
     const n = Math.round(Number(centen));
     if (!Number.isFinite(n) || n < 0 || n > MAX_CENTEN) return { status: 400, error: 'Geen geldig bedrag in centen.' };
-    const b = String(bron == null ? '' : bron).trim().slice(0, 300);
-    if (b.length < 4) return { status: 400, error: 'Een bedrag zonder bron bestaat niet; noem de nota of de afrekening.' };
+    let fid = String(factuurId == null ? '' : factuurId).trim() || null;
+    let b = String(bron == null ? '' : bron).trim().slice(0, 300);
+    if (fid) {
+      const uit = ctx.providerfactuur && ctx.providerfactuur.bronVan(fid);
+      if (!uit) return { status: 404, error: 'Die leveranciersfactuur bestaat niet.' };
+      b = uit;
+    }
+    if (b.length < 4) return { status: 400, error: 'Een bedrag zonder bron bestaat niet; noem de leveranciersfactuur, of anders de nota of afrekening.' };
     const r = boek()[p] || (boek()[p] = {});
     const oud = r[s.id];
-    r[s.id] = { centen: n, bron: b, gezetOp: nu(), gezetDoor: String(wie || 'kantoor').slice(0, 80),
+    r[s.id] = { centen: n, bron: b, factuurId: fid, gezetOp: nu(), gezetDoor: String(wie || 'kantoor').slice(0, 80),
       vorige: oud ? { centen: oud.centen, bron: oud.bron, gezetOp: oud.gezetOp } : null };
     save();
-    return { status: 200, ok: true, post: { soort: s.id, centen: n, bron: b } };
+    return { status: 200, ok: true, post: { soort: s.id, centen: n, bron: b, factuurId: fid } };
   }
 
   /* Welke toegerekende soorten missen een rekening voor deze maand. Het

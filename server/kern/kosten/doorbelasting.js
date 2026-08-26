@@ -130,6 +130,15 @@ module.exports = (ctx) => {
     const p = meter.periodeVan(periode);
     if (!/^\d{4}-\d{2}$/.test(p)) return { status: 400, error: 'Geen geldige maand (JJJJ-MM).' };
     if (ronde(p)) return { status: 409, error: 'Deze maand is al vrijgegeven op ' + ronde(p).vrijgegevenOp + '.' };
+    /* EEN MAAND IN ONDERZOEK GAAT NIET NAAR EEN REKENING. Open is "er is nog
+       niet naar gekeken" en dat mag; gesloten is "het klopt" en dat mag zeker.
+       In-onderzoek betekent dat iemand van dit huis zelf heeft vastgesteld dat de
+       cijfers niet kloppen -- en dan factureren is de duurste fout die deze laag
+       kan maken (KOSTEN.md par. 7). */
+    if (ctx.periode && ctx.periode.isOnderzoek(p)) {
+      return { status: 409, error: 'Deze maand staat in onderzoek: er is een verschil gevonden dat nog niet verklaard is. ' +
+        'Sluit de maand eerst, of zet hem terug op open.' };
+    }
     const naam = String(wie || '').trim().slice(0, 80);
     if (!naam) return { status: 400, error: 'Vrijgeven is een handeling van een mens; zonder wie gebeurt het niet.' };
     if (typeof boekDoorbelasting !== 'function') return { status: 503, error: 'De factuurlaag is nog niet wakker; probeer het zo weer.' };

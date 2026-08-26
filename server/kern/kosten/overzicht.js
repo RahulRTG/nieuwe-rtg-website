@@ -54,8 +54,11 @@ module.exports = (ctx) => {
   function regelVan(periode, soortId, aantal) {
     const s = soort(soortId);
     const t = tarieven.tariefOp(soortId, eindeVan(periode));
-    const basis = { soort: soortId, naam: s.naam, aantal: Math.round(aantal * 1000) / 1000,
-      ruw: s.ruw, eenheid: s.eenheid };
+    /* afrond() en niet Math.round(x*1000)/1000: opslag staat in gigabytes, en
+       drie decimalen laat de kluis van een lid met een paar bestanden als NUL
+       lezen. Zie de kop van ./meter.js. */
+    const basis = { soort: soortId, naam: s.naam, aantal: meter.afrond(aantal),
+      ruw: s.ruw, eenheid: s.eenheid, aard: s.aard };
     if (!t) return Object.assign(basis, { millicenten: null, graad: 'onbekend', bron: null,
       waarom: 'Er is geen tarief ingevoerd voor ' + s.naam.toLowerCase() + ', dus er wordt niets uitgerekend.' });
     return Object.assign(basis, {
@@ -114,7 +117,14 @@ module.exports = (ctx) => {
     const centen = Math.round(millicenten / 1000) + verdeeldeCenten;
     const graad = zwakste(directe.concat(verdeeld).map(r => r.graad || 'onbekend'));
     return { periode: p, drager, wie: ontleed(drager), regels: directe, toegerekend: verdeeld,
-      totaal: { centen, millicenten, graad },
+      /* `milliTotaal` is het HELE bedrag in millicenten, dus inclusief het
+         toegerekende deel. Hij staat erbij omdat er lagen zijn die er nog mee
+         REKENEN in plaats van hem te tonen -- de projectie van ./vooruitblik.js
+         deelt hem door de dagen, en op hele centen valt een klein lid dan stil:
+         een cent gedeeld door zesentwintig dagen maal eenendertig is weer een
+         cent, en dan voorspelt de projectie niets. Eenmaal afronden, aan het
+         eind, op de plek waar een mens het leest. */
+      totaal: { centen, millicenten, milliTotaal: millicenten + verdeeldeCenten * 1000, graad },
       zonderTarief: directe.filter(r => r.millicenten == null).map(r => r.soort),
       nietGemeten: nietGemeten(p) };
   }

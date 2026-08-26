@@ -33,6 +33,17 @@ const REGEL = (titel, ref) => '<a class="reis" href="/apps/office.html" data-sig
   '<span class="onder"><button class="rtg-ref" type="button" data-ref="' + ref + '">' + ref + '</button>' +
   '<span class="bron">Office</span></span></span></span><span class="pijl">&rsaquo;</span></a>';
 
+/* DE MAAT WORDT VLAK VOOR DE VEEG GENOMEN, en niet een keer aan het begin.
+   boundingBox() rekent in het VENSTER: rolt de pagina tussendoor (een tik op een
+   actie, een lade die opent), dan wijst een eerder gemeten doos naar een plek
+   waar de regel niet meer staat, en landt de muis ernaast. Dat is de tweede helft
+   van dezelfde fout als de scrollIntoView hieronder -- een proef die faalt om de
+   verkeerde reden is net zo min een proef. */
+async function maat(loc) {
+  await loc.scrollIntoViewIfNeeded();
+  return loc.boundingBox();
+}
+
 async function veeg(page, doos, px, losLaten) {
   const y = doos.y + doos.height / 2;
   const x0 = px < 0 ? doos.x + doos.width * 0.7 : doos.x + doos.width * 0.15;
@@ -97,10 +108,18 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
       'een gebarenregel hoort te zeggen DAT hij acties draagt, ook aan wie het scherm niet ziet');
 
     const rij = page.locator('#werkdag .reis').first();
+    /* EERST IN BEELD, DAN METEN -- dezelfde reparatie als bij de proefregel
+       verderop in dit bestand, en om precies dezelfde reden. boundingBox()
+       rekent in het VENSTER. #werkdag staat op kantoor.html onder de vouw: op
+       900 hoog kwam het veegpunt op y 920 uit, dus buiten beeld, en dan landt de
+       muis nergens en komt er geen lade. De toets zakte daarmee op zijn eigen
+       schermhoogte in plaats van op het gebaar. Gemeten met
+       elementFromPoint(618, 920): null. */
+    await rij.scrollIntoViewIfNeeded();
     const doos = await rij.boundingBox();
 
     // 2. halve veeg naar links -> de rechterlade blijft open staan, niets gebeurt
-    await veeg(page, doos, -140, true);
+    await veeg(page, await maat(rij), -140, true);
     await ladeOpen(page);
     assert.deepEqual(await laden(page), { kant: 'rechts', gereed: false, acties: ['Openen', 'Delen'] },
       'een halve veeg naar links hoort de rechterlade te openen zonder iets uit te voeren');
@@ -113,7 +132,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     assert.equal(await laden(page), null, 'na een tik hoort de lade opgeruimd te zijn');
 
     // 4. de andere kant draagt andere acties -- dat is de hele afspraak
-    await veeg(page, doos, 140, true);
+    await veeg(page, await maat(rij), 140, true);
     await ladeOpen(page);
     assert.deepEqual((await laden(page)).acties, ['Kenmerk', 'Overnemen'],
       'een veeg naar rechts hoort de ANDERE lade te openen');
@@ -122,7 +141,7 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
 
     // 5. doorvegen: eerst zichtbaar gereed, dan uitgevoerd, dan een melding
     const drempel = Math.max(168 + 52, doos.width * 0.55) + 70;
-    await veeg(page, doos, drempel, false);
+    await veeg(page, await maat(rij), drempel, false);
     assert.equal((await laden(page)).gereed, true,
       'voorbij de drempel hoort de lade te laten ZIEN dat loslaten iets doet');
     await page.mouse.up();
@@ -196,6 +215,7 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
       });
     });
     const rij = page.locator('.proefrij');
+    await rij.scrollIntoViewIfNeeded();   // zie de toelichting hierboven
     const doos = await rij.boundingBox();
 
     // 1. doorvegen naar links voert af EN biedt de weg terug aan

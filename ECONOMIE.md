@@ -311,6 +311,28 @@ Dat sluit aan op `WERELD.md`: er is één beginscherm en dat is een lege keuze, 
 voorgekookte statusstrook. Een kostenmelding die er elke dag staat, is over een
 maand behang.
 
+**Wat hiervan inmiddels STAAT** (`KOSTEN.md` par. 13). Dat scherm bestaat, voor
+alle drie de soorten klanten: een lid ziet het in RTG Geld (stand *Kosten*), een
+zaak op `/apps/zaakkosten.html`, een gezin in het beheerscherm van de
+RTFoundation -- de eerste twee op één gedeelde tekenlaag, het gezin bewust in de
+eigen vormtaal en toon van de stichting. Het opent met één toestand en hooguit één
+bedrag; de onderbouwing staat eronder, en "waarom betaal ik dit" opent de keten
+terug naar de factuur van onze eigen leverancier.
+
+Van de vijf beloften hierboven zijn er dus **drie** waar: RTG weet wat het kost,
+kan iedere cent uitleggen, en waarschuwt vóórdat het duur wordt (de eigen grens,
+par. 10). Wat er **niet** staat is de tweede -- *voorkomen dat je te veel
+betaalt* -- want dat is cost routing, en dat is jaren weg (par. 9). En de vijfde,
+"val je nergens mee lastig", is geen functie maar een vorm: het scherm is
+uitzonderingsgestuurd en er staat geen melding tegenover als er niets aan de hand
+is.
+
+Eén ding daar is strenger dan het lijkt. Zonder tarief staat er op zo'n scherm
+**geen bedrag** maar de reden -- ook geen nul. Een nul leest als "gratis", en dat
+is een andere bewering dan "niet bekend". Op een klantscherm is dat de
+makkelijkst te breken regel van deze hele laag, en er staan drie schermtoetsen op
+die precies dat vastleggen.
+
 ---
 
 ## 13. Wat er vandaag staat, kort
@@ -330,6 +352,7 @@ maand behang.
 | periode sluiten met verklaarde verschillen | **staat** | `kern/kosten/periode.js` |
 | projectie met gemeten trefzekerheid | **staat** | `kern/kosten/vooruitblik.js` |
 | guardrails die de AI-weg dichtzetten | **staat** | `kern/kosten/grens.js` |
+| het rustige klantscherm voor lid, zaak en gezin | **staat** | KOSTEN.md par. 13 |
 | ouder-relatie tussen dragers (economische graaf) | **een stap weg** | par. 5 |
 | guardrails per afdeling of agent | **een stap weg** | par. 10 |
 | autonomous budgeting | **een stap weg** (wacht op historie) | par. 10 |

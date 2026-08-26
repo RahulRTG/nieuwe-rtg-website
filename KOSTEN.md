@@ -378,21 +378,31 @@ boekhouding de AI van het hele huis stilzet.
 
 ---
 
-## 13. De drie schermen
+## 13. De vier schermen
 
 De laag had tot nu toe één scherm en dat was het bord van de boardroom. Wie de
 rekening KRIJGT, kon nergens zien waar hij vandaan kwam -- en dat is precies de
 verkeerde kant om te beginnen.
 
-Er zijn drie lezers en dus drie schermen, op **één** antwoord van de server
-(`server/routes/kosten-beeld.js`) en met **één** tekenlaag in de browser
-(`public/shared/kostenbeeld.js` en `kostenketen.js`):
+Er zijn vier lezers en dus vier schermen, op **één** antwoord van de server
+(`server/routes/kosten-beeld.js`), en drie ervan op **één** tekenlaag in de
+browser (`public/shared/kostenbeeld.js` en `kostenketen.js`):
 
 | Wie | Waar | Wat er anders is |
 |---|---|---|
 | een **lid** | RTG Geld, stand *Kosten* (`/apps/geld.html#kosten`) | plus zijn eigen verbruiksgrens |
 | een **zaak** | `/apps/zaakkosten.html`, vanuit *Facturen* in de zaak-app | zakelijke aanspreekvorm, geen eigen grens |
+| een **gezin** | RTFoundation, *Gezin beheren*, alleen de beheerder | eigen route en eigen vormtaal; zie hieronder |
 | het **kantoor** | `/apps/kosten.html`, vanuit de boardroom | tarieven, nota's, maand sluiten, vrijgeven |
+
+**Het gezin staat er bewust NAAST en niet op dezelfde tekenlaag.** De
+RTFoundation heeft een eigen vormtaal, een eigen toon (je in plaats van u) en een
+eigen route (`/api/foundation/kosten`) die opent met de belofte in plaats van met
+het bedrag. Dat blok zegt eerst dat de RTFoundation dit betaalt en dat er nooit
+een rekening komt, en toont het bedrag daaronder -- die volgorde is er een toets
+waard (`test/rtfkosten.e2e.js`), want een blok dat met een bedrag opent leest als
+een openstaande post. En er staat niets vergelijkends bij: de bijdrage-spiegel is
+nooit vergelijkend (`LEVEN.md`).
 
 **Waarom het tekenwerk gedeeld is en niet overgetikt.** Twee kopieën van
 hetzelfde beeld zeggen op een dag iets anders over dezelfde maand, en dan is de

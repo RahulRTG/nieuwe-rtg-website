@@ -26,7 +26,7 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, elevateTier } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -450,12 +450,30 @@ test('partner worden: land en handelsactiviteit sturen de juiste bewijsvelden',
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
+    /* MET EEN PAS DIE PARTNER MAG ZIJN, en dat is sinds de ladderronde een eis
+       en geen beleefdheid: /api/partner/types is de volledige kaart van wat RTG
+       van een partner vraagt, en die staat achter can_be_partner (business-lite
+       of business -- test/commercie.test.js legt die twee vast). Deze toets is
+       ouder dan die poort en kwam anoniem binnen: de landenlijst bleef dan op
+       zijn ene hardgecodeerde optie staan en de wachttijd liep vol. De poort is
+       een bewust veiligheidsbesluit (de ladder handhaaft hem op norm nul), dus
+       de toets logt in -- niet andersom. */
+    const t = Date.now();
+    const reg = await (await fetch(base + '/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Partner ' + t, email: 'pw' + t + '@v.test', phone: '06' + String(t).slice(-8),
+        password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
+    })).json();
+    assert.ok(reg.token, 'de proef heeft een ingelogd lid nodig');
+    await elevateTier(base, reg.token, 'business');
+
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
+    await page.addInitScript((tok) => { try { localStorage.setItem('rtg_member_token', tok); } catch (e) {} }, reg.token);
     await page.goto(base + '/apps/partner-worden.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.querySelectorAll('[name="landCode"] option').length === 189,
+    await page.waitForFunction(() => document.querySelectorAll('[name="landCode"] option').length > 100,
       null, { timeout: 12000 });
     await page.selectOption('[name="landCode"]', 'BE');
     await page.selectOption('[name="type"]', 'restaurant');

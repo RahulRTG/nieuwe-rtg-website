@@ -83,49 +83,17 @@
       </aside>
     </div>
   </main>
-  <script>
-  (() => {
-    'use strict';
-    const form = document.getElementById('aanvraag');
-    const type = form.elements.type;
-    const melding = document.getElementById('melding');
-    const lijst = document.getElementById('statusLijst');
-    const knop = document.getElementById('verstuur');
-    const token = (() => { try { return localStorage.getItem('rtg_member_token') || ''; } catch (_) { return ''; } })();
-    const veilig = waarde => String(waarde == null ? '' : waarde).replace(/[&<>"']/g, teken => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[teken]));
-    const toon = (tekst, soort) => { melding.textContent = tekst; melding.className = 'msg on ' + (soort || ''); };
-    const post = async (pad, body) => {
-      const res = await fetch('/api' + pad, { method:'POST', headers:{'Content-Type':'application/json', ...(token ? {Authorization:'Bearer ' + token} : {})}, body:JSON.stringify(body || {}) });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'Dit lukte niet. Probeer het opnieuw.');
-      return data;
-    };
-    post('/partner/types').then(data => {
-      type.innerHTML = '<option value="">Kies een type</option>' + (data.types || []).map(t => '<option value="' + veilig(t.code) + '">' + veilig(t.label) + '</option>').join('');
-    }).catch(err => { type.innerHTML = '<option value="">Niet beschikbaar</option>'; toon(err.message, 'bad'); });
-    const laadStatus = () => {
-      if (!token) return;
-      post('/partner/applications/mijn').then(data => {
-        lijst.innerHTML = (data.aanvragen || []).length ? data.aanvragen.map(a => '<div class="status-row"><b>' + veilig(a.company) + '</b><span>' + veilig(a.city) + '</span><span class="pill">' + veilig(a.status) + (a.code ? ' · ' + veilig(a.code) : '') + '</span></div>').join('') : '<p class="lead" style="font-size:.76rem">Nog geen aanvragen met dit account.</p>';
-      }).catch(err => { lijst.innerHTML = '<p class="lead" style="font-size:.76rem">' + veilig(err.message) + '</p>'; });
-    };
-    form.addEventListener('submit', async event => {
-      event.preventDefault();
-      if (!token) { toon('Open eerst uw pas en log in. Kom daarna terug naar dit formulier.', 'bad'); return; }
-      if (!form.reportValidity()) return;
-      knop.disabled = true;
-      const data = Object.fromEntries(new FormData(form).entries());
-      data.akkoord = form.elements.akkoord.checked;
-      try {
-        await post('/partner/apply', data);
-        toon('Uw aanvraag is ontvangen. RTG beoordeelt hem persoonlijk; de status verschijnt hier.', 'good');
-        form.reset(); laadStatus();
-      } catch (err) { toon(err.message, 'bad'); }
-      finally { knop.disabled = false; }
-    });
-    laadStatus();
-  })();
-  </script>
+  <!-- HET SCRIPT STAAT IN /apps/partner-worden.js EN NIET MEER HIERBINNEN.
+       De samenvoeging hield een oudere versie van deze pagina met een eigen
+       inline-script: dat laadde de typen en verstuurde de aanvraag, maar kende
+       geen landen (de lijst bleef op één hardgecodeerd "Nederland" staan), geen
+       bewijsvelden en geen handelsvinkjes -- terwijl de opmaak hierboven en de
+       toets in test/premium.e2e.js daar allebei van uitgaan. partner-worden.js
+       doet alles wat het inline-script deed, plus de catalogus per land en de
+       bewijsvelden die daaruit volgen. Twee scripts die allebei submit
+       afhandelen zou elke aanvraag dubbel versturen, dus het inline-blok is
+       weg en niet ernaast gezet. -->
+  <script src="/apps/partner-worden.js"></script>
   <script src="/shared/metgezel.js" defer></script>
   <script src="/shared/basis.js" defer></script>
   <script src="/shared/cookie.js" defer></script>

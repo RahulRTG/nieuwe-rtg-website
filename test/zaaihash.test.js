@@ -17,6 +17,8 @@
         "de seed rekent nog een handvol hashes uit" ZAKKEN allebei (RAAK)
    - hashPasswordSync -- de ECHTE weg -- ook laten onthouden
      -> "de echte weg houdt per rij zijn eigen zout" ZAKT (RAAK)
+   - en de mutatiemotor zelf: met de liegpoort over /api/ komt de eigenaar niet
+     meer binnen -> "de seed rekent nog een handvol hashes uit" ZAKT (RAAK)
 
    Los: node --experimental-sqlite --test test/zaaihash.test.js */
 const { test } = require('node:test');
@@ -83,8 +85,13 @@ test('alleen de seed mag de zaai-hash aanroepen', () => {
    een voornemen. Deze toets start een echte server met een telraam ervoor en
    kijkt hoeveel scrypt-hashes de seed nog maakt. Waren er 220; vier is er een
    per demo-wachtwoord. De grens staat op tien, zodat een demo-wachtwoord erbij
-   mag komen en tweehonderd niet. */
-test('de seed rekent nog een handvol hashes uit, geen tweehonderd', async () => {
+   mag komen en tweehonderd niet.
+
+   EN DAARNA LOGT HIJ IN, en dat is niet voor de sier. Een hash die goedkoop
+   gemaakt is maar niemand meer binnenlaat, is geen besparing maar een kapotte
+   seed -- en dat zou een telraam nooit zien. De demo-eigenaar loopt hier de
+   echte inlogroute af met het wachtwoord uit de seed. */
+test('de seed rekent nog een handvol hashes uit, en die hash logt gewoon in', async () => {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'zaaitel-'));
   const telling = path.join(map, 'telling.json');
   const telraam = path.join(map, 'telraam.js');
@@ -102,6 +109,12 @@ test('de seed rekent nog een handvol hashes uit, geen tweehonderd', async () => 
     const n = Number(fs.readFileSync(telling, 'utf8'));
     assert.ok(n > 0, 'het telraam heeft niets gezien; dan stelt deze toets niets vast');
     assert.ok(n <= 10, 'de seed maakte ' + n + ' scrypt-hashes; de zaai-hash is stuk of iemand zaait weer per account');
+
+    const inlog = await (await fetch(srv.base + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
+    })).json();
+    assert.ok(inlog && inlog.token, 'de eigenaar komt niet binnen met het seed-wachtwoord: ' + JSON.stringify(inlog).slice(0, 200));
   } finally {
     if (srv) stop(srv.child);
     fs.rmSync(map, { recursive: true, force: true });

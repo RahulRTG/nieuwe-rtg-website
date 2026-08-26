@@ -30,144 +30,29 @@
 
    GEMETEN OP 17 AUGUSTUS 2026, volledige suite (6520 toetsen) in EEN proces:
      regels 80,63   takken 80,60   functies 67,73   -> vloer 78 / 78 / 65
-   NAGEMETEN OP 26 AUGUSTUS 2026, dezelfde suite over vier delen, opgeteld:
-     regels 78,91   takken 80,04   functies 65,07
-   De vloeren blijven dus staan waar ze stonden -- het opdelen kost ze niets.
-   Wat wel opvalt en hier hoort te staan: de lucht boven de vloer is dun
-   geworden, en op functies is hij zeven honderdsten. De eerstvolgende tak die
-   een handvol functies toevoegt zonder toets maakt deze stap rood. Dat is de
-   ratel die werkt, geen defect -- maar wie hem tegenkomt weet nu waarom.
-   Bij de volgende meting hoort de vloer mee op te schuiven; dat is dezelfde
-   ratel als NORM.json.
+   NAGEMETEN OP 26 AUGUSTUS 2026, de suite (975 toetsbestanden) over vier
+   delen, opgeteld:
+     regels 81,32   takken 80,66   functies 68,80
+   Het opdelen kost de vloeren dus niets: de drie cijfers liggen op of boven de
+   basislijn van augustus. De afstand tot de vloer is ook dezelfde gebleven als
+   toen hij gezet werd (ruim drie, bijna drie en bijna vier punten), dus de
+   vloeren blijven staan waar ze staan.
+
+   EEN WAARSCHUWING UIT DEZELFDE MIDDAG, want hij kost anders een uur. Een eerste
+   ronde gaf 78,91 / 80,04 / 65,07 en dat leek dunne lucht. Het was een kapotte
+   meting: er kwam tijdens die ronde een toetsbestand bij, en omdat de delen om
+   en om over de GESORTEERDE lijst lopen, schoof daarmee de verdeling een plek
+   op -- een kwart van de bestanden draaide nooit. Wie hier een cijfer ziet dat
+   niet klopt, kijkt dus eerst of alle delen dezelfde lijst zagen.
 
    Gebruik:
      node scripts/dekkingsvloer.js <map-of-lcov-bestand> [...meer]
      node scripts/dekkingsvloer.js dekking --json
    ========================================================================== */
 
-const fs = require('fs');
-const path = require('path');
+const { meet, voegSamen, tel, lcovBestanden } = require('./lib/lcov');
 
 const VLOER = { regels: 78, takken: 78, functies: 65 };
-
-function lcovBestanden(paden) {
-  const uit = [];
-  for (const p of paden) {
-    let st;
-    try { st = fs.statSync(p); } catch (e) { continue; }
-    if (st.isDirectory()) {
-      for (const naam of fs.readdirSync(p).sort()) uit.push(...lcovBestanden([path.join(p, naam)]));
-    } else if (/\.(info|lcov)$/.test(p)) {
-      uit.push(p);
-    }
-  }
-  return uit;
-}
-
-/* Een lcov-bestand inlezen en optellen bij wat er al ligt. Elke aanroep is EEN
-   deel; de sleutel per bestand is het pad zoals lcov het noemt.
-
-   REGELS EN FUNCTIES zijn eenvoudig: een teller die in het ene deel nul is en in
-   het andere niet, telt als geraakt. Nagemeten tegen node's eigen dekkingstabel
-   op twee steekproeven: dezelfde percentages tot op de honderdste. Let op dat de
-   functiesleutel de NAAM is en niet regel+naam -- dat is niet slordigheid maar
-   de meting: met regel+naam kwamen er functies bij die node zelf niet telt
-   (56,45 tegen node's 55,59), met de naam alleen komt het cijfer exact uit.
-
-   TAKKEN VRAGEN MEER, en dat is een echte eigenschap van lcov en niet van ons.
-   Een BRDA-regel heet `regel,blok,tak`, en die blok- en taknummers zijn PER
-   PROCES toegekend: wat in deel 1 blok 0 heet, kan in deel 2 blok 1 heten. Wie
-   die drie zomaar als sleutel gebruikt, krijgt er bij het samenvoegen takken bij
-   die niet bestaan -- de noemer groeit harder dan de teller en de dekking zakt
-   zonder dat er iets veranderd is.
-
-   GEMETEN OP 26 AUGUSTUS 2026, op dezelfde 244 toetsbestanden, een keer in een
-   proces en een keer in twee:
-     sleutel regel:blok:tak   77,15%  ->  74,17%   (bijna drie punten verlies)
-     per regel het maximum    77,15%  ->  76,40%
-     noemer max + vereniging  77,15%  ->  76,96%   <- deze
-   Daarom: de NOEMER van een regel is het grootste aantal takken dat een deel op
-   die regel zag, en de TELLER is de vereniging van de takken die ergens genomen
-   zijn, afgetopt op die noemer. In een enkel proces geeft dat exact hetzelfde
-   getal als de simpele sleutel; over delen blijft het verschil onder een halve
-   punt, en het verschil dat overblijft valt de veilige kant op (te laag). */
-function voegSamen(kaart, tekst) {
-  let huidig = null;
-  let takkenVanDitDeel = null;      // per bestand: regelnr -> aantal takken in DIT deel
-  const sluitBestand = () => {
-    if (!huidig || !takkenVanDitDeel) return;
-    for (const [nr, aantal] of takkenVanDitDeel) {
-      const tak = huidig.takken.get(nr);
-      if (!tak) huidig.takken.set(nr, { noemer: aantal, genomen: new Set() });
-      else tak.noemer = Math.max(tak.noemer, aantal);
-    }
-    takkenVanDitDeel = null;
-  };
-  for (const regel of String(tekst).split(/\r?\n/)) {
-    if (regel.startsWith('SF:')) {
-      sluitBestand();
-      const naam = regel.slice(3).trim().split(path.sep).join('/');
-      huidig = kaart.get(naam);
-      if (!huidig) { huidig = { regels: new Map(), functies: new Map(), takken: new Map() }; kaart.set(naam, huidig); }
-      takkenVanDitDeel = new Map();
-      continue;
-    }
-    if (!huidig) continue;
-    if (regel === 'end_of_record') { sluitBestand(); huidig = null; continue; }
-    if (regel.startsWith('DA:')) {
-      const [nr, aantal] = regel.slice(3).split(',');
-      huidig.regels.set(nr, (huidig.regels.get(nr) || 0) + Number(aantal || 0));
-    } else if (regel.startsWith('FNDA:')) {
-      const komma = regel.indexOf(',');
-      const aantal = Number(regel.slice(5, komma) || 0);
-      const naam = regel.slice(komma + 1);
-      huidig.functies.set(naam, (huidig.functies.get(naam) || 0) + aantal);
-    } else if (regel.startsWith('FN:')) {
-      const komma = regel.indexOf(',');
-      const naam = regel.slice(komma + 1);
-      if (!huidig.functies.has(naam)) huidig.functies.set(naam, 0);
-    } else if (regel.startsWith('BRDA:')) {
-      const [nr, blok, tak, genomen] = regel.slice(5).split(',');
-      takkenVanDitDeel.set(nr, (takkenVanDitDeel.get(nr) || 0) + 1);
-      if (genomen !== '-' && Number(genomen || 0) > 0) {
-        let bekend = huidig.takken.get(nr);
-        if (!bekend) { bekend = { noemer: 0, genomen: new Set() }; huidig.takken.set(nr, bekend); }
-        bekend.genomen.add(blok + ':' + tak);
-      }
-    }
-  }
-  sluitBestand();
-  return kaart;
-}
-
-function tel(kaart) {
-  const som = { regels: [0, 0], takken: [0, 0], functies: [0, 0] };
-  for (const bestand of kaart.values()) {
-    for (const soort of ['regels', 'functies']) {
-      for (const aantal of bestand[soort].values()) {
-        som[soort][1]++;
-        if (aantal > 0) som[soort][0]++;
-      }
-    }
-    for (const tak of bestand.takken.values()) {
-      som.takken[1] += tak.noemer;
-      som.takken[0] += Math.min(tak.genomen.size, tak.noemer);
-    }
-  }
-  const pct = (a) => a[1] ? (a[0] / a[1]) * 100 : 100;
-  return {
-    bestanden: kaart.size,
-    regels: pct(som.regels), takken: pct(som.takken), functies: pct(som.functies),
-    ruw: som
-  };
-}
-
-function meet(paden) {
-  const bestanden = lcovBestanden(paden);
-  const kaart = new Map();
-  for (const b of bestanden) voegSamen(kaart, fs.readFileSync(b, 'utf8'));
-  return Object.assign(tel(kaart), { delen: bestanden.length, delenNamen: bestanden });
-}
 
 if (require.main === module) {
   const argv = process.argv.slice(2);
@@ -212,4 +97,6 @@ if (require.main === module) {
   if (!jsonUit) console.log('De dekking haalt elke vloer.');
 }
 
+/* De meetfuncties gaan hier ook weer naar buiten: test/delen.test.js leest de
+   vloer en de samenvoeging als een geheel, en dat is precies wat de CI doet. */
 module.exports = { VLOER, meet, voegSamen, tel, lcovBestanden };

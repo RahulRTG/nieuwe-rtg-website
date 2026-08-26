@@ -17,9 +17,8 @@ async function createUser(gegevens) {
 function createUserSync(gegevens) {
   return schrijfUser(gegevens, kluis.hashPasswordSync(gegevens.password));
 }
-/* Alleen voor de demo-seed: dezelfde weg, maar met de hash die kluis.zaaiHash
-   per wachtwoord eenmalig uitrekent. Waarom dat mag en waarom het buiten de
-   demostand weigert, staat bij zaaiHash zelf. */
+/* Alleen voor de demo-seed; waarom dat mag en waarom het buiten de demostand
+   weigert, staat bij kluis.zaaiHash. */
 function createUserZaai(gegevens) {
   return schrijfUser(gegevens, kluis.zaaiHash(gegevens.password));
 }
@@ -123,9 +122,8 @@ function zetActief(id, aan) {
 }
 const isActief = (u) => !!u && u.actief !== 0;
 
-/* Het schrijven zelf, los van waar de hash vandaan komt: hashPasswordSync voor
-   de gewone weg, kluis.zaaiHash voor de demo-seed. Twee kopieen van deze UPDATE
-   zouden uiteenlopen zodra de sessiegrens verandert (LAT.md regel 4). */
+/* Het schrijven zelf, los van waar de hash vandaan komt. Twee kopieen van deze
+   UPDATE lopen uiteen zodra de sessiegrens verandert (LAT.md regel 4). */
 function zetWachtwoordHash(userId, hash) {
   // ook hier de sessiegrens, en om dezelfde reden als in tokens.js setPassword:
   // twee wegen naar hetzelfde wachtwoord horen niet twee verschillende dingen
@@ -140,8 +138,8 @@ function zetWachtwoordHash(userId, hash) {
 function setPasswordSync(userId, password) {
   return zetWachtwoordHash(userId, kluis.hashPasswordSync(password));
 }
-/* Alleen voor de demo-seed (de eigenaar krijgt bij elke start zijn bekende
-   wachtwoord terug); zie kluis.zaaiHash. */
+/* Alleen voor de demo-seed: de eigenaar krijgt bij elke start zijn bekende
+   wachtwoord terug. Zie kluis.zaaiHash. */
 function setPasswordZaai(userId, password) {
   return zetWachtwoordHash(userId, kluis.zaaiHash(password));
 }

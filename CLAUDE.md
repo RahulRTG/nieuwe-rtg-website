@@ -96,7 +96,13 @@ vier standen, met **RTG Lite en Business Lite er al in en `bestaatNog: false`
 erbij**, en met `gezin` en `huis` als beloften die géén schakelaar zijn -- de
 RTFoundation blijft gratis voor elk gezin, dat gezin ziet alleen wát het kost
 (`/api/foundation/kosten`, alleen de beheerder, en het antwoord opent met de
-belofte en niet met het bedrag). **Alle negen soorten hebben nu een teller of een
+belofte en niet met het bedrag). **Drie lezers, drie schermen, een tekenlaag**:
+een lid ziet het in RTG Geld (stand *Kosten*), een zaak op
+`/apps/zaakkosten.html`, het kantoor op `/apps/kosten.html` -- alle drie op
+hetzelfde antwoord van de server en op dezelfde vormtaal
+(`public/shared/kostenbeeld.js`), zodat "vermoed" op het scherm van het lid
+hetzelfde betekent en er hetzelfde uitziet als op het bord waar een mens besluit
+hem de rekening te sturen. **Alle negen soorten hebben nu een teller of een
 verdeling**: AI en verzoeken via de poorten, berichten via mail én sms (twee
 choke points, want er komt een aanroeper rechtstreeks langs `sendSms`), opslag als
 STAND die je peilt in plaats van optelt (`kern/kosten/meterstand.js` -- wie een

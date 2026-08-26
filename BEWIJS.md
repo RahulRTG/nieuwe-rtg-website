@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1121 bestanden en 7503 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1124 bestanden en 7511 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1121 |
-| losse beweringen (`test(...)`) | 7503 |
+| toetsbestanden | 1124 |
+| losse beweringen (`test(...)`) | 7511 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 946 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 949 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 18 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-981 bestanden, 7267 beweringen.
+982 bestanden, 7271 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -396,6 +396,7 @@ toets omvalt.
 | `kostenmeters.test.js` | 6 | gezakt op `liegpoort /api/` | DE VIER METERS DIE ER NIET WAREN: opslag, bericht, transactie en transactiewaarde. Van de negen kostensoorten waren er vijf aangesloten en vier niet. |
 | `kostenperiode.test.js` | 5 | gezakt op `liegpoort /api/` | EEN MAAND SLUITEN, EN WAAROM DAT NIET ZOMAAR KAN. "RTG accepteert geen onverklaarde kosten" was een zin. |
 | `kostenvooruitblik.test.js` | 5 | gezakt op `liegpoort /api/` | WAT WORDT HET DEZE MAAND -- en waarom er GEEN bandbreedte staat. "Verwacht: 284,20 euro, marge 279-289, betrouwbaarheid 99,1%" ziet er indrukwekkend uit en is een verzinsel met een decimaal zolang niemand die 99,1%... |
+| `kostenzaak.test.js` | 4 | gezakt op `liegpoort /api/` | RTG KOSTPRIJS VOOR EEN ZAAK: wat het gebruik van deze zaak ons kost. Er stond geen enkele toets op /api/supplier/kosten, terwijl dat de route is waarop de rekening van een ONDERNEMER wordt gebouwd. |
 | `kruisscan.test.js` | 6 | gezakt op `!==->===#0` | Tests voor de kruis-slice-scan (scripts/kruisscan.js). Deze scan bewaakt dat een opgeknipte module-map (X/index.js + zusjes) geen slice bevat die kaal naar een top-level naam van een zuster-slice verwijst -- een... |
 | `kwaliteit.test.js` | 6 | gezakt op `===->!==#0` | De gegevenskwaliteit (kern/command/kwaliteit.js) en de kennisgraaf (kern/command/graaf.js). Beide draaien op dezelfde meting: welk veld blijkt in de praktijk naar welke soort te verwijzen. |
 | `laatste-negen.test.js` | 4 | gezakt op `liegpoort /api/` | DE LAATSTE ZES -- open verbindingen, padparameters en de kinderkant. foundation/gezin/:code/kanaal, foundation/les/:code/stream, foundation/schrift/:code, supplier/stream en de twee rtf/social/kind/boardroom-routes... |
@@ -1021,7 +1022,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-140 bestanden, 236 beweringen.
+142 bestanden, 240 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1059,7 +1060,7 @@ toets omvalt.
 | `galerij.e2e.js` | 1 | -- | Scherm-test voor RTG Galerij: de tijdlijn met beelden uit twee bronnen (De Salon en RTG Bestanden), de kijker met favoriet, en een album bouwen. Draait alleen waar een browser beschikbaar is. |
 | `gastscherm.e2e.js` | 1 | -- | Het gastscherm is de publieke QR-ingang aan tafel en op de kamer. Zonder code hoort het niet leeg of technisch te ogen: het legt uit wat iemand moet doen, zonder alsnog een leden- of leveranciersdeur te tonen. |
 | `gedachten-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/gedachten.html. Het punt dat hier op het scherm zelf moet kloppen: bij een zin waar de crisisregel op aanslaat blijft de notitie STAAN en komt de hulp ernaast. |
-| `geld.e2e.js` | 1 | -- | Scherm-test voor RTG Geld als ECHTE app: elf standen in een schil (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
+| `geld.e2e.js` | 1 | -- | Scherm-test voor RTG Geld als ECHTE app: twaalf standen in een schil (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
 | `genootschap.e2e.js` | 1 | -- | Scherm-test voor Genootschap. De unit-toetsen (test/genootschap.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: oprichten, een bijeenkomst uitroepen en beantwoorden, en een peiling waarvan de... |
 | `gereedschap.e2e.js` | 1 | -- | Scherm-test voor RTG Gereedschap: rekenen met de toetsen (btw erbij), een wekker en een timer zetten (de server telt), en het alarmscherm dat op het SSE-seintje opent. Draait alleen waar een browser is. |
 | `gpsschakelaar.e2e.js` | 1 | -- | Scherm-test voor de GPS-schakelaar van het OS-menu (rtg_os_gps). De schakelaar bestond, maar geen enkele locatie-aanroep las hem: wie hem op "uit" zette werd alsnog om de twintig seconden om een positie gevraagd (de... |
@@ -1081,7 +1082,8 @@ toets omvalt.
 | `kantoorgesprek.e2e.js` | 1 | -- | Scherm-test voor de kantoor-inlog als gesprek. De server-kant staat in test/kantoorgesprek.test.js; dit gaat over wat een mens ziet. |
 | `kassawachtrij.e2e.js` | 1 | -- | DE KASSA ZONDER LIJN, in een echte browser. HORECA.md eist dat elke locatie blijft werken zonder internet. |
 | `klankwerk.e2e.js` | 1 | -- | Scherm-test voor RTG Klankwerk. test/muziek.test.js bewijst de server-kant; deze bewijst dat het instrument werkt: een stuk openen, een stap aanzetten, een noot in de notenrol zetten, Rahul om een voorstel vragen en... |
-| `kosten.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET KOSTENBORD IN EEN ECHTE BROWSER. test/kosten.test.js bewijst wat de SERVER doet. |
+| `kosten.e2e.js` | 2 | gezakt op `liegpoort /api/` | HET KOSTENBORD IN EEN ECHTE BROWSER. test/kosten.test.js bewijst wat de SERVER doet. |
+| `kostenklant.e2e.js` | 2 | gezakt op `liegpoort /api/` | DE KLANTKANT VAN DE KOSTPRIJSLAAG, IN EEN ECHTE BROWSER. test/kosten.e2e.js beproeft het BORD van de boardroom; dit is de andere kant: wat een LID (de stand Kosten in RTG Geld) en een ZAAK (/apps/zaakkosten.html) te... |
 | `kwijtschelding-scherm.e2e.js` | 1 | -- | Schermtoets: de kwijtschelding in het Belastingkantoor gaat door TWEE inspecteurs, en dat moet je op het scherm ook ZIEN. De regel zelf staat vast in test/belastingkantoor.test.js (de server weigert dezelfde ogen). |
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | -- | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |
@@ -1123,6 +1125,7 @@ toets omvalt.
 | `rtfgeld.e2e.js` | 1 | -- | Scherm-test voor de geldschool: de ouder zet op klusjes.html weekgeld en verzilvert sterren; het kind ziet alles eerlijk terug in zakgeld.html. |
 | `rtfhulpwijzer.e2e.js` | 1 | -- | Scherm-test voor de consistentieronde van golf 6 (deel 3): de hulpwijzer draait op de gedeelde coach-laag (soort 'hulp', wachttekst van Meike), de privacyregel staat onder elke chat, en veilig.html wijst warm door... |
 | `rtfkinderschermen.e2e.js` | 5 | -- | DE RTF-KINDERSCHERMEN: WAT ZIET EEN KIND ALS HET NOG NERGENS BIJ HOORT? Acht schermen van de RTFoundation-kant, alle acht uit de lijst van TAKEN 4.9. |
+| `rtfkosten.e2e.js` | 1 | gezakt op `liegpoort /api/` | WAT DIT GEZIN KOST, OP HET SCHERM VAN DE BEHEERDER. De route was getoetst (test/kosten.test.js), het scherm niet -- en juist hier zit het risico niet in het bedrag maar in de VOLGORDE. |
 | `rtfosafmaak.e2e.js` | 2 | -- | DE TWEE LAATSTE SCHERMEN De grenzen staan in test/rtfos-afmaak.test.js. Dit gaat over wat er op het scherm verschijnt, en bij deze twee is dat elk een ander soort fout. |
 | `rtfosdoelgroepen.e2e.js` | 4 | -- | DE DRIE SCHERMEN VAN DE DOELGROEPEN De API-grenzen staan in test/rtfos-doelgroepen.test.js. Dit gaat over wat er op het SCHERM verschijnt -- en juist bij deze drie is dat een ander soort fout dan een kapotte knop. |
 | `rtfosgovernance.e2e.js` | 1 | -- | HET GOVERNANCE-SCHERM De grendels zelf staan in test/rtfos-governance.test.js. Dit gaat over de vraag of het scherm ze TOONT -- en dat is bij deze laag een ander soort fout dan een kapotte knop. |

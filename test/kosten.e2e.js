@@ -15,7 +15,13 @@
      3. een tarief zetten VIA HET SCHERM komt echt aan en staat er daarna;
      4. de vier economieen en de firewall staan op ditzelfde scherm;
      5. de vooruitblik staat er ZONDER bandbreedte zolang die niet gemeten is;
-     6. wat het scherm niet weet, staat er ook echt.
+     6. wat het scherm niet weet, staat er ook echt;
+     7. elke bewijsgraad draagt een TEKEN naast zijn woord, en niet alleen een
+        kleur -- de enige ontwerpregel die ook een toegankelijkheidsregel is
+        (ONTWERP.md par. 5);
+     8. het bord is vanuit de boardroom te bereiken. Het bestond, werkte en
+        stond in de app-gids terwijl geen enkele knop ernaartoe wees; een scherm
+        dat je niet kunt vinden is geen scherm.
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
@@ -84,7 +90,47 @@ test('het kostenbord: laadt, toont het voorbehoud, en zet een tarief',
     assert.equal(t.perEenheid, 1500);
     assert.match(t.bron, /Prijslijst modelaanbieder/);
 
+    /* DE BEWIJSGRAAD DRAAGT EEN TEKEN. Wie kleur niet ziet, of het bord
+       zwart-wit uitdraait om het in een vergadering te leggen, hoort het
+       verschil tussen gemeten en vermoed nog steeds te zien.
+
+       DE MUTATIE: laat graad() weer een gewone <span class="st"> teruggeven.
+       Het bord ziet er dan identiek uit in kleur, en het verschil verdwijnt op
+       papier. */
+    const tekens = await page.$$eval('#main .rtg-status[data-teken]', els => els.map(e => e.dataset.teken));
+    assert.ok(tekens.length, 'geen enkele status met een teken; kleur is dan de enige drager');
+    assert.ok(tekens.some(x => x === '✓' || x === '~' || x === '?'),
+      'de bewijsgraden horen hun eigen teken te dragen: ' + tekens.join(' '));
+
     assert.deepEqual(fouten, [], 'scriptfouten op het kostenbord');
+  } finally {
+    if (browser) await browser.close();
+    stop(srv);
+  }
+});
+
+test('het kostenbord is vanuit de boardroom te bereiken', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+  const srv = await startServer();
+  const base = srv.base;
+  let browser = null;
+  try {
+    /* De eigenaar logt in als MENS; de boardroompagina draait op zijn
+       ledensessie en doet zijn tabrij pas open als de server de poort opendoet.
+       De verwijzing naar het kostenbord hoort exact dat moment te volgen: eerder
+       wijst hij naar een deur die dichtzit. */
+    const eig = await fetch(base + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
+    }).then(r => r.json());
+    assert.ok(eig.token, 'geen eigenaarssessie: ' + JSON.stringify(eig).slice(0, 160));
+
+    browser = await pw.chromium.launch();
+    const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
+    await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) {} }, eig.token);
+    await page.goto(base + '/apps/boardroom.html', { waitUntil: 'networkidle' });
+    await page.waitForSelector('#boKostprijs a', { state: 'visible', timeout: 15000 });
+    const href = await page.getAttribute('#boKostprijs a', 'href');
+    assert.equal(href, '/apps/kosten.html', 'de verwijzing wijst niet naar het kostenbord');
   } finally {
     if (browser) await browser.close();
     stop(srv);

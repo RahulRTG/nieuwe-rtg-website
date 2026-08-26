@@ -2579,6 +2579,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kostenklant.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "kostenmeters.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2594,6 +2601,13 @@
       "scherp": "gezakt"
     },
     "kostenvooruitblik.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "kostenzaak.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -4867,6 +4881,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "rtfkosten.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "rtfleerlingtoegang.test.js": {

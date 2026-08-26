@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Kostprijs: wat uw zaak ons kost</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De materialenleer en de tokenlaag van ONTWERP.md, in die volgorde en NA
+     rtg-ui.css -- dezelfde stapeling als /apps/werk.html en /apps/geld.html.
+     Dit scherm leunt er echt op: de bedragen dragen `--rtg-cijfers`, de
+     toestand bovenaan een signaalrail, en de statussen hun eigen teken. -->
+<link href="/shared/rtg-materiaal.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/zaakscherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-modus="pro">
+<header>
+  <a class="terug" href="/apps/leverancier.html" aria-label="Terug naar de zaak">&#8592;</a>
+  <span><span class="ey">RTG Kostprijs</span><h1>Wat uw zaak ons kost</h1></span>
+  <span class="h-flex1"></span>
+</header>
+
+<!-- DEZELFDE VRAAG ALS EEN LID STELT, en met opzet hetzelfde antwoord: het
+     tekenwerk komt uit /shared/kostenbeeld.js en /shared/kostenketen.js, die
+     ook de stand Kosten in RTG Geld tekenen. Twee kopieen van dit beeld zouden
+     op een dag iets anders zeggen over dezelfde maand, en dan is de vraag welke
+     van de twee op de factuur staat.
+
+     Wat hier NIET staat is een eigen verbruiksgrens. Die hoort bij een PERSOON
+     die zijn eigen uitgaven in de hand houdt; op een zaak zou hij een
+     medewerker het werk uit handen slaan zonder dat die weet wie hem zette. Het
+     kantoorslot geldt hier wel, en dat is het slot dat op deze plek hoort. -->
+<main id="main">
+  <div id="ksHoofd"><p class="stil">Laden...</p></div>
+
+  <div class="kaart">
+    <div class="kop">Waar dit vandaan komt</div>
+    <div id="ksRegels"><p class="stil">Laden...</p></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Wie betaalt dit</div>
+    <div id="ksBetaalt"><p class="stil">Laden...</p></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Wat dit scherm niet weet</div>
+    <div id="ksNiet"><p class="stil">Laden...</p></div>
+  </div>
+</main>
+
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/shared/kostenbeeld.js"></script>
+<script src="/shared/kostenketen.js"></script>
+<script src="/apps/zaakkosten.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

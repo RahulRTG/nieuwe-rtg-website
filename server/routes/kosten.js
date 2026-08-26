@@ -78,8 +78,32 @@ module.exports = (kern) => {
   });
 
   // ---------- de zaak ----------
+  /* DEZELFDE DRIE VRAGEN ALS EEN LID, en met opzet dezelfde antwoorden: wat
+     kost mijn gebruik, wat wordt het deze maand, en waarom staat dit bedrag er.
+     Een zaak is juist de lezer die de derde vraag stelt -- die moet het aan zijn
+     eigen boekhouder kunnen uitleggen.
+
+     De drager komt uit de SESSIE van de zaak en nooit uit het lichaam, precies
+     zoals bij het lid hierboven. Er is geen parameter om de kosten van een
+     andere zaak op te vragen.
+
+     Wat een zaak NIET heeft is een eigen verbruiksgrens: die staat bij een lid
+     op de persoon, en op een zaak zou hij een medewerker het werk uit handen
+     slaan zonder dat die weet wie hem heeft gezet. Het kantoorslot geldt hier
+     wel (kosten-kantoor.js), en dat is het slot dat op deze plek hoort. */
   app.post('/api/supplier/kosten', supplierAuth, (req, res) => {
     const p = maand(req.body);
     res.json(eigenBeeld(kosten.drager('zaak', req.supplier.code), p));
+  });
+
+  app.post('/api/supplier/kosten/vooruitblik', supplierAuth, (req, res) => {
+    res.json(Object.assign({ ok: true },
+      kosten.vooruitblik(maand(req.body), kosten.drager('zaak', req.supplier.code))));
+  });
+
+  app.post('/api/supplier/kosten/herkomst', supplierAuth, (req, res) => {
+    const b = req.body || {};
+    const r = kosten.herkomst(maand(b), kosten.drager('zaak', req.supplier.code), b.soort);
+    res.status(r.status || 200).json(r);
   });
 };

@@ -375,3 +375,45 @@ De grens hangt aan `kern/kosten/haak.js` en wordt gevraagd in `server/ai.js`,
 vlak voordat er een model wordt aangeroepen. Een **kapotte** grenswacht sluit de
 AI-weg niet: hij geeft dan groen. Het omgekeerde zou betekenen dat een fout in de
 boekhouding de AI van het hele huis stilzet.
+
+---
+
+## 13. De drie schermen
+
+De laag had tot nu toe één scherm en dat was het bord van de boardroom. Wie de
+rekening KRIJGT, kon nergens zien waar hij vandaan kwam -- en dat is precies de
+verkeerde kant om te beginnen.
+
+Er zijn drie lezers en dus drie schermen, op **één** antwoord van de server
+(`server/routes/kosten-beeld.js`) en met **één** tekenlaag in de browser
+(`public/shared/kostenbeeld.js` en `kostenketen.js`):
+
+| Wie | Waar | Wat er anders is |
+|---|---|---|
+| een **lid** | RTG Geld, stand *Kosten* (`/apps/geld.html#kosten`) | plus zijn eigen verbruiksgrens |
+| een **zaak** | `/apps/zaakkosten.html`, vanuit *Facturen* in de zaak-app | zakelijke aanspreekvorm, geen eigen grens |
+| het **kantoor** | `/apps/kosten.html`, vanuit de boardroom | tarieven, nota's, maand sluiten, vrijgeven |
+
+**Waarom het tekenwerk gedeeld is en niet overgetikt.** Twee kopieën van
+hetzelfde beeld zeggen op een dag iets anders over dezelfde maand, en dan is de
+vraag welke van de twee op de factuur staat. Dat geldt tot in het kleine: de
+afbeelding van een bewijsgraad op een signaalkleur staat op één plek, zodat het
+lid dat de rekening krijgt "vermoed" in dezelfde kleur en met hetzelfde teken
+ziet als de mens die op het bord besluit hem te sturen.
+
+**De vorm van het klantscherm is uitzonderingsgestuurd** (`ONTWERP.md` par. 3):
+eerst één toestand met hooguit één bedrag, en pas daaronder waar dat vandaan
+komt. Een kostenpagina die twintig getallen toont, verplaatst het werk naar de
+lezer -- die mag dan zelf uitzoeken of er iets aan de hand is.
+
+**En de eerste grens uit paragraaf 1 wordt juist hier het makkelijkst gebroken.**
+Zonder tarief rekent de server niets uit, de graad staat op `onbekend`, en dan
+staat er op het klantscherm *geen bedrag* maar de reden. Een nul zou "gratis"
+betekenen, en dat is een andere bewering dan "niet bekend". Er staat een
+schermtoets op die precies dat vastlegt, voor het lid én voor de zaak
+(`test/kostenklant.e2e.js`).
+
+**Wat een zaak niet heeft is een eigen verbruiksgrens.** Die hoort bij een
+persoon die zijn eigen uitgaven in de hand houdt; op een zaak zou hij een
+medewerker het werk uit handen slaan zonder dat die weet wie hem heeft gezet.
+Het kantoorslot geldt daar wel, en dat is het slot dat op die plek hoort.

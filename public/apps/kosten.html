@@ -9,22 +9,48 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De materialenleer NA rtg-ui.css en VOOR de tokenlaag, net als in
+     /apps/werk.html en /apps/geld.html. Dit scherm kopieerde zijn goud en zijn
+     bordeaux als hexcodes; die kopie loopt uit de pas zodra het beeldmerk
+     verandert, en juist op het bord waar over andermans rekening wordt besloten
+     hoort dat niet te kunnen (MATERIAAL.md, "de ankers komen uit het logo"). -->
+<link href="/shared/rtg-materiaal.css" rel="stylesheet">
 <link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
+  /* GEEN EIGEN KLEUREN MEER. Wat hier stond (--burgundy, --gold, --groen) waren
+     drie overgetikte hexcodes, en ze deden twee verschillende dingen door
+     elkaar: het merk dragen EN een toestand aanduiden. Nu staan ze uit elkaar.
+     De merkkant komt uit de materialenleer (het goud van het logo, met het
+     hoogsel als tekstkleur op zwart), de toestandkant uit de signaaltokens van
+     ONTWERP.md par. 4 -- want dat is wat ze op dit scherm werkelijk zijn:
+     "let op", "in orde", "hier moet een mens naar kijken". */
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; --groen:#4C9A75; }
+    --merkgoud:var(--gold-tekst);
+    --burgundy:var(--rtg-sig-incident); --gold:var(--rtg-sig-aandacht); --groen:var(--rtg-sig-gezond); }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
-  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  /* SERIF STAAT OP EEN GESLOTEN LIJST ROLLEN (ONTWERP.md par. 1), en h2/h3
+     stonden er niet op: een kaarttitel is werk en geen ceremonie. Bodoni overal
+     oogt luxe en leest als modeblad; een signatuur die op elke kop staat, is
+     geen signatuur meer. De koppen hieronder zijn nu werk-labels in Inter, en
+     de enige twee ceremoniele elementen op dit bord zijn de paginatitel en het
+     ene dominante getal per kaart (.rtg-kpi uit de tokenlaag). */
+  h1{font-family:var(--rtg-display);font-weight:500;letter-spacing:-.01em;}
+  h2,h3{font-family:var(--rtg-interface);font-weight:600;}
   a{color:inherit;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);
     padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--merkgoud);}
   header h1{font-size:1.3rem;margin-top:.05rem;}
   main{padding:1.1rem;max-width:980px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;}
-  .kaart h2{font-size:1.1rem;margin-bottom:.15rem;}
+  /* De maten komen uit de modus op de body (Command: dit is een directiebord met
+     tientallen objecten). Stonden ze hier als vaste rem-waarden, dan zette
+     data-rtg-modus niets en was de modus een lege belofte -- dezelfde fout die
+     /apps/geld.html eerder maakte. */
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:calc(var(--rtg-ruim) * 1.2) calc(var(--rtg-ruim) * 1.4);margin-bottom:var(--rtg-ruim);}
+  .kaart h2{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--merkgoud);margin-bottom:.35rem;}
   .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
   .rij.strak{margin-top:0;}
@@ -34,28 +60,44 @@
   .knop{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;min-width:2.6rem;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
   .scheiding{border-top:1px solid var(--line);padding-top:.7rem;margin-top:.7rem;}
-  .groot{font-family:'Bodoni Moda',serif;font-size:1.9rem;line-height:1.1;}
-  .bev{border-left:3px solid var(--burgundy);padding:.45rem .7rem;margin-top:.5rem;background:rgba(194,58,94,.07);border-radius:0 10px 10px 0;font-size:.8rem;line-height:1.5;}
-  .bev.letop{border-left-color:var(--gold);background:rgba(169,143,28,.08);}
-  .bev.rust{border-left-color:var(--groen);background:rgba(76,154,117,.08);}
+  /* Het dominante getal per kaart komt uit de tokenlaag (.rtg-kpi): daar staat
+     de maat, de serif EN de tabulaire cijfers op een plek. Hier stond een eigen
+     .groot die het derde vergat, dus de percentages en bedragen lijnden niet
+     uit -- precies het detail waaraan je een instrument van een website
+     onderscheidt (ONTWERP.md par. 8). */
+  .rtg-kpi{font-size:1.9rem;}
+  /* En de vulling van een voorbehoud volgt dezelfde toestandkleur in plaats van
+     een overgetikte rgba() van de oude hexcode. Die drie stonden er nog met de
+     cijfers van #C23A5E, #A98F1C en #4C9A75 erin -- dus de rand veranderde mee
+     met het token en het vlak eronder niet. color-mix laat een kleur EEN keer
+     wonen; dezelfde weg als shared/command.css. */
+  .bev{border-left:3px solid var(--burgundy);padding:.45rem .7rem;margin-top:.5rem;
+    background:color-mix(in srgb,var(--burgundy) 7%,transparent);border-radius:0 10px 10px 0;font-size:.8rem;line-height:1.5;}
+  .bev.letop{border-left-color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,transparent);}
+  .bev.rust{border-left-color:var(--groen);background:color-mix(in srgb,var(--groen) 8%,transparent);}
+  /* .st is de NEUTRALE pil ("vast", "bestaat nog niet"): een etiket zonder
+     toestand. De drie gekleurde varianten die hier stonden zijn weg: een
+     bewijsgraad IS een toestand en hoort dus de huiscomponent .rtg-status te
+     dragen, met een teken naast het woord en kleur pas als derde laag
+     (ONTWERP.md par. 5). Het is bovendien dezelfde afbeelding graad -> signaal
+     als op het ledenscherm, en die hoort op EEN plek te staan:
+     /shared/kostenbeeld.js. Twee schermen die "vermoed" verschillend kleuren,
+     zeggen iets anders over hetzelfde bewijs. */
   .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:7px;border:1px solid var(--line);color:var(--muted);}
-  .st.gemeten{border-color:var(--groen);color:#7FC7A6;}
-  .st.vermoed{border-color:var(--gold);color:#D9BE55;}
-  .st.onbekend{border-color:var(--burgundy);color:#E58BA4;}
   table{width:100%;border-collapse:collapse;font-size:.83rem;}
-  th,td{text-align:left;padding:.42rem .35rem;border-bottom:1px solid var(--line);vertical-align:top;}
+  th,td{text-align:left;padding:var(--rtg-ruim-klein) .35rem;border-bottom:1px solid var(--line);vertical-align:top;}
   th{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
-  td.getal,th.getal{text-align:right;white-space:nowrap;}
+  td.getal,th.getal{text-align:right;white-space:nowrap;font-variant-numeric:var(--rtg-cijfers);}
   .schuif{overflow-x:auto;}
   /* Uit een inline stijlattribuut gehaald: die houden style-src-attr in de CSP
      open en scripts/norm.js telt ze. */
   .kop3{font-size:.9rem;color:var(--soft);margin-top:1rem;font-weight:500;}
-  code{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:var(--gold);}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:var(--merkgoud);}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
     border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
 </style>
 </head>
-<body>
+<body data-rtg-modus="command">
 
 <!-- Geen eigen springlink: shared/basis.js zet er al een neer op elk scherm dat
      hem laadt, met de juiste maat. Hier stond er wel een, en de a11y-keuring wees
@@ -72,6 +114,14 @@
 
 <main id="main"><div class="kaart"><p class="sub">Bezig met laden&hellip;</p></div></main>
 <div class="melding" id="melding" role="status"></div>
+
+<!-- De gedeelde kostenlaag van de klantschermen, en dit bord leest er EEN ding
+     uit: hoe een bewijsgraad eruitziet. Zonder defer en voor het script
+     hieronder, want dat tekent er meteen mee. Waarom gedeeld en niet
+     overgetikt: het lid dat straks deze rekening krijgt, hoort "vermoed" in
+     dezelfde kleur en met hetzelfde teken te zien als de mens die hier besluit
+     hem te sturen. -->
+<script src="/shared/kostenbeeld.js"></script>
 
 <script>
 /* HET KOSTENBORD VAN DE BOARDROOM.
@@ -97,7 +147,10 @@ const api = (pad, body) => fetch(pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
-const graad = g => '<span class="st '+esc(g||'onbekend')+'">'+esc(g||'onbekend')+'</span>';
+/* De bewijsgraad komt uit de gedeelde laag en niet uit dit bestand: hetzelfde
+   woord, hetzelfde teken en dezelfde kleur als op het scherm van het lid dat
+   straks de rekening krijgt (/shared/kostenbeeld.js). */
+const graad = g => window.RTGKosten.graad(g);
 const wieTekst = w => !w ? '' : (w.soort === 'huis' ? 'het huis' : w.soort + ' ' + w.id);
 
 /* Wat de gebruiker kost, tegenover wat hij betaalt. Het percentage staat er
@@ -107,7 +160,7 @@ function tekenDekking(d){
   const pct = d.dekkingsgraad == null ? null : Math.round(d.dekkingsgraad * 100);
   return '<div class="kaart"><h2>Dekken de bijdragen de kosten?</h2>'+
     '<p class="sub">'+d.gebruikers+' gebruikers in deze maand.</p>'+
-    '<div class="rij"><div class="groei"><div class="groot">'+(pct == null ? '--' : pct + '%')+'</div>'+
+    '<div class="rij"><div class="groei"><div class="rtg-kpi">'+(pct == null ? '--' : pct + '%')+'</div>'+
       '<p class="sub">'+eur(d.bijdragenCenten)+' aan bijdragen tegenover '+eur(d.kostenCenten)+' aan kosten'+
       (d.verschilCenten < 0 ? ' (tekort '+eur(-d.verschilCenten)+')' : ' (over '+eur(d.verschilCenten)+')')+'.</p></div></div>'+
     '<div class="bev letop"><b>Wat dit percentage niet zegt.</b> Van '+d.zonderBekendeBijdrage.aantal+
@@ -128,7 +181,7 @@ function tekenDekking(d){
 function tekenVooruitblik(v){
   const tz = v.trefzekerheid || {};
   return '<div class="kaart"><h2>Wat wordt het deze maand</h2>'+
-    '<div class="rij"><div class="groei"><div class="groot">'+eur(v.verwachtCenten)+'</div>'+
+    '<div class="rij"><div class="groei"><div class="rtg-kpi">'+eur(v.verwachtCenten)+'</div>'+
     '<p class="sub">Nu ' + eur(v.totNuCenten) + ' na ' + v.dagenVoorbij + ' van de ' + v.dagenInMaand + ' dagen. '+
     esc(v.zegtNiet || '')+'</p></div></div>'+
     (v.band
@@ -152,7 +205,10 @@ function tekenPeriode(pr){
       ? '<div class="rij"><button class="knop" id="pSluit" type="button">Maand sluiten</button></div>'
       : '<p class="sub">'+esc(pr.waarom || '')+'</p>';
   return '<div class="kaart"><h2>De maand '+esc(pr.periode)+'</h2>'+
-    '<div class="rij strak"><span class="st '+(pr.stand === 'gesloten' ? 'gemeten' : pr.stand === 'in-onderzoek' ? 'onbekend' : 'vermoed')+'">'+esc(pr.stand)+'</span>'+
+    '<div class="rij strak"><span class="rtg-status"'+
+      (pr.stand === 'gesloten' ? ' data-sig="gezond" data-teken="✓"'
+        : pr.stand === 'in-onderzoek' ? ' data-sig="incident" data-teken="!"' : ' data-teken="◷"')+
+      '>'+esc(pr.stand)+'</span>'+
     (pr.geslotenOp ? '<span class="sub">gesloten op '+esc(pr.geslotenOp)+' door <code>'+esc(pr.geslotenDoor || '')+'</code></span>' : '')+'</div>'+
     '<p class="sub">Een maand gaat pas dicht als elk verschil een verklaring draagt. Een maand in onderzoek gaat niet naar de rekening van een lid.</p>'+
     (pr.verschillen.length
@@ -247,7 +303,7 @@ function tekenVoorstel(v, beleid){
       '<td>'+esc(b.stand)+(b.vast ? ' <span class="st">vast</span>' : '')+'</td>'+
       '<td class="sub">'+esc(b.uitleg)+(b.verzet ? '<br>Verzet van '+esc(b.verzet.van)+' naar '+esc(b.verzet.naar)+': '+esc(b.verzet.reden) : '')+'</td></tr>').join('')+
     '</tbody></table></div>'+
-    '<div class="rij"><div class="groei"><div class="groot">'+eur(v.totalen.teFactureren)+'</div>'+
+    '<div class="rij"><div class="groei"><div class="rtg-kpi">'+eur(v.totalen.teFactureren)+'</div>'+
       '<p class="sub">te factureren aan '+teFactureren.length+' gebruikers. '+
       eur(v.totalen.inbegrepen)+' zit in de pasprijs, '+eur(v.totalen.rtfoundation)+' draagt de RTFoundation, '+
       eur(v.totalen.huis)+' is verbruik zonder eigenaar.</p></div></div>'+

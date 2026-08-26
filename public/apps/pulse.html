@@ -22,6 +22,17 @@
   .schrijf{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-bottom:.9rem;}
   .schrijf textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:3.2rem;resize:vertical;}
   .schrijf .voet{display:flex;align-items:center;gap:.6rem;margin-top:.5rem;}
+  /* DE HOOFDHANDELING HOORT ONDER BEIDE DUIMEN. "Plaatsen" stond als laatste in
+     deze rij en kwam daarmee op x 301 van 390 uit: het kwart aan de ankerzijde
+     van een LINKSHANDIGE, waar zijn duim niet komt (ADAPTIEF.md, en de eigen
+     mobielkeuring meet het). Rechtshandig was hij prima -- precies het soort
+     gebrek dat je niet ziet als je zelf met een hand test. Op telefoonformaat
+     krijgt hij een eigen volle regel: dan is hij niet smal en niet aan een kant,
+     en bereikbaar ongeacht welke hand de telefoon vasthoudt. */
+  @media(max-width:560px){
+    .schrijf .voet{flex-wrap:wrap;}
+    .schrijf .voet #plaats{flex:1 0 100%;}
+  }
   .teller{font-size:.75rem;color:var(--soft);margin-left:auto;}
   .teller.vol{color:var(--burgundy);}
   .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.85rem;padding:.45rem 1rem;cursor:pointer;}

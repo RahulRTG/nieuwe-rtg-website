@@ -13,7 +13,14 @@
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; }
+    /* HET GOUD VOLGT DE GROND. #A98F1C is nagerekend op onyx (6,18:1) en stond
+       hier vast, terwijl deze pagina in alle vier de thema's wordt getoond: op
+       champagne haalde hij 2,45, op bordeaux 3,25, op royal 3,62. --rtg-leesgoud
+       is de tint die per thema WEL leest (6,25 / 9,05 / 10,23 / 8,11) -- op
+       fluweel en satijn is dat ivoor, en dat is een besluit dat in
+       rtg-themas.css al staat. De vaste waarde blijft als terugval voor een
+       scherm zonder thema. */
+    --burgundy:#C23A5E; --gold:var(--rtg-leesgoud,#A98F1C); }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}

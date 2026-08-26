@@ -365,6 +365,13 @@ body.rtg-social-messages .zoekrij input::placeholder{color:#949189;}
 body.rtg-social-messages .nieuwknop{border:1px solid rgba(205,184,121,.36)!important;background:transparent!important;color:#d5bd7c!important;}
 body.rtg-social-messages .laden{padding:0 1.15rem!important;border-bottom-color:rgba(255,255,255,.09)!important;}
 body.rtg-social-messages .laden button{color:#948F88!important;}
+/* De donkere inbox herkleurde koppen, knoppen en gesprekken, maar niet de LEGE
+   staat -- en juist die is het eerste wat een uitgelogd bezoeker ziet. `.leeg`
+   hield daardoor de --rtg-muted van de LICHTE huid (#625f57, gemaakt voor
+   #f1eee7) en landde op dit donkere verloop: 2,45:1. Dezelfde toon als de
+   ladenbalk hierboven, want dit is dezelfde rol op dezelfde grond; op de
+   lichtste stop van het verloop (#2d2023) haalt hij 4,87:1. */
+body.rtg-social-messages .leeg{color:#948F88;}
 body.rtg-social-messages .laden button[aria-current="true"]{color:#f3ede1!important;border-bottom-color:#cdb879!important;}
 body.rtg-social-messages .gsp{min-height:76px;padding:.9rem 1.2rem;border-bottom-color:rgba(255,255,255,.08)!important;color:#eae4d8;}
 body.rtg-social-messages .gsp:hover{background:rgba(255,255,255,.035);}

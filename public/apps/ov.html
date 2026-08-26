@@ -101,9 +101,16 @@
      Champagne is het enige LICHTE thema van het huis (rtg-themas.css), dus dat
      is hier de schakelaar. Komt er ooit een tweede lichte grond bij, dan hoort
      deze regel mee te groeien -- de a11y-poort zegt het dan meteen. */
-  :root[data-rtg-thema="champagne"] .moveHero .eyebrow,
-  :root[data-rtg-thema="champagne"] .moveHero .moveStop,
-  :root[data-rtg-thema="champagne"] .moveHero .moveOrb b{
+  /* EN DE SCHAKELAAR IS HET VLAK, NIET HET THEMA -- dat is met schade geleerd.
+     Deze pagina verklaart haar eigen grond als onyx (data-rtg-eigenvlak op de
+     body hieronder), dus zij is DONKER ook als het thema champagne is. De regel
+     keek naar het thema en verdonkerde de inkt dus juist op een donkere grond:
+     de orb haalde 2,42:1. `:not(:has(...))` laat hem alleen gelden waar de grond
+     werkelijk het thema volgt -- dezelfde vorm die rtg-themas.css gebruikt om
+     een eigen vlak te herkennen. */
+  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .eyebrow,
+  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .moveStop,
+  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .moveOrb b{
     color:color-mix(in srgb,var(--accent) 40%,#000);}
   .moveHero{--accent:var(--ov-accent,#5EE7F7);position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:0;
     border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--card)),var(--card) 70%);box-shadow:0 24px 70px rgba(0,0,0,.25)}

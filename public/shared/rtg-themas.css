@@ -10,6 +10,17 @@
    hoe sterk hij doorkomt: op fluweel mag hij nauwelijks, op champagne verdraagt
    de grond meer.
 
+   EEN ZACHTE TOON WORDT NAGEREKEND OP HET LICHTSTE VLAK, NIET OP DE GROND.
+   Alle drie de zachte tonen stonden op ~4,87:1 gemeten tegen --rtg-bg, de
+   DIEPSTE laag van het materiaal. Dat is de gunstigste meting die er is, en er
+   staat bijna nooit tekst op: een kaart, een paneel of een was tilt de grond op,
+   en dan zakt diezelfde toon eronder. Gemeten door de eigen a11y-scan over de
+   drie thema's: onyx 3,69 op een opgetild vlak, royal 4,01, champagne 4,40 --
+   drie keer een norm die op papier gehaald werd en op het scherm niet. De drie
+   tonen zijn nu bijgesteld op het LICHTSTE vlak waarop de scan ze aantrof; het
+   getal achter elke regel noemt beide grenzen. Wie een materiaal wijzigt, hoort
+   ze opnieuw te laten uitrekenen -- op dat vlak, niet op de grond.
+
    Insluiten NA rtg-materiaal.css. */
 
 :root[data-rtg-thema]{ color-scheme:dark; }
@@ -21,7 +32,7 @@
   --rtg-grond:var(--pearl-glans);
   --rtg-txt:var(--op-pearl);
   --rtg-muted:#34322F;                 /* 8,24:1 op de ergste champagne-grond */
-  --rtg-soft:#555452;                  /* 4,88:1 -- zo zacht als de norm toelaat */
+  --rtg-soft:#52514F;                  /* 6,98:1 op parelmoer, 4,61 op het lichtste vlak */
   --rtg-line:var(--pearl-rand);
   --rtg-card:rgba(255,255,255,0.42);
   --rtg-card2:rgba(255,255,255,0.70);
@@ -44,7 +55,7 @@
   --rtg-grond:var(--onyx-glans);
   --rtg-txt:var(--op-onyx);
   --rtg-muted:#CDC9C0;                 /* 8,92:1 */
-  --rtg-soft:#989489;                  /* 4,87:1 */
+  --rtg-soft:#ABA79C;                  /* 8,14:1 op de basis, 4,65 op het lichtste vlak */
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
   --rtg-card2:#1B1817;
@@ -79,7 +90,7 @@
   --rtg-grond:var(--royal-glans);
   --rtg-txt:var(--op-royal);
   --rtg-muted:#DADFE8;                 /* 6,11:1 */
-  --rtg-soft:#C0C8D7;                  /* 4,85:1 */
+  --rtg-soft:#CED6E5;                  /* 11,23:1 op diep, 4,62 op het lichtste vlak */
   --rtg-line:var(--royal-rand);
   --rtg-card:rgba(0,0,0,0.20);
   --rtg-card2:rgba(0,0,0,0.32);
@@ -214,7 +225,7 @@
   --rtg-grond:var(--onyx-glans);
   --rtg-txt:var(--op-onyx);
   --rtg-muted:#CDC9C0;                 /* 8,92:1 */
-  --rtg-soft:#989489;                  /* 4,87:1 */
+  --rtg-soft:#ABA79C;                  /* 8,14:1 op de basis, 4,65 op het lichtste vlak */
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
   --rtg-card2:#1B1817;
@@ -250,7 +261,7 @@
   --rtg-grond:var(--onyx-glans);
   --rtg-txt:var(--op-onyx);
   --rtg-muted:#CDC9C0;
-  --rtg-soft:#989489;
+  --rtg-soft:#ABA79C;
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
   --rtg-card2:#1B1817;

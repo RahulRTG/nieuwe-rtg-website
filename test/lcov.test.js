@@ -126,3 +126,45 @@ test('samenvoegen is commutatief -- de volgorde van de scherven doet er niet toe
   const terug = tel(voegSamen([scherfB, scherfA]));
   assert.deepEqual(heen, terug);
 });
+
+/* ----------------------------------------------------------------------------
+   DE WACHTER DIE SCHERVEN TELT, EN NIET BESTANDEN.
+
+   De vloer is fail-closed: ontbreekt er een scherf, dan wordt er niet gerekend.
+   Die wachter telde bestanden, en dat is iets anders -- elke scherf schreef in
+   CI naar dezelfde bestandsnaam, dus na het samenvoegen van de artefacten bleef
+   er van vier scherven een handvol bestanden over die elkaar hadden
+   overschreven. De bouw zakte op "er ontbreken scherven" terwijl alle vier
+   hadden geupload. Sinds de bestandsnaam zijn scherfnummer draagt, leest de
+   wachter dat nummer terug. Deze twee toetsen houden dat vast: een scherf die
+   twee bestanden oplevert telt een keer, en een scherf die er nul oplevert valt
+   op MET zijn nummer.
+   -------------------------------------------------------------------------- */
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+
+const VLOER = path.join(__dirname, '..', 'scripts', 'dekkingsvloer.js');
+const DEKKING = ['TN:', 'SF:/rtg/server/z.js', 'DA:1,1', 'LF:1', 'LH:1',
+  'BRF:0', 'BRH:0', 'FNF:0', 'FNH:0', 'end_of_record'].join('\n');
+
+function draaiVloer(namen) {
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scherven-'));
+  for (const n of namen) fs.writeFileSync(path.join(map, n), DEKKING + '\n');
+  const uit = spawnSync(process.execPath, [VLOER, '--map', map, '--scherven', '4'], { encoding: 'utf8' });
+  fs.rmSync(map, { recursive: true, force: true });
+  return { code: uit.status, tekst: (uit.stdout || '') + (uit.stderr || '') };
+}
+
+test('vier scherven, waarvan een met twee bestanden: de wachter laat door', () => {
+  const uit = draaiVloer(['scherf-1.info', 'scherf-2.info', 'solo-2.info', 'scherf-3.info', 'scherf-4.info']);
+  assert.equal(uit.code, 0, uit.tekst);
+  assert.match(uit.tekst, /scherven met dekking: 1, 2, 3, 4/);
+});
+
+test('een ontbrekende scherf zakt, en de melding noemt welke', () => {
+  const uit = draaiVloer(['scherf-1.info', 'scherf-2.info', 'scherf-4.info']);
+  assert.equal(uit.code, 1, uit.tekst);
+  assert.match(uit.tekst, /scherf 3 ontbreekt/);
+});

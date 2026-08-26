@@ -58,14 +58,34 @@ try {
 
 console.log('\n=== De dekkingsvloer, over alle scherven ===\n');
 const toon = (p) => { const r = path.relative(WORTEL, p); return r.startsWith('..') ? p : r; };
-console.log('  ' + paden.length + ' scherf/scherven gevonden in ' + toon(map));
+console.log('  ' + paden.length + ' dekkingsbestand(en) gevonden in ' + toon(map));
 
-/* FAIL-CLOSED: een ontbrekende scherf maakt de meting anders, niet lager. */
-if (verwacht && paden.length !== verwacht) {
-  console.error('\n\x1b[31m  Er werden ' + verwacht + ' scherven verwacht en er zijn er ' + paden.length +
-    '.\x1b[0m\n  Een som over een deel van de scherven is geen lagere dekking maar een ANDERE\n' +
-    '  meting, en die hoort niet te bepalen of een tak doorkomt.\n');
-  process.exit(1);
+/* FAIL-CLOSED: een ontbrekende scherf maakt de meting anders, niet lager.
+
+   Geteld worden SCHERVEN en niet BESTANDEN. Dat verschil is een keer duur
+   geweest: elke scherf schreef naar dekking/scherf.info, en die vier bestanden
+   heten na `merge-multiple` allemaal hetzelfde -- drie ervan overschreven
+   elkaar. De teller zag er twee (scherf.info en solo.info) en riep sinds die
+   dag dat er scherven ontbraken, terwijl er in werkelijkheid vier hadden
+   geupload. Sindsdien draagt elk bestand zijn scherfnummer, en leest deze
+   wachter dat nummer terug: een scherf die twee bestanden oplevert (een solo-
+   ronde naast de gewone) telt een keer, en een scherf die er nul oplevert valt
+   op met naam en nummer. */
+const nummers = new Set();
+for (const p of paden) {
+  const m = /-(\d+)\.(?:info|lcov)$/.exec(path.basename(p));
+  if (m) nummers.add(Number(m[1]));
+}
+if (verwacht) {
+  const zoek = [];
+  for (let i = 1; i <= verwacht; i++) if (!nummers.has(i)) zoek.push(i);
+  if (zoek.length) {
+    console.error('\n\x1b[31m  Er werden ' + verwacht + ' scherven verwacht; scherf ' + zoek.join(', ') +
+      ' ontbreekt.\x1b[0m\n  Een som over een deel van de scherven is geen lagere dekking maar een ANDERE\n' +
+      '  meting, en die hoort niet te bepalen of een tak doorkomt.\n');
+    process.exit(1);
+  }
+  console.log('  scherven met dekking: ' + [...nummers].sort((a, b) => a - b).join(', '));
 }
 if (!paden.length) {
   console.error('\n\x1b[31m  Geen enkele scherf: er valt niets te handhaven.\x1b[0m\n');

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1337 bestanden en 9259 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1337 bestanden en 9261 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1337 |
-| losse beweringen (`test(...)`) | 9259 |
+| losse beweringen (`test(...)`) | 9261 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1006 |
 | **overleefd**: geen mutatie kreeg hem rood | 18 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1169 bestanden, 8972 beweringen.
+1169 bestanden, 8974 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -492,7 +492,7 @@ toets omvalt.
 | `lab2-werk.test.js` | 14 | gezakt op `liegpoort /api/` | Het KANTOORWERK van het RTF Living Lab: het bestuur van een lab (budget, partners), het stafbeeld op een lab, het vraagstuk, "wat nu", de deelnemers en hun rollen, de werkplaats (taken, agenda, documenten, logboek,... |
 | `labfonds.test.js` | 4 | gezakt op `===->!==#0` | Het Lab-fonds (kern/labfonds.js): leden zamelen in voor het RTF Onderzoekslab, per locatie verdeeld, en beslissen gezamenlijk met de AI-scheidsrechter. |
 | `landpakket.test.js` | 6 | gezakt op `===->!==#0` | Landpakketten (kern/command/landpakket.js): een land aanzetten als configuratiebundel. WAT DEZE TOETS VOORAL BEWAAKT is dat "geactiveerd" nooit gaat lezen als "in orde". |
-| `lcov.test.js` | 10 | genoemd | HET REGRESSIECORPUS VAN DE LCOV-SAMENVOEGING. Deze code bepaalt of de dekkingsvloer wordt gehaald wanneer de suite over parallelle scherven is verdeeld. |
+| `lcov.test.js` | 12 | genoemd | HET REGRESSIECORPUS VAN DE LCOV-SAMENVOEGING. Deze code bepaalt of de dekkingsvloer wordt gehaald wanneer de suite over parallelle scherven is verdeeld. |
 | `leden-gids-pg.test.js` | 1 | slaat zichzelf over | Integratietest voor de Postgres-ledengids (member_dir): met DATABASE_URL gezet staat de codenaam/pas-gids als GEINDEXEERDE RIJEN in Postgres in plaats van als object in het geheugen. Een nieuw lid dat zich meldt... |
 | `leden-teller.test.js` | 1 | gezakt op `liegpoort /api/` | De kantoor-totalen tellen de leden met een goedkope, onderhouden teller (ledenAantal) i.p.v. Object.keys(memberDir).length, dat O(N) is en bij miljoenen leden seconden per verzoek kost. |
 | `ledenaflopen.test.js` | 2 | gezakt op `liegpoort /api/` | HET LEDENBESTAND MAG NIET OP VOLGNUMMER AF TE LOPEN ZIJN. WAT ER MISGING. |

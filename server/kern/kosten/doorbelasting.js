@@ -75,7 +75,7 @@ module.exports = (ctx) => {
       factureren: stand === 'doorbelasten' && !teLaag && !!fw.ok,
       waaromNiet: stand !== 'doorbelasten' ? b.uitleg
         : !fw.ok ? fw.uitleg
-        : teLaag ? ('Onder de drempel van ' + (DREMPEL_CENTEN / 100).toFixed(2) + ' euro; schuift door naar de volgende maand.') : null,
+        : teLaag ? ('Onder de drempel van ' + (DREMPEL_CENTEN / 100).toFixed(2).replace('.', ',') + ' euro; schuift door naar de volgende maand.') : null,
       /* Het PLAFOND van de relatie geldt per wereld en niet per gebruiker; het
          wordt daarom in voorstel() getoetst, waar het weretotaal bekend is. Een
          plafond dat per gebruiker afslaat, laat willekeurig de laatsten in de

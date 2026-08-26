@@ -2572,6 +2572,13 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "kostenketen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "kostenmeters.test.js": {
       "soort": "server",
       "staat": "gezakt",

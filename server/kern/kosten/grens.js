@@ -29,6 +29,11 @@
 
 const MAX_CENTEN = 100000000;   // een miljoen euro: grens op het doel
 
+/* Bedragen in een Nederlandse zin met een KOMMA. `toFixed()` geeft een punt, en
+   dan staat er "394.86 euro" in een melding die verder Nederlands is. Klein, en
+   precies het soort detail waar een premium merk op afgerekend wordt. */
+const euro = (centen) => (Number(centen) / 100).toFixed(2).replace('.', ',') + ' euro';
+
 module.exports = (ctx) => {
   const { d, save, nu, meter, overzicht } = ctx;
 
@@ -102,8 +107,8 @@ module.exports = (ctx) => {
         ? 'In dit bedrag zit een toegerekend deel; dat is een verdeling van een nota en geen meting.' : null };
     if (g.plafond && nuCenten >= g.plafond.centen) {
       return Object.assign(basis, { stand: 'dicht', ok: false,
-        uitleg: 'Het verbruik van deze maand (' + (nuCenten / 100).toFixed(2) + ' euro) heeft het plafond van ' +
-          (g.plafond.centen / 100).toFixed(2) + ' euro bereikt. De AI-weg staat dicht tot de volgende maand of tot de grens wordt verzet.' });
+        uitleg: 'Het verbruik van deze maand (' + euro(nuCenten) + ') heeft het plafond van ' + euro(g.plafond.centen) +
+          ' bereikt. De AI-weg staat dicht tot de volgende maand of tot de grens wordt verzet; de rest van RTG werkt gewoon door.' });
     }
     if (g.waarschuw && nuCenten >= g.waarschuw.centen) {
       return Object.assign(basis, { stand: 'waarschuwing', ok: true,

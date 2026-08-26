@@ -21,6 +21,13 @@ on:
   push:
     branches: [ main, master ]
   pull_request:
+  # MET DE HAND TE STARTEN, en dat is geen luxe. Een tak zonder PR krijgt geen
+  # keuring (zie hierboven), en een PR die op een ANDERE tak staat dan main --
+  # zoals een vervolgtak op een tak die nog niet gemerged is -- kreeg op
+  # 26 augustus 2026 helemaal geen run: de trigger vuurde niet bij het openen.
+  # Zonder deze knop is de enige uitweg dan wachten op de merge eronder, en dat
+  # is precies wanneer je de keuring wilt hebben.
+  workflow_dispatch:
 
 # Geen workflowstap krijgt stilzwijgend schrijfrechten op de repository.
 permissions:

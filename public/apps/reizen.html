@@ -64,7 +64,13 @@
         </div>
 
         <section id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
-          <h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2>
+          <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
+               momenten neer, net zoals #tel dat doet bij "Wat eraan komt". De span
+               kwam de samenvoeging niet door, dus liep `$('#telVandaag').textContent`
+               op null -- en die uitzondering brak de HELE reizenlijst af: #komend
+               toonde "Cannot set properties of null" in plaats van de reizen, ook na
+               een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
+          <h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2><span id="telVandaag" class="tel"></span>
           <div id="vandaag"></div>
         </section>
 
@@ -200,6 +206,53 @@
         </form>
       </div>
     </section>
+
+    <!-- DEZE DRIE BLOKKEN STONDEN BUITEN DE SCHIL, en dat was geen opmaakdetail.
+         Ze kwamen met de samenvoeging mee en werden ACHTER de tabbalk geplakt,
+         achter </main> en achter </div> van .reisapp -- dus als kinderen van
+         <body>. De tweede </main> onderaan werd door de browser genegeerd.
+         Gevolg: ze misten de 104 pixels die .reisapp links vrijhoudt voor de
+         vaste tabbalk, en die balk (position:fixed, z-index 25) lag eroverheen.
+         Gemeten op 1280: #invoer stond op x 0 met breedte 1280 en de knop "Voeg
+         toe aan mijn reizen" ving zijn klik niet meer op -- een hoofdhandeling
+         die niet werkt. Ze staan nu IN main, na de vier tabbladen, dus zichtbaar
+         ongeacht welke tab actief is; dat is hoe de toets ze ook gebruikt. -->
+  <!-- DE REISWACHT (REIZEN.md fase 3). Uitzonderingsgestuurd: alleen wat
+       aandacht vraagt staat erin, en rust is een uitkomst -- die wordt dan ook
+       gewoon gezegd. Onderaan staan de bronnen, INCLUSIEF de bronnen die er
+       niet zijn: een wachter zonder bron zegt dat hij niet kijkt (par. 4.2),
+       en dit beeld is een momentopname bij het openen, geen achtergrondwacht. -->
+  <div class="regkop"><h2>De reiswacht</h2></div>
+  <div id="wacht"><p class="stil">Laden...</p></div>
+
+  <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
+       anders geboekt is. Twee stappen, en die volgorde is het ontwerp: RTG
+       LEEST en zet klaar, de mens BEVESTIGT. Wat er gelezen is staat er met
+       zoveel woorden bij -- waaruit, en hoe zeker -- want een extractie die
+       zichzelf in een reisplan zet, zet daar vroeg of laat een verkeerde datum
+       in. -->
+  <div class="regkop"><h2>Zelf iets toevoegen</h2><span class="tel" id="invTel"></span></div>
+  <div class="rtg-groep" id="invoer">
+    <p class="rtg-uitleg">Ergens anders geboekt? Plak de bevestiging of kies het bestand. RTG leest eruit
+      wat het zeker weet, bewaart het origineel in uw eigen kluis, en zet het pas bij uw reizen
+      nadat u het heeft nagekeken.</p>
+    <label class="rtg-label" for="invTekst">De tekst van uw bevestiging, of de strook van een boardingpass</label>
+    <textarea class="rtg-veld" id="invTekst" rows="3" maxlength="20000"
+      placeholder="Plak hier de e-mail, de voucher of de M1-strook van uw instapkaart"></textarea>
+    <div class="rtg-acties" style="margin-top:.7rem;align-items:center;">
+      <input type="file" id="invBestand" hidden accept=".txt,.pdf,image/*,text/plain,application/pdf">
+      <button class="rtg-knop" id="invKies" type="button">Kies een bestand</button>
+      <span class="rtg-sub" id="invBestandNaam"></span>
+      <button class="rtg-knop vol" id="invLees" type="button">Lees voor</button>
+    </div>
+    <div id="invUit" aria-live="polite"></div>
+    <div id="invMijn"></div>
+    <p class="rtg-sub" style="margin-top:.7rem;">Eerder een reisgenoot uitgenodigd?
+      <a href="/apps/reisuitnodiging.html">Bekijk of trek uw uitnodigingen in</a>.</p>
+  </div>
+
+  <div class="regkop"><h2>De reiswereld</h2></div>
+  <div class="poorten" id="poorten"></div>
   </main>
 
   <nav class="hoofdtabs" aria-label="RTG Reizen">
@@ -238,44 +291,6 @@
     <button class="actieknop" type="button" data-sluit-bevestiging><span>KLAAR</span><b>→</b></button>
   </div>
 </dialog>
-
-  <!-- DE REISWACHT (REIZEN.md fase 3). Uitzonderingsgestuurd: alleen wat
-       aandacht vraagt staat erin, en rust is een uitkomst -- die wordt dan ook
-       gewoon gezegd. Onderaan staan de bronnen, INCLUSIEF de bronnen die er
-       niet zijn: een wachter zonder bron zegt dat hij niet kijkt (par. 4.2),
-       en dit beeld is een momentopname bij het openen, geen achtergrondwacht. -->
-  <div class="regkop"><h2>De reiswacht</h2></div>
-  <div id="wacht"><p class="stil">Laden...</p></div>
-
-  <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
-       anders geboekt is. Twee stappen, en die volgorde is het ontwerp: RTG
-       LEEST en zet klaar, de mens BEVESTIGT. Wat er gelezen is staat er met
-       zoveel woorden bij -- waaruit, en hoe zeker -- want een extractie die
-       zichzelf in een reisplan zet, zet daar vroeg of laat een verkeerde datum
-       in. -->
-  <div class="regkop"><h2>Zelf iets toevoegen</h2><span class="tel" id="invTel"></span></div>
-  <div class="rtg-groep" id="invoer">
-    <p class="rtg-uitleg">Ergens anders geboekt? Plak de bevestiging of kies het bestand. RTG leest eruit
-      wat het zeker weet, bewaart het origineel in uw eigen kluis, en zet het pas bij uw reizen
-      nadat u het heeft nagekeken.</p>
-    <label class="rtg-label" for="invTekst">De tekst van uw bevestiging, of de strook van een boardingpass</label>
-    <textarea class="rtg-veld" id="invTekst" rows="3" maxlength="20000"
-      placeholder="Plak hier de e-mail, de voucher of de M1-strook van uw instapkaart"></textarea>
-    <div class="rtg-acties" style="margin-top:.7rem;align-items:center;">
-      <input type="file" id="invBestand" hidden accept=".txt,.pdf,image/*,text/plain,application/pdf">
-      <button class="rtg-knop" id="invKies" type="button">Kies een bestand</button>
-      <span class="rtg-sub" id="invBestandNaam"></span>
-      <button class="rtg-knop vol" id="invLees" type="button">Lees voor</button>
-    </div>
-    <div id="invUit" aria-live="polite"></div>
-    <div id="invMijn"></div>
-    <p class="rtg-sub" style="margin-top:.7rem;">Eerder een reisgenoot uitgenodigd?
-      <a href="/apps/reisuitnodiging.html">Bekijk of trek uw uitnodigingen in</a>.</p>
-  </div>
-
-  <div class="regkop"><h2>De reiswereld</h2></div>
-  <div class="poorten" id="poorten"></div>
-</main>
 
 <dialog class="keuzedialoog" id="veiligDialoog">
   <form method="dialog">
@@ -809,8 +824,17 @@
       VOORSTEL = null; BESTAND = null;
       $('#invTekst').value = ''; $('#invBestandNaam').textContent = '';
       $('#invBestand').value = '';
-      $('#invUit').innerHTML = '<p class="stil">Toegevoegd. Het staat nu bij uw reizen hierboven.</p>';
+      $('#invUit').innerHTML = '<p class="stil">Toegevoegd. Het staat nu bij uw reizen.</p>';
       laad(); laadMijnInvoer(); laadWacht();
+      /* EN DAN OOK ECHT LATEN ZIEN. Hier stond "het staat nu bij uw reizen
+         HIERBOVEN", en dat was waar op de platte pagina van voor de tabbladen:
+         de reizenlijst stond er toen letterlijk boven. Sinds deze pagina vier
+         tabbladen heeft, staat #komend in het blad "reizen" en dat is standaard
+         hidden -- de belofte van deze zin was dus niet meer na te komen, en wie
+         net iets toevoegde zag niets veranderen. De regel doet nu wat hij zegt.
+         `wisselBlad` is de ENE plek die van blad wisselt (reizen-performance.js);
+         hier een tweede maken zou twee waarheden geven over welk blad open is. */
+      if (window.RTGReizen && window.RTGReizen.wisselBlad) window.RTGReizen.wisselBlad('reizen');
     } catch (e) { $('#invUit').innerHTML += '<p class="stil">' + esc(e.message) + '</p>'; knop.disabled = false; }
   }
 
@@ -841,13 +865,14 @@
 /* Deze adapter staat bewust in het scherm: test/canvas.test.js bewaakt dat elke
    wereld dezelfde gemeten stand en tijdlijn gebruikt. De rest van de interactie
    staat in reizen-performance.js. */
-function tekenStand(d) {
-  var t = d.telling || {};
-  RTGCanvas.stand('#stand', { app: 'RTG Reizen', stand: d.stand, cijfers: [
-    [t.komend || 0, 'gepland'], [t.aandacht || 0, 'vraagt actie'], [t.wachtend || 0, 'wacht']
-  ] });
-  RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: RTGCanvas.zin(d.stand, { stil: d.stil }) });
-}
+/* DE STANDREGEL HEEFT EEN EIGENAAR, net als het register hieronder. Hier stond
+   een TWEEDE tekenStand die #stand vulde met `telling.komend` -- het aantal
+   BOEKINGEN. De versie in de gesloten laag hierboven telt REIZEN, en die staat
+   er met haar eigen uitleg bij: drie boekingen voor één trip naar Dubai lazen
+   als "3 reizen gepland" terwijl het er één is. Ze zaten in verschillende
+   scopes, dus ze overschreven elkaar niet -- ze schilderden om beurten over
+   hetzelfde vlak, en wie het laatst klaar was won. Op het scherm stond daardoor
+   "3 gepland" waar "2 reizen gepland" hoorde. Eén teller, één betekenis. */
 function opDeKlok(x) { return x.van === new Date().toISOString().slice(0, 10) && !!x.tijd; }
 function tekenCanvasVandaag(lijst) {
   var punten = (lijst || []).filter(opDeKlok).sort(function(a, b) { return String(a.tijd).localeCompare(String(b.tijd)); });
@@ -856,7 +881,6 @@ function tekenCanvasVandaag(lijst) {
   RTGCanvas.lijn('#vandaag', punten.map(function(x) { return { uur: x.tijd, titel: (x.titel || 'Reis') + (x.bestemming ? ' naar ' + x.bestemming : ''), toe: x.status || x.app, href: x.link, sig: x.sig }; }));
   return (lijst || []).filter(x => !opDeKlok(x));
 }
-tekenStand({});
 </script>
 <script src="/apps/reizen-performance.js"></script>
 <script src="/apps/reizen-performance-reis.js"></script>

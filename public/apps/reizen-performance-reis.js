@@ -15,21 +15,25 @@
     var d = new Date(String(iso || '') + 'T12:00:00');
     return isNaN(d.getTime()) ? { dag: '--', maand: '' } : { dag: String(d.getDate()).padStart(2, '0'), maand: MAAND[d.getMonth()] };
   }
-  function renderRegister(lijst) {
-    var doel = $('#komend'); doel.textContent = '';
-    $('#tel').textContent = lijst.length ? lijst.length + (lijst.length === 1 ? ' reis' : ' reizen') : '';
-    if (!lijst.length) { doel.appendChild(maak('p', 'leegtekst', 'Verder staat er niets gepland. Nieuwe boekingen verschijnen hier vanzelf.')); return; }
-    lijst.forEach(function (reis) {
-      var a = maak('a', 'reisregel'); a.href = reis.link || '#';
-      if (reis.link === '#taxi') a.addEventListener('click', function (e) { e.preventDefault(); R.wisselBlad('taxi'); });
-      var dat = datumDelen(reis.van), datum = maak('span', 'reisdatum'), kern = maak('span', 'reiskern'), status = maak('span', 'reisstatus');
-      datum.appendChild(maak('b', '', dat.dag)); datum.appendChild(document.createTextNode(dat.maand));
-      kern.appendChild(maak('b', '', reis.titel || 'Reis'));
-      kern.appendChild(maak('small', '', [reis.bestemming, reis.app, reis.kenmerk].filter(Boolean).join(' · ')));
-      status.appendChild(document.createTextNode((reis.teken || '·') + ' ' + (reis.status || 'Status niet bekend')));
-      a.appendChild(datum); a.appendChild(kern); a.appendChild(status); doel.appendChild(a);
-    });
-  }
+  /* HET REISREGISTER HEEFT EEN EIGENAAR, EN DAT IS DIT BESTAND NIET.
+     Hier stond renderRegister(): die vulde #komend met een PLATTE, chronologische
+     lijst reisregels. reizen.html vult datzelfde element met de GEGROEPEERDE
+     vorm -- een kop per reis, met de onderdelen eronder -- en dat is het model
+     van REIZEN.md: een Reis met onderdelen, niet een stroom losse regels.
+
+     Allebei draaiden ze bij het laden, allebei schreven ze in #komend, en wie
+     het laatst klaar was won. Dat is niet "soms de verkeerde opmaak" maar twee
+     waarheden over hetzelfde register; in de toets won de platte en
+     test/reizenscherm.e2e.js zakte op zijn eigen onderwerp.
+
+     Dit bestand houdt wat van hem is: de stand, het canvas van vandaag en het
+     volgende reismoment in de kop. Het register is van reizen.html, samen met
+     de teller #tel die eraan hangt.
+
+     WAT HIERMEE VERVALT, en dat hoort hardop: de taxi-deeplink die een regel met
+     `link === '#taxi'` naar het taxiblad stuurde, en de demolijst die zonder
+     token werd getoond. Dat laatste is geen verlies: een scherm dat zonder
+     gegevens toch reizen toont, zegt iets wat het niet weet. */
   function updateVandaag(data) {
     var lijst = data.komend || [], vlucht = lijst.find(function (x) { return x.soort === 'vlucht'; });
     var eerst = lijst.filter(function (x) { return x.van === R.vandaagISO(0) && x.tijd; })
@@ -44,14 +48,16 @@
     if (vlucht && vlucht.tijd) $('#volgendExtra').textContent = 'VLUCHT ' + vlucht.tijd;
   }
   function renderReizen(data) {
-    R.staat.reizen = data; tekenStand(data);
-    renderRegister(tekenCanvasVandaag(data.komend || [])); updateVandaag(data);
+    R.staat.reizen = data;
+    tekenCanvasVandaag(data.komend || []); updateVandaag(data);
   }
   R.laadReizen = function (melding) {
     if (!R.token) { renderReizen(demoReizen()); if (melding) R.toast('Demoreis bijgewerkt. Log in voor uw eigen reizen.'); return Promise.resolve(); }
     return R.api('/api/reis/wereld', {}).then(function (data) { renderReizen(data); if (melding) R.toast('Uw reizen zijn bijgewerkt.'); })
-      .catch(function (e) { tekenStand({}); $('#komend').textContent = '';
-        $('#komend').appendChild(maak('p', 'leegtekst', e.message + ' Uw vorige gegevens worden niet als actueel getoond.')); R.toast(e.message); });
+      /* Ook bij een storing NIET in #komend schrijven: dat register is van
+         reizen.html, en die zegt zelf wat er misging. Twee foutmeldingen over
+         elkaar heen leest als twee storingen. */
+      .catch(function (e) { R.toast(e.message); });
   };
   $('[data-ververs-reizen]').addEventListener('click', function () { R.laadReizen(true); });
 })(window.RTGReizen);

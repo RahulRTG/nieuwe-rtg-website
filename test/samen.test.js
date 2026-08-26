@@ -86,7 +86,15 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
       buf += dec.decode(value);
       if (!eerste) eerste = buf.slice(0, 120);
       if (buf.includes('hello')) { zagHello = true; meldOpen(); }
-      if (buf.includes('event: samen')) { events.push(buf); reden = 'seintje'; break; }
+      /* WACHTEN OP EEN HELE GEBEURTENIS, niet op haar kopregel. Hier stond
+         `buf.includes('event: samen')`, en dat is waar zodra de REGEL binnen is
+         -- terwijl `data:` er dan nog niet hoeft te staan. Op deze machine komt
+         een SSE-brok in zijn geheel binnen en viel dat nooit op; op een belaste
+         runner splitst hij, en dan brak de lus af op een halve gebeurtenis en
+         zakte de toets op zijn eigen leessnelheid. Een gebeurtenis is pas af bij
+         de lege regel erna; daar wachten we nu op. */
+      const k = buf.indexOf('event: samen');
+      if (k >= 0 && buf.indexOf('\n\n', k) >= 0) { events.push(buf); reden = 'seintje'; break; }
     }
     if (!reden) reden = 'lijn dicht of tijd op';
     meldOpen();   // ook als de lijn dichtging: nooit blijven hangen

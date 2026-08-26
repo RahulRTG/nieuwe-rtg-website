@@ -21,6 +21,20 @@
    sleutel meestuurt. Twee lagen die hetzelfde bedoelen is hier geen doublure
    maar een vangnet: de client MAG de sleutel vergeten, de kassa niet.
 
+   DE TOETSVRAAG DIE HIER ALLES BESLIST, en zij is drie keer met schade geleerd:
+   krijgt een woordelijk gelijke HERHALING een ANDER antwoord dan de eerste keer?
+   Zo ja, dan mag de poort niets doen. Een geldlaag zit vol met zulke tweede
+   antwoorden -- "dat staat al geparkeerd", "daar zit nog een bedenktijd op",
+   "die rekening kan nog niet ontvangen" -- en dat zijn juist de antwoorden die
+   een mens moet zien. Een poort die er het eerste "gelukt" overheen legt, maakt
+   van een weigering een bevestiging, en dat is erger dan de dubbele boeking die
+   hij voorkomt (zie de kop van ./idem-poort.js, die dit al zei).
+
+   Drie routes zijn er hier op betrapt: /api/pay/terug (de wachttijd op een
+   gewijzigd IBAN), /api/office/bank/terugstorting (een teruggezette stand) en
+   /api/geld/grens/weg (de bedenktijd op een versoepeling). Alle drie zetten ze
+   een BEVEILIGING uit, en alle drie zijn ze door een bestaande toets gevangen.
+
    Het blijft EEN register: ./idemsleutels.js voegt dit deel samen met zijn
    eigen lijst voor er ook maar iets opzoekbaar is. Lees de kop hiernaast voor
    de vormen. */
@@ -38,7 +52,6 @@ const SLEUTELS = {
 
   /* ---- zet een stand: tweemaal hetzelfde is eenmaal die stand ---- */
   'POST /api/geld/grens/zet': { zelfdeVerzoek: true },              // de grens zelf
-  'POST /api/geld/grens/weg': { velden: ['id'] },                   // welke grens weg moet
   'POST /api/supplier/pay/treasury/zet': { zelfdeVerzoek: true },   // de inrichting
 
   /* ---- laat los; de handeling is haar eigen id ---- */
@@ -85,6 +98,15 @@ const SLEUTELS = {
      tweede grens aan), en dat is de schade die de poort hoort te voorkomen. */
   'POST /api/office/bank/terugstorting': { nietIdempotent: true,
     waarom: 'een herhaalde zet is een bewuste zet: terugzetten binnen het venster zou stil verdwijnen, samen met de auditregel eronder' },
+
+  /* En het weggooien van een grens, om de derde variant van dezelfde reden. Een
+     grens met bedenktijd verdwijnt niet meteen: de eerste poging PARKEERT hem en
+     antwoordt 200 met een wachtTot, de tweede hoort 409 te krijgen -- "nog een
+     keer proberen versnelt niets". Met `velden: ['id']` kwam de 200 van de
+     eerste terug, en dan is de bedenktijd te omzeilen door twee keer te drukken.
+     Precies de omweg waar die toets over gaat. */
+  'POST /api/geld/grens/weg': { nietIdempotent: true,
+    waarom: 'een tweede poging hoort de 409 van de bedenktijd te krijgen en niet de 200 van de eerste; anders is de bedenktijd met een dubbeltik weg' },
 
   'POST /api/pay/rekening': { nietIdempotent: true,
     waarom: 'een herhaalde rekeningwijziging start de wachttijd opnieuw; samenvouwen zou terugzetten naar een oud IBAN de wachttijd laten omzeilen' },

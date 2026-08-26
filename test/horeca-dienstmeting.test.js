@@ -163,3 +163,39 @@ test('6. een onbevestigde allergiewijziging die toch doorliep, wordt geteld', as
     'een regel die klaar staat terwijl hij op bevestiging wacht, telt mee');
   assert.match(punt(m2, 'onbevestigde allergie').rekensom, /wachten er/, 'met hoeveel er nu wachten');
 });
+
+/* ----------------------------------------------------------------------------
+   6. EEN BELOFTE OVER MIDDERNACHT HEEN BLIJFT EEN BELOFTE.
+
+   Een gang die om 23:35 wordt vrijgegeven met "we serveren om 00:05" is een
+   normale bestelling in een keuken die 's avonds draait -- geen gang die
+   drieentwintig uur te vroeg klaar stond. De meting plakte de afgesproken tijd
+   op de dag waarop de gang klaar was en kwam daardoor uit op 1411 minuten; in
+   CI zakte deze suite daar ook echt op, om 23:35 UTC. De cadanslaag las de klok
+   al goed, en die lezing wordt nu gedeeld. Beide kanten staan hier: de gang die
+   over middernacht heen wordt beloofd, en de gang die na middernacht klaar komt
+   terwijl de belofte van voor middernacht is.
+   -------------------------------------------------------------------------- */
+const { belofte } = require('../server/kern/horeca/dienstmeting-tijden');
+
+function gangMet(vrij, klaar, om) {
+  return [{ regels: [{ gang: 2, serveerOm: om, vrijAt: vrij.toISOString(), klaarAt: klaar.toISOString() }] }];
+}
+const opDag = (u, m, dagen) => {
+  const d = new Date(2026, 7, 20 + (dagen || 0), u, m, 0, 0);
+  return d;
+};
+
+test('6. een serveertijd na middernacht is geen gang van gisteren', () => {
+  /* Vrijgegeven om 23:35, beloofd voor 00:05, klaar om 00:06: een minuut laat. */
+  const uit = belofte(gangMet(opDag(23, 35), opDag(0, 6, 1), '00:05'), 'beloofde versus werkelijke');
+  assert.equal(uit.soort, 'gemeten');
+  assert.ok(uit.waarde <= 2, 'een minuut te laat, geen kwart etmaal: ' + uit.waarde);
+});
+
+test('6b. en een belofte van voor middernacht telt niet als bijna een dag te vroeg', () => {
+  /* Vrijgegeven om 23:20, beloofd voor 23:50, klaar om 00:10 de volgende dag. */
+  const uit = belofte(gangMet(opDag(23, 20), opDag(0, 10, 1), '23:50'), 'beloofde versus werkelijke');
+  assert.equal(uit.soort, 'gemeten');
+  assert.ok(uit.waarde >= 19 && uit.waarde <= 21, 'twintig minuten uitgelopen: ' + uit.waarde);
+});

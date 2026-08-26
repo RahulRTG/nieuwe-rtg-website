@@ -403,10 +403,10 @@ test('20. het rooster maken is managerwerk; het lezen doet iedereen', async () =
     naam: 'Bar Lima', soort: 'bar', ouder: terreinId }, manager)).plek;
 
   assert.equal((await api('/api/festival/dienst', { festival: fid, editie: eid, dag: vandaagId,
-    plek: terrein.id, wie: deurNaam, van: '00:00', tot: '23:00' }, deur)).status, 403);
+    plek: terrein.id, wie: deurNaam, van: '00:00', tot: '23:59' }, deur)).status, 403);
 
   const gezet = await post('/api/festival/dienst', { festival: fid, editie: eid, dag: vandaagId,
-    plek: terrein.id, wie: deurNaam, van: '00:00', tot: '23:00', rol: 'Bar', briefing: 'Bekers bij B12' }, manager);
+    plek: terrein.id, wie: deurNaam, van: '00:00', tot: '23:59', rol: 'Bar', briefing: 'Bekers bij B12' }, manager);
   assert.equal(gezet.ok, true);
 
   const rooster = await post('/api/festival/diensten', { festival: fid, editie: eid, dag: vandaagId }, deur);
@@ -414,7 +414,11 @@ test('20. het rooster maken is managerwerk; het lezen doet iedereen', async () =
 });
 
 test('21. wie de dienst van is komt uit de sessie', async () => {
-  /* Het personeelslid ziet zijn eigen dienst... */
+  /* Het personeelslid ziet zijn eigen dienst... De dienst hierboven loopt van
+     00:00 tot 23:59 en niet tot 23:00: met dat laatste uur eraf zakte deze
+     toets elke dag tussen elf en middernacht op "de dienst loopt nu", en in CI
+     (die in UTC draait) gebeurde dat ook echt. Een toets die van het uur van de
+     dag afhangt, meet het uur en niet de code. */
   const mijne = await post('/api/festival/dienst/mijn', { festival: fid, editie: eid }, deur);
   assert.equal(mijne.ok, true);
   assert.ok(mijne.nu, 'de dienst loopt nu');

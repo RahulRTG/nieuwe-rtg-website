@@ -15,6 +15,16 @@
 'use strict';
 
 const MIN = 60000;
+/* EEN BELOFTE DRAAGT EEN KLOK EN GEEN DATUM, en die lezing hoort op een
+   plek te staan. Deze meting had er een eigen: zij plakte de afgesproken
+   tijd op de dag waarop de gang klaar stond. Rond middernacht is dat mis --
+   een gang die om 23:35 wordt beloofd voor 00:05 kwam er als 1411 minuten
+   te vroeg uit, en juist de late uren zijn de drukke uren van een keuken.
+   De cadanslaag wist dit allang (klokTijdNaarMs rolt door naar de volgende
+   dag als de tijd ver voor het anker ligt); die lezing wordt hier nu
+   gedeeld in plaats van nagemaakt. Het anker is het moment waarop de zaal
+   de gang vrijgaf, want dat is het moment waarop de belofte is gedaan. */
+const { klokTijdNaarMs } = require('./cadans-doel');
 const minutenTussen = (a, b) => Math.round(Math.abs(Date.parse(a) - Date.parse(b)) / MIN);
 const DRANK = ['bar', 'koffie'];
 
@@ -82,16 +92,17 @@ function belofte(reks, naam) {
       for (const x of (r.regels || [])) {
         if (!x.serveerOm || !x.klaarAt) continue;
         const k = String(x.gang || 0);
-        if (!perGang.has(k)) perGang.set(k, { om: x.serveerOm, klaar: [] });
+        if (!perGang.has(k)) perGang.set(k, { om: x.serveerOm, vrij: [], klaar: [] });
+        const v = Date.parse(x.vrijAt || '');
+        if (!isNaN(v)) perGang.get(k).vrij.push(v);
         perGang.get(k).klaar.push(Date.parse(x.klaarAt));
       }
       for (const [, g] of perGang) {
-        const m = /^([0-2]?\d):([0-5]\d)$/.exec(g.om);
-        if (!m) continue;
-        const laatste = new Date(Math.max(...g.klaar));
-        const doel = new Date(laatste);
-        doel.setHours(Number(m[1]), Number(m[2]), 0, 0);
-        afwijkingen.push(Math.round((laatste.getTime() - doel.getTime()) / MIN));
+        const laatste = Math.max(...g.klaar);
+        const anker = g.vrij.length ? Math.min(...g.vrij) : laatste;
+        const doel = klokTijdNaarMs(g.om, anker);
+        if (doel === null) continue;
+        afwijkingen.push(Math.round((laatste - doel) / MIN));
       }
     }
   return afwijkingen.length

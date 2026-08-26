@@ -291,7 +291,25 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       await page.mouse.move(orb.x + orb.width / 2, orb.y + orb.height / 2);
       await page.mouse.down();
       // ook hier is de tijd het gebaar: vasthouden tot de orb zijn voorstel opent
-      await page.waitForSelector('.rtg-laag-lade.open', { timeout: 8000 });
+      /* GAAT DE LADE NIET OPEN, DAN ZEGT DE MELDING WAAROM NIET. Deze bewering
+         zakte in CI zonder een spoor: "Timeout 8000ms" zegt niet of de orb er
+         niet was, de laag niet was aangehaakt (m._orb), of de lade wel bestond
+         maar niet open ging. Lokaal is hij niet betrouwbaar te reproduceren --
+         dezelfde ronde geeft hier per keer een andere uitkomst onder belasting --
+         dus hoort de diagnose in de toets zelf, net als bij samen.test.js. */
+      try { await page.waitForSelector('.rtg-laag-lade.open', { timeout: 8000 }); }
+      catch (e) {
+        console.error('[orb-diagnose] ' + JSON.stringify(await page.evaluate(() => {
+          const m = document.querySelector('#rtgCommand .cmd-mondknop');
+          const r = m ? m.getBoundingClientRect() : null;
+          return { mond: !!m, orbHaak: m ? !!m._orb : null,
+            zicht: r ? { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) } : null,
+            lade: !!document.querySelector('.rtg-laag-lade'),
+            openKlasse: !!document.querySelector('.rtg-laag-lade.open'),
+            venster: { w: innerWidth, h: innerHeight } };
+        })));
+        throw e;
+      }
       await page.mouse.up();
       const kopjes = await page.locator('.lg-kopje').allTextContents();
       assert.deepEqual(kopjes, ['Dit kan hier', 'Dit kan hier niet']);

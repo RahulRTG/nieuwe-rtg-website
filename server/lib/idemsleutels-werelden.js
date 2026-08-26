@@ -102,6 +102,14 @@ const SLEUTELS = {
   'POST /api/theater/ondertitels': { zelfdeVerzoek: true },      // de regels voor dit stuk vervangen; herhalen zet hetzelfde vel
   'POST /api/rtgid/stapop/opties': { nietIdempotent: true,
     waarom: 'elke aanroep munt een nieuwe WebAuthn-uitdaging; de herhaling hoort een nieuwe uitdaging te geven en niet de oude terug' },
+
+  /* ---- de datingapps (dating-premium-ronde, main van 26 augustus) ----
+     De toetsvraag van dit register: krijgt een woordelijk gelijke HERHALING een
+     ANDER antwoord dan de eerste keer? Bij blokkeren niet -- en samenvouwen is
+     hier juist de bescherming: elke herhaling met een melding erbij zou een
+     TWEEDE melding bij kantoor leggen, en een dubbeltik is geen tweede klacht. */
+  'POST /api/member/rendezvous/blokkeer': { zelfdeVerzoek: true },
+  'POST /api/office/rendezvous/meldingen': { leest: true },
 };
 
 module.exports = { SLEUTELS };

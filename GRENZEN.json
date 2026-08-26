@@ -34,6 +34,14 @@
    "alpine",
    "status"
   ],
+  "appstore": [
+   "appstore",
+   "appstoreBrug",
+   "appstoreWinkel",
+   "codenaamVan",
+   "onboarding",
+   "tenant"
+  ],
   "atelierweb": [
    "antivirus",
    "atelierweb",
@@ -496,6 +504,7 @@
    "bankOperationeelZet",
    "bankPartnerRailZet",
    "bankSalarisRekeningen",
+   "bankTerugstorting",
    "bankTerugstortingZet",
    "bankVergunningZet",
    "betaal",
@@ -1026,9 +1035,9 @@
    "rvIntroAntwoord",
    "rvIntroducties",
    "rvKandidaten",
-   "rvLike",
+   "rvKies",
    "rvMatches",
-   "rvPas",
+   "rvMeldingen",
    "rvProfiel",
    "rvProfielGet",
    "rvSamen",
@@ -2031,6 +2040,12 @@
    "wacht",
    "zekeringMag"
   ],
+  "tenant": [
+   "bedrijf",
+   "bijstand",
+   "findSupplier",
+   "tenant"
+  ],
   "theater": [
    "resolveSession",
    "theaterAbonneer",
@@ -2298,20 +2313,6 @@
    "status",
    "wallet",
    "zorgpolis"
-  ],
-  "tenant": [
-   "bedrijf",
-   "bijstand",
-   "findSupplier",
-   "tenant"
-  ],
-  "appstore": [
-   "appstore",
-   "appstoreBrug",
-   "appstoreWinkel",
-   "codenaamVan",
-   "onboarding",
-   "tenant"
   ]
  }
 }

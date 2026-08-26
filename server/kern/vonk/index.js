@@ -112,7 +112,11 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
   const publiek = (key, p, zelf, niveau) => ({ codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
     stad: p.stad, interesses: p.interesses, betrouwbaarheid: niveauVan(key), kenmerken: W.toonKenmerken(p, zelf ? 'match' : (niveau || 'kandidaten')),
     ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt, leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax,
-      maxKm: p.maxKm, actief: p.actief, wensen: p.wensen || {}, zicht: p.zicht || {},
+      /* afstandActief komt uit de dating-premium-ronde op main: het scherm zegt
+         ermee of de afstandsfilter iets kan meten (er is een eigen plek bekend)
+         of dood staat. Alleen voor de eigenaar, net als de rest van dit blok. */
+      maxKm: p.maxKm, actief: p.actief, afstandActief: isFinite(p.lat) && isFinite(p.lng),
+      wensen: p.wensen || {}, zicht: p.zicht || {},
       beschikbaar: p.beschikbaar || [], datewens: p.datewens || H.zetDatewens(null, {}) } : {}) });
 
   /* ---- de dagselectie: eindig en wederzijds passend ----

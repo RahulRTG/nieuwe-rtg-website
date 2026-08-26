@@ -9,7 +9,7 @@
    Afgesplitst van ./rendezvous.js, dat het profiel houdt. Krijgt de gedeelde
    context van daar. */
 module.exports = (ctx) => {
-  const { R, AW, B, mag, codenaam, gedeeld, save, notify, nu, partnerVan } = ctx;
+  const { R, AW, B, mag, codenaam, gedeeld, save, notify, nu, partnerVan, geblokkeerd } = ctx;
 
   function rvKandidaten(key) {
     const poort = mag(key);
@@ -26,7 +26,9 @@ module.exports = (ctx) => {
     for (const [k, p] of Object.entries(r.profielen)) {
       if (k === key || !p.aan) continue;
       if (partnerVan && partnerVan(k)) continue;
-      if (mijnPasses[k]) continue;
+      /* De blokkade uit de dating-premium-ronde: wie u blokkeerde ziet u niet
+         meer, en andersom ook niet -- geblokkeerd() kijkt in beide richtingen. */
+      if (mijnPasses[k] || (geblokkeerd && geblokkeerd(r, key, k))) continue;
       const zijLikenMij = !!(r.likes[k] && r.likes[k][key]);
       const ikLikeHen = !!mijnLikes[k];
       uit.push({ id: k, codenaam: codenaam(k), over: p.over || '', zoekt: p.zoekt || '',
@@ -47,38 +49,10 @@ module.exports = (ctx) => {
     return { status: 200, kandidaten: uit.slice(0, 60), profielAan: !!mij.aan };
   }
 
-  function rvLike(key, targetKey) {
-    const poort = mag(key);
-    if (!poort.ok) return { status: 403, error: poort.reden };
-    const r = R();
-    if (!targetKey || targetKey === key) return { status: 400, error: 'Onbekend lid.' };
-    if (!r.profielen[key] || !r.profielen[key].aan) return { status: 400, error: 'Zet eerst uw eigen profiel aan.' };
-    const doel = r.profielen[targetKey];
-    if (!doel || !doel.aan) return { status: 404, error: 'Dit lid is niet (meer) beschikbaar.' };
-    if (!r.likes[key]) r.likes[key] = {};
-    if (r.passes[key]) delete r.passes[key][targetKey];
-    r.likes[key][targetKey] = nu();
-    const match = !!(r.likes[targetKey] && r.likes[targetKey][key]);
-    save();
-    if (match && notify) {
-      const g = gedeeld(r.profielen[key].locaties, doel.locaties);
-      const waar = g.length ? ' Denk aan een date in ' + g[0] + '.' : '';
-      try { notify(key, { title: 'Rendez-vous', body: 'U heeft een match met ' + codenaam(targetKey) + '.' + waar, scope: 'lifestyle' }); } catch (e) {}
-      try { notify(targetKey, { title: 'Rendez-vous', body: 'U heeft een match met ' + codenaam(key) + '.' + waar, scope: 'lifestyle' }); } catch (e) {}
-    }
-    return { status: 200, ok: true, match };
-  }
-  function rvPas(key, targetKey) {
-    const poort = mag(key);
-    if (!poort.ok) return { status: 403, error: poort.reden };
-    const r = R();
-    if (!targetKey) return { status: 400, error: 'Onbekend lid.' };
-    if (!r.passes[key]) r.passes[key] = {};
-    r.passes[key][targetKey] = nu();
-    if (r.likes[key]) delete r.likes[key][targetKey];
-    save();
-    return { status: 200, ok: true };
-  }
-
-  return { rvKandidaten, rvLike, rvPas };
+  /* rvLike en rvPas stonden hier en zijn verhuisd naar ./rendezvous-acties.js
+     (de dating-premium-ronde van main): de routelaag stuurt like, pas en
+     blokkeer alle drie langs rvKies, en twee mutatiepaden naar dezelfde like is
+     de dubbeling die dit huis net uit het reisscherm heeft gehaald. De
+     18+-poort is meeverhuisd; dit bestand houdt het KIJKEN. */
+  return { rvKandidaten };
 };

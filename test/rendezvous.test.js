@@ -11,9 +11,10 @@ const os = require('os');
 const path = require('path');
 const { startServer, elevateTier } = require('./helper');
 
+const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rendezvous-'));
-let child;
+let child, office;
 
 const raw = (pad, body, token) => fetch(BASE + '/api' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
@@ -24,6 +25,7 @@ const rv = (pad, body, token) => raw('/member/rendezvous/' + pad, body, token);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  office = (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -32,7 +34,6 @@ test.after(() => {
 
 let teller = 0;
 const officeTok = async () => (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
-const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 /* Het paspoort door de balie halen. Zonder dit komt een lid de ontmoetpoort niet
    door, ook niet met een Lifestyle Pass: de leeftijd wordt uit member_state.geboren
@@ -142,7 +143,14 @@ test('de ontmoetpoort: zonder geverifieerd paspoort geen Rendez-vous, ook niet m
   const los = await lidMet('lifestyle', { kyc: false });
   const dicht = await rv('profiel', {}, los);
   assert.equal(dicht.status, 403, 'zonder KYC blijft de deur dicht');
-  assert.match((await json(dicht)).error, /paspoort/i, 'en de reden noemt het paspoort');
+  /* Sinds de dating-premium-ronde spreekt de VOORDEUR eerst (route-eis met
+     foutcode IDENTITY_REQUIRED, zodat het scherm de juiste deur toont); de
+     kernpoort blijft de handhaver erachter. Beide redenen zijn goed -- de een
+     zegt identiteit, de ander paspoort -- zolang de deur maar dicht is en de
+     code het scherm de weg wijst. */
+  const dichtBody = await json(dicht);
+  assert.match(dichtBody.error, /paspoort|identiteit/i, 'en de reden noemt de identiteitseis');
+  assert.equal(dichtBody.code, 'IDENTITY_REQUIRED', 'met de code waar het scherm zijn deur op kiest');
   // ook de schrijvende ingangen zijn dicht, niet alleen het lezen
   assert.equal((await rv('profiel/zet', { aan: true, locaties: 'Ibiza' }, los)).status, 403);
   assert.equal((await rv('kandidaten', {}, los)).status, 403);
@@ -622,4 +630,46 @@ test('the table: iemand erbij kan, maar niet voorbij het aantal plaatsen', async
     { naam: 'Diner 06', plaatsen: 2, genodigden: [leden[0], leden[1]] }, office));
   const vol = await raw('/office/rendezvous/tafel/nodig', { id: g.tafel.id, codenaam: leden[2] }, office);
   assert.equal(vol.status, 409, 'de tafel zit vol');
+});
+
+/* De twee toetsen hieronder komen uit de dating-premium-ronde op main. De
+   eerste toetst de FOUTCODES van de voordeur (de route-eis geeft
+   IDENTITY_REQUIRED en AGE_REQUIRED zodat het scherm de juiste deur toont; de
+   handhaver blijft kern/ontmoetpoort.js -- zie de notitie in de route). De
+   tweede is de blokkade: beide kanten zien elkaar niet meer, en de melding gaat
+   op codenaam naar kantoor. Aangepast aan de helper van deze suite: main's
+   `verifieer: false` heet hier `kyc: false`. */
+test('Rendez-vous eist naast de pas ook een geverifieerde identiteit en 18+', async () => {
+  const ongeverifieerd = await lidMet('lifestyle', { kyc: false });
+  let r = await rv('profiel', {}, ongeverifieerd);
+  assert.equal(r.status, 403);
+  assert.equal((await json(r)).code, 'IDENTITY_REQUIRED');
+
+  const minderjarig = await lidMet('lifestyle', { geboortedatum: '2010-05-05' });
+  r = await rv('profiel', {}, minderjarig);
+  assert.equal(r.status, 403);
+  assert.equal((await json(r)).code, 'AGE_REQUIRED');
+});
+
+test('blokkeren verwijdert de connectie direct; melden gaat op codenaam naar kantoor', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'A', locaties: 'Ibiza' }, a);
+  await rv('profiel/zet', { aan: true, over: 'B', locaties: 'Ibiza' }, b);
+  const kandidaat = (await json(await rv('kandidaten', {}, a))).kandidaten.find(k => k.over === 'B');
+  assert.ok(kandidaat);
+  await rv('like', { id: kandidaat.id }, a);
+  const andersom = (await json(await rv('kandidaten', {}, b))).kandidaten.find(k => k.over === 'A');
+  await rv('like', { id: andersom.id }, b);
+  assert.equal((await json(await rv('matches', {}, a))).matches.length, 1);
+
+  const blok = await json(await raw('/member/rendezvous/blokkeer', { id: kandidaat.id, meld: 'Ongepast bericht' }, a));
+  assert.equal(blok.gemeld, true);
+  assert.equal((await json(await rv('matches', {}, a))).matches.length, 0, 'de match is direct weg voor A');
+  assert.equal((await json(await rv('matches', {}, b))).matches.length, 0, 'de match is direct weg voor B');
+  assert.ok(!(await json(await rv('kandidaten', {}, b))).kandidaten.some(k => k.id === andersom.id), 'beiden zien elkaar niet meer');
+
+  const meldingen = await json(await raw('/office/rendezvous/meldingen', {}, office));
+  assert.ok(meldingen.meldingen.some(m => m.reden === 'Ongepast bericht'), 'kantoor ontvangt de melding');
+  assert.ok(meldingen.meldingen.every(m => m.van && m.over), 'de melding gebruikt codenamen');
 });

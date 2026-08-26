@@ -3,337 +3,366 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
 <title>Rendez-vous · Lifestyle Pass</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
-    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
-  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
-  header h1{font-size:1.35rem;}
-  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
-  /* Rendez-vous houdt zijn eigen tabbladen (Profiel / Ontdek / Matches): een
-     scherm tegelijk, precies wat het deelmenu elders doet. Alleen de vorm gaat
-     mee met het huis -- een rustige balk met kleine kapitalen en een gouden
-     streep onder het deel waar je staat, in plaats van drie mappen. De selector
-     moet dieper dan `.tab`: de kit tekent die rij al met `body.rtg-stijl .tab`,
-     en die is specifieker dan een kale `.tab`. */
-  body.rtg-stijl .tabs{display:flex;flex-wrap:wrap;gap:.15rem;max-width:760px;margin:.6rem auto 0;
-    padding:0 1.1rem .1rem;overflow:visible;border-bottom:1px solid var(--line);}
-  body.rtg-stijl .tabs > .tab{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
-    border-radius:0;cursor:pointer;padding:.55rem .8rem .6rem;
-    font-family:'Inter',system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--muted);white-space:nowrap;}
-  body.rtg-stijl .tabs > .tab:hover{color:var(--txt);border-bottom-color:transparent;}
-  body.rtg-stijl .tabs > .tab.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
-  main{padding:1.1rem;max-width:760px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.9rem;}
-  .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
-  .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
-.samen{color:var(--gold);font-size:.85rem;margin-top:.4rem;}
-.rooster{width:100%;border-collapse:collapse;margin-top:.5rem;font-size:.78rem;}
-.rooster th{font-weight:400;color:var(--soft);font-size:.7rem;text-align:left;padding:.3rem .2rem;}
-.rooster td{padding:0;}
-.rooster label{display:flex;align-items:center;justify-content:center;margin:0;min-height:2.75rem;border:1px solid var(--line);border-radius:0;cursor:pointer;}
-.per{display:flex;gap:.4rem;align-items:flex-end;flex-wrap:wrap;margin-top:.5rem;}
-.per>span{flex:1;min-width:6rem;}
-.per input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.85rem;padding:.5rem .6rem;min-height:2.75rem;}
-.weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:0;font:inherit;font-size:.85rem;padding:.5rem .8rem;min-height:2.75rem;cursor:pointer;}
-.stilknop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;font:inherit;font-size:.85rem;padding:.55rem 1rem;min-height:2.75rem;cursor:pointer;}
-  .veld,textarea.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .7rem;}
-  textarea.veld{min-height:3.2rem;resize:vertical;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.85rem;padding:.55rem 1rem;cursor:pointer;}
-  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
-  .schakel{display:flex;align-items:center;gap:.6rem;font-size:.92rem;}
-  .schakel input{width:1.2rem;height:1.2rem;accent-color:var(--gold);}
-  .chip{display:inline-block;font-size:.72rem;padding:.15rem .55rem;border-radius:0;border:1px solid var(--line);color:var(--muted);margin:.15rem .2rem 0 0;}
-  .chip.deel{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  .kand{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-bottom:.7rem;background:var(--card2);}
-  .kand .nm{font-family:'Bodoni Moda',serif;font-size:1.15rem;}
-  .kand .over{font-size:.88rem;color:var(--muted);margin-top:.3rem;line-height:1.5;}
-  .kand .acts{display:flex;gap:.5rem;margin-top:.7rem;}
-  .kand .acts .knop{flex:1;}
-  .hart{background:var(--burgundy);color:#fff;border:none;}
-  .badge{display:inline-block;font-size:.66rem;padding:.12rem .5rem;border-radius:0;background:var(--burgundy);color:#fff;margin-left:.4rem;vertical-align:middle;}
-  .match{border-color:var(--gold);}
-  .leeg{color:var(--soft);font-size:.88rem;padding:.6rem 0;text-align:center;}
-  .note{font-size:.8rem;color:var(--soft);margin-top:.4rem;line-height:1.5;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
-  .datebox{margin-top:.6rem;font-size:.92rem;line-height:1.55;color:var(--muted);border-top:1px solid var(--line);padding-top:.6rem;}
-  .inlog{text-align:center;padding:2.5rem 1rem;}
-</style>
+<!-- Samenvoeging: het eigen stijlblok uit de ONTMOETEN.md-ronde is vervallen;
+     de premium-laag (shared/dating-premium.css, gedeeld met Vonk) kleedt alles. -->
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-materiaal.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/social-suite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
+<link href="/shared/dating-premium.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
 <script src="/shared/social-suite.js" defer></script>
 <script src="/shared/social-intelligence.js" defer></script>
 <script src="/shared/social-intelligence-deck.js" defer></script>
 <script src="/shared/social-intelligence-runtime.js" defer></script>
 <script src="/shared/social-intelligence-data.js" defer></script>
 </head>
-<body class="rtg-stijl">
-<header><div><div class="ey">Lifestyle Pass · besloten</div><h1>Rendez-vous</h1></div><a class="terug" href="/apps/lifestyle.html">&#8592; kantoor</a></header>
-<div class="tabs" id="tabs"></div>
-<main id="main"><div class="leeg">Laden…</div></main>
-<div class="melding" id="melding"></div>
+<body class="rtg-stijl" data-rtg-modus="world" data-rtg-dating="rendezvous">
+<a class="skip" href="#main">Naar de inhoud</a>
+<header><div><span>Lifestyle Pass · besloten</span><h1>Rendez-vous</h1></div></header>
+<nav class="dating-tabs" id="tabs" aria-label="Rendez-vous"></nav>
+<main id="main" tabindex="-1"><div class="dating-empty"><strong>Rendez-vous wordt geopend</strong><p>Uw besloten ruimte en identiteitsstatus worden gecontroleerd.</p></div></main>
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+
+<dialog class="dating-dialog" id="safetyDialog" aria-labelledby="safetyTitle">
+  <form method="dialog">
+    <div class="dating-dialog-head"><span class="dating-eyebrow">Veilige afstand</span><h2 id="safetyTitle">Blokkeren of melden</h2></div>
+    <div class="dating-dialog-body">
+      <p>Na blokkeren zien jullie elkaar niet meer. Alleen bij melden leest een RTG-medewerker uw reden; echte namen blijven in de kluis.</p>
+      <div class="dating-field"><label for="safetyReason">Reden voor RTG (alleen nodig bij melden)</label><textarea class="dating-input" id="safetyReason" maxlength="200" placeholder="Beschrijf kort wat er gebeurde."></textarea></div>
+      <div class="dating-actions">
+        <button class="dating-button quiet" value="cancel">Annuleren</button>
+        <button class="dating-button" id="blockOnly" value="block">Alleen blokkeren</button>
+        <button class="dating-button danger" id="blockReport" value="report">Blokkeren en melden</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
 <script src="/shared/deur.js"></script>
-<!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
-const $=s=>document.querySelector(s);
-const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
-function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
-const api=(pad,body)=>fetch('/api/member/rendezvous/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.status=r.status;throw e;}return d;});
-let TAB='profiel';
-const TABS=[['profiel','Profiel'],['ontdek','Ontdek'],['matches','Matches'],['kring','De kring']];
-function tekenTabs(){ $('#tabs').innerHTML=TABS.map(([k,n])=>'<button class="tab'+(TAB===k?' aan':'')+'" data-t="'+k+'">'+n+'</button>').join(''); document.querySelectorAll('[data-t]').forEach(b=> b.onclick=()=>{ TAB=b.dataset.t; laad(); }); }
-/* Meenemen (shared/uitvoer.js): u neemt mee wat er op het tabblad staat -- uw
-   matches of de kandidaten die u nu ziet -- met de velden los, niet de kaart
-   als een lap tekst. Iedereen staat er met zijn CODENAAM in, precies zoals op
-   het scherm; echte namen kent deze app niet en die horen hier ook niet in.
-   Het profieltabblad is een formulier, daar valt niets mee te nemen. */
-let UIT=null;
-if(window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT&&UIT.rijen.length?UIT:null; });
-/* Een venster in gewone taal: "22-24 augustus", of met maand erbij als het er
-   twee zijn. Grofmazig blijft grofmazig -- er is geen tijd om te tonen. */
-const MND=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-function venster(v){
-  const a=String(v.van||'').split('-'), b=String(v.tot||'').split('-');
-  if(a.length!==3||b.length!==3) return esc(v.van)+' t/m '+esc(v.tot);
-  const d1=+a[2], m1=+a[1]-1, d2=+b[2], m2=+b[1]-1;
-  return (a[0]===b[0]&&m1===m2) ? d1+'\u2013'+d2+' '+MND[m2] : d1+' '+MND[m1]+' \u2013 '+d2+' '+MND[m2];
-}
-const samenRegel=arr=>(arr||[]).map(v=>
-  '<div class="samen">U bent allebei in '+esc(v.stad)+', '+venster(v)+'.</div>').join('');
+/* Samenvoeging van twee rondes. De dating-premium-ronde van main levert de
+   opzet: de shell (command/werk/context), de tabs-runtime, toonGate met
+   foutcodes en de veiligheidsdialoog. De ONTMOETEN.md-ronde levert de fasen
+   die het ontmoeten dragen: de Presence Graph (waar en wanneer u bent), het
+   rooster in dagdelen, Arrange It, en het vierde tabblad De kring (tafels,
+   introducties, encounter-pin en Together). Niets van beide bouwrondes is
+   weggelaten; de naden staan hieronder benoemd. */
+(() => {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let token = null; try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
+  let tab = 'profiel', uitvoer = null, locaties = [], safetyTarget = null;
+  /* Vier tabbladen: de eerste drie uit de premium-ronde, het vierde uit de
+     ONTMOETEN.md-ronde -- tafels, introducties en Together horen bij het
+     ontmóéten en niet bij het vinden, dus ze staan apart. */
+  const tabs = [['profiel','Profiel'],['ontdek','Ontdek'],['matches','Matches'],['kring','De kring']];
+  const voorkeuren = ['Gastronomie','Kunst','Zeilen','Wellness','Reizen','Cultuur'];
+  document.addEventListener('DOMContentLoaded', () => { document.querySelector('.rtg-spring')?.remove(); document.body.prepend($('.skip')); }, { once:true });
 
-function chips(arr,deel){ deel=deel||[]; const dl=deel.map(x=>x.toLowerCase()); return (arr||[]).map(x=>'<span class="chip'+(dl.includes(x.toLowerCase())?' deel':'')+'">'+esc(x)+'</span>').join('')||'<span class="note">niets opgegeven</span>'; }
-
-async function laad(){
-  tekenTabs(); UIT=null;   // eerst leeg: gaat het laden mis, dan valt er ook niets mee te nemen
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2></div>'; return; }
-  try{
-    if(TAB==='profiel') return await profiel();
-    if(TAB==='ontdek') return await ontdek();
-    if(TAB==='kring') return await kring();
-    return await matches();
-  }catch(e){ if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; } $('#main').innerHTML='<div class="leeg">Kon Rendez-vous niet laden.</div>'; }
-}
-
-/* Een periode is een rij: stad, van, tot. Type "date" houdt de invoer vanzelf
-   op hele dagen -- er is dus geen veld waar een tijdstip in past. */
-function rijHtml(v){
-  return '<div class="per">'
-    +'<span><span class="lbl">Stad</span><input data-stad value="'+esc(v.stad||'')+'" placeholder="Parijs" aria-label="Stad"></span>'
-    +'<span><span class="lbl">Van</span><input data-van type="date" value="'+esc(v.van||'')+'" aria-label="Van welke dag"></span>'
-    +'<span><span class="lbl">Tot</span><input data-tot type="date" value="'+esc(v.tot||'')+'" aria-label="Tot en met welke dag"></span>'
-    +'<button class="weg" data-weg aria-label="Deze periode weghalen">Weg</button></div>';
-}
-/* Dezelfde eenentwintig hokjes als in Vonk, uit hetzelfde rooster van de server
-   (kern/beschikbaar.js). Een tabel, want dag maal dagdeel is er een. */
-function roosterHtml(R, mijn){
-  const aan=new Set(mijn||[]);
-  const kop='<tr><th></th>'+R.delen.map(p=>'<th scope="col">'+esc(p.label)+'</th>').join('')+'</tr>';
-  const rijen=R.dagen.map(d=>'<tr><th scope="row">'+esc(d.label)+'</th>'+R.delen.map(p=>{
-    const s=R.slots.find(x=>x.id===d.id+'-'+p.id);
-    return '<td><label><input type="checkbox" data-slot="'+esc(s.id)+'"'+(aan.has(s.id)?' checked':'')+' aria-label="'+esc(s.label)+'"></label></td>';
-  }).join('')+'</tr>').join('');
-  return '<table class="rooster">'+kop+rijen+'</table>';
-}
-
-function koppelRijen(){
-  document.querySelectorAll('#periodes [data-weg]').forEach(b=> b.onclick=()=>{ b.closest('.per').remove(); });
-}
-
-async function profiel(){
-  const d=await api('profiel'); const p=d.profiel;   // een formulier is geen register: UIT blijft leeg
-  let h='<div class="kaart"><div class="schakel"><input type="checkbox" id="aan"'+(p.aan?' checked':'')+'><label for="aan">Mijn profiel is zichtbaar voor andere leden</label></div><div class="note">U bent alleen zichtbaar op uw codenaam ('+esc(d.codenaam)+'). Uw echte naam blijft in de kluis.</div></div>';
-  h+='<div class="kaart"><h2>Uw profiel</h2><span class="lbl">Over u</span><textarea class="veld" id="over" placeholder="Vertel kort iets over uzelf.">'+esc(p.over)+'</textarea>'
-    +'<span class="lbl">Wat u zoekt</span><input class="veld" id="zoekt" value="'+esc(p.zoekt)+'" placeholder="Bijv. iemand die van zeilen en kunst houdt.">'
-    +'<span class="lbl">Wensen (met komma\'s)</span><input class="veld" id="wensen" value="'+esc((p.wensen||[]).join(', '))+'" placeholder="reizen, fine dining, cultuur">'
-    +'<span class="lbl">Locaties waar u openstaat voor een date (met komma\'s)</span><input class="veld" id="locaties" value="'+esc((p.locaties||[]).join(', '))+'" placeholder="Ibiza, Saint-Tropez, Gstaad">'
-    +'<div class="h-mt80"><button class="knop" id="bewaar">Bewaren</button></div></div>';
-
-  /* WAAR U WANNEER BENT. Alleen wat u zelf intikt: Rendez-vous leest uw reizen
-     niet mee, en een periode is een stad en dagen -- geen adres, geen tijdstip. */
-  h+='<div class="kaart"><h2>Waar u bent</h2>'
-    +'<span class="lbl">Waar u woont</span><input class="veld" id="thuis" value="'+esc(p.thuis||'')+'" placeholder="Amsterdam">'
-    +'<span class="lbl">Periodes dat u ergens anders bent</span>'
-    +'<div id="periodes">'+((p.aanwezig||[]).map(rijHtml).join('')||'')+'</div>'
-    +'<div class="h-mt40"><button class="stilknop" id="plus">Periode toevoegen</button></div>'
-    +'<div class="note">Andere leden zien hier niets van, behalve wanneer u tegelijk ergens bent. Uw woonplaats wordt nooit los getoond.</div>'
-    +'<div class="h-mt80"><button class="knop" id="bewaarWaar">Bewaren</button> <button class="stilknop" id="wis">Alles wissen</button></div></div>';
-
-  h+='<div class="kaart"><h2>Wanneer u kunt</h2>'
-    +'<div class="note">Kruis aan wanneer u meestal kunt. Geen agenda, geen datum, geen tijdstip &mdash; en niemand ziet uw vinkjes. Bij een wederzijdse match krijgt u allebei \u00e9\u00e9n dagdeel te zien dat u beiden aankruiste.</div>'
-    +roosterHtml(d.rooster, p.beschikbaar)
-    +'<div class="h-mt80"><button class="knop" id="bewaarWanneer">Bewaren</button></div></div>';
-
-  h+='<div class="note">Bij een match stelt Rahul een jetset-date voor op een plek waar u beiden bent of voor openstaat. Rahul belooft niets; De Rechterhand regelt de date pas als u beiden akkoord bent.</div>';
-  $('#main').innerHTML=h;
-  $('#bewaar').onclick=async()=>{ try{ await api('profiel/zet',{aan:$('#aan').checked,over:$('#over').value,zoekt:$('#zoekt').value,wensen:$('#wensen').value,locaties:$('#locaties').value}); meld('Profiel bewaard.'); }catch(e){ meld(e.message); } };
-  $('#bewaarWanneer').onclick=async()=>{
-    const beschikbaar=Array.from(document.querySelectorAll('[data-slot]')).filter(c=>c.checked).map(c=>c.dataset.slot);
-    try{ await api('profiel/zet',{beschikbaar}); meld('Bewaard.'); }catch(e){ meld(e.message); }
-  };
-  $('#plus').onclick=()=>{ $('#periodes').insertAdjacentHTML('beforeend', rijHtml({stad:'',van:'',tot:''})); koppelRijen(); };
-  koppelRijen();
-  $('#bewaarWaar').onclick=async()=>{
-    const aanwezig=Array.from(document.querySelectorAll('#periodes .per')).map(r=>({
-      stad:r.querySelector('[data-stad]').value, van:r.querySelector('[data-van]').value, tot:r.querySelector('[data-tot]').value
-    })).filter(v=>v.stad&&v.van&&v.tot);
-    try{ await api('profiel/zet',{thuis:$('#thuis').value,aanwezig}); meld('Bewaard.'); laad(); }catch(e){ meld(e.message); }
-  };
-  $('#wis').onclick=async()=>{
-    if(!confirm('Alles wissen wat u over uw verblijfplaats hebt opgegeven? Uw profiel en matches blijven.')) return;
-    try{ await api('aanwezig/wis'); meld('Gewist.'); laad(); }catch(e){ meld(e.message); }
-  };
-  $('#aan').onchange=async()=>{ try{ await api('profiel/zet',{aan:$('#aan').checked}); meld($('#aan').checked?'U bent nu zichtbaar.':'U bent nu verborgen.'); }catch(e){ meld(e.message); } };
-}
-
-async function ontdek(){
-  const d=await api('kandidaten');
-  UIT={ naam:'kandidaten', kolommen:['codenaam','status','zoekt','locaties','gedeelde locaties','tegelijk ergens'],
-    rijen:(d.kandidaten||[]).map(k=>[k.codenaam||'', k.status||'', k.zoekt||'',
-      (k.locaties||[]).join(', '), (k.gedeeldeLocaties||[]).join(', '),
-      (k.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', ')]) };
-  let h='';
-  if(!d.profielAan) h+='<div class="kaart" style="border-color:rgba(194,58,94,.4);"><b>Uw profiel staat uit.</b><div class="note">Zet uw profiel aan bij Profiel om te kunnen liken en om zelf gevonden te worden.</div></div>';
-  if(!d.kandidaten.length){ h+='<div class="leeg">Nog geen andere leden om te ontdekken. Kom straks terug.</div>'; $('#main').innerHTML=h; return; }
-  h+=d.kandidaten.map(k=>{
-    const isMatch=k.status==='match', geliked=k.status==='geliked';
-    return '<div class="kand'+(isMatch?' match':'')+'"><div class="nm">'+esc(k.codenaam)+(isMatch?'<span class="badge">match</span>':geliked?'<span class="badge" style="background:var(--card);color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);">geliked</span>':k.likteMij?'<span class="badge">vindt u al leuk</span>':'')+'</div>'
-      +(k.over?'<div class="over">'+esc(k.over)+'</div>':'')
-      +(k.zoekt?'<div class="note">Zoekt: '+esc(k.zoekt)+'</div>':'')
-      +samenRegel(k.samen)
-      +'<div class="h-mt40">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'
-      +(k.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">U staat allebei open voor: '+k.gedeeldeLocaties.map(esc).join(', ')+'</div>':'')
-      +'<div class="acts">'+(isMatch?'':'<button class="knop stil" data-pas="'+k.id+'">Overslaan</button><button class="knop hart" data-like="'+k.id+'">Leuk</button>')+(isMatch?'<button class="knop" data-ga="1">Ga naar Matches</button>':'')+'</div></div>';
-  }).join('');
-  $('#main').innerHTML=h;
-  document.querySelectorAll('[data-like]').forEach(b=> b.onclick=async()=>{ try{ const r=await api('like',{id:b.dataset.like}); meld(r.match?'Het is een match! Bekijk Matches.':'Uw like is verstuurd.'); laad(); }catch(e){ meld(e.message); } });
-  document.querySelectorAll('[data-pas]').forEach(b=> b.onclick=async()=>{ try{ await api('pas',{id:b.dataset.pas}); laad(); }catch(e){ meld(e.message); } });
-  document.querySelectorAll('[data-ga]').forEach(b=> b.onclick=()=>{ TAB='matches'; laad(); });
-}
-
-/* De kring: uitnodigingen, de vragen die openstaan, de pin voor een ontmoeting,
-   en Together. Wat hier NIET staat is net zo belangrijk als wat er wel staat:
-   geen gastenlijst bij een tafel, en geen enkel spoor van wie er al ja zei. */
-async function kring(){
-  const [t,i,sm]=await Promise.all([api('tafels'),api('introducties'),api('samen')]);
-  UIT={ naam:'kring', kolommen:['soort','wat','wanneer','status'],
-    rijen:(t.tafels||[]).map(x=>['tafel',x.naam,(x.datum||'')+' '+(x.tijd||''),x.mijnStatus])
-      .concat((i.introducties||[]).map(x=>['introductie',x.codenaam,String(x.at||'').slice(0,10),x.geopend?'open':'in behandeling'])) };
-  let h='';
-
-  h+='<div class="kaart"><h2>Samen</h2>'
-    +(sm.samen?'<div>U bent samen met '+esc(sm.met)+'. Er komen geen introducties meer; uw uitnodigingen en de concierge blijven gewoon.</div>'
-      +'<div class="h-mt40"><button class="stilknop" id="losser">Dit klopt niet meer</button></div>'
-      :'<div class="note">Bent u samen met iemand die u hier heeft ontmoet? Dan zegt u dat allebei, en stoppen de introducties. U vindt de knop bij de match.</div>')
-    +'</div>';
-
-  h+='<div class="kaart"><h2>Uitnodigingen</h2>'+((t.tafels||[]).length
-    ? t.tafels.map(x=>'<div class="kand"><div class="nm">'+esc(x.naam)+'</div>'
-        +'<div class="note">'+esc([x.stad,x.datum,x.tijd].filter(Boolean).join(' \u00b7 '))+'</div>'
-        +(x.thema?'<div class="note">'+esc(x.thema)+'</div>':'')
-        +'<div class="note">'+x.plaatsen+' leden aan tafel. Wie er komen, hoort u aan tafel.</div>'
-        +(x.mijnStatus==='open'?'<div class="acts"><button class="knop stil" data-tafel="'+esc(x.id)+'" data-ja="0">Nee</button>'
-          +'<button class="knop hart" data-tafel="'+esc(x.id)+'" data-ja="1">Ik kom</button></div>'
-          :'<div class="note">U heeft '+(x.mijnStatus==='ja'?'toegezegd':'afgezegd')+'.</div>')
-        +'</div>').join('')
-    : '<div class="note">Geen uitnodigingen op dit moment.</div>')+'</div>';
-
-  h+='<div class="kaart"><h2>Voorgesteld worden</h2>'+((i.introducties||[]).length
-    ? i.introducties.map(x=>'<div class="kand"><div class="nm">'+esc(x.codenaam)+'</div>'
-        +'<div class="note">'+esc(x.aanleiding||'')+'</div>'
-        +(x.geopend?'<div class="samen">De introductie is open.</div>'
-          : x.ikAntwoordde===null
-            ? '<div class="acts"><button class="knop stil" data-intro="'+esc(x.id)+'" data-ja="0">Liever niet</button>'
-              +'<button class="knop hart" data-intro="'+esc(x.id)+'" data-ja="1">Graag</button></div>'
-            : '<div class="note">'+(x.ikAntwoordde?'U heeft ja gezegd. U hoort het als het wederzijds is.':'U heeft dit afgeslagen.')+'</div>')
-        +'</div>').join('')
-    : '<div class="note">Geen vragen die openstaan.</div>')+'</div>';
-
-  h+='<div class="kaart"><h2>Iemand ontmoet?</h2>'
-    +'<div class="note">Wissel geen nummers uit. Voer de pin in die u van elkaar kreeg &mdash; van beide kanten. Daarna krijgt u ieder afzonderlijk de vraag of u aan de ander voorgesteld wilt worden.</div>'
-    +'<span class="lbl">Pin</span><input class="veld" id="pin" placeholder="ABC-123">'
-    +'<div class="h-mt40"><button class="knop" id="pinOk">Ik heb deze persoon ontmoet</button></div></div>';
-
-  $('#main').innerHTML=h;
-  document.querySelectorAll('[data-tafel]').forEach(b=> b.onclick=async()=>{
-    try{ await api('tafel/antwoord',{id:b.dataset.tafel,ja:b.dataset.ja==='1'}); laad(); }catch(e){ meld(e.message); } });
-  document.querySelectorAll('[data-intro]').forEach(b=> b.onclick=async()=>{
-    try{ const r=await api('introductie/antwoord',{id:b.dataset.intro,ja:b.dataset.ja==='1'});
-      meld(r.geopend?'De introductie is open.':'Genoteerd.'); laad(); }catch(e){ meld(e.message); } });
-  $('#pinOk').onclick=async()=>{
-    try{ const r=await api('encounter',{pin:$('#pin').value});
-      meld(r.wacht?'Genoteerd. Zodra de ander uw pin ook invoert, krijgt u allebei de vraag.':'Genoteerd. U krijgt allebei de vraag.');
-      $('#pin').value=''; laad(); }catch(e){ meld(e.message); } };
-  const los=$('#losser'); if(los) los.onclick=async()=>{
-    try{ await api('samen/zet',{ja:false}); meld('Bijgewerkt.'); laad(); }catch(e){ meld(e.message); } };
-}
-
-async function matches(){
-  const d=await api('matches');
-  UIT={ naam:'matches', kolommen:['codenaam','gedeelde locaties','tegelijk ergens','voorstel','sinds'],
-    rijen:(d.matches||[]).map(m=>[m.codenaam||'', (m.gedeeldeLocaties||[]).join(', '),
-      (m.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', '),
-      m.voorstel||'', String(m.sinds||'').slice(0,10)]) };
-  if(!d.matches.length){ $('#main').innerHTML='<div class="leeg">Nog geen matches. Like iemand bij Ontdek; is het wederzijds, dan verschijnt de match hier.</div>'; return; }
-  let h=d.matches.map(m=>'<div class="kaart match"><div class="nm" style="font-family:Bodoni Moda,serif;font-size:1.15rem;">'+esc(m.codenaam)+'</div>'
-    +samenRegel(m.samen)
-    +(m.wanneer&&m.wanneer.samen?'<div class="samen">'+esc(m.wanneer.tekst)+'</div>':'')
-    +(m.gedeeldeLocaties.length?'<div class="note" style="color:var(--gold);">Gedeelde locaties: '+m.gedeeldeLocaties.map(esc).join(', ')+'</div>':((m.samen||[]).length?'':'<div class="note">Nog geen gedeelde locatie. Vul locaties aan bij Profiel.</div>'))
-    +'<div class="h-mt70"><button class="knop hart" data-date="'+m.id+'">Stel een jetset-date voor</button> <button class="stilknop" data-arrange="'+m.id+'">Arrange it</button>'
-    +' <button class="stilknop" data-samen="'+m.id+'">Wij zijn samen</button></div>'
-    +'<div class="datebox" id="date-'+m.id+'" style="display:none;"></div>'
-    +'<div id="arr-'+m.id+'"></div></div>').join('');
-  $('#main').innerHTML=h;
-  /* Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt.
-     Er staat bewust geen zaaknaam in het voorstel -- alleen de setting, de stad,
-     de dagen en het dagdeel. Welke zaak het wordt, doet een mens. */
-  function arrangeHtml(id, r){
-    const v=r.voorstel;
-    return '<div class="kaart"><div class="lbl">Voorstel</div><div>'+esc(v.tekst)+'</div>'
-      +'<div class="note">'+(v.bijRechterhand
-        ? 'U bent er allebei uit. De Rechterhand regelt de reservering en bevestigt bij u; er staat nog niets vast.'
-        : v.ikAkkoord ? 'U bent akkoord. Zodra de ander dat ook is, gaat het naar De Rechterhand.'
-        : 'Bekijk het en geef akkoord als het u schikt.')+'</div>'
-      +(v.bijRechterhand?'':'<div class="h-mt40">'+(r.settings||[]).map(x=>
-        '<button class="stilknop" data-setting="'+esc(id)+'" data-s="'+esc(x.id)+'"'+(x.id===v.setting?' disabled':'')+'>'+esc(x.label)+'</button>').join(' ')+'</div>')
-      +(v.bijRechterhand?'':'<div class="h-mt40"><button class="knop" data-akkoord="'+esc(id)+'" data-ja="'+(v.ikAkkoord?'0':'1')+'">'
-        +(v.ikAkkoord?'Akkoord intrekken':'Akkoord')+'</button></div>')
-      +'</div>';
+  function meld(tekst) {
+    const el = $('#melding'); el.textContent = tekst; el.style.opacity = '1';
+    clearTimeout(el._timer); el._timer = setTimeout(() => { el.style.opacity = '0'; }, 3200);
   }
-  async function toonArrange(id, extra){
-    const doel=$('#arr-'+id); doel.innerHTML='<div class="note">Rahul stelt samen\u2026</div>';
-    try{ const r=await api('arrange',Object.assign({id},extra||{})); doel.innerHTML=arrangeHtml(id,r); koppelArrange(); }
-    catch(e){ doel.innerHTML='<div class="note">'+esc(e.message)+'</div>'; }
+  async function api(pad, body) {
+    const r = await fetch('/api/member/rendezvous/' + pad, { method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+token}, body:JSON.stringify(body || {}) });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) { const fout = new Error(data.error || 'Er ging iets mis.'); fout.status = r.status; fout.code = data.code; throw fout; }
+    return data;
   }
-  function koppelArrange(){
-    document.querySelectorAll('[data-setting]').forEach(b=> b.onclick=()=> toonArrange(b.dataset.setting,{setting:b.dataset.s}));
-    document.querySelectorAll('[data-akkoord]').forEach(b=> b.onclick=async()=>{
-      try{ await api('akkoord',{id:b.dataset.akkoord,ja:b.dataset.ja==='1'}); toonArrange(b.dataset.akkoord); }
-      catch(e){ meld(e.message); } });
+  function tekenTabs() {
+    $('#tabs').innerHTML = tabs.map(([key,label]) => '<button type="button" role="tab" aria-selected="'+(tab===key)+'" data-tab="'+key+'">'+label+'</button>').join('');
+    document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; laad(); });
   }
-  document.querySelectorAll('[data-arrange]').forEach(b=> b.onclick=()=> toonArrange(b.dataset.arrange));
-  /* U zet alleen uw EIGEN helft. Pas als de ander hetzelfde doet, bestaat
-     "samen" -- zie de kop van kern/rendezvous-samen.js. */
-  document.querySelectorAll('[data-samen]').forEach(b=> b.onclick=async()=>{
-    try{ const r=await api('samen/zet',{met:b.dataset.samen});
-      meld(r.samen?'U bent allebei samen. De introducties stoppen.':'Genoteerd. Zodra de ander hetzelfde zegt, stoppen de introducties.');
-    }catch(e){ meld(e.message); } });
-  document.querySelectorAll('[data-date]').forEach(b=> b.onclick=async()=>{ const box=$('#date-'+b.dataset.date); box.style.display='block'; box.textContent='Rahul denkt na…'; try{ const r=await api('date',{id:b.dataset.date}); box.textContent=r.antwoord; }catch(e){ box.textContent=e.message; } });
-}
-laad();
+  function command(titel, detail) {
+    return '<section class="dating-command" aria-label="Veiligheidsstatus">'+
+      '<div class="dating-command-main"><span>Private introductions</span><strong>'+esc(titel)+'</strong></div>'+
+      '<div class="dating-command-cell" data-state="safe"><span>Identiteit</span><strong>18+ · geverifieerd</strong></div>'+
+      '<div class="dating-command-cell"><span>Privacy</span><strong>Alleen codenaam</strong></div>'+
+      '<div class="dating-command-cell"><span>Regie</span><strong>'+esc(detail || 'U beslist')+'</strong></div></section>';
+  }
+  function shell(werk, context, titel, detail) {
+    return command(titel, detail) + '<div class="dating-layout"><article class="dating-work">'+werk+'</article><aside class="dating-context" aria-label="Vertrouwen en uitleg">'+context+'</aside></div>';
+  }
+  const trust = (titel, tekst) => '<div><span class="dating-eyebrow">Uw privacy</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p></div><div><dl><div><dt>Profiel</dt><dd>Codenaam, nooit echte naam</dd></div><div><dt>Selectie</dt><dd>Besloten Lifestyle-pool</dd></div><div><dt>Actie</dt><dd>Niets zonder uw akkoord</dd></div></dl><a href="/apps/app.html">Beheer uw identiteit</a></div>';
+  function chips(items, shared) {
+    const samen = (shared || []).map(x => x.toLowerCase());
+    return (items || []).map(x => '<span class="dating-chip'+(samen.includes(String(x).toLowerCase())?' shared':'')+'">'+esc(x)+'</span>').join('');
+  }
+  function toonGate(fout) {
+    const inlog = !token || (fout && fout.status === 401);
+    const identiteit = fout && fout.code === 'IDENTITY_REQUIRED';
+    const leeftijd = fout && fout.code === 'AGE_REQUIRED';
+    const titel = inlog ? 'Open uw besloten ledenaccount' : identiteit ? 'Verifieer eerst uw identiteit' : leeftijd ? 'Alleen voor geverifieerde leden van 18+' : 'Lifestyle Pass vereist';
+    const tekst = fout && fout.message ? fout.message : 'Log eerst in via de leden-app om Rendez-vous te openen.';
+    const href = inlog || identiteit || leeftijd ? '/apps/app.html' : '/apps/lifestyle.html';
+    const knop = inlog ? 'Naar de leden-app' : identiteit ? 'Start identiteitscontrole' : leeftijd ? 'Terug naar de leden-app' : 'Bekijk de Lifestyle Pass';
+    $('#main').innerHTML = '<section class="dating-gate"><div class="dating-seal">R</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p><div class="dating-actions"><a class="dating-button primary" href="'+href+'">'+knop+'</a></div></section>';
+  }
+  function openSafety(id, naam) {
+    safetyTarget = { id, naam }; $('#safetyReason').value = '';
+    $('#safetyTitle').textContent = naam + ' blokkeren?'; $('#safetyDialog').showModal();
+  }
+  async function safety(report) {
+    if (!safetyTarget) return;
+    const reden = $('#safetyReason').value.trim();
+    if (report && !reden) { meld('Vul kort een reden in voor RTG.'); return; }
+    try {
+      await api('blokkeer', { id:safetyTarget.id, meld:report ? reden : '' });
+      $('#safetyDialog').close(); meld(report ? 'Geblokkeerd en veilig gemeld bij RTG.' : 'Geblokkeerd. Jullie zien elkaar niet meer.'); laad();
+    } catch (e) { meld(e.message); }
+  }
+  $('#blockOnly').addEventListener('click', e => { e.preventDefault(); safety(false); });
+  $('#blockReport').addEventListener('click', e => { e.preventDefault(); safety(true); });
+
+  /* Meenemen (shared/uitvoer.js): u neemt mee wat er op het tabblad staat, met
+     de velden los en iedereen op zijn CODENAAM -- echte namen kent deze app
+     niet. Het profieltabblad is een formulier, daar valt niets mee te nemen. */
+  if (window.RTGUitvoer) RTGUitvoer.bron(() => uitvoer && uitvoer.rijen.length ? uitvoer : null);
+
+  /* ---- Presence Graph-helpers uit de ONTMOETEN.md-ronde. Een venster in
+     gewone taal: "22--24 augustus", met beide maanden als het er twee zijn.
+     Grofmazig blijft grofmazig -- er is geen tijd om te tonen. ---- */
+  const MND = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  function venster(v) {
+    const a = String(v.van||'').split('-'), b = String(v.tot||'').split('-');
+    if (a.length !== 3 || b.length !== 3) return esc(v.van)+' t/m '+esc(v.tot);
+    const d1 = +a[2], m1 = +a[1]-1, d2 = +b[2], m2 = +b[1]-1;
+    return (a[0] === b[0] && m1 === m2) ? d1+'--'+d2+' '+MND[m2] : d1+' '+MND[m1]+' -- '+d2+' '+MND[m2];
+  }
+  const samenRegel = arr => (arr||[]).map(v =>
+    '<div class="dating-meta">U bent allebei in '+esc(v.stad)+', '+venster(v)+'.</div>').join('');
+
+  /* Een periode is een rij: stad, van, tot. Type "date" houdt de invoer
+     vanzelf op hele dagen -- er is geen veld waar een tijdstip in past. De rij
+     leent zijn raster inline, in het idioom van de premium-ronde: de gedeelde
+     laag kleedt velden en knoppen, maar dit scherm heeft geen eigen stijlblok
+     meer. */
+  function rijHtml(v) {
+    return '<div class="per" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:.5rem;align-items:end;margin-top:.6rem;">'
+      +'<div class="dating-field"><label>Stad</label><input class="dating-input" data-stad maxlength="40" value="'+esc(v.stad||'')+'" placeholder="Parijs" aria-label="Stad"></div>'
+      +'<div class="dating-field"><label>Van</label><input class="dating-input" data-van type="date" value="'+esc(v.van||'')+'" aria-label="Van welke dag"></div>'
+      +'<div class="dating-field"><label>Tot</label><input class="dating-input" data-tot type="date" value="'+esc(v.tot||'')+'" aria-label="Tot en met welke dag"></div>'
+      +'<button class="dating-button quiet" type="button" data-weg aria-label="Deze periode weghalen">Weg</button></div>';
+  }
+  /* Dezelfde eenentwintig hokjes als in Vonk, uit hetzelfde rooster van de
+     server (kern/beschikbaar.js). In de ONTMOETEN.md-ronde was dit een tabel;
+     de premium-laag kent geen tabelkleding, dus dezelfde vinkjes staan nu als
+     segmenten per dag -- zelfde data-slot-ids, zelfde bewaarknop. */
+  function roosterHtml(R, mijn) {
+    const aan = new Set(mijn || []);
+    return '<div class="dating-form-grid" style="margin-top:1rem">'+R.dagen.map(d =>
+      '<fieldset class="dating-fieldset"><legend class="dating-legend">'+esc(d.label)+'</legend><div class="dating-segments">'
+      +R.delen.map(pd => {
+        const s = R.slots.find(x => x.id === d.id+'-'+pd.id);
+        return '<label><input type="checkbox" data-slot="'+esc(s.id)+'"'+(aan.has(s.id)?' checked':'')+' aria-label="'+esc(s.label)+'"><span>'+esc(pd.label)+'</span></label>';
+      }).join('')+'</div></fieldset>').join('')+'</div>';
+  }
+  // elke periode-rij krijgt zijn eigen weghaalknop, ook een rij die net is bijgezet
+  function koppelRijen() {
+    document.querySelectorAll('#periodes [data-weg]').forEach(b => b.onclick = () => { b.closest('.per').remove(); });
+  }
+
+  async function profiel() {
+    const data = await api('profiel'); const p = data.profiel; locaties = [...(p.locaties || [])];
+    const buiten = (p.wensen || []).filter(x => !voorkeuren.some(v => v.toLowerCase() === String(x).toLowerCase()));
+    const checks = voorkeuren.map(v => '<label><input type="checkbox" data-pref="'+esc(v)+'"'+((p.wensen||[]).some(x=>String(x).toLowerCase()===v.toLowerCase())?' checked':'')+'><span>'+esc(v)+'</span></label>').join('');
+    let werk = '<div class="dating-visibility"><div><strong>Profielzichtbaarheid</strong><small>U verschijnt uitsluitend op codenaam in de besloten Lifestyle-selectie.</small></div><label class="dating-switch"><input type="checkbox" id="aan"'+(p.aan?' checked':'')+' aria-label="Profiel zichtbaar"><span></span></label></div>'+
+      '<div class="dating-section-head"><div><span class="dating-eyebrow">Uw signatuur</span><h2>Een profiel met intentie</h2></div><p>Kort, specifiek en oprecht werkt beter dan veel tekst.</p></div>'+
+      '<div class="dating-form-grid"><div class="dating-field wide"><label for="over">Over u</label><textarea class="dating-input" id="over" maxlength="600" placeholder="Wat typeert een avond of reis met u?">'+esc(p.over)+'</textarea></div>'+
+      '<div class="dating-field wide"><label for="zoekt">Wat u zoekt</label><input class="dating-input" id="zoekt" maxlength="300" value="'+esc(p.zoekt)+'" placeholder="Bijvoorbeeld: iemand met humor, nieuwsgierigheid en liefde voor kunst."></div>'+
+      '<fieldset class="dating-fieldset wide"><legend class="dating-legend">Interesses</legend><div class="dating-segments">'+checks+'</div><div class="dating-field" style="margin-top:.75rem"><label for="extraWensen">Aanvullend</label><input class="dating-input" id="extraWensen" value="'+esc(buiten.join(', '))+'" placeholder="Andere interesses, gescheiden met komma’s"><small class="dating-help">Maximaal twaalf; alleen gedeelde interesses worden benadrukt.</small></div></fieldset>'+
+      '<div class="dating-field wide"><label for="locInput">Plekken waar u openstaat voor een ontmoeting</label><div class="dating-message"><input class="dating-input" id="locInput" maxlength="40" placeholder="Bijvoorbeeld Ibiza of Gstaad"><button class="dating-button" type="button" id="addLoc">Plek toevoegen</button></div><div class="dating-chips" id="locaties"></div><small class="dating-help">Voeg alleen stad of regio toe, nooit een adres.</small></div></div>'+
+      '<div class="dating-actions"><button class="dating-button primary" type="button" id="bewaar">Profiel bewaren</button><span class="dating-save-status" id="saveStatus">Codenaam: '+esc(data.codenaam)+'</span></div>';
+
+    /* WAAR U BENT -- de Presence Graph uit de ONTMOETEN.md-ronde, in de vorm
+       van de premium-ronde. Alleen wat u zelf intikt: Rendez-vous leest uw
+       reizen niet mee, en een periode is een stad en dagen -- geen adres, geen
+       tijdstip. */
+    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Presence</span><h2>Waar u bent</h2></div><p>Andere leden zien hier niets van, behalve wanneer u tegelijk ergens bent. Uw woonplaats wordt nooit los getoond.</p></div>'+
+      '<div class="dating-form-grid"><div class="dating-field wide"><label for="thuis">Waar u woont</label><input class="dating-input" id="thuis" maxlength="40" value="'+esc(p.thuis||'')+'" placeholder="Amsterdam"></div></div>'+
+      '<fieldset class="dating-fieldset" style="margin-top:1rem"><legend class="dating-legend">Periodes dat u ergens anders bent</legend><div id="periodes">'+((p.aanwezig||[]).map(rijHtml).join(''))+'</div><div class="dating-actions" style="border-top:0;padding-top:0;margin-top:.7rem"><button class="dating-button" type="button" id="plus">Periode toevoegen</button></div></fieldset>'+
+      '<div class="dating-actions"><button class="dating-button primary" type="button" id="bewaarWaar">Bewaren</button><button class="dating-button quiet" type="button" id="wis">Alles wissen</button></div>';
+
+    /* WANNEER U KUNT -- het rooster in dagdelen uit de ONTMOETEN.md-ronde. */
+    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Ritme</span><h2>Wanneer u kunt</h2></div><p>Geen agenda, geen datum, geen tijdstip -- en niemand ziet uw vinkjes.</p></div>'+
+      '<p class="dating-copy">Kruis aan wanneer u meestal kunt. Bij een wederzijdse match krijgt u allebei één dagdeel te zien dat u beiden aankruiste.</p>'+
+      roosterHtml(data.rooster, p.beschikbaar)+
+      '<div class="dating-actions"><button class="dating-button primary" type="button" id="bewaarWanneer">Bewaren</button></div>';
+
+    $('#main').innerHTML = shell(werk, trust('Echte mensen, discrete gegevens','Uw identiteit is gecontroleerd, maar andere leden zien alleen uw codenaam en wat u hier zelf deelt.'), 'Uw besloten profiel', p.aan ? 'Zichtbaar' : 'Verborgen');
+    const renderLocs = () => { $('#locaties').innerHTML = locaties.map((x,i) => '<button type="button" class="dating-chip shared" data-remove-loc="'+i+'" aria-label="Verwijder '+esc(x)+'">'+esc(x)+' ×</button>').join(''); document.querySelectorAll('[data-remove-loc]').forEach(b => b.onclick=()=>{locaties.splice(Number(b.dataset.removeLoc),1);renderLocs();}); };
+    const addLoc = () => { const v=$('#locInput').value.trim(); if(!v)return; if(!locaties.some(x=>x.toLowerCase()===v.toLowerCase())&&locaties.length<12)locaties.push(v); $('#locInput').value='';renderLocs(); };
+    renderLocs(); $('#addLoc').onclick=addLoc; $('#locInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addLoc();}};
+    $('#bewaar').onclick = async () => {
+      const wensen = [...document.querySelectorAll('[data-pref]:checked')].map(x=>x.dataset.pref).concat($('#extraWensen').value.split(',').map(x=>x.trim()).filter(Boolean));
+      try { await api('profiel/zet',{aan:$('#aan').checked,over:$('#over').value,zoekt:$('#zoekt').value,wensen,locaties}); $('#saveStatus').textContent='Bewaard · '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); meld('Uw profiel is veilig bewaard.'); } catch(e){ meld(e.message); }
+    };
+    $('#aan').onchange = async () => { try { await api('profiel/zet',{aan:$('#aan').checked}); meld($('#aan').checked?'Uw profiel is nu zichtbaar op codenaam.':'Uw profiel is verborgen.'); } catch(e){ $('#aan').checked=!$('#aan').checked; meld(e.message); } };
+    /* De handlers van de Presence-kant, ongewijzigd uit de ONTMOETEN.md-ronde:
+       bewaren vervangt de lijst (zie kern/rendezvous-aanwezig.js), wissen is
+       één handeling over alles wat u over uw verblijfplaats opgaf. */
+    $('#plus').onclick = () => { $('#periodes').insertAdjacentHTML('beforeend', rijHtml({stad:'',van:'',tot:''})); koppelRijen(); };
+    koppelRijen();
+    $('#bewaarWaar').onclick = async () => {
+      const aanwezig = Array.from(document.querySelectorAll('#periodes .per')).map(r => ({
+        stad: r.querySelector('[data-stad]').value, van: r.querySelector('[data-van]').value, tot: r.querySelector('[data-tot]').value
+      })).filter(v => v.stad && v.van && v.tot);
+      try { await api('profiel/zet', { thuis: $('#thuis').value, aanwezig }); meld('Bewaard.'); laad(); } catch (e) { meld(e.message); }
+    };
+    $('#wis').onclick = async () => {
+      if (!confirm('Alles wissen wat u over uw verblijfplaats hebt opgegeven? Uw profiel en matches blijven.')) return;
+      try { await api('aanwezig/wis'); meld('Gewist.'); laad(); } catch (e) { meld(e.message); }
+    };
+    $('#bewaarWanneer').onclick = async () => {
+      const beschikbaar = Array.from(document.querySelectorAll('[data-slot]')).filter(c => c.checked).map(c => c.dataset.slot);
+      try { await api('profiel/zet', { beschikbaar }); meld('Bewaard.'); } catch (e) { meld(e.message); }
+    };
+  }
+
+  async function ontdek() {
+    const data = await api('kandidaten');
+    uitvoer = {naam:'kandidaten',kolommen:['codenaam','status','zoekt','locaties','gedeelde locaties','tegelijk ergens'],rijen:(data.kandidaten||[]).map(k=>[k.codenaam||'',k.status||'',k.zoekt||'',(k.locaties||[]).join(', '),(k.gedeeldeLocaties||[]).join(', '),(k.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', ')])};
+    let lijst = '';
+    if (!data.profielAan) lijst += '<div class="dating-date"><strong>Uw profiel is verborgen.</strong> Zet het bij Profiel aan om een like te kunnen geven en zelf gevonden te worden.</div>';
+    if (!data.kandidaten.length) lijst += '<div class="dating-empty"><strong>Uw selectie is voor nu compleet</strong><p>Rendez-vous blijft bewust eindig. Nieuwe passende Lifestyle-leden verschijnen zodra ze beschikbaar zijn.</p></div>';
+    else lijst += '<div class="dating-list">'+data.kandidaten.map(k => {
+      const match=k.status==='match', liked=k.status==='geliked';
+      return '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">'+(match?'Wederzijdse match':liked?'Uw interesse is genoteerd':k.likteMij?'Interesse in u':'Besloten introductie')+'</div><h3>'+esc(k.codenaam)+'</h3>'+
+        (k.zoekt?'<div class="dating-meta">Zoekt · '+esc(k.zoekt)+'</div>':'')+(k.over?'<p class="dating-bio">'+esc(k.over)+'</p>':'')+
+        samenRegel(k.samen)+  /* de Presence Graph: samen ergens zijn is een aanleiding, een gedeelde stad een toevalligheid */
+        '<div class="dating-chips">'+chips(k.locaties,k.gedeeldeLocaties)+'</div>'+(k.gedeeldeLocaties.length?'<div class="dating-meta">Gedeeld · '+k.gedeeldeLocaties.map(esc).join(', ')+'</div>':'')+'</div>'+
+        '<div class="dating-person-actions">'+(match?'<button class="dating-button primary" data-matches>Open match</button>':'<button class="dating-button wine" data-like="'+esc(k.id)+'">Interesse</button><button class="dating-button" data-pass="'+esc(k.id)+'">Voorbij</button>')+'<button class="dating-button quiet" data-safe="'+esc(k.id)+'" data-name="'+esc(k.codenaam)+'">Veiligheid</button></div></article>';
+    }).join('')+'</div>';
+    const werk='<div class="dating-section-head"><div><span class="dating-eyebrow">Een eindige selectie</span><h2>Ontdek op inhoud</h2></div><p>Geen score en geen oneindig vegen. U ziet alleen besloten profielen.</p></div>'+lijst;
+    $('#main').innerHTML=shell(werk,trust('Rust boven bereik','Een like wordt pas een verbinding wanneer de ander u ook kiest. Afwijzen blijft stil en privé.'),'Uw Lifestyle-selectie',data.kandidaten.length+' introducties');
+    document.querySelectorAll('[data-like]').forEach(b=>b.onclick=async()=>{try{const r=await api('like',{id:b.dataset.like});meld(r.match?'Het is wederzijds. Uw match staat klaar.':'Uw interesse is discreet genoteerd.');laad();}catch(e){meld(e.message);}});
+    document.querySelectorAll('[data-pass]').forEach(b=>b.onclick=async()=>{try{await api('pas',{id:b.dataset.pass});laad();}catch(e){meld(e.message);}});
+    document.querySelectorAll('[data-matches]').forEach(b=>b.onclick=()=>{tab='matches';laad();});
+    document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe,b.dataset.name));
+  }
+
+  async function matches() {
+    const data=await api('matches');
+    uitvoer={naam:'matches',kolommen:['codenaam','gedeelde locaties','tegelijk ergens','voorstel','sinds'],rijen:(data.matches||[]).map(m=>[m.codenaam||'',(m.gedeeldeLocaties||[]).join(', '),(m.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', '),m.voorstel||'',String(m.sinds||'').slice(0,10)])};
+    const lijst=!data.matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Wanneer jullie elkaar allebei kiezen, verschijnt de verbinding hier. Tot die tijd blijft elke interesse privé.</p></div>':'<div class="dating-list">'+data.matches.map(m=>'<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Wederzijdse match</div><h3>'+esc(m.codenaam)+'</h3><div class="dating-meta">'+(m.gedeeldeLocaties.length?'Gedeelde plekken · '+m.gedeeldeLocaties.map(esc).join(', '):'Nog geen gedeelde plek')+'</div>'+
+      samenRegel(m.samen)+  /* waar u tegelijk bent gaat voor op waar u allebei weleens komt */
+      (m.wanneer&&m.wanneer.samen?'<div class="dating-meta">'+esc(m.wanneer.tekst)+'</div>':'')+  /* het ene gedeelde dagdeel uit het rooster, pas ná de wederzijdse like */
+      '<div class="dating-date" id="date-'+esc(m.id)+'" hidden></div><div id="arr-'+esc(m.id)+'"></div></div>'+
+      '<div class="dating-person-actions"><button class="dating-button wine" data-date="'+esc(m.id)+'">Maak een voorstel</button><button class="dating-button" data-arrange="'+esc(m.id)+'">Arrange it</button><button class="dating-button" data-samen="'+esc(m.id)+'">Wij zijn samen</button><button class="dating-button quiet" data-safe="'+esc(m.id)+'" data-name="'+esc(m.codenaam)+'">Veiligheid</button></div></article>').join('')+'</div>';
+    const werk='<div class="dating-section-head"><div><span class="dating-eyebrow">Wederzijds gekozen</span><h2>Uw matches</h2></div><p>Rahul kan een idee voorbereiden. De Rechterhand regelt pas nadat u beiden akkoord bent.</p></div>'+lijst;
+    $('#main').innerHTML=shell(werk,trust('Voorstellen, nooit beloven','Rahul schetst een passende ontmoeting. Er wordt niets gereserveerd, verstuurd of betaald zonder menselijk akkoord.'),'Uw wederzijdse matches',data.matches.length+' actief');
+    /* Arrange It (ONTMOETEN.md-ronde): Rahul stelt samen, beiden keuren goed,
+       De Rechterhand regelt. Er staat bewust geen zaaknaam in het voorstel --
+       alleen de setting, de stad, de dagen en het dagdeel. Welke zaak het
+       wordt, doet een mens. */
+    function arrangeHtml(id, r) {
+      const v = r.voorstel;
+      return '<div class="dating-date"><strong>Voorstel</strong> · '+esc(v.tekst)
+        +'<div class="dating-help">'+(v.bijRechterhand
+          ? 'U bent er allebei uit. De Rechterhand regelt de reservering en bevestigt bij u; er staat nog niets vast.'
+          : v.ikAkkoord ? 'U bent akkoord. Zodra de ander dat ook is, gaat het naar De Rechterhand.'
+          : 'Bekijk het en geef akkoord als het u schikt.')+'</div>'
+        +(v.bijRechterhand ? '' : '<div class="dating-actions" style="border-top:0;padding-top:.7rem;margin-top:.4rem">'
+          +(r.settings||[]).map(x => '<button class="dating-button" type="button" data-setting="'+esc(id)+'" data-s="'+esc(x.id)+'"'+(x.id===v.setting?' disabled':'')+'>'+esc(x.label)+'</button>').join('')
+          +'<button class="dating-button primary" type="button" data-akkoord="'+esc(id)+'" data-ja="'+(v.ikAkkoord?'0':'1')+'">'+(v.ikAkkoord?'Akkoord intrekken':'Akkoord')+'</button></div>')
+        +'</div>';
+    }
+    async function toonArrange(id, extra) {
+      const doel = $('#arr-'+CSS.escape(id)); doel.innerHTML = '<div class="dating-meta">Rahul stelt samen…</div>';
+      try { const r = await api('arrange', Object.assign({ id }, extra || {})); doel.innerHTML = arrangeHtml(id, r); koppelArrange(); }
+      catch (e) { doel.innerHTML = '<div class="dating-meta">'+esc(e.message)+'</div>'; }
+    }
+    function koppelArrange() {
+      document.querySelectorAll('[data-setting]').forEach(b => b.onclick = () => toonArrange(b.dataset.setting, { setting: b.dataset.s }));
+      document.querySelectorAll('[data-akkoord]').forEach(b => b.onclick = async () => {
+        try { await api('akkoord', { id: b.dataset.akkoord, ja: b.dataset.ja === '1' }); toonArrange(b.dataset.akkoord); }
+        catch (e) { meld(e.message); } });
+    }
+    document.querySelectorAll('[data-arrange]').forEach(b => b.onclick = () => toonArrange(b.dataset.arrange));
+    /* U zet alleen uw EIGEN helft. Pas als de ander hetzelfde doet, bestaat
+       "samen" -- zie de kop van kern/rendezvous-samen.js. */
+    document.querySelectorAll('[data-samen]').forEach(b => b.onclick = async () => {
+      try { const r = await api('samen/zet', { met: b.dataset.samen });
+        meld(r.samen ? 'U bent allebei samen. De introducties stoppen.' : 'Genoteerd. Zodra de ander hetzelfde zegt, stoppen de introducties.');
+      } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-date]').forEach(b=>b.onclick=async()=>{const box=$('#date-'+CSS.escape(b.dataset.date));box.hidden=false;box.textContent='Rahul bereidt een discreet voorstel voor…';try{const r=await api('date',{id:b.dataset.date});box.textContent=r.antwoord;}catch(e){box.textContent=e.message;}});
+    document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe,b.dataset.name));
+  }
+
+  /* De kring (ONTMOETEN.md-ronde, in de vorm van de premium-ronde):
+     uitnodigingen, de vragen die openstaan, de pin voor een ontmoeting, en
+     Together. Wat hier NIET staat is net zo belangrijk als wat er wel staat:
+     geen gastenlijst bij een tafel, en geen enkel spoor van wie er al ja zei. */
+  async function kring() {
+    const [t, i, sm] = await Promise.all([api('tafels'), api('introducties'), api('samen')]);
+    uitvoer = { naam:'kring', kolommen:['soort','wat','wanneer','status'],
+      rijen:(t.tafels||[]).map(x=>['tafel',x.naam,(x.datum||'')+' '+(x.tijd||''),x.mijnStatus])
+        .concat((i.introducties||[]).map(x=>['introductie',x.codenaam,String(x.at||'').slice(0,10),x.geopend?'open':'in behandeling'])) };
+
+    let werk = '<div class="dating-section-head"><div><span class="dating-eyebrow">Together</span><h2>Samen</h2></div><p>Bent u samen, dan stoppen de introducties. Uw uitnodigingen en de concierge blijven gewoon.</p></div>'
+      +(sm.samen
+        ? '<p class="dating-copy">U bent samen met '+esc(sm.met)+'. Er komen geen introducties meer.</p><div class="dating-actions"><button class="dating-button" type="button" id="losser">Dit klopt niet meer</button></div>'
+        : '<p class="dating-copy">Bent u samen met iemand die u hier heeft ontmoet? Dan zegt u dat allebei, en stoppen de introducties. U vindt de knop bij de match.</p>');
+
+    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">The Table</span><h2>Uitnodigingen</h2></div><p>Wie er komen, hoort u aan tafel.</p></div>'
+      +((t.tafels||[]).length ? '<div class="dating-list">'+t.tafels.map(x =>
+        '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Tafel</div><h3>'+esc(x.naam)+'</h3>'
+        +'<div class="dating-meta">'+esc([x.stad,x.datum,x.tijd].filter(Boolean).join(' · '))+'</div>'
+        +(x.thema?'<p class="dating-bio">'+esc(x.thema)+'</p>':'')
+        +'<div class="dating-meta">'+x.plaatsen+' leden aan tafel.</div></div>'
+        +'<div class="dating-person-actions">'+(x.mijnStatus==='open'
+          ? '<button class="dating-button wine" data-tafel="'+esc(x.id)+'" data-ja="1">Ik kom</button><button class="dating-button" data-tafel="'+esc(x.id)+'" data-ja="0">Nee</button>'
+          : '<span class="dating-meta">U heeft '+(x.mijnStatus==='ja'?'toegezegd':'afgezegd')+'.</span>')+'</div></article>').join('')+'</div>'
+      : '<p class="dating-copy">Geen uitnodigingen op dit moment.</p>');
+
+    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Introducties</span><h2>Voorgesteld worden</h2></div><p>U hoort het pas als het wederzijds is. Een nee blijft stil.</p></div>'
+      +((i.introducties||[]).length ? '<div class="dating-list">'+i.introducties.map(x =>
+        '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Introductie</div><h3>'+esc(x.codenaam)+'</h3>'
+        +(x.aanleiding?'<p class="dating-bio">'+esc(x.aanleiding)+'</p>':'')
+        +(x.geopend?'<div class="dating-meta">De introductie is open.</div>':'')+'</div>'
+        +'<div class="dating-person-actions">'+(x.geopend ? '' : x.ikAntwoordde===null
+          ? '<button class="dating-button wine" data-intro="'+esc(x.id)+'" data-ja="1">Graag</button><button class="dating-button" data-intro="'+esc(x.id)+'" data-ja="0">Liever niet</button>'
+          : '<span class="dating-meta">'+(x.ikAntwoordde?'U heeft ja gezegd. U hoort het als het wederzijds is.':'U heeft dit afgeslagen.')+'</span>')+'</div></article>').join('')+'</div>'
+      : '<p class="dating-copy">Geen vragen die openstaan.</p>');
+
+    werk += '<div class="dating-section-head" style="margin-top:2.2rem"><div><span class="dating-eyebrow">Encounter</span><h2>Iemand ontmoet?</h2></div><p>Wissel geen nummers uit.</p></div>'
+      +'<p class="dating-copy">Voer de pin in die u van elkaar kreeg -- van beide kanten. Daarna krijgt u ieder afzonderlijk de vraag of u aan de ander voorgesteld wilt worden.</p>'
+      +'<div class="dating-field" style="margin-top:.9rem"><label for="pin">Pin</label><div class="dating-message"><input class="dating-input" id="pin" maxlength="12" placeholder="ABC-123"><button class="dating-button primary" type="button" id="pinOk">Ik heb deze persoon ontmoet</button></div></div>';
+
+    $('#main').innerHTML = shell(werk, trust('De kring is besloten','Een tafel toont nooit de gastenlijst en een introductie verklapt nooit wie er al ja zei. Alles blijft op codenaam.'), 'Uw kring', sm.samen ? 'Samen' : 'Open voor introducties');
+    document.querySelectorAll('[data-tafel]').forEach(b => b.onclick = async () => {
+      try { await api('tafel/antwoord', { id: b.dataset.tafel, ja: b.dataset.ja === '1' }); laad(); } catch (e) { meld(e.message); } });
+    document.querySelectorAll('[data-intro]').forEach(b => b.onclick = async () => {
+      try { const r = await api('introductie/antwoord', { id: b.dataset.intro, ja: b.dataset.ja === '1' });
+        meld(r.geopend ? 'De introductie is open.' : 'Genoteerd.'); laad(); } catch (e) { meld(e.message); } });
+    $('#pinOk').onclick = async () => {
+      try { const r = await api('encounter', { pin: $('#pin').value });
+        meld(r.wacht ? 'Genoteerd. Zodra de ander uw pin ook invoert, krijgt u allebei de vraag.' : 'Genoteerd. U krijgt allebei de vraag.');
+        $('#pin').value = ''; laad(); } catch (e) { meld(e.message); } };
+    const los = $('#losser'); if (los) los.onclick = async () => {
+      try { await api('samen/zet', { ja: false }); meld('Bijgewerkt.'); laad(); } catch (e) { meld(e.message); } };
+  }
+
+  async function laad() {
+    tekenTabs(); uitvoer=null;
+    if(!token){toonGate(new Error('Log eerst in via de leden-app.'));return;}
+    try { if(tab==='profiel')await profiel(); else if(tab==='ontdek')await ontdek(); else if(tab==='kring')await kring(); else await matches(); }
+    catch(e){ if(e.status===403||e.status===401)toonGate(e); else { $('#main').innerHTML='<div class="dating-empty"><strong>Rendez-vous kon niet laden</strong><p>'+esc(e.message)+'</p></div>'; meld(e.message); } }
+  }
+  laad();
+})();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

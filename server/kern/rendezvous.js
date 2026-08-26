@@ -30,9 +30,11 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   const lijstUit = (v, max, elk) => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => schoon(x, elk || 40)).filter(Boolean).slice(0, max || 12);
 
   function R() {
-    if (!db.data.rendezvous || typeof db.data.rendezvous !== 'object') db.data.rendezvous = { profielen: {}, likes: {}, passes: {} };
+    if (!db.data.rendezvous || typeof db.data.rendezvous !== 'object')
+      db.data.rendezvous = { profielen: {}, likes: {}, passes: {}, blokkades: {}, meldingen: [] };
     const r = db.data.rendezvous;
-    for (const v of ['profielen', 'likes', 'passes']) if (!r[v] || typeof r[v] !== 'object') r[v] = {};
+    for (const v of ['profielen', 'likes', 'passes', 'blokkades']) if (!r[v] || typeof r[v] !== 'object') r[v] = {};
+    if (!Array.isArray(r.meldingen)) r.meldingen = [];
     return r;
   }
   /* DE CODENAAM VAN EEN SLEUTEL. Hier stond `liveCodename(key)`, en dat is de
@@ -46,11 +48,17 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
      keyVanCodenaam -- zonder dat kon het kantoor een tafel niet op codenaam
      samenstellen. */
   const codenaam = key => (codenaamVan ? codenaamVan(key) : '') || 'Een lid';
+  /* Uit de dating-premium-ronde op main: een blokkade werkt in BEIDE richtingen,
+     wie u blokkeerde ziet u ook niet meer. */
+  const geblokkeerd = (r, a, b) => !!((r.blokkades[a] && r.blokkades[a][b]) || (r.blokkades[b] && r.blokkades[b][a]));
   // overlap van twee locatielijsten, hoofdletterongevoelig, met de oorspronkelijke schrijfwijze
   function gedeeld(a, b) {
     const bl = (b || []).map(x => x.toLowerCase());
     return (a || []).filter(x => bl.includes(x.toLowerCase()));
   }
+  const { rvKies, rvMeldingen } = require('./rendezvous-acties')({
+    R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd, mag
+  });
 
   function rvProfielGet(key) {
     const poort = mag(key);
@@ -90,7 +98,7 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
     const mij = r.profielen[key] || { locaties: [] };
     const uit = [];
     for (const t of Object.keys(mijn)) {
-      if (r.likes[t] && r.likes[t][key] && r.profielen[t]) {
+      if (!geblokkeerd(r, key, t) && r.likes[t] && r.likes[t][key] && r.profielen[t]) {
         const g = gedeeld(mij.locaties, r.profielen[t].locaties);
         const samen = AW.overlapTussen(mij, r.profielen[t]);
         // waar u tegelijk bent gaat voor op waar u allebei weleens komt
@@ -123,7 +131,7 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
 
   // Together: twee eenzijdige verklaringen, "samen" is de projectie erover
   const samen = require('./rendezvous-samen')({ R, mag, codenaam, nu, save });
-  const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu,
+  const ontdek = require('./rendezvous-ontdek')({ R, AW, B, mag, codenaam, gedeeld, save, notify, nu, geblokkeerd,
     partnerVan: samen.rvPartnerVan });
   // The Table, Moment en Encounter (een tweezijdige ja, twee momenten)
   const kring = require('./rendezvous-kring')({ R, mag, codenaam, schoon, nu, save, crypto, notify, handleVanPin });
@@ -131,7 +139,13 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   // Arrange It: Rahul stelt samen, beiden keuren goed, De Rechterhand regelt
   const arrange = require('./rendezvous-arrange')({ R, AW, B, mag, codenaam, schoon, nu, save,
     matchesVan, tableZet, notify });
+  /* rvKies en rvMeldingen komen uit de dating-premium-ronde (main): kiezen met
+     drie acties (like/pas/blokkeer) en de meldingen voor kantoor. De routelaag
+     stuurt like en pas daar al langs, dus rvLike/rvPas uit ontdek bestaan niet
+     meer -- twee mutatiepaden naar dezelfde like is precies de dubbeling die de
+     samenvoeging eerder in het reisscherm liet zien. */
   return { rvProfielGet, rvProfiel, ...ontdek, ...kring, rvMatches, rvDate, rvAanwezigWis,
+    rvKies, rvMeldingen,
     rvArrange: arrange.rvArrange, rvAkkoord: arrange.rvAkkoord,
     rvSamen: samen.rvSamen, rvSamenZet: samen.rvSamenZet };
 };

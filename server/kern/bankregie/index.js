@@ -147,6 +147,7 @@ function maakBankregie({ db, save }) {
     bankSpaarrenteBp: spaarrenteBp, bankRoodStandaard: roodLimietStandaard, bankIbanParams: ibanParams, bankTarief: tarief,
     bankVergunning: vergunning, bankPartnerRails: partnerRails,
     bankVergunningZet: verg.vergunningZet, bankPartnerRailZet: verg.partnerRailZet,
+    bankTerugstorting: verg.terugstorting, bankTerugstortingZet: verg.terugstortingZet,
     // de knop, nu via vier-ogen bij het opschalen
     bankModusZet: ({ modus: m, wie }) => aut.aanvraag({ actie: 'modus', modus: m, door: wie }),
     bankDraai: ({ wie } = {}) => aut.aanvraag({ actie: 'draai', door: wie }),

@@ -7763,6 +7763,62 @@
    "operator": "!==->===#0",
    "gezakt": 6,
    "geprobeerd": 6
+  },
+  "geldgrens.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 8,
+   "scherp": "gezakt"
+  },
+  "paybudget.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 8,
+   "scherp": "gezakt"
+  },
+  "payterug.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 12,
+   "scherp": "gezakt"
+  },
+  "payvooraf.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 5,
+   "scherp": "gezakt"
+  },
+  "terugstortstand.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 6,
+   "scherp": "gezakt"
+  },
+  "treasury.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 8,
+   "scherp": "gezakt"
+  },
+  "waarde.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 14,
+   "scherp": "gezakt"
+  },
+  "waardegraaf.test.js": {
+   "soort": "server",
+   "staat": "gezakt",
+   "operator": "liegpoort /api/",
+   "gezakt": 6,
+   "scherp": "gezakt"
   }
  }
 }

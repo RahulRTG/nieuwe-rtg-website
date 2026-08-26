@@ -109,3 +109,49 @@ test('de gewogen uitzonderingen leven nog allemaal', () => {
   }
   assert.ok(n >= 1, 'er hoort minstens een gewogen uitzondering te staan');
 });
+
+test('een bestand dat tijdens het meten verdwijnt, sloopt de Keuring niet', () => {
+  /* DIT IS EEN ECHTE STORING GEWEEST, en niet in de theorie.
+
+     test/meterijk.test.js zet een tijdelijk routebestand neer om te bewijzen dat
+     de metertjes werkelijk bewegen, en ruimt het daarna op. Dit bestand start
+     ondertussen scripts/keuring.js. De toetsen draaien met
+     --test-concurrency=4, dus die twee lopen tegelijk: het bestand stond nog in
+     de bestandslijst en was bij de stat al weg. De hele Keuring stierf met
+     ENOENT, en dus lag de CI rood om een bestand dat niemand miste.
+
+     Een kapotte symlink geeft precies dezelfde ENOENT op statSync als een
+     bestand dat net verdwenen is, maar dan bepaalbaar in plaats van op een
+     race. Zo is dit te toetsen zonder op timing te hopen.
+
+     IN EEN APART PROCES, om dezelfde reden als de dode-codeproef hierboven: de
+     Keuring bouwt haar bestandslijst een keer op bij het laden. Draaide dit in
+     dit proces, dan zou de lijst van voor de symlink zijn en stond de toets
+     groen zonder ook maar iets te bewijzen -- dat is bij het schrijven ervan
+     ook precies een keer gebeurd.
+
+     WAT HIER NIET WORDT GEDAAN: alle statfouten wegslikken. Een rechtenfout of
+     een stukke schijf hoort de Keuring wel om te gooien; dat is een storing die
+     je wilt zien, geen bestand dat er niet meer is. */
+  const kapot = path.join(WORTEL, 'server', 'kern', 'zz-keuringsproef-link.js');
+  try { fs.unlinkSync(kapot); } catch (e) {}
+  fs.symlinkSync('/bestaat/echt/niet', kapot);
+  try {
+    const uit = require('child_process').execFileSync(process.execPath,
+      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'keuring.js'), '--json'],
+      { cwd: WORTEL, maxBuffer: 1e9, encoding: 'utf8' });
+    const oordeel = JSON.parse(uit);
+    assert.ok(Array.isArray(oordeel.bevindingen),
+      'de Keuring velt gewoon een oordeel, ook met een onbereikbaar bestand in de lijst');
+    /* En ze is niet halverwege gestopt: de omvangmeting is PRECIES de lus die
+       op de kapotte symlink stuk ging, dus die moet zijn afgelopen. Hier stond
+       eerst een bewering over dekking.routes, en die zakte onder een volle
+       parallelle toetsronde -- niet omdat de Keuring omviel, maar omdat de
+       routekaart daarvoor een hele server start en die het onder die drukte niet
+       haalde. Dan meet je iets anders dan je denkt. */
+    assert.ok(oordeel.cijfers.uitschieters.bijnaTeGroot > 0,
+      'de omvanglus is afgelopen en heeft geteld: ' + JSON.stringify(oordeel.cijfers.uitschieters));
+  } finally {
+    try { fs.unlinkSync(kapot); } catch (e) {}
+  }
+});

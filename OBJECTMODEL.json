@@ -1,12 +1,12 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-25",
+  "vastgelegd": "2026-08-26",
   "gemeten": {
-    "bestanden": 1766,
-    "vormen": 1245,
-    "velden": 1804,
-    "modules": 660,
-    "domeinen": 235,
+    "bestanden": 1788,
+    "vormen": 1254,
+    "velden": 1807,
+    "modules": 667,
+    "domeinen": 236,
     "envelopDrempel": 15,
     "envelop": 31,
     "veldenDomeineigen": 1269,
@@ -72,6 +72,18 @@
       ]
     },
     {
+      "veld": "ok",
+      "domeinen": 14,
+      "waar": [
+        "kern/festival",
+        "kern/fiscaal",
+        "kern/foundationregistratie-register",
+        "kern/koppel",
+        "kern/leren",
+        "kern/mailaanname"
+      ]
+    },
+    {
       "veld": "type",
       "domeinen": 13,
       "waar": [
@@ -96,6 +108,18 @@
       ]
     },
     {
+      "veld": "doel",
+      "domeinen": 13,
+      "waar": [
+        "kern/appstore",
+        "kern/commercie",
+        "kern/defensie",
+        "kern/labfonds",
+        "kern/magnaat-trainingslobby",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "bedrag",
       "domeinen": 13,
       "waar": [
@@ -105,18 +129,6 @@
         "kern/koppel",
         "kern/labfonds",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "ok",
-      "domeinen": 13,
-      "waar": [
-        "kern/festival",
-        "kern/fiscaal",
-        "kern/foundationregistratie-register",
-        "kern/koppel",
-        "kern/leren",
-        "kern/mailaanname"
       ]
     },
     {
@@ -165,18 +177,6 @@
         "kern/klok",
         "kern/lidboard",
         "kern/pay"
-      ]
-    },
-    {
-      "veld": "doel",
-      "domeinen": 11,
-      "waar": [
-        "kern/appstore",
-        "kern/commercie",
-        "kern/defensie",
-        "kern/labfonds",
-        "kern/magnaat-trainingslobby",
-        "kern/rtfclubs"
       ]
     },
     {

@@ -40,6 +40,47 @@ module.exports = (ctx) => {
     return { ok: true, partnerRails: { ...d().partnerRails } };
   }
 
+  /* ---- DE TERUGSTORTSTAND: krijgen leden hun saldo terug, ja of nee? ----
 
-  return { vergunning, partnerRails, vergunningZet, partnerRailZet };
+     Dit is de enige schakelaar in dit huis die niet regelt wat RTG DOET maar
+     wat RTG JURIDISCH IS. Daarom staat hij hier, naast de vergunning, en niet
+     bij de gewone functieschakelaars.
+
+       gesloten  saldo is alleen binnen RTG te besteden en komt er niet uit. Een
+                 gesloten circuit met plafonds; RTG rekent dat tot een beperkt
+                 netwerk en houdt daarvoor geen vergunning aan.
+       open      een lid kan zijn saldo terugvragen. Dan is dat saldo tegen de
+                 nominale waarde inwisselbaar voor de houder, en dat IS
+                 elektronisch geld -- ongeacht hoe je het noemt.
+
+     De stand bepaalt dus de SOORT van het vermogen WALLET_SALDO in
+     kern/bevoegdheid/lijst.js: in `gesloten` een besluit met een grond, in
+     `open` een rail die over de eigen rails een e-geldvergunning vraagt. Dat is
+     geen twee dingen die toevallig samenhangen -- het is één werkelijkheid,
+     twee kanten. Zou de stand hier staan en de soort daar los meebewegen, dan
+     ontstaat precies de fout die dit hele traject heeft blootgelegd: een
+     document dat iets anders zegt dan de code doet.
+
+     WAAROM DIT EEN SCHAKELAAR MAG ZIJN EN DE VERGUNNING NIET. Een vergunning
+     kun je jezelf niet geven; die is afgegeven of niet, dus is het een
+     registratie. Terugstorten is wél een eigen keuze: RTG bepaalt zelf of het
+     die belofte aan leden doet. Wat er daarna juridisch geldt, bepaalt RTG
+     niet -- en juist daarom moet het omzetten van deze knop meteen de
+     bevoegdheidsvraag verzwaren in plaats van hem te omzeilen.
+
+     `open` is de standaard, want dat is wat er is besloten (24 augustus 2026)
+     en de lijst hoort te beschrijven wat er is en niet wat lichter uitkomt. */
+  const TERUGSTORTSTANDEN = ['gesloten', 'open'];
+  const terugstorting = () => (TERUGSTORTSTANDEN.includes(d().terugstorting) ? d().terugstorting : 'open');
+  function terugstortingZet({ stand, wie }) {
+    if (!TERUGSTORTSTANDEN.includes(stand))
+      return { status: 400, error: 'Kies ' + TERUGSTORTSTANDEN.join(' of ') + '.' };
+    d().terugstorting = stand; save();
+    return { ok: true, terugstorting: stand, wie: wie || 'boardroom',
+      uitleg: stand === 'open'
+        ? 'Leden kunnen hun saldo terugvragen. Daarmee is aangehouden saldo elektronisch geld: over de eigen rails vraagt dat een vergunning als elektronischgeldinstelling, en anders loopt het over een vergunninghoudende partner.'
+        : 'Saldo blijft binnen RTG en wordt niet terugbetaald aan leden. Daarmee is het een gesloten circuit met plafonds, en RTG rekent dat tot een beperkt netwerk.' };
+  }
+
+  return { vergunning, partnerRails, vergunningZet, partnerRailZet, terugstorting, terugstortingZet, TERUGSTORTSTANDEN };
 };

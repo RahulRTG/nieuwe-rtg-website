@@ -80,6 +80,47 @@ wat er bewust niet komt (een eigen chain, crypto eruit, een koers, tegoed dat
 verjaart ten gunste van RTG) en de drie besluiten die openstaan — waarvan de
 eerste, de bank-uitgang, vóór de leden-bank opengaat genomen moet worden en
 niet erna.
+**`WAARDE.md` is de laag onder het geld** — RTG Value: niet wat één lid met zijn
+geld doet (dat is GELD.md) maar wat waarde binnen RTG zélf is. De kern in één
+zin: elke euro, elk tegoed en elk budget weet wie het bezit, waarvoor het
+gebruikt mag worden, wie het mag verplaatsen en welk bewijs daarvoor bestaat.
+Lees die vóór je aan saldo, tegoeden, vouchers, budgetten of uitbetalen werkt.
+Zes waardeklassen met elk een **grond** (`kern/waarde/klassen.js`), drie
+beleidslagen van hard naar zacht (`kern/waarde/policy.js`), en één poort waar
+elke betaling langs gaat (`kern/pay/poort.js`). Twee manieren waarop geld
+vaststaat en ze zijn met opzet niet hetzelfde: een **reservering** is iemand
+anders die uw geld vasthoudt en die vervalt (`kern/waarde/reserve.js`), een
+**oormerk** is u die uw eigen geld apart zet en dat blijft
+(`kern/waarde/oormerk.js`). Verder: budgetten van een werkgever of gemeente als
+eigen positie, slim betalen uit meerdere potjes waarbij het meest beperkte potje
+eerst opgaat, een eigen geldgrens die wél weigert (`kern/geldbeleid/grens.js`),
+treasury voor ondernemers, een terugstorting naar de eigen bankrekening
+(`kern/pay/terug.js`), en een bewijsbord dat drie standen kent en géén groen
+(`kern/pay/bewijs.js`). Vier grenzen die niet mogen sneuvelen: er komt geen
+tweede boekhouding bij, **uitbetaalbaar hangt altijd aan een bevoegdheid en
+nooit aan een boolean** (elke uitbetaalbare klasse noemt haar
+`uitbetaalVermogen`), het plafond per wallet is een grond en geen instelling, en
+de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
+paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
+oplaadmoment — en dát is het echte voordeel.
+
+**Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
+is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
+schakelaar *ís* de juridische positie — geen twee dingen die toevallig
+samenhangen. `WALLET_SALDO` is daarom geen vaste soort maar **afhankelijk**, met
+twee uitgeschreven gezichten in `kern/bevoegdheid/lijst.js`:
+
+| Stand | `WALLET_SALDO` | `LID_UITBETALING` | Wat RTG dan is |
+|---|---|---|---|
+| `gesloten` | besluit, met grond | bestaat niet | beperkt netwerk, geen vergunning |
+| `open` (standaard) | rail, e-geldinstelling | rail, sepa | uitgever van elektronisch geld |
+
+Saldo dat tegen de nominale waarde inwisselbaar is voor de houder ís elektronisch
+geld; dat valt niet weg te schrijven. Bouw hier dus nooit een pad omheen dat de
+belofte aan leden verandert zonder dat de bevoegdheidsvraag meebeweegt — dan is
+de knop een manier om om de vergunningplicht heen te komen. Ontbreekt de stand,
+dan geldt per vermogen het strengste gezicht, en dat is niet voor allebei
+hetzelfde.
 
 **`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
 het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht

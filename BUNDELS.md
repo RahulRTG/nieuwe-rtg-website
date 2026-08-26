@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**58 bundels, 447 delen, 3 zonder onderwerp.**
+**58 bundels, 448 delen, 3 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -202,7 +202,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 110 delen, 9437 regels in de delen, waarvan 2 zonder onderwerp
+`public/apps/leverancier/` -- 111 delen, 9542 regels in de delen, waarvan 2 zonder onderwerp
 
 | deel | onderwerp |
 |---|---|
@@ -238,10 +238,11 @@ omlaag.
 | `leverancier-17.js` | de menukaart per station (keuken of bar) |
 | `leverancier-18.js` | de events van de zaak |
 | `leverancier-19.js` | de minibar-catalogus |
+| `leverancier-19b.js` | TREASURY: geld dat binnenkomt is niet hetzelfde als geld dat van u is |
 | `leverancier-20.js` | het tarief van de zaak |
-| `leverancier-20b.js` | Vakwerk Pro op het vandaag-bord: de functies waar vakbedrijven elders per maand voor betalen -- offertes, werkbonnen,... |
 | `leverancier-20c.js` | Vakwerk Pro, tweede laag: vaste afspraken, wachtlijst, beoordelingen en de team-capaciteit -- ook dit elders betaalde... |
 | `leverancier-21.js` | een prijs doorgeven aan RTG |
+| `leverancier-21b.js` | De handelingen van het treasury-bord (leverancier-19b.js): apart zetten, vrijgeven en de automatische regels |
 | `leverancier-22.js` | de instellingen van de zaak opslaan |
 | `leverancier-22a.js` | schakelaars van de zaak: elke functie aan of uit, direct doorgevoerd |
 | `leverancier-22b.js` | binds van het THUIS-KANTOOR (sectie 'thuis' in het Kantoor) |

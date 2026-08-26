@@ -5,7 +5,8 @@
    kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan, walletRuimte,
-    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
+    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde,
+    MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
 
   /* ---------- geld sturen en Klompjes ---------- */
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
@@ -138,11 +139,21 @@ module.exports = (ctx) => {
       tegen: (r.naar === rek ? r.van : r.naar).replace(/^lid:/, '').replace(/^partner:/, 'zaak ').replace(/^extern:oplaad$/, 'opgeladen').replace(/^extern:uitbetaald$/, 'bank')
     }));
     const v = verzoekenVoor(codenaam);
-    /* Het plafond gaat mee naar het scherm, want een grens die je pas raakt is
-       een grens die je niet kende: de wallet kan tonen hoeveel er nog bij kan
-       voordat het opladen weigert. Uitzonderingsgestuurd blijft het aan het
-       scherm (ONTWERP.md) -- hier staan de twee getallen, niet het oordeel. */
+    /* Saldo, gereserveerd en beschikbaar staan hier alle drie, en dat is geen
+       uitgebreidheid maar een noodzaak: zonder het tweede getal ziet een lid
+       saldo dat hij niet kan uitgeven en kan niemand hem uitleggen waarom. Een
+       zaak die een borg vastzet, moet zichtbaar zijn op het scherm van degene
+       bij wie hij vastzit. Zonder waardelaag zijn saldo en beschikbaar gewoon
+       hetzelfde getal en staat er geen reservering. */
+    const vast = waarde ? waarde.gereserveerd(rek) : 0;
+    /* En het PLAFOND staat er ook bij, want een grens die je pas raakt is een
+       grens die je niet kende: de wallet toont hoeveel er nog bij kan voordat
+       opladen weigert. Twee getallen, geen oordeel -- dat blijft aan het scherm
+       (ONTWERP.md, uitzonderingsgestuurd). */
     return { ok: true, codenaam, saldo: saldoVan(rek), plafond: walletMax(), ruimte: walletRuimte(codenaam),
+      gereserveerd: vast, beschikbaar: saldoVan(rek) - vast,
+      reserveringen: waarde ? waarde.reserveringen(rek).map(r => ({
+        id: r.id, centen: r.centen, doel: r.doel, tot: r.tot, door: r.ref })) : [],
       geschiedenis: rijen, aanMij: v.aanMij, vanMij: v.vanMij };
   }
 

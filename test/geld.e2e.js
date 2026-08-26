@@ -1,4 +1,4 @@
-/* Scherm-test voor RTG Geld als ECHTE app: tien standen in een schil
+/* Scherm-test voor RTG Geld als ECHTE app: elf standen in een schil
    (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd).
 
    Wat hier bewezen wordt:
@@ -23,7 +23,16 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
   body: JSON.stringify(body || {})
 })).json();
 
-const STANDEN = ['overzicht', 'wallet', 'bank', 'wbw', 'metier', 'balans',
+/* De standenbalk, in de volgorde waarin hij op het scherm staat. Deze lijst is
+   met opzet met de HAND bijgehouden en niet uit de app gelezen: een toets die
+   zijn verwachting bij het onderwerp ophaalt, keurt elke uitkomst goed. Komt er
+   een stand bij, dan hoort die hier ook bij te komen -- en dat is precies wat
+   deze toets afdwingt.
+
+   `waarde` staat achter `wallet` omdat dat de volgorde met betekenis is: de
+   wallet toont EEN saldo, de stand Waarde toont waarom dat getal alleen niet
+   meer genoeg is zodra er een werkgeversbudget of gemeentetegoed naast staat. */
+const STANDEN = ['overzicht', 'wallet', 'waarde', 'bank', 'wbw', 'metier', 'balans',
   'rtgcode', 'labfonds', 'mecenaat', 'logboek', 'nalatenschap'];
 const OUDE_PADEN = {
   '/apps/wallet.html': 'wallet', '/apps/bank.html': 'bank', '/apps/wbw.html': 'wbw',
@@ -32,7 +41,7 @@ const OUDE_PADEN = {
   '/apps/logboek.html': 'logboek', '/apps/nalatenschap.html': 'nalatenschap'
 };
 
-test('RTG Geld: tien standen openen, wisselen schoon, en de oude paden leiden om',
+test('RTG Geld: elf standen openen, wisselen schoon, en de oude paden leiden om',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldapp-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -63,7 +72,7 @@ test('RTG Geld: tien standen openen, wisselen schoon, en de oude paden leiden om
     const knoppen = await page.evaluate(() =>
       [...document.querySelectorAll('#standen button')].map((b) => b.dataset.id));
     assert.deepEqual(knoppen, STANDEN,
-      'de standenbalk hoort precies de tien standen plus het overzicht te dragen, in deze volgorde');
+      'de standenbalk hoort precies de elf standen plus het overzicht te dragen, in deze volgorde');
 
     /* Elke stand openen. "Iets tekenen" is hier de lat: een premium-stand op
        een RTG-pas toont de weigering van de server, en dat is ook iets -- een

@@ -469,10 +469,25 @@ function i18n() {
    dat er nieuwe overtreders bijkomen en moet daarvoor DEZELFDE grens kennen. */
 const { GRENS } = require('./lib/omvang');
 
+/* EEN BESTAND KAN TUSSEN LISTEN EN METEN VERDWIJNEN, en dan viel deze keuring
+   om met een ENOENT in plaats van een oordeel te vellen.
+
+   Dat is geen theorie. test/meterijk.test.js zet een tijdelijk routebestand neer
+   om te bewijzen dat de metertjes echt bewegen, en gooit het daarna weg.
+   test/keuring.test.js start ondertussen dit script. Draaien die twee tegelijk
+   -- en dat doen ze, de toetsen lopen met --test-concurrency=4 -- dan staat het
+   bestand nog in de lijst en is het bij de stat al weg. De hele keuring stierf
+   dan aan een bestand dat niemand mist.
+
+   Alleen ENOENT wordt overgeslagen, en met opzet niets anders: een rechtenfout
+   of een stukke schijf hoort wél hard te vallen. Een verdwenen bestand heeft
+   geen omvang, dus er valt ook niets over te melden. */
 function uitschieters() {
   let bijna = 0, teGroot = 0;
   for (const p of serverJs) {
-    const b = fs.statSync(p).size;
+    let b;
+    try { b = fs.statSync(p).size; }
+    catch (e) { if (e && e.code === 'ENOENT') continue; throw e; }
     if (b > GRENS) {
       teGroot++;
       meld('scheef', 'omvang', 'Dit bestand is met ' + b + ' bytes over de grens van ' + GRENS + '.', kort(p),

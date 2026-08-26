@@ -28,25 +28,25 @@
    het tegoed dat een lid voor een ander koopt in ./tegoed, en het afrekenen
    met een zaak in ./zaakbetaling. */
 
-module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
-  const nu = () => Date.now();
-  const d = () => db.data;
-  /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zeven
+module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde, accounts }) => {
+  /* DE TIJD VAN DE HELE PAYLAAG, uit de huisklok en niet uit het
+     besturingssysteem. Elk deelbestand hieronder leest `nu` uit deze ctx, dus
+     deze ene regel bepaalt of vervaldatums, aflopende reserveringen, de
+     wachttijd op een gewijzigd IBAN en dag- en maandgrenzen met RTG_KLOK
+     meebewegen. Stond hier Date.now(), dan zaten de deelbestanden formeel op
+     een gedeelde klok en in werkelijkheid nog steeds aan het OS -- de teller
+     tevreden, de tijdmachine niet. Zonder RTG_KLOK geeft klok.nu() exact
+     Date.now(); in productie weigert een verzette klok bij het laden. */
+  const nu = require('../../lib/klok').nu;
+  /* De opslagvorm -- de vijf bakken in db.data en de vier naamregels ('lid:',
+     'partner:', het saldo van een rekening, een nieuw id) -- staat in ./bakken.js. */
+  const { d, saldi, grootboek, klompjes, kascodes, tikcodes, rekLid, rekPartner, saldoVan, id } =
+    require('./bakken')({ db, crypto });
+  /* De stand van deze laag -- de drie schakelaars uit de omgeving en de zes
      bedragen -- staat in ./stand.js. Een keer bepaald bij het opstarten, en
      daarna onveranderlijk; alles hieronder werkt per boeking. */
   const { betalingenUit, uitFout, schaduw, motorklant, geldModus,
     MIN_CENTEN, MAX_CENTEN, WALLET_MAX, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
-
-  function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
-  function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
-  function klompjes() { if (!Array.isArray(d().payVerzoeken)) d().payVerzoeken = []; return d().payVerzoeken; }
-  function kascodes() { if (!Array.isArray(d().payCodes)) d().payCodes = []; return d().payCodes; }
-  function tikcodes() { if (!Array.isArray(d().payTikCodes)) d().payTikCodes = []; return d().payTikCodes; }
-
-  const rekLid = c => 'lid:' + c;
-  const rekPartner = c => 'partner:' + c;
-  const saldoVan = rek => Math.round(saldi()[rek] || 0);
-  const id = p => (p || 'P') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
   /* Idempotentie die een herstart overleeft: dezelfde knop twee keer indrukken
      (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
@@ -60,64 +60,25 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      EEN bundel (zie lib/idem.js); deze vlag maakt die bundel ook duurzaam. */
   const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen, duurzaam: true });
 
-  /* ---------- het grootboek zelf ----------
-     `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek
-     (geen guard meer). Gedeeld door de JS-guard (boek, schaduw-modus) en door de
-     motor-spiegel (boekAsync, motor-modus past de door de motor bevestigde regel
-     toe). */
-  function pasToe(rij) {
-    saldi()[rij.van] = saldoVan(rij.van) - rij.centen;
-    saldi()[rij.naar] = saldoVan(rij.naar) + rij.centen;
-    grootboek().unshift(rij);
-    if (grootboek().length > 50000) grootboek().pop(); // weergavecap; de saldi blijven de waarheid
-    save();
-  }
-  /* Het plafond per wallet -- de tweede helft van de voorwaarde waarop
-     kern/bevoegdheid/lijst.js het walletsaldo toestaat -- staat in ./plafond.js,
-     inclusief waar het bedrag vandaan komt en waarom hij vóór de motor valt. */
+  /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
+     saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
+     Optioneel: zonder `waarde` is dit exact de regel die hier altijd stond. */
+  const waardePoort = require('./poort')({ saldoVan, grootboek, waarde, nu });
+  /* Het walletplafond blijft bedraad: main verplaatste die toets naar de
+     waardepoort, maar onze ./opladen.js roept plafondFout nog rechtstreeks aan
+     en ./verzoeken.js toont ruimte en plafond. Zonder deze regel staan die namen
+     wel in de ctx en zijn ze undefined -- geen laadfout, wel een uitzondering bij
+     de eerste oplaadpoging. Twee poorten die hetzelfde weigeren is veilig. */
   const { plafondFout, walletRuimte, koppelPlafond, walletMax } =
     require('./plafond')({ saldoVan, rekLid, standaard: WALLET_MAX });
+  /* DE SCHRIJFWEG van het grootboek -- pasToe, boek en boekAsync -- staat in
+     ./boeking.js. Dat is een ander onderwerp dan dit bestand: wie daar iets
+     verandert, verandert wat er met GELD gebeurt; wie hier iets verandert,
+     verandert welke ONDERDELEN aan elkaar hangen. */
+  const { pasToe, boek, boekAsync } = require('./boeking')({
+    saldi, saldoVan, grootboek, save, id, schoon, nu, waardePoort,
+    betalingenUit, uitFout, geldModus, motorklant, schaduw, MIN_CENTEN, MAX_CENTEN });
 
-  // De synchrone JS-guard. In motor-modus mag dit NIET: dan is de motor de
-  // autoriteit en moet alles via boekAsync. Fail-closed (luid), nooit stil een
-  // tweede grootboek naast de motor bijhouden (dat zou split-brain zijn).
-  function boek({ van, naar, centen, soort, oms, ref }) {
-    if (betalingenUit) return uitFout();
-    if (geldModus === 'motor') {
-      const bron = (new Error().stack || '').split('\n')[2] || '';
-      throw new Error('pay.boek (synchroon) is niet toegestaan in RTG_MOTOR_GELD=motor; gebruik boekAsync.' + bron);
-    }
-    const c = Math.round(Number(centen));
-    if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
-    if (!van || !naar || van === naar) return { status: 400, error: 'Van en naar kloppen niet.' };
-    if (!van.startsWith('extern:') && saldoVan(van) < c) return { status: 402, error: 'Onvoldoende saldo.' };
-    const vol = plafondFout(naar, c);
-    if (vol) return vol;
-    const rij = { id: id('PB'), van, naar, centen: c, soort: soort || 'boeking', oms: schoon(oms, 120), ref: ref || null, at: nu() };
-    pasToe(rij);
-    schaduw.spiegel(rij); // schaduw-modus: naar de Rust-motor (no-op als uit)
-    return { ok: true, boeking: rij };
-  }
-  /* De async boeking: het EEN choke-point voor de cutover. In schaduw-modus is
-     dit exact de sync-guard (gewoon awaitbaar gemaakt) -- geen gedragsverandering.
-     In motor-modus gaat de boeking geguard naar de motor (de autoriteit); pas als
-     die hem bevestigt, spiegelt de JS-engine dezelfde regel. Weigert de motor
-     (onvoldoende saldo) of is hij onbereikbaar, dan verandert er NIETS aan de
-     JS-saldi -- de fout gaat netjes terug naar de caller. */
-  async function boekAsync({ van, naar, centen, soort, oms, ref }) {
-    if (betalingenUit) return uitFout();
-    if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref });
-    // Het walletplafond valt VOOR de motor; zie de reden bij plafondFout.
-    const vol = plafondFout(naar, Math.round(Number(centen)));
-    if (vol) return vol;
-    const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref });
-    if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
-    // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
-    const b = r.boeking;
-    const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
-    pasToe(rij);
-    return { ok: true, boeking: rij };
-  }
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */
@@ -138,30 +99,45 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   const ctx = {
     db, save, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, kascodes, tikcodes,
-    rekLid, rekPartner, saldoVan, walletRuimte, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
-    betaaldienstKosten: betaaldienstKosten || (() => 0),
+    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
+    betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX,
-    walletMax
+    walletMax, walletRuimte, koppelPlafond
   };
   /* rekLid hoort bij het koppelvlak: de vorm 'lid:' + codenaam is een regel
      van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
      hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
      op dag een al drie keer bijna fout gegaan. */
-  /* KASCODE_MS staat erbij omdat de capability eromheen (./kassacode.js) exact
-     dezelfde termijn moet aanhouden; een tweede getal is een tweede waarheid. */
-  /* De motorzekering en de schaduwstand: ./statusbord.js (alleen voor het bord). */
-  const { motorZekering, schaduwMetAfdruk } = require('./statusbord')({ motorklant, schaduw, sluitcontrole, saldi });
-  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, WALLET_MAX, walletMax, koppelPlafond, walletRuimte, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor, motorZekering };
-  api.schaduw = schaduwMetAfdruk;   // de drift-detector; zie ./statusbord.js
-  Object.assign(api, require('./verzoeken')(ctx));
-  Object.assign(api, require('./kassa')(ctx));
-  Object.assign(api, require('./tegoed')(ctx));
-  Object.assign(api, require('./zaakbetaling')(ctx));
-  /* De verkoop met inhoudingen (./verkoop.js): een lid koopt van een partner en
-     wat er af moet -- btw, een afdracht -- volgt als eigen regel in hetzelfde
-     grootboek. Staat na ./kassa omdat het hetzelfde patroon is, en apart omdat
-     de teruggang erin zit en kassa.js daar met opzet anders mee omgaat. */
-  Object.assign(api, require('./verkoop')(ctx));
+  /* KASCODE_* staat OP DE API en niet alleen in de ctx: ./kassacode.js leest
+     pay.KASCODE_MS voor zijn eigen ttl. Main kent dat bestand niet, dus was het
+     undefined en weigerde de linklaag bij het opstarten. */
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
+  api.schaduw = schaduwStand;
+  // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
+  if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);
+  // late binding voor de eigen geldgrens van het lid (kern/geldbeleid, na pay gemount)
+  api.koppelGrens = waardePoort.koppelGrens;
+  /* koppelPlafond blijft geexporteerd: kernlaag4b.js roept hem aan zodra
+     bankregie zijn grenzen kent, en zonder export viel het opstarten om.
+     koppelGrens is de uitgaafgrens, koppelPlafond het maximum dat er STAAT. */
+  api.koppelPlafond = koppelPlafond;
+  /* De deelbestanden. ./samen en ./treasury gaan EERST in de ctx: kassa en
+     vooraf betalen erlangs (een betaling kan sinds er budgetten bestaan uit
+     meerdere potjes komen) en zetten via ./treasury meteen apart. ./vooraf
+     staat naast ./kassa en niet erin: kassa kent EEN afrekenmoment, vooraf
+     kent er twee met tijd ertussen.
+
+     ./verkoop staat NA ./kassa en dat is de volgorde van main: een lid koopt
+     van een partner en wat eraf moet -- btw, een afdracht -- volgt als eigen
+     regel in hetzelfde grootboek. Apart van kassa omdat de teruggang erin zit
+     en kassa.js daar met opzet anders mee omgaat. */
+  // in de CTX: waar de rest op leunt. Op de API: wat naar buiten gaat.
+  for (const naam of ['samen', 'treasury']) Object.assign(ctx, require('./' + naam)(ctx));
+  /* 'tegoed' en 'zaakbetaling' staan erbij omdat main ze niet bedraadt: die
+     bestanden zijn van deze tak. Zonder deze regel bestaan ze wel en geven hun
+     routes 404 -- de stilste manier om een functie kwijt te raken. */
+  for (const naam of ['verzoeken', 'kassa', 'tegoed', 'zaakbetaling', 'verkoop', 'vooraf', 'budget', 'graaf', 'bewijs', 'terug']) Object.assign(api, require('./' + naam)(ctx));
+  for (const k of ['treasuryBeleid', 'treasuryZet', 'treasuryStand', 'treasuryVrij', 'treasuryApart']) api[k] = ctx[k];
   return { pay: api };
 };

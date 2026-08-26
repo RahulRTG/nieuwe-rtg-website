@@ -81,6 +81,35 @@ module.exports = [
      dat was hij niet: de boardroom kon de sepa-rail uitzetten, waarna de bank
      stopte met overboeken terwijl partners gewoon doorbetaald werden. Een rail
      die half uit staat is geen rail die uit staat. */
+  /* DE TERUGSTORTING. Een eigen regel en niet onder 'dom-pay-wallet', want het
+     is een ander vermogen: saldo AANHOUDEN (WALLET_SALDO, de rekeningen-rail)
+     en saldo TERUGBETALEN (LID_UITBETALING, de sepa-rail) horen apart te kunnen
+     sluiten. Valt de uitbetaalrail weg, dan hoort de wallet gewoon te blijven
+     werken -- betalen binnen RTG heeft er niets mee te maken.
+
+     `/rekening` staat erbij: dat verplaatst geen geld, maar het zet wel de
+     bestemming klaar. Een bestemming kunnen wijzigen terwijl er niets heen kan,
+     is een knop die belooft wat hij niet waarmaakt.
+
+     `/terugstand` staat er BEWUST NIET BIJ, en dat is geen weglating. Dat is de
+     route die uitlegt WAAROM het niet kan -- met de blokkades en hun reden erin.
+     Hangt hij aan hetzelfde vermogen, dan geeft hij een kale 503 zodra de
+     terugstorting dichtstaat, en dan kan een lid niet eens meer zien dat het een
+     keuze van RTG is en geen storing. Een deur mag op slot; het bordje ernaast
+     hoort leesbaar te blijven. */
+  { id: 'dom-pay-terug', categorie: 'Geld', naam: 'Saldo terugstorten naar het lid', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Het eigen walletsaldo terugstorten naar de eigen bankrekening.',
+    paden: ['/api/pay/terug', '/api/pay/rekening'],
+    vermogen: 'LID_UITBETALING' },
+  /* De pre-autorisatie hangt aan WALLET_SALDO en niet aan de kassa-schakelaar:
+     wat hier gebeurt is dat een deel van het WALLETSALDO VAN EEN LID wordt
+     vastgezet. Valt de grond onder dat besluit weg, dan hoort dit mee te
+     vallen -- vastzetten is dan net zo goed klantgeld aanhouden als saldo
+     aanhouden, alleen met een zaak die erop wacht. */
+  { id: 'dom-pay-vooraf', categorie: 'Geld', naam: 'Vooraf vastzetten aan de kassa', standaard: true, doelgroepen: ['leverancier'],
+    uitleg: 'Een zaak zet een maximum vast op de code van een lid (borg, open rekening, ritprijs) en legt later het werkelijke bedrag vast.',
+    paden: ['/api/supplier/pay/vooraf', '/api/supplier/pay/vastleg', '/api/supplier/pay/vrijgeef'],
+    vermogen: 'WALLET_SALDO' },
   { id: 'dom-partner-uitbetaling', categorie: 'Geld', naam: 'Partnersaldo uitbetalen', standaard: true, doelgroepen: ['leverancier'],
     uitleg: 'Het RTG Pay-saldo van een zaak naar zijn bankrekening sturen.', paden: ['/api/supplier/pay/uitbetaal'],
     vermogen: 'PARTNER_UITBETALING' }

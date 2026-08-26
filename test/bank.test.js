@@ -661,13 +661,23 @@ test('in de hybride stand telt de eigen rail, niet de partner die er ook nog is'
    geld, dezelfde partner, dezelfde naad, en toch maar een van de twee dicht.
    Dat is het soort halve maatregel waar een noodstop op stukloopt.
 
-   Meteen ook de vierde soort in de lijst: een BESLUIT. Het walletsaldo staat
-   niet open omdat er een vergunning ligt en niet omdat een partner het doet,
-   maar omdat RTG heeft vastgesteld dat een gesloten circuit met plafonds
-   erbuiten valt. Dat mag, maar dan hoort het opgeschreven te staan waar iemand
-   het kan tegenspreken -- en niet te ontbreken, want ontbreken lijkt op "er is
-   over nagedacht". */
-test('de partnerrail geldt voor iedereen die eraan hangt, en een besluit staat opgeschreven', async () => {
+   HIER STOND EEN TWEEDE BEWERING, EN DIE IS OP 24 AUGUSTUS 2026 VERVALLEN. Het
+   walletsaldo was een BESLUIT: niet open omdat er een vergunning lag of een
+   partner het deed, maar omdat RTG had vastgesteld dat een gesloten circuit met
+   plafonds buiten de vergunningplicht viel. Deze toets bewaakte dat die grond
+   opgeschreven stond waar iemand hem kon tegenspreken.
+
+   Sinds leden hun saldo kunnen terugstorten, is het circuit niet gesloten meer
+   en is de grond vervallen -- saldo dat inwisselbaar is tegen de nominale
+   waarde is elektronisch geld. Het besluit droeg zijn eigen vervalclausule en
+   die is ingegaan: WALLET_SALDO is van soort gewisseld naar een rail.
+
+   Een toets die een vervallen regel blijft bewaken is erger dan geen toets: hij
+   blokkeert de verandering die wél is besloten en zegt de reden er niet bij.
+   Wat ervoor in de plaats komt bewaakt hetzelfde principe op de nieuwe stand --
+   dezelfde rail sluit ALLE deuren die eraan hangen, en dat zijn er nu drie:
+   de bank-SEPA, de partneruitbetaling en de terugstorting aan het lid. */
+test('de partnerrail geldt voor iedereen die eraan hangt, inclusief de terugstorting', async () => {
   /* De manager van een zaak, want uitbetalen is managerwerk (test/pay.test.js
      legt die deur vast). Zonder managerrol krijgen we een 403 en toetsen we de
      verkeerde grendel. */
@@ -689,14 +699,25 @@ test('de partnerrail geldt voor iedereen die eraan hangt, en een besluit staat o
   const bankUit = await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'rail-uit' }, lid.token);
   assert.equal(bankUit.status, 503, 'en de bank-SEPA ook, want het is dezelfde rail');
 
-  // de matrix laat het besluit zien met zijn grond, niet als kaal vinkje
+  /* DE DERDE DEUR AAN DEZELFDE RAIL: de terugstorting aan het lid. Dit is de
+     reden dat deze toets is herschreven in plaats van geschrapt -- er is een
+     uitweg bijgekomen en die hoort net zo hard dicht te gaan. */
+  const terug = await api('pay/terug', { centen: 500, idem: 'rail-terug' }, lid.token);
+  assert.equal(terug.status, 503, 'de terugstorting hangt aan dezelfde rail');
+
+  /* De matrix laat zien dat WALLET_SALDO geen besluit meer is maar een rail met
+     een vergunning erachter. Het aanhouden van saldo hangt aan de
+     REKENINGEN-rail en niet aan sepa: bij een storing op de uitbetaalrail hoort
+     de wallet niet mee te vallen, en dat verschil is hier na te rekenen. */
   const m = await oapi('bank/bevoegdheid', {}, 'RTG');
   const wallet = m.body.regels.find(r => r.id === 'WALLET_SALDO');
-  assert.equal(wallet.mag, true);
-  assert.equal(wallet.soort, 'besluit', 'geen software en geen vergunning: een besluit');
-  assert.match(wallet.besluit, /gesloten circuit/, 'met de grond erbij');
-  assert.match(wallet.besluit, /vervalt de grond/, 'en met wanneer die grond vervalt');
-  // en het walletsaldo zelf blijft gewoon werken -- een besluit sluit niets
+  assert.equal(wallet.soort, 'rail', 'geen besluit meer: klantgeld aanhouden dat inwisselbaar is, is elektronisch geld');
+  assert.equal(wallet.mag, true, 'en hij staat open, want de rekeningen-rail draait gewoon');
+  const uitbetaling = m.body.regels.find(r => r.id === 'LID_UITBETALING');
+  assert.ok(uitbetaling, 'de terugstorting staat als eigen vermogen in de lijst');
+  assert.equal(uitbetaling.mag, false, 'en die is dicht, want sepa staat uit');
+
+  // het walletsaldo zelf blijft gewoon werken: een dichte uitbetaalrail is geen dichte wallet
   assert.equal((await api('pay/overzicht', {}, lid.token)).status, 200);
 
   assert.equal((await oapi('bank/partnerrail', { rail: 'sepa', aan: true }, 'RTG')).status, 200, 'rail weer aan');

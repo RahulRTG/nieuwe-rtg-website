@@ -84,7 +84,16 @@ module.exports = (ctx) => {
   }
   async function partnerUitbetaal({ supplierCode, idem }) {
     const rek = rekPartner(supplierCode);
-    if (saldoVan(rek) <= 0) return { status: 400, error: 'Er staat niets om uit te betalen.' };
+    /* BESCHIKBAAR EN NIET HET SALDO, en dat is geld-veiligheid en geen detail.
+       Wat de zaak zelf apart heeft gezet voor de btw of de loonrun
+       (kern/pay/treasury.js) hoort niet mee de deur uit, en een borg die zij bij
+       een lid heeft vastgezet evenmin. Stond hier het kale saldo, dan nam de
+       eerstvolgende uitbetaling de btw-reservering gewoon mee -- en dan is die
+       reservering decoratie. Overgenomen uit main bij de samenvoeging van
+       26 augustus 2026; zonder waardelaag is dit exact het oude getal. */
+    const nuVrij = ctx.waarde ? ctx.waarde.beschikbaar(rek, saldoVan(rek)) : saldoVan(rek);
+    if (nuVrij <= 0) return { status: 400, error: 'Er staat niets beschikbaars om uit te betalen.',
+      saldo: saldoVan(rek), beschikbaar: nuVrij };
     /* Een uitbetaling heeft geen parameters buiten de partner zelf (het gaat
        altijd om het saldo), dus de afdruk is de partner. Het bedrag bewust NIET
        meenemen: dat verschilt legitiem per moment. */
@@ -102,8 +111,10 @@ module.exports = (ctx) => {
          met "Dat bedrag kan niet". Het saldo bleef staan, de partner kon NOOIT
          uitbetaald krijgen, en elke nieuwe poging legde er weer een vast. Boven
          de grens betalen we in delen uit; wat overblijft, blijft staan. */
-      const c = Math.min(saldoVan(rek), MAX_CENTEN);
-      if (c <= 0) return { status: 400, error: 'Er staat niets om uit te betalen.' };
+      const vrij = ctx.waarde ? ctx.waarde.beschikbaar(rek, saldoVan(rek)) : saldoVan(rek);
+      const c = Math.min(vrij, MAX_CENTEN);
+      if (c <= 0) return { status: 400, error: 'Er staat niets beschikbaars om uit te betalen.',
+        saldo: saldoVan(rek), beschikbaar: vrij };
       /* Eerst afboeken, dan pas uitbetalen -- het stond andersom, dus de
          uitbetaling lag al vast terwijl de boeking nog kon weigeren. */
       const b = await boekAsync({ van: rek, naar: 'extern:uitbetaald', centen: c, soort: 'uitbetaling', oms: 'Uitbetaald naar de bank' });

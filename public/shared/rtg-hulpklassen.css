@@ -46,6 +46,12 @@
 /* een cel die de hele rasterbreedte pakt */
 .h-volbreed { grid-column: 1 / -1 !important; }
 
+/* een melding die opvalt zonder een eigen kaartsoort te worden: volle breedte
+   met een gouden rand. Bestond tot nu toe alleen als style="grid-column:1/-1;
+   border-color:var(--gold);" en stond zo op een stuk of tien plekken in de
+   zaak-app -- precies het soort herhaald attribuut waar dit bestand voor is. */
+.h-goudrand { grid-column: 1 / -1 !important; border-color: var(--gold, #857007) !important; }
+
 /* afstand naar boven; de naam draagt de waarde, zodat je hem niet hoeft op te
    zoeken en er geen tweede plek ontstaat waar hij anders staat */
 .h-mt0   { margin-top: 0 !important; }

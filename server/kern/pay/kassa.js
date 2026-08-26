@@ -7,7 +7,7 @@
    daar betaalt hij zelf. Krijgt de gedeelde ctx van kern/pay/index.js. */
 module.exports = (ctx) => {
   const { crypto, save, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
-    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, opdrachten, db,
+    metIdem, boekAsync, betaalUit, seintje, betaaldienstKosten, opdrachten, db,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
 
   /* De vergoedingenrij van de betaaldienst: wat is verschuldigd, en is het
@@ -49,7 +49,7 @@ module.exports = (ctx) => {
     if (!k || k.gebruikt || k.geldigTot < nu()) return null;
     return { maxCenten: k.maxCenten, geldigTot: k.geldigTot };
   }
-  async function kasInt({ supplierCode, code, centen, oms, idem }) {
+  async function kasInt({ supplierCode, code, centen, oms, idem, genre }) {
     const k = kascodes().find(x => x.code === String(code || '').toUpperCase().trim());
     if (!k || k.gebruikt || k.geldigTot < nu()) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
     const c = Math.round(Number(centen));
@@ -68,9 +68,13 @@ module.exports = (ctx) => {
       if (k.gebruikt || k.geldigTot < nu()) return { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
       k.gebruikt = true; save();
       const terug = (r) => { k.gebruikt = false; save(); return r; };
-      const z = await zorgSaldo({ codenaam: k.codenaam, centen: c, idem });
-      if (z.error) return terug(z);
-      const b = await boekAsync({ van: rekLid(k.codenaam), naar: rekPartner(supplierCode), centen: c, soort: 'kassa', oms: oms || 'Kassa', ref: k.code });
+      /* Betalen loopt sinds de waardelaag langs ./samen.js: heeft dit lid een
+         maaltijdbudget of een gemeentetegoed dat hier geldt, dan gaat dat er
+         eerst op en pas daarna zijn eigen geld. Het bijladen zit daarbinnen.
+         Heeft hij alleen een wallet -- verreweg het meest -- dan is dit exact
+         één boeking, precies zoals het was. */
+      const b = await betaalUit({ codenaam: k.codenaam, naar: rekPartner(supplierCode), centen: c,
+        genre: genre, oms: oms || 'Kassa', ref: k.code, idem, soort: 'kassa' });
       if (b.error) return terug(b);
       /* De kosten van de betaaldienst gaan DIRECT naar de ondernemer: per
          transactie meteen verrekend op de partnerrekening, als eigen regel in
@@ -98,14 +102,23 @@ module.exports = (ctx) => {
         if (kb.error) fees.mislukt(f, kb); else fees.geboekt(f, (kb.boeking || {}).id || null);
         kostenStatus = f ? f.status : null;
       }
+      /* Meteen apart zetten wat de zaak zelf heeft ingesteld (btw, loonreserve).
+         Bewust NA de kosten en bewust zonder de uitkomst te toetsen: het geld is
+         binnen, en een mislukte oormerking is een gemiste reservering en geen
+         verloren cent. De ontvangst laten mislukken omdat een voornemen niet
+         paste, zou de zaak een echte betaling kosten voor een administratief
+         detail. */
+      let apart = 0;
+      try { apart = (ctx.bijOntvangst(supplierCode, c - kosten) || {}).apart || 0; } catch (e) { apart = 0; }
       save();
       seintje(k.codenaam);
-      return { ok: true, centen: c, van: k.codenaam, kosten, kostenStatus };
+      return { ok: true, centen: c, van: k.codenaam, kosten, kostenStatus, apartGezet: apart, delen: b.delen, bijgeladen: b.bijgeladen || 0 };
     });
   }
 
-    /* fees gaat MEE naar de partnerkant in plaats van daar opnieuw te worden
-     opgebouwd: een vergoedingenrij hoort er een te zijn. */
+  /* De partnerkant staat in ./partner.js en niet hier: dit bestand ging anders
+     over de 10 kB-maat. `fees` gaat MEE in plaats van daar opnieuw te worden
+     opgebouwd -- een vergoedingenrij hoort er een te zijn. */
   const partner = require('./partner')(Object.assign({}, ctx, { fees }));
 
   return Object.assign({ kasCode, kasStand, kasInt }, partner);

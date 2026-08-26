@@ -19,7 +19,7 @@
    db, accounts en fonds kan meegeven. */
 module.exports = { maakSettlement };
 
-function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd, payOplaadAfronden }) {
+function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRegistreerBevestigd, payOplaadAfronden, payIbanBevestigd }) {
   return async function settleFactuur(ctx, betaling) {
   if (!ctx) return { status: 400, error: 'Settlementcontext ontbreekt.' };
   // Een rechtstreekse betaling aan een partner: pas na een geverifieerde
@@ -63,6 +63,24 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, dpRe
     try {
       const r = await payOplaadAfronden({ codenaam: ctx.codenaam, centen: betaling.centen, oms: ctx.oms, ref: betaling.id });
       if (r && r.error) { (log && log.error || console.error)('[settlement] oplading NIET bijgeschreven: ' + r.error, { id: betaling && betaling.id }); return r; }
+      /* HET BETALER-IBAN BEVESTIGEN, als de aanbieder het meestuurde. Heeft dit
+         lid dezelfde rekening als uitbetaalrekening ingesteld, dan is die
+         daarmee bewezen van hem en vervalt de wachttijd: hij haalt zijn geld
+         terug naar de rekening waarvandaan het kwam.
+
+         Dit ZET geen rekening -- het bevestigt er alleen een die het lid zelf
+         heeft ingevoerd (kern/pay/uitbetaalrekening.js weigert als het IBAN niet
+         overeenkomt). Zou een providerantwoord een bestemming kunnen aanmaken,
+         dan is een nagebootste melding genoeg om geld om te leiden.
+
+         Buiten de foutafhandeling van de boeking om, en met opzet: een mislukte
+         bevestiging is een gemiste versnelling, geen verloren cent. De oplading
+         laten mislukken omdat een comfortstap niet lukte, zou het lid zijn geld
+         kosten voor een detail. */
+      if (payIbanBevestigd && betaling.betalerIban && ctx.userId) {
+        try { payIbanBevestigd({ userId: ctx.userId, iban: betaling.betalerIban }); }
+        catch (e) { /* comfort, geen geld */ }
+      }
       return { ok: true };
     } catch (e) {
       (log && log.error || console.error)('[settlement] oplading NIET bijgeschreven: ' + e.message, { id: betaling && betaling.id });

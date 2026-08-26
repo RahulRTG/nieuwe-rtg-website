@@ -498,7 +498,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
            maakDispatchIndex, kandidaten, eersteNa) los van het AFHANDELEN
            (handle: de keten aflopen, fouten doorgeven, next). Het eerste is een
            gegevensstructuur met een eigen bewijslast, het tweede is gedrag. */
-    'server/kern/pay/index.js',
     'server/web/routing.js',
     /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
        ging erover zodra er een gemeten oorzaak bij de foutentabel kwam

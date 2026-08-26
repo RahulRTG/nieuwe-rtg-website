@@ -34,9 +34,23 @@ Object.assign(kern, bankregie);
 const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
   vergunning: bankregie.bankVergunning,
   partnerRails: bankregie.bankPartnerRails,
-  clearing: bankregie.bankClearing
+  clearing: bankregie.bankClearing,
+  /* De terugstortstand bepaalt WELK GEZICHT de vermogens WALLET_SALDO en
+     LID_UITBETALING hebben: gesloten circuit (een besluit, beperkt netwerk) of
+     inwisselbaar saldo (een rail met een e-geldvergunning). Een schakelaar die
+     de juridische positie verandert, hoort die verandering ook meteen in de
+     bevoegdheidsvraag te laten doorwerken -- anders is hij een manier om
+     eromheen te komen. */
+  terugstorting: bankregie.bankTerugstorting
 });
 kern.bevoegd = bevoegd;
+/* DE TERUGSTORTING AANSLUITEN OP DE BEVOEGDHEID. Sinds leden hun saldo kunnen
+   terugstorten is walletsaldo elektronisch geld (zie de kop van WALLET_SALDO in
+   kern/bevoegdheid/lijst.js), en die handeling mag alleen als LID_UITBETALING
+   open staat. Zonder deze regel vraagt niemand dat, en dan weigert
+   kern/pay/terug.js elke terugstorting -- dat is de veilige kant, maar het is
+   niet de bedoeling. Late binding, want bevoegdheid wordt na pay gemount. */
+if (kern.pay && kern.pay.koppelBevoegdTerug) kern.pay.koppelBevoegdTerug(id => bevoegd.mag(id));
 /* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
@@ -181,6 +195,15 @@ kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
    bestaan al voordat de bankregie is gebouwd, en tot dat moment geldt hun eigen
    standaard. */
 kern.pay.koppelPlafond(() => bankregie.bankPlafonds().walletCenten);
+/* EN DE WAARDELAAG LEEST HETZELFDE GETAL. kern/waarde/klassen.js droeg voor
+   PERSONAL_FUNDED een eigen plafondCenten, en dat liep meteen uit de pas: de
+   boardroom verzette het walletplafond naar 10.000 en die laag weigerde nog
+   steeds op 5.000, met een melding die een ander bedrag noemde dan het scherm
+   van het lid. Twee waarheden over hetzelfde getal is precies wat LAT.md
+   regel 4 verbiedt. */
+if (kern.waarde && typeof kern.waarde.koppelWalletPlafond === 'function') {
+  kern.waarde.koppelWalletPlafond(() => bankregie.bankPlafonds().walletCenten);
+}
 kern.puntenKoppelPlafond(() => bankregie.bankPlafonds().puntenCenten);
 /* De geldnaden (cutover-reconcile en de late binding van het fonds aan de bank)
    staan in ./kern-geldnaden.js: dit deel liep over de 10 kB-grens. Ze horen

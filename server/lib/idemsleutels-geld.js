@@ -39,18 +39,43 @@ const SLEUTELS = {
   /* ---- zet een stand: tweemaal hetzelfde is eenmaal die stand ---- */
   'POST /api/geld/grens/zet': { zelfdeVerzoek: true },              // de grens zelf
   'POST /api/geld/grens/weg': { velden: ['id'] },                   // welke grens weg moet
-  'POST /api/pay/rekening': { zelfdeVerzoek: true },                // iban + naam
   'POST /api/office/bank/terugstorting': { zelfdeVerzoek: true },   // open of gesloten
   'POST /api/supplier/pay/treasury/zet': { zelfdeVerzoek: true },   // de inrichting
 
-  /* ---- legt geld vast of laat het los; de handeling draagt zijn eigen id ---- */
-  'POST /api/pay/terug': { zelfdeVerzoek: true },                   // bedrag + rekening
-  'POST /api/supplier/pay/budget': { zelfdeVerzoek: true },         // aan wie + hoeveel
+  /* ---- laat los; de handeling is haar eigen id ---- */
   'POST /api/supplier/pay/treasury/apart': { zelfdeVerzoek: true }, // doel + bedrag
   'POST /api/supplier/pay/treasury/vrij': { velden: ['id'] },       // welke pot vrij
-  'POST /api/supplier/pay/vooraf': { zelfdeVerzoek: true },         // code + maximum
-  'POST /api/supplier/pay/vastleg': { velden: ['reservering'] },    // welke reservering
   'POST /api/supplier/pay/vrijgeef': { velden: ['reservering'] },   // welke reservering
+
+  /* ---- DE ROUTES MET EEN EIGEN SLEUTEL, en dit is de belangrijkste alinea van
+     dit bestand. Ze dragen `idem` in hun body -- en `idem` staat in
+     BUITEN_AFDRUK (./idem-kast.js), dus de poort ziet juist het veld NIET dat
+     twee verzoeken uit elkaar houdt. Voor hem zijn twee bewuste terugstortingen
+     van tien euro hetzelfde verzoek, en dan speelt hij het eerste antwoord
+     terug.
+
+     Dat is geen doublure maar een gat, en het is hier gemeten: met
+     `zelfdeVerzoek` op /api/pay/terug kwam een 200 van een eerdere terugstorting
+     terug op een verzoek dat 409 hoorde te zijn -- de wachttijd na een gewijzigd
+     IBAN, precies de maatregel die een accountovername moet stoppen. Twee
+     toetsen in payterug.test.js vielen erover, en op main staan ze groen.
+
+     De poort hoort hier dus NIETS te doen. De eigen sleutel van de route is de
+     bescherming, en die is fijner dan wat de poort kan zien. */
+  'POST /api/pay/terug': { nietIdempotent: true,
+    waarom: 'de route draagt een eigen idem-sleutel; twee terugstortingen van hetzelfde bedrag met een ANDERE sleutel zijn twee bewuste opdrachten, en de poort ziet die sleutel niet' },
+  'POST /api/supplier/pay/budget': { nietIdempotent: true,
+    waarom: 'eigen idem-sleutel; twee gelijke budgetten met een andere sleutel zijn twee toekenningen' },
+  'POST /api/supplier/pay/vooraf': { nietIdempotent: true,
+    waarom: 'eigen idem-sleutel; twee pre-autorisaties op dezelfde code zijn twee reserveringen' },
+  'POST /api/supplier/pay/vastleg': { nietIdempotent: true,
+    waarom: 'eigen idem-sleutel; een tweede vastlegging hoort de weigering van de kern te krijgen en niet het antwoord van de eerste' },
+
+  /* En het zetten van een rekening: een herhaling ZET DE KLOK OPNIEUW, dus zij
+     heeft een ander gevolg dan de eerste. Samenvouwen zou "terugzetten naar het
+     oude IBAN" gratis maken -- de omweg waar de wachttijd juist voor is. */
+  'POST /api/pay/rekening': { nietIdempotent: true,
+    waarom: 'een herhaalde rekeningwijziging start de wachttijd opnieuw; samenvouwen zou terugzetten naar een oud IBAN de wachttijd laten omzeilen' },
 };
 
 module.exports = { SLEUTELS };

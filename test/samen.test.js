@@ -44,7 +44,7 @@ test('1. een lid start een samen-sessie en een vriend doet mee met de code', asy
 test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SSE-seintje komt live binnen', async () => {
   // B luistert op de stroom; A stuurt de kamer naar de Mall
   const events = [];
-  let zagHello = false; let eerste = '';
+  let zagHello = false; let eerste = ''; let reden = '';
   const es = await fetch(base + '/api/stream?token=' + encodeURIComponent(B));
   /* DE VOORWAARDE EERST, en dat is met schade geleerd. /api/stream antwoordt
      401 met een LEGE body, en de rem hieronder 429 met een korte. In beide
@@ -86,8 +86,9 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
       buf += dec.decode(value);
       if (!eerste) eerste = buf.slice(0, 120);
       if (buf.includes('hello')) { zagHello = true; meldOpen(); }
-      if (buf.includes('event: samen')) { events.push(buf); break; }
+      if (buf.includes('event: samen')) { events.push(buf); reden = 'seintje'; break; }
     }
+    if (!reden) reden = 'lijn dicht of tijd op';
     meldOpen();   // ook als de lijn dichtging: nooit blijven hangen
   })();
   await open;
@@ -97,7 +98,14 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
   await leesEven;
   try { await lezer.cancel(); } catch (e) {}
   assert.ok(zagHello, 'de stroom sloot voordat de server B als luisteraar kende; eerste bytes: ' + JSON.stringify(eerste));
-  assert.ok(events.length && /"kind":"kijk"/.test(events[0]) && /mall\.html/.test(events[0]), 'B kreeg het kijk-seintje live');
+  /* DE ONTVANGEN BYTES HOREN IN DE MELDING. Zonder ze zegt deze toets alleen
+     "B kreeg het seintje niet", en dat is drie verschillende oorzaken tegelijk:
+     geen seintje, een seintje met andere inhoud, of een lijn die dichtging. In
+     CI zakt hij binnen 33 ms terwijl de tijdgrens 15 seconden is -- dus kwam er
+     WEL iets. Wat, dat hoort de melding te zeggen. */
+  assert.ok(events.length && /"kind":"kijk"/.test(events[0]) && /mall\.html/.test(events[0]),
+    'B kreeg het kijk-seintje live (einde: ' + reden + ', hello gezien: ' + zagHello +
+    ', ontvangen: ' + JSON.stringify((events[0] || eerste).slice(0, 400)) + ')');
   // en wie later binnenkomt ziet het in de staat
   const staat = await api(base, '/api/samen/staat', { code }, B);
   assert.equal(staat.body.kamer.pad, '/apps/mall.html');

@@ -103,11 +103,9 @@ module.exports = function maakBasis() {
   }
   router.use(express.json({ limit: '4mb' }));
 
-  /* De kostenpoort van de RTFoundation: wie draagt de kosten van dit verzoek.
-     De derde poort, naast die van de leden (opzet/diensten2.js) en die van de
-     zaken (opzet/leverancierpoort.js). In een eigen bestandje om dezelfde reden
-     als kern/aipoort.js: zo is de BESLISSING te beproeven zonder een server op
-     te starten, en hier ook omdat dit bestand anders over de omvangsgrens gaat. */
+  /* De kostenpoort van de RTFoundation: de derde, naast die van de leden en de
+     zaken. In een eigen bestandje zoals kern/aipoort.js, zodat de beslissing te
+     beproeven is zonder server. */
   router.use(require('./kostenpoort')({ db }));
 
   function F() {

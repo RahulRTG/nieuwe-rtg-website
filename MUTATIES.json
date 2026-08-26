@@ -2537,6 +2537,13 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "kosten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
     "kruisscan.test.js": {
       "soort": "puur",
       "staat": "gezakt",

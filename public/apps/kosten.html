@@ -48,15 +48,18 @@
   td.getal,th.getal{text-align:right;white-space:nowrap;}
   .schuif{overflow-x:auto;}
   code{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:var(--gold);}
-  .springlink{position:absolute;left:-999rem;top:0;}
-  .springlink:focus{left:.5rem;top:.5rem;z-index:20;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .8rem;}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
     border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
 </style>
 </head>
 <body>
 
-<a class="springlink" href="#main">Naar de inhoud</a>
+<!-- Geen eigen springlink: shared/basis.js zet er al een neer op elk scherm dat
+     hem laadt, met de juiste maat. Hier stond er wel een, en de a11y-keuring wees
+     hem meteen aan: 116x20 op telefoonformaat, onder de 24x24 van WCAG 2.5.8 --
+     en erger, hij ONDERDRUKTE de gedeelde versie, want basis.js laat de zijne weg
+     zodra de pagina er zelf al een heeft. Een eigen kopie van een gedeelde
+     voorziening is hier dus niet alleen dubbel maar slechter. -->
 
 <header>
   <a class="knop stil" href="/apps/boardroom.html">&larr; Boardroom</a>

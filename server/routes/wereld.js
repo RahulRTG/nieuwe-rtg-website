@@ -45,6 +45,7 @@ module.exports = (kern) => {
   const { app, auth, db, save, liveCodename, codenaamVan, zijnVrienden, keyVanCodenaam,
     gidsHaal, openVacatures, anthropic } = kern;
   const rechten = require('../kern/wereld/rechten');
+  const lidmaatschap = require('../kern/lidmaatschap');
   const koppel = require('../kern/wereld/koppel');
   const { feed } = require('../kern/wereld/feed')({ db, codenaamVan, zijnVrienden });
   const profiel = require('../kern/wereld/profiel')({ db, zijnVrienden });
@@ -87,6 +88,8 @@ module.exports = (kern) => {
       return res.status(403).json({ error: 'RTG Wereld is er voor leden met een pas.' });
     res.json({
       ik: { codenaam: liveCodename(req.session) || 'Een lid', pas: tier },
+      lidmaatschap: lidmaatschap.voorSessie(req.session),
+      lenzen: lidmaatschap.lenzenVoor(tier),
       modus: mijnModus(req),
       modi: rechten.modiVoor(tier),
       lagen: rechten.lagenVoor(tier),

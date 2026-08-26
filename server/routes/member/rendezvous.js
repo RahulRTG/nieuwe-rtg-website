@@ -1,5 +1,5 @@
-/* Member-submodule: Rendez-vous -- de besloten AI-datingapp van de Lifestyle Pass.
-   Gated op de Lifestyle Pass (Business erft mee). De logica woont in
+/* Member-submodule: Rendez-vous -- de besloten AI-datingapp voor Signature.
+   Lifestyle en Business zijn beide Signature. De logica woont in
    kern/rendezvous.js. Gemount vanuit routes/member.js.
 
    HIER STAAT ALLEEN DE PAS-EIS. Welke pas toegang geeft is een productkeuze en
@@ -19,7 +19,7 @@ module.exports = (kern) => {
      doorkomt, strandt alsnog op de kernpoort. */
   function eis(req, res) {
     if (!['lifestyle', 'business'].includes(req.session.tier)) {
-      res.status(403).json({ code: 'PASS_REQUIRED', error: 'Rendez-vous is onderdeel van de Lifestyle Pass.' });
+      res.status(403).json({ code: 'PASS_REQUIRED', error: 'Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass.' });
       return false;
     }
     const account = req.session.account && accounts.getUserById(req.session.account.id);

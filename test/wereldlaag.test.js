@@ -69,6 +69,12 @@ test('de gratis pas krijgt Lifestyle en Communities, maar Business blijft dicht'
   const st = await json(await post('/api/wereld/state', {}, g.token));
 
   assert.equal(st.ik.pas, 'rtg');
+  assert.equal(st.lidmaatschap.status.id, 'verified', 'RTG Pass is de Verified-memberclass');
+  assert.equal(st.lidmaatschap.pas.naam, 'RTG Pass');
+  assert.equal(st.lidmaatschap.identiteit.id, 'pending',
+    'een net account krijgt niet ten onrechte een afgeronde identiteitscontrole');
+  assert.deepEqual(st.lenzen.filter(l => l.open).map(l => l.id), ['friends', 'travel', 'events']);
+  assert.deepEqual(st.lenzen.filter(l => !l.open).map(l => l.id), ['dating', 'business']);
   const open = st.modi.filter(m => m.open).map(m => m.id);
   assert.deepEqual(open.sort(), ['alles', 'genootschap', 'lifestyle', 'prive'],
     'precies deze vier staan open voor de gratis pas');
@@ -88,6 +94,8 @@ test('Lifestyle en Business krijgen alle vijf de werelden', async () => {
     const l = await lid(naam, mail, pas);
     const st = await json(await post('/api/wereld/state', {}, l.token));
     assert.equal(st.ik.pas, pas);
+    assert.equal(st.lidmaatschap.status.id, 'signature', pas + ' is een Signature-membership');
+    assert.equal(st.lenzen.filter(x => x.open).length, 5, pas + ' heeft alle vijf de lenzen');
     assert.equal(st.modi.filter(m => m.open).length, 5, pas + ' heeft alle vijf de werelden');
     assert.equal((await post('/api/wereld/modus', { modus: 'business' }, l.token)).status, 200);
   }

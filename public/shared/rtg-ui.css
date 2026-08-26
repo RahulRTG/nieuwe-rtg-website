@@ -423,6 +423,17 @@ body.rtg-stijl [role="button"].hoofd{
   body.rtg-stijl [role="button"].hoofd{
     width:100%;max-width:100%;flex:1 1 100%;
   }
+  /* EN DE RIJ MOET DAN OOK KUNNEN WRAPPEN, anders is de zin hierboven niet waar.
+     De uitzondering verderop zegt van de smalle schermen: "de rij wrapt, het
+     veld pakt de volle breedte en de knop valt eronder". Dat is precies het
+     goede gedrag -- maar het gebeurt alleen als de rij het MAG. Op
+     /apps/comm.html staat `.zoekrij` op nowrap, en daar werd de "+"-knop 337
+     breed naast een zoekveld van 28: de rij liep buiten haar eigen vak en de
+     knop stond op x 391 van 375, zonder schuifbalk en zonder foutmelding.
+     Gemeten in de browser: met wrap staat diezelfde knop op 356 en krijgt het
+     veld zijn volle breedte terug. De regel die de knop breed maakt, hoort dus
+     zelf te zorgen dat er plek voor is. */
+  .rtg-duimeind{flex-wrap:wrap;}
 
   /* TWEE UITZONDERINGEN, EN ALLEBEI MET EEN NAAM ERBIJ IN PLAATS VAN EEN GOK.
 

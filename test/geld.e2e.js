@@ -12,7 +12,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, stopHard } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -125,7 +125,14 @@ test('RTG Geld: elf standen openen, wisselen schoon, en de oude paden leiden om'
     assert.deepEqual(echteFouten, [], 'RTG Geld hoort zonder consolefouten te draaien');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    /* WACHTEN TOT HET PROCES ECHT WEG IS, en dan pas wissen. Hier stond
+       `child.kill()` met de rmSync er direct achter: het signaal is verstuurd,
+       maar de server heeft de datamap dan nog vast en schrijft zijn sqlite nog
+       dicht. Het wissen viel daarop om met ENOTEMPTY -- een zakker in de
+       opruiming, niet in het onderwerp, en dus een die niets zegt over RTG
+       Geld. stopHard() wacht op `exit`; dat is het teken (zie de kop bij
+       stopHard in ./helper.js, waar dezelfde gok eerder is opgeruimd). */
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

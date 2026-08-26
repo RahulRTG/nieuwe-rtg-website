@@ -156,18 +156,25 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     /* 3. het verzoek oppakken */
     assert.match(beeld.nu + beeld.open, /gebarsten/, 'het verzoek van de gast staat er');
-    const gaan = await page.$('[data-stand="opgepakt"]');
-    assert.ok(gaan, 'er staat een knop "Ik ga"');
-    await gaan.click();
+    /* EEN VERWIJZING EN GEEN VASTE HANDLE, en dat is met schade geleerd bij de
+       knop hieronder. `page.$()` levert een handle naar DIT element; pakt de
+       PDA een taak op, dan hertekent hij de kaart en is dat element weg. De
+       klik komt dan uit op iets wat niet meer in het document staat
+       ("Element is not attached to the DOM"). Een locator zoekt op het moment
+       van klikken opnieuw en wacht tot het element stabiel is -- dat is precies
+       wat een scherm doet dat zichzelf hertekent. */
+    const gaan = page.locator('[data-stand="opgepakt"]');
+    assert.ok(await gaan.count(), 'er staat een knop "Ik ga"');
+    await gaan.first().click();
     // oppakken hertekent de kaart met de naam van wie het heeft: dat is het teken
     await wachtOpTekst(page, /U heeft dit opgepakt/);
     beeld = await lees();
     assert.match(beeld.nu + beeld.open, /U heeft dit opgepakt/, 'na oppakken staat er wie het heeft');
 
     /* 6. oppakken van een gang vinkt niets af */
-    const pak = await page.$('[data-pak]');
-    assert.ok(pak, 'er staat een knop om de gang te dragen');
-    await pak.click();
+    const pak = page.locator('[data-pak]');
+    assert.ok(await pak.count(), 'er staat een knop om de gang te dragen');
+    await pak.first().click();
     /* Opgepakt betekent dat "Ik draag hem" plaatsmaakt voor "Loslaten" (pda-taak.js).
        Staat [data-pak] er nog, dan is de claim niet verwerkt -- en dan zou de vraag
        aan de server hieronder een oude stand lezen. Op de tekst "U heeft dit

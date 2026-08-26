@@ -70,7 +70,8 @@ function maakVonk({ db, save, crypto, schoon, accounts, leeftijdVan, codenaamVan
   }
   const publiek = (key, p, zelf) => ({ codenaam: codenaamVan(key), over: p.over, leeftijd: p.leeftijd,
     stad: p.stad, interesses: p.interesses, ...(zelf ? { geslacht: p.geslacht, zoekt: p.zoekt,
-      leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax, maxKm: p.maxKm, actief: p.actief } : {}) });
+      leeftijdMin: p.leeftijdMin, leeftijdMax: p.leeftijdMax, maxKm: p.maxKm, actief: p.actief,
+      afstandActief: isFinite(p.lat) && isFinite(p.lng) } : {}) });
 
   /* ---- de dagselectie: eindig en wederzijds passend ---- */
   function pastBij(a, b) { // valt b binnen de wensen van a?

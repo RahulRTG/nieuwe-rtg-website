@@ -143,6 +143,15 @@ function sleutelVoor(methode, pad) {
   return SLEUTELS[String(methode || '').toUpperCase() + ' ' + String(pad || '')] || null;
 }
 
+/* EERST SAMENVOEGEN, DAN PAS NAKIJKEN -- en die volgorde was fout. De lus
+   hieronder stond VOOR deze regel, dus hij liep alleen over de lijst in dit
+   bestand: het werelden-deel werd nooit gecontroleerd, en een `nietIdempotent`
+   zonder reden was daar dus gewoon toegestaan. Een controle die niet over alles
+   loopt is geen controle. */
+Object.assign(SLEUTELS,
+  require('./idemsleutels-werelden').SLEUTELS,
+  require('./idemsleutels-geld').SLEUTELS);
+
 /* De verklaring nakijken bij het laden: een `nietIdempotent` zonder reden is
    geen verklaring maar een ontsnapping, en een lege veldenlijst zegt niets. */
 for (const [sleutel, v] of Object.entries(SLEUTELS)) {
@@ -153,7 +162,5 @@ for (const [sleutel, v] of Object.entries(SLEUTELS)) {
   if (!v.nietIdempotent && !v.zelfdeVerzoek && !v.velden && !v.leest)
     throw new Error('idemsleutels: "' + sleutel + '" verklaart niets');
 }
-
-Object.assign(SLEUTELS, require('./idemsleutels-werelden').SLEUTELS);
 
 module.exports = { SLEUTELS, sleutelVoor, VENSTER_MS };

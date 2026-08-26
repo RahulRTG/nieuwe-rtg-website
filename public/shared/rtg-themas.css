@@ -32,7 +32,13 @@
   --rtg-grond:var(--pearl-glans);
   --rtg-txt:var(--op-pearl);
   --rtg-muted:#34322F;                 /* 8,24:1 op de ergste champagne-grond */
-  --rtg-soft:#52514F;                  /* 6,98:1 op parelmoer, 4,61 op het lichtste vlak */
+  /* De zachte toon is hier geijkt tegen de DONKERSTE dagkleurwas, niet tegen
+     de tint van vandaag: op champagne ademt --dag-kleur over de grond, en een
+     nachttint over pearl-diep drukte de vorige waarde (#52514F) naar 4,31 --
+     gemeten door de CI-runner, die toevallig in een ander dagdeel stond dan
+     deze machine. Nagerekend over alle zestien tinten op alle drie de
+     glansstops: ergste 4,63, kale basis 9,12. */
+  --rtg-soft:#41403E;
   --rtg-line:var(--pearl-rand);
   --rtg-card:rgba(255,255,255,0.42);
   --rtg-card2:rgba(255,255,255,0.70);

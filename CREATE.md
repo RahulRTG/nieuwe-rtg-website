@@ -17,6 +17,26 @@ naam erop zet, `ARCHITECTUUR.md` waar de dingen staan.
 
 ---
 
+## De hoofdregel
+
+Alles in dit document hangt aan één zin, en die zin is er gekomen nadat een
+eerdere versie van dit plan bijna acht zelfstandige makers tot één technische
+familie had uitgeroepen:
+
+> **RTG Create verenigt vindbaarheid, identiteit, publiceren, bewijs en de
+> makerservaring — nooit domeinbetekenis zonder gemeten overlap.**
+
+Create maakt de ERVARING uniform, niet noodzakelijk de implementatie. Dat
+onderscheid is geen nuance maar de hele architectuur: het is het verschil tussen
+een laag die het huis samenhang geeft en een laag die vier werkende producten
+tot één gemiddelde vermaalt.
+
+De kortste vorm ervan, en meteen de belofte aan een maker:
+
+> *RTG voelt als één platform zonder te doen alsof alles erin hetzelfde is.*
+
+---
+
 ## 0. Wat dit document is, en de vier bakken
 
 Net als `PLATFORM.md` en `DEVELOPERCLOUD.md` noemt dit stuk niet alleen de
@@ -31,13 +51,58 @@ verlanglijst; hier staat alles in vier bakken:
 | **jaren weg** | het is een eigen project met een eigen bewijslast |
 
 **Wat in de laatste twee bakken staat, hoort nergens als knop op een scherm te
-verschijnen.** Dat is dezelfde regel als in DEVELOPERCLOUD.md par. 0, en hij
-geldt hier extra: een makerslaag die dingen belooft die er niet zijn, wordt door
+verschijnen.** Een makerslaag die dingen belooft die er niet zijn, wordt door
 makers als eerste doorgeprikt.
 
 ---
 
-## 1. De vier routes die er vandaag al zijn
+## 1. De grondwet van Create
+
+Zeven regels. Ze gaan over hoe een mens dit huis ervaart en niet over hoe het
+van binnen is gebouwd — dat is precies waarom ze in dit document staan en niet
+in `ARCHITECTUUR.md`. Bij elke regel staat wat hem vandaag handhaaft, en waar
+dat nog niemand is, staat dat er ook.
+
+**CREATE-01 — Elke maker is bereikbaar vanaf één maakvlak.**
+Eén ingang met één vraag: *wat wil je maken?* Geen keuze vooraf tussen
+webontwikkelaar, appbouwer of automatiseerder. *Handhaver: nog niets — dit is
+het eerste dat gebouwd moet worden.*
+
+**CREATE-02 — Een gedeeld scherm betekent geen gedeelde domeinbetekenis.**
+Twee makers onder dezelfde ingang delen daarmee geen datamodel, geen opslag en
+geen werkstroom. *Handhaver: `PLATFORM.md` par. 0b, en de meting uit par. 3
+hieronder.*
+
+**CREATE-03 — Een gedeeld model vraagt gemeten semantische overlap.**
+Niet een gedeelde naam, niet een gedeeld gevoel: een meting. *Handhaver:
+`scripts/objectmodel.js` en `OBJECTMODEL.json` hebben dit al een keer gedaan en
+`Asset` daarmee tegengehouden; `scripts/makers.js` moet het voor de makers doen.*
+
+**CREATE-04 — Eenvoudig maken toont alleen veilige standaarden.**
+Wie op niveau 1 begint, kan niets kiezen dat hem later in de problemen brengt.
+Diepte is beschikbaar, niet verplicht. *Handhaver: de Website-maker doet dit al
+— beeld komt uit eigen bronnen, adressen worden geschoond, grenzen zijn gerekend.*
+
+**CREATE-05 — Professionele diepte komt erbij zonder migratie.**
+Een project dat op niveau 1 begon, gaat naar 2, 3 en 4 zonder opnieuw te
+beginnen en zonder van identiteit te wisselen. *Handhaver: nog niets voor apps;
+voor websites is dit aantoonbaar (zie par. 3).*
+
+**CREATE-06 — Publiceren is altijd een uitdrukkelijke handeling.**
+Niets komt naar buiten omdat er iets is bewaard. *Handhaver: `managerOnly` op de
+zaakkant, `kern/webmaker-publiceren.js`, het menselijke besluit in
+`kern/appstore/besluit.js`.*
+
+**CREATE-07 — De AI stelt voor; een mens legt vast waar het productcontract dat
+eist.**
+*Handhaver: `kern/webmaker-ai.js` slaat niets op, `kern/onderneming/ontwerper.js`
+schrijft niets weg, `kern/appstore/besluit.js` weigert een handtekening van de
+uitgever zelf. De grens zelf staat in `CLAUDE.md` (de AI belooft nooit toegang)
+en `GELD.md` par. 3 (klaarzetten is de bovengrens).*
+
+---
+
+## 2. De vier routes die er vandaag al zijn
 
 Dit is de reden dat dit document bestaat. Er is hier geen lege developer cloud;
 er zijn **vier verschillende manieren waarop iemand vandaag iets op RTG maakt**,
@@ -56,14 +121,11 @@ en Mall-bouwer, Magnaat Partnerstudio, de creator-laag.
 Wat er dus al is: creëren, publiceren, distribueren, verkopen, isoleren,
 white-labelen, AI-assistentie, rechten, menselijke review en een business master
 record. Wat er niet is, is **de ervaring waarmee iemand die kracht prettig
-gebruikt** — en dat is precies waar de aandacht heen moet.
+gebruikt.**
 
 ---
 
-## 2. De regel die beslist of dit één familie mag worden
-
-Dit is de belangrijkste paragraaf in dit document, en hij komt niet uit een
-mening maar uit een fout die hier al een keer is gemaakt.
+## 3. Waarom dit een laag is en geen samensmelting
 
 `PLATFORM.md` par. 0b stelt de toetsvraag bij alles wat "erbij" of "eraf" moet:
 
@@ -75,61 +137,87 @@ mening maar uit een fout die hier al een keer is gemaakt.
 
 Die regel is er gekomen na Cercle en Entourage: twee apps die identiek KLONKEN
 en bij onderzoek totaal verschillende data en werkstromen bleken te hebben.
-Dezelfde meting is later herhaald over de hele codebase (`scripts/objectmodel.js`,
-`OBJECTMODEL.json`): van 1140 bewaarde vormen in 216 domeinen horen **1179 van de
-1661 velden (71%) bij precies één domein**, en `Asset` bestaat niet — tafel,
-kamer, podium en leaseauto delen niets buiten hun verpakking.
+Dezelfde meting is later herhaald over de hele codebase: van 1140 bewaarde
+vormen in 216 domeinen horen **1179 van de 1661 velden (71%) bij precies één
+domein**, en `Asset` bestaat niet.
 
-**RTG Create is daarom een LAAG en geen samensmelting.** Dat onderscheid is niet
-semantisch:
+De formule die daaruit volgt, geldt voor heel Create:
 
-- *Een laag erboven* betekent: één ingang ("wat wil je maken?"), één
-  projectbegrip, één publicatiemodel, één bewijsrecord — en daaronder blijven
-  Lesmaker, Clips en de Website-maker hun eigen kern, data en workflow houden.
-- *Samensmelten* betekent: één codebase, één datamodel. Dat mag alleen waar de
-  toetsvraag met "andere ingang naar dezelfde capability" wordt beantwoord.
+> **Gedeelde ingang, zelfstandig domein.**
 
-En dat is aantoonbaar niet overal zo. Twee voorbeelden uit deze codebase:
+Create → Nieuw → Les opent de Lesmaker. Zelfde ingang, zelfde identiteit,
+mogelijk dezelfde publicatiestroom — en daarachter een eigen model dat niemand
+in een vreemde taal probeert te drukken.
 
-- **Website-maker en Website-studio delen wél een kern.** Allebei draaien ze op
-  dezelfde bloktaal, en de studio zet sjablonen in een etalage die de maker als
-  startpunt leest. De maker kent er veertien (`kern/webmaker-schoon.js`), de
-  studio tien (`kern/atelierweb.js`) — de vier extra zijn `zaakdata`,
-  `formulier`, `faq` en `prijzen`, en dat is geen andere taal maar een
-  bovenverzameling: de studio maakt sjablonen en heeft geen live bedrijfsblok
-  nodig. Twee ingangen naar dezelfde capability. Samenvoegen mag.
-- **Lesmaker en Clips-studio delen niets.** De Lesmaker maakt lesstof met een
-  klascode, een leraar die elke vraag zelf start en lessen die na zes uur
-  verlopen. Clips knipt video die **het toestel van de maker nooit verlaat** —
-  daar valt niets te renderen omdat RTG het beeld niet heeft. Dat zijn twee
-  zelfstandige capabilities met een gedeeld woord ("studio") en verder niets.
+### Waar de overlap wél bewezen is
 
-### Wat er dus eerst gemeten moet worden
+**Website-maker en Website-studio delen een kern.** Allebei draaien ze op
+dezelfde bloktaal; de studio zet sjablonen in een etalage die de maker als
+startpunt leest. Twee ingangen naar dezelfde capability. Samenvoegen mag.
+
+### En daarbinnen loopt de naad ergens anders dan hij lijkt
+
+Het ligt voor de hand om de veertien bloktypen van de maker te lezen als *tien
+consumentenblokken plus vier zakelijke*. **Dat klopt niet, en het verschil is
+belangrijk genoeg om er een developer-oppervlak op te bouwen of juist niet.**
+Gemeten in `kern/webmaker-schoon.js` en `kern/webplatform.js` zijn er drie
+klassen:
+
+| klasse | blokken | wat het is |
+|---|---|---|
+| **inhoud** | hero, kop, tekst, knop, beeld, kolommen, galerij, citaat, ruimte, voettekst, faq, prijzen (12) | wat de maker zelf invult; staat er zoals hij het achterliet |
+| **view** | `zaakdata` (1) | wijst een BRON aan en wordt bij elk bezoek opgelost uit het zaakprofiel |
+| **handeling** | `formulier` (1) | doet iets, en bestaat alleen als er een ONTVANGER is |
+
+`faq` en `prijzen` zijn dus geen zakelijke blokken — een lid dat iets verkoopt,
+gebruikt ze net zo goed. Het enige echt zakelijke blok is `zaakdata`, en dat is
+ook het enige blok dat een tweede waarheid raakt.
+
+Twee gedragingen die daaruit volgen en die precies de "views, geen kopieën"-wet
+zijn:
+
+- Een `zaakdata`-blok op een site zonder zaak **valt stil weg** in plaats van als
+  lege doos te blijven staan — behalve `bron: 'salon'`, want Salonbeeld is van
+  het huis en niet van een zaak, en lost dus ook op een ledensite op.
+- Een pagina die alléén live blokken droeg en waarvan niets overbleef,
+  **verdwijnt uit de site**. Anders staat "Werken bij ons" in de navigatie van
+  een zaak zonder vacatures, en dat is een deur naar een lege kamer. Pagina's die
+  de maker zelf vulde blijven altijd staan, ook leeg — die laten verdwijnen zou
+  hem overvallen.
+- Een `formulier` zonder ontvanger wordt niet getoond, want anders is het een
+  knop die stilletjes niets doet.
+
+**Dat is de juiste indeling voor een `rtg.web.blocks`-oppervlak.** Een blok van
+een derde zou moeten verklaren tot welke klasse het hoort, en de derde klasse —
+een blok dat iets DOET — is precies waar machtigingen aan hangen. Een indeling in
+consument/zakelijk had die vraag nooit gesteld.
+
+### Wat er eerst gemeten moet worden
 
 Voordat er een familie wordt uitgeroepen, hoort dezelfde meting te draaien die
-par. 2 van DEVELOPERCLOUD.md al een keer heeft gedaan — nu over de makers:
+`scripts/objectmodel.js` al een keer heeft gedaan — nu over de makers
+(`scripts/makers.js`). Per maker: objectmodel, opdrachten, opslagmodel,
+publicatiemodel, machtigingen, levensloop, gedeelde taal. Envelop eraf, dan pas
+vergelijken.
 
-1. haal per maker de vorm op van wat hij bewaart (een site, een les, een clip,
-   een mallprofiel, een partnerbedrijf);
-2. trek de envelop eraf (`id`, `naam`, `at`, `status` — de 35 velden die
-   `OBJECTMODEL.json` al als verpakking heeft aangewezen);
-3. tel wat er overblijft.
+Uitkomst in de vorm waarin je hem kunt gebruiken:
+
+```
+Website-maker  ↔ Website-studio    gedeelde kern: JA
+Lesmaker       ↔ Website-studio    gedeelde kern: NEE
+Clips          ↔ Lesmaker          gedeelde kern: NEE
+```
 
 **Wat vier makers delen, is een projectmodel. Wat er twee delen, is een
-toevalligheid met een mooie naam.** Zonder die meting is "Universal Project" een
-aanname over gedeelde vorm, en dat is exact de aanname die hier al een keer fout
-is geweest.
-
-Het gereedschap ervoor bestaat al; er hoeft geen methode te worden bedacht,
-alleen een script (`scripts/makers.js`) dat `scripts/objectmodel.js` volgt.
+toevalligheid met een mooie naam.** Pas na die meting mogen gedeelde abstracties
+ontstaan — dezelfde discipline waarmee `Asset` is voorkomen.
 
 ---
 
-## 3. De ladder
+## 4. De ladder
 
-Vier niveaus, één onderliggende software. Dit is de belofte, en hij is
-controleerbaar: **hetzelfde project moet door alle vier de ingangen te bekijken
-zijn.**
+Vier niveaus, één onderliggende software. De belofte is controleerbaar:
+**hetzelfde project moet door alle vier de ingangen te bekijken zijn.**
 
 | niveau | wat de mens doet | wat er vandaag al voor staat |
 |---|---|---|
@@ -138,61 +226,79 @@ zijn.**
 | **3 — Studio** | schrijft code: SDK, CLI, schema's, events | niets — dit is fase 4 van DEVELOPERCLOUD.md |
 | **4 — Engineering** | teams, omgevingen, uitrol, governance | `kern/tenant/`, SSO, SCIM, het bewijsmodel |
 
-De ladder is niet vier producten maar één trap: een kapper begint op 1, huurt
-later een ontwerper in die op 2 werkt, dan een bureau dat op 3 zit, en groeit
-door naar 300 vestigingen op 4 — met de merkenlaag die uitrolt. **Zonder
-platformmigratie.** Dat is de sterkste claim in dit document en tegelijk de
-duurste: hij is pas waar als niveau 3 bestaat.
+### De Website-maker is de eerste volledige demonstrator
+
+Niet omdat websites het belangrijkst zijn, maar omdat de overlap daar **bewezen**
+is en de ladder er dus vandaag al bijna helemaal staat:
+
+| | wat een mens daar doet | staat het? |
+|---|---|---|
+| amateur | blokken slepen, kleuren kiezen | ja |
+| AI | "maak het luxer", "voeg een pagina voor bruiloften toe" | ja — en het bewaart niets, de mens bevestigt |
+| professioneel | het ontwerpbureau beheert sjablonen in de Studio | ja |
+| ontwikkelaar | eigen blokken via `rtg.web.blocks` | nee — dit is het eerste echte stukje niveau 3 |
+| enterprise | merkuitrol over honderden vestigingen | ja |
+
+Eén ontbrekend blokje in een verder complete ladder is een veel beter eerste
+doelwit dan een generieke app-bouwer. **Maak dit het referentieproduct van
+Create**, en de belofte "start simple, never outgrow RTG" is te demonstreren in
+plaats van te beweren.
 
 ---
 
-## 4. Wat er STAAT
+## 5. Wat er STAAT
 
-Niet als inschatting; per punt het bestand dat het doet.
+Per punt het bestand dat het doet.
 
 - **Isolatie.** Derdencode in een naamloze herkomst, eigen CSP, `connect-src
   'none'`, integriteit bij elke lezing — `routes/appstore/cel.js`.
 - **Machtigingen met een doel.** Drie machtigingen, elk met een gesloten lijst
-  doelen; een machtiging zonder doel wordt geweigerd — `kern/appstore/machtigingen.js`,
-  `manifest.js`.
+  doelen; een machtiging zonder doel wordt geweigerd — `kern/appstore/machtigingen.js`.
 - **De vergunningsdiff.** Een versie die meer vraagt, vraagt opnieuw —
   `kern/appstore/besluit.js`.
 - **De brug.** Zes methodes, en de brug leest wat het lid VERLEENDE, niet wat het
   manifest vroeg — `kern/appstore/brug.js`.
 - **Grenzen die gerekend worden en niet vertrouwd.** 32 sleutels, 4 kB per
-  waarde, 64 kB totaal, 5 berichten per dag, 120 aanroepen per minuut — `GRENS`.
+  waarde, 64 kB totaal, 5 berichten per dag, 120 aanroepen per minuut.
 - **Een poort die uitlegt.** Per bestand én per regel wat er is en hoe het wél
   kan — `kern/appstore/keuring.js`, `verboden.js`.
-- **Een proefkeuring.** Dezelfde poort, niets bewaard, geen rem —
-  `kern/appstore/versies.js`.
+- **Een proefkeuring.** Dezelfde poort, niets bewaard, geen rem.
 - **Onveranderlijke bundels.** Hash in het pad, immutable, integriteit per
   lezing — `kern/appstore/bundel.js`.
 - **Geld.** Prijs in het manifest, btw in het land van het lid, afdracht,
-  payout, teruggaverecht — `kern/appstore/geld.js`, `kern/pay/verkoop.js`.
+  payout, teruggaverecht.
 - **Publiceren met een weg terug.** Versiegeschiedenis, herstellen, plannen,
-  spoor — `kern/webmaker-versies.js`, `-plan.js`, `-spoor.js`.
-- **Views in plaats van kopieën.** Live zaakdata-blokken die bij het openen uit
-  het profiel worden opgelost — `kern/webplatform.js`.
+  spoor.
+- **Views in plaats van kopieën.** Live zaakdata-blokken, opgelost bij bezoek.
 - **Enterprise.** SAML, OIDC, SCIM, contract, quota, uitgang, bewijspoort.
 - **Het inkoopdossier.** Per bewering een bron in de code, plus een blok "wat dit
-  dossier NIET zegt" — `kern/appstore/dossier.js`.
+  dossier NIET zegt".
 
 ---
 
-## 5. Een stap weg
+## 6. Een stap weg
 
 De onderdelen staan; wat ontbreekt is de schil. Dit is fase 4 van
-DEVELOPERCLOUD.md, met de doorrekening.
+DEVELOPERCLOUD.md, doorgerekend.
 
 1. **Eén brugklant, één CSP.** Ze staan nu als string-literal in
    `routes/appstore/cel.js` (regel 43 en 77). Een CLI die ze kopieert, maakt een
    tweede brug — LAT-regel 4. Verhuizen naar `kern/appstore/brugklant.js`.
 2. **Eén foutmodel — en het is nu kapot.** `brug.js` geeft bij een weigering vier
-   velden terug (`machtiging`, `verleend`, `gevraagd`, `hoe`) die precies
-   uitleggen of de app het niet vroeg, het lid het niet gaf, of het lid het
-   introk. `appcel.html:133` maakt er `new Error(d.error)` van, `:179` stuurt
-   alleen `err.message` terug, `cel.js:81` maakt er opnieuw een kale string van.
-   **Dat zorgvuldig geschreven antwoord bereikt vandaag niemand.**
+   velden terug (`machtiging`, `verleend`, `gevraagd`, `hoe`). `appcel.html:133`
+   maakt er `new Error(d.error)` van, `:179` stuurt alleen `err.message` terug,
+   `cel.js:81` maakt er opnieuw een kale string van. **Dat antwoord bereikt
+   vandaag niemand.** Het doel is niet een code maar een taal:
+
+   ```
+   RTG_PERMISSION_PURPOSE_MISMATCH
+   operation:         bericht.zet
+   allowed_purpose:   klaar-melden
+   requested_purpose: marketing
+   retryable:         false
+   ```
+
+   met de mensentekst ernaast: *deze machtiging bestaat, maar niet voor dit doel.*
 3. **`rtg check`.** `keur()` is al puur (`{bestanden, manifest, antivirus}`, geen
    db, geen sessie), dus een CLI kan de echte poort requiren in plaats van hem na
    te bouwen. Eén obstakel: zonder virusscanner geeft `keur()` `door: false`, wat
@@ -203,33 +309,51 @@ DEVELOPERCLOUD.md, met de doorrekening.
    die op de server default `true` blijft.
 4. **`rtg dev` draait de ECHTE brug.** `maakBrug()` heeft alleen
    `{S, save, nu, boek, eigen}` nodig; een in-memory `S()` levert de echte brug
-   met de echte grenzen. Een emulator die de regels nábouwt liegt vroeg of laat
-   over precies de grens waarop een app stukloopt. Deze voert ze uit.
-5. **SDK en typings, gegenereerd.** Uit `METHODES` + `machtigingen.js`, met een
-   toets die zakt als er een methode bij komt zonder hergeneratie.
+   met de echte grenzen. Een emulator die de regels nábouwt, liegt vroeg of laat
+   over precies de grens waarop een app stukloopt.
+
+   **En hij doet nooit alsof een ontbrekende capability bestaat.** Lokaal
+   `rtg.notifications.send()` laten werken terwijl productie hem met opzet niet
+   kent, is de duurste vorm van behulpzaamheid die er is. De emulator antwoordt
+   woordelijk zoals productie antwoordt:
+
+   ```
+   Capability niet beschikbaar
+   Reden:     Een derde mag een bericht KLAARZETTEN, maar het toestel
+              van een lid niet onderbreken.
+   Wel:       bericht.klaarzetten
+   ```
+
+   Nee, plus waarom, plus de veilige route.
+5. **SDK en typings, gegenereerd** uit `METHODES` + `machtigingen.js`, met een
+   toets die zakt als er een methode bij komt zonder hergeneratie. De SDK is een
+   **getypeerde projectie van de bewezen architectuur** — dus `rtg.profile.basic`
+   en `rtg.messages.prepare`, en géén `rtg.assets` zolang dat begrip niet bestaat.
 6. **`rtg new`.** Vraagt wat je maakt, niet welk configbestand je wilt.
 
-Volgorde: 1 → 2 → 3 → 4 → 5 → 6. Punt 2 vóór 5, want je codificeert geen
-foutmodel dat onderweg wordt weggegooid. Punt 1 vóór 4, want anders is *"werkt
-lokaal, geblokkeerd in de cel"* het eerste wat een uitgever meemaakt.
+### `NIET_GEBOUWD` wordt documentatie
+
+De meeste platforms documenteren alleen wat bestaat. Dit huis heeft al een lijst
+van wat er met opzet níét is, mét de reden (`kern/appstore/machtigingen.js`).
+Die hoort in de ontwikkelaarsdocumentatie te staan onder zijn eigen kop —
+**Bewust niet beschikbaar** — met per regel: status, reden, het beschikbare
+alternatief, en de voorwaarde waaronder het ooit wél kan.
+
+Dat is geen zwaktebod maar het tegendeel: het laat zien dat een ontbrekende API
+geen vergeten werk is. En het is het enige eerlijke antwoord op de vraag die
+iedere ontwikkelaar toch stelt.
 
 ---
 
-## 6. Vraagt een besluit
+## 7. Vraagt een besluit
 
-Zes punten die kunnen, maar die een bestaande belofte of grens raken. Ze horen
-een besluit van de eigenaar te krijgen in plaats van stilletjes de ene of de
-andere kant op te vallen.
-
-### 6.1 Ontwikkelen zonder eerst bedrijf te zijn
+### 7.1 Ontwikkelen zonder eerst bedrijf te zijn
 
 Vandaag loopt inzenden via `supplierAuth`, en de uitgeversplek eist een
 organisatie: *"Een app in de officiële App Store heeft een aanspreekbare
-rechtspersoon achter zich"* (`routes/appstore/uitgever.js`). Een student met een
-goed idee komt er dus niet in.
+rechtspersoon achter zich."* Een student met een goed idee komt er dus niet in.
 
-De uitweg is een ladder van identiteiten, en die botst niet met TENANT.md zolang
-er geen vijfde identiteitsbegrip bij komt:
+De uitweg is een ladder van identiteiten, zonder een vijfde identiteitsbegrip:
 
 | niveau | mag |
 |---|---|
@@ -238,185 +362,204 @@ er geen vijfde identiteitsbegrip bij komt:
 | **commercieel** | betaald distribueren (rechtspersoon, bank, fiscaal) |
 | **enterprise** | teams, SSO, SCIM |
 
+> **Bouw vrij; publiceer naar risico.**
+
 **Het besluit zit op de tweede regel, niet op de eerste.** Bouwen en lokaal
 draaien vragen geen enkele identiteit — dat kan morgen, want `rtg check` en
 `rtg dev` raken de server niet. Maar zodra code van een natuurlijk persoon voor
-een LID draait, staat er geen aanspreekbare partij meer achter, en dat is precies
-wat APPSTORE.md met opzet heeft dichtgezet.
+een LID draait, staat er geen aanspreekbare partij meer achter.
 
-### 6.2 De capabilities die vandaag met een reden NIET bestaan
+### 7.2 De capabilities die vandaag met een reden NIET bestaan
 
-Een lijst als `calendar.read`, `payments.request`, `location.approximate`,
-`files.pick`, `notifications.send` leest als een routekaart. Vijf ervan staan
-vandaag in `machtigingen.NIET_GEBOUWD` **met een reden**, en die redenen zijn
+Vijf staan in `machtigingen.NIET_GEBOUWD` **met een reden**, en die redenen zijn
 geen achterstand:
 
 | gevraagd | wat er nu staat |
 |---|---|
-| `payments.request` | geld verlaat het huis nooit vanzelf (GELD.md par. 3); er is geen weg waarlangs een lid een betaling van een derde bevestigt |
-| `calendar.read` | er is geen leesweg naar de agenda die een codenaam niet terugvoert op een mens — een afspraaktitel bevat namen |
-| `files.pick` | de bestandenlaag kent delen per persoon en per zaak, niet per app; een vierde deelmodel maakt "wie mag hierbij" op twee plekken beantwoordbaar (LAT-regel 4) |
+| `payments.request` | geld verlaat het huis nooit vanzelf (GELD.md par. 3) |
+| `calendar.read` | er is geen leesweg die een codenaam niet terugvoert op een mens — een afspraaktitel bevat namen |
+| `files.pick` | de bestandenlaag kent delen per persoon en per zaak, niet per app; een vierde deelmodel is LAT-regel 4 |
 | `location.approximate` | zolang er geen intrekbare, zichtbare en tijdgebonden vorm van staat, komt er geen ruwe vorm van |
 | `notifications.send` | **push onderbreekt.** Een derde krijgt geen kanaal dat een telefoon laat trillen |
 
-De laatste is geen technische schuld maar een merkbesluit, en hij staat haaks op
-`notifications.send` als capability. `bericht.klaarzetten` bestaat juist omdat
-het de niet-onderbrekende vorm is: de app legt het bericht neer, het lid haalt
-het op.
+De laatste is geen technische schuld maar een merkbesluit.
+`bericht.klaarzetten` bestaat juist als de niet-onderbrekende vorm.
 
 **Elke capability die erbij komt, komt erbij door zijn reden op te lossen — niet
-door hem op een lijst te zetten.** Een regel in `NIET_GEBOUWD` verdwijnt pas als
-de brug hem uitvoert.
+door hem op een lijst te zetten.**
 
-### 6.3 Uitgaand netwerk, connectors, en eigen backend
+### 7.3 Uitgaand netwerk, connectors, en eigen backend
 
-`connect-src 'none'` is vandaag strenger dan een hostlijst, en dat is geen
-voorzichtigheid maar een andere aankoop: *zolang een app niets kan versturen,
-hoeft niemand te bewaken wát hij verstuurt.* DEVELOPERCLOUD.md par. 3.1 raadt aan
-dat zo te houden zolang de capability-poort het werk kan doen.
+`connect-src 'none'` is strenger dan een hostlijst, en dat is een andere
+aankoop: *zolang een app niets kan versturen, hoeft niemand te bewaken wát hij
+verstuurt.* Connectors met een expliciete uitgaande binding (welke partij, welk
+land, welke dataklasse, welke toestemming) zijn de juiste vorm als het toch moet;
+"Bring Your Own Backend" is diezelfde beslissing in zijn duurste vorm, want dan
+is de uitgaande weg de normale weg. **Eén besluit met twee gezichten.**
 
-Connectors met een expliciete uitgaande binding (welke partij, welk land, welke
-dataklasse, welke toestemming) zijn de juiste vorm als het toch moet — en "Bring
-Your Own Backend" is diezelfde beslissing in zijn duurste vorm, want dan is de
-uitgaande weg de normale weg. Beide vragen een uitgaande proxy met logging per
-verzoek. **Dit is één besluit met twee gezichten, geen twee features.**
+### 7.4 Agents als publiceerbaar producttype
 
-### 6.4 Agents als publiceerbaar producttype
+Een inkoopagent met `purchase.draft` en zonder `payment.execute` is exact
+"klaarzetten", en dat is de bovengrens die GELD.md par. 3 al trekt. Wat een
+besluit vraagt is niet de agent maar zijn **duur**: tijdelijk, begrensd,
+intrekbaar, met een spoor. Een agent met een permanente machtiging is het niet.
 
-Het gekozen voorbeeld valt precies goed en dat is het vermelden waard: een
-inkoopagent met `purchase.draft` en zonder `payment.execute` is exact
-"klaarzetten", en dat is de bovengrens die GELD.md par. 3 al trekt. De
-vier-niveautabel bestaat dus al (kijken / voorstellen / klaarzetten /
-automatisch), en DEVELOPERCLOUD.md par. 3.2 legt hem naast observe / assisted /
-autonomous.
+### 7.5 Private apps via entitlements
 
-Wat een besluit vraagt is niet de agent maar zijn **duur**: een tijdelijke,
-begrensde, intrekbare bevoegdheid met een spoor is de vorm waarin dit kan. Een
-agent met een permanente machtiging is het niet.
+De private catalogus is geweigerd omdat hij zou vragen welk LID bij welke
+ORGANISATIE hoort — een antwoord dat hier al twee keer bestaat (CONCERN.md,
+TENANT.md). Een derde lezing erbij is LAT-regel 4.
 
-### 6.5 Private catalogus via entitlements — de sterkste vondst
+**Entitlements lossen dat op zonder derde register.** De catalogus vraagt niet
+*waar werkt deze persoon* maar *heeft deze actor entitlement X*, en de
+identiteitslaag blijft gezaghebbend. Interne apps worden mogelijk zonder de
+privacyarchitectuur te breken.
 
-DEVELOPERCLOUD.md weigert de private catalogus vandaag met een reden: hij vraagt
-te weten welk LID bij welke ORGANISATIE hoort, en dat antwoord bestaat al twee
-keer (het dienstverband uit CONCERN.md, de SSO-inrichting uit TENANT.md). Een
-derde lezing erbij is LAT-regel 4.
+Het patroon is breder toepasbaar — `site.template.luxury`, `app.beta.8271`,
+`developer.preview` — maar dat is een tweede stap, en CREATE-03 geldt ook hier:
+één distributiemechanisme mag pas als de semantiek aantoonbaar dezelfde is.
 
-**Entitlements lossen dat op zonder een derde register.** De App Store vraagt dan
-niet "bij welke organisatie hoort deze mens", maar krijgt uit de identiteitslaag
-alleen `entitlement: app.internal.1234`. Geen directory, geen kopie, geen derde
-bron van waarheid — en interne apps worden mogelijk zonder de privacyarchitectuur
-te breken.
+### 7.6 De afdracht
 
-Dit is het patroon dat dit huis wil: **een nieuwe functie door een betere
-capabilitygrens, niet door een datakopie.** Van alles in deze paragraaf is dit
-het punt met de beste verhouding tussen waarde en risico.
-
-### 6.6 De afdracht
-
-Staat vandaag op 0%, en dit huis belooft partners "RTG rekent 0% commissie".
-Elke marketplace-economie hierboven (onderdelen, thema's, workflows, agents)
-gaat ervan uit dat er iets te verdelen valt. Van 0% naar iets is een verandering
-van een bestaande belofte en hoort zo te worden opgeschreven.
+Staat op 0%, en dit huis belooft partners "RTG rekent 0% commissie". Elke
+marketplace-economie hierboven gaat ervan uit dat er iets te verdelen valt. Van
+0% naar iets is een verandering van een bestaande belofte.
 
 ---
 
-## 7. Jaren weg
+## 8. Jaren weg
 
-Eigen project, eigen bewijslast, en het hoort niet als knop op een scherm.
-
-- **Serverside functies, cron, background jobs, managed data, realtime.** Vandaag
-  draait derdencode uitsluitend in de browser van het lid. Zodra
-  `onOrderCreated(event)` bij ons draait, verandert het dreigingsmodel volledig:
-  procesisolatie, resourcelimieten, buurmanlekken, uitbraak, en een
-  aanvalsoppervlak dat 24 uur per dag aan staat. Dat is niet een feature erbij
-  maar RTG dat een hostingbedrijf wordt (DEVELOPERCLOUD.md par. 3.4).
-- **Er is één ding dat hiervóór moet, en het is gemeten.** `IDEMPROEF.json`:
-  van 3074 routes met een rol zijn er **115 beoordeeld, 15 beschermd, 100
-  onbeschermd en 2959 ongemeten.** Het bestand zegt er zelf bij dat
-  "onbeschermd" een telling is en geen defect-oordeel — maar dat is precies het
-  punt: **het getal dat ertoe doet is 2959.** Achtergrondtaken met retries
-  bovenop een laag waarvan de herhaalbaarheid grotendeels ongemeten is,
-  vermenigvuldigt een bestaand gat in plaats van een nieuwe functie te leveren.
-  Retry-semantiek is dus geen los punt maar een voorwaarde.
-- **SDK's in vijf talen uit één contract.** Zinvol zodra het contract er is; niet
-  ervoor.
-- **Visuele app-bouwer en conversation-to-app.** Dit is niveau 1 en 2 voor apps
-  in plaats van sites. De Website-maker bewijst dat het patroon werkt; de sprong
-  zit in wat een app IS zonder eigen runtime.
+- **Serverside functies, cron, jobs, managed data, realtime.** Vandaag draait
+  derdencode uitsluitend in de browser van het lid. Zodra `onOrderCreated(event)`
+  bij ons draait, verandert het dreigingsmodel volledig. Eigen document, eigen
+  bewijslast (DEVELOPERCLOUD.md par. 3.4).
+- **Event-platform voor derden.** Eerst de envelop (par. 10), dan pas abonneren.
+- **SDK's in vijf talen uit één contract.** Zinvol zodra het contract er is.
+- **Visuele app-bouwer en conversation-to-app.** Niveau 1 en 2 voor apps in
+  plaats van sites. De Website-maker bewijst het patroon; de sprong zit in wat
+  een app IS zonder eigen runtime.
 
 ---
 
-## 8. Drie aannames die de code niet steunt
+## 9. Drie aannames die de code niet steunt
 
-Deze staan hier apart omdat ze de volgorde veranderen, en omdat een plan dat
-leunt op iets wat er niet is, het duurst is op het moment dat iemand erop bouwt.
+Deze staan apart omdat ze de volgorde veranderen, en omdat een plan dat leunt op
+iets wat er niet is, het duurst is op het moment dat iemand erop bouwt.
 
-### 8.1 Magnaat is een leerspel, geen testharnas
+### 9.1 Magnaat is een leerspel — en hoort uit de ontwikkelaarsroute
 
 `kern/magnaatwereld.js` opent met: *"een spelopdracht roept NOOIT een
 productie-endpoint aan. Elke functie wordt vertaald naar een trainingskopie met
 synthetische data."* Magnaat is een kantoor- en ondernemersgame waarin een MENS
-oefent met RTG-functies — trainingslobby, werkroutes, economenlab,
-partnerstudio. Er zit geen motor in die een app van derden met 100.000
-synthetische gebruikers bestookt.
+oefent — trainingslobby, werkroutes, economenlab, partnerstudio.
 
-"Test in Magnaat" is dus geen integratie van iets bestaands maar een nieuwe
-engine met een bekende naam. **Wat er wél staat, staat ergens anders:**
-`scripts/aanval.js` (een aanvalsronde tegen een draaiende server, mét de
-eerlijke kanttekening dat het geen onafhankelijke pentest is),
-`scripts/chaos.js` (een server omleggen en meten of de rest het overneemt) en
-`scripts/beproeving.js`. "Break My App" hoort daar te beginnen, niet in Magnaat.
+**Er zit geen motor in die een app van derden met synthetische gebruikers
+bestookt, en die naam hoort dus niet in de ontwikkelaarsroute.** "Test in
+Magnaat" zou semantisch misleidend zijn: het belooft een testomgeving en levert
+een leerspel.
 
-### 8.2 De keuring kijkt niet naar toegankelijkheid
+De twee begrippen blijven daarom strikt uit elkaar:
+
+| | wat het is |
+|---|---|
+| **Magnaat** | de spel- en trainingswereld, voor mensen |
+| **RTG Forge** | de geautomatiseerde beproevingsomgeving, voor software |
+
+De naam Forge is van de eigenaar en mag veranderen; **de scheiding niet.** Wat er
+al staat om Forge mee te beginnen, staat er echt: `scripts/aanval.js` (een
+aanvalsronde tegen een draaiende server, mét de eerlijke kanttekening dat het
+geen onafhankelijke pentest is) en `scripts/chaos.js` (een server omleggen en
+meten of de rest het overneemt). Daar hoort `rtg break` te beginnen — niet in
+Magnaat. Magnaat kan later scenario's aanleveren; het is niet dezelfde motor.
+
+### 9.2 De keuring kijkt niet naar toegankelijkheid
 
 `kern/appstore/keuring.js` controleert bestandssoort, budget, verboden vormen,
-externe verwijzingen en de virusscan. Meer niet. De a11y-machinerie van dit huis
-(`scripts/a11y.js`, `test/a11ykeuring.test.js`, `TOEGANKELIJK.md`) draait over
-**onze eigen 258 schermen** en heeft nooit een derdenbundel gezien.
+externe verwijzingen en de virusscan. Meer niet. De a11y-machinerie
+(`scripts/a11y.js`, `test/a11ykeuring.test.js`) draait over onze eigen schermen
+en heeft nooit een derdenbundel gezien.
 
-Een toegankelijkheidsscore in de keuring is dus nieuw werk — verdedigbaar werk,
-want de poort die per regel uitlegt hoe het wél kan is er al en dit past er
-precies in. Maar het is bouwen, geen zichtbaar maken.
+**Bouw daar geen tweede stack voor.** Wat ontbreekt is een adapter: derdenbundel
+→ gerenderd testoppervlak → de bestaande machinerie → bewijs bij de app. Dan
+wordt een machine die er al staat breder inzetbaar, en past het naadloos in een
+poort die toch al per regel uitlegt hoe het wél kan.
 
-### 8.3 Er is geen Economic Control Plane
+### 9.3 Er is geen kostenvlak
 
-Er is geen laag die kosten per app, per gebruiker of per functie bijhoudt.
-Wat er is: `scripts/duurzaamheidskosten.js` (wat een duurzame commit kost, één
-meting), `kern/servicekosten.js` en `kern/pasprijs.js` (prijzen van RTG-diensten
-aan leden), en `kern/magnaat-economie.js` — dat laatste is de spel-economie.
-
-Kostenvoorspelling per deployment is daarmee niet "ons bestaande vlak
-aansluiten" maar een nieuw meetvlak. Het is een goed idee en waarschijnlijk een
-echte differentiator; het is alleen geen stap weg.
+Er is geen laag die kosten per app, per gebruiker of per functie bijhoudt. Wat er
+is: `scripts/duurzaamheidskosten.js` (één meting), `kern/servicekosten.js` en
+`kern/pasprijs.js` (prijzen aan leden), en `kern/magnaat-economie.js` (de
+spel-economie). Kostenvoorspelling per uitrol is een nieuw meetvlak — een goed
+idee, maar geen stap weg.
 
 ---
 
-## 9. De volgorde
+## 10. Mutatiesemantiek: geclassificeerd, niet idempotent
 
-Wat eerst moet, is wat de rest mogelijk maakt — niet wat het aantrekkelijkst is.
+`IDEMPROEF.json` meet wat er gebeurt als een route twee keer wordt aangeroepen:
+van **3074 routes met een rol** zijn er **115 beoordeeld, 15 beschermd, 100
+onbeschermd en 2959 ongemeten**. Het bestand zegt er zelf bij dat "onbeschermd"
+een telling is en geen defect-oordeel — en dat is juist. Het getal dat ertoe doet
+is 2959.
 
-| | wat | waarom hier |
+**Maar het doel is niet 3074 van 3074 idempotent. Het doel is 3074 van 3074
+geclassificeerd.** Een mutatie mag bewust niet veilig herhaalbaar zijn; dat moet
+alleen uitgesproken zijn, zodat de SDK, de taakloper, de client en een
+werkstroommotor weten wat ze ermee moeten.
+
+Zes klassen:
+
+| klasse | betekenis |
+|---|---|
+| `IDEMPOTENT` | herhalen is gratis |
+| `IDEMPOTENCY_KEY_REQUIRED` | herhalen mag mét sleutel |
+| `AT_MOST_ONCE` | nooit automatisch herhalen |
+| `COMPENSATABLE` | herhalen mag, terugdraaien bestaat |
+| `NON_REPEATABLE` | herhalen is per definitie een tweede gebeurtenis |
+| `UNKNOWN` | niet vastgesteld |
+
+En de poort die het bruikbaar maakt: **`UNKNOWN` is verboden voor elke nieuwe
+publiek aanroepbare ontwikkelaarsopdracht.** Niet met terugwerkende kracht over
+2959 routes — dat is jarenlang werk — maar vanaf nu, aan de rand waar het
+ontwikkelaarsplatform begint. Zo groeit de dekking mee met wat naar buiten gaat,
+in plaats van dat een megaproject vooraf moet slagen.
+
+Dit is de reden dat cron, jobs en functies in bak vier staan: retries bovenop een
+laag waarvan de herhaalbaarheid grotendeels ongemeten is, vermenigvuldigen een
+bestaand gat in plaats van een functie te leveren.
+
+### De envelop deelt vorm, geen betekenis
+
+Hetzelfde principe geldt voor gebeurtenissen, en het is precies CREATE-02 in zijn
+technische vorm. Eén envelop — `event_id`, `type`, `schema_version`, `actor`,
+`subject`, `organization`, `purpose`, `occurred_at`, `correlation_id`,
+`causation_id`, `classification`, `source`, `payload` — en daarbinnen betekent
+`website.published` iets totaal anders dan `message.prepared`. **De envelop is
+verpakking; de payload is domein.** Dat is dezelfde scheiding die
+`OBJECTMODEL.json` al maakte toen hij 35 velden als envelop aanwees.
+
+---
+
+## 11. De volgorde
+
+| | fase | wat |
 |---|---|---|
-| **1** | de makersmeting (`scripts/makers.js`) | beslist of "één familie" een laag of een samensmelting is, vóórdat er code op die aanname staat |
-| **2** | brugklant + CSP los, foutmodel heel | vier bestanden; alles hierna leunt erop |
-| **3** | `rtg check` (met de derde uitslag) | grootste winst per regel, en vraagt geen inlog |
-| **4** | `rtg dev` op de echte brug | de ontbrekende lokale ervaring |
-| **5** | SDK, typings, `rtg new` | pas zinvol als 2 t/m 4 staan |
-| **6** | ontwikkelaarsidentiteit (niveau individueel) | opent de deur voor wie geen zaak is; het besluit uit 6.1 hoort hier |
-| **7** | entitlements → interne apps | de beste verhouding waarde/risico van alles in par. 6 |
-| **8** | retry-semantiek over de gemeten routes | voorwaarde voor alles in par. 7, niet een punt erna |
-| **9** | console, observability, kostenvlak | zodra er iets draait dat waargenomen moet worden |
-| **10** | runtime (functies, jobs, data) | eigen document, eigen bewijslast |
+| **P0** | corrigeren | makersmeting (`scripts/makers.js`); capabilityterminologie vastzetten; de gebeurtenisenvelop; mutatieclassificatie met `UNKNOWN` verboden aan de rand |
+| **P1** | de ingang voor ontwikkelaars | individuele ontwikkelaarsidentiteit; brugklant + CSP los; het foutmodel heel; `rtg check`; `rtg dev`; SDK en typings; `rtg new` |
+| **P2** | zichtbaarheid | console; documentatie inclusief *bewust niet beschikbaar*; machtigingenverkenner; logs en traces; toegankelijkheid in de derdenkeuring |
+| **P3** | distributie | private apps via entitlements; previews en beta; de vergunningsdiff als uitgave-primitief; snellere review waar het risico dat toelaat |
+| **P4** | RTG Forge | `aanval.js` + `chaos.js` tot één beproevingshal; app-gerichte adversariële tests; replay; regressiebewijs |
+| **P5** | serverside platform | functies, jobs, cron, managed state, gecontroleerd netwerk — pas als P0's mutatieclassificatie het draagt |
 
-**Stap 1 kost het minst en beslist het meest.** Elke stap daarna is
-omkeerbaar; het projectmodel is dat niet.
+**P0 kost het minst en beslist het meest.** Elke stap daarna is omkeerbaar; het
+projectmodel en de gebeurtenistaal zijn dat niet.
 
 ---
 
-## 10. Wat dit document niet is
+## 12. Wat dit document niet is
 
 Geen toezegging dat alles hierboven wordt gebouwd, en geen volgorde die vastligt
-buiten par. 9. Wat het wel is: de plek waar de vier bestaande makersroutes voor
+buiten par. 11. Wat het wel is: de plek waar de vier bestaande makersroutes voor
 het eerst als één ding worden beschreven, mét de grenzen die ze al hebben.
 
 De drie beloftes eronder mogen pas op een scherm staan als ze waar zijn:

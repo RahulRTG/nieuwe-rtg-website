@@ -185,19 +185,28 @@ niet uit die meting komt.
 ontwikkelaar maar de hele ladder van amateur tot enterprise, over de vier
 makersroutes die dit huis al heeft (Website-maker, Website Platform, App Store,
 tenant). Lees die vóór je iets aan een maker, een projectbegrip of een
-publicatiestroom verandert. De harde regel staat in paragraaf 2 en komt niet uit
-een mening maar uit Cercle en Entourage: **RTG Create is een laag erboven en geen
-samensmelting.** De toetsvraag van PLATFORM.md par. 0b beslist per maker welke
-van de twee het is, en waar het antwoord niet vaststaat wordt het **gemeten**
-zoals `scripts/objectmodel.js` dat deed — niet aangenomen. Website-maker en
-Website-studio delen aantoonbaar een kern (dezelfde bloktaal); Lesmaker en
-Clips-studio delen alleen een woord. Par. 8 staat er even groot bij: drie dingen
-die in zo'n plan makkelijk voor bestaand worden aangezien en het niet zijn —
-Magnaat is een leerspel en geen testharnas, de App Store-keuring kijkt niet naar
-toegankelijkheid, en er is geen kostenvlak. En één getal dat de volgorde bepaalt:
-van 3074 routes met een rol zijn er 115 beproefd op herhaalbaarheid en 2959
-ongemeten (`IDEMPROEF.json`), dus retry-semantiek is een voorwaarde voor
-achtergrondwerk en niet een punt erna.
+publicatiestroom verandert. Alles hangt aan één zin: **Create verenigt
+vindbaarheid, identiteit, publiceren, bewijs en de makerservaring — nooit
+domeinbetekenis zonder gemeten overlap.** Create maakt de ervaring uniform, niet
+de implementatie; de formule is *gedeelde ingang, zelfstandig domein*. Daaruit
+volgt de grondwet CREATE-01 t/m 07 in par. 1, met bij elke regel wie hem
+handhaaft en waar dat nog niemand is. De toetsvraag van PLATFORM.md par. 0b
+beslist per maker of samenvoegen mag, en waar het antwoord niet vaststaat wordt
+het **gemeten** zoals `scripts/objectmodel.js` dat deed — niet aangenomen.
+Website-maker en Website-studio delen aantoonbaar een kern; Lesmaker en
+Clips-studio delen alleen een woord. Let in par. 3 op de bloktaal: de naad loopt
+niet tussen consument en zakelijk maar tussen **inhoud (12), view (`zaakdata`) en
+handeling (`formulier`)** — een blok dat iets DOET is precies waar machtigingen
+aan hangen, en een indeling in consument/zakelijk had die vraag nooit gesteld.
+Par. 9 staat er even groot bij: drie dingen die makkelijk voor bestaand worden
+aangezien en het niet zijn — **Magnaat is een leerspel voor mensen en hoort niet
+in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
+ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
+App Store-keuring kijkt niet naar toegankelijkheid, en er is geen kostenvlak. En
+par. 10 draait één aanname om die vaak fout gaat: van 3074 routes met een rol
+zijn er 115 beproefd op herhaalbaarheid en 2959 ongemeten (`IDEMPROEF.json`),
+maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
+`UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
